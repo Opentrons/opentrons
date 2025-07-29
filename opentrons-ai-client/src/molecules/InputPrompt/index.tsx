@@ -80,7 +80,6 @@ export function InputPrompt(): JSX.Element {
 
   const [requestId, setRequestId] = useState<string>(uuidv4())
 
-  // Use custom hook for file attachments
   const {
     attachedFiles,
     fileError,
@@ -123,8 +122,10 @@ export function InputPrompt(): JSX.Element {
     isUpdateOrCreateRequest: boolean = false,
     isRegenerateRequest: boolean = false
   ): Promise<void> => {
-    const newRequestId =
-      uuidv4() + getPreFixText(isUpdateOrCreateRequest, isNewProtocol)
+    const newRequestId = `${uuidv4()}${getPreFixText(
+      isUpdateOrCreateRequest,
+      isNewProtocol
+    )}`
     setRequestId(newRequestId)
     const currentProtocolFormat = detectProtocolFormat(
       watchUserPrompt,
@@ -134,12 +135,11 @@ export function InputPrompt(): JSX.Element {
     // Prepare files for upload - use multipart for efficiency
     let validatedFiles: File[] = []
     if (attachedFiles.length > 0 && !isUpdateOrCreateRequest) {
-      try {
-        validatedFiles = prepareFilesForUpload()
-      } catch (fileError: unknown) {
-        // Error is already set in the hook
-        return // Don't proceed with chat if file validation fails
+      const files = prepareFilesForUpload()
+      if (files === null) {
+        return // Validation failed, error already shown to user
       }
+      validatedFiles = files
     }
 
     const userInput: ChatData = {
@@ -160,7 +160,7 @@ export function InputPrompt(): JSX.Element {
                 id: uuidv4(),
                 name: file.name,
                 type: fileType,
-                content: '', // Content will be uploaded via multipart
+                content: '', // Empty for multipart uploads, populated by backend
               }
             })
           : undefined,
@@ -169,121 +169,116 @@ export function InputPrompt(): JSX.Element {
     clearFiles() // Clear attached files and errors after sending
     setChatData(chatData => [...chatData, userInput])
 
-    try {
-      const headers = {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    }
+
+    const url = isUpdateOrCreateRequest
+      ? getCreateOrUpdateEndpoint()
+      : getChatEndpoint()
+
+    const promptData = getUpdateOrCreatePrompt(
+      isNewProtocol,
+      createProtocol,
+      updateProtocol,
+      isRegenerateRequest,
+      detectProtocolFormat(
+        isNewProtocol ? createProtocol.prompt : updateProtocol.prompt
+      )
+    )
+
+    // Build a complete history array that preserves file attachments in their original messages.
+    // This allows the backend to construct proper conversation history with files in the right context.
+    const completeHistory = chatHistory.map(msg => {
+      const baseMessage = {
+        role: msg.role,
+        content: msg.content,
+        attachments: msg.attachments || [], // Keep attachments with their original messages
       }
 
-      const url = isUpdateOrCreateRequest
-        ? getCreateOrUpdateEndpoint()
-        : getChatEndpoint()
+      // Handle Protocol Designer content if needed
+      if (
+        currentProtocolFormat === 'Protocol Designer' &&
+        msg.protocol_content != null
+      ) {
+        // Use helper to parse the protocol content into a plain object
+        const rawPdJson = parseProtocolContent(msg.protocol_content)
 
-      const promptData = getUpdateOrCreatePrompt(
-        isNewProtocol,
-        createProtocol,
-        updateProtocol,
-        isRegenerateRequest,
-        detectProtocolFormat(
-          isNewProtocol ? createProtocol.prompt : updateProtocol.prompt
-        )
-      )
+        // Extract all properties except labwareDefinitions using destructuring
+        const { labwareDefinitions, ...pdWithoutLabwareDefs } = rawPdJson
 
-      // Build a complete history array that preserves file attachments in their original messages.
-      // This allows the backend to construct proper conversation history with files in the right context.
-      const completeHistory = chatHistory.map(msg => {
-        const baseMessage = {
-          role: msg.role,
-          content: msg.content,
-          attachments: msg.attachments || [], // Keep attachments with their original messages
-        }
+        baseMessage.content = `${msg.content}\n\n${JSON.stringify(
+          pdWithoutLabwareDefs
+        )}`
+      }
 
-        // Handle Protocol Designer content if needed
-        if (
-          currentProtocolFormat === 'Protocol Designer' &&
-          msg.protocol_content != null
-        ) {
-          // Use helper to parse the protocol content into a plain object
-          const rawPdJson = parseProtocolContent(msg.protocol_content)
+      return baseMessage
+    })
 
-          // Extract all properties except labwareDefinitions using destructuring
-          const { labwareDefinitions, ...pdWithoutLabwareDefs } = rawPdJson
+    // Use multipart upload when files are attached (much more efficient)
+    let config: AxiosRequestConfig
 
-          baseMessage.content = `${msg.content}\n\n${JSON.stringify(
-            pdWithoutLabwareDefs
-          )}`
-        }
+    if (validatedFiles.length > 0 && !isUpdateOrCreateRequest) {
+      // Process files locally for chat history storage
+      const fileAttachmentsWithContent = processFilesForHistory(validatedFiles)
 
-        return baseMessage
+      // Multipart upload for file attachments
+      const formData = new FormData()
+      formData.append('message', watchUserPrompt)
+      formData.append('history', JSON.stringify(completeHistory)) // Send complete history with attachments
+      formData.append('fake', 'false')
+      formData.append('protocol_format', currentProtocolFormat)
+
+      // Add files to FormData
+      validatedFiles.forEach(file => {
+        formData.append('files', file)
       })
 
-      // Use multipart upload when files are attached (much more efficient)
-      let config: AxiosRequestConfig
-
-      if (validatedFiles.length > 0 && !isUpdateOrCreateRequest) {
-        // Process files locally for chat history storage
-        const fileAttachmentsWithContent = processFilesForHistory(
-          validatedFiles
-        )
-
-        // Multipart upload for file attachments
-        const formData = new FormData()
-        formData.append('message', watchUserPrompt)
-        formData.append('history', JSON.stringify(completeHistory)) // Send complete history with attachments
-        formData.append('fake', 'false')
-        formData.append('protocol_format', currentProtocolFormat)
-
-        // Add files to FormData
-        validatedFiles.forEach(file => {
-          formData.append('files', file)
-        })
-
-        config = {
-          url: getChatEndpoint().replace(
-            '/completion',
-            '/completion-multipart'
-          ),
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            // Don't set Content-Type for multipart - browser sets it with boundary
-          },
-          data: formData,
-        }
-
-        // Ensure all files were processed successfully
-        if (fileAttachmentsWithContent.length !== validatedFiles.length) {
-          console.error('Failed to process some files for chat history')
-          return
-        }
-
-        // Store processed files for chat history
-        userInput.attachments = fileAttachmentsWithContent.map(file => ({
-          id: file.id,
-          name: file.filename,
-          type: file.file_type as FileType,
-          content: file.content,
-        }))
-      } else {
-        // Traditional JSON request (no files or update/create requests)
-        config = {
-          url,
-          method: 'POST',
-          headers,
-          data: isUpdateOrCreateRequest
-            ? promptData
-            : {
-                message: watchUserPrompt,
-                history: completeHistory, // Send complete history with attachments
-                fake: false,
-                chat_options: isUpdateOrCreateRequest ? 'create' : 'update',
-                pd_protocol_content: pdProtocolContent,
-                protocol_format: currentProtocolFormat,
-                // No separate attachments parameter needed - they're in history now
-              },
-        }
+      config = {
+        url: getChatEndpoint().replace('/completion', '/completion-multipart'),
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          // Don't set Content-Type for multipart - browser sets it with boundary
+        },
+        data: formData,
       }
 
+      // Ensure all files were processed successfully
+      if (fileAttachmentsWithContent.length !== validatedFiles.length) {
+        console.error('Failed to process some files for chat history')
+        return
+      }
+
+      // Store processed files for chat history
+      userInput.attachments = fileAttachmentsWithContent.map(file => ({
+        id: file.id,
+        name: file.filename,
+        type: file.file_type as FileType,
+        content: file.content, // Populated by backend processing
+      }))
+    } else {
+      // Traditional JSON request (no files or update/create requests)
+      config = {
+        url,
+        method: 'POST',
+        headers,
+        data: isUpdateOrCreateRequest
+          ? promptData
+          : {
+              message: watchUserPrompt,
+              history: completeHistory, // Send complete history with attachments
+              fake: false,
+              chat_options: isUpdateOrCreateRequest ? 'create' : 'update',
+              pd_protocol_content: pdProtocolContent,
+              protocol_format: currentProtocolFormat,
+              // No separate attachments parameter needed - they're in history now
+            },
+      }
+    }
+
+    try {
       await callApi(config)
 
       // Update chat history AFTER successful API call

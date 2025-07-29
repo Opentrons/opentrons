@@ -7,14 +7,14 @@ export const parseProtocolContent = (
   content: unknown
 ): Record<string, unknown> => {
   let parsed: unknown
-  if (typeof content === 'string') {
+  if (content) {
     try {
-      parsed = JSON.parse(content)
+      parsed = JSON.parse(content as string)
     } catch {
       parsed = {}
     }
   } else {
-    parsed = content
+    parsed = {}
   }
 
   // Ensure result is a non-null object; otherwise fall back to {}

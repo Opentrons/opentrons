@@ -3,15 +3,12 @@ import { COLORS, Icon } from '@opentrons/components'
 import {
   getFileExtension,
   getFileType,
-  getSimpleFileTypeLabel,
 } from '/ai-client/resources/utils/fileUtils'
 
 import styles from './attachedfileitem.module.css'
 
 interface AttachedFileItemProps {
-  file: {
-    name: string
-  }
+  file: File | { name: string; type?: string }
   onRemove?: () => void
   showRemoveButton?: boolean
 }
@@ -39,7 +36,13 @@ export function AttachedFileItem({
       <div className={styles.file_details_container}>
         <div className={styles.file_name}>{file.name}</div>
         <div className={styles.file_details}>
-          {getSimpleFileTypeLabel(fileType ?? 'unknown', file.name)}
+          {fileType === 'pdf'
+            ? 'PDF file'
+            : fileType === 'csv'
+            ? 'CSV file'
+            : fileType === 'python'
+            ? 'Python file'
+            : 'Unknown file'}
         </div>
       </div>
       {showRemoveButton && onRemove != null && (

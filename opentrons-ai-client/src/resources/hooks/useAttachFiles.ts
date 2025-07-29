@@ -12,7 +12,7 @@ export interface FileAttachmentForBackend {
   id: string
   filename: string
   file_type: string
-  content: string
+  content: string // Empty for multipart uploads, populated by backend
   media_type: string
 }
 
@@ -21,7 +21,7 @@ interface UseAttachFilesReturn {
   fileError: string | null
   handleFileSelect: (files: FileList) => void
   handleRemoveFile: (index: number) => void
-  prepareFilesForUpload: () => File[]
+  prepareFilesForUpload: () => File[] | null
   processFilesForHistory: (validatedFiles: File[]) => FileAttachmentForBackend[]
   clearFiles: () => void
   clearError: () => void
@@ -65,16 +65,12 @@ export function useAttachFiles(): UseAttachFilesReturn {
     setFileError(null)
   }
 
-  const prepareFilesForUpload = (): File[] => {
-    try {
-      return prepareFilesForMultipart(attachedFiles)
-    } catch (error) {
-      console.error('File validation failed:', error)
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to validate files'
-      setFileError(errorMessage)
-      throw error
+  const prepareFilesForUpload = (): File[] | null => {
+    const result = prepareFilesForMultipart(attachedFiles)
+    if (result === null) {
+      setFileError('Failed to validate files')
     }
+    return result
   }
 
   const processFilesForHistory = (
@@ -83,25 +79,14 @@ export function useAttachFiles(): UseAttachFilesReturn {
     const fileAttachmentsWithContent: FileAttachmentForBackend[] = []
 
     for (const file of validatedFiles) {
-      try {
-        const fileType = getFileType(file)
-        if (!fileType) {
-          throw new Error(`Unsupported file type: ${file.name}`)
-        }
-
+      const fileType = getFileType(file)
+      if (fileType) {
         fileAttachmentsWithContent.push({
           id: uuidv4(),
           filename: file.name,
           file_type: fileType,
-          content: '', // No content needed for chat history - server processes files via multipart
+          content: '',
           media_type: file.type || 'text/plain',
-        })
-      } catch (error) {
-        console.error('Failed to process file for history:', {
-          fileName: file.name,
-          fileType: file.type,
-          fileSize: file.size,
-          error,
         })
       }
     }

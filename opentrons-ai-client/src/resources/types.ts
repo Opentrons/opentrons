@@ -12,7 +12,7 @@ export interface FileAttachment {
   id?: string // Optional because it's not present when initially selecting files
   name: string
   type: FileType
-  content: string
+  content: string // Populated by backend after processing
 }
 
 export interface ChatData {

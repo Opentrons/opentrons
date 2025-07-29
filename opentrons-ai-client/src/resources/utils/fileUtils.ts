@@ -1,14 +1,15 @@
 // MIME types provide better security than file extensions
 // as they check the actual file content headers
 export const ALLOWED_MIME_TYPES = {
-  pdf: ['application/pdf'] as string[],
-  csv: ['text/csv', 'application/csv', 'application/vnd.ms-excel'] as string[],
+  pdf: ['application/pdf', 'pdf'],
+  csv: ['text/csv', 'application/csv', 'application/vnd.ms-excel', 'csv'],
   python: [
     'text/x-python',
     'text/x-python-script',
     'text/plain',
     'application/x-python-code',
-  ] as string[],
+    'python',
+  ],
 }
 
 export type FileType = 'pdf' | 'csv' | 'python'
@@ -65,13 +66,6 @@ export const getFileType = (file: File): FileType | null => {
     return 'python'
   }
 
-  // Special case: Python files often have unreliable MIME types
-  // Check if it's a .py file regardless of MIME type
-  const extension = '.' + file.name.split('.').pop()?.toLowerCase()
-  if (extension === '.py') {
-    return 'python'
-  }
-
   return null
 }
 
@@ -79,45 +73,21 @@ export const getFileType = (file: File): FileType | null => {
  * Prepare files for multipart upload (no processing needed)
  * This is the new, efficient way to handle file uploads
  */
-export const prepareFilesForMultipart = (files: File[]): File[] => {
+export const prepareFilesForMultipart = (files: File[]): File[] | null => {
   // Validate files but don't process content
-  return files.filter(file => {
+  for (const file of files) {
     const type = getFileType(file)
-    if (!type) {
-      throw new Error(`Unsupported file type: ${file.type || file.name}`)
+    if (type === null) {
+      return null // Unsupported file type
     }
 
     const validation = validateFile(file)
     if (!validation.isValid) {
-      throw new Error(validation.error)
+      return null // File validation failed
     }
-
-    return true
-  })
-}
-
-/**
- * Get simple file type labels for display
- */
-export const getSimpleFileTypeLabel = (
-  type: string,
-  fileName: string
-): string => {
-  // Check for Python files first
-  if (fileName.toLowerCase().endsWith('.py')) {
-    return 'Python file'
   }
 
-  switch (type) {
-    case 'pdf':
-      return 'PDF file'
-    case 'csv':
-      return 'CSV file'
-    case 'python':
-      return 'Python file'
-  }
-
-  return `${type.toUpperCase()} file`
+  return files
 }
 
 /**
