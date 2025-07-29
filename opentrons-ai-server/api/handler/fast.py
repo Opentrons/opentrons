@@ -266,7 +266,7 @@ def _generate_llm_response_with_history(
                 prompt=prompt,
                 history_with_attachments=history_with_attachments,
                 message_type="update",
-                new_file_references=new_file_references,
+                new_file_references=all_file_references,
             )
 
 
@@ -416,45 +416,7 @@ async def create_chat_completion(
                     }
                     history_with_attachments.append(history_msg)
 
-        # Process NEW attached files for current message (if any)
-        new_file_references = []
-        if body.attachments:
-            for attachment in body.attachments:
-                # Validate file content first
-                validation_error = FileProcessor.validate_file_content(
-                    attachment.filename, attachment.media_type or "text/plain", attachment.content or ""
-                )
-                if validation_error:
-                    logger.error(f"File validation failed: {validation_error}")
-                    return ErrorResponse(message=validation_error)
-
-                # Process the file content
-                try:
-                    processed = FileProcessor.process_file(
-                        attachment.filename, attachment.media_type or "text/plain", attachment.content or ""
-                    )
-
-                    new_file_references.append(
-                        {
-                            "id": attachment.id,
-                            "filename": attachment.filename,
-                            "file_type": processed["file_type"],
-                            "content": processed["content"],
-                            "media_type": processed["media_type"],
-                        }
-                    )
-                except Exception as e:
-                    logger.error(f"File processing failed for {attachment.filename}: {str(e)}")
-                    return ErrorResponse(message=f"Failed to process file {attachment.filename}: {str(e)}")
-
-            logger.info(
-                "Processing chat with new file attachments",
-                extra={
-                    "user_id": str(user.sub),
-                    "num_files": len(new_file_references),
-                    "file_types": [ref["file_type"] for ref in new_file_references],
-                },
-            )
+        new_file_references: List[Dict[str, str]] = []
 
         # Use the new history-aware response generation
         response = _generate_llm_response_with_history(

@@ -8,20 +8,20 @@ import logging
 from typing import Any, Dict, List, Literal, Optional, TypedDict
 
 import anthropic
-from api.constants.file_constants import CONTENT_TYPE_MAPPING, FILE_SIZE_LIMITS, format_file_size_error, get_file_size_limit
+from api.constants.file_constants import CONTENT_TYPE_MAPPING, format_file_size_error, get_file_size_limit
 from ddtrace import tracer
 
 logger = logging.getLogger(__name__)
 
-# Type definitions for better type safety
-FileType = Literal["pdf", "csv", "python", "unknown"]
+# Type definitions
+FileType = Literal["pdf", "csv", "python"]
 MediaType = Literal["application/pdf", "text/csv", "text/x-python", "text/plain"]
 
 
 class ProcessedFileResult(TypedDict):
     """Type definition for processed file results"""
 
-    content: str
+    content: str  # Base64-encoded for PDFs, UTF-8 decoded text for CSV/Python files
     media_type: MediaType
     file_type: FileType
 
@@ -75,7 +75,27 @@ class FileProcessor:
 
     @staticmethod
     def process_multipart_file(filename: str, content_type: str, raw_content: bytes) -> ProcessedFileResult:
-        """Process a raw file from multipart upload directly without double processing."""
+        """
+        Process raw multipart file uploads into Anthropic-compatible format.
+
+        This is the entry point for files uploaded via FastAPI's multipart form data.
+        It handles the raw bytes directly from the HTTP request, performs validation,
+        and converts content to the appropriate format for Anthropic's API (base64 for PDFs,
+        UTF-8 text for CSV/Python files).
+
+        Pipeline position: HTTP Request → Multipart Processing → File Processing → Token Validation
+
+        Args:
+            filename: Original filename from the upload
+            content_type: MIME type from the HTTP request header
+            raw_content: Raw file bytes from the multipart upload
+
+        Returns:
+            ProcessedFileResult with content, media_type, and file_type for Anthropic
+
+        Raises:
+            ValueError: If file type is unsupported, too large, or content is invalid
+        """
         # Validate file size first
         file_size = len(raw_content)
 
@@ -92,7 +112,6 @@ class FileProcessor:
         if file_size > max_size:
             raise ValueError(format_file_size_error(filename, file_size, file_type))
 
-        # Process content based on type without double processing
         if content_type == "application/pdf":
             # Convert raw PDF to base64
             processed_content = base64.b64encode(raw_content).decode("utf-8")
@@ -107,74 +126,37 @@ class FileProcessor:
             # Return appropriate media type based on content type
             if content_type in ["text/csv", "application/csv", "application/vnd.ms-excel"]:
                 return {"content": processed_content, "media_type": "text/csv", "file_type": "csv"}
-            elif filename.lower().endswith(".py"):
-                return {"content": processed_content, "media_type": "text/x-python", "file_type": "python"}
             else:
-                return {"content": processed_content, "media_type": "text/plain", "file_type": "unknown"}
-
-    @staticmethod
-    def process_file(filename: str, mime_type: str, content: str) -> ProcessedFileResult:
-        """
-        Process a file based on its MIME type
-
-        Args:
-            filename: Original filename
-            mime_type: MIME type as reported by browser
-            content: Raw file content (base64 for PDFs, text for others)
-
-        Returns:
-            Dict with processed content and media type for Anthropic
-        """
-        # Determine file type from MIME type
-        if mime_type == "application/pdf":
-            return FileProcessor._process_pdf(filename, content)
-        elif mime_type in ["text/csv", "application/csv", "application/vnd.ms-excel"]:
-            return FileProcessor._process_csv(filename, content)
-        elif mime_type in ["text/x-python", "text/x-python-script", "text/plain", "application/x-python-code"]:
-            # Check if it's actually a Python file
-            if filename.lower().endswith(".py"):
-                return FileProcessor._process_python(filename, content)
-
-        # Default: treat as plain text
-        return {"content": content, "media_type": "text/plain", "file_type": "unknown"}
-
-    @staticmethod
-    def _process_pdf(filename: str, content: str) -> ProcessedFileResult:
-        """Process PDF file (already base64 encoded from frontend)"""
-        # Validate base64 content
-        if not content:
-            raise ValueError(f"PDF file {filename} has empty content")
-
-        # Validate it's valid base64
-        try:
-            base64.b64decode(content, validate=True)
-        except Exception as e:
-            raise ValueError(f"Invalid base64 content for PDF {filename}: {str(e)}") from e
-
-        return {"content": content, "media_type": "application/pdf", "file_type": "pdf"}
-
-    @staticmethod
-    def _process_csv(filename: str, content: str) -> ProcessedFileResult:
-        """Process CSV file - Claude handles CSV natively, no conversion needed"""
-        if not content:
-            logger.info(f"CSV file {filename} is empty")
-            return {"content": "", "media_type": "text/csv", "file_type": "csv"}
-
-        logger.info(f"Processing CSV file {filename} ({len(content)} bytes) as plain text")
-        return {"content": content, "media_type": "text/csv", "file_type": "csv"}
-
-    @staticmethod
-    def _process_python(filename: str, content: str) -> ProcessedFileResult:
-        """Process Python file"""
-        # Could add Python syntax validation here if needed
-        return {"content": content, "media_type": "text/x-python", "file_type": "python"}
+                # Python files should be handled by the content type check above
+                # If we reach here, it's likely a text file with .py extension
+                if filename.lower().endswith(".py"):
+                    return {"content": processed_content, "media_type": "text/x-python", "file_type": "python"}
+                else:
+                    raise ValueError(f"Unsupported file type for {filename}. Only PDF, CSV, and Python files are supported.")
 
     @staticmethod
     @tracer.wrap()
     def check_files_token_warning(
         file_references: Optional[List[Dict[str, Any]]], anthropic_client: anthropic.Anthropic, model: Optional[str] = None
     ) -> Optional[str]:
-        """Check if total tokens across all files exceeds limits and return warning message."""
+        """
+        Validate token limits for processed files before sending to Anthropic API.
+
+        This function is called in the multipart upload handler AFTER files have been processed
+        and validated, but BEFORE the chat completion request is made to Anthropic. It ensures
+        the total token count across all uploaded files doesn't exceed Claude's context limits,
+        providing early feedback to users about potential issues.
+
+        Pipeline position: HTTP Handler → File Processing → Token Validation → Anthropic API
+
+        Args:
+            file_references: List of processed file dictionaries with content and metadata
+            anthropic_client: Authenticated Anthropic client for token counting API calls
+            model: Model name for accurate token counting (defaults to configured model)
+
+        Returns:
+            Warning message string if limits are exceeded, None if within limits
+        """
         if not file_references:
             return None
 
@@ -209,41 +191,5 @@ class FileProcessor:
                 f"Warning: Total file tokens ({total_tokens:,}) is approaching the limit "
                 f"({FileProcessor.MAX_TOTAL_TOKENS:,} tokens). Consider reducing file sizes to avoid issues."
             )
-
-        return None
-
-    @staticmethod
-    def validate_file_content(filename: str, mime_type: str, content: str) -> Optional[str]:
-        """
-        Validate file content matches expected type
-
-        Returns:
-            Error message if validation fails, None if valid
-        """
-        if not content:
-            return f"File {filename} has empty content"
-
-        # PDF validation
-        if mime_type == "application/pdf":
-            if not content:
-                return f"PDF file {filename} has no content"
-            try:
-                base64.b64decode(content, validate=True)
-            except Exception:
-                return f"PDF file {filename} contains invalid base64 content"
-
-        # Size validation (approximate, before processing)
-        content_size = len(content)
-
-        if mime_type == "application/pdf":
-            # Base64 encoded PDFs are ~33% larger than original
-            estimated_original_size = int(content_size * 0.75)
-            if estimated_original_size > FILE_SIZE_LIMITS["pdf"]:
-                return format_file_size_error(filename, estimated_original_size, "pdf")
-        elif mime_type in ["text/csv", "application/csv", "application/vnd.ms-excel"]:
-            if content_size > FILE_SIZE_LIMITS["csv"]:
-                return format_file_size_error(filename, content_size, "csv")
-        elif filename.lower().endswith(".py") and content_size > FILE_SIZE_LIMITS["python"]:
-            return format_file_size_error(filename, content_size, "python")
 
         return None

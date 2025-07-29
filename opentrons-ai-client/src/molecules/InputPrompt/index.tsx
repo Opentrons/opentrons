@@ -206,11 +206,8 @@ export function InputPrompt(): JSX.Element {
           // Use helper to parse the protocol content into a plain object
           const rawPdJson = parseProtocolContent(msg.protocol_content)
 
-          // Remove labwareDefinitions without using the `delete` operator
-          const {
-            labwareDefinitions: _omit,
-            ...pdWithoutLabwareDefs
-          } = rawPdJson
+          // Extract all properties except labwareDefinitions using destructuring
+          const { labwareDefinitions, ...pdWithoutLabwareDefs } = rawPdJson
 
           baseMessage.content = `${msg.content}\n\n${JSON.stringify(
             pdWithoutLabwareDefs

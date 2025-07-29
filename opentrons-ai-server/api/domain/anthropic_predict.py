@@ -298,13 +298,9 @@ class AnthropicPredict:
 
         for file_ref in file_references:
             filename = file_ref.get("filename", "Attached File")
+            # file_type is the internal type ("pdf", "csv", "python"), not MIME type
             file_type = file_ref.get("file_type", "unknown").lower()
             file_content = file_ref.get("content", "")
-
-            # Debug log to see what filename we're using
-            logger.info(
-                f"Processing file attachment: filename='{filename}', file_type='{file_type}', file_ref_keys={list(file_ref.keys())}"
-            )
 
             if not file_content:
                 # Fallback if content is missing
@@ -334,12 +330,12 @@ class AnthropicPredict:
                 doc_block = DocumentBlockParam(
                     type="document",
                     source={"type": "base64", "media_type": "application/pdf", "data": file_content},
-                    title=filename,  # Preserve filename for PDF documents
+                    title=filename,
                 )
                 content_blocks.append(doc_block)
             else:
                 # CSV and Python files are sent as text blocks
-                # Add explicit filename context for Python files to prevent confusion with protocolName
+                # Add explicit filename context for all text-based files (consistent with PDF approach)
                 if file_type.lower() == "python":
                     # Add explicit filename introduction similar to PDF approach
                     python_intro_text = (
@@ -348,6 +344,14 @@ class AnthropicPredict:
                     )
                     filename_intro_block = TextBlockParam(type="text", text=python_intro_text)
                     content_blocks.append(filename_intro_block)
+                elif file_type.lower() == "csv":
+                    # Add explicit filename introduction for CSV files
+                    csv_intro_text = (
+                        f"=== UPLOADED CSV FILE: {filename} ===\n\n"
+                        f"The following is the CSV data file named '{filename}' that was uploaded:\n\n"
+                    )
+                    filename_intro_block = TextBlockParam(type="text", text=csv_intro_text)
+                    content_blocks.append(filename_intro_block)
 
                 # Add the file content
                 text_block = TextBlockParam(
@@ -355,15 +359,6 @@ class AnthropicPredict:
                     text=f"=== FILE CONTENT ===\n\n{file_content}\n\n=== END OF FILE: {filename} ===\n\n",
                 )
                 content_blocks.append(text_block)
-
-        # Add an introductory message only for text-based files (not PDFs)
-        has_pdf = any(file_ref.get("file_type", "").lower() == "pdf" for file_ref in file_references or [])
-
-        if content_blocks and not has_pdf:
-            intro_block = TextBlockParam(
-                type="text", text=f"The user has uploaded {len(file_references)} file(s). Here are the contents:\n\n"
-            )
-            content_blocks.insert(0, intro_block)
 
         return content_blocks
 
