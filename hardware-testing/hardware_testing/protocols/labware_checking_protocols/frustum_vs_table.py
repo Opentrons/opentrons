@@ -217,7 +217,7 @@ def run(ctx: ProtocolContext) -> None:
     ethanol_liq = ctx.define_liquid("Ethanol", display_color="#FFFFC5")
     src["A1"].load_liquid(ethanol_liq, src["A1"].max_volume - 1000)
     ctx.load_trash_bin("A3")
-    dial = ctx.load_labware("dial_indicator", SLOT_DIAL)
+    dial = ctx.load_labware("nest_1_reservoir_290ml", SLOT_DIAL)
 
     # LOAD TIP RACKS AND PIPETTES
     if frustum_labware["A1"].max_volume < 100:
@@ -289,6 +289,7 @@ def run(ctx: ProtocolContext) -> None:
     heights = [low_height, mid_height, high_height]
     frustum_volumes = {}
     udv_volumes = {}
+    
     for i in range(num_of_rows):
         try:
             wells_in_row = frustum_labware.rows()[i]
@@ -296,10 +297,8 @@ def run(ctx: ProtocolContext) -> None:
             wells_in_row = frustum_labware.rows()[0]
         well_names = [str(well).split(" ")[0] for well in wells_in_row][:6]
         frustum_vol = frustum_labware["A1"].volume_from_height(heights[i])
-        ud_vol = frustum_labware["A1"].volume_from_height(heights[i])  # placeholder, will update after loading UDV
         for well in well_names:
             frustum_volumes[well] = frustum_vol
-            udv_volumes[well] = ud_vol
 
     # Pick up Tips
     pick_up_tips(probe_pipette, liq_pipette)
