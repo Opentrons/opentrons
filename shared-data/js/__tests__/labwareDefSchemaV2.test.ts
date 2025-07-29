@@ -326,12 +326,6 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
     return 'sections' in def
   }
 
-  function isUserDefinedVolumes(
-    def: InnerWellGeometry | UserDefinedVolumes
-  ): def is UserDefinedVolumes {
-    return 'heightToVolumeMap' in def
-  }
-
   test("a well's depth should equal the height of its geometry", () => {
     for (const well of Object.values(labwareDef.wells)) {
       const wellGeometryId = well.geometryDefinitionId
