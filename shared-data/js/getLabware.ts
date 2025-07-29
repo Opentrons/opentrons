@@ -183,6 +183,8 @@ export const getIsPipettableLabware = (
   if (labwareDef.allowedRoles == null) {
     return true
   }
-  const allowedRolesSet = new Set(labwareDef.allowedRoles)
-  return allowedRolesSet.has('labware') && !allowedRolesSet.has('lid')
+  return (
+    labwareDef.allowedRoles.includes('labware') &&
+    !labwareDef.allowedRoles.includes('lid')
+  )
 }
