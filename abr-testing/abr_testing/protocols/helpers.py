@@ -56,7 +56,7 @@ def load_disposable_lids(
         )
         unused_lids = deck_riser_adapter.load_lid_stack(lid_str, num_of_lids)
     else:
-        unused_lids = protocol.load_lid_stack(lid_str, deck_slot[0], num_of_lids)
+        unused_lids = protocol.load_lid_stack(lid_str, deck_slot, num_of_lids)
     return unused_lids
 
 

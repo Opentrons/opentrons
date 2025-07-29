@@ -173,6 +173,9 @@ def aspirate_dispense_measure(
         tip_z_error = _get_tip_z_error(ctx, probe_pipette, dial)
         fill_with_manual_pipette = ctx.params.fill_with_manual_pipette  # type: ignore[attr-defined]
         if not fill_with_manual_pipette:
+            # Find Height of Source Reservoir
+            liq_pipette.measure_liquid_height(src["A1"])
+            liq_pipette.blow_out()
             liq_pipette.transfer_with_liquid_class(
                 ethanol,
                 vol if liq_pipette.channels == 1 else vol / 8,
@@ -204,9 +207,8 @@ def run(ctx: ProtocolContext) -> None:
     global DIAL_PORT, RUN_ID, FILE_NAME
     labware_type = ctx.params.labware_type  # type: ignore[attr-defined]
     # LOAD LABWARE AND DIAL
-    frustum_version = ctx.params.labware_version_of_frustum  # type: ignore[attr-defined]
     frustum_labware = ctx.load_labware(
-        labware_type, SLOT_FRUSTUM_LABWARE, version=frustum_version
+        labware_type, SLOT_FRUSTUM_LABWARE
     )
     frustum_labware.load_empty(frustum_labware.wells())
     udv_version = ctx.params.labware_version_of_table  # type: ignore[attr-defined]
@@ -240,10 +242,10 @@ def run(ctx: ProtocolContext) -> None:
     else:
         channel_num = 1
     liq_pipette = ctx.load_instrument(
-        f"flex_{channel_num}channel_1000", "left", tip_racks=liq_racks
+        f"flex_{channel_num}channel_1000", "right", tip_racks=liq_racks
     )
     probe_pipette = ctx.load_instrument(
-        "flex_1channel_50", "right", tip_racks=[probe_tip_rack]
+        "flex_1channel_50", "left", tip_racks=[probe_tip_rack]
     )
 
     # Assign ethanol liquid class behavior
@@ -284,7 +286,7 @@ def run(ctx: ProtocolContext) -> None:
     num_of_rows = 3
     low_height = 3
     mid_height = frustum_labware["A1"].depth / 2
-    high_height = frustum_labware["A1"].depth - 3
+    high_height = frustum_labware["A1"].depth - 5
     heights = [low_height, mid_height, high_height]
     frustum_volumes = {}
     udv_volumes = {}
@@ -302,16 +304,11 @@ def run(ctx: ProtocolContext) -> None:
     # Pick up Tips
     pick_up_tips(probe_pipette, liq_pipette)
 
-    # Find Height of Source Reservoir
-    liq_pipette.measure_liquid_height(src["A1"])
-    liq_pipette.drop_tip()
-
     # FRUSTUM DEFINITION
     _write_line_to_csv(
         ctx,
         [
             "FRUSTUM LABWARE",
-            f"Labware Version: {frustum_version}",
         ],
     )
     aspirate_dispense_measure(
@@ -326,16 +323,12 @@ def run(ctx: ProtocolContext) -> None:
     )
 
     pick_up_tips(probe_pipette, liq_pipette)
-    # Find Height of Source Reservoir
-    liq_pipette.measure_liquid_height(src["A1"])
-    liq_pipette.drop_tip()
 
     # USER DEFINED DEFINITION
     _write_line_to_csv(
         ctx,
         [
             "USER DEFINED LABWARE",
-            f"Labware Version: {udv_version}",
         ],
     )
     aspirate_dispense_measure(

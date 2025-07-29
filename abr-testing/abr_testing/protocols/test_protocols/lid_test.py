@@ -7,7 +7,7 @@ from opentrons.protocol_api.module_contexts import (
 
 
 metadata = {"protocolName": "5 Stack Test"}
-requirements = {"robotType": "Flex", "apiLevel": "2.25"}
+requirements = {"robotType": "Flex", "apiLevel": "2.24"}
 
 
 def add_parameters(parameters: ParameterContext) -> None:
@@ -16,7 +16,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         variable_name="lid_type",
         display_name="Lid Type",
         choices=[
-            {
+            { 
                 "display_name": "Tough Autosealing Lid",
                 "value": "opentrons_tough_pcr_auto_sealing_lid",
             },
@@ -29,17 +29,17 @@ def add_parameters(parameters: ParameterContext) -> None:
         display_name="Num of Lids in Stack",
         minimum=1,
         maximum=5,
-        default=5,
+        default=4,
     )
     parameters.add_bool(
-        variable_name="deck_riser_bool", display_name="Deck Riser", default=False
+        variable_name="deck_riser_bool", display_name="Deck Riser", default=True
     )
     parameters.add_float(
         variable_name="num_offset",
         display_name="Numerical Offset",
         minimum=-5,
         maximum=5,
-        default=0,
+        default=1,
     )
     parameters.add_str(
         variable_name="offset",
@@ -49,7 +49,7 @@ def add_parameters(parameters: ParameterContext) -> None:
             {"display_name": "Y", "value": "Y"},
             {"display_name": "X", "value": "X"},
         ],
-        default="X",
+        default="Z",
     )
     parameters.add_str(
         variable_name="module",
@@ -77,7 +77,7 @@ def run(protocol: ProtocolContext) -> None:
     # Thermocycler
     if module == "None":
         plate = protocol.load_labware(
-            "opentrons_96_wellplate_200ul_pcr_full_skirt", "D1"
+            "opentrons_96_wellplate_200ul_pcr_full_skirt", "C1"
         )
     elif module == "thermocycler module gen2":
         thermocycler: ThermocyclerContext = protocol.load_module(
@@ -98,7 +98,7 @@ def run(protocol: ProtocolContext) -> None:
         plate = module.load_labware("opentrons_96_wellplate_200ul_pcr_full_skirt")
     # Load Lids
     if deck_riser_bool:
-        deck_riser_adapter = protocol.load_adapter("opentrons_flex_deck_riser", "D3")
+        deck_riser_adapter = protocol.load_adapter("opentrons_flex_deck_riser", "D2")
         lid_stack = deck_riser_adapter.load_lid_stack(lid_type, lids_in_stack)
     else:
         lid_stack = protocol.load_lid_stack(lid_type, "D2", lids_in_stack)
@@ -109,19 +109,20 @@ def run(protocol: ProtocolContext) -> None:
         "Z": {"x": 0, "y": 0, "z": num_offset},
     }
     # move  all lids to plate and then restack
-    for i in range(lids_in_stack):
-        protocol.comment(f"{offset} Offset {num_offset}, Lid # {i+1}")
+    stack_positions = ["C2", "D2"]  # Add more if needed
+    current_stack_index = 0
 
-        protocol.move_lid(
-            lid_stack,
-            plate,
-            use_gripper=True,
-            pick_up_offset=pick_up_offset[offset],
-        )
-        if i == 0:
-            maybe_stack = protocol.move_lid(plate, "C2", use_gripper=True)
-            if maybe_stack is None:
-                raise RuntimeError("Failed to move lid to C2; no lid stack returned.")
-            new_lid_stack = maybe_stack
-        else:
-            protocol.move_lid(plate, new_lid_stack, use_gripper=True)
+    for n in range(5):
+        for i in range(lids_in_stack):
+            protocol.comment(f"{offset} Offset {num_offset}, Lid # {i+1}")
+            if i == 0:
+                maybe_stack = protocol.move_lid(lid_stack, stack_positions[current_stack_index], use_gripper=True)
+                if maybe_stack is None:
+                    raise RuntimeError("Failed to move lid to C2; no lid stack returned.")
+                new_lid_stack = maybe_stack
+            else:
+                protocol.move_lid(lid_stack, new_lid_stack, use_gripper=True)
+        # Flip between stack positions for next round
+        current_stack_index = (current_stack_index + 1) % len(stack_positions)
+        # Set the new lid stack as the source for next round
+        lid_stack = new_lid_stack
