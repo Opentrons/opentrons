@@ -1,5 +1,5 @@
 ---
-title: "Thermocycler GEN2 Instruction Manual: Product Specifications"
+title: "Thermocycler Module: Product Specifications"
 ---
 
 # Product Specifications
@@ -64,48 +64,52 @@ TCG2
 <table>
   <thead>
     <tr>
-      <th>LED Color and Behavior</th>
-      <th>Module Conditions</th>
+      <th>LED Color</th>
+      <th>Module Status</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td>Solid white</td>
-      <td>Idle</td>
+      <td><span class="status-dot-container"><span class="status-dot white"></span>White</span></td>
+      <td>A solid white light indicates the module is idle (not actively heating or cooling).<br>
+        <span style="font-size: 1.5em;">⚠️ </span><strong> Warning: </strong>The module could still be hot. Handle with care.</td>
     </tr>
     <tr>
-      <td>Flashing orange</td>
-      <td>Error</td>
+      <td><span class="status-dot-container"><span class="status-dot yellow"></span>Orange</span></td>
+      <td>A pulsing orange light indicates an error state.</td>
     </tr>
     <tr>
-      <td>Pulsing red</td>
-      <td>Changing to hot temperature (&gt;23 °C)</td>
+      <td><span class="status-dot-container"><span class="status-dot red"></span>Red</span></td>
+      <td>A red light indicates a hot temperature state. For example:
+        <ul>
+          <li>Solid red: holding at a hot temperature (&gt;23 °C)</li>
+          <li>Pulsing red: changing to hot temperature (&gt;23 °C)</li>
+        </ul>
+      </td>
     </tr>
     <tr>
-      <td>Solid red</td>
-      <td>Holding at hot temperature (&gt;23 °C)</td>
-    </tr>
-    <tr>
-      <td>Pulsing blue</td>
-      <td>Changing to cool temperature (&lt; °C)</td>
-    </tr>
-    <tr>
-      <td>Solid blue</td>
-      <td>Holding at cool temperature (&lt;23 °C)</td>
+      <td><span class="status-dot-container"><span class="status-dot blue"></span>Blue</span></td>
+      <td>A blue light indicates a cool temperature state: For example:
+        <ul>
+          <li>Solid blue: holding at a cool temperature (&lt;23 °C)</li>
+          <li>Pulsing blue: changing to a cool temperature (&lt;23 °C)</li>
+        </ul>
+      </td>
     </tr>
   </tbody>
 </table>
 
-!!!warning
-    The status LED displays solid white whenever the module is not actively heating or cooling, regardless of its current temperature. Handle with caution. The module may still be hot to the touch.
-
 ## Emergency Lid Opening
 
 In case of a power outage, connectivity issue, or other electrical failure, the Thermocycler lid may not open. Follow these steps to manually open the lid:
+
+<div class="instruction-list" markdown>
 
 1. If possible, turn the unit off and unplug it.
 2. Insert the included hex wrench into the circular slot on the left side of the module.
 3. Push the wrench inward 25 mm / 1 inch.
 4. Lift the lid manually.
 
-![Emergency latch release](../images/emergency-lid-open.png)
+![Emergency latch release](images/emergency-lid-open.png)
+
+</div>

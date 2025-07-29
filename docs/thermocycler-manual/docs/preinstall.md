@@ -1,5 +1,5 @@
 ---
-title: "Thermocycler GEN2 Instruction Manual: Before You Begin"
+title: "Thermocycler Module: Before You Begin"
 ---
 
 # Before You Begin

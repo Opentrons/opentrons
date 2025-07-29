@@ -1,5 +1,5 @@
 ---
-title: "Thermocycler GEN2 Instruction Manual: Additional Product Information"
+title: "Thermocycler Module: Additional Product Information"
 ---
 
 ## Warranty
@@ -39,4 +39,4 @@ If you have any questions about the use of the system, abnormal phenomena, or sp
 
 Trademarks: Opentrons®, Opentrons drop logo (Opentrons Labworks, Inc.). Registered names, trademarks, etc. used in this document, even when not specifically marked as such, are not to be considered unprotected by law.
 
-December 2024 © OPENTRONS 2024. ALL RIGHTS RESERVED
+August 2025 © OPENTRONS 2025. ALL RIGHTS RESERVED

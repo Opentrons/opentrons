@@ -1,5 +1,5 @@
 ---
-title: "Thermocycler GEN2 Instruction Manual: Thermocycler Lid Seals"
+title: "Thermocycler Module: Thermocycler Lid Seals"
 ---
 
 # Thermocycler Lid Seals

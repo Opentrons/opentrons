@@ -1,10 +1,12 @@
 ---
-title: "Thermocycler GEN2 Instruction Manual: OT-2 Attachment Steps"
+title: "Thermocycler Module: OT-2 Attachment Steps"
 ---
 
 # OT-2 Attachment Steps
 
 To attach the Thermocycler to your OT-2:
+
+<div class="instruction-list" markdown>
 
 1. Use a 2.5 mm hex screwdriver or L-key to attach the exhaust duct to the back of the module. Use the two included screws, one on either side of the duct.
 
@@ -22,6 +24,8 @@ To attach the Thermocycler to your OT-2:
 
 7. Remove and discard the shipping insert after opening the module's lid. The insert consists of a pad attached to a PCR plate.
 
-![](images/shipping-insert.svg)
+    ![](images/shipping-insert.svg)
+
+</div>
 
 When successfully connected, the module appears in the Pipettes and Modules section on your robot's device detail page in the Opentrons App. The module is ready to use and does not require calibration on an OT-2.

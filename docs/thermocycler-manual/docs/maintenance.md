@@ -1,5 +1,5 @@
 ---
-title: "Thermocycler GEN2 Instruction Manual: Maintenance and Cleaning"
+title: "Thermocycler Module: Maintenance and Cleaning"
 ---
 
 # Maintenance and Cleaning
