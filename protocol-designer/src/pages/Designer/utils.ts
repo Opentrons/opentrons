@@ -403,8 +403,7 @@ export const getUnoccupiedStackOptions = (args: {
         labwareIdFromDropdown
       )
 
-      const isUsedLid =
-        robotState?.labware[labwareIdFromDropdown]?.isUsedLid === true
+      const isUsedLid = temporalLabwareOnDeck.isUsedLid === true
       const newLabwareEntity = labwareEntities[labwareId]
       const isNewLabwarePipettable =
         newLabwareEntity?.def != null &&
@@ -417,8 +416,8 @@ export const getUnoccupiedStackOptions = (args: {
         isTopOfStack &&
         isCompatible &&
         isNotCurrentLabwareStack &&
-        isSafeLidMove &&
-        !isInWasteChute
+        !isInWasteChute &&
+        isSafeLidMove
       ) {
         const similarLabwareStackIds = getAllLabwareIdsOfCertainURIOnStack(
           deckSetupLabware,

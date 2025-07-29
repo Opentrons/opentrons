@@ -70,7 +70,7 @@ export const getInitialRobotState: (
       initialDeckSetup.labware,
       ({ id, stack }): LabwareTemporalProperties => {
         const labwareEntity = invariantContext.labwareEntities[id]
-        const isLid = getIsLid(labwareEntity?.def)
+        const isLid = getIsLid(labwareEntity.def)
         const nearestParent = getNearestParentInStack(stack)
         const isParentPipettableLabware =
           nearestParent != null &&
@@ -80,7 +80,8 @@ export const getInitialRobotState: (
           )
         return {
           stack,
-          ...(isLid && isParentPipettableLabware ? { isUsed: true } : {}),
+          // set isUsedLid to true if the labware is a lid and the parent is pipettable labware
+          ...(isLid && isParentPipettableLabware ? { isUsedLid: true } : {}),
         }
       }
     )

@@ -51,6 +51,7 @@ export function LabwareLocationField(
   const unoccupiedLabwareLocationsOptionsSelector =
     useSelector(getUnoccupiedLabwareLocationOptions) ?? []
 
+  // invalid offDeck move filter
   const unoccupiedLabwareLocationsOptions = [
     ...unoccupiedLabwareStackOptions,
     ...unoccupiedLabwareLocationsOptionsSelector,
