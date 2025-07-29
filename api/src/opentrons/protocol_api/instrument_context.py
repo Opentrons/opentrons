@@ -3105,6 +3105,16 @@ class InstrumentContext(publisher.CommandPublisher):
         if isinstance(target, validation.PointTarget):
             return target.location, None, None
 
+    @property
+    def _last_tip_picked_up_from(self) -> Optional[labware.Well]:
+        """This exists to prevent old protocols that relied on this old internal variable from failing.
+
+        Normally we would enforce not relying on underscore variables/methods, but given this
+        variable's age and the lack of other ways to get this data previously, we'll continue
+        to support this.
+        """
+        return self._get_last_tiprack_well()
+
     def _get_last_tiprack_well(self) -> Optional[labware.Well]:
         tiprack_cores = self._core.get_last_well_tip_picked_up_from()
         if tiprack_cores is None:
