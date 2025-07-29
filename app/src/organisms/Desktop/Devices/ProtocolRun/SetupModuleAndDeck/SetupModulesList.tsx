@@ -28,7 +28,6 @@ import {
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
-  getMainUsbModuleFixtureIdForComboFixture,
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
