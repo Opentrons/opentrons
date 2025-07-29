@@ -14,6 +14,7 @@ import {
 } from '@opentrons/shared-data'
 import {
   getFullStackFromLabwares,
+  getNearestParentInStack,
   getSlotInLocationStack,
 } from '@opentrons/step-generation'
 
@@ -388,10 +389,15 @@ export const getUnoccupiedStackOptions = (args: {
   const { def } = deckSetupLabware[labwareIdFromDropdown]
   const labwareCompatibleParentLabware = def.compatibleParentLabware
 
-  return Object.entries(robotState.labware).reduce<Option[]>(
+  const { labware: labwareState } = robotState
+
+  const isLabwareToMoveUsedLid =
+    labwareState[labwareIdFromDropdown]?.isUsedLid === true
+
+  return Object.entries(labwareState).reduce<Option[]>(
     (acc, [labwareId, temporalLabwareOnDeck]) => {
       const slot = getSlotInLocationStack(temporalLabwareOnDeck.stack)
-      const fullStack = getFullStackFromLabwares(robotState.labware, slot)
+      const fullStack = getFullStackFromLabwares(labwareState, slot)
       const labwareOnDeck = deckSetupLabware[labwareId]
       const isTopOfStack = fullStack[0] === labwareId
       const { def: labwareOnDeckDef } = labwareOnDeck
@@ -403,12 +409,17 @@ export const getUnoccupiedStackOptions = (args: {
         labwareIdFromDropdown
       )
 
-      const isUsedLid = temporalLabwareOnDeck.isUsedLid === true
-      const newLabwareEntity = labwareEntities[labwareId]
+      const nearestParentInStack = getNearestParentInStack(fullStack)
+      const isNearestParentPipettableLabware =
+        nearestParentInStack != null &&
+        labwareEntities[nearestParentInStack] != null &&
+        getIsPipettableLabware(labwareEntities[nearestParentInStack].def)
+
       const isNewLabwarePipettable =
-        newLabwareEntity?.def != null &&
-        getIsPipettableLabware(newLabwareEntity.def)
-      const isSafeLidMove = !(isUsedLid && isNewLabwarePipettable)
+        labwareOnDeckDef != null && getIsPipettableLabware(labwareOnDeckDef)
+      const isSafeLidMove =
+        !(isLabwareToMoveUsedLid && isNewLabwarePipettable) &&
+        !isNearestParentPipettableLabware
 
       const isInWasteChute = slot === 'gripperWasteChute'
 
