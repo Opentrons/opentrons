@@ -134,11 +134,11 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
             const deckConfigCompatabilityD3 = deckConfigCompatibility?.find(
               configItem => configItem.cutoutId === 'cutoutD3'
             )
-            const mainUsbModuleFixtureId = getMainUsbModuleFixtureIdForComboFixture(deckConfigCompatabilityD3?.compatibleCutoutFixtureIds)
             if (
               deckConfigCompatabilityD3 != null &&
-              WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(
-                deckConfigCompatabilityD3?.compatibleCutoutFixtureIds[0]
+     deckConfigCompatabilityD3.compatibleCutoutFixtureIds.every(
+     cutoutFixtureId =>
+ WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(cutoutFixtureId)
               )
             ) {
               const comboFixtureId =
