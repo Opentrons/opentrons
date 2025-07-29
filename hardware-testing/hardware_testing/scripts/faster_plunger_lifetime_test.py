@@ -101,7 +101,7 @@ async def main(args: argparse.Namespace, cfg: TestConfig) -> None:
         }
         writer = csv.DictWriter(csvfile, test_data)
         writer.writeheader()
-        start_time = time.time()
+        start_time = time.monotonic()
         try:
             currents = list(CURRENTS_SPEEDS.keys())
             for cycle in range(1, args.cycles + 1):
@@ -133,7 +133,7 @@ async def main(args: argparse.Namespace, cfg: TestConfig) -> None:
                             api, mount, bottom, speed=speed, motor_current=current
                         )
                         down_passed = await position_check()
-                        test_data["time_sec"] = time.time() - start_time
+                        test_data["time_sec"] = time.monotonic() - start_time
                         test_data["cycle"] = cycle
                         test_data["position"] = "bottom"
                         test_data["position_check"] = down_passed
@@ -191,7 +191,7 @@ async def main(args: argparse.Namespace, cfg: TestConfig) -> None:
                             api, mount, 0, speed=speed, motor_current=current
                         )
                         up_passed = await position_check()
-                        test_data["time_sec"] = time.time() - start_time
+                        test_data["time_sec"] = time.monotonic() - start_time
                         test_data["cycle"] = cycle
                         test_data["position"] = "top"
                         test_data["position_check"] = up_passed

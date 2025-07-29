@@ -23,6 +23,7 @@ import {
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 
+import { useModuleUSBPort } from '/app/local-resources/modules'
 import { ODDFixtureOption } from '/app/molecules/ODDFixtureOption'
 import { OddModal } from '/app/molecules/OddModal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration/'
@@ -204,6 +205,7 @@ export function AddFixtureModal({
   }
 
   const sendIdentifyStacker = useSendIdentifyStacker()
+  const { parseModuleUSBPort } = useModuleUSBPort()
   const [identifyInUse, setIdentifyInUse] = useState<string | null>(null)
   const [identifyTimeout, setTimeoutID] = useState<NodeJS.Timeout | null>(null)
 
@@ -273,14 +275,11 @@ export function AddFixtureModal({
   }
 
   const fixtureOptions = availableOptions.map(cutoutConfigs => {
-    const usbPort = (modulesData?.data ?? []).find(
-      m => m.serialNumber === cutoutConfigs[0].opentronsModuleSerialNumber
-    )?.usbPort
-    const portDisplay =
-      usbPort?.hubPort != null
-        ? `${usbPort.port}.${usbPort.hubPort}`
-        : usbPort?.port
-
+    const matchedModule =
+      (modulesData?.data ?? []).find(
+        m => m.serialNumber === cutoutConfigs[0].opentronsModuleSerialNumber
+      ) ?? null
+    const portDisplay = parseModuleUSBPort(matchedModule)
     const fixtureSerialNumber = cutoutConfigs[0].opentronsModuleSerialNumber
     if (
       fixtureSerialNumber !== undefined &&

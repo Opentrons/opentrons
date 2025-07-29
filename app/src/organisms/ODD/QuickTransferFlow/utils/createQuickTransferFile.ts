@@ -1,35 +1,28 @@
+import flatMap from 'lodash/flatMap'
 import uuidv1 from 'uuid/v4'
 
 import {
   FLEX_ROBOT_TYPE,
   FLEX_STANDARD_DECKID,
   getAllLiquidClassDefs,
-  getDeckDefFromRobotType,
   getFlexNameConversion,
-  TRASH_BIN_ADAPTER_FIXTURE,
-  WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 import {
-  consolidate,
-  distribute,
   getLiquidClassName,
   getSlotInLocationStack,
-  getWasteChuteAddressableAreaNamePip,
   pythonImports,
   pythonMetadata,
   pythonRequirements,
-  transfer,
 } from '@opentrons/step-generation'
 
-import { generateQuickTransferArgs } from './'
+import { generateQuickTransferArgs } from './generateQuickTransferArgs'
+import { generateQuickTransferRobotStateTimeline } from './generateQuickTransferRobotStateTimeline'
 import { pythonDef } from './pythonDef'
 
 import type {
-  AddressableAreaName,
   CommandAnnotationV1Mixin,
   CommandV14Mixin,
   CreateCommand,
-  CutoutId,
   DeckConfiguration,
   LabwareDefinition2,
   LabwareV2Mixin,
@@ -39,7 +32,6 @@ import type {
   LoadPipetteCreateCommand,
   OT3RobotMixin,
 } from '@opentrons/shared-data'
-import type { CommandCreatorResult } from '@opentrons/step-generation'
 import type { QuickTransferSummaryState } from '../types'
 
 const uuid: () => string = uuidv1
@@ -151,87 +143,22 @@ export function createQuickTransferFile(
         }
       : null
 
-  let nonLoadCommandCreator: CommandCreatorResult | null = null
-  if (stepArgs?.commandCreatorFnName === 'transfer') {
-    nonLoadCommandCreator = transfer(
-      stepArgs,
-      invariantContext,
-      initialRobotState
-    )
-  } else if (stepArgs?.commandCreatorFnName === 'consolidate') {
-    nonLoadCommandCreator = consolidate(
-      stepArgs,
-      invariantContext,
-      initialRobotState
-    )
-  } else if (stepArgs?.commandCreatorFnName === 'distribute') {
-    nonLoadCommandCreator = distribute(
-      stepArgs,
-      invariantContext,
-      initialRobotState
-    )
-  }
+  const robotStateTimeline = generateQuickTransferRobotStateTimeline({
+    stepArgs,
+    initialRobotState,
+    invariantContext,
+  })
+  const nonLoadCommands: CreateCommand[] = flatMap(
+    robotStateTimeline.timeline,
+    timelineFrame => timelineFrame.commands
+  )
 
-  const nonLoadCommands =
-    nonLoadCommandCreator != null && 'commands' in nonLoadCommandCreator
-      ? nonLoadCommandCreator.commands
-      : []
-
-  let finalDropTipCommands: CreateCommand[] = []
-  let addressableAreaName: AddressableAreaName | null = null
-  if (
-    quickTransferState.dropTipLocation.cutoutFixtureId ===
-    TRASH_BIN_ADAPTER_FIXTURE
-  ) {
-    const trashLocation = quickTransferState.dropTipLocation.cutoutId
-    const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
-    const cutouts: Record<CutoutId, AddressableAreaName[]> | null =
-      deckDef.cutoutFixtures.find(
-        cutoutFixture => cutoutFixture.id === 'trashBinAdapter'
-      )?.providesAddressableAreas ?? null
-    addressableAreaName =
-      trashLocation != null && cutouts != null
-        ? cutouts[trashLocation]?.[0] ?? null
-        : null
-  } else if (
-    WASTE_CHUTE_FIXTURES.includes(
-      quickTransferState.dropTipLocation.cutoutFixtureId
-    )
-  ) {
-    addressableAreaName = getWasteChuteAddressableAreaNamePip(
-      pipetteEntity.spec.channels
-    )
-  }
-  if (addressableAreaName == null) {
-    console.error(
-      `expected to find addressableAreaName with trashBin or wasteChute location but could not`
-    )
-  } else {
-    finalDropTipCommands = [
-      {
-        key: uuid(),
-        commandType: 'moveToAddressableAreaForDropTip',
-        params: {
-          pipetteId: pipetteEntity.id,
-          addressableAreaName,
-        },
-      },
-      {
-        key: uuid(),
-        commandType: 'dropTipInPlace',
-        params: {
-          pipetteId: pipetteEntity.id,
-        },
-      },
-    ]
-  }
   const commands: CreateCommand[] = [
     loadPipetteCommand,
     ...loadAdapterCommands,
     ...loadLabwareCommands,
     ...(loadLiquidCommand != null ? [loadLiquidCommand] : []),
     ...nonLoadCommands,
-    ...finalDropTipCommands,
   ]
   const sourceLabwareName = quickTransferState.source.metadata.displayName
   let destinationLabwareName = sourceLabwareName
