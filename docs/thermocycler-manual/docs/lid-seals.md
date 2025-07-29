@@ -47,7 +47,7 @@ You can stack up to 5 auto-sealing lids on a special [deck riser](https://opentr
 
 ## Reusable Automation Seals (GEN2)
 
-While disposable PCR lids offer sterile, single-use convenience, the Thermocycler GEN2 also ships with a package of reusable automation seals. Unlike the disposable lids, these seals require sanitization before use and can be reused up to 20 times. Note that only one type of seal (disposable or reusable) should be used at a time; _do not_ use both simultaneously on the same thermocycler.
+While disposable PCR lids offer sterile, single-use convenience, the Thermocycler GEN2 also ships with a package of reusable automation seals. Unlike the disposable lids, these seals require sanitization before use and can be reused up to 20 times. Note that only one type of seal (disposable or reusable) should be used at a time; _do not_ use both simultaneously on the same Thermocycler.
 
 ![Reusable automation seals](images/reuseable-seals.png)
 

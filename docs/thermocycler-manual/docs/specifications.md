@@ -80,16 +80,16 @@ TCG2
     </tr>
     <tr>
       <td><span class="status-dot-container"><span class="status-dot red"></span>Red</span></td>
-      <td>A red light indicates a hot temperature state. For example:
+      <td>A red light indicates a hot temperature state.
         <ul>
           <li>Solid red: holding at a hot temperature (&gt;23 °C)</li>
-          <li>Pulsing red: changing to hot temperature (&gt;23 °C)</li>
+          <li>Pulsing red: changing to a hot temperature (&gt;23 °C)</li>
         </ul>
       </td>
     </tr>
     <tr>
       <td><span class="status-dot-container"><span class="status-dot blue"></span>Blue</span></td>
-      <td>A blue light indicates a cool temperature state: For example:
+      <td>A blue light indicates a cool temperature state.
         <ul>
           <li>Solid blue: holding at a cool temperature (&lt;23 °C)</li>
           <li>Pulsing blue: changing to a cool temperature (&lt;23 °C)</li>
