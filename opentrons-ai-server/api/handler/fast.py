@@ -503,7 +503,15 @@ async def create_chat_completion_multipart(
 
 
 async def _process_multipart_files(files: List[UploadFile]) -> tuple[Optional[List[Dict[str, str]]], Optional[str]]:
-    """Process uploaded files for multipart requests."""
+    """
+    Process uploaded files in the multipart completion handler.
+
+    This is called within the /api/chat/completion-multipart endpoint, AFTER FastAPI
+    has parsed the multipart form data but BEFORE sending files to the LLM. It handles
+    raw file bytes, processes them via FileProcessor, and validates token limits.
+
+    Pipeline position: HTTP Request → Multipart Parsing → File Processing → LLM Request
+    """
     if not files or not any(f.filename for f in files):
         return None, None
 

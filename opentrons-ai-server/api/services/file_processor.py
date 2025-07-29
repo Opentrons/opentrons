@@ -37,7 +37,12 @@ class FileProcessor:
 
     @staticmethod
     def _estimate_tokens(content: str, media_type: str) -> int:
-        """Estimate token count when API call fails."""
+        """
+        Fallback token estimation when Anthropic API fails.
+
+        Used as backup when count_file_tokens() encounters API errors during token validation.
+        Provides rough estimates based on content length and media type characteristics.
+        """
         if media_type == "application/pdf":
             # Base64 increases size by ~33%, PDF typically has ~8 chars per token
             # Add overhead for document block structure
@@ -51,7 +56,15 @@ class FileProcessor:
     def count_file_tokens(
         filename: str, content: str, media_type: str, anthropic_client: anthropic.Anthropic, model: Optional[str] = None
     ) -> int:
-        """Count tokens for a file using Anthropic API with fallback estimation."""
+        """
+        Count tokens for a processed file using Anthropic API with fallback estimation.
+
+        This is called during token validation phase, AFTER files have been processed into
+        Anthropic-compatible format (base64 for PDFs, UTF-8 for text) but BEFORE sending
+        the chat completion request. It provides accurate token counts for quota checking.
+
+        Pipeline position: File Processing → Token Counting → Token Validation → Anthropic API
+        """
         try:
             # Build message content based on media type
             message_content = [
