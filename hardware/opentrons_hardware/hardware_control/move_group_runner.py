@@ -678,7 +678,7 @@ class MoveScheduler:
 
         expected_time = max(3.0, self._durations[group_id - self._start_at_index] * 1.1)
         full_timeout = max(10.0, self._durations[group_id - self._start_at_index] * 2)
-        start_time = time.time()
+        start_time = time.monotonic()
 
         try:
             # The staged timeout handles some times when a move takes a liiiittle extra
@@ -686,7 +686,7 @@ class MoveScheduler:
                 self._event.wait(),
                 full_timeout,
             )
-            duration = time.time() - start_time
+            duration = time.monotonic() - start_time
             await self._send_stop_if_necessary(can_messenger, group_id)
 
             if duration >= expected_time:
@@ -707,7 +707,7 @@ class MoveScheduler:
                     "missing-nodes": missing_node_msg,
                     "full-timeout": str(full_timeout),
                     "expected-time": str(expected_time),
-                    "elapsed": str(time.time() - start_time),
+                    "elapsed": str(time.monotonic() - start_time),
                 },
             )
         except EnumeratedError:
