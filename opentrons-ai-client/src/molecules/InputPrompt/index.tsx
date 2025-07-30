@@ -48,7 +48,6 @@ import styles from './inputprompt.module.css'
 import type { AxiosRequestConfig } from 'axios'
 import type { ProtocolFile } from '@opentrons/shared-data'
 import type { ChatData } from '/ai-client/resources/types'
-import type { FileType } from '/ai-client/resources/utils/fileUtils'
 
 export function InputPrompt(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
@@ -86,7 +85,6 @@ export function InputPrompt(): JSX.Element {
     handleFileSelect,
     handleRemoveFile,
     prepareFilesForUpload,
-    processFilesForHistory,
     clearFiles,
   } = useAttachFiles()
 
@@ -160,7 +158,7 @@ export function InputPrompt(): JSX.Element {
                 id: uuidv4(),
                 name: file.name,
                 type: fileType,
-                content: '', // Empty for multipart uploads, populated by backend
+                content: file, // Store the raw File object
               }
             })
           : undefined,
@@ -191,10 +189,19 @@ export function InputPrompt(): JSX.Element {
     // Build a complete history array that preserves file attachments in their original messages.
     // This allows the backend to construct proper conversation history with files in the right context.
     const completeHistory = chatHistory.map(msg => {
-      const baseMessage = {
+      const baseMessage: any = {
         role: msg.role,
         content: msg.content,
-        attachments: msg.attachments || [], // Keep attachments with their original messages
+      }
+
+      // Convert File objects to metadata for JSON serialization
+      if (msg.attachments && msg.attachments.length > 0) {
+        baseMessage.attachments = msg.attachments.map(att => ({
+          id: att.id,
+          name: att.name,
+          type: att.type,
+          // Don't include the File object as it can't be serialized
+        }))
       }
 
       // Handle Protocol Designer content if needed
@@ -220,9 +227,6 @@ export function InputPrompt(): JSX.Element {
     let config: AxiosRequestConfig
 
     if (validatedFiles.length > 0 && !isUpdateOrCreateRequest) {
-      // Process files locally for chat history storage
-      const fileAttachmentsWithContent = processFilesForHistory(validatedFiles)
-
       // Multipart upload for file attachments
       const formData = new FormData()
       formData.append('message', watchUserPrompt)
@@ -230,9 +234,31 @@ export function InputPrompt(): JSX.Element {
       formData.append('fake', 'false')
       formData.append('protocol_format', currentProtocolFormat)
 
-      // Add files to FormData
+      // Collect and add files from chat history with message index
+      completeHistory.forEach((msg, messageIndex) => {
+        if (msg.role === 'user' && msg.attachments) {
+          msg.attachments.forEach((att: any) => {
+            // Get the File object from the original chat history
+            const originalMsg = chatHistory[messageIndex]
+            if (originalMsg?.attachments) {
+              const originalAtt = originalMsg.attachments.find(
+                a => a.name === att.name
+              )
+              if (originalAtt?.content) {
+                // Use message index in filename for backend association
+                const fileKey = `msg${messageIndex}_${att.name}`
+                formData.append('files', originalAtt.content, fileKey)
+              }
+            }
+          })
+        }
+      })
+
+      // Add current message files (they belong to the next message index)
+      const currentMessageIndex = completeHistory.length
       validatedFiles.forEach(file => {
-        formData.append('files', file)
+        const fileKey = `msg${currentMessageIndex}_${file.name}`
+        formData.append('files', file, fileKey)
       })
 
       config = {
@@ -244,20 +270,6 @@ export function InputPrompt(): JSX.Element {
         },
         data: formData,
       }
-
-      // Ensure all files were processed successfully
-      if (fileAttachmentsWithContent.length !== validatedFiles.length) {
-        console.error('Failed to process some files for chat history')
-        return
-      }
-
-      // Store processed files for chat history
-      userInput.attachments = fileAttachmentsWithContent.map(file => ({
-        id: file.id,
-        name: file.filename,
-        type: file.file_type as FileType,
-        content: file.content, // Populated by backend processing
-      }))
     } else {
       // Traditional JSON request (no files or update/create requests)
       config = {

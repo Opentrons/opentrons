@@ -474,24 +474,33 @@ async def create_chat_completion_multipart(
         except json.JSONDecodeError:
             parsed_history_with_attachments = []
 
-        # Process NEW uploaded files for current message
-        new_file_references, token_warning = await _process_multipart_files(files)
+        # Process uploaded files with message mapping
+        files_by_message, token_warning = await _process_multipart_files_with_mapping(files)
+
+        # Reconstruct conversation history with file content
+        enhanced_history = _reconstruct_conversation_history(parsed_history_with_attachments, files_by_message)
+
+        # Get current message files (either at index -1 or at the end of history)
+        current_message_index = len(enhanced_history)
+        current_files = files_by_message.get(current_message_index, [])
+        if not current_files and -1 in files_by_message:
+            current_files = files_by_message[-1]
 
         # Determine protocol format
         protocol_format_enum = ProtocolFormat.PYTHON
         if protocol_format.lower() == "protocol_designer":
             protocol_format_enum = ProtocolFormat.PROTOCOL_DESIGNER
 
-        # Generate response using the new history-aware logic
+        # Generate response using the enhanced history
         response = _generate_llm_response_with_history(
             model_type=settings.model,
             user_id=str(user.sub),
             prompt=message,
             enable_analytics=enable_analytics,
-            history_with_attachments=parsed_history_with_attachments,
+            history_with_attachments=enhanced_history,
             protocol_format=protocol_format_enum,
             protocol_action="update",  # Default action
-            new_file_references=new_file_references,
+            new_file_references=current_files,
         )
         return _format_response(response, protocol_format_enum, fake, token_warning)
 
@@ -502,54 +511,136 @@ async def create_chat_completion_multipart(
         ) from e
 
 
-async def _process_multipart_files(files: List[UploadFile]) -> tuple[Optional[List[Dict[str, str]]], Optional[str]]:
-    """
-    Process uploaded files in the multipart completion handler.
-
-    This is called within the /api/chat/completion-multipart endpoint, AFTER FastAPI
-    has parsed the multipart form data but BEFORE sending files to the LLM. It handles
-    raw file bytes, processes them via FileProcessor, and validates token limits.
-
-    Pipeline position: HTTP Request → Multipart Parsing → File Processing → LLM Request
-    """
+async def _process_multipart_files_with_mapping(files: List[UploadFile]) -> tuple[Dict[int, List[Dict[str, str]]], Optional[str]]:
+    """Process uploaded files and group them by message index."""
     if not files or not any(f.filename for f in files):
-        return None, None
+        return {}, None
 
-    file_references: List[Dict[str, str]] = []
+    files_by_message: Dict[int, List[Dict[str, str]]] = {}
+
     for file in files:
-        if not file.filename:  # Skip empty file entries
+        if not file.filename:
             continue
 
-        # Read file content
-        file_content = await file.read()
+        message_index, original_filename = _extract_message_index_from_filename(file.filename)
 
-        # Validate content type before processing
-        if not file.content_type:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"File {file.filename} has no content type")
+        # Initialize message group if needed
+        if message_index not in files_by_message:
+            files_by_message[message_index] = []
 
-        # Let FileProcessor handle all validation and processing
         try:
-            processed = FileProcessor.process_multipart_file(file.filename, file.content_type, file_content)
-
-            file_references.append(
-                {
-                    "id": f"upload_{len(file_references)}",
-                    "filename": file.filename,
-                    "file_type": processed["file_type"],
-                    "content": processed["content"],
-                    "media_type": processed["media_type"],
-                }
-            )
+            file_count = len(files_by_message[message_index])
+            file_ref = await _process_single_multipart_file(file, message_index, file_count)
+            file_ref["filename"] = original_filename  # Use extracted original filename
+            files_by_message[message_index].append(file_ref)
         except ValueError as e:
-            # Handle file processing errors (like PDF too large)
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
 
-    # Check total token count and generate warning if needed
-    token_warning = (
-        FileProcessor.check_files_token_warning(file_references, claude.client, settings.anthropic_model_name) if file_references else None
-    )
+    # Check token count for all files
+    all_files = [file for file_list in files_by_message.values() for file in file_list]
+    token_warning = None
+    if all_files:
+        token_warning = FileProcessor.check_files_token_warning(all_files, claude.client, settings.anthropic_model_name)
 
-    return file_references, token_warning
+    return files_by_message, token_warning
+
+
+def _enhance_message_with_file_content(msg: Dict[str, Any], message_files: List[Dict[str, str]]) -> Dict[str, Any]:
+    """Post-upload phase: Merges frontend attachment metadata with processed file content.
+
+    Bridges frontend JSON (metadata only) with backend processed files before AI model.
+    """
+    enhanced_msg = msg.copy()
+    file_content_map = {f["filename"]: f for f in message_files}
+
+    if enhanced_msg.get("attachments"):
+        # Message has attachment metadata - enhance with content
+        enhanced_attachments = []
+        for att in enhanced_msg["attachments"]:
+            filename = att.get("name", att.get("filename", ""))
+            if filename in file_content_map:
+                file_ref = file_content_map[filename]
+                enhanced_attachments.append(
+                    {
+                        "id": att.get("id", file_ref["id"]),
+                        "filename": filename,
+                        "file_type": file_ref["file_type"],
+                        "content": file_ref["content"],
+                        "media_type": file_ref["media_type"],
+                    }
+                )
+        enhanced_msg["attachments"] = enhanced_attachments
+    else:
+        # No metadata - use files directly
+        enhanced_msg["attachments"] = []
+        for file_ref in message_files:
+            enhanced_msg["attachments"].append(
+                {
+                    "id": file_ref["id"],
+                    "filename": file_ref["filename"],
+                    "file_type": file_ref["file_type"],
+                    "content": file_ref["content"],
+                    "media_type": file_ref["media_type"],
+                }
+            )
+
+    return enhanced_msg
+
+
+def _reconstruct_conversation_history(
+    parsed_history: List[Dict[str, Any]], files_by_message: Dict[int, List[Dict[str, str]]]
+) -> List[Dict[str, Any]]:
+    """Pre-AI phase: Final assembly of conversation history with files in correct message positions.
+
+    Ensures AI model sees files in their original conversational context.
+    """
+    enhanced_history = []
+
+    for i, msg in enumerate(parsed_history):
+        if i in files_by_message and files_by_message[i]:
+            enhanced_msg = _enhance_message_with_file_content(msg, files_by_message[i])
+        else:
+            enhanced_msg = msg.copy()
+        enhanced_history.append(enhanced_msg)
+
+    return enhanced_history
+
+
+def _extract_message_index_from_filename(filename: str) -> tuple[int, str]:
+    """Raw upload phase: Parses msgN_filename format to determine conversation placement.
+
+    Returns (message_index, original_filename) for proper file grouping.
+    """
+    if filename.startswith("msg") and "_" in filename:
+        parts = filename.split("_", 1)
+        if len(parts) == 2 and parts[0][3:].isdigit():
+            return int(parts[0][3:]), parts[1]
+
+    return -1, filename  # Default for current message
+
+
+async def _process_single_multipart_file(file: UploadFile, message_index: int, file_count: int) -> Dict[str, str]:
+    """Raw upload processing: Validates and processes single file for AI consumption.
+
+    Sits between HTTP multipart parsing and conversation reconstruction.
+    """
+    file_content = await file.read()
+
+    if not file.filename:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="File has no filename")
+
+    if not file.content_type:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"File {file.filename} has no content type")
+
+    processed = FileProcessor.process_multipart_file(file.filename, file.content_type, file_content)
+
+    return {
+        "id": f"upload_{message_index}_{file_count}",
+        "filename": file.filename,
+        "file_type": processed["file_type"],
+        "content": processed["content"],
+        "media_type": processed["media_type"],
+    }
 
 
 def _determine_protocol_action(body: ChatRequest) -> str:

@@ -370,10 +370,10 @@ class AnthropicPredict:
 
         return {
             "id": attachment.get("id", ""),
-            "filename": attachment.get("name", attachment.get("filename", "")),
-            "file_type": attachment.get("type", attachment.get("file_type", "")),
+            "filename": attachment.get("filename", ""),
+            "file_type": attachment.get("file_type", ""),
             "content": attachment.get("content", ""),
-            "media_type": self._determine_media_type(attachment.get("type", attachment.get("file_type", ""))),
+            "media_type": self._determine_media_type(attachment.get("file_type", "")),
         }
 
     def _build_conversation_history(self, history_with_attachments: List[Dict[str, Any]], user_id: str) -> List[MessageParam]:
