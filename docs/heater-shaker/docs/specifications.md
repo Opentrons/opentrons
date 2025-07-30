@@ -1,5 +1,5 @@
 ---
-title: "Heater-Shaker Module GEN1 Instruction Manual: Product Specifications"
+title: "Heater-Shaker Module: Product Specifications"
 ---
 
 # Product Specifications
@@ -123,42 +123,41 @@ The Heater-Shaker has an LED status light that can display three colors: amber, 
 <table>
   <thead>
     <tr>
-      <th>LED Color and Behavior</th>
-      <th>Module Conditions</th>
+      <th>LED Color</th>
+      <th>Module Status</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td>Pulsing red</td>
+      <td><span class="status-dot red"></span>Red</td>
       <td>Heating</td>
     </tr>
     <tr>
       <td>Solid red</td>
-      <td>
+      <td>A red light indicates a hot temperature state.
         <ul>
-          <li>Holding at target temperature.</li>
-          <li>Hot to the touch (>49&deg;C).</li>
+          <li>Solid red: Hot to the touch (>49 °C).</li>
+          <li>Pulsing red: Heating</li>
         </ul>
       </td>
     </tr>
     <tr>
-      <td>Solid white</td>
-      <td>
+      <td><span class="status-dot" white></span>White</td>
+      <td>A solid white light indicates the module is:
         <ul>
-          <li>Powered on and idle.</li>
-          <li>Deactivated and not hot to the touch (<49&deg;C).</li>
+          <li>Powered on and idle (not actively heating or cooling).</li>
+          <li>Deactivated and not hot to the touch (<49 °C).</li>
         </ul>
       </td>
     </tr>
     <tr>
-      <td>Pulsing amber</td>
-      <td>Error</td>
+      <td><span class="status-dot" yellow></span> Amber</td>
+      <td>
+        <ul>
+          <li>Solid amber indicates an error.</li>
+          <li>Pulsing red and amber (alternating) indicates an error _and_ the module is hot to the touch (>49 °C)</li>
+        <ul>
     </tr>
-    <tr>
-      <td>Pulsing red and amber, alternating</td>
-      <td>Error and hot to the touch (>49&deg;C)</td>
-    </tr>
-    <tr>
       <td>LED off</td>
       <td>Powered off</td>
     </tr>

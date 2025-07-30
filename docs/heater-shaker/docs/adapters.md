@@ -1,5 +1,5 @@
 ---
-title: "Heater-Shaker Module GEN1 Instruction Manual: Thermal Adapters"
+title: "Heater-Shaker Module: Thermal Adapters"
 ---
 
 # Thermal Adapters

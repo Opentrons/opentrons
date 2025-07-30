@@ -1,5 +1,5 @@
 ---
-title: "Heater-Shaker Module GEN1 Instruction Manual: Safety Information and Regulatory Compliance"
+title: "Heater-Shaker Module: Safety Information and Regulatory Compliance"
 ---
 
 # Safety Information and Regulatory Compliance
@@ -57,33 +57,6 @@ The following table lists and defines use and storage standards for the Heater-S
 | Acceptable | These conditions are acceptable for system operation. The Heater-Shaker is safe to use in these conditions, but the module may not meet performance specifications. |
 | Storage | Storage and transportation conditions only apply when the device is completely disconnected from power and other equipment. |
 
-## Safety Warning Labels
-
-Warning symbols posted on the Heater-Shaker and in this manual warn you about sources of potential injury or harm. The following table lists and defines each safety warning symbol.
-
-<table>
-  <thead>
-    <tr>
-      <th>Symbol</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><img src="../images/hot-surface-warning.svg" alt="Hot surface warning symbol"></td>
-      <td><strong>CAUTION: Hot Surface!</strong><br>
-        This symbol identifies in instrument components that pose a risk of burning or heat damage if handled improperly.
-      </td>
-    </tr>
-    <tr>
-      <td><img src="../images/pinch-point-warning.svg" alt="Pinch point warning symbol"></td>
-      <td><strong>CAUTION: Pinch point!</strong><br>
-        This symbol identifies instrument components which can pose a risk of personal injury due to moving parts.
-      </td>
-    </tr>
-  </tbody>
-</table>
-
 ## Instrument Safety Warnings
 
 Warning symbols posted on the Heater-Shaker or listed here refer directly to the safe use of the instrument. Refer to the previous table for symbol definitions.
@@ -98,13 +71,13 @@ Warning symbols posted on the Heater-Shaker or listed here refer directly to the
   <tbody>
     <tr>
       <td><img src="../images/hot-surface-warning.svg" alt="Hot surface warning symbol"></td>
-      <td><strong>CAUTION: Warning about risk of burning.</strong><br>
+      <td><strong>CAUTION: Hot surface.</strong><br>
         The Heater-Shaker generates enough heat to cause serious burns. Wear safety goggles or other eye protection at all times during operation. Always ensure the module returns to idle temperature before removing samples or the module. Always allow maximum clearance to avoid accidental burns.
       </td>
     </tr>
     <tr>
       <td><img src="../images/pinch-point-warning.svg" alt="Pinch point warning symbol"></td>
-      <td><strong>CAUTION: Warning about moving parts.</strong><br>
+      <td><strong>CAUTION: Pinch point.</strong><br>
         The labware latch on the Heater-Shaker presents a pinch point hazard. Keep hands and fingers away from the module while the latch opens and closes.
       </td>
     </tr>
@@ -132,13 +105,11 @@ Press the power button above the USB connector to turn off the module. You can u
 
 ## Standards Compliance
 
-The Heater-Shaker has been tested and found to be in compliance
-with all applicable requirements of the following safety and
-electromagnetic standards.
+The Heater-Shaker has been tested and found to be in compliance with all applicable requirements of the following safety and electromagnetic standards.
 
 ### Safety
 
-- IEC/EN 61010-1 Safety ­ Requirements ­ for­ Electrical­ Equipment for­ Measurement,­ Control­ , and Laboratory Use
+- IEC/EN 61010-1 Safety­ Requirements­ for­ Electrical­ Equipment for­ Measurement,­ Control­, and Laboratory Use
 - IEC ­ 61010-2-010­ Requirement ­for­ Heating
 - IEC 61010-2-051: 2018­ Particular Requirements For Laboratory Equipment for Mixing and Stirring
 

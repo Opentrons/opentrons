@@ -1,5 +1,5 @@
 ---
-title: "Heater-Shaker Module GEN1 Instruction Manual: Additional Product Information"
+title: "Heater-Shaker Module: Additional Product Information"
 ---
 
 # Additional Product Information

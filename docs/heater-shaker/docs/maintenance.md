@@ -1,5 +1,5 @@
 ---
-title: "Heater-Shaker Module GEN1 Instruction Manual: Maintenance and Cleaning"
+title: "Heater-Shaker Module: Maintenance and Cleaning"
 ---
 
 # Maintenance and Cleaning

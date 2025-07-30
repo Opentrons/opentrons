@@ -1,5 +1,5 @@
 ---
-title: "Heater-Shaker Module GEN1 Instruction Manual"
+title: "Heater-Shaker Module"
 hide: toc
 ---
 

@@ -30,4 +30,12 @@ Opentrons hardware modules add features and capabilities to your robot.
 
     [:octicons-arrow-right-24: Instruction Manual](../hepa-uv/index.md)
 
+    ---
+
+    Provides on-deck heating and orbital shaking.
+
+    [:octicons-arrow-right-24: Instruction Manual](../heater-shaker/index.md)
+
+-   :opentrons-????:{ .xl .middle } __MODULE SOMETHING__
+
 </div>
