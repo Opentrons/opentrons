@@ -3,12 +3,10 @@ import isEqual from 'lodash/isEqual'
 import { css } from 'styled-components'
 
 import {
-  Banner,
   DeckConfigurator,
-  LegacyStyledText,
+  InlineNotification,
   RESPONSIVENESS,
-  SIZE_1,
-  SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
@@ -16,6 +14,7 @@ import {
   FAKE_FIXTURE_IDS,
   FLEX_ROBOT_TYPE,
   FLEX_STACKER_FIXTURES,
+  FLEX_STACKER_MODULE_TYPE,
   getAAForModuleFixture,
   getCutoutConfigReplacmentForModule,
   getCutoutFixturesForModuleModel,
@@ -32,6 +31,7 @@ import {
   SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
 
+import { useModuleUSBPort } from '/app/local-resources/modules'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 
 import { getFixtureIdByCutoutId } from './getFixtureIdByCutoutId'
@@ -79,6 +79,10 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
 
   const { t } = useTranslation('module_wizard_flows')
   const moduleName = getModuleDisplayName(attachedModule.moduleModel)
+  const { parseModuleUSBPort } = useModuleUSBPort()
+
+  const isFlexStacker = attachedModule.moduleType === FLEX_STACKER_MODULE_TYPE
+
   const handleOnClick = (): void => {
     if (maintenanceRunId == null) {
       createMaintenanceRun({}).catch(error => {
@@ -229,12 +233,21 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
       }
       bodyText={
         <>
-          <LegacyStyledText css={BODY_STYLE}>
-            {t('select_the_slot', { module: moduleName })}
-          </LegacyStyledText>
-          <Banner type="warning" size={SIZE_1} marginY={SPACING.spacing4}>
-            {t('module_secured')}
-          </Banner>
+          <StyledText css={BODY_STYLE}>
+            {t('select_the_slot', {
+              module: moduleName,
+              port: parseModuleUSBPort(attachedModule),
+            })}
+            {isFlexStacker ? null : ` ${t('location_must_be_correct')}`}
+          </StyledText>
+          {isFlexStacker ? (
+            <InlineNotification
+              type="neutral"
+              message={t('look_for_pulsing_lights')}
+            />
+          ) : (
+            <InlineNotification type="alert" message={t('module_secured')} />
+          )}
         </>
       }
       proceedButtonText={t('confirm_location')}

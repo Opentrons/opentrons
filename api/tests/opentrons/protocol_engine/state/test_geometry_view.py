@@ -192,6 +192,15 @@ _MOCK_LABWARE_DEFINITION3 = LabwareDefinition3.model_construct(  # type: ignore[
     ),
 )
 
+_MOCK_LABWARE_DEFINITION2 = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+    namespace="test",
+    version=1,
+    schemaVersion=2,
+    dimensions=LabwareDimensions(xDimension=1000, yDimension=1200, zDimension=750),
+    parameters=LabwareDefinition2Parameters.model_construct(loadName="labware-name"),  # type: ignore[call-arg]
+)
+
+
 MOCK_ADDRESSABLE_AREA = AddressableArea(
     area_name="1",
     area_type=AreaType.SLOT,
@@ -2735,31 +2744,76 @@ def test_ensure_location_not_occupied_raises(
     )
 
 
-def test_get_labware_grip_point(
+def test_get_labware_grip_point_v2_definition(
     decoy: Decoy,
     mock_labware_view: LabwareView,
     mock_addressable_area_view: AddressableAreaView,
     subject: GeometryView,
 ) -> None:
-    """It should get the grip point of the labware at the specified location."""
+    """It should get the grip point of a LabwareDefinition2 labware at the specified location."""
     decoy.when(
-        mock_labware_view.get_grip_height_from_labware_bottom(
-            sentinel.labware_definition
-        )
+        mock_labware_view.get_grip_height_from_labware_bottom(_MOCK_LABWARE_DEFINITION2)
     ).then_return(100)
 
     decoy.when(
         mock_addressable_area_view.get_addressable_area_center(DeckSlotName.SLOT_1.id)
     ).then_return(Point(x=101, y=102, z=103))
+
+    decoy.when(
+        mock_addressable_area_view.get_addressable_area(DeckSlotName.SLOT_1.id)
+    ).then_return(MOCK_ADDRESSABLE_AREA)
+
+    expected_lw_origin_to_parent = Point(0, 0, 0)
+
     labware_center = subject.get_labware_grip_point(
-        labware_definition=sentinel.labware_definition,
+        labware_definition=_MOCK_LABWARE_DEFINITION2,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
     )
 
     assert labware_center == Point(
-        101.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x,
-        102.0 + +_PARENT_ORIGIN_TO_LABWARE_ORIGIN.y,
-        203 + +_PARENT_ORIGIN_TO_LABWARE_ORIGIN.z,
+        101.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x + expected_lw_origin_to_parent.x,
+        102.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y + expected_lw_origin_to_parent.y,
+        203 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z + expected_lw_origin_to_parent.z,
+    )
+
+
+def test_get_labware_grip_point_v3_definition(
+    decoy: Decoy,
+    mock_labware_view: LabwareView,
+    mock_addressable_area_view: AddressableAreaView,
+    subject: GeometryView,
+) -> None:
+    """It should get the grip point of a LabwareDefinition3 labware at the specified location."""
+    decoy.when(
+        mock_labware_view.get_grip_height_from_labware_bottom(_MOCK_LABWARE_DEFINITION3)
+    ).then_return(100)
+
+    decoy.when(
+        mock_addressable_area_view.get_addressable_area_center(DeckSlotName.SLOT_1.id)
+    ).then_return(Point(x=101, y=102, z=103))
+
+    decoy.when(
+        mock_addressable_area_view.get_addressable_area(DeckSlotName.SLOT_1.id)
+    ).then_return(MOCK_ADDRESSABLE_AREA)
+
+    expected_lw_origin_to_parent = (
+        Point(
+            0,
+            MOCK_ADDRESSABLE_AREA.bounding_box.y,
+            MOCK_ADDRESSABLE_AREA.bounding_box.z,
+        )
+        * -1
+    )
+
+    labware_center = subject.get_labware_grip_point(
+        labware_definition=_MOCK_LABWARE_DEFINITION3,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+    )
+
+    assert labware_center == Point(
+        101.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x + expected_lw_origin_to_parent.x,
+        102.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y + expected_lw_origin_to_parent.y,
+        203 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z + expected_lw_origin_to_parent.z,
     )
 
 
@@ -2790,15 +2844,31 @@ def test_get_labware_grip_point_on_labware(
         mock_addressable_area_view.get_addressable_area_center(DeckSlotName.SLOT_4.id)
     ).then_return(Point(x=5, y=9, z=10))
 
+    decoy.when(
+        mock_addressable_area_view.get_addressable_area(DeckSlotName.SLOT_4.id)
+    ).then_return(MOCK_ADDRESSABLE_AREA)
+
+    expected_lw_origin_to_parent = (
+        Point(
+            0,
+            MOCK_ADDRESSABLE_AREA.bounding_box.y,
+            MOCK_ADDRESSABLE_AREA.bounding_box.z,
+        )
+        * -1
+    )
+
     grip_point = subject.get_labware_grip_point(
         labware_definition=sentinel.definition,
         location=OnLabwareLocation(labwareId="below-id"),
     )
 
     assert grip_point == Point(
-        5.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x * 2,  # The labware and adapter
-        9.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y * 2,
-        110.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z * 2,
+        5.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x * 2 + expected_lw_origin_to_parent.x,
+        9.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y * 2 + expected_lw_origin_to_parent.y,
+        10.0
+        + 100
+        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z * 2
+        + expected_lw_origin_to_parent.z,
     )
 
 
@@ -2868,14 +2938,23 @@ def test_get_labware_grip_point_for_labware_on_module(
         )
     ).then_return(Point(x=0, y=0, z=0))
 
+    expected_lw_origin_to_parent = (
+        Point(
+            0,
+            MOCK_ADDRESSABLE_AREA.bounding_box.y,
+            MOCK_ADDRESSABLE_AREA.bounding_box.z,
+        )
+        * -1
+    )
+
     result_grip_point = subject.get_labware_grip_point(
         labware_definition=sentinel.labware_definition,
         location=ModuleLocation(moduleId="module-id"),
     )
     assert result_grip_point == Point(
-        x=492 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x,
-        y=350 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y,
-        z=838 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z,
+        x=492 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x + expected_lw_origin_to_parent.x,
+        y=350 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y + expected_lw_origin_to_parent.y,
+        z=838 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z + expected_lw_origin_to_parent.z,
     )
 
 
@@ -2953,6 +3032,15 @@ def test_get_labware_grip_point_for_labware_stack_on_module(
         "magneticBlockV1C3"
     )
 
+    expected_lw_origin_to_parent = (
+        Point(
+            0,
+            MOCK_ADDRESSABLE_AREA.bounding_box.y,
+            MOCK_ADDRESSABLE_AREA.bounding_box.z,
+        )
+        * -1
+    )
+
     result_grip_point = subject.get_labware_grip_point(
         labware_definition=sentinel.labware_definition,
         location=OnLabwareLocation(labwareId="below-id-9"),
@@ -2960,9 +3048,14 @@ def test_get_labware_grip_point_for_labware_stack_on_module(
 
     assert result_grip_point == Point(
         x=492.0
-        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x * 2,  # The labware and module beneath it.
-        y=350.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y * 2,
-        z=838.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z * 2,
+        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x * 2  # The labware and module beneath it.
+        + expected_lw_origin_to_parent.x,
+        y=350.0
+        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y * 2
+        + expected_lw_origin_to_parent.y,
+        z=838.0
+        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z * 2
+        + expected_lw_origin_to_parent.z,
     )
 
 

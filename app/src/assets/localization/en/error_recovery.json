@@ -142,6 +142,7 @@
   "stacker_latch_jammed_errors_occur_when": "Stacker latch jammed errors occur when labware gets stuck in between the stacker latch. This is usually caused by improperly placed labware or inaccurate labware definitions",
   "stacker_latch_will_reengage": "The stacker latch will re-engage so that you can reload the stacker. Make sure that any obstructions have been cleared.",
   "stacker_shuttle_missing_error_occurs_when": "Stacker shuttle missing errors occur when the shuttle is not placed correctly on the track. Load the stacker shuttle onto the track to proceed.",
+  "stacker_shuttle_not_empty": "Stacker Shuttle Not Empty",
   "stacker_stall_or_collision_error": "Stacker stalled",
   "stall_or_collision_detected_when": "A stall or collision is detected when the robot's motors are blocked",
   "stall_or_collision_error": "Stall or collision",
