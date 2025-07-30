@@ -103,15 +103,14 @@
     "body1": "Pause protocol now to wait until module reaches {{temperature}}°C before continuing on to the next step.",
     "body2": "Build a pause later if you want your protocol to proceed to the next steps while the temperature module ramps up to {{temperature}}°C.",
     "heater_shaker_pause_later": "Build a pause later if you want your protocol to proceed to the next steps while the Heater-Shaker module goes to {{temperature}}°C",
-    "heater_shaker_title": "Pause protocol until Heater-Shaker module is at {{temperature}}°C?",
+    "heater_shaker_title": "Pause protocol until Heater-Shaker module reaches {{temperature}}°C",
     "later_button": "I will build a pause later",
     "now_button": "Pause protocol now",
     "redesign": {
-      "body1": "Build a pause step to wait until {{module}} reaches {{temp}}°C before continuing to the next step.",
-      "body2": "Build a pause step later if you want your protocol to proceed to the next step while the {{module}} goes to {{temp}}°C",
-      "build_pause_later": "Build pause later",
-      "pause_protocol": "Pause protocol",
-      "title": "Pause protocol until {{module}} is at {{temp}}°C"
+      "body": "Add a pause step to wait until the {{module}} reaches {{temperature}}°C. Click Skip to continue to the next protocol step without pausing.",
+      "skip_pause_step": "Skip pause step",
+      "add_pause_step": "Add pause step",
+      "title": "Pause protocol until {{module}} reaches {{temp}}°C?"
     },
     "title": "Pause protocol until temperature module is at {{temperature}}°C?"
   },
