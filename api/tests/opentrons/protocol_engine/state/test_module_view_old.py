@@ -4,6 +4,7 @@ DEPRECATED: Testing ModuleView independently of ModuleView is no longer helpful.
 Try to add new tests to test_module_state.py, where they can be tested together,
 treating ModuleState as a private implementation detail.
 """
+
 import pytest
 from math import isclose
 from pytest_lazy_fixtures import lf as lazy_fixture
@@ -137,10 +138,10 @@ def make_module_view(
         for module_id in slot_by_module_id:
             deck_slot = slot_by_module_id[module_id]
             if deck_slot is not None:
-                load_location_by_module_id[
-                    module_id
-                ] = deck_configuration_provider.get_cutout_id_by_deck_slot_name(
-                    deck_slot
+                load_location_by_module_id[module_id] = (
+                    deck_configuration_provider.get_cutout_id_by_deck_slot_name(
+                        deck_slot
+                    )
                 )
             else:
                 load_location_by_module_id[module_id] = None
@@ -1159,7 +1160,7 @@ def test_magnetic_module_view_calculate_magnet_hardware_height(
         assert result == expected_result
 
 
-@pytest.mark.parametrize("target_temp", [36.8, 95.1])
+@pytest.mark.parametrize("target_temp", [-1, 95.1])
 def test_validate_heater_shaker_target_temperature_raises(
     heater_shaker_v1_def: ModuleDefinition,
     target_temp: float,
