@@ -47,7 +47,7 @@ import styles from './inputprompt.module.css'
 
 import type { AxiosRequestConfig } from 'axios'
 import type { ProtocolFile } from '@opentrons/shared-data'
-import type { ChatData } from '/ai-client/resources/types'
+import type { ChatData, ChatMessage } from '/ai-client/resources/types'
 
 export function InputPrompt(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
@@ -189,7 +189,7 @@ export function InputPrompt(): JSX.Element {
     // Build a complete history array that preserves file attachments in their original messages.
     // This allows the backend to construct proper conversation history with files in the right context.
     const completeHistory = chatHistory.map(msg => {
-      const baseMessage: any = {
+      const baseMessage: ChatMessage = {
         role: msg.role,
         content: msg.content,
       }

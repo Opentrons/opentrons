@@ -85,6 +85,15 @@ export interface Chat {
   attachments?: FileAttachment[]
 }
 
+/** Chat message serialized for API requests (without File content) */
+export interface ChatMessage {
+  role: Role
+  content: string
+  protocol_content?: string
+  protocol_format?: ProtocolFormat
+  attachments?: Array<Omit<FileAttachment, 'content'>>
+}
+
 export interface RouteProps {
   /** the component rendered by a route match
    * drop developed components into slots held by placeholder div components
