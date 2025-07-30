@@ -156,7 +156,7 @@ async def _execute_common(  # noqa: C901
         # only way for this to happen is if someone tries to do a liquid probe with
         # a tip that's previously held liquid, which they should avoid anyway.
         raise PipetteNotReadyToAspirateError(
-            "The pipette cannot probe liquid because a previous dispense or blow out"
+            "The pipette cannot probe liquid because a previous dispense or blowout"
             " pushed the plunger beyond the bottom position."
             " The plunger must be reset while the tip is somewhere away from liquid."
         )

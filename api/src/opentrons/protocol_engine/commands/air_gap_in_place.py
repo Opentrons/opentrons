@@ -89,8 +89,8 @@ class AirGapInPlaceImplementation(
         )
         if not ready_to_aspirate:
             raise PipetteNotReadyToAspirateError(
-                "Pipette cannot air gap in place because a previous dispense or blow"
-                " out pushed the plunger beyond the bottom position."
+                "Pipette cannot air gap in place because a previous dispense or blowout"
+                " pushed the plunger beyond the bottom position."
                 " The subsequent aspirate must be from a specific well so the plunger"
                 " can be reset in a known safe position."
             )
