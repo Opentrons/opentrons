@@ -27,6 +27,7 @@
     "@opentrons/step-generation": "link:../step-generation",
     "@opentrons/shared-data": "link:../shared-data",
     "@sentry/react": "^9.12.0",
+    "@syncfusion/ej2-react-charts": "30.1.41",
     "@types/redux-actions": "2.6.1",
     "@types/styled-components": "^5.1.26",
     "@types/ua-parser-js": "0.7.36",
@@ -41,6 +42,7 @@
     "lodash": "4.17.21",
     "mixpanel-browser": "2.22.1",
     "query-string": "6.2.0",
+    "plotly.js": "3.1.0-rc.0",
     "react": "18.2.0",
     "react-color": "2.19.3",
     "react-dnd": "16.0.1",
@@ -49,6 +51,7 @@
     "react-error-boundary": "^4.0.10",
     "react-hook-form": "7.49.3",
     "react-i18next": "14.0.0",
+    "react-plotly.js": "2.6.0",
     "react-redux": "8.1.2",
     "redux": "5.0.1",
     "redux-actions": "2.2.1",
@@ -68,6 +71,7 @@
     "postcss-loader": "^4.0.4",
     "postcss-preset-env": "9.3.0",
     "postcss-color-mod-function": "3.0.3",
+    "victory": "37.1.1",
     "yup": "1.3.3"
   },
   "devDependencies": {

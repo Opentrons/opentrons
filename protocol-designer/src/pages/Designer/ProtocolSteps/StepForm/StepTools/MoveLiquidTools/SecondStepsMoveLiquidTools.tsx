@@ -1,17 +1,34 @@
 import { useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
+import Plot from 'react-plotly.js'
 import { useSelector } from 'react-redux'
 import { round } from 'lodash'
 
 import {
+  ALIGN_CENTER,
+  Chip,
+  COLORS,
   DIRECTION_COLUMN,
   Divider,
   Flex,
+  FLEX_MIN_CONTENT,
+  JUSTIFY_FLEX_END,
+  Modal,
+  PrimaryButton,
+  SecondaryButton,
   SPACING,
   StyledText,
   Tabs,
+  Tag,
 } from '@opentrons/components'
-import { getMaxPushOutVolume, getMinXYDimension } from '@opentrons/shared-data'
+import {
+  getAllLiquidClassDefs,
+  getFlexNameConversion,
+  getMaxPushOutVolume,
+  getMinXYDimension,
+  NONE_LIQUID_CLASS_NAME,
+} from '@opentrons/shared-data'
 import { getTrashOrLabware } from '@opentrons/step-generation'
 
 import {
@@ -19,6 +36,7 @@ import {
   InputStepFormField,
   ToggleStepFormField,
 } from '../../../../../../components/molecules'
+import { getMainPagePortalEl } from '../../../../../../components/organisms'
 import { ResetSettingsModal } from '../../../../../../components/organisms/ResetSettingsModal'
 import { getRobotType } from '../../../../../../file-data/selectors'
 import {
@@ -44,12 +62,218 @@ import { MultiInputField } from './MultiInputField'
 import { ResetSettingsField } from './ResetSettingsField'
 
 import type { Dispatch, SetStateAction } from 'react'
+import type { LiquidHandlingPropertyByVolume } from '@opentrons/shared-data'
 import type { FormData, StepFieldName } from '../../../../../../form-types'
 import type { FieldPropsByName, LiquidHandlingTab } from '../../types'
 import type { StepInputFieldProps } from './MultiInputField'
 
+function DraggableLineChart(props: {
+  dataPoints: Array<{ id: string; x: number; y: number }>
+  setDataPoints: (
+    dataPoints: Array<{ id: string; x: number; y: number }>
+  ) => void
+  byVolume: LiquidHandlingPropertyByVolume
+}): JSX.Element {
+  const { dataPoints, setDataPoints } = props
+
+  // Function to handle the relayout event (when shapes are dragged)
+  const handleRelayout = (eventData: any): void => {
+    // Loop through the existing data points
+    const updatedPoints = [...dataPoints]
+    let changed = false
+
+    // Plotly's relayout event provides information about changes.
+    // For shapes, it's typically in the format 'shapes[index].x0', 'shapes[index].y0', etc.
+    // We need to iterate through possible shape indices to find what changed.
+    for (let i = 0; i < updatedPoints.length; i++) {
+      const xKey = `shapes[${i}].x0`
+      const yKey = `shapes[${i}].y0`
+
+      if (eventData[xKey] !== undefined && eventData[yKey] !== undefined) {
+        // Adjust the x and y values for the center of the circle,
+        // as x0/y0 represent the top-left corner of the bounding box.
+        // Assuming a radius of 0.1 for the circles as in `getShapes`.
+        const newX = eventData[xKey] as number
+        const newY = eventData[yKey] as number
+
+        if (updatedPoints[i].x !== newX || updatedPoints[i].y !== newY) {
+          updatedPoints[i] = {
+            ...updatedPoints[i],
+            // x: Math.max(newX, 0),
+            y: Math.max(newY, 0),
+          }
+          changed = true
+        }
+      }
+    }
+
+    if (changed) {
+      setDataPoints(updatedPoints)
+    }
+  }
+  const getAnnotations = (): any => {
+    return dataPoints.map(point => ({
+      xref: 'x',
+      yref: 'y',
+      x: point.x,
+      y: point.y,
+      text: `(${point.x.toFixed(2)}, ${point.y.toFixed(2)})`,
+      showarrow: false,
+      xanchor: 'center',
+      yanchor: 'bottom',
+      yshift: 15,
+      font: {
+        color: 'black',
+        size: 11,
+      },
+      opacity: 1, // --- Simplified: Always visible now ---
+    }))
+  }
+
+  // Helper function to generate shapes based on data points
+  const getShapes = (): any => {
+    return dataPoints.map((point, index) => ({
+      type: 'circle',
+      xref: 'x',
+      yref: 'y',
+      // x0, y0, x1, y1 define the bounding box of the circle
+      // We'll make the circle radius 0.1 for visual clarity
+      x0: point.x - 5,
+      y0: point.y - 5,
+      x1: point.x + 5,
+      y1: point.y + 5,
+      fillcolor: COLORS.blue50, // Red, semi-transparent
+      line: { width: 0 },
+      editable: false, // This makes the circle draggable
+      // A unique ID helps track the shape, though not directly used in this simple handler
+      name: point.id,
+    }))
+  }
+
+  return (
+    <div>
+      <Plot
+        data={[
+          {
+            x: dataPoints.map(p => p.x),
+            y: dataPoints.map(p => p.y),
+            mode: 'lines+markers',
+            type: 'scatter',
+            marker: {
+              size: 35,
+              opacity: 0,
+            },
+            line: { width: 2 },
+            showlegend: false, // Hide this trace from the legend
+            hoverinfo: 'none',
+          },
+        ]}
+        layout={{
+          width: 700,
+          height: 700,
+          title: { text: 'Flow rate (ul/s) vs Volume (ul)', editable: false },
+          xaxis: { title: 'Volume (ul)', range: [0, 210] },
+          yaxis: { title: 'Flow rate (ul/s)', range: [0, 210] },
+          shapes: getShapes(), // Add the draggable shapes
+          hovermode: 'closest', // Improves hover experience
+          annotations: getAnnotations(),
+        }}
+        config={{
+          editable: true,
+          displayModeBar: true,
+          modeBarButtonsToRemove: [
+            'zoom2d', // Remove the zoom box button
+            'pan2d', // Remove the pan button
+            'autoScale2d', // Remove the autoscale button
+            'hoverClosestCartesian', // Remove hover tooltips
+            'toImage', // Remove download image button
+            'lasso2d',
+            'select2d',
+            'toggleHover',
+            'zoomIn2d',
+            'zoomOut2d',
+          ],
+          edits: {
+            titleText: false, // Disable title editing
+            axisTitleText: false, // Explicitly disable axis title editing
+            legendText: false, // Explicitly disable legend text editing
+            colorbarTitleText: false, // Explicitly disable colorbar title editing
+            shapePosition: true, // <-- Allow dragging shapes (this is the one we want true)
+            shapeEdit: false, // <-- Attempt to disable general shape editing (including resize)
+          },
+        }}
+        onRelayout={handleRelayout}
+      />
+    </div>
+  )
+}
+
 const addPrefix = (prefix: string) => (fieldName: string): StepFieldName =>
   `${prefix}_${fieldName}`
+
+const getByVolumeMappedToXY = (
+  data: LiquidHandlingPropertyByVolume
+): Array<{ x: number; y: number }> => {
+  return [
+    { x: 0, y: data[0][1] },
+    ...data.map(item => ({
+      x: item[0],
+      y: item[1],
+    })),
+  ]
+}
+
+function EditableLineChartModal(props: {
+  byVolume: LiquidHandlingPropertyByVolume
+  onClose: () => void
+  setFlowRates: Dispatch<SetStateAction<LiquidHandlingPropertyByVolume>>
+  defaultFlowRates: LiquidHandlingPropertyByVolume
+  setIsFlowRatesUpdated: Dispatch<SetStateAction<boolean>>
+}): JSX.Element {
+  const {
+    byVolume = [],
+    onClose,
+    setFlowRates,
+    defaultFlowRates,
+    setIsFlowRatesUpdated,
+  } = props
+  const defaultDataPoints = getByVolumeMappedToXY(byVolume)
+  const [dataPoints, setDataPoints] = useState(defaultDataPoints)
+
+  return createPortal(
+    <Modal
+      title="Flow rate (ul/s) vs Volume (ul)"
+      onClose={onClose}
+      closeOnOutsideClick
+      width={FLEX_MIN_CONTENT}
+    >
+      <DraggableLineChart
+        dataPoints={dataPoints}
+        setDataPoints={setDataPoints}
+        byVolume={byVolume}
+      />
+      <Flex justifyContent={JUSTIFY_FLEX_END} gridGap={SPACING.spacing4}>
+        <SecondaryButton
+          onClick={() => {
+            setDataPoints(getByVolumeMappedToXY(defaultFlowRates))
+          }}
+        >
+          Reset curve
+        </SecondaryButton>
+        <PrimaryButton
+          onClick={() => {
+            setFlowRates(dataPoints.map(p => [p.x, p.y]))
+            onClose()
+            setIsFlowRatesUpdated(true)
+          }}
+        >
+          Save
+        </PrimaryButton>
+      </Flex>
+    </Modal>,
+    getMainPagePortalEl()
+  )
+}
 
 interface SecondStepsMoveLiquidToolsProps {
   propsForFields: FieldPropsByName
@@ -76,10 +300,27 @@ export const SecondStepsMoveLiquidTools = ({
   const { trashBinEntities, wasteChuteEntities } = useSelector(
     getInvariantContext
   )
+  const { spec: pipetteSpecs } = pipetteEntities[String(formData.pipette)]
+  const byTipValues = getAllLiquidClassDefs()
+    [
+      formData.liquidClass !== NONE_LIQUID_CLASS_NAME
+        ? formData.liquidClass
+        : 'waterV1'
+    ].byPipette.find(
+      ({ pipetteModel }) => pipetteModel === getFlexNameConversion(pipetteSpecs)
+    )
+    ?.byTipType.find(({ tiprack }) => tiprack === formData.tipRack)?.aspirate
+    .flowRateByVolume
+
   const robotType = useSelector(getRobotType)
   const pipetteSpec = useSelector(getPipetteEntities)[formData.pipette]?.spec
   const [showResetModal, setShowResetModal] = useState<boolean>(false)
-
+  const [showChart, setShowChart] = useState<boolean>(false)
+  const [flowRates, setFlowRates] = useState<LiquidHandlingPropertyByVolume>(
+    byTipValues ?? []
+  )
+  // need presaved logic here
+  const [isFlowRatesUpdated, setIsFlowRatesUpdated] = useState<boolean>(false)
   const addFieldNamePrefix = addPrefix(tab)
   const isWasteChuteSelected =
     propsForFields.dispense_labware?.value != null
@@ -281,19 +522,38 @@ export const SecondStepsMoveLiquidTools = ({
           <Tabs tabs={[aspirateTab, dispenseTab]} />
         </Flex>
         <Divider marginY="0" />
-        <FlowRateField
-          key={`${addFieldNamePrefix('flowRate')}_flowRateField`}
-          {...propsForFields[addFieldNamePrefix('flowRate')]}
-          pipetteId={formData.pipette}
-          flowRateType={tab}
-          volume={propsForFields.volume?.value ?? 0}
-          tiprack={propsForFields.tipRack.value}
-          showTooltip={false}
-          formData={formData}
-        />
+        {byTipValues != null ? (
+          <Flex
+            paddingX={SPACING.spacing16}
+            gridGap={SPACING.spacing4}
+            alignItems={ALIGN_CENTER}
+          >
+            <PrimaryButton
+              onClick={() => {
+                setShowChart(true)
+              }}
+            >
+              Flow rate builder
+            </PrimaryButton>
+            {isFlowRatesUpdated ? (
+              <Chip type="success" text="updated flow rates" />
+            ) : null}
+            {showChart ? (
+              <EditableLineChartModal
+                byVolume={flowRates}
+                onClose={() => {
+                  setShowChart(false)
+                }}
+                setFlowRates={setFlowRates}
+                defaultFlowRates={byTipValues ?? []}
+                setIsFlowRatesUpdated={setIsFlowRatesUpdated}
+              />
+            ) : null}
+          </Flex>
+        ) : null}
+
         {hideWellOrderField ? null : (
           <>
-            <Divider marginY="0" />
             <WellsOrderField
               prefix={tab}
               updateFirstWellOrder={
