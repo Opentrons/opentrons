@@ -29,8 +29,15 @@ import type {
 export type DeckSlot = string
 type THERMOCYCLER_STATE = 'thermocyclerState'
 type THERMOCYCLER_PROFILE = 'thermocyclerProfile'
+
+export const TOUCHED_PIPETTABLE_LABWARE: 'TOUCHED_PIPETTABLE_LABWARE' =
+  'TOUCHED_PIPETTABLE_LABWARE'
 export interface LabwareTemporalProperties {
-  stack: string[] // a stack of ids from top to bottom
+  // a stack of ids from top to bottom
+  stack: string[]
+  // we currently use this property only to track if a lid has been placed on a "pipettable" labware that could presumably contain liquid
+  // we can expand this type in the future to track other types of sterility for various labware types
+  sterility?: typeof TOUCHED_PIPETTABLE_LABWARE
 }
 
 export interface PipetteTemporalProperties {
