@@ -16,6 +16,7 @@ import {
   getFullStackFromLabwares,
   getNearestParentInStack,
   getSlotInLocationStack,
+  TOUCHED_PIPETTABLE_LABWARE,
 } from '@opentrons/step-generation'
 
 import { getRobotType } from '../../file-data/selectors'
@@ -392,7 +393,8 @@ export const getUnoccupiedStackOptions = (args: {
   const { labware: labwareState } = robotState
 
   const isLabwareToMoveUsedLid =
-    labwareState[labwareIdFromDropdown]?.isUsedLid === true
+    labwareState[labwareIdFromDropdown]?.touchedPipettableLabware ===
+    TOUCHED_PIPETTABLE_LABWARE
 
   return Object.entries(labwareState).reduce<Option[]>(
     (acc, [labwareId, temporalLabwareOnDeck]) => {

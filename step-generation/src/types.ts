@@ -29,11 +29,13 @@ import type {
 export type DeckSlot = string
 type THERMOCYCLER_STATE = 'thermocyclerState'
 type THERMOCYCLER_PROFILE = 'thermocyclerProfile'
+
+export const TOUCHED_PIPETTABLE_LABWARE: 'TOUCHED_PIPETTABLE_LABWARE' =
+  'TOUCHED_PIPETTABLE_LABWARE'
 export interface LabwareTemporalProperties {
   // a stack of ids from top to bottom
   stack: string[]
-  // isUsed is a boolean currently only used for lids that designates whether the lid was previously placed on a labware
-  isUsedLid?: boolean
+  touchedPipettableLabware?: typeof TOUCHED_PIPETTABLE_LABWARE
 }
 
 export interface PipetteTemporalProperties {

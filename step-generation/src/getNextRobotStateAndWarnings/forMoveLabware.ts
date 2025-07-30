@@ -1,5 +1,6 @@
 import { getIsLid, getIsPipettableLabware } from '@opentrons/shared-data'
 
+import { TOUCHED_PIPETTABLE_LABWARE } from '../types'
 import { getFullStackFromLabwares, getSlotInLocationStack } from '../utils'
 
 import type { MoveLabwareParams } from '@opentrons/shared-data'
@@ -62,7 +63,9 @@ export function forMoveLabware(
       robotState.labware[id] = {
         ...robotState.labware[id],
         stack: [id, ...stackBelow, ...newLocationStack],
-        isUsedLid: isLabwareToMoveLid && isParentPipettableLabware,
+        ...(isLabwareToMoveLid && isParentPipettableLabware
+          ? { touchedPipettableLabware: TOUCHED_PIPETTABLE_LABWARE }
+          : {}),
       }
     }
   })

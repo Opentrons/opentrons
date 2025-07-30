@@ -6,7 +6,10 @@ import { createSelector } from 'reselect'
 
 import { getIsLid, getIsPipettableLabware } from '@opentrons/shared-data'
 import * as StepGeneration from '@opentrons/step-generation'
-import { getNearestParentInStack } from '@opentrons/step-generation'
+import {
+  getNearestParentInStack,
+  TOUCHED_PIPETTABLE_LABWARE,
+} from '@opentrons/step-generation'
 
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
@@ -80,8 +83,10 @@ export const getInitialRobotState: (
           )
         return {
           stack,
-          // set isUsedLid to true if the labware is a lid and the parent is pipettable labware
-          ...(isLid && isParentPipettableLabware ? { isUsedLid: true } : {}),
+          // set touchedPipettableLabware to TOUCHED_PIPETTABLE_LABWARE if the labware is a lid and the parent is pipettable labware
+          ...(isLid && isParentPipettableLabware
+            ? { touchedPipettableLabware: TOUCHED_PIPETTABLE_LABWARE }
+            : {}),
         }
       }
     )
