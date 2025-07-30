@@ -1,4 +1,5 @@
 """Heater-Shaker Module sub-state."""
+
 from dataclasses import dataclass
 from typing import NewType, Optional
 
@@ -18,8 +19,7 @@ from opentrons.protocol_engine.errors import (
 HeaterShakerModuleId = NewType("HeaterShakerModuleId", str)
 
 
-# TODO (spp, 2022-03-22): Move these values to heater-shaker module definition.
-HEATER_SHAKER_TEMPERATURE_RANGE = TemperatureRange(min=37, max=95)
+HEATER_SHAKER_MAX_TEMPERATURE_RANGE = TemperatureRange(min=0, max=95)
 HEATER_SHAKER_SPEED_RANGE = SpeedRange(min=200, max=3000)
 
 
@@ -99,9 +99,11 @@ class HeaterShakerModuleSubState:
         if ModuleDataValidator.is_heater_shaker_data(data):
             return cls(
                 module_id=module_id,
-                labware_latch_status=HeaterShakerLatchStatus.CLOSED
-                if data["labwareLatchStatus"] == "idle_closed"
-                else HeaterShakerLatchStatus.OPEN,
+                labware_latch_status=(
+                    HeaterShakerLatchStatus.CLOSED
+                    if data["labwareLatchStatus"] == "idle_closed"
+                    else HeaterShakerLatchStatus.OPEN
+                ),
                 is_plate_shaking=data["targetSpeed"] is not None,
                 plate_target_temperature=data["targetTemp"],
             )
