@@ -9,12 +9,14 @@ Usage:
 import os
 import sys
 import argparse
+import numpy as np
 import plotly.graph_objects as go  # type: ignore
 import pandas as pd  # type: ignore
 import statistics
 import json
 
 from ast import literal_eval
+from scipy.signal import correlate
 from collections import defaultdict
 from enum import Enum
 from typing import Any, DefaultDict, Dict, List, Optional, Tuple
@@ -114,13 +116,17 @@ def convert_to_dict(obj: DefaultDict[Any, Any]) -> Dict[Any, Any]:
 def is_valid_row(axis: str, platform: str, zone: int, config: Dict[Any, Any], count: Optional[Tuple[int,int]] = None ) -> bool:
     """Determine if the row should be processed."""
     labware_count = config["labware_count"]
+    assert len(labware_count) == 2, "Labware count must be 2 integers."
     for a in ["x", "z"]:
         if axis == a:
+            lw_count = 0 if not count else count[0] if a == 'x' else count[1]
+            exp_count = 0 if not count else labware_count[0] if a == 'x' else labware_count[1]
             platform_list = config[f"platform_list_{a}"]
             zone_list = config[f"zone_list_{a}"]
+            print("COUNT", count, labware_count, lw_count, exp_count, lw_count == exp_count)
             return (not platform_list or platform in platform_list) and (
                 not zone_list or zone in zone_list
-            ) and (not count or labware_count in count)
+            ) and (not count or lw_count == exp_count)
     return False
 
 
@@ -139,7 +145,7 @@ def parse_common_args(args: argparse.Namespace) -> Dict[str, Any]:
         "axis_list": args.axis,
         "stacker_list": args.stackers or [],
         "labware_list": [] if "all" in args.labware else args.labware or ["baseline"],
-        "labware_count": args.labware_count,
+        "labware_count": tuple(args.labware_count),
         "platform_list_x": args.platform_x,
         "platform_list_z": args.platform_z,
         "zone_list_x": args.zones_x or list(range(NUMBER_OF_ZONES)),
@@ -151,6 +157,7 @@ def parse_common_args(args: argparse.Namespace) -> Dict[str, Any]:
         "std": getattr(args, "std", [DEFAULT_STD] * 4),
         "threshold": args.threshold,
         "bin_range": args.bin_range,
+        "cross_correlation": args.enable_cross_correlation,
     }
 
 
@@ -244,6 +251,143 @@ def read_filtered_data(
     return convert_to_dict(measurements), samples
 
 
+def correlate_histograms_against_baseline(
+    histograms: List[Dict[int, List[float]]],
+    baseline: Dict[int, List[float]],
+) -> List[Dict[int, Tuple[int, float]]]:
+    """
+    For each histogram sample, compute per-zone offset and correlation
+    against the provided baseline.
+
+    Returns:
+        List of dicts: one per histogram, with zone -> (offset, peak correlation)
+    """
+    all_results = []
+
+    for sample_idx, histogram in enumerate(histograms):
+        sample_result = {}
+        for zone in histogram:
+            if zone not in baseline:
+                # print(f"[Sample {sample_idx}] Skipping zone {zone}: not in baseline.")
+                continue
+
+            hist = np.array(histogram[zone])
+            base = np.array(baseline[zone])
+
+            if len(hist) != len(base):
+                # print(f"[Sample {sample_idx}] Skipping zone {zone}: length mismatch.")
+                continue
+
+            corr = correlate(hist, base, mode='full')
+            lags = np.arange(-len(hist) + 1, len(hist))
+            max_idx = np.argmax(corr)
+            offset = lags[max_idx]
+            peak_value = corr[max_idx]
+
+            sample_result[zone] = (offset, peak_value)
+
+        all_results.append(sample_result)
+
+    return all_results
+
+
+def plot_zone_overlay_all_samples_plotly(
+    fig: go.Figure,
+    histograms: List[Dict[int, List[float]]],
+    baseline: Dict[int, List[float]],
+    results: List[Dict[int, Tuple[int, float]]],
+    zones_to_plot: List[int] = None,
+    normalize: bool = True,
+    max_samples: int = None,
+) -> DefaultDict[int, List[int]]:
+    """
+    Plot interactive Plotly chart for each zone:
+        - Baseline
+        - Raw histograms (faint gray)
+        - Aligned histograms (dashed color) from all samples
+    """
+    num_samples = len(histograms)
+    sample_indices = list(range(min(max_samples or num_samples, num_samples)))
+    zones_to_plot = zones_to_plot or sorted(baseline.keys())
+
+    def normalize_signal(x: np.ndarray) -> np.ndarray:
+        return x / (np.max(x) + 1e-9) if normalize else x
+
+    zone_visibility = defaultdict(list)
+    for zone in zones_to_plot:
+        if zone not in baseline:
+            continue
+
+        base = normalize_signal(np.array(baseline[zone]))
+        bins = list(range(len(base)))
+
+        idx = len(fig.data) - 1  # type: ignore
+        zone_visibility[zone].append(idx)
+
+        for sample_idx in sample_indices:
+            hist_sample = histograms[sample_idx]
+            result = results[sample_idx]
+
+            if zone not in hist_sample or zone not in result:
+                continue
+
+            offset, corr = result[zone]
+            raw = normalize_signal(np.array(hist_sample[zone]))
+            aligned = normalize_signal(np.roll(np.array(hist_sample[zone]), -offset))
+
+
+            idx = len(fig.data) - 1  # type: ignore
+            zone_visibility[zone].append(idx)
+
+            # Raw (light gray)
+            fig.add_trace(go.Scatter(
+                x=bins,
+                y=raw,
+                mode='lines',
+                line=dict(color='lightgray', width=0.1),
+                name=f'Sample {sample_idx} (raw)',
+                hoverinfo='skip',
+                showlegend=False
+            ))
+
+
+            fig.add_trace(
+                go.Scatter(
+                    x=bins,
+                    y=aligned,
+                    mode="lines",
+                    name=f"Zone {zone}",
+                    line=dict(width=0.3),
+                )
+            )
+
+    return zone_visibility
+
+
+
+def flatten_histogram_structure(
+    data: List[Dict[int, Dict[int | str, List[float] | str]]]
+) -> List[Dict[int, List[float]]]:
+    """
+    Convert List[Dict[zone][subzone] -> List[float]] to
+    List[Dict[zone] -> List[float]], concatenating subzone values.
+    Removes keys like "lw" inside each zone.
+    """
+    flattened: List[Dict[int, List[float]]] = []
+
+    for sample in data:
+        flat_sample: Dict[int, List[float]] = {}
+        for zone, subzones in sample.items():
+            combined = []
+            for subzone, values in subzones.items():
+                if isinstance(subzone, int) and isinstance(values, list):
+                    combined.extend(values)
+            flat_sample[zone] = combined
+        flattened.append(flat_sample)
+
+    return flattened
+
+
 def plot_baseline(args: argparse.Namespace) -> None:
     """Plots the baseline and dataframe."""
 
@@ -291,9 +435,25 @@ def plot_baseline(args: argparse.Namespace) -> None:
                         zone_visibility[zone].append(idx)
 
                     if measurements:
+                        #histograms = list(measurements.get(axis, {}).get(platform, {}).values())
+                        #flat_histograms = flatten_histogram_structure(histograms)
+                        #print("FLT", flat_histograms)
+                        #results = correlate_histograms_against_baseline(flat_histograms, baseline)
+                        #plot_zone_overlay_all_samples_plotly(flat_histograms, baseline, results, zones_to_plot=[1,2,3], normalize=False)
+                        #print("ALL", results)
+                        #return
                         for stacker, entries in (
                             measurements.get(axis, {}).get(platform, {}).items()
                         ):
+
+                            if config["cross_correlation"]:
+                                print("CORRELATE!", stacker, len(entries))
+                                histograms = list(entries.values())
+                                results = correlate_histograms_against_baseline(histograms, baseline)
+                                visibility = plot_zone_overlay_all_samples_plotly(fig, histograms, baseline, results, zones_to_plot=[1,2,3], normalize=False)
+                                zone_visibility.update(visibility)
+                                continue
+
                             for _, zone_data in entries.items():
                                 zone_data.pop("lw")
                                 for zone, bin in zone_data.items():
@@ -310,6 +470,7 @@ def plot_baseline(args: argparse.Namespace) -> None:
                                             legendgroup=stacker,
                                             legendgrouptitle=dict(text=stacker),
                                             visible=platform == "extend",
+                                            hovertemplate=f"{stacker}<br>Bin: %{{x}}<br>Value: %{{y:.2f}}"
                                         )
                                     )
                                     idx = len(fig.data) - 1  # type: ignore
@@ -795,7 +956,8 @@ if __name__ == "__main__":
         "--labware-count",
         help="The labware count to filter by, defaults to 0 0 for X and Z.",
         type=int,
-        default=0
+        nargs="+",
+        default=[0, 0]
     )
     parser.add_argument(
         "-s",
@@ -818,6 +980,12 @@ if __name__ == "__main__":
     parser.add_argument(
         "--disable-validation-plot",
         help="Disables grapping the validation plots.",
+        action="store_true",
+        default=False,
+    )
+    parser.add_argument(
+        "--enable-cross-correlation",
+        help="Enable Cross-Correlation of the given histograms against the baseline",
         action="store_true",
         default=False,
     )
