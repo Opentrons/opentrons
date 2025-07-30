@@ -7,7 +7,7 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  JUSTIFY_END,
+  JUSTIFY_SPACE_BETWEEN,
   Link,
   Modal,
   PrimaryButton,
@@ -66,11 +66,10 @@ export const AnnouncementModal = (
           width="47rem"
           footer={
             <Flex
-              justifyContent={JUSTIFY_END}
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
               paddingX={SPACING.spacing24}
               paddingBottom={SPACING.spacing24}
               alignItems={ALIGN_CENTER}
-              gridGap={SPACING.spacing8}
             >
               <Link
                 external
@@ -78,7 +77,7 @@ export const AnnouncementModal = (
                 css={TYPOGRAPHY.linkPSemiBold}
               >
                 <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
-                  <StyledText>{t('view_full_release_notes')}</StyledText>
+                  <StyledText>{t('release_notes')}</StyledText>
                   <Icon
                     size={SPACING.spacing8}
                     name="open-in-new"

@@ -297,8 +297,9 @@
     "tiprack": "Tiprack*"
   },
   "pipette_type": "Pipette Type",
-  "protocol_name": "Protocol Name",
   "protocol_name_and_description": "Protocol name and description",
+  "protocol_name": "Protocol Name",
+  "release_notes": "Release notes",
   "review_file_details": "Review file details",
   "robot_type": "Robot Type",
   "staging_areas": "Staging area slots",
@@ -361,7 +362,6 @@
   },
   "upload": "Upload",
   "upload_tiprack": "Upload a custom tiprack to select its definition",
-  "view_full_release_notes": "View full release notes",
   "well_order": {
     "body": "Change the order in which the robot aspirates from the selected wells",
     "field_label": "Order",
