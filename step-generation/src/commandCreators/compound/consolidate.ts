@@ -219,15 +219,17 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     name: pipetteName,
     pythonName: pythonPipetteName,
   } = pipetteEntities[pipette]
-  const liquidClassValuesForTip = getAllLiquidClassDefs()
-    [
-      liquidClass === NONE_LIQUID_CLASS_NAME || liquidClass == null
-        ? WATER_LIQUID_CLASS_NAME
-        : liquidClass
-    ].byPipette?.find(
-      ({ pipetteModel }) => (pipetteModel = getFlexNameConversion(pipetteSpecs))
-    )
-    ?.byTipType.find(({ tiprack }) => tiprack === tiprackDefUri)
+  const liquidClassValuesForTip =
+    getAllLiquidClassDefs()
+      [
+        liquidClass === NONE_LIQUID_CLASS_NAME || liquidClass == null
+          ? WATER_LIQUID_CLASS_NAME
+          : liquidClass
+      ].byPipette?.find(
+        ({ pipetteModel }) =>
+          pipetteModel === getFlexNameConversion(pipetteSpecs)
+      )
+      ?.byTipType.find(({ tiprack }) => tiprack === tiprackDefUri) ?? null
   const { aspirate } = liquidClassValuesForTip ?? {}
   const { multiWellHandling } = getTransferPlanAndReferenceVolumes({
     pipetteSpecs,
@@ -323,16 +325,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       byVolumeProperty: 'correctionByVolume',
       defaultValue: 0,
     }) ?? 0
-  const dispenseCorrectionForTotalDispense =
-    getByVolumeValue({
-      liquidClass,
-      pipetteSpecs,
-      tiprackDefUri: tipRack,
-      targetVolume: volume,
-      liquidHandlingAction: 'singleDispense',
-      byVolumeProperty: 'correctionByVolume',
-      defaultValue: 0,
-    }) ?? 0
+
   /** needed for python generation! > */
   const destTrashPipetteName =
     trashBinEntities[destLabware]?.pythonName ??
@@ -361,8 +354,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         ? getFlexNameConversion(pipetteSpecs)
         : pipetteName,
       tiprackUri: tipRack,
-      aspirateCorrectionVolume: aspirateCorrectionVolumeForSampleAspiration,
-      dispenseCorrectionVolume: dispenseCorrectionForTotalDispense,
+      liquidClassValuesForTip,
     })}`,
   ]
   const customLiquidClass = `${PROTOCOL_CONTEXT_NAME}.define_liquid_class(\n${indentPyLines(

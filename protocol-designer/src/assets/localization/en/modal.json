@@ -63,7 +63,7 @@
       "body12": "If the timer of a Heater-Shaker step is toggled on and off, the timer input field no longer errors.",
       "body13": "Successfully delete a defined liquid that has not been assigned to any location.",
       "body14": "Display correct substep details for all transfer paths and pipettes.",
-      "body15": "All protocols now require Opentrons App version 8.5.0+ to run.",
+      "body15": "All protocols now require Opentrons App version 8.5.1+ to run.",
       "body16": "For more information, see the <link1>Protocol Designer Instruction Manual</link1>.",
       "body2": "We're excited to introduce support for liquid classes and exporting Python!",
       "body3": "Additionally, improvements for the following:",

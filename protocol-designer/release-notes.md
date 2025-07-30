@@ -41,7 +41,7 @@ Use Opentrons-verified liquid classes to automatically define transfer settings 
 - Successfully delete a defined liquid that has not been assigned to any location.
 - Display correct substep details for all transfer paths and pipettes.
 
-Running a protocol created in Protocol Designer now requires Opentrons App version 8.5.0 or newer.
+Running a protocol created in Protocol Designer now requires Opentrons App version 8.5.1 or newer.
 
 ## Opentrons Protocol Designer Changes in 8.4.4
 
