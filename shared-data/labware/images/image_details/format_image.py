@@ -88,7 +88,6 @@ def convert_to_png(path: str) -> str:
     else:
         return path
 
-
 def image_sequence(path: str)-> str:
     """Converting image sequence."""
     converted_path = convert_to_png(path)
@@ -113,6 +112,8 @@ if __name__ == "__main__":
     if os.path.isfile(path):
         file = True
         new_paths.append(image_sequence(path))
+        img = Image.open(new_paths[0])
+        img.show()
     else:
         for file in os.listdir(path):
             new_paths.append(image_sequence(path))

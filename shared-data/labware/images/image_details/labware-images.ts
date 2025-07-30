@@ -3,7 +3,7 @@ import * as path from 'path';
 
 const definitionsDir = 'shared-data/labware/definitions/2';
 const imageDir = 'shared-data/labware/images';
-const outputFile = 'shared-data/labware/images/image_details/labware-images.generated.ts';
+const outputFile = 'shared-data/labware/images/image_details/labware-images-generated.ts';
 
 // this will be used in import statements, relative to the generated file
 const relativeImportPrefix = '../';
@@ -24,7 +24,7 @@ const imageKeyToVar: Record<string, string> = {};
 for (const file of imageFiles) {
   const base = path.basename(file, path.extname(file));
   const varName = base.replace(/\./g, '_').replace(/-/g, '_');
-  const importPath = `${relativeImportPrefix}${path.basename(imageDir)}/${file}`;
+  const importPath = `${relativeImportPrefix}${file}`;
   importLines.push(`import ${varName} from '${importPath}'`);
   imageKeyToVar[varName] = varName;
 }
@@ -34,15 +34,29 @@ const labwareImages: Record<string, string[]> = {};
 
 for (const loadName of loadNames) {
   const normalizedLoadName = loadName.replace(/\./g, '_').replace(/-/g, '_');
+  const loadParts = normalizedLoadName.split('_');
+  const brandPrefix = loadParts[0];
 
-  const matchingVars = Object.keys(imageKeyToVar).filter(varName =>
-    varName.startsWith(normalizedLoadName)
-  );
+  const matchingVars = Object.keys(imageKeyToVar).filter(varName => {
+    const varParts = varName.split('_');
+
+    // Match only if varParts appear in the same order as loadParts
+    let i = 0;
+    for (let j = 0; j < varParts.length; j++) {
+      if (loadParts[i] === varParts[j]) {
+        i++;
+      }
+      if (i === loadParts.length) break;
+    }
+
+    return i === loadParts.length || normalizedLoadName.includes(varName);
+  });
 
   if (matchingVars.length > 0) {
     labwareImages[loadName] = matchingVars;
   }
 }
+
 
 // 5. Output TS file
 const output = [

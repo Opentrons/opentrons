@@ -11,10 +11,9 @@ import {
   SPACING,
   SPACING_AUTO,
 } from '@opentrons/components'
-import { getLabwareViewBox } from '@opentrons/shared-data'
+import { getLabwareViewBox, labwareImages } from '@opentrons/shared-data'
 
 import type { LabwareDefinition } from '@opentrons/shared-data'
-import  { labwareImages } from '@opentrons/shared-data'
 
 /**
  * opentrons_universal_flat_adapter has a protrusion on one side, but the `dimensions`

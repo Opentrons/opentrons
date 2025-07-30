@@ -19,10 +19,11 @@ import {
 } from '@opentrons/components'
 
 import { Divider } from '/app/atoms/structure'
-import { labwareImages } from '/app/local-resources/labware'
+import { labwareImages } from '@opentrons/shared-data'
 import { getIsOnDevice } from '/app/redux/config'
 
 import { equipmentImages } from './equipmentImages'
+
 
 import type { ComponentProps } from 'react'
 import type { StyleProps } from '@opentrons/components'
@@ -133,7 +134,7 @@ function RequiredEquipmentCard(props: RequiredEquipmentCardProps): JSX.Element {
 
   let imageSrc: string | null = null
   if (loadName in labwareImages) {
-    imageSrc = labwareImages[loadName as keyof typeof labwareImages]
+    imageSrc = labwareImages[loadName as keyof typeof labwareImages][0]
   } else if (loadName in equipmentImages) {
     imageSrc = equipmentImages[loadName as keyof typeof equipmentImages]
   }

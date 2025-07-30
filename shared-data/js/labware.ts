@@ -10,7 +10,19 @@ import fixtureTiprack300ul from '../labware/fixtures/2/fixture_tiprack_300_ul.js
 import fixtureTrash from '../labware/fixtures/2/fixture_trash.json'
 import labwareSchemaV2 from '../labware/schemas/2.json'
 import labwareSchemaV3 from '../labware/schemas/3.json'
+import eppendorf_96_tiprack_1000ul_eptips from '../labware/images/geb_96_tiprack_1000ul_side_view.jpg'
+import eppendorf_96_tiprack_10ul_eptips from '../labware/images/geb_96_tiprack_10ul_side_view.jpg'
+import geb_96_tiprack_10ul from '../labware/images/geb_96_tiprack_1000ul_side_view.jpg'
+import geb_96_tiprack_1000ul from '../labware/images/geb_96_tiprack_1000ul_side_view.jpg'
+import generic_custom_tiprack from '../labware/images/generic_tiprack_side_view.png'
+import opentrons_96_tiprack_10ul_side_view from '../labware/images/opentrons_96_tiprack_10ul_side_view.jpg'
+import opentrons_96_tiprack_300ul_side_view from '../labware/images/opentrons_96_tiprack_300ul_side_view.jpg'
+import opentrons_96_tiprack_1000ul_side_view from '../labware/images/opentrons_96_tiprack_300ul_side_view.jpg' 
+import opentrons_calibrationblock from '../labware/images/opentrons_calibration_block.png'
+import removable_black_plastic_trash_bin from '../labware/images/removable_black_plastic_trash_bin.png'
+import tipone_96_tiprack_200ul from '../labware/images/tipone_96_tiprack_200ul_side_view.jpg'
 
+import { labwareImages } from '../labware/images/image_details/labware-images-generated'
 import type {
   LabwareDef2ByDefURI,
   LabwareDefinition,
@@ -103,6 +115,7 @@ export function getAllLegacyDefinitions(): LegacyLabwareDefByName {
 }
 
 export {
+  labwareImages,
   labwareSchemaV2,
   labwareSchemaV3,
   fixture96Plate,
@@ -115,6 +128,17 @@ export {
   fixtureTrash,
   fixture384Plate,
   fixtureCalibrationBlock,
+  eppendorf_96_tiprack_10ul_eptips,
+  eppendorf_96_tiprack_1000ul_eptips,
+  geb_96_tiprack_10ul,
+  geb_96_tiprack_1000ul,
+  generic_custom_tiprack,
+  opentrons_96_tiprack_10ul_side_view,
+  opentrons_96_tiprack_300ul_side_view,
+  opentrons_96_tiprack_1000ul_side_view,
+  opentrons_calibrationblock,
+  removable_black_plastic_trash_bin,
+  tipone_96_tiprack_200ul
 }
 
 // Legacy exports.

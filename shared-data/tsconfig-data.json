@@ -11,6 +11,7 @@
   "include": [
     "deck/**/*.json",
     "labware/**/*.json",
+    "labware/**/*.ts",
     "liquid/**/*.json",
     "liquid-class/**/*.json",
     "command/**/*.json",
