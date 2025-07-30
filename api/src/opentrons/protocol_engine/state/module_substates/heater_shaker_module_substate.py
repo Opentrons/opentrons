@@ -19,7 +19,7 @@ from opentrons.protocol_engine.errors import (
 HeaterShakerModuleId = NewType("HeaterShakerModuleId", str)
 
 
-HEATER_SHAKER_MAX_TEMPERATURE_RANGE = TemperatureRange(min=0, max=95)
+HEATER_SHAKER_TEMPERATURE_RANGE = TemperatureRange(min=0, max=95)
 HEATER_SHAKER_SPEED_RANGE = SpeedRange(min=200, max=3000)
 
 
