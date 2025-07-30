@@ -230,14 +230,14 @@ export function InputPrompt(): JSX.Element {
       // Multipart upload for file attachments
       const formData = new FormData()
       formData.append('message', watchUserPrompt)
-      formData.append('history', JSON.stringify(completeHistory)) // Send complete history with attachments
+      formData.append('history', JSON.stringify(completeHistory))
       formData.append('fake', 'false')
       formData.append('protocol_format', currentProtocolFormat)
 
       // Collect and add files from chat history with message index
       completeHistory.forEach((msg, messageIndex) => {
         if (msg.role === 'user' && msg.attachments) {
-          msg.attachments.forEach((att: any) => {
+          msg.attachments.forEach(att => {
             // Get the File object from the original chat history
             const originalMsg = chatHistory[messageIndex]
             if (originalMsg?.attachments) {
