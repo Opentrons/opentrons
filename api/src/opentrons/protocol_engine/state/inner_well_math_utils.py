@@ -3,7 +3,7 @@ from typing import List, Tuple
 from numpy import pi, iscomplex, roots, real
 from math import isclose
 
-from ..errors.exceptions import InvalidLiquidHeightFound
+from ..errors.exceptions import InvalidLiquidHeightFound, InvalidUserDefinedVolumesError
 
 from opentrons.protocol_engine.types.liquid_level_detection import (
     LiquidTrackingType,
@@ -363,10 +363,12 @@ def _find_volume_in_partial_frustum(
 def _linear_interpolation(
     interpolating_from: List[float], to_interpolate: List[float], target_val: float
 ) -> float:
-    assert len(interpolating_from) == len(to_interpolate), "Invalid height/volume data"
-    assert (
-        interpolating_from[0] == to_interpolate[0] == 0.0
-    ), "height and volume data must start with 0.0"
+    if len(interpolating_from) != len(to_interpolate):
+        raise InvalidUserDefinedVolumesError(
+            "Height and volume data have unequal sizes"
+        )
+    if not (interpolating_from[0] == to_interpolate[0] == 0.0):
+        raise ValueError("linear interpolation datasets must start with 0.0")
 
     if target_val == 0.0:
         return 0.0
@@ -395,7 +397,7 @@ def find_volume_user_defined_volumes(
     max_height = sorted_volume_map[-1].height
     if target_height < 0 or target_height > max_height:
         raise InvalidLiquidHeightFound(
-            f"Invalid target height {target_height} mm; max well height is {max_height} mm."
+            f"Invalid target height {target_height} mm; greatest well height in InnerLabwareGeometry is {max_height} mm."
         )
     volumes = [0.0]
     heights = [0.0]
@@ -426,7 +428,7 @@ def find_height_user_defined_volumes(
     max_volume = sorted_volume_map[-1].volume
     if target_volume < 0 or target_volume > max_volume:
         raise InvalidLiquidHeightFound(
-            f"Invalid target volume {target_volume} mm; max well volume is {max_volume} uL."
+            f"Invalid target volume {target_volume}µL; greatest well volume in InnerLabwareGeometry is {max_volume}µL."
         )
 
     volumes = [0.0]
@@ -516,7 +518,7 @@ def _find_height_in_partial_frustum(
     # also this code should never be reached bc an invalid target volume should be changed
     # by find_height_at_well_volume
     raise InvalidLiquidHeightFound(
-        f"Target volume {target_volume} uL exceeds the well volume {total_well_volume} uL."
+        f"Target volume {target_volume}µL exceeds the well volume {total_well_volume}µL."
     )
 
 
