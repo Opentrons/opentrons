@@ -129,7 +129,7 @@ The Heater-Shaker has an LED status light that can display three colors: amber, 
   </thead>
   <tbody>
     <tr>
-      <td><span class="status-dot red"></span>Red</td>
+      <td><span class="status-dot-container"><span class="status-dot red"></span>Red</span></td>
       <td>A red light indicates a hot temperature state.
         <ul>
           <li>Solid red: Hot to the touch (>49 °C).</li>
@@ -138,7 +138,7 @@ The Heater-Shaker has an LED status light that can display three colors: amber, 
       </td>
     </tr>
     <tr>
-      <td><span class="status-dot white"></span>White</td>
+      <td><span class="status-dot-container"><span class="status-dot white"></span>White</span></td>
       <td>A solid white light indicates the module is:
         <ul>
           <li>Powered on and idle (not actively heating or cooling).</li>
@@ -147,7 +147,7 @@ The Heater-Shaker has an LED status light that can display three colors: amber, 
       </td>
     </tr>
     <tr>
-      <td><span class="status-dot yellow"></span> Amber</td>
+      <td><span class="status-dot-container"><span class="status-dot yellow"></span> Amber</span></td>
       <td>
         <ul>
           <li>Solid amber indicates an error.</li>

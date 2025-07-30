@@ -7,7 +7,10 @@ nav:
   - Additional Product Information: warranty.md
   - Product Specifications: specifications.md
   - Thermal Adapters: adapters.md
-  - Before You Begin: preinstall.md
+  - Installing the Heater-Shaker:
+      - Before You Begin: preinstall.md
+      - Flex Attachment Steps: flex-installation.md
+      - OT-2 Attachment Steps: ot2-installation.md
 
 theme:
   name: material
