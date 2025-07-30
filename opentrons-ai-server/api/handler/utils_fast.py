@@ -43,20 +43,20 @@ def enhance_message_with_file_content(msg: Dict[str, Any], message_files: List[D
     Bridges frontend JSON (metadata only) with backend processed files before AI model.
     """
     enhanced_msg = msg.copy()
-    file_content_map = {f["filename"]: f for f in message_files}
+    file_content_map = {f["name"]: f for f in message_files}
 
     if enhanced_msg.get("attachments"):
         # Message has attachment metadata - enhance with content
         enhanced_attachments = []
         for att in enhanced_msg["attachments"]:
-            filename = att.get("name", att.get("filename", ""))
+            filename = att.get("name", "")
             if filename in file_content_map:
                 file_ref = file_content_map[filename]
                 enhanced_attachments.append(
                     {
                         "id": att.get("id", file_ref["id"]),
-                        "filename": filename,
-                        "file_type": file_ref["file_type"],
+                        "name": filename,
+                        "type": file_ref["type"],
                         "content": file_ref["content"],
                         "media_type": file_ref["media_type"],
                     }
@@ -69,8 +69,8 @@ def enhance_message_with_file_content(msg: Dict[str, Any], message_files: List[D
             enhanced_msg["attachments"].append(
                 {
                     "id": file_ref["id"],
-                    "filename": file_ref["filename"],
-                    "file_type": file_ref["file_type"],
+                    "name": file_ref["name"],
+                    "type": file_ref["type"],
                     "content": file_ref["content"],
                     "media_type": file_ref["media_type"],
                 }
@@ -115,8 +115,8 @@ async def process_single_multipart_file(file: UploadFile, message_index: int, fi
 
     return {
         "id": f"upload_{message_index}_{file_count}",
-        "filename": file.filename,
-        "file_type": processed["file_type"],
+        "name": file.filename,
+        "type": processed["file_type"],
         "content": processed["content"],
         "media_type": processed["media_type"],
     }

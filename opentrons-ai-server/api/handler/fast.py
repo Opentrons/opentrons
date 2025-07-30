@@ -244,10 +244,10 @@ def _generate_llm_response_with_history(
                         all_file_references.append(
                             {
                                 "id": attachment.get("id", ""),
-                                "filename": attachment.get("name", attachment.get("filename", "")),
-                                "file_type": attachment.get("type", attachment.get("file_type", "")),
+                                "name": attachment.get("name", ""),
+                                "type": attachment.get("type", ""),
                                 "content": attachment.get("content", ""),
-                                "media_type": MEDIA_TYPE_MAPPING.get(attachment.get("type", attachment.get("file_type", "")), "text/plain"),
+                                "media_type": MEDIA_TYPE_MAPPING.get(attachment.get("type", ""), "text/plain"),
                             }
                         )
 
@@ -536,7 +536,7 @@ async def _process_multipart_files_with_mapping(files: List[UploadFile]) -> tupl
         try:
             file_count = len(files_by_message[message_index])
             file_ref = await process_single_multipart_file(file, message_index, file_count)
-            file_ref["filename"] = original_filename  # Use extracted original filename
+            file_ref["name"] = original_filename  # Use extracted original filename
             files_by_message[message_index].append(file_ref)
         except ValueError as e:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e

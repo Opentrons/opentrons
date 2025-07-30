@@ -296,9 +296,9 @@ class AnthropicPredict:
         content_blocks: List[ContentBlockParam] = []
 
         for file_ref in file_references:
-            filename = file_ref.get("filename", "Attached File")
+            filename = file_ref.get("name", "Attached File")
             # file_type is the internal type ("pdf", "csv", "python"), not MIME type
-            file_type = file_ref.get("file_type", "unknown").lower()
+            file_type = file_ref.get("type", "unknown").lower()
             file_content = file_ref.get("content", "")
 
             if not file_content:
@@ -370,10 +370,10 @@ class AnthropicPredict:
 
         return {
             "id": attachment.get("id", ""),
-            "filename": attachment.get("filename", ""),
-            "file_type": attachment.get("file_type", ""),
+            "name": attachment.get("name", ""),
+            "type": attachment.get("type", ""),
             "content": attachment.get("content", ""),
-            "media_type": self._determine_media_type(attachment.get("file_type", "")),
+            "media_type": self._determine_media_type(attachment.get("type", "")),
         }
 
     def _build_conversation_history(self, history_with_attachments: List[Dict[str, Any]], user_id: str) -> List[MessageParam]:
