@@ -190,7 +190,7 @@ Here, the ``glycerol_50`` viscous liquid class definition accounts for all other
 
 * Moves to 2 mm above the top of the source well at 4 mm/sec.
 * Submerges to 2 mm above the bottom of the source well at 4mm/sec. 
-* Aspirates 50 µL at 50 µL/sec with a correction of -0.2 µL. 
+* Aspirates 50 µL at 50 µL/sec with a volume correction. 
 * Delays for 1 second.
 * Retracts to 2 mm above the top of the well at 4 mm/sec. 
 
@@ -198,7 +198,7 @@ And for each dispense, the pipette:
 
 * Moves to 2 mm above the top of the destination well at 4 mm/sec. 
 * Submerges to 2 mm above the top of the destination well at 4 mm/sec. 
-* Dispenses 50 µL at 25 µL/sec with a correction of -0.2 µL. 
+* Dispenses 50 µL at 25 µL/sec with a volume correction. 
 * Pushes out a volume of air equivalent to 3.9 µL
 * Delays for 0.5 second. 
 * Retracts to 2 mm above the top of the well at 4 mm/sec. 
