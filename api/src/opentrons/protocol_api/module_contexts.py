@@ -894,7 +894,11 @@ class HeaterShakerContext(ModuleContext):
 
         No other protocol commands will execute while waiting for the temperature.
 
-        :param celsius: A value between 27 and 95, representing the target temperature in °C.
+        .. versionchanged:: 2.25
+            Removed the minimum temperature limit of 37 °C. Note that temperatures under ambient are
+            not achievable.
+
+        :param celsius: A value under 95, representing the target temperature in °C.
                         Values are automatically truncated to two decimal places,
                         and the Heater-Shaker module has a temperature accuracy of ±0.5 °C.
         """
