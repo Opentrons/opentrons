@@ -138,10 +138,10 @@ def make_module_view(
         for module_id in slot_by_module_id:
             deck_slot = slot_by_module_id[module_id]
             if deck_slot is not None:
-                load_location_by_module_id[module_id] = (
-                    deck_configuration_provider.get_cutout_id_by_deck_slot_name(
-                        deck_slot
-                    )
+                load_location_by_module_id[
+                    module_id
+                ] = deck_configuration_provider.get_cutout_id_by_deck_slot_name(
+                    deck_slot
                 )
             else:
                 load_location_by_module_id[module_id] = None
