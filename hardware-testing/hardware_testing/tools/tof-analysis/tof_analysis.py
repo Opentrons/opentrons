@@ -17,7 +17,7 @@ import json
 from ast import literal_eval
 from collections import defaultdict
 from enum import Enum
-from typing import Any, DefaultDict, Dict, List, Tuple
+from typing import Any, DefaultDict, Dict, List, Optional, Tuple
 from itertools import product
 from math import trunc
 
@@ -111,16 +111,17 @@ def convert_to_dict(obj: DefaultDict[Any, Any]) -> Dict[Any, Any]:
     }
 
 
-def is_valid_row(axis: str, platform: str, zone: int, config: Dict[Any, Any]) -> bool:
+def is_valid_row(axis: str, platform: str, zone: int, config: Dict[Any, Any], count: Optional[Tuple[int,int]] = None ) -> bool:
     """Determine if the row should be processed."""
+    labware_count = config["labware_count"]
     for a in ["x", "z"]:
         if axis == a:
             platform_list = config[f"platform_list_{a}"]
             zone_list = config[f"zone_list_{a}"]
             return (not platform_list or platform in platform_list) and (
                 not zone_list or zone in zone_list
-            )
-    return True
+            ) and (not count or labware_count in count)
+    return False
 
 
 def get_visibility_mask(
@@ -137,7 +138,8 @@ def parse_common_args(args: argparse.Namespace) -> Dict[str, Any]:
     return {
         "axis_list": args.axis,
         "stacker_list": args.stackers or [],
-        "labware_list": [] if "all" in args.labwares else args.labwares or ["baseline"],
+        "labware_list": [] if "all" in args.labware else args.labware or ["baseline"],
+        "labware_count": args.labware_count,
         "platform_list_x": args.platform_x,
         "platform_list_z": args.platform_z,
         "zone_list_x": args.zones_x or list(range(NUMBER_OF_ZONES)),
@@ -225,8 +227,9 @@ def read_filtered_data(
                 stacker = row.Stacker_SN
                 labware = row.Labware_Name
                 sample = row.Sample
+                count = (row.Labware_Num_X, row.Labware_Num_Z)
 
-                if not is_valid_row(axis, platform, zone, config):
+                if not is_valid_row(axis, platform, zone, config, count):
                     continue
 
                 bins = list(row[start_index : start_index + bin_count])
@@ -783,10 +786,16 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "-l",
-        "--labwares",
+        "--labware",
         help="The list of labware to use, set to 'all' for all labware. Uses 'baseline' by default.",
         default=[],
         nargs="+",
+    )
+    parser.add_argument(
+        "--labware-count",
+        help="The labware count to filter by, defaults to 0 0 for X and Z.",
+        type=int,
+        default=0
     )
     parser.add_argument(
         "-s",
