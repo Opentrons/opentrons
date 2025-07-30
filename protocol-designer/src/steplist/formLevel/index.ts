@@ -80,7 +80,6 @@ import {
   wellRatioMoveLiquid,
 } from './errors'
 import {
-  belowPipetteMinimumVolume,
   composeWarnings,
   incompatibleLiquidClass,
   maxDispenseWellVolume,
@@ -184,11 +183,7 @@ const stepFormHelperMap: {
       transferVolumeMin,
       pipetteRequired
     ),
-    getWarnings: composeWarnings(
-      belowPipetteMinimumVolume,
-      mixTipPositionInTube,
-      incompatibleLiquidClass
-    ),
+    getWarnings: composeWarnings(mixTipPositionInTube, incompatibleLiquidClass),
   },
   pause: {
     getErrors: composeErrors(
@@ -242,7 +237,6 @@ const stepFormHelperMap: {
       disposalVolumeRequired
     ),
     getWarnings: composeWarnings(
-      belowPipetteMinimumVolume,
       maxDispenseWellVolume,
       tipPositionInTube,
       incompatibleLiquidClass
