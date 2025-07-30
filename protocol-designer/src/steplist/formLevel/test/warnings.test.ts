@@ -24,24 +24,6 @@ vi.mock('@opentrons/shared-data', async () => {
   }
 })
 
-describe('Below pipette minimum volume', () => {
-  let fieldsWithPipette: {
-    pipette: { spec: { liquids: { default: { minVolume: number } } } }
-  }
-  beforeEach(() => {
-    fieldsWithPipette = {
-      pipette: {
-        spec: {
-          liquids: {
-            default: {
-              minVolume: 100,
-            },
-          },
-        },
-      },
-    }
-  })
-
 describe('Max dispense well volume', () => {
   let fieldsWithDispenseLabware: any
   beforeEach(() => {
