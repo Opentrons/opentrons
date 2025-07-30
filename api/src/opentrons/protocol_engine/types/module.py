@@ -197,7 +197,7 @@ class ModuleDefinition(BaseModel):
         ...,
     )
     gripperOffsets: Optional[Dict[str, LabwareMovementOffsetData]] = Field(
-        default_factory=dict,
+        default_factory=lambda: {},
     )
 
     features: LocatingFeatures = Field(
