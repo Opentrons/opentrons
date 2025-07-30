@@ -26,6 +26,7 @@ import {
   getDeckDefFromRobotType,
   getLoadedLabwareDefinitionsByUri,
   getModuleType,
+  GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
   inferModuleOrientationFromXCoordinate,
   OT2_ROBOT_TYPE,
   TC_MODULE_LOCATION_OT2,
@@ -275,7 +276,8 @@ function LabwareDisplayLocation(
   } else if ('slotName' in location) {
     displayLocation = location.slotName
   } else if ('addressableAreaName' in location) {
-    displayLocation = location.addressableAreaName
+    const aaLocation = location.addressableAreaName
+    displayLocation = aaLocation === GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA ? 'Waste Chute' : aaLocation
   } else if ('moduleId' in location) {
     const moduleModel = getModuleModelFromRunData(
       protocolData,
@@ -318,6 +320,7 @@ function LabwareDisplayLocation(
       const moduleModel = protocolData.modules.find(
         module => module.id === moduleIdUnderAdapter
       )?.model
+      console.log('moduleModel', moduleModel)
       if (moduleModel == null) {
         console.warn('labware is located on an adapter on an unknown module')
       } else {
