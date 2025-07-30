@@ -4081,7 +4081,7 @@
       "displayColor": "#ffd600"
     }
   },
-  "commandSchemaId": "opentronsCommandSchemaV10",
+  "commandSchemaId": "opentronsCommandSchemaV14",
   "commands": [
     {
       "key": "6f95dddd-e02a-40dc-a239-e19fa19679ce",
