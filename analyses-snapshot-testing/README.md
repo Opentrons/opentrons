@@ -7,7 +7,6 @@
 1. have uv installed
 1. `make setup`
 
-
 ## Concepts
 
 - Analysis is done against the local code!!!
