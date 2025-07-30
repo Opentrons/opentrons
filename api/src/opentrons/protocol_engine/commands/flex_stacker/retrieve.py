@@ -275,11 +275,7 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
             try:
                 stacker_hw.set_stacker_identify(True)
                 await stacker_hw.dispense_labware(
-                    labware_height=stacker_state.get_pool_height_minus_overlap(),
-                    # TODO (ba, 2025-07-18): This disables Labware sensing on the
-                    # stacker tower due to inconsistensies with data seen
-                    # in PVT stacker, review this once we have more data.
-                    enforce_hopper_lw_sensing=False,
+                    labware_height=stacker_state.get_pool_height_minus_overlap()
                 )
             except (
                 FlexStackerStallError,
