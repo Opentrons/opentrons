@@ -18,11 +18,10 @@ import {
   getFixtureDisplayName,
   getModuleDisplayName,
   getModuleType,
+  getModuleDeckLabel,
   GRIPPER_V1_2,
   MAGNETIC_BLOCK_FIXTURES,
   MAGNETIC_BLOCK_TYPE,
-  TC_MODULE_LOCATION_OT3,
-  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import {
@@ -122,11 +121,13 @@ function HardwareItem({
     </LegacyStyledText>
   )
   if (hardware.hardwareType === 'module') {
-    const slot =
-      getModuleType(hardware.moduleModel) === THERMOCYCLER_MODULE_TYPE
-        ? TC_MODULE_LOCATION_OT3
-        : hardware.slot
-    location = <DeckInfoLabel deckLabel={slot} />
+    location = (
+      <DeckInfoLabel
+        deckLabel={
+          getModuleDeckLabel(getModuleType(hardware.moduleModel), hardware.slot)
+        }
+      />
+    )
   } else if (hardware.hardwareType === 'fixture') {
     location = (
       <DeckInfoLabel
