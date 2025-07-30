@@ -17,20 +17,19 @@ import {
   FLEX_USB_MODULE_FIXTURES,
   getCutoutDisplayName,
   getFixtureDisplayName,
+  getModuleDeckLabel,
   getModuleDisplayName,
   getModuleType,
   getPipetteNameSpecs,
   MAGNETIC_BLOCK_FIXTURES,
   MAGNETIC_BLOCK_TYPE,
   SINGLE_SLOT_FIXTURES,
-  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { InstrumentContainer } from '/app/atoms/InstrumentContainer'
 import { Divider } from '/app/atoms/structure'
 
 import { getRobotTypeDisplayName } from '../ProtocolsLanding/utils'
-import { getSlotsForThermocycler } from './utils'
 
 import type { TFunction } from 'i18next'
 import type { ReactNode } from 'react'
@@ -167,12 +166,10 @@ export const RobotConfigurationDetails = (
             <Fragment key={`module_${index}`}>
               <Divider marginY={SPACING.spacing12} width="100%" />
               <RobotConfigurationDetailsItem
-                label={`${t('slot')} ${
-                  getModuleType(module.params.model) ===
-                  THERMOCYCLER_MODULE_TYPE
-                    ? getSlotsForThermocycler(robotType)
-                    : module.params.location.slotName
-                }`}
+                label={`${t('slot')} ${getModuleDeckLabel(
+                  getModuleType(module.params.model),
+                  module.params.location.slotName
+                )}`}
                 item={
                   <>
                     <ModuleIcon
