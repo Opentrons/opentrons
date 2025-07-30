@@ -15,7 +15,6 @@ import {
   CELSIUS,
   getModuleDisplayName,
   HS_TEMP_MAX,
-  HS_TEMP_MIN,
 } from '@opentrons/shared-data'
 
 import { SubmitPrimaryButton } from '/app/atoms/buttons'
@@ -91,14 +90,14 @@ export const HeaterShakerSlideout = (
       onCloseClick()
     }
   }
-  const errorMessage =
-    hsValue != null && (hsValue < HS_TEMP_MIN || hsValue > HS_TEMP_MAX)
-      ? t('input_out_of_range')
-      : null
 
   const inputMax = HS_TEMP_MAX
-  const inputMin = HS_TEMP_MIN
+  const inputMin = 20
   const unit = CELSIUS
+  const errorMessage =
+    hsValue != null && (hsValue < inputMin || hsValue > HS_TEMP_MAX)
+      ? t('input_out_of_range')
+      : null
 
   const handleCloseSlideout = (): void => {
     setHsValue(null)
