@@ -57,6 +57,7 @@ import opentrons_96_deep_well_temp_mod_adapter_img from '/app/assets/images/labw
 import opentrons_96_tiprack_10ul_side_view from '/app/assets/images/labware/opentrons_96_tiprack_10ul_side_view.jpg'
 import opentrons_96_tiprack_300ul_side_view from '/app/assets/images/labware/opentrons_96_tiprack_300ul_side_view.jpg'
 import opentrons_96_tiprack_1000ul_side_view from '/app/assets/images/labware/opentrons_96_tiprack_1000ul_side_view.jpg'
+import opentrons_flex_96_tiprack_50ul from '/app/assets/images/labware/opentrons_96_flex_tiprack_50ul.png'
 import opentrons_flex_deck_riser_img from '/app/assets/images/labware/opentrons_flex_deck_riser.png'
 import pcr_plate_adapter from '/app/assets/images/labware/pcr_plate_adapter.jpg'
 import smc_384_read_plate from '/app/assets/images/labware/smc_384_read_plate.png'
@@ -267,6 +268,7 @@ export const labwareImages: Record<string, string[]> = {
     opentrons_96_deep_well_temp_mod_adapter_img,
   ],
   opentrons_flex_deck_riser: [opentrons_flex_deck_riser_img],
+  opentrons_flex_96_tiprack_50ul : [opentrons_flex_96_tiprack_50ul],
   ev_resin_tips_flex_short_adapter: [ev_resin_tips_flex_short_adapter_img],
   ev_resin_tips_flex_tall_adapter: [ev_resin_tips_flex_tall_adapter_img],
   ev_resin_tips_flex_96_labware: [ev_resin_tips_flex_96_labware],

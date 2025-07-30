@@ -33,3 +33,4 @@ numpy = "==1.22.3"
 # transitive dependency. 3.22 introduces a build plugin called coherent.licensed that
 # is not safe to have installed when another project is being built.
 zipp = "==3.21.0"
+pillow = "*"

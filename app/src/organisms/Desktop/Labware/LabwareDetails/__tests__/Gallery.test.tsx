@@ -5,7 +5,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { mockDefinition } from '/app/redux/custom-labware/__fixtures__'
 
 import { Gallery } from '../Gallery'
-import { labwareImages } from '../labware-images'
+import { labwareImages } from '@opentrons/shared-data/labware/images/image_details/labware-images-generated'
 
 import type { ComponentProps } from 'react'
 
