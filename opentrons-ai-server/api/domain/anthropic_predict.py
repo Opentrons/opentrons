@@ -3,13 +3,13 @@ import re
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, ContextManager, Dict, Iterable, List, Literal, cast
+from typing import Any, ContextManager, Dict, List, Literal, Optional
 
 import requests
 import structlog
 import weave
 from anthropic import Anthropic
-from anthropic.types import Message, MessageParam, TextBlockParam
+from anthropic.types import ContentBlockParam, DocumentBlockParam, Message, MessageParam, TextBlockParam
 from ddtrace import tracer
 from weave.trace.context.call_context import set_tracing_enabled
 
@@ -69,26 +69,20 @@ class AnthropicPredict:
         self.path_api_docs: Path = ROOT_PATH / "api" / "storage" / "api_docs" / "api_docs_struct.md"
         self.system_prompt_pd = self.get_system_prompt_pd()
 
-        self.cached_docs: List[MessageParam] = cast(
-            List[MessageParam],
-            [
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": DOCUMENTS.format(doc_content=self.get_docs()), "cache_control": {"type": "ephemeral"}}
-                    ],
-                }
-            ],
-        )
-        self.cached_api_docs: List[MessageParam] = cast(
-            List[MessageParam],
-            [
-                {
-                    "role": "user",
-                    "content": [{"type": "text", "text": self.get_api_docs(), "cache_control": {"type": "ephemeral"}}],
-                }
-            ],
-        )
+        self.cached_docs: List[MessageParam] = [
+            {
+                "role": "user",
+                "content": [
+                    TextBlockParam(type="text", text=DOCUMENTS.format(doc_content=self.get_docs()), cache_control={"type": "ephemeral"})
+                ],
+            }
+        ]
+        self.cached_api_docs: List[MessageParam] = [
+            {
+                "role": "user",
+                "content": [TextBlockParam(type="text", text=self.get_api_docs(), cache_control={"type": "ephemeral"})],
+            }
+        ]
         self.tools: List[Dict[str, Any]] = [
             {
                 "name": "simulate_protocol",
@@ -104,7 +98,7 @@ class AnthropicPredict:
         ]
 
     @tracer.wrap()
-    def get_system_prompt_pd(self) -> List[Dict[str, Any]]:
+    def get_system_prompt_pd(self) -> List[TextBlockParam]:
         """
         Get the system prompt for the PD model
         """
@@ -133,15 +127,11 @@ class AnthropicPredict:
         # complete prompt
         self.PROMPT_PD = self.PROMPT_PD.format(EXPECTED_JSON=expected_json, USER_PROMPT="{USER_PROMPT}")
 
-        system_content = [
-            {
-                "type": "text",
-                "text": SYSTEM_PROMPT_PD,
-            },
-            {"type": "text", "text": formatted_documents_pd, "cache_control": {"type": "ephemeral"}},
+        system_content: List[TextBlockParam] = [
+            TextBlockParam(type="text", text=SYSTEM_PROMPT_PD),
+            TextBlockParam(type="text", text=formatted_documents_pd, cache_control={"type": "ephemeral"}),
         ]
-        # Cast to satisfy mypy return type
-        return cast(List[Dict[str, Any]], system_content)
+        return system_content
 
     @tracer.wrap()
     def get_docs(self) -> str:
@@ -264,6 +254,8 @@ class AnthropicPredict:
         For now, system prompt is the same.
         """
 
+        # With the Files API, uploaded files should be automatically accessible
+        # when file IDs are mentioned in the message content (which we do in _create_file_attachment_blocks)
         response: Message = self.client.messages.create(  # type: ignore[call-overload]
             max_tokens=self.max_tokens,
             messages=messages,
@@ -285,9 +277,247 @@ class AnthropicPredict:
         )
         return response
 
+    def _create_file_attachment_blocks(
+        self, file_references: Optional[List[Dict[str, str]]], user_id: str  # noqa: ARG002
+    ) -> List[ContentBlockParam]:
+        """
+        Create content blocks with file attachments using appropriate format for each file type
+
+        Args:
+            file_references: List of file references with content included
+            user_id: User ID (kept for interface compatibility, not used in simplified approach)
+
+        Returns:
+            List of content blocks for Anthropic API (text blocks for CSV/Python, document blocks for PDF)
+        """
+        if not file_references:
+            return []
+
+        content_blocks: List[ContentBlockParam] = []
+
+        for file_ref in file_references:
+            filename = file_ref.get("filename", "Attached File")
+            # file_type is the internal type ("pdf", "csv", "python"), not MIME type
+            file_type = file_ref.get("file_type", "unknown").lower()
+            file_content = file_ref.get("content", "")
+
+            if not file_content:
+                # Fallback if content is missing
+                text_block = TextBlockParam(
+                    type="text",
+                    text=f"=== FILE: {filename} ({file_type.upper()}) ===\n\n"
+                    f"[File content is empty or missing]\n\n"
+                    f"=== END OF FILE: {filename} ===\n\n",
+                )
+                content_blocks.append(text_block)
+                continue
+
+            if file_type == "pdf":
+                # PDF files are sent as base64-encoded documents
+                # Add explicit filename context that Claude cannot ignore
+                logger.info(f"Creating PDF document block with title: '{filename}'")
+
+                # Add a text block with explicit filename information before the PDF
+                pdf_intro_text = (
+                    f"=== UPLOADED PDF FILE: {filename} ===\n\n"
+                    f"The following document is the PDF file named '{filename}' that was uploaded:\n\n"
+                )
+                filename_text_block = TextBlockParam(type="text", text=pdf_intro_text)
+                content_blocks.append(filename_text_block)
+
+                # Then add the actual PDF document
+                doc_block = DocumentBlockParam(
+                    type="document",
+                    source={"type": "base64", "media_type": "application/pdf", "data": file_content},
+                    title=filename,
+                )
+                content_blocks.append(doc_block)
+            else:
+                # CSV and Python files are sent as text blocks
+                # Add explicit filename context for all text-based files (consistent with PDF approach)
+                if file_type.lower() == "python":
+                    # Add explicit filename introduction similar to PDF approach
+                    python_intro_text = (
+                        f"=== UPLOADED PYTHON FILE: {filename} ===\n\n"
+                        f"The following is the Python protocol file named '{filename}' that was uploaded:\n\n"
+                    )
+                    filename_intro_block = TextBlockParam(type="text", text=python_intro_text)
+                    content_blocks.append(filename_intro_block)
+                elif file_type.lower() == "csv":
+                    # Add explicit filename introduction for CSV files
+                    csv_intro_text = (
+                        f"=== UPLOADED CSV FILE: {filename} ===\n\n"
+                        f"The following is the CSV data file named '{filename}' that was uploaded:\n\n"
+                    )
+                    filename_intro_block = TextBlockParam(type="text", text=csv_intro_text)
+                    content_blocks.append(filename_intro_block)
+
+                # Add the file content
+                text_block = TextBlockParam(
+                    type="text",
+                    text=f"=== FILE CONTENT ===\n\n{file_content}\n\n=== END OF FILE: {filename} ===\n\n",
+                )
+                content_blocks.append(text_block)
+
+        return content_blocks
+
+    def _process_historical_attachments(self, attachment: Dict[str, Any]) -> Dict[str, str]:
+        """Process a single historical attachment and return file reference."""
+        attachment_keys = list(attachment.keys())
+        attachment_name = attachment.get("name")
+        attachment_filename = attachment.get("filename")
+        logger.info(f"Processing historical attachment: keys={attachment_keys}, " f"name={attachment_name}, filename={attachment_filename}")
+
+        return {
+            "id": attachment.get("id", ""),
+            "filename": attachment.get("name", attachment.get("filename", "")),
+            "file_type": attachment.get("type", attachment.get("file_type", "")),
+            "content": attachment.get("content", ""),
+            "media_type": self._determine_media_type(attachment.get("type", attachment.get("file_type", ""))),
+        }
+
+    def _build_conversation_history(self, history_with_attachments: List[Dict[str, Any]], user_id: str) -> List[MessageParam]:
+        """Build conversation history with proper file context."""
+        messages: List[MessageParam] = []
+
+        for msg in history_with_attachments:
+            if msg["role"] == "user" and msg.get("attachments"):
+                # Create content blocks for this historical message
+                user_content: List[ContentBlockParam] = [TextBlockParam(type="text", text=msg["content"])]
+
+                # Add file blocks for this specific message's attachments
+                if msg["attachments"]:
+                    historical_file_refs = [self._process_historical_attachments(attachment) for attachment in msg["attachments"]]
+
+                    # Add file blocks to this message
+                    file_blocks = self._create_file_attachment_blocks(historical_file_refs, user_id)
+                    user_content.extend(file_blocks)
+
+                messages.append({"role": "user", "content": user_content})
+            else:
+                # Regular message without attachments
+                messages.append({"role": msg["role"], "content": msg["content"]})
+
+        return messages
+
+    def _create_current_user_message(self, prompt: str, new_file_references: Optional[List[Dict[str, str]]], user_id: str) -> MessageParam:
+        """Create the current user message with file attachments."""
+        relevant_api_docs = self.get_relevant_api_docs(prompt, user_id)
+        prompt_with_docs = f"{prompt}\n\n{relevant_api_docs}"
+
+        # Create current user message with any new file attachments
+        current_user_content: List[ContentBlockParam] = [TextBlockParam(type="text", text=PROMPT.format(USER_PROMPT=prompt_with_docs))]
+
+        # Add NEW file attachments to current message
+        if new_file_references:
+            file_refs_summary = [{k: v for k, v in ref.items() if k != "content"} for ref in new_file_references]
+            logger.info(f"Processing new file attachments: {file_refs_summary}")
+
+            new_file_blocks = self._create_file_attachment_blocks(new_file_references, user_id)
+            current_user_content.extend(new_file_blocks)
+            logger.info(
+                "Added new file attachments to current message",
+                extra={
+                    "user_id": user_id,
+                    "num_new_files": len(new_file_references),
+                    "file_ids": [ref["id"] for ref in new_file_references],
+                },
+            )
+
+        return {"role": "user", "content": current_user_content}
+
+    @tracer.wrap()
+    def process_chat_with_attachments(
+        self,
+        user_id: str,
+        prompt: str,
+        history_with_attachments: List[Dict[str, Any]] | None = None,
+        message_type: MessageType = "create",
+        new_file_references: Optional[List[Dict[str, str]]] = None,
+    ) -> str | None:
+        """Process chat message with file attachments in conversation history"""
+        try:
+            messages: List[MessageParam] = self.cached_docs.copy()
+
+            # Build proper conversation history with files in their original context
+            if history_with_attachments:
+                historical_messages = self._build_conversation_history(history_with_attachments, user_id)
+                messages.extend(historical_messages)
+
+            # Create and add current user message
+            current_user_message = self._create_current_user_message(prompt, new_file_references, user_id)
+            messages.append(current_user_message)
+
+            # Log the improved message structure
+            messages_with_files = 0
+            for msg in messages:
+                content = msg.get("content")
+                if isinstance(content, list) and len(content) > 1:
+                    messages_with_files += 1
+            logger.info(
+                "Constructed conversation with proper file context",
+                extra={
+                    "user_id": user_id,
+                    "total_messages": len(messages),
+                    "messages_with_files": messages_with_files,
+                },
+            )
+
+            response = self._process_message(user_id=user_id, messages=messages, message_type=message_type)
+            return self._handle_response(response, messages, user_id, message_type)
+
+        except Exception as e:
+            logger.error(f"Error in process_chat_with_attachments: {str(e)}", exc_info=True)
+            raise
+
+    def _handle_response(self, response: Message, messages: List[MessageParam], user_id: str, message_type: MessageType) -> str | None:
+        """Handle the response from the AI model, including tool use."""
+        # Handle tool use if present
+        if response.content[-1].type == "tool_use":
+            tool_use = response.content[-1]
+            messages.append({"role": "assistant", "content": response.content})
+            result = self.handle_tool_use(tool_use.name, tool_use.input)  # type: ignore[arg-type]
+            messages.append(
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "tool_result",
+                            "tool_use_id": tool_use.id,
+                            "content": result,
+                        }
+                    ],
+                }
+            )
+            follow_up = self._process_message(user_id=user_id, messages=messages, message_type=message_type)
+            if follow_up.content and follow_up.content[0].type == "text":
+                return follow_up.content[0].text
+            logger.error("Unexpected follow-up response type")
+            return None
+
+        elif response.content and response.content[0].type == "text":
+            return response.content[0].text
+
+        logger.error("Unexpected response type")
+        return None
+
+    def _determine_media_type(self, file_type: str) -> str:
+        """Determine media type from file type."""
+        type_mapping = {
+            "csv": "application/json",
+            "python": "text/x-python",
+            "pdf": "application/pdf",
+        }
+        return type_mapping.get(file_type, "text/plain")
+
     @tracer.wrap()
     def process_message(
-        self, user_id: str, prompt: str, history: List[MessageParam] | None = None, message_type: MessageType = "create"
+        self,
+        user_id: str,
+        prompt: str,
+        history: List[MessageParam] | None = None,
+        message_type: MessageType = "create",
+        file_references: Optional[List[Dict[str, str]]] = None,
     ) -> str | None:
         """Unified method for creating and updating messages"""
         try:
@@ -296,9 +526,36 @@ class AnthropicPredict:
                 messages += history
 
             relevant_api_docs = self.get_relevant_api_docs(prompt, user_id)
-            prompt = f"{prompt}\n\n{relevant_api_docs}"
+            prompt_with_docs = f"{prompt}\n\n{relevant_api_docs}"
 
-            messages.append({"role": "user", "content": PROMPT.format(USER_PROMPT=prompt)})
+            # Create user message with file attachments if present
+            user_content: List[ContentBlockParam] = [TextBlockParam(type="text", text=PROMPT.format(USER_PROMPT=prompt_with_docs))]
+
+            # Add file attachments with actual content
+            if file_references:
+                file_blocks = self._create_file_attachment_blocks(file_references, user_id)
+                user_content.extend(file_blocks)
+                logger.info(
+                    "Added file attachments to message",
+                    extra={"user_id": user_id, "num_files": len(file_references), "file_ids": [ref["id"] for ref in file_references]},
+                )
+
+            user_message: MessageParam = {"role": "user", "content": user_content}
+
+            # Debug log the message structure for PDF debugging
+            if file_references:
+                logger.info(
+                    "Message structure debug",
+                    extra={
+                        "user_id": user_id,
+                        "content_types": [block.get("type") for block in user_content],
+                        "has_document_blocks": any(block.get("type") == "document" for block in user_content),
+                        "message_structure": user_message,
+                    },
+                )
+
+            messages.append(user_message)
+
             response = self._process_message(user_id=user_id, messages=messages, message_type=message_type)
 
             if response.content[-1].type == "tool_use":
@@ -351,7 +608,7 @@ class AnthropicPredict:
                 max_tokens=self.max_tokens,
                 messages=messages,
                 model=self.model_name,
-                system=cast(Iterable[TextBlockParam], self.system_prompt_pd),
+                system=self.system_prompt_pd,
                 metadata={"user_id": user_id},
                 temperature=0.0,
             )

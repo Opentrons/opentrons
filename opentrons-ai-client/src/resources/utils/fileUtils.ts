@@ -1,27 +1,29 @@
-import type { ValidFileType } from '../types'
+// MIME types provide better security than file extensions
+// as they check the actual file content headers
+export const ALLOWED_MIME_TYPES = {
+  pdf: ['application/pdf', 'pdf'],
+  csv: ['text/csv', 'application/csv', 'application/vnd.ms-excel', 'csv'],
+  python: [
+    'text/x-python',
+    'text/x-python-script',
+    'text/plain',
+    'application/x-python-code',
+    'python',
+  ],
+}
 
-export const ALLOWED_FILE_TYPES = {
-  pdf: ['.pdf'],
-  csv: ['.csv'],
-  python: ['.py'],
-} as const
-
-export type FileType = ValidFileType
+export type FileType = 'pdf' | 'csv' | 'python'
 
 export interface FileValidationResult {
   isValid: boolean
   error?: string
 }
 
-export interface ProcessedFileContent {
-  content: string
-  mediaType: string
-}
-
-const UNIT_MB = 1024 * 1024
+const UNIT_KB = 1024
+const UNIT_MB = UNIT_KB * UNIT_KB
 
 export const FILE_SIZE_LIMITS = {
-  pdf: 10 * UNIT_MB, // 10MB
+  pdf: 5 * UNIT_MB, // 5MB
   csv: 2 * UNIT_MB, // 2MB
   python: 1 * UNIT_MB, // 1MB
 } as const
@@ -29,23 +31,15 @@ export const FILE_SIZE_LIMITS = {
 export const MAX_FILES_PER_MESSAGE = 5
 
 export const validateFile = (file: File): FileValidationResult => {
-  const extension = '.' + file.name.split('.').pop()?.toLowerCase()
+  const fileType = getFileType(file)
 
-  // Check if file type is supported
-  const isSupportedType =
-    ALLOWED_FILE_TYPES.pdf.includes(extension as '.pdf') ||
-    ALLOWED_FILE_TYPES.csv.includes(extension as '.csv') ||
-    ALLOWED_FILE_TYPES.python.includes(extension as '.py')
-
-  if (!isSupportedType) {
+  if (fileType === null) {
     return {
       isValid: false,
       error:
         'Unsupported file type. Please upload PDF, CSV, or Python (.py) files.',
     }
   }
-
-  const fileType = getFileType(file)
   const sizeLimit = FILE_SIZE_LIMITS[fileType]
   if (file.size > sizeLimit) {
     const sizeMB = Math.round(sizeLimit / UNIT_MB)
@@ -58,79 +52,60 @@ export const validateFile = (file: File): FileValidationResult => {
   return { isValid: true }
 }
 
-export const getFileType = (file: File): FileType => {
-  const extension = '.' + file.name.split('.').pop()?.toLowerCase()
+export const getFileType = (file: File): FileType | null => {
+  const mimeType = file.type.toLowerCase()
 
-  if (ALLOWED_FILE_TYPES.pdf.includes(extension as '.pdf')) {
+  // Check MIME type first for security (reliable for PDF/CSV)
+  if (ALLOWED_MIME_TYPES.pdf.includes(mimeType)) {
     return 'pdf'
   }
-  if (ALLOWED_FILE_TYPES.csv.includes(extension as '.csv')) {
+  if (ALLOWED_MIME_TYPES.csv.includes(mimeType)) {
     return 'csv'
   }
-  if (ALLOWED_FILE_TYPES.python.includes(extension as '.py')) {
+  if (ALLOWED_MIME_TYPES.python.includes(mimeType)) {
     return 'python'
   }
 
-  // This should never happen if validateFile is called first
-  throw new Error(`Unsupported file type: ${extension}`)
+  return null
 }
 
-const fileTypeLabels: Record<FileType, string> = {
-  pdf: 'PDF file',
-  csv: 'CSV file',
-  python: 'Python file',
+/**
+ * Prepare files for multipart upload (no processing needed)
+ * This is the new, efficient way to handle file uploads
+ */
+export const prepareFilesForMultipart = (files: File[]): File[] | null => {
+  // Validate files but don't process content
+  for (const file of files) {
+    const type = getFileType(file)
+    if (type === null) {
+      return null // Unsupported file type
+    }
+
+    const validation = validateFile(file)
+    if (!validation.isValid) {
+      return null // File validation failed
+    }
+  }
+
+  return files
 }
 
-export const getFileTypeLabel = (type: FileType): string => fileTypeLabels[type]
+/**
+ * Get file extension for display in the icon container based on validated file type
+ * This ensures consistency - if a file is validated as Python based on MIME type,
+ * it will show .py regardless of actual filename extension
+ */
+export const getFileExtension = (file: File): string => {
+  const fileType = getFileType(file)
 
-export const readFileContent = async (
-  file: File,
-  type: FileType
-): Promise<ProcessedFileContent> => {
-  switch (type) {
+  switch (fileType) {
     case 'pdf':
-      // PDF files need base64 encoding for Anthropic API
-      const pdfArrayBuffer = await file.arrayBuffer()
-      const pdfBase64 = btoa(
-        String.fromCharCode(...new Uint8Array(pdfArrayBuffer))
-      )
-      return {
-        content: pdfBase64,
-        mediaType: 'application/pdf',
-      }
-
+      return '.pdf'
     case 'csv':
-      // CSV files are sent as plain text
-      const csvText = await file.text()
-      return {
-        content: csvText,
-        mediaType: 'text/csv',
-      }
-
+      return '.csv'
     case 'python':
-      // Python files are sent as plain text
-      const pyText = await file.text()
-      return {
-        content: pyText,
-        mediaType: 'text/x-python',
-      }
-
+      return '.py'
     default:
-      throw new Error(`Unsupported file type: ${type}`)
+      return '.file'
   }
-}
-
-export const formatFileSize = (bytes: number): string => {
-  if (bytes === 0) {
-    return '0 B'
-  }
-
-  const k = 1024
-  const sizes = ['B', 'KB', 'MB', 'GB']
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
-
-  const size = bytes / Math.pow(k, i)
-  const rounded = size.toFixed(1)
-
-  return `${rounded} ${sizes[i]}`
 }

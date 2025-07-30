@@ -85,6 +85,7 @@ class ErrorCodes(Enum):
     STACKER_SHUTTLE_MISSING = _code_from_dict_entry("3020")
     STACKER_SHUTTLE_LABWARE_FAILED = _code_from_dict_entry("3021")
     STACKER_HOPPER_LABWARE_FAILED = _code_from_dict_entry("3022")
+    STACKER_SHUTTLE_OCCUPIED = _code_from_dict_entry("3023")
     GENERAL_ERROR = _code_from_dict_entry("4000")
     ROBOT_IN_USE = _code_from_dict_entry("4001")
     API_REMOVED = _code_from_dict_entry("4002")

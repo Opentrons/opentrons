@@ -2,7 +2,7 @@ import asyncio
 import json
 import os
 import time
-from typing import Annotated, Any, Awaitable, Callable, List, Literal, Optional, Union, cast
+from typing import Annotated, Any, Awaitable, Callable, Dict, List, Literal, Optional, Union, cast
 
 import structlog
 from anthropic.types import MessageParam
@@ -10,7 +10,7 @@ from asgi_correlation_id import CorrelationIdMiddleware
 from asgi_correlation_id.context import correlation_id
 from ddtrace import tracer
 from ddtrace.contrib.asgi.middleware import TraceMiddleware
-from fastapi import BackgroundTasks, FastAPI, HTTPException, Query, Request, Response, Security, status
+from fastapi import BackgroundTasks, FastAPI, File, Form, HTTPException, Query, Request, Response, Security, UploadFile, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -20,6 +20,7 @@ from pydantic import BaseModel, Field, conint
 from starlette.middleware.base import BaseHTTPMiddleware
 from uvicorn.protocols.utils import get_path_with_query_string
 
+from api.constants.file_constants import MEDIA_TYPE_MAPPING
 from api.domain.anthropic_predict import AnthropicPredict, get_tracing_context, setup_weave_analytics
 from api.domain.fake_responses import FakeResponse, get_fake_response
 from api.domain.openai_predict import OpenAIPredict
@@ -38,6 +39,7 @@ from api.models.internal_server_error import InternalServerError
 from api.models.protocol_format import ProtocolFormat
 from api.models.update_protocol import UpdateProtocol
 from api.models.user import User
+from api.services.file_processor import FileProcessor
 from api.settings import Settings
 
 settings: Settings = Settings()
@@ -205,6 +207,69 @@ def _handle_fake_response(fake: bool, fake_key: Optional[str] = None) -> Optiona
     return None
 
 
+def _generate_llm_response_with_history(
+    model_type: str,
+    user_id: str,
+    prompt: str,
+    enable_analytics: bool,
+    history_with_attachments: Optional[List[Dict[str, Any]]] = None,
+    protocol_format: Optional[ProtocolFormat] = None,
+    protocol_action: Optional[str] = None,
+    new_file_references: Optional[List[Dict[str, str]]] = None,
+) -> Optional[str]:
+    """Generate a response from the appropriate LLM with proper history handling."""
+    # Wrap all LLM calls with the appropriate tracing context
+    with get_tracing_context(enable_analytics):
+        if "openai" in model_type.lower():
+            # For OpenAI, we'll need to convert the history format
+            # This is a simplified version - OpenAI handling would need more work
+            # Cast to expected type since the structure should be compatible
+            openai_history = cast(Optional[List[Any]], history_with_attachments)
+            return openai.predict(prompt=prompt, chat_completion_message_params=openai_history)
+
+        # Claude models - convert history to proper message format
+        converted_history = []
+        all_file_references = []
+
+        if history_with_attachments:
+            for msg in history_with_attachments:
+                if msg["role"] == "user" and msg.get("attachments"):
+                    # Collect all file references from history
+                    for attachment in msg["attachments"]:
+                        all_file_references.append(
+                            {
+                                "id": attachment.get("id", ""),
+                                "filename": attachment.get("name", attachment.get("filename", "")),
+                                "file_type": attachment.get("type", attachment.get("file_type", "")),
+                                "content": attachment.get("content", ""),
+                                "media_type": MEDIA_TYPE_MAPPING.get(attachment.get("type", attachment.get("file_type", "")), "text/plain"),
+                            }
+                        )
+
+                # Convert to MessageParam format (role + content only)
+                converted_history.append({"role": msg["role"], "content": msg["content"]})
+
+        # Add new files to the collection
+        if new_file_references:
+            all_file_references.extend(new_file_references)
+
+        # Use existing Claude logic with all files
+        if protocol_format == ProtocolFormat.PROTOCOL_DESIGNER:
+            return claude.create_pd(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], converted_history))
+
+        # For regular chat, use the new history-aware method or fallback to create
+        if protocol_action == "create":
+            return claude.create(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], converted_history))
+        else:
+            return claude.process_chat_with_attachments(
+                user_id=user_id,
+                prompt=prompt,
+                history_with_attachments=history_with_attachments,
+                message_type="update",
+                new_file_references=all_file_references,
+            )
+
+
 def _generate_llm_response(
     model_type: str,
     user_id: str,
@@ -213,6 +278,7 @@ def _generate_llm_response(
     history: Optional[List[Any]] = None,
     protocol_format: Optional[ProtocolFormat] = None,
     protocol_action: Optional[str] = None,
+    file_references: Optional[List[Dict[str, str]]] = None,
 ) -> Optional[str]:
     """Generate a response from the appropriate LLM based on context."""
     # Wrap all LLM calls with the appropriate tracing context
@@ -224,6 +290,16 @@ def _generate_llm_response(
         if protocol_format == ProtocolFormat.PROTOCOL_DESIGNER:
             return claude.create_pd(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], history))
 
+        # For regular chat, we use the process_message method directly with file references
+        if file_references and protocol_action != "create":
+            return claude.process_message(
+                user_id=user_id,
+                prompt=prompt,
+                history=cast(Optional[List[MessageParam]], history),
+                message_type="update",
+                file_references=file_references,
+            )
+
         if protocol_action == "create":
             return claude.create(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], history))
 
@@ -231,10 +307,12 @@ def _generate_llm_response(
         return claude.update(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], history))
 
 
-def _format_response(response: Optional[str], protocol_format: Optional[ProtocolFormat], is_fake: bool) -> ChatResponse:
+def _format_response(
+    response: Optional[str], protocol_format: Optional[ProtocolFormat], is_fake: bool, file_token_warning: Optional[str] = None
+) -> ChatResponse:
     """Format the LLM response according to the protocol format."""
     if response is None or response == "":
-        return ChatResponse(reply="No response was generated, please try again.", fake=bool(is_fake))
+        return ChatResponse(reply="No response was generated, please try again.", fake=bool(is_fake), file_token_warning=file_token_warning)
 
     if protocol_format == ProtocolFormat.PROTOCOL_DESIGNER:
         logger.debug("Formatting response for Protocol Designer")
@@ -242,7 +320,7 @@ def _format_response(response: Optional[str], protocol_format: Optional[Protocol
         try:
             # Case 1: No PD JSON content, but comments are present.
             if pd_json_content is None and comments is not None:
-                return ChatResponse(reply=comments, fake=bool(is_fake))
+                return ChatResponse(reply=comments, fake=bool(is_fake), file_token_warning=file_token_warning)
 
             # Case 2: PD JSON content is present (comments may or may not be).
             elif pd_json_content is not None:
@@ -250,7 +328,9 @@ def _format_response(response: Optional[str], protocol_format: Optional[Protocol
                 parsed_protocol_json = json.loads(pd_content_str)  # Can raise JSONDecodeError
 
                 reply_text = comments if comments is not None else ""  # Avoid literal "None"
-                return ChatResponse(reply=reply_text, fake=bool(is_fake), protocol_content=parsed_protocol_json)
+                return ChatResponse(
+                    reply=reply_text, fake=bool(is_fake), protocol_content=parsed_protocol_json, file_token_warning=file_token_warning
+                )
 
             # Case 3: No PD JSON content AND no comments.
             else:
@@ -262,6 +342,7 @@ def _format_response(response: Optional[str], protocol_format: Optional[Protocol
                     reply="""The AI's response did not contain a parsable protocol or any specific
                     comments. Please try rephrasing your request.""",
                     fake=bool(is_fake),
+                    file_token_warning=file_token_warning,
                 )
 
         except json.JSONDecodeError as e:
@@ -274,7 +355,7 @@ def _format_response(response: Optional[str], protocol_format: Optional[Protocol
             else:
                 error_message = "Failed to generate a protocol. Please try again."
 
-            return ChatResponse(reply=error_message, fake=bool(is_fake))
+            return ChatResponse(reply=error_message, fake=bool(is_fake), file_token_warning=file_token_warning)
 
         except Exception as e:
             logger.error(
@@ -286,9 +367,9 @@ def _format_response(response: Optional[str], protocol_format: Optional[Protocol
                 error_message = f"\nComments: {comments}"
             else:
                 error_message = "An unexpected error occurred while preparing the protocol. Please try again."
-            return ChatResponse(reply=error_message, fake=bool(is_fake))
+            return ChatResponse(reply=error_message, fake=bool(is_fake), file_token_warning=file_token_warning)
 
-    return ChatResponse(reply=response, fake=bool(is_fake))
+    return ChatResponse(reply=response, fake=bool(is_fake), file_token_warning=file_token_warning)
 
 
 @tracer.wrap()
@@ -322,14 +403,31 @@ async def create_chat_completion(
         protocol_format = getattr(body, "protocol_format", ProtocolFormat.PYTHON)
         protocol_action = _determine_protocol_action(body)
 
-        response = _generate_llm_response(
+        # Convert history format - extract files from messages and handle new attachments
+        history_with_attachments = []
+        if body.history:
+            for msg in body.history:
+                # Handle both old format (dict with role/content) and new format (with attachments)
+                if isinstance(msg, dict):
+                    history_msg = {
+                        "role": msg.get("role", ""),
+                        "content": msg.get("content", ""),
+                        "attachments": msg.get("attachments", []),
+                    }
+                    history_with_attachments.append(history_msg)
+
+        new_file_references: List[Dict[str, str]] = []
+
+        # Use the new history-aware response generation
+        response = _generate_llm_response_with_history(
             model_type=settings.model,
             user_id=str(user.sub),
             prompt=body.message,
             enable_analytics=enable_analytics,
-            history=body.history,
+            history_with_attachments=history_with_attachments,
             protocol_format=protocol_format,
             protocol_action=protocol_action,
+            new_file_references=new_file_references,
         )
         return _format_response(response, protocol_format, bool(body.fake))
 
@@ -338,6 +436,120 @@ async def create_chat_completion(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=InternalServerError(exception_object=e).model_dump()
         ) from e
+
+
+@tracer.wrap()
+@app.post(
+    "/api/chat/completion-multipart",
+    response_model=Union[ChatResponse, ErrorResponse],
+    summary="Create Chat Completion with File Uploads",
+    description="Generate a chat response with multipart file uploads (more efficient than base64).",
+)
+async def create_chat_completion_multipart(
+    request: Request,  # FastAPI auto-injects this
+    user: Annotated[User, Security(auth.verify)],
+    message: str = Form(..., description="The chat message"),
+    history: str = Form(default="[]", description="Chat history as JSON string with attachments"),
+    fake: bool = Form(default=False, description="Whether this is a fake request for testing"),
+    protocol_format: str = Form(default="python", description="Protocol format"),
+    files: List[UploadFile] = File(default=[]),  # noqa: B008
+) -> Union[ChatResponse, ErrorResponse]:
+    """
+    Generate a chat completion response using multipart/form-data for file uploads.
+    This is more efficient than base64 encoding for binary files like PDFs.
+    """
+    logger.info(
+        "POST /api/chat/completion-multipart",
+        extra={"message": message, "num_files": len(files), "file_names": [f.filename for f in files], "user": user},
+    )
+
+    try:
+        # Setup Weave analytics based on frontend preference
+        enable_analytics = _get_analytics_preference(request) if request else False
+        setup_weave_analytics(enable_analytics)
+
+        # Parse history from JSON string (now includes attachments in each message)
+        try:
+            parsed_history_with_attachments = json.loads(history) if history else []
+        except json.JSONDecodeError:
+            parsed_history_with_attachments = []
+
+        # Process NEW uploaded files for current message
+        new_file_references, token_warning = await _process_multipart_files(files)
+
+        # Determine protocol format
+        protocol_format_enum = ProtocolFormat.PYTHON
+        if protocol_format.lower() == "protocol_designer":
+            protocol_format_enum = ProtocolFormat.PROTOCOL_DESIGNER
+
+        # Generate response using the new history-aware logic
+        response = _generate_llm_response_with_history(
+            model_type=settings.model,
+            user_id=str(user.sub),
+            prompt=message,
+            enable_analytics=enable_analytics,
+            history_with_attachments=parsed_history_with_attachments,
+            protocol_format=protocol_format_enum,
+            protocol_action="update",  # Default action
+            new_file_references=new_file_references,
+        )
+        return _format_response(response, protocol_format_enum, fake, token_warning)
+
+    except Exception as e:
+        logger.exception("Error processing multipart chat completion")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=InternalServerError(exception_object=e).model_dump()
+        ) from e
+
+
+async def _process_multipart_files(files: List[UploadFile]) -> tuple[Optional[List[Dict[str, str]]], Optional[str]]:
+    """
+    Process uploaded files in the multipart completion handler.
+
+    This is called within the /api/chat/completion-multipart endpoint, AFTER FastAPI
+    has parsed the multipart form data but BEFORE sending files to the LLM. It handles
+    raw file bytes, processes them via FileProcessor, and validates token limits.
+
+    Pipeline position: HTTP Request → Multipart Parsing → File Processing → LLM Request
+    """
+    if not files or not any(f.filename for f in files):
+        return None, None
+
+    file_references: List[Dict[str, str]] = []
+    for file in files:
+        if not file.filename:  # Skip empty file entries
+            continue
+
+        # Read file content
+        file_content = await file.read()
+
+        # Validate content type before processing
+        if not file.content_type:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"File {file.filename} has no content type")
+
+        # Let FileProcessor handle all validation and processing
+        try:
+            processed = FileProcessor.process_multipart_file(file.filename, file.content_type, file_content)
+
+            file_references.append(
+                {
+                    "id": f"upload_{len(file_references)}",
+                    "filename": file.filename,
+                    "file_type": processed["file_type"],
+                    "content": processed["content"],
+                    "media_type": processed["media_type"],
+                }
+            )
+        except ValueError as e:
+            # Handle file processing errors (like PDF too large)
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
+
+    # Check total token count and generate warning if needed
+    token_warning = (
+        FileProcessor.check_files_token_warning(file_references, claude.client, settings.anthropic_model_name) if file_references else None
+    )
+
+    return file_references, token_warning
 
 
 def _determine_protocol_action(body: ChatRequest) -> str:

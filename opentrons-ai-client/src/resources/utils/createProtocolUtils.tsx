@@ -7,7 +7,7 @@ import {
   splitLabwareDefURI,
 } from '@opentrons/shared-data'
 
-import { OTHER } from '../../organisms/ApplicationSection'
+import { OTHER } from '/ai-client/organisms/ApplicationSection'
 import {
   FLEX_GRIPPER,
   NO_PIPETTES,
@@ -15,14 +15,15 @@ import {
   OPENTRONS_OT2,
   ROBOT_FIELD_NAME,
   TWO_PIPETTES,
-} from '../../organisms/InstrumentsSection'
-import { PROTOCOL_FORMAT, PYTHON } from '../constants'
+} from '/ai-client/organisms/InstrumentsSection'
+import { PROTOCOL_FORMAT, PYTHON } from '/ai-client/resources/constants'
+
 import { getOnlyLatestDefs } from './labware'
 
 import type { UseFormWatch } from 'react-hook-form'
 import type { PipetteName } from '@opentrons/shared-data'
-import type { CreateProtocolFormData } from '../../pages/CreateProtocol'
-import type { CreatePrompt } from '../types'
+import type { CreateProtocolFormData } from '/ai-client/pages/CreateProtocol'
+import type { CreatePrompt } from '/ai-client/resources/types'
 
 export function generatePromptPreviewProtocolFormatItems(
   watch: UseFormWatch<CreateProtocolFormData>,
