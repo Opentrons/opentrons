@@ -87,9 +87,10 @@ class AspirateInPlaceImplementation(
         )
         if not ready_to_aspirate:
             raise PipetteNotReadyToAspirateError(
-                "Pipette cannot aspirate in place because of a previous blow out."
-                " The first aspirate following a blow-out must be from a specific well"
-                " so the plunger can be reset in a known safe position."
+                "Pipette cannot aspirate in place because a previous dispense or blow"
+                " out pushed the plunger beyond the bottom position."
+                " The subsequent aspirate must be from a specific well so the plunger"
+                " can be reset in a known safe position."
             )
 
         current_position = await self._gantry_mover.get_position(params.pipetteId)
