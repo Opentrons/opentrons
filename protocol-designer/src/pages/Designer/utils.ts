@@ -393,7 +393,7 @@ export const getUnoccupiedStackOptions = (args: {
   const { labware: labwareState } = robotState
 
   const isLabwareToMoveUsedLid =
-    labwareState[labwareIdFromDropdown]?.touchedPipettableLabware ===
+    labwareState[labwareIdFromDropdown]?.sterility ===
     TOUCHED_PIPETTABLE_LABWARE
 
   return Object.entries(labwareState).reduce<Option[]>(

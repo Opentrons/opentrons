@@ -35,7 +35,7 @@ export const TOUCHED_PIPETTABLE_LABWARE: 'TOUCHED_PIPETTABLE_LABWARE' =
 export interface LabwareTemporalProperties {
   // a stack of ids from top to bottom
   stack: string[]
-  touchedPipettableLabware?: typeof TOUCHED_PIPETTABLE_LABWARE
+  sterility?: typeof TOUCHED_PIPETTABLE_LABWARE
 }
 
 export interface PipetteTemporalProperties {

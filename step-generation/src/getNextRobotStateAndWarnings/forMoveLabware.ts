@@ -64,7 +64,7 @@ export function forMoveLabware(
         ...robotState.labware[id],
         stack: [id, ...stackBelow, ...newLocationStack],
         ...(isLabwareToMoveLid && isParentPipettableLabware
-          ? { touchedPipettableLabware: TOUCHED_PIPETTABLE_LABWARE }
+          ? { sterility: TOUCHED_PIPETTABLE_LABWARE }
           : {}),
       }
     }

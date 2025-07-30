@@ -83,9 +83,9 @@ export const getInitialRobotState: (
           )
         return {
           stack,
-          // set touchedPipettableLabware to TOUCHED_PIPETTABLE_LABWARE if the labware is a lid and the parent is pipettable labware
+          // set sterility to TOUCHED_PIPETTABLE_LABWARE if the labware is a lid and the parent is pipettable labware
           ...(isLid && isParentPipettableLabware
-            ? { touchedPipettableLabware: TOUCHED_PIPETTABLE_LABWARE }
+            ? { sterility: TOUCHED_PIPETTABLE_LABWARE }
             : {}),
         }
       }
