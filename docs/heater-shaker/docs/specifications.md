@@ -95,7 +95,7 @@ The following table lists power consumption values measured at the wall outlet. 
 
 ## Temperature Profile
 
-table>
+<table>
   <tbody>
     <tr>
       <th>Temperature Range</th>
@@ -130,10 +130,6 @@ The Heater-Shaker has an LED status light that can display three colors: amber, 
   <tbody>
     <tr>
       <td><span class="status-dot red"></span>Red</td>
-      <td>Heating</td>
-    </tr>
-    <tr>
-      <td>Solid red</td>
       <td>A red light indicates a hot temperature state.
         <ul>
           <li>Solid red: Hot to the touch (>49 °C).</li>
@@ -142,7 +138,7 @@ The Heater-Shaker has an LED status light that can display three colors: amber, 
       </td>
     </tr>
     <tr>
-      <td><span class="status-dot" white></span>White</td>
+      <td><span class="status-dot white"></span>White</td>
       <td>A solid white light indicates the module is:
         <ul>
           <li>Powered on and idle (not actively heating or cooling).</li>
@@ -151,13 +147,15 @@ The Heater-Shaker has an LED status light that can display three colors: amber, 
       </td>
     </tr>
     <tr>
-      <td><span class="status-dot" yellow></span> Amber</td>
+      <td><span class="status-dot yellow"></span> Amber</td>
       <td>
         <ul>
           <li>Solid amber indicates an error.</li>
-          <li>Pulsing red and amber (alternating) indicates an error _and_ the module is hot to the touch (>49 °C)</li>
-        <ul>
+          <li>Pulsing red and amber (alternating) indicates an error <em>and</em> the module is hot to the touch (>49 °C)</li>
+        </ul>
+      </td>
     </tr>
+    <tr>
       <td>LED off</td>
       <td>Powered off</td>
     </tr>
