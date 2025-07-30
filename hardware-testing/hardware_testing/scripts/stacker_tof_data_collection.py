@@ -107,7 +107,8 @@ class Stacker_TOF_Data_Collection:
         self.home: Optional[Point] = None
         self.axes = [Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R]
         self.stackers: List[str] = []
-        self.test_files: List[str] = []
+        self.test_file: str = ""
+        self.flex_serial: Optional[str] = None
 
         self.test_data = {
             "Hash_id": "None",
@@ -142,6 +143,7 @@ class Stacker_TOF_Data_Collection:
         self.api = await build_async_ot3_hardware_api(
             is_simulating=self.simulate, use_defaults=True
         )
+        self.flex_serial = await self.api.get_serial_number()
         self.mount = OT3Mount.LEFT
         await self.stacker_setup()
         self.file_setup()
@@ -171,23 +173,18 @@ class Stacker_TOF_Data_Collection:
         self.test_header = self.dict_keys_to_line(self.test_data)
         self.test_id = data.create_run_id()
         self.test_date = "run-" + datetime.utcnow().strftime("%y-%m-%d")
-        class_name = self.__class__.__name__
-        self.test_path = data.create_folder_for_test_data(class_name.lower())
-        for stacker in self.stackers:
-            self.test_tag = (
-                f"labx{self.labware_amount_x}_labz{self.labware_amount_z}_{stacker}"
-            )
-            test_file = data.create_file_name(
-                self.labware_name, self.test_id, self.test_tag
-            )
-            data.append_data_to_file(
-                test_name=self.test_name,
-                run_id=self.test_date,
-                file_name=test_file,
-                data=self.test_header,
-            )
-            self.test_files.append(test_file)
-            print("FILE = ", f"{self.test_path}/{self.test_date}/{test_file}")
+        self.test_path = data.create_folder_for_test_data(self.test_name)
+        self.test_tag = (
+            f"labx{self.labware_amount_x}_labz{self.labware_amount_z}_{self.flex_serial}"
+        )
+        self.test_file = data.create_file_name(self.labware_name, self.test_id, self.test_tag)
+        data.append_data_to_file(
+            test_name=self.test_name,
+            run_id=self.test_date,
+            file_name=self.test_file,
+            data=self.test_header,
+        )
+        print("FILE = ", f"{self.test_path}/{self.test_date}/{self.test_file}")
 
     def dict_keys_to_line(self, dict: Dict[str, Any]) -> str:
         """Convert dict keys to CSV line."""
@@ -236,14 +233,12 @@ class Stacker_TOF_Data_Collection:
 
                                 # Update the csv with new values
                                 test_data_str = self.dict_values_to_line(test_data)
-                                for test_file in self.test_files:
-                                    if self.stackers[i] in test_file:
-                                        data.append_data_to_file(
-                                            test_name=self.test_name,
-                                            run_id=self.test_date,
-                                            file_name=test_file,
-                                            data=test_data_str,
-                                        )
+                                data.append_data_to_file(
+                                    test_name=self.test_name,
+                                    run_id=self.test_date,
+                                    file_name=self.test_file,
+                                    data=test_data_str,
+                                )
                             time.sleep(self.interval)
                 print("")
 
