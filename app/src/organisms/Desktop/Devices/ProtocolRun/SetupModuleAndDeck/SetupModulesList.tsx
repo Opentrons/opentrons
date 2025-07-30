@@ -29,14 +29,12 @@ import {
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
-  getModuleType,
+  getModuleDeckLabel,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
   OT2_ROBOT_TYPE,
-  TC_MODULE_LOCATION_OT2,
-  TC_MODULE_LOCATION_OT3,
   WASTE_CHUTE_FLEX_STACKER_FIXTURES,
 } from '@opentrons/shared-data'
 
@@ -69,6 +67,7 @@ import type {
   CutoutFixtureId,
   DeckDefinition,
   ModuleModel,
+  ModuleType,
 } from '@opentrons/shared-data'
 import type { ModulePrepCommandsType } from '/app/local-resources/modules'
 import type { AttachedModule } from '/app/redux/modules/types'
@@ -127,11 +126,11 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
         }) => {
           // filter out the magnetic block here, because it is handled by the SetupFixturesList
           if (moduleDef.moduleType === MAGNETIC_BLOCK_TYPE) return null
-          // if the module is a flex stacker in D4, check if it needs a waste chute
+          // if the module is a flex stacker in row D, check if it needs a waste chute
           // combo fixture
           if (
             moduleDef.moduleType === FLEX_STACKER_MODULE_TYPE &&
-            slotName === 'D4'
+            slotName[0] === 'D'
           ) {
             const deckConfigCompatabilityD3 = deckConfigCompatibility?.find(
               configItem => configItem.cutoutId === 'cutoutD3'
@@ -154,6 +153,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
                     moduleDef.model
                   )}_slot_${slotName}`}
                   moduleModel={moduleDef.model}
+                  moduleType={moduleDef.moduleType}
                   displayName={moduleDef.displayName}
                   slotName={slotName}
                   attachedModuleMatch={attachedModuleMatch}
@@ -176,6 +176,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
                 moduleDef.model
               )}_slot_${slotName}`}
               moduleModel={moduleDef.model}
+              moduleType={moduleDef.moduleType}
               displayName={moduleDef.displayName}
               slotName={slotName}
               attachedModuleMatch={attachedModuleMatch}
@@ -201,6 +202,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
 
 interface ModulesListItemProps {
   moduleModel: ModuleModel
+  moduleType: ModuleType
   displayName: string
   slotName: string
   attachedModuleMatch: AttachedModule | null
@@ -219,6 +221,7 @@ interface ModulesListItemProps {
 
 export function ModulesListItem({
   moduleModel,
+  moduleType,
   displayName,
   slotName,
   attachedModuleMatch,
@@ -468,11 +471,7 @@ export function ModulesListItem({
             justifyContent={JUSTIFY_CENTER}
           >
             <LegacyStyledText as="p">
-              {getModuleType(moduleModel) === 'thermocyclerModuleType'
-                ? isFlex
-                  ? TC_MODULE_LOCATION_OT3
-                  : TC_MODULE_LOCATION_OT2
-                : slotName}
+              {getModuleDeckLabel(moduleType, slotName)}
             </LegacyStyledText>
             {portDisplay != null ? (
               <LegacyStyledText as="p">{portDisplay}</LegacyStyledText>
