@@ -277,7 +277,10 @@ function LabwareDisplayLocation(
     displayLocation = location.slotName
   } else if ('addressableAreaName' in location) {
     const aaLocation = location.addressableAreaName
-    displayLocation = aaLocation === GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA ? 'Waste Chute' : aaLocation
+    displayLocation =
+      aaLocation === GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA
+        ? 'Waste Chute'
+        : aaLocation
   } else if ('moduleId' in location) {
     const moduleModel = getModuleModelFromRunData(
       protocolData,
