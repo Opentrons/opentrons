@@ -174,10 +174,10 @@ class Stacker_TOF_Data_Collection:
         self.test_id = data.create_run_id()
         self.test_date = "run-" + datetime.utcnow().strftime("%y-%m-%d")
         self.test_path = data.create_folder_for_test_data(self.test_name)
-        self.test_tag = (
-            f"labx{self.labware_amount_x}_labz{self.labware_amount_z}_{self.flex_serial}"
+        self.test_tag = f"labx{self.labware_amount_x}_labz{self.labware_amount_z}_{self.flex_serial}"
+        self.test_file = data.create_file_name(
+            self.labware_name, self.test_id, self.test_tag
         )
-        self.test_file = data.create_file_name(self.labware_name, self.test_id, self.test_tag)
         data.append_data_to_file(
             test_name=self.test_name,
             run_id=self.test_date,
