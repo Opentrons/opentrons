@@ -1097,14 +1097,36 @@ class GeometryView:
             if self._modules.should_dodge_thermocycler(
                 from_slot=from_slot, to_slot=to_slot
             ):
-                middle_slot = DeckSlotName.SLOT_5.to_equivalent_for_robot_type(
-                    self._config.robot_type
-                )
-                middle_slot_center = (
-                    self._addressable_areas.get_addressable_area_center(
-                        addressable_area_name=middle_slot.id,
+
+                middle_slot_fixture = (
+                    self._addressable_areas.get_fixture_by_deck_slot_name(
+                        DeckSlotName.SLOT_C2
                     )
                 )
+                if middle_slot_fixture is None:
+                    middle_slot = DeckSlotName.SLOT_5.to_equivalent_for_robot_type(
+                        self._config.robot_type
+                    )
+                    middle_slot_center = (
+                        self._addressable_areas.get_addressable_area_center(
+                            addressable_area_name=middle_slot.id,
+                        )
+                    )
+                else:
+                    # todo(chb, 2025-07-30): For now we're defaulting to the first addressable area for these center slot fixtures, but
+                    # if we ever introduce a fixture in the center slot with many addressable areas that aren't "centered" over the deck
+                    # slot we will enter up generating a pretty whacky movement path (potentially dangerous).
+                    middle_slot_center = self._addressable_areas.get_addressable_area_center(
+                        addressable_area_name=middle_slot_fixture[
+                            "providesAddressableAreas"
+                        ][
+                            deck_configuration_provider.get_cutout_id_by_deck_slot_name(
+                                DeckSlotName.SLOT_C2
+                            )
+                        ][
+                            0
+                        ],
+                    )
                 return [(middle_slot_center.x, middle_slot_center.y)]
         return []
 
