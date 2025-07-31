@@ -1536,6 +1536,7 @@ class GeometryView:
         self,
         gripper_homed_position_z: float,
         labware_id: str,
+        # todo(mm, 2025-07-31): arg unused, investigate or remove.
         current_location: OnDeckLabwareLocation,
     ) -> None:
         """Check for potential collision of tips against labware to be lifted."""
@@ -1550,10 +1551,17 @@ class GeometryView:
             if not tip:
                 continue
 
-            labware_top_z_when_gripped = gripper_homed_position_z + (
-                self._labware.get_dimensions(labware_definition=labware_definition).z
-                - self._labware.get_grip_z(labware_definition)
+            labware_origin_to_grip_point = self._labware.get_grip_z(labware_definition)
+            grip_point_to_labware_origin = -labware_origin_to_grip_point
+            height_above_labware_origin = self._labware.get_extents_around_lw_origin(
+                labware_definition
+            ).max_z
+            labware_top_z_when_gripped = (
+                gripper_homed_position_z
+                + grip_point_to_labware_origin
+                + height_above_labware_origin
             )
+
             # TODO(cb, 2024-01-18): Utilizing the nozzle map and labware X coordinates,
             # verify if collisions will occur on the X axis (analysis will use hard coded data
             # to measure from the gripper critical point to the pipette mount)

@@ -121,6 +121,9 @@ from opentrons.protocol_engine.state.addressable_areas import (
     AddressableAreaState,
 )
 
+from opentrons.protocol_engine.state._axis_aligned_bounding_box import (
+    AxisAlignedBoundingBox3D as EngineAABB,
+)
 from opentrons.protocol_engine.state import geometry
 from opentrons.protocol_engine.state.geometry import GeometryView, _GripperMoveType
 from opentrons.protocol_engine.state.inner_well_math_utils import (
@@ -3653,17 +3656,10 @@ def test_check_gripper_labware_tip_collision(
         Point(1, 2, 3)
     )
     decoy.when(mock_labware_view.get_definition("labware-id")).then_return(definition)
-    decoy.when(mock_labware_view.get_dimensions(labware_id="labware-id")).then_return(
-        Dimensions(
-            x=definition.dimensions.xDimension,
-            y=definition.dimensions.yDimension,
-            z=definition.dimensions.zDimension,
-        )
-    )
 
-    decoy.when(
-        mock_labware_view.get_dimensions(labware_definition=definition)
-    ).then_return(Dimensions(x=1, y=2, z=67))
+    decoy.when(mock_labware_view.get_extents_around_lw_origin(definition)).then_return(
+        EngineAABB(min_x=0, max_x=0, min_y=0, max_y=0, min_z=100, max_z=167)
+    )
     decoy.when(mock_labware_view.get_grip_z(definition)).then_return(1.0)
 
     with pytest.raises(errors.LabwareMovementNotAllowedError):
