@@ -179,9 +179,9 @@ class MoveGroupRunner:
     def _accumulate_move_completions(
         completions: _Completions,
     ) -> NodeDict[MotorPositionStatus]:
-        position: NodeDict[
-            List[Tuple[Tuple[int, int], MotorPositionStatus]]
-        ] = defaultdict(list)
+        position: NodeDict[List[Tuple[Tuple[int, int], MotorPositionStatus]]] = (
+            defaultdict(list)
+        )
         gear_motor_position: NodeDict[
             List[Tuple[Tuple[int, int], MotorPositionStatus]]
         ] = defaultdict(list)
@@ -694,6 +694,7 @@ class MoveScheduler:
                     f"Move set {str(group_id)} took longer ({duration} seconds) than expected ({expected_time} seconds)."
                 )
         except asyncio.TimeoutError:
+            await asyncio.sleep(0)
             missing_nodes = self._get_nodes_in_move_group(group_id)
             if not missing_nodes:
                 log.warning(
