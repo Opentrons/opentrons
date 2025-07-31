@@ -76,10 +76,9 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
     selectIsAnyNecessaryDefaultOffsetMissing(runId)
   )
 
-  const isSetupComplete = true
-  // isCalibrationComplete &&
-  // isModuleCalibrationComplete &&
-  // missingModuleIds.length === 0
+  const isSetupComplete = isCalibrationComplete &&
+  isModuleCalibrationComplete &&
+  missingModuleIds.length === 0
   const isRobotTypeSetupComplete = isFlex
     ? isSetupComplete && !isRequiredOffsetMissing
     : isSetupComplete
