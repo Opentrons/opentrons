@@ -704,9 +704,10 @@ class MoveScheduler:
             await asyncio.wait_for(self._event.wait(), expected_time)
             return
         except asyncio.TimeoutError:
-            duration = time.monotonic() - start_time
+            first_time = time.monotonic()
+            duration = first_time - start_time
             log.warning(
-                f"Move set {str(group_id)} took longer ({duration} seconds) than expected ({expected_time} seconds)."
+                f"Move set {str(group_id)} took longer ({duration}s) than expected ({expected_time} seconds)."
             )
         try:
             await asyncio.wait_for(
@@ -715,15 +716,18 @@ class MoveScheduler:
             )
             return
         except asyncio.TimeoutError:
+            full_time = time.monotonic()
+            full_duration = full_time - start_time
+            second_duration = full_time - first_time
             missing_nodes = self._get_nodes_in_move_group(group_id)
             if not missing_nodes:
                 log.warning(
-                    f"Move timeout fired with no missing nodes after {time.monotonic() - start_time}s on a {full_timeout}s timeout; may not have been scheduled"
+                    f"Move timeout fired with no missing nodes after {full_duration}s full, second-phase {second_duration} on a {full_timeout}s timeout; may not have been scheduled"
                 )
                 return
             missing_node_msg = ", ".join(node.name for node in missing_nodes)
             log.error(
-                f"Move set {str(group_id)} timed out of max duration {full_timeout}. Expected time: {expected_time}. Missing: {missing_node_msg}"
+                f"Move set {str(group_id)} timed out of max duration {full_duration}s full, second-phase {second_duration}. Expected time: {expected_time}. Missing: {missing_node_msg}"
             )
 
             raise MotionFailedError(
