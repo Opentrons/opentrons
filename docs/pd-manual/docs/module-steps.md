@@ -2,15 +2,15 @@ When you add modules to the robot deck, available module steps appear in the "Ad
 
 | Module and generation | Opentrons Flex | Opentrons OT-2 |
 | --------------------- | :--------------: | :--------: |
-| Absorbance Plate Reader Module GEN1 | <img src="/images/check.png" height=35 width=35></td> | <img src="/images/X.png" height=30 width=30></td> |
-| Heater-Shaker Module GEN1 | <img src="/images/check.png" height=35 width=35></td> | <img src="/images/X.png" height=30 width=30></td> |
-| Magnetic Module GEN1 | <img src="/images/X.png" height=35 width=35></td> | <img src="/images/check.png" height=30 width=30></td> |
-| Magnetic Module GEN2 | <img src="/images/X.png" height=35 width=35></td> | <img src="/images/check.png" height=30 width=30></td> |
-| Magnetic Block GEN1 | <img src="/images/X.png" height=35 width=35></td> | <img src="/images/check.png" height=30 width=30></td> |
-| Temperature Module GEN1 | <img src="/images/X.png" height=35 width=35></td> | <img src="/images/check.png" height=30 width=30></td> |
-| Temperature Module GEN2 | <img src="/images/check.png" height=35 width=35></td> | <img src="/images/check.png" height=30 width=30></td> |
-| Thermocycler Module GEN1 | <img src="/images/X.png" height=35 width=35></td> | <img src="/images/check.png" height=30 width=30></td> |
-| Thermocycler Module GEN2 | <img src="/images/check.png" height=35 width=35></td> | <img src="/images/check.png" height=30 width=30></td> |
+| Absorbance Plate Reader Module GEN1 | :octicons-check-16: | :octicons-x-16: |
+| Heater-Shaker Module GEN1 | :octicons-check-16: | :octicons-x-16: |
+| Magnetic Module GEN1 | :octicons-x-16: | :octicons-check-16: |
+| Magnetic Module GEN2 | :octicons-x-16: | :octicons-check-16: |
+| Magnetic Block GEN1 | :octicons-x-16: | :octicons-check-16: |
+| Temperature Module GEN1 | :octicons-x-16: | :octicons-check-16: |
+| Temperature Module GEN2 | :octicons-check-16: | :octicons-check-16: |
+| Thermocycler Module GEN1 | :octicons-x-16:| :octicons-check-16: |
+| Thermocycler Module GEN2 | :octicons-check-16: | :octicons-check-16: |
 
 
 You can add multiple modules of the same type only on the Flex. Only one Thermocycler can be used on the Flex and the OT-2. 
@@ -69,16 +69,21 @@ In this example, a Corning 96-well flat plate is placed on top of an Opentrons u
 
 In the Heater-Shaker step form, set the temperature or shake functions to **Active** and enter a custom value for temperature or shake speed. The Heater-Shaker module can heat samples between 37 and 95° C, and shake samples between 200 and 3000 rpm. 
 
-Set a custom time for your Heater-Shaker step by enabling the timer. The timer will begin after the Heater-Shaker reaches the target temperature or shaking speed. Reaching a target temperature takes more time than changing the shaking speed, so you can set the Heater-Shaker to reach a target temperature while your protocol proceeds. 
+Set a custom time for your Heater-Shaker step by enabling the timer. The timer will begin after the Heater-Shaker reaches the target temperature or shaking speed. 
+
+If your Heater-Shaker Step doesn't include a set time, Protocol Designer will ask how to pause your protocol. Because reaching a target temperature takes more time than changing the shaking speed, you can set the Heater-Shaker to reach a target temperature while your protocol proceeds to the next step. 
 
 <figure class="screenshot" markdown>
   ![Heater-Shaker pause](images/heater_shaker_pause.png)
   <figcaption>Build a pause step now or later in your protocol.</figcaption>
 </figure>
 
-You can choose to pause your protocol until the Heater-Shaker
-reaches the set temperature, or build a pause step later in your
-protocol. Building a pause step later allows the robot to continue
+You can choose to:
+
+* pause your protocol until the Heater-Shaker reaches the set temperature. 
+* build a pause step later in your protocol. 
+
+Building a pause step later allows the robot to continue
 your protocol while the module reaches the set temperature. 
 
 After your Heater-Shaker step, follow the same steps to deactivate

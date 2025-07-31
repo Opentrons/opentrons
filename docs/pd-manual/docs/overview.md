@@ -17,10 +17,10 @@ The protocol overview shows instruments, including pipettes and the gripper, add
 
 The protocol overivew also includes a preview of your protocol starting deck. The initial deck state for a protocol includes all the labware, modules, and fixtures you've added. Protocol Designer automatically adds modules, fixtures, and tip racks to deck slots. You can edit their locations on the starting deck and add labware and liquids by clicking  **Edit protocol** in the upper right. 
 
-Hovering over a deck slot shows individual details below the deck map, like labware and liquids. In the example below, slot B2 contains an Opentrons Flex filter tip rack. 
+Hover over a deck slot to see individual details beneath the deck map, like labware and liquids. In the example below, slot B2 contains an Opentrons Flex filter tip rack. 
 
 <figure class="screenshot" markdown>
-  ![Protocol overview](images/protocol-overview-right.png)
+  ![Protocol overview](images/protocol_overview_right_2.png)
   <figcaption>The right section of the protocol overview screen.</figcaption>
 </figure>
 

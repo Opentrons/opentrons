@@ -21,6 +21,9 @@ markdown_extensions:
   - md_in_html # combining MD and HTML
   - attr_list # grids (for parts lists)
   - pymdownx.blocks.caption ## add captions to images?
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
 
 plugins:
   - glightbox # for zoom functionality on images
