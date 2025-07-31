@@ -179,9 +179,9 @@ class MoveGroupRunner:
     def _accumulate_move_completions(
         completions: _Completions,
     ) -> NodeDict[MotorPositionStatus]:
-        position: NodeDict[List[Tuple[Tuple[int, int], MotorPositionStatus]]] = (
-            defaultdict(list)
-        )
+        position: NodeDict[
+            List[Tuple[Tuple[int, int], MotorPositionStatus]]
+        ] = defaultdict(list)
         gear_motor_position: NodeDict[
             List[Tuple[Tuple[int, int], MotorPositionStatus]]
         ] = defaultdict(list)
@@ -657,6 +657,20 @@ class MoveScheduler:
             )
 
     async def _run_one_group(self, group_id: int, can_messenger: CanMessenger) -> None:
+        try:
+            return await self._tiered_timeout_wait(group_id, can_messenger)
+        except EnumeratedError:
+            log.exception("Cancelling move group scheduler")
+            raise
+        except BaseException as e:
+            log.exception("canceling move group scheduler")
+            raise PythonException(e) from e
+        finally:
+            await self._send_stop_if_necessary(can_messenger, group_id)
+
+    async def _tiered_timeout_wait(
+        self, group_id: int, can_messenger: CanMessenger
+    ) -> None:
         self._event.clear()
 
         log.debug(f"Executing move group {group_id}.")
@@ -677,24 +691,28 @@ class MoveScheduler:
         if error != ErrorCode.ok:
             log.error(f"received error trying to execute move group: {str(error)}")
 
+        # sometimes, the task running this code doesn't get scheduled for a while. when that happens, we may
+        # get woken up with a timeout error essentially no matter what the timeout was... even if we got all
+        # the messages. we want to make sure that when that happens, we give the canbus reader asyncio task
+        # (and the canbus handler reader thread from pycan) enough time to pull messages out of the transceiver
+        # and kernel buffers and send them in. so we wait in two chunks, which means that if we don't get scheduled
+        # for a while, when we eventually _do_ get scheduled we have a resume point at which we can go back to sleep.
         expected_time = max(3.0, self._durations[group_id - self._start_at_index] * 1.1)
         full_timeout = max(10.0, self._durations[group_id - self._start_at_index] * 2)
         start_time = time.monotonic()
-
         try:
-            # The staged timeout handles some times when a move takes a liiiittle extra
-            await asyncio.wait_for(
-                self._event.wait(),
-                full_timeout,
-            )
-            duration = time.monotonic() - start_time
-
-            if duration >= expected_time:
-                log.warning(
-                    f"Move set {str(group_id)} took longer ({duration} seconds) than expected ({expected_time} seconds)."
-                )
+            return await asyncio.wait_for(self._event.wait(), expected_time)
         except asyncio.TimeoutError:
-            await asyncio.sleep(0)
+            duration = time.monotonic() - start_time
+            log.warning(
+                f"Move set {str(group_id)} took longer ({duration} seconds) than expected ({expected_time} seconds)."
+            )
+        try:
+            return await asyncio.wait_for(
+                self._event.wait(),
+                max(full_timeout - expected_time - duration, 1.0),
+            )
+        except asyncio.TimeoutError:
             missing_nodes = self._get_nodes_in_move_group(group_id)
             if not missing_nodes:
                 log.warning(
@@ -715,14 +733,6 @@ class MoveScheduler:
                     "elapsed": str(time.monotonic() - start_time),
                 },
             )
-        except EnumeratedError:
-            log.exception("Cancelling move group scheduler")
-            raise
-        except BaseException as e:
-            log.exception("canceling move group scheduler")
-            raise PythonException(e) from e
-        finally:
-            await self._send_stop_if_necessary(can_messenger, group_id)
 
     async def run(self, can_messenger: CanMessenger) -> _Completions:
         """Start each move group after the prior has completed."""
