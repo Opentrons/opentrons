@@ -179,9 +179,9 @@ class MoveGroupRunner:
     def _accumulate_move_completions(
         completions: _Completions,
     ) -> NodeDict[MotorPositionStatus]:
-        position: NodeDict[List[Tuple[Tuple[int, int], MotorPositionStatus]]] = (
-            defaultdict(list)
-        )
+        position: NodeDict[
+            List[Tuple[Tuple[int, int], MotorPositionStatus]]
+        ] = defaultdict(list)
         gear_motor_position: NodeDict[
             List[Tuple[Tuple[int, int], MotorPositionStatus]]
         ] = defaultdict(list)
