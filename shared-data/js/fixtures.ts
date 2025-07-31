@@ -1111,6 +1111,13 @@ export const getMainNonComboFixtureId = (
   const cutoutFixtures = deckDef.cutoutFixtures.filter(cf =>
     compatibleCutoutFixtureIds.includes(cf.id)
   )
+  const aaAreaType = getAAByAAId(addressableAreaIds[0], deckDef).areaType
+  if (aaAreaType === FLEX_MODULE_AA_TYPE_BY_MODEL[FLEX_STACKER_MODULE_V1]) {
+    return (
+      getMainUsbModuleFixtureIdForComboFixture(compatibleCutoutFixtureIds) ??
+      null
+    )
+  }
   const cutoutFixturesWithAddressableAreas = cutoutFixtures.filter(cf =>
     Object.values(cf.providesAddressableAreas).some(providedAAs =>
       addressableAreaIds.every(aa => providedAAs.includes(aa))
@@ -1124,12 +1131,14 @@ export const getMainNonComboFixtureId = (
   // Find the fixture with the least items in its providesAddressableAreas
   const fixtureWithLeastAAs = cutoutFixturesWithAddressableAreas.reduce(
     (minFixture, currentFixture) => {
-      const minAAsCount = Object.entries(
-        minFixture.providesAddressableAreas
-      ).filter(([key, value]) => key === cutoutId).length
+      const minAAsCount = Object.entries(minFixture.providesAddressableAreas)
+        .filter(([key, value]) => key === cutoutId)
+        .map(([key, value]) => value)[0].length
       const currentAAsCount = Object.entries(
         currentFixture.providesAddressableAreas
-      ).filter(([key, value]) => key === cutoutId).length
+      )
+        .filter(([key, value]) => key === cutoutId)
+        .map(([key, value]) => value)[0].length
       return currentAAsCount < minAAsCount ? currentFixture : minFixture
     }
   )

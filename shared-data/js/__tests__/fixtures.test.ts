@@ -7,6 +7,7 @@ import {
   FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT,
   FLEX_STACKER_V1_FIXTURE,
   FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
+  FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
   FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
   MAGNETIC_BLOCK_V1_FIXTURE,
   SINGLE_CENTER_SLOT_FIXTURE,
@@ -668,12 +669,13 @@ describe('getMainNonComboFixtureId', () => {
         STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
         FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
       ],
-      ['gripperWasteChute']
+      ['gripperWasteChute'],
+      'cutoutD3'
     )
     expect(result).toEqual(WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE)
   })
 
-  it.only('should get main non combo fixture id for staging area', () => {
+  it('should get main non combo fixture id for staging area', () => {
     const result = getMainNonComboFixtureId(
       [
         STAGING_AREA_RIGHT_SLOT_FIXTURE,
@@ -685,5 +687,19 @@ describe('getMainNonComboFixtureId', () => {
       'cutoutD3'
     )
     expect(result).toEqual(STAGING_AREA_RIGHT_SLOT_FIXTURE)
+  })
+
+  it.only('should get main non combo fixture id for flex stacker', () => {
+    const result = getMainNonComboFixtureId(
+      [
+        FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
+        FLEX_STACKER_V1_FIXTURE,
+        FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+        FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
+      ],
+      ['flexStackerModuleV1D4'],
+      'cutoutD3'
+    )
+    expect(result).toEqual(FLEX_STACKER_V1_FIXTURE)
   })
 })
