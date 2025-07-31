@@ -42,6 +42,13 @@ export function Overview(props: OverviewProps): JSX.Element | null {
     makeSnackbar(t('create_new_to_edit') as string)
   }
 
+  let pathCopy = t('single')
+  if (state.path === 'multiAspirate') {
+    pathCopy = t('consolidate')
+  } else if (state.path === 'multiDispense') {
+    pathCopy = t('distribute')
+  }
+
   const displayItems = [
     {
       option: t('pipette'),
@@ -68,7 +75,7 @@ export function Overview(props: OverviewProps): JSX.Element | null {
     },
     {
       option: t('pipette_path'),
-      value: t(state.path),
+      value: pathCopy,
     },
     {
       option: t('tip_change_frequency'),
