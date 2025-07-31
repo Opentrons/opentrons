@@ -1,11 +1,12 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it } from 'vitest'
 
+import { labwareImages } from '@opentrons/shared-data'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { mockDefinition } from '/app/redux/custom-labware/__fixtures__'
 
 import { Gallery } from '../Gallery'
-import { labwareImages } from '@opentrons/shared-data'
 
 import type { ComponentProps } from 'react'
 
