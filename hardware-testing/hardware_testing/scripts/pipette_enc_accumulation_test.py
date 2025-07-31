@@ -83,7 +83,6 @@ async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount, slot: s
             print(f"Stall or collision detected while moving to top position: {e}")
             stall = True
 
-
         try:
             print("Move to bottom plunger position\n")
             await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom_pos)
@@ -94,6 +93,7 @@ async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount, slot: s
         except StallOrCollisionDetectedError as e:
             print(f"Stall or collision detected while moving to bottom position: {e}")
             stall = True
+        
         finally:
             if cycle > 0:
                 test_tag = ""
