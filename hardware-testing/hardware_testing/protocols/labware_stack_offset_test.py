@@ -79,8 +79,12 @@ def add_parameters(parameters: ParameterContext) -> None:
                 "display_name": "USA Scientific 96 2.4ml Deep",
                 "value": "usascientific_96_wellplate_2.4ml_deep",
             },
+            {
+                "display_name": "eppendorf_96_wellplate_1000ul",
+                "value": "eppendorf_96_wellplate_1000ul",
+            },
         ],
-        default="opentrons_96_wellplate_200ul_pcr_full_skirt",
+        default="eppendorf_96_wellplate_1000ul",
     )
     parameters.add_int(
         variable_name="number_of_labware",
@@ -114,7 +118,7 @@ def add_parameters(parameters: ParameterContext) -> None:
     parameters.add_bool(
         variable_name="no_gripper",
         display_name="Only Test Stacker",
-        default=True,
+        default=False,
         description="If True, the protocol will only store and retrieve.",
     )
     parameters.add_float(
