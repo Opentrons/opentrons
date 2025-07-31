@@ -92,6 +92,7 @@ import type {
 } from './constants'
 import type {
   AddressableArea,
+  AreaType,
   CoordinateTuple,
   CutoutConfig,
   CutoutConfigMap,
@@ -1112,7 +1113,9 @@ export const getMainNonComboFixtureId = (
     compatibleCutoutFixtureIds.includes(cf.id)
   )
   const aaAreaType = getAAByAAId(addressableAreaIds[0], deckDef).areaType
-  if (Object.values(FLEX_MODULE_AA_TYPE_BY_MODEL).includes(aaAreaType as any)) {
+  if (
+    Object.values(FLEX_MODULE_AA_TYPE_BY_MODEL).includes(aaAreaType as AreaType)
+  ) {
     return (
       getMainUsbModuleFixtureIdForComboFixture(compatibleCutoutFixtureIds) ??
       null
