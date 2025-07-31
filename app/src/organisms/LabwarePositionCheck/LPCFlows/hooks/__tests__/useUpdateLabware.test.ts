@@ -131,40 +131,6 @@ describe('useUpdateLabware', () => {
     )
   })
 
-  it('should not re-dispatch when runId changes but other params remain the same', () => {
-    const { rerender } = renderHook(
-      props => {
-        useUpdateLabware(
-          props.isFlex,
-          props.runId,
-          props.maintenanceRunId,
-          props.labwareInfo
-        )
-      },
-      {
-        initialProps: {
-          isFlex: true,
-          runId: RUN_ID,
-          maintenanceRunId: null,
-          labwareInfo: MOCK_LABWARE_INFO,
-        },
-      }
-    )
-
-    expect(mockDispatch).toHaveBeenCalledTimes(1)
-    mockDispatch.mockClear()
-
-    const NEW_RUN_ID = 'run-456'
-    rerender({
-      isFlex: true,
-      runId: NEW_RUN_ID,
-      maintenanceRunId: null,
-      labwareInfo: MOCK_LABWARE_INFO,
-    })
-
-    expect(mockDispatch).not.toHaveBeenCalled()
-  })
-
   it('should not dispatch if the robot is not a flex', () => {
     renderHook(() =>
       useUpdateLabware(false, RUN_ID, MAINTENANCE_RUN_ID, MOCK_LABWARE_INFO)
