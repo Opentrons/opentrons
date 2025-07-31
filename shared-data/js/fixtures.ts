@@ -1112,7 +1112,7 @@ export const getMainNonComboFixtureId = (
     compatibleCutoutFixtureIds.includes(cf.id)
   )
   const aaAreaType = getAAByAAId(addressableAreaIds[0], deckDef).areaType
-  if (aaAreaType === FLEX_MODULE_AA_TYPE_BY_MODEL[FLEX_STACKER_MODULE_V1]) {
+  if (Object.values(FLEX_MODULE_AA_TYPE_BY_MODEL).includes(aaAreaType as any)) {
     return (
       getMainUsbModuleFixtureIdForComboFixture(compatibleCutoutFixtureIds) ??
       null
