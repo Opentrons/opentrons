@@ -113,15 +113,13 @@ async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount, slot: s
                 break
 
     print("\n=========== Test Complete ===========\n")
-    print("\n*******************************************************************")
-    print("*******************************************************************")
-    print("**TEST STATS:                                                    **")
-    print(f"**\t>> Total cycles:           {completed_moves}                **")
-    print(f"**\t>> Stall detected:         {stall}                          **")
-    print(f"**\t>> Cumulative error:       {cumulative_error} mm            **")
-    print(f"**\t>> Absolute error average: {abs_error / completed_moves} mm **")
-    print("\n*******************************************************************")
-    print("*******************************************************************\n")
+    print("\n*******************************************************************\n")
+    print("TEST STATS:")
+    print(f"\t>> Total cycles:           {completed_moves}")
+    print(f"\t>> Stall detected:         {stall}")
+    print(f"\t>> Cumulative error:       {cumulative_error} mm")
+    print(f"\t>> Absolute error average: {abs_error / completed_moves} mm")
+    print("\n*******************************************************************\n")
 
 
 if __name__ == "__main__":
