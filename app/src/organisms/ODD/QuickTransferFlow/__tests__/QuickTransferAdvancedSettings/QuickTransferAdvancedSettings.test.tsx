@@ -269,7 +269,7 @@ describe('QuickTransferAdvancedSettings', () => {
     }
     render(props)
     const delayAspirate = screen.getAllByText('Delay')[0]
-    screen.getByText('5s')
+    screen.getByText('5 s')
     fireEvent.click(delayAspirate)
     expect(vi.mocked(Delay)).toHaveBeenCalled()
   })
@@ -378,7 +378,7 @@ describe('QuickTransferAdvancedSettings', () => {
     }
     render(props)
     const delayDispense = screen.getAllByText('Delay')[1]
-    screen.getByText('10s')
+    screen.getByText('10 s')
     fireEvent.click(delayDispense)
     expect(vi.mocked(Delay)).toHaveBeenCalled()
   })
