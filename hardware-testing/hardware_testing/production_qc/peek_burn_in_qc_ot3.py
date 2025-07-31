@@ -464,54 +464,54 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
     await _reset_gantry(api)
 
     # test each attached pipette
-    while True:
-        mount_list = await _get_next_pipette_mount(api)
-        for mount in mount_list:
-            # if not api.is_simulator and not ui.get_user_answer(f"QC {mount.name} pipette"):
-            #     continue
+    mount_list = await _get_next_pipette_mount(api)
 
-            report = _build_csv_report(cycles=cycles, trials=trials)
-            dut = helpers_ot3.DeviceUnderTest.by_mount(mount)
-            helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut)
+    for mount in mount_list:
+        # if not api.is_simulator and not ui.get_user_answer(f"QC {mount.name} pipette"):
+        #     continue
 
-            for cycle in range(0, cycles*TRIALS_PER_CYCLE, TRIALS_PER_CYCLE):
-                await _test_plunger(
-                    api, mount, report,
-                    cycle=cycle, trials=trials,
-                    continue_after_stall=continue_after_stall
-                )
+        report = _build_csv_report(cycles=cycles, trials=trials)
+        dut = helpers_ot3.DeviceUnderTest.by_mount(mount)
+        helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut)
 
-                # this is the old fix, we can use it if the fw reset doesn't work
-                # await _move_plunger_as_cycle_settings(api, mount)
-                await _reset_pipette_fw(api, mount)
-
-                failed_cycles = await _cycle_plunger(
-                    api, mount,
-                    cycle=cycle, trials=TRIALS_PER_CYCLE,
-                    continue_after_stall=continue_after_stall
-                )
-                data = [failed_cycles, CSVResult.from_Numbool(failed_cycles)]
-                report(
-                    _get_cycling_section_tag(),
-                    _get_cycling_test_tag(cycle),
-                    data,
-                )
+        for cycle in range(0, cycles * TRIALS_PER_CYCLE, TRIALS_PER_CYCLE):
             await _test_plunger(
-                    api, mount, report,
-                    cycle=cycles*TRIALS_PER_CYCLE, trials=trials,
-                    continue_after_stall=continue_after_stall
-                )
-            data = [0, CSVResult.from_Numbool(0)]
+                api, mount, report,
+                cycle=cycle, trials=trials,
+                continue_after_stall=continue_after_stall
+            )
+
+            # this is the old fix, we can use it if the fw reset doesn't work
+            # await _move_plunger_as_cycle_settings(api, mount)
+            await _reset_pipette_fw(api, mount)
+
+            failed_cycles = await _cycle_plunger(
+                api, mount,
+                cycle=cycle, trials=TRIALS_PER_CYCLE,
+                continue_after_stall=continue_after_stall
+            )
+            data = [failed_cycles, CSVResult.from_Numbool(failed_cycles)]
             report(
                 _get_cycling_section_tag(),
-                _get_cycling_test_tag(cycles*TRIALS_PER_CYCLE),
+                _get_cycling_test_tag(cycle),
                 data,
             )
-            ui.print_title("DONE")
-            report.save_to_disk()
-            report.print_results()
-            if api.is_simulator:
-                break
+        await _test_plunger(
+            api, mount, report,
+            cycle=cycles * TRIALS_PER_CYCLE, trials=trials,
+            continue_after_stall=continue_after_stall
+        )
+        data = [0, CSVResult.from_Numbool(0)]
+        report(
+            _get_cycling_section_tag(),
+            _get_cycling_test_tag(cycles * TRIALS_PER_CYCLE),
+            data,
+        )
+        ui.print_title("DONE")
+        report.save_to_disk()
+        report.print_results()
+        if api.is_simulator:
+            break
 
 
 if __name__ == "__main__":
