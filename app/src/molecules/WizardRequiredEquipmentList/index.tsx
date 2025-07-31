@@ -17,13 +17,12 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { labwareImages } from '@opentrons/shared-data'
 
 import { Divider } from '/app/atoms/structure'
-import { labwareImages } from '@opentrons/shared-data'
 import { getIsOnDevice } from '/app/redux/config'
 
 import { equipmentImages } from './equipmentImages'
-
 
 import type { ComponentProps } from 'react'
 import type { StyleProps } from '@opentrons/components'
