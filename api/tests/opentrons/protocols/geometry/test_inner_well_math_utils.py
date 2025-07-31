@@ -404,6 +404,61 @@ def test_volume_at_section_boundary_heights(well: List[Any]) -> None:
         assert isclose(cast(float, top_ul), tot_ul)
 
 
+def test_user_volumes_raises_error_for_invalid_target(
+    user_defined_volumes_params: Dict[str, Any]
+) -> None:
+    """Test that UserDefinedVolumes calculations reject target inputs that are not allowed."""
+    user_defined_volumes_obj = user_defined_volumes_params["obj"]
+    max_defined_height = user_defined_volumes_obj.heightToVolumeMap[-1].height
+    max_defined_volume = user_defined_volumes_obj.heightToVolumeMap[-1].volume
+    min_defined_height = user_defined_volumes_obj.heightToVolumeMap[0].height
+    min_defined_volume = user_defined_volumes_obj.heightToVolumeMap[0].volume
+
+    # less than 0 should raise an error
+    with pytest.raises(InvalidLiquidHeightFound):
+        find_volume_user_defined_volumes(
+            target_height=-0.01, well_geometry=user_defined_volumes_obj
+        )
+    with pytest.raises(InvalidLiquidHeightFound):
+        find_height_user_defined_volumes(
+            target_volume=-0.01, well_geometry=user_defined_volumes_obj
+        )
+
+    # between 0 and min defined height should be ok
+    vol = find_volume_user_defined_volumes(
+        target_height=(min_defined_height / 2), well_geometry=user_defined_volumes_obj
+    )
+    assert vol is not None
+    height = find_height_user_defined_volumes(
+        target_volume=(min_defined_volume / 2), well_geometry=user_defined_volumes_obj
+    )
+    assert height is not None
+
+    # betwen min defined height and max defined height should be ok
+    vol = find_volume_user_defined_volumes(
+        target_height=((min_defined_height + max_defined_height) / 2),
+        well_geometry=user_defined_volumes_obj,
+    )
+    assert vol is not None
+    height = find_height_user_defined_volumes(
+        target_volume=((min_defined_volume + max_defined_volume) / 2),
+        well_geometry=user_defined_volumes_obj,
+    )
+    assert height is not None
+
+    # any greater than max defined height should cause an error
+    with pytest.raises(InvalidLiquidHeightFound):
+        find_volume_user_defined_volumes(
+            target_height=max_defined_height + 0.01,
+            well_geometry=user_defined_volumes_obj,
+        )
+    with pytest.raises(InvalidLiquidHeightFound):
+        find_height_user_defined_volumes(
+            target_volume=max_defined_volume + 0.01,
+            well_geometry=user_defined_volumes_obj,
+        )
+
+
 def test_get_user_volumes(user_defined_volumes_params: Dict[str, Any]) -> None:
     """Test linear interpolation math for user-defined volumes."""
     user_defined_volumes_obj = user_defined_volumes_params["obj"]

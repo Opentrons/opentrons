@@ -18,7 +18,10 @@ import {
 import { SOURCE_WELL_BLOWOUT_DESTINATION } from '../utils'
 import { getCustomLiquidClassProperties } from '../utils/liquidClassUtils'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type {
+  ByTipTypeSetting,
+  LabwareDefinition2,
+} from '@opentrons/shared-data'
 
 describe('getCustomLiquidClassProperties', () => {
   it('returns all args populated for transfer', () => {
@@ -91,8 +94,18 @@ describe('getCustomLiquidClassProperties', () => {
         },
         pipetteName: 'p20_single_gen2',
         tiprackUri: 'opentrons/opentrons_96_tiprack_20ul/1',
-        aspirateCorrectionVolume: 5,
-        dispenseCorrectionVolume: 5,
+        liquidClassValuesForTip: {
+          aspirate: {
+            correctionByVolume: [[0, 5]],
+          },
+          singleDispense: {
+            correctionByVolume: [
+              [0, 5],
+              [100, 10],
+            ],
+          },
+          tiprack: 'opentrons/opentrons_96_tiprack_20ul/1',
+        } as ByTipTypeSetting,
       })
     ).toEqual(
       `
@@ -137,7 +150,6 @@ describe('getCustomLiquidClassProperties', () => {
             "position_reference": "well-bottom",
         },
         "flow_rate_by_volume": [(0, 2.2)],
-        "correction_by_volume": [(0, 5)],
         "delay": {"enabled": True, "duration": 20},
         "submerge": {
             "delay": {"enabled": True, "duration": 50},
@@ -163,6 +175,7 @@ describe('getCustomLiquidClassProperties', () => {
             },
             "blowout": {"enabled": True, "location": "source", "flow_rate": 2.3},
         },
+        "correction_by_volume": [(0, 5), (100, 10)],
         "push_out_by_volume": [(0, 0)],
         "mix": {"enabled": True, "repetitions": 3, "volume": 10},
     },
@@ -241,8 +254,23 @@ describe('getCustomLiquidClassProperties', () => {
         },
         pipetteName: 'p20_single_gen2',
         tiprackUri: 'opentrons/opentrons_96_tiprack_20ul/1',
-        aspirateCorrectionVolume: 5,
-        dispenseCorrectionVolume: 5,
+        liquidClassValuesForTip: {
+          aspirate: {
+            correctionByVolume: [[0, 5]],
+          },
+          singleDispense: {
+            correctionByVolume: [
+              [0, 5],
+              [100, 10],
+            ],
+          },
+          multiDispense: {
+            correctionByVolume: [
+              [0, 5],
+              [200, 20],
+            ],
+          },
+        } as ByTipTypeSetting,
       })
     ).toEqual(
       `
@@ -287,7 +315,6 @@ describe('getCustomLiquidClassProperties', () => {
             "position_reference": "well-bottom",
         },
         "flow_rate_by_volume": [(0, 2.2)],
-        "correction_by_volume": [(0, 5)],
         "delay": {"enabled": True, "duration": 20},
         "submerge": {
             "delay": {"enabled": True, "duration": 50},
@@ -313,6 +340,7 @@ describe('getCustomLiquidClassProperties', () => {
             },
             "blowout": {"enabled": True, "location": "source", "flow_rate": 2.3},
         },
+        "correction_by_volume": [(0, 5), (100, 10)],
         "push_out_by_volume": [(0, 0)],
         "mix": {"enabled": False},
     },
@@ -322,7 +350,6 @@ describe('getCustomLiquidClassProperties', () => {
             "position_reference": "well-bottom",
         },
         "flow_rate_by_volume": [(0, 2.2)],
-        "correction_by_volume": [(0, 5)],
         "delay": {"enabled": True, "duration": 20},
         "submerge": {
             "delay": {"enabled": True, "duration": 50},
@@ -348,6 +375,7 @@ describe('getCustomLiquidClassProperties', () => {
             },
             "blowout": {"enabled": True, "location": "source", "flow_rate": 2.3},
         },
+        "correction_by_volume": [(0, 5), (200, 20)],
         "conditioning_by_volume": [(0, 5)],
         "disposal_by_volume": [(0, 5)],
     },

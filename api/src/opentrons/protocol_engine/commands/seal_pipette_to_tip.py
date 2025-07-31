@@ -84,21 +84,21 @@ class SealPipetteToTipResult(DestinationPositionResult):
     """Result data from the execution of a SealPipetteToTip."""
 
     tipVolume: float = Field(
-        0,
+        0.0,
         description="Maximum volume of liquid that the picked up tip can hold, in µL.",
-        ge=0,
+        ge=0.0,
     )
 
     tipLength: float = Field(
-        0,
+        0.0,
         description="The length of the tip in mm.",
-        ge=0,
+        ge=0.0,
     )
 
     tipDiameter: float = Field(
-        0,
+        0.0,
         description="The diameter of the tip in mm.",
-        ge=0,
+        ge=0.0,
     )
 
 
