@@ -13,6 +13,14 @@ from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedErro
 
 STALL_THRESHOLD = 0.25
 
+def record_data(cycle: int, test_tag: str, positions: tuple, t_name: str, r_id: str, f_name: str) -> None:
+    cycle_data = [cycle + 1, test_tag, positions[0], positions[1],
+                  positions[2], positions[3], positions[4],
+                  positions[5], positions[6], positions[7]]
+    cycle_data_str = data.convert_list_to_csv_line(cycle_data)
+    data.append_data_to_file(test_name=t_name, run_id=r_id, file_name=f_name, data=cycle_data_str)
+
+
 async def _plunger_alignment(api: OT3API, mount: OT3Mount) -> (float, float, float):
     print("Checking alignment...\n")
     pipette_ax = types.Axis.of_main_tool_actuator(mount)
@@ -67,6 +75,7 @@ async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount, slot: s
     cumulative_error = 0
     abs_error = 0
     completed_moves = 0
+    cycle_count = 0
     stall = False
 
     for cycle in range(cycles):
@@ -84,6 +93,12 @@ async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount, slot: s
         except StallOrCollisionDetectedError as e:
             print(f"Stall or collision detected while moving to top position: {e}")
             stall = True
+            positions = (init_pos[pipette_ax], init_encoder_pos[pipette_ax],
+                         "-", "-", "-",
+                         "-", "-", "-")
+            record_data(cycle, "", positions, test_name, run_name, file_name)
+            print("Stall detected, stopping test.")
+            break
 
         try:
             print("Move to bottom plunger position\n")
@@ -95,27 +110,28 @@ async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount, slot: s
             print(f"\t>> Cumulative error:       {cumulative_error} mm")
             print(f"\t>> Absolute error average: {abs_error / completed_moves} mm")
         except StallOrCollisionDetectedError as e:
-            print(f"Stall or collision detected while moving to bottom position: {e}")
+            print(f"Stall or collision detected while moving to top position: {e}")
             stall = True
+            positions = (init_pos[pipette_ax], init_encoder_pos[pipette_ax],
+                         "-", "-", "-",
+                         "-", "-", "-")
+            record_data(cycle, "", positions, test_name, run_name, file_name)
+            print("Stall detected, stopping test.")
+            break
 
-        finally:
-            if cycle > 0:
-                test_tag = ""
+        if cycle > 0:
+            test_tag = ""
 
-            cycle_data = [cycle + 1, test_tag,
-                          init_pos[pipette_ax], init_encoder_pos[pipette_ax],
-                          top_est, top_enc, top_est - top_enc,
-                          bot_est, bot_enc, bot_est - bot_enc]
-            cycle_data_str = data.convert_list_to_csv_line(cycle_data)
-            data.append_data_to_file(test_name=test_name, run_id=run_name, file_name=file_name, data=cycle_data_str)
-            if stall:
-                print("Stall detected, stopping test.")
-                break
+        positions = (init_pos[pipette_ax], init_encoder_pos[pipette_ax],
+                      top_est, top_enc, top_est - top_enc,
+                      bot_est, bot_enc, bot_est - bot_enc)
+        record_data(cycle, test_tag, positions, test_name, run_name, file_name)
+        cycle_count += 1
 
     print("\n=========== Test Complete ===========\n")
     print("\n*******************************************************************\n")
     print("TEST STATS:")
-    print(f"\t>> Total cycles:           {cycles}")
+    print(f"\t>> Cycle count:            {cycle_count}/{cycles}")
     print(f"\t>> Total completed moves:  {completed_moves}")
     print(f"\t>> Stall detected:         {stall}")
     print(f"\t>> Cumulative error:       {cumulative_error} mm")
