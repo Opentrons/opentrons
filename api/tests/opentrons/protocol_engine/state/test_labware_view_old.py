@@ -1849,8 +1849,8 @@ def test_get_grip_height_from_labware_origin() -> None:
         schemaVersion=3,
         extents=Extents(
             total=AxisAlignedBoundingBox3D(
-                backLeftBottom={"x": 0, "y": 0, "z": 500},
-                frontRightTop={"x": 0, "y": 0, "z": 1000},
+                backLeftBottom=Vector3D(x=0, y=0, z=500),
+                frontRightTop=Vector3D(x=0, y=0, z=1000),
             )
         ),
     )
