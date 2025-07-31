@@ -1,8 +1,9 @@
 import {
-  FLEX_STACKER_MODULE_V1,
+  FLEX_STACKER_MODULE_TYPE,
   getModuleDisplayName,
   getModuleType,
   getOccludedSlotCountForModule,
+  getModuleDeckLabel,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
@@ -51,23 +52,18 @@ export function getLabwareDisplayLocation(
   const { t, isOnDevice = false, location } = params
   const locationResult = Array.isArray(location)
     ? getLabwareLocationFromSequence({
-        ...params,
-        locationSequence: location,
-      })
+      ...params,
+      locationSequence: location,
+    })
     : getLabwareLocation({
-        ...params,
-        location: location ?? null,
-      })
+      ...params,
+      location: location ?? null,
+    })
   if (locationResult == null) {
     return ''
   }
 
-  const { slotName: initialSlotName, moduleModel, adapterName } = locationResult
-  const slotName =
-    moduleModel === THERMOCYCLER_MODULE_V1 ||
-    moduleModel === THERMOCYCLER_MODULE_V2
-      ? 'A1+B1'
-      : initialSlotName
+  const { slotName, moduleModel, adapterName } = locationResult
 
   if (slotName === 'offDeck' || slotName === 'systemLocation') {
     return t('off_deck')
@@ -83,37 +79,26 @@ export function getLabwareDisplayLocation(
   }
   // Module location without adapter
   else if (moduleModel != null && adapterName == null) {
-    if (params.detailLevel === 'slot-only') {
-      switch (moduleModel) {
-        case THERMOCYCLER_MODULE_V1:
-        case THERMOCYCLER_MODULE_V2:
-          return t('slot', { slot_name: 'A1+B1' })
-        case FLEX_STACKER_MODULE_V1:
-          return t('stacker_display_name', {
-            stacker_slot: getSlotColumn(slotName),
-          })
-        default:
-          return t('slot', { slot_name: slotName })
-      }
-    } else {
-      switch (moduleModel) {
-        case FLEX_STACKER_MODULE_V1:
-          return t('stacker_column_display_name', {
-            stacker_slot: getSlotColumn(slotName),
-          })
-        default:
-          return isOnDevice
-            ? `${getModuleDisplayName(moduleModel)}, ${slotName}`
-            : t('module_in_slot', {
-                count: getOccludedSlotCountForModule(
-                  getModuleType(moduleModel),
-                  params.robotType
-                ),
-                module: getModuleDisplayName(moduleModel),
-                slot_name: slotName,
-              })
-      }
+    const moduleSlot = getModuleDeckLabel(getModuleType(moduleModel), slotName)
+    if (getModuleType(moduleModel) === FLEX_STACKER_MODULE_TYPE) {
+      // in hopper location always return Stacker {{row}}
+      return t('stacker_hopper_display', {
+        row: getSlotRow(moduleSlot as string),
+      })
     }
+    if (params.detailLevel === 'slot-only') {
+      return t('slot', { slot_name: moduleSlot })
+    }
+    return isOnDevice
+      ? `${getModuleDisplayName(moduleModel)}, ${moduleSlot}`
+      : t('module_in_slot', {
+        count: getOccludedSlotCountForModule(
+          getModuleType(moduleModel),
+          params.robotType
+        ),
+        module: getModuleDisplayName(moduleModel),
+        slot_name: moduleSlot,
+      })
   }
   // Adapter locations
   else if (adapterName != null) {
@@ -138,7 +123,7 @@ export function getLabwareDisplayLocation(
   }
 }
 
-function getSlotColumn(slotName: string): string {
+function getSlotRow(slotName: string): string {
   return slotName.charAt(0)
 }
 

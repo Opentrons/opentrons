@@ -130,6 +130,15 @@ export function getLabwareLocationFromSequence(
                 : moduleModel ?? undefined,
           }
         }
+      } else if (sequenceItem.kind === 'inStackerHopper') {
+        return {
+          ...acc,
+          slotName: getModuleDisplayLocation(
+            loadedModules,
+            sequenceItem.moduleId
+          ),
+          moduleModel: getModuleModel(loadedModules, sequenceItem.moduleId),
+        }
       }
       // TODO(tz, 4-16-25): add inHopperLocation when logic is merged
       else if (detailLevel === 'full') {

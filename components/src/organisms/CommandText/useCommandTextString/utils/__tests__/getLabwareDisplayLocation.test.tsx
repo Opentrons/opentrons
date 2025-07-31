@@ -268,6 +268,50 @@ describe('getLabwareDisplayLocation with translations', () => {
             }
           })
         })
+
+        detailLevels.forEach(detailLevel => {
+          it(`should handle labware on a stacker module with detailLevel "${detailLevel}"`, () => {
+            const locationSequence: LabwareLocationSequence = [
+              { kind: 'onAddressableArea', addressableAreaName: 'flexStackerModuleV1D4' },
+              { kind: 'onModule', moduleId: 'mockModuleId' },
+              {
+                kind: 'onCutoutFixture',
+                cutoutId: 'cutoutD3',
+                possibleCutoutFixtureIds: ['flexStackerModuleV1WithWasteChuteRightAdapterNoCover']
+              }]
+            vi.mocked(getModuleModel).mockReturnValue('flexStackerModuleV1')
+            vi.mocked(getModuleDisplayLocation).mockReturnValue('D3')
+            vi.mocked(getModuleDisplayName).mockReturnValue('Flex Stacker')
+            vi.mocked(getModuleType).mockReturnValue('flexStackerModuleType')
+
+            render({
+              location: locationSequence,
+              params: { ...defaultParams, detailLevel }
+            })
+
+            screen.getByText('Slot D4')
+          })
+        })
+
+        detailLevels.forEach(detailLevel => {
+          it(`should handle labware in stacker hopper with detailLevel "${detailLevel}"`, () => {
+            const locationSequence: LabwareLocationSequence = [
+              { kind: "inStackerHopper", moduleId: "UUID" }
+            ]
+
+            vi.mocked(getModuleModel).mockReturnValue('flexStackerModuleV1')
+            vi.mocked(getModuleDisplayLocation).mockReturnValue('D3')
+            vi.mocked(getModuleDisplayName).mockReturnValue('Flex Stacker')
+            vi.mocked(getModuleType).mockReturnValue('flexStackerModuleType')
+
+            render({
+              location: locationSequence,
+              params: { ...defaultParams, detailLevel }
+            })
+
+            screen.getByText('Stacker D')
+          })
+        })
       })
 
       describe('labware on another labware', () => {
@@ -448,4 +492,3 @@ describe('getLabwareDisplayLocation with translations', () => {
     })
   })
 })
-
