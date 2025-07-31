@@ -34,12 +34,7 @@ If you prefer a guided approach, this manual is structured so you can follow it 
 
 ## Notes and warnings
 
-Throughout this manual, you'll find specially formatted note and warning
-blocks. Notes provide helpful information that may not be obvious in the
-ordinary course of using Flex. Pay special attention to warnings---they
-are only used in situations where you run the risk of personal injury,
-damage to equipment, loss or spoilage of samples or reagents, data loss,
-or other harm.
+Throughout this manual, you'll find specially formatted note and warning blocks. Notes provide helpful information that may not be obvious in the ordinary course of using Flex. Pay special attention to warnings---they are only used in situations where you run the risk of personal injury, damage to equipment, loss or spoilage of samples or reagents, data loss, or other harm.
 
 Notes and warnings look like this:
 

@@ -4,7 +4,14 @@ nav:
   - index.md
   - Preface: preface.md
   - Introduction: introduction.md
-  - Installation and Relocation: installation-relocation.md
+  - Safety and Regulatory Information: safety-regulatory.md
+  - Installation and Relocation: 
+      - Installation Home: installation/index.md
+      - Installation Requirements: installation/requirements.md
+      - Unboxing: installation/unboxing.md
+      - First Run: installation/first-run.md
+      - Instruments: installation/instruments.md
+      - Relocation: installation/relocation.md
   - System Description: system-description.md
   - Modules: modules.md
   - Labware: labware.md
@@ -22,6 +29,8 @@ theme:
   palette:
     primary: custom
     accent: custom
+  features:
+    - navigation.indexes
   logo: images/opentrons-droplet-white.svg
   favicon: images/opentrons-droplet-color.svg
   icon:
