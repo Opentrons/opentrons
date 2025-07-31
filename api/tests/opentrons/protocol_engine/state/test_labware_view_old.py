@@ -1814,16 +1814,16 @@ def test_get_grip_force(
     assert subject.get_grip_force(reservoir_def) == 15  # default
 
 
-def test_get_grip_height_from_labware_bottom(
+def test_get_grip_height_from_labware_origin(
     well_plate_def: LabwareDefinition,
     reservoir_def: LabwareDefinition,
 ) -> None:
     """It should get the grip height, if present, from labware definition or return default."""
     subject = get_labware_view()
     assert (
-        subject.get_grip_height_from_labware_bottom(well_plate_def) == 12.2
+        subject.get_grip_height_from_labware_origin(well_plate_def) == 12.2
     )  # from definition
-    assert subject.get_grip_height_from_labware_bottom(reservoir_def) == 15.7  # default
+    assert subject.get_grip_height_from_labware_origin(reservoir_def) == 15.7  # default
 
 
 @pytest.mark.parametrize(

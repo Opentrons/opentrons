@@ -1041,7 +1041,7 @@ class GeometryView:
         z-position of labware bottom + grip height from labware bottom.
         """
         grip_height_from_labware_bottom = (
-            self._labware.get_grip_height_from_labware_bottom(labware_definition)
+            self._labware.get_grip_height_from_labware_origin(labware_definition)
         )
         aa_name = self._get_underlying_addressable_area_name(location)
         parent_to_lw_offset = self._get_stackup_placement_origin_to_lw_origin(
@@ -1552,7 +1552,7 @@ class GeometryView:
                 continue
             labware_top_z_when_gripped = gripper_homed_position_z + (
                 self._labware.get_dimensions(labware_definition=labware_definition).z
-                - self._labware.get_grip_height_from_labware_bottom(labware_definition)
+                - self._labware.get_grip_height_from_labware_origin(labware_definition)
             )
             # TODO(cb, 2024-01-18): Utilizing the nozzle map and labware X coordinates verify if collisions will occur on the X axis (analysis will use hard coded data to measure from the gripper critical point to the pipette mount)
             if (_PIPETTE_HOMED_POSITION_Z - tip.length) < labware_top_z_when_gripped:

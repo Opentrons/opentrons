@@ -2752,7 +2752,7 @@ def test_get_labware_grip_point_v2_definition(
 ) -> None:
     """It should get the grip point of a LabwareDefinition2 labware at the specified location."""
     decoy.when(
-        mock_labware_view.get_grip_height_from_labware_bottom(_MOCK_LABWARE_DEFINITION2)
+        mock_labware_view.get_grip_height_from_labware_origin(_MOCK_LABWARE_DEFINITION2)
     ).then_return(100)
 
     decoy.when(
@@ -2785,7 +2785,7 @@ def test_get_labware_grip_point_v3_definition(
 ) -> None:
     """It should get the grip point of a LabwareDefinition3 labware at the specified location."""
     decoy.when(
-        mock_labware_view.get_grip_height_from_labware_bottom(_MOCK_LABWARE_DEFINITION3)
+        mock_labware_view.get_grip_height_from_labware_origin(_MOCK_LABWARE_DEFINITION3)
     ).then_return(100)
 
     decoy.when(
@@ -2836,7 +2836,7 @@ def test_get_labware_grip_point_on_labware(
         sentinel.below_definition
     )
     decoy.when(
-        mock_labware_view.get_grip_height_from_labware_bottom(
+        mock_labware_view.get_grip_height_from_labware_origin(
             labware_definition=sentinel.definition
         )
     ).then_return(100)
@@ -2913,7 +2913,7 @@ def test_get_labware_grip_point_for_labware_on_module(
         addressable_area_view=addressable_area_view,
     )
     decoy.when(
-        mock_labware_view.get_grip_height_from_labware_bottom(
+        mock_labware_view.get_grip_height_from_labware_origin(
             sentinel.labware_definition
         )
     ).then_return(500)
@@ -3000,7 +3000,7 @@ def test_get_labware_grip_point_for_labware_stack_on_module(
         addressable_area_view=addressable_area_view,
     )
     decoy.when(
-        mock_labware_view.get_grip_height_from_labware_bottom(
+        mock_labware_view.get_grip_height_from_labware_origin(
             sentinel.labware_definition
         )
     ).then_return(500)
@@ -3675,7 +3675,7 @@ def test_check_gripper_labware_tip_collision(
         mock_labware_view.get_dimensions(labware_definition=definition)
     ).then_return(Dimensions(x=1, y=2, z=67))
     decoy.when(
-        mock_labware_view.get_grip_height_from_labware_bottom(definition)
+        mock_labware_view.get_grip_height_from_labware_origin(definition)
     ).then_return(1.0)
 
     with pytest.raises(errors.LabwareMovementNotAllowedError):

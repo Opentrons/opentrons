@@ -1350,15 +1350,33 @@ class LabwareView:
             recommended_force if recommended_force is not None else LABWARE_GRIP_FORCE
         )
 
-    def get_grip_height_from_labware_bottom(
+    def get_grip_height_from_labware_origin(
         self, labware_definition: LabwareDefinition
     ) -> float:
-        """Get the recommended grip height from labware bottom, if present."""
-        recommended_height = labware_definition.gripHeightFromLabwareBottom
+        """Get the place on the labware where the gripper should contact.
+
+        The returned value is a z-offset relative to the labware origin.
+        """
+
+        def get_origin_to_mid_z(labware_definition: LabwareDefinition) -> float:
+            """Return the z-coordinate of the middle of the labware, relative to the labware's origin."""
+            if labware_definition.schemaVersion == 2:
+                return labware_definition.dimensions.zDimension / 2
+            else:
+                bottom_z = labware_definition.extents.total.backLeftBottom.z
+                top_z = labware_definition.extents.total.frontRightTop.z
+                return (bottom_z + top_z) / 2
+
+        if labware_definition.schemaVersion == 2:
+            # In schema 2, the bottom of the labware is at the z-origin by definition.
+            defined_height_from_origin = labware_definition.gripHeightFromLabwareBottom
+        else:
+            defined_height_from_origin = labware_definition.gripHeightFromLabwareOrigin
+
         return (
-            recommended_height
-            if recommended_height is not None
-            else self.get_dimensions(labware_definition=labware_definition).z / 2
+            defined_height_from_origin
+            if defined_height_from_origin is not None
+            else get_origin_to_mid_z(labware_definition)
         )
 
     @staticmethod
