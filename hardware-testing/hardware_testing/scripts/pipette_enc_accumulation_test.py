@@ -110,7 +110,7 @@ async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount, slot: s
             print(f"\t>> Cumulative error:       {cumulative_error} mm")
             print(f"\t>> Absolute error average: {abs_error / completed_moves} mm")
         except StallOrCollisionDetectedError as e:
-            print(f"Stall or collision detected while moving to top position: {e}")
+            print(f"Stall or collision detected while moving to bottom position: {e}")
             stall = True
             positions = (init_pos[pipette_ax], init_encoder_pos[pipette_ax],
                          "-", "-", "-",
