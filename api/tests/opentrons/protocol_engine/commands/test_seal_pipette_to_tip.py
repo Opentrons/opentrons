@@ -26,7 +26,12 @@ from opentrons.protocol_engine.execution import MovementHandler, GantryMover, Ti
 from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.types import TipGeometry, FluidKind, AspiratedFluid
+from opentrons.protocol_engine.types import (
+    TipGeometry,
+    FluidKind,
+    AspiratedFluid,
+    LabwareWellId,
+)
 
 from opentrons.protocol_engine.commands.movement_common import StallOrCollisionError
 from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
@@ -130,7 +135,7 @@ async def test_success(
             pipette_tip_state=update_types.PipetteTipStateUpdate(
                 pipette_id="pipette-id",
                 tip_geometry=TipGeometry(length=42, diameter=5, volume=300),
-                well_picked_up_from=update_types.Well(
+                well_picked_up_from=LabwareWellId(
                     labware_id="labware-id", well_name="A3"
                 ),
             ),
@@ -140,7 +145,7 @@ async def test_success(
             ),
             pipette_location=update_types.PipetteLocationUpdate(
                 pipette_id="pipette-id",
-                new_location=update_types.Well(labware_id="labware-id", well_name="A3"),
+                new_location=LabwareWellId(labware_id="labware-id", well_name="A3"),
                 new_deck_point=DeckPoint(x=111, y=222, z=333),
             ),
         ),
@@ -226,7 +231,7 @@ async def test_no_tip_physically_missing_error(
             pipette_tip_state=update_types.PipetteTipStateUpdate(
                 pipette_id="pipette-id",
                 tip_geometry=TipGeometry(length=42, diameter=5, volume=300),
-                well_picked_up_from=update_types.Well(
+                well_picked_up_from=LabwareWellId(
                     labware_id="labware-id", well_name="well-name"
                 ),
             ),
@@ -236,7 +241,7 @@ async def test_no_tip_physically_missing_error(
             ),
             pipette_location=update_types.PipetteLocationUpdate(
                 pipette_id="pipette-id",
-                new_location=update_types.Well(
+                new_location=LabwareWellId(
                     labware_id="labware-id", well_name="well-name"
                 ),
                 new_deck_point=DeckPoint(x=111, y=222, z=333),

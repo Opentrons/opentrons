@@ -28,6 +28,7 @@ from opentrons.protocol_engine.errors.exceptions import TipAttachedError
 from opentrons.protocol_engine.resources.model_utils import ModelUtils
 from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.state import StateView
+from opentrons.protocol_engine.types import LabwareWellId
 from opentrons.protocol_engine.execution import MovementHandler, TipHandler
 
 
@@ -143,7 +144,7 @@ async def test_drop_tip_implementation(
         state_update=update_types.StateUpdate(
             pipette_location=update_types.PipetteLocationUpdate(
                 pipette_id="abc",
-                new_location=update_types.Well(
+                new_location=LabwareWellId(
                     labware_id="123",
                     well_name="A3",
                 ),
@@ -232,7 +233,7 @@ async def test_drop_tip_with_alternating_locations(
         state_update=update_types.StateUpdate(
             pipette_location=update_types.PipetteLocationUpdate(
                 pipette_id="abc",
-                new_location=update_types.Well(
+                new_location=LabwareWellId(
                     labware_id="123",
                     well_name="A3",
                 ),
@@ -322,7 +323,7 @@ async def test_tip_attached_error(
         state_update=update_types.StateUpdate(
             pipette_location=update_types.PipetteLocationUpdate(
                 pipette_id="abc",
-                new_location=update_types.Well(
+                new_location=LabwareWellId(
                     labware_id="123",
                     well_name="A3",
                 ),
@@ -340,7 +341,7 @@ async def test_tip_attached_error(
             ),
             pipette_location=update_types.PipetteLocationUpdate(
                 pipette_id="abc",
-                new_location=update_types.Well(
+                new_location=LabwareWellId(
                     labware_id="123",
                     well_name="A3",
                 ),

@@ -38,6 +38,7 @@ from ..types import (
     CurrentAddressableArea,
     CurrentPipetteLocation,
     TipGeometry,
+    LabwareWellId,
 )
 from ..actions import (
     Action,
@@ -255,7 +256,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             new_logical_location = location_update.new_location
             new_deck_point = location_update.new_deck_point
             match new_logical_location:
-                case update_types.Well(labware_id=labware_id, well_name=well_name):
+                case LabwareWellId(labware_id=labware_id, well_name=well_name):
                     self._state.current_location = CurrentWell(
                         pipette_id=location_update.pipette_id,
                         labware_id=labware_id,

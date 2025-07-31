@@ -10,7 +10,7 @@ from typing_extensions import Literal
 from ..errors import ErrorOccurrence, PickUpTipTipNotAttachedError
 from ..resources import ModelUtils
 from ..state import update_types
-from ..types import PickUpTipWellLocation
+from ..types import PickUpTipWellLocation, LabwareWellId
 from .pipetting_common import (
     PipetteIdMixin,
 )
@@ -155,7 +155,7 @@ class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, _ExecuteRetur
                 .update_pipette_tip_state(
                     pipette_id=pipette_id,
                     tip_geometry=e.tip_geometry,
-                    well_picked_up_from=update_types.Well(
+                    well_picked_up_from=LabwareWellId(
                         labware_id=labware_id, well_name=well_name
                     ),
                 )
@@ -193,7 +193,7 @@ class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, _ExecuteRetur
                 move_result.state_update.update_pipette_tip_state(
                     pipette_id=pipette_id,
                     tip_geometry=tip_geometry,
-                    well_picked_up_from=update_types.Well(
+                    well_picked_up_from=LabwareWellId(
                         labware_id=labware_id, well_name=well_name
                     ),
                 )

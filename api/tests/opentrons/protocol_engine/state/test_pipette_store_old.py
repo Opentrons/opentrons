@@ -20,6 +20,7 @@ from opentrons.protocol_engine.types import (
     TipGeometry,
     AspiratedFluid,
     FluidKind,
+    LabwareWellId,
 )
 from opentrons.protocol_engine.actions import (
     SetPipetteMovementSpeedAction,
@@ -87,7 +88,7 @@ def test_location_state_update(subject: PipetteStore) -> None:
             state_update=update_types.StateUpdate(
                 pipette_location=update_types.PipetteLocationUpdate(
                     pipette_id="pipette-id",
-                    new_location=update_types.Well(
+                    new_location=LabwareWellId(
                         labware_id="come on barbie",
                         well_name="let's go party",
                     ),
@@ -281,7 +282,7 @@ def test_handles_pick_up_and_drop_tip(subject: PipetteStore) -> None:
                 pipette_tip_state=update_types.PipetteTipStateUpdate(
                     pipette_id="abc",
                     tip_geometry=TipGeometry(volume=42, length=101, diameter=8.0),
-                    well_picked_up_from=update_types.Well(
+                    well_picked_up_from=LabwareWellId(
                         labware_id="xyz", well_name="123"
                     ),
                 ),
@@ -343,7 +344,7 @@ def test_handles_drop_tip_in_place(subject: PipetteStore) -> None:
                 pipette_tip_state=update_types.PipetteTipStateUpdate(
                     pipette_id="xyz",
                     tip_geometry=TipGeometry(volume=42, length=101, diameter=8.0),
-                    well_picked_up_from=update_types.Well(
+                    well_picked_up_from=LabwareWellId(
                         labware_id="abc", well_name="123"
                     ),
                 ),
@@ -404,7 +405,7 @@ def test_handles_unsafe_drop_tip_in_place(subject: PipetteStore) -> None:
                 pipette_tip_state=update_types.PipetteTipStateUpdate(
                     pipette_id="xyz",
                     tip_geometry=TipGeometry(volume=42, length=101, diameter=8.0),
-                    well_picked_up_from=update_types.Well(
+                    well_picked_up_from=LabwareWellId(
                         labware_id="abc", well_name="123"
                     ),
                 ),
@@ -472,7 +473,7 @@ def test_aspirate_adds_volume(subject: PipetteStore) -> None:
                 pipette_tip_state=update_types.PipetteTipStateUpdate(
                     pipette_id="pipette-id",
                     tip_geometry=TipGeometry(volume=42, length=101, diameter=8.0),
-                    well_picked_up_from=update_types.Well(
+                    well_picked_up_from=LabwareWellId(
                         labware_id="abc", well_name="123"
                     ),
                 ),
@@ -532,7 +533,7 @@ def test_dispense_subtracts_volume(subject: PipetteStore) -> None:
                 pipette_tip_state=update_types.PipetteTipStateUpdate(
                     pipette_id="pipette-id",
                     tip_geometry=TipGeometry(volume=47, length=101, diameter=8.0),
-                    well_picked_up_from=update_types.Well(
+                    well_picked_up_from=LabwareWellId(
                         labware_id="abc", well_name="123"
                     ),
                 ),
@@ -592,7 +593,7 @@ def test_blow_out_clears_volume(subject: PipetteStore) -> None:
                 pipette_tip_state=update_types.PipetteTipStateUpdate(
                     pipette_id="pipette-id",
                     tip_geometry=TipGeometry(volume=47, length=101, diameter=8.0),
-                    well_picked_up_from=update_types.Well(
+                    well_picked_up_from=LabwareWellId(
                         labware_id="abc", well_name="123"
                     ),
                 ),
@@ -765,7 +766,7 @@ def test_prepare_to_aspirate_marks_pipette_ready(
                 pipette_tip_state=update_types.PipetteTipStateUpdate(
                     pipette_id="pipette-id",
                     tip_geometry=TipGeometry(volume=42, length=101, diameter=8.0),
-                    well_picked_up_from=update_types.Well(
+                    well_picked_up_from=LabwareWellId(
                         labware_id="abc", well_name="123"
                     ),
                 ),
