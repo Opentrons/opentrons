@@ -19,7 +19,7 @@ Reattach the lift handles to move your Flex to a new, nearby location. Lifting a
 
 A long-distance move transports your Flex off the grounds of your university, facility, or institution. Across town, to a new city, state, province, or country are all examples of a long-distance move. In this case, you'll need to pack the Flex to protect it from the elements, shocks, and rough movements that may occur while in transit.
 
-If you've kept the shipping crate and internal supports that came with your Flex, you can repackage it in these materials for a long-distance move. Follow the [unboxing steps][unboxing] in reverse order to prepare your Flex for a long-distance move. Basically, you should:
+If you've kept the shipping crate and internal supports that came with your Flex, you can repackage it in these materials for a long-distance move. Follow the [unboxing steps](unboxing.md) in reverse order to prepare your Flex for a long-distance move. Basically, you should:
 
 - Disconnect the power and network cable, if attached.
 

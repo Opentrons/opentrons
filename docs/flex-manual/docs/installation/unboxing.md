@@ -226,4 +226,4 @@ After moving the Flex to a temporary work area, or its permanent home, it's time
 
 </div>
 
-Now that your Flex is out of the box and ready to go, continue to the First Run section below.
+Now that your Flex is out of the box and ready to go, continue to the [First Run section](first-run.md).
