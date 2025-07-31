@@ -1865,32 +1865,25 @@ def test_get_grip_force(
     assert subject.get_grip_force(reservoir_def) == 15  # default
 
 
-def test_get_grip_height_from_labware_origin() -> None:
+def test_get_grip_z() -> None:
     """It should get the grip height, if present, from labware definition or return default."""
     subject = get_labware_view()
 
     schema_2_with_defined_height = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
         schemaVersion=2, gripHeightFromLabwareBottom=123
     )
-    assert (
-        subject.get_grip_height_from_labware_origin(schema_2_with_defined_height) == 123
-    )
+    assert subject.get_grip_z(schema_2_with_defined_height) == 123
 
     schema_3_with_defined_height = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
         schemaVersion=3, gripHeightFromLabwareOrigin=123
     )
-    assert (
-        subject.get_grip_height_from_labware_origin(schema_3_with_defined_height) == 123
-    )
+    assert subject.get_grip_z(schema_3_with_defined_height) == 123
 
     schema_2_without_defined_height = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
         schemaVersion=2,
         dimensions=LabwareDimensions(xDimension=0, yDimension=0, zDimension=500),
     )
-    assert (
-        subject.get_grip_height_from_labware_origin(schema_2_without_defined_height)
-        == 250
-    )
+    assert subject.get_grip_z(schema_2_without_defined_height) == 250
 
     schema_3_without_defined_height = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
         schemaVersion=3,
@@ -1901,10 +1894,7 @@ def test_get_grip_height_from_labware_origin() -> None:
             )
         ),
     )
-    assert (
-        subject.get_grip_height_from_labware_origin(schema_3_without_defined_height)
-        == 750
-    )
+    assert subject.get_grip_z(schema_3_without_defined_height) == 750
 
 
 @pytest.mark.parametrize(

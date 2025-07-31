@@ -1353,9 +1353,7 @@ class LabwareView:
             recommended_force if recommended_force is not None else LABWARE_GRIP_FORCE
         )
 
-    def get_grip_height_from_labware_origin(
-        self, labware_definition: LabwareDefinition
-    ) -> float:
+    def get_grip_z(self, labware_definition: LabwareDefinition) -> float:
         """Get the place on the labware where the gripper should contact.
 
         The returned value is a z-offset relative to the labware origin.
