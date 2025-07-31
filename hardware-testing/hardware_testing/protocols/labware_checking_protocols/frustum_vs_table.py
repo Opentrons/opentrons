@@ -112,6 +112,13 @@ def _get_tip_z_error(
 def add_parameters(parameters: ParameterContext) -> None:
     """Add parameters."""
     parameters.add_int(
+        variable_name = "number_of_trials",
+        display_name="Number of Trials",
+        maximum =6,
+        minimum=3,
+        default=3
+    )
+    parameters.add_int(
         variable_name="labware_version_of_frustum",
         display_name="Labware Version of Frustum",
         maximum=10,
@@ -145,7 +152,7 @@ def add_parameters(parameters: ParameterContext) -> None:
             },
             {"display_name": "nest 195 ml", "value": "nest_1_reservoir_195ml"},
         ],
-        default="usascientific_96_wellplate_2.4ml_deep",
+        default="usascientific_12_reservoir_22ml",
     )
     parameters.add_bool(
         variable_name="fill_with_manual_pipette",
@@ -212,12 +219,13 @@ def run(ctx: ProtocolContext) -> None:
     frustum_labware = ctx.load_labware(
         labware_type, SLOT_FRUSTUM_LABWARE
     )
+    number_of_trials = ctx.params.number_of_trials # type: ignore[attr-defined]
     frustum_labware.load_empty(frustum_labware.wells())
     src = ctx.load_labware("nest_1_reservoir_290ml", SLOT_RESERVOIR)
     ethanol_liq = ctx.define_liquid("Ethanol", display_color="#FFFFC5")
     src["A1"].load_liquid(ethanol_liq, src["A1"].max_volume - 1000)
     ctx.load_trash_bin("A3")
-    dial = ctx.load_labware("dial_indicator", SLOT_DIAL)
+    dial = ctx.load_labware("nest_1_reservoir_290ml", SLOT_DIAL)
 
     # LOAD TIP RACKS AND PIPETTES
     if frustum_labware["A1"].max_volume < 100:
@@ -295,7 +303,7 @@ def run(ctx: ProtocolContext) -> None:
             wells_in_row = frustum_labware.rows()[i]
         except IndexError:
             wells_in_row = frustum_labware.rows()[0]
-        well_names = [str(well).split(" ")[0] for well in wells_in_row][:6]
+        well_names = [str(well).split(" ")[0] for well in wells_in_row][:number_of_trials]
         frustum_vol = frustum_labware["A1"].volume_from_height(heights[i])
         for well in well_names:
             frustum_volumes[well] = frustum_vol
