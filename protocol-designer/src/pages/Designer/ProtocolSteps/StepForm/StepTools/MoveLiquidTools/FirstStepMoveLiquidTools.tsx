@@ -1,35 +1,14 @@
-import { useState } from 'react'
-import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { registerLicense } from '@syncfusion/ej2-base'
-import {
-  Category,
-  ChartComponent,
-  ColumnSeries,
-  DataEditing,
-  Inject,
-  Legend,
-  LineSeries,
-  SeriesCollectionDirective,
-  SeriesDirective,
-} from '@syncfusion/ej2-react-charts'
 
 import {
   DIRECTION_COLUMN,
   Divider,
   Flex,
-  Modal,
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import {
-  getAllLiquidClassDefs,
-  getFlexNameConversion,
-  NONE_LIQUID_CLASS_NAME,
-} from '@opentrons/shared-data'
 
-import { getMainPagePortalEl } from '../../../../../../components/organisms'
 import {
   getEnablePartialTipSupport,
   getEnableReturnTip,
@@ -53,100 +32,8 @@ import {
   WellSelectionField,
 } from '../../PipetteFields'
 
-import type { LiquidHandlingPropertyByVolume } from '@opentrons/shared-data'
 import type { FormData } from '../../../../../../form-types'
 import type { FieldPropsByName } from '../../types'
-
-const getByVolumeMappedToXY = (
-  data: LiquidHandlingPropertyByVolume
-): Array<{ x: number; y: number }> => {
-  return [
-    { x: 0, y: data[0][1] },
-    ...data.map(item => ({
-      x: item[0],
-      y: item[1],
-    })),
-  ]
-}
-
-function EditableLineChartModal(props: {
-  byVolume: LiquidHandlingPropertyByVolume
-  onClose: () => void
-}): JSX.Element {
-  const { byVolume = [], onClose } = props
-  const onChartLoad = (): void => {
-    registerLicense(
-      'Ngo9BigBOggjHTQxAR8/V1JEaF5cXmRCdkx0THxbf1x1ZFRHallVTnVdUiweQnxTdEBjXnxecXVQQmNbUkVzW0leYw=='
-    )
-    let chart: Element = document.getElementById('charts')
-    chart.setAttribute('title', '')
-  }
-
-  const data = getByVolumeMappedToXY(byVolume)
-  const maxFlowRate = 200
-  return createPortal(
-    <Modal
-      title="Flow rate (ul/s) vs Volume (ul)"
-      onClose={onClose}
-      closeOnOutsideClick
-    >
-      <div className="control-pane" style={{ width: '100%' }}>
-        <div className="control-section">
-          <ChartComponent
-            id="charts"
-            style={{ textAlign: 'center' }}
-            primaryXAxis={{
-              valueType: 'Category',
-              labelFormat: 'y',
-              labelPlacement: 'BetweenTicks',
-              majorGridLines: { width: 0 },
-              edgeLabelPlacement: 'Shift',
-              majorTickLines: { width: 0 },
-              minorTickLines: { width: 0 },
-            }}
-            primaryYAxis={{
-              rangePadding: 'None',
-              minimum: 0,
-              maximum: maxFlowRate,
-              interval: maxFlowRate / 10,
-              title: 'Flow rate (ul/s)',
-              lineStyle: { width: 0 },
-              majorTickLines: { width: 0 },
-              minorTickLines: { width: 0 },
-            }}
-            chartArea={{ border: { width: 0 }, margin: { bottom: 12 } }}
-            width="100%"
-            title="Flow rate (ul/s) vs Volume (ul)"
-            loaded={onChartLoad}
-          >
-            <Inject
-              services={[
-                LineSeries,
-                ColumnSeries,
-                Category,
-                DataEditing,
-                Legend,
-              ]}
-            />
-            <SeriesCollectionDirective>
-              <SeriesDirective
-                dataSource={data}
-                dragSettings={{ enable: true }}
-                xName="x"
-                yName="y"
-                name="Volume (ul)"
-                width={2}
-                marker={{ visible: true, width: 7, height: 7, isFilled: true }}
-                type="Line"
-              />
-            </SeriesCollectionDirective>
-          </ChartComponent>
-        </div>
-      </div>
-    </Modal>,
-    getMainPagePortalEl()
-  )
-}
 
 interface FirstStepMoveLiquidToolsProps {
   propsForFields: FieldPropsByName
@@ -182,19 +69,6 @@ export function FirstStepMoveLiquidTools({
     additionalEquipmentEntities[String(propsForFields.dispense_labware.value)]
       ?.name === 'trashBin'
 
-  const { spec: pipetteSpecs } = pipettes[String(formData.pipette)]
-  const byTipValues = getAllLiquidClassDefs()
-    [
-      formData.liquidClass !== NONE_LIQUID_CLASS_NAME
-        ? formData.liquidClass
-        : 'waterV1'
-    ].byPipette.find(
-      ({ pipetteModel }) => pipetteModel === getFlexNameConversion(pipetteSpecs)
-    )
-    ?.byTipType.find(({ tiprack }) => tiprack === formData.tipRack)?.aspirate
-    .flowRateByVolume
-
-  const [showChart, setShowChart] = useState<boolean>(false)
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}

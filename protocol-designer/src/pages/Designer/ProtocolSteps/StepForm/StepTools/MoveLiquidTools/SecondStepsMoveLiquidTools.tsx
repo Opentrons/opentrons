@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import Plot from 'react-plotly.js'
+import Plot from 'react-plotly'
 import { useSelector } from 'react-redux'
 import { round } from 'lodash'
 
@@ -20,7 +20,6 @@ import {
   SPACING,
   StyledText,
   Tabs,
-  Tag,
 } from '@opentrons/components'
 import {
   getAllLiquidClassDefs,
@@ -67,39 +66,34 @@ import type { FormData, StepFieldName } from '../../../../../../form-types'
 import type { FieldPropsByName, LiquidHandlingTab } from '../../types'
 import type { StepInputFieldProps } from './MultiInputField'
 
+interface DataPoint {
+  x: number
+  y: number
+}
+
 function DraggableLineChart(props: {
-  dataPoints: Array<{ id: string; x: number; y: number }>
-  setDataPoints: (
-    dataPoints: Array<{ id: string; x: number; y: number }>
-  ) => void
+  dataPoints: DataPoint[]
+  setDataPoints: (dataPoints: DataPoint[]) => void
   byVolume: LiquidHandlingPropertyByVolume
 }): JSX.Element {
   const { dataPoints, setDataPoints } = props
 
   // Function to handle the relayout event (when shapes are dragged)
   const handleRelayout = (eventData: any): void => {
-    // Loop through the existing data points
     const updatedPoints = [...dataPoints]
     let changed = false
 
-    // Plotly's relayout event provides information about changes.
-    // For shapes, it's typically in the format 'shapes[index].x0', 'shapes[index].y0', etc.
-    // We need to iterate through possible shape indices to find what changed.
     for (let i = 0; i < updatedPoints.length; i++) {
       const xKey = `shapes[${i}].x0`
       const yKey = `shapes[${i}].y0`
 
       if (eventData[xKey] !== undefined && eventData[yKey] !== undefined) {
-        // Adjust the x and y values for the center of the circle,
-        // as x0/y0 represent the top-left corner of the bounding box.
-        // Assuming a radius of 0.1 for the circles as in `getShapes`.
         const newX = eventData[xKey] as number
         const newY = eventData[yKey] as number
 
         if (updatedPoints[i].x !== newX || updatedPoints[i].y !== newY) {
           updatedPoints[i] = {
             ...updatedPoints[i],
-            // x: Math.max(newX, 0),
             y: Math.max(newY, 0),
           }
           changed = true
@@ -108,9 +102,29 @@ function DraggableLineChart(props: {
     }
 
     if (changed) {
-      setDataPoints(updatedPoints)
+      const sortedPoints = updatedPoints.sort((a, b) => a.x - b.x)
+      setDataPoints(sortedPoints)
     }
   }
+
+  // Function to handle a click on the invisible "click" trace
+  const handlePlotClick = (eventData: any): void => {
+    // This event handler is triggered by clicking on the invisible trace's line.
+    // The `eventData.points` array will contain information about the clicked point.
+    if (eventData && eventData.points && eventData.points.length > 0) {
+      const point = eventData.points[0]
+      const newPoint: DataPoint = {
+        x: point.x,
+        y: point.y,
+      }
+
+      const updatedPoints = [...dataPoints, newPoint]
+      const sortedPoints = updatedPoints.sort((a, b) => a.x - b.x)
+      setDataPoints(sortedPoints)
+    }
+  }
+
+  // Helper function to generate annotations
   const getAnnotations = (): any => {
     return dataPoints.map(point => ({
       xref: 'x',
@@ -126,7 +140,7 @@ function DraggableLineChart(props: {
         color: 'black',
         size: 11,
       },
-      opacity: 1, // --- Simplified: Always visible now ---
+      opacity: 1,
     }))
   }
 
@@ -136,17 +150,14 @@ function DraggableLineChart(props: {
       type: 'circle',
       xref: 'x',
       yref: 'y',
-      // x0, y0, x1, y1 define the bounding box of the circle
-      // We'll make the circle radius 0.1 for visual clarity
       x0: point.x - 5,
       y0: point.y - 5,
       x1: point.x + 5,
       y1: point.y + 5,
-      fillcolor: COLORS.blue50, // Red, semi-transparent
+      fillcolor: COLORS.blue50,
       line: { width: 0 },
-      editable: false, // This makes the circle draggable
-      // A unique ID helps track the shape, though not directly used in this simple handler
-      name: point.id,
+      editable: true,
+      name: String(point.x),
     }))
   }
 
@@ -164,8 +175,22 @@ function DraggableLineChart(props: {
               opacity: 0,
             },
             line: { width: 2 },
-            showlegend: false, // Hide this trace from the legend
+            showlegend: false,
             hoverinfo: 'none',
+          },
+          // This is the invisible, "clickable" trace.
+          {
+            x: dataPoints.map(p => p.x),
+            y: dataPoints.map(p => p.y),
+            mode: 'lines',
+            type: 'scatter',
+            line: {
+              width: 20,
+              color: 'rgba(0,0,0,0)', // Completely transparent
+            },
+            hoverinfo: 'none',
+            showlegend: false,
+            name: 'click-trace',
           },
         ]}
         layout={{
@@ -174,19 +199,19 @@ function DraggableLineChart(props: {
           title: { text: 'Flow rate (ul/s) vs Volume (ul)', editable: false },
           xaxis: { title: 'Volume (ul)', range: [0, 210] },
           yaxis: { title: 'Flow rate (ul/s)', range: [0, 210] },
-          shapes: getShapes(), // Add the draggable shapes
-          hovermode: 'closest', // Improves hover experience
+          shapes: getShapes(),
+          hovermode: 'closest',
           annotations: getAnnotations(),
         }}
         config={{
           editable: true,
           displayModeBar: true,
           modeBarButtonsToRemove: [
-            'zoom2d', // Remove the zoom box button
-            'pan2d', // Remove the pan button
-            'autoScale2d', // Remove the autoscale button
-            'hoverClosestCartesian', // Remove hover tooltips
-            'toImage', // Remove download image button
+            'zoom2d',
+            'pan2d',
+            'autoScale2d',
+            'hoverClosestCartesian',
+            'toImage',
             'lasso2d',
             'select2d',
             'toggleHover',
@@ -194,15 +219,16 @@ function DraggableLineChart(props: {
             'zoomOut2d',
           ],
           edits: {
-            titleText: false, // Disable title editing
-            axisTitleText: false, // Explicitly disable axis title editing
-            legendText: false, // Explicitly disable legend text editing
-            colorbarTitleText: false, // Explicitly disable colorbar title editing
-            shapePosition: true, // <-- Allow dragging shapes (this is the one we want true)
-            shapeEdit: false, // <-- Attempt to disable general shape editing (including resize)
+            titleText: false,
+            axisTitleText: false,
+            legendText: false,
+            colorbarTitleText: false,
+            shapePosition: true,
+            shapeEdit: false,
           },
         }}
         onRelayout={handleRelayout}
+        onClick={handlePlotClick}
       />
     </div>
   )
