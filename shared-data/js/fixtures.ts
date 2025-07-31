@@ -1102,6 +1102,40 @@ export const getMainUsbModuleFixtureIdForComboFixture = (
   )
 }
 
+export const getMainNonComboFixtureId = (
+  compatibleCutoutFixtureIds: CutoutFixtureId[],
+  addressableAreaIds: AddressableAreaName[],
+  cutoutId: CutoutId
+): CutoutFixtureId | null => {
+  const deckDef = getDeckDefFromRobotType('OT-3 Standard')
+  const cutoutFixtures = deckDef.cutoutFixtures.filter(cf =>
+    compatibleCutoutFixtureIds.includes(cf.id)
+  )
+  const cutoutFixturesWithAddressableAreas = cutoutFixtures.filter(cf =>
+    Object.values(cf.providesAddressableAreas).some(providedAAs =>
+      addressableAreaIds.every(aa => providedAAs.includes(aa))
+    )
+  )
+
+  if (cutoutFixturesWithAddressableAreas.length === 0) {
+    return null
+  }
+
+  // Find the fixture with the least items in its providesAddressableAreas
+  const fixtureWithLeastAAs = cutoutFixturesWithAddressableAreas.reduce(
+    (minFixture, currentFixture) => {
+      const minAAsCount = Object.entries(
+        minFixture.providesAddressableAreas
+      ).filter(([key, value]) => key === cutoutId).length
+      const currentAAsCount = Object.entries(
+        currentFixture.providesAddressableAreas
+      ).filter(([key, value]) => key === cutoutId).length
+      return currentAAsCount < minAAsCount ? currentFixture : minFixture
+    }
+  )
+  return fixtureWithLeastAAs.id
+}
+
 export const isModuleAllowedOnAA = (
   cutoutId: CutoutId,
   aa: AddressableAreaNamesWithFakes,

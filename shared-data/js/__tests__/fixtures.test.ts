@@ -14,6 +14,8 @@ import {
   SINGLE_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
+  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   TEMPERATURE_MODULE_V2_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
@@ -26,6 +28,7 @@ import {
   getCutoutConfigReplacmentForModule,
   getCutoutFixtureReplacementIfNeeded,
   getMainAAForAFixture,
+  getMainNonComboFixtureId,
   getMainUsbModuleFixtureIdForComboFixture,
   getReplacementFixtureForFakeFixture,
   getReplacementFixtureForFixtureRemoval,
@@ -646,11 +649,41 @@ describe('getMainModuleFixtureIdForComboFixture', () => {
     expect(result).toEqual('flexStackerModuleV1')
   })
 
-  it('should get first entry when no usb module is found', () => {
+  it('should return null when no usb module is found', () => {
     const result = getMainUsbModuleFixtureIdForComboFixture([
       WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
       WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
     ])
+    expect(result).toEqual(null)
+  })
+})
+
+describe('getMainNonComboFixtureId', () => {
+  it('should get main non combo fixture id for waste chute', () => {
+    const result = getMainNonComboFixtureId(
+      [
+        WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+        WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+        STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+        STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+        FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+      ],
+      ['gripperWasteChute']
+    )
     expect(result).toEqual(WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE)
+  })
+
+  it.only('should get main non combo fixture id for staging area', () => {
+    const result = getMainNonComboFixtureId(
+      [
+        STAGING_AREA_RIGHT_SLOT_FIXTURE,
+        STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
+        STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+        STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+      ],
+      ['D4'],
+      'cutoutD3'
+    )
+    expect(result).toEqual(STAGING_AREA_RIGHT_SLOT_FIXTURE)
   })
 })
