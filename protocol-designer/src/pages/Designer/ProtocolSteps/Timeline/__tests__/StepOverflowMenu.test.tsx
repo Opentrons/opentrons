@@ -70,6 +70,7 @@ describe('StepOverflowMenu', () => {
       confirmDelete: mockConfirm,
       confirmMultiDelete: vi.fn(),
       sidebarWidth: 235,
+      isStepAfterError: false,
     }
     vi.mocked(getMultiSelectItemIds).mockReturnValue(null)
     vi.mocked(getCurrentFormIsPresaved).mockReturnValue(false)
@@ -113,5 +114,15 @@ describe('StepOverflowMenu', () => {
     })
     render(props)
     expect(screen.getByText('View details')).toBeInTheDocument()
+  })
+
+  it('should not clickable except for delete button when isStepAfterError is true', () => {
+    props = {
+      ...props,
+      isStepAfterError: true,
+    }
+    render(props)
+    expect(screen.getByText('Delete step')).not.toBeDisabled()
+    expect(screen.getByText('Edit step')).toBeDisabled()
   })
 })

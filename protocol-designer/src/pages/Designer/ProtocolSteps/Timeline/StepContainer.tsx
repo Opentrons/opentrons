@@ -327,6 +327,7 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
               confirmMultiDelete={confirmMultiDelete}
               multiSelectItemIds={multiSelectItemIds}
               sidebarWidth={sidebarWidth}
+              isStepAfterError={isStepAfterError}
             />,
             getMainPagePortalEl()
           )

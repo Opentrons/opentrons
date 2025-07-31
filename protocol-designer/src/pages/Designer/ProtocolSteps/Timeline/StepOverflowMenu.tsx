@@ -43,6 +43,7 @@ interface StepOverflowMenuProps {
   confirmMultiDelete: () => void
   multiSelectItemIds: string[] | null
   sidebarWidth: number // adjust the position of the overflow menu
+  isStepAfterError: boolean
 }
 
 export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
@@ -56,6 +57,7 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
     confirmMultiDelete,
     multiSelectItemIds,
     sidebarWidth,
+    isStepAfterError,
   } = props
   const { t } = useTranslation('protocol_steps')
   const singleEditFormHasUnsavedChanges = useSelector(
@@ -116,7 +118,7 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
         {multiSelectItemIds != null && multiSelectItemIds.length > 0 ? (
           <>
             <MenuItem
-              disabled={batchEditFormHasUnstagedChanges}
+              disabled={batchEditFormHasUnstagedChanges || isStepAfterError}
               onClick={() => {
                 duplicateMultipleSteps()
                 setOpenedOverflowMenuId(null)
@@ -137,9 +139,11 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
         ) : (
           <>
             {formData != null ? null : (
-              <MenuItem onClick={handleEdit}>{t('edit_step')}</MenuItem>
+              <MenuItem onClick={handleEdit} disabled={isStepAfterError}>
+                {t('edit_step')}
+              </MenuItem>
             )}
-            {isPipetteStep || isThermocyclerProfile ? (
+            {isPipetteStep || isThermocyclerProfile || !isStepAfterError ? (
               <MenuItem
                 disabled={formData != null}
                 onClick={() => {
@@ -153,7 +157,7 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
               </MenuItem>
             ) : null}
             <MenuItem
-              disabled={singleEditFormHasUnsavedChanges}
+              disabled={singleEditFormHasUnsavedChanges || isStepAfterError}
               onClick={() => {
                 duplicateStep(stepId)
                 setOpenedOverflowMenuId(null)
