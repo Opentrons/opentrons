@@ -130,7 +130,7 @@ interface PrepareToRunProps {
   robotName: string
   runRecord: Run | null
   labwareConfirmed: boolean
-  isRequiredOffsetMissing: boolean
+  offsetsConfirmed: boolean
   isLPCInitializing: boolean
 }
 
@@ -143,9 +143,9 @@ function PrepareToRun({
   robotName,
   runRecord,
   labwareConfirmed,
-  isRequiredOffsetMissing,
   isLPCInitializing,
   confirmStepsComplete,
+  offsetsConfirmed,
 }: PrepareToRunProps): JSX.Element {
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
   const navigate = useNavigate()
@@ -348,11 +348,15 @@ function PrepareToRun({
       ? 'ready'
       : 'not ready'
 
+  const isAnyNecessaryDefaultOffsetMissing = useSelector(
+    selectIsAnyNecessaryDefaultOffsetMissing(runId)
+  )
+
   const isReadyToRun =
     incompleteInstrumentCount === 0 &&
     areModulesReady &&
     areFixturesReady &&
-    !isRequiredOffsetMissing
+    !isAnyNecessaryDefaultOffsetMissing
   const onPlay = (): void => {
     if (doorStatus.isDoorOpen) {
       if (
@@ -506,9 +510,6 @@ function PrepareToRun({
   const numMissingLSOffsets = useSelector(
     selectCountMissingLSOffsetsWithoutDefault(runId)
   )
-  const isAnyNecessaryDefaultOffsetMissing = useSelector(
-    selectIsAnyNecessaryDefaultOffsetMissing(runId)
-  )
 
   const lpcSetupStepProps = (): Pick<
     ProtocolSetupStepProps,
@@ -520,7 +521,7 @@ function PrepareToRun({
         status: 'ready',
         interactionDisabled: true,
       }
-    } else if (isRequiredOffsetMissing) {
+    } else if (offsetsConfirmed) {
       return {
         detail: t('num_offsets_applied', { num: totalOffsets }),
         status: 'ready',
@@ -816,9 +817,6 @@ export function ProtocolSetup(): JSX.Element {
   )
   // TODO(jh 10-31-24): Refactor the below to utilize useMissingStepsModal.
   const [labwareConfirmed, setLabwareConfirmed] = useState<boolean>(false)
-  const isRequiredOffsetMissing = useSelector(
-    selectIsAnyNecessaryDefaultOffsetMissing(runId)
-  )
   const missingSteps = [
     !labwareConfirmed ? t('labware_placement') : null,
     !offsetsConfirmed ? t('applied_labware_offsets') : null,
@@ -850,8 +848,8 @@ export function ProtocolSetup(): JSX.Element {
         robotName={robotName}
         runRecord={runRecord ?? null}
         labwareConfirmed={labwareConfirmed}
-        isRequiredOffsetMissing={isRequiredOffsetMissing}
         isLPCInitializing={lpcLaunchProps.isFlexLPCInitializing}
+        offsetsConfirmed={offsetsConfirmed}
       />
     ),
     instruments: (

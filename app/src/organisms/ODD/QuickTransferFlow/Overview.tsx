@@ -90,7 +90,7 @@ export function Overview(props: OverviewProps): JSX.Element | null {
     },
     {
       option: t('liquid_class'),
-      value: allLiquidClasses[state?.liquidClassName]?.displayName,
+      value: allLiquidClasses[state?.liquidClassName]?.displayName ?? t('none'),
     },
   ]
 
