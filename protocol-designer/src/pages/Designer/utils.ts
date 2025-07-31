@@ -246,8 +246,11 @@ const getNickname = (
   t: any
 ): string => {
   const { modules } = activeDeckSetup
-  const stack = activeDeckSetup.labware[labwareId].stack
-  const latestSlot = resolveSlotLocation(modules, stack, robotType)
+  const stack = activeDeckSetup.labware[labwareId]?.stack
+  const latestSlot =
+    stack != null
+      ? resolveSlotLocation(modules, stack, robotType)
+      : 'unknown slot'
   const name = nicknamesById[labwareId]
   let nickName: string = name
   if (latestSlot != null && latestSlot !== 'offDeck') {
@@ -275,7 +278,7 @@ export const useLabwareDropdownOptions = (
       labwareId: string
     ): DropdownOption[] => {
       const deckSlot = getSlotInLocationStack(
-        activeDeckSetup.labware[labwareId].stack
+        activeDeckSetup.labware[labwareId]?.stack
       )
       const isLabwareInWasteChute = deckSlot === 'gripperWasteChute'
 

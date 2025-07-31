@@ -2,14 +2,17 @@ import assert from 'assert'
 import zip from 'lodash/zip'
 
 import {
+  getAllLiquidClassDefs,
   getByVolumeValue,
   getFlexNameConversion,
   getMmFromBottom,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
   isFlexPipette,
   LOW_VOLUME_PIPETTES,
+  NONE_LIQUID_CLASS_NAME,
   POSITION_REFERENCE_MAPPED_TO_WELL_ORIGIN,
   SAFE_MOVE_TO_WELL_LOCATION,
+  WATER_LIQUID_CLASS_NAME,
   WELL_ORIGIN_TOP,
 } from '@opentrons/shared-data'
 
@@ -19,6 +22,7 @@ import {
   curryCommandCreator,
   curryWithoutPython,
   DEST_WELL_BLOWOUT_DESTINATION,
+  formatChangeTipArg,
   formatPyStr,
   getIsRetractSafeForAirGap,
   getSlotInLocationStack,
@@ -310,6 +314,32 @@ export const transfer: CommandCreator<TransferArgs> = (
     pythonName: pythonPipetteName,
   } = pipetteEntities[args.pipette]
 
+  const tiprack = Object.values(labwareEntities).find(
+    ({ labwareDefURI }) => labwareDefURI === tipRack
+  )
+  if (tiprack == null) {
+    errors.push(
+      errorCreators.labwareDoesNotExist({
+        actionName,
+        labware: tipRack,
+      })
+    )
+  }
+
+  const { labwareDefURI: tiprackDefUri } = tiprack ?? {}
+
+  const liquidClassValuesForTip =
+    getAllLiquidClassDefs()
+      [
+        liquidClass === NONE_LIQUID_CLASS_NAME || liquidClass == null
+          ? WATER_LIQUID_CLASS_NAME
+          : liquidClass
+      ].byPipette?.find(
+        ({ pipetteModel }) =>
+          pipetteModel === getFlexNameConversion(pipetteSpecs)
+      )
+      ?.byTipType.find(({ tiprack }) => tiprack === tiprackDefUri) ?? null
+
   const dispenseCorrectionVolumeForSubtransferTarget =
     getByVolumeValue({
       liquidClass: args.liquidClass,
@@ -362,8 +392,7 @@ export const transfer: CommandCreator<TransferArgs> = (
         ? getFlexNameConversion(pipetteSpecs)
         : pipetteName,
       tiprackUri: tipRack,
-      aspirateCorrectionVolume: dispenseCorrectionVolumeForSubtransferTarget,
-      dispenseCorrectionVolume: aspirateCorrectionVolumeForSubtransferTarget,
+      liquidClassValuesForTip,
     })}`,
   ]
   const customLiquidClass = `${PROTOCOL_CONTEXT_NAME}.define_liquid_class(\n${indentPyLines(
@@ -376,7 +405,7 @@ export const transfer: CommandCreator<TransferArgs> = (
     `dest=${
       pythonDestWells != null ? `[${pythonDestWells}]` : destTrashPipetteName
     }`,
-    `new_tip=${formatPyStr(changeTip)}`,
+    `new_tip=${formatPyStr(formatChangeTipArg(changeTip))}`,
     `trash_location=${trashPipetteName}`,
     ...(pipetteSpecs.channels > 1 ? [`group_wells=False`] : []),
     `keep_last_tip=True`,

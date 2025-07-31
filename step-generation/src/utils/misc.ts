@@ -956,6 +956,7 @@ export const getTransferPlanAndReferenceVolumes = (args: {
   tiprackDefinition: LabwareDefinition2 | null
   volume: number
   path: PathOption
+  numAspirateWells: number
   numDispenseWells: number
   aspirateAirGapByVolume: Array<[number, number]>
   conditioningByVolume: Array<[number, number]> | null
@@ -975,6 +976,7 @@ export const getTransferPlanAndReferenceVolumes = (args: {
     conditioningByVolume,
     disposalByVolume,
     numDispenseWells,
+    numAspirateWells,
     aspirateAirGapByVolume,
   } = args
   const { liquids } = pipetteSpecs
@@ -1015,6 +1017,20 @@ export const getTransferPlanAndReferenceVolumes = (args: {
           : 0)
   const isMultiAspirateAvailable =
     maxWorkingVolume > minVolumeForMultiAspirateDispense
+
+  if (path === 'multiAspirate' && numAspirateWells <= numDispenseWells) {
+    console.warn(
+      'Invalid combination of source and destination wells for multiAspirate path'
+    )
+  } else if (path === 'multiDispense' && numAspirateWells >= numDispenseWells) {
+    console.warn(
+      'Invalid combination of source and destination wells for multiDispense path'
+    )
+  } else if (path === 'single' && numAspirateWells !== numDispenseWells) {
+    console.warn(
+      'Invalid combination of source and destination wells for single path'
+    )
+  }
 
   // early return if multiAspirate/multiDispense cannot be accommodated
   if (
@@ -1111,9 +1127,15 @@ export const getTransferPlanAndReferenceVolumes = (args: {
       },
     }
   }
+
   // path is valid multiAspirate
   const maxSourcesPerAspiration = Math.floor(maxWorkingVolume / volume)
-  const volumeTotalAspiration = maxSourcesPerAspiration * volume
+  const sourcesPerAspiration = Math.min(
+    maxSourcesPerAspiration,
+    numAspirateWells
+  )
+  const volumeTotalAspiration = sourcesPerAspiration * volume
+
   return {
     referenceVolumes: {
       airGap: {
@@ -1134,7 +1156,7 @@ export const getTransferPlanAndReferenceVolumes = (args: {
     },
     multiWellHandling: {
       isSupported: true,
-      numWellsToFitInTip: maxSourcesPerAspiration,
+      numWellsToFitInTip: sourcesPerAspiration,
     },
   }
 }

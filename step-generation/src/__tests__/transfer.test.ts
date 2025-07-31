@@ -207,7 +207,6 @@ mock_pipette.transfer_with_liquid_class(
                     "position_reference": "well-bottom",
                 },
                 "flow_rate_by_volume": [(0, 12)],
-                "correction_by_volume": [(0, 0)],
                 "delay": {"enabled": False},
                 "submerge": {
                     "delay": {"enabled": False},
@@ -228,6 +227,7 @@ mock_pipette.transfer_with_liquid_class(
                     "touch_tip": {"enabled": False},
                     "blowout": {"enabled": False},
                 },
+                "correction_by_volume": [(0, 0)],
                 "push_out_by_volume": [(0, 0)],
                 "mix": {"enabled": False},
             },
@@ -398,7 +398,6 @@ mock_pipette.transfer_with_liquid_class(
                     "position_reference": "well-bottom",
                 },
                 "flow_rate_by_volume": [(0, 12)],
-                "correction_by_volume": [(0, 0)],
                 "delay": {"enabled": False},
                 "submerge": {
                     "delay": {"enabled": False},
@@ -419,6 +418,7 @@ mock_pipette.transfer_with_liquid_class(
                     "touch_tip": {"enabled": False},
                     "blowout": {"enabled": False},
                 },
+                "correction_by_volume": [(0, 0)],
                 "push_out_by_volume": [(0, 0)],
                 "mix": {"enabled": False},
             },
@@ -651,7 +651,6 @@ mock_pipette.transfer_with_liquid_class(
                     "position_reference": "well-bottom",
                 },
                 "flow_rate_by_volume": [(0, 12)],
-                "correction_by_volume": [(0, 0)],
                 "delay": {"enabled": False},
                 "submerge": {
                     "delay": {"enabled": False},
@@ -672,6 +671,7 @@ mock_pipette.transfer_with_liquid_class(
                     "touch_tip": {"enabled": False},
                     "blowout": {"enabled": False},
                 },
+                "correction_by_volume": [(0, 0)],
                 "push_out_by_volume": [(0, 0)],
                 "mix": {"enabled": False},
             },
@@ -5552,7 +5552,6 @@ mock_pipette.transfer_with_liquid_class(
                     "position_reference": "well-bottom",
                 },
                 "flow_rate_by_volume": [(0, 12)],
-                "correction_by_volume": [(0, 0)],
                 "delay": {"enabled": True, "duration": 12},
                 "submerge": {
                     "delay": {"enabled": False},
@@ -5573,6 +5572,7 @@ mock_pipette.transfer_with_liquid_class(
                     "touch_tip": {"enabled": True, "z_offset": -3.4},
                     "blowout": {"enabled": True, "location": "trash", "flow_rate": 2.3},
                 },
+                "correction_by_volume": [(0, 0)],
                 "push_out_by_volume": [(0, 0)],
                 "mix": {"enabled": True, "repetitions": 1, "volume": 36},
             },

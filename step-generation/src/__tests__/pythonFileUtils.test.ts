@@ -19,6 +19,7 @@ import {
 } from '@opentrons/shared-data'
 
 import {
+  formatChangeTipArg,
   getDefineLiquids,
   getLoadAdapters,
   getLoadLabware,
@@ -213,6 +214,7 @@ describe('getLoadAdapters', () => {
 adapter_1 = magnetic_block_1.load_adapter(
     "fixture_flex_96_tiprack_adapter",
     namespace="opentrons",
+    version=1,
 )
 adapter_2 = protocol.load_adapter_from_definition(
     CUSTOM_LABWARE["fixture/fixture_flex_96_tiprack_adapter/1"],
@@ -238,10 +240,12 @@ well_plate_1 = adapter_2.load_labware(
     "fixture_96_plate",
     label="reagent plate",
     namespace="opentrons",
+    version=1,
 )
 well_plate_2 = magnetic_block_2.load_labware(
     "fixture_96_plate",
     namespace="opentrons",
+    version=1,
 )
 well_plate_3 = protocol.load_labware_from_definition(
     CUSTOM_LABWARE["fixture/fixture_96_plate/1"],
@@ -274,6 +278,7 @@ well_plate_5 = protocol.load_labware(
     "fixture_96_plate",
     location=protocol_api.OFF_DECK,
     namespace="opentrons",
+    version=1,
 )`.trimStart()
       )
     })
@@ -564,5 +569,17 @@ water_base_class = protocol.get_liquid_class("water")
 ethanol_80_base_class = protocol.get_liquid_class("ethanol_80")
 glycerol_50_base_class = protocol.get_liquid_class("glycerol_50")`.trimStart()
     )
+  })
+})
+
+describe('formatChangeTipArg', () => {
+  it('should transform perSource into per source', () => {
+    expect(formatChangeTipArg('perSource')).toBe('per source')
+  })
+  it('should transform perDest into per destination', () => {
+    expect(formatChangeTipArg('perDest')).toBe('per destination')
+  })
+  it('should not alter never', () => {
+    expect(formatChangeTipArg('never')).toBe('never')
   })
 })

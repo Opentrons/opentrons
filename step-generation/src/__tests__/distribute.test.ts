@@ -189,7 +189,6 @@ mock_pipette.distribute_with_liquid_class(
             "dispense": {
                 "dispense_position": {"offset": {"x": 0, "y": 0, "z": 0}},
                 "flow_rate_by_volume": [(0, 2.2)],
-                "correction_by_volume": [(0, 0)],
                 "delay": {"enabled": False},
                 "submerge": {
                     "delay": {"enabled": False},
@@ -202,13 +201,13 @@ mock_pipette.distribute_with_liquid_class(
                     "touch_tip": {"enabled": False},
                     "blowout": {"enabled": True, "location": "trash", "flow_rate": 2.3},
                 },
+                "correction_by_volume": [(0, 0)],
                 "push_out_by_volume": [(0, 0)],
                 "mix": {"enabled": False},
             },
             "multi_dispense": {
                 "dispense_position": {"offset": {"x": 0, "y": 0, "z": 0}},
                 "flow_rate_by_volume": [(0, 2.2)],
-                "correction_by_volume": [(0, 0)],
                 "delay": {"enabled": False},
                 "submerge": {
                     "delay": {"enabled": False},
@@ -221,6 +220,7 @@ mock_pipette.distribute_with_liquid_class(
                     "touch_tip": {"enabled": False},
                     "blowout": {"enabled": True, "location": "trash", "flow_rate": 2.3},
                 },
+                "correction_by_volume": [(0, 0)],
                 "conditioning_by_volume": [(0, 0)],
                 "disposal_by_volume": [(0, 60)],
             },
@@ -381,7 +381,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       volume: 120,
       mixBeforeAspirate: { times: 2, volume: 50 },
       disposalVolume: 12,
-      blowoutLocation: SOURCE_LABWARE,
+      blowoutLocation: 'source_well',
     } as DistributeArgs
     const result = distribute(
       distributeArgs,
@@ -820,13 +820,53 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       aspirateHelper('A1', aspirateVol),
       dispenseHelper('A2', volume),
       dispenseHelper('A3', volume),
-      blowoutSingleToSourceA1,
+      {
+        commandType: 'moveToAddressableArea',
+        key: expect.anything(),
+        params: {
+          addressableAreaName: 'movableTrashA3',
+          offset: {
+            x: 0,
+            y: 0,
+            z: 0,
+          },
+          pipetteId: 'p300SingleId',
+        },
+      },
+      {
+        commandType: 'blowOutInPlace',
+        key: expect.anything(),
+        params: {
+          flowRate: 2.3,
+          pipetteId: 'p300SingleId',
+        },
+      },
 
       ...mixCommands,
       aspirateHelper('A1', aspirateVol),
       dispenseHelper('A4', volume),
       dispenseHelper('A5', volume),
-      blowoutSingleToSourceA1,
+      {
+        commandType: 'moveToAddressableArea',
+        key: expect.anything(),
+        params: {
+          addressableAreaName: 'movableTrashA3',
+          offset: {
+            x: 0,
+            y: 0,
+            z: 0,
+          },
+          pipetteId: 'p300SingleId',
+        },
+      },
+      {
+        commandType: 'blowOutInPlace',
+        key: expect.anything(),
+        params: {
+          flowRate: 2.3,
+          pipetteId: 'p300SingleId',
+        },
+      },
     ])
   })
 
@@ -1018,7 +1058,6 @@ mock_pipette.distribute_with_liquid_class(
             "dispense": {
                 "dispense_position": {"offset": {"x": 0, "y": 0, "z": 0}},
                 "flow_rate_by_volume": [(0, 2.2)],
-                "correction_by_volume": [(0, 0)],
                 "delay": {"enabled": True, "duration": 12},
                 "submerge": {
                     "delay": {"enabled": False},
@@ -1031,13 +1070,13 @@ mock_pipette.distribute_with_liquid_class(
                     "touch_tip": {"enabled": True, "z_offset": -3.4},
                     "blowout": {"enabled": True, "location": "trash", "flow_rate": 2.3},
                 },
+                "correction_by_volume": [(0, 0)],
                 "push_out_by_volume": [(0, 0)],
                 "mix": {"enabled": False},
             },
             "multi_dispense": {
                 "dispense_position": {"offset": {"x": 0, "y": 0, "z": 0}},
                 "flow_rate_by_volume": [(0, 2.2)],
-                "correction_by_volume": [(0, 0)],
                 "delay": {"enabled": True, "duration": 12},
                 "submerge": {
                     "delay": {"enabled": False},
@@ -1050,6 +1089,7 @@ mock_pipette.distribute_with_liquid_class(
                     "touch_tip": {"enabled": True, "z_offset": -3.4},
                     "blowout": {"enabled": True, "location": "trash", "flow_rate": 2.3},
                 },
+                "correction_by_volume": [(0, 0)],
                 "conditioning_by_volume": [(0, 10)],
                 "disposal_by_volume": [(0, 60)],
             },
