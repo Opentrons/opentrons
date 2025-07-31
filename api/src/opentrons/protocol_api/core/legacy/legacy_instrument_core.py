@@ -67,7 +67,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
             api_level=self._api_version,
         )
         self._liquid_presence_detection = False
-        self._last_tiprack_and_well: Optional[
+        self._last_tip_rack_and_well: Optional[
             Tuple[LegacyLabwareCore, LegacyWellCore]
         ] = None
 
@@ -259,7 +259,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
         # a well or labware
         parent_labware, _ = location.labware.get_parent_labware_and_well()
         if parent_labware is not None:
-            self._last_tiprack_and_well = parent_labware._core, well_core  # type: ignore[assignment]
+            self._last_tip_rack_and_well = parent_labware._core, well_core  # type: ignore[assignment]
 
     def drop_tip(
         self,
@@ -306,7 +306,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
         hw = self._protocol_interface.get_hardware()
         self.move_to(location=location)
         hw.drop_tip(self._mount, home_after=True if home_after is None else home_after)
-        self._last_tiprack_and_well = None
+        self._last_tip_rack_and_well = None
 
         if self._api_version < APIVersion(2, 2) and labware_core.is_tip_rack():
             # If this is a tiprack we can try and add the dirty tip back to the tracker
@@ -544,7 +544,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
     def get_last_well_tip_picked_up_from(
         self,
     ) -> Optional[Tuple[LegacyLabwareCore, LegacyWellCore]]:
-        return self._last_tiprack_and_well
+        return self._last_tip_rack_and_well
 
     def set_flow_rate(
         self,

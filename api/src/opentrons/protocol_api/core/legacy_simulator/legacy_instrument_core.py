@@ -82,7 +82,7 @@ class LegacyInstrumentCoreSimulator(
             protocol_interface.get_hardware().get_instrument_max_height(self._mount)
         )
         self._liquid_presence_detection = False
-        self._last_tiprack_and_well: Optional[
+        self._last_tip_rack_and_well: Optional[
             Tuple[LegacyLabwareCore, LegacyWellCore]
         ] = None
 
@@ -231,7 +231,7 @@ class LegacyInstrumentCoreSimulator(
         # a well or labware
         parent_labware, _ = location.labware.get_parent_labware_and_well()
         if parent_labware is not None:
-            self._last_tiprack_and_well = parent_labware._core, well_core  # type: ignore[assignment]
+            self._last_tip_rack_and_well = parent_labware._core, well_core  # type: ignore[assignment]
 
     def drop_tip(
         self,
@@ -272,7 +272,7 @@ class LegacyInstrumentCoreSimulator(
         self._pipette_dict["has_tip"] = False
         self._pipette_dict["tip_length"] = 0.0
         self._update_volume(0)
-        self._last_tiprack_and_well = None
+        self._last_tip_rack_and_well = None
 
         if self._api_version < APIVersion(2, 2) and labware_core.is_tip_rack():
             # If this is a tiprack we can try and add the dirty tip back to the tracker
@@ -435,7 +435,7 @@ class LegacyInstrumentCoreSimulator(
     def get_last_well_tip_picked_up_from(
         self,
     ) -> Optional[Tuple[LegacyLabwareCore, LegacyWellCore]]:
-        return self._last_tiprack_and_well
+        return self._last_tip_rack_and_well
 
     def set_flow_rate(
         self,

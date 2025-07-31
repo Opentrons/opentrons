@@ -1072,7 +1072,7 @@ class InstrumentContext(publisher.CommandPublisher):
         if not self._core.has_tip():
             _log.warning("Pipette has no tip to return")
 
-        loc = self._get_last_tiprack_well()
+        loc = self._get_last_tip_rack_well()
 
         # TODO rewrite this error message
         if not isinstance(loc, labware.Well):
@@ -1848,7 +1848,7 @@ class InstrumentContext(publisher.CommandPublisher):
             source=source,
             dest=dest,
             tip_policy=new_tip,
-            last_tip_well=self._get_last_tiprack_well(),
+            last_tip_well=self._get_last_tip_rack_well(),
             tip_racks=self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
             group_wells_for_multi_channel=group_wells,
@@ -1977,7 +1977,7 @@ class InstrumentContext(publisher.CommandPublisher):
             source=source,
             dest=dest,
             tip_policy=new_tip,
-            last_tip_well=self._get_last_tiprack_well(),
+            last_tip_well=self._get_last_tip_rack_well(),
             tip_racks=self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
             group_wells_for_multi_channel=group_wells,
@@ -2115,7 +2115,7 @@ class InstrumentContext(publisher.CommandPublisher):
             source=source,
             dest=dest,
             tip_policy=new_tip,
-            last_tip_well=self._get_last_tiprack_well(),
+            last_tip_well=self._get_last_tip_rack_well(),
             tip_racks=self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
             group_wells_for_multi_channel=group_wells,
@@ -3113,16 +3113,16 @@ class InstrumentContext(publisher.CommandPublisher):
         variable's age and the lack of other ways to get this data previously, we'll continue
         to support this.
         """
-        return self._get_last_tiprack_well()
+        return self._get_last_tip_rack_well()
 
-    def _get_last_tiprack_well(self) -> Optional[labware.Well]:
-        tiprack_cores = self._core.get_last_well_tip_picked_up_from()
-        if tiprack_cores is None:
+    def _get_last_tip_rack_well(self) -> Optional[labware.Well]:
+        tip_rack_cores = self._core.get_last_well_tip_picked_up_from()
+        if tip_rack_cores is None:
             return None
-        labware_core, well_core = tiprack_cores
-        tiprack_labware = self._core_map.get(labware_core)
+        labware_core, well_core = tip_rack_cores
+        tip_rack_labware = self._core_map.get(labware_core)
         return labware.Well(
-            parent=tiprack_labware, core=well_core, api_version=self._api_version
+            parent=tip_rack_labware, core=well_core, api_version=self._api_version
         )
 
 

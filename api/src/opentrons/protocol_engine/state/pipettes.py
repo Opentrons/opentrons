@@ -127,7 +127,7 @@ class PipetteState:
     liquid_presence_detection_by_id: Dict[str, bool]
     ready_to_aspirate_by_id: Dict[str, bool]
     has_clean_tips_by_id: Dict[str, bool]
-    last_tiprack_well_by_id: Dict[
+    last_tip_rack_well_by_id: Dict[
         str, Optional[Tuple[str, str]]
     ]  # TODO make this another type?
 
@@ -152,7 +152,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             liquid_presence_detection_by_id={},
             ready_to_aspirate_by_id={},
             has_clean_tips_by_id={},
-            last_tiprack_well_by_id={},
+            last_tip_rack_well_by_id={},
         )
 
     def handle_action(self, action: Action) -> None:
@@ -184,7 +184,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._state.movement_speed_by_id[pipette_id] = None
             self._state.attached_tip_by_id[pipette_id] = None
             self._state.ready_to_aspirate_by_id[pipette_id] = False
-            self._state.last_tiprack_well_by_id[pipette_id] = None
+            self._state.last_tip_rack_well_by_id[pipette_id] = None
 
     def _update_tip_state(self, state_update: update_types.StateUpdate) -> None:
         if state_update.pipette_tip_state != update_types.NO_CHANGE:
@@ -195,7 +195,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 assert last_well is not None
 
                 self._state.attached_tip_by_id[pipette_id] = attached_tip
-                self._state.last_tiprack_well_by_id[pipette_id] = (
+                self._state.last_tip_rack_well_by_id[pipette_id] = (
                     last_well.labware_id,
                     last_well.well_name,
                 )
@@ -227,7 +227,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 pipette_id = state_update.pipette_tip_state.pipette_id
                 self._state.attached_tip_by_id[pipette_id] = None
                 self._state.has_clean_tips_by_id[pipette_id] = False
-                self._state.last_tiprack_well_by_id[pipette_id] = None
+                self._state.last_tip_rack_well_by_id[pipette_id] = None
 
                 static_config = self._state.static_config_by_id.get(pipette_id)
                 if static_config:
@@ -488,15 +488,15 @@ class PipetteView:
             if tip is not None
         ]
 
-    def get_last_tiprack_well_picked_up_from(
+    def get_tip_rack_well_picked_up_from(
         self, pipette_id: str
     ) -> Optional[Tuple[str, str]]:
-        """Get the last tiprack well a tip has been has picked up from, if there currently is a tip attached."""
+        """Get the tip rack well a tip has been has picked up from, if there currently is a tip attached."""
         try:
-            return self._state.last_tiprack_well_by_id[pipette_id]
+            return self._state.last_tip_rack_well_by_id[pipette_id]
         except KeyError as e:
             raise errors.PipetteNotLoadedError(
-                f"Pipette {pipette_id} no found; unable to get last tiprack well."
+                f"Pipette {pipette_id} no found; unable to get last tip rack well accessed."
             ) from e
 
     def get_aspirated_volume(self, pipette_id: str) -> Optional[float]:

@@ -73,7 +73,7 @@ def test_sets_initial_state(subject: PipetteStore) -> None:
         liquid_presence_detection_by_id={},
         ready_to_aspirate_by_id={},
         has_clean_tips_by_id={},
-        last_tiprack_well_by_id={},
+        last_tip_rack_well_by_id={},
     )
 
 
@@ -295,7 +295,7 @@ def test_handles_pick_up_and_drop_tip(subject: PipetteStore) -> None:
         volume=42, length=101, diameter=8.0
     )
     assert subject.state.pipette_contents_by_id["abc"] == FluidStack()
-    assert subject.state.last_tiprack_well_by_id["abc"] == ("xyz", "123")
+    assert subject.state.last_tip_rack_well_by_id["abc"] == ("xyz", "123")
 
     subject.handle_action(
         SucceedCommandAction(
@@ -357,7 +357,7 @@ def test_handles_drop_tip_in_place(subject: PipetteStore) -> None:
         volume=42, length=101, diameter=8.0
     )
     assert subject.state.pipette_contents_by_id["xyz"] == FluidStack()
-    assert subject.state.last_tiprack_well_by_id["xyz"] == ("abc", "123")
+    assert subject.state.last_tip_rack_well_by_id["xyz"] == ("abc", "123")
 
     subject.handle_action(
         SucceedCommandAction(
@@ -418,7 +418,7 @@ def test_handles_unsafe_drop_tip_in_place(subject: PipetteStore) -> None:
         volume=42, length=101, diameter=8.0
     )
     assert subject.state.pipette_contents_by_id["xyz"] == FluidStack()
-    assert subject.state.last_tiprack_well_by_id["xyz"] == ("abc", "123")
+    assert subject.state.last_tip_rack_well_by_id["xyz"] == ("abc", "123")
 
     subject.handle_action(
         SucceedCommandAction(
