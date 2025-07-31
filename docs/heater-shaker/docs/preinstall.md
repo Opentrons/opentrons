@@ -20,8 +20,8 @@ The OT-2 does not use caddies. The module clips directly to the deck. However, y
 
 Anchors are screw-adjustable panels on the Heater-Shaker module. They provide the clamping force that secures the module to its caddy or to the deck when mounted on a Flex or OT-2. Use the T10 Torx screwdriver that comes with the module to adjust the anchors.
 
-- Loosen the anchors...
-- Tighten the anchors...
+- To loosen/retract the anchors, turn the screws counterclockwise.
+- To tighten/extend the anchors, turn the screws clockwise.
 
 ![Adjusting module anchors](images/hs-anchors.png)
 

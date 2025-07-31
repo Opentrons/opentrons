@@ -12,7 +12,7 @@ GEN1
 
 ## Included Parts
 
-<font color="red">IMAGE PLACEHOLDER</font>
+![Module parts with labels](images/hs-parts.png)
 
 ## Software Requirements
 
@@ -116,7 +116,7 @@ The following table lists power consumption values measured at the wall outlet. 
   </tbody>
 </table>
 
-## LED Status Light
+## LED Status Light { #led-status }
 
 The Heater-Shaker has an LED status light that can display three colors: amber, red, and white. Understanding these status indications is important for safely handling the module. The possible module conditions indicated by the light are listed below.
 
