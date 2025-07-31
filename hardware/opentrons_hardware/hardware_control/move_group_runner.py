@@ -710,9 +710,11 @@ class MoveScheduler:
                 f"Move set {str(group_id)} took longer ({duration}s) than expected ({expected_time} seconds)."
             )
         try:
+            # if we were not scheduled, we don't want to wait forever _again_, but we want to
+            # wait at least a little bit more
             await asyncio.wait_for(
                 self._event.wait(),
-                max(full_timeout - expected_time - duration, 1.0),
+                max(full_timeout - max(expected_time, duration), 1.0),
             )
             return
         except asyncio.TimeoutError:
