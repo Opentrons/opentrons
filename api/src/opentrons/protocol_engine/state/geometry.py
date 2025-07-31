@@ -1550,16 +1550,18 @@ class GeometryView:
             tip = self._pipettes.get_attached_tip(pipette.id)
             if not tip:
                 continue
+
             labware_top_z_when_gripped = gripper_homed_position_z + (
                 self._labware.get_dimensions(labware_definition=labware_definition).z
                 - self._labware.get_grip_height_from_labware_origin(labware_definition)
             )
-            # TODO(cb, 2024-01-18): Utilizing the nozzle map and labware X coordinates verify if collisions will occur on the X axis (analysis will use hard coded data to measure from the gripper critical point to the pipette mount)
+            # TODO(cb, 2024-01-18): Utilizing the nozzle map and labware X coordinates,
+            # verify if collisions will occur on the X axis (analysis will use hard coded data
+            # to measure from the gripper critical point to the pipette mount)
             if (_PIPETTE_HOMED_POSITION_Z - tip.length) < labware_top_z_when_gripped:
                 raise LabwareMovementNotAllowedError(
                     f"Cannot move labware '{labware_definition.parameters.loadName}' when {int(tip.volume)} µL tips are attached."
                 )
-        return
 
     def _nominal_gripper_offsets_for_location(
         self, location: OnDeckLabwareLocation
