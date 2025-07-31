@@ -128,9 +128,7 @@ class PipetteState:
     liquid_presence_detection_by_id: Dict[str, bool]
     ready_to_aspirate_by_id: Dict[str, bool]
     has_clean_tips_by_id: Dict[str, bool]
-    last_tip_rack_well_by_id: Dict[
-        str, Optional[Tuple[str, str]]
-    ]  # TODO make this another type?
+    last_tip_rack_well_by_id: Dict[str, Optional[LabwareWellId]]
 
 
 class PipetteStore(HasState[PipetteState], HandlesActions):
@@ -192,14 +190,11 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             pipette_id = state_update.pipette_tip_state.pipette_id
             if state_update.pipette_tip_state.tip_geometry:
                 attached_tip = state_update.pipette_tip_state.tip_geometry
-                last_well = state_update.pipette_tip_state.well_picked_up_from
-                assert last_well is not None
 
                 self._state.attached_tip_by_id[pipette_id] = attached_tip
-                self._state.last_tip_rack_well_by_id[pipette_id] = (
-                    last_well.labware_id,
-                    last_well.well_name,
-                )
+                self._state.last_tip_rack_well_by_id[
+                    pipette_id
+                ] = state_update.pipette_tip_state.well_picked_up_from
 
                 static_config = self._state.static_config_by_id.get(pipette_id)
                 if static_config:
@@ -491,7 +486,7 @@ class PipetteView:
 
     def get_tip_rack_well_picked_up_from(
         self, pipette_id: str
-    ) -> Optional[Tuple[str, str]]:
+    ) -> Optional[LabwareWellId]:
         """Get the tip rack well a tip has been has picked up from, if there currently is a tip attached."""
         try:
             return self._state.last_tip_rack_well_by_id[pipette_id]

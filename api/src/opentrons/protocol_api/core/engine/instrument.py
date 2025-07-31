@@ -1052,17 +1052,18 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
     def get_last_well_tip_picked_up_from(
         self,
     ) -> Optional[Tuple[LabwareCore, WellCore]]:
-        tip_rack_ids = (
+        tip_rack_id = (
             self._engine_client.state.pipettes.get_tip_rack_well_picked_up_from(
                 self._pipette_id
             )
         )
-        if tip_rack_ids is None:
+        if tip_rack_id is None:
             return None
         else:
-            labware_id, well_name = tip_rack_ids
-            tip_rack_labware_core = self._protocol_core._labware_cores_by_id[labware_id]
-            tip_well_core = tip_rack_labware_core.get_well_core(well_name)
+            tip_rack_labware_core = self._protocol_core._labware_cores_by_id[
+                tip_rack_id.labware_id
+            ]
+            tip_well_core = tip_rack_labware_core.get_well_core(tip_rack_id.well_name)
             return tip_rack_labware_core, tip_well_core
 
     def is_tip_tracking_available(self) -> bool:
