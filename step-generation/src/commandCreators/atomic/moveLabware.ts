@@ -33,6 +33,7 @@ import type {
   CommandCreator,
   CommandCreatorError,
   CommandCreatorWarning,
+  ModuleState,
 } from '../../types'
 
 /** Move labware from one location to another, manually or via a gripper. */
@@ -164,10 +165,25 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
   const initialSlot =
     initialAdapterSlot != null ? initialAdapterSlot : initialLabwareSlot
 
-  const initialModuleState =
-    initialSlot != null
-      ? prevRobotState.modules[initialSlot]?.moduleState
-      : null
+  const getModuleStateFromSlotOrId = (
+    identifier: string | null
+  ): ModuleState | null => {
+    if (identifier == null) {
+      return null
+    } else if (identifier in prevRobotState.modules) {
+      // identifier is a module id
+      return prevRobotState.modules[identifier].moduleState
+    } else {
+      // identifier is a slot name
+      return (
+        Object.values(prevRobotState.modules).find(
+          ({ slot }) => slot === identifier
+        )?.moduleState ?? null
+      )
+    }
+  }
+
+  const initialModuleState = getModuleStateFromSlotOrId(initialSlot)
   if (initialModuleState != null) {
     if (
       initialModuleState.type === THERMOCYCLER_MODULE_TYPE &&
@@ -220,13 +236,8 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
     warnings.push(warningCreators.labwareInWasteChuteHasLiquid())
   }
 
-  if (
-    destinationModuleIdOrSlot != null &&
-    prevRobotState.modules[destinationModuleIdOrSlot] != null
-  ) {
-    const destModuleState =
-      prevRobotState.modules[destinationModuleIdOrSlot].moduleState
-
+  const destModuleState = getModuleStateFromSlotOrId(destinationModuleIdOrSlot)
+  if (destModuleState != null) {
     if (
       destModuleState.type === THERMOCYCLER_MODULE_TYPE &&
       destModuleState.lidOpen !== true
