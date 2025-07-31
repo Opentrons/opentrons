@@ -47,7 +47,7 @@ export function useAspirateSettingsConfig({
       value:
         state.tipPositionAspirate !== null
           ? t('tip_position_value', { position: state.tipPositionAspirate })
-          : '',
+          : t('option_disabled'),
       enabled: true,
       onClick: () => {
         setSelectedSetting(SETTING_OPTIONS.ASPIRATE_TIP_POSITION)
@@ -63,7 +63,7 @@ export function useAspirateSettingsConfig({
               delayDuration: state.submergeAspirate.delayDuration,
               position: state.submergeAspirate.positionFromBottom,
             })
-          : '',
+          : t('option_disabled'),
       enabled: true,
       onClick: () => {
         setSelectedSetting(SETTING_OPTIONS.ASPIRATE_SUBMERGE)
@@ -87,7 +87,7 @@ export function useAspirateSettingsConfig({
               volume: state.mixOnAspirate?.mixVolume,
               reps: state.mixOnAspirate?.repetitions,
             })
-          : '',
+          : t('option_disabled'),
       enabled:
         state.transferType === 'transfer' ||
         state.transferType === 'distribute',
@@ -108,7 +108,7 @@ export function useAspirateSettingsConfig({
       value:
         state.conditionAspirate != null || state.conditionAspirate !== 0
           ? t('volume', { volume: state.conditionAspirate })
-          : '',
+          : t('option_disabled'),
       enabled: isMultiTransfer,
       onClick: () => {
         setSelectedSetting(SETTING_OPTIONS.ASPIRATE_CONDITION)
@@ -153,7 +153,7 @@ export function useAspirateSettingsConfig({
               speed: state.touchTipAspirateSpeed,
               position: state.touchTipAspirate,
             })
-          : '',
+          : t('option_disabled'),
       enabled: !sourceIsReservoir,
       onClick: () => {
         if (!sourceIsReservoir) {
