@@ -4,6 +4,7 @@ import {
   getAllLiquidClassDefs,
   getModuleDisplayName,
   getModuleType,
+  getModuleDeckLabel,
   getOccludedSlotCountForModule,
   getPipetteSpecsV2,
   THERMOCYCLER_MODULE_V1,
@@ -42,21 +43,15 @@ export const getLoadCommandText = ({
       })
     }
     case 'loadModule': {
+      const moduleType = getModuleType(command.params.model)
       const occludedSlotCount = getOccludedSlotCountForModule(
-        getModuleType(command.params.model),
+        moduleType,
         robotType
       )
-      let slotName = command.params.location.slotName
-      if (
-        THERMOCYCLER_MODULE_V2 === command.params.model ||
-        THERMOCYCLER_MODULE_V1 === command.params.model
-      ) {
-        slotName = 'A1 + B1'
-      }
       return t('load_module_protocol_setup', {
         count: occludedSlotCount,
         module: getModuleDisplayName(command.params.model),
-        slot_name: slotName,
+        slot_name: getModuleDeckLabel(moduleType, command.params.location.slotName),
       })
     }
     case 'loadLid':
