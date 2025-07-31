@@ -743,23 +743,26 @@ export function getAAComboFixtureDisplayName(
 // note: we've decided not to translate these strings
 export function getFixtureDisplayName(
   cutoutFixtureId: CutoutFixtureIdsWithFakes | null,
-  usbPortNumber?: string | null
+  usbPortNumber?: string | null,  
+  t: TFunction
 ): string {
+  const translationFileName = 'deck_configuration'
+
   switch (cutoutFixtureId) {
     case STAGING_AREA_RIGHT_SLOT_FIXTURE:
-      return 'Staging area slot'
+      return t(`${translationFileName}:staging_area_slot_title`)
     case FAKE_STAGING_AREA_RIGHT_SLOT:
-      return 'Fake Staging area slot'
+      return 'Fake Staging Area Slot'
     case TRASH_BIN_ADAPTER_FIXTURE:
-      return 'Trash bin'
+      return t(`${translationFileName}:trash_bin`)
     case WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE:
-      return 'Waste chute'
+      return 'Waste Chute'
     case WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE:
-      return 'Waste chute with cover'
+      return 'Waste Chute with Cover'
     case STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE:
-      return 'Waste chute with staging area slot'
+      return 'Waste Chute with Staging Area Slot'
     case STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE:
-      return 'Waste chute with staging area slot and cover'
+      return 'Waste chute with Staging Area Slot and Cover'
     case HEATERSHAKER_MODULE_V1_FIXTURE:
       return usbPortNumber != null
         ? `${getModuleDisplayName(HEATERSHAKER_MODULE_V1)} in ${usbPortNumber}`
@@ -772,7 +775,7 @@ export function getFixtureDisplayName(
     case FAKE_STAGING_SLOT_WITH_MAG_BLOCK:
       return `${getModuleDisplayName(MAGNETIC_BLOCK_V1)}`
     case STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE:
-      return `${getModuleDisplayName(MAGNETIC_BLOCK_V1)} with staging area slot`
+      return `${getModuleDisplayName(MAGNETIC_BLOCK_V1)} with Staging Area Slot`
     case THERMOCYCLER_V2_REAR_FIXTURE:
       return usbPortNumber != null
         ? `${getModuleDisplayName(THERMOCYCLER_MODULE_V2)} in ${usbPortNumber}`
@@ -793,22 +796,22 @@ export function getFixtureDisplayName(
       return usbPortNumber != null
         ? `${getModuleDisplayName(
             FLEX_STACKER_MODULE_V1
-          )} in ${usbPortNumber} and waste chute with cover`
+          )} in ${usbPortNumber} and Waste Chute with Cover`
         : `${getModuleDisplayName(
             FLEX_STACKER_MODULE_V1
-          )} and waste chute with cover`
+          )} and Waste Chute with Cover`
     case FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE:
       return usbPortNumber != null
         ? `${getModuleDisplayName(
             FLEX_STACKER_MODULE_V1
-          )} in ${usbPortNumber} and waste chute`
-        : `${getModuleDisplayName(FLEX_STACKER_MODULE_V1)} and waste chute`
+          )} in ${usbPortNumber} and Waste Chute`
+        : `${getModuleDisplayName(FLEX_STACKER_MODULE_V1)} and Waste Chute`
     case FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE:
       return usbPortNumber != null
         ? `${getModuleDisplayName(
             FLEX_STACKER_MODULE_V1
-          )} in ${usbPortNumber} and magnetic block`
-        : `${getModuleDisplayName(FLEX_STACKER_MODULE_V1)} and magnetic block`
+          )} in ${usbPortNumber} and Magnetic Block`
+        : `${getModuleDisplayName(FLEX_STACKER_MODULE_V1)} and Magnetic Block`
     case SINGLE_CENTER_SLOT_FIXTURE:
       return 'Center slot'
     case SINGLE_RIGHT_SLOT_FIXTURE:

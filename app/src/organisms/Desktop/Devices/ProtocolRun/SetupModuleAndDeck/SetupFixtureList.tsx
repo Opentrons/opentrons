@@ -86,7 +86,7 @@ export function FixtureListItem({
   robotName,
   partialRequiredCutoutFixtureId,
 }: FixtureListItemProps): JSX.Element {
-  const { t } = useTranslation('protocol_setup')
+  const { t } = useTranslation(['protocol_setup', 'deck_configuration'])
 
   const isCurrentFixtureCompatible = isFixtureCompatible(
     cutoutFixtureId,
@@ -213,11 +213,12 @@ export function FixtureListItem({
               >
                 {isCurrentFixtureCompatible
                   ? getFixtureDisplayName(
-                      partialRequiredCutoutFixtureId ?? cutoutFixtureId
+                      partialRequiredCutoutFixtureId ?? cutoutFixtureId, t
                     )
                   : getFixtureDisplayName(
                       partialRequiredCutoutFixtureId ??
-                        compatibleCutoutFixtureIds?.[0]
+                        compatibleCutoutFixtureIds?.[0],
+                        t
                     )}
               </LegacyStyledText>
               <Btn

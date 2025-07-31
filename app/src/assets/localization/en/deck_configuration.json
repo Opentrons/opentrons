@@ -12,5 +12,6 @@
   "magnetic_block": "Magnetic block",
   "waste_chute": "Waste chute",
   "staging_area_slot": "Staging area slot",
+  "staging_area_slot_title": "Staging Area Slot",
   "module_in_port": "{{moduleName}} in {{usbPortNumber}}"
 }
