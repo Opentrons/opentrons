@@ -5,7 +5,7 @@ description = "Snapshot Testing of Opentrons Protocols"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-  "anyio>=3.6.1,<4.0.0",
+  "anyio>=4.9.0,<5",
   "docker>=7.1.0",
   "httpx>=0.28.1",
   "importlib-metadata>=8.7.0",
