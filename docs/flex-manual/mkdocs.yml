@@ -12,7 +12,14 @@ nav:
       - First Run: installation/first-run.md
       - Instruments: installation/instruments.md
       - Relocation: installation/relocation.md
-  - System Description: system-description.md
+  - System Description:
+      - System Description Home: system-description/index.md
+      - Robot Components: system-description/robot.md
+      - Pipettes: system-description/pipettes.md
+      - Gripper: system-description/gripper.md
+      - Emergency Stop Pendant: system-description/e-stop.md
+      - Connections: system-description/connections.md
+      - System Specifications: system-description/specs.md
   - Modules: modules.md
   - Labware: labware.md
   - Protocol Development: protocol-development.md
