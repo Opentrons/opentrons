@@ -14,13 +14,17 @@ from opentrons_shared_data.deck.types import DeckDefinitionV5
 from opentrons_shared_data.pipette.types import LabwareUri
 from opentrons_shared_data.labware import load_definition
 from opentrons_shared_data.labware.labware_definition import (
-    Parameters2,
+    AxisAlignedBoundingBox3D,
+    Dimensions as LabwareDimensions,
+    Extents,
+    GripperOffsets,
+    labware_definition_type_adapter,
     LabwareDefinition,
     LabwareDefinition2,
+    LabwareDefinition3,
     LabwareRole,
-    GripperOffsets,
+    Parameters2,
     Vector3D,
-    labware_definition_type_adapter,
 )
 
 from opentrons.types import DeckSlotName, MountType
@@ -1814,16 +1818,46 @@ def test_get_grip_force(
     assert subject.get_grip_force(reservoir_def) == 15  # default
 
 
-def test_get_grip_height_from_labware_origin(
-    well_plate_def: LabwareDefinition,
-    reservoir_def: LabwareDefinition,
-) -> None:
+def test_get_grip_height_from_labware_origin() -> None:
     """It should get the grip height, if present, from labware definition or return default."""
     subject = get_labware_view()
+
+    schema_2_with_defined_height = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+        schemaVersion=2, gripHeightFromLabwareBottom=123
+    )
     assert (
-        subject.get_grip_height_from_labware_origin(well_plate_def) == 12.2
-    )  # from definition
-    assert subject.get_grip_height_from_labware_origin(reservoir_def) == 15.7  # default
+        subject.get_grip_height_from_labware_origin(schema_2_with_defined_height) == 123
+    )
+
+    schema_3_with_defined_height = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
+        schemaVersion=3, gripHeightFromLabwareOrigin=123
+    )
+    assert (
+        subject.get_grip_height_from_labware_origin(schema_3_with_defined_height) == 123
+    )
+
+    schema_2_without_defined_height = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+        schemaVersion=2,
+        dimensions=LabwareDimensions(xDimension=0, yDimension=0, zDimension=500),
+    )
+    assert (
+        subject.get_grip_height_from_labware_origin(schema_2_without_defined_height)
+        == 250
+    )
+
+    schema_3_without_defined_height = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
+        schemaVersion=3,
+        extents=Extents(
+            total=AxisAlignedBoundingBox3D(
+                backLeftBottom={"x": 0, "y": 0, "z": 500},
+                frontRightTop={"x": 0, "y": 0, "z": 1000},
+            )
+        ),
+    )
+    assert (
+        subject.get_grip_height_from_labware_origin(schema_3_without_defined_height)
+        == 750
+    )
 
 
 @pytest.mark.parametrize(
