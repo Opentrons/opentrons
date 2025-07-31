@@ -20,7 +20,16 @@ nav:
       - Emergency Stop Pendant: system-description/e-stop.md
       - Connections: system-description/connections.md
       - System Specifications: system-description/specs.md
-  - Modules: modules.md
+  - Modules: 
+      - Modules Home: modules/index.md
+      - Caddy System: modules/caddy.md
+      - Module Calibration: modules/calibration.md
+      - Absorbance Plate Reader: modules/absorbance-plate-reader.md
+      - Heater-Shaker: modules/heater-shaker.md
+      - HEPA/UV Module: modules/hepa-uv.md
+      - Magnetic Block: modules/magnetic-block.md
+      - Temperature Module: modules/temperature.md
+      - Thermocycler: modules/thermocycler.md
   - Labware: labware.md
   - Protocol Development: protocol-development.md
   - Software and Operation: software-operation.md
