@@ -4,15 +4,11 @@ title: "Opentrons Flex: Introduction"
 
 # Introduction
 
-This chapter introduces you to the Opentrons Flex ecosystem, including the overall system design and available workstation configurations. It also includes important compliance and safety information, which you should review before setting up your Opentrons Flex robot. For more details on the features of Opentrons Flex, see the [System Description chapter](system-description.md).
-
-## Welcome to Opentrons Flex
-
 Opentrons Flex is a liquid-handling robot designed for high throughput and complex workflows. The Flex robot is the base of a modular system that includes pipettes, a labware gripper, deck fixtures, on-deck modules, and labware — all of which you can swap out yourself. Flex is designed with a touchscreen so you can work with it directly at the lab bench, or you can control it from across your lab with the Opentrons App or our open-source APIs.
 
 Flex workstations come with all of the equipment — robot, hardware, and labware — that you need to get started automating common lab tasks. For other applications, Opentrons Flex runs on fully open-source software and firmware, and is reagent- and labware-agnostic, giving you control over how you design and run your protocols.
 
-### What's new in Flex
+## What's new in Flex
 
 Opentrons Flex is part of the Opentrons liquid handler series of robots. Users of Opentrons Flex may be familiar with the Opentrons OT-2, our personal pipetting robot. Flex goes beyond the capabilities of OT-2 in several key areas, delivering higher throughput and walkaway time.
 
@@ -32,11 +28,11 @@ A detailed [comparison of robot technical specifications](https://opentrons.com/
 
 Both Flex and OT-2 robots run on our open-source software, and the Opentrons App can control both types of robots at once. While OT-2 protocols can't be run directly on Flex, it's straightforward to adapt them (see the [OT-2 Protocols section][ot-2-python-protocols] of the Protocol Development chapter for details).
 
-### Flex workstations
+## Flex workstations
 
 Opentrons Flex workstations include the Flex robot, accessories, pipettes and gripper, on-deck modules, and labware needed to automate a particular application. All workstation components are modular. If you need to change applications, you can add or swap in other Flex hardware and compatible consumables.
 
-#### NGS Workstation
+### NGS Workstation
 
 The Opentrons Flex NGS Workstation automates NGS library prep. It can automate pre-sequencing workflows using any leading reagent system, including fragmentation- and tagmentation-based library prep.
 
@@ -60,7 +56,7 @@ In addition to the Flex robot, the NGS Workstation includes:
 
 - Labware kit with filter tips, microcentrifuge tubes, reservoirs, and PCR plates
 
-#### PCR Workstation
+### PCR Workstation
 
 The Opentrons Flex PCR Workstation automates PCR setup and thermocycling workflows for up to 96 samples. It can aliquot chilled reagents and samples into a 96-well PCR plate. With the addition of the automated Thermocycler Module, use the gripper to load the plate into the Thermocycler, and then run your chosen PCR program.
 
@@ -80,7 +76,7 @@ In addition to the Flex robot, the PCR Workstation includes:
 
 - Labware kit with filter tips, microcentrifuge tubes, reservoirs, and PCR plates
 
-#### Nucleic Acid Extraction Workstation
+### Nucleic Acid Extraction Workstation
 
 The Opentrons Flex Nucleic Acid Extraction Workstation automates DNA/RNA isolation and purification. It uses the Magnetic Block for separation of magnetic beads, and the Heater-Shaker for sample lysis and resuspension of magnetic beads.
 
@@ -102,7 +98,7 @@ In addition to the Flex robot, the Nucleic Acid Extraction Workstation includes:
 
 - Labware kit with filter tips, reservoirs, PCR plates, and deep well plates
 
-#### Magnetic Bead Protein Purification Workstation
+### Magnetic Bead Protein Purification Workstation
 
 The Opentrons Flex Magnetic Bead Protein Purification Workstation automates small-scale protein purification and proteomics sample prep for up to 96 samples. It is compatible with many popular magnetic-bead-based reagents.
 
