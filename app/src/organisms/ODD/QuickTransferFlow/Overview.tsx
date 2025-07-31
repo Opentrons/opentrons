@@ -68,11 +68,11 @@ export function Overview(props: OverviewProps): JSX.Element | null {
     },
     {
       option: t('pipette_path'),
-      value: state.path,
+      value: t(state.path),
     },
     {
       option: t('tip_change_frequency'),
-      value: state.changeTip,
+      value: t(state.changeTip),
     },
     {
       option: t('tip_drop_location'),
