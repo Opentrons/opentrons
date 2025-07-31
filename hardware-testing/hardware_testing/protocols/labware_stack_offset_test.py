@@ -140,9 +140,7 @@ def run(protocol: ProtocolContext) -> None:
     no_gripper = protocol.params.no_gripper  # type: ignore[attr-defined]
     offset = protocol.params.offset  # type: ignore[attr-defined]
     # Load first labware on deck
-    initial_labware = protocol.load_labware(
-        labware_type, location=labware_location, version=2
-    )
+    initial_labware = protocol.load_labware(labware_type, location=labware_location)
     list_of_labware: List[Labware] = [initial_labware]
 
     # Load additional labware stacked on top
@@ -152,11 +150,10 @@ def run(protocol: ProtocolContext) -> None:
             list_of_labware.append(next_labware)
 
     # Load stacker module
-
-    stacker: FlexStackerContext = protocol.load_module(
-        "flexStackerModuleV1", stacker_location
-    )  # type: ignore[assignment]
     if no_gripper:
+        stacker: FlexStackerContext = protocol.load_module(
+            "flexStackerModuleV1", stacker_location
+        )  # type: ignore[assignment]
         if offset > 0:
             stacker.set_stored_labware(
                 load_name=labware_type,
