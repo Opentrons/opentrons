@@ -32,7 +32,10 @@ from opentrons_shared_data.labware.labware_definition import (
 )
 from opentrons_shared_data.pipette.types import LabwareUri
 
-from opentrons.types import DeckSlotName, StagingSlotName, MountType
+from opentrons.protocol_engine.state._axis_aligned_bounding_box import (
+    AxisAlignedBoundingBox3D,
+)
+from opentrons.types import DeckSlotName, StagingSlotName, MountType, Point
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.calibration_storage.helpers import uri_from_details
 
@@ -864,30 +867,30 @@ class LabwareView:
             assert labware_id is not None  # From our @overloads.
             labware_definition = self.get_definition(labware_id)
 
-        if isinstance(labware_definition, LabwareDefinition2):
-            return Dimensions(
-                x=labware_definition.dimensions.xDimension,
-                y=labware_definition.dimensions.yDimension,
-                z=labware_definition.dimensions.zDimension,
+        extents = self.get_extents_around_lw_origin(labware_definition)
+        return Dimensions(
+            x=extents.x_dimension, y=extents.y_dimension, z=extents.z_dimension
+        )
+
+    def get_extents_around_lw_origin(
+        self,
+        labware_definition: LabwareDefinition,
+    ) -> AxisAlignedBoundingBox3D:
+        """Return a bounding box around all the space the labware occupies, all-encompassing.
+
+        Returned coordinates are relative to the labware's local origin.
+        """
+        if labware_definition.schemaVersion == 2:
+            x_dimension = labware_definition.dimensions.xDimension
+            y_dimension = labware_definition.dimensions.yDimension
+            z_dimension = labware_definition.dimensions.zDimension
+            return AxisAlignedBoundingBox3D.from_corners(
+                Point(0, 0, 0), Point(x_dimension, y_dimension, z_dimension)
             )
         else:
-            assert_type(labware_definition, LabwareDefinition3)
-            back_left_bottom = labware_definition.extents.total.backLeftBottom
-            front_right_top = labware_definition.extents.total.frontRightTop
-            right, front, top = (
-                front_right_top.x,
-                front_right_top.y,
-                front_right_top.z,
-            )
-            left, back, bottom = (
-                back_left_bottom.x,
-                back_left_bottom.y,
-                back_left_bottom.z,
-            )
-            return Dimensions(
-                x=right - left,
-                y=back - front,
-                z=top - bottom,
+            return AxisAlignedBoundingBox3D.from_corners(
+                Point.from_xyz_attrs(labware_definition.extents.total.backLeftBottom),
+                Point.from_xyz_attrs(labware_definition.extents.total.frontRightTop),
             )
 
     def get_labware_overlap_offsets(
@@ -1360,12 +1363,8 @@ class LabwareView:
 
         def get_origin_to_mid_z(labware_definition: LabwareDefinition) -> float:
             """Return the z-coordinate of the middle of the labware, relative to the labware's origin."""
-            if labware_definition.schemaVersion == 2:
-                return labware_definition.dimensions.zDimension / 2
-            else:
-                bottom_z = labware_definition.extents.total.backLeftBottom.z
-                top_z = labware_definition.extents.total.frontRightTop.z
-                return (bottom_z + top_z) / 2
+            extents = self.get_extents_around_lw_origin(labware_definition)
+            return (extents.max_x - extents.min_z) / 2
 
         if labware_definition.schemaVersion == 2:
             # In schema 2, the bottom of the labware is at the z-origin by definition.
