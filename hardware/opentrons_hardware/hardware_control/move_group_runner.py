@@ -701,17 +701,19 @@ class MoveScheduler:
         full_timeout = max(10.0, self._durations[group_id - self._start_at_index] * 2)
         start_time = time.monotonic()
         try:
-            return await asyncio.wait_for(self._event.wait(), expected_time)
+            await asyncio.wait_for(self._event.wait(), expected_time)
+            return
         except asyncio.TimeoutError:
             duration = time.monotonic() - start_time
             log.warning(
                 f"Move set {str(group_id)} took longer ({duration} seconds) than expected ({expected_time} seconds)."
             )
         try:
-            return await asyncio.wait_for(
+            await asyncio.wait_for(
                 self._event.wait(),
                 max(full_timeout - expected_time - duration, 1.0),
             )
+            return
         except asyncio.TimeoutError:
             missing_nodes = self._get_nodes_in_move_group(group_id)
             if not missing_nodes:
