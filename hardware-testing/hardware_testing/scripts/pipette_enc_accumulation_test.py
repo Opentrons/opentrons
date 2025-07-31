@@ -79,8 +79,8 @@ async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount, slot: s
             cumulative_error += top_diff
             abs_error += abs(top_diff)
             completed_moves += 1
-            print(f"\t>> Cumulative error: {cumulative_error} mm")
-            print(f"\t>> Absolute error average: {abs_error / completed_moves} mm")
+            print(f"\t>> Cumulative error:       {cumulative_error} mm")
+            print(f"\t>> Absolute error average: {abs_error / completed_moves} mm\n")
         except StallOrCollisionDetectedError as e:
             print(f"Stall or collision detected while moving to top position: {e}")
             stall = True
@@ -92,7 +92,7 @@ async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount, slot: s
             cumulative_error += bot_diff
             abs_error += abs(bot_diff)
             completed_moves += 1
-            print(f"\t>> Cumulative error: {cumulative_error} mm")
+            print(f"\t>> Cumulative error:       {cumulative_error} mm")
             print(f"\t>> Absolute error average: {abs_error / completed_moves} mm")
         except StallOrCollisionDetectedError as e:
             print(f"Stall or collision detected while moving to bottom position: {e}")
@@ -113,13 +113,15 @@ async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount, slot: s
                 break
 
     print("\n=========== Test Complete ===========\n")
-    print("\n***********")
-    print("TEST STATS:")
-    print(f"\t>> Total cycles: {completed_moves}")
-    print(f"\t>> Stall detected: {stall}")
-    print(f"\t>> Cumulative error: {cumulative_error} mm")
-    print(f"\t>> Absolute error average: {abs_error / completed_moves} mm")
-    print("***********\n")
+    print("\n*******************************************************************")
+    print("*******************************************************************")
+    print("**TEST STATS:                                                    **")
+    print(f"**\t>> Total cycles:           {completed_moves}                **")
+    print(f"**\t>> Stall detected:         {stall}                          **")
+    print(f"**\t>> Cumulative error:       {cumulative_error} mm            **")
+    print(f"**\t>> Absolute error average: {abs_error / completed_moves} mm **")
+    print("\n*******************************************************************")
+    print("*******************************************************************\n")
 
 
 if __name__ == "__main__":
