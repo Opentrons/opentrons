@@ -702,6 +702,8 @@ class GeometryView:
             # should be updated.
             module_id = lw_data.location.moduleId
             height_over_labware = self._modules.get_height_over_labware(module_id)
+        # todo(mm, 2025-07-31): This math needs updating for schema 2:
+        # labware_pos.z is not necessarily the bottom of the labware.
         return labware_pos.z + z_dim + height_over_labware
 
     def get_nominal_effective_tip_length(
