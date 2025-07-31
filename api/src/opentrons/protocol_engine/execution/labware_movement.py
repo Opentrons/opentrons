@@ -111,6 +111,7 @@ class LabwareMovementHandler:
         user_pick_up_offset: Point,
         user_drop_offset: Point,
         post_drop_slide_offset: Optional[Point],
+        gripper_z_offset: Optional[float],
     ) -> None:
         ...
 
@@ -124,6 +125,7 @@ class LabwareMovementHandler:
         user_pick_up_offset: Point,
         user_drop_offset: Point,
         post_drop_slide_offset: Optional[Point],
+        gripper_z_offset: Optional[float] = None,
     ) -> None:
         """Physically move a labware from one location to another using the gripper.
 
@@ -174,8 +176,13 @@ class LabwareMovementHandler:
 
         gripper_mount = OT3Mount.GRIPPER
 
-        # Retract all mounts
-        await ot3api.home(axes=[Axis.Z_L, Axis.Z_R, Axis.Z_G])
+        if gripper_z_offset is None:
+            # Retract all mounts
+            await ot3api.home(axes=[Axis.Z_L, Axis.Z_R, Axis.Z_G])
+        else:
+            # Retract left and right mounts, but only retract the gripper mount a set distance
+            await ot3api.home(axes=[Axis.Z_L, Axis.Z_R])
+            await ot3api.move_axes(position={Axis.Z_G: gripper_z_offset})
         gripper_homed_position = await ot3api.gantry_position(mount=gripper_mount)
 
         # todo(mm, 2024-11-07): We should do this collision checking even when we
