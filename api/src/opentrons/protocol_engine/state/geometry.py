@@ -678,7 +678,6 @@ class GeometryView:
                     delta=delta,
                     meniscus_tracking=meniscus_tracking,
                 )
-        return NotImplemented
 
     def get_well_height(
         self,
