@@ -98,7 +98,7 @@ export function useAspirateSettingsConfig({
         ) {
           setSelectedSetting(SETTING_OPTIONS.ASPIRATE_MIX)
         } else {
-          makeSnackbar(t('advanced_setting_disabled') as string)
+          makeSnackbar(t('aspirate_setting_disabled') as string)
         }
       },
     },
@@ -159,7 +159,7 @@ export function useAspirateSettingsConfig({
         if (!sourceIsReservoir) {
           setSelectedSetting(SETTING_OPTIONS.ASPIRATE_TOUCH_TIP)
         } else {
-          makeSnackbar(t('advanced_setting_disabled') as string)
+          makeSnackbar(t('aspirate_setting_disabled') as string)
         }
       },
     },
