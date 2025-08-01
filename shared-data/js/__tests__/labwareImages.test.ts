@@ -4,8 +4,6 @@ import { describe, expect, it } from 'vitest'
 
 // ✅ List of image filenames to ignore (case-sensitive)
 const ignoredImages = new Set([
-  'generic_tiprack_side_view.png',
-  'opentrons_calibration_block.png',
   'opentrons_flat_aluminumblock_side_view.jpg',
   'plate_multi.png',
   'plate_single.png',

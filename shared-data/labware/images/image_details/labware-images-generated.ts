@@ -28,6 +28,7 @@ import geb_96_tiprack_1000ul_side_view from '../geb_96_tiprack_1000ul_side_view.
 import geb_96_tiprack_1000ul_tip from '../geb_96_tiprack_1000ul_tip.jpg'
 import generic_2ml_screwcap from '../generic_2ml_screwcap.jpg'
 import generic_pcr_strip_200ul from '../generic_pcr_strip_200ul.jpg'
+import generic_custom_tiprack from '../generic_tiprack_side_view.png'
 import ibidi_96_square_well_plate_300ul from '../ibidi_96_square_well_plate_300ul.png'
 import nest_0_5ml_screwcap from '../nest_0.5ml_screwcap.jpg'
 import nest_1_reservoir_195ml_three_quarters from '../nest_1_reservoir_195ml_three_quarters.jpg'
@@ -61,6 +62,8 @@ import opentrons_96_tiprack_10ul_side_view from '../opentrons_96_tiprack_10ul_si
 import opentrons_96_tiprack_300ul_side_view from '../opentrons_96_tiprack_300ul_side_view.jpg'
 import opentrons_96_tiprack_1000ul_side_view from '../opentrons_96_tiprack_1000ul_side_view.jpg'
 import opentrons_aluminum_flat_bottom_plate from '../opentrons_aluminum_flat_bottom_plate.png'
+import opentrons_calibrationblock_short_side_left from '../opentrons_calibrationblock_short_side_left.png'
+import opentrons_calibrationblock_short_side_right from '../opentrons_calibrationblock_short_side_right.png'
 import opentrons_flex_96_tiprack_50ul from '../opentrons_flex_96_tiprack_50ul.png'
 import opentrons_flex_96_tiprack_adapter from '../opentrons_flex_96_tiprack_adapter.png'
 import opentrons_flex_deck_riser from '../opentrons_flex_deck_riser.png'
@@ -255,6 +258,12 @@ export const labwareImages: Record<string, string[]> = {
   opentrons_96_tiprack_10ul: [opentrons_96_tiprack_10ul_side_view],
   opentrons_96_tiprack_300ul: [opentrons_96_tiprack_300ul_side_view],
   opentrons_aluminum_flat_bottom_plate: [opentrons_aluminum_flat_bottom_plate],
+  opentrons_calibrationblock_short_side_left: [
+    opentrons_calibrationblock_short_side_left,
+  ],
+  opentrons_calibrationblock_short_side_right: [
+    opentrons_calibrationblock_short_side_right,
+  ],
   opentrons_flex_96_tiprack_50ul: [opentrons_flex_96_tiprack_50ul],
   opentrons_flex_96_tiprack_adapter: [opentrons_flex_96_tiprack_adapter],
   opentrons_flex_deck_riser: [opentrons_flex_deck_riser],
@@ -276,4 +285,5 @@ export const labwareImages: Record<string, string[]> = {
   'usascientific_96_wellplate_2.4ml_deep': [
     usascientific_96_wellplate_2_4ml_deep_side_view,
   ],
+  generic_custom_tiprack: [generic_custom_tiprack],
 }
