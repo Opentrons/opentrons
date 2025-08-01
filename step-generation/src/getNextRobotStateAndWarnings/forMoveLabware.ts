@@ -1,3 +1,6 @@
+import { getIsLid, getIsPipettableLabware } from '@opentrons/shared-data'
+
+import { TOUCHED_PIPETTABLE_LABWARE } from '../types'
 import { getFullStackFromLabwares, getSlotInLocationStack } from '../utils'
 
 import type { MoveLabwareParams } from '@opentrons/shared-data'
@@ -10,6 +13,7 @@ export function forMoveLabware(
 ): void {
   const { labwareId, newLocation } = params
   const { robotState } = robotStateAndWarnings
+  const { labwareEntities } = invariantContext
   const { modules, labware } = robotState
   const initialDeckSlot = getSlotInLocationStack(labware[labwareId].stack)
   const fullStackFromLabwares = getFullStackFromLabwares(
@@ -18,6 +22,9 @@ export function forMoveLabware(
   )
   const index = fullStackFromLabwares.indexOf(labwareId)
   const labwareToMove = fullStackFromLabwares.slice(0, index + 1) // includes labwareId you're moving
+
+  const isLabwareToMoveLid = getIsLid(labwareEntities[labwareId].def)
+  let isParentPipettableLabware: boolean = false
 
   const newLocationStack: string[] = []
   if (newLocation === 'offDeck' || newLocation === 'systemLocation') {
@@ -28,9 +35,23 @@ export function forMoveLabware(
       modules[newLocation.moduleId].slot
     )
   } else if ('slotName' in newLocation) {
-    newLocationStack.push(newLocation.slotName)
+    // need to handle slotName being a labwareId or a slotId (misleading property name)
+    const { slotName } = newLocation
+    // new location is a labware stack
+    if (slotName in labware) {
+      isParentPipettableLabware = getIsPipettableLabware(
+        labwareEntities[slotName].def
+      )
+      newLocationStack.push(...labware[slotName].stack)
+    } else {
+      // new location is a slot
+      newLocationStack.push(slotName)
+    }
   } else if ('labwareId' in newLocation) {
     const labwareId = newLocation.labwareId
+    isParentPipettableLabware = getIsPipettableLabware(
+      labwareEntities[labwareId].def
+    )
     const labwareIdStack = labware[labwareId].stack
     newLocationStack.push(...labwareIdStack)
   } else if ('addressableAreaName' in newLocation) {
@@ -39,7 +60,13 @@ export function forMoveLabware(
   labwareToMove.forEach((id, i) => {
     if (labware[id] != null) {
       const stackBelow = labwareToMove.slice(i + 1) // what's under labware you're moving
-      robotState.labware[id].stack = [id, ...stackBelow, ...newLocationStack]
+      robotState.labware[id] = {
+        ...robotState.labware[id],
+        stack: [id, ...stackBelow, ...newLocationStack],
+        ...(isLabwareToMoveLid && isParentPipettableLabware
+          ? { sterility: TOUCHED_PIPETTABLE_LABWARE }
+          : {}),
+      }
     }
   })
 }

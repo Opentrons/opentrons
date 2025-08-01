@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   DEFAULT_AA_FOR_WASTE_CHUTE,
+  FAKE_STAGING_AREA_RIGHT_SLOT,
   FLEX_STACKER_MODULE_TYPE,
   FLEX_STACKER_MODULE_V1,
   getDeckDefFromRobotType,
@@ -211,8 +212,16 @@ describe('getFixtureOptions', () => {
       ],
     ])
   })
+  it('Should not get a trash bin for cutoutD3 and aa D3 with a stacker in the slot', () => {
+    const result = getFixtureOptions('cutoutD3', 'D3', FLEX_STACKER_MODULE_V1)
+    expect(result).toEqual([])
+  })
   it('Should get staging area for cutoutD3 and aa fakeD4', () => {
-    const result = getFixtureOptions('cutoutD3', 'fakeD4')
+    const result = getFixtureOptions(
+      'cutoutD3',
+      'fakeD4',
+      FAKE_STAGING_AREA_RIGHT_SLOT
+    )
     expect(result).toEqual([
       [
         {

@@ -44,6 +44,7 @@ import { StatusLabel } from '/app/atoms/StatusLabel'
 import {
   getFlexStackerPrepCommands,
   getModuleImage,
+  useModuleUSBPort,
 } from '/app/local-resources/modules'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { ModuleSetupModal } from '/app/organisms/ModuleCard/ModuleSetupModal'
@@ -135,8 +136,9 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
             )
             if (
               deckConfigCompatabilityD3 != null &&
-              WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(
-                deckConfigCompatabilityD3?.compatibleCutoutFixtureIds[0]
+              deckConfigCompatabilityD3.compatibleCutoutFixtureIds.every(
+                cutoutFixtureId =>
+                  WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(cutoutFixtureId)
               )
             ) {
               const comboFixtureId =
@@ -240,6 +242,7 @@ export function ModulesListItem({
   ] = useState<boolean>(false)
 
   const [showModuleWizard, setShowModuleWizard] = useState<boolean>(false)
+  const { parseModuleUSBPort } = useModuleUSBPort()
 
   const handleSetupModuleClick = (): void => {
     setShowModuleWizard(true)
@@ -386,11 +389,7 @@ export function ModulesListItem({
 
   // convert slot name to cutout id
   const cutoutIdForSlotName = getCutoutIdForSlotName(slotName, deckDef)
-
-  const portDisplay =
-    attachedModuleMatch?.usbPort?.hubPort != null
-      ? `${attachedModuleMatch.usbPort.port}.${attachedModuleMatch.usbPort.hubPort}`
-      : attachedModuleMatch?.usbPort?.port
+  const portDisplay = parseModuleUSBPort(attachedModuleMatch)
 
   return (
     <>
@@ -473,11 +472,7 @@ export function ModulesListItem({
                 : slotName}
             </LegacyStyledText>
             {portDisplay != null ? (
-              <LegacyStyledText as="p">
-                {t('usb_port_number', {
-                  port: portDisplay,
-                })}
-              </LegacyStyledText>
+              <LegacyStyledText as="p">{portDisplay}</LegacyStyledText>
             ) : null}
           </Flex>
           <Flex

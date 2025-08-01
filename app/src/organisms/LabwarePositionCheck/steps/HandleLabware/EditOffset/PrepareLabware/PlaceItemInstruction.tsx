@@ -102,7 +102,11 @@ export function PlaceItemInstruction(
       {isActivePipette96ch && isDefaultOffset && (
         <InlineNotification
           type="alert"
-          heading={t('ensure_tip_rack_accurately_placed')}
+          heading={
+            isLwTiprack
+              ? t('ensure_tip_rack_accurately_placed')
+              : t('ensure_labware_accurately_placed')
+          }
         />
       )}
     </Flex>

@@ -1,6 +1,9 @@
 import { getAddressableAreasInProtocol, getDeckDefFromRobotType } from '.'
 import { FLEX_ROBOT_TYPE } from '../constants'
-import { getAddressableAreaFromSlotId } from '../fixtures'
+import {
+  getAddressableAreaFromSlotId,
+  getMainNonComboFixtureId,
+} from '../fixtures'
 
 import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../../deck'
 import type { ProtocolAnalysisOutput } from '../../protocol'
@@ -64,7 +67,6 @@ export function getSimplestDeckConfigForProtocol(
             deckDef.cutoutFixtures
           )
         : null
-
     const existingCutoutConfig = acc.find(
       cutoutConfig => cutoutConfig.cutoutId === cutoutIdForAddressableArea
     )
@@ -86,6 +88,7 @@ export function getSimplestDeckConfigForProtocol(
         previousRequiredAAs.includes(addressableArea)
           ? previousRequiredAAs
           : [...previousRequiredAAs, addressableArea]
+
       const nextCompatibleCutoutFixture = getSimplestFixtureForAddressableAreas(
         cutoutIdForAddressableArea,
         allNextRequiredAddressableAreas,
@@ -188,5 +191,16 @@ export function getSimplestFixtureForAddressableAreas(
     requiredAddressableAreas,
     cutoutFixturesForCutoutId
   )
-  return nextCompatibleCutoutFixtures?.[0] ?? null
+  if (nextCompatibleCutoutFixtures.length > 1) {
+    const mainFixture = getMainNonComboFixtureId(
+      nextCompatibleCutoutFixtures.map(cf => cf.id),
+      requiredAddressableAreas,
+      cutoutId
+    )
+    return (
+      nextCompatibleCutoutFixtures.find(cf => cf.id === mainFixture) ?? null
+    )
+  } else {
+    return nextCompatibleCutoutFixtures?.[0] ?? null
+  }
 }

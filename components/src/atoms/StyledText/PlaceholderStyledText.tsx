@@ -37,7 +37,6 @@ export const PlaceholderStyledText = (
     desktopStyle != null ? styleMap[desktopStyle as StyleKey] : null,
     oddStyle != null ? styleMap[oddStyle as StyleKey] : null
   )
-
   return (
     <text className={combinedClassName} style={{ color: color ?? '' }}>
       {children}

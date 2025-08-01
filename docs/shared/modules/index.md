@@ -30,13 +30,20 @@ Opentrons hardware modules add features and capabilities to your robot.
 
     [:octicons-arrow-right-24: Instruction Manual](../hepa-uv/index.md)
 
--   :opentrons-heater-shaker:{ .xl .middle } __Heater-Shaker__
+-   :opentrons-heater-shaker:{ .xl .middle } __Heater-Shaker__
 
-    ---
+    ---
 
-    Provides on-deck heating and orbital shaking.
+    Provides on-deck heating and orbital shaking.
 
-    [:octicons-arrow-right-24: Instruction Manual](../heater-shaker/index.md)
+    [:octicons-arrow-right-24: Instruction Manual](../heater-shaker/index.md)
 
+-   :opentrons-thermocycler:{ .xl .middle } __Thermocycler Module__
+
+    ---
+
+    An automated on-deck thermocycler in a 96-well plate format.
+
+    [:octicons-arrow-right-24: Instruction Manual](../thermocycler-manual/index.md)
 
 </div>

@@ -228,6 +228,7 @@ export function getRelevantFailedLabwareCmdFrom({
     case ERROR_KINDS.STACKER_SHUTTLE_MISSING:
     case ERROR_KINDS.STACKER_HOPPER_EMPTY:
     case ERROR_KINDS.STACKER_SHUTTLE_EMPTY:
+    case ERROR_KINDS.STACKER_SHUTTLE_OCCUPIED:
       return failedCommandByRunRecord as FlexStackerRetrieveRunTimeCommand
     default:
       console.error(
@@ -375,6 +376,7 @@ export function getRelevantLabwareIdFromFailedCmd(
       'flexStackerShuttleMissing',
       'flexStackerHopperLabwareFailed',
       'flexStackerLabwareRetrieveFailed',
+      'flexStackerShuttleOccupied',
     ].includes(error.errorType)
   if (recentRelevantFailedLabwareCmd == null) {
     return null
