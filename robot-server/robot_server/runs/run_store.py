@@ -304,13 +304,11 @@ class RunStore:
         self._clear_caches()
         return run
 
-    @lru_cache(maxsize=_CACHE_ENTRIES)
     def has(self, run_id: str) -> bool:
         """Whether a given run exists in the store."""
         with self._sql_engine.begin() as transaction:
             return self._run_exists(run_id, transaction)
 
-    @lru_cache(maxsize=_CACHE_ENTRIES)
     def get(self, run_id: str) -> Union[RunResource, BadRunResource]:
         """Get a specific run entry by its identifier.
 
@@ -342,7 +340,6 @@ class RunStore:
 
         return _convert_row_to_run(run_row, action_rows)
 
-    @lru_cache(maxsize=_CACHE_ENTRIES)
     def get_all(
         self, length: Optional[int] = None
     ) -> List[Union[RunResource, BadRunResource]]:
@@ -384,7 +381,6 @@ class RunStore:
             for run_row in runs
         ]
 
-    @lru_cache(maxsize=_CACHE_ENTRIES)
     def get_state_summary(self, run_id: str) -> Union[StateSummary, BadStateSummary]:
         """Get the archived run state summary.
 
@@ -418,7 +414,6 @@ class RunStore:
                 )
             )
 
-    @lru_cache(maxsize=_CACHE_ENTRIES)
     def get_run_time_parameters(self, run_id: str) -> List[RunTimeParameter]:
         """Get the archived run time parameters.
 
@@ -653,7 +648,6 @@ class RunStore:
             commands_errors=sliced_commands,
         )
 
-    @lru_cache(maxsize=_CACHE_ENTRIES)
     def get_command(self, run_id: str, command_id: str) -> Command:
         """Get run command by id.
 
@@ -722,12 +716,7 @@ class RunStore:
         return result
 
     def _clear_caches(self) -> None:
-        self.has.cache_clear()
-        self.get.cache_clear()
-        self.get_all.cache_clear()
-        self.get_state_summary.cache_clear()
-        self.get_command.cache_clear()
-        self.get_run_time_parameters.cache_clear()
+        pass
 
 
 # The columns that must be present in a row passed to _convert_row_to_run().

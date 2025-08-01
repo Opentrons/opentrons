@@ -54,6 +54,10 @@ class RunsPublisher:
             ]
         )
 
+    def test(self):
+        self._run_hooks = None
+        self._engine_state_slice = None
+
     def start_publishing_for_run(
         self,
         run_id: str,

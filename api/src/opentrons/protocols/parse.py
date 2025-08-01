@@ -464,7 +464,6 @@ def _extract_static_dict(static_dict: ast.Dict, name: str) -> Dict[str, str]:
     return evaluated_literal
 
 
-@functools.lru_cache(1)
 def _has_api_v1_imports(parsed: ast.Module) -> bool:
     """Return whether a Python protocol has import statements specific to PAPIv1."""
     # Imports in the form of `import opentrons.robot` will have an entry in

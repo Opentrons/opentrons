@@ -13,7 +13,6 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 log = logging.getLogger(__name__)
 
 
-@lru_cache(maxsize=1)
 def get_settings() -> "RobotServerSettings":
     """Get the settings"""
     load_dotenv(get_dotenv_path())

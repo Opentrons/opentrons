@@ -537,7 +537,6 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
 
     # Cache max is chosen somewhat arbitrarily. With a float is input we don't
     # want this to unbounded.
-    @functools.lru_cache(maxsize=100)
     def ul_per_mm(self, ul: float, action: UlPerMmAction) -> float:
         return calculate_ul_per_mm(
             ul,

@@ -1,5 +1,6 @@
 """Asynchronous task queue to accomplish a protocol run."""
 import asyncio
+import gc
 import logging
 from typing import Any, Awaitable, Callable, Optional, ParamSpec, Concatenate
 
@@ -85,6 +86,16 @@ class TaskQueue:
         except Exception as e:
             log.exception("Exception raised by protocol")
             error = e
+        finally:
+            # Critical: Clear function references to prevent memory leaks
+            # The closures can hold references to protocol context and other objects
+            self._run_func = None
+            run_func = None
+            gc.collect()
 
-        if self._cleanup_func is not None:
-            await self._cleanup_func(error)
+        try:
+            if self._cleanup_func is not None:
+                await self._cleanup_func(error)
+        finally:
+            # Clear cleanup function reference as well
+            self._cleanup_func = None

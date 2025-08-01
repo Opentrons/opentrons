@@ -295,6 +295,7 @@ class RunOrchestratorStore:
         run_time_parameters = self.run_orchestrator.get_run_time_parameters()
         command_annotations = self.run_orchestrator.get_command_annotations()
 
+        self._run_orchestrator.clear_command_history()
         self._run_orchestrator = None
 
         return RunResult(

@@ -1,5 +1,5 @@
 """Manage current and historical run data."""
-
+import gc
 from datetime import datetime
 from typing import Dict, List, Optional, Callable, Union, Mapping, Sequence
 

@@ -1,5 +1,11 @@
 """Wrappers for Protocol API v2 execution pipeline."""
 import asyncio
+import concurrent.futures
+import gc
+import linecache
+import sys
+import logging
+import threading
 from typing import Dict, Iterable, Optional, cast
 
 from anyio import to_thread
@@ -47,6 +53,9 @@ LEGACY_PYTHON_API_VERSION_CUTOFF = ENGINE_CORE_API_VERSION
 # The earliest JSON protocol schema version where the protocol is executed directly by
 # Protocol Engine, rather than going through Python Protocol API v2.
 LEGACY_JSON_SCHEMA_VERSION_CUTOFF = 6
+
+
+_log = logging.getLogger(__name__)
 
 
 class PythonAndLegacyFileReader:
@@ -155,13 +164,123 @@ class PythonProtocolExecutor:
         context: ProtocolContext,
         run_time_parameters_with_overrides: Optional[Parameters],
     ) -> None:
-        """Execute a PAPIv2 protocol with a given ProtocolContext in a child thread."""
-        await to_thread.run_sync(
-            run_protocol,
-            protocol,
-            context,
-            run_time_parameters_with_overrides,
+        """Execute a PAPIv2 protocol with a given ProtocolContext in a dedicated fresh thread."""
+
+        # Store original module state for cleanup
+        original_modules = sys.modules.copy()
+
+        # Create a new thread pool executor with max_workers=1 to ensure isolation
+        # This prevents thread reuse that can cause memory leaks
+        executor = concurrent.futures.ThreadPoolExecutor(
+            max_workers=1, thread_name_prefix="protocol_execution"
         )
+
+        try:
+            # Execute in the dedicated thread
+            await asyncio.get_event_loop().run_in_executor(
+                executor,
+                PythonProtocolExecutor._run_protocol_sync,
+                protocol,
+                context,
+                run_time_parameters_with_overrides,
+                original_modules,  # Pass original modules to the thread
+            )
+        finally:
+            # Explicitly shutdown the executor and wait for thread cleanup
+            executor.shutdown(wait=True)
+
+            # Comprehensive cleanup after thread execution
+            PythonProtocolExecutor._cleanup_after_thread_execution(original_modules)
+
+    @staticmethod
+    def _run_protocol_sync(protocol, context, parameters, original_modules):
+        """Static method to avoid closure issues."""
+        try:
+            return run_protocol(protocol, context, parameters)
+        finally:
+            # Explicit cleanup in the worker thread
+            PythonProtocolExecutor._cleanup_in_thread(context, original_modules)
+
+    @staticmethod
+    def _cleanup_in_thread(context, original_modules):
+        """Comprehensive cleanup within the worker thread."""
+        try:
+            if hasattr(context, "clear_commands"):
+                context.clear_commands()
+
+            linecache.clearcache()
+
+            current_thread = threading.current_thread()
+            if hasattr(current_thread, "__dict__"):
+                current_thread.__dict__.clear()
+
+            current_modules = list(sys.modules.keys())
+            for module_name in current_modules:
+                if module_name not in original_modules:
+                    try:
+                        module = sys.modules[module_name]
+                        if hasattr(module, "__dict__"):
+                            module.__dict__.clear()
+                        del sys.modules[module_name]
+                    except KeyError:
+                        pass
+
+            if hasattr(sys, "_clear_type_cache"):
+                sys._clear_type_cache()
+
+            try:
+                import importlib
+
+                if hasattr(importlib, "invalidate_caches"):
+                    importlib.invalidate_caches()
+            except:
+                pass
+
+            for _ in range(3):
+                gc.collect()
+
+        except Exception as e:
+            print(f"THREAD CLEANUP ERROR: {e}")
+
+    @staticmethod
+    def _cleanup_after_thread_execution(original_modules):
+        """Cleanup after thread execution completes."""
+        try:
+            # Clear linecache globally
+            linecache.clearcache()
+
+            # Clear any remaining modules
+            current_modules = list(sys.modules.keys())
+            for module_name in current_modules:
+                if module_name not in original_modules:
+                    try:
+                        module = sys.modules[module_name]
+                        if hasattr(module, "__dict__"):
+                            module.__dict__.clear()
+                        del sys.modules[module_name]
+                    except KeyError:
+                        pass
+
+            # Clear import caches
+            try:
+                import importlib
+
+                if hasattr(importlib, "invalidate_caches"):
+                    importlib.invalidate_caches()
+            except:
+                pass
+
+            # Clear type caches
+            if hasattr(sys, "_clear_type_cache"):
+                sys._clear_type_cache()
+
+            # Force garbage collection
+            for _ in range(5):
+                collected = gc.collect()
+                print(f"POST-THREAD CLEANUP: GC collected {collected} objects")
+
+        except Exception as e:
+            print(f"POST-THREAD CLEANUP ERROR: {e}")
 
     @staticmethod
     def extract_run_parameters(

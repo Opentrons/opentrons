@@ -22,7 +22,6 @@ from opentrons.protocol_engine.types import (
 )
 
 
-@lru_cache
 def load_from_robot_type(robot_type: RobotType) -> DeckDefinitionV5:
     """Get a deck from robot type."""
     if robot_type == "OT-3 Standard":

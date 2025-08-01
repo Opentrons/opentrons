@@ -13,7 +13,6 @@ class SharedDataMissingError(IOError):
     pass
 
 
-@lru_cache(maxsize=1)
 def get_shared_data_root() -> Path:
     """
     Get the root directory of the shared data.

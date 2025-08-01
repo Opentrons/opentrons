@@ -1020,7 +1020,6 @@ class OT3API(
             velocity=homing_velocity,
         )
 
-    @lru_cache(1)
     def _carriage_offset(self) -> top_types.Point:
         return top_types.Point(*self._config.carriage_offset)
 

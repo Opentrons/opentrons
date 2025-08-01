@@ -92,7 +92,6 @@ def save_module_calibration(
 
 
 @no_type_check
-@lru_cache(maxsize=10)
 def get_module_offset(
     module: ModuleType, module_id: str, slot: Optional[str] = None
 ) -> Optional[v1.ModuleOffsetModel]:
@@ -114,7 +113,6 @@ def get_module_offset(
         return None
 
 
-@lru_cache(maxsize=10)
 def load_all_module_offsets() -> List[v1.ModuleOffsetModel]:
     """Load all module offsets from the disk."""
 

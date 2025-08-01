@@ -337,23 +337,21 @@ class ProtocolContext(CommandPublisher):
         if self._unsubscribe_commands:
             self._unsubscribe_commands()
 
-        def on_command(message: cmd_types.CommandMessage) -> None:
-            payload = message.get("payload")
-
-            if payload is None:
-                return
-
-            text = payload.get("text")
-
-            if text is None:
-                return
-
-            if message["$"] == "before":
-                self._commands.append(text)
-
+        # Use a bound method instead of a closure to avoid capturing self in a closure cell
         self._unsubscribe_commands = self.broker.subscribe(
-            cmd_types.COMMAND, on_command
+            cmd_types.COMMAND, self._on_command_callback
         )
+
+    def _on_command_callback(self, message: cmd_types.CommandMessage) -> None:
+        """Callback for command messages. This is a bound method, not a closure."""
+        payload = message.get("payload")
+        if payload is None:
+            return
+        text = payload.get("text")
+        if text is None:
+            return
+        if message["$"] == "before":
+            self._commands.append(text)
 
     @requires_version(2, 0)
     def is_simulating(self) -> bool:

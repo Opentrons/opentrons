@@ -1,4 +1,4 @@
-"""Protocol run control and management."""
+"""Protocol run control and management with deep reference tracking."""
 import asyncio
 from typing import List, NamedTuple, Optional, Union
 
@@ -181,6 +181,10 @@ class PythonAndLegacyRunner(AbstractRunner):
             post_run_hardware_state=post_run_hardware_state,
         )
         self._parameter_context: Optional[ParameterContext] = None
+        self._current_protocol = None
+        self._current_context = None
+        self._current_parameters = None
+        self._initial_home_command = None
 
     @property
     def run_time_parameters(self) -> List[RunTimeParameter]:
@@ -197,6 +201,8 @@ class PythonAndLegacyRunner(AbstractRunner):
         run_time_param_paths: Optional[CSVRuntimeParamPaths],
     ) -> None:
         """Load a Python or JSONv5(& older) ProtocolSource into managed ProtocolEngine."""
+        await self._cleanup_previous_run()
+
         labware_definitions = await protocol_reader.extract_labware_definitions(
             protocol_source=protocol_source
         )
@@ -210,6 +216,10 @@ class PythonAndLegacyRunner(AbstractRunner):
         protocol = self._protocol_file_reader.read(
             protocol_source, labware_definitions, python_parse_mode
         )
+
+        # Start tracking the protocol object for reference analysis
+        self._current_protocol = protocol
+
         if isinstance(protocol, PythonProtocol):
             self._parameter_context = ParameterContext(api_version=protocol.api_level)
             run_time_parameters_with_overrides = (
@@ -222,6 +232,8 @@ class PythonAndLegacyRunner(AbstractRunner):
             )
         else:
             run_time_parameters_with_overrides = None
+
+        self._current_parameters = run_time_parameters_with_overrides
         equipment_broker = None
 
         if protocol.api_level < LEGACY_PYTHON_API_VERSION_CUTOFF:
@@ -242,22 +254,102 @@ class PythonAndLegacyRunner(AbstractRunner):
             broker=self._broker,
             equipment_broker=equipment_broker,
         )
+
+        self._current_context = context
+
         initial_home_command = pe_commands.HomeCreate(
             # this command homes all axes, including pipette plunger and gripper jaw
             params=pe_commands.HomeParams(axes=None)
         )
 
-        async def run_func() -> None:
-            await self._protocol_engine.add_and_execute_command(
-                request=initial_home_command
-            )
-            await self._protocol_executor.execute(
-                protocol=protocol,
-                context=context,
-                run_time_parameters_with_overrides=run_time_parameters_with_overrides,
-            )
+        self._initial_home_command = initial_home_command
 
-        self._task_queue.set_run_func(run_func)
+        self._task_queue.set_run_func(self._execute_protocol_method)
+
+    async def _execute_protocol_method(self) -> None:
+        """Execute protocol using instance variables to avoid closure captures."""
+        await self._protocol_engine.add_and_execute_command(
+            request=self._initial_home_command
+        )
+        await self._protocol_executor.execute(
+            protocol=self._current_protocol,
+            context=self._current_context,
+            run_time_parameters_with_overrides=self._current_parameters,
+        )
+
+    async def _cleanup_after_execution(self) -> None:
+        """Clean up references after protocol execution."""
+        # Store objects for final analysis before clearing them
+
+        if self._current_context:
+            # STEP 1: Try the normal unsubscribe first
+            if (
+                hasattr(self._current_context, "_unsubscribe_commands")
+                and self._current_context._unsubscribe_commands
+            ):
+                print("LEAK CLEANUP: Calling unsubscribe_commands")
+                try:
+                    self._current_context._unsubscribe_commands()
+                except Exception as e:
+                    print(f"LEAK CLEANUP: unsubscribe_commands failed: {e}")
+                self._current_context._unsubscribe_commands = None
+
+            # STEP 2: Manually clear broker subscriptions as backup
+            if (
+                hasattr(self._current_context, "broker")
+                and self._current_context.broker
+            ):
+                broker = self._current_context.broker
+                print(
+                    f"LEAK CLEANUP: Broker subscriptions before cleanup: {len(broker.subscriptions)}"
+                )
+
+                # Just clear the whole subscriptions dict
+                broker.subscriptions.clear()
+                print("LEAK CLEANUP: Cleared broker.subscriptions")
+
+            # STEP 3: Call other cleanup methods
+            if hasattr(self._current_context, "cleanup"):
+                if asyncio.iscoroutinefunction(self._current_context.cleanup):
+                    await self._current_context.cleanup()
+                else:
+                    self._current_context.cleanup()
+
+            # STEP 4: Clear commands list directly (don't call clear_commands again)
+            if hasattr(self._current_context, "_commands"):
+                self._current_context._commands.clear()
+
+            if hasattr(self._current_context, "_core"):
+                if hasattr(self._current_context._core, "cleanup"):
+                    self._current_context._core.cleanup()
+
+        if self._parameter_context:
+            if hasattr(self._parameter_context, "cleanup"):
+                self._parameter_context.cleanup()
+
+        if hasattr(self._task_queue, "_run_func"):
+            self._task_queue._run_func = None
+
+        # Clear all our references BEFORE final analysis
+        self._current_protocol = None
+        self._current_context = None
+        self._current_parameters = None
+        self._parameter_context = None
+        self._initial_home_command = None
+
+        # Force multiple garbage collection cycles
+        import gc
+
+        for i in range(5):
+            collected = gc.collect()
+            print(f"LEAK CLEANUP: GC cycle {i + 1} collected {collected} objects")
+
+    async def _cleanup_previous_run(self) -> None:
+        """Clean up any references from a previous run."""
+        if any(
+            [self._current_protocol, self._current_context, self._current_parameters]
+        ):
+            await self._cleanup_after_execution()
 
     async def run(  # noqa: D102
         self,
@@ -269,27 +361,30 @@ class PythonAndLegacyRunner(AbstractRunner):
     ) -> RunResult:
         # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`
         # currently `protocol_source` arg is only used by tests & protocol analyzer
-        if protocol_source:
-            await self.load(
-                protocol_source=protocol_source,
-                python_parse_mode=python_parse_mode,
-                run_time_param_values=run_time_param_values,
-                run_time_param_paths=run_time_param_paths,
+        try:
+            if protocol_source:
+                await self.load(
+                    protocol_source=protocol_source,
+                    python_parse_mode=python_parse_mode,
+                    run_time_param_values=run_time_param_values,
+                    run_time_param_paths=run_time_param_paths,
+                )
+
+            self.play(deck_configuration=deck_configuration)
+            self._task_queue.start()
+            await self._task_queue.join()
+
+            run_data = self._protocol_engine.state_view.get_summary()
+            commands = self._protocol_engine.state_view.commands.get_all()
+            parameters = self.run_time_parameters
+            return RunResult(
+                commands=commands,
+                state_summary=run_data,
+                parameters=parameters,
+                command_annotations=[],
             )
-
-        self.play(deck_configuration=deck_configuration)
-        self._task_queue.start()
-        await self._task_queue.join()
-
-        run_data = self._protocol_engine.state_view.get_summary()
-        commands = self._protocol_engine.state_view.commands.get_all()
-        parameters = self.run_time_parameters
-        return RunResult(
-            commands=commands,
-            state_summary=run_data,
-            parameters=parameters,
-            command_annotations=[],
-        )
+        finally:
+            await self._cleanup_after_execution()
 
 
 class JsonRunner(AbstractRunner):

@@ -87,7 +87,6 @@ class Deck(UserDict):  # type: ignore[type-arg]
             self.__setitem__(slot_name, loaded_f)
 
     @staticmethod
-    @functools.lru_cache(20)
     def _assure_int(key: object) -> int:
         if isinstance(key, str):
             return int(key)

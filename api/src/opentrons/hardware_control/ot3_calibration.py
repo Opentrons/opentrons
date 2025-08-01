@@ -569,7 +569,6 @@ async def find_calibration_structure_center(
     raise_verify_error: bool = True,
     probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
 ) -> Point:
-
     # Perform xy offset search
     if method == CalibrationMethod.BINARY_SEARCH:
         found_center = await find_slot_center_binary(
@@ -1037,7 +1036,6 @@ class OT3RobotCalibrationProvider:
             gripper_mount_offset=Point(*config.gripper_mount_offset),
         )
 
-    @lru_cache(1)
     def _validate(self) -> DeckTransformState:
         return validate_attitude_deck_calibration(
             self._robot_calibration.deck_calibration

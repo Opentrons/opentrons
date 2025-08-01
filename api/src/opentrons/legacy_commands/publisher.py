@@ -124,7 +124,6 @@ def publish_context(broker: LegacyBroker, command: CommandPayload) -> Iterator[N
         _do_publish(broker=broker, message_id=message_id, command=command, when="after")
 
 
-@functools.lru_cache(maxsize=None)
 def _inspect_signature(func: Callable[..., Any]) -> inspect.Signature:
     """Inspect function signatures, memoized because it is called very often."""
     return inspect.signature(func)

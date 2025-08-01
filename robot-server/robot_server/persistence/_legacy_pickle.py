@@ -205,7 +205,6 @@ def _get_legacy_ot_types() -> List[_LegacyTypeInfo]:
     # fmt: on
 
 
-@lru_cache(maxsize=1)
 def _get_types_by_original_name() -> Dict[str, type]:
     types_by_original_name: Dict[str, type] = {}
 

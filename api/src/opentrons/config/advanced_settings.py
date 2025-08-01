@@ -256,7 +256,6 @@ def _filtered_key(
         return robot_type in definition.robot_type and not definition.internal_only
 
 
-@lru_cache(maxsize=1)
 def get_all_adv_settings(
     robot_type: RobotTypeEnum, include_internal: bool = False
 ) -> Dict[str, Setting]:

@@ -10,7 +10,6 @@ _OVERLAP_VERSION_MAP: Final = {
 }
 
 
-@lru_cache(1)
 def overlap_for_api_version(api_version: APIVersion) -> str:
     """Get the overlap version for a specific API version."""
     defined = list(reversed(sorted(_OVERLAP_VERSION_MAP.keys())))

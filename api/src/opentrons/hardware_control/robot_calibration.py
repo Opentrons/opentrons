@@ -176,7 +176,6 @@ class RobotCalibrationProvider:
     def __init__(self) -> None:
         self._robot_calibration = load()
 
-    @lru_cache(1)
     def _validate(self) -> DeckTransformState:
         return validate_attitude_deck_calibration(
             self._robot_calibration.deck_calibration

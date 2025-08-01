@@ -100,7 +100,6 @@ class ErrorCodes(Enum):
     INCORRECT_API_VERSION = _code_from_dict_entry("4011")
 
     @classmethod
-    @lru_cache(25)
     def by_error_code(cls, error_code: str) -> "ErrorCodes":
         """Get an error by its code.
 
@@ -112,7 +111,6 @@ class ErrorCodes(Enum):
         raise KeyError(error_code)
 
     @classmethod
-    @lru_cache(len(ErrorCategories))
     def of_category(cls, category: ErrorCategories) -> Tuple["ErrorCodes", ...]:
         """Get all error codes by their category."""
         return tuple(

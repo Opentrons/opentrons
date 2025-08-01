@@ -138,7 +138,6 @@ def get_major_version_from_pipette_name(
         return 1
 
 
-@lru_cache(4)
 def version_from_generation(pipette_name_tuple: Tuple[str, ...]) -> PipetteVersionType:
     """Convert pipetteName to a py:obj:PipetteVersionType
 

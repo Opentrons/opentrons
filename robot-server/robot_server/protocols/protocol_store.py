@@ -182,7 +182,6 @@ class ProtocolStore:
         self._sources_by_id[resource.protocol_id] = resource.source
         self._clear_caches()
 
-    @lru_cache(maxsize=_CACHE_ENTRIES)
     def get(self, protocol_id: str) -> ProtocolResource:
         """Get a single protocol by ID.
 
@@ -198,7 +197,6 @@ class ProtocolStore:
             source=self._sources_by_id[sql_resource.protocol_id],
         )
 
-    @lru_cache(maxsize=_CACHE_ENTRIES)
     def get_all(self) -> List[ProtocolResource]:
         """Get all protocols currently saved in this store.
 
@@ -216,7 +214,6 @@ class ProtocolStore:
             for r in all_sql_resources
         ]
 
-    @lru_cache(maxsize=_CACHE_ENTRIES)
     def get_all_ids(self) -> List[str]:
         """Get all protocol ids currently saved in this store."""
         select_ids = sqlalchemy.select(protocol_table.c.id).order_by(sqlite_rowid)
@@ -231,7 +228,6 @@ class ProtocolStore:
                 return p.protocol_id
         return None
 
-    @lru_cache(maxsize=_CACHE_ENTRIES)
     def has(self, protocol_id: str) -> bool:
         """Check for the presence of a protocol ID in the store."""
         statement = sqlalchemy.select(protocol_table).where(
@@ -442,10 +438,7 @@ class ProtocolStore:
             raise ProtocolNotFoundError(protocol_id=protocol_id)
 
     def _clear_caches(self) -> None:
-        self.get.cache_clear()
-        self.get_all_ids.cache_clear()
-        self.get_all.cache_clear()
-        self.has.cache_clear()
+        pass
 
 
 # TODO(mm, 2022-04-18):

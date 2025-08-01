@@ -7,7 +7,6 @@ from dotenv import load_dotenv, set_key
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-@lru_cache(maxsize=1)
 def get_settings() -> "SystemServerSettings":
     """Get the settings."""
     env = Environment().dot_env_path

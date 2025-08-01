@@ -490,3 +490,34 @@ class RunOrchestrator:
             return PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS
         else:
             raise UnknownProtocolParseMode()
+
+    def clear_command_history(self) -> None:
+        """Force cleanup of command history data before clearing the orchestrator."""
+        print(f"LEAK: Attempting to force command history cleanup...")
+
+        # Access the command history through the protocol engine
+        command_state = self._protocol_engine._state_store._command_store._state
+        history = command_state.command_history
+        commands_by_id = history._commands_by_id
+
+        before_count = len(commands_by_id)
+        print(f"LEAK: Before cleanup: {before_count} commands in history")
+
+        # Clear all the command storage
+        commands_by_id.clear()
+
+        # Clear other command lists
+        history._all_command_ids.clear()
+        history._all_failed_command_ids.clear()
+        history._all_command_ids_but_fixit_command_ids.clear()
+        print(f"LEAK: Cleared command ID lists")
+
+        # Clear queue sets
+        history._queued_command_ids.clear()
+        history._queued_setup_command_ids.clear()
+        history._queued_fixit_command_ids.clear()
+        print(f"LEAK: Cleared command queue sets")
+
+        after_count = len(commands_by_id)
+        print(f"LEAK: After cleanup: {after_count} commands in history")
+        print(f"LEAK: Successfully cleared {before_count} commands from history")

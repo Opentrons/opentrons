@@ -118,7 +118,6 @@ MessageDefinition = Union[
 ]
 
 
-@lru_cache(maxsize=None)
 def get_definition(message_id: MessageId) -> Optional[Type[MessageDefinition]]:
     """Get the message type for a message id.
 

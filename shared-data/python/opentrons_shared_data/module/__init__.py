@@ -100,7 +100,6 @@ def load_definition(
         return cast(ModuleDefinitionV3, json.loads(data))
 
 
-@lru_cache
 def load_tof_baseline_data(
     model_or_loadname: Union[str, ModuleModel],
 ) -> TOFSensorBaseline:

@@ -42,7 +42,6 @@ class ErrorCategories(Enum):
     GENERAL_ERROR = _category_from_dict_entry("generalError")
 
     @classmethod
-    @lru_cache(4)
     def by_category_name(cls, category_name: str) -> "ErrorCategories":
         """Get a subsystem by its category name."""
         for entry in cls:
@@ -51,7 +50,6 @@ class ErrorCategories(Enum):
         raise KeyError(category_name)
 
     @classmethod
-    @lru_cache(4)
     def by_code_prefix(cls, prefix: str) -> "ErrorCategories":
         """Get an error category by its code prefix."""
         for entry in cls:

@@ -1,4 +1,3 @@
-import asyncio
 import inspect
 import logging
 import traceback
@@ -6,7 +5,6 @@ import sys
 from types import TracebackType
 from typing import Any, Dict, Optional
 
-from opentrons.drivers.smoothie_drivers.errors import SmoothieAlarm
 from opentrons.protocol_api import ProtocolContext, ParameterContext
 from opentrons.protocol_api._parameters import Parameters
 from opentrons.protocols.execution.errors import ExceptionInProtocolError
@@ -16,8 +14,6 @@ from opentrons.protocol_engine.types import (
     CSVRuntimeParamPaths,
 )
 
-
-from opentrons_shared_data.errors.exceptions import ExecutionCancelledError
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -141,29 +137,45 @@ def exec_run(
     context: ProtocolContext,
     run_time_parameters_with_overrides: Optional[Parameters] = None,
 ) -> None:
-    new_globs: Dict[Any, Any] = {}
-    exec(proto.contents, new_globs)
-    # If the protocol is written correctly, it will have defined a function
-    # like run(context: ProtocolContext). If so, that function is now in the
-    # current scope.
-    filename = _get_filename(proto)
-    if run_time_parameters_with_overrides:
-        context._params = run_time_parameters_with_overrides
+    """Execute protocol run function with enhanced cleanup and traceback management."""
+
+    # Store original modules to restore later
+    original_modules = sys.modules.copy()
+
+    # Store original exception info to restore later
+    original_exc_info = sys.exc_info()
+
+    # Create isolated globals dictionary
+    new_globs: Dict[Any, Any] = {
+        "__builtins__": __builtins__,
+        "__name__": "__main__",
+        "__file__": _get_filename(proto),
+    }
 
     try:
+        # Execute protocol code
+        exec(proto.contents, new_globs)
+
+        # Validate run function
         _runfunc_ok(new_globs.get("run"))
-    except SyntaxError as se:
-        raise MalformedPythonProtocolError(str(se))
 
-    new_globs["__context"] = context
-    try:
+        # Set up parameters if available
+        if run_time_parameters_with_overrides:
+            context._params = run_time_parameters_with_overrides
+
+        # Execute the run function
+        new_globs["__context"] = context
         exec("run(__context)", new_globs)
-    except (
-        SmoothieAlarm,
-        asyncio.CancelledError,
-        ExecutionCancelledError,
-    ):
-        # this is a protocol cancel and shouldn't have special logging
-        raise
+
     except Exception as e:
-        _raise_pretty_protocol_error(exception=e, filename=filename)
+        if hasattr(sys, "exc_clear"):
+            sys.exc_clear()
+
+        raise e.with_traceback(None)
+
+    finally:
+        try:
+            if hasattr(sys, "exc_clear"):
+                sys.exc_clear()
+        except:
+            pass

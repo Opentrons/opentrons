@@ -53,7 +53,6 @@ EMPTY_ORDERED_DICT = OrderedDict(
 )
 
 
-@lru_cache(4)
 def offset_for_mount(
     primary_mount: Union[OT3Mount, Mount],
     left_mount_offset: Point,

@@ -1,5 +1,6 @@
 """A helper for controlling a `ProtocolEngine` without async/await."""
 from asyncio import AbstractEventLoop, run_coroutine_threadsafe
+from logging import getLogger
 from typing import Any, Final, overload
 from typing_extensions import Literal
 
@@ -12,6 +13,8 @@ from ..errors import ProtocolCommandFailedError
 from ..error_recovery_policy import ErrorRecoveryType
 from ..state.state import StateView
 from ..commands import Command, CommandCreate, CommandResult, CommandStatus
+
+_log = getLogger(__name__)
 
 
 class RunStoppedBeforeCommandError(RuntimeError):
@@ -151,10 +154,14 @@ class ChildThreadTransport:
 
             return command
 
-        command = run_coroutine_threadsafe(
-            run_in_pe_thread(),
-            loop=self._loop,
-        ).result()
+        try:
+            command = run_coroutine_threadsafe(
+                run_in_pe_thread(),
+                loop=self._loop,
+            ).result()
+        except Exception as e:
+            _log.warning(f"LEAK Exception during command: {e}")
+            raise e
 
         return command
 

@@ -61,7 +61,6 @@ def get_serial() -> str:
         return "unknown"
 
 
-@lru_cache(maxsize=1)
 def get_boot_id() -> str:
     # See the "/proc Interface" section in man(4) random.
     return Path("/proc/sys/kernel/random/boot_id").read_text().strip()
