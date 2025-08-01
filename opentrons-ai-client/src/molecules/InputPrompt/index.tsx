@@ -27,6 +27,7 @@ import {
   STAGING_CREATE_PROTOCOL_END_POINT,
   STAGING_END_POINT,
   STAGING_UPDATE_PROTOCOL_END_POINT,
+  TRACK_EVENTS,
 } from '/ai-client/resources/constants'
 import { useApiCall } from '/ai-client/resources/hooks'
 import { useAttachFiles } from '/ai-client/resources/hooks/useAttachFiles'
@@ -105,14 +106,14 @@ export function InputPrompt(): JSX.Element {
 
   useEffect(() => {
     if (sendAutoFilledPrompt) {
-      handleClick(true)
+      void handleClick(true)
       setSendAutoFilledPrompt(false)
     }
   }, [watchUserPrompt])
 
   useEffect(() => {
     if (regenerateProtocol.regenerate) {
-      handleClick(regenerateProtocol.isCreateOrUpdateProtocol, true)
+      void handleClick(regenerateProtocol.isCreateOrUpdateProtocol, true)
       setRegenerateProtocol({
         isCreateOrUpdateProtocol: false,
         regenerate: false,
@@ -219,7 +220,7 @@ export function InputPrompt(): JSX.Element {
           const originalMsg = chatHistory[messageIndex]
           if (originalMsg?.attachments) {
             const originalAtt = originalMsg.attachments.find(
-              a => a.name === att.name
+              attachment => attachment.name === att.name
             )
             if (originalAtt?.content) {
               // Use message index in filename for backend association
@@ -252,7 +253,7 @@ export function InputPrompt(): JSX.Element {
       'Content-Type': 'application/json',
     }
 
-    const url = isUpdateOrCreateRequest
+    const targetEndpoint = isUpdateOrCreateRequest
       ? getCreateOrUpdateEndpoint()
       : getChatEndpoint()
 
@@ -286,7 +287,7 @@ export function InputPrompt(): JSX.Element {
       )
 
       return {
-        url,
+        url: targetEndpoint,
         method: 'POST',
         headers,
         data: isUpdateOrCreateRequest
@@ -317,7 +318,7 @@ export function InputPrompt(): JSX.Element {
       },
     ])
     trackEvent({
-      name: 'chat-submitted',
+      name: TRACK_EVENTS.CHAT_SUBMITTED,
       properties: {
         chat: watchUserPrompt,
         protocol_format: protocolFormat,
@@ -385,13 +386,8 @@ export function InputPrompt(): JSX.Element {
       }
     }
 
-    try {
-      await callApi(config)
-      handleSuccessfulSubmission(userInput, currentProtocolFormat)
-    } catch (err: any) {
-      console.error(`error: ${err.message}`)
-      throw err
-    }
+    await callApi(config)
+    handleSuccessfulSubmission(userInput, currentProtocolFormat)
   }
 
   const getCreateOrUpdateEndpoint = (): string => {
@@ -419,7 +415,7 @@ export function InputPrompt(): JSX.Element {
       ])
       setChatData(chatData => [...chatData, assistantResponse])
       trackEvent({
-        name: 'generated-protocol',
+        name: TRACK_EVENTS.GENERATED_PROTOCOL,
         properties: {
           createOrUpdate: isNewProtocol ? 'create' : 'update',
           protocol: reply,

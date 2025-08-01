@@ -18,6 +18,7 @@ import {
   LOCAL_FEEDBACK_END_POINT,
   PROD_FEEDBACK_END_POINT,
   STAGING_FEEDBACK_END_POINT,
+  TRACK_EVENTS,
 } from '/ai-client/resources/constants'
 import { useApiCall } from '/ai-client/resources/hooks'
 import { useTrackEvent } from '/ai-client/resources/hooks/useTrackEvent'
@@ -34,46 +35,41 @@ export function FeedbackModal(): JSX.Element {
   const { callApi } = useApiCall()
 
   const handleSendFeedback = async (): Promise<void> => {
-    try {
-      const headers = {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      }
-
-      const getEndpoint = (): string => {
-        switch (process.env.NODE_ENV) {
-          case 'production':
-            return PROD_FEEDBACK_END_POINT
-          case 'development':
-            return LOCAL_FEEDBACK_END_POINT
-          default:
-            return STAGING_FEEDBACK_END_POINT
-        }
-      }
-
-      const url = getEndpoint()
-
-      const config = {
-        url,
-        method: 'POST',
-        headers,
-        data: {
-          feedbackText: feedbackValue,
-          fake: false,
-        },
-      }
-      await callApi(config as AxiosRequestConfig)
-      trackEvent({
-        name: 'feedback-sent',
-        properties: {
-          feedback: feedbackValue,
-        },
-      })
-      setShowFeedbackModal(false)
-    } catch (err: any) {
-      console.error(`error: ${err.message}`)
-      throw err
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
     }
+
+    const getEndpoint = (): string => {
+      switch (process.env.NODE_ENV) {
+        case 'production':
+          return PROD_FEEDBACK_END_POINT
+        case 'development':
+          return LOCAL_FEEDBACK_END_POINT
+        default:
+          return STAGING_FEEDBACK_END_POINT
+      }
+    }
+
+    const url = getEndpoint()
+
+    const config = {
+      url,
+      method: 'POST',
+      headers,
+      data: {
+        feedbackText: feedbackValue,
+        fake: false,
+      },
+    }
+    await callApi(config as AxiosRequestConfig)
+    trackEvent({
+      name: TRACK_EVENTS.FEEDBACK_SENT,
+      properties: {
+        feedback: feedbackValue,
+      },
+    })
+    setShowFeedbackModal(false)
   }
 
   return (
