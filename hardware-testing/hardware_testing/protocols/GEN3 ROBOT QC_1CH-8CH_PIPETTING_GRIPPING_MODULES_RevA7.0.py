@@ -5,17 +5,32 @@ import random
 
 from opentrons import protocol_api
 from opentrons import types
+from opentrons.protocol_api import ProtocolContext, ParameterContext
+from opentrons.protocol_api.module_contexts import (
+    FlexStackerContext,
+)
 
 metadata = {
     "ctxName": "gripper test with modules",
 }
 
-requirements = {"robotType": "OT-3", "apiLevel": "2.15"}
-
+requirements = {"robotType": "OT-3", "apiLevel": "2.25"}
 
 def run(protocol: protocol_api.ProtocolContext):
     # LABWARE AND MODULES
 
+    # Trash
+    trash = protocol.load_trash_bin(location="A3")
+
+    # STACKERS
+    stacker: FlexStackerContext = protocol.load_module(
+        "flexStackerModuleV1",
+        "B4",  # type: ignore[attr-defined]
+    )
+    stacker.set_stored_labware(
+        load_name="biorad_384_wellplate_50ul",
+        count=1,
+    )
     heatershaker = protocol.load_module("heaterShakerModuleV1", location="D1")
     hs_pcr_adapter = heatershaker.load_adapter("opentrons_96_pcr_adapter")
     hs_deepwell_adapter = protocol.load_adapter(
@@ -35,7 +50,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
     deepwell_plate = mag_block.load_labware("nest_96_wellplate_2ml_deep")
 
-    plate_384_1 = protocol.load_labware("biorad_384_wellplate_50ul", location="C1")
+    # plate_384_1 = protocol.load_labware("biorad_384_wellplate_50ul", location="C1")
     reservoir = protocol.load_labware("nest_12_reservoir_15ml", location="B3")
     tiprack_50 = protocol.load_labware("opentrons_flex_96_tiprack_50ul", location="A2")
     tiprack_200 = protocol.load_labware(
@@ -52,7 +67,8 @@ def run(protocol: protocol_api.ProtocolContext):
     m1000 = protocol.load_instrument(
         "flex_8channel_1000", "right", tip_racks=[tiprack_1000, tiprack_200, tiprack_50]
     )
-
+    plate_384_1 = stacker.retrieve()
+    protocol.move_labware(plate_384_1, "C1", use_gripper=True)
     # # GRIPPER MOVED
     def move_to_new_location(
         labware, slot, p_x_off=0, p_y_off=0, p_z_off=0, d_x_off=0, d_y_off=0, d_z_off=0
