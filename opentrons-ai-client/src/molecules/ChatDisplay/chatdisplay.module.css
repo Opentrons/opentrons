@@ -21,8 +21,7 @@
 .message_container {
   position: relative;
   display: flex;
-  width: fit-content;
-  max-width: 70%;
+  width: 70%;
   flex-direction: column;
   padding: var(--spacing-24);
   border-radius: var(--spacing-12);
