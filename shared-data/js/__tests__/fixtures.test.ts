@@ -689,7 +689,7 @@ describe('getMainNonComboFixtureId', () => {
     expect(result).toEqual(STAGING_AREA_RIGHT_SLOT_FIXTURE)
   })
 
-  it.only('should get main non combo fixture id for flex stacker', () => {
+  it('should get main non combo fixture id for flex stacker', () => {
     const result = getMainNonComboFixtureId(
       [
         FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
@@ -701,5 +701,18 @@ describe('getMainNonComboFixtureId', () => {
       'cutoutD3'
     )
     expect(result).toEqual(FLEX_STACKER_V1_FIXTURE)
+  })
+
+  it.only('should get main non combo fixture id for magnetic block', () => {
+    const result = getMainNonComboFixtureId(
+      [
+        FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
+        MAGNETIC_BLOCK_V1_FIXTURE,
+        STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
+      ],
+      ['magneticBlockV1D3'],
+      'cutoutD3'
+    )
+    expect(result).toEqual(MAGNETIC_BLOCK_V1_FIXTURE)
   })
 })

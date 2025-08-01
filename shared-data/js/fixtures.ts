@@ -1114,7 +1114,10 @@ export const getMainNonComboFixtureId = (
   )
   const aaAreaType = getAAByAAId(addressableAreaIds[0], deckDef).areaType
   if (
-    Object.values(FLEX_MODULE_AA_TYPE_BY_MODEL).includes(aaAreaType as AreaType)
+    Object.values(FLEX_MODULE_AA_TYPE_BY_MODEL).includes(
+      aaAreaType as AreaType
+    ) &&
+    aaAreaType !== 'magneticBlock'
   ) {
     return (
       getMainUsbModuleFixtureIdForComboFixture(compatibleCutoutFixtureIds) ??
