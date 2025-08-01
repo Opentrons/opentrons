@@ -1,5 +1,3 @@
-import pytest
-
 from opentrons.protocol_engine.state._axis_aligned_bounding_box import (
     AxisAlignedBoundingBox3D,
 )
@@ -23,23 +21,3 @@ def test_dimensions() -> None:
     assert result.x_dimension == 8
     assert result.y_dimension == 6
     assert result.z_dimension == 4
-
-
-def test_invalid_input() -> None:
-    """It should raise if any axis's coordinates are backwards."""
-    with pytest.raises(ValueError):
-        AxisAlignedBoundingBox3D(min_x=1, max_x=-1, min_y=0, max_y=0, min_z=0, max_z=0)
-
-    with pytest.raises(ValueError):
-        AxisAlignedBoundingBox3D(min_x=0, max_x=0, min_y=1, max_y=-1, min_z=0, max_z=0)
-
-    with pytest.raises(ValueError):
-        AxisAlignedBoundingBox3D(min_x=0, max_x=0, min_y=0, max_y=0, min_z=1, max_z=-1)
-
-
-def test_zero_input() -> None:
-    """It should allow a zero-sized bounding box."""
-    # Should not raise.
-    AxisAlignedBoundingBox3D(min_x=0, max_x=0, min_y=0, max_y=0, min_z=0, max_z=0)
-    # Should not raise.
-    AxisAlignedBoundingBox3D.from_corners(Point(), Point())

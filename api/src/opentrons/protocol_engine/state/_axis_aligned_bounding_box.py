@@ -34,15 +34,6 @@ class AxisAlignedBoundingBox3D:
             max_z=max(corner_a.z, corner_b.z),
         )
 
-    def __post_init__(self) -> None:
-        """Validate that the input coordinates make sense."""
-        if not (
-            self.min_x <= self.max_x
-            and self.min_y <= self.max_y
-            and self.min_z <= self.max_z
-        ):
-            raise ValueError("Invalid coordinates.", self)
-
     @property
     def x_dimension(self) -> float:
         """Return the dimension along the x-axis."""
