@@ -765,7 +765,7 @@
     },
     "gripperOffsets": {
       "type": "object",
-      "description": "Offsets to add when picking up or dropping another labware stacked atop this one. Do not use this to adjust the position of the gripper paddles relative to this labware or the child labware; use `gripHeightFromLabwareBottom` on this definition or the child's definition for that.",
+      "description": "Offsets to add when picking up or dropping another labware stacked atop this one. Do not use this to adjust the position of the gripper paddles relative to this labware or the child labware; use `gripHeightFromLabwareOrigin` on this definition or the child's definition for that.",
       "additionalProperties": {
         "$ref": "#/definitions/pickUpAndDropOffsets",
         "description": "Properties here are named for, and matched based on, the deck slot that this labware is atop--or, if this labware is atop a module, the deck slot that that module is atop."
@@ -789,9 +789,9 @@
       "type": "number",
       "description": "Force, in Newtons, with which the gripper should grip the labware."
     },
-    "gripHeightFromLabwareBottom": {
+    "gripHeightFromLabwareOrigin": {
       "type": "number",
-      "description": "Recommended Z-height, from labware bottom to the center of gripper pads, when gripping the labware."
+      "description": "Recommended Z-height, from labware origin to the center of gripper pads, when gripping the labware."
     },
     "stackLimit": {
       "type": "number",
