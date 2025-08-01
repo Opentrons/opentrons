@@ -2,7 +2,7 @@ import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/ai-client/__testing-utils__'
-import { TRACK_EVENTS } from '/ai-client/analytics/constants'
+import { ANALYTICS } from '/ai-client/analytics/constants'
 import { feedbackModalAtom } from '/ai-client/resources/atoms'
 
 import { FeedbackModal } from '..'
@@ -81,7 +81,7 @@ describe('FeedbackModal', () => {
     // Then wait for the tracking event to be triggered
     await waitFor(() => {
       expect(mockUseTrackEvent).toHaveBeenCalledWith({
-        name: TRACK_EVENTS.FEEDBACK_SENT,
+        name: ANALYTICS.FEEDBACK_SENT,
         properties: {
           feedback: 'This is a test feedback',
         },

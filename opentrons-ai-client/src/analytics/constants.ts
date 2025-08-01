@@ -1,4 +1,4 @@
-export const TRACK_EVENTS = {
+export const ANALYTICS = {
   // App lifecycle
   APP_OPEN: 'appOpen',
 
@@ -25,4 +25,4 @@ export const TRACK_EVENTS = {
   FEEDBACK_SENT: 'feedback-sent',
 } as const
 
-export type AnalyticsTrackEvent = typeof TRACK_EVENTS[keyof typeof TRACK_EVENTS]
+export type AnalyticsTrackEvent = typeof ANALYTICS[keyof typeof ANALYTICS]

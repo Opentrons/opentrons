@@ -15,7 +15,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { TRACK_EVENTS } from '/ai-client/analytics/constants'
+import { ANALYTICS } from '/ai-client/analytics/constants'
 import { feedbackModalAtom, tokenAtom } from '/ai-client/resources/atoms'
 import {
   LOCAL_FEEDBACK_END_POINT,
@@ -74,7 +74,7 @@ export function FeedbackModal(): JSX.Element {
       if (!error && data) {
         // Success - track event and close modal
         trackEvent({
-          name: TRACK_EVENTS.FEEDBACK_SENT,
+          name: ANALYTICS.FEEDBACK_SENT,
           properties: {
             feedback: feedbackValue,
           },

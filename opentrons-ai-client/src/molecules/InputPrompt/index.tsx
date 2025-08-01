@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 import { COLORS, StyledText, TYPOGRAPHY } from '@opentrons/components'
 
-import { TRACK_EVENTS } from '/ai-client/analytics/constants'
+import { ANALYTICS } from '/ai-client/analytics/constants'
 import { AttachedFileItem } from '/ai-client/atoms/AttachedFileItem'
 import { AttachFileButton } from '/ai-client/atoms/AttachFileButton'
 import { SendButton } from '/ai-client/atoms/SendButton'
@@ -318,7 +318,7 @@ export function InputPrompt(): JSX.Element {
       },
     ])
     trackEvent({
-      name: TRACK_EVENTS.CHAT_SUBMITTED,
+      name: ANALYTICS.CHAT_SUBMITTED,
       properties: {
         chat: watchUserPrompt,
         protocol_format: protocolFormat,
@@ -420,7 +420,7 @@ export function InputPrompt(): JSX.Element {
         ])
         setChatData(chatData => [...chatData, assistantResponse])
         trackEvent({
-          name: TRACK_EVENTS.GENERATED_PROTOCOL,
+          name: ANALYTICS.GENERATED_PROTOCOL,
           properties: {
             createOrUpdate: isNewProtocol ? 'create' : 'update',
             protocol: reply,
