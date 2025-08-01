@@ -350,11 +350,95 @@ async def calibrate_tiprack(api, mount) -> Point:
                         tiprack_loc_dict[Axis.by_mount(mount)])
     return tiprack_loc
 
+async def carlos_liquid_probe(api, mount, probe_settings, details):
+    data_dir = get_testing_data_directory()
+    probes: List[InstrumentProbeType] = [InstrumentProbeType.PRIMARY]
+    probe_target: InstrumentProbeType = InstrumentProbeType.PRIMARY
+    if args.nozzles > 1:
+        probes.append(InstrumentProbeType.SECONDARY)
+        probe_target = InstrumentProbeType.BOTH
+    data_files: Dict[InstrumentProbeType, str] = {}
+    data_capture: PipetteSensorResponseQueue = PipetteSensorResponseQueue()
+    for probe in probes:
+        data_filename = f"pressure_sensor_data-trial{details[0]}-tip{details[1]}-{probe.name}.csv"
+        data_file = f"{data_dir}/dead_volume/{data_filename}"
+        ui.print_info(f"logging pressure data to {data_file}")
+        data_files[probe] = data_file
+    # We need to use this probe function to find the bottom
+    z_height= await api.liquid_probe(mount=mount,
+                            max_z_dist = 50,
+                            probe_settings=probe_settings,
+                            probe=InstrumentProbeType.PRIMARY,
+                            force_both_sensors=False,
+                            response_queue=data_capture
+                            )
+    result: LLDResult = LLDResult.success
+    print(f"Deck Coordinate Z Height: {z_height}")
+    for probe in probes:
+            sensor_id = (
+                PipetteSensorId.S0
+                if probe == InstrumentProbeType.PRIMARY
+                else PipetteSensorId.S1
+            )
+            as_dict = data_capture.get_nowait()
+            data = [d.to_float() for d in as_dict[sensor_id]]
+            print(data)
+            with open(data_files[probe], "w") as d_file:
+                writer = csv.writer(d_file)
+                writer.writerow(
+                    [
+                        "time(s)",
+                        "Pressure(pascals)",
+                        "z_velocity(mm/s)",
+                        "plunger_velocity(mm/s)",
+                        "threshold(pascals)",
+                    ]
+                )
+                writer.writerow(
+                    [
+                        "0",
+                        "0",
+                        f"{probe_settings.mount_speed}",
+                        f"{probe_settings.plunger_speed}",
+                        f"{args.pressure_threshold}",
+                    ]
+                )
+                for i in range(len(data)):
+                    writer.writerow([f"{i*0.004}", f"{data[i]}"])
+    for probe in data_files:
+        if _test_for_blockage(data_files[probe], probe_settings.sensor_threshold_pascals):
+            result = LLDResult.blockage
+            break
+    return z_height
+
+async def find_pickup_height(api, mount, pickup_location) -> float:
+    cp = CriticalPoint.NOZZLE
+    await move_to_point(api, mount, pickup_location, cp)
+    prep_target = Point(x=pickup_location.x+RADIUS,
+                            y=pickup_location.y,
+                            z=pickup_location.z+PREP_PRESS_DISTANCE)
+
+    await move_direct(api, mount, prep_target, cp)   
+    async with api._backend.motor_current(run_currents={Axis.by_mount(mount): TIP_PRESS_MOTOR_CURRENT}):       
+        target = Point(x=pickup_location.x+RADIUS, 
+                        y=pickup_location.y, 
+                        z=pickup_location.z-PRESS_DISTANCE)
+        await api.move_to(mount=mount, 
+                            abs_position=target, 
+                            speed=10, 
+                            critical_point=CriticalPoint.NOZZLE,
+                            max_speeds=None,
+                            expect_stalls=True)
+    await api._update_position_estimation([Axis.by_mount(mount)])
+    init_tipoverlap = (await api.encoder_current_position_ot3(mount, cp, refresh=True))[Axis.by_mount(mount)]
+    print(f'init_tipoverlap: {init_tipoverlap}')
+    return init_tipoverlap
+
 async def _main(args: argparse.Namespace, cfg: TestConfig) -> None:
     today = datetime.date.today()
     probe_settings = LiquidProbeSettings(
-                            mount_speed=3,
-                            plunger_speed=5,
+                            mount_speed=args.mount_speed,
+                            plunger_speed=args.plunger_speed,
                             plunger_impulse_time=0.4,
                             sensor_threshold_pascals=args.pressure_threshold,
                             aspirate_while_sensing=True,
@@ -372,7 +456,6 @@ async def _main(args: argparse.Namespace, cfg: TestConfig) -> None:
     fw = hw_api.get_fw_version()
     print(f'fw version: {fw}')
     await hw_api.cache_instruments()
-    
     attached_instr = hw_api.get_all_attached_instr()[mount]
     if attached_instr is not None and mount in attached_instr:
         pipette_model = attached_instr[mount.value]["pipette_id"]
@@ -418,12 +501,15 @@ async def _main(args: argparse.Namespace, cfg: TestConfig) -> None:
             await move_direct(hw_api, mount, pickup_location, cp)
             # This would be my initial press position
             # the first tip overlap value passed to pickup tip is a placeholder
-            tip_overlap_dict = await hw_api.pick_up_tip(
+            tip_length = tip_length_dict[args.tip_size] 
+            tip_overlap = tip_overlap_dict[args.tip_size]
+            print(f'tip_length: {tip_length}')
+            TipOverlap_dict = await hw_api.pick_up_tip(
                                         mount, 
-                                        tip_length=(tip_length[args.tip_size]-tip_overlap))
+                                        tip_length=(tip_length-tip_overlap))
             print(f'Init Position: {init_tipoverlap}')
-            print(f'tip_overlap_dict: {tip_overlap_dict}')
-            enc_tipoverlap =  (tip_overlap_dict['init'] - tip_overlap_dict['final'])+args.press_comp
+            print(f'tip_overlap_dict: {TipOverlap_dict}')
+            enc_tipoverlap =  (TipOverlap_dict['init'] - TipOverlap_dict['final'])
             print(f'TipOverlap(mm): {enc_tipoverlap}')
             tip_overlap_measurements.append(enc_tipoverlap)
             instr = hw_api._pipette_handler.get_pipette(mount)
@@ -434,7 +520,7 @@ async def _main(args: argparse.Namespace, cfg: TestConfig) -> None:
             new_tipL = instr.current_tip_length
             instr.remove_tip()
             print(f'new_current end effector: {new_tipL}')
-            instr.add_tip((tip_length[args.tip_size]-enc_tipoverlap))
+            instr.add_tip((tip_length-enc_tipoverlap))
 
         else:
             x = deck_slot['deck_slot'][args.tiprack_slot][Axis.X.name] 
@@ -458,21 +544,22 @@ async def _main(args: argparse.Namespace, cfg: TestConfig) -> None:
                                     expect_stalls=True)
             await hw_api._update_position_estimation([Axis.by_mount(mount)])
             init_tipoverlap = (await hw_api.encoder_current_position_ot3(mount, cp, refresh=True))[Axis.by_mount(mount)]
-            # init_tipoverlap = init_tipoverlap[Axis.by_mount(mount)]
             print(f'init_tipoverlap: {init_tipoverlap}')
             pickup_location = Point(x=pickup_loc.x, y=pickup_loc.y,z=init_tipoverlap) 
             # Let's pressed onto the tip -> stall and measure the encoder position
             await move_direct(hw_api, mount, pickup_location, cp)
             # This would be my initial press position
             # the first tip overlap value passed to pickup tip is a placeholder
-            tip_overlap_dict = await hw_api.pick_up_tip(
+            TipOverlap_position = await hw_api.pick_up_tip(
                                         mount, 
-                                        tip_length=(tip_length[args.tip_size]-tip_overlap))
+                                        tip_length=(tip_length-tip_overlap))
             print(f'Init Position: {init_tipoverlap}')
             print(f'tip_overlap_dict: {tip_overlap_dict}')
-            enc_tipoverlap =  (tip_overlap_dict['init'] - tip_overlap_dict['final'])+args.press_comp
+            enc_tipoverlap =  (TipOverlap_position['init'] - TipOverlap_position['final'])
             print(f'TipOverlap(mm): {enc_tipoverlap}')
             await hw_api.home([Axis.by_mount(mount)])
+
+
 
         cp = CriticalPoint.TIP
         current_position = await hw_api.current_position_ot3(mount, cp)
@@ -490,170 +577,165 @@ async def _main(args: argparse.Namespace, cfg: TestConfig) -> None:
         deck_slot['deck_slot']['C2'][Axis.Y.name] = start_height.y
         deck_slot['deck_slot']['C2']['Z'] = start_height.z
         save_config_(path+cal_fn, deck_slot)
-        data_dir = get_testing_data_directory()
-        probes: List[InstrumentProbeType] = [InstrumentProbeType.PRIMARY]
-        probe_target: InstrumentProbeType = InstrumentProbeType.PRIMARY
-        if args.nozzles > 1:
-            probes.append(InstrumentProbeType.SECONDARY)
-            probe_target = InstrumentProbeType.BOTH
-        data_files: Dict[InstrumentProbeType, str] = {}
-        data_capture: PipetteSensorResponseQueue = PipetteSensorResponseQueue()
-        for probe in probes:
-            data_filename = f"pressure_sensor_data-trial{1}-tip{1}-{probe.name}.csv"
-            data_file = f"{data_dir}/dead_volume/1/{data_filename}"
-            ui.print_info(f"logging pressure data to {data_file}")
-            data_files[probe] = data_file
-        # We need to use this probe function to find the bottom
-        z_height= await hw_api.liquid_probe(mount=mount,
-                                max_z_dist = 50,
-                                probe_settings=probe_settings,
-                                probe=InstrumentProbeType.PRIMARY,
-                                force_both_sensors=False,
-                                response_queue=data_capture
-                                )
-        result: LLDResult = LLDResult.success
-        print(f"Deck Coordinate Z Height: {z_height}")
-        for probe in probes:
-                sensor_id = (
-                    PipetteSensorId.S0
-                    if probe == InstrumentProbeType.PRIMARY
-                    else PipetteSensorId.S1
-                )
-                as_dict = data_capture.get_nowait()
-                data = [d.to_float() for d in as_dict[sensor_id]]
-                print(data)
-                with open(data_files[probe], "w") as d_file:
-                    writer = csv.writer(d_file)
-                    writer.writerow(
-                        [
-                            "time(s)",
-                            "Pressure(pascals)",
-                            "z_velocity(mm/s)",
-                            "plunger_velocity(mm/s)",
-                            "threshold(pascals)",
-                        ]
-                    )
-                    writer.writerow(
-                        [
-                            "0",
-                            "0",
-                            f"{probe_settings.mount_speed}",
-                            f"{probe_settings.plunger_speed}",
-                            f"{args.pressure_threshold}",
-                        ]
-                    )
-                    for i in range(len(data)):
-                        writer.writerow([f"{i*0.004}", f"{data[i]}"])
-        for probe in data_files:
-            if _test_for_blockage(data_files[probe], probe_settings.sensor_threshold_pascals):
-                result = LLDResult.blockage
-                break
-        await hw_api._update_position_estimation()
-        hw_api._pipette_handler.ready_for_tip_action(
-            instr, HardwareAction.PREPARE_ASPIRATE, OT3Mount.from_mount(mount)
-        )
-        current_position = await hw_api.encoder_current_position_ot3(mount, 
-                                                                    cp,
-                                                                    refresh=True)
-        z_position = current_position[Axis.by_mount(mount)]
-        pip_position  = current_position[Axis.of_main_tool_actuator(mount)]
-        print(f"Pipette Position: {pip_position}")
-        print(f"Z position: {z_position}")
-        aspirate_spec = hw_api._pipette_handler.plan_check_aspirate(
-            mount = OT3Mount.from_mount(mount),
-            volume = 10.0,
-            rate=1.0,
-            correction_volume = 0.0,
-        )
-        target_pos = target_position_from_plunger(
-            OT3Mount.from_mount(mount),
-            aspirate_spec.plunger_distance,
-            hw_api._current_position,
-        )
-        offset = 20
-        print(f"plunger_pos: {target_pos}")
-        retract_point = Point(x = current_position[Axis.X], 
-                                y = current_position[Axis.Y],
-                                z = z_position + offset)
-        await hw_api.move_to(mount = mount,
-                             abs_position = retract_point,
-                             speed= None,
-                             critical_point=cp)
         
-        input("Press Enter")
-        bottom_offset = 0.1
-        aspirate_pos = Point(x = current_position[Axis.X], 
-                            y = current_position[Axis.Y],
-                            z = z_position + bottom_offset)
-        await hw_api.move_to(mount = mount,
-                             abs_position = aspirate_pos,
-                             speed = None,
-                             critical_point=cp)
-        ul_per_mm = instr.ul_per_mm(10, 'aspirate')
-        c_volume = ul_per_mm*(instr.plunger_positions.bottom-pip_position)
-        aspirate_spec.instr.set_current_volume(0)
-        aspirate_spec.instr.add_current_volume(c_volume)
-        print(f'current volume: {instr.current_volume}')
-        await hw_api.refresh_positions()
-        for num in range(1, 3): 
-            await hw_api.aspirate(mount = mount,
-                                volume = 20,
-                                rate=1.0)
+        total_tips = 96
+        x_coord_offset = 0
+        y_coord_offset = 0
+        true_tip_count = 1
+        trial = 1
+        num_of_columns = args.num_cols
+        measurements = []
+        for tip in range(1, total_tips+1):
+            z_height = await carlos_liquid_probe(hw_api, mount, probe_settings, details)
+            measurements.append(z_height)
+            print(f'Measurements: {z_height}')
+            print(f'TipOverlap:{tip_overlap_measurements}')
+            await hw_api._update_position_estimation()
+            hw_api._pipette_handler.ready_for_tip_action(
+                instr, HardwareAction.PREPARE_ASPIRATE, OT3Mount.from_mount(mount)
+            )
+            current_position = await hw_api.encoder_current_position_ot3(mount, 
+                                                                        cp,
+                                                                        refresh=True)
+            z_position = current_position[Axis.by_mount(mount)]
+            pip_position  = current_position[Axis.of_main_tool_actuator(mount)]
+            print(f"Pipette Position: {pip_position}")
+            print(f"Z position: {z_position}")
+            aspirate_spec = hw_api._pipette_handler.plan_check_aspirate(
+                mount = OT3Mount.from_mount(mount),
+                volume = 10.0,
+                rate=1.0,
+                correction_volume = 0.0,
+            )
+            target_pos = target_position_from_plunger(
+                OT3Mount.from_mount(mount),
+                aspirate_spec.plunger_distance,
+                hw_api._current_position,
+            )
+            offset = 20
+            print(f"plunger_pos: {target_pos}")
+            retract_point = Point(x = current_position[Axis.X], 
+                                    y = current_position[Axis.Y],
+                                    z = z_position + offset)
+            await hw_api.move_to(mount = mount,
+                                abs_position = retract_point,
+                                speed= None,
+                                critical_point=cp)
+            
             input("Press Enter")
-            # Retract from source well
-            retract_point = Point(x = current_position[Axis.X], 
-                                    y = current_position[Axis.Y],
-                                    z = z_position + offset)
-            await hw_api.move_to(mount = mount,
-                                abs_position = retract_point,
-                                speed= None,
-                                critical_point=cp)
-            # Move to next well
-            move_to_next = Point(x = current_position[Axis.X], 
-                                    y = current_position[Axis.Y] + 9,
-                                    z = z_position + offset)
-            await hw_api.move_to(mount = mount,
-                                abs_position = move_to_next,
-                                speed= None,
-                                critical_point=cp)
-            # Dispense to next well
-            dispense_pos = Point(x = current_position[Axis.X], 
-                            y = current_position[Axis.Y] + 9,
-                            z = z_position + bottom_offset)
-            await hw_api.move_to(mount = mount,
-                                abs_position = dispense_pos,
-                                speed= None,
-                                critical_point=cp)
-            await hw_api.dispense(mount = mount,
-                                  volume=20+instr.current_volume,
-                                  is_full_dispense = True)
-            # Retact from destination well
-            await hw_api.move_to(mount = mount,
-                                abs_position = move_to_next,
-                                speed= None,
-                                critical_point=cp)
-            # Move to Source Well
-            retract_point = Point(x = current_position[Axis.X], 
-                                    y = current_position[Axis.Y],
-                                    z = z_position + offset)
-            await hw_api.move_to(mount = mount,
-                                abs_position = retract_point,
-                                speed= None,
-                                critical_point=cp)
-            await hw_api.prepare_for_aspirate(mount)
-            # Aspirate 
+            bottom_offset = 0.1
             aspirate_pos = Point(x = current_position[Axis.X], 
-                                    y = current_position[Axis.Y],
-                                    z = z_position + bottom_offset)
+                                y = current_position[Axis.Y],
+                                z = z_position + bottom_offset)
             await hw_api.move_to(mount = mount,
                                 abs_position = aspirate_pos,
-                                speed= None,
+                                speed = None,
                                 critical_point=cp)
+            ul_per_mm = instr.ul_per_mm(10, 'aspirate')
+            c_volume = ul_per_mm*(instr.plunger_positions.bottom-pip_position)
+            aspirate_spec.instr.set_current_volume(0)
+            aspirate_spec.instr.add_current_volume(c_volume)
+            print(f'current volume: {instr.current_volume}')
+            await hw_api.refresh_positions()
+            for num in range(1, 3): 
+                await hw_api.aspirate(mount = mount,
+                                    volume = 20,
+                                    rate=1.0)
+                # Retract from source well
+                retract_point = Point(x = current_position[Axis.X], 
+                                        y = current_position[Axis.Y],
+                                        z = z_position + offset)
+                await hw_api.move_to(mount = mount,
+                                    abs_position = retract_point,
+                                    speed= None,
+                                    critical_point=cp)
+                # Move to next well
+                move_to_next = Point(x = current_position[Axis.X] + 9, 
+                                        y = current_position[Axis.Y],
+                                        z = z_position + offset)
+                await hw_api.move_to(mount = mount,
+                                    abs_position = move_to_next,
+                                    speed= None,
+                                    critical_point=cp)
+                # Dispense to next well
+                dispense_pos = Point(x = current_position[Axis.X] + 9, 
+                                y = current_position[Axis.Y],
+                                z = z_position + bottom_offset)
+                await hw_api.move_to(mount = mount,
+                                    abs_position = dispense_pos,
+                                    speed= None,
+                                    critical_point=cp)
+                await hw_api.dispense(mount = mount,
+                                    volume=20+instr.current_volume,
+                                    is_full_dispense = True)
+                # Retact from destination well
+                await hw_api.move_to(mount = mount,
+                                    abs_position = move_to_next,
+                                    speed= None,
+                                    critical_point=cp)
+                # Move to Source Well
+                retract_point = Point(x = current_position[Axis.X], 
+                                        y = current_position[Axis.Y],
+                                        z = z_position + offset)
+                await hw_api.move_to(mount = mount,
+                                    abs_position = retract_point,
+                                    speed= None,
+                                    critical_point=cp)
+                await hw_api.prepare_for_aspirate(mount)
+                # Aspirate 
+                aspirate_pos = Point(x = current_position[Axis.X], 
+                                        y = current_position[Axis.Y],
+                                        z = z_position + bottom_offset)
+                await hw_api.move_to(mount = mount,
+                                    abs_position = aspirate_pos,
+                                    speed= None,
+                                    critical_point=cp)
+            # Return tip
+            drop_tip_location =  Point(pickup_location.x,
+                                       pickup_location.y,
+                                       pickup_location.z-(tip_length-tip_length*0.5))
+            await move_to_point(hw_api, mount, drop_tip_location, cp)
+            await hw_api.drop_tip(mount)
+            cp = CriticalPoint.NOZZLE
+            x_dir, y_dir = (1, -1)
+            true_tip_count += 1
+            y_coord_offset = y_coord_offset + y_dir*9
+            if true_tip_count % 9 == 0:
+                x_coord_offset = x_coord_offset + x_dir*9
+                y_coord_offset = 0
+                y_dir = 0
+                true_tip_count = 1
             
+            pickup_location = Point(pickup_loc[0] + x_coord_offset,
+                                    pickup_loc[1] + y_coord_offset,
+                                    pickup_loc[2])
+            print(f'pick up location: {pickup_location}')
 
+            init_tip_loc = await find_pickup_height(hw_api, mount, pickup_location)
+            TipOverlap_dict = await hw_api.pick_up_tip(mount,
+                                    tip_length=(tip_length-tip_overlap),
+                                    presses = 1,
+                                    increment = 0)
+            print(f'Init Position: {init_tipoverlap}')
+            print(f'Tip overlap positions: {TipOverlap_dict}')
+            enc_tipoverlap = (init_tip_loc - TipOverlap_dict['final'])
+            print(f'Enc TipOverlap: {enc_tipoverlap}')
+            tip_overlap_measurements.append(enc_tipoverlap)
+            instr = hw_api._pipette_handler.get_pipette(mount)
+            print(f'current_tipL: {instr.current_tip_length}')
+            new_tipL = (tip_length-enc_tipoverlap)
+            print(f'new_current_tipL: {new_tipL}')
+            tip_overlap_measurements.append(new_tipL)
+            hw_api.remove_tip()
+            hw_api.add_tip(new_tipL)
+            cp = CriticalPoint.TIP
+            current_position = await hw_api.current_position_ot3(mount, cp)
+
+            well_location = Point(lw_point[0] + x_coord_offset,
+                                    lw_point[1] + y_coord_offset,
+                                    lw_point[2])
+            await move_to_point(hw_api, mount, well_location, cp)
             
-
-
     except Exception as e:
         await hw_api.disengage_axes([Axis.X, Axis.Y])
         raise("Error: {e}")
@@ -695,6 +777,8 @@ if __name__ == "__main__":
     parser.add_argument("--tip_size", type=str, default="T50", help="Tip Size")
     parser.add_argument("--nozzles", type=int, default=1)
     parser.add_argument("--press_comp", type=float, default = 0.0)
+    parser.add_argument("--mount_speed", type=int, default = 3)
+    parser.add_argument("--plunger_speed", type=int, default = 5)
     parser.add_argument("--pipette", type=int, choices=[50, 200, 1000], default=50)
     parser.add_argument("--method", type=str, choices=["one", "eight", "every"], default="every")
     parser.add_argument("--pressure_threshold", type=int, default=1000)
@@ -711,9 +795,9 @@ if __name__ == "__main__":
     else:
         with open(path + cal_fn, 'r') as openfile:
             deck_slot = json.load(openfile)
-    tip_length = {"T1K": 95.6, "T200": 58.35, "T50": 57.9}
-    tip_overlap = {"T1K": 9.651, "T200": 9.759, "T50": 10.088}
-    tip_overlap = tip_overlap[args.tip_size]
+    tip_length_dict = {"T1K": 95.6, "T200": 58.35, "T50": 57.9}
+    tip_overlap_dict = {"T1K": 9.651, "T200": 9.759, "T50": 10.088}
+    tip_overlap = tip_overlap_dict[args.tip_size]
     if args.mount == "left":
         mount = OT3Mount.LEFT
     else:
