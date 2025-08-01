@@ -126,7 +126,7 @@ export function useDispenseSettingsConfig({
         ) {
           setSelectedSetting('dispense_mix')
         } else {
-          makeSnackbar(t('advanced_setting_disabled') as string)
+          makeSnackbar(t('dispense_setting_disabled') as string)
         }
       },
     },
@@ -168,7 +168,7 @@ export function useDispenseSettingsConfig({
       enabled: state.transferType !== 'distribute',
       onClick: () => {
         if (state.transferType === 'distribute') {
-          makeSnackbar(t('advanced_setting_disabled') as string)
+          makeSnackbar(t('dispense_setting_disabled') as string)
         } else {
           setSelectedSetting('dispense_blow_out')
         }
@@ -191,7 +191,11 @@ export function useDispenseSettingsConfig({
           : t('option_disabled'),
       enabled: isMultiTransfer,
       onClick: () => {
-        setSelectedSetting('dispense_disposal_volume')
+        if (isMultiTransfer) {
+          setSelectedSetting('dispense_disposal_volume')
+        } else {
+          makeSnackbar(t('dispense_setting_disabled') as string)
+        }
       },
     },
     {
