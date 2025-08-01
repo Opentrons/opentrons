@@ -842,9 +842,14 @@ def reset_retract_discontinuity(fixture_settings: FixtureSettings) -> None:
     if _should_alter_discontinuity(fixture_settings):
         hw_api = fixture_settings.ctx._core.get_hardware()
         if fixture_settings.pipette_channels == 96:
-            hw_api.config.motion_settings.max_speed_discontinuity.high_throughput[
-                OT3AxisKind.Z
-            ] = DEFAULT_MAX_SPEED_DISCONTINUITY.high_throughput[OT3AxisKind.Z]
+            if fixture_settings.pipette_volume == 200:
+                hw_api.config.motion_settings.max_speed_discontinuity.high_throughput[
+                    OT3AxisKind.Z
+                ] = DEFAULT_MAX_SPEED_DISCONTINUITY.high_throughput_200[OT3AxisKind.Z]
+            else:
+                hw_api.config.motion_settings.max_speed_discontinuity.high_throughput[
+                    OT3AxisKind.Z
+                ] = DEFAULT_MAX_SPEED_DISCONTINUITY.high_throughput_1000[OT3AxisKind.Z]
         else:
             hw_api.config.motion_settings.max_speed_discontinuity.low_throughput[
                 OT3AxisKind.Z
