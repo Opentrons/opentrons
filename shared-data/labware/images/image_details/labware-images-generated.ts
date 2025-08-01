@@ -15,6 +15,8 @@ import corning_96_wellplate_360ul_flat_three_quarters from '../corning_96_wellpl
 import corning_384_wellplate_112ul_flat_photo_three_quarters from '../corning_384_wellplate_112ul_flat_photo_three_quarters.jpg'
 import eppendorf_1_5ml_safelock_snapcap from '../eppendorf_1.5ml_safelock_snapcap.jpg'
 import eppendorf_2ml_safelock_snapcap from '../eppendorf_2ml_safelock_snapcap.jpg'
+import eppendorf_96_tiprack_10ul_eptips from '../eppendorf_96_tiprack_10ul_eptips.jpg'
+import eppendorf_96_tiprack_1000ul_eptips from '../eppendorf_96_tiprack_1000ul_eptips.jpg'
 import ev_resin_tips_flex_96_labware from '../ev_resin_tips_flex_96_labware.png'
 import ev_resin_tips_flex_96_tiprack_adapter from '../ev_resin_tips_flex_96_tiprack_adapter.png'
 import ev_resin_tips_flex_short_adapter from '../ev_resin_tips_flex_short_adapter.png'
@@ -100,6 +102,8 @@ export const labwareImages: Record<string, string[]> = {
   corning_96_wellplate_360ul_flat: [
     corning_96_wellplate_360ul_flat_three_quarters,
   ],
+  eppendorf_96_tiprack_1000ul_eptips: [eppendorf_96_tiprack_1000ul_eptips],
+  eppendorf_96_tiprack_10ul_eptips: [eppendorf_96_tiprack_10ul_eptips],
   ev_resin_tips_flex_96_labware: [ev_resin_tips_flex_96_labware],
   ev_resin_tips_flex_96_tiprack_adapter: [
     ev_resin_tips_flex_96_tiprack_adapter,
