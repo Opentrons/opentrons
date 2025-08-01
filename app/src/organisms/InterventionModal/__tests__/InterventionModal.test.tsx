@@ -2,7 +2,10 @@ import { fireEvent, renderHook, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { RUN_STATUS_RUNNING, RUN_STATUS_STOPPED } from '@opentrons/api-client'
-import { getLabwareDefURI } from '@opentrons/shared-data'
+import {
+  getLabwareDefURI,
+  GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
+} from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -247,6 +250,44 @@ describe('InterventionModal', () => {
     screen.getByText('mockLabware')
     screen.queryAllByText('A1')
     screen.queryAllByText('C1')
+  })
+
+  it('renders a move labware intervention modal given a move labware command into waste chute', () => {
+    props = {
+      ...props,
+      command: {
+        id: 'mockMoveLabwareCommandId',
+        key: 'mockMoveLabwareCommandKey',
+        commandType: 'moveLabware',
+        params: {
+          labwareId: 'mockLabwareId',
+          newLocation: {
+            addressableAreaName: GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
+          },
+          strategy: 'manualMoveWithPause',
+        },
+        startedAt: 'fake_timestamp',
+        completedAt: 'fake_timestamp',
+        createdAt: 'fake_timestamp',
+        status: 'succeeded',
+      },
+      run: {
+        labware: [
+          {
+            id: 'mockLabwareId',
+            displayName: 'mockLabwareInStagingArea',
+            location: { slotName: 'B4' },
+            definitionUri: getLabwareDefURI(mockTipRackDefinition),
+          },
+        ],
+        modules: [],
+      } as any,
+    }
+    render(props)
+    screen.getByText('Labware name')
+    screen.getByText('mockLabwareInStagingArea')
+    screen.queryAllByText('B4')
+    screen.queryAllByText('Waste Chute')
   })
 
   it('renders an empty stacker modal', () => {

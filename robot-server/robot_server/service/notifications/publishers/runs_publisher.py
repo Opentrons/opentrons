@@ -31,6 +31,7 @@ class _EngineStateSlice:
     current_command: Optional[CommandPointer] = None
     recovery_target_command: Optional[CommandPointer] = None
     state_summary_status: Optional[EngineStatus] = None
+    state_summary_labware_offset_count: Optional[int] = None
 
 
 class RunsPublisher:
@@ -49,7 +50,7 @@ class RunsPublisher:
             [
                 self._handle_current_command_change,
                 self._handle_recovery_target_command_change,
-                self._handle_engine_status_change,
+                self._handle_relevant_engine_change,
             ]
         )
 
@@ -145,20 +146,30 @@ class RunsPublisher:
                     new_recovery_target_command
                 )
 
-    async def _handle_engine_status_change(self) -> None:
-        """Publish a refetch flag if the engine status has changed."""
+    async def _handle_relevant_engine_change(self) -> None:
+        """Publish a refetch flag if relevant engine changes occur."""
         if self._run_hooks is not None and self._engine_state_slice is not None:
             new_state_summary = self._run_hooks.get_state_summary(
                 self._run_hooks.run_id
             )
 
-            if (
-                new_state_summary is not None
-                and self._engine_state_slice.state_summary_status
-                != new_state_summary.status
-            ):
-                self.publish_runs_advise_refetch(run_id=self._run_hooks.run_id)
-                self._engine_state_slice.state_summary_status = new_state_summary.status
+            if new_state_summary is not None:
+                if (
+                    self._engine_state_slice.state_summary_status
+                    != new_state_summary.status
+                ):
+                    self.publish_runs_advise_refetch(run_id=self._run_hooks.run_id)
+                    self._engine_state_slice.state_summary_status = (
+                        new_state_summary.status
+                    )
+
+                elif self._engine_state_slice.state_summary_labware_offset_count != len(
+                    new_state_summary.labwareOffsets
+                ):
+                    self.publish_runs_advise_refetch(run_id=self._run_hooks.run_id)
+                    self._engine_state_slice.state_summary_labware_offset_count = len(
+                        new_state_summary.labwareOffsets
+                    )
 
 
 _runs_publisher_accessor: AppStateAccessor[RunsPublisher] = AppStateAccessor[

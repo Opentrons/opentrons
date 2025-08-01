@@ -54,6 +54,7 @@ export function PipettingSubsteps(props: PipettingSubstepsProps): JSX.Element {
       })
     : substeps.rows.map((row, substepIndex) => (
         <Substep
+          isNested={false}
           trashName={trashName}
           key={substepIndex}
           selectSubstep={selectSubstep}

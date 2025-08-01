@@ -23,6 +23,7 @@ import {
   curryCommandCreator,
   curryWithoutPython,
   DEST_WELL_BLOWOUT_DESTINATION,
+  formatChangeTipArg,
   formatPyStr,
   getIsRetractSafeForAirGap,
   getIsSafePipetteMovement,
@@ -225,21 +226,24 @@ export const distribute: CommandCreator<DistributeArgs> = (
     pythonName: pythonPipetteName,
   } = pipetteEntities[pipette]
 
-  const liquidClassValuesForTip = getAllLiquidClassDefs()
-    [
-      liquidClass === NONE_LIQUID_CLASS_NAME || liquidClass == null
-        ? WATER_LIQUID_CLASS_NAME
-        : liquidClass
-    ].byPipette?.find(
-      ({ pipetteModel }) => (pipetteModel = getFlexNameConversion(pipetteSpecs))
-    )
-    ?.byTipType.find(({ tiprack }) => tiprack === tiprackDefUri)
+  const liquidClassValuesForTip =
+    getAllLiquidClassDefs()
+      [
+        liquidClass === NONE_LIQUID_CLASS_NAME || liquidClass == null
+          ? WATER_LIQUID_CLASS_NAME
+          : liquidClass
+      ].byPipette?.find(
+        ({ pipetteModel }) =>
+          pipetteModel === getFlexNameConversion(pipetteSpecs)
+      )
+      ?.byTipType.find(({ tiprack }) => tiprack === tiprackDefUri) ?? null
   const { aspirate, multiDispense } = liquidClassValuesForTip ?? {}
   const { multiWellHandling } = getTransferPlanAndReferenceVolumes({
     pipetteSpecs,
     tiprackDefinition,
     volume,
     path: 'multiDispense',
+    numAspirateWells: 1,
     numDispenseWells: destWells.length,
     conditioningByVolume: (multiDispense?.conditioningByVolume ?? []) as Array<
       [number, number]
@@ -345,16 +349,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
       errors,
     }
 
-  const aspirateCorrectionVolume =
-    getByVolumeValue({
-      liquidClass,
-      pipetteSpecs,
-      tiprackDefUri: tipRack,
-      targetVolume: volume,
-      liquidHandlingAction: 'aspirate',
-      byVolumeProperty: 'correctionByVolume',
-      defaultValue: 0,
-    }) ?? 0
   const dispenseCorrectionVolumeForDestination =
     getByVolumeValue({
       liquidClass,
@@ -393,8 +387,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
         ? getFlexNameConversion(pipetteSpecs)
         : pipetteName,
       tiprackUri: tipRack,
-      aspirateCorrectionVolume: aspirateCorrectionVolume,
-      dispenseCorrectionVolume: dispenseCorrectionVolumeForDestination,
+      liquidClassValuesForTip,
     })}`,
   ]
   const customLiquidClass = `${PROTOCOL_CONTEXT_NAME}.define_liquid_class(\n${indentPyLines(
@@ -405,9 +398,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
     `volume=${volume}`,
     `source=[${pythonSourceWells}]`,
     `dest=[${pythonDestWells ?? destTrashPipetteName}]`,
-    //  TODO: fix bug where new_tip api arg does not allow
-    //  changeTip: always but PD does
-    `new_tip=${formatPyStr(changeTip)}`,
+    `new_tip=${formatPyStr(formatChangeTipArg(changeTip))}`,
     `trash_location=${trashPipetteName}`,
     ...(pipetteSpecs.channels > 1 ? [`group_wells=False`] : []),
     `keep_last_tip=True`,

@@ -1196,6 +1196,19 @@ class IncompleteLabwareDefinitionError(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
+class InvalidUserDefinedVolumesError(ProtocolEngineError):
+    """Raised when a UserDefinedVolumes type InnerLabwareDefinition is invalid."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an InvalidUserDefinedVolumesError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class IncompleteWellDefinitionError(ProtocolEngineError):
     """Raised when a well definition lacks a geometryDefinitionId."""
 

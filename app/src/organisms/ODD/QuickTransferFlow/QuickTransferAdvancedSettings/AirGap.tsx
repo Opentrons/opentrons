@@ -116,6 +116,9 @@ export function AirGap(props: AirGapProps): JSX.Element {
   // dispense air gap is performed whenever a tip is on its way to the trash, so
   // we can have the max be at the max tip capacity
   let maxAvailableCapacity = Math.min(maxPipetteVolume, tipVolume)
+  console.log('maxAvailableCapacity', maxAvailableCapacity)
+  console.log('path', state.path)
+  console.log('volume', state.volume)
 
   // for aspirate, air gap behaves differently depending on the path
   if (kind === 'aspirate') {
@@ -140,6 +143,7 @@ export function AirGap(props: AirGapProps): JSX.Element {
   }
 
   const volumeRange = { min: 1, max: Math.floor(maxAvailableCapacity) }
+  console.log(volumeRange)
   let volumeError = null
   if (volumeRange.min > volumeRange.max) {
     volumeError = t('air_gap_capacity_error')

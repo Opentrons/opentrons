@@ -5,6 +5,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
+import { useModuleUSBPort } from '/app/local-resources/modules'
 import { ModuleInfo } from '/app/molecules/ModuleInfo'
 
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
@@ -21,8 +22,8 @@ export function ModulesAndDeckMapView({
   runId,
   protocolAnalysis,
 }: ModulesAndDeckMapViewProps): JSX.Element | null {
+  const { parseModuleUSBPort } = useModuleUSBPort()
   if (protocolAnalysis == null) return null
-
   const deckConfig = getSimplestDeckConfigForProtocol(protocolAnalysis)
 
   const modulesOnDeck = attachedProtocolModuleMatches.map(module => ({
@@ -32,7 +33,7 @@ export function ModulesAndDeckMapView({
       <ModuleInfo
         moduleModel={module.moduleDef.model}
         isAttached={module.attachedModuleMatch != null}
-        physicalPort={module.attachedModuleMatch?.usbPort ?? null}
+        physicalPort={parseModuleUSBPort(module.attachedModuleMatch)}
         runId={runId}
       />
     ),

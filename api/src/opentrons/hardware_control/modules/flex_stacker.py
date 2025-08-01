@@ -59,6 +59,7 @@ from opentrons_shared_data.errors.exceptions import (
     FlexStackerShuttleMissingError,
     FlexStackerShuttleLabwareError,
     FlexStackerHopperLabwareError,
+    FlexStackerShuttleNotEmptyError,
 )
 from opentrons_shared_data.module import load_tof_baseline_data
 
@@ -711,7 +712,13 @@ class FlexStacker(mod_abc.AbstractModule):
         """Check whether or not a labware is detected on the shuttle."""
         result = await self.labware_detected(StackerAxis.X, direction)
         if labware_expected != result:
-            raise FlexStackerShuttleLabwareError(
+            if labware_expected:
+                raise FlexStackerShuttleLabwareError(
+                    self.device_info["serial"],
+                    shuttle_state=self.platform_state,
+                    labware_expected=labware_expected,
+                )
+            raise FlexStackerShuttleNotEmptyError(
                 self.device_info["serial"],
                 shuttle_state=self.platform_state,
                 labware_expected=labware_expected,

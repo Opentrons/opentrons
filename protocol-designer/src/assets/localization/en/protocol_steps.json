@@ -82,6 +82,7 @@
   "heater_shaker_state": "Heater-Shaker state",
   "in": "in",
   "into": "into",
+  "individual_wells": "Individual wells",
   "labware_in": "Labware in",
   "labware_to": "{{labware}} to",
   "liquids": "{{num}} liquids",

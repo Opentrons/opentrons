@@ -19,5 +19,5 @@ export function useUpdateLabware(
     if (runId != null && maintenanceRunId == null && isFlex) {
       dispatch(updateLPCLabware(runId, labwareInfo.labware))
     }
-  }, [labwareInfo, maintenanceRunId, isFlex])
+  }, [labwareInfo, maintenanceRunId, isFlex, runId])
 }

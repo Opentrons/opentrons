@@ -144,7 +144,7 @@
           "aspirate_airGap_volume": null,
           "aspirate_delay_checkbox": false,
           "aspirate_delay_seconds": "1",
-          "aspirate_flowRate": null,
+          "aspirate_flowRate": 46.43,
           "aspirate_labware": "1e610d40-75c7-11ea-b42f-4b64e50f43e5:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",
           "aspirate_mix_checkbox": true,
           "aspirate_mix_times": "2",
@@ -183,7 +183,7 @@
           "dispense_airGap_volume": null,
           "dispense_delay_checkbox": false,
           "dispense_delay_seconds": "1",
-          "dispense_flowRate": null,
+          "dispense_flowRate": 46.43,
           "dispense_labware": "21ed8f60-75c7-11ea-b42f-4b64e50f43e5:opentrons/opentrons_24_aluminumblock_generic_2ml_screwcap/1",
           "dispense_mix_checkbox": false,
           "dispense_mix_times": null,
@@ -2670,7 +2670,7 @@
       "displayColor": "#b925ff"
     }
   },
-  "commandSchemaId": "opentronsCommandSchemaV10",
+  "commandSchemaId": "opentronsCommandSchemaV14",
   "commands": [
     {
       "key": "c85ee673-fbc8-4831-8edf-29570cb23561",

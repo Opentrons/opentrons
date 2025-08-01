@@ -105,9 +105,6 @@ jobs:
       - name: Sync the project
         working-directory: ./analyses-snapshot-testing
         run: make ci-setup
-      - name: Install Opentrons
-        working-directory: ./analyses-snapshot-testing
-        run: make install-ot
       - uses: actions/download-artifact@v4
         with:
           name: chunks
@@ -145,9 +142,6 @@ jobs:
       - name: Sync the project
         working-directory: ./analyses-snapshot-testing
         run: make ci-setup
-      - name: Install Opentrons
-        working-directory: ./analyses-snapshot-testing
-        run: make install-ot
       - name: Download All Analysis Results
         uses: actions/download-artifact@v4
         with:
@@ -191,6 +185,8 @@ jobs:
           body: 'This PR was requested on the PR https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}'
           branch: 'analyses-snapshot-testing/heal-${{ github.event.pull_request.head.ref }}'
           base: ${{ github.event.pull_request.head.ref }}
+          add-paths: |
+            analyses-snapshot-testing/tests/__snapshots__/analyses_snapshot_test/
 
       - name: Comment on feature PR
         if: always() && steps.create_pull_request.outcome == 'success' && github.event_name == 'pull_request'
@@ -214,3 +210,5 @@ jobs:
           body: 'The edge overnight analyses snapshot test is failing. This PR was opened to alert us to the failure.'
           branch: 'analyses-snapshot-testing/heal-edge'
           base: edge
+          add-paths: |
+            analyses-snapshot-testing/tests/__snapshots__/analyses_snapshot_test/

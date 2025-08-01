@@ -165,7 +165,7 @@ describe('PlaceItemInstruction', () => {
     expect(tipRackItem).toBeTruthy()
   })
 
-  it('should show inline notification for 96-channel pipette when calibrating a default offset', () => {
+  it('should show inline notification for 96-channel pipette when calibrating a default offset for a tiprack ', () => {
     vi.mocked(selectIsSelectedLwTipRack).mockImplementation(() => () => true)
     vi.mocked(selectSelectedLwOverview).mockImplementation(() => () =>
       mockTipRackStackup as any
@@ -177,7 +177,23 @@ describe('PlaceItemInstruction', () => {
     render()
 
     screen.getByText(
-      'Ensure the tip rack is accurately placed in the slot as outlined above to prevent damage to your labware.'
+      'Ensure the tip rack is accurately placed in the slot according to the instructions provided to prevent damage.'
+    )
+  })
+
+  it('should show inline notification for 96-channel pipette when calibrating a default offset for a labware', () => {
+    vi.mocked(selectIsSelectedLwTipRack).mockImplementation(() => () => false)
+    vi.mocked(selectSelectedLwOverview).mockImplementation(() => () =>
+      mockTipRackStackup as any
+    )
+    vi.mocked(selectActivePipetteChannelCount).mockImplementation(() => () =>
+      96
+    )
+
+    render()
+
+    screen.getByText(
+      'Ensure the labware is accurately placed in the slot according to the instructions provided to prevent damage.'
     )
   })
 

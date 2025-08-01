@@ -6,9 +6,11 @@
 import isEqual from 'lodash/isEqual'
 
 import {
+  COMBO_FIXTURES,
   FLEX_MODULE_AA_TYPE_BY_MODEL,
   FLEX_STACKER_FIXTURES,
   FLEX_STAGING_ADDRESSABLE_AREAS_WITH_FAKES,
+  FLEX_USB_MODULE_FIXTURES,
   WASTE_CHUTE_FIXTURES,
   WASTE_CHUTE_WITH_FAKE_FIXTURES,
 } from '.'
@@ -91,6 +93,7 @@ import type {
 } from './constants'
 import type {
   AddressableArea,
+  AreaType,
   CoordinateTuple,
   CutoutConfig,
   CutoutConfigMap,
@@ -687,9 +690,7 @@ export function getAddressableAreaNamesFromLoadedModule(
 export const getModuleDisplayNameWithPort = (
   usbPortNumber: number | string
 ): string => {
-  return `${getModuleDisplayName(
-    FLEX_STACKER_MODULE_V1
-  )} in USB-${usbPortNumber}`
+  return `${getModuleDisplayName(FLEX_STACKER_MODULE_V1)} in ${usbPortNumber}`
 }
 
 export function getAAComboFixtureDisplayName(
@@ -697,7 +698,7 @@ export function getAAComboFixtureDisplayName(
   addressableAreaId: AddressableAreaNamesWithFakes,
   deckDef: DeckDefinition,
   t: TFunction,
-  usbPortNumber?: number | string
+  usbPortNumber?: string | null
 ): string | null {
   const aaItem = getAAByAAId(addressableAreaId, deckDef)
   const translationFileName = 'deck_configuration'
@@ -744,7 +745,7 @@ export function getAAComboFixtureDisplayName(
 // note: we've decided not to translate these strings
 export function getFixtureDisplayName(
   cutoutFixtureId: CutoutFixtureIdsWithFakes | null,
-  usbPortNumber?: number | string
+  usbPortNumber?: string | null
 ): string {
   switch (cutoutFixtureId) {
     case STAGING_AREA_RIGHT_SLOT_FIXTURE:
@@ -763,15 +764,11 @@ export function getFixtureDisplayName(
       return 'Waste chute with staging area slot and cover'
     case HEATERSHAKER_MODULE_V1_FIXTURE:
       return usbPortNumber != null
-        ? `${getModuleDisplayName(
-            HEATERSHAKER_MODULE_V1
-          )} in USB-${usbPortNumber}`
+        ? `${getModuleDisplayName(HEATERSHAKER_MODULE_V1)} in ${usbPortNumber}`
         : getModuleDisplayName(HEATERSHAKER_MODULE_V1)
     case TEMPERATURE_MODULE_V2_FIXTURE:
       return usbPortNumber != null
-        ? `${getModuleDisplayName(
-            TEMPERATURE_MODULE_V2
-          )} in USB-${usbPortNumber}`
+        ? `${getModuleDisplayName(TEMPERATURE_MODULE_V2)} in ${usbPortNumber}`
         : getModuleDisplayName(TEMPERATURE_MODULE_V2)
     case MAGNETIC_BLOCK_V1_FIXTURE:
     case FAKE_STAGING_SLOT_WITH_MAG_BLOCK:
@@ -780,33 +777,25 @@ export function getFixtureDisplayName(
       return `${getModuleDisplayName(MAGNETIC_BLOCK_V1)} with staging area slot`
     case THERMOCYCLER_V2_REAR_FIXTURE:
       return usbPortNumber != null
-        ? `${getModuleDisplayName(
-            THERMOCYCLER_MODULE_V2
-          )} in USB-${usbPortNumber}`
+        ? `${getModuleDisplayName(THERMOCYCLER_MODULE_V2)} in ${usbPortNumber}`
         : getModuleDisplayName(THERMOCYCLER_MODULE_V2)
     case THERMOCYCLER_V2_FRONT_FIXTURE:
       return usbPortNumber != null
-        ? `${getModuleDisplayName(
-            THERMOCYCLER_MODULE_V2
-          )} in USB-${usbPortNumber}`
+        ? `${getModuleDisplayName(THERMOCYCLER_MODULE_V2)} in ${usbPortNumber}`
         : getModuleDisplayName(THERMOCYCLER_MODULE_V2)
     case ABSORBANCE_READER_V1_FIXTURE:
       return usbPortNumber != null
-        ? `${getModuleDisplayName(
-            ABSORBANCE_READER_V1
-          )} in USB-${usbPortNumber}`
+        ? `${getModuleDisplayName(ABSORBANCE_READER_V1)} in ${usbPortNumber}`
         : getModuleDisplayName(ABSORBANCE_READER_V1)
     case FLEX_STACKER_V1_FIXTURE:
       return usbPortNumber != null
-        ? `${getModuleDisplayName(
-            FLEX_STACKER_MODULE_V1
-          )} in USB-${usbPortNumber}`
+        ? `${getModuleDisplayName(FLEX_STACKER_MODULE_V1)} in ${usbPortNumber}`
         : getModuleDisplayName(FLEX_STACKER_MODULE_V1)
     case FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE:
       return usbPortNumber != null
         ? `${getModuleDisplayName(
             FLEX_STACKER_MODULE_V1
-          )} in USB-${usbPortNumber} and waste chute with cover`
+          )} in ${usbPortNumber} and waste chute with cover`
         : `${getModuleDisplayName(
             FLEX_STACKER_MODULE_V1
           )} and waste chute with cover`
@@ -814,13 +803,13 @@ export function getFixtureDisplayName(
       return usbPortNumber != null
         ? `${getModuleDisplayName(
             FLEX_STACKER_MODULE_V1
-          )} in USB-${usbPortNumber} and waste chute`
+          )} in ${usbPortNumber} and waste chute`
         : `${getModuleDisplayName(FLEX_STACKER_MODULE_V1)} and waste chute`
     case FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE:
       return usbPortNumber != null
         ? `${getModuleDisplayName(
             FLEX_STACKER_MODULE_V1
-          )} in USB-${usbPortNumber} and magnetic block`
+          )} in ${usbPortNumber} and magnetic block`
         : `${getModuleDisplayName(FLEX_STACKER_MODULE_V1)} and magnetic block`
     case SINGLE_CENTER_SLOT_FIXTURE:
       return 'Center slot'
@@ -1070,17 +1059,27 @@ export const getAAForModuleFixture = (
 export const getMainAAForAFixture = (
   cutoutId: CutoutId,
   fixtureId: CutoutFixtureId,
-  addressableAreaId: AddressableAreaNamesWithFakes
+  addressableAreaId: AddressableAreaNamesWithFakes,
+  existingCutoutFixtureId?: CutoutFixtureIdsWithFakes
 ): AddressableAreaNamesWithFakes | null => {
-  const addressableAreasByFIxtureId = getAAsToFixtureIdFromDeckDefWithFakes(
+  const addressableAreasByFixtureId = getAAsToFixtureIdFromDeckDefWithFakes(
     cutoutId,
     getDeckDefFromRobotType('OT-3 Standard')
   )
-  const aaListForFixtureId = addressableAreasByFIxtureId[fixtureId] ?? []
+  const aaListForFixtureId = addressableAreasByFixtureId[fixtureId] ?? []
   if (LEFT_AND_CENTER_CUTOUTS.includes(cutoutId)) {
     return aaListForFixtureId[0]
   } else if (WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE === fixtureId) {
     return DEFAULT_AA_FOR_WASTE_CHUTE
+  } else if (fixtureId === TRASH_BIN_ADAPTER_FIXTURE) {
+    if (
+      existingCutoutFixtureId &&
+      COMBO_FIXTURES.includes(existingCutoutFixtureId)
+    ) {
+      return null
+    } else {
+      return aaListForFixtureId[0]
+    }
   } else {
     const aa = aaListForFixtureId.find((aa: AddressableAreaNamesWithFakes) => {
       const vsId = getVisualSlotIdFromAAId(aa)
@@ -1089,6 +1088,64 @@ export const getMainAAForAFixture = (
     })
     return aa as AddressableAreaNamesWithFakes // we can cast this bc there should me a match for every fixtureId
   }
+}
+
+export const getMainUsbModuleFixtureIdForComboFixture = (
+  compatibleCutoutFixtureIds: CutoutFixtureId[]
+): CutoutFixtureId | null => {
+  return (
+    compatibleCutoutFixtureIds.find(cf =>
+      FLEX_USB_MODULE_FIXTURES.includes(cf)
+    ) ?? null
+  )
+}
+
+export const getMainNonComboFixtureId = (
+  compatibleCutoutFixtureIds: CutoutFixtureId[],
+  addressableAreaIds: AddressableAreaName[],
+  cutoutId: CutoutId
+): CutoutFixtureId | null => {
+  const deckDef = getDeckDefFromRobotType('OT-3 Standard')
+  const cutoutFixtures = deckDef.cutoutFixtures.filter(cf =>
+    compatibleCutoutFixtureIds.includes(cf.id)
+  )
+  const aaAreaType = getAAByAAId(addressableAreaIds[0], deckDef).areaType
+  if (
+    Object.values(FLEX_MODULE_AA_TYPE_BY_MODEL).includes(
+      aaAreaType as AreaType
+    ) &&
+    aaAreaType !== 'magneticBlock'
+  ) {
+    return (
+      getMainUsbModuleFixtureIdForComboFixture(compatibleCutoutFixtureIds) ??
+      null
+    )
+  }
+  const cutoutFixturesWithAddressableAreas = cutoutFixtures.filter(cf =>
+    Object.values(cf.providesAddressableAreas).some(providedAAs =>
+      addressableAreaIds.every(aa => providedAAs.includes(aa))
+    )
+  )
+
+  if (cutoutFixturesWithAddressableAreas.length === 0) {
+    return null
+  }
+
+  // Find the fixture with the least items in its providesAddressableAreas in order to find the simplest fixture
+  const fixtureWithLeastAAs = cutoutFixturesWithAddressableAreas.reduce(
+    (minFixture, currentFixture) => {
+      const minAAsCount = Object.entries(minFixture.providesAddressableAreas)
+        .filter(([key, value]) => key === cutoutId)
+        .map(([key, value]) => value)[0].length
+      const currentAAsCount = Object.entries(
+        currentFixture.providesAddressableAreas
+      )
+        .filter(([key, value]) => key === cutoutId)
+        .map(([key, value]) => value)[0].length
+      return currentAAsCount < minAAsCount ? currentFixture : minFixture
+    }
+  )
+  return fixtureWithLeastAAs.id
 }
 
 export const isModuleAllowedOnAA = (

@@ -170,14 +170,14 @@ async def run_test(
     task = asyncio.get_event_loop().create_task(
         _do_test(driver, load_percentage, bitrate, results_queue, mode)
     )
-    started = time.time()
+    started = time.monotonic()
     should_quit = False
     try:
         while not should_quit:
             results = await results_queue.get()
             sent_in = yield results
             should_quit = bool(sent_in)
-            if duration and (time.time() - started > duration):
+            if duration and (time.monotonic() - started > duration):
                 should_quit = True
     finally:
         task.cancel()
@@ -191,12 +191,12 @@ class WarningsWithCooldown:
 
     def __init__(self, cooldown_secs: float = 10) -> None:
         """Build the warner."""
-        self.last_warning = time.time()
+        self.last_warning = time.monotonic()
         self.cooldown_secs = cooldown_secs
 
     def warning(self, message: str) -> None:
         """Send a warning to logging.warning."""
-        now = time.time()
+        now = time.monotonic()
         if now > self.last_warning + self.cooldown_secs:
             log.warning(message)
             sys.stderr.write(message)
@@ -262,12 +262,12 @@ async def _do_test(
     transaction_size = message_size + response_size
 
     time_per_transaction = float(transaction_size) / (bitrate * load_percentage)
-    started = time.time()
+    started = time.monotonic()
 
     def listener(definition: MessageDefinition, arb_id: ArbitrationId) -> None:
         result_queue.put_nowait(
             StatisticElement(
-                sec_since_start=time.time() - started,
+                sec_since_start=time.monotonic() - started,
                 sending_node=arb_id.parts.originating_node,
                 bits=definition.payload.get_size(),
                 error=False,
@@ -277,7 +277,7 @@ async def _do_test(
     try:
         messenger.add_listener(listener)
         while True:
-            then = time.time()
+            then = time.monotonic()
             try:
                 await messenger.send(target, message(payload=EmptyPayload()))
                 error = False
@@ -288,13 +288,13 @@ async def _do_test(
                 bits = 0
             await result_queue.put(
                 StatisticElement(
-                    sec_since_start=(time.time() - started),
+                    sec_since_start=(time.monotonic() - started),
                     sending_node=NodeId.host,
                     bits=bits,
                     error=error,
                 )
             )
-            now = time.time()
+            now = time.monotonic()
             left = time_per_transaction - now - then
             if left > 0:
                 await asyncio.sleep(left)
