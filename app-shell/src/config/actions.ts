@@ -1,3 +1,4 @@
+// app-shell/src/config/actions.ts
 import {
   ADD_CUSTOM_LABWARE,
   ADD_CUSTOM_LABWARE_FAILURE,
@@ -42,6 +43,9 @@ import {
   USB_HTTP_REQUESTS_STOP,
   VALUE_UPDATED,
   VIEW_PROTOCOL_SOURCE_FOLDER,
+  LOCK_PROTOCOL,
+  UNLOCK_PROTOCOL,
+  VERIFY_PROTOCOL_PASSWORD,
 } from '../constants'
 
 import type {
@@ -73,13 +77,16 @@ import type {
   AnalyzeProtocolSuccessAction,
   ClearAddProtocolFailureAction,
   FetchProtocolsAction,
+  LockProtocolAction,
   OpenProtocolDirectoryAction,
   ProtocolListActionSource,
   RemoveProtocolAction,
   StoredProtocolData,
   StoredProtocolDir,
+  UnlockProtocolAction,
   UpdateProtocolListAction,
   UpdateProtocolListFailureAction,
+  VerifyProtocolPasswordAction,
   ViewProtocolSourceFolder,
 } from '@opentrons/app/src/redux/protocol-storage'
 import type {
@@ -304,6 +311,33 @@ export const viewProtocolSourceFolder = (
 ): ViewProtocolSourceFolder => ({
   type: VIEW_PROTOCOL_SOURCE_FOLDER,
   payload: { protocolKey },
+  meta: { shell: true },
+})
+
+export const lockProtocol = (
+  protocolKey: string,
+  password: string
+): LockProtocolAction => ({
+  type: LOCK_PROTOCOL,
+  payload: { protocolKey, password },
+  meta: { shell: true },
+})
+
+export const unlockProtocol = (
+  protocolKey: string,
+  password: string
+): UnlockProtocolAction => ({
+  type: UNLOCK_PROTOCOL,
+  payload: { protocolKey, password },
+  meta: { shell: true },
+})
+
+export const verifyProtocolPassword = (
+  protocolKey: string,
+  password: string
+): VerifyProtocolPasswordAction => ({
+  type: VERIFY_PROTOCOL_PASSWORD,
+  payload: { protocolKey, password },
   meta: { shell: true },
 })
 

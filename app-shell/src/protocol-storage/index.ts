@@ -6,12 +6,8 @@ import {
   analyzeProtocol,
   analyzeProtocolFailure,
   analyzeProtocolSuccess,
-  fetchProtocols as refetchProtocols,
   updateProtocolList,
   updateProtocolListFailure,
-  LOCK_PROTOCOL,
-  UNLOCK_PROTOCOL,
-  VERIFY_PROTOCOL_PASSWORD,
 } from '../config/actions'
 import {
   ADD_PROTOCOL,
@@ -24,10 +20,12 @@ import {
   REMOVE_PROTOCOL,
   UI_INITIALIZED,
   VIEW_PROTOCOL_SOURCE_FOLDER,
+  LOCK_PROTOCOL,
+  UNLOCK_PROTOCOL,
+  VERIFY_PROTOCOL_PASSWORD,
 } from '../constants'
 import { createFailedAnalysis } from '../protocol-analysis/writeFailedAnalysis'
 import * as FileSystem from './file-system'
-// NOTE: These DB functions must be created in a new file, e.g., './db.ts'
 import {
   getProtocolLockStatuses,
   lockProtocolInDb,
@@ -35,7 +33,6 @@ import {
   verifyPasswordInDb,
 } from './db'
 
-import type { StoredProtocolData } from '@opentrons/app/src/redux/protocol-storage'
 import type { ProtocolListActionSource as ListSource } from '@opentrons/app/src/redux/protocol-storage/types'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { Action, Dispatch } from '../types'
@@ -59,13 +56,12 @@ export const getParsedAnalysisFromPath = (
   }
 }
 
-// This function has been restored to its original, correct implementation.
+// FIX: Restored the correct function call from the FileSystem module
 const migrateProtocolsFromTempDirectory = FileSystem.preParityMigrateProtocolsFrom(
   FileSystem.PRE_V7_PARITY_DIRECTORY_PATH,
   FileSystem.PROTOCOLS_DIRECTORY_PATH
 )
 
-// This function has been rewritten with async/await for clarity and correctness.
 export const fetchProtocols = async (
   dispatch: Dispatch,
   source: ListSource
@@ -82,9 +78,16 @@ export const fetchProtocols = async (
 
     const storedProtocolsData = storedProtocols.map(storedProtocolDir => {
       const protocolKey = path.parse(storedProtocolDir.dirPath).base
-      const mostRecentAnalysisFilePath =
+      interface StoredProtocolDir {
+        dirPath: string
+        modified: number
+        srcFilePaths: string[]
+        analysisFilePaths: string[]
+      }
+
+      const mostRecentAnalysisFilePath: string | null =
         storedProtocolDir.analysisFilePaths.reduce<string | null>(
-          (acc, analysisFilePath) => {
+          (acc: string | null, analysisFilePath: string) => {
             if (acc === null) return analysisFilePath
             return getUnixTimeFromAnalysisPath(analysisFilePath) >
               getUnixTimeFromAnalysisPath(acc)
@@ -106,22 +109,17 @@ export const fetchProtocols = async (
           filePath => path.parse(filePath).base
         ),
         srcFiles: storedProtocolDir.srcFilePaths.map(srcFilePath => {
-          const buffer = fse.readFileSync(srcFilePath)
-          return buffer.buffer.slice(
-            buffer.byteOffset,
-            buffer.byteOffset + buffer.byteLength
-          )
+          return fse.readFileSync(srcFilePath)
         }),
         mostRecentAnalysis,
       }
     })
     dispatch(updateProtocolList(storedProtocolsData, source))
   } catch (error: any) {
-    dispatch(updateProtocolListFailure(error?.message ?? 'Unknown error', source))
+    dispatch(updateProtocolListFailure(String(error?.message ?? 'Unknown error'), source))
   }
 }
 
-// This function has been restored to its original structure with the new cases added cleanly.
 export function registerProtocolStorage(dispatch: Dispatch): (action: Action) => void {
   return function handleActionForProtocolStorage(action: Action) {
     switch (action.type) {
@@ -132,7 +130,7 @@ export function registerProtocolStorage(dispatch: Dispatch): (action: Action) =>
         break
       }
       case ADD_PROTOCOL: {
-        FileSystem.addProtocolFile(
+        void FileSystem.addProtocolFile(
           action.payload.protocolFilePath,
           FileSystem.PROTOCOLS_DIRECTORY_PATH
         ).then(protocolKey => {
@@ -177,7 +175,7 @@ export function registerProtocolStorage(dispatch: Dispatch): (action: Action) =>
       case LOCK_PROTOCOL: {
         const { protocolKey, password } = action.payload
         if (password != null) {
-          lockProtocolInDb(protocolKey, password).then(() => {
+          void lockProtocolInDb(protocolKey, password).then(() => {
             void fetchProtocols(dispatch, PROTOCOL_ADDITION)
           })
         }
@@ -186,7 +184,7 @@ export function registerProtocolStorage(dispatch: Dispatch): (action: Action) =>
       case UNLOCK_PROTOCOL: {
         const { protocolKey, password } = action.payload
         if (password != null) {
-          unlockProtocolInDb(protocolKey, password).then(() => {
+          void unlockProtocolInDb(protocolKey, password).then(() => {
             void fetchProtocols(dispatch, PROTOCOL_ADDITION)
           })
         }
@@ -195,7 +193,7 @@ export function registerProtocolStorage(dispatch: Dispatch): (action: Action) =>
       case VERIFY_PROTOCOL_PASSWORD: {
         const { protocolKey, password } = action.payload
         if (password != null) {
-          verifyPasswordInDb(protocolKey, password).then((isValid: boolean) => {
+          void verifyPasswordInDb(protocolKey, password).then((isValid: boolean) => {
             console.log(
               `Password verification for ${protocolKey}: ${
                 isValid ? 'SUCCESS' : 'FAILURE'

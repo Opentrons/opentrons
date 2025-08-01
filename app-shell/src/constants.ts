@@ -248,6 +248,17 @@ export const DISCOVERY_UPDATE_LIST: DISCOVERY_UPDATE_LIST_TYPE =
 
 export const DISCOVERY_REMOVE: DISCOVERY_REMOVE_TYPE = 'discovery:REMOVE'
 
+
+//  Skunkworks constants for protocol locking
+export const LOCK_PROTOCOL: 'protocolStorage:LOCK_PROTOCOL' =
+  'protocolStorage:LOCK_PROTOCOL'
+
+export const UNLOCK_PROTOCOL: 'protocolStorage:UNLOCK_PROTOCOL' =
+  'protocolStorage:UNLOCK_PROTOCOL'
+
+export const VERIFY_PROTOCOL_PASSWORD: 'protocolStorage:VERIFY_PROTOCOL_PASSWORD' =
+  'protocolStorage:VERIFY_PROTOCOL_PASSWORD'
+// Back to the app-shell constants
 export const CLEAR_CACHE: CLEAR_CACHE_TYPE = 'discovery:CLEAR_CACHE'
 export const HEALTH_STATUS_OK: 'ok' = 'ok'
 export const HEALTH_STATUS_NOT_OK: 'notOk' = 'notOk'

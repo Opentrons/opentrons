@@ -13,16 +13,16 @@ import type { StoredProtocolDir } from '@opentrons/app/src/redux/protocol-storag
  *
  * example directory structure:
  * protocols/
- *  ├─ abc123-uuid/
- *  │  ├─ src/
- *  │  │  ├─ serialDilution.py
- *  │  ├─ analysis/
- *  │  │  ├─ 1646303907.json
- *  ├─ def456-uuid/
- *  │  ├─ src/
- *  │  │  ├─ swiftTurbo.json
- *  │  ├─ analysis/
- *  │  │  ├─ 1646303906.json
+ * ├─ abc123-uuid/
+ * │  ├─ src/
+ * │  │  ├─ serialDilution.py
+ * │  ├─ analysis/
+ * │  │  ├─ 1646303907.json
+ * ├─ def456-uuid/
+ * │  ├─ src/
+ * │  │  ├─ swiftTurbo.json
+ * │  ├─ analysis/
+ * │  │  ├─ 1646303906.json
  */
 export const PRE_V7_PARITY_DIRECTORY_PATH = path.join(
   app.getPath('userData'),
@@ -62,6 +62,65 @@ export function readFilesWithinDirectory(dir: string): Promise<string[]> {
 
     return protocolDirPaths
   })
+}
+
+// FIX: Added the 'export' keyword to make this function available for import
+export function preParityMigrateProtocolsFrom(
+  src: string,
+  dest: string
+): () => Promise<void> {
+  let hasCheckedForMigration = false
+
+  return function (): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (hasCheckedForMigration) resolve()
+      hasCheckedForMigration = true
+
+      fs
+        .stat(src)
+        .then(doesSrcExist => {
+          if (!doesSrcExist.isDirectory()) resolve()
+
+          console.log(
+            `Performing protocol migration to ${PROTOCOLS_DIRECTORY_NAME}...`
+          )
+
+          return migrateProtocols(src, dest).then(() => {
+            console.log('Protocol migration complete.')
+            resolve()
+          })
+        })
+        .catch(e => {
+          console.log(
+            `Error migrating protocols to ${PROTOCOLS_DIRECTORY_NAME}: ${e}`
+          )
+          resolve()
+        })
+    })
+  }
+
+  function migrateProtocols(src: string, dest: string): Promise<void> {
+    return fs
+      .readdir(src)
+      .then(items => {
+        const protocols = items.map(item => {
+          const srcItem = path.join(src, item)
+          const destItem = path.join(dest, item)
+
+          return fs.copy(srcItem, destItem, {
+            overwrite: false,
+          })
+        })
+        // Delete the tmp directory.
+        return Promise.all(protocols).then(() =>
+          fs.rm(src, {
+            recursive: true,
+            force: true,
+          })
+        )
+      })
+      .catch(e => Promise.reject(e))
+  }
 }
 
 export function parseProtocolDirs(
