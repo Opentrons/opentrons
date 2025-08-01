@@ -6,7 +6,7 @@ title: "Heater-Shaker Module: Thermal Adapters"
 
 Aluminum thermal adapters help transfer heat from the Heater-Shaker to attached labware. The module comes with your choice of a universal flat adapter, a PCR well plate adapter, a 96-well flat bottom adapter, or a deep well adapter. You can also purchase additional adapters directly from the [modules section](https://opentrons.com/products/categories/modules) of the Opentrons website.
 
-<font color="red">IMAGE PLACEHOLDER</font>
+![Universal adapter, PCR adapter, flat bottom adapater, deep well adapter images](images/thermal-adapters.png)
 
 ## Supported Labware
 
@@ -35,14 +35,17 @@ The Universal Flat Bottom Plate Adapter works with most flat- bottom ANSI/SLAS a
 
 1. Use the included T10 Torx screwdriver and Thermal Adapter Screw to attach your chosen adapter to the module.
 
-    ![Attaching an adapter](images/adapter-attachment.png){width="60%"}
-
     !!!warning
         Using a different screwdriver can strip the screws. Using different screws can damage the module.
 
+![Image shows fastening an adapter to the module](images/adapter-attachment.png){ width="40%"}
+
+<!-- Cannot get the attachment image to resize when indented to fit the ordered list
+Also, had to flip it with the Warning, else the warning breaks and shows as codeblock -->
+
 2. Check the alignment of the thermal adapter. If properly attached, it will sit flush to the surface of the module.
 
-    ![Aligned and misaligned adapter image](../images/adapter-alignment.png)
+    ![Aligned and misaligned adapter image](images/adapter-alignment.png)
 
 3. Verify that the adapter is firmly attached. The adapter is secure when it doesn’t move while gently pulling on it and rocking it from side to side.
 

@@ -22,21 +22,24 @@ Installing the Heater-Shaker on your robot includes attaching it to the deck and
     !!!warning
         The shaking motion of the Heater-Shaker requires anchoring to help ensure it does not dislodge itself while in operation.
 
-4. Connect the power and USB cables to the module. The Heater-Shaker has an asymmetrical 4-pin power connector. When connecting the power cable to the module:
+4. Connect the USB cable to the module.
 
-    - Align the connector's flat side with the flat side of the module's power port.
-    - Connect the cable to the module first, before plugging it in to a wall outlet.
-    - _Do not_ force cable connections, or you may damage the module.
+5. Connect power cable to the module. The Heater-Shaker has an asymmetrical 4-pin power connector. When connecting the power cable to the module:
+
+    - Match the connector's flat side to the flat side of the module's power port.
+    - Aligned cables attach easily; misaligned cables do not.
+    - _Do not_ plug the power cable into a wall outlet until instructed to do so.
 
     <figure class="screenshot">
     ![DIN power connector](images/din-power-connector.png)
     </figure>
 
-5. Insert the caddy into the deck slot and route the power and USB cables through the removable side covers of the Flex. _Do not_ connect the power cable to a wall outlet yet.
+6. Insert the caddy into the deck slot and route the power and USB cables through the removable side covers of the Flex.
 
-6. Connect the other end of the USB cable to a USB port on the Flex.
+7. Connect the USB cable to a USB port on the Flex.
 
-7. Connect the power cable to a wall outlet. Gently press the on/off switch to turn the module on.
+8. Connect the power cable to a wall outlet. Gently press the on/off switch to turn the module on.
+
 </div>
 
 If the temperature and status LCDs are illuminated, the module is powered on.
@@ -54,6 +57,8 @@ To calibrate the Heater-Shaker, turn on the power supply. This starts the calibr
 !!!warning
     The gantry and pipette will move during calibration. Keep your hands clear of the working area before tapping an action button on the touchscreen.
 
+<div class="instruction-list" markdown>
+
 1. Tap **Start setup** on the touchscreen. The robot checks the
 module’s firmware and updates it automatically, if required.
 
@@ -66,3 +71,5 @@ module’s firmware and updates it automatically, if required.
 5. After the calibration process is complete, remove the calibration adapter from the module and remove the calibration probe from the pipette.
 
 6. Tap **Exit**. Your module is now calibrated.
+
+</div>

@@ -59,7 +59,11 @@ Turn off the Heater-Shaker before cleaning it. You can clean the top surfaces of
 
 Once you’ve prepared the module for cleaning:
 
+<div class="instruction-list" markdown>
+
 1. Dampen a soft, clean cloth or paper towel with a cleaning solution.
 2. Gently wipe off the module’s surfaces.
 3. Rinse off any remaining residue using a cloth dampened with distilled water.
 4. Let the module air dry.
+
+</div>
