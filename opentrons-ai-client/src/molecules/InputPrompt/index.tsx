@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 import { COLORS, StyledText, TYPOGRAPHY } from '@opentrons/components'
 
+import { TRACK_EVENTS } from '/ai-client/analytics/constants'
 import { AttachedFileItem } from '/ai-client/atoms/AttachedFileItem'
 import { AttachFileButton } from '/ai-client/atoms/AttachFileButton'
 import { SendButton } from '/ai-client/atoms/SendButton'
@@ -27,7 +28,6 @@ import {
   STAGING_CREATE_PROTOCOL_END_POINT,
   STAGING_END_POINT,
   STAGING_UPDATE_PROTOCOL_END_POINT,
-  TRACK_EVENTS,
 } from '/ai-client/resources/constants'
 import { useApiCall } from '/ai-client/resources/hooks'
 import { useAttachFiles } from '/ai-client/resources/hooks/useAttachFiles'
@@ -75,7 +75,7 @@ export function InputPrompt(): JSX.Element {
   const [submitted, setSubmitted] = useState<boolean>(false)
   const watchUserPrompt = (watch('userPrompt') ?? '') as string
 
-  const { data, isLoading, callApi } = useApiCall()
+  const { data, isLoading, callApi, error } = useApiCall()
 
   let pdProtocolContent: null | ProtocolFile = null
   if (data != null && typeof data === 'object' && 'protocol_content' in data) {
@@ -395,47 +395,53 @@ export function InputPrompt(): JSX.Element {
   }
 
   useEffect(() => {
-    if (submitted && data != null && !isLoading) {
-      const { role, reply, protocol_content } = data as ChatData
-      const assistantResponse: ChatData = {
-        requestId,
-        role,
-        reply,
-        protocol_content,
+    if (submitted && !isLoading) {
+      if (error) {
+        // Error occurred - reset submitted state to allow retry
+        setSubmitted(false)
+      } else if (data != null) {
+        // Success - process the response
+        const { role, reply, protocol_content } = data as ChatData
+        const assistantResponse: ChatData = {
+          requestId,
+          role,
+          reply,
+          protocol_content,
+        }
+        setChatHistory(chatHistory => [
+          ...chatHistory,
+          {
+            role: 'assistant',
+            content: reply,
+            protocol_content: (JSON.stringify(
+              protocol_content
+            ) as unknown) as string,
+          },
+        ])
+        setChatData(chatData => [...chatData, assistantResponse])
+        trackEvent({
+          name: TRACK_EVENTS.GENERATED_PROTOCOL,
+          properties: {
+            createOrUpdate: isNewProtocol ? 'create' : 'update',
+            protocol: reply,
+          },
+        })
+        setSubmitted(false)
       }
-      setChatHistory(chatHistory => [
-        ...chatHistory,
-        {
-          role: 'assistant',
-          content: reply,
-          protocol_content: (JSON.stringify(
-            protocol_content
-          ) as unknown) as string,
-        },
-      ])
-      setChatData(chatData => [...chatData, assistantResponse])
-      trackEvent({
-        name: TRACK_EVENTS.GENERATED_PROTOCOL,
-        properties: {
-          createOrUpdate: isNewProtocol ? 'create' : 'update',
-          protocol: reply,
-        },
-      })
-      setSubmitted(false)
     }
-  }, [data, isLoading, submitted])
+  }, [data, isLoading, submitted, error])
 
   return (
     <form id="User_Prompt" className={styles.form}>
       {/* Error message */}
-      {fileError && (
+      {(fileError || error) && (
         <div className={styles.error_container}>
           <StyledText
             color={COLORS.red50}
             fontSize={TYPOGRAPHY.fontSizeH3}
             lineHeight={TYPOGRAPHY.lineHeight20}
           >
-            {fileError}
+            {fileError || error}
           </StyledText>
         </div>
       )}

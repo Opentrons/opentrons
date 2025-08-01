@@ -1,9 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAtom } from 'jotai'
 
 import {
   ALIGN_FLEX_END,
+  COLORS,
+  DIRECTION_COLUMN,
   Flex,
   InputField,
   Modal,
@@ -13,12 +15,12 @@ import {
   StyledText,
 } from '@opentrons/components'
 
+import { TRACK_EVENTS } from '/ai-client/analytics/constants'
 import { feedbackModalAtom, tokenAtom } from '/ai-client/resources/atoms'
 import {
   LOCAL_FEEDBACK_END_POINT,
   PROD_FEEDBACK_END_POINT,
   STAGING_FEEDBACK_END_POINT,
-  TRACK_EVENTS,
 } from '/ai-client/resources/constants'
 import { useApiCall } from '/ai-client/resources/hooks'
 import { useTrackEvent } from '/ai-client/resources/hooks/useTrackEvent'
@@ -32,7 +34,8 @@ export function FeedbackModal(): JSX.Element {
   const [feedbackValue, setFeedbackValue] = useState<string>('')
   const [, setShowFeedbackModal] = useAtom(feedbackModalAtom)
   const [token] = useAtom(tokenAtom)
-  const { callApi } = useApiCall()
+  const { callApi, error, isLoading, data } = useApiCall()
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
 
   const handleSendFeedback = async (): Promise<void> => {
     const headers = {
@@ -62,15 +65,25 @@ export function FeedbackModal(): JSX.Element {
         fake: false,
       },
     }
+    setIsSubmitting(true)
     await callApi(config as AxiosRequestConfig)
-    trackEvent({
-      name: TRACK_EVENTS.FEEDBACK_SENT,
-      properties: {
-        feedback: feedbackValue,
-      },
-    })
-    setShowFeedbackModal(false)
   }
+
+  useEffect(() => {
+    if (isSubmitting && !isLoading) {
+      if (!error && data) {
+        // Success - track event and close modal
+        trackEvent({
+          name: TRACK_EVENTS.FEEDBACK_SENT,
+          properties: {
+            feedback: feedbackValue,
+          },
+        })
+        setShowFeedbackModal(false)
+      }
+      setIsSubmitting(false)
+    }
+  }, [isSubmitting, isLoading, error, data, feedbackValue])
 
   return (
     <Modal
@@ -94,7 +107,7 @@ export function FeedbackModal(): JSX.Element {
             </StyledText>
           </SecondaryButton>
           <PrimaryButton
-            disabled={feedbackValue === ''}
+            disabled={feedbackValue === '' || isLoading}
             onClick={async () => {
               await handleSendFeedback()
             }}
@@ -106,14 +119,21 @@ export function FeedbackModal(): JSX.Element {
         </Flex>
       }
     >
-      <InputField
-        title={t(`send_feedback_input_title`)}
-        size="medium"
-        value={feedbackValue}
-        onChange={event => {
-          setFeedbackValue(event.target.value as string)
-        }}
-      ></InputField>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+        {error && (
+          <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.red50}>
+            {error}
+          </StyledText>
+        )}
+        <InputField
+          title={t(`send_feedback_input_title`)}
+          size="medium"
+          value={feedbackValue}
+          onChange={event => {
+            setFeedbackValue(event.target.value as string)
+          }}
+        />
+      </Flex>
     </Modal>
   )
 }
