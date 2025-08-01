@@ -42,12 +42,12 @@ export function Overview(props: OverviewProps): JSX.Element | null {
     makeSnackbar(t('create_new_to_edit') as string)
   }
 
-  let pathCopy = t('single')
-  if (state.path === 'multiAspirate') {
-    pathCopy = t('consolidate')
-  } else if (state.path === 'multiDispense') {
-    pathCopy = t('distribute')
+  const pathCopyMap = {
+    multiAspirate: t('consolidate'),
+    multiDispense: t('distribute'),
+    single: t('single'),
   }
+  const pathCopy = pathCopyMap[state.path]
 
   const displayItems = [
     {
