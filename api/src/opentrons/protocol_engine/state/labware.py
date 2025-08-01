@@ -1361,7 +1361,7 @@ class LabwareView:
         def get_origin_to_mid_z(labware_definition: LabwareDefinition) -> float:
             """Return the z-coordinate of the middle of the labware, relative to the labware's origin."""
             extents = self.get_extents_around_lw_origin(labware_definition)
-            return (extents.max_x - extents.min_z) / 2
+            return (extents.max_z + extents.min_z) / 2
 
         if labware_definition.schemaVersion == 2:
             # In schema 2, the bottom of the labware is at the z-origin by definition.
