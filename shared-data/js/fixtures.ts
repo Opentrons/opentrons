@@ -743,7 +743,7 @@ export function getAAComboFixtureDisplayName(
 // note: we've decided not to translate these strings
 export function getFixtureDisplayName(
   cutoutFixtureId: CutoutFixtureIdsWithFakes | null,
-  usbPortNumber?: string | null,  
+  usbPortNumber?: string | null,
   t: TFunction
 ): string {
   const translationFileName = 'deck_configuration'
@@ -756,13 +756,15 @@ export function getFixtureDisplayName(
     case TRASH_BIN_ADAPTER_FIXTURE:
       return t(`${translationFileName}:trash_bin`)
     case WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE:
-      return 'Waste Chute'
+      return t(`${translationFileName}:waste_chute`)
     case WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE:
-      return 'Waste Chute with Cover'
+      return t(`${translationFileName}:waste_chute_with_cover`)
     case STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE:
-      return 'Waste Chute with Staging Area Slot'
+      return t(`${translationFileName}:waste_chute_with_staging_area_slot`)
     case STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE:
-      return 'Waste chute with Staging Area Slot and Cover'
+      return t(
+        `${translationFileName}:waste_chute_with_staging_area_slot_and_cover`
+      )
     case HEATERSHAKER_MODULE_V1_FIXTURE:
       return usbPortNumber != null
         ? `${getModuleDisplayName(HEATERSHAKER_MODULE_V1)} in ${usbPortNumber}`
@@ -802,25 +804,27 @@ export function getFixtureDisplayName(
           )} and Waste Chute with Cover`
     case FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE:
       return usbPortNumber != null
-        ? `${getModuleDisplayName(
-            FLEX_STACKER_MODULE_V1
-          )} in ${usbPortNumber} and Waste Chute`
+        ? t(`${translationFileName}:module_in_port_and_waste_chute`, {
+            moduleName: getModuleDisplayName(FLEX_STACKER_MODULE_V1),
+            usbPortNumber,
+          })
         : `${getModuleDisplayName(FLEX_STACKER_MODULE_V1)} and Waste Chute`
     case FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE:
       return usbPortNumber != null
-        ? `${getModuleDisplayName(
-            FLEX_STACKER_MODULE_V1
-          )} in ${usbPortNumber} and Magnetic Block`
+        ? t(`${translationFileName}:module_in_port_and_magnetic_block`, {
+            moduleName: getModuleDisplayName(FLEX_STACKER_MODULE_V1),
+            usbPortNumber,
+          })
         : `${getModuleDisplayName(FLEX_STACKER_MODULE_V1)} and Magnetic Block`
     case SINGLE_CENTER_SLOT_FIXTURE:
-      return 'Center slot'
+      return t(`${translationFileName}:center_slot`)
     case SINGLE_RIGHT_SLOT_FIXTURE:
-      return 'Right slot'
+      return t(`${translationFileName}:right_slot`)
     case SINGLE_LEFT_SLOT_FIXTURE:
-      return 'Left slot'
+      return t(`${translationFileName}:left_slot`)
     default:
       console.error('was not able to find display name for: ', cutoutFixtureId)
-      return 'Slot'
+      return t(`${translationFileName}:slot`)
   }
 }
 

@@ -213,12 +213,13 @@ export function FixtureListItem({
               >
                 {isCurrentFixtureCompatible
                   ? getFixtureDisplayName(
-                      partialRequiredCutoutFixtureId ?? cutoutFixtureId, t
+                      partialRequiredCutoutFixtureId ?? cutoutFixtureId,
+                      t
                     )
                   : getFixtureDisplayName(
                       partialRequiredCutoutFixtureId ??
                         compatibleCutoutFixtureIds?.[0],
-                        t
+                      t
                     )}
               </LegacyStyledText>
               <Btn
