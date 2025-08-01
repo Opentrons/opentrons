@@ -1,3 +1,5 @@
+# noqa: D100
+
 from opentrons.protocol_engine.state._axis_aligned_bounding_box import (
     AxisAlignedBoundingBox3D,
 )

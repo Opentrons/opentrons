@@ -15,7 +15,7 @@ from typing import (
     Union,
     overload,
 )
-from typing_extensions import assert_never, assert_type
+from typing_extensions import assert_never
 
 from opentrons.protocol_engine.state import update_types
 from opentrons_shared_data.deck.types import DeckDefinitionV5
@@ -24,7 +24,6 @@ from opentrons_shared_data.labware.labware_definition import (
     InnerWellGeometry,
     LabwareDefinition,
     LabwareDefinition2,
-    LabwareDefinition3,
     LabwareRole,
     WellDefinition2,
     WellDefinition3,
