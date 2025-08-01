@@ -123,7 +123,6 @@ def is_valid_row(axis: str, platform: str, zone: int, config: Dict[Any, Any], co
             exp_count = 0 if not count else labware_count[0] if a == 'x' else labware_count[1]
             platform_list = config[f"platform_list_{a}"]
             zone_list = config[f"zone_list_{a}"]
-            print("COUNT", count, labware_count, lw_count, exp_count, lw_count == exp_count)
             return (not platform_list or platform in platform_list) and (
                 not zone_list or zone in zone_list
             ) and (not count or lw_count == exp_count)
@@ -158,6 +157,7 @@ def parse_common_args(args: argparse.Namespace) -> Dict[str, Any]:
         "threshold": args.threshold,
         "bin_range": args.bin_range,
         "cross_correlation": args.enable_cross_correlation,
+        "test_name": args.test_name,
     }
 
 
@@ -221,6 +221,8 @@ def read_filtered_data(
             sys.exit(f"ERROR: Invalid dataframe file provided - {filepath}")
         for df in pd.read_csv(filepath, chunksize=CHUNK_SIZE):
             df = df[df["Axis"].isin(config["axis_list"])]
+            if config["test_name"]:
+                df = df[df["Test"].isin(config["test_name"])]
             if config["stacker_list"]:
                 df = df[df["Stacker_SN"].isin(config["stacker_list"])]
             if config["labware_list"]:
@@ -964,6 +966,12 @@ if __name__ == "__main__":
         "--stackers",
         help="The list of stacker serial number to process data for, ex. FSTA1020250401005.",
         nargs="+",
+    )
+    parser.add_argument(
+        "--test-name",
+        help="The list of test names to filter by, uses all by default.",
+        nargs="+",
+        type=str,
     )
     parser.add_argument(
         "--max-samples",
