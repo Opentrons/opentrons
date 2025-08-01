@@ -116,6 +116,7 @@ import type {
   ProtocolFixture,
   ProtocolHardware,
 } from '/app/transformations/commands'
+import { TFunction } from 'i18next'
 
 const FETCH_DURATION_MS = 5000
 
@@ -147,7 +148,11 @@ function PrepareToRun({
   confirmStepsComplete,
   offsetsConfirmed,
 }: PrepareToRunProps): JSX.Element {
-  const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
+  const { t, i18n } = useTranslation([
+    'protocol_setup',
+    'shared',
+    'deck_configuration',
+  ])
   const navigate = useNavigate()
   const { makeSnackbar } = useToaster()
   const { scrollRef, isScrolled } = useScrollPosition()
@@ -457,6 +462,7 @@ function PrepareToRun({
   const missingFixturesText =
     missingFixtures.length === 1
       ? `${t('missing')} ${getFixtureDisplayName(
+          t as TFunction,
           missingFixtures[0].cutoutFixtureId
         )}`
       : t('multiple_fixtures_missing', { count: missingFixtures.length })

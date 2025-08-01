@@ -44,6 +44,7 @@ import type {
 import type { ModulePrepCommandsType } from '/app/local-resources/modules'
 import type { ProtocolCalibrationStatus } from '/app/resources/runs'
 import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
+import { TFunction } from 'i18next'
 
 export type ModuleStatusType =
   | 'locationConflict'
@@ -120,7 +121,11 @@ export function ModuleTableItem({
   robotName,
   comboFixtureId,
 }: ModuleTableItemProps): JSX.Element {
-  const { i18n, t } = useTranslation(['protocol_setup', 'module_wizard_flows'])
+  const { i18n, t } = useTranslation([
+    'protocol_setup',
+    'module_wizard_flows',
+    'deck_configuration',
+  ])
 
   const { makeSnackbar } = useToaster()
 
@@ -329,7 +334,7 @@ export function ModuleTableItem({
         <Flex flex="3.5 0 0" alignItems={ALIGN_CENTER}>
           <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {comboFixtureId != null
-              ? getFixtureDisplayName(comboFixtureId)
+              ? getFixtureDisplayName(t as TFunction, comboFixtureId)
               : getModuleDisplayName(module.moduleDef.model)}
           </LegacyStyledText>
         </Flex>

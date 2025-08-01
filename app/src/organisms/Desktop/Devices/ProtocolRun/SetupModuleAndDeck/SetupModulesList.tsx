@@ -227,7 +227,11 @@ export function ModulesListItem({
   robotName,
   comboFixtureId,
 }: ModulesListItemProps): JSX.Element {
-  const { t } = useTranslation(['protocol_setup', 'module_wizard_flows'])
+  const { t } = useTranslation([
+    'protocol_setup',
+    'module_wizard_flows',
+    'deck_configuration',
+  ])
   const moduleConnectionStatus =
     attachedModuleMatch != null
       ? t('module_connected')
@@ -452,7 +456,7 @@ export function ModulesListItem({
                 marginLeft={SPACING.spacing20}
               >
                 {comboFixtureId != null
-                  ? getFixtureDisplayName(comboFixtureId)
+                  ? getFixtureDisplayName(t as TFunction, comboFixtureId)
                   : displayName}
               </LegacyStyledText>
               {subText}

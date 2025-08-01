@@ -63,7 +63,11 @@ export const RobotConfigurationDetails = (
     isLoading,
     robotType,
   } = props
-  const { t } = useTranslation(['protocol_details', 'shared'])
+  const { t } = useTranslation([
+    'protocol_details',
+    'shared',
+    'deck_configuration',
+  ])
 
   const loadingText = (
     <StyledText desktopStyle="bodyDefaultRegular">
@@ -205,7 +209,7 @@ export const RobotConfigurationDetails = (
                     />
                   ) : null}
                   <StyledText desktopStyle="bodyDefaultRegular">
-                    {getFixtureDisplayName(fixture.cutoutFixtureId)}
+                    {getFixtureDisplayName(t, fixture.cutoutFixtureId)}
                   </StyledText>
                 </>
               }

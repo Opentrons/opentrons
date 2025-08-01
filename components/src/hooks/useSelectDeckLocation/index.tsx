@@ -38,6 +38,7 @@ import type {
   ModuleLocation,
   RobotType,
 } from '@opentrons/shared-data'
+import type { TFunction } from 'i18next'
 
 export type DeckLocationSelectThemes = 'default' | 'grey'
 
@@ -97,7 +98,7 @@ export function DeckLocationSelect({
 }: DeckLocationSelectProps): JSX.Element {
   const robotType = deckDef.robot.model
 
-  const { t } = useTranslation('module_wizard_flows')
+  const { t } = useTranslation(['module_wizard_flows', 'deck_configuration'])
 
   const [hoveredData, setHoveredData] = useState<{
     slot: AddressableArea
@@ -313,6 +314,7 @@ export function DeckLocationSelect({
               {hoveredData.disabledReason != null
                 ? t('location_occupied', {
                     fixture: getFixtureDisplayName(
+                      t as TFunction,
                       hoveredData.disabledReason
                     ).toLowerCase(),
                   })

@@ -39,6 +39,7 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 import type { CutoutConfigAndCompatibility } from '/app/resources/deck_configuration/hooks'
+import type { TFunction } from 'i18next'
 
 interface FixtureTableProps {
   robotType: RobotType
@@ -108,7 +109,7 @@ function FixtureTableItem({
   robotName,
   partialRequiredCutoutFixtureId,
 }: FixtureTableItemProps): JSX.Element {
-  const { t, i18n } = useTranslation('protocol_setup')
+  const { t, i18n } = useTranslation(['protocol_setup', 'deck_configuration'])
 
   const [
     showLocationConflictModal,
@@ -218,9 +219,11 @@ function FixtureTableItem({
           <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {cutoutFixtureId != null && isCurrentFixtureCompatible
               ? getFixtureDisplayName(
+                  t as TFunction,
                   partialRequiredCutoutFixtureId ?? cutoutFixtureId
                 )
               : getFixtureDisplayName(
+                  t as TFunction,
                   partialRequiredCutoutFixtureId ??
                     compatibleCutoutFixtureIds?.[0]
                 )}

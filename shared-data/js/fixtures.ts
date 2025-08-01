@@ -742,9 +742,9 @@ export function getAAComboFixtureDisplayName(
 
 // note: we've decided not to translate these strings
 export function getFixtureDisplayName(
+  t: TFunction,
   cutoutFixtureId: CutoutFixtureIdsWithFakes | null,
-  usbPortNumber?: string | null,
-  t: TFunction
+  usbPortNumber?: string | null
 ): string {
   const translationFileName = 'deck_configuration'
 

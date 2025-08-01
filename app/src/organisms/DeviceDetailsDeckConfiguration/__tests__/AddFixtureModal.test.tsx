@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -42,6 +43,8 @@ const render = (props: ComponentProps<typeof AddFixtureModal>) => {
     i18nInstance: i18n,
   })
 }
+
+const { t } = useTranslation('deck_configuration')
 
 describe('Touchscreen AddFixtureModal', () => {
   let props: ComponentProps<typeof AddFixtureModal>
@@ -208,6 +211,7 @@ describe('Desktop AddFixtureModal', () => {
     ).toBe(1)
 
     const displayText = getFixtureDisplayName(
+      t,
       WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
     )
     screen.getByText(displayText)

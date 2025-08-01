@@ -23,6 +23,7 @@ import { patchDeckConfigForRequiredFixture } from '/app/organisms/LocationConfli
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
+import { TFunction } from 'i18next'
 
 interface NotConfiguredModalProps {
   onCloseClick: () => void
@@ -35,7 +36,11 @@ export const NotConfiguredModal = (
   props: NotConfiguredModalProps
 ): JSX.Element => {
   const { onCloseClick, cutoutId, requiredFixtureId, isOnDevice } = props
-  const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
+  const { t, i18n } = useTranslation([
+    'protocol_setup',
+    'shared',
+    'deck_configuration',
+  ])
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const deckConfig = useNotifyDeckConfigurationQuery()?.data ?? []
 
@@ -56,7 +61,7 @@ export const NotConfiguredModal = (
         onOutsideClick={onCloseClick}
         header={{
           title: t('add_fixture', {
-            fixtureName: getFixtureDisplayName(requiredFixtureId),
+            fixtureName: getFixtureDisplayName(t as TFunction, requiredFixtureId),
             locationName: cutoutDisplayName,
           }),
           hasExitIcon: true,
@@ -69,7 +74,7 @@ export const NotConfiguredModal = (
           </StyledText>
           <ListTable>
             <ODDFixtureOption
-              optionName={getFixtureDisplayName(requiredFixtureId)}
+              optionName={getFixtureDisplayName(t as TFunction, requiredFixtureId)}
               onClickHandler={handleUpdateDeck}
               buttonText={i18n.format(t('shared:add'), 'capitalize')}
             />
@@ -79,7 +84,7 @@ export const NotConfiguredModal = (
     ) : (
       <Modal
         title={t('add_fixture', {
-          fixtureName: getFixtureDisplayName(requiredFixtureId),
+          fixtureName: getFixtureDisplayName(t as TFunction, requiredFixtureId),
           locationName: cutoutDisplayName,
         })}
         onClose={onCloseClick}
@@ -91,7 +96,7 @@ export const NotConfiguredModal = (
           </StyledText>
           <ListTable>
             <FixtureOption
-              optionName={getFixtureDisplayName(requiredFixtureId)}
+              optionName={getFixtureDisplayName(t as TFunction, requiredFixtureId)}
               onClickHandler={handleUpdateDeck}
               buttonText={i18n.format(t('shared:add'), 'capitalize')}
             />
