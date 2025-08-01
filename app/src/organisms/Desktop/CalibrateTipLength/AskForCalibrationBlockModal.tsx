@@ -18,9 +18,9 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { labwareImages } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { labwareImages } from '/app/local-resources/labware'
 import { WizardHeader } from '/app/molecules/WizardHeader'
 import { setUseTrashSurfaceForTipCal } from '/app/redux/calibration'
 
