@@ -65,11 +65,19 @@ def build_arg_parser() -> argparse.ArgumentParser:
     )
     arg_parser.add_argument(
         "-t",
-        "--test_name",
+        "--tof_test_name",
         type=str,
         required=False,
-        help="Sets the name of the test",
+        help="Sets the name of the test saved in the csv file",
         default="tof_data_collection",
+    )
+    arg_parser.add_argument(
+        "-o",
+        "--only",
+        type=str,
+        required=False,
+        help="Run one specific position, options: x_retract, x_extend, z_retract, z_extend",
+        default=None,
     )
     arg_parser.add_argument(
         "-s",
@@ -92,7 +100,8 @@ class Stacker_TOF_Data_Collection:
         labware_amount_x: int,
         labware_amount_z: int,
         labware_name: str,
-        test_name: str,
+        tof_test_name: str,
+        only: Optional[str] = None,
     ) -> None:
         """Init."""
         self.simulate = simulate
@@ -101,7 +110,7 @@ class Stacker_TOF_Data_Collection:
         self.labware_amount_x = labware_amount_x
         self.labware_amount_z = labware_amount_z
         self.labware_name = labware_name
-        self.test_name = test_name
+        self.tof_test_name = tof_test_name
         self.api: Optional[OT3API] = None
         self.mount: Optional[OT3Mount] = None
         self.home: Optional[Point] = None
@@ -129,14 +138,35 @@ class Stacker_TOF_Data_Collection:
             {str(bin): "None" for bin in range(1, NUMBER_OF_BINS + 1)}
         )
 
-        self.tof_axes = {
-            "x": TOFSensor.X,
-            "z": TOFSensor.Z,
-        }
-        self.directions = {
-            "retract": Direction.RETRACT,
-            "extend": Direction.EXTEND,
-        }
+        
+
+        if only is None:
+            self.tof_axes = {
+                "x": TOFSensor.X,
+                "z": TOFSensor.Z,
+            }
+            self.directions = {
+                "retract": Direction.RETRACT,
+                "extend": Direction.EXTEND,
+            }
+        else:
+            only = only.lower()
+            if only == "x_retract":
+                self.directions = {"retract": Direction.RETRACT}
+                self.tof_axes = {"x": TOFSensor.X}
+            elif only == "x_extend":
+                self.directions = {"extend": Direction.EXTEND}
+                self.tof_axes = {"x": TOFSensor.X}
+            elif only == "z_retract":
+                self.directions = {"retract": Direction.RETRACT}
+                self.tof_axes = {"z": TOFSensor.Z}
+            elif only == "z_extend":
+                self.directions = {"extend": Direction.EXTEND}
+                self.tof_axes = {"z": TOFSensor.Z}
+            else:
+                raise ValueError(
+                    f"Invalid option for --only: {only}. Valid options are x_retract, x_extend, z_retract, z_extend."
+                )
 
     async def test_setup(self) -> None:
         """Setup the test."""
@@ -173,6 +203,7 @@ class Stacker_TOF_Data_Collection:
         self.test_header = self.dict_keys_to_line(self.test_data)
         self.test_id = data.create_run_id()
         self.test_date = "run-" + datetime.utcnow().strftime("%y-%m-%d")
+        self.test_name = data.create_test_name_from_file(__file__)
         self.test_path = data.create_folder_for_test_data(self.test_name)
         self.test_tag = f"labx{self.labware_amount_x}_labz{self.labware_amount_z}_{self.flex_serial}"
         self.test_file = data.create_file_name(
@@ -218,7 +249,7 @@ class Stacker_TOF_Data_Collection:
                                 test_data = self.test_data.copy()
                                 test_data["Hash_id"] = str(uuid.uuid4())
                                 test_data["Date"] = str(date)
-                                test_data["Test"] = self.test_name
+                                test_data["Test"] = self.tof_test_name
                                 test_data["Labware_Name"] = self.labware_name
                                 test_data["Stacker_SN"] = self.stackers[i]
                                 test_data["Axis"] = str(axis.lower())
@@ -280,6 +311,7 @@ if __name__ == "__main__":
         args.labware_amount_x,
         args.labware_amount_z,
         args.labware_name,
-        args.test_name,
+        args.tof_test_name,
+        args.only,
     )
     asyncio.run(test.run())
