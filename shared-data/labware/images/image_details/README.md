@@ -15,5 +15,3 @@
 3. **Upload the image**  
    - Place the image file(s) in the `../images` directory.
 
-4. **Register the image in code**  
-   - Run `../labware-images.ts` to ensure the image(s) are properly imported into the `labwareImages` map.

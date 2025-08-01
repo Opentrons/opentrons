@@ -8,7 +8,7 @@ import fixtureTiprackAdapter from '../labware/fixtures/2/fixture_flex_96_tiprack
 import fixtureTiprack10ul from '../labware/fixtures/2/fixture_tiprack_10_ul.json'
 import fixtureTiprack300ul from '../labware/fixtures/2/fixture_tiprack_300_ul.json'
 import fixtureTrash from '../labware/fixtures/2/fixture_trash.json'
-import { labwareImages } from '../labware/images/image_details/labware-images-generated'
+import { labwareImages } from '../labware/images/image_details/labware-images'
 import labwareSchemaV2 from '../labware/schemas/2.json'
 import labwareSchemaV3 from '../labware/schemas/3.json'
 
