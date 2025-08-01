@@ -96,7 +96,7 @@ export function AskForCalibrationBlockModal(props: Props): JSX.Element {
           <Flex flex="1" justifyContent={JUSTIFY_CENTER}>
             <img
               className={styles.block_image}
-              src={labwareImages[CAL_BLOCK_LOAD_NAME]}
+              src={labwareImages[CAL_BLOCK_LOAD_NAME][0]}
             />
           </Flex>
         </Flex>

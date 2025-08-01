@@ -40,7 +40,7 @@ export function ChosenTipRackRender(
           max-width: 7rem;
           max-height: 3.7rem;
         `}
-        src={imageSrc}
+        src={imageSrc[0]}
         alt={`${String(displayName)} image`}
       />
       <Box>
