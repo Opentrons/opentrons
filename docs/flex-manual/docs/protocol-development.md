@@ -186,21 +186,21 @@ The protocol timeline on the left side of the screen shows the steps the Flex wi
 
 * **Module steps** let you control Flex modules during a protocol. Protocol Designer includes different customizable options for each module. 
 
-  * **Absorbance Plate Reader**: Protocol Designer lets you create multiple steps to initialize the plate reader, read samples in a plate, or move the lid on and off the module. An option to **Read labware** is only available when a plate is inside the plate reader. After reading a plate, you can find a CSV file with absorbance measurement data in the Flex's recent protocol runs in the Opentrons App. 
+    * **Absorbance Plate Reader**: Protocol Designer lets you create multiple steps to initialize the plate reader, read samples in a plate, or move the lid on and off the module. An option to **Read labware** is only available when a plate is inside the plate reader. After reading a plate, you can find a CSV file with absorbance measurement data in the Flex's recent protocol runs in the Opentrons App. 
 
-!!! note
-    You'll need a Flex Gripper to add an Absorbance Plate Reader Module to your protocol starting deck. To prevent damage, only a Flex Gripper can move the lid on and off the Plate Reader.  
+    !!! note
+        You'll need a Flex Gripper to add an Absorbance Plate Reader Module to your protocol starting deck. To prevent damage, only a Flex Gripper can move the lid on and off the Plate Reader.  
 
-  * **Heater-Shaker**: Protocol Designer supports multiple Heater-Shaker adapters for use with deep well, flat bottom, or PCR plates. In the step menu, control the temperature, shake speed, and labware latch of the Heater-Shaker Module.
+      * **Heater-Shaker**: Protocol Designer supports multiple Heater-Shaker adapters for use with deep well, flat bottom, or PCR plates. In the step menu, control the temperature, shake speed, and labware latch of the Heater-Shaker Module.
 
-      You can set a custom time for your step, to begin after the Heater-Shaker reaches the target temperature or shake speed. Because reaching a target temperature takes more time than changing the shaking speed, your protocol can proceed while the Heater-Shaker reaches a target temperature.
+          You can set a custom time for your step, to begin after the Heater-Shaker reaches the target temperature or shake speed. Because reaching a target temperature takes more time than changing the shaking speed, your protocol can proceed while the Heater-Shaker reaches a target temperature.
 
-  * **Temperature**: Set a target temperature or deactivate the Temperature Module. 
+      * **Temperature**: Set a target temperature or deactivate the Temperature Module. 
 
-  * **Thermocycler**: Use the menu to add one of two mutually exclusive types of steps:
+      * **Thermocycler**: Use the menu to add one of two mutually exclusive types of steps:
 
-      - Change Thermocycler state: Set a block or lid temperature, or move the lid.
-      - Program a Thermocycler profile: Add steps or a cycle to create a *profile*, a timed heating and cooling routine the Thermocycler will automatically repeat. Each step of the profile holds the block and labware inside at a certain temperature for a certain time. Profiles do not change the temperature of the lid. 
+          - Change Thermocycler state: Set a block or lid temperature, or move the lid.
+          - Program a Thermocycler profile: Add steps or a cycle to create a *profile*, a timed heating and cooling routine the Thermocycler will automatically repeat. Each step of the profile holds the block and labware inside at a certain temperature for a certain time. Profiles do not change the temperature of the lid. 
 
   * **Pause**: Stop your protocol for a certain amount of time. Define your pause with one of three options, and tell the Flex how to resume your protocol: 
 
