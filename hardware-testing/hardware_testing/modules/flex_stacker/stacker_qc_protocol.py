@@ -57,7 +57,7 @@ def run(protocol: ProtocolContext) -> None:
         protocol.move_labware(tiprack, stacker, use_gripper=True)
         stacker.store()
 
-    # =================== FILL TIPRACKS WITH PCR PLATES ======================
+    # =================== FILL STACKERS WITH PCR PLATES ======================
 
     stacker.empty("Empty all tipracks from the hopper and load in 6 PCR plates.")
     stacker.set_stored_labware(
@@ -66,6 +66,25 @@ def run(protocol: ProtocolContext) -> None:
     )
 
     # ======================= RETRIEVE/STORE PCR PLATES ======================
+    plates = []
+    for slot in SLOTS:
+        plate = stacker.retrieve()
+        protocol.move_labware(plate, slot, use_gripper=True)
+        plates.append(plate)
+
+    for plate in plates:
+        protocol.move_labware(plate, stacker, use_gripper=True)
+        stacker.store()
+
+    # =================== FILL STACKERS WITH 384 wells PLATES ======================
+
+    stacker.empty("Empty all PCR plates from the hopper and load in 6 384 plates.")
+    stacker.set_stored_labware(
+        load_name="biorad_384_wellplate_50ul",
+        count=6,
+    )
+
+    # ======================= RETRIEVE/STORE 384 wells PLATES ======================
     plates = []
     for slot in SLOTS:
         plate = stacker.retrieve()
