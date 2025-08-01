@@ -28,18 +28,18 @@ plugins:
 copyright: Copyright © OPENTRONS, 2025
 
 nav:
-  ## index.md includes About PD through the bulleted list
-  - About Protocol Designer: about-pd.md ## second half of About PD + PD Requirements + PD Settings... open to just putting all this in index.md
+  - index.md
+  - About Protocol Designer: about-pd.md 
   - Create a protocol:
       - Robot and instruments: robot-instruments.md
       - Modules and fixtures: modules-fixtures.md
       - Protocol metadata and overview: overview.md
-  - Protocol starting deck: starting-deck.md ## includes "define and add liquids;" must include mention of hardware configurations
+  - Protocol starting deck: starting-deck.md 
   - Protocol steps:
       - Transfer steps: transfer-steps.md
       - Mix steps: mix-steps.md
       - Move steps: move-steps.md
-      - Module steps: module-steps.md ## can't include a third subsection; but want to include the table
+      - Module steps: module-steps.md 
       - Magnet steps: magnet-steps.md
       - Pause steps: pause-steps.md
   - Editing steps: editing-steps.md
