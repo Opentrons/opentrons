@@ -51,7 +51,7 @@
     }
   },
   "gripForce": 16,
-  "gripHeightFromLabwareBottom": 23.9,
+  "gripHeightFromLabwareOrigin": 23.9,
   "wells": {
     "A1": {
       "depth": 97.5,

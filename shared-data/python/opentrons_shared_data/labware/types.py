@@ -231,7 +231,7 @@ class LabwareDefinition3(_OTSharedSchemaMixin, TypedDict):
     allowedRoles: NotRequired[list[LabwareRoles]]
     gripperOffsets: NotRequired[dict[str, GripperOffsets]]
     gripForce: NotRequired[float]
-    gripHeightFromLabwareBottom: NotRequired[float]
+    gripHeightFromLabwareOrigin: NotRequired[float]
     stackLimit: NotRequired[int]
     compatibleParentLabware: NotRequired[list[str]]
     # The innerLabwareGeometry dict values are not currently modeled in these
