@@ -120,13 +120,3 @@ figure.side-by-side img {
   align-items: center;
   gap: 5px;
 }
-
-/* colors for material icons */
-
-.twemoji.green {
-  color: green;
-}
-
-.twemoji.red {
-  color: red;
-}
