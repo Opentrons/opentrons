@@ -1134,7 +1134,7 @@ export const getMainNonComboFixtureId = (
     return null
   }
 
-  // Find the fixture with the least items in its providesAddressableAreas
+  // Find the fixture with the least items in its providesAddressableAreas in order to find the simplest fixture
   const fixtureWithLeastAAs = cutoutFixturesWithAddressableAreas.reduce(
     (minFixture, currentFixture) => {
       const minAAsCount = Object.entries(minFixture.providesAddressableAreas)

@@ -60,7 +60,6 @@ export function getSimplestDeckConfigForProtocol(
       addressableArea,
       cutoutFixturesForAddressableArea
     )
-    console.log('cutoutIdForAddressableArea', cutoutIdForAddressableArea)
     const cutoutFixturesForCutoutId =
       cutoutIdForAddressableArea != null
         ? getCutoutFixturesForCutoutId(
@@ -68,11 +67,9 @@ export function getSimplestDeckConfigForProtocol(
             deckDef.cutoutFixtures
           )
         : null
-    console.log('cutoutFixturesForCutoutId', cutoutFixturesForCutoutId)
     const existingCutoutConfig = acc.find(
       cutoutConfig => cutoutConfig.cutoutId === cutoutIdForAddressableArea
     )
-    console.log('existingCutoutConfig', existingCutoutConfig)
 
     if (
       existingCutoutConfig != null &&
@@ -86,23 +83,17 @@ export function getSimplestDeckConfigForProtocol(
         ({ cutoutId }) => cutoutId === cutoutIdForAddressableArea
       )
       const previousRequiredAAs = acc[accIndex]?.requiredAddressableAreas
-      console.log('previousRequiredAAs', previousRequiredAAs)
-      console.log('addressableArea: ', addressableArea)
       const allNextRequiredAddressableAreas =
         previousRequiredAAs != null &&
         previousRequiredAAs.includes(addressableArea)
           ? previousRequiredAAs
           : [...previousRequiredAAs, addressableArea]
-      console.log(
-        'allNextRequiredAddressableAreas',
-        allNextRequiredAddressableAreas
-      )
+
       const nextCompatibleCutoutFixture = getSimplestFixtureForAddressableAreas(
         cutoutIdForAddressableArea,
         allNextRequiredAddressableAreas,
         cutoutFixturesForCutoutId
       )
-      console.log('first', nextCompatibleCutoutFixture)
       const indexOfCurrentFixture = cutoutFixturesForCutoutId.findIndex(
         ({ id }) => id === nextCompatibleCutoutFixture?.id
       )
@@ -124,7 +115,6 @@ export function getSimplestDeckConfigForProtocol(
     }
     return acc
   }, FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC)
-  console.log('simplestDeckConfig', simplestDeckConfig)
   return simplestDeckConfig
 }
 
@@ -201,14 +191,12 @@ export function getSimplestFixtureForAddressableAreas(
     requiredAddressableAreas,
     cutoutFixturesForCutoutId
   )
-  console.log('nextCompatibleCutoutFixtures', nextCompatibleCutoutFixtures)
   if (nextCompatibleCutoutFixtures.length > 1) {
     const mainFixture = getMainNonComboFixtureId(
       nextCompatibleCutoutFixtures.map(cf => cf.id),
       requiredAddressableAreas,
       cutoutId
     )
-    console.log('mainFixture', mainFixture)
     return (
       nextCompatibleCutoutFixtures.find(cf => cf.id === mainFixture) ?? null
     )
