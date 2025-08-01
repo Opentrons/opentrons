@@ -116,7 +116,7 @@
     "schema3test_flex_96_tiprack_200ul"
   ],
   "gripForce": 10,
-  "gripHeightFromLabwareBottom": 10,
+  "gripHeightFromLabwareOrigin": 10,
   "gripperOffsets": {
     "default": {
       "pickUpOffset": {
