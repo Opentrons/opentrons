@@ -12,7 +12,8 @@ const ignoredImages = new Set([
   'removable_black_plastic_trash_bin.png',
   'tipone_200ul_tip_side_view.jpg',
 ])
-// If this test is failed, run ../labware-images.ts
+
+// If this test fails, run ../labware-images.ts to regenerate imports
 function getAllFiles(dir: string): string[] {
   return fs.readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
     const res = path.resolve(dir, entry.name)
@@ -33,12 +34,14 @@ describe('Image import verification', () => {
     const imageFiles = getAllFiles(imageDir).filter(file =>
       /\.(jpg|jpeg|png|svg)$/i.test(file)
     )
+
     const notImported: string[] = []
 
     for (const fullPath of imageFiles) {
       const filename = path.basename(fullPath)
       if (ignoredImages.has(filename)) continue
-      const pattern = new RegExp(`[\'"][^\'"]*${filename}[\'"]`, 'i')
+
+      const pattern = new RegExp(`['"][^'"]*${filename}['"]`, 'i')
       if (!pattern.test(importFileContent)) {
         notImported.push(filename)
       }
@@ -47,6 +50,7 @@ describe('Image import verification', () => {
     if (notImported.length > 0) {
       console.warn('Missing imports for:', notImported)
     }
+
     expect(notImported).toEqual([])
   })
 })
