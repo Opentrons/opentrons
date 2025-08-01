@@ -385,7 +385,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
                 )
                 retrying = True
         pip._retract()
-        #if ctx.params.lld:  # type: ignore [attr-defined]
+        # if ctx.params.lld:  # type: ignore [attr-defined]
         #    pip.return_tip()
         #    pip._retract()
         #    ctx.pause("Replace tip rack.")
@@ -442,7 +442,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
         liquid_class = _get_transfer_settings(tips, i == 0)
         pip.pick_up_tip(tips["A1"])
 
-        #if i == 0:
+        # if i == 0:
         #    _validate_dye_liquid_height()
         _validate_dye_liquid_height(i)
 
