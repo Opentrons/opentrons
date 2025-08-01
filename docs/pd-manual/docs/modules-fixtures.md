@@ -20,9 +20,9 @@ Protocol Designer protocols can control Opentrons modules on the Flex or OT-2, a
 On the Flex, you can also customize fixtures, including the waste chute, trash bin, and staging areas, to optimize deck space. 
 
 | **Fixture** {style="width: 30%"} | **Opentrons Flex** {style="width: 35%"}| **Opentrons OT-2** {style="width: 35%"} |
-| :------------| :------------------: | :------------------: |
+| :------------| :------------------ | :------------------ |
 | Trash Bin | <ul><li>Only 1 trash bin</li><li>Slots A1-D1 or A3-D3</li></ul> | <ul><li>Only 1 trash bin</li><li>Slot 12</li></ul> |
 | Waste Chute | <ul><li>Only 1 waste chute</li><li>Slot D3</li></ul> | Not compatible |
 | Staging area | <ul><li>Up to 4 staging areas</li><li>Slots A3-D3</li></ul> | Not compatible |
 
-You can create additional space on the Flex deck by adding as many as four staging areas to slots A3-D3. This creates an additional row of slots (A4-D4). 
+You can create additional space on the Flex deck by adding as many as four staging areas to slots A3–D3. This creates an additional row of slots (A4-D4). 

@@ -11,4 +11,4 @@ When selecting labware for a move step, you can choose labware directly on the d
 
 If required, labware adapters need to be added to a module before a labware move. To add an adapter, return to the protocol starting deck. 
 
-When moving labware to and from the Heater-Shaker, Thermocycler, or Absorbance Plate Reader Module, the labware latch or lid must be open. Add a module step to open the latch or lid before moving labware to or from the module. You'll need to use a Flex Gripper to move the lid or off the Absorbance Plate Reader Module. 
+When moving labware to and from the Heater-Shaker, Thermocycler, or Absorbance Plate Reader Module, the labware latch or lid must be open. Add a module step to open the latch or lid before moving labware to or from the module. You'll need to use a Flex Gripper to move the lid on or off the Absorbance Plate Reader Module. 

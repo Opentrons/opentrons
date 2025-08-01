@@ -23,7 +23,7 @@ view more details, if available.
 
 In this transfer step, step details include each single-path
 aspirate and dispense motion required to add 10 µL of a DNA sample
-to wells A1 and A2 of a Corning 96-well plate in the Heater-Shaker
+to wells A1 and B1 of a Corning 96-well plate in the Heater-Shaker
 Module. Step details can also show mix wells and repetitions for a
 mix step, or steps and cycles of a Thermocycler Module profile.
 
