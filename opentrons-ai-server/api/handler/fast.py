@@ -20,7 +20,6 @@ from pydantic import BaseModel, Field, conint
 from starlette.middleware.base import BaseHTTPMiddleware
 from uvicorn.protocols.utils import get_path_with_query_string
 
-from api.constants.file_constants import MEDIA_TYPE_MAPPING
 from api.domain.anthropic_predict import AnthropicPredict, get_tracing_context, setup_weave_analytics
 from api.domain.fake_responses import FakeResponse, get_fake_response
 from api.domain.openai_predict import OpenAIPredict
@@ -220,7 +219,7 @@ def _generate_llm_response_with_history(
     history_with_attachments: Optional[List[Dict[str, Any]]] = None,
     protocol_format: Optional[ProtocolFormat] = None,
     protocol_action: Optional[str] = None,
-    new_file_references: Optional[List[Dict[str, str]]] = None,
+    current_msg_files: Optional[List[Dict[str, str]]] = None,
 ) -> Optional[str]:
     """Generate a response from the appropriate LLM with proper history handling."""
     # Wrap all LLM calls with the appropriate tracing context
@@ -234,29 +233,9 @@ def _generate_llm_response_with_history(
 
         # Claude models - convert history to proper message format
         converted_history = []
-        all_file_references = []
-
         if history_with_attachments:
             for msg in history_with_attachments:
-                if msg["role"] == "user" and msg.get("attachments"):
-                    # Collect all file references from history
-                    for attachment in msg["attachments"]:
-                        all_file_references.append(
-                            {
-                                "id": attachment.get("id", ""),
-                                "name": attachment.get("name", ""),
-                                "type": attachment.get("type", ""),
-                                "content": attachment.get("content", ""),
-                                "media_type": MEDIA_TYPE_MAPPING.get(attachment.get("type", ""), "text/plain"),
-                            }
-                        )
-
-                # Convert to MessageParam format (role + content only)
                 converted_history.append({"role": msg["role"], "content": msg["content"]})
-
-        # Add new files to the collection
-        if new_file_references:
-            all_file_references.extend(new_file_references)
 
         # Use existing Claude logic with all files
         if protocol_format == ProtocolFormat.PROTOCOL_DESIGNER:
@@ -271,7 +250,7 @@ def _generate_llm_response_with_history(
                 prompt=prompt,
                 history_with_attachments=history_with_attachments,
                 message_type="update",
-                new_file_references=all_file_references,
+                current_msg_files=current_msg_files,
             )
 
 
@@ -421,8 +400,6 @@ async def create_chat_completion(
                     }
                     history_with_attachments.append(history_msg)
 
-        new_file_references: List[Dict[str, str]] = []
-
         # Use the new history-aware response generation
         response = _generate_llm_response_with_history(
             model_type=settings.model,
@@ -432,7 +409,7 @@ async def create_chat_completion(
             history_with_attachments=history_with_attachments,
             protocol_format=protocol_format,
             protocol_action=protocol_action,
-            new_file_references=new_file_references,
+            current_msg_files=[],
         )
         return _format_response(response, protocol_format, bool(body.fake))
 
@@ -467,13 +444,13 @@ async def create_chat_completion_multipart(
         "POST /api/chat/completion-multipart",
         extra={"message": message, "num_files": len(files), "file_names": [f.filename for f in files], "user": user},
     )
-
     try:
         # Setup Weave analytics based on frontend preference
         enable_analytics = _get_analytics_preference(request) if request else False
         setup_weave_analytics(enable_analytics)
 
         # Parse history from JSON string (now includes attachments in each message)
+
         try:
             parsed_history_with_attachments = json.loads(history) if history else []
         except json.JSONDecodeError:
@@ -483,29 +460,28 @@ async def create_chat_completion_multipart(
         files_by_message, token_warning = await _process_multipart_files_with_mapping(files)
 
         # Reconstruct conversation history with file content
-        enhanced_history = reconstruct_conversation_history(parsed_history_with_attachments, files_by_message)
+        history_with_attachments = reconstruct_conversation_history(parsed_history_with_attachments, files_by_message)
 
-        # Get current message files (either at index -1 or at the end of history)
-        current_message_index = len(enhanced_history)
-        current_files = files_by_message.get(current_message_index, [])
-        if not current_files and -1 in files_by_message:
-            current_files = files_by_message[-1]
+        # Get current message files. history_with_attachments contains messages without current message
+        # The files for current message are in files_by_message[N]. 0 to N-1 are the previous messages.
+        # N is the current message index.
+        # For example, when history_with_attachments=[], files_by_message={0: [file1, file2]}.
+        current_msg_idx = len(history_with_attachments)
+        current_msg_files = files_by_message.get(current_msg_idx, [])
 
-        # Determine protocol format
         protocol_format_enum = ProtocolFormat.PYTHON
         if protocol_format.lower() == "protocol_designer":
             protocol_format_enum = ProtocolFormat.PROTOCOL_DESIGNER
 
-        # Generate response using the enhanced history
         response = _generate_llm_response_with_history(
             model_type=settings.model,
             user_id=str(user.sub),
             prompt=message,
             enable_analytics=enable_analytics,
-            history_with_attachments=enhanced_history,
+            history_with_attachments=history_with_attachments,
             protocol_format=protocol_format_enum,
-            protocol_action="update",  # Default action
-            new_file_references=current_files,
+            protocol_action="update",
+            current_msg_files=current_msg_files,
         )
         return _format_response(response, protocol_format_enum, fake, token_warning)
 

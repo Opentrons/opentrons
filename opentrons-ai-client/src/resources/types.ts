@@ -12,7 +12,7 @@ export interface FileAttachment {
   id?: string // Optional because it's not present when initially selecting files
   name: string
   type: FileType
-  content: File // Raw File object
+  content: File
 }
 
 export interface ChatData {
@@ -91,7 +91,7 @@ export interface ChatMessage {
   content: string
   protocol_content?: string
   protocol_format?: ProtocolFormat
-  attachments?: Array<Omit<FileAttachment, 'content'>>
+  fileMetadata?: Array<Omit<FileAttachment, 'content'>>
 }
 
 export interface RouteProps {

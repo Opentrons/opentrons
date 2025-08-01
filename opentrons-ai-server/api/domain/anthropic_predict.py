@@ -400,7 +400,7 @@ class AnthropicPredict:
 
         return messages
 
-    def _create_current_user_message(self, prompt: str, new_file_references: Optional[List[Dict[str, str]]], user_id: str) -> MessageParam:
+    def _create_current_user_message(self, prompt: str, current_msg_files: Optional[List[Dict[str, str]]], user_id: str) -> MessageParam:
         """Create the current user message with file attachments."""
         relevant_api_docs = self.get_relevant_api_docs(prompt, user_id)
         prompt_with_docs = f"{prompt}\n\n{relevant_api_docs}"
@@ -409,18 +409,18 @@ class AnthropicPredict:
         current_user_content: List[ContentBlockParam] = [TextBlockParam(type="text", text=PROMPT.format(USER_PROMPT=prompt_with_docs))]
 
         # Add NEW file attachments to current message
-        if new_file_references:
-            file_refs_summary = [{k: v for k, v in ref.items() if k != "content"} for ref in new_file_references]
+        if current_msg_files:
+            file_refs_summary = [{k: v for k, v in ref.items() if k != "content"} for ref in current_msg_files]
             logger.info(f"Processing new file attachments: {file_refs_summary}")
 
-            new_file_blocks = self._create_file_attachment_blocks(new_file_references, user_id)
+            new_file_blocks = self._create_file_attachment_blocks(current_msg_files, user_id)
             current_user_content.extend(new_file_blocks)
             logger.info(
                 "Added new file attachments to current message",
                 extra={
                     "user_id": user_id,
-                    "num_new_files": len(new_file_references),
-                    "file_ids": [ref["id"] for ref in new_file_references],
+                    "num_new_files": len(current_msg_files),
+                    "file_ids": [ref["id"] for ref in current_msg_files],
                 },
             )
 
@@ -433,7 +433,7 @@ class AnthropicPredict:
         prompt: str,
         history_with_attachments: List[Dict[str, Any]] | None = None,
         message_type: MessageType = "create",
-        new_file_references: Optional[List[Dict[str, str]]] = None,
+        current_msg_files: Optional[List[Dict[str, str]]] = None,
     ) -> str | None:
         """Process chat message with file attachments in conversation history"""
         try:
@@ -445,7 +445,7 @@ class AnthropicPredict:
                 messages.extend(historical_messages)
 
             # Create and add current user message
-            current_user_message = self._create_current_user_message(prompt, new_file_references, user_id)
+            current_user_message = self._create_current_user_message(prompt, current_msg_files, user_id)
             messages.append(current_user_message)
 
             # Log the improved message structure

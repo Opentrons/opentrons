@@ -26,76 +26,94 @@ def parse_tagged_content(text: str) -> Tuple[Optional[str], Optional[str], Optio
 
 def extract_message_index_from_filename(filename: str) -> tuple[int, str]:
     """
-    Raw upload phase: Parses msgN_filename format to determine conversation placement.
-    Returns (message_index, original_filename) for proper file grouping.
+    Parses msgN_filename format to extract message index and original filename.
+    Example: "msg0_report.pdf" -> (0, "report.pdf")
     """
-    if filename.startswith("msg") and "_" in filename:
-        parts = filename.split("_", 1)
-        if len(parts) == 2 and parts[0][3:].isdigit():
-            return int(parts[0][3:]), parts[1]
-
-    return -1, filename  # Default for current message
+    parts = filename.split("_", 1)
+    message_index = int(parts[0][3:])
+    original_filename = parts[1]
+    return message_index, original_filename
 
 
-def enhance_message_with_file_content(msg: Dict[str, Any], message_files: List[Dict[str, str]]) -> Dict[str, Any]:
+def enhance_message_with_file_content(msg: Dict[str, Any], msg_files: List[Dict[str, str]]) -> Dict[str, Any]:
     """
-    Post-upload phase: Merges frontend attachment metadata with processed file content.
-    Bridges frontend JSON (metadata only) with backend processed files before AI model.
-    """
-    enhanced_msg = msg.copy()
-    file_content_map = {f["name"]: f for f in message_files}
+    Merges frontend attachment metadata with processed file content.
+    i.e., attachment = file metadata + file content
 
-    if enhanced_msg.get("attachments"):
-        # Message has attachment metadata - enhance with content
-        enhanced_attachments = []
-        for att in enhanced_msg["attachments"]:
-            filename = att.get("name", "")
-            if filename in file_content_map:
-                file_ref = file_content_map[filename]
-                enhanced_attachments.append(
-                    {
-                        "id": att.get("id", file_ref["id"]),
-                        "name": filename,
-                        "type": file_ref["type"],
-                        "content": file_ref["content"],
-                        "media_type": file_ref["media_type"],
-                    }
-                )
-        enhanced_msg["attachments"] = enhanced_attachments
-    else:
-        # No metadata - use files directly
-        enhanced_msg["attachments"] = []
-        for file_ref in message_files:
-            enhanced_msg["attachments"].append(
+    Input:
+    msg = {
+        'role': 'user',
+        'content': 'hi',
+        'fileMetadata': [{'id': ..., 'name': ..., 'type': ...}]
+    }
+
+    msg_files = [
+        {
+            'id': ...,
+            'name': ...,
+            'type': ...,
+            'content': ..., # note: this is the file content
+            'media_type': ...
+        }
+    ]
+
+    Return:
+    msg_with_files = {
+        'role': 'user',
+        'content': 'hi',
+        'fileMetadata': [{'id': ..., 'name': ..., 'type': ...}],
+        'attachments': [
+            {
+                'id': ...,
+                'name': ...,
+                'type': ...,
+                'content': ..., # note: this is the file content
+                'media_type': ...
+            }
+        ]
+    }
+
+    """
+
+    msg_with_files = msg.copy()
+    file_content_map = {f["name"]: f for f in msg_files}
+
+    attachments = []
+    for att in msg_with_files["fileMetadata"]:
+        filename = att.get("name", "")
+        if filename in file_content_map:
+            file_ref = file_content_map[filename]
+            attachments.append(
                 {
-                    "id": file_ref["id"],
-                    "name": file_ref["name"],
+                    "id": att.get("id", file_ref["id"]),
+                    "name": filename,
                     "type": file_ref["type"],
                     "content": file_ref["content"],
                     "media_type": file_ref["media_type"],
                 }
             )
+    msg_with_files["attachments"] = attachments
 
-    return enhanced_msg
+    return msg_with_files
 
 
 def reconstruct_conversation_history(
     parsed_history: List[Dict[str, Any]], files_by_message: Dict[int, List[Dict[str, str]]]
 ) -> List[Dict[str, Any]]:
     """
-    Pre-AI phase: Final assembly of conversation history with files in correct message positions.
+    Assembly of conversation history with files in correct message positions.
     Ensures AI model sees files in their original conversational context.
     """
-    enhanced_history = []
+    history_with_files = []
 
     for i, msg in enumerate(parsed_history):
         if i in files_by_message and files_by_message[i]:
-            enhanced_msg = enhance_message_with_file_content(msg, files_by_message[i])
+            msg_with_files = enhance_message_with_file_content(msg, files_by_message[i])
         else:
-            enhanced_msg = msg.copy()
-        enhanced_history.append(enhanced_msg)
+            msg_with_files = msg.copy()
+        history_with_files.append(msg_with_files)
 
-    return enhanced_history
+    return history_with_files
 
 
 async def process_single_multipart_file(file: UploadFile, message_index: int, file_count: int) -> Dict[str, str]:

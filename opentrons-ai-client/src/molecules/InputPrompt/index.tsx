@@ -47,7 +47,11 @@ import styles from './inputprompt.module.css'
 
 import type { AxiosRequestConfig } from 'axios'
 import type { ProtocolFile } from '@opentrons/shared-data'
-import type { ChatData, ChatMessage } from '/ai-client/resources/types'
+import type {
+  ChatData,
+  ChatMessage,
+  ProtocolFormat,
+} from '/ai-client/resources/types'
 
 export function InputPrompt(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
@@ -116,35 +120,30 @@ export function InputPrompt(): JSX.Element {
     }
   }, [regenerateProtocol])
 
-  const handleClick = async (
-    isUpdateOrCreateRequest: boolean = false,
-    isRegenerateRequest: boolean = false
-  ): Promise<void> => {
-    const newRequestId = `${uuidv4()}${getPreFixText(
-      isUpdateOrCreateRequest,
-      isNewProtocol
-    )}`
-    setRequestId(newRequestId)
-    const currentProtocolFormat = detectProtocolFormat(
-      watchUserPrompt,
-      chatHistory
-    )
-
-    // Prepare files for upload - use multipart for efficiency
-    let validatedFiles: File[] = []
-    if (attachedFiles.length > 0 && !isUpdateOrCreateRequest) {
-      const files = prepareFilesForUpload()
-      if (files === null) {
-        return // Validation failed, error already shown to user
-      }
-      validatedFiles = files
+  const prepareValidatedFiles = (
+    isUpdateOrCreateRequest: boolean
+  ): File[] | null => {
+    if (attachedFiles.length === 0 || isUpdateOrCreateRequest) {
+      return []
     }
 
-    const userInput: ChatData = {
-      requestId: newRequestId,
+    const files = prepareFilesForUpload()
+    if (files === null) {
+      return null // Validation failed, error already shown to user
+    }
+    return files
+  }
+
+  const createUserInput = (
+    requestId: string,
+    protocolFormat: ProtocolFormat,
+    validatedFiles: File[]
+  ): ChatData => {
+    return {
+      requestId,
       role: 'user',
       reply: watchUserPrompt,
-      protocol_format: currentProtocolFormat,
+      protocol_format: protocolFormat,
       attachments:
         validatedFiles.length > 0
           ? validatedFiles.map(file => {
@@ -158,55 +157,32 @@ export function InputPrompt(): JSX.Element {
                 id: uuidv4(),
                 name: file.name,
                 type: fileType,
-                content: file, // Store the raw File object
+                content: file,
               }
             })
           : undefined,
     }
-    reset()
-    clearFiles() // Clear attached files and errors after sending
-    setChatData(chatData => [...chatData, userInput])
+  }
 
-    const headers = {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    }
-
-    const url = isUpdateOrCreateRequest
-      ? getCreateOrUpdateEndpoint()
-      : getChatEndpoint()
-
-    const promptData = getUpdateOrCreatePrompt(
-      isNewProtocol,
-      createProtocol,
-      updateProtocol,
-      isRegenerateRequest,
-      detectProtocolFormat(
-        isNewProtocol ? createProtocol.prompt : updateProtocol.prompt
-      )
-    )
-
-    // Build a complete history array that preserves file attachments in their original messages.
-    // This allows the backend to construct proper conversation history with files in the right context.
-    const completeHistory = chatHistory.map(msg => {
+  const buildChatHistory = (protocolFormat: ProtocolFormat): ChatMessage[] => {
+    return chatHistory.map(msg => {
       const baseMessage: ChatMessage = {
         role: msg.role,
         content: msg.content,
       }
 
-      // Convert File objects to metadata for JSON serialization
+      // Extract file metadata from attachments for JSON serialization
       if (msg.attachments && msg.attachments.length > 0) {
-        baseMessage.attachments = msg.attachments.map(att => ({
+        baseMessage.fileMetadata = msg.attachments.map(att => ({
           id: att.id,
           name: att.name,
           type: att.type,
-          // Don't include the File object as it can't be serialized
         }))
       }
 
       // Handle Protocol Designer content if needed
       if (
-        currentProtocolFormat === 'Protocol Designer' &&
+        protocolFormat === 'Protocol Designer' &&
         msg.protocol_content != null
       ) {
         // Use helper to parse the protocol content into a plain object
@@ -222,46 +198,73 @@ export function InputPrompt(): JSX.Element {
 
       return baseMessage
     })
+  }
 
-    // Use multipart upload when files are attached (much more efficient)
-    let config: AxiosRequestConfig
+  const buildMultipartFormData = (
+    completeHistory: ChatMessage[],
+    validatedFiles: File[],
+    protocolFormat: ProtocolFormat
+  ): FormData => {
+    const formData = new FormData()
+    formData.append('message', watchUserPrompt)
+    formData.append('history', JSON.stringify(completeHistory))
+    formData.append('fake', 'false')
+    formData.append('protocol_format', protocolFormat)
+
+    // Collect and add files from chat history with message index
+    completeHistory.forEach((msg, messageIndex) => {
+      if (msg.role === 'user' && msg.fileMetadata) {
+        msg.fileMetadata.forEach(att => {
+          // Get the File object from the original chat history
+          const originalMsg = chatHistory[messageIndex]
+          if (originalMsg?.attachments) {
+            const originalAtt = originalMsg.attachments.find(
+              a => a.name === att.name
+            )
+            if (originalAtt?.content) {
+              // Use message index in filename for backend association
+              const fileKey = `msg${messageIndex}_${att.name}`
+              formData.append('files', originalAtt.content, fileKey)
+            }
+          }
+        })
+      }
+    })
+
+    // Add current message files (they belong to the next message index)
+    const currentMessageIndex = completeHistory.length
+    validatedFiles.forEach(file => {
+      const fileKey = `msg${currentMessageIndex}_${file.name}`
+      formData.append('files', file, fileKey)
+    })
+
+    return formData
+  }
+
+  const buildRequestConfig = (
+    validatedFiles: File[],
+    isUpdateOrCreateRequest: boolean,
+    completeHistory: ChatMessage[],
+    protocolFormat: ProtocolFormat
+  ): AxiosRequestConfig => {
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    }
+
+    const url = isUpdateOrCreateRequest
+      ? getCreateOrUpdateEndpoint()
+      : getChatEndpoint()
 
     if (validatedFiles.length > 0 && !isUpdateOrCreateRequest) {
       // Multipart upload for file attachments
-      const formData = new FormData()
-      formData.append('message', watchUserPrompt)
-      formData.append('history', JSON.stringify(completeHistory))
-      formData.append('fake', 'false')
-      formData.append('protocol_format', currentProtocolFormat)
+      const formData = buildMultipartFormData(
+        completeHistory,
+        validatedFiles,
+        protocolFormat
+      )
 
-      // Collect and add files from chat history with message index
-      completeHistory.forEach((msg, messageIndex) => {
-        if (msg.role === 'user' && msg.attachments) {
-          msg.attachments.forEach(att => {
-            // Get the File object from the original chat history
-            const originalMsg = chatHistory[messageIndex]
-            if (originalMsg?.attachments) {
-              const originalAtt = originalMsg.attachments.find(
-                a => a.name === att.name
-              )
-              if (originalAtt?.content) {
-                // Use message index in filename for backend association
-                const fileKey = `msg${messageIndex}_${att.name}`
-                formData.append('files', originalAtt.content, fileKey)
-              }
-            }
-          })
-        }
-      })
-
-      // Add current message files (they belong to the next message index)
-      const currentMessageIndex = completeHistory.length
-      validatedFiles.forEach(file => {
-        const fileKey = `msg${currentMessageIndex}_${file.name}`
-        formData.append('files', file, fileKey)
-      })
-
-      config = {
+      return {
         url: getChatEndpoint().replace('/completion', '/completion-multipart'),
         method: 'POST',
         headers: {
@@ -272,7 +275,17 @@ export function InputPrompt(): JSX.Element {
       }
     } else {
       // Traditional JSON request (no files or update/create requests)
-      config = {
+      const promptData = getUpdateOrCreatePrompt(
+        isNewProtocol,
+        createProtocol,
+        updateProtocol,
+        false, // isRegenerateRequest will be passed from handleClick
+        detectProtocolFormat(
+          isNewProtocol ? createProtocol.prompt : updateProtocol.prompt
+        )
+      )
+
+      return {
         url,
         method: 'POST',
         headers,
@@ -284,32 +297,97 @@ export function InputPrompt(): JSX.Element {
               fake: false,
               chat_options: isUpdateOrCreateRequest ? 'create' : 'update',
               pd_protocol_content: pdProtocolContent,
-              protocol_format: currentProtocolFormat,
+              protocol_format: protocolFormat,
               // No separate attachments parameter needed - they're in history now
             },
+      }
+    }
+  }
+
+  const handleSuccessfulSubmission = (
+    userInput: ChatData,
+    protocolFormat: ProtocolFormat
+  ): void => {
+    setChatHistory(chatHistory => [
+      ...chatHistory,
+      {
+        role: 'user',
+        content: watchUserPrompt,
+        attachments: userInput.attachments, // Use the processed attachments with content
+      },
+    ])
+    trackEvent({
+      name: 'chat-submitted',
+      properties: {
+        chat: watchUserPrompt,
+        protocol_format: protocolFormat,
+      },
+    })
+    setSubmitted(true)
+  }
+
+  const handleClick = async (
+    isUpdateOrCreateRequest: boolean = false,
+    isRegenerateRequest: boolean = false
+  ): Promise<void> => {
+    const newRequestId = `${uuidv4()}${getPreFixText(
+      isUpdateOrCreateRequest,
+      isNewProtocol
+    )}`
+    setRequestId(newRequestId)
+    const currentProtocolFormat = detectProtocolFormat(
+      watchUserPrompt,
+      chatHistory
+    )
+
+    // Prepare files for upload
+    const validatedFiles = prepareValidatedFiles(isUpdateOrCreateRequest)
+    if (validatedFiles === null) {
+      return // Validation failed, error already shown to user
+    }
+
+    // Create user input data
+    const userInput = createUserInput(
+      newRequestId,
+      currentProtocolFormat,
+      validatedFiles
+    )
+
+    // Clear form and update state
+    reset()
+    clearFiles()
+    setChatData(chatData => [...chatData, userInput])
+
+    // Build complete chat history for API
+    const completeHistory = buildChatHistory(currentProtocolFormat)
+
+    // Build request configuration
+    const config = buildRequestConfig(
+      validatedFiles,
+      isUpdateOrCreateRequest,
+      completeHistory,
+      currentProtocolFormat
+    )
+
+    // Handle regenerate request for traditional JSON requests
+    if (isRegenerateRequest && validatedFiles.length === 0) {
+      const promptData = getUpdateOrCreatePrompt(
+        isNewProtocol,
+        createProtocol,
+        updateProtocol,
+        isRegenerateRequest,
+        detectProtocolFormat(
+          isNewProtocol ? createProtocol.prompt : updateProtocol.prompt
+        )
+      )
+      if (isUpdateOrCreateRequest && config.data !== promptData) {
+        config.data = promptData
       }
     }
 
     try {
       await callApi(config)
-
-      // Update chat history AFTER successful API call
-      setChatHistory(chatHistory => [
-        ...chatHistory,
-        {
-          role: 'user',
-          content: watchUserPrompt,
-          attachments: userInput.attachments, // Use the processed attachments with content
-        },
-      ])
-      trackEvent({
-        name: 'chat-submitted',
-        properties: {
-          chat: watchUserPrompt,
-          protocol_format: currentProtocolFormat,
-        },
-      })
-      setSubmitted(true)
+      handleSuccessfulSubmission(userInput, currentProtocolFormat)
     } catch (err: any) {
       console.error(`error: ${err.message}`)
       throw err
@@ -409,7 +487,7 @@ export function InputPrompt(): JSX.Element {
             disabled={watchUserPrompt.length === 0}
             isLoading={isLoading}
             handleClick={() => {
-              handleClick()
+              void handleClick()
             }}
           />
         </div>
