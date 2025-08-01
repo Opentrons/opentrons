@@ -189,7 +189,6 @@ mock_pipette.distribute_with_liquid_class(
             "dispense": {
                 "dispense_position": {"offset": {"x": 0, "y": 0, "z": 0}},
                 "flow_rate_by_volume": [(0, 2.2)],
-                "correction_by_volume": [(0, 0)],
                 "delay": {"enabled": False},
                 "submerge": {
                     "delay": {"enabled": False},
@@ -202,13 +201,13 @@ mock_pipette.distribute_with_liquid_class(
                     "touch_tip": {"enabled": False},
                     "blowout": {"enabled": True, "location": "trash", "flow_rate": 2.3},
                 },
+                "correction_by_volume": [(0, 0)],
                 "push_out_by_volume": [(0, 0)],
                 "mix": {"enabled": False},
             },
             "multi_dispense": {
                 "dispense_position": {"offset": {"x": 0, "y": 0, "z": 0}},
                 "flow_rate_by_volume": [(0, 2.2)],
-                "correction_by_volume": [(0, 0)],
                 "delay": {"enabled": False},
                 "submerge": {
                     "delay": {"enabled": False},
@@ -221,6 +220,7 @@ mock_pipette.distribute_with_liquid_class(
                     "touch_tip": {"enabled": False},
                     "blowout": {"enabled": True, "location": "trash", "flow_rate": 2.3},
                 },
+                "correction_by_volume": [(0, 0)],
                 "conditioning_by_volume": [(0, 0)],
                 "disposal_by_volume": [(0, 60)],
             },
@@ -1058,7 +1058,6 @@ mock_pipette.distribute_with_liquid_class(
             "dispense": {
                 "dispense_position": {"offset": {"x": 0, "y": 0, "z": 0}},
                 "flow_rate_by_volume": [(0, 2.2)],
-                "correction_by_volume": [(0, 0)],
                 "delay": {"enabled": True, "duration": 12},
                 "submerge": {
                     "delay": {"enabled": False},
@@ -1071,13 +1070,13 @@ mock_pipette.distribute_with_liquid_class(
                     "touch_tip": {"enabled": True, "z_offset": -3.4},
                     "blowout": {"enabled": True, "location": "trash", "flow_rate": 2.3},
                 },
+                "correction_by_volume": [(0, 0)],
                 "push_out_by_volume": [(0, 0)],
                 "mix": {"enabled": False},
             },
             "multi_dispense": {
                 "dispense_position": {"offset": {"x": 0, "y": 0, "z": 0}},
                 "flow_rate_by_volume": [(0, 2.2)],
-                "correction_by_volume": [(0, 0)],
                 "delay": {"enabled": True, "duration": 12},
                 "submerge": {
                     "delay": {"enabled": False},
@@ -1090,6 +1089,7 @@ mock_pipette.distribute_with_liquid_class(
                     "touch_tip": {"enabled": True, "z_offset": -3.4},
                     "blowout": {"enabled": True, "location": "trash", "flow_rate": 2.3},
                 },
+                "correction_by_volume": [(0, 0)],
                 "conditioning_by_volume": [(0, 10)],
                 "disposal_by_volume": [(0, 60)],
             },

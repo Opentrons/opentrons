@@ -31,6 +31,9 @@ export function useDispenseSettingsConfig({
   const { makeSnackbar } = useToaster()
 
   const getBlowoutValueCopy = (): string | undefined => {
+    if (state.blowOutDispense == null) {
+      return t('option_disabled')
+    }
     if (state.blowOutDispense?.location === 'dest_well') {
       return t('blow_out_into_destination_well')
     } else if (state.blowOutDispense?.location === 'source_well') {
@@ -67,7 +70,7 @@ export function useDispenseSettingsConfig({
       value:
         state.tipPositionDispense !== undefined
           ? t('tip_position_value', { position: state.tipPositionDispense })
-          : '',
+          : t('option_disabled'),
       enabled: true,
       onClick: () => {
         setSelectedSetting('dispense_tip_position')
@@ -83,7 +86,7 @@ export function useDispenseSettingsConfig({
               delayDuration: state.submergeDispense.delayDuration,
               position: state.submergeDispense.positionFromBottom,
             })
-          : '',
+          : t('option_disabled'),
       enabled: true,
       onClick: () => {
         setSelectedSetting(SETTING_OPTIONS.DISPENSE_SUBMERGE)
@@ -112,7 +115,7 @@ export function useDispenseSettingsConfig({
               volume: state.mixOnDispense?.mixVolume,
               reps: state.mixOnDispense?.repetitions,
             })
-          : '',
+          : t('option_disabled'),
       enabled:
         state.transferType === 'transfer' ||
         state.transferType === 'consolidate',
@@ -149,7 +152,7 @@ export function useDispenseSettingsConfig({
               delayDuration: state.retractDispense.delayDuration,
               position: state.retractDispense.positionFromBottom,
             })
-          : '',
+          : t('option_disabled'),
       enabled: true,
       onClick: () => {
         setSelectedSetting('dispense_retract')
@@ -185,7 +188,7 @@ export function useDispenseSettingsConfig({
                   : t('trashBin'),
               flowRate: state.disposalVolumeDispenseSettings.flowRate,
             })
-          : '',
+          : t('option_disabled'),
       enabled: isMultiTransfer,
       onClick: () => {
         setSelectedSetting('dispense_disposal_volume')
@@ -200,7 +203,7 @@ export function useDispenseSettingsConfig({
               speed: state.touchTipDispenseSpeed,
               position: state.touchTipDispense,
             })
-          : '',
+          : t('option_disabled'),
       enabled: true,
       onClick: () => {
         setSelectedSetting('dispense_touch_tip')

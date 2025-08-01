@@ -1801,9 +1801,6 @@ class InstrumentContext(publisher.CommandPublisher):
     ) -> InstrumentContext:
         """Move a particular type of liquid from one well or group of wells to another.
 
-        ..
-            This is intended for Opentrons internal use only and is not a guaranteed API.
-
         :param liquid_class: The type of liquid to move. You must specify the liquid class,
             even if you have used :py:meth:`.Labware.load_liquid` to indicate what liquid the
             source contains.
@@ -1944,16 +1941,12 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         Distribute a particular type of liquid from one well to a group of wells.
 
-        ..
-            This is intended for Opentrons internal use only and is not a guaranteed API.
-
         :param liquid_class: The type of liquid to move. You must specify the liquid class,
             even if you have used :py:meth:`.Labware.load_liquid` to indicate what liquid the
             source contains.
         :type liquid_class: :py:class:`.LiquidClass`
 
-        :param volume: The amount, in µL, to aspirate from the source and dispense to
-                       each destination.
+        :param volume: The amount, in µL, to dispense to each destination.
         :param source: A single well for the pipette to target, or a group of wells to
                        target in a single aspirate for a multi-channel pipette.
         :param dest: A list of wells to dispense liquid into.
@@ -2092,16 +2085,12 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         Consolidate a particular type of liquid from a group of wells to one well.
 
-        ..
-            This is intended for Opentrons internal use only and is not a guaranteed API.
-
         :param liquid_class: The type of liquid to move. You must specify the liquid class,
             even if you have used :py:meth:`.Labware.load_liquid` to indicate what liquid the
             source contains.
         :type liquid_class: :py:class:`.LiquidClass`
 
-        :param volume: The amount, in µL, to aspirate from the source and dispense to
-                       each destination.
+        :param volume: The amount, in µL, to aspirate from each source well.
         :param source: A list of wells to aspirate liquid from.
         :param dest: A single well, list of wells, trash bin, or waste chute to dispense liquid into.
                      Multiple wells can only be given for multi-channel pipette configurations, and

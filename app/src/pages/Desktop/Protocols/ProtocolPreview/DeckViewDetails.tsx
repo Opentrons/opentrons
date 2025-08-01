@@ -181,7 +181,6 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
                 >
                   <StyledText
                     desktopStyle="captionRegular"
-                    transform={`rotate(180deg) scaleX(-1)`}
                     color={COLORS.white}
                   >
                     {isActiveLayerVisible

@@ -51,21 +51,21 @@ class PickUpTipResult(DestinationPositionResult):
 
     # Tip volume has a default ONLY for parsing data from earlier versions, which did not include this in the result
     tipVolume: float = Field(
-        0,
+        0.0,
         description="Maximum volume of liquid that the picked up tip can hold, in µL.",
-        ge=0,
+        ge=0.0,
     )
 
     tipLength: float = Field(
-        0,
+        0.0,
         description="The length of the tip in mm.",
-        ge=0,
+        ge=0.0,
     )
 
     tipDiameter: float = Field(
-        0,
+        0.0,
         description="The diameter of the tip in mm.",
-        ge=0,
+        ge=0.0,
     )
 
 

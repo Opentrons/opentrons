@@ -19,7 +19,7 @@
   "edit": "Edit",
   "fixtures_added": "Fixtures added",
   "fixtures_replace": "Fixtures replace standard deck slots and let you add functionality to your Flex.",
-  "incompatible_tip_body": "Using a pipette with an incompatible tip rack may result reduce pipette accuracy and collisions. We strongly recommend that you do not pair a pipette with an incompatible tip rack.",
+  "incompatible_tip_body": "Incompatible tip racks cause reduced pipette accuracy and collisions. Use compatible tip racks only.",
   "incompatible_tips": "Incompatible tips",
   "labware_name": "Labware name",
   "left_right": "Left + Right",

@@ -32,6 +32,8 @@ import type {
   LPCFlowsProps,
 } from '/app/organisms/LabwarePositionCheck/LPCFlows/LPCFlows'
 
+const RUN_RECORD_INTERVAL_MS = 1000 * 5
+
 interface UseLPCFlowsBase {
   showLPC: boolean
   lpcProps: LPCFlowsProps | null
@@ -72,7 +74,9 @@ export function useLPCFlows({
 
   const isFlex = robotType === FLEX_ROBOT_TYPE
   const deckConfig = useNotifyDeckConfigurationQuery().data
-  const { data: runRecord } = useNotifyRunQuery(runId ?? null)
+  const { data: runRecord } = useNotifyRunQuery(runId ?? null, {
+    refetchInterval: RUN_RECORD_INTERVAL_MS,
+  })
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const compatibleFlexAnalysis = useCompatibleAnalysis(
     runId,
