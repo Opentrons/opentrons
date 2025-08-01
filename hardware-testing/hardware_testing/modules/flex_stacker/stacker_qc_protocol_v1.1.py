@@ -5,7 +5,7 @@ from opentrons.protocol_api.module_contexts import (
 )
 
 metadata = {
-    "protocolName": "Flex Stacker PVT QC",
+    "protocolName": "Flex Stacker PVT QC V1.1",
     "author": "Opentrons <protocols@opentrons.com>",
 }
 requirements = {
