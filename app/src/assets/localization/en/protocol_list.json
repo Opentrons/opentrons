@@ -22,5 +22,9 @@
   "start_setup": "Start setup",
   "this_protocol_will_be_trashed": "This protocol will be moved to this computer’s trash and may be unrecoverable.",
   "updated": "Updated",
-  "yes_delete_this_protocol": "Yes, delete protocol"
+  "yes_delete_this_protocol": "Yes, delete protocol",
+  "lock_protocol": "Lock Protocol",
+  "unlock_protocol": "Unlock Protocol",
+  "password_required": "Password Required",
+  "enter_password_to_proceed": "Please enter the password to proceed."
 }

@@ -38,6 +38,16 @@ export const ANALYZE_PROTOCOL_FAILURE: 'protocolStorage:ANALYZE_PROTOCOL_FAILURE
 export const VIEW_PROTOCOL_SOURCE_FOLDER: 'protocolStorage:VIEW_PROTOCOL_SOURCE_FOLDER' =
   'protocolStorage:VIEW_PROTOCOL_SOURCE_FOLDER'
 
+// ADDED: New action type literals for protocol locking
+export const LOCK_PROTOCOL: 'protocolStorage:LOCK_PROTOCOL' =
+  'protocolStorage:LOCK_PROTOCOL'
+
+export const UNLOCK_PROTOCOL: 'protocolStorage:UNLOCK_PROTOCOL' =
+  'protocolStorage:UNLOCK_PROTOCOL'
+
+export const VERIFY_PROTOCOL_PASSWORD: 'protocolStorage:VERIFY_PROTOCOL_PASSWORD' =
+  'protocolStorage:VERIFY_PROTOCOL_PASSWORD'
+
 // action meta literals
 
 export const POLL = 'poll' as const
@@ -132,5 +142,33 @@ export const viewProtocolSourceFolder = (
 ): Types.ViewProtocolSourceFolder => ({
   type: VIEW_PROTOCOL_SOURCE_FOLDER,
   payload: { protocolKey },
+  meta: { shell: true },
+})
+
+// ADDED: New action creators for protocol locking
+export const lockProtocol = (
+  protocolKey: string,
+  password: string
+): Types.LockProtocolAction => ({
+  type: LOCK_PROTOCOL,
+  payload: { protocolKey, password },
+  meta: { shell: true },
+})
+
+export const unlockProtocol = (
+  protocolKey: string,
+  password: string
+): Types.UnlockProtocolAction => ({
+  type: UNLOCK_PROTOCOL,
+  payload: { protocolKey, password },
+  meta: { shell: true },
+})
+
+export const verifyProtocolPassword = (
+  protocolKey: string,
+  password: string
+): Types.VerifyProtocolPasswordAction => ({
+  type: VERIFY_PROTOCOL_PASSWORD,
+  payload: { protocolKey, password },
   meta: { shell: true },
 })

@@ -1,3 +1,4 @@
+
 // common types
 
 import type {
@@ -34,6 +35,8 @@ export interface StoredProtocolDir {
 
 export interface StoredProtocolData {
   protocolKey: string
+  /** True if the protocol has been locked with a password. */
+  isLocked: boolean
   modified: number
   srcFileNames: string[]
   srcFiles: Buffer[]
@@ -128,6 +131,24 @@ export interface ViewProtocolSourceFolder {
   meta: { shell: true }
 }
 
+export interface LockProtocolAction {
+  type: 'protocolStorage:LOCK_PROTOCOL'
+  payload: { protocolKey: string; password?: string }
+  meta: { shell: true }
+}
+
+export interface UnlockProtocolAction {
+  type: 'protocolStorage:UNLOCK_PROTOCOL'
+  payload: { protocolKey: string; password?: string }
+  meta: { shell: true }
+}
+
+export interface VerifyProtocolPasswordAction {
+  type: 'protocolStorage:VERIFY_PROTOCOL_PASSWORD'
+  payload: { protocolKey: string; password?: string }
+  meta: { shell: true }
+}
+
 export type ProtocolStorageAction =
   | FetchProtocolsAction
   | UpdateProtocolListAction
@@ -141,3 +162,11 @@ export type ProtocolStorageAction =
   | AnalyzeProtocolSuccessAction
   | AnalyzeProtocolFailureAction
   | ViewProtocolSourceFolder
+  | LockProtocolAction
+  | UnlockProtocolAction
+  | VerifyProtocolPasswordAction
+  | AnalyzeProtocolSuccessAction
+  | AnalyzeProtocolFailureAction
+  | ViewProtocolSourceFolder
+  | FetchProtocolsAction
+  | UpdateProtocolListAction

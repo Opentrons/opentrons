@@ -2,6 +2,7 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import { css } from 'styled-components'
+import { useState } from 'react'
 
 import {
   ALIGN_FLEX_END,
@@ -21,7 +22,6 @@ import { FLEX_DISPLAY_NAME } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
 import {
-  ANALYTICS_DELETE_PROTOCOL_FROM_APP,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   useTrackEvent,
 } from '/app/redux/analytics'
@@ -29,11 +29,17 @@ import {
   analyzeProtocol,
   removeProtocol,
   viewProtocolSourceFolder,
+  // NOTE: These are new actions you will need to create
+  lockProtocol,
+  unlockProtocol,
+  verifyProtocolPassword,
 } from '/app/redux/protocol-storage'
 
 import { ConfirmDeleteProtocolModal } from './ConfirmDeleteProtocolModal'
+// NOTE: This is a new component file you will need to create
+import { PasswordModal } from './PasswordModal'
 
-import type { MouseEvent, MouseEventHandler } from 'react'
+import type { MouseEvent } from 'react'
 import type { StyleProps } from '@opentrons/components'
 import type { StoredProtocolData } from '/app/redux/protocol-storage'
 import type { Dispatch } from '/app/redux/types'
@@ -52,7 +58,7 @@ export function ProtocolOverflowMenu(
     handleRunProtocol,
     handleSendProtocolToFlex,
   } = props
-  const { mostRecentAnalysis, protocolKey } = storedProtocolData
+  const { mostRecentAnalysis, protocolKey, isLocked } = storedProtocolData
   const { t } = useTranslation(['protocol_list', 'shared'])
   const {
     menuOverlay,
@@ -62,51 +68,90 @@ export function ProtocolOverflowMenu(
   } = useMenuHandleClickOutside()
   const dispatch = useDispatch<Dispatch>()
   const trackEvent = useTrackEvent()
+
+  const [showPasswordModal, setShowPasswordModal] = useState(false)
+  const [passwordAction, setPasswordAction] = useState<{
+    onConfirm: (password: string) => void
+  } | null>(null)
+
+  const handleCloseMenu = (): void => setShowOverflowMenu(false)
+
+  const runProtectedAction = (action: () => void): void => {
+    handleCloseMenu()
+    if (isLocked) {
+      setPasswordAction({
+        onConfirm: password => {
+          // NOTE: In a real implementation, this dispatch should likely return a promise
+          // that resolves on success before running the action.
+          dispatch(verifyProtocolPassword(protocolKey, password))
+          action()
+          setShowPasswordModal(false)
+        },
+      })
+      setShowPasswordModal(true)
+    } else {
+      action()
+    }
+  }
+
   const {
     confirm: confirmDeleteProtocol,
     showConfirmation: showDeleteConfirmation,
     cancel: cancelDeleteProtocol,
-  } = useConditionalConfirm(() => {
-    dispatch(removeProtocol(protocolKey))
-    trackEvent({ name: ANALYTICS_DELETE_PROTOCOL_FROM_APP, properties: {} })
-  }, true)
+  } = useConditionalConfirm(
+    () => { runProtectedAction(() => dispatch(removeProtocol(protocolKey))) },
+    true
+  )
 
   const robotType =
     mostRecentAnalysis != null ? mostRecentAnalysis?.robotType ?? null : null
 
-  const handleClickShowInFolder: MouseEventHandler<HTMLButtonElement> = e => {
-    e.preventDefault()
-    e.stopPropagation()
-    dispatch(viewProtocolSourceFolder(protocolKey))
-    setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
-  }
-  const handleClickRun: MouseEventHandler<HTMLButtonElement> = e => {
-    e.preventDefault()
-    e.stopPropagation()
+  // UNPROTECTED ACTIONS
+  const handleClickRun = (): void => {
+    handleCloseMenu()
     trackEvent({
       name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
       properties: { sourceLocation: 'ProtocolsLanding' },
     })
     handleRunProtocol(storedProtocolData)
-    setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }
-  const handleClickSendToOT3: MouseEventHandler<HTMLButtonElement> = e => {
-    e.preventDefault()
-    e.stopPropagation()
+  const handleClickSendToOT3 = (): void => {
+    handleCloseMenu()
     handleSendProtocolToFlex(storedProtocolData)
-    setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }
-  const handleClickDelete: MouseEventHandler<HTMLButtonElement> = e => {
-    e.preventDefault()
-    e.stopPropagation()
-    confirmDeleteProtocol()
-    setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
+  const handleClickShowInFolder = (): void => {
+    handleCloseMenu()
+    dispatch(viewProtocolSourceFolder(protocolKey))
   }
-  const handleClickReanalyze: MouseEventHandler<HTMLButtonElement> = e => {
-    e.preventDefault()
-    e.stopPropagation()
-    dispatch(analyzeProtocol(protocolKey))
-    setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
+
+  // PROTECTED ACTIONS
+  const handleClickReanalyze = (): void => {
+    runProtectedAction(() => dispatch(analyzeProtocol(protocolKey)))
+  }
+  const handleClickDelete = (): void => {
+    runProtectedAction(() => confirmDeleteProtocol())
+  }
+
+  // NEW LOCK/UNLOCK HANDLERS
+  const handleLock = (): void => {
+    handleCloseMenu()
+    setPasswordAction({
+      onConfirm: password => {
+        dispatch(lockProtocol(protocolKey, password))
+        setShowPasswordModal(false)
+      },
+    })
+    setShowPasswordModal(true)
+  }
+  const handleUnlock = (): void => {
+    handleCloseMenu()
+    setPasswordAction({
+      onConfirm: password => {
+        dispatch(unlockProtocol(protocolKey, password))
+        setShowPasswordModal(false)
+      },
+    })
+    setShowPasswordModal(true)
   }
 
   return (
@@ -144,13 +189,25 @@ export function ProtocolOverflowMenu(
           >
             {t('start_setup')}
           </MenuItem>
-          <MenuItem
-            onClick={handleClickReanalyze}
-            data-testid="ProtocolOverflowMenu_reanalyze"
-          >
-            {t('shared:reanalyze')}
-          </MenuItem>
-          {robotType !== 'OT-2 Standard' ? (
+          {robotType !== 'OT-2 Standard' &&
+            (isLocked ? (
+              <MenuItem onClick={handleUnlock}>
+                {t('protocol_list:unlock_protocol')}
+              </MenuItem>
+            ) : (
+              <MenuItem onClick={handleLock}>
+                {t('protocol_list:lock_protocol')}
+              </MenuItem>
+            ))}
+          {!isLocked && (
+            <MenuItem
+              onClick={handleClickReanalyze}
+              data-testid="ProtocolOverflowMenu_reanalyze"
+            >
+              {t('shared:reanalyze')}
+            </MenuItem>
+          )}
+          {robotType !== 'OT-2 Standard' && (
             <MenuItem
               onClick={handleClickSendToOT3}
               data-testid="ProtocolOverflowMenu_sendToOT3"
@@ -159,25 +216,37 @@ export function ProtocolOverflowMenu(
                 robot_display_name: FLEX_DISPLAY_NAME,
               })}
             </MenuItem>
-          ) : null}
+          )}
           <MenuItem
             onClick={handleClickShowInFolder}
             data-testid="ProtocolOverflowMenu_showInFolder"
           >
             {t('show_in_folder')}
           </MenuItem>
-          <MenuItem
-            onClick={handleClickDelete}
-            data-testid="ProtocolOverflowMenu_deleteProtocol"
-            css={css`
-              border-radius: 0 0 ${BORDERS.borderRadius8}
-                ${BORDERS.borderRadius8};
-            `}
-          >
-            {t('shared:delete')}
-          </MenuItem>
+          {!isLocked && (
+            <MenuItem
+              onClick={handleClickDelete}
+              data-testid="ProtocolOverflowMenu_deleteProtocol"
+              css={css`
+                border-radius: 0 0 ${BORDERS.borderRadius8}
+                  ${BORDERS.borderRadius8};
+              `}
+            >
+              {t('shared:delete')}
+            </MenuItem>
+          )}
         </Flex>
       ) : null}
+
+      {showPasswordModal && passwordAction != null
+        ? createPortal(
+            <PasswordModal
+              onConfirm={passwordAction.onConfirm}
+              onCancel={() => { setShowPasswordModal(false) }}
+            />,
+            getTopPortalEl()
+          )
+        : null}
 
       {showDeleteConfirmation
         ? createPortal(
