@@ -43,6 +43,7 @@ class RunsPublisher:
         """Returns a configured Runs Publisher."""
         self._client = client
         #  Variables and callbacks related to PE state changes.
+
         self._run_hooks: Optional[_RunHooks] = None
         self._engine_state_slice: Optional[_EngineStateSlice] = None
 
@@ -54,6 +55,7 @@ class RunsPublisher:
             ]
         )
 
+    # TODO(jh, 08-01-25): Free run_hooks and engine_state_slice during run cleanup for more predictable protocol engine GC.
     def start_publishing_for_run(
         self,
         run_id: str,
