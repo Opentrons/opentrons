@@ -1,6 +1,8 @@
 import {
   FLEX_STACKER_MODULE_V1,
   getCutoutDisplayName,
+  getModuleType,
+  FLEX_STACKER_MODULE_TYPE,
   getLabwareDefURI,
   getLabwareDisplayName,
   getModuleModelFromAddressableArea,
@@ -204,7 +206,9 @@ export function getLabwareLocation(
 
     return {
       slotName,
-      moduleModel,
+      moduleModel: getModuleType(moduleModel) === FLEX_STACKER_MODULE_TYPE
+        ? undefined
+        : moduleModel,
     }
   } else if ('labwareId' in location) {
     if (!Array.isArray(loadedLabwares)) {

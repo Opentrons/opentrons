@@ -10,6 +10,7 @@ import {
   DIRECTION_COLUMN,
   DISPLAY_NONE,
   Flex,
+  getLabwareDisplayLocation,
   getLoadedLabware,
   getLoadedModule,
   Icon,
@@ -184,19 +185,27 @@ export function MoveLabwareInterventionContent({
             </Flex>
             <Divider css={DIVIDER_STYLE} />
             <Flex css={LABWARE_DIRECTION_STYLE}>
-              <LabwareDisplayLocation
-                protocolData={run}
-                location={oldLabwareLocation}
-                robotType={robotType}
-                labwareDefsByUri={labwareDefsByUri}
+              <DeckInfoLabel
+                deckLabel={getLabwareDisplayLocation({
+                  location: oldLabwareLocation,
+                  loadedModules: run.modules,
+                  loadedLabwares: run.labware,
+                  robotType: 'OT-3 Standard',
+                  detailLevel: 'slot-only',
+                  t,
+                })}
               />
 
               <Icon name="arrow-right" css={ICON_STYLE} />
-              <LabwareDisplayLocation
-                protocolData={run}
-                location={command.params.newLocation}
-                robotType={robotType}
-                labwareDefsByUri={labwareDefsByUri}
+              <DeckInfoLabel
+                deckLabel={getLabwareDisplayLocation({
+                  location: command.params.newLocation,
+                  loadedModules: run.modules,
+                  loadedLabwares: run.labware,
+                  robotType: 'OT-3 Standard',
+                  detailLevel: 'slot-only',
+                  t,
+                })}
               />
             </Flex>
           </Flex>
