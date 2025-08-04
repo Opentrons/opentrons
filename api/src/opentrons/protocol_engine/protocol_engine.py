@@ -645,6 +645,10 @@ class ProtocolEngine:
         """Replace the run's error recovery policy with a new one."""
         self._action_dispatcher.dispatch(SetErrorRecoveryPolicyAction(policy))
 
+    def clear_command_history(self) -> None:
+        """Clear command history."""
+        self._state_store.clear_command_history()
+
 
 # TODO(tz, 7-12-23): move this to shared data when we dont relay on ErrorOccurrence
 def code_in_error_tree(

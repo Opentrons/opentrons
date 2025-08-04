@@ -120,7 +120,7 @@
     "protocol_engine_lid_stack_object"
   ],
   "gripForce": 15,
-  "gripHeightFromLabwareBottom": 7.91,
+  "gripHeightFromLabwareOrigin": 7.91,
   "gripperOffsets": {
     "default": {
       "pickUpOffset": {
