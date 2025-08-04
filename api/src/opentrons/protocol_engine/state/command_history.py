@@ -255,6 +255,19 @@ class CommandHistory:
         self._set_most_recently_completed_command_id(command.id)
         self._all_failed_command_ids.append(command.id)
 
+    # TODO(jh, 08-01-25) Although protocol engine is garbage collected, command history persists in memory between protocol runs.
+    # Explicitly clearing all history before dereferencing protocol engine and the run's run orchestrator eliminates
+    # memory accumulation. Investigate further.
+    def clear(self) -> None:
+        """Clear state."""
+        self._commands_by_id.clear()
+        self._all_command_ids.clear()
+        self._all_failed_command_ids.clear()
+        self._all_command_ids_but_fixit_command_ids.clear()
+        self._queued_command_ids.clear()
+        self._queued_setup_command_ids.clear()
+        self._queued_fixit_command_ids.clear()
+
     def _add(self, command_id: str, command_entry: CommandEntry) -> None:
         """Create or update a command entry."""
         if command_id not in self._commands_by_id:

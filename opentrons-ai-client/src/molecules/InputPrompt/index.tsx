@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
+import clsx from 'clsx'
 import { useAtom } from 'jotai'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -375,7 +376,12 @@ export function InputPrompt(): JSX.Element {
         )}
 
         {/* Text input area - separate row */}
-        <div className={styles.text_input_section}>
+        <div
+          className={clsx(
+            styles.text_input_section,
+            attachedFiles.length === 0 && styles.text_input_section_no_files
+          )}
+        >
           <textarea
             rows={calcTextAreaHeight(watchUserPrompt)}
             placeholder={t('type_your_prompt')}

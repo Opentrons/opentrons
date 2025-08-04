@@ -38,7 +38,7 @@ def model_config() -> PipetteModelSpecs:
     return copy.deepcopy(_model_config())
 
 
-@lru_cache(maxsize=None)
+@lru_cache(maxsize=1)
 def _model_config() -> PipetteModelSpecs:
     return json.loads(
         load_shared_data("pipette/definitions/1/pipetteModelSpecs.json") or "{}"
@@ -50,7 +50,7 @@ def name_config() -> PipetteNameSpecs:
     return _name_config()
 
 
-@lru_cache(maxsize=None)
+@lru_cache(maxsize=1)
 def _name_config() -> PipetteNameSpecs:
     return json.loads(
         load_shared_data("pipette/definitions/1/pipetteNameSpecs.json") or "{}"
@@ -73,7 +73,7 @@ def fuse_specs(
     return copy.deepcopy(_fuse_specs_cached(pipette_model, pipette_name))
 
 
-@lru_cache(maxsize=None)
+@lru_cache(maxsize=10)
 def _fuse_specs_cached(
     pipette_model: PipetteModel, pipette_name: Optional[PipetteName] = None
 ) -> PipetteFusedSpec:
