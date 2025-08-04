@@ -1,8 +1,6 @@
 """Modules routes."""
+from fastapi import APIRouter, Depends, status
 from typing import Annotated, List, Dict
-
-from fastapi import Depends, status
-from server_utils.fastapi_utils.light_router import LightRouter
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import module_calibration
@@ -23,7 +21,7 @@ from .module_models import AttachedModule, ModuleCalibrationData
 from .module_identifier import ModuleIdentifier
 from .module_data_mapper import ModuleDataMapper
 
-modules_router = LightRouter()
+modules_router = APIRouter()
 
 
 @PydanticResponse.wrap_route(

@@ -6,7 +6,6 @@ from typing import Annotated, Union
 
 import fastapi
 from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
-from server_utils.fastapi_utils.light_router import LightRouter
 
 from opentrons_shared_data.deck.types import DeckDefinitionV5
 
@@ -22,7 +21,7 @@ from .fastapi_dependencies import get_deck_configuration_store
 from .store import DeckConfigurationStore
 
 
-router = LightRouter()
+router = fastapi.APIRouter()
 
 
 @PydanticResponse.wrap_route(

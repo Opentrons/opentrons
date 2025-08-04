@@ -6,7 +6,6 @@ from typing import Annotated, Literal
 
 import fastapi
 from pydantic.json_schema import SkipJsonSchema
-from server_utils.fastapi_utils.light_router import LightRouter
 
 from robot_server.labware_offsets.models import LabwareOffsetNotFound
 from robot_server.service.dependencies import (
@@ -35,7 +34,7 @@ from .models import (
 )
 
 
-router = LightRouter()
+router = fastapi.APIRouter()
 
 
 @PydanticResponse.wrap_route(

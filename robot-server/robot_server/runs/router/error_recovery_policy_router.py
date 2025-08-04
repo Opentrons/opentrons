@@ -4,8 +4,7 @@
 from textwrap import dedent
 from typing import Annotated
 
-from fastapi import status, Depends
-from server_utils.fastapi_utils.light_router import LightRouter
+from fastapi import status, APIRouter, Depends
 
 from robot_server.errors.error_responses import ErrorBody
 from robot_server.service.json_api.request import RequestModel
@@ -21,7 +20,7 @@ from ..run_data_manager import RunDataManager, RunNotCurrentError
 from ..error_recovery_models import ErrorRecoveryPolicy
 
 
-error_recovery_policy_router = LightRouter()
+error_recovery_policy_router = APIRouter()
 
 
 @PydanticResponse.wrap_route(

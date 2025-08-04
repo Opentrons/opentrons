@@ -1,8 +1,7 @@
 """Router for top-level /commands endpoints."""
 from typing import Annotated, Final, List, Literal, Optional, cast
 
-from fastapi import Depends, Query, status
-from server_utils.fastapi_utils.light_router import LightRouter
+from fastapi import APIRouter, Depends, Query, status
 
 from opentrons.protocol_engine import CommandIntent
 from opentrons.protocol_engine.errors import CommandDoesNotExistError
@@ -26,7 +25,7 @@ from .stateless_commands import StatelessCommand, StatelessCommandCreate
 _DEFAULT_COMMAND_LIST_LENGTH: Final = 20
 
 
-commands_router = LightRouter()
+commands_router = APIRouter()
 
 
 class CommandNotFound(ErrorDetails):

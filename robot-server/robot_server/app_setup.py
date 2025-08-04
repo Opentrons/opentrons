@@ -117,7 +117,7 @@ app.add_middleware(
 app.middleware("http")(server_timing_middleware())
 
 # main router
-router.install_on_app(app)
+app.include_router(router=router)
 
 
 def _get_persistence_directory(settings: RobotServerSettings) -> Optional[Path]:

@@ -4,7 +4,6 @@ import textwrap
 from typing import Annotated, Literal
 
 import fastapi
-from server_utils.fastapi_utils.light_router import LightRouter
 
 from robot_server.client_data.store import (
     ClientData,
@@ -19,7 +18,7 @@ from robot_server.service.notifications.publishers.client_data_publisher import 
     get_client_data_publisher,
 )
 
-router = LightRouter()
+router = fastapi.APIRouter()
 
 
 Key = Annotated[

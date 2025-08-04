@@ -8,9 +8,8 @@ from textwrap import dedent
 from typing import Annotated, Optional, Callable
 from typing_extensions import Literal
 
-from fastapi import Depends, status
+from fastapi import APIRouter, Depends, status
 from pydantic import BaseModel, Field
-from server_utils.fastapi_utils.light_router import LightRouter
 
 from robot_server.errors.error_responses import ErrorDetails, ErrorBody
 from robot_server.service.dependencies import get_current_time, get_unique_id
@@ -43,7 +42,7 @@ from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.service.notifications import get_pe_notify_publishers
 
 log = logging.getLogger(__name__)
-base_router = LightRouter()
+base_router = APIRouter()
 
 
 # TODO (spp, 2023-04-10): move all error types from maintenance & regular runs
