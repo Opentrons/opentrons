@@ -53,7 +53,7 @@ const loadNames = Array.from(
   new Set(
     Object.keys(definitionModules).map(defPath => {
       const parts = defPath.split('/')
-      return parts[5] 
+      return parts[5]
     })
   )
 )
