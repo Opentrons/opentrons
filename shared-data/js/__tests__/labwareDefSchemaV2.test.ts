@@ -130,11 +130,8 @@ const expectedWellsNotMatchingZDimension: Record<string, Set<string>> = {
   // This batch may have incompletely-updated geometry from recent work related to
   // liquid level detection and meniscus-relative pipetting. Probably, the wells were
   // updated but not the overall labware dimensions. This needs to be investigated and fixed.
-  nest_96_wellplate_100ul_pcr_full_skirt: standard96WellNames,
   'opentrons_24_tuberack_nest_1.5ml_screwcap': standard24WellNames,
   opentrons_24_tuberack_nest_2ml_screwcap: standard24WellNames,
-  'corning_12_wellplate_6.9ml_flat': generateStandardWellNames(3, 4),
-  biorad_96_wellplate_200ul_pcr: standard96WellNames,
 }
 
 const filterWells = (
@@ -317,10 +314,6 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
 
       const labwareWithWellDepthMismatches = [
         // todo(mm, 2025-03-17): Investigate and resolve these mismatches.
-        'corning_24_wellplate_3.4ml_flat',
-        'corning_6_wellplate_16.8ml_flat',
-        'corning_96_wellplate_360ul_flat',
-        'nest_96_wellplate_2ml_deep',
         'opentrons_15_tuberack_falcon_15ml_conical',
         'opentrons_24_aluminumblock_nest_1.5ml_screwcap',
         'opentrons_24_aluminumblock_nest_2ml_screwcap',
