@@ -33,13 +33,13 @@ import { NotConfiguredModal } from '/app/organisms/LocationConflictModal/NotConf
 import { getLocalRobot } from '/app/redux/discovery'
 import { getRequiredDeckConfig } from '/app/resources/deck_configuration/utils'
 
+import type { TFunction } from 'i18next'
 import type {
   CutoutFixtureId,
   DeckDefinition,
   RobotType,
 } from '@opentrons/shared-data'
 import type { CutoutConfigAndCompatibility } from '/app/resources/deck_configuration/hooks'
-import type { TFunction } from 'i18next'
 
 interface FixtureTableProps {
   robotType: RobotType

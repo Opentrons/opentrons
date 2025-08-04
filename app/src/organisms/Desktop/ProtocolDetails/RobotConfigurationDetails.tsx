@@ -32,6 +32,7 @@ import { Divider } from '/app/atoms/structure'
 import { getRobotTypeDisplayName } from '../ProtocolsLanding/utils'
 import { getSlotsForThermocycler } from './utils'
 
+import type { TFunction } from 'i18next'
 import type { ReactNode } from 'react'
 import type {
   CutoutConfigProtocolSpec,
@@ -209,7 +210,10 @@ export const RobotConfigurationDetails = (
                     />
                   ) : null}
                   <StyledText desktopStyle="bodyDefaultRegular">
-                    {getFixtureDisplayName(t, fixture.cutoutFixtureId)}
+                    {getFixtureDisplayName(
+                      t as TFunction,
+                      fixture.cutoutFixtureId
+                    )}
                   </StyledText>
                 </>
               }

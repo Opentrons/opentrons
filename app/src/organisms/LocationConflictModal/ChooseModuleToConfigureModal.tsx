@@ -37,6 +37,7 @@ import { useCloseCurrentRun } from '/app/resources/runs'
 
 import { useSendIdentifyStacker } from '../ModuleWizardFlows/hooks'
 
+import type { TFunction } from 'i18next'
 import type { AttachedModule } from '@opentrons/api-client'
 import type { DeckDefinition, ModuleModel } from '@opentrons/shared-data'
 
@@ -163,7 +164,11 @@ export const ChooseModuleToConfigureModal = (
             onClickHandler={() => {
               handleStackerClearAndConfigureModule(selectedModule)
             }}
-            optionName={getFixtureDisplayName(t, moduleFixtures[0].id, usbPort)}
+            optionName={getFixtureDisplayName(
+              t as TFunction,
+              moduleFixtures[0].id,
+              usbPort
+            )}
             buttonText={i18n.format(t('shared:add'), 'capitalize')}
             secondaryButtonText={i18n.format(
               t('shared:identify'),
@@ -179,7 +184,11 @@ export const ChooseModuleToConfigureModal = (
             onClickHandler={() => {
               handleStackerClearAndConfigureModule(selectedModule)
             }}
-            optionName={getFixtureDisplayName(t, moduleFixtures[0].id, usbPort)}
+            optionName={getFixtureDisplayName(
+              t as TFunction,
+              moduleFixtures[0].id,
+              usbPort
+            )}
             buttonText={i18n.format(t('shared:add'), 'capitalize')}
             secondaryButtonText={i18n.format(
               t('shared:identify'),
@@ -197,7 +206,11 @@ export const ChooseModuleToConfigureModal = (
             onClickHandler={() => {
               handleConfigureModule(serialNumber)
             }}
-            optionName={getFixtureDisplayName(t, moduleFixtures[0].id, usbPort)}
+            optionName={getFixtureDisplayName(
+              t as TFunction,
+              moduleFixtures[0].id,
+              usbPort
+            )}
             buttonText={i18n.format(t('shared:add'), 'capitalize')}
           />
         ) : (
@@ -206,7 +219,11 @@ export const ChooseModuleToConfigureModal = (
             onClickHandler={() => {
               handleConfigureModule(serialNumber)
             }}
-            optionName={getFixtureDisplayName(t, moduleFixtures[0].id, usbPort)}
+            optionName={getFixtureDisplayName(
+              t as TFunction,
+              moduleFixtures[0].id,
+              usbPort
+            )}
             buttonText={i18n.format(t('shared:add'), 'capitalize')}
           />
         )

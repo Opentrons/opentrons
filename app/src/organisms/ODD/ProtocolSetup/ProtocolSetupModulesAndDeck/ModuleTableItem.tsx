@@ -34,6 +34,7 @@ import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getModuleTooHot } from '/app/transformations/modules'
 
+import type { TFunction } from 'i18next'
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
 import type {
   CutoutConfig,
@@ -44,7 +45,6 @@ import type {
 import type { ModulePrepCommandsType } from '/app/local-resources/modules'
 import type { ProtocolCalibrationStatus } from '/app/resources/runs'
 import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
-import { TFunction } from 'i18next'
 
 export type ModuleStatusType =
   | 'locationConflict'

@@ -103,6 +103,7 @@ import { CloseButton, PlayButton } from './Buttons'
 import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 import { ConfirmSetupStepsCompleteModal } from './ConfirmSetupStepsCompleteModal'
 
+import type { TFunction } from 'i18next'
 import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { Dispatch, SetStateAction } from 'react'
 import type { Run, RunStatus } from '@opentrons/api-client'
@@ -116,7 +117,6 @@ import type {
   ProtocolFixture,
   ProtocolHardware,
 } from '/app/transformations/commands'
-import { TFunction } from 'i18next'
 
 const FETCH_DURATION_MS = 5000
 

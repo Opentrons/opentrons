@@ -35,6 +35,7 @@ import {
 } from '../DeviceDetailsDeckConfiguration/utils'
 import { useSendIdentifyStacker } from '../ModuleWizardFlows/hooks'
 
+import type { TFunction } from 'i18next'
 import type { AttachedModule } from '@opentrons/api-client'
 import type { ModalProps } from '@opentrons/components'
 import type {
@@ -293,7 +294,7 @@ export function AddFixtureModal({
         <ODDFixtureOption
           key={cutoutConfigs[0].cutoutFixtureId}
           optionName={getFixtureDisplayName(
-            t,
+            t as TFunction,
             cutoutConfigs[0].cutoutFixtureId,
             portDisplay
           )}
@@ -310,7 +311,7 @@ export function AddFixtureModal({
         <FixtureOption
           key={cutoutConfigs[0].cutoutFixtureId}
           optionName={getFixtureDisplayName(
-            t,
+            t as TFunction,
             cutoutConfigs[0].cutoutFixtureId,
             portDisplay
           )}
@@ -329,7 +330,7 @@ export function AddFixtureModal({
         <ODDFixtureOption
           key={cutoutConfigs[0].cutoutFixtureId}
           optionName={getFixtureDisplayName(
-            t,
+            t as TFunction,
             cutoutConfigs[0].cutoutFixtureId,
             portDisplay
           )}
@@ -342,7 +343,7 @@ export function AddFixtureModal({
         <FixtureOption
           key={cutoutConfigs[0].cutoutFixtureId}
           optionName={getFixtureDisplayName(
-            t,
+            t as TFunction,
             cutoutConfigs[0].cutoutFixtureId,
             portDisplay
           )}

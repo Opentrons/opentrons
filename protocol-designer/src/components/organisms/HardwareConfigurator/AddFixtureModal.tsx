@@ -35,6 +35,7 @@ import { getMainPagePortalEl } from '../Portal'
 import { getLabwareCompatibleForEditHardware } from '../utils'
 import { getAvailableOptions } from './useDeckConfigurationEditing'
 
+import type { TFunction } from 'i18next'
 import type { UseFormSetValue } from 'react-hook-form'
 import type { ModalProps } from '@opentrons/components'
 import type {
@@ -47,7 +48,6 @@ import type {
 import type { FormModules, ModuleOnDeck } from '../../../step-forms'
 import type { DeckFixture } from '../../../step-forms/actions/additionalItems'
 import type { Fixtures, WizardFormState } from '../types'
-import type { TFunction } from 'i18next'
 
 export interface ModuleExtended extends ModuleOnDeck {
   cutoutId: CutoutId
@@ -302,7 +302,10 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     return (
       <FixtureOption
         key={cutoutConfigs[0].cutoutFixtureId}
-        optionName={getFixtureDisplayName(t as TFunction, cutoutConfigs[0].cutoutFixtureId)}
+        optionName={getFixtureDisplayName(
+          t as TFunction,
+          cutoutConfigs[0].cutoutFixtureId
+        )}
         buttonText={i18n.format(t('add'), 'capitalize')}
         onClickHandler={() => {
           handleAddFixture(cutoutConfigs)

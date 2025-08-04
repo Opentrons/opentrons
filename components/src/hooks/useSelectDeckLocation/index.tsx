@@ -29,6 +29,7 @@ import { Text } from '../../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
+import type { TFunction } from 'i18next'
 import type {
   AddressableArea,
   CoordinateTuple,
@@ -38,7 +39,6 @@ import type {
   ModuleLocation,
   RobotType,
 } from '@opentrons/shared-data'
-import type { TFunction } from 'i18next'
 
 export type DeckLocationSelectThemes = 'default' | 'grey'
 

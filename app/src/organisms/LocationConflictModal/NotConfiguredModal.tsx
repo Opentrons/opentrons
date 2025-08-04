@@ -22,8 +22,8 @@ import { OddModal } from '/app/molecules/OddModal'
 import { patchDeckConfigForRequiredFixture } from '/app/organisms/LocationConflictModal/patchDeckConfigForRequiredFixture'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
+import type { TFunction } from 'i18next'
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
-import { TFunction } from 'i18next'
 
 interface NotConfiguredModalProps {
   onCloseClick: () => void
@@ -61,7 +61,10 @@ export const NotConfiguredModal = (
         onOutsideClick={onCloseClick}
         header={{
           title: t('add_fixture', {
-            fixtureName: getFixtureDisplayName(t as TFunction, requiredFixtureId),
+            fixtureName: getFixtureDisplayName(
+              t as TFunction,
+              requiredFixtureId
+            ),
             locationName: cutoutDisplayName,
           }),
           hasExitIcon: true,
@@ -74,7 +77,10 @@ export const NotConfiguredModal = (
           </StyledText>
           <ListTable>
             <ODDFixtureOption
-              optionName={getFixtureDisplayName(t as TFunction, requiredFixtureId)}
+              optionName={getFixtureDisplayName(
+                t as TFunction,
+                requiredFixtureId
+              )}
               onClickHandler={handleUpdateDeck}
               buttonText={i18n.format(t('shared:add'), 'capitalize')}
             />
@@ -96,7 +102,10 @@ export const NotConfiguredModal = (
           </StyledText>
           <ListTable>
             <FixtureOption
-              optionName={getFixtureDisplayName(t as TFunction, requiredFixtureId)}
+              optionName={getFixtureDisplayName(
+                t as TFunction,
+                requiredFixtureId
+              )}
               onClickHandler={handleUpdateDeck}
               buttonText={i18n.format(t('shared:add'), 'capitalize')}
             />
