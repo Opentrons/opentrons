@@ -1845,7 +1845,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         tip_racks: List[Tuple[Location, LabwareCore]],
         starting_tip: Optional[WellCore],
         tiprack_uri_for_transfer_props: str,
-    ) -> Tuple[Location, WellCore]:
+    ) -> None:
         """Resolve next tip and pick it up, for use in liquid class transfer code."""
         next_tip = self.get_next_tip(
             tip_racks=[core for loc, core in tip_racks],
@@ -1872,7 +1872,6 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             presses=None,
             increment=None,
         )
-        return tiprack_loc, tip_well
 
     def _drop_tip_for_liquid_class(
         self,
