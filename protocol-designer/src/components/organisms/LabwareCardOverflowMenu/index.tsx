@@ -103,21 +103,15 @@ export function LabwareCardOverflowMenu(
     labwareIds.forEach(labwareId => {
       dispatch(deleteContainer({ labwareId }))
     })
-    if (isAdapter) {
-      dispatch(
-        editSlotInfo({
-          adapterDefURI: null,
-        })
-      )
-    } else {
-      dispatch(
-        editSlotInfo({
-          labwareDefURI: null,
-          lidDefURI: null,
-          amount: 1,
-        })
-      )
+    const module = moduleId != null ? deckSetupModules[moduleId] : null
+    const moduleModel = module?.model ?? null
+    const newSlotInfo = {
+      ...(moduleModel != null ? { moduleModel } : {}),
+      ...(isAdapter === true
+        ? { adapterDefURI: null }
+        : { labwareDefURI: null, lidDefURI: null, amount: 1 }),
     }
+    dispatch(editSlotInfo(newSlotInfo))
   }
   const handleConfirmDeleteEntityInUseModal = (): void => {
     labwareIds.forEach(labwareId => {
