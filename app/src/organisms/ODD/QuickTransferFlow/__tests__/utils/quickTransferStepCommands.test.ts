@@ -243,7 +243,6 @@ pipette.transfer_with_liquid_class(
                     "position_reference": "well-bottom",
                 },
                 "flow_rate_by_volume": [(0, 80)],
-                "correction_by_volume": [(0, 0)],
                 "delay": {"enabled": False},
                 "submerge": {
                     "delay": {"enabled": False},
@@ -262,6 +261,7 @@ pipette.transfer_with_liquid_class(
                     "touch_tip": {"enabled": False},
                     "blowout": {"enabled": True, "location": "source", "flow_rate": 50},
                 },
+                "correction_by_volume": [(0, 0)],
                 "push_out_by_volume": [(0, 0)],
                 "mix": {"enabled": False},
             },
@@ -396,7 +396,6 @@ pipette.consolidate_with_liquid_class(
                     "position_reference": "well-bottom",
                 },
                 "flow_rate_by_volume": [(0, 80)],
-                "correction_by_volume": [(0, 0)],
                 "delay": {"enabled": False},
                 "submerge": {
                     "delay": {"enabled": False},
@@ -415,6 +414,7 @@ pipette.consolidate_with_liquid_class(
                     "touch_tip": {"enabled": False},
                     "blowout": {"enabled": True, "location": "trash", "flow_rate": 50},
                 },
+                "correction_by_volume": [(0, 0)],
                 "push_out_by_volume": [(0, 0)],
                 "mix": {"enabled": False},
             },
@@ -550,7 +550,6 @@ pipette.distribute_with_liquid_class(
                     "position_reference": "well-bottom",
                 },
                 "flow_rate_by_volume": [(0, 80)],
-                "correction_by_volume": [(0, 0)],
                 "delay": {"enabled": False},
                 "submerge": {
                     "delay": {"enabled": False},
@@ -569,6 +568,7 @@ pipette.distribute_with_liquid_class(
                     "touch_tip": {"enabled": False},
                     "blowout": {"enabled": True, "location": "source", "flow_rate": 50},
                 },
+                "correction_by_volume": [(0, 0)],
                 "push_out_by_volume": [(0, 0)],
                 "mix": {"enabled": False},
             },
@@ -578,7 +578,6 @@ pipette.distribute_with_liquid_class(
                     "position_reference": "well-bottom",
                 },
                 "flow_rate_by_volume": [(0, 80)],
-                "correction_by_volume": [(0, 0)],
                 "delay": {"enabled": False},
                 "submerge": {
                     "delay": {"enabled": False},
@@ -597,6 +596,7 @@ pipette.distribute_with_liquid_class(
                     "touch_tip": {"enabled": False},
                     "blowout": {"enabled": True, "location": "source", "flow_rate": 50},
                 },
+                "correction_by_volume": [(0, 0)],
                 "conditioning_by_volume": [(0, 0)],
                 "disposal_by_volume": [(0, 0)],
             },
