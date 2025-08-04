@@ -10,7 +10,7 @@ nav:
       - Installation Requirements: installation/requirements.md
       - Unboxing: installation/unboxing.md
       - First Run: installation/first-run.md
-      - Instruments: installation/instruments.md
+      - Instrument Setup: installation/instruments.md
       - Relocation: installation/relocation.md
   - System Description:
       - System Description Home: system-description/index.md
