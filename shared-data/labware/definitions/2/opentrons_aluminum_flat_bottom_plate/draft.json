@@ -1,0 +1,41 @@
+{
+  "ordering": [],
+  "brand": {
+    "brand": "Opentrons",
+    "brandId": []
+  },
+  "metadata": {
+    "displayName": "Opentrons Aluminum Flat Bottom Plate",
+    "displayCategory": "aluminumBlock",
+    "displayVolumeUnits": "µL",
+    "tags": []
+  },
+  "dimensions": {
+    "xDimension": 134,
+    "yDimension": 92,
+    "zDimension": 11.2
+  },
+  "wells": {},
+  "groups": [
+    {
+      "metadata": {},
+      "wells": []
+    }
+  ],
+  "parameters": {
+    "format": "96Standard",
+    "quirks": [],
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "loadName": "opentrons_aluminum_flat_bottom_plate"
+  },
+  "namespace": "opentrons",
+  "version": 1,
+  "schemaVersion": 2,
+  "allowedRoles": ["adapter"],
+  "cornerOffsetFromSlot": {
+    "x": -3,
+    "y": -3,
+    "z": 0
+  }
+}
