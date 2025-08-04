@@ -1072,7 +1072,7 @@ class InstrumentContext(publisher.CommandPublisher):
         if not self._core.has_tip():
             _log.warning("Pipette has no tip to return")
 
-        loc = self._get_last_tip_rack_well()
+        loc = self.get_last_tip_rack_well_used()
 
         # TODO rewrite this error message
         if not isinstance(loc, labware.Well):
@@ -1848,7 +1848,7 @@ class InstrumentContext(publisher.CommandPublisher):
             source=source,
             dest=dest,
             tip_policy=new_tip,
-            last_tip_well=self._get_last_tip_rack_well(),
+            last_tip_well=self.get_last_tip_rack_well_used(),
             tip_racks=self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
             group_wells_for_multi_channel=group_wells,
@@ -1977,7 +1977,7 @@ class InstrumentContext(publisher.CommandPublisher):
             source=source,
             dest=dest,
             tip_policy=new_tip,
-            last_tip_well=self._get_last_tip_rack_well(),
+            last_tip_well=self.get_last_tip_rack_well_used(),
             tip_racks=self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
             group_wells_for_multi_channel=group_wells,
@@ -2115,7 +2115,7 @@ class InstrumentContext(publisher.CommandPublisher):
             source=source,
             dest=dest,
             tip_policy=new_tip,
-            last_tip_well=self._get_last_tip_rack_well(),
+            last_tip_well=self.get_last_tip_rack_well_used(),
             tip_racks=self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
             group_wells_for_multi_channel=group_wells,
@@ -3107,15 +3107,20 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @property
     def _last_tip_picked_up_from(self) -> Optional[labware.Well]:
-        """This exists to prevent old protocols that relied on this old internal variable from failing.
-
-        Normally we would enforce not relying on underscore variables/methods, but given this
-        variable's age and the lack of other ways to get this data previously, we'll continue
-        to support this.
         """
-        return self._get_last_tip_rack_well()
+        .. deprecated:: 2.26
+           Use :py:obj:`ProtocolContext.get_last_tip_rack_well_used` instead.
 
-    def _get_last_tip_rack_well(self) -> Optional[labware.Well]:
+           If the pipette has a tip on it, returns the tip rack well it was picked up from.
+           Otherwise will return ``None``.
+        """
+        return self.get_last_tip_rack_well_used()
+
+    def get_last_tip_rack_well_used(self) -> Optional[labware.Well]:
+        """Returns the tip rack well the current tip has been picked up from.
+
+        If there is no tip currently on the pipette, this will return ``None``.
+        """
         tip_rack_cores = self._core.get_last_well_tip_picked_up_from()
         if tip_rack_cores is None:
             return None
