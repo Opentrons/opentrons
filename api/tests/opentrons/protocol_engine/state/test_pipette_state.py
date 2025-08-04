@@ -9,6 +9,7 @@ from collections import OrderedDict
 import pytest
 
 from opentrons_shared_data.pipette import pipette_definition
+from opentrons_shared_data.pipette.types import PipetteNameType
 
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine import actions, commands
@@ -17,8 +18,8 @@ from opentrons.protocol_engine.resources.pipette_data_provider import (
 )
 from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.pipettes import PipetteStore, PipetteView
-from opentrons.protocol_engine.types import FlowRates
-from opentrons.types import Point
+from opentrons.protocol_engine.types import FlowRates, TipGeometry, LabwareWellId
+from opentrons.types import Point, MountType
 
 from ..pipette_fixtures import (
     EIGHT_CHANNEL_COLS,
@@ -223,4 +224,65 @@ def test_active_channels(
     assert (
         PipetteView(subject.state).get_active_channels("pipette-id")
         == expected_channels
+    )
+
+
+def test_last_tip_rack_well() -> None:
+    """Should update last tip rack well after pipette load and tip state updates."""
+    subject = PipetteStore()
+
+    load_pipette_update = update_types.LoadPipetteUpdate(
+        pipette_id="pipette-id",
+        pipette_name=PipetteNameType.P50_SINGLE_FLEX,
+        mount=MountType.RIGHT,
+        liquid_presence_detection=None,
+    )
+
+    subject.handle_action(
+        actions.SucceedCommandAction(
+            state_update=update_types.StateUpdate(loaded_pipette=load_pipette_update),
+            command=_dummy_command(),
+        )
+    )
+
+    assert (
+        PipetteView(subject.state).get_tip_rack_well_picked_up_from("pipette-id")
+        is None
+    )
+
+    tip_picked_up_update = update_types.PipetteTipStateUpdate(
+        pipette_id="pipette-id",
+        tip_geometry=TipGeometry(length=1, diameter=2, volume=3),
+        well_picked_up_from=LabwareWellId(
+            labware_id="my-cool-labware", well_name="less-cool-well"
+        ),
+    )
+
+    subject.handle_action(
+        actions.SucceedCommandAction(
+            state_update=update_types.StateUpdate(
+                pipette_tip_state=tip_picked_up_update
+            ),
+            command=_dummy_command(),
+        )
+    )
+
+    assert PipetteView(subject.state).get_tip_rack_well_picked_up_from(
+        "pipette-id"
+    ) == LabwareWellId(labware_id="my-cool-labware", well_name="less-cool-well")
+
+    tip_dropped_update = update_types.PipetteTipStateUpdate(
+        pipette_id="pipette-id", tip_geometry=None, well_picked_up_from=None
+    )
+
+    subject.handle_action(
+        actions.SucceedCommandAction(
+            state_update=update_types.StateUpdate(pipette_tip_state=tip_dropped_update),
+            command=_dummy_command(),
+        )
+    )
+
+    assert (
+        PipetteView(subject.state).get_tip_rack_well_picked_up_from("pipette-id")
+        is None
     )
