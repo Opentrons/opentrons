@@ -31,7 +31,10 @@ NUMBER_OF_BINS = 128
 DEFAULT_STD = 6
 DEFAULT_THRESHOLD = 1000
 # Defaults taken from TOF_DETECTION_CONFIG in api flex_stacker.py
+# X-Extend, X-Retract, Z-Extend, Z-Retract
 DEFAULT_BIN_RANGES = [(30, 40), (17, 30), (15, 63), (15, 63)]
+DEFAULT_ZONES =      [(5,6,7), (5,6,7), (1,2,3), (1,2,3)]
+
 DEFAULT_MAX_SAMPLES = 100000
 
 ACTIONS = ["plot", "generate", "validate"]
@@ -147,8 +150,8 @@ def parse_common_args(args: argparse.Namespace) -> Dict[str, Any]:
         "labware_count": tuple(args.labware_count),
         "platform_list_x": args.platform_x,
         "platform_list_z": args.platform_z,
-        "zone_list_x": args.zones_x or list(range(NUMBER_OF_ZONES)),
-        "zone_list_z": args.zones_z or list(range(NUMBER_OF_ZONES)),
+        "zone_list_x": args.zones_x or DEFAULT_ZONES[0],  # x-extend
+        "zone_list_z": args.zones_z or DEFAULT_ZONES[2],  # z-extend
         "bins_list": args.bins or list(range(NUMBER_OF_BINS)),
         "max_samples": args.max_samples or DEFAULT_MAX_SAMPLES,
         "baseline_version": getattr(args, "baseline_version", None),
@@ -909,13 +912,13 @@ if __name__ == "__main__":
     parser.add_argument(
         "--platform-x",
         help="The X platform position (extend, retract, or both)",
-        default=["extend", "retract"],
+        default=["retract"],
         nargs="+",
     )
     parser.add_argument(
         "--platform-z",
         help="The Z platform position (extend, retract, or both)",
-        default=["extend", "retract"],
+        default=["extend"],
         nargs="+",
     )
     parser.add_argument(
