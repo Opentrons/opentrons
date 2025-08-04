@@ -22,9 +22,9 @@ HOME_CURRENT = STACKER_MOTION_CONFIG[TEST_AXIS]["home"].run_current
 STALLTHRESHOLD = STALLGUARD_CONFIG[TEST_AXIS].threshold
 
 TEST_SPEEDS = [200, 250]  # mm/s
-TEST_CURRENTS = [1.5, 1.2, 1.0, 0.8, 0.7, 0.3]  # A rms
+TEST_CURRENTS = [1.0, 0.7, 0.6, 0.5, 0.4, 0.3]  # A rms
 TEST_ACCELERATION = STACKER_MOTION_CONFIG[TEST_AXIS]["move"].move_params.acceleration
-CURRENT_THRESHOD = 1.0  # A rms
+CURRENT_THRESHOD = 0.3  # A rms
 TEST_TRIALS = 10
 
 # All units in mm
