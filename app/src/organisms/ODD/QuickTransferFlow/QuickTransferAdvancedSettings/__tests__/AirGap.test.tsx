@@ -76,7 +76,7 @@ describe('AirGap', () => {
     fireEvent.click(screen.getByRole('button', { name: '1' }))
     fireEvent.click(screen.getByRole('button', { name: '1' }))
     fireEvent.click(screen.getByText('Save'))
-    screen.getByText('Value must be between 1 to 5')
+    screen.getByText('Value must be between 0 to 9')
   })
 
   it('should call dispatch when clicking save button aspirate', () => {

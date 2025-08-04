@@ -126,7 +126,6 @@ export function AirGap(props: AirGapProps): JSX.Element {
         )
 
   const volumeRange = { min, max }
-  console.log(volumeRange)
   let volumeError = null
   if (volumeRange.min > volumeRange.max) {
     volumeError = t('air_gap_capacity_error')
