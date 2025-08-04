@@ -1,22 +1,14 @@
 import { useMemo, useRef, useState } from 'react'
-import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import Plot from 'react-plotly'
 import { useSelector } from 'react-redux'
 import { round } from 'lodash'
 
 import {
   ALIGN_CENTER,
-  Chip,
-  COLORS,
   DIRECTION_COLUMN,
   Divider,
   Flex,
-  FLEX_MIN_CONTENT,
-  JUSTIFY_FLEX_END,
-  Modal,
   PrimaryButton,
-  SecondaryButton,
   SPACING,
   StyledText,
   Tabs,
@@ -28,15 +20,18 @@ import {
   getMinXYDimension,
   NONE_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
-import { getTrashOrLabware } from '@opentrons/step-generation'
+import {
+  getPipetteWithTipMaxVol,
+  getTrashOrLabware,
+} from '@opentrons/step-generation'
 
 import {
   CheckboxExpandStepFormField,
   InputStepFormField,
   ToggleStepFormField,
 } from '../../../../../../components/molecules'
-import { getMainPagePortalEl } from '../../../../../../components/organisms'
 import { ResetSettingsModal } from '../../../../../../components/organisms/ResetSettingsModal'
+import { getEnableByVolumeBuilder } from '../../../../../../feature-flags/selectors'
 import { getRobotType } from '../../../../../../file-data/selectors'
 import {
   getAdditionalEquipmentEntities,
@@ -57,6 +52,8 @@ import {
   getBlowoutLocationOptionsForForm,
   getLabwareFieldForPositioningField,
 } from '../../utils'
+import { ByVolumeBuilderModal } from '../ByVolumeBuilderModal/ByVolumeBuilderModal'
+import { FLOW_RATE } from '../ByVolumeBuilderModal/types'
 import { MultiInputField } from './MultiInputField'
 import { ResetSettingsField } from './ResetSettingsField'
 
@@ -66,240 +63,8 @@ import type { FormData, StepFieldName } from '../../../../../../form-types'
 import type { FieldPropsByName, LiquidHandlingTab } from '../../types'
 import type { StepInputFieldProps } from './MultiInputField'
 
-interface DataPoint {
-  x: number
-  y: number
-}
-
-function DraggableLineChart(props: {
-  dataPoints: DataPoint[]
-  setDataPoints: (dataPoints: DataPoint[]) => void
-  byVolume: LiquidHandlingPropertyByVolume
-}): JSX.Element {
-  const { dataPoints, setDataPoints } = props
-
-  // Function to handle the relayout event (when shapes are dragged)
-  const handleRelayout = (eventData: any): void => {
-    const updatedPoints = [...dataPoints]
-    let changed = false
-
-    for (let i = 0; i < updatedPoints.length; i++) {
-      const xKey = `shapes[${i}].x0`
-      const yKey = `shapes[${i}].y0`
-
-      if (eventData[xKey] !== undefined && eventData[yKey] !== undefined) {
-        const newX = eventData[xKey] as number
-        const newY = eventData[yKey] as number
-
-        if (updatedPoints[i].x !== newX || updatedPoints[i].y !== newY) {
-          updatedPoints[i] = {
-            ...updatedPoints[i],
-            y: Math.max(newY, 0),
-          }
-          changed = true
-        }
-      }
-    }
-
-    if (changed) {
-      const sortedPoints = updatedPoints.sort((a, b) => a.x - b.x)
-      setDataPoints(sortedPoints)
-    }
-  }
-
-  // Function to handle a click on the invisible "click" trace
-  const handlePlotClick = (eventData: any): void => {
-    // This event handler is triggered by clicking on the invisible trace's line.
-    // The `eventData.points` array will contain information about the clicked point.
-    if (eventData && eventData.points && eventData.points.length > 0) {
-      const point = eventData.points[0]
-      const newPoint: DataPoint = {
-        x: point.x,
-        y: point.y,
-      }
-
-      const updatedPoints = [...dataPoints, newPoint]
-      const sortedPoints = updatedPoints.sort((a, b) => a.x - b.x)
-      setDataPoints(sortedPoints)
-    }
-  }
-
-  // Helper function to generate annotations
-  const getAnnotations = (): any => {
-    return dataPoints.map(point => ({
-      xref: 'x',
-      yref: 'y',
-      x: point.x,
-      y: point.y,
-      text: `(${point.x.toFixed(2)}, ${point.y.toFixed(2)})`,
-      showarrow: false,
-      xanchor: 'center',
-      yanchor: 'bottom',
-      yshift: 15,
-      font: {
-        color: 'black',
-        size: 11,
-      },
-      opacity: 1,
-    }))
-  }
-
-  // Helper function to generate shapes based on data points
-  const getShapes = (): any => {
-    return dataPoints.map((point, index) => ({
-      type: 'circle',
-      xref: 'x',
-      yref: 'y',
-      x0: point.x - 5,
-      y0: point.y - 5,
-      x1: point.x + 5,
-      y1: point.y + 5,
-      fillcolor: COLORS.blue50,
-      line: { width: 0 },
-      editable: true,
-      name: String(point.x),
-    }))
-  }
-
-  return (
-    <div>
-      <Plot
-        data={[
-          {
-            x: dataPoints.map(p => p.x),
-            y: dataPoints.map(p => p.y),
-            mode: 'lines+markers',
-            type: 'scatter',
-            marker: {
-              size: 35,
-              opacity: 0,
-            },
-            line: { width: 2 },
-            showlegend: false,
-            hoverinfo: 'none',
-          },
-          // This is the invisible, "clickable" trace.
-          {
-            x: dataPoints.map(p => p.x),
-            y: dataPoints.map(p => p.y),
-            mode: 'lines',
-            type: 'scatter',
-            line: {
-              width: 20,
-              color: 'rgba(0,0,0,0)', // Completely transparent
-            },
-            hoverinfo: 'none',
-            showlegend: false,
-            name: 'click-trace',
-          },
-        ]}
-        layout={{
-          width: 700,
-          height: 700,
-          title: { text: 'Flow rate (ul/s) vs Volume (ul)', editable: false },
-          xaxis: { title: 'Volume (ul)', range: [0, 210] },
-          yaxis: { title: 'Flow rate (ul/s)', range: [0, 210] },
-          shapes: getShapes(),
-          hovermode: 'closest',
-          annotations: getAnnotations(),
-        }}
-        config={{
-          editable: true,
-          displayModeBar: true,
-          modeBarButtonsToRemove: [
-            'zoom2d',
-            'pan2d',
-            'autoScale2d',
-            'hoverClosestCartesian',
-            'toImage',
-            'lasso2d',
-            'select2d',
-            'toggleHover',
-            'zoomIn2d',
-            'zoomOut2d',
-          ],
-          edits: {
-            titleText: false,
-            axisTitleText: false,
-            legendText: false,
-            colorbarTitleText: false,
-            shapePosition: true,
-            shapeEdit: false,
-          },
-        }}
-        onRelayout={handleRelayout}
-        onClick={handlePlotClick}
-      />
-    </div>
-  )
-}
-
 const addPrefix = (prefix: string) => (fieldName: string): StepFieldName =>
   `${prefix}_${fieldName}`
-
-const getByVolumeMappedToXY = (
-  data: LiquidHandlingPropertyByVolume
-): Array<{ x: number; y: number }> => {
-  return [
-    { x: 0, y: data[0][1] },
-    ...data.map(item => ({
-      x: item[0],
-      y: item[1],
-    })),
-  ]
-}
-
-function EditableLineChartModal(props: {
-  byVolume: LiquidHandlingPropertyByVolume
-  onClose: () => void
-  setFlowRates: Dispatch<SetStateAction<LiquidHandlingPropertyByVolume>>
-  defaultFlowRates: LiquidHandlingPropertyByVolume
-  setIsFlowRatesUpdated: Dispatch<SetStateAction<boolean>>
-}): JSX.Element {
-  const {
-    byVolume = [],
-    onClose,
-    setFlowRates,
-    defaultFlowRates,
-    setIsFlowRatesUpdated,
-  } = props
-  const defaultDataPoints = getByVolumeMappedToXY(byVolume)
-  const [dataPoints, setDataPoints] = useState(defaultDataPoints)
-
-  return createPortal(
-    <Modal
-      title="Flow rate (ul/s) vs Volume (ul)"
-      onClose={onClose}
-      closeOnOutsideClick
-      width={FLEX_MIN_CONTENT}
-    >
-      <DraggableLineChart
-        dataPoints={dataPoints}
-        setDataPoints={setDataPoints}
-        byVolume={byVolume}
-      />
-      <Flex justifyContent={JUSTIFY_FLEX_END} gridGap={SPACING.spacing4}>
-        <SecondaryButton
-          onClick={() => {
-            setDataPoints(getByVolumeMappedToXY(defaultFlowRates))
-          }}
-        >
-          Reset curve
-        </SecondaryButton>
-        <PrimaryButton
-          onClick={() => {
-            setFlowRates(dataPoints.map(p => [p.x, p.y]))
-            onClose()
-            setIsFlowRatesUpdated(true)
-          }}
-        >
-          Save
-        </PrimaryButton>
-      </Flex>
-    </Modal>,
-    getMainPagePortalEl()
-  )
-}
 
 interface SecondStepsMoveLiquidToolsProps {
   propsForFields: FieldPropsByName
@@ -326,7 +91,14 @@ export const SecondStepsMoveLiquidTools = ({
   const { trashBinEntities, wasteChuteEntities } = useSelector(
     getInvariantContext
   )
+  const enableByVolumeBuilder = useSelector(getEnableByVolumeBuilder)
   const { spec: pipetteSpecs } = pipetteEntities[String(formData.pipette)]
+  const invariantContext = useSelector(getInvariantContext)
+  const maxVolume = getPipetteWithTipMaxVol(
+    formData.pipette as string,
+    invariantContext,
+    formData.tipRack as string
+  )
   const byTipValues = getAllLiquidClassDefs()
     [
       formData.liquidClass !== NONE_LIQUID_CLASS_NAME
@@ -345,8 +117,7 @@ export const SecondStepsMoveLiquidTools = ({
   const [flowRates, setFlowRates] = useState<LiquidHandlingPropertyByVolume>(
     byTipValues ?? []
   )
-  // need presaved logic here
-  const [isFlowRatesUpdated, setIsFlowRatesUpdated] = useState<boolean>(false)
+  // need presaved and deep equality check logic here
   const addFieldNamePrefix = addPrefix(tab)
   const isWasteChuteSelected =
     propsForFields.dispense_labware?.value != null
@@ -548,7 +319,7 @@ export const SecondStepsMoveLiquidTools = ({
           <Tabs tabs={[aspirateTab, dispenseTab]} />
         </Flex>
         <Divider marginY="0" />
-        {byTipValues != null ? (
+        {enableByVolumeBuilder && byTipValues != null ? (
           <Flex
             paddingX={SPACING.spacing16}
             gridGap={SPACING.spacing4}
@@ -559,25 +330,33 @@ export const SecondStepsMoveLiquidTools = ({
                 setShowChart(true)
               }}
             >
-              Flow rate builder
+              {t('protocol_steps:flow_rate_builder')}
             </PrimaryButton>
-            {isFlowRatesUpdated ? (
-              <Chip type="success" text="updated flow rates" />
-            ) : null}
             {showChart ? (
-              <EditableLineChartModal
+              <ByVolumeBuilderModal
                 byVolume={flowRates}
                 onClose={() => {
                   setShowChart(false)
                 }}
-                setFlowRates={setFlowRates}
+                type={FLOW_RATE}
+                setByVolume={setFlowRates}
                 defaultFlowRates={byTipValues ?? []}
-                setIsFlowRatesUpdated={setIsFlowRatesUpdated}
+                maxVolume={maxVolume}
               />
             ) : null}
           </Flex>
-        ) : null}
-
+        ) : (
+          <FlowRateField
+            key={`${addFieldNamePrefix('flowRate')}_flowRateField`}
+            {...propsForFields[addFieldNamePrefix('flowRate')]}
+            pipetteId={formData.pipette}
+            flowRateType={tab}
+            volume={propsForFields.volume?.value ?? 0}
+            tiprack={propsForFields.tipRack.value}
+            showTooltip={false}
+            formData={formData}
+          />
+        )}
         {hideWellOrderField ? null : (
           <>
             <WellsOrderField

@@ -1,6 +1,7 @@
 import alert from './alert.json'
 import application from './application.json'
 import button from './button.json'
+import by_volume_builder from './by_volume_builder.json'
 import card from './card.json'
 import context_menu from './context_menu.json'
 import deck_configuration from './deck_configuration.json'
@@ -23,6 +24,7 @@ export const en = {
   alert,
   application,
   button,
+  by_volume_builder,
   card,
   context_menu,
   deck,
