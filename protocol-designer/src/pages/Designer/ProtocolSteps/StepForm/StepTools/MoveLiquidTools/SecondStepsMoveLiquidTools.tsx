@@ -114,6 +114,9 @@ export const SecondStepsMoveLiquidTools = ({
   const pipetteSpec = useSelector(getPipetteEntities)[formData.pipette]?.spec
   const [showResetModal, setShowResetModal] = useState<boolean>(false)
   const [showChart, setShowChart] = useState<boolean>(false)
+
+  // TODO: replace this state/setter with propsForFields value/updateValue
+  // should remove the need for byTipValues (handled in form change utils)
   const [flowRates, setFlowRates] = useState<LiquidHandlingPropertyByVolume>(
     byTipValues ?? []
   )
