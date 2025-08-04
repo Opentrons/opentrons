@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next'
 
 import { Banner, DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 
-import { ControlledRadioButtonGroup } from '../../molecules/ControlledRadioButtonGroup'
-import { PD, PROTOCOL_FORMAT, PYTHON } from '../../resources/constants'
+import { ControlledRadioButtonGroup } from '/ai-client/molecules/ControlledRadioButtonGroup'
+import { PD, PROTOCOL_FORMAT, PYTHON } from '/ai-client/resources/constants'
 
 export function ProtocolFormatSection(): JSX.Element | null {
   const { t } = useTranslation('create_protocol')

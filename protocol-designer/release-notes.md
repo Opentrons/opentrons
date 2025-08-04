@@ -33,7 +33,7 @@ Use Opentrons-verified liquid classes to automatically define transfer settings 
 - During a mix, push out is set to 0 by default for all mixes except for the last, to avoid multiple push out actions. You can choose your own push out volume in a mix step menu.
 - Choose a new tip drop location from the dropdown menu when an uploaded protocol is missing a tip drop location.
 - Protocol Designer correctly updates adapter and labware combination definitions when you upload a protocol designed in Protocol Designer v7.0.0 or earlier.
-- When adding a disposal volume, a blowout location is now required.
+- When adding a disposal volume, a blowout location is now required. Older protocols that specified a blowout with no location selected will be updated to blowout in a loaded trash bin or waste chute.
 - No longer allow touch tip with incompatible labware. This changes the behavior of imported protocols that had touch tip on incompatible labware.
 - If multiple labware end up in the same slot at the same time due to deleting/rearranging steps, an error appears on the protocol timeline.
 - If a Heater-Shaker step is created with a a heater set and a timer, the protocol will now wait until the temperature is reached before counting down the timer.
@@ -41,7 +41,7 @@ Use Opentrons-verified liquid classes to automatically define transfer settings 
 - Successfully delete a defined liquid that has not been assigned to any location.
 - Display correct substep details for all transfer paths and pipettes.
 
-Running a protocol created in Protocol Designer now requires Opentrons App version 8.5.0 or newer.
+Running a protocol created in Protocol Designer now requires Opentrons App version 8.5.1 or newer.
 
 ## Opentrons Protocol Designer Changes in 8.4.4
 

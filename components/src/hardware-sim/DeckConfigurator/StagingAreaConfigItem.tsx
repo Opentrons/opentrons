@@ -29,10 +29,11 @@ interface StagingAreaConfigItemProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
   cutoutFixtureId: CutoutFixtureIdsWithFakes
-  addressableArea: AddressableAreaNamesWithFakes
+  addressableAreaId: AddressableAreaNamesWithFakes
   handleClickRemove?: (
     fixtureLocation: CutoutId,
-    cutoutFixtureId: CutoutFixtureIdsWithFakes
+    cutoutFixtureId: CutoutFixtureIdsWithFakes,
+    addressableAreaId: AddressableAreaNamesWithFakes
   ) => void
   selected?: boolean
 }
@@ -47,7 +48,7 @@ export function StagingAreaConfigItem(
     handleClickRemove,
     fixtureLocation,
     cutoutFixtureId,
-    addressableArea,
+    addressableAreaId,
     selected = false,
   } = props
 
@@ -55,7 +56,7 @@ export function StagingAreaConfigItem(
     cutout => cutout.id === fixtureLocation
   )
   const offsetVector = getAALocationForCutoutAndFixtureId(
-    addressableArea,
+    addressableAreaId,
     deckDefinition
   )
   /**
@@ -69,6 +70,11 @@ export function StagingAreaConfigItem(
   const y = ySlotPosition + Y_ADJUSTMENT
 
   const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
+  const handleRemoveClick = (): void => {
+    if (handleClickRemove != null) {
+      handleClickRemove(fixtureLocation, cutoutFixtureId, addressableAreaId)
+    }
+  }
   return (
     <RobotCoordsForeignObject
       width={COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH}
@@ -81,13 +87,8 @@ export function StagingAreaConfigItem(
       <Btn
         css={handleClickRemove != null ? editableStyle : CONFIG_STYLE_READ_ONLY}
         cursor={handleClickRemove != null ? 'pointer' : 'default'}
-        onClick={
-          handleClickRemove != null
-            ? () => {
-                handleClickRemove(fixtureLocation, cutoutFixtureId)
-              }
-            : () => {}
-        }
+        onClick={handleRemoveClick}
+        height="100%"
       >
         <StyledText
           oddStyle="smallBodyTextSemiBold"

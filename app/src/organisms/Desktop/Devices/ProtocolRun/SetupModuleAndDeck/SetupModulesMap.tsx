@@ -12,6 +12,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
+import { useModuleUSBPort } from '/app/local-resources/modules'
 import { ModuleInfo } from '/app/molecules/ModuleInfo'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
@@ -33,6 +34,7 @@ export const SetupModulesMap = ({
   runId,
 }: SetupModulesMapProps): JSX.Element | null => {
   // similar data pattern to ODD ProtocolSetupModules, with addition of stored analysis
+  const { parseModuleUSBPort } = useModuleUSBPort()
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolAnalysis = robotProtocolAnalysis ?? storedProtocolAnalysis
@@ -66,7 +68,7 @@ export const SetupModulesMap = ({
       <ModuleInfo
         moduleModel={module.moduleDef.model}
         isAttached={module.attachedModuleMatch != null}
-        physicalPort={module.attachedModuleMatch?.usbPort ?? null}
+        physicalPort={parseModuleUSBPort(module.attachedModuleMatch)}
         runId={runId}
       />
     ),

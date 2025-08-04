@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
@@ -28,17 +29,23 @@ import {
 
 import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons'
+import { useModuleUSBPort } from '/app/local-resources/modules'
+import { ODDFixtureOption } from '/app/molecules/ODDFixtureOption'
 import { OddModal } from '/app/molecules/OddModal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useCloseCurrentRun } from '/app/resources/runs'
+
+import { useSendIdentifyStacker } from '../ModuleWizardFlows/hooks'
 
 import type { AttachedModule } from '@opentrons/api-client'
 import type { DeckDefinition, ModuleModel } from '@opentrons/shared-data'
 
 const EQUIPMENT_POLL_MS = 5000
+const MODULE_IDENTIFY_TIME_MS = 10000
+
 interface ModuleFixtureOption {
   moduleModel: ModuleModel
-  usbPort?: number | string
+  usbPort?: string
   serialNumber?: string
 }
 interface ChooseModuleToConfigureModalProps {
@@ -64,6 +71,7 @@ export const ChooseModuleToConfigureModal = (
     displaySlotName,
   } = props
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
+  const { parseModuleUSBPort } = useModuleUSBPort()
   const attachedModules =
     useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
   const deckConfig = useNotifyDeckConfigurationQuery()?.data ?? []
@@ -83,19 +91,54 @@ export const ChooseModuleToConfigureModal = (
       [[], []]
     ) ?? []
 
+  const sendIdentifyStacker = useSendIdentifyStacker()
+  const [identifyInUse, setIdentifyInUse] = useState<string | null>(null)
+  const [identifyTimeout, setTimeoutID] = useState<NodeJS.Timeout | null>(null)
+
+  const stackerIdentifyHandler = (module: AttachedModule): void => {
+    sendIdentifyStacker(module, true, 'blue')
+    setIdentifyInUse(module.serialNumber)
+    const timeoutID = setTimeout(() => {
+      sendIdentifyStacker(module, false)
+      setIdentifyInUse(null)
+    }, MODULE_IDENTIFY_TIME_MS)
+    setTimeoutID(timeoutID)
+  }
+
   const connectedOptions: ModuleFixtureOption[] = unconfiguredModuleMatches.map(
     attachedMod => {
-      const portDisplay =
-        attachedMod.usbPort.hubPort != null
-          ? `${attachedMod.usbPort.port}.${attachedMod.usbPort.hubPort}`
-          : attachedMod.usbPort.port
       return {
         moduleModel: attachedMod.moduleModel,
-        usbPort: portDisplay,
+        usbPort: parseModuleUSBPort(attachedMod),
         serialNumber: attachedMod.serialNumber,
       }
     }
   )
+  const handleIdentifyFixture = (module: AttachedModule): void => {
+    if (identifyInUse === null) {
+      stackerIdentifyHandler(module)
+    } else if (identifyInUse !== null) {
+      const previousModule =
+        unconfiguredModuleMatches.find(m => m.serialNumber === identifyInUse) ??
+        null
+      if (previousModule !== null && module !== null) {
+        sendIdentifyStacker(previousModule, false)
+        if (identifyTimeout !== null) {
+          clearTimeout(identifyTimeout)
+        }
+        stackerIdentifyHandler(module)
+      }
+    }
+  }
+  const handleStackerClearAndConfigureModule = (
+    module: AttachedModule
+  ): void => {
+    sendIdentifyStacker(module, false)
+    if (identifyTimeout !== null) {
+      clearTimeout(identifyTimeout)
+    }
+    handleConfigureModule(module.serialNumber)
+  }
   const passiveOptions: ModuleFixtureOption[] =
     requiredModuleModel === MAGNETIC_BLOCK_V1
       ? [{ moduleModel: MAGNETIC_BLOCK_V1 }]
@@ -106,17 +149,64 @@ export const ChooseModuleToConfigureModal = (
         moduleModel,
         deckDef
       )
-      return (
-        <FixtureOption
-          key={serialNumber}
-          onClickHandler={() => {
-            handleConfigureModule(serialNumber)
-          }}
-          optionName={getFixtureDisplayName(moduleFixtures[0].id, usbPort)}
-          buttonText={i18n.format(t('shared:add'), 'capitalize')}
-          isOnDevice={isOnDevice}
-        />
-      )
+      const selectedModule =
+        unconfiguredModuleMatches.find(m => m.serialNumber === serialNumber) ??
+        null
+      if (moduleModel === 'flexStackerModuleV1' && selectedModule !== null) {
+        return isOnDevice ? (
+          <ODDFixtureOption
+            key={serialNumber}
+            onClickHandler={() => {
+              handleStackerClearAndConfigureModule(selectedModule)
+            }}
+            optionName={getFixtureDisplayName(moduleFixtures[0].id, usbPort)}
+            buttonText={i18n.format(t('shared:add'), 'capitalize')}
+            secondaryButtonText={i18n.format(
+              t('shared:identify'),
+              'capitalize'
+            )}
+            secondaryOnClickHandler={() => {
+              handleIdentifyFixture(selectedModule)
+            }}
+          />
+        ) : (
+          <FixtureOption
+            key={serialNumber}
+            onClickHandler={() => {
+              handleStackerClearAndConfigureModule(selectedModule)
+            }}
+            optionName={getFixtureDisplayName(moduleFixtures[0].id, usbPort)}
+            buttonText={i18n.format(t('shared:add'), 'capitalize')}
+            secondaryButtonText={i18n.format(
+              t('shared:identify'),
+              'capitalize'
+            )}
+            secondaryOnClickHandler={() => {
+              handleIdentifyFixture(selectedModule)
+            }}
+          />
+        )
+      } else {
+        return isOnDevice ? (
+          <ODDFixtureOption
+            key={serialNumber}
+            onClickHandler={() => {
+              handleConfigureModule(serialNumber)
+            }}
+            optionName={getFixtureDisplayName(moduleFixtures[0].id, usbPort)}
+            buttonText={i18n.format(t('shared:add'), 'capitalize')}
+          />
+        ) : (
+          <FixtureOption
+            key={serialNumber}
+            onClickHandler={() => {
+              handleConfigureModule(serialNumber)
+            }}
+            optionName={getFixtureDisplayName(moduleFixtures[0].id, usbPort)}
+            buttonText={i18n.format(t('shared:add'), 'capitalize')}
+          />
+        )
+      }
     }
   )
 

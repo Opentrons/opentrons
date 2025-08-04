@@ -6,26 +6,36 @@ import {
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
 import {
+  FLEX_STACKER_V1_FIXTURE,
+  getDeckDefFromRobotType,
   getFixtureDisplayName,
-  WASTE_CHUTE_FIXTURES,
+  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
+import { useSendIdentifyStacker } from '../../ModuleWizardFlows/hooks'
 import { AddFixtureModal } from '../AddFixtureModal'
 
 import type { ComponentProps } from 'react'
 import type { UseQueryResult } from 'react-query'
-import type { Modules } from '@opentrons/api-client'
-import type { DeckConfiguration } from '@opentrons/shared-data'
+import type { AttachedModule, Modules } from '@opentrons/api-client'
+import type { DeckConfiguration, IdentifyColor } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/deck_configuration')
+vi.mock('/app/organisms/ModuleCard/utils')
+vi.mock('/app/organisms/ModuleWizardFlows/hooks.tsx')
 
 const mockCloseModal = vi.fn()
 const mockUpdateDeckConfiguration = vi.fn()
+const deckDef = getDeckDefFromRobotType('OT-3 Standard')
+const mockFixture = {
+  cutoutId: 'cutoutD3',
+  cutoutFixtureId: FLEX_STACKER_V1_FIXTURE,
+}
 
 const render = (props: ComponentProps<typeof AddFixtureModal>) => {
   return renderWithProviders(<AddFixtureModal {...props} />, {
@@ -35,29 +45,37 @@ const render = (props: ComponentProps<typeof AddFixtureModal>) => {
 
 describe('Touchscreen AddFixtureModal', () => {
   let props: ComponentProps<typeof AddFixtureModal>
+  let sendIdentifyStacker: (
+    module: AttachedModule,
+    start: boolean,
+    color?: IdentifyColor
+  ) => void
 
   beforeEach(() => {
+    sendIdentifyStacker = vi.fn()
     props = {
       cutoutId: 'cutoutD3',
+      addressableAreaId: 'D3',
       closeModal: mockCloseModal,
-      isOnDevice: true,
+      deckDef,
     }
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
     } as any)
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
-      data: [],
+      data: [mockFixture],
     } as unknown) as UseQueryResult<DeckConfiguration>)
     vi.mocked(useModulesQuery).mockReturnValue(({
       data: { data: [] },
     } as unknown) as UseQueryResult<Modules>)
+    vi.mocked(useSendIdentifyStacker).mockReturnValue(sendIdentifyStacker)
   })
 
   it('should render text and buttons', () => {
     render(props)
-    screen.getByText('Add to slot D3')
+    screen.getByText('Add to Slot D3')
     screen.getByText(
-      'Add this hardware to your deck configuration. It will be referenced during protocol analysis.'
+      'Choose an item below to add to your deck configuration. It will be referenced during protocol analysis.'
     )
     screen.getByText('Fixtures')
     screen.getByText('Modules')
@@ -69,23 +87,6 @@ describe('Touchscreen AddFixtureModal', () => {
     fireEvent.click(screen.getAllByText('Select options')[1])
     fireEvent.click(screen.getAllByText('Add')[0])
   })
-
-  it('when fixture options are provided, should only render those options', () => {
-    props = {
-      ...props,
-      providedFixtureOptions: ['trashBinAdapter'],
-    }
-    render(props)
-    screen.getByText('Add to slot D3')
-    screen.getByText(
-      'Add this hardware to your deck configuration. It will be referenced during protocol analysis.'
-    )
-    expect(screen.queryByText('Staging area slot')).toBeNull()
-    screen.getByText('Trash bin')
-    expect(screen.queryByText('Waste chute')).toBeNull()
-    expect(screen.getAllByText('Add').length).toBe(1)
-    expect(screen.queryByText('Select options')).toBeNull()
-  })
 })
 
 describe('Desktop AddFixtureModal', () => {
@@ -94,11 +95,16 @@ describe('Desktop AddFixtureModal', () => {
   beforeEach(() => {
     props = {
       cutoutId: 'cutoutD3',
+      addressableAreaId: 'D3',
       closeModal: mockCloseModal,
+      deckDef,
     }
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
     } as any)
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
+      data: [],
+    } as unknown) as UseQueryResult<DeckConfiguration>)
   })
 
   afterEach(() => {
@@ -107,29 +113,49 @@ describe('Desktop AddFixtureModal', () => {
 
   it('should render text and buttons slot D3', () => {
     render(props)
-    screen.getByText('Add to slot D3')
+    screen.getByText('Add to Slot D3')
     screen.getByText(
-      'Add this hardware to your deck configuration. It will be referenced during protocol analysis.'
+      'Choose an item below to add to your deck configuration. It will be referenced during protocol analysis.'
     )
 
     screen.getByText('Fixtures')
     screen.getByText('Modules')
     fireEvent.click(screen.getAllByText('Select options')[0])
-    screen.getByText('Staging area slot')
     screen.getByText('Trash bin')
+    expect(screen.getAllByRole('button', { name: 'Add' }).length).toBe(1)
+    expect(
+      screen.getAllByRole('button', { name: 'Select options' }).length
+    ).toBe(1)
+  })
+
+  it('should not render trash bin text and buttons slot D3 with a stacker in the slot', () => {
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
+      data: [mockFixture],
+    } as unknown) as UseQueryResult<DeckConfiguration>)
+    props = { ...props, existingCutoutFixtureId: FLEX_STACKER_V1_FIXTURE }
+    render(props)
+    screen.getByText('Add to Slot D3')
+    screen.getByText(
+      'Choose an item below to add to your deck configuration. It will be referenced during protocol analysis.'
+    )
+
+    screen.getByText('Fixtures')
+    screen.getByText('Modules')
+    fireEvent.click(screen.getAllByText('Select options')[0])
     screen.getByText('Waste chute')
-    expect(screen.getAllByRole('button', { name: 'Add' }).length).toBe(2)
+    // Verify trash bin is not rendered
+    expect(screen.queryByText('Trash bin')).not.toBeInTheDocument()
     expect(
       screen.getAllByRole('button', { name: 'Select options' }).length
     ).toBe(1)
   })
 
   it('should render text and buttons slot A1', () => {
-    props = { ...props, cutoutId: 'cutoutA1' }
+    props = { ...props, cutoutId: 'cutoutA1', addressableAreaId: 'A1' }
     render(props)
-    screen.getByText('Add to slot A1')
+    screen.getByText('Add to Slot A1')
     screen.getByText(
-      'Add this hardware to your deck configuration. It will be referenced during protocol analysis.'
+      'Choose an item below to add to your deck configuration. It will be referenced during protocol analysis.'
     )
     screen.getByText('Fixtures')
     screen.getByText('Modules')
@@ -139,26 +165,25 @@ describe('Desktop AddFixtureModal', () => {
   })
 
   it('should render text and buttons slot B3', () => {
-    props = { ...props, cutoutId: 'cutoutB3' }
+    props = { ...props, cutoutId: 'cutoutB3', addressableAreaId: 'B3' }
     render(props)
-    screen.getByText('Add to slot B3')
+    screen.getByText('Add to Slot B3')
     screen.getByText(
-      'Add this hardware to your deck configuration. It will be referenced during protocol analysis.'
+      'Choose an item below to add to your deck configuration. It will be referenced during protocol analysis.'
     )
     screen.getByText('Fixtures')
     screen.getByText('Modules')
     fireEvent.click(screen.getAllByText('Select options')[0])
-    screen.getByText('Staging area slot')
     screen.getByText('Trash bin')
-    expect(screen.getAllByRole('button', { name: 'Add' }).length).toBe(2)
+    expect(screen.getAllByRole('button', { name: 'Add' }).length).toBe(1)
   })
 
   it('should only render module options in column 2', () => {
-    props = { ...props, cutoutId: 'cutoutB2' }
+    props = { ...props, cutoutId: 'cutoutB2', addressableAreaId: 'B2' }
     render(props)
-    screen.getByText('Add to slot B2')
+    screen.getByText('Add to Slot B2')
     screen.getByText(
-      'Add this hardware to your deck configuration. It will be referenced during protocol analysis.'
+      'Choose an item below to add to your deck configuration. It will be referenced during protocol analysis.'
     )
     screen.getByText('Magnetic Block GEN1')
     expect(screen.getByRole('button', { name: 'Add' })).toBeInTheDocument()
@@ -167,37 +192,35 @@ describe('Desktop AddFixtureModal', () => {
   it('should call update deck config when add button is clicked', () => {
     props = { ...props, cutoutId: 'cutoutA1' }
     render(props)
-    fireEvent.click(screen.getAllByText('Select options')[1])
+    fireEvent.click(screen.getAllByText('Select options')[0])
     fireEvent.click(screen.getByText('Add'))
     expect(mockUpdateDeckConfiguration).toHaveBeenCalled()
   })
 
   it('should display appropriate Waste Chute options when the generic Waste Chute button is clicked', () => {
     render(props)
-    fireEvent.click(screen.getAllByText('Select options')[0]) // click fixtures
-    fireEvent.click(screen.getByRole('button', { name: 'Select options' })) // click waste chute options
-    expect(screen.getAllByRole('button', { name: 'Add' }).length).toBe(
-      WASTE_CHUTE_FIXTURES.length
-    )
+    fireEvent.click(
+      screen.getAllByRole('button', { name: 'Select options' })[0]
+    ) // click fixtures
+    expect(screen.getAllByRole('button', { name: 'Add' }).length).toBe(1)
+    expect(
+      screen.getAllByRole('button', { name: 'Select options' }).length
+    ).toBe(1)
 
-    WASTE_CHUTE_FIXTURES.forEach(cutoutId => {
-      const displayText = getFixtureDisplayName(cutoutId)
-      screen.getByText(displayText)
-    })
+    const displayText = getFixtureDisplayName(
+      WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
+    )
+    screen.getByText(displayText)
   })
 
   it('should allow a user to exit the Waste Chute submenu by clicking "go back"', () => {
     render(props)
-    fireEvent.click(screen.getAllByText('Select options')[0]) // click fixtures
-    fireEvent.click(screen.getByRole('button', { name: 'Select options' }))
-
-    fireEvent.click(screen.getByText('Go back'))
-    screen.getByText('Staging area slot')
-    screen.getByText('Trash bin')
-    screen.getByText('Waste chute')
-    expect(screen.getAllByRole('button', { name: 'Add' }).length).toBe(2)
     expect(
       screen.getAllByRole('button', { name: 'Select options' }).length
-    ).toBe(1)
+    ).toBe(2)
+    fireEvent.click(
+      screen.getAllByRole('button', { name: 'Select options' })[0]
+    ) // click fixtures
+    screen.getByText('Waste chute')
   })
 })

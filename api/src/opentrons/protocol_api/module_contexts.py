@@ -181,7 +181,7 @@ class ModuleContext(CommandPublisher):
 
         labware_core = self._protocol_core.load_labware(
             load_name=name,
-            label=label,
+            label=label if label is None else str(label),
             namespace=namespace,
             version=version,
             location=load_location,
@@ -252,7 +252,10 @@ class ModuleContext(CommandPublisher):
         """
         _log.warning("load_labware_by_name is deprecated. Use load_labware instead.")
         return self.load_labware(
-            name=name, label=label, namespace=namespace, version=version
+            name=name,
+            label=label,
+            namespace=namespace,
+            version=version,
         )
 
     @requires_version(2, 15)
@@ -891,7 +894,11 @@ class HeaterShakerContext(ModuleContext):
 
         No other protocol commands will execute while waiting for the temperature.
 
-        :param celsius: A value between 27 and 95, representing the target temperature in °C.
+        .. versionchanged:: 2.25
+            Removed the minimum temperature limit of 37 °C. Note that temperatures under ambient are
+            not achievable.
+
+        :param celsius: A value under 95, representing the target temperature in °C.
                         Values are automatically truncated to two decimal places,
                         and the Heater-Shaker module has a temperature accuracy of ±0.5 °C.
         """
@@ -909,11 +916,17 @@ class HeaterShakerContext(ModuleContext):
         Use :py:meth:`~.HeaterShakerContext.wait_for_temperature` to delay
         protocol execution.
 
-        :param celsius: A value between 27 and 95, representing the target temperature in °C.
+        .. versionchanged:: 2.25
+            Removed the minimum temperature limit of 37 °C. Note that temperatures under ambient are
+            not achievable.
+
+        :param celsius: A value under 95, representing the target temperature in °C.
                         Values are automatically truncated to two decimal places,
                         and the Heater-Shaker module has a temperature accuracy of ±0.5 °C.
         """
-        validated_temp = validate_heater_shaker_temperature(celsius=celsius)
+        validated_temp = validate_heater_shaker_temperature(
+            celsius=celsius, api_version=self.api_version
+        )
         self._core.set_target_temperature(celsius=validated_temp)
 
     @requires_version(2, 13)
@@ -1115,18 +1128,18 @@ class FlexStackerContext(ModuleContext):
     It should not be instantiated directly; instead, it should be
     created through :py:meth:`.ProtocolContext.load_module`.
 
-    .. versionadded:: 2.23
+    .. versionadded:: 2.25
     """
 
     _core: FlexStackerCore
 
     @property
-    @requires_version(2, 23)
+    @requires_version(2, 25)
     def serial_number(self) -> str:
         """Get the module's unique hardware serial number."""
         return self._core.get_serial_number()
 
-    @requires_version(2, 23)
+    @requires_version(2, 25)
     def retrieve(self) -> Labware:
         """Retrieve a labware from the Flex Stacker and place it on the shuttle.
 
@@ -1144,7 +1157,7 @@ class FlexStackerContext(ModuleContext):
             ),
         )
 
-    @requires_version(2, 23)
+    @requires_version(2, 25)
     def store(self) -> None:
         """Move the labware currently on the Flex Stacker shuttle into the Flex Stacker."""
         self._core.store()
@@ -1164,7 +1177,7 @@ class FlexStackerContext(ModuleContext):
 
         return list(_convert())
 
-    @requires_version(2, 24)
+    @requires_version(2, 25)
     def get_max_storable_labware_from_list(
         self,
         labware: list[Labware],
@@ -1200,7 +1213,7 @@ class FlexStackerContext(ModuleContext):
             ),
         )
 
-    @requires_version(2, 24)
+    @requires_version(2, 25)
     def get_current_storable_labware_from_list(
         self, labware: list[Labware]
     ) -> list[Labware]:
@@ -1221,7 +1234,7 @@ class FlexStackerContext(ModuleContext):
             )
         )
 
-    @requires_version(2, 24)
+    @requires_version(2, 25)
     def get_max_storable_labware(self) -> int:
         """Get the number of labware that the Flex Stacker can store with its current stored labware configuration.
 
@@ -1231,7 +1244,7 @@ class FlexStackerContext(ModuleContext):
         """
         return self._core.get_max_storable_labware()
 
-    @requires_version(2, 24)
+    @requires_version(2, 25)
     def get_current_storable_labware(self) -> int:
         """Get the number of labware that the Flex Stacker currently has space for.
 
@@ -1240,7 +1253,7 @@ class FlexStackerContext(ModuleContext):
         """
         return self._core.get_current_storable_labware()
 
-    @requires_version(2, 24)
+    @requires_version(2, 25)
     def set_stored_labware_items(
         self,
         labware: list[Labware],
@@ -1290,7 +1303,7 @@ class FlexStackerContext(ModuleContext):
             stacking_offset_z=stacking_offset_z,
         )
 
-    @requires_version(2, 23)
+    @requires_version(2, 25)
     def set_stored_labware(
         self,
         load_name: str,
@@ -1366,7 +1379,7 @@ class FlexStackerContext(ModuleContext):
             stacking_offset_z=stacking_offset_z,
         )
 
-    @requires_version(2, 23)
+    @requires_version(2, 25)
     def fill(self, count: int | None = None, message: str | None = None) -> None:
         """Pause the protocol to add more labware to the Flex Stacker.
 
@@ -1374,25 +1387,9 @@ class FlexStackerContext(ModuleContext):
         :param count: The amount of labware the Flex Stacker should hold after this command is executed.
                       If not specified, the Flex Stacker should be full after this command is executed.
         """
-        if self.api_version < APIVersion(2, 24):
-            # politeness: the order of the arguments changed in api 2.24. This wasn't released so it isn't
-            # a problem, but anybody using this probably would not like their protocols suddenly breaking
-            if isinstance(count, str):
-                checked_message = count
-                checked_count = message
-            elif (not isinstance(message, str)) and message is not None:
-                checked_count = message
-                checked_message = count
-            else:
-                checked_count = count
-                checked_message = message
-        else:
-            checked_count = count
-            checked_message = message
+        self._core.fill(count, message)
 
-        self._core.fill(checked_count, checked_message)
-
-    @requires_version(2, 24)
+    @requires_version(2, 25)
     def fill_items(self, labware: list[Labware], message: str | None = None) -> None:
         """Pause the protocol to add a specific list of labware to the Flex Stacker.
 
@@ -1407,7 +1404,7 @@ class FlexStackerContext(ModuleContext):
         """
         self._core.fill_items(self._labware_to_cores(labware), message)
 
-    @requires_version(2, 23)
+    @requires_version(2, 25)
     def empty(self, message: str | None = None) -> None:
         """Pause the protocol to remove labware from the Flex Stacker.
 
@@ -1418,7 +1415,7 @@ class FlexStackerContext(ModuleContext):
             message,
         )
 
-    @requires_version(2, 24)
+    @requires_version(2, 25)
     def get_stored_labware(self) -> list[Labware]:
         """Get the list of labware currently stored inside the stacker.
 

@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from opentrons.protocol_api.labware import Well
     from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
     from opentrons.protocol_api._liquid import LiquidClass
+    from opentrons.protocol_api._nozzle_layout import NozzleLayout
 
 from opentrons.types import Location, Mount, AxisMapType
 
@@ -50,6 +51,8 @@ CONSOLIDATE_WITH_LIQUID_CLASS: Final = "command.CONSOLIDATE_WITH_LIQUID_CLASS"
 SEAL: Final = "command.SEAL"
 UNSEAL: Final = "command.UNSEAL"
 PRESSURIZE: Final = "command.PRESSURIZE"
+CONFIGURE_FOR_VOLUME: Final = "command.CONFIGURE_FOR_VOLUME"
+CONFIGURE_NOZZLE_LAYOUT: Final = "command.CONFIGURE_NOZZLE_LAYOUT"
 
 
 # Modules #
@@ -589,6 +592,18 @@ class PressurizeCommandPayload(TextOnlyPayload):
     instrument: InstrumentContext
 
 
+class ConfigureForVolumePayload(TypedDict, TextOnlyPayload):
+    instrument: InstrumentContext
+    volume: float
+
+
+class ConfigureNozzleLayoutPayload(TypedDict, TextOnlyPayload):
+    instrument: InstrumentContext
+    style: NozzleLayout
+    start: Union[str, None]
+    end: Union[str, None]
+
+
 class MoveLabwareCommand(TypedDict):
     name: Literal["command.MOVE_LABWARE"]
     payload: MoveLabwareCommandPayload
@@ -607,6 +622,16 @@ class UnsealCommand(TypedDict):
 class PressurizeCommand(TypedDict):
     name: Literal["command.PRESSURIZE"]
     payload: PressurizeCommandPayload
+
+
+class ConfigureForVolumeCommand(TypedDict):
+    name: Literal["command.CONFIGURE_FOR_VOLUME"]
+    payload: ConfigureForVolumePayload
+
+
+class ConfigureNozzleLayoutCommand(TypedDict):
+    name: Literal["command.CONFIGURE_NOZZLE_LAYOUT"]
+    payload: ConfigureNozzleLayoutPayload
 
 
 # Robot Commands and Payloads
@@ -706,6 +731,8 @@ Command = Union[
     SealCommand,
     UnsealCommand,
     PressurizeCommand,
+    ConfigureForVolumeCommand,
+    ConfigureNozzleLayoutCommand,
     # Robot commands
     RobotMoveToCommand,
     RobotMoveAxisToCommand,
@@ -765,6 +792,8 @@ CommandPayload = Union[
     SealCommandPayload,
     UnsealCommandPayload,
     PressurizeCommandPayload,
+    ConfigureForVolumePayload,
+    ConfigureNozzleLayoutPayload,
     # Robot payloads
     RobotMoveToCommandPayload,
     RobotMoveAxisRelativeCommandPayload,

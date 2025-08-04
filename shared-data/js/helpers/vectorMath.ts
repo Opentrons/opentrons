@@ -1,4 +1,6 @@
-import type { Vector3D } from '../types'
+import type { CoordinateTuple, Vector3D } from '../types'
+
+export const IDENTITY_VECTOR: Vector3D = { x: 0, y: 0, z: 0 }
 
 /**
  * Add an arbitrary number of vectors.
@@ -39,4 +41,11 @@ export function getVectorInverse(vector: Vector3D): Vector3D {
     y: -vector.y,
     z: -vector.z,
   }
+}
+
+export function coordinateTupleToVector3D(
+  coordinateTuple: CoordinateTuple
+): Vector3D {
+  const [x, y, z] = coordinateTuple
+  return { x, y, z }
 }

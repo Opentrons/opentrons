@@ -1,8 +1,7 @@
 import { COLORS } from '@opentrons/components'
 
 import type { WellGroup } from '@opentrons/components'
-import type { Liquid } from '@opentrons/shared-data'
-import type { LabwareByLiquidId } from '/app/transformations/commands'
+import type { LabwareByLiquidId, Liquid } from '@opentrons/shared-data'
 
 export function getWellFillFromLabwareId(
   labwareId: string,

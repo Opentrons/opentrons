@@ -9,7 +9,6 @@ import {
 
 import * as errorCreators from '../../errorCreators'
 import {
-  blowoutLocationHelper,
   curryCommandCreator,
   curryWithoutPython,
   formatPyStr,
@@ -17,6 +16,7 @@ import {
   getIsSafePipetteMovement,
   getSlotInLocationStack,
   indentPyLines,
+  mixBlowoutLocationHelper,
   reduceCommandCreators,
 } from '../../utils'
 import {
@@ -271,6 +271,7 @@ export const mix: CommandCreator<MixArgs> = (
     xOffset,
     yOffset,
     finalPushOut,
+    nozzles,
   } = data
 
   const aspirateDelaySeconds = data.aspirateDelaySeconds ?? 0
@@ -373,6 +374,8 @@ export const mix: CommandCreator<MixArgs> = (
             pipette,
             dropTipLocation,
             tipRack,
+            ...(nozzles != null ? { nozzles } : {}),
+            isFromMixCommand: true,
           }),
         ]
       }
@@ -398,7 +401,7 @@ export const mix: CommandCreator<MixArgs> = (
             }),
           ]
         : []
-      const blowoutCommand = blowoutLocationHelper({
+      const blowoutCommand = mixBlowoutLocationHelper({
         pipette: data.pipette,
         sourceLabwareId: data.labware,
         sourceWell: well,

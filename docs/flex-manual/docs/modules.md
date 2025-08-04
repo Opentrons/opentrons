@@ -1,14 +1,28 @@
+---
+title: "Opentrons Flex: Modules"
+---
+
 # Modules
 
-Opentrons Flex integrates with a number of Opentrons hardware modules. All modules are peripherals that occupy deck slots, and most are controlled by the robot over a USB connection.
+Opentrons Flex integrates with several Opentrons hardware modules that add features and capabilities to the robot. Modules can occupy deck slots or are external, frame-mounted components. Flex communicates with and controls most modules via a USB connection.
 
-This chapter describes the functions and physical specifications of modules that are compatible with the Opentrons Flex system, as well as how to attach and calibrate them. For further details on module setup and use, consult the manuals for the individual modules. For details on integrating modules into your protocols, see the [Protocol Designer section][protocol-designer] of the Protocol Development chapter or the online [Python Protocol API documentation](https://docs.opentrons.com/v2/).
+This chapter summarizes the functions and physical specifications of modules that are compatible with Opentrons Flex. It also covers the caddy attachment system and module calibration.
+
+!!!tip
+    - For complete instructions on module installation and use, refer to the quickstart guide that shipped with your unit or find its manual in the [documentation and manuals section](https://opentrons.com/resources/knowledge-hub?c%5B%5D=documentation-manuals) of the Opentrons website.
+
+    - For details on integrating modules into your protocols, see the [Protocol Designer section](protocol-development.md#protocol-designer) of the Protocol Development chapter or the [Hardware Modules section](https://docs.opentrons.com/v2/new_modules.html) of our Python API documentation.
+
 
 ## Supported modules
 
-Opentrons Flex is compatible with four types of on-deck Opentrons modules:
+Opentrons Flex is compatible with with the following Opentrons modules:
+
+- The **Absorbance Plate Reader** is a fully automated spectrophotometer that uses light absorbance to determine sample concentrations. This module is optimized for a variety of applications, including protein quantification, sample normalization, cell viability assays, and monitoring bacterial growth.
 
 - The **Heater-Shaker Module** provides on-deck heating and orbital shaking. The module can be heated to 95 °C, and can shake samples from 200 to 3000 rpm.
+
+- The **HEPA/UV Module** is a positive-pressure clean air and ultraviolet disinfectant accessory for Opentrons Flex. A single 15-minute filtration and UV cycle is sufficient to create an ISO-5 clean bench environment within the Flex enclosure.
 
 - The **Magnetic Block** is a passive device that holds labware close to its high-strength neodymium magnets. The OT-2 Magnetic Module GEN1 and GEN2, which actively move their magnets up and down relative to labware, are not supported on Opentrons Flex.
 
@@ -16,19 +30,22 @@ Opentrons Flex is compatible with four types of on-deck Opentrons modules:
 
 - The **Thermocycler Module** provides on-deck, fully automated thermocycling, enabling automation of upstream and downstream workflow steps. Thermocycler GEN2 is fully compatible with the gripper. Thermocycler GEN1 cannot be used with the gripper, and is therefore not supported on Opentrons Flex.
 
-Some modules originally designed for the OT-2 are compatible with Flex, as summarized in the table below. A checkmark indicates compatibility, and an X indicates incompatibility.
+Some modules originally designed for the OT-2 are compatible with Flex, as summarized in the table below. A checkmark :heavy_check_mark: indicates compatibility, and an :heavy_multiplication_x: indicates incompatibility.
 
-| Device type and generation      | OT-2 | Flex |
-|---------------------------------|:----:|:----:|
-| Heater-Shaker Module GEN1       |  ✓   |  ✓   |
-| Magnetic Module GEN1            |  ✓   |  ×   |
-| Magnetic Module GEN2            |  ✓   |  ×   |
-| Magnetic Block GEN1             |  ×   |  ✓   |
-| Temperature Module GEN1         |  ✓   |  ×   |
-| Temperature Module GEN2         |  ✓   |  ✓   |
-| Thermocycler Module GEN1        |  ✓   |  ×   |
-| Thermocycler Module GEN2        |  ✓   |  ✓   |
-| HEPA Module                     |  ✓   |  ×   |
+
+| Device type and generation    | OT-2                     | Flex                     |
+|:------------------------------|:------------------------:|:------------------------:|
+| Absorbance Plate Reader       | :heavy_multiplication_x: | :heavy_check_mark:       |
+| Heater-Shaker Module GEN1     | :heavy_check_mark:       | :heavy_check_mark:       |
+| HEPA Module                   | :heavy_check_mark:       | :heavy_multiplication_x: |
+| HEPA/UV Module                | :heavy_multiplication_x: | :heavy_check_mark:       |
+| Magnetic Block GEN1           | :heavy_multiplication_x: | :heavy_check_mark:       |
+| Magnetic Module GEN1          | :heavy_check_mark:       | :heavy_multiplication_x: |
+| Magnetic Module GEN2          | :heavy_check_mark:       | :heavy_multiplication_x: |
+| Temperature Module GEN1       | :heavy_check_mark:       | :heavy_multiplication_x: |
+| Temperature Module GEN2       | :heavy_check_mark:       | :heavy_check_mark:       |
+| Thermocycler Module GEN1      | :heavy_check_mark:       | :heavy_multiplication_x: |
+| Thermocycler Module GEN2      | :heavy_check_mark:       | :heavy_check_mark: 
 
 ## Module caddy system
 
@@ -57,6 +74,16 @@ In general, to install a module caddy:
 
 For exact installation instructions, consult the Quickstart Guide or Instruction Manual for the specific module. Cable connections and method of attachment to the caddy vary by module.
 
+!!!warning
+    The Heater-Shaker Module and Temperature Module have asymmetrical 4-pin DIN power connectors. When connecting the power cable:
+
+    * Align the connector's flat side with the flat side of the module's power port.
+    * Connect the cable to the module first, before plugging it in to a wall outlet.
+
+    ![DIN power connector](images/module-power-connector.png){width="40%"}
+
+    _Do not_ force cable connections, or you may damage the module.
+
 ## Module calibration
 
 When you first install a module on Flex, you need to run automated positional calibration. This process is similar to positional calibration for instruments, and ensures that Flex moves to the exact correct locations for optimal protocol performance. During calibration, Flex will move to locations on a module calibration adapter, which looks similar to the calibration squares that are part of removable deck slots.
@@ -71,7 +98,9 @@ Thermocycler Modules.
 </figcaption>
 </figure>
 
-Module calibration is required for all modules that install via a caddy: the Heater-Shaker, Temperature, and Thermocycler Modules. The Magnetic Block doesn't require calibration, and is ready for use as soon as you place it on the deck.
+Calibration is required for some modules that use a separate caddy, specifically the Heater-Shaker, Temperature, and Thermocycler Modules.
+
+Other modules do not require calibration and are ready for use upon installation. These include the Absorbance Plate Reader Module (which ships preinstalled in its caddy), the HEPA/UV Module, and the Magnetic Block.
 
 ### When to calibrate modules
 
@@ -94,6 +123,115 @@ Instructions on the touchscreen or in the Opentrons App will guide you through t
 Once calibration is complete and you've removed the adapter and probe, the module will be ready for use in protocols.
 
 At any time, you can view and manage your module calibration data in the Opentrons App. Go to **Robot Settings** for your Flex and click on the **Calibration** tab.
+
+## Absorbance Plate Reader
+
+![plate reader hero](images/plate-reader-hero-lid-off.png)
+
+### Plate reader features
+
+The Opentrons Absorbance Plate Reader Module is a deck-mounted, fully automated spectrophotometer. It uses light absorbance to determine sample concentrations. This module is ideal for a broad array of applications, including protein quantification, sample normalization, cell viability assays, and bacterial growth monitoring. The plate reader is designed for indoor laboratory research and other non-in-vitro diagnostic analyses.
+
+!!!note
+    The Opentrons Flex Absorbance Plate Reader Module may currently not be offered, used or put on the market in any European Patent Convention States due to a third-party patent application.
+
+#### Measurement capabilities
+
+The plate reader uses 96 separate detection units for rapid sample analysis. The detection units use light in the 400–700 nanometer (nm) range to determine sample concentrations.
+
+#### Gripper compatibility
+
+The Opentrons Flex Gripper is required when using the plate reader. The Gripper is needed to move labware and the plate reader's lid, onto and off the module.
+
+#### Deck placement
+
+The plate reader fits in deck slots A3–D3 only. It comes preinstalled in a caddy, which helps secure the unit to the deck. This module does not require calibration, but you can run Labware Position Check on any installed labware.
+
+#### Software control
+
+The plate reader is fully programmable in Protocol Designer and the Python Protocol API.
+
+### Plate reader specifications
+
+<table>
+    <tr>
+        <th>Specification</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td><strong>Dimensions</strong></td>
+        <td>155.3 mm L x 95.5 mm W x 57 mm H</td>
+    </tr>
+    <tr>
+        <td><strong>Weight</strong></td>
+        <td>~790 g</td>
+    </tr>
+    <tr>
+        <td><strong>Module power</strong></td>
+        <td>
+            <ul>
+                <li>Input: USB 5 VDC, 3 A</li>
+                <li>Consumption: 2.5 W</li>
+                <li>Fuse: 1 A (very fast acting)</li>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <td><strong>Detection</strong></td>
+        <td>
+            <ul>
+                <li>Hardware: 96 photodiodes</li>
+                <li>Wavelengths: The plate reader emits light in the visible spectrum at 450 nm (blue), 562 nm (green), 600 nm (orange) and 650 nm (red).</li>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <td><strong>Measurement methods</strong></td>
+        <td>
+            <ul>
+                <li>Method: Absorbance</li>
+                <li>Techniques: Endpoint and kinetic</li>
+                <li>Range: 0–4.0 OD</li>
+                <li>Resolution: 0.001 OD</li>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <td><strong>Accuracy</strong></td>
+        <td>The maximum deviation between the determined value and the true value.<br><br>At 405 nm:
+            <ul>
+                <li>≤ 1.5% + 0.010 OD from 0.0–2.0 OD</li>
+                <li>≤ 3% + 0.010 OD from 2.0–3.0 OD</li>
+            </ul>At or above 450 nm:
+            <ul>
+                <li>≤ 1% + 0.010 OD from 0.0–2.0 OD</li>
+                <li>1.5% + 0.010 OD from 2.0–3.0 OD</li>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <td><strong>Linearity</strong></td>
+        <td>The maximum deviation between the true and determined increase of the value.<br><br>At 405 nm:
+            <ul>
+                <li>≤ 1.5% from 0.0–2.0 OD</li>
+                <li>≤ 3% 2.0–3.0 OD</li>
+            </ul>At or above 450 nm:
+            <ul>
+                <li>≤ 1% from 0.0–2.0 OD</li>
+                <li>≤ 1.5% from 2.0–3.0 OD</li>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <td><strong>Reproducibility</strong></td>
+        <td>The maximum deviation between the determined values when the measurement is repeated directly.<br>
+            <ul>
+                <li>≤ 0.5% + 0.005 OD from 0.0–2.0 OD</li>
+                <li>≤ 1% + 0.010 OD from 2.0–3.0 OD</li>
+            </ul>
+        </td>
+    </tr>
+</table>
 
 ## Heater-Shaker Module GEN1
 
@@ -169,20 +307,166 @@ Outside of protocols, the Opentrons App can display the current status of the He
 
 ### Heater-Shaker specifications
 
-| **Specification**               | **Details**  |
-|---------------------------------|--------------|
-| **Dimensions**                  | 152 × 90 × 82 mm (L/W/H)                                                   |
-| **Weight**                      | 1.34 kg                                                                    |
-| **Module power input**          | 36 VDC, 6.1 A                                                              |
-| **Power adapter input**         | 100–240 VAC, 50/60 Hz                                                      |
-| **Mains supply voltage fluctuation** | ±10%                                                                  |
-| **Overvoltage**                 | Category II                                                                |
-| **Power consumption**           | Idle: 3 W<br />Typical: <ul><li>Shaking: 4–11 W</li><li>Heating: 10–30 W</li><li>Heating and shaking: 10–40 W</li></ul>Maximum: 125–130 W |
-| **Environmental conditions**    | Indoor use only                                                            |
-| **Ambient temperature**         | 20–25 °C                                                                   |
-| **Relative humidity**           | Up to 80%, non-condensing                                                  |
-| **Altitude**                    | Up to 2,000 m above sea level                                              |
-| **Pollution degree**            | 2                                                                          |
+<table>
+  <thead>
+    <tr>
+      <th>Specification</th>
+      <th>Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Dimensions</strong></td>
+      <td>152 × 90 × 82 mm (L/W/H)</td>
+    </tr>
+    <tr>
+      <td><strong>Weight</strong></td>
+      <td>1.34 kg</td>
+    </tr>
+    <tr>
+      <td><strong>Module power input</strong></td>
+      <td>36 VDC, 6.1 A</td>
+    </tr>
+    <tr>
+      <td><strong>Power adapter input</strong></td>
+      <td>100–240 VAC, 50/60 Hz</td>
+    </tr>
+    <tr>
+      <td><strong>Mains supply voltage fluctuation</strong></td>
+      <td>±10%</td>
+    </tr>
+    <tr>
+      <td><strong>Overvoltage</strong></td>
+      <td>Category II</td>
+    </tr>
+    <tr>
+      <td><strong>Power consumption</strong></td>
+      <td>
+        Idle: 3 W<br />Typical:
+        <ul>
+          <li>Shaking: 4–11 W</li>
+          <li>Heating: 10–30 W</li>
+          <li>Heating and shaking: 10–40 W</li>
+        </ul>
+        Maximum: 125–130 W
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Environmental conditions</strong></td>
+      <td>Indoor use only</td>
+    </tr>
+    <tr>
+      <td><strong>Ambient temperature</strong></td>
+      <td>20–25 °C</td>
+    </tr>
+    <tr>
+      <td><strong>Relative humidity</strong></td>
+      <td>Up to 80%, non-condensing</td>
+    </tr>
+    <tr>
+      <td><strong>Altitude</strong></td>
+      <td>Up to 2,000 m above sea level</td>
+    </tr>
+    <tr>
+      <td><strong>Pollution degree</strong></td>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
+
+## HEPA/UV Module
+
+![hepa-uv hero](images/hepa-uv-hero.png)
+
+The top-mounted Opentrons Flex HEPA/UV Module is a clean air and ultraviolet (UV-C) disinfectant accessory for the Flex liquid handling robot. It contains a mesh pre-filter, a HEPA filter, and two UV lights. During operation, the HEPA system creates a positive pressure environment inside the Flex enclosure, which helps protect samples from contamination. When running the UV lights and air filtration for a full, 15-minute cycle, the HEPA/UV module can achieve ISO-5 clean bench standards within the Flex enclosure.
+
+!!!warning
+    The HEPA/UV Module is not a biosafety cabinet. Do not use it with pathogens or to filter particles smaller than 0.3 micrometers (μM).
+
+### HEPA/UV Module features
+
+#### Air filtration
+
+The HEPA/UV Module relies on a 2-stage filtration system to purify air pulled into the enclosure. This system includes a reusable pre-filter and a disposable H14 HEPA main filter. The pre-filter traps large particles while the HEPA filter captures up to 99.99% of airborne particulate matter at ≥ 0.3 μm. Vertical air flow from the filter creates a positive pressure environment within the enclosure.
+
+#### UV disinfection
+
+The HEPA/UV Module uses two compact fluorescent bulbs that emit UV-C light at a wavelength of 254 nm. After a 15-minute exposure cycle, the UV light produced is sufficient to reach log-4 (99.99%) inactivation of commonly targeted microorganisms within the enclosure.
+
+#### Safety features
+
+The HEPA/UV Module includes safety features that protect you from UV-C exposure and prevent it from operating in an unsafe manner.
+
+- Panels: The robot's polycarbonate door and side panels block UV spectrum light to below a level that represents an exposure risk.
+
+- Door switch: Flex uses a mechanical switch to tell if the front door is open or closed. The UV lights only work when the front door is closed.
+
+- Attachment sensors: The Flex and HEPA/UV module each have a built-in sensor to detect if the module is attached properly. The sensors deactivate/disable the UV lights if the module is not mounted on the robot, removed while in operation, or misaligned.
+
+### HEPA/UV Module specifications
+
+<table>
+    <tr>
+        <th>Specification</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td><strong>Dimensions</strong></td>
+        <td>87 cm L x 64 cm W x 14 cm H</td>
+    </tr>
+    <tr>
+        <td><strong>Weight</strong></td>
+        <td>~20 kg (42 lbs)</td>
+    </tr>
+    <tr>
+        <td><strong>Power input</strong></td>
+        <td>
+            <ul>
+                <li>100–240 VAC, 50/60 Hz</li>
+                <li>2.2 A at 115 VAC</li>
+                <li>1.1 A 230 VAC</li>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <td><strong>Power output</strong></td>
+        <td>24 VDC, 8.4 A, 201 W max</td>
+    </tr>
+    <tr>
+        <td><strong>Filter</strong></td>
+        <td>
+            <ul>
+                <li>Metal mesh pre-filter, reusable</li>
+                <li>H14 HEPA secondary filter, good for 3 years/6,000 hours, disposable</li>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <td><strong>Ambient fan noise</strong></td>
+        <td>≤ 70 dB at 1 meter during operation</td>
+    </tr>
+    <tr>
+        <td><strong>Bulb type</strong></td>
+        <td>
+            <ul>
+                <li>Actinic fluorescent</li>
+                <li>2G11 base (4 pin, single-cap)</li>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <td><strong>Bulb life</strong></td>
+        <td>
+            <ul>
+                <li>9,000 hours</li>
+                <li>UV end-of-life depreciation: 20%</li>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <td><strong>Mercury (Hg) content</strong></td>
+        <td>4.4 mg</td>
+</table>
 
 ## Magnetic Block GEN1
 ![The Magnetic Block has an array of 96 high-strength magnets.](images/magnetic-block.png "Magnetic Block")
@@ -265,16 +549,53 @@ Outside of protocols, the Opentrons App can display the current status of the Te
 
 ### Temperature Module specifications
 
-| **Specification**               | **Details**                                                                 |
-|----------------------------------|-----------------------------------------------------------------------------|
-| **Dimensions**                  | 194 × 90 × 84 mm (L/W/H)                                                   |
-| **Weight**                      | 1.5 kg                                                                    |
-| **Module power**                | <ul><li>Input: 100–240 VAC, 50/60 Hz, 4.0 A</li><li>Output: 36 VDC, 6.1 A, 219.6 W max</li></ul> |
-| **Environmental conditions**    | Indoor use only                                                            |
-| **Ambient temperature**         | <22 °C (recommended for optimal cooling)                                  |
-| **Relative humidity**           | Up to 60%, non-condensing                                                  |
-| **Altitude**                    | Up to 2000 m above sea level                                               |
-| **Pollution degree**            | 2                                                                          |
+<table>
+  <thead>
+    <tr>
+      <th><strong>Specification</strong></th>
+      <th><strong>Details</strong></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Dimensions</strong></td>
+      <td>194 × 90 × 84 mm (L/W/H)</td>
+    </tr>
+    <tr>
+      <td><strong>Weight</strong></td>
+      <td>1.5 kg</td>
+    </tr>
+    <tr>
+      <td><strong>Module power</strong></td>
+      <td>
+        <ul>
+          <li>Input: 100–240 VAC, 50/60 Hz, 4.0 A</li>
+          <li>Output: 36 VDC, 6.1 A, 219.6 W max</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Environmental conditions</strong></td>
+      <td>Indoor use only</td>
+    </tr>
+    <tr>
+      <td><strong>Ambient temperature</strong></td>
+      <td>&lt;22 °C (recommended for optimal cooling)</td>
+    </tr>
+    <tr>
+      <td><strong>Relative humidity</strong></td>
+      <td>Up to 60%, non-condensing</td>
+    </tr>
+    <tr>
+      <td><strong>Altitude</strong></td>
+      <td>Up to 2000 m above sea level</td>
+    </tr>
+    <tr>
+      <td><strong>Pollution degree</strong></td>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
 
 ## Thermocycler Module GEN2
 
@@ -282,7 +603,7 @@ Outside of protocols, the Opentrons App can display the current status of the Te
 
 ### Thermocycler features
 
-The Opentrons Thermocycler Module GEN2 is a fully automated on-deck thermocycler, providing hands-free PCR in a 96-well plate format. Its heated lid and disposable seal fit tightly over the plate, ensuring efficient sample heating and minimal evaporation.
+The Opentrons Thermocycler Module is a fully automated on-deck thermocycler designed for hands-free PCR in a 96-well plate format. It is compatible with the Flex Gripper, other deck-mounted hardware, and is fully supported in the Opentrons App and Python API. When used with a reusable rubber seal or single-use PCR plate lid, the module's heated lid provides a tight seal that helps ensure efficient sample heating and minimizes evaporation, crucial for reliable and repeatable experimental results.
 
 #### Heating and cooling
 
@@ -304,9 +625,18 @@ The automated lid can be opened or closed as needed during protocol execution.
 
 The Thermocycler can execute *profiles*: automatically cycling through a sequence of block temperatures to perform heat-sensitive reactions.
 
-#### Rubber automation seals
+#### Thermocycler lid seals
 
-The Thermocycler comes with rubber automation seals to help reduce evaporation. Each seal must be sterilized before use and can be used for several runs. [Replacement seals](https://opentrons.com/products/gen2-thermocycler-seals) come in packages of 10, which you can purchase directly from Opentrons.
+The Thermocycler works with two different plate seals to help protect your samples. These are the the [Opentrons Tough PCR Auto-sealing Lid](https://opentrons.com/products/opentrons-flex-tough-auto-sealing-lids-20-count) and reuseable [rubber automation seals](https://opentrons.com/products/gen2-thermocycler-seals).
+
+| Lid Type | Description |
+|----|----|
+| Opentrons Tough PCR Auto-sealing Lid | These sterile, single-use PCR plate lids help prevent cross-contamination and evaporation during Thermocycler incubation periods. The lids are Gripper-compatible and can be stacked directly on the deck or placed in a special deck riser. |
+| Rubber Automation Seal | These are adhesive-backed ethylene propylene diene monomer (EPDM) seals you manually apply to the Thermocycler lid. Rubber seals can be reused up to 20 times; however, unlike the Opentrons Tough Auto-sealing Lid, they are not sterile. The seals must be cleaned and sanitized before each use. |
+
+!!!warning
+    Do not use the Opentrons Tough Auto-sealing PCR Lid and a rubber automation seal on the Thermocycler at the same time. This combination prevents the module's lid from closing properly, which can cause temperature control problems and mechanical damage. Always remove the rubber seal before running protocols that use the disposable PCR lid.
+    ![PCR lid and rubber seal warning](images/thermocycler-lid-warning.png)
 
 #### Software control
 

@@ -12,7 +12,7 @@ import {
   WasteChuteStagingAreaFixture,
 } from '@opentrons/components'
 import {
-  getModuleDef2,
+  getModuleDef,
   getPositionFromSlotId,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
@@ -96,9 +96,10 @@ export const FixtureRender = (props: FixtureRenderProps): JSX.Element => {
         key={adjacentModule.id}
         x={slotPosition != null ? slotPosition[0] : 0}
         y={slotPosition != null ? slotPosition[1] : 0}
-        def={getModuleDef2(adjacentModule.model)}
+        def={getModuleDef(adjacentModule.model)}
         targetSlotId={adjacentModule.slot}
         targetDeckId={deckDef.otId}
+        childrenPositioningMode="offsetToSlot"
       />
     )
   }

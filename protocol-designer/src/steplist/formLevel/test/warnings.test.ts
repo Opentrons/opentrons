@@ -10,7 +10,6 @@ import {
   belowPipetteMinimumVolume,
   incompatibleLiquidClass,
   maxDispenseWellVolume,
-  minDisposalVolume,
   mixTipPositionInTube,
   tipPositionInTube,
 } from '../warnings'
@@ -68,96 +67,13 @@ describe('Below pipette minimum volume', () => {
     )
   })
 })
-describe('Below min disposal volume', () => {
-  let fieldsWithPipette: {
-    pipette: { spec: { liquids: { default: { minVolume: number } } } }
-    disposalVolume_checkbox: boolean
-    disposalVolume_volume: number
-    path: string
-  }
-  beforeEach(() => {
-    fieldsWithPipette = {
-      pipette: {
-        spec: {
-          liquids: {
-            default: {
-              minVolume: 100,
-            },
-          },
-        },
-      },
-      disposalVolume_checkbox: true,
-      disposalVolume_volume: 100,
-      path: 'multiDispense',
-    }
-  })
-  it('should NOT return a warning when there is no pipette', () => {
-    const fields = {
-      ...fieldsWithPipette,
-      pipette: undefined,
-    } as any
-    expect(minDisposalVolume(fields)).toBe(null)
-  })
-  it('should NOT return a warning when there is no pipette spec', () => {
-    const fields = {
-      ...fieldsWithPipette,
-      pipette: { spec: undefined },
-    } as any
-    expect(minDisposalVolume(fields)).toBe(null)
-  })
-  it('should NOT return a warning when the path is NOT multi dispense', () => {
-    const fields = {
-      ...fieldsWithPipette,
-      path: 'another_path',
-    } as any
-    expect(minDisposalVolume(fields)).toBe(null)
-  })
-  it('should NOT return a warning when the volume is equal to the min pipette volume', () => {
-    const fields = {
-      ...fieldsWithPipette,
-      disposalVolume_volume: 100,
-    } as any
-    expect(minDisposalVolume(fields)).toBe(null)
-  })
-  it('should NOT return a warning when the volume is greater than the min pipette volume', () => {
-    const fields = {
-      ...fieldsWithPipette,
-      disposalVolume_volume: 100,
-    } as any
-    expect(minDisposalVolume(fields)).toBe(null)
-  })
-
-  it('should return a warning when the volume is less than the min pipette volume', () => {
-    const fields = {
-      ...fieldsWithPipette,
-      disposalVolume_volume: 99,
-    }
-    // @ts-expect-error(sa, 2021-6-15): minDisposalVolume might return null, need to null check before property access
-    expect(minDisposalVolume(fields).type).toBe('BELOW_MIN_DISPOSAL_VOLUME')
-  })
-  it('should return a warning when the path is multi dispense and the checkbox is unchecked', () => {
-    const fields = {
-      ...fieldsWithPipette,
-      disposalVolume_checkbox: false,
-    }
-    // @ts-expect-error(sa, 2021-6-15): minDisposalVolume might return null, need to null check before property access
-    expect(minDisposalVolume(fields).type).toBe('BELOW_MIN_DISPOSAL_VOLUME')
-  })
-  it('should return a warning when the path is multi dispense and there is no disposal volume', () => {
-    const fields = {
-      ...fieldsWithPipette,
-      disposalVolume_volume: undefined,
-    }
-    // @ts-expect-error(sa, 2021-6-15): minDisposalVolume might return null, need to null check before property access
-    expect(minDisposalVolume(fields).type).toBe('BELOW_MIN_DISPOSAL_VOLUME')
-  })
-})
 describe('Max dispense well volume', () => {
   let fieldsWithDispenseLabware: any
   beforeEach(() => {
     fieldsWithDispenseLabware = {
       dispense_labware: { def: fixture24Tuberack },
       dispense_wells: ['A1', 'A2'],
+      aspirate_wells: ['A1', 'A2'],
     }
   })
   it('should NOT return a warning when there is no dispense labware', () => {
@@ -305,7 +221,7 @@ const MOCK_WATER = {
     },
   ],
 } as LiquidClass
-describe('class compatibility', () => {
+describe('liquid class compatibility', () => {
   let fields: any
   beforeEach(() => {
     fields = {
@@ -321,7 +237,20 @@ describe('class compatibility', () => {
       water: MOCK_WATER,
     })
   })
-
+  it('should return null if the pipette is null', () => {
+    fields = {
+      ...fields,
+      pipette: null,
+    }
+    expect(incompatibleLiquidClass(fields)).toBe(null)
+  })
+  it('should return null if the tiprack is null', () => {
+    fields = {
+      ...fields,
+      tipRack: null,
+    }
+    expect(incompatibleLiquidClass(fields)).toBe(null)
+  })
   it('should return null if the liquid class is compatible with the pipette, tips, volume, and path', () => {
     expect(incompatibleLiquidClass(fields)).toBe(null)
   })

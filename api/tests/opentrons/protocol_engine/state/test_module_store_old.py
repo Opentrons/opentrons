@@ -11,7 +11,7 @@ import pytest
 from opentrons.protocol_engine.state import update_types
 from opentrons_shared_data.robot.types import RobotType
 from opentrons_shared_data.deck.types import DeckDefinitionV5
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
+from pytest_lazy_fixtures import lf as lazy_fixture
 
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine import commands, actions
@@ -216,8 +216,14 @@ def test_load_module(
                 moduleId="module-id",
                 model=result_model,
                 serialNumber="serial-number",
-                definition=module_definition,
             ),
+        ),
+        state_update=update_types.StateUpdate().set_load_module(
+            module_id="module-id",
+            definition=module_definition,
+            requested_model=params_model,
+            serial_number="serial-number",
+            slot_name=DeckSlotName.SLOT_1,
         ),
     )
 
@@ -283,8 +289,14 @@ def test_load_thermocycler_in_thermocycler_slot(
                 moduleId="module-id",
                 model=ModuleModel.THERMOCYCLER_MODULE_V2,
                 serialNumber="serial-number",
-                definition=thermocycler_v2_def,
             ),
+        ),
+        state_update=update_types.StateUpdate().set_load_module(
+            module_id="module-id",
+            definition=thermocycler_v2_def,
+            requested_model=ModuleModel.THERMOCYCLER_MODULE_V2,
+            serial_number="serial-number",
+            slot_name=tc_slot,
         ),
     )
     load_position_for_module = f"cutout{tc_slot.value}"
@@ -410,7 +422,6 @@ def test_handle_hs_temperature_commands(heater_shaker_v1_def: ModuleDefinition) 
             moduleId="module-id",
             model=ModuleModel.HEATER_SHAKER_MODULE_V1,
             serialNumber="serial-number",
-            definition=heater_shaker_v1_def,
         ),
     )
     set_temp_cmd = hs_commands.SetTargetTemperature.model_construct(  # type: ignore[call-arg]
@@ -426,7 +437,18 @@ def test_handle_hs_temperature_commands(heater_shaker_v1_def: ModuleDefinition) 
         deck_fixed_labware=[],
     )
 
-    subject.handle_action(actions.SucceedCommandAction(command=load_module_cmd))
+    subject.handle_action(
+        actions.SucceedCommandAction(
+            command=load_module_cmd,
+            state_update=update_types.StateUpdate().set_load_module(
+                module_id="module-id",
+                definition=heater_shaker_v1_def,
+                requested_model=ModuleModel.HEATER_SHAKER_MODULE_V1,
+                serial_number="serial-number",
+                slot_name=DeckSlotName.SLOT_1,
+            ),
+        )
+    )
     subject.handle_action(actions.SucceedCommandAction(command=set_temp_cmd))
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
@@ -458,7 +480,6 @@ def test_handle_hs_shake_commands(heater_shaker_v1_def: ModuleDefinition) -> Non
             moduleId="module-id",
             model=ModuleModel.HEATER_SHAKER_MODULE_V1,
             serialNumber="serial-number",
-            definition=heater_shaker_v1_def,
         ),
     )
     set_shake_cmd = hs_commands.SetAndWaitForShakeSpeed.model_construct(  # type: ignore[call-arg]
@@ -474,7 +495,18 @@ def test_handle_hs_shake_commands(heater_shaker_v1_def: ModuleDefinition) -> Non
         deck_fixed_labware=[],
     )
 
-    subject.handle_action(actions.SucceedCommandAction(command=load_module_cmd))
+    subject.handle_action(
+        actions.SucceedCommandAction(
+            command=load_module_cmd,
+            state_update=update_types.StateUpdate().set_load_module(
+                module_id="module-id",
+                definition=heater_shaker_v1_def,
+                requested_model=ModuleModel.HEATER_SHAKER_MODULE_V1,
+                serial_number="serial-number",
+                slot_name=DeckSlotName.SLOT_1,
+            ),
+        )
+    )
     subject.handle_action(actions.SucceedCommandAction(command=set_shake_cmd))
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
@@ -508,7 +540,6 @@ def test_handle_hs_labware_latch_commands(
             moduleId="module-id",
             model=ModuleModel.HEATER_SHAKER_MODULE_V1,
             serialNumber="serial-number",
-            definition=heater_shaker_v1_def,
         ),
     )
     close_latch_cmd = hs_commands.CloseLabwareLatch.model_construct(  # type: ignore[call-arg]
@@ -524,7 +555,18 @@ def test_handle_hs_labware_latch_commands(
         deck_fixed_labware=[],
     )
 
-    subject.handle_action(actions.SucceedCommandAction(command=load_module_cmd))
+    subject.handle_action(
+        actions.SucceedCommandAction(
+            command=load_module_cmd,
+            state_update=update_types.StateUpdate().set_load_module(
+                module_id="module-id",
+                definition=heater_shaker_v1_def,
+                requested_model=ModuleModel.HEATER_SHAKER_MODULE_V1,
+                serial_number="serial-number",
+                slot_name=DeckSlotName.SLOT_1,
+            ),
+        )
+    )
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
             module_id=HeaterShakerModuleId("module-id"),
@@ -567,7 +609,6 @@ def test_handle_tempdeck_temperature_commands(
             moduleId="module-id",
             model=ModuleModel.TEMPERATURE_MODULE_V2,
             serialNumber="serial-number",
-            definition=tempdeck_v2_def,
         ),
     )
     set_temp_cmd = temp_commands.SetTargetTemperature.model_construct(  # type: ignore[call-arg]
@@ -585,7 +626,18 @@ def test_handle_tempdeck_temperature_commands(
         deck_fixed_labware=[],
     )
 
-    subject.handle_action(actions.SucceedCommandAction(command=load_module_cmd))
+    subject.handle_action(
+        actions.SucceedCommandAction(
+            command=load_module_cmd,
+            state_update=update_types.StateUpdate().set_load_module(
+                module_id="module-id",
+                definition=tempdeck_v2_def,
+                requested_model=ModuleModel.HEATER_SHAKER_MODULE_V1,
+                serial_number="serial-number",
+                slot_name=DeckSlotName.SLOT_1,
+            ),
+        )
+    )
     subject.handle_action(actions.SucceedCommandAction(command=set_temp_cmd))
     assert subject.state.substate_by_module_id == {
         "module-id": TemperatureModuleSubState(
@@ -613,7 +665,6 @@ def test_handle_thermocycler_temperature_commands(
             moduleId="module-id",
             model=ModuleModel.THERMOCYCLER_MODULE_V1,
             serialNumber="serial-number",
-            definition=thermocycler_v1_def,
         ),
     )
     set_block_temp_cmd = tc_commands.SetTargetBlockTemperature.model_construct(  # type: ignore[call-arg]
@@ -641,7 +692,18 @@ def test_handle_thermocycler_temperature_commands(
         deck_fixed_labware=[],
     )
 
-    subject.handle_action(actions.SucceedCommandAction(command=load_module_cmd))
+    subject.handle_action(
+        actions.SucceedCommandAction(
+            command=load_module_cmd,
+            state_update=update_types.StateUpdate().set_load_module(
+                module_id="module-id",
+                definition=thermocycler_v1_def,
+                requested_model=ModuleModel.THERMOCYCLER_MODULE_V1,
+                serial_number="serial-number",
+                slot_name=DeckSlotName.SLOT_1,
+            ),
+        )
+    )
     subject.handle_action(actions.SucceedCommandAction(command=set_block_temp_cmd))
     assert subject.state.substate_by_module_id == {
         "module-id": ThermocyclerModuleSubState(
@@ -693,7 +755,6 @@ def test_handle_thermocycler_lid_commands(
             moduleId="module-id",
             model=ModuleModel.THERMOCYCLER_MODULE_V1,
             serialNumber="serial-number",
-            definition=thermocycler_v1_def,
         ),
     )
 
@@ -715,7 +776,18 @@ def test_handle_thermocycler_lid_commands(
         deck_fixed_labware=[],
     )
 
-    subject.handle_action(actions.SucceedCommandAction(command=load_module_cmd))
+    subject.handle_action(
+        actions.SucceedCommandAction(
+            command=load_module_cmd,
+            state_update=update_types.StateUpdate().set_load_module(
+                module_id="module-id",
+                definition=thermocycler_v1_def,
+                requested_model=ModuleModel.THERMOCYCLER_MODULE_V1,
+                serial_number="serial-number",
+                slot_name=DeckSlotName.SLOT_1,
+            ),
+        )
+    )
     subject.handle_action(actions.SucceedCommandAction(command=open_lid_cmd))
     assert subject.state.substate_by_module_id == {
         "module-id": ThermocyclerModuleSubState(
@@ -750,7 +822,6 @@ def test_handle_absorbance_reader_commands(
             moduleId="module-id",
             model=ModuleModel.ABSORBANCE_READER_V1,
             serialNumber="serial-number",
-            definition=abs_reader_v1_def,
         ),
     )
 
@@ -785,12 +856,23 @@ def test_handle_absorbance_reader_commands(
     subject.handle_action(
         actions.SucceedCommandAction(
             command=load_module_cmd,
+            state_update=update_types.StateUpdate().set_load_module(
+                module_id="module-id",
+                definition=abs_reader_v1_def,
+                requested_model=ModuleModel.ABSORBANCE_READER_V1,
+                serial_number="serial-number",
+                slot_name=DeckSlotName.SLOT_1,
+            ),
+        )
+    )
+    subject.handle_action(
+        actions.SucceedCommandAction(
+            command=initialize_reader,
             state_update=update_types.StateUpdate().initialize_absorbance_reader(
                 "module-id", "single", [1], None
             ),
         )
     )
-    subject.handle_action(actions.SucceedCommandAction(command=initialize_reader))
     assert subject.state.substate_by_module_id == {
         "module-id": AbsorbanceReaderSubState(
             module_id=AbsorbanceReaderId("module-id"),

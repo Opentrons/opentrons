@@ -165,12 +165,12 @@ class BusLoader:
 
     async def _load_bus(self) -> None:
         warned = False
-        then = time.time()
+        then = time.monotonic()
         while True:
             for node in self._targets:
                 await self._messenger.send(node_id=node, message=DeviceInfoRequest())
                 self._stats.messages_sent[node] += 1
-            now = time.time()
+            now = time.monotonic()
             if now - then > self._period:
                 if not warned:
                     log.warning(

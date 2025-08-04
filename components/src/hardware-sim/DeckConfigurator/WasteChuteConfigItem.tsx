@@ -1,5 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
+import { DEFAULT_AA_FOR_WASTE_CHUTE } from '@opentrons/shared-data'
+
 import { StyledText } from '../../atoms/StyledText/StyledText'
 import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
@@ -17,6 +19,7 @@ import {
 } from './constants'
 
 import type {
+  AddressableAreaNamesWithFakes,
   CutoutFixtureIdsWithFakes,
   CutoutId,
   DeckDefinition,
@@ -28,7 +31,8 @@ interface WasteChuteConfigItemProps {
   cutoutFixtureId: CutoutFixtureIdsWithFakes
   handleClickRemove?: (
     fixtureLocation: CutoutId,
-    cutoutFixtureId: CutoutFixtureIdsWithFakes
+    cutoutFixtureId: CutoutFixtureIdsWithFakes,
+    addressableAreaId: AddressableAreaNamesWithFakes
   ) => void
   hasStagingAreas?: boolean
   selected?: boolean
@@ -62,6 +66,15 @@ export function WasteChuteConfigFixture(
   const y = ySlotPosition + Y_ADJUSTMENT
 
   const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
+  const handleRemoveClick = (): void => {
+    if (handleClickRemove != null) {
+      handleClickRemove(
+        fixtureLocation,
+        cutoutFixtureId,
+        DEFAULT_AA_FOR_WASTE_CHUTE
+      )
+    }
+  }
   return (
     <RobotCoordsForeignObject
       width={COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH}
@@ -74,13 +87,8 @@ export function WasteChuteConfigFixture(
       <Btn
         css={handleClickRemove != null ? editableStyle : CONFIG_STYLE_READ_ONLY}
         cursor={handleClickRemove != null ? 'pointer' : 'default'}
-        onClick={
-          handleClickRemove != null
-            ? () => {
-                handleClickRemove(fixtureLocation, cutoutFixtureId)
-              }
-            : () => {}
-        }
+        onClick={handleRemoveClick}
+        height="100%"
       >
         <StyledText
           oddStyle="smallBodyTextSemiBold"

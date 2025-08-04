@@ -496,6 +496,7 @@
     "parameters",
     "ordering",
     "extents",
+    "features",
     "wells",
     "groups"
   ],
@@ -614,18 +615,91 @@
       }
     },
     "extents": {
-      "description": "The outer dimensions of the labware.",
+      "description": "The outer dimensions of the labware. Includes offsets from `cornerOffsetFromSlot`.",
       "type": "object",
-      "required": ["total", "footprint"],
+      "required": ["total"],
       "additionalProperties": false,
       "properties": {
         "total": {
           "description": "The all-encompassing outer dimensions of the labware.",
           "$ref": "#/definitions/axisAlignedBoundingBox3D"
+        }
+      }
+    },
+    "features": {
+      "type": "object",
+      "description": "Locating features when this labware is a part of a stackup.",
+      "required": [],
+      "properties": {
+        "slotFootprintAsChild": {
+          "description": "The 3D plane of the labware that makes physical contact with a parent entity. Constrained by the dimensions of a slot.",
+          "type": "object",
+          "required": ["backLeft", "frontRight", "z"],
+          "properties": {
+            "backLeft": {
+              "description": "(-x, +y) relative to the labware origin.",
+              "$ref": "#/definitions/vector2D"
+            },
+            "frontRight": {
+              "description": "(+x, -y) relative to the labware origin.",
+              "$ref": "#/definitions/vector2D"
+            },
+            "z": {
+              "description": "Always zero by convention. Z-coordinate of the footprint plane.",
+              "type": "number"
+            },
+            "springDirectionalForce": {
+              "description": "Applicable when the labware contains a spring that influences its position when placed on a parent deck item.",
+              "type": "string",
+              "enum": ["backLeftBottom"]
+            }
+          }
         },
-        "footprint": {
-          "description": "The outer dimensions of the labware where it meets the deck.",
-          "$ref": "#/definitions/axisAlignedBoundingBox2D"
+        "slotFootprintAsParent": {
+          "description": "The 2D plane on which a child deck item resides.",
+          "type": "object",
+          "required": ["backLeft", "frontRight", "z"],
+          "properties": {
+            "backLeft": {
+              "description": "(-x, +y), the back left corner of a labware's mating plane.",
+              "$ref": "#/definitions/vector2D"
+            },
+            "frontRight": {
+              "description": "(+x, -y), the back left corner of a labware's module plane.",
+              "$ref": "#/definitions/vector2D"
+            },
+            "z": {
+              "description": "The z-offset from this labware's origin to the plane on which a child deck item resides.",
+              "type": "number"
+            },
+            "springDirectionalForce": {
+              "description": "Applicable when the labware contains a spring that influences the positioning of a child deck item.",
+              "type": "string",
+              "enum": ["backLeftBottom"]
+            }
+          }
+        },
+        "opentronsFlexTipRackLidAsParent": {
+          "description": "Allows placement of Flex tip rack lids on this labware.",
+          "type": "object",
+          "required": ["matingZ"],
+          "properties": {
+            "matingZ": {
+              "description": "Z-coordinate in the parent where the child makes contact. By convention, measured from the bottom of the labware.",
+              "type": "number"
+            }
+          }
+        },
+        "opentronsFlexTipRackLidAsChild": {
+          "description": "Designates this labware as a flex tip rack lid.",
+          "type": "object",
+          "required": ["matingZ"],
+          "properties": {
+            "matingZ": {
+              "description": "Z-coordinate in the child where it makes contact with the parent. By convention, measured from the bottom of the lid.",
+              "type": "number"
+            }
+          }
         }
       }
     },
@@ -713,7 +787,7 @@
     },
     "gripperOffsets": {
       "type": "object",
-      "description": "Offsets to add when picking up or dropping another labware stacked atop this one. Do not use this to adjust the position of the gripper paddles relative to this labware or the child labware; use `gripHeightFromLabwareBottom` on this definition or the child's definition for that.",
+      "description": "Offsets to add when picking up or dropping another labware stacked atop this one. Do not use this to adjust the position of the gripper paddles relative to this labware or the child labware; use `gripHeightFromLabwareOrigin` on this definition or the child's definition for that.",
       "additionalProperties": {
         "$ref": "#/definitions/pickUpAndDropOffsets",
         "description": "Properties here are named for, and matched based on, the deck slot that this labware is atop--or, if this labware is atop a module, the deck slot that that module is atop."
@@ -737,9 +811,9 @@
       "type": "number",
       "description": "Force, in Newtons, with which the gripper should grip the labware."
     },
-    "gripHeightFromLabwareBottom": {
+    "gripHeightFromLabwareOrigin": {
       "type": "number",
-      "description": "Recommended Z-height, from labware bottom to the center of gripper pads, when gripping the labware."
+      "description": "Recommended Z-height, from labware origin to the center of gripper pads, when gripping the labware."
     },
     "stackLimit": {
       "type": "number",

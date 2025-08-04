@@ -5,7 +5,7 @@ import values from 'lodash/values'
 import { Module } from '@opentrons/components'
 import {
   getAddressableAreaFromSlotId,
-  getModuleDef2,
+  getModuleDef,
   getPositionFromSlotId,
   inferModuleOrientationFromSlot,
   inferModuleOrientationFromXCoordinate,
@@ -29,7 +29,6 @@ import {
   getStagingAreaAddressableAreas,
   getTopmostLabwareOnModuleFromStack,
 } from '../../../utils'
-import { getShowTCLid } from '../../ProtocolOverview/utils'
 import { HighlightLabware } from '../HighlightLabware'
 import { getSlotInformation } from '../utils'
 import { HighlightItems } from './HighlightItems'
@@ -200,7 +199,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           console.warn(`no slot ${slotId} for module ${moduleOnDeck.id}`)
           return null
         }
-        const moduleDef = getModuleDef2(moduleOnDeck.model)
+        const moduleDef = getModuleDef(moduleOnDeck.model)
 
         const getModuleInnerProps = (
           moduleState: ModuleTemporalProperties['moduleState']
@@ -276,6 +275,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
               innerProps={innerProps}
               targetSlotId={slotId}
               targetDeckId={deckDef.otId}
+              childrenPositioningMode="offsetToSlot"
             >
               {labwareOnModule != null &&
               !isLabwareOccludedByThermocyclerLid ? (
@@ -429,8 +429,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
         if (
           getSlotInLocationStack(labware.stack) === 'offDeck' ||
           allModules.some(m => labware.stack.includes(m.id)) ||
-          labware.id === adjacentLabware?.id ||
-          getShowTCLid(labware)
+          labware.id === adjacentLabware?.id
         ) {
           return null
         }

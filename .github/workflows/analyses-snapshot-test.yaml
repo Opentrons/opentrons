@@ -3,14 +3,6 @@ name: Analyses Snapshot Test
 on:
   workflow_dispatch:
     inputs:
-      ANALYSIS_REF:
-        description: 'Branch or tag that provides the analysis output at test runtime'
-        required: true
-        default: 'edge'
-      SNAPSHOT_REF:
-        description: 'Branch or tag that provides the snapshot and test code at test runtime'
-        required: true
-        default: 'edge'
       OPEN_PR_ON_FAILURE:
         description: 'If the test fails, open a PR to update the snapshots'
         type: boolean
@@ -41,67 +33,125 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-and-test:
+  collect-chunks:
+    timeout-minutes: 2
+    runs-on: ubuntu-latest
+    outputs:
+      matrix_json: ${{ steps.set-matrix.outputs.json }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.10'
+          enable-cache: true
+          cache-dependency-glob: './analyses-snapshot-testing/uv.lock'
+      - name: Sync the project
+        working-directory: ./analyses-snapshot-testing
+        run: make ci-setup
+      - name: Generate Chunks
+        working-directory: ./analyses-snapshot-testing
+        run: make gen-chunks
+      - name: Save Chunks
+        uses: actions/upload-artifact@v4
+        with:
+          name: chunks
+          path: analyses-snapshot-testing/chunks/
+      - name: Set Matrix
+        id: set-matrix
+        run: echo "json=$(jq -c . analyses-snapshot-testing/chunks/matrix.json)" >> $GITHUB_OUTPUT
+  diff-from-target-branch:
+    timeout-minutes: 2
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Are the analyses snapshots in my PR branch in sync with the target branch?
+        if: github.event_name == 'pull_request'
+        run: |
+          git fetch origin ${{ github.event.pull_request.base.ref }}
+          DIFF_OUTPUT=$(git diff HEAD origin/${{ github.event.pull_request.base.ref }} -- analyses-snapshot-testing/tests/__snapshots__/analyses_snapshot_test)
+          if [ -n "$DIFF_OUTPUT" ]; then
+            echo "## Analyses Snapshot Diff Check" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "- :x: Analyses snapshots do **NOT** match \`${{ github.event.pull_request.base.ref }}\` snapshots." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "  - Is this because you have not pulled and merged \`${{ github.event.pull_request.base.ref }}\`?" >> $GITHUB_STEP_SUMMARY
+            echo "  - Or is this because you have already updated your snapshots and are all good 😊?" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## Analyses Snapshot Diff Check" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo ":white_check_mark: **Analyses snapshots match \`${{ github.event.pull_request.base.ref }}\` snapshots.**" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  process-chunk:
+    timeout-minutes: 5
+    needs: collect-chunks
+    strategy:
+      matrix:
+        chunk: ${{ fromJson(needs.collect-chunks.outputs.matrix_json) }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.10'
+          enable-cache: true
+          cache-dependency-glob: './analyses-snapshot-testing/uv.lock'
+      - name: Sync the project
+        working-directory: ./analyses-snapshot-testing
+        run: make ci-setup
+      - uses: actions/download-artifact@v4
+        with:
+          name: chunks
+          path: analyses-snapshot-testing/chunks/
+      - name: Generate Analyses from Chunk
+        working-directory: ./analyses-snapshot-testing
+        run: make analyze-chunk CHUNK=${{ matrix.chunk.chunk_id }}
+      - name: Upload Analysis Results
+        uses: actions/upload-artifact@v4
+        with:
+          # Each chunk uploads its files as one artifact named after the chunk
+          name: analysis-results-${{ matrix.chunk.chunk_id }}.zip
+          path: analyses-snapshot-testing/analysis_results/*
+          if-no-files-found: error
+
+  execute-tests:
     timeout-minutes: 15
+    needs: process-chunk
     runs-on: ubuntu-latest
     env:
-      BASE_IMAGE_NAME: opentrons-python-base:3.10
-      ANALYSIS_REF: ${{ github.event.inputs.ANALYSIS_REF || github.head_ref || 'edge' }}
-      SNAPSHOT_REF: ${{ github.event.inputs.SNAPSHOT_REF || github.head_ref || 'edge' }}
       # If we're running because of workflow_dispatch, use the user input to decide
       # whether to open a PR on failure. Otherwise, there is no user input,
       # so we only open a PR if the PR has the label 'gen-analyses-snapshot-pr'
       OPEN_PR_ON_FAILURE: ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.OPEN_PR_ON_FAILURE) || ((github.event_name != 'workflow_dispatch') && (contains(github.event.pull_request.labels.*.name, 'gen-analyses-snapshot-pr'))) }}
-      PR_TARGET_BRANCH: ${{ github.event.pull_request.base.ref || 'not a pr'}}
+      PR_TARGET_BRANCH: ${{ github.event.pull_request.base.ref || 'edge'}}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v6
         with:
-          ref: ${{ env.SNAPSHOT_REF }}
-
-      - name: Are the analyses snapshots in my PR branch in sync with the target branch?
-        if: github.event_name == 'pull_request'
+          python-version: '3.10'
+          enable-cache: true
+          cache-dependency-glob: './analyses-snapshot-testing/uv.lock'
+      - name: Sync the project
+        working-directory: ./analyses-snapshot-testing
+        run: make ci-setup
+      - name: Download All Analysis Results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: analysis-results-*
+          path: all_analysis_results
+      - name: Consolidate Analysis Results
         run: |
-          git fetch origin ${{ env.PR_TARGET_BRANCH }}
-          DIFF_OUTPUT=$(git diff HEAD origin/${{ env.PR_TARGET_BRANCH }} -- analyses-snapshot-testing/tests/__snapshots__/analyses_snapshot_test)
-          if [ -n "$DIFF_OUTPUT" ]; then
-            echo "Analyses snapshots do NOT match ${{ env.PR_TARGET_BRANCH }} snapshots."
-            echo "Is this becasue you have not pulled and merged ${{ env.PR_TARGET_BRANCH }}?"
-            echo "Or is this because you have already updated your snapshots and are all good 😊?"
-          else
-            echo "Analyses snapshots match ${{ env.PR_TARGET_BRANCH }} snapshots."
-          fi
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build base image
-        id: build_base_image
-        uses: docker/build-push-action@v6
-        with:
-          context: analyses-snapshot-testing/citools
-          file: analyses-snapshot-testing/citools/Dockerfile.base
-          push: false
-          load: true
-          tags: ${{ env.BASE_IMAGE_NAME }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Build analysis image
-        working-directory: analyses-snapshot-testing
-        run: make build-opentrons-analysis BASE_IMAGE_NAME=${{ env.BASE_IMAGE_NAME }} ANALYSIS_REF=${{ env.ANALYSIS_REF }} CACHEBUST=${{ github.run_number }}
-
-      - name: Set up Python 3.13
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.13.0'
-          cache: 'pipenv'
-          cache-dependency-path: analyses-snapshot-testing/Pipfile.lock
-
-      - name: Setup Python Dependencies
-        working-directory: analyses-snapshot-testing
-        run: make setup
-
+          find all_analysis_results -type f -exec cp {} analyses-snapshot-testing/analysis_results/ \;
+      - name: List All Gathered Files (for debug)
+        run: ls -lh analyses-snapshot-testing/analysis_results/
       - name: Run Test
         id: run_test
         working-directory: analyses-snapshot-testing
@@ -131,10 +181,12 @@ jobs:
         uses: peter-evans/create-pull-request@v7
         with:
           commit-message: 'fix(analyses-snapshot-testing): heal analyses snapshots'
-          title: 'fix(analyses-snapshot-testing): heal ${{ env.ANALYSIS_REF }} snapshots'
+          title: 'fix(analyses-snapshot-testing): heal ${{ github.event.pull_request.head.ref }} snapshots'
           body: 'This PR was requested on the PR https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}'
-          branch: 'analyses-snapshot-testing/${{ env.ANALYSIS_REF }}-from-${{ env.SNAPSHOT_REF }}'
-          base: ${{ env.SNAPSHOT_REF }}
+          branch: 'analyses-snapshot-testing/heal-${{ github.event.pull_request.head.ref }}'
+          base: ${{ github.event.pull_request.head.ref }}
+          add-paths: |
+            analyses-snapshot-testing/tests/__snapshots__/analyses_snapshot_test/
 
       - name: Comment on feature PR
         if: always() && steps.create_pull_request.outcome == 'success' && github.event_name == 'pull_request'
@@ -152,9 +204,11 @@ jobs:
       - name: Create Snapshot update Request on edge overnight failure
         if: always() && steps.handle_failure.outcome == 'success' && github.event_name == 'schedule'
         uses: peter-evans/create-pull-request@v7
-        with: # scheduled run uses the default values for ANALYSIS_REF and SNAPSHOT_REF which are edge
-          commit-message: 'fix(analyses-snapshot-testing): heal ${{ env.ANALYSIS_REF }} snapshots'
-          title: 'fix(analyses-snapshot-testing): heal ${{ env.ANALYSIS_REF }} snapshots'
-          body: 'The ${{ env.ANALYSIS_REF }} overnight analyses snapshot test is failing. This PR was opened to alert us to the failure.'
-          branch: 'analyses-snapshot-testing/${{ env.ANALYSIS_REF }}-from-${{ env.SNAPSHOT_REF }}'
-          base: ${{ env.SNAPSHOT_REF }}
+        with:
+          commit-message: 'fix(analyses-snapshot-testing): heal edge snapshots'
+          title: 'fix(analyses-snapshot-testing): heal edge snapshots'
+          body: 'The edge overnight analyses snapshot test is failing. This PR was opened to alert us to the failure.'
+          branch: 'analyses-snapshot-testing/heal-edge'
+          base: edge
+          add-paths: |
+            analyses-snapshot-testing/tests/__snapshots__/analyses_snapshot_test/

@@ -35,8 +35,11 @@
         "y": -85.75,
         "z": 99
       }
-    },
-    "footprint": {
+    }
+  },
+  "features": {
+    "slotFootprintAsChild": {
+      "z": 0,
       "backLeft": {
         "x": 0,
         "y": 0
@@ -45,10 +48,13 @@
         "x": 127.75,
         "y": -85.75
       }
+    },
+    "opentronsFlexTipRackLidAsParent": {
+      "matingZ": 84.75
     }
   },
   "gripForce": 16,
-  "gripHeightFromLabwareBottom": 23.9,
+  "gripHeightFromLabwareOrigin": 23.9,
   "wells": {
     "A1": {
       "depth": 97.5,
@@ -1030,12 +1036,5 @@
   "namespace": "opentrons",
   "version": 999,
   "schemaVersion": 3,
-  "stackingOffsetWithLabware": {
-    "opentrons_flex_96_tiprack_adapter": {
-      "x": 0,
-      "y": 0,
-      "z": 121
-    }
-  },
   "$otSharedSchema": "#/labware/schemas/3"
 }

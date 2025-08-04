@@ -1,3 +1,7 @@
+---
+title: "Opentrons Flex: Software and Operation"
+---
+
 # Software and Operation
 
 There are multiple ways to control Opentrons Flex, depending on the needs of your lab. You can perform most functions either from the touchscreen or from a computer running the Opentrons App. This chapter will focus primarily on touchscreen operation, and will only cover features of the Opentrons App that are not possible on the touchscreen. It will also outline advanced control features, such as running Python code using the Jupyter Notebook server or from the command line of Flex.
@@ -216,42 +220,55 @@ When working with CSV files, keep in mind that:
 
 Parameter and CSV file selections are still editable until you tap **Confirm values**. Modifications become read-only after that. To make further adjustments, you'll have to cancel the protocol run and start over.
 
-### Labware Position Check
+### Labware offsets and position checking
 
-Opentrons recommends performing Labware Position Check before your protocol run. This process fine- tunes the positioning of instruments, relative to specific types of labware in specific slots on the deck. The results of Labware Position Check are saved as labware offsets, which are measured to the nearest 0.1 mm. You can apply saved labware offsets to future runs of the same protocol (or other protocols that use the same labware in the same positions) to save time.
+#### Labware offsets
+Labware offsets are fine-tuned positional coordinates that help your robot align its pipette relative to a specific piece of labware. The release of robot software version 8.4 introduced significant improvements to the labware offset and position checking system.
 
-Labware Position Check guides you through these steps:
+| Feature | Description |
+|----|----|
+| Protocol independence | Offsets are positional adjustments associated with a piece of labware, rather than with a specific protocol, and saved on the robot. This allows for greater flexibility and reusability of offset data in any protocol. |
+| Default offsets | Default offsets are manually created via Labware Position Check and then automatically applied to each instance of that labware, regardless of deck slot or protocol. This "measure once, set everywhere" feature means you don't have to check offsets for duplicate labware, which helps reduce protocol setup time and effort. |
+| Applied offsets | Applied offsets override defaults for a specific piece of labware in a specific deck slot. You can use an applied offset with different protocols, but the labware and deck slot must be the same as the original applied offset. |
+| Hardcoded offsets | A hardcoded offset is an offset type typically created by advanced users via the Opentrons Python API. Because these offsets are defined in code (`set_offset`), you cannot change them from the touchscreen or Opentrons App. You’ll need to modify the Python protocol file to change a hardcoded offset. See [Setting Labware Offsets](https://docs.opentrons.com/v2/new_advanced_running.html?highlight=offset#setting-labware-offsets). |
 
-1.  Attach the calibration probe to the pipette.
+#### Offsets at-a-glance
 
-2.  Clear the deck of labware, but leave modules in place.
+This illustration shows how the different types of offsets appear as you're configuring a protocol on the Flex touchscreen.
 
-3.  Place a specific type of labware in a specific deck slot.
+![](images/labware-offsets.svg)
 
-4.  Align the probe to the labware using the on-screen jog controls. Then confirm the position.
+#### Labware Position Check
 
-5.  Repeat steps 3 and 4 for each labware--slot combination used in your protocol.
+Labware Position Check lets you align a pipette relative to a piece of labware (e.g. a well plate), which helps ensure accurate and reproducible pipetting results.
 
-6.  Review and save your new labware offset data.
+You must ensure that each piece of labware used in your protocol has a default or applied offset associated with it. As shown in the touchscreen example below, you cannot run a protocol (the blue run button is inactive) if it uses labware that is missing offset data.
 
-7.  Remove the calibration probe from the pipette.
+<figure class="screenshot" markdown>
+![Touchscreen showing missing labware offset](images/missing-offsets.png)
+</figure>
+
+Tap **Labware Offsets** to see which labware is missing an offset and to start Labware Position Check. Refer to the touchscreen or the Opentrons App when running Labware Position Check. It will provide instructions and animations to guide you through this process.
+
+#### Jog controls
+
+During Labware Position Check, you’ll use the jog controls to align the pipette with the selected labware.
 
 <figure class="screenshot" markdown>
 ![Jog controls, with three options for jump size on the left, toggle between axes in the middle, and arrow buttons on the right.](images/touchscreen-lpc-jog-controls.png "Labware Position Check jog controls")
-<figcaption>Jog controls used in Labware Position Check. Use larger jump sizes to
-move the pipette quickly, but beware of crashing the pipette into
-labware.</figcaption>
+<figcaption>Jog controls used in Labware Position Check.</figcaption>
 </figure>
 
-<figure class="screenshot" markdown>
-TK image of 8.4 LPC
-<figcaption>Summary of new labware offsets ready to be applied to a protocol.</figcaption>
-</figure>
+To use the jog controls:
 
-When you run Labware Position Check for the first time, the pipette will start at its default position for all labware (X 0.0 Y 0.0 Z 0.0). On subsequent runs, the pipette will start at the previously saved offset locations. This lets you quickly confirm offset data before every protocol run.
+1. Select a jog control option to set the pipette's axis of movement.
+2. Select a jump size to set how far the pipette moves (in mm). You can move the pipette in increments of 0.1, 1, or 10 mm.  Use larger jump sizes to move the pipette quickly, but beware of crashing the pipette into labware.
+3. Tap an arrow to move the pipette for your selected direction and distance.
+4. Tap **Close** when, in your best judgement, the pipette is optimally aligned with the selected labware.
+5. Continue to follow prompts and instructions on the touchscreen to complete the Labware Position Check process.
 
 !!! note
-    The pipette will always start at the default position if you turn off Apply Labware Offsets in the robot settings.
+    Labware Position Check corrects for minor, millimeter-scale pipette and labware alignment variations. If you find yourself using it to compensate for large, multi-centimeter offsets, this may suggest an alignment problem related to labware manufacturing defects or incorrect labware definitions. Contact Opentrons Support if you encounter persistent, significant instrument or labware misalignments.
 
 ### Run progress
 
@@ -282,14 +299,59 @@ Tap **Launch recovery mode** to see options for the particular type of error tha
 
 Flex provides a protocol recovery path for the following error conditions.
 
-| Error type | Description {style="width: 30%;"} | Recovery options |
-| :--------- | :---------- | :--------------- |
-| No liquid detected | Occurs when a pipette encounters an empty well and expects a liquid to be present. | <ul><li>Manually refill well and skip to the next step.</li><li>Ignore the error and skip to the next step.</li><li>Cancel protocol run.</li></ul> |
-| Pipette overpressure | Occurs when pressure inside the pipette exceeds the normal range while aspirating or dispensing liquid. Caused by clogged, bent, or sealed tips. | <ul><li>For aspiration:</li><ul><li>Retry with new tips.</li><li>Cancel protocol run.</li></ul><li>For dispense:</li><ul><li>Skip to the next step with the same tips.</li><li>Skip to the next step with new tips.</li><li>Cancel protocol run.</li></ul></ul> |
-| General errors | A catch-all category for other errors. | <ul><li>Retry step.</li><li>Skip to next step.</li><li>Cancel protocol run.</li></ul> |
+<table>
+  <thead>
+    <tr>
+      <th>Error type</th>
+      <th style="width: 30%;">Description</th>
+      <th>Recovery options</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>No liquid detected</td>
+      <td>Occurs when a pipette encounters an empty well and expects a liquid to be present.</td>
+      <td>
+        <ul>
+          <li>Manually fill the empty well and retry with the same tips.</li>
+          <li>Manually fill the empty well and retry with new tips.</li>
+          <li>Manually fill the empty well and skip to the next step.</li>
+          <li>Ignore the error and skip to the next step.</li>
+          <li>Cancel protocol run.</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td>Pipette overpressure</td>
+      <td>Occurs when pressure inside the pipette exceeds the normal range while aspirating or dispensing liquid. Caused by clogged, bent, or sealed tips.</td>
+      <td>For aspiration:<br>
+        <ul>
+            <li>Retry with new tips.</li>
+            <li>Cancel protocol run.</li>
+        </ul>
+        For dispense:
+        <ul>
+            <li>Skip to the next step with the same tips.</li>
+            <li>Skip to the next step with new tips.</li>
+            <li>Cancel protocol run.</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td>General errors</td>
+      <td>A catch-all category for other errors.</td>
+      <td>
+        <ul>
+          <li>Retry step.</li>
+          <li>Skip to next step.</li>
+          <li>Cancel protocol run.</li>
+        </ul>
+      </td>
+    </tr> </tbody>
+</table>
 
 !!! note
-    The tip presence sensor is disabled for [partial tip pickup][partial-tip-pickup] of 1, 2, or 3 tips. In these configurations, Flex cannot detect tip pickup errors and will not present error recovery options if the pipette fails to pick up the tips. The run will continue unless and until another error occurs.
+    The tip presence sensor is disabled for [partial tip pickup](system-description.md#partial-tip-pickup) of 1, 2, or 3 tips. In these configurations, Flex cannot detect tip pickup errors and will not present error recovery options if the pipette fails to pick up the tips. The run will continue unless and until another error occurs.
 
 You can view the status of a finished protocol and review any resolved errors on the run completion screen.
 
@@ -700,9 +762,101 @@ Each entry in the recent protocol runs list includes the protocol name, its time
 
 Flex *will not* retain information about more than 20 runs on the robot. Proceeding to the Run Setup screen generates an entry in the list and counts towards the maximum of 20 runs, even if you never begin the protocol.
 
-## Advanced operation
+## Command line operation over SSH
 
-### Jupyter Notebook
+You can work with your Flex through a Secure Shell (SSH) terminal connection. Terminal access lets you [run protocols directly from the command line](https://docs.opentrons.com/v2/new_advanced_running.html#command-line) or perform advanced tasks, such as customizing the Python environment on the robot. Protocols that reference external files on disk (apart from custom labware definition files) must be run from the command line.
+
+!!!note
+    - SSH keys are required before you can connect to Flex and issue commands from a terminal.
+    - If you're unable to use a Wi-Fi network for SSH, see [Hardwired SSH Connections][hardwired-ssh-connections] below.
+
+### Creating SSH keys
+
+Follow these steps to create SSH keys on your Mac, Windows, or Linux computer:
+
+1. Open a terminal window and type this command:
+
+    ```
+    ssh-keygen -f robot_key -t ecdsa
+    ```
+
+1. Create a passphrase when prompted. This process generates a file, `robot_key.pub`. A passphrase is not required, but you should create one.
+
+1. Copy the `robot_key.pub` file to the root of a USB-A flash drive. You will use this USB drive (and the saved key) for SSH authentication to the robot.
+
+    !!!note
+        The flash drive must have a single partition formatted with a file system readable by the embedded Linux system on Flex. FAT32, NTFS, and ext4 file systems are supported. The macOS HFS+ and APFS file systems are not. macOS can read and write to FAT-formatted drives.
+
+1. Eject the USB drive.
+
+### Making an SSH connection
+
+To make an SSH connection:
+
+1. Insert the USB drive that holds the SSH key created earlier into a USB port on your Flex.
+
+1. On your computer, open a terminal window and type the commands shown below. Replace `ROBOT_IP` with the IP address of your Flex.
+
+    ```
+    curl \
+    --location --request POST \
+    'http://ROBOT_IP:31950/server/ssh_keys/from_local'
+    ```
+    The command is successful when you see a response message that indicates a new key was added.
+
+1. After adding the key, type the command shown below. Replace `ROBOT_IP` with the IP address of your Flex.
+
+    ```
+    ssh -i robot_key root@ROBOT_IP
+    ```
+
+1. Type the passphrase you set when creating the SSH key.
+
+When an SSH connection is successful, the terminal command prompt changes to `root@` followed by the serial number of your robot (e.g., `root@FLXA1020231007001:~#`). You can now interact with the robot via the terminal window.
+
+### Hardwired SSH connections
+
+A hardwired connection uses an Ethernet cable to connect and transmit data directly between your computer and Flex. This is a secure alternative for SSH access in situations where network policies prevent you from making a wireless connection to the robot.
+
+!!!note
+    The hardwired SSH procedure requires assigning a static IP address to the robot. You may want to ask for help from your IT support team before proceeding.
+
+#### Physical connection
+
+Connect a computer to the robot using an Ethernet cable. If your computer has a built-in RJ-45 Ethernet port, plug one end into the computer and connect the other end to the Ethernet port on the robot. If you're using a computer without an Ethernet port, use an adapter with an Ethernet port to make this connection.
+
+When disconnected from a network, your Flex will assign itself an IP address and subnet mask. You'll need this information to set a static address on your computer within the same IP address range and subnet as your Flex.
+
+#### Finding the robot's IP address
+
+You can get the IP address range and subnet mask from the robot by connecting it to your computer and checking the Opentrons App:
+
+1. If the robot is connected by Ethernet cable to a switch or wall jack, disconnect it. Then establish a physical Ethernet connection to your computer, as described above.
+
+1. Launch the Opentrons App.
+
+1. Click the **Devices** tab and find your robot.
+
+    !!!note
+        If your robot appears as inactive or inaccessible in the app, wait a few moments. Flex will configure itself and eventually become available again. If this does not happen, turn the robot's power off, wait a few seconds, turn the power back on, and check the app again after the robot boots up.
+
+1. After locating your robot in the app, click the three-dot menu (⋮), select **Robot settings**, and then click the **Networking** tab.
+
+The Networking tab will show you the IP address and subnet mask of your robot. When disconnected from a network, Flex will assign itself a non-routing IP address. Here's an example of a self-assigned IP address on a Flex:
+
+- IP address: 169.254.29.160
+- Subnet mask: 255.255.0.0
+
+#### Setting a static IP address
+
+The static IP address on your computer needs to be in the same IP range and subnet that your Flex uses. Given the robot's IP address above, you could set your computer's IP address and subnet as shown here:
+
+- IP address: 169.254.29.164
+- Subnet mask: 255.255.0.0
+
+After you have a working hardwired connection, follow the instructions in [Making an SSH Connection](software-operation.md#making-an-ssh-connection) above.
+
+## Jupyter Notebook
 
 Flex runs a [Jupyter Notebook](https://jupyter.org/) server on port 48888, which you can connect to with your web browser. Use Jupyter to individually run discrete chunks of Python code, called *cells*. This is a convenient environment for writing and debugging protocols, since you can define different parts of your protocol in different notebook cells, and run a single cell at a time.
 
@@ -715,39 +869,3 @@ Access your robot's Jupyter Notebook either:
 For more details on using Jupyter, including preparing executable cells
 of code and running them on a robot, see the [Jupyter Notebook section](https://docs.opentrons.com/v2/new_advanced_running.html#jupyter-notebook) of the Python Protocol API documentation.
 
-### Command-line operation over SSH
-
-You can work with your Flex through a Secure Shell (SSH) terminal connection. Terminal access lets you [run protocols directly from the command line](https://docs.opentrons.com/v2/new_advanced_running.html#command-line) or perform advanced tasks, such as customizing the Python environment on the robot. Protocols that reference external files on disk (apart from custom labware definition files) must be run from the command line.
-
-SSH keys are required to connect to Flex and issue commands from a terminal. Setup requires a `bash` or `zsh` shell with `openssh` installed.
-
-Follow these steps to authenticate to your Flex via SSH:
-
-1.  Open a terminal on your computer and type `ssh-keygen -f robot_key ecdsa`.
-
-2.  Create a passphrase when prompted. A passphrase is not required, but you should always create one. This process generates a file, `robot_key.pub`.
-
-3.  Find the `robot_key.pub` file and copy it to the root of a USB-A flash drive.
-
-    !!! note
-        The flash drive must have a single partition formatted with a file system readable by the embedded Linux system on Flex. FAT32, NTFS, and ext4 file systems are supported. The macOS HFS+ and APFS file systems are not. (macOS can read and write to FAT-formatted drives.)
-
-4.  Eject the drive and connect it to an open USB-A port on your Flex. Make sure that it is the only drive attached to your Flex, or the key file may not be accessible.
-
-5.  On your computer, type the following command in your terminal. Replace `ROBOT_IP` with the local IP address of your Flex.
-
-    ``` bash
-    curl \
-    --location --request POST \
-    'http://ROBOT_IP:31950/server/ssh_keys/from_local'
-    ```
-    
-    The command is successful if you get a 201 response with a message indicating how many keys were added. The command failed if you get a 404 response.
-
-6.  After successfully adding the key, type the following command. Again, replace `ROBOT_IP` with the local IP address of your Flex.
-
-    ``` bash
-    ssh -i robot_key root@ROBOT_IP
-    ```
-
-The connection works if you see an ASCII art version of the Opentrons logo. You can now browse the Flex file system and issue commands from the terminal.

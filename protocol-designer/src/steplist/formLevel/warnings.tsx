@@ -2,6 +2,7 @@ import {
   getAllLiquidClassDefs,
   getFlexNameConversion,
   getWellTotalVolume,
+  OT2_PIPETTES,
 } from '@opentrons/shared-data'
 
 import { MINIMUM_LIQUID_CLASS_VOLUME } from '../../constants'
@@ -20,7 +21,6 @@ import type { FormError } from './errors'
  ********************/
 
 export type FormWarningType =
-  | 'BELOW_MIN_DISPOSAL_VOLUME'
   | 'BELOW_PIPETTE_MINIMUM_VOLUME'
   | 'INCOMPATIBLE_ALL_PIPETTE'
   | 'INCOMPATIBLE_PIPETTE_PATH'
@@ -48,15 +48,6 @@ const overMaxWellVolumeWarning = (): FormWarning => ({
   type: 'OVER_MAX_WELL_VOLUME',
   title: 'Dispense volume will overflow a destination well',
   dependentFields: ['dispense_labware', 'dispense_wells', 'volume'],
-  location: 'form',
-})
-
-const belowMinDisposalVolumeWarning = (min: number): FormWarning => ({
-  type: 'BELOW_MIN_DISPOSAL_VOLUME',
-  title: `Disposal volume is below recommended minimum (${min} uL)`,
-  body:
-    'For accuracy in multi-dispense Transfers we recommend you use a disposal volume of at least the pipette`s minimum.',
-  dependentFields: ['disposalVolume_volume', 'pipette'],
   location: 'form',
 })
 
@@ -143,39 +134,21 @@ export const belowPipetteMinimumVolume = (
 export const maxDispenseWellVolume = (
   fields: HydratedMoveLiquidFormData
 ): FormWarning | null => {
-  const { dispense_labware, dispense_wells, volume } = fields
-  if (!dispense_labware || !dispense_wells) return null
+  const { aspirate_wells, dispense_labware, dispense_wells, volume } = fields
+  if (!dispense_labware || !dispense_wells) {
+    return null
+  }
+
+  const isManyToOne = aspirate_wells.length > dispense_wells.length
+  const effectiveVolume = isManyToOne ? volume * aspirate_wells.length : volume
   const hasExceeded = dispense_wells.some((well: string) => {
     const maximum =
       'def' in dispense_labware
         ? getWellTotalVolume(dispense_labware.def as LabwareDefinition2, well)
         : Infinity
-    return maximum && volume > maximum
+    return maximum && effectiveVolume > maximum
   })
   return hasExceeded ? overMaxWellVolumeWarning() : null
-}
-
-export const minDisposalVolume = (
-  fields: HydratedMoveLiquidFormData
-): FormWarning | null => {
-  const {
-    disposalVolume_checkbox,
-    disposalVolume_volume,
-    pipette,
-    path,
-  } = fields
-  if (!(pipette && pipette.spec) || path !== 'multiDispense') return null
-  const isUnselected = !disposalVolume_checkbox || !disposalVolume_volume
-  const liquidSpecs = pipette.spec.liquids
-  const minVolume =
-    'lowVolumeDefault' in liquidSpecs
-      ? liquidSpecs.lowVolumeDefault.minVolume
-      : liquidSpecs.default.minVolume
-  if (isUnselected) {
-    return belowMinDisposalVolumeWarning(minVolume as number)
-  }
-  const isBelowMin = disposalVolume_volume < minVolume
-  return isBelowMin ? belowMinDisposalVolumeWarning(minVolume as number) : null
 }
 
 export const _lowVolumeTransferWarning = (): FormWarning => ({
@@ -251,8 +224,15 @@ export const incompatibleLiquidClass: (
   fields: HydratedMoveLiquidFormData | HydratedMixFormData
 ) => FormWarning | null = formData => {
   const { pipette, tipRack, volume: rawVolume } = formData
+  if (pipette == null || tipRack == null) {
+    return null
+  }
+  // don't show warnings for OT-2
+  const isOT2 = Object.values(OT2_PIPETTES).includes(pipette.name)
+  if (isOT2) {
+    return null
+  }
   const liquidClasses = getAllLiquidClassDefs()
-
   const pipetteName = getFlexNameConversion(pipette.spec)
   const volume = Number(rawVolume)
   const path = 'path' in formData ? (formData.path as PathOption) : null

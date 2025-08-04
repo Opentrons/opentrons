@@ -48,13 +48,13 @@ export function SelectPipettePath({
   if (sourceWells.length === 1 && destinationWells.length > 1) {
     allowedPipettePathOptions.push({
       pathOption: 'multiDispense',
-      description: t('pipette_path_multi_dispense'),
+      description: t('distribute'),
     })
   }
   if (sourceWells.length > 1 && destinationWells.length === 1) {
     allowedPipettePathOptions.push({
       pathOption: 'multiAspirate',
-      description: t('pipette_path_multi_aspirate'),
+      description: t('consolidate'),
     })
   }
 
@@ -80,8 +80,8 @@ export function SelectPipettePath({
       <Flex
         marginTop={SPACING.spacing120}
         flexDirection={DIRECTION_COLUMN}
-        padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
-        gridGap={SPACING.spacing4}
+        padding={`${SPACING.spacing32} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
+        gridGap={SPACING.spacing8}
         width="100%"
       >
         {allowedPipettePathOptions.map(option => (

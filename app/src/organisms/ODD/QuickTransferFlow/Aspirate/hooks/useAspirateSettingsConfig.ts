@@ -16,12 +16,14 @@ interface UseAspirateSettingsConfigProps {
   state: QuickTransferSummaryState
   dispatch: Dispatch<QuickTransferSummaryAction>
   setSelectedSetting: (setting: AspirateSettingOption | null) => void
+  isMultiTransfer: boolean
 }
 
 export function useAspirateSettingsConfig({
   state,
   dispatch,
   setSelectedSetting,
+  isMultiTransfer,
 }: UseAspirateSettingsConfigProps): SettingItem[] {
   const { t } = useTranslation(['quick_transfer', 'shared'])
   const { makeSnackbar } = useToaster()
@@ -45,7 +47,7 @@ export function useAspirateSettingsConfig({
       value:
         state.tipPositionAspirate !== null
           ? t('tip_position_value', { position: state.tipPositionAspirate })
-          : '',
+          : t('option_disabled'),
       enabled: true,
       onClick: () => {
         setSelectedSetting(SETTING_OPTIONS.ASPIRATE_TIP_POSITION)
@@ -58,9 +60,10 @@ export function useAspirateSettingsConfig({
         state.submergeAspirate !== undefined
           ? t('submerge_value', {
               speed: state.submergeAspirate.speed,
+              delayDuration: state.submergeAspirate.delayDuration,
               position: state.submergeAspirate.positionFromBottom,
             })
-          : '',
+          : t('option_disabled'),
       enabled: true,
       onClick: () => {
         setSelectedSetting(SETTING_OPTIONS.ASPIRATE_SUBMERGE)
@@ -84,7 +87,7 @@ export function useAspirateSettingsConfig({
               volume: state.mixOnAspirate?.mixVolume,
               reps: state.mixOnAspirate?.repetitions,
             })
-          : '',
+          : t('option_disabled'),
       enabled:
         state.transferType === 'transfer' ||
         state.transferType === 'distribute',
@@ -95,8 +98,20 @@ export function useAspirateSettingsConfig({
         ) {
           setSelectedSetting(SETTING_OPTIONS.ASPIRATE_MIX)
         } else {
-          makeSnackbar(t('advanced_setting_disabled') as string)
+          makeSnackbar(t('aspirate_setting_disabled') as string)
         }
+      },
+    },
+    {
+      option: SETTING_OPTIONS.ASPIRATE_CONDITION,
+      copy: t('condition'),
+      value:
+        state.conditionAspirate != null || state.conditionAspirate !== 0
+          ? t('volume', { volume: state.conditionAspirate })
+          : t('option_disabled'),
+      enabled: isMultiTransfer,
+      onClick: () => {
+        setSelectedSetting(SETTING_OPTIONS.ASPIRATE_CONDITION)
       },
     },
     {
@@ -106,7 +121,6 @@ export function useAspirateSettingsConfig({
         state.delayAspirate !== undefined
           ? t('delay_value', {
               delay: state.delayAspirate.delayDuration,
-              position: state.delayAspirate.positionFromBottom,
             })
           : '',
       enabled: true,
@@ -121,6 +135,7 @@ export function useAspirateSettingsConfig({
         state.retractAspirate !== undefined
           ? t('retract_value', {
               speed: state.retractAspirate.speed,
+              delayDuration: state.retractAspirate.delayDuration,
               position: state.retractAspirate.positionFromBottom,
             })
           : '',
@@ -138,13 +153,13 @@ export function useAspirateSettingsConfig({
               speed: state.touchTipAspirateSpeed,
               position: state.touchTipAspirate,
             })
-          : '',
+          : t('option_disabled'),
       enabled: !sourceIsReservoir,
       onClick: () => {
         if (!sourceIsReservoir) {
           setSelectedSetting(SETTING_OPTIONS.ASPIRATE_TOUCH_TIP)
         } else {
-          makeSnackbar(t('advanced_setting_disabled') as string)
+          makeSnackbar(t('aspirate_setting_disabled') as string)
         }
       },
     },
@@ -162,5 +177,8 @@ export function useAspirateSettingsConfig({
     },
   ]
 
-  return aspirateSettingsItems
+  return aspirateSettingsItems.filter(
+    item =>
+      item.option !== SETTING_OPTIONS.ASPIRATE_CONDITION || isMultiTransfer
+  )
 }

@@ -14,7 +14,7 @@ export const OFF_DECK = 'protocol_api.OFF_DECK'
 /** The variable name for the Python dict containing the custom labware defintions. */
 export const CUSTOM_LABWARE_DICT_NAME = 'CUSTOM_LABWARE'
 
-const INDENT = '    '
+export const INDENT = '    '
 
 /** Indent each of the lines in `text`. */
 export function indentPyLines(text: string): string {
@@ -150,4 +150,15 @@ export function formatPyWellLocation(wellLocation?: WellLocation): string {
     python += `.move(types.Point(${args.join(', ')}))`
   }
   return python
+}
+
+export function getChunkForIndentingLists(
+  lists: string[],
+  size: number
+): string[][] {
+  const chunks: string[][] = []
+  for (let index = 0; index < lists.length; index += size) {
+    chunks.push(lists.slice(index, index + size))
+  }
+  return chunks
 }

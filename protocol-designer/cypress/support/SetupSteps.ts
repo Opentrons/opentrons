@@ -57,7 +57,7 @@ export enum SetupContent {
   SampleLiquidName = 'My liquid!',
   ProtocolSteps = 'Protocol steps',
   AddStep = 'Add Step',
-  NestDeepWell = 'NEST 96 Deep Well Plate 2mL',
+  NestDeepWell = 'NEST 96 Deep Well Plate 2 mL',
   Save = 'Save',
 }
 
@@ -381,7 +381,6 @@ export const SetupSteps = {
   ChoseDeckSlotC2Labware: (): StepThunk => ({
     call: () => {
       chooseDeckSlot('C2')
-        .find('.Box-sc-8ozbhb-0.kIDovv')
         .find('a[role="button"]')
         .contains(RegexSetupContent.slotText)
         .click({ force: true })
@@ -603,7 +602,7 @@ export const SetupSteps = {
   }),
 
   /**
-   * Adds "NEST 96 Deep Well Plate 2mL".
+   * Adds "NEST 96 Deep Well Plate 2 mL".
    */
   AddNest96DeepWellPlate: (): StepThunk => ({
     call: () => {

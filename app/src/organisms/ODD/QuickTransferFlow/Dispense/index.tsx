@@ -22,10 +22,11 @@ const PADDING_TOP_FOR_NAV = '12rem'
 interface DispenseProps {
   state: QuickTransferSummaryState
   dispatch: Dispatch<QuickTransferSummaryAction>
+  isMultiTransfer: boolean
 }
 
 export function Dispense(props: DispenseProps): JSX.Element | null {
-  const { state, dispatch } = props
+  const { state, dispatch, isMultiTransfer } = props
   const { t } = useTranslation(['quick_transfer', 'shared'])
   const [
     selectedSetting,
@@ -38,6 +39,7 @@ export function Dispense(props: DispenseProps): JSX.Element | null {
   const dispenseSettingsItems = useDispenseSettingsConfig({
     state,
     setSelectedSetting,
+    isMultiTransfer,
   })
 
   const handleResetSettings = (): void => {
@@ -52,7 +54,8 @@ export function Dispense(props: DispenseProps): JSX.Element | null {
       {showResetAdvancedSettingsModal ? (
         <ResetAdvancedSettingsModal
           kind="dispense"
-          liquidClass={state.liquidClass}
+          state={state}
+          dispatch={dispatch}
           onClose={handleClose}
         />
       ) : null}
@@ -77,6 +80,7 @@ export function Dispense(props: DispenseProps): JSX.Element | null {
             onBack={() => {
               setSelectedSetting(null)
             }}
+            isMultiTransfer={isMultiTransfer}
           />
         </Flex>
         <MediumButton

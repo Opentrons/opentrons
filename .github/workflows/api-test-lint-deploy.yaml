@@ -17,6 +17,7 @@ on:
       - '.github/workflows/api-test-lint-deploy.yaml'
       - '.github/actions/python/**'
       - '.github/workflows/utils.js'
+      - 'package-testing/**'
   push:
     paths:
       - 'api/**'
@@ -67,7 +68,7 @@ jobs:
       - name: Lint with opentrons_hardware
         run: make -C api lint
   test:
-    name: 'opentrons package tests on ${{ matrix.os }}, python ${{ matrix.python }}'
+    name: 'opentrons package tests on ${{ matrix.os }}, python ${{ matrix.python }}, ot-hardware ${{ matrix.with-ot-hardware }}'
     timeout-minutes: 30
     needs: [lint]
     strategy:

@@ -1,0 +1,81 @@
+{
+  "allowedRoles": ["labware", "lid"],
+  "ordering": [],
+  "brand": {
+    "brand": "Opentrons",
+    "brandId": []
+  },
+  "metadata": {
+    "displayName": "Opentrons Flex Tip Rack Lid",
+    "displayCategory": "lid",
+    "displayVolumeUnits": "µL",
+    "tags": []
+  },
+  "$otSharedSchema": "#/labware/schemas/3",
+  "extents": {
+    "total": {
+      "backLeftBottom": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "frontRightTop": {
+        "x": 127.7,
+        "y": -78.75,
+        "z": 17
+      }
+    }
+  },
+  "features": {
+    "opentronsFlexTipRackLidAsChild": {
+      "matingZ": 0
+    }
+  },
+  "wells": {},
+  "groups": [
+    {
+      "metadata": {},
+      "wells": []
+    }
+  ],
+  "parameters": {
+    "format": "irregular",
+    "quirks": [],
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "isDeckSlotCompatible": false,
+    "loadName": "schema3test_flex_tiprack_lid"
+  },
+  "namespace": "opentrons",
+  "version": 999,
+  "schemaVersion": 3,
+  "stackLimit": 1,
+  "gripForce": 10,
+  "gripHeightFromLabwareOrigin": 10,
+  "gripperOffsets": {
+    "default": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "dropOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      }
+    },
+    "lidDisposalOffsets": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "dropOffset": {
+        "x": 0,
+        "y": 5.0,
+        "z": 50.0
+      }
+    }
+  }
+}

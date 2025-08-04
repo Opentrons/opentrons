@@ -14,10 +14,32 @@ class CustomJSONSnapshotExtension(JSONSnapshotExtension):
                 (r"moduleId='[^']+'", "moduleId='UUID'"),
             ],
             "traceback": [
+                # Pattern to match file paths in tracebacks
                 (r"line \d+,", "line N,"),
+                # This pattern finds absolute paths and uses backreferences (\1, \2)
+                # to keep the surrounding "File " and quotes.
+                (r"(File \")(?:/|[a-zA-Z]:\\).*?(\")", r"\1<PATH>\2"),
+            ],
+            "obj": [
+                (r"(<[\w\.]+ object at 0x)[0-9a-fA-F]+(>)", r"\1UUID\2"),
             ],
         }
-        self.id_keys_to_replace = ["id", "pipetteId", "labwareId", "serialNumber", "moduleId", "liquidId", "offsetId", "lidId"]
+        self.id_keys_to_replace = [
+            "id",
+            "pipetteId",
+            "labwareId",
+            "serialNumber",
+            "moduleId",
+            "liquidId",
+            "offsetId",
+            "lidId",
+            "liquidClassId",
+            "labwareIds",
+            "primaryLabwareId",
+            "lidLabwareId",
+            "stackLabwareId",
+            "lid_id",
+        ]
         self.timestamp_keys_to_replace = [
             "createdAt",
             "startedAt",
@@ -38,7 +60,15 @@ class CustomJSONSnapshotExtension(JSONSnapshotExtension):
         return data
 
     def process_field(self, key: str, value: Union[str, Any]) -> Union[str, Any]:
+        # Do not inspect the "files" key
+        # Then we can always just use all the custom labware for each analysis.
+        # If we don't do this, anytime we add custom labware,
+        # all protocol snapshots will be altered.
+        if key == "files":
+            return []
         if key in self.id_keys_to_replace:
+            if isinstance(value, list):
+                return ["UUID"] * len(value)
             return "UUID"
         if key in self.timestamp_keys_to_replace:
             return "TIMESTAMP"

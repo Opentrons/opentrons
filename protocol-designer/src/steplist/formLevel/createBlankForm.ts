@@ -31,7 +31,7 @@ const getStepType = (stepType: StepType): string => {
       return 'magnetic module state'
     }
     case 'temperature': {
-      return 'temperature module state'
+      return 'temperature'
     }
     default: {
       return stepType

@@ -38,16 +38,16 @@ describe('FileUploadMessagesModal', () => {
     vi.mocked(getFileUploadMessages).mockReturnValue({
       isError: false,
       messageKey: 'DID_MIGRATE',
-      migrationsRan: ['8.1.0'],
+      migrationsRan: ['8.5.0'],
     })
     render()
     screen.getByText(
       'Your protocol was made in an older version of Protocol Designer'
     )
     screen.getByText(
-      'Your protocol will be automatically updated to the latest version.'
+      'Your protocol and included labware will be automatically updated to the latest version. We recommend making a separate copy of your file before importing.'
     )
-    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Import' }))
     expect(vi.mocked(dismissFileUploadMessage)).toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(vi.mocked(undoLoadFile)).toHaveBeenCalled()

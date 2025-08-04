@@ -29,8 +29,15 @@ import type {
 export type DeckSlot = string
 type THERMOCYCLER_STATE = 'thermocyclerState'
 type THERMOCYCLER_PROFILE = 'thermocyclerProfile'
+
+export const TOUCHED_PIPETTABLE_LABWARE: 'TOUCHED_PIPETTABLE_LABWARE' =
+  'TOUCHED_PIPETTABLE_LABWARE'
 export interface LabwareTemporalProperties {
-  stack: string[] // a stack of ids from top to bottom
+  // a stack of ids from top to bottom
+  stack: string[]
+  // we currently use this property only to track if a lid has been placed on a "pipettable" labware that could presumably contain liquid
+  // we can expand this type in the future to track other types of sterility for various labware types
+  sterility?: typeof TOUCHED_PIPETTABLE_LABWARE
 }
 
 export interface PipetteTemporalProperties {
@@ -39,7 +46,10 @@ export interface PipetteTemporalProperties {
   entityId?: string
   //  primary nozzle's wellName if over a labware
   wellName?: string
+  //  pipette's nozzle configuration
   nozzles?: NozzleConfigurationStyle
+  //  current tiprack assosciated with pipette
+  tiprackId?: string
 }
 
 export interface MagneticModuleState {
@@ -229,7 +239,6 @@ export interface InnerMixArgs {
 
 export interface InnerDelayArgs {
   seconds: number
-  mmFromBottom: number // TODO: deprecate this
 }
 
 interface CommonArgs {
@@ -765,4 +774,17 @@ export interface Timeline {
 export interface RobotStateAndWarnings {
   robotState: RobotState
   warnings: CommandCreatorWarning[]
+}
+export interface WellContents {
+  // eg 'A1', 'A2' etc
+  wellName?: string
+  groupIds: string[]
+  ingreds: LocationLiquidState
+  highlighted?: boolean
+  selected?: boolean
+  maxVolume?: number
+}
+
+export interface WellContentsByNumber {
+  [wellName: string]: number
 }

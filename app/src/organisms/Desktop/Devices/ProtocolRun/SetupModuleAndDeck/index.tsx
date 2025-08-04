@@ -67,7 +67,6 @@ export const SetupModuleAndDeck = ({
     robotType,
     protocolAnalysis
   )
-
   const isFixtureMismatch = getIsFixtureMismatch(deckConfigCompatibility)
 
   const requiredDeckConfigCompatibility = getRequiredDeckConfig(
@@ -113,7 +112,11 @@ export const SetupModuleAndDeck = ({
               marginBottom={SPACING.spacing24}
             >
               {hasModules ? (
-                <SetupModulesList robotName={robotName} runId={runId} />
+                <SetupModulesList
+                  robotName={robotName}
+                  runId={runId}
+                  deckConfigCompatibility={requiredDeckConfigCompatibility}
+                />
               ) : null}
               {requiredDeckConfigCompatibility.length > 0 ? (
                 <SetupFixtureList

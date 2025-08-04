@@ -12,12 +12,11 @@ import {
   RobotCoordsForeignObject,
   SPACING,
   STACKER_HOPPER_LABWARE_X_OFFSET,
-  STACKER_HOPPER_LABWARE_Y_OFFSET,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   FLEX_STACKER_MODULE_TYPE,
-  getModuleDef2,
+  getModuleDef,
   getModuleDisplayName,
   MAGNETIC_BLOCK_V1,
 } from '@opentrons/shared-data'
@@ -25,18 +24,17 @@ import {
 import { useRunHasStarted } from '/app/resources/runs'
 
 import type { ModuleModel } from '@opentrons/shared-data'
-import type { PhysicalPort } from '/app/redux/modules/api-types'
 
 export interface ModuleInfoProps {
   moduleModel: ModuleModel
   isAttached: boolean
-  physicalPort: PhysicalPort | null
+  physicalPort?: string | null
   runId?: string
 }
 
 export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
   const { moduleModel, physicalPort, isAttached, runId = null } = props
-  const moduleDef = getModuleDef2(moduleModel)
+  const moduleDef = getModuleDef(moduleModel)
   const {
     xDimension,
     yDimension,
@@ -50,14 +48,8 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
   if (moduleModel === MAGNETIC_BLOCK_V1) {
     connectionStatus = t('no_usb_required')
   }
-  if (physicalPort === null && isAttached) {
-    connectionStatus = t('usb_connected_no_port_info')
-  } else if (physicalPort != null && isAttached) {
-    const portDisplay =
-      physicalPort?.hubPort != null
-        ? `${physicalPort.port}.${physicalPort.hubPort}`
-        : physicalPort?.port
-    connectionStatus = t('usb_port_connected', { port: portDisplay })
+  if (isAttached) {
+    connectionStatus = physicalPort ?? t('usb_connected_no_port_info')
   }
 
   return (
@@ -67,11 +59,7 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
           ? STACKER_HOPPER_LABWARE_X_OFFSET
           : 0
       }
-      y={
-        moduleDef.moduleType === FLEX_STACKER_MODULE_TYPE
-          ? STACKER_HOPPER_LABWARE_Y_OFFSET
-          : 0
-      }
+      y={0}
       height={labwareInterfaceYDimension ?? yDimension}
       width={labwareInterfaceXDimension ?? xDimension}
       flexProps={{

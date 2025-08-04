@@ -128,6 +128,7 @@ mock_pipette.consolidate_with_liquid_class(
     dest=[mock_dest_plate["B1"]],
     new_tip="once",
     trash_location=trash_bin_1,
+    keep_last_tip=True,
     liquid_class=protocol.define_liquid_class(
         name="consolidate_step_undefined",
         properties={"p300_single": {"fixture/fixture_tiprack_300_ul/1": {
@@ -151,11 +152,8 @@ mock_pipette.consolidate_with_liquid_class(
             },
             "dispense": {
                 "dispense_position": {"offset": {"x": 0, "y": 0}},
-                "push_out_by_volume": [(0, 0)],
                 "flow_rate_by_volume": [(0, 2.2)],
-                "correction_by_volume": [(0, 0)],
                 "delay": {"enabled": False},
-                "mix": {"enabled": False},
                 "submerge": {
                     "delay": {"enabled": False},
                     "start_position": {"offset": {}},
@@ -167,6 +165,9 @@ mock_pipette.consolidate_with_liquid_class(
                     "touch_tip": {"enabled": False},
                     "blowout": {"enabled": False},
                 },
+                "correction_by_volume": [(0, 0)],
+                "push_out_by_volume": [(0, 0)],
+                "mix": {"enabled": False},
             },
         }}},
     ),
@@ -220,6 +221,7 @@ mock_pipette.consolidate_with_liquid_class(
     dest=[mock_dest_plate["B1"]],
     new_tip="never",
     trash_location=trash_bin_1,
+    keep_last_tip=True,
     liquid_class=protocol.define_liquid_class(
         name="consolidate_step_undefined",
         properties={"p300_single": {"fixture/fixture_tiprack_300_ul/1": {
@@ -243,11 +245,8 @@ mock_pipette.consolidate_with_liquid_class(
             },
             "dispense": {
                 "dispense_position": {"offset": {"x": 0, "y": 0}},
-                "push_out_by_volume": [(0, 0)],
                 "flow_rate_by_volume": [(0, 2.2)],
-                "correction_by_volume": [(0, 0)],
                 "delay": {"enabled": True, "duration": 12},
-                "mix": {"enabled": True, "repetitions": 1, "volume": 36},
                 "submerge": {
                     "delay": {"enabled": False},
                     "start_position": {"offset": {}},
@@ -259,6 +258,9 @@ mock_pipette.consolidate_with_liquid_class(
                     "touch_tip": {"enabled": True, "z_offset": -3.4},
                     "blowout": {"enabled": True, "location": "destination", "flow_rate": 2.3},
                 },
+                "correction_by_volume": [(0, 0)],
+                "push_out_by_volume": [(0, 0)],
+                "mix": {"enabled": True, "repetitions": 1, "volume": 36},
             },
         }}},
     ),
@@ -286,6 +288,7 @@ mock_pipette.consolidate_with_liquid_class(
     dest=[mock_dest_plate["B1"]],
     new_tip="once",
     trash_location=trash_bin_1,
+    keep_last_tip=True,
     liquid_class=protocol.define_liquid_class(
         name="consolidate_step_undefined",
         properties={"p300_single": {"fixture/fixture_tiprack_300_ul/1": {
@@ -309,11 +312,8 @@ mock_pipette.consolidate_with_liquid_class(
             },
             "dispense": {
                 "dispense_position": {"offset": {"x": 0, "y": 0}},
-                "push_out_by_volume": [(0, 0)],
                 "flow_rate_by_volume": [(0, 2.2)],
-                "correction_by_volume": [(0, 0)],
                 "delay": {"enabled": False},
-                "mix": {"enabled": False},
                 "submerge": {
                     "delay": {"enabled": False},
                     "start_position": {"offset": {}},
@@ -325,6 +325,9 @@ mock_pipette.consolidate_with_liquid_class(
                     "touch_tip": {"enabled": False},
                     "blowout": {"enabled": False},
                 },
+                "correction_by_volume": [(0, 0)],
+                "push_out_by_volume": [(0, 0)],
+                "mix": {"enabled": False},
             },
         }}},
     ),

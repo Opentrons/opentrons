@@ -1,0 +1,247 @@
+{
+  "commandAnnotations": [],
+  "commands": [
+    {
+      "commandType": "home",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
+      "notes": [],
+      "params": {},
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    }
+  ],
+  "config": {
+    "apiVersion": [
+      2,
+      20
+    ],
+    "protocolType": "python"
+  },
+  "createdAt": "TIMESTAMP",
+  "errors": [
+    {
+      "createdAt": "TIMESTAMP",
+      "detail": "RuntimeParameterRequired [line 146]: Error 4010 RUNTIME_PARAMETER_VALUE_REQUIRED (RuntimeParameterRequired): CSV parameter needs to be set to a file for full analysis or run.",
+      "errorCode": "4000",
+      "errorInfo": {},
+      "errorType": "ExceptionInProtocolError",
+      "id": "UUID",
+      "isDefined": false,
+      "wrappedErrors": [
+        {
+          "createdAt": "TIMESTAMP",
+          "detail": "CSV parameter needs to be set to a file for full analysis or run.",
+          "errorCode": "4010",
+          "errorInfo": {},
+          "errorType": "RuntimeParameterRequired",
+          "id": "UUID",
+          "isDefined": false,
+          "wrappedErrors": []
+        }
+      ]
+    }
+  ],
+  "files": [],
+  "labware": [],
+  "liquidClasses": [],
+  "liquids": [],
+  "metadata": {
+    "author": "Boren Lin, Opentrons",
+    "description": "Protein samples normalized to a set volume and concentration using data colleted from BCA assay 1",
+    "protocolName": "Protein Quantification and Normalization - Part 2: Normalized Sample Preparation"
+  },
+  "modules": [],
+  "pipettes": [],
+  "result": "parameter-value-required",
+  "robotType": "OT-3 Standard",
+  "runTimeParameters": [
+    {
+      "description": "Absorbance reading of each sample",
+      "displayName": "Readings of Samples",
+      "type": "csv_file",
+      "variableName": "csv_data"
+    },
+    {
+      "default": 40.0,
+      "description": "Number of samples to be assayed (maximum: 40)",
+      "displayName": "Number of Samples",
+      "max": 40.0,
+      "min": 1.0,
+      "type": "int",
+      "value": 40.0,
+      "variableName": "num_sample"
+    },
+    {
+      "choices": [
+        {
+          "displayName": "24 Tube Rack with 1.5mL Tubes",
+          "value": 1
+        },
+        {
+          "displayName": "2mL 96-Well Plate ",
+          "value": 2
+        }
+      ],
+      "default": 1,
+      "description": "Labware used for samples?",
+      "displayName": "Sample Labware",
+      "type": "int",
+      "value": 1,
+      "variableName": "sample_labware"
+    },
+    {
+      "default": 1000.0,
+      "description": "1st standard concentration (highest)",
+      "displayName": "Standard #1",
+      "max": 2000.0,
+      "min": 20.0,
+      "suffix": "ng/µL",
+      "type": "float",
+      "value": 1000.0,
+      "variableName": "std_1"
+    },
+    {
+      "default": 500.0,
+      "description": "2nd standard concentration",
+      "displayName": "Standard #2",
+      "max": 2000.0,
+      "min": 20.0,
+      "suffix": "ng/µL",
+      "type": "float",
+      "value": 500.0,
+      "variableName": "std_2"
+    },
+    {
+      "default": 250.0,
+      "description": "3rd standard concentration",
+      "displayName": "Standard #3",
+      "max": 2000.0,
+      "min": 20.0,
+      "suffix": "ng/µL",
+      "type": "float",
+      "value": 250.0,
+      "variableName": "std_3"
+    },
+    {
+      "default": 125.0,
+      "description": "4th standard concentration",
+      "displayName": "Standard #4",
+      "max": 2000.0,
+      "min": 20.0,
+      "suffix": "ng/µL",
+      "type": "float",
+      "value": 125.0,
+      "variableName": "std_4"
+    },
+    {
+      "default": 62.5,
+      "description": "5th standard concentration",
+      "displayName": "Standard #5",
+      "max": 2000.0,
+      "min": 20.0,
+      "suffix": "ng/µL",
+      "type": "float",
+      "value": 62.5,
+      "variableName": "std_5"
+    },
+    {
+      "default": 31.5,
+      "description": "6th standard concentration (lowest)",
+      "displayName": "Standard #6",
+      "max": 2000.0,
+      "min": 20.0,
+      "suffix": "ng/µL",
+      "type": "float",
+      "value": 31.5,
+      "variableName": "std_6"
+    },
+    {
+      "choices": [
+        {
+          "displayName": "1x",
+          "value": 1.0
+        },
+        {
+          "displayName": "0.5x",
+          "value": 0.5
+        },
+        {
+          "displayName": "0.2x",
+          "value": 0.2
+        }
+      ],
+      "default": 1.0,
+      "description": "Samples will be diluted for 1x, 0.5x, 0.2x?",
+      "displayName": "First Dilution",
+      "type": "float",
+      "value": 1.0,
+      "variableName": "dilution_1"
+    },
+    {
+      "choices": [
+        {
+          "displayName": "1x",
+          "value": 1.0
+        },
+        {
+          "displayName": "0.5x",
+          "value": 0.5
+        },
+        {
+          "displayName": "0.2x",
+          "value": 0.2
+        }
+      ],
+      "default": 0.5,
+      "description": "Samples will be diluted for 1x, 0.5x, 0.2x?",
+      "displayName": "Second Dilution",
+      "type": "float",
+      "value": 0.5,
+      "variableName": "dilution_2"
+    },
+    {
+      "default": 100.0,
+      "description": "Target volume of each sample after normalization?",
+      "displayName": "Normalized Sample Volume",
+      "max": 100.0,
+      "min": 10.0,
+      "suffix": "µL",
+      "type": "int",
+      "value": 100.0,
+      "variableName": "vol_final"
+    },
+    {
+      "default": 100.0,
+      "description": "Amount of protein in each sample after normalization?",
+      "displayName": "Protein Amount",
+      "max": 190.0,
+      "min": 1.0,
+      "suffix": "µg",
+      "type": "int",
+      "value": 100.0,
+      "variableName": "amount_final"
+    },
+    {
+      "choices": [
+        {
+          "displayName": "on the right",
+          "value": 1
+        },
+        {
+          "displayName": "on the left",
+          "value": 2
+        }
+      ],
+      "default": 1,
+      "description": "How P1000 single channel pipette is mounted?",
+      "displayName": "P1000 1-ch Position",
+      "type": "int",
+      "value": 1,
+      "variableName": "pipet_location"
+    }
+  ]
+}

@@ -1,16 +1,23 @@
-import { css } from 'styled-components'
-
 import type { ComponentProps, ReactNode } from 'react'
 
 export interface RobotCoordsTextProps extends ComponentProps<'text'> {
   x: number
+  /** The y-coordinate of the text baseline, in the Opentrons robot orientation, so +y is towards the top of the screen. */
   y: number
   children?: ReactNode
   canHighlight?: boolean
 }
 
-/** SVG text reflected to use take robot coordinates as props */
-// TODO: Ian 2019-05-07 reconcile this with Brian's version
+/**
+ * SVG text positioned with Opentrons robot coordinates.
+ *
+ * This should be used inside a wrapper like RobotWorkSpace that sets up a transformation
+ * to orient the SVG with the Opentrons coordinate convention, with +y towards the
+ * top of the screen.
+ *
+ * This component surgically undoes the wrapper's transformation so the child text is
+ * displayed right-side-up.
+ */
 export function RobotCoordsText(props: RobotCoordsTextProps): JSX.Element {
   const { x, y, children, canHighlight = true, ...additionalProps } = props
   return (
@@ -19,13 +26,7 @@ export function RobotCoordsText(props: RobotCoordsTextProps): JSX.Element {
       x={x}
       y={-1 * y}
       transform="scale(1, -1)"
-      css={
-        !canHighlight
-          ? css`
-              user-select: none;
-            `
-          : undefined
-      }
+      style={{ userSelect: !canHighlight ? 'none' : undefined }}
     >
       {children}
     </text>

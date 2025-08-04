@@ -57,6 +57,7 @@ export function useNotifyDataReady<TData, TError = Error>({
   const forcePollingFF = useFeatureFlag('forceHttpPolling')
   const seenHostname = useRef<string | null>(null)
   const [refetch, setRefetch] = useState<HTTPRefetchFrequency>(null)
+  const [pendingRefetch, setPendingRefetch] = useState(false)
   const [
     hasEncounteredNotificationsError,
     setHasEncounteredNotificationsError,
@@ -106,18 +107,32 @@ export function useNotifyDataReady<TData, TError = Error>({
         })
       }
     } else if ('refetch' in data || 'unsubscribe' in data) {
-      setRefetch('once')
+      setRefetch(currentRefetch => {
+        // A refetch is already in progress, mark that we need to do another
+        // one after the current refetch resolves.
+        if (currentRefetch === 'once') {
+          setPendingRefetch(true)
+          return currentRefetch
+        }
+        // No refetch is in progress, start one immediately.
+        else {
+          return 'once'
+        }
+      })
     }
   }, [])
 
   const notifyOnSettled = useCallback(
     (data: TData | undefined, error: TError | null) => {
       if (refetch === 'once') {
-        setRefetch(null)
+        setRefetch(pendingRefetch ? 'once' : null)
+        // We only ever need to queue up one additional refetch to get the latest
+        // data, so it's safe to the pending to false as soon as the refetch settles.
+        setPendingRefetch(false)
       }
       options.onSettled?.(data, error)
     },
-    [refetch, options.onSettled]
+    [refetch, pendingRefetch, options.onSettled]
   )
 
   const isNotifyEnabled =

@@ -1,0 +1,12 @@
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-20);
+  row-gap: var(--spacing-4);
+}
+
+.absorbance_reader {
+  display: flex;
+  align-items: center;
+  grid-gap: var(--spacing-4);
+}

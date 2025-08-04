@@ -11,9 +11,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { RecoveryRadioGroup } from '/app/organisms/ErrorRecoveryFlows/shared/RecoveryRadioGroup'
-
-import { DESKTOP_ONLY, ODD_ONLY, RECOVERY_MAP } from '../constants'
+import { RECOVERY_MAP } from '../constants'
 import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 
@@ -32,6 +30,7 @@ export function HoldingLabware({
   currentRecoveryOptionUtils,
   recoveryCommands,
   recoveryMap,
+  isOnDevice,
 }: RecoveryContentProps): JSX.Element {
   const {
     proceedNextStep,
@@ -85,12 +84,12 @@ export function HoldingLabware({
           case STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
             return proceedToRouteAndStep(
               STACKER_SHUTTLE_EMPTY_RETRY.ROUTE,
-              STACKER_SHUTTLE_EMPTY_RETRY.STEPS.CONFIRM_RETRY
+              STACKER_SHUTTLE_EMPTY_RETRY.STEPS.FILL_HOPPER
             )
           case STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
             return proceedToRouteAndStep(
               STACKER_SHUTTLE_EMPTY_SKIP.ROUTE,
-              STACKER_SHUTTLE_EMPTY_SKIP.STEPS.CONFIRM_RETRY
+              STACKER_SHUTTLE_EMPTY_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE
             )
           default: {
             console.error('Unexpected recovery option for gripper routing.')
@@ -123,18 +122,12 @@ export function HoldingLabware({
         >
           {buildTitle()}
         </StyledText>
-        <Flex css={ODD_ONLY}>
-          <ODDGripperHoldingLwOptions
+        <Flex>
+          <GripperHoldingLwOptions
             selectedOption={selectedOption}
             setSelectedOption={setSelectionOption}
             t={t}
-          />
-        </Flex>
-        <Flex css={DESKTOP_ONLY}>
-          <DesktopGripperHoldingLwOptions
-            selectedOption={selectedOption}
-            setSelectedOption={setSelectionOption}
-            t={t}
+            isOnDevice={isOnDevice}
           />
         </Flex>
       </Flex>
@@ -150,15 +143,17 @@ interface GripperHoldingOptionsProps {
   t: TFunction
   selectedOption: HoldingLabwareOption
   setSelectedOption: (option: HoldingLabwareOption) => void
+  isOnDevice: boolean
 }
 
-function ODDGripperHoldingLwOptions({
+function GripperHoldingLwOptions({
   t,
   selectedOption,
   setSelectedOption,
+  isOnDevice,
 }: GripperHoldingOptionsProps): JSX.Element {
   return (
-    <Flex css={ODD_OPTIONS_STLYE}>
+    <Flex css={OPTIONS_STLYE}>
       {HOLDING_LABWARE_OPTIONS.map(option => {
         const optionCopy = getCopyFromOption(option, t)
         return (
@@ -171,41 +166,11 @@ function ODDGripperHoldingLwOptions({
             }}
             isSelected={option === selectedOption}
             radioButtonType="large"
+            largeDesktopBorderRadius={!isOnDevice}
           />
         )
       })}
     </Flex>
-  )
-}
-
-function DesktopGripperHoldingLwOptions({
-  t,
-  selectedOption,
-  setSelectedOption,
-}: GripperHoldingOptionsProps): JSX.Element {
-  return (
-    <RecoveryRadioGroup
-      css={RADIO_GAP}
-      onChange={e => {
-        setSelectedOption(e.currentTarget.value as HoldingLabwareOption)
-      }}
-      value={selectedOption}
-      options={HOLDING_LABWARE_OPTIONS.map(
-        option =>
-          ({
-            value: option,
-            children: (
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
-                role="label"
-                htmlFor={option}
-              >
-                {getCopyFromOption(option, t)}
-              </StyledText>
-            ),
-          } as const)
-      )}
-    />
   )
 }
 
@@ -229,12 +194,8 @@ const CONTAINER_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
 `
 
-const ODD_OPTIONS_STLYE = css`
+const OPTIONS_STLYE = css`
   flex-direction: ${DIRECTION_COLUMN};
   width: 100%;
   gap: ${SPACING.spacing8};
-`
-
-const RADIO_GAP = `
-  gap: ${SPACING.spacing4};
 `

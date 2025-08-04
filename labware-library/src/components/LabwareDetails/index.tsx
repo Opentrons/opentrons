@@ -1,6 +1,5 @@
 // full-width labware details
-import { isNewLabware } from '../../definitions'
-import { Gallery, LoadName, NewLabwareAlert, Tags } from '../labware-ui'
+import { Gallery, LoadName, Tags } from '../labware-ui'
 import { LabwareDetailsBox } from './LabwareDetailsBox'
 import { LabwareTitle } from './LabwareTitle'
 import styles from './styles.module.css'
@@ -24,7 +23,6 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
       <div className={styles.gallery_container}>
         <Gallery definition={definition} />
         <Tags definition={definition} className={styles.tags_container} />
-        {isNewLabware(definition) && <NewLabwareAlert />}
         <LoadName loadName={loadName} />
       </div>
 

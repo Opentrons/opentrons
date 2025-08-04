@@ -1,0 +1,124 @@
+/* flex grid formatting for visual parts lists */
+
+div.parts-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start; 
+  gap: 5px; 
+}
+
+div.parts-list figure {
+  width: 200px;
+}
+
+/* Bolder darker text for parts list captions */
+div.parts-list figcaption {
+  font-weight: 600;
+  color: #4A4C4E;
+}
+
+/* But regular styling for sub-captions, e.g. screw size */
+div.parts-list figcaption .part-info {
+  font-weight: 400;
+  color: #737578;
+  margin-top: 0;
+}
+
+/* Border for screenshot figures */
+
+figure.screenshot img {
+  border: 1px solid #888;
+}
+
+/* 2-up figures for compare/contrast */
+
+figure.side-by-side p {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start; 
+  gap: 2%; 
+}
+
+figure.side-by-side img {
+  width: 48%;
+}
+
+/* Circular bullets for instruction lists */
+
+.instruction-list > ol {
+  list-style: none; 
+  padding-left: 0; 
+}
+
+
+.instruction-list > ol > li {
+  margin-bottom: 0.5em; 
+  position: relative; 
+  padding-left: 2.5em; 
+}
+
+
+.instruction-list > ol > li::before {
+  content: counter(list-item); 
+  background-color: #006CFA; 
+  color: white; 
+  border-radius: 50%; 
+  width: 1.8em; 
+  height: 1.8em; 
+  line-height: 1.8em; 
+  text-align: center; 
+  display: inline-flex; 
+  justify-content: center; 
+  align-items: center; 
+  position: absolute; 
+  left: 0; 
+  top: 0; 
+  font-weight: bold; 
+  font-size: 0.9em; 
+}
+
+.instruction-list > ol > li img {
+  width: 80%;
+  margin: 1em auto;
+  display: block;
+}
+
+/* Dots for status light colors */
+.status-dot {
+  height: 1rem;
+  width: 1rem;
+  border-radius: 50%;
+  display: inline-block;
+  vertical-align: middle;
+  border: 1px solid black;
+  margin-right: 5px;
+ }
+
+ .status-dot.white {
+  background-color: #F8F6F0;
+  animation: pulse-white 3s;
+  animation-iteration-count: 3;
+ }
+
+ .status-dot.green {
+  background-color: green;
+ }
+
+ .status-dot.blue {
+  background-color: #006CFA;
+ }
+
+ .status-dot.red {
+  background-color: red;
+ }
+
+ .status-dot.yellow {
+  background-color: #F09D20;
+ }
+
+ /* Aligns status dots and text if needed*/
+.status-dot-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}

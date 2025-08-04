@@ -35,6 +35,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
+import { useModuleUSBPort } from '/app/local-resources/modules'
 import { UpdateBanner } from '/app/molecules/UpdateBanner'
 import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
@@ -139,10 +140,10 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [showSetupWizard, setShowSetupWizard] = useState(false)
   const [showFWBanner, setShowFWBanner] = useState(true)
   const [showCalModal, setShowCalModal] = useState(false)
-
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   const runStatus = useCurrentRunStatus()
+  const { parseModuleUSBPort } = useModuleUSBPort()
 
   const isPipetteReady =
     !Boolean(attachPipetteRequired) &&
@@ -437,15 +438,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   slotName != null
                     ? t('deck_slot', { slot: slotName }) + ' - '
                     : null}
-                  {module?.usbPort !== null
-                    ? t('usb_port', {
-                        port: module?.usbPort?.port,
-                        hubPort:
-                          module?.usbPort?.hubPort != null
-                            ? `.${module.usbPort.hubPort}`
-                            : '',
-                      })
-                    : t('usb_port_not_connected')}
+                  {parseModuleUSBPort(module)}
                 </StyledText>
                 <Flex
                   data-testid={`ModuleCard_display_name_${module.serialNumber}`}

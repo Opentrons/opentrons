@@ -153,6 +153,7 @@ describe('Aspirate', () => {
         },
       } as any,
       dispatch: vi.fn(),
+      isMultiTransfer: false,
     }
     vi.mocked(AspirateSettingItem).mockReturnValue(
       <div>mock AspirateSettingItem</div>

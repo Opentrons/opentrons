@@ -21,10 +21,11 @@ const PADDING_TOP_FOR_NAV = '12rem'
 interface AspirateProps {
   state: QuickTransferSummaryState
   dispatch: Dispatch<QuickTransferSummaryAction>
+  isMultiTransfer: boolean
 }
 
 export function Aspirate(props: AspirateProps): JSX.Element | null {
-  const { state, dispatch } = props
+  const { state, dispatch, isMultiTransfer } = props
   const { t } = useTranslation(['quick_transfer', 'shared'])
   const [
     selectedSetting,
@@ -39,6 +40,7 @@ export function Aspirate(props: AspirateProps): JSX.Element | null {
     state,
     dispatch,
     setSelectedSetting,
+    isMultiTransfer,
   })
 
   const handleResetSettings = (): void => {
@@ -52,8 +54,9 @@ export function Aspirate(props: AspirateProps): JSX.Element | null {
     <>
       {showResetAdvancedSettingsModal ? (
         <ResetAdvancedSettingsModal
+          state={state}
           kind="aspirate"
-          liquidClass={state.liquidClass}
+          dispatch={dispatch}
           onClose={handleClose}
         />
       ) : null}
@@ -80,6 +83,7 @@ export function Aspirate(props: AspirateProps): JSX.Element | null {
             onBack={() => {
               setSelectedSetting(null)
             }}
+            isMultiTransfer={isMultiTransfer}
           />
         </Flex>
         <MediumButton

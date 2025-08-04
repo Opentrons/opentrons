@@ -5,9 +5,9 @@ import { v4 as uuid } from 'uuid'
 import { EmptySelectorButton, Flex, SPACING, WRAP } from '@opentrons/components'
 import { TEMPERATURE_MODULE_TYPE } from '@opentrons/shared-data'
 
-import { MODULES_FIELD_NAME } from '../../organisms/ModulesAndFixturesSection'
+import { MODULES_FIELD_NAME } from '/ai-client/organisms/ModulesAndFixturesSection'
 
-import type { DisplayModule } from '../../organisms/ModulesAndFixturesSection'
+import type { DisplayModule } from '/ai-client/organisms/ModulesAndFixturesSection'
 
 export function ModulesButtonGroup({
   modules,

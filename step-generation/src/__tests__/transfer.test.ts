@@ -168,6 +168,7 @@ mock_pipette.transfer_with_liquid_class(
     dest=[mock_dest_plate["B2"]],
     new_tip="always",
     trash_location=waste_chute,
+    keep_last_tip=True,
     liquid_class=protocol.define_liquid_class(
         name="transfer_step_1",
         properties={"p300_single": {"fixture/fixture_tiprack_300_ul/1": {
@@ -205,11 +206,8 @@ mock_pipette.transfer_with_liquid_class(
                     "offset": {"x": 0, "y": 0, "z": 3},
                     "position_reference": "well-bottom",
                 },
-                "push_out_by_volume": [(0, 0)],
                 "flow_rate_by_volume": [(0, 12)],
-                "correction_by_volume": [(0, 0)],
                 "delay": {"enabled": False},
-                "mix": {"enabled": False},
                 "submerge": {
                     "delay": {"enabled": False},
                     "speed": 52,
@@ -229,6 +227,9 @@ mock_pipette.transfer_with_liquid_class(
                     "touch_tip": {"enabled": False},
                     "blowout": {"enabled": False},
                 },
+                "correction_by_volume": [(0, 0)],
+                "push_out_by_volume": [(0, 0)],
+                "mix": {"enabled": False},
             },
         }}},
     ),
@@ -358,6 +359,7 @@ mock_pipette.transfer_with_liquid_class(
     dest=[mock_dest_plate["B2"]],
     new_tip="never",
     trash_location=trash_bin_1,
+    keep_last_tip=True,
     liquid_class=protocol.define_liquid_class(
         name="transfer_step_1",
         properties={"p300_single": {"fixture/fixture_tiprack_300_ul/1": {
@@ -395,11 +397,8 @@ mock_pipette.transfer_with_liquid_class(
                     "offset": {"x": 0, "y": 0, "z": 3},
                     "position_reference": "well-bottom",
                 },
-                "push_out_by_volume": [(0, 0)],
                 "flow_rate_by_volume": [(0, 12)],
-                "correction_by_volume": [(0, 0)],
                 "delay": {"enabled": False},
-                "mix": {"enabled": False},
                 "submerge": {
                     "delay": {"enabled": False},
                     "speed": 52,
@@ -419,6 +418,9 @@ mock_pipette.transfer_with_liquid_class(
                     "touch_tip": {"enabled": False},
                     "blowout": {"enabled": False},
                 },
+                "correction_by_volume": [(0, 0)],
+                "push_out_by_volume": [(0, 0)],
+                "mix": {"enabled": False},
             },
         }}},
     ),
@@ -610,6 +612,7 @@ mock_pipette.transfer_with_liquid_class(
     dest=[mock_dest_plate["B2"], mock_dest_plate["C2"]],
     new_tip="never",
     trash_location=trash_bin_1,
+    keep_last_tip=True,
     liquid_class=protocol.define_liquid_class(
         name="transfer_step_1",
         properties={"p300_single": {"fixture/fixture_tiprack_300_ul/1": {
@@ -647,11 +650,8 @@ mock_pipette.transfer_with_liquid_class(
                     "offset": {"x": 0, "y": 0, "z": 3},
                     "position_reference": "well-bottom",
                 },
-                "push_out_by_volume": [(0, 0)],
                 "flow_rate_by_volume": [(0, 12)],
-                "correction_by_volume": [(0, 0)],
                 "delay": {"enabled": False},
-                "mix": {"enabled": False},
                 "submerge": {
                     "delay": {"enabled": False},
                     "speed": 52,
@@ -671,6 +671,9 @@ mock_pipette.transfer_with_liquid_class(
                     "touch_tip": {"enabled": False},
                     "blowout": {"enabled": False},
                 },
+                "correction_by_volume": [(0, 0)],
+                "push_out_by_volume": [(0, 0)],
+                "mix": {"enabled": False},
             },
         }}},
     ),
@@ -3245,7 +3248,7 @@ describe('advanced options', () => {
         ...advArgs,
         volume: 350,
         preWetTip: true,
-        aspirateDelay: { mmFromBottom: 14, seconds: 12 },
+        aspirateDelay: { seconds: 12 },
       }
 
       const result = transfer(advArgs, invariantContext, robotStateWithTip)
@@ -3402,7 +3405,7 @@ describe('advanced options', () => {
         ...advArgs,
         volume: 350,
         preWetTip: true,
-        dispenseDelay: { mmFromBottom: 14, seconds: 12 },
+        dispenseDelay: { seconds: 12 },
       }
 
       const result = transfer(advArgs, invariantContext, robotStateWithTip)
@@ -4043,7 +4046,7 @@ describe('advanced options', () => {
           volume: 250,
           times: 2,
         },
-        aspirateDelay: { seconds: 12, mmFromBottom: 14 },
+        aspirateDelay: { seconds: 12 },
       }
 
       // mixes will include the delays after aspirating
@@ -4202,7 +4205,7 @@ describe('advanced options', () => {
       advArgs = {
         ...advArgs,
         volume: 350,
-        aspirateDelay: { seconds: 12, mmFromBottom: 14 },
+        aspirateDelay: { seconds: 12 },
       }
 
       const result = transfer(advArgs, invariantContext, robotStateWithTip)
@@ -4666,7 +4669,7 @@ describe('advanced options', () => {
         ...advArgs,
         volume: 350,
         aspirateAirGapVolume: 5,
-        aspirateDelay: { seconds: 12, mmFromBottom: 14 },
+        aspirateDelay: { seconds: 12 },
       }
 
       const result = transfer(advArgs, invariantContext, robotStateWithTip)
@@ -4825,7 +4828,7 @@ describe('advanced options', () => {
         ...advArgs,
         volume: 350,
         aspirateAirGapVolume: 5,
-        dispenseDelay: { seconds: 12, mmFromBottom: 14 },
+        dispenseDelay: { seconds: 12 },
       }
 
       const result = transfer(advArgs, invariantContext, robotStateWithTip)
@@ -5149,7 +5152,7 @@ describe('advanced options', () => {
           volume: 250,
           times: 2,
         },
-        dispenseDelay: { seconds: 12, mmFromBottom: 14 },
+        dispenseDelay: { seconds: 12 },
       }
 
       // mixes will include the delays after aspirating
@@ -5310,7 +5313,7 @@ describe('advanced options', () => {
       advArgs = {
         ...advArgs,
         volume: 350,
-        dispenseDelay: { seconds: 12, mmFromBottom: 14 },
+        dispenseDelay: { seconds: 12 },
       }
 
       const result = transfer(advArgs, invariantContext, robotStateWithTip)
@@ -5510,6 +5513,7 @@ mock_pipette.transfer_with_liquid_class(
     dest=[mock_dest_plate["B1"]],
     new_tip="never",
     trash_location=trash_bin_1,
+    keep_last_tip=True,
     liquid_class=protocol.define_liquid_class(
         name="transfer_step_1",
         properties={"p300_single": {"fixture/fixture_tiprack_300_ul/1": {
@@ -5547,11 +5551,8 @@ mock_pipette.transfer_with_liquid_class(
                     "offset": {"x": 0, "y": 0, "z": 3},
                     "position_reference": "well-bottom",
                 },
-                "push_out_by_volume": [(0, 0)],
                 "flow_rate_by_volume": [(0, 12)],
-                "correction_by_volume": [(0, 0)],
                 "delay": {"enabled": True, "duration": 12},
-                "mix": {"enabled": True, "repetitions": 1, "volume": 36},
                 "submerge": {
                     "delay": {"enabled": False},
                     "speed": 52,
@@ -5571,6 +5572,9 @@ mock_pipette.transfer_with_liquid_class(
                     "touch_tip": {"enabled": True, "z_offset": -3.4},
                     "blowout": {"enabled": True, "location": "trash", "flow_rate": 2.3},
                 },
+                "correction_by_volume": [(0, 0)],
+                "push_out_by_volume": [(0, 0)],
+                "mix": {"enabled": True, "repetitions": 1, "volume": 36},
             },
         }}},
     ),

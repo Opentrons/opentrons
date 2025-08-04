@@ -22,9 +22,9 @@ F = TypeVar("F", bound=Callable[..., Any])
 def timeit(func: F) -> F:
     @wraps(func)
     def wrapper(*args: Any, **kwargs: Any) -> Any:
-        start_time = time.time()
+        start_time = time.monotonic()
         result = func(*args, **kwargs)
-        end_time = time.time()
+        end_time = time.monotonic()
         elapsed_time = end_time - start_time
         console.print(f"[bold green]{func.__name__} completed in {elapsed_time:.4f} seconds[/bold green]")
         return result

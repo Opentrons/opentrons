@@ -109,7 +109,9 @@ export function ProtocolDropTipModal({
       name: 'information',
       color: COLORS.red50,
       size: SPACING.spacing20,
-      marginRight: SPACING.spacing8,
+      style: {
+        marginRight: SPACING.spacing8,
+      },
     }
   }
 

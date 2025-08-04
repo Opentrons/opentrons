@@ -30,7 +30,6 @@ from ..errors import (
 from ..types import (
     OnLabwareLocation,
     LabwareLocation,
-    LabwareMovementOffsetData,
     OnDeckLabwareLocation,
 )
 
@@ -96,7 +95,8 @@ class LabwareMovementHandler:
         labware_id: str,
         current_location: OnDeckLabwareLocation,
         new_location: OnDeckLabwareLocation,
-        user_offset_data: LabwareMovementOffsetData,
+        user_pick_up_offset: Point,
+        user_drop_offset: Point,
         post_drop_slide_offset: Optional[Point],
     ) -> None:
         ...
@@ -108,7 +108,8 @@ class LabwareMovementHandler:
         labware_definition: LabwareDefinition,
         current_location: OnDeckLabwareLocation,
         new_location: OnDeckLabwareLocation,
-        user_offset_data: LabwareMovementOffsetData,
+        user_pick_up_offset: Point,
+        user_drop_offset: Point,
         post_drop_slide_offset: Optional[Point],
     ) -> None:
         ...
@@ -120,7 +121,8 @@ class LabwareMovementHandler:
         labware_definition: LabwareDefinition | None = None,
         current_location: OnDeckLabwareLocation,
         new_location: OnDeckLabwareLocation,
-        user_offset_data: LabwareMovementOffsetData,
+        user_pick_up_offset: Point,
+        user_drop_offset: Point,
         post_drop_slide_offset: Optional[Point],
     ) -> None:
         """Physically move a labware from one location to another using the gripper.
@@ -193,7 +195,8 @@ class LabwareMovementHandler:
                 self._state_store.geometry.get_final_labware_movement_offset_vectors(
                     from_location=current_location,
                     to_location=new_location,
-                    additional_offset_vector=user_offset_data,
+                    additional_pick_up_offset=user_pick_up_offset,
+                    additional_drop_offset=user_drop_offset,
                     current_labware=labware_definition,
                 )
             )
@@ -274,9 +277,12 @@ class LabwareMovementHandler:
                 await self._tc_movement_flagger.ensure_labware_in_open_thermocycler(
                     labware_parent=parent
                 )
-                await self._hs_movement_flagger.raise_if_labware_latched_on_heater_shaker(
-                    labware_parent=parent
-                )
+                if not self._state_store.labware.is_lid(labware_id):
+                    # Lid placement is actually improved by holding the labware latched on the H/S
+                    # So, we skip this check for lids.
+                    await self._hs_movement_flagger.raise_if_labware_latched_on_heater_shaker(
+                        labware_parent=parent
+                    )
             except ThermocyclerNotOpenError:
                 raise LabwareMovementNotAllowedError(
                     "Cannot move labware to or from a Thermocycler with its lid closed."

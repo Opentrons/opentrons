@@ -39,7 +39,6 @@
         "commandType": {
           "const": "airGapInPlace",
           "default": "airGapInPlace",
-          "enum": ["airGapInPlace"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -105,7 +104,6 @@
         "style": {
           "const": "ALL",
           "default": "ALL",
-          "enum": ["ALL"],
           "title": "Style",
           "type": "string"
         }
@@ -119,7 +117,6 @@
         "commandType": {
           "const": "aspirate",
           "default": "aspirate",
-          "enum": ["aspirate"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -147,7 +144,6 @@
         "commandType": {
           "const": "aspirateInPlace",
           "default": "aspirateInPlace",
-          "enum": ["aspirateInPlace"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -260,6 +256,7 @@
       "type": "object"
     },
     "AspirateProperties": {
+      "additionalProperties": false,
       "description": "Properties specific to the aspirate function.",
       "properties": {
         "aspiratePosition": {
@@ -377,7 +374,6 @@
         "commandType": {
           "const": "aspirateWhileTracking",
           "default": "aspirateWhileTracking",
-          "enum": ["aspirateWhileTracking"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -457,7 +453,6 @@
         "commandType": {
           "const": "blowout",
           "default": "blowout",
-          "enum": ["blowout"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -485,7 +480,6 @@
         "commandType": {
           "const": "blowOutInPlace",
           "default": "blowOutInPlace",
-          "enum": ["blowOutInPlace"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -566,6 +560,7 @@
       "type": "string"
     },
     "BlowoutParams": {
+      "additionalProperties": false,
       "description": "Parameters for blowout.",
       "properties": {
         "flowRate": {
@@ -592,6 +587,7 @@
       "type": "object"
     },
     "BlowoutProperties": {
+      "additionalProperties": false,
       "description": "Blowout properties.",
       "properties": {
         "enable": {
@@ -615,7 +611,6 @@
         "commandType": {
           "const": "calibration/calibrateGripper",
           "default": "calibration/calibrateGripper",
-          "enum": ["calibration/calibrateGripper"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -665,7 +660,6 @@
         "commandType": {
           "const": "calibration/calibrateModule",
           "default": "calibration/calibrateModule",
-          "enum": ["calibration/calibrateModule"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -715,7 +709,6 @@
         "commandType": {
           "const": "calibration/calibratePipette",
           "default": "calibration/calibratePipette",
-          "enum": ["calibration/calibratePipette"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -755,7 +748,6 @@
         "commandType": {
           "const": "robot/closeGripperJaw",
           "default": "robot/closeGripperJaw",
-          "enum": ["robot/closeGripperJaw"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -795,7 +787,6 @@
         "commandType": {
           "const": "heaterShaker/closeLabwareLatch",
           "default": "heaterShaker/closeLabwareLatch",
-          "enum": ["heaterShaker/closeLabwareLatch"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -842,7 +833,6 @@
         "style": {
           "const": "COLUMN",
           "default": "COLUMN",
-          "enum": ["COLUMN"],
           "title": "Style",
           "type": "string"
         }
@@ -863,7 +853,6 @@
         "commandType": {
           "const": "comment",
           "default": "comment",
-          "enum": ["comment"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -904,7 +893,6 @@
         "commandType": {
           "const": "configureForVolume",
           "default": "configureForVolume",
-          "enum": ["configureForVolume"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -956,7 +944,6 @@
         "commandType": {
           "const": "configureNozzleLayout",
           "default": "configureNozzleLayout",
-          "enum": ["configureNozzleLayout"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -1058,7 +1045,6 @@
         "commandType": {
           "const": "custom",
           "default": "custom",
-          "enum": ["custom"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -1093,7 +1079,6 @@
         "commandType": {
           "const": "thermocycler/deactivateBlock",
           "default": "thermocycler/deactivateBlock",
-          "enum": ["thermocycler/deactivateBlock"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -1134,7 +1119,6 @@
         "commandType": {
           "const": "heaterShaker/deactivateHeater",
           "default": "heaterShaker/deactivateHeater",
-          "enum": ["heaterShaker/deactivateHeater"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -1175,7 +1159,6 @@
         "commandType": {
           "const": "thermocycler/deactivateLid",
           "default": "thermocycler/deactivateLid",
-          "enum": ["thermocycler/deactivateLid"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -1216,7 +1199,6 @@
         "commandType": {
           "const": "heaterShaker/deactivateShaker",
           "default": "heaterShaker/deactivateShaker",
-          "enum": ["heaterShaker/deactivateShaker"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -1257,7 +1239,6 @@
         "commandType": {
           "const": "temperatureModule/deactivate",
           "default": "temperatureModule/deactivate",
-          "enum": ["temperatureModule/deactivate"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -1356,6 +1337,7 @@
       "type": "string"
     },
     "DelayParams": {
+      "additionalProperties": false,
       "description": "Parameters for delay.",
       "properties": {
         "duration": {
@@ -1378,7 +1360,8 @@
       "type": "object"
     },
     "DelayProperties": {
-      "description": "Shared properties for delay..",
+      "additionalProperties": false,
+      "description": "Shared properties for delay.",
       "properties": {
         "enable": {
           "description": "Whether delay is enabled.",
@@ -1401,7 +1384,6 @@
         "commandType": {
           "const": "magneticModule/disengage",
           "default": "magneticModule/disengage",
-          "enum": ["magneticModule/disengage"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -1442,7 +1424,6 @@
         "commandType": {
           "const": "dispense",
           "default": "dispense",
-          "enum": ["dispense"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -1470,7 +1451,6 @@
         "commandType": {
           "const": "dispenseInPlace",
           "default": "dispenseInPlace",
-          "enum": ["dispenseInPlace"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -1598,7 +1578,6 @@
         "commandType": {
           "const": "dispenseWhileTracking",
           "default": "dispenseWhileTracking",
-          "enum": ["dispenseWhileTracking"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -1683,7 +1662,6 @@
         "commandType": {
           "const": "dropTip",
           "default": "dropTip",
-          "enum": ["dropTip"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -1711,7 +1689,6 @@
         "commandType": {
           "const": "dropTipInPlace",
           "default": "dropTipInPlace",
-          "enum": ["dropTipInPlace"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -1819,7 +1796,6 @@
         "commandType": {
           "const": "flexStacker/empty",
           "default": "flexStacker/empty",
-          "enum": ["flexStacker/empty"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -1884,7 +1860,6 @@
         "commandType": {
           "const": "magneticModule/engage",
           "default": "magneticModule/engage",
-          "enum": ["magneticModule/engage"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -1930,7 +1905,6 @@
         "commandType": {
           "const": "flexStacker/fill",
           "default": "flexStacker/fill",
-          "enum": ["flexStacker/fill"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -2011,7 +1985,6 @@
         "commandType": {
           "const": "getNextTip",
           "default": "getNextTip",
-          "enum": ["getNextTip"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -2065,7 +2038,6 @@
         "commandType": {
           "const": "getTipPresence",
           "default": "getTipPresence",
-          "enum": ["getTipPresence"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -2106,7 +2078,6 @@
         "commandType": {
           "const": "home",
           "default": "home",
-          "enum": ["home"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -2154,7 +2125,6 @@
         "commandType": {
           "const": "identifyModule",
           "default": "identifyModule",
-          "enum": ["identifyModule"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -2217,7 +2187,6 @@
         "commandType": {
           "const": "absorbanceReader/initialize",
           "default": "absorbanceReader/initialize",
-          "enum": ["absorbanceReader/initialize"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -2304,6 +2273,7 @@
       "type": "object"
     },
     "LiquidClassRecord": {
+      "additionalProperties": false,
       "description": "LiquidClassRecord is our internal representation of an (immutable) liquid class.\n\nConceptually, a liquid class record is the tuple (name, pipette, tip, transfer properties).\nWe consider two liquid classes to be the same if every entry in that tuple is the same; and liquid\nclasses are different if any entry in the tuple is different.\n\nThis class defines the tuple via inheritance so that we can reuse the definitions from shared_data.",
       "properties": {
         "aspirate": {
@@ -2346,6 +2316,7 @@
       "type": "object"
     },
     "LiquidClassTouchTipParams": {
+      "additionalProperties": false,
       "description": "Parameters for touch-tip.",
       "properties": {
         "mmFromEdge": {
@@ -2408,7 +2379,6 @@
             },
             {
               "const": "operationVolume",
-              "enum": ["operationVolume"],
               "type": "string"
             }
           ],
@@ -2426,7 +2396,6 @@
         "commandType": {
           "const": "liquidProbe",
           "default": "liquidProbe",
-          "enum": ["liquidProbe"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -2481,7 +2450,6 @@
         "commandType": {
           "const": "loadLabware",
           "default": "loadLabware",
-          "enum": ["loadLabware"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -2534,12 +2502,10 @@
             },
             {
               "const": "offDeck",
-              "enum": ["offDeck"],
               "type": "string"
             },
             {
               "const": "systemLocation",
-              "enum": ["systemLocation"],
               "type": "string"
             },
             {
@@ -2570,7 +2536,6 @@
         "commandType": {
           "const": "loadLid",
           "default": "loadLid",
-          "enum": ["loadLid"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -2613,12 +2578,10 @@
             },
             {
               "const": "offDeck",
-              "enum": ["offDeck"],
               "type": "string"
             },
             {
               "const": "systemLocation",
-              "enum": ["systemLocation"],
               "type": "string"
             },
             {
@@ -2649,7 +2612,6 @@
         "commandType": {
           "const": "loadLidStack",
           "default": "loadLidStack",
-          "enum": ["loadLidStack"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -2700,12 +2662,10 @@
             },
             {
               "const": "offDeck",
-              "enum": ["offDeck"],
               "type": "string"
             },
             {
               "const": "systemLocation",
-              "enum": ["systemLocation"],
               "type": "string"
             },
             {
@@ -2746,7 +2706,6 @@
         "commandType": {
           "const": "loadLiquidClass",
           "default": "loadLiquidClass",
-          "enum": ["loadLiquidClass"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -2791,7 +2750,6 @@
         "commandType": {
           "const": "loadLiquid",
           "default": "loadLiquid",
-          "enum": ["loadLiquid"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -2828,7 +2786,6 @@
             },
             {
               "const": "EMPTY",
-              "enum": ["EMPTY"],
               "type": "string"
             }
           ],
@@ -2854,7 +2811,6 @@
         "commandType": {
           "const": "loadModule",
           "default": "loadModule",
-          "enum": ["loadModule"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -2903,7 +2859,6 @@
         "commandType": {
           "const": "loadPipette",
           "default": "loadPipette",
-          "enum": ["loadPipette"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -2963,6 +2918,7 @@
       "type": "string"
     },
     "MixParams": {
+      "additionalProperties": false,
       "description": "Parameters for mix.",
       "properties": {
         "repetitions": {
@@ -2991,6 +2947,7 @@
       "type": "object"
     },
     "MixProperties": {
+      "additionalProperties": false,
       "description": "Mixing properties.",
       "properties": {
         "enable": {
@@ -3065,7 +3022,6 @@
         "commandType": {
           "const": "robot/moveAxesRelative",
           "default": "robot/moveAxesRelative",
-          "enum": ["robot/moveAxesRelative"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -3095,6 +3051,9 @@
             "type": "number"
           },
           "description": "A dictionary mapping axes to relative movements in mm.",
+          "propertyNames": {
+            "$ref": "#/$defs/MotorAxis"
+          },
           "title": "Axis Map",
           "type": "object"
         },
@@ -3114,7 +3073,6 @@
         "commandType": {
           "const": "robot/moveAxesTo",
           "default": "robot/moveAxesTo",
-          "enum": ["robot/moveAxesTo"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -3144,6 +3102,9 @@
             "type": "number"
           },
           "description": "The specified axes to move to an absolute deck position with.",
+          "propertyNames": {
+            "$ref": "#/$defs/MotorAxis"
+          },
           "title": "Axis Map",
           "type": "object"
         },
@@ -3152,6 +3113,9 @@
             "type": "number"
           },
           "description": "The critical point to move the mount with.",
+          "propertyNames": {
+            "$ref": "#/$defs/MotorAxis"
+          },
           "title": "Critical Point",
           "type": "object"
         },
@@ -3171,7 +3135,6 @@
         "commandType": {
           "const": "moveLabware",
           "default": "moveLabware",
-          "enum": ["moveLabware"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -3219,12 +3182,10 @@
             },
             {
               "const": "offDeck",
-              "enum": ["offDeck"],
               "type": "string"
             },
             {
               "const": "systemLocation",
-              "enum": ["systemLocation"],
               "type": "string"
             },
             {
@@ -3254,7 +3215,6 @@
         "commandType": {
           "const": "moveRelative",
           "default": "moveRelative",
-          "enum": ["moveRelative"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -3304,7 +3264,6 @@
         "commandType": {
           "const": "moveToAddressableArea",
           "default": "moveToAddressableArea",
-          "enum": ["moveToAddressableArea"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -3332,7 +3291,6 @@
         "commandType": {
           "const": "moveToAddressableAreaForDropTip",
           "default": "moveToAddressableAreaForDropTip",
-          "enum": ["moveToAddressableAreaForDropTip"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -3462,7 +3420,6 @@
         "commandType": {
           "const": "moveToCoordinates",
           "default": "moveToCoordinates",
-          "enum": ["moveToCoordinates"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -3523,7 +3480,6 @@
         "commandType": {
           "const": "robot/moveTo",
           "default": "robot/moveTo",
-          "enum": ["robot/moveTo"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -3551,7 +3507,6 @@
         "commandType": {
           "const": "calibration/moveToMaintenancePosition",
           "default": "calibration/moveToMaintenancePosition",
-          "enum": ["calibration/moveToMaintenancePosition"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -3617,7 +3572,6 @@
         "commandType": {
           "const": "moveToWell",
           "default": "moveToWell",
-          "enum": ["moveToWell"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -3689,6 +3643,7 @@
       "type": "string"
     },
     "MultiDispenseProperties": {
+      "additionalProperties": false,
       "description": "Properties specific to the multi-dispense function.",
       "properties": {
         "conditioningByVolume": {
@@ -3882,7 +3837,6 @@
         "commandType": {
           "const": "robot/openGripperJaw",
           "default": "robot/openGripperJaw",
-          "enum": ["robot/openGripperJaw"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -3916,7 +3870,6 @@
         "commandType": {
           "const": "heaterShaker/openLabwareLatch",
           "default": "heaterShaker/openLabwareLatch",
-          "enum": ["heaterShaker/openLabwareLatch"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -3957,7 +3910,6 @@
         "commandType": {
           "const": "pickUpTip",
           "default": "pickUpTip",
-          "enum": ["pickUpTip"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -4064,7 +4016,6 @@
         "commandType": {
           "const": "prepareToAspirate",
           "default": "prepareToAspirate",
-          "enum": ["prepareToAspirate"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -4105,7 +4056,6 @@
         "commandType": {
           "const": "pressureDispense",
           "default": "pressureDispense",
-          "enum": ["pressureDispense"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -4242,7 +4192,6 @@
         "style": {
           "const": "QUADRANT",
           "default": "QUADRANT",
-          "enum": ["QUADRANT"],
           "title": "Style",
           "type": "string"
         }
@@ -4257,7 +4206,6 @@
         "commandType": {
           "const": "absorbanceReader/read",
           "default": "absorbanceReader/read",
-          "enum": ["absorbanceReader/read"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -4303,7 +4251,6 @@
         "commandType": {
           "const": "reloadLabware",
           "default": "reloadLabware",
-          "enum": ["reloadLabware"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -4339,6 +4286,7 @@
       "type": "object"
     },
     "RetractAspirate": {
+      "additionalProperties": false,
       "description": "Shared properties for the retract function after aspiration.",
       "properties": {
         "airGapByVolume": {
@@ -4420,7 +4368,6 @@
         "commandType": {
           "const": "retractAxis",
           "default": "retractAxis",
-          "enum": ["retractAxis"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -4455,6 +4402,7 @@
       "type": "object"
     },
     "RetractDispense": {
+      "additionalProperties": false,
       "description": "Shared properties for the retract function after dispense.",
       "properties": {
         "airGapByVolume": {
@@ -4541,7 +4489,6 @@
         "commandType": {
           "const": "flexStacker/retrieve",
           "default": "flexStacker/retrieve",
-          "enum": ["flexStacker/retrieve"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -4608,7 +4555,6 @@
         "style": {
           "const": "ROW",
           "default": "ROW",
-          "enum": ["ROW"],
           "title": "Style",
           "type": "string"
         }
@@ -4623,7 +4569,6 @@
         "commandType": {
           "const": "thermocycler/runExtendedProfile",
           "default": "thermocycler/runExtendedProfile",
-          "enum": ["thermocycler/runExtendedProfile"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -4684,7 +4629,6 @@
         "commandType": {
           "const": "thermocycler/runProfile",
           "default": "thermocycler/runProfile",
-          "enum": ["thermocycler/runProfile"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -4756,7 +4700,6 @@
         "commandType": {
           "const": "savePosition",
           "default": "savePosition",
-          "enum": ["savePosition"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -4807,7 +4750,6 @@
         "commandType": {
           "const": "sealPipetteToTip",
           "default": "sealPipetteToTip",
-          "enum": ["sealPipetteToTip"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -4874,7 +4816,6 @@
         "commandType": {
           "const": "heaterShaker/setAndWaitForShakeSpeed",
           "default": "heaterShaker/setAndWaitForShakeSpeed",
-          "enum": ["heaterShaker/setAndWaitForShakeSpeed"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -4920,7 +4861,6 @@
         "commandType": {
           "const": "setRailLights",
           "default": "setRailLights",
-          "enum": ["setRailLights"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -4961,7 +4901,6 @@
         "commandType": {
           "const": "setStatusBar",
           "default": "setStatusBar",
-          "enum": ["setStatusBar"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -5001,7 +4940,6 @@
         "commandType": {
           "const": "flexStacker/setStoredLabware",
           "default": "flexStacker/setStoredLabware",
-          "enum": ["flexStacker/setStoredLabware"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -5101,7 +5039,6 @@
         "commandType": {
           "const": "thermocycler/setTargetBlockTemperature",
           "default": "thermocycler/setTargetBlockTemperature",
-          "enum": ["thermocycler/setTargetBlockTemperature"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -5157,7 +5094,6 @@
         "commandType": {
           "const": "thermocycler/setTargetLidTemperature",
           "default": "thermocycler/setTargetLidTemperature",
-          "enum": ["thermocycler/setTargetLidTemperature"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -5198,6 +5134,7 @@
       "type": "object"
     },
     "SingleDispenseProperties": {
+      "additionalProperties": false,
       "description": "Properties specific to the single-dispense function.",
       "properties": {
         "correctionByVolume": {
@@ -5352,7 +5289,6 @@
         "style": {
           "const": "SINGLE",
           "default": "SINGLE",
-          "enum": ["SINGLE"],
           "title": "Style",
           "type": "string"
         }
@@ -5424,7 +5360,6 @@
         "commandType": {
           "const": "flexStacker/store",
           "default": "flexStacker/store",
-          "enum": ["flexStacker/store"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -5460,6 +5395,7 @@
       "type": "object"
     },
     "Submerge": {
+      "additionalProperties": false,
       "description": "Shared properties for the submerge function before aspiration or dispense.",
       "properties": {
         "delay": {
@@ -5515,6 +5451,7 @@
       "type": "object"
     },
     "TipPosition": {
+      "additionalProperties": false,
       "description": "Properties for tip position reference and relative offset.",
       "properties": {
         "offset": {
@@ -5542,7 +5479,6 @@
         "commandType": {
           "const": "touchTip",
           "default": "touchTip",
-          "enum": ["touchTip"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -5608,6 +5544,7 @@
       "type": "object"
     },
     "TouchTipProperties": {
+      "additionalProperties": false,
       "description": "Shared properties for the touch-tip function.",
       "properties": {
         "enable": {
@@ -5631,7 +5568,6 @@
         "commandType": {
           "const": "tryLiquidProbe",
           "default": "tryLiquidProbe",
-          "enum": ["tryLiquidProbe"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -5686,7 +5622,6 @@
         "commandType": {
           "const": "unsafe/blowOutInPlace",
           "default": "unsafe/blowOutInPlace",
-          "enum": ["unsafe/blowOutInPlace"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -5733,7 +5668,6 @@
         "commandType": {
           "const": "unsafe/dropTipInPlace",
           "default": "unsafe/dropTipInPlace",
-          "enum": ["unsafe/dropTipInPlace"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -5779,7 +5713,6 @@
         "commandType": {
           "const": "unsafe/engageAxes",
           "default": "unsafe/engageAxes",
-          "enum": ["unsafe/engageAxes"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -5823,7 +5756,6 @@
         "commandType": {
           "const": "unsafe/flexStacker/closeLatch",
           "default": "unsafe/flexStacker/closeLatch",
-          "enum": ["unsafe/flexStacker/closeLatch"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -5864,7 +5796,6 @@
         "commandType": {
           "const": "unsafe/flexStacker/manualRetrieve",
           "default": "unsafe/flexStacker/manualRetrieve",
-          "enum": ["unsafe/flexStacker/manualRetrieve"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -5925,7 +5856,6 @@
         "commandType": {
           "const": "unsafe/flexStacker/openLatch",
           "default": "unsafe/flexStacker/openLatch",
-          "enum": ["unsafe/flexStacker/openLatch"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -5966,7 +5896,6 @@
         "commandType": {
           "const": "unsafe/flexStacker/prepareShuttle",
           "default": "unsafe/flexStacker/prepareShuttle",
-          "enum": ["unsafe/flexStacker/prepareShuttle"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -6013,7 +5942,6 @@
         "commandType": {
           "const": "unsafe/placeLabware",
           "default": "unsafe/placeLabware",
-          "enum": ["unsafe/placeLabware"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -6072,7 +6000,6 @@
         "commandType": {
           "const": "unsafe/ungripLabware",
           "default": "unsafe/ungripLabware",
-          "enum": ["unsafe/ungripLabware"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -6106,7 +6033,6 @@
         "commandType": {
           "const": "unsealPipetteFromTip",
           "default": "unsealPipetteFromTip",
-          "enum": ["unsealPipetteFromTip"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -6161,7 +6087,6 @@
         "commandType": {
           "const": "unsafe/updatePositionEstimators",
           "default": "unsafe/updatePositionEstimators",
-          "enum": ["unsafe/updatePositionEstimators"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -6225,7 +6150,6 @@
         "commandType": {
           "const": "verifyTipPresence",
           "default": "verifyTipPresence",
-          "enum": ["verifyTipPresence"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -6275,7 +6199,6 @@
         "commandType": {
           "const": "thermocycler/waitForBlockTemperature",
           "default": "thermocycler/waitForBlockTemperature",
-          "enum": ["thermocycler/waitForBlockTemperature"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -6316,7 +6239,6 @@
         "commandType": {
           "const": "waitForDuration",
           "default": "waitForDuration",
-          "enum": ["waitForDuration"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -6362,7 +6284,6 @@
         "commandType": {
           "const": "thermocycler/waitForLidTemperature",
           "default": "thermocycler/waitForLidTemperature",
-          "enum": ["thermocycler/waitForLidTemperature"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -6490,7 +6411,6 @@
         "commandType": {
           "const": "absorbanceReader/closeLid",
           "default": "absorbanceReader/closeLid",
-          "enum": ["absorbanceReader/closeLid"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -6531,7 +6451,6 @@
         "commandType": {
           "const": "absorbanceReader/openLid",
           "default": "absorbanceReader/openLid",
-          "enum": ["absorbanceReader/openLid"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -6572,7 +6491,6 @@
         "commandType": {
           "const": "heaterShaker/setTargetTemperature",
           "default": "heaterShaker/setTargetTemperature",
-          "enum": ["heaterShaker/setTargetTemperature"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -6618,7 +6536,6 @@
         "commandType": {
           "const": "heaterShaker/waitForTemperature",
           "default": "heaterShaker/waitForTemperature",
-          "enum": ["heaterShaker/waitForTemperature"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -6664,7 +6581,6 @@
         "commandType": {
           "const": "temperatureModule/setTargetTemperature",
           "default": "temperatureModule/setTargetTemperature",
-          "enum": ["temperatureModule/setTargetTemperature"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -6710,7 +6626,6 @@
         "commandType": {
           "const": "temperatureModule/waitForTemperature",
           "default": "temperatureModule/waitForTemperature",
-          "enum": ["temperatureModule/waitForTemperature"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -6756,7 +6671,6 @@
         "commandType": {
           "const": "thermocycler/closeLid",
           "default": "thermocycler/closeLid",
-          "enum": ["thermocycler/closeLid"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -6797,7 +6711,6 @@
         "commandType": {
           "const": "thermocycler/openLid",
           "default": "thermocycler/openLid",
-          "enum": ["thermocycler/openLid"],
           "title": "Commandtype",
           "type": "string"
         },
