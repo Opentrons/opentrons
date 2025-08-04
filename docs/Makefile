@@ -20,7 +20,7 @@ deploy:
 	@if [ -n "$$CI" ]; then \
 		echo "If you need to run this locally, set the variable AWS_PROFILE."; \
 	fi
-	aws s3 sync /site/ s3://$(SANDBOX_S3_BUCKET)/$(BRANCH)/ --acl public-read $(if $(AWS_PROFILE),--profile $(AWS_PROFILE))
+	aws s3 sync ./site/ s3://$(SANDBOX_S3_BUCKET)/$(BRANCH)/ --acl public-read $(if $(AWS_PROFILE),--profile $(AWS_PROFILE))
 
 .PHONY: serve-flex-manual
 serve-flex-manual:
