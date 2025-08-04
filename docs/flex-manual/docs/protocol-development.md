@@ -165,7 +165,6 @@ Click **Liquids** in the upper right to add liquids in your protocol. Then, clic
 
 The protocol timeline on the left side of the screen shows the steps the Flex will perform. Click **Add step** to add transfer, move, mix, pause, or module-specific steps in your protocol.
 
-[//]: # (screenshot here? would make a nice break before the steps section)
 
 * **Transfer steps** move liquid from one well or group of wells to another. In the first transfer step menu, specify the basics: source and destination, pipette path, and tip management settings. Next, choose whether to apply liquid class settings in the transfer step. 
 
@@ -233,9 +232,7 @@ Protocol Designer can help you save time and stay organized when your protocol u
 
 To prevent errors, Protocol Designer displays hints, warnings, and error descriptions as you create and edit a protocol. Deleting a module or labware used in your protocol, running out of tips in a transfer step, or leaving a labware latch closed can all result in a Protocol Designer errors. 
 
-Click on any step that appears in red in the protocol timeline and follow the text instructions to fix errors. We recommend resolving all warnings and errors to avoid problems in your workflow. For more details, see the Protocol Designer [instruction manual](https://insights.opentrons.com/hubfs/Protocol%20Designer%20Instruction%20Manual.pdf?_gl=1*ui6se*_ga*MTYxODA1OTk3LjE3MzgxODAyNjI.*_ga_66HK7MC5D7*MTc0MzUyMjc5NS4xMDQuMS4xNzQzNTIyODEwLjQ1LjAuMA..*_gcl_aw*R0NMLjE3NDAwMDA1NDYuQ2p3S0NBaUFuOWE5QmhCdEVpd0FiS2c2ZmlTMDk1QzdSekg3ZmVUUW0waUJ5LVpLckptZlQ2Y2ZpNFpGZVNQMmZvUElETWxrUzZfNjZCb0N2bHdRQXZEX0J3RQ..*_gcl_au*MjEyNDk3NTAzMi4xNzM5OTE4MjIy*_ga_GNSMNLW4RY*MTc0MzUyMjc5NS4xMDUuMS4xNzQzNTIyODEwLjQ1LjAuOTExNjgzNjA0 "instruction manual").
-
-[//]: # (temporary link, until we have an online/mkdocs PD manual)
+Click on any step that appears in red in the protocol timeline and follow the text instructions to fix errors. We recommend resolving all warnings and errors to avoid problems in your workflow. For more details, see the Protocol Designer [instruction manual](https://insights.opentrons.com/hubfs/Protocol%20Designer%20Instruction%20Manual.pdf "instruction manual").
 
 
 ### Part 3: Export a protocol
@@ -243,8 +240,6 @@ Click on any step that appears in red in the protocol timeline and follow the te
 When you're finished creating and editing your protocol, click **Done** in the upper right to return to the protocol overview. Click **Export protocol** to download your protocol file. 
 
 To run your protocol, import it into the Opentrons App (see the Software and Operation chapter for details on installing and using the Opentrons App). Then, run your protocol from the app or send it to your Flex to run from the touchscreen. 
-
-[//]: # (insert internal link in above paragraph)
 
 ### Modify an existing protocol
 
@@ -344,10 +339,6 @@ Runtime parameters can customize Boolean, numerical, and string values in your p
 #### Non-blocking commands
 
 Some module commands that take a long time to complete (such as heating from ambient temperature to a high temperature) can be run in a *non-blocking* manner. This lets your protocol save time by continuing on to other pipetting tasks instead of waiting for the command to complete. Non-blocking commands are currently supported on the [Heater-Shaker Module](https://docs.opentrons.com/v2/modules/heater_shaker.html#non-blocking-commands).
-
-#### Multiple modules of the same type
-
-The Python API only restricts module placement based on physical limitations. Protocol Designer can only place one of each type of module on the deck, except the Temperature Module. [`ProtocolContext.load_module()`](https://docs.opentrons.com/v2/new_protocol_api.html#opentrons.protocol_api.ProtocolContext.load_module) allows placing any powered module in any column 1 or 3 slot (except the Thermocycler Module, which only fits in slots A1 and B1). And it allows placing Magnetic Blocks in any working area slot.
 
 #### Python packages
 
