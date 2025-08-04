@@ -93,7 +93,7 @@ _RIGHT_SIDE_SLOTS = {
 
 
 # The max height of the labware that can fit in a plate reader
-_PLATE_READER_MAX_LABWARE_Z_MM = 16
+_PLATE_READER_MAX_LABWARE_Z_MM = 16.0
 
 
 _WellDefinition = WellDefinition2 | WellDefinition3

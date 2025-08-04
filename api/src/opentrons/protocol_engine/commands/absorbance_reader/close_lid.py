@@ -12,6 +12,8 @@ from opentrons.protocol_engine.types import AddressableAreaLocation
 
 from ...state.update_types import StateUpdate
 
+from .common import LID_Z_CLEARANCE
+
 from opentrons.types import Point
 
 from opentrons.drivers.types import AbsorbanceReaderLidStatus
@@ -23,9 +25,6 @@ if TYPE_CHECKING:
         EquipmentHandler,
         LabwareMovementHandler,
     )
-
-_PLATE_READER_MAX_LABWARE_Z_MM = 16.0
-_LID_Z_CLEARANCE = 20.0
 
 
 CloseLidCommandType = Literal["absorbanceReader/closeLid"]
@@ -123,7 +122,7 @@ class CloseLidImpl(AbstractCommandImpl[CloseLidParams, SuccessData[CloseLidResul
                 ),
                 user_drop_offset=Point.from_xyz_attrs(lid_gripper_offsets.dropOffset),
                 post_drop_slide_offset=None,
-                gripper_z_offset=_PLATE_READER_MAX_LABWARE_Z_MM + _LID_Z_CLEARANCE,
+                gripper_z_offset=LID_Z_CLEARANCE,
             )
             state_update.set_absorbance_reader_lid(
                 module_id=mod_substate.module_id,

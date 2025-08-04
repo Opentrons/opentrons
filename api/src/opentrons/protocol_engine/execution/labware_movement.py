@@ -176,13 +176,8 @@ class LabwareMovementHandler:
 
         gripper_mount = OT3Mount.GRIPPER
 
-        if gripper_z_offset is None:
-            # Retract all mounts
-            await ot3api.home(axes=[Axis.Z_L, Axis.Z_R, Axis.Z_G])
-        else:
-            # Retract left and right mounts, but only retract the gripper mount a set distance
-            await ot3api.home(axes=[Axis.Z_L, Axis.Z_R])
-            await ot3api.move_axes(position={Axis.Z_G: gripper_z_offset})
+        # Retract all mounts
+        await ot3api.home(axes=[Axis.Z_L, Axis.Z_R, Axis.Z_G])
         gripper_homed_position = await ot3api.gantry_position(mount=gripper_mount)
 
         # todo(mm, 2024-11-07): We should do this collision checking even when we
@@ -213,6 +208,7 @@ class LabwareMovementHandler:
                 gripper_home_z=gripper_homed_position.z,
                 offset_data=final_offsets,
                 post_drop_slide_offset=post_drop_slide_offset,
+                gripper_home_z_offset=gripper_z_offset,
             )
             labware_grip_force = self._state_store.labware.get_grip_force(
                 labware_definition
