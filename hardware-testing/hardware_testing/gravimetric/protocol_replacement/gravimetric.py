@@ -1030,6 +1030,7 @@ def run_one_test(
         fixture_settings, channel, 5 + fixture_settings.submerge_depth
     )
     transfer_properties.aspirate.submerge.start_position.offset = asp_offset
+    transfer_properties.dispense.submerge.start_position.offset = disp_offset
     transfer_properties.aspirate.aspirate_position.offset = asp_offset
     transfer_properties.dispense.dispense_position.offset = disp_offset
     transfer_properties.aspirate.retract.end_position.offset = disp_retract_offset
