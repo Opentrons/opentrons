@@ -137,13 +137,13 @@ class AnthropicPredict:
     def get_docs(self) -> str:
         """
         Processes documents from a directory and returns their content wrapped in XML tags.
-        Each document is wrapped in <document> tags with metadata subtags.
+        Each document is wrapped in <system_doc> tags with metadata subtags.
 
         Returns:
-            str: XML-formatted string containing all documents and their metadata
+            str: XML-formatted string containing all system documentation
         """
         logger.info("Getting docs", extra={"path": str(self.path_docs)})
-        xml_output = ["<documents>"]
+        xml_output = ["<system_documentation>"]
         for file_path in self.path_docs.iterdir():
             try:
                 # Skip directories
@@ -152,12 +152,13 @@ class AnthropicPredict:
 
                 content = file_path.read_text(encoding="utf-8")
                 document_xml = [
-                    "<document>",
-                    f"  <source>{file_path.name}</source>",
-                    "   <document_content>",
+                    "<system_doc>",
+                    f"  <title>{file_path.name}</title>",
+                    "  <type>reference</type>",
+                    "   <content>",
                     f"    {content}",
-                    "   </document_content>",
-                    "</document>",
+                    "   </content>",
+                    "</system_doc>",
                 ]
                 xml_output.extend(document_xml)
 
@@ -165,7 +166,7 @@ class AnthropicPredict:
                 logger.error("Error processing file", extra={"file": file_path.name, "error": str(e)})
                 continue
 
-        xml_output.append("</documents>")
+        xml_output.append("</system_documentation>")
         return "\n".join(xml_output)
 
     @tracer.wrap()
@@ -295,6 +296,10 @@ class AnthropicPredict:
 
         content_blocks: List[ContentBlockParam] = []
 
+        # Add wrapper for user uploaded files
+        user_files_header = TextBlockParam(type="text", text="<user_uploaded_files>\n")
+        content_blocks.append(user_files_header)
+
         for file_ref in file_references:
             filename = file_ref.get("name", "Attached File")
             # file_type is the internal type ("pdf", "csv", "python"), not MIME type
@@ -305,9 +310,10 @@ class AnthropicPredict:
                 # Fallback if content is missing
                 text_block = TextBlockParam(
                     type="text",
-                    text=f"=== FILE: {filename} ({file_type.upper()}) ===\n\n"
-                    f"[File content is empty or missing]\n\n"
-                    f"=== END OF FILE: {filename} ===\n\n",
+                    text=f"<user_file name=\"{filename}\" type=\"{file_type}\" id=\"{file_ref.get('id', 'unknown')}\">\n"
+                    f"Filename: {filename}\n"
+                    f"[File content is empty or missing]\n"
+                    f"</user_file>\n\n",
                 )
                 content_blocks.append(text_block)
                 continue
@@ -317,11 +323,9 @@ class AnthropicPredict:
                 # Add explicit filename context that Claude cannot ignore
                 logger.info(f"Creating PDF document block with title: '{filename}'")
 
-                # Add a text block with explicit filename information before the PDF
-                pdf_intro_text = (
-                    f"=== UPLOADED PDF FILE: {filename} ===\n\n"
-                    f"The following document is the PDF file named '{filename}' that was uploaded:\n\n"
-                )
+                # Add a text block to start the user file wrapper with prominent filename
+                pdf_intro_text = f"<user_file name=\"{filename}\" type=\"{file_type}\" id=\"{file_ref.get('id', 'unknown')}\">\n"
+                pdf_intro_text += f"Filename: {filename}\n"
                 filename_text_block = TextBlockParam(type="text", text=pdf_intro_text)
                 content_blocks.append(filename_text_block)
 
@@ -332,32 +336,25 @@ class AnthropicPredict:
                     title=filename,
                 )
                 content_blocks.append(doc_block)
+
+                # Close the user file wrapper
+                pdf_close_text = "</user_file>\n\n"
+                filename_close_block = TextBlockParam(type="text", text=pdf_close_text)
+                content_blocks.append(filename_close_block)
             else:
                 # CSV and Python files are sent as text blocks
-                # Add explicit filename context for all text-based files (consistent with PDF approach)
-                if file_type.lower() == "python":
-                    # Add explicit filename introduction similar to PDF approach
-                    python_intro_text = (
-                        f"=== UPLOADED PYTHON FILE: {filename} ===\n\n"
-                        f"The following is the Python protocol file named '{filename}' that was uploaded:\n\n"
-                    )
-                    filename_intro_block = TextBlockParam(type="text", text=python_intro_text)
-                    content_blocks.append(filename_intro_block)
-                elif file_type.lower() == "csv":
-                    # Add explicit filename introduction for CSV files
-                    csv_intro_text = (
-                        f"=== UPLOADED CSV FILE: {filename} ===\n\n"
-                        f"The following is the CSV data file named '{filename}' that was uploaded:\n\n"
-                    )
-                    filename_intro_block = TextBlockParam(type="text", text=csv_intro_text)
-                    content_blocks.append(filename_intro_block)
-
-                # Add the file content
                 text_block = TextBlockParam(
                     type="text",
-                    text=f"=== FILE CONTENT ===\n\n{file_content}\n\n=== END OF FILE: {filename} ===\n\n",
+                    text=f"<user_file name=\"{filename}\" type=\"{file_type}\" id=\"{file_ref.get('id', 'unknown')}\">\n"
+                    f"Filename: {filename}\n"
+                    f"{file_content}\n"
+                    f"</user_file>\n\n",
                 )
                 content_blocks.append(text_block)
+
+        # Close wrapper for user uploaded files
+        user_files_footer = TextBlockParam(type="text", text="</user_uploaded_files>\n")
+        content_blocks.append(user_files_footer)
 
         return content_blocks
 
