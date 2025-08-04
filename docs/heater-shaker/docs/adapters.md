@@ -35,6 +35,9 @@ The Universal Flat Bottom Plate Adapter works with most flat- bottom ANSI/SLAS a
 
 1. Use the included T10 Torx screwdriver and Thermal Adapter Screw to attach your chosen adapter to the module.
 
+    !!!warning
+        Using a different screwdriver can strip the screws. Using different screws can damage the module.
+
 ![Attaching an adapter to the module](images/adapter-attachment.png){style="width: 60%; margin-left: 0;"}
 
 2. Check the alignment of the thermal adapter. If properly attached, it will sit flush to the surface of the module.
