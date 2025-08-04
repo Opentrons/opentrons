@@ -227,11 +227,7 @@ class LegacyInstrumentCoreSimulator(
             num_channels=self.get_channels(),
             fail_if_full=self._api_version < APIVersion(2, 2),
         )
-        # In practice this will always resolve to a labware, since location should be either
-        # a well or labware
-        parent_labware, _ = location.labware.get_parent_labware_and_well()
-        if parent_labware is not None:
-            self._last_tip_rack_and_well = parent_labware._core, well_core  # type: ignore[assignment]
+        self._last_tip_rack_and_well = tip_rack_core, well_core
 
     def drop_tip(
         self,
