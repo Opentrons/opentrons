@@ -85,7 +85,7 @@ The following table lists power consumption values measured at the wall outlet. 
     </tr>
     <tr>
       <th>Speed Accuracy</th>
-      <td>&plusmn;25 rpm</td>
+      <td>±25 rpm</td>
     </tr>
   </tbody>
 </table>
@@ -99,19 +99,19 @@ The following table lists power consumption values measured at the wall outlet. 
   <tbody>
     <tr>
       <th>Temperature Range</th>
-      <td>37-95&deg;C</td>
+      <td>37-95 °C</td>
     </tr>
     <tr>
       <th>Temperature Accuracy</th>
-      <td>&plusmn;0.5&deg;C at 55&deg;C</td>
+      <td>±0.5 °C at 55 °C</td>
     </tr>
     <tr>
       <th>Temperature Uniformity</th>
-      <td>&plusmn;0.5&deg;C at 55&deg;C</td>
+      <td>±0.5 °C at 55 °C</td>
     </tr>
     <tr>
       <th>Ramp Rate</th>
-      <td>10&deg;C/min</td>
+      <td>10 °C/min</td>
     </tr>
   </tbody>
 </table>
@@ -147,7 +147,8 @@ The Heater-Shaker has an LED status light that can display three colors: amber, 
       </td>
     </tr>
     <tr>
-      <td><span class="status-dot-container"><span class="status-dot yellow"></span> Amber</span></td>
+      <td><span class="status-dot-container"> <!-- testing split color dot -->
+        <span class="status-dot yellow-red-split"></span> Amber/Red</span></td>
       <td>
         <ul>
           <li>Solid amber indicates an error.</li>

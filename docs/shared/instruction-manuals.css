@@ -116,6 +116,12 @@ figure.side-by-side img {
   background-color: #F09D20;
  }
 
+/* Longitudinal split dot for two-color LEDs */
+.status-dot.yellow-red-split {
+  background-image: linear-gradient(to right, #F09D20 50%, red 50%);
+  background-color: transparent;
+}
+
  /* Aligns status dots and text if needed*/
 .status-dot-container {
   display: flex;
