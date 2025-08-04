@@ -11,8 +11,7 @@ interface KnowledgeLinkProps {
 export const RELEASE_NOTES_URL =
   'https://github.com/Opentrons/opentrons/blob/edge/protocol-designer/release-notes.md'
 
-export const DOC_URL =
-  'https://docs.opentrons.com/protocol-designer/'
+export const DOC_URL = 'https://docs.opentrons.com/protocol-designer/'
 
 export function KnowledgeLink(props: KnowledgeLinkProps): JSX.Element {
   const { children } = props
