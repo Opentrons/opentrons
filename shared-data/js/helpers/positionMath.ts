@@ -335,7 +335,7 @@ export function getDeckSlotOriginToLabwareOrigin(
  * to go slot->module and a second function to go module->labware.
  */
 export function getModuleParentOriginToLabwareOrigin(
-  deckId: string,
+  deckId: string | null,
   slotId: string | null,
   moduleDefinition: ModuleDefinition,
   labwareDefinition: LabwareDefinition

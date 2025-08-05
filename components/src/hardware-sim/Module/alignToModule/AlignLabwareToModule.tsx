@@ -8,9 +8,9 @@ import type {
 
 export type AlignLabwareToModuleProps = PropsWithChildren<{
   /** Should match the `deckId` passed to the parent `<Module>`. */
-  deckId: string
+  deckId: string | null
   /** Should match the `slotId` passed to the parent `<Module>`. */
-  slotId: string
+  slotId: string | null
   /** Should match the module definition passed to the parent `<Module>`. */
   moduleDefinition: ModuleDefinition
   /** Should match the labware definition passed to the child `<Labware>`/`<LabwareRender>`. */
