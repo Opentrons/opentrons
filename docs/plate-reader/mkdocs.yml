@@ -17,6 +17,7 @@ nav:
   - Home: index.md
   - Safety Information: safety.md
   - Additional Product Information: warranty.md
+  - Product Specifications: specifications.md
 
 
 plugins:
