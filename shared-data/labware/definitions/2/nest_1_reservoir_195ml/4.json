@@ -61,8 +61,8 @@
           "shape": "cuboidal",
           "topXDimension": 107.3,
           "topYDimension": 71.3,
-          "bottomXDimension": 70.6,
-          "bottomYDimension": 106.8,
+          "bottomXDimension": 106.8,
+          "bottomYDimension": 70.6,
           "topHeight": 26.85,
           "bottomHeight": 2.0
         },
