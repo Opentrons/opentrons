@@ -427,7 +427,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                     <g cursor={onLabwareClick != null ? 'pointer' : ''}>
                       <LabwareRender
                         definition={nestedLabwareDef}
-                        positioningMode="offsetInSlot"
+                        positioningMode="passThrough"
                         onLabwareClick={onLabwareClick}
                         wellFill={nestedLabwareWellFill}
                         shouldRotateAdapterOrientation={
