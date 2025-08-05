@@ -158,37 +158,42 @@ export const RobotConfigurationDetails = (
           />
         </>
       ) : null}
-      {requiredModuleDetails.map((module, index) => {
-        return (
-          <Fragment key={`module_${index}`}>
-            <Divider marginY={SPACING.spacing12} width="100%" />
-            <RobotConfigurationDetailsItem
-              label={`${t('slot')} ${
-                getModuleType(module.params.model) === THERMOCYCLER_MODULE_TYPE
-                  ? getSlotsForThermocycler(robotType)
-                  : module.params.location.slotName
-              }`}
-              item={
-                <>
-                  <ModuleIcon
-                    key={index}
-                    moduleType={getModuleType(module.params.model)}
-                    marginRight={SPACING.spacing4}
-                    alignSelf={ALIGN_CENTER}
-                    color={COLORS.grey50}
-                    height={SIZE_1}
-                    minWidth={SIZE_1}
-                    minHeight={SIZE_1}
-                  />
-                  <StyledText desktopStyle="bodyDefaultRegular">
-                    {getModuleDisplayName(module.params.model)}
-                  </StyledText>
-                </>
-              }
-            />
-          </Fragment>
+      {requiredModuleDetails
+        .sort((a, b) =>
+          a.params.location.slotName.localeCompare(b.params.location.slotName)
         )
-      })}
+        .map((module, index) => {
+          return (
+            <Fragment key={`module_${index}`}>
+              <Divider marginY={SPACING.spacing12} width="100%" />
+              <RobotConfigurationDetailsItem
+                label={`${t('slot')} ${
+                  getModuleType(module.params.model) ===
+                  THERMOCYCLER_MODULE_TYPE
+                    ? getSlotsForThermocycler(robotType)
+                    : module.params.location.slotName
+                }`}
+                item={
+                  <>
+                    <ModuleIcon
+                      key={index}
+                      moduleType={getModuleType(module.params.model)}
+                      marginRight={SPACING.spacing4}
+                      alignSelf={ALIGN_CENTER}
+                      color={COLORS.grey50}
+                      height={SIZE_1}
+                      minWidth={SIZE_1}
+                      minHeight={SIZE_1}
+                    />
+                    <StyledText desktopStyle="bodyDefaultRegular">
+                      {getModuleDisplayName(module.params.model)}
+                    </StyledText>
+                  </>
+                }
+              />
+            </Fragment>
+          )
+        })}
       {nonStandardRequiredFixtureDetails.map((fixture, index) => {
         return (
           <Fragment key={`fixture_${index}`}>
