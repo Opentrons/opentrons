@@ -534,7 +534,12 @@ class FlexStacker(mod_abc.AbstractModule):
         await self._prepare_for_action()
 
         if enforce_hopper_lw_sensing:
-            await self.verify_hopper_labware_presence(Direction.EXTEND, True)
+            # TODO: re-enable this function after TOF calibration is implemented.
+            # Until then, we should also check the TOF X sensor before raising the error
+            # await self.verify_hopper_labware_presence(Direction.EXTEND, True)
+            hopper_empty = not await self.labware_detected(
+                StackerAxis.Z, Direction.EXTEND
+            )
 
         # Move platform along the X and make sure we DONT detect labware
         await self._move_and_home_axis(StackerAxis.X, Direction.RETRACT, HOME_OFFSET_MD)
@@ -556,7 +561,18 @@ class FlexStacker(mod_abc.AbstractModule):
         await self.home_axis(StackerAxis.Z, Direction.RETRACT)
 
         if enforce_shuttle_lw_sensing:
-            await self.verify_shuttle_labware_presence(Direction.RETRACT, True)
+            try:
+                await self.verify_shuttle_labware_presence(Direction.RETRACT, True)
+            except FlexStackerShuttleLabwareError:
+                # No labware detected on the shuttle, so we need to check what the Z TOF
+                # sensor says about the hopper
+                if hopper_empty:
+                    raise FlexStackerHopperLabwareError(
+                        self.device_info["serial"],
+                        labware_expected=True,
+                    ) from None
+                raise
+
         await self._move_and_home_axis(StackerAxis.X, Direction.EXTEND, HOME_OFFSET_MD)
 
     async def store_labware(
