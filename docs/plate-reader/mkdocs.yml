@@ -19,6 +19,7 @@ nav:
   - Additional Product Information: warranty.md
   - Product Specifications: specifications.md
   - Deck Placement: placement.md
+  - Installation: installation.md
 
 plugins:
   - search
