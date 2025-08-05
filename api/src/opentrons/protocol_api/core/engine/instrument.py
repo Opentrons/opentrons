@@ -100,8 +100,6 @@ _RESIN_TIP_DEFAULT_FLOW_RATE = 10.0
 
 _FLEX_PIPETTE_NAMES_FIXED_IN = APIVersion(2, 23)
 """The version after which InstrumentContext.name returns the correct API-specific names of Flex pipettes."""
-_RETURN_TIP_SCRAPE_ADDED_IN = APIVersion(2, 23)
-"""The version after which return-tip for 1/8 channels will scrape off."""
 
 
 class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
