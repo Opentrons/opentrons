@@ -206,6 +206,7 @@ export const RECOVERY_MAP = {
   STACKER_STALLED_RETRY: {
     ROUTE: 'stacker-stalled-retry',
     STEPS: {
+      EMPTY_STACKER: 'empty-stacker',
       PREPARE_TRACK_FOR_HOMING: 'prepare-track-for-homing',
       CLEAR_TRACK_OF_OBSTRUCTIONS: 'clear-track-of-obstructions',
       CHECK_HOPPER: 'check-hopper',
@@ -216,6 +217,7 @@ export const RECOVERY_MAP = {
   STACKER_STALLED_SKIP: {
     ROUTE: 'stacker-stalled-skip',
     STEPS: {
+      EMPTY_STACKER: 'empty-stacker',
       PREPARE_TRACK_FOR_HOMING: 'prepare-track-for-homing',
       CLEAR_TRACK_OF_OBSTRUCTIONS: 'clear-track-of-obstructions',
       PLACE_LABWARE_ON_SHUTTLE: 'place-labware-on-shuttle',
@@ -416,6 +418,7 @@ export const STEP_ORDER: StepOrder = {
     MANUAL_REPLACE_AND_RETRY.STEPS.RETRY,
   ],
   [STACKER_STALLED_RETRY.ROUTE]: [
+    STACKER_STALLED_RETRY.STEPS.EMPTY_STACKER,
     STACKER_STALLED_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING,
     STACKER_STALLED_RETRY.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS,
     STACKER_STALLED_RETRY.STEPS.CHECK_HOPPER,
@@ -423,6 +426,7 @@ export const STEP_ORDER: StepOrder = {
     STACKER_STALLED_RETRY.STEPS.RETRY,
   ],
   [STACKER_STALLED_SKIP.ROUTE]: [
+    STACKER_STALLED_SKIP.STEPS.EMPTY_STACKER,
     STACKER_STALLED_SKIP.STEPS.PREPARE_TRACK_FOR_HOMING,
     STACKER_STALLED_SKIP.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS,
     STACKER_STALLED_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE,
@@ -621,6 +625,9 @@ export const RECOVERY_MAP_METADATA: RecoveryRouteStepMetadata = {
     [MANUAL_REPLACE_AND_RETRY.STEPS.RETRY]: { allowDoorOpen: true },
   },
   [STACKER_STALLED_RETRY.ROUTE]: {
+    [STACKER_STALLED_RETRY.STEPS.EMPTY_STACKER]: {
+      allowDoorOpen: true,
+    },
     [STACKER_STALLED_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING]: {
       allowDoorOpen: false,
     },
@@ -636,6 +643,9 @@ export const RECOVERY_MAP_METADATA: RecoveryRouteStepMetadata = {
     [STACKER_STALLED_RETRY.STEPS.RETRY]: { allowDoorOpen: false },
   },
   [STACKER_STALLED_SKIP.ROUTE]: {
+    [STACKER_STALLED_SKIP.STEPS.EMPTY_STACKER]: {
+      allowDoorOpen: true,
+    },
     [STACKER_STALLED_SKIP.STEPS.PREPARE_TRACK_FOR_HOMING]: {
       allowDoorOpen: false,
     },
