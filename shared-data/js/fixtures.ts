@@ -10,6 +10,7 @@ import {
   FLEX_MODULE_AA_TYPE_BY_MODEL,
   FLEX_STACKER_FIXTURES,
   FLEX_STAGING_ADDRESSABLE_AREAS_WITH_FAKES,
+  FLEX_USB_MODULE_FIXTURES,
   WASTE_CHUTE_FIXTURES,
   WASTE_CHUTE_WITH_FAKE_FIXTURES,
 } from '.'
@@ -92,6 +93,7 @@ import type {
 } from './constants'
 import type {
   AddressableArea,
+  AreaType,
   CoordinateTuple,
   CutoutConfig,
   CutoutConfigMap,
@@ -1115,6 +1117,64 @@ export const getMainAAForAFixture = (
     })
     return aa as AddressableAreaNamesWithFakes // we can cast this bc there should me a match for every fixtureId
   }
+}
+
+export const getMainUsbModuleFixtureIdForComboFixture = (
+  compatibleCutoutFixtureIds: CutoutFixtureId[]
+): CutoutFixtureId | null => {
+  return (
+    compatibleCutoutFixtureIds.find(cf =>
+      FLEX_USB_MODULE_FIXTURES.includes(cf)
+    ) ?? null
+  )
+}
+
+export const getMainNonComboFixtureId = (
+  compatibleCutoutFixtureIds: CutoutFixtureId[],
+  addressableAreaIds: AddressableAreaName[],
+  cutoutId: CutoutId
+): CutoutFixtureId | null => {
+  const deckDef = getDeckDefFromRobotType('OT-3 Standard')
+  const cutoutFixtures = deckDef.cutoutFixtures.filter(cf =>
+    compatibleCutoutFixtureIds.includes(cf.id)
+  )
+  const aaAreaType = getAAByAAId(addressableAreaIds[0], deckDef).areaType
+  if (
+    Object.values(FLEX_MODULE_AA_TYPE_BY_MODEL).includes(
+      aaAreaType as AreaType
+    ) &&
+    aaAreaType !== 'magneticBlock'
+  ) {
+    return (
+      getMainUsbModuleFixtureIdForComboFixture(compatibleCutoutFixtureIds) ??
+      null
+    )
+  }
+  const cutoutFixturesWithAddressableAreas = cutoutFixtures.filter(cf =>
+    Object.values(cf.providesAddressableAreas).some(providedAAs =>
+      addressableAreaIds.every(aa => providedAAs.includes(aa))
+    )
+  )
+
+  if (cutoutFixturesWithAddressableAreas.length === 0) {
+    return null
+  }
+
+  // Find the fixture with the least items in its providesAddressableAreas in order to find the simplest fixture
+  const fixtureWithLeastAAs = cutoutFixturesWithAddressableAreas.reduce(
+    (minFixture, currentFixture) => {
+      const minAAsCount = Object.entries(minFixture.providesAddressableAreas)
+        .filter(([key, value]) => key === cutoutId)
+        .map(([key, value]) => value)[0].length
+      const currentAAsCount = Object.entries(
+        currentFixture.providesAddressableAreas
+      )
+        .filter(([key, value]) => key === cutoutId)
+        .map(([key, value]) => value)[0].length
+      return currentAAsCount < minAAsCount ? currentFixture : minFixture
+    }
+  )
+  return fixtureWithLeastAAs.id
 }
 
 export const isModuleAllowedOnAA = (

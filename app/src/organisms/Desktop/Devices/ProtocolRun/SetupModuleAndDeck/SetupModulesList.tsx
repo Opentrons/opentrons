@@ -137,8 +137,9 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
             )
             if (
               deckConfigCompatabilityD3 != null &&
-              WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(
-                deckConfigCompatabilityD3?.compatibleCutoutFixtureIds[0]
+              deckConfigCompatabilityD3.compatibleCutoutFixtureIds.every(
+                cutoutFixtureId =>
+                  WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(cutoutFixtureId)
               )
             ) {
               const comboFixtureId =
