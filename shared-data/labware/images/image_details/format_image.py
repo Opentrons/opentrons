@@ -1,20 +1,19 @@
 """Crop Images so that Labware is Centered and Change File Size and Type to PNG."""
 
-from PIL import Image
+from PIL import Image, ImageEnhance
 import argparse
 import os
 
 
 def crop_image(path: str) -> str:
-    """Crop image to the object by removing surrounding white space."""
+    """Crop image to a rectangular object region by removing surrounding white space."""
     print("✂️ Beginning Crop Steps.")
     try:
         img = Image.open(path).convert("RGBA")
     except FileNotFoundError:
         print(f"File not found: {path}")
         return path
-    # Convert image to alpha mask if it has transparency
-    # or assume white background if not
+
     datas = img.getdata()
     non_empty_pixels = []
     for y in range(img.height):
@@ -23,38 +22,64 @@ def crop_image(path: str) -> str:
             # Assuming object is not pure white or fully transparent
             if pixel[3] > 0 and pixel[:3] != (240, 240, 240):
                 non_empty_pixels.append((x, y))
+
     if not non_empty_pixels:
         print("❌ Could not detect object.")
         return path
-    # Get bounding box of non-white/non-transparent pixels
-    x_coords, y_coords = zip(*non_empty_pixels)
-    bbox = (min(x_coords), min(y_coords), max(x_coords)+5, max(y_coords)+5)
 
+    # Get bounding box of detected object
+    x_coords, y_coords = zip(*non_empty_pixels)
+    min_x, max_x = min(x_coords), max(x_coords)
+    min_y, max_y = min(y_coords), max(y_coords)
+
+    # Enforce square crop box with margin
+    margin = 200
+    width = max_x - min_x
+    height = max_y - min_y
+    side = max(width, height)
+
+    center_x = (min_x + max_x) // 2
+    center_y = (min_y + max_y) // 2
+
+    half_side = side // 2 + margin
+
+    crop_left = max(center_x - half_side, 0)
+    crop_upper = max(center_y - half_side, 0)
+    crop_right = min(center_x + half_side, img.width)
+    crop_lower = min(center_y + half_side, img.height)
+
+    bbox = (crop_left, crop_upper, crop_right, crop_lower)
     img_cropped = img.crop(bbox)
+
     output_path = os.path.splitext(path)[0] + "_cropped.png"
     img_cropped.save(output_path, "PNG")
     print(f"✅ Image cropped and saved: {output_path}")
     return output_path
 
-def resize_image(path: str, target_kb: int = 200) -> str:
+def resize_image(path: str, target_kb: int = 400) -> str:
     """Resize PNG image by downscaling until it's under target size (in KB)."""
     print("📏 Beginning Resize Steps.")
 
     img = Image.open(path).convert("RGBA")
     target_bytes = target_kb * 1024
-    quality_tolerance = 10  # +/- 10 KB tolerance
+    quality_tolerance = 10 * 1024  # 10 KB tolerance
     factor = 0.95  # Resize factor per iteration
     min_size = 300  # Don't resize below this dimension
     output_path = os.path.splitext(path)[0] + "_resized.png"
+
     while True:
-        # Convert to a palette image to reduce size
+        # Convert to palette mode (lower size)
         img_quantized = img.convert("P", palette=Image.ADAPTIVE, colors=256)
         img_quantized.save(output_path, format="PNG", optimize=True)
         size = os.path.getsize(output_path)
+
         print(f"Current size: {size // 1024} KB")
-        if abs(size - target_bytes) <= quality_tolerance * 1024 or min(img.size) < min_size:
+
+        # ✅ Only resize if we're still **over** the target size
+        if size <= target_bytes + quality_tolerance or min(img.size) < min_size:
             break
-        # Downscale and repeat
+
+        # Downscale image
         new_size = (int(img.size[0] * factor), int(img.size[1] * factor))
         img = img.resize(new_size, Image.LANCZOS)
 
