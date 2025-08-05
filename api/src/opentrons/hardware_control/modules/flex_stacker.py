@@ -568,7 +568,9 @@ class FlexStacker(mod_abc.AbstractModule):
                 # sensor says about the hopper
                 if hopper_empty:
                     # homing here so we don't have to modify the error recovery flow
-                    await self._move_and_home_axis(StackerAxis.X, Direction.EXTEND, HOME_OFFSET_MD)
+                    await self._move_and_home_axis(
+                        StackerAxis.X, Direction.EXTEND, HOME_OFFSET_MD
+                    )
                     raise FlexStackerHopperLabwareError(
                         self.device_info["serial"],
                         labware_expected=True,
