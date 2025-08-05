@@ -69,7 +69,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.DOCS_STAGING_ROLE }}
+          role-to-assume: ${{ secrets.DOCS_SANDBOX_ROLE }}
           aws-region: us-east-2
       - name: 'Checkout Repository'
         uses: actions/checkout@v4
@@ -105,7 +105,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.DOCS_PRODUCTION_ROLE }}
+          role-to-assume: ${{ secrets.DOCS_SANDBOX_ROLE }}
           aws-region: us-east-2
       - name: 'Checkout Repository'
         uses: actions/checkout@v4
