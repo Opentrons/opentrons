@@ -1,17 +1,17 @@
-# Welcome to MkDocs
+---
+title: "Plate Reader Manual"
+hide: toc
+---
 
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
+# Absorbance Plate Reader Module Instruction Manual
 
-## Commands
+IMAGE PLACEHOLDER
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
+CAPTION PLACEHOLDER
 
-## Project layout
+## Product description
 
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+The Opentrons Absorbance Plate Reader Module is an on-deck microplate spectrophotometer that works with the Flex liquid handling robot. It uses light absorbance to determine sample concentrations. The module accepts ANSI/SBS-standard 96-well plates and has 96 separate detection units, which allows for rapid endpoint or kinetic sample analysis. The Absorbance Plate Reader is designed for laboratory research and other non-in-vitro diagnostic analyses.
+
+**The Opentrons Flex Absorbance Plate Reader may currently not be offered, used or put on the market in any European Patent Convention States due to a third party patent application.**
+
