@@ -351,8 +351,8 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                 >
                   {nestedLabwareDef != null ? (
                     <AlignLabwareToModule
-                      // todo(mm, 2025-07-16): Investigate whether <AlignLabwareToModule> is correct to use in the face of
-                      // STACKER_MODULE_Y_OFFSET / STACKER_HOPPER_LABWARE_X_OFFSET / STACKER_HOPPER_LABWARE_Y_OFFSET.
+                      // todo(mm, 2025-07-16): Investigate whether <AlignLabwareToModule> is correct to use
+                      // in the face of STACKER_HOPPER_LABWARE_X_OFFSET.
                       deckId={deckDef.otId}
                       slotId={moduleLocation.slotName}
                       moduleDefinition={moduleDef}
