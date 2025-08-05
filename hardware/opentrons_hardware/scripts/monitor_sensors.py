@@ -2,13 +2,15 @@
 import asyncio
 import argparse
 import datetime
+from contextlib import AsyncExitStack
+import struct
 
 from opentrons_hardware.drivers.can_bus import (
     build,
     CanMessenger,
     WaitableCallback,
 )
-from opentrons_hardware.firmware_bindings import constants
+from opentrons_hardware.firmware_bindings import constants, utils
 from opentrons_hardware.firmware_bindings.messages import (
     message_definitions,
     payloads,
@@ -19,6 +21,8 @@ from opentrons_hardware.sensors.types import (
     SensorDataType,
     sensor_fixed_point_conversion,
 )
+from opentrons_hardware.sensors.sensor_driver import LogListener, SensorDriver
+from opentrons_hardware.sensors.sensor_types import PressureSensor, CapacitiveSensor
 
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 
@@ -32,6 +36,7 @@ async def do_run(
     threshold: float,
 ) -> None:
     """Configure and start the monitoring."""
+    threshold = 9999
     threshold_payload = payloads.SetSensorThresholdRequestPayload(
         sensor=fields.SensorTypeField(constants.SensorType.capacitive),
         sensor_id=fields.SensorIdField(sensor_id),
@@ -41,11 +46,21 @@ async def do_run(
     threshold_message = message_definitions.SetSensorThresholdRequest(
         payload=threshold_payload
     )
-    await messenger.send(target_node, threshold_message)
+    # await messenger.send(target_node, threshold_message)
+    baseline_payload = payloads.BaselineSensorRequestPayload(
+        sensor=fields.SensorTypeField(target_sensor.value),
+        sensor_id=fields.SensorIdField(sensor_id),
+        number_of_reads=utils.UInt16Field(20),
+    )
+    baseline_message = message_definitions.BaselineSensorRequest(
+        payload=baseline_payload
+    )
+
+    await messenger.ensure_send(target_node, baseline_message)
     stim_payload = payloads.BindSensorOutputRequestPayload(
         sensor=fields.SensorTypeField(target_sensor.value),
         sensor_id=fields.SensorIdField(sensor_id),
-        binding=fields.SensorOutputBindingField(3),
+        binding=fields.SensorOutputBindingField(2),
     )
     stim_message = message_definitions.BindSensorOutputRequest(payload=stim_payload)
     reset_payload = payloads.BindSensorOutputRequestPayload(
@@ -55,22 +70,72 @@ async def do_run(
     )
     reset_message = message_definitions.BindSensorOutputRequest(payload=reset_payload)
     print(f"Sending stimulus to {target_node.name} {target_sensor.name}")
-    await messenger.send(target_node, stim_message)
-    start = datetime.datetime.now()
-    try:
-        print("Monitoring")
-        async for message, _arbid in callback:
-            if isinstance(message, message_definitions.ReadFromSensorResponse):
-                ts = (datetime.datetime.now() - start).total_seconds()
-                s = constants.SensorType(message.payload.sensor.value).name
-                d = SensorDataType.build(
-                    message.payload.sensor_data, message.payload.sensor
-                )
-                rd = message.payload.sensor_data
-                print(f"{ts:.3f}: {s} {d.to_float():5.3f}, \traw data: {str(rd)}")
-    finally:
-        print("cleaning up")
-        await messenger.send(target_node, reset_message)
+    pressure_sensor = PressureSensor.build(
+        sensor_id=fields.SensorIdField(sensor_id),
+        node_id=target_node,
+        stop_threshold=Int32Field(threshold)
+    )
+
+    log_listener = LogListener(messenger=messenger, sensor=pressure_sensor)
+    async with AsyncExitStack() as binding_stack:
+        await binding_stack.enter_async_context(log_listener)
+
+        await messenger.send(target_node, stim_message)
+        start = datetime.datetime.now()
+        try:
+            print("Monitoring")
+            async for message, _arbid in callback:
+                if isinstance(message, message_definitions.ReadFromSensorResponse):
+                    ts = (datetime.datetime.now() - start).total_seconds()
+                    s = constants.SensorType(message.payload.sensor.value).name
+                    d = SensorDataType.build(
+                        message.payload.sensor_data, message.payload.sensor
+                    )
+                    rd = message.payload.sensor_data
+                    print(f"{ts:.3f}: {s} {d.to_float():5.3f}, \traw data: {str(rd)}")
+                elif isinstance(message, message_definitions.BatchReadFromSensorResponse):
+                    ts = (datetime.datetime.now() - start).total_seconds()
+                    s = constants.SensorType(message.payload.sensor.value).name
+                    data_length = message.payload.data_length.value
+                    data_bytes = message.payload.sensor_data.value
+                    data_ints = [
+                        int.from_bytes(data_bytes[i * 4 : i * 4 + 4], byteorder="little")
+                        for i in range(data_length)
+                    ]
+                    data_ints_big = [
+                        int.from_bytes(data_bytes[i * 4 : i * 4 + 4], byteorder="big")
+                        for i in range(data_length)
+                    ]
+                    new_vals = [
+                        (int(Int32Field(d).value) / 65536, int(Int32Field(b).value) / 65536**2)
+                        for d, b in zip(data_ints, data_ints_big)
+                    ] 
+                    struct_vals = [
+                        struct.unpack('>l', data_bytes[i * 4 : i * 4 + 4])[0] / 65536
+                        for i in range(data_length)
+                    ]
+
+                    # convert the hex to int
+                    # divide the int by 65536
+                    # build as int32field
+
+
+
+                    # data_floats = [
+                    #     SensorDataType.build(d, message.payload.sensor)
+                    #     for d in data_ints
+                    # ]
+                    # print(f"raw data = {message.payload.sensor_data:X}")
+                    # breakpoint()
+                    # for d in data_ints:
+                    for v in struct_vals:
+                        # pressure_val_float = d / 65536 
+                        # print(f"{ts:.3f}: {s} {d}")
+                        print(f"{ts:.3f}: {s} little {v:5.3f}") #', big {v[1]:5.3f}")
+
+        finally:
+            print("cleaning up")
+            await messenger.send(target_node, reset_message)
 
 
 async def run(args: argparse.Namespace) -> None:
