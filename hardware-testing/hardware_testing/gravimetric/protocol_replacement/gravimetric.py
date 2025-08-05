@@ -165,6 +165,7 @@ class FixtureSettings:
     scale_delay: int
     blank_trials: int
     submerge_depth: float
+    retracted_offset: float
     isolate_volumes: bool
     extra: bool
     labware_on_scale: str
@@ -216,6 +217,9 @@ class FixtureSettings:
         scale_delay = int(lookup_key("scale_delay", csv_params)[0])
         blank_trials = int(lookup_key("blank_trials", csv_params)[0])
         submerge_depth = float(lookup_key("submerge_depth", csv_params)[0])
+        retracted_offset = 5.0
+        # TODO maybe make this a CSV option
+        # retracted_offset = float(lookup_key("retracted_offset", csv_params)[0])
         volumes_to_test_20ul = [
             float(volume) for volume in lookup_key("volumes_to_test_20ul", csv_params)
         ]
@@ -422,6 +426,7 @@ class FixtureSettings:
             scale_delay=scale_delay,
             blank_trials=blank_trials,
             submerge_depth=submerge_depth,
+            retracted_offset=retracted_offset,
             isolate_volumes=False,
             extra=extra,
             labware_on_scale=labware_on_scale,
@@ -860,6 +865,7 @@ def aspirate_with_liquid_class(
     transfer_properties: TransferProperties,
 ) -> List[tx_comps_executor.LiquidAndAirGapPair]:
     """Aspirate with liquid class."""
+    print_info(f"transfer props {transfer_properties}")
     fixture_settings.recorder.set_sample_tag(
         create_measurement_tag("aspirate", volume, channel, trial)
     )
@@ -1015,30 +1021,46 @@ def run_one_test(
     transfer_properties = fixture_settings.liquid_class.get_for(
         fixture_settings.pipette.name, tip_rack=tiprack_uri
     )
-    asp_offset = _get_offset_for_channel(
+
+    submerged_offset = _get_offset_for_channel(
         fixture_settings, channel, fixture_settings.submerge_depth
     )
-    disp_offset = _get_offset_for_channel(
-        fixture_settings, channel, fixture_settings.submerge_depth
+    retracted_offset = _get_offset_for_channel(
+        fixture_settings, channel, fixture_settings.retracted_offset
     )
-    disp_retract_offset = _get_offset_for_channel(
-        fixture_settings, channel, 5 + fixture_settings.submerge_depth
+
+    # aspirate and dispense submerge start offsets.
+    transfer_properties.aspirate.submerge.start_position.position_reference = (
+        PositionReference.LIQUID_MENISCUS
     )
-    transfer_properties.aspirate.submerge.start_position.offset = asp_offset
-    transfer_properties.dispense.submerge.start_position.offset = disp_offset
-    transfer_properties.aspirate.aspirate_position.offset = asp_offset
-    transfer_properties.dispense.dispense_position.offset = disp_offset
-    transfer_properties.aspirate.retract.end_position.offset = disp_retract_offset
-    transfer_properties.dispense.retract.end_position.offset = disp_retract_offset
+    transfer_properties.dispense.submerge.start_position.position_reference = (
+        PositionReference.LIQUID_MENISCUS
+    )
+    transfer_properties.aspirate.submerge.start_position.offset = retracted_offset
+    transfer_properties.dispense.submerge.start_position.offset = retracted_offset
+
+    # aspirate and dispense offsets
     transfer_properties.aspirate.aspirate_position.position_reference = (
         PositionReference.LIQUID_MENISCUS
     )
     transfer_properties.dispense.dispense_position.position_reference = (
         PositionReference.LIQUID_MENISCUS
     )
+
+    transfer_properties.aspirate.aspirate_position.offset = submerged_offset
+    transfer_properties.dispense.dispense_position.offset = submerged_offset
+
+    # aspirate and dispense retract end offsets
+
+    transfer_properties.aspirate.retract.end_position.position_reference = (
+        PositionReference.LIQUID_MENISCUS
+    )
     transfer_properties.dispense.retract.end_position.position_reference = (
         PositionReference.LIQUID_MENISCUS
     )
+    transfer_properties.aspirate.retract.end_position.offset = retracted_offset
+    transfer_properties.dispense.retract.end_position.offset = retracted_offset
+
     fixture_settings.pipette._core.load_liquid_class(  # type: ignore [attr-defined]
         name=fixture_settings.liquid_class.name,
         transfer_properties=transfer_properties,
@@ -1055,7 +1077,7 @@ def run_one_test(
     well_top = fixture_settings.liquid_source.top().point
     above_scale = Point(
         well_top.x,
-        well_top.y + asp_offset.y,
+        well_top.y + retracted_offset.y,
         fixture_settings.pipette._get_last_location_by_api_version().point.z,  # type: ignore [union-attr]
     )
     fixture_settings.pipette.move_to(Location(above_scale, None))
