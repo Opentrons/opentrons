@@ -1,9 +1,8 @@
 import asyncio
 import pytest
 import mock
-from decoy import Decoy
 from contextlib import nullcontext as does_not_raise
-from typing import AsyncGenerator, ContextManager, Any, Optional
+from typing import AsyncGenerator, ContextManager, Any
 from opentrons.drivers.flex_stacker.simulator import SimulatingDriver
 from opentrons.drivers.flex_stacker.types import (
     Direction,
@@ -476,59 +475,36 @@ async def test_dispense_labware_motion_sequence(
         assert verify_shuttle_labware_presence.call_count == 2
 
 
-@pytest.mark.parametrize(
-    (
-        "hopper_lw_detected",
-        "shuttle_lw_detected_before",
-        "shuttle_lw_detected_after",
-        "expected_raise",
-    ),
-    [
-        (True, False, True, does_not_raise()),  # Happy Path
-        (
-            False,
-            False,
-            True,
-            does_not_raise(),
-        ),  # Hopper reported empty but a labware is successfully retrieved
-        (
-            False,
-            True,
-            None,
-            pytest.raises(FlexStackerShuttleNotEmptyError),
-        ),  # Shuttle is already occupied before retrieving
-        (
-            True,
-            False,
-            False,
-            pytest.raises(FlexStackerShuttleLabwareError),
-        ),  # Hopper reported empty but no labware was retrieved
-        (
-            False,
-            False,
-            False,
-            pytest.raises(FlexStackerHopperLabwareError),
-        ),  # Hopper reported empty but no labware was retrieved
-    ],
-)
+@pytest.mark.parametrize("hopper_lw_detected", [True, False])
+@pytest.mark.parametrize("shuttle_lw_detected_before", [True, False])
+@pytest.mark.parametrize("shuttle_lw_detected_after", [True, False])
 async def test_dispense_labware_error_handling(
-    decoy: Decoy,
     subject: modules.FlexStacker,
     hopper_lw_detected: bool,
     shuttle_lw_detected_before: bool,
-    shuttle_lw_detected_after: Optional[bool],
-    expected_raise: ContextManager[Any],
+    shuttle_lw_detected_after: bool,
 ) -> None:
     """
-    Test successful dispense labware with labware sensing enforced.
+    Test different error handling scenarios when dispensing labware.
     """
+    expected_raise: ContextManager[Any]
+    if shuttle_lw_detected_before is True:
+        # If the shuttle is occupied, it should always raise an error
+        expected_raise = pytest.raises(FlexStackerShuttleNotEmptyError)
+    elif shuttle_lw_detected_after is True:
+        # if the shuttle has labware after dispensing, no need to raise any error
+        expected_raise = does_not_raise()
+    elif hopper_lw_detected is False:
+        # if the shuttle has no labware after dispensing, and the hopper has no labware,
+        # it should raise a FlexStackerHopperLabwareError
+        expected_raise = pytest.raises(FlexStackerHopperLabwareError)
+    else:
+        # if the shuttle has no labware after dispensing, but the hopper has labware,
+        # it should raise a FlexStackerShuttleLabwareError letting user know
+        # the labware latch is properly jammed
+        expected_raise = pytest.raises(FlexStackerShuttleLabwareError)
+
     with (
-        mock.patch.object(
-            subject, "_prepare_for_action", mock.AsyncMock()
-        ) as _prepare_for_action,
-        mock.patch.object(
-            subject, "_move_and_home_axis", mock.AsyncMock()
-        ) as _move_and_home_axis,
         mock.patch.object(
             subject,
             "labware_detected",
@@ -537,27 +513,28 @@ async def test_dispense_labware_error_handling(
                 shuttle_lw_detected_before,
                 shuttle_lw_detected_after,
             ],
+            autospec=True,
         ) as labware_detected,
-        mock.patch.object(
-            subject,
-            "verify_shuttle_labware_presence",
-            side_effect=subject.verify_shuttle_labware_presence,
-        ) as verify_shuttle_labware_presence,
-        mock.patch.object(
-            subject,
-            "verify_hopper_labware_presence",
-            side_effect=subject.verify_hopper_labware_presence,
-        ) as verify_hopper_labware_presence,
-        mock.patch.object(subject, "move_axis", mock.AsyncMock()) as move_axis,
-        mock.patch.object(subject, "home_axis", mock.AsyncMock()) as home_axis,
-        mock.patch.object(subject, "open_latch", mock.AsyncMock()) as open_latch,
-        mock.patch.object(subject, "close_latch", mock.AsyncMock()) as close_latch,
     ):
+
         with expected_raise:
             # Test valid labware height
             await subject.dispense_labware(
                 labware_height=100.0,
             )
+
+        expected_calls = [
+            mock.call(StackerAxis.Z, Direction.EXTEND),
+            mock.call(StackerAxis.X, Direction.RETRACT),
+            mock.call(StackerAxis.X, Direction.RETRACT),
+        ]
+
+        if expected_raise is pytest.raises(FlexStackerShuttleNotEmptyError):
+            assert labware_detected.call_count == 2
+            labware_detected.assert_has_calls(expected_calls[:2])
+        else:
+            assert labware_detected.call_count == 3
+            labware_detected.assert_has_calls(expected_calls)
 
 
 @pytest.mark.parametrize(
