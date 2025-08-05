@@ -170,3 +170,21 @@ export function getWellPropsForSVGLabwareV1(
     y: _getSvgYValueForWell(def, wellDef) + yCorrection,
   }))
 }
+
+// determines if the labware is a lid
+export const getIsLid = (labwareDef: LabwareDefinition): boolean =>
+  labwareDef.allowedRoles?.includes('lid') ?? false
+
+// determines if the labware can be a target for pipetting
+export const getIsPipettableLabware = (
+  labwareDef: LabwareDefinition
+): boolean => {
+  // assume the labware can be a pipetting target if labware definition's `allowedRoles` is undefined
+  if (labwareDef.allowedRoles == null) {
+    return true
+  }
+  return (
+    labwareDef.allowedRoles.includes('labware') &&
+    !labwareDef.allowedRoles.includes('lid')
+  )
+}

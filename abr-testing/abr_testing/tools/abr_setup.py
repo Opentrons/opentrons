@@ -7,7 +7,7 @@ import sys
 from datetime import datetime, timedelta
 from typing import Any
 from hardware_testing.scripts import ABRAsairScript  # type: ignore
-from abr_testing.automation import google_sheets_tool
+from abr_testing.automation import google_sheets_tool, gopro
 from abr_testing.data_collection import (
     get_run_logs,
     abr_google_drive,
@@ -189,6 +189,9 @@ def main(configurations: configparser.ConfigParser) -> None:
             "Storage, Email, Drive Folder, or Sheet name is missing, please fix configs"
         )
         sys.exit(1)
+    # Set up go pros
+    storage_directory = configurations["RUN-LOG"]["Storage"]
+    gopro.run(storage_directory)
 
 
 if __name__ == "__main__":

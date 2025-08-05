@@ -608,7 +608,7 @@ class LabwareDefinition3(BaseModel):
     allowedRoles: list[LabwareRole] = Field(default_factory=list)
     gripperOffsets: dict[str, GripperOffsets] = Field(default_factory=dict)
     gripForce: float | None = None
-    gripHeightFromLabwareBottom: float | None = None
+    gripHeightFromLabwareOrigin: float | None = None
     stackLimit: int | None = None
     compatibleParentLabware: list[str] | None = None
     innerLabwareGeometry: dict[str, InnerWellGeometry] | None = None

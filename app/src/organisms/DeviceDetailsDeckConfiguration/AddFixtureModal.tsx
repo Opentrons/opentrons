@@ -1,10 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 
 import {
-  Btn,
-  COLORS,
   DIRECTION_COLUMN,
   FixtureOption,
   Flex,
@@ -12,7 +9,6 @@ import {
   Modal,
   SPACING,
   StyledText,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   useModulesQuery,
@@ -24,13 +20,19 @@ import {
   replaceCutoutFixtureWithComboFixture,
   replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   SINGLE_CENTER_CUTOUTS,
+  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 
+import { useModuleUSBPort } from '/app/local-resources/modules'
 import { ODDFixtureOption } from '/app/molecules/ODDFixtureOption'
 import { OddModal } from '/app/molecules/OddModal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration/'
 
-import { getOptions } from '../DeviceDetailsDeckConfiguration/utils'
+import {
+  getFixtureOptions,
+  getOptions,
+  getWasteChuteOptions,
+} from '../DeviceDetailsDeckConfiguration/utils'
 import { useSendIdentifyStacker } from '../ModuleWizardFlows/hooks'
 
 import type { AttachedModule } from '@opentrons/api-client'
@@ -39,6 +41,7 @@ import type {
   AddressableAreaNamesWithFakes,
   CutoutConfig,
   CutoutConfigMap,
+  CutoutFixtureId,
   CutoutId,
   DeckDefinition,
 } from '@opentrons/shared-data'
@@ -53,6 +56,7 @@ interface AddFixtureModalProps {
   closeModal: () => void
   deckDef: DeckDefinition
   isOnDevice?: boolean
+  existingCutoutFixtureId?: CutoutFixtureId
 }
 type OptionStage =
   | 'modulesOrFixtures'
@@ -67,6 +71,7 @@ export function AddFixtureModal({
   closeModal,
   isOnDevice = false,
   deckDef,
+  existingCutoutFixtureId,
 }: AddFixtureModalProps): JSX.Element {
   const { t } = useTranslation(['device_details', 'shared'])
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
@@ -89,6 +94,23 @@ export function AddFixtureModal({
     ? 'moduleOptions'
     : 'modulesOrFixtures'
   const [optionStage, setOptionStage] = useState<OptionStage>(initialStage)
+
+  // Bind allFixtureOptions with useEffect
+  const [allFixtureOptions, setAllFixtureOptions] = useState<
+    CutoutConfigMap[][]
+  >([])
+
+  useEffect(() => {
+    const options = [
+      ...getFixtureOptions(
+        cutoutId,
+        addressableAreaId,
+        existingCutoutFixtureId
+      ),
+      ...getWasteChuteOptions(cutoutId),
+    ]
+    setAllFixtureOptions(options)
+  }, [cutoutId, addressableAreaId, existingCutoutFixtureId])
 
   const modalHeader: OddModalHeaderBaseProps = {
     title: t('add_to', {
@@ -113,7 +135,8 @@ export function AddFixtureModal({
     unconfiguredMods,
     optionStage,
     addressableAreaId,
-    deckDef
+    deckDef,
+    existingCutoutFixtureId
   )
 
   let nextStageOptions = null
@@ -141,11 +164,12 @@ export function AddFixtureModal({
       </>
     ) : (
       <>
-        {SINGLE_CENTER_CUTOUTS.includes(cutoutId) ? null : (
+        {SINGLE_CENTER_CUTOUTS.includes(cutoutId) ||
+        allFixtureOptions.length === 0 ? null : (
           <FixtureOption
             key="fixturesOption"
             optionName="Fixtures"
-            buttonText={t('add')}
+            buttonText={t('select_options')}
             onClickHandler={() => {
               setOptionStage('fixtureOptions')
             }}
@@ -154,9 +178,26 @@ export function AddFixtureModal({
         <FixtureOption
           key="modulesOption"
           optionName="Modules"
-          buttonText={t('add')}
+          buttonText={t('select_options')}
           onClickHandler={() => {
             setOptionStage('moduleOptions')
+          }}
+        />
+      </>
+    )
+  } else if (
+    optionStage === 'fixtureOptions' &&
+    cutoutId === WASTE_CHUTE_CUTOUT &&
+    addressableAreaId === 'D3'
+  ) {
+    nextStageOptions = (
+      <>
+        <FixtureOption
+          key="wasteChuteStageOption"
+          optionName="Waste chute"
+          buttonText={t('select_options')}
+          onClickHandler={() => {
+            setOptionStage('wasteChuteOptions')
           }}
         />
       </>
@@ -164,6 +205,7 @@ export function AddFixtureModal({
   }
 
   const sendIdentifyStacker = useSendIdentifyStacker()
+  const { parseModuleUSBPort } = useModuleUSBPort()
   const [identifyInUse, setIdentifyInUse] = useState<string | null>(null)
   const [identifyTimeout, setTimeoutID] = useState<NodeJS.Timeout | null>(null)
 
@@ -233,14 +275,11 @@ export function AddFixtureModal({
   }
 
   const fixtureOptions = availableOptions.map(cutoutConfigs => {
-    const usbPort = (modulesData?.data ?? []).find(
-      m => m.serialNumber === cutoutConfigs[0].opentronsModuleSerialNumber
-    )?.usbPort
-    const portDisplay =
-      usbPort?.hubPort != null
-        ? `${usbPort.port}.${usbPort.hubPort}`
-        : usbPort?.port
-
+    const matchedModule =
+      (modulesData?.data ?? []).find(
+        m => m.serialNumber === cutoutConfigs[0].opentronsModuleSerialNumber
+      ) ?? null
+    const portDisplay = parseModuleUSBPort(matchedModule)
     const fixtureSerialNumber = cutoutConfigs[0].opentronsModuleSerialNumber
     if (
       fixtureSerialNumber !== undefined &&
@@ -333,32 +372,8 @@ export function AddFixtureModal({
               {nextStageOptions}
             </ListTable>
           </Flex>
-          {optionStage === 'wasteChuteOptions' ? (
-            <Btn
-              onClick={() => {
-                setOptionStage('fixtureOptions')
-              }}
-              aria-label="back"
-              paddingX={SPACING.spacing16}
-              marginTop="1.44rem"
-              marginBottom="0.56rem"
-            >
-              <StyledText css={GO_BACK_BUTTON_STYLE}>
-                {t('shared:go_back')}
-              </StyledText>
-            </Btn>
-          ) : null}
         </Modal>
       )}
     </>
   )
 }
-
-const GO_BACK_BUTTON_STYLE = css`
-  ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.grey50};
-
-  &:hover {
-    opacity: 70%;
-  }
-`

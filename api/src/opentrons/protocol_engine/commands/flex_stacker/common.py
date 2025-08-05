@@ -148,6 +148,17 @@ class FlexStackerLabwareRetrieveError(ErrorOccurrence):
     errorInfo: FailedLabware
 
 
+class FlexStackerShuttleOccupiedError(ErrorOccurrence):
+    """Returned when the Flex Stacker Shuttle is occupied when it shouldn't be."""
+
+    isDefined: bool = True
+    errorType: Literal["flexStackerShuttleOccupied"] = "flexStackerShuttleOccupied"
+
+    errorCode: str = ErrorCodes.STACKER_SHUTTLE_OCCUPIED.value.code
+    detail: str = ErrorCodes.STACKER_SHUTTLE_OCCUPIED.value.detail
+    errorInfo: FailedLabware
+
+
 @dataclass
 class _LabwareDefPair:
     definition: LabwareDefinition

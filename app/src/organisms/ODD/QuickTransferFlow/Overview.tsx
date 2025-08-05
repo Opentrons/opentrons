@@ -5,11 +5,10 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   ListItem,
   NO_WRAP,
   SPACING,
-  TEXT_ALIGN_RIGHT,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -43,6 +42,13 @@ export function Overview(props: OverviewProps): JSX.Element | null {
     makeSnackbar(t('create_new_to_edit') as string)
   }
 
+  const pathCopyMap = {
+    multiAspirate: t('consolidate'),
+    multiDispense: t('distribute'),
+    single: t('single'),
+  }
+  const pathCopy = pathCopyMap[state.path]
+
   const displayItems = [
     {
       option: t('pipette'),
@@ -69,11 +75,11 @@ export function Overview(props: OverviewProps): JSX.Element | null {
     },
     {
       option: t('pipette_path'),
-      value: state.path,
+      value: pathCopy,
     },
     {
       option: t('tip_change_frequency'),
-      value: state.changeTip,
+      value: t(state.changeTip),
     },
     {
       option: t('tip_drop_location'),
@@ -91,7 +97,7 @@ export function Overview(props: OverviewProps): JSX.Element | null {
     },
     {
       option: t('liquid_class'),
-      value: allLiquidClasses[state?.liquidClassName]?.displayName,
+      value: allLiquidClasses[state?.liquidClassName]?.displayName ?? t('none'),
     },
   ]
 
@@ -104,20 +110,20 @@ export function Overview(props: OverviewProps): JSX.Element | null {
       {displayItems.map(displayItem => (
         <ListItem type="default" key={displayItem.option} onClick={onClick}>
           <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-            <LegacyStyledText
-              css={TYPOGRAPHY.level4HeaderSemiBold}
+            <StyledText
+              oddStyle="level4HeaderRegular"
               width="20rem"
               whiteSpace={NO_WRAP}
             >
               {displayItem.option}
-            </LegacyStyledText>
-            <LegacyStyledText
-              css={TYPOGRAPHY.level4HeaderRegular}
+            </StyledText>
+            <StyledText
+              oddStyle="level4HeaderRegular"
               color={COLORS.grey60}
-              textAlign={TEXT_ALIGN_RIGHT}
+              textAlign={TYPOGRAPHY.textAlignRight}
             >
               {displayItem.value}
-            </LegacyStyledText>
+            </StyledText>
           </Flex>
         </ListItem>
       ))}

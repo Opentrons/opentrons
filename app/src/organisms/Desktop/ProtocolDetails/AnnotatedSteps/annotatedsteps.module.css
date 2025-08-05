@@ -61,6 +61,13 @@
 
 .individual_command {
   display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.individual_command_header {
+  display: flex;
   align-items: center;
   gap: var(--spacing-8);
 }

@@ -90,14 +90,8 @@ export function getLabwareViewBox(
 
 /** Logically specifies where a labware is located. */
 export interface ComputeLabwareOriginInput {
-  /** The underlying deck. */
-  deckDefinition: DeckDefinition
-
-  /**
-   * The underlying slot. If this is a Flex and the labware is on a module, this should
-   * be the slot that the module replaces.
-   */
-  slotId: string
+  /** The labware and all the labware underneath it. */
+  labwareDefinitionsTopToBottom: LabwareDefinition[]
 
   /**
    * The definition of the module underneath the labware, if there is one.
@@ -106,8 +100,14 @@ export interface ComputeLabwareOriginInput {
    */
   moduleDefinition: ModuleDefinition | null
 
-  /** The labware and all the labware underneath it. */
-  labwareDefinitionsBottomToTop: LabwareDefinition[]
+  /**
+   * The underlying slot. If this is a Flex and the labware is on a module, this should
+   * be the slot that the module replaces.
+   */
+  slotId: string
+
+  /** The underlying deck. */
+  deckDefinition: DeckDefinition
 }
 
 /**
@@ -145,14 +145,33 @@ function getLabwareStackAsArray(
     deckDefinition,
     slotId,
     moduleDefinition,
-    labwareDefinitionsBottomToTop,
+    labwareDefinitionsTopToBottom,
   } = input
 
-  if (labwareDefinitionsBottomToTop.length === 0) {
+  if (labwareDefinitionsTopToBottom.length === 0) {
     return []
   }
+  const bottomLabware =
+    labwareDefinitionsTopToBottom[labwareDefinitionsTopToBottom.length - 1]
 
   const result: LabwareStackElement[] = []
+
+  for (const [
+    childLabwareDefinition,
+    parentLabwareDefinition,
+  ] of pairsFromArray(labwareDefinitionsTopToBottom)) {
+    result.push({
+      debugInfo: {
+        type: 'labwareOnLabware',
+        parentLabwareDefinition,
+        childLabwareDefinition,
+      },
+      offset: getLabwareOriginToLabwareOrigin(
+        parentLabwareDefinition,
+        childLabwareDefinition
+      ),
+    })
+  }
 
   if (moduleDefinition == null) {
     // The bottom of the stack is a labware in a deck slot.
@@ -166,22 +185,22 @@ function getLabwareStackAsArray(
     }
     const slotPosition = coordinateTupleToVector3D(slotPositionTuple)
     result.push({
-      debugMetadata: {
+      debugInfo: {
+        type: 'labwareOnDeckSlot',
+        parentSlotId: slotId,
+        childLabwareDefinition: bottomLabware,
+      },
+      offset: getDeckSlotOriginToLabwareOrigin(
+        slotAddressableArea,
+        bottomLabware
+      ),
+    })
+    result.push({
+      debugInfo: {
         type: 'rootDeckSlot',
         slotId,
       },
       offset: slotPosition,
-    })
-    result.push({
-      debugMetadata: {
-        type: 'deckSlotToLabware',
-        parentSlotId: slotId,
-        childLabwareDefinition: labwareDefinitionsBottomToTop[0],
-      },
-      offset: getDeckSlotOriginToLabwareOrigin(
-        slotAddressableArea,
-        labwareDefinitionsBottomToTop[0]
-      ),
     })
   } else {
     // The bottom of the stack is a labware in a module in a deck slot.
@@ -191,7 +210,20 @@ function getLabwareStackAsArray(
     }
     const slotPosition = coordinateTupleToVector3D(slotPositionTuple)
     result.push({
-      debugMetadata: {
+      debugInfo: {
+        type: 'labwareOnModule',
+        parentModuleDefinition: moduleDefinition,
+        childLabwareDefinition: bottomLabware,
+      },
+      offset: getModuleParentOriginToLabwareOrigin(
+        deckDefinition.otId,
+        slotId,
+        moduleDefinition,
+        bottomLabware
+      ),
+    })
+    result.push({
+      debugInfo: {
         type: 'rootModule',
         parentSlotId: slotId,
         moduleDefinition,
@@ -199,36 +231,6 @@ function getLabwareStackAsArray(
       // Modules don't really have an origin of their own that's separate from the
       // origin of their parent deck slot.
       offset: slotPosition,
-    })
-    result.push({
-      debugMetadata: {
-        type: 'moduleToLabware',
-        parentModuleDefinition: moduleDefinition,
-        childLabwareDefinition: labwareDefinitionsBottomToTop[0],
-      },
-      offset: getModuleParentOriginToLabwareOrigin(
-        deckDefinition.otId,
-        slotId,
-        moduleDefinition,
-        labwareDefinitionsBottomToTop[0]
-      ),
-    })
-  }
-
-  for (const [
-    parentLabwareDefinition,
-    childLabwareDefinition,
-  ] of pairsFromArray(labwareDefinitionsBottomToTop)) {
-    result.push({
-      debugMetadata: {
-        type: 'labwareToLabware',
-        parentLabwareDefinition,
-        childLabwareDefinition,
-      },
-      offset: getLabwareOriginToLabwareOrigin(
-        parentLabwareDefinition,
-        childLabwareDefinition
-      ),
     })
   }
 
@@ -243,7 +245,7 @@ interface LabwareStackElement {
    * Human-readable metadata for the benefit of throwing in a console.log() or whatever.
    * Code should not consume this.
    */
-  debugMetadata:
+  debugInfo:
     | {
         type: 'rootDeckSlot'
         slotId: string
@@ -254,17 +256,17 @@ interface LabwareStackElement {
         moduleDefinition: ModuleDefinition
       }
     | {
-        type: 'deckSlotToLabware'
+        type: 'labwareOnDeckSlot'
         parentSlotId: string
         childLabwareDefinition: LabwareDefinition
       }
     | {
-        type: 'moduleToLabware'
+        type: 'labwareOnModule'
         parentModuleDefinition: ModuleDefinition
         childLabwareDefinition: LabwareDefinition
       }
     | {
-        type: 'labwareToLabware'
+        type: 'labwareOnLabware'
         parentLabwareDefinition: LabwareDefinition
         childLabwareDefinition: LabwareDefinition
       }

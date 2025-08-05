@@ -22,6 +22,7 @@ import {
   curryCommandCreator,
   curryWithoutPython,
   DEST_WELL_BLOWOUT_DESTINATION,
+  formatChangeTipArg,
   formatPyStr,
   getIsRetractSafeForAirGap,
   getIsSafePipetteMovement,
@@ -218,22 +219,25 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     name: pipetteName,
     pythonName: pythonPipetteName,
   } = pipetteEntities[pipette]
-  const liquidClassValuesForTip = getAllLiquidClassDefs()
-    [
-      liquidClass === NONE_LIQUID_CLASS_NAME || liquidClass == null
-        ? WATER_LIQUID_CLASS_NAME
-        : liquidClass
-    ].byPipette?.find(
-      ({ pipetteModel }) => (pipetteModel = getFlexNameConversion(pipetteSpecs))
-    )
-    ?.byTipType.find(({ tiprack }) => tiprack === tiprackDefUri)
+  const liquidClassValuesForTip =
+    getAllLiquidClassDefs()
+      [
+        liquidClass === NONE_LIQUID_CLASS_NAME || liquidClass == null
+          ? WATER_LIQUID_CLASS_NAME
+          : liquidClass
+      ].byPipette?.find(
+        ({ pipetteModel }) =>
+          pipetteModel === getFlexNameConversion(pipetteSpecs)
+      )
+      ?.byTipType.find(({ tiprack }) => tiprack === tiprackDefUri) ?? null
   const { aspirate } = liquidClassValuesForTip ?? {}
   const { multiWellHandling } = getTransferPlanAndReferenceVolumes({
     pipetteSpecs,
     tiprackDefinition,
     volume,
     path: 'multiAspirate',
-    numDispenseWells: sourceWells.length,
+    numAspirateWells: sourceWells.length,
+    numDispenseWells: 1,
     aspirateAirGapByVolume:
       (aspirate?.retract.airGapByVolume as Array<[number, number]>) ?? [],
     conditioningByVolume: null,
@@ -321,16 +325,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       byVolumeProperty: 'correctionByVolume',
       defaultValue: 0,
     }) ?? 0
-  const dispenseCorrectionForTotalDispense =
-    getByVolumeValue({
-      liquidClass,
-      pipetteSpecs,
-      tiprackDefUri: tipRack,
-      targetVolume: volume,
-      liquidHandlingAction: 'singleDispense',
-      byVolumeProperty: 'correctionByVolume',
-      defaultValue: 0,
-    }) ?? 0
+
   /** needed for python generation! > */
   const destTrashPipetteName =
     trashBinEntities[destLabware]?.pythonName ??
@@ -359,8 +354,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         ? getFlexNameConversion(pipetteSpecs)
         : pipetteName,
       tiprackUri: tipRack,
-      aspirateCorrectionVolume: aspirateCorrectionVolumeForSampleAspiration,
-      dispenseCorrectionVolume: dispenseCorrectionForTotalDispense,
+      liquidClassValuesForTip,
     })}`,
   ]
   const customLiquidClass = `${PROTOCOL_CONTEXT_NAME}.define_liquid_class(\n${indentPyLines(
@@ -373,9 +367,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     `dest=${
       pythonDestWells != null ? `[${pythonDestWells}]` : destTrashPipetteName
     }`,
-    //  TODO: fix bug where new_tip api arg does not allow
-    //  changeTip: always but PD does
-    `new_tip=${formatPyStr(changeTip)}`,
+    `new_tip=${formatPyStr(formatChangeTipArg(changeTip))}`,
     `trash_location=${trashPipetteName}`,
     ...(pipetteSpecs.channels > 1 ? [`group_wells=False`] : []),
     `keep_last_tip=True`,

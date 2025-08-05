@@ -23,6 +23,7 @@ from opentrons_shared_data.errors.exceptions import (
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
+    LabwareDefinition2,
     InnerWellGeometry,
 )
 from opentrons_shared_data.deck.types import CutoutFixture
@@ -91,6 +92,7 @@ from ..types import (
     WellLocationType,
     WellLocationFunction,
     LabwareParentDefinition,
+    AddressableArea,
 )
 from ..types.liquid_level_detection import SimulatedProbeResult, LiquidTrackingType
 from .config import Config
@@ -676,7 +678,6 @@ class GeometryView:
                     delta=delta,
                     meniscus_tracking=meniscus_tracking,
                 )
-        return NotImplemented
 
     def get_well_height(
         self,
@@ -701,6 +702,8 @@ class GeometryView:
             # should be updated.
             module_id = lw_data.location.moduleId
             height_over_labware = self._modules.get_height_over_labware(module_id)
+        # todo(mm, 2025-07-31): This math needs updating for schema 2:
+        # labware_pos.z is not necessarily the bottom of the labware.
         return labware_pos.z + z_dim + height_over_labware
 
     def get_nominal_effective_tip_length(
@@ -1038,28 +1041,44 @@ class GeometryView:
         It is calculated as the xy center of the slot with z as the point indicated by
         z-position of labware bottom + grip height from labware bottom.
         """
-        grip_height_from_labware_bottom = (
-            self._labware.get_grip_height_from_labware_bottom(labware_definition)
-        )
-        location_name = self._get_underlying_addressable_area_name(location)
+        grip_z_from_lw_origin = self._labware.get_grip_z(labware_definition)
+        aa_name = self._get_underlying_addressable_area_name(location)
         parent_to_lw_offset = self._get_stackup_placement_origin_to_lw_origin(
             location=location,
             definition=labware_definition,
             is_topmost_labware=True,  # We aren't concerned with entities above the gripped labware.
         )
+        addressable_area = self._addressable_areas.get_addressable_area(aa_name)
+        lw_origin_to_parent = self._get_lw_origin_to_parent(
+            labware_definition=labware_definition, addressable_area=addressable_area
+        )
         mod_cal_offset = self._get_calibrated_module_offset(location)
-        location_center = self._addressable_areas.get_addressable_area_center(
-            location_name
+        location_center = self._addressable_areas.get_addressable_area_center(aa_name)
+
+        return (
+            location_center
+            + parent_to_lw_offset
+            + lw_origin_to_parent
+            + mod_cal_offset
+            + Point(0, 0, grip_z_from_lw_origin)
         )
 
-        return Point(
-            x=location_center.x + parent_to_lw_offset.x + mod_cal_offset.x,
-            y=location_center.y + parent_to_lw_offset.y + mod_cal_offset.y,
-            z=location_center.z
-            + parent_to_lw_offset.z
-            + mod_cal_offset.z
-            + grip_height_from_labware_bottom,
-        )
+    def _get_lw_origin_to_parent(
+        self, labware_definition: LabwareDefinition, addressable_area: AddressableArea
+    ) -> Point:
+        if isinstance(labware_definition, LabwareDefinition2):
+            return Point(0, 0, 0)
+        else:
+            bb_y = addressable_area.bounding_box.y
+            bb_z = addressable_area.bounding_box.z
+            return (
+                Point(
+                    x=0,
+                    y=bb_y,
+                    z=bb_z,
+                )
+                * -1
+            )
 
     def get_extra_waypoints(
         self,
@@ -1517,6 +1536,7 @@ class GeometryView:
         self,
         gripper_homed_position_z: float,
         labware_id: str,
+        # todo(mm, 2025-07-31): arg unused, investigate or remove.
         current_location: OnDeckLabwareLocation,
     ) -> None:
         """Check for potential collision of tips against labware to be lifted."""
@@ -1530,16 +1550,25 @@ class GeometryView:
             tip = self._pipettes.get_attached_tip(pipette.id)
             if not tip:
                 continue
-            labware_top_z_when_gripped = gripper_homed_position_z + (
-                self._labware.get_dimensions(labware_definition=labware_definition).z
-                - self._labware.get_grip_height_from_labware_bottom(labware_definition)
+
+            labware_origin_to_grip_point = self._labware.get_grip_z(labware_definition)
+            grip_point_to_labware_origin = -labware_origin_to_grip_point
+            height_above_labware_origin = self._labware.get_extents_around_lw_origin(
+                labware_definition
+            ).max_z
+            labware_top_z_when_gripped = (
+                gripper_homed_position_z
+                + grip_point_to_labware_origin
+                + height_above_labware_origin
             )
-            # TODO(cb, 2024-01-18): Utilizing the nozzle map and labware X coordinates verify if collisions will occur on the X axis (analysis will use hard coded data to measure from the gripper critical point to the pipette mount)
+
+            # TODO(cb, 2024-01-18): Utilizing the nozzle map and labware X coordinates,
+            # verify if collisions will occur on the X axis (analysis will use hard coded data
+            # to measure from the gripper critical point to the pipette mount)
             if (_PIPETTE_HOMED_POSITION_Z - tip.length) < labware_top_z_when_gripped:
                 raise LabwareMovementNotAllowedError(
                     f"Cannot move labware '{labware_definition.parameters.loadName}' when {int(tip.volume)} µL tips are attached."
                 )
-        return
 
     def _nominal_gripper_offsets_for_location(
         self, location: OnDeckLabwareLocation

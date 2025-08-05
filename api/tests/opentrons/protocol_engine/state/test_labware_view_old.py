@@ -14,16 +14,20 @@ from opentrons_shared_data.deck.types import DeckDefinitionV5
 from opentrons_shared_data.pipette.types import LabwareUri
 from opentrons_shared_data.labware import load_definition
 from opentrons_shared_data.labware.labware_definition import (
-    Parameters2,
+    AxisAlignedBoundingBox3D,
+    Dimensions as LabwareDimensions,
+    Extents,
+    GripperOffsets,
+    labware_definition_type_adapter,
     LabwareDefinition,
     LabwareDefinition2,
+    LabwareDefinition3,
     LabwareRole,
-    GripperOffsets,
+    Parameters2,
     Vector3D,
-    labware_definition_type_adapter,
 )
 
-from opentrons.types import DeckSlotName, MountType
+from opentrons.types import DeckSlotName, MountType, Point
 
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
@@ -49,6 +53,10 @@ from opentrons.protocol_engine.state.labware import (
     LabwareView,
     LabwareLoadParams,
 )
+from opentrons.protocol_engine.state._axis_aligned_bounding_box import (
+    AxisAlignedBoundingBox3D as EngineAABB,
+)
+
 
 plate = LoadedLabware(
     id="plate-id",
@@ -760,21 +768,64 @@ def test_get_load_name(reservoir_def: LabwareDefinition) -> None:
     assert result == reservoir_def.parameters.loadName
 
 
-def test_get_dimensions(well_plate_def: LabwareDefinition) -> None:
+def test_get_dimensions() -> None:
     """It should compute the dimensions of a labware."""
-    subject = get_labware_view(
-        labware_by_id={"plate-id": plate},
-        definitions_by_uri={"some-plate-uri": well_plate_def},
-    )
+    subject = get_labware_view()
 
-    result = subject.get_dimensions(labware_id="plate-id")
+    # Schema 2 case:
+    assert subject.get_dimensions(
+        labware_definition=LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+            schemaVersion=2,
+            cornerOffsetFromSlot=Vector3D(
+                x=1, y=2, z=3
+            ),  # Should not affect dimensions.
+            dimensions=LabwareDimensions(
+                xDimension=100, yDimension=200, zDimension=300
+            ),
+        )
+    ) == Dimensions(100, 200, 300)
 
-    assert well_plate_def.schemaVersion == 2  # For the presence of `dimensions`.
-    assert result == Dimensions(
-        x=well_plate_def.dimensions.xDimension,
-        y=well_plate_def.dimensions.yDimension,
-        z=well_plate_def.dimensions.zDimension,
-    )
+    # Schema 3 case:
+    assert subject.get_dimensions(
+        labware_definition=LabwareDefinition3.model_construct(  # type: ignore[call-arg]
+            schemaVersion=3,
+            extents=Extents(
+                total=AxisAlignedBoundingBox3D(
+                    backLeftBottom=Vector3D(x=1, y=2, z=3),
+                    frontRightTop=Vector3D(x=101, y=-198, z=303),
+                )
+            ),
+        )
+    ) == Dimensions(100, 200, 300)
+
+
+def test_get_extents_around_lw_origin() -> None:
+    """It should compute the extents of the labware, relative to the labware's origin."""
+    subject = get_labware_view()
+
+    # Schema 2 case:
+    assert subject.get_extents_around_lw_origin(
+        LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+            schemaVersion=2,
+            cornerOffsetFromSlot=Vector3D(x=1, y=2, z=3),  # Should not affect extents.
+            dimensions=LabwareDimensions(
+                xDimension=100, yDimension=200, zDimension=300
+            ),
+        )
+    ) == EngineAABB.from_corners(Point(0, 0, 0), Point(100, 200, 300))
+
+    # Schema 3 case:
+    assert subject.get_extents_around_lw_origin(
+        LabwareDefinition3.model_construct(  # type: ignore[call-arg]
+            schemaVersion=3,
+            extents=Extents(
+                total=AxisAlignedBoundingBox3D(
+                    backLeftBottom=Vector3D(x=100, y=200, z=300),
+                    frontRightTop=Vector3D(x=50, y=250, z=350),
+                )
+            ),
+        )
+    ) == EngineAABB.from_corners(Point(100, 200, 300), Point(50, 250, 350))
 
 
 def test_get_default_magnet_height(
@@ -1814,16 +1865,36 @@ def test_get_grip_force(
     assert subject.get_grip_force(reservoir_def) == 15  # default
 
 
-def test_get_grip_height_from_labware_bottom(
-    well_plate_def: LabwareDefinition,
-    reservoir_def: LabwareDefinition,
-) -> None:
+def test_get_grip_z() -> None:
     """It should get the grip height, if present, from labware definition or return default."""
     subject = get_labware_view()
-    assert (
-        subject.get_grip_height_from_labware_bottom(well_plate_def) == 12.2
-    )  # from definition
-    assert subject.get_grip_height_from_labware_bottom(reservoir_def) == 15.7  # default
+
+    schema_2_with_defined_height = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+        schemaVersion=2, gripHeightFromLabwareBottom=123
+    )
+    assert subject.get_grip_z(schema_2_with_defined_height) == 123
+
+    schema_3_with_defined_height = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
+        schemaVersion=3, gripHeightFromLabwareOrigin=123
+    )
+    assert subject.get_grip_z(schema_3_with_defined_height) == 123
+
+    schema_2_without_defined_height = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+        schemaVersion=2,
+        dimensions=LabwareDimensions(xDimension=0, yDimension=0, zDimension=500),
+    )
+    assert subject.get_grip_z(schema_2_without_defined_height) == 250
+
+    schema_3_without_defined_height = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
+        schemaVersion=3,
+        extents=Extents(
+            total=AxisAlignedBoundingBox3D(
+                backLeftBottom=Vector3D(x=0, y=0, z=500),
+                frontRightTop=Vector3D(x=0, y=0, z=1000),
+            )
+        ),
+    )
+    assert subject.get_grip_z(schema_3_without_defined_height) == 750
 
 
 @pytest.mark.parametrize(

@@ -31,7 +31,7 @@ import { PlateReader } from './PlateReader'
 import { Temperature } from './Temperature'
 import { Thermocycler } from './Thermocycler'
 
-import type { ComponentProps, ReactNode } from 'react'
+import type { ComponentProps, Dispatch, ReactNode, SetStateAction } from 'react'
 import type {
   ModuleDefinition,
   ThermocyclerModuleModel,
@@ -54,19 +54,6 @@ interface Props {
   y: number
 
   def: ModuleDefinition
-  orientation?: 'left' | 'right'
-  innerProps?:
-    | ComponentProps<typeof Thermocycler>
-    | ComponentProps<typeof HeaterShaker>
-    | ComponentProps<typeof Temperature>
-    | {}
-  statusInfo?: ReactNode /** contents of small status rectangle, not displayed if absent */
-
-  /**
-   * Contents to be rendered above and as part of the module, typically labware.
-   * See `childrenPositioningMode`.
-   */
-  children?: ReactNode
 
   /**
    * How child components should be positioned. Use `passThrough` for new code.
@@ -100,6 +87,22 @@ interface Props {
    * If you're rendering the module on a deck, supply this for correct positioning.
    */
   targetDeckId: string | null
+  orientation?: 'left' | 'right'
+  innerProps?:
+    | ComponentProps<typeof Thermocycler>
+    | ComponentProps<typeof HeaterShaker>
+    | ComponentProps<typeof Temperature>
+    | {}
+  statusInfo?: ReactNode /** contents of small status rectangle, not displayed if absent */
+
+  /**
+   * Contents to be rendered above and as part of the module, typically labware.
+   * See `childrenPositioningMode`.
+   */
+  children?: ReactNode
+
+  setSelectedSlot?: Dispatch<SetStateAction<string | null>>
+  setHoveredSlot?: Dispatch<SetStateAction<string | null>>
 }
 
 const statusInfoWrapperProps = {
@@ -128,6 +131,8 @@ export const Module = (props: Props): JSX.Element => {
     childrenPositioningMode,
     targetSlotId,
     targetDeckId,
+    setSelectedSlot,
+    setHoveredSlot,
   } = props
 
   const moduleType = getModuleType(def.model)
@@ -227,6 +232,18 @@ export const Module = (props: Props): JSX.Element => {
     <g
       transform={parentSlotPositionTransform}
       data-test={`Module_${moduleType}`}
+      onMouseEnter={() => {
+        setHoveredSlot?.(targetSlotId)
+      }}
+      onMouseLeave={() => {
+        setHoveredSlot?.(null)
+      }}
+      onClick={() => {
+        setSelectedSlot?.(targetSlotId)
+      }}
+      cursor={
+        setHoveredSlot != null || setSelectedSlot != null ? 'pointer' : 'auto'
+      }
     >
       <g transform={orientationTransform}>
         <g transform={offsetTransform} style={{ fill: C_DARK_GRAY }}>

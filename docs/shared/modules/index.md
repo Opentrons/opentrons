@@ -30,4 +30,12 @@ Opentrons hardware modules add features and capabilities to your robot.
 
     [:octicons-arrow-right-24: Instruction Manual](../hepa-uv/index.md)
 
+-   :opentrons-thermocycler:{ .xl .middle } __Thermocycler Module__
+
+    ---
+
+    An automated on-deck thermocycler in a 96-well plate format.
+
+    [:octicons-arrow-right-24: Instruction Manual](../thermocycler-manual/index.md)
+
 </div>
