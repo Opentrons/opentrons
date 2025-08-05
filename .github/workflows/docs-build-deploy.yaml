@@ -66,6 +66,7 @@ jobs:
     env:
       BRANCH: ${{ github.ref_name }}
     steps:
+      
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -87,7 +88,7 @@ jobs:
         run: make build-flex-manual
       - name: Deploy Flex Manual to Staging
         working-directory: ./docs
-        run: python deploy_flex_manual.py staging --branch ${{ env.BRANCH }}
+        run: python deploy_flex_manual.py staging --branch ${{ github.sha }}
       - name: Output URL to Summary
         run: |
           echo "## Flex Manual deployed to staging" >> $GITHUB_STEP_SUMMARY
@@ -123,7 +124,7 @@ jobs:
         run: make build-flex-manual
       - name: Deploy Flex Manual to Production
         working-directory: ./docs
-        run: python deploy_flex_manual.py production --branch ${{ env.BRANCH }}
+        run: python deploy_flex_manual.py production --branch ${{ github.sha }}
       - name: Output URL to Summary
         run: |
           echo "## Flex Manual deployed to production" >> $GITHUB_STEP_SUMMARY
