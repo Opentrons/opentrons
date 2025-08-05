@@ -38,14 +38,14 @@ export function useDisableStackerSensors(
   }, [dispatch, robotName])
 
   const toggleSensors = (): void => {
+    setSensorsDisabledCache(!sensorDisabledCache)
     dispatch(
       updateSetting(
         robotName,
         'disableFlexStackerLabwareDetection',
-        sensorDisabledCache
+        !sensorDisabledCache
       )
     )
-    setSensorsDisabledCache(!sensorDisabledCache)
   }
 
   return { sensorsDisabled: sensorDisabledCache, toggleSensors }
