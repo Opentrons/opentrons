@@ -29,7 +29,7 @@ describe('IncompatibleTipsModal', () => {
     render(props)
     screen.getByText('Incompatible tips')
     screen.getByText(
-      'Using a pipette with an incompatible tip rack may result reduce pipette accuracy and collisions. We strongly recommend that you do not pair a pipette with an incompatible tip rack.'
+      'Incompatible tip racks cause reduced pipette accuracy and collisions. Use compatible tip racks only.'
     )
     fireEvent.click(screen.getByText('Show more tip types'))
     expect(vi.mocked(setFeatureFlags)).toHaveBeenCalled()

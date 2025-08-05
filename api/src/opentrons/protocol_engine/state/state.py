@@ -317,6 +317,10 @@ class StateStore(StateView, ActionHandler):
 
         return await self._wait_for(condition=predicate, truthiness_to_wait_for=True)
 
+    def clear_command_history(self) -> None:
+        """Clear CommandHistory state."""
+        self._command_store.clear_history()
+
     async def wait_for_not(
         self,
         condition: Callable[_ParamsT, _ReturnT],

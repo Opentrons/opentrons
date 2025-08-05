@@ -121,7 +121,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     onClose: closeModal,
     closeOnOutsideClick: true,
     childrenPadding: SPACING.spacing24,
-    width: '26.75rem',
+    width: '28.75rem',
   }
 
   const availableOptions = getAvailableOptions({ optionStage, cutoutId })

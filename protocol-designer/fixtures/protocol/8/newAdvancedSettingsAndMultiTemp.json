@@ -3649,7 +3649,7 @@
   },
   "liquidSchemaId": "opentronsLiquidSchemaV1",
   "liquids": {},
-  "commandSchemaId": "opentronsCommandSchemaV10",
+  "commandSchemaId": "opentronsCommandSchemaV14",
   "commands": [
     {
       "key": "62957217-7b11-4df8-b810-214307ce9ceb",

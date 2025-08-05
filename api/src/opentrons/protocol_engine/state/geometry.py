@@ -678,7 +678,6 @@ class GeometryView:
                     delta=delta,
                     meniscus_tracking=meniscus_tracking,
                 )
-        return NotImplemented
 
     def get_well_height(
         self,
@@ -703,6 +702,8 @@ class GeometryView:
             # should be updated.
             module_id = lw_data.location.moduleId
             height_over_labware = self._modules.get_height_over_labware(module_id)
+        # todo(mm, 2025-07-31): This math needs updating for schema 2:
+        # labware_pos.z is not necessarily the bottom of the labware.
         return labware_pos.z + z_dim + height_over_labware
 
     def get_nominal_effective_tip_length(
@@ -1040,9 +1041,7 @@ class GeometryView:
         It is calculated as the xy center of the slot with z as the point indicated by
         z-position of labware bottom + grip height from labware bottom.
         """
-        grip_height_from_labware_bottom = (
-            self._labware.get_grip_height_from_labware_bottom(labware_definition)
-        )
+        grip_z_from_lw_origin = self._labware.get_grip_z(labware_definition)
         aa_name = self._get_underlying_addressable_area_name(location)
         parent_to_lw_offset = self._get_stackup_placement_origin_to_lw_origin(
             location=location,
@@ -1061,7 +1060,7 @@ class GeometryView:
             + parent_to_lw_offset
             + lw_origin_to_parent
             + mod_cal_offset
-            + Point(0, 0, grip_height_from_labware_bottom)
+            + Point(0, 0, grip_z_from_lw_origin)
         )
 
     def _get_lw_origin_to_parent(
@@ -1097,14 +1096,36 @@ class GeometryView:
             if self._modules.should_dodge_thermocycler(
                 from_slot=from_slot, to_slot=to_slot
             ):
-                middle_slot = DeckSlotName.SLOT_5.to_equivalent_for_robot_type(
-                    self._config.robot_type
-                )
-                middle_slot_center = (
-                    self._addressable_areas.get_addressable_area_center(
-                        addressable_area_name=middle_slot.id,
+
+                middle_slot_fixture = (
+                    self._addressable_areas.get_fixture_by_deck_slot_name(
+                        DeckSlotName.SLOT_C2
                     )
                 )
+                if middle_slot_fixture is None:
+                    middle_slot = DeckSlotName.SLOT_5.to_equivalent_for_robot_type(
+                        self._config.robot_type
+                    )
+                    middle_slot_center = (
+                        self._addressable_areas.get_addressable_area_center(
+                            addressable_area_name=middle_slot.id,
+                        )
+                    )
+                else:
+                    # todo(chb, 2025-07-30): For now we're defaulting to the first addressable area for these center slot fixtures, but
+                    # if we ever introduce a fixture in the center slot with many addressable areas that aren't "centered" over the deck
+                    # slot we will enter up generating a pretty whacky movement path (potentially dangerous).
+                    middle_slot_center = self._addressable_areas.get_addressable_area_center(
+                        addressable_area_name=middle_slot_fixture[
+                            "providesAddressableAreas"
+                        ][
+                            deck_configuration_provider.get_cutout_id_by_deck_slot_name(
+                                DeckSlotName.SLOT_C2
+                            )
+                        ][
+                            0
+                        ],
+                    )
                 return [(middle_slot_center.x, middle_slot_center.y)]
         return []
 
@@ -1537,6 +1558,7 @@ class GeometryView:
         self,
         gripper_homed_position_z: float,
         labware_id: str,
+        # todo(mm, 2025-07-31): arg unused, investigate or remove.
         current_location: OnDeckLabwareLocation,
     ) -> None:
         """Check for potential collision of tips against labware to be lifted."""
@@ -1550,16 +1572,25 @@ class GeometryView:
             tip = self._pipettes.get_attached_tip(pipette.id)
             if not tip:
                 continue
-            labware_top_z_when_gripped = gripper_homed_position_z + (
-                self._labware.get_dimensions(labware_definition=labware_definition).z
-                - self._labware.get_grip_height_from_labware_bottom(labware_definition)
+
+            labware_origin_to_grip_point = self._labware.get_grip_z(labware_definition)
+            grip_point_to_labware_origin = -labware_origin_to_grip_point
+            height_above_labware_origin = self._labware.get_extents_around_lw_origin(
+                labware_definition
+            ).max_z
+            labware_top_z_when_gripped = (
+                gripper_homed_position_z
+                + grip_point_to_labware_origin
+                + height_above_labware_origin
             )
-            # TODO(cb, 2024-01-18): Utilizing the nozzle map and labware X coordinates verify if collisions will occur on the X axis (analysis will use hard coded data to measure from the gripper critical point to the pipette mount)
+
+            # TODO(cb, 2024-01-18): Utilizing the nozzle map and labware X coordinates,
+            # verify if collisions will occur on the X axis (analysis will use hard coded data
+            # to measure from the gripper critical point to the pipette mount)
             if (_PIPETTE_HOMED_POSITION_Z - tip.length) < labware_top_z_when_gripped:
                 raise LabwareMovementNotAllowedError(
                     f"Cannot move labware '{labware_definition.parameters.loadName}' when {int(tip.volume)} µL tips are attached."
                 )
-        return
 
     def _nominal_gripper_offsets_for_location(
         self, location: OnDeckLabwareLocation

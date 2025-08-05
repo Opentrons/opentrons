@@ -72,6 +72,10 @@ export function SelectPipetteModal(
   const fields = watch('fields')
   const allLabware = useSelector(getLabwareDefsByURI)
   const [showIncompatibleTip, setIncompatibleTip] = useState<boolean>(false)
+  const [selectedTipracks, setSelectedTipracks] = useState<string[]>(
+    () => pipettesByMount[mount].tiprackDefURI ?? []
+  )
+
   const allowAllTipracks = useSelector(getAllowAllTipracks)
   const allPipetteOptions = getAllPipetteNames('maxVolume', 'channels')
   const robotType = fields.robotType
@@ -80,23 +84,26 @@ export function SelectPipetteModal(
       ? `${pipetteVolume}_${pipetteType}`
       : `${pipetteVolume}_${pipetteType}_${pipetteGen.toLowerCase()}`
 
-  const selectedValues = pipettesByMount[mount].tiprackDefURI ?? []
-
-  const noPipette =
-    (pipettesByMount.left.pipetteName == null ||
-      pipettesByMount.left.tiprackDefURI == null) &&
-    (pipettesByMount.right.pipetteName == null ||
-      pipettesByMount.right.tiprackDefURI == null)
-
-  const isDisabled =
-    (pipettesByMount[mount].tiprackDefURI == null && noPipette) ||
-    ((pipettesByMount.left.tiprackDefURI == null ||
-      pipettesByMount.left.tiprackDefURI.length === 0) &&
-      (pipettesByMount.right.tiprackDefURI == null ||
-        pipettesByMount.right.tiprackDefURI.length === 0))
+  const currentPipetteSelected = pipetteType != null && pipetteVolume != null
+  const currentTipracksSelected = selectedTipracks.length > 0
+  const otherMount = mount === 'left' ? 'right' : 'left'
+  const otherMountData = pipettesByMount[otherMount]
+  const otherPipetteConfigured = otherMountData?.pipetteName != null
+  const otherTipracksConfigured =
+    otherMountData?.tiprackDefURI != null &&
+    otherMountData.tiprackDefURI.length > 0
+  const otherMountComplete = otherPipetteConfigured && otherTipracksConfigured
+  const currentMountComplete = currentPipetteSelected && currentTipracksSelected
+  const noPipette = !currentMountComplete && !otherMountComplete
+  const isDisabled = noPipette || !currentTipracksSelected
 
   if (robotType == null) {
     return null
+  }
+
+  const handleSave = (): void => {
+    setValue(`pipettesByMount.${mount}.tiprackDefURI`, selectedTipracks)
+    setSelectedPipetteName(selectedPipetteName)
   }
 
   return createPortal(
@@ -122,12 +129,7 @@ export function SelectPipetteModal(
             <SecondaryButton onClick={handleBack}>
               {t('shared:cancel')}
             </SecondaryButton>
-            <PrimaryButton
-              onClick={() => {
-                setSelectedPipetteName(selectedPipetteName)
-              }}
-              disabled={isDisabled}
-            >
+            <PrimaryButton onClick={handleSave} disabled={isDisabled}>
               {t('shared:save')}
             </PrimaryButton>
           </Flex>
@@ -178,11 +180,10 @@ export function SelectPipetteModal(
                   <SelectPipetteTips
                     tiprackOptions={tiprackOptions}
                     setIncompatibleTip={setIncompatibleTip}
-                    mount={mount}
                     robotType={robotType}
-                    selectedValues={selectedValues}
                     pipetteVolume={pipetteVolume}
-                    setValue={setValue}
+                    selectedValues={selectedTipracks}
+                    setSelectedTipracks={setSelectedTipracks}
                   />
                 )
               })()

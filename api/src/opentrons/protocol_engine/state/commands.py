@@ -301,6 +301,10 @@ class CommandStore(HasState[CommandState], HandlesActions):
             case _:
                 pass
 
+    def clear_history(self) -> None:
+        """Clears CommandHistory state."""
+        self._state.command_history.clear()
+
     def _handle_queue_command_action(self, action: QueueCommandAction) -> None:
         # TODO(mc, 2021-06-22): mypy has trouble with this automatic
         # request > command mapping, figure out how to type precisely

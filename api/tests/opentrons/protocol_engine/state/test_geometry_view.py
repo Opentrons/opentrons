@@ -121,6 +121,9 @@ from opentrons.protocol_engine.state.addressable_areas import (
     AddressableAreaState,
 )
 
+from opentrons.protocol_engine.state._axis_aligned_bounding_box import (
+    AxisAlignedBoundingBox3D as EngineAABB,
+)
 from opentrons.protocol_engine.state import geometry
 from opentrons.protocol_engine.state.geometry import GeometryView, _GripperMoveType
 from opentrons.protocol_engine.state.inner_well_math_utils import (
@@ -2751,9 +2754,7 @@ def test_get_labware_grip_point_v2_definition(
     subject: GeometryView,
 ) -> None:
     """It should get the grip point of a LabwareDefinition2 labware at the specified location."""
-    decoy.when(
-        mock_labware_view.get_grip_height_from_labware_bottom(_MOCK_LABWARE_DEFINITION2)
-    ).then_return(100)
+    decoy.when(mock_labware_view.get_grip_z(_MOCK_LABWARE_DEFINITION2)).then_return(100)
 
     decoy.when(
         mock_addressable_area_view.get_addressable_area_center(DeckSlotName.SLOT_1.id)
@@ -2784,9 +2785,7 @@ def test_get_labware_grip_point_v3_definition(
     subject: GeometryView,
 ) -> None:
     """It should get the grip point of a LabwareDefinition3 labware at the specified location."""
-    decoy.when(
-        mock_labware_view.get_grip_height_from_labware_bottom(_MOCK_LABWARE_DEFINITION3)
-    ).then_return(100)
+    decoy.when(mock_labware_view.get_grip_z(_MOCK_LABWARE_DEFINITION3)).then_return(100)
 
     decoy.when(
         mock_addressable_area_view.get_addressable_area_center(DeckSlotName.SLOT_1.id)
@@ -2836,9 +2835,7 @@ def test_get_labware_grip_point_on_labware(
         sentinel.below_definition
     )
     decoy.when(
-        mock_labware_view.get_grip_height_from_labware_bottom(
-            labware_definition=sentinel.definition
-        )
+        mock_labware_view.get_grip_z(labware_definition=sentinel.definition)
     ).then_return(100)
     decoy.when(
         mock_addressable_area_view.get_addressable_area_center(DeckSlotName.SLOT_4.id)
@@ -2912,11 +2909,9 @@ def test_get_labware_grip_point_for_labware_on_module(
         pipette_view=subject._pipettes,
         addressable_area_view=addressable_area_view,
     )
-    decoy.when(
-        mock_labware_view.get_grip_height_from_labware_bottom(
-            sentinel.labware_definition
-        )
-    ).then_return(500)
+    decoy.when(mock_labware_view.get_grip_z(sentinel.labware_definition)).then_return(
+        500
+    )
     decoy.when(mock_module_view.get_location("module-id")).then_return(
         DeckSlotLocation(slotName=DeckSlotName.SLOT_C3)
     )
@@ -2999,11 +2994,9 @@ def test_get_labware_grip_point_for_labware_stack_on_module(
         pipette_view=subject._pipettes,
         addressable_area_view=addressable_area_view,
     )
-    decoy.when(
-        mock_labware_view.get_grip_height_from_labware_bottom(
-            sentinel.labware_definition
-        )
-    ).then_return(500)
+    decoy.when(mock_labware_view.get_grip_z(sentinel.labware_definition)).then_return(
+        500
+    )
     decoy.when(mock_module_view.get_location("module-id")).then_return(
         DeckSlotLocation(slotName=DeckSlotName.SLOT_C3)
     )
@@ -3663,20 +3656,11 @@ def test_check_gripper_labware_tip_collision(
         Point(1, 2, 3)
     )
     decoy.when(mock_labware_view.get_definition("labware-id")).then_return(definition)
-    decoy.when(mock_labware_view.get_dimensions(labware_id="labware-id")).then_return(
-        Dimensions(
-            x=definition.dimensions.xDimension,
-            y=definition.dimensions.yDimension,
-            z=definition.dimensions.zDimension,
-        )
-    )
 
-    decoy.when(
-        mock_labware_view.get_dimensions(labware_definition=definition)
-    ).then_return(Dimensions(x=1, y=2, z=67))
-    decoy.when(
-        mock_labware_view.get_grip_height_from_labware_bottom(definition)
-    ).then_return(1.0)
+    decoy.when(mock_labware_view.get_extents_around_lw_origin(definition)).then_return(
+        EngineAABB(min_x=0, max_x=0, min_y=0, max_y=0, min_z=100, max_z=167)
+    )
+    decoy.when(mock_labware_view.get_grip_z(definition)).then_return(1.0)
 
     with pytest.raises(errors.LabwareMovementNotAllowedError):
         subject.check_gripper_labware_tip_collision(

@@ -61,19 +61,7 @@ const APP = 'Opentrons App'
 const OPENTRONS_PD = 'Opentrons Protocol Designer'
 const OPENTRONS_ABSORBANCE_READER_URL =
   'https://opentrons.com/products/opentrons-flex-absorbance-plate-reader-module-gen1'
-const EIGHT_FIVE_ZERO_RELEASE_BULLET_POINTS = [
-  '4',
-  '5',
-  '6',
-  '7',
-  '8',
-  '9',
-  '10',
-  '11',
-  '12',
-  '13',
-  '14',
-]
+const EIGHT_FIVE_ZERO_RELEASE_BULLET_POINTS = ['4', '5', '6']
 
 export const useAnnouncements = (): Announcement[] => {
   const { t } = useTranslation('modal')
@@ -596,6 +584,7 @@ export const useAnnouncements = (): Announcement[] => {
           <StyledText desktopStyle="bodyDefaultRegular">
             {t('announcements.liquidClassAndPythonExport.body2')}
           </StyledText>
+
           <Flex flexDirection={DIRECTION_COLUMN}>
             <StyledText desktopStyle="bodyDefaultRegular">
               {t('announcements.liquidClassAndPythonExport.body3')}
@@ -614,7 +603,7 @@ export const useAnnouncements = (): Announcement[] => {
           </Flex>
           <Flex gridGap={SPACING.spacing4} flexDirection={DIRECTION_COLUMN}>
             <StyledText desktopStyle="bodyDefaultRegular">
-              {t('announcements.liquidClassAndPythonExport.body15')}
+              {t('announcements.liquidClassAndPythonExport.body7')}
             </StyledText>
             <StyledText desktopStyle="bodyDefaultRegular">
               <Trans
@@ -629,7 +618,7 @@ export const useAnnouncements = (): Announcement[] => {
                     />
                   ),
                 }}
-                i18nKey="announcements.liquidClassAndPythonExport.body16"
+                i18nKey="announcements.liquidClassAndPythonExport.body8"
               />
             </StyledText>
           </Flex>
