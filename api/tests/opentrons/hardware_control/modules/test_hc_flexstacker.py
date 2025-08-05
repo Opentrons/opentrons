@@ -528,8 +528,7 @@ async def test_dispense_labware_error_handling(
             mock.call(StackerAxis.X, Direction.RETRACT),
             mock.call(StackerAxis.X, Direction.RETRACT),
         ]
-
-        if expected_raise is pytest.raises(FlexStackerShuttleNotEmptyError):
+        if shuttle_lw_detected_before:
             assert labware_detected.call_count == 2
             labware_detected.assert_has_calls(expected_calls[:2])
         else:
