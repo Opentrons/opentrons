@@ -286,12 +286,14 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
   })
 
   test('first frustum section should match well diameter or x/y dimensions within ±1 mm', () => {
-     // todo(rc, 2025-08-05): Investigate labware definitions with discrepancies less than 1 mm and greater than 0 mm.
+    // TODO(rc, 2025-08-05): Review labware with 0–1 mm geometry discrepancies.
     const wells = labwareDef.wells ?? {}
     const geometries = labwareDef.innerLabwareGeometry ?? {}
+    // Allow minor mismatch due to simplified geometric approximation
     const allowedDiscrepancy = 1
-    for (const [wellName, well] of Object.entries(wells)) {
-      const geometryId = well.geometryDefinitionId ?? ""
+
+    for (const well of Object.values(wells)) {
+      const geometryId = well.geometryDefinitionId ?? ''
       const geometry = geometries[geometryId]
 
       if (
