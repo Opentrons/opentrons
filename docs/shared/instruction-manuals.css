@@ -116,6 +116,12 @@ figure.side-by-side img {
   background-color: #F09D20;
  }
 
+/* Creates dot with red to blue spectrum lines. See plate reader LED table. */
+.status-dot.rainbow {
+  background-image: linear-gradient(to right, red, orange, yellow, green, blue);
+  background-color: transparent; 
+}
+
  /* Aligns status dots and text if needed*/
 .status-dot-container {
   display: flex;
