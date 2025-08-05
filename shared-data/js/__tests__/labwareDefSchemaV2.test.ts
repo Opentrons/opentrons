@@ -285,6 +285,46 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
     }
   })
 
+  test('first frustum section should match well diameter or x/y dimensions within ±1 mm', () => {
+     // todo(rc, 2025-08-05): Investigate labware definitions with discrepancies less than 1 mm and greater than 0 mm.
+    const wells = labwareDef.wells ?? {}
+    const geometries = labwareDef.innerLabwareGeometry ?? {}
+    const allowedDiscrepancy = 1
+    for (const [wellName, well] of Object.entries(wells)) {
+      const geometryId = well.geometryDefinitionId ?? ""
+      const geometry = geometries[geometryId]
+
+      if (
+        !geometry ||
+        !('sections' in geometry) ||
+        !Array.isArray(geometry.sections)
+      ) {
+        continue
+      }
+
+      const section = geometry.sections[0]
+      if (!section) continue
+
+      if (well.shape === 'circular' && section.shape === 'conical') {
+        expect(
+          Math.abs(section.topDiameter - well.diameter)
+        ).toBeLessThanOrEqual(allowedDiscrepancy)
+      } else if (well.shape === 'rectangular' && section.shape === 'cuboidal') {
+        expect(
+          Math.abs(section.topXDimension - well.xDimension)
+        ).toBeLessThanOrEqual(allowedDiscrepancy)
+        expect(
+          Math.abs(section.topYDimension - well.yDimension)
+        ).toBeLessThanOrEqual(allowedDiscrepancy)
+      } else if (well.shape === 'circular' && section.shape === 'spherical') {
+        // radius of curvature should be roughly half the well diameter
+        expect(
+          Math.abs(section.radiusOfCurvature - well.diameter / 2)
+        ).toBeLessThanOrEqual(allowedDiscrepancy)
+      }
+    }
+  })
+
   test('the bottom of a well geometry should be at height 0', () => {
     for (const geometry of Object.values(
       labwareDef.innerLabwareGeometry ?? {}
