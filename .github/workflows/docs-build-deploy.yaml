@@ -1,5 +1,3 @@
-# Run tests, build PD, and deploy it to sandbox
-
 name: 'Docs build and deploy'
 
 on:
@@ -9,10 +7,13 @@ on:
       - '.github/workflows/docs-build-deploy.yaml'
   push:
     branches:
-      - 'edge'
+      - 'docs-testing-jesse'
+    tags:
+      - 'staging-*'
+      - 'production-*'
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 defaults:
@@ -21,8 +22,8 @@ defaults:
 
 jobs:
   sandbox-build-and-deploy-flex-manual:
-    timeout-minutes: 5
-    runs-on: 'ubuntu-24.04'
+    if: github.event_name != 'push' || !startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-24.04
     permissions:
       id-token: write
       contents: read
@@ -50,8 +51,80 @@ jobs:
         run: make build-flex-manual
       - name: Deploy Flex Manual to Sandbox
         working-directory: ./docs
-        run: make deploy-flex-manual BRANCH=${{ env.BRANCH }}
+        run: python deploy_flex_manual.py sandbox --branch ${{ env.BRANCH }}
       - name: Output URL to Summary
         run: |
           echo "## Flex Manual deployed to sandbox" >> $GITHUB_STEP_SUMMARY
           echo "<http://sandbox.docs.s3-website.us-east-2.amazonaws.com/${{ env.BRANCH }}/flex-manual/>" >> $GITHUB_STEP_SUMMARY
+
+  staging-build-and-deploy-flex-manual:
+    if: startsWith(github.ref, 'refs/tags/staging-')
+    runs-on: ubuntu-24.04
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      BRANCH: ${{ github.ref_name }}
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.DOCS_STAGING_ROLE }}
+          aws-region: us-east-2
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v4
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.10'
+          enable-cache: true
+          cache-dependency-glob: './docs/uv.lock'
+      - name: Sync the project
+        working-directory: ./docs
+        run: make setup
+      - name: Build Flex Manual
+        working-directory: ./docs
+        run: make build-flex-manual
+      - name: Deploy Flex Manual to Staging
+        working-directory: ./docs
+        run: python deploy_flex_manual.py staging --branch ${{ env.BRANCH }}
+      - name: Output URL to Summary
+        run: |
+          echo "## Flex Manual deployed to staging" >> $GITHUB_STEP_SUMMARY
+          echo "<https://staging.docs.opentrons.com/${{ env.BRANCH }}/flex-manual/>" >> $GITHUB_STEP_SUMMARY
+
+  production-build-and-deploy-flex-manual:
+    if: startsWith(github.ref, 'refs/tags/production-')
+    runs-on: ubuntu-24.04
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      BRANCH: ${{ github.ref_name }}
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.DOCS_PRODUCTION_ROLE }}
+          aws-region: us-east-2
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v4
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.10'
+          enable-cache: true
+          cache-dependency-glob: './docs/uv.lock'
+      - name: Sync the project
+        working-directory: ./docs
+        run: make setup
+      - name: Build Flex Manual
+        working-directory: ./docs
+        run: make build-flex-manual
+      - name: Deploy Flex Manual to Production
+        working-directory: ./docs
+        run: python deploy_flex_manual.py production --branch ${{ env.BRANCH }}
+      - name: Output URL to Summary
+        run: |
+          echo "## Flex Manual deployed to production" >> $GITHUB_STEP_SUMMARY
+          echo "<https://docs.opentrons.com/${{ env.BRANCH }}/flex-manual/>" >> $GITHUB_STEP_SUMMARY

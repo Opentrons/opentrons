@@ -1,7 +1,6 @@
 FLEX_MANUAL_PREFIX ?= flex-manual
 # AWS_PROFILE is intentionally left undefined by default
 BRANCH ?= edge
-SANDBOX_S3_BUCKET ?= sandbox.docs
 
 .PHONY: setup
 setup:
@@ -15,9 +14,18 @@ serve-flex-manual:
 build-flex-manual:
 	uv run mkdocs build -f $(FLEX_MANUAL_PREFIX)/mkdocs.yml
 
-.PHONY: deploy-flex-manual
-deploy-flex-manual:
-	@if [ -n "$$CI" ]; then \
-		echo "If you need to run this locally, set the variable AWS_PROFILE."; \
-	fi
-	aws s3 sync $(FLEX_MANUAL_PREFIX)/site/ s3://$(SANDBOX_S3_BUCKET)/$(BRANCH)/$(FLEX_MANUAL_PREFIX)/ --delete --acl public-read $(if $(AWS_PROFILE),--profile $(AWS_PROFILE))
+.PHONY: deploy-flex-manual-sandbox
+deploy-flex-manual-sandbox:
+	python deploy_flex_manual.py sandbox $(if $(BRANCH),--branch $(BRANCH)) $(if $(AWS_PROFILE),--aws-profile $(AWS_PROFILE)) $(if $(FLEX_MANUAL_PREFIX),--flex-manual-prefix $(FLEX_MANUAL_PREFIX))
+
+.PHONY: deploy-flex-manual-staging
+deploy-flex-manual-staging:
+	python deploy_flex_manual.py staging $(if $(BRANCH),--branch $(BRANCH)) $(if $(AWS_PROFILE),--aws-profile $(AWS_PROFILE)) $(if $(FLEX_MANUAL_PREFIX),--flex-manual-prefix $(FLEX_MANUAL_PREFIX))
+
+.PHONY: deploy-flex-manual-production
+deploy-flex-manual-production:
+	python deploy_flex_manual.py production $(if $(BRANCH),--branch $(BRANCH)) $(if $(AWS_PROFILE),--aws-profile $(AWS_PROFILE)) $(if $(FLEX_MANUAL_PREFIX),--flex-manual-prefix $(FLEX_MANUAL_PREFIX))
+
+# Backward compatibility - defaults to sandbox
+#.PHONY: deploy-flex-manual
+#deploy-flex-manual: deploy-flex-manual-sandbox
