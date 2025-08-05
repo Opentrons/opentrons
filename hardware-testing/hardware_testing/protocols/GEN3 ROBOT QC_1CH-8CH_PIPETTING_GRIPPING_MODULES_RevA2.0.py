@@ -80,33 +80,18 @@ def run(protocol: protocol_api.ProtocolContext):
     tiprack_1000 = stacker.retrieve()
     protocol.move_labware(tiprack_1000, "C2", use_gripper=True)
 
-    lid_stack1 = protocol.load_lid_stack(
-        load_name="opentrons_flex_tiprack_lid",
-        location="A2",
-        quantity=1
-    )
-    lid_stack2 = protocol.load_lid_stack(
-        load_name="opentrons_flex_tiprack_lid",
-        location="B2",
-        quantity=1
-    )
-    lid_stack3 = protocol.load_lid_stack(
-        load_name="opentrons_flex_tiprack_lid",
-        location="C2",
-        quantity=1
-    )
     protocol.move_lid(
-        source_location=lid_stack1,
+        source_location=tiprack_50,
         new_location=trash,
         use_gripper=True
     )
     protocol.move_lid(
-        source_location=lid_stack2,
+        source_location=tiprack_200,
         new_location=trash,
         use_gripper=True
     )
     protocol.move_lid(
-        source_location=lid_stack3,
+        source_location=tiprack_1000,
         new_location=trash,
         use_gripper=True
     )
