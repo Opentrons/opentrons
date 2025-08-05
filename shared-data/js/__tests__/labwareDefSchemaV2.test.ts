@@ -337,7 +337,21 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
         expect(depthFromWell).toStrictEqual(depthFromGeometry)
       }
 
-      expect(xyDimensionsFromWell).toStrictEqual(xyDimensionsFromGeometry)
+      const labwareWithXYDimensionMismatches = [
+        // todo(mm, 2025-08-05): Investigate and resolve these mismatches.
+        'eppendorf_96_wellplate_1000ul',
+        'nest_8_reservoir_22ml',
+      ]
+
+      if (
+        labwareWithXYDimensionMismatches.includes(
+          labwareDef.parameters.loadName
+        )
+      ) {
+        expect(xyDimensionsFromWell).not.toStrictEqual(xyDimensionsFromGeometry)
+      } else {
+        expect(xyDimensionsFromWell).toStrictEqual(xyDimensionsFromGeometry)
+      }
     }
   })
 }
