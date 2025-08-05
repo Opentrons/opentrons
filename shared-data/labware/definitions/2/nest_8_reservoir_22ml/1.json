@@ -5,24 +5,24 @@
     "brandId": []
   },
   "metadata": {
-    "displayName": "Nest 8 Reservoir 22 mL",
+    "displayName": "Nest 8 Reservoir 22000 µL",
     "displayCategory": "reservoir",
-    "displayVolumeUnits": "mL",
+    "displayVolumeUnits": "µL",
     "tags": []
   },
   "dimensions": {
     "xDimension": 127.76,
     "yDimension": 85.48,
-    "zDimension": 31.4 
+    "zDimension": 31.4
   },
   "wells": {
     "A1": {
       "depth": 26.85,
       "totalLiquidVolume": 22000,
       "shape": "rectangular",
-      "xDimension": 107.1,
-      "yDimension": 8.25,
-      "x": 64.4,
+      "xDimension": 107.5,
+      "yDimension": 8.2,
+      "x": 63.88,
       "y": 74.24,
       "z": 4.55
     },
@@ -30,9 +30,9 @@
       "depth": 26.85,
       "totalLiquidVolume": 22000,
       "shape": "rectangular",
-      "xDimension": 107.1,
-      "yDimension": 8.25,
-      "x": 64.4,
+      "xDimension": 107.5,
+      "yDimension": 8.2,
+      "x": 63.88,
       "y": 65.24,
       "z": 4.55
     },
@@ -40,9 +40,9 @@
       "depth": 26.85,
       "totalLiquidVolume": 22000,
       "shape": "rectangular",
-      "xDimension": 107.1,
-      "yDimension": 8.25,
-      "x": 64.4,
+      "xDimension": 107.5,
+      "yDimension": 8.2,
+      "x": 63.88,
       "y": 56.24,
       "z": 4.55
     },
@@ -50,9 +50,9 @@
       "depth": 26.85,
       "totalLiquidVolume": 22000,
       "shape": "rectangular",
-      "xDimension": 107.1,
-      "yDimension": 8.25,
-      "x": 64.4,
+      "xDimension": 107.5,
+      "yDimension": 8.2,
+      "x": 63.88,
       "y": 47.24,
       "z": 4.55
     },
@@ -60,9 +60,9 @@
       "depth": 26.85,
       "totalLiquidVolume": 22000,
       "shape": "rectangular",
-      "xDimension": 107.1,
-      "yDimension": 8.25,
-      "x": 64.4,
+      "xDimension": 107.5,
+      "yDimension": 8.2,
+      "x": 63.88,
       "y": 38.24,
       "z": 4.55
     },
@@ -70,9 +70,9 @@
       "depth": 26.85,
       "totalLiquidVolume": 22000,
       "shape": "rectangular",
-      "xDimension": 107.1,
-      "yDimension": 8.25,
-      "x": 64.4,
+      "xDimension": 107.5,
+      "yDimension": 8.2,
+      "x": 63.88,
       "y": 29.24,
       "z": 4.55
     },
@@ -80,9 +80,9 @@
       "depth": 26.85,
       "totalLiquidVolume": 22000,
       "shape": "rectangular",
-      "xDimension": 107.1,
-      "yDimension": 8.25,
-      "x": 64.4,
+      "xDimension": 107.5,
+      "yDimension": 8.2,
+      "x": 63.88,
       "y": 20.24,
       "z": 4.55
     },
@@ -90,9 +90,9 @@
       "depth": 26.85,
       "totalLiquidVolume": 22000,
       "shape": "rectangular",
-      "xDimension": 107.1,
-      "yDimension": 8.25,
-      "x": 64.4,
+      "xDimension": 107.5,
+      "yDimension": 8.2,
+      "x": 63.88,
       "y": 11.24,
       "z": 4.55
     }
@@ -106,15 +106,20 @@
     }
   ],
   "parameters": {
-    "format": "irregular",
+    "format": "trough",
     "quirks": [],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "nest_8_reservoir_22ml"
+    "loadName": "nest_8_reservoir_22000ul"
   },
-  "namespace": "custom_beta",
+  "namespace": "opentrons",
   "version": 1,
   "schemaVersion": 2,
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
   "stackingOffsetWithLabware": {
     "opentrons_universal_flat_adapter": {
       "x": 0,
@@ -122,9 +127,28 @@
       "z": 10.22
     }
   },
-  "cornerOffsetFromSlot": {
-    "x": 0,
-    "y": 0,
-    "z": 0
+  "innerLabwareGeometry": {
+    "cuboidalWell": {
+      "sections": [
+        {
+          "shape": "cuboidal",
+          "topXDimension": 107.5,
+          "topYDimension": 8.2,
+          "bottomXDimension": 107.5,
+          "bottomYDimension": 8,
+          "topHeight": 26.85,
+          "bottomHeight": 2.02
+        },
+        {
+          "shape": "cuboidal",
+          "topXDimension": 107.5,
+          "topYDimension": 8,
+          "bottomXDimension": 101.5,
+          "bottomYDimension": 2,
+          "topHeight": 2.02,
+          "bottomHeight": 0
+        }
+      ]
+    }
   }
 }
