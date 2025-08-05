@@ -5,6 +5,15 @@ from automation.data.protocol_with_overrides import ProtocolWithOverrides
 
 
 class ProtocolsWithOverrides:
+    Flex_2_25_96_all_module_LC_Stacker_Overrride: ProtocolWithOverrides = ProtocolWithOverrides(
+        file_stem="Flex_2_25_96_all_module_LC_Stacker_Overrride",
+        file_extension="py",
+        robot="Flex",
+        override_variable_name="type_to_test",
+        overrides=["number_of_stackers", "wrong_type_in_variable_name", "test_configuration", "reservoir_name", "well_plate_name"],
+        folder=GENERATORS_FOLDER,
+    )
+
     Flex_X_v2_18_NO_PIPETTES_Overrides_BadTypesInRTP: ProtocolWithOverrides = ProtocolWithOverrides(
         file_stem="Flex_X_v2_18_NO_PIPETTES_Overrides_BadTypesInRTP",
         file_extension="py",
