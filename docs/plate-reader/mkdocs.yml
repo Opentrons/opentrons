@@ -16,10 +16,11 @@ theme:
 nav:
   - Home: index.md
   - Safety Information: safety.md
-  - Additional Product Information: warranty.md
   - Product Specifications: specifications.md
   - Deck Placement: placement.md
   - Installation: installation.md
+  - Using Plate Reader Data: data.md
+  - Additional Product Information: warranty.md
 
 plugins:
   - search
