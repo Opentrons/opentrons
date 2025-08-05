@@ -1,5 +1,3 @@
-# Run tests, build PD, and deploy it to sandbox
-
 name: 'Docs build and deploy'
 
 on:
@@ -9,10 +7,13 @@ on:
       - '.github/workflows/docs-build-deploy.yaml'
   push:
     branches:
-      - 'edge'
+      - 'docs-testing-jesse'
+    tags:
+      - 'staging-MKDOCS*'
+      - 'MKDOCS*'
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'docs-testing-jesse' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
   cancel-in-progress: true
 
 defaults:
@@ -20,9 +21,9 @@ defaults:
     shell: bash
 
 jobs:
-  sandbox-build-and-deploy-mkdocs-site:
+  build-and-deploy-mkdocs-site:
     timeout-minutes: 5
-    runs-on: 'ubuntu-24.04'
+    runs-on: ubuntu-24.04
     permissions:
       id-token: write
       contents: read
@@ -42,16 +43,34 @@ jobs:
           python-version: '3.10'
           enable-cache: true
           cache-dependency-glob: './docs/uv.lock'
+      - name: Set DEPLOY_ENV
+        id: set-env
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/MKDOCS* ]] && [[ "${GITHUB_REF}" != refs/tags/staging-MKDOCS* ]]; then
+            echo "DEPLOY_ENV=production" >> $GITHUB_ENV
+          elif [[ "${GITHUB_REF}" == refs/tags/staging-MKDOCS* ]]; then
+            echo "DEPLOY_ENV=staging" >> $GITHUB_ENV
+          else
+            echo "DEPLOY_ENV=sandbox" >> $GITHUB_ENV
+          fi
       - name: Sync the project
         working-directory: ./docs
         run: make setup
       - name: Build Docs Site
         working-directory: ./docs
         run: make build
-      - name: Deploy Docs Site to Sandbox
+      - name: Deploy Docs Site
         working-directory: ./docs
-        run: make deploy BRANCH=${{ env.BRANCH }}
+        run: make deploy ENVIRONMENT=${{ env.DEPLOY_ENV }} BRANCH=${{ env.BRANCH }}
       - name: Output URL to Summary
         run: |
-          echo "## Docs site deployed to sandbox" >> $GITHUB_STEP_SUMMARY
-          echo "<http://sandbox.docs.s3-website.us-east-2.amazonaws.com/${{ env.BRANCH }}/>" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ env.DEPLOY_ENV }}" == "production" ]]; then
+            echo "## Docs site deployed to production" >> $GITHUB_STEP_SUMMARY
+            echo "<https://docs.opentrons.com/${{ env.BRANCH }}/>" >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ env.DEPLOY_ENV }}" == "staging" ]]; then
+            echo "## Docs site deployed to staging" >> $GITHUB_STEP_SUMMARY
+            echo "<https://staging.docs.opentrons.com/${{ env.BRANCH }}/>" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## Docs site deployed to sandbox" >> $GITHUB_STEP_SUMMARY
+            echo "<http://sandbox.docs.s3-website.us-east-2.amazonaws.com/${{ env.BRANCH }}/>" >> $GITHUB_STEP_SUMMARY
+          fi
