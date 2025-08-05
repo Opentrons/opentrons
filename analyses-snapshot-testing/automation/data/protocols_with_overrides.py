@@ -9,7 +9,7 @@ class ProtocolsWithOverrides:
         file_stem="Flex_2_25_96_all_module_LC_Stacker_Overrride",
         file_extension="py",
         robot="Flex",
-        override_variable_name="type_to_test",
+        override_variable_name="key",
         overrides=["number_of_stackers", "wrong_type_in_variable_name", "test_configuration", "reservoir_name", "well_plate_name"],
         folder=GENERATORS_FOLDER,
     )

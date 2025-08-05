@@ -11,7 +11,6 @@ key = "1 stacker"
 # key = "1 stacker with OT 1 Well 300 mL"
 # protocol.override_variable_name = key
 
-
 #############
 # CHANGELOG #
 #############
@@ -109,6 +108,7 @@ key = "1 stacker"
 from typing import List
 from opentrons import protocol_api, types # type: ignore
 from opentrons.protocol_api import Labware # type: ignore
+from dataclasses import dataclass
 
 
 metadata = {
@@ -201,7 +201,6 @@ def comment_tip_rack_status(ctx, tip_rack):
 def log_position(ctx, item):
     ctx.comment(f"Item {item.load_name} is at {item.parent}")
 
-from dataclasses import dataclass
 
 @dataclass
 class Test:
@@ -210,8 +209,6 @@ class Test:
     test_configuration: str
     reservoir_name: str
     well_plate_name: str
-
-
 
 Tests = [
     Test(key="1 stacker",
@@ -279,6 +276,8 @@ def get_test(key):
 
 def run(ctx: protocol_api.ProtocolContext) -> None:
     test = get_test(key)
+    comment = f"Running Flex Smoke Test with {test.number_of_stackers} stacker(s) and configuration: {test.test_configuration}"
+    ctx.comment(msg=comment)
 
     ################
     ### FIXTURES ###
