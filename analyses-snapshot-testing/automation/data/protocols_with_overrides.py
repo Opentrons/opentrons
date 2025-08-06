@@ -10,7 +10,18 @@ class ProtocolsWithOverrides:
         file_extension="py",
         robot="Flex",
         override_variable_name="key",
-        overrides=["number_of_stackers", "wrong_type_in_variable_name", "test_configuration", "reservoir_name", "well_plate_name"],
+        overrides=[
+            "1 stacker",
+            "2 stackers",
+            "3 stackers",
+            "1 stacker with OT 12 Well 22 mL",
+            "2 stackers with OT 12 Well 22 mL",
+            "3 stackers with OT 12 Well 22 mL",
+            "1 stacker with OT 4 Well 300 mL",
+            "2 stackers with OT 4 Well 300 mL",
+            "3 stackers with OT 4 Well 300 mL",
+            "1 stacker with OT 1 Well 300mL",
+        ],
         folder=GENERATORS_FOLDER,
     )
 
@@ -28,7 +39,7 @@ class ProtocolsWithOverrides:
             "wrong_type_in_description",
             "wrong_type_in_minimum",
             "wrong_type_in_maximum",
-            "wrong_type_in_unit",  # we going unit or suffix?
+            "wrong_type_in_unit",
         ],
         folder=GENERATORS_FOLDER,
     )
