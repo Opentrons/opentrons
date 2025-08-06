@@ -64,7 +64,7 @@ def resize_image(path: str, target_kb: int = 400) -> str:
     target_bytes = target_kb * 1024
     quality_tolerance = 10 * 1024  # 10 KB tolerance
     factor = 0.95  # Resize factor per iteration
-    min_size = 300  # Don't resize below this dimension
+    min_size = 500  # Don't resize below this dimension
     output_path = os.path.splitext(path)[0] + "_resized.png"
 
     while True:

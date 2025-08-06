@@ -35,7 +35,6 @@ const loadNames = Array.from(
     })
   )
 )
-console.log(loadNames)
 
 describe('labwareImages mapping', () => {
   it('should have at least one image for every definition loadName', () => {
@@ -43,7 +42,6 @@ describe('labwareImages mapping', () => {
       loadName =>
         !(loadName in labwareImages) && !ignoredLoadNames.has(loadName)
     )
-
     expect(missingLoadNames).toEqual([])
   })
 })
