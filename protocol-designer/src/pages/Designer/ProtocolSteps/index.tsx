@@ -291,7 +291,9 @@ export function ProtocolSteps({
                   : CONTENT_MAX_WIDTH
               }
               justifyContent={JUSTIFY_CENTER}
-              paddingTop={isZoomedIn ? '0' : SPACING.spacing60}
+              paddingTop={
+                isZoomedIn || showTimelineAlerts ? '0' : SPACING.spacing60
+              }
               marginX="auto"
             >
               {isZoomedIn || selectedTerminalItemId === HARDWARE_ID ? null : (

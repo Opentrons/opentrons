@@ -10,6 +10,7 @@ import {
   useOnClickOutside,
 } from '@opentrons/components'
 
+import { NAV_BAR_HEIGHT_REM } from '../../components/atoms/constants'
 import { DefineLiquidsModal } from '../../components/organisms'
 import { useKitchen } from '../../components/organisms/Kitchen/hooks'
 import { LiquidsOverflowMenu } from '../../components/organisms/LiquidsOverflowMenu'
@@ -101,7 +102,12 @@ export function Designer(): JSX.Element {
           targetWidth={targetWidth}
         />
       ) : null}
-      <Flex height="100%" width="100%" overflowY={OVERFLOW_HIDDEN}>
+      <Flex
+        height="100%"
+        maxHeight={`calc(100vh - ${NAV_BAR_HEIGHT_REM}rem )`}
+        width="100%"
+        overflowY={OVERFLOW_HIDDEN}
+      >
         <ProtocolSteps
           zoomedInSlot={zoomIn.slot}
           showLiquidOverflowMenu={showLiquidOverflowMenu}
