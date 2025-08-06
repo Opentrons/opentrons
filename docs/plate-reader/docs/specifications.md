@@ -4,7 +4,7 @@ title: "Plate Reader Module: Product Specifications"
 
 # Product Specifications
 
-<font color="red">**IMAGE PLACEHOLDER**</font>
+![Module parts with labels](images/plate-reader-labeled.svg)
 
 ## Included Parts
 

@@ -12,7 +12,7 @@ All hardware purchased from Opentrons is covered under a 1-year standard warrant
 
 Opentrons Support can help you with questions about our products and services. If you discover a defect, or believe your product is not functioning to published specifications, contact us at <support@opentrons.com>.
 
-Please have the Thermocycler's serial number available when contacting Opentrons Support. You can find the serial number on the bottom of the module or in the Opentrons App. To find the module serial number in the app, go to the Instruments and Modules section of your robot’s device details page, click the three-dot menu (⋮) and then click **About**.
+Please have the module's serial number available when contacting Opentrons Support. You can find the serial number on the bottom of the module or in the Opentrons App. To find the module serial number in the app, go to the Instruments and Modules section of your robot’s device details page, click the three-dot menu (⋮) and then click **About**.
 
 ## App Download
 

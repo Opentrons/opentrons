@@ -48,7 +48,7 @@ The following table lists and defines standards for recommended use, transportat
           <li>Protect the module from moisture, heat, and dust during long-term storage.</li>
           <li>Avoid operating or letting the module sit in direct sunlight.</li>
           <li>Don't store well plates filled with reagents in the module. Evaporating gases could damage it.</li>
-          <li>Check for and remove well plates from the module before transport or storage. This helps avoid spillage and contamination. </li>
+          <li>Check for and remove well plates from the module before transport or storage. This helps avoid spillage and contamination.</li>
         </ul>
       </td>
     </tr>
