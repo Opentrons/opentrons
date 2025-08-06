@@ -7,7 +7,7 @@ const exactMatchOnlyLoadNames = new Set([
   'opentrons_96_filtertiprack_1000ul',
   'opentrons_96_tiprack_1000ul',
   'opentrons_universal_flat_adapter',
-  'opentrons_universal_flat_adapter_type_b'
+  'opentrons_universal_flat_adapter_type_b',
 ])
 
 // 1. Import all images
