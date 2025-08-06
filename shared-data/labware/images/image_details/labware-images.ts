@@ -1,3 +1,14 @@
+const exactMatchOnlyLoadNames = new Set([
+  'milliplex_microtiter_plate',
+  'milliplex_microtiter_plate_lid',
+  'ibidi_96_square_well_plate_300ul',
+  'ibidi_96_square_well_plate_300ul_lid',
+  'opentrons_96_deep_well_adapter',
+  'opentrons_96_filtertiprack_1000ul',
+  'opentrons_96_tiprack_1000ul',
+  'opentrons_universal_flat_adapter',
+  'opentrons_universal_flat_adapter_type_b'
+])
 
 // 1. Import all images
 const imageModules = import.meta.glob('../*.{png,jpg,jpeg}', {
@@ -5,7 +16,7 @@ const imageModules = import.meta.glob('../*.{png,jpg,jpeg}', {
   import: 'default',
 })
 
-// 2. Import all definition files 
+// 2. Import all definition files
 const definitionModules = import.meta.glob(
   '../../definitions/2/*/*.{json,ts}',
   {
@@ -14,7 +25,7 @@ const definitionModules = import.meta.glob(
   }
 )
 
-// 3. Extract unique load names 
+// 3. Extract unique load names
 const loadNames = Array.from(
   new Set(
     Object.keys(definitionModules).map(defPath => {
@@ -46,6 +57,11 @@ for (const loadName of loadNames) {
   const matchingUrls = Object.entries(imageKeyToUrl)
     .filter(([varName]) => {
       const varParts = varName.split('_')
+
+      if (exactMatchOnlyLoadNames.has(loadName)) {
+        // Only match if the variable name exactly matches the normalized load name
+        return varName === normalizedLoadName
+      }
 
       let i = 0
       for (let j = 0; j < varParts.length; j++) {
