@@ -234,7 +234,6 @@ export function ProtocolSteps({
 
       <Flex
         backgroundColor={COLORS.grey10}
-        maxHeight={`calc(100vh - ${NAV_BAR_HEIGHT_REM}rem)`}
         width="100%"
         minHeight={FLEX_MAX_CONTENT}
       >
