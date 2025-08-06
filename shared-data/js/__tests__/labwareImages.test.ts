@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { labwareImages } from '@opentrons/shared-data'
+import { labwareImages } from '../../labware/images/image_details/labware-images'
 
 const ignoredLoadNames = new Set([
   'opentrons_1_trash_1100ml_fixed',
