@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import round from 'lodash/round'
@@ -13,6 +13,7 @@ import {
   JUSTIFY_END,
   JUSTIFY_SPACE_BETWEEN,
   OVERFLOW_AUTO,
+  POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
   StyledText,
@@ -169,6 +170,23 @@ export function ProtocolSteps({
     activeItem?.id !== HARDWARE_ID
   const stepDetails = currentStep?.stepDetails ?? null
 
+  const stepComponentRef = useRef<HTMLDivElement>(null)
+
+  const handleScrollToTop = (): void => {
+    if (stepComponentRef.current && hasTimelineErrors) {
+      stepComponentRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      })
+    }
+  }
+
+  useEffect(() => {
+    if (selectedStepId != null) {
+      handleScrollToTop()
+    }
+  }, [selectedStepId])
+
   let header: string = t(activeItem?.id)
   if (currentStep != null) {
     header = i18n.format(currentStep.stepName, 'titleCase')
@@ -251,7 +269,12 @@ export function ProtocolSteps({
             {isZoomedIn ||
             formData != null ||
             selectedSubstep != null ? null : (
-              <Flex justifyContent={JUSTIFY_END}>
+              <Flex
+                justifyContent={JUSTIFY_END}
+                position={POSITION_ABSOLUTE}
+                right="0"
+                zIndex={1000}
+              >
                 <ExportButton onClick={handleExporting} />
               </Flex>
             )}
@@ -274,12 +297,16 @@ export function ProtocolSteps({
               {isZoomedIn || selectedTerminalItemId === HARDWARE_ID ? null : (
                 <>
                   {showTimelineAlerts ? (
-                    <TimelineAlerts
-                      justifyContent={JUSTIFY_CENTER}
-                      width="100%"
-                      flexDirection={DIRECTION_COLUMN}
-                      gridGap={SPACING.spacing4}
-                    />
+                    <>
+                      {/* empty div to scroll to top of timeline alerts */}
+                      <div ref={stepComponentRef} />
+                      <TimelineAlerts
+                        justifyContent={JUSTIFY_CENTER}
+                        width="100%"
+                        flexDirection={DIRECTION_COLUMN}
+                        gridGap={SPACING.spacing4}
+                      />
+                    </>
                   ) : null}
                   <Flex
                     justifyContent={JUSTIFY_SPACE_BETWEEN}
