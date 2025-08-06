@@ -14,14 +14,6 @@ serve-flex-manual:
 build-flex-manual:
 	uv run mkdocs build -f $(FLEX_MANUAL_PREFIX)/mkdocs.yml
 
-.PHONY: deploy_sandbox
-deploy_sandbox:
-    python deploy_flex_manual.py sandbox --branch ${{ env.BRANCH }}
-
-.PHONY: deploy_staging
-deploy_staging:
-    python deploy_flex_manual.py staging --branch ${{ env.BRANCH }}
-
-.PHONY: deploy_production
-deploy_production:
-    python deploy_flex_manual.py production --branch ${{ env.BRANCH }}
+.PHONY: deploy-flex-manual
+deploy-flex-manual:
+	python deploy_flex_manual.py $(ENVIRONMENT) --branch $(BRANCH)
