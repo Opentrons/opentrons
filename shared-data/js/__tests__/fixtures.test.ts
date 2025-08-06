@@ -9,6 +9,7 @@ import {
   FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
   FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
   FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+  HEATERSHAKER_MODULE_V1_FIXTURE,
   MAGNETIC_BLOCK_V1_FIXTURE,
   SINGLE_CENTER_SLOT_FIXTURE,
   SINGLE_LEFT_SLOT_FIXTURE,
@@ -28,6 +29,7 @@ import {
   getAAWithFakesFromCutoutFixtureId,
   getCutoutConfigReplacmentForModule,
   getCutoutFixtureReplacementIfNeeded,
+  getFixtureDisplayName,
   getMainAAForAFixture,
   getMainNonComboFixtureId,
   getMainUsbModuleFixtureIdForComboFixture,
@@ -47,6 +49,7 @@ import type { CutoutConfig, DeckConfiguration } from '..'
 
 vi.mock('react-i18next', () => ({
   useTranslation: vi.fn(),
+  initReactI18next: vi.fn(),
 }))
 
 const deckDef = getDeckDefFromRobotType('OT-3 Standard')
@@ -637,6 +640,64 @@ describe('getCutoutConfigReplacmentForModule', () => {
         mockDeckConfig
       )
     ).toStrictEqual('flexStackerModuleV1')
+  })
+})
+
+describe('getFixtureDisplayName', () => {
+  let t: Mock
+
+  beforeEach(() => {
+    t = vi.fn(key => key)
+
+    vi.mocked(useTranslation).mockReturnValue({ t } as any)
+  })
+
+  it('should get fixture display name for flex stacker with mag block', () => {
+    const result = getFixtureDisplayName(t, FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE)
+    expect(result).toEqual('deck_configuration:module_with_mag_block')
+  })
+
+  it('should get fixture display name for flex stacker with waste chute', () => {
+    const result = getFixtureDisplayName(
+      t,
+      FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE
+    )
+    expect(result).toEqual('deck_configuration:module_with_waste_chute')
+  })
+
+  it('should get fixture display name for flex stacker with waste chute', () => {
+    const result = getFixtureDisplayName(
+      t,
+      FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE
+    )
+    expect(result).toEqual(
+      'deck_configuration:module_with_waste_chute_and_cover'
+    )
+  })
+
+  it('should get fixture display name for waste chute', () => {
+    const result = getFixtureDisplayName(
+      t,
+      WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
+    )
+    expect(result).toEqual('deck_configuration:waste_chute')
+  })
+
+  it('should get fixture display name for heater shaker in port', () => {
+    const result = getFixtureDisplayName(
+      t,
+      HEATERSHAKER_MODULE_V1_FIXTURE,
+      'test-123'
+    )
+    expect(result).toEqual('deck_configuration:module_in_port')
+  })
+
+  it('should get fixture display name for mag block with staging area slot', () => {
+    const result = getFixtureDisplayName(
+      t,
+      STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE
+    )
+    expect(result).toEqual('deck_configuration:module_with_staging_area')
   })
 })
 
