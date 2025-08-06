@@ -94,9 +94,9 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
   const [hasMissingFileParam, setHasMissingFileParam] = useState<boolean>(
     runTimeParameters?.some(parameter => parameter.type === 'csv_file') ?? false
   )
-  useEffect(() => setRunTimeParametersOverrides(runTimeParameters), [
-    storedProtocolData,
-  ])
+  useEffect(() => {
+    setRunTimeParametersOverrides(runTimeParameters)
+  }, [storedProtocolData])
 
   const [targetProps, tooltipProps] = useHoverTooltip()
 
