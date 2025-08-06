@@ -1,13 +1,20 @@
 ---
-title: "Plate Reader Manual"
+title: "Plate Reader Module"
 hide: toc
 ---
 
-# Absorbance Plate Reader Module Instruction Manual
+<div style="text-align: center;" markdown>
 
-IMAGE PLACEHOLDER
+![Opentrons Flex®](../images/opentrons-flex-logo.svg "opentrons-flex-logo.svg"){style="width: 60%"}
 
-CAPTION PLACEHOLDER
+# Absorbance Plate Reader Instruction Manual
+
+![Plate reader cover image](images/plate-reader-hero.png){style="width: 60%"}
+
+**Opentrons Labworks Inc.**<br>
+October 2024
+
+</div>
 
 ## Product description
 

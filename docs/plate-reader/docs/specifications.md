@@ -1,5 +1,5 @@
 ---
-title: "Plate Reader Manual: Product Specifications"
+title: "Plate Reader Module: Product Specifications"
 ---
 
 # Product Specifications

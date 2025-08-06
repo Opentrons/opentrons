@@ -1,5 +1,5 @@
 ---
-title: "Plate Reader Manual: Safety Information"
+title: "Plate Reader Module: Safety Information"
 ---
 
 # Safety Information
@@ -8,7 +8,7 @@ Opentrons recommends that you follow the safe use specifications listed in this 
 
 ## Safe Use Specifications
 
-The Absorbance Plate Reader is designed for use with the Flex liquid handling robot. It cannot be used with an OT-2 robot or as standalone equipment. Follow the <font color="red"> PLACEHOLDER installation instructions</font> to ensure proper and safe operation.
+The Absorbance Plate Reader is designed for use with the Flex liquid handling robot. It cannot be used with an OT-2 robot or as standalone equipment. Follow the [installation instructions](installation.md) to ensure proper and safe operation.
 
 !!!warning
     Always use the Opentrons Flex Gripper to move the illumination unit onto or off of the detection unit. Do not move the illumination unit by hand.
