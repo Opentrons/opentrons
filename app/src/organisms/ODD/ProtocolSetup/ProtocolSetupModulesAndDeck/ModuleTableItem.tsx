@@ -43,7 +43,6 @@ import type {
   CutoutConfig,
   CutoutFixtureId,
   DeckDefinition,
-  ModuleModel,
 } from '@opentrons/shared-data'
 import type { ModulePrepCommandsType } from '/app/local-resources/modules'
 import type { ProtocolCalibrationStatus } from '/app/resources/runs'

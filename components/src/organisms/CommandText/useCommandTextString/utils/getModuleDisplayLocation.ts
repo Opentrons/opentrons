@@ -1,4 +1,5 @@
 import { FLEX_STACKER_MODULE_TYPE, getModuleType } from '@opentrons/shared-data'
+
 import { getLoadedModule } from './getLoadedModule'
 
 import type { LoadedModules } from './types'

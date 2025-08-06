@@ -18,7 +18,10 @@ import { getModuleDisplayLocation } from '../getModuleDisplayLocation'
 import { getModuleModel } from '../getModuleModel'
 
 import type { ComponentProps } from 'react'
-import type { LabwareLocation, LabwareLocationSequence } from '@opentrons/shared-data'
+import type {
+  LabwareLocation,
+  LabwareLocationSequence,
+} from '@opentrons/shared-data'
 
 vi.mock('../getModuleModel')
 vi.mock('../getModuleDisplayLocation')
@@ -65,7 +68,7 @@ describe('getLabwareDisplayLocation with translations', () => {
     it('should return an empty string for null location', () => {
       render({
         location: null,
-        params: defaultParams
+        params: defaultParams,
       })
       expect(screen.queryByText(/.+/)).toBeNull()
     })
@@ -73,7 +76,7 @@ describe('getLabwareDisplayLocation with translations', () => {
     it('should return "off deck" for offDeck location', () => {
       render({
         location: 'offDeck',
-        params: defaultParams
+        params: defaultParams,
       })
       screen.getByText('off deck')
     })
@@ -81,7 +84,7 @@ describe('getLabwareDisplayLocation with translations', () => {
     it('should return a slot name for slot location', () => {
       render({
         location: { slotName: 'A1' },
-        params: defaultParams
+        params: defaultParams,
       })
       screen.getByText('Slot A1')
     })
@@ -89,7 +92,7 @@ describe('getLabwareDisplayLocation with translations', () => {
     it('should return an addressable area name for an addressable area location', () => {
       render({
         location: { addressableAreaName: 'B2' },
-        params: defaultParams
+        params: defaultParams,
       })
       screen.getByText('Slot B2')
     })
@@ -122,7 +125,7 @@ describe('getLabwareDisplayLocation with translations', () => {
 
           render({
             location: { moduleId: 'temp123' },
-            params: { ...defaultParams, detailLevel }
+            params: { ...defaultParams, detailLevel },
           })
 
           if (detailLevel === 'full') {
@@ -179,7 +182,9 @@ describe('getLabwareDisplayLocation with translations', () => {
               location: { moduleId: 'temp123' },
             },
           ]
-          const mockLoadedModules = [{ id: 'temp123', model: 'temperatureModuleV2' }]
+          const mockLoadedModules = [
+            { id: 'temp123', model: 'temperatureModuleV2' },
+          ]
           const mockAllRunDefs = [
             { uri: 'adapter-uri', metadata: { displayName: 'Mock Adapter' } },
           ]
@@ -218,22 +223,26 @@ describe('getLabwareDisplayLocation with translations', () => {
       it('should handle onAddressableArea sequence', () => {
         const locationSequence: LabwareLocationSequence = [
           { kind: 'onAddressableArea', addressableAreaName: 'A1' },
-          { kind: 'onCutoutFixture', cutoutId: 'cutoutA1', possibleCutoutFixtureIds: ['singleLeftSlot'] }
+          {
+            kind: 'onCutoutFixture',
+            cutoutId: 'cutoutA1',
+            possibleCutoutFixtureIds: ['singleLeftSlot'],
+          },
         ]
         render({
           location: locationSequence,
-          params: defaultParams
+          params: defaultParams,
         })
         screen.getByText('Slot A1')
       })
 
       it('should handle notOnDeck sequence', () => {
         const locationSequence: LabwareLocationSequence = [
-          { kind: 'notOnDeck', logicalLocationName: 'offDeck' }
+          { kind: 'notOnDeck', logicalLocationName: 'offDeck' },
         ]
         render({
           location: locationSequence,
-          params: defaultParams
+          params: defaultParams,
         })
         screen.getByText('off deck')
       })
@@ -242,23 +251,28 @@ describe('getLabwareDisplayLocation with translations', () => {
         detailLevels.forEach(detailLevel => {
           it(`should handle onModule sequence with detailLevel "${detailLevel}"`, () => {
             const locationSequence: LabwareLocationSequence = [
-              { kind: 'onAddressableArea', addressableAreaName: 'thermocyclerModuleV2' },
+              {
+                kind: 'onAddressableArea',
+                addressableAreaName: 'thermocyclerModuleV2',
+              },
               { kind: 'onModule', moduleId: 'mockModuleId' },
               {
                 kind: 'onCutoutFixture',
                 cutoutId: 'cutoutId',
-                possibleCutoutFixtureIds: ['thermocyclerModuleV2Front']
+                possibleCutoutFixtureIds: ['thermocyclerModuleV2Front'],
               },
             ]
 
             vi.mocked(getModuleModel).mockReturnValue('thermocyclerModuleV2')
             vi.mocked(getModuleDisplayLocation).mockReturnValue('B1')
-            vi.mocked(getModuleDisplayName).mockReturnValue('Thermocycler Module')
+            vi.mocked(getModuleDisplayName).mockReturnValue(
+              'Thermocycler Module'
+            )
             vi.mocked(getModuleType).mockReturnValue('thermocyclerModuleType')
 
             render({
               location: locationSequence,
-              params: { ...defaultParams, detailLevel }
+              params: { ...defaultParams, detailLevel },
             })
 
             if (detailLevel === 'full') {
@@ -272,13 +286,19 @@ describe('getLabwareDisplayLocation with translations', () => {
         detailLevels.forEach(detailLevel => {
           it(`should handle labware on a stacker module with detailLevel "${detailLevel}"`, () => {
             const locationSequence: LabwareLocationSequence = [
-              { kind: 'onAddressableArea', addressableAreaName: 'flexStackerModuleV1D4' },
+              {
+                kind: 'onAddressableArea',
+                addressableAreaName: 'flexStackerModuleV1D4',
+              },
               { kind: 'onModule', moduleId: 'mockModuleId' },
               {
                 kind: 'onCutoutFixture',
                 cutoutId: 'cutoutD3',
-                possibleCutoutFixtureIds: ['flexStackerModuleV1WithWasteChuteRightAdapterNoCover']
-              }]
+                possibleCutoutFixtureIds: [
+                  'flexStackerModuleV1WithWasteChuteRightAdapterNoCover',
+                ],
+              },
+            ]
             vi.mocked(getModuleModel).mockReturnValue('flexStackerModuleV1')
             vi.mocked(getModuleDisplayLocation).mockReturnValue('D3')
             vi.mocked(getModuleDisplayName).mockReturnValue('Flex Stacker')
@@ -286,7 +306,7 @@ describe('getLabwareDisplayLocation with translations', () => {
 
             render({
               location: locationSequence,
-              params: { ...defaultParams, detailLevel }
+              params: { ...defaultParams, detailLevel },
             })
 
             screen.getByText('Slot D4')
@@ -296,7 +316,7 @@ describe('getLabwareDisplayLocation with translations', () => {
         detailLevels.forEach(detailLevel => {
           it(`should handle labware in stacker hopper with detailLevel "${detailLevel}"`, () => {
             const locationSequence: LabwareLocationSequence = [
-              { kind: "inStackerHopper", moduleId: "UUID" }
+              { kind: 'inStackerHopper', moduleId: 'UUID' },
             ]
 
             vi.mocked(getModuleModel).mockReturnValue('flexStackerModuleV1')
@@ -306,7 +326,7 @@ describe('getLabwareDisplayLocation with translations', () => {
 
             render({
               location: locationSequence,
-              params: { ...defaultParams, detailLevel }
+              params: { ...defaultParams, detailLevel },
             })
 
             screen.getByText('Stacker D')
@@ -320,7 +340,14 @@ describe('getLabwareDisplayLocation with translations', () => {
             const locationSequence: LabwareLocationSequence = [
               { kind: 'onLabware', labwareId: 'labwareABC', lidId: null },
               { kind: 'onAddressableArea', addressableAreaName: 'A3' },
-              { kind: 'onCutoutFixture', cutoutId: 'cutoutA3', possibleCutoutFixtureIds: ['flexStackerModuleV1', 'singleRightSlot'] }
+              {
+                kind: 'onCutoutFixture',
+                cutoutId: 'cutoutA3',
+                possibleCutoutFixtureIds: [
+                  'flexStackerModuleV1',
+                  'singleRightSlot',
+                ],
+              },
             ]
             const mockLoadedLabwares = [
               {
@@ -342,8 +369,8 @@ describe('getLabwareDisplayLocation with translations', () => {
                 ...defaultParams,
                 detailLevel,
                 loadedLabwares: mockLoadedLabwares,
-                allRunDefs: mockAllRunDefs
-              }
+                allRunDefs: mockAllRunDefs,
+              },
             })
 
             if (detailLevel === 'full') {
@@ -362,9 +389,16 @@ describe('getLabwareDisplayLocation with translations', () => {
           it(`should handle labware on module sequence with detailLevel "${detailLevel}"`, () => {
             const locationSequence: LabwareLocationSequence = [
               { kind: 'onLabware', labwareId: 'adapter1234', lidId: null },
-              { addressableAreaName: 'temperatureModuleV2C1', kind: 'onAddressableArea' },
+              {
+                addressableAreaName: 'temperatureModuleV2C1',
+                kind: 'onAddressableArea',
+              },
               { kind: 'onModule', moduleId: 'temp123' },
-              { cutoutId: 'cutoutC1', kind: 'onCutoutFixture', possibleCutoutFixtureIds: ['temperatureModuleV2'] }
+              {
+                cutoutId: 'cutoutC1',
+                kind: 'onCutoutFixture',
+                possibleCutoutFixtureIds: ['temperatureModuleV2'],
+              },
             ]
 
             const mockLoadedLabwares = [
@@ -375,7 +409,7 @@ describe('getLabwareDisplayLocation with translations', () => {
               },
             ]
             const mockLoadedModules = [
-              { id: 'temp123', model: 'temperatureModuleV2' }
+              { id: 'temp123', model: 'temperatureModuleV2' },
             ]
             const mockAllRunDefs = [
               { uri: 'adapter-uri', metadata: { displayName: 'Mock Adapter' } },
@@ -385,7 +419,9 @@ describe('getLabwareDisplayLocation with translations', () => {
             vi.mocked(getLabwareDisplayName).mockReturnValue('Mock Adapter')
             vi.mocked(getModuleModel).mockReturnValue('temperatureModuleV2')
             vi.mocked(getModuleDisplayLocation).mockReturnValue('C1')
-            vi.mocked(getModuleDisplayName).mockReturnValue('Temperature Module')
+            vi.mocked(getModuleDisplayName).mockReturnValue(
+              'Temperature Module'
+            )
             vi.mocked(getModuleType).mockReturnValue('temperatureModuleType')
             vi.mocked(getOccludedSlotCountForModule).mockReturnValue(1)
 
@@ -396,8 +432,8 @@ describe('getLabwareDisplayLocation with translations', () => {
                 detailLevel,
                 loadedLabwares: mockLoadedLabwares,
                 loadedModules: mockLoadedModules,
-                allRunDefs: mockAllRunDefs
-              }
+                allRunDefs: mockAllRunDefs,
+              },
             })
 
             if (detailLevel === 'full') {
@@ -414,7 +450,14 @@ describe('getLabwareDisplayLocation with translations', () => {
           { kind: 'onLabware', labwareId: 'topLabware', lidId: null },
           { kind: 'onLabware', labwareId: 'adapter123', lidId: null },
           { kind: 'onAddressableArea', addressableAreaName: 'A3' },
-          { kind: 'onCutoutFixture', cutoutId: 'cutoutA3', possibleCutoutFixtureIds: ['flexStackerModuleV1', 'singleRightSlot'] }
+          {
+            kind: 'onCutoutFixture',
+            cutoutId: 'cutoutA3',
+            possibleCutoutFixtureIds: [
+              'flexStackerModuleV1',
+              'singleRightSlot',
+            ],
+          },
         ]
 
         const mockLoadedLabwares = [
@@ -447,8 +490,8 @@ describe('getLabwareDisplayLocation with translations', () => {
             ...defaultParams,
             detailLevel: 'full',
             loadedLabwares: mockLoadedLabwares,
-            allRunDefs: mockAllRunDefs
-          }
+            allRunDefs: mockAllRunDefs,
+          },
         })
 
         screen.getByText('Top Labware in Slot A3')
@@ -458,20 +501,20 @@ describe('getLabwareDisplayLocation with translations', () => {
         const locationSequence: LabwareLocationSequence = [
           {
             addressableAreaName: 'gripperWasteChute',
-            kind: 'onAddressableArea'
+            kind: 'onAddressableArea',
           },
           {
             cutoutId: 'cutoutD3',
             kind: 'onCutoutFixture',
             possibleCutoutFixtureIds: [
-              'stagingAreaSlotWithWasteChuteRightAdapterNoCover'
-            ]
-          }
+              'stagingAreaSlotWithWasteChuteRightAdapterNoCover',
+            ],
+          },
         ]
 
         render({
           location: locationSequence,
-          params: defaultParams
+          params: defaultParams,
         })
 
         screen.getByText('Waste Chute')
@@ -480,12 +523,16 @@ describe('getLabwareDisplayLocation with translations', () => {
       it('should handle trash bin sequence', () => {
         const locationSequence: LabwareLocationSequence = [
           { kind: 'onAddressableArea', addressableAreaName: 'movableTrashA3' },
-          { kind: 'onCutoutFixture', cutoutId: 'cutoutA3', possibleCutoutFixtureIds: ['movableTrashA3'] }
+          {
+            kind: 'onCutoutFixture',
+            cutoutId: 'cutoutA3',
+            possibleCutoutFixtureIds: ['movableTrashA3'],
+          },
         ]
 
         render({
           location: locationSequence,
-          params: defaultParams
+          params: defaultParams,
         })
         screen.getByText('Trash Bin')
       })

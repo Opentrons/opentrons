@@ -102,7 +102,10 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
             <DeckInfoLabel
               deckLabel={
                 moduleOnSlot != null
-                  ? getModuleDeckLabel(moduleEntities[moduleOnSlot[0]].type, slotId)
+                  ? getModuleDeckLabel(
+                      moduleEntities[moduleOnSlot[0]].type,
+                      slotId
+                    )
                   : slotId
               }
             />
@@ -134,8 +137,8 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
           <TrashSlotDetails trashBinEntities={trashBinEntities} />
         ) : null}
         {moduleOnSlot == null &&
-          topMostLabwareOnSlot == null &&
-          !isTrashOnSlot ? (
+        topMostLabwareOnSlot == null &&
+        !isTrashOnSlot ? (
           <SlotDetailsEmptyState />
         ) : null}
       </div>

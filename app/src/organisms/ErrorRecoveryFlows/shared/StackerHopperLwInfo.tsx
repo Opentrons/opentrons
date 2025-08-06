@@ -22,8 +22,8 @@ export function StackerHopperLwInfo(props: RecoveryContentProps): JSX.Element {
         <LeftColumnLabwareInfo
           {...props}
           title={t('ensure_stacker_has_labware')}
-          type={'location'}
-          layout={'stacked'}
+          type="location"
+          layout="stacked"
           bannerText={t('make_sure_loaded_correct_number_of_labware_stacker')}
         />
         <RightColumnAnimation animationSrc={FillHopper} />

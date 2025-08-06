@@ -16,9 +16,9 @@ import {
 import {
   getCutoutDisplayName,
   getFixtureDisplayName,
+  getModuleDeckLabel,
   getModuleDisplayName,
   getModuleType,
-  getModuleDeckLabel,
   GRIPPER_V1_2,
   MAGNETIC_BLOCK_FIXTURES,
   MAGNETIC_BLOCK_TYPE,
@@ -123,9 +123,10 @@ function HardwareItem({
   if (hardware.hardwareType === 'module') {
     location = (
       <DeckInfoLabel
-        deckLabel={
-          getModuleDeckLabel(getModuleType(hardware.moduleModel), hardware.slot)
-        }
+        deckLabel={getModuleDeckLabel(
+          getModuleType(hardware.moduleModel),
+          hardware.slot
+        )}
       />
     )
   } else if (hardware.hardwareType === 'fixture') {

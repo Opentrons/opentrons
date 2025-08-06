@@ -2,13 +2,11 @@ import find from 'lodash/find'
 
 import {
   getAllLiquidClassDefs,
+  getModuleDeckLabel,
   getModuleDisplayName,
   getModuleType,
-  getModuleDeckLabel,
   getOccludedSlotCountForModule,
   getPipetteSpecsV2,
-  THERMOCYCLER_MODULE_V1,
-  THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 
 import { getLabwareDisplayLocation } from '../getLabwareDisplayLocation'
@@ -51,7 +49,10 @@ export const getLoadCommandText = ({
       return t('load_module_protocol_setup', {
         count: occludedSlotCount,
         module: getModuleDisplayName(command.params.model),
-        slot_name: getModuleDeckLabel(moduleType, command.params.location.slotName),
+        slot_name: getModuleDeckLabel(
+          moduleType,
+          command.params.location.slotName
+        ),
       })
     }
     case 'loadLid':

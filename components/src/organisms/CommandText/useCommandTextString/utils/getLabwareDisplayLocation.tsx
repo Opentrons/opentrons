@@ -1,12 +1,10 @@
 import {
   FLEX_STACKER_MODULE_TYPE,
+  getModuleDeckLabel,
   getModuleDisplayName,
   getModuleType,
   getOccludedSlotCountForModule,
-  getModuleDeckLabel,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
-  THERMOCYCLER_MODULE_V1,
-  THERMOCYCLER_MODULE_V2,
   TRASH_BIN_FIXTURE,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
@@ -31,6 +29,7 @@ export interface DisplayLocationSlotOnlyParams
   extends Omit<LocationSlotOnlyParams, 'location'> {
   t: TFunction
   isOnDevice?: boolean
+  includeSlotText?: boolean
   location?: LabwareLocation | LabwareLocationSequence | null
 }
 export interface DisplayLocationFullParams
@@ -47,18 +46,19 @@ export type DisplayLocationParams =
 // labware, ex, "in module XYZ in slot C1".
 // If 'slot-only', return only the slot name, ex "in slot C1".
 export function getLabwareDisplayLocation(
-  params: DisplayLocationParams
+  params: DisplayLocationParams,
+  includeSlotText: boolean = true
 ): string {
   const { t, isOnDevice = false, location } = params
   const locationResult = Array.isArray(location)
     ? getLabwareLocationFromSequence({
-      ...params,
-      locationSequence: location,
-    })
+        ...params,
+        locationSequence: location,
+      })
     : getLabwareLocation({
-      ...params,
-      location: location ?? null,
-    })
+        ...params,
+        location: location ?? null,
+      })
   if (locationResult == null) {
     return ''
   }
@@ -75,7 +75,9 @@ export function getLabwareDisplayLocation(
   // Simple slot location
   else if (moduleModel == null && adapterName == null) {
     const validatedSlotCopy = handleSpecialSlotNames(slotName, t)
-    return isOnDevice ? validatedSlotCopy.odd : validatedSlotCopy.desktop
+    return isOnDevice || !includeSlotText
+      ? validatedSlotCopy.odd
+      : validatedSlotCopy.desktop
   }
   // Module location without adapter
   else if (moduleModel != null && adapterName == null) {
@@ -87,18 +89,18 @@ export function getLabwareDisplayLocation(
       })
     }
     if (params.detailLevel === 'slot-only') {
-      return t('slot', { slot_name: moduleSlot })
+      return includeSlotText ? t('slot', { slot_name: moduleSlot }) : moduleSlot
     }
     return isOnDevice
       ? `${getModuleDisplayName(moduleModel)}, ${moduleSlot}`
       : t('module_in_slot', {
-        count: getOccludedSlotCountForModule(
-          getModuleType(moduleModel),
-          params.robotType
-        ),
-        module: getModuleDisplayName(moduleModel),
-        slot_name: moduleSlot,
-      })
+          count: getOccludedSlotCountForModule(
+            getModuleType(moduleModel),
+            params.robotType
+          ),
+          module: getModuleDisplayName(moduleModel),
+          slot_name: moduleSlot,
+        })
   }
   // Adapter locations
   else if (adapterName != null) {
