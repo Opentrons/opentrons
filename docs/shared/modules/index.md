@@ -38,4 +38,12 @@ Opentrons hardware modules add features and capabilities to your robot.
 
     [:octicons-arrow-right-24: Instruction Manual](../thermocycler-manual/index.md)
 
+-   :opentrons-temperature:{ .xl .middle } __Temperature Module__
+
+    ---
+
+    A hot and cold plate module with a temperature range between 4°C and 95°C.
+
+    [:octicons-arrow-right-24: Instruction Manual](../temperature-module/index.md)
+
 </div>
