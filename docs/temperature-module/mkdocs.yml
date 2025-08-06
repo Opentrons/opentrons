@@ -15,6 +15,7 @@ theme:
 
 nav:
   - Home: index.md
+  - Additional Product Information: warranty.md
 
 plugins:
   - search
