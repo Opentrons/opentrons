@@ -8,6 +8,7 @@ dependencies = [
     "mkdocs>=1.6.1",
     "mkdocs-autorefs>=1.4.2",
     "mkdocs-material>=9.6.14",
+    "mkdocs-monorepo-plugin>=1.1.2",
     "mkdocs-parent-css-plugin",
 ]
 

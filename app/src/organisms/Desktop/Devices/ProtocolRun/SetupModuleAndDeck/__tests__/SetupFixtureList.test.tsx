@@ -87,7 +87,7 @@ describe('SetupFixtureList', () => {
 
   it('should a fixture with configured status', () => {
     render(props)
-    screen.getByText('Waste chute with staging area slot')
+    screen.getByText('Waste Chute with Staging Area Slot')
     screen.getByRole('button', { name: 'View setup instructions' })
     screen.getByText('D3')
     screen.getByText('Configured')
@@ -139,7 +139,7 @@ describe('SetupFixtureList', () => {
     render(props)
     screen.getByText('Magnetic Block GEN1')
     screen.getByText('Configured')
-    screen.getByText('Staging area slot')
+    screen.getByText('Staging Area Slot')
     screen.getByText('Not configured')
     fireEvent.click(screen.getByRole('button', { name: 'Resolve' }))
     screen.getByText('mock not configured modal')

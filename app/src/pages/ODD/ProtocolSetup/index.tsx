@@ -103,6 +103,7 @@ import { CloseButton, PlayButton } from './Buttons'
 import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 import { ConfirmSetupStepsCompleteModal } from './ConfirmSetupStepsCompleteModal'
 
+import type { TFunction } from 'i18next'
 import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { Dispatch, SetStateAction } from 'react'
 import type { Run, RunStatus } from '@opentrons/api-client'
@@ -147,7 +148,11 @@ function PrepareToRun({
   confirmStepsComplete,
   offsetsConfirmed,
 }: PrepareToRunProps): JSX.Element {
-  const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
+  const { t, i18n } = useTranslation([
+    'protocol_setup',
+    'shared',
+    'deck_configuration',
+  ])
   const navigate = useNavigate()
   const { makeSnackbar } = useToaster()
   const { scrollRef, isScrolled } = useScrollPosition()
@@ -457,6 +462,7 @@ function PrepareToRun({
   const missingFixturesText =
     missingFixtures.length === 1
       ? `${t('missing')} ${getFixtureDisplayName(
+          t as TFunction,
           missingFixtures[0].cutoutFixtureId
         )}`
       : t('multiple_fixtures_missing', { count: missingFixtures.length })
