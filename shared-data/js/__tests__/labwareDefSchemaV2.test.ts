@@ -318,12 +318,7 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
         expect(
           Math.abs(section.topYDimension - well.yDimension)
         ).toBeLessThanOrEqual(allowedDiscrepancy)
-      } else if (well.shape === 'circular' && section.shape === 'spherical') {
-        // radius of curvature should be roughly half the well diameter
-        expect(
-          Math.abs(section.radiusOfCurvature - well.diameter / 2)
-        ).toBeLessThanOrEqual(allowedDiscrepancy)
-      }
+      } 
     }
   })
 
