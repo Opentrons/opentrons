@@ -33,6 +33,10 @@ describe('Render StackerEmptyHopper', () => {
       recoveryCommands: {
         skipFailedCommand: mockSkipFailedCommand,
       } as any,
+      recoveryMap: {
+        route: RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE,
+        step: RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.STEPS.EMPTY_STACKER,
+      },
       currentRecoveryOptionUtils: {
         selectedRecoveryOption: RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE,
       } as any,
