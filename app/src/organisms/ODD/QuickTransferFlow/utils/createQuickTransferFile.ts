@@ -118,7 +118,6 @@ export function createQuickTransferFile(
     stepArgs?.liquidClass != null && stepArgs.liquidClass !== 'none'
       ? stepArgs.liquidClass
       : null
-  console.log('liquidClass', liquidClass)
   const byTipTypeSettings =
     liquidClass != null
       ? getAllLiquidClassDefs()
