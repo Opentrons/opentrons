@@ -127,6 +127,7 @@ DEFAULT_LABWARE_VERSIONS: DefaultLabwareVersions = {
 # This list should not be consumed by production code--it's only for the benefit of tests
 # that make sure every labware is accounted for somehow.
 KNOWN_EXCEPTIONS_FOR_TESTS: set[str] = {
+    # Dev testing junk for labware schema 3, not things that users should ever load:
     "schema3test_96_well_aluminum_block",
     "schema3test_96_wellplate_200ul_pcr_full_skirt",
     "schema3test_aluminum_flat_bottom_plate",
@@ -135,6 +136,21 @@ KNOWN_EXCEPTIONS_FOR_TESTS: set[str] = {
     "schema3test_flex_tiprack_lid",
     "schema3test_tough_pcr_auto_sealing_lid",
     "schema3test_universal_flat_adapter",
+    # These were supposed to be short-lived drafts as part of of a one-two punch of
+    # https://github.com/Opentrons/opentrons/pull/18266 + https://github.com/Opentrons/opentrons/pull/18284,
+    # but the second punch took a while. We should merge the second punch after v8.6.0
+    # and remove these exceptions as part of that.
+    "agilent_1_reservoir_290ml",
+    "corning_384_wellplate_112ul_flat",
+    "nest_1_reservoir_290ml",
+    "opentrons_24_aluminumblock_nest_0.5ml_screwcap",
+    "opentrons_24_tuberack_nest_0.5ml_screwcap",
+    "opentrons_96_aluminumblock_generic_pcr_strip_200ul",
+    "usascientific_12_reservoir_22ml",
+    # fixme(mm, 2025-08-06) These seem straightforwardly accidental:
+    "axygen_96_wellplate_500ul",
+    "ibidi_96_square_well_plate_300ul",
+    "smc_384_read_plate",
 }
 
 
