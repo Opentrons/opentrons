@@ -87,6 +87,18 @@ describe('Touchscreen AddFixtureModal', () => {
     fireEvent.click(screen.getAllByText('Select options')[1])
     fireEvent.click(screen.getAllByText('Add')[0])
   })
+
+  it('should render text and buttons without modules', () => {
+    render(props)
+    props = { ...props, addressableAreaId: 'D4' }
+    screen.getByText('Add to Slot D3')
+    screen.getByText(
+      'Choose an item below to add to your deck configuration. It will be referenced during protocol analysis.'
+    )
+    screen.getByText('Fixtures')
+    expect(screen.queryByText('Modules')).not.toBeInTheDocument()
+    expect(screen.getAllByText('Select options').length).toBe(1)
+  })
 })
 
 describe('Desktop AddFixtureModal', () => {

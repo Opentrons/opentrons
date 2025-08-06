@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  ABSORBANCE_READER_V1_FIXTURE,
   FAKE_STAGING_AREA_RIGHT_SLOT,
   FAKE_STAGING_SLOT_WITH_MAG_BLOCK,
   FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT,
@@ -467,6 +468,14 @@ describe('replaceCutoutFixtureRemove', () => {
     )
     expect(result).toEqual(WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE)
   })
+  it('should get fixture replacment for ABSORBANCE_READER_V1_FIXTURE', () => {
+    const result = replaceCutoutFixtureRemove(
+      ABSORBANCE_READER_V1_FIXTURE,
+      'cutoutD3',
+      'absorbanceReaderV1D3'
+    )
+    expect(result).toEqual(SINGLE_RIGHT_SLOT_FIXTURE)
+  })
 })
 
 describe('getAAFixtureDisplayName', () => {
@@ -703,7 +712,7 @@ describe('getMainNonComboFixtureId', () => {
     expect(result).toEqual(FLEX_STACKER_V1_FIXTURE)
   })
 
-  it.only('should get main non combo fixture id for magnetic block', () => {
+  it('should get main non combo fixture id for magnetic block', () => {
     const result = getMainNonComboFixtureId(
       [
         FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
