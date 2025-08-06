@@ -1,5 +1,5 @@
 ---
-title: "Temperature Module"
+title: "Temperature Module: Additional Product Information"
 ---
 
 # Additional Product Information

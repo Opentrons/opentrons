@@ -1,5 +1,5 @@
 ---
-title: "Temperature Module"
+title: "Temperature Module Instruction Manual"
 hide: toc
 ---
 

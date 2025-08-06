@@ -1,5 +1,5 @@
 ---
-title: "Temperature Module"
+title: "Temperature Module: Maintenance and Cleaning"
 ---
 
 # Maintenance and Cleaning
