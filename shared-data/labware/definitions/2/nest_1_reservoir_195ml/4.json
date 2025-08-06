@@ -47,7 +47,7 @@
     "loadName": "nest_1_reservoir_195ml"
   },
   "namespace": "opentrons",
-  "version": 3,
+  "version": 4,
   "schemaVersion": 2,
   "cornerOffsetFromSlot": {
     "x": 0,
@@ -59,10 +59,10 @@
       "sections": [
         {
           "shape": "cuboidal",
-          "topXDimension": 71.3,
-          "topYDimension": 107.3,
-          "bottomXDimension": 70.6,
-          "bottomYDimension": 106.8,
+          "topXDimension": 107.3,
+          "topYDimension": 71.3,
+          "bottomXDimension": 106.8,
+          "bottomYDimension": 70.6,
           "topHeight": 26.85,
           "bottomHeight": 2.0
         },
