@@ -20,12 +20,16 @@ from pydantic import BaseModel, Field, conint
 from starlette.middleware.base import BaseHTTPMiddleware
 from uvicorn.protocols.utils import get_path_with_query_string
 
-from api.constants.file_constants import MEDIA_TYPE_MAPPING
 from api.domain.anthropic_predict import AnthropicPredict, get_tracing_context, setup_weave_analytics
 from api.domain.fake_responses import FakeResponse, get_fake_response
 from api.domain.openai_predict import OpenAIPredict
 from api.handler.custom_logging import setup_logging
-from api.handler.utils_fast import parse_tagged_content
+from api.handler.utils_fast import (
+    extract_message_index_from_filename,
+    parse_tagged_content,
+    process_single_multipart_file,
+    reconstruct_conversation_history,
+)
 from api.integration.auth import VerifyToken
 from api.integration.google_sheets import GoogleSheetsClient
 from api.models.chat_request import ChatRequest
@@ -215,7 +219,7 @@ def _generate_llm_response_with_history(
     history_with_attachments: Optional[List[Dict[str, Any]]] = None,
     protocol_format: Optional[ProtocolFormat] = None,
     protocol_action: Optional[str] = None,
-    new_file_references: Optional[List[Dict[str, str]]] = None,
+    current_msg_files: Optional[List[Dict[str, str]]] = None,
 ) -> Optional[str]:
     """Generate a response from the appropriate LLM with proper history handling."""
     # Wrap all LLM calls with the appropriate tracing context
@@ -229,29 +233,9 @@ def _generate_llm_response_with_history(
 
         # Claude models - convert history to proper message format
         converted_history = []
-        all_file_references = []
-
         if history_with_attachments:
             for msg in history_with_attachments:
-                if msg["role"] == "user" and msg.get("attachments"):
-                    # Collect all file references from history
-                    for attachment in msg["attachments"]:
-                        all_file_references.append(
-                            {
-                                "id": attachment.get("id", ""),
-                                "filename": attachment.get("name", attachment.get("filename", "")),
-                                "file_type": attachment.get("type", attachment.get("file_type", "")),
-                                "content": attachment.get("content", ""),
-                                "media_type": MEDIA_TYPE_MAPPING.get(attachment.get("type", attachment.get("file_type", "")), "text/plain"),
-                            }
-                        )
-
-                # Convert to MessageParam format (role + content only)
                 converted_history.append({"role": msg["role"], "content": msg["content"]})
-
-        # Add new files to the collection
-        if new_file_references:
-            all_file_references.extend(new_file_references)
 
         # Use existing Claude logic with all files
         if protocol_format == ProtocolFormat.PROTOCOL_DESIGNER:
@@ -266,7 +250,7 @@ def _generate_llm_response_with_history(
                 prompt=prompt,
                 history_with_attachments=history_with_attachments,
                 message_type="update",
-                new_file_references=all_file_references,
+                current_msg_files=current_msg_files,
             )
 
 
@@ -416,8 +400,6 @@ async def create_chat_completion(
                     }
                     history_with_attachments.append(history_msg)
 
-        new_file_references: List[Dict[str, str]] = []
-
         # Use the new history-aware response generation
         response = _generate_llm_response_with_history(
             model_type=settings.model,
@@ -427,7 +409,7 @@ async def create_chat_completion(
             history_with_attachments=history_with_attachments,
             protocol_format=protocol_format,
             protocol_action=protocol_action,
-            new_file_references=new_file_references,
+            current_msg_files=[],
         )
         return _format_response(response, protocol_format, bool(body.fake))
 
@@ -462,36 +444,44 @@ async def create_chat_completion_multipart(
         "POST /api/chat/completion-multipart",
         extra={"message": message, "num_files": len(files), "file_names": [f.filename for f in files], "user": user},
     )
-
     try:
         # Setup Weave analytics based on frontend preference
         enable_analytics = _get_analytics_preference(request) if request else False
         setup_weave_analytics(enable_analytics)
 
         # Parse history from JSON string (now includes attachments in each message)
+
         try:
             parsed_history_with_attachments = json.loads(history) if history else []
         except json.JSONDecodeError:
             parsed_history_with_attachments = []
 
-        # Process NEW uploaded files for current message
-        new_file_references, token_warning = await _process_multipart_files(files)
+        # Process uploaded files with message mapping
+        files_by_message, token_warning = await _process_multipart_files_with_mapping(files)
 
-        # Determine protocol format
+        # Reconstruct conversation history with file content
+        history_with_attachments = reconstruct_conversation_history(parsed_history_with_attachments, files_by_message)
+
+        # Get current message files. history_with_attachments contains messages without current message
+        # The files for current message are in files_by_message[N]. 0 to N-1 are the previous messages.
+        # N is the current message index.
+        # For example, when history_with_attachments=[], files_by_message={0: [file1, file2]}.
+        current_msg_idx = len(history_with_attachments)
+        current_msg_files = files_by_message.get(current_msg_idx, [])
+
         protocol_format_enum = ProtocolFormat.PYTHON
         if protocol_format.lower() == "protocol_designer":
             protocol_format_enum = ProtocolFormat.PROTOCOL_DESIGNER
 
-        # Generate response using the new history-aware logic
         response = _generate_llm_response_with_history(
             model_type=settings.model,
             user_id=str(user.sub),
             prompt=message,
             enable_analytics=enable_analytics,
-            history_with_attachments=parsed_history_with_attachments,
+            history_with_attachments=history_with_attachments,
             protocol_format=protocol_format_enum,
-            protocol_action="update",  # Default action
-            new_file_references=new_file_references,
+            protocol_action="update",
+            current_msg_files=current_msg_files,
         )
         return _format_response(response, protocol_format_enum, fake, token_warning)
 
@@ -502,54 +492,38 @@ async def create_chat_completion_multipart(
         ) from e
 
 
-async def _process_multipart_files(files: List[UploadFile]) -> tuple[Optional[List[Dict[str, str]]], Optional[str]]:
-    """
-    Process uploaded files in the multipart completion handler.
-
-    This is called within the /api/chat/completion-multipart endpoint, AFTER FastAPI
-    has parsed the multipart form data but BEFORE sending files to the LLM. It handles
-    raw file bytes, processes them via FileProcessor, and validates token limits.
-
-    Pipeline position: HTTP Request → Multipart Parsing → File Processing → LLM Request
-    """
+async def _process_multipart_files_with_mapping(files: List[UploadFile]) -> tuple[Dict[int, List[Dict[str, str]]], Optional[str]]:
+    """Process uploaded files and group them by message index."""
     if not files or not any(f.filename for f in files):
-        return None, None
+        return {}, None
 
-    file_references: List[Dict[str, str]] = []
+    files_by_message: Dict[int, List[Dict[str, str]]] = {}
+
     for file in files:
-        if not file.filename:  # Skip empty file entries
+        if not file.filename:
             continue
 
-        # Read file content
-        file_content = await file.read()
+        message_index, original_filename = extract_message_index_from_filename(file.filename)
 
-        # Validate content type before processing
-        if not file.content_type:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"File {file.filename} has no content type")
+        # Initialize message group if needed
+        if message_index not in files_by_message:
+            files_by_message[message_index] = []
 
-        # Let FileProcessor handle all validation and processing
         try:
-            processed = FileProcessor.process_multipart_file(file.filename, file.content_type, file_content)
-
-            file_references.append(
-                {
-                    "id": f"upload_{len(file_references)}",
-                    "filename": file.filename,
-                    "file_type": processed["file_type"],
-                    "content": processed["content"],
-                    "media_type": processed["media_type"],
-                }
-            )
+            file_count = len(files_by_message[message_index])
+            file_ref = await process_single_multipart_file(file, message_index, file_count)
+            file_ref["name"] = original_filename  # Use extracted original filename
+            files_by_message[message_index].append(file_ref)
         except ValueError as e:
-            # Handle file processing errors (like PDF too large)
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
 
-    # Check total token count and generate warning if needed
-    token_warning = (
-        FileProcessor.check_files_token_warning(file_references, claude.client, settings.anthropic_model_name) if file_references else None
-    )
+    # Check token count for all files
+    all_files = [file for file_list in files_by_message.values() for file in file_list]
+    token_warning = None
+    if all_files:
+        token_warning = FileProcessor.check_files_token_warning(all_files, claude.client, settings.anthropic_model_name)
 
-    return file_references, token_warning
+    return files_by_message, token_warning
 
 
 def _determine_protocol_action(body: ChatRequest) -> str:

@@ -15,7 +15,7 @@ from typing import (
     Union,
     overload,
 )
-from typing_extensions import assert_never, assert_type
+from typing_extensions import assert_never
 
 from opentrons.protocol_engine.state import update_types
 from opentrons_shared_data.deck.types import DeckDefinitionV5
@@ -24,7 +24,6 @@ from opentrons_shared_data.labware.labware_definition import (
     InnerWellGeometry,
     LabwareDefinition,
     LabwareDefinition2,
-    LabwareDefinition3,
     LabwareRole,
     WellDefinition2,
     WellDefinition3,
@@ -32,7 +31,10 @@ from opentrons_shared_data.labware.labware_definition import (
 )
 from opentrons_shared_data.pipette.types import LabwareUri
 
-from opentrons.types import DeckSlotName, StagingSlotName, MountType
+from opentrons.protocol_engine.state._axis_aligned_bounding_box import (
+    AxisAlignedBoundingBox3D,
+)
+from opentrons.types import DeckSlotName, StagingSlotName, MountType, Point
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.calibration_storage.helpers import uri_from_details
 
@@ -91,7 +93,7 @@ _RIGHT_SIDE_SLOTS = {
 
 
 # The max height of the labware that can fit in a plate reader
-_PLATE_READER_MAX_LABWARE_Z_MM = 16
+_PLATE_READER_MAX_LABWARE_Z_MM = 16.0
 
 
 _WellDefinition = WellDefinition2 | WellDefinition3
@@ -864,30 +866,30 @@ class LabwareView:
             assert labware_id is not None  # From our @overloads.
             labware_definition = self.get_definition(labware_id)
 
-        if isinstance(labware_definition, LabwareDefinition2):
-            return Dimensions(
-                x=labware_definition.dimensions.xDimension,
-                y=labware_definition.dimensions.yDimension,
-                z=labware_definition.dimensions.zDimension,
+        extents = self.get_extents_around_lw_origin(labware_definition)
+        return Dimensions(
+            x=extents.x_dimension, y=extents.y_dimension, z=extents.z_dimension
+        )
+
+    def get_extents_around_lw_origin(
+        self,
+        labware_definition: LabwareDefinition,
+    ) -> AxisAlignedBoundingBox3D:
+        """Return a bounding box around all the space the labware occupies, all-encompassing.
+
+        Returned coordinates are relative to the labware's local origin.
+        """
+        if labware_definition.schemaVersion == 2:
+            x_dimension = labware_definition.dimensions.xDimension
+            y_dimension = labware_definition.dimensions.yDimension
+            z_dimension = labware_definition.dimensions.zDimension
+            return AxisAlignedBoundingBox3D.from_corners(
+                Point(0, 0, 0), Point(x_dimension, y_dimension, z_dimension)
             )
         else:
-            assert_type(labware_definition, LabwareDefinition3)
-            back_left_bottom = labware_definition.extents.total.backLeftBottom
-            front_right_top = labware_definition.extents.total.frontRightTop
-            right, front, top = (
-                front_right_top.x,
-                front_right_top.y,
-                front_right_top.z,
-            )
-            left, back, bottom = (
-                back_left_bottom.x,
-                back_left_bottom.y,
-                back_left_bottom.z,
-            )
-            return Dimensions(
-                x=right - left,
-                y=back - front,
-                z=top - bottom,
+            return AxisAlignedBoundingBox3D.from_corners(
+                Point.from_xyz_attrs(labware_definition.extents.total.backLeftBottom),
+                Point.from_xyz_attrs(labware_definition.extents.total.frontRightTop),
             )
 
     def get_labware_overlap_offsets(
@@ -1350,15 +1352,27 @@ class LabwareView:
             recommended_force if recommended_force is not None else LABWARE_GRIP_FORCE
         )
 
-    def get_grip_height_from_labware_bottom(
-        self, labware_definition: LabwareDefinition
-    ) -> float:
-        """Get the recommended grip height from labware bottom, if present."""
-        recommended_height = labware_definition.gripHeightFromLabwareBottom
+    def get_grip_z(self, labware_definition: LabwareDefinition) -> float:
+        """Get the place on the labware where the gripper should contact.
+
+        The returned value is a z-offset relative to the labware origin.
+        """
+
+        def get_origin_to_mid_z(labware_definition: LabwareDefinition) -> float:
+            """Return the z-coordinate of the middle of the labware, relative to the labware's origin."""
+            extents = self.get_extents_around_lw_origin(labware_definition)
+            return (extents.max_z + extents.min_z) / 2
+
+        if labware_definition.schemaVersion == 2:
+            # In schema 2, the bottom of the labware is at the z-origin by definition.
+            defined_height_from_origin = labware_definition.gripHeightFromLabwareBottom
+        else:
+            defined_height_from_origin = labware_definition.gripHeightFromLabwareOrigin
+
         return (
-            recommended_height
-            if recommended_height is not None
-            else self.get_dimensions(labware_definition=labware_definition).z / 2
+            defined_height_from_origin
+            if defined_height_from_origin is not None
+            else get_origin_to_mid_z(labware_definition)
         )
 
     @staticmethod

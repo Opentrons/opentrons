@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { Trans, useTranslation } from 'react-i18next'
 import Markdown from 'react-markdown'
+import { clsx } from 'clsx'
 import { useAtom } from 'jotai'
 import delay from 'lodash/delay'
 
@@ -252,9 +253,10 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
       </div>
       {/* text should be markdown so this component will have a package or function to parse markdown */}
       <div
-        className={`${styles.message_container} ${
+        className={clsx(
+          styles.message_container,
           isUser ? styles.message_container_user : styles.message_container_ai
-        }`}
+        )}
         data-testid={`ChatDisplay_from_${isUser ? 'user' : 'backend'}`}
       >
         {protocolContent == null && (

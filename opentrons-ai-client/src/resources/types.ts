@@ -12,7 +12,7 @@ export interface FileAttachment {
   id?: string // Optional because it's not present when initially selecting files
   name: string
   type: FileType
-  content: string // Populated by backend after processing
+  content: File
 }
 
 export interface ChatData {
@@ -83,6 +83,15 @@ export interface Chat {
   protocol_format?: ProtocolFormat
   /** attached files */
   attachments?: FileAttachment[]
+}
+
+/** Chat message serialized for API requests (without File content) */
+export interface ChatMessage {
+  role: Role
+  content: string
+  protocol_content?: string
+  protocol_format?: ProtocolFormat
+  fileMetadata?: Array<Omit<FileAttachment, 'content'>>
 }
 
 export interface RouteProps {
