@@ -314,7 +314,7 @@ def aspirate_with_liquid_class(
     return contents
 
 
-def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
+def run(ctx: protocol_api.ProtocolContext) -> None:
     """Run."""
     ctx.load_trash_bin("A3")
     # tips
