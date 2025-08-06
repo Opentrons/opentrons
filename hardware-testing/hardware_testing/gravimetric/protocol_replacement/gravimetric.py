@@ -174,6 +174,7 @@ class FixtureSettings:
     retract_discontinuity: float
     disc_ver_cuttoff: int
     lld_every_tip: bool
+    single_tip_96: bool
 
     @classmethod
     def build(cls, ctx: ProtocolContext) -> "FixtureSettings":
@@ -256,6 +257,7 @@ class FixtureSettings:
         disc_ver_cuttoff = int(lookup_key("disc_ver_cuttoff", csv_params)[0])
         gantry_speed = int(lookup_key("gantry_speed", csv_params)[0])
         lld_every_tip = bool(lookup_key("lld_every_tip", csv_params)[0] == "TRUE")
+        single_tip_96 = bool(lookup_key("single_tip_96", csv_params)[0] == "TRUE")
         volumes = {
             20: volumes_to_test_20ul,
             50: volumes_to_test_50ul,
@@ -435,6 +437,7 @@ class FixtureSettings:
             retract_discontinuity=retract_discontinuity,
             disc_ver_cuttoff=disc_ver_cuttoff,
             lld_every_tip=lld_every_tip,
+            single_tip_96=single_tip_96,
         )
 
     def validate_settings(self) -> bool:
@@ -511,6 +514,24 @@ def _get_tips_for_test_single_multi(
         wells += rack.wells()
     return wells
 
+def _get_tips_for_test_96_single(
+    fixture_settings: FixtureSettings, tip: int, blank: bool = False
+) -> List[Well]:
+    wells = []
+    loaded_labwares = fixture_settings.ctx.loaded_labwares
+    used_slots = [
+        str(DeckSlotName.from_primitive(slot).to_ot3_equivalent())
+        for slot in loaded_labwares.keys()
+    ]
+    partially_used = [slot for slot in fixture_settings.tips[tip] if slot in used_slots]
+    tipracks_lw = [
+        fixture_settings.ctx.load_labware(f"opentrons_flex_96_tiprack_{tip}uL", slot)
+        for slot in fixture_settings.tips[tip]
+        if slot not in partially_used
+    ]
+    wells += tips.get_unused_tips(fixture_settings.ctx, tip)
+    wells = sorted(wells, reverse=True, key=lambda well: f"{well.well_name[0]}{chr(int(well.well_name[1:]))}")
+    return wells
 
 def _get_tips_for_test_96(
     fixture_settings: FixtureSettings, tip: int, blank: bool = False
@@ -571,7 +592,10 @@ def _get_tips_for_test(
     fixture_settings: FixtureSettings, tip: int, blank: bool = False, channel: int = 0
 ) -> List[Well]:
     if fixture_settings.pipette_channels == 96:
-        return _get_tips_for_test_96(fixture_settings, tip, blank)
+        if fixture_settings.single_tip_96:
+            return _get_tips_for_test_96_single(fixture_settings, tip, blank)
+        else:
+            return _get_tips_for_test_96(fixture_settings, tip, blank)
     return _get_tips_for_test_single_multi(fixture_settings, tip, channel)
 
 
@@ -1140,7 +1164,7 @@ def run_one_test(
 
 
 def _configure_tip_count(fixture_settings: FixtureSettings, channel: int) -> None:
-    if fixture_settings.pipette_channels == 8 and not fixture_settings.increment:
+    if (fixture_settings.pipette_channels == 8 and not fixture_settings.increment) or fixture_settings.single_tip_96:
         primary = "A1"
         if channel in [4, 5, 6, 7]:
             primary = "H1"
