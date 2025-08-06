@@ -115,7 +115,10 @@ export function createQuickTransferFile(
   } = quickTransferState.tipRack.parameters
 
   const liquidClass =
-    stepArgs?.liquidClass != null ? stepArgs.liquidClass : null
+    stepArgs?.liquidClass != null && stepArgs.liquidClass !== 'none'
+      ? stepArgs.liquidClass
+      : null
+  console.log('liquidClass', liquidClass)
   const byTipTypeSettings =
     liquidClass != null
       ? getAllLiquidClassDefs()
