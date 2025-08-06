@@ -25,7 +25,6 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
-import { NAV_BAR_HEIGHT_REM } from '../../../components/atoms'
 import { ExportButton, HotKeyDisplay } from '../../../components/molecules'
 import {
   SlotDetailsContainer,
