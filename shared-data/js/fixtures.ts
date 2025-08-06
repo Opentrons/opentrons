@@ -11,6 +11,7 @@ import {
   FLEX_STACKER_FIXTURES,
   FLEX_STAGING_ADDRESSABLE_AREAS_WITH_FAKES,
   FLEX_USB_MODULE_FIXTURES,
+  THERMOCYCLER_MODULE_CUTOUTS,
   WASTE_CHUTE_FIXTURES,
   WASTE_CHUTE_WITH_FAKE_FIXTURES,
 } from '.'
@@ -1182,6 +1183,9 @@ export const isModuleAllowedOnAA = (
   aa: AddressableAreaNamesWithFakes,
   moduleModel: ModuleModel
 ): boolean => {
+  if (moduleModel === THERMOCYCLER_MODULE_V2) {
+    return THERMOCYCLER_MODULE_CUTOUTS.includes(cutoutId) ? true : false
+  }
   const fixtureId = getCutoutFixtureIdsForModuleModel(moduleModel)
   const aaForFixture = getAAWithFakesFromCutoutFixtureId(
     cutoutId,
