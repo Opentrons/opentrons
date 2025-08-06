@@ -143,17 +143,17 @@
           "topXDimension": 107.5,
           "topYDimension": 8.2,
           "bottomXDimension": 107.5,
-          "bottomYDimension": 8,
+          "bottomYDimension": 6.88,
           "topHeight": 26.85,
-          "bottomHeight": 2.02
+          "bottomHeight": 1.68
         },
         {
           "shape": "cuboidal",
           "topXDimension": 107.5,
-          "topYDimension": 8,
-          "bottomXDimension": 101.5,
-          "bottomYDimension": 2,
-          "topHeight": 2.02,
+          "topYDimension": 6.88,
+          "bottomXDimension": 102.52,
+          "bottomYDimension": 1.9,
+          "topHeight": 1.68,
           "bottomHeight": 0
         }
       ]
