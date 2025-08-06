@@ -51,7 +51,7 @@ jobs:
         run: make build-flex-manual
       - name: Deploy Flex Manual to Sandbox
         working-directory: ./docs
-        run: make deploy_flex_manual_sandbox
+        run: make deploy_sandbox
       - name: Output URL to Summary
         run: |
           echo "## Flex Manual deployed to sandbox" >> $GITHUB_STEP_SUMMARY
@@ -87,7 +87,7 @@ jobs:
         run: make build-flex-manual
       - name: Deploy Flex Manual to Staging
         working-directory: ./docs
-        run: make deploy_flex_manual_staging
+        run: make deploy_staging
       - name: Output URL to Summary
         run: |
           echo "## Flex Manual deployed to staging" >> $GITHUB_STEP_SUMMARY
@@ -123,7 +123,7 @@ jobs:
         run: make build-flex-manual
       - name: Deploy Flex Manual to Production
         working-directory: ./docs
-        run: make deploy_flex_manual_production
+        run: make deploy_production
       - name: Output URL to Summary
         run: |
           echo "## Flex Manual deployed to production" >> $GITHUB_STEP_SUMMARY
