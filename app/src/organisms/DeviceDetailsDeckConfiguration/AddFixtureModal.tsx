@@ -30,6 +30,7 @@ import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configurati
 
 import {
   getFixtureOptions,
+  getModuleOptions,
   getOptions,
   getWasteChuteOptions,
 } from '../DeviceDetailsDeckConfiguration/utils'
@@ -99,9 +100,12 @@ export function AddFixtureModal({
   const [allFixtureOptions, setAllFixtureOptions] = useState<
     CutoutConfigMap[][]
   >([])
+  const [allModuleOptions, setAllModuleOptions] = useState<CutoutConfigMap[][]>(
+    []
+  )
 
   useEffect(() => {
-    const options = [
+    const fixtureOptions = [
       ...getFixtureOptions(
         cutoutId,
         addressableAreaId,
@@ -109,8 +113,23 @@ export function AddFixtureModal({
       ),
       ...getWasteChuteOptions(cutoutId),
     ]
-    setAllFixtureOptions(options)
-  }, [cutoutId, addressableAreaId, existingCutoutFixtureId])
+    const moduleOptions = [
+      ...getModuleOptions(
+        cutoutId,
+        unconfiguredMods,
+        addressableAreaId,
+        deckDef
+      ),
+    ]
+    setAllFixtureOptions(fixtureOptions)
+    setAllModuleOptions(moduleOptions)
+  }, [
+    cutoutId,
+    addressableAreaId,
+    existingCutoutFixtureId,
+    unconfiguredMods,
+    deckDef,
+  ])
 
   const modalHeader: OddModalHeaderBaseProps = {
     title: t('add_to', {
@@ -175,14 +194,16 @@ export function AddFixtureModal({
             }}
           />
         )}
-        <FixtureOption
-          key="modulesOption"
-          optionName="Modules"
-          buttonText={t('select_options')}
-          onClickHandler={() => {
-            setOptionStage('moduleOptions')
-          }}
-        />
+        {allModuleOptions.length > 0 && (
+          <FixtureOption
+            key="modulesOption"
+            optionName="Modules"
+            buttonText={t('select_options')}
+            onClickHandler={() => {
+              setOptionStage('moduleOptions')
+            }}
+          />
+        )}
       </>
     )
   } else if (
