@@ -14,18 +14,14 @@ serve-flex-manual:
 build-flex-manual:
 	uv run mkdocs build -f $(FLEX_MANUAL_PREFIX)/mkdocs.yml
 
-.PHONY: deploy-flex-manual-sandbox
-deploy-flex-manual-sandbox:
-	python deploy_flex_manual.py sandbox $(if $(BRANCH),--branch $(BRANCH)) $(if $(AWS_PROFILE),--aws-profile $(AWS_PROFILE)) $(if $(FLEX_MANUAL_PREFIX),--flex-manual-prefix $(FLEX_MANUAL_PREFIX))
+.PHONY: deploy_flex_manual_sandbox
+deploy_flex_manual_production:
+    python deploy_flex_manual.py sandbox --branch ${{ env.BRANCH }}
 
-.PHONY: deploy-flex-manual-staging
-deploy-flex-manual-staging:
-	python deploy_flex_manual.py staging $(if $(BRANCH),--branch $(BRANCH)) $(if $(AWS_PROFILE),--aws-profile $(AWS_PROFILE)) $(if $(FLEX_MANUAL_PREFIX),--flex-manual-prefix $(FLEX_MANUAL_PREFIX))
+.PHONY: deploy_flex_manual_staging
+deploy_flex_manual_production:
+    python deploy_flex_manual.py staging --branch ${{ env.BRANCH }}
 
-.PHONY: deploy-flex-manual-production
-deploy-flex-manual-production:
-	python deploy_flex_manual.py production $(if $(BRANCH),--branch $(BRANCH)) $(if $(AWS_PROFILE),--aws-profile $(AWS_PROFILE)) $(if $(FLEX_MANUAL_PREFIX),--flex-manual-prefix $(FLEX_MANUAL_PREFIX))
-
-# Backward compatibility - defaults to sandbox
-#.PHONY: deploy-flex-manual
-#deploy-flex-manual: deploy-flex-manual-sandbox
+.PHONY: deploy_flex_manual_production
+deploy_flex_manual_production:
+    python deploy_flex_manual.py production --branch ${{ env.BRANCH }}
