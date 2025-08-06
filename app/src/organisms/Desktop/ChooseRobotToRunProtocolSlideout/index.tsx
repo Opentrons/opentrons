@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import first from 'lodash/first'
@@ -94,6 +94,9 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
   const [hasMissingFileParam, setHasMissingFileParam] = useState<boolean>(
     runTimeParameters?.some(parameter => parameter.type === 'csv_file') ?? false
   )
+  useEffect(() => setRunTimeParametersOverrides(runTimeParameters), [
+    storedProtocolData,
+  ])
 
   const [targetProps, tooltipProps] = useHoverTooltip()
 
