@@ -40,7 +40,7 @@ export function StackerSelectErrorFlow(
 
   switch (step) {
     case STACKER_HOPPER_OR_SHUTTLE_EMPTY.STEPS.SELECT_FLOW:
-      return <StackerOptions {...props} />
+      return <StackerHopperOrShuttleEmptyOptions {...props} />
     default:
       console.warn(
         `StackerSelectErrorFlow: ${step} in ${route} not explicitly handled. Rerouting.`
@@ -49,7 +49,9 @@ export function StackerSelectErrorFlow(
   }
 }
 
-export function StackerOptions(props: RecoveryContentProps): JSX.Element {
+export function StackerHopperOrShuttleEmptyOptions(
+  props: RecoveryContentProps
+): JSX.Element {
   const {
     routeUpdateActions,
     getRecoveryOptionCopy,
