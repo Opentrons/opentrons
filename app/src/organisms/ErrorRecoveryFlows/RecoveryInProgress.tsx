@@ -203,18 +203,7 @@ export function useReleaseLabware({
                 RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE
               ) {
                 void releaseLabwareLatch().then(() => {
-                  if (isDoorOpen) {
-                    return handleMotionRouting(false).then(() => {
-                      proceedToDoorStep()
-                    })
-                  }
-
-                  return handleMotionRouting(true)
-                    .then(() => homeExceptPlungers())
-                    .then(() => handleMotionRouting(false))
-                    .then(() => {
-                      proceedToValidNextStep()
-                    })
+                  proceedToValidNextStep()
                 })
               } else {
                 void releaseGripperJaws().then(() => {

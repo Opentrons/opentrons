@@ -543,7 +543,7 @@ export const RECOVERY_MAP_METADATA: RecoveryRouteStepMetadata = {
   },
   [ROBOT_RELEASING_LABWARE_LATCH.ROUTE]: {
     [ROBOT_RELEASING_LABWARE_LATCH.STEPS.RELEASING_LABWARE_LATCH]: {
-      allowDoorOpen: false,
+      allowDoorOpen: true,
     },
   },
   [ROBOT_RESUMING.ROUTE]: {
