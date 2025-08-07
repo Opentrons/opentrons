@@ -330,7 +330,7 @@ async def _main() -> None:
     #cp = CriticalPoint.TIP
     #trash = Point(slot_loc["A3"][0]+50, slot_loc["A3"][1]-20, tip_home_pos - 150) if args.channel == 1 else Point(slot_loc["A3"][0]+110, slot_loc["A3"][1]-20, tip_home_pos - 150)
 
-    await move_to_point(hw_api, mount, tiprack_loc+Point(x=0,y=0,z=20), cp)
+    await move_to_point(hw_api, mount, tiprack_loc, cp)
     await hw_api.drop_tip(mount)
     
     tip_count = 2
@@ -395,7 +395,7 @@ async def _main() -> None:
             current_position = await hw_api.current_position_ot3(
                 mount, critical_point=CriticalPoint.TIP
             )
-            await move_to_point(hw_api, mount, trash, cp)
+            await move_to_point(hw_api, mount, tip_location, cp)
             await hw_api.drop_tip(mount)
             tip_count += 1
 
