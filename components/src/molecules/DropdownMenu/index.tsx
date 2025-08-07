@@ -292,7 +292,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
           onFocus={onFocus}
           onBlur={onBlur}
           css={DROPDOWN_STYLE}
-          data-testId="dropdownMenu"
+          data-testid="dropdownMenu"
           tabIndex={tabIndex}
         >
           <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>

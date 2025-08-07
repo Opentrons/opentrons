@@ -1,13 +1,32 @@
-[tool.black]
-line-length = 140
-target-version = ['py313']
+[project]
+name = "analyses-snapshot-testing"
+version = "0.0.0"
+description = "Snapshot Testing of Opentrons Protocols"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "anyio>=4.9.0,<5",
+  "docker>=7.1.0",
+  "httpx>=0.28.1",
+  "importlib-metadata>=8.7.0",
+  "pydantic>=2.11.5",
+  "pytest>=8.3.5",
+  "pytest-html>=4.1.1",
+  "python-dotenv>=1.1.0",
+  "rich>=14.0.0",
+  "ruff>=0.11.12",
+  "syrupy>=4.9.1",
+  "opentrons @ {root:uri}/../api",
+  "opentrons-shared-data @ {root:uri}/../shared-data"
+]
+
+[project.scripts]
+protocol-analysis-cli = "automation.protocol_analysis_cli:main"
 
 [tool.ruff]
-# Like Black
 line-length = 140
-# Like Black
 indent-width = 4
-target-version = "py313"
+target-version = "py310"
 exclude = ["files"]
 src = ["*.py", "automation", "tests", "citools"]
 
@@ -23,14 +42,20 @@ select = [
 fixable = ["ALL"]
 
 [tool.ruff.format]
-# Like Black, use double quotes for strings.
 quote-style = "double"
-
-# Like Black, indent with spaces, rather than tabs.
 indent-style = "space"
-
-# Like Black, respect magic trailing commas.
 skip-magic-trailing-comma = false
-
-# Like Black, automatically detect the appropriate line ending.
 line-ending = "auto"
+
+[build-system]
+requires = ["hatchling==1.27.0"]
+build-backend = "hatchling.build"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.version]
+fallback_version = '0.0.0-dev'
+
+[tool.hatch.build.targets.wheel]
+packages = ["automation", "citools"]

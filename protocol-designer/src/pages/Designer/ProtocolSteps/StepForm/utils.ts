@@ -11,7 +11,6 @@ import {
 
 import { i18n } from '../../../../assets/localization'
 import { PROFILE_CYCLE } from '../../../../form-types'
-import { getFieldErrors } from '../../../../steplist/fieldLevel'
 import {
   getDefaultsForStepType,
   getDisabledFields,
@@ -126,7 +125,6 @@ export const getVisibleFormErrors = (args: {
   page: number
 }): StepFormErrors => {
   const { focusedField, errors, page = 0, showErrors } = args
-
   return errors.filter(error => {
     const dependentFieldsAreNotFocused = !error.dependentFields.includes(
       // @ts-expect-error(sa, 2021-6-22): focusedField might be undefined
@@ -134,7 +132,6 @@ export const getVisibleFormErrors = (args: {
     )
 
     const isPageImplicated = error.page != null ? page === error.page : true
-
     return isPageImplicated && dependentFieldsAreNotFocused && showErrors
   })
 }
@@ -196,17 +193,17 @@ export const getVisibleProfileFormLevelErrors = (args: {
   })
 }
 export const getFieldDefaultTooltip = (name: string, t: any): string =>
-  name != null ? t(`step_fields.defaults.${name}`) : ''
+  name != null ? t(`tooltip:step_fields.defaults.${name}`) : ''
 export const getFieldIndeterminateTooltip = (name: string, t: any): string =>
-  name != null ? t(`step_fields.indeterminate.${name}`) : ''
+  name != null ? t(`tooltip:step_fields.indeterminate.${name}`) : ''
 export const getSingleSelectDisabledTooltip = (
   name: string,
   stepType: string,
   t: any
 ): string =>
   name != null
-    ? t(`step_fields.${stepType}.disabled.${name}`)
-    : t(`step_fields.${stepType}.disabled.$generic`)
+    ? t(`tooltip:step_fields.${stepType}.disabled.${name}`)
+    : t(`tooltip:step_fields.${stepType}.disabled.$generic`)
 
 export const getFieldCaptions = (
   name: string,
@@ -306,9 +303,12 @@ export const makeSingleEditFieldProps = (
   formData: FormData,
   handleChangeFormInput: (name: string, value: unknown) => void,
   hydratedForm: HydratedFormData,
-  t: any
+  t: any,
+  visibleFormErrors: StepFormErrors,
+  showFormErrors: boolean,
+  currentFormIsPresaved: boolean
 ): FieldPropsByName => {
-  const { dirtyFields, blur, focusedField, focus } = focusHandlers
+  const { blur, focus } = focusHandlers
   const fieldNames: string[] = Object.keys(
     getDefaultsForStepType(formData.stepType)
   )
@@ -317,14 +317,20 @@ export const makeSingleEditFieldProps = (
       ? getDisabledFields(hydratedForm).has(name)
       : false
     const value = formData ? formData[name] : null
-    const showErrors = showFieldErrors({
-      name,
-      focusedField,
-      dirtyFields,
-    })
-    const errors = getFieldErrors(name, value, hydratedForm)
-    const errorToShow =
-      showErrors && errors.length > 0 ? errors.join(', ') : null
+    const mappedErrorsToField =
+      visibleFormErrors?.length > 0
+        ? getFormErrorsMappedToField(visibleFormErrors)
+        : {}
+
+    //  NOTE: some fields can have multiple errors, but we
+    //  will always just show the first one until they're all
+    //  resolved
+    const error = mappedErrorsToField[name]?.[0]
+    const errorTitle =
+      error != null &&
+      (showFormErrors || (!currentFormIsPresaved && error.showOnReopen))
+        ? error.title
+        : null
     const updateValue = (value: unknown): void => {
       handleChangeFormInput(name, value)
     }
@@ -347,7 +353,7 @@ export const makeSingleEditFieldProps = (
 
     const fieldProps: FieldProps = {
       disabled,
-      errorToShow,
+      errorToShow: errorTitle,
       name,
       updateValue,
       value,
@@ -410,35 +416,22 @@ export type ErrorMappedToField = Record<string, FormError>
 
 export const getFormErrorsMappedToField = (
   formErrors: StepFormErrors
-): ErrorMappedToField => {
-  return formErrors.reduce<ErrorMappedToField>((acc, error) => {
-    const { dependentFields } = error
+): Record<string, FormError[]> => {
+  return formErrors.reduce<Record<string, FormError[]>>((acc, error) => {
+    const { dependentFields, location } = error
+
     for (const field of dependentFields) {
-      const { showAtField, showAtForm, title } = error
-      if (showAtField == null || showAtForm == null) {
-        console.error(
-          `${title} should wire up where to show error (at form and/or field)`
-        )
+      if (!acc[field]) {
+        acc[field] = []
       }
-      // map each field to only one one error
-      acc[field] = {
-        ...error,
-        showAtField: error.showAtField ?? true,
-        showAtForm: error.showAtForm ?? true,
+      if (location === 'field') {
+        acc[field].push({
+          ...error,
+        })
       }
     }
     return acc
   }, {})
-}
-
-export const getFormLevelError = (
-  fieldName: string,
-  mappedErrorsToField: ErrorMappedToField
-): string | null => {
-  return mappedErrorsToField[fieldName] &&
-    mappedErrorsToField[fieldName].showAtField
-    ? mappedErrorsToField[fieldName].title
-    : null
 }
 
 export const getShouldUpdateForLiquidClass = (

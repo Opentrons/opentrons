@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -7,12 +7,14 @@ import { i18n } from '/app/i18n'
 import { Dispense } from '../../Dispense'
 import { DispenseSettingDetail } from '../../Dispense/DispenseSettingDetail'
 import { DispenseSettingItem } from '../../Dispense/DispenseSettingItem'
+import { ResetAdvancedSettingsModal } from '../../QuickTransferAdvancedSettings/ResetAdvancedSettingsModal'
 
 import type { ComponentProps } from 'react'
 
 vi.mock('../../Dispense/DispenseSettingItem')
 vi.mock('../../Dispense/DispenseSettingDetail')
 vi.mock('../../Dispense/hooks/useAspirateSettingsConfig')
+vi.mock('../../QuickTransferAdvancedSettings/ResetAdvancedSettingsModal')
 
 const render = (props: ComponentProps<typeof Dispense>) => {
   return renderWithProviders(<Dispense {...props} />, {
@@ -82,6 +84,7 @@ describe('Dispense', () => {
         },
       } as any,
       dispatch: vi.fn(),
+      isMultiTransfer: false,
     }
     vi.mocked(DispenseSettingItem).mockReturnValue(
       <div>mock DispenseSettingItem</div>
@@ -89,12 +92,24 @@ describe('Dispense', () => {
     vi.mocked(DispenseSettingDetail).mockReturnValue(
       <div>mock DispenseSettingDetail</div>
     )
+    vi.mocked(ResetAdvancedSettingsModal).mockReturnValue(
+      <div>mock ResetAdvancedSettingsModal</div>
+    )
   })
 
   it('renders mock components and reset button', () => {
     render(props)
-    expect(screen.getAllByText('mock DispenseSettingItem').length).toBe(10)
+    expect(screen.getAllByText('mock DispenseSettingItem').length).toBe(11)
     screen.getByText('mock DispenseSettingDetail')
     screen.getByRole('button', { name: 'Reset dispense settings' })
+  })
+
+  it('when clicking reset button, shows ResetAdvancedSettingsModal', () => {
+    render(props)
+    const resetButton = screen.getByRole('button', {
+      name: 'Reset dispense settings',
+    })
+    fireEvent.click(resetButton)
+    screen.getByText('mock ResetAdvancedSettingsModal')
   })
 })

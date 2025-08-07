@@ -23,9 +23,7 @@ OT-2 deck slots: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, trash bin.
   - Not allowed: Slots 2, 5, 8, 11
 
 - Magnetic Block: Not compatible with OT-2
-
 - Plate Reader Module (Absorbance): Not compatible with OT-2
-
 - Temperature Module
 
   - Recommended: Slot 3
@@ -39,6 +37,7 @@ OT-2 deck slots: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, trash bin.
   - Note: Only one Thermocycler module can be added to the deck.
 
 - Fixtures - N/A
+
   - The OT-2 waste bin is fixed on the deck map, taking up what would have been Slot 12.
 
 ### Labware
@@ -65,6 +64,7 @@ Note: We should default to placing the shortest labware near the front and left 
   - Allowed: Any slot
 
 - Tip racks
+
   - Recommended: Slots 11, 10, 9, 8, 7 (Start towards the back right and move left then to the front)
   - If available: Slots 6, 5, 4, 3, 2, 1
   - Allowed: Any slot
@@ -82,7 +82,6 @@ Flex deck layout: D1, D2, D3, C1, C2, C3, B1, B2, B3, A1, A2, A3 (Trash bin)
   - Not allowed: Slots A2, B2, C2, or D2
 
 - Magnetic Module: Not compatible with Flex
-
 - Magnetic Block
 
   - Recommended: Slot D2
@@ -102,6 +101,7 @@ Flex deck layout: D1, D2, D3, C1, C2, C3, B1, B2, B3, A1, A2, A3 (Trash bin)
   - Not allowed: A2, B2, C2, or D2
 
 - Thermocycler Module
+
   - Recommended/Allowed: A1 + B1 (Both slots)
   - Not allowed: Any other location
 
@@ -123,6 +123,7 @@ Flex deck layout: D1, D2, D3, C1, C2, C3, B1, B2, B3, A1, A2, A3 (Trash bin)
   - Note: The trash bin cannot occupy the same deck slot as a staging area slot.
 
 - Waste chute
+
   - Recommended/Allowed: D3 (The waste chute fixture diverts waste to an off-deck receptacle and is designed to be placed exclusively in slot D3).
   - Not allowed: Any other location
 
@@ -156,6 +157,7 @@ Note: We should default to placing the shortest labware near the front and left 
   - Allowed: Any slot
 
 - Adapters
+
   - Opentrons Flex 96 Tip Rack Adapter
   - Recommended: A2, B2, C2, D2 (to avoid modules in columns 1 and 3)
   - Allowed: Any slot

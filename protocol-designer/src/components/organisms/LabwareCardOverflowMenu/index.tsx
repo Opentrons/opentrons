@@ -38,11 +38,12 @@ import type { ThunkDispatch } from '../../../types'
 interface LabwareCardOverflowMenuProps {
   labwareIds: string[]
   setShowOverflowMenu: Dispatch<SetStateAction<boolean>>
+  lidId?: string
 }
 export function LabwareCardOverflowMenu(
   props: LabwareCardOverflowMenuProps
 ): JSX.Element | null {
-  const { labwareIds, setShowOverflowMenu } = props
+  const { labwareIds, setShowOverflowMenu, lidId } = props
   const { t } = useTranslation('starting_deck_state')
   const savedSteps = useSelector(getSavedStepForms)
   const deckSetup = useSelector(getDeckSetupForActiveItem)
@@ -98,26 +99,22 @@ export function LabwareCardOverflowMenu(
     savedSteps,
     deckSetupLabware[topLabwareId]
   )
-
   const handleClear = (): void => {
     labwareIds.forEach(labwareId => {
       dispatch(deleteContainer({ labwareId }))
     })
-    if (isAdapter) {
-      dispatch(
-        editSlotInfo({
-          adapterDefURI: null,
-        })
-      )
-    } else {
-      dispatch(
-        editSlotInfo({
-          labwareDefURI: null,
-          lidDefURI: null,
-          amount: 1,
-        })
-      )
+    if (lidId != null) {
+      dispatch(deleteContainer({ labwareId: lidId }))
     }
+    const module = moduleId != null ? deckSetupModules[moduleId] : null
+    const moduleModel = module?.model ?? null
+    const newSlotInfo = {
+      ...(moduleModel != null ? { moduleModel } : {}),
+      ...(isAdapter === true
+        ? { adapterDefURI: null }
+        : { labwareDefURI: null, lidDefURI: null, amount: 1 }),
+    }
+    dispatch(editSlotInfo(newSlotInfo))
   }
   const handleConfirmDeleteEntityInUseModal = (): void => {
     labwareIds.forEach(labwareId => {

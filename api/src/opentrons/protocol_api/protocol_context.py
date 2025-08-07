@@ -337,23 +337,24 @@ class ProtocolContext(CommandPublisher):
         if self._unsubscribe_commands:
             self._unsubscribe_commands()
 
-        def on_command(message: cmd_types.CommandMessage) -> None:
-            payload = message.get("payload")
-
-            if payload is None:
-                return
-
-            text = payload.get("text")
-
-            if text is None:
-                return
-
-            if message["$"] == "before":
-                self._commands.append(text)
-
         self._unsubscribe_commands = self.broker.subscribe(
-            cmd_types.COMMAND, on_command
+            cmd_types.COMMAND, self._on_command_callback
         )
+
+    def _on_command_callback(self, message: cmd_types.CommandMessage) -> None:
+        """Callback for command messages."""
+        payload = message.get("payload")
+
+        if payload is None:
+            return
+
+        text = payload.get("text")
+
+        if text is None:
+            return
+
+        if message["$"] == "before":
+            self._commands.append(text)
 
     @requires_version(2, 0)
     def is_simulating(self) -> bool:
@@ -499,7 +500,7 @@ class ProtocolContext(CommandPublisher):
         labware_core = self._core.load_labware(
             load_name=load_name,
             location=load_location,
-            label=label,
+            label=label if label is None else str(label),
             namespace=namespace,
             version=version,
         )
@@ -1371,51 +1372,44 @@ class ProtocolContext(CommandPublisher):
             display_color=display_color,
         )
 
-    @requires_version(2, 23)
-    def define_liquid_class(
+    @requires_version(2, 24)
+    def get_liquid_class(
         self,
         name: str,
     ) -> LiquidClass:
         """
-        Define a liquid class for use in the protocol.
-        ..
-            This is intended for Opentrons internal use only and is not a guaranteed API.
+        Get an instance of an Opentrons-verified liquid class for use in a Flex protocol.
 
-        :meta private:
+        :param name: Name of an Opentrons-verified liquid class. Must be one of:
+
+            - ``"water"``: an Opentrons-verified liquid class based on deionized water.
+            - ``"glycerol_50"``: an Opentrons-verified liquid class for viscous liquid. Based on 50% glycerol.
+            - ``"ethanol_80"``: an Opentrons-verified liquid class for volatile liquid. Based on 80% ethanol.
+
+        :raises: ``LiquidClassDefinitionDoesNotExist``: if the specified liquid class does not exist.
+
+        :returns: A new LiquidClass object.
         """
-        return self._core.define_liquid_class(name=name, version=DEFAULT_LC_VERSION)
+        return self._core.get_liquid_class(name=name, version=DEFAULT_LC_VERSION)
 
     @requires_version(2, 24)
-    def define_custom_liquid_class(
+    def define_liquid_class(
         self,
         name: str,
         properties: Dict[str, Dict[str, TransferPropertiesDict]],
         base_liquid_class: Optional[LiquidClass] = None,
         display_name: Optional[str] = None,
     ) -> LiquidClass:
-        """Define a custom liquid class, either a completely new one or based on an existing one.
+        """Define a custom liquid class, either based on an existing liquid class, or create a completely new one.
 
-        Args:
-            name: The name to give to the new liquid class. Cannot use names of existing in-built liquid classes.
-            properties: A dict of transfer properties per tip per pipette.
-                Accepts a nested dictionary in the following format:
+        :param name: The name to give to the new liquid class. Cannot use the name of an Opentrons-verified liquid class.
+        :param properties: A dict of transfer properties for pipette and tip combinations to use for liquid class transfers. The nested dictionary must have top-level keys corresponding to pipette load names and second-level keys corresponding to compatible tip rack load names. Further nested key–value pairs should be as specified in ``TransferPropertiesDict``. See the  `liquid class type definitions <https://github.com/Opentrons/opentrons/blob/edge/shared-data/python/opentrons_shared_data/liquid_classes/types.py>`_.
 
-                .. code-block:: python
+        :param base_liquid_class: An existing liquid class object to base the newly defined liquid class on. The specified ``transfer_properties`` will override any existing properties for the specified pipette and tip combinations. All other properties will remain the same as those in the base class.
 
-                    {
-                    <pipette_name>: {
-                        <tiprack_uri>: <properties in the shape of TransferPropertiesDict>
+        :param display_name: An optional name for the liquid class. Defaults to the title-case ``name`` if a display name isn't provided.
 
-                        # TransferPropertiesDict is a dictionary representation of the
-                        # transfer properties returned by the `LiquidClass.get_for(..)` function.
-                    }}
-
-            base_liquid_class: A LiquidClass to base this liquid class on. The properties
-                specified in transfer_properties will override any existing ones
-                for the specified pipettes & tips.
-            display_name: An optional human-readable name for the liquid. If not provided,
-                will default to title-cased name.
-
+        :returns: A new LiquidClass object.
         """
         if definition_exists(name, DEFAULT_LC_VERSION):
             raise ValueError(

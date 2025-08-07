@@ -15,7 +15,6 @@ import {
   StyledText,
   useOnClickOutside,
 } from '@opentrons/components'
-import { FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS } from '@opentrons/shared-data'
 import {
   getFullStackFromLabwares,
   getTopLocationInStack,
@@ -26,7 +25,7 @@ import {
   ConfirmDeleteStagingAreaModal,
   EditNickNameModal,
 } from '../../../components/organisms'
-import { useKitchen } from '../../../components/organisms/Kitchen/hooks'
+import { useKitchen } from '../../../components/organisms/Kitchen/useKitchen'
 import { getRobotType } from '../../../file-data/selectors'
 import {
   deleteContainer,
@@ -38,11 +37,7 @@ import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locati
 import { getIsLabwareOnSlotInUse } from './utils'
 
 import type { MouseEvent, SetStateAction } from 'react'
-import type {
-  AddressableAreaName,
-  CoordinateTuple,
-  DeckSlotId,
-} from '@opentrons/shared-data'
+import type { CoordinateTuple, DeckSlotId } from '@opentrons/shared-data'
 import type { ThunkDispatch } from '../../../types'
 
 const ROBOT_BOTTOM_HALF_SLOTS = [
@@ -139,11 +134,6 @@ export function SlotOverflowMenu(
 
   const adapterOnSlot = Object.values(deckSetupLabware).find(
     lw => lw.id === labwareStackOnSlot[1]
-  )
-  const hasNoItem = labwareStackOnSlot.length === 0
-
-  const isStagingSlot = FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS.includes(
-    location as AddressableAreaName
   )
 
   const handleDuplicate = (): void => {
@@ -262,7 +252,7 @@ export function SlotOverflowMenu(
           }}
         >
           <StyledText desktopStyle="bodyDefaultRegular">
-            {hasNoItem ? t('add_labware') : t('edit_labware')}
+            {t('edit_labware')}
           </StyledText>
         </MenuItem>
         {showDuplicateBtn ? (
@@ -274,7 +264,6 @@ export function SlotOverflowMenu(
         ) : null}
         <Divider marginY="0" />
         <MenuItem
-          disabled={hasNoItem && !isStagingSlot}
           onClick={(e: MouseEvent) => {
             handleClearLabware(e)
           }}
@@ -297,10 +286,8 @@ export function SlotOverflowMenu(
       width="10.75rem"
       height="11.25rem"
       innerDivProps={{
-        style: {
-          position: POSITION_ABSOLUTE,
-          transform: `rotate(180deg) scaleX(-1) ${invertY ? 'scaleY(-1)' : ''}`,
-        },
+        position: POSITION_ABSOLUTE,
+        transform: `rotate(180deg) scaleX(-1) ${invertY ? 'scaleY(-1)' : ''}`,
       }}
     >
       {slotOverflowBody}

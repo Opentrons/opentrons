@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import styled from 'styled-components'
 
 import {
   DIRECTION_COLUMN,
@@ -8,7 +7,6 @@ import {
   ListItem,
   SPACING,
   StyledText,
-  WRAP,
 } from '@opentrons/components'
 import {
   getModuleDisplayName,
@@ -25,9 +23,11 @@ import {
 import { getRobotStateAtActiveItem } from '../../../top-selectors/labware-locations'
 import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
 import { LINE_CLAMP_TEXT_STYLE } from '../../atoms'
+import { AbsorbanceReaderSummary } from './AbsorbanceReaderSummary'
 import { MixSummary } from './MixSummary'
 import { MoveLiquidSummary } from './MoveLiquidSummary'
 import { StyledTrans } from './StyledTrans'
+import styles from './summary.module.css'
 
 import type { FormData } from '../../../form-types'
 
@@ -41,7 +41,7 @@ interface StepSummaryProps {
 export function StepSummary(props: StepSummaryProps): JSX.Element | null {
   const { currentStep, stepDetails } = props
   const { t } = useTranslation(['protocol_steps', 'application'])
-  const unknownModule = t('unkonwn_module')
+  const unknownModule = t('unknown_module')
   const labwareNicknamesById = useSelector(getLabwareNicknamesById)
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
@@ -55,7 +55,7 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
     return null
   }
   const { stepType } = currentStep
-  const { liquidState } = robotState
+  const { labware: labwareState, liquidState } = robotState
   let stepSummaryContent: JSX.Element | null = null
   switch (stepType) {
     case 'mix': {
@@ -112,7 +112,7 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
       } = currentStep
       stepSummaryContent =
         thermocyclerFormType === 'thermocyclerState' ? (
-          <StepSummaryContainer>
+          <div className={styles.container}>
             {blockIsActive ? (
               <StyledTrans
                 i18nKey="protocol_steps:thermocycler_module.thermocycler_state.block"
@@ -133,9 +133,9 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
                 }`
               )}
             />
-          </StepSummaryContainer>
+          </div>
         ) : (
-          <StepSummaryContainer>
+          <div className={styles.container}>
             <StyledTrans
               i18nKey="protocol_steps:thermocycler_module.thermocycler_profile.volume"
               tagText={`${profileVolume} ${t('application:units.microliter')}`}
@@ -160,7 +160,7 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
                 }`
               )}
             />
-          </StepSummaryContainer>
+          </div>
         )
       break
     }
@@ -289,7 +289,7 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
       const moduleDisplayName =
         moduleModel != null ? getModuleDisplayName(moduleModel) : unknownModule
       stepSummaryContent = (
-        <StepSummaryContainer>
+        <div className={styles.container}>
           <StyledTrans
             i18nKey="protocol_steps:heater_shaker.active.temperature"
             values={{ module: moduleDisplayName }}
@@ -321,7 +321,17 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
                 : 'protocol_steps:heater_shaker.latch.closed'
             )}
           />
-        </StepSummaryContainer>
+        </div>
+      )
+      break
+    }
+    case 'absorbanceReader': {
+      stepSummaryContent = (
+        <AbsorbanceReaderSummary
+          currentStep={currentStep}
+          labwareNicknamesById={labwareNicknamesById}
+          labwareState={labwareState}
+        />
       )
       break
     }
@@ -357,9 +367,3 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
     </Flex>
   ) : null
 }
-
-const StepSummaryContainer = styled(Flex)`
-  flex-wrap: ${WRAP};
-  gap: ${SPACING.spacing20};
-  row-gap: ${SPACING.spacing4};
-`

@@ -22,16 +22,12 @@ ssh_helper = $(if $(ssh_key),-i $(ssh_key)) $(ssh_opts)
 # used to create the wheel.
 wheel_file = dist/$(call python_get_wheelname,performance-metrics,$(project_rs_default),performance_metrics,$(BUILD_NUMBER))
 
-# Find the version of the sdist file from git using a helper script.
-sdist_file = dist/$(call python_get_sdistname,performance-metrics,$(project_rs_default),performance_metrics)
-
 # Find the branch, sha, version that will be used to update the VERSION.json file
 version_file = $(call python_get_git_version,performance-metrics,$(project_rs_default),performance_metrics)
 
 
 clean_cmd = $(SHX) rm -rf 'build' '**/*.egg-info' '**/__pycache__' **/*.pyc '.mypy_cache' '.pytest_cache'
 clean_wheel_cmd = $(clean_cmd) dist/*.whl
-clean_sdist_cmd = $(clean_cmd) dist/*.tar.gz
 clean_all_cmd = $(clean_cmd) dist
 
 .PHONY: lint
@@ -63,25 +59,17 @@ wheel:
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
-.PHONY: sdist
-sdist: export OPENTRONS_PROJECT=$(project_rs_default)
-sdist:
-	$(clean_sdist_cmd)
-	$(python) setup.py sdist
-	$(SHX) rm -rf build
-	$(SHX) ls dist
-
 .PHONY: push-no-restart
 push-no-restart: wheel
-	$(call push-python-package,$(host),$(ssh_key),$(ssh_opts),$(wheel_file))
+	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/usr/lib/python3.10/site-packages/)
 
 .PHONY: push
 push: push-no-restart
 	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-robot-server")
 
 .PHONY: push-no-restart-ot3
-push-no-restart-ot3: sdist
-	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,performance_metrics,src,,$(version_file))
+push-no-restart-ot3: wheel
+	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/opt/opentrons-robot-server/)
 
 .PHONY: push-ot3
 push-ot3: push-no-restart-ot3
@@ -179,10 +167,6 @@ DEV_DATA_FOLDER ?= /data/performance_metrics_data_dev
 
 cleanup-remote-flex:
 	@echo "Cleaning up performance metrics on host $(host)..."
-	
-	# Note not using || to exit on error because it only looks to see 
-	# if the previous command failed, whereas we want to catch any error or a successful exit
-
 	@ssh -i $(ssh_key) root@$(host) "\
 		trap 'echo \"Remounting filesystem as read-only\" && mount -o remount,ro /' EXIT ERR && \
 		echo 'Configuring remote file system to read/write' && \

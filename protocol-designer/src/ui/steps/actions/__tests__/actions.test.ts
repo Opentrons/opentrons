@@ -1,6 +1,6 @@
 import last from 'lodash/last'
-import configureMockStore from 'redux-mock-store'
-import thunk from 'redux-thunk'
+import { legacy_configureStore } from 'redux-mock-store'
+import { thunk } from 'redux-thunk'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
@@ -22,7 +22,7 @@ vi.mock('../../../../step-forms/selectors')
 vi.mock('../../selectors')
 vi.mock('../../../../file-data/selectors')
 
-const mockStore = configureMockStore([thunk])
+const mockStore = legacy_configureStore([thunk] as any)
 
 const initialRobotState: RobotState = {
   labware: {

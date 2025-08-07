@@ -4,7 +4,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { FileUploadMessagesModal } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
-import { getEnablePythonExport } from '../../../../feature-flags/selectors'
 import {
   dismissFileUploadMessage,
   undoLoadFile,
@@ -23,7 +22,6 @@ const render = () => {
 
 describe('FileUploadMessagesModal', () => {
   beforeEach(() => {
-    vi.mocked(getEnablePythonExport).mockReturnValue(true)
     vi.mocked(getFileUploadMessages).mockReturnValue({
       isError: true,
       errorType: 'INVALID_FILE_TYPE',
@@ -36,28 +34,20 @@ describe('FileUploadMessagesModal', () => {
       'Protocol Designer only accepts JSON and Python protocol files created with Protocol Designer. Upload a valid file to continue.'
     )
   })
-  it('renders modal for a non-JSON and non-python file with ff turned off', () => {
-    vi.mocked(getEnablePythonExport).mockReturnValue(false)
-    render()
-    screen.getByText('Invalid file type')
-    screen.getByText(
-      'Protocol Designer only accepts JSON protocol files created with Protocol Designer. Upload a valid file to continue.'
-    )
-  })
   it('renders modal for a migration', () => {
     vi.mocked(getFileUploadMessages).mockReturnValue({
       isError: false,
       messageKey: 'DID_MIGRATE',
-      migrationsRan: ['8.1.0'],
+      migrationsRan: ['8.5.0'],
     })
     render()
     screen.getByText(
       'Your protocol was made in an older version of Protocol Designer'
     )
     screen.getByText(
-      'Your protocol will be automatically updated to the latest version.'
+      'Your protocol and included labware will be automatically updated to the latest version. We recommend making a separate copy of your file before importing.'
     )
-    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Import' }))
     expect(vi.mocked(dismissFileUploadMessage)).toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(vi.mocked(undoLoadFile)).toHaveBeenCalled()

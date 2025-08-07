@@ -15,7 +15,7 @@ from typing import (
     Union,
     overload,
 )
-from typing_extensions import assert_never, assert_type
+from typing_extensions import assert_never
 
 from opentrons.protocol_engine.state import update_types
 from opentrons_shared_data.deck.types import DeckDefinitionV5
@@ -24,14 +24,17 @@ from opentrons_shared_data.labware.labware_definition import (
     InnerWellGeometry,
     LabwareDefinition,
     LabwareDefinition2,
-    LabwareDefinition3,
     LabwareRole,
     WellDefinition2,
     WellDefinition3,
+    UserDefinedVolumes,
 )
 from opentrons_shared_data.pipette.types import LabwareUri
 
-from opentrons.types import DeckSlotName, StagingSlotName, MountType
+from opentrons.protocol_engine.state._axis_aligned_bounding_box import (
+    AxisAlignedBoundingBox3D,
+)
+from opentrons.types import DeckSlotName, StagingSlotName, MountType, Point
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.calibration_storage.helpers import uri_from_details
 
@@ -51,7 +54,6 @@ from ..types import (
     LabwareLocation,
     LoadedLabware,
     ModuleLocation,
-    ModuleModel,
     OverlapOffset,
     LabwareMovementOffsetData,
     OnDeckLabwareLocation,
@@ -91,7 +93,7 @@ _RIGHT_SIDE_SLOTS = {
 
 
 # The max height of the labware that can fit in a plate reader
-_PLATE_READER_MAX_LABWARE_Z_MM = 16
+_PLATE_READER_MAX_LABWARE_Z_MM = 16.0
 
 
 _WellDefinition = WellDefinition2 | WellDefinition3
@@ -684,7 +686,7 @@ class LabwareView:
 
     def get_well_geometry(
         self, labware_id: str, well_name: Optional[str] = None
-    ) -> InnerWellGeometry:
+    ) -> InnerWellGeometry | UserDefinedVolumes:
         """Get a well's inner geometry by labware and well name."""
         labware_def = self.get_definition(labware_id)
         if labware_def.innerLabwareGeometry is None:
@@ -864,30 +866,30 @@ class LabwareView:
             assert labware_id is not None  # From our @overloads.
             labware_definition = self.get_definition(labware_id)
 
-        if isinstance(labware_definition, LabwareDefinition2):
-            return Dimensions(
-                x=labware_definition.dimensions.xDimension,
-                y=labware_definition.dimensions.yDimension,
-                z=labware_definition.dimensions.zDimension,
+        extents = self.get_extents_around_lw_origin(labware_definition)
+        return Dimensions(
+            x=extents.x_dimension, y=extents.y_dimension, z=extents.z_dimension
+        )
+
+    def get_extents_around_lw_origin(
+        self,
+        labware_definition: LabwareDefinition,
+    ) -> AxisAlignedBoundingBox3D:
+        """Return a bounding box around all the space the labware occupies, all-encompassing.
+
+        Returned coordinates are relative to the labware's local origin.
+        """
+        if labware_definition.schemaVersion == 2:
+            x_dimension = labware_definition.dimensions.xDimension
+            y_dimension = labware_definition.dimensions.yDimension
+            z_dimension = labware_definition.dimensions.zDimension
+            return AxisAlignedBoundingBox3D.from_corners(
+                Point(0, 0, 0), Point(x_dimension, y_dimension, z_dimension)
             )
         else:
-            assert_type(labware_definition, LabwareDefinition3)
-            back_left_bottom = labware_definition.extents.total.backLeftBottom
-            front_right_top = labware_definition.extents.total.frontRightTop
-            right, front, top = (
-                front_right_top.x,
-                front_right_top.y,
-                front_right_top.z,
-            )
-            left, back, bottom = (
-                back_left_bottom.x,
-                back_left_bottom.y,
-                back_left_bottom.z,
-            )
-            return Dimensions(
-                x=right - left,
-                y=back - front,
-                z=top - bottom,
+            return AxisAlignedBoundingBox3D.from_corners(
+                Point.from_xyz_attrs(labware_definition.extents.total.backLeftBottom),
+                Point.from_xyz_attrs(labware_definition.extents.total.frontRightTop),
             )
 
     def get_labware_overlap_offsets(
@@ -904,32 +906,6 @@ class LabwareView:
             )
         return OverlapOffset(
             x=stacking_overlap.x, y=stacking_overlap.y, z=stacking_overlap.z
-        )
-
-    def get_module_overlap_offsets(
-        self, definition: LabwareDefinition, module_model: ModuleModel
-    ) -> OverlapOffset:
-        """Get the labware's overlap with requested module model."""
-        stacking_overlap = definition.stackingOffsetWithModule.get(
-            str(module_model.value)
-        )
-        if not stacking_overlap:
-            if self._is_thermocycler_on_ot2(module_model):
-                return OverlapOffset(x=0, y=0, z=10.7)
-            else:
-                return OverlapOffset(x=0, y=0, z=0)
-
-        return OverlapOffset(
-            x=stacking_overlap.x, y=stacking_overlap.y, z=stacking_overlap.z
-        )
-
-    def _is_thermocycler_on_ot2(self, module_model: ModuleModel) -> bool:
-        """Whether the given module is a thermocycler with the current deck being an OT2 deck."""
-        robot_model = self.get_deck_definition()["robot"]["model"]
-        return (
-            module_model
-            in [ModuleModel.THERMOCYCLER_MODULE_V1, ModuleModel.THERMOCYCLER_MODULE_V2]
-            and robot_model == "OT-2 Standard"
         )
 
     def get_default_magnet_height(self, module_id: str, offset: float) -> float:
@@ -1056,6 +1032,10 @@ class LabwareView:
             self.get(labware_id).loadName
         )
 
+    def is_lid(self, labware_id: str) -> bool:
+        """Check if labware is a lid."""
+        return LabwareRole.lid in self.get_definition(labware_id).allowedRoles
+
     def raise_if_labware_inaccessible_by_pipette(self, labware_id: str) -> None:
         """Raise an error if the specified location cannot be reached via a pipette."""
         labware = self.get(labware_id)
@@ -1162,6 +1142,40 @@ class LabwareView:
                     f"Labware {adapter_labware_definition.parameters.loadName} cannot be used as an adapter for {primary_labware_definition.parameters.loadName}"
                 )
 
+    def stacker_labware_pool_to_ordered_list(
+        self,
+        primary_labware_definition: LabwareDefinition,
+        lid_labware_definition: LabwareDefinition | None,
+        adapter_labware_definition: LabwareDefinition | None,
+    ) -> List[LabwareDefinition]:
+        """Get the pool definitions in the top-first order suitable for geometry calculations."""
+        self.raise_if_stacker_labware_pool_is_not_valid(
+            primary_labware_definition,
+            lid_labware_definition,
+            adapter_labware_definition,
+        )
+        return [
+            x
+            for x in [
+                lid_labware_definition,
+                primary_labware_definition,
+                adapter_labware_definition,
+            ]
+            if x is not None
+        ]
+
+    def get_stacker_labware_overlap_offset(
+        self, definitions: list[LabwareDefinition]
+    ) -> OverlapOffset:
+        """Get the overlap amount between each labware pool.
+
+        The definitions must be in top-first order, ideally created by
+        `stacker_labware_pool_to_ordered_list`.
+        """
+        return self.get_labware_overlap_offsets(
+            definitions[-1], definitions[0].parameters.loadName
+        )
+
     def raise_if_labware_cannot_be_stacked(  # noqa: C901
         self, top_labware_definition: LabwareDefinition, bottom_labware_id: str
     ) -> None:
@@ -1172,12 +1186,26 @@ class LabwareView:
                 " on other labware."
             )
         below_labware = self.get(bottom_labware_id)
-        if not labware_validation.validate_labware_can_be_stacked(
+        if isinstance(
+            top_labware_definition, LabwareDefinition2
+        ) and not labware_validation.validate_labware_can_be_stacked(
             top_labware_definition=top_labware_definition,
             below_labware_load_name=below_labware.loadName,
         ):
             raise errors.LabwareCannotBeStackedError(
                 f"Labware {top_labware_definition.parameters.loadName} cannot be loaded onto labware {below_labware.loadName}"
+            )
+        elif (
+            labware_validation.validate_definition_is_lid(top_labware_definition)
+            and top_labware_definition.compatibleParentLabware is not None
+            and self.get_load_name(bottom_labware_id)
+            not in top_labware_definition.compatibleParentLabware
+        ):
+            # This parent is assumed to be compatible, unless the lid enumerates
+            # all its compatible parents and this parent is missing from the list.
+            raise ValueError(
+                f"Labware Lid {top_labware_definition.parameters.loadName} may not be loaded on parent labware"
+                f" {self.get_display_name(bottom_labware_id)}."
             )
         elif isinstance(below_labware.location, ModuleLocation):
             below_definition = self.get_definition(labware_id=below_labware.id)
@@ -1324,15 +1352,27 @@ class LabwareView:
             recommended_force if recommended_force is not None else LABWARE_GRIP_FORCE
         )
 
-    def get_grip_height_from_labware_bottom(
-        self, labware_definition: LabwareDefinition
-    ) -> float:
-        """Get the recommended grip height from labware bottom, if present."""
-        recommended_height = labware_definition.gripHeightFromLabwareBottom
+    def get_grip_z(self, labware_definition: LabwareDefinition) -> float:
+        """Get the place on the labware where the gripper should contact.
+
+        The returned value is a z-offset relative to the labware origin.
+        """
+
+        def get_origin_to_mid_z(labware_definition: LabwareDefinition) -> float:
+            """Return the z-coordinate of the middle of the labware, relative to the labware's origin."""
+            extents = self.get_extents_around_lw_origin(labware_definition)
+            return (extents.max_z + extents.min_z) / 2
+
+        if labware_definition.schemaVersion == 2:
+            # In schema 2, the bottom of the labware is at the z-origin by definition.
+            defined_height_from_origin = labware_definition.gripHeightFromLabwareBottom
+        else:
+            defined_height_from_origin = labware_definition.gripHeightFromLabwareOrigin
+
         return (
-            recommended_height
-            if recommended_height is not None
-            else self.get_dimensions(labware_definition=labware_definition).z / 2
+            defined_height_from_origin
+            if defined_height_from_origin is not None
+            else get_origin_to_mid_z(labware_definition)
         )
 
     @staticmethod

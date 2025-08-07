@@ -71,7 +71,7 @@
   "paste_from_document_title": "Paste the steps from your document. Make sure your steps are clearly numbered.",
   "paste_from_document": "Paste from document",
   "pcr": "PCR",
-  "pd_prompt_warning": "Not all prompts will be possible to output to Protocol Designer.",
+  "pd_prompt_warning": "Not all prompts will be possible to output to Protocol Designer. If OpentronsAI produces errors, you can correct them in OpentronsAI chat.",
   "pd_protocol": "Protocol Designer protocol",
   "pipette_mounts": "Pipette mount(s)",
   "protocol_format_title": "Protocol Format",

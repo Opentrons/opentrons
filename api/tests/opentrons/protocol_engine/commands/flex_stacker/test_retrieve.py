@@ -14,6 +14,7 @@ from opentrons.protocol_engine.commands.flex_stacker.common import (
     FlexStackerShuttleError,
     FlexStackerHopperError,
     FlexStackerLabwareRetrieveError,
+    FlexStackerShuttleOccupiedError,
 )
 from opentrons.protocol_engine.resources import ModelUtils
 
@@ -60,6 +61,7 @@ from opentrons_shared_data.errors.exceptions import (
     FlexStackerShuttleMissingError,
     FlexStackerHopperLabwareError,
     FlexStackerShuttleLabwareError,
+    FlexStackerShuttleNotEmptyError,
 )
 
 
@@ -138,6 +140,7 @@ async def test_retrieve_raises_when_empty(
         contained_labware_bottom_first=[],
         max_pool_count=5,
         pool_overlap=0,
+        pool_height=0,
     )
     decoy.when(
         state_view.modules.get_flex_stacker_substate(module_id=stacker_id)
@@ -169,7 +172,8 @@ async def test_retrieve_primary_only(
         pool_lid_definition=None,
         contained_labware_bottom_first=_contained_labware(1),
         max_pool_count=5,
-        pool_overlap=0,
+        pool_overlap=6,
+        pool_height=10,
     )
     decoy.when(
         state_view.labware.get_uri_from_definition(flex_50uL_tiprack)
@@ -197,15 +201,14 @@ async def test_retrieve_primary_only(
         LabwareOffset.model_construct(id="offset-id-1")  # type: ignore[call-arg]
     )
 
-    decoy.when(
-        state_view.geometry.get_height_of_stacker_labware_pool(stacker_id)
-    ).then_return(4)
-
     _prep_stacker_own_location(decoy, state_view, stacker_id)
 
     result = await subject.execute(data)
 
-    decoy.verify(await stacker_hardware.dispense_labware(labware_height=4), times=1)
+    decoy.verify(
+        await stacker_hardware.dispense_labware(labware_height=4),
+        times=1,
+    )
 
     assert result == SuccessData(
         public=flex_stacker.RetrieveResult(
@@ -253,7 +256,8 @@ async def test_retrieve_primary_and_lid(
         pool_lid_definition=tiprack_lid_def,
         contained_labware_bottom_first=_contained_labware(2, with_lid=True),
         max_pool_count=5,
-        pool_overlap=0,
+        pool_overlap=2,
+        pool_height=10,
     )
     decoy.when(
         state_view.modules.get_flex_stacker_substate(module_id=stacker_id)
@@ -297,14 +301,14 @@ async def test_retrieve_primary_and_lid(
             ],
         )
     ).then_return(None)
-    decoy.when(
-        state_view.geometry.get_height_of_stacker_labware_pool(stacker_id)
-    ).then_return(8)
-
     _prep_stacker_own_location(decoy, state_view, stacker_id)
+
     result = await subject.execute(data)
 
-    decoy.verify(await stacker_hardware.dispense_labware(labware_height=8), times=1)
+    decoy.verify(
+        await stacker_hardware.dispense_labware(labware_height=8),
+        times=1,
+    )
 
     assert result == SuccessData(
         public=flex_stacker.RetrieveResult(
@@ -372,7 +376,8 @@ async def test_retrieve_primary_and_adapter(
         pool_lid_definition=None,
         contained_labware_bottom_first=_contained_labware(2, with_adapter=True),
         max_pool_count=5,
-        pool_overlap=0,
+        pool_overlap=3,
+        pool_height=15,
     )
     decoy.when(
         state_view.modules.get_flex_stacker_substate(module_id=stacker_id)
@@ -418,14 +423,14 @@ async def test_retrieve_primary_and_adapter(
     ).then_return(
         LabwareOffset.model_construct(id="offset-id-2")  # type: ignore[call-arg]
     )
-    decoy.when(
-        state_view.geometry.get_height_of_stacker_labware_pool(stacker_id)
-    ).then_return(12)
 
     _prep_stacker_own_location(decoy, state_view, stacker_id)
     result = await subject.execute(data)
 
-    decoy.verify(await stacker_hardware.dispense_labware(labware_height=12), times=1)
+    decoy.verify(
+        await stacker_hardware.dispense_labware(labware_height=12),
+        times=1,
+    )
 
     assert result == SuccessData(
         public=flex_stacker.RetrieveResult(
@@ -499,7 +504,8 @@ async def test_retrieve_primary_adapter_and_lid(
             2, with_lid=True, with_adapter=True
         ),
         max_pool_count=5,
-        pool_overlap=0,
+        pool_overlap=4,
+        pool_height=20,
     )
     decoy.when(
         state_view.modules.get_flex_stacker_substate(module_id=stacker_id)
@@ -566,14 +572,15 @@ async def test_retrieve_primary_adapter_and_lid(
         )
     ).then_return(None)
 
-    decoy.when(
-        state_view.geometry.get_height_of_stacker_labware_pool(stacker_id)
-    ).then_return(16)
-
     _prep_stacker_own_location(decoy, state_view, stacker_id)
     result = await subject.execute(data)
 
-    decoy.verify(await stacker_hardware.dispense_labware(labware_height=16), times=1)
+    decoy.verify(
+        await stacker_hardware.dispense_labware(
+            labware_height=16,
+        ),
+        times=1,
+    )
 
     assert result == SuccessData(
         public=flex_stacker.RetrieveResult(
@@ -676,6 +683,12 @@ async def test_retrieve_primary_adapter_and_lid(
             ),
             FlexStackerLabwareRetrieveError,
         ),
+        (
+            FlexStackerShuttleNotEmptyError(
+                serial="123", labware_expected=True, shuttle_state=""
+            ),
+            FlexStackerShuttleOccupiedError,
+        ),
     ],
 )
 async def test_retrieve_raises_recoverable_error(
@@ -709,24 +722,23 @@ async def test_retrieve_raises_recoverable_error(
         pool_lid_definition=None,
         contained_labware_bottom_first=_contained_labware(1),
         max_pool_count=999,
-        pool_overlap=0,
+        pool_overlap=4,
+        pool_height=20,
     )
     decoy.when(
         state_view.modules.get_flex_stacker_substate(module_id=stacker_id)
     ).then_return(fs_module_substate)
-
-    decoy.when(
-        state_view.geometry.get_height_of_stacker_labware_pool(stacker_id)
-    ).then_return(16)
 
     _prep_stacker_own_location(decoy, state_view, stacker_id)
 
     decoy.when(model_utils.generate_id()).then_return(error_id)
     decoy.when(model_utils.get_timestamp()).then_return(error_timestamp)
 
-    decoy.when(await stacker_hardware.dispense_labware(labware_height=16)).then_raise(
-        shared_data_error
-    )
+    decoy.when(
+        await stacker_hardware.dispense_labware(
+            labware_height=16,
+        )
+    ).then_raise(shared_data_error)
 
     result = await subject.execute(data)
 

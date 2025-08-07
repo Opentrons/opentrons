@@ -8,6 +8,6 @@ import type { Action, State } from './types'
 export * from './actions'
 export * from './selectors'
 
-export function createStore(): Store<State, Action> {
+export function legacy_createStore(): Store<State, Action> {
   return createReduxStore(reducer)
 }

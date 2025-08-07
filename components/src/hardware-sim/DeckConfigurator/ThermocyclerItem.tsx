@@ -17,6 +17,7 @@ import {
 } from './constants'
 
 import type {
+  AddressableAreaNamesWithFakes,
   CutoutFixtureIdsWithFakes,
   CutoutId,
   DeckDefinition,
@@ -26,9 +27,11 @@ interface ThermocyclerItemProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
   cutoutFixtureId: CutoutFixtureIdsWithFakes
+  addressableAreaId: AddressableAreaNamesWithFakes
   handleClickRemove?: (
     fixtureLocation: CutoutId,
-    cutoutFixtureId: CutoutFixtureIdsWithFakes
+    cutoutFixtureId: CutoutFixtureIdsWithFakes,
+    addressableAreaId: AddressableAreaNamesWithFakes
   ) => void
   selected?: boolean
 }
@@ -41,6 +44,7 @@ export function ThermocyclerItem(props: ThermocyclerItemProps): JSX.Element {
     handleClickRemove,
     fixtureLocation,
     cutoutFixtureId,
+    addressableAreaId,
     selected = false,
   } = props
 
@@ -58,6 +62,11 @@ export function ThermocyclerItem(props: ThermocyclerItemProps): JSX.Element {
   const y = ySlotPosition + Y_ADJUSTMENT
 
   const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
+  const handleRemoveClick = (): void => {
+    if (handleClickRemove != null) {
+      handleClickRemove(fixtureLocation, cutoutFixtureId, addressableAreaId)
+    }
+  }
   return (
     <RobotCoordsForeignObject
       width={THERMOCYCLER_FIXTURE_WIDTH}
@@ -70,13 +79,8 @@ export function ThermocyclerItem(props: ThermocyclerItemProps): JSX.Element {
       <Btn
         css={handleClickRemove != null ? editableStyle : CONFIG_STYLE_READ_ONLY}
         cursor={handleClickRemove != null ? 'pointer' : 'default'}
-        onClick={
-          handleClickRemove != null
-            ? () => {
-                handleClickRemove(fixtureLocation, cutoutFixtureId)
-              }
-            : () => {}
-        }
+        onClick={handleRemoveClick}
+        height="100%"
       >
         <StyledText
           oddStyle="smallBodyTextSemiBold"

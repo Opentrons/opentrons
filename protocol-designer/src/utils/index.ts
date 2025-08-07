@@ -1,9 +1,9 @@
-import round from 'lodash/round'
 import snakeCase from 'lodash/snakeCase'
 import uuidv1 from 'uuid/v4'
 
 import {
   FLEX_ROBOT_TYPE,
+  getAllLabwareDefs,
   getDeckDefFromRobotType,
   getTiprackVolume,
   INTERACTIVE_WELL_DATA_ATTRIBUTE,
@@ -186,6 +186,56 @@ export const getStagingAreaAddressableAreas = (
   return addressableAreasRaw
 }
 
+export function getMatchingTipLiquidSpecsFromSpec(
+  pipetteSpecs: PipetteV2Specs,
+  volume: number,
+  tiprackUri: string
+): SupportedTip {
+  const matchingLabwareDef = getAllLabwareDefs()[tiprackUri]
+
+  console.assert(
+    matchingLabwareDef,
+    `expected to find a matching labware def with tiprack ${tiprackUri} but could not`
+  )
+
+  const tipLength = matchingLabwareDef?.parameters.tipLength ?? 0
+
+  if (tipLength === 0) {
+    console.error(
+      `expected to find a tiplength with tiprack ${
+        matchingLabwareDef?.metadata.displayName ?? 'unknown displayName'
+      } but could not`
+    )
+  }
+
+  const isLowVolumePipette = Object.keys(pipetteSpecs.liquids).some(
+    key => key === 'lowVolumeDefault'
+  )
+
+  const isUsingLowVolume = volume < 5
+  const liquidType =
+    isLowVolumePipette && isUsingLowVolume ? 'lowVolumeDefault' : 'default'
+  const liquidSupportedTips = Object.values(
+    pipetteSpecs.liquids[liquidType].supportedTips
+  )
+
+  //  find the supported tip liquid specs that either exactly match
+  //  tipLength or are closest, this accounts for custom tipracks
+  const matchingTipLiquidSpecs = liquidSupportedTips.sort((tipA, tipB) => {
+    const differenceA = Math.abs(tipA.defaultTipLength - tipLength)
+    const differenceB = Math.abs(tipB.defaultTipLength - tipLength)
+    return differenceA - differenceB
+  })[0]
+  console.assert(
+    matchingTipLiquidSpecs,
+    `expected to find the tip liquid specs but could not with pipette tiprack displayname ${
+      matchingLabwareDef?.metadata.displayName ?? 'unknown displayname'
+    }`
+  )
+
+  return matchingTipLiquidSpecs
+}
+
 export function getMatchingTipLiquidSpecs(
   pipetteEntity: PipetteEntity,
   volume: number,
@@ -320,28 +370,6 @@ export const getDefaultBlowoutFlowRate = (
   ].defaultBlowOutFlowRate.default
 }
 
-/**
- * Gets maximum pushout volume for a given transfer plan given transfer volume and pipette spec
- *
- * @param {number} transferVolume - The transfer volume for the transfer plan
- * @param {PipetteV2Specs} - The specs for the pipette used for the transfer
- * @returns {number} - The maximum supported push out volume for each dispense
- */
-export const getMaxPushOutVolume = (
-  transferVolume: number,
-  pipetteSpecs: PipetteV2Specs
-): number => {
-  const { liquids, plungerPositionsConfigurations, shaftULperMM } = pipetteSpecs
-  const isInLowVolumeMode =
-    transferVolume < liquids.default.minVolume && 'lowVolumeDefault' in liquids
-  const { bottom, blowout } = isInLowVolumeMode
-    ? plungerPositionsConfigurations.lowVolumeDefault ??
-      plungerPositionsConfigurations.default
-    : plungerPositionsConfigurations.default
-  // absolute value to account for flipped z-axis on OT-2 vs. Flex pipettes
-  return round(Math.abs(blowout - bottom) * shaftULperMM, 1)
-}
-
 export const getDefaultPushOutVolume = (
   transferVolume: number,
   pipetteSpecs: PipetteV2Specs,
@@ -381,8 +409,10 @@ export const getMaxConditioningVolume = (args: {
     pipetteSpecs,
   } = args
   const { liquids } = pipetteSpecs
+  const minVolumeForMultiDispense = transferVolume * 2
   const isInLowVolumeMode =
-    transferVolume < liquids.default.minVolume && 'lowVolumeDefault' in liquids
+    minVolumeForMultiDispense < liquids.default.minVolume &&
+    'lowVolumeDefault' in liquids
   const tiprack = Object.values(labwareEntities).find(
     ({ labwareDefURI }) => labwareDefURI === tiprackDefUri
   )
@@ -394,7 +424,10 @@ export const getMaxConditioningVolume = (args: {
       : liquids.default.maxVolume,
     ...(tipMaxVolume != null ? [tipMaxVolume] : [])
   )
-  return maxWorkingVolume - disposalVolume - transferVolume
+  return Math.max(
+    0,
+    maxWorkingVolume - disposalVolume - minVolumeForMultiDispense
+  )
 }
 
 // for stacking

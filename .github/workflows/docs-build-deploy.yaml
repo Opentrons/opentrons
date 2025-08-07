@@ -1,0 +1,57 @@
+# Run tests, build PD, and deploy it to sandbox
+
+name: 'Docs build and deploy'
+
+on:
+  pull_request:
+    paths:
+      - 'docs/**'
+      - '.github/workflows/docs-build-deploy.yaml'
+  push:
+    branches:
+      - 'edge'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  sandbox-build-and-deploy-mkdocs-site:
+    timeout-minutes: 5
+    runs-on: 'ubuntu-24.04'
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      BRANCH: ${{ github.event.pull_request.head.ref != '' && github.event.pull_request.head.ref || github.ref_name }}
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.DOCS_SANDBOX_ROLE }}
+          aws-region: us-east-2
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v4
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.10'
+          enable-cache: true
+          cache-dependency-glob: './docs/uv.lock'
+      - name: Sync the project
+        working-directory: ./docs
+        run: make setup
+      - name: Build Docs Site
+        working-directory: ./docs
+        run: make build
+      - name: Deploy Docs Site to Sandbox
+        working-directory: ./docs
+        run: make deploy BRANCH=${{ env.BRANCH }}
+      - name: Output URL to Summary
+        run: |
+          echo "## Docs site deployed to sandbox" >> $GITHUB_STEP_SUMMARY
+          echo "<http://sandbox.docs.s3-website.us-east-2.amazonaws.com/${{ env.BRANCH }}/>" >> $GITHUB_STEP_SUMMARY

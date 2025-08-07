@@ -46,7 +46,7 @@ async def build(
     simulating: bool,
     usb_port: USBPort,
     hw_control_loop: asyncio.AbstractEventLoop,
-    execution_manager: ExecutionManager,
+    execution_manager: Optional[ExecutionManager] = None,
     sim_model: Optional[str] = None,
     sim_serial_number: Optional[str] = None,
     disconnected_callback: ModuleDisconnectedCallback = None,

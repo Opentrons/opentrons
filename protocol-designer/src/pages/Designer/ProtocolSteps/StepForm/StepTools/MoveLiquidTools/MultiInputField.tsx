@@ -16,7 +16,7 @@ import {
 import { InputStepFormField } from '../../../../../../components/molecules'
 import { PositionField } from '../../PipetteFields'
 
-import type { ReferenceFields } from '../../../../../../form-types'
+import type { FormData, ReferenceFields } from '../../../../../../form-types'
 import type { MoveLiquidPrefixType } from '../../../../../../resources/types'
 import type { FieldPropsByName } from '../../types'
 
@@ -24,9 +24,9 @@ export interface StepInputFieldProps {
   fieldTitle: string
   fieldKey: string
   units: string
-  errorToShow?: string | null
 }
 interface MultiInputFieldProps {
+  formData: FormData
   name: string
   tooltipContent: string
   propsForFields: FieldPropsByName
@@ -39,6 +39,7 @@ interface MultiInputFieldProps {
 
 export function MultiInputField(props: MultiInputFieldProps): JSX.Element {
   const {
+    formData,
     name,
     tooltipContent,
     isWellPosition,
@@ -77,7 +78,7 @@ export function MultiInputField(props: MultiInputFieldProps): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing8}
         >
-          {fields.map(({ fieldTitle, fieldKey, units, errorToShow }) => (
+          {fields.map(({ fieldTitle, fieldKey, units }) => (
             <InputStepFormField
               key={fieldKey}
               showTooltip={false}
@@ -85,11 +86,11 @@ export function MultiInputField(props: MultiInputFieldProps): JSX.Element {
               title={t(fieldTitle)}
               {...propsForFields[fieldKey]}
               units={t(units)}
-              errorToShow={errorToShow}
             />
           ))}
           {(isWellPosition ?? false) && (
             <PositionField
+              formData={formData}
               padding="0"
               prefix={prefix}
               propsForFields={propsForFields}

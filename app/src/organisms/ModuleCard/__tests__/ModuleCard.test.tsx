@@ -10,6 +10,8 @@ import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { getIsHeaterShakerAttached } from '/app/redux/config'
+import { getLocalRobot } from '/app/redux/discovery'
+import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 import {
   mockHeaterShaker,
   mockMagneticModule,
@@ -22,6 +24,7 @@ import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configurati
 import { useIsEstopNotDisengaged } from '/app/resources/devices'
 
 import { ModuleCard } from '..'
+import { useIsDoorOpen } from '../../DoorOpenControl/useIsDoorOpen'
 import { ErrorInfo } from '../ErrorInfo'
 import { FirmwareUpdateFailedModal } from '../FirmwareUpdateFailedModal'
 import { FlexStackerModuleData } from '../FlexStackerModuleData'
@@ -55,8 +58,10 @@ vi.mock('../FirmwareUpdateFailedModal')
 vi.mock('/app/redux/robot-api')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/organisms/ToasterOven')
-vi.mock('/app/resources/devices')
+vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
 vi.mock('/app/resources/deck_configuration')
+vi.mock('../../DoorOpenControl/useIsDoorOpen')
+vi.mock('/app/redux/discovery')
 
 const mockMagneticModuleHub = {
   id: 'magdeck_id',
@@ -189,6 +194,7 @@ const mockFlexStacker = {
     path: '/dev/ot_module_flex_stacker',
     hub: false,
     port: 1,
+    hubPort: 1,
     portGroup: 'unknown',
   },
   data: {
@@ -259,6 +265,14 @@ describe('ModuleCard', () => {
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
       data: [],
     } as unknown) as UseQueryResult<DeckConfiguration>)
+    vi.mocked(getLocalRobot).mockReturnValue({
+      ...mockConnectedRobot,
+      name: props.robotName,
+    })
+    vi.mocked(useIsDoorOpen).mockReturnValue({
+      isDoorOpen: true,
+      moduleDoorLocation: null,
+    })
   })
   afterEach(() => {
     vi.resetAllMocks()
@@ -268,7 +282,7 @@ describe('ModuleCard', () => {
     render(props)
     screen.getByText('Magnetic Module GEN1')
     screen.getByText('Mock Magnetic Module Data')
-    screen.getByText('usb-1')
+    screen.getByText('USB-1')
     screen.getByAltText('magneticModuleV1')
   })
   it('renders information for a temperature module with mocked status', () => {
@@ -282,7 +296,7 @@ describe('ModuleCard', () => {
     })
     screen.getByText('Temperature Module GEN2')
     screen.getByText('Mock Temperature Module Data')
-    screen.getByText('usb-1')
+    screen.getByText('USB-1')
     screen.getByAltText('temperatureModuleV2')
   })
 
@@ -294,7 +308,7 @@ describe('ModuleCard', () => {
 
     screen.getByText('Thermocycler Module GEN1')
     screen.getByText('Mock Thermocycler Module Data')
-    screen.getByText('usb-1')
+    screen.getByText('USB-1')
     screen.getByAltText('thermocyclerModuleV1')
   })
 
@@ -307,7 +321,7 @@ describe('ModuleCard', () => {
 
     screen.getByText('Heater-Shaker Module GEN1')
     screen.getByText('Mock Heater Shaker Module Data')
-    screen.getByText('usb-1')
+    screen.getByText('USB-1')
     screen.getByAltText('heaterShakerModuleV1')
   })
 
@@ -320,7 +334,7 @@ describe('ModuleCard', () => {
 
     screen.getByText('Flex Stacker Module GEN1')
     screen.getByText('Mock Flex Stacker Module Data')
-    screen.getByText('usb-1')
+    screen.getByText('S-1')
     screen.getByAltText('flexStackerModuleV1')
   })
 
@@ -402,6 +416,7 @@ describe('ModuleCard', () => {
   })
   it('renders module setup link for no-calibration required modules if firmware update available', () => {
     mockFlexStacker.hasAvailableUpdate = true
+
     render({
       ...props,
       module: mockFlexStacker,

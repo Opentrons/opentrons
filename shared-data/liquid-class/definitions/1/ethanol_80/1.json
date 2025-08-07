@@ -73,9 +73,10 @@
               [50.0, 30.0]
             ],
             "correctionByVolume": [
-              [1.0, -1.6],
-              [10.0, -1.1],
-              [50.0, -3.0]
+              [0.0, 0.0],
+              [1.0, -0.7],
+              [10.0, -0.2],
+              [50.0, -0.5]
             ],
             "preWet": false,
             "mix": {
@@ -126,7 +127,11 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 7.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -144,18 +149,19 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 30.0]],
+            "flowRateByVolume": [[0.0, 7.0]],
             "correctionByVolume": [
-              [1.0, -1.6],
-              [10.0, -1.1],
-              [50.0, -3.0]
+              [0.0, 0.0],
+              [1.0, -0.7],
+              [10.0, -0.2],
+              [50.0, -0.5]
             ],
             "mix": {
               "enable": false,
@@ -164,7 +170,7 @@
                 "volume": 50
               }
             },
-            "pushOutByVolume": [[0.0, 1.0]],
+            "pushOutByVolume": [[0.0, 0.0]],
             "delay": {
               "enable": true,
               "params": {
@@ -209,7 +215,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 30.0
+                  "flowRate": 7.0
                 }
               },
               "touchTip": {
@@ -228,18 +234,19 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 30.0]],
+            "flowRateByVolume": [[0.0, 7.0]],
             "correctionByVolume": [
-              [1.0, -1.6],
-              [10.0, -1.1],
-              [50.0, -3.0]
+              [0.0, 0.0],
+              [1.0, -0.7],
+              [10.0, -0.2],
+              [50.0, -0.5]
             ],
             "conditioningByVolume": [
               [1.0, 5.0],
@@ -325,9 +332,10 @@
               [50.0, 30.0]
             ],
             "correctionByVolume": [
-              [1.0, -1.6],
-              [10.0, -1.1],
-              [50.0, -3.0]
+              [0.0, 0.0],
+              [1.0, -0.7],
+              [10.0, -0.2],
+              [50.0, -0.5]
             ],
             "preWet": false,
             "mix": {
@@ -378,7 +386,11 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 7.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -396,18 +408,19 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 30.0]],
+            "flowRateByVolume": [[0.0, 7.0]],
             "correctionByVolume": [
-              [1.0, -1.6],
-              [10.0, -1.1],
-              [50.0, -3.0]
+              [0.0, 0.0],
+              [1.0, -0.7],
+              [10.0, -0.2],
+              [50.0, -0.5]
             ],
             "mix": {
               "enable": false,
@@ -416,7 +429,7 @@
                 "volume": 50
               }
             },
-            "pushOutByVolume": [[0.0, 1.0]],
+            "pushOutByVolume": [[0.0, 0.0]],
             "delay": {
               "enable": true,
               "params": {
@@ -461,7 +474,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 30.0
+                  "flowRate": 7.0
                 }
               },
               "touchTip": {
@@ -480,18 +493,19 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 30.0]],
+            "flowRateByVolume": [[0.0, 7.0]],
             "correctionByVolume": [
-              [1.0, -1.6],
-              [10.0, -1.1],
-              [50.0, -3.0]
+              [0.0, 0.0],
+              [1.0, -0.7],
+              [10.0, -0.2],
+              [50.0, -0.5]
             ],
             "conditioningByVolume": [
               [1.0, 5.0],
@@ -582,9 +596,10 @@
               [50.0, 30.0]
             ],
             "correctionByVolume": [
-              [1.0, -1.6],
-              [10.0, -1.1],
-              [50.0, -3.0]
+              [0.0, 0.0],
+              [1.0, -0.5],
+              [10.0, -0.2],
+              [50.0, -1.5]
             ],
             "preWet": false,
             "mix": {
@@ -635,7 +650,11 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 35.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -653,18 +672,19 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 30.0]],
+            "flowRateByVolume": [[0.0, 35.0]],
             "correctionByVolume": [
-              [1.0, -1.6],
-              [10.0, -1.1],
-              [50.0, -3.0]
+              [0.0, 0.0],
+              [1.0, -0.5],
+              [10.0, -0.2],
+              [50.0, -1.5]
             ],
             "mix": {
               "enable": false,
@@ -673,7 +693,7 @@
                 "volume": 50
               }
             },
-            "pushOutByVolume": [[0.0, 1.0]],
+            "pushOutByVolume": [[0.0, 0.0]],
             "delay": {
               "enable": true,
               "params": {
@@ -718,7 +738,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 30.0
+                  "flowRate": 35.0
                 }
               },
               "touchTip": {
@@ -737,18 +757,19 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 30.0]],
+            "flowRateByVolume": [[0.0, 35.0]],
             "correctionByVolume": [
-              [1.0, -1.6],
-              [10.0, -1.1],
-              [50.0, -3.0]
+              [0.0, 0.0],
+              [1.0, -0.5],
+              [10.0, -0.2],
+              [50.0, -1.5]
             ],
             "conditioningByVolume": [
               [1.0, 5.0],
@@ -834,9 +855,10 @@
               [50.0, 30.0]
             ],
             "correctionByVolume": [
-              [1.0, -1.6],
-              [10.0, -1.1],
-              [50.0, -3.0]
+              [0.0, 0.0],
+              [1.0, -0.5],
+              [10.0, -0.2],
+              [50.0, -1.5]
             ],
             "preWet": false,
             "mix": {
@@ -887,7 +909,11 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 35.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -905,18 +931,19 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 30.0]],
+            "flowRateByVolume": [[0.0, 35.0]],
             "correctionByVolume": [
-              [1.0, -1.6],
-              [10.0, -1.1],
-              [50.0, -3.0]
+              [0.0, 0.0],
+              [1.0, -0.5],
+              [10.0, -0.2],
+              [50.0, -1.5]
             ],
             "mix": {
               "enable": false,
@@ -925,7 +952,7 @@
                 "volume": 50
               }
             },
-            "pushOutByVolume": [[0.0, 1.0]],
+            "pushOutByVolume": [[0.0, 0.0]],
             "delay": {
               "enable": true,
               "params": {
@@ -970,7 +997,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 30.0
+                  "flowRate": 35.0
                 }
               },
               "touchTip": {
@@ -989,18 +1016,19 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 30.0]],
+            "flowRateByVolume": [[0.0, 35.0]],
             "correctionByVolume": [
-              [1.0, -1.6],
-              [10.0, -1.1],
-              [50.0, -3.0]
+              [0.0, 0.0],
+              [1.0, -0.5],
+              [10.0, -0.2],
+              [50.0, -1.5]
             ],
             "conditioningByVolume": [
               [1.0, 5.0],
@@ -1091,9 +1119,10 @@
               [50.0, 30.0]
             ],
             "correctionByVolume": [
-              [5.0, -2.1],
-              [10.0, -1.7],
-              [50.0, -3.3]
+              [0.0, 0.0],
+              [5.0, -0.75],
+              [10.0, -0.7],
+              [50.0, -1.3]
             ],
             "preWet": false,
             "mix": {
@@ -1144,7 +1173,11 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 100.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -1162,18 +1195,19 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 125.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
-              [5.0, -2.1],
-              [10.0, -1.7],
-              [50.0, -3.3]
+              [0.0, 0.0],
+              [5.0, -0.75],
+              [10.0, -0.7],
+              [50.0, -1.3]
             ],
             "mix": {
               "enable": false,
@@ -1183,15 +1217,15 @@
               }
             },
             "pushOutByVolume": [
-              [5.0, 10.0],
-              [10.0, 5.0],
-              [45.0, 5.0],
+              [5.0, 0.0],
+              [10.0, 0.0],
+              [45.0, 0.0],
               [50.0, 0.0]
             ],
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 2.0
               }
             }
           },
@@ -1232,7 +1266,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 125.0
+                  "flowRate": 100.0
                 }
               },
               "touchTip": {
@@ -1251,18 +1285,19 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 125.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
-              [5.0, -2.1],
-              [10.0, -1.7],
-              [50.0, -3.3]
+              [0.0, 0.0],
+              [5.0, -0.75],
+              [10.0, -0.7],
+              [50.0, -1.3]
             ],
             "conditioningByVolume": [
               [1.0, 5.0],
@@ -1279,7 +1314,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 2.0
               }
             }
           }
@@ -1348,9 +1383,10 @@
               [50.0, 30.0]
             ],
             "correctionByVolume": [
-              [5.0, -2.1],
-              [10.0, -1.7],
-              [50.0, -3.3]
+              [0.0, 0.0],
+              [5.0, -0.75],
+              [10.0, -0.7],
+              [50.0, -1.3]
             ],
             "preWet": false,
             "mix": {
@@ -1401,7 +1437,11 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 100.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -1419,18 +1459,19 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 125.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
-              [5.0, -2.1],
-              [10.0, -1.7],
-              [50.0, -3.3]
+              [0.0, 0.0],
+              [5.0, -0.75],
+              [10.0, -0.7],
+              [50.0, -1.3]
             ],
             "mix": {
               "enable": false,
@@ -1440,15 +1481,15 @@
               }
             },
             "pushOutByVolume": [
-              [5.0, 10.0],
-              [10.0, 5.0],
-              [45.0, 5.0],
+              [5.0, 0.0],
+              [10.0, 0.0],
+              [45.0, 0.0],
               [50.0, 0.0]
             ],
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 2.0
               }
             }
           },
@@ -1489,7 +1530,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 125.0
+                  "flowRate": 100.0
                 }
               },
               "touchTip": {
@@ -1508,18 +1549,19 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 125.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
-              [5.0, -2.1],
-              [10.0, -1.7],
-              [50.0, -3.3]
+              [0.0, 0.0],
+              [5.0, -0.75],
+              [10.0, -0.7],
+              [50.0, -1.3]
             ],
             "conditioningByVolume": [
               [1.0, 5.0],
@@ -1536,7 +1578,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 2.0
               }
             }
           }
@@ -1605,9 +1647,10 @@
               [200.0, 200.0]
             ],
             "correctionByVolume": [
-              [5.0, -1.5],
+              [0.0, 0.0],
+              [5.0, -0.5],
               [50.0, -2.2],
-              [200.0, -7.4]
+              [200.0, -8.9]
             ],
             "preWet": false,
             "mix": {
@@ -1658,7 +1701,11 @@
                 [200.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 100.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -1676,18 +1723,19 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 125.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
-              [5.0, -1.5],
+              [0.0, 0.0],
+              [5.0, -0.5],
               [50.0, -2.2],
-              [200.0, -7.4]
+              [200.0, -8.9]
             ],
             "mix": {
               "enable": false,
@@ -1697,14 +1745,14 @@
               }
             },
             "pushOutByVolume": [
-              [5.0, 8.0],
-              [50.0, 4.0],
-              [200.0, 4.0]
+              [5.0, 0.0],
+              [50.0, 0.0],
+              [200.0, 0.0]
             ],
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 1.0
               }
             }
           },
@@ -1745,7 +1793,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 125.0
+                  "flowRate": 100.0
                 }
               },
               "touchTip": {
@@ -1764,18 +1812,19 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 125.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
-              [5.0, -1.5],
+              [0.0, 0.0],
+              [5.0, -0.5],
               [50.0, -2.2],
-              [200.0, -7.4]
+              [200.0, -8.9]
             ],
             "conditioningByVolume": [
               [1.0, 5.0],
@@ -1792,7 +1841,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 1.0
               }
             }
           }
@@ -1861,9 +1910,10 @@
               [200.0, 200.0]
             ],
             "correctionByVolume": [
-              [5.0, -1.5],
+              [0.0, 0.0],
+              [5.0, -0.5],
               [50.0, -2.2],
-              [200.0, -7.4]
+              [200.0, -8.9]
             ],
             "preWet": false,
             "mix": {
@@ -1914,7 +1964,11 @@
                 [200.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 100.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -1932,18 +1986,19 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 125.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
-              [5.0, -1.5],
+              [0.0, 0.0],
+              [5.0, -0.5],
               [50.0, -2.2],
-              [200.0, -7.4]
+              [200.0, -8.9]
             ],
             "mix": {
               "enable": false,
@@ -1953,14 +2008,14 @@
               }
             },
             "pushOutByVolume": [
-              [5.0, 8.0],
-              [50.0, 4.0],
-              [200.0, 4.0]
+              [5.0, 0.0],
+              [50.0, 0.0],
+              [200.0, 0.0]
             ],
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 1.0
               }
             }
           },
@@ -2001,7 +2056,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 125.0
+                  "flowRate": 100.0
                 }
               },
               "touchTip": {
@@ -2020,18 +2075,19 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 125.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
-              [5.0, -1.5],
+              [0.0, 0.0],
+              [5.0, -0.5],
               [50.0, -2.2],
-              [200.0, -7.4]
+              [200.0, -8.9]
             ],
             "conditioningByVolume": [
               [1.0, 5.0],
@@ -2048,7 +2104,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 1.0
               }
             }
           }
@@ -2117,8 +2173,9 @@
               [200.0, 200.0]
             ],
             "correctionByVolume": [
-              [10.0, -1.9],
-              [100.0, -3.6],
+              [0.0, 0.0],
+              [10.0, -0.9],
+              [100.0, -2.6],
               [1000.0, -32.2]
             ],
             "preWet": false,
@@ -2170,7 +2227,11 @@
                 [1000.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 300.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -2188,17 +2249,18 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 250.0]],
+            "flowRateByVolume": [[0.0, 300.0]],
             "correctionByVolume": [
-              [10.0, -1.9],
-              [100.0, -3.6],
+              [0.0, 0.0],
+              [10.0, -0.9],
+              [100.0, -2.6],
               [1000.0, -32.2]
             ],
             "mix": {
@@ -2209,14 +2271,14 @@
               }
             },
             "pushOutByVolume": [
-              [10.0, 6.0],
-              [100.0, 3.0],
-              [1000.0, 3.0]
+              [10.0, 0.0],
+              [100.0, 0.0],
+              [1000.0, 0.0]
             ],
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 1.0
               }
             }
           },
@@ -2257,7 +2319,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 250.0
+                  "flowRate": 300.0
                 }
               },
               "touchTip": {
@@ -2276,17 +2338,18 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 250.0]],
+            "flowRateByVolume": [[0.0, 300.0]],
             "correctionByVolume": [
-              [10.0, -1.9],
-              [100.0, -3.6],
+              [0.0, 0.0],
+              [10.0, -0.9],
+              [100.0, -2.6],
               [1000.0, -32.2]
             ],
             "conditioningByVolume": [
@@ -2304,7 +2367,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 1.0
               }
             }
           }
@@ -2373,8 +2436,9 @@
               [200.0, 200.0]
             ],
             "correctionByVolume": [
-              [10.0, -1.9],
-              [100.0, -3.6],
+              [0.0, 0.0],
+              [10.0, -0.9],
+              [100.0, -2.6],
               [1000.0, -32.2]
             ],
             "preWet": false,
@@ -2426,7 +2490,11 @@
                 [1000.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 300.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -2444,17 +2512,18 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 250.0]],
+            "flowRateByVolume": [[0.0, 300.0]],
             "correctionByVolume": [
-              [10.0, -1.9],
-              [100.0, -3.6],
+              [0.0, 0.0],
+              [10.0, -0.9],
+              [100.0, -2.6],
               [1000.0, -32.2]
             ],
             "mix": {
@@ -2465,14 +2534,14 @@
               }
             },
             "pushOutByVolume": [
-              [10.0, 6.0],
-              [100.0, 3.0],
-              [1000.0, 3.0]
+              [10.0, 0.0],
+              [100.0, 0.0],
+              [1000.0, 0.0]
             ],
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 1.0
               }
             }
           },
@@ -2513,7 +2582,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 250.0
+                  "flowRate": 300.0
                 }
               },
               "touchTip": {
@@ -2532,17 +2601,18 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 250.0]],
+            "flowRateByVolume": [[0.0, 300.0]],
             "correctionByVolume": [
-              [10.0, -1.9],
-              [100.0, -3.6],
+              [0.0, 0.0],
+              [10.0, -0.9],
+              [100.0, -2.6],
               [1000.0, -32.2]
             ],
             "conditioningByVolume": [
@@ -2560,7 +2630,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 1.0
               }
             }
           }
@@ -2634,9 +2704,10 @@
               [50.0, 30.0]
             ],
             "correctionByVolume": [
-              [5.0, -2.1],
-              [10.0, -1.7],
-              [50.0, -3.3]
+              [0.0, 0.0],
+              [5.0, -0.75],
+              [10.0, -0.7],
+              [50.0, -1.3]
             ],
             "preWet": false,
             "mix": {
@@ -2687,7 +2758,11 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 100.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -2705,18 +2780,19 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 125.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
-              [5.0, -2.1],
-              [10.0, -1.7],
-              [50.0, -3.3]
+              [0.0, 0.0],
+              [5.0, -0.75],
+              [10.0, -0.7],
+              [50.0, -1.3]
             ],
             "mix": {
               "enable": false,
@@ -2726,15 +2802,15 @@
               }
             },
             "pushOutByVolume": [
-              [5.0, 10.0],
-              [10.0, 5.0],
-              [45.0, 5.0],
+              [5.0, 0.0],
+              [10.0, 0.0],
+              [45.0, 0.0],
               [50.0, 0.0]
             ],
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 2.0
               }
             }
           },
@@ -2775,7 +2851,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 125.0
+                  "flowRate": 100.0
                 }
               },
               "touchTip": {
@@ -2794,23 +2870,24 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 125.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
-              [5.0, -2.1],
-              [10.0, -1.7],
-              [50.0, -3.3]
+              [0.0, 0.0],
+              [5.0, -0.75],
+              [10.0, -0.7],
+              [50.0, -1.3]
             ],
             "conditioningByVolume": [
-              [1.0, 5.0],
+              [0.0, 0.0],
               [40.0, 5.0],
-              [45.0, 0.0],
+              [45.0, 5.0],
               [50.0, 0.0]
             ],
             "disposalByVolume": [
@@ -2822,7 +2899,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 2.0
               }
             }
           }
@@ -2891,9 +2968,10 @@
               [50.0, 30.0]
             ],
             "correctionByVolume": [
-              [5.0, -2.1],
-              [10.0, -1.7],
-              [50.0, -3.3]
+              [0.0, 0.0],
+              [5.0, -0.75],
+              [10.0, -0.7],
+              [50.0, -1.3]
             ],
             "preWet": false,
             "mix": {
@@ -2944,7 +3022,11 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 100.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -2962,18 +3044,19 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 125.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
-              [5.0, -2.1],
-              [10.0, -1.7],
-              [50.0, -3.3]
+              [0.0, 0.0],
+              [5.0, -0.75],
+              [10.0, -0.7],
+              [50.0, -1.3]
             ],
             "mix": {
               "enable": false,
@@ -2983,15 +3066,15 @@
               }
             },
             "pushOutByVolume": [
-              [5.0, 10.0],
-              [10.0, 5.0],
-              [45.0, 5.0],
+              [5.0, 0.0],
+              [10.0, 0.0],
+              [45.0, 0.0],
               [50.0, 0.0]
             ],
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 2.0
               }
             }
           },
@@ -3032,7 +3115,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 125.0
+                  "flowRate": 100.0
                 }
               },
               "touchTip": {
@@ -3051,18 +3134,19 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 125.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
-              [5.0, -2.1],
-              [10.0, -1.7],
-              [50.0, -3.3]
+              [0.0, 0.0],
+              [5.0, -0.75],
+              [10.0, -0.7],
+              [50.0, -1.3]
             ],
             "conditioningByVolume": [
               [1.0, 5.0],
@@ -3079,7 +3163,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 2.0
               }
             }
           }
@@ -3148,9 +3232,10 @@
               [200.0, 200.0]
             ],
             "correctionByVolume": [
-              [5.0, -1.5],
-              [50.0, -2.2],
-              [200.0, -7.4]
+              [0.0, 0.0],
+              [5.0, -0.5],
+              [50.0, -0.2],
+              [200.0, -4.9]
             ],
             "preWet": false,
             "mix": {
@@ -3201,7 +3286,11 @@
                 [200.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 100.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -3219,18 +3308,19 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 125.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
-              [5.0, -1.5],
-              [50.0, -2.2],
-              [200.0, -7.4]
+              [0.0, 0.0],
+              [5.0, -0.5],
+              [50.0, -0.2],
+              [200.0, -4.9]
             ],
             "mix": {
               "enable": false,
@@ -3240,14 +3330,14 @@
               }
             },
             "pushOutByVolume": [
-              [5.0, 8.0],
-              [50.0, 4.0],
-              [200.0, 4.0]
+              [5.0, 0.0],
+              [50.0, 0.0],
+              [200.0, 0.0]
             ],
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 1.0
               }
             }
           },
@@ -3288,7 +3378,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 125.0
+                  "flowRate": 100.0
                 }
               },
               "touchTip": {
@@ -3307,18 +3397,19 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 125.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
-              [5.0, -1.5],
-              [50.0, -2.2],
-              [200.0, -7.4]
+              [0.0, 0.0],
+              [5.0, -0.5],
+              [50.0, -0.2],
+              [200.0, -4.9]
             ],
             "conditioningByVolume": [
               [1.0, 5.0],
@@ -3335,7 +3426,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 1.0
               }
             }
           }
@@ -3404,9 +3495,10 @@
               [200.0, 200.0]
             ],
             "correctionByVolume": [
-              [5.0, -1.5],
-              [50.0, -2.2],
-              [200.0, -7.4]
+              [0.0, 0.0],
+              [5.0, -0.5],
+              [50.0, -0.2],
+              [200.0, -4.9]
             ],
             "preWet": false,
             "mix": {
@@ -3457,7 +3549,11 @@
                 [200.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 100.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -3475,18 +3571,19 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 125.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
-              [5.0, -1.5],
-              [50.0, -2.2],
-              [200.0, -7.4]
+              [0.0, 0.0],
+              [5.0, -0.5],
+              [50.0, -0.2],
+              [200.0, -4.9]
             ],
             "mix": {
               "enable": false,
@@ -3496,14 +3593,14 @@
               }
             },
             "pushOutByVolume": [
-              [5.0, 8.0],
-              [50.0, 4.0],
-              [200.0, 4.0]
+              [5.0, 0.0],
+              [50.0, 0.0],
+              [200.0, 0.0]
             ],
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 1.0
               }
             }
           },
@@ -3544,7 +3641,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 125.0
+                  "flowRate": 100.0
                 }
               },
               "touchTip": {
@@ -3563,18 +3660,19 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 125.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
-              [5.0, -1.5],
-              [50.0, -2.2],
-              [200.0, -7.4]
+              [0.0, 0.0],
+              [5.0, -0.5],
+              [50.0, -0.2],
+              [200.0, -4.9]
             ],
             "conditioningByVolume": [
               [1.0, 5.0],
@@ -3591,7 +3689,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 1.0
               }
             }
           }
@@ -3660,8 +3758,9 @@
               [200.0, 200.0]
             ],
             "correctionByVolume": [
-              [10.0, -1.9],
-              [100.0, -3.6],
+              [0.0, 0.0],
+              [10.0, -0.9],
+              [100.0, -2.6],
               [1000.0, -32.2]
             ],
             "preWet": false,
@@ -3713,7 +3812,11 @@
                 [1000.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 300.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -3731,17 +3834,18 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 250.0]],
+            "flowRateByVolume": [[0.0, 300.0]],
             "correctionByVolume": [
-              [10.0, -1.9],
-              [100.0, -3.6],
+              [0.0, 0.0],
+              [10.0, -0.9],
+              [100.0, -2.6],
               [1000.0, -32.2]
             ],
             "mix": {
@@ -3752,14 +3856,14 @@
               }
             },
             "pushOutByVolume": [
-              [10.0, 6.0],
-              [100.0, 3.0],
-              [1000.0, 3.0]
+              [10.0, 0.0],
+              [100.0, 0.0],
+              [1000.0, 0.0]
             ],
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 1.0
               }
             }
           },
@@ -3800,7 +3904,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 250.0
+                  "flowRate": 300.0
                 }
               },
               "touchTip": {
@@ -3819,17 +3923,18 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 250.0]],
+            "flowRateByVolume": [[0.0, 300.0]],
             "correctionByVolume": [
-              [10.0, -1.9],
-              [100.0, -3.6],
+              [0.0, 0.0],
+              [10.0, -0.9],
+              [100.0, -2.6],
               [1000.0, -32.2]
             ],
             "conditioningByVolume": [
@@ -3847,7 +3952,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 1.0
               }
             }
           }
@@ -3916,8 +4021,9 @@
               [200.0, 200.0]
             ],
             "correctionByVolume": [
-              [10.0, -1.9],
-              [100.0, -3.6],
+              [0.0, 0.0],
+              [10.0, -0.9],
+              [100.0, -2.6],
               [1000.0, -32.2]
             ],
             "preWet": false,
@@ -3969,7 +4075,11 @@
                 [1000.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 300.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -3987,17 +4097,18 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 250.0]],
+            "flowRateByVolume": [[0.0, 300.0]],
             "correctionByVolume": [
-              [10.0, -1.9],
-              [100.0, -3.6],
+              [0.0, 0.0],
+              [10.0, -0.9],
+              [100.0, -2.6],
               [1000.0, -32.2]
             ],
             "mix": {
@@ -4008,14 +4119,14 @@
               }
             },
             "pushOutByVolume": [
-              [10.0, 6.0],
-              [100.0, 3.0],
-              [1000.0, 3.0]
+              [10.0, 0.0],
+              [100.0, 0.0],
+              [1000.0, 0.0]
             ],
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 1.0
               }
             }
           },
@@ -4056,7 +4167,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 250.0
+                  "flowRate": 300.0
                 }
               },
               "touchTip": {
@@ -4075,17 +4186,18 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 250.0]],
+            "flowRateByVolume": [[0.0, 300.0]],
             "correctionByVolume": [
-              [10.0, -1.9],
-              [100.0, -3.6],
+              [0.0, 0.0],
+              [10.0, -0.9],
+              [100.0, -2.6],
               [1000.0, -32.2]
             ],
             "conditioningByVolume": [
@@ -4103,7 +4215,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 1.0
               }
             }
           }
@@ -4177,9 +4289,10 @@
               [50.0, 30.0]
             ],
             "correctionByVolume": [
-              [5.0, -2.1],
-              [10.0, -1.7],
-              [50.0, -3.3]
+              [0.0, 0.0],
+              [5.0, -0.35],
+              [10.0, 0.1],
+              [50.0, -1.3]
             ],
             "preWet": false,
             "mix": {
@@ -4230,7 +4343,11 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 100.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -4248,18 +4365,19 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 125.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
-              [5.0, -2.1],
-              [10.0, -1.7],
-              [50.0, -3.3]
+              [0.0, 0.0],
+              [5.0, -0.35],
+              [10.0, 0.1],
+              [50.0, -1.3]
             ],
             "mix": {
               "enable": false,
@@ -4269,15 +4387,15 @@
               }
             },
             "pushOutByVolume": [
-              [5.0, 10.0],
-              [10.0, 5.0],
-              [45.0, 5.0],
+              [5.0, 0.0],
+              [10.0, 0.0],
+              [45.0, 0.0],
               [50.0, 0.0]
             ],
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 2.0
               }
             }
           },
@@ -4318,7 +4436,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 125.0
+                  "flowRate": 100.0
                 }
               },
               "touchTip": {
@@ -4337,18 +4455,19 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 125.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
-              [5.0, -2.1],
-              [10.0, -1.7],
-              [50.0, -3.3]
+              [0.0, 0.0],
+              [5.0, -0.35],
+              [10.0, 0.1],
+              [50.0, -1.3]
             ],
             "conditioningByVolume": [
               [1.0, 5.0],
@@ -4365,7 +4484,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 2.0
               }
             }
           }
@@ -4434,9 +4553,10 @@
               [50.0, 30.0]
             ],
             "correctionByVolume": [
-              [5.0, -2.1],
-              [10.0, -1.7],
-              [50.0, -3.3]
+              [0.0, 0.0],
+              [5.0, -0.35],
+              [10.0, 0.1],
+              [50.0, -1.3]
             ],
             "preWet": false,
             "mix": {
@@ -4487,7 +4607,11 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 100.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -4505,18 +4629,19 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 125.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
-              [5.0, -2.1],
-              [10.0, -1.7],
-              [50.0, -3.3]
+              [0.0, 0.0],
+              [5.0, -0.35],
+              [10.0, 0.1],
+              [50.0, -1.3]
             ],
             "mix": {
               "enable": false,
@@ -4526,15 +4651,15 @@
               }
             },
             "pushOutByVolume": [
-              [5.0, 10.0],
-              [10.0, 5.0],
-              [45.0, 5.0],
+              [5.0, 0.0],
+              [10.0, 0.0],
+              [45.0, 0.0],
               [50.0, 0.0]
             ],
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 2.0
               }
             }
           },
@@ -4575,7 +4700,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 125.0
+                  "flowRate": 100.0
                 }
               },
               "touchTip": {
@@ -4594,18 +4719,19 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 125.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
-              [5.0, -2.1],
-              [10.0, -1.7],
-              [50.0, -3.3]
+              [0.0, 0.0],
+              [5.0, -0.35],
+              [10.0, 0.1],
+              [50.0, -1.3]
             ],
             "conditioningByVolume": [
               [1.0, 5.0],
@@ -4622,7 +4748,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 2.0
               }
             }
           }
@@ -4691,9 +4817,10 @@
               [200.0, 200.0]
             ],
             "correctionByVolume": [
-              [5.0, -1.5],
+              [0.0, 0.0],
+              [5.0, -0.25],
               [50.0, -2.2],
-              [200.0, -7.4]
+              [200.0, -8.9]
             ],
             "preWet": false,
             "mix": {
@@ -4744,7 +4871,11 @@
                 [200.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 100.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -4762,18 +4893,19 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 125.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
-              [5.0, -1.5],
+              [0.0, 0.0],
+              [5.0, -0.25],
               [50.0, -2.2],
-              [200.0, -7.4]
+              [200.0, -8.9]
             ],
             "mix": {
               "enable": false,
@@ -4783,14 +4915,14 @@
               }
             },
             "pushOutByVolume": [
-              [5.0, 8.0],
-              [50.0, 4.0],
-              [200.0, 4.0]
+              [5.0, 0.0],
+              [50.0, 0.0],
+              [200.0, 0.0]
             ],
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 1.0
               }
             }
           },
@@ -4831,7 +4963,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 125.0
+                  "flowRate": 100.0
                 }
               },
               "touchTip": {
@@ -4850,18 +4982,19 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 125.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
-              [5.0, -1.5],
+              [0.0, 0.0],
+              [5.0, -0.25],
               [50.0, -2.2],
-              [200.0, -7.4]
+              [200.0, -8.9]
             ],
             "conditioningByVolume": [
               [1.0, 5.0],
@@ -4878,7 +5011,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 1.0
               }
             }
           }
@@ -4947,9 +5080,10 @@
               [200.0, 200.0]
             ],
             "correctionByVolume": [
-              [5.0, -1.5],
+              [0.0, 0.0],
+              [5.0, -0.25],
               [50.0, -2.2],
-              [200.0, -7.4]
+              [200.0, -8.9]
             ],
             "preWet": false,
             "mix": {
@@ -5000,7 +5134,11 @@
                 [200.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 100.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -5018,18 +5156,19 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 125.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
-              [5.0, -1.5],
+              [0.0, 0.0],
+              [5.0, -0.25],
               [50.0, -2.2],
-              [200.0, -7.4]
+              [200.0, -8.9]
             ],
             "mix": {
               "enable": false,
@@ -5039,14 +5178,14 @@
               }
             },
             "pushOutByVolume": [
-              [5.0, 8.0],
-              [50.0, 4.0],
-              [200.0, 4.0]
+              [5.0, 0.0],
+              [50.0, 0.0],
+              [200.0, 0.0]
             ],
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 1.0
               }
             }
           },
@@ -5087,7 +5226,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 125.0
+                  "flowRate": 100.0
                 }
               },
               "touchTip": {
@@ -5106,18 +5245,19 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 125.0]],
+            "flowRateByVolume": [[0.0, 100.0]],
             "correctionByVolume": [
-              [5.0, -1.5],
+              [0.0, 0.0],
+              [5.0, -0.25],
               [50.0, -2.2],
-              [200.0, -7.4]
+              [200.0, -8.9]
             ],
             "conditioningByVolume": [
               [1.0, 5.0],
@@ -5134,7 +5274,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 1.0
               }
             }
           }
@@ -5203,8 +5343,9 @@
               [200.0, 200.0]
             ],
             "correctionByVolume": [
-              [10.0, -1.9],
-              [100.0, -3.6],
+              [0.0, 0.0],
+              [10.0, -0.4],
+              [100.0, -2.6],
               [1000.0, -32.2]
             ],
             "preWet": false,
@@ -5256,7 +5397,11 @@
                 [1000.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 200.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -5274,7 +5419,7 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -5283,8 +5428,9 @@
             },
             "flowRateByVolume": [[0.0, 200.0]],
             "correctionByVolume": [
-              [10.0, -1.9],
-              [100.0, -3.6],
+              [0.0, 0.0],
+              [10.0, -0.4],
+              [100.0, -2.6],
               [1000.0, -32.2]
             ],
             "mix": {
@@ -5295,14 +5441,14 @@
               }
             },
             "pushOutByVolume": [
-              [10.0, 6.0],
-              [100.0, 3.0],
-              [1000.0, 3.0]
+              [10.0, 0.0],
+              [100.0, 0.0],
+              [1000.0, 0.0]
             ],
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 1.0
               }
             }
           },
@@ -5362,7 +5508,7 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -5371,8 +5517,9 @@
             },
             "flowRateByVolume": [[0.0, 200.0]],
             "correctionByVolume": [
-              [10.0, -1.9],
-              [100.0, -3.6],
+              [0.0, 0.0],
+              [10.0, -0.4],
+              [100.0, -2.6],
               [1000.0, -32.2]
             ],
             "conditioningByVolume": [
@@ -5390,7 +5537,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 1.0
               }
             }
           }
@@ -5459,8 +5606,9 @@
               [200.0, 200.0]
             ],
             "correctionByVolume": [
-              [10.0, -1.9],
-              [100.0, -3.6],
+              [0.0, 0.0],
+              [10.0, -0.4],
+              [100.0, -2.6],
               [1000.0, -32.2]
             ],
             "preWet": false,
@@ -5512,7 +5660,11 @@
                 [1000.0, 0.0]
               ],
               "blowout": {
-                "enable": false
+                "enable": false,
+                "params": {
+                  "location": "destination",
+                  "flowRate": 200.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -5530,7 +5682,7 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -5539,8 +5691,9 @@
             },
             "flowRateByVolume": [[0.0, 200.0]],
             "correctionByVolume": [
-              [10.0, -1.9],
-              [100.0, -3.6],
+              [0.0, 0.0],
+              [10.0, -0.4],
+              [100.0, -2.6],
               [1000.0, -32.2]
             ],
             "mix": {
@@ -5551,14 +5704,14 @@
               }
             },
             "pushOutByVolume": [
-              [10.0, 6.0],
-              [100.0, 3.0],
-              [1000.0, 3.0]
+              [10.0, 0.0],
+              [100.0, 0.0],
+              [1000.0, 0.0]
             ],
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 1.0
               }
             }
           },
@@ -5618,7 +5771,7 @@
               }
             },
             "dispensePosition": {
-              "positionReference": "well-top",
+              "positionReference": "well-bottom",
               "offset": {
                 "x": 0,
                 "y": 0,
@@ -5627,8 +5780,9 @@
             },
             "flowRateByVolume": [[0.0, 200.0]],
             "correctionByVolume": [
-              [10.0, -1.9],
-              [100.0, -3.6],
+              [0.0, 0.0],
+              [10.0, -0.4],
+              [100.0, -2.6],
               [1000.0, -32.2]
             ],
             "conditioningByVolume": [
@@ -5646,7 +5800,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 1.0
               }
             }
           }

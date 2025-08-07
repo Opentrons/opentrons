@@ -33,7 +33,10 @@ export const forDropTipInPlace = (
   const { pipetteId } = params
   const { robotState } = robotStateAndWarnings
   const entityId = robotState.pipettes[pipetteId].entityId ?? ''
-  robotState.tipState.pipettes[pipetteId] = false
+  robotState.tipState.pipettes[pipetteId] = {
+    hasTip: false,
+    tiprackURI: null,
+  }
 
   dispenseUpdateLiquidState({
     invariantContext,
@@ -43,4 +46,6 @@ export const forDropTipInPlace = (
     robotStateAndWarnings,
     entityId,
   })
+
+  robotState.pipettes[pipetteId].tiprackId = undefined
 }

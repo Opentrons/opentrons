@@ -4,7 +4,11 @@ import pickBy from 'lodash/pickBy'
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 
+import { getAllLabwareDefs } from '@opentrons/shared-data'
+
 import { getPDMetadata } from '../../file-types'
+import { getOnlyLatestDefs } from '../../labware-defs'
+import { getMigratedLabwareId } from '../utils'
 
 import type { Reducer } from 'redux'
 import type {
@@ -125,7 +129,7 @@ const selectedLiquidGroup = handleActions(
     EDIT_LIQUID_GROUP: () => unselectedLiquidGroupState, // clear on form save
   },
   unselectedLiquidGroupState
-)
+) as Reducer<SelectedLiquidGroupState, Action>
 const initialLabwareState: ContainersState = {}
 // @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
 // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
@@ -180,10 +184,19 @@ export const containers: Reducer<ContainersState, any> = handleActions(
     ): ContainersState => {
       const { file } = action.payload
       const metadata = getPDMetadata(file)
+      const allLabwareDefs = getAllLabwareDefs()
+      const latestDefs = getOnlyLatestDefs()
       const containers: ContainersState = Object.entries(
         metadata.labware
       ).reduce((acc: ContainersState, [id, labwareLoadInfo], key) => {
-        acc[id] = {
+        const latestLabwareId = getMigratedLabwareId(
+          id,
+          metadata.labware,
+          allLabwareDefs,
+          latestDefs
+        )
+
+        acc[latestLabwareId] = {
           nickname: labwareLoadInfo.displayName,
           disambiguationNumber: key,
         }
@@ -299,7 +312,26 @@ export const ingredLocations: Reducer<LocationsState, any> = handleActions(
     LOAD_FILE: (
       state: LocationsState,
       action: LoadFileAction
-    ): LocationsState => getPDMetadata(action.payload.file).ingredLocations,
+    ): LocationsState => {
+      const ingredLocations = getPDMetadata(action.payload.file).ingredLocations
+      const labware = getPDMetadata(action.payload.file).labware
+      const allLabwareDefs = getAllLabwareDefs()
+      const latestDefs = getOnlyLatestDefs()
+
+      return Object.entries(ingredLocations).reduce(
+        (acc: LocationsState, [labwareId, liquidIngredient]) => {
+          const latestLabwareId = getMigratedLabwareId(
+            labwareId,
+            labware,
+            allLabwareDefs,
+            latestDefs
+          )
+          acc[latestLabwareId] = liquidIngredient
+          return acc
+        },
+        {}
+      )
+    },
   },
   {}
 )
@@ -313,7 +345,7 @@ const selectedSlotInfoInitialState: ZoomedIntoSlotInfoState = {
   selectedSlot: { slot: null, cutout: null },
 }
 
-export const zoomedInSlotInfo = (
+export const zoomedInSlotInfo = ((
   state: ZoomedIntoSlotInfoState = selectedSlotInfoInitialState,
   action:
     | SelectTopLabwareAction
@@ -332,7 +364,11 @@ export const zoomedInSlotInfo = (
         ...state,
         selectedTopLabware: {
           labwareDefURI,
-          amount: state.selectedTopLabware.amount,
+          // defaults amount to 1 if labware is selected
+          amount:
+            labwareDefURI != null && state.selectedTopLabware.amount === 0
+              ? 1
+              : state.selectedTopLabware.amount,
         },
       }
     }
@@ -399,13 +435,13 @@ export const zoomedInSlotInfo = (
     default:
       return state
   }
-}
+}) as Reducer<ZoomedIntoSlotInfoState, Action>
 
 const initialGenerateNewProtocolState: GenerateNewProtocolState = {
   isNewProtocol: false,
 }
 
-export const generateNewProtocol = (
+export const generateNewProtocol = ((
   state: GenerateNewProtocolState = initialGenerateNewProtocolState,
   action: GenerateNewProtocolAction
 ): GenerateNewProtocolState => {
@@ -417,7 +453,7 @@ export const generateNewProtocol = (
     default:
       return state
   }
-}
+}) as Reducer<GenerateNewProtocolState, Action>
 export interface RootState {
   zoomedInSlotInfo: ZoomedIntoSlotInfoState
   modeLabwareSelection: DeckSlot | false
@@ -429,8 +465,9 @@ export interface RootState {
   ingredLocations: LocationsState
   generateNewProtocol: GenerateNewProtocolState
 }
+
 // TODO Ian 2018-01-15 factor into separate files
-export const rootReducer: Reducer<RootState, Action> = combineReducers({
+export const rootReducer = combineReducers({
   zoomedInSlotInfo,
   modeLabwareSelection,
   selectedContainerId,
@@ -440,4 +477,4 @@ export const rootReducer: Reducer<RootState, Action> = combineReducers({
   ingredients,
   ingredLocations,
   generateNewProtocol,
-})
+}) as Reducer<RootState, Action>

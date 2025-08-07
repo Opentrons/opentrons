@@ -8,6 +8,7 @@ import {
   uuid,
 } from '@opentrons/step-generation'
 
+import { getLoadLiquidClassCommands } from '../../load-file/migration/utils/getLoadLiquidClassCommands'
 import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
 
 import type {
@@ -32,6 +33,7 @@ import type {
   TimelineFrame,
 } from '@opentrons/step-generation'
 import type { Labware, Modules, Pipettes } from '../../file-types'
+import type { SavedStepFormState } from '../../step-forms/reducers'
 
 interface MappedPipettes {
   [pipetteId: string]: { name: PipetteName }
@@ -44,7 +46,8 @@ export const getLoadCommands = (
   labwareEntities: LabwareEntities,
   labwareNicknamesById: Record<string, string>,
   liquidEntities: LiquidEntities,
-  ingredLocations: LabwareLiquidState
+  ingredLocations: LabwareLiquidState,
+  savedStepForms: SavedStepFormState
 ): CreateCommand[] => {
   const pipettes: MappedPipettes = mapValues(
     initialRobotState.pipettes,
@@ -178,6 +181,11 @@ export const getLoadCommands = (
     ingredLocations
   )
 
+  const loadLiquidClassCommands = getLoadLiquidClassCommands(
+    pipetteEntities,
+    savedStepForms
+  )
+
   const loadModuleCommands = map(
     initialRobotState.modules,
     (
@@ -206,6 +214,7 @@ export const getLoadCommands = (
     ...loadAdapterCommands,
     ...loadLabwareCommands,
     ...loadLiquidCommands,
+    ...loadLiquidClassCommands,
   ]
 }
 

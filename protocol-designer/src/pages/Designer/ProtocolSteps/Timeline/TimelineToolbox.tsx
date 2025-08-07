@@ -21,7 +21,7 @@ import {
   LINK_BUTTON_STYLE,
   NAV_BAR_HEIGHT_REM,
 } from '../../../../components/atoms'
-import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
+import { useKitchen } from '../../../../components/organisms/Kitchen/useKitchen'
 import { getFileMetadata } from '../../../../file-data/selectors'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import {
@@ -131,9 +131,9 @@ export function TimelineToolbox({
       maxHeight={`calc(100vh - ${NAV_BAR_HEIGHT_REM}rem - 2 * ${SPACING.spacing12})`}
       width={`${sidebarWidth / 16}rem`}
       title={
-        <Flex flexDirection={DIRECTION_COLUMN}>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           <StyledText
-            desktopStyle="bodyDefaultSemiBold"
+            desktopStyle="bodyLargeSemiBold"
             overflowWrap={OVERFLOW_WRAP_ANYWHERE}
             css={LINE_CLAMP_TEXT_STYLE(1)}
           >
@@ -156,7 +156,10 @@ export function TimelineToolbox({
       childrenPadding="0px"
       confirmButton={
         formData != null ? undefined : (
-          <AddStepButton hasText={sidebarWidth > SIDEBAR_MIN_WIDTH_FOR_ICON} />
+          <AddStepButton
+            hasText={sidebarWidth > SIDEBAR_MIN_WIDTH_FOR_ICON}
+            sidebarWidth={sidebarWidth}
+          />
         )
       }
     >

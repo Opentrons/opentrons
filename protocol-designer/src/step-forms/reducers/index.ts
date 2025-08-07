@@ -8,6 +8,7 @@ import { handleActions } from 'redux-actions'
 import {
   FLEX_SIMPLEST_DECK_CONFIG,
   getAllDefinitions,
+  getAllLabwareDefs,
   getLabwareDefaultEngageHeight,
   getLabwareDefURI,
   getModuleType,
@@ -19,7 +20,14 @@ import { GRIPPER_LOCATION } from '@opentrons/step-generation'
 
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 import { getPDMetadata } from '../../file-types'
-import { rootReducer as labwareDefsRootReducer } from '../../labware-defs'
+import {
+  getOnlyLatestDefs,
+  rootReducer as labwareDefsRootReducer,
+} from '../../labware-defs'
+import {
+  getMigratedLabwareId,
+  getMigratedURI,
+} from '../../labware-ingred/utils'
 import {
   getDefaultsForStepType,
   handleFormChange,
@@ -366,50 +374,119 @@ export const savedStepForms = (
 
     case 'LOAD_FILE': {
       const { file } = action.payload
-      const stepFormsFromFile = getPDMetadata(file).savedStepForms
-      return mapValues(stepFormsFromFile, stepForm => ({
-        ...getDefaultsForStepType(stepForm.stepType),
-        ...stepForm,
-      }))
+      const metadata = getPDMetadata(file)
+      const { savedStepForms: stepFormsFromFile, labware } = metadata
+      const prevInitialDeckSetupStep =
+        stepFormsFromFile[INITIAL_DECK_SETUP_STEP_ID]
+      const formLabwareLocationUpdate: Record<string, string> =
+        prevInitialDeckSetupStep.labwareLocationUpdate
+      const allLabware = getAllDefinitions()
+      const latestDefs = getOnlyLatestDefs()
+      const updatedLabwareLocationUpdate = Object.entries(
+        formLabwareLocationUpdate
+      ).reduce((acc: Record<string, string>, [id, location]) => {
+        const updatedLabwareId = getMigratedLabwareId(
+          id,
+          labware,
+          allLabware,
+          latestDefs
+        )
+        acc[updatedLabwareId] = location
+        return acc
+      }, {})
+
+      return mapValues(stepFormsFromFile, (stepForm: FormData, formId) => {
+        if (formId === INITIAL_DECK_SETUP_STEP_ID) {
+          return {
+            ...prevInitialDeckSetupStep,
+            labwareLocationUpdate: {
+              ...updatedLabwareLocationUpdate,
+            },
+          }
+        } else if (
+          stepForm.stepType === 'mix' ||
+          stepForm.stepType === 'moveLabware'
+        ) {
+          return {
+            ...getDefaultsForStepType(stepForm.stepType),
+            ...stepForm,
+            labware: getMigratedLabwareId(
+              stepForm.labware as string,
+              labware,
+              allLabware,
+              latestDefs
+            ),
+            tipRack:
+              stepForm.stepType === 'mix'
+                ? getMigratedURI(
+                    stepForm.tipRack as string,
+                    allLabware,
+                    latestDefs
+                  )
+                : undefined,
+          }
+        } else if (stepForm.stepType === 'moveLiquid') {
+          return {
+            ...getDefaultsForStepType(stepForm.stepType),
+            ...stepForm,
+            aspirate_labware: getMigratedLabwareId(
+              stepForm.aspirate_labware as string,
+              labware,
+              allLabware,
+              latestDefs
+            ),
+            dispense_labware: getMigratedLabwareId(
+              stepForm.dispense_labware as string,
+              labware,
+              allLabware,
+              latestDefs
+            ),
+            tipRack: getMigratedURI(
+              stepForm.tipRack as string,
+              allLabware,
+              latestDefs
+            ),
+          }
+        }
+        return {
+          ...getDefaultsForStepType(stepForm.stepType),
+          ...stepForm,
+        }
+      })
     }
     case 'CREATE_DECK_FIXTURE': {
       const { id, location, name } = action.payload
       const prevInitialDeckSetupStep =
         savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
       const locationUpdate = `${name}LocationUpdate`
-      return mapValues(
-        savedStepForms,
-        (form: FormData): FormData => {
-          if (form.stepType === 'manualIntervention') {
-            return {
-              ...form,
-              [INITIAL_DECK_SETUP_STEP_ID]: {
-                ...prevInitialDeckSetupStep,
-                [locationUpdate]: {
-                  ...prevInitialDeckSetupStep[locationUpdate],
-                  [id]: location,
-                },
-              },
-            }
-          } else if (
-            form.dropTip_location == null &&
-            (name === 'trashBin' || name === 'wasteChute')
-          ) {
-            return {
-              ...form,
-              ...handleFormChange(
-                {
-                  dropTip_location: id,
-                },
-                form,
-                _getPipetteEntitiesRootState(rootState),
-                _getLabwareEntitiesRootState(rootState)
-              ),
-            }
+      return mapValues(savedStepForms, (savedForm: FormData, formId) => {
+        if (formId === INITIAL_DECK_SETUP_STEP_ID) {
+          return {
+            ...prevInitialDeckSetupStep,
+            [locationUpdate]: {
+              ...prevInitialDeckSetupStep[locationUpdate],
+              [id]: location,
+            },
           }
-          return form
+        } else if (
+          (locationUpdate[savedForm.dropTip_location] == null ||
+            savedForm.dropTip_location == null) &&
+          (name === 'trashBin' || name === 'wasteChute')
+        ) {
+          return {
+            ...savedForm,
+            ...handleFormChange(
+              {
+                dropTip_location: id,
+              },
+              savedForm,
+              _getPipetteEntitiesRootState(rootState),
+              _getLabwareEntitiesRootState(rootState)
+            ),
+          }
         }
-      )
+        return savedForm
+      })
     }
     case 'DELETE_DECK_FIXTURE': {
       const { id } = action.payload
@@ -740,6 +817,7 @@ export const savedStepForms = (
               ...handleFormChange(
                 {
                   pipette: null,
+                  tipRack: null,
                 },
                 form,
                 _getPipetteEntitiesRootState(rootState),
@@ -1069,11 +1147,13 @@ export const labwareInvariantProperties: Reducer<
       const metadata = getPDMetadata(file)
       const labwareDefinitionsFromFile = file.labwareDefinitions
       const allLabware = getAllDefinitions()
+      const latestDefs = getOnlyLatestDefs()
       let labware: NormalizedLabwareById = {}
 
       labware = Object.entries(metadata.labware).reduce(
         (acc: NormalizedLabwareById, [id, labwareLoadInfo]) => {
           const labwareDefURI = labwareLoadInfo.labwareDefURI
+
           const definition =
             //  labwareDefinitionsFromFile from file are either customLabware for py
             //  or all labwareDefs for JSON
@@ -1086,6 +1166,11 @@ export const labwareInvariantProperties: Reducer<
             )
           }
 
+          const loadName = definition.parameters.loadName
+          const latestDefURI = Object.entries(latestDefs).find(
+            ([_, def]) => def.parameters.loadName === loadName
+          )?.[0]
+
           const displayCategory =
             definition?.metadata.displayCategory ?? 'otherLabware'
 
@@ -1093,8 +1178,14 @@ export const labwareInvariantProperties: Reducer<
             lw => lw.displayCategory === displayCategory
           ).length
 
-          acc[id] = {
-            labwareDefURI,
+          const labwareIdString = id.split(':')[0]
+          const latestLabwareId =
+            latestDefURI != null
+              ? `${labwareIdString}:${latestDefURI}`
+              : labwareDefURI
+
+          acc[latestLabwareId] = {
+            labwareDefURI: latestDefURI ?? labwareDefURI,
             pythonName: getLabwarePythonName(
               displayCategory,
               displayCategoryCount + 1
@@ -1231,19 +1322,24 @@ export const pipetteInvariantProperties: Reducer<
     ): NormalizedPipetteById => {
       const { file } = action.payload
       const metadata = getPDMetadata(file)
+      const allLabwareDefs = getAllLabwareDefs()
+      const latestDefs = getOnlyLatestDefs()
       const pipettes = Object.entries(metadata.pipettes).reduce(
         (
           acc: NormalizedPipetteById,
           [id, pipetteLoadInfo]: [string, PipetteLoadInfo]
         ) => {
           const tiprackDefURI = metadata.pipetteTiprackAssignments[id]
+          const latestTiprackDefURIs = tiprackDefURI.map(uri =>
+            getMigratedURI(uri, allLabwareDefs, latestDefs)
+          )
 
           return {
             ...acc,
             [id]: {
               id,
               name: pipetteLoadInfo.pipetteName as PipetteName,
-              tiprackDefURI,
+              tiprackDefURI: latestTiprackDefURIs,
             },
           }
         },

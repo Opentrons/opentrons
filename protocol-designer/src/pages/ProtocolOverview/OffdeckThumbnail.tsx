@@ -18,9 +18,11 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { getSlotInLocationStack } from '@opentrons/step-generation'
+import {
+  getSlotInLocationStack,
+  wellFillFromWellContents,
+} from '@opentrons/step-generation'
 
-import { wellFillFromWellContents } from '../../components/organisms/LabwareOnDeck/utils'
 import { getRobotType } from '../../file-data/selectors'
 import { selectors } from '../../labware-ingred/selectors'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
@@ -65,9 +67,10 @@ export function OffDeckThumbnail(props: OffDeckThumbnailProps): JSX.Element {
           width="100%"
           color={COLORS.grey60}
           alignItems={ALIGN_CENTER}
-          gridGap={SPACING.spacing8}
+          gridGap={SPACING.spacing12}
+          flexDirection={DIRECTION_COLUMN}
         >
-          <Icon name="ot-alert" size="1rem" />
+          <Icon name="ot-alert" size="1.25rem" />
           <StyledText desktopStyle="bodyDefaultSemiBold">
             {t('no_offdeck_labware')}
           </StyledText>
@@ -118,6 +121,7 @@ export function OffDeckThumbnail(props: OffDeckThumbnailProps): JSX.Element {
                         <>
                           <LabwareRender
                             definition={definition}
+                            positioningMode="offsetInSlot"
                             wellFill={wellFillFromWellContents(
                               wellContents,
                               liquidDisplayColors

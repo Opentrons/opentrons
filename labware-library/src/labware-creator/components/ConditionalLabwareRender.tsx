@@ -93,7 +93,13 @@ const PopulatedPreview = (props: {
         bBox == null ? '0 0 0 0' : calculateViewBox(bBox)
       }
     >
-      {() => <LabwareRender definition={definition} gRef={gRef} />}
+      {() => (
+        <LabwareRender
+          definition={definition}
+          positioningMode="offsetInSlot"
+          gRef={gRef}
+        />
+      )}
     </RobotWorkSpace>
   )
 }
@@ -106,6 +112,8 @@ const Placeholder = (): JSX.Element => {
       {() => (
         <>
           <LabwareOutline
+            minX={0}
+            minY={0}
             width={DEFAULT_X_DIMENSION}
             height={DEFAULT_Y_DIMENSION}
           />

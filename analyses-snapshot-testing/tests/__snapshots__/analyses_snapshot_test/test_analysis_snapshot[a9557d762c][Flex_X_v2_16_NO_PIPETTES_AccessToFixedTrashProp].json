@@ -49,12 +49,7 @@
       ]
     }
   ],
-  "files": [
-    {
-      "name": "Flex_X_v2_16_NO_PIPETTES_AccessToFixedTrashProp.py",
-      "role": "main"
-    }
-  ],
+  "files": [],
   "labware": [],
   "liquidClasses": [],
   "liquids": [],

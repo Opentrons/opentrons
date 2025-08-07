@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import { last } from 'lodash'
+import last from 'lodash/last'
 import { css } from 'styled-components'
 
 import {
@@ -40,7 +40,7 @@ import {
   ConfirmDeleteModal,
   getMainPagePortalEl,
 } from '../../../../components/organisms'
-import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
+import { useKitchen } from '../../../../components/organisms/Kitchen/useKitchen'
 import { OFFDECK } from '../../../../constants'
 import { getEnableComment } from '../../../../feature-flags/selectors'
 import {
@@ -66,9 +66,13 @@ import type { BaseState } from '../../../../types'
 
 interface AddStepButtonProps {
   hasText: boolean
+  sidebarWidth: number
 }
 
-export function AddStepButton({ hasText }: AddStepButtonProps): JSX.Element {
+export function AddStepButton({
+  hasText,
+  sidebarWidth,
+}: AddStepButtonProps): JSX.Element {
   const { t } = useTranslation(['tooltip', 'button', 'starting_deck_state'])
   const enableComment = useSelector(getEnableComment)
   const { makeSnackbar } = useKitchen()

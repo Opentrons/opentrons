@@ -18,6 +18,7 @@ import {
 } from '@opentrons/shared-data'
 import {
   COLUMN_4_SLOTS,
+  getSlotInLocationStack,
   getTopLocationInStack,
 } from '@opentrons/step-generation'
 
@@ -187,11 +188,12 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
 
     const unoccupiedAdapterOptions = Object.entries(labware).reduce<Option[]>(
       (acc, [labwareId, labwareOnDeck]) => {
-        const labwareOnAdapter = Object.values(labware).find(
-          temporalProperties =>
-            getTopLocationInStack(temporalProperties.stack) === labwareId
+        const hasLabwareAboveAdapter = Object.values(labware).some(
+          ({ stack }) =>
+            stack.includes(labwareId) &&
+            getTopLocationInStack(stack) !== labwareId
         )
-        const adapterSlot = getTopLocationInStack(labwareOnDeck.stack)
+        const adapterSlot = getSlotInLocationStack(labwareOnDeck.stack)
         const modIdWithAdapter = Object.keys(modules).find(modId =>
           labwareOnDeck.stack.includes(modId)
         )
@@ -206,7 +208,8 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
             : 'unknown module'
         const moduleSlotInfo = modSlot ?? 'unknown slot'
         const adapterSlotInfo = adapterSlot ?? 'unknown adapter'
-        return labwareOnAdapter == null && isAdapter
+
+        return isAdapter && !hasLabwareAboveAdapter
           ? [
               ...acc,
               {
@@ -227,7 +230,7 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
     const unoccupiedModuleOptions = Object.entries(modules).reduce<Option[]>(
       (acc, [modId, modOnDeck]) => {
         const moduleHasLabware = Object.entries(labware).some(
-          ([_, lwOnDeck]) => lwOnDeck.stack[0] === modId
+          ([_, lwOnDeck]) => lwOnDeck.stack[lwOnDeck.stack.length - 2] === modId
         )
         const type = moduleEntities[modId].type
         const slot = modOnDeck.slot
@@ -266,24 +269,23 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
       )
     )
 
-    const unoccupiedSlotOptions = allSlotIds
-      .filter(slotId => {
-        const isTrashSlot =
-          robotType === FLEX_ROBOT_TYPE
-            ? MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(slotId)
-            : ['fixedTrash', '12'].includes(slotId)
-        return (
-          !slotIdsOccupiedByModules.includes(slotId) &&
-          !Object.values(labware).some(lw => lw.stack.includes(slotId)) &&
-          !isTrashSlot &&
-          !trashCutouts.some(cutout => cutout.includes(slotId)) &&
-          !WASTE_CHUTE_ADDRESSABLE_AREAS.includes(slotId) &&
-          !notSelectedStagingAreaAddressableAreas.includes(slotId) &&
-          !FLEX_MODULE_ADDRESSABLE_AREAS.includes(slotId) &&
-          !FLEX_STACKER_ADDRESSABLE_AREAS.includes(slotId)
-        )
-      })
-      .map(slotId => ({ name: slotId, value: slotId, deckLabel: slotId }))
+    const unoccupiedSlotOptions = allSlotIds.reduce<Option[]>((acc, slotId) => {
+      const isTrashSlot =
+        robotType === FLEX_ROBOT_TYPE
+          ? MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(slotId)
+          : ['fixedTrash', '12'].includes(slotId)
+      return !slotIdsOccupiedByModules.includes(slotId) &&
+        !Object.values(labware).some(lw => lw.stack.includes(slotId)) &&
+        !isTrashSlot &&
+        !trashCutouts.some(cutout => cutout.includes(slotId)) &&
+        !WASTE_CHUTE_ADDRESSABLE_AREAS.includes(slotId) &&
+        !notSelectedStagingAreaAddressableAreas.includes(slotId) &&
+        !FLEX_MODULE_ADDRESSABLE_AREAS.includes(slotId) &&
+        !FLEX_STACKER_ADDRESSABLE_AREAS.includes(slotId)
+        ? [...acc, { name: slotId, value: slotId, deckLabel: slotId }]
+        : acc
+    }, [])
+
     const offDeck = {
       name: 'Off-deck',
       value: OFFDECK,
@@ -295,20 +297,13 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
       deckLabel: 'D3',
     }
 
-    return hasWasteChute
-      ? [
-          wasteChuteSlot,
-          ...unoccupiedAdapterOptions,
-          ...unoccupiedModuleOptions,
-          ...unoccupiedSlotOptions,
-          offDeck,
-        ]
-      : [
-          ...unoccupiedAdapterOptions,
-          ...unoccupiedModuleOptions,
-          ...unoccupiedSlotOptions,
-          offDeck,
-        ]
+    return [
+      ...(hasWasteChute ? [wasteChuteSlot] : []),
+      ...unoccupiedAdapterOptions,
+      ...unoccupiedModuleOptions,
+      ...unoccupiedSlotOptions,
+      offDeck,
+    ]
   }
 )
 

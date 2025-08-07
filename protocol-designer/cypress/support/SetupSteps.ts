@@ -57,7 +57,7 @@ export enum SetupContent {
   SampleLiquidName = 'My liquid!',
   ProtocolSteps = 'Protocol steps',
   AddStep = 'Add Step',
-  NestDeepWell = 'NEST 96 Deep Well Plate 2mL',
+  NestDeepWell = 'NEST 96 Deep Well Plate 2 mL',
   Save = 'Save',
 }
 
@@ -92,7 +92,7 @@ export enum SetupLocators {
 }
 
 export const RegexSetupContent = {
-  slotText: /Edit (slot|labware)/i,
+  slotText: /(Add|Edit) labware/i,
 }
 
 /**
@@ -381,7 +381,6 @@ export const SetupSteps = {
   ChoseDeckSlotC2Labware: (): StepThunk => ({
     call: () => {
       chooseDeckSlot('C2')
-        .find('.Box-sc-8ozbhb-0.kIDovv')
         .find('a[role="button"]')
         .contains(RegexSetupContent.slotText)
         .click({ force: true })
@@ -400,15 +399,6 @@ export const SetupSteps = {
    * Adds labware to a deck slot.
    */
   AddHardwareLabware: (): StepThunk => ({
-    call: () => {
-      cy.get('button[data-testid="SlotOverflowMenu_openTools"]').click()
-    },
-  }),
-
-  /**
-   * Edits existing labware/hardware on a deck slot.
-   */
-  EditHardwareLabwareOnDeck: (): StepThunk => ({
     call: () => {
       cy.get('button[data-testid="SlotOverflowMenu_openTools"]').click()
     },
@@ -612,7 +602,7 @@ export const SetupSteps = {
   }),
 
   /**
-   * Adds "NEST 96 Deep Well Plate 2mL".
+   * Adds "NEST 96 Deep Well Plate 2 mL".
    */
   AddNest96DeepWellPlate: (): StepThunk => ({
     call: () => {
@@ -1182,7 +1172,7 @@ export const CompositeSetupSteps = {
         `Running AddLabwareToDeckSlot with slot ${deckSlot} and labware ${labwareName}`
       )
       SetupSteps.ChoseDeckSlotWithLabware(slotToUse).call()
-      SetupSteps.AddHardwareLabware().call()
+      // SetupSteps.AddHardwareLabware().call()
       SetupSteps.OpenSelectLabwareModal().call()
       SetupSteps.ClickWellPlatesSection().call()
       SetupSteps.SelectLabwareByDisplayName(labwareToUse).call()

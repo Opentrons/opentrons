@@ -14,10 +14,10 @@ import {
 
 import { analyticsEvent } from '../../../../analytics/actions'
 import { OPEN_STEP_DETAILS_EVENT } from '../../../../analytics/constants'
+import { OVERFLOW_MENU_POSITION_ADJUSTMENT } from '../../../../constants'
 import {
   getBatchEditFormHasUnsavedChanges,
   getCurrentFormHasUnsavedChanges,
-  getPipetteEntities,
   getSavedStepForms,
   getUnsavedForm,
 } from '../../../../step-forms/selectors'
@@ -45,8 +45,6 @@ interface StepOverflowMenuProps {
   sidebarWidth: number // adjust the position of the overflow menu
 }
 
-const POSITION_ADJUSTMENT = 4
-
 export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
   const {
     stepId,
@@ -69,7 +67,6 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const formData = useSelector(getUnsavedForm)
   const savedStepFormData = useSelector(getSavedStepForms)[stepId]
-  const pipetteEntities = useSelector(getPipetteEntities)
 
   const isPipetteStep =
     savedStepFormData.stepType === 'moveLiquid' ||
@@ -77,8 +74,6 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
   const isThermocyclerProfile =
     savedStepFormData.stepType === 'thermocycler' &&
     savedStepFormData.thermocyclerFormType === 'thermocyclerProfile'
-  const is96Channel =
-    pipetteEntities[savedStepFormData.pipette]?.name === 'p1000_96'
 
   const duplicateStep = (
     stepId: StepIdType
@@ -106,7 +101,7 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
         ref={menuRootRef}
         zIndex={12}
         top={top}
-        left={sidebarWidth - POSITION_ADJUSTMENT} // the space between kebab menu button and overflow menu is 8px
+        left={sidebarWidth + OVERFLOW_MENU_POSITION_ADJUSTMENT} // the space between kebab menu button and overflow menu is 8px
         position={POSITION_ABSOLUTE}
         whiteSpace={NO_WRAP}
         borderRadius={BORDERS.borderRadius8}
@@ -144,8 +139,7 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
             {formData != null ? null : (
               <MenuItem onClick={handleEdit}>{t('edit_step')}</MenuItem>
             )}
-            {/* Note the following 96-channel check is temp */}
-            {(isPipetteStep && !is96Channel) || isThermocyclerProfile ? (
+            {isPipetteStep || isThermocyclerProfile ? (
               <MenuItem
                 disabled={formData != null}
                 onClick={() => {

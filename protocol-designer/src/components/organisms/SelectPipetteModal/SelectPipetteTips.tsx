@@ -25,35 +25,32 @@ import { setFeatureFlags } from '../../../feature-flags/actions'
 import { getAllowAllTipracks } from '../../../feature-flags/selectors'
 import { createCustomTiprackDef } from '../../../labware-defs/actions'
 import { removeOpentronsPhrases } from '../../../utils'
-import { useKitchen } from '../Kitchen/hooks'
+import { useKitchen } from '../Kitchen/useKitchen'
 
 import type { ThunkDispatch } from 'redux-thunk'
 import type { Dispatch, SetStateAction } from 'react'
-import type { UseFormSetValue } from 'react-hook-form'
-import type { PipetteMount, RobotType } from '@opentrons/shared-data'
+import type { RobotType } from '@opentrons/shared-data'
 import type { BaseState } from '../../../types'
 
 interface SelectPipetteTipsProps {
-  mount: PipetteMount
   robotType: RobotType
   tiprackOptions: Record<string, string>
-  setValue: UseFormSetValue<any>
   selectedValues: string[]
   pipetteVolume: string | null
   setIncompatibleTip: Dispatch<SetStateAction<boolean>>
+  setSelectedTipracks: Dispatch<SetStateAction<string[]>>
 }
 
 const MAX_TIPRACKS_ALLOWED = 3
 
 export function SelectPipetteTips(props: SelectPipetteTipsProps): JSX.Element {
   const {
-    mount,
     robotType,
     tiprackOptions,
-    setValue,
     selectedValues,
     pipetteVolume,
     setIncompatibleTip,
+    setSelectedTipracks,
   } = props
   const { t } = useTranslation('onboarding')
   const { makeSnackbar } = useKitchen()
@@ -64,18 +61,12 @@ export function SelectPipetteTips(props: SelectPipetteTipsProps): JSX.Element {
     const isCurrentlySelected = selectedValues.includes(value)
 
     if (isCurrentlySelected) {
-      setValue(
-        `pipettesByMount.${mount}.tiprackDefURI`,
-        selectedValues.filter(v => v !== value)
-      )
+      setSelectedTipracks(selectedValues.filter(v => v !== value))
     } else {
       if (selectedValues.length === MAX_TIPRACKS_ALLOWED) {
         makeSnackbar(t('up_to_3_tipracks') as string)
       } else {
-        setValue(`pipettesByMount.${mount}.tiprackDefURI`, [
-          ...selectedValues,
-          value,
-        ])
+        setSelectedTipracks([...selectedValues, value])
       }
     }
   }

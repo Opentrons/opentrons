@@ -84,7 +84,7 @@ def run(protocol: ProtocolContext) -> None:
     if pvt1abr7:
         protocol.pause("SET UP PVT1ABR7")
         res1 = protocol.load_labware(
-            "nest_12_reservoir_15ml", str(SLOTS["LABWARE"][0]), "Reservoir"
+            "opentrons_tough_12_reservoir_22ml", str(SLOTS["LABWARE"][0]), "Reservoir"
         )
         elution_plate = protocol.load_labware(
             "opentrons_96_wellplate_200ul_pcr_full_skirt",
@@ -115,7 +115,7 @@ def run(protocol: ProtocolContext) -> None:
     if pvt1abr9:
         protocol.pause("SET UP PVT1ABR9")
         res1 = protocol.load_labware(
-            "nest_12_reservoir_15ml", str(SLOTS["LABWARE"][0]), "Reservoir"
+            "opentrons_tough_12_reservoir_22ml", str(SLOTS["LABWARE"][0]), "Reservoir"
         )
         elution_plate = protocol.load_labware(
             "opentrons_96_wellplate_200ul_pcr_full_skirt",
@@ -146,13 +146,19 @@ def run(protocol: ProtocolContext) -> None:
     if pvt1abr10:
         protocol.pause("SET UP PVT1ABR10")
         res1 = protocol.load_labware(
-            "nest_12_reservoir_15ml", str(SLOTS["LABWARE"][0]), "Reagent Reservoir 1"
+            "opentrons_tough_12_reservoir_22ml",
+            str(SLOTS["LABWARE"][0]),
+            "Reagent Reservoir 1",
         )
         res2 = protocol.load_labware(
-            "nest_12_reservoir_15ml", str(SLOTS["LABWARE"][1]), "Reagent Reservoir 2"
+            "opentrons_tough_12_reservoir_22ml",
+            str(SLOTS["LABWARE"][1]),
+            "Reagent Reservoir 2",
         )
         res3 = protocol.load_labware(
-            "nest_12_reservoir_15ml", str(SLOTS["LABWARE"][2]), "Reagent Reservoir 3"
+            "opentrons_tough_12_reservoir_22ml",
+            str(SLOTS["LABWARE"][2]),
+            "Reagent Reservoir 3",
         )
         lysis_and_pk = 12320 / 8
         beads_and_binding = 11875 / 8
@@ -464,7 +470,7 @@ def run(protocol: ProtocolContext) -> None:
     if dvt1abr1:
         protocol.pause("SET UP DVT1ABR1")
         reservoir = protocol.load_labware(
-            "nest_12_reservoir_15ml", str(SLOTS["LABWARE"][0])
+            "opentrons_tough_12_reservoir_22ml", str(SLOTS["LABWARE"][0])
         )
         pipette.configure_nozzle_layout(
             style=COLUMN,

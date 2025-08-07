@@ -2,104 +2,96 @@
 
 ## Setup
 
-1. Follow the instructions in [DEV_SETUP.md](../DEV_SETUP.md)
+1. Follow the instructions in [DEV_SETUP.md](../DEV_SETUP.md) for javascript
 1. `cd analyses-snapshot-testing`
-1. use pyenv to install python 3.13 and set it as the local python version for this directory
+1. have uv installed
 1. `make setup`
-1. Have docker installed and ready
 
 ## Concepts
 
-- If working locally the branch you have checked out is the test code/snapshots you are working with.
-  - In CI this is the `SNAPSHOT_REF`. This is the branch or tag of the test code/snapshots that analyses generated will be compared to.
-- The `ANALYSIS_REF` is the branch or tag that you want analyses generated from.
-
-## Build the opentrons-analysis image
-
-> This ALWAYS gets the remote code pushed to Opentrons/opentrons for the specified ANALYSIS_REF
-
-- build the base image
-  - `make build-base-image`
-- build the opentrons-analysis image
-  - `make build-opentrons-analysis ANALYSIS_REF=release`
+- Analysis is done against the local code!!!
+- Protocols to be analyzed are stored in the [files/protocols](./files/protocols) directory
+- Protocols generators, that generate many protocols at test time (not under source control), where a key (override) is injected at the top of the file, are stored in the [files/protocols_with_overrides](./files/protocols/generators) directory
+- Protocols are named according to the [files/README.md](./files/README.md) instructions
+- Protocols are loaded into the analyses battery in [automation/data/protocols.py](./automation/data/protocols.py)
+  - This is AUTOMATICALLY generated
+- Protocols are ALSO loaded from [automation/data/protocols_with_overrides.py](./automation/data/protocols_with_overrides.py)
+  - This is NOT automatically generated
+- Snapshots are stored in the [tests/**snapshots**](./tests/__snapshots__) directory
+  - The test plugin **syrupy** generates these according to the custom snapshotting logic in [tests/custom_json_snapshot_extension.py](./tests/custom_json_snapshot_extension.py)
 
 ## Running the tests locally
 
-- Compare the current branch snapshots to analyses generated from the edge branch
-  - `make build-opentrons-analysis ANALYSIS_REF=edge` this builds a docker image named and tagged `opentrons-analysis:edge`
-    - this pulls the latest edge every time it builds!
-  - `make snapshot-test ANALYSIS_REF=edge`
-    - This runs the test. The test:
-      - Spins up a container from the `opentrons-analysis:edge` image. ANALYSIS_REF=edge specifies the image to use.
-      - Analyses as .json files are generated for all protocols defined in [protocols.py](./automation/data/protocols.py) and [protocols_with_overrides.py](./automation/data/protocols_with_overrides.py)
-      - the test compares the generated analyses to the snapshots in the [./tests/**snapshots**/](./tests/__snapshots__/) directory
+### Run all the tests
 
-## Updating the snapshots
+- `make snapshot-test`
 
-- Assuming you have already built the `opentrons-analysis:edge` image
-- `make snapshot-test-update ANALYSIS_REF=edge`
-  - This will update the snapshots in the [./tests/**snapshots**/](./tests/__snapshots__/) directory with the analyses generated from the edge branch
+### Run some specific tests
 
-## Running the tests against specific protocols
-
-> We are omitting ANALYSIS_REF=edge because we can, it is the default in the Makefile
+These are the property names in `protocols.py` and `protocols_with_overrides.py` that you can use to run specific tests:
 
 - `make snapshot-test PROTOCOL_NAMES=Flex_S_v2_19_Illumina_DNA_PCR_Free OVERRIDE_PROTOCOL_NAMES=none`
 - `make snapshot-test PROTOCOL_NAMES=none OVERRIDE_PROTOCOL_NAMES=Flex_X_v2_18_NO_PIPETTES_Overrides_BadTypesInRTP`
 - `make snapshot-test PROTOCOL_NAMES="Flex_S_v2_19_Illumina_DNA_PCR_Free,OT2_S_v2_18_P300M_P20S_HS_TC_TM_SmokeTestV3" OVERRIDE_PROTOCOL_NAMES=none`
 
-## Running a Flex just like `make -C robot-server dev-flex`
+## Updating the snapshots
 
-> This ALWAYS gets the remote code pushed to Opentrons/opentrons for the specified OPENTRONS_VERSION
+### Update all snapshots
 
-```shell
-cd analyses-snapshot-testing \
-&& make build-base-image \
-&& make build-rs OPENTRONS_VERSION=release \
-&& make run-rs OPENTRONS_VERSION=release`
-```
+- `make snapshot-test-update`
 
-### Default OPENTRONS_VERSION=edge in the Makefile so you can omit it if you want latest edge
+### Update some specific snapshots
 
-```shell
-cd analyses-snapshot-testing \
-&& make build-base-image \
-&& make build-rs \
-&& make run-rs
-```
-
-## Running the Analyses Battery against your local code
-
-> This copies in your local code to the container and runs the analyses battery against it.
-
-`cd PYENV_ROOT && git pull` - make sure pyenv is up to date so you may install python 3.13.0
-`pyenv install 3.13.0` - install python 3.13.0
-`cd <OPENTRONS_REPO_ROOT>/analyses-snapshot-testing` - navigate to the analyses-snapshot-testing directory
-`pyenv local 3.13.0` - set the local python version to 3.13.0
-`make setup` - install the requirements
-`make snapshot-test-local` - this target builds the base image, builds the local code into the base image, then runs the analyses battery against the image you just created
-
-You have the option to specify one or many protocols to run the analyses on. This is also described above [Running the tests against specific protocols](#running-the-tests-against-specific-protocols)
-
-- `make snapshot-test-local PROTOCOL_NAMES=Flex_S_v2_19_Illumina_DNA_PCR_Free OVERRIDE_PROTOCOL_NAMES=none`
-
-### Updating the snapshots locally
-
-- `make snapshot-test-update-local` - this target builds the base image, builds the local code into the base image, then runs the analyses battery against the image you just created, updating the snapshots by passing the `--update-snapshots` flag to the test
+- `make snapshot-test-update PROTOCOL_NAMES=Flex_S_v2_19_Illumina_DNA_PCR_Free OVERRIDE_PROTOCOL_NAMES=none`
+- `make snapshot-test-update PROTOCOL_NAMES=none OVERRIDE_PROTOCOL_NAMES=Flex_X_v2_18_NO_PIPETTES_Overrides_BadTypesInRTP`
+- `make snapshot-test-update PROTOCOL_NAMES="Flex_S_v2_19_Illumina_DNA_PCR_Free,OT2_S_v2_18_P300M_P20S_HS_TC_TM_SmokeTestV3" OVERRIDE_PROTOCOL_NAMES=none`
 
 ### Add some protocols to the analyses battery
 
-> The below instructions avoid needing docker and executing snapshot tests locally.
-
-1. create new protocol file(s) in the [files/protocols](./files/protocols) directory following the naming convention in [files/README.md](./files/README.md)
-1. add the protocol(s) to the [protocols.py](./automation/data/protocols.py)
-1. `make format` (make sure you have followed setup instructions)
-1. commit and push your branch
-1. open a PR and add the label `gen-analyses-snapshot-pr`
-1. when the snapshot fails because your new protocols don't have snapshots a PR will be created that heals.
-1. merge the healing PR if the snapshots are as expected
-1. get a review and merge! 🎉 now your protocols are a part of the test
+1. create new protocol file(s) in the [files/protocols](./files/protocols) directory following the naming convention below [Protocol File Organization & Naming Conventions](#protocol-file-organization--naming-conventions)
+   - If you are adding a protocol with overrides, create it in the [files/protocols/generators](./files/protocols/generators) directory
+2. `make prep`
+   1. This will edit the `automation/data/protocols.py` file with your new protocols included
+   2. A panel will print with the command needed to update the snapshots for the new protocols
+3. It will look like `make snapshot-test-update PROTOCOL_NAMES=<the entry added to protocols> OVERRIDE_PROTOCOL_NAMES=none`
 
 ### Add a protocol with overrides to the analyses battery
 
-> TODO when we have a more straight forward example
+> TODO when we complete the automated auditing of overrides protocols. Today this is manual.
+
+### Matrix Analysis
+
+1. make build-matrix
+2. make matrix
+
+## Protocol File Organization & Naming Conventions
+
+### Folders
+
+- `files/protocols`: Testing protocols
+- `files/protocols/generators`: Testing protocols with overrides
+- `files/protocols/protocol_designer`: PD protocols
+- `files/protocols/manual_protocol_library`: Manually imported protocols from Protocol Library
+- `files/protocols/protocol_library`: Automatically imported protocols from Protocol Library
+
+### Naming Convention in order
+
+- Robot (OT2 or Flex)
+- Success (S) or Failure (X)
+- PD or API version
+- _PL_ = Protocol Library - (if applicable)
+- _MPL_ = Manual Protocol Library - (if applicable)
+- Pipettes
+- Modules
+  - GRIP(gripper)
+  - HS(heater shaker)
+  - MM(magnetic module)
+  - MB(magnetic block)
+  - TC(Thermocycler)
+  - TM(Temperature Module)
+- Overrides `Overrides` or nothing
+- Description (don't exceed 25 characters)
+
+## Importing Protocols from Protocol Library
+
+`make create-pl-protocols`

@@ -1,11 +1,22 @@
+import { FormProvider, useForm } from 'react-hook-form'
 import { I18nextProvider } from 'react-i18next'
 
 import { COLORS, Flex, SPACING } from '@opentrons/components'
 
-import { i18n } from '../../i18n'
+import { i18n } from '/ai-client/i18n'
+
 import { ChatDisplay } from './index'
 
 import type { Meta, StoryObj } from '@storybook/react'
+
+const FormProviderWrapper = ({
+  children,
+}: {
+  children: React.ReactNode
+}): JSX.Element => {
+  const methods = useForm()
+  return <FormProvider {...methods}>{children}</FormProvider>
+}
 
 const meta: Meta<typeof ChatDisplay> = {
   title: 'AI/molecules/ChatDisplay',
@@ -13,9 +24,11 @@ const meta: Meta<typeof ChatDisplay> = {
   decorators: [
     Story => (
       <I18nextProvider i18n={i18n}>
-        <Flex backgroundColor={COLORS.grey10} padding={SPACING.spacing40}>
-          <Story />
-        </Flex>
+        <FormProviderWrapper>
+          <Flex backgroundColor={COLORS.grey10} padding={SPACING.spacing40}>
+            <Story />
+          </Flex>
+        </FormProviderWrapper>
       </I18nextProvider>
     ),
   ],
@@ -27,7 +40,8 @@ export const OpentronsAI: Story = {
   args: {
     chat: {
       role: 'assistant',
-      content: `
+      requestId: 'story-request-1',
+      reply: `
 ## sample output from OpentronsAI
 
 \`\`\`py
@@ -61,7 +75,8 @@ export const User: Story = {
   args: {
     chat: {
       role: 'user',
-      content: `
+      requestId: 'story-request-2',
+      reply: `
     - Application: Reagent transfer
     - Robot: OT-2
     - API: 2.13

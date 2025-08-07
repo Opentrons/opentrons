@@ -5,7 +5,7 @@ import {
   getFlexNameConversion,
   linearInterpolate,
 } from '../..'
-import { getCorrectionVolume } from '../liquidClasses'
+import { getByVolumeValue } from '../liquidClasses'
 
 vi.mock('../..')
 
@@ -73,7 +73,7 @@ const MOCK_LIQUID_CLASS_DEFS = {
   },
 } as any
 
-describe('getCorrectionVolume', () => {
+describe('getByVolumeValue', () => {
   let args: any
   beforeEach(() => {
     vi.mocked(getAllLiquidClassDefs).mockReturnValue(MOCK_LIQUID_CLASS_DEFS)
@@ -84,6 +84,8 @@ describe('getCorrectionVolume', () => {
       tiprackDefUri: MOCK_TIPRACK_DEF_URI,
       targetVolume: 40,
       liquidHandlingAction: 'aspirate',
+      byVolumeProperty: 'correctionByVolume',
+      defaultValue: 0,
     }
   })
   describe('calling liquid class with defined multiDispense object', () => {
@@ -91,7 +93,7 @@ describe('getCorrectionVolume', () => {
       args = { ...args, liquidClass: 'waterV1' }
     })
     it('calls interpolation with correct values for water > aspirate', () => {
-      getCorrectionVolume({
+      getByVolumeValue({
         ...args,
         liquidHandlingAction: 'aspirate',
       })
@@ -101,7 +103,7 @@ describe('getCorrectionVolume', () => {
       ])
     })
     it('calls interpolation with water values for water > singleDispense', () => {
-      getCorrectionVolume({
+      getByVolumeValue({
         ...args,
         liquidHandlingAction: 'singleDispense',
       })
@@ -111,7 +113,7 @@ describe('getCorrectionVolume', () => {
       ])
     })
     it('calls interpolation with water values for water > multiDispense', () => {
-      getCorrectionVolume({
+      getByVolumeValue({
         ...args,
         liquidHandlingAction: 'multiDispense',
       })
@@ -127,12 +129,12 @@ describe('getCorrectionVolume', () => {
     })
     it('returns 0 for water values for unknown pipette', () => {
       vi.mocked(getFlexNameConversion).mockReturnValue(MOCK_UNKNOWN_PIPETTE_ID)
-      const result = getCorrectionVolume(args)
+      const result = getByVolumeValue(args)
       expect(result).toEqual(0)
     })
     it('returns 0 for water values for unknown tiprack', () => {
       vi.mocked(getFlexNameConversion).mockReturnValue(MOCK_PIPETTE_ID)
-      const result = getCorrectionVolume({
+      const result = getByVolumeValue({
         ...args,
         tiprackDefUri: MOCK_UNKNOWN_TIPRACK_DEF_URI,
       })
@@ -140,11 +142,11 @@ describe('getCorrectionVolume', () => {
     })
   })
   it('returns 0 if no liquid class passed', () => {
-    const result = getCorrectionVolume(args)
+    const result = getByVolumeValue(args)
     expect(result).toEqual(0)
   })
   it('calls interpolation with water values for unknown liquid class', () => {
-    getCorrectionVolume({
+    getByVolumeValue({
       ...args,
       liquidClass: MOCK_UNKNOWN_LIQUID_CLASS,
       liquidHandlingAction: 'aspirate',
@@ -155,7 +157,7 @@ describe('getCorrectionVolume', () => {
     ])
   })
   it('calls interpolation for singleDispense if multiDispense values not found', () => {
-    getCorrectionVolume({
+    getByVolumeValue({
       ...args,
       liquidClass: 'ethanol70',
       liquidHandlingAction: 'multiDispense',

@@ -236,9 +236,11 @@ export const makeStateArgsStandard = (): StandardMakeStateArgs => ({
   pipetteLocations: {
     [DEFAULT_PIPETTE]: {
       mount: 'left',
+      tiprackId: 'tiprack1Id',
     },
     [MULTI_PIPETTE]: {
       mount: 'right',
+      tiprackId: 'tiprack1Id',
     },
   },
   labwareLocations: {
@@ -340,7 +342,10 @@ export const getRobotStateWithTipStandard = (
       tiprack2Id: true,
     },
   })
-  robotStateWithTip.tipState.pipettes[DEFAULT_PIPETTE] = true
+  robotStateWithTip.tipState.pipettes[DEFAULT_PIPETTE] = {
+    hasTip: true,
+    tiprackURI: 'tiprackId',
+  }
   return robotStateWithTip
 }
 export const getRobotStatePickedUpTipStandard = (
@@ -353,7 +358,10 @@ export const getRobotStatePickedUpTipStandard = (
       tiprack1Id: true,
     },
   })
-  robotStatePickedUpOneTip.tipState.pipettes[DEFAULT_PIPETTE] = true
+  robotStatePickedUpOneTip.tipState.pipettes[DEFAULT_PIPETTE] = {
+    hasTip: true,
+    tiprackURI: 'tiprackId',
+  }
   robotStatePickedUpOneTip.tipState.tipracks.tiprack1Id.A1 = false
   return robotStatePickedUpOneTip
 }

@@ -1,0 +1,35 @@
+site_name: stacker-manual
+
+theme:
+  name: material
+  palette:
+    primary: custom
+    accent: custom
+  icon:
+    admonition:
+      tip: material/lightbulb-on-outline
+  favicon: images/favicon.png
+  logo: assets/logo.png
+
+markdown_extensions:
+  - md_in_html
+  - toc:
+      permalink: true
+      title: Page Contents
+      toc_depth: 3
+  - admonition
+  - abbr
+  - pymdownx.blocks.caption
+  - attr_list
+  - sane_lists
+
+nav:
+  - Product Description: index.md
+  - Safety and Compliance: compliance.md
+  - Product Specifications: specifications.md
+  - Pre-installation Information: preinstall.md
+  - Installing the Stacker: installation.md
+  - Post-installation Procedures: postinstall.md
+  - Loading Labware: loading-labware.md
+  - Maintenance and Cleaning: maintenance.md
+  - Additional Product Information: warranty.md

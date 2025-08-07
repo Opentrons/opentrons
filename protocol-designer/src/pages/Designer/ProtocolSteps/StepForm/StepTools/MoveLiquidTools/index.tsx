@@ -1,11 +1,6 @@
-import { useSelector } from 'react-redux'
-
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-
-import { getEnableLiquidClasses } from '../../../../../../feature-flags/selectors'
-import { getRobotType } from '../../../../../../file-data/selectors'
 import { FirstStepMoveLiquidTools } from './FirstStepMoveLiquidTools'
-import { useAssignLiquidClass } from './hooks'
+import { useAssignLiquidClass } from './hooks/useAssignLiquidClass'
+import { useSupportedLiquidClassOptions } from './hooks/useSupportedLiquidClassOptions'
 import { LiquidClassesStepTools } from './LiquidClassesStepTools'
 import { SecondStepsMoveLiquidTools } from './SecondStepsMoveLiquidTools'
 
@@ -16,20 +11,21 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
     toolboxStep,
     propsForFields,
     formData,
-    visibleFormErrors,
     setShowFormErrors,
     tab,
     setTab,
   } = props
-  const enableLiquidClasses = useSelector(getEnableLiquidClasses)
-
   const orderedLiquidClassOptions = useAssignLiquidClass(
     formData,
     'aspirate_labware',
     'aspirate_wells',
     propsForFields.liquidClass.updateValue
   )
-  const robotType = useSelector(getRobotType)
+
+  const orderedSupportedLiquidClassOptions = useSupportedLiquidClassOptions(
+    orderedLiquidClassOptions,
+    formData
+  )
 
   const renderStepComponent = (): JSX.Element => {
     switch (toolboxStep) {
@@ -38,31 +34,17 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
           <FirstStepMoveLiquidTools
             propsForFields={propsForFields}
             formData={formData}
-            visibleFormErrors={visibleFormErrors}
           />
         )
       case 1:
         return (
-          <>
-            {enableLiquidClasses && robotType === FLEX_ROBOT_TYPE ? (
-              <LiquidClassesStepTools
-                propsForFields={propsForFields}
-                formData={formData}
-                setShowFormErrors={setShowFormErrors}
-                type="transfer"
-                orderedLiquidClassOptions={orderedLiquidClassOptions}
-              />
-            ) : (
-              <SecondStepsMoveLiquidTools
-                propsForFields={propsForFields}
-                formData={formData}
-                tab={tab}
-                setTab={setTab}
-                setShowFormErrors={setShowFormErrors}
-                visibleFormErrors={visibleFormErrors}
-              />
-            )}
-          </>
+          <LiquidClassesStepTools
+            propsForFields={propsForFields}
+            formData={formData}
+            setShowFormErrors={setShowFormErrors}
+            type="transfer"
+            orderedLiquidClassOptions={orderedSupportedLiquidClassOptions}
+          />
         )
       case 2:
         return (
@@ -72,7 +54,6 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
             tab={tab}
             setTab={setTab}
             setShowFormErrors={setShowFormErrors}
-            visibleFormErrors={visibleFormErrors}
           />
         )
       default:
@@ -83,7 +64,6 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
           <FirstStepMoveLiquidTools
             propsForFields={propsForFields}
             formData={formData}
-            visibleFormErrors={visibleFormErrors}
           />
         )
     }

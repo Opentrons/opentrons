@@ -11,7 +11,7 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '../constants'
 import {
-  getModuleDef2,
+  getModuleDef,
   getModuleDisplayName,
   getModuleType,
   normalizeModuleModel,
@@ -19,7 +19,7 @@ import {
 
 describe('all valid models work', () => {
   MODULE_MODELS.forEach(model => {
-    const loadedDef = getModuleDef2(model)
+    const loadedDef = getModuleDef(model)
 
     it('ensure valid models load', () => {
       expect(loadedDef).not.toBeNull()

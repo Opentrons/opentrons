@@ -2,7 +2,7 @@ import clamp from 'lodash/clamp'
 import pick from 'lodash/pick'
 import round from 'lodash/round'
 
-import { getPipetteSpecsV2 } from '@opentrons/shared-data'
+import { ALL, getPipetteSpecsV2, SINGLE } from '@opentrons/shared-data'
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
   SOURCE_WELL_BLOWOUT_DESTINATION,
@@ -22,10 +22,10 @@ import {
   getAllWellsFromPrimaryWells,
   getChannels,
   getDefaultWells,
-  getMaxDisposalVolumeForMultidispense,
-  volumeInCapacityForMulti,
+  getMaxDisposalVolumeForMultiDispense,
 } from './utils'
 
+import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
 import type {
   LabwareEntities,
   PipetteEntities,
@@ -132,45 +132,6 @@ const wellRatioUpdatesMap = [
   },
 ]
 const wellRatioUpdater = makeConditionalPatchUpdater(wellRatioUpdatesMap)
-export function updatePatchPathField(
-  patch: FormPatch,
-  rawForm: FormData,
-  pipetteEntities: PipetteEntities
-): FormPatch {
-  const { id, stepType, ...stepData } = rawForm
-  const appliedPatch = { ...(stepData as FormPatch), ...patch }
-  const { path, changeTip } = appliedPatch
-
-  if (path == null) {
-    // invalid well ratio - fall back to 'single'
-    return { ...patch, path: 'single' }
-  }
-
-  let pipetteCapacityExceeded = false
-
-  if (
-    appliedPatch.volume != null &&
-    typeof appliedPatch.pipette === 'string' &&
-    appliedPatch.pipette in pipetteEntities
-  ) {
-    pipetteCapacityExceeded = !volumeInCapacityForMulti(
-      // @ts-expect-error(sa, 2021-6-14): appliedPatch is not of type FormData, address in #3161
-      appliedPatch,
-      pipetteEntities
-    )
-  }
-
-  // changeTip value incompatible with next path value
-  const incompatiblePath =
-    (changeTip === 'perSource' && path === 'multiAspirate') ||
-    (changeTip === 'perDest' && path === 'multiDispense')
-
-  if (pipetteCapacityExceeded || incompatiblePath) {
-    return { ...patch, path: 'single' }
-  }
-
-  return patch
-}
 
 const updatePatchOnLabwareChange = (
   patch: FormPatch,
@@ -236,10 +197,14 @@ const updatePatchOnPipetteChange = (
   if (fieldHasChanged(rawForm, patch, 'pipette')) {
     const newPipette = patch.pipette
     let airGapVolume: string | null = null
+    let nozzles: NozzleConfigurationStyle | null = null
 
     if (typeof newPipette === 'string' && newPipette in pipetteEntities) {
       const minVolume = getMinPipetteVolume(pipetteEntities[newPipette])
       airGapVolume = minVolume.toString()
+      const hasPartialTipSupportedChannel =
+        pipetteEntities[newPipette].spec.channels !== 1
+      nozzles = hasPartialTipSupportedChannel ? ALL : null
     }
 
     return {
@@ -252,9 +217,9 @@ const updatePatchOnPipetteChange = (
         'disposalVolume_volume',
         'aspirate_mmFromBottom',
         'dispense_mmFromBottom',
-        'nozzles',
         'tipRack'
       ),
+      nozzles,
       aspirate_airGap_volume: airGapVolume,
       dispense_airGap_volume: airGapVolume,
     }
@@ -451,7 +416,7 @@ const clampDisposalVolume = (
   const isDecimalString = appliedPatch.disposalVolume_volume === '.'
   // @ts-expect-error(sa, 2021-6-14): appliedPatch isn't well-typed, address in #3161
   if (appliedPatch.path !== 'multiDispense' || isDecimalString) return patch
-  const maxDisposalVolume = getMaxDisposalVolumeForMultidispense(
+  const maxDisposalVolume = getMaxDisposalVolumeForMultiDispense(
     // @ts-expect-error(sa, 2021-6-14): appliedPatch isn't well-typed, address in #3161
     appliedPatch,
     pipetteEntities
@@ -501,11 +466,15 @@ const updatePatchOnPipetteChannelChange = (
 ): FormPatch => {
   if (patch.pipette === undefined) return patch
   let update: FormPatch = {}
-  const prevChannels = getChannels(rawForm.pipette as string, pipetteEntities)
+  const previousChannels = getChannels(
+    rawForm.pipette as string,
+    pipetteEntities
+  )
   const nextChannels =
     typeof patch.pipette === 'string'
       ? getChannels(patch.pipette, pipetteEntities)
       : null
+
   const { id, stepType, ...stepData } = rawForm
   const appliedPatch: FormPatch = {
     ...(stepData as FormPatch),
@@ -513,10 +482,11 @@ const updatePatchOnPipetteChannelChange = (
     id,
     stepType,
   }
+
   const singleToMulti =
-    prevChannels === 1 && (nextChannels === 8 || nextChannels === 96)
+    previousChannels === 1 && nextChannels === 8 && patch.nozzles !== SINGLE
   const multiToSingle =
-    (prevChannels === 8 || prevChannels === 96) && nextChannels === 1
+    previousChannels === 8 && rawForm.nozzles !== SINGLE && nextChannels === 1
 
   const pipetteId: string = appliedPatch.pipette as string
 
@@ -539,10 +509,6 @@ const updatePatchOnPipetteChannelChange = (
       }),
     }
   } else if (multiToSingle) {
-    let channels = 8
-    if (prevChannels === 96) {
-      channels = 96
-    }
     // multi-channel to single-channel: convert primary wells to all wells
     const sourceLabwareId: string = appliedPatch.aspirate_labware as string
     const destLabwareId: string = appliedPatch.dispense_labware as string
@@ -554,7 +520,7 @@ const updatePatchOnPipetteChannelChange = (
         aspirate_wells: getAllWellsFromPrimaryWells(
           appliedPatch.aspirate_wells as string[],
           sourceLabware.def,
-          channels as 8 | 96
+          previousChannels
         ),
         dispense_wells:
           destLabwareId.includes('trashBin') ||
@@ -568,7 +534,7 @@ const updatePatchOnPipetteChannelChange = (
             : getAllWellsFromPrimaryWells(
                 appliedPatch.dispense_wells as string[],
                 destLabware.def,
-                channels as 8 | 96
+                previousChannels
               ),
       }
     }
@@ -758,7 +724,6 @@ export function dependentFieldsUpdateMoveLiquid(
     chainPatch =>
       updatePatchOnPipetteChange(chainPatch, rawForm, pipetteEntities),
     chainPatch => updatePatchOnWellRatioChange(chainPatch, rawForm),
-    chainPatch => updatePatchPathField(chainPatch, rawForm, pipetteEntities),
     chainPatch =>
       updatePatchDisposalVolumeFields(chainPatch, rawForm, pipetteEntities),
     chainPatch =>

@@ -11,10 +11,11 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { FIXTURES_FIELD_NAME } from '../../organisms/ModulesAndFixturesSection'
+import { FIXTURES_FIELD_NAME } from '/ai-client/organisms/ModulesAndFixturesSection'
+
 import { FixtureDiagram } from '../FixtureDiagram'
 
-import type { DisplayFixture } from '../../organisms/ModulesAndFixturesSection'
+import type { DisplayFixture } from '/ai-client/organisms/ModulesAndFixturesSection'
 
 export function FixtureListItemGroup(): JSX.Element | null {
   const { watch, setValue } = useFormContext()

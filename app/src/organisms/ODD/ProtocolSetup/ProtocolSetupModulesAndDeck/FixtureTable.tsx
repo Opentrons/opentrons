@@ -16,40 +16,34 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  FLEX_USB_MODULE_ADDRESSABLE_AREAS,
   getCutoutDisplayName,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
-  getSimplestDeckConfigForProtocol,
-  SINGLE_SLOT_FIXTURES,
-  TC_MODULE_LOCATION_OT3,
-  THERMOCYCLER_V2_FRONT_FIXTURE,
-  THERMOCYCLER_V2_REAR_FIXTURE,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
+import {
+  getFilteredDeckConfigFixtureCompatibility,
+  isConflictingFixtureConfigured,
+  isFixtureCompatible,
+} from '/app/organisms/LocationConflictModal/getFilteredDeckConfigFixtureCompatibility'
+import { NotConfiguredModal } from '/app/organisms/LocationConflictModal/NotConfiguredModal'
 import { getLocalRobot } from '/app/redux/discovery'
-import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import { getRequiredDeckConfig } from '/app/resources/deck_configuration/utils'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { TFunction } from 'i18next'
 import type {
-  CompletedProtocolAnalysis,
   CutoutFixtureId,
-  CutoutId,
   DeckDefinition,
   RobotType,
 } from '@opentrons/shared-data'
 import type { CutoutConfigAndCompatibility } from '/app/resources/deck_configuration/hooks'
-import type { SetupScreens } from '../types'
 
 interface FixtureTableProps {
   robotType: RobotType
-  mostRecentAnalysis: CompletedProtocolAnalysis | null
-  setSetupScreen: Dispatch<SetStateAction<SetupScreens>>
-  setCutoutId: (cutoutId: CutoutId) => void
-  setProvidedFixtureOptions: (providedFixtureOptions: CutoutFixtureId[]) => void
+  deckConfigCompatibility: CutoutConfigAndCompatibility[]
 }
 
 /**
@@ -59,18 +53,8 @@ interface FixtureTableProps {
  */
 export function FixtureTable({
   robotType,
-  mostRecentAnalysis,
-  setSetupScreen,
-  setCutoutId,
-  setProvidedFixtureOptions,
+  deckConfigCompatibility,
 }: FixtureTableProps): JSX.Element | null {
-  const requiredFixtureDetails = getSimplestDeckConfigForProtocol(
-    mostRecentAnalysis
-  )
-  const deckConfigCompatibility = useDeckConfigurationCompatibility(
-    robotType,
-    mostRecentAnalysis
-  )
   const deckDef = getDeckDefFromRobotType(robotType)
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : ''
@@ -79,26 +63,8 @@ export function FixtureTable({
     deckConfigCompatibility
   )
 
-  const hasTwoLabwareThermocyclerConflicts =
-    requiredDeckConfigCompatibility.some(
-      ({ cutoutFixtureId, missingLabwareDisplayName }) =>
-        cutoutFixtureId === THERMOCYCLER_V2_FRONT_FIXTURE &&
-        missingLabwareDisplayName != null
-    ) &&
-    requiredDeckConfigCompatibility.some(
-      ({ cutoutFixtureId, missingLabwareDisplayName }) =>
-        cutoutFixtureId === THERMOCYCLER_V2_REAR_FIXTURE &&
-        missingLabwareDisplayName != null
-    )
-
-  // if there are two labware conflicts with the thermocycler, don't show the conflict with the thermocycler rear fixture
-  const filteredDeckConfigCompatibility = requiredDeckConfigCompatibility.filter(
-    ({ cutoutFixtureId }) => {
-      return (
-        !hasTwoLabwareThermocyclerConflicts ||
-        !(cutoutFixtureId === THERMOCYCLER_V2_REAR_FIXTURE)
-      )
-    }
+  const filteredDeckConfigCompatibility = getFilteredDeckConfigFixtureCompatibility(
+    requiredDeckConfigCompatibility
   )
 
   // list not configured/conflicted fixtures first
@@ -113,18 +79,11 @@ export function FixtureTable({
   return sortedDeckConfigCompatibility.length > 0 ? (
     <>
       {sortedDeckConfigCompatibility.map((fixtureCompatibility, index) => {
-        // filter out all fixtures that only provide module addressable areas (e.g. everything but StagingAreaWithMagBlockV1)
-        // as they're handled in the Modules Table
-        return fixtureCompatibility.requiredAddressableAreas.every(raa =>
-          FLEX_USB_MODULE_ADDRESSABLE_AREAS.includes(raa)
-        ) ? null : (
+        return (
           <FixtureTableItem
             key={`FixtureTableItem_${index}`}
             {...fixtureCompatibility}
-            lastItem={index === requiredFixtureDetails.length - 1}
-            setSetupScreen={setSetupScreen}
-            setCutoutId={setCutoutId}
-            setProvidedFixtureOptions={setProvidedFixtureOptions}
+            lastItem={index === sortedDeckConfigCompatibility.length - 1}
             deckDef={deckDef}
             robotName={robotName}
           />
@@ -136,50 +95,55 @@ export function FixtureTable({
 
 interface FixtureTableItemProps extends CutoutConfigAndCompatibility {
   lastItem: boolean
-  setSetupScreen: Dispatch<SetStateAction<SetupScreens>>
-  setCutoutId: (cutoutId: CutoutId) => void
-  setProvidedFixtureOptions: (providedFixtureOptions: CutoutFixtureId[]) => void
   deckDef: DeckDefinition
   robotName: string
+  partialRequiredCutoutFixtureId?: CutoutFixtureId
 }
 
 function FixtureTableItem({
   cutoutId,
   cutoutFixtureId,
   compatibleCutoutFixtureIds,
-  missingLabwareDisplayName,
   lastItem,
-  setSetupScreen,
-  setCutoutId,
-  setProvidedFixtureOptions,
   deckDef,
   robotName,
+  partialRequiredCutoutFixtureId,
 }: FixtureTableItemProps): JSX.Element {
-  const { t, i18n } = useTranslation('protocol_setup')
+  const { t, i18n } = useTranslation(['protocol_setup', 'deck_configuration'])
 
   const [
     showLocationConflictModal,
     setShowLocationConflictModal,
   ] = useState<boolean>(false)
+  const [showNotConfiguredModal, setShowNotConfiguredModal] = useState<boolean>(
+    false
+  )
+  const isCurrentFixtureCompatible = isFixtureCompatible(
+    cutoutFixtureId,
+    compatibleCutoutFixtureIds,
+    partialRequiredCutoutFixtureId
+  )
+  const isFourthColumnFixture =
+    (partialRequiredCutoutFixtureId != null &&
+      STAGING_AREA_RIGHT_SLOT_FIXTURE === partialRequiredCutoutFixtureId) ||
+    STAGING_AREA_RIGHT_SLOT_FIXTURE === compatibleCutoutFixtureIds[0]
 
-  const isCurrentFixtureCompatible =
-    cutoutFixtureId != null &&
-    compatibleCutoutFixtureIds.includes(cutoutFixtureId)
-  const isRequiredSingleSlotMissing = missingLabwareDisplayName != null
-
-  const isThermocyclerCurrentFixture =
-    cutoutFixtureId === THERMOCYCLER_V2_FRONT_FIXTURE ||
-    cutoutFixtureId === THERMOCYCLER_V2_REAR_FIXTURE
+  const displayLocation = isFourthColumnFixture
+    ? `${getCutoutDisplayName(cutoutId).charAt(0)}4`
+    : getCutoutDisplayName(cutoutId)
 
   let chipLabel: JSX.Element
   if (!isCurrentFixtureCompatible) {
-    const isConflictingFixtureConfigured =
-      cutoutFixtureId != null && !SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
+    const hasConflict = isConflictingFixtureConfigured(
+      cutoutFixtureId,
+      partialRequiredCutoutFixtureId
+    )
+
     chipLabel = (
       <>
         <Chip
           text={
-            isConflictingFixtureConfigured
+            hasConflict
               ? i18n.format(t('location_conflict'), 'capitalize')
               : i18n.format(t('not_configured'), 'capitalize')
           }
@@ -189,18 +153,14 @@ function FixtureTableItem({
         />
         <SmallButton
           buttonCategory="rounded"
-          buttonText={
-            isConflictingFixtureConfigured ? t('resolve') : t('configure')
-          }
+          buttonText={hasConflict ? t('resolve') : t('configure')}
           onClick={
-            isConflictingFixtureConfigured
+            hasConflict
               ? () => {
                   setShowLocationConflictModal(true)
                 }
               : () => {
-                  setCutoutId(cutoutId)
-                  setProvidedFixtureOptions(compatibleCutoutFixtureIds)
-                  setSetupScreen('deck configuration')
+                  setShowNotConfiguredModal(true)
                 }
           }
         />
@@ -218,15 +178,28 @@ function FixtureTableItem({
   }
   return (
     <Fragment key={cutoutId}>
+      {showNotConfiguredModal ? (
+        <NotConfiguredModal
+          onCloseClick={() => {
+            setShowNotConfiguredModal(false)
+          }}
+          cutoutId={cutoutId}
+          requiredFixtureId={
+            partialRequiredCutoutFixtureId ?? compatibleCutoutFixtureIds[0]
+          }
+          isOnDevice
+        />
+      ) : null}
       {showLocationConflictModal ? (
         <LocationConflictModal
           onCloseClick={() => {
             setShowLocationConflictModal(false)
           }}
           cutoutId={cutoutId}
-          requiredFixtureId={compatibleCutoutFixtureIds[0]}
+          requiredFixtureId={
+            partialRequiredCutoutFixtureId ?? compatibleCutoutFixtureIds[0]
+          }
           isOnDevice={true}
-          missingLabwareDisplayName={missingLabwareDisplayName}
           deckDef={deckDef}
           robotName={robotName}
         />
@@ -244,20 +217,20 @@ function FixtureTableItem({
       >
         <Flex flex="3.5 0 0" alignItems={ALIGN_CENTER}>
           <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-            {cutoutFixtureId != null &&
-            (isCurrentFixtureCompatible || isRequiredSingleSlotMissing)
-              ? getFixtureDisplayName(cutoutFixtureId)
-              : getFixtureDisplayName(compatibleCutoutFixtureIds?.[0])}
+            {cutoutFixtureId != null && isCurrentFixtureCompatible
+              ? getFixtureDisplayName(
+                  t as TFunction,
+                  partialRequiredCutoutFixtureId ?? cutoutFixtureId
+                )
+              : getFixtureDisplayName(
+                  t as TFunction,
+                  partialRequiredCutoutFixtureId ??
+                    compatibleCutoutFixtureIds?.[0]
+                )}
           </LegacyStyledText>
         </Flex>
         <Flex flex="2 0 0" alignItems={ALIGN_CENTER}>
-          <DeckInfoLabel
-            deckLabel={
-              isThermocyclerCurrentFixture && isRequiredSingleSlotMissing
-                ? TC_MODULE_LOCATION_OT3
-                : getCutoutDisplayName(cutoutId)
-            }
-          />
+          <DeckInfoLabel deckLabel={displayLocation} />
         </Flex>
         <Flex
           flex="4 0 0"

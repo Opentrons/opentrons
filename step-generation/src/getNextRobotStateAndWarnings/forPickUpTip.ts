@@ -20,7 +20,8 @@ export function forPickUpTip(
   const tipState = robotStateAndWarnings.robotState.tipState
   const nozzles = robotStateAndWarnings.robotState.pipettes[pipetteId].nozzles
   // pipette now has tip(s)
-  tipState.pipettes[pipetteId] = true
+  tipState.pipettes[pipetteId].hasTip = true
+  tipState.pipettes[pipetteId].tiprackURI = labwareId
   // remove tips from tiprack
   if (pipetteSpec.channels === 1 || nozzles === SINGLE) {
     tipState.tipracks[labwareId][wellName] = false
@@ -44,4 +45,6 @@ export function forPickUpTip(
       tipState.tipracks[labwareId][wellName] = false
     })
   }
+  // update tiprackID assosciated with pipette for configureNozzleLayout
+  robotStateAndWarnings.robotState.pipettes[pipetteId].tiprackId = labwareId
 }

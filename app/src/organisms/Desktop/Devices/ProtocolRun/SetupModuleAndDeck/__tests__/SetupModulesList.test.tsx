@@ -19,6 +19,7 @@ import {
   mockMagneticModule as mockMagneticModuleFixture,
 } from '/app/redux/modules/__fixtures__/index'
 import {
+  useChainLiveCommands,
   useModuleRenderInfoForProtocolById,
   useRunCalibrationStatus,
   useUnmatchedModulesForProtocol,
@@ -57,7 +58,6 @@ const mockMagneticModule = {
   calibrationPoint: { x: 0, y: 0 },
   displayName: 'Magnetic Module',
   dimensions: {},
-  twoDimensionalRendering: { children: [] },
   quirks: [],
 }
 
@@ -86,12 +86,16 @@ const render = (props: ComponentProps<typeof SetupModulesList>) => {
 }
 
 describe('SetupModulesList', () => {
+  let mockChainLiveCommands = vi.fn()
   let props: ComponentProps<typeof SetupModulesList>
   beforeEach(() => {
     props = {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
+      deckConfigCompatibility: [],
     }
+    mockChainLiveCommands = vi.fn()
+    mockChainLiveCommands.mockResolvedValue(null)
     when(vi.mocked(useRobot))
       .calledWith(ROBOT_NAME)
       .thenReturn({ robotModel: FLEX_ROBOT_TYPE } as DiscoveredRobot)
@@ -111,6 +115,9 @@ describe('SetupModulesList', () => {
     vi.mocked(ModuleWizardFlows).mockReturnValue(
       <div>mock ModuleWizardFlows</div>
     )
+    vi.mocked(useChainLiveCommands).mockReturnValue({
+      chainLiveCommands: mockChainLiveCommands,
+    } as any)
     vi.mocked(LocationConflictModal).mockReturnValue(
       <div>mock location conflict modal</div>
     )

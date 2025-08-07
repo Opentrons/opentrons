@@ -40,12 +40,14 @@ import {
   useIsDoorOpen,
 } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 import { LabwareOffsetsConflictModal } from '/app/organisms/LabwareOffsetsConflictModal'
-import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
+import {
+  useApplyOffsets,
+  useLPCFlows,
+} from '/app/organisms/LabwarePositionCheck'
 import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
 import {
   AnalysisFailedModal,
   getUnmatchedModulesForProtocol,
-  ProtocolSetupDeckConfiguration,
   ProtocolSetupInstruments,
   ProtocolSetupLabware,
   ProtocolSetupModulesAndDeck,
@@ -101,10 +103,10 @@ import { CloseButton, PlayButton } from './Buttons'
 import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 import { ConfirmSetupStepsCompleteModal } from './ConfirmSetupStepsCompleteModal'
 
+import type { TFunction } from 'i18next'
 import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { Dispatch, SetStateAction } from 'react'
 import type { Run, RunStatus } from '@opentrons/api-client'
-import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 import type { OnDeviceRouteParams } from '/app/App/types'
 import type {
   ProtocolSetupStepProps,
@@ -142,11 +144,15 @@ function PrepareToRun({
   robotName,
   runRecord,
   labwareConfirmed,
-  offsetsConfirmed,
   isLPCInitializing,
   confirmStepsComplete,
+  offsetsConfirmed,
 }: PrepareToRunProps): JSX.Element {
-  const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
+  const { t, i18n } = useTranslation([
+    'protocol_setup',
+    'shared',
+    'deck_configuration',
+  ])
   const navigate = useNavigate()
   const { makeSnackbar } = useToaster()
   const { scrollRef, isScrolled } = useScrollPosition()
@@ -347,11 +353,15 @@ function PrepareToRun({
       ? 'ready'
       : 'not ready'
 
+  const isAnyNecessaryDefaultOffsetMissing = useSelector(
+    selectIsAnyNecessaryDefaultOffsetMissing(runId)
+  )
+
   const isReadyToRun =
     incompleteInstrumentCount === 0 &&
     areModulesReady &&
     areFixturesReady &&
-    offsetsConfirmed
+    !isAnyNecessaryDefaultOffsetMissing
   const onPlay = (): void => {
     if (doorStatus.isDoorOpen) {
       if (
@@ -452,6 +462,7 @@ function PrepareToRun({
   const missingFixturesText =
     missingFixtures.length === 1
       ? `${t('missing')} ${getFixtureDisplayName(
+          t as TFunction,
           missingFixtures[0].cutoutFixtureId
         )}`
       : t('multiple_fixtures_missing', { count: missingFixtures.length })
@@ -504,9 +515,6 @@ function PrepareToRun({
   )
   const numMissingLSOffsets = useSelector(
     selectCountMissingLSOffsetsWithoutDefault(runId)
-  )
-  const isAnyNecessaryDefaultOffsetMissing = useSelector(
-    selectIsAnyNecessaryDefaultOffsetMissing(runId)
   )
 
   const lpcSetupStepProps = (): Pick<
@@ -779,7 +787,9 @@ export function ProtocolSetup(): JSX.Element {
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
 
-  const handleProceedToRunClick = (): void => {
+  const offsetsConfirmed = useSelector(selectAreOffsetsApplied(runId))
+  const { applyOffsets, isApplyingOffsets } = useApplyOffsets(runId)
+  const proceedToRun = (): void => {
     trackEvent({
       name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
       properties: { robotSerialNumber },
@@ -790,6 +800,16 @@ export function ProtocolSetup(): JSX.Element {
     })
     play()
   }
+
+  const handleProceedToRunClick = (): Promise<void> => {
+    if (!offsetsConfirmed) {
+      return applyOffsets().then(proceedToRun)
+    } else {
+      proceedToRun()
+      return Promise.resolve()
+    }
+  }
+
   const configBypassHeaterShakerAttachmentConfirmation = useSelector(
     getIsHeaterShakerAttached
   )
@@ -801,15 +821,11 @@ export function ProtocolSetup(): JSX.Element {
     handleProceedToRunClick,
     !configBypassHeaterShakerAttachmentConfirmation
   )
-  const [cutoutId, setCutoutId] = useState<CutoutId | null>(null)
-  const [providedFixtureOptions, setProvidedFixtureOptions] = useState<
-    CutoutFixtureId[]
-  >([])
   // TODO(jh 10-31-24): Refactor the below to utilize useMissingStepsModal.
   const [labwareConfirmed, setLabwareConfirmed] = useState<boolean>(false)
-  const offsetsConfirmed = useSelector(selectAreOffsetsApplied(runId))
   const missingSteps = [
     !labwareConfirmed ? t('labware_placement') : null,
+    !offsetsConfirmed ? t('applied_labware_offsets') : null,
   ].filter(s => s != null)
   const {
     confirm: confirmMissingSteps,
@@ -838,8 +854,8 @@ export function ProtocolSetup(): JSX.Element {
         robotName={robotName}
         runRecord={runRecord ?? null}
         labwareConfirmed={labwareConfirmed}
-        offsetsConfirmed={offsetsConfirmed}
         isLPCInitializing={lpcLaunchProps.isFlexLPCInitializing}
+        offsetsConfirmed={offsetsConfirmed}
       />
     ),
     instruments: (
@@ -849,8 +865,6 @@ export function ProtocolSetup(): JSX.Element {
       <ProtocolSetupModulesAndDeck
         runId={runId}
         setSetupScreen={setSetupScreen}
-        setCutoutId={setCutoutId}
-        setProvidedFixtureOptions={setProvidedFixtureOptions}
       />
     ),
     offsets: (
@@ -869,14 +883,6 @@ export function ProtocolSetup(): JSX.Element {
         setSetupScreen={setSetupScreen}
         isConfirmed={labwareConfirmed}
         setIsConfirmed={setLabwareConfirmed}
-      />
-    ),
-    'deck configuration': (
-      <ProtocolSetupDeckConfiguration
-        cutoutId={cutoutId}
-        runId={runId}
-        setSetupScreen={setSetupScreen}
-        providedFixtureOptions={providedFixtureOptions}
       />
     ),
     'view only parameters': (
@@ -904,6 +910,7 @@ export function ProtocolSetup(): JSX.Element {
               ? confirmAttachment()
               : handleProceedToRunClick()
           }}
+          isRunStarting={isApplyingOffsets}
         />
       ) : null}
       {showHSConfirmationModal ? (

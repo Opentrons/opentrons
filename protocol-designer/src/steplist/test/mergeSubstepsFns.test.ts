@@ -156,6 +156,8 @@ describe('mergeSubstepRowsSingleChannel', () => {
             preIngreds: {},
             postIngreds: { [ingred1Id]: 10 },
           },
+          dispenseVolume: 10,
+          aspirateVolume: 10,
           volume: 10,
         },
       ],
@@ -177,6 +179,8 @@ describe('mergeSubstepRowsSingleChannel', () => {
         },
         // last asp + disp merged into single row
         {
+          aspirateVolume: 5,
+          dispenseVolume: 10,
           activeTips,
           source: {
             well: 'A2',
@@ -199,6 +203,8 @@ describe('mergeSubstepRowsSingleChannel', () => {
       expected: [
         // first aspirate + disp merged into single row
         {
+          aspirateVolume: 10,
+          dispenseVolume: 5,
           activeTips,
           source: {
             well: 'A1',

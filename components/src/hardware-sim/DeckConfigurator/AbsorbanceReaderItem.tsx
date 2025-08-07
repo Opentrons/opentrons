@@ -7,16 +7,17 @@ import { Btn } from '../../primitives'
 import { TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
-  COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH,
   COLUMN_DEFAULT_X_ADJUSTMENT,
   CONFIG_STYLE_EDITABLE,
   CONFIG_STYLE_READ_ONLY,
   CONFIG_STYLE_SELECTED,
   FIXTURE_HEIGHT,
+  LARGE_SINGLE_ITEM_SLOT_WIDTH,
   Y_ADJUSTMENT,
 } from './constants'
 
 import type {
+  AddressableAreaNamesWithFakes,
   CutoutFixtureIdsWithFakes,
   CutoutId,
   DeckDefinition,
@@ -26,9 +27,11 @@ interface AbsorbanceReaderItemProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
   cutoutFixtureId: CutoutFixtureIdsWithFakes
+  addressableAreaId: AddressableAreaNamesWithFakes
   handleClickRemove?: (
     fixtureLocation: CutoutId,
-    cutoutFixtureId: CutoutFixtureIdsWithFakes
+    cutoutFixtureId: CutoutFixtureIdsWithFakes,
+    addressableAreaId: AddressableAreaNamesWithFakes
   ) => void
   selected?: boolean
 }
@@ -43,6 +46,7 @@ export function AbsorbanceReaderItem(
     handleClickRemove,
     fixtureLocation,
     cutoutFixtureId,
+    addressableAreaId,
     selected = false,
   } = props
 
@@ -62,9 +66,14 @@ export function AbsorbanceReaderItem(
   const y = ySlotPosition + Y_ADJUSTMENT
 
   const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
+  const handleRemoveClick = (): void => {
+    if (handleClickRemove != null) {
+      handleClickRemove(fixtureLocation, cutoutFixtureId, addressableAreaId)
+    }
+  }
   return (
     <RobotCoordsForeignObject
-      width={COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH}
+      width={LARGE_SINGLE_ITEM_SLOT_WIDTH}
       height={FIXTURE_HEIGHT}
       x={x}
       y={y}
@@ -74,13 +83,8 @@ export function AbsorbanceReaderItem(
       <Btn
         css={handleClickRemove != null ? editableStyle : CONFIG_STYLE_READ_ONLY}
         cursor={handleClickRemove != null ? 'pointer' : 'default'}
-        onClick={
-          handleClickRemove != null
-            ? () => {
-                handleClickRemove(fixtureLocation, cutoutFixtureId)
-              }
-            : () => {}
-        }
+        onClick={handleRemoveClick}
+        height="100%"
       >
         <StyledText
           oddStyle="smallBodyTextSemiBold"

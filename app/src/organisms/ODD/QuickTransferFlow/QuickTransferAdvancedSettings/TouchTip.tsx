@@ -268,7 +268,7 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
           <Flex
             width="30.5rem"
             height="100%"
-            gridGap={SPACING.spacing24}
+            gridGap={SPACING.spacing8}
             flexDirection={DIRECTION_COLUMN}
             marginTop={SPACING.spacing68}
           >
@@ -279,6 +279,12 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
               error={positionError}
               readOnly
             />
+            <StyledText oddStyle="bodyTextRegular" color={COLORS.grey60}>
+              {t('touch_tip_from_top', {
+                min: positionRange.min,
+                max: positionRange.max,
+              })}
+            </StyledText>
           </Flex>
           <Flex
             paddingX={SPACING.spacing24}

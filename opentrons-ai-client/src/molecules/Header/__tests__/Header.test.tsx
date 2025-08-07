@@ -2,11 +2,16 @@ import * as auth0 from '@auth0/auth0-react'
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/ai-client/__testing-utils__'
+import { i18n } from '/ai-client/i18n'
+
 import { Header } from '../index'
 
 vi.mock('@auth0/auth0-react')
+vi.mock('react-router-dom', () => ({
+  useNavigate: vi.fn(() => vi.fn()),
+  useLocation: vi.fn(() => ({ pathname: '/' })),
+}))
 const mockLogout = vi.fn()
 const mockUseTrackEvent = vi.fn()
 

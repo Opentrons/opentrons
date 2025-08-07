@@ -42,6 +42,8 @@ LabwareRoles = Literal[
     "system",
 ]
 
+SpringDirectionalForce = Literal["backLeftBottom"]
+
 
 class Vector2D(TypedDict):
     x: float
@@ -154,7 +156,38 @@ class WellGroup(TypedDict):
 
 class Extents(TypedDict):
     total: AxisAlignedBoundingBox3D
-    footprint: AxisAlignedBoundingBox2D
+
+
+class SlotFootprintAsChildFeature(TypedDict):
+    z: float
+    backLeft: Vector2D
+    frontRight: Vector2D
+    springDirectionalForce: NotRequired[SpringDirectionalForce]
+
+
+class SlotFootprintAsParentFeature(TypedDict):
+    z: float
+    backLeft: Vector2D
+    frontRight: Vector2D
+    springDirectionalForce: NotRequired[SpringDirectionalForce]
+
+
+class OpentronsFlexTipRackLidAsParentFeature(TypedDict):
+    matingZ: float
+
+
+class OpentronsFlexTipRackLidAsChildFeature(TypedDict):
+    matingZ: float
+
+
+class LocatingFeatures(TypedDict):
+    """A dictionary of locating features."""
+
+    slotFootprintAsChild: NotRequired[SlotFootprintAsChildFeature]
+    slotFootprintAsParent: NotRequired[SlotFootprintAsParentFeature]
+    springDirectionalForceAsParent: NotRequired[SpringDirectionalForce]
+    opentronsFlexTipRackLidAsParent: NotRequired[OpentronsFlexTipRackLidAsParentFeature]
+    opentronsFlexTipRackLidAsChild: NotRequired[OpentronsFlexTipRackLidAsChildFeature]
 
 
 class LabwareDefinition2(TypedDict):
@@ -199,6 +232,7 @@ class LabwareDefinition3(_OTSharedSchemaMixin, TypedDict):
     brand: LabwareBrandData
     parameters: LabwareParameters3
     ordering: list[list[str]]
+    features: LocatingFeatures
     extents: Extents
     wells: dict[str, WellDefinition3]
     groups: list[WellGroup]
@@ -207,7 +241,7 @@ class LabwareDefinition3(_OTSharedSchemaMixin, TypedDict):
     allowedRoles: NotRequired[list[LabwareRoles]]
     gripperOffsets: NotRequired[dict[str, GripperOffsets]]
     gripForce: NotRequired[float]
-    gripHeightFromLabwareBottom: NotRequired[float]
+    gripHeightFromLabwareOrigin: NotRequired[float]
     stackLimit: NotRequired[int]
     compatibleParentLabware: NotRequired[list[str]]
     # The innerLabwareGeometry dict values are not currently modeled in these

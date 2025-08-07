@@ -29,8 +29,15 @@ import type {
 export type DeckSlot = string
 type THERMOCYCLER_STATE = 'thermocyclerState'
 type THERMOCYCLER_PROFILE = 'thermocyclerProfile'
+
+export const TOUCHED_PIPETTABLE_LABWARE: 'TOUCHED_PIPETTABLE_LABWARE' =
+  'TOUCHED_PIPETTABLE_LABWARE'
 export interface LabwareTemporalProperties {
-  stack: string[] // a stack of ids from top to bottom
+  // a stack of ids from top to bottom
+  stack: string[]
+  // we currently use this property only to track if a lid has been placed on a "pipettable" labware that could presumably contain liquid
+  // we can expand this type in the future to track other types of sterility for various labware types
+  sterility?: typeof TOUCHED_PIPETTABLE_LABWARE
 }
 
 export interface PipetteTemporalProperties {
@@ -39,7 +46,10 @@ export interface PipetteTemporalProperties {
   entityId?: string
   //  primary nozzle's wellName if over a labware
   wellName?: string
+  //  pipette's nozzle configuration
   nozzles?: NozzleConfigurationStyle
+  //  current tiprack assosciated with pipette
+  tiprackId?: string
 }
 
 export interface MagneticModuleState {
@@ -133,7 +143,7 @@ export interface LiquidEntity {
   description: string | null
   pythonName: string
   liquidGroupId: string
-  liquidClass?: string
+  liquidClass?: string | null
 }
 
 export interface LiquidEntities {
@@ -229,7 +239,6 @@ export interface InnerMixArgs {
 
 export interface InnerDelayArgs {
   seconds: number
-  mmFromBottom: number
 }
 
 interface CommonArgs {
@@ -242,6 +251,7 @@ interface CommonArgs {
 // ===== Processed form types. Used as args to call command creator fns =====
 
 export type SharedTransferLikeArgs = CommonArgs & {
+  stepId: number
   tipRack: string // tipRackDefUri
   pipette: string // PipetteId
   nozzles: NozzleConfigurationStyle | null // setting for 96-channel
@@ -271,7 +281,7 @@ export type SharedTransferLikeArgs = CommonArgs & {
   /** Flow rate in uL/sec for all aspirates */
   aspirateFlowRateUlSec: number
   /** offset from bottom of well in mm */
-  aspirateOffsetFromBottomMm: number
+  aspirateOffsetFromBottomMm: number // TODO: deprecate this
   /** x offset mm */
   aspirateXOffset: number
   /** y offset mm */
@@ -293,7 +303,7 @@ export type SharedTransferLikeArgs = CommonArgs & {
   /** Flow rate in uL/sec for all dispenses */
   dispenseFlowRateUlSec: number
   /** offset from bottom of well in mm */
-  dispenseOffsetFromBottomMm: number
+  dispenseOffsetFromBottomMm: number // TODO: deprecate this
   /** x offset mm */
   dispenseXOffset: number
   /** y offset mm */
@@ -304,7 +314,6 @@ export type SharedTransferLikeArgs = CommonArgs & {
   /** If given, blow out in the specified destination after dispense at the end of each asp-dispense cycle */
   blowoutLocation: string | null | undefined
   blowoutFlowRateUlSec: number
-  blowoutOffsetFromTopMm: number
 
   // ===== SETTINGS INTRODUCED WITH LIQUID CLASSES =====
   liquidClass: string | null
@@ -637,7 +646,10 @@ export interface TimelineFrame {
       }
     }
     pipettes: {
-      [pipetteId: string]: boolean // true if pipette has tip(s)
+      [pipetteId: string]: {
+        hasTip: boolean
+        tiprackURI: string | null
+      } // true if pipette has tip(s)
     }
   }
   liquidState: {
@@ -762,4 +774,17 @@ export interface Timeline {
 export interface RobotStateAndWarnings {
   robotState: RobotState
   warnings: CommandCreatorWarning[]
+}
+export interface WellContents {
+  // eg 'A1', 'A2' etc
+  wellName?: string
+  groupIds: string[]
+  ingreds: LocationLiquidState
+  highlighted?: boolean
+  selected?: boolean
+  maxVolume?: number
+}
+
+export interface WellContentsByNumber {
+  [wellName: string]: number
 }

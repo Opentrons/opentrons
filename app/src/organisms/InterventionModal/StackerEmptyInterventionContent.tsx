@@ -1,19 +1,20 @@
 import { css } from 'styled-components'
 
 import {
+  AnimationVideo,
   BORDERS,
-  Box,
-  COLORS,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
 } from '@opentrons/components'
 import { useRunCurrentState } from '@opentrons/react-api-client'
-import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
+import {
+  getLoadedLabwareDefinitionsByUri,
+  getStackerLocationFromSlotName,
+} from '@opentrons/shared-data'
 
+import EmptyHopper from '/app/assets/videos/error-recovery/FlexStacker_EmptyHopper.webm'
 import { InterventionInfo } from '/app/molecules/InterventionModal/InterventionContent'
-import { getStackerLocationFromSlotName } from '/app/transformations/commands'
 
 import { InterventionCommandMessage } from './InterventionCommandMessage'
 
@@ -26,10 +27,7 @@ import type {
 
 const STACKER_IMAGE_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
-  grid-gap: ${SPACING.spacing8};
-  padding: ${SPACING.spacing16};
-  background-color: ${COLORS.grey35};
-  border-radius: ${BORDERS.lineBorder};
+  border-radius: ${BORDERS.borderRadius16};
 `
 
 export interface StackerEmptyInterventionProps {
@@ -93,12 +91,9 @@ export function StackerEmptyInterventionContent({
           />
         </Flex>
         <Flex width="50%" css={STACKER_IMAGE_STYLE}>
-          <Box margin="0 auto" width="100%">
-            {/* TODO (chb, 04-30-2025): Replace this with proper empty content */}
-            <LegacyStyledText as="p">
-              {'Replace me with a Stacker Empty image/animation'}
-            </LegacyStyledText>
-          </Box>
+          <AnimationVideo role="presentation" width="100%">
+            <source src={EmptyHopper} data-testid="empty-animation" />
+          </AnimationVideo>
         </Flex>
       </Flex>
     </Flex>

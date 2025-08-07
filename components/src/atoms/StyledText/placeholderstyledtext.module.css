@@ -1,0 +1,26 @@
+@media not all and (width: 1024px) and (height: 600px) {
+  .heading_small_bold {
+    font-size: 1.125rem;
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-24);
+  }
+
+  .caption_bold {
+    font-size: 0.75rem;
+    font-weight: var(--font-weight-bold);
+  }
+
+  .body_default_semi_bold {
+    font-size: var(--font-size-h3);
+    font-weight: var(--font-weight-semi-bold);
+    line-height: var(--line-height-20);
+  }
+}
+
+@media (width: 1024px) and (height: 600px) {
+  .small_body_text_bold {
+    font-size: var(--font-size-20);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--font-height-24);
+  }
+}

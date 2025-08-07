@@ -4,9 +4,10 @@ DEPRECATED: Testing ModuleView independently of ModuleView is no longer helpful.
 Try to add new tests to test_module_state.py, where they can be tested together,
 treating ModuleState as a private implementation detail.
 """
+
 import pytest
 from math import isclose
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
+from pytest_lazy_fixtures import lf as lazy_fixture
 
 from contextlib import nullcontext as does_not_raise
 from typing import (
@@ -26,7 +27,7 @@ from opentrons_shared_data.robot.types import RobotType
 from opentrons_shared_data.deck.types import DeckDefinitionV5
 
 from opentrons_shared_data import load_shared_data
-from opentrons.types import DeckSlotName, MountType
+from opentrons.types import DeckSlotName, MountType, Point
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
     LoadedModule,
@@ -61,6 +62,8 @@ from opentrons.protocol_engine.state.module_substates import (
     TemperatureModuleId,
     ThermocyclerModuleSubState,
     ThermocyclerModuleId,
+    FlexStackerId,
+    FlexStackerSubState,
     ModuleSubStateType,
 )
 from opentrons_shared_data.deck import load as load_deck
@@ -360,59 +363,59 @@ def test_get_properties_by_id(
         (
             lazy_fixture("tempdeck_v1_def"),
             DeckSlotName.SLOT_1,
-            LabwareOffsetVector(x=-0.15, y=-0.15, z=80.09),
+            Point(x=-0.15, y=-0.15, z=80.09),
         ),
         (
             lazy_fixture("tempdeck_v2_def"),
             DeckSlotName.SLOT_1,
-            LabwareOffsetVector(x=-1.45, y=-0.15, z=80.09),
+            Point(x=-1.45, y=-0.15, z=80.09),
         ),
         (
             lazy_fixture("tempdeck_v2_def"),
             DeckSlotName.SLOT_3,
-            LabwareOffsetVector(x=1.15, y=-0.15, z=80.09),
+            Point(x=1.15, y=-0.15, z=80.09),
         ),
         (
             lazy_fixture("magdeck_v1_def"),
             DeckSlotName.SLOT_1,
-            LabwareOffsetVector(x=0.125, y=-0.125, z=82.25),
+            Point(x=0.125, y=-0.125, z=82.25),
         ),
         (
             lazy_fixture("magdeck_v2_def"),
             DeckSlotName.SLOT_1,
-            LabwareOffsetVector(x=-1.175, y=-0.125, z=82.25),
+            Point(x=-1.175, y=-0.125, z=82.25),
         ),
         (
             lazy_fixture("magdeck_v2_def"),
             DeckSlotName.SLOT_3,
-            LabwareOffsetVector(x=1.425, y=-0.125, z=82.25),
+            Point(x=1.425, y=-0.125, z=82.25),
         ),
         (
             lazy_fixture("thermocycler_v1_def"),
             DeckSlotName.SLOT_7,
-            LabwareOffsetVector(x=0, y=82.56, z=97.8),
+            Point(x=0, y=82.56, z=97.8),
         ),
         (
             lazy_fixture("thermocycler_v2_def"),
             DeckSlotName.SLOT_7,
-            LabwareOffsetVector(x=0, y=68.8, z=108.96),
+            Point(x=0, y=68.8, z=108.96),
         ),
         (
             lazy_fixture("heater_shaker_v1_def"),
             DeckSlotName.SLOT_1,
-            LabwareOffsetVector(x=-0.125, y=1.125, z=68.275),
+            Point(x=-0.125, y=1.125, z=68.275),
         ),
         (
             lazy_fixture("heater_shaker_v1_def"),
             DeckSlotName.SLOT_3,
-            LabwareOffsetVector(x=0.125, y=-1.125, z=68.275),
+            Point(x=0.125, y=-1.125, z=68.275),
         ),
     ],
 )
 def test_get_module_offset_for_ot2_standard(
     module_def: ModuleDefinition,
     slot: DeckSlotName,
-    expected_offset: LabwareOffsetVector,
+    expected_offset: Point,
 ) -> None:
     """It should return the correct labware offset for module in specified slot."""
     subject = make_module_view(
@@ -1052,7 +1055,7 @@ class _CalculateMagnetHardwareHeightTestParams(NamedTuple):
     [
         # Happy cases:
         _CalculateMagnetHardwareHeightTestParams(
-            definition=lazy_fixture("magdeck_v1_def"),
+            definition=lazy_fixture("magdeck_v1_def"),  # type: ignore[arg-type]
             mm_from_base=10,
             # TODO(mm, 2022-03-09): It's unclear if this expected result is correct.
             # https://github.com/Opentrons/opentrons/issues/9585
@@ -1060,7 +1063,7 @@ class _CalculateMagnetHardwareHeightTestParams(NamedTuple):
             expected_exception_type=None,
         ),
         _CalculateMagnetHardwareHeightTestParams(
-            definition=lazy_fixture("magdeck_v2_def"),
+            definition=lazy_fixture("magdeck_v2_def"),  # type: ignore[arg-type]
             mm_from_base=10,
             expected_result=12.5,
             expected_exception_type=None,
@@ -1074,49 +1077,49 @@ class _CalculateMagnetHardwareHeightTestParams(NamedTuple):
         # TODO(mm, 2022-03-09): It's unclear if the bounds used for V1 modules
         # are physically correct. https://github.com/Opentrons/opentrons/issues/9585
         _CalculateMagnetHardwareHeightTestParams(  # V1 barely too low.
-            definition=lazy_fixture("magdeck_v1_def"),
+            definition=lazy_fixture("magdeck_v1_def"),  # type: ignore[arg-type]
             mm_from_base=-2.51,
             expected_result=None,
             expected_exception_type=errors.EngageHeightOutOfRangeError,
         ),
         _CalculateMagnetHardwareHeightTestParams(  # V1 lowest allowed.
-            definition=lazy_fixture("magdeck_v1_def"),
+            definition=lazy_fixture("magdeck_v1_def"),  # type: ignore[arg-type]
             mm_from_base=-2.5,
             expected_result=0,
             expected_exception_type=None,
         ),
         _CalculateMagnetHardwareHeightTestParams(  # V1 highest allowed.
-            definition=lazy_fixture("magdeck_v1_def"),
+            definition=lazy_fixture("magdeck_v1_def"),  # type: ignore[arg-type]
             mm_from_base=20,
             expected_result=45,
             expected_exception_type=None,
         ),
         _CalculateMagnetHardwareHeightTestParams(  # V1 barely too high.
-            definition=lazy_fixture("magdeck_v1_def"),
+            definition=lazy_fixture("magdeck_v1_def"),  # type: ignore[arg-type]
             mm_from_base=20.01,
             expected_result=None,
             expected_exception_type=errors.EngageHeightOutOfRangeError,
         ),
         _CalculateMagnetHardwareHeightTestParams(  # V2 barely too low.
-            definition=lazy_fixture("magdeck_v2_def"),
+            definition=lazy_fixture("magdeck_v2_def"),  # type: ignore[arg-type]
             mm_from_base=-2.51,
             expected_result=None,
             expected_exception_type=errors.EngageHeightOutOfRangeError,
         ),
         _CalculateMagnetHardwareHeightTestParams(  # V2 lowest allowed.
-            definition=lazy_fixture("magdeck_v2_def"),
+            definition=lazy_fixture("magdeck_v2_def"),  # type: ignore[arg-type]
             mm_from_base=-2.5,
             expected_result=0,
             expected_exception_type=None,
         ),
         _CalculateMagnetHardwareHeightTestParams(  # V2 highest allowed.
-            definition=lazy_fixture("magdeck_v2_def"),
+            definition=lazy_fixture("magdeck_v2_def"),  # type: ignore[arg-type]
             mm_from_base=22.5,
             expected_result=25,
             expected_exception_type=None,
         ),
         _CalculateMagnetHardwareHeightTestParams(  # V2 barely too high.
-            definition=lazy_fixture("magdeck_v2_def"),
+            definition=lazy_fixture("magdeck_v2_def"),  # type: ignore[arg-type]
             mm_from_base=22.51,
             expected_result=None,
             expected_exception_type=errors.EngageHeightOutOfRangeError,
@@ -1157,7 +1160,7 @@ def test_magnetic_module_view_calculate_magnet_hardware_height(
         assert result == expected_result
 
 
-@pytest.mark.parametrize("target_temp", [36.8, 95.1])
+@pytest.mark.parametrize("target_temp", [-1, 95.1])
 def test_validate_heater_shaker_target_temperature_raises(
     heater_shaker_v1_def: ModuleDefinition,
     target_temp: float,
@@ -1749,6 +1752,39 @@ def test_raise_if_labware_in_location(
     )
     with expected_raise:
         subject.raise_if_module_in_location(location=location)
+
+
+def test_raise_if_module_in_col_4_location(
+    flex_stacker_v1_def: ModuleDefinition,
+) -> None:
+    """It should raise if there is already a module in column 4 when loading a module."""
+    subject = make_module_view(
+        slot_by_module_id={"module-id-1": DeckSlotName.SLOT_D3},
+        hardware_by_module_id={
+            "module-id-1": HardwareModule(
+                serial_number="serial-number",
+                definition=flex_stacker_v1_def,
+            )
+        },
+        substate_by_module_id={
+            "module-id-1": FlexStackerSubState(
+                module_id=FlexStackerId("module-id-1"),
+                pool_primary_definition=None,
+                pool_adapter_definition=None,
+                pool_lid_definition=None,
+                pool_height=0,
+                pool_overlap=0,
+                max_pool_count=0,
+                contained_labware_bottom_first=[],
+            )
+        },
+    )
+    with pytest.raises(
+        errors.LocationIsOccupiedError, match="is already present at D4"
+    ):
+        subject.raise_if_module_in_location(
+            location=DeckSlotLocation(slotName=DeckSlotName("D3"))
+        )
 
 
 def test_get_by_slot() -> None:

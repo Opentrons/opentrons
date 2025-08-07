@@ -11,10 +11,10 @@ from hypothesis import HealthCheck, Phase, Verbosity, settings
 
 # If there start being tests which do not use the DeckConfiguration object, then this Phase setting
 # can be applied prescriptively to only tests that use the DeckConfiguration object.
-DONT_SHRINK = set(settings.default.phases) - {Phase.shrink}
+DONT_SHRINK = set(settings.default.phases) - {Phase.shrink}  # type: ignore[union-attr]
 
 # The tests are slow because they are running the analysis on generated protocols, which takes longer than the default 200ms.
-# The tests are also filtering a lot of examples because they are generating a lot of invalid protocols. But generating 
+# The tests are also filtering a lot of examples because they are generating a lot of invalid protocols. But generating
 # examples is extremely fast, so we will leave this until we start seeing example generation start taking a long time.
 
 ITS_GONNA_BE_SLOW = (HealthCheck.too_slow, HealthCheck.filter_too_much)

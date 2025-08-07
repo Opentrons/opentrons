@@ -1,16 +1,13 @@
 module.exports = {
-  processors: [
-    [
-      'stylelint-processor-styled-components',
-      {
-        ignoreFiles: ['**/*.css'],
-      },
-    ],
+  extends: ['stylelint-config-standard', 'stylelint-config-idiomatic-order'],
+
+  ignoreFiles: [
+    'api/**',
+    '**/dist/**',
+    '**/coverage/**',
+    '**/venv/**',
+    'docs/**',
   ],
-
-  extends: ['stylelint-config-standard', 'stylelint-config-styled-components'],
-
-  ignoreFiles: ['api/**', '**/dist/**', '**/coverage/**', '**/venv/**'],
 
   rules: {
     'selector-class-pattern': /^[a-z0-9_]+$/,

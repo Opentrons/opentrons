@@ -1,10 +1,19 @@
 import type { FC } from 'react'
 import type { ProtocolFile } from '@opentrons/shared-data'
+import type { Flags } from '../feature-flags/types'
+import type { FileType } from './utils/fileUtils'
 
 export type ProtocolFormat = 'Protocol Designer' | 'Python'
 
 /** assistant: ChatGPT API, user: user */
 type Role = 'assistant' | 'user'
+
+export interface FileAttachment {
+  id?: string // Optional because it's not present when initially selecting files
+  name: string
+  type: FileType
+  content: File
+}
 
 export interface ChatData {
   /** assistant: ChatGPT API, user: user */
@@ -19,6 +28,8 @@ export interface ChatData {
   protocol_content?: ProtocolFile
   /** The format of the protocol */
   protocol_format?: ProtocolFormat
+  /** attached files */
+  attachments?: FileAttachment[]
 }
 
 export interface CreatePrompt {
@@ -44,6 +55,7 @@ export interface CreatePrompt {
 
 export type UpdateOptions =
   | 'adapt_python_protocol'
+  | 'add_runtime_parameters'
   | 'change_labware'
   | 'change_pipettes'
   | 'other'
@@ -69,6 +81,17 @@ export interface Chat {
   protocol_content?: string
   /** The format of the protocol */
   protocol_format?: ProtocolFormat
+  /** attached files */
+  attachments?: FileAttachment[]
+}
+
+/** Chat message serialized for API requests (without File content) */
+export interface ChatMessage {
+  role: Role
+  content: string
+  protocol_content?: string
+  protocol_format?: ProtocolFormat
+  fileMetadata?: Array<Omit<FileAttachment, 'content'>>
 }
 
 export interface RouteProps {
@@ -124,7 +147,4 @@ export interface PromptData {
   }
 }
 
-export interface FeatureFlags {
-  enablePrereleaseMode: boolean
-  enablePDProtocolGeneration: boolean
-}
+export type FeatureFlags = Flags

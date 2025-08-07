@@ -138,6 +138,7 @@
                 "2": [[12.5135, 0, 0.7945]]
               }
             },
+            "uiMaxFlowRate": 57,
             "defaultPushOutVolume": 0
           }
         },

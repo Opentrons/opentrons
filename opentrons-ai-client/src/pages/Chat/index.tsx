@@ -1,27 +1,29 @@
 import { useEffect, useRef } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { useAtom } from 'jotai'
 import styled from 'styled-components'
 
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 
-import { ChatDisplay } from '../../molecules/ChatDisplay'
-import { ChatFooter } from '../../molecules/ChatFooter'
-import { FeedbackModal } from '../../molecules/FeedbackModal'
+import { ChatDisplay } from '/ai-client/molecules/ChatDisplay'
+import { ChatFooter } from '/ai-client/molecules/ChatFooter'
+import { FeedbackModal } from '/ai-client/molecules/FeedbackModal'
 import {
   chatDataAtom,
   createProtocolChatAtom,
   feedbackModalAtom,
   scrollToBottomAtom,
   updateProtocolChatAtom,
-} from '../../resources/atoms'
+} from '/ai-client/resources/atoms'
 
 export interface InputType {
   userPrompt: string
 }
 
 export function Chat(): JSX.Element | null {
+  const { t } = useTranslation('protocol_generator')
   const methods = useForm<InputType>({
     defaultValues: {
       userPrompt: '',
@@ -35,10 +37,17 @@ export function Chat(): JSX.Element | null {
   const navigate = useNavigate()
   const [updateProtocolChat] = useAtom(updateProtocolChatAtom)
   const [createProtocolChat] = useAtom(createProtocolChatAtom)
+  const isDirectChatAccess =
+    updateProtocolChat.update_details === 'direct_chat_access'
 
   // Redirect to home page if there is no prompt (user has refreshed the page)
+  // Exception: Allow direct chat access
   useEffect(() => {
-    if (updateProtocolChat.prompt === '' && createProtocolChat.prompt === '') {
+    if (
+      updateProtocolChat.prompt === '' &&
+      createProtocolChat.prompt === '' &&
+      !isDirectChatAccess
+    ) {
       navigate('/')
     }
   }, [])
@@ -66,6 +75,16 @@ export function Chat(): JSX.Element | null {
           gridGap={SPACING.spacing24}
         >
           <ChatDataContainer>
+            {isDirectChatAccess ? (
+              <ChatDisplay
+                chat={{
+                  role: 'assistant',
+                  reply: t('chat_welcome_message'),
+                  requestId: 'welcome-message',
+                }}
+                chatId="welcome-message"
+              />
+            ) : null}
             {chatData.length > 0
               ? chatData.map((chat, index) => (
                   <ChatDisplay

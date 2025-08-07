@@ -12,6 +12,7 @@ from opentrons_shared_data.errors.exceptions import (
     FlexStackerShuttleMissingError,
     FlexStackerHopperLabwareError,
     FlexStackerShuttleLabwareError,
+    FlexStackerShuttleNotEmptyError,
 )
 
 from ..command import (
@@ -41,6 +42,7 @@ from .common import (
     FlexStackerShuttleError,
     FlexStackerHopperError,
     FlexStackerLabwareRetrieveError,
+    FlexStackerShuttleOccupiedError,
     primary_location_sequence,
     adapter_location_sequence,
     lid_location_sequence,
@@ -57,6 +59,7 @@ RecoverableExceptions = Union[
     FlexStackerShuttleMissingError,
     FlexStackerHopperLabwareError,
     FlexStackerShuttleLabwareError,
+    FlexStackerShuttleNotEmptyError,
 ]
 
 
@@ -147,7 +150,8 @@ _ExecuteReturn = Union[
     DefinedErrorData[FlexStackerStallOrCollisionError]
     | DefinedErrorData[FlexStackerShuttleError]
     | DefinedErrorData[FlexStackerHopperError]
-    | DefinedErrorData[FlexStackerLabwareRetrieveError],
+    | DefinedErrorData[FlexStackerLabwareRetrieveError]
+    | DefinedErrorData[FlexStackerShuttleOccupiedError],
 ]
 
 
@@ -175,6 +179,7 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
         | DefinedErrorData[FlexStackerShuttleError]
         | DefinedErrorData[FlexStackerHopperError]
         | DefinedErrorData[FlexStackerLabwareRetrieveError]
+        | DefinedErrorData[FlexStackerShuttleOccupiedError]
     ):
         """Handle a recoverable error raised during command execution."""
         error_map = {
@@ -182,6 +187,7 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
             FlexStackerShuttleMissingError: FlexStackerShuttleError,
             FlexStackerHopperLabwareError: FlexStackerHopperError,
             FlexStackerShuttleLabwareError: FlexStackerLabwareRetrieveError,
+            FlexStackerShuttleNotEmptyError: FlexStackerShuttleOccupiedError,
         }
         return DefinedErrorData(
             public=error_map[type(error)](
@@ -225,9 +231,6 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
                 f"Cannot retrieve a labware from Flex Stacker in {location} if the carriage is occupied"
             )
 
-        labware_height = self._state_view.geometry.get_height_of_stacker_labware_pool(
-            params.moduleId
-        )
         to_retrieve = stacker_state.contained_labware_bottom_first[0]
         remaining = stacker_state.contained_labware_bottom_first[1:]
 
@@ -271,12 +274,15 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
         if stacker_hw is not None:
             try:
                 stacker_hw.set_stacker_identify(True)
-                await stacker_hw.dispense_labware(labware_height=labware_height)
+                await stacker_hw.dispense_labware(
+                    labware_height=stacker_state.get_pool_height_minus_overlap()
+                )
             except (
                 FlexStackerStallError,
                 FlexStackerShuttleMissingError,
                 FlexStackerHopperLabwareError,
                 FlexStackerShuttleLabwareError,
+                FlexStackerShuttleNotEmptyError,
             ) as e:
                 return self.handle_recoverable_error(
                     e, to_retrieve.primaryLabwareId, state_update

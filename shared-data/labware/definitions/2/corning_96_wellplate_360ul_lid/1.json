@@ -1,0 +1,111 @@
+{
+  "allowedRoles": ["labware", "lid"],
+  "ordering": [],
+  "brand": {
+    "brand": "Corning",
+    "brandId": []
+  },
+  "metadata": {
+    "displayName": "Corning 96 Wellplate 360ul Lid",
+    "displayCategory": "lid",
+    "displayVolumeUnits": "\u00b5L",
+    "tags": []
+  },
+  "dimensions": {
+    "xDimension": 127,
+    "yDimension": 85,
+    "zDimension": 10
+  },
+  "wells": {},
+  "groups": [
+    {
+      "metadata": {},
+      "wells": []
+    }
+  ],
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": -0.71
+  },
+  "parameters": {
+    "format": "irregular",
+    "quirks": ["stackingMaxFive"],
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "loadName": "corning_96_wellplate_360ul_lid"
+  },
+  "namespace": "opentrons",
+  "version": 1,
+  "schemaVersion": 2,
+  "stackingOffsetWithModule": {
+    "thermocyclerModuleV2": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    }
+  },
+  "stackingOffsetWithLabware": {
+    "corning_96_wellplate_360ul_flat": {
+      "x": 0,
+      "y": 0,
+      "z": 6.5
+    },
+    "opentrons_flex_deck_riser": {
+      "x": 0,
+      "y": 0,
+      "z": 34
+    },
+    "protocol_engine_lid_stack_object": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    }
+  },
+  "stackLimit": 5,
+  "compatibleParentLabware": [
+    "protocol_engine_lid_stack_object",
+    "opentrons_flex_deck_riser",
+    "corning_96_wellplate_360ul_flat"
+  ],
+  "gripForce": 10,
+  "gripHeightFromLabwareBottom": 7,
+  "gripperOffsets": {
+    "default": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "dropOffset": {
+        "x": 0,
+        "y": 0,
+        "z": -6
+      }
+    },
+    "lidOffsets": {
+      "pickUpOffset": {
+        "x": 0.5,
+        "y": 0,
+        "z": -5
+      },
+      "dropOffset": {
+        "x": 0.5,
+        "y": 0,
+        "z": -1
+      }
+    },
+    "lidDisposalOffsets": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "dropOffset": {
+        "x": 0,
+        "y": 5.0,
+        "z": 50.0
+      }
+    }
+  }
+}

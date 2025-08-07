@@ -19,7 +19,10 @@ import {
   StyledText,
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
-import { getSlotInLocationStack } from '@opentrons/step-generation'
+import {
+  getSlotInLocationStack,
+  wellFillFromWellContents,
+} from '@opentrons/step-generation'
 
 import { selectors } from '../../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../../step-forms'
@@ -31,7 +34,6 @@ import { getSelectedWells } from '../../../well-selection/selectors'
 import { LINE_CLAMP_TEXT_STYLE, NAV_BAR_HEIGHT_REM } from '../../atoms'
 import { LiquidButton } from '../../molecules'
 import { SelectableLabware } from '../Labware/SelectableLabware'
-import { wellFillFromWellContents } from '../LabwareOnDeck/utils'
 import { LiquidToolbox } from './LiquidToolbox'
 
 import type { Dispatch, SetStateAction } from 'react'
@@ -41,11 +43,12 @@ const CONTAINER_WIDTH = '49.8125rem'
 
 interface AssignLiquidsModalProps {
   showLiquidOverflowMenu: Dispatch<SetStateAction<boolean>>
+  setDefineLiquidModal: Dispatch<SetStateAction<boolean>>
 }
 export function AssignLiquidsModal(
   props: AssignLiquidsModalProps
 ): JSX.Element | null {
-  const { showLiquidOverflowMenu } = props
+  const { showLiquidOverflowMenu, setDefineLiquidModal } = props
   const { t } = useTranslation('liquids')
   const [highlightedWells, setHighlightedWells] = useState<WellGroup | {}>({})
   const [showBadFormState, setShowBadFormState] = useState(false)
@@ -146,6 +149,7 @@ export function AssignLiquidsModal(
                   labwareProps={{
                     wellLabelOption: WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE,
                     definition: labwareDef,
+                    positioningMode: 'offsetInSlot',
                     highlightedWells,
                     wellFill: wellFillFromWellContents(
                       wellContents,
@@ -187,6 +191,7 @@ export function AssignLiquidsModal(
         <LiquidToolbox
           showBadFormState={showBadFormState}
           setShowBadFormState={setShowBadFormState}
+          setDefineLiquidModal={setDefineLiquidModal}
         />
       </Flex>
     </Flex>

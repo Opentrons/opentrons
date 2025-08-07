@@ -18,16 +18,16 @@ import {
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 
-import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
+import heater_shaker_module_transparent from '/ai-client/assets/images/modules/heater_shaker_module_transparent.png'
+import magdeck_gen1 from '/ai-client/assets/images/modules/magdeck_gen1.png'
+import magdeck_gen2 from '/ai-client/assets/images/modules/magdeck_gen2.png'
+import mag_block from '/ai-client/assets/images/modules/MagneticBlock_GEN1_HERO.png'
+import temp_deck_gen_2_transparent from '/ai-client/assets/images/modules/temp_deck_gen_2_transparent.png'
+import tempdeck_gen1 from '/ai-client/assets/images/modules/tempdeck_gen1.png'
+import thermocycler_gen2 from '/ai-client/assets/images/modules/thermocycler_gen2.png'
+import thermocycler from '/ai-client/assets/images/modules/thermocycler.png'
 
-import heater_shaker_module_transparent from '../../assets/images/modules/heater_shaker_module_transparent.png'
-import magdeck_gen1 from '../../assets/images/modules/magdeck_gen1.png'
-import magdeck_gen2 from '../../assets/images/modules/magdeck_gen2.png'
-import mag_block from '../../assets/images/modules/MagneticBlock_GEN1_HERO.png'
-import temp_deck_gen_2_transparent from '../../assets/images/modules/temp_deck_gen_2_transparent.png'
-import tempdeck_gen1 from '../../assets/images/modules/tempdeck_gen1.png'
-import thermocycler_gen2 from '../../assets/images/modules/thermocycler_gen2.png'
-import thermocycler from '../../assets/images/modules/thermocycler.png'
+import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
 interface Props {
   type: ModuleType

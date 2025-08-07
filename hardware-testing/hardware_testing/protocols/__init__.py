@@ -96,7 +96,7 @@ def create_labware_parameters(parameters: ParameterContext) -> None:
         display_name="Labware",
         description="Labware to probe.",
         choices=available_labware_choices,
-        default="opentrons_10_tuberack_nest_4x50ml_6x15ml_conical",
+        default="opentrons_96_wellplate_200ul_pcr_full_skirt",
     )
 
 

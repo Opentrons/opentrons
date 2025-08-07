@@ -133,6 +133,7 @@ describe('createPresavedStepForm', () => {
         pauseTemperature: null,
         stepDetails: '',
         stepName: 'pause',
+        stepNumber: 0,
       })
     })
   })
@@ -152,35 +153,33 @@ describe('createPresavedStepForm', () => {
       aspirate_airGap_checkbox: false,
       aspirate_airGap_volume: '1',
       aspirate_delay_checkbox: false,
-      aspirate_delay_mmFromBottom: null,
       aspirate_delay_seconds: '1',
       dispense_delay_checkbox: false,
       dispense_delay_seconds: '1',
-      dispense_delay_mmFromBottom: null,
       aspirate_flowRate: null,
       aspirate_labware: null,
       aspirate_mix_checkbox: false,
       aspirate_mix_times: null,
       aspirate_mix_volume: null,
       aspirate_mmFromBottom: null,
-      aspirate_position_reference: null,
-      aspirate_retract_position_reference: null,
-      aspirate_retract_delay_seconds: null,
+      aspirate_position_reference: 'well-bottom',
+      aspirate_retract_position_reference: 'well-top',
+      aspirate_retract_delay_seconds: 0,
       aspirate_retract_mmFromBottom: null,
       aspirate_retract_speed: null,
       aspirate_retract_x_position: 0,
       aspirate_retract_y_position: 0,
-      aspirate_submerge_position_reference: null,
+      aspirate_submerge_position_reference: 'well-top',
       aspirate_submerge_mmFromBottom: null,
       aspirate_submerge_x_position: 0,
       aspirate_submerge_y_position: 0,
 
-      aspirate_submerge_delay_seconds: null,
+      aspirate_submerge_delay_seconds: 0,
       aspirate_submerge_speed: null,
       aspirate_touchTip_checkbox: false,
-      aspirate_touchTip_mmFromEdge: null,
+      aspirate_touchTip_mmFromEdge: 0,
       aspirate_touchTip_mmFromTop: null,
-      aspirate_touchTip_speed: null,
+      aspirate_touchTip_speed: 60,
       aspirate_wellOrder_first: 't2b',
       aspirate_wellOrder_second: 'l2r',
       aspirate_wells: [],
@@ -196,23 +195,23 @@ describe('createPresavedStepForm', () => {
       dispense_mix_times: null,
       dispense_mix_volume: null,
       dispense_mmFromBottom: null,
-      dispense_position_reference: null,
-      dispense_retract_delay_seconds: null,
-      dispense_retract_position_reference: null,
+      dispense_position_reference: 'well-bottom',
+      dispense_retract_delay_seconds: 0,
+      dispense_retract_position_reference: 'well-top',
       dispense_retract_mmFromBottom: null,
       dispense_retract_speed: null,
       dispense_retract_x_position: 0,
       dispense_retract_y_position: 0,
-      dispense_submerge_position_reference: null,
+      dispense_submerge_position_reference: 'well-top',
       dispense_submerge_mmFromBottom: null,
       dispense_submerge_x_position: 0,
       dispense_submerge_y_position: 0,
-      dispense_submerge_delay_seconds: null,
+      dispense_submerge_delay_seconds: 0,
       dispense_submerge_speed: null,
       dispense_touchTip_checkbox: false,
-      dispense_touchTip_mmFromEdge: null,
+      dispense_touchTip_mmFromEdge: 0,
       dispense_touchTip_mmFromTop: null,
-      dispense_touchTip_speed: null,
+      dispense_touchTip_speed: 60,
       dispense_wellOrder_first: 't2b',
       dispense_wellOrder_second: 'l2r',
       dispense_wells: [],
@@ -231,10 +230,10 @@ describe('createPresavedStepForm', () => {
       aspirate_y_position: 0,
       dispense_x_position: 0,
       dispense_y_position: 0,
-      blowout_z_offset: 0,
       blowout_flowRate: null,
       liquidClassesSupported: true,
       liquidClass: 'none',
+      stepNumber: 0,
     })
   })
   describe('mix step', () => {
@@ -244,6 +243,7 @@ describe('createPresavedStepForm', () => {
         id: stepId,
         pipette: 'leftPipetteId',
         stepType: 'mix',
+        stepNumber: 0,
         // default fields
         labware: null,
         nozzles: null,
@@ -279,7 +279,7 @@ describe('createPresavedStepForm', () => {
         liquidClass: 'none',
         pushOut_checkbox: null,
         pushOut_volume: null,
-        mix_position_reference: null,
+        mix_position_reference: 'well-bottom',
       })
     })
   })
@@ -294,6 +294,7 @@ describe('createPresavedStepForm', () => {
       // Default values
       stepName: 'magnetic module state',
       stepDetails: '',
+      stepNumber: 0,
     })
   })
   it('should set a default magnetic module for magnet step, and set magnetAction=disengage, when the previous magnet step is an engage', () => {
@@ -308,6 +309,7 @@ describe('createPresavedStepForm', () => {
           magnetAction: 'engage',
           stepName: 'magnetic module state',
           stepDetails: '',
+          stepNumber: 0,
         },
       },
       orderedStepIds: ['prevStepId'],
@@ -321,6 +323,7 @@ describe('createPresavedStepForm', () => {
       magnetAction: 'disengage',
       stepName: 'magnetic module state',
       stepDetails: '',
+      stepNumber: 0,
     })
   })
   it('should set a default magnetic module for magnet step, and set magnetAction=engage, when the previous magnet step is a disengage', () => {
@@ -348,6 +351,7 @@ describe('createPresavedStepForm', () => {
       magnetAction: 'engage',
       stepName: 'magnetic module state',
       stepDetails: '',
+      stepNumber: 0,
     })
   })
   it('should set a default temperature module when a Temperature step is added', () => {
@@ -359,8 +363,9 @@ describe('createPresavedStepForm', () => {
       // Default fields
       setTemperature: null,
       targetTemperature: null,
-      stepName: 'temperature module state',
+      stepName: 'temperature',
       stepDetails: '',
+      stepNumber: 0,
     })
   })
   ;[true, false].forEach(timelineHasErrors => {
@@ -398,6 +403,7 @@ describe('createPresavedStepForm', () => {
               // TC Default fields (should all be ignored, robotState is used to populate the form)
               stepName: 'thermocycler',
               stepDetails: '',
+              stepNumber: 0,
               thermocyclerFormType: 'thermocyclerState',
               blockIsActive: false,
               blockTargetTemp: null,
@@ -436,6 +442,7 @@ describe('createPresavedStepForm', () => {
           profileTargetLidTemp: null,
           profileVolume: null,
           stepDetails: '',
+          stepNumber: 0,
           stepName: 'thermocycler',
           stepType: 'thermocycler',
           thermocyclerFormType: 'thermocyclerState',
