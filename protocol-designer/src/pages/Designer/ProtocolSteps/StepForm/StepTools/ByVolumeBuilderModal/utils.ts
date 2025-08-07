@@ -28,7 +28,7 @@ export const getAnnotations = (
     showarrow: false,
     xanchor: 'center',
     yanchor: 'bottom',
-    yshift: 15,
+    yshift: 5,
     font: {
       color: COLORS.black90,
       size: TYPOGRAPHY.fontSize20,
