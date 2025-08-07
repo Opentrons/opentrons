@@ -11,6 +11,7 @@ import {
   FLEX_STACKER_FIXTURES,
   FLEX_STAGING_ADDRESSABLE_AREAS_WITH_FAKES,
   FLEX_USB_MODULE_FIXTURES,
+  THERMOCYCLER_MODULE_CUTOUTS,
   WASTE_CHUTE_FIXTURES,
   WASTE_CHUTE_WITH_FAKE_FIXTURES,
 } from '.'
@@ -1217,6 +1218,9 @@ export const isModuleAllowedOnAA = (
   aa: AddressableAreaNamesWithFakes,
   moduleModel: ModuleModel
 ): boolean => {
+  if (moduleModel === THERMOCYCLER_MODULE_V2) {
+    return THERMOCYCLER_MODULE_CUTOUTS.includes(cutoutId)
+  }
   const fixtureId = getCutoutFixtureIdsForModuleModel(moduleModel)
   const aaForFixture = getAAWithFakesFromCutoutFixtureId(
     cutoutId,
@@ -1288,6 +1292,14 @@ export const replaceCutoutFixtureWithComboFixture = (
   return addedCutoutConfigs.map(aaCutoutItem => {
     console.log('Processing cutout item:', aaCutoutItem)
 
+    if (
+      THERMOCYCLER_MODULE_CUTOUTS.includes(cutoutId) &&
+      MODULE_FIXTURES_BY_MODEL.thermocyclerModuleV2?.includes(
+        aaCutoutItem.cutoutFixtureId as CutoutFixtureId
+      )
+    ) {
+      return { ...aaCutoutItem }
+    }
     // Filter potential combo fixture options
     const comboFixturesOptions = Object.entries(
       addressableAreasById

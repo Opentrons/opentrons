@@ -20,6 +20,7 @@ import {
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   TEMPERATURE_MODULE_V2_FIXTURE,
+  THERMOCYCLER_MODULE_V2,
   WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '..'
@@ -598,6 +599,21 @@ describe('isModuleAllowedOnAA', () => {
   it('should return true for tempModule on D3', () => {
     const vs = isModuleAllowedOnAA('cutoutD3', 'D3', 'temperatureModuleV2')
     expect(vs).toEqual(true)
+  })
+
+  it('should return true for thermocycler on A1', () => {
+    const vs = isModuleAllowedOnAA('cutoutA1', 'A1', THERMOCYCLER_MODULE_V2)
+    expect(vs).toEqual(true)
+  })
+
+  it('should return true for thermocycler on B1', () => {
+    const vs = isModuleAllowedOnAA('cutoutB1', 'B1', THERMOCYCLER_MODULE_V2)
+    expect(vs).toEqual(true)
+  })
+
+  it('should return false for thermocycler on A3', () => {
+    const vs = isModuleAllowedOnAA('cutoutA3', 'A3', THERMOCYCLER_MODULE_V2)
+    expect(vs).toEqual(false)
   })
 })
 
