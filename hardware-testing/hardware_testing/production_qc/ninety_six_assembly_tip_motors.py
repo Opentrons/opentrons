@@ -49,6 +49,7 @@ async def _check_if_jaw_is_aligned_with_endstop(api: OT3API) -> bool:
         ui.print_error("endstop hit too early")
     return pass_no_hit
 
+
 async def jaw_precheck(api: OT3API, ax: Axis, speed: float) -> Tuple[bool, bool]:
     """Check the LEDs work and jaws are aligned."""
     # HOME
@@ -73,6 +74,7 @@ async def jaw_precheck(api: OT3API, ax: Axis, speed: float) -> Tuple[bool, bool]
         ui.print_error("Jaws Misaligned")
     return led_check, jaws_aligned
 
+
 async def _run_test_jaw(api: OT3API):
     ax = Axis.Q
     settings = helpers_ot3.get_gantry_load_per_axis_motion_settings_ot3(api, ax)
@@ -85,6 +87,7 @@ async def _run_test_jaw(api: OT3API):
         else:
             no_hit = False
         return led_check and jaws_aligned and no_hit
+
     await api.home_z(OT3Mount.LEFT)
     slot_5 = helpers_ot3.get_slot_calibration_square_position_ot3(5)
     home_pos = await api.gantry_position(OT3Mount.LEFT)
@@ -121,6 +124,7 @@ async def _run_test_jaw(api: OT3API):
         await _check_if_jaw_is_aligned_with_endstop(api)
     print("homing...")
     await api.home([ax])
+
 
 async def _main() -> None:
     print("start")
