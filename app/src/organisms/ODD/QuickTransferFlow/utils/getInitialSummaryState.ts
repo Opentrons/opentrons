@@ -33,6 +33,7 @@ interface InitialSummaryStateProps {
     pushOutDispense?: {
       volume: number
     }
+    changeTip: ChangeTipOptions
   }
   deckConfig: DeckConfiguration
 }
@@ -69,14 +70,6 @@ export function getInitialSummaryState(
     path = 'multiAspirate'
   }
 
-  let changeTip: ChangeTipOptions = 'always'
-  if (
-    state.sourceWells.length * state.pipette.channels > 96 ||
-    state.destinationWells.length * state.pipette.channels > 96
-  ) {
-    changeTip = 'once'
-  }
-
   const trashConfigCutout = deckConfig.find(
     configCutout =>
       WASTE_CHUTE_FIXTURES.includes(configCutout.cutoutFixtureId) ||
@@ -108,7 +101,7 @@ export function getInitialSummaryState(
     tipPositionAspirate: 1,
     preWetTip: false,
     tipPositionDispense: 1,
-    changeTip,
+    changeTip: state.changeTip,
     dropTipLocation: trashConfigCutout,
     liquidClassName: state.liquidClassName,
     liquidClassValuesInitialized: false,
