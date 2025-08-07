@@ -67,7 +67,6 @@
   "latch_will_release_in_s": "Latch will release labware in {{seconds}} seconds",
   "launch_recovery_mode": "Launch recovery mode",
   "load_labware_into_labware_shuttle": "Load labware onto labware shuttle",
-  "load_labware_into_stacker": "Load {{quantity}} labware into stacker",
   "load_labware_into_stacker_and_retry_step": "Load labware into stacker and retry step",
   "load_labware_shuttle_and_retry_step": "Load labware shuttle and retry step",
   "load_labware_shuttle_onto_track": "Load labware shuttle onto track",
