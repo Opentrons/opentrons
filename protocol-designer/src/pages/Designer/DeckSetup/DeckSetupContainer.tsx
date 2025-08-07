@@ -242,7 +242,7 @@ export function DeckSetupContainer(
               deckDef={deckDef}
               viewBox={viewBoxAdjusted}
               transform={
-              robotType === OT2_ROBOT_TYPE
+                robotType === OT2_ROBOT_TYPE
                   ? 'scale(1.3, -1.3)'
                   : 'scale(1, -1)'
               }
