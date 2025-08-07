@@ -383,7 +383,7 @@ export const transfer: CommandCreator<TransferArgs> = (
 
   const pythonLiquidClassArgs = [
     `name=${formatPyStr(`${args.commandCreatorFnName}_step_${stepId}`)}`,
-    ...(liquidClass != null && liquidClass !== 'none'
+    ...(liquidClass != null
       ? [`base_liquid_class=${getLiquidClassName(liquidClass, true)}`]
       : []),
     `properties=${getCustomLiquidClassProperties({
