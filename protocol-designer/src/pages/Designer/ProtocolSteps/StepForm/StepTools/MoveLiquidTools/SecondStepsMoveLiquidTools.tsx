@@ -94,7 +94,7 @@ export const SecondStepsMoveLiquidTools = ({
   const enableByVolumeBuilder = useSelector(getEnableByVolumeBuilder)
   const { spec: pipetteSpecs } = pipetteEntities[String(formData.pipette)]
   const invariantContext = useSelector(getInvariantContext)
-  const maxVolume = getPipetteWithTipMaxVol(
+  const pipetteWithTipMaxVol = getPipetteWithTipMaxVol(
     formData.pipette as string,
     invariantContext,
     formData.tipRack as string
@@ -109,6 +109,8 @@ export const SecondStepsMoveLiquidTools = ({
     )
     ?.byTipType.find(({ tiprack }) => tiprack === formData.tipRack)?.aspirate
     .flowRateByVolume
+  const highestY = Math.max(...(byTipValues?.map(point => point[1]) ?? []))
+  const maxVolume = Math.max(pipetteWithTipMaxVol, highestY)
 
   const robotType = useSelector(getRobotType)
   const pipetteSpec = useSelector(getPipetteEntities)[formData.pipette]?.spec
