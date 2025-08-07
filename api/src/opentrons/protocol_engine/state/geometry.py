@@ -588,6 +588,40 @@ class GeometryView:
                 f"Liquid Height of {probed_height} mm is greater than maximum well height {well_depth} mm."
             )
 
+    def get_xy_offset_if_needed(self, labware_id: str, well_name: str) -> WellOffset:
+        """Add an x,y offset to position the tip into the center of the well if needed."""
+        well_def = self._labware.get_well_definition(labware_id, well_name)
+        well_geometry = self._labware.get_well_geometry(
+            labware_id=labware_id, well_name=well_name
+        )
+        x_offset = 0.0
+        y_offset = 0.0
+        if isinstance(well_geometry, InnerWellGeometry):
+            sorted_well = sorted(
+                well_geometry.sections, key=lambda section: section.topHeight
+            )
+            bottom_xcount = sorted_well[0].xCount
+            bottom_ycount = sorted_well[0].yCount
+
+            if well_def.shape == "circular":
+                well_x_dimension = well_y_dimension = well_def.diameter
+            else:
+                assert well_def.shape == "rectangular", "invalid well shape"
+                well_x_dimension = well_def.xDimension
+                well_y_dimension = well_def.yDimension
+
+            # if there are an even number of subsections, we'll need to reposition into
+            # the middle of one of the subsections, rather than the middle of the whole well.
+            if bottom_xcount % 2 == 0:
+                subsection_x_dimension = well_x_dimension / bottom_xcount
+                # move over into the middle of the nearest subsection
+                x_offset = subsection_x_dimension / 2
+            if bottom_ycount % 2 == 0:
+                subsection_y_dimension = well_y_dimension / bottom_ycount
+                # move over into the middle of the nearest subection
+                y_offset = subsection_y_dimension / 2
+        return WellOffset(x=x_offset, y=y_offset, z=0)
+
     def get_well_position(
         self,
         labware_id: str,
@@ -600,8 +634,10 @@ class GeometryView:
         labware_pos = self.get_labware_position(labware_id)
         well_def = self._labware.get_well_definition(labware_id, well_name)
         well_depth = well_def.depth
-
-        offset = WellOffset(x=0, y=0, z=well_depth)
+        xy_offset = self.get_xy_offset_if_needed(
+            labware_id=labware_id, well_name=well_name
+        )
+        offset = WellOffset(x=xy_offset.x, y=xy_offset.y, z=well_depth)
         if well_location is not None:
             offset = well_location.offset  # location of the bottom of the well
             offset_adjustment = self.get_well_offset_adjustment(
