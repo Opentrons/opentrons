@@ -6,6 +6,7 @@ import {
 
 import type { Mount } from '@opentrons/api-client'
 import type {
+  CutoutConfig,
   DeckConfiguration,
   LabwareDefinition2,
   PipetteV2Specs,
@@ -33,6 +34,7 @@ interface InitialSummaryStateProps {
     pushOutDispense?: {
       volume: number
     }
+    dropTipLocation?: CutoutConfig
   }
   deckConfig: DeckConfiguration
 }
@@ -109,7 +111,7 @@ export function getInitialSummaryState(
     preWetTip: false,
     tipPositionDispense: 1,
     changeTip,
-    dropTipLocation: trashConfigCutout,
+    dropTipLocation: state.dropTipLocation ?? trashConfigCutout,
     liquidClassName: state.liquidClassName,
     liquidClassValuesInitialized: false,
     pushOutDispense: state.pushOutDispense,
