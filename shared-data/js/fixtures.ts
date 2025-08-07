@@ -1184,7 +1184,7 @@ export const isModuleAllowedOnAA = (
   moduleModel: ModuleModel
 ): boolean => {
   if (moduleModel === THERMOCYCLER_MODULE_V2) {
-    return THERMOCYCLER_MODULE_CUTOUTS.includes(cutoutId) ? true : false
+    return THERMOCYCLER_MODULE_CUTOUTS.includes(cutoutId)
   }
   const fixtureId = getCutoutFixtureIdsForModuleModel(moduleModel)
   const aaForFixture = getAAWithFakesFromCutoutFixtureId(
