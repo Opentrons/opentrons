@@ -1,4 +1,4 @@
-import { QuickTransferSummaryState } from '../types'
+import type { QuickTransferSummaryState } from '../types'
 
 export const getIsTouchTipEnabled = (
   sourceOrDestination:
