@@ -123,7 +123,7 @@ class UnsealPipetteFromTipImplementation(
             state_update=move_result.state_update.set_fluid_unknown(
                 pipette_id=pipette_id
             ).update_pipette_tip_state(
-                pipette_id=params.pipetteId, tip_geometry=None, well_picked_up_from=None
+                pipette_id=params.pipetteId, tip_geometry=None, tip_source=None
             ),
         )
 

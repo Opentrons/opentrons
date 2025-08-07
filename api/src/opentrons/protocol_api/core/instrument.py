@@ -311,7 +311,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
         ...
 
     @abstractmethod
-    def get_last_well_tip_picked_up_from(
+    def get_tip_origin(
         self,
     ) -> Optional[Tuple[LabwareCoreType, WellCoreType]]:
         ...

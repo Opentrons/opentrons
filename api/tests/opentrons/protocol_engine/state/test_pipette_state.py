@@ -253,7 +253,7 @@ def test_last_tip_rack_well() -> None:
     tip_picked_up_update = update_types.PipetteTipStateUpdate(
         pipette_id="pipette-id",
         tip_geometry=TipGeometry(length=1, diameter=2, volume=3),
-        well_picked_up_from=LabwareWellId(
+        tip_source=LabwareWellId(
             labware_id="my-cool-labware", well_name="less-cool-well"
         ),
     )
@@ -272,7 +272,7 @@ def test_last_tip_rack_well() -> None:
     ) == LabwareWellId(labware_id="my-cool-labware", well_name="less-cool-well")
 
     tip_dropped_update = update_types.PipetteTipStateUpdate(
-        pipette_id="pipette-id", tip_geometry=None, well_picked_up_from=None
+        pipette_id="pipette-id", tip_geometry=None, tip_source=None
     )
 
     subject.handle_action(

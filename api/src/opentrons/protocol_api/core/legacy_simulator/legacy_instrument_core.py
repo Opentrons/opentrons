@@ -428,7 +428,7 @@ class LegacyInstrumentCoreSimulator(
     def get_blow_out_flow_rate(self, rate: float = 1.0) -> float:
         return self._pipette_dict["blow_out_flow_rate"] * rate
 
-    def get_last_well_tip_picked_up_from(
+    def get_tip_origin(
         self,
     ) -> Optional[Tuple[LegacyLabwareCore, LegacyWellCore]]:
         return self._last_tip_rack_and_well

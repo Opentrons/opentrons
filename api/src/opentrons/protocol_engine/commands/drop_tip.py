@@ -193,7 +193,7 @@ class DropTipImplementation(AbstractCommandImpl[DropTipParams, _ExecuteReturn]):
                 state_update_if_false_positive=move_result.state_update.update_pipette_tip_state(
                     pipette_id=params.pipetteId,
                     tip_geometry=None,
-                    well_picked_up_from=None,
+                    tip_source=None,
                 ),
             )
         else:
@@ -204,7 +204,7 @@ class DropTipImplementation(AbstractCommandImpl[DropTipParams, _ExecuteReturn]):
                 ).update_pipette_tip_state(
                     pipette_id=params.pipetteId,
                     tip_geometry=None,
-                    well_picked_up_from=None,
+                    tip_source=None,
                 ),
             )
 

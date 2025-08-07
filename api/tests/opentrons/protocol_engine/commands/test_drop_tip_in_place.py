@@ -62,7 +62,7 @@ async def test_success(
         public=DropTipInPlaceResult(),
         state_update=StateUpdate(
             pipette_tip_state=PipetteTipStateUpdate(
-                pipette_id="abc", tip_geometry=None, well_picked_up_from=None
+                pipette_id="abc", tip_geometry=None, tip_source=None
             ),
             pipette_aspirated_fluid=PipetteUnknownFluidUpdate(pipette_id="abc"),
         ),
@@ -117,7 +117,7 @@ async def test_tip_attached_error(
             pipette_tip_state=PipetteTipStateUpdate(
                 pipette_id="abc",
                 tip_geometry=None,
-                well_picked_up_from=None,
+                tip_source=None,
             ),
         ),
     )

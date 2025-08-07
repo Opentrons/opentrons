@@ -3121,7 +3121,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         If there is no tip currently on the pipette, this will return ``None``.
         """
-        tip_rack_cores = self._core.get_last_well_tip_picked_up_from()
+        tip_rack_cores = self._core.get_tip_origin()
         if tip_rack_cores is None:
             return None
         labware_core, well_core = tip_rack_cores

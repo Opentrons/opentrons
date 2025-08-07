@@ -537,7 +537,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
     def get_speed(self) -> PlungerSpeeds:
         return self._speeds
 
-    def get_last_well_tip_picked_up_from(
+    def get_tip_origin(
         self,
     ) -> Optional[Tuple[LegacyLabwareCore, LegacyWellCore]]:
         return self._last_tip_rack_and_well

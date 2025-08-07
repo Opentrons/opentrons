@@ -89,7 +89,7 @@ class UnsafeDropTipInPlaceImplementation(
         state_update.update_pipette_tip_state(
             pipette_id=params.pipetteId,
             tip_geometry=None,
-            well_picked_up_from=None,
+            tip_source=None,
         )
         state_update.set_fluid_unknown(pipette_id=params.pipetteId)
 

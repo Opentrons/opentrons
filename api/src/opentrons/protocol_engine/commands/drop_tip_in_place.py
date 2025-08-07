@@ -100,7 +100,7 @@ class DropTipInPlaceImplementation(
             state_update_if_false_positive.update_pipette_tip_state(
                 pipette_id=params.pipetteId,
                 tip_geometry=None,
-                well_picked_up_from=None,
+                tip_source=None,
             )
             state_update.set_fluid_unknown(pipette_id=params.pipetteId)
             error = TipPhysicallyAttachedError(
@@ -125,7 +125,7 @@ class DropTipInPlaceImplementation(
             state_update_if_false_positive.update_pipette_tip_state(
                 pipette_id=params.pipetteId,
                 tip_geometry=None,
-                well_picked_up_from=None,
+                tip_source=None,
             )
             state_update.set_fluid_unknown(pipette_id=params.pipetteId)
             return DefinedErrorData(
@@ -149,7 +149,7 @@ class DropTipInPlaceImplementation(
             state_update_if_false_positive.update_pipette_tip_state(
                 pipette_id=params.pipetteId,
                 tip_geometry=None,
-                well_picked_up_from=None,
+                tip_source=None,
             )
             state_update.set_fluid_unknown(pipette_id=params.pipetteId)
             return DefinedErrorData(
@@ -173,7 +173,7 @@ class DropTipInPlaceImplementation(
             state_update.update_pipette_tip_state(
                 pipette_id=params.pipetteId,
                 tip_geometry=None,
-                well_picked_up_from=None,
+                tip_source=None,
             )
             return SuccessData(public=DropTipInPlaceResult(), state_update=state_update)
 

@@ -1049,7 +1049,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
     def get_liquid_presence_detection(self) -> bool:
         return self._liquid_presence_detection
 
-    def get_last_well_tip_picked_up_from(
+    def get_tip_origin(
         self,
     ) -> Optional[Tuple[LabwareCore, WellCore]]:
         last_tip_pickup_info = (
@@ -1882,7 +1882,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
     ) -> None:
         """Drop or return tip for usage in liquid class transfers."""
         if return_tip:
-            last_tip = self.get_last_well_tip_picked_up_from()
+            last_tip = self.get_tip_origin()
             assert last_tip is not None
             _, tip_well = last_tip
             self.drop_tip(

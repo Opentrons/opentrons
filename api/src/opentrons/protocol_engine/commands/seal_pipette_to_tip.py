@@ -310,9 +310,7 @@ class SealPipetteToTipImplementation(
         state_update = move_result.state_update.update_pipette_tip_state(
             pipette_id=pipette_id,
             tip_geometry=tip_geometry,
-            well_picked_up_from=LabwareWellId(
-                labware_id=labware_id, well_name=well_name
-            ),
+            tip_source=LabwareWellId(labware_id=labware_id, well_name=well_name),
         ).set_fluid_aspirated(
             pipette_id=pipette_id,
             fluid=AspiratedFluid(kind=FluidKind.LIQUID, volume=_SAFE_TOP_VOLUME),

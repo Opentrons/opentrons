@@ -223,7 +223,7 @@ class PipetteTipStateUpdate:
 
     pipette_id: str
     tip_geometry: TipGeometry | None
-    well_picked_up_from: LabwareWellId | None
+    tip_source: LabwareWellId | None
 
 
 @dataclasses.dataclass
@@ -719,13 +719,13 @@ class StateUpdate:
         self: Self,
         pipette_id: str,
         tip_geometry: TipGeometry | None,
-        well_picked_up_from: LabwareWellId | None,
+        tip_source: LabwareWellId | None,
     ) -> Self:
         """Update a pipette's tip state. See `PipetteTipStateUpdate`."""
         self.pipette_tip_state = PipetteTipStateUpdate(
             pipette_id=pipette_id,
             tip_geometry=tip_geometry,
-            well_picked_up_from=well_picked_up_from,
+            tip_source=tip_source,
         )
         return self
 

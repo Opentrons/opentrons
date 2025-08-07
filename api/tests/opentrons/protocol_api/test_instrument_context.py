@@ -1027,7 +1027,7 @@ def test_return_tip(
     decoy.when(mock_well_core.get_name()).then_return("foo")
     decoy.when(mock_well.top()).then_return(top_location)
     decoy.when(mock_instrument_core.has_tip()).then_return(True)
-    decoy.when(mock_instrument_core.get_last_well_tip_picked_up_from()).then_return(
+    decoy.when(mock_instrument_core.get_tip_origin()).then_return(
         (mock_tiprack_core, mock_well_core)
     )
 
@@ -1041,9 +1041,7 @@ def test_return_tip(
             alternate_drop_location=False,
         )
     )
-    decoy.when(mock_instrument_core.get_last_well_tip_picked_up_from()).then_return(
-        None
-    )
+    decoy.when(mock_instrument_core.get_tip_origin()).then_return(None)
 
     with pytest.raises(TypeError, match="Last tip location"):
         subject.return_tip()
