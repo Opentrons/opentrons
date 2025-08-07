@@ -312,11 +312,11 @@ describe('useReleaseLabware', () => {
             break
           default:
             expect(releaseGripperJaws).toHaveBeenCalledTimes(1)
+            expect(handleMotionRouting).toHaveBeenNthCalledWith(1, true)
+            expect(homeExceptPlungers).toHaveBeenCalledTimes(1)
+            expect(handleMotionRouting).toHaveBeenNthCalledWith(2, false)
             break
         }
-        expect(handleMotionRouting).toHaveBeenNthCalledWith(1, true)
-        expect(homeExceptPlungers).toHaveBeenCalledTimes(1)
-        expect(handleMotionRouting).toHaveBeenNthCalledWith(2, false)
         expect(proceedToRouteAndStep).toHaveBeenCalledWith(
           recoveryOption,
           nextStep
