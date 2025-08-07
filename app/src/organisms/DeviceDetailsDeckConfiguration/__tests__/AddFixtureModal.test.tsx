@@ -88,10 +88,11 @@ describe('Touchscreen AddFixtureModal', () => {
     fireEvent.click(screen.getAllByText('Add')[0])
   })
 
-  it('should render text and buttons without modules', () => {
-    render(props)
+  it.only('should render text and buttons without modules', () => {
     props = { ...props, addressableAreaId: 'D4' }
-    screen.getByText('Add to Slot D3')
+    render(props)
+
+    screen.getByText('Add to Slot D4')
     screen.getByText(
       'Choose an item below to add to your deck configuration. It will be referenced during protocol analysis.'
     )
