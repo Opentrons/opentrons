@@ -5,5 +5,5 @@ export const getIsTouchTipEnabled = (
     | QuickTransferSummaryState['source']
     | QuickTransferSummaryState['destination']
 ): boolean =>
-  typeof sourceOrDestination === 'object' &&
-  sourceOrDestination.metadata?.displayCategory !== 'reservoir'
+  sourceOrDestination === 'source' ||
+  sourceOrDestination.metadata.displayCategory !== 'reservoir'
