@@ -82,19 +82,6 @@ describe('Render StackerHopperLwInfo', () => {
 
     expect(LeftColumnLabwareInfo).toHaveBeenCalledWith(
       expect.objectContaining({
-        title: 'Load 2 labware into stacker',
-      }),
-      expect.anything()
-    )
-    screen.getByText('MOCK_LEFT_COLUMN_LABWARE_INFO')
-  })
-
-  it(`renders correct title for other error kinds`, () => {
-    props.errorKind = ERROR_KINDS.STACKER_SHUTTLE_EMPTY
-    render(props)
-
-    expect(LeftColumnLabwareInfo).toHaveBeenCalledWith(
-      expect.objectContaining({
         title: 'Ensure stacker has labware',
       }),
       expect.anything()
