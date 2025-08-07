@@ -1,12 +1,11 @@
 ---
 title: "Temperature Module: OT-2 Attachment Steps"
+hide: toc
 ---
 
 # OT-2 Attachment Steps
 
 To install the Temperature Module on your OT-2:
-
-<div class="instruction-list" markdown>
 
 1. Choose the supported deck slot you want to use for the module and press it gently into place.
 

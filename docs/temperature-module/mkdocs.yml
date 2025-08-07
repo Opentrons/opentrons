@@ -15,6 +15,7 @@ theme:
 
 nav:
   - Home: index.md
+  - Flex Installation: flex-installation.md
   - OT-2 Installation: ot2-installation.md
   - Maintenance and Cleaning: maintenance.md
   - Additional Product Information: warranty.md
