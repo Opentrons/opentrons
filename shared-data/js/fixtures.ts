@@ -1257,6 +1257,14 @@ export const replaceCutoutFixtureWithComboFixture = (
   return addedCutoutConfigs.map(aaCutoutItem => {
     console.log('Processing cutout item:', aaCutoutItem)
 
+    if (
+      THERMOCYCLER_MODULE_CUTOUTS.includes(cutoutId) &&
+      MODULE_FIXTURES_BY_MODEL.thermocyclerModuleV2?.includes(
+        aaCutoutItem.cutoutFixtureId as CutoutFixtureId
+      )
+    ) {
+      return { ...aaCutoutItem }
+    }
     // Filter potential combo fixture options
     const comboFixturesOptions = Object.entries(
       addressableAreasById
@@ -1385,6 +1393,7 @@ export const getCutoutConfigReplacmentForModule = (
     deckConfigWithAA,
     cutoutId
   )
+  console.log('replacmentFixture:', replacmentFixture)
 
   return getReplacementFixtureForFakeFixture(
     replacmentFixture[0].cutoutFixtureId
