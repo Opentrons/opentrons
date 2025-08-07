@@ -2,7 +2,7 @@
 import asyncio
 import argparse
 import datetime
-import struct
+from struct import unpack
 
 from opentrons_hardware.drivers.can_bus import (
     build,
@@ -88,7 +88,7 @@ async def do_run(
                 data_length = message.payload.data_length.value
                 data_bytes = message.payload.sensor_data.value
                 struct_vals = [
-                    struct.unpack(">l", data_bytes[i * 4 : i * 4 + 4])[0] / 65536
+                    unpack(">l", data_bytes[i * 4 : i * 4 + 4])[0] / 65536
                     for i in range(data_length)
                 ]
                 for v in struct_vals:
