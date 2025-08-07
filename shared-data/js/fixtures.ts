@@ -1393,7 +1393,6 @@ export const getCutoutConfigReplacmentForModule = (
     deckConfigWithAA,
     cutoutId
   )
-  console.log('replacmentFixture:', replacmentFixture)
 
   return getReplacementFixtureForFakeFixture(
     replacmentFixture[0].cutoutFixtureId
