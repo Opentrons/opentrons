@@ -109,6 +109,7 @@ export const LabwareInfoOverlay = (
         display: DISPLAY_FLEX,
         flexDirection: DIRECTION_COLUMN,
         justifyContent: JUSTIFY_FLEX_END,
+        transform: 'rotate(180deg) scaleX(-1)',
       }}
     >
       <LabwareInfo

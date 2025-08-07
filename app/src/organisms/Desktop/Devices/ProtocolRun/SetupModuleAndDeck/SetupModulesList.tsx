@@ -62,6 +62,7 @@ import { OT2MultipleModulesHelp } from './OT2MultipleModulesHelp'
 import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
 import { getFixtureImage } from './utils'
 
+import type { TFunction } from 'i18next'
 import type { CommandData } from '@opentrons/api-client'
 import type {
   CutoutFixtureId,
@@ -136,8 +137,9 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
             )
             if (
               deckConfigCompatabilityD3 != null &&
-              WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(
-                deckConfigCompatabilityD3?.compatibleCutoutFixtureIds[0]
+              deckConfigCompatabilityD3.compatibleCutoutFixtureIds.every(
+                cutoutFixtureId =>
+                  WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(cutoutFixtureId)
               )
             ) {
               const comboFixtureId =
@@ -227,7 +229,11 @@ export function ModulesListItem({
   robotName,
   comboFixtureId,
 }: ModulesListItemProps): JSX.Element {
-  const { t } = useTranslation(['protocol_setup', 'module_wizard_flows'])
+  const { t } = useTranslation([
+    'protocol_setup',
+    'module_wizard_flows',
+    'deck_configuration',
+  ])
   const moduleConnectionStatus =
     attachedModuleMatch != null
       ? t('module_connected')
@@ -452,7 +458,7 @@ export function ModulesListItem({
                 marginLeft={SPACING.spacing20}
               >
                 {comboFixtureId != null
-                  ? getFixtureDisplayName(comboFixtureId)
+                  ? getFixtureDisplayName(t as TFunction, comboFixtureId)
                   : displayName}
               </LegacyStyledText>
               {subText}

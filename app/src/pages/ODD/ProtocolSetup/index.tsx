@@ -103,6 +103,7 @@ import { CloseButton, PlayButton } from './Buttons'
 import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 import { ConfirmSetupStepsCompleteModal } from './ConfirmSetupStepsCompleteModal'
 
+import type { TFunction } from 'i18next'
 import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { Dispatch, SetStateAction } from 'react'
 import type { Run, RunStatus } from '@opentrons/api-client'
@@ -130,7 +131,7 @@ interface PrepareToRunProps {
   robotName: string
   runRecord: Run | null
   labwareConfirmed: boolean
-  isRequiredOffsetMissing: boolean
+  offsetsConfirmed: boolean
   isLPCInitializing: boolean
 }
 
@@ -143,11 +144,15 @@ function PrepareToRun({
   robotName,
   runRecord,
   labwareConfirmed,
-  isRequiredOffsetMissing,
   isLPCInitializing,
   confirmStepsComplete,
+  offsetsConfirmed,
 }: PrepareToRunProps): JSX.Element {
-  const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
+  const { t, i18n } = useTranslation([
+    'protocol_setup',
+    'shared',
+    'deck_configuration',
+  ])
   const navigate = useNavigate()
   const { makeSnackbar } = useToaster()
   const { scrollRef, isScrolled } = useScrollPosition()
@@ -348,11 +353,15 @@ function PrepareToRun({
       ? 'ready'
       : 'not ready'
 
+  const isAnyNecessaryDefaultOffsetMissing = useSelector(
+    selectIsAnyNecessaryDefaultOffsetMissing(runId)
+  )
+
   const isReadyToRun =
     incompleteInstrumentCount === 0 &&
     areModulesReady &&
     areFixturesReady &&
-    !isRequiredOffsetMissing
+    !isAnyNecessaryDefaultOffsetMissing
   const onPlay = (): void => {
     if (doorStatus.isDoorOpen) {
       if (
@@ -453,6 +462,7 @@ function PrepareToRun({
   const missingFixturesText =
     missingFixtures.length === 1
       ? `${t('missing')} ${getFixtureDisplayName(
+          t as TFunction,
           missingFixtures[0].cutoutFixtureId
         )}`
       : t('multiple_fixtures_missing', { count: missingFixtures.length })
@@ -506,9 +516,6 @@ function PrepareToRun({
   const numMissingLSOffsets = useSelector(
     selectCountMissingLSOffsetsWithoutDefault(runId)
   )
-  const isAnyNecessaryDefaultOffsetMissing = useSelector(
-    selectIsAnyNecessaryDefaultOffsetMissing(runId)
-  )
 
   const lpcSetupStepProps = (): Pick<
     ProtocolSetupStepProps,
@@ -520,7 +527,7 @@ function PrepareToRun({
         status: 'ready',
         interactionDisabled: true,
       }
-    } else if (isRequiredOffsetMissing) {
+    } else if (offsetsConfirmed) {
       return {
         detail: t('num_offsets_applied', { num: totalOffsets }),
         status: 'ready',
@@ -816,9 +823,6 @@ export function ProtocolSetup(): JSX.Element {
   )
   // TODO(jh 10-31-24): Refactor the below to utilize useMissingStepsModal.
   const [labwareConfirmed, setLabwareConfirmed] = useState<boolean>(false)
-  const isRequiredOffsetMissing = useSelector(
-    selectIsAnyNecessaryDefaultOffsetMissing(runId)
-  )
   const missingSteps = [
     !labwareConfirmed ? t('labware_placement') : null,
     !offsetsConfirmed ? t('applied_labware_offsets') : null,
@@ -850,8 +854,8 @@ export function ProtocolSetup(): JSX.Element {
         robotName={robotName}
         runRecord={runRecord ?? null}
         labwareConfirmed={labwareConfirmed}
-        isRequiredOffsetMissing={isRequiredOffsetMissing}
         isLPCInitializing={lpcLaunchProps.isFlexLPCInitializing}
+        offsetsConfirmed={offsetsConfirmed}
       />
     ),
     instruments: (

@@ -19,13 +19,13 @@ class InvalidTargetSpeedError(ValueError):
 
 
 def _validate_hs_temp_nomin(celsius: float) -> float:
-    if celsius <= HEATER_SHAKER_TEMPERATURE_MAX:
+    if 0 <= celsius <= HEATER_SHAKER_TEMPERATURE_MAX:
         return celsius
     else:
         raise InvalidTargetTemperatureError(
             f"Cannot set Heater-Shaker to {celsius} °C."
             f" The maximum temperature for the Heater-Shaker is"
-            f"{HEATER_SHAKER_TEMPERATURE_MAX} °C."
+            f"{HEATER_SHAKER_TEMPERATURE_MAX} °C, and the temperature must be positive."
         )
 
 

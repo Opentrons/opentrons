@@ -35,6 +35,7 @@ import {
 } from '../DeviceDetailsDeckConfiguration/utils'
 import { useSendIdentifyStacker } from '../ModuleWizardFlows/hooks'
 
+import type { TFunction } from 'i18next'
 import type { AttachedModule } from '@opentrons/api-client'
 import type { ModalProps } from '@opentrons/components'
 import type {
@@ -73,7 +74,11 @@ export function AddFixtureModal({
   deckDef,
   existingCutoutFixtureId,
 }: AddFixtureModalProps): JSX.Element {
-  const { t } = useTranslation(['device_details', 'shared'])
+  const { t } = useTranslation([
+    'device_details',
+    'shared',
+    'deck_configuration',
+  ])
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const { data: modulesData } = useModulesQuery()
   const deckConfig = useNotifyDeckConfigurationQuery()?.data ?? []
@@ -289,6 +294,7 @@ export function AddFixtureModal({
         <ODDFixtureOption
           key={cutoutConfigs[0].cutoutFixtureId}
           optionName={getFixtureDisplayName(
+            t as TFunction,
             cutoutConfigs[0].cutoutFixtureId,
             portDisplay
           )}
@@ -305,6 +311,7 @@ export function AddFixtureModal({
         <FixtureOption
           key={cutoutConfigs[0].cutoutFixtureId}
           optionName={getFixtureDisplayName(
+            t as TFunction,
             cutoutConfigs[0].cutoutFixtureId,
             portDisplay
           )}
@@ -323,6 +330,7 @@ export function AddFixtureModal({
         <ODDFixtureOption
           key={cutoutConfigs[0].cutoutFixtureId}
           optionName={getFixtureDisplayName(
+            t as TFunction,
             cutoutConfigs[0].cutoutFixtureId,
             portDisplay
           )}
@@ -335,6 +343,7 @@ export function AddFixtureModal({
         <FixtureOption
           key={cutoutConfigs[0].cutoutFixtureId}
           optionName={getFixtureDisplayName(
+            t as TFunction,
             cutoutConfigs[0].cutoutFixtureId,
             portDisplay
           )}

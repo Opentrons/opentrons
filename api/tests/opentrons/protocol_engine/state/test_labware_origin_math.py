@@ -23,6 +23,8 @@ from opentrons_shared_data.labware.types import (
     SlotFootprintAsChildFeature,
     SlotFootprintAsParentFeature,
     Vector2D,
+    OpentronsFlexTipRackLidAsChildFeature,
+    OpentronsFlexTipRackLidAsParentFeature,
 )
 
 from opentrons.types import Point
@@ -174,6 +176,43 @@ _LW_V3_WITH_SLOT_AS_PARENT_CHILD_FEATURES = LabwareDefinition3.model_construct( 
     parameters=Parameters3.model_construct(loadName="dual-feature-labware"),  # type: ignore[call-arg]
 )
 
+_LW_V3_WITH_FLEX_TIP_RACK_LID_AS_PARENT = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
+    namespace="test",
+    version=1,
+    schemaVersion=3,
+    extents=Extents(
+        total=AxisAlignedBoundingBox3D(
+            backLeftBottom=Vector3D(x=0, y=0, z=0),
+            frontRightTop=Vector3D(x=1000, y=800, z=50),
+        ),
+    ),
+    features=LocatingFeatures(
+        opentronsFlexTipRackLidAsParent=OpentronsFlexTipRackLidAsParentFeature(
+            matingZ=25
+        )
+    ),
+    parameters=Parameters3.model_construct(loadName="flex-tip-rack-lid-parent"),  # type: ignore[call-arg]
+)
+
+_LW_V3_WITH_FLEX_TIP_RACK_LID_AS_CHILD = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
+    namespace="test",
+    version=1,
+    schemaVersion=3,
+    extents=Extents(
+        total=AxisAlignedBoundingBox3D(
+            backLeftBottom=Vector3D(x=10, y=20, z=30),
+            frontRightTop=Vector3D(x=810, y=-580, z=830),
+        ),
+    ),
+    features=LocatingFeatures(
+        opentronsFlexTipRackLidAsChild=OpentronsFlexTipRackLidAsChildFeature(matingZ=15)
+    ),
+    stackingOffsetWithLabware={
+        "default": Vector3D(x=0, y=0, z=0),
+    },
+    parameters=Parameters3.model_construct(loadName="flex-tip-rack-lid-child"),  # type: ignore[call-arg]
+)
+
 _MODULE_DEF_TEMP_V2 = ModuleDefinition.model_construct(  # type: ignore[call-arg]
     schemaVersion=2,
     model=ModuleModel.TEMPERATURE_MODULE_V2,
@@ -226,6 +265,22 @@ _ADDRESSABLE_AREA_WITH_PARENT_FEATURES = AddressableArea(
     features=LocatingFeatures(
         slotFootprintAsParent=SlotFootprintAsParentFeature(
             backLeft=Vector2D(x=0, y=0), frontRight=Vector2D(x=150, y=120), z=15
+        )
+    ),
+    mating_surface_unit_vector=[-1, 1, -1],
+)
+
+_ADDRESSABLE_AREA_WITH_FLEX_TIP_RACK_LID = AddressableArea(
+    area_name="test_area_with_flex_lid",
+    area_type=AreaType.SLOT,
+    base_slot=DeckSlotName.SLOT_A3,
+    display_name="Test Area with Flex Tip Rack Lid",
+    bounding_box=AddressableAreaDimensions(x=1100, y=1400, z=2100),
+    position=AddressableOffsetVector(x=50, y=100, z=150),
+    compatible_module_types=[],
+    features=LocatingFeatures(
+        opentronsFlexTipRackLidAsParent=OpentronsFlexTipRackLidAsParentFeature(
+            matingZ=30
         )
     ),
     mating_surface_unit_vector=[-1, 1, -1],
@@ -445,6 +500,22 @@ LW_V3_SPECS: List[LabwareV3Spec] = [
         is_topmost_labware=True,
         labware_location=OnLabwareLocation(labwareId="labware-v3-basic"),
         expected_total_offset=Point(x=0, y=0, z=1000),
+    ),
+    LabwareV3Spec(
+        child_definition=_LW_V3_WITH_FLEX_TIP_RACK_LID_AS_CHILD,
+        parent_definition=_LW_V3_WITH_FLEX_TIP_RACK_LID_AS_PARENT,
+        is_topmost_labware=True,
+        labware_location=OnLabwareLocation(labwareId="flex-tip-rack-lid-parent"),
+        expected_total_offset=Point(x=0, y=0, z=40),
+    ),
+    LabwareV3Spec(
+        child_definition=_LW_V3_WITH_FLEX_TIP_RACK_LID_AS_CHILD,
+        parent_definition=_ADDRESSABLE_AREA_WITH_FLEX_TIP_RACK_LID,
+        is_topmost_labware=True,
+        labware_location=AddressableAreaLocation(
+            addressableAreaName="test_area_with_flex_lid"
+        ),
+        expected_total_offset=Point(x=0, y=0, z=45),
     ),
 ]
 

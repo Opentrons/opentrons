@@ -290,7 +290,13 @@ describe('getUnoccupiedStackOptions', () => {
       labId3: mockLabOnStagingArea,
     }
     expect(
-      getUnoccupiedStackOptions(mockRobotState, mockLabware, 'labId2', mockT)
+      getUnoccupiedStackOptions({
+        robotState: mockRobotState,
+        deckSetupLabware: mockLabware,
+        labwareIdFromDropdown: 'labId2',
+        labwareEntities: mockLabware,
+        t: mockT,
+      })
     ).toEqual([
       {
         name: 'Fixture Flex 96 Tip Rack Adapter',
@@ -304,7 +310,32 @@ describe('getUnoccupiedStackOptions', () => {
       labId: mockLabOnDeck1Flex,
     }
     expect(
-      getUnoccupiedStackOptions(mockRobotState, mockLabware, 'labId', mockT)
+      getUnoccupiedStackOptions({
+        robotState: mockRobotState,
+        deckSetupLabware: mockLabware,
+        labwareIdFromDropdown: 'labId',
+        labwareEntities: mockLabware,
+        t: mockT,
+      })
+    ).toEqual([])
+  })
+
+  it('should filter out labware that was moved to a waste chute', () => {
+    const mockLabware: AllTemporalPropertiesForTimelineFrame['labware'] = {
+      labId: mockLabOnDeck1Flex,
+      labId2: {
+        ...mockLabOnDeck2Flex,
+        stack: ['labId2', 'gripperWasteChute'],
+      },
+    }
+    expect(
+      getUnoccupiedStackOptions({
+        robotState: mockRobotState,
+        deckSetupLabware: mockLabware,
+        labwareIdFromDropdown: 'labId',
+        labwareEntities: mockLabware,
+        t: mockT,
+      })
     ).toEqual([])
   })
 })

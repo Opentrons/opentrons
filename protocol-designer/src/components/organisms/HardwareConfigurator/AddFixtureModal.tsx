@@ -35,6 +35,7 @@ import { getMainPagePortalEl } from '../Portal'
 import { getLabwareCompatibleForEditHardware } from '../utils'
 import { getAvailableOptions } from './useDeckConfigurationEditing'
 
+import type { TFunction } from 'i18next'
 import type { UseFormSetValue } from 'react-hook-form'
 import type { ModalProps } from '@opentrons/components'
 import type {
@@ -103,7 +104,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     hasGripper,
     updateInitialDeckState,
   } = props
-  const { t, i18n } = useTranslation('shared')
+  const { t, i18n } = useTranslation(['shared', 'deck_configuration'])
   const initialDeckSetup = useSelector(getInitialDeckSetup)
   const { labware } = initialDeckSetup
   const dispatch = useDispatch()
@@ -120,7 +121,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     onClose: closeModal,
     closeOnOutsideClick: true,
     childrenPadding: SPACING.spacing24,
-    width: '26.75rem',
+    width: '28.75rem',
   }
 
   const availableOptions = getAvailableOptions({ optionStage, cutoutId })
@@ -301,7 +302,10 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     return (
       <FixtureOption
         key={cutoutConfigs[0].cutoutFixtureId}
-        optionName={getFixtureDisplayName(cutoutConfigs[0].cutoutFixtureId)}
+        optionName={getFixtureDisplayName(
+          t as TFunction,
+          cutoutConfigs[0].cutoutFixtureId
+        )}
         buttonText={i18n.format(t('add'), 'capitalize')}
         onClickHandler={() => {
           handleAddFixture(cutoutConfigs)

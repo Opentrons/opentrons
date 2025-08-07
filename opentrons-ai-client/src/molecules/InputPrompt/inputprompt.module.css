@@ -1,5 +1,6 @@
 .form {
   width: 100%;
+  border-radius: var(--border-radius-12);
 }
 
 .error_container {
@@ -64,6 +65,10 @@
 .text_input_section {
   padding: var(--spacing-16) var(--spacing-16) var(--spacing-4);
   background-color: var(--white);
+}
+
+.text_input_section_no_files {
+  border-radius: var(--border-radius-12) var(--border-radius-12) 0 0;
 }
 
 .button_row_container {

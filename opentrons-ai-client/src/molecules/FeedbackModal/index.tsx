@@ -1,9 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAtom } from 'jotai'
 
 import {
   ALIGN_FLEX_END,
+  COLORS,
+  DIRECTION_COLUMN,
   Flex,
   InputField,
   Modal,
@@ -13,6 +15,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 
+import { ANALYTICS } from '/ai-client/analytics/constants'
 import { feedbackModalAtom, tokenAtom } from '/ai-client/resources/atoms'
 import {
   LOCAL_FEEDBACK_END_POINT,
@@ -31,50 +34,56 @@ export function FeedbackModal(): JSX.Element {
   const [feedbackValue, setFeedbackValue] = useState<string>('')
   const [, setShowFeedbackModal] = useAtom(feedbackModalAtom)
   const [token] = useAtom(tokenAtom)
-  const { callApi } = useApiCall()
+  const { callApi, error, isLoading, data } = useApiCall()
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
 
   const handleSendFeedback = async (): Promise<void> => {
-    try {
-      const headers = {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      }
-
-      const getEndpoint = (): string => {
-        switch (process.env.NODE_ENV) {
-          case 'production':
-            return PROD_FEEDBACK_END_POINT
-          case 'development':
-            return LOCAL_FEEDBACK_END_POINT
-          default:
-            return STAGING_FEEDBACK_END_POINT
-        }
-      }
-
-      const url = getEndpoint()
-
-      const config = {
-        url,
-        method: 'POST',
-        headers,
-        data: {
-          feedbackText: feedbackValue,
-          fake: false,
-        },
-      }
-      await callApi(config as AxiosRequestConfig)
-      trackEvent({
-        name: 'feedback-sent',
-        properties: {
-          feedback: feedbackValue,
-        },
-      })
-      setShowFeedbackModal(false)
-    } catch (err: any) {
-      console.error(`error: ${err.message}`)
-      throw err
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
     }
+
+    const getEndpoint = (): string => {
+      switch (process.env.NODE_ENV) {
+        case 'production':
+          return PROD_FEEDBACK_END_POINT
+        case 'development':
+          return LOCAL_FEEDBACK_END_POINT
+        default:
+          return STAGING_FEEDBACK_END_POINT
+      }
+    }
+
+    const url = getEndpoint()
+
+    const config = {
+      url,
+      method: 'POST',
+      headers,
+      data: {
+        feedbackText: feedbackValue,
+        fake: false,
+      },
+    }
+    setIsSubmitting(true)
+    await callApi(config as AxiosRequestConfig)
   }
+
+  useEffect(() => {
+    if (isSubmitting && !isLoading) {
+      if (!error && data) {
+        // Success - track event and close modal
+        trackEvent({
+          name: ANALYTICS.FEEDBACK_SENT,
+          properties: {
+            feedback: feedbackValue,
+          },
+        })
+        setShowFeedbackModal(false)
+      }
+      setIsSubmitting(false)
+    }
+  }, [isSubmitting, isLoading, error, data, feedbackValue])
 
   return (
     <Modal
@@ -98,7 +107,7 @@ export function FeedbackModal(): JSX.Element {
             </StyledText>
           </SecondaryButton>
           <PrimaryButton
-            disabled={feedbackValue === ''}
+            disabled={feedbackValue === '' || isLoading}
             onClick={async () => {
               await handleSendFeedback()
             }}
@@ -110,14 +119,21 @@ export function FeedbackModal(): JSX.Element {
         </Flex>
       }
     >
-      <InputField
-        title={t(`send_feedback_input_title`)}
-        size="medium"
-        value={feedbackValue}
-        onChange={event => {
-          setFeedbackValue(event.target.value as string)
-        }}
-      ></InputField>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+        {error && (
+          <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.red50}>
+            {error}
+          </StyledText>
+        )}
+        <InputField
+          title={t(`send_feedback_input_title`)}
+          size="medium"
+          value={feedbackValue}
+          onChange={event => {
+            setFeedbackValue(event.target.value as string)
+          }}
+        />
+      </Flex>
     </Modal>
   )
 }

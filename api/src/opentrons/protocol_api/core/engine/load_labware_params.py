@@ -89,6 +89,7 @@ _APILEVEL_2_25_OT_DEFAULT_VERSIONS: dict[str, int] = deepcopy(
 _APILEVEL_2_25_OT_DEFAULT_VERSIONS.update(
     {
         "appliedbiosystemsmicroamp_384_wellplate_40ul": 3,
+        "axygen_96_wellplate_500ul": 2,
         "biorad_384_wellplate_50ul": 4,
         "biorad_96_wellplate_200ul_pcr": 4,
         "corning_12_wellplate_6.9ml_flat": 4,
@@ -96,10 +97,12 @@ _APILEVEL_2_25_OT_DEFAULT_VERSIONS.update(
         "corning_48_wellplate_1.6ml_flat": 5,
         "corning_6_wellplate_16.8ml_flat": 4,
         "corning_96_wellplate_360ul_flat": 4,
+        "ibidi_96_square_well_plate_300ul": 2,
         "nest_96_wellplate_100ul_pcr_full_skirt": 4,
         "nest_96_wellplate_200ul_flat": 4,
         "nest_96_wellplate_2ml_deep": 4,
         "opentrons_96_wellplate_200ul_pcr_full_skirt": 4,
+        "smc_384_read_plate": 2,
         "thermoscientificnunc_96_wellplate_1300ul": 3,
         "thermoscientificnunc_96_wellplate_2000ul": 3,
         "usascientific_96_wellplate_2.4ml_deep": 3,
