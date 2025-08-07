@@ -21,7 +21,7 @@ import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 import { useSendIdentifyStacker } from './hooks'
 
 import type { AttachedModule } from '@opentrons/api-client'
-import type { ModuleSetupWizardStepProps } from './types'
+import type { ModuleSetupWizardMaybePipetteStepProps } from './types'
 
 export const BODY_STYLE = css`
   ${TYPOGRAPHY.pRegular};
@@ -32,7 +32,7 @@ export const BODY_STYLE = css`
   }
 `
 
-interface SuccessProps extends ModuleSetupWizardStepProps {
+interface SuccessProps extends ModuleSetupWizardMaybePipetteStepProps {
   setSelectedModule: (module: AttachedModule | null) => void
   attachedModuleOnLaunch?: AttachedModule | null
 }

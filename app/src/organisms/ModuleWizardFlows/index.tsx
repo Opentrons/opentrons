@@ -63,6 +63,7 @@ export function ModuleWizardFlows(
     buildFlowForSelectedModule,
     patchModuleAfterUpdate,
     deckConfig,
+    requirePipette,
   } = useModuleSetupWizard({ closeFlow, attachedModuleOnLaunch, onComplete })
 
   // build out flow if there is a module passed in at launch
@@ -89,7 +90,7 @@ export function ModuleWizardFlows(
 
   const doorStatus = useIsDoorOpen(robotName).isDoorOpen
 
-  if (wizardFlowBaseProps.attachedPipette == null) return null
+  if (wizardFlowBaseProps.attachedPipette == null && requirePipette) return null
   if (showLaunchSetup || wizardFlowBaseProps.attachedModule == null) {
     return (
       <ModuleWizardScreen
@@ -112,6 +113,7 @@ export function ModuleWizardFlows(
           setSelectedModule={setSelectedModule}
           setShowLaunchSetup={setShowLaunchSetup}
           attachedModuleOnLaunch={attachedModuleOnLaunch}
+          attachedPipette={wizardFlowBaseProps.attachedPipette}
         />
       </ModuleWizardScreen>
     )
@@ -217,7 +219,7 @@ export function ModuleWizardFlows(
         </ModuleWizardScreen>
       )
     case SECTIONS.PLACE_ADAPTER:
-      return (
+      return wizardFlowBaseProps.attachedPipette == null ? null : (
         <ModuleWizardScreen
           isRobotMoving={wizardFlowBaseProps.isRobotMoving}
           isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
@@ -236,7 +238,7 @@ export function ModuleWizardFlows(
         </ModuleWizardScreen>
       )
     case SECTIONS.ATTACH_PROBE:
-      return (
+      return wizardFlowBaseProps.attachedPipette == null ? null : (
         <ModuleWizardScreen
           isRobotMoving={wizardFlowBaseProps.isRobotMoving}
           isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
@@ -255,7 +257,7 @@ export function ModuleWizardFlows(
         </ModuleWizardScreen>
       )
     case SECTIONS.DETACH_PROBE:
-      return (
+      return wizardFlowBaseProps.attachedPipette == null ? null : (
         <ModuleWizardScreen
           isRobotMoving={wizardFlowBaseProps.isRobotMoving}
           isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}

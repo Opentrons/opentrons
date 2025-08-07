@@ -15,6 +15,10 @@ import {
   useCreateLiveCommandMutation,
   useHost,
 } from '@opentrons/react-api-client'
+import {
+  ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 
 import { useToaster } from '/app/organisms/ToasterOven'
 import { checkShellUpdate } from '/app/redux/shell'
@@ -26,7 +30,10 @@ import { useCurrentRunId } from '../resources/runs'
 import { SharedScrollRefContext } from './ODDProviders/ScrollRefProvider'
 
 import type { AttachedModule } from '@opentrons/api-client'
-import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
+import type {
+  ModuleType,
+  SetStatusBarCreateCommand,
+} from '@opentrons/shared-data'
 import type { Dispatch } from '/app/redux/types'
 
 const UPDATE_RECHECK_INTERVAL_MS = 60000
@@ -151,12 +158,28 @@ export function useGetNewModules(): AttachedModule[] {
   return []
 }
 
+const MODULES_NOT_REQUIRING_PIPETTE_FOR_SETUP: ModuleType[] = [
+  ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
+]
+
 export function useModuleAttachedToast(
   launchModuleSetupCallback: () => void
 ): void {
   const newModules = useGetNewModules()
   const currentRunId = useCurrentRunId({ refetchInterval: CURRENT_RUN_POLL })
-  const attachedPipettes = useAttachedPipettes(newModules.length > 0)
+  const modulesNotRequiringPipette = newModules
+    .filter(thisModule =>
+      MODULES_NOT_REQUIRING_PIPETTE_FOR_SETUP.includes(thisModule.moduleType)
+    )
+    .map(thisModule => thisModule.serialNumber)
+  const moduleSerialsRequiringPipette = newModules
+    .map(thisModule => thisModule.serialNumber)
+    .filter(thisSerial => !modulesNotRequiringPipette.includes(thisSerial))
+
+  const attachedPipettes = useAttachedPipettes(
+    moduleSerialsRequiringPipette.length > 0
+  )
   const { t, i18n } = useTranslation(['module_wizard_flows', 'shared'])
   const { makeToast } = useToaster()
   const moduleSerials = newModules.map(m => m.serialNumber)
@@ -165,9 +188,19 @@ export function useModuleAttachedToast(
 
   useEffect(() => {
     const newModuleSerials = difference(moduleSerials, moduleSerialsRef.current)
+    const newModulesRequiringPipette = newModuleSerials.filter(serial =>
+      moduleSerialsRequiringPipette.includes(serial)
+    )
+    const newModulesNotRequiringPipette = newModuleSerials.filter(
+      serial => !moduleSerialsRequiringPipette.includes(serial)
+    )
     const hasPipette =
       attachedPipettes.left != null || attachedPipettes.right != null
-    if (!runInProgress && hasPipette && newModuleSerials.length > 0) {
+    if (
+      !runInProgress &&
+      ((hasPipette && newModulesRequiringPipette.length > 0) ||
+        newModulesNotRequiringPipette.length > 0)
+    ) {
       makeToast(t('module_added') as string, 'info', {
         buttonText: i18n.format(t('shared:close'), 'capitalize'),
         linkText: t('module_added_link'),
@@ -179,7 +212,7 @@ export function useModuleAttachedToast(
     moduleSerialsRef.current = moduleSerials
     // dont want this hook to rerun when other deps change
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [moduleSerials, runInProgress])
+  }, [moduleSerials, runInProgress, moduleSerialsRequiringPipette])
 }
 
 export function useScrollRef(): {

@@ -12,7 +12,11 @@ import {
   RESPONSIVENESS,
   SPACING,
 } from '@opentrons/components'
-import { getModuleDisplayName } from '@opentrons/shared-data'
+import {
+  ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
+  getModuleDisplayName,
+} from '@opentrons/shared-data'
 
 import { useGetNewModules } from '/app/App/hooks'
 import { SmallButton } from '/app/atoms/buttons'
@@ -27,6 +31,8 @@ import {
 import { useSendIdentifyStacker } from './hooks'
 
 import type { AttachedModule } from '@opentrons/api-client'
+import type { ModuleType } from '@opentrons/shared-data'
+import type { PipetteInformation } from '/app/redux/pipettes'
 
 interface SelectModuleProps {
   buildFlowForSelectedModule: (module: AttachedModule) => void
@@ -35,6 +41,7 @@ interface SelectModuleProps {
   setSelectedModule: (module: AttachedModule | null) => void
   setShowLaunchSetup: (show: boolean) => void
   attachedModuleOnLaunch?: AttachedModule | null
+  attachedPipette?: PipetteInformation | null
 }
 
 interface ModuleNameAndPort {
@@ -42,7 +49,7 @@ interface ModuleNameAndPort {
   port: string
 }
 
-export function SelectModule(props: SelectModuleProps): JSX.Element {
+export function SelectModule(props: SelectModuleProps): JSX.Element | null {
   const {
     buildFlowForSelectedModule,
     isOnDevice,
@@ -50,15 +57,25 @@ export function SelectModule(props: SelectModuleProps): JSX.Element {
     setSelectedModule,
     setShowLaunchSetup,
     attachedModuleOnLaunch = null,
+    attachedPipette,
   } = props
   const { t } = useTranslation('module_wizard_flows')
 
   const { parseModuleUSBPort } = useModuleUSBPort()
   const availableModules = useGetNewModules()
-  const newModules =
+  const allNewModules =
     attachedModuleOnLaunch !== null
       ? [attachedModuleOnLaunch]
       : availableModules
+
+  const modulesNotRequiringPipette = allNewModules.filter(thisModule =>
+    ([
+      ABSORBANCE_READER_TYPE,
+      FLEX_STACKER_MODULE_TYPE,
+    ] as ModuleType[]).includes(thisModule.moduleType)
+  )
+  const newModules =
+    attachedPipette == null ? modulesNotRequiringPipette : allNewModules
 
   const isSingleModule = newModules.length === 1
   const sendIdentifyStacker = useSendIdentifyStacker()
@@ -114,8 +131,9 @@ export function SelectModule(props: SelectModuleProps): JSX.Element {
       padding-left: ${SPACING.spacing32};
     }
   `
-
-  if (isSingleModule && selectedModule != null) {
+  if (newModules.length === 0) {
+    return null
+  } else if (isSingleModule && selectedModule != null) {
     const m = getModuleNameAndPort(selectedModule)
     return (
       <SimpleWizardBody
