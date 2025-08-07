@@ -30,6 +30,7 @@ import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configurati
 
 import {
   getFixtureOptions,
+  getModuleOptions,
   getOptions,
   getWasteChuteOptions,
 } from '../DeviceDetailsDeckConfiguration/utils'
@@ -94,7 +95,6 @@ export function AddFixtureModal({
             attachedMod.serialNumber === opentronsModuleSerialNumber
         )
     ) ?? []
-
   const initialStage: OptionStage = SINGLE_CENTER_CUTOUTS.includes(cutoutId) // only mag block (a module) can be configured in column 2
     ? 'moduleOptions'
     : 'modulesOrFixtures'
@@ -104,7 +104,9 @@ export function AddFixtureModal({
   const [allFixtureOptions, setAllFixtureOptions] = useState<
     CutoutConfigMap[][]
   >([])
-
+  const [allModuleOptions, setAllModuleOptions] = useState<CutoutConfigMap[][]>(
+    []
+  )
   useEffect(() => {
     const options = [
       ...getFixtureOptions(
@@ -115,6 +117,15 @@ export function AddFixtureModal({
       ...getWasteChuteOptions(cutoutId),
     ]
     setAllFixtureOptions(options)
+    const moduleOptions = [
+      ...getModuleOptions(
+        cutoutId,
+        unconfiguredMods,
+        addressableAreaId,
+        deckDef
+      ),
+    ]
+    setAllModuleOptions(moduleOptions)
   }, [cutoutId, addressableAreaId, existingCutoutFixtureId])
 
   const modalHeader: OddModalHeaderBaseProps = {
@@ -180,14 +191,16 @@ export function AddFixtureModal({
             }}
           />
         )}
-        <FixtureOption
-          key="modulesOption"
-          optionName="Modules"
-          buttonText={t('select_options')}
-          onClickHandler={() => {
-            setOptionStage('moduleOptions')
-          }}
-        />
+        {allModuleOptions.length > 0 && (
+          <FixtureOption
+            key="modulesOption"
+            optionName="Modules"
+            buttonText={t('select_options')}
+            onClickHandler={() => {
+              setOptionStage('moduleOptions')
+            }}
+          />
+        )}
       </>
     )
   } else if (
