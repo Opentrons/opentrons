@@ -35,6 +35,9 @@ vi.mock('../FirstStepMixTools')
 vi.mock('../SecondStepMixTools')
 vi.mock('../../MoveLiquidTools/LiquidClassesStepTools')
 vi.mock('../../MoveLiquidTools/hooks/useAssignLiquidClass')
+vi.mock('react-plotly.js', () => ({
+  default: () => <div data-testid="plotly-chart">Mock Plotly Chart</div>,
+}))
 
 const labwareId = 'mockLabwareId'
 const pipetteId = 'mockPipetteId'
