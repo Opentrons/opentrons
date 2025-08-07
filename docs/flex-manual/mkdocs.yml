@@ -30,7 +30,12 @@ nav:
       - Magnetic Block: modules/magnetic-block.md
       - Temperature Module: modules/temperature.md
       - Thermocycler: modules/thermocycler.md
-  - Labware: labware.md
+  - Labware: 
+      - Labware Home: labware/index.md
+      - Labware Concepts: labware/concepts.md
+      - Labware Types: labware/types.md
+      - Using the Gripper: labware/gripper.md
+      - Labware Definitions: labware/definitions.md
   - Protocol Development: protocol-development.md
   - Software and Operation: software-operation.md
   - Maintenance and Service: maintenance-service.md
