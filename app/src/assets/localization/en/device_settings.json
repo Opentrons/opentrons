@@ -91,6 +91,8 @@
   "device_reset_slideout_description": "Select individual settings to only clear specific data types.",
   "device_resets_cannot_be_undone": "Resets cannot be undone",
   "directly_connected_to_this_computer": "Directly connected to this computer.",
+  "disable_stacker_sensors": "Disable Stacker sensors for labware detection in z-axis and x-axis",
+  "disable_stacker_sensors_description": "Disable sensors for all stackers that are connected to the robot.",
   "disconnect": "Disconnect",
   "disconnect_from_ssid": "Disconnect from {{ssid}}",
   "disconnect_from_wifi": "Disconnect from Wi-Fi",
