@@ -205,13 +205,15 @@ async def run(
     for trial in range(2):
         ui.print_header("JOG to 96-Tip RACK")
         if trial == 0:
-            tip_rack = pipette
+            tip_rack: int = pipette
             test_volume: int = pipette
         else:
             tip_rack = 50
             test_volume = 1 if pipette == 200 else 5
         if not api.is_simulator:
-            ui.get_user_ready(f"ADD 96 tip-rack-{tip_rack}ul to slot #{TIP_RACK_96_SLOT}")
+            ui.get_user_ready(
+                f"ADD 96 tip-rack-{tip_rack}ul to slot #{TIP_RACK_96_SLOT}"
+            )
         await helpers_ot3.move_to_arched_ot3(
             api, OT3Mount.LEFT, tip_rack_96_a1_nominal + Point(z=30)
         )
