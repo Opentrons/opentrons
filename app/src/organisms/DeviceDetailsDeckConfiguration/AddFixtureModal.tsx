@@ -307,7 +307,6 @@ export function AddFixtureModal({
         <ODDFixtureOption
           key={cutoutConfigs[0].cutoutFixtureId}
           optionName={getFixtureDisplayName(
-            t as TFunction,
             cutoutConfigs[0].cutoutFixtureId,
             portDisplay
           )}
@@ -324,7 +323,6 @@ export function AddFixtureModal({
         <FixtureOption
           key={cutoutConfigs[0].cutoutFixtureId}
           optionName={getFixtureDisplayName(
-            t as TFunction,
             cutoutConfigs[0].cutoutFixtureId,
             portDisplay
           )}
@@ -343,7 +341,6 @@ export function AddFixtureModal({
         <ODDFixtureOption
           key={cutoutConfigs[0].cutoutFixtureId}
           optionName={getFixtureDisplayName(
-            t as TFunction,
             cutoutConfigs[0].cutoutFixtureId,
             portDisplay
           )}
@@ -356,7 +353,6 @@ export function AddFixtureModal({
         <FixtureOption
           key={cutoutConfigs[0].cutoutFixtureId}
           optionName={getFixtureDisplayName(
-            t as TFunction,
             cutoutConfigs[0].cutoutFixtureId,
             portDisplay
           )}
