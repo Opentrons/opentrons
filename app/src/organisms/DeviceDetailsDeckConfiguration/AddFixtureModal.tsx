@@ -36,7 +36,6 @@ import {
 } from '../DeviceDetailsDeckConfiguration/utils'
 import { useSendIdentifyStacker } from '../ModuleWizardFlows/hooks'
 
-import type { TFunction } from 'i18next'
 import type { AttachedModule } from '@opentrons/api-client'
 import type { ModalProps } from '@opentrons/components'
 import type {
