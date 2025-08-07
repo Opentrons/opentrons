@@ -87,6 +87,13 @@ export function StackerHopperOrShuttleEmptyOptions(
     }
   }
 
+  const buildText = (): string => {
+    if (showErrorOptions) {
+      return isOnDevice ? t('check_stacker') : t('stacker_what_is_wrong')
+    }
+    return t('choose_a_recovery_action')
+  }
+
   const buildErrorSelection = (): JSX.Element => (
     <>
       <RadioButton
@@ -133,7 +140,7 @@ export function StackerHopperOrShuttleEmptyOptions(
           desktopStyle="headingSmallBold"
           css={ODD_SECTION_TITLE_STYLE}
         >
-          {isOnDevice ? t('check_stacker') : t('stacker_what_is_wrong')}
+          {buildText()}
         </StyledText>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
           {showErrorOptions ? buildErrorSelection() : buildRecoveryOptions()}
