@@ -25,7 +25,6 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
-import { NAV_BAR_HEIGHT_REM } from '../../../components/atoms'
 import { ExportButton, HotKeyDisplay } from '../../../components/molecules'
 import {
   SlotDetailsContainer,
@@ -234,7 +233,6 @@ export function ProtocolSteps({
 
       <Flex
         backgroundColor={COLORS.grey10}
-        maxHeight={`calc(100vh - ${NAV_BAR_HEIGHT_REM}rem)`}
         width="100%"
         minHeight={FLEX_MAX_CONTENT}
       >
@@ -272,7 +270,7 @@ export function ProtocolSteps({
               <Flex
                 justifyContent={JUSTIFY_END}
                 position={POSITION_ABSOLUTE}
-                right="0"
+                right={SPACING.spacing24}
                 zIndex={1000}
               >
                 <ExportButton onClick={handleExporting} />
@@ -291,7 +289,9 @@ export function ProtocolSteps({
                   : CONTENT_MAX_WIDTH
               }
               justifyContent={JUSTIFY_CENTER}
-              paddingTop={isZoomedIn ? '0' : SPACING.spacing60}
+              paddingTop={
+                isZoomedIn || showTimelineAlerts ? '0' : SPACING.spacing60
+              }
               marginX="auto"
             >
               {isZoomedIn || selectedTerminalItemId === HARDWARE_ID ? null : (
