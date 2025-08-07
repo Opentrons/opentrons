@@ -22,6 +22,10 @@ import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 
 import { ACTIONS } from '../constants'
+import {
+  getAspirateAirGapVolumeRange,
+  getDispenseAirGapVolumeRange,
+} from '../utils'
 
 import type { Dispatch } from 'react'
 import type {
@@ -110,40 +114,18 @@ export function AirGap(props: AirGapProps): JSX.Element {
   const setSaveOrContinueButtonText =
     airGapEnabled && currentStep < 2 ? t('shared:continue') : t('shared:save')
 
-  const maxPipetteVolume = Object.values(state.pipette.liquids)[0].maxVolume
-  const tipVolume = Object.values(state.tipRack.wells)[0].totalLiquidVolume
+  const { min, max } =
+    kind === 'aspirate'
+      ? getAspirateAirGapVolumeRange(state.pipette, state.tipRack)
+      : getDispenseAirGapVolumeRange(
+          state.volume,
+          state?.disposalVolume ?? 0,
+          state.path,
+          state.pipette,
+          state.tipRack
+        )
 
-  // dispense air gap is performed whenever a tip is on its way to the trash, so
-  // we can have the max be at the max tip capacity
-  let maxAvailableCapacity = Math.min(maxPipetteVolume, tipVolume)
-  console.log('maxAvailableCapacity', maxAvailableCapacity)
-  console.log('path', state.path)
-  console.log('volume', state.volume)
-
-  // for aspirate, air gap behaves differently depending on the path
-  if (kind === 'aspirate') {
-    if (state.path === 'single') {
-      // for a single path, air gap capacity is just the difference between the
-      // pipette/tip capacity and the volume per well
-      maxAvailableCapacity =
-        Math.min(maxPipetteVolume, tipVolume) - state.volume
-    } else if (state.path === 'multiAspirate') {
-      // an aspirate air gap for multi aspirate will aspirate an air gap
-      // after each aspirate action, so we need to halve the available capacity for single path
-      // to get the amount available, assuming a min of 2 aspirates per dispense
-      maxAvailableCapacity =
-        (Math.min(maxPipetteVolume, tipVolume) - 2 * state.volume) / 2
-    } else {
-      // aspirate air gap for multi dispense occurs once per asprirate and
-      // available volume is max capacity - volume*3 assuming a min of 2 dispenses
-      // per aspirate plus 1x the volume for disposal
-      maxAvailableCapacity =
-        Math.min(maxPipetteVolume, tipVolume) - state.volume * 3
-    }
-  }
-
-  const volumeRange = { min: 1, max: Math.floor(maxAvailableCapacity) }
-  console.log(volumeRange)
+  const volumeRange = { min, max }
   let volumeError = null
   if (volumeRange.min > volumeRange.max) {
     volumeError = t('air_gap_capacity_error')

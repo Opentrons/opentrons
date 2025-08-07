@@ -181,7 +181,7 @@ class FileProcessor:
                 logger.warning(f"Invalid file reference type: {type(file_ref)}")
                 continue
 
-            filename = file_ref.get("filename", "unknown")
+            filename = file_ref.get("name", "unknown")
             content = file_ref.get("content", "")
             media_type = file_ref.get("media_type", "text/plain")
 

@@ -45,6 +45,7 @@ import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configurati
 import { ChooseModuleToConfigureModal } from './ChooseModuleToConfigureModal'
 import { patchDeckConfigForRequiredFixture } from './patchDeckConfigForRequiredFixture'
 
+import type { TFunction } from 'i18next'
 import type {
   CutoutConfig,
   CutoutFixtureId,
@@ -77,7 +78,11 @@ export const LocationConflictModal = (
     moduleSerialNumber,
     isOnDevice = false,
   } = props
-  const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
+  const { t, i18n } = useTranslation([
+    'protocol_setup',
+    'shared',
+    'deck_configuration',
+  ])
 
   const [showModuleSelect, setShowModuleSelect] = useState(false)
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
@@ -97,7 +102,10 @@ export const LocationConflictModal = (
 
   const currentFixtureDisplayName =
     deckConfigurationAtLocationFixtureId != null
-      ? getFixtureDisplayName(deckConfigurationAtLocationFixtureId)
+      ? getFixtureDisplayName(
+          t as TFunction,
+          deckConfigurationAtLocationFixtureId
+        )
       : ''
 
   const handleConfigureModule = (moduleSerialNumber?: string): void => {
@@ -199,7 +207,10 @@ export const LocationConflictModal = (
 
   let protocolSpecifiesDisplayName = ''
   if (requiredFixtureId != null) {
-    protocolSpecifiesDisplayName = getFixtureDisplayName(requiredFixtureId)
+    protocolSpecifiesDisplayName = getFixtureDisplayName(
+      t as TFunction,
+      requiredFixtureId
+    )
   } else if (requiredModule != null) {
     protocolSpecifiesDisplayName = getModuleDisplayName(requiredModule)
   }
