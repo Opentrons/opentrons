@@ -51,8 +51,17 @@ def deploy_docs(environment, branch=None, aws_profile=None, source_dir="site"):
         print("Make sure you've run 'make build' first.")
         sys.exit(1)
     
-    # Build S3 sync command
-    s3_path = f"s3://{bucket}/{branch}/"
+    # Build S3 sync command - use branch for sandbox, root for staging/production
+    if environment == "sandbox":
+        s3_path = f"s3://{bucket}/{branch}/"
+        url = f"http://sandbox.docs.s3-website.us-east-2.amazonaws.com/{branch}/"
+    else:
+        s3_path = f"s3://{bucket}/"
+        if environment == "staging":
+            url = f"https://staging.docs.opentrons.com/"
+        else:  # production
+            url = f"https://docs.opentrons.com/"
+    
     cmd = [
         "aws", "s3", "sync",
         str(source_path) + "/",
@@ -67,7 +76,8 @@ def deploy_docs(environment, branch=None, aws_profile=None, source_dir="site"):
     
     print(f"Deploying to {environment} environment:")
     print(f"  Bucket: {bucket}")
-    print(f"  Branch: {branch}")
+    if environment == "sandbox":
+        print(f"  Branch: {branch}")
     print(f"  S3 Path: {s3_path}")
     
     try:
@@ -75,7 +85,6 @@ def deploy_docs(environment, branch=None, aws_profile=None, source_dir="site"):
         print(f"✅ Successfully deployed to {environment}!")
         
         # Print the URL where it's deployed
-        url = f"https://{bucket}/{branch}/"
         print(f"📍 Deployed to: {url}")
         
     except subprocess.CalledProcessError as e:
