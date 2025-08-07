@@ -6,4 +6,4 @@ export const getIsTouchTipEnabled = (
     | QuickTransferSummaryState['destination']
 ): boolean =>
   sourceOrDestination === 'source' ||
-  (sourceOrDestination.parameters.quirks?.includes('reservoir') ?? true)
+  (sourceOrDestination.parameters.quirks?.includes('touchTipDisabled') ?? true)
