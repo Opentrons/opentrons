@@ -18,7 +18,7 @@ class Mitutoyo_Digimatic_Indicator:
         self.raise_exceptions = True
         self.reading_raw = ""
         self.GCODE = {
-            "READ": "r",
+            "READ":b'r',
         }
         self.gauge = serial.Serial()
         self.packet = ""
@@ -45,7 +45,7 @@ class Mitutoyo_Digimatic_Indicator:
     def _send_packet(self, packet: str) -> None:
         self.gauge.flush()
         self.gauge.flushInput()
-        self.gauge.write(packet.encode("utf-8"))
+        self.gauge.write(packet)
 
     def _get_packet(self) -> str:
         self.gauge.flushOutput()
@@ -54,15 +54,20 @@ class Mitutoyo_Digimatic_Indicator:
 
     def read(self) -> float:
         """Reads dial indicator."""
+        data_list = []
         self.packet = self.GCODE["READ"]
-        self._send_packet(self.packet)
-        time.sleep(0.001)
         reading = True
         while reading:
+            self._send_packet(self.packet)
+            time.sleep(0.01)
+    
             data = self._get_packet()
             if data != "":
+                data_list.append(float(data[3:]))
+            if data != "" and len(data_list)>5:  # read 5 times and get lasted number
                 reading = False
-        return float(data)
+        print("Data List:", data_list)
+        return float(data_list[-1])
 
     def read_stable(self, timeout: float = 5) -> float:
         """Reads dial indicator with stable reading."""
