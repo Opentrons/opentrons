@@ -30,6 +30,7 @@ const MARKER_OPACITY = 0
 const LINE_WIDTH = 2
 
 export const AXIS_OFFSET_PERCENTAGE = 0.05
+export const POINT_DIAMETER_SCALAR = 0.02
 
 export const CONFIG = {
   editable: true,

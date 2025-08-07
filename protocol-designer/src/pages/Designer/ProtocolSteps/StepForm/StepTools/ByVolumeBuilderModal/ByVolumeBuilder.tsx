@@ -85,6 +85,8 @@ export function ByVolumeBuilder(props: {
   }
   const axisOffsetX = maxX * AXIS_OFFSET_PERCENTAGE
   const axisOffsetY = maxY * AXIS_OFFSET_PERCENTAGE
+  const axisRangeX = maxX + 2 * axisOffsetX
+  const axisRangeY = maxY + 2 * axisOffsetY
   return (
     <div>
       <Plot
@@ -124,7 +126,7 @@ export function ByVolumeBuilder(props: {
             },
             range: [-1 * axisOffsetY, maxY + axisOffsetY],
           },
-          shapes: getShapes(dataPoints, maxX, maxY),
+          shapes: getShapes(dataPoints, axisRangeX, axisRangeY),
           annotations: getAnnotations(dataPoints),
         }}
         config={CONFIG}

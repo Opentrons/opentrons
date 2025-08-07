@@ -1,5 +1,7 @@
 import { COLORS, TYPOGRAPHY } from '@opentrons/components'
 
+import { POINT_DIAMETER_SCALAR } from './constants'
+
 import type { LiquidHandlingPropertyByVolume } from '@opentrons/shared-data'
 import type { DataPoint } from './types'
 
@@ -36,15 +38,13 @@ export const getAnnotations = (
   }))
 }
 
-const POINT_SCALAR = 0.02
-
 export const getShapes = (
   dataPoints: DataPoint[],
   axisRangeX: number,
   axisRangeY: number
 ): any => {
-  const shapeXRadius = (axisRangeX * POINT_SCALAR) / 2
-  const shapeYRadius = (axisRangeY * POINT_SCALAR) / 2
+  const shapeXRadius = (axisRangeX * POINT_DIAMETER_SCALAR) / 2
+  const shapeYRadius = (axisRangeY * POINT_DIAMETER_SCALAR) / 2
   return dataPoints.map(point => ({
     type: 'circle',
     xref: 'x',
