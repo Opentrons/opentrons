@@ -43,7 +43,7 @@ import type { DeleteModalType } from '../../../../components/organisms'
 import type { StepIdType } from '../../../../form-types'
 import type { BaseState, ThunkAction } from '../../../../types'
 import type {
-  HoverOnStepAction,
+  // HoverOnStepAction,
   SelectMultipleStepsAction,
 } from '../../../../ui/steps'
 
