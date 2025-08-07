@@ -20,12 +20,11 @@ from opentrons_hardware.sensors.types import (
     SensorDataType,
     sensor_fixed_point_conversion,
 )
-from opentrons_hardware.sensors.sensor_driver import LogListener, SensorDriver
-from opentrons_hardware.sensors.sensor_types import PressureSensor, CapacitiveSensor
 
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 
 THRESHOLD_NUM_READS = 20
+
 
 async def do_run(
     messenger: CanMessenger,
@@ -55,8 +54,8 @@ async def do_run(
         payload=baseline_payload
     )
 
-    await messenger.ensure_send(target_node, baseline_message)
-    # set sensor to report 
+    await messenger.send(target_node, baseline_message)
+    # set sensor to report
     stim_payload = payloads.BindSensorOutputRequestPayload(
         sensor=fields.SensorTypeField(target_sensor.value),
         sensor_id=fields.SensorIdField(sensor_id),
@@ -70,11 +69,6 @@ async def do_run(
     )
     reset_message = message_definitions.BindSensorOutputRequest(payload=reset_payload)
     print(f"Sending stimulus to {target_node.name} {target_sensor.name}")
-    pressure_sensor = PressureSensor.build(
-        sensor_id=fields.SensorIdField(sensor_id),
-        node_id=target_node,
-        stop_threshold=Int32Field(threshold)
-    )
     await messenger.send(target_node, stim_message)
     start = datetime.datetime.now()
     try:
@@ -94,7 +88,7 @@ async def do_run(
                 data_length = message.payload.data_length.value
                 data_bytes = message.payload.sensor_data.value
                 struct_vals = [
-                    struct.unpack('>l', data_bytes[i * 4 : i * 4 + 4])[0] / 65536
+                    struct.unpack(">l", data_bytes[i * 4 : i * 4 + 4])[0] / 65536
                     for i in range(data_length)
                 ]
                 for v in struct_vals:
