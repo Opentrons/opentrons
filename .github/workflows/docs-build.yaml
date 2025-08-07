@@ -39,6 +39,9 @@ jobs:
   build:
     name: opentrons documentation build
     runs-on: 'ubuntu-24.04'
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - uses: 'actions/checkout@v4'
         with:
@@ -77,3 +80,11 @@ jobs:
           domain: 'docs.opentrons.com'
           distPath: './api/docs/dist'
           destPrefix: ${{ env.OT_BRANCH }}
+      - name: 'Configure AWS Credentials for docs bucket'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.DOCS_SANDBOX_ROLE }}
+          aws-region: us-east-2
+      - name: 'Deploy docs to sandbox.docs bucket'
+        run: |
+          aws s3 sync ./api/docs/dist/ s3://sandbox.docs/api/ --delete --acl public-read
