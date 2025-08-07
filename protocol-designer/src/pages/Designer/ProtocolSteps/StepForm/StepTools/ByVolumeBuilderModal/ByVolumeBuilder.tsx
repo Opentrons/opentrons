@@ -17,9 +17,10 @@ export function ByVolumeBuilder(props: {
   dataPoints: DataPoint[]
   setDataPoints: (dataPoints: DataPoint[]) => void
   byVolume: LiquidHandlingPropertyByVolume
-  maxVolume: number
+  maxX: number
+  maxY: number
 }): JSX.Element {
-  const { type, dataPoints, setDataPoints, maxVolume } = props
+  const { type, dataPoints, setDataPoints, maxX, maxY } = props
 
   const { t } = useTranslation(['by_volume_builder'])
 
@@ -47,8 +48,8 @@ export function ByVolumeBuilder(props: {
         if (updatedPoints[i].x !== newX || updatedPoints[i].y !== newY) {
           updatedPoints[i] = {
             ...updatedPoints[i],
-            x: Math.min(Math.max(newX, 0), maxVolume),
-            y: Math.min(Math.max(newY, 0), maxVolume),
+            x: Math.min(Math.max(newX, 0), maxX),
+            y: Math.min(Math.max(newY, 0), maxY),
           }
           changed = true
         }
@@ -82,7 +83,8 @@ export function ByVolumeBuilder(props: {
       setDataPoints(sortedPoints)
     }
   }
-  const axisOffset = maxVolume * AXIS_OFFSET_PERCENTAGE
+  const axisOffsetX = maxX * AXIS_OFFSET_PERCENTAGE
+  const axisOffsetY = maxY * AXIS_OFFSET_PERCENTAGE
   return (
     <div>
       <Plot
@@ -90,7 +92,7 @@ export function ByVolumeBuilder(props: {
           {
             ...BASE_DATA,
             // ensure the curve starts at 0 and ends at maxVolume
-            x: [0, ...dataPoints.map(p => p.x), maxVolume],
+            x: [0, ...dataPoints.map(p => p.x), maxX],
             y: [
               dataPoints[0].y,
               ...dataPoints.map(p => p.y),
@@ -111,7 +113,7 @@ export function ByVolumeBuilder(props: {
               }),
               editable: false,
             },
-            range: [-1 * axisOffset, maxVolume + axisOffset],
+            range: [-1 * axisOffsetX, maxX + axisOffsetX],
           },
           yaxis: {
             title: {
@@ -120,9 +122,9 @@ export function ByVolumeBuilder(props: {
               }),
               editable: false,
             },
-            range: [-1 * axisOffset, maxVolume + axisOffset],
+            range: [-1 * axisOffsetY, maxY + axisOffsetY],
           },
-          shapes: getShapes(dataPoints, maxVolume),
+          shapes: getShapes(dataPoints, maxX, maxY),
           annotations: getAnnotations(dataPoints),
         }}
         config={CONFIG}

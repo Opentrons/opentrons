@@ -110,7 +110,7 @@ export const SecondStepsMoveLiquidTools = ({
     ?.byTipType.find(({ tiprack }) => tiprack === formData.tipRack)?.aspirate
     .flowRateByVolume
   const highestY = Math.max(...(byTipValues?.map(point => point[1]) ?? []))
-  const maxVolume = Math.max(pipetteWithTipMaxVol, highestY)
+  const maxY = Math.max(pipetteWithTipMaxVol, highestY)
 
   const robotType = useSelector(getRobotType)
   const pipetteSpec = useSelector(getPipetteEntities)[formData.pipette]?.spec
@@ -346,7 +346,8 @@ export const SecondStepsMoveLiquidTools = ({
                 type={FLOW_RATE}
                 setByVolume={setFlowRates}
                 defaultFlowRates={byTipValues ?? []}
-                maxVolume={maxVolume}
+                maxX={pipetteWithTipMaxVol}
+                maxY={maxY}
               />
             ) : null}
           </Flex>

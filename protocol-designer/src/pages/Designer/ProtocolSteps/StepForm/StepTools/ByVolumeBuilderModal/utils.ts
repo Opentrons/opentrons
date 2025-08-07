@@ -36,16 +36,23 @@ export const getAnnotations = (
   }))
 }
 
-export const getShapes = (dataPoints: DataPoint[], axisRange: number): any => {
-  const shapeRadius = axisRange / 50 / 2
+const POINT_SCALAR = 0.02
+
+export const getShapes = (
+  dataPoints: DataPoint[],
+  axisRangeX: number,
+  axisRangeY: number
+): any => {
+  const shapeXRadius = (axisRangeX * POINT_SCALAR) / 2
+  const shapeYRadius = (axisRangeY * POINT_SCALAR) / 2
   return dataPoints.map(point => ({
     type: 'circle',
     xref: 'x',
     yref: 'y',
-    x0: point.x - shapeRadius,
-    y0: point.y - shapeRadius,
-    x1: point.x + shapeRadius,
-    y1: point.y + shapeRadius,
+    x0: point.x - shapeXRadius,
+    y0: point.y - shapeYRadius,
+    x1: point.x + shapeXRadius,
+    y1: point.y + shapeYRadius,
     fillcolor: COLORS.blue50,
     line: { width: 0 },
     editable: true,

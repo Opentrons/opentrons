@@ -29,7 +29,8 @@ export function ByVolumeBuilderModal(props: {
   type: ByVolumeType
   onClose: () => void
   defaultFlowRates: LiquidHandlingPropertyByVolume
-  maxVolume: number
+  maxX: number
+  maxY: number
 }): JSX.Element {
   const {
     byVolume = [],
@@ -37,7 +38,8 @@ export function ByVolumeBuilderModal(props: {
     onClose,
     setByVolume,
     defaultFlowRates,
-    maxVolume,
+    maxX,
+    maxY,
   } = props
 
   const { t } = useTranslation(['shared', 'by_volume_builder'])
@@ -47,7 +49,7 @@ export function ByVolumeBuilderModal(props: {
 
   // adds a new point to the center x value at the interpolated y value
   const handleAddPoint = (): void => {
-    const newXValue = maxVolume / 2
+    const newXValue = maxX / 2
     const newYValue = linearInterpolate(
       newXValue,
       dataPoints.map(p => [p.x, p.y])
@@ -72,7 +74,8 @@ export function ByVolumeBuilderModal(props: {
           dataPoints={dataPoints}
           setDataPoints={setDataPoints}
           byVolume={byVolume}
-          maxVolume={maxVolume}
+          maxX={maxX}
+          maxY={maxY}
         />
         <ByVolumeCalculator
           type={type}
