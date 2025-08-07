@@ -241,7 +241,11 @@ export function DeckSetupContainer(
               minWidth="auto"
               deckDef={deckDef}
               viewBox={viewBoxAdjusted}
-              transform={'scale(1.3, -1.3)'}
+              transform={
+                robotType === OT2_ROBOT_TYPE
+                  ? 'scale(1.3, -1.3)'
+                  : 'scale(1, -1)'
+              }
               outline="auto"
               zoomed={zoomIn.slot != null}
               borderRadius={BORDERS.borderRadius12}
