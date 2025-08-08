@@ -3118,7 +3118,7 @@ class InstrumentContext(publisher.CommandPublisher):
     @property
     def _last_tip_picked_up_from(self) -> Optional[labware.Well]:
         """
-        .. deprecated:: 2.26
+        .. deprecated:: 2.25
            Use :py:obj:`ProtocolContext.last_tip_rack_well_used` instead.
 
            If the pipette has a tip on it, returns the tip rack well it was picked up from.
