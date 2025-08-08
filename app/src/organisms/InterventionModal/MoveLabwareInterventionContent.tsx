@@ -15,7 +15,6 @@ import {
   Icon,
   LabwareRender,
   LegacyStyledText,
-  Module,
   MoveLabwareOnDeck,
   RESPONSIVENESS,
   SPACING,
@@ -27,7 +26,6 @@ import {
   getLoadedLabwareDefinitionsByUri,
   getModuleType,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
-  inferModuleOrientationFromXCoordinate,
   OT2_ROBOT_TYPE,
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
@@ -124,16 +122,29 @@ export function MoveLabwareInterventionContent({
   const deckDef = getDeckDefFromRobotType(robotType)
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
-  const moduleRenderInfo = getRunModuleRenderInfo(
-    run,
-    deckDef,
-    labwareDefsByUri
-  )
   const labwareRenderInfo = getRunLabwareRenderInfo(
     run,
     labwareDefsByUri,
     deckDef
   )
+  const moduleRenderInfo = getRunModuleRenderInfo(
+    run,
+    deckDef,
+    labwareDefsByUri
+  )
+  const modulesOnDeck = moduleRenderInfo
+    ?.filter(module => module.targetSlotId != null)
+    .map(module => {
+      return {
+        moduleModel: module.moduleDef.model,
+        moduleLocation: { slotName: module.targetSlotId ?? '' },
+        nestedLabwareDef:
+          module.nestedLabwareId !== command.params.labwareId
+            ? module.nestedLabwareDef
+            : null,
+      }
+    })
+
   const oldLabwareLocation =
     getLoadedLabware(run.labware, command.params.labwareId)?.location ?? null
 
@@ -202,39 +213,9 @@ export function MoveLabwareInterventionContent({
               loadedModules={run.modules}
               loadedLabware={run.labware}
               deckConfig={deckConfig}
+              modulesOnDeck={modulesOnDeck}
               backgroundItems={
                 <>
-                  {moduleRenderInfo.map(
-                    ({
-                      x,
-                      y,
-                      moduleId,
-                      moduleDef,
-                      nestedLabwareDef,
-                      nestedLabwareId,
-                      targetDeckId,
-                      targetSlotId,
-                    }) => (
-                      <Module
-                        key={moduleId}
-                        def={moduleDef}
-                        x={x}
-                        y={y}
-                        orientation={inferModuleOrientationFromXCoordinate(x)}
-                        targetDeckId={targetDeckId}
-                        targetSlotId={targetSlotId}
-                        childrenPositioningMode="offsetToSlot"
-                      >
-                        {nestedLabwareDef != null &&
-                        nestedLabwareId !== command.params.labwareId ? (
-                          <LabwareRender
-                            definition={nestedLabwareDef}
-                            positioningMode="offsetInSlot"
-                          />
-                        ) : null}
-                      </Module>
-                    )
-                  )}
                   {labwareRenderInfo
                     .filter(l => l.labwareId !== command.params.labwareId)
                     .map(({ labwareOrigin, labwareDef, labwareId }) => (
