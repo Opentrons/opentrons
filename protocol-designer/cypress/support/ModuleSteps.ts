@@ -101,7 +101,7 @@ export const ModuleSteps = {
    */
   PauseAfterSettingTempdeck: (): StepThunk => ({
     call: () => {
-      cy.contains(ModLocators.Button, 'Pause protocol')
+      cy.contains(ModLocators.Button, 'Add pause step')
         .should('exist')
         .and('be.visible')
         .click()

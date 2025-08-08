@@ -3,9 +3,11 @@ import { useMemo } from 'react'
 import { getLabwareLocation } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   getDeckDefFromRobotType,
   getFixedTrashLabwareDefinition,
   getModuleDef,
+  getModuleType,
   getPositionFromSlotId,
   getSimplestDeckConfigForProtocol,
   OT2_ROBOT_TYPE,
@@ -495,9 +497,13 @@ export function updateLabwareInModules({
 } {
   const usedSlots = new Set<string>()
 
+  // a flex stackers module location will be in slot 3, but labware in that slot
+  // is not nested on the stacker so we shouldn't match those up
   const updatedModules = runCurrentModules.map(moduleInfo => {
     const labwareInSameLoc = currentLabwareInfo.find(
-      lw => moduleInfo.moduleLocation.slotName === lw.slotName
+      lw =>
+        moduleInfo.moduleLocation.slotName === lw.slotName &&
+        getModuleType(moduleInfo.moduleModel) !== FLEX_STACKER_MODULE_TYPE
     )
 
     if (labwareInSameLoc != null) {

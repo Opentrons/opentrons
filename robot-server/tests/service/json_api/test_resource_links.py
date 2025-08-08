@@ -32,6 +32,6 @@ def test_must_be_self_key_with_string_value():
             "msg": "Field required",
             "type": "missing",
             "input": {"invalid": {"key": "value"}},
-            "url": "https://errors.pydantic.dev/2.9/v/missing",
+            "url": "https://errors.pydantic.dev/2.11/v/missing",
         }
     ]

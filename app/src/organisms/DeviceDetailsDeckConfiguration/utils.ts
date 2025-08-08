@@ -19,6 +19,7 @@ import type {
   AddressableAreaNamesWithFakes,
   CutoutConfigMap,
   CutoutFixtureId,
+  CutoutFixtureIdsWithFakes,
   CutoutId,
   CutoutIdToCutoutFixtureId,
   DeckDefinition,
@@ -220,14 +221,17 @@ export const getWasteChuteOptions = (
 
 export const getFixtureOptions = (
   cutoutId: CutoutId,
-  addressableAreaId: AddressableAreaNamesWithFakes
+  addressableAreaId: AddressableAreaNamesWithFakes,
+  existingCutoutFixtureId?: CutoutFixtureIdsWithFakes
 ): CutoutConfigMap[][] => {
   let availableOptions: CutoutConfigMap[][] = []
   const TrashBinAA = getMainAAForAFixture(
     cutoutId,
     TRASH_BIN_ADAPTER_FIXTURE,
-    addressableAreaId
+    addressableAreaId,
+    existingCutoutFixtureId
   )
+
   if (TrashBinAA != null) {
     availableOptions = [
       ...availableOptions,
@@ -268,10 +272,15 @@ export const getOptions = (
   unconfiguredMods: AttachedModule[],
   optionStage: string,
   addressableAreaId: AddressableAreaNamesWithFakes,
-  deckDefinition: DeckDefinition
+  deckDefinition: DeckDefinition,
+  existingCutoutFixtureId?: CutoutFixtureIdsWithFakes
 ): CutoutConfigMap[][] => {
   if (optionStage === 'fixtureOptions') {
-    return getFixtureOptions(cutoutId, addressableAreaId)
+    return getFixtureOptions(
+      cutoutId,
+      addressableAreaId,
+      existingCutoutFixtureId
+    )
   }
   if (optionStage === 'moduleOptions') {
     return getModuleOptions(

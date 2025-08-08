@@ -159,8 +159,10 @@ def run(
     robot_names_and_hepa_serials = get_hepa_serials(storage_directory)
     if turning_hepa_fan == "on":
         print("𖣘 TIME STAMPING START OF HEPA FANS & UV LIGHT.")
-    else:
+    elif turning_hepa_fan == "off":
         print("𖣘 TIME STAMPING END OF HEPA FANS & UV LIGHT.")
+    else:
+        return
 
     answer = input("Do you want to exclude any robots (y/n)?")
     if answer.lower == "y":

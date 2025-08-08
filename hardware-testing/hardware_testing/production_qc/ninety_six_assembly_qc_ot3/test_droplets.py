@@ -1,6 +1,6 @@
 """Test Droplets."""
 from asyncio import sleep
-from time import time
+from time import monotonic
 from typing import List, Union, Tuple, Optional, Dict, Literal
 
 from opentrons.hardware_control.ot3api import OT3API
@@ -110,7 +110,7 @@ async def aspirate_and_wait(
     await api.aspirate(OT3Mount.LEFT, volume)
     await api.move_to(OT3Mount.LEFT, reservoir + Point(z=HOVER_HEIGHT_MM))
 
-    start_time = time()
+    start_time = monotonic()
     for i in range(seconds):
         print(f"waiting {i + 1}/{seconds}")
         if i == 0 or i == seconds - 1:
@@ -123,7 +123,7 @@ async def aspirate_and_wait(
         result = ui.get_user_answer("look good")
     else:
         result = True
-    duration_seconds = time() - start_time
+    duration_seconds = monotonic() - start_time
     print(f"waited for {duration_seconds} seconds")
 
     await api.move_to(

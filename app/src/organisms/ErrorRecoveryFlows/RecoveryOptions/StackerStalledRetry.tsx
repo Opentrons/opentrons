@@ -1,6 +1,7 @@
 import { RECOVERY_MAP } from '../constants'
 import {
   RetryStepInfo,
+  StackerEmptyHopper,
   StackerEnsureShuttleEmpty,
   StackerHomeShuttle,
   StackerHopperLwInfo,
@@ -15,6 +16,8 @@ export function StackerStalledRetry(props: RecoveryContentProps): JSX.Element {
   const { STACKER_STALLED_RETRY } = RECOVERY_MAP
 
   switch (step) {
+    case STACKER_STALLED_RETRY.STEPS.EMPTY_STACKER:
+      return <StackerEmptyHopper {...props} />
     case STACKER_STALLED_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING:
     case STACKER_STALLED_RETRY.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS:
       return <StackerHomeShuttle {...props} />

@@ -3,6 +3,7 @@ import uuidv1 from 'uuid/v4'
 
 import {
   FLEX_ROBOT_TYPE,
+  getAllLabwareDefs,
   getDeckDefFromRobotType,
   getTiprackVolume,
   INTERACTIVE_WELL_DATA_ATTRIBUTE,
@@ -183,6 +184,56 @@ export const getStagingAreaAddressableAreas = (
     )
   }
   return addressableAreasRaw
+}
+
+export function getMatchingTipLiquidSpecsFromSpec(
+  pipetteSpecs: PipetteV2Specs,
+  volume: number,
+  tiprackUri: string
+): SupportedTip {
+  const matchingLabwareDef = getAllLabwareDefs()[tiprackUri]
+
+  console.assert(
+    matchingLabwareDef,
+    `expected to find a matching labware def with tiprack ${tiprackUri} but could not`
+  )
+
+  const tipLength = matchingLabwareDef?.parameters.tipLength ?? 0
+
+  if (tipLength === 0) {
+    console.error(
+      `expected to find a tiplength with tiprack ${
+        matchingLabwareDef?.metadata.displayName ?? 'unknown displayName'
+      } but could not`
+    )
+  }
+
+  const isLowVolumePipette = Object.keys(pipetteSpecs.liquids).some(
+    key => key === 'lowVolumeDefault'
+  )
+
+  const isUsingLowVolume = volume < 5
+  const liquidType =
+    isLowVolumePipette && isUsingLowVolume ? 'lowVolumeDefault' : 'default'
+  const liquidSupportedTips = Object.values(
+    pipetteSpecs.liquids[liquidType].supportedTips
+  )
+
+  //  find the supported tip liquid specs that either exactly match
+  //  tipLength or are closest, this accounts for custom tipracks
+  const matchingTipLiquidSpecs = liquidSupportedTips.sort((tipA, tipB) => {
+    const differenceA = Math.abs(tipA.defaultTipLength - tipLength)
+    const differenceB = Math.abs(tipB.defaultTipLength - tipLength)
+    return differenceA - differenceB
+  })[0]
+  console.assert(
+    matchingTipLiquidSpecs,
+    `expected to find the tip liquid specs but could not with pipette tiprack displayname ${
+      matchingLabwareDef?.metadata.displayName ?? 'unknown displayname'
+    }`
+  )
+
+  return matchingTipLiquidSpecs
 }
 
 export function getMatchingTipLiquidSpecs(

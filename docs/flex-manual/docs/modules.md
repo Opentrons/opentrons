@@ -603,7 +603,7 @@ Outside of protocols, the Opentrons App can display the current status of the Te
 
 ### Thermocycler features
 
-The Opentrons Thermocycler Module GEN2 is a fully automated on-deck thermocycler, providing hands-free PCR in a 96-well plate format. Its heated lid and disposable seal fit tightly over the plate, ensuring efficient sample heating and minimal evaporation.
+The Opentrons Thermocycler Module is a fully automated on-deck thermocycler designed for hands-free PCR in a 96-well plate format. It is compatible with the Flex Gripper, other deck-mounted hardware, and is fully supported in the Opentrons App and Python API. When used with a reusable rubber seal or single-use PCR plate lid, the module's heated lid provides a tight seal that helps ensure efficient sample heating and minimizes evaporation, crucial for reliable and repeatable experimental results.
 
 #### Heating and cooling
 
@@ -625,9 +625,18 @@ The automated lid can be opened or closed as needed during protocol execution.
 
 The Thermocycler can execute *profiles*: automatically cycling through a sequence of block temperatures to perform heat-sensitive reactions.
 
-#### Rubber automation seals
+#### Thermocycler lid seals
 
-The Thermocycler comes with rubber automation seals to help reduce evaporation. Each seal must be sterilized before use and can be used for several runs. [Replacement seals](https://opentrons.com/products/gen2-thermocycler-seals) come in packages of 10, which you can purchase directly from Opentrons.
+The Thermocycler works with two different plate seals to help protect your samples. These are the the [Opentrons Tough PCR Auto-sealing Lid](https://opentrons.com/products/opentrons-flex-tough-auto-sealing-lids-20-count) and reuseable [rubber automation seals](https://opentrons.com/products/gen2-thermocycler-seals).
+
+| Lid Type | Description |
+|----|----|
+| Opentrons Tough PCR Auto-sealing Lid | These sterile, single-use PCR plate lids help prevent cross-contamination and evaporation during Thermocycler incubation periods. The lids are Gripper-compatible and can be stacked directly on the deck or placed in a special deck riser. |
+| Rubber Automation Seal | These are adhesive-backed ethylene propylene diene monomer (EPDM) seals you manually apply to the Thermocycler lid. Rubber seals can be reused up to 20 times; however, unlike the Opentrons Tough Auto-sealing Lid, they are not sterile. The seals must be cleaned and sanitized before each use. |
+
+!!!warning
+    Do not use the Opentrons Tough Auto-sealing PCR Lid and a rubber automation seal on the Thermocycler at the same time. This combination prevents the module's lid from closing properly, which can cause temperature control problems and mechanical damage. Always remove the rubber seal before running protocols that use the disposable PCR lid.
+    ![PCR lid and rubber seal warning](images/thermocycler-lid-warning.png)
 
 #### Software control
 

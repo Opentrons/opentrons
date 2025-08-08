@@ -67,6 +67,8 @@ class NotificationClient:
         self._client.on_connect = self._on_connect
         self._client.on_disconnect = self._on_disconnect
 
+        self._client.max_queued_messages_set(100)
+
     def connect(self) -> None:
         """Connect the client to the MQTT broker."""
         self._client.on_connect = self._on_connect

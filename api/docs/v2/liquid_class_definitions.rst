@@ -10,6 +10,12 @@ A *liquid class definition* specifies nearly all transfer behavior a Flex pipett
 
 This section details specific changes to transfer behavior for each Opentrons-verified liquid class. The transfer steps are listed in the order the robot performs them. Advanced settings like mix, pre-wet tip, touch tip, and blowout are automatically disabled in Opentrons-verified liquid class definitions.
 
+.. note:: 
+
+    You can customize a liquid class definition for your workflow, either by customizing individual properties of an Opentrons-verified liquid class definition or by creating your own definition from scratch.
+
+    For more information, see :ref:`customizing-liquid-classes`.
+
 To use the tables below, select your liquid class: :ref:`aqueous`, :ref:`viscous`, or :ref:`volatile`. Then, click different tabs to view your pipette and tip combination. 
 
 In a liquid class transfer, flow rates and air gap or push out volumes vary based on the pipette and tip combination used in your protocol. Let's say you use a Flex P1000 1-channel pipette and Flex 200 µL tips to aspirate a volatile liquid. The transfer volume specifies the flow rate: 

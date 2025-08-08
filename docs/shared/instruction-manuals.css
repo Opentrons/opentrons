@@ -115,3 +115,10 @@ figure.side-by-side img {
  .status-dot.yellow {
   background-color: #F09D20;
  }
+
+ /* Aligns status dots and text if needed*/
+.status-dot-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}

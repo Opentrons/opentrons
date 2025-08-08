@@ -11,7 +11,7 @@ from opentrons_shared_data.errors.exceptions import PositionUnknownError
 from opentrons.types import MountType
 from opentrons.protocol_engine.types import MotorAxis
 from ..resources import ModelUtils, ensure_ot3_hardware
-from ..types import PickUpTipWellLocation, FluidKind, AspiratedFluid
+from ..types import PickUpTipWellLocation, FluidKind, AspiratedFluid, LabwareWellId
 from .pipetting_common import (
     PipetteIdMixin,
 )
@@ -84,21 +84,21 @@ class SealPipetteToTipResult(DestinationPositionResult):
     """Result data from the execution of a SealPipetteToTip."""
 
     tipVolume: float = Field(
-        0,
+        0.0,
         description="Maximum volume of liquid that the picked up tip can hold, in µL.",
-        ge=0,
+        ge=0.0,
     )
 
     tipLength: float = Field(
-        0,
+        0.0,
         description="The length of the tip in mm.",
-        ge=0,
+        ge=0.0,
     )
 
     tipDiameter: float = Field(
-        0,
+        0.0,
         description="The diameter of the tip in mm.",
-        ge=0,
+        ge=0.0,
     )
 
 
@@ -310,6 +310,7 @@ class SealPipetteToTipImplementation(
         state_update = move_result.state_update.update_pipette_tip_state(
             pipette_id=pipette_id,
             tip_geometry=tip_geometry,
+            tip_source=LabwareWellId(labware_id=labware_id, well_name=well_name),
         ).set_fluid_aspirated(
             pipette_id=pipette_id,
             fluid=AspiratedFluid(kind=FluidKind.LIQUID, volume=_SAFE_TOP_VOLUME),

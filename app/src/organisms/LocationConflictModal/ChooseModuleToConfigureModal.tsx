@@ -29,6 +29,7 @@ import {
 
 import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons'
+import { useModuleUSBPort } from '/app/local-resources/modules'
 import { ODDFixtureOption } from '/app/molecules/ODDFixtureOption'
 import { OddModal } from '/app/molecules/OddModal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
@@ -36,6 +37,7 @@ import { useCloseCurrentRun } from '/app/resources/runs'
 
 import { useSendIdentifyStacker } from '../ModuleWizardFlows/hooks'
 
+import type { TFunction } from 'i18next'
 import type { AttachedModule } from '@opentrons/api-client'
 import type { DeckDefinition, ModuleModel } from '@opentrons/shared-data'
 
@@ -44,7 +46,7 @@ const MODULE_IDENTIFY_TIME_MS = 10000
 
 interface ModuleFixtureOption {
   moduleModel: ModuleModel
-  usbPort?: number | string
+  usbPort?: string
   serialNumber?: string
 }
 interface ChooseModuleToConfigureModalProps {
@@ -69,7 +71,12 @@ export const ChooseModuleToConfigureModal = (
     robotName,
     displaySlotName,
   } = props
-  const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
+  const { t, i18n } = useTranslation([
+    'protocol_setup',
+    'shared',
+    'deck_configuration',
+  ])
+  const { parseModuleUSBPort } = useModuleUSBPort()
   const attachedModules =
     useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
   const deckConfig = useNotifyDeckConfigurationQuery()?.data ?? []
@@ -105,13 +112,9 @@ export const ChooseModuleToConfigureModal = (
 
   const connectedOptions: ModuleFixtureOption[] = unconfiguredModuleMatches.map(
     attachedMod => {
-      const portDisplay =
-        attachedMod.usbPort.hubPort != null
-          ? `${attachedMod.usbPort.port}.${attachedMod.usbPort.hubPort}`
-          : attachedMod.usbPort.port
       return {
         moduleModel: attachedMod.moduleModel,
-        usbPort: portDisplay,
+        usbPort: parseModuleUSBPort(attachedMod),
         serialNumber: attachedMod.serialNumber,
       }
     }
@@ -161,7 +164,11 @@ export const ChooseModuleToConfigureModal = (
             onClickHandler={() => {
               handleStackerClearAndConfigureModule(selectedModule)
             }}
-            optionName={getFixtureDisplayName(moduleFixtures[0].id, usbPort)}
+            optionName={getFixtureDisplayName(
+              t as TFunction,
+              moduleFixtures[0].id,
+              usbPort
+            )}
             buttonText={i18n.format(t('shared:add'), 'capitalize')}
             secondaryButtonText={i18n.format(
               t('shared:identify'),
@@ -177,7 +184,11 @@ export const ChooseModuleToConfigureModal = (
             onClickHandler={() => {
               handleStackerClearAndConfigureModule(selectedModule)
             }}
-            optionName={getFixtureDisplayName(moduleFixtures[0].id, usbPort)}
+            optionName={getFixtureDisplayName(
+              t as TFunction,
+              moduleFixtures[0].id,
+              usbPort
+            )}
             buttonText={i18n.format(t('shared:add'), 'capitalize')}
             secondaryButtonText={i18n.format(
               t('shared:identify'),
@@ -195,7 +206,11 @@ export const ChooseModuleToConfigureModal = (
             onClickHandler={() => {
               handleConfigureModule(serialNumber)
             }}
-            optionName={getFixtureDisplayName(moduleFixtures[0].id, usbPort)}
+            optionName={getFixtureDisplayName(
+              t as TFunction,
+              moduleFixtures[0].id,
+              usbPort
+            )}
             buttonText={i18n.format(t('shared:add'), 'capitalize')}
           />
         ) : (
@@ -204,7 +219,11 @@ export const ChooseModuleToConfigureModal = (
             onClickHandler={() => {
               handleConfigureModule(serialNumber)
             }}
-            optionName={getFixtureDisplayName(moduleFixtures[0].id, usbPort)}
+            optionName={getFixtureDisplayName(
+              t as TFunction,
+              moduleFixtures[0].id,
+              usbPort
+            )}
             buttonText={i18n.format(t('shared:add'), 'capitalize')}
           />
         )

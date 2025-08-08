@@ -162,8 +162,17 @@ export interface RunCommandErrorFlexStackerHopperLabware
   errorInfo: { labwareId?: string }
 }
 
+export interface RunCommandErrorFlexStackerShuttleOccupied
+  extends RunCommandErrorBase {
+  errorCode: '3023'
+  errorType: 'flexStackerShuttleOccupied'
+  isDefined: true
+  errorInfo: { labwareId?: string }
+}
+
 export type RunCommandFlexStackerError =
   | RunCommandErrorFlexStackerStall
   | RunCommandErrorFlexStackerShuttleMissing
   | RunCommandErrorFlexStackerHopperLabware
   | RunCommandErrorFlexStackerShuttleLabware
+  | RunCommandErrorFlexStackerShuttleOccupied

@@ -44,6 +44,7 @@ import { StatusLabel } from '/app/atoms/StatusLabel'
 import {
   getFlexStackerPrepCommands,
   getModuleImage,
+  useModuleUSBPort,
 } from '/app/local-resources/modules'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { ModuleSetupModal } from '/app/organisms/ModuleCard/ModuleSetupModal'
@@ -61,6 +62,7 @@ import { OT2MultipleModulesHelp } from './OT2MultipleModulesHelp'
 import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
 import { getFixtureImage } from './utils'
 
+import type { TFunction } from 'i18next'
 import type { CommandData } from '@opentrons/api-client'
 import type {
   CutoutFixtureId,
@@ -135,8 +137,9 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
             )
             if (
               deckConfigCompatabilityD3 != null &&
-              WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(
-                deckConfigCompatabilityD3?.compatibleCutoutFixtureIds[0]
+              deckConfigCompatabilityD3.compatibleCutoutFixtureIds.every(
+                cutoutFixtureId =>
+                  WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(cutoutFixtureId)
               )
             ) {
               const comboFixtureId =
@@ -226,7 +229,11 @@ export function ModulesListItem({
   robotName,
   comboFixtureId,
 }: ModulesListItemProps): JSX.Element {
-  const { t } = useTranslation(['protocol_setup', 'module_wizard_flows'])
+  const { t } = useTranslation([
+    'protocol_setup',
+    'module_wizard_flows',
+    'deck_configuration',
+  ])
   const moduleConnectionStatus =
     attachedModuleMatch != null
       ? t('module_connected')
@@ -240,6 +247,7 @@ export function ModulesListItem({
   ] = useState<boolean>(false)
 
   const [showModuleWizard, setShowModuleWizard] = useState<boolean>(false)
+  const { parseModuleUSBPort } = useModuleUSBPort()
 
   const handleSetupModuleClick = (): void => {
     setShowModuleWizard(true)
@@ -386,11 +394,7 @@ export function ModulesListItem({
 
   // convert slot name to cutout id
   const cutoutIdForSlotName = getCutoutIdForSlotName(slotName, deckDef)
-
-  const portDisplay =
-    attachedModuleMatch?.usbPort?.hubPort != null
-      ? `${attachedModuleMatch.usbPort.port}.${attachedModuleMatch.usbPort.hubPort}`
-      : attachedModuleMatch?.usbPort?.port
+  const portDisplay = parseModuleUSBPort(attachedModuleMatch)
 
   return (
     <>
@@ -454,7 +458,7 @@ export function ModulesListItem({
                 marginLeft={SPACING.spacing20}
               >
                 {comboFixtureId != null
-                  ? getFixtureDisplayName(comboFixtureId)
+                  ? getFixtureDisplayName(t as TFunction, comboFixtureId)
                   : displayName}
               </LegacyStyledText>
               {subText}
@@ -473,11 +477,7 @@ export function ModulesListItem({
                 : slotName}
             </LegacyStyledText>
             {portDisplay != null ? (
-              <LegacyStyledText as="p">
-                {t('usb_port_number', {
-                  port: portDisplay,
-                })}
-              </LegacyStyledText>
+              <LegacyStyledText as="p">{portDisplay}</LegacyStyledText>
             ) : null}
           </Flex>
           <Flex
