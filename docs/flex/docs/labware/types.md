@@ -17,7 +17,7 @@ Opentrons Flex works by default with single-well and multi-well reservoirs. [Res
 
 Labware Library currently only includes reservoirs in 1-well and 12-well configurations, although other well configurations are possible.
 
-Try creating a custom labware definition with the [Opentrons Labware Creator](https://labware.opentrons.com/create/) if a reservoir you'd like to use isn't listed in the Labware Library. A custom definition combines all the dimensions, metadata, shapes, volumetric capacity, and other information in a JSON file. The Opentrons Flex needs this information to understand how to work with your custom labware. See the [Custom Labware Definitions section][custom-labware-definitions] for more information. 
+Try creating a custom labware definition with the [Opentrons Labware Creator](https://labware.opentrons.com/create/) if a reservoir you'd like to use isn't listed in the Labware Library. A custom definition combines all the dimensions, metadata, shapes, volumetric capacity, and other information in a JSON file. The Opentrons Flex needs this information to understand how to work with your custom labware. See the [Labware Definitions section][labware-definitions] for more information. 
 
 ## Well plates 
 
@@ -45,7 +45,7 @@ The Labware Library includes 384-well plates for applications that require great
 
 ### Custom well plates
 
-Try using the Opentrons Labware Creator to make a custom labware definition if a well plate you'd like to use isn't listed in the Labware Library. A custom definition combines all the dimensions, metadata, shapes, volumetric capacity, and other information in a JSON file. The Opentrons Flex reads this information to understand how to work with your custom labware. See the [Custom Labware Definitions section][custom-labware-definitions] for more information. 
+Try using the Opentrons Labware Creator to make a custom labware definition if a well plate you'd like to use isn't listed in the Labware Library. A custom definition combines all the dimensions, metadata, shapes, volumetric capacity, and other information in a JSON file. The Opentrons Flex reads this information to understand how to work with your custom labware. See the [Labware Definitions section][labware-definitions] for more information. 
 
 ## Lids
 
@@ -123,7 +123,7 @@ The 24-tube rack supports both snap cap and screw cap tubes.
 
 ### Custom tube rack labware 
 
-Try creating a custom labware definition using the [Opentrons Labware Creator](https://labware.opentrons.com/create/) if a tube and rack combination you'd like to use isn't listed on Labware Library. A custom definition combines all the dimensions, metadata, shapes, volumetric capacity, and other information in a JSON file. The Opentrons Flex reads this information to understand how to work with your custom labware. See the [Custom Labware Definitions section][custom-labware-definitions] for more information. 
+Try creating a custom labware definition using the [Opentrons Labware Creator](https://labware.opentrons.com/create/) if a tube and rack combination you'd like to use isn't listed on Labware Library. A custom definition combines all the dimensions, metadata, shapes, volumetric capacity, and other information in a JSON file. The Opentrons Flex reads this information to understand how to work with your custom labware. See the [Labware Definitions section][labware-definitions] for more information. 
 
 ## Aluminum blocks 
 
@@ -166,4 +166,4 @@ The 96-well block supports a wide variety of well plate types. For example, it a
 
 ### Custom aluminum block combinations
 
-Labware Creator can't define new aluminum blocks. For placing tubes in the 24-well block, it can create combination labware definitions that comprise the aluminum block and the tubes. For placing custom plates on the 96-well adapter, define the custom plate with the stacking offset information required for seating the plate on top of the block. See the [Custom Labware Definitions section][custom-labware-definitions] for more information.  
+Labware Creator can't define new aluminum blocks. For placing tubes in the 24-well block, it can create combination labware definitions that comprise the aluminum block and the tubes. For placing custom plates on the 96-well adapter, define the custom plate with the stacking offset information required for seating the plate on top of the block. See the [Labware Definitions section][labware-definitions] for more information.  

@@ -57,7 +57,7 @@ After naming your protocol, review the details in the protocol overview. Protoco
 
 ## Part 2: Edit a protocol
 
-Click **Edit protocol** to add labware, liquids, and additional hardware to your protocol. The protocol starting deck view shows everything on the deck down to individual wells -- even on 384-well plates. 
+Click **Edit protocol** to add labware, liquids, and additional hardware to your protocol. The protocol starting deck view shows everything on the deck down to individual wells, even on 384-well plates. 
 
 You can fully customize the Flex deck in Protocol Designer by adding compatible modules, staging areas, the waste chute, and custom labware. Click any open slot to add or edit hardware or labware. Click, drag, and drop to move labware and tips racks on the deck. 
 

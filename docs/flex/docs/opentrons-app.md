@@ -73,11 +73,11 @@ Click the three-dot menu (⋮) on your protocol and choose **Start setup**. Choo
 
 If you stay in the app, expand the sections under the Setup tab and follow the instructions in each one: Robot Calibration, Module Setup (if your protocol uses modules), Labware Position Check (recommended), and Labware Setup. Then click :material-play-circle: **Start run** to to begin the protocol.
 
-If you move to the touchscreen, follow the steps in the [Run Setup section][run-setup] above.
+If you move to the touchscreen, follow the steps in the [Protocol Setup section][protocol-setup].
 
 ### Run later
 
-Click the three-dot menu (⋮) on your protocol and choose **Send to Opentrons Flex**. Choose a connected and available Flex from the list to transfer the protocol. A message indicating a successful transfer will pop up both in the app and on the touchscreen. To set up your protocol, you need to move to the touchscreen and follow the steps in the [Run Setup section][run-setup] above.
+Click the three-dot menu (⋮) on your protocol and choose **Send to Opentrons Flex**. Choose a connected and available Flex from the list to transfer the protocol. A message indicating a successful transfer will pop up both in the app and on the touchscreen. To set up your protocol, you need to move to the touchscreen and follow the steps in the [Protocol Setup section][protocol-setup].
 
 ## Module status and controls
 
