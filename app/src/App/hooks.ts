@@ -142,7 +142,7 @@ const MODULES_NOT_REQUIRING_PIPETTE_FOR_SETUP: ModuleType[] = [
 
 const MODULES_NOT_REQUIRING_CALIBRATION = MODULES_NOT_REQUIRING_PIPETTE_FOR_SETUP
 
-export function useGetUnlocatedModules(): AttachedModule[] {
+export function useGetModulesNeedingSetup(): AttachedModule[] {
   const attachedModules =
     useAttachedModules({
       refetchInterval: ATTACHED_MODULE_POLL_MS,
@@ -156,26 +156,18 @@ export function useGetUnlocatedModules(): AttachedModule[] {
       ?.filter(c => c.opentronsModuleSerialNumber)
       .map(m => m.opentronsModuleSerialNumber)
     return attachedModules.filter(
-      m => !modulesInDeckConfig.includes(m.serialNumber)
+      m =>
+        !modulesInDeckConfig.includes(m.serialNumber) ||
+        (!MODULES_NOT_REQUIRING_CALIBRATION.includes(m.moduleType) &&
+          m.moduleOffset === undefined)
     )
   }
   return []
 }
 
-export function useGetModulesNeedingSetup(): AttachedModule[] {
-  const allNewModules = useGetUnlocatedModules()
-  console.log(`ugmns: ${allNewModules}`)
-  return allNewModules.filter(
-    m =>
-      MODULES_NOT_REQUIRING_CALIBRATION.includes(m.moduleType) ||
-      m.moduleOffset === undefined
-  )
-}
-
 export function useGetModulesNeedingSetupThatCanCurrentlyBeSetUp(): AttachedModule[] {
   const modulesRequiringSetup = useGetModulesNeedingSetup()
   const attachedPipettes = useAttachedPipettes(modulesRequiringSetup.length > 0)
-  console.log(`ugmnstccbs: ${modulesRequiringSetup}`)
   return modulesRequiringSetup.filter(
     m =>
       MODULES_NOT_REQUIRING_PIPETTE_FOR_SETUP.includes(m.moduleType) ||
@@ -188,7 +180,6 @@ export function useModuleAttachedToast(
   launchModuleSetupCallback: () => void
 ): void {
   const currentlySetuppableModules = useGetModulesNeedingSetupThatCanCurrentlyBeSetUp()
-  console.log(`umat: ${currentlySetuppableModules}`)
 
   const currentRunId = useCurrentRunId({ refetchInterval: CURRENT_RUN_POLL })
   const { t, i18n } = useTranslation(['module_wizard_flows', 'shared'])
@@ -201,7 +192,6 @@ export function useModuleAttachedToast(
 
   useEffect(() => {
     const newModuleSerials = difference(moduleSerials, moduleSerialsRef.current)
-    console.log(`umat effect: ${newModuleSerials}`)
     if (!runInProgress && newModuleSerials.length > 0) {
       makeToast(t('module_added') as string, 'info', {
         buttonText: i18n.format(t('shared:close'), 'capitalize'),
