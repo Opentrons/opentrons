@@ -1092,6 +1092,7 @@ class ProtocolContext(CommandPublisher):
             tip_racks=tip_racks,
             trash=trash,
             requested_as=instrument_name,
+            core_map=self._core_map,
         )
 
         self._instruments[checked_mount] = instrument
