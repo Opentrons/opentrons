@@ -59,7 +59,6 @@ export interface UseModuleSetupWizardResult {
   buildFlowForSelectedModule: (module: AttachedModule) => void
   patchModuleAfterUpdate: (module: AttachedModule) => void
   deckConfig: DeckConfiguration
-  requirePipette: boolean
 }
 
 export interface UseModuleSetupWizardParams {
@@ -264,8 +263,6 @@ export function useModuleSetupWizard(
     deckConfig,
     buildFlowForSelectedModule,
     patchModuleAfterUpdate,
-    requirePipette:
-      attachedModuleOnLaunch?.moduleType === FLEX_STACKER_MODULE_TYPE,
   }
 }
 

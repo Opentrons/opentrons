@@ -18,7 +18,7 @@ import {
   getModuleDisplayName,
 } from '@opentrons/shared-data'
 
-import { useGetNewModules } from '/app/App/hooks'
+import { useGetModulesNeedingSetupThatCanCurrentlyBeSetUp } from '/app/App/hooks'
 import { SmallButton } from '/app/atoms/buttons'
 import { i18n } from '/app/i18n'
 import { useModuleUSBPort } from '/app/local-resources/modules'
@@ -62,13 +62,13 @@ export function SelectModule(props: SelectModuleProps): JSX.Element | null {
   const { t } = useTranslation('module_wizard_flows')
 
   const { parseModuleUSBPort } = useModuleUSBPort()
-  const availableModules = useGetNewModules()
+  const availableModules = useGetModulesNeedingSetupThatCanCurrentlyBeSetUp()
+  const allSettupable = useGetModulesNeedingSetup()
   const allNewModules =
     attachedModuleOnLaunch !== null
       ? [attachedModuleOnLaunch]
       : availableModules
-
-  const modulesNotRequiringPipette = allNewModules.filter(thisModule =>
+  const modulesNotRequiringPipette = availableModules.filter(thisModule =>
     ([
       ABSORBANCE_READER_TYPE,
       FLEX_STACKER_MODULE_TYPE,

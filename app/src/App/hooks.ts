@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useRef } from 'react'
+import { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { useDispatch } from 'react-redux'
@@ -135,7 +135,14 @@ export function useProtocolReceiptToast(): void {
   }, [protocolIds])
 }
 
-export function useGetNewModules(): AttachedModule[] {
+const MODULES_NOT_REQUIRING_PIPETTE_FOR_SETUP: ModuleType[] = [
+  ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
+]
+
+const MODULES_NOT_REQUIRING_CALIBRATION = MODULES_NOT_REQUIRING_PIPETTE_FOR_SETUP
+
+export function useGetUnlocatedModules(): AttachedModule[] {
   const attachedModules =
     useAttachedModules({
       refetchInterval: ATTACHED_MODULE_POLL_MS,
@@ -148,59 +155,54 @@ export function useGetNewModules(): AttachedModule[] {
     const modulesInDeckConfig = deckConfig
       ?.filter(c => c.opentronsModuleSerialNumber)
       .map(m => m.opentronsModuleSerialNumber)
-    const newModules = attachedModules.filter(
-      m =>
-        m.moduleOffset === undefined &&
-        !modulesInDeckConfig.includes(m.serialNumber)
+    return attachedModules.filter(
+      m => !modulesInDeckConfig.includes(m.serialNumber)
     )
-    return newModules
   }
   return []
 }
 
-const MODULES_NOT_REQUIRING_PIPETTE_FOR_SETUP: ModuleType[] = [
-  ABSORBANCE_READER_TYPE,
-  FLEX_STACKER_MODULE_TYPE,
-]
+export function useGetModulesNeedingSetup(): AttachedModule[] {
+  const allNewModules = useGetUnlocatedModules()
+  console.log(`ugmns: ${allNewModules}`)
+  return allNewModules.filter(
+    m =>
+      MODULES_NOT_REQUIRING_CALIBRATION.includes(m.moduleType) ||
+      m.moduleOffset === undefined
+  )
+}
+
+export function useGetModulesNeedingSetupThatCanCurrentlyBeSetUp(): AttachedModule[] {
+  const modulesRequiringSetup = useGetModulesNeedingSetup()
+  const attachedPipettes = useAttachedPipettes(modulesRequiringSetup.length > 0)
+  console.log(`ugmnstccbs: ${modulesRequiringSetup}`)
+  return modulesRequiringSetup.filter(
+    m =>
+      MODULES_NOT_REQUIRING_PIPETTE_FOR_SETUP.includes(m.moduleType) ||
+      attachedPipettes.left != null ||
+      attachedPipettes.right != null
+  )
+}
 
 export function useModuleAttachedToast(
   launchModuleSetupCallback: () => void
 ): void {
-  const newModules = useGetNewModules()
-  const currentRunId = useCurrentRunId({ refetchInterval: CURRENT_RUN_POLL })
-  const modulesNotRequiringPipette = newModules
-    .filter(thisModule =>
-      MODULES_NOT_REQUIRING_PIPETTE_FOR_SETUP.includes(thisModule.moduleType)
-    )
-    .map(thisModule => thisModule.serialNumber)
-  const moduleSerialsRequiringPipette = newModules
-    .map(thisModule => thisModule.serialNumber)
-    .filter(thisSerial => !modulesNotRequiringPipette.includes(thisSerial))
+  const currentlySetuppableModules = useGetModulesNeedingSetupThatCanCurrentlyBeSetUp()
+  console.log(`umat: ${currentlySetuppableModules}`)
 
-  const attachedPipettes = useAttachedPipettes(
-    moduleSerialsRequiringPipette.length > 0
-  )
+  const currentRunId = useCurrentRunId({ refetchInterval: CURRENT_RUN_POLL })
   const { t, i18n } = useTranslation(['module_wizard_flows', 'shared'])
   const { makeToast } = useToaster()
-  const moduleSerials = newModules.map(m => m.serialNumber)
+  const moduleSerials = currentlySetuppableModules.map(m => m.serialNumber)
   const moduleSerialsRef = useRef(moduleSerials)
   const runInProgress = currentRunId != null
 
+  const [firstRun, setFirstRun] = useState<boolean>(true)
+
   useEffect(() => {
     const newModuleSerials = difference(moduleSerials, moduleSerialsRef.current)
-    const newModulesRequiringPipette = newModuleSerials.filter(serial =>
-      moduleSerialsRequiringPipette.includes(serial)
-    )
-    const newModulesNotRequiringPipette = newModuleSerials.filter(
-      serial => !moduleSerialsRequiringPipette.includes(serial)
-    )
-    const hasPipette =
-      attachedPipettes.left != null || attachedPipettes.right != null
-    if (
-      !runInProgress &&
-      ((hasPipette && newModulesRequiringPipette.length > 0) ||
-        newModulesNotRequiringPipette.length > 0)
-    ) {
+    console.log(`umat effect: ${newModuleSerials}`)
+    if (!runInProgress && newModuleSerials.length > 0) {
       makeToast(t('module_added') as string, 'info', {
         buttonText: i18n.format(t('shared:close'), 'capitalize'),
         linkText: t('module_added_link'),
@@ -210,9 +212,10 @@ export function useModuleAttachedToast(
       })
     }
     moduleSerialsRef.current = moduleSerials
+    setFirstRun(false)
     // dont want this hook to rerun when other deps change
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [moduleSerials, runInProgress, moduleSerialsRequiringPipette])
+  }, [moduleSerials, runInProgress, firstRun])
 }
 
 export function useScrollRef(): {

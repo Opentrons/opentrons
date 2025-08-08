@@ -63,7 +63,6 @@ export function ModuleWizardFlows(
     buildFlowForSelectedModule,
     patchModuleAfterUpdate,
     deckConfig,
-    requirePipette,
   } = useModuleSetupWizard({ closeFlow, attachedModuleOnLaunch, onComplete })
 
   // build out flow if there is a module passed in at launch
@@ -90,7 +89,6 @@ export function ModuleWizardFlows(
 
   const doorStatus = useIsDoorOpen(robotName).isDoorOpen
 
-  if (wizardFlowBaseProps.attachedPipette == null && requirePipette) return null
   if (showLaunchSetup || wizardFlowBaseProps.attachedModule == null) {
     return (
       <ModuleWizardScreen
