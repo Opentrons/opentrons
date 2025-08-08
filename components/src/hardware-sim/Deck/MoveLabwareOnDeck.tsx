@@ -116,25 +116,36 @@ export function MoveLabwareOnDeck(
     animationFinalCoordinates
   )
 
-  const springProps = useSpring({
-    reset: shouldReset,
-    config: { duration: 1000, easing: easings.easeInOutSine },
-    from: {
-      ...animationInitialCoordinates,
-      splashOpacity: 0,
-      deckOpacity: 0,
-    },
-    to: [
-      { deckOpacity: 1 },
-      { splashOpacity: 1 },
-      { splashOpacity: 0 },
-      { ...animationFinalCoordinates },
-      { splashOpacity: 1 },
-      { splashOpacity: 0 },
-      { deckOpacity: 0 },
-    ],
-    loop: true,
-  })
+  const [springProps] = useSpring(
+    () => ({
+      reset: shouldReset,
+      config: { duration: 1000, easing: easings.easeInOutSine },
+      from: {
+        ...animationInitialCoordinates,
+        splashOpacity: 0,
+        deckOpacity: 0,
+      },
+      to: [
+        { deckOpacity: 1 },
+        { splashOpacity: 1 },
+        { splashOpacity: 0 },
+        { ...animationFinalCoordinates },
+        { splashOpacity: 1 },
+        { splashOpacity: 0 },
+        { deckOpacity: 0 },
+      ],
+      loop: true,
+    }),
+    // Dependency array:
+    [
+      shouldReset,
+      // react-spring behaves weirdly if its props are updated too frequently.
+      // So make sure to filter out coordinate "updates" that are just object identity
+      // updates and not updates to the actual x/y/z components.
+      ...Object.values(animationInitialCoordinates),
+      ...Object.values(animationFinalCoordinates),
+    ]
+  )
 
   return (
     <BaseDeck
