@@ -10,11 +10,11 @@ By installing and using Opentrons software, you agree to the Opentrons End-User 
 
 ## Opentrons App Changes in 8.6.0
 
-Welcome to the v8.6.0 release of the Opentrons App! This release adds support for the Flex Stacker module, as well as other improvements.
+Welcome to the v8.6.0 release of the Opentrons App! This release adds support for the Flex Stacker Module, as well as other improvements.
 
 ### New Features
 
-- Automate labware storage with the Flex Stacker module. Store additional well plates, reservoirs, or Flex tip racks to move onto the deck during a protocol, increasing workflow throughput.
+- Automate labware storage with the Flex Stacker Module. Store additional well plates, reservoirs, or Flex tip racks to move onto the deck during a protocol, increasing workflow throughput.
 
 ### Improvements
 
