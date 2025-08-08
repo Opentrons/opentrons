@@ -10,6 +10,7 @@ nav:
       - Flex Stacker: '!include stacker-manual/mkdocs.yml'
       - HEPA/UV Module: '!include hepa-uv/mkdocs.yml'
       - Thermocycler Module: '!include thermocycler-manual/mkdocs.yml'
+  - Opentrons Flex: '!include protocol-designer/mkdocs.yml'
   - Python API: https://docs.opentrons.com/v2/
 
 plugins:
