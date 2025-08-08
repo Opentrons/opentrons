@@ -281,7 +281,6 @@ describe('InterventionModal', () => {
       } as any,
     }
     render(props)
-    screen.getByText('Labware name')
     screen.getByText('mockLabwareInStagingArea')
     screen.queryAllByText('B4')
     screen.queryAllByText('Waste Chute')
