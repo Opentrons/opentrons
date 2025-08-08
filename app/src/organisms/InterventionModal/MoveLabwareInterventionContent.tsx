@@ -47,7 +47,7 @@ export function MoveLabwareInterventionContent({
   robotType,
   isOnDevice,
 }: MoveLabwareInterventionProps): JSX.Element | null {
-  const { i18n, t } = useTranslation('protocol_command_text')
+  const { t } = useTranslation('protocol_command_text')
 
   const analysisCommands = analysis?.commands ?? []
   const labwareDefsByUri = getLoadedLabwareDefinitionsByUri(analysisCommands)
