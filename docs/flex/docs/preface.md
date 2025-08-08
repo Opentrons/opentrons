@@ -16,7 +16,7 @@ If you prefer a guided approach, this manual is structured so you can follow it 
 
 - **Get started with Flex.** If you need to set up your Flex, follow the detailed [installation instructions](installation/index.md). Then familiarize yourself with the components of Flex in the [system description](system-description/index.md).
 
-- **Set up your deck.** Configuring the deck enables different scientific applications on Flex. [Modules](modules/index.md) are Opentrons peripherals that you can install into or on top of the deck to perform specific scientific tasks. Flex works with out of the box with a wide range of [labware](labware/index.md) for holding liquids.
+- **Set up your deck.** Configuring the deck enables different scientific applications on Flex. [Modules](modules/index.md) are Opentrons peripherals that you can install into or on top of the deck to perform specific scientific tasks. Flex works out of the box with a wide range of [labware](labware/index.md) for holding liquids.
 
 - **Run a protocol.** The core use of Flex is running standardized scientific procedures, known as [protocols](protocols/index.md). Opentrons offers several ways to get ready-made protocols or design them yourself. To run your protocol, use the [touchscreen](touchscreen/index.md) or the [Opentrons App](opentrons-app.md). Both the touchscreen and app let you perform other tasks and customize your robot's settings.
 
@@ -34,7 +34,7 @@ If you prefer a guided approach, this manual is structured so you can follow it 
 
 ## Notes and warnings
 
-Throughout this manual, you'll find specially formatted note and warning blocks. Notes provide helpful information that may not be obvious in the ordinary course of using Flex. Pay special attention to warnings---they are only used in situations where you run the risk of personal injury, damage to equipment, loss or spoilage of samples or reagents, data loss, or other harm.
+Throughout this manual, you'll find specially formatted note and warning blocks. Notes provide helpful information that may not be obvious in the ordinary course of using Flex. Pay special attention to warnings: they are only used in situations where you run the risk of personal injury, damage to equipment, loss or spoilage of samples or reagents, data loss, or other harm.
 
 Notes and warnings look like this:
 

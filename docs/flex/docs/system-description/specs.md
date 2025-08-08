@@ -11,7 +11,7 @@ title: "Opentrons Flex: System Specifications"
 | **Dimensions**           | 87 × 69 × 84 cm / 34.25 × 27 × 33 in (W, D, H) |
 | **Weight**               | 88.5 kg / 195 lb |
 | **Deck slots**           | <ul><li>12 ANSI/SLAS-compatible slots in working area (accessible to pipettes)</li><li>4 additional slots for staging tips and labware (gripper only)</li></ul> |
-| **Touchscreen**          | 7-inch LCD touchscreen with scratch- and damage-resistant Gorilla Glass 3 |
+| **Touchscreen**          | 7-inch LCD touchscreen with scratch-resistant and damage-resistant Gorilla Glass 3 |
 | **Wi-Fi**                | 802.11 ac/a/b/g/n dual-band (2.4/5 GHz) |
 | **Ethernet**             | 100 Mbps |
 | **USB**                  | <ul><li>9 USB-A ports</li><li>1 USB-B port</li><li>USB 2.0 speed</li></ul> |

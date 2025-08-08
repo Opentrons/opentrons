@@ -60,8 +60,8 @@ Always observe the following additional safety warnings:
 | ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | Opentrons Flex has not been certified for use with explosive or flammable liquids. Do not load plates, tubes, or vials containing explosive or flammable liquids into the robot or otherwise operate the instrument with explosive or flammable liquids in the enclosure. |
 | ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | Use good laboratory practices and follow the manufacturer's precautions when working with chemicals. Opentrons is not responsible or liable for any damages because of, or as a result of, the use of hazardous chemicals.           |
 | ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | The Flex weighs 88.5 kg (195 lbs). As a result, it requires two people to lift and move it safely. See the [Relocation section][relocation] in the Installation and Relocation chapter.                                                                        |
-| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | The Flex should be placed on a surface capable of supporting its weight of 88.5 kg (195 lbs) with sufficient surface area to accommodate the robot plus its minimum clearance distance (20 cm/8 in). See the in the Installation and Relocation chapter. |
-| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | The Flex can emit vibrations while in operation. Place the robot on a surface that is sturdy, level, and water-resistant with cross-bracing or welded joints. See the in the Installation and Relocation chapter.                |
+| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | The Flex should be placed on a surface capable of supporting its weight of 88.5 kg (195 lbs) with sufficient surface area to accommodate the robot plus its minimum clearance distance (20 cm/8 in). See the [Installation Requirements section][installation-requirements] in the Installation and Relocation chapter. |
+| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | The Flex can emit vibrations while in operation. Place the robot on a surface that is sturdy, level, and water-resistant with cross-bracing or welded joints. See the [Installation Requirements section][installation-requirements] in the Installation and Relocation chapter.                |
 
 ### Safety cautions
 
@@ -69,7 +69,7 @@ To help protect the Flex from damage, follow these precautions:
 
 | Symbol   | Description  |
 | :------- | :----------- |
-| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | Use labware that is ANSI/SLAS-compliant or approved by Opentrons. See the [Labware chapter](labware.md). |
+| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | Use labware that is ANSI/SLAS-compliant or approved by Opentrons. See the [Labware chapter](labware/index.md). |
 | ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | Keep corrosive materials, agents, or otherwise damaging materials away from the robot.|
 
 ### Biological safety
@@ -78,7 +78,7 @@ Treat specimens and reagents containing materials taken from humans as potential
 
 Under normal circumstances, the Flex does not create detectable aerosols from source liquids. However, under certain conditions, it is possible to generate aerosols from source liquids. When operating with biosafety level 2 or greater source liquids, consider taking precautions against aerosol exposure, in accordance with your local regulatory bodies. To minimize the potential risk of aerosol exposure from the robot, ensure that you:
 
-- Perform maintenance as described in the [Maintenance and Service chapter](maintenance-service.md).
+- Perform maintenance as described in the [Maintenance and Service chapter](maintenance/index.md).
 
 - Properly install and secure all instrument covers, pipettes, modules, and labware.
 

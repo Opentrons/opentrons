@@ -19,7 +19,7 @@ The Thermocycler's block can heat and cool, and its lid can heat, with the follo
 
 - Thermal block temperature range: 4–99 °C
 
-- Thermal block maximum heating ramp rate: 4.25 °C/s from GEN2 ambient to 95 °C
+- Thermal block maximum heating ramp rate: 4.25 °C/s from ambient to 95 °C
 
 - Thermal block maximum cooling ramp rate: 2.0 °C/s from 95 °C to ambient
 
@@ -39,7 +39,7 @@ The Thermocycler works with two different plate seals to help protect your sampl
 
 | Lid Type | Description |
 |----|----|
-| Opentrons Tough PCR Auto-sealing Lid | These sterile, single-use PCR plate lids help prevent cross-contamination and evaporation during Thermocycler incubation periods. The lids are Gripper-compatible and can be stacked directly on the deck or placed in a special deck riser. |
+| Opentrons Tough PCR Auto-sealing Lid | These sterile, single-use PCR plate lids help prevent cross-contamination and evaporation during Thermocycler incubation periods. The lids are gripper-compatible and can be stacked directly on the deck or placed in a special deck riser. |
 | Rubber Automation Seal | These are adhesive-backed ethylene propylene diene monomer (EPDM) seals you manually apply to the Thermocycler lid. Rubber seals can be reused up to 20 times; however, unlike the Opentrons Tough Auto-sealing Lid, they are not sterile. The seals must be cleaned and sanitized before each use. |
 
 !!!warning

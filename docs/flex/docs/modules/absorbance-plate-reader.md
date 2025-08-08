@@ -22,7 +22,7 @@ The plate reader uses 96 separate detection units for rapid sample analysis. The
 
 ### Gripper compatibility
 
-The Opentrons Flex Gripper is required when using the plate reader. The Gripper is needed to move labware and the plate reader's lid, onto and off the module.
+The Opentrons Flex Gripper is required when using the plate reader. The gripper is needed to move labware and the plate reader's lid, onto and off the module.
 
 ### Deck placement
 

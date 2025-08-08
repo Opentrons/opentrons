@@ -6,7 +6,7 @@ title: "Opentrons Flex: Gripper"
 
 The *gripper* moves labware throughout the working area and staging area during the execution of protocols. The gripper attaches to the *extension mount*, which is separate from the pipette mounts; the gripper can be used with any pipette configuration. For details on installing the gripper, see [Instrument Installation and Calibration][instrument-installation-and-calibration].
 
-The gripper can move labware across the deck and onto or off of modules. The gripper can manipulate certain fully skirted well plates, deep well plates, and tip racks. For more details on what labware the gripper can move, see the [Labware and the Opentrons Flex Gripper section][labware-and-the-opentrons-flex-gripper] of the Labware chapter, or consult the [Opentrons Labware Library](https://labware.opentrons.com).
+The gripper can move labware across the deck and onto or off of modules. The gripper can manipulate certain fully skirted well plates, lids, and tip racks. For more details on what labware the gripper can move, see the [Labware and the Opentrons Flex Gripper section][labware-and-the-opentrons-flex-gripper] of the Labware chapter, or consult the [Opentrons Labware Library](https://labware.opentrons.com).
 
 ## Gripper specifications
 
@@ -15,7 +15,7 @@ The *jaws* perform the primary motion of the gripper, which is to open or close 
 To move a piece of labware that has been gripped by the jaws, the gantry lifts the gripper along the z-axis, moves it laterally, and then lowers it into the Calibration pin labware's new position.
 
 <figure markdown>
-![The gripper has attachment screws on its right side. Also on the right side is the storage area for the calibration pin. At the bottom of the gripper are its jaws, each of which has a paddle at its end.](../images/gripper-components.png "Gripper components")
+![The gripper has attachment screws on its right side. Also on the right side is the storage area for the calibration pin. At the bottom of the gripper are its jaws, each of which has a paddle at its end.](../images/gripper-components.png "Gripper components"){style="max-height: 600px"}
 <figcaption>Locations of components of the gripper.</figcaption>
 </figure>
 

@@ -46,7 +46,6 @@ You can also purchase a [set of four slots](https://opentrons.com/products/opent
 
 <figure markdown>
 ![Staging area slots in column 4.](../images/deck-staging-area.png "Staging area slots")
-<figcaption>Staging Area with Slots Installed</figcaption>
 </figure>
 
 ## Deck fixtures
@@ -67,7 +66,7 @@ locations for each fixture.
 
 Fixtures are unpowered. They do not contain electronic or mechanical components that communicate their current state and deck location to the robot. This means you have to use the deck configuration feature to let the Flex know what fixtures are attached to the deck and where they're located.
 
-You can access the deck configuration settings from the touchscreen via the three-dot (⋮) menu and from the Opentrons App. See the [Deck Configuration section][deck-configuration] of the Software and Operation chapter for information on how to configure the deck from the touchscreen.
+You can access the deck configuration settings from the touchscreen via the three-dot (⋮) menu and from the Opentrons App. See the [Deck Configuration section][deck-configuration] of the Touchscreen chapter for more information.
 
 ## Waste chute
 
@@ -105,7 +104,7 @@ Staging area slots are compatible with the Flex instruments, modules, and labwar
 | **Gripper**        | The Flex Gripper can move labware to or from staging area slots.                                                     |
 | **Pipettes**       | Flex pipettes cannot reach the staging area. Use the gripper to move tip racks and labware from the staging area to the working area before pipetting. |
 | **Modules**        | The Magnetic Block GEN1 can be placed in column 3 on top of a staging area slot. Modules are not supported in column 4.<br><br>Powered modules such as the Heater-Shaker and Temperature Module fit into caddies that can be placed in column 3. You can't add a staging area slot to a position occupied by a module caddy. |
-| **Labware**        | Staging area slots have the same ANSI/SLAS dimensions as standard deck slots. Use in the staging area, or manually add and remove labware from this location. |
+| **Labware**        | Staging area slots have the same ANSI/SLAS dimensions as standard deck slots. Use [gripper-compatible labware][labware-and-the-opentrons-flex-gripper] in the staging area, or manually add and remove labware from this location. |
 
 ## Gantry
 
@@ -117,8 +116,10 @@ In turn, attached to the gantry are the *pipette mounts* and the *extension moun
 
 The electronics contained in the gantry provide 36 VDC power and communications to the pipettes and gripper, when attached.
 
+<figure markdown>
 ![Diagram of the horizontal gantry and its attached pipette and extension mounts.](../images/gantry-diagram.svg "Gantry components")
-Location of instrument mounts on Flex.
+<figcaption>Location of instrument mounts on Flex.</figcaption>
+</figure>
 
 ## Touchscreen and LED displays
 
@@ -136,7 +137,7 @@ The primary user interface is the 7-inch LCD *touchscreen*, located on the front
 
 - Operation logs and error notifications
 
-For more information on using Flex via the touchscreen, see the [Touchscreen Operation section](software-operation.md#touchscreen-operation) of the Software and Operation chapter.
+For more information on using Flex via the touchscreen, see the [Touchscreen chapter](../touchscreen/index.md).
 
 The *status light* is a strip of LEDs along the top front of the robot that provides at-a-glance information about the robot. Different colors and patterns of illumination can communicate various success, failure, or idle states:
 

@@ -24,7 +24,9 @@ Follow the prompts on the touchscreen to get your robot connected so it can chec
 <figcaption>Network connection options. You need to have internet connectivity to set up Flex.</figcaption>
 </figure>
 
-**Wi-Fi:** Use the touchscreen to connect to Wi-Fi networks that are secured with WPA2 Personal authentication (most networks that only require a password to join fall under this category).
+### Wi-Fi
+
+Use the touchscreen to connect to Wi-Fi networks that are secured with WPA2 Personal authentication (most networks that only require a password to join fall under this category).
 
 !!! note 
     Flex does not support captive portals (networks that don't have a password but load a webpage to authenticate users after connecting).
@@ -56,11 +58,15 @@ Select your network from the dropdown menu or choose "Join other network..." and
 
 Each of these methods requires a username and password, and depending on your exact network configuration may require certificate files or other options. Consult your facility's IT documentation or contact your IT manager for details of your network setup.
 
-**Ethernet:** Connect your robot to a network switch or hub with an Ethernet cable. You can also connect directly to the Ethernet port on your computer, starting in robot system version 7.1.0.
+### Ethernet
 
-**USB:** Connect the provided USB A-to-B cable to the robot's USB-B port and an open port on your computer. Use a USB B-to-C cable or a USB A-to-C adapter if your computer does not have a USB-A port.
+Connect your robot to a network switch or hub with an Ethernet cable. You can also connect directly to the Ethernet port on your computer, starting in robot system version 7.1.0.
 
-To proceed with setup, the connected computer must have the Opentrons App installed *and running*. For details on installing the Opentrons App, see the [App Installation section][app-installation] of the Software and Operation chapter.
+### USB 
+
+Connect the provided USB A-to-B cable to the robot's USB-B port and an open port on your computer. Use a USB B-to-C cable or a USB A-to-C adapter if your computer does not have a USB-A port.
+
+To proceed with setup, the connected computer must have the Opentrons App installed *and running*. For details on installing the Opentrons App, see the [App Installation section][app-installation].
 
 ## Install software updates
 
@@ -76,8 +82,8 @@ Connect the included Emergency Stop Pendant (E-stop) to an auxiliary port (AUX-1
 <figcaption>Before and after connecting the Emergency Stop Pendant.</figcaption>
 </figure>
 
-Attaching and enabling the E-stop is *mandatory* for attaching instruments and running protocols on Flex. For more information on using the E-stop during robot operation, see the of the System Description chapter.
+Attaching and enabling the E-stop is *mandatory* for attaching instruments and running protocols on Flex. For more information on using the E-stop during robot operation, see the [When to Use the E-stop section][when-to-use-the-e-stop].
 
 ## Give your robot a name
 
-Naming your robot lets you easily identify it in your lab environment. If you have multiple Opentrons robots on your network, make sure to give them unique names. Once you've confirmed your robot's name, you'll be taken to your Opentrons Flex Dashboard. Likely the next step you'll want to take is attaching instruments, which is covered in the next section.
+Naming your robot lets you easily identify it in your lab environment. If you have multiple Opentrons robots on your network, make sure to give them unique names. Once you've confirmed your robot's name, you'll be taken to your Opentrons Flex Dashboard. Likely the next step you'll want to take is [attaching instruments][instrument-installation-and-calibration].

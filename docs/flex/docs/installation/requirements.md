@@ -19,9 +19,15 @@ Space is a valuable commodity in almost every lab. Your Flex is going to need so
 !!! warning
     *Do not* position the sides or back of the Flex flush against a wall.
 
-![Opentrons Flex with arrows labeling width, height, and depth](../images/flex-dimensions.png "Opentrons Flex base dimensions") Opentrons Flex base dimensions.
+<figure markdown>
+![Opentrons Flex with arrows labeling width, height, and depth](../images/flex-dimensions.png "Opentrons Flex base dimensions")
+<figcaption>Opentrons Flex base dimensions.</figcaption>
+</figure>
 
-![Top view of Opentrons Flex, showing minimum side and back clearance.](../images/flex-clearance.png "Flex minimum clearance") Top view of Opentrons Flex, showing minimum side and back clearance.
+<figure markdown>
+![Top view of Opentrons Flex, showing minimum side and back clearance.](../images/flex-clearance.png "Flex minimum clearance")
+<figcaption>Top view of Opentrons Flex, showing minimum side and back clearance.</figcaption>
+</figure>
 
 ## Power consumption
 

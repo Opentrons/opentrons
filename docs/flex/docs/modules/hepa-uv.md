@@ -12,7 +12,7 @@ title: "Opentrons Flex: HEPA/UV Module"
 The top-mounted Opentrons Flex HEPA/UV Module is a clean air and ultraviolet (UV-C) disinfectant accessory for the Flex liquid handling robot. It contains a mesh pre-filter, a HEPA filter, and two UV lights. During operation, the HEPA system creates a positive pressure environment inside the Flex enclosure, which helps protect samples from contamination. When running the UV lights and air filtration for a full, 15-minute cycle, the HEPA/UV module can achieve ISO-5 clean bench standards within the Flex enclosure.
 
 !!!warning
-    The HEPA/UV Module is not a biosafety cabinet. Do not use it with pathogens or to filter particles smaller than 0.3 micrometers (μM).
+    The HEPA/UV Module is not a biosafety cabinet. Do not use it with pathogens or to filter particles smaller than 0.3 micrometers (μm).
 
 ## HEPA/UV Module features
 
