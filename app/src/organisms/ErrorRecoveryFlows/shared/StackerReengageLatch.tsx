@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import ReengageLatch from '/app/assets/images/flex_stacker_reengage_latch.png'
 import { DescriptionContent, TwoColumn } from '/app/molecules/InterventionModal'
 
-import { RECOVERY_MAP } from '../constants'
 import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 
@@ -16,17 +15,12 @@ export function StackerReengageLatch(props: RecoveryContentProps): JSX.Element {
   const {
     proceedNextStep,
     goBackPrevStep,
-    handleMotionRouting,
   } = routeUpdateActions
   const { closeLabwareLatch } = recoveryCommands
-  const { ROBOT_IN_MOTION } = RECOVERY_MAP
 
   const primaryOnClick = (): void => {
-    void handleMotionRouting(true, ROBOT_IN_MOTION.ROUTE).then(() => {
-      void closeLabwareLatch().then(() => {
-        void proceedNextStep()
-      })
-    })
+    void closeLabwareLatch()
+      .then(() => { void proceedNextStep() })
   }
 
   return (
