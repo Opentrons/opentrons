@@ -24,14 +24,6 @@
 
     [:octicons-arrow-right-24: View all modules](modules/index.md)
 
--   :opentrons-python-outline:{ .xl .middle } __Python Protocol API__
-
-    ---
-
-    Code your own automated biology lab protocols for Flex or OT-2.
-
-    [:octicons-arrow-right-24: Documentation and Reference](https://docs.opentrons.com/v2/)
-
 -   :opentrons-protocol-designer:{ .xl .middle } __Protocol Designer__
 
     ---
@@ -39,5 +31,13 @@
     Our no-code, web-based tool for developing protocols for Flex or OT-2.
 
     [:octicons-arrow-right-24: Instruction Manual](protocol-designer/index.md)
+
+-   :opentrons-python-outline:{ .xl .middle } __Python Protocol API__
+
+    ---
+
+    Code your own automated biology lab protocols for Flex or OT-2.
+
+    [:octicons-arrow-right-24: Documentation and Reference](https://docs.opentrons.com/v2/)
 
 </div>
