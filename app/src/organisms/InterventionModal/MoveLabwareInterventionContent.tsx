@@ -132,7 +132,7 @@ export function MoveLabwareInterventionContent({
     deckDef,
     labwareDefsByUri
   )
-  const modulesOnDeck = moduleRenderInfo.map(module => {
+  const modulesOnDeck = moduleRenderInfo?.map(module => {
     return {
       moduleModel: module.moduleDef.model,
       moduleLocation: { slotName: module.targetSlotId },
