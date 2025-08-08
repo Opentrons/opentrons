@@ -88,12 +88,10 @@ export const getModuleDisplayStatus = (
       attachedModule.moduleType !== ABSORBANCE_READER_TYPE &&
       attachedModule.moduleOffset?.last_modified == null
     ) {
-      // module is connected but instrument not calibrated
-      if (!calibrationStatus.complete) {
-        return 'calibrationBlocked'
-      } else {
-        return 'needsCalibration'
-      }
+      // check if instrument ready to perform module calibration
+      return !calibrationStatus.complete
+        ? 'calibrationBlocked'
+        : 'needsCalibration'
     }
     return 'connected'
   }
