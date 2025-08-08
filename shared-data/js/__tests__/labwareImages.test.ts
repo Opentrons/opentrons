@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { labwareImages } from '../../labware/images/image_details/labware-images'
+import { getAllLabwareDefs, labwareImages } from '../labware'
 
 const ignoredLoadNames = new Set([
   'opentrons_1_trash_1100ml_fixed',
@@ -16,22 +16,14 @@ const ignoredLoadNames = new Set([
   'protocol_engine_lid_stack_object',
 ])
 
-const definitionModules = import.meta.glob(
-  '../../labware/definitions/2/*/*.{json,ts}',
-  {
-    eager: true,
-    import: 'default',
-  }
-)
 const loadNames = Array.from(
   new Set(
-    Object.keys(definitionModules).map(defPath => {
-      const parts = defPath.split('/')
-      return parts[5]
+    Object.keys(getAllLabwareDefs()).map(uri => {
+      const parts = uri.split('/')
+      return parts[1] ?? uri
     })
   )
 )
-
 describe('labwareImages mapping', () => {
   it('should have at least one image for every labware definition', () => {
     const missingLoadNames = loadNames.filter(

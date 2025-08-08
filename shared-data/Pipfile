@@ -11,6 +11,7 @@ flake8-docstrings = "~=1.7.0"
 flake8-noqa = "~=1.4.0"
 twine = "==4.0.0"
 wheel = "==0.37.1"
+pillow = "*"
 pytest = "<9,>=8.4.0"
 pytest-cov = "==4.1.0"
 pytest-xdist = "~=3.5.0 "
@@ -33,4 +34,3 @@ numpy = "==1.22.3"
 # transitive dependency. 3.22 introduces a build plugin called coherent.licensed that
 # is not safe to have installed when another project is being built.
 zipp = "==3.21.0"
-pillow = "*"

@@ -8,7 +8,6 @@ import fixtureTiprackAdapter from '../labware/fixtures/2/fixture_flex_96_tiprack
 import fixtureTiprack10ul from '../labware/fixtures/2/fixture_tiprack_10_ul.json'
 import fixtureTiprack300ul from '../labware/fixtures/2/fixture_tiprack_300_ul.json'
 import fixtureTrash from '../labware/fixtures/2/fixture_trash.json'
-import { labwareImages } from '../labware/images/image_details/labware-images'
 import labwareSchemaV2 from '../labware/schemas/2.json'
 import labwareSchemaV3 from '../labware/schemas/3.json'
 
@@ -103,8 +102,102 @@ export function getAllLegacyDefinitions(): LegacyLabwareDefByName {
   return schema1DefinitionsByName
 }
 
+// Labware Images Mapping
+
+function getAllImages(): Record<string, string> {
+  const imageModules = import.meta.glob('../labware/images/*.{png,jpg,jpeg}', {
+    eager: true,
+    import: 'default',
+  })
+  const imageKeyToUrl: Record<string, string> = {}
+  for (const imgPath in imageModules) {
+    const filename = imgPath.split('/').pop() ?? ''
+    const base = filename.replace(/\.(png|jpe?g)$/i, '')
+    const varName = base.replace(/\./g, '_').replace(/-/g, '_')
+    imageKeyToUrl[varName] = imageModules[imgPath] as string
+  }
+  return imageKeyToUrl
+}
+
+const loadNames = Array.from(
+  new Set(
+    Object.keys(getAllLabwareDefs()).map(uri => {
+      const parts = uri.split('/')
+      return parts[1] ?? uri
+    })
+  )
+)
+
+function matchLoadNamestoURL(loadName: string, varName: string): boolean {
+  const exactMatchOnlyLoadNames = new Set([
+    'milliplex_microtiter_plate',
+    'milliplex_microtiter_plate_lid',
+    'ibidi_96_square_well_plate_300ul',
+    'ibidi_96_square_well_plate_300ul_lid',
+    'opentrons_96_deep_well_adapter',
+    'opentrons_96_filtertiprack_1000ul',
+    'opentrons_96_tiprack_1000ul',
+    'opentrons_universal_flat_adapter',
+    'opentrons_universal_flat_adapter_type_b',
+  ])
+
+  const normalizedLoadName = loadName.replace(/\./g, '_').replace(/-/g, '_')
+  const loadParts = normalizedLoadName.split('_')
+  const normalizedVarName = varName.replace(/\./g, '_').replace(/-/g, '_')
+  const varParts = normalizedVarName.split('_')
+
+  if (exactMatchOnlyLoadNames.has(loadName)) {
+    return normalizedVarName === normalizedLoadName
+  }
+
+  function isConsecutiveSubarray(subarr: string[], arr: string[]): boolean {
+    for (let i = 0; i <= arr.length - subarr.length; i++) {
+      let match = true
+      for (let j = 0; j < subarr.length; j++) {
+        if (arr[i + j] !== subarr[j]) {
+          match = false
+          break
+        }
+      }
+      if (match) return true
+    }
+    return false
+  }
+
+  return (
+    isConsecutiveSubarray(loadParts, varParts) ||
+    normalizedLoadName.includes(normalizedVarName)
+  )
+}
+// Match images to load names
+const labwareImages: Record<string, string[]> = {}
+const matchedImageVars = new Set<string>()
+const imageKeyToUrl = getAllImages()
+for (const loadName of loadNames) {
+  const matchingUrls = Object.entries(imageKeyToUrl)
+    .filter(([varName]) => matchLoadNamestoURL(loadName, varName))
+    .map(([varName, url]) => {
+      matchedImageVars.add(varName)
+      return url
+    })
+
+  if (matchingUrls.length > 0) {
+    labwareImages[loadName] = matchingUrls
+  }
+}
+
+// Clean up labwareImages
+for (const [varName, url] of Object.entries(imageKeyToUrl)) {
+  if (!matchedImageVars.has(varName)) {
+    labwareImages[varName] = [url]
+  }
+}
+const sortedLabwareImages = Object.fromEntries(
+  Object.entries(labwareImages).sort(([a], [b]) => a.localeCompare(b))
+)
+
 export {
-  labwareImages,
+  sortedLabwareImages as labwareImages,
   labwareSchemaV2,
   labwareSchemaV3,
   fixture96Plate,
