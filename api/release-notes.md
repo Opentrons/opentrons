@@ -8,6 +8,12 @@ By installing and using Opentrons software, you agree to the Opentrons End-User 
 
 ---
 
+## Opentrons Robot Software Changes in 8.6.0
+
+### TODO
+
+---
+
 ## Opentrons Robot Software Changes in 8.5.1
 
 The 8.5.1 hotfix release fixes these bugs:
