@@ -43,7 +43,19 @@ nav:
       - Protocol Designer: protocols/designer.md
       - Python API: protocols/python-api.md
       - Converting OT-2 Protocols: protocols/ot-2.md
-  - Software and Operation: software-operation.md
+  - Touchscreen: 
+      - Touchscreen Home: touchscreen/index.md
+      - Dashboard: touchscreen/dashboard.md
+      - Deck Configuration: touchscreen/deck-config.md
+      - Protocol Management: touchscreen/protocol-management.md
+      - Protocol Details: touchscreen/protocol-details.md
+      - Protocol Setup: touchscreen/protocol-setup.md
+      - Protocol Run: touchscreen/protocol-run.md
+      - Quick Transfer: touchscreen/quick-transfer.md
+      - Instruments: touchscreen/instruments.md
+      - Settings: touchscreen/settings.md
+  - Opentrons App: opentrons-app.md
+  - Advanced Operation: advanced-operation.md
   - Maintenance and Service: maintenance-service.md
   - Appendices:
       - Glossary: glossary.md
