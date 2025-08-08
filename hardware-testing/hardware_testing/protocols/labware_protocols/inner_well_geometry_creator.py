@@ -1,6 +1,6 @@
 """inner-well-geometry-creator Protocol."""
 
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Union, Dict
 from opentrons.protocol_api import (
     ProtocolContext,
     ParameterContext,
@@ -11,9 +11,11 @@ from opentrons.protocol_api import (
     OFF_DECK,
 )
 from opentrons.types import Point
-from typing import Union
 from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
 from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
+import numpy as np
+import json
+from hardware_testing import data 
 
 
 ###########################################
@@ -62,6 +64,7 @@ DIAL_PORT_NAME = "/dev/ttyUSB0"
 DIAL_POS_WITHOUT_TIP: List[Optional[float]] = [None, None]
 RUN_ID = ""
 FILE_NAME = ""
+USER_DEFINED_VOLUMES = ""
 CSV_SEPARATOR = ""
 CSV_HEADER = ["well", "step volume", "dispense volume", "tip-z-error", "error from nominal", "height", "hdelta"]
 
@@ -339,20 +342,107 @@ def _get_tip_z_error(
 def _get_height_of_liquid_in_well(
     pipette: InstrumentContext, well: Well, simulating: bool
 ) -> float:
+    
     def extract_float(result: Union[float | SimulatedProbeResult]) -> float:
         if isinstance(result, SimulatedProbeResult):
             return result.net_liquid_exchanged_after_probe
         return float(result)
+    if not simulating:
+        return extract_float(pipette.measure_liquid_height(well))
+    else:
+        return 0.01
 
-    try:
-        if pipette.detect_liquid_presence(well) and not simulating:
-            return extract_float(pipette.measure_liquid_height(well))
-    except PipetteLiquidNotFoundError:
-        if not simulating:
-            return extract_float(pipette.measure_liquid_height(well))
-        else:
-            return 0.01
-    return 0.01
+
+
+def generate_frusta(ctx, data, labware) -> List[Dict]:
+    inner_well_json = labware._core.get_definition()
+    depth = inner_well_json["wells"]["A1"]["depth"]
+    well_shape = inner_well_json["wells"]["A1"].get("shape")
+
+
+    if well_shape == "circular":
+        geoID = "conicalWell"
+    elif well_shape == "rectangular":
+        geoID = "cuboidalWell"
+    else:
+        geoID = "defaultWell"
+
+    for well_name in inner_well_json["wells"]:
+        inner_well_json["wells"][well_name]["geometryDefinitionId"] = geoID
+    
+    frusta_data = []
+    radius = 0.0
+    side_length = 0.0
+
+    for i in range(1, len(data)):
+
+        vol1, h1 = data[i - 1]
+        vol2, h2 = data[i]
+
+        delta_volume = vol2 - vol1
+        delta_height = h2 - h1
+
+        if delta_height == 0:
+            continue
+
+        if geoID == "cuboidalWell":
+            if not ctx.is_simulating():
+                side_length = np.sqrt(delta_volume / delta_height)
+            section = {
+                "shape": geoID[:-4], 
+                "bottomXDimension": side_length,
+                "bottomYDimension": side_length,
+                "topXDimension": side_length,
+                "topYDimension": side_length,
+                "topHeight": h2,
+                "bottomHeight": h1
+            }
+        elif geoID == "conicalWell":
+            if not ctx.is_simulating():
+                radius = np.sqrt(delta_volume / (np.pi * delta_height))
+            diameter = 2 * radius
+            section = {
+                "shape": geoID[:-4],  
+                "bottomDiameter": diameter,
+                "topDiameter": diameter,
+                "topHeight": h2,
+                "bottomHeight": h1
+            }
+
+        frusta_data.append(section)
+
+    #add one more frusta to ensure heights add up to total depth
+    last = frusta_data[-1]
+    bottom_height = last["topHeight"]
+
+    if geoID == "cuboidalWell":
+        final_section = {
+            "shape": geoID[:-4],
+            "topXDimension": side_length,
+            "topYDimension": side_length,
+            "bottomXDimension": side_length,
+            "bottomYDimension": side_length,
+            "topHeight": depth,
+            "bottomHeight": bottom_height
+        }
+    elif geoID == "conicalWell":
+        final_section = {
+            "shape": geoID[:-4],
+            "topDiameter": diameter,
+            "bottomDiameter": diameter,
+            "topHeight": depth,
+            "bottomHeight": bottom_height
+        }
+
+    frusta_data.append(final_section)
+
+    inner_well_json["innerLabwareGeometry"] = {
+        geoID: {
+            "sections": frusta_data
+        }
+    }
+
+    return inner_well_json
 
 
 def run(ctx: ProtocolContext) -> None:
@@ -393,6 +483,7 @@ def run(ctx: ProtocolContext) -> None:
     total_vol = 0.0
     dispense_volume = 0
     current_well = "none"
+    udv_table = []
 
     _store_dial_baseline(ctx, probe_pipette, dial)
     _write_line_to_csv(ctx, CSV_HEADER)
@@ -448,6 +539,7 @@ def run(ctx: ProtocolContext) -> None:
         return new_volume
 
     def write_trial_log() -> None:
+        nonlocal udv_table
         trial_data = [
             current_well,
             round(step_volume, 5),
@@ -457,6 +549,7 @@ def run(ctx: ProtocolContext) -> None:
             corrected_height,
             hdelta,
         ]
+        udv_table.append(trial_data)
         _write_line_to_csv(ctx, [str(d) for d in trial_data])
     
     def reload_labware() -> None:
@@ -486,7 +579,8 @@ def run(ctx: ProtocolContext) -> None:
             reload_labware()
         
         pick_up_tips()
-
+        tip_z_error = _get_tip_z_error(ctx, probe_pipette, dial)
+        
         # determine step volume 
         if step == 0:
             step_volume = first_dispense if dynamic_steps else max_volume / number_of_steps
@@ -512,7 +606,7 @@ def run(ctx: ProtocolContext) -> None:
             return_tip=False,
         )
         
-        height = probe_pipette.measure_liquid_height(labware[current_well])
+        height = _get_height_of_liquid_in_well(probe_pipette, labware[current_well], ctx.is_simulating())
         
         corrected_height = height + tip_z_error
 
@@ -539,3 +633,22 @@ def run(ctx: ProtocolContext) -> None:
         drop_tips()
 
     drop_tips()
+
+
+    #create labware def 
+    udv_data = np.array([(trial[2], trial[5]) for trial in udv_table])  # total_vol, corrected_height
+    new_inner_well_json = generate_frusta(ctx, udv_data, labware)
+
+    user_defined_volumes = data.create_folder_for_test_data("user_defined_volumes")
+    udv_def_name = f"{RUN_ID}_{labware_type}"
+    file_path = user_defined_volumes / udv_def_name
+
+    with open(file_path, "w") as f:
+        json.dump(new_inner_well_json, f, indent=2)
+
+
+
+    
+
+    
+
