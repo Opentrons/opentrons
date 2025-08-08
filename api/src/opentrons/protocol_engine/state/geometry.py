@@ -590,6 +590,9 @@ class GeometryView:
 
     def get_xy_offset_if_needed(self, labware_id: str, well_name: str) -> WellOffset:
         """Add an x,y offset to position the tip into the center of a sub-well if needed."""
+        labware_definition = self._labware.get_definition(labware_id)
+        if labware_definition.innerLabwareGeometry is None:
+            return WellOffset(x=0, y=0, z=0)
         well_def = self._labware.get_well_definition(labware_id, well_name)
         well_geometry = self._labware.get_well_geometry(
             labware_id=labware_id, well_name=well_name
