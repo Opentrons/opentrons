@@ -4,7 +4,6 @@ import {
   DIRECTION_COLUMN,
   Flex,
   LegacyStyledText,
-  OVERFLOW_SCROLL,
   RadioButton,
   SPACING,
   TYPOGRAPHY,

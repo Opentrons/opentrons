@@ -2,7 +2,6 @@ import { useEffect, useReducer, useState } from 'react'
 import { useSelector } from 'react-redux'
 
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
-import { FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
 
 import { getModulePrepCommands } from '/app/local-resources/modules'
 import { getIsOnDevice } from '/app/redux/config'
