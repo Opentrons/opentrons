@@ -42,10 +42,7 @@ import type { Dispatch, MouseEvent, SetStateAction } from 'react'
 import type { DeleteModalType } from '../../../../components/organisms'
 import type { StepIdType } from '../../../../form-types'
 import type { BaseState, ThunkAction } from '../../../../types'
-import type {
-  // HoverOnStepAction,
-  SelectMultipleStepsAction,
-} from '../../../../ui/steps'
+import type { SelectMultipleStepsAction } from '../../../../ui/steps'
 
 export interface ConnectedStepInfoProps {
   stepId: StepIdType
@@ -127,10 +124,6 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
     dispatch(stepsActions.resetSelectStep(stepId))
   const selectStepOnDoubleClick = (): ThunkAction<any> =>
     dispatch(stepsActions.selectStep(stepId))
-  // const highlightStep = (): HoverOnStepAction =>
-  //   dispatch(stepsActions.hoverOnStep(stepId))
-  // const unhighlightStep = (): HoverOnStepAction =>
-  //   dispatch(stepsActions.hoverOnStep(null))
   const handleSelectStep = (event: MouseEvent): void => {
     if (selectedStep !== stepId) {
       dispatch(toggleViewSubstep(null))
@@ -209,13 +202,11 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
   const iconName = stepIconsByType[step.stepType]
 
   const handleMouseEnter = (): void => {
-    console.log('Mouse ENTER stepId:', stepId, 'current hovered:', hoveredStep)
     debouncedUnhighlightStep.cancel()
     dispatch(stepsActions.hoverOnStep(stepId))
   }
 
   const handleMouseLeave = (): void => {
-    console.log('Mouse LEAVE stepId:', stepId, 'current hovered:', hoveredStep)
     debouncedUnhighlightStep()
   }
 
