@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useRef } from 'react'
+import { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { useDispatch } from 'react-redux'
@@ -152,34 +152,49 @@ export function useGetNewModules(): AttachedModule[] {
 }
 
 export function useModuleAttachedToast(
-  launchModuleSetupCallback: () => void
+  launchModuleSetupCallback: (open: boolean) => void
 ): void {
   const newModules = useGetNewModules()
   const currentRunId = useCurrentRunId({ refetchInterval: CURRENT_RUN_POLL })
   const attachedPipettes = useAttachedPipettes(newModules.length > 0)
   const { t, i18n } = useTranslation(['module_wizard_flows', 'shared'])
-  const { makeToast } = useToaster()
+  const { makeToast, eatToast } = useToaster()
   const moduleSerials = newModules.map(m => m.serialNumber)
   const moduleSerialsRef = useRef(moduleSerials)
   const runInProgress = currentRunId != null
+  const [toastID, setToastID] = useState<string>('')
 
   useEffect(() => {
     const newModuleSerials = difference(moduleSerials, moduleSerialsRef.current)
     const hasPipette =
       attachedPipettes.left != null || attachedPipettes.right != null
     if (!runInProgress && hasPipette && newModuleSerials.length > 0) {
-      makeToast(t('module_added') as string, 'info', {
-        buttonText: i18n.format(t('shared:close'), 'capitalize'),
-        linkText: t('module_added_link'),
-        onLinkClick: launchModuleSetupCallback,
-        disableTimeout: true,
-        displayType: 'odd',
-      })
+      setToastID(
+        makeToast(t('module_added') as string, 'info', {
+          buttonText: i18n.format(t('shared:close'), 'capitalize'),
+          linkText: t('module_added_link'),
+          onLinkClick: () => {
+            launchModuleSetupCallback(true)
+          },
+          disableTimeout: true,
+          displayType: 'odd',
+        })
+      )
     }
+
     moduleSerialsRef.current = moduleSerials
     // dont want this hook to rerun when other deps change
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [moduleSerials, runInProgress])
+
+  useEffect(() => {
+    // Close toast if there are no new modules to setup
+    if (toastID && newModules.length === 0) {
+      launchModuleSetupCallback(false)
+      eatToast(toastID)
+      setToastID('')
+    }
+  }, [toastID, newModules])
 }
 
 export function useScrollRef(): {

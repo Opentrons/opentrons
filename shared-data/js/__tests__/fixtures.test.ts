@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  ABSORBANCE_READER_V1_FIXTURE,
   FAKE_STAGING_AREA_RIGHT_SLOT,
   FAKE_STAGING_SLOT_WITH_MAG_BLOCK,
   FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT,
@@ -19,6 +20,7 @@ import {
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   TEMPERATURE_MODULE_V2_FIXTURE,
+  THERMOCYCLER_MODULE_V2,
   WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '..'
@@ -470,6 +472,14 @@ describe('replaceCutoutFixtureRemove', () => {
     )
     expect(result).toEqual(WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE)
   })
+  it('should get fixture replacment for ABSORBANCE_READER_V1_FIXTURE', () => {
+    const result = replaceCutoutFixtureRemove(
+      ABSORBANCE_READER_V1_FIXTURE,
+      'cutoutD3',
+      'absorbanceReaderV1D3'
+    )
+    expect(result).toEqual(SINGLE_RIGHT_SLOT_FIXTURE)
+  })
 })
 
 describe('getAAFixtureDisplayName', () => {
@@ -589,6 +599,21 @@ describe('isModuleAllowedOnAA', () => {
   it('should return true for tempModule on D3', () => {
     const vs = isModuleAllowedOnAA('cutoutD3', 'D3', 'temperatureModuleV2')
     expect(vs).toEqual(true)
+  })
+
+  it('should return true for thermocycler on A1', () => {
+    const vs = isModuleAllowedOnAA('cutoutA1', 'A1', THERMOCYCLER_MODULE_V2)
+    expect(vs).toEqual(true)
+  })
+
+  it('should return true for thermocycler on B1', () => {
+    const vs = isModuleAllowedOnAA('cutoutB1', 'B1', THERMOCYCLER_MODULE_V2)
+    expect(vs).toEqual(true)
+  })
+
+  it('should return false for thermocycler on A3', () => {
+    const vs = isModuleAllowedOnAA('cutoutA3', 'A3', THERMOCYCLER_MODULE_V2)
+    expect(vs).toEqual(false)
   })
 })
 
@@ -764,7 +789,7 @@ describe('getMainNonComboFixtureId', () => {
     expect(result).toEqual(FLEX_STACKER_V1_FIXTURE)
   })
 
-  it.only('should get main non combo fixture id for magnetic block', () => {
+  it('should get main non combo fixture id for magnetic block', () => {
     const result = getMainNonComboFixtureId(
       [
         FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,

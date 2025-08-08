@@ -24,6 +24,7 @@ import type {
   RobotType,
   Vector3D,
 } from '@opentrons/shared-data'
+import type { ModuleOnDeck } from '../../hardware-sim/BaseDeck'
 import type { StyleProps } from '../../primitives'
 
 const SPLASH_Y_BUFFER_MM = 10
@@ -35,6 +36,7 @@ interface MoveLabwareOnDeckProps extends StyleProps {
   finalLabwareLocation: LabwareLocation
   loadedModules: LoadedModule[]
   loadedLabware: LoadedLabware[]
+  modulesOnDeck?: ModuleOnDeck[]
   labwareDefinitions: LabwareDefinition[]
   deckConfig: DeckConfiguration
   backgroundItems?: ReactNode
@@ -47,6 +49,7 @@ export function MoveLabwareOnDeck(
     robotType,
     movedLabwareDef,
     loadedLabware,
+    modulesOnDeck,
     labwareDefinitions,
     initialLabwareLocation,
     finalLabwareLocation,
@@ -137,6 +140,7 @@ export function MoveLabwareOnDeck(
     <BaseDeck
       deckConfig={deckConfig}
       robotType={robotType}
+      modulesOnDeck={modulesOnDeck}
       svgProps={{
         style: { opacity: springProps.deckOpacity },
         ...styleProps,
