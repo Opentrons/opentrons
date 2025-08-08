@@ -35,8 +35,8 @@ async def main() -> NoReturn:
         exit(-1)
 
     # Give the kernel a couple seconds to set up the handle
-    timeout = time.time() + 2.0
-    while time.time() < timeout and not config.handle_exists():
+    timeout = time.monotonic() + 2.0
+    while time.monotonic() < timeout and not config.handle_exists():
         time.sleep(0.1)
 
     if not config.handle_exists():

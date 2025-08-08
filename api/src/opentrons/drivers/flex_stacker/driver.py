@@ -129,6 +129,15 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
         return bool(int(match.group(1)))
 
     @classmethod
+    def parse_estop_engaged(cls, response: str) -> bool:
+        """Parse estop enagaged."""
+        _RE = re.compile(rf"^{GCODE.GET_ESTOP_ENGAGED} E:(\d)$")
+        match = _RE.match(response)
+        if not match:
+            raise ValueError(f"Incorrect Response for Estop engaged: {response}")
+        return bool(int(match.group(1)))
+
+    @classmethod
     def parse_move_params(cls, response: str) -> MoveParams:
         """Parse move params."""
         field_names = MoveParams.get_fields()
@@ -651,6 +660,16 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
             GCODE.GET_INSTALL_DETECTED.build_command()
         )
         return self.parse_installation_detected(response)
+
+    async def get_estop_engaged(self) -> bool:
+        """Get whether or not the estop was detected by this stacker.
+
+        :return: True if the estop is trigguered, False otherwise
+        """
+        response = await self._connection.send_command(
+            GCODE.GET_ESTOP_ENGAGED.build_command()
+        )
+        return self.parse_estop_engaged(response)
 
     async def move_in_mm(
         self, axis: StackerAxis, distance: float, params: MoveParams | None = None

@@ -86,7 +86,10 @@ const getHardwareLocation = (
   }
 }
 
-const useHardwareName = (protocolHardware: ProtocolHardware): string => {
+const useHardwareName = (
+  protocolHardware: ProtocolHardware,
+  t: TFunction
+): string => {
   const gripperDisplayName = useGripperDisplayName(GRIPPER_V1_2)
 
   const pipetteDisplayName =
@@ -100,7 +103,7 @@ const useHardwareName = (protocolHardware: ProtocolHardware): string => {
   } else if (protocolHardware.hardwareType === 'module') {
     return getModuleDisplayName(protocolHardware.moduleModel)
   } else {
-    return getFixtureDisplayName(protocolHardware.cutoutFixtureId)
+    return getFixtureDisplayName(t, protocolHardware.cutoutFixtureId)
   }
 }
 
@@ -109,9 +112,9 @@ function HardwareItem({
 }: {
   hardware: ProtocolHardware
 }): JSX.Element {
-  const { t, i18n } = useTranslation('protocol_details')
+  const { t, i18n } = useTranslation(['protocol_details', 'deck_configuration'])
 
-  const hardwareName = useHardwareName(hardware)
+  const hardwareName = useHardwareName(hardware, t as TFunction)
 
   let location: JSX.Element = (
     <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>

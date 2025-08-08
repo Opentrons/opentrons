@@ -2,19 +2,26 @@ import { useTranslation } from 'react-i18next'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  ABSORBANCE_READER_V1_FIXTURE,
   FAKE_STAGING_AREA_RIGHT_SLOT,
   FAKE_STAGING_SLOT_WITH_MAG_BLOCK,
   FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT,
   FLEX_STACKER_V1_FIXTURE,
   FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
+  FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
   FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+  HEATERSHAKER_MODULE_V1_FIXTURE,
   MAGNETIC_BLOCK_V1_FIXTURE,
   SINGLE_CENTER_SLOT_FIXTURE,
   SINGLE_LEFT_SLOT_FIXTURE,
   SINGLE_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
+  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   TEMPERATURE_MODULE_V2_FIXTURE,
+  THERMOCYCLER_MODULE_V2,
+  WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '..'
 import {
@@ -24,7 +31,10 @@ import {
   getAAWithFakesFromCutoutFixtureId,
   getCutoutConfigReplacmentForModule,
   getCutoutFixtureReplacementIfNeeded,
+  getFixtureDisplayName,
   getMainAAForAFixture,
+  getMainNonComboFixtureId,
+  getMainUsbModuleFixtureIdForComboFixture,
   getReplacementFixtureForFakeFixture,
   getReplacementFixtureForFixtureRemoval,
   getVisualSlotIdForAA,
@@ -41,6 +51,7 @@ import type { CutoutConfig, DeckConfiguration } from '..'
 
 vi.mock('react-i18next', () => ({
   useTranslation: vi.fn(),
+  initReactI18next: vi.fn(),
 }))
 
 const deckDef = getDeckDefFromRobotType('OT-3 Standard')
@@ -312,7 +323,6 @@ describe('getFlexDeckDefAAByFixtureIdForCutoutId', () => {
       'cutoutD3',
       deckDef
     )
-    console.log('cutoutD3Result: ', cutoutD3Result)
     expect(cutoutD3Result).toEqual({
       absorbanceReaderV1: [
         'absorbanceReaderV1D3',
@@ -462,6 +472,14 @@ describe('replaceCutoutFixtureRemove', () => {
     )
     expect(result).toEqual(WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE)
   })
+  it('should get fixture replacment for ABSORBANCE_READER_V1_FIXTURE', () => {
+    const result = replaceCutoutFixtureRemove(
+      ABSORBANCE_READER_V1_FIXTURE,
+      'cutoutD3',
+      'absorbanceReaderV1D3'
+    )
+    expect(result).toEqual(SINGLE_RIGHT_SLOT_FIXTURE)
+  })
 })
 
 describe('getAAFixtureDisplayName', () => {
@@ -582,6 +600,21 @@ describe('isModuleAllowedOnAA', () => {
     const vs = isModuleAllowedOnAA('cutoutD3', 'D3', 'temperatureModuleV2')
     expect(vs).toEqual(true)
   })
+
+  it('should return true for thermocycler on A1', () => {
+    const vs = isModuleAllowedOnAA('cutoutA1', 'A1', THERMOCYCLER_MODULE_V2)
+    expect(vs).toEqual(true)
+  })
+
+  it('should return true for thermocycler on B1', () => {
+    const vs = isModuleAllowedOnAA('cutoutB1', 'B1', THERMOCYCLER_MODULE_V2)
+    expect(vs).toEqual(true)
+  })
+
+  it('should return false for thermocycler on A3', () => {
+    const vs = isModuleAllowedOnAA('cutoutA3', 'A3', THERMOCYCLER_MODULE_V2)
+    expect(vs).toEqual(false)
+  })
 })
 
 describe('getAAForModuleFixture', () => {
@@ -632,5 +665,140 @@ describe('getCutoutConfigReplacmentForModule', () => {
         mockDeckConfig
       )
     ).toStrictEqual('flexStackerModuleV1')
+  })
+})
+
+describe('getFixtureDisplayName', () => {
+  let t: Mock
+
+  beforeEach(() => {
+    t = vi.fn(key => key)
+
+    vi.mocked(useTranslation).mockReturnValue({ t } as any)
+  })
+
+  it('should get fixture display name for flex stacker with mag block', () => {
+    const result = getFixtureDisplayName(t, FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE)
+    expect(result).toEqual('deck_configuration:module_with_mag_block')
+  })
+
+  it('should get fixture display name for flex stacker with waste chute', () => {
+    const result = getFixtureDisplayName(
+      t,
+      FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE
+    )
+    expect(result).toEqual('deck_configuration:module_with_waste_chute')
+  })
+
+  it('should get fixture display name for flex stacker with waste chute', () => {
+    const result = getFixtureDisplayName(
+      t,
+      FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE
+    )
+    expect(result).toEqual(
+      'deck_configuration:module_with_waste_chute_and_cover'
+    )
+  })
+
+  it('should get fixture display name for waste chute', () => {
+    const result = getFixtureDisplayName(
+      t,
+      WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
+    )
+    expect(result).toEqual('deck_configuration:waste_chute')
+  })
+
+  it('should get fixture display name for heater shaker in port', () => {
+    const result = getFixtureDisplayName(
+      t,
+      HEATERSHAKER_MODULE_V1_FIXTURE,
+      'test-123'
+    )
+    expect(result).toEqual('deck_configuration:module_in_port')
+  })
+
+  it('should get fixture display name for mag block with staging area slot', () => {
+    const result = getFixtureDisplayName(
+      t,
+      STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE
+    )
+    expect(result).toEqual('deck_configuration:module_with_staging_area')
+  })
+})
+
+describe('getMainModuleFixtureIdForComboFixture', () => {
+  it('should get flex stacker module fixture id', () => {
+    const result = getMainUsbModuleFixtureIdForComboFixture([
+      FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
+      FLEX_STACKER_V1_FIXTURE,
+      FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+    ])
+    expect(result).toEqual('flexStackerModuleV1')
+  })
+
+  it('should return null when no usb module is found', () => {
+    const result = getMainUsbModuleFixtureIdForComboFixture([
+      WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+      WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+    ])
+    expect(result).toEqual(null)
+  })
+})
+
+describe('getMainNonComboFixtureId', () => {
+  it('should get main non combo fixture id for waste chute', () => {
+    const result = getMainNonComboFixtureId(
+      [
+        WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+        WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+        STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+        STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+        FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+      ],
+      ['gripperWasteChute'],
+      'cutoutD3'
+    )
+    expect(result).toEqual(WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE)
+  })
+
+  it('should get main non combo fixture id for staging area', () => {
+    const result = getMainNonComboFixtureId(
+      [
+        STAGING_AREA_RIGHT_SLOT_FIXTURE,
+        STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
+        STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+        STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+      ],
+      ['D4'],
+      'cutoutD3'
+    )
+    expect(result).toEqual(STAGING_AREA_RIGHT_SLOT_FIXTURE)
+  })
+
+  it('should get main non combo fixture id for flex stacker', () => {
+    const result = getMainNonComboFixtureId(
+      [
+        FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
+        FLEX_STACKER_V1_FIXTURE,
+        FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+        FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
+      ],
+      ['flexStackerModuleV1D4'],
+      'cutoutD3'
+    )
+    expect(result).toEqual(FLEX_STACKER_V1_FIXTURE)
+  })
+
+  it('should get main non combo fixture id for magnetic block', () => {
+    const result = getMainNonComboFixtureId(
+      [
+        FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
+        MAGNETIC_BLOCK_V1_FIXTURE,
+        STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
+      ],
+      ['magneticBlockV1D3'],
+      'cutoutD3'
+    )
+    expect(result).toEqual(MAGNETIC_BLOCK_V1_FIXTURE)
   })
 })

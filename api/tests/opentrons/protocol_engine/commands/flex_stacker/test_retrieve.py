@@ -14,6 +14,7 @@ from opentrons.protocol_engine.commands.flex_stacker.common import (
     FlexStackerShuttleError,
     FlexStackerHopperError,
     FlexStackerLabwareRetrieveError,
+    FlexStackerShuttleOccupiedError,
 )
 from opentrons.protocol_engine.resources import ModelUtils
 
@@ -60,6 +61,7 @@ from opentrons_shared_data.errors.exceptions import (
     FlexStackerShuttleMissingError,
     FlexStackerHopperLabwareError,
     FlexStackerShuttleLabwareError,
+    FlexStackerShuttleNotEmptyError,
 )
 
 
@@ -204,9 +206,7 @@ async def test_retrieve_primary_only(
     result = await subject.execute(data)
 
     decoy.verify(
-        await stacker_hardware.dispense_labware(
-            labware_height=4, enforce_hopper_lw_sensing=False
-        ),
+        await stacker_hardware.dispense_labware(labware_height=4),
         times=1,
     )
 
@@ -306,9 +306,7 @@ async def test_retrieve_primary_and_lid(
     result = await subject.execute(data)
 
     decoy.verify(
-        await stacker_hardware.dispense_labware(
-            labware_height=8, enforce_hopper_lw_sensing=False
-        ),
+        await stacker_hardware.dispense_labware(labware_height=8),
         times=1,
     )
 
@@ -430,9 +428,7 @@ async def test_retrieve_primary_and_adapter(
     result = await subject.execute(data)
 
     decoy.verify(
-        await stacker_hardware.dispense_labware(
-            labware_height=12, enforce_hopper_lw_sensing=False
-        ),
+        await stacker_hardware.dispense_labware(labware_height=12),
         times=1,
     )
 
@@ -581,7 +577,7 @@ async def test_retrieve_primary_adapter_and_lid(
 
     decoy.verify(
         await stacker_hardware.dispense_labware(
-            labware_height=16, enforce_hopper_lw_sensing=False
+            labware_height=16,
         ),
         times=1,
     )
@@ -687,6 +683,12 @@ async def test_retrieve_primary_adapter_and_lid(
             ),
             FlexStackerLabwareRetrieveError,
         ),
+        (
+            FlexStackerShuttleNotEmptyError(
+                serial="123", labware_expected=True, shuttle_state=""
+            ),
+            FlexStackerShuttleOccupiedError,
+        ),
     ],
 )
 async def test_retrieve_raises_recoverable_error(
@@ -734,7 +736,7 @@ async def test_retrieve_raises_recoverable_error(
 
     decoy.when(
         await stacker_hardware.dispense_labware(
-            labware_height=16, enforce_hopper_lw_sensing=False
+            labware_height=16,
         )
     ).then_raise(shared_data_error)
 

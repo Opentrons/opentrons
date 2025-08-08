@@ -100,6 +100,7 @@ from .labware import (
     LabwareOffsetCreateInternal,
     LoadedLabware,
     LabwareParentDefinition,
+    LabwareWellId,
 )
 from .liquid import HexColor, EmptyLiquidId, LiquidId, Liquid, FluidKind, AspiratedFluid
 from .labware_offset_location import (
@@ -253,6 +254,7 @@ __all__ = [
     "LoadedLabware",
     "LabwareOffsetVector",
     "LabwareParentDefinition",
+    "LabwareWellId",
     # Liquids
     "HexColor",
     "EmptyLiquidId",

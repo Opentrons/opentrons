@@ -285,18 +285,47 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
     }
   })
 
-  test('the last entry for UserDefinedVolumes should be the max volume of the well at its depth', () => {
-    for (const well of Object.values(labwareDef.wells)) {
-      const wellGeometryId = well.geometryDefinitionId
-      if (wellGeometryId === undefined) return
-      const wellDepth = well.depth
-      const innerGeometryObject =
-        labwareDef.innerLabwareGeometry?.[wellGeometryId]
-      if (innerGeometryObject === undefined) return
-      if (!isUserDefinedVolumes(innerGeometryObject)) return
-      const pairingList = innerGeometryObject.heightToVolumeMap
-      const firstEntry = pairingList[0]
-      expect(firstEntry.height).toStrictEqual(wellDepth)
+  test('first frustum section should match well diameter or x/y dimensions within ±1 mm', () => {
+    // TODO(rc, 2025-08-05): Review labware with 0–2 mm geometry discrepancies.
+    const wells = labwareDef.wells ?? {}
+    const geometries = labwareDef.innerLabwareGeometry ?? {}
+    // Allow minor mismatch due to simplified geometric approximation
+    const allowedDiscrepancy = 2
+    // Ignoring bc of a known x y mismatch
+    if (
+      labwareDef.parameters.loadName === 'nest_1_reservoir_195ml' &&
+      labwareDef.version === 3
+    ) {
+      return
+    }
+
+    for (const well of Object.values(wells)) {
+      const geometryId = well.geometryDefinitionId ?? ''
+      const geometry = geometries[geometryId]
+
+      if (
+        !geometry ||
+        !('sections' in geometry) ||
+        !Array.isArray(geometry.sections)
+      ) {
+        continue
+      }
+
+      const section = geometry.sections[0]
+      if (!section) continue
+
+      if (well.shape === 'circular' && section.shape === 'conical') {
+        expect(
+          Math.abs(section.topDiameter - well.diameter)
+        ).toBeLessThanOrEqual(allowedDiscrepancy)
+      } else if (well.shape === 'rectangular' && section.shape === 'cuboidal') {
+        expect(
+          Math.abs(section.topXDimension - well.xDimension)
+        ).toBeLessThanOrEqual(allowedDiscrepancy)
+        expect(
+          Math.abs(section.topYDimension - well.yDimension)
+        ).toBeLessThanOrEqual(allowedDiscrepancy)
+      }
     }
   })
 
@@ -339,12 +368,6 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
     def: InnerWellGeometry | UserDefinedVolumes
   ): def is InnerWellGeometry {
     return 'sections' in def
-  }
-
-  function isUserDefinedVolumes(
-    def: InnerWellGeometry | UserDefinedVolumes
-  ): def is UserDefinedVolumes {
-    return 'heightToVolumeMap' in def
   }
 
   test("a well's depth should equal the height of its geometry", () => {

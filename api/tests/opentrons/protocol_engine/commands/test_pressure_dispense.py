@@ -29,6 +29,7 @@ from opentrons.protocol_engine.commands.pressure_dispense import (
 from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.state import update_types
+from opentrons.protocol_engine.types import LabwareWellId
 
 from opentrons_shared_data.labware import load_definition
 
@@ -128,7 +129,7 @@ async def test_pressure_dispense_implementation(
         state_update=update_types.StateUpdate(
             pipette_location=update_types.PipetteLocationUpdate(
                 pipette_id="pipette-id-abc123",
-                new_location=update_types.Well(
+                new_location=LabwareWellId(
                     labware_id="labware-id-abc123",
                     well_name="A3",
                 ),

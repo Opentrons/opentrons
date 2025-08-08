@@ -6,6 +6,7 @@ import {
 } from './misc'
 import { formatPyDict } from './pythonFormat'
 
+import type { ByTipTypeSetting } from '@opentrons/shared-data'
 import type {
   ConsolidateArgs,
   DistributeArgs,
@@ -19,20 +20,13 @@ interface CustomLiquidClassPropertiesProps {
   args: TransferArgs | ConsolidateArgs | DistributeArgs
   pipetteName: string
   tiprackUri: string
-  aspirateCorrectionVolume: number
-  dispenseCorrectionVolume: number
+  liquidClassValuesForTip: ByTipTypeSetting | null
 }
 
 export const getCustomLiquidClassProperties = (
   props: CustomLiquidClassPropertiesProps
 ): string => {
-  const {
-    args,
-    pipetteName,
-    tiprackUri,
-    aspirateCorrectionVolume,
-    dispenseCorrectionVolume,
-  } = props
+  const { args, pipetteName, tiprackUri, liquidClassValuesForTip } = props
   let aspirateMixArgs: InnerMixArgs | null = null
   if ('mixBeforeAspirate' in args) {
     aspirateMixArgs = args.mixBeforeAspirate as InnerMixArgs | null
@@ -50,7 +44,6 @@ export const getCustomLiquidClassProperties = (
       position_reference: args.dispensePositionReference,
     },
     flow_rate_by_volume: [[0, args.dispenseFlowRateUlSec ?? 0]],
-    correction_by_volume: [[0, dispenseCorrectionVolume ?? 0]],
     delay: {
       enabled: args.dispenseDelay != null,
       duration: args.dispenseDelay?.seconds ?? undefined,
@@ -125,7 +118,8 @@ export const getCustomLiquidClassProperties = (
           flow_rate_by_volume: [[0, args.aspirateFlowRateUlSec]],
 
           pre_wet: args.preWetTip,
-          correction_by_volume: [[0, aspirateCorrectionVolume ?? 0]],
+          correction_by_volume: liquidClassValuesForTip?.aspirate
+            .correctionByVolume ?? [[0, 0]], // nullish coalescing for type checks. Should never hit
           delay: {
             enabled: args.aspirateDelay != null,
             duration: args.aspirateDelay?.seconds ?? undefined,
@@ -183,6 +177,8 @@ export const getCustomLiquidClassProperties = (
         },
         dispense: {
           ...sharedDispenseArgs,
+          correction_by_volume: liquidClassValuesForTip?.singleDispense
+            .correctionByVolume ?? [[0, 0]], // nullish coalescing for type checks. Should never hit
           push_out_by_volume: [[0, args.pushOut ?? 0]],
           mix: {
             enabled:
@@ -204,6 +200,8 @@ export const getCustomLiquidClassProperties = (
               multi_dispense: {
                 ...sharedDispenseArgs,
                 //  distribute specific args
+                correction_by_volume: liquidClassValuesForTip?.multiDispense
+                  ?.correctionByVolume ?? [[0, 0]], // nullish coalescing for type checks. Should never hit
                 ...('conditioningVolume' in args
                   ? {
                       conditioning_by_volume: [
@@ -231,7 +229,7 @@ export const getCustomLiquidClassProperties = (
 }
 
 export const getLiquidClassName = (
-  liquidClass: string,
+  liquidClass: string, // a liquid class name like "water", "none" is not allowed
   showBase?: boolean
 ): string => {
   const allLiquidClassDefs = getAllLiquidClassDefs()

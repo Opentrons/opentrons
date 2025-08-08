@@ -61,16 +61,23 @@ export function SelectRecoveryOptionHome({
 
   useCurrentTipStatus(determineTipStatus)
 
+  const proceed = (): void => {
+    analytics.reportActionSelectedEvent(selectedRoute)
+    setSelectedRecoveryOption(selectedRoute)
+    void proceedToRouteAndStep(selectedRoute as RecoveryRoute)
+  }
+
+  if (validRecoveryOptions.length === 1) {
+    // If there is only one valid recovery option, automatically proceed to that route
+    proceed()
+  }
+
   return (
     <Flex css={CONTAINER_STYLE}>
       <RecoverySingleColumnContentWrapper
         css={CONTENT_WRAPPER_OVERRIDE_STYLE}
         footerDetails={{
-          primaryBtnOnClick: () => {
-            analytics.reportActionSelectedEvent(selectedRoute)
-            setSelectedRecoveryOption(selectedRoute)
-            void proceedToRouteAndStep(selectedRoute as RecoveryRoute)
-          },
+          primaryBtnOnClick: proceed,
           isSticky: true,
         }}
       >
@@ -197,8 +204,17 @@ export function getRecoveryOptions(errorKind: ErrorKind): RecoveryRoute[] {
       return STACKER_SHUTTLE_MISSING_OPTIONS
     case ERROR_KINDS.STACKER_SHUTTLE_EMPTY:
       return STACKER_SHUTTLE_EMPTY_OPTIONS
+    case ERROR_KINDS.STACKER_SHUTTLE_OCCUPIED:
+      return STACKER_SHUTTLE_OCCUPIED_OPTIONS
+    case ERROR_KINDS.STACKER_HOPPER_OR_SHUTTLE_EMPTY:
+      return [RECOVERY_MAP.STACKER_HOPPER_OR_SHUTTLE_EMPTY.ROUTE]
   }
 }
+
+export const STACKER_SHUTTLE_OCCUPIED_OPTIONS: RecoveryRoute[] = [
+  RECOVERY_MAP.STACKER_STALLED_RETRY.ROUTE,
+  RECOVERY_MAP.CANCEL_RUN.ROUTE,
+]
 
 export const STACKER_SHUTTLE_EMPTY_OPTIONS: RecoveryRoute[] = [
   RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE,

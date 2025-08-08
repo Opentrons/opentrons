@@ -121,3 +121,11 @@ LabwareParentDefinition = Union[
     DeckLocationDefinition, ModuleDefinition, LabwareDefinition
 ]
 """Information pertaining to a labware's parent (deck slot, module, or another labware) location."""
+
+
+@dataclass(frozen=True)
+class LabwareWellId:
+    """Designates a well in a labware."""
+
+    labware_id: str
+    well_name: str
