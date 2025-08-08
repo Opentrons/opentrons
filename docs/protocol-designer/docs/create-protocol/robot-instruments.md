@@ -1,3 +1,9 @@
+---
+title: "Protocol Designer: Robot and Instruments"
+---
+
+# Robot and Instruments
+
 Click **Create a protocol** on the Protocol Designer homepage or click **Create new** in the header at any time to get started building a protocol. First, select the robot you'll use. You can use Protocol Designer to create protocols that run on either the Opentrons Flex or the OT-2. 
 
 Next, add your pipettes. Select your pipette type and volume to view available tip rack options. Protocol Designer automatically shows you tips that are compatible with your chosen pipette. You will need to choose at least one tip rack for each pipette. If your protocol uses two of the same pipette, you can start with a single tip rack for both. Later, you can add tip racks to the protocol starting deck to be sure you have enough tips for all the steps in your protocol. 
@@ -9,7 +15,7 @@ Add a gripper to move labware automatically on the Flex. You'll need a gripper t
 To start, Protocol Designer will automatically assign deck slots for modules and fixtures in your protocol. To avoid deck conflicts, choose whether your Flex protocol will include a Thermocycler Module or waste chute. Both occupy a fixed deck slot.
 
 <figure class="screenshot" markdown>
-  ![Choose to add a Thermocycler Module or waste chute](images/deck-conflicts.png)
+  ![Choose to add a Thermocycler Module or waste chute](../images/deck-conflicts.png)
   <figcaption>Add the basics for your protocol.</figcaption>
 </figure>
 

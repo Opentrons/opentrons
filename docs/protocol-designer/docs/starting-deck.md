@@ -1,4 +1,10 @@
-Click **Edit protocol** to add and edit hardware, labware,  and liquids on the protocol starting deck. 
+---
+title: "Protocol Designer: Starting Deck"
+---
+
+# Starting Deck Setup
+
+Click **Edit protocol** to add and edit hardware, labware, and liquids on the protocol starting deck. 
 
 The protocol starting deck view shows how your Flex or OT-2 deck will look at the beginning of a protocol. This is the first step in your protocol timeline, shown on the left. It's also the same view of the deck as in the protocol overview, but editable. 
 

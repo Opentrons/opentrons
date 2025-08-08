@@ -1,3 +1,9 @@
+---
+title: "Protocol Designer: Pause"
+---
+
+# Pause Steps
+
 You can add a pause step in Protocol Designer to stop your protocol. Three options are available in the form to define the pause and instruct the robot how to resume your protocol. 
 
 | Pause option | Description | 
@@ -11,6 +17,6 @@ Flex touchscreen or in the Opentrons App. Once a pause step is
 created, you can also rename the step to add more information. 
 
 <figure class="screenshot" markdown>
-  ![Pause step](images/pause_step.png)
+  ![Pause step](../images/pause_step.png)
   <figcaption>Add a custom name and message for your pause step.</figcaption>
 </figure>

@@ -1,3 +1,9 @@
+---
+title: "Protocol Designer: Modules"
+---
+
+# Module Steps
+
 When you add modules to the robot deck, available module steps appear in the "Add step" menu. Protocol Designer supports the use of the following modules:
 
 | Module and generation | Opentrons Flex | Opentrons OT-2 |
@@ -35,7 +41,7 @@ Follow the instructions to add a total of six Absorbance Plate Reader steps to y
     
 
     <figure class="screenshot" markdown>
-    ![Plate Reader step](images/plate_reader.png)
+    ![Plate Reader step](../images/plate_reader.png)
    <figcaption>Add a single initialization and a reference wavelength in a Plate Reader step.</figcaption>
    </figure>
 
@@ -62,7 +68,7 @@ Follow the instructions to add a total of six Absorbance Plate Reader steps to y
 Adding a Heater-Shaker Module step to your protocol displays any labware and adapters currently on the module. 
 
 <figure class="screenshot" markdown>
-  ![Heater-Shaker step](images/heater_shaker.png)
+  ![Heater-Shaker step](../images/heater_shaker.png)
   <figcaption>Add a temperature, shake speed, and timer for a Heater-Shaker step.</figcaption>
 </figure>
 
@@ -75,7 +81,7 @@ Set a custom time for your Heater-Shaker step by enabling the timer. The timer w
 If your Heater-Shaker Step doesn't include a set time, Protocol Designer will ask how to pause your protocol. Because reaching a target temperature takes more time than changing the shaking speed, you can set the Heater-Shaker to reach a target temperature while your protocol proceeds to the next step. 
 
 <figure class="screenshot" markdown>
-  ![Heater-Shaker pause](images/heater_shaker_pause.png)
+  ![Heater-Shaker pause](../images/heater_shaker_pause.png)
   <figcaption>Build a pause step now or later in your protocol.</figcaption>
 </figure>
 
@@ -125,7 +131,7 @@ volume and initial lid temperature. Click **No profile defined** to open
 the profile steps menu.
 
 <figure class="screenshot" markdown>
-  ![Thermocycler profile](images/thermocycler.png)
+  ![Thermocycler profile](../images/thermocycler.png)
   <figcaption>Add a cycle of temperature holds within a Thermocycler step.</figcaption>
 </figure>
 

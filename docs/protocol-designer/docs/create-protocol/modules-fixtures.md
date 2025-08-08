@@ -1,7 +1,13 @@
+---
+title: "Protocol Designer: Modules and Fixtures"
+---
+
+# Add Modules and Fixtures
+
 The second step in building your protocol is to add modules or fixtures to the deck. Click an open slot to add a module, like the Temperature Module, or a fixture like the trash bin. 
 
 <figure class="screenshot" markdown>
-  ![Configure deck hardware](images/configure-hardware.png)
+  ![Configure deck hardware](../images/configure-hardware.png)
   <figcaption>Click an open Flex deck slot to add compatible modules and fixtures.</figcaption>
 </figure>
 
