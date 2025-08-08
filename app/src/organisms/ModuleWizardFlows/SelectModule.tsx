@@ -8,6 +8,7 @@ import {
   Flex,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
+  OVERFLOW_AUTO,
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
@@ -162,6 +163,7 @@ export function SelectModule(props: SelectModuleProps): JSX.Element | null {
           margin={SPACING.spacing32}
           flexDirection={DIRECTION_COLUMN}
           height="100%"
+          overflowY={OVERFLOW_AUTO}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
           <ModalContentOneColSimpleButtons
@@ -175,6 +177,7 @@ export function SelectModule(props: SelectModuleProps): JSX.Element | null {
                 ? t('connect_a_pipette_to_set_up_more_modules')
                 : null
             }
+            scroll={true}
           />
         </Flex>
         <Flex css={BUTTON_STYLE}>
