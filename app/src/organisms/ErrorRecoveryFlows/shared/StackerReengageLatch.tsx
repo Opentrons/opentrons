@@ -12,15 +12,13 @@ export function StackerReengageLatch(props: RecoveryContentProps): JSX.Element {
   const { t } = useTranslation('error_recovery')
 
   const { routeUpdateActions, recoveryCommands } = props
-  const {
-    proceedNextStep,
-    goBackPrevStep,
-  } = routeUpdateActions
+  const { proceedNextStep, goBackPrevStep } = routeUpdateActions
   const { closeLabwareLatch } = recoveryCommands
 
   const primaryOnClick = (): void => {
-    void closeLabwareLatch()
-      .then(() => { void proceedNextStep() })
+    void closeLabwareLatch().then(() => {
+      void proceedNextStep()
+    })
   }
 
   return (
