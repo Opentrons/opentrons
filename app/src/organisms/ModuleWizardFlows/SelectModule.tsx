@@ -58,13 +58,22 @@ export function SelectModule(props: SelectModuleProps): JSX.Element | null {
   const { t } = useTranslation('module_wizard_flows')
 
   const { parseModuleUSBPort } = useModuleUSBPort()
+  // Every module that needs setup (isn't calibrated, isn't in deck config) that also
+  // CAN be set up with the current robot configuration (pipettes or not pipettes)
   const allSetupable = useGetModulesNeedingSetupThatCanCurrentlyBeSetUp()
+  // Every module that needs setup, but not all are guaranteed to be able to be set up
+  // right now (e.g. because they need calibration but we don't have a pipette)
   const allNeedingSetup = useGetModulesNeedingSetup()
   const newModules =
     attachedModuleOnLaunch == null ? allSetupable : [attachedModuleOnLaunch]
-  // allNeedingSetup is a superset of allSetupable
+  // if there are more modules that need setup than modules that can be set up, then
+  // it follows that some modules need setup but cannot be set up. in that case we want
+  // a warning
   const hasUnsetupabbleModules = allNeedingSetup.length > allSetupable.length
+  // And our special short-circuit flows where we never show a menu if there's only one
+  // entry should be avoided if we have that warning
   const isSingleModule = newModules.length === 1 && !hasUnsetupabbleModules
+  // Unless, of course, we're being invoked by a caller giving us a specific module
   const shortCircuitFlow = attachedModuleOnLaunch != null || isSingleModule
   const sendIdentifyStacker = useSendIdentifyStacker()
 
