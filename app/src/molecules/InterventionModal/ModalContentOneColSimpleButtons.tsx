@@ -4,6 +4,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   LegacyStyledText,
+  OVERFLOW_SCROLL,
   RadioButton,
   SPACING,
   TYPOGRAPHY,
@@ -25,6 +26,7 @@ export interface ModalContentOneColSimpleButtonsProps {
   onSelect?: ChangeEventHandler<HTMLInputElement>
   initialSelected?: string
   subText?: string
+  scroll?: boolean
 }
 
 export function ModalContentOneColSimpleButtons(
@@ -34,16 +36,26 @@ export function ModalContentOneColSimpleButtons(
     props.initialSelected ?? null
   )
   return (
-    <OneColumn>
-      <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing16}>
-        <LegacyStyledText
-          fontSize={TYPOGRAPHY.fontSize28}
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          lineHeight={TYPOGRAPHY.lineHeight36}
+    <OneColumn height="100%">
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gap={SPACING.spacing16}
+        height="100%"
+      >
+        <Flex>
+          <LegacyStyledText
+            fontSize={TYPOGRAPHY.fontSize28}
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            lineHeight={TYPOGRAPHY.lineHeight36}
+          >
+            {props.headline}
+          </LegacyStyledText>
+        </Flex>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gap={SPACING.spacing4}
+          overflowY={props.scroll === true ? 'auto' : null}
         >
-          {props.headline}
-        </LegacyStyledText>
-        <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing4}>
           {props.buttons.map((buttonProps, idx) => (
             <RadioButton
               key={`button${idx}-${buttonProps.value}`}
