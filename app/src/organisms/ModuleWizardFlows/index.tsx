@@ -6,7 +6,7 @@ import { COLORS, LegacyStyledText } from '@opentrons/components'
 import { ApiHostProvider, useModulesQuery } from '@opentrons/react-api-client'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import { useGetModulesNeedingSetupThatCanCurrentlyBeSetUp } from '/app/App/hooks'
+import { useGetNewModules } from '/app/App/hooks'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
@@ -90,7 +90,7 @@ export function ModuleWizardFlows(
   }, [])
 
   // Close the modal if no new modules are attached
-  const newModules = useGetModulesNeedingSetupThatCanCurrentlyBeSetUp()
+  const newModules = useGetNewModules()
   useEffect(() => {
     if (newModules.length === 0 && wizardFlowBaseProps.attachedModule == null) {
       handleCleanUpAndClose()

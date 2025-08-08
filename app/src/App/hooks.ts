@@ -197,20 +197,16 @@ export function useModuleAttachedToast(
 
   const { t, i18n } = useTranslation(['module_wizard_flows', 'shared'])
   const { makeToast, eatToast } = useToaster()
-  const moduleSerials = currentlySetuppableModules.map(m => m.serialNumber)
+  const moduleSerials = newModules.map(m => m.serialNumber)
   const moduleSerialsRef = useRef(moduleSerials)
   const runInProgress = currentRunId != null
   const [toastID, setToastID] = useState<string>('')
 
-  const [firstRun, setFirstRun] = useState<boolean>(true)
-
   useEffect(() => {
     const newModuleSerials = difference(moduleSerials, moduleSerialsRef.current)
-    if (
-      !runInProgress &&
-      ongoingSubsystemUpdate == null &&
-      newModuleSerials.length > 0
-    ) {
+    const hasPipette =
+      attachedPipettes.left != null || attachedPipettes.right != null
+    if (!runInProgress && hasPipette && newModuleSerials.length > 0) {
       setToastID(
         makeToast(t('module_added') as string, 'info', {
           buttonText: i18n.format(t('shared:close'), 'capitalize'),
@@ -228,16 +224,16 @@ export function useModuleAttachedToast(
     setFirstRun(false)
     // dont want this hook to rerun when other deps change
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [moduleSerials, runInProgress, firstRun])
+  }, [moduleSerials, runInProgress])
 
   useEffect(() => {
     // Close toast if there are no new modules to setup
-    if (toastID && currentlySetuppableModules.length === 0) {
+    if (toastID && newModules.length === 0) {
       launchModuleSetupCallback(false)
       eatToast(toastID)
       setToastID('')
     }
-  }, [toastID, currentlySetuppableModules])
+  }, [toastID, newModules])
 }
 
 export function useScrollRef(): {
