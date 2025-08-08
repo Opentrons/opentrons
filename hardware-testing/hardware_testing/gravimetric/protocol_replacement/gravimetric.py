@@ -514,6 +514,7 @@ def _get_tips_for_test_single_multi(
         wells += rack.wells()
     return wells
 
+
 def _get_tips_for_test_96_single(
     fixture_settings: FixtureSettings, tip: int, blank: bool = False
 ) -> List[Well]:
@@ -530,8 +531,13 @@ def _get_tips_for_test_96_single(
         if slot not in partially_used
     ]
     wells += tips.get_unused_tips(fixture_settings.ctx, tip)
-    wells = sorted(wells, reverse=True, key=lambda well: f"{well.well_name[0]}{chr(int(well.well_name[1:]))}")
+    wells = sorted(
+        wells,
+        reverse=True,
+        key=lambda well: f"{well.well_name[0]}{chr(int(well.well_name[1:]))}",
+    )
     return wells
+
 
 def _get_tips_for_test_96(
     fixture_settings: FixtureSettings, tip: int, blank: bool = False
@@ -1155,7 +1161,9 @@ def run_one_test(
 
 
 def _configure_tip_count(fixture_settings: FixtureSettings, channel: int) -> None:
-    if (fixture_settings.pipette_channels == 8 and not fixture_settings.increment) or fixture_settings.single_tip_96:
+    if (
+        fixture_settings.pipette_channels == 8 and not fixture_settings.increment
+    ) or fixture_settings.single_tip_96:
         primary = "A1"
         if channel in [4, 5, 6, 7]:
             primary = "H1"
@@ -1291,9 +1299,9 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                         )
                         + avg_disp_evap
                     )
-                    if (
-                        fixture_settings.increment
-                        or fixture_settings.pipette_channels == 96
+                    if fixture_settings.increment or (
+                        fixture_settings.pipette_channels == 96
+                        and not fixture_settings.single_tip_96
                     ):
                         avg_asp_evap = avg_asp_evap / fixture_settings.pipette_channels
                         disp_with_evap = (
