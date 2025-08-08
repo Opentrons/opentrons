@@ -9,7 +9,7 @@ Add a gripper to move labware automatically on the Flex. You'll need a gripper t
 To start, Protocol Designer will automatically assign deck slots for modules and fixtures in your protocol. To avoid deck conflicts, choose whether your Flex protocol will include a Thermocycler Module or waste chute. Both occupy a fixed deck slot.
 
 <figure class="screenshot" markdown>
-  ![Choose to add a Thermocycler Module or waste chute](images/deck-conflicts.png)
+  ![Choose to add a Thermocycler Module or waste chute](../images/deck-conflicts.png)
   <figcaption>Add the basics for your protocol.</figcaption>
 </figure>
 

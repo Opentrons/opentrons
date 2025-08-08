@@ -7,7 +7,7 @@ Before you finish creating your protocol, add a few more details. A unique title
 The protocol overview summarizes details you've added for your protocol. The protocol metadata section at the top left includes your protocol description, author, and organization details. You can also see the dates the protocol was created and exported. Modifying a protocol updates the last export date. Click **Edit** at the top right of the section to make changes. 
 
 <figure class="screenshot" markdown>
-  ![Protocol overview](images/protocol-overview-left-2.png)
+  ![Protocol overview](../images/protocol-overview-left-2.png)
   <figcaption>The left section of the protocol overview screen.</figcaption>
 </figure>
 
@@ -20,7 +20,7 @@ The protocol overivew also includes a preview of your protocol starting deck. Th
 Hover over a deck slot to see individual details beneath the deck map, like labware and liquids. In the example below, slot C2 contains an Opentrons Flex filter tip rack. 
 
 <figure class="screenshot" markdown>
-  ![Protocol overview](images/protocol_overview_right_2.png)
+  ![Protocol overview](../images/protocol_overview_right_2.png)
   <figcaption>The right section of the protocol overview screen.</figcaption>
 </figure>
 

@@ -36,7 +36,7 @@ Consolidate and distribute paths use a cycle of aspiration and dispensing to com
 If you choose an incompatible well ratio or an empty source well, Protocol Designer displays a warning in the transfer form. 
 
 <figure class="screenshot" markdown>
-  ![Transfer warning](images/transfer_warning.png)
+  ![Transfer warning](../images/transfer_warning.png)
   <figcaption>Incompatible well ratio in a transfer step.</figcaption>
 </figure>
 
@@ -58,7 +58,7 @@ If you chose to apply a liquid class to your transfer step, each tab already con
 Click the default well order or tip position to open the menu and edit. Here, graphics show the order the robot moves from well to well, and where in each well the robot aspirates or dispenses liquid. You can choose a custom well order and adjust the X, Y, and Z tip positions within the valid range for your chosen labware. 
 
 <figure class="screenshot" markdown>
-  ![Tip position](images/tip_position.png)
+  ![Tip position](../images/tip_position.png)
   <figcaption>Edit the aspirate tip position.</figcaption>
 </figure>
 

@@ -30,7 +30,7 @@
 
     Code your own automated biology lab protocols for Flex or OT-2.
 
-    [:octicons-arrow-right-24: Documentation and Reference](#)
+    [:octicons-arrow-right-24: Documentation and Reference](https://docs.opentrons.com/v2/)
 
 -   :opentrons-protocol-designer:{ .xl .middle } __Protocol Designer__
 
@@ -38,6 +38,6 @@
 
     Our no-code, web-based tool for developing protocols for Flex or OT-2.
 
-    [:octicons-arrow-right-24: Instruction Manual](#)
+    [:octicons-arrow-right-24: Instruction Manual](protocol-designer/index.md)
 
 </div>

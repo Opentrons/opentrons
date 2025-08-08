@@ -1,4 +1,4 @@
-site_name: Protocol Designer Instruction Manual
+site_name: protocol-designer
 
 theme:
   name: material
@@ -30,6 +30,7 @@ plugins:
 
 nav:
   
+  - Protocol Designer Instruction Manual: index.md
   - About Protocol Designer: about.md 
   - Create a protocol:
       - Robot and instruments: create-protocol/robots-instruments.md
@@ -37,12 +38,12 @@ nav:
       - Protocol metadata and overview: create-protocol/metadata-overview.md
   - Protocol starting deck: starting-deck.md 
   - Protocol steps:
-      - Transfer steps: transfer.md
-      - Mix steps: mix.md
-      - Move steps: move.md
-      - Module steps: module.md 
-      - Magnet steps: magnet.md
-      - Pause steps: pause.md
+      - Transfer steps: steps/transfer.md
+      - Mix steps: steps/mix.md
+      - Move steps: steps/move.md
+      - Module steps: steps/module.md 
+      - Magnet steps: steps/magnet.md
+      - Pause steps: steps/pause.md
   - Editing steps: edit-steps.md
   - Warnings and errors: warnings-errors.md
   - Export a protocol: export-protocol.md

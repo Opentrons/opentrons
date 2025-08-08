@@ -11,6 +11,6 @@ Flex touchscreen or in the Opentrons App. Once a pause step is
 created, you can also rename the step to add more information. 
 
 <figure class="screenshot" markdown>
-  ![Pause step](images/pause_step.png)
+  ![Pause step](../images/pause_step.png)
   <figcaption>Add a custom name and message for your pause step.</figcaption>
 </figure>

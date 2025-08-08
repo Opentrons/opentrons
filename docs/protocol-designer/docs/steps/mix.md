@@ -3,7 +3,7 @@ In a mix step, the robot mixes liquid by repeatedly aspirating and dispensing. M
 You can customize settings for your mix step in a two-part form. Just like in a transfer step, start by selecting a pipette, tip rack, and labware. You can customize volume per well and the number of times the robot will mix. Choose tip management settings, or how often the robot will select a new tip, and a tip drop location before clicking **Continue**. 
 
 <figure class="screenshot" markdown>
-  ![Mix step](images/mix_step.png)
+  ![Mix step](../images/mix_step.png)
   <figcaption>Select wells, volume, repetitions, and tip management settings in the first mix step form.</figcaption>
 </figure>
 
