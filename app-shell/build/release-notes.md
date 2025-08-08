@@ -20,7 +20,7 @@ Welcome to the v8.6.0 release of the Opentrons App! This release adds support fo
 
 - Choose from three Opentrons-verified liquid classes to optimize liquid handling in quick transfers. 
 - Easily tell your tip racks apart during run setup. Colored tip racks now appear in the app to match different tip volume ranges. 
-- Improvements to Labware Position Chcek include new prompts to apply offsets before a protocol run. 
+- Improvements to Labware Position Check include new prompts to apply offsets before a protocol run. 
 
 ---
 
