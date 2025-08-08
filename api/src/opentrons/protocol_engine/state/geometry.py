@@ -588,11 +588,11 @@ class GeometryView:
                 f"Liquid Height of {probed_height} mm is greater than maximum well height {well_depth} mm."
             )
 
-    def get_xy_offset_if_needed(self, labware_id: str, well_name: str) -> WellOffset:
+    def _get_xy_offset_if_needed(self, labware_id: str, well_name: str) -> Point:
         """Add an x,y offset to position the tip into the center of a sub-well if needed."""
         labware_definition = self._labware.get_definition(labware_id)
         if labware_definition.innerLabwareGeometry is None:
-            return WellOffset(x=0, y=0, z=0)
+            return Point(x=0, y=0, z=0)
         well_def = self._labware.get_well_definition(labware_id, well_name)
         well_geometry = self._labware.get_well_geometry(
             labware_id=labware_id, well_name=well_name
@@ -609,7 +609,6 @@ class GeometryView:
             if well_def.shape == "circular":
                 well_x_dimension = well_y_dimension = well_def.diameter
             else:
-                assert well_def.shape == "rectangular", "invalid well shape"
                 well_x_dimension = well_def.xDimension
                 well_y_dimension = well_def.yDimension
 
@@ -623,7 +622,7 @@ class GeometryView:
                 subsection_y_dimension = well_y_dimension / bottom_ycount
                 # move over into the middle of the nearest subection
                 y_offset = subsection_y_dimension / 2
-        return WellOffset(x=x_offset, y=y_offset, z=0)
+        return Point(x=x_offset, y=y_offset, z=0)
 
     def get_well_position(
         self,
@@ -637,7 +636,7 @@ class GeometryView:
         labware_pos = self.get_labware_position(labware_id)
         well_def = self._labware.get_well_definition(labware_id, well_name)
         well_depth = well_def.depth
-        xy_offset = self.get_xy_offset_if_needed(
+        xy_offset = self._get_xy_offset_if_needed(
             labware_id=labware_id, well_name=well_name
         )
         offset = WellOffset(x=xy_offset.x, y=xy_offset.y, z=well_depth)
