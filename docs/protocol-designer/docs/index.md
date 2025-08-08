@@ -1,3 +1,7 @@
+---
+title: "Protocol Designer Instruction Manual"
+---
+
 <img src="images/tm-opentrons-full-blackcolor.png" height=350 width=350>
 
 # Protocol Designer Instruction Manual

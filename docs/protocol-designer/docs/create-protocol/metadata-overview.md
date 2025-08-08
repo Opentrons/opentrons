@@ -1,3 +1,9 @@
+---
+title: "Protocol Designer: Metadata and Overview"
+---
+
+# Protocol Metadata and Overview
+
 ## Protocol metadata
 
 Before you finish creating your protocol, add a few more details. A unique title, description, and author details will be displayed in the Opentrons App for your completed protocol and help it stand out from the others. 

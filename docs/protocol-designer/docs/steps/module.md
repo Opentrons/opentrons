@@ -1,3 +1,9 @@
+---
+title: "Protocol Designer: Modules"
+---
+
+# Module Steps
+
 When you add modules to the robot deck, available module steps appear in the "Add step" menu. Protocol Designer supports the use of the following modules:
 
 | Module and generation | Opentrons Flex | Opentrons OT-2 |

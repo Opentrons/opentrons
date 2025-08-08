@@ -33,7 +33,7 @@ nav:
   - Protocol Designer Instruction Manual: index.md
   - About Protocol Designer: about.md 
   - Create a protocol:
-      - Robot and instruments: create-protocol/robots-instruments.md
+      - Robot and instruments: create-protocol/robot-instruments.md
       - Modules and fixtures: create-protocol/modules-fixtures.md
       - Protocol metadata and overview: create-protocol/metadata-overview.md
   - Protocol starting deck: starting-deck.md 

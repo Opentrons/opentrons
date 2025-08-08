@@ -1,3 +1,9 @@
+---
+title: "Protocol Designer: Modifying a Protocol"
+---
+
+# Modifying an Existing Protocol
+
 You can upload and edit protocols you've previously made in Protocol Designer. Click **Import** to upload an existing .py or .json file. 
 
 Your protocol details will be visible in the protocol overview. Click **Edit protocol** to make your desired changes. 

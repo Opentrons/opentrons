@@ -1,3 +1,9 @@
+---
+title: "Protocol Designer: Moving Labware"
+---
+
+# Move Steps
+
 Add a move step whenever you need to move labware during a protocol, either with the Flex Gripper or manually. By default, move steps will use a gripper if added in your protocol. Click **Use gripper** in the step form to change your selection. 
 
 During a manual move step, the protocol will pause and display a message on the Flex touchscreen or in the Opentrons App. Confirm your labware move to resume the protocol. 

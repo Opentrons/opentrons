@@ -1,3 +1,9 @@
+---
+title: "Protocol Designer: Export"
+---
+
+# Exporting a Protocol
+
 When you're finished creating and editing your protocol, click **Back to overview** in the upper left. Review the hardware, labware, liquids, and steps added to your protocol. Then, click **Export protocol** in the upper right. Your protocol will automatically download as a Python (.py) file. 
 
 !!! Note

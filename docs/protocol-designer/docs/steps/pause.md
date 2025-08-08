@@ -1,3 +1,9 @@
+---
+title: "Protocol Designer: Pause"
+---
+
+# Pause Steps
+
 You can add a pause step in Protocol Designer to stop your protocol. Three options are available in the form to define the pause and instruct the robot how to resume your protocol. 
 
 | Pause option | Description | 
