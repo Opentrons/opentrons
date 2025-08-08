@@ -131,18 +131,16 @@ export function TwoColLwInfoAndDeck(
         const isValidDeck =
           currentLoc != null && newLoc != null && movedLabwareDef != null
 
-        const modulesOnDeck = moduleRenderInfo
-          ?.filter(module => module.targetSlotId != null)
-          .map(module => {
-            return {
-              moduleModel: module.moduleDef.model,
-              moduleLocation: { slotName: module.targetSlotId ?? '' },
-              nestedLabwareDef:
-                module.nestedLabwareId !== failedLwId
-                  ? module.nestedLabwareDef
-                  : null,
-            }
-          })
+        const modulesOnDeck = moduleRenderInfo.map(module => {
+          return {
+            moduleModel: module.moduleDef.model,
+            moduleLocation: { slotName: module.targetSlotId },
+            nestedLabwareDef:
+              module.nestedLabwareId !== failedLwId
+                ? module.nestedLabwareDef
+                : null,
+          }
+        })
         return isValidDeck ? (
           <MoveLabwareOnDeck
             deckFill={isOnDevice ? COLORS.grey35 : '#e6e6e6'}

@@ -132,18 +132,16 @@ export function MoveLabwareInterventionContent({
     deckDef,
     labwareDefsByUri
   )
-  const modulesOnDeck = moduleRenderInfo
-    ?.filter(module => module.targetSlotId != null)
-    .map(module => {
-      return {
-        moduleModel: module.moduleDef.model,
-        moduleLocation: { slotName: module.targetSlotId ?? '' },
-        nestedLabwareDef:
-          module.nestedLabwareId !== command.params.labwareId
-            ? module.nestedLabwareDef
-            : null,
-      }
-    })
+  const modulesOnDeck = moduleRenderInfo.map(module => {
+    return {
+      moduleModel: module.moduleDef.model,
+      moduleLocation: { slotName: module.targetSlotId },
+      nestedLabwareDef:
+        module.nestedLabwareId !== command.params.labwareId
+          ? module.nestedLabwareDef
+          : null,
+    }
+  })
 
   const oldLabwareLocation =
     getLoadedLabware(run.labware, command.params.labwareId)?.location ?? null
