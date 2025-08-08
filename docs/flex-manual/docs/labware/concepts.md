@@ -16,7 +16,7 @@ One way to think of labware is as the durable components and consumable items th
 
 ## Opentrons-verified labware 
 
-Opentrons has prepared information about common labware for our [Labware Library](https://labware.opentrons.com/). This information is stored in Javascript object notation (JSON) files with .json file extensions. A JSON file includes spatial dimensions (length, width, height), volumetric capacity (µL, mL), and other metrics that define the labware's surface features, their shapes, and locations. Newer labware definitions also include information about the internal shapes of wells within labware. When running a protocol, the Flex reads these .json files to know what labware is on the deck and how to work with it. 
+Opentrons has prepared information about common labware for our Labware Library. This information is stored in Javascript object notation (JSON) files with .json file extensions. A JSON file includes spatial dimensions (length, width, height), volumetric capacity (µL, mL), and other metrics that define the labware's surface features, their shapes, and locations. Newer labware definitions also include information about the internal shapes of wells within labware. When running a protocol, the Flex reads these .json files to know what labware is on the deck and how to work with it. 
 
 ## Custom labware
 
