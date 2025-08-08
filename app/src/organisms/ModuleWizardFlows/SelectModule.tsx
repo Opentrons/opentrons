@@ -12,13 +12,12 @@ import {
   RESPONSIVENESS,
   SPACING,
 } from '@opentrons/components'
-import {
-  ABSORBANCE_READER_TYPE,
-  FLEX_STACKER_MODULE_TYPE,
-  getModuleDisplayName,
-} from '@opentrons/shared-data'
+import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import { useGetModulesNeedingSetupThatCanCurrentlyBeSetUp } from '/app/App/hooks'
+import {
+  useGetModulesNeedingSetup,
+  useGetModulesNeedingSetupThatCanCurrentlyBeSetUp,
+} from '/app/App/hooks'
 import { SmallButton } from '/app/atoms/buttons'
 import { i18n } from '/app/i18n'
 import { useModuleUSBPort } from '/app/local-resources/modules'
@@ -31,8 +30,6 @@ import {
 import { useSendIdentifyStacker } from './hooks'
 
 import type { AttachedModule } from '@opentrons/api-client'
-import type { ModuleType } from '@opentrons/shared-data'
-import type { PipetteInformation } from '/app/redux/pipettes'
 
 interface SelectModuleProps {
   buildFlowForSelectedModule: (module: AttachedModule) => void
@@ -41,7 +38,6 @@ interface SelectModuleProps {
   setSelectedModule: (module: AttachedModule | null) => void
   setShowLaunchSetup: (show: boolean) => void
   attachedModuleOnLaunch?: AttachedModule | null
-  attachedPipette?: PipetteInformation | null
 }
 
 interface ModuleNameAndPort {
@@ -57,27 +53,18 @@ export function SelectModule(props: SelectModuleProps): JSX.Element | null {
     setSelectedModule,
     setShowLaunchSetup,
     attachedModuleOnLaunch = null,
-    attachedPipette,
   } = props
   const { t } = useTranslation('module_wizard_flows')
 
   const { parseModuleUSBPort } = useModuleUSBPort()
-  const availableModules = useGetModulesNeedingSetupThatCanCurrentlyBeSetUp()
-  const allSettupable = useGetModulesNeedingSetup()
-  const allNewModules =
-    attachedModuleOnLaunch !== null
-      ? [attachedModuleOnLaunch]
-      : availableModules
-  const modulesNotRequiringPipette = availableModules.filter(thisModule =>
-    ([
-      ABSORBANCE_READER_TYPE,
-      FLEX_STACKER_MODULE_TYPE,
-    ] as ModuleType[]).includes(thisModule.moduleType)
-  )
+  const allSetupable = useGetModulesNeedingSetupThatCanCurrentlyBeSetUp()
+  const allNeedingSetup = useGetModulesNeedingSetup()
   const newModules =
-    attachedPipette == null ? modulesNotRequiringPipette : allNewModules
-
-  const isSingleModule = newModules.length === 1
+    attachedModuleOnLaunch == null ? allSetupable : [attachedModuleOnLaunch]
+  // allNeedingSetup is a superset of allSetupable
+  const hasUnsetupabbleModules = allNeedingSetup.length > allSetupable.length
+  const isSingleModule = newModules.length === 1 && !hasUnsetupabbleModules
+  const shortCircuitFlow = attachedModuleOnLaunch != null || isSingleModule
   const sendIdentifyStacker = useSendIdentifyStacker()
 
   const getModuleNameAndPort = (module: AttachedModule): ModuleNameAndPort => {
@@ -88,11 +75,11 @@ export function SelectModule(props: SelectModuleProps): JSX.Element | null {
 
   // Handler for when there is one module
   useEffect(() => {
-    if (isSingleModule) {
+    if (shortCircuitFlow) {
       setSelectedModule(newModules[0])
       sendIdentifyStacker(newModules[0], true)
     }
-  }, [isSingleModule])
+  }, [shortCircuitFlow])
 
   // Handler for when there are multiple modules.
   const handleModuleSelected = (serialNumber: string): void => {
@@ -133,7 +120,7 @@ export function SelectModule(props: SelectModuleProps): JSX.Element | null {
   `
   if (newModules.length === 0) {
     return null
-  } else if (isSingleModule && selectedModule != null) {
+  } else if (shortCircuitFlow && selectedModule != null) {
     const m = getModuleNameAndPort(selectedModule)
     return (
       <SimpleWizardBody
@@ -183,6 +170,11 @@ export function SelectModule(props: SelectModuleProps): JSX.Element | null {
             onSelect={event => {
               handleModuleSelected(event.target.value)
             }}
+            subText={
+              hasUnsetupabbleModules
+                ? t('connect_a_pipette_to_set_up_more_modules')
+                : null
+            }
           />
         </Flex>
         <Flex css={BUTTON_STYLE}>

@@ -111,7 +111,6 @@ export function ModuleWizardFlows(
           setSelectedModule={setSelectedModule}
           setShowLaunchSetup={setShowLaunchSetup}
           attachedModuleOnLaunch={attachedModuleOnLaunch}
-          attachedPipette={wizardFlowBaseProps.attachedPipette}
         />
       </ModuleWizardScreen>
     )
