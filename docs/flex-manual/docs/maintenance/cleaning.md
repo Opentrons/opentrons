@@ -1,18 +1,10 @@
----
-title: "Opentrons Flex: Maintenance and Service"
----
-
-# Maintenance and Service
-
-This chapter covers how to perform routine maintenance on your Opentrons Flex, and what to do if you require service for a problem. You should be able to perform cleaning tasks yourself, whereas service and repairs should be handled by Opentrons Support.
-
-## Cleaning your Flex
+# Cleaning your Flex
 
 Routine cleaning helps keep Flex free of contaminants that can affect your protocols. Cleaning also gives you a chance to inspect the robot for wear and damage. You should review this section for information, instructions, and resources about how to clean your Flex, pipettes, gripper, modules, and other hardware.
 
 If you have any questions about cleaning your Flex and its related components, contact the support team at <support@opentrons.com>.
 
-### Before you begin
+## Before you begin
 
 Flex is an electrically powered mechanical device. As a good practice, turn off the power before you start cleaning it and before reaching inside the enclosure. You may even want to unplug the robot as well. These are simple safety steps you can take to make the robot inoperable until you're finished.
 
@@ -35,7 +27,7 @@ The following table lists the chemicals you can use to clean your Flex. Diluted 
 | **Bleach** | Dilute to 10% (1:10 bleach/water ratio) for cleaning. Do not use 100% bleach. |
 | **Distilled water** | You can use distilled water to clean or rinse your robot. |
 
-### Frame and window panel cleaning
+## Frame and window panel cleaning
 
 To clean the exterior and interior frame and window panels of your Flex:
 
@@ -44,7 +36,7 @@ To clean the exterior and interior frame and window panels of your Flex:
 3. Rinse off any remaining residue using a cloth dampened with distilled water.
 4. Let the robot air dry.
 
-### Deck cleaning
+## Deck cleaning
 
 To clean the deck, deck slots, and trash bin:
 
@@ -53,7 +45,7 @@ To clean the deck, deck slots, and trash bin:
 3. Rinse off any remaining residue using a cloth dampened with distilled water.
 4. Let the deck pieces air dry. Replace any items that you removed for cleaning.
 
-### Gantry cleaning
+## Gantry cleaning
 
 To clean the gantry:
 
@@ -62,7 +54,7 @@ To clean the gantry:
 3. Rinse off any remaining residue using a cloth dampened with distilled water.
 4. Let the gantry air dry.
 
-### Waste chute cleaning
+## Waste chute cleaning
 
 To clean the waste chute:
 
@@ -73,7 +65,7 @@ To clean the waste chute:
 5. Let the waste chute air dry.
 6. Reattach the waste chute to its deck plate adapter.
 
-## Cleaning pipettes and tips
+## Pipette cleaning
 
 To clean a 1-, 8-, or 96-channel pipette:
 
@@ -88,7 +80,7 @@ To clean a 1-, 8-, or 96-channel pipette:
 6. Reattach the pipette to the gantry. When prompted, note that recalibration is optional, but recommended.
 
 
-![Cleanable pipette components, including the body, ejector, and nozzles.](images/pipette-components-cleaning.png "Pipette components")
+![Cleanable pipette components, including the body, ejector, and nozzles.](../images/pipette-components-cleaning.png "Pipette components")
 
 !!! warning
     - *Do not* disassemble Flex pipettes for cleaning or attempt to clean their internal electronic components.
@@ -122,11 +114,11 @@ Filtered pipette tips help prevent contaminating the barrel or inside of the pip
 6. Reattach the pipette to the gantry. When prompted, note that recalibration is optional, but recommended.
 
 
-### Cleaning pipette tips
+## Tip cleaning
 
 Flex pipette tips are disposable items. You can autoclave and reuse them if your protocol allows it. For best results, we recommend using clean, fresh tips. Discard pipette tips after you no longer need them. You can purchase [replacement tips](https://opentrons.com/products/categories/tips-&-labware) directly from Opentrons.
 
-## Cleaning the gripper
+## Gripper cleaning
 
 To clean the gripper:
 
@@ -140,21 +132,21 @@ To clean the gripper:
 5. Let the gripper air dry.
 6. Reattach the gripper to the gantry. When prompted, note that recalibration is optional, but recommended.
 
-![Cleanable gripper components, including the body, jaws, and paddles.](images/gripper-components-cleaning.png "Gripper components"){width="50%"}
+![Cleanable gripper components, including the body, jaws, and paddles.](../images/gripper-components-cleaning.png "Gripper components"){width="50%"}
 
 !!! warning
     - *Do not* disassemble the gripper for cleaning or attempt to clean its internal electronic components.
     - *Do not* put the gripper in an autoclave. The high temperatures, pressures, and steam used inside an autoclave can damage the electronics, circuit boards, small electric motors, and other sensitive components.
 
 
-#### Gripper paddles
+### Gripper paddles
 
 The gripper paddles are wear items that require periodic replacement. When cleaning the gripper, inspect the rubber pads for tears, nicks, or other wear. Replace the paddles as needed with the two spares (included with the gripper). If you need additional gripper paddles, contact Opentrons Support at <support@opentrons.com>.
 
 !!! note
     Aggressive cleaning chemicals may reduce the lifetime of the rubber pads on the gripper paddles.
 
-## Cleaning modules
+## Module cleaning
 
 You can clean the surfaces of any of your Flex modules. The general procedure is the same for all supported modules: Heater-Shaker, Magnetic Block, Temperature, and Thermocycler.
 
@@ -186,7 +178,7 @@ To set up the Thermocycler with a clean seal:
 3. Rinse the seal with molecular biology grade water.
 4. Let the seal air dry.
 
-![Location of the automation seal on the inside lid of the Thermocycler](images/thermocycler-seal.svg "Thermocycler seal"){width="50%"}
+![Location of the automation seal on the inside lid of the Thermocycler](../images/thermocycler-seal.svg "Thermocycler seal"){width="50%"}
 
 ## Autoclave-safe labware
 
@@ -226,95 +218,3 @@ The following table lists labware sold by Opentrons that we have verified as aut
 </table>
 
 If you're using labware from a manufacturer that's not listed here, refer to their website to see whether those items can be autoclaved.
-
-## Servicing Flex
-
-Opentrons Flex is designed for years of full-time operation. Unlike cleaning, you should not attempt to service or repair Flex yourself. Opentrons offers multiple levels of service for Flex and related Opentrons hardware, some of which include maintenance and repairs.
-
-### Opentrons services
-
-Opentrons offers two levels of service, Opentrons Care and Opentrons Care Plus, both of which include benefits for onboarding, maintenance, repair, and more. Both services are available in the continental United States; Opentrons Care is also available internationally. Both services include:
-
-- Onboarding with an Opentrons field applications scientist.
-- Parts for yearly preventive maintenance.
-- Access to a dedicated support engineer.
-
-In addition, Opentrons Care Plus includes on-site visits for:
-
-- Installation.
-- Preventive maintenance, yearly.
-- Repairs, as needed.
-
-You can also [purchase services](https://opentrons.com/instrument-services) individually, including installation, protocol development (remote or on-site), repair, relocation, and preventive maintenance. Contact Opentrons Sales for more information.
-
-### Installation qualification and operation qualification
-
-Opentrons recommends performing installation qualification and operation qualification (IQ/OQ) after you first set up Flex, after you attach hardware, and after having service performed. IQ/OQ generally verifies:
-
-- The serial numbers of your hardware, including the Flex robot, pipettes, gripper, and modules.
-- Software and firmware versions.
-- Proper connection of attached hardware.
-- Pipette and module calibrations.
-
-Consult the [Flex IQ/OQ form](https://opentrons-flex-iq-oq-checklist.paperform.co) for a complete checklist of IQ/OQ activities to perform.
-
-### Preventative maintenance
-
-Along with routine cleaning, Opentrons also recommends the following optional procedures to help keep your Flex running smoothly. These suggestions are based on a Flex that operates for about 20 hours per week, 50 weeks per year. Feel free to adapt this schedule to your robot's workload. Alternatively, let Opentrons do the work for you—see the [Instrument Services section](https://opentrons.com/instrument-services) of our website for information about our service contract offerings.
-
-<table>
-  <thead>
-    <tr>
-      <th>Frequency</th>
-      <th>Task</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td rowspan="2">Daily</td>
-      <td>Empty trash</td>
-      <td>Take the movable trash out of its deck slot, safely discard its contents, and replace it into the deck.</td>
-    </tr>
-    <tr>
-      <td>Inspect working area</td>
-      <td>Clear the deck of any debris, liquid, or no-longer-needed labware. Check that the plastic labware clips are not damaged.</td>
-    </tr>
-    <tr>
-      <td>Weekly</td>
-      <td>Clean surfaces</td>
-      <td>Clean the exterior surfaces of the deck, gantry, windows, instruments, and other hardware, as described above.</td>
-    </tr>
-    <tr>
-      <td>Monthly</td>
-      <td>Power cycle</td>
-      <td>Turn off Flex and all connected modules. Then turn them back on.</td>
-    </tr>
-    <tr>
-      <td rowspan="3">Every six months</td>
-      <td>Inspect pipettes</td>
-      <td>Inspect the O-rings on the pipette nozzles for signs of wear (notches, deformation). Replace the O-rings with the provided spares, if needed.</td>
-    </tr>
-    <tr>
-      <td>Inspect gripper</td>
-      <td>Inspect the rubber pads on the gripper paddles. Replace the gripper paddles with the provided spares, if needed.</td>
-    </tr>
-    <tr>
-      <td>Recalibrate instruments</td>
-      <td>Run recalibration for the pipettes and gripper.</td>
-    </tr>
-    <tr>
-      <td>Yearly</td>
-      <td>Evaluate pipette performance</td>
-      <td>Evaluate the overall performance of your Flex pipettes. Replace any pipette that is not performing according to the <a href="../system-description/#pipette-specifications">published accuracy and precision standards</a>.</td>
-    </tr>
-  </tbody>
-</table>
-
-The annual on-site preventative maintenance visit that is part of Opentrons Care Plus includes performance of all of the tasks listed above, as well as replacement parts.
-
-### Warranty
-
-All hardware purchased from Opentrons is covered under a [1-year standard warranty](https://support.opentrons.com/s/article/Our-warranty). Opentrons warrants to the end-user of the products that they will be free of manufacturing defects due to part quality issues or poor workmanship and also warrants that the products will materially conform to Opentrons' published specifications. See the [Services page](https://opentrons.com/instrument-services) of our website for information about service contracts, custom protocol development, and other support offerings.
-
-Contact us at <support@opentrons.com> if you have any questions about our warranty.

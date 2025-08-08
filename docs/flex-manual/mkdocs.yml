@@ -56,12 +56,15 @@ nav:
       - Settings: touchscreen/settings.md
   - Opentrons App: opentrons-app.md
   - Advanced Operation: advanced-operation.md
-  - Maintenance and Service: maintenance-service.md
+  - Maintenance: 
+      - Maintenance Home: maintenance/index.md
+      - Cleaning: maintenance/cleaning.md
+      - Service: maintenance/service.md
   - Appendices:
       - Glossary: glossary.md
-      - Additional Documentation: additional-documentation.md
-      - Open-Source Software: open-source-software.md
-      - Support and Contact Information: support-contact-information.md
+      - Additional Documentation: additional-docs.md
+      - Open-Source Software: open-source.md
+      - Support and Contact Information: support.md
 
 theme:
   name: material
