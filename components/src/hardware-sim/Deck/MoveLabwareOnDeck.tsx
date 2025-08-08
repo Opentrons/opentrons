@@ -111,6 +111,13 @@ export function MoveLabwareOnDeck(
       ? finalCoordinates
       : offDeckCoordinates
 
+  // The user can't see the splash animation if it happens off-deck.
+  // Skip it so there's no pause where it looks like nothing is happening.
+  const shouldAnimateSplashBeforeMove =
+    animationInitialCoordinates !== offDeckCoordinates
+  const shouldAnimateSplashAfterMove =
+    animationFinalCoordinates !== offDeckCoordinates
+
   const shouldReset = usePositionChangeReset(
     animationInitialCoordinates,
     animationFinalCoordinates
@@ -127,11 +134,13 @@ export function MoveLabwareOnDeck(
       },
       to: [
         { deckOpacity: 1 },
-        { splashOpacity: 1 },
-        { splashOpacity: 0 },
+        ...(shouldAnimateSplashBeforeMove
+          ? [{ splashOpacity: 1 }, { splashOpacity: 0 }]
+          : []),
         { ...animationFinalCoordinates },
-        { splashOpacity: 1 },
-        { splashOpacity: 0 },
+        ...(shouldAnimateSplashAfterMove
+          ? [{ splashOpacity: 1 }, { splashOpacity: 0 }]
+          : []),
         { deckOpacity: 0 },
       ],
       loop: true,
@@ -144,6 +153,8 @@ export function MoveLabwareOnDeck(
       // updates and not updates to the actual x/y/z components.
       ...Object.values(animationInitialCoordinates),
       ...Object.values(animationFinalCoordinates),
+      shouldAnimateSplashBeforeMove,
+      shouldAnimateSplashAfterMove,
     ]
   )
 
