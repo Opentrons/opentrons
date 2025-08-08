@@ -177,35 +177,50 @@ export function useGetModulesNeedingSetupThatCanCurrentlyBeSetUp(): AttachedModu
 }
 
 export function useModuleAttachedToast(
-  launchModuleSetupCallback: () => void
+  launchModuleSetupCallback: (open: boolean) => void
 ): void {
   const currentlySetuppableModules = useGetModulesNeedingSetupThatCanCurrentlyBeSetUp()
 
   const currentRunId = useCurrentRunId({ refetchInterval: CURRENT_RUN_POLL })
   const { t, i18n } = useTranslation(['module_wizard_flows', 'shared'])
-  const { makeToast } = useToaster()
+  const { makeToast, eatToast } = useToaster()
   const moduleSerials = currentlySetuppableModules.map(m => m.serialNumber)
   const moduleSerialsRef = useRef(moduleSerials)
   const runInProgress = currentRunId != null
+  const [toastID, setToastID] = useState<string>('')
 
   const [firstRun, setFirstRun] = useState<boolean>(true)
 
   useEffect(() => {
     const newModuleSerials = difference(moduleSerials, moduleSerialsRef.current)
     if (!runInProgress && newModuleSerials.length > 0) {
-      makeToast(t('module_added') as string, 'info', {
-        buttonText: i18n.format(t('shared:close'), 'capitalize'),
-        linkText: t('module_added_link'),
-        onLinkClick: launchModuleSetupCallback,
-        disableTimeout: true,
-        displayType: 'odd',
-      })
+      setToastID(
+          makeToast(t('module_added') as string, 'info', {
+            buttonText: i18n.format(t('shared:close'), 'capitalize'),
+            linkText: t('module_added_link'),
+            onLinkClick: () => {
+              launchModuleSetupCallback(true)
+            },
+            disableTimeout: true,
+            displayType: 'odd',
+          })
+      )
     }
+
     moduleSerialsRef.current = moduleSerials
     setFirstRun(false)
     // dont want this hook to rerun when other deps change
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [moduleSerials, runInProgress, firstRun])
+
+  useEffect(() => {
+    // Close toast if there are no new modules to setup
+    if (toastID && currentlySetuppableModules.length === 0) {
+      launchModuleSetupCallback(false)
+      eatToast(toastID)
+      setToastID('')
+    }
+  }, [toastID, currentlySetuppableModules])
 }
 
 export function useScrollRef(): {

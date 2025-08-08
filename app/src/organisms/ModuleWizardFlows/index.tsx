@@ -5,6 +5,7 @@ import { COLORS, LegacyStyledText } from '@opentrons/components'
 import { useModulesQuery } from '@opentrons/react-api-client'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
+import { useGetModulesNeedingSetupThatCanCurrentlyBeSetUp } from '/app/App/hooks'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
@@ -65,13 +66,6 @@ export function ModuleWizardFlows(
     deckConfig,
   } = useModuleSetupWizard({ closeFlow, attachedModuleOnLaunch, onComplete })
 
-  // build out flow if there is a module passed in at launch
-  useEffect(() => {
-    if (attachedModuleOnLaunch != null) {
-      buildFlowForSelectedModule(attachedModuleOnLaunch)
-    }
-  }, [])
-
   const sendIdentifyStacker = useSendIdentifyStacker()
   const [selectedModule, setSelectedModule] = useState<AttachedModule | null>(
     null
@@ -86,6 +80,21 @@ export function ModuleWizardFlows(
       refetchInterval: EQUIPMENT_POLL_MS,
       enabled: wizardFlowBaseProps.attachedModule != null,
     })?.data?.data ?? []
+
+  // build out flow if there is a module passed in at launch
+  useEffect(() => {
+    if (attachedModuleOnLaunch != null) {
+      buildFlowForSelectedModule(attachedModuleOnLaunch)
+    }
+  }, [])
+
+  // Close the modal if no new modules are attached
+  const newModules = useGetModulesNeedingSetupThatCanCurrentlyBeSetUp()
+  useEffect(() => {
+    if (newModules.length === 0 && wizardFlowBaseProps.attachedModule == null) {
+      handleCleanUpAndClose()
+    }
+  }, [newModules, wizardFlowBaseProps])
 
   const doorStatus = useIsDoorOpen(robotName).isDoorOpen
 
