@@ -1,3 +1,7 @@
+---
+title: "Opentrons Flex Instruction Manual"
+---
+
 <style>
 .md-content__inner {
   text-align: center;
