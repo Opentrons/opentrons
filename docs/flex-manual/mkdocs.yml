@@ -36,7 +36,13 @@ nav:
       - Labware Types: labware/types.md
       - Using the Gripper: labware/gripper.md
       - Labware Definitions: labware/definitions.md
-  - Protocol Development: protocol-development.md
+  - Protocol Development: 
+      - Protocols Home: protocols/index.md
+      - Protocol Library: protocols/library.md
+      - Custom Protocol Service: protocols/development-service.md
+      - Protocol Designer: protocols/designer.md
+      - Python API: protocols/python-api.md
+      - Converting OT-2 Protocols: protocols/ot-2.md
   - Software and Operation: software-operation.md
   - Maintenance and Service: maintenance-service.md
   - Appendices:
