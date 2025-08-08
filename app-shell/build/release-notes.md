@@ -8,6 +8,12 @@ By installing and using Opentrons software, you agree to the Opentrons End-User 
 
 ---
 
+## Opentrons App Changes in 8.6.0
+
+### TODO
+
+---
+
 ## Opentrons App Changes in 8.5.1
 
 Welcome to the v8.5.1 release of the Opentrons App!
