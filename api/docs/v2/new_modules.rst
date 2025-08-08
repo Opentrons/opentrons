@@ -8,6 +8,7 @@ Hardware Modules
 
 .. toctree::
     modules/setup
+    modules/stacker
     modules/absorbance_plate_reader
     modules/heater_shaker
     modules/magnetic_block
