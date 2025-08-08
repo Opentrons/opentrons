@@ -24,6 +24,7 @@ export interface ModalContentOneColSimpleButtonsProps {
   buttons: ButtonProps[]
   onSelect?: ChangeEventHandler<HTMLInputElement>
   initialSelected?: string
+  subText?: string
 }
 
 export function ModalContentOneColSimpleButtons(
@@ -56,6 +57,15 @@ export function ModalContentOneColSimpleButtons(
               }}
             />
           ))}
+          {props.subText != null ? (
+            <LegacyStyledText
+              fontSize={TYPOGRAPHY.fontSize22}
+              fontWeight={TYPOGRAPHY.fontWeightRegular}
+              lineHeight={TYPOGRAPHY.lineHeight28}
+            >
+              {props.subText}
+            </LegacyStyledText>
+          ) : null}
         </Flex>
       </Flex>
     </OneColumn>
