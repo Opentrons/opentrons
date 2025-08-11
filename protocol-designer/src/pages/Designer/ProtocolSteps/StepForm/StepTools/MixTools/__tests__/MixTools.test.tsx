@@ -11,7 +11,7 @@ import { MixTools } from '..'
 import { renderWithProviders } from '../../../../../../../__testing-utils__'
 import {
   getEnablePartialTipSupport,
-  getEnableReturnTip,
+  getEnableTipPickupLocation,
 } from '../../../../../../../feature-flags/selectors'
 import { getRobotType } from '../../../../../../../file-data/selectors'
 import {
@@ -75,7 +75,7 @@ describe('MixToolFirstStep', () => {
         pythonName: 'mockPythonName',
       },
     })
-    vi.mocked(getEnableReturnTip).mockReturnValue(false)
+    vi.mocked(getEnableTipPickupLocation).mockReturnValue(false)
     vi.mocked(getEnablePartialTipSupport).mockReturnValue(false)
     vi.mocked(getFormErrorsMappedToField).mockReturnValue({})
     vi.mocked(FirstStepMixTools).mockReturnValue(
