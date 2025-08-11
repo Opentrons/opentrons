@@ -43,7 +43,7 @@ export function ReleaseLabware({
       case STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
         void handleMotionRouting(
           true,
-          RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE
+          RECOVERY_MAP.STACKER_RELEASING_LABWARE_LATCH.ROUTE
         )
         break
       default:

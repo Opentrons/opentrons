@@ -34,8 +34,8 @@ interface InitialSummaryStateProps {
     pushOutDispense?: {
       volume: number
     }
-    dropTipLocation?: CutoutConfig
     changeTip: ChangeTipOptions
+    dropTipLocation?: CutoutConfig
   }
   deckConfig: DeckConfiguration
 }
@@ -103,8 +103,8 @@ export function getInitialSummaryState(
     tipPositionAspirate: 1,
     preWetTip: false,
     tipPositionDispense: 1,
-    dropTipLocation: state.dropTipLocation ?? trashConfigCutout,
     changeTip: state.changeTip,
+    dropTipLocation: state.dropTipLocation ?? trashConfigCutout,
     liquidClassName: state.liquidClassName,
     liquidClassValuesInitialized: false,
     pushOutDispense: state.pushOutDispense,

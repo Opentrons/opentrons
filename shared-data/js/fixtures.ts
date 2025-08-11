@@ -1165,6 +1165,31 @@ export const getMainUsbModuleFixtureIdForComboFixture = (
   )
 }
 
+export const getMainFixtureIdForAA = (
+  compatibleCutoutFixtureIds: CutoutFixtureId[],
+  addressableAreaIds: AddressableAreaName[],
+  cutoutId: CutoutId
+): CutoutFixtureId | null => {
+  if (addressableAreaIds.length === 1) {
+    return getMainNonComboFixtureId(
+      compatibleCutoutFixtureIds,
+      addressableAreaIds,
+      cutoutId
+    )
+  }
+
+  const deckDef = getDeckDefFromRobotType('OT-3 Standard')
+  const cutoutFixtures = deckDef.cutoutFixtures.filter(cf =>
+    compatibleCutoutFixtureIds.includes(cf.id)
+  )
+  const cutoutFixturesWithAddressableAreas = cutoutFixtures.find(cf =>
+    Object.values(cf.providesAddressableAreas).some(providedAAs =>
+      addressableAreaIds.every(aa => providedAAs.includes(aa))
+    )
+  )
+  return cutoutFixturesWithAddressableAreas?.id ?? null
+}
+
 export const getMainNonComboFixtureId = (
   compatibleCutoutFixtureIds: CutoutFixtureId[],
   addressableAreaIds: AddressableAreaName[],

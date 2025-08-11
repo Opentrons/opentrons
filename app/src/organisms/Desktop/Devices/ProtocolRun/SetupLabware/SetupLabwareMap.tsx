@@ -53,6 +53,11 @@ export function SetupLabwareMap({
     stack: StackItem[]
   } | null>(null)
   const [hoverLabwareId, setHoverLabwareId] = useState<string | null>(null)
+
+  const deckConfig = useMemo(() => {
+    return getSimplestDeckConfigForProtocol(protocolAnalysis)
+  }, [protocolAnalysis])
+
   const startingDeck = useMemo(
     () =>
       getStackedItemsOnStartingDeck(
@@ -162,9 +167,6 @@ export function SetupLabwareMap({
       }
     }
   )
-
-  const deckConfig = getSimplestDeckConfigForProtocol(protocolAnalysis)
-
   const labwareOnDeck: Array<LabwareOnDeck | null> = Object.entries(
     getLabwareOnDeck(startingDeck)
   ).map(([slotName, stackedItems]) => {
