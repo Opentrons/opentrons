@@ -1,7 +1,6 @@
 site_name: Opentrons Documentation
 
 docs_dir: ./shared
-custom_dir: ./shared
 
 nav:
   - Opentrons Flex: '!include flex/mkdocs.yml'
@@ -31,6 +30,7 @@ theme:
   icon:
     admonition:
       tip: material/lightbulb-on-outline
+  custom_dir: ./shared
 
 markdown_extensions:
   - admonition

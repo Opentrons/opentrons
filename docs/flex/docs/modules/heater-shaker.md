@@ -4,7 +4,7 @@ title: "Opentrons Flex: Heater-Shaker Module"
 
 # Heater-Shaker Module GEN1
 
-![The Heater-Shaker module as seen from the front left. The top of the module has the heating and shaking platform and labware latch. The left side of the module has the power button, USB port, and power port.](../../images/heater-shaker-module.png "Heater-Shaker Module")
+![The Heater-Shaker module as seen from the front left. The top of the module has the heating and shaking platform and labware latch. The left side of the module has the power button, USB port, and power port.](../images/heater-shaker-module.png "Heater-Shaker Module")
 
 !!! info "Additional Documentation"
     For complete instructions on module installation and use, see the Heater-Shaker Module Instruction Manual.
@@ -44,22 +44,22 @@ A compatible thermal adapter is required for adding labware to the Heater-Shaker
 
 <div class="parts-list" markdown>
 <figure markdown>
-![Adapter with flat plate and prongs on one side to press against the labware latch.](../../images/heater-shaker-adapter-universal.png "Heater-Shaker Universal Flat Adapter")
+![Adapter with flat plate and prongs on one side to press against the labware latch.](../images/heater-shaker-adapter-universal.png "Heater-Shaker Universal Flat Adapter")
 <figcaption>Universal Flat Adapter </figcaption>
 </figure>
 
 <figure markdown>
-![Adapter with indentations to hold 96-well PCR plates.](../../images/heater-shaker-adapter-pcr.png "Heater-Shaker PCR Adapter")
+![Adapter with indentations to hold 96-well PCR plates.](../images/heater-shaker-adapter-pcr.png "Heater-Shaker PCR Adapter")
 <figcaption>PCR Adapter</figcaption>
 </figure>
 
 <figure markdown>
-![Adapter with raised sides for deep well plates.](../../images/heater-shaker-adapter-deep-well.png "Heater-Shaker Deep Well Adapter")
+![Adapter with raised sides for deep well plates.](../images/heater-shaker-adapter-deep-well.png "Heater-Shaker Deep Well Adapter")
 <figcaption>Deep Well Adapter</figcaption>
 </figure>
 
 <figure markdown>
-![Adapter with flat bottom and sides to fit 96-well plates with circular wells.](../../images/heater-shaker-adapter-flat-bottom.png "Heater-Shaker 96 Flat Bottom Adapter")
+![Adapter with flat bottom and sides to fit 96-well plates with circular wells.](../images/heater-shaker-adapter-flat-bottom.png "Heater-Shaker 96 Flat Bottom Adapter")
 <figcaption>96 Flat Bottom Adapter</figcaption>
 </figure>
 </div>
