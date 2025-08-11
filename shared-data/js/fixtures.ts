@@ -11,6 +11,7 @@ import {
   FLEX_STACKER_FIXTURES,
   FLEX_STAGING_ADDRESSABLE_AREAS_WITH_FAKES,
   FLEX_USB_MODULE_FIXTURES,
+  THERMOCYCLER_MODULE_CUTOUTS,
   WASTE_CHUTE_FIXTURES,
   WASTE_CHUTE_WITH_FAKE_FIXTURES,
 } from '.'
@@ -500,6 +501,17 @@ export const replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA = (
           cutoutFixtureId: cutoutFixtureReplacment,
         })
       }
+    } else if (obj.cutoutFixtureId === ABSORBANCE_READER_V1_FIXTURE) {
+      const absorbanceReaderAA = aaPerCutoutFixture?.find(
+        aa => getAAByAAId(aa, deckDef).areaType === 'absorbanceReader'
+      )
+      if (absorbanceReaderAA != null) {
+        acc.push({
+          ...obj,
+          addressableAreaId: absorbanceReaderAA,
+          cutoutFixtureId: cutoutFixtureReplacment,
+        })
+      }
     } else {
       aaPerCutoutFixture?.forEach(item => {
         acc.push({
@@ -744,82 +756,111 @@ export function getAAComboFixtureDisplayName(
 
 // note: we've decided not to translate these strings
 export function getFixtureDisplayName(
+  t: TFunction,
   cutoutFixtureId: CutoutFixtureIdsWithFakes | null,
   usbPortNumber?: string | null
 ): string {
+  const translationFileName = 'deck_configuration'
+
   switch (cutoutFixtureId) {
     case STAGING_AREA_RIGHT_SLOT_FIXTURE:
-      return 'Staging area slot'
+      return t(`${translationFileName}:staging_area_slot_title`)
     case FAKE_STAGING_AREA_RIGHT_SLOT:
-      return 'Fake Staging area slot'
+      return 'Fake Staging Area Slot'
     case TRASH_BIN_ADAPTER_FIXTURE:
-      return 'Trash bin'
+      return t(`${translationFileName}:trash_bin`)
     case WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE:
-      return 'Waste chute'
+      return t(`${translationFileName}:waste_chute`)
     case WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE:
-      return 'Waste chute with cover'
+      return t(`${translationFileName}:waste_chute_with_cover`)
     case STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE:
-      return 'Waste chute with staging area slot'
+      return t(`${translationFileName}:waste_chute_with_staging_area_slot`)
     case STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE:
-      return 'Waste chute with staging area slot and cover'
+      return t(
+        `${translationFileName}:waste_chute_with_staging_area_slot_and_cover`
+      )
     case HEATERSHAKER_MODULE_V1_FIXTURE:
       return usbPortNumber != null
-        ? `${getModuleDisplayName(HEATERSHAKER_MODULE_V1)} in ${usbPortNumber}`
+        ? t(`${translationFileName}:module_in_port`, {
+            moduleName: getModuleDisplayName(HEATERSHAKER_MODULE_V1),
+            usbPortNumber,
+          })
         : getModuleDisplayName(HEATERSHAKER_MODULE_V1)
     case TEMPERATURE_MODULE_V2_FIXTURE:
       return usbPortNumber != null
-        ? `${getModuleDisplayName(TEMPERATURE_MODULE_V2)} in ${usbPortNumber}`
+        ? t(`${translationFileName}:module_in_port`, {
+            moduleName: getModuleDisplayName(TEMPERATURE_MODULE_V2),
+            usbPortNumber,
+          })
         : getModuleDisplayName(TEMPERATURE_MODULE_V2)
     case MAGNETIC_BLOCK_V1_FIXTURE:
     case FAKE_STAGING_SLOT_WITH_MAG_BLOCK:
       return `${getModuleDisplayName(MAGNETIC_BLOCK_V1)}`
     case STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE:
-      return `${getModuleDisplayName(MAGNETIC_BLOCK_V1)} with staging area slot`
+      return t(`${translationFileName}:module_with_staging_area`, {
+        moduleName: getModuleDisplayName(MAGNETIC_BLOCK_V1),
+      })
+    case THERMOCYCLER_V2_FRONT_FIXTURE:
     case THERMOCYCLER_V2_REAR_FIXTURE:
       return usbPortNumber != null
-        ? `${getModuleDisplayName(THERMOCYCLER_MODULE_V2)} in ${usbPortNumber}`
-        : getModuleDisplayName(THERMOCYCLER_MODULE_V2)
-    case THERMOCYCLER_V2_FRONT_FIXTURE:
-      return usbPortNumber != null
-        ? `${getModuleDisplayName(THERMOCYCLER_MODULE_V2)} in ${usbPortNumber}`
+        ? t(`${translationFileName}:module_in_port`, {
+            moduleName: getModuleDisplayName(THERMOCYCLER_MODULE_V2),
+            usbPortNumber,
+          })
         : getModuleDisplayName(THERMOCYCLER_MODULE_V2)
     case ABSORBANCE_READER_V1_FIXTURE:
       return usbPortNumber != null
-        ? `${getModuleDisplayName(ABSORBANCE_READER_V1)} in ${usbPortNumber}`
+        ? t(`${translationFileName}:module_in_port`, {
+            moduleName: getModuleDisplayName(ABSORBANCE_READER_V1),
+            usbPortNumber,
+          })
         : getModuleDisplayName(ABSORBANCE_READER_V1)
     case FLEX_STACKER_V1_FIXTURE:
       return usbPortNumber != null
-        ? `${getModuleDisplayName(FLEX_STACKER_MODULE_V1)} in ${usbPortNumber}`
+        ? t(`${translationFileName}:module_in_port`, {
+            moduleName: getModuleDisplayName(FLEX_STACKER_MODULE_V1),
+            usbPortNumber,
+          })
         : getModuleDisplayName(FLEX_STACKER_MODULE_V1)
     case FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE:
       return usbPortNumber != null
-        ? `${getModuleDisplayName(
-            FLEX_STACKER_MODULE_V1
-          )} in ${usbPortNumber} and waste chute with cover`
-        : `${getModuleDisplayName(
-            FLEX_STACKER_MODULE_V1
-          )} and waste chute with cover`
+        ? t(
+            `${translationFileName}:module_in_port_and_waste_chute_with_cover`,
+            {
+              moduleName: getModuleDisplayName(FLEX_STACKER_MODULE_V1),
+              usbPortNumber,
+            }
+          )
+        : t(`${translationFileName}:module_with_waste_chute_and_cover`, {
+            moduleName: getModuleDisplayName(FLEX_STACKER_MODULE_V1),
+          })
     case FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE:
       return usbPortNumber != null
-        ? `${getModuleDisplayName(
-            FLEX_STACKER_MODULE_V1
-          )} in ${usbPortNumber} and waste chute`
-        : `${getModuleDisplayName(FLEX_STACKER_MODULE_V1)} and waste chute`
+        ? t(`${translationFileName}:module_in_port_and_waste_chute`, {
+            moduleName: getModuleDisplayName(FLEX_STACKER_MODULE_V1),
+            usbPortNumber,
+          })
+        : t(`${translationFileName}:module_with_waste_chute`, {
+            moduleName: getModuleDisplayName(FLEX_STACKER_MODULE_V1),
+          })
     case FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE:
       return usbPortNumber != null
-        ? `${getModuleDisplayName(
-            FLEX_STACKER_MODULE_V1
-          )} in ${usbPortNumber} and magnetic block`
-        : `${getModuleDisplayName(FLEX_STACKER_MODULE_V1)} and magnetic block`
+        ? t(`${translationFileName}:module_in_port_and_magnetic_block`, {
+            moduleName: getModuleDisplayName(FLEX_STACKER_MODULE_V1),
+            usbPortNumber,
+          })
+        : t(`${translationFileName}:module_with_mag_block`, {
+            moduleName: getModuleDisplayName(FLEX_STACKER_MODULE_V1),
+          })
     case SINGLE_CENTER_SLOT_FIXTURE:
-      return 'Center slot'
+      return t(`${translationFileName}:center_slot`)
     case SINGLE_RIGHT_SLOT_FIXTURE:
-      return 'Right slot'
+      return t(`${translationFileName}:right_slot`)
     case SINGLE_LEFT_SLOT_FIXTURE:
-      return 'Left slot'
+      return t(`${translationFileName}:left_slot`)
     default:
       console.error('was not able to find display name for: ', cutoutFixtureId)
-      return 'Slot'
+      return t(`${translationFileName}:slot`)
   }
 }
 
@@ -909,6 +950,7 @@ export const VS_TO_AA: Record<VISUAL_SLOTS, AddressableAreaNamesWithFakes[]> = {
     'temperatureModuleV2A3',
     'heaterShakerV1A3',
     'movableTrashA3',
+    'absorbanceReaderV1A3',
   ],
   VSB3: [
     'B3',
@@ -916,6 +958,7 @@ export const VS_TO_AA: Record<VISUAL_SLOTS, AddressableAreaNamesWithFakes[]> = {
     'temperatureModuleV2B3',
     'heaterShakerV1B3',
     'movableTrashB3',
+    'absorbanceReaderV1B3',
   ],
   VSC3: [
     'C3',
@@ -923,6 +966,7 @@ export const VS_TO_AA: Record<VISUAL_SLOTS, AddressableAreaNamesWithFakes[]> = {
     'temperatureModuleV2C3',
     'heaterShakerV1C3',
     'movableTrashC3',
+    'absorbanceReaderV1C3',
   ],
   VSD3: [
     'D3',
@@ -934,11 +978,32 @@ export const VS_TO_AA: Record<VISUAL_SLOTS, AddressableAreaNamesWithFakes[]> = {
     '1ChannelWasteChute',
     '8ChannelWasteChute',
     'gripperWasteChute',
+    'absorbanceReaderV1D3',
   ],
-  VSA4: ['fakeA4', 'A4', 'flexStackerModuleV1A4'],
-  VSB4: ['fakeB4', 'B4', 'flexStackerModuleV1B4'],
-  VSC4: ['fakeC4', 'C4', 'flexStackerModuleV1C4'],
-  VSD4: ['fakeD4', 'D4', 'flexStackerModuleV1D4'],
+  VSA4: [
+    'fakeA4',
+    'A4',
+    'flexStackerModuleV1A4',
+    'absorbanceReaderV1LidDockA4',
+  ],
+  VSB4: [
+    'fakeB4',
+    'B4',
+    'flexStackerModuleV1B4',
+    'absorbanceReaderV1LidDockB4',
+  ],
+  VSC4: [
+    'fakeC4',
+    'C4',
+    'flexStackerModuleV1C4',
+    'absorbanceReaderV1LidDockC4',
+  ],
+  VSD4: [
+    'fakeD4',
+    'D4',
+    'flexStackerModuleV1D4',
+    'absorbanceReaderV1LidDockD4',
+  ],
 }
 
 export const getVisualSlotIdFromAAId = (
@@ -1153,6 +1218,9 @@ export const isModuleAllowedOnAA = (
   aa: AddressableAreaNamesWithFakes,
   moduleModel: ModuleModel
 ): boolean => {
+  if (moduleModel === THERMOCYCLER_MODULE_V2) {
+    return THERMOCYCLER_MODULE_CUTOUTS.includes(cutoutId)
+  }
   const fixtureId = getCutoutFixtureIdsForModuleModel(moduleModel)
   const aaForFixture = getAAWithFakesFromCutoutFixtureId(
     cutoutId,
@@ -1224,6 +1292,14 @@ export const replaceCutoutFixtureWithComboFixture = (
   return addedCutoutConfigs.map(aaCutoutItem => {
     console.log('Processing cutout item:', aaCutoutItem)
 
+    if (
+      THERMOCYCLER_MODULE_CUTOUTS.includes(cutoutId) &&
+      MODULE_FIXTURES_BY_MODEL.thermocyclerModuleV2?.includes(
+        aaCutoutItem.cutoutFixtureId as CutoutFixtureId
+      )
+    ) {
+      return { ...aaCutoutItem }
+    }
     // Filter potential combo fixture options
     const comboFixturesOptions = Object.entries(
       addressableAreasById
@@ -1297,6 +1373,8 @@ export const replaceCutoutFixtureRemove = (
     } else {
       return WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
     }
+  } else if (cutoutFixtureRemoved === ABSORBANCE_READER_V1_FIXTURE) {
+    return SINGLE_RIGHT_SLOT_FIXTURE
   } else {
     const updated = aaForCutoutAndFixture?.map(aa => {
       const vsId = getVisualSlotIdForAA(cutoutId, cutoutFixtureRemoved, aa)

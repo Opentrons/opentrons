@@ -185,6 +185,7 @@ export function handleRecoveryOptionAction<T>(
     case RECOVERY_MAP.STACKER_HOPPER_EMPTY_RETRY.ROUTE:
     case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
     case RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.ROUTE:
+    case RECOVERY_MAP.STACKER_HOPPER_OR_SHUTTLE_EMPTY.ROUTE:
       return currentStepReturnVal
     default: {
       console.error('Unhandled recovery toast case. Handle explicitly.')

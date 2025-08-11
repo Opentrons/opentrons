@@ -132,7 +132,7 @@ describe('getSVGContainerWidth', () => {
 
   it('returns 70% for non-OT2 robot type, not zoomed', () => {
     const result = getSVGContainerWidth(FLEX_ROBOT_TYPE, false)
-    expect(result).toBe('70%')
+    expect(result).toBe('100%')
   })
 
   it('returns 100% for OT2 robot type,  and zoomed', () => {

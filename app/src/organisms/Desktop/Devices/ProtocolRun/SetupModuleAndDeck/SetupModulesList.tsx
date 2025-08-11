@@ -62,6 +62,7 @@ import { OT2MultipleModulesHelp } from './OT2MultipleModulesHelp'
 import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
 import { getFixtureImage } from './utils'
 
+import type { TFunction } from 'i18next'
 import type { CommandData } from '@opentrons/api-client'
 import type {
   CutoutFixtureId,
@@ -228,7 +229,11 @@ export function ModulesListItem({
   robotName,
   comboFixtureId,
 }: ModulesListItemProps): JSX.Element {
-  const { t } = useTranslation(['protocol_setup', 'module_wizard_flows'])
+  const { t } = useTranslation([
+    'protocol_setup',
+    'module_wizard_flows',
+    'deck_configuration',
+  ])
   const moduleConnectionStatus =
     attachedModuleMatch != null
       ? t('module_connected')
@@ -453,7 +458,7 @@ export function ModulesListItem({
                 marginLeft={SPACING.spacing20}
               >
                 {comboFixtureId != null
-                  ? getFixtureDisplayName(comboFixtureId)
+                  ? getFixtureDisplayName(t as TFunction, comboFixtureId)
                   : displayName}
               </LegacyStyledText>
               {subText}

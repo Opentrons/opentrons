@@ -11,6 +11,7 @@ import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import {
   getEnablePartialTipSupport,
   getEnableReturnTip,
+  getEnableTipPickupLocation,
 } from '/protocol-designer/feature-flags/selectors'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
 import {
@@ -76,7 +77,7 @@ describe('MixToolFirstStep', () => {
         pythonName: 'mockPythonName',
       },
     })
-    vi.mocked(getEnableReturnTip).mockReturnValue(false)
+    vi.mocked(getEnableTipPickupLocation).mockReturnValue(false)
     vi.mocked(getEnablePartialTipSupport).mockReturnValue(false)
     vi.mocked(getFormErrorsMappedToField).mockReturnValue({})
     vi.mocked(FirstStepMixTools).mockReturnValue(

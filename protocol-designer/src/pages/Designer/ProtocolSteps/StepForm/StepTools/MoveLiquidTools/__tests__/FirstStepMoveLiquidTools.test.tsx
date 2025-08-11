@@ -7,7 +7,10 @@ import formDataForSingleStep from '/protocol-designer/__fixtures__/formDataForSi
 import propsForFieldsForSingleStep from '/protocol-designer/__fixtures__/propsForFieldsForSingleStep.json'
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
-import { getEnableReturnTip } from '/protocol-designer/feature-flags/selectors'
+import {
+  getEnableReturnTip,
+  getEnableTipPickupLocation,
+} from '/protocol-designer/feature-flags/selectors'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
@@ -87,7 +90,7 @@ describe('FirstStepMoveLiquidTools', () => {
     vi.mocked(TipWellSelectionField).mockReturnValue(
       <div>mock TipWellSelectionField</div>
     )
-    vi.mocked(getEnableReturnTip).mockReturnValue(false)
+    vi.mocked(getEnableTipPickupLocation).mockReturnValue(false)
   })
 
   it('renders fields', () => {
@@ -103,7 +106,7 @@ describe('FirstStepMoveLiquidTools', () => {
   })
 
   it('renders fields when feature flag is enabled', () => {
-    vi.mocked(getEnableReturnTip).mockReturnValue(true)
+    vi.mocked(getEnableTipPickupLocation).mockReturnValue(true)
     render(props)
     screen.getByText('mock PickUpTipField')
   })

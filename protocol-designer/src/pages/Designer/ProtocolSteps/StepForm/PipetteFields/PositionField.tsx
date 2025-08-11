@@ -109,8 +109,8 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
 
   const handleOpen = (has3Specs: boolean): void => {
     if (
-      wellDepthMm != null &&
-      (has3Specs ? wellXWidthMm != null && wellYWidthMm != null : true)
+      (has3Specs && wellDepthMm && wellXWidthMm && wellYWidthMm) ||
+      (!has3Specs && wellDepthMm)
     ) {
       setIsModalOpen(true)
     }
