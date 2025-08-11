@@ -81,7 +81,10 @@ export function getSimplestDeckConfigForProtocol(
       cutoutFixturesForCutoutId != null &&
       cutoutIdForAddressableArea != null
     ) {
-      // finds what index in out accumulated deck config object that cutout is at
+      // finds what index in our acc that the `existingCutoutConfig` is at so that
+      // we know which item to swap out with a new CutoutConfig that provides the previously
+      // and newly found addressable areas
+      
       // so that we can see if we've already added a fixture for a different
       // addressable area located at the same cutout. this would mean we need to change it
       // to be a combination fixture
