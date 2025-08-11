@@ -31,7 +31,7 @@ interface FirstStepMixToolsProps {
   formData: FormData
   enablePartialTip: boolean
   pipettes: PipetteEntities
-  enableReturnTip: boolean
+  enableTipPickupLocation: boolean
   userSelectedPickUpTipLocation: boolean
   userSelectedDropTipLocation: boolean
 }
@@ -41,7 +41,7 @@ export function FirstStepMixTools({
   formData,
   enablePartialTip,
   pipettes,
-  enableReturnTip,
+  enableTipPickupLocation,
   userSelectedPickUpTipLocation,
   userSelectedDropTipLocation,
 }: FirstStepMixToolsProps): JSX.Element {
@@ -119,7 +119,7 @@ export function FirstStepMixTools({
           padding="0"
         />
       </Flex>
-      {enableReturnTip ? (
+      {enableTipPickupLocation ? (
         <>
           <PickUpTipField {...propsForFields.pickUpTip_location} />
           {userSelectedPickUpTipLocation ? (
@@ -139,7 +139,7 @@ export function FirstStepMixTools({
           ) : null}
         </>
       ) : null}
-      {userSelectedDropTipLocation && enableReturnTip ? (
+      {userSelectedDropTipLocation && enableTipPickupLocation ? (
         <>
           <Divider marginY="0" />
           <TipWellSelectionField
