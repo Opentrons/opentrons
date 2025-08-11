@@ -11,6 +11,7 @@ nav:
       - HEPA/UV Module: '!include hepa-uv/mkdocs.yml'
       - Thermocycler Module: '!include thermocycler-manual/mkdocs.yml'
       - Heater-Shaker Module: '!include heater-shaker/mkdocs.yml'
+  - Protocol Designer: '!include protocol-designer/mkdocs.yml'
   - Python API: https://docs.opentrons.com/v2/
 
 plugins:
@@ -55,3 +56,5 @@ markdown_extensions:
 extra_css:
   - opentrons-theme.css
   - instruction-manuals.css
+
+copyright: '© Opentrons 2025. All rights reserved. <br /> Trademarks: Opentrons®, Opentrons drop logo (Opentrons Labworks, Inc.). <br /> Registered names, trademarks, etc. used in this document, even when not specifically marked as such, are not to be considered unprotected by law.'

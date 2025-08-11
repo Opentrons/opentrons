@@ -337,23 +337,24 @@ class ProtocolContext(CommandPublisher):
         if self._unsubscribe_commands:
             self._unsubscribe_commands()
 
-        def on_command(message: cmd_types.CommandMessage) -> None:
-            payload = message.get("payload")
-
-            if payload is None:
-                return
-
-            text = payload.get("text")
-
-            if text is None:
-                return
-
-            if message["$"] == "before":
-                self._commands.append(text)
-
         self._unsubscribe_commands = self.broker.subscribe(
-            cmd_types.COMMAND, on_command
+            cmd_types.COMMAND, self._on_command_callback
         )
+
+    def _on_command_callback(self, message: cmd_types.CommandMessage) -> None:
+        """Callback for command messages."""
+        payload = message.get("payload")
+
+        if payload is None:
+            return
+
+        text = payload.get("text")
+
+        if text is None:
+            return
+
+        if message["$"] == "before":
+            self._commands.append(text)
 
     @requires_version(2, 0)
     def is_simulating(self) -> bool:
@@ -1091,6 +1092,7 @@ class ProtocolContext(CommandPublisher):
             tip_racks=tip_racks,
             trash=trash,
             requested_as=instrument_name,
+            core_map=self._core_map,
         )
 
         self._instruments[checked_mount] = instrument

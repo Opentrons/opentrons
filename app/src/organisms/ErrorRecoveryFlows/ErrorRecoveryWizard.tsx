@@ -25,6 +25,7 @@ import {
   SkipStepSameTips,
   StackerHopperEmptyRetry,
   StackerHopperEmptySkip,
+  StackerSelectErrorFlow,
   StackerShuttleEmptyRetry,
   StackerShuttleEmptySkip,
   StackerShuttleMissing,
@@ -263,6 +264,9 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
   const buildStackerStalledSkip = (): JSX.Element => {
     return <StackerStalledSkip {...props} />
   }
+  const buildStackerSelectErrorFlow = (): JSX.Element => {
+    return <StackerSelectErrorFlow {...props} />
+  }
 
   switch (props.recoveryMap.route) {
     case RECOVERY_MAP.OPTION_SELECTION.ROUTE:
@@ -293,6 +297,8 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
       return buildManualMoveLwAndSkip()
     case RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE:
       return buildManualReplaceLwAndRetry()
+    case RECOVERY_MAP.STACKER_HOPPER_OR_SHUTTLE_EMPTY.ROUTE:
+      return buildStackerSelectErrorFlow()
     case RECOVERY_MAP.STACKER_HOPPER_EMPTY_RETRY.ROUTE:
       return buildStackerHopperEmptyRetry()
     case RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.ROUTE:
