@@ -172,12 +172,22 @@ class SlotFootprintAsParentFeature(TypedDict):
     springDirectionalForce: NotRequired[SpringDirectionalForce]
 
 
+class OpentronsFlexTipRackLidAsParentFeature(TypedDict):
+    matingZ: float
+
+
+class OpentronsFlexTipRackLidAsChildFeature(TypedDict):
+    matingZ: float
+
+
 class LocatingFeatures(TypedDict):
     """A dictionary of locating features."""
 
     slotFootprintAsChild: NotRequired[SlotFootprintAsChildFeature]
     slotFootprintAsParent: NotRequired[SlotFootprintAsParentFeature]
     springDirectionalForceAsParent: NotRequired[SpringDirectionalForce]
+    opentronsFlexTipRackLidAsParent: NotRequired[OpentronsFlexTipRackLidAsParentFeature]
+    opentronsFlexTipRackLidAsChild: NotRequired[OpentronsFlexTipRackLidAsChildFeature]
 
 
 class LabwareDefinition2(TypedDict):

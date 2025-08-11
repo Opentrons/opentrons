@@ -8,6 +8,7 @@ import { Dispense } from '../../Dispense'
 import { DispenseSettingDetail } from '../../Dispense/DispenseSettingDetail'
 import { DispenseSettingItem } from '../../Dispense/DispenseSettingItem'
 import { ResetAdvancedSettingsModal } from '../../QuickTransferAdvancedSettings/ResetAdvancedSettingsModal'
+import { getIsTouchTipEnabled } from '../../utils/getIsTouchTipEnabled'
 
 import type { ComponentProps } from 'react'
 
@@ -15,6 +16,7 @@ vi.mock('../../Dispense/DispenseSettingItem')
 vi.mock('../../Dispense/DispenseSettingDetail')
 vi.mock('../../Dispense/hooks/useAspirateSettingsConfig')
 vi.mock('../../QuickTransferAdvancedSettings/ResetAdvancedSettingsModal')
+vi.mock('../../utils/getIsTouchTipEnabled')
 
 const render = (props: ComponentProps<typeof Dispense>) => {
   return renderWithProviders(<Dispense {...props} />, {
@@ -95,6 +97,7 @@ describe('Dispense', () => {
     vi.mocked(ResetAdvancedSettingsModal).mockReturnValue(
       <div>mock ResetAdvancedSettingsModal</div>
     )
+    vi.mocked(getIsTouchTipEnabled).mockReturnValue(true)
   })
 
   it('renders mock components and reset button', () => {

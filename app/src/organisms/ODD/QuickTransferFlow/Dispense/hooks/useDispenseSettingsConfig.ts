@@ -9,6 +9,7 @@ import { SOURCE_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
 import { useToaster } from '/app/organisms/ToasterOven'
 
 import { DISPENSE_SETTING_OPTIONS as SETTING_OPTIONS } from '../../constants'
+import { getIsTouchTipEnabled } from '../../utils/getIsTouchTipEnabled'
 
 import type {
   DispenseSettingOption,
@@ -53,6 +54,8 @@ export function useDispenseSettingsConfig({
       return t('blow_out_into_waste_chute')
     }
   }
+
+  const touchTipEnabled = getIsTouchTipEnabled(state.destination)
 
   const dispenseSettingsItems = [
     {
@@ -202,15 +205,19 @@ export function useDispenseSettingsConfig({
       option: 'dispense_touch_tip',
       copy: t('touch_tip'),
       value:
-        state.touchTipDispense !== undefined
+        state.touchTipDispense !== undefined && touchTipEnabled
           ? t('touch_tip_value', {
               speed: state.touchTipDispenseSpeed,
               position: state.touchTipDispense,
             })
           : t('option_disabled'),
-      enabled: true,
+      enabled: touchTipEnabled,
       onClick: () => {
-        setSelectedSetting('dispense_touch_tip')
+        if (touchTipEnabled) {
+          setSelectedSetting('dispense_touch_tip')
+        } else {
+          makeSnackbar(t('dispense_setting_disabled') as string)
+        }
       },
     },
     {

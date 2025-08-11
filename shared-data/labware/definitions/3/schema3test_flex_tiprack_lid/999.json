@@ -27,16 +27,8 @@
     }
   },
   "features": {
-    "slotFootprintAsChild": {
-      "z": 0,
-      "backLeft": {
-        "x": 0,
-        "y": 0
-      },
-      "frontRight": {
-        "x": 127.7,
-        "y": -78.75
-      }
+    "opentronsFlexTipRackLidAsChild": {
+      "matingZ": 0
     }
   },
   "wells": {},
@@ -57,64 +49,7 @@
   "namespace": "opentrons",
   "version": 999,
   "schemaVersion": 3,
-  "stackingOffsetWithLabware": {
-    "default": {
-      "x": 0,
-      "y": 0,
-      "z": 14.25
-    },
-    "opentrons_flex_96_filtertiprack_50ul": {
-      "x": 0,
-      "y": 0,
-      "z": 14.25
-    },
-    "opentrons_flex_96_filtertiprack_200ul": {
-      "x": 0,
-      "y": 0,
-      "z": 14.25
-    },
-    "schema3test_flex_96_tiprack_200ul": {
-      "x": 0,
-      "y": 0,
-      "z": 14.25
-    },
-    "opentrons_flex_96_filtertiprack_1000ul": {
-      "x": 0,
-      "y": 0,
-      "z": 14.25
-    },
-    "opentrons_flex_96_tiprack_20ul": {
-      "x": 0,
-      "y": 0,
-      "z": 14.25
-    },
-    "opentrons_flex_96_tiprack_50ul": {
-      "x": 0,
-      "y": 0,
-      "z": 14.25
-    },
-    "opentrons_flex_96_tiprack_200ul": {
-      "x": 0,
-      "y": 0,
-      "z": 14.25
-    },
-    "opentrons_flex_96_tiprack_1000ul": {
-      "x": 0,
-      "y": 0,
-      "z": 14.25
-    }
-  },
   "stackLimit": 1,
-  "compatibleParentLabware": [
-    "opentrons_flex_96_tiprack_20ul",
-    "opentrons_flex_96_tiprack_50ul",
-    "opentrons_flex_96_tiprack_200ul",
-    "opentrons_flex_96_tiprack_1000ul",
-    "opentrons_flex_96_filtertiprack_50ul",
-    "opentrons_flex_96_filtertiprack_200ul",
-    "opentrons_flex_96_filtertiprack_1000ul",
-    "schema3test_flex_96_tiprack_200ul"
-  ],
   "gripForce": 10,
   "gripHeightFromLabwareOrigin": 10,
   "gripperOffsets": {

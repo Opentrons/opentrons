@@ -678,6 +678,28 @@
               "enum": ["backLeftBottom"]
             }
           }
+        },
+        "opentronsFlexTipRackLidAsParent": {
+          "description": "Allows placement of Flex tip rack lids on this labware.",
+          "type": "object",
+          "required": ["matingZ"],
+          "properties": {
+            "matingZ": {
+              "description": "Z-coordinate in the parent where the child makes contact. By convention, measured from the bottom of the labware.",
+              "type": "number"
+            }
+          }
+        },
+        "opentronsFlexTipRackLidAsChild": {
+          "description": "Designates this labware as a flex tip rack lid.",
+          "type": "object",
+          "required": ["matingZ"],
+          "properties": {
+            "matingZ": {
+              "description": "Z-coordinate in the child where it makes contact with the parent. By convention, measured from the bottom of the lid.",
+              "type": "number"
+            }
+          }
         }
       }
     },
