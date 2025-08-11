@@ -5,6 +5,7 @@ import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { DropdownStepFormField } from '/protocol-designer/components/molecules'
 import { getEnableStacking } from '/protocol-designer/feature-flags/selectors'
+import { getUnoccupiedStackOptions } from '/protocol-designer/pages/Designer/utils'
 import { getLabwareEntities } from '/protocol-designer/step-forms/selectors'
 import {
   getDeckSetupForActiveItem,
