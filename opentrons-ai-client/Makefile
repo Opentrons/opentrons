@@ -40,13 +40,13 @@ clean:
 .PHONY: build-production
 build-production: export NODE_ENV := production
 build-production:
-	vite build
+	pnpm exec vite build
 	git rev-parse HEAD > dist/.commit
 
 .PHONY: build-staging
 build-staging: export NODE_ENV := staging
 build-staging:
-	vite build
+	pnpm exec vite build
 	git rev-parse HEAD > dist/.commit
 
 # development
@@ -56,7 +56,7 @@ build-staging:
 dev: export NODE_ENV := development
 dev: export PORT := $(PORT)
 dev:
-	vite serve
+	pnpm exec vite serve
 
 # production assets server
 .PHONY: serve
