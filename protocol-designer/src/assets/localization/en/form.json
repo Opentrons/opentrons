@@ -170,7 +170,7 @@
         "title": "Condition"
       },
       "dropTip": {
-        "option": { "return": "Return to tip rack" }
+        "option": { "return": "Tip rack" }
       },
       "delay": {
         "label": "delay"
