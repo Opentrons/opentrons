@@ -311,6 +311,12 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
         ...
 
     @abstractmethod
+    def get_tip_origin(
+        self,
+    ) -> Optional[Tuple[LabwareCoreType, WellCoreType]]:
+        ...
+
+    @abstractmethod
     def _pressure_supported_by_pipette(self) -> bool:
         ...
 
@@ -372,8 +378,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
         trash_location: Union[types.Location, TrashBin, WasteChute],
         return_tip: bool,
         keep_last_tip: bool,
-        last_tip_location: Optional[Tuple[types.Location, WellCoreType]],
-    ) -> Optional[Tuple[types.Location, WellCoreType]]:
+    ) -> None:
         """Transfer a liquid from source to dest according to liquid class properties."""
         ...
 
@@ -390,8 +395,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
         trash_location: Union[types.Location, TrashBin, WasteChute],
         return_tip: bool,
         keep_last_tip: bool,
-        last_tip_location: Optional[Tuple[types.Location, WellCoreType]],
-    ) -> Optional[Tuple[types.Location, WellCoreType]]:
+    ) -> None:
         """
         Distribute a liquid from single source to multiple destinations
         according to liquid class properties.
@@ -411,8 +415,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
         trash_location: Union[types.Location, TrashBin, WasteChute],
         return_tip: bool,
         keep_last_tip: bool,
-        last_tip_location: Optional[Tuple[types.Location, WellCoreType]],
-    ) -> Optional[Tuple[types.Location, WellCoreType]]:
+    ) -> None:
         """
         Consolidate liquid from multiple sources to a single destination
         using the specified liquid class properties.

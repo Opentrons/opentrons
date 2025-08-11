@@ -1,17 +1,11 @@
 import { useTranslation } from 'react-i18next'
 
 import {
-  AlignLabwareToModule,
   COLORS,
   Flex,
   LabwareRender,
-  Module,
   MoveLabwareOnDeck,
 } from '@opentrons/components'
-import {
-  getDeckDefFromRobotType,
-  inferModuleOrientationFromXCoordinate,
-} from '@opentrons/shared-data'
 
 import { DeckMapContent, TwoColumn } from '/app/molecules/InterventionModal'
 
@@ -53,8 +47,6 @@ export function TwoColLwInfoAndDeck(
   const { proceedNextStep, goBackPrevStep } = routeUpdateActions
   const { failedPipetteInfo, isPartialTipConfigValid } = failedPipetteUtils
   const { t } = useTranslation('error_recovery')
-
-  const deckDef = getDeckDefFromRobotType(robotType)
 
   const {
     displayNameCurrentLoc: slot,
@@ -140,6 +132,16 @@ export function TwoColLwInfoAndDeck(
         const isValidDeck =
           currentLoc != null && newLoc != null && movedLabwareDef != null
 
+        const modulesOnDeck = moduleRenderInfo?.map(module => {
+          return {
+            moduleModel: module.moduleDef.model,
+            moduleLocation: { slotName: module.targetSlotId },
+            nestedLabwareDef:
+              module.nestedLabwareId !== failedLwId
+                ? module.nestedLabwareDef
+                : null,
+          }
+        })
         return isValidDeck ? (
           <MoveLabwareOnDeck
             deckFill={isOnDevice ? COLORS.grey35 : '#e6e6e6'}
@@ -148,47 +150,9 @@ export function TwoColLwInfoAndDeck(
             movedLabwareDef={movedLabwareDef}
             labwareDefinitions={allRunDefs}
             {...restUtils}
+            modulesOnDeck={modulesOnDeck}
             backgroundItems={
               <>
-                {moduleRenderInfo.map(
-                  ({
-                    x,
-                    y,
-                    moduleId,
-                    slotName,
-                    moduleDef,
-                    nestedLabwareDef,
-                    nestedLabwareId,
-                    targetDeckId,
-                    targetSlotId,
-                  }) => (
-                    <Module
-                      key={moduleId}
-                      def={moduleDef}
-                      x={x}
-                      y={y}
-                      orientation={inferModuleOrientationFromXCoordinate(x)}
-                      targetDeckId={targetDeckId}
-                      targetSlotId={targetSlotId}
-                      childrenPositioningMode="passThrough"
-                    >
-                      {nestedLabwareDef != null &&
-                      nestedLabwareId !== failedLwId ? (
-                        <AlignLabwareToModule
-                          deckId={deckDef.otId}
-                          slotId={slotName}
-                          moduleDefinition={moduleDef}
-                          labwareDefinition={nestedLabwareDef}
-                        >
-                          <LabwareRender
-                            definition={nestedLabwareDef}
-                            positioningMode="passThrough"
-                          />
-                        </AlignLabwareToModule>
-                      ) : null}
-                    </Module>
-                  )
-                )}
                 {labwareRenderInfo
                   .filter(l => l.labwareId !== failedLwId)
                   .map(({ labwareOrigin, labwareDef, labwareId }) => (

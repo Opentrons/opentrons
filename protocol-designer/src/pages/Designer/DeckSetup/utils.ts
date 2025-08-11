@@ -565,9 +565,6 @@ export const getSVGContainerWidth = (
   if (robotType === OT2_ROBOT_TYPE && !isZoomed) {
     return '78.5%'
   }
-  if (robotType !== OT2_ROBOT_TYPE && !isZoomed) {
-    return '70%'
-  }
   return '100%'
 }
 

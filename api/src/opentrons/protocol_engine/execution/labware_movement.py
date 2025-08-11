@@ -111,6 +111,7 @@ class LabwareMovementHandler:
         user_pick_up_offset: Point,
         user_drop_offset: Point,
         post_drop_slide_offset: Optional[Point],
+        gripper_z_offset: Optional[float],
     ) -> None:
         ...
 
@@ -124,6 +125,7 @@ class LabwareMovementHandler:
         user_pick_up_offset: Point,
         user_drop_offset: Point,
         post_drop_slide_offset: Optional[Point],
+        gripper_z_offset: Optional[float] = None,
     ) -> None:
         """Physically move a labware from one location to another using the gripper.
 
@@ -206,6 +208,7 @@ class LabwareMovementHandler:
                 gripper_home_z=gripper_homed_position.z,
                 offset_data=final_offsets,
                 post_drop_slide_offset=post_drop_slide_offset,
+                gripper_home_z_offset=gripper_z_offset,
             )
             labware_grip_force = self._state_store.labware.get_grip_force(
                 labware_definition

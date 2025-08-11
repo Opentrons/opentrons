@@ -53,6 +53,7 @@ from opentrons.hardware_control.modules.types import (
     FlexStackerData,
 )
 from opentrons.hardware_control.types import StatusBarState, StatusBarUpdateEvent
+from opentrons.config import feature_flags as ff
 
 from opentrons_shared_data.errors.exceptions import (
     FlexStackerStallError,
@@ -534,7 +535,12 @@ class FlexStacker(mod_abc.AbstractModule):
         await self._prepare_for_action()
 
         if enforce_hopper_lw_sensing:
-            await self.verify_hopper_labware_presence(Direction.EXTEND, True)
+            # TODO: re-enable this function after TOF calibration is implemented.
+            # Until then, we should also check the TOF X sensor before raising the error
+            # await self.verify_hopper_labware_presence(Direction.EXTEND, True)
+            hopper_empty = not await self.labware_detected(
+                StackerAxis.Z, Direction.EXTEND
+            )
 
         # Move platform along the X and make sure we DONT detect labware
         await self._move_and_home_axis(StackerAxis.X, Direction.RETRACT, HOME_OFFSET_MD)
@@ -556,7 +562,22 @@ class FlexStacker(mod_abc.AbstractModule):
         await self.home_axis(StackerAxis.Z, Direction.RETRACT)
 
         if enforce_shuttle_lw_sensing:
-            await self.verify_shuttle_labware_presence(Direction.RETRACT, True)
+            try:
+                await self.verify_shuttle_labware_presence(Direction.RETRACT, True)
+            except FlexStackerShuttleLabwareError:
+                # No labware detected on the shuttle, so we need to check what the Z TOF
+                # sensor says about the hopper
+                if hopper_empty:
+                    # homing here so we don't have to modify the error recovery flow
+                    await self._move_and_home_axis(
+                        StackerAxis.X, Direction.EXTEND, HOME_OFFSET_MD
+                    )
+                    raise FlexStackerHopperLabwareError(
+                        self.device_info["serial"],
+                        labware_expected=True,
+                    ) from None
+                raise
+
         await self._move_and_home_axis(StackerAxis.X, Direction.EXTEND, HOME_OFFSET_MD)
 
     async def store_labware(
@@ -710,6 +731,8 @@ class FlexStacker(mod_abc.AbstractModule):
         self, direction: Direction, labware_expected: bool
     ) -> None:
         """Check whether or not a labware is detected on the shuttle."""
+        if ff.flex_stacker_tof_sensors_disabled():
+            return
         result = await self.labware_detected(StackerAxis.X, direction)
         if labware_expected != result:
             if labware_expected:
@@ -728,6 +751,8 @@ class FlexStacker(mod_abc.AbstractModule):
         self, direction: Direction, labware_expected: bool
     ) -> None:
         """Check whether or not a labware is detected inside the hopper."""
+        if ff.flex_stacker_tof_sensors_disabled():
+            return
         result = await self.labware_detected(StackerAxis.Z, direction)
         if labware_expected != result:
             raise FlexStackerHopperLabwareError(
