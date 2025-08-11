@@ -104,7 +104,7 @@ def run(protocol: ProtocolContext) -> None:
     sample_plate_2, hs_adapter = helpers.load_hs_adapter_and_labware(
         "nest_96_wellplate_2ml_deep", heatershaker, "Sample Plate 2"
     )
-    
+
     reservoir = protocol.load_labware("nest_96_wellplate_2ml_deep", "2", "Liquid Waste")
     temp_block: TemperatureModuleContext = protocol.load_module(
         helpers.temp_str, "3"
