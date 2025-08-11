@@ -39,11 +39,11 @@ Protocol Designer:
 | Protocol setup | Specify your robot, pipettes, modules, and other hardware (like the Flex Gripper). |
 | Protocol overview | View protocol details like instruments, liquids, and the protocol starting deck at a glance. |
 | Edit protocol | Edit the starting deck, define liquids, and create protocol steps. |
-| Export protocol | Save and import your protocol into the Opentrons App to run on the Flex. |
+| Export protocol | Save your protocol file, which is ready to import into the Opentrons App and run on the Flex. |
 
 ## Part 1: Create a protocol
 
-When you launch Protocol Designer, click to **Create a protocol**. Start by selecting pipettes and, if needed, a Flex Gripper to use with the Flex. You can also customize modules and fixtures, like the waste chute, trash bin, and staging areas, to optimize deck space. Only modules and fixtures compatible with Flex are available. 
+When you launch Protocol Designer, click to **Create a protocol**. Start by selecting pipettes and, if needed, a Flex Gripper. You can also customize modules and fixtures, like the waste chute, trash bin, and staging areas, to optimize deck space. Only modules and fixtures compatible with Flex are available. 
 
 Protocol Designer protocols can control multiple Flex modules of the same type, except for the Thermocycler. At any time, you can edit the protocol to change your hardware configuration. 
 
@@ -132,14 +132,14 @@ Protocol Designer can help you save time and stay organized when your protocol u
 
 To prevent errors, Protocol Designer displays hints, warnings, and error descriptions as you create and edit a protocol. Deleting a module or labware used in your protocol, running out of tips in a transfer step, or leaving a labware latch closed can all result in a Protocol Designer errors. 
 
-Click on any step that appears in red in the protocol timeline and follow the text instructions to fix errors. We recommend resolving all warnings and errors to avoid problems in your workflow. For more details, see the Protocol Designer [instruction manual](https://insights.opentrons.com/hubfs/Protocol%20Designer%20Instruction%20Manual.pdf "instruction manual").
+Click on any step that appears in red in the protocol timeline and follow the text instructions to fix errors. We recommend resolving all warnings and errors to avoid problems in your workflow.
 
 
 ## Part 3: Export a protocol
 
-When you're finished creating and editing your protocol, click **Done** in the upper right to return to the protocol overview. Click **Export protocol** to download your protocol file. 
+When you've finished creating and editing your protocol, click **Done** in the upper right to return to the protocol overview. Click **Export protocol** to download your protocol file. 
 
-To run your protocol, import it into the Opentrons App (see the Software and Operation chapter for details on installing and using the Opentrons App). Then, run your protocol from the app or send it to your Flex to run from the touchscreen. 
+To run your protocol, [import it into the Opentrons App][import-a-protocol]. Then, run your protocol from the app or send it to your Flex to run from the touchscreen. 
 
 ## Modify an existing protocol
 

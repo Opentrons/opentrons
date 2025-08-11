@@ -2,7 +2,7 @@
 title: "Opentrons Flex: OT-2 Protocols"
 ---
 
-# OT-2 protocols
+# OT-2 Protocols
 
 There are hundreds of OT-2 protocols in the Protocol Library, and you may have created your own OT-2 protocols for your lab. Opentrons Flex can perform all the basic actions that the OT-2 can, but OT-2 protocols aren't directly compatible with Flex. However, with a little effort, you can adapt an OT-2 protocol so it will run on Flex. This lets you have parity across different Opentrons robots in your lab, or you can extend older protocols to take advantage of new features only offered on Flex.
 
@@ -27,7 +27,7 @@ Flex uses different types of pipettes and tip racks than OT-2, which have their 
 For example, you could convert an OT-2 protocol that uses a P300 Single-Channel GEN2 pipette and 300 µL tips to a Flex protocol that uses a Flex 1-Channel 1000 µL pipette and 1000 µL tips:
 
 ```python
- Original OT-2 code
+# Original OT-2 code
 def run(protocol: protocol_api.ProtocolContext):
     tips = protocol.load_labware("opentrons_96_tiprack_300ul", 1)
     left_pipette = protocol.load_instrument(
@@ -36,7 +36,7 @@ def run(protocol: protocol_api.ProtocolContext):
 ```
 
 ```python
- Modified Flex code
+# Modified Flex code
 def run(protocol: protocol_api.ProtocolContext):
     tips = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", "D1")
     left_pipette = protocol.load_instrument(

@@ -22,7 +22,7 @@ You can use the Custom Labware Creator if your labware meets the following crite
 - Wells and tubes are uniform and identical.
 - All rows are evenly spaced (the space between rows is equal).
 - All columns are evenly spaced (the space between columns is equal).
-- Fits perfectly in one deck slot.
+- The labware fits perfectly in one deck slot.
 
 | Layout {style="width: 200px;"} | Description |
 | ------ | ----------- |
@@ -35,10 +35,10 @@ For other labware, consider the Custom Labware Service, outlined below. Or you c
 
 Get in touch with us if the labware you'd like to use isn't available in the library, if you can't create your own definitions, or because a custom item includes different shapes, sizes, or other irregularities described below. 
 
-- Wells and tube shapes vary.
+- Well or tube shapes vary.
 - Rows are not evenly spaced.
 - Columns are not evenly spaced.
-- Smaller than one deck slot (requires adapter) or spans multiple deck slots.
+- The labware is smaller than one deck slot (requires adapter) or spans multiple deck slots.
 
 | Layout {style="width: 200px;"} | Description |
 | ------ | ----------- |
@@ -59,7 +59,7 @@ A schema is a framework for organizing data. It sets the rules about what inform
 | `schemaVersion`     | Number    | Schema version used by a labware. The current version is `2`. |
 | `version`           | Integer   | An incrementing integer that identifies the labware version. Minimum version is `1`. |
 | `namespace`         | String    | See `safeString` in the JSON definitions section below. |
-| `metadata`          | Object    | Properties used for search and display. Accepts only:<ul><li>`displayName` (String): An easy-to-remember labware name.</li><li>`displayCategory`: Labels used in the UI to categorize labware. See `displayCategory` in the JSON definitions section below.</li><li>`displayVolumeUnits` (String): Labels used in the UI to indicate volume. Must be either µL, mL, or L.</li></ul> |
+| `metadata`          | Object    | Properties used for search and display. Accepts only:<ul><li>`displayName` (String): An easy-to-remember labware name.</li><li>`displayCategory`: Labels used in the UI to categorize labware. See `displayCategory` in the JSON definitions section below.</li><li>`displayVolumeUnits` (String): Labels used in the UI to indicate volume. Must be either `µL`, `mL`, or `L`.</li></ul> |
 | `brand`             | Object    | Information about the labware manufacturer or those products the labware is compatible with. |
 | `parameters`        | Object    | Internal parameters that describe labware characteristics. Accepts only:<ul><li>`format` (String): Determines labware compatibility with multichannel pipettes. Must be one of `96Standard`, `384Standard`, `trough`, `irregular`, or `trash`.</li><li>`quirks` (Array): Strings describing labware behavior. See the [Opentrons 96 Deep Well Adapter](https://github.com/Opentrons/opentrons/blob/03cd0336c6051c05fa66088fabec426c7b751a85/shared-data/labware/definitions/2/opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep/1.json#L1108) definition.</li><li>`isTiprack` (Boolean): Indicates if labware is a tip rack (`true`) or not (`false`).</li><li>`tipLength` (Number): Required if labware is a tip rack. Specifies tip length (in mm), from top to bottom, as indicated in technical drawings or as measured with calipers.</li><li>`tipoverlap` (Number): Required if labware is a tip rack. Specifies how far tips on a tip rack are expected to overlap with the pipette's nozzle. Defined as tip length minus the distance between the bottom of the pipette and the bottom of the tip. The robot's calibration process may fine-tune this estimate.</li><li>`loadName`: Name used to reference a labware definition (e.g., `opentrons_flex_96_tiprack_50_ul`).</li><li>`isMagneticModuleCompatible` (Boolean): Indicates if labware is compatible with the Magnetic Module.</li><li>`magneticModuleEngageHeight`: How far the Magnetic Module will move its magnets when used with this labware. See `positiveNumber` in the JSON definitions section below.</li></ul> |
 | `ordering`          | Array     | An array that tracks how wells should be ordered on a piece of labware. See the [Opentrons 96 PCR Adapter](https://github.com/Opentrons/opentrons/blob/8569e32d2d918abb1f232f48a7b28385021215fd/shared-data/labware/definitions/2/opentrons_96_pcr_adapter/1.json#L2) example. |
@@ -80,6 +80,6 @@ A schema is a framework for organizing data. It sets the rules about what inform
 | :-------------- | :-------- | :------------------------------------------- |
 | `positiveNumber` | Number    | Minimum: 0.                      |
 | `brandData`     | Object    | Information about branded items. Accepts only:<br><ul><li>`brand` (String): Brand/manufacturer's name.</li><li>`brandId` (Array): OEM part numbers or IDs.</li><li>`links` (Array): Manufacturer URLs. Array items are strings.</li></ul> |
-| `displayCategory` | String    | Must be one of:<br><ul><li>`tipRack`</li><li>`tubeRack`</li><li>`reservoir`</li><li>`trash`</li><li>`wellPlate`</li><li>`aluminumBlock`</li><li>`adapter`</li><li>`other`</li></ul> |
+| `displayCategory` | String    | Must be one of:<br><ul><li>`tipRack`</li><li>`tubeRack`</li><li>`reservoir`</li><li>`trash`</li><li>`wellPlate`</li><li>`aluminumBlock`</li><li>`adapter`</li><li>`other`</li><li>`lid`</li></ul> |
 | `safeString`    | String    | A string safe to use for load names and namespaces. Lowercase letters, numerals, periods, and underscores only. |
 | `coordinates`   | Object    | Coordinates that specify a distance or position along the x-, y-, and z-axes. Accepts only:<br><ul><li>`x` (number)</li><li>`y` (number)</li><li>`z` (number)</li></ul> |

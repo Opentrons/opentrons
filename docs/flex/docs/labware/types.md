@@ -6,7 +6,7 @@ This section covers the different types of labware included in the Opentrons Lab
 
 ## Reservoirs 
 
-Opentrons Flex works by default with single-well and multi-well reservoirs. [Reservoirs on the Opentrons Labware Library](https://labware.opentrons.com/?category=reservoir) are automation-ready right out of the box.
+Opentrons Flex works by default with single-well and multi-well reservoirs. [Reservoirs on the Opentrons Labware Library](https://labware.opentrons.com/#/?category=reservoir) are automation-ready right out of the box.
 
 <figure class="side-by-side" markdown>
 ![Single-well reservoir labware.](../images/labware-1-well-reservoir.png "Single-well reservoir")
@@ -21,7 +21,7 @@ Try creating a custom labware definition with the [Opentrons Labware Creator](ht
 
 ## Well plates 
 
-The Opentrons Flex works by default with well plates in a variety of well configurations. This category includes standard depth and deep well plates, with various well bottom shapes. [Well plates on the Opentrons Labware Library](https://labware.opentrons.com/?category=wellPlate) are automation-ready right out of the box. 
+The Opentrons Flex works by default with well plates in a variety of well configurations. This category includes standard depth and deep well plates, with various well bottom shapes. [Well plates on the Opentrons Labware Library](https://labware.opentrons.com/#/?category=wellPlate) are automation-ready right out of the box. 
 
 <figure class="side-by-side" markdown>
 ![24-well plate labware.](../images/labware-24-well-plate.png "24-well plate")
@@ -49,7 +49,7 @@ Try using the Opentrons Labware Creator to make a custom labware definition if a
 
 ## Lids
 
-Opentrons Flex works by default with lids that fit on top of certain other labware to protect their contents. Labware Library contains lids that fit on well plates, as well as lids that are packaged with and fit on top of Opentrons Flex tip racks.
+Opentrons Flex works by default with lids that fit on top of certain other labware to protect their contents. [Labware Library contains lids](https://labware.opentrons.com/#/?category=lid) that fit on well plates, as well as lids that are packaged with and fit on top of Opentrons Flex tip racks.
 
 For a full example of a well plate lid, reference the [Opentrons Tough PCR Auto-Sealing Lid definition](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_tough_pcr_auto_sealing_lid/1.json) on GitHub. Importantly, the definition lists the other types of labware that the lid fits on.
 
@@ -76,7 +76,7 @@ When ordering or reordering, tips and racks come in two different packaged confi
 
 ### Tip-pipette compatibility 
 
-Flex pipette tips work with all single- and multi-channel Opentrons Flex 50 µL and 1000 µL pipettes. Flex pipette tips are designed for the Opentrons Flex pipettes. Flex tips are not backwards compatible with Opentrons OT-2 pipettes, nor can you use OT-2 tips on Flex pipettes. 
+Flex pipette tips are designed for the Opentrons Flex pipettes. Flex tips are not backwards compatible with Opentrons OT-2 pipettes, nor can you use OT-2 tips on Flex pipettes. 
 
 Flex pipettes only accept tips with capacities less than or equal to the pipette capacity. 
 
@@ -110,7 +110,7 @@ The tip rack adapter is compatible with the Opentrons Flex Gripper. You can use 
 ![NEST tubes in two sizes.](../images/labware-tubes.jpg "NEST tubes")
 </figure>
 
-The [Opentrons 4-in-1 Tube Rack system](https://opentrons.com/products/4-in-1-tube-rack-set) works with the Opentrons Flex by default. [Tube rack combinations on the Opentrons Labware Library](https://labware.opentrons.com/?category=tubeRack) are automation-ready right out of the box. 
+The [Opentrons 4-in-1 Tube Rack system](https://opentrons.com/products/4-in-1-tube-rack-set) works with the Opentrons Flex by default. [Tube rack combinations on the Opentrons Labware Library](https://labware.opentrons.com/#/?category=tubeRack) are automation-ready right out of the box. 
 
 The Opentrons 4-in-1 tube rack supports a wide variety of tube sizes, singly or in different size (volume) combinations. These include a: 
 
@@ -127,15 +127,15 @@ Try creating a custom labware definition using the [Opentrons Labware Creator](h
 
 ## Aluminum blocks 
 
-Aluminum blocks ship with the Temperature Module GEN2 and can be purchased separately as a [three-piece set](https://opentrons.com/products/aluminum-block-1-5-2-0ml-tubes). The set includes a flat bottom plate, a 24-well block, and a 96-well block. 
+[Aluminum blocks on the Labware Library](https://labware.opentrons.com/#/?category=aluminumBlock) work with the Temperature Module GEN2 or directly on the deck. A flat bottom plate, a 24-well block, and a 96-well block are available for purchase from Opentrons.
 
-The Opentrons Flex uses aluminum blocks to hold sample tubes and well plates on the Temperature Module or directly on the deck. When used with the Temperature Module, the aluminum blocks can keep your sample tubes, PCR strips, or plates at a constant temperature between 4 °C and 95 °C. 
+The Opentrons Flex uses aluminum blocks to hold sample tubes or well plates. When used with the Temperature Module, the aluminum blocks can keep your sample tubes, PCR strips, or plates at a constant temperature between 4 °C and 95 °C. 
 
 ### Flat bottom plate 
 
 ![The flat bottom plate with the Opentrons Flex logo.](../images/temperature-module-block-flat.png "Flex flat bottom plate")
 
-The flat bottom plate for Flex ships with the Temperature Module's caddy and is compatible with various ANSI/SLAS standard well plates. This flat plate differs from the plate that ships with the Temperature Module itself or the separate three-piece set. It features a wider working surface and chamfered corner clips. These features help improve the performance of the Opentrons Flex Gripper when moving labware onto or off of the plate. 
+The flat bottom plate for Flex ships with the Temperature Module's caddy and is compatible with various ANSI/SLAS standard well plates. This flat plate differs from the plate that ships with the Temperature Module itself. It features a wider working surface and chamfered corner clips. These features help improve the performance of the Opentrons Flex Gripper when moving labware onto or off of the plate. 
 
 !!! note
     You can tell which flat bottom plate you have because the one for Flex has the words "Opentrons Flex" on its top surface. The one for OT-2 does not. 

@@ -2,7 +2,7 @@
 title: "Opentrons Flex: Custom Protocol Service"
 ---
 
-# Custom Protocol Development service
+# Custom Protocol Development Service
 
 Opentrons provides a [Remote Custom Protocol Development service](https://opentrons.com/instrument-services) for applications not already included in the Protocol Library. Our comprehensive authoring and validation service has a turnaround time of two weeks. As part of the service, Opentrons field applications scientists will:
 
