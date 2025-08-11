@@ -1,6 +1,6 @@
 """Utilities for doing coverage math on wells."""
 
-from typing import Iterator
+from typing import Iterator, Dict, List
 from opentrons_shared_data.errors.exceptions import (
     InvalidStoredData,
     InvalidProtocolData,
@@ -17,13 +17,47 @@ def wells_covered_by_pipette_configuration(
     """Compute the wells covered by a pipette nozzle configuration."""
     if len(labware_wells_by_column) >= 12 and len(labware_wells_by_column[0]) >= 8:
         yield from wells_covered_dense(
-            nozzle_map,
+            nozzle_map.columns,
+            nozzle_map.rows,
+            nozzle_map.starting_nozzle,
             target_well,
             labware_wells_by_column,
         )
     elif len(labware_wells_by_column) < 12 and len(labware_wells_by_column[0]) < 8:
         yield from wells_covered_sparse(
-            nozzle_map, target_well, labware_wells_by_column
+            nozzle_map.columns,
+            nozzle_map.rows,
+            nozzle_map.starting_nozzle,
+            target_well,
+            labware_wells_by_column,
+        )
+    else:
+        raise InvalidStoredData(
+            "Labware of non-SBS and non-reservoir format cannot be handled"
+        )
+
+
+def wells_covered_by_physical_pipette(
+    nozzle_map: NozzleMap,
+    target_well: str,
+    labware_wells_by_column: list[list[str]],
+) -> Iterator[str]:
+    """Compute the wells covered by a pipette nozzle configuration."""
+    if len(labware_wells_by_column) >= 12 and len(labware_wells_by_column[0]) >= 8:
+        yield from wells_covered_dense(
+            nozzle_map.full_instrument_columns,
+            nozzle_map.full_instrument_rows,
+            nozzle_map.starting_nozzle,
+            target_well,
+            labware_wells_by_column,
+        )
+    elif len(labware_wells_by_column) < 12 and len(labware_wells_by_column[0]) < 8:
+        yield from wells_covered_sparse(
+            nozzle_map.full_instrument_columns,
+            nozzle_map.full_instrument_rows,
+            nozzle_map.starting_nozzle,
+            target_well,
+            labware_wells_by_column,
         )
     else:
         raise InvalidStoredData(
@@ -42,7 +76,11 @@ def row_col_ordinals_from_column_major_map(
 
 
 def wells_covered_dense(  # noqa: C901
-    nozzle_map: NozzleMap, target_well: str, target_wells_by_column: list[list[str]]
+    columns: Dict[str, List[str]],
+    rows: Dict[str, List[str]],
+    starting_nozzle: str,
+    target_well: str,
+    target_wells_by_column: list[list[str]],
 ) -> Iterator[str]:
     """Get the list of wells covered by a nozzle map on an SBS format labware with a specified multiplier of 96 into the number of wells.
 
@@ -66,11 +104,11 @@ def wells_covered_dense(  # noqa: C901
             "This labware cannot be used with wells_covered_dense() because it is less dense than an SBS 96 standard"
         )
 
-    for nozzle_column in range(len(nozzle_map.columns)):
+    for nozzle_column in range(len(columns)):
         target_column_offset = nozzle_column * column_downsample
-        for nozzle_row in range(len(nozzle_map.rows)):
+        for nozzle_row in range(len(rows)):
             target_row_offset = nozzle_row * row_downsample
-            if nozzle_map.starting_nozzle == "A1":
+            if starting_nozzle == "A1":
                 if (
                     target_column_index + target_column_offset
                     < len(target_wells_by_column)
@@ -81,7 +119,7 @@ def wells_covered_dense(  # noqa: C901
                     yield target_wells_by_column[
                         target_column_index + target_column_offset
                     ][target_row_index + target_row_offset]
-            elif nozzle_map.starting_nozzle == "A12":
+            elif starting_nozzle == "A12":
                 if (target_column_index - target_column_offset >= 0) and (
                     target_row_index + target_row_offset
                     < len(target_wells_by_column[target_column_index])
@@ -89,7 +127,7 @@ def wells_covered_dense(  # noqa: C901
                     yield target_wells_by_column[
                         target_column_index - target_column_offset
                     ][target_row_index + target_row_offset]
-            elif nozzle_map.starting_nozzle == "H1":
+            elif starting_nozzle == "H1":
                 if (
                     target_column_index + target_column_offset
                     < len(target_wells_by_column)
@@ -97,7 +135,7 @@ def wells_covered_dense(  # noqa: C901
                     yield target_wells_by_column[
                         target_column_index + target_column_offset
                     ][target_row_index - target_row_offset]
-            elif nozzle_map.starting_nozzle == "H12":
+            elif starting_nozzle == "H12":
                 if (target_column_index - target_column_offset >= 0) and (
                     target_row_index - target_row_offset >= 0
                 ):
@@ -106,12 +144,16 @@ def wells_covered_dense(  # noqa: C901
                     ][target_row_index - target_row_offset]
             else:
                 raise InvalidProtocolData(
-                    f"A pipette nozzle configuration may not having a starting nozzle of {nozzle_map.starting_nozzle}"
+                    f"A pipette nozzle configuration may not having a starting nozzle of {starting_nozzle}"
                 )
 
 
 def wells_covered_sparse(  # noqa: C901
-    nozzle_map: NozzleMap, target_well: str, target_wells_by_column: list[list[str]]
+    columns: Dict[str, List[str]],
+    rows: Dict[str, List[str]],
+    starting_nozzle: str,
+    target_well: str,
+    target_wells_by_column: list[list[str]],
 ) -> Iterator[str]:
     """Get the list of wells covered by a nozzle map on a column-oriented reservoir.
 
@@ -128,9 +170,9 @@ def wells_covered_sparse(  # noqa: C901
         raise InvalidStoredData(
             "This labware cannot be used with wells_covered_sparse() because it is more dense than an SBS 96 standard."
         )
-    for nozzle_column in range(max(1, len(nozzle_map.columns) // column_upsample)):
-        for nozzle_row in range(max(1, len(nozzle_map.rows) // row_upsample)):
-            if nozzle_map.starting_nozzle == "A1":
+    for nozzle_column in range(max(1, len(columns) // column_upsample)):
+        for nozzle_row in range(max(1, len(rows) // row_upsample)):
+            if starting_nozzle == "A1":
                 if (
                     target_column_index + nozzle_column < len(target_wells_by_column)
                 ) and (
@@ -140,7 +182,7 @@ def wells_covered_sparse(  # noqa: C901
                     yield target_wells_by_column[target_column_index + nozzle_column][
                         target_row_index + nozzle_row
                     ]
-            elif nozzle_map.starting_nozzle == "A12":
+            elif starting_nozzle == "A12":
                 if (target_column_index - nozzle_column >= 0) and (
                     target_row_index + nozzle_row
                     < len(target_wells_by_column[target_column_index])
@@ -148,7 +190,7 @@ def wells_covered_sparse(  # noqa: C901
                     yield target_wells_by_column[target_column_index - nozzle_column][
                         target_row_index + nozzle_row
                     ]
-            elif nozzle_map.starting_nozzle == "H1":
+            elif starting_nozzle == "H1":
                 if (
                     target_column_index + nozzle_column
                     < len(target_wells_by_column[target_column_index])
@@ -156,7 +198,7 @@ def wells_covered_sparse(  # noqa: C901
                     yield target_wells_by_column[target_column_index + nozzle_column][
                         target_row_index - nozzle_row
                     ]
-            elif nozzle_map.starting_nozzle == "H12":
+            elif starting_nozzle == "H12":
                 if (target_column_index - nozzle_column >= 0) and (
                     target_row_index - nozzle_row >= 0
                 ):
@@ -165,7 +207,7 @@ def wells_covered_sparse(  # noqa: C901
                     ]
             else:
                 raise InvalidProtocolData(
-                    f"A pipette nozzle configuration may not having a starting nozzle of {nozzle_map.starting_nozzle}"
+                    f"A pipette nozzle configuration may not having a starting nozzle of {starting_nozzle}"
                 )
 
 

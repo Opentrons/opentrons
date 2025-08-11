@@ -18,7 +18,7 @@ from opentrons.protocol_engine.state._well_math import (
     nozzles_per_well,
 )
 
-from .. import pipette_fixtures
+from tests.opentrons.protocol_engine import pipette_fixtures
 
 _96_FULL_MAP = NozzleMap.build(
     physical_nozzles=pipette_fixtures.NINETY_SIX_MAP,
@@ -225,7 +225,18 @@ def test_wells_covered_dense_96(
     _96_wells: list[list[str]],
 ) -> None:
     """It should calculate well coverage for an SBS 96."""
-    assert list(wells_covered_dense(nozzle_map, target_well, _96_wells)) == result
+    assert (
+        list(
+            wells_covered_dense(
+                nozzle_map.columns,
+                nozzle_map.rows,
+                nozzle_map.starting_nozzle,
+                target_well,
+                _96_wells,
+            )
+        )
+        == result
+    )
 
 
 @pytest.mark.parametrize(
@@ -307,7 +318,18 @@ def test_wells_covered_dense_384(
     _384_wells: list[list[str]],
 ) -> None:
     """It should calculate well coverage for an SBS 384."""
-    assert list(wells_covered_dense(nozzle_map, target_well, _384_wells)) == result
+    assert (
+        list(
+            wells_covered_dense(
+                nozzle_map.columns,
+                nozzle_map.rows,
+                nozzle_map.starting_nozzle,
+                target_well,
+                _384_wells,
+            )
+        )
+        == result
+    )
 
 
 @pytest.mark.parametrize(
@@ -338,7 +360,18 @@ def test_wells_covered_sparse_12(
     _12_reservoir: list[list[str]],
 ) -> None:
     """It should calculate well coverage for a 12 column reservoir."""
-    assert list(wells_covered_sparse(nozzle_map, target_well, _12_reservoir)) == result
+    assert (
+        list(
+            wells_covered_sparse(
+                nozzle_map.columns,
+                nozzle_map.rows,
+                nozzle_map.starting_nozzle,
+                target_well,
+                _12_reservoir,
+            )
+        )
+        == result
+    )
 
 
 @pytest.mark.parametrize(
@@ -354,7 +387,15 @@ def test_wells_covered_sparse_1(
     nozzle_map: NozzleMap, _1_reservoir: list[list[str]]
 ) -> None:
     """It should calculate well coverage for a 1 column reservoir."""
-    assert list(wells_covered_sparse(nozzle_map, "A1", _1_reservoir)) == ["A1"]
+    assert list(
+        wells_covered_sparse(
+            nozzle_map.columns,
+            nozzle_map.rows,
+            nozzle_map.starting_nozzle,
+            "A1",
+            _1_reservoir,
+        )
+    ) == ["A1"]
 
 
 @pytest.mark.parametrize(
