@@ -3,11 +3,13 @@ from typing import Tuple, Dict, Literal, Optional
 from typing_extensions import TypedDict
 
 from opentrons.hardware_control.ot3api import OT3API
+from opentrons.types import Mount
 from dataclasses import dataclass
 
 import time
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import Axis, OT3Mount
+from hardware_testing.gravimetric.helpers import get_pipette_unique_name
 import enum
 import argparse
 import csv
@@ -27,6 +29,8 @@ class TestConfig:
 
     simulate: bool
     pipette: Literal[200, 1000]
+    blowout:int
+    blowoutnum:int
 
 
 class TestData(TypedDict):
@@ -68,6 +72,10 @@ async def main(args: argparse.Namespace, cfg: TestConfig) -> None:
         stall_detection_enable=False,
     )
     ax = Axis.P_L
+    xxx = Axis.X
+    yyy = Axis.Y
+    Z1 = Axis.Z_L
+    Z2 = Axis.Z_R
     mount = OT3Mount.LEFT
     settings = helpers_ot3.get_gantry_load_per_axis_motion_settings_ot3(api, ax)
     settings.max_speed = 25
@@ -76,7 +84,7 @@ async def main(args: argparse.Namespace, cfg: TestConfig) -> None:
     default_current = settings.run_current
     default_speed = settings.max_speed
     default_acceleration = 100
-    top, bottom, _, _ = helpers_ot3.get_plunger_positions_ot3(api, mount)
+    top, bottom, blow_out, _ = helpers_ot3.get_plunger_positions_ot3(api, mount)
     print(f"Settings: {settings}")
 
     async def position_check() -> bool:
@@ -84,11 +92,14 @@ async def main(args: argparse.Namespace, cfg: TestConfig) -> None:
         print(f"Estimate: {est}, Encoder: {enc}, Aligned: {aligned}")
         return aligned
 
-    await api.home_z(OT3Mount.LEFT)
+    await api.cache_instruments()
+    #await api.home_z(OT3Mount.LEFT)
     # LOOP THROUGH CURRENTS + SPEEDS
+    await api.home([xxx,yyy,Z1,Z2])
     today = datetime.now().strftime("%m-%d-%y_%H-%M")
+    pip_id = api.attached_pipettes[Mount.LEFT]["pipette_id"]
     with open(
-        f"/data/testing_data/P200H_test_plunger_speed_test_{today}.csv", "w", newline=""
+        f"/data/testing_data/P200H_LT_{pip_id}_{today}.csv", "w", newline=""
     ) as csvfile:
         test_data: TestData = {
             "time_sec": None,
@@ -104,51 +115,112 @@ async def main(args: argparse.Namespace, cfg: TestConfig) -> None:
         try:
             currents = list(CURRENTS_SPEEDS.keys())
             for cycle in range(1, args.cycles + 1):
-                print(f"Cycle: {cycle}")
-                for current in sorted(currents, reverse=True):
-                    speed = CURRENTS_SPEEDS[current]
-                    # HOME
-                    print("homing...")
-                    #await api.home([ax])
-                    await api.home()
-                    print(f"run-current set to {current} amps")
-                    await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
-                        api,
-                        ax,
-                        run_current=current,
-                    )
-                    await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
-                        api,
-                        ax,
-                        default_max_speed=speed,
-                        acceleration=default_acceleration,
-                    )
-                    # MOVE DOWN
-                    print(f"moving down {bottom} mm at {speed} mm/sec")
-                    position_checked = await position_check()
-                    print(f"position checked: {position_checked}")
-                    try:
-                        await helpers_ot3.move_plunger_absolute_ot3(
-                            api, mount, bottom, speed=speed, motor_current=current
+                
+                if cycle % cfg.blowoutnum == 0 and cfg.blowout == 2:
+                    print(f"Cycle: {cycle}")
+                    for current in sorted(currents, reverse=True):
+                        speed = CURRENTS_SPEEDS[current]
+                        # HOME
+                        print("homing...")
+                        await api.home([ax])
+
+                        print(f"run-current set to {current} amps")
+                        await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
+                            api,
+                            ax,
+                            run_current=current,
                         )
-                        down_passed = await position_check()
-                        test_data["time_sec"] = time.time() - start_time
-                        test_data["cycle"] = cycle
-                        test_data["position"] = "bottom"
-                        test_data["position_check"] = down_passed
-                        test_data["stall"] = "NONE"
-                        print(test_data)
-                        writer.writerow(test_data)
-                        csvfile.flush()
-                    except Exception as e:
-                        print("STALL DETECTION")
-                        down_passed = await position_check()
-                        test_data["position_check"] = down_passed
-                        test_data["stall"] = str("Failed to move plunger down")
-                        test_data["error"] = str(e)
-                        print(test_data)
-                        writer.writerow(test_data)
-                        csvfile.flush()
+                        await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
+                            api,
+                            ax,
+                            default_max_speed=speed,
+                            acceleration=default_acceleration,
+                        )
+                        # MOVE DOWN
+                        print(f"moving down {blow_out} mm at {speed} mm/sec")
+                        position_checked = await position_check()
+                        print(f"position checked: {position_checked}")
+                        try:
+                            await helpers_ot3.move_plunger_absolute_ot3(
+                                api, mount, blow_out, speed=speed, motor_current=current
+                            )
+                            down_passed = await position_check()
+                            test_data["time_sec"] = time.time() - start_time
+                            test_data["cycle"] = cycle
+                            test_data["position"] = "blow_out"
+                            test_data["position_check"] = down_passed
+                            test_data["stall"] = "NONE"
+                            print(test_data)
+                            writer.writerow(test_data)
+                            csvfile.flush()
+                        except Exception as e:
+                            print("STALL DETECTION")
+                            down_passed = await position_check()
+                            test_data["position_check"] = down_passed
+                            test_data["stall"] = str("Failed to move plunger down")
+                            test_data["error"] = str(e)
+                            print(test_data)
+                            writer.writerow(test_data)
+                            csvfile.flush()
+                            print("homing...")
+                            await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
+                                api, ax, run_current=default_current
+                            )
+                            await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
+                                api,
+                                ax,
+                                default_max_speed=default_speed,
+                                acceleration=default_acceleration,
+                            )
+                            await api._backend.set_active_current(
+                                {Axis.P_L: default_current}
+                            )
+                            await api.home([ax])
+                            await helpers_ot3.move_plunger_absolute_ot3(
+                                api,
+                                mount,
+                                blow_out,
+                                speed=default_speed,
+                                motor_current=default_current,
+                            )
+                        # MOVE UP
+                        print(f"moving up {top} mm at {speed} mm/sec")
+                        position_checked = await position_check()
+                        print(f"position checked: {position_checked}")
+                        await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
+                            api,
+                            ax,
+                            run_current=current,
+                        )
+                        await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
+                            api,
+                            ax,
+                            default_max_speed=speed,
+                            acceleration=default_acceleration,
+                        )
+                        try:
+                            await helpers_ot3.move_plunger_absolute_ot3(
+                                api, mount, 0, speed=speed, motor_current=current
+                            )
+                            up_passed = await position_check()
+                            test_data["time_sec"] = time.time() - start_time
+                            test_data["cycle"] = cycle
+                            test_data["position"] = "top"
+                            test_data["position_check"] = up_passed
+                            print(test_data)
+                            writer.writerow(test_data)
+                            test_data["stall"] = "NONE"
+                            csvfile.flush()
+                        except Exception as e:
+                            print("STALL DETECTION")
+                            up_passed = await position_check()
+                            test_data["stall"] = str("Failed to move plunger down")
+                            test_data["position_check"] = up_passed
+                            test_data["error"] = str(e)
+                            print(test_data)
+                            writer.writerow(test_data)
+                            csvfile.flush()
+                        # RESET CURRENTS AND HOME
                         print("homing...")
                         await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
                             api, ax, run_current=default_current
@@ -159,66 +231,125 @@ async def main(args: argparse.Namespace, cfg: TestConfig) -> None:
                             default_max_speed=default_speed,
                             acceleration=default_acceleration,
                         )
-                        await api._backend.set_active_current(
-                            {Axis.P_L: default_current}
-                        )
+                        await api._backend.set_active_current({Axis.P_L: default_current})
+                
+                else:
+
+                    print(f"Cycle: {cycle}")
+                    for current in sorted(currents, reverse=True):
+                        speed = CURRENTS_SPEEDS[current]
+                        # HOME
+                        print("homing...")
                         await api.home([ax])
-                        await helpers_ot3.move_plunger_absolute_ot3(
+
+                        print(f"run-current set to {current} amps")
+                        await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
                             api,
-                            mount,
-                            bottom,
-                            speed=default_speed,
-                            motor_current=default_current,
+                            ax,
+                            run_current=current,
                         )
-                    # MOVE UP
-                    print(f"moving up {top} mm at {speed} mm/sec")
-                    position_checked = await position_check()
-                    print(f"position checked: {position_checked}")
-                    await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
-                        api,
-                        ax,
-                        run_current=current,
-                    )
-                    await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
-                        api,
-                        ax,
-                        default_max_speed=speed,
-                        acceleration=default_acceleration,
-                    )
-                    try:
-                        await helpers_ot3.move_plunger_absolute_ot3(
-                            api, mount, 0, speed=speed, motor_current=current
+                        await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
+                            api,
+                            ax,
+                            default_max_speed=speed,
+                            acceleration=default_acceleration,
                         )
-                        up_passed = await position_check()
-                        test_data["time_sec"] = time.time() - start_time
-                        test_data["cycle"] = cycle
-                        test_data["position"] = "top"
-                        test_data["position_check"] = up_passed
-                        print(test_data)
-                        writer.writerow(test_data)
-                        test_data["stall"] = "NONE"
-                        csvfile.flush()
-                    except Exception as e:
-                        print("STALL DETECTION")
-                        up_passed = await position_check()
-                        test_data["stall"] = str("Failed to move plunger down")
-                        test_data["position_check"] = up_passed
-                        test_data["error"] = str(e)
-                        print(test_data)
-                        writer.writerow(test_data)
-                        csvfile.flush()
-                    # RESET CURRENTS AND HOME
-                    print("homing...")
-                    await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
-                        api, ax, run_current=default_current
-                    )
-                    await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
-                        api,
-                        ax,
-                        default_max_speed=default_speed,
-                        acceleration=default_acceleration,
-                    )
-                    await api._backend.set_active_current({Axis.P_L: default_current})
+                        # MOVE DOWN
+                        print(f"moving down {bottom} mm at {speed} mm/sec")
+                        position_checked = await position_check()
+                        print(f"position checked: {position_checked}")
+                        try:
+                            await helpers_ot3.move_plunger_absolute_ot3(
+                                api, mount, bottom, speed=speed, motor_current=current
+                            )
+                            down_passed = await position_check()
+                            test_data["time_sec"] = time.time() - start_time
+                            test_data["cycle"] = cycle
+                            test_data["position"] = "bottom"
+                            test_data["position_check"] = down_passed
+                            test_data["stall"] = "NONE"
+                            print(test_data)
+                            writer.writerow(test_data)
+                            csvfile.flush()
+                        except Exception as e:
+                            print("STALL DETECTION")
+                            down_passed = await position_check()
+                            test_data["position_check"] = down_passed
+                            test_data["stall"] = str("Failed to move plunger down")
+                            test_data["error"] = str(e)
+                            print(test_data)
+                            writer.writerow(test_data)
+                            csvfile.flush()
+                            print("homing...")
+                            await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
+                                api, ax, run_current=default_current
+                            )
+                            await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
+                                api,
+                                ax,
+                                default_max_speed=default_speed,
+                                acceleration=default_acceleration,
+                            )
+                            await api._backend.set_active_current(
+                                {Axis.P_L: default_current}
+                            )
+                            await api.home([ax])
+                            await helpers_ot3.move_plunger_absolute_ot3(
+                                api,
+                                mount,
+                                bottom,
+                                speed=default_speed,
+                                motor_current=default_current,
+                            )
+                        # MOVE UP
+                        print(f"moving up {top} mm at {speed} mm/sec")
+                        position_checked = await position_check()
+                        print(f"position checked: {position_checked}")
+                        await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
+                            api,
+                            ax,
+                            run_current=current,
+                        )
+                        await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
+                            api,
+                            ax,
+                            default_max_speed=speed,
+                            acceleration=default_acceleration,
+                        )
+                        try:
+                            await helpers_ot3.move_plunger_absolute_ot3(
+                                api, mount, 0, speed=speed, motor_current=current
+                            )
+                            up_passed = await position_check()
+                            test_data["time_sec"] = time.time() - start_time
+                            test_data["cycle"] = cycle
+                            test_data["position"] = "top"
+                            test_data["position_check"] = up_passed
+                            print(test_data)
+                            writer.writerow(test_data)
+                            test_data["stall"] = "NONE"
+                            csvfile.flush()
+                        except Exception as e:
+                            print("STALL DETECTION")
+                            up_passed = await position_check()
+                            test_data["stall"] = str("Failed to move plunger down")
+                            test_data["position_check"] = up_passed
+                            test_data["error"] = str(e)
+                            print(test_data)
+                            writer.writerow(test_data)
+                            csvfile.flush()
+                        # RESET CURRENTS AND HOME
+                        print("homing...")
+                        await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
+                            api, ax, run_current=default_current
+                        )
+                        await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
+                            api,
+                            ax,
+                            default_max_speed=default_speed,
+                            acceleration=default_acceleration,
+                        )
+                        await api._backend.set_active_current({Axis.P_L: default_current})
 
         except Exception as e:
             test_data["error"] = str(e)
@@ -232,7 +363,9 @@ if __name__ == "__main__":
     parser.add_argument("--cycles", type=int, default=100000)
     parser.add_argument("--simulate", action="store_true")
     parser.add_argument("--pipette", type=int, choices=[200, 1000], default=200)
+    parser.add_argument("--blowout", type=int, default=1)
+    parser.add_argument("--blowoutnum",type=int,default=100)
     args = parser.parse_args()
-    _config = TestConfig(simulate=args.simulate, pipette=args.pipette)
+    _config = TestConfig(simulate=args.simulate, pipette=args.pipette,blowout=args.blowout,blowoutnum=args.blowoutnum)
 
     asyncio.run(main(args, _config))
