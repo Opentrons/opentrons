@@ -51,6 +51,14 @@ def deploy_docs(environment, branch=None, aws_profile=None, source_dir="site"):
         print("Make sure you've run 'make build' first.")
         sys.exit(1)
     
+    # Check if source directory has content
+    source_files = list(source_path.glob("*"))
+    if not source_files:
+        print(f"Warning: Source directory {source_path} is empty.")
+        print("Make sure you've run 'make build' first.")
+    
+    print(f"Source directory contents: {[f.name for f in source_files[:10]]}{'...' if len(source_files) > 10 else ''}")
+    
     # Build S3 sync command - use branch for sandbox, root for staging/production
     if environment == "sandbox":
         s3_path = f"s3://{bucket}/{branch}/"
@@ -67,7 +75,8 @@ def deploy_docs(environment, branch=None, aws_profile=None, source_dir="site"):
         str(source_path) + "/",
         s3_path,
         "--delete",
-        "--acl", "public-read"
+        "--acl", "public-read",
+        "--verbose"
     ]
     
     # Add AWS profile if specified
@@ -79,6 +88,24 @@ def deploy_docs(environment, branch=None, aws_profile=None, source_dir="site"):
     if environment == "sandbox":
         print(f"  Branch: {branch}")
     print(f"  S3 Path: {s3_path}")
+    
+    # Check if bucket exists
+    bucket_check_cmd = ["aws", "s3", "ls", f"s3://{bucket}/"]
+    if aws_profile:
+        bucket_check_cmd.extend(["--profile", aws_profile])
+    
+    print(f"Checking if bucket exists: {' '.join(bucket_check_cmd)}")
+    try:
+        bucket_result = subprocess.run(bucket_check_cmd, capture_output=True, text=True)
+        if bucket_result.returncode != 0:
+            print(f"❌ Bucket {bucket} does not exist or is not accessible")
+            print(f"Error: {bucket_result.stderr}")
+            sys.exit(1)
+        else:
+            print(f"✅ Bucket {bucket} exists and is accessible")
+    except Exception as e:
+        print(f"❌ Error checking bucket: {e}")
+        sys.exit(1)
     
     try:
         run_command(cmd)
