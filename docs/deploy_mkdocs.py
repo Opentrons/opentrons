@@ -130,7 +130,11 @@ def deploy_docs(environment, branch=None, aws_profile=None, source_dir="site"):
     
     # Test write permissions to bucket
     print("Testing write permissions...")
-    test_cmd = ["aws", "s3", "cp", "/dev/null", f"s3://{bucket}/test-write-permission"]
+    # Create a temporary test file
+    test_file = Path("test-write-permission.txt")
+    test_file.write_text("test")
+    
+    test_cmd = ["aws", "s3", "cp", str(test_file), f"s3://{bucket}/test-write-permission.txt"]
     if aws_profile:
         test_cmd.extend(["--profile", aws_profile])
     
@@ -139,7 +143,7 @@ def deploy_docs(environment, branch=None, aws_profile=None, source_dir="site"):
         if test_result.returncode == 0:
             print("✅ Write permissions confirmed")
             # Clean up test file
-            cleanup_cmd = ["aws", "s3", "rm", f"s3://{bucket}/test-write-permission"]
+            cleanup_cmd = ["aws", "s3", "rm", f"s3://{bucket}/test-write-permission.txt"]
             if aws_profile:
                 cleanup_cmd.extend(["--profile", aws_profile])
             subprocess.run(cleanup_cmd, capture_output=True, text=True)
@@ -149,6 +153,10 @@ def deploy_docs(environment, branch=None, aws_profile=None, source_dir="site"):
     except Exception as e:
         print(f"❌ Error testing write permissions: {e}")
         sys.exit(1)
+    finally:
+        # Clean up local test file
+        if test_file.exists():
+            test_file.unlink()
     
     try:
         result = run_command(cmd)
