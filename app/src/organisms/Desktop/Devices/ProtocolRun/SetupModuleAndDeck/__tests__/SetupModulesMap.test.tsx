@@ -78,6 +78,7 @@ const mockMagneticModule = {
     labwareInterfaceXDimension: 80,
     labwareInterfaceYDimension: 120,
   },
+  slotTransforms: {},
 }
 
 const mockTCModule = {
@@ -94,6 +95,7 @@ const mockTCModule = {
     labwareInterfaceXDimension: 80,
     labwareInterfaceYDimension: 120,
   },
+  slotTransforms: {},
 }
 
 describe('SetupModulesMap', () => {
