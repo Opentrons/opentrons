@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import {
   BaseDeck,
@@ -50,15 +50,10 @@ export function SetupLabwareMap({
     stack: StackItem[]
   } | null>(null)
   const [hoverLabwareId, setHoverLabwareId] = useState<string | null>(null)
-  const [deckConfig, setDeckConfig] = useState(() =>
-    protocolAnalysis != null
-      ? getSimplestDeckConfigForProtocol(protocolAnalysis)
-      : []
-  )
 
-  useEffect(() => {
+  const deckConfig = useMemo(() => {
     if (protocolAnalysis != null) {
-      setDeckConfig(getSimplestDeckConfigForProtocol(protocolAnalysis))
+      getSimplestDeckConfigForProtocol(protocolAnalysis)
     }
   }, [protocolAnalysis])
 
