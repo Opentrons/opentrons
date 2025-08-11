@@ -40,6 +40,9 @@ export const SlotLabels = ({
   const simpleItemWidthStyle: Record<string, string> = {
     '--dynamic-width': `${widthLargeRem}rem`,
   }
+  const smallItemWidthStyle: Record<string, string> = {
+    '--dynamic-width': `${widthSmallRem}rem`,
+  }
   const nextTo4thWidthStyle: Record<string, string> = {
     '--dynamic-width': itemDynamicWidth,
   }
@@ -88,7 +91,7 @@ export const SlotLabels = ({
           </div>
           <div
             className={styles.deck_label_row_container}
-            style={simpleItemWidthStyle}
+            style={smallItemWidthStyle}
           >
             <DeckInfoLabel deckLabel="2" height="100%" />
           </div>

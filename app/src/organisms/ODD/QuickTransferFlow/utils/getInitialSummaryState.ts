@@ -6,6 +6,7 @@ import {
 
 import type { Mount } from '@opentrons/api-client'
 import type {
+  CutoutConfig,
   DeckConfiguration,
   LabwareDefinition2,
   PipetteV2Specs,
@@ -33,6 +34,8 @@ interface InitialSummaryStateProps {
     pushOutDispense?: {
       volume: number
     }
+    changeTip: ChangeTipOptions
+    dropTipLocation?: CutoutConfig
   }
   deckConfig: DeckConfiguration
 }
@@ -69,14 +72,6 @@ export function getInitialSummaryState(
     path = 'multiAspirate'
   }
 
-  let changeTip: ChangeTipOptions = 'always'
-  if (
-    state.sourceWells.length * state.pipette.channels > 96 ||
-    state.destinationWells.length * state.pipette.channels > 96
-  ) {
-    changeTip = 'once'
-  }
-
   const trashConfigCutout = deckConfig.find(
     configCutout =>
       WASTE_CHUTE_FIXTURES.includes(configCutout.cutoutFixtureId) ||
@@ -108,8 +103,8 @@ export function getInitialSummaryState(
     tipPositionAspirate: 1,
     preWetTip: false,
     tipPositionDispense: 1,
-    changeTip,
-    dropTipLocation: trashConfigCutout,
+    changeTip: state.changeTip,
+    dropTipLocation: state.dropTipLocation ?? trashConfigCutout,
     liquidClassName: state.liquidClassName,
     liquidClassValuesInitialized: false,
     pushOutDispense: state.pushOutDispense,

@@ -32,7 +32,7 @@ from opentrons.protocol_engine.resources.model_utils import ModelUtils
 from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.execution import MovementHandler, GantryMover, TipHandler
-from opentrons.protocol_engine.types import TipGeometry
+from opentrons.protocol_engine.types import TipGeometry, LabwareWellId
 
 from opentrons.types import Point
 
@@ -164,14 +164,16 @@ async def test_drop_tip_implementation(
         state_update=update_types.StateUpdate(
             pipette_location=update_types.PipetteLocationUpdate(
                 pipette_id="abc",
-                new_location=update_types.Well(
+                new_location=LabwareWellId(
                     labware_id="123",
                     well_name="A3",
                 ),
                 new_deck_point=DeckPoint(x=111, y=222, z=333),
             ),
             pipette_tip_state=update_types.PipetteTipStateUpdate(
-                pipette_id="abc", tip_geometry=None
+                pipette_id="abc",
+                tip_geometry=None,
+                tip_source=None,
             ),
             pipette_aspirated_fluid=update_types.PipetteUnknownFluidUpdate(
                 pipette_id="abc"

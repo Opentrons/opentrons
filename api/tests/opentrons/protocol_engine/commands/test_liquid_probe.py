@@ -33,6 +33,7 @@ from opentrons.protocol_engine.state.pipettes import (
 from opentrons.protocol_engine.state import update_types
 from opentrons.types import MountType, Point
 from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset, DeckPoint
+from opentrons.protocol_engine.types import LabwareWellId
 from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
 
 from opentrons.protocol_engine.commands.liquid_probe import (
@@ -247,7 +248,7 @@ async def test_liquid_probe_implementation(
         state_update=update_types.StateUpdate(
             pipette_location=update_types.PipetteLocationUpdate(
                 pipette_id="abc",
-                new_location=update_types.Well(labware_id="123", well_name="A3"),
+                new_location=LabwareWellId(labware_id="123", well_name="A3"),
                 new_deck_point=DeckPoint(x=1, y=2, z=3),
             ),
             liquid_probed=update_types.LiquidProbedUpdate(
@@ -362,7 +363,7 @@ async def test_liquid_not_found_error(
     expected_state_update = update_types.StateUpdate(
         pipette_location=update_types.PipetteLocationUpdate(
             pipette_id=pipette_id,
-            new_location=update_types.Well(labware_id=labware_id, well_name=well_name),
+            new_location=LabwareWellId(labware_id=labware_id, well_name=well_name),
             new_deck_point=DeckPoint(x=position.x, y=position.y, z=position.z),
         ),
         liquid_probed=update_types.LiquidProbedUpdate(

@@ -59,7 +59,9 @@ async def test_drop_tip_implementation(
         public=UnsafeDropTipInPlaceResult(),
         state_update=StateUpdate(
             pipette_tip_state=PipetteTipStateUpdate(
-                pipette_id="abc", tip_geometry=None
+                pipette_id="abc",
+                tip_geometry=None,
+                tip_source=None,
             ),
             pipette_aspirated_fluid=PipetteUnknownFluidUpdate(pipette_id="abc"),
         ),

@@ -229,7 +229,7 @@ export const getCustomLiquidClassProperties = (
 }
 
 export const getLiquidClassName = (
-  liquidClass: string,
+  liquidClass: string, // a liquid class name like "water", "none" is not allowed
   showBase?: boolean
 ): string => {
   const allLiquidClassDefs = getAllLiquidClassDefs()

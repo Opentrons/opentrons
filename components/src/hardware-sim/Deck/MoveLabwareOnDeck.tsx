@@ -24,6 +24,7 @@ import type {
   RobotType,
   Vector3D,
 } from '@opentrons/shared-data'
+import type { ModuleOnDeck } from '../../hardware-sim/BaseDeck'
 import type { StyleProps } from '../../primitives'
 
 const SPLASH_Y_BUFFER_MM = 10
@@ -35,6 +36,7 @@ interface MoveLabwareOnDeckProps extends StyleProps {
   finalLabwareLocation: LabwareLocation
   loadedModules: LoadedModule[]
   loadedLabware: LoadedLabware[]
+  modulesOnDeck?: ModuleOnDeck[]
   labwareDefinitions: LabwareDefinition[]
   deckConfig: DeckConfiguration
   backgroundItems?: ReactNode
@@ -47,6 +49,7 @@ export function MoveLabwareOnDeck(
     robotType,
     movedLabwareDef,
     loadedLabware,
+    modulesOnDeck,
     labwareDefinitions,
     initialLabwareLocation,
     finalLabwareLocation,
@@ -108,35 +111,58 @@ export function MoveLabwareOnDeck(
       ? finalCoordinates
       : offDeckCoordinates
 
+  // The user can't see the splash animation if it happens off-deck.
+  // Skip it so there's no pause where it looks like nothing is happening.
+  const shouldAnimateSplashBeforeMove =
+    animationInitialCoordinates !== offDeckCoordinates
+  const shouldAnimateSplashAfterMove =
+    animationFinalCoordinates !== offDeckCoordinates
+
   const shouldReset = usePositionChangeReset(
     animationInitialCoordinates,
     animationFinalCoordinates
   )
 
-  const springProps = useSpring({
-    reset: shouldReset,
-    config: { duration: 1000, easing: easings.easeInOutSine },
-    from: {
-      ...animationInitialCoordinates,
-      splashOpacity: 0,
-      deckOpacity: 0,
-    },
-    to: [
-      { deckOpacity: 1 },
-      { splashOpacity: 1 },
-      { splashOpacity: 0 },
-      { ...animationFinalCoordinates },
-      { splashOpacity: 1 },
-      { splashOpacity: 0 },
-      { deckOpacity: 0 },
-    ],
-    loop: true,
-  })
+  const [springProps] = useSpring(
+    () => ({
+      reset: shouldReset,
+      config: { duration: 1000, easing: easings.easeInOutSine },
+      from: {
+        ...animationInitialCoordinates,
+        splashOpacity: 0,
+        deckOpacity: 0,
+      },
+      to: [
+        { deckOpacity: 1 },
+        ...(shouldAnimateSplashBeforeMove
+          ? [{ splashOpacity: 1 }, { splashOpacity: 0 }]
+          : []),
+        { ...animationFinalCoordinates },
+        ...(shouldAnimateSplashAfterMove
+          ? [{ splashOpacity: 1 }, { splashOpacity: 0 }]
+          : []),
+        { deckOpacity: 0 },
+      ],
+      loop: true,
+    }),
+    // Dependency array:
+    [
+      shouldReset,
+      // react-spring behaves weirdly if its props are updated too frequently.
+      // So make sure to filter out coordinate "updates" that are just object identity
+      // updates and not updates to the actual x/y/z components.
+      ...Object.values(animationInitialCoordinates),
+      ...Object.values(animationFinalCoordinates),
+      shouldAnimateSplashBeforeMove,
+      shouldAnimateSplashAfterMove,
+    ]
+  )
 
   return (
     <BaseDeck
       deckConfig={deckConfig}
       robotType={robotType}
+      modulesOnDeck={modulesOnDeck}
       svgProps={{
         style: { opacity: springProps.deckOpacity },
         ...styleProps,
