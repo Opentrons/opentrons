@@ -1,4 +1,5 @@
 import {
+  AlignControlToModule,
   BaseDeck,
   Box,
   DIRECTION_COLUMN,
@@ -22,6 +23,8 @@ import {
   getAttachedProtocolModuleMatches,
   getProtocolModulesInfo,
 } from '/app/transformations/analysis'
+
+import type { ModuleOnDeck } from '@opentrons/components'
 
 const ATTACHED_MODULE_POLL_MS = 5000
 const DECK_CONFIG_POLL_MS = 5000
@@ -61,18 +64,26 @@ export const SetupModulesMap = ({
     robotType
   )
 
-  const modulesOnDeck = attachedProtocolModuleMatches.map(module => ({
-    moduleModel: module.moduleDef.model,
-    moduleLocation: { slotName: module.slotName },
-    moduleChildren: (
-      <ModuleInfo
-        moduleModel={module.moduleDef.model}
-        isAttached={module.attachedModuleMatch != null}
-        physicalPort={parseModuleUSBPort(module.attachedModuleMatch)}
-        runId={runId}
-      />
-    ),
-  }))
+  const modulesOnDeck = attachedProtocolModuleMatches.map(
+    (module): ModuleOnDeck => ({
+      moduleModel: module.moduleDef.model,
+      moduleLocation: { slotName: module.slotName },
+      moduleChildren: (
+        <AlignControlToModule
+          deckId={deckDef.otId}
+          slotId={module.slotName}
+          moduleDefinition={module.moduleDef}
+        >
+          <ModuleInfo
+            moduleModel={module.moduleDef.model}
+            isAttached={module.attachedModuleMatch != null}
+            physicalPort={parseModuleUSBPort(module.attachedModuleMatch)}
+            runId={runId}
+          />
+        </AlignControlToModule>
+      ),
+    })
+  )
 
   const simplestProtocolDeckConfig = getSimplestDeckConfigForProtocol(
     protocolAnalysis
