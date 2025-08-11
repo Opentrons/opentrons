@@ -31,6 +31,7 @@ import {
   dispenseTouchTipMmFromEdgeRequired,
   dispenseTouchTipSpeedRequired,
   dispenseWellsRequired,
+  disposalVolumeRequired,
   engageHeightRangeExceeded,
   engageHeightRequired,
   fileNameRequired,
@@ -83,7 +84,6 @@ import {
   composeWarnings,
   incompatibleLiquidClass,
   maxDispenseWellVolume,
-  minDisposalVolume,
   mixTipPositionInTube,
   tipPositionInTube,
 } from './warnings'
@@ -238,12 +238,12 @@ const stepFormHelperMap: {
       aspirateSubmergeSpeedRequired,
       aspirateRetractSpeedRequired,
       dispenseSubmergeSpeedRequired,
-      dispenseRetractSpeedRequired
+      dispenseRetractSpeedRequired,
+      disposalVolumeRequired
     ),
     getWarnings: composeWarnings(
       belowPipetteMinimumVolume,
       maxDispenseWellVolume,
-      minDisposalVolume,
       tipPositionInTube,
       incompatibleLiquidClass
     ),

@@ -93,7 +93,13 @@ const PopulatedPreview = (props: {
         bBox == null ? '0 0 0 0' : calculateViewBox(bBox)
       }
     >
-      {() => <LabwareRender definition={definition} gRef={gRef} />}
+      {() => (
+        <LabwareRender
+          definition={definition}
+          positioningMode="offsetInSlot"
+          gRef={gRef}
+        />
+      )}
     </RobotWorkSpace>
   )
 }

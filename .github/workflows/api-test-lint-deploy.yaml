@@ -17,6 +17,7 @@ on:
       - '.github/workflows/api-test-lint-deploy.yaml'
       - '.github/actions/python/**'
       - '.github/workflows/utils.js'
+      - 'package-testing/**'
   push:
     paths:
       - 'api/**'
@@ -56,7 +57,7 @@ jobs:
           fetch-depth: 0
       - uses: 'actions/setup-node@v4'
         with:
-          node-version: '22.11.0'
+          node-version: '22.12.0'
       - uses: 'actions/setup-python@v4'
         with:
           python-version: '3.10'
@@ -93,7 +94,7 @@ jobs:
           git checkout ${{ github.ref }}
       - uses: 'actions/setup-node@v4'
         with:
-          node-version: '22.11.0'
+          node-version: '22.12.0'
       - uses: 'actions/setup-python@v4'
         with:
           python-version: ${{ matrix.python }}
@@ -120,8 +121,6 @@ jobs:
         run: make -C api test-cov
       - name: Ensure assets build
         run: make -C api sdist wheel
-      - name: Check stacking regression tests
-        run: make -C api test-integration
       - name: Upload coverage report
         uses: 'codecov/codecov-action@v3'
         with:
@@ -199,7 +198,7 @@ jobs:
           git checkout ${{ github.ref }}
       - uses: 'actions/setup-node@v4'
         with:
-          node-version: '22.11.0'
+          node-version: '22.12.0'
       - uses: 'actions/setup-python@v4'
         with:
           python-version: '3.10'

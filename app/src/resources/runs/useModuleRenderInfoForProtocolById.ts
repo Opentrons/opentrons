@@ -1,6 +1,7 @@
 import {
   checkModuleCompatibility,
   FLEX_ROBOT_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   getCutoutFixturesForModuleModel,
   getCutoutIdsFromModuleSlotName,
   getDeckDefFromRobotType,
@@ -112,11 +113,19 @@ export function useModuleRenderInfoForProtocolById(
       }
     }
   )
-  return allModuleRenderInfo.reduce(
-    (acc, moduleInfo) => ({
-      ...acc,
-      [moduleInfo.moduleId]: moduleInfo,
-    }),
-    {}
-  )
+  return allModuleRenderInfo
+    .sort((a, b) => a.slotName.localeCompare(b.slotName))
+    .reduce(
+      (acc, moduleInfo) => ({
+        ...acc,
+        [moduleInfo.moduleId]: {
+          ...moduleInfo,
+          slotName:
+            moduleInfo.moduleDef.moduleType === FLEX_STACKER_MODULE_TYPE
+              ? `${moduleInfo.slotName.charAt(0)}4`
+              : moduleInfo.slotName,
+        },
+      }),
+      {}
+    )
 }

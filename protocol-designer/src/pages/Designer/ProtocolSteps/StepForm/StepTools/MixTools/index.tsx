@@ -2,7 +2,7 @@ import { useSelector } from 'react-redux'
 
 import {
   getEnablePartialTipSupport,
-  getEnableReturnTip,
+  getEnableTipPickupLocation,
 } from '../../../../../../feature-flags/selectors'
 import {
   getLabwareEntities,
@@ -31,7 +31,7 @@ export function MixTools(
     setShowFormErrors,
   } = props
   const pipettes = useSelector(getPipetteEntities)
-  const enableReturnTip = useSelector(getEnableReturnTip)
+  const enableTipPickupLocation = useSelector(getEnableTipPickupLocation)
   const enablePartialTip = useSelector(getEnablePartialTipSupport)
   const labwares = useSelector(getLabwareEntities)
 
@@ -64,7 +64,7 @@ export function MixTools(
         formData={formData}
         enablePartialTip={enablePartialTip}
         pipettes={pipettes}
-        enableReturnTip={enableReturnTip}
+        enableTipPickupLocation={enableTipPickupLocation}
         userSelectedPickUpTipLocation={userSelectedPickUpTipLocation}
         userSelectedDropTipLocation={userSelectedDropTipLocation}
       />

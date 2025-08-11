@@ -194,6 +194,7 @@ const mockFlexStacker = {
     path: '/dev/ot_module_flex_stacker',
     hub: false,
     port: 1,
+    hubPort: 1,
     portGroup: 'unknown',
   },
   data: {
@@ -281,7 +282,7 @@ describe('ModuleCard', () => {
     render(props)
     screen.getByText('Magnetic Module GEN1')
     screen.getByText('Mock Magnetic Module Data')
-    screen.getByText('usb-1')
+    screen.getByText('USB-1')
     screen.getByAltText('magneticModuleV1')
   })
   it('renders information for a temperature module with mocked status', () => {
@@ -295,7 +296,7 @@ describe('ModuleCard', () => {
     })
     screen.getByText('Temperature Module GEN2')
     screen.getByText('Mock Temperature Module Data')
-    screen.getByText('usb-1')
+    screen.getByText('USB-1')
     screen.getByAltText('temperatureModuleV2')
   })
 
@@ -307,7 +308,7 @@ describe('ModuleCard', () => {
 
     screen.getByText('Thermocycler Module GEN1')
     screen.getByText('Mock Thermocycler Module Data')
-    screen.getByText('usb-1')
+    screen.getByText('USB-1')
     screen.getByAltText('thermocyclerModuleV1')
   })
 
@@ -320,7 +321,7 @@ describe('ModuleCard', () => {
 
     screen.getByText('Heater-Shaker Module GEN1')
     screen.getByText('Mock Heater Shaker Module Data')
-    screen.getByText('usb-1')
+    screen.getByText('USB-1')
     screen.getByAltText('heaterShakerModuleV1')
   })
 
@@ -333,7 +334,7 @@ describe('ModuleCard', () => {
 
     screen.getByText('Flex Stacker Module GEN1')
     screen.getByText('Mock Flex Stacker Module Data')
-    screen.getByText('usb-1')
+    screen.getByText('S-1')
     screen.getByAltText('flexStackerModuleV1')
   })
 

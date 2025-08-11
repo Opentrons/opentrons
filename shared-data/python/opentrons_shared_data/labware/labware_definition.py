@@ -546,8 +546,17 @@ WellSegment = Annotated[
 ]
 
 
+class HeightVolumePair(BaseModel):
+    height: float
+    volume: float
+
+
 class InnerWellGeometry(BaseModel):
     sections: Annotated[list[WellSegment], Field(min_length=1)]
+
+
+class UserDefinedVolumes(BaseModel):
+    heightToVolumeMap: list[HeightVolumePair]
 
 
 class Extents(BaseModel):
@@ -574,7 +583,9 @@ class LabwareDefinition2(BaseModel):
     gripHeightFromLabwareBottom: float | None = None
     stackLimit: int | None = None
     compatibleParentLabware: list[str] | None = None
-    innerLabwareGeometry: dict[str, InnerWellGeometry] | None = None
+    innerLabwareGeometry: dict[
+        str, InnerWellGeometry | UserDefinedVolumes
+    ] | None = None
 
 
 class LabwareDefinition3(BaseModel):
@@ -597,7 +608,7 @@ class LabwareDefinition3(BaseModel):
     allowedRoles: list[LabwareRole] = Field(default_factory=list)
     gripperOffsets: dict[str, GripperOffsets] = Field(default_factory=dict)
     gripForce: float | None = None
-    gripHeightFromLabwareBottom: float | None = None
+    gripHeightFromLabwareOrigin: float | None = None
     stackLimit: int | None = None
     compatibleParentLabware: list[str] | None = None
     innerLabwareGeometry: dict[str, InnerWellGeometry] | None = None

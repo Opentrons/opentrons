@@ -24,6 +24,7 @@ describe('FeatureFlag', () => {
         PRERELEASE_MODE: true,
         OT_PD_ALLOW_ALL_TIPRACKS: true,
         OT_PD_ENABLE_COMMENT: true,
+        OT_PD_ENABLE_TIP_PICKUP_LOCATION: true,
         OT_PD_ENABLE_RETURN_TIP: true,
         OT_PD_ENABLE_REACT_SCAN: true,
         OT_PD_ENABLE_TIMELINE_SCRUBBER: true,
@@ -40,15 +41,15 @@ describe('FeatureFlag', () => {
     screen.getByText('Enable selection of all tip racks for each pipette.')
     screen.getByText('Enable comment step')
     screen.getByText('You can add comments anywhere between timeline steps.')
+    screen.getByText('Enable tip pickup location')
+    screen.getByText('You can choose which tip to pick up.')
     screen.getByText('Enable return tip')
-    screen.getByText(
-      'You can choose which tip to pick up and where to drop tip.'
-    )
+    screen.getByText('You can choose where to drop tip.')
     screen.getByText('Enable React Scan')
     screen.getByText('Enable React Scan support for components rendering check')
     screen.getByText('Enable timeline scrubber')
     screen.getByText('See the protocol timeline visualization in overview')
-    expect(screen.getAllByRole('switch').length).toBe(6)
+    expect(screen.getAllByRole('switch').length).toBe(7)
   })
   it('should call function when clicking toggle switches', () => {
     render(props)
@@ -71,15 +72,20 @@ describe('FeatureFlag', () => {
 
     fireEvent.click(toggleButtons[3])
     expect(vi.mocked(featureFlagActions.setFeatureFlags)).toHaveBeenCalledWith({
-      OT_PD_ENABLE_RETURN_TIP: false,
+      OT_PD_ENABLE_TIP_PICKUP_LOCATION: false,
     })
 
     fireEvent.click(toggleButtons[4])
     expect(vi.mocked(featureFlagActions.setFeatureFlags)).toHaveBeenCalledWith({
-      OT_PD_ENABLE_REACT_SCAN: false,
+      OT_PD_ENABLE_RETURN_TIP: false,
     })
 
     fireEvent.click(toggleButtons[5])
+    expect(vi.mocked(featureFlagActions.setFeatureFlags)).toHaveBeenCalledWith({
+      OT_PD_ENABLE_REACT_SCAN: false,
+    })
+
+    fireEvent.click(toggleButtons[6])
     expect(vi.mocked(featureFlagActions.setFeatureFlags)).toHaveBeenCalledWith({
       OT_PD_ENABLE_TIMELINE_SCRUBBER: false,
     })

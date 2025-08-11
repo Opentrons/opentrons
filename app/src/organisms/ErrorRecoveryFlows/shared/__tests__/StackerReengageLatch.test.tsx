@@ -14,13 +14,13 @@ import type { ComponentProps } from 'react'
 describe('Render StackerReengageLatch', () => {
   let props: ComponentProps<typeof StackerReengageLatch>
   let mockHandleMotionRouting: Mock
-  let mockHomeShuttle: Mock
+  let mockCloseLabwareLatch: Mock
   let mockProceedNextStep: Mock
   let mockGoBackPrevStep: Mock
 
   beforeEach(() => {
     mockHandleMotionRouting = vi.fn(() => Promise.resolve())
-    mockHomeShuttle = vi.fn(() => Promise.resolve())
+    mockCloseLabwareLatch = vi.fn(() => Promise.resolve())
     mockProceedNextStep = vi.fn(() => Promise.resolve())
     mockGoBackPrevStep = vi.fn(() => Promise.resolve())
 
@@ -31,7 +31,7 @@ describe('Render StackerReengageLatch', () => {
         goBackPrevStep: mockGoBackPrevStep,
       } as any,
       recoveryCommands: {
-        homeShuttle: mockHomeShuttle,
+        closeLabwareLatch: mockCloseLabwareLatch,
       } as any,
       currentRecoveryOptionUtils: {
         selectedRecoveryOption: RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE,
@@ -49,7 +49,10 @@ describe('Render StackerReengageLatch', () => {
   it('calls proceedNextStep when primary button is clicked', async () => {
     render(props)
 
-    clickButtonLabeled('Continue')
+    clickButtonLabeled('Re-engage latch')
+    await waitFor(() => {
+      expect(mockCloseLabwareLatch).toHaveBeenCalled()
+    })
     await waitFor(() => {
       expect(mockProceedNextStep).toHaveBeenCalled()
     })

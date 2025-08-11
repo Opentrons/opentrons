@@ -1,4 +1,5 @@
 """Configure for volume command request, result, and implementation models."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type, Any
 
@@ -29,7 +30,7 @@ class ConfigureForVolumeParams(PipetteIdMixin):
         ...,
         description="Amount of liquid in uL. Must be at least 0 and no greater "
         "than a pipette-specific maximum volume.",
-        ge=0,
+        ge=0.0,
     )
     tipOverlapNotAfterVersion: str | SkipJsonSchema[None] = Field(
         None,

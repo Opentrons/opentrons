@@ -7,6 +7,8 @@ import postCssImport from 'postcss-import'
 import postCssPresetEnv from 'postcss-preset-env'
 import { defineConfig } from 'vite'
 
+import { cssModuleSideEffect } from './cssModuleSideEffect'
+
 export default defineConfig({
   // this makes imports relative rather than absolute
   base: '',
@@ -22,6 +24,7 @@ export default defineConfig({
         configFile: true,
       },
     }),
+    cssModuleSideEffect(),
   ],
   optimizeDeps: {
     esbuildOptions: {
@@ -45,8 +48,8 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@opentrons/components/styles': path.resolve(
-        '../components/src/index.module.css'
+      '@opentrons/components/styles/global': path.resolve(
+        '../components/src/styles/global.css'
       ),
       '@opentrons/components': path.resolve('../components/src/index.ts'),
       '/ai-client/': path.resolve('./src/') + '/',

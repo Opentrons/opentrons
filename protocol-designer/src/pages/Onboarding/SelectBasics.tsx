@@ -107,7 +107,13 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
 
   useEffect(() => {
     handleScrollToBottom()
-  }, [hasGripper, hasThermocycer, hasWasteChute, selectedPipetteName])
+  }, [
+    hasGripper,
+    hasThermocycer,
+    hasWasteChute,
+    selectedPipetteName,
+    robotType,
+  ])
 
   const handleSwapMounts = (): void => {
     const leftPipetteName = pipettesByMount.left.pipetteName
@@ -393,11 +399,7 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
             </>
           ) : null}
           {robotType === FLEX_ROBOT_TYPE && !noPipette && (
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              gridGap={SPACING.spacing60}
-              ref={ref}
-            >
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing60}>
               <BasicsButtons
                 type="gripper"
                 subHeader={t('some_modules_require_gripper')}
@@ -434,6 +436,8 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
               ) : null}
             </Flex>
           )}
+          {/* empty div for scrolling to bottom on form changes */}
+          <div ref={ref} />
         </WizardBody>
       </HandleEnter>
     </>

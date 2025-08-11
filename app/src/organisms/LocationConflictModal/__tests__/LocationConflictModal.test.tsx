@@ -18,19 +18,26 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
+import {
+  mockFlexStacker,
+  mockHeaterShaker,
+} from '/app/redux/modules/__fixtures__'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useCloseCurrentRun } from '/app/resources/runs'
 
+import { useSendIdentifyStacker } from '../../ModuleWizardFlows/hooks'
 import { LocationConflictModal } from '../LocationConflictModal'
 
 import type { ComponentProps } from 'react'
 import type { UseQueryResult } from 'react-query'
-import type { DeckConfiguration } from '@opentrons/shared-data'
+import type { AttachedModule } from '@opentrons/api-client'
+import type { DeckConfiguration, IdentifyColor } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/deck_configuration')
 vi.mock('/app/resources/runs')
+vi.mock('/app/organisms/ModuleCard/utils')
+vi.mock('/app/organisms/ModuleWizardFlows/hooks.tsx')
 
 const mockFixture = {
   cutoutId: 'cutoutB3',
@@ -50,6 +57,11 @@ const render = (props: ComponentProps<typeof LocationConflictModal>) => {
 
 describe('LocationConflictModal', () => {
   let props: ComponentProps<typeof LocationConflictModal>
+  let sendIdentifyStacker: (
+    module: AttachedModule,
+    start: boolean,
+    color?: IdentifyColor
+  ) => void
   const mockUpdate = vi.fn()
   beforeEach(() => {
     props = {
@@ -59,6 +71,7 @@ describe('LocationConflictModal', () => {
       deckDef: ot3StandardDeckV5 as any,
       robotName: 'otie',
     }
+    sendIdentifyStacker = vi.fn()
     vi.mocked(useCloseCurrentRun).mockReturnValue({
       closeCurrentRun: vi.fn(),
     } as any)
@@ -69,6 +82,7 @@ describe('LocationConflictModal', () => {
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdate,
     } as any)
+    vi.mocked(useSendIdentifyStacker).mockReturnValue(sendIdentifyStacker)
   })
   afterEach(() => {
     vi.resetAllMocks()
@@ -79,7 +93,7 @@ describe('LocationConflictModal', () => {
     screen.getByText('Slot B3')
     screen.getByText('Protocol specifies')
     screen.getByText('Currently configured')
-    screen.getAllByText('Staging area slot')
+    screen.getAllByText('Staging Area Slot')
     screen.getByText('Trash bin')
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(props.onCloseClick).toHaveBeenCalled()
@@ -104,6 +118,28 @@ describe('LocationConflictModal', () => {
     expect(props.onCloseClick).toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: 'Update deck' }))
     screen.getByText('Heater-Shaker Module GEN1 in USB-1')
+    fireEvent.click(screen.getByRole('button', { name: 'Add' }))
+    expect(mockUpdate).toHaveBeenCalled()
+  })
+  it('should render the modal information for a stacker module fixture and include the identify button', () => {
+    vi.mocked(useModulesQuery).mockReturnValue({
+      data: { data: [mockFlexStacker] },
+    } as any)
+    props = {
+      onCloseClick: vi.fn(),
+      cutoutId: 'cutoutB3',
+      requiredModule: 'flexStackerModuleV1',
+      deckDef: ot3StandardDeckV5 as any,
+      robotName: 'otie',
+    }
+    render(props)
+    screen.getByText('Protocol specifies')
+    screen.getByText('Currently configured')
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+    expect(props.onCloseClick).toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: 'Update deck' }))
+    screen.getByText('Flex Stacker Module GEN1 in S-1')
+    screen.getByText('Identify')
     fireEvent.click(screen.getByRole('button', { name: 'Add' }))
     expect(mockUpdate).toHaveBeenCalled()
   })
@@ -145,7 +181,7 @@ describe('LocationConflictModal', () => {
     screen.getByText('Slot B3')
     screen.getByText('Protocol specifies')
     screen.getByText('Currently configured')
-    screen.getAllByText('Staging area slot')
+    screen.getAllByText('Staging Area Slot')
     screen.getByText('Trash bin')
     fireEvent.click(screen.getByText('Cancel'))
     expect(props.onCloseClick).toHaveBeenCalled()

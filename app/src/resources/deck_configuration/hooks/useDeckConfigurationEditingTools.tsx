@@ -17,6 +17,7 @@ import { useNotifyDeckConfigurationQuery } from '../useNotifyDeckConfigurationQu
 import type { ReactNode } from 'react'
 import type {
   AddressableAreaNamesWithFakes,
+  CutoutFixtureId,
   CutoutFixtureIdsWithFakes,
   CutoutId,
 } from '@opentrons/shared-data'
@@ -50,12 +51,21 @@ export function useDeckConfigurationEditingTools(
     setAddressableAreaId,
   ] = useState<AddressableAreaNamesWithFakes | null>(null)
 
+  const [
+    existingCutoutFixtureId,
+    setExistingCutoutFixtureId,
+  ] = useState<CutoutFixtureId | null>(null)
+
   const addFixtureToCutout = (
     cutoutId: CutoutId,
     addressableAreaId: AddressableAreaNamesWithFakes
   ): void => {
     setTargetCutoutId(cutoutId)
     setAddressableAreaId(addressableAreaId)
+    const foundFixtureId =
+      deckConfig.find(config => config.cutoutId === cutoutId)
+        ?.cutoutFixtureId ?? null
+    setExistingCutoutFixtureId(foundFixtureId ?? null)
   }
 
   const removeFixtureFromCutout = (
@@ -124,6 +134,7 @@ export function useDeckConfigurationEditingTools(
           }}
           isOnDevice={isOnDevice}
           deckDef={deckDef}
+          existingCutoutFixtureId={existingCutoutFixtureId ?? undefined}
         />
       ) : null,
   }

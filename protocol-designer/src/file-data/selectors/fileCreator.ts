@@ -19,9 +19,9 @@ import {
   pythonImports,
   pythonMetadata,
   pythonRequirements,
+  swatchColors,
 } from '@opentrons/step-generation'
 
-import { swatchColors } from '../../components/organisms/DefineLiquidsModal/swatchColors'
 import { selectors as dismissSelectors } from '../../dismiss'
 import { selectors as labwareDefSelectors } from '../../labware-defs'
 import { selectors as ingredSelectors } from '../../labware-ingred/selectors'
@@ -39,7 +39,7 @@ import {
 
 import type {
   CommandAnnotationV1Mixin,
-  CommandV10Mixin,
+  CommandV14Mixin,
   CreateCommand,
   LabwareV2Mixin,
   LiquidV1Mixin,
@@ -253,8 +253,8 @@ export const createJSONFile: Selector<ProtocolFile> = createSelector(
       liquids,
     }
 
-    const commandv10Mixin: CommandV10Mixin = {
-      commandSchemaId: 'opentronsCommandSchemaV10',
+    const commandv14Mixin: CommandV14Mixin = {
+      commandSchemaId: 'opentronsCommandSchemaV14',
       commands,
     }
 
@@ -310,7 +310,7 @@ export const createJSONFile: Selector<ProtocolFile> = createSelector(
       ...deckStructure,
       ...labwareV2Mixin,
       ...liquidV2Mixin,
-      ...commandv10Mixin,
+      ...commandv14Mixin,
       ...commandAnnotionaV1Mixin,
     }
   }

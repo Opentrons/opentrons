@@ -2,13 +2,13 @@ from typing import Any, Dict, cast
 
 import pytest
 from _pytest.fixtures import SubRequest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
+from pytest_lazy_fixtures import lf as lazy_fixture
 from opentrons.config.advanced_settings import _migrate, _ensure
 
 
 @pytest.fixture
 def migrated_file_version() -> int:
-    return 37
+    return 38
 
 
 # make sure to set a boolean value in default_file_settings only if
@@ -30,6 +30,7 @@ def default_file_settings() -> Dict[str, Any]:
         "enableErrorRecoveryExperiments": None,
         "enableOEMMode": None,
         "enablePerformanceMetrics": None,
+        "disableFlexStackerLabwareDetection": None,
     }
 
 
@@ -438,8 +439,19 @@ def v37_config(v36_config: Dict[str, Any]) -> Dict[str, Any]:
     return r
 
 
+@pytest.fixture
+def v38_config(v37_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = v37_config.copy()
+    r.update(
+        {
+            "_version": 38,
+            "disableFlexStackerLabwareDetection": None,
+        }
+    )
+    return r
+
+
 @pytest.fixture(
-    scope="session",
     params=[
         lazy_fixture("empty_settings"),
         lazy_fixture("version_less"),
@@ -480,6 +492,7 @@ def v37_config(v36_config: Dict[str, Any]) -> Dict[str, Any]:
         lazy_fixture("v35_config"),
         lazy_fixture("v36_config"),
         lazy_fixture("v37_config"),
+        lazy_fixture("v38_config"),
     ],
 )
 def old_settings(request: SubRequest) -> Dict[str, Any]:
@@ -570,4 +583,5 @@ def test_ensures_config() -> None:
         "enableErrorRecoveryExperiments": None,
         "enableOEMMode": None,
         "enablePerformanceMetrics": None,
+        "disableFlexStackerLabwareDetection": None,
     }

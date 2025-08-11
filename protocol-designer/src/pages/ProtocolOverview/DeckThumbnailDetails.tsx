@@ -4,7 +4,7 @@ import values from 'lodash/values'
 import { Module } from '@opentrons/components'
 import {
   getAddressableAreaFromSlotId,
-  getModuleDef2,
+  getModuleDef,
   getPositionFromSlotId,
   inferModuleOrientationFromXCoordinate,
   isAddressableAreaStandardSlot,
@@ -69,7 +69,7 @@ export const DeckThumbnailDetails = (
           console.warn(`no slot ${slotId} for module ${id}`)
           return null
         }
-        const moduleDef = getModuleDef2(model)
+        const moduleDef = getModuleDef(model)
         const labwareLoadedOnModuleId = getTopmostLabwareOnModuleFromStack(
           id,
           allLabware
@@ -91,9 +91,10 @@ export const DeckThumbnailDetails = (
               }
               targetSlotId={slotId}
               targetDeckId={deckDef.otId}
+              childrenPositioningMode="offsetToSlot"
             >
-              {labwareLoadedOnModuleId != null ? (
-                <>
+              <>
+                {labwareLoadedOnModuleId != null ? (
                   <LabwareOnDeck
                     x={0}
                     y={0}
@@ -101,15 +102,7 @@ export const DeckThumbnailDetails = (
                       initialDeckSetup.labware[labwareLoadedOnModuleId]
                     }
                   />
-                  <SlotHover
-                    robotType={robotType}
-                    hover={hover}
-                    setHover={setHover}
-                    slotPosition={[0, 0, 0]}
-                    slotId={slotId}
-                  />
-                </>
-              ) : (
+                ) : null}
                 <SlotHover
                   robotType={robotType}
                   hover={hover}
@@ -117,7 +110,7 @@ export const DeckThumbnailDetails = (
                   slotPosition={[0, 0, 0]}
                   slotId={slotId}
                 />
-              )}
+              </>
             </Module>
           </Fragment>
         )

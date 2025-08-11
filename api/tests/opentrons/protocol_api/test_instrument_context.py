@@ -8,7 +8,7 @@ from typing import ContextManager, Optional, Any
 from unittest.mock import sentinel
 
 from decoy import Decoy, matchers
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
+from pytest_lazy_fixtures import lf as lazy_fixture
 
 from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
 from opentrons.protocol_engine.errors.error_occurrence import (
@@ -50,7 +50,13 @@ from opentrons.protocol_api import (
     labware,
     LiquidClass,
 )
-from opentrons.protocol_api.core.common import InstrumentCore, ProtocolCore
+from opentrons.protocol_api.core.common import (
+    InstrumentCore,
+    ProtocolCore,
+    WellCore,
+    LabwareCore,
+)
+from opentrons.protocol_api.core.core_map import LoadedCoreMap
 from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
     LegacyInstrumentCore,
 )
@@ -133,6 +139,12 @@ def mock_protocol_core(decoy: Decoy) -> ProtocolCore:
 
 
 @pytest.fixture
+def mock_core_map(decoy: Decoy) -> LoadedCoreMap:
+    """Get a mock LoadedCoreMap."""
+    return decoy.mock(cls=LoadedCoreMap)
+
+
+@pytest.fixture
 def mock_broker(decoy: Decoy) -> LegacyBroker:
     """Get a mock command message broker."""
     return decoy.mock(cls=LegacyBroker)
@@ -154,6 +166,7 @@ def api_version() -> APIVersion:
 def subject(
     mock_instrument_core: InstrumentCore,
     mock_protocol_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
     mock_broker: LegacyBroker,
     mock_trash: Labware,
     api_version: APIVersion,
@@ -167,6 +180,7 @@ def subject(
         tip_racks=[],
         trash=mock_trash,
         requested_as="requested-pipette-name",
+        core_map=mock_core_map,
     )
 
 
@@ -1002,28 +1016,32 @@ def test_return_tip(
     decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
 ) -> None:
     """It should pick up a tip and return it."""
+    mock_tiprack_core = decoy.mock(cls=LabwareCore)
+    mock_tiprack = decoy.mock(cls=Labware)
+    mock_well_core = decoy.mock(cls=WellCore)
+    subject._core_map = {mock_tiprack_core: mock_tiprack}  # type: ignore[assignment]
     mock_well = decoy.mock(cls=Well)
     top_location = Location(point=Point(1, 2, 3), labware=mock_well)
-    decoy.when(mock_well.top()).then_return(top_location)
 
-    subject.pick_up_tip(mock_well)
+    decoy.when(mock_well_core.get_display_name()).then_return("bar")
+    decoy.when(mock_well_core.get_name()).then_return("foo")
+    decoy.when(mock_well.top()).then_return(top_location)
+    decoy.when(mock_instrument_core.has_tip()).then_return(True)
+    decoy.when(mock_instrument_core.get_tip_origin()).then_return(
+        (mock_tiprack_core, mock_well_core)
+    )
+
     subject.return_tip()
 
     decoy.verify(
-        mock_instrument_core.pick_up_tip(
-            location=top_location,
-            well_core=mock_well._core,
-            presses=None,
-            increment=None,
-            prep_after=True,
-        ),
         mock_instrument_core.drop_tip(
             location=None,
-            well_core=mock_well._core,
+            well_core=mock_well_core,
             home_after=None,
             alternate_drop_location=False,
-        ),
+        )
     )
+    decoy.when(mock_instrument_core.get_tip_origin()).then_return(None)
 
     with pytest.raises(TypeError, match="Last tip location"):
         subject.return_tip()
@@ -2495,7 +2513,6 @@ def test_transfer_liquid_delegates_to_engine_core(
             trash_location=trash_location,
             return_tip=True,
             keep_last_tip=False,
-            last_tip_location=None,
         )
     )
 
@@ -2559,7 +2576,6 @@ def test_transfer_liquid_multi_channel_delegates_to_engine_core(
             trash_location=trash_location,
             return_tip=True,
             keep_last_tip=False,
-            last_tip_location=None,
         )
     )
 
@@ -2611,7 +2627,6 @@ def test_transfer_liquid_delegates_to_engine_core_with_trash_destination(
             trash_location=trash_location,
             return_tip=True,
             keep_last_tip=False,
-            last_tip_location=None,
         )
     )
 
@@ -2837,7 +2852,6 @@ def test_distribute_liquid_delegates_to_engine_core(
             trash_location=trash_location,
             return_tip=True,
             keep_last_tip=False,
-            last_tip_location=None,
         )
     )
 
@@ -2904,7 +2918,6 @@ def test_distribute_liquid_multi_channel_delegates_to_engine_core(
             trash_location=trash_location,
             return_tip=True,
             keep_last_tip=False,
-            last_tip_location=None,
         )
     )
 
@@ -3124,7 +3137,6 @@ def test_consolidate_liquid_delegates_to_engine_core(
             trash_location=trash_location,
             return_tip=True,
             keep_last_tip=False,
-            last_tip_location=None,
         )
     )
 
@@ -3192,7 +3204,6 @@ def test_consolidate_liquid_multi_channel_delegates_to_engine_core(
             trash_location=trash_location,
             return_tip=True,
             keep_last_tip=False,
-            last_tip_location=None,
         )
     )
 
@@ -3245,6 +3256,5 @@ def test_consolidate_liquid_delegates_to_engine_core_with_trash_destination(
             trash_location=trash_location,
             return_tip=True,
             keep_last_tip=False,
-            last_tip_location=None,
         )
     )

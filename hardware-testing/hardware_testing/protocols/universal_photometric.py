@@ -1,11 +1,26 @@
 """Universal photometric test."""
-from typing import Tuple
-
 from opentrons import protocol_api
-from opentrons.types import Mount
+
+from typing import List
+
+from opentrons.protocol_api import (
+    InstrumentContext,
+    Well,
+    LiquidClass,
+    Labware,
+)
+from opentrons.protocol_api._liquid_properties import TransferProperties
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    Coordinate,
+    PositionReference,
+)
+from opentrons.protocol_api.core.engine import (
+    transfer_components_executor as tx_comps_executor,
+)
+
 
 metadata = {"protocolName": "96ch Universal Photometric Protocol"}
-requirements = {"robotType": "Flex", "apiLevel": "2.23"}
+requirements = {"robotType": "Flex", "apiLevel": "2.24"}
 
 DYE_RESERVOIR_DEAD_VOLUME = 20000  # 20k uL
 
@@ -64,6 +79,14 @@ def add_parameters(parameters: protocol_api.ParameterContext) -> None:
             {"display_name": "1", "value": 1},
             {"display_name": "5", "value": 5},
         ],
+    )
+    parameters.add_float(
+        display_name="First aspirate submerge depth",
+        variable_name="first_asp_sub_depth",
+        description="Override the submerge depth for the first test.",
+        default=1.5,
+        minimum=0.0,
+        maximum=20.0,
     )
 
     parameters.add_bool(
@@ -240,7 +263,58 @@ def add_parameters(parameters: protocol_api.ParameterContext) -> None:
     )
 
 
-def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
+def dispense_with_liquid_class(
+    pipette: InstrumentContext,
+    volume: float,
+    transfer_properties: TransferProperties,
+    transfer_type: tx_comps_executor.TransferType,
+    dest: Well,
+    contents: List[tx_comps_executor.LiquidAndAirGapPair],
+) -> List[tx_comps_executor.LiquidAndAirGapPair]:
+    """Dispense with liquid class."""
+    return pipette._core.dispense_liquid_class(  # type: ignore [attr-defined]
+        volume=volume,
+        dest=(
+            dest.top(),
+            dest._core,
+        ),
+        source=None,
+        transfer_properties=transfer_properties,
+        transfer_type=transfer_type,
+        tip_contents=contents,
+        add_final_air_gap=True,
+        trash_location=pipette.trash_container,
+    )
+
+
+def aspirate_with_liquid_class(
+    pipette: InstrumentContext,
+    volume: float,
+    transfer_properties: TransferProperties,
+    transfer_type: tx_comps_executor.TransferType,
+    source: Well,
+) -> List[tx_comps_executor.LiquidAndAirGapPair]:
+    """Aspirate with liquid class."""
+    contents = pipette._core.aspirate_liquid_class(  # type: ignore [attr-defined]
+        volume=volume,
+        source=(
+            source.top(),
+            source._core,
+        ),
+        transfer_properties=transfer_properties,
+        transfer_type=transfer_type,
+        tip_contents=[
+            tx_comps_executor.LiquidAndAirGapPair(
+                liquid=0,
+                air_gap=0,
+            )
+        ],
+        volume_for_pipette_mode_configuration=None,
+    )
+    return contents
+
+
+def run(ctx: protocol_api.ProtocolContext) -> None:
     """Run."""
     ctx.load_trash_bin("A3")
     # tips
@@ -287,7 +361,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
         display_color="#FE0000",
     )
 
-    def _validate_dye_liquid_height() -> None:
+    def _validate_dye_liquid_height(trial: int) -> None:
 
         liquid_height_valid = False
         retrying = False
@@ -304,7 +378,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
 
             needed_starting_dye_volume = (
                 96
-                * ctx.params.cycles  # type: ignore [attr-defined]
+                * (ctx.params.cycles - trial)  # type: ignore [attr-defined]
                 * ctx.params.target_volume  # type: ignore [attr-defined]
             ) + DYE_RESERVOIR_DEAD_VOLUME
             # note: want to acct for needed dead volume here
@@ -319,156 +393,109 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
                 )
                 retrying = True
         pip._retract()
-        if ctx.params.lld:  # type: ignore [attr-defined]
-            pip.return_tip()
-            pip._retract()
-            ctx.pause("Replace tip rack.")
-            pip.pick_up_tip(tips["A1"])
+        # if ctx.params.lld:  # type: ignore [attr-defined]
+        #    pip.return_tip()
+        #    pip._retract()
+        #    ctx.pause("Replace tip rack.")
+        #    pip.pick_up_tip(tips["A1"])
 
-    def _set_pipette_motion_settings() -> Tuple[
-        float, float, float, float, float, float
-    ]:
-        if ctx.params.use_pip_motion_defaults:  # type: ignore [attr-defined]
-            aspirate_submerge_speed = 50
-            dispense_submerge_speed = 50
-            aspirate_exit_speed = 50
-            dispense_exit_speed = 50
-            air_gap = 0.0
-            if not ctx.is_simulating():
-                from hardware_testing.gravimetric.liquid_class.defaults import (
-                    get_liquid_class,
-                )
+    target_volume = ctx.params.target_volume  # type: ignore [attr-defined]
 
-                liquid_class = get_liquid_class(
-                    pipette=ctx.params.model_type,  # type: ignore [attr-defined]
-                    channels=96,
-                    tip=ctx.params.tip_type,  # type: ignore [attr-defined]
-                    volume=ctx.params.target_volume,  # type: ignore [attr-defined]
-                )
-                pip.flow_rate.aspirate = liquid_class.aspirate.plunger_flow_rate
-                pip.flow_rate.dispense = liquid_class.dispense.plunger_flow_rate
-                set_push_out = liquid_class.dispense.blow_out_submerged
-                air_gap = min(
-                    liquid_class.aspirate.trailing_air_gap,
-                    ctx.params.tip_type - ctx.params.target_volume,  # type: ignore [attr-defined]
-                )
-            else:  # if simulating
-                pip.flow_rate.aspirate = ctx.params.asp_flow_rate  # type: ignore [attr-defined]
-                pip.flow_rate.dispense = ctx.params.disp_flow_rate  # type: ignore [attr-defined]
-                set_push_out = ctx.params.push_out  # type: ignore [attr-defined]
-        else:
-            set_push_out = ctx.params.push_out  # type: ignore [attr-defined]
-            pip.flow_rate.aspirate = ctx.params.asp_flow_rate  # type: ignore [attr-defined]
-            pip.flow_rate.dispense = ctx.params.disp_flow_rate  # type: ignore [attr-defined]
-            pip.flow_rate.blow_out = ctx.params.blowout_flow_rate  # type: ignore [attr-defined]
-            aspirate_submerge_speed = ctx.params.asp_submerge_speed  # type: ignore [attr-defined]
-            dispense_submerge_speed = ctx.params.disp_submerge_speed  # type: ignore [attr-defined]
-            air_gap = ctx.params.air_gap  # type: ignore [attr-defined]
-        return (
-            aspirate_submerge_speed,
-            aspirate_exit_speed,
-            dispense_submerge_speed,
-            dispense_exit_speed,
-            set_push_out,
-            air_gap,
+    def _get_transfer_settings(tiprack: Labware, first_trial: bool) -> LiquidClass:
+        liquid_class = ctx.get_liquid_class("water")
+        transfer_properties = liquid_class.get_for(pip, tiprack)
+
+        asp_offset = Coordinate(x=0, y=0, z=-1 * ctx.params.asp_sub_depth)  # type: ignore [attr-defined]
+        if first_trial:
+            asp_offset = Coordinate(x=0, y=0, z=-1 * ctx.params.first_asp_sub_depth)  # type: ignore [attr-defined]
+        disp_offset = Coordinate(x=0, y=0, z=-1 * ctx.params.disp_sub_depth)  # type: ignore [attr-defined]
+
+        transfer_properties.aspirate.submerge.start_position.offset = asp_offset
+        transfer_properties.aspirate.aspirate_position.offset = asp_offset
+        transfer_properties.aspirate.retract.end_position.offset = asp_offset
+        transfer_properties.aspirate.aspirate_position.position_reference = (
+            PositionReference.LIQUID_MENISCUS
+        )
+        transfer_properties.dispense.submerge.start_position.offset = disp_offset
+        transfer_properties.dispense.dispense_position.offset = disp_offset
+        transfer_properties.dispense.retract.end_position.offset = disp_offset
+        transfer_properties.dispense.dispense_position.position_reference = (
+            PositionReference.LIQUID_MENISCUS
         )
 
-    (
-        aspirate_submerge_speed,
-        aspirate_exit_speed,
-        dispense_submerge_speed,
-        dispense_exit_speed,
-        set_push_out,
-        air_gap,
-    ) = _set_pipette_motion_settings()
+        if not ctx.params.use_pip_motion_defaults:  # type: ignore [attr-defined]
+            transfer_properties.aspirate.flow_rate_by_volume.set_for_volume(target_volume, ctx.params.asp_flow_rate)  # type: ignore [attr-defined]
+            transfer_properties.aspirate.submerge.speed = ctx.params.asp_submerge_speed  # type: ignore [attr-defined]
+            transfer_properties.aspirate.submerge.delay.enabled = ctx.params.submerged_delay_time > 0  # type: ignore [attr-defined]
+            transfer_properties.aspirate.submerge.delay.duration = ctx.params.submerged_delay_time  # type: ignore [attr-defined]
+            transfer_properties.aspirate.retract.speed = ctx.params.asp_exit_speed  # type: ignore [attr-defined]
+
+            transfer_properties.dispense.push_out_by_volume.set_for_volume(target_volume, ctx.params.push_out)  # type: ignore [attr-defined]
+            transfer_properties.dispense.flow_rate_by_volume.set_for_volume(target_volume, ctx.params.disp_flow_rate)  # type: ignore [attr-defined]
+            transfer_properties.dispense.retract.blowout.flow_rate = ctx.params.blowout_flow_rate  # type: ignore [attr-defined]
+            transfer_properties.dispense.submerge.speed = ctx.params.disp_submerge_speed  # type: ignore [attr-defined]
+            transfer_properties.dispense.retract.speed = ctx.params.disp_exit_speed  # type: ignore [attr-defined]
+
+            transfer_properties.multi_dispense.push_out_by_volume.set_for_volume(target_volume, ctx.params.push_out)  # type: ignore [attr-defined, union-attr]
+            transfer_properties.multi_dispense.flow_rate_by_volume.set_for_volume(target_volume, ctx.params.disp_flow_rate)  # type: ignore [attr-defined, union-attr]
+            transfer_properties.multi_dispense.retract.blowout.flow_rate = ctx.params.blowout_flow_rate  # type: ignore [attr-defined, union-attr]
+            transfer_properties.multi_dispense.submerge.speed = ctx.params.disp_submerge_speed  # type: ignore [attr-defined, union-attr]
+            transfer_properties.multi_dispense.retract.speed = ctx.params.disp_exit_speed  # type: ignore [attr-defined, union-attr]
+
+        liquid_class.update_for(pip, tiprack, transfer_properties)
+        return liquid_class
+
     for i in range(ctx.params.cycles):  # type: ignore [attr-defined]
         tips = _get_tiprack(i)
+        liquid_class = _get_transfer_settings(tips, i == 0)
         pip.pick_up_tip(tips["A1"])
 
-        if i == 0:
-            _validate_dye_liquid_height()
+        # if i == 0:
+        #    _validate_dye_liquid_height()
+        _validate_dye_liquid_height(i)
+
+        # we'll always end up with 200 uL after dispensing
+        prep_vol = 200 - target_volume
+        plate.load_liquid(plate.wells(), prep_vol, diluent)
 
         aspirate_volume = (
-            ctx.params.target_volume  # type: ignore [attr-defined]
+            target_volume
             + ctx.params.conditioning_volume  # type: ignore [attr-defined]
         )
-        aspirate_pos = (
-            dye_source["A1"].estimate_liquid_height_after_pipetting(
-                Mount.LEFT, -1 * ctx.params.target_volume  # type: ignore [attr-defined]
-            )
-            - ctx.params.asp_sub_depth  # type: ignore [attr-defined]
-        )
-        # Move above reservoir
-        pip.move_to(location=dye_source["A1"].top())
-        # Move to aspirate position at aspirate submerge speed
-        if ctx.is_simulating():
-            aspirate_pos = 0.1
-        pip.move_to(
-            location=dye_source["A1"].bottom(aspirate_pos),
-            speed=aspirate_submerge_speed,
-        )
-        # Submerged delay time
-        ctx.delay(seconds=ctx.params.submerged_delay_time)  # type: ignore [attr-defined]
-        # Aspirate in place
-        pip.aspirate(
-            volume=aspirate_volume,
-            location=None,
+        transfer_type = tx_comps_executor.TransferType.ONE_TO_ONE
+        if ctx.params.conditioning_volume > 0:  # type: ignore [attr-defined]
+            transfer_type = tx_comps_executor.TransferType.ONE_TO_MANY
+        contents = aspirate_with_liquid_class(
+            pip,
+            aspirate_volume,
+            liquid_class.get_for(pip, tips),
+            transfer_type,
+            dye_source["A1"],
         )
         # Dispense conditioning volume, if any, while submerged
         if ctx.params.conditioning_volume:  # type: ignore [attr-defined]
-            pip.dispense(
-                volume=ctx.params.conditioning_volume,  # type: ignore [attr-defined]
-                location=None,
+            contents = dispense_with_liquid_class(
+                pip,
+                ctx.params.conditioning_volume,  # type: ignore [attr-defined]
+                liquid_class.get_for(pip, tips),
+                transfer_type,
+                dye_source["A1"],
+                contents,
             )
-        # Exit liquid from aspirate position at aspirate exit speed
-        pip.move_to(
-            location=dye_source["A1"].top(),
-            speed=aspirate_exit_speed,
-        )
-        pip.air_gap(air_gap, height=0)
-        # Retract pipette
-        pip._retract()
         # Pause after aspiration
         if ctx.params.pause_after_asp:  # type: ignore [attr-defined]
+            pip._retract()
             ctx.pause("Inspect for dropouts.")
-        # we'll always end up with 200 uL after dispensing
-        prep_vol = 200 - ctx.params.target_volume  # type: ignore [attr-defined]
-        plate.load_liquid(plate.wells(), prep_vol, diluent)
-        dispense_pos = plate["A1"].estimate_liquid_height_after_pipetting(
-            Mount.LEFT, ctx.params.target_volume  # type: ignore [attr-defined]
-        )
 
-        # note: would probably be good to add a needed dead volume in this comparison
-        dispense_submerge_depth = ctx.params.disp_sub_depth  # type: ignore [attr-defined]
-        if dispense_submerge_depth >= dispense_pos:  # type: ignore [attr-defined]
-            raise ValueError(
-                f"submerge depth {dispense_submerge_depth} \
-                too deep for dispense position {dispense_pos}"
-            )
-        dispense_pos -= ctx.params.disp_sub_depth  # type: ignore [attr-defined]
-        # Move to plate
-        pip.move_to(location=plate["A1"].top())
-        # Move to dispense position at dispense submerge speed
-        pip.move_to(
-            location=plate["A1"].bottom(dispense_pos),  # type: ignore [arg-type]
-            speed=dispense_submerge_speed,
-        )
         # Dispense
-        pip.dispense(
-            volume=ctx.params.target_volume,  # type: ignore [attr-defined]
-            location=None,
-            push_out=set_push_out,  # type: ignore [attr-defined]
+        contents = dispense_with_liquid_class(
+            pip,
+            target_volume,
+            liquid_class.get_for(pip, tips),
+            transfer_type,
+            plate.wells()[0],
+            contents,
         )
-        # Exit liquid from dispense position at dispense exit speed
-        blow_out_pos = plate["A1"].bottom(
-            dispense_pos + ctx.params.disp_sub_depth + 5  # type: ignore [attr-defined]
-        )
-        pip.move_to(
-            location=blow_out_pos,
-            speed=dispense_exit_speed,
-        )
-        # Perform blow out
-        pip.blow_out()
         # Return tip to tip rack
         pip.return_tip()
         # Retract pipette

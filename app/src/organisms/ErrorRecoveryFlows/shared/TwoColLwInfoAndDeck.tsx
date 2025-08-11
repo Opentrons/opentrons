@@ -4,10 +4,8 @@ import {
   COLORS,
   Flex,
   LabwareRender,
-  Module,
   MoveLabwareOnDeck,
 } from '@opentrons/components'
-import { inferModuleOrientationFromXCoordinate } from '@opentrons/shared-data'
 
 import { DeckMapContent, TwoColumn } from '/app/molecules/InterventionModal'
 
@@ -30,6 +28,7 @@ export function TwoColLwInfoAndDeck(
     deckMapUtils,
     currentRecoveryOptionUtils,
     isOnDevice,
+    allRunDefs,
   } = props
   const {
     RETRY_NEW_TIPS,
@@ -132,45 +131,38 @@ export function TwoColLwInfoAndDeck(
         const isValidDeck =
           currentLoc != null && newLoc != null && movedLabwareDef != null
 
+        const modulesOnDeck = moduleRenderInfo?.map(module => {
+          return {
+            moduleModel: module.moduleDef.model,
+            moduleLocation: { slotName: module.targetSlotId },
+            nestedLabwareDef:
+              module.nestedLabwareId !== failedLwId
+                ? module.nestedLabwareDef
+                : null,
+          }
+        })
         return isValidDeck ? (
           <MoveLabwareOnDeck
             deckFill={isOnDevice ? COLORS.grey35 : '#e6e6e6'}
             initialLabwareLocation={currentLoc}
             finalLabwareLocation={newLoc}
             movedLabwareDef={movedLabwareDef}
+            labwareDefinitions={allRunDefs}
             {...restUtils}
+            modulesOnDeck={modulesOnDeck}
             backgroundItems={
               <>
-                {moduleRenderInfo.map(
-                  ({
-                    x,
-                    y,
-                    moduleId,
-                    moduleDef,
-                    nestedLabwareDef,
-                    nestedLabwareId,
-                  }) => (
-                    <Module
-                      key={moduleId}
-                      def={moduleDef}
-                      x={x}
-                      y={y}
-                      orientation={inferModuleOrientationFromXCoordinate(x)}
-                    >
-                      {nestedLabwareDef != null &&
-                      nestedLabwareId !== failedLwId ? (
-                        <LabwareRender definition={nestedLabwareDef} />
-                      ) : null}
-                    </Module>
-                  )
-                )}
                 {labwareRenderInfo
                   .filter(l => l.labwareId !== failedLwId)
-                  .map(({ x, y, labwareDef, labwareId }) => (
-                    <g key={labwareId} transform={`translate(${x},${y})`}>
-                      {labwareDef != null && labwareId !== failedLwId ? (
-                        <LabwareRender definition={labwareDef} />
-                      ) : null}
+                  .map(({ labwareOrigin, labwareDef, labwareId }) => (
+                    <g
+                      key={labwareId}
+                      transform={`translate(${labwareOrigin.x},${labwareOrigin.y})`}
+                    >
+                      <LabwareRender
+                        definition={labwareDef}
+                        positioningMode="passThrough"
+                      />
                     </g>
                   ))}
               </>

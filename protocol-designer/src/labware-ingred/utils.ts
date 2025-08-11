@@ -22,6 +22,8 @@ import type {
   LabwareDefinition2,
   RobotType,
 } from '@opentrons/shared-data'
+import type { Labware } from '../file-types'
+import type { LabwareDefByDefURI } from '../labware-defs'
 import type { InitialDeckSetup } from '../step-forms/types'
 import type { DeckSlot } from '../types'
 
@@ -131,4 +133,34 @@ export function getNextNickname(
   return Number.isFinite(topMatchNum)
     ? `${proposedNickname.trim()} (${topMatchNum + 1})`
     : proposedNickname
+}
+
+export const getMigratedLabwareId = (
+  oldLabwareId: string,
+  labware: Labware,
+  allLabwareDefs: Record<string, LabwareDefinition2>,
+  latestDefs: LabwareDefByDefURI
+): string => {
+  const defURI = labware[oldLabwareId].labwareDefURI
+  const loadName = allLabwareDefs[defURI]?.parameters.loadName
+  const latestURI = Object.entries(latestDefs).find(
+    ([_, def]) => def.parameters.loadName === loadName
+  )?.[0]
+  const labwareIdString = oldLabwareId.split(':')[0]
+  const latestLabwareId =
+    latestURI != null ? `${labwareIdString}:${latestURI}` : oldLabwareId // fallback to original labwareId for custom labware
+
+  return latestLabwareId
+}
+
+export const getMigratedURI = (
+  oldURI: string,
+  allLabwareDefs: Record<string, LabwareDefinition2>,
+  latestDefs: LabwareDefByDefURI
+): string => {
+  const loadName = allLabwareDefs[oldURI]?.parameters.loadName
+  const latestURI = Object.entries(latestDefs).find(
+    ([_, def]) => def.parameters.loadName === loadName
+  )?.[0]
+  return latestURI ?? oldURI // fallback to oldURI for custom labware
 }

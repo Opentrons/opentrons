@@ -11,7 +11,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { ToggleButton } from '../../../molecules/ToggleButton'
+import { ToggleButton } from '/ai-client/components/molecules/ToggleButton'
 
 interface PrivacyProps {
   enableAnalytics: boolean

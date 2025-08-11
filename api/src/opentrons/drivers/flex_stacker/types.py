@@ -12,6 +12,7 @@ class GCODE(str, Enum):
     HOME_AXIS = "G28"
     STOP_MOTORS = "M0"
     ENABLE_MOTORS = "M17"
+    GET_ESTOP_ENGAGED = "M112"
     GET_RESET_REASON = "M114"
     DEVICE_INFO = "M115"
     GET_LIMIT_SWITCH = "M119"
@@ -134,7 +135,11 @@ class Direction(Enum):
 
     def __str__(self) -> str:
         """Convert to tag for clear logging."""
-        return "negative" if self == Direction.RETRACT else "positive"
+        return self.name.lower()
+
+    def polarity(self) -> str:
+        """Convert to polarity tag for testing."""
+        return "positive" if self == Direction.EXTEND else "negative"
 
     def opposite(self) -> "Direction":
         """Get opposite direction."""

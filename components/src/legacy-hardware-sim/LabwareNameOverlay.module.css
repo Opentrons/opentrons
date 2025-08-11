@@ -2,16 +2,16 @@
 
 .name_overlay {
   width: 100%;
-  font-size: 0.5rem;
-  color: var(--c-font-light);
-  background-color: color-mod(var(--c-black) alpha(0.75));
   padding: 0.25rem;
   border-radius: 0 0 0.5rem 0.5rem;
+  background-color: color-mod(var(--c-black) alpha(0.75));
+  color: var(--c-font-light);
+  font-size: 0.5rem;
 }
 
 .display_name {
-  font-weight: var(--fw-semibold);
   color: var(--c-font-light);
+  font-weight: var(--fw-semibold);
   overflow-wrap: break-word;
 }
 

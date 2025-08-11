@@ -57,6 +57,7 @@ import type {
   LabwareEntity,
   LabwareTemporalProperties,
   LocationLiquidState,
+  ModuleEntities,
   PathOption,
   PipetteEntity,
   RobotState,
@@ -359,7 +360,7 @@ export function getWellsForTips(
 // Set blowout location depending on the 'blowoutLocation' arg: set it to
 // the SOURCE_WELL_BLOWOUT_DESTINATION / DEST_WELL_BLOWOUT_DESTINATION
 // special strings, or to a labware ID.
-export const blowoutLocationHelper = (args: {
+export const mixBlowoutLocationHelper = (args: {
   pipette: BlowoutParams['pipetteId']
   sourceLabwareId: string
   sourceWell: BlowoutParams['wellName']
@@ -381,41 +382,25 @@ export const blowoutLocationHelper = (args: {
     offsetFromTopMm,
     invariantContext,
   } = args
-  if (!blowoutLocation) return []
-  const {
-    labwareEntities,
-    trashBinEntities,
-    wasteChuteEntities,
-  } = invariantContext
-  const trashOrLabware = getTrashOrLabware(
-    labwareEntities,
-    wasteChuteEntities,
-    trashBinEntities,
-    destLabwareId
-  )
+  if (!blowoutLocation) {
+    return []
+  }
+  const { trashBinEntities, wasteChuteEntities } = invariantContext
 
-  let labware: LabwareEntity | null = null
+  let labwareId: string | null = null
   let well: string | null = null
   if (blowoutLocation === SOURCE_WELL_BLOWOUT_DESTINATION) {
-    labware = invariantContext.labwareEntities[sourceLabwareId]
+    labwareId = sourceLabwareId
     well = sourceWell
   } else if (blowoutLocation === DEST_WELL_BLOWOUT_DESTINATION) {
-    labware =
-      trashOrLabware === 'labware'
-        ? invariantContext.labwareEntities[destLabwareId]
-        : null
-    well = trashOrLabware === 'labware' ? destWell : null
-  } else {
-    // if it's not one of the magic strings, it's a labware or waste chute or trash bin id
-    labware = invariantContext.labwareEntities?.[blowoutLocation]
-    well = trashOrLabware === 'labware' ? 'A1' : null
+    labwareId = destLabwareId
+    well = destWell
   }
-
-  if (well != null && trashOrLabware === 'labware' && labware != null) {
+  if (well != null && labwareId != null) {
     return [
       curryCommandCreator(blowOutInWell, {
         pipetteId: pipette,
-        labwareId: labware.id,
+        labwareId: labwareId,
         wellName: well,
         flowRate,
         wellLocation: {
@@ -426,7 +411,7 @@ export const blowoutLocationHelper = (args: {
         },
       }),
     ]
-  } else if (trashOrLabware === 'wasteChute') {
+  } else if (wasteChuteEntities[blowoutLocation] != null) {
     return [
       curryCommandCreator(blowOutInWasteChute, {
         pipetteId: pipette,
@@ -908,6 +893,61 @@ export const getTopLocationInStack = (stack?: string[]): string => {
   }
 }
 
+export const getNearestParentInStack = (stack: string[]): string | null =>
+  stack.length >= 2 ? stack[1] : null
+
+export const getLargestStackInSlot = (
+  labwareState: RobotState['labware'],
+  slot: string
+): string[] =>
+  Object.values(labwareState).reduce<string[]>((acc, { stack }) => {
+    if (stack[stack.length - 1] === slot && stack.length > acc.length) {
+      acc = stack
+    }
+    return acc
+  }, [])
+
+export const getIsLabwareCompatibleWithStack = (
+  labwareId: string,
+  stack: string[],
+  labwareEntities: LabwareEntities,
+  moduleEntities: ModuleEntities
+): boolean => {
+  // if stack is empty, moving directly to empty slot
+  if (stack.length === 0) {
+    return true
+  }
+  const topIdInStack = getTopLocationInStack(stack)
+
+  // check compatibility with labware
+  if (topIdInStack in labwareEntities) {
+    const movingLabwareEntity = labwareEntities[labwareId]
+    const topLabwareEntity = labwareEntities[topIdInStack]
+    const loadNameToCheck = topLabwareEntity.def.parameters.loadName
+    return (
+      // check compatible labware key
+      movingLabwareEntity.def.compatibleParentLabware?.some(
+        loadName => loadName === loadNameToCheck
+      ) ||
+      // check stacking offset map for legacy compatibility
+      Object.keys(movingLabwareEntity.def.stackingOffsetWithLabware ?? {}).some(
+        lw => lw === loadNameToCheck
+      )
+    )
+    // check compatibility with module
+  } else if (topIdInStack in moduleEntities) {
+    const topModuleEntity = moduleEntities[topIdInStack]
+    const { model: stackingModel } = topModuleEntity
+    return (
+      // check compatible labware key
+      Object.keys(
+        labwareEntities[labwareId].def.stackingOffsetWithModule ?? {}
+      ).some(model => stackingModel === model)
+    )
+  }
+  return false
+}
+
 export const getModuleIdFromRobotStateStack = (
   modules: RobotState['modules'],
   stack?: string[]
@@ -972,6 +1012,7 @@ export const getTransferPlanAndReferenceVolumes = (args: {
   tiprackDefinition: LabwareDefinition2 | null
   volume: number
   path: PathOption
+  numAspirateWells: number
   numDispenseWells: number
   aspirateAirGapByVolume: Array<[number, number]>
   conditioningByVolume: Array<[number, number]> | null
@@ -991,6 +1032,7 @@ export const getTransferPlanAndReferenceVolumes = (args: {
     conditioningByVolume,
     disposalByVolume,
     numDispenseWells,
+    numAspirateWells,
     aspirateAirGapByVolume,
   } = args
   const { liquids } = pipetteSpecs
@@ -1031,6 +1073,20 @@ export const getTransferPlanAndReferenceVolumes = (args: {
           : 0)
   const isMultiAspirateAvailable =
     maxWorkingVolume > minVolumeForMultiAspirateDispense
+
+  if (path === 'multiAspirate' && numAspirateWells <= numDispenseWells) {
+    console.warn(
+      'Invalid combination of source and destination wells for multiAspirate path'
+    )
+  } else if (path === 'multiDispense' && numAspirateWells >= numDispenseWells) {
+    console.warn(
+      'Invalid combination of source and destination wells for multiDispense path'
+    )
+  } else if (path === 'single' && numAspirateWells !== numDispenseWells) {
+    console.warn(
+      'Invalid combination of source and destination wells for single path'
+    )
+  }
 
   // early return if multiAspirate/multiDispense cannot be accommodated
   if (
@@ -1127,9 +1183,15 @@ export const getTransferPlanAndReferenceVolumes = (args: {
       },
     }
   }
+
   // path is valid multiAspirate
   const maxSourcesPerAspiration = Math.floor(maxWorkingVolume / volume)
-  const volumeTotalAspiration = maxSourcesPerAspiration * volume
+  const sourcesPerAspiration = Math.min(
+    maxSourcesPerAspiration,
+    numAspirateWells
+  )
+  const volumeTotalAspiration = sourcesPerAspiration * volume
+
   return {
     referenceVolumes: {
       airGap: {
@@ -1150,7 +1212,7 @@ export const getTransferPlanAndReferenceVolumes = (args: {
     },
     multiWellHandling: {
       isSupported: true,
-      numWellsToFitInTip: maxSourcesPerAspiration,
+      numWellsToFitInTip: sourcesPerAspiration,
     },
   }
 }

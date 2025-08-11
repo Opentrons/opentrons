@@ -33,6 +33,7 @@ import {
   BANNER_TEXT_CONTAINER_STYLE,
   BANNER_TEXT_CONTENT_STYLE,
   RECOVERY_MAP,
+  STACKER_ERROR_KINDS,
 } from './constants'
 import { useErrorName } from './hooks'
 import { RecoveryInterventionModal, StepInfo } from './shared'
@@ -94,6 +95,8 @@ export function RecoverySplash(props: RecoverySplashProps): JSX.Element | null {
   const { proceedToRouteAndStep, handleMotionRouting } = routeUpdateActions
   const { reportErrorEvent } = analytics
 
+  const isStackerError = STACKER_ERROR_KINDS.includes(errorKind)
+
   const buildTitleHeadingDesktop = (): JSX.Element => {
     return (
       <StyledText desktopStyle="bodyLargeSemiBold">
@@ -148,8 +151,16 @@ export function RecoverySplash(props: RecoverySplashProps): JSX.Element | null {
           )
         })
         .then(() => handleMotionRouting(true))
-        .then(() => recoveryCommands.homePipetteZAxes())
-        .finally(() => handleMotionRouting(false))
+        .then(() => {
+          if (isStackerError) {
+            return recoveryCommands.homeExceptPlungers()
+          } else {
+            return recoveryCommands.homePipetteZAxes()
+          }
+        })
+        .finally(() => {
+          void handleMotionRouting(false)
+        })
     }
     handleConditionalClick(onClick)
   }

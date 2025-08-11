@@ -204,7 +204,7 @@ export interface CuboidalFrustum {
 
 export interface SquaredConeSegment {
   shape: 'squaredcone'
-  bottomCrossSection: string
+  bottomCrossSection: 'circular' | 'rectangular'
   circleDiameter: number
   rectangleXDimension: number
   rectangleYDimension: number
@@ -214,7 +214,7 @@ export interface SquaredConeSegment {
 
 export interface RoundedCuboidSegment {
   shape: 'roundedcuboid'
-  bottomCrossSection: string
+  bottomCrossSection: 'circular' | 'rectangular'
   circleDiameter: number
   rectangleXDimension: number
   rectangleYDimension: number
@@ -229,8 +229,16 @@ export type WellSegment =
   | SphericalSegment
   | RoundedCuboidSegment
 
+export interface HeightVolumePair {
+  height: number
+  volume: number
+}
+
 export interface InnerWellGeometry {
   sections: WellSegment[]
+}
+export interface UserDefinedVolumes {
+  heightToVolumeMap: HeightVolumePair[]
 }
 
 // TODO(mc, 2019-03-21): exact object is tough to use with the initial value in
@@ -269,8 +277,15 @@ export interface SlotFootprintAsChildFeature {
   frontRight: Vector2D
 }
 
+export interface SlotFootprintAsParentFeature {
+  z: number
+  backLeft: Vector2D
+  frontRight: Vector2D
+}
+
 export interface LocatingFeatures {
   slotFootprintAsChild?: SlotFootprintAsChildFeature
+  slotFootprintAsParent?: SlotFootprintAsParentFeature
 }
 
 export type LabwareRoles =
@@ -299,7 +314,10 @@ export interface LabwareDefinition2 {
   stackingOffsetWithModule?: Record<string, LabwareOffset>
   stackLimit?: number
   compatibleParentLabware?: string[]
-  innerLabwareGeometry?: Record<string, InnerWellGeometry> | null
+  innerLabwareGeometry?: Record<
+    string,
+    InnerWellGeometry | UserDefinedVolumes
+  > | null
 }
 
 export interface LabwareDefinition3 {
@@ -572,17 +590,26 @@ export interface ModuleDefinition {
   quirks: string[]
   slotTransforms: SlotTransforms
   compatibleWith: ModuleModel[]
-  twoDimensionalRendering: any // deprecated SVGson INode use Module SVG Components instead
 }
 
-export type AffineTransformMatrix = number[][]
+type AffineTransformRow = [number, number, number, number]
+export type AffineTransformMatrix = [
+  AffineTransformRow,
+  AffineTransformRow,
+  AffineTransformRow,
+  AffineTransformRow
+]
 
 export interface SlotTransforms {
-  [deckOtId: string]: {
-    [slotId: string]: {
-      [transformKey in keyof ModuleDefinition]?: AffineTransformMatrix
-    }
-  }
+  [deckOtId: string]:
+    | undefined
+    | {
+        [slotId: string]:
+          | undefined
+          | {
+              [transformKey in keyof ModuleDefinition]?: AffineTransformMatrix
+            }
+      }
 }
 
 export type ModuleOrientation = 'left' | 'right'
@@ -895,7 +922,7 @@ export interface ByTipTypeSetting {
   singleDispense: SingleDispenseProperties
   multiDispense?: MultiDispenseProperties
 }
-interface ByPipetteSetting {
+export interface ByPipetteSetting {
   pipetteModel: string
   byTipType: ByTipTypeSetting[]
 }

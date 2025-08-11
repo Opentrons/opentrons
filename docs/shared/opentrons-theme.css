@@ -1,0 +1,92 @@
+/* Fonts: Public Sans (proportional) and Reddit Mono (monospace) */
+
+@import url('https://fonts.googleapis.com/css?family=Public+Sans:300,400,400i,600,700');
+@import url('https://fonts.googleapis.com/css2?family=Reddit+Mono:wght@200..900&display=swap');
+
+body {
+  font-family: "Public Sans", sans-serif;
+}
+
+code, pre {
+  font-family: "Reddit Mono", "Consolas", "Lucida Console", monospace;
+}
+
+/* Font sizes */
+
+.admonition p, .admonition li {
+  font-size: 0.75rem;
+}
+
+th, td {
+  font-size: 0.75rem;
+}
+
+/* Headers */
+
+.md-typeset h1 {
+  font-weight: 700;
+  color: black;
+}
+
+.md-typeset h2 {
+  font-weight: 700;
+}
+
+.md-typeset h3 {
+  font-weight: 600;
+}
+
+.md-typeset h4 {
+  font-weight: 600;
+}
+
+/* Colors */
+
+:root {
+  --md-primary-fg-color: #006CFA; /* Helix blue 50 (Opentrons Blue) */
+  --md-accent-fg-color: #0056C8; /* Helix blue 55 */
+}
+
+.opentrons-blue, .blue-50 {
+  color: #006CFA;
+}
+
+.grey, .grey-60 {
+  color: #4A4C4E;
+}
+
+.green {
+  color: green;
+}
+
+.red {
+  color: red;
+}
+
+
+/* Applying colors to elements */
+
+th {
+    background-color: #D0E6FE;
+}
+
+.md-footer {
+  background-color: var(--md-primary-fg-color);
+}
+
+/* Square bullets for unordered lists */
+
+article ul li {
+  list-style-type: square;
+}
+
+article ul li::marker {
+  color: #006CFA;
+}
+
+/* Caption styling */
+
+.md-typeset figcaption { /* .md-typeset parent required or will not override font-style */
+  font-style: normal;
+  color: #737578;
+}

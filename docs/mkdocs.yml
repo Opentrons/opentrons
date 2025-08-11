@@ -1,0 +1,59 @@
+site_name: Opentrons Documentation
+
+docs_dir: ./shared
+custom_dir: ./shared
+
+nav:
+  - Opentrons Flex: '!include flex/mkdocs.yml'
+  - Modules:
+      - Modules home: modules/index.md
+      - Flex Stacker: '!include stacker-manual/mkdocs.yml'
+      - HEPA/UV Module: '!include hepa-uv/mkdocs.yml'
+      - Thermocycler Module: '!include thermocycler-manual/mkdocs.yml'
+  - Protocol Designer: '!include protocol-designer/mkdocs.yml'
+  - Python API: https://docs.opentrons.com/v2/
+
+plugins:
+  - monorepo
+  - search
+  - autorefs
+
+theme:
+  name: material
+  palette:
+    primary: custom
+    accent: custom
+  features:
+    - navigation.indexes
+    - navigation.tabs
+  logo: images/opentrons-droplet-white.svg
+  favicon: images/opentrons-droplet-color.svg
+  icon:
+    admonition:
+      tip: material/lightbulb-on-outline
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+      options:
+        custom_icons:
+          - shared/icons
+  - pymdownx.inlinehilite
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: true
+      pygments_lang_class: true
+  - pymdownx.superfences
+  - sane_lists
+  - toc:
+      permalink: true
+
+extra_css:
+  - opentrons-theme.css
+  - instruction-manuals.css
+
+copyright: '© Opentrons 2025. All rights reserved. <br /> Trademarks: Opentrons®, Opentrons drop logo (Opentrons Labworks, Inc.). <br /> Registered names, trademarks, etc. used in this document, even when not specifically marked as such, are not to be considered unprotected by law.'

@@ -22,9 +22,9 @@ import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 
 import type { AttachedModule } from '@opentrons/api-client'
 import type { DeckConfiguration } from '@opentrons/shared-data'
-import type { ModuleSetupWizardStepProps } from './types'
+import type { ModuleSetupWizardMaybePipetteStepProps } from './types'
 
-interface InstallShuttleProps extends ModuleSetupWizardStepProps {
+interface InstallShuttleProps extends ModuleSetupWizardMaybePipetteStepProps {
   deckConfig: DeckConfiguration
   attachedModules: AttachedModule[]
 }
@@ -109,16 +109,9 @@ export function InstallShuttle(props: InstallShuttleProps): JSX.Element {
       <GenericWizardTile
         header={i18n.format(t('place_shuttle'), 'capitalize')}
         rightHandBody={
-          <Flex height="13.25rem" paddingTop={SPACING.spacing4}>
-            <AnimationVideo
-              css={css`
-                max-width: 100%;
-                max-height: 100%;
-              `}
-            >
-              <source src={StackerInstallShuttle} />
-            </AnimationVideo>
-          </Flex>
+          <AnimationVideo width="100%">
+            <source src={StackerInstallShuttle} />
+          </AnimationVideo>
         }
         bodyText={
           <>

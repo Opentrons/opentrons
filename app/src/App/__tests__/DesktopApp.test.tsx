@@ -20,7 +20,7 @@ import { ProtocolsLanding } from '/app/pages/Desktop/Protocols/ProtocolsLanding'
 // prettier-ignore
 import { AlertsModal } from '/app/organisms/Desktop/Alerts/AlertsModal';
 
-import { ProtocolTimeline } from '/app/pages/Desktop/Protocols/ProtocolDetails/ProtocolTimeline'
+import { ProtocolPreview } from '/app/pages/Desktop/Protocols/ProtocolPreview'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useFeatureFlag } from '/app/redux/config'
 
@@ -44,6 +44,7 @@ vi.mock('/app/pages/Desktop/Protocols/ProtocolDetails/ProtocolTimeline')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux-resources/robots')
 vi.mock('../hooks')
+vi.mock('/app/pages/Desktop/Protocols/ProtocolPreview')
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -70,9 +71,7 @@ describe('DesktopApp', () => {
     vi.mocked(ProtocolRunDetails).mockReturnValue(
       <div>Mock ProtocolRunDetails</div>
     )
-    vi.mocked(ProtocolTimeline).mockReturnValue(
-      <div>Mock ProtocolTimeline</div>
-    )
+    vi.mocked(ProtocolPreview).mockReturnValue(<div>Mock Preview</div>)
     vi.mocked(RobotSettings).mockReturnValue(<div>Mock RobotSettings</div>)
     vi.mocked(GeneralSettings).mockReturnValue(<div>Mock AppSettings</div>)
     vi.mocked(Breadcrumbs).mockReturnValue(<div>Mock Breadcrumbs</div>)
@@ -131,9 +130,9 @@ describe('DesktopApp', () => {
     screen.getByText('Mock ProtocolsLanding')
   })
 
-  it('renders a ProtocolsTimeline component from /protocolTimeline', () => {
-    render(`/protocols/95e67900-bc9f-4fbf-92c6-cc4d7226a51b/timeline`)
-    screen.getByText('Mock ProtocolTimeline')
+  it('renders a ProtocolsTimeline component from /preview', () => {
+    render(`/protocols/95e67900-bc9f-4fbf-92c6-cc4d7226a51b/preview`)
+    screen.getByText('Mock Preview')
   })
 
   it('renders a ProtocolRunDetails component from /devices/:robotName/protocol-runs/:runId/:protocolRunDetailsTab', () => {

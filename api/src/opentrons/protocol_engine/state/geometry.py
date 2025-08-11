@@ -23,6 +23,8 @@ from opentrons_shared_data.errors.exceptions import (
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
+    LabwareDefinition2,
+    InnerWellGeometry,
 )
 from opentrons_shared_data.deck.types import CutoutFixture
 from opentrons_shared_data.pipette import PIPETTE_X_SPAN
@@ -90,6 +92,7 @@ from ..types import (
     WellLocationType,
     WellLocationFunction,
     LabwareParentDefinition,
+    AddressableArea,
 )
 from ..types.liquid_level_detection import SimulatedProbeResult, LiquidTrackingType
 from .config import Config
@@ -98,9 +101,11 @@ from .wells import WellView
 from .modules import ModuleView
 from .pipettes import PipetteView
 from .addressable_areas import AddressableAreaView
-from .frustum_helpers import (
-    find_volume_at_well_height,
-    find_height_at_well_volume,
+from .inner_well_math_utils import (
+    find_height_inner_well_geometry,
+    find_volume_inner_well_geometry,
+    find_height_user_defined_volumes,
+    find_volume_user_defined_volumes,
 )
 from ._well_math import wells_covered_by_pipette_configuration, nozzles_per_well
 from ._labware_origin_math import get_parent_placement_origin_to_lw_origin
@@ -673,7 +678,6 @@ class GeometryView:
                     delta=delta,
                     meniscus_tracking=meniscus_tracking,
                 )
-        return NotImplemented
 
     def get_well_height(
         self,
@@ -698,6 +702,8 @@ class GeometryView:
             # should be updated.
             module_id = lw_data.location.moduleId
             height_over_labware = self._modules.get_height_over_labware(module_id)
+        # todo(mm, 2025-07-31): This math needs updating for schema 2:
+        # labware_pos.z is not necessarily the bottom of the labware.
         return labware_pos.z + z_dim + height_over_labware
 
     def get_nominal_effective_tip_length(
@@ -1035,28 +1041,44 @@ class GeometryView:
         It is calculated as the xy center of the slot with z as the point indicated by
         z-position of labware bottom + grip height from labware bottom.
         """
-        grip_height_from_labware_bottom = (
-            self._labware.get_grip_height_from_labware_bottom(labware_definition)
-        )
-        location_name = self._get_underlying_addressable_area_name(location)
+        grip_z_from_lw_origin = self._labware.get_grip_z(labware_definition)
+        aa_name = self._get_underlying_addressable_area_name(location)
         parent_to_lw_offset = self._get_stackup_placement_origin_to_lw_origin(
             location=location,
             definition=labware_definition,
             is_topmost_labware=True,  # We aren't concerned with entities above the gripped labware.
         )
+        addressable_area = self._addressable_areas.get_addressable_area(aa_name)
+        lw_origin_to_parent = self._get_lw_origin_to_parent(
+            labware_definition=labware_definition, addressable_area=addressable_area
+        )
         mod_cal_offset = self._get_calibrated_module_offset(location)
-        location_center = self._addressable_areas.get_addressable_area_center(
-            location_name
+        location_center = self._addressable_areas.get_addressable_area_center(aa_name)
+
+        return (
+            location_center
+            + parent_to_lw_offset
+            + lw_origin_to_parent
+            + mod_cal_offset
+            + Point(0, 0, grip_z_from_lw_origin)
         )
 
-        return Point(
-            x=location_center.x + parent_to_lw_offset.x + mod_cal_offset.x,
-            y=location_center.y + parent_to_lw_offset.y + mod_cal_offset.y,
-            z=location_center.z
-            + parent_to_lw_offset.z
-            + mod_cal_offset.z
-            + grip_height_from_labware_bottom,
-        )
+    def _get_lw_origin_to_parent(
+        self, labware_definition: LabwareDefinition, addressable_area: AddressableArea
+    ) -> Point:
+        if isinstance(labware_definition, LabwareDefinition2):
+            return Point(0, 0, 0)
+        else:
+            bb_y = addressable_area.bounding_box.y
+            bb_z = addressable_area.bounding_box.z
+            return (
+                Point(
+                    x=0,
+                    y=bb_y,
+                    z=bb_z,
+                )
+                * -1
+            )
 
     def get_extra_waypoints(
         self,
@@ -1074,14 +1096,36 @@ class GeometryView:
             if self._modules.should_dodge_thermocycler(
                 from_slot=from_slot, to_slot=to_slot
             ):
-                middle_slot = DeckSlotName.SLOT_5.to_equivalent_for_robot_type(
-                    self._config.robot_type
-                )
-                middle_slot_center = (
-                    self._addressable_areas.get_addressable_area_center(
-                        addressable_area_name=middle_slot.id,
+
+                middle_slot_fixture = (
+                    self._addressable_areas.get_fixture_by_deck_slot_name(
+                        DeckSlotName.SLOT_C2
                     )
                 )
+                if middle_slot_fixture is None:
+                    middle_slot = DeckSlotName.SLOT_5.to_equivalent_for_robot_type(
+                        self._config.robot_type
+                    )
+                    middle_slot_center = (
+                        self._addressable_areas.get_addressable_area_center(
+                            addressable_area_name=middle_slot.id,
+                        )
+                    )
+                else:
+                    # todo(chb, 2025-07-30): For now we're defaulting to the first addressable area for these center slot fixtures, but
+                    # if we ever introduce a fixture in the center slot with many addressable areas that aren't "centered" over the deck
+                    # slot we will enter up generating a pretty whacky movement path (potentially dangerous).
+                    middle_slot_center = self._addressable_areas.get_addressable_area_center(
+                        addressable_area_name=middle_slot_fixture[
+                            "providesAddressableAreas"
+                        ][
+                            deck_configuration_provider.get_cutout_id_by_deck_slot_name(
+                                DeckSlotName.SLOT_C2
+                            )
+                        ][
+                            0
+                        ],
+                    )
                 return [(middle_slot_center.x, middle_slot_center.y)]
         return []
 
@@ -1514,6 +1558,7 @@ class GeometryView:
         self,
         gripper_homed_position_z: float,
         labware_id: str,
+        # todo(mm, 2025-07-31): arg unused, investigate or remove.
         current_location: OnDeckLabwareLocation,
     ) -> None:
         """Check for potential collision of tips against labware to be lifted."""
@@ -1527,16 +1572,25 @@ class GeometryView:
             tip = self._pipettes.get_attached_tip(pipette.id)
             if not tip:
                 continue
-            labware_top_z_when_gripped = gripper_homed_position_z + (
-                self._labware.get_dimensions(labware_definition=labware_definition).z
-                - self._labware.get_grip_height_from_labware_bottom(labware_definition)
+
+            labware_origin_to_grip_point = self._labware.get_grip_z(labware_definition)
+            grip_point_to_labware_origin = -labware_origin_to_grip_point
+            height_above_labware_origin = self._labware.get_extents_around_lw_origin(
+                labware_definition
+            ).max_z
+            labware_top_z_when_gripped = (
+                gripper_homed_position_z
+                + grip_point_to_labware_origin
+                + height_above_labware_origin
             )
-            # TODO(cb, 2024-01-18): Utilizing the nozzle map and labware X coordinates verify if collisions will occur on the X axis (analysis will use hard coded data to measure from the gripper critical point to the pipette mount)
+
+            # TODO(cb, 2024-01-18): Utilizing the nozzle map and labware X coordinates,
+            # verify if collisions will occur on the X axis (analysis will use hard coded data
+            # to measure from the gripper critical point to the pipette mount)
             if (_PIPETTE_HOMED_POSITION_Z - tip.length) < labware_top_z_when_gripped:
                 raise LabwareMovementNotAllowedError(
                     f"Cannot move labware '{labware_definition.parameters.loadName}' when {int(tip.volume)} µL tips are attached."
                 )
-        return
 
     def _nominal_gripper_offsets_for_location(
         self, location: OnDeckLabwareLocation
@@ -2065,6 +2119,44 @@ class GeometryView:
             )
         return handling_height
 
+    def find_volume_at_well_height(
+        self,
+        labware_id: str,
+        well_name: str,
+        target_height: LiquidTrackingType,
+    ) -> LiquidTrackingType:
+        """Call the correct volume from height function based on well geoemtry type."""
+        well_geometry = self._labware.get_well_geometry(
+            labware_id=labware_id, well_name=well_name
+        )
+        if isinstance(well_geometry, InnerWellGeometry):
+            return find_volume_inner_well_geometry(
+                target_height=target_height, well_geometry=well_geometry
+            )
+        else:
+            return find_volume_user_defined_volumes(
+                target_height=target_height, well_geometry=well_geometry
+            )
+
+    def find_height_at_well_volume(
+        self,
+        labware_id: str,
+        well_name: str,
+        target_volume: LiquidTrackingType,
+    ) -> LiquidTrackingType:
+        """Call the correct height from volume function based on well geometry type."""
+        well_geometry = self._labware.get_well_geometry(
+            labware_id=labware_id, well_name=well_name
+        )
+        if isinstance(well_geometry, InnerWellGeometry):
+            return find_height_inner_well_geometry(
+                target_volume=target_volume, well_geometry=well_geometry
+            )
+        else:
+            return find_height_user_defined_volumes(
+                target_volume=target_volume, well_geometry=well_geometry
+            )
+
     def get_well_height_after_liquid_handling(
         self,
         labware_id: str,
@@ -2079,12 +2171,10 @@ class GeometryView:
         """
         well_def = self._labware.get_well_definition(labware_id, well_name)
         well_depth = well_def.depth
-        well_geometry = self._labware.get_well_geometry(
-            labware_id=labware_id, well_name=well_name
-        )
+
         try:
-            initial_volume = find_volume_at_well_height(
-                target_height=initial_height, well_geometry=well_geometry
+            initial_volume = self.find_volume_at_well_height(
+                labware_id=labware_id, well_name=well_name, target_height=initial_height
             )
             final_volume = initial_volume + (
                 volume
@@ -2097,8 +2187,8 @@ class GeometryView:
             # NOTE(cm): if final_volume is outside the bounds of the well, it will get
             # adjusted inside find_height_at_well_volume to accomodate well the height
             # calculation.
-            height_inside_well = find_height_at_well_volume(
-                target_volume=final_volume, well_geometry=well_geometry
+            height_inside_well = self.find_height_at_well_volume(
+                labware_id=labware_id, well_name=well_name, target_volume=final_volume
             )
             return self._validate_well_position(
                 target_height=height_inside_well,
@@ -2115,10 +2205,9 @@ class GeometryView:
         self, labware_id: str, well_name: str, volume: LiquidTrackingType
     ) -> LiquidTrackingType:
         """Convert well volume to height."""
-        well_geometry = self._labware.get_well_geometry(labware_id, well_name)
         try:
-            return find_height_at_well_volume(
-                target_volume=volume, well_geometry=well_geometry
+            return self.find_height_at_well_volume(
+                labware_id=labware_id, well_name=well_name, target_volume=volume
             )
         except InvalidLiquidHeightFound as _exception:
             raise InvalidLiquidHeightFound(
@@ -2133,10 +2222,9 @@ class GeometryView:
         height: LiquidTrackingType,
     ) -> LiquidTrackingType:
         """Convert well height to volume."""
-        well_geometry = self._labware.get_well_geometry(labware_id, well_name)
         try:
-            return find_volume_at_well_height(
-                target_height=height, well_geometry=well_geometry
+            return self.find_volume_at_well_height(
+                labware_id=labware_id, well_name=well_name, target_height=height
             )
         except InvalidLiquidHeightFound as _exception:
             raise InvalidLiquidHeightFound(
@@ -2156,13 +2244,14 @@ class GeometryView:
         well_volumetric_capacity = float(well_def.totalLiquidVolume)
         if well_location.origin == WellOrigin.MENISCUS:
             # TODO(pbm, 10-23-24): refactor to smartly reduce height/volume conversions
-            well_geometry = self._labware.get_well_geometry(labware_id, well_name)
             meniscus_height = self.get_meniscus_height(
                 labware_id=labware_id, well_name=well_name
             )
             try:
-                meniscus_volume = find_volume_at_well_height(
-                    target_height=meniscus_height, well_geometry=well_geometry
+                meniscus_volume = self.find_volume_at_well_height(
+                    labware_id=labware_id,
+                    well_name=well_name,
+                    target_height=meniscus_height,
                 )
             except InvalidLiquidHeightFound as _exception:
                 raise InvalidLiquidHeightFound(

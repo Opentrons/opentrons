@@ -476,6 +476,32 @@ def test_dispense_and_wait_skips_delay(
     )
 
 
+def test_dispense_and_wait_raises_if_tip_volume_less_than_dispense_vol(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    sample_transfer_props: TransferProperties,
+) -> None:
+    """Should raise a useful error if trying to dispense more than liquid present in tip."""
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(50)
+
+    subject = TransferComponentsExecutor(
+        instrument_core=mock_instrument_core,
+        transfer_properties=sample_transfer_props,
+        target_location=Location(Point(1, 2, 3), labware=None),
+        target_well=decoy.mock(cls=WellCore),
+        tip_state=TipState(),
+        transfer_type=TransferType.ONE_TO_ONE,
+    )
+    with pytest.raises(
+        RuntimeError, match="Cannot dispense 51uL when the tip has only 50uL."
+    ):
+        subject.dispense_and_wait(
+            dispense_properties=sample_transfer_props.dispense,
+            volume=51,
+            push_out_override=123,
+        )
+
+
 def test_dispense_into_trash_and_wait(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
@@ -1108,7 +1134,7 @@ def test_retract_after_dispense_with_blowout_in_source(
     air_gap_flow_rate_by_vol = 123
     air_gap_correction_by_vol = 0.321
 
-    sample_transfer_props.aspirate.retract.air_gap_by_volume.set_for_volume(
+    sample_transfer_props.dispense.retract.air_gap_by_volume.set_for_volume(
         0, air_gap_volume
     )
     sample_transfer_props.aspirate.flow_rate_by_volume.set_for_volume(
@@ -1232,6 +1258,10 @@ def test_retract_after_dispense_with_blowout_in_destination(
     air_gap_correction_by_vol = 0.321
 
     sample_transfer_props.aspirate.retract.air_gap_by_volume.set_for_volume(
+        0,
+        1234,  # Explicitly check that this value is not used during post-dispense air gap
+    )
+    sample_transfer_props.dispense.retract.air_gap_by_volume.set_for_volume(
         0, air_gap_volume
     )
     sample_transfer_props.aspirate.flow_rate_by_volume.set_for_volume(
@@ -1340,7 +1370,7 @@ def test_retract_after_dispense_with_blowout_in_trash_well(
     air_gap_flow_rate_by_vol = 123
     air_gap_correction_by_vol = 0.321
 
-    sample_transfer_props.aspirate.retract.air_gap_by_volume.set_for_volume(
+    sample_transfer_props.dispense.retract.air_gap_by_volume.set_for_volume(
         0, air_gap_volume
     )
     sample_transfer_props.aspirate.flow_rate_by_volume.set_for_volume(
@@ -1467,7 +1497,7 @@ def test_retract_after_dispense_with_blowout_in_disposal_location(
     air_gap_flow_rate_by_vol = 123
     air_gap_correction_by_vol = 0.321
 
-    sample_transfer_props.aspirate.retract.air_gap_by_volume.set_for_volume(
+    sample_transfer_props.dispense.retract.air_gap_by_volume.set_for_volume(
         0, air_gap_volume
     )
     sample_transfer_props.aspirate.flow_rate_by_volume.set_for_volume(
@@ -1573,7 +1603,7 @@ def test_retract_after_dispense_in_trash_with_blowout_in_source(
     air_gap_flow_rate_by_vol = 123
     air_gap_correction_by_vol = 0.321
 
-    sample_transfer_props.aspirate.retract.air_gap_by_volume.set_for_volume(
+    sample_transfer_props.dispense.retract.air_gap_by_volume.set_for_volume(
         0, air_gap_volume
     )
     sample_transfer_props.aspirate.flow_rate_by_volume.set_for_volume(
@@ -1671,7 +1701,7 @@ def test_retract_after_dispense_in_trash_with_blowout_in_destination(
     air_gap_flow_rate_by_vol = 123
     air_gap_correction_by_vol = 0.321
 
-    sample_transfer_props.aspirate.retract.air_gap_by_volume.set_for_volume(
+    sample_transfer_props.dispense.retract.air_gap_by_volume.set_for_volume(
         0, air_gap_volume
     )
     sample_transfer_props.aspirate.flow_rate_by_volume.set_for_volume(
@@ -1754,7 +1784,7 @@ def test_retract_after_dispense_in_trash_with_blowout_in_disposal_location(
     air_gap_flow_rate_by_vol = 123
     air_gap_correction_by_vol = 0.321
 
-    sample_transfer_props.aspirate.retract.air_gap_by_volume.set_for_volume(
+    sample_transfer_props.dispense.retract.air_gap_by_volume.set_for_volume(
         0, air_gap_volume
     )
     sample_transfer_props.aspirate.flow_rate_by_volume.set_for_volume(
@@ -1873,7 +1903,7 @@ def test_retract_after_dispense_with_blowout_in_src_moves_to_safe_loc_for_air_ga
     air_gap_flow_rate_by_vol = 123
     air_gap_correction_by_vol = 0.321
 
-    sample_transfer_props.aspirate.retract.air_gap_by_volume.set_for_volume(
+    sample_transfer_props.dispense.retract.air_gap_by_volume.set_for_volume(
         0, air_gap_volume
     )
     sample_transfer_props.aspirate.flow_rate_by_volume.set_for_volume(
@@ -2013,26 +2043,33 @@ def test_multi_dispense_retract_after_dispense_without_conditioning_volume_or_bl
     dest_well = decoy.mock(cls=WellCore)
     well_top_point = Point(1, 2, 3)
     sample_transfer_props.multi_dispense.retract.touch_tip.enabled = True  # type: ignore[union-attr]
-    air_gap_volume = 0.123
     air_gap_flow_rate_by_vol = 123
     air_gap_correction_by_vol = 0.321
 
-    sample_transfer_props.aspirate.retract.air_gap_by_volume.set_for_volume(
-        0, air_gap_volume
+    sample_transfer_props.multi_dispense.retract.air_gap_by_volume.set_for_volume(  # type: ignore[union-attr]
+        100, 51
     )
     sample_transfer_props.aspirate.flow_rate_by_volume.set_for_volume(
-        air_gap_volume, air_gap_flow_rate_by_vol
+        51, air_gap_flow_rate_by_vol
     )
     sample_transfer_props.aspirate.correction_by_volume.set_for_volume(
-        air_gap_volume, air_gap_correction_by_vol
+        51, air_gap_correction_by_vol
     )
-
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
         transfer_properties=sample_transfer_props,
         target_location=Location(Point(1, 1, 1), labware=None),
         target_well=dest_well,
-        tip_state=TipState(),
+        tip_state=TipState(
+            ready_to_aspirate=True,
+            last_liquid_and_air_gap_in_tip=LiquidAndAirGapPair(
+                # Since we'll be testing retract_during_multi_dispensing right after
+                # initializing the executor, this is the tip state that retract_during_multi_dispensing
+                # will start with.
+                liquid=100,
+                air_gap=0,
+            ),
+        ),
         transfer_type=TransferType.ONE_TO_MANY,
     )
     decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
@@ -2086,7 +2123,7 @@ def test_multi_dispense_retract_after_dispense_without_conditioning_volume_or_bl
             and [
                 mock_instrument_core.air_gap_in_place(
                     # type: ignore[func-returns-value]
-                    volume=air_gap_volume,
+                    volume=51,
                     flow_rate=air_gap_flow_rate_by_vol,
                     correction_volume=air_gap_correction_by_vol,
                 ),
@@ -2133,8 +2170,8 @@ def test_multi_dispense_retract_after_dispense_with_blowout_without_conditioning
     air_gap_flow_rate_by_vol = 123
     air_gap_correction_by_vol = 0.321
 
-    sample_transfer_props.aspirate.retract.air_gap_by_volume.set_for_volume(
-        0, air_gap_volume
+    sample_transfer_props.multi_dispense.retract.air_gap_by_volume.set_for_all_volumes(  # type: ignore[union-attr]
+        air_gap_volume
     )
     sample_transfer_props.aspirate.flow_rate_by_volume.set_for_volume(
         air_gap_volume, air_gap_flow_rate_by_vol

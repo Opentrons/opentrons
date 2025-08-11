@@ -1,3 +1,5 @@
+import max from 'lodash/max'
+
 import {
   FLEX_ROBOT_TYPE,
   getAllLiquidClassDefs,
@@ -24,6 +26,7 @@ import {
 
 import type { CutoutId, ProtocolFile, RobotType } from '@opentrons/shared-data'
 import type {
+  ChangeTipOptions,
   InvariantContext,
   LabwareEntities,
   LabwareEntity,
@@ -114,7 +117,7 @@ export function getLoadAdapters(
   const pythonAdapters = Object.values(adapterEntities)
     .map(adapter => {
       const { id, def, pythonName } = adapter
-      const { parameters, namespace } = def
+      const { parameters, namespace, version } = def
       // 2nd item in stack is the slot the adapter is on
       const adapterSlot = labwareRobotState[id].stack[1]
       const onModule = moduleEntities[adapterSlot] != null
@@ -136,10 +139,7 @@ export function getLoadAdapters(
           `${formatPyStr(parameters.loadName)}`,
           ...(locationArg ? [locationArg] : []),
           `namespace=${formatPyStr(namespace)}`,
-          //  NOTE: temporarily removing version number
-          //  until PD migrated labware defs to the latest version
-          //  upon re-import
-          // `version=${version}`,
+          `version=${version}`,
         ].join(',\n')
         return (
           `${pythonName} = ${parentName}.load_adapter(\n` +
@@ -164,6 +164,70 @@ export function getLoadAdapters(
   return pythonAdapters ? `# Load Adapters:\n${pythonAdapters}` : ''
 }
 
+const _getLidStacks = (
+  lidEntities: LabwareEntity[],
+  allLabwareEntities: LabwareEntities,
+  labwareState: TimelineFrame['labware']
+): Record<string, { loadName: string; quantity: number }> =>
+  lidEntities.reduce<Record<string, { loadName: string; quantity: number }>>(
+    (acc, { id, labwareDefURI, def }) => {
+      const { stack } = labwareState[id]
+      const nonSlotStackLength = stack.length - 1
+      const parentLabware = stack.slice(1, nonSlotStackLength) // excluding stack
+      const isLidStack = parentLabware.every(
+        parentLabwareId =>
+          allLabwareEntities[parentLabwareId].labwareDefURI === labwareDefURI
+      )
+      const loadName = def.parameters.loadName
+      if (!isLidStack) {
+        return acc
+      }
+      const lidSlot = getSlotInLocationStack(stack)
+      if (!(lidSlot in acc)) {
+        return {
+          ...acc,
+          [lidSlot]: { loadName, quantity: nonSlotStackLength },
+        }
+      }
+      const { quantity } = acc[lidSlot]
+      const newQuantity = max([quantity, nonSlotStackLength]) ?? quantity
+      return { ...acc, [lidSlot]: { loadName, quantity: newQuantity } }
+    },
+    {}
+  )
+
+export const getLoadLidStacks = (
+  allLabwareEntities: LabwareEntities,
+  labwareRobotState: TimelineFrame['labware']
+): string => {
+  const lidEntities = Object.values(allLabwareEntities).filter(lw =>
+    lw.def.allowedRoles?.includes('lid')
+  )
+
+  // store quantity here
+  const lidStacks = _getLidStacks(
+    lidEntities,
+    allLabwareEntities,
+    labwareRobotState
+  )
+
+  const pythonLidStacks = Object.entries(lidStacks)
+    .map<string>(([slot, { loadName, quantity }]) => {
+      const loadNameArg = `load_name=${formatPyStr(loadName)}`
+      const locationArg = `location=${formatPyStr(slot)}`
+      const quantityArg = `quantity=${quantity}`
+      const allArgs = [loadNameArg, locationArg, quantityArg].join(',\n')
+      const allArgsIndented = indentPyLines(allArgs)
+      return (
+        `lid_stack_${slot} = ${PROTOCOL_CONTEXT_NAME}.load_lid_stack(\n` +
+        `${allArgsIndented},\n` +
+        `)`
+      )
+    })
+    .join('\n')
+  return pythonLidStacks ? `# Load Lid Stacks:\n${pythonLidStacks}` : ''
+}
+
 export function getLoadLabware(
   moduleEntities: ModuleEntities,
   allLabwareEntities: LabwareEntities,
@@ -178,13 +242,15 @@ export function getLoadLabware(
   const lidEntities = Object.values(allLabwareEntities).filter(lw =>
     lw.def.allowedRoles?.includes('lid')
   )
+
   const pythonLabware = Object.values(labwareEntities)
-    .map(labware => {
+    .reduce<string[]>((acc, labware) => {
       const { id, def, pythonName } = labware
-      const { metadata, parameters, namespace } = def
+      const { metadata, parameters, namespace, version } = def
       const lidEntity = Object.values(lidEntities).find(
         lid => labwareRobotState[lid.id].stack[1] === id
       )
+
       const hasNickname =
         labwareNicknamesById[id] != null &&
         labwareNicknamesById[id] !== metadata.displayName
@@ -219,16 +285,14 @@ export function getLoadLabware(
           ...(lidEntity != null
             ? [`lid=${formatPyStr(lidEntity.def.parameters.loadName)}`]
             : []),
-          //  NOTE: temporarily removing version number
-          //  until PD migrated labware defs to the latest version
-          //  upon re-import
-          // `version=${version}`,
+          `version=${version}`,
         ].join(',\n')
-        return (
+        return [
+          ...acc,
           `${pythonName} = ${parentName}.load_labware(\n` +
-          `${indentPyLines(loadLabwareArgs)},\n` +
-          `)`
-        )
+            `${indentPyLines(loadLabwareArgs)},\n` +
+            `)`,
+        ]
       } else {
         // custom labware
         const loadFromDefnArgs = [
@@ -236,13 +300,14 @@ export function getLoadLabware(
           ...(locationArg ? [locationArg] : []),
           ...(labelArg ? [labelArg] : []),
         ].join(',\n')
-        return (
+        return [
+          ...acc,
           `${pythonName} = ${parentName}.load_labware_from_definition(\n` +
-          `${indentPyLines(loadFromDefnArgs)},\n` +
-          `)`
-        )
+            `${indentPyLines(loadFromDefnArgs)},\n` +
+            `)`,
+        ]
       }
-    })
+    }, [])
     .join('\n')
 
   return pythonLabware ? `# Load Labware:\n${pythonLabware}` : ''
@@ -258,9 +323,7 @@ export function getLoadPipettes(
     .map(pipette => {
       const { name, id, spec, pythonName, tiprackDefURI } = pipette
       const mount =
-        spec.channels === 96
-          ? ''
-          : `, ${formatPyStr(pipetteRobotState[id].mount)}`
+        spec.channels === 96 ? '' : formatPyStr(pipetteRobotState[id].mount)
       const pipetteName = isFlexPipette(name)
         ? getFlexNameConversion(spec)
         : name
@@ -288,13 +351,20 @@ export function getLoadPipettes(
       const tiprackPythonNames = [...onDeckTipracks, ...offDeckTipracks]
         .map(tiprack => tiprack.pythonName)
         .join(', ')
-
       const pythonTipRacks =
-        tiprackDefURI.length === 0 ? '' : `, tip_racks=[${tiprackPythonNames}]`
+        tiprackDefURI.length === 0 ? '' : `tip_racks=[${tiprackPythonNames}]`
 
-      return `${pythonName} = ${PROTOCOL_CONTEXT_NAME}.load_instrument(${formatPyStr(
-        pipetteName
-      )}${mount}${pythonTipRacks})`
+      return (
+        `${pythonName} = ${PROTOCOL_CONTEXT_NAME}.load_instrument(\n` +
+        `${indentPyLines(
+          [
+            formatPyStr(pipetteName),
+            ...(mount ? [mount] : []),
+            ...(pythonTipRacks ? [pythonTipRacks] : []),
+          ].join(', ')
+        )},\n` +
+        ')'
+      )
     })
     .join('\n')
 
@@ -375,7 +445,7 @@ export function getLoadLiquids(
       const pythonWells =
         formattedWells.length < 8
           ? formattedWells.join(', ')
-          : `\n${indentedWells}\n${INDENT}`
+          : `\n${indentedWells}\n`
 
       const loadLiquidArgs = [
         `wells=[${pythonWells}],\n` +
@@ -475,6 +545,7 @@ export function pythonDefRun(
   const sections: string[] = [
     getLoadModules(moduleEntities, modules),
     getLoadAdapters(moduleEntities, labwareEntities, labware),
+    getLoadLidStacks(labwareEntities, labware),
     getLoadLabware(
       moduleEntities,
       labwareEntities,
@@ -521,5 +592,19 @@ export function pythonCustomLabwareDict(
     )}""")`
   } else {
     return ''
+  }
+}
+
+export const formatChangeTipArg = (changeTip: ChangeTipOptions): string => {
+  switch (changeTip) {
+    case 'perDest': {
+      return 'per destination'
+    }
+    case 'perSource': {
+      return 'per source'
+    }
+    default: {
+      return changeTip
+    }
   }
 }

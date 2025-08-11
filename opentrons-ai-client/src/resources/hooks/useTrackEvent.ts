@@ -1,7 +1,8 @@
 import { useAtom } from 'jotai'
 
-import { trackEvent } from '../../analytics/mixpanel'
-import { mixpanelAtom } from '../atoms'
+import { trackEvent } from '/ai-client/analytics/mixpanel'
+
+import { featureFlagsAtom, mixpanelAtom } from '../atoms'
 
 import type { AnalyticsEvent } from '../types'
 
@@ -12,7 +13,14 @@ import type { AnalyticsEvent } from '../types'
  */
 export function useTrackEvent(): (e: AnalyticsEvent) => void {
   const [mixpanel] = useAtom(mixpanelAtom)
+  const [featureFlags] = useAtom(featureFlagsAtom)
+
   return event => {
-    trackEvent(event, mixpanel?.analytics?.hasOptedIn ?? false)
+    // Analytics must be enabled in both feature flags AND mixpanel state
+    const featureFlagEnabled = featureFlags.enableAnalytics ?? true
+    const mixpanelOptedIn = mixpanel?.analytics?.hasOptedIn ?? false
+    const analyticsEnabled = featureFlagEnabled && mixpanelOptedIn
+
+    trackEvent(event, analyticsEnabled)
   }
 }

@@ -12,12 +12,13 @@ import {
   OVERFLOW_AUTO,
 } from '@opentrons/components'
 
-import { initializeMixpanel } from './analytics/mixpanel'
-import { ExitConfirmModal } from './molecules/ExitConfirmModal'
-import { Footer } from './molecules/Footer'
-import { Header } from './molecules/Header'
-import { HeaderWithMeter } from './molecules/HeaderWithMeter'
-import { Loading } from './molecules/Loading'
+import { ExitConfirmModal } from '/ai-client/components/molecules/ExitConfirmModal'
+import { Footer } from '/ai-client/components/molecules/Footer'
+import { Header } from '/ai-client/components/molecules/Header'
+import { HeaderWithMeter } from '/ai-client/components/molecules/HeaderWithMeter'
+import { Loading } from '/ai-client/components/molecules/Loading'
+
+import { initializeMixpanel, setMixpanelTracking } from './analytics/mixpanel'
 import { OpentronsAIRoutes } from './OpentronsAIRoutes'
 import {
   featureFlagsAtom,
@@ -35,7 +36,7 @@ export function OpentronsAI(): JSX.Element | null {
   const [{ displayHeaderWithMeter, progress }] = useAtom(headerWithMeterAtom)
   const [mixpanelState, setMixpanelState] = useAtom(mixpanelAtom)
   const { getAccessToken } = useGetAccessToken()
-  const [, setFeatureFlags] = useAtom(featureFlagsAtom)
+  const [featureFlags, setFeatureFlags] = useAtom(featureFlagsAtom)
 
   const trackEvent = useTrackEvent()
 
@@ -67,6 +68,23 @@ export function OpentronsAI(): JSX.Element | null {
       trackEvent({ name: 'user-login', properties: {} })
     }
   }, [isAuthenticated])
+
+  // Sync feature flag changes with Mixpanel analytics state
+  useEffect(() => {
+    if (mixpanelState?.isInitialized) {
+      const analyticsEnabled = featureFlags.enableAnalytics ?? true
+      const currentMixpanelState = mixpanelState.analytics.hasOptedIn
+
+      // Only update if there's a difference to avoid unnecessary calls
+      if (analyticsEnabled !== currentMixpanelState) {
+        setMixpanelState({
+          ...mixpanelState,
+          analytics: { hasOptedIn: analyticsEnabled },
+        })
+        setMixpanelTracking(analyticsEnabled)
+      }
+    }
+  }, [featureFlags.enableAnalytics, mixpanelState, setMixpanelState])
 
   if (isLoading) {
     return <Loading />

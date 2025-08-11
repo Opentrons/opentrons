@@ -1,0 +1,391 @@
+.container {
+  padding: var(--spacing-16);
+}
+
+.heading_text {
+  font-size: var(--font-size-28);
+  font-weight: var(--font-weight-bold);
+}
+
+.play_button {
+  width: 3.75rem;
+  height: 3.75rem;
+  border-radius: 12.5rem;
+  background-color: var(--blue-50);
+  cursor: pointer;
+}
+
+.play_button:active,
+.play_button:hover {
+  background-color: var(--blue-60);
+}
+
+.fast_button {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 12.5rem;
+  background-color: var(--blue-30);
+  cursor: pointer;
+}
+
+.fast_button:active,
+.fast_button:hover {
+  background-color: var(--blue-40);
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-8);
+}
+
+.controls_info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-16);
+}
+
+.all_controls_info {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--spacing-20);
+}
+
+.controls_container {
+  position: relative;
+  width: 100%;
+  padding: 0 var(--spacing-16);
+  border-radius: var(--border-radius-8);
+  background-color: var(--white);
+}
+
+.controls_overflow_btn {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+}
+
+.max_content_size {
+  width: max-content;
+}
+
+.range_input {
+  display: block;
+  width: 100%;
+  height: var(--spacing-4);
+  border-radius: var(--border-radius-2);
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.range_input::-webkit-slider-runnable-track {
+  position: relative;
+  height: var(--spacing-4);
+  border-radius: var(--border-radius-2);
+  background:
+    linear-gradient(
+      to right,
+      var(--blue-50) 0%,
+      var(--blue-50) var(--progress, 0%),
+      #ccc var(--progress, 0%),
+      #ccc 100%
+    );
+}
+
+/* Hide thumb initially */
+.range_input::-webkit-slider-thumb {
+  z-index: 5;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  margin-top: -4px;
+  appearance: none;
+  background: var(--blue-50);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+/* Show thumb on hover/focus */
+.range_input:hover::-webkit-slider-thumb,
+.range_input:focus::-webkit-slider-thumb,
+.range_input:active::-webkit-slider-thumb {
+  position: relative;
+  z-index: 5;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.deck_view_container {
+  width: 34.75rem;
+  height: 100%;
+  padding: 28px 32px;
+  border-radius: var(--border-radius-8);
+  background-color: var(--white);
+  gap: var(--spacing-20);
+}
+
+.detail_container {
+  padding-right: var(--spacing-16);
+  padding-bottom: var(--spacing-16);
+}
+
+.slot_container {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  padding-right: var(--spacing-16);
+  gap: var(--spacing-8);
+}
+
+.command_step {
+  border-radius: var(--border-radius-8);
+  background-color: var(--white);
+}
+
+.command_step_header {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--spacing-16);
+}
+
+.command_step_groups {
+  height:
+    calc(
+      100vh - 248px
+    ); /* 248px is height of the controls container + timeline header */
+
+  overflow-y: scroll;
+}
+
+.slot_details {
+  height: 100vh;
+  border-radius: var(--border-radius-8);
+  background-color: var(--white);
+  overflow-y: scroll;
+}
+
+.preview_container {
+  display: flex;
+  height: calc(100vh - 170px); /* 170px is height of the controls container */
+  padding-bottom: var(--spacing-16);
+}
+
+.app {
+  display: flex;
+  height: 100vh; /* fills the viewport */
+  flex-direction: column;
+}
+
+.deck_view_padding {
+  padding: 0 var(--spacing-12);
+}
+
+.align_deck_modules {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.module_copy {
+  margin-bottom: 6rem;
+}
+
+.slot_details_active_step {
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--spacing-12) var(--spacing-12) var(--spacing-12);
+  gap: var(--spacing-8);
+}
+
+.command_text_container {
+  display: flex;
+  height: 6.25rem;
+  flex-direction: column;
+  padding: 0 var(--spacing-16) var(--spacing-16) var(--spacing-16);
+  gap: var(--spacing-8);
+}
+
+.command_text {
+  padding: var(--spacing-8);
+  border-radius: var(--border-radius-4);
+  background-color: #f4def7;
+}
+
+.loading_icon {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.slot_detail_header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+}
+
+.cursor_pointer {
+  cursor: pointer;
+}
+
+.module_details_status {
+  display: flex;
+  justify-content: space-between;
+  padding-left: var(--spacing-16);
+}
+
+.module_details_status_container {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.labware_details_labware_display {
+  display: flex;
+  justify-content: center;
+  padding: var(--spacing-16);
+  border-radius: var(--border-radius-4);
+  background-color: var(--grey-20);
+}
+
+.labware_details_liquid_info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-8);
+}
+
+.labware_details_liquid_info_container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.well_details_speed {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.labware_details_all_liquids {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.labware_details_all_liquids_container {
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--spacing-16) var(--spacing-16) var(--spacing-16);
+  gap: var(--spacing-8);
+}
+
+.well_details_speed_container {
+  display: flex;
+  height: 2rem;
+  flex-direction: column;
+  padding: 0 var(--spacing-16) var(--spacing-16) var(--spacing-16);
+  gap: var(--spacing-8);
+}
+
+.labware_details_padding {
+  padding: 0 var(--spacing-16) var(--spacing-16) var(--spacing-16);
+}
+
+.labware_details_container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--spacing-16);
+  border-radius: var(--border-radius-4);
+  background-color: var(--grey-20);
+}
+
+.slot_box {
+  width: 127.76px; /* STANDARD_X_WIDTH */
+  height: 85.48px; /* STANDARD_Y_HEIGHT */
+  padding: var(--spacing-8);
+  border: 3px solid black;
+  border-radius: var(--border-radius-8);
+  background-color: transparent;
+}
+
+.dont_show_render_slot_box {
+  background-color: var(--grey-50);
+}
+
+.hovered_inactive_slot_box {
+  background-color: var(--grey-60);
+}
+
+.active_slot_box {
+  background-color: var(--purple-50-touchscreen);
+}
+
+.hovered_active_slot_box {
+  background-color: var(--purple-60-touchscreen);
+}
+
+.well_details_caption_bottom {
+  position: absolute;
+  right: 3.6rem;
+  bottom: 0.7rem;
+}
+
+.well_details_caption_side {
+  position: absolute;
+  right: 0.8rem;
+  bottom: 4rem;
+}
+
+.well_detail_svg_container {
+  position: relative;
+  overflow: hidden;
+  width: 10rem;
+  height: 11rem;
+  border-radius: var(--border-radius-4);
+  background-color: var(--grey-20);
+}
+
+.well_detail_svg_positioning {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-6);
+}
+
+.empty_state_box {
+  width: 100%;
+  height: 8.330625rem;
+  border-radius: var(--border-radius-4);
+  background-color: var(--grey-10);
+}
+
+.empty_state_box_container {
+  padding: 0 var(--spacing-12);
+}
+
+.deck_overlay {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--border-radius-4);
+  gap: var(--spacing-8);
+}
+
+.controls_overflow_menu {
+  position: absolute;
+  z-index: 2;
+  top: 3.4rem;
+  right: 1.25rem;
+  flex-direction: column;
+  border-radius: var(--border-radius-4);
+  background-color: var(--white);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}

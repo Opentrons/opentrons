@@ -1,10 +1,8 @@
 import asyncio
 import pytest
 import mock
-from typing import AsyncGenerator
-from opentrons.drivers.flex_stacker.driver import (
-    STACKER_MOTION_CONFIG,
-)
+from contextlib import nullcontext as does_not_raise
+from typing import AsyncGenerator, ContextManager, Any
 from opentrons.drivers.flex_stacker.simulator import SimulatingDriver
 from opentrons.drivers.flex_stacker.types import (
     Direction,
@@ -17,16 +15,23 @@ from opentrons.drivers.flex_stacker.types import (
 from opentrons.hardware_control import modules, ExecutionManager
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control.modules.flex_stacker import (
+    LATCH_CLEARANCE,
     MAX_TRAVEL,
     HOME_OFFSET_MD,
     HOME_OFFSET_SM,
     PLATFORM_OFFSET,
     SIMULATING_POLL_PERIOD,
+    STACKER_MOTION_CONFIG,
     FlexStackerReader,
 )
 from opentrons.hardware_control.modules.types import PlatformState
 from opentrons.hardware_control.poller import Poller
 from opentrons.hardware_control.types import StatusBarState, StatusBarUpdateEvent
+from opentrons_shared_data.errors.exceptions import (
+    FlexStackerShuttleLabwareError,
+    FlexStackerHopperLabwareError,
+    FlexStackerShuttleNotEmptyError,
+)
 
 
 @pytest.fixture
@@ -359,12 +364,13 @@ async def test_store_labware_motion_sequence(
         verify_shuttle_labware_presence.assert_any_call(Direction.RETRACT, True)
 
         # Assertions for offset calculation and move_axis
-        distance = MAX_TRAVEL[StackerAxis.Z] - labware_height - PLATFORM_OFFSET
+        latch_clear_distance = labware_height + PLATFORM_OFFSET - LATCH_CLEARANCE
+        distance = MAX_TRAVEL[StackerAxis.Z] - latch_clear_distance
         move_axis.assert_any_call(StackerAxis.Z, Direction.EXTEND, distance)
 
         # Verify labware transfer
         open_latch.assert_called_once()
-        z_distance = MAX_TRAVEL[StackerAxis.Z] - distance - HOME_OFFSET_SM
+        z_distance = latch_clear_distance - HOME_OFFSET_SM
         z_speed = STACKER_MOTION_CONFIG[StackerAxis.Z]["move"].move_params.max_speed / 2
         move_axis.assert_any_call(StackerAxis.Z, Direction.EXTEND, z_distance, z_speed)
         home_axis.assert_any_call(StackerAxis.Z, Direction.EXTEND, z_speed)
@@ -401,48 +407,133 @@ async def test_dispense_labware_motion_sequence(
             subject, "_move_and_home_axis", mock.AsyncMock()
         ) as _move_and_home_axis,
         mock.patch.object(
-            subject, "verify_shuttle_labware_presence", mock.AsyncMock()
+            subject, "labware_detected", mock.AsyncMock()
+        ) as labware_detected,
+        mock.patch.object(
+            subject,
+            "verify_shuttle_labware_presence",
+            autospec=True,
+            side_effect=subject.verify_shuttle_labware_presence,
         ) as verify_shuttle_labware_presence,
         mock.patch.object(
-            subject, "verify_hopper_labware_presence", mock.AsyncMock()
+            subject, "verify_hopper_labware_presence", autospec=True
         ) as verify_hopper_labware_presence,
         mock.patch.object(subject, "move_axis", mock.AsyncMock()) as move_axis,
         mock.patch.object(subject, "home_axis", mock.AsyncMock()) as home_axis,
         mock.patch.object(subject, "open_latch", mock.AsyncMock()) as open_latch,
         mock.patch.object(subject, "close_latch", mock.AsyncMock()) as close_latch,
     ):
+        labware_detected.side_effect = [True, False, True]
         # Test valid labware height
         await subject.dispense_labware(
             labware_height=labware_height,
         )
 
         # We need to verify the move sequence
-        verify_hopper_labware_presence.assert_called_once_with(True)
+        # verify_hopper_labware_presence.assert_called_once_with(Direction.EXTEND, True)
+        verify_hopper_labware_presence.assert_not_called()
         _prepare_for_action.assert_called()
+
         _move_and_home_axis.assert_any_call(
             StackerAxis.X, Direction.RETRACT, HOME_OFFSET_MD
         )
+        # Verify labware presence
+        verify_shuttle_labware_presence.assert_any_call(Direction.RETRACT, False)
         _move_and_home_axis.assert_any_call(
             StackerAxis.Z, Direction.EXTEND, HOME_OFFSET_SM
         )
 
         # Verify labware transfer
         open_latch.assert_called_once()
-        move_axis.assert_any_call(StackerAxis.Z, Direction.RETRACT, labware_height)
+        latch_clear_distance = labware_height + PLATFORM_OFFSET - LATCH_CLEARANCE
+        move_axis.assert_any_call(
+            StackerAxis.Z, Direction.RETRACT, latch_clear_distance
+        )
         close_latch.assert_called_once()
 
         # Assertions for offset calculation and move_axis/home_axis
-        z_distance = MAX_TRAVEL[StackerAxis.Z] - labware_height - HOME_OFFSET_SM
+        z_distance = MAX_TRAVEL[StackerAxis.Z] - latch_clear_distance - HOME_OFFSET_SM
         move_axis.assert_any_call(StackerAxis.Z, Direction.RETRACT, z_distance)
         home_axis.assert_any_call(StackerAxis.Z, Direction.RETRACT)
 
         # Verify labware presence
-        verify_shuttle_labware_presence.assert_called_once_with(Direction.RETRACT, True)
+        verify_shuttle_labware_presence.assert_any_call(Direction.RETRACT, True)
 
         # Then finally the x is moved to the gripper position
         _move_and_home_axis.assert_any_call(
             StackerAxis.X, Direction.EXTEND, HOME_OFFSET_MD
         )
+
+        # Make sure labware presense check on the X retract was called twice
+        labware_detected.assert_has_calls(
+            [
+                mock.call(StackerAxis.Z, Direction.EXTEND),
+                mock.call(StackerAxis.X, Direction.RETRACT),
+                mock.call(StackerAxis.X, Direction.RETRACT),
+            ]
+        )
+        assert verify_shuttle_labware_presence.call_count == 2
+
+
+@pytest.mark.parametrize("hopper_lw_detected", [True, False])
+@pytest.mark.parametrize("shuttle_lw_detected_before", [True, False])
+@pytest.mark.parametrize("shuttle_lw_detected_after", [True, False])
+async def test_dispense_labware_error_handling(
+    subject: modules.FlexStacker,
+    hopper_lw_detected: bool,
+    shuttle_lw_detected_before: bool,
+    shuttle_lw_detected_after: bool,
+) -> None:
+    """
+    Test different error handling scenarios when dispensing labware.
+    """
+    expected_raise: ContextManager[Any]
+    if shuttle_lw_detected_before is True:
+        # If the shuttle is occupied, it should always raise an error
+        expected_raise = pytest.raises(FlexStackerShuttleNotEmptyError)
+    elif shuttle_lw_detected_after is True:
+        # if the shuttle has labware after dispensing, no need to raise any error
+        expected_raise = does_not_raise()
+    elif hopper_lw_detected is False:
+        # if the shuttle has no labware after dispensing, and the hopper has no labware,
+        # it should raise a FlexStackerHopperLabwareError
+        expected_raise = pytest.raises(FlexStackerHopperLabwareError)
+    else:
+        # if the shuttle has no labware after dispensing, but the hopper has labware,
+        # it should raise a FlexStackerShuttleLabwareError letting user know
+        # the labware latch is properly jammed
+        expected_raise = pytest.raises(FlexStackerShuttleLabwareError)
+
+    with (
+        mock.patch.object(
+            subject,
+            "labware_detected",
+            side_effect=[
+                hopper_lw_detected,
+                shuttle_lw_detected_before,
+                shuttle_lw_detected_after,
+            ],
+            autospec=True,
+        ) as labware_detected,
+    ):
+
+        with expected_raise:
+            # Test valid labware height
+            await subject.dispense_labware(
+                labware_height=100.0,
+            )
+
+        expected_calls = [
+            mock.call(StackerAxis.Z, Direction.EXTEND),
+            mock.call(StackerAxis.X, Direction.RETRACT),
+            mock.call(StackerAxis.X, Direction.RETRACT),
+        ]
+        if shuttle_lw_detected_before:
+            assert labware_detected.call_count == 2
+            labware_detected.assert_has_calls(expected_calls[:2])
+        else:
+            assert labware_detected.call_count == 3
+            labware_detected.assert_has_calls(expected_calls)
 
 
 @pytest.mark.parametrize(

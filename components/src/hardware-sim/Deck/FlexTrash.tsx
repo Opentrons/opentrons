@@ -1,3 +1,5 @@
+import clsx from 'clsx'
+
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
@@ -6,12 +8,11 @@ import {
   opentrons1Trash3200MlFixedV1 as trashLabwareDef,
 } from '@opentrons/shared-data'
 
-import { BORDERS, COLORS } from '../../helix-design-system'
+import { PlaceholderStyledText } from '../../atoms'
+import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import { DeckLabelSet } from '../../organisms'
-import { Flex, Text } from '../../primitives'
-import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
-import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import styles from './deck.module.css'
 import { RobotCoordsForeignObject } from './RobotCoordsForeignObject'
 
 import type { RobotType } from '@opentrons/shared-data'
@@ -38,6 +39,9 @@ interface FlexTrashProps {
   showHighlight?: boolean
   /** optional tag info to display a tag below the trash */
   tagInfo?: DeckLabelProps[]
+  onClick?: () => void
+  onMouseEnter?: () => void
+  onMouseLeave?: () => void
 }
 
 /**
@@ -52,6 +56,9 @@ export const FlexTrash = ({
   trashCutoutId,
   showHighlight,
   tagInfo,
+  onClick,
+  onMouseEnter,
+  onMouseLeave,
 }: FlexTrashProps): JSX.Element | null => {
   // be sure we don't try to render for an OT-2
   if (robotType !== FLEX_ROBOT_TYPE) return null
@@ -97,28 +104,37 @@ export const FlexTrash = ({
         height={yDimension}
         x={x + xAdjustment}
         y={y + yAdjustment}
-        flexProps={{ flex: '1' }}
-        foreignObjectProps={{ flex: '1' }}
+        flexProps={{
+          flex: '1',
+        }}
+        flexEvents={{
+          onClick: onClick,
+          onMouseEnter: onMouseEnter,
+          onMouseLeave: onMouseLeave,
+        }}
+        foreignObjectProps={{
+          flex: '1',
+          cursor: onClick != null ? 'pointer' : 'default',
+        }}
       >
-        <Flex
-          alignItems={ALIGN_CENTER}
-          backgroundColor={backgroundColor}
-          borderRadius={BORDERS.borderRadius4}
-          justifyContent={JUSTIFY_CENTER}
-          gridGap={SPACING.spacing8}
-          width="100%"
-          border={showHighlight ? `3px solid ${COLORS.blue50}` : 'none'}
+        <div
+          className={clsx(styles.trash_container, {
+            [styles.trash_container_highlight]: showHighlight,
+          })}
+          style={{ backgroundColor }}
         >
           {rotateDegrees === '180' ? (
-            <Text
-              color={COLORS.white}
-              // rotate text back 180 degrees
-              transform={`rotate(${rotateDegrees}deg)`}
-              transformOrigin="center"
-              css={TYPOGRAPHY.bodyTextSemiBold}
+            <div
+              className={styles.trash_container_rotate_copy}
+              style={{ transform: `rotate(${rotateDegrees}deg)` }}
             >
-              Trash bin
-            </Text>
+              <PlaceholderStyledText
+                color={COLORS.white}
+                desktopStyle="bodyDefaultSemiBold"
+              >
+                Trash bin
+              </PlaceholderStyledText>
+            </div>
           ) : null}
           <Icon
             name="trash"
@@ -129,11 +145,14 @@ export const FlexTrash = ({
             transformOrigin="center"
           />
           {rotateDegrees === '0' ? (
-            <Text color={COLORS.white} css={TYPOGRAPHY.bodyTextSemiBold}>
+            <PlaceholderStyledText
+              color={COLORS.white}
+              desktopStyle="bodyDefaultSemiBold"
+            >
               Trash bin
-            </Text>
+            </PlaceholderStyledText>
           ) : null}
-        </Flex>
+        </div>
       </RobotCoordsForeignObject>
       {tagInfo != null && tagInfo.length > 0 ? (
         <DeckLabelSet

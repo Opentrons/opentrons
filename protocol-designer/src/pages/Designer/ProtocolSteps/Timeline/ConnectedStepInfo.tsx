@@ -1,5 +1,7 @@
+import { useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+import debounce from 'lodash/debounce'
 
 import { useConditionalConfirm } from '@opentrons/components'
 
@@ -40,10 +42,7 @@ import type { Dispatch, MouseEvent, SetStateAction } from 'react'
 import type { DeleteModalType } from '../../../../components/organisms'
 import type { StepIdType } from '../../../../form-types'
 import type { BaseState, ThunkAction } from '../../../../types'
-import type {
-  HoverOnStepAction,
-  SelectMultipleStepsAction,
-} from '../../../../ui/steps'
+import type { SelectMultipleStepsAction } from '../../../../ui/steps'
 
 export interface ConnectedStepInfoProps {
   stepId: StepIdType
@@ -53,6 +52,8 @@ export interface ConnectedStepInfoProps {
   setOpenedOverflowMenuId?: Dispatch<SetStateAction<string | null>>
   sidebarWidth: number
 }
+
+const DEBOUNCE_DURATION_MS = 500
 
 export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
   const {
@@ -111,14 +112,18 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
   ): ThunkAction<SelectMultipleStepsAction> =>
     dispatch(stepsActions.selectMultipleSteps(steps, lastSelected))
 
+  const debouncedUnhighlightStep = useMemo(
+    () =>
+      debounce(() => {
+        dispatch(stepsActions.hoverOnStep(null))
+      }, DEBOUNCE_DURATION_MS),
+    [dispatch]
+  )
+
   const selectStep = (): ThunkAction<any> =>
     dispatch(stepsActions.resetSelectStep(stepId))
   const selectStepOnDoubleClick = (): ThunkAction<any> =>
     dispatch(stepsActions.selectStep(stepId))
-  const highlightStep = (): HoverOnStepAction =>
-    dispatch(stepsActions.hoverOnStep(stepId))
-  const unhighlightStep = (): HoverOnStepAction =>
-    dispatch(stepsActions.hoverOnStep(null))
   const handleSelectStep = (event: MouseEvent): void => {
     if (selectedStep !== stepId) {
       dispatch(toggleViewSubstep(null))
@@ -196,6 +201,21 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
 
   const iconName = stepIconsByType[step.stepType]
 
+  const handleMouseEnter = (): void => {
+    debouncedUnhighlightStep.cancel()
+    dispatch(stepsActions.hoverOnStep(stepId))
+  }
+
+  const handleMouseLeave = (): void => {
+    debouncedUnhighlightStep()
+  }
+
+  useEffect(() => {
+    return () => {
+      debouncedUnhighlightStep.cancel()
+    }
+  }, [debouncedUnhighlightStep, hoveredStep, stepId])
+
   return (
     <>
       {showConfirmationDoubleClick && (
@@ -218,12 +238,12 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
         hasError={hasError}
         isStepAfterError={stepAfterError}
         stepId={stepId}
-        onMouseLeave={unhighlightStep}
+        onMouseLeave={handleMouseLeave}
         selected={selected}
         onDoubleClick={confirmDoubleClick}
         onClick={confirm}
         hovered={hoveredStep === stepId && !hoveredSubstep}
-        onMouseEnter={highlightStep}
+        onMouseEnter={handleMouseEnter}
         iconName={hasError || hasWarnings ? 'alert-circle' : iconName}
         title={`${stepNumber}. ${
           i18n.format(step.stepName, 'titleCase') ||

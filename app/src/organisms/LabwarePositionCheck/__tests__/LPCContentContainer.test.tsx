@@ -36,6 +36,9 @@ describe('LPCContentContainer', () => {
       header: 'MOCK_HEADER',
       ...mockLPCContentProps,
       children: <div>MOCK_CHILDREN</div>,
+      desktopHeaderBtnCopy: '',
+      desktopFooterBtnCopy: '',
+      oddHeaderBtnCopy: '',
     }
 
     vi.mocked(ChildNavigation).mockReturnValue(<div>MOCK_CHILD_NAV</div>)

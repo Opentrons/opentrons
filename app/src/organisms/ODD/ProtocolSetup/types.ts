@@ -4,5 +4,4 @@ export type SetupScreens =
   | 'modules'
   | 'offsets'
   | 'labware'
-  | 'deck configuration'
   | 'view only parameters'

@@ -15,7 +15,6 @@ import {
   Icon,
   LabwareRender,
   LegacyStyledText,
-  Module,
   MoveLabwareOnDeck,
   RESPONSIVENESS,
   SPACING,
@@ -26,7 +25,7 @@ import {
   getDeckDefFromRobotType,
   getLoadedLabwareDefinitionsByUri,
   getModuleType,
-  inferModuleOrientationFromXCoordinate,
+  GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
   OT2_ROBOT_TYPE,
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
@@ -123,16 +122,27 @@ export function MoveLabwareInterventionContent({
   const deckDef = getDeckDefFromRobotType(robotType)
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
-  const moduleRenderInfo = getRunModuleRenderInfo(
-    run,
-    deckDef,
-    labwareDefsByUri
-  )
   const labwareRenderInfo = getRunLabwareRenderInfo(
     run,
     labwareDefsByUri,
     deckDef
   )
+  const moduleRenderInfo = getRunModuleRenderInfo(
+    run,
+    deckDef,
+    labwareDefsByUri
+  )
+  const modulesOnDeck = moduleRenderInfo?.map(module => {
+    return {
+      moduleModel: module.moduleDef.model,
+      moduleLocation: { slotName: module.targetSlotId },
+      nestedLabwareDef:
+        module.nestedLabwareId !== command.params.labwareId
+          ? module.nestedLabwareDef
+          : null,
+    }
+  })
+
   const oldLabwareLocation =
     getLoadedLabware(run.labware, command.params.labwareId)?.location ?? null
 
@@ -197,42 +207,24 @@ export function MoveLabwareInterventionContent({
               initialLabwareLocation={oldLabwareLocation}
               finalLabwareLocation={command.params.newLocation}
               movedLabwareDef={movedLabwareDef}
+              labwareDefinitions={Object.values(labwareDefsByUri)}
               loadedModules={run.modules}
               loadedLabware={run.labware}
               deckConfig={deckConfig}
+              modulesOnDeck={modulesOnDeck}
               backgroundItems={
                 <>
-                  {moduleRenderInfo.map(
-                    ({
-                      x,
-                      y,
-                      moduleId,
-                      moduleDef,
-                      nestedLabwareDef,
-                      nestedLabwareId,
-                    }) => (
-                      <Module
-                        key={moduleId}
-                        def={moduleDef}
-                        x={x}
-                        y={y}
-                        orientation={inferModuleOrientationFromXCoordinate(x)}
-                      >
-                        {nestedLabwareDef != null &&
-                        nestedLabwareId !== command.params.labwareId ? (
-                          <LabwareRender definition={nestedLabwareDef} />
-                        ) : null}
-                      </Module>
-                    )
-                  )}
                   {labwareRenderInfo
                     .filter(l => l.labwareId !== command.params.labwareId)
-                    .map(({ x, y, labwareDef, labwareId }) => (
-                      <g key={labwareId} transform={`translate(${x},${y})`}>
-                        {labwareDef != null &&
-                        labwareId !== command.params.labwareId ? (
-                          <LabwareRender definition={labwareDef} />
-                        ) : null}
+                    .map(({ labwareOrigin, labwareDef, labwareId }) => (
+                      <g
+                        key={labwareId}
+                        transform={`translate(${labwareOrigin.x},${labwareOrigin.y})`}
+                      >
+                        <LabwareRender
+                          definition={labwareDef}
+                          positioningMode="passThrough"
+                        />
                       </g>
                     ))}
                 </>
@@ -263,7 +255,11 @@ function LabwareDisplayLocation(
   } else if ('slotName' in location) {
     displayLocation = location.slotName
   } else if ('addressableAreaName' in location) {
-    displayLocation = location.addressableAreaName
+    const aaLocation = location.addressableAreaName
+    displayLocation =
+      aaLocation === GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA
+        ? t('waste_chute')
+        : aaLocation
   } else if ('moduleId' in location) {
     const moduleModel = getModuleModelFromRunData(
       protocolData,

@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import {
   COLORS,
   Flex,
-  FLEX_MAX_CONTENT,
   Icon,
   PrimaryButton,
   StyledText,
@@ -65,7 +64,7 @@ export function SubStepsToolbox(
     <Toolbox
       maxHeight={`calc(100vh - ${NAV_BAR_HEIGHT_REM}rem - 1.5rem)`}
       height="100%"
-      width={FLEX_MAX_CONTENT}
+      width="20.5625rem"
       closeButton={<Icon size="2rem" name="close" />}
       onCloseClick={handleClose}
       confirmButton={

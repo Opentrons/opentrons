@@ -5,6 +5,7 @@ import { reduce } from 'lodash'
 import {
   FLEX_ROBOT_TYPE,
   getAllLabwareDefs,
+  getIsPipettableLabware,
   getIsTiprack,
   getPositionFromSlotId,
   TC_MODULE_LOCATION_OT2,
@@ -13,7 +14,9 @@ import {
 } from '@opentrons/shared-data'
 import {
   getFullStackFromLabwares,
+  getNearestParentInStack,
   getSlotInLocationStack,
+  TOUCHED_PIPETTABLE_LABWARE,
 } from '@opentrons/step-generation'
 
 import { getRobotType } from '../../file-data/selectors'
@@ -36,6 +39,7 @@ import type {
 import type {
   AdditionalEquipmentName,
   DeckSlot,
+  LabwareEntities,
   LabwareEntity,
   RobotState,
 } from '@opentrons/step-generation'
@@ -250,20 +254,30 @@ const getLabwareInfo = (
   nicknamesById: Record<string, string>,
   activeDeckSetup: AllTemporalPropertiesForTimelineFrame,
   labwareId: string,
-  robotType: RobotType
+  robotType: RobotType,
+  t: any
 ): { nickName: string; latestSlot: string } => {
-  const { modules, labware } = activeDeckSetup
-  const stack = labware[labwareId].stack
-  const latestSlot = resolveSlotLocation(modules, stack, robotType)
-
-  return { nickName: nicknamesById[labwareId], latestSlot }
+  const { modules } = activeDeckSetup
+  const stack = activeDeckSetup.labware[labwareId]?.stack
+  const latestSlot =
+    stack != null
+      ? resolveSlotLocation(modules, stack, robotType)
+      : 'unknown slot'
+  const name = nicknamesById[labwareId]
+  let nickName: string = name
+  if (latestSlot != null && latestSlot !== 'offDeck') {
+    nickName = t('labware_in_slot', { name, slot: latestSlot })
+  } else if (latestSlot != null && latestSlot === 'offDeck') {
+    nickName = t('labware_offdeck', { name })
+  }
+  return { nickName, latestSlot }
 }
 
 export const useLabwareDropdownOptions = (
   type: 'moveLabware' | 'labware',
   useGripper: boolean
 ): DropdownOption[] => {
-  const { t } = useTranslation('shared')
+  const { t } = useTranslation(['shared', 'protocol_steps'])
   const labwareEntities = useSelector(getLabwareEntities)
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
   const { labware: deckSetupLabware } = activeDeckSetup
@@ -277,7 +291,9 @@ export const useLabwareDropdownOptions = (
       labwareId: string
     ): DropdownOption[] => {
       const { def } = labwareEntity
-      const deckSlot = getSlotInLocationStack(deckSetupLabware[labwareId].stack)
+      const deckSlot = getSlotInLocationStack(
+        deckSetupLabware[labwareId]?.stack
+      )
       const fullStackFromLabwares = getFullStackFromLabwares(
         deckSetupLabware,
         deckSlot
@@ -306,7 +322,8 @@ export const useLabwareDropdownOptions = (
         nicknamesById,
         activeDeckSetup,
         labwareId,
-        robotType
+        robotType,
+        t
       )
       const isTiprack = getIsTiprack(def)
       const isFilterOffDeck =
@@ -317,7 +334,7 @@ export const useLabwareDropdownOptions = (
       const bottomOfStackOption: DropdownOption | null =
         showStackOption && bottomOfStack != null
           ? {
-              name: t('unoccupied_stack', { name: nickName }),
+              name: t('protocol_steps:unoccupied_stack', { name: nickName }),
               value: bottomOfStack,
               deckLabel: latestSlot,
             }
@@ -352,12 +369,20 @@ export const useLabwareDropdownOptions = (
 }
 
 //  used for LabwareLocationField dropdown
-export const getUnoccupiedStackOptions = (
-  robotState: RobotState,
-  deckSetupLabware: AllTemporalPropertiesForTimelineFrame['labware'],
-  labwareIdFromDropdown: string,
+export const getUnoccupiedStackOptions = (args: {
+  robotState: RobotState
+  deckSetupLabware: AllTemporalPropertiesForTimelineFrame['labware']
+  labwareIdFromDropdown: string
+  labwareEntities: LabwareEntities
   t: any
-): Option[] => {
+}): Option[] => {
+  const {
+    robotState,
+    deckSetupLabware,
+    labwareIdFromDropdown,
+    labwareEntities,
+    t,
+  } = args
   if (deckSetupLabware[labwareIdFromDropdown] == null) {
     return []
   }
@@ -365,10 +390,16 @@ export const getUnoccupiedStackOptions = (
   const { def } = deckSetupLabware[labwareIdFromDropdown]
   const labwareCompatibleParentLabware = def.compatibleParentLabware
 
-  return Object.entries(robotState.labware).reduce<Option[]>(
+  const { labware: labwareState } = robotState
+
+  const isLabwareToMoveUsedLid =
+    labwareState[labwareIdFromDropdown]?.sterility ===
+    TOUCHED_PIPETTABLE_LABWARE
+
+  return Object.entries(labwareState).reduce<Option[]>(
     (acc, [labwareId, temporalLabwareOnDeck]) => {
       const slot = getSlotInLocationStack(temporalLabwareOnDeck.stack)
-      const fullStack = getFullStackFromLabwares(robotState.labware, slot)
+      const fullStack = getFullStackFromLabwares(labwareState, slot)
       const labwareOnDeck = deckSetupLabware[labwareId]
       const isTopOfStack = fullStack[0] === labwareId
       const { def: labwareOnDeckDef } = labwareOnDeck
@@ -380,23 +411,45 @@ export const getUnoccupiedStackOptions = (
         labwareIdFromDropdown
       )
 
-      if (isTopOfStack && isCompatible && isNotCurrentLabwareStack) {
+      const nearestParentInStack = getNearestParentInStack(fullStack)
+      const isNearestParentPipettableLabware =
+        nearestParentInStack != null &&
+        labwareEntities[nearestParentInStack] != null &&
+        getIsPipettableLabware(labwareEntities[nearestParentInStack].def)
+
+      const isNewLabwarePipettable =
+        labwareOnDeckDef != null && getIsPipettableLabware(labwareOnDeckDef)
+      const isSafeLidMove =
+        !(isLabwareToMoveUsedLid && isNewLabwarePipettable) &&
+        !isNearestParentPipettableLabware
+
+      const isInWasteChute = slot === 'gripperWasteChute'
+
+      if (
+        isTopOfStack &&
+        isCompatible &&
+        isNotCurrentLabwareStack &&
+        !isInWasteChute &&
+        isSafeLidMove
+      ) {
         const similarLabwareStackIds = getAllLabwareIdsOfCertainURIOnStack(
           deckSetupLabware,
           labwareOnDeck
         )
-        acc.push({
-          name:
-            similarLabwareStackIds.length > 1
-              ? t('protocol_steps:unoccupied_stack', {
-                  name: displayName,
-                })
-              : displayName,
-          value: labwareId,
-          deckLabel: slot,
-        })
+        return [
+          ...acc,
+          {
+            name:
+              similarLabwareStackIds.length > 1
+                ? t('protocol_steps:unoccupied_stack', {
+                    name: displayName,
+                  })
+                : displayName,
+            value: labwareId,
+            deckLabel: slot,
+          },
+        ]
       }
-
       return acc
     },
     []

@@ -9,6 +9,7 @@ import { SOURCE_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
 import { useToaster } from '/app/organisms/ToasterOven'
 
 import { DISPENSE_SETTING_OPTIONS as SETTING_OPTIONS } from '../../constants'
+import { getIsTouchTipEnabled } from '../../utils/getIsTouchTipEnabled'
 
 import type {
   DispenseSettingOption,
@@ -31,22 +32,30 @@ export function useDispenseSettingsConfig({
   const { makeSnackbar } = useToaster()
 
   const getBlowoutValueCopy = (): string | undefined => {
-    if (state.blowOut === 'dest_well') {
+    if (state.blowOutDispense == null) {
+      return t('option_disabled')
+    }
+    if (state.blowOutDispense?.location === 'dest_well') {
       return t('blow_out_into_destination_well')
-    } else if (state.blowOut === 'source_well') {
+    } else if (state.blowOutDispense?.location === 'source_well') {
       return t('blow_out_into_source_well')
     } else if (
-      state.blowOut != null &&
-      state.blowOut.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
+      state.blowOutDispense?.location != null &&
+      state.blowOutDispense.location.cutoutFixtureId ===
+        TRASH_BIN_ADAPTER_FIXTURE
     ) {
       return t('blow_out_into_trash_bin')
     } else if (
-      state.blowOut != null &&
-      WASTE_CHUTE_FIXTURES.includes(state.blowOut.cutoutFixtureId)
+      state.blowOutDispense?.location != null &&
+      WASTE_CHUTE_FIXTURES.includes(
+        state.blowOutDispense.location.cutoutFixtureId
+      )
     ) {
       return t('blow_out_into_waste_chute')
     }
   }
+
+  const touchTipEnabled = getIsTouchTipEnabled(state.destination)
 
   const dispenseSettingsItems = [
     {
@@ -64,7 +73,7 @@ export function useDispenseSettingsConfig({
       value:
         state.tipPositionDispense !== undefined
           ? t('tip_position_value', { position: state.tipPositionDispense })
-          : '',
+          : t('option_disabled'),
       enabled: true,
       onClick: () => {
         setSelectedSetting('dispense_tip_position')
@@ -77,9 +86,10 @@ export function useDispenseSettingsConfig({
         state.submergeDispense !== undefined
           ? t('submerge_value', {
               speed: state.submergeDispense.speed,
+              delayDuration: state.submergeDispense.delayDuration,
               position: state.submergeDispense.positionFromBottom,
             })
-          : '',
+          : t('option_disabled'),
       enabled: true,
       onClick: () => {
         setSelectedSetting(SETTING_OPTIONS.DISPENSE_SUBMERGE)
@@ -92,7 +102,6 @@ export function useDispenseSettingsConfig({
         state.delayDispense !== undefined
           ? t('delay_value', {
               delay: state.delayDispense.delayDuration,
-              position: state.delayDispense.positionFromBottom,
             })
           : '',
       enabled: true,
@@ -109,7 +118,7 @@ export function useDispenseSettingsConfig({
               volume: state.mixOnDispense?.mixVolume,
               reps: state.mixOnDispense?.repetitions,
             })
-          : '',
+          : t('option_disabled'),
       enabled:
         state.transferType === 'transfer' ||
         state.transferType === 'consolidate',
@@ -120,7 +129,7 @@ export function useDispenseSettingsConfig({
         ) {
           setSelectedSetting('dispense_mix')
         } else {
-          makeSnackbar(t('advanced_setting_disabled') as string)
+          makeSnackbar(t('dispense_setting_disabled') as string)
         }
       },
     },
@@ -128,8 +137,8 @@ export function useDispenseSettingsConfig({
       option: 'dispense_push_out',
       copy: t('push_out'),
       value:
-        state.pushOut != null && state.pushOut
-          ? t('option_enabled')
+        state.pushOutDispense != null && state.pushOutDispense.volume != null
+          ? t('push_out_value', { volume: state.pushOutDispense.volume })
           : t('option_disabled'),
       enabled: true,
       onClick: () => {
@@ -143,9 +152,10 @@ export function useDispenseSettingsConfig({
         state.retractDispense !== undefined
           ? t('retract_value', {
               speed: state.retractDispense.speed,
+              delayDuration: state.retractDispense.delayDuration,
               position: state.retractDispense.positionFromBottom,
             })
-          : '',
+          : t('option_disabled'),
       enabled: true,
       onClick: () => {
         setSelectedSetting('dispense_retract')
@@ -161,7 +171,7 @@ export function useDispenseSettingsConfig({
       enabled: state.transferType !== 'distribute',
       onClick: () => {
         if (state.transferType === 'distribute') {
-          makeSnackbar(t('advanced_setting_disabled') as string)
+          makeSnackbar(t('dispense_setting_disabled') as string)
         } else {
           setSelectedSetting('dispense_blow_out')
         }
@@ -181,25 +191,33 @@ export function useDispenseSettingsConfig({
                   : t('trashBin'),
               flowRate: state.disposalVolumeDispenseSettings.flowRate,
             })
-          : '',
+          : t('option_disabled'),
       enabled: isMultiTransfer,
       onClick: () => {
-        setSelectedSetting('dispense_disposal_volume')
+        if (isMultiTransfer) {
+          setSelectedSetting('dispense_disposal_volume')
+        } else {
+          makeSnackbar(t('dispense_setting_disabled') as string)
+        }
       },
     },
     {
       option: 'dispense_touch_tip',
       copy: t('touch_tip'),
       value:
-        state.touchTipDispense !== undefined
+        state.touchTipDispense !== undefined && touchTipEnabled
           ? t('touch_tip_value', {
               speed: state.touchTipDispenseSpeed,
               position: state.touchTipDispense,
             })
-          : '',
-      enabled: true,
+          : t('option_disabled'),
+      enabled: touchTipEnabled,
       onClick: () => {
-        setSelectedSetting('dispense_touch_tip')
+        if (touchTipEnabled) {
+          setSelectedSetting('dispense_touch_tip')
+        } else {
+          makeSnackbar(t('dispense_setting_disabled') as string)
+        }
       },
     },
     {

@@ -1,4 +1,5 @@
 import {
+  AlignControlToModule,
   BaseDeck,
   Box,
   DIRECTION_COLUMN,
@@ -12,6 +13,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
+import { useModuleUSBPort } from '/app/local-resources/modules'
 import { ModuleInfo } from '/app/molecules/ModuleInfo'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
@@ -21,6 +23,8 @@ import {
   getAttachedProtocolModuleMatches,
   getProtocolModulesInfo,
 } from '/app/transformations/analysis'
+
+import type { ModuleOnDeck } from '@opentrons/components'
 
 const ATTACHED_MODULE_POLL_MS = 5000
 const DECK_CONFIG_POLL_MS = 5000
@@ -33,6 +37,7 @@ export const SetupModulesMap = ({
   runId,
 }: SetupModulesMapProps): JSX.Element | null => {
   // similar data pattern to ODD ProtocolSetupModules, with addition of stored analysis
+  const { parseModuleUSBPort } = useModuleUSBPort()
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolAnalysis = robotProtocolAnalysis ?? storedProtocolAnalysis
@@ -59,18 +64,26 @@ export const SetupModulesMap = ({
     robotType
   )
 
-  const modulesOnDeck = attachedProtocolModuleMatches.map(module => ({
-    moduleModel: module.moduleDef.model,
-    moduleLocation: { slotName: module.slotName },
-    moduleChildren: (
-      <ModuleInfo
-        moduleModel={module.moduleDef.model}
-        isAttached={module.attachedModuleMatch != null}
-        physicalPort={module.attachedModuleMatch?.usbPort ?? null}
-        runId={runId}
-      />
-    ),
-  }))
+  const modulesOnDeck = attachedProtocolModuleMatches.map(
+    (module): ModuleOnDeck => ({
+      moduleModel: module.moduleDef.model,
+      moduleLocation: { slotName: module.slotName },
+      moduleChildren: (
+        <AlignControlToModule
+          deckId={deckDef.otId}
+          slotId={module.slotName}
+          moduleDefinition={module.moduleDef}
+        >
+          <ModuleInfo
+            moduleModel={module.moduleDef.model}
+            isAttached={module.attachedModuleMatch != null}
+            physicalPort={parseModuleUSBPort(module.attachedModuleMatch)}
+            runId={runId}
+          />
+        </AlignControlToModule>
+      ),
+    })
+  )
 
   const simplestProtocolDeckConfig = getSimplestDeckConfigForProtocol(
     protocolAnalysis

@@ -27,6 +27,7 @@ import {
   FLEX_STACKER_MODULE_TYPE,
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
+  getFixtureDisplayName,
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
@@ -35,6 +36,7 @@ import {
   OT2_ROBOT_TYPE,
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
+  WASTE_CHUTE_FLEX_STACKER_FIXTURES,
 } from '@opentrons/shared-data'
 
 import { TertiaryButton } from '/app/atoms/buttons'
@@ -42,6 +44,7 @@ import { StatusLabel } from '/app/atoms/StatusLabel'
 import {
   getFlexStackerPrepCommands,
   getModuleImage,
+  useModuleUSBPort,
 } from '/app/local-resources/modules'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { ModuleSetupModal } from '/app/organisms/ModuleCard/ModuleSetupModal'
@@ -57,27 +60,31 @@ import { getModuleTooHot } from '/app/transformations/modules'
 
 import { OT2MultipleModulesHelp } from './OT2MultipleModulesHelp'
 import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
+import { getFixtureImage } from './utils'
 
+import type { TFunction } from 'i18next'
 import type { CommandData } from '@opentrons/api-client'
 import type {
-  CutoutConfig,
+  CutoutFixtureId,
   DeckDefinition,
   ModuleModel,
 } from '@opentrons/shared-data'
 import type { ModulePrepCommandsType } from '/app/local-resources/modules'
 import type { AttachedModule } from '/app/redux/modules/types'
+import type { CutoutConfigAndCompatibility } from '/app/resources/deck_configuration/hooks'
 import type {
   ModuleRenderInfoForProtocol,
   ProtocolCalibrationStatus,
 } from '/app/resources/runs'
 
 interface SetupModulesListProps {
+  deckConfigCompatibility: CutoutConfigAndCompatibility[]
   robotName: string
   runId: string
 }
 
 export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
-  const { robotName, runId } = props
+  const { robotName, runId, deckConfigCompatibility } = props
   const moduleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById(
     runId
   )
@@ -119,6 +126,49 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
         }) => {
           // filter out the magnetic block here, because it is handled by the SetupFixturesList
           if (moduleDef.moduleType === MAGNETIC_BLOCK_TYPE) return null
+          // if the module is a flex stacker in D4, check if it needs a waste chute
+          // combo fixture
+          if (
+            moduleDef.moduleType === FLEX_STACKER_MODULE_TYPE &&
+            slotName === 'D4'
+          ) {
+            const deckConfigCompatabilityD3 = deckConfigCompatibility?.find(
+              configItem => configItem.cutoutId === 'cutoutD3'
+            )
+            if (
+              deckConfigCompatabilityD3 != null &&
+              deckConfigCompatabilityD3.compatibleCutoutFixtureIds.every(
+                cutoutFixtureId =>
+                  WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(cutoutFixtureId)
+              )
+            ) {
+              const comboFixtureId =
+                deckConfigCompatabilityD3?.compatibleCutoutFixtureIds[0]
+              const comboFixtureConflict = !deckConfigCompatabilityD3?.compatibleCutoutFixtureIds.includes(
+                deckConfigCompatabilityD3.cutoutFixtureId
+              )
+              return (
+                <ModulesListItem
+                  key={`SetupModulesList_${String(
+                    moduleDef.model
+                  )}_slot_${slotName}`}
+                  moduleModel={moduleDef.model}
+                  displayName={moduleDef.displayName}
+                  slotName={slotName}
+                  attachedModuleMatch={attachedModuleMatch}
+                  heaterShakerModuleFromProtocol={null}
+                  isFlex={isFlex}
+                  calibrationStatus={calibrationStatus}
+                  chainLiveCommands={chainLiveCommands}
+                  conflictedFixture={comboFixtureConflict}
+                  deckDef={deckDef}
+                  robotName={robotName}
+                  comboFixtureId={comboFixtureId}
+                />
+              )
+            }
+          }
+
           return (
             <ModulesListItem
               key={`SetupModulesList_${String(
@@ -137,7 +187,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
               isFlex={isFlex}
               calibrationStatus={calibrationStatus}
               chainLiveCommands={chainLiveCommands}
-              conflictedFixture={conflictedFixture}
+              conflictedFixture={conflictedFixture != null}
               deckDef={deckDef}
               robotName={robotName}
             />
@@ -161,8 +211,9 @@ interface ModulesListItemProps {
     continuePastCommandFailure: boolean
   ) => Promise<CommandData[]>
   deckDef: DeckDefinition
-  conflictedFixture: CutoutConfig | null
+  conflictedFixture: boolean
   robotName: string
+  comboFixtureId?: CutoutFixtureId
 }
 
 export function ModulesListItem({
@@ -176,8 +227,13 @@ export function ModulesListItem({
   conflictedFixture,
   deckDef,
   robotName,
+  comboFixtureId,
 }: ModulesListItemProps): JSX.Element {
-  const { t } = useTranslation(['protocol_setup', 'module_wizard_flows'])
+  const { t } = useTranslation([
+    'protocol_setup',
+    'module_wizard_flows',
+    'deck_configuration',
+  ])
   const moduleConnectionStatus =
     attachedModuleMatch != null
       ? t('module_connected')
@@ -191,6 +247,7 @@ export function ModulesListItem({
   ] = useState<boolean>(false)
 
   const [showModuleWizard, setShowModuleWizard] = useState<boolean>(false)
+  const { parseModuleUSBPort } = useModuleUSBPort()
 
   const handleSetupModuleClick = (): void => {
     setShowModuleWizard(true)
@@ -337,11 +394,7 @@ export function ModulesListItem({
 
   // convert slot name to cutout id
   const cutoutIdForSlotName = getCutoutIdForSlotName(slotName, deckDef)
-
-  const portDisplay =
-    attachedModuleMatch?.usbPort?.hubPort != null
-      ? `${attachedModuleMatch.usbPort.port}.${attachedModuleMatch.usbPort.hubPort}`
-      : attachedModuleMatch?.usbPort?.port
+  const portDisplay = parseModuleUSBPort(attachedModuleMatch)
 
   return (
     <>
@@ -352,6 +405,8 @@ export function ModulesListItem({
           }}
           cutoutId={cutoutIdForSlotName}
           requiredModule={moduleModel}
+          requiredFixtureId={comboFixtureId}
+          moduleSerialNumber={attachedModuleMatch?.serialNumber}
           deckDef={deckDef}
           robotName={robotName}
         />
@@ -388,13 +443,23 @@ export function ModulesListItem({
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
           <Flex alignItems={JUSTIFY_CENTER} width="45%">
-            <img width="60px" height="54px" src={getModuleImage(moduleModel)} />
+            <img
+              width="60px"
+              height="54px"
+              src={
+                comboFixtureId != null
+                  ? getFixtureImage(comboFixtureId)
+                  : getModuleImage(moduleModel)
+              }
+            />
             <Flex flexDirection={DIRECTION_COLUMN}>
               <LegacyStyledText
                 css={TYPOGRAPHY.pSemiBold}
                 marginLeft={SPACING.spacing20}
               >
-                {displayName}
+                {comboFixtureId != null
+                  ? getFixtureDisplayName(t as TFunction, comboFixtureId)
+                  : displayName}
               </LegacyStyledText>
               {subText}
             </Flex>
@@ -412,11 +477,7 @@ export function ModulesListItem({
                 : slotName}
             </LegacyStyledText>
             {portDisplay != null ? (
-              <LegacyStyledText as="p">
-                {t('usb_port_number', {
-                  port: portDisplay,
-                })}
-              </LegacyStyledText>
+              <LegacyStyledText as="p">{portDisplay}</LegacyStyledText>
             ) : null}
           </Flex>
           <Flex
@@ -424,7 +485,7 @@ export function ModulesListItem({
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing10}
           >
-            {conflictedFixture != null && isFlex ? (
+            {conflictedFixture && isFlex ? (
               <Flex
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing10}

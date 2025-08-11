@@ -78,7 +78,7 @@ const mockMagneticModule = {
     labwareInterfaceXDimension: 80,
     labwareInterfaceYDimension: 120,
   },
-  twoDimensionalRendering: { children: [] },
+  slotTransforms: {},
 }
 
 const mockTCModule = {
@@ -95,7 +95,7 @@ const mockTCModule = {
     labwareInterfaceXDimension: 80,
     labwareInterfaceYDimension: 120,
   },
-  twoDimensionalRendering: { children: [] },
+  slotTransforms: {},
 }
 
 describe('SetupModulesMap', () => {
@@ -157,7 +157,7 @@ describe('SetupModulesMap', () => {
         expect.objectContaining({
           moduleModel: mockMagneticModule.model,
           isAttached: false,
-          physicalPort: null,
+          physicalPort: 'usb not connected',
           runId: MOCK_RUN_ID,
         }),
         // @ts-expect-error Potential Vitest issue. Seems this actually takes two args.
@@ -212,7 +212,7 @@ describe('SetupModulesMap', () => {
         expect.objectContaining({
           moduleModel: mockMagneticModule.model,
           isAttached: true,
-          physicalPort: mockMagneticModuleFixture.usbPort,
+          physicalPort: 'USB-1',
           runId: MOCK_RUN_ID,
         }),
         // @ts-expect-error Potential Vitest issue. Seems this actually takes two args.
@@ -225,7 +225,7 @@ describe('SetupModulesMap', () => {
         expect.objectContaining({
           moduleModel: mockTCModule.model,
           isAttached: true,
-          physicalPort: mockThermocyclerFixture.usbPort,
+          physicalPort: 'USB-1',
           runId: MOCK_RUN_ID,
         }),
         // @ts-expect-error Potential Vitest issue. Seems this actually takes two args.
@@ -288,7 +288,7 @@ describe('SetupModulesMap', () => {
         expect.objectContaining({
           moduleModel: mockMagneticModule.model,
           isAttached: true,
-          physicalPort: mockMagneticModuleFixture.usbPort,
+          physicalPort: 'USB-1',
           runId: MOCK_RUN_ID,
         }),
         // @ts-expect-error Potential Vitest issue. Seems this actually takes two args.
@@ -301,12 +301,7 @@ describe('SetupModulesMap', () => {
         expect.objectContaining({
           moduleModel: mockMagneticModule.model,
           isAttached: true,
-          physicalPort: {
-            port: dupModPort,
-            hub: false,
-            portGroup: 'unknown',
-            path: '',
-          },
+          physicalPort: `USB-${dupModPort}`,
           runId: MOCK_RUN_ID,
         }),
         // @ts-expect-error Potential Vitest issue. Seems this actually takes two args.
