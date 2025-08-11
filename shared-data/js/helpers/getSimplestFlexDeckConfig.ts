@@ -2,7 +2,7 @@ import { getAddressableAreasInProtocol, getDeckDefFromRobotType } from '.'
 import { FLEX_ROBOT_TYPE } from '../constants'
 import {
   getAddressableAreaFromSlotId,
-  getMainNonComboFixtureId,
+  getMainFixtureIdForAA,
 } from '../fixtures'
 
 import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../../deck'
@@ -198,7 +198,7 @@ export function getSimplestFixtureForAddressableAreas(
     cutoutFixturesForCutoutId
   )
   if (nextCompatibleCutoutFixtures.length > 1) {
-    const mainFixture = getMainNonComboFixtureId(
+    const mainFixture = getMainFixtureIdForAA(
       nextCompatibleCutoutFixtures.map(cf => cf.id),
       requiredAddressableAreas,
       cutoutId
