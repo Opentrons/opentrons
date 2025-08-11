@@ -273,7 +273,7 @@ export const useLabwareDropdownOptions = (
   type: 'moveLabware' | 'labware',
   useGripper: boolean
 ): DropdownOption[] => {
-  const { t } = useTranslation('shared')
+  const { t } = useTranslation(['shared', 'protocol_steps'])
   const labwareEntities = useSelector(getLabwareEntities)
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
   const { labware: deckSetupLabware } = activeDeckSetup
@@ -330,7 +330,7 @@ export const useLabwareDropdownOptions = (
       const bottomOfStackOption: DropdownOption | null =
         showStackOption && bottomOfStack != null
           ? {
-              name: t('unoccupied_stack', { name: nickName }),
+              name: t('protocol_steps:unoccupied_stack', { name: nickName }),
               value: bottomOfStack,
               deckLabel: latestSlot,
             }
