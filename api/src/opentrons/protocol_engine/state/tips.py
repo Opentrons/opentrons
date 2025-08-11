@@ -288,14 +288,14 @@ def _resolve_well_order(  # noqa: C901
     """Given a list of ordered columns and pipette information, returns a flat list of wells ordered for tip pick up.
 
     Wells can be ordered in four different ways:
-        - Left to right, top to bottom (A1, B1, ... A2, B2, ... G12, H12)
-        - Left to right, bottom to top (H1, G1, ... H2, G2, ... B12, A12)
-        - Right to left, top to bottom (A12, B12, ... A11, B11, ... G1, H1)
-        - Right to left, bottom to top (A12, B12, ... A11, B11, ... G1, H1)
+        - Top to bottom, left to right (A1, B1, ... A2, B2, ... G12, H12)
+        - Top to bottom, right to left (A12, B12, ... A11, B11, ... G1, H1)
+        - Bottom to top, left to right, (H1, G1, ... H2, G2, ... B12, A12)
+        - Bottom to top, right to left (A12, B12, ... A11, B11, ... G1, H1)
 
-    - Full configurations (which will always cover a single channel) will always go left to right, top to bottom.
-    - A partial 8-channel pipette configuration will always search left to right, either top to bottom for starting
-        nozzle H1 or bottom to top for starting nozzle A1
+    - Full configurations (which will always cover a single channel) will go top to bottom, left to right.
+    - A partial 8-channel pipette configuration will always search left to right, starting at either top to bottom for
+        starting nozzle H1 or bottom to top for starting nozzle A1
     - A partial 96-channel pipette configuration will always begin in the opposite corner of the starting nozzle
     """
     if nozzle_map.configuration == NozzleConfigurationType.FULL:
