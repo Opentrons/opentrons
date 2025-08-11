@@ -334,12 +334,10 @@ def _get_height_of_liquid_in_well(
         return 0.01
 
 
-
 def generate_frusta(ctx, data, labware) -> List[Dict]:
     inner_well_json = labware._core.get_definition()
     depth = inner_well_json["wells"]["A1"]["depth"]
     well_shape = inner_well_json["wells"]["A1"].get("shape")
-
 
     if well_shape == "circular":
         geoID = "conicalWell"
@@ -448,9 +446,6 @@ def run(ctx: ProtocolContext) -> None:
     max_volume = labware["A1"].max_volume
     min_step = max(max_volume * 0.005, 2)
     max_step = min(max_volume * 0.3, 1500)
-    tolerance = (
-        max_volume / 30
-    )  # if the height within tolerance, then protocol can finish.
 
     # Initialize state
     corrected_height = 0.0
@@ -459,7 +454,6 @@ def run(ctx: ProtocolContext) -> None:
     step = 0
     hdelta = 0.0
     height = 0.0
-    vol_diff = 0.0
     step_volume = 0.0
     total_vol = 0.0
     dispense_volume = 0
@@ -474,7 +468,6 @@ def run(ctx: ProtocolContext) -> None:
             probe_pipette.pick_up_tip()
         if not liq_pipette.has_tip:
             liq_pipette.pick_up_tip()
-
 
     def drop_tips() -> None:
         if probe_pipette.has_tip:
@@ -492,7 +485,7 @@ def run(ctx: ProtocolContext) -> None:
     ) -> float:  # desired steady state height step in mm
 
         # deadband to avoid unnecessary step volume corrections
-        delta_tolerance = neutral_target * 0.2
+        delta_tolerance = neutral_target * 0.10
         lower_bound = neutral_target - delta_tolerance
         upper_bound = neutral_target + delta_tolerance
 
@@ -509,7 +502,7 @@ def run(ctx: ProtocolContext) -> None:
         # decreasing
         elif hdelta > upper_bound:
             error = hdelta - neutral_target
-            new_volume = step_volume * max(0.2, 1 - alpha * error)
+            new_volume = step_volume * max(0.2, 1 - alpha * error) # decrease clamped to 20% of previous volume 
 
         # hdelta <= 0, most likely a probe error
         else:
@@ -551,7 +544,7 @@ def run(ctx: ProtocolContext) -> None:
     _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating()) 
     liq_pipette.drop_tip()
 
-    while total_vol < (max_volume - tolerance):
+    while total_vol < max_volume:
 
         current_well = wells[step % num_wells]
 
