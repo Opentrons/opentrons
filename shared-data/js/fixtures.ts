@@ -1182,15 +1182,10 @@ export const getMainFixtureIdForAA = (
   const cutoutFixtures = deckDef.cutoutFixtures.filter(cf =>
     compatibleCutoutFixtureIds.includes(cf.id)
   )
-  console.log('cutoutFixtures', cutoutFixtures)
   const cutoutFixturesWithAddressableAreas = cutoutFixtures.find(cf =>
     Object.values(cf.providesAddressableAreas).some(providedAAs =>
       addressableAreaIds.every(aa => providedAAs.includes(aa))
     )
-  )
-  console.log(
-    'cutoutFixturesWithAddressableAreas',
-    cutoutFixturesWithAddressableAreas
   )
   return cutoutFixturesWithAddressableAreas?.id ?? null
 }

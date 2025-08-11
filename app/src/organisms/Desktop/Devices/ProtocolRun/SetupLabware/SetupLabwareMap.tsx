@@ -52,9 +52,7 @@ export function SetupLabwareMap({
   const [hoverLabwareId, setHoverLabwareId] = useState<string | null>(null)
 
   const deckConfig = useMemo(() => {
-    if (protocolAnalysis != null) {
       getSimplestDeckConfigForProtocol(protocolAnalysis)
-    }
   }, [protocolAnalysis])
 
   const startingDeck = useMemo(
