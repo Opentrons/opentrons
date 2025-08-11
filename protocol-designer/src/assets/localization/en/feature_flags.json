@@ -15,9 +15,13 @@
     "title": "Enable comment step",
     "description": "You can add comments anywhere between timeline steps."
   },
+  "OT_PD_ENABLE_TIP_PICKUP_LOCATION": {
+    "title": "Enable tip pickup location",
+    "description": "You can choose which tip to pick up."
+  },
   "OT_PD_ENABLE_RETURN_TIP": {
     "title": "Enable return tip",
-    "description": "You can choose which tip to pick up and where to drop tip."
+    "description": "You can choose where to drop tip."
   },
   "OT_PD_ENABLE_HOT_KEYS_DISPLAY": {
     "title": "Timeline editing guidance",
