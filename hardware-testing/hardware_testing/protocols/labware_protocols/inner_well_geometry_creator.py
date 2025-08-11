@@ -66,7 +66,7 @@ RUN_ID = ""
 FILE_NAME = ""
 USER_DEFINED_VOLUMES = ""
 CSV_SEPARATOR = ""
-CSV_HEADER = ["well", "step volume", "dispense volume", "tip-z-error", "error from nominal", "height", "hdelta"]
+CSV_HEADER = ["well", "step volume", "dispense volume", "tip-z-error", "height", "hdelta"]
 
 def add_parameters(parameters: ParameterContext) -> None:
     """Add parameters to the protocol."""
@@ -78,28 +78,9 @@ def add_parameters(parameters: ParameterContext) -> None:
         variable_name="labware_type",
         display_name="Labware Type",
         choices=[
-            {"display_name": "corning 24", "value": "corning_24_wellplate_3.4ml_flat"},
-            {"display_name": "axygen", "value": "axygen_96_wellplate_500ul"},
-            {"display_name": "smc 384", "value": "smc_384_read_plate"},
-            {"display_name": "ibidi", "value": "ibidi_96_square_well_plate_300ul"},
-            {"display_name": "nest 24", "value": "nest_24_wellplate_10.4ml"},
-            {
-                "display_name": "usa96deep",
-                "value": "usascientific_96_wellplate_2.4ml_deep",
-            },
-            {
-                "display_name": "applied24",
-                "value": "appliedbiosystemsmicroamp_384_wellplate_40ul",
-            },
-            {
-                "display_name": "opentrons96",
-                "value": "opentrons_96_wellplate_200ul_pcr_full_skirt",
-            },
-            {"display_name": "usa 12 22ml", "value": "usascientific_12_reservoir_22ml"},
-            {"display_name": "nest 96 2ml", "value": "nest_96_wellplate_2ml_deep"},
-            {"display_name": "nest 195 reservoir", "value": "nest_1_reservoir_195ml"},
+            {"display_name": "eppendorf1000 test", "value": "eppendorf_96_wellplate_1000ul_custom"},
         ],
-        default= "nest_96_wellplate_2ml_deep",
+        default= "eppendorf_96_wellplate_1000ul_custom",
     )
 
     parameters.add_float(
@@ -239,8 +220,8 @@ def _setup(
         meniscus_z = -0.5
         props.aspirate.aspirate_position.position_reference = lm
         props.aspirate.aspirate_position.offset.z = meniscus_z
-        props.dispense.dispense_position.position_reference = lm
-        props.dispense.dispense_position.offset.z = meniscus_z
+        #props.dispense.dispense_position.position_reference = lm
+        #props.dispense.dispense_position.offset.z = meniscus_z
 
     if not ctx.is_simulating() and DIAL_PORT is None:
         from hardware_testing.data import create_file_name, create_run_id
@@ -545,7 +526,6 @@ def run(ctx: ProtocolContext) -> None:
             round(step_volume, 5),
             round(total_vol, 5),
             round(tip_z_error, 5),
-            vol_diff,
             corrected_height,
             hdelta,
         ]
@@ -610,10 +590,6 @@ def run(ctx: ProtocolContext) -> None:
         
         corrected_height = height + tip_z_error
 
-        # Error from nominal (api)
-        api_vol = labware[current_well].height_from_volume(dispense_volume)
-        vol_diff = api_vol - corrected_height
-
         # Calculating change in height from previous step
         corrected_heights.append(corrected_height)
         hdelta = corrected_heights[-1] - corrected_heights[-2] if len(corrected_heights) > 1 else 0.0
@@ -636,10 +612,10 @@ def run(ctx: ProtocolContext) -> None:
 
 
     #create labware def 
-    udv_data = np.array([(trial[2], trial[5]) for trial in udv_table])  # total_vol, corrected_height
+    udv_data = np.array([(trial[2], trial[4]) for trial in udv_table])  # total_vol, corrected_height
     new_inner_well_json = generate_frusta(ctx, udv_data, labware)
 
-    user_defined_volumes = data.create_folder_for_test_data("user_defined_volumes")
+    user_defined_volumes = data.create_folder_for_test_data("user-defined-volumes")
     udv_def_name = f"{RUN_ID}_{labware_type}"
     file_path = user_defined_volumes / udv_def_name
 
