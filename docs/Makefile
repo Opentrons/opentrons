@@ -1,4 +1,4 @@
-FLEX_MANUAL_PREFIX ?= flex-manual
+FLEX_MANUAL_PREFIX ?= flex
 # AWS_PROFILE is intentionally left undefined by default
 BRANCH ?= edge
 SANDBOX_S3_BUCKET ?= sandbox.docs
