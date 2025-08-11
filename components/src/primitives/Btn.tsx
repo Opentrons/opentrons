@@ -192,33 +192,14 @@ export const NewSecondaryBtn = styled(SecondaryBtn)`
 `
 
 /**
- * Red secondary button variant used in app
+ * Tertiary button variant
  *
  * @component
  */
-export const NewAlertSecondaryBtn = styled(NewSecondaryBtn)`
-  color: ${Styles.C_ERROR_DARK};
-
-  &:hover,
-  &:focus {
-    color: ${Styles.C_ERROR_DARK};
-  }
-
-  &:active {
-    color: ${Styles.C_ERROR_LIGHT};
-  }
-
-  ${styleProps}
-`
-
-/**
- * Light secondary button variant
- *
- * @component
- */
-export const LightSecondaryBtn = styled(SecondaryBtn)`
+export const TertiaryBtn = styled(SecondaryBtn)`
   background-color: ${Styles.C_TRANSPARENT};
   color: ${Styles.C_WHITE};
+  border-width: 0;
 
   &:hover,
   &:focus {
@@ -236,13 +217,4 @@ export const LightSecondaryBtn = styled(SecondaryBtn)`
   }
 
   ${styleProps}
-`
-
-/**
- * Tertiary button variant
- *
- * @component
- */
-export const TertiaryBtn = styled(LightSecondaryBtn)`
-  border-width: 0;
 `
