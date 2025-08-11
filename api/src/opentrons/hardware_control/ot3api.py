@@ -1892,6 +1892,7 @@ class OT3API(
         # the volume chamber and the drop-tip sleeve on p1000.
         # This extra shake ensures those tips are removed
         for rel_point, speed in spec.shake_off_moves:
+            
             await self.move_rel(realmount, rel_point, speed=speed)
 
         if isinstance(self._backend, OT3Simulator):
@@ -1900,9 +1901,62 @@ class OT3API(
         # fixme: really only need this during labware position check so user
         # can verify if a tip is properly attached
         if spec.ending_z_retract_distance:
+            print("spec.ending_z_retract_distance",spec.ending_z_retract_distance)
             await self.move_rel(
                 realmount, top_types.Point(z=spec.ending_z_retract_distance)
             )
+        
+    async def tip_pickup_moves_96(
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        presses: Optional[int] = None,
+        increment: Optional[float] = None,
+        ) -> None:
+        """This is a slightly more barebones variation of pick_up_tip. This is only the motor routine
+        directly involved in tip pickup, and leaves any state updates and plunger moves to the caller.
+        """
+        realmount = OT3Mount.from_mount(mount)
+        instrument = self._pipette_handler.get_pipette(realmount)
+
+        if (
+            self.gantry_load == GantryLoad.HIGH_THROUGHPUT
+            and instrument.nozzle_manager.current_configuration.configuration
+            == top_types.NozzleConfigurationType.FULL
+        ):  
+            spec = self._pipette_handler.plan_ht_pick_up_tip(
+                instrument.nozzle_manager.current_configuration.tip_count
+            )
+            if spec.z_distance_to_tiprack:
+                await self.move_rel(
+                    realmount, top_types.Point(z=spec.z_distance_to_tiprack)
+                )
+            await self._tip_motor_action(realmount, spec.tip_action_moves)
+        else:
+            spec = self._pipette_handler.plan_lt_pick_up_tip(
+                realmount,
+                instrument.nozzle_manager.current_configuration.tip_count,
+                presses,
+                increment,
+            )
+            await self._force_pick_up_tip(realmount, spec)
+
+        # neighboring tips tend to get stuck in the space between
+        # the volume chamber and the drop-tip sleeve on p1000.
+        # This extra shake ensures those tips are removed
+        for rel_point, speed in spec.shake_off_moves:
+            await self.move_rel(realmount, rel_point, speed=speed)
+
+        if isinstance(self._backend, OT3Simulator):
+            self._backend._update_tip_state(realmount, True)
+
+        # fixme: really only need this during labware position check so user
+        # can verify if a tip is properly attached
+        print("spec.ending_z_retract_distance",spec.ending_z_retract_distance)
+        # if spec.ending_z_retract_distance:
+        #     print("spec.ending_z_retract_distance",spec.ending_z_retract_distance)
+        #     await self.move_rel(
+        #         realmount, top_types.Point(z=spec.ending_z_retract_distance)
+        #     )
 
     async def _move_to_plunger_bottom(
         self,
@@ -2298,6 +2352,31 @@ class OT3API(
         await self._move_to_plunger_bottom(realmount, rate=1.0)
 
         await self.tip_pickup_moves(mount, presses, increment)
+
+        add_tip_to_instr()
+
+        if prep_after:
+            await self.prepare_for_aspirate(realmount)
+    
+    async def pick_up_tip_96_fixture(
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        tip_length: float,
+        presses: Optional[int] = None,
+        increment: Optional[float] = None,
+        prep_after: bool = True,
+    ) -> None:
+        """Pick up tip from current location."""
+        realmount = OT3Mount.from_mount(mount)
+        instrument = self._pipette_handler.get_pipette(realmount)
+
+        def add_tip_to_instr() -> None:
+            instrument.add_tip(tip_length=tip_length)
+            instrument.set_current_volume(0)
+
+        await self._move_to_plunger_bottom(realmount, rate=1.0)
+
+        await self.tip_pickup_moves_96(mount, presses, increment)
 
         add_tip_to_instr()
 

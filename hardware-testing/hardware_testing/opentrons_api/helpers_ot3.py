@@ -842,7 +842,7 @@ async def move_to_arched_ot3(
     abs_position: Point,
     speed: Optional[float] = None,
     safe_height: float = -100.0,
-) -> None:
+) -> Point:
     """Move OT3 gantry in an arched path."""
     z_ax = Axis.by_mount(mount)
     max_z = get_endstop_position_ot3(api, mount)[z_ax]
@@ -855,6 +855,7 @@ async def move_to_arched_ot3(
     ]
     for p in points:
         await api.move_to(mount=mount, abs_position=p, speed=speed)
+    return points
 
 
 class SensorResponseBad(Exception):
