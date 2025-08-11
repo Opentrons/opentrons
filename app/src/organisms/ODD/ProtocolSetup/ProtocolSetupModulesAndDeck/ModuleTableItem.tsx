@@ -34,6 +34,7 @@ import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getModuleTooHot } from '/app/transformations/modules'
 
+import type { TFunction } from 'i18next'
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
 import type {
   CutoutConfig,
@@ -82,17 +83,15 @@ export const getModuleDisplayStatus = (
       return 'connected'
     }
 
-    // module is connected but instrument not calibrated
-    if (!calibrationStatus.complete) {
-      return 'calibrationBlocked'
-    }
-
     // Absorbance reader module does not require calibration
     if (
       attachedModule.moduleType !== ABSORBANCE_READER_TYPE &&
       attachedModule.moduleOffset?.last_modified == null
     ) {
-      return 'needsCalibration'
+      // check if instrument ready to perform module calibration
+      return !calibrationStatus.complete
+        ? 'calibrationBlocked'
+        : 'needsCalibration'
     }
     return 'connected'
   }
@@ -120,7 +119,11 @@ export function ModuleTableItem({
   robotName,
   comboFixtureId,
 }: ModuleTableItemProps): JSX.Element {
-  const { i18n, t } = useTranslation(['protocol_setup', 'module_wizard_flows'])
+  const { i18n, t } = useTranslation([
+    'protocol_setup',
+    'module_wizard_flows',
+    'deck_configuration',
+  ])
 
   const { makeSnackbar } = useToaster()
 
@@ -329,7 +332,7 @@ export function ModuleTableItem({
         <Flex flex="3.5 0 0" alignItems={ALIGN_CENTER}>
           <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {comboFixtureId != null
-              ? getFixtureDisplayName(comboFixtureId)
+              ? getFixtureDisplayName(t as TFunction, comboFixtureId)
               : getModuleDisplayName(module.moduleDef.model)}
           </LegacyStyledText>
         </Flex>

@@ -70,7 +70,7 @@ describe('getErrorKind', () => {
     {
       commandType: 'flexStacker/retrieve',
       errorType: DEFINED_ERROR_TYPES.STACKER_SHUTTLE_EMPTY,
-      expectedError: ERROR_KINDS.STACKER_SHUTTLE_EMPTY,
+      expectedError: ERROR_KINDS.STACKER_HOPPER_OR_SHUTTLE_EMPTY,
     },
     {
       commandType: 'flexStacker/retrieve',

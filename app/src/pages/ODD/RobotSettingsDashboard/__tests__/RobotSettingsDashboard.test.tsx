@@ -22,7 +22,10 @@ import { getRobotSettings } from '/app/redux/robot-settings'
 import { getRobotUpdateAvailable } from '/app/redux/robot-update'
 import { useErrorRecoverySettingsToggle } from '/app/resources/errorRecovery'
 import { useNetworkConnection } from '/app/resources/networking'
-import { useLEDLights } from '/app/resources/robot-settings'
+import {
+  useDisableStackerSensors,
+  useLEDLights,
+} from '/app/resources/robot-settings'
 
 import { RobotSettingsDashboard } from '../'
 
@@ -48,6 +51,7 @@ vi.mock('/app/organisms/ODD/RobotSettingsDashboard/LanguageSetting')
 
 const mockToggleLights = vi.fn()
 const mockToggleER = vi.fn()
+const mockToggleStackerSensors = vi.fn()
 
 const render = () => {
   return renderWithProviders(
@@ -78,6 +82,10 @@ describe('RobotSettingsDashboard', () => {
     vi.mocked(useLEDLights).mockReturnValue({
       lightsEnabled: false,
       toggleLights: mockToggleLights,
+    })
+    vi.mocked(useDisableStackerSensors).mockReturnValue({
+      sensorsDisabled: false,
+      toggleSensors: mockToggleStackerSensors,
     })
     vi.mocked(useNetworkConnection).mockReturnValue({} as any)
     vi.mocked(useErrorRecoverySettingsToggle).mockReturnValue({
@@ -172,6 +180,32 @@ describe('RobotSettingsDashboard', () => {
     expect(
       screen.getByTestId('RobotSettingButton_error_recovery_mode')
     ).toHaveTextContent('Off')
+  })
+
+  it('should render disable stacker sensors copy, and calls toggleSensors', () => {
+    render()
+    screen.getByText(
+      'Disable Stacker sensors for labware detection in z-axis and x-axis'
+    )
+
+    const toggle = screen.getByTestId(
+      'RobotSettingButton_disable_stacker_sensors'
+    )
+    expect(toggle).toHaveTextContent('Off')
+
+    fireEvent.click(toggle)
+    expect(mockToggleStackerSensors).toHaveBeenCalled()
+  })
+
+  it('should render on toggle with stacker sensors disabled', () => {
+    vi.mocked(useDisableStackerSensors).mockReturnValue({
+      sensorsDisabled: true,
+      toggleSensors: mockToggleStackerSensors,
+    })
+    render()
+    expect(
+      screen.getByTestId('RobotSettingButton_disable_stacker_sensors')
+    ).toHaveTextContent('On')
   })
 
   it('should render component when tapping network settings', () => {

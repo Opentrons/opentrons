@@ -7,7 +7,7 @@ import {
   splitLabwareDefURI,
 } from '@opentrons/shared-data'
 
-import { OTHER } from '/ai-client/organisms/ApplicationSection'
+import { OTHER } from '/ai-client/components/organisms/ApplicationSection'
 import {
   FLEX_GRIPPER,
   NO_PIPETTES,
@@ -15,7 +15,7 @@ import {
   OPENTRONS_OT2,
   ROBOT_FIELD_NAME,
   TWO_PIPETTES,
-} from '/ai-client/organisms/InstrumentsSection'
+} from '/ai-client/components/organisms/InstrumentsSection'
 import { PROTOCOL_FORMAT, PYTHON } from '/ai-client/resources/constants'
 
 import { getOnlyLatestDefs } from './labware'

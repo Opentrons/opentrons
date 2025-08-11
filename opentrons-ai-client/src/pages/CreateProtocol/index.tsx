@@ -11,12 +11,12 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { ResizeBar } from '/ai-client/atoms/ResizeBar'
-import { PromptPreview } from '/ai-client/molecules/PromptPreview'
+import { ResizeBar } from '/ai-client/components/atoms/ResizeBar'
+import { PromptPreview } from '/ai-client/components/molecules/PromptPreview'
 import {
   ProtocolSectionsContainer,
   TOTAL_STEPS,
-} from '/ai-client/organisms/ProtocolSectionsContainer'
+} from '/ai-client/components/organisms/ProtocolSectionsContainer'
 import {
   chatDataAtom,
   chatHistoryAtom,
@@ -33,11 +33,11 @@ import {
 } from '/ai-client/resources/utils/createProtocolUtils'
 
 import type { MouseEvent } from 'react'
-import type { DisplayLabware } from '/ai-client/organisms/LabwareLiquidsSection'
+import type { DisplayLabware } from '/ai-client/components/organisms/LabwareLiquidsSection'
 import type {
   DisplayFixture,
   DisplayModule,
-} from '/ai-client/organisms/ModulesAndFixturesSection'
+} from '/ai-client/components/organisms/ModulesAndFixturesSection'
 
 export interface CreateProtocolFormData {
   protocol_format: 'Protocol Designer' | 'Python'
