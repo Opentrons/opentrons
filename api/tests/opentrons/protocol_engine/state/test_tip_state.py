@@ -178,7 +178,6 @@ def test_get_next_tip_skips_picked_up_tip(
     subject.handle_action(load_labware_action)
 
     if input_starting_tip is not None:
-        pipette_name_type = PipetteNameType.P1000_96
         if input_tip_amount == 1:
             pipette_name_type = PipetteNameType.P300_SINGLE_GEN2
         elif input_tip_amount == 8:
@@ -186,7 +185,6 @@ def test_get_next_tip_skips_picked_up_tip(
         else:
             pipette_name_type = PipetteNameType.P1000_96
     else:
-        pipette_name_type = PipetteNameType.P1000_96
         if get_next_tip_tips == 1:
             pipette_name_type = PipetteNameType.P300_SINGLE_GEN2
         elif get_next_tip_tips == 8:
@@ -560,27 +558,27 @@ def test_next_tip_automatic_tip_tracking_with_partial_configurations(
             ),
         )
 
-    map = _build_nozzle_map("A1", "A1", "H3")
-    _assert_and_pickup("A10", map)
-    map = _build_nozzle_map("A1", "A1", "F2")
-    _assert_and_pickup("C8", map)
+    pipette_nozzle_map = _build_nozzle_map("A1", "A1", "H3")
+    _assert_and_pickup("A10", pipette_nozzle_map)
+    pipette_nozzle_map = _build_nozzle_map("A1", "A1", "F2")
+    _assert_and_pickup("C8", pipette_nozzle_map)
 
     # Configure to single tip pickups
-    map = _build_nozzle_map("H12", "H12", "H12")
-    _assert_and_pickup("A1", map)
-    map = _build_nozzle_map("H1", "H1", "H1")
-    _assert_and_pickup("A9", map)
-    map = _build_nozzle_map("A12", "A12", "A12")
-    _assert_and_pickup("H1", map)
-    map = _build_nozzle_map("A1", "A1", "A1")
-    _assert_and_pickup("B9", map)
+    pipette_nozzle_map = _build_nozzle_map("H12", "H12", "H12")
+    _assert_and_pickup("A1", pipette_nozzle_map)
+    pipette_nozzle_map = _build_nozzle_map("H1", "H1", "H1")
+    _assert_and_pickup("A9", pipette_nozzle_map)
+    pipette_nozzle_map = _build_nozzle_map("A12", "A12", "A12")
+    _assert_and_pickup("H1", pipette_nozzle_map)
+    pipette_nozzle_map = _build_nozzle_map("A1", "A1", "A1")
+    _assert_and_pickup("B9", pipette_nozzle_map)
 
 
 def test_next_tip_automatic_tip_tracking_tiprack_limits(
     subject: TipStore,
     load_labware_action: actions.SucceedCommandAction,
 ) -> None:
-    """Test tip tracking logic to ensure once a tiprack is consumed it returns None when consuming tips using multiple pipette configurations."""
+    """Ensure once a tip rack is consumed it returns None when consuming tips using multiple pipette configurations."""
     # Load labware
     subject.handle_action(load_labware_action)
 
@@ -643,28 +641,28 @@ def test_next_tip_automatic_tip_tracking_tiprack_limits(
             ),
         )
 
-    map = _build_nozzle_map("A1", "A1", "A1")
+    pipette_nozzle_map = _build_nozzle_map("A1", "A1", "A1")
     for _ in range(96):
-        assert _get_next_and_pickup(map) is not None
-    assert _get_next_and_pickup(map) is None
+        assert _get_next_and_pickup(pipette_nozzle_map) is not None
+    assert _get_next_and_pickup(pipette_nozzle_map) is None
 
     subject.handle_action(actions.ResetTipsAction(labware_id="cool-labware"))
-    map = _build_nozzle_map("A12", "A12", "A12")
+    pipette_nozzle_map = _build_nozzle_map("A12", "A12", "A12")
     for _ in range(96):
-        assert _get_next_and_pickup(map) is not None
-    assert _get_next_and_pickup(map) is None
+        assert _get_next_and_pickup(pipette_nozzle_map) is not None
+    assert _get_next_and_pickup(pipette_nozzle_map) is None
 
     subject.handle_action(actions.ResetTipsAction(labware_id="cool-labware"))
-    map = _build_nozzle_map("H1", "H1", "H1")
+    pipette_nozzle_map = _build_nozzle_map("H1", "H1", "H1")
     for _ in range(96):
-        assert _get_next_and_pickup(map) is not None
-    assert _get_next_and_pickup(map) is None
+        assert _get_next_and_pickup(pipette_nozzle_map) is not None
+    assert _get_next_and_pickup(pipette_nozzle_map) is None
 
     subject.handle_action(actions.ResetTipsAction(labware_id="cool-labware"))
-    map = _build_nozzle_map("H12", "H12", "H12")
+    pipette_nozzle_map = _build_nozzle_map("H12", "H12", "H12")
     for _ in range(96):
-        assert _get_next_and_pickup(map) is not None
-    assert _get_next_and_pickup(map) is None
+        assert _get_next_and_pickup(pipette_nozzle_map) is not None
+    assert _get_next_and_pickup(pipette_nozzle_map) is None
 
 
 def test_handle_batch_labware_loaded_update(
