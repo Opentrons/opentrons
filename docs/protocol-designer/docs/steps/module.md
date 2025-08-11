@@ -72,7 +72,7 @@ Adding a Heater-Shaker Module step to your protocol displays any labware and ada
   <figcaption>Add a temperature, shake speed, and timer for a Heater-Shaker step.</figcaption>
 </figure>
 
-In this example, a Corning 96-well flat plate is placed on top of an Opentrons universal flat Heater-Shaker adapter. Both are on the Heater-Shaker in deck slot D1. Before moving labware to or from the Heater-Shaker, make sure that the labware latch is open. Add a Heater-Shaker step that opens the labware latch before any step that moves labware to the Heater-Shaker. Without this step, a [timeline error](warnings-errors.md#errors) could occur. 
+In this example, a Corning 96-well flat plate is placed on top of an Opentrons universal flat Heater-Shaker adapter. Both are on the Heater-Shaker in deck slot D1. Before moving labware to or from the Heater-Shaker, make sure that the labware latch is open. Add a Heater-Shaker step that opens the labware latch before any step that moves labware to the Heater-Shaker. Without this step, a [timeline error](../warnings-errors.md#errors) could occur. 
 
 In the Heater-Shaker step form, set the temperature or shake functions to **Active** and enter a custom value for temperature or shake speed. The Heater-Shaker module can heat samples between 37 and 95° C, and shake samples between 200 and 3000 rpm. 
 
