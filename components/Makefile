@@ -17,7 +17,7 @@ all: clean dist
 
 .PHONY: clean
 clean:
-	cd .. && pnpm exec shx rm -rf storybook-static
+	cd .. && pnpm shx rm -rf storybook-static
 
 # artifacts
 #####################################################################
@@ -40,6 +40,7 @@ build-ts:
 
 .PHONY: dev
 dev:
+	# Run the storybook development server using pnpm
 	cd .. && pnpm sb dev --port $(port)
 
 .PHONY: test
@@ -48,4 +49,4 @@ test:
 
 .PHONY: test-cov
 test-cov:
-	make -C .. test-js-components tests=$(tests) test_opts="$(test_opts)" cov_opts="$(cov_opts)"
+	$(MAKE) -C .. test-js-components tests=$(tests) test_opts="$(test_opts)" cov_opts="$(cov_opts)"
