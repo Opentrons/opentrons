@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { ALL, NozzleConfigurationStyle } from '@opentrons/shared-data'
+import { ALL } from '@opentrons/shared-data'
 
 import { DropdownStepFormField } from '../../../../../components/molecules'
 import { getEnableReturnTip } from '../../../../../feature-flags/selectors'
@@ -12,6 +12,7 @@ import {
 } from '../../../../../step-forms/selectors'
 
 import type { DropdownOption } from '@opentrons/components'
+import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
 import type { FieldProps } from '../types'
 
 interface DropTipFieldProps extends FieldProps {
