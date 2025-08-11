@@ -210,13 +210,9 @@ class TipView:
             return True
 
         # Get an ordered list of wells to most efficiently search, depending on pipette configuration
-        targeted_well_list = _resolve_well_order(
-            wells_by_columns,
-            nozzle_map.starting_nozzle,
-            nozzle_map.physical_nozzle_count,
-        )
+        well_list = _resolve_well_order(wells_by_columns, nozzle_map)
 
-        for well in targeted_well_list:
+        for well in well_list:
             # If the target well/tip isn't clean, skip to the next one
             if tip_well_states[well] != _TipRackWellState.CLEAN:
                 continue
@@ -290,47 +286,49 @@ def _drop_wells_before_starting_tip(
 
 
 def _resolve_well_order(  # noqa: C901
-    well_list: List[List[str]], starting_nozzle: str, physical_nozzle_count: int
+    well_list: List[List[str]], nozzle_map: NozzleMapInterface
 ) -> List[str]:
     """Given a list of ordered columns and pipette information, returns a flat list of wells ordered for tip pick up.
 
-    The order depends on the physical nozzle count and starting nozzle of the pipette configuration
-    - A single channel pipette will search for tips top to bottom, left to right (A1, B1, ... A2, B2, .. G12, H12)
-    - An eight channel pipette will always search left to right, top to bottom if the starting nozzle is H1,
-        bottom to top (H1, G1, ... H2, G2, ... B12, A12) if the starting nozzle is A1
-    - A 96 channel pipette will begin in the opposite corner of it's primary nozzle
-        - Top to bottom, left to right for starting nozzle H12
-        - Bottom to top, left to right for starting nozzle A12
-        - Top to bottom, right to left (A12, B12, ... A11, B11, ... G1, H1) for starting nozzle H1
-        - Bottom to top, right to left (H12, G12, ... H11, G11, ... B1, A1) for starting nozzle A1
+    Wells can be ordered in four different ways:
+        - Left to right, top to bottom (A1, B1, ... A2, B2, ... G12, H12)
+        - Left to right, bottom to top (H1, G1, ... H2, G2, ... B12, A12)
+        - Right to left, top to bottom (A12, B12, ... A11, B11, ... G1, H1)
+        - Right to left, bottom to top (A12, B12, ... A11, B11, ... G1, H1)
+
+    - Full configurations (which will always cover a single channel) will always go left to right, top to bottom.
+    - A partial 8-channel pipette configuration will always search left to right, either top to bottom for starting
+        nozzle H1 or bottom to top for starting nozzle A1
+    - A partial 96-channel pipette configuration will always begin in the opposite corner of the starting nozzle
     """
-    if physical_nozzle_count == 1:
+    if nozzle_map.configuration == NozzleConfigurationType.FULL:
         return _get_top_to_bottom_left_to_right(well_list)
-    elif physical_nozzle_count == 8:
-        if starting_nozzle == "A1":
+    elif nozzle_map.physical_nozzle_count == 8:
+        if nozzle_map.starting_nozzle == "A1":
             return _get_bottom_to_top_left_to_right(well_list)
-        elif starting_nozzle == "H1":
+        elif nozzle_map.starting_nozzle == "H1":
             return _get_top_to_bottom_left_to_right(well_list)
         else:
             raise ValueError(
-                f"Nozzle {starting_nozzle} is an invalid starting tip for 8-channel pipette automatic tip pickup."
+                f"Nozzle {nozzle_map.starting_nozzle} is an invalid starting tip for"
+                " 8-channel pipette automatic tip pickup."
             )
-    elif physical_nozzle_count == 96:
-        if starting_nozzle == "A1":
+    elif nozzle_map.physical_nozzle_count == 96:
+        if nozzle_map.starting_nozzle == "A1":
             return _get_bottom_to_top_right_to_left(well_list)
-        elif starting_nozzle == "A12":
+        elif nozzle_map.starting_nozzle == "A12":
             return _get_bottom_to_top_left_to_right(well_list)
-        elif starting_nozzle == "H1":
+        elif nozzle_map.starting_nozzle == "H1":
             return _get_top_to_bottom_right_to_left(well_list)
-        elif starting_nozzle == "H12":
+        elif nozzle_map.starting_nozzle == "H12":
             return _get_top_to_bottom_left_to_right(well_list)
         else:
             raise ValueError(
-                f"Nozzle {starting_nozzle} is an invalid starting tip for 96-channel automatic tip pickup."
+                f"Nozzle {nozzle_map.starting_nozzle} is an invalid starting tip for 96-channel automatic tip pickup."
             )
     else:
         raise ValueError(
-            f"Automatic tip pickup does not support {physical_nozzle_count}-channel pipettes"
+            f"Automatic tip pickup does not support {nozzle_map.physical_nozzle_count}-channel pipettes"
         )
 
 
