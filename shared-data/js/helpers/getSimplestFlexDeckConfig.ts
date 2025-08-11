@@ -70,7 +70,8 @@ export function getSimplestDeckConfigForProtocol(
             deckDef.cutoutFixtures
           )
         : null
-    // finds what is currently in that specific cutout
+    // this grabs the previously found CutoutConfig if we've already added one to our acc
+    // for a different addressable area required by the same CutoutId
     const existingCutoutConfig = acc.find(
       cutoutConfig => cutoutConfig.cutoutId === cutoutIdForAddressableArea
     )
