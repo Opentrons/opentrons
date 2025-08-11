@@ -118,6 +118,7 @@ export function FirstStepMixTools({
           nozzles={formData.nozzles}
           tooltipContent={null}
           padding="0"
+          tiprackDefUri={formData.tipRack}
         />
       </Flex>
       {enableTipPickupLocation ? (
