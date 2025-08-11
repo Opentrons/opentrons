@@ -67,36 +67,6 @@ export const Btn: StyledComponent<
 `
 
 /**
- * Primary button variant
- *
- * @component
- */
-export const PrimaryBtn = styled(Btn)`
-  ${BUTTON_VARIANT_STYLE}
-  background-color: ${Styles.C_DARK_GRAY};
-  color: ${Styles.C_WHITE};
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
-
-  &:hover,
-  &:focus {
-    background-color: ${Styles.C_BLACK};
-  }
-
-  &:active {
-    background-color: ${Styles.C_MED_DARK_GRAY};
-  }
-
-  &:disabled,
-  &.disabled {
-    background-color: ${Styles.C_LIGHT_GRAY};
-    color: ${Styles.C_MED_GRAY};
-    box-shadow: none;
-  }
-
-  ${styleProps}
-`
-
-/**
  * Secondary button variant
  *
  * @component
@@ -130,7 +100,10 @@ export const SecondaryBtn = styled(Btn)`
  *
  * @component
  */
-export const NewPrimaryBtn = styled(PrimaryBtn)`
+export const NewPrimaryBtn = styled(Btn)`
+  ${BUTTON_VARIANT_STYLE}
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+
   background-color: ${Styles.C_BLUE};
   color: ${Styles.C_WHITE};
 
