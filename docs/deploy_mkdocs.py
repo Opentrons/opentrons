@@ -78,8 +78,7 @@ def deploy_docs(environment, branch=None, aws_profile=None, source_dir="site"):
         "aws", "s3", "sync",
         str(source_path) + "/",
         s3_path,
-        "--delete",
-        "--acl", "public-read"
+        "--delete"
     ]
     
     # Add AWS profile if specified
