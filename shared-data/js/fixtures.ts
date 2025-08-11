@@ -11,6 +11,7 @@ import {
   FLEX_STACKER_FIXTURES,
   FLEX_STAGING_ADDRESSABLE_AREAS_WITH_FAKES,
   FLEX_USB_MODULE_FIXTURES,
+  THERMOCYCLER_MODULE_CUTOUTS,
   WASTE_CHUTE_FIXTURES,
   WASTE_CHUTE_WITH_FAKE_FIXTURES,
 } from '.'
@@ -500,6 +501,17 @@ export const replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA = (
           cutoutFixtureId: cutoutFixtureReplacment,
         })
       }
+    } else if (obj.cutoutFixtureId === ABSORBANCE_READER_V1_FIXTURE) {
+      const absorbanceReaderAA = aaPerCutoutFixture?.find(
+        aa => getAAByAAId(aa, deckDef).areaType === 'absorbanceReader'
+      )
+      if (absorbanceReaderAA != null) {
+        acc.push({
+          ...obj,
+          addressableAreaId: absorbanceReaderAA,
+          cutoutFixtureId: cutoutFixtureReplacment,
+        })
+      }
     } else {
       aaPerCutoutFixture?.forEach(item => {
         acc.push({
@@ -938,6 +950,7 @@ export const VS_TO_AA: Record<VISUAL_SLOTS, AddressableAreaNamesWithFakes[]> = {
     'temperatureModuleV2A3',
     'heaterShakerV1A3',
     'movableTrashA3',
+    'absorbanceReaderV1A3',
   ],
   VSB3: [
     'B3',
@@ -945,6 +958,7 @@ export const VS_TO_AA: Record<VISUAL_SLOTS, AddressableAreaNamesWithFakes[]> = {
     'temperatureModuleV2B3',
     'heaterShakerV1B3',
     'movableTrashB3',
+    'absorbanceReaderV1B3',
   ],
   VSC3: [
     'C3',
@@ -952,6 +966,7 @@ export const VS_TO_AA: Record<VISUAL_SLOTS, AddressableAreaNamesWithFakes[]> = {
     'temperatureModuleV2C3',
     'heaterShakerV1C3',
     'movableTrashC3',
+    'absorbanceReaderV1C3',
   ],
   VSD3: [
     'D3',
@@ -963,11 +978,32 @@ export const VS_TO_AA: Record<VISUAL_SLOTS, AddressableAreaNamesWithFakes[]> = {
     '1ChannelWasteChute',
     '8ChannelWasteChute',
     'gripperWasteChute',
+    'absorbanceReaderV1D3',
   ],
-  VSA4: ['fakeA4', 'A4', 'flexStackerModuleV1A4'],
-  VSB4: ['fakeB4', 'B4', 'flexStackerModuleV1B4'],
-  VSC4: ['fakeC4', 'C4', 'flexStackerModuleV1C4'],
-  VSD4: ['fakeD4', 'D4', 'flexStackerModuleV1D4'],
+  VSA4: [
+    'fakeA4',
+    'A4',
+    'flexStackerModuleV1A4',
+    'absorbanceReaderV1LidDockA4',
+  ],
+  VSB4: [
+    'fakeB4',
+    'B4',
+    'flexStackerModuleV1B4',
+    'absorbanceReaderV1LidDockB4',
+  ],
+  VSC4: [
+    'fakeC4',
+    'C4',
+    'flexStackerModuleV1C4',
+    'absorbanceReaderV1LidDockC4',
+  ],
+  VSD4: [
+    'fakeD4',
+    'D4',
+    'flexStackerModuleV1D4',
+    'absorbanceReaderV1LidDockD4',
+  ],
 }
 
 export const getVisualSlotIdFromAAId = (
@@ -1182,6 +1218,9 @@ export const isModuleAllowedOnAA = (
   aa: AddressableAreaNamesWithFakes,
   moduleModel: ModuleModel
 ): boolean => {
+  if (moduleModel === THERMOCYCLER_MODULE_V2) {
+    return THERMOCYCLER_MODULE_CUTOUTS.includes(cutoutId)
+  }
   const fixtureId = getCutoutFixtureIdsForModuleModel(moduleModel)
   const aaForFixture = getAAWithFakesFromCutoutFixtureId(
     cutoutId,
@@ -1253,6 +1292,14 @@ export const replaceCutoutFixtureWithComboFixture = (
   return addedCutoutConfigs.map(aaCutoutItem => {
     console.log('Processing cutout item:', aaCutoutItem)
 
+    if (
+      THERMOCYCLER_MODULE_CUTOUTS.includes(cutoutId) &&
+      MODULE_FIXTURES_BY_MODEL.thermocyclerModuleV2?.includes(
+        aaCutoutItem.cutoutFixtureId as CutoutFixtureId
+      )
+    ) {
+      return { ...aaCutoutItem }
+    }
     // Filter potential combo fixture options
     const comboFixturesOptions = Object.entries(
       addressableAreasById
@@ -1326,6 +1373,8 @@ export const replaceCutoutFixtureRemove = (
     } else {
       return WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
     }
+  } else if (cutoutFixtureRemoved === ABSORBANCE_READER_V1_FIXTURE) {
+    return SINGLE_RIGHT_SLOT_FIXTURE
   } else {
     const updated = aaForCutoutAndFixture?.map(aa => {
       const vsId = getVisualSlotIdForAA(cutoutId, cutoutFixtureRemoved, aa)

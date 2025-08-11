@@ -53,6 +53,7 @@ from opentrons.hardware_control.modules.types import (
     FlexStackerData,
 )
 from opentrons.hardware_control.types import StatusBarState, StatusBarUpdateEvent
+from opentrons.config import feature_flags as ff
 
 from opentrons_shared_data.errors.exceptions import (
     FlexStackerStallError,
@@ -730,6 +731,8 @@ class FlexStacker(mod_abc.AbstractModule):
         self, direction: Direction, labware_expected: bool
     ) -> None:
         """Check whether or not a labware is detected on the shuttle."""
+        if ff.flex_stacker_tof_sensors_disabled():
+            return
         result = await self.labware_detected(StackerAxis.X, direction)
         if labware_expected != result:
             if labware_expected:
@@ -748,6 +751,8 @@ class FlexStacker(mod_abc.AbstractModule):
         self, direction: Direction, labware_expected: bool
     ) -> None:
         """Check whether or not a labware is detected inside the hopper."""
+        if ff.flex_stacker_tof_sensors_disabled():
+            return
         result = await self.labware_detected(StackerAxis.Z, direction)
         if labware_expected != result:
             raise FlexStackerHopperLabwareError(
