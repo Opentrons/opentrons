@@ -128,15 +128,44 @@ def deploy_docs(environment, branch=None, aws_profile=None, source_dir="site"):
         print(f"❌ Error checking bucket: {e}")
         sys.exit(1)
     
+    # Test write permissions to bucket
+    print("Testing write permissions...")
+    test_cmd = ["aws", "s3", "cp", "/dev/null", f"s3://{bucket}/test-write-permission"]
+    if aws_profile:
+        test_cmd.extend(["--profile", aws_profile])
+    
     try:
-        run_command(cmd)
-        print(f"✅ Successfully deployed to {environment}!")
-        
-        # Print the URL where it's deployed
-        print(f"📍 Deployed to: {url}")
+        test_result = subprocess.run(test_cmd, capture_output=True, text=True)
+        if test_result.returncode == 0:
+            print("✅ Write permissions confirmed")
+            # Clean up test file
+            cleanup_cmd = ["aws", "s3", "rm", f"s3://{bucket}/test-write-permission"]
+            if aws_profile:
+                cleanup_cmd.extend(["--profile", aws_profile])
+            subprocess.run(cleanup_cmd, capture_output=True, text=True)
+        else:
+            print(f"❌ Write permission denied: {test_result.stderr}")
+            sys.exit(1)
+    except Exception as e:
+        print(f"❌ Error testing write permissions: {e}")
+        sys.exit(1)
+    
+    try:
+        result = run_command(cmd)
+        if result.returncode == 0:
+            print(f"✅ Successfully deployed to {environment}!")
+            # Print the URL where it's deployed
+            print(f"📍 Deployed to: {url}")
+        else:
+            print(f"❌ Deployment failed with exit code {result.returncode}")
+            print(f"STDOUT: {result.stdout}")
+            print(f"STDERR: {result.stderr}")
+            sys.exit(1)
         
     except subprocess.CalledProcessError as e:
         print(f"❌ Deployment failed with exit code {e.returncode}")
+        print(f"STDOUT: {e.stdout}")
+        print(f"STDERR: {e.stderr}")
         sys.exit(1)
 
 def main():
