@@ -115,6 +115,7 @@ export function FirstStepMixTools({
         />
         <DropTipField
           {...propsForFields.dropTip_location}
+          nozzles={formData.nozzles}
           tooltipContent={null}
           padding="0"
         />

@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { RETURN_TIP } from '@opentrons/step-generation'
+import { ALL, NozzleConfigurationStyle } from '@opentrons/shared-data'
 
 import { DropdownStepFormField } from '../../../../../components/molecules'
 import { getEnableReturnTip } from '../../../../../feature-flags/selectors'
@@ -14,8 +14,13 @@ import {
 import type { DropdownOption } from '@opentrons/components'
 import type { FieldProps } from '../types'
 
-export function DropTipField(props: FieldProps): JSX.Element {
-  const { value: dropdownItem, updateValue } = props
+interface DropTipFieldProps extends FieldProps {
+  nozzles: NozzleConfigurationStyle | null
+  tiprackDefUri: string
+}
+
+export function DropTipField(props: DropTipFieldProps): JSX.Element {
+  const { value: dropdownItem, updateValue, nozzles, tiprackDefUri } = props
   const { t, i18n } = useTranslation(['form', 'shared'])
   const additionalEquipment = useSelector(getAdditionalEquipmentEntities)
   const labwareEntities = useSelector(getLabwareEntities)
@@ -42,14 +47,21 @@ export function DropTipField(props: FieldProps): JSX.Element {
 
   const returnOption: DropdownOption = {
     name: t('form:step_edit_form.field.dropTip.option.return'),
-    value: RETURN_TIP,
+    value: tiprackDefUri,
   }
+
+  const isReturnTipValid =
+    enableReturnTip && (nozzles === ALL || nozzles == null)
+
+  const isTipDropLocationReturnTip = Object.values(labwareEntities).some(
+    ({ labwareDefURI }) => labwareDefURI === tiprackDefUri
+  )
 
   useEffect(() => {
     if (
       additionalEquipment[String(dropdownItem)] == null &&
       labwareEntities[String(dropdownItem)] == null &&
-      dropdownItem !== RETURN_TIP
+      !isTipDropLocationReturnTip
     ) {
       updateValue(null)
     }
@@ -59,7 +71,7 @@ export function DropTipField(props: FieldProps): JSX.Element {
     <DropdownStepFormField
       {...props}
       updateValue={updateValue}
-      options={enableReturnTip ? [...options, returnOption] : options}
+      options={isReturnTipValid ? [...options, returnOption] : options}
       value={dropdownItem ? String(dropdownItem) : null}
       title={i18n.format(
         t('step_edit_form.field.location.dropTip'),

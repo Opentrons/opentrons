@@ -165,6 +165,8 @@ export function FirstStepMoveLiquidTools({
         />
         <DropTipField
           {...propsForFields.dropTip_location}
+          nozzles={formData.nozzles}
+          tiprackDefUri={formData.tipRack}
           tooltipContent={null}
           padding="0"
         />
