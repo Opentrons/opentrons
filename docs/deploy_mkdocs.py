@@ -18,6 +18,10 @@ def run_command(cmd, check=True):
         print(result.stdout)
     if result.stderr:
         print(result.stderr, file=sys.stderr)
+    if result.returncode != 0:
+        print(f"Command failed with exit code: {result.returncode}")
+        print(f"STDOUT: {result.stdout}")
+        print(f"STDERR: {result.stderr}")
     return result
 
 def deploy_docs(environment, branch=None, aws_profile=None, source_dir="site"):
@@ -88,6 +92,23 @@ def deploy_docs(environment, branch=None, aws_profile=None, source_dir="site"):
     if environment == "sandbox":
         print(f"  Branch: {branch}")
     print(f"  S3 Path: {s3_path}")
+    
+    # Test AWS credentials
+    print("Testing AWS credentials...")
+    sts_cmd = ["aws", "sts", "get-caller-identity"]
+    if aws_profile:
+        sts_cmd.extend(["--profile", aws_profile])
+    
+    try:
+        sts_result = subprocess.run(sts_cmd, capture_output=True, text=True)
+        if sts_result.returncode == 0:
+            print(f"✅ AWS credentials working: {sts_result.stdout.strip()}")
+        else:
+            print(f"❌ AWS credentials issue: {sts_result.stderr}")
+            sys.exit(1)
+    except Exception as e:
+        print(f"❌ Error testing AWS credentials: {e}")
+        sys.exit(1)
     
     # Check if bucket exists
     bucket_check_cmd = ["aws", "s3", "ls", f"s3://{bucket}/"]
