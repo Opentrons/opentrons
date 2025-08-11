@@ -26,7 +26,7 @@ Contact Sales if you'd like to talk with a representative about the Flex and sch
 
 - For online chat, go to <https://opentrons.com/contact> and click **Chat With Us**.
 
-Sales business hours are Monday through Friday, 9:00 AM–6:00 PM Eastern Time (UTC–5 in autumn/ winter, UTC–4 in spring/summer).
+Sales business hours are Monday through Friday, 4:00 AM–8:00 PM Eastern Time (UTC–5 in autumn/winter, UTC–4 in spring/summer).
 
 ## Support
 
@@ -36,7 +36,7 @@ Answers to many common questions are available on the Opentrons Help Center at <
 
 - For online chat, go to the [Opentrons website](https://opentrons.com/) and click on the live chat popup on the lower right corner of the page.
 
-Support business hours are Monday through Friday, 9:00 AM–6:00 PM Eastern Time (UTC–5 in autumn/ winter, UTC–4 in spring/summer).
+Support business hours are Monday through Friday, 4:00 AM–8:00 PM Eastern Time (UTC–5 in autumn/winter, UTC–4 in spring/summer).
 
 For after-hours contact and communication, we will do our best to address your issues, but may not be able to provide a proper response until the next business day.
 
@@ -44,7 +44,7 @@ For after-hours contact and communication, we will do our best to address your i
 
 Opentrons Labworks Inc<br/> 45-18 Ct Square W<br/> Long Island City, NY 11101, USA<br/> <https://opentrons.com/>
 
-Our general office hours are Monday through Friday, 9:00 AM–6:00 PM Eastern Time (UTC–5 in autumn/ winter, UTC–4 in spring/summer).
+Our general office hours are Monday through Friday, 9:00 AM–6:00 PM Eastern Time (UTC–5 in autumn/winter, UTC–4 in spring/summer).
 
 Opentrons is closed for the following US holidays:
 

@@ -81,7 +81,7 @@ To clean a 1-, 8-, or 96-channel pipette:
     - Nozzles
 4. Rinse off any remaining residue using a cloth dampened with distilled water.
 5. Let the pipette air dry.
-6. Reattach the pipette to the gantry. When prompted, note that recalibration is optional, but recommended.
+6. Reattach the pipette to the gantry. When prompted, recalibrate the pipette (optional, but recommended).
 
 
 ![Cleanable pipette components, including the body, ejector, and nozzles.](../images/pipette-components-cleaning.png "Pipette components")
@@ -115,7 +115,7 @@ Filtered pipette tips help prevent contaminating the barrel or inside of the pip
 3. Gently shake the pipette to swirl the cleaning solution.
 4. Rinse with distilled water.
 5. Let the pipette air dry.
-6. Reattach the pipette to the gantry. When prompted, note that recalibration is optional, but recommended.
+6. Reattach the pipette to the gantry. When prompted, recalibrate the pipette (optional, but recommended).
 
 
 ## Tip cleaning
@@ -134,7 +134,7 @@ To clean the gripper:
     - Paddles
 4. Rinse off any remaining residue using a cloth dampened with distilled water.
 5. Let the gripper air dry.
-6. Reattach the gripper to the gantry. When prompted, note that recalibration is optional, but recommended.
+6. Reattach the gripper to the gantry. When prompted, recalibrate the gripper (optional, but recommended).
 
 ![Cleanable gripper components, including the body, jaws, and paddles.](../images/gripper-components-cleaning.png "Gripper components"){width="50%"}
 

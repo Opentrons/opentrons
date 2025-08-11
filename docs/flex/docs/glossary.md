@@ -6,7 +6,7 @@ title: "Opentrons Flex: Glossary"
 
 This appendix defines terms related to Opentrons Flex. It omits industry-standard terms like "labware" unless the term has a special meaning in relation to Flex. For example, the definition for *pipette* describes the narrower meaning that the term has when using Flex, as opposed to any pipette you might find elsewhere in a lab.
 
-The glossary is formatted to help you navigate within it and to other places in this manual. Words in italics indicate terms that are also defined in the glossary. Extremely common terms like "deck", "module", "pipette", and "protocol" aren't italicized, to improve readability. Links within definitions take you to the most relevant section that includes additional discussion of the term. And you can always use your PDF reader to search for every occurrence of a term to find even more information.
+The glossary is formatted to help you navigate within it and to other places in this manual. Words in italics indicate terms that are also defined in the glossary. Extremely common terms like "deck", "module", "pipette", and "protocol" aren't italicized, to improve readability. Links within definitions take you to the most relevant section that includes additional discussion of the term. And you can always search for every occurrence of a term to find even more information.
 
 ##### Above deck
 
@@ -42,7 +42,7 @@ A metal pin you attach to the *gripper's jaws* during gripper calibration. See t
 
 ##### Calibration probe
 
-A metal collar you attach to the *nozzle* of a pipette during pipette calibration, module calibration, and *Labware Position Check*. See the [Pipette calibration section][pipette-calibration] in the System Description chapter and the [Module calibration section][module-calibration] in the Modules chapter. See also the [Labware Position Check section](software-operation.md#labware-position-check) of the Software and Operation chapter.
+A metal collar you attach to the *nozzle* of a pipette during pipette calibration, module calibration, and *Labware Position Check*. See the [Pipette calibration section][pipette-calibration] in the System Description chapter and the [Module calibration section][module-calibration] in the Modules chapter. See also the [Labware Position Check section](touchscreen/protocol-setup.md#labware-position-check) of the Touchscreen chapter.
 
 ##### Calibration square
 
@@ -58,11 +58,11 @@ One of four aluminum handles that screw into the bottom corners of the robot. Th
 
 ##### Carrying handle cap
 
-A flat metal cover that goes over the attachment point for a *carrying handle*. The caps close the handle openings in the *frame* and give the robot a clean appearance. See the [Physical components section][physical-components] in the System Description chapter.
+A flat metal cover that goes over the attachment point for a *carrying handle*. The caps close the handle openings in the *frame* and give the robot a clean appearance. See the [Robot Components section][robot-components] in the System Description chapter.
 
 ##### Dashboard
 
-The main screen for the robot, accessible by tapping the robot's name in the top left corner of the *touchscreen*. The dashboard gives you quick access to recently run protocols. See the [Touchscreen operation section][touchscreen-operation] in the Software and Operation chapter.
+The main screen for the robot, accessible by tapping the robot's name in the top left corner of the *touchscreen*. The dashboard gives you quick access to recently run protocols. See the [Dashboard section](touchscreen/dashboard.md) in the Touchscreen chapter.
 
 ##### Deck
 
@@ -70,15 +70,11 @@ The machined aluminum surface on which automated science protocols are executed.
 
 ##### Deck border
 
-The fixed portion of the deck around the four edges of the robot (outside of the area where *deck slot*
-
-panels fit). It contains the removable accessory covers.
+The fixed portion of the deck around the four edges of the robot (outside of the area where *deck slot* panels fit). It contains the removable accessory covers.
 
 ##### Deck fixture
 
-Hardware items that replace standard *deck slots*. They let you customize the deck layout and
-
-add functionality to your Flex. Deck fixtures include the *staging area slots*, *trash bin*, and *waste chute*.
+Hardware items that replace standard *deck slots*. They let you customize the deck layout and add functionality to your Flex. Deck fixtures include the *staging area slots*, *trash bin*, and *waste chute*.
 
 ##### Deck slot
 
@@ -90,7 +86,7 @@ The mechanism that automatically pushes tips off the *nozzle* of a pipette. See 
 
 ##### Emergency Stop Pendant
 
-An external accessory that you press to stop the robot immediately. Also referred to as the E-stop. See the [Emergency Stop Pendant section](system-description.md#emergency-stop-pendant) in the System Description chapter.
+An external accessory that you press to stop the robot immediately. Also referred to as the E-stop. See the [Emergency Stop Pendant section](system-description/e-stop.md) in the System Description chapter.
 
 ##### Expansion slot
 
@@ -98,7 +94,7 @@ See *A1 expansion slot*.
 
 ##### Extension mount
 
-The attachment point on the *gantry* for the Flex Gripper. See the [Movement system section][movement-system] in the System Description chapter.
+The attachment point on the *gantry* for the Flex Gripper. See the [Gantry section](system-description/robot.md#gantry) in the System Description chapter.
 
 ##### Finishing cap
 
@@ -122,7 +118,7 @@ The hinged clear panel on the front of the robot.
 
 ##### Gantry
 
-The robot's positioning system that moves attached *instruments* horizontally (on the x- and y-axis). See the [Movement system section][movement-system] in the System Description chapter.
+The robot's positioning system that moves attached *instruments* horizontally (on the x- and y-axis). See the [Gantry section](system-description/robot.md#gantry) in the System Description chapter.
 
 ##### Gripper
 
@@ -138,7 +134,7 @@ Any component that attaches to the *gantry* and manipulates liquids or labware o
 
 ##### Instrument mount
 
-Attachment point for an *instrument*. Examples include the *pipette mounts* and the *extension mount* for the *gripper*. See the [Movement system section][movement-system] in the System Description chapter.
+Attachment point for an *instrument*. Examples include the *pipette mounts* and the *extension mount* for the *gripper*. See the [Gantry section](system-description/robot.md#gantry) in the System Description chapter.
 
 ##### Jaws
 
@@ -170,7 +166,7 @@ Positional data that is created and stored by running *Labware Position Check*. 
 
 ##### Labware Position Check
 
-A guided process to visually check and adjust pipette movement relative to a piece of labware, with a resolution of 0.1 mm. See the [Labware Position Check section](software-operation.md#labware-position-check) in the Software and Operation chapter.
+A guided process to visually check and adjust pipette movement relative to a piece of labware, with a resolution of 0.1 mm. See the [Labware Position Check section](touchscreen/protocol-setup.md#labware-position-check) in the Touchscreen chapter.
 
 ##### Lift handles
 
@@ -186,7 +182,7 @@ A specific *gantry* position at the front left side of the *working area*. The g
 
 ##### Module
 
-A peripheral that occupies a *deck slot*. Most modules are controlled by the robot via a USB connection. The Heater-Shaker, Temperature Module, and Thermocycler are all powered modules. The Magnetic Block is an unpowered module. See the [Modules chapter](modules.md).
+A peripheral that occupies a *deck slot*. Most modules are controlled by the robot via a USB connection. The Heater-Shaker, Temperature Module, and Thermocycler are all powered modules. The Magnetic Block is an unpowered module. See the [Modules chapter](modules/index.md).
 
 ##### Module caddy
 
@@ -206,7 +202,7 @@ The working end of a pipette. Flex pipettes pick up disposable tips by pressing 
 
 ##### Opentrons App
 
-Software used to control a Flex (or other Opentrons robots) from a laptop or desktop computer. The Opentrons App is available for Mac, Windows, and Linux. See the [Opentrons App section](software-operation.md#opentrons-app) in the Software and Operation chapter.
+Software used to control a Flex (or other Opentrons robots) from a laptop or desktop computer. The Opentrons App is available for Mac, Windows, and Linux. See the [Opentrons App chapter](opentrons-app.md).
 
 ##### Paddle
 
@@ -214,7 +210,7 @@ Part of the *gripper* that grasps and holds labware. Paddles are replaceable wea
 
 ##### Pinned protocol
 
-Protocols you have saved for easy access at the top of the All Protocols tab on the *touchscreen*. See the [Protocol management section][protocol-management] in the Software and Operation chapter.
+Protocols you have saved for easy access at the top of the All Protocols tab on the *touchscreen*. See the [Protocol management section][protocol-management] in the Touchscreen chapter.
 
 ##### Pipette
 
@@ -222,7 +218,7 @@ Protocols you have saved for easy access at the top of the All Protocols tab on 
 
 ##### Pipette mount
 
-The attachment point on the *gantry* for a pipette. See the [Movement system section][movement-system] in the System Description chapter.
+The attachment point on the *gantry* for a pipette. See the [Gantry section](system-description/robot.md#gantry) in the System Description chapter.
 
 ##### Profile
 
@@ -234,11 +230,11 @@ An automated task or procedure you program to run on Opentrons robots, including
 
 ##### Protocol Designer
 
-A web-based, no-code tool for developing *JSON protocols* that run on Opentrons robots, including Opentrons Flex. See the [Protocol Designer section](protocol-development.md#protocol-designer) in the Protocol Development chapter and <https://designer.opentrons.com>.
+A web-based, no-code tool for developing *JSON protocols* that run on Opentrons robots, including Opentrons Flex. See the [Protocol Designer section](protocols/designer.md) in the Protocol Development chapter and <https://designer.opentrons.com>.
 
 ##### Protocol Library
 
-A public, searchable library that hosts protocols authored by Opentrons or by members of the Opentrons community. See the [Protocol Library section](protocol-development.md#protocol-library) in the Protocol Development chapter and <https://library.opentrons.com>.
+A public, searchable library that hosts protocols authored by Opentrons or by members of the Opentrons community. See the [Protocol Library section](protocols/library.md) in the Protocol Development chapter and <https://library.opentrons.com>.
 
 ##### Protocol run
 
@@ -250,7 +246,7 @@ A protocol script written using the Opentrons *Python Protocol API*. See the [Wr
 
 ##### Python Protocol API
 
-A Python package that exposes a wide range of liquid handling features on Opentrons robots. See the [Python Protocol API section](protocol-development.md#python-protocol-api) in the Protocol Development chapter and the online [Opentrons Python Protocol API documentation](https://docs.opentrons.com/v2/).
+A Python package that exposes a wide range of liquid handling features on Opentrons robots. See the [Python Protocol API section](protocols/python-api.md) in the Protocol Development chapter and the online [Opentrons Python Protocol API documentation](https://docs.opentrons.com/v2/).
 
 ##### Removable deck slot
 
@@ -270,11 +266,11 @@ Fixed clear panels on the right and left sides of the robot.
 
 ##### Staging area
 
-The right-hand side of the *deck* (column 4), which is only accessible by the *gripper*. This area requires special *staging area slots* for use. See the [Staging area section](system-description.md#staging-area) in the System Description chapter.
+The right-hand side of the *deck* (column 4), which is only accessible by the *gripper*. This area requires special *staging area slots* for use. See the [Staging Area section](system-description/robot.md#staging-area) in the System Description chapter.
 
 ##### Staging area slot
 
-Staging area slots are ANSI/SLAS compatible deck pieces that replace the standard slots in column 3 (A3 to D3) and extend a new slot into the *staging area*. You can install a single slot or a maximum of four slots to create a new column (A4 to D4) along the right side of the *deck*. See the [Staging area section](system-description.md#staging-area) in the System Description chapter.
+Staging area slots are ANSI/SLAS compatible deck pieces that replace the standard slots in column 3 (A3 to D3) and extend a new slot into the *staging area*. You can install a single slot or a maximum of four slots to create a new column (A4 to D4) along the right side of the *deck*. See the [Staging Area Slots section](system-description/robot.md#staging-area-slots) in the System Description chapter.
 
 ##### Status light
 
@@ -294,7 +290,7 @@ A sequence of temperature changes used by the Thermocycler to perform heat-sensi
 
 ##### Tip rack adapter
 
-An aluminum bracket used by the 96-channel pipette to attach a full rack of pipette tips. See the [Pipettes section][pipettes] in the System Description chapter.
+An aluminum bracket used by the 96-channel pipette to attach a full rack of pipette tips. See the [Pipette Tip Rack Adapter section][pipette-tip-rack-adapter] in the System Description chapter.
 
 ##### Touchscreen
 
@@ -326,7 +322,7 @@ Opentrons Flex workstations include the Flex robot, instruments, modules, access
 
 ##### Z-axis carriage
 
-The *gantry* component that includes the *pipette mounts* and the *extension mount* for the *gripper*. It moves these *instruments* along the z-axis (up and down) to locate them precisely during protocol execution. See the [Movement system section][movement-system] in the System Description chapter.
+The *gantry* component that includes the *pipette mounts* and the *extension mount* for the *gripper*. It moves these *instruments* along the z-axis (up and down) to locate them precisely during protocol execution. See the [Gantry section](system-description/robot.md#gantry) in the System Description chapter.
 
 ##### 96-channel mounting plate
 
