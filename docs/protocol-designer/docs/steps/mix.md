@@ -13,4 +13,4 @@ You can customize settings for your mix step in a two-part form. Just like in a 
   <figcaption>Select wells, volume, repetitions, and tip management settings in the first mix step form.</figcaption>
 </figure>
 
-In the aspirate and dispense tabs, you can adjust the flow rate, well order, and tip position within the well. Available advanced settings in a mix step include a delay after aspirating or dispensing, and blowout and touch tip after dispensing. See the advanced settings table in [Transfer steps](transfer-steps.md) for descriptions of each.
+In the aspirate and dispense tabs, you can adjust the flow rate, well order, and tip position within the well. Available advanced settings in a mix step include a delay after aspirating or dispensing, and blowout and touch tip after dispensing. See the advanced settings table in [Transfer steps](transfer.md) for descriptions of each.
