@@ -4,7 +4,7 @@ docs_dir: ./shared
 custom_dir: ./shared
 
 nav:
-  - Opentrons Flex: '!include flex-manual/mkdocs.yml'
+  - Opentrons Flex: '!include flex/mkdocs.yml'
   - Modules:
       - Modules home: modules/index.md
       - Flex Stacker: '!include stacker-manual/mkdocs.yml'
@@ -55,3 +55,5 @@ markdown_extensions:
 extra_css:
   - opentrons-theme.css
   - instruction-manuals.css
+
+copyright: '© Opentrons 2025. All rights reserved. <br /> Trademarks: Opentrons®, Opentrons drop logo (Opentrons Labworks, Inc.). <br /> Registered names, trademarks, etc. used in this document, even when not specifically marked as such, are not to be considered unprotected by law.'

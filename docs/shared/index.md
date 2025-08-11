@@ -14,7 +14,7 @@
 
     Everything you need to know to set up and use Flex in your lab.
 
-    [:octicons-arrow-right-24: Instruction Manual](flex-manual/index.md)
+    [:octicons-arrow-right-24: Instruction Manual](flex/index.md)
 
 -   :opentrons-modules:{ .xl .middle } __Modules__
 
