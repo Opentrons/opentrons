@@ -127,39 +127,43 @@ class TipView:
         """
         if starting_tip_name is None and nozzle_map is not None:
             return self._get_next_tip_with_nozzle_map(labware_id, nozzle_map)
+        else:
+            wells = self._state.tips_by_labware_id.get(labware_id, {})
+            columns = self._state.columns_by_labware_id.get(labware_id, [])
+            if columns and num_tips == len(columns[0]):  # Get next tips for 8-channel
+                column_head = [column[0] for column in columns]
+                starting_column_index = 0
 
-        wells = self._state.tips_by_labware_id.get(labware_id, {})
-        columns = self._state.columns_by_labware_id.get(labware_id, [])
-        if columns and num_tips == len(columns[0]):  # Get next tips for 8-channel
-            column_head = [column[0] for column in columns]
-            starting_column_index = 0
+                if starting_tip_name:
+                    for idx, column in enumerate(columns):
+                        if starting_tip_name in column:
+                            if starting_tip_name not in column_head:
+                                starting_column_index = idx + 1
+                            else:
+                                starting_column_index = idx
 
-            if starting_tip_name:
-                for idx, column in enumerate(columns):
-                    if starting_tip_name in column:
-                        if starting_tip_name not in column_head:
-                            starting_column_index = idx + 1
-                        else:
-                            starting_column_index = idx
+                for column in columns[starting_column_index:]:
+                    if not any(
+                        wells[well] == _TipRackWellState.USED for well in column
+                    ):
+                        return column[0]
 
-            for column in columns[starting_column_index:]:
-                if not any(wells[well] == _TipRackWellState.USED for well in column):
-                    return column[0]
-        elif num_tips == len(wells.keys()):  # Get next tips for 96 channel
-            if starting_tip_name and starting_tip_name != columns[0][0]:
-                return None
+            elif num_tips == len(wells.keys()):  # Get next tips for 96 channel
+                if starting_tip_name and starting_tip_name != columns[0][0]:
+                    return None
 
-            if not any(
-                tip_state == _TipRackWellState.USED for tip_state in wells.values()
-            ):
-                return next(iter(wells))
-        else:  # Get next tips for single channel
-            if starting_tip_name is not None:
-                wells = _drop_wells_before_starting_tip(wells, starting_tip_name)
+                if not any(
+                    tip_state == _TipRackWellState.USED for tip_state in wells.values()
+                ):
+                    return next(iter(wells))
 
-            for well_name, tip_state in wells.items():
-                if tip_state == _TipRackWellState.CLEAN:
-                    return well_name
+            else:  # Get next tips for single channel
+                if starting_tip_name is not None:
+                    wells = _drop_wells_before_starting_tip(wells, starting_tip_name)
+
+                for well_name, tip_state in wells.items():
+                    if tip_state == _TipRackWellState.CLEAN:
+                        return well_name
         return None
 
     def _get_next_tip_with_nozzle_map(
