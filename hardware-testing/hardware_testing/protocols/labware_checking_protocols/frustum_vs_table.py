@@ -26,7 +26,7 @@ DIAL_PORT = None
 DIAL_PORT_NAME = "/dev/ttyUSB0"
 DIAL_POS_WITHOUT_TIP: List[Optional[float]] = [None, None]
 
-metadata = {"protocolName": "Compare Labware Definitions - UDV only"}
+metadata = {"protocolName": "Compare Labware Definitions"}
 requirements = {"robotType": "Flex", "apiLevel": "2.24"}
 
 
@@ -123,23 +123,10 @@ def add_parameters(parameters: ParameterContext) -> None:
         variable_name="labware_type",
         display_name="Labware Type",
         choices=[
-            {
-                "display_name": "usa96deep",
-                "value": "usascientific_96_wellplate_2.4ml_deep",
-            },
-            {
-                "display_name": "opentrons96",
-                "value": "opentrons_96_wellplate_200ul_pcr_full_skirt",
-            },
-            {"display_name": "usa 12 22ml", "value": "usascientific_12_reservoir_22ml"},
-            {"display_name": "nest 96 2ml", "value": "nest_96_wellplate_2ml_deep"},
-            {
-                "display_name": "appliedbiosystems 384",
-                "value": "appliedbiosystemsmicroamp_384_wellplate_40ul",
-            },
-            {"display_name": "nest 195 ml", "value": "nest_1_reservoir_195ml"},
+
+            {"display_name": "eppendorf1000 test", "value": "eppendorf_96_wellplate_1000ul_custom"},
         ],
-        default="usascientific_12_reservoir_22ml",
+        default="eppendorf_96_wellplate_1000ul_custom",
     )
     parameters.add_bool(
         variable_name="fill_with_manual_pipette",
@@ -356,7 +343,7 @@ def run(ctx: ProtocolContext) -> None:
     drop_tips(probe_pipette, liq_pipette)
 
     ctx.move_labware(frustum_labware, OFF_DECK, use_gripper=False)
-    udv_labware_type = "custom_" + labware_type
+    udv_labware_type = labware_type
     udv_labware = ctx.load_labware(udv_labware_type, SLOT_FRUSTUM_LABWARE)
     udv_labware.load_empty(udv_labware.wells())
 
