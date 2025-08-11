@@ -195,15 +195,15 @@ export function useModuleAttachedToast(
     const newModuleSerials = difference(moduleSerials, moduleSerialsRef.current)
     if (!runInProgress && newModuleSerials.length > 0) {
       setToastID(
-          makeToast(t('module_added') as string, 'info', {
-            buttonText: i18n.format(t('shared:close'), 'capitalize'),
-            linkText: t('module_added_link'),
-            onLinkClick: () => {
-              launchModuleSetupCallback(true)
-            },
-            disableTimeout: true,
-            displayType: 'odd',
-          })
+        makeToast(t('module_added') as string, 'info', {
+          buttonText: i18n.format(t('shared:close'), 'capitalize'),
+          linkText: t('module_added_link'),
+          onLinkClick: () => {
+            launchModuleSetupCallback(true)
+          },
+          disableTimeout: true,
+          displayType: 'odd',
+        })
       )
     }
 
