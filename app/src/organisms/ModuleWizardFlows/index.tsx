@@ -89,7 +89,6 @@ export function ModuleWizardFlows(
 
   const doorStatus = useIsDoorOpen(robotName).isDoorOpen
 
-  if (wizardFlowBaseProps.attachedPipette == null) return null
   if (showLaunchSetup || wizardFlowBaseProps.attachedModule == null) {
     return (
       <ModuleWizardScreen
@@ -217,7 +216,7 @@ export function ModuleWizardFlows(
         </ModuleWizardScreen>
       )
     case SECTIONS.PLACE_ADAPTER:
-      return (
+      return wizardFlowBaseProps.attachedPipette == null ? null : (
         <ModuleWizardScreen
           isRobotMoving={wizardFlowBaseProps.isRobotMoving}
           isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
@@ -236,7 +235,7 @@ export function ModuleWizardFlows(
         </ModuleWizardScreen>
       )
     case SECTIONS.ATTACH_PROBE:
-      return (
+      return wizardFlowBaseProps.attachedPipette == null ? null : (
         <ModuleWizardScreen
           isRobotMoving={wizardFlowBaseProps.isRobotMoving}
           isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
@@ -255,7 +254,7 @@ export function ModuleWizardFlows(
         </ModuleWizardScreen>
       )
     case SECTIONS.DETACH_PROBE:
-      return (
+      return wizardFlowBaseProps.attachedPipette == null ? null : (
         <ModuleWizardScreen
           isRobotMoving={wizardFlowBaseProps.isRobotMoving}
           isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}

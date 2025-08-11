@@ -15,6 +15,7 @@
   "close_doors_description": "The robot needs to safely move to its home location before you can set the labware shuttle onto the track.",
   "close_stacker_doors": "Close robot door and all stacker doors",
   "complete_calibration": "Complete calibration",
+  "connect_a_pipette_to_set_up_more_modules": "Connect a pipette to set up more modules.",
   "confirm_location": "Confirm location",
   "confirm_placement": "Confirm placement",
   "door_circuit_error": "Robot is open",
