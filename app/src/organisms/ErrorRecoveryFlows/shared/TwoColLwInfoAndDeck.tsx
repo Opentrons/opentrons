@@ -22,7 +22,6 @@ export function TwoColLwInfoAndDeck(
   props: RecoveryContentProps
 ): JSX.Element | null {
   const {
-    robotType,
     routeUpdateActions,
     failedPipetteUtils,
     failedLabwareUtils,
