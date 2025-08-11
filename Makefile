@@ -62,7 +62,7 @@ setup-py-toolchain:
 # this needs to be installed AFTER pipenv or pipenv will update this to the bad version
 	$(OT_PYTHON) -m pip install virtualenv==20.30.0
 
-# front-end dependecies handled by yarn
+# front-end dependecies handled by pnpm
 .PHONY: setup-js
 setup-js:
 setup-js: setup-py-toolchain
@@ -234,7 +234,7 @@ lint-js-eslint:
 
 .PHONY: lint-js-prettier
 lint-js-prettier:
-	pnpm prettier --ignore-path .eslintignore --check $(FORMAT_FILE_GLOB)
+	pnpm exec prettier --ignore-path .eslintignore --check $(FORMAT_FILE_GLOB)
 
 
 .PHONY: lint-json
@@ -243,7 +243,7 @@ lint-json:
 
 .PHONY: lint-css
 lint-css:
-	pnpm stylelint "**/*.css" "**/*.js"
+	pnpm exec stylelint "**/*.css" "**/*.js"
 
 .PHONY: format
 format: format-js format-py format-css
@@ -258,11 +258,11 @@ format-py: $(PYTHON_FORMAT_TARGETS)
 
 .PHONY: format-js
 format-js:
-	pnpm prettier --ignore-path .eslintignore --write $(FORMAT_FILE_GLOB)
+	pnpm exec prettier --ignore-path .eslintignore --write $(FORMAT_FILE_GLOB)
 
 .PHONY: format-css
 format-css:
-	yarn stylelint "**/*.css" --fix
+	pnpm exec stylelint "**/*.css" --fix
 
 .PHONY: check-js
 check-js: build-ts

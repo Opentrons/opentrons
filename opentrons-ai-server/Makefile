@@ -33,7 +33,7 @@ mypy:
 
 .PHONY: format-readme
 format-readme:
-	yarn prettier --ignore-path .eslintignore --write opentrons-ai-server/**/*.md opentrons-ai-server/**/*.json
+	pnpm exec prettier --ignore-path .eslintignore --write opentrons-ai-server/**/*.md opentrons-ai-server/**/*.json
 
 .PHONY: lint
 lint: black-check ruff-check mypy
@@ -44,7 +44,7 @@ format:
 	$(MAKE) black
 	@echo running ruff
 	$(MAKE) ruff
-	@echo formatting the readme with yarn prettier
+	@echo formatting the readme with pnpm exec prettier
 	$(MAKE) format-readme
 
 .PHONY: fixup

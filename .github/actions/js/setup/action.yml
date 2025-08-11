@@ -1,7 +1,7 @@
 name: 'Setup JS Environment'
 description: >
   Composite action to fix tag handling in checkout,
-  setup Node.js, install udev for USB detection, cache Yarn/NPM caches,
+  setup Node.js, install udev for USB detection, cache PNPM/NPM caches,
   and perform JS setup.
 
 inputs: {}
@@ -15,14 +15,14 @@ runs:
       uses: actions/setup-node@v4
       with:
         node-version: '22.12.0'
-        cache: 'yarn'
+        cache: 'pnpm'
 
     - name: 'Cache Cypress binary'
       id: cache-cypress
       uses: actions/cache@v4
       with:
         path: ~/.cache/Cypress
-        key: cypress-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+        key: cypress-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
 
     - name: 'Install udev for USB-detection'
       if: runner.os == 'Linux'

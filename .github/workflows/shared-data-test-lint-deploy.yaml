@@ -124,19 +124,19 @@ jobs:
           # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
           sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
           sudo apt-get update && sudo apt-get install libudev-dev
-      - name: 'cache yarn cache'
+      - name: 'cache pnpm cache'
         uses: actions/cache@v4
         with:
           path: |
-            ${{ github.workspace }}/.yarn-cache
+            ${{ github.workspace }}/.pnpm-cache
             ${{ github.workspace }}/.npm-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
           restore-keys: |
-            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
+            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-pnpm-
       - name: 'js deps'
         run: |
           npm config set cache ./.npm-cache
-          yarn config set cache-folder ./.yarn-cache
+          pnpm config set cache ./.pnpm-cache
           make setup-js
       - name: 'run shared-data JS unit tests'
         run: make -C shared-data test-cov
@@ -212,7 +212,7 @@ jobs:
           elif [ "${{ format('{0}', startsWith(github.ref, 'refs/tags/components')) }}" = "true" ] ; then
             echo "Publishing builds for components@ tags"
             echo 'should_publish=true' >> $GITHUB_OUTPUT
-          else 
+          else
             echo "No publish for ref ${{github.ref}} and event ${{github.event_type}}"
             echo 'should_publish=false' >> $GITHUB_OUTPUT
           fi
@@ -239,19 +239,19 @@ jobs:
           # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
           sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
           sudo apt-get update && sudo apt-get install libudev-dev
-      - name: 'cache yarn cache'
+      - name: 'cache pnpm cache'
         uses: actions/cache@v4
         with:
           path: |
-            ${{ github.workspace }}/.yarn-cache
+            ${{ github.workspace }}/.pnpm-cache
             ${{ github.workspace }}/.npm-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
           restore-keys: |
-            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
+            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-pnpm-
       - name: 'js deps'
         run: |
           npm config set cache ./.npm-cache
-          yarn config set cache-folder ./.yarn-cache
+          pnpm config set cache ./.pnpm-cache
           make setup-js
       - name: 'build typescript'
         run: make build-ts

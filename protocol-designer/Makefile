@@ -95,12 +95,12 @@ cy-lint-eslint-fix: clean-downloads clean-screenshots
 
 .PHONY: cy-lint-prettier-check
 cy-lint-prettier-check: clean-downloads clean-screenshots
-	pnpm prettier --ignore-path ../.eslintignore --check $(CYPRESS_PRETTIER_GLOB)
+	pnpm exec prettier --ignore-path ../.eslintignore --check $(CYPRESS_PRETTIER_GLOB)
 	@echo "Cypress Prettier check completed."
 
 .PHONY: cy-lint-prettier-fix
 cy-lint-prettier-fix: clean-downloads clean-screenshots
-	pnpm prettier --ignore-path ../.eslintignore --write $(CYPRESS_PRETTIER_GLOB)
+	pnpm exec prettier --ignore-path ../.eslintignore --write $(CYPRESS_PRETTIER_GLOB)
 	@echo "Cypress Prettier fix applied."
 
 .PHONY: cy-ui

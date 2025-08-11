@@ -27,7 +27,7 @@ The opentrons-ai-server/api/settings.py file manages environment variables and s
 1. `cd opentrons/opentrons-ai-server`
 1. Have pyenv installed per [DEV_SETUP.md](../DEV_SETUP.md).
 1. Use pyenv to install python `pyenv install 3.12.6` or latest 3.12.\*.
-1. Have nodejs and yarn installed per [DEV_SETUP.md](../DEV_SETUP.md).
+1. Have nodejs and pnpm installed per [DEV_SETUP.md](../DEV_SETUP.md).
    1. This allows formatting of of `.md` and `.json` files.
 1. select the python version `pyenv local 3.12.6`.
    1. This will create a `.python-version` file in this directory.

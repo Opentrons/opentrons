@@ -24,7 +24,7 @@ ruff-check:
 format: 
 	@echo "Running ruff"
 	$(MAKE) ruff
-	@echo "Formatting the readme with yarn prettier"
+	@echo "Formatting the readme with pnpm exec prettier"
 	$(MAKE) format-readme
 
 .PHONY: audit
@@ -52,7 +52,7 @@ setup:
 
 .PHONY: format-readme
 format-readme:
-	yarn prettier --ignore-path .eslintignore --write analyses-snapshot-testing/**/*.md .github/workflows/analyses-snapshot-test.yaml
+	pnpm run prettier --ignore-path .eslintignore --write analyses-snapshot-testing/**/*.md .github/workflows/analyses-snapshot-test.yaml
 
 
 .PHONY: snapshot-test

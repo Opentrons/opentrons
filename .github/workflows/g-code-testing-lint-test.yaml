@@ -66,17 +66,17 @@ jobs:
       - uses: './.github/actions/python/setup'
         with:
           project: 'g-code-testing'
-      - name: 'cache yarn cache'
+      - name: 'cache pnpm cache'
         uses: actions/cache@v4
         with:
           path: |
             ${{ github.workspace }}/.npm-cache/_prebuild
-            ${{ github.workspace }}/.yarn-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+            ${{ github.workspace }}/.pnpm-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
       - name: 'setup-js'
         run: |
           npm config set cache ${{ github.workspace }}/.npm-cache
-          yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
+          pnpm config set cache ${{ github.workspace }}/.pnpm-cache
           make setup-js
       - name: Lint
         run: make -C g-code-testing lint

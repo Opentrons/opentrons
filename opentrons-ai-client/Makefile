@@ -4,7 +4,7 @@
 SHELL := bash
 
 # add node_modules/.bin to PATH
-PATH := $(shell cd .. && yarn bin):$(PATH)
+PATH := $(shell cd .. && pnpm exec bin):$(PATH)
 
 # dev server port
 PORT ?= 5173
@@ -28,7 +28,7 @@ all: clean build-$(target)
 
 .PHONY: setup
 setup:
-	yarn
+	pnpm install
 
 .PHONY: clean
 clean:
@@ -81,4 +81,4 @@ prod-deploy:
 
 .PHONY: format-md-json
 format-md-json:
-	yarn prettier --ignore-path .eslintignore --write **/*.md **/*.json
+	pnpm exec prettier --ignore-path .eslintignore --write **/*.md **/*.json
