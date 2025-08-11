@@ -108,7 +108,7 @@ export const migrateAndMatchSnapshot = ({
         savedFile.designerApplication.version as string
       )
       assert(version !== null, 'PD version is not valid semver')
-      const isBelowVersion850 = semver.lt(version ?? '', '8.5.0')
+      const isBelowVersion850 = semver.lte(version ?? '', '8.5.0')
 
       const files = [savedFile, expectedFile]
       files.forEach(f => {
