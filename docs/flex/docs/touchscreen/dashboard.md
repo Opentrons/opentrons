@@ -22,4 +22,4 @@ From the dashboard you can also perform actions that apply to the robot as a who
 
 - **Lights on/off:** Toggle the LED lights that illuminate the working area.
 
-The top navigation on the dashboard provides access to the other main screens: All Protocols, Quick Transfer, Instruments, and Settings. Next we'll look at how to manage protocols on the All Protocols screen
+The top navigation on the dashboard provides access to the other main screens: [All Protocols](protocol-management.md), [Quick Transfer](quick-transfer.md), [Instruments](instruments.md), and [Settings](settings.md).

@@ -4,7 +4,7 @@ title: "Opentrons Flex: Protocol Management"
 
 # Protocol Management
 
-The All Protocols screen is an interactive list of all protocols that you've stored on Opentrons Flex. (Sending a protocol to Flex requires the Opentrons App. See the [Transferring Protocols to Flex section][transferring-protocols-to-flex] below for details on that process.)
+The All Protocols screen is an interactive list of all protocols that you've stored on Opentrons Flex. (Sending a protocol to Flex requires the Opentrons App. See the [Transferring Protocols to Flex section][transferring-protocols-to-flex] for details on that process.)
 
 There are two sections of the All Protocols screen:
 

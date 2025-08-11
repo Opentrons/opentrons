@@ -98,7 +98,7 @@ The static IP address on your computer needs to be in the same IP range and subn
 - IP address: 169.254.29.164
 - Subnet mask: 255.255.0.0
 
-After you have a working hardwired connection, follow the instructions in [Making an SSH Connection](software-operation.md#making-an-ssh-connection) above.
+After you have a working hardwired connection, follow the instructions in [Making an SSH Connection][making-an-ssh-connection] above.
 
 ## Jupyter Notebook
 
