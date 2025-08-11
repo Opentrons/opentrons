@@ -45,7 +45,7 @@ Warning symbols posted on the Opentrons Temperature Module refer directly to the
     <tbody>
         <tr>
             <td><img src="../images/hot-warning-label.svg"></td>
-            <td><strong>CAUTION: Warning about risk of burning.</strong><br>
+            <td><strong>CAUTION: Hot surface.</strong><br>
                 The Opentrons Temperature Module generates enough heat to cause serious burns. Wear safety goggles or other eye protection at all times during operation. Always ensure the sample block returns to idle temperature before removing samples. Always allow maximum clearance to avoid accidental burns.
             </td>
         </tr>
@@ -59,19 +59,18 @@ The Temperature Module has been tested and found to be in compliance with all ap
 ### Safety
 
 - IEC/UL/CSA 61010-1 Safety­ Requirements­ for­ Electrical Equipment­ for Measurement,­ Control,­ and­ Laboratory­ Use–Part­ 1:­ General Requirements
-- IEC/UL/CSA ­ 61010-2-010­ Particular­ Requirements  for Laboratory­ Equipment for­ the Heating­ of­ Materials
+- IEC/UL/CSA­ 61010-2-010­ Particular­ Requirements for Laboratory­ Equipment for­ the Heating­ of­ Materials
 
 ### Electromagnetic Compatibility
 
-- EN/BSI 61326-1­ Electrical ­ Equipment­ for ­ Measurement, Control­ and­ Laboratory­ Use­ –EMC Requirements–Part­ 1:­ General­ Requirements
-- EN 55011 Industrial, Scientific and Medical Equipment–Radio Frequency­ Disturbance Characteristics–
-­ Limits  and­ Methods of­ Measurement
+- EN/BSI 61326-1­ Electrical ­Equipment­ for­ Measurement, Control­ and­ Laboratory­ Use­ –EMC Requirements–Part­ 1:­ General­ Requirements
+- EN 55011 Industrial, Scientific and Medical Equipment–Radio Frequency­ Disturbance Characteristics–­Limits and­ Methods of­ Measurement
 - FCC 47CFR Part 15 Subpart B Class A: Unintentional Radiators
 - IC ICES–003 Spectrum Management and Telecommunications Interference Causing Equipment Standard–Information Technology Equipment (Including Digital Apparatus)
 
 ### FCC Warnings and Notes
 
-**Warning:** Changes or modifications to this unit not expressly approved by Opentrons could void the user’s authority to operate the equipment. This device complies with part 15 of the FCC Rules. Operation is subject to the following two conditions:
+**Warning:** Changes or modifications to this unit not expressly approved by Opentrons could void the user's authority to operate the equipment. This device complies with part 15 of the FCC Rules. Operation is subject to the following two conditions:
 
 - This device may not cause harmful interference.
 - This device must accept any interference received, including interference that may cause undesired operation.

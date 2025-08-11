@@ -16,6 +16,7 @@ theme:
 nav:
   - Home: index.md
   - Safety Information and Regulatory Compliance: compliance.md
+  - Product Specifications: specifications.md
   - Installing the Temperature Module:
       - Before You Begin: preinstall.md
       - Flex Installation: flex-installation.md
