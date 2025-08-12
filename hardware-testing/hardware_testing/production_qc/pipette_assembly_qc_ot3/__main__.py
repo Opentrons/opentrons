@@ -51,6 +51,7 @@ from .pressure import (  # type: ignore[import]
     PRESSURE_FIXTURE_INSERT_DEPTH,
     PRESSURE_ASPIRATE_DELTA_SPEC,
 )
+from .test_encoder import test_encoder
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import (
     OT3Mount,
@@ -504,7 +505,7 @@ async def _move_to_fixture(api: OT3API, mount: OT3Mount) -> None:
         IDEAL_LABWARE_LOCATIONS.fixture,
         CALIBRATED_LABWARE_LOCATIONS.fixture,
     )
-    
+
 
     #Z down 0.5
     # if "single" in pipptype[OT3Mount.LEFT]['name']:
@@ -550,7 +551,7 @@ async def _aspirate_and_look_for_droplets(
         leak_test_passed = True
     else:
         leak_test_passed = _get_operator_answer_to_question("did it pass? no leaking?")
-    
+
     #print("dispensing back into reservoir")
     LOG_GING.info("dispensing back into reservoir")
     await api.move_rel(mount, Point(z=-LEAK_HOVER_ABOVE_LIQUID_MM))
@@ -901,23 +902,23 @@ async def _read_pipette_sensor_repeatedly_and_average(
                 r = res[1]
             else:
                 raise ValueError(f"unexpected sensor type: {sensor_type}")
-            
+
             #print(f"{sensor_type} {sensor_id} sensor response {r}")
             LOG_GING.info(f"{sensor_type} {sensor_id} sensor response {r}")
         except helpers_ot3.SensorResponseBad:
             sequential_failures += 1
             if sequential_failures == 3:
                 sensor_type_dic = {1:"capacitive(电容)",3:"pressure(气压)",6:"temperature(温度)",5:"humidity(湿度)"
-                    
+
                 }
                 printerr = f"07-01 {sensor_type_dic[int(sensor_type)]} 故障: 传感器{sensor_type_dic[int(sensor_type)]} 通道ID {sensor_id} 读取数据失败)"
                 ui.print_fail(printerr)
                 FINAL_TEST_FAIL_INFOR.append(printerr)
                 return -999999999999.0
-            
+
             r = 0.0
             continue
-                
+
         readings.append(r)
     readings.sort()
     readings = readings[1:-1]
@@ -951,9 +952,9 @@ async def _test_diagnostics_environment(
                 'Enter the ROOM humidity (%) (example: "54.0"): '
             )
         env_sensor = ENVIRONMENT_SENSOR.get_reading()
-        
+
         #print("Air temperature and humidity",env_sensor)
-        LOG_GING.info("Air temperature and humidity={}".format(env_sensor))    
+        LOG_GING.info("Air temperature and humidity={}".format(env_sensor))
         room_celsius = env_sensor.temperature#_get_room_celsius()
         room_humidity =env_sensor.relative_humidity #_get_room_humidity()
     else:
@@ -1092,7 +1093,7 @@ async def _test_diagnostics_capacitive(  # noqa: C901
                 LOG_GING.error(printtxt)
                 ui.print_fail(printtxt)
                 FINAL_TEST_FAIL_INFOR.append(printtxt)
-                
+
             else:
                 results.append(True)
         else:
@@ -1104,8 +1105,8 @@ async def _test_diagnostics_capacitive(  # noqa: C901
                 _bool_to_pass_fail(results[-1]),
             ]
         )
-        
-    
+
+
     for sensor_id in sensor_ids:
         if not api.is_simulator:
             if pip.channels == 1:
@@ -1149,7 +1150,7 @@ async def _test_diagnostics_capacitive(  # noqa: C901
         testflag = 1
         if capacitance == -999999999999.0:
             testflag = -1
-            
+
 
         offsets: List[Point] = []
         if testflag == 1:
@@ -1235,7 +1236,7 @@ async def _test_diagnostics_capacitive(  # noqa: C901
                 LOG_GING.error(printtxt)
                 ui.print_fail(printtxt)
                 FINAL_TEST_FAIL_INFOR.append(printtxt)
-                
+
             else:
                 results.append(True)
         else:
@@ -1276,32 +1277,32 @@ async def _test_diagnostics_pressure(
             api, mount, SensorType.pressure, 10, _sensor_id
         )
 
-    
-    global CHTYPE_PIPPETE 
+
+    global CHTYPE_PIPPETE
     movez = -100
-    
+
     if "p50" in pipptype[OT3Mount.LEFT]['name']:
         CHTYPE_PIPPETE = 50
         if "single" in pipptype[OT3Mount.LEFT]['name']:
-            movez = -155.5   
+            movez = -155.5
             current_val = PRESSURE_THRESH_current[pip_channels][CHTYPE_PIPPETE][1]
         elif "multi" in pipptype[OT3Mount.LEFT]['name']:
             movez = -154.8
             current_val = PRESSURE_THRESH_current[pip_channels][CHTYPE_PIPPETE][2]
             print("current_val",current_val)
             await helpers_ot3.update_pick_up_current(api,mount,current_val)
-            
+
     elif "p1000" in pipptype[OT3Mount.LEFT]['name']:
         CHTYPE_PIPPETE = 1000
         movez = -117
 
-        if "single" in pipptype[OT3Mount.LEFT]['name']:  
+        if "single" in pipptype[OT3Mount.LEFT]['name']:
             current_val = PRESSURE_THRESH_current[pip_channels][CHTYPE_PIPPETE][1]
         elif "multi" in pipptype[OT3Mount.LEFT]['name']:
             current_val = PRESSURE_THRESH_current[pip_channels][CHTYPE_PIPPETE][2]
             print("current_val",current_val)
             await helpers_ot3.update_pick_up_current(api,mount,current_val)
-        
+
 
     for sensor_id in sensor_ids:
         pressure = await _read_pressure(sensor_id)
@@ -1311,7 +1312,7 @@ async def _test_diagnostics_pressure(
             if (
                 pressure < PRESSURE_THRESH_OPEN_AIR[pip_channels][CHTYPE_PIPPETE][0]
                 or pressure > PRESSURE_THRESH_OPEN_AIR[pip_channels][CHTYPE_PIPPETE][1]
-            ):  
+            ):
                 # print(
                 #         f"FAIL: open-air {sensor_id.name} pressure ({pressure}) is not correct"
                 #     )
@@ -1375,7 +1376,7 @@ async def _test_diagnostics_pressure(
                 LOG_GING.error(printtxt)
                 ui.print_fail(printtxt)
                 FINAL_TEST_FAIL_INFOR.append(printtxt)
-                
+
             else:
                 results.append(True)
         else:
@@ -1448,6 +1449,9 @@ async def _test_diagnostics(api: OT3API, mount: OT3Mount, write_cb: Callable) ->
     #print(f"encoder: {_bool_to_pass_fail(encoder_pass)}")
     LOG_GING.info(f"encoder: {_bool_to_pass_fail(encoder_pass)}")
     write_cb(["diagnostics-encoder", _bool_to_pass_fail(encoder_pass)])
+    encoder_clean_pass = await test_encoder(api, mount)
+    LOG_GING.info(f"encoder: {_bool_to_pass_fail(encoder_clean_pass)}")
+    write_cb(["diagnostics-encoder-clean", _bool_to_pass_fail(encoder_clean_pass)])
     # CAPACITIVE SENSOR
     #print("SKIPPING CAPACITIVE TESTS")
     LOG_GING.info("SKIPPING CAPACITIVE TESTS")
@@ -1462,7 +1466,8 @@ async def _test_diagnostics(api: OT3API, mount: OT3Mount, write_cb: Callable) ->
     #print(f"pressure: {_bool_to_pass_fail(pressure_pass)}")
     LOG_GING.info(f"pressure: {_bool_to_pass_fail(pressure_pass)}")
     write_cb(["diagnostics-pressure", _bool_to_pass_fail(pressure_pass)])
-    return environment_pass and pressure_pass and encoder_pass and capacitance_pass
+
+    return environment_pass and pressure_pass and encoder_pass and capacitance_pass and encoder_clean_pass
 
 
 async def _test_plunger_positions(
@@ -1743,7 +1748,7 @@ async def _test_liquid_probe(
                 ui.print_fail(probeval)
                 FINAL_TEST_FAIL_INFOR.append(probeval)
                 end_z = 0
-            
+
             if probe == InstrumentProbeType.PRIMARY:
                 pz = CALIBRATED_LABWARE_LOCATIONS.plate_primary.z
             else:
@@ -1775,13 +1780,13 @@ class CSVProperties:
 
 def _save_logging_print(pipette_sn: str):
     try:
-       
+
         logger = logging.getLogger("QCTEST")
         logger.setLevel(logging.DEBUG)
         logger.propagate = False
 
-        
-            
+
+
         run_id = data.create_run_id()
         test_name = Path(__file__).parent.name.replace("_", "-")
         folder_path = data.create_folder_for_test_data(test_name)
@@ -1792,7 +1797,7 @@ def _save_logging_print(pipette_sn: str):
         file_handler = logging.FileHandler(csv_display_name)
         file_handler.setLevel(logging.DEBUG)
 
-        
+
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         file_handler.setFormatter(formatter)
 
@@ -1807,7 +1812,7 @@ def _save_logging_print(pipette_sn: str):
         return logger
     except Exception as eeerr:
         print(f"log err: {eeerr}")
-    
+
 
 def _create_csv_and_get_callbacks(
     pipette_sn: str,
@@ -1942,7 +1947,7 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
 
         global ENVIRONMENT_SENSOR
         ENVIRONMENT_SENSOR = asair_sensor.BuildAsairSensor(False)
-        
+
         # create API instance, and get Pipette serial number
         try:
             api = await helpers_ot3.build_async_ot3_hardware_api(
@@ -1952,8 +1957,8 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
             )
         except Exception as errv:
             print("07-04识别不到移液器:无法识别该移液器类型.",errv)
-        
-        
+
+
 
         global pipptype
         pipptype = api.get_all_attached_instr()
@@ -1973,7 +1978,7 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
         pips = {OT3Mount.from_mount(m): p for m, p in api.hardware_pipettes.items() if p}
         assert pips, "no pipettes attached"
         for mount, pipette in pips.items():
-            
+
             PIP_CURRENT = api.hardware_pipettes[mount.to_mount()]
             assert PIP_CURRENT
             PIP_CHANNELS_CURRENT = int(PIP_CURRENT.channels)
@@ -2111,7 +2116,7 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
             hover_over_slot_3 = pos_slot_3._replace(z=current_pos.z)
 
             if not test_config.skip_plunger or not test_config.skip_diagnostics:
-                
+
                 if not test_config.skip_diagnostics:
                     """fail code 01"""
                     LOG_GING.info("test-diagnostics")
@@ -2140,7 +2145,7 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
                     # force the operator to re-calibrate the liquid for each tip-type
                     CALIBRATED_LABWARE_LOCATIONS.plate_primary = None
                     CALIBRATED_LABWARE_LOCATIONS.plate_secondary = None
-                    
+
                     # pip = api.hardware_pipettes[mount.to_mount()]
                     # assert pip
                     # pip_channels = int(pip.channels)
@@ -2229,7 +2234,7 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
                         ui.print_fail(printsig)
                         FINAL_TEST_FAIL_INFOR.append(printsig)
                         LOG_GING.error(printsig)
-                        
+
                     csv_cb.results(f"droplets-{droplet_wait_seconds}", test_passed)
 
             if not test_config.skip_fixture:
@@ -2302,7 +2307,7 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
         LOG_GING.info("done")
         #print("done")
     except Exception as err:
-        
+
         printsig = f"08-01-assembly-system-error:系统错误,日志:{err}"
         ui.print_fail(printsig)
         if LOG_GING == '':

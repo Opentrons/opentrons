@@ -102,6 +102,10 @@ class SimPressureFixture(PressureFixtureBase):
         """Connect."""
         return
 
+    def connect_96(self) -> None:
+        """Connect."""
+        return
+
     def disconnect(self) -> None:
         """Disconnect."""
         return
@@ -215,7 +219,7 @@ class PressureFixture(PressureFixtureBase):
         assert (
             fw_version == FIXTURE_VERSION_REQUIRED
         ), f"unexpected pressure-fixture version: {fw_version}"
-    
+
     def connect_96(self) -> None:
         """Connect."""
         self._port.open()
@@ -252,7 +256,7 @@ class PressureFixture(PressureFixtureBase):
         if self._slot_side == "left":
             data.reverse()  # reverse order, so pipette channel 1 is at index 0
         return data
-    
+
     def read_all_pressure_channel_96(self) -> List[float]:
         """Reads from all the channels from the fixture."""
         cmd_str = f"{FIXTURE_CMD_GET_ALL_PRESSURE_96}{FIXTURE_CMD_TERMINATOR}"
