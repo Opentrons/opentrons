@@ -704,7 +704,7 @@ describe('moveLabware', () => {
       ...robotState,
       tipState: {
         tipracks: {
-          tiprack1Id: { A1: true },
+          tiprack1Id: { A1: { hasTip: true } },
         },
         pipettes: {
           p10SingleId: false,

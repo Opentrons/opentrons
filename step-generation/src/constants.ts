@@ -86,3 +86,7 @@ export const COLUMN_4_SLOTS = ['A4', 'B4', 'C4', 'D4']
 export const ZERO_OFFSET: AddressableOffsetVector = { x: 0, y: 0, z: 0 }
 
 export const GRIPPER_LOCATION: 'mounted' = 'mounted'
+
+export const CLEAN: 'CLEAN' = 'CLEAN'
+export const DIRTY: 'DIRTY' = 'DIRTY'
+export const EMPTY: 'EMPTY' = 'EMPTY'
