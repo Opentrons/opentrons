@@ -6,6 +6,7 @@ import {
   GRIPPER_MOVE_STEPS,
   INVALID,
   RECOVERY_MAP,
+  STACKER_LATCH_STEPS,
   STEP_ORDER,
 } from '../constants'
 
@@ -109,10 +110,14 @@ export function useRouteUpdateActions(
   )
 
   // If the door is permitted on the current step, but the robot is about to move, we need to manually redirect users
-  // to the door modal unless the step is specifically a gripper jaw release step.
+  // to the door modal unless the step is specifically a gripper jaw/stacker latch release step.
   const checkDoorStatus = useCallback((): Promise<void> => {
     return new Promise((resolve, reject) => {
-      if (isDoorOpen && !GRIPPER_MOVE_STEPS.includes(currentStep)) {
+      if (
+        isDoorOpen &&
+        !GRIPPER_MOVE_STEPS.includes(currentStep) &&
+        !STACKER_LATCH_STEPS.includes(currentStep)
+      ) {
         stashedMapRef.current = { route: currentRoute, step: currentStep }
 
         setRecoveryMap({

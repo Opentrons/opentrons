@@ -10,12 +10,13 @@ import {
 import {
   DEFAULT_MM_OFFSET_FROM_BOTTOM,
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
-} from '../../../constants'
-import { getIsTouchTipField } from '../../../form-types'
+} from '/protocol-designer/constants'
+import { getIsTouchTipField } from '/protocol-designer/form-types'
+
 import { DECIMALS_ALLOWED, TOO_MANY_DECIMALS } from './constants'
 
 import type { PositionReference } from '@opentrons/shared-data'
-import type { StepFieldName } from '../../../form-types'
+import type { StepFieldName } from '/protocol-designer/form-types'
 
 export function getDefaultMmFromEdge(args: {
   name: StepFieldName

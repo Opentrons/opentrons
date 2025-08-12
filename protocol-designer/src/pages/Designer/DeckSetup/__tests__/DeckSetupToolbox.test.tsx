@@ -11,25 +11,26 @@ import {
   FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
-import { SelectLabwareModal } from '../../../../components/organisms'
-import { useKitchen } from '../../../../components/organisms/Kitchen/useKitchen'
-import { getRobotType } from '../../../../file-data/selectors'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { SelectLabwareModal } from '/protocol-designer/components/organisms'
+import { useKitchen } from '/protocol-designer/components/organisms/Kitchen/useKitchen'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
 import {
   deleteContainer,
   openIngredientSelector,
-} from '../../../../labware-ingred/actions'
-import { selectors } from '../../../../labware-ingred/selectors'
+} from '/protocol-designer/labware-ingred/actions'
+import { selectors } from '/protocol-designer/labware-ingred/selectors'
 import {
   getAdditionalEquipment,
   getLabwareEntities,
   getSavedStepForms,
-} from '../../../../step-forms/selectors'
-import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
-import * as wellContentsSelectors from '../../../../top-selectors/well-contents'
-import { getDismissedHints } from '../../../../tutorial/selectors'
-import { getLabwareNicknamesById } from '../../../../ui/labware/selectors'
+} from '/protocol-designer/step-forms/selectors'
+import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
+import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
+import { getDismissedHints } from '/protocol-designer/tutorial/selectors'
+import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
+
 import { DeckSetupToolbox } from '../DeckSetupToolbox'
 
 import type { ComponentProps } from 'react'
@@ -39,17 +40,17 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 const mockNavigate = vi.fn()
 const mockMakeSnackbar = vi.fn()
 
-vi.mock('../../../../feature-flags/selectors')
-vi.mock('../../../../file-data/selectors')
-vi.mock('../../../../top-selectors/labware-locations')
-vi.mock('../../../../labware-ingred/actions')
-vi.mock('../../../../labware-ingred/selectors')
-vi.mock('../../../../tutorial/selectors')
-vi.mock('../../../../step-forms/selectors')
-vi.mock('../../../../top-selectors/well-contents')
-vi.mock('../../../../components/organisms/Kitchen/useKitchen')
-vi.mock('../../../../components/organisms/SelectLabwareModal')
-vi.mock('../../../../ui/labware/selectors')
+vi.mock('/protocol-designer/feature-flags/selectors')
+vi.mock('/protocol-designer/file-data/selectors')
+vi.mock('/protocol-designer/top-selectors/labware-locations')
+vi.mock('/protocol-designer/labware-ingred/actions')
+vi.mock('/protocol-designer/labware-ingred/selectors')
+vi.mock('/protocol-designer/tutorial/selectors')
+vi.mock('/protocol-designer/step-forms/selectors')
+vi.mock('/protocol-designer/top-selectors/well-contents')
+vi.mock('/protocol-designer/components/organisms/Kitchen/useKitchen')
+vi.mock('/protocol-designer/components/organisms/SelectLabwareModal')
+vi.mock('/protocol-designer/ui/labware/selectors')
 const render = (props: ComponentProps<typeof DeckSetupToolbox>) => {
   return renderWithProviders(<DeckSetupToolbox {...props} />, {
     i18nInstance: i18n,

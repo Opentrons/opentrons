@@ -4,7 +4,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fixture96Plate } from '@opentrons/shared-data'
 import { getLiquidIdsOnLabware } from '@opentrons/step-generation'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+
 import { i18n } from '../../../../assets/localization'
 import { getEnableStacking } from '../../../../feature-flags/selectors'
 import { openIngredientSelector } from '../../../../labware-ingred/actions'

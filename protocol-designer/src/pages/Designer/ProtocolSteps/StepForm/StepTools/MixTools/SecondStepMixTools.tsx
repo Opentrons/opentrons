@@ -15,9 +15,10 @@ import { getMaxPushOutVolume } from '@opentrons/shared-data'
 import {
   CheckboxExpandStepFormField,
   InputStepFormField,
-} from '../../../../../../components/molecules'
-import { ResetSettingsModal } from '../../../../../../components/organisms/ResetSettingsModal'
-import { getRobotType } from '../../../../../../file-data/selectors'
+} from '/protocol-designer/components/molecules'
+import { ResetSettingsModal } from '/protocol-designer/components/organisms/ResetSettingsModal'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
+
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
@@ -38,7 +39,7 @@ import {
 import { ResetSettingsField } from '../MoveLiquidTools/ResetSettingsField'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { FormData } from '../../../../../../form-types'
+import type { FormData } from '/protocol-designer/form-types'
 import type { FieldPropsByName, LiquidHandlingTab } from '../../types'
 
 interface SecondStepMixToolsProps {

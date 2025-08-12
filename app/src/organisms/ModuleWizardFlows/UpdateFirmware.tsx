@@ -24,12 +24,12 @@ import { useSendIdentifyStacker } from './hooks'
 
 import type { AttachedModule } from '@opentrons/api-client'
 import type { Dispatch, State } from '/app/redux/types'
-import type { ModuleSetupWizardStepProps } from './types'
+import type { ModuleSetupWizardMaybePipetteStepProps } from './types'
 
 const EQUIPMENT_POLL_MS = 3000
 const MODULE_TIMEOUT_MS = 60000
 const NO_UPDATE_FOUND_TIMEOUT_MS = 2000
-interface UpdateFirmwareProps extends ModuleSetupWizardStepProps {
+interface UpdateFirmwareProps extends ModuleSetupWizardMaybePipetteStepProps {
   robotName: string
   patchModuleAfterUpdate: (module: AttachedModule) => void
 }

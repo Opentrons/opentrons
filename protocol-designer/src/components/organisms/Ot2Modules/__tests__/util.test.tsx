@@ -7,7 +7,7 @@ import {
 
 import { getModuleOnSlot } from '../util'
 
-import type { ModuleOnDeck } from '../../../../step-forms'
+import type { ModuleOnDeck } from '/protocol-designer/step-forms'
 
 describe('getModuleOnSlot', () => {
   it('should return false and module id', () => {

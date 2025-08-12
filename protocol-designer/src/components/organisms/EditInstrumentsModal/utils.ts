@@ -9,9 +9,12 @@ import type {
   PipetteName,
   PipetteV2Specs,
 } from '@opentrons/shared-data'
-import type { LabwareDefByDefURI } from '../../../labware-defs'
-import type { Gen, PipetteType } from '../../../pages/Onboarding/types'
-import type { PipetteOnDeck } from '../../../step-forms'
+import type { LabwareDefByDefURI } from '/protocol-designer/labware-defs'
+import type {
+  Gen,
+  PipetteType,
+} from '/protocol-designer/pages/Onboarding/types'
+import type { PipetteOnDeck } from '/protocol-designer/step-forms'
 
 export interface PipetteSections {
   type: PipetteType

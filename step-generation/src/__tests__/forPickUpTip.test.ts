@@ -2,6 +2,7 @@ import merge from 'lodash/merge'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { makeImmutableStateUpdater } from '../__utils__'
+import { EMPTY } from '../constants'
 import {
   DEFAULT_PIPETTE,
   getInitialRobotStateStandard,
@@ -40,7 +41,7 @@ describe('tip tracking', () => {
         tipState: {
           tipracks: {
             [tiprack1Id]: {
-              A1: false,
+              A1: EMPTY,
             },
           },
           pipettes: {
@@ -62,7 +63,7 @@ describe('tip tracking', () => {
       merge({}, initialRobotState, {
         tipState: {
           tipracks: {
-            [tiprack1Id]: getTipColumn(1, false),
+            [tiprack1Id]: getTipColumn(1, EMPTY),
           },
           pipettes: {
             [p300MultiId]: { hasTip: true, tiprackURI: tiprack1Id },

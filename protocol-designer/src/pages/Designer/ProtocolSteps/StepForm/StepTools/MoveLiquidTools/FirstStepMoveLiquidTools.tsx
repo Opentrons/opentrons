@@ -11,13 +11,14 @@ import {
 
 import {
   getEnablePartialTipSupport,
-  getEnableReturnTip,
-} from '../../../../../../feature-flags/selectors'
+  getEnableTipPickupLocation,
+} from '/protocol-designer/feature-flags/selectors'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
   getPipetteEntities,
-} from '../../../../../../step-forms/selectors'
+} from '/protocol-designer/step-forms/selectors'
+
 import {
   ChangeTipField,
   DropTipField,
@@ -32,7 +33,7 @@ import {
   WellSelectionField,
 } from '../../PipetteFields'
 
-import type { FormData } from '../../../../../../form-types'
+import type { FormData } from '/protocol-designer/form-types'
 import type { FieldPropsByName } from '../../types'
 
 interface FirstStepMoveLiquidToolsProps {
@@ -51,7 +52,7 @@ export function FirstStepMoveLiquidTools({
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
-  const enableReturnTip = useSelector(getEnableReturnTip)
+  const enableTipPickupLocation = useSelector(getEnableTipPickupLocation)
 
   const { pipette, tipRack } = propsForFields
   const is96Channel =
@@ -165,11 +166,13 @@ export function FirstStepMoveLiquidTools({
         />
         <DropTipField
           {...propsForFields.dropTip_location}
+          nozzles={formData.nozzles}
+          tiprackDefUri={formData.tipRack}
           tooltipContent={null}
           padding="0"
         />
       </Flex>
-      {enableReturnTip ? (
+      {enableTipPickupLocation ? (
         <>
           <Divider marginY="0" />
           <PickUpTipField {...propsForFields.pickUpTip_location} />
@@ -189,7 +192,7 @@ export function FirstStepMoveLiquidTools({
           ) : null}
         </>
       ) : null}
-      {userSelectedDropTipLocation && enableReturnTip ? (
+      {userSelectedDropTipLocation && enableTipPickupLocation ? (
         <>
           <Divider marginY="0" />
           <TipWellSelectionField

@@ -4,18 +4,19 @@ import { useSelector } from 'react-redux'
 
 import { ALL, COLUMN, getAllLiquidClassDefs } from '@opentrons/shared-data'
 
-import { selectors as labwareIngredSelectors } from '../../../../../../../labware-ingred/selectors'
 import {
   getCurrentFormIsPresaved,
   getCurrentFormUnsavedChangedFields,
   getLabwareEntities,
   getLiquidEntities,
-} from '../../../../../../../step-forms/selectors'
-import { getAllWellsFromPrimaryWells } from '../../../../../../../steplist/formLevel/handleFormChange/utils'
-import { getAllWellContentsForActiveItem } from '../../../../../../../top-selectors/well-contents'
+} from '/protocol-designer/step-forms/selectors'
+import { getAllWellsFromPrimaryWells } from '/protocol-designer/steplist/formLevel/handleFormChange/utils'
+import { getAllWellContentsForActiveItem } from '/protocol-designer/top-selectors/well-contents'
+
+import { selectors as labwareIngredSelectors } from '../../../../../../../labware-ingred/selectors'
 import { getShouldUpdateForLiquidClass } from '../../../utils'
 
-import type { FormData } from '../../../../../../../form-types'
+import type { FormData } from '/protocol-designer/form-types'
 
 export interface LiquidClassOption {
   name: string

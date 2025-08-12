@@ -6,12 +6,13 @@ import {
 } from '@opentrons/shared-data'
 import { fixture_96_plate } from '@opentrons/shared-data/labware/fixtures/2'
 
-import { DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP } from '../../../../constants'
+import { DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP } from '/protocol-designer/constants'
+
 import { getOrderedWells } from '../../../utils'
 import { mixFormToArgs } from '../mixFormToArgs'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { HydratedMixFormData } from '../../../../form-types'
+import type { HydratedMixFormData } from '/protocol-designer/form-types'
 
 vi.mock('../../../utils')
 

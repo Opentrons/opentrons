@@ -15,6 +15,10 @@ import {
   useCreateLiveCommandMutation,
   useHost,
 } from '@opentrons/react-api-client'
+import {
+  ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 
 import { useToaster } from '/app/organisms/ToasterOven'
 import { checkShellUpdate } from '/app/redux/shell'
@@ -26,7 +30,10 @@ import { useCurrentRunId } from '../resources/runs'
 import { SharedScrollRefContext } from './ODDProviders/ScrollRefProvider'
 
 import type { AttachedModule } from '@opentrons/api-client'
-import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
+import type {
+  ModuleType,
+  SetStatusBarCreateCommand,
+} from '@opentrons/shared-data'
 import type { Dispatch } from '/app/redux/types'
 
 const UPDATE_RECHECK_INTERVAL_MS = 60000
@@ -128,7 +135,14 @@ export function useProtocolReceiptToast(): void {
   }, [protocolIds])
 }
 
-export function useGetNewModules(): AttachedModule[] {
+const MODULES_NOT_REQUIRING_PIPETTE_FOR_SETUP: ModuleType[] = [
+  ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
+]
+
+const MODULES_NOT_REQUIRING_CALIBRATION = MODULES_NOT_REQUIRING_PIPETTE_FOR_SETUP
+
+export function useGetModulesNeedingSetup(): AttachedModule[] {
   const attachedModules =
     useAttachedModules({
       refetchInterval: ATTACHED_MODULE_POLL_MS,
@@ -141,34 +155,45 @@ export function useGetNewModules(): AttachedModule[] {
     const modulesInDeckConfig = deckConfig
       ?.filter(c => c.opentronsModuleSerialNumber)
       .map(m => m.opentronsModuleSerialNumber)
-    const newModules = attachedModules.filter(
+    return attachedModules.filter(
       m =>
-        m.moduleOffset === undefined &&
-        !modulesInDeckConfig.includes(m.serialNumber)
+        !modulesInDeckConfig.includes(m.serialNumber) ||
+        (!MODULES_NOT_REQUIRING_CALIBRATION.includes(m.moduleType) &&
+          m.moduleOffset === undefined)
     )
-    return newModules
   }
   return []
+}
+
+export function useGetModulesNeedingSetupThatCanCurrentlyBeSetUp(): AttachedModule[] {
+  const modulesRequiringSetup = useGetModulesNeedingSetup()
+  const attachedPipettes = useAttachedPipettes(modulesRequiringSetup.length > 0)
+  return modulesRequiringSetup.filter(
+    m =>
+      MODULES_NOT_REQUIRING_PIPETTE_FOR_SETUP.includes(m.moduleType) ||
+      attachedPipettes.left != null ||
+      attachedPipettes.right != null
+  )
 }
 
 export function useModuleAttachedToast(
   launchModuleSetupCallback: (open: boolean) => void
 ): void {
-  const newModules = useGetNewModules()
+  const currentlySetuppableModules = useGetModulesNeedingSetupThatCanCurrentlyBeSetUp()
+
   const currentRunId = useCurrentRunId({ refetchInterval: CURRENT_RUN_POLL })
-  const attachedPipettes = useAttachedPipettes(newModules.length > 0)
   const { t, i18n } = useTranslation(['module_wizard_flows', 'shared'])
   const { makeToast, eatToast } = useToaster()
-  const moduleSerials = newModules.map(m => m.serialNumber)
+  const moduleSerials = currentlySetuppableModules.map(m => m.serialNumber)
   const moduleSerialsRef = useRef(moduleSerials)
   const runInProgress = currentRunId != null
   const [toastID, setToastID] = useState<string>('')
 
+  const [firstRun, setFirstRun] = useState<boolean>(true)
+
   useEffect(() => {
     const newModuleSerials = difference(moduleSerials, moduleSerialsRef.current)
-    const hasPipette =
-      attachedPipettes.left != null || attachedPipettes.right != null
-    if (!runInProgress && hasPipette && newModuleSerials.length > 0) {
+    if (!runInProgress && newModuleSerials.length > 0) {
       setToastID(
         makeToast(t('module_added') as string, 'info', {
           buttonText: i18n.format(t('shared:close'), 'capitalize'),
@@ -183,18 +208,19 @@ export function useModuleAttachedToast(
     }
 
     moduleSerialsRef.current = moduleSerials
+    setFirstRun(false)
     // dont want this hook to rerun when other deps change
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [moduleSerials, runInProgress])
+  }, [moduleSerials, runInProgress, firstRun])
 
   useEffect(() => {
     // Close toast if there are no new modules to setup
-    if (toastID && newModules.length === 0) {
+    if (toastID && currentlySetuppableModules.length === 0) {
       launchModuleSetupCallback(false)
       eatToast(toastID)
       setToastID('')
     }
-  }, [toastID, newModules])
+  }, [toastID, currentlySetuppableModules])
 }
 
 export function useScrollRef(): {

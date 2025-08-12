@@ -8,7 +8,8 @@ import {
   arrayToWellGroup,
   getCollidingWells,
   getWellSetForMultichannel,
-} from '../../../utils'
+} from '/protocol-designer/utils'
+
 import { SelectionRect } from './SelectionRect'
 import { SingleLabware } from './SingleLabware'
 import { WellTooltip } from './WellTooltip'
@@ -20,10 +21,10 @@ import type {
   WellMouseEvent,
   WellStroke,
 } from '@opentrons/components'
-import type { GenericRect } from '../../../collision-types'
-import type { ContentsByWell } from '../../../labware-ingred/types'
-import type { WellIngredientNames } from '../../../steplist/types'
-import type { NozzleType } from '../../../types'
+import type { GenericRect } from '/protocol-designer/collision-types'
+import type { ContentsByWell } from '/protocol-designer/labware-ingred/types'
+import type { WellIngredientNames } from '/protocol-designer/steplist/types'
+import type { NozzleType } from '/protocol-designer/types'
 
 export interface SelectableLabwareProps {
   labwareProps: Omit<ComponentProps<typeof SingleLabware>, 'selectedWells'>
