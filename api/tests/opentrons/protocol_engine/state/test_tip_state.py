@@ -665,6 +665,64 @@ def test_next_tip_automatic_tip_tracking_tiprack_limits(
     assert _get_next_and_pickup(pipette_nozzle_map) is None
 
 
+def test_96_column_after_row_returns_none(
+    subject: TipStore,
+    load_labware_action: actions.SucceedCommandAction,
+) -> None:
+    """It should return None when there's no valid columns to pick up."""
+    subject.handle_action(load_labware_action)
+
+    def _get_next_and_pickup(nozzle_map: NozzleMap) -> str | None:
+        result = TipView(subject.state).get_next_tip(
+            labware_id="cool-labware",
+            num_tips=0,
+            starting_tip_name=None,
+            nozzle_map=nozzle_map,
+        )
+        if result is not None:
+            pick_up_tip_state_update = update_types.StateUpdate(
+                tips_used=update_types.TipsUsedUpdate(
+                    labware_id="cool-labware",
+                    well_names=TipView(subject.state).compute_tips_to_mark_as_used(
+                        labware_id="cool-labware",
+                        well_name=result,
+                        nozzle_map=nozzle_map,
+                    ),
+                )
+            )
+
+            subject.handle_action(
+                actions.SucceedCommandAction(
+                    command=_dummy_command(),
+                    state_update=pick_up_tip_state_update,
+                )
+            )
+
+        return result
+
+    row_nozzle_map = NozzleMap.build(
+        physical_nozzles=NINETY_SIX_MAP,
+        physical_rows=NINETY_SIX_ROWS,
+        physical_columns=NINETY_SIX_COLS,
+        starting_nozzle="A1",
+        back_left_nozzle="A1",
+        front_right_nozzle="A12",
+        valid_nozzle_maps=ValidNozzleMaps(maps={"RowA": NINETY_SIX_ROWS["A"]}),
+    )
+    assert _get_next_and_pickup(row_nozzle_map) is not None
+
+    col_nozzle_map = NozzleMap.build(
+        physical_nozzles=NINETY_SIX_MAP,
+        physical_rows=NINETY_SIX_ROWS,
+        physical_columns=NINETY_SIX_COLS,
+        starting_nozzle="A1",
+        back_left_nozzle="A1",
+        front_right_nozzle="H1",
+        valid_nozzle_maps=ValidNozzleMaps(maps={"Column1": NINETY_SIX_COLS["1"]}),
+    )
+    assert _get_next_and_pickup(col_nozzle_map) is None
+
+
 def test_handle_batch_labware_loaded_update(
     subject: TipStore, labware_definition: LabwareDefinition
 ) -> None:
