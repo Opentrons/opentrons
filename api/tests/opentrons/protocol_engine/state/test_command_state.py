@@ -438,7 +438,7 @@ def test_nonfatal_command_failure_with_door_open() -> None:
         module_serial=None,
     )
     subject.handle_action(door_open)
-    assert subject_view.get_is_door_blocking() == True
+    assert subject_view.get_is_door_blocking() is True
 
     fail_1 = actions.FailCommandAction(
         command_id="command-id-1",
