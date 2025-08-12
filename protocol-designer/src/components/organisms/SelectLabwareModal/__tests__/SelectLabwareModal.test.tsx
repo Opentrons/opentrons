@@ -11,34 +11,35 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
-import { getEnableStacking } from '../../../../feature-flags/selectors'
-import { getRobotType } from '../../../../file-data/selectors'
-import { createCustomLabwareDef } from '../../../../labware-defs/actions'
-import { getCustomLabwareDefsByURI } from '../../../../labware-defs/selectors'
-import { selectTopLabware } from '../../../../labware-ingred/actions'
-import { selectors } from '../../../../labware-ingred/selectors'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { getEnableStacking } from '/protocol-designer/feature-flags/selectors'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
+import { createCustomLabwareDef } from '/protocol-designer/labware-defs/actions'
+import { getCustomLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
+import { selectTopLabware } from '/protocol-designer/labware-ingred/actions'
+import { selectors } from '/protocol-designer/labware-ingred/selectors'
 import {
   getInitialDeckSetup,
   getPermittedTipracks,
   getPipetteEntities,
-} from '../../../../step-forms/selectors'
-import { getHas96Channel } from '../../../../utils'
-import { SelectLabwareModal } from '../index'
+} from '/protocol-designer/step-forms/selectors'
+import { getHas96Channel } from '/protocol-designer/utils'
+
+import { SelectLabwareModal } from '..'
 
 import type { ComponentProps } from 'react'
 import type { InfoScreen } from '@opentrons/components'
 import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
 
-vi.mock('../../../../step-forms/selectors')
-vi.mock('../../../../utils')
-vi.mock('../../../../labware-ingred/selectors')
-vi.mock('../../../../labware-defs/selectors')
-vi.mock('../../../../labware-defs/actions')
-vi.mock('../../../../file-data/selectors')
-vi.mock('../../../../labware-ingred/actions')
-vi.mock('../../../../feature-flags/selectors')
+vi.mock('/protocol-designer/step-forms/selectors')
+vi.mock('/protocol-designer/utils')
+vi.mock('/protocol-designer/labware-ingred/selectors')
+vi.mock('/protocol-designer/labware-defs/selectors')
+vi.mock('/protocol-designer/labware-defs/actions')
+vi.mock('/protocol-designer/file-data/selectors')
+vi.mock('/protocol-designer/labware-ingred/actions')
+vi.mock('/protocol-designer/feature-flags/selectors')
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof InfoScreen>()
   return {

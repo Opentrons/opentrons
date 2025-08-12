@@ -10,7 +10,7 @@ import {
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { PIPETTE_VOLUMES } from '../../../pages/Onboarding/constants'
+import { PIPETTE_VOLUMES } from '/protocol-designer/pages/Onboarding/constants'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { RobotType } from '@opentrons/shared-data'
@@ -19,7 +19,7 @@ import type {
   PipetteInfoByGen,
   PipetteInfoByType,
   PipetteType,
-} from '../../../pages/Onboarding/types'
+} from '/protocol-designer/pages/Onboarding/types'
 
 interface SelectPipetteVolumeProps {
   pipetteGen: Gen | 'flex'

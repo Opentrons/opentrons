@@ -7,18 +7,18 @@ import { MAGNETIC_MODULE_V1 } from '@opentrons/shared-data'
 import {
   DropdownStepFormField,
   ToggleExpandStepFormField,
-} from '../../../../../../components/molecules'
+} from '/protocol-designer/components/molecules'
 import {
   MAX_ENGAGE_HEIGHT_V1,
   MAX_ENGAGE_HEIGHT_V2,
   MIN_ENGAGE_HEIGHT_V1,
   MIN_ENGAGE_HEIGHT_V2,
-} from '../../../../../../constants'
-import { getModuleEntities } from '../../../../../../step-forms/selectors'
+} from '/protocol-designer/constants'
+import { getModuleEntities } from '/protocol-designer/step-forms/selectors'
 import {
   getMagneticLabwareOptions,
   getMagnetLabwareEngageHeight,
-} from '../../../../../../ui/modules/selectors'
+} from '/protocol-designer/ui/modules/selectors'
 
 import type { StepFormProps } from '../../types'
 

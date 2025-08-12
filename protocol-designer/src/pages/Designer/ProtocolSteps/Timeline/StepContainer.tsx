@@ -23,22 +23,23 @@ import {
   useConditionalConfirm,
 } from '@opentrons/components'
 
-import { LINE_CLAMP_TEXT_STYLE } from '../../../../components/atoms'
+import { LINE_CLAMP_TEXT_STYLE } from '/protocol-designer/components/atoms'
 import {
   ConfirmDeleteModal,
   DELETE_MULTIPLE_STEP_FORMS,
   DELETE_STEP_FORM,
   getMainPagePortalEl,
-} from '../../../../components/organisms'
-import { useKitchen } from '../../../../components/organisms/Kitchen/useKitchen'
-import { actions as steplistActions } from '../../../../steplist'
-import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
+} from '/protocol-designer/components/organisms'
+import { useKitchen } from '/protocol-designer/components/organisms/Kitchen/useKitchen'
+import { actions as steplistActions } from '/protocol-designer/steplist'
+import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import {
   deselectAllSteps,
   populateForm,
-} from '../../../../ui/steps/actions/actions'
-import { getMultiSelectItemIds } from '../../../../ui/steps/selectors'
-import { getHasTrash } from '../../../../utils'
+} from '/protocol-designer/ui/steps/actions/actions'
+import { getMultiSelectItemIds } from '/protocol-designer/ui/steps/selectors'
+import { getHasTrash } from '/protocol-designer/utils'
+
 import { StepOverflowMenu } from './StepOverflowMenu'
 import { capitalizeFirstLetterAfterNumber } from './utils'
 
@@ -49,8 +50,8 @@ import type {
   SetStateAction,
 } from 'react'
 import type { IconName } from '@opentrons/components'
-import type { StepIdType } from '../../../../form-types'
-import type { BaseState } from '../../../../types'
+import type { StepIdType } from '/protocol-designer/form-types'
+import type { BaseState } from '/protocol-designer/types'
 
 const STARTING_DECK_STATE = 'Starting deck'
 const FINAL_DECK_STATE = 'Ending deck'

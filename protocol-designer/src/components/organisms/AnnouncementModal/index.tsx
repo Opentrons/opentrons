@@ -20,7 +20,8 @@ import {
   getLocalStorageItem,
   localStorageAnnouncementKey,
   setLocalStorageItem,
-} from '../../../persist'
+} from '/protocol-designer/persist'
+
 import { RELEASE_NOTES_URL } from '../KnowledgeLink'
 import { useAnnouncements } from './announcements'
 

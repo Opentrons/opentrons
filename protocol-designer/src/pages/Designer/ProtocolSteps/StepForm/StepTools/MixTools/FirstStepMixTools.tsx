@@ -8,7 +8,8 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { InputStepFormField } from '../../../../../../components/molecules'
+import { InputStepFormField } from '/protocol-designer/components/molecules'
+
 import {
   ChangeTipField,
   DropTipField,
@@ -23,7 +24,7 @@ import {
 } from '../../PipetteFields'
 
 import type { PipetteEntities } from '@opentrons/step-generation'
-import type { FormData } from '../../../../../../form-types'
+import type { FormData } from '/protocol-designer/form-types'
 import type { FieldPropsByName } from '../../types'
 
 interface FirstStepMixToolsProps {

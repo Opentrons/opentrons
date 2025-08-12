@@ -23,7 +23,7 @@ import {
 } from '@opentrons/shared-data'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { IngredInputs } from '../../../labware-ingred/types'
+import type { IngredInputs } from '/protocol-designer/labware-ingred/types'
 import type { WellContentsByNumber } from './index'
 
 interface LiquidDetailCardProps {

@@ -16,18 +16,19 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { HARDWARE_ID } from '../../../../steplist'
+import { HARDWARE_ID } from '/protocol-designer/steplist'
 import {
   getHoveredTerminalItemId,
   getSelectedTerminalItemId,
-} from '../../../../ui/steps'
+} from '/protocol-designer/ui/steps'
 import {
   hoverOnTerminalItem,
   selectTerminalItem,
-} from '../../../../ui/steps/actions/actions'
+} from '/protocol-designer/ui/steps/actions/actions'
+
 import { PX_SIDEBAR_MIN_WIDTH_FOR_ICON } from './StepContainer'
 
-import type { ThunkDispatch } from '../../../../types'
+import type { ThunkDispatch } from '/protocol-designer/types'
 
 interface HardwareStepProps {
   sidebarWidth: number

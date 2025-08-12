@@ -4,8 +4,8 @@ import { useSelector } from 'react-redux'
 import {
   ABSORBANCE_READER_INITIALIZE,
   ABSORBANCE_READER_READ,
-} from '../../../../../constants'
-import { getRobotStateAtActiveItem } from '../../../../../top-selectors/labware-locations'
+} from '/protocol-designer/constants'
+import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 
 import type { AbsorbanceReaderState } from '@opentrons/step-generation'
 

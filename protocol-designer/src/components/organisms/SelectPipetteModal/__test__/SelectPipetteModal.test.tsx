@@ -6,25 +6,26 @@ import { fireEvent, screen } from '@testing-library/react'
 
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { getAllowAllTipracks } from '/protocol-designer/feature-flags/selectors'
+import { createCustomTiprackDef } from '/protocol-designer/labware-defs/actions'
+import { getLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
+import { getTiprackOptions } from '/protocol-designer/pages/Onboarding/utils'
+
 import { SelectPipetteModal } from '..'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
-import { getAllowAllTipracks } from '../../../../feature-flags/selectors'
-import { createCustomTiprackDef } from '../../../../labware-defs/actions'
-import { getLabwareDefsByURI } from '../../../../labware-defs/selectors'
-import { getTiprackOptions } from '../../../../pages/Onboarding/utils'
 import { IncompatibleTipsModal } from '../../IncompatibleTipsModal'
 
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
-import type { WizardTileProps } from '../../../../pages/Onboarding/types'
-import type { WizardFormState } from '../../types'
+import type { WizardFormState } from '/protocol-designer/components/organisms/types'
+import type { WizardTileProps } from '/protocol-designer/pages/Onboarding/types'
 
-vi.mock('../../../../labware-defs/actions')
-vi.mock('../../../../pages/Onboarding/utils')
+vi.mock('/protocol-designer/labware-defs/actions')
+vi.mock('/protocol-designer/pages/Onboarding/utils')
 vi.mock('../../IncompatibleTipsModal')
-vi.mock('../../../../labware-defs/selectors')
-vi.mock('../../../../feature-flags/selectors')
+vi.mock('/protocol-designer/labware-defs/selectors')
+vi.mock('/protocol-designer/feature-flags/selectors')
 const mockLocation = vi.fn()
 window.HTMLElement.prototype.scrollIntoView = vi.fn()
 

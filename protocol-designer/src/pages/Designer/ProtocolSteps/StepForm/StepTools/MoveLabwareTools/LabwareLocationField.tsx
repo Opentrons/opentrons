@@ -3,18 +3,18 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
-import { DropdownStepFormField } from '../../../../../../components/molecules'
-import { getEnableStacking } from '../../../../../../feature-flags/selectors'
-import { getLabwareEntities } from '../../../../../../step-forms/selectors'
+import { DropdownStepFormField } from '/protocol-designer/components/molecules'
+import { getEnableStacking } from '/protocol-designer/feature-flags/selectors'
+import { getUnoccupiedStackOptions } from '/protocol-designer/pages/Designer/utils'
+import { getLabwareEntities } from '/protocol-designer/step-forms/selectors'
 import {
   getDeckSetupForActiveItem,
   getRobotStateAtActiveItem,
   getUnoccupiedLabwareLocationOptions,
-} from '../../../../../../top-selectors/labware-locations'
-import { hoverSelection } from '../../../../../../ui/steps/actions/actions'
-import { getUnoccupiedStackOptions } from '../../../../utils'
+} from '/protocol-designer/top-selectors/labware-locations'
+import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
 
-import type { Option } from '../../../../../../top-selectors/labware-locations'
+import type { Option } from '/protocol-designer/top-selectors/labware-locations'
 import type { FieldProps } from '../../types'
 
 interface LabwareLocationFieldProps extends FieldProps {

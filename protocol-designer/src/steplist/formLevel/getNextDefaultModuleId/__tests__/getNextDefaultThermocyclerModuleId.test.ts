@@ -12,7 +12,7 @@ import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
 
 import { getNextDefaultThermocyclerModuleId } from '../getNextDefaultThermocyclerModuleId'
 
-import type { ModuleOnDeck } from '../../../../step-forms'
+import type { ModuleOnDeck } from '/protocol-designer/step-forms'
 
 const getThermocycler = () => ({
   id: 'tcId',

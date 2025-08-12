@@ -23,17 +23,21 @@ import {
 import {
   ConfirmDeleteEntityInUseModal,
   EditNickNameModal,
-} from '../../../components/organisms'
-import { deleteContainer, editSlotInfo } from '../../../labware-ingred/actions'
-import { getIsLabwareOnSlotInUse } from '../../../pages/Designer/DeckSetup/utils'
-import { getSavedStepForms } from '../../../step-forms/selectors'
-import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
-import { getModuleIdFromStack } from '../../../utils'
-import { COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE } from '../../../utils/labwareModuleCompatibility'
+} from '/protocol-designer/components/organisms'
+import {
+  deleteContainer,
+  editSlotInfo,
+} from '/protocol-designer/labware-ingred/actions'
+import { getIsLabwareOnSlotInUse } from '/protocol-designer/pages/Designer/DeckSetup/utils'
+import { getSavedStepForms } from '/protocol-designer/step-forms/selectors'
+import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
+import { getModuleIdFromStack } from '/protocol-designer/utils'
+import { COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE } from '/protocol-designer/utils/labwareModuleCompatibility'
+
 import { LabwareNotCompatibleModal } from '../LabwareNotCompatibleModal'
 
 import type { Dispatch, MouseEvent, SetStateAction } from 'react'
-import type { ThunkDispatch } from '../../../types'
+import type { ThunkDispatch } from '/protocol-designer/types'
 
 interface LabwareCardOverflowMenuProps {
   labwareIds: string[]

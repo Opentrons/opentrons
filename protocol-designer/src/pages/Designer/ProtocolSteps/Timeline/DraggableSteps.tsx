@@ -11,15 +11,16 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { DND_TYPES } from '../../../../constants'
-import { stepIconsByType } from '../../../../form-types'
-import { selectors as stepFormSelectors } from '../../../../step-forms'
+import { DND_TYPES } from '/protocol-designer/constants'
+import { stepIconsByType } from '/protocol-designer/form-types'
+import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
+
 import { ConnectedStepInfo } from './ConnectedStepInfo'
 import { StepContainer } from './StepContainer'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { DragLayerMonitor, DropTargetMonitor } from 'react-dnd'
-import type { StepIdType } from '../../../../form-types'
+import type { StepIdType } from '/protocol-designer/form-types'
 
 export interface ConnectedStepItemProps {
   stepId: StepIdType
