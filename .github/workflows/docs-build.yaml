@@ -67,6 +67,12 @@ jobs:
           script: |
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
+            
+            // Set the actual branch name (not tag name)
+            const actualBranch = context.ref.startsWith('refs/tags/') 
+              ? context.payload.repository.default_branch 
+              : context.ref.replace(/^refs\/heads\//, '')
+            core.exportVariable('ACTUAL_BRANCH', actualBranch)
       - name: 'Build docs'
         run: |
           make -C api docs
@@ -79,7 +85,7 @@ jobs:
         with:
           domain: 'docs.opentrons.com'
           distPath: './api/docs/dist'
-          destPrefix: ${{ github.ref_name }}
+          destPrefix: ${{ env.ACTUAL_BRANCH }}
       - name: 'Configure AWS Credentials for docs bucket'
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -87,4 +93,4 @@ jobs:
           aws-region: us-east-2
       - name: 'Deploy docs to sandbox.docs bucket'
         run: |
-          aws s3 sync ./api/docs/dist/ s3://sandbox.docs/${{ github.ref_name }}/api/ --delete --acl public-read
+          aws s3 sync ./api/docs/dist/ s3://sandbox.docs/${{ env.ACTUAL_BRANCH }}/api/ --delete --acl public-read
