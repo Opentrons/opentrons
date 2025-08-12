@@ -14,7 +14,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { transfer } from '../commandCreators/compound/transfer'
-import { FIXED_TRASH_ID } from '../constants'
+import { CLEAN, FIXED_TRASH_ID } from '../constants'
 import {
   aspirateHelperLiquidClass,
   blowoutInTrashCommands,
@@ -880,7 +880,7 @@ describe('single transfer exceeding pipette max', () => {
       volume: 350,
     } as TransferArgs
     // tip setup: tiprack's A1 has tip, pipette has no tip
-    robotStateWithTip.tipState.tipracks.tiprack1Id.A1 = true
+    robotStateWithTip.tipState.tipracks.tiprack1Id.A1 = CLEAN
     robotStateWithTip.tipState.pipettes.p300SingleId = {
       hasTip: false,
       tiprackURI: null,

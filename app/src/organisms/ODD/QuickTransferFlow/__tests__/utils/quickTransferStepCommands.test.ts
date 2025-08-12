@@ -6,7 +6,10 @@ import {
   fixtureTiprack1000ul,
   POSITION_REFERENCE_BOTTOM,
 } from '@opentrons/shared-data'
-import { SOURCE_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
+import {
+  CLEAN,
+  SOURCE_WELL_BLOWOUT_DESTINATION,
+} from '@opentrons/step-generation'
 
 import { quickTransferStepCommands } from '../../utils/pythonDef'
 
@@ -85,8 +88,8 @@ const mockRobotState: TimelineFrame = {
   tipState: {
     tipracks: {
       mockTiprack: {
-        A1: true,
-        B1: true,
+        A1: CLEAN,
+        B1: CLEAN,
       },
     },
     pipettes: {
