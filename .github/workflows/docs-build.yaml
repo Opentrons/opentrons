@@ -69,11 +69,35 @@ jobs:
             buildComplexEnvVars(core, context)
             
             // Set the actual branch name (not tag name)
-            const actualBranch = context.ref.startsWith('refs/tags/') 
-              ? context.payload.head_ref || context.payload.base_ref || context.payload.repository.default_branch
-              : context.ref.replace(/^refs\/heads\//, '')
+            let actualBranch
+            if (context.ref.startsWith('refs/tags/')) {
+              // For tags, get the branch from the tag's commit
+              const tagName = context.ref.replace(/^refs\/tags\//, '')
+              try {
+                const branches = await github.rest.repos.listBranches({ owner: context.repo.owner, repo: context.repo.repo })
+                const tagCommit = await github.rest.git.getRef({ owner: context.repo.owner, repo: context.repo.repo, ref: `tags/${tagName}` })
+                const commitSha = tagCommit.data.object.sha
+                
+                // Find which branch contains this commit
+                for (const branch of branches.data) {
+                  const branchCommit = await github.rest.repos.getBranch({ owner: context.repo.owner, repo: context.repo.repo, branch: branch.name })
+                  if (branchCommit.data.commit.sha === commitSha) {
+                    actualBranch = branch.name
+                    break
+                  }
+                }
+                if (!actualBranch) {
+                  actualBranch = context.payload.repository.default_branch
+                }
+              } catch (error) {
+                console.log('Error finding branch for tag, using default branch')
+                actualBranch = context.payload.repository.default_branch
+              }
+            } else {
+              actualBranch = context.ref.replace(/^refs\/heads\//, '')
+            }
             core.exportVariable('ACTUAL_BRANCH', actualBranch)
-            console.log(`Using branch: ${actualBranch} (ref: ${context.ref}, head_ref: ${context.payload.head_ref}, base_ref: ${context.payload.base_ref})`)
+            console.log(`Using branch: ${actualBranch} (ref: ${context.ref})`)
       - name: 'Build docs'
         run: |
           make -C api docs
