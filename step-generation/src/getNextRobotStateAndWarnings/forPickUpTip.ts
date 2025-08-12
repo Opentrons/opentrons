@@ -2,8 +2,10 @@ import assert from 'assert'
 
 import { ALL, COLUMN, getIsTiprack, SINGLE } from '@opentrons/shared-data'
 
+import { EMPTY } from '../constants'
+import { InvariantContext, RobotStateAndWarnings } from '../types'
+
 import type { PickUpTipParams } from '@opentrons/shared-data'
-import type { InvariantContext, RobotStateAndWarnings } from '../types'
 
 export function forPickUpTip(
   params: PickUpTipParams,
@@ -24,7 +26,7 @@ export function forPickUpTip(
   tipState.pipettes[pipetteId].tiprackURI = labwareId
   // remove tips from tiprack
   if (pipetteSpec.channels === 1 || nozzles === SINGLE) {
-    tipState.tipracks[labwareId][wellName] = false
+    tipState.tipracks[labwareId][wellName] = EMPTY
   } else if (pipetteSpec.channels === 8 || nozzles === COLUMN) {
     const allWells = tiprackDef.ordering.find(col => col[0] === wellName)
 
@@ -34,7 +36,7 @@ export function forPickUpTip(
     }
 
     allWells.forEach(function (wellName) {
-      tipState.tipracks[labwareId][wellName] = false
+      tipState.tipracks[labwareId][wellName] = EMPTY
     })
   } else if (pipetteSpec.channels === 96 && nozzles === ALL) {
     const allTips: string[] = tiprackDef.ordering.reduce(
@@ -42,7 +44,7 @@ export function forPickUpTip(
       []
     )
     allTips.forEach(function (wellName) {
-      tipState.tipracks[labwareId][wellName] = false
+      tipState.tipracks[labwareId][wellName] = EMPTY
     })
   }
   // update tiprackID assosciated with pipette for configureNozzleLayout
