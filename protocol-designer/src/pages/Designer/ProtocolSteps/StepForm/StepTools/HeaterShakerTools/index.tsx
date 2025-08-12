@@ -14,9 +14,9 @@ import {
   DropdownStepFormField,
   ToggleExpandStepFormField,
   ToggleStepFormField,
-} from '../../../../../../components/molecules'
-import { getHeaterShakerLabwareOptions } from '../../../../../../ui/modules/selectors'
-import { hoverSelection } from '../../../../../../ui/steps/actions/actions'
+} from '/protocol-designer/components/molecules'
+import { getHeaterShakerLabwareOptions } from '/protocol-designer/ui/modules/selectors'
+import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
 
 import type { StepFormProps } from '../../types'
 

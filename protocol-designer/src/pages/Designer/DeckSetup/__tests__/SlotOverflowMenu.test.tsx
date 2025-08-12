@@ -6,21 +6,22 @@ import { fireEvent, screen } from '@testing-library/react'
 
 import { fixture96Plate } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
 import {
   ConfirmDeleteEntityInUseModal,
   EditNickNameModal,
-} from '../../../../components/organisms'
-import { useKitchen } from '../../../../components/organisms/Kitchen/useKitchen'
+} from '/protocol-designer/components/organisms'
+import { useKitchen } from '/protocol-designer/components/organisms/Kitchen/useKitchen'
 import {
   deleteContainer,
   duplicateLabware,
-} from '../../../../labware-ingred/actions'
-import { selectors as labwareIngredSelectors } from '../../../../labware-ingred/selectors'
-import { getNextAvailableDeckSlot } from '../../../../labware-ingred/utils'
-import { getSavedStepForms } from '../../../../step-forms/selectors'
-import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
+} from '/protocol-designer/labware-ingred/actions'
+import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
+import { getNextAvailableDeckSlot } from '/protocol-designer/labware-ingred/utils'
+import { getSavedStepForms } from '/protocol-designer/step-forms/selectors'
+import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
+
 import { SlotOverflowMenu } from '../SlotOverflowMenu'
 import { getIsLabwareOnSlotInUse } from '../utils'
 
@@ -31,14 +32,14 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 const mockNavigate = vi.fn()
 
 vi.mock('../utils')
-vi.mock('../../../../step-forms/selectors')
-vi.mock('../../../../top-selectors/labware-locations')
-vi.mock('../../../../labware-ingred/actions')
-vi.mock('../../../../labware-ingred/selectors')
-vi.mock('../../../../components/organisms')
-vi.mock('../../../../file-data/selectors')
-vi.mock('../../../../labware-ingred/utils')
-vi.mock('../../../../components/organisms/Kitchen/useKitchen')
+vi.mock('/protocol-designer/step-forms/selectors')
+vi.mock('/protocol-designer/top-selectors/labware-locations')
+vi.mock('/protocol-designer/labware-ingred/actions')
+vi.mock('/protocol-designer/labware-ingred/selectors')
+vi.mock('/protocol-designer/components/organisms')
+vi.mock('/protocol-designer/file-data/selectors')
+vi.mock('/protocol-designer/labware-ingred/utils')
+vi.mock('/protocol-designer/components/organisms/Kitchen/useKitchen')
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<NavigateFunction>()
   return {

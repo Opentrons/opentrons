@@ -29,16 +29,17 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
-import { setFeatureFlags } from '../../../feature-flags/actions'
-import { getAllowAllTipracks } from '../../../feature-flags/selectors'
-import { createCustomTiprackDef } from '../../../labware-defs/actions'
-import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
+import { setFeatureFlags } from '/protocol-designer/feature-flags/actions'
+import { getAllowAllTipracks } from '/protocol-designer/feature-flags/selectors'
+import { createCustomTiprackDef } from '/protocol-designer/labware-defs/actions'
+import { getLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
 import {
   PIPETTE_GENS,
   PIPETTE_TYPES,
   PIPETTE_VOLUMES,
-} from '../../../pages/Onboarding/constants'
-import { removeOpentronsPhrases } from '../../../utils'
+} from '/protocol-designer/pages/Onboarding/constants'
+import { removeOpentronsPhrases } from '/protocol-designer/utils'
+
 import { getShouldShowPipetteType, getTiprackOptions } from './utils'
 
 import type { PipetteName, RobotType } from '@opentrons/shared-data'
@@ -47,9 +48,9 @@ import type {
   PipetteInfoByGen,
   PipetteInfoByType,
   PipetteType,
-} from '../../../pages/Onboarding/types'
-import type { PipetteOnDeck } from '../../../step-forms'
-import type { ThunkDispatch } from '../../../types'
+} from '/protocol-designer/pages/Onboarding/types'
+import type { PipetteOnDeck } from '/protocol-designer/step-forms'
+import type { ThunkDispatch } from '/protocol-designer/types'
 import type { PipetteConfig } from './usePipetteConfig'
 
 interface PipetteConfigurationProps {

@@ -9,7 +9,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { replaceTip } from '../commandCreators/compound/replaceTip'
-import { FIXED_TRASH_ID } from '../constants'
+import { EMPTY, FIXED_TRASH_ID } from '../constants'
 import {
   DEFAULT_PIPETTE,
   dropTipHelper,
@@ -70,7 +70,7 @@ describe('replaceTip', () => {
           tipState: {
             tipracks: {
               [tiprack1Id]: {
-                A1: false,
+                A1: EMPTY,
               },
             },
             pipettes: {
@@ -86,7 +86,7 @@ describe('replaceTip', () => {
       const initialTestRobotState = merge({}, initialRobotState, {
         tipState: {
           tipracks: {
-            [tiprack1Id]: getTipColumn(1, false),
+            [tiprack1Id]: getTipColumn(1, EMPTY),
           },
           pipettes: {
             p300SingleId: { hasTip: false },
@@ -110,7 +110,7 @@ describe('replaceTip', () => {
         tipState: {
           tipracks: {
             [tiprack1Id]: {
-              A1: false,
+              A1: EMPTY,
             },
           },
           pipettes: {
@@ -138,7 +138,7 @@ describe('replaceTip', () => {
         tipState: {
           tipracks: {
             [tiprack1Id]: {
-              A1: false,
+              A1: EMPTY,
             },
           },
           pipettes: {
@@ -218,7 +218,7 @@ describe('replaceTip', () => {
         tipState: {
           tipracks: {
             [tiprack1Id]: {
-              A1: false,
+              A1: EMPTY,
             },
           },
           pipettes: {
@@ -267,7 +267,10 @@ describe('replaceTip', () => {
         tipState: {
           ...initialRobotState.tipState,
           tipracks: {
-            [tiprack1Id]: { ...getTiprackTipstate(true), A1: false },
+            [tiprack1Id]: {
+              ...getTiprackTipstate(true),
+              A1: EMPTY,
+            },
             [tiprack2Id]: getTiprackTipstate(true),
           },
         },

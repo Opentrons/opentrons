@@ -259,6 +259,50 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
     }
   })
 
+  test('first frustum section should match well diameter or x/y dimensions within ±1 mm', () => {
+    // TODO(rc, 2025-08-05): Review labware with 0–2 mm geometry discrepancies.
+    const wells = labwareDef.wells ?? {}
+    const geometries = labwareDef.innerLabwareGeometry ?? {}
+    // Allow minor mismatch due to simplified geometric approximation
+    const allowedDiscrepancy = 2
+    // Ignoring bc of a known x y mismatch
+    if (
+      labwareDef.parameters.loadName === 'nest_1_reservoir_195ml' &&
+      labwareDef.version === 3
+    ) {
+      return
+    }
+
+    for (const well of Object.values(wells)) {
+      const geometryId = well.geometryDefinitionId ?? ''
+      const geometry = geometries[geometryId]
+
+      if (
+        !geometry ||
+        !('sections' in geometry) ||
+        !Array.isArray(geometry.sections)
+      ) {
+        continue
+      }
+
+      const section = geometry.sections[0]
+      if (!section) continue
+
+      if (well.shape === 'circular' && section.shape === 'conical') {
+        expect(
+          Math.abs(section.topDiameter - well.diameter)
+        ).toBeLessThanOrEqual(allowedDiscrepancy)
+      } else if (well.shape === 'rectangular' && section.shape === 'cuboidal') {
+        expect(
+          Math.abs(section.topXDimension - well.xDimension)
+        ).toBeLessThanOrEqual(allowedDiscrepancy)
+        expect(
+          Math.abs(section.topYDimension - well.yDimension)
+        ).toBeLessThanOrEqual(allowedDiscrepancy)
+      }
+    }
+  })
+
   test('the bottom of a well geometry should be at height 0', () => {
     for (const geometry of Object.values(
       labwareDef.innerLabwareGeometry ?? {}

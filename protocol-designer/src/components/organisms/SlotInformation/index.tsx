@@ -22,8 +22,8 @@ import {
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 
-import { useDeckSetupWindowBreakPoint } from '../../../pages/Designer/DeckSetup/utils'
-import { LINE_CLAMP_TEXT_STYLE } from '../../atoms'
+import { LINE_CLAMP_TEXT_STYLE } from '/protocol-designer/components/atoms'
+import { useDeckSetupWindowBreakPoint } from '/protocol-designer/pages/Designer/DeckSetup/utils'
 
 import type { FC } from 'react'
 import type { RobotType } from '@opentrons/shared-data'

@@ -85,6 +85,7 @@ def create_csv_test_report(
     trials: int,
     name: str,
     run_id: str,
+    dont_write_to_disk: bool = False,
 ) -> CSVReport:
     """Create CSV test report."""
     env_info = [field.name.replace("_", "-") for field in fields(EnvironmentData)]
@@ -129,6 +130,7 @@ def create_csv_test_report(
         test_name=name,
         run_id=run_id,
         validate_meta_data=False,  # to avoid >3 columns in CSV (:shrug:)
+        dont_write_to_disk=dont_write_to_disk,
         sections=[
             CSVSection(
                 title="SERIAL-NUMBERS",

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { css } from 'styled-components'
 
 import type { MouseEventHandler, ReactNode } from 'react'
-import type { DragRect, GenericRect } from '../../../collision-types'
+import type { DragRect, GenericRect } from '/protocol-designer/collision-types'
 
 const blueColor = '#5fd8ee'
 const blueColorAlpha = '#5fd8ee4d'

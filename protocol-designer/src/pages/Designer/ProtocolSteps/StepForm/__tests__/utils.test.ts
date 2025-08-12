@@ -11,7 +11,8 @@ import {
   FLEX_HIGH_THROUGHPUT_PLUNGER_MAX_SPEED,
   FLEX_LOW_THROUGHPUT_PLUNGER_MAX_SPEED,
   OT2_PLUNGER_MAX_SPEED,
-} from '../../../../../constants'
+} from '/protocol-designer/constants'
+
 import { getMaxUiFlowRate } from '../PipetteFields/utils'
 import {
   capitalizeFirstLetter,
@@ -20,7 +21,7 @@ import {
 } from '../utils'
 
 import type { PipetteChannels } from '@opentrons/shared-data'
-import type { FormErrorLocationType } from '../../../../../steplist/formLevel/errors'
+import type { FormErrorLocationType } from '/protocol-designer/steplist/formLevel/errors'
 
 const BASE_VISIBLE_FORM_ERROR = {
   title: 'form level error title',
