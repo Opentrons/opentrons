@@ -10,7 +10,6 @@ import {
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import {
   getEnablePartialTipSupport,
-  getEnableReturnTip,
   getEnableTipPickupLocation,
 } from '/protocol-designer/feature-flags/selectors'
 import { getRobotType } from '/protocol-designer/file-data/selectors'

@@ -10,7 +10,6 @@ import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
 } from '/protocol-designer/step-forms/selectors'
-import { getAllTiprackOptions } from '/protocol-designer/ui/labware/selectors'
 
 import type { DropdownOption } from '@opentrons/components'
 import type { NozzleConfigurationStyle } from '@opentrons/shared-data'

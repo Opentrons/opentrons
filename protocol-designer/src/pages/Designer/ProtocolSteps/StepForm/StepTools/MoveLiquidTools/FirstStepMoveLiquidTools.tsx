@@ -11,7 +11,6 @@ import {
 
 import {
   getEnablePartialTipSupport,
-  getEnableReturnTip,
   getEnableTipPickupLocation,
 } from '/protocol-designer/feature-flags/selectors'
 import {

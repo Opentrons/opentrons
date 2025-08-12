@@ -2,7 +2,6 @@ import { useSelector } from 'react-redux'
 
 import {
   getEnablePartialTipSupport,
-  getEnableReturnTip,
   getEnableTipPickupLocation,
 } from '/protocol-designer/feature-flags/selectors'
 import {
