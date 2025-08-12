@@ -19,6 +19,7 @@ export const SUGGESTED_XY_RANGE = 1
 
 export const MAX_Z_DIMENSION = 195
 export const MAX_SUGGESTED_Z = 124
+export const MAX_SUGGESTED_GRIPPER_Z = 155
 
 export const DISPLAY_VOLUME_UNITS = 'µL'
 
@@ -110,6 +111,7 @@ export interface LabwareFields {
   footprintXDimension: string | null | undefined
   footprintYDimension: string | null | undefined
   labwareZDimension: string | null | undefined
+  stackedLabwareZDimension: number | null | undefined
 
   gridRows: string | null | undefined
   gridColumns: string | null | undefined
@@ -163,6 +165,7 @@ export interface ProcessedLabwareFields {
   footprintXDimension: number
   footprintYDimension: number
   labwareZDimension: number
+  stackedLabwareZDimension: number
 
   gridRows: number
   gridColumns: number
@@ -386,7 +389,7 @@ export const getDefaultFormState = (): LabwareFields => ({
   footprintXDimension: null,
   footprintYDimension: null,
   labwareZDimension: null,
-
+  stackedLabwareZDimension: null,
   gridRows: null,
   gridColumns: null,
   gridSpacingX: null,
@@ -454,6 +457,7 @@ export const LABELS: Record<keyof LabwareFields, string> = {
   loadName: 'API Load Name',
   compatibleAdapters: 'Is this labware compatible with an adapter?',
   compatibleModules: 'Is this labware compatible with a module?',
+  stackedLabwareZDimension: 'Stacked Labware Height',
 }
 
 export const getLabel = (

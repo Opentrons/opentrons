@@ -106,6 +106,16 @@ export function fieldsToLabware(
     const isTiprack = fields.labwareType === 'tipRack'
 
     const stackingOffsetWithLabware: Record<string, LabwareOffset> = {}
+    // Add entry for stacking on itself
+    if (fields.stackedLabwareZDimension != null) {
+      stackingOffsetWithLabware[fields.loadName] = {
+        x: 0,
+        y: 0,
+        z:
+          2 * fields.labwareZDimension -
+          Number(fields.stackedLabwareZDimension),
+      }
+    }
     Object.entries(compatibleAdapters).forEach(([loadName, z]) => {
       const adapterHeight =
         adapterDefinitions != null
@@ -120,6 +130,7 @@ export function fieldsToLabware(
         z: fields.labwareZDimension + adapterHeight - parseFloat(String(z)),
       })
     })
+
     const stackingOffsetWithModule: Record<string, LabwareOffset> = {}
     Object.entries(compatibleModules).forEach(([moduleModel, z]) => {
       const moduleDefinition = getModuleDef(moduleModel as ModuleModel)

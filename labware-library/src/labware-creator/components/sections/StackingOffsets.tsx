@@ -24,6 +24,7 @@ import { makeMaskToDecimal } from '../../fieldMasks'
 import styles from '../../styles.module.css'
 import { isEveryFieldHidden } from '../../utils'
 import { FormAlerts } from '../alerts/FormAlerts'
+import { StackingAlerts } from '../alerts/StackingAlerts'
 import { TextField } from '../TextField'
 import { SectionBody } from './SectionBody'
 
@@ -31,12 +32,14 @@ import type { LabwareDefinition2, ModuleModel } from '@opentrons/shared-data'
 import type { LabwareFields } from '../../fields'
 
 import src from '../../../images/stacking_offsets.svg'
+import heightOfTwoPlates from '../../images/height_stacked_labware.svg'
 
 const HIGHEST_TC_COMPATIBLE_LABWARE_HEIGHT = 16.06
 const MODULE_MODELS_WITH_NO_ADAPTERS: ModuleModel[] = [
   MAGNETIC_BLOCK_V1,
   THERMOCYCLER_MODULE_V2,
 ]
+const maskTo2Decimal = makeMaskToDecimal(2)
 
 export function StackingOffsets(): JSX.Element | null {
   const labwareDefinitions = getAllDefinitions()
@@ -47,6 +50,7 @@ export function StackingOffsets(): JSX.Element | null {
   const fieldList: Array<keyof LabwareFields> = [
     'compatibleAdapters',
     'compatibleModules',
+    'stackedLabwareZDimension',
   ]
   const {
     values,
@@ -179,23 +183,47 @@ export function StackingOffsets(): JSX.Element | null {
             <div className={styles.instructions_column}>
               <p>
                 Stacking offset is only required for labware that can be placed
-                on an adapter or module. Select the compatible adapters or
-                modules below.
+                on an adapter, module, or itself. Select the compatible objects
+                below.
               </p>
               <p>
-                Stack the labware onto the adapter or module and then make the
-                required measurement with calipers.
+                Stack the labware onto the adapter, module, or itself and then
+                make the required measurement with calipers.
               </p>
             </div>
-            <img src={src} alt="Stacking offset image" />
+
             {modifiedAdapterDefinitions.length === 0 ? null : (
               <Flex gridGap={SPACING.spacing4} flexDirection={DIRECTION_COLUMN}>
                 <LegacyStyledText
                   as="h3"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 >
+                  Labware
+                </LegacyStyledText>
+                <img
+                  src={heightOfTwoPlates}
+                  alt="Labware stacking offset image"
+                  style={{ width: '300px', height: 'auto' }}
+                />
+                <div className={styles.form_fields_column}>
+                  <TextField
+                    name="stackedLabwareZDimension"
+                    inputMasks={[maskTo2Decimal]}
+                    units="mm"
+                  />
+                  <StackingAlerts values={values} touched={touched} />
+                </div>
+                <LegacyStyledText
+                  as="h3"
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                >
                   Adapters
                 </LegacyStyledText>
+                <img
+                  src={src}
+                  alt="Stacking offset image"
+                  style={{ width: '300px', height: 'auto' }}
+                />
                 {modifiedAdapterDefinitions.map((definition, index) => {
                   const key = definition.parameters.loadName
                   const fieldName = `compatibleAdapters.${key}`
@@ -359,4 +387,8 @@ export function StackingOffsets(): JSX.Element | null {
       </SectionBody>
     </div>
   )
+}
+export function useStackedLabwareZDimension(): number | null {
+  const { values } = useFormikContext<LabwareFields>()
+  return values.stackedLabwareZDimension ?? null
 }

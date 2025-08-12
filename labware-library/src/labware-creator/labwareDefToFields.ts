@@ -84,6 +84,7 @@ export function labwareDefToFields(
   const firstGroup: LabwareWellGroup | undefined = def.groups[0]
   const firstGroupBrand = firstGroup?.brand
   const zDimension = def.dimensions.zDimension
+  const stackedLabwareZDimension: number | null | undefined = 0
   const compatibleAdapters: Record<string, number> =
     def.stackingOffsetWithLabware != null
       ? Object.entries(
@@ -92,13 +93,18 @@ export function labwareDefToFields(
           const adapterZDimension = Object.values(adapterDefinitions).find(
             def => def.parameters.loadName === loadName
           )?.dimensions.zDimension
+
           if (adapterZDimension != null) {
             acc[loadName] = adapterZDimension + zDimension - offset.z
           }
-
+          if (stackedLabwareZDimension != null) {
+            acc[def.parameters.loadName] =
+              zDimension * 2 - stackedLabwareZDimension
+          }
           return acc
         }, {})
       : {}
+
   const compatibleModules: Record<string, number> =
     def.stackingOffsetWithModule != null
       ? Object.entries(
@@ -154,11 +160,11 @@ export function labwareDefToFields(
     brandId: def.brand.brandId != null ? def.brand.brandId.join(',') : null, // comma-separated values
     groupBrand: firstGroupBrand?.brand,
     groupBrandId: firstGroupBrand?.brandId?.join(',') ?? undefined,
-
     // NOTE: intentionally null these fields, do not import them
     loadName: null,
     displayName: null,
     compatibleAdapters,
     compatibleModules,
+    stackedLabwareZDimension,
   }
 }
