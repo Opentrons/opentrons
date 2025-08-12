@@ -12,38 +12,42 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 
-import { Ot2Modules } from '..'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { MagnetModuleChangeContent } from '/protocol-designer/components/molecules'
+import { ConfirmDeleteEntityInUseModal } from '/protocol-designer/components/organisms/ConfirmDeleteEntityInUseModal'
+import { useKitchen } from '/protocol-designer/components/organisms/Kitchen/useKitchen'
 import {
   getDisableModuleRestrictions,
   getEnableMutlipleTempsOT2,
-} from '../../../../feature-flags/selectors'
-import { deleteModule, getAllModuleSlotsByTypeOt2 } from '../../../../modules'
-import { createModule } from '../../../../step-forms/actions'
-import { createModuleEntityAndChangeForm } from '../../../../step-forms/actions/thunks'
+} from '/protocol-designer/feature-flags/selectors'
+import {
+  deleteModule,
+  getAllModuleSlotsByTypeOt2,
+} from '/protocol-designer/modules'
+import { createModule } from '/protocol-designer/step-forms/actions'
+import { createModuleEntityAndChangeForm } from '/protocol-designer/step-forms/actions/thunks'
 import {
   getInitialDeckSetup,
   getSavedStepForms,
-} from '../../../../step-forms/selectors'
-import { getDismissedHints } from '../../../../tutorial/selectors'
-import { MagnetModuleChangeContent } from '../../../molecules'
-import { ConfirmDeleteEntityInUseModal } from '../../ConfirmDeleteEntityInUseModal'
-import { useKitchen } from '../../Kitchen/useKitchen'
+} from '/protocol-designer/step-forms/selectors'
+import { getDismissedHints } from '/protocol-designer/tutorial/selectors'
+
+import { Ot2Modules } from '..'
 import { getModuleOnSlot } from '../util'
 
 import type * as Components from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-vi.mock('../../../../feature-flags/selectors')
-vi.mock('../../../../step-forms/selectors')
-vi.mock('../../../../step-forms/actions')
-vi.mock('../../../../modules')
-vi.mock('../../Kitchen/useKitchen')
-vi.mock('../../../../tutorial/selectors')
-vi.mock('../../../../step-forms/actions/thunks')
-vi.mock('../../ConfirmDeleteEntityInUseModal')
-vi.mock('../../../molecules')
+vi.mock('/protocol-designer/feature-flags/selectors')
+vi.mock('/protocol-designer/step-forms/selectors')
+vi.mock('/protocol-designer/step-forms/actions')
+vi.mock('/protocol-designer/modules')
+vi.mock('/protocol-designer/components/organisms/Kitchen/useKitchen')
+vi.mock('/protocol-designer/tutorial/selectors')
+vi.mock('/protocol-designer/step-forms/actions/thunks')
+vi.mock('/protocol-designer/components/organisms/ConfirmDeleteEntityInUseModal')
+vi.mock('/protocol-designer/components/molecules')
 vi.mock('../util')
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof Components>()

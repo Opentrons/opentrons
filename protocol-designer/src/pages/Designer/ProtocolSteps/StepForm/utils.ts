@@ -9,12 +9,12 @@ import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
 
-import { i18n } from '../../../../assets/localization'
-import { PROFILE_CYCLE } from '../../../../form-types'
+import { i18n } from '/protocol-designer/assets/localization'
+import { PROFILE_CYCLE } from '/protocol-designer/form-types'
 import {
   getDefaultsForStepType,
   getDisabledFields,
-} from '../../../../steplist/formLevel'
+} from '/protocol-designer/steplist/formLevel'
 
 import type { DropdownOption } from '@opentrons/components'
 import type { PipetteEntity } from '@opentrons/step-generation'
@@ -25,12 +25,12 @@ import type {
   ProfileItem,
   StepFieldName,
   StepType,
-} from '../../../../form-types'
-import type { FormError } from '../../../../steplist/formLevel'
-import type { ProfileFormError } from '../../../../steplist/formLevel/profileErrors'
-import type { FormWarning } from '../../../../steplist/formLevel/warnings'
-import type { StepFormErrors } from '../../../../steplist/types'
-import type { NozzleType } from '../../../../types'
+} from '/protocol-designer/form-types'
+import type { FormError } from '/protocol-designer/steplist/formLevel'
+import type { ProfileFormError } from '/protocol-designer/steplist/formLevel/profileErrors'
+import type { FormWarning } from '/protocol-designer/steplist/formLevel/warnings'
+import type { StepFormErrors } from '/protocol-designer/steplist/types'
+import type { NozzleType } from '/protocol-designer/types'
 import type { FieldProps, FieldPropsByName, FocusHandlers } from './types'
 
 export function getBlowoutLocationOptionsForForm(args: {

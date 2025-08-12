@@ -6,23 +6,24 @@ import { fireEvent, screen } from '@testing-library/react'
 
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../assets/localization'
-import { IncompatibleTipsModal } from '../../../components/organisms'
-import { getAllowAllTipracks } from '../../../feature-flags/selectors'
-import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { IncompatibleTipsModal } from '/protocol-designer/components/organisms'
+import { getAllowAllTipracks } from '/protocol-designer/feature-flags/selectors'
+import { getLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
+
 import { SelectBasics } from '../SelectBasics'
 import { getTiprackOptions } from '../utils'
 
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
-import type { WizardFormState } from '../../../components/organisms'
+import type { WizardFormState } from '/protocol-designer/components/organisms'
 import type { WizardTileProps } from '../types'
 
-vi.mock('../../../labware-defs/selectors')
-vi.mock('../../../feature-flags/selectors')
-vi.mock('../../../components/organisms')
-vi.mock('../../../labware-defs/actions')
+vi.mock('/protocol-designer/labware-defs/selectors')
+vi.mock('/protocol-designer/feature-flags/selectors')
+vi.mock('/protocol-designer/components/organisms')
+vi.mock('/protocol-designer/labware-defs/actions')
 vi.mock('../utils')
 const mockLocation = vi.fn()
 window.HTMLElement.prototype.scrollIntoView = vi.fn()

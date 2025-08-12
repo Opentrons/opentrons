@@ -10,10 +10,10 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { actions as featureFlagActions } from '../../../feature-flags'
-import { ToggleButton } from '../../atoms/ToggleButton'
+import { ToggleButton } from '/protocol-designer/components/atoms/ToggleButton'
+import { actions as featureFlagActions } from '/protocol-designer/feature-flags'
 
-import type { FlagTypes } from '../../../feature-flags'
+import type { FlagTypes } from '/protocol-designer/feature-flags'
 
 interface FeatureFlagProps {
   flags: Partial<Record<FlagTypes, boolean | null | undefined>>

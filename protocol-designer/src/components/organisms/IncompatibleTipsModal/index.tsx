@@ -11,11 +11,11 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { setFeatureFlags } from '../../../feature-flags/actions'
-import { HandleEnter } from '../../atoms'
+import { HandleEnter } from '/protocol-designer/components/atoms'
+import { setFeatureFlags } from '/protocol-designer/feature-flags/actions'
 
 import type { ThunkDispatch } from 'redux-thunk'
-import type { BaseState } from '../../../types'
+import type { BaseState } from '/protocol-designer/types'
 
 interface IncompatibleTipsProps {
   onClose: () => void

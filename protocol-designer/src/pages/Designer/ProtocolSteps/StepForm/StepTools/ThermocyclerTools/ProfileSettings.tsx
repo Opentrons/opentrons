@@ -7,7 +7,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { InputStepFormField } from '../../../../../../components/molecules'
+import { InputStepFormField } from '/protocol-designer/components/molecules'
 
 import type { FieldPropsByName } from '../../types'
 

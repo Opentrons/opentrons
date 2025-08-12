@@ -13,11 +13,12 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
-import { InputStepFormField } from '../../../../../../components/molecules'
+import { InputStepFormField } from '/protocol-designer/components/molecules'
+
 import { PositionField } from '../../PipetteFields'
 
-import type { FormData, ReferenceFields } from '../../../../../../form-types'
-import type { MoveLiquidPrefixType } from '../../../../../../resources/types'
+import type { FormData, ReferenceFields } from '/protocol-designer/form-types'
+import type { MoveLiquidPrefixType } from '/protocol-designer/resources/types'
 import type { FieldPropsByName } from '../../types'
 
 export interface StepInputFieldProps {

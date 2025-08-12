@@ -26,18 +26,18 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
-import { LINK_BUTTON_STYLE } from '../../../../../../components/atoms'
+import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
 import {
   ABSORBANCE_READER_MAX_WAVELENGTH_NM,
   ABSORBANCE_READER_MIN_WAVELENGTH_NM,
-} from '../../../../../../constants'
-import { maskToInteger } from '../../../../../../steplist/fieldLevel/processing'
+} from '/protocol-designer/constants'
+import { maskToInteger } from '/protocol-designer/steplist/fieldLevel/processing'
 
 import type { TFunction } from 'i18next'
 import type { Dispatch, SetStateAction } from 'react'
 import type { DropdownOption } from '@opentrons/components'
-import type { FormData } from '../../../../../../form-types'
-import type { InitializationMode } from '../../../../../../step-forms/types'
+import type { FormData } from '/protocol-designer/form-types'
+import type { InitializationMode } from '/protocol-designer/step-forms/types'
 import type { FieldProps, FieldPropsByName } from '../../types'
 
 const MAX_WAVELENGTHS = 6
