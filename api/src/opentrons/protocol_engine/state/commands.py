@@ -374,7 +374,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             prev_entry.command.intent in (CommandIntent.PROTOCOL, None)
             and action.type == ErrorRecoveryType.WAIT_FOR_RECOVERY
         ):
-            if self._state.is_door_blocking:
+            if self._state.queue_status == QueueStatus.PAUSED or self._state.is_door_blocking:
                 self._state.queue_status = QueueStatus.AWAITING_RECOVERY_PAUSED
             else:
                 self._state.queue_status = QueueStatus.AWAITING_RECOVERY
