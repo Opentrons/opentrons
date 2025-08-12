@@ -59,6 +59,13 @@ class StoreParams(BaseModel):
         ...,
         description="Unique ID of the flex stacker.",
     )
+    manualMove: bool | SkipJsonSchema[None] = Field(
+        None,
+        description=(
+            "If true, indicates that the store action is being performed manually, "
+            "as done in error recovery, without moving the stacker hardware."
+        ),
+    )
 
 
 class StoreResult(BaseModel):
@@ -201,42 +208,44 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
         stacker_hw = self._equipment.get_module_hardware_api(stacker_state.module_id)
 
         state_update = update_types.StateUpdate()
-        try:
-            if stacker_hw is not None:
-                stacker_hw.set_stacker_identify(True)
-                await stacker_hw.store_labware(
-                    labware_height=stacker_state.get_pool_height_minus_overlap()
+
+        if stacker_hw is None and not params.manualMove:
+            try:
+                if stacker_hw is not None:
+                    stacker_hw.set_stacker_identify(True)
+                    await stacker_hw.store_labware(
+                        labware_height=stacker_state.get_pool_height_minus_overlap()
+                    )
+            except FlexStackerStallError as e:
+                return DefinedErrorData(
+                    public=FlexStackerStallOrCollisionError(
+                        id=self._model_utils.generate_id(),
+                        createdAt=self._model_utils.get_timestamp(),
+                        wrappedErrors=[
+                            ErrorOccurrence.from_failed(
+                                id=self._model_utils.generate_id(),
+                                createdAt=self._model_utils.get_timestamp(),
+                                error=e,
+                            )
+                        ],
+                        errorInfo={"labwareId": primary_id},
+                    ),
                 )
-        except FlexStackerStallError as e:
-            return DefinedErrorData(
-                public=FlexStackerStallOrCollisionError(
-                    id=self._model_utils.generate_id(),
-                    createdAt=self._model_utils.get_timestamp(),
-                    wrappedErrors=[
-                        ErrorOccurrence.from_failed(
-                            id=self._model_utils.generate_id(),
-                            createdAt=self._model_utils.get_timestamp(),
-                            error=e,
-                        )
-                    ],
-                    errorInfo={"labwareId": primary_id},
-                ),
-            )
-        except FlexStackerShuttleMissingError as e:
-            return DefinedErrorData(
-                public=FlexStackerShuttleError(
-                    id=self._model_utils.generate_id(),
-                    createdAt=self._model_utils.get_timestamp(),
-                    wrappedErrors=[
-                        ErrorOccurrence.from_failed(
-                            id=self._model_utils.generate_id(),
-                            createdAt=self._model_utils.get_timestamp(),
-                            error=e,
-                        )
-                    ],
-                    errorInfo={"labwareId": primary_id},
-                ),
-            )
+            except FlexStackerShuttleMissingError as e:
+                return DefinedErrorData(
+                    public=FlexStackerShuttleError(
+                        id=self._model_utils.generate_id(),
+                        createdAt=self._model_utils.get_timestamp(),
+                        wrappedErrors=[
+                            ErrorOccurrence.from_failed(
+                                id=self._model_utils.generate_id(),
+                                createdAt=self._model_utils.get_timestamp(),
+                                error=e,
+                            )
+                        ],
+                        errorInfo={"labwareId": primary_id},
+                    ),
+                )
 
         id_list = [
             id for id in (primary_id, maybe_adapter_id, maybe_lid_id) if id is not None
@@ -273,7 +282,7 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
             ),
         )
 
-        if stacker_hw is not None:
+        if stacker_hw is not None and not params.manualMove:
             stacker_hw.set_stacker_identify(False)
 
         return SuccessData(
