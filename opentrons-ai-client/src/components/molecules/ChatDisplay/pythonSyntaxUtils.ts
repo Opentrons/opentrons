@@ -37,3 +37,24 @@ export interface SyntaxToken {
 export const escapeHtml = (text: string): string => {
   return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
+
+// Regex patterns for detecting inline code vs code blocks
+export const INLINE_CODE_PATTERNS = {
+  simpleFunctionCall: /^\w+\(\)$/, // Simple function call like "transfer()"
+  functionWithParams: /^\w+\([^)]*\)$/, // Function with simple params
+  simpleIdentifier: /^[\w.]+$/, // Simple identifier or property access
+} as const
+
+// Helper function to check if code should be displayed inline
+export const isInlineCode = (codeContent: string): boolean => {
+  const trimmedCode = codeContent.trim()
+
+  return (
+    trimmedCode.length <= 50 && // Short length
+    !trimmedCode.includes('\n') && // Single line
+    (INLINE_CODE_PATTERNS.simpleFunctionCall.test(trimmedCode) ||
+      INLINE_CODE_PATTERNS.functionWithParams.test(trimmedCode) ||
+      INLINE_CODE_PATTERNS.simpleIdentifier.test(trimmedCode) ||
+      trimmedCode.split(' ').length <= 5) // Very short code snippets
+  )
+}

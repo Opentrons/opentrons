@@ -2,6 +2,7 @@ import Markdown from 'react-markdown'
 
 import { CodeBlock } from './CodeBlock'
 import styles from './enhancedmarkdown.module.css'
+import { isInlineCode } from './pythonSyntaxUtils'
 
 interface EnhancedMarkdownProps {
   content: string
@@ -36,15 +37,7 @@ export const EnhancedMarkdown: React.FC<EnhancedMarkdownProps> = ({
             const codeContent = String(children).trim()
 
             // Check if it's a simple function call or short code snippet that should be inline
-            const isShortCode =
-              codeContent.length <= 50 && // Short length
-              !codeContent.includes('\n') && // Single line
-              (/^\w+\(\)$/.test(codeContent) || // Simple function call like "transfer()"
-                /^\w+\([^)]*\)$/.test(codeContent) || // Function with simple params
-                /^[\w.]+$/.test(codeContent) || // Simple identifier or property access
-                codeContent.split(' ').length <= 5) // Very short code snippets
-
-            if (isShortCode) {
+            if (isInlineCode(codeContent)) {
               return <code className={styles.inline_code}>{codeContent}</code>
             }
 
