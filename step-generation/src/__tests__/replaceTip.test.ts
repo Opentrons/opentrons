@@ -9,7 +9,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { replaceTip } from '../commandCreators/compound/replaceTip'
-import { CLEAN, EMPTY, FIXED_TRASH_ID } from '../constants'
+import { EMPTY, FIXED_TRASH_ID } from '../constants'
 import {
   DEFAULT_PIPETTE,
   dropTipHelper,

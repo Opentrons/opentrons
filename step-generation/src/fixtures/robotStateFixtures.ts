@@ -24,7 +24,6 @@ import {
   FIXED_TRASH_ID,
   TEMPERATURE_DEACTIVATED,
 } from '../constants'
-import { TipState, TrashBinEntities } from '../types'
 import { makeInitialRobotState } from '../utils'
 import {
   DEFAULT_PIPETTE,
@@ -49,6 +48,7 @@ import type {
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_AT_TARGET,
 } from '../constants'
+import type { TipState, TrashBinEntities } from '../types'
 
 const fixture96Plate = _fixture96Plate as LabwareDefinition2
 const fixture12Trough = _fixture12Trough as LabwareDefinition2
