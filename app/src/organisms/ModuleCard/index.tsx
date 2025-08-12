@@ -2,11 +2,7 @@ import { useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
-import {
-  type HostConfig,
-  RUN_STATUS_FINISHING,
-  RUN_STATUS_RUNNING,
-} from '@opentrons/api-client'
+import { RUN_STATUS_FINISHING, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import {
   ALIGN_START,
   Banner,
@@ -81,6 +77,7 @@ import { ThermocyclerModuleData } from './ThermocyclerModuleData'
 import { ThermocyclerModuleSlideout } from './ThermocyclerModuleSlideout'
 import { getModuleCardImage } from './utils'
 
+import type { HostConfig } from '@opentrons/api-client'
 import type { IconProps } from '@opentrons/components'
 import type { ModuleType } from '@opentrons/shared-data'
 import type {

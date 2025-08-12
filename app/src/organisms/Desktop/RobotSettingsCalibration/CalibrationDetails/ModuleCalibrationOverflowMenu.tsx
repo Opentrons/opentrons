@@ -1,7 +1,6 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { type HostConfig } from '@opentrons/api-client'
 import {
   ALIGN_FLEX_END,
   COLORS,
@@ -23,6 +22,7 @@ import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstop
 import { useRunStatuses } from '/app/resources/runs'
 import { getModuleTooHot } from '/app/transformations/modules'
 
+import type { HostConfig } from '@opentrons/api-client'
 import type { AttachedModule } from '/app/redux/modules/types'
 import type { FormattedPipetteOffsetCalibration } from '..'
 
