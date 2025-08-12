@@ -1324,9 +1324,8 @@ export const replaceCutoutFixtureWithComboFixture = (
     if (WASTE_CHUTE_CUTOUT === aaCutoutItem.cutoutId) {
       console.log('cutoutD3', aaCutoutItem)
       if (
-        FLEX_STACKER_FIXTURES.includes(
-          aaCutoutItem.cutoutFixtureId as CutoutFixtureId
-        ) ||
+        FLEX_STACKER_V1_FIXTURE ===
+          (aaCutoutItem.cutoutFixtureId as CutoutFixtureId) ||
         WASTE_CHUTE_ONLY_FIXTURES_WITH_FAKES.includes(
           aaCutoutItem.cutoutFixtureId
         )
@@ -1346,10 +1345,17 @@ export const replaceCutoutFixtureWithComboFixture = (
             fixture.cutoutId === aaCutoutItem.cutoutId
         )
 
+        console.log('hasWasteChute', hasWasteChute)
+        console.log('hasFlexStacker', hasFlexStacker)
+        console.log(
+          'aaCutoutItem.cutoutFixtureId',
+          aaCutoutItem.cutoutFixtureId
+        )
         if (
           aaCutoutItem.cutoutFixtureId === FLEX_STACKER_MODULE_V1 &&
           hasWasteChute
         ) {
+          console.log('hasWasteChute and flex stacker')
           return {
             cutoutId: aaCutoutItem.cutoutId,
             cutoutFixtureId: FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
@@ -1378,8 +1384,6 @@ export const replaceCutoutFixtureWithComboFixture = (
             opentronsModuleSerialNumber:
               aaCutoutItem.opentronsModuleSerialNumber,
           }
-        } else {
-          return { ...aaCutoutItem }
         }
       }
     }
