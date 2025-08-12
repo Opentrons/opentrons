@@ -1,12 +1,12 @@
 /* Enhanced Markdown Styles */
 .enhanced_markdown {
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
   width: 100%;
+  flex-direction: column;
   color: #000;
   font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI',
     'Helvetica Neue', Arial, sans-serif;
+  gap: 0.5rem;
   line-height: 1.5rem;
 }
 
@@ -14,21 +14,21 @@
 .code_block_wrapper {
   position: relative;
   overflow: hidden;
-  margin: 0.5rem 0;
-  background: #f8f8f8;
   border: 1px solid #e0e0e0;
   border-radius: 0.375rem;
+  margin: 0.5rem 0;
+  background: #f8f8f8;
 }
 
 .code_block {
-  overflow-x: auto;
-  margin: 0;
   padding: 0.75rem 1rem;
+  margin: 0;
   background: #f8f8f8;
   color: #000;
   font-family: 'Monaco', 'Consolas', 'Courier New', monospace;
   font-size: 0.875rem;
   line-height: 1.25rem;
+  overflow-x: auto;
 }
 
 .python_code {
@@ -41,8 +41,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.5rem 1rem;
-  background: #f0f0f0;
   border-bottom: 1px solid #e1e1e1;
+  background: #f0f0f0;
 }
 
 .button_group {
@@ -53,38 +53,38 @@
 
 .language_badge {
   color: #666;
-  font-weight: 500;
   font-size: 0.75rem;
-  text-transform: uppercase;
+  font-weight: 500;
   letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .copy_button {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
   padding: 0.25rem 0.5rem;
-  background: #fff;
   border: 1px solid #d1d1d1;
   border-radius: 4px;
+  background: #fff;
   color: #333;
-  font-size: 0.75rem;
   cursor: pointer;
+  font-size: 0.75rem;
+  gap: 0.25rem;
   transition: all 0.2s ease;
 }
 
 .copy_button:hover {
-  background: #f5f5f5;
   border-color: #999;
+  background: #f5f5f5;
 }
 
 /* Inline code */
 .inline_code {
   display: inline-block;
   padding: 0.125rem 0.25rem;
-  background: #f0f0f0;
   border: 1px solid #d0d0d0;
   border-radius: 0.25rem;
+  background: #f0f0f0;
   color: #000;
   font-family: 'Monaco', 'Consolas', 'Courier New', monospace;
   font-size: 0.9rem;
@@ -93,11 +93,11 @@
 
 /* Text elements - Body default regular */
 .paragraph {
-  margin: 0;
   padding: 0.5rem 0;
+  margin: 0;
   color: #000;
-  font-weight: 400;
   font-size: 1rem;
+  font-weight: 400;
   line-height: 1.5rem;
 }
 
@@ -110,8 +110,8 @@
 }
 
 .list {
-  margin: 0;
   padding: 0.5rem 0 0.5rem 1.5rem;
+  margin: 0;
   font-size: 1rem;
   line-height: 1.5rem;
 }
@@ -125,8 +125,8 @@
 
 /* Headings - heading small regular */
 .heading {
-  margin: 0;
   padding: 1.5rem 0 0.5rem 0;
+  margin: 0;
   color: #000;
   font-weight: 400;
 }
