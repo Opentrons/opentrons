@@ -71,26 +71,16 @@ jobs:
             // Set the actual branch name (not tag name)
             let actualBranch
             if (context.ref.startsWith('refs/tags/')) {
-              // For tags, get the branch from the tag's commit
+              // For tags, use git to find which branch contains this tag
               const tagName = context.ref.replace(/^refs\/tags\//, '')
               try {
-                const branches = await github.rest.repos.listBranches({ owner: context.repo.owner, repo: context.repo.repo })
-                const tagCommit = await github.rest.git.getRef({ owner: context.repo.owner, repo: context.repo.repo, ref: `tags/${tagName}` })
-                const commitSha = tagCommit.data.object.sha
-                
-                // Find which branch contains this commit
-                for (const branch of branches.data) {
-                  const branchCommit = await github.rest.repos.getBranch({ owner: context.repo.owner, repo: context.repo.repo, branch: branch.name })
-                  if (branchCommit.data.commit.sha === commitSha) {
-                    actualBranch = branch.name
-                    break
-                  }
-                }
-                if (!actualBranch) {
-                  actualBranch = context.payload.repository.default_branch
-                }
+                const { execSync } = require('child_process')
+                const branches = execSync(`git branch --contains ${tagName}`, { encoding: 'utf8' })
+                const branchList = branches.trim().split('\n').map(b => b.replace(/^\*?\s*/, ''))
+                actualBranch = branchList[0] || context.payload.repository.default_branch
+                console.log(`Found branches for tag ${tagName}: ${branchList.join(', ')}`)
               } catch (error) {
-                console.log('Error finding branch for tag, using default branch')
+                console.log(`Error finding branch for tag ${tagName}: ${error.message}`)
                 actualBranch = context.payload.repository.default_branch
               }
             } else {
