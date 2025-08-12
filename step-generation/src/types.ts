@@ -651,8 +651,8 @@ export interface TimelineFrame {
     }
     pipettes: {
       [pipetteId: string]: {
-        tiprackURI: string | null
         hasTip: boolean
+        tiprackURI: string | null
       }
     }
   }
