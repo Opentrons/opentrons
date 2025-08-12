@@ -389,6 +389,78 @@ def test_nonfatal_command_failure() -> None:
     assert subject_view.get_running_command_id() is None
 
 
+def test_nonfatal_command_failure_with_door_open() -> None:
+    """Test the command queue if a command fails recoverably but the door is open.
+
+    Commands that were after the failed command in the queue should be left in
+    the queue.
+
+    The queue status should be "awaiting-recovery-paused."
+    """
+    subject = CommandStore(
+        is_door_open=False,
+        config=Config(
+            block_on_door_open=True,
+            # Choice of robot and deck type are arbitrary.
+            robot_type="OT-3 Standard",
+            deck_type=DeckType.OT3_STANDARD,
+        ),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+    )
+    subject_view = CommandView(subject.state)
+
+    queue_1 = actions.QueueCommandAction(
+        request=commands.WaitForResumeCreate(
+            params=commands.WaitForResumeParams(), key="command-key-1"
+        ),
+        request_hash=None,
+        created_at=datetime(year=2021, month=1, day=1),
+        command_id="command-id-1",
+    )
+    subject.handle_action(queue_1)
+    queue_2 = actions.QueueCommandAction(
+        request=commands.WaitForResumeCreate(
+            params=commands.WaitForResumeParams(), key="command-key-2"
+        ),
+        request_hash=None,
+        created_at=datetime(year=2021, month=1, day=1),
+        command_id="command-id-2",
+    )
+    subject.handle_action(queue_2)
+
+    run_1 = actions.RunCommandAction(
+        command_id="command-id-1",
+        started_at=datetime(year=2022, month=2, day=2),
+    )
+    subject.handle_action(run_1)
+    door_open = actions.DoorChangeAction(
+        door_state=DoorState.OPEN,
+        module_serial=None,
+    )
+    subject.handle_action(door_open)
+    assert subject_view.get_is_door_blocking() == True
+
+    fail_1 = actions.FailCommandAction(
+        command_id="command-id-1",
+        running_command=subject_view.get("command-id-1"),
+        error_id="error-id",
+        failed_at=datetime(year=2023, month=3, day=3),
+        error=errors.ProtocolEngineError(message="oh no"),
+        notes=[],
+        type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
+    )
+    subject.handle_action(fail_1)
+
+    assert (
+        subject_view.get_status() == EngineStatus.AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR
+    )
+    assert [(c.id, c.status) for c in subject_view.get_all()] == [
+        ("command-id-1", commands.CommandStatus.FAILED),
+        ("command-id-2", commands.CommandStatus.QUEUED),
+    ]
+    assert subject_view.get_running_command_id() is None
+
+
 def test_fixit_command_failure_handling_by_recovery_type() -> None:
     """Test that fixit command failures are handled differently based on error recovery type.
 
