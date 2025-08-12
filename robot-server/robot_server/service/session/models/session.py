@@ -85,7 +85,6 @@ class SessionResponseAttributes(DeprecatedResponseDataModel):
     createdAt: datetime = Field(
         ..., description="Date and time that this session was created"
     )
-    details: BaseModel = Field(..., description="Detailed session specific status")
 
 
 class CalibrationCheckResponseAttributes(
