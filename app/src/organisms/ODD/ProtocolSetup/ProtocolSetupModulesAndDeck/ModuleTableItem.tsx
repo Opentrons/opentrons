@@ -14,6 +14,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useHost } from '@opentrons/react-api-client'
 import {
   ABSORBANCE_READER_TYPE,
   FLEX_STACKER_MODULE_TYPE,
@@ -30,12 +31,16 @@ import { OddInfoScreen } from '/app/molecules/ODDInfoScreen'
 import { OddModal } from '/app/molecules/OddModal'
 import { useIsDoorOpen } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
-import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
+import { handleModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getModuleTooHot } from '/app/transformations/modules'
 
 import type { TFunction } from 'i18next'
-import type { AttachedModule, CommandData } from '@opentrons/api-client'
+import type {
+  AttachedModule,
+  CommandData,
+  HostConfig,
+} from '@opentrons/api-client'
 import type {
   CutoutConfig,
   CutoutFixtureId,
@@ -124,6 +129,7 @@ export function ModuleTableItem({
     'module_wizard_flows',
     'deck_configuration',
   ])
+  const host = useHost() as HostConfig
 
   const { makeSnackbar } = useToaster()
 
@@ -132,7 +138,11 @@ export function ModuleTableItem({
       if (getModuleTooHot(module.attachedModuleMatch)) {
         makeSnackbar(t('module_wizard_flows:module_too_hot') as string)
       } else {
-        setShowModuleWizard(true)
+        handleModuleWizardFlows({
+          attachedModule: module.attachedModuleMatch,
+          robotName,
+          host,
+        })
       }
     } else {
       makeSnackbar(t('attach_module') as string)
@@ -157,7 +167,6 @@ export function ModuleTableItem({
     calibrationStatus
   )
 
-  const [showModuleWizard, setShowModuleWizard] = useState<boolean>(false)
   const [showHomeStackerWarning, setShowHomeStackerWarning] = useState<boolean>(
     false
   )
@@ -296,15 +305,6 @@ export function ModuleTableItem({
 
   return (
     <>
-      {showModuleWizard && module.attachedModuleMatch != null ? (
-        <ModuleWizardFlows
-          attachedModule={module.attachedModuleMatch}
-          closeFlow={() => {
-            setShowModuleWizard(false)
-          }}
-          robotName={robotName}
-        />
-      ) : null}
       {showLocationConflictModal && conflictedFixture != null ? (
         <LocationConflictModal
           onCloseClick={() => {

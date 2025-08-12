@@ -81,13 +81,13 @@ export function UpdateFirmware(props: UpdateFirmwareProps): JSX.Element {
       }
       // Update failed
       if (matchingModule.hasAvailableUpdate) {
-          setIsModuleUpdating(false)
-          setInProgress(false)
-          setErrorMessage(t('firmware_update_failed') as string)
-          if (latestRequestId != null) {
-            dispatch(dismissRequest(latestRequestId))
-          }
-          return
+        setIsModuleUpdating(false)
+        setInProgress(false)
+        setErrorMessage(t('firmware_update_failed') as string)
+        if (latestRequestId != null) {
+          dispatch(dismissRequest(latestRequestId))
+        }
+        return
       }
       // Update passed
       setShouldProceed(true)
@@ -110,14 +110,14 @@ export function UpdateFirmware(props: UpdateFirmwareProps): JSX.Element {
     setTimeout(() => {
       setCheckingFirmware(false)
       if (!attachedModule.hasAvailableUpdate) {
-          setIsModuleUpdating(false)
-          setShouldProceed(true)
-          setTimeout(() => {
-            proceed()
-          }, NO_UPDATE_FOUND_TIMEOUT_MS)
+        setIsModuleUpdating(false)
+        setShouldProceed(true)
+        setTimeout(() => {
+          proceed()
+        }, NO_UPDATE_FOUND_TIMEOUT_MS)
       }
     }, CHECKING_UPDATE_TIMEOUT_MS)
-  }, [attachedModule.hasAvailableUpdate])
+  }, [])
 
   useEffect(() => {
     if (requestStatus === PENDING) {
@@ -149,7 +149,7 @@ export function UpdateFirmware(props: UpdateFirmwareProps): JSX.Element {
     const name = getModuleDisplayName(attachedModule.moduleModel)
     return (
       <SimpleWizardInProgressBody
-        description={t('checking_firmware', {module: name})}
+        description={t('checking_firmware', { module: name })}
       />
     )
   } else if (inProgress) {
