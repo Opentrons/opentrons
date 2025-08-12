@@ -18,7 +18,7 @@ from opentrons.protocol_engine.state._well_math import (
     nozzles_per_well,
 )
 
-from tests.opentrons.protocol_engine import pipette_fixtures
+from .. import pipette_fixtures
 
 _96_FULL_MAP = NozzleMap.build(
     physical_nozzles=pipette_fixtures.NINETY_SIX_MAP,
