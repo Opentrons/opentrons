@@ -444,8 +444,11 @@ def run(ctx: ProtocolContext) -> None:
 
     # Constants
     max_volume = labware["A1"].max_volume
+
+    #these are all magic numbers
     min_step = max(max_volume * 0.005, 2)
     max_step = min(max_volume * 0.3, 1500)
+    tolerance = max_volume * 0.05 
 
     # Initialize state
     corrected_height = 0.0
@@ -485,7 +488,7 @@ def run(ctx: ProtocolContext) -> None:
     ) -> float:  # desired steady state height step in mm
 
         # deadband to avoid unnecessary step volume corrections
-        delta_tolerance = neutral_target * 0.10
+        delta_tolerance = neutral_target * 0.15
         lower_bound = neutral_target - delta_tolerance
         upper_bound = neutral_target + delta_tolerance
 
@@ -544,7 +547,7 @@ def run(ctx: ProtocolContext) -> None:
     _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating()) 
     liq_pipette.drop_tip()
 
-    while total_vol < max_volume:
+    while total_vol < (max_volume - tolerance):
 
         current_well = wells[step % num_wells]
 
