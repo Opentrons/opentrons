@@ -8,6 +8,7 @@ import {
   COLORS,
   DeckFromLayers,
   DIRECTION_COLUMN,
+  FixedTrashText,
   Flex,
   FlexTrash,
   JUSTIFY_CENTER,
@@ -28,7 +29,6 @@ import {
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 
-import { FixedTrashText } from '../../../components/molecules'
 import { DECK_SETUP_TOOLS_WIDTH_REM } from '../../../constants'
 import { getDisableModuleRestrictions } from '../../../feature-flags/selectors'
 import {
