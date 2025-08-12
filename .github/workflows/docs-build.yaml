@@ -79,7 +79,7 @@ jobs:
         with:
           domain: 'docs.opentrons.com'
           distPath: './api/docs/dist'
-          destPrefix: ${{ env.OT_BRANCH }}
+          destPrefix: ${{ github.ref_name }}
       - name: 'Configure AWS Credentials for docs bucket'
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -87,4 +87,4 @@ jobs:
           aws-region: us-east-2
       - name: 'Deploy docs to sandbox.docs bucket'
         run: |
-          aws s3 sync ./api/docs/dist/ s3://sandbox.docs/${{ env.OT_BRANCH }}/api/ --delete --acl public-read
+          aws s3 sync ./api/docs/dist/ s3://sandbox.docs/${{ github.ref_name }}/api/ --delete --acl public-read
