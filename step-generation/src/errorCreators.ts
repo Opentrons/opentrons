@@ -298,8 +298,8 @@ export const noTipSelected = (): CommandCreatorError => {
 
 export const labwareDiscarded = (): CommandCreatorError => {
   return {
-    type: 'LABWARE_DISCARDED_IN_WASTE_CHUTE',
-    message: 'The labware was discarded in waste chute in a previous step.',
+    type: 'LABWARE_DISCARDED_IN_TRASH',
+    message: 'The labware was discarded in trash in a previous step.',
   }
 }
 

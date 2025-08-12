@@ -454,7 +454,7 @@ describe('moveLabware', () => {
       type: 'LABWARE_ON_ANOTHER_ENTITY',
     })
   })
-  it('should return an error for the labware already being discarded in previous step', () => {
+  it('should return an error for the labware already being discarded in previous step in a waste chute', () => {
     const wasteChuteInvariantContext = {
       ...invariantContext,
       wasteChuteEntities: {
@@ -479,7 +479,7 @@ describe('moveLabware', () => {
     const result = moveLabware(params, wasteChuteInvariantContext, robotState)
     expect(getErrorResult(result).errors).toHaveLength(1)
     expect(getErrorResult(result).errors[0]).toMatchObject({
-      type: 'LABWARE_DISCARDED_IN_WASTE_CHUTE',
+      type: 'LABWARE_DISCARDED_IN_TRASH',
     })
   })
   it('should return an error for trying to move the labware off deck with a gripper', () => {

@@ -1,11 +1,15 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { DropdownStepFormField } from '../../../../../../components/molecules'
 import { getEnableStacking } from '../../../../../../feature-flags/selectors'
-import { getLabwareEntities } from '../../../../../../step-forms/selectors'
+import {
+  getAdditionalEquipmentEntities,
+  getLabwareEntities,
+} from '../../../../../../step-forms/selectors'
 import {
   getDeckSetupForActiveItem,
   getRobotStateAtActiveItem,
@@ -31,6 +35,9 @@ export function LabwareLocationField(
   const { labware: deckSetupLabware } = useSelector(getDeckSetupForActiveItem)
   const dispatch = useDispatch()
   const labwareEntities = useSelector(getLabwareEntities)
+  const additionalEquipmentEntities = useSelector(
+    getAdditionalEquipmentEntities
+  )
   const robotState = useSelector(getRobotStateAtActiveItem)
   const unoccupiedLabwareStackOptions: Option[] =
     robotState && enableStacking
@@ -47,18 +54,37 @@ export function LabwareLocationField(
       ? getSlotInLocationStack(robotState?.labware[labware]?.stack ?? []) ===
         'offDeck'
       : false
-
+  const isLabwareALid =
+    deckSetupLabware[labware]?.def.allowedRoles?.includes('lid') ?? false
   const unoccupiedLabwareLocationsOptionsSelector =
     useSelector(getUnoccupiedLabwareLocationOptions) ?? []
 
-  // invalid offDeck move filter
-  const unoccupiedLabwareLocationsOptions = [
+  let unoccupiedLabwareLocationsOptions = [
     ...unoccupiedLabwareStackOptions,
     ...unoccupiedLabwareLocationsOptionsSelector,
-  ].filter(option => {
-    const canMoveOffDeck = !(useGripper || isLabwareOffDeck)
-    return option.value !== 'offDeck' || canMoveOffDeck
-  })
+  ]
+  if (useGripper || isLabwareOffDeck) {
+    unoccupiedLabwareLocationsOptions = unoccupiedLabwareLocationsOptions.filter(
+      option => option.value !== 'offDeck'
+    )
+  }
+
+  if (
+    !useGripper &&
+    Object.values(additionalEquipmentEntities).find(
+      ae => ae.name === 'wasteChute'
+    ) != null
+  ) {
+    unoccupiedLabwareLocationsOptions = unoccupiedLabwareLocationsOptions.filter(
+      option => option.value !== WASTE_CHUTE_CUTOUT
+    )
+  }
+
+  if (!isLabwareALid) {
+    unoccupiedLabwareLocationsOptions = unoccupiedLabwareLocationsOptions.filter(
+      option => option.name !== 'Trash bin'
+    )
+  }
 
   return (
     <DropdownStepFormField

@@ -115,7 +115,13 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
       ? getSlotInLocationStack(prevRobotState.labware[labwareId].stack)
       : null
 
-  if (hasWasteChute && initialLabwareSlot === 'gripperWasteChute') {
+  if (
+    (hasWasteChute && initialLabwareSlot === 'gripperWasteChute') ||
+    MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(
+      initialLabwareSlot as AddressableAreaName
+    ) ||
+    initialLabwareSlot === 'fixedTrash'
+  ) {
     errors.push(errorCreators.labwareDiscarded())
   }
   const initialAdapterSlot =
@@ -223,7 +229,6 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
     strategy,
     newLocation,
   }
-
   const commands: CreateCommand[] = [
     {
       commandType: 'moveLabware',

@@ -8,6 +8,7 @@ import {
   getIsPipettableLabware,
   getIsTiprack,
   getPositionFromSlotId,
+  MOVABLE_TRASH_ADDRESSABLE_AREAS,
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
@@ -31,6 +32,7 @@ import {
 
 import type { DropdownOption } from '@opentrons/components'
 import type {
+  AddressableAreaName,
   CoordinateTuple,
   CutoutId,
   DeckDefinition,
@@ -298,24 +300,14 @@ export const useLabwareDropdownOptions = (
         deckSetupLabware,
         deckSlot
       )
-      const labwareStack = fullStackFromLabwares.filter(
-        id =>
-          deckSetupLabware[id] != null &&
-          !deckSetupLabware[id].def.allowedRoles?.includes('adapter')
-      )
-      const labwareStackLength = labwareStack.length - 1
-      const allowStacking = def.stackLimit != null && def.stackLimit > 1
-      const showStackOption = !useGripper && type === 'moveLabware'
 
       const isTopOfStack = fullStackFromLabwares[0] === labwareId
-      const isBottomOfStack =
-        labwareStack[labwareStackLength] === labwareId &&
-        allowStacking &&
-        labwareStack.length > 1
-      const bottomOfStack = isBottomOfStack
-        ? labwareStack[labwareStackLength]
-        : null
-      const isLabwareInWasteChute = deckSlot === 'gripperWasteChute'
+      const isLabwareInTrash =
+        deckSlot === 'gripperWasteChute' ||
+        MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(
+          deckSlot as AddressableAreaName
+        ) ||
+        deckSlot === 'fixedTrash'
 
       const isAdapter = def.allowedRoles?.includes('adapter') ?? false
       const { nickName, latestSlot } = getLabwareInfo(
@@ -330,18 +322,9 @@ export const useLabwareDropdownOptions = (
         deckSlot === 'offDeck' &&
         (type === 'labware' || (type === 'moveLabware' && useGripper))
 
-      //  show full stack option if moving labware manually
-      const bottomOfStackOption: DropdownOption | null =
-        showStackOption && bottomOfStack != null
-          ? {
-              name: t('protocol_steps:unoccupied_stack', { name: nickName }),
-              value: bottomOfStack,
-              deckLabel: latestSlot,
-            }
-          : null
-      const restOfOptions: DropdownOption[] =
+      const options: DropdownOption[] =
         isAdapter ||
-        isLabwareInWasteChute ||
+        isLabwareInTrash ||
         (type === 'labware' && isTiprack) ||
         isFilterOffDeck ||
         !isTopOfStack
@@ -358,10 +341,7 @@ export const useLabwareDropdownOptions = (
       //  filter out moving adapters, and labware in
       //  waste chute for moveLabware, labware off-deck and
       //  labware that is a tiprack for the labware dropdown only
-      return [
-        ...restOfOptions,
-        ...(bottomOfStackOption != null ? [bottomOfStackOption] : []),
-      ]
+      return options
     },
     []
   )
@@ -422,14 +402,16 @@ export const getUnoccupiedStackOptions = (args: {
       const isSafeLidMove =
         !(isLabwareToMoveUsedLid && isNewLabwarePipettable) &&
         !isNearestParentPipettableLabware
-
-      const isInWasteChute = slot === 'gripperWasteChute'
+      const isInTrash =
+        slot === 'gripperWasteChute' ||
+        MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(slot as AddressableAreaName) ||
+        slot === 'fixedTrash'
 
       if (
         isTopOfStack &&
         isCompatible &&
         isNotCurrentLabwareStack &&
-        !isInWasteChute &&
+        !isInTrash &&
         isSafeLidMove
       ) {
         const similarLabwareStackIds = getAllLabwareIdsOfCertainURIOnStack(

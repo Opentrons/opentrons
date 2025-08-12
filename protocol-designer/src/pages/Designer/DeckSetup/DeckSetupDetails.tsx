@@ -429,7 +429,8 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
         if (
           getSlotInLocationStack(labware.stack) === 'offDeck' ||
           allModules.some(m => labware.stack.includes(m.id)) ||
-          labware.id === adjacentLabware?.id
+          labware.id === adjacentLabware?.id ||
+          labware.stack.includes('fixedTrash')
         ) {
           return null
         }
