@@ -348,45 +348,52 @@ async def _fixture_check_pressure(
     )
     results.append(r)
     # aspirate 50uL
-    aspiratevol = PRESSURE_FIXTURE_ASPIRATE_VOLUME[pip_vol]
-    print("aspirate:",aspiratevol)
-    await api.aspirate(mount, aspiratevol)
-    await asyncio.sleep(delaytime)
-    #await api.aspirate(OT3Mount.LEFT, volume)
-    if pip_vol == 50:
-        asp_evt = PressureEvent.ASPIRATE_P50
-    elif pip_vol == 1000:
-        asp_evt = PressureEvent.ASPIRATE_P1000
-    elif pip_vol == 200:
-        asp_evt = PressureEvent.ASPIRATE_P200
-    r, _ = await _read_pressure_and_check_results(
-        api,
-        pip_channels,
-        pip_vol,
-        fixture,
-        asp_evt,
-        write_cb,
-        accumulate_raw_data_cb,
-        pip_channels,
-        previous=inserted_pressure_data,
-    )
-    results.append(r)
-    # dispense
     
-    print("dispense:",aspiratevol)
-    await api.dispense(mount, aspiratevol)
-    await asyncio.sleep(delaytime)
-    r, _ = await _read_pressure_and_check_results(
-        api,
-        pip_channels,
-        pip_vol,
-        fixture,
-        PressureEvent.DISPENSE,
-        write_cb,
-        accumulate_raw_data_cb,
-        pip_channels,
-    )
-    results.append(r)
+    aspiratevol = PRESSURE_FIXTURE_ASPIRATE_VOLUME[pip_vol]
+
+    for aspval in aspiratevol:
+        print("aspirate:",aspval)
+        write_cb(["aspirate-dispense",aspval,"ul"])
+        await api.aspirate(mount, aspval)
+        await asyncio.sleep(delaytime)
+        #await api.aspirate(OT3Mount.LEFT, volume)
+        if pip_vol == 50:
+            asp_evt = PressureEvent.ASPIRATE_P50
+        elif pip_vol == 1000:
+            asp_evt = PressureEvent.ASPIRATE_P1000
+        elif pip_vol == 200:
+            asp_evt = PressureEvent.ASPIRATE_P200
+        r, _ = await _read_pressure_and_check_results(
+            api,
+            pip_channels,
+            pip_vol,
+            fixture,
+            asp_evt,
+            write_cb,
+            accumulate_raw_data_cb,
+            pip_channels,
+            previous=inserted_pressure_data,
+            aspirate_dispense=aspval
+        )
+        results.append(r)
+        # dispense
+        
+        print("dispense:",aspval)
+        await api.dispense(mount, aspval)
+        await asyncio.sleep(delaytime)
+        r, _ = await _read_pressure_and_check_results(
+            api,
+            pip_channels,
+            pip_vol,
+            fixture,
+            PressureEvent.DISPENSE,
+            write_cb,
+            accumulate_raw_data_cb,
+            pip_channels,
+            aspirate_dispense=aspval
+        )
+        results.append(r)
+        await api.prepare_for_aspirate(OT3Mount.LEFT)
     # retract out of fixture
     #await api.move_rel(mount, Point(z=fixture_depth))
     await api.move_rel(OT3Mount.LEFT,Point(z=20))
@@ -415,6 +422,7 @@ async def _read_pressure_and_check_results(
     accumulate_raw_data_cb: Callable,
     channels: int = 1,
     previous: Optional[List[List[float]]] = None,
+    aspirate_dispense:int=None
 ) -> Tuple[bool, List[List[float]]]:
     
     def print_pressure_datas(data_list):
@@ -448,8 +456,15 @@ async def _read_pressure_and_check_results(
         
         ui.print_header(f"{i + 1}/{pressure_event_config.sample_count}: {tag.value}")
         print_pressure_datas(_sample_as_strings)
-        csv_data_sample = [tag.value] + _sample_as_strings
+        if tag.value == "holding" or tag.value == "dispensed":
+            csv_data_sample = [tag.value +"-"+ str(aspirate_dispense)+"ul"] + _sample_as_strings
+        else:
+            csv_data_sample = [tag.value] + _sample_as_strings
         # print(f"{i + 1}/{pressure_event_config.sample_count}: {csv_data_sample}")
+        print("tag.value:",tag.value)
+        # if tag.value == "holding" or tag.value == "dispensed":
+        #     accumulate_raw_data_cb(["aspirate_dispense",aspirate_dispense,"ul"])
+
         accumulate_raw_data_cb(csv_data_sample)
         delay_time = next_sample_time - time()
         if (
