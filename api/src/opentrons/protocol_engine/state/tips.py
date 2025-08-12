@@ -185,6 +185,8 @@ class TipView:
                 state == _TipRackWellState.CLEAN for state in target_well_states
             ):
                 return False
+            # Since we know a full configuration will always produce zero non-active overlapping wells
+            # we can skip the following checks if it is a full configuration.
             if nozzle_map.configuration != NozzleConfigurationType.FULL:
                 # If we have a partial configuration we need to ensure that any wells in the way are NOT present
                 wells_covered_physically = set(
@@ -210,7 +212,8 @@ class TipView:
         target_well_list = _resolve_well_order(wells_by_columns, nozzle_map)
 
         for well in target_well_list:
-            # If the target well/tip isn't clean, skip to the next one
+            # If the target well/tip isn't clean, skip to the next one. This will be checked
+            # again in _validate_wells, but we can short circuit the following checks if this is False
             if tip_well_states[well] != _TipRackWellState.CLEAN:
                 continue
             # Get list of all wells (i.e. tips) that would be covered by the active nozzles
@@ -290,7 +293,7 @@ def _resolve_well_order(  # noqa: C901
     Wells can be ordered in four different ways:
         - Top to bottom, left to right (A1, B1, ... A2, B2, ... G12, H12)
         - Top to bottom, right to left (A12, B12, ... A11, B11, ... G1, H1)
-        - Bottom to top, left to right, (H1, G1, ... H2, G2, ... B12, A12)
+        - Bottom to top, left to right (H1, G1, ... H2, G2, ... B12, A12)
         - Bottom to top, right to left (A12, B12, ... A11, B11, ... G1, H1)
 
     - Full configurations (which will always cover a single channel) will go top to bottom, left to right.

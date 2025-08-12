@@ -1,6 +1,6 @@
 """Utilities for doing coverage math on wells."""
 
-from typing import Iterator, Dict, List
+from typing import Iterator
 from opentrons_shared_data.errors.exceptions import (
     InvalidStoredData,
     InvalidProtocolData,
@@ -76,8 +76,8 @@ def row_col_ordinals_from_column_major_map(
 
 
 def wells_covered_dense(  # noqa: C901
-    columns: Dict[str, List[str]],
-    rows: Dict[str, List[str]],
+    columns: dict[str, list[str]],
+    rows: dict[str, list[str]],
     starting_nozzle: str,
     target_well: str,
     target_wells_by_column: list[list[str]],
@@ -149,8 +149,8 @@ def wells_covered_dense(  # noqa: C901
 
 
 def wells_covered_sparse(  # noqa: C901
-    columns: Dict[str, List[str]],
-    rows: Dict[str, List[str]],
+    columns: dict[str, list[str]],
+    rows: dict[str, list[str]],
     starting_nozzle: str,
     target_well: str,
     target_wells_by_column: list[list[str]],
