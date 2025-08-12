@@ -97,7 +97,19 @@ The Temperature Module module uses aluminum thermal blocks to hold labware at te
 
 For Flex, the Temperature Module caddy comes with a deep well block and a flat bottom block designed for use with the Flex Gripper.
 
-IMAGE PLACEHOLDER
+<div class="parts-list" markdown>
+
+<figure markdown>
+  ![Flex deep well block](images/flex-deep-well-block.png "Flex Deep Well Thermal Block")
+  <figcaption>Deep Well Thermal Block</figcaption>
+</figure>
+
+<figure markdown>
+  ![Flex flat bottom thermal block](images/flex-flat-bottom-well.png "Flex Flat Bottom Thermal Block")
+  <figcaption>Flat Bottom Thermal Block for Flex</figcaption>
+</figure>
+
+</div>
 
 The Flex flat bottom plate is compatible with various ANSI/SLAS standard well plates. It is different from the flat plate that ships with the Temperature Module and the separate three-piece set. The Flex flat plate features a wider working surface and chamfered corner clips. These features help improve the performance of the Opentrons Flex Gripper when moving labware onto or off of the
 plate. You can tell which flat bottom plate you have because the one for Flex has the words “Opentrons Flex” on its top surface. The one for OT-2 does not.
@@ -106,10 +118,10 @@ plate. You can tell which flat bottom plate you have because the one for Flex ha
 
 The following table lists the thermal blocks recommended for use with either Flex or an OT-2.
 
-| Thermal Block           | Flex | OT-2                    |
-|:------------------------|:-----|:------------------------|
+| Thermal Block           | Flex | OT-2                  |
+|:------------------------|:-----|:----------------------|
 | 24-well                 |      | :material-check-bold: |
 | 96-well PCR             |      | :material-check-bold: |
-| Deep Well               | :material-check-bold: |                 |
+| Deep Well               | :material-check-bold: |      |
 | Flat Bottom for Flex    | :material-check-bold: | :octicons-x-12: |
 | Flat Bottom for OT-2    | :octicons-x-12: | :material-check-bold: |

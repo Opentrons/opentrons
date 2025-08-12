@@ -3,9 +3,8 @@
 div.parts-list {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-start; 
-  gap: 5px; 
-  align-items: flex-end; /* bottom aligns misaligned captions */
+  align-items: flex-end;
+  gap: 5px;
 }
 
 div.parts-list figure {
