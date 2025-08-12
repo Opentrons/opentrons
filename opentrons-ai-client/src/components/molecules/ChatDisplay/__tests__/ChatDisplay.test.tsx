@@ -94,47 +94,8 @@ describe('ChatDisplay', () => {
     })
   })
 
-  it('should call trackEvent when download button is clicked', () => {
-    props.chat = {
-      ...props.chat,
-      role: 'assistant',
-      reply:
-        '```python\ndef run(protocol):\n    print("hello")\n print("protocol")\n return True\n```',
-    }
-    URL.createObjectURL = vi.fn()
-    window.URL.revokeObjectURL = vi.fn()
-    HTMLAnchorElement.prototype.click = vi.fn()
-
-    render(props)
-    // eslint-disable-next-line testing-library/no-node-access, @typescript-eslint/non-nullable-type-assertion-style
-    const downloadPath = document.querySelector(
-      '[aria-roledescription="download"]'
-    ) as Element
-    fireEvent.click(downloadPath)
-
-    expect(mockUseTrackEvent).toHaveBeenCalledWith({
-      name: 'download-protocol',
-      properties: {},
-    })
-  })
-
-  it('should not call trackEvent when download button is clicked', () => {
-    URL.createObjectURL = vi.fn()
-    window.URL.revokeObjectURL = vi.fn()
-    HTMLAnchorElement.prototype.click = vi.fn()
-
-    render(props)
-    // eslint-disable-next-line testing-library/no-node-access, @typescript-eslint/non-nullable-type-assertion-style
-    const downloadPath = document.querySelector(
-      '[aria-roledescription="download"]'
-    ) as Element
-    fireEvent.click(downloadPath)
-
-    expect(mockUseTrackEvent).not.toHaveBeenCalledWith({
-      name: 'download-protocol',
-      properties: {},
-    })
-  })
+  // Note: Download functionality has been moved to individual code blocks in EnhancedMarkdown
+  // These tests are removed as the main ChatDisplay no longer has a download button
 
   it('should call trackEvent when copy button is clicked', async () => {
     Object.defineProperty(navigator, 'clipboard', {
