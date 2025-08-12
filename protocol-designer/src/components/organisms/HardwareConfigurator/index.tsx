@@ -11,8 +11,9 @@ import {
   THERMOCYCLER_V2_REAR_FIXTURE,
 } from '@opentrons/shared-data'
 
-import { editDeckConfiguration } from '../../../step-forms/actions'
-import { getDeckConfiguration } from '../../../step-forms/selectors'
+import { editDeckConfiguration } from '/protocol-designer/step-forms/actions'
+import { getDeckConfiguration } from '/protocol-designer/step-forms/selectors'
+
 import { HardwareConfiguratorContainer } from './HardwareConfiguratorContainer'
 
 import type { UseFormSetValue } from 'react-hook-form'
@@ -21,7 +22,7 @@ import type {
   CutoutId,
   DeckConfiguration,
 } from '@opentrons/shared-data'
-import type { FormModule, FormModules } from '../../../step-forms'
+import type { FormModule, FormModules } from '/protocol-designer/step-forms'
 import type { Fixtures, WizardFormState } from '../types'
 import type {
   CutoutConfigExtended,

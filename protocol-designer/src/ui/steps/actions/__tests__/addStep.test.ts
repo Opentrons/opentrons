@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { PRESAVED_STEP_ID } from '../../../../steplist/types'
+import { PRESAVED_STEP_ID } from '/protocol-designer/steplist/types'
+
 import { addStep } from '../actions'
 
 describe('addStep', () => {

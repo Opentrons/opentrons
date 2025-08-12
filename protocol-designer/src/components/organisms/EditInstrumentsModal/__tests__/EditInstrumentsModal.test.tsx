@@ -3,24 +3,25 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { EditInstrumentsModal } from '..'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
-import { getRobotType } from '../../../../file-data/selectors'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
 import {
   getAdditionalEquipment,
   getInitialDeckSetup,
-} from '../../../../step-forms/selectors'
-import { getHas96Channel } from '../../../../utils'
+} from '/protocol-designer/step-forms/selectors'
+import { getHas96Channel } from '/protocol-designer/utils'
+
+import { EditInstrumentsModal } from '..'
 import { PipetteConfiguration } from '../PipetteConfiguration'
 import { PipetteOverview } from '../PipetteOverview'
 import { usePipetteConfig } from '../usePipetteConfig'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('../../../../file-data/selectors')
-vi.mock('../../../../step-forms/selectors')
-vi.mock('../../../../utils')
+vi.mock('/protocol-designer/file-data/selectors')
+vi.mock('/protocol-designer/step-forms/selectors')
+vi.mock('/protocol-designer/utils')
 vi.mock('../usePipetteConfig')
 vi.mock('../PipetteOverview')
 vi.mock('../PipetteConfiguration')

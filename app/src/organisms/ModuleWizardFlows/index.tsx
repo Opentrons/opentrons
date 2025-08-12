@@ -5,7 +5,7 @@ import { COLORS, LegacyStyledText } from '@opentrons/components'
 import { useModulesQuery } from '@opentrons/react-api-client'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import { useGetNewModules } from '/app/App/hooks'
+import { useGetModulesNeedingSetupThatCanCurrentlyBeSetUp } from '/app/App/hooks'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
@@ -89,7 +89,7 @@ export function ModuleWizardFlows(
   }, [])
 
   // Close the modal if no new modules are attached
-  const newModules = useGetNewModules()
+  const newModules = useGetModulesNeedingSetupThatCanCurrentlyBeSetUp()
   useEffect(() => {
     if (newModules.length === 0 && wizardFlowBaseProps.attachedModule == null) {
       handleCleanUpAndClose()
@@ -98,7 +98,6 @@ export function ModuleWizardFlows(
 
   const doorStatus = useIsDoorOpen(robotName).isDoorOpen
 
-  if (wizardFlowBaseProps.attachedPipette == null) return null
   if (showLaunchSetup || wizardFlowBaseProps.attachedModule == null) {
     return (
       <ModuleWizardScreen
@@ -226,7 +225,7 @@ export function ModuleWizardFlows(
         </ModuleWizardScreen>
       )
     case SECTIONS.PLACE_ADAPTER:
-      return (
+      return wizardFlowBaseProps.attachedPipette == null ? null : (
         <ModuleWizardScreen
           isRobotMoving={wizardFlowBaseProps.isRobotMoving}
           isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
@@ -245,7 +244,7 @@ export function ModuleWizardFlows(
         </ModuleWizardScreen>
       )
     case SECTIONS.ATTACH_PROBE:
-      return (
+      return wizardFlowBaseProps.attachedPipette == null ? null : (
         <ModuleWizardScreen
           isRobotMoving={wizardFlowBaseProps.isRobotMoving}
           isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
@@ -264,7 +263,7 @@ export function ModuleWizardFlows(
         </ModuleWizardScreen>
       )
     case SECTIONS.DETACH_PROBE:
-      return (
+      return wizardFlowBaseProps.attachedPipette == null ? null : (
         <ModuleWizardScreen
           isRobotMoving={wizardFlowBaseProps.isRobotMoving}
           isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}

@@ -28,8 +28,9 @@ import {
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack, uuid } from '@opentrons/step-generation'
 
-import { editDeckConfiguration } from '../../../step-forms/actions'
-import { getInitialDeckSetup } from '../../../step-forms/selectors'
+import { editDeckConfiguration } from '/protocol-designer/step-forms/actions'
+import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
+
 import { useKitchen } from '../Kitchen/useKitchen'
 import { getMainPagePortalEl } from '../Portal'
 import { getLabwareCompatibleForEditHardware } from '../utils'
@@ -45,8 +46,8 @@ import type {
   FlexModuleCutoutFixtureId,
   ModuleModel,
 } from '@opentrons/shared-data'
-import type { FormModules, ModuleOnDeck } from '../../../step-forms'
-import type { DeckFixture } from '../../../step-forms/actions/additionalItems'
+import type { FormModules, ModuleOnDeck } from '/protocol-designer/step-forms'
+import type { DeckFixture } from '/protocol-designer/step-forms/actions/additionalItems'
 import type { Fixtures, WizardFormState } from '../types'
 
 export interface ModuleExtended extends ModuleOnDeck {

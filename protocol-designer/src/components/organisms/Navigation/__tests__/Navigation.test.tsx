@@ -2,20 +2,21 @@ import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { SettingsIcon } from '/protocol-designer/components/organisms/SettingsIcon'
+import { getHasUnsavedChanges } from '/protocol-designer/load-file/selectors'
+
 import { Navigation } from '..'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
-import { getHasUnsavedChanges } from '../../../../load-file/selectors'
-import { SettingsIcon } from '../../SettingsIcon'
 
 import type { NavigateFunction } from 'react-router-dom'
 
 const mockNavigate = vi.fn()
 
-vi.mock('../../SettingsIcon')
-vi.mock('../../../../navigation/actions')
-vi.mock('../../../../file-data/selectors')
-vi.mock('../../../../load-file/selectors')
+vi.mock('/protocol-designer/components/organisms/SettingsIcon')
+vi.mock('/protocol-designer/navigation/actions')
+vi.mock('/protocol-designer/file-data/selectors')
+vi.mock('/protocol-designer/load-file/selectors')
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<NavigateFunction>()
   return {

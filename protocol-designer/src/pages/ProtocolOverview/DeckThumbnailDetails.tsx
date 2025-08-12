@@ -93,8 +93,8 @@ export const DeckThumbnailDetails = (
               targetDeckId={deckDef.otId}
               childrenPositioningMode="offsetToSlot"
             >
-              {labwareLoadedOnModuleId != null ? (
-                <>
+              <>
+                {labwareLoadedOnModuleId != null ? (
                   <LabwareOnDeck
                     x={0}
                     y={0}
@@ -102,15 +102,7 @@ export const DeckThumbnailDetails = (
                       initialDeckSetup.labware[labwareLoadedOnModuleId]
                     }
                   />
-                  <SlotHover
-                    robotType={robotType}
-                    hover={hover}
-                    setHover={setHover}
-                    slotPosition={[0, 0, 0]}
-                    slotId={slotId}
-                  />
-                </>
-              ) : (
+                ) : null}
                 <SlotHover
                   robotType={robotType}
                   hover={hover}
@@ -118,7 +110,7 @@ export const DeckThumbnailDetails = (
                   slotPosition={[0, 0, 0]}
                   slotId={slotId}
                 />
-              )}
+              </>
             </Module>
           </Fragment>
         )

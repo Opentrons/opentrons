@@ -11,15 +11,16 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { DropdownStepFormField } from '../../../../../../components/molecules'
+import { DropdownStepFormField } from '/protocol-designer/components/molecules'
 import {
   ABSORBANCE_READER_INITIALIZE,
   ABSORBANCE_READER_LID,
   ABSORBANCE_READER_READ,
-} from '../../../../../../constants'
-import { getRobotStateAtActiveItem } from '../../../../../../top-selectors/labware-locations'
-import { getAbsorbanceReaderLabwareOptions } from '../../../../../../ui/modules/selectors'
-import { hoverSelection } from '../../../../../../ui/steps/actions/actions'
+} from '/protocol-designer/constants'
+import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
+import { getAbsorbanceReaderLabwareOptions } from '/protocol-designer/ui/modules/selectors'
+import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
+
 import { useAbsorbanceReaderCommandType } from '../../hooks'
 import { Initialization } from './Initialization'
 import { InitializationSettings } from './InitializationSettings'
@@ -27,7 +28,7 @@ import { LidControls } from './LidControls'
 import { ReadSettings } from './ReadSettings'
 
 import type { AbsorbanceReaderState } from '@opentrons/step-generation'
-import type { AbsorbanceReaderFormType } from '../../../../../../form-types'
+import type { AbsorbanceReaderFormType } from '/protocol-designer/form-types'
 import type { StepFormProps } from '../../types'
 
 export function AbsorbanceReaderTools(props: StepFormProps): JSX.Element {

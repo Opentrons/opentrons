@@ -8,7 +8,8 @@ import {
   fixture_trash,
 } from '@opentrons/shared-data/labware/fixtures/2'
 
-import { DEFAULT_MM_OFFSET_FROM_BOTTOM } from '../../../../constants'
+import { DEFAULT_MM_OFFSET_FROM_BOTTOM } from '/protocol-designer/constants'
+
 import { dependentFieldsUpdateMix } from '../dependentFieldsUpdateMix'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -16,7 +17,7 @@ import type {
   LabwareEntities,
   PipetteEntities,
 } from '@opentrons/step-generation'
-import type { FormData } from '../../../../form-types'
+import type { FormData } from '/protocol-designer/form-types'
 
 const fixture96Plate = fixture_96_plate as LabwareDefinition2
 const fixtureTrash = fixture_trash as LabwareDefinition2

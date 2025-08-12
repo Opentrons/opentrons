@@ -13,7 +13,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { COLUMN_4_SLOTS } from './constants'
+import { COLUMN_4_SLOTS, EMPTY } from './constants'
 import { getSlotInLocationStack } from './utils'
 
 import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
@@ -67,7 +67,8 @@ export function _getNextTip(args: {
   const tiprackWellsState = robotState.tipState.tipracks[tiprackId]
   const tiprackDef = invariantContext.labwareEntities[tiprackId]?.def
 
-  const hasTip = (wellName: string): boolean => tiprackWellsState[wellName]
+  const hasTip = (wellName: string): boolean =>
+    tiprackWellsState[wellName] !== EMPTY
 
   const orderedWells = orderWells(tiprackDef.ordering, 't2b', 'l2r')
   if (pipetteChannels === 1 || nozzles === SINGLE) {

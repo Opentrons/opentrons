@@ -2,24 +2,25 @@ import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { Settings } from '..'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { optIn } from '../../../analytics/actions'
-import { getHasOptedIn } from '../../../analytics/selectors'
-import { i18n } from '../../../assets/localization'
-import { AnnouncementModal } from '../../../components/organisms'
-import { setFeatureFlags } from '../../../feature-flags/actions'
-import { getFeatureFlagData } from '../../../feature-flags/selectors'
-import { clearAllHintDismissals } from '../../../tutorial/actions'
-import { getCanClearHintDismissals } from '../../../tutorial/selectors'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { optIn } from '/protocol-designer/analytics/actions'
+import { getHasOptedIn } from '/protocol-designer/analytics/selectors'
+import { i18n } from '/protocol-designer/assets/localization'
+import { AnnouncementModal } from '/protocol-designer/components/organisms'
+import { setFeatureFlags } from '/protocol-designer/feature-flags/actions'
+import { getFeatureFlagData } from '/protocol-designer/feature-flags/selectors'
+import { clearAllHintDismissals } from '/protocol-designer/tutorial/actions'
+import { getCanClearHintDismissals } from '/protocol-designer/tutorial/selectors'
 
-vi.mock('../../../components/organisms')
-vi.mock('../../../feature-flags/actions')
-vi.mock('../../../analytics/actions')
-vi.mock('../../../tutorial/actions')
-vi.mock('../../../tutorial/selectors')
-vi.mock('../../../feature-flags/selectors')
-vi.mock('../../../analytics/selectors')
+import { Settings } from '..'
+
+vi.mock('/protocol-designer/components/organisms')
+vi.mock('/protocol-designer/feature-flags/actions')
+vi.mock('/protocol-designer/analytics/actions')
+vi.mock('/protocol-designer/tutorial/actions')
+vi.mock('/protocol-designer/tutorial/selectors')
+vi.mock('/protocol-designer/feature-flags/selectors')
+vi.mock('/protocol-designer/analytics/selectors')
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
