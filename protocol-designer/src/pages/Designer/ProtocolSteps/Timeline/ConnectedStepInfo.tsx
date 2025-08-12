@@ -43,10 +43,7 @@ import type { Dispatch, MouseEvent, SetStateAction } from 'react'
 import type { DeleteModalType } from '/protocol-designer/components/organisms'
 import type { StepIdType } from '/protocol-designer/form-types'
 import type { BaseState, ThunkAction } from '/protocol-designer/types'
-import type {
-  HoverOnStepAction,
-  SelectMultipleStepsAction,
-} from '/protocol-designer/ui/steps'
+import type { SelectMultipleStepsAction } from '/protocol-designer/ui/steps'
 
 export interface ConnectedStepInfoProps {
   stepId: StepIdType
