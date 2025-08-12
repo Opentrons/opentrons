@@ -75,12 +75,23 @@ jobs:
               const tagName = context.ref.replace(/^refs\/tags\//, '')
               try {
                 const { execSync } = require('child_process')
-                const branches = execSync(`git branch --contains ${tagName}`, { encoding: 'utf8' })
+                console.log(`Current git status:`)
+                console.log(execSync('git status', { encoding: 'utf8' }))
+                console.log(`All branches:`)
+                console.log(execSync('git branch -a', { encoding: 'utf8' }))
+                console.log(`Tag info:`)
+                console.log(execSync(`git show ${tagName} --oneline`, { encoding: 'utf8' }))
+                
+                // First, fetch all remote branches
+                execSync('git fetch --all', { encoding: 'utf8' })
+                // Get remote branches that contain this tag
+                const branches = execSync(`git branch -r --contains ${tagName}`, { encoding: 'utf8' })
+                console.log(`Raw branch output: "${branches}"`)
                 const branchList = branches.trim().split('\n')
-                  .map(b => b.replace(/^\*?\s*/, ''))
-                  .filter(b => !b.includes('HEAD detached') && b.trim() !== '')
+                  .map(b => b.replace(/^\*?\s*/, '').replace(/^origin\//, ''))
+                  .filter(b => b.trim() !== '' && !b.includes('HEAD'))
                 actualBranch = branchList[0] || context.payload.repository.default_branch
-                console.log(`Found branches for tag ${tagName}: ${branchList.join(', ')}`)
+                console.log(`Found remote branches for tag ${tagName}: ${branchList.join(', ')}`)
               } catch (error) {
                 console.log(`Error finding branch for tag ${tagName}: ${error.message}`)
                 actualBranch = context.payload.repository.default_branch
