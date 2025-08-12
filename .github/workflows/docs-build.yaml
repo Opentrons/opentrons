@@ -70,7 +70,7 @@ jobs:
             
             // Set the actual branch name (not tag name)
             const actualBranch = context.ref.startsWith('refs/tags/') 
-              ? context.payload.repository.default_branch 
+              ? context.payload.base_ref || context.payload.repository.default_branch
               : context.ref.replace(/^refs\/heads\//, '')
             core.exportVariable('ACTUAL_BRANCH', actualBranch)
       - name: 'Build docs'
