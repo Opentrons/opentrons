@@ -4,8 +4,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   ABSORBANCE_READER_V1_FIXTURE,
   FAKE_STAGING_AREA_RIGHT_SLOT,
-  FAKE_STAGING_SLOT_WITH_MAG_BLOCK,
-  FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT,
+  FAKE_STAGING_SLOT_WITH_MAG_BLOCK_FIXTURE,
+  FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT_FIXTURE,
   FLEX_STACKER_V1_FIXTURE,
   FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
   FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
@@ -405,14 +405,14 @@ describe('getReplacementFixtureForFakeFixture', () => {
 
   it('should return waste chute fixture instead of FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT', () => {
     const result = getReplacementFixtureForFakeFixture(
-      FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT
+      FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT_FIXTURE
     )
     expect(result).toEqual(WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE)
   })
 
   it('should return mag block fixture instead of FAKE_STAGING_SLOT_WITH_MAG_BLOCK', () => {
     const result = getReplacementFixtureForFakeFixture(
-      FAKE_STAGING_SLOT_WITH_MAG_BLOCK
+      FAKE_STAGING_SLOT_WITH_MAG_BLOCK_FIXTURE
     )
     expect(result).toEqual(MAGNETIC_BLOCK_V1_FIXTURE)
   })
@@ -422,7 +422,7 @@ describe('getVisualSlotIdForAA', () => {
   it('should get vs name for single right slot', () => {
     const result = getVisualSlotIdForAA(
       'cutoutA3',
-      FAKE_STAGING_SLOT_WITH_MAG_BLOCK,
+      FAKE_STAGING_SLOT_WITH_MAG_BLOCK_FIXTURE,
       'magneticBlockV1A3'
     )
     expect(result).toEqual('VSA3')
@@ -525,7 +525,7 @@ describe('getAAFixtureDisplayName', () => {
 
   it('Should return waste chute name when using waste chute fixture', () => {
     const name = getAAComboFixtureDisplayName(
-      FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT,
+      FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT_FIXTURE,
       '96ChannelWasteChute',
       deckDef,
       t,
