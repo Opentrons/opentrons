@@ -75,18 +75,10 @@ jobs:
               const tagName = context.ref.replace(/^refs\/tags\//, '')
               try {
                 const { execSync } = require('child_process')
-                console.log(`Current git status:`)
-                console.log(execSync('git status', { encoding: 'utf8' }))
-                console.log(`All branches:`)
-                console.log(execSync('git branch -a', { encoding: 'utf8' }))
-                console.log(`Tag info:`)
-                console.log(execSync(`git show ${tagName} --oneline`, { encoding: 'utf8' }))
-                
                 // First, fetch all remote branches
                 execSync('git fetch --all', { encoding: 'utf8' })
                 // Get remote branches that contain this tag
                 const branches = execSync(`git branch -r --contains ${tagName}`, { encoding: 'utf8' })
-                console.log(`Raw branch output: "${branches}"`)
                 const branchList = branches.trim().split('\n')
                   .map(b => b.replace(/^\*?\s*/, '').replace(/^origin\//, ''))
                   .filter(b => b.trim() !== '' && !b.includes('HEAD'))
