@@ -43,26 +43,14 @@ SessionCreateParamType = typing.Union[
 ]
 
 
-class SessionCreateAttributes(BaseModel):
-    """Attributes required for creating a session"""
-
-    sessionType: SessionType = Field(..., description="The type of the session")
-
-
-class SessionCreateAttributesNoParams(SessionCreateAttributes):
-    """The base model of request that has no createParams."""
-
-    createParams: typing.Optional[BaseModel] = None
-
-
-class CalibrationCheckCreateAttributes(SessionCreateAttributesNoParams):
+class CalibrationCheckCreateAttributes(BaseModel):
     """The calibration check create request."""
 
     sessionType: Literal[SessionType.calibration_check] = SessionType.calibration_check
     createParams: CalCheckCreateParams
 
 
-class TipLengthCalibrationCreateAttributes(SessionCreateAttributes):
+class TipLengthCalibrationCreateAttributes(BaseModel):
     """The tip length calibration create request."""
 
     sessionType: Literal[
@@ -71,13 +59,18 @@ class TipLengthCalibrationCreateAttributes(SessionCreateAttributes):
     createParams: SessionCreateParams
 
 
-class DeckCalibrationCreateAttributes(SessionCreateAttributesNoParams):
+class _NoParams(BaseModel):
+    ...
+
+
+class DeckCalibrationCreateAttributes(BaseModel):
     """The deck calibration create request."""
 
     sessionType: Literal[SessionType.deck_calibration] = SessionType.deck_calibration
+    createParams: None | _NoParams = None
 
 
-class PipetteOffsetCalibrationCreateAttributes(SessionCreateAttributes):
+class PipetteOffsetCalibrationCreateAttributes(BaseModel):
     """Pipette offset calibration create request."""
 
     sessionType: Literal[
