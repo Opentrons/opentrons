@@ -208,14 +208,14 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
         stacker_hw = self._equipment.get_module_hardware_api(stacker_state.module_id)
 
         state_update = update_types.StateUpdate()
+        if stacker_hw is not None:
+            stacker_hw.set_stacker_identify(True)
 
-        if stacker_hw is None and not params.manualMove:
+        if not params.manualMove and stacker_hw is not None:
             try:
-                if stacker_hw is not None:
-                    stacker_hw.set_stacker_identify(True)
-                    await stacker_hw.store_labware(
-                        labware_height=stacker_state.get_pool_height_minus_overlap()
-                    )
+                await stacker_hw.store_labware(
+                    labware_height=stacker_state.get_pool_height_minus_overlap()
+                )
             except FlexStackerStallError as e:
                 return DefinedErrorData(
                     public=FlexStackerStallOrCollisionError(
@@ -282,7 +282,7 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
             ),
         )
 
-        if stacker_hw is not None and not params.manualMove:
+        if stacker_hw is not None:
             stacker_hw.set_stacker_identify(False)
 
         return SuccessData(

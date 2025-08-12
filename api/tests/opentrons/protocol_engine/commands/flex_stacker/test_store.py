@@ -444,6 +444,7 @@ async def test_store_raises_if_labware_does_not_match(
         await subject.execute(data)
 
 
+@pytest.mark.parametrize("manual_move", [False, True])
 async def test_store(
     decoy: Decoy,
     state_view: StateView,
@@ -452,9 +453,10 @@ async def test_store(
     subject: StoreImpl,
     stacker_hardware: FlexStacker,
     flex_50uL_tiprack: LabwareDefinition,
+    manual_move: bool,
 ) -> None:
     """It should store the labware on the stack."""
-    data = flex_stacker.StoreParams(moduleId=stacker_id)
+    data = flex_stacker.StoreParams(moduleId=stacker_id, manualMove=manual_move)
 
     fs_module_substate = FlexStackerSubState(
         module_id=stacker_id,
@@ -513,7 +515,11 @@ async def test_store(
 
     result = await subject.execute(data)
 
-    decoy.verify(await stacker_hardware.store_labware(labware_height=4), times=1)
+    decoy.verify(
+        await stacker_hardware.store_labware(labware_height=4),
+        times=1 if not manual_move else 0,
+    )
+
     assert result == SuccessData(
         public=flex_stacker.StoreResult(
             primaryOriginLocationSequence=[
