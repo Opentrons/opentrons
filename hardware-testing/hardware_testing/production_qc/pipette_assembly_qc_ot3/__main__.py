@@ -1449,9 +1449,9 @@ async def _test_diagnostics(api: OT3API, mount: OT3Mount, write_cb: Callable) ->
     #print(f"encoder: {_bool_to_pass_fail(encoder_pass)}")
     LOG_GING.info(f"encoder: {_bool_to_pass_fail(encoder_pass)}")
     write_cb(["diagnostics-encoder", _bool_to_pass_fail(encoder_pass)])
-    encoder_clean_pass = await test_encoder(api, mount)
+    encoder_clean_pass, cumulative_drift, avg_drift  = await test_encoder(api, mount)
     LOG_GING.info(f"encoder: {_bool_to_pass_fail(encoder_clean_pass)}")
-    write_cb(["diagnostics-encoder-clean", _bool_to_pass_fail(encoder_clean_pass)])
+    write_cb(["diagnostics-encoder-clean", cumulative_drift, avg_drift, _bool_to_pass_fail(encoder_clean_pass)])
     # CAPACITIVE SENSOR
     #print("SKIPPING CAPACITIVE TESTS")
     LOG_GING.info("SKIPPING CAPACITIVE TESTS")

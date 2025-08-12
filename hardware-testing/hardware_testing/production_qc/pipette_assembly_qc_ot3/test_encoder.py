@@ -35,7 +35,7 @@ async def _plunger_alignment(
 async def test_encoder(
     api: OT3API,
     mount: types.OT3Mount,
-) -> bool:
+) -> Tuple[bool,float,float]:
     cycles = 100
     await api.cache_instruments()
     await api.home()
@@ -110,4 +110,4 @@ async def test_encoder(
     print(f"\t>> Cumulative error:       {cumulative_error} mm")
     print(f"\t>> Absolute error average: {abs_error / completed_moves} mm")
     print("\n*******************************************************************\n")
-    return (not stall)
+    return ((not stall), cumulative_error, (abs_error / completed_moves))
