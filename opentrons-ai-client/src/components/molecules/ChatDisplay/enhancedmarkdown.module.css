@@ -1,0 +1,160 @@
+/* Enhanced Markdown Styles */
+.enhanced_markdown {
+  width: 100%;
+  line-height: 1.5rem;
+  font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    'Helvetica Neue', Arial, sans-serif;
+  color: #000000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Code Block - Light theme */
+.code_block_wrapper {
+  position: relative;
+  margin: 0.5rem 0;
+  border-radius: 0.375rem;
+  background: #f8f8f8;
+  overflow: hidden;
+  border: 1px solid #e0e0e0;
+}
+
+.code_block {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  background: #f8f8f8;
+  color: #000000;
+  font-family: 'Monaco', 'Consolas', 'Courier New', monospace;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  overflow-x: auto;
+}
+
+.python_code {
+  display: block;
+}
+
+/* Copy Button */
+.copy_button_container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background: #f0f0f0;
+  border-bottom: 1px solid #e1e1e1;
+}
+
+.button_group {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.language_badge {
+  font-size: 0.75rem;
+  color: #666666;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.copy_button {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: #ffffff;
+  border: 1px solid #d1d1d1;
+  color: #333333;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.copy_button:hover {
+  background: #f5f5f5;
+  border-color: #999999;
+}
+
+/* Inline code */
+.inline_code {
+  background: #f0f0f0;
+  border: 1px solid #d0d0d0;
+  border-radius: 0.25rem;
+  padding: 0.125rem 0.25rem;
+  font-family: 'Monaco', 'Consolas', 'Courier New', monospace;
+  font-size: 0.9rem;
+  color: #000000;
+  white-space: pre-wrap;
+  display: inline-block;
+}
+
+/* Text elements - Body default regular */
+.paragraph {
+  margin: 0;
+  padding: 0.5rem 0;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 400;
+  color: #000000;
+}
+
+.paragraph:first-child {
+  padding-top: 0;
+}
+
+.paragraph:last-child {
+  padding-bottom: 0;
+}
+
+.list {
+  margin: 0;
+  padding: 0.5rem 0 0.5rem 1.5rem;
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+
+.list_item {
+  margin: 0.25rem 0;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  color: #000000;
+}
+
+/* Headings - heading small regular */
+.heading {
+  margin: 0;
+  padding: 1.5rem 0 0.5rem 0;
+  font-weight: 400;
+  color: #000000;
+}
+
+.heading:first-child {
+  padding-top: 0;
+}
+
+.heading_h1 {
+  font-size: 1.5rem;
+  line-height: 1.75rem;
+}
+
+.heading_h2 {
+  font-size: 1.25rem;
+  line-height: 1.5rem;
+}
+
+.heading_h3 {
+  font-size: 1.125rem;
+  line-height: 1.375rem;
+}
+
+.link {
+  color: #0066cc;
+  text-decoration: underline;
+}
+
+.link:hover {
+  color: #0052a3;
+}
