@@ -76,7 +76,9 @@ jobs:
               try {
                 const { execSync } = require('child_process')
                 const branches = execSync(`git branch --contains ${tagName}`, { encoding: 'utf8' })
-                const branchList = branches.trim().split('\n').map(b => b.replace(/^\*?\s*/, ''))
+                const branchList = branches.trim().split('\n')
+                  .map(b => b.replace(/^\*?\s*/, ''))
+                  .filter(b => !b.includes('HEAD detached') && b.trim() !== '')
                 actualBranch = branchList[0] || context.payload.repository.default_branch
                 console.log(`Found branches for tag ${tagName}: ${branchList.join(', ')}`)
               } catch (error) {
