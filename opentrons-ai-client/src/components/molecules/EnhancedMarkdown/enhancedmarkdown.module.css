@@ -19,9 +19,9 @@
 /* Inline code */
 .inline_code {
   display: inline-block;
-  padding: 0.125rem 0.25rem;
+  padding: var(--spacing-2, 0.125rem) var(--spacing-4, 0.25rem);
   border: 1px solid #d0d0d0;
-  border-radius: 0.25rem;
+  border-radius: var(--spacing-4, 0.25rem);
   background: #f0f0f0;
   color: #000;
   font-family: 'Reddit Mono', monospace;
@@ -31,7 +31,7 @@
 
 /* Text elements - Body default regular */
 .paragraph {
-  padding: 0.5rem 0;
+  padding: var(--spacing-8, 0.5rem) 0;
   margin: 0;
   color: #000;
   font-size: 1rem;
@@ -48,14 +48,14 @@
 }
 
 .list {
-  padding: 0.25rem 0 0.5rem 1.5rem;
+  padding: var(--spacing-4, 0.25rem) 0 var(--spacing-8, 0.5rem) var(--spacing-24, 1.5rem);
   margin: 0;
   font-size: 1rem;
   line-height: 1.5rem;
 }
 
 .list_item {
-  margin: 0.25rem 0;
+  margin: var(--spacing-4, 0.25rem) 0;
   color: #000;
   font-size: 1rem;
   line-height: 1.5rem;
@@ -63,7 +63,7 @@
 
 /* Headings - heading small regular */
 .heading {
-  padding: 1.5rem 0 0.5rem 0;
+  padding: var(--spacing-24, 1.5rem) 0 var(--spacing-8, 0.5rem) 0;
   margin: 0;
   color: #000;
   font-weight: 400;
@@ -99,5 +99,5 @@
 
 /* Spacing adjustments for better visual hierarchy */
 .paragraph + .list {
-  margin-top: -0.75rem; /* Pull lists much closer to preceding paragraphs */
+  margin-top: var(--spacing-negative-12, -0.75rem); /* Pull lists much closer to preceding paragraphs */
 }

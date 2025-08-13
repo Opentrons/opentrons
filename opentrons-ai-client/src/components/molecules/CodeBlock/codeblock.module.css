@@ -8,8 +8,7 @@
 }
 
 .code_block {
-  padding: calc(var(--spacing-12, 0.75rem) + 0.5rem) var(--spacing-16, 1rem);
-  margin: 0;
+  padding: 1.25rem var(--spacing-16, 1rem);
   background: #f8f8f8;
   color: #000;
   font-family: 'Reddit Mono', monospace;

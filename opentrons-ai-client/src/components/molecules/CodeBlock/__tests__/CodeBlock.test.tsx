@@ -1,5 +1,5 @@
 import { screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { renderWithProviders } from '/ai-client/__testing-utils__'
 import { i18n } from '/ai-client/i18n'
@@ -23,8 +23,14 @@ const render = (
 }
 
 describe('CodeBlock', () => {
+  let props: ComponentProps<typeof CodeBlock>
+
+  beforeEach(() => {
+    props = { code: mockPythonCode }
+  })
+
   it('should render Python code', () => {
-    render()
+    render(props)
     // Check that code block structure is rendered
     expect(screen.getByRole('code')).toBeInTheDocument()
 
@@ -39,14 +45,15 @@ describe('CodeBlock', () => {
   })
 
   it('should render empty code block when code is empty', () => {
-    render({ code: '' })
+    props.code = ''
+    render(props)
     // Code element should still be present even when empty
     expect(screen.getByRole('code')).toBeInTheDocument()
   })
 
   it('should preserve multiple lines of code', () => {
-    const multilineCode = 'line1\nline2\nline3'
-    render({ code: multilineCode })
+    props.code = 'line1\nline2\nline3'
+    render(props)
 
     // Check that code block is rendered with proper structure
     expect(screen.getByRole('code')).toBeInTheDocument()

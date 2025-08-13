@@ -6,6 +6,7 @@ import { CodeBlockToolbar } from '/ai-client/components/molecules/CodeBlockToolb
 
 import styles from './codeblock.module.css'
 
+import type { CSSProperties } from 'react'
 import type { SyntaxToken } from '/ai-client/components/molecules/CodeBlock/pythonSyntaxUtils'
 
 interface CodeBlockProps {
@@ -17,6 +18,11 @@ const FONT_STYLE_ITALIC = 'font-style: italic;'
 
 const highlightPythonSyntax = (code: string): JSX.Element[] => {
   const lines = code.split('\n')
+
+  // Remove trailing empty line if code ends with newline
+  if (lines[lines.length - 1] === '') {
+    lines.pop()
+  }
 
   return lines.map((line, lineIndex) => {
     // Create tokens with positions to avoid overlapping
@@ -82,7 +88,7 @@ const highlightPythonSyntax = (code: string): JSX.Element[] => {
     PYTHON_REGEX_PATTERNS.methodCall.lastIndex = 0
     while ((match = PYTHON_REGEX_PATTERNS.methodCall.exec(line)) !== null) {
       // Create a match object for just the method name (without the dot)
-      const methodMatch = Object.assign([], match[1]) as RegExpExecArray
+      const methodMatch = [match[1]] as RegExpExecArray
       methodMatch.index = (match.index ?? 0) + 1
       methodMatch.input = match.input
       addToken(methodMatch, PYTHON_SYNTAX_COLORS.functionCall)
@@ -117,7 +123,7 @@ const highlightPythonSyntax = (code: string): JSX.Element[] => {
       }
 
       // Add the styled token
-      const style: React.CSSProperties = {
+      const style: CSSProperties = {
         color: token.color,
       }
 

@@ -1,5 +1,5 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/ai-client/__testing-utils__'
 import { i18n } from '/ai-client/i18n'
@@ -15,7 +15,7 @@ const render = (props = {}) => {
 }
 
 describe('CodeBlockToolbar', () => {
-  beforeEach(() => {
+  afterEach(() => {
     vi.clearAllMocks()
     // Mock clipboard API
     Object.defineProperty(navigator, 'clipboard', {
