@@ -37,7 +37,8 @@ metadata = {"protocolName": "8ch Pre-heating protocol"}
 requirements = {"robotType": "Flex", "apiLevel": "2.21"}
 
 
-async def change_current(self, current: float) -> None:
+async def change_current(self, current: float) -> None:  # noqa: ANN001
+    """Set active current."""
     await self._backend.set_active_current({Axis.P_L: current})
 
 

@@ -100,7 +100,7 @@ def print_info(message: str) -> None:
 
 
 def print_fail(message: str) -> None:
-    """print fail"""
+    """Print fail."""
     length = len(message)
     dashes = PRINT_HEADER_DASHES + ("-" * length) + PRINT_HEADER_DASHES
     middle = f"|{PRINT_HEADER_SPACES}{message}{PRINT_HEADER_SPACES}|"
@@ -109,7 +109,7 @@ def print_fail(message: str) -> None:
 
 
 def print_test_results(message: str, passval: bool) -> None:
-    """print fail"""
+    """Print test results."""
     PRINT_HEADER_ASTERISK = "*" * PRINT_HEADER_NUM_SPACES
     length = len(message)
     dashes = PRINT_HEADER_ASTERISK + ("*" * length) + PRINT_HEADER_ASTERISK
@@ -121,14 +121,13 @@ def print_test_results(message: str, passval: bool) -> None:
         _output(f"\033[1;31m\n 测试结果 {dashes} \n{middle}\n{dashes}\n\033[0m")
 
 
-def print_results(message: Union[str, Set[str], List[str]], passval: bool) -> None:
-    """ "test results list"""
-
+def print_results(message: Union[Set[str], List[str]], passval: bool) -> None:
+    """Print test results list."""
     max_length = max(len(item) for item in message)
     PRINT_HEADER_ASTERISK = "*" * PRINT_HEADER_NUM_SPACES
     dashes = PRINT_HEADER_ASTERISK + ("*" * max_length) + PRINT_HEADER_ASTERISK
     if passval:
-        _output(f"\033[4;32m\n 测试结果PASS  ")
+        _output("\033[4;32m\n 测试结果PASS  ")
         _output(f"{dashes}\n\033[0m")
     else:
         middle = [

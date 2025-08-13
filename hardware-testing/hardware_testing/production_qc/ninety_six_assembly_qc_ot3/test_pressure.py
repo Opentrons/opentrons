@@ -15,7 +15,6 @@ from opentrons.hardware_control.types import InstrumentProbeType
 from opentrons.hardware_control.motion_utilities import target_position_from_relative
 
 from hardware_testing.data import ui
-from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import OT3Mount, Point, Axis
 from hardware_testing.data.csv_report import (
     CSVReport,
@@ -33,7 +32,7 @@ SECOND_SEALED_PRESSURE_FIXTURE_POS = (
     Point(264.71, 212.81, 49.4) if USE_SEALED_BLOCK else Point(264.71, 212.81, 44.4)
 )  # attached tip
 SET_PRESSURE_TARGET = 100  # read air pressure when the force pressure value is over 100
-REACHED_PRESSURE = 0
+REACHED_PRESSURE = 0.0
 
 SECONDS_BETWEEN_READINGS = 0.25
 NUM_PRESSURE_READINGS = 10
@@ -150,9 +149,8 @@ def check_value(
 
 async def calibrate_to_pressue_fixture(
     api: OT3API, sensor: SealedPressureDriver, fixture_pos: Point
-):
-    """move to suitable height for readding air pressure"""
-    global REACHED_PRESSURE
+) -> None:
+    """Move to suitable height for reading air pressure."""
     await api.move_to(OT3Mount.LEFT, fixture_pos)
     if api.is_simulator:
         debug_target = f"{SET_PRESSURE_TARGET}"
@@ -166,6 +164,7 @@ async def calibrate_to_pressue_fixture(
         force_pressure = sensor.get_pressure()
         # step = -0.06 if abs(float(force_pressure)) > 0.1 else -0.1
         step = -0.06
+        assert force_pressure is not None
         print("Force pressure is: ", force_pressure)
         if force_pressure < float(debug_target.strip()):
             await api.move_rel(OT3Mount.LEFT, Point(x=0, y=0, z=step))
@@ -206,7 +205,7 @@ async def _partial_pick_up(api: OT3API, position: Point, current: float) -> None
     await api.home_z(OT3Mount.LEFT)
 
 
-async def run(
+async def run(  # NOQA: C901
     api: OT3API, report: CSVReport, section: str, pipette: Literal[200, 1000]
 ) -> None:
     """Run."""

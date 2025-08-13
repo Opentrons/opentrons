@@ -9,7 +9,6 @@ from dataclasses import dataclass
 import time
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import Axis, OT3Mount
-from hardware_testing.gravimetric.helpers import get_pipette_unique_name
 import enum
 import argparse
 import csv
@@ -81,9 +80,6 @@ async def main(args: argparse.Namespace, cfg: TestConfig) -> None:
     settings.max_speed = 25
     settings.acceleration = 100
     settings.run_current = 0.7
-    default_current = settings.run_current
-    default_speed = settings.max_speed
-    default_acceleration = 100
     top, bottom, blow_out, _ = helpers_ot3.get_plunger_positions_ot3(api, mount)
     print(f"Settings: {settings}")
     print(f"top: {top} bottom: {bottom} blow_out: {blow_out}")

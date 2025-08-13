@@ -1,12 +1,8 @@
-import argparse
-import asyncio
-
+"""Test Encoder cleanliness."""
 from hardware_testing.opentrons_api import types
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing import data
 from typing import List, Union, Literal, Tuple
-from hardware_testing.opentrons_api.types import GantryLoad, OT3Mount, Axis, Point, Axis
-from time import monotonic
+from hardware_testing.opentrons_api.types import OT3Mount
 from opentrons.hardware_control.ot3api import OT3API
 
 from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
@@ -54,16 +50,12 @@ async def run(
     section: str,
     pipette_size: Literal[200, 1000],
 ) -> None:
+    """Run."""
     cycles = 100
     mount = types.OT3Mount.LEFT
     await api.cache_instruments()
     await api.home()
     await api.home_plunger(mount)
-
-    pipette = helpers_ot3._get_pipette_from_mount(api, mount)
-    test_tag = pipette.name
-
-    test_name = "pipette-mixing-test"
 
     top_pos, bottom_pos, _, _ = helpers_ot3.get_plunger_positions_ot3(api, mount)
     pipette_ax = types.Axis.of_main_tool_actuator(mount)

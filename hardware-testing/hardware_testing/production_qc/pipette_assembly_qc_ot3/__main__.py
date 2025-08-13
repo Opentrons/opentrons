@@ -47,7 +47,6 @@ from .pressure import (  # type: ignore[import]
     pressure_fixture_a1_location,
     PressureEvent,
     PressureEventConfig,
-    PRESSURE_FIXTURE_INSERT_DEPTH,
     PRESSURE_ASPIRATE_DELTA_SPEC,
 )
 from hardware_testing.opentrons_api import helpers_ot3
@@ -57,7 +56,6 @@ from hardware_testing.opentrons_api.types import (
     Axis,
 )
 
-from opentrons.config.defaults_ot3 import DEFAULT_LIQUID_PROBE_SETTINGS
 
 DEFAULT_SLOT_TIP_RACK_1000 = 7
 DEFAULT_SLOT_TIP_RACK_200 = 4
@@ -215,7 +213,6 @@ TRASH_OFFSETS = [
 
 
 LOGGING: logging.Logger = logging.getLogger("QCTEST")
-LOGGING_STARTED = False
 
 
 def _save_logging_print(pipette_sn: str) -> None:
@@ -247,7 +244,6 @@ def _save_logging_print(pipette_sn: str) -> None:
 
         LOGGING.addHandler(console_handler)
         LOGGING.addHandler(file_handler)
-        LOGGING_STARTED = True
     except Exception as eeerr:
         print(f"log err: {eeerr}")
 
@@ -387,7 +383,7 @@ async def _pick_up_tip(
     except Exception as err:
         # print(f"Error picking up tip: {err}")
         LOGGING.critical(f"Error picking up tip: {err}")
-        prinval = f"07-02光电传感器故障: 取针管状态不正确"
+        prinval = "07-02光电传感器故障: 取针管状态不正确"
         LOGGING.error(prinval)
         FINAL_TEST_FAIL_INFOR.append(prinval)
         ui.print_fail(prinval)
@@ -405,6 +401,7 @@ async def _pick_up_tip_newfixture(
     tip_volume: Optional[float] = None,
     movezval: float = 1,
 ) -> Point:
+    """Pick up a tip."""
     actual = await _move_to_or_calibrate(api, mount, expected, actual)
     tip_offset = _tip_name_to_xy_offset(tip)
     tip_pos = actual + tip_offset
@@ -421,7 +418,7 @@ async def _pick_up_tip_newfixture(
     except Exception as err:
         # print(f"Error picking up tip: {err}")
         LOGGING.critical(f"Error picking up tip: {err}")
-        prinval = f"07-02光电传感器故障: 取针管状态不正确"
+        prinval = "07-02光电传感器故障: 取针管状态不正确"
         LOGGING.error(prinval)
         FINAL_TEST_FAIL_INFOR.append(prinval)
         ui.print_fail(prinval)
@@ -434,6 +431,7 @@ async def _pick_up_tip_newfixture(
 async def _pick_up_tip_for_tip_volume(
     api: OT3API, mount: OT3Mount, tip_volume: int
 ) -> None:
+    """Pick up tip."""
     pip = api.hardware_pipettes[mount.to_mount()]
     assert pip
     pip_channels = pip.channels.value
@@ -994,7 +992,7 @@ async def _test_diagnostics_environment(
     celsius_pass = True
     humidity_pass = True
 
-    ENVIRONMENT_SENSOR = asair_sensor.BuildAsairSensor(not api.is_simulator)
+    ENVIRONMENT_SENSOR = asair_sensor.BuildAsairSensor(api.is_simulator)
     # ROOM
     if not api.is_simulator:
 
@@ -1323,7 +1321,7 @@ async def _test_diagnostics_capacitive(  # noqa: C901
     return all(results)
 
 
-async def _test_diagnostics_pressure(
+async def _test_diagnostics_pressure(  # NOQA: C901
     api: OT3API, mount: OT3Mount, write_cb: Callable
 ) -> bool:
     # print("testing pressure")
@@ -1931,8 +1929,8 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
         pipptype = api.attached_pipettes
         try:
             print(f"pipette type: {pipptype[OT3Mount.LEFT.to_mount()]['name']}")
-        except Exception as errr:
-            print("07-05移液器无条码:移液器没烧录条码")
+        except Exception as err:
+            print(f"07-05移液器无条码:移液器没烧录条码: {err}")
 
         # home and move to attach position
         await api.home([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R])
@@ -2284,7 +2282,7 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
 
         printsig = f"08-01-assembly-system-error:系统错误,日志:{err}"
         ui.print_fail(printsig)
-        if not LOGGING_STARTED:
+        if len(LOGGING.handlers) == 0:
             _save_logging_print("Pipette-test-system-err")
         LOGGING.error(printsig)
         LOGGING.critical(err)

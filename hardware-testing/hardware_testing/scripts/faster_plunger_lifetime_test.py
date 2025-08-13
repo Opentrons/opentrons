@@ -9,7 +9,6 @@ from dataclasses import dataclass
 import time
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import Axis, OT3Mount
-from hardware_testing.gravimetric.helpers import get_pipette_unique_name
 import enum
 import argparse
 import csv
@@ -62,7 +61,7 @@ async def _is_plunger_still_aligned_with_encoder(
     return p_enc, p_est, is_aligned
 
 
-async def main(args: argparse.Namespace, cfg: TestConfig) -> None:
+async def main(args: argparse.Namespace, cfg: TestConfig) -> None:  # NOQA: C901
     """Run."""
     pipette_string = "p1000_96_v3.4" if cfg.pipette == 1000 else "p200_96_v3.1"
 

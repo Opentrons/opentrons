@@ -4,7 +4,6 @@ import asyncio
 from typing import List
 
 from opentrons.hardware_control.ot3api import OT3API
-from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.config.defaults_ot3 import (
     DEFAULT_RUN_CURRENT,
     DEFAULT_MAX_SPEEDS,

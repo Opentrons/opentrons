@@ -1,32 +1,17 @@
 """96ch Tip-Motors Assembly."""
 import asyncio
 
-from hardware_testing.opentrons_api.types import Axis
-from hardware_testing.opentrons_api import helpers_ot3
 
-
-MOTOR_RETRACT_MM = 5
-
-
-# test jaws
-"""Test Jaws."""
-from typing import List, Union, Tuple, Dict
+from typing import List, Tuple, Dict
 
 from opentrons.hardware_control.ot3api import OT3API
 
 from hardware_testing.data import ui
-from hardware_testing.data.csv_report import (
-    CSVReport,
-    CSVResult,
-    CSVLine,
-    CSVLineRepeating,
-)
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import Axis, OT3Mount
 
-# from opentrons.hardware_control.backends.ot3utils import axis_convert
 
-
+MOTOR_RETRACT_MM = 5
 RETRACT_MM = 0.25  # 0.25
 MAX_TRAVEL = 29.8 - RETRACT_MM  # FIXME: what is the max travel?
 ENDSTOP_OVERRUN_MM = (
@@ -75,7 +60,7 @@ async def jaw_precheck(api: OT3API, ax: Axis, speed: float) -> Tuple[bool, bool]
     return led_check, jaws_aligned
 
 
-async def _run_test_jaw(api: OT3API):
+async def _run_test_jaw(api: OT3API) -> None:
     ax = Axis.Q
     settings = helpers_ot3.get_gantry_load_per_axis_motion_settings_ot3(api, ax)
     default_current = settings.run_current
