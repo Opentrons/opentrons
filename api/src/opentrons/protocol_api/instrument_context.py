@@ -1833,6 +1833,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :param keep_last_tip: When ``True``, the pipette keeps the last tip used in the transfer attached. When
             ``False``, the last tip will be dropped or returned. If not set, behavior depends on the value of
             ``new_tip``. ``new_tip="never"`` keeps the tip, and all other values of ``new_tip`` drop or return the tip.
+        :param tip_racks: If provided, use the tip racks given instead of the pipette's assigned tip racks.
 
         """
         if volume == 0.0:
@@ -1959,6 +1960,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :param keep_last_tip: When ``True``, the pipette keeps the last tip used in the distribute attached. When
             ``False``, the last tip will be dropped or returned. If not set, behavior depends on the value of
             ``new_tip``. ``new_tip="never"`` keeps the tip, and all other values of ``new_tip`` drop or return the tip.
+        :param tip_racks: If provided, use the tip racks given instead of the pipette's assigned tip racks.
 
         """
         if volume == 0.0:
@@ -2094,6 +2096,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :param keep_last_tip: When ``True``, the pipette keeps the last tip used in the consolidate attached. When
             ``False``, the last tip will be dropped or returned. If not set, behavior depends on the value of
             ``new_tip``. ``new_tip="never"`` keeps the tip, and all other values of ``new_tip`` drop or return the tip.
+        :param tip_racks: If provided, use the tip racks given instead of the pipette's assigned tip racks.
 
         """
         if volume == 0.0:
