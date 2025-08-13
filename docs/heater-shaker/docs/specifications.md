@@ -54,15 +54,15 @@ The following table lists power consumption values measured at the wall outlet. 
       <td>Normal</td>
       <td>
         <ul>
-          <li>Shaking: 4-11 W</li>
-          <li>Heating: 10-30 W</li>
-          <li>Heating and Shaking: 10-40 W</li>
+          <li>Shaking: 4–11 W</li>
+          <li>Heating: 10–30 W</li>
+          <li>Heating and Shaking: 10–40 W</li>
         </ul>
       </td>
     </tr>
     <tr>
       <td>Maximum</td>
-      <td>125-130 W</td>
+      <td>125–130 W</td>
     </tr>
   </tbody>
 </table>

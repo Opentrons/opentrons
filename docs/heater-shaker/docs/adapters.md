@@ -27,7 +27,7 @@ The listed thermal adapters are only compatible with the following labware.
 [opentronsTough]: https://labware.opentrons.com/nest_96_wellplate_100ul_pcr_full_skirt?category=wellPlate#/?loadName=opentrons_96_wellplate_200ul_pcr_full_skirt
 [corning384]: https://labware.opentrons.com/nest_96_wellplate_100ul_pcr_full_skirt?category=wellPlate#/?loadName=corning_384_wellplate_112ul_flat
 
-The Universal Flat Bottom Plate Adapter works with most flat- bottom ANSI/SLAS automation compliant labware. For more information, see the JSON Labware Schema section in the Labware chapter of the Flex Instruction Manual.
+The Universal Flat Bottom Plate Adapter works with most flat- bottom ANSI/SLAS automation compliant labware. For more information, see the [JSON Labware Schema section](../flex/labware/definitions.md#json-labware-schema) in the Labware chapter of the Flex Instruction Manual.
 
 ## Attaching a Thermal Adapter
 

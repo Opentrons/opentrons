@@ -8,7 +8,7 @@ Review this section for important information about deck placement, alignment, a
 
 ## Flex Caddies
 
-When used with a Flex robot, the Heater-Shaker fits into a caddy that occupies space below the deck. The caddy places your labware closer to the deck surface and allows for below-deck cable routing. See the Caddies section in Chapter 4 of the Flex Instruction Manual for more information.
+When used with a Flex robot, the Heater-Shaker fits into a caddy that occupies space below the deck. The caddy places your labware closer to the deck surface and allows for below-deck cable routing. See the [Caddies section](../flex/modules/caddy.md) of the Flex Instruction Manual for more information.
 
 ![Module caddy with labels](images/hs-caddy.png)
 

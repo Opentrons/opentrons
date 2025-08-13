@@ -24,15 +24,15 @@ Opentrons has validated the Heater-Shaker’s performance in the conditions reco
   <tbody>
     <tr>
       <td>Ambient Temperatures</td>
-      <td>20-24 °C</td>
-      <td>20-25 °C</td>
-      <td>-10 to +60 °C</td>
+      <td>20 to 24 °C</td>
+      <td>20 to 25 °C</td>
+      <td>–10 to +60 °C</td>
     </tr>
     <tr>
       <td>Relative Humidity</td>
-      <td>40-60%, non-condensing</td>
+      <td>40 to 60%, non-condensing</td>
       <td>80%</td>
-      <td>10-85%, non-condensing (below 30 °C)</td>
+      <td>10 to 85%, non-condensing (below 30 °C)</td>
     </tr>
     <tr>
       <td>Altitude</td>
@@ -110,7 +110,7 @@ The Heater-Shaker has been tested and found to be in compliance with all applica
 ### Safety
 
 - IEC/EN 61010-1 Safety­ Requirements­ for­ Electrical­ Equipment for­ Measurement,­ Control­, and Laboratory Use
-- IEC ­ 61010-2-010­ Requirement ­for­ Heating
+- IEC 61010-2-010­ Requirement ­for­ Heating
 - IEC 61010-2-051: 2018­ Particular Requirements For Laboratory Equipment for Mixing and Stirring
 
 ### Electromagnetic Compatibility
