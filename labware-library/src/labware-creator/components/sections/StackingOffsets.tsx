@@ -152,7 +152,6 @@ export function StackingOffsets(): JSX.Element | null {
   ) {
     return null
   }
-
   return (
     <div className={styles.new_definition_section}>
       <SectionBody label={label} id="StackingOffsets">
@@ -190,10 +189,7 @@ export function StackingOffsets(): JSX.Element | null {
                 make the required measurement with calipers.
               </p>
             </div>
-
-            {modifiedAdapterDefinitions.length === 0 ? null : (
-              <Flex gridGap={SPACING.spacing4} flexDirection={DIRECTION_COLUMN}>
-                <LegacyStyledText
+            <LegacyStyledText
                   as="h3"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 >
@@ -212,6 +208,8 @@ export function StackingOffsets(): JSX.Element | null {
                   />
                   <StackingAlerts values={values} touched={touched} />
                 </div>
+            {modifiedAdapterDefinitions.length === 0 ? null : (
+              <Flex gridGap={SPACING.spacing4} flexDirection={DIRECTION_COLUMN}>
                 <LegacyStyledText
                   as="h3"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}

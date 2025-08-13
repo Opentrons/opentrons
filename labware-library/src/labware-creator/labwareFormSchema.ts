@@ -9,10 +9,10 @@ import {
   LABWARE_TOO_SMALL_ERROR,
   labwareTypeOptions,
   LOOSE_TIP_FIT_ERROR,
+  MAX_SUGGESTED_GRIPPER_Z,
   MAX_X_DIMENSION,
   MAX_Y_DIMENSION,
   MAX_Z_DIMENSION,
-  MAX_SUGGESTED_GRIPPER_Z,
   MIN_X_DIMENSION,
   MIN_Y_DIMENSION,
   MUST_BE_A_NUMBER_ERROR,
@@ -21,12 +21,14 @@ import {
   wellShapeOptions,
 } from './fields'
 import { getDefaultDisplayName, getDefaultLoadName } from './formSelectors'
+import { getStackedLabwareZDimension } from './labwareDefToFields'
 
 import type {
   LabwareFields,
   LabwareType,
   ProcessedLabwareFields,
 } from './fields'
+import { StackedLabeledControl } from '@opentrons/components/src/controls/StackedLabeledControl'
 
 // global overrides for Yup's default error messages.
 Yup.setLocale({
@@ -126,10 +128,6 @@ export const labwareFormSchemaBaseObject = Yup.object({
       }
     )
     .default({}),
-  useStackedLabwareZDimension: requiredPositiveNumber(LABELS.stackedLabwareZDimension).max(
-      MAX_SUGGESTED_GRIPPER_Z,
-      IRREGULAR_LABWARE_ERROR
-    ),
   tubeRackInsertLoadName: Yup.mixed().when('labwareType', {
     is: 'tubeRack',
     then: requiredString(LABELS.tubeRackInsertLoadName),
@@ -180,6 +178,10 @@ export const labwareFormSchemaBaseObject = Yup.object({
     .nullable()
     .required(),
   labwareZDimension: requiredPositiveNumber(LABELS.labwareZDimension).max(
+    MAX_Z_DIMENSION,
+    IRREGULAR_LABWARE_ERROR
+  ),
+  stackedLabwareZDimension: requiredPositiveNumber(LABELS.labwareZDimension).max(
     MAX_Z_DIMENSION,
     IRREGULAR_LABWARE_ERROR
   ),
