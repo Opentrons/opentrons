@@ -387,7 +387,6 @@ export function ModuleWizardFlows(
 
 interface ModuleWizardFlowsPropsWithHost
   extends Omit<ModuleWizardFlowsProps, 'closeFlow'> {
-  onClose?: () => void
   host: HostConfig
 }
 
@@ -401,9 +400,6 @@ const NiceModalModuleWizardFlows = NiceModal.create(
   (props: ModuleWizardFlowsPropsWithHost): JSX.Element => {
     const modal = useModal()
     const closeFlow = (): void => {
-      if (props.onClose !== undefined) {
-        props.onClose()
-      }
       modal.remove()
     }
 
