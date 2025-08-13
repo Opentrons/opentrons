@@ -92,10 +92,10 @@ MULTI_CHANNEL_1_OFFSET = Point(y=9 * 7 * 0.5)
 
 # NOTE: there is a ton of pressure data, so we want it on the bottom of the CSV
 #       so here we cache these readings, and append them to the CSV in the end
-PRESSURE_DATA_CACHE = []
+PRESSURE_DATA_CACHE: List[List[str]] = []
 # save final test results, to be saved and displayed at the end
-FINAL_TEST_RESULTS = []
-FINAL_TEST_FAIL_INFOR = []
+FINAL_TEST_RESULTS: List[List[str]] = []
+FINAL_TEST_FAIL_INFOR: List[str] = []
 
 
 _available_tips: Dict[int, List[str]] = {}
@@ -212,6 +212,44 @@ TRASH_OFFSETS = [
     Point(x=(64 * 0.5)),
     Point(x=(64 * 0.75)),
 ]
+
+
+LOGGING: logging.Logger = logging.getLogger("QCTEST")
+LOGGING_STARTED = False
+
+
+def _save_logging_print(pipette_sn: str) -> None:
+    try:
+
+        LOGGING.setLevel(logging.DEBUG)
+        LOGGING.propagate = False
+
+        run_id = data.create_run_id()
+        test_name = Path(__file__).parent.name.replace("_", "-")
+        folder_path = data.create_folder_for_test_data(test_name)
+        run_path = data.create_folder_for_test_data(folder_path / run_id)
+        file_name = f"{test_name}_{run_id}_{pipette_sn}.txt"
+        csv_display_name = os.path.join(run_path, file_name)
+        print(f"log txt: {csv_display_name}")
+        file_handler = logging.FileHandler(csv_display_name)
+        file_handler.setLevel(logging.DEBUG)
+
+        formatter = logging.Formatter(
+            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        )
+        file_handler.setFormatter(formatter)
+
+        # 创建一个终端处理器
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(logging.DEBUG)
+        formatterconsole = logging.Formatter("%(asctime)s-%(levelname)s- %(message)s")
+        console_handler.setFormatter(formatterconsole)
+
+        LOGGING.addHandler(console_handler)
+        LOGGING.addHandler(file_handler)
+        LOGGING_STARTED = True
+    except Exception as eeerr:
+        print(f"log err: {eeerr}")
 
 
 def _bool_to_pass_fail(result: bool) -> str:
@@ -348,9 +386,9 @@ async def _pick_up_tip(
         await api.pick_up_tip(mount, tip_length=tip_length)
     except Exception as err:
         # print(f"Error picking up tip: {err}")
-        LOG_GING.critical(f"Error picking up tip: {err}")
+        LOGGING.critical(f"Error picking up tip: {err}")
         prinval = f"07-02光电传感器故障: 取针管状态不正确"
-        LOG_GING.error(prinval)
+        LOGGING.error(prinval)
         FINAL_TEST_FAIL_INFOR.append(prinval)
         ui.print_fail(prinval)
 
@@ -382,9 +420,9 @@ async def _pick_up_tip_newfixture(
         await api.pick_up_tip(mount, tip_length=tip_length)
     except Exception as err:
         # print(f"Error picking up tip: {err}")
-        LOG_GING.critical(f"Error picking up tip: {err}")
+        LOGGING.critical(f"Error picking up tip: {err}")
         prinval = f"07-02光电传感器故障: 取针管状态不正确"
-        LOG_GING.error(prinval)
+        LOGGING.error(prinval)
         FINAL_TEST_FAIL_INFOR.append(prinval)
         ui.print_fail(prinval)
     if movezval == 1:
@@ -549,14 +587,14 @@ async def _aspirate_and_look_for_droplets(
     assert pip
     pipette_volume = pip.working_volume
     # print(f"aspirating {pipette_volume} microliters")
-    LOG_GING.info(f"aspirating {pipette_volume} microliters")
+    LOGGING.info(f"aspirating {pipette_volume} microliters")
     await api.move_rel(mount, Point(z=-ASPIRATE_SUBMERGE_MM))
     await api.aspirate(mount, pipette_volume - TRAILING_AIR_GAP_DROPLETS_UL)
     await api.move_rel(mount, Point(z=LEAK_HOVER_ABOVE_LIQUID_MM))
     await api.aspirate(mount, TRAILING_AIR_GAP_DROPLETS_UL)
     for t in range(wait_time):
         # print(f"waiting for leaking tips ({t + 1}/{wait_time})")
-        LOG_GING.info(f"waiting for leaking tips ({t + 1}/{wait_time})")
+        LOGGING.info(f"waiting for leaking tips ({t + 1}/{wait_time})")
         if not api.is_simulator:
             await asyncio.sleep(1)
     if api.is_simulator:
@@ -565,7 +603,7 @@ async def _aspirate_and_look_for_droplets(
         leak_test_passed = _get_operator_answer_to_question("did it pass? no leaking?")
 
     # print("dispensing back into reservoir")
-    LOG_GING.info("dispensing back into reservoir")
+    LOGGING.info("dispensing back into reservoir")
     await api.move_rel(mount, Point(z=-LEAK_HOVER_ABOVE_LIQUID_MM))
     await api.dispense(mount, pipette_volume, is_full_dispense=True)
     await api.blow_out(mount)
@@ -594,9 +632,7 @@ async def _read_pressure_and_check_results(
         _sample_as_strings = [str(round(p, 2)) for p in _samples[-1]]
         csv_data_sample = [tag.value] + _sample_as_strings
         # print(f"{i + 1}/{pressure_event_config.sample_count}: {csv_data_sample}")
-        LOG_GING.info(
-            f"{i + 1}/{pressure_event_config.sample_count}: {csv_data_sample}"
-        )
+        LOGGING.info(f"{i + 1}/{pressure_event_config.sample_count}: {csv_data_sample}")
         accumulate_raw_data_cb(csv_data_sample)
         delay_time = next_sample_time - time()
         if (
@@ -614,11 +650,11 @@ async def _read_pressure_and_check_results(
         _c_max = max(_samples_per_channel[c][1:])
         csv_data_min = [f"pressure-{tag.value}-channel-{c + 1}", "min", _c_min]
         # print(csv_data_min)
-        LOG_GING.info(f"{csv_data_min}")
+        LOGGING.info(f"{csv_data_min}")
         write_cb(csv_data_min)
         csv_data_max = [f"pressure-{tag.value}-channel-{c + 1}", "max", _c_max]
         # print(csv_data_max)
-        LOG_GING.info(f"{csv_data_max}")
+        LOGGING.info(f"{csv_data_max}")
         write_cb(csv_data_max)
         csv_data_avg = [
             f"pressure-{tag.value}-channel-{c + 1}",
@@ -626,14 +662,14 @@ async def _read_pressure_and_check_results(
             _average_per_channel[c],
         ]
         # print(csv_data_avg)
-        LOG_GING.info(f"{csv_data_avg}")
+        LOGGING.info(f"{csv_data_avg}")
         write_cb(csv_data_avg)
         if _c_max - _c_min > pressure_event_config.stability_threshold:
             # print(
             #     f"ERROR: channel {c + 1} samples are too far apart, "
             #     f"max={round(_c_max, 2)} and min={round(_c_min, 2)}"
             # )
-            LOG_GING.error(
+            LOGGING.error(
                 f"ERROR: channel {c + 1} samples are too far apart, "
                 f"max={round(_c_max, 2)} and min={round(_c_min, 2)}"
             )
@@ -642,7 +678,7 @@ async def _read_pressure_and_check_results(
             ui.print_fail(printsig)
             FINAL_TEST_FAIL_INFOR.append(printsig)
             test_pass_stability = False
-            LOG_GING.error(printsig)
+            LOGGING.error(printsig)
     csv_data_stability = [
         f"pressure-{tag.value}",
         "stability",
@@ -662,7 +698,7 @@ async def _read_pressure_and_check_results(
         #     f"ERROR: samples are out of range, "
         #     f"max={round(_samples_max, 2)} and min={round(_samples_min, 2)}"
         # )
-        LOG_GING.error(
+        LOGGING.error(
             f"ERROR: samples are out of range, "
             f"max={round(_samples_max, 2)} and min={round(_samples_min, 2)}"
         )
@@ -671,7 +707,7 @@ async def _read_pressure_and_check_results(
         ui.print_fail(printsig)
         FINAL_TEST_FAIL_INFOR.append(printsig)
         test_pass_accuracy = False
-        LOG_GING.error(printsig)
+        LOGGING.error(printsig)
     else:
         test_pass_accuracy = True
     csv_data_accuracy = [
@@ -680,7 +716,7 @@ async def _read_pressure_and_check_results(
         _bool_to_pass_fail(test_pass_accuracy),
     ]
     # print(csv_data_accuracy)
-    LOG_GING.info(csv_data_accuracy)
+    LOGGING.info(csv_data_accuracy)
     write_cb(csv_data_accuracy)
     test_pass_delta = True
     if previous:
@@ -700,7 +736,7 @@ async def _read_pressure_and_check_results(
                     f"ERROR: channel {c + 1} pressure delta ({_delta}) "
                     f"out of range: max={_delta_max}, min={_delta_min}"
                 )
-                LOG_GING.error(
+                LOGGING.error(
                     f"ERROR: channel {c + 1} pressure delta ({_delta}) "
                     f"out of range: max={_delta_max}, min={_delta_min}"
                 )
@@ -709,14 +745,14 @@ async def _read_pressure_and_check_results(
                 ui.print_fail(printsig)
                 FINAL_TEST_FAIL_INFOR.append(printsig)
                 test_pass_delta = False
-                LOG_GING.error(printsig)
+                LOGGING.error(printsig)
         csv_data_delta = [
             f"pressure-{tag.value}",
             "delta",
             _bool_to_pass_fail(test_pass_delta),
         ]
         # print(csv_data_delta)
-        LOG_GING.info(csv_data_delta)
+        LOGGING.info(csv_data_delta)
         write_cb(csv_data_delta)
     _passed = test_pass_stability and test_pass_accuracy and test_pass_delta
     return _passed, _samples
@@ -850,17 +886,16 @@ async def _test_for_leak(
     accumulate_raw_data_cb: Optional[Callable],
     droplet_wait_seconds: int = 30,
 ) -> bool:
+    hw_pipette = api.hardware_pipettes[mount.to_mount()]
+    assert hw_pipette is not None
 
-    if PIP_CHANNELS_CURRENT == 8:
-        current_val = PRESSURE_THRESH_current[PIP_CHANNELS_CURRENT][PIP_VOL_CURRENT][8]
-        LOG_GING.info(f"current_val:{current_val}")
+    if hw_pipette.channels == 8:
+        current_val = PRESSURE_THRESH_current[hw_pipette.channels][
+            int(hw_pipette.working_volume)
+        ][8]
+        LOGGING.info(f"current_val:{current_val}")
         await helpers_ot3.update_pick_up_current(api, mount, current_val)
-    # elif PIP_CHANNELS_CURRENT == 1:
-    #     current_val = PRESSURE_THRESH_current[PIP_CHANNELS_CURRENT][PIP_VOL_CURRENT][1]
-    #     LOG_GING.info(f"current_val:{current_val}")
-    #     await helpers_ot3.update_pick_up_current(api,mount,current_val)
     if fixture:
-        # await _move_to_fixture(api, mount)
         assert write_cb, "pressure fixture requires recording data to disk"
         assert (
             accumulate_raw_data_cb
@@ -927,7 +962,7 @@ async def _read_pipette_sensor_repeatedly_and_average(
                 raise ValueError(f"unexpected sensor type: {sensor_type}")
 
             # print(f"{sensor_type} {sensor_id} sensor response {r}")
-            LOG_GING.info(f"{sensor_type} {sensor_id} sensor response {r}")
+            LOGGING.info(f"{sensor_type} {sensor_id} sensor response {r}")
         except helpers_ot3.SensorResponseBad:
             sequential_failures += 1
             if sequential_failures == 3:
@@ -955,10 +990,11 @@ async def _test_diagnostics_environment(
     api: OT3API, mount: OT3Mount, write_cb: Callable
 ) -> bool:
     # print("testing environmental sensor")
-    LOG_GING.info("testing environmental sensor")
+    LOGGING.info("testing environmental sensor")
     celsius_pass = True
     humidity_pass = True
 
+    ENVIRONMENT_SENSOR = asair_sensor.BuildAsairSensor(not api.is_simulator)
     # ROOM
     if not api.is_simulator:
 
@@ -981,7 +1017,7 @@ async def _test_diagnostics_environment(
         env_sensor = ENVIRONMENT_SENSOR.get_reading()
 
         # print("Air temperature and humidity",env_sensor)
-        LOG_GING.info("Air temperature and humidity={}".format(env_sensor))
+        LOGGING.info("Air temperature and humidity={}".format(env_sensor))
         room_celsius = env_sensor.temperature  # _get_room_celsius()
         room_humidity = env_sensor.relative_humidity  # _get_room_humidity()
     else:
@@ -993,13 +1029,13 @@ async def _test_diagnostics_environment(
         api, mount, SensorType.temperature, 10, SensorId.S0
     )
     # print(f"celsius: {celsius} C")
-    LOG_GING.info(f"celsius: {celsius} C")
+    LOGGING.info(f"celsius: {celsius} C")
     if celsius != -999999999999.0:
         if celsius < TEMP_THRESH[0] or celsius > TEMP_THRESH[1]:
             # print(f"FAIL: celsius {celsius} is out of range")
-            LOG_GING.error(f"FAIL: celsius {celsius} is out of range")
-            printtxt = f"01-01-TEMP:移液器内温度,温度值 {humidity} 超出阈值 {TEMP_THRESH}"
-            LOG_GING.error(printtxt)
+            LOGGING.error(f"FAIL: celsius {celsius} is out of range")
+            printtxt = f"01-01-TEMP:移液器内温度,温度值 {celsius} 超出阈值 {TEMP_THRESH}"
+            LOGGING.error(printtxt)
             ui.print_fail(printtxt)
             FINAL_TEST_FAIL_INFOR.append(printtxt)
             celsius_pass = False
@@ -1012,13 +1048,13 @@ async def _test_diagnostics_environment(
         api, mount, SensorType.humidity, 10, SensorId.S0
     )
     # print(f"humidity: {humidity} C")
-    LOG_GING.info(f"humidity: {humidity} C")
+    LOGGING.info(f"humidity: {humidity} C")
     if humidity != -999999999999.0:
         if humidity < HUMIDITY_THRESH[0] or humidity > HUMIDITY_THRESH[1]:
             print(f"FAIL: humidity {humidity} is out of range")
-            LOG_GING.error(f"FAIL: humidity {humidity} is out of range")
+            LOGGING.error(f"FAIL: humidity {humidity} is out of range")
             printtxt = f"01-02-HUMIDITY:移液器内湿度,湿度值 {humidity} 超出阈值 {HUMIDITY_THRESH}"
-            LOG_GING.error(printtxt)
+            LOGGING.error(printtxt)
             ui.print_fail(printtxt)
             FINAL_TEST_FAIL_INFOR.append(printtxt)
 
@@ -1034,7 +1070,7 @@ async def _test_diagnostics_encoder(
     api: OT3API, mount: OT3Mount, write_cb: Callable
 ) -> bool:
     # print("testing encoder")
-    LOG_GING.info("testing encoder")
+    LOGGING.info("testing encoder")
     pip_axis = Axis.of_main_tool_actuator(mount)
     encoder_home_pass = True
     encoder_move_pass = True
@@ -1047,40 +1083,40 @@ async def _test_diagnostics_encoder(
         return _pos[pip_axis], _enc[pip_axis]
 
     # print("homing plunger")
-    LOG_GING.info("homing plunger")
+    LOGGING.info("homing plunger")
     await api.home([pip_axis])
     pip_pos, pip_enc = await _get_plunger_pos_and_encoder()
     # NOTE: homing has tighter spec (0.005mm)
     if abs(pip_pos - pip_enc) > ENCODER_ALIGNMENT_THRESHOLD_HOME_MM:
         # print(f"FAIL: plunger ({pip_pos}) or encoder ({pip_enc}) is not near 0.0 after homing")
-        LOG_GING.error(
+        LOGGING.error(
             f"FAIL: plunger ({pip_pos}) or encoder ({pip_enc}) is not near 0.0 after homing"
         )
         printtxt = f"01-03-home-encoder:移液器home状态行程与电机encoder的位置差值 {abs(pip_pos - pip_enc)} 大于阈值 {ENCODER_ALIGNMENT_THRESHOLD_HOME_MM}"
-        LOG_GING.error(printtxt)
+        LOGGING.error(printtxt)
         ui.print_fail(printtxt)
         FINAL_TEST_FAIL_INFOR.append(printtxt)
         encoder_home_pass = False
     write_cb(["encoder-home", pip_pos, pip_enc, _bool_to_pass_fail(encoder_home_pass)])
 
     # print("moving plunger")
-    LOG_GING.info("moving plunger")
+    LOGGING.info("moving plunger")
     await helpers_ot3.move_plunger_absolute_ot3(api, mount, drop_tip)
     pip_pos, pip_enc = await _get_plunger_pos_and_encoder()
     if abs(pip_pos - pip_enc) > ENCODER_ALIGNMENT_THRESHOLD_MM:
         # print(f"FAIL: plunger ({pip_pos}) and encoder ({pip_enc}) are too different")
-        LOG_GING.error(
+        LOGGING.error(
             f"FAIL: plunger ({pip_pos}) and encoder ({pip_enc}) are too different"
         )
         printtxt = f"01-04-plunger-encoder:移液器plunger状态行程与电机encoder位置差值 {abs(pip_pos - pip_enc)} 大于阈值 {ENCODER_ALIGNMENT_THRESHOLD_HOME_MM}"
-        LOG_GING.error(printtxt)
+        LOGGING.error(printtxt)
         ui.print_fail(printtxt)
         FINAL_TEST_FAIL_INFOR.append(printtxt)
         encoder_move_pass = False
     write_cb(["encoder-move", pip_pos, pip_enc, _bool_to_pass_fail(encoder_move_pass)])
 
     # print("homing plunger")
-    LOG_GING.info("homing plunger")
+    LOGGING.info("homing plunger")
     await api.home([pip_axis])
     return encoder_home_pass and encoder_move_pass and encoder_stall_pass
 
@@ -1089,7 +1125,7 @@ async def _test_diagnostics_capacitive(  # noqa: C901
     api: OT3API, mount: OT3Mount, write_cb: Callable
 ) -> bool:
     # print("testing capacitance")
-    LOG_GING.info("testing capacitance")
+    LOGGING.info("testing capacitance")
     results: List[bool] = []
     pip = api.hardware_pipettes[mount.to_mount()]
     assert pip
@@ -1109,7 +1145,7 @@ async def _test_diagnostics_capacitive(  # noqa: C901
     for sensor_id in sensor_ids:
         capacitance = await _read_cap(sensor_id)
         # print(f"open-air {sensor_id.name} capacitance: {capacitance}")
-        LOG_GING.info(f"open-air {sensor_id.name} capacitance: {capacitance}")
+        LOGGING.info(f"open-air {sensor_id.name} capacitance: {capacitance}")
         if capacitance != -999999999999.0:
             if (
                 capacitance < CAP_THRESH_OPEN_AIR[pip.channels][0]
@@ -1119,11 +1155,11 @@ async def _test_diagnostics_capacitive(  # noqa: C901
                 # print(
                 #     f"FAIL: open-air {sensor_id.name} capacitance ({capacitance}) is not correct"
                 # )
-                LOG_GING.error(
+                LOGGING.error(
                     f"FAIL: open-air {sensor_id.name} capacitance ({capacitance}) is not correct"
                 )
                 printtxt = f"01-05-open-air-capacitance:电容传感器,通道{sensor_id.name}在空气中的电容值{capacitance}超出范围{CAP_THRESH_OPEN_AIR}"
-                LOG_GING.error(printtxt)
+                LOGGING.error(printtxt)
                 ui.print_fail(printtxt)
                 FINAL_TEST_FAIL_INFOR.append(printtxt)
 
@@ -1155,17 +1191,17 @@ async def _test_diagnostics_capacitive(  # noqa: C901
                 )
         capacitance = await _read_cap(sensor_id)
         # print(f"probe {sensor_id.name} capacitance: {capacitance}")
-        LOG_GING.info(f"probe {sensor_id.name} capacitance: {capacitance}")
+        LOGGING.info(f"probe {sensor_id.name} capacitance: {capacitance}")
         if capacitance != -999999999999.0:
             if (
                 capacitance < CAP_THRESH_PROBE[pip.channels][0]
                 or capacitance > CAP_THRESH_PROBE[pip.channels][1]
             ):
                 # print(f"FAIL: probe capacitance ({capacitance}) is not correct")
-                LOG_GING.info(f"FAIL: probe capacitance ({capacitance}) is not correct")
+                LOGGING.info(f"FAIL: probe capacitance ({capacitance}) is not correct")
                 results.append(False)
                 printtxt = f"01-06-probe-capacitance:电容传感器,通道{sensor_id.name}装上probe的电容值{capacitance}超出范围{CAP_THRESH_PROBE}"
-                LOG_GING.error(printtxt)
+                LOGGING.error(printtxt)
                 ui.print_fail(printtxt)
                 FINAL_TEST_FAIL_INFOR.append(printtxt)
             else:
@@ -1187,7 +1223,7 @@ async def _test_diagnostics_capacitive(  # noqa: C901
         if testflag == 1:
             for trial in range(2):
                 # print("probing deck slot #5")
-                LOG_GING.info("probing deck slot #5")
+                LOGGING.info("probing deck slot #5")
                 if trial > 0 and not api.is_simulator:
                     input("`REINSTALL` the probe, press ENTER when ready: ")
                 await api.home()
@@ -1202,14 +1238,14 @@ async def _test_diagnostics_capacitive(  # noqa: C901
                     CalibrationStructureNotFoundError,
                 ) as e:
                     # print(f"calibrate_pipette ERROR: {e}")
-                    LOG_GING.error(f"ERROR: {e}")
+                    LOGGING.error(f"ERROR: {e}")
                     write_cb([f"probe-slot-{sensor_id.name}-{trial}", None, None, None])
                 else:
                     pip = api.hardware_pipettes[mount.to_mount()]
                     assert pip
                     o = pip.pipette_offset.offset
                     # print(f"found offset: {o}")
-                    LOG_GING.info(f"found offset: {o}")
+                    LOGGING.info(f"found offset: {o}")
                     write_cb(
                         [
                             f"probe-slot-{sensor_id.name}-{trial}",
@@ -1234,7 +1270,7 @@ async def _test_diagnostics_capacitive(  # noqa: C901
             results.append(False)
         probe_slot_result = _bool_to_pass_fail(results[-1])
         # print(f"probe-slot-{sensor_id.name}-result: {probe_slot_result}")
-        LOG_GING.info(f"probe-slot-{sensor_id.name}-result: {probe_slot_result}")
+        LOGGING.info(f"probe-slot-{sensor_id.name}-result: {probe_slot_result}")
         write_cb([f"capacitive-probe-{sensor_id.name}-slot-result", probe_slot_result])
 
         if len(offsets) > 1:
@@ -1244,7 +1280,7 @@ async def _test_diagnostics_capacitive(  # noqa: C901
                 probe_pos += Point(x=0, y=9 * 7, z=0)
             api.add_tip(mount, api.config.calibration.probe_length)
             # print(f"Moving to: {probe_pos}")
-            LOG_GING.info(f"Moving to: {probe_pos}")
+            LOGGING.info(f"Moving to: {probe_pos}")
             # start probe 5mm above deck
             _probe_start_mm = probe_pos.z + 5
             current_pos = await api.gantry_position(mount)
@@ -1255,18 +1291,16 @@ async def _test_diagnostics_capacitive(  # noqa: C901
             await api.move_to(mount, probe_pos)
             capacitance = await _read_cap(sensor_id)
             # print(f"square capacitance {sensor_id.name}: {capacitance}")
-            LOG_GING.info(f"square capacitance {sensor_id.name}: {capacitance}")
+            LOGGING.info(f"square capacitance {sensor_id.name}: {capacitance}")
             if (
                 capacitance < CAP_THRESH_SQUARE[pip.channels][0]
                 or capacitance > CAP_THRESH_SQUARE[pip.channels][1]
             ):
                 # print(f"FAIL: square capacitance ({capacitance}) is not correct")
-                LOG_GING.info(
-                    f"FAIL: square capacitance ({capacitance}) is not correct"
-                )
+                LOGGING.info(f"FAIL: square capacitance ({capacitance}) is not correct")
                 results.append(False)
                 printtxt = f"01-07-square-capacitance:电容传感器,通道{sensor_id.name}触碰OT3底板的电容值:{capacitance} 不在范围:{CAP_THRESH_SQUARE}内"
-                LOG_GING.error(printtxt)
+                LOGGING.error(printtxt)
                 ui.print_fail(printtxt)
                 FINAL_TEST_FAIL_INFOR.append(printtxt)
 
@@ -1293,7 +1327,7 @@ async def _test_diagnostics_pressure(
     api: OT3API, mount: OT3Mount, write_cb: Callable
 ) -> bool:
     # print("testing pressure")
-    LOG_GING.info("testing pressure")
+    LOGGING.info("testing pressure")
     results: List[bool] = []
     pip = api.hardware_pipettes[mount.to_mount()]
     assert pip
@@ -1311,26 +1345,27 @@ async def _test_diagnostics_pressure(
         )
 
     global CHTYPE_PIPPETE
-    movez = -100
-
-    if "p50" in pipptype[OT3Mount.LEFT]["name"]:
+    movez = -100.0
+    pipptype = api.attached_pipettes[OT3Mount.LEFT.to_mount()]
+    assert pipptype is not None
+    if "p50" in pipptype["name"]:
         CHTYPE_PIPPETE = 50
-        if "single" in pipptype[OT3Mount.LEFT]["name"]:
+        if "single" in pipptype["name"]:
             movez = -155.5
             current_val = PRESSURE_THRESH_current[pip_channels][CHTYPE_PIPPETE][1]
-        elif "multi" in pipptype[OT3Mount.LEFT]["name"]:
+        elif "multi" in pipptype["name"]:
             movez = -154.8
             current_val = PRESSURE_THRESH_current[pip_channels][CHTYPE_PIPPETE][2]
             print("current_val", current_val)
             await helpers_ot3.update_pick_up_current(api, mount, current_val)
 
-    elif "p1000" in pipptype[OT3Mount.LEFT]["name"]:
+    elif "p1000" in pipptype["name"]:
         CHTYPE_PIPPETE = 1000
         movez = -117
 
-        if "single" in pipptype[OT3Mount.LEFT]["name"]:
+        if "single" in pipptype["name"]:
             current_val = PRESSURE_THRESH_current[pip_channels][CHTYPE_PIPPETE][1]
-        elif "multi" in pipptype[OT3Mount.LEFT]["name"]:
+        elif "multi" in pipptype["name"]:
             current_val = PRESSURE_THRESH_current[pip_channels][CHTYPE_PIPPETE][2]
             print("current_val", current_val)
             await helpers_ot3.update_pick_up_current(api, mount, current_val)
@@ -1338,7 +1373,7 @@ async def _test_diagnostics_pressure(
     for sensor_id in sensor_ids:
         pressure = await _read_pressure(sensor_id)
         # print(f"pressure-open-air-{sensor_id.name}: {pressure}")
-        LOG_GING.info(f"pressure-open-air-{sensor_id.name}: {pressure}")
+        LOGGING.info(f"pressure-open-air-{sensor_id.name}: {pressure}")
         if pressure != -999999999999.0:
             if (
                 pressure < PRESSURE_THRESH_OPEN_AIR[pip_channels][CHTYPE_PIPPETE][0]
@@ -1347,12 +1382,12 @@ async def _test_diagnostics_pressure(
                 # print(
                 #         f"FAIL: open-air {sensor_id.name} pressure ({pressure}) is not correct"
                 #     )
-                LOG_GING.error(
+                LOGGING.error(
                     f"FAIL: open-air {sensor_id.name} pressure ({pressure}) is not correct"
                 )
                 results.append(False)
                 printtxt = f"01-08-open-air-pressure:气压传感器,通道{sensor_id.name}在空气中的气压差值{pressure}超出范围值{PRESSURE_THRESH_OPEN_AIR[pip_channels][CHTYPE_PIPPETE]}"
-                LOG_GING.error(printtxt)
+                LOGGING.error(printtxt)
                 ui.print_fail(printtxt)
                 FINAL_TEST_FAIL_INFOR.append(printtxt)
             else:
@@ -1370,7 +1405,7 @@ async def _test_diagnostics_pressure(
     # PICK-UP TIP(S)
     _, bottom, _, _ = helpers_ot3.get_plunger_positions_ot3(api, mount)
     # print("moving plunger to bottom")
-    LOG_GING.info("moving plunger to bottom")
+    LOGGING.info("moving plunger to bottom")
     await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom)
     await _pick_up_tip_for_tip_volume(api, mount, tip_volume=50)
     await api.retract(mount)
@@ -1378,13 +1413,13 @@ async def _test_diagnostics_pressure(
     # SEALED PRESSURE
     current_pos = await api.gantry_position(mount)
 
-    if "single" in pipptype[OT3Mount.LEFT]["name"]:
+    if "single" in pipptype["name"]:
         slot_5_pos = helpers_ot3.get_slot_calibration_square_position_ot3(11)
         current_pos = await api.gantry_position(mount)
         await api.move_to(mount, slot_5_pos._replace(z=current_pos.z))
         await api.move_rel(mount, Point(z=movez + 10))
         await api.move_rel(mount, Point(z=-10), speed=5)
-    elif "multi" in pipptype[OT3Mount.LEFT]["name"]:
+    elif "multi" in pipptype["name"]:
         slot_5_pos = helpers_ot3.get_slot_calibration_square_position_ot3(11)
         current_pos = await api.gantry_position(mount)
         await api.move_to(
@@ -1396,19 +1431,19 @@ async def _test_diagnostics_pressure(
     for sensor_id in sensor_ids:
         pressure = await _read_pressure(sensor_id)
         # print(f"pressure-sealed: {pressure}")
-        LOG_GING.info(f"pressure-sealed: {pressure}")
+        LOGGING.info(f"pressure-sealed: {pressure}")
         if pressure != -999999999999.0:
             if (
                 pressure < PRESSURE_THRESH_SEALED[pip_channels][CHTYPE_PIPPETE][0]
                 or pressure > PRESSURE_THRESH_SEALED[pip_channels][CHTYPE_PIPPETE][1]
             ):
                 # print(f"FAIL: sealed {sensor_id.name} pressure ({pressure}) is not correct")
-                LOG_GING.info(
+                LOGGING.info(
                     f"FAIL: sealed {sensor_id.name} pressure ({pressure}) is not correct"
                 )
                 results.append(False)
                 printtxt = f"01-09-sealed-pressure:气压传感器,通道{sensor_id.name}堵住针管时的气压差值{pressure}超出范围值{PRESSURE_THRESH_SEALED[pip_channels][CHTYPE_PIPPETE]}"
-                LOG_GING.error(printtxt)
+                LOGGING.error(printtxt)
                 ui.print_fail(printtxt)
                 FINAL_TEST_FAIL_INFOR.append(printtxt)
 
@@ -1431,13 +1466,13 @@ async def _test_diagnostics_pressure(
     pip_channels = int(pip.channels)
     plunger_aspirate_ul = PRESSURE_ASPIRATE_VOL[pip_channels][pip_vol]
     # print(f"aspirate {plunger_aspirate_ul} ul")
-    LOG_GING.info(f"aspirate {plunger_aspirate_ul} ul")
+    LOGGING.info(f"aspirate {plunger_aspirate_ul} ul")
     await api.aspirate(mount, plunger_aspirate_ul)
     await asyncio.sleep(2)
     for sensor_id in sensor_ids:
         pressure = await _read_pressure(sensor_id)
         # print(f"pressure-compressed-{sensor_id.name}: {pressure}")
-        LOG_GING.info(f"pressure-compressed-{sensor_id.name}: {pressure}")
+        LOGGING.info(f"pressure-compressed-{sensor_id.name}: {pressure}")
         if pressure != -999999999999.0:
             if (
                 pressure < PRESSURE_THRESH_COMPRESS[pip_channels][CHTYPE_PIPPETE][0]
@@ -1447,11 +1482,11 @@ async def _test_diagnostics_pressure(
                 # print(
                 #     f"FAIL: compressed {sensor_id.name} pressure ({pressure}) is not correct"
                 # )
-                LOG_GING.error(
+                LOGGING.error(
                     f"FAIL: compressed {sensor_id.name} pressure ({pressure}) is not correct"
                 )
                 printtxt = f"01-10-compressed-pressure:气压传感器,通道{sensor_id.name}吸液{plunger_aspirate_ul}ul时的气压差{pressure}超出范围值{PRESSURE_THRESH_COMPRESS[pip_channels][CHTYPE_PIPPETE]}"
-                LOG_GING.error(printtxt)
+                LOGGING.error(printtxt)
                 ui.print_fail(printtxt)
                 FINAL_TEST_FAIL_INFOR.append(printtxt)
             else:
@@ -1467,7 +1502,7 @@ async def _test_diagnostics_pressure(
         )
     # print("moving plunger back down to BOTTOM position")
     await asyncio.sleep(1)
-    LOG_GING.info("moving plunger back down to BOTTOM position")
+    LOGGING.info("moving plunger back down to BOTTOM position")
     await api.dispense(mount)
     await api.prepare_for_aspirate(mount)
 
@@ -1479,26 +1514,26 @@ async def _test_diagnostics(api: OT3API, mount: OT3Mount, write_cb: Callable) ->
     # ENVIRONMENT SENSOR
     environment_pass = await _test_diagnostics_environment(api, mount, write_cb)
     # print(f"environment: {_bool_to_pass_fail(environment_pass)}")
-    LOG_GING.info(f"environment: {_bool_to_pass_fail(environment_pass)}")
+    LOGGING.info(f"environment: {_bool_to_pass_fail(environment_pass)}")
     write_cb(["diagnostics-environment", _bool_to_pass_fail(environment_pass)])
     # ENCODER
     encoder_pass = await _test_diagnostics_encoder(api, mount, write_cb)
     # print(f"encoder: {_bool_to_pass_fail(encoder_pass)}")
-    LOG_GING.info(f"encoder: {_bool_to_pass_fail(encoder_pass)}")
+    LOGGING.info(f"encoder: {_bool_to_pass_fail(encoder_pass)}")
     write_cb(["diagnostics-encoder", _bool_to_pass_fail(encoder_pass)])
     # CAPACITIVE SENSOR
     # print("SKIPPING CAPACITIVE TESTS")
-    LOG_GING.info("SKIPPING CAPACITIVE TESTS")
+    LOGGING.info("SKIPPING CAPACITIVE TESTS")
     pip = api.hardware_pipettes[mount.to_mount()]
     assert pip
     capacitance_pass = await _test_diagnostics_capacitive(api, mount, write_cb)
     # print(f"capacitance: {_bool_to_pass_fail(capacitance_pass)}")
-    LOG_GING.info(f"capacitance: {_bool_to_pass_fail(capacitance_pass)}")
+    LOGGING.info(f"capacitance: {_bool_to_pass_fail(capacitance_pass)}")
     write_cb(["diagnostics-capacitance", _bool_to_pass_fail(capacitance_pass)])
     # PRESSURE
     pressure_pass = await _test_diagnostics_pressure(api, mount, write_cb)
     # print(f"pressure: {_bool_to_pass_fail(pressure_pass)}")
-    LOG_GING.info(f"pressure: {_bool_to_pass_fail(pressure_pass)}")
+    LOGGING.info(f"pressure: {_bool_to_pass_fail(pressure_pass)}")
     write_cb(["diagnostics-pressure", _bool_to_pass_fail(pressure_pass)])
     return environment_pass and pressure_pass and encoder_pass and capacitance_pass
 
@@ -1507,14 +1542,14 @@ async def _test_plunger_positions(
     api: OT3API, mount: OT3Mount, write_cb: Callable
 ) -> bool:
     # print("homing Z axis")
-    LOG_GING.info("homing Z axis")
+    LOGGING.info("homing Z axis")
     await api.home([Axis.by_mount(mount)])
     # print("homing the plunger")
-    LOG_GING.info("homing the plunger")
+    LOGGING.info("homing the plunger")
     await api.home([Axis.of_main_tool_actuator(mount)])
     _, bottom, blow_out, drop_tip = helpers_ot3.get_plunger_positions_ot3(api, mount)
     # print("moving plunger to BLOW-OUT")
-    LOG_GING.info("moving plunger to BLOW-OUT")
+    LOGGING.info("moving plunger to BLOW-OUT")
     await helpers_ot3.move_plunger_absolute_ot3(api, mount, blow_out)
     if api.is_simulator:
         blow_out_passed = True
@@ -1522,12 +1557,12 @@ async def _test_plunger_positions(
         blow_out_passed = _get_operator_answer_to_question("is BLOW-OUT correct?")
         if not blow_out_passed:
             printval = f"02-01-BLOW-OUT:移液器BLOW-OUT {blow_out_passed}"
-            LOG_GING.error(printval)
+            LOGGING.error(printval)
             ui.print_fail(printval)
             FINAL_TEST_FAIL_INFOR.append(printval)
     write_cb(["plunger-blow-out", _bool_to_pass_fail(blow_out_passed)])
     # print("moving plunger to DROP-TIP")
-    LOG_GING.info("moving plunger to DROP-TIP")
+    LOGGING.info("moving plunger to DROP-TIP")
     await helpers_ot3.move_plunger_absolute_ot3(api, mount, drop_tip)
     if api.is_simulator:
         drop_tip_passed = True
@@ -1535,12 +1570,12 @@ async def _test_plunger_positions(
         drop_tip_passed = _get_operator_answer_to_question("is DROP-TIP correct?")
         if not drop_tip_passed:
             printval = f"02-02-DROP-TIP:移液器DROP-TIP {drop_tip_passed}"
-            LOG_GING.error(printval)
+            LOGGING.error(printval)
             ui.print_fail(printval)
             FINAL_TEST_FAIL_INFOR.append(printval)
     write_cb(["plunger-drop-tip", _bool_to_pass_fail(drop_tip_passed)])
     # print("homing the plunger")
-    LOG_GING.info("homing the plunger")
+    LOGGING.info("homing the plunger")
     await api.home([Axis.of_main_tool_actuator(mount)])
     return blow_out_passed and drop_tip_passed
 
@@ -1568,32 +1603,30 @@ async def _jog_for_tip_state(
             return False
 
     times = 0
-    LOG_GING.info(f"状态{tip_state} Z Coordinate : {current_z}")
+    LOGGING.info(f"状态{tip_state} Z Coordinate : {current_z}")
     while (step_mm > 0 and current_z < max_z) or (step_mm < 0 and current_z > max_z):
         await _jog(step_mm)
         times += 1
-        LOG_GING.info(f"状态{tip_state} {times}")
+        LOGGING.info(f"状态{tip_state} {times}")
         if await _matches_state(tip_state):
             graval = times * 0.1
             passed = min(criteria) <= current_z <= max(criteria)
             # print(f"found {tip_state.name} displacement: {current_z} ({passed})")
-            LOG_GING.info(
-                f"found {tip_state.name} displacement: {current_z} ({passed})"
-            )
+            LOGGING.info(f"found {tip_state.name} displacement: {current_z} ({passed})")
             if not passed:
                 printsig = f"06-02-tip-presence:测试光栅距离,针管状态{tip_state.name}移液轴头到触发光栅的距离为{current_z} 结果为{passed} 阈值为{min(criteria)} ~ {max(criteria)}.触发光电开关的走的距离为{graval}"
                 ui.print_fail(printsig)
                 FINAL_TEST_FAIL_INFOR.append(printsig)
-                LOG_GING.error(printsig)
+                LOGGING.error(printsig)
             return passed
     # print(f"ERROR: did not find {tip_state.name} displacement: {current_z}")
-    LOG_GING.error(f"ERROR: did not find {tip_state.name} displacement: {current_z}")
+    LOGGING.error(f"ERROR: did not find {tip_state.name} displacement: {current_z}")
     printsig = (
         f"06-03-tip-presence:光电传感器故障,在状态{tip_state.name} 位移最大值{current_z} 没触发光电开关"
     )
     ui.print_fail(printsig)
     FINAL_TEST_FAIL_INFOR.append(printsig)
-    LOG_GING.error(printsig)
+    LOGGING.error(printsig)
     return False
 
 
@@ -1622,21 +1655,21 @@ async def _test_tip_presence_flag(
     await api.retract(mount)
     await helpers_ot3.move_to_arched_ot3(api, mount, nominal_test_pos)
     # print("align NOZZLE with tip-rack HOLE:")
-    LOG_GING.info("align NOZZLE with tip-rack HOLE:")
+    LOGGING.info("align NOZZLE with tip-rack HOLE:")
     await helpers_ot3.jog_mount_ot3(api, mount)
     nozzle_pos = await api.gantry_position(mount)
     # print(f"nozzle: {nozzle_pos.z}")
-    LOG_GING.info(f"nozzle: {nozzle_pos.z}")
+    LOGGING.info(f"nozzle: {nozzle_pos.z}")
     if pip_channels == 1:
         await api.move_rel(mount, Point(z=-6))
     else:
         await api.move_rel(mount, Point(z=-2))
     # print("align EJECTOR with tip-rack HOLE:")
-    LOG_GING.info("align EJECTOR with tip-rack HOLE:")
+    LOGGING.info("align EJECTOR with tip-rack HOLE:")
     await helpers_ot3.jog_mount_ot3(api, mount)
     ejector_pos = await api.gantry_position(mount)
     ejector_rel_pos = round(ejector_pos.z - nozzle_pos.z, 2)
-    LOG_GING.info(f"{ejector_pos.z} {nozzle_pos.z}ejector_rel_pos: {ejector_rel_pos}")
+    LOGGING.info(f"{ejector_pos.z} {nozzle_pos.z}ejector_rel_pos: {ejector_rel_pos}")
     pick_up_criteria = {
         1: (
             ejector_rel_pos + -1.3,
@@ -1724,16 +1757,13 @@ async def _test_liquid_probe(
         await _pick_up_tip_for_tip_volume(api, mount, tip_volume)
         for probe in probes:
             await _move_to_above_plate_liquid(api, mount, probe, height_mm=hover_mm)
-            end_z = await api.liquid_probe(
-                mount, max_z_distance_machine_coords, probe=probe
-            )
             try:
                 end_z = await api.liquid_probe(
-                    mount, max_z_distance_machine_coords, probe_settings, probe=probe
+                    mount, max_z_distance_machine_coords, probe=probe
                 )
             except Exception as eee:
                 # print(f"Error {eee}")
-                LOG_GING.critical(f"senser err {eee}")
+                LOGGING.critical(f"senser err {eee}")
                 probeval = f"07-03{probe}传感器故障: 读取{probe}传感器值失败"
                 ui.print_fail(probeval)
                 FINAL_TEST_FAIL_INFOR.append(probeval)
@@ -1745,7 +1775,7 @@ async def _test_liquid_probe(
                 pz = CALIBRATED_LABWARE_LOCATIONS.plate_secondary.z  # type: ignore[union-attr]
             error_mm = end_z - pz
             # print(f"liquid-probe error: {error_mm}")
-            LOG_GING.info(f"liquid-probe error: {error_mm}")
+            LOGGING.info(f"liquid-probe error: {error_mm}")
             trial_results[probe].append(error_mm)  # store the mm error from target
         await _drop_tip_in_trash(api, mount)
     return trial_results
@@ -1767,41 +1797,6 @@ class CSVProperties:
     id: str
     name: str
     path: str
-
-
-def _save_logging_print(pipette_sn: str):
-    try:
-
-        logger = logging.getLogger("QCTEST")
-        logger.setLevel(logging.DEBUG)
-        logger.propagate = False
-
-        run_id = data.create_run_id()
-        test_name = Path(__file__).parent.name.replace("_", "-")
-        folder_path = data.create_folder_for_test_data(test_name)
-        run_path = data.create_folder_for_test_data(folder_path / run_id)
-        file_name = f"{test_name}_{run_id}_{pipette_sn}.txt"
-        csv_display_name = os.path.join(run_path, file_name)
-        print(f"log txt: {csv_display_name}")
-        file_handler = logging.FileHandler(csv_display_name)
-        file_handler.setLevel(logging.DEBUG)
-
-        formatter = logging.Formatter(
-            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-        )
-        file_handler.setFormatter(formatter)
-
-        # 创建一个终端处理器
-        console_handler = logging.StreamHandler()
-        console_handler.setLevel(logging.DEBUG)
-        formatterconsole = logging.Formatter("%(asctime)s-%(levelname)s- %(message)s")
-        console_handler.setFormatter(formatterconsole)
-
-        logger.addHandler(console_handler)
-        logger.addHandler(file_handler)
-        return logger
-    except Exception as eeerr:
-        print(f"log err: {eeerr}")
 
 
 def _create_csv_and_get_callbacks(
@@ -1865,13 +1860,13 @@ async def _wait_for_tip_presence_state_change(
     if not api.is_simulator:
         input("wiggle test, press ENTER when ready: ")
     # print("prepare to wiggle the ejector, in 3 seconds...")
-    LOG_GING.info("prepare to wiggle the ejector, in 3 seconds...")
+    LOGGING.info("prepare to wiggle the ejector, in 3 seconds...")
     for i in range(3):
         print(f"{i + 1}..")
         if not api.is_simulator:
             await asyncio.sleep(1)
     # print("WIGGLE!")
-    LOG_GING.info("WIGGLE!")
+    LOGGING.info("WIGGLE!")
 
     event = asyncio.Event()
     test_pass = True
@@ -1881,12 +1876,12 @@ async def _wait_for_tip_presence_state_change(
             if isinstance(message, PushTipPresenceNotification):
                 event.set()
 
-        messenger = api._backend._messenger  # type: ignore[union-attr]
+        messenger = api._backend._messenger  # type: ignore[union-attr, attr-defined]
         messenger.add_listener(_listener)
         try:
             for i in range(seconds_to_wait):
                 # print(f"wiggle the ejector ({i + 1}/{seconds_to_wait} seconds)")
-                LOG_GING.info(f"wiggle the ejector ({i + 1}/{seconds_to_wait} seconds)")
+                LOGGING.info(f"wiggle the ejector ({i + 1}/{seconds_to_wait} seconds)")
                 try:
                     await asyncio.wait_for(event.wait(), 1.0)
                     test_pass = False  # event was set, so we failed the test
@@ -1898,12 +1893,12 @@ async def _wait_for_tip_presence_state_change(
             messenger.remove_listener(_listener)
     if test_pass:
         # print("PASS: no unexpected tip-presence")
-        LOG_GING.info("PASS: no unexpected tip-presence")
+        LOGGING.info("PASS: no unexpected tip-presence")
     else:
         printsig = "06-01:针管存在状态,摇动针管支架触发了针管状态光电开关传感器"
         ui.print_fail(printsig)
         FINAL_TEST_FAIL_INFOR.append(printsig)
-        LOG_GING.error(printsig)
+        LOGGING.error(printsig)
     return test_pass
 
 
@@ -1917,18 +1912,6 @@ def _test_barcode(api: OT3API, pipette_sn: str) -> Tuple[str, bool]:
 
 async def _main(test_config: TestConfig) -> None:  # noqa: C901
     try:
-
-        global IDEAL_LABWARE_LOCATIONS
-        global CALIBRATED_LABWARE_LOCATIONS
-        global FINAL_TEST_RESULTS
-        global PRESSURE_DATA_CACHE
-        global FINAL_TEST_FAIL_INFOR
-        global LOG_GING
-        global PIP_CURRENT
-        global PIP_CHANNELS_CURRENT  # pip_channels_stecurrent
-        global PIP_VOL_CURRENT  # pip_vol_setcurrent
-        LOG_GING = ""
-
         FINAL_TEST_FAIL_INFOR = []
         # connect to the pressure fixture (or simulate one)
         fixture = connect_to_fixture(
@@ -1936,10 +1919,6 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
             side=test_config.fixture_side,
         )
 
-        global ENVIRONMENT_SENSOR
-        ENVIRONMENT_SENSOR = asair_sensor.BuildAsairSensor(False)
-
-        # create API instance, and get Pipette serial number
         try:
             api = await helpers_ot3.build_async_ot3_hardware_api(
                 is_simulating=test_config.simulate,
@@ -1949,10 +1928,9 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
         except Exception as errv:
             print("07-04识别不到移液器:无法识别该移液器类型.", errv)
 
-        global pipptype
-        pipptype = api.get_all_attached_instr()
+        pipptype = api.attached_pipettes
         try:
-            print(f"pipette type: {pipptype[OT3Mount.LEFT]['name']}")
+            print(f"pipette type: {pipptype[OT3Mount.LEFT.to_mount()]['name']}")
         except Exception as errr:
             print("07-05移液器无条码:移液器没烧录条码")
 
@@ -1968,11 +1946,8 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
         }
         assert pips, "no pipettes attached"
         for mount, pipette in pips.items():
-
-            PIP_CURRENT = api.hardware_pipettes[mount.to_mount()]
-            assert PIP_CURRENT
-            PIP_CHANNELS_CURRENT = int(PIP_CURRENT.channels)
-            PIP_VOL_CURRENT = int(PIP_CURRENT.working_volume)
+            PIP_CHANNELS_CURRENT = int(pipette.channels)
+            PIP_VOL_CURRENT = int(pipette.working_volume)
 
             pipette_sn = helpers_ot3.get_pipette_serial_ot3(pipette)
             print(f"Pipette: {pipette_sn} on the {mount.name} mount")
@@ -2001,11 +1976,9 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
             )
 
             # callback function for writing new data to CSV file
-            FINAL_TEST_RESULTS = []
-            PRESSURE_DATA_CACHE = []
             csv_props, csv_cb = _create_csv_and_get_callbacks(pipette_sn)
-            LOG_GING = _save_logging_print(pipette_sn)
-            LOG_GING.info(f"Starting QC for pipette {pipette_sn}")
+            _save_logging_print(pipette_sn)
+            LOGGING.info(f"Starting QC for pipette {pipette_sn}")
             # cache the pressure-data header
             csv_cb.pressure(PRESSURE_DATA_HEADER, first_row_value="")
 
@@ -2016,7 +1989,7 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
                 pcba_version = api.attached_subsystems[subsystem].pcba_revision
 
             # print(f"PCBA version: {pcba_version}")
-            LOG_GING.info(f"PCBA version: {pcba_version}")
+            LOGGING.info(f"PCBA version: {pcba_version}")
             # add metadata to CSV
             # FIXME: create a set of CSV helpers, such that you can define a test-report
             #        schema/format/line-length/etc., before having to fill its contents.
@@ -2090,7 +2063,7 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
             csv_cb.write(["TEST"])
 
             # print("homing")
-            LOG_GING.info("homing")
+            LOGGING.info("homing")
             await api.home([Axis.of_main_tool_actuator(mount)])
 
             barcode_sn, barcode_passed = _test_barcode(api, pipette_sn)
@@ -2110,7 +2083,7 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
 
                 if not test_config.skip_diagnostics:
                     """fail code 01"""
-                    LOG_GING.info("test-diagnostics")
+                    LOGGING.info("test-diagnostics")
                     await api.move_to(mount, hover_over_slot_3)
                     await api.move_rel(mount, Point(z=-20))
                     test_passed = await _test_diagnostics(api, mount, csv_cb.write)
@@ -2118,7 +2091,7 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
                     csv_cb.results("diagnostics", test_passed)
                 if not test_config.skip_plunger:
                     """fail code 02"""
-                    LOG_GING.info("test-diagnostics")
+                    LOGGING.info("test-diagnostics")
                     await api.move_to(mount, hover_over_slot_3)
                     await api.move_rel(mount, Point(z=-20))
                     test_passed = await _test_plunger_positions(
@@ -2128,7 +2101,7 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
 
             if not test_config.skip_liquid_probe:
                 """fail code 03"""
-                LOG_GING.info("test-liquid_probe")
+                LOGGING.info("test-liquid_probe")
                 tip_vols = [50] if pipette_volume == 50 else [50, 200, 1000]
                 probes = [InstrumentProbeType.PRIMARY]
                 if pipette_channels > 1:
@@ -2147,13 +2120,13 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
                         current_val = PRESSURE_THRESH_current[PIP_CHANNELS_CURRENT][
                             PIP_VOL_CURRENT
                         ][2]
-                        LOG_GING.info(f"current_val:{current_val}")
+                        LOGGING.info(f"current_val:{current_val}")
                         await helpers_ot3.update_pick_up_current(
                             api, mount, current_val
                         )
                     # elif PIP_CHANNELS_CURRENT == 1:
                     #     current_val = PRESSURE_THRESH_current[PIP_CHANNELS_CURRENT][PIP_VOL_CURRENT][1]
-                    #     LOG_GING.info(f"current_val:{current_val}")
+                    #     LOGGING.info(f"current_val:{current_val}")
                     #     await helpers_ot3.update_pick_up_current(api,mount,current_val)
 
                     await _pick_up_tip_for_tip_volume(api, mount, tip_vol)
@@ -2202,23 +2175,23 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
                             prec_tag2 = f"03-01-liquid-probe:测试液体探测,{tip_vol}ul针管{probe.name.lower()}自动点水精度{precision}结果{_bool_to_pass_fail(precision_passed)} 阈值为(<{LIQUID_PROBE_ERROR_THRESHOLD_PRECISION_MM} mm)"
                             ui.print_fail(prec_tag2)
                             FINAL_TEST_FAIL_INFOR.append(prec_tag2)
-                            LOG_GING.error(prec_tag2)
+                            LOGGING.error(prec_tag2)
                         if not accuracy_passed:
                             acc_tag2 = f"03-02-liquid-probe:测试液体探测,{tip_vol}ul针管{probe.name.lower()}自动点水准确度{accuracy}结果{_bool_to_pass_fail(accuracy_passed)} 阈值为(<{LIQUID_PROBE_ERROR_THRESHOLD_ACCURACY_MM} mm)"
                             ui.print_fail(acc_tag2)
                             FINAL_TEST_FAIL_INFOR.append(acc_tag2)
-                            LOG_GING.error(acc_tag2)
+                            LOGGING.error(acc_tag2)
                         if not tip_passed:
                             tip_tag2 = f"03-03-liquid-probe:测试液体探测,{tip_vol}ul针管{probe.name.lower()}自动点水测试结果{tip_passed}"
                             ui.print_fail(tip_tag2)
                             FINAL_TEST_FAIL_INFOR.append(tip_tag2)
-                            LOG_GING.error(tip_tag2)
+                            LOGGING.error(tip_tag2)
 
                 csv_cb.results("liquid-probe", test_passed)
 
             if not test_config.skip_liquid:
                 """fail code 04"""
-                LOG_GING.info("test-skip_liquid")
+                LOGGING.info("test-skip_liquid")
                 for i in range(test_config.num_trials):
                     droplet_wait_seconds = test_config.droplet_wait_seconds * (i + 1)
                     test_passed = await _test_for_leak_by_eye(
@@ -2234,13 +2207,13 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
                         )
                         ui.print_fail(printsig)
                         FINAL_TEST_FAIL_INFOR.append(printsig)
-                        LOG_GING.error(printsig)
+                        LOGGING.error(printsig)
 
                     csv_cb.results(f"droplets-{droplet_wait_seconds}", test_passed)
 
             if not test_config.skip_fixture:
                 """fail code 05"""
-                LOG_GING.info("test-fixture")
+                LOGGING.info("test-fixture")
                 test_passed = await _test_for_leak(
                     api,
                     mount,
@@ -2255,7 +2228,7 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
 
             if not test_config.skip_tip_presence:
                 """fail code 06"""
-                LOG_GING.info("test-tip_presence")
+                LOGGING.info("test-tip_presence")
                 test_passed = await _test_tip_presence_flag(api, mount, csv_cb.write)
                 print("tip-presence: ", _bool_to_pass_fail(test_passed))
                 csv_cb.results("tip-presence", test_passed)
@@ -2305,16 +2278,16 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
                 ui.print_results(sensor_err, False)
         else:
             ui.print_test_results("诊断测试通过(ASSEMBLY QC TESTING PASS)", True)
-        LOG_GING.info("done")
+        LOGGING.info("done")
         # print("done")
     except Exception as err:
 
         printsig = f"08-01-assembly-system-error:系统错误,日志:{err}"
         ui.print_fail(printsig)
-        if LOG_GING == "":
-            LOG_GING = _save_logging_print("Pipette-test-system-err")
-        LOG_GING.error(printsig)
-        LOG_GING.critical(err)
+        if not LOGGING_STARTED:
+            _save_logging_print("Pipette-test-system-err")
+        LOGGING.error(printsig)
+        LOGGING.critical(err)
         await api.home()
         await api.drop_tip(mount, home_after=False)
 
