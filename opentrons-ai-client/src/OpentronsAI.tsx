@@ -108,7 +108,6 @@ export function OpentronsAI(): JSX.Element | null {
             <Header />
           )}
         </StickyHeader>
-
         <Flex
           flex="1"
           flexDirection={DIRECTION_COLUMN}
