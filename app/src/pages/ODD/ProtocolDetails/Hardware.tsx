@@ -22,6 +22,7 @@ import {
   GRIPPER_V1_2,
   MAGNETIC_BLOCK_FIXTURES,
   MAGNETIC_BLOCK_TYPE,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
 
 import {
@@ -99,6 +100,11 @@ const useHardwareName = (
     return gripperDisplayName
   } else if (protocolHardware.hardwareType === 'pipette') {
     return pipetteDisplayName
+  } else if (
+    protocolHardware.hardwareType === 'module' &&
+    protocolHardware.comboFixtureId != null
+  ) {
+    return getFixtureDisplayName(t, protocolHardware.comboFixtureId)
   } else if (protocolHardware.hardwareType === 'module') {
     return getModuleDisplayName(protocolHardware.moduleModel)
   } else {
@@ -130,11 +136,12 @@ function HardwareItem({
       />
     )
   } else if (hardware.hardwareType === 'fixture') {
-    location = (
-      <DeckInfoLabel
-        deckLabel={getCutoutDisplayName(hardware.location.cutout)}
-      />
-    )
+    const cutoutDisplayName = getCutoutDisplayName(hardware.location.cutout)
+    const slotName =
+      hardware.cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE
+        ? `${cutoutDisplayName[0]}4`
+        : cutoutDisplayName
+    location = <DeckInfoLabel deckLabel={slotName} />
   }
   const isMagneticBlockFixture =
     hardware.hardwareType === 'fixture' &&
@@ -174,6 +181,7 @@ export const Hardware = (props: { protocolId: string }): JSX.Element => {
   const { requiredProtocolHardware } = useRequiredProtocolHardware(
     props.protocolId
   )
+  console.log(requiredProtocolHardware)
   const { t, i18n } = useTranslation('protocol_details')
 
   return requiredProtocolHardware.length === 0 ? (

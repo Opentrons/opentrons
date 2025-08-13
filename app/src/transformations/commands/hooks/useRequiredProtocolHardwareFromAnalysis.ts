@@ -5,7 +5,7 @@ import {
 import {
   FLEX_ROBOT_TYPE,
   FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS,
-  FLEX_USB_MODULE_ADDRESSABLE_AREAS,
+  FLEX_STACKER_MODULE_TYPE,
   getCutoutFixtureIdsForModuleModel,
   getCutoutFixturesForModuleModel,
   getCutoutIdForSlotName,
@@ -15,6 +15,7 @@ import {
 } from '@opentrons/shared-data'
 
 import {
+  getFilteredDeckConfigFixtureCompatibility,
   useDeckConfigurationCompatibility,
   useNotifyDeckConfigurationQuery,
 } from '/app/resources/deck_configuration'
@@ -80,6 +81,16 @@ export const useRequiredProtocolHardwareFromAnalysis = (
         location.slotName,
         deckDef
       )
+      const moduleType = getModuleType(model)
+      const fixtureD3 = deckConfigCompatibility.find(
+        fixture => fixture.cutoutId === 'cutoutD3'
+      )
+      const comboFixtureId =
+        moduleType === FLEX_STACKER_MODULE_TYPE &&
+        location.slotName === 'D3' &&
+        fixtureD3 != null
+          ? fixtureD3.cutoutFixtureId
+          : null
       const moduleFixtures = getCutoutFixturesForModuleModel(model, deckDef)
 
       const configuredModuleSerialNumber =
@@ -101,6 +112,7 @@ export const useRequiredProtocolHardwareFromAnalysis = (
         hardwareType: 'module',
         moduleModel: model,
         slot: location.slotName,
+        comboFixtureId,
         connected: isConnected,
         hasSlotConflict: deckConfig.some(
           ({ cutoutId, cutoutFixtureId }) =>
@@ -137,24 +149,28 @@ export const useRequiredProtocolHardwareFromAnalysis = (
       return atLeastOneAA && notOnlySingleSlot
     }
   )
+  const filteredDeckConfigCompatibility = getFilteredDeckConfigFixtureCompatibility(
+    requiredDeckConfigCompatibility
+  )
 
-  const requiredFixtures = requiredDeckConfigCompatibility
-    // filter out all fixtures that only provide usb module addressable areas
-    // as they're handled in the requiredModules section via hardwareType === 'module'
-    .filter(
-      ({ requiredAddressableAreas }) =>
-        !requiredAddressableAreas.every(modAA =>
-          FLEX_USB_MODULE_ADDRESSABLE_AREAS.includes(modAA)
-        )
-    )
-    .map(({ cutoutFixtureId, cutoutId, compatibleCutoutFixtureIds }) => ({
-      hardwareType: 'fixture' as const,
-      cutoutFixtureId: compatibleCutoutFixtureIds[0],
-      location: { cutout: cutoutId },
-      hasSlotConflict:
-        cutoutFixtureId != null &&
-        !compatibleCutoutFixtureIds.includes(cutoutFixtureId),
-    }))
+  const requiredFixtures = filteredDeckConfigCompatibility.map(
+    ({
+      cutoutFixtureId,
+      compatibleCutoutFixtureIds,
+      cutoutId,
+      partialRequiredCutoutFixtureId,
+    }) => {
+      return {
+        hardwareType: 'fixture' as const,
+        cutoutFixtureId:
+          partialRequiredCutoutFixtureId ?? compatibleCutoutFixtureIds[0],
+        location: { cutout: cutoutId },
+        hasSlotConflict:
+          cutoutFixtureId != null &&
+          !compatibleCutoutFixtureIds.includes(cutoutFixtureId),
+      }
+    }
+  )
 
   return {
     requiredProtocolHardware: [
