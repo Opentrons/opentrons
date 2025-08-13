@@ -269,7 +269,7 @@ export const getPythonAssignTipRacksString = (args: {
       string[]
     >((acc, id) => {
       const isOffDeck = last(labwareState[id].stack) === 'offDeck'
-      if (labwareEntities[id].labwareDefURI === tiprackURI && isOffDeck) {
+      if (labwareEntities[id].labwareDefURI === tiprackURI && !isOffDeck) {
         return [...acc, labwareEntities[id].pythonName]
       }
       return acc
