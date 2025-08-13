@@ -48,7 +48,7 @@
 }
 
 .list {
-  padding: 0.5rem 0 0.5rem 1.5rem;
+  padding: 0.25rem 0 0.5rem 1.5rem;
   margin: 0;
   font-size: 1rem;
   line-height: 1.5rem;
@@ -95,4 +95,9 @@
 
 .link:hover {
   color: #0052a3;
+}
+
+/* Spacing adjustments for better visual hierarchy */
+.paragraph + .list {
+  margin-top: -0.75rem; /* Pull lists much closer to preceding paragraphs */
 }
