@@ -34,7 +34,7 @@ import type { AttachedModule, HostConfig } from '@opentrons/api-client'
 
 interface ModuleWizardFlowsProps {
   robotName: string
-  closeFlow?: () => void
+  closeFlow: () => void
   attachedModule?: AttachedModule
   showSetupLauncher?: boolean
   isLoadedInRun?: boolean
@@ -385,7 +385,10 @@ export function ModuleWizardFlows(
   }
 }
 
-type ModuleWizardFlowsPropsWithHost = ModuleWizardFlowsProps & {
+type ModuleWizardFlowsPropsWithHost = Omit<
+  ModuleWizardFlowsProps,
+  'closeFlow'
+> & {
   host: HostConfig
 }
 
@@ -399,9 +402,6 @@ const NiceModalModuleWizardFlows = NiceModal.create(
   (props: ModuleWizardFlowsPropsWithHost): JSX.Element => {
     const modal = useModal()
     const closeFlowAndModal = (): void => {
-      if (props.closeFlow !== undefined) {
-        props.closeFlow()
-      }
       modal.remove()
     }
 
