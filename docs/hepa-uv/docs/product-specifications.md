@@ -79,7 +79,7 @@ The HEPA/UV Module has the following power input requirements, which are met by 
 | Mains supply voltage fluctuation | 100–240 VAC ±10% |
 | Fuse type | T3.15 A, 250 V, 5×20 mm |
 
-### Power consumption
+### Power consumption { #power-consumption-hepa-uv }
 
 The power consumption specifications are measured with the UV lights and fan on.
 

@@ -8,7 +8,7 @@ Review this section for important information about the Thermocycler's deck plac
 
 ## Flex Caddies
 
-When used with a Flex robot, the Thermocycler fits into a caddy that occupies space below the deck. The caddy places your labware closer to the deck surface and allows for below-deck cable routing. See the [Modules chapter](../flex-manual/modules.md) in the Flex Instruction Manual for more information.
+When used with a Flex robot, the Thermocycler fits into a caddy that occupies space below the deck. The caddy places your labware closer to the deck surface and allows for below-deck cable routing. See the [Modules chapter](../flex/modules.md) in the Flex Instruction Manual for more information.
 
 ![Flex caddy with labels](images/flex-caddy.png)
 
@@ -45,8 +45,8 @@ To properly align the module relative to the robot, make sure its exhaust port f
 
 The Flex and OT-2 need at least 20 cm (8") of side and back clearance. This space helps dissipate exhaust from the Thermocycler.
 
-![Diagram showing recommended clearance around robot](../images/robot-clearance.png)
+![Diagram showing recommended clearance around robot](images/robot-clearance.png)
 
 For OT-2 ventilation, Opentrons recommends using the side and rear window panels shown below. These panels are included with newer OT-2 models. If you have an older OT-2 and need these panels, contact us at <support@opentrons.com>.
 
-![OT-2 replacement window panels](../images/ot2-panels.png)
+![OT-2 replacement window panels](images/ot2-panels.png)

@@ -29,7 +29,7 @@ Space is a valuable commodity in almost every lab. Your Flex is going to need so
 <figcaption>Top view of Opentrons Flex, showing minimum side and back clearance.</figcaption>
 </figure>
 
-## Power consumption
+## Power consumption { #power-consumption-flex }
 
 Opentrons Flex should be connected to a wall outlet at or near the bench location where you install it. Only connect Flex to circuits that can accommodate its peak power draw:
 
@@ -60,7 +60,7 @@ Along with the conditions described above, total power consumption also depends 
 !!! note 
     Always account for other electronics that consume power on the same circuit, including Flex modules with their own power supplies. For example, the Thermocycler Module has a peak power consumption (630 W) that is much greater than the Flex robot itself. If necessary, consult the manager of your facility to make sure it meets your equipment's peak power requirements.
 
-## Environmental conditions
+## Environmental conditions { #environmental-conditions-flex }
 
 Environmental conditions for recommended use, acceptable use, and storage vary:
 

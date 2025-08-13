@@ -13,7 +13,11 @@ serve:
 
 .PHONY: build
 build:
-	uv run mkdocs build -f ./mkdocs.yml
+	@if [ -n "$$CI" ]; then \
+		uv run mkdocs build -f ./mkdocs.yml --strict; \
+	else \
+		uv run mkdocs build -f ./mkdocs.yml; \
+	fi
 
 .PHONY: deploy
 deploy:
