@@ -482,8 +482,8 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
             )
 
             # this is the old fix, we can use it if the fw reset doesn't work
-            # await _move_plunger_as_cycle_settings(api, mount)
-            await _reset_pipette_fw(api, mount)
+            await _move_plunger_as_cycle_settings(api, mount)
+            # await _reset_pipette_fw(api, mount)
 
             failed_cycles = await _cycle_plunger(
                 api, mount,
