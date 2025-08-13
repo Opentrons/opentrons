@@ -1,4 +1,4 @@
-import { last } from 'lodash'
+import last from 'lodash/last'
 
 import { getAllLiquidClassDefs } from '@opentrons/shared-data'
 
@@ -266,31 +266,16 @@ export const getPythonAssignTipRacksString = (args: {
   const { pythonName: pythonPipetteName } = pipetteEntity
   if (pipetteEntity.tiprackDefURI.length > 1) {
     const assignedTipRackPythonNames = Object.keys(labwareEntities).reduce<
-      Record<'onDeck' | 'offDeck', string[]>
-    >(
-      (acc, id) => {
-        const isOffDeck = last(labwareState[id].stack) === 'offDeck'
-        if (labwareEntities[id].labwareDefURI === tiprackURI) {
-          return isOffDeck
-            ? {
-                ...acc,
-                offDeck: [...acc.offDeck, labwareEntities[id].pythonName],
-              }
-            : {
-                ...acc,
-                onDeck: [...acc.onDeck, labwareEntities[id].pythonName],
-              }
-        }
-        return acc
-      },
-      { onDeck: [], offDeck: [] }
-    )
-    const orderedAssignedTipRackPythonNames = [
-      ...assignedTipRackPythonNames.onDeck,
-      ...assignedTipRackPythonNames.offDeck,
-    ]
+      string[]
+    >((acc, id) => {
+      const isOffDeck = last(labwareState[id].stack) === 'offDeck'
+      if (labwareEntities[id].labwareDefURI === tiprackURI && isOffDeck) {
+        return [...acc, labwareEntities[id].pythonName]
+      }
+      return acc
+    }, [])
 
-    return `${pythonPipetteName}.tip_racks = [${orderedAssignedTipRackPythonNames.join(
+    return `${pythonPipetteName}.tip_racks = [${assignedTipRackPythonNames.join(
       ', '
     )}]\n`
   }
