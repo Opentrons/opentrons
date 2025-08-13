@@ -8,6 +8,12 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 ---
 
+## Opentrons Protocol Designer Changes in 8.5.1
+
+**Welcome to Protocol Designer 8.5.1!**
+
+This hotfix release addresses a bug that caused the incorrect tip rack to be assigned to some liquid transfers.
+
 ## Opentrons Protocol Designer Changes in 8.5.0
 
 **Welcome to Protocol Designer v8.5.0!**
