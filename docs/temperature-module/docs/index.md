@@ -1,13 +1,11 @@
 ---
-title: "Temperature Module Instruction Manual"
+title: "Temperature Module GEN2 Instruction Manual"
 hide: toc
 ---
 
 <div style="text-align: center;" markdown>
 
-![Opentrons Flex®](../images/opentrons-flex-logo.svg "opentrons-flex-logo.svg"){style="width: 60%"}
-
-# Temperature Module GEN2 Instruction Manual
+# Temperature Module GEN2 Instruction Manual <!-- inside or outside the div? -->
 
 ![Module cover image](images/temp-mod-hero.png){style="width: 60%"}
 

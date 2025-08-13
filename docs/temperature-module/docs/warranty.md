@@ -18,15 +18,6 @@ Please have the module’s serial number available when contacting support. You 
 
 Control your liquid handling robot and modules using the Opentrons App. Download the app for Mac, Windows, or Linux at <https://opentrons.com/ot-app>.
 
-## WEEE Policy
-
-<img src="../images/WEEE.svg" style="float: right;" width="10%">
-Opentrons is dedicated to adhering to the EU Directive on Waste Electrical and Electronic Equipment (WEEE – 2012/19/EU). Our goal is to ensure that our products are properly disposed of or recycled once they reach the end of their useful life.
-
-Opentrons products that fall under the WEEE directive are labeled with the <img src="../images/WEEE.svg" style="height: 1.75em; vertical-align: middle;"> symbol, signifying that they should not be thrown away with regular household waste but must be collected and handled separately.
-
-If you or your business have Opentrons products that are at end of life or need to be discarded for a separate purpose, contact Opentrons for proper disposal and recycling.
-
 ## Manufacturer Description
 
 [Opentrons Labworks Inc](https://opentrons.com/)<br>

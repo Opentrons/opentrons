@@ -6,7 +6,9 @@ title: "Temperature Module: Safety and Compliance"
 
 Opentrons recommends that you follow the safe use specifications listed in this section and throughout this manual.
 
-## Input and Output Connections
+## Safe Use Specifications 
+
+### Input and Output Connections
 
 The Temperature Module has the following power requirements, which are met by the unit’s power supply.
 
@@ -16,7 +18,7 @@ The Temperature Module has the following power requirements, which are met by th
 - **Input:** 100–240 VAC, 50/60 Hz, 4.0 A at 115 VAC, 2.0 A at 230 VAC
 - **Output:** 36 VDC, 6.1 A, 219.6 W maximum
 
-## Environmental Conditions
+### Environmental Conditions
 
 The Temperature Module should only be used indoors on a sturdy, dry, flat horizontal surface. It must be installed in a low-vibration environment with stable ambient conditions. Keep the Temperature Module away from direct sunlight or HVAC systems that may cause significant temperature or humidity changes.
 
@@ -31,7 +33,7 @@ Opentrons has validated the Temperature Module’s performance in the conditions
 !!!note "Note: Low Temperature Condensation"
     You may see condensation on the module’s cold surfaces upon reaching temperatures lower than ambient. The exact temperature at which condensation occurs depends on the atmospheric temperature and relative humidity in your lab. You can calculate this temperature by consulting any standard dew point index or condensation table.
 
-## Instrument Safety Warnings
+### Instrument Safety Warnings
 
 Warning symbols posted on the Opentrons Temperature Module refer directly to the safe use of the instrument. Refer to the previous table for symbol definitions.
 
@@ -87,3 +89,12 @@ Le présent produit est conforme aux spécifications techniques applicables d’
 ### CISPR 11 Class A
 
 **Caution:** This equipment is not intended for use in residential environments and may not provide adequate protection to radio reception in such environments.
+
+### WEEE Policy
+
+<img src="../images/WEEE.svg" style="float: right;" width="10%">
+Opentrons is dedicated to adhering to the EU Directive on Waste Electrical and Electronic Equipment (WEEE – 2012/19/EU). Our goal is to ensure that our products are properly disposed of or recycled once they reach the end of their useful life.
+
+Opentrons products that fall under the WEEE directive are labeled with the <img src="../images/WEEE.svg" style="height: 1.75em; vertical-align: middle;"> symbol, signifying that they should not be thrown away with regular household waste but must be collected and handled separately.
+
+If you or your business have Opentrons products that are at end of life or need to be discarded for a separate purpose, contact Opentrons for proper disposal and recycling.

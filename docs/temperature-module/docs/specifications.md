@@ -49,18 +49,8 @@ title: "Temperature Module: Product Specifications"
 
 ## Physical Specifications
 
-<table>
-  <tbody>
-    <tr>
-      <th>Dimensions</th>
-      <td>194 mm L x 90 mm W x 84 mm H</td>
-    </tr>
-    <tr>
-      <th>Weight</th>
-      <td>1.5 kg</td>
-    </tr>
-  </tbody>
-</table>
+- **Dimensions:** 194 mm L x 90 mm W x 84 mm H
+- **Weight:** 1.5 kg
 
 ## Temperature Profile
 
@@ -68,7 +58,7 @@ The Temperature Module is designed to achieve and maintain a target temperature 
 
 Additionally, Opentrons has tested the Temperature Module’s temperature profile with both the 24-well and 96-well thermal blocks. The module can generally reach its minimum temperature in 12 to 18 minutes, depending on the block and contents. The module can reach a hot temperature (65 °C) in six minutes. For more details, see the [Temperature Module White Paper](https://insights.opentrons.com/hubfs/Products/Modules/Temperature%20Module%20White%20Paper.pdf).
 
-<!-- Is this paper ⬆️ still valid/useful and should we continue to link to it? -->
+<!-- Is this paper ⬆️ still valid/should we continue to link to it? -->
 
 ## Thermal Blocks
 
