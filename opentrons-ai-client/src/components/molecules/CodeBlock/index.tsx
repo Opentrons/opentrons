@@ -1,12 +1,13 @@
-import { CodeBlockToolbar } from './CodeBlockToolbar'
-import styles from './enhancedmarkdown.module.css'
 import {
   escapeHtml,
   PYTHON_REGEX_PATTERNS,
   PYTHON_SYNTAX_COLORS,
-} from './pythonSyntaxUtils'
+} from '/ai-client/components/molecules/CodeBlock/pythonSyntaxUtils'
+import { CodeBlockToolbar } from '/ai-client/components/molecules/CodeBlockToolbar'
 
-import type { SyntaxToken } from './pythonSyntaxUtils'
+import styles from './codeblock.module.css'
+
+import type { SyntaxToken } from '/ai-client/components/molecules/CodeBlock/pythonSyntaxUtils'
 
 interface CodeBlockProps {
   code: string

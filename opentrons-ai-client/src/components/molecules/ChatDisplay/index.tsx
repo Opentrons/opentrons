@@ -16,6 +16,7 @@ import {
 
 import smallLogo from '/ai-client/assets/images/opentrons_logo_small.svg'
 import { AttachedFileItem } from '/ai-client/components/atoms/AttachedFileItem'
+import { EnhancedMarkdown } from '/ai-client/components/molecules/EnhancedMarkdown'
 import {
   chatDataAtom,
   createProtocolChatAtom,
@@ -27,8 +28,6 @@ import {
 import { useTrackEvent } from '/ai-client/resources/hooks/useTrackEvent'
 
 import styles from './chatdisplay.module.css'
-// Enhanced markdown component only
-import { EnhancedMarkdown } from './EnhancedMarkdown'
 
 import type { ChatData } from '/ai-client/resources/types'
 

@@ -1,14 +1,16 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { Icon, SPACING } from '@opentrons/components'
 
-import styles from './enhancedmarkdown.module.css'
+import styles from './codeblocktoolbar.module.css'
 
 interface CodeBlockToolbarProps {
   code: string
 }
 
 export function CodeBlockToolbar({ code }: CodeBlockToolbarProps): JSX.Element {
+  const { t } = useTranslation('protocol_generator')
   const [isCopied, setIsCopied] = useState(false)
 
   const handleCopy = async (): Promise<void> => {
@@ -57,7 +59,7 @@ export function CodeBlockToolbar({ code }: CodeBlockToolbarProps): JSX.Element {
           onClick={() => {
             void handleCopy()
           }}
-          title={isCopied ? 'Copied!' : 'Copy code'}
+          title={isCopied ? t('copied') : t('copy_code')}
         >
           <Icon
             name={isCopied ? 'check' : 'content-copy'}
@@ -67,7 +69,7 @@ export function CodeBlockToolbar({ code }: CodeBlockToolbarProps): JSX.Element {
         <button
           className={styles.copy_button}
           onClick={handleDownload}
-          title="Download as .py file"
+          title={t('download')}
         >
           <Icon name="download" size={SPACING.spacing16} />
         </button>

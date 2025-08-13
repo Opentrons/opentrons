@@ -49,5 +49,5 @@ opentrons-ai-server/api/storage/
 # And ignore non-semantic formatting issues in mkdocs YAML configuration files.
 /docs/**/*.yml
 
-# CSS files should not be linted by ESLint (they use CSS-specific tools)
+# CSS files should not be linted by ESLint (CSS files are linted by stylelint)
 **/*.css

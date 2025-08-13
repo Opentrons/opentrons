@@ -1,16 +1,17 @@
 import Markdown from 'react-markdown'
 
-import { CodeBlock } from './CodeBlock'
+import { CodeBlock } from '/ai-client/components/molecules/CodeBlock'
+import { isInlineCode } from '/ai-client/components/molecules/CodeBlock/pythonSyntaxUtils'
+
 import styles from './enhancedmarkdown.module.css'
-import { isInlineCode } from './pythonSyntaxUtils'
 
 interface EnhancedMarkdownProps {
   content: string
 }
 
-export const EnhancedMarkdown: React.FC<EnhancedMarkdownProps> = ({
+export function EnhancedMarkdown({
   content,
-}) => {
+}: EnhancedMarkdownProps): JSX.Element {
   return (
     <div className={styles.enhanced_markdown}>
       <Markdown
