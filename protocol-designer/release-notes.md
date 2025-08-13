@@ -8,6 +8,12 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 ---
 
+## Opentrons Protocol Designer Changes in 8.5.1
+
+**Welcome to Protocol Designer 8.5.1!**
+
+This release fixes a bug where the incorrect tiprack was being assigned to the custom liquid class properties.
+
 ## Opentrons Protocol Designer Changes in 8.5.0
 
 **Welcome to Protocol Designer v8.5.0!**
