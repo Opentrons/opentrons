@@ -492,6 +492,42 @@ export function getStacksWithLabware(
   return Object.fromEntries(stacksWithLabwareEntries)
 }
 
+// filter function to get off deck labware stacks
+export function getOffDeckRenderInfo(
+  stackedItems: StackedItemsOnDeck
+): LabwareLiquidRenderInfo[] {
+  const offDeckItems = Object.keys(stackedItems).includes('offDeck')
+    ? stackedItems.offDeck.filter(
+        (item): item is LabwareInStack => 'labwareId' in item
+      )
+    : null
+  if (offDeckItems == null) {
+    return []
+  } else {
+    return offDeckItems.reduce<LabwareLiquidRenderInfo[]>((acc, stackItem) => {
+      const matchingLabwareIndex = acc.findIndex(
+        lw =>
+          lw.definitionUri === stackItem.definitionUri &&
+          (lw.lidDisplayName == null ||
+            lw.lidDisplayName === stackItem.lidDisplayName)
+      )
+      if (
+        matchingLabwareIndex !== -1 &&
+        matchingLabwareIndex === acc.length - 1
+      ) {
+        acc[matchingLabwareIndex].quantity += 1
+      } else {
+        acc.push({
+          ...stackItem,
+          quantity: 1,
+          liquids: 0,
+        })
+      }
+      return acc
+    }, [])
+  }
+}
+
 // filter function to get stacks that include modules
 export function getStacksOnModules(
   itemsOnDeck: StackedItemsOnDeck
