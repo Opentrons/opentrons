@@ -21,7 +21,7 @@ HOME_SPEED = STACKER_MOTION_CONFIG[TEST_AXIS]["home"].move_params.max_speed
 HOME_CURRENT = STACKER_MOTION_CONFIG[TEST_AXIS]["home"].run_current
 
 TEST_SPEEDS = [50, 100, 150]  # mm/s
-TEST_CURRENTS = [1.5, 1.2, 0.8, 0.3]  # A rms
+TEST_CURRENTS = [1.5, 0.8, 0.7, 0.6, 0.5, 0.4]  # A rms
 TEST_ACCELERATION = STACKER_MOTION_CONFIG[TEST_AXIS]["move"].move_params.acceleration
 CURRENT_THRESHOD = 0.8  # A rms
 TEST_TRIALS = 5
