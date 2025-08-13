@@ -1,3 +1,5 @@
+import { last } from 'lodash'
+
 import { getAllLiquidClassDefs } from '@opentrons/shared-data'
 
 import {
@@ -13,6 +15,7 @@ import type {
   InnerMixArgs,
   LabwareEntities,
   PipetteEntity,
+  RobotState,
   TransferArgs,
 } from '../types'
 
@@ -256,21 +259,38 @@ const getBlowoutPythonLocation = (
 export const getPythonAssignTipRacksString = (args: {
   pipetteEntity: PipetteEntity
   labwareEntities: LabwareEntities
+  labwareState: RobotState['labware']
   tiprackURI: string
 }): string => {
-  const { pipetteEntity, labwareEntities, tiprackURI } = args
+  const { pipetteEntity, labwareEntities, labwareState, tiprackURI } = args
   const { pythonName: pythonPipetteName } = pipetteEntity
   if (pipetteEntity.tiprackDefURI.length > 1) {
     const assignedTipRackPythonNames = Object.keys(labwareEntities).reduce<
-      string[]
-    >((acc, id) => {
-      // return only tipracks matching the tiprack URI used in this step
-      if (labwareEntities[id].labwareDefURI === tiprackURI) {
-        return [...acc, labwareEntities[id].pythonName]
-      }
-      return acc
-    }, [])
-    return `${pythonPipetteName}.tip_racks = [${assignedTipRackPythonNames.join(
+      Record<'onDeck' | 'offDeck', string[]>
+    >(
+      (acc, id) => {
+        const isOffDeck = last(labwareState[id].stack) === 'offDeck'
+        if (labwareEntities[id].labwareDefURI === tiprackURI) {
+          return isOffDeck
+            ? {
+                ...acc,
+                offDeck: [...acc.offDeck, labwareEntities[id].pythonName],
+              }
+            : {
+                ...acc,
+                onDeck: [...acc.onDeck, labwareEntities[id].pythonName],
+              }
+        }
+        return acc
+      },
+      { onDeck: [], offDeck: [] }
+    )
+    const orderedAssignedTipRackPythonNames = [
+      ...assignedTipRackPythonNames.onDeck,
+      ...assignedTipRackPythonNames.offDeck,
+    ]
+
+    return `${pythonPipetteName}.tip_racks = [${orderedAssignedTipRackPythonNames.join(
       ', '
     )}]\n`
   }

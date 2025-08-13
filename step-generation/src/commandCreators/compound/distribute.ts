@@ -398,6 +398,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
   const pythonAssignTipracks = getPythonAssignTipRacksString({
     pipetteEntity: pipetteEntities[pipette],
     labwareEntities,
+    labwareState: prevRobotState.labware,
     tiprackURI: tipRack,
   })
 

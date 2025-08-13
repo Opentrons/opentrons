@@ -385,6 +385,7 @@ export const transfer: CommandCreator<TransferArgs> = (
   const pythonAssignTipracks = getPythonAssignTipRacksString({
     pipetteEntity: pipetteEntities[pipette],
     labwareEntities,
+    labwareState: prevRobotState.labware,
     tiprackURI: tipRack,
   })
 

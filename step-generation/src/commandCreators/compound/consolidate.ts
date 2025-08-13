@@ -365,6 +365,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   const pythonAssignTipracks = getPythonAssignTipRacksString({
     pipetteEntity: pipetteEntities[pipette],
     labwareEntities,
+    labwareState: prevRobotState.labware,
     tiprackURI: tipRack,
   })
 
