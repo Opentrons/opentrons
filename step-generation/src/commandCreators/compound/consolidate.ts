@@ -36,6 +36,7 @@ import {
 import {
   getCustomLiquidClassProperties,
   getLiquidClassName,
+  getPythonAssignTipRacksString,
 } from '../../utils/liquidClassUtils'
 import {
   airGapInPlace,
@@ -361,6 +362,12 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     pythonLiquidClassArgs.join(',\n')
   )},\n)`
 
+  const pythonAssignTipracks = getPythonAssignTipRacksString({
+    pipetteEntity: pipetteEntities[pipette],
+    labwareEntities,
+    tiprackURI: tipRack,
+  })
+
   const pythonArgs = [
     `volume=${volume}`,
     `source=[${pythonSourceWells}]`,
@@ -375,7 +382,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   ]
   const pythonCommandCreator: CurriedCommandCreator = () => ({
     commands: [],
-    python: `${pythonPipetteName}.consolidate_with_liquid_class(\n${indentPyLines(
+    python: `${pythonAssignTipracks}${pythonPipetteName}.consolidate_with_liquid_class(\n${indentPyLines(
       pythonArgs.join(',\n')
     )},\n)`,
   })

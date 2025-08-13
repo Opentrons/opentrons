@@ -11,6 +11,8 @@ import type {
   ConsolidateArgs,
   DistributeArgs,
   InnerMixArgs,
+  LabwareEntities,
+  PipetteEntity,
   TransferArgs,
 } from '../types'
 
@@ -249,4 +251,28 @@ const getBlowoutPythonLocation = (
   } else {
     return 'trash'
   }
+}
+
+export const getPythonAssignTipRacksString = (args: {
+  pipetteEntity: PipetteEntity
+  labwareEntities: LabwareEntities
+  tiprackURI: string
+}): string => {
+  const { pipetteEntity, labwareEntities, tiprackURI } = args
+  const { pythonName: pythonPipetteName } = pipetteEntity
+  if (pipetteEntity.tiprackDefURI.length > 1) {
+    const assignedTipRackPythonNames = Object.keys(labwareEntities).reduce<
+      string[]
+    >((acc, id) => {
+      // return only tipracks matching the tiprack URI used in this step
+      if (labwareEntities[id].labwareDefURI === tiprackURI) {
+        return [...acc, labwareEntities[id].pythonName]
+      }
+      return acc
+    }, [])
+    return `${pythonPipetteName}.tip_racks = [${assignedTipRackPythonNames.join(
+      ', '
+    )}]\n`
+  }
+  return ''
 }

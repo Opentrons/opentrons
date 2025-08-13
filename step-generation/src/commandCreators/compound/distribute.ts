@@ -37,6 +37,7 @@ import {
 import {
   getCustomLiquidClassProperties,
   getLiquidClassName,
+  getPythonAssignTipRacksString,
 } from '../../utils/liquidClassUtils'
 import {
   airGapInPlace,
@@ -394,6 +395,12 @@ export const distribute: CommandCreator<DistributeArgs> = (
     pythonLiquidClassArgs.join(',\n')
   )},\n)`
 
+  const pythonAssignTipracks = getPythonAssignTipRacksString({
+    pipetteEntity: pipetteEntities[pipette],
+    labwareEntities,
+    tiprackURI: tipRack,
+  })
+
   const pythonArgs = [
     `volume=${volume}`,
     `source=[${pythonSourceWells}]`,
@@ -406,7 +413,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
   ]
   const pythonCommandCreator: CurriedCommandCreator = () => ({
     commands: [],
-    python: `${pythonPipetteName}.distribute_with_liquid_class(\n${indentPyLines(
+    python: `${pythonAssignTipracks}${pythonPipetteName}.distribute_with_liquid_class(\n${indentPyLines(
       pythonArgs.join(',\n')
     )},\n)`,
   })

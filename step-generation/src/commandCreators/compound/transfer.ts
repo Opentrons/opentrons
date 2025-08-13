@@ -35,6 +35,7 @@ import {
 import {
   getCustomLiquidClassProperties,
   getLiquidClassName,
+  getPythonAssignTipRacksString,
 } from '../../utils/liquidClassUtils'
 import {
   airGapInPlace,
@@ -381,6 +382,12 @@ export const transfer: CommandCreator<TransferArgs> = (
           .join(', ')
       : null
 
+  const pythonAssignTipracks = getPythonAssignTipRacksString({
+    pipetteEntity: pipetteEntities[pipette],
+    labwareEntities,
+    tiprackURI: tipRack,
+  })
+
   const pythonLiquidClassArgs = [
     `name=${formatPyStr(`${args.commandCreatorFnName}_step_${stepId}`)}`,
     ...(liquidClass != null
@@ -413,7 +420,7 @@ export const transfer: CommandCreator<TransferArgs> = (
   ]
   const pythonCommandCreator: CurriedCommandCreator = () => ({
     commands: [],
-    python: `${pythonPipetteName}.transfer_with_liquid_class(\n${indentPyLines(
+    python: `${pythonAssignTipracks}${pythonPipetteName}.transfer_with_liquid_class(\n${indentPyLines(
       pythonArgs.join(',\n')
     )},\n)`,
   })

@@ -14,6 +14,7 @@ import {
   formatPyStr,
   formatPyWellLocation,
   getIsSafePipetteMovement,
+  getPythonAssignTipRacksString,
   getSlotInLocationStack,
   indentPyLines,
   mixBlowoutLocationHelper,
@@ -64,6 +65,7 @@ const makePythonCommandCreator: (args: {
     yOffset: number
     offsetFromBottomMm: number
   }
+  tiprackURI: string
 }) => CurriedCommandCreator = args => () => {
   const {
     invariantContext,
@@ -76,6 +78,7 @@ const makePythonCommandCreator: (args: {
     aspirateFlowRateUlSec,
     dispenseFlowRateUlSec,
     positionArgs,
+    tiprackURI,
   } = args
 
   const { pipetteEntities, labwareEntities } = invariantContext
@@ -92,6 +95,13 @@ const makePythonCommandCreator: (args: {
       well
     )}]${formatPyWellLocation(pythonWellLocation)}`
   }
+
+  const pythonAssignTipracks = getPythonAssignTipRacksString({
+    pipetteEntity: pipetteEntities[pipette],
+    labwareEntities,
+    tiprackURI,
+  })
+
   const pythonArgs = [
     `repetitions=${times}`,
     `volume=${volume}`,
@@ -110,12 +120,11 @@ const makePythonCommandCreator: (args: {
     commands: [],
     //  Note: we do not support mix in trashBin or wasteChute so location
     //  will always be a well
-    python: `${pipettePythonName}.mix(\n${indentPyLines(
+    python: `${pythonAssignTipracks}${pipettePythonName}.mix(\n${indentPyLines(
       pythonArgs.join(',\n')
     )},\n)`,
   }
 }
-
 /** Helper fn to make mix command creators w/ minimal arguments */
 export const mixInPlaceUtil = (args: {
   pipette: string
@@ -168,6 +177,7 @@ export const mixInPlaceUtil = (args: {
             offsetFromBottomMm: moveToWellParams.wellLocation?.offset?.z ?? 0,
           }
         : undefined,
+    tiprackURI: tiprack,
   })
 
   const pipetteSpecs = invariantContext.pipetteEntities[pipette].spec
