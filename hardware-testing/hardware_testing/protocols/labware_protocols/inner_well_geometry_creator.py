@@ -44,7 +44,7 @@ SLOT_DIAL = "B2"
 
 
 # below threshold, alpha low. above threshold, alpha high
-THRESHOLD = 3
+THRESHOLD = 4.5
 # sensitivity values for bottom and top zones:
 ALPHA_LOW = 0.2
 ALPHA_HIGH = 0.4
@@ -440,11 +440,12 @@ def run(ctx: ProtocolContext) -> None:
     step_volume = 0.0
     dispense_volume = 0.0
     current_well = "none"
+    status = "pass"
     udv_table = []
+
     # deadband to avoid unnecessary step volume corrections
     lower_bound = target_height - target_height * DELTA_TOLERANCE
     upper_bound = target_height + target_height * DELTA_TOLERANCE
-    status = "pass"
 
     _store_dial_baseline(ctx, probe_pipette, dial)
     _write_line_to_csv(ctx, CSV_HEADER)
@@ -466,10 +467,10 @@ def run(ctx: ProtocolContext) -> None:
         return ALPHA_LOW if h < THRESHOLD else ALPHA_HIGH
 
     # Proportional Controller
-    # TODO: take in smoothed heights as inputs
     def adaptive_volume_step(
         hdelta: float, height: float, step_volume: float, target_height: float
     ) -> float:  # desired steady state height step in mm
+        nonlocal lower_bound, upper_bound
 
         alpha = get_alpha_for_height(height)
 
@@ -570,18 +571,21 @@ def run(ctx: ProtocolContext) -> None:
         )
 
         # Check for bad hdelta
-        #if not ctx.is_simulating():
-        #    if step == 0: 
-        #        status = "pass" if 2.0 < hdelta < 3.0 else "fail"
-        #    else:
-        #        if hdelta <= lower_bound or hdelta >= upper_bound:
-        #            status = "fail"
-        #            write_trial_log(udv_table)
-        #            dispense_volume -= step_volume #rollback dispense volume 
-        #            corrected_heights.pop() #rollback corrected heights
-        #        else: 
-        #            status = "pass"
-        #            write_trial_log(udv_table)
+        if not ctx.is_simulating():
+            if step == 0: 
+                status = "pass" if 2.0 < hdelta < 3.0 else "fail"
+                write_trial_log(udv_table)
+            else:
+                if hdelta <= lower_bound or hdelta >= upper_bound:
+                    status = "fail"
+                    write_trial_log(udv_table)
+                    dispense_volume -= step_volume #rollback dispense volume 
+                    corrected_heights.pop() #rollback corrected heights
+                else:
+                    status = "pass"
+                    write_trial_log(udv_table)
+        else: 
+            write_trial_log(udv_table)
 
         #recalculate step volume for next step 
         step_volume = adaptive_volume_step(hdelta, corrected_height, step_volume, target_height)
