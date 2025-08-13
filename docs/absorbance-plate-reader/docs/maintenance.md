@@ -5,6 +5,8 @@ hide: toc
 
 # Maintenance and Cleaning
 
+## Maintenance
+
 There are no user-repairable parts on the Absorbance Plate Reader. Contact Opentrons Support if the unit is damaged.
 
 ## Cleaning
