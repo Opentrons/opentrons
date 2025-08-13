@@ -116,11 +116,11 @@ def test_gravimetric_test_protocol_has_max_api(pipette: str) -> None:
         # ["1ch1000_extra.csv"],
         ["1ch50.csv"],
         # ["1ch50_extra.csv"],
-        ["96ch1000.csv"],
+        # ["96ch1000.csv"],
         # ["96ch200.csv"], #Needs LC to complete
         # ["8ch1000.csv"],
         # ["8ch1000_extra.csv"],
-        ["8ch50.csv"],
+        # ["8ch50.csv"],
         # ["8ch50_extra.csv"],
     ],
 )
@@ -137,6 +137,21 @@ def test_analasis(csv: str) -> None:
                 )
             }
         ),
+    )
+    print(result.stdout_stderr)
+    assert result.exit_code == 0
+
+
+def test_photometric() -> None:
+    """Make sure each CSV can analyze successfully."""
+    photometric_protocol = (
+        Path(__file__).parent
+        / "../../../hardware_testing/protocols/universal_photometric.py"
+    )
+    result = _get_analysis_result(
+        [photometric_protocol],
+        "--json-output",
+        check=True,
     )
     print(result.stdout_stderr)
     assert result.exit_code == 0

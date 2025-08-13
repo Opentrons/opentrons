@@ -10,14 +10,15 @@ import {
   CLOSE_UNSAVED_STEP_FORM,
   ConfirmDeleteModal,
   DELETE_STEP_FORM,
-} from '../../../../components/organisms'
+} from '/protocol-designer/components/organisms'
 import {
   getHydratedForm,
   selectors as stepFormSelectors,
-} from '../../../../step-forms'
-import { getInvariantContext } from '../../../../step-forms/selectors'
-import { actions } from '../../../../steplist'
-import { actions as stepsActions } from '../../../../ui/steps'
+} from '/protocol-designer/step-forms'
+import { getInvariantContext } from '/protocol-designer/step-forms/selectors'
+import { actions } from '/protocol-designer/steplist'
+import { actions as stepsActions } from '/protocol-designer/ui/steps'
+
 import { StepFormToolbox } from './StepFormToolbox'
 import { getDirtyFields } from './utils'
 
@@ -27,8 +28,8 @@ import type {
   FormData,
   StepFieldName,
   StepIdType,
-} from '../../../../form-types'
-import type { BaseState, ThunkDispatch } from '../../../../types'
+} from '/protocol-designer/form-types'
+import type { BaseState, ThunkDispatch } from '/protocol-designer/types'
 
 interface StateProps {
   canSave: boolean

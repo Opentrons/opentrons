@@ -483,7 +483,7 @@ function PrepareToRun({
   } else if (isMissingModules) {
     modulesDetail = missingModulesText
   } else if (!moduleCalibrationStatus.complete) {
-    modulesDetail = t('calibration_required')
+    modulesDetail = t('action_needed')
   } else {
     // modules and deck are ready
     const hardwareDetail = getConnectedHardwareText(

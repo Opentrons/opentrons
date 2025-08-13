@@ -2,21 +2,22 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { fixture12Trough, fixtureTiprack1000ul } from '@opentrons/shared-data'
 
-import * as fileDataSelectors from '../../../../file-data/selectors'
-import { selectors as labwareIngredSelectors } from '../../../../labware-ingred/selectors'
-import { getInitialDeckSetup } from '../../../../step-forms/selectors'
-import { PRESAVED_STEP_ID } from '../../../../steplist/types'
-import { addHint } from '../../../../tutorial/actions'
+import * as fileDataSelectors from '/protocol-designer/file-data/selectors'
+import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
+import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
+import { PRESAVED_STEP_ID } from '/protocol-designer/steplist/types'
+import { addHint } from '/protocol-designer/tutorial/actions'
+
 import { addAndSelectStep } from '../thunks'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { StepType } from '../../../../form-types'
+import type { StepType } from '/protocol-designer/form-types'
 
-vi.mock('../../../../tutorial/actions')
-vi.mock('../../../../ui/modules/selectors')
-vi.mock('../../../../labware-ingred/selectors')
-vi.mock('../../../../file-data/selectors')
-vi.mock('../../../../step-forms/selectors')
+vi.mock('/protocol-designer/tutorial/actions')
+vi.mock('/protocol-designer/ui/modules/selectors')
+vi.mock('/protocol-designer/labware-ingred/selectors')
+vi.mock('/protocol-designer/file-data/selectors')
+vi.mock('/protocol-designer/step-forms/selectors')
 const dispatch = vi.fn()
 const getState = vi.fn()
 

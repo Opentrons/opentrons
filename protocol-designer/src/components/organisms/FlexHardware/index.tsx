@@ -15,16 +15,17 @@ import {
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
 
-import { deleteContainer } from '../../../labware-ingred/actions'
-import { deleteModule } from '../../../modules'
-import { editDeckConfiguration } from '../../../step-forms/actions'
-import { deleteDeckFixture } from '../../../step-forms/actions/additionalItems'
+import { deleteContainer } from '/protocol-designer/labware-ingred/actions'
+import { deleteModule } from '/protocol-designer/modules'
+import { editDeckConfiguration } from '/protocol-designer/step-forms/actions'
+import { deleteDeckFixture } from '/protocol-designer/step-forms/actions/additionalItems'
 import {
   getAdditionalEquipmentEntities,
   getInitialDeckSetup,
   getSavedStepForms,
-} from '../../../step-forms/selectors'
-import { uuid } from '../../../utils'
+} from '/protocol-designer/step-forms/selectors'
+import { uuid } from '/protocol-designer/utils'
+
 import { ConfirmDeleteEntityInUseModal } from '../ConfirmDeleteEntityInUseModal'
 import { ConfirmDeleteStagingAreaModal } from '../ConfirmDeleteStagingAreaModal'
 import { HardwareConfigurator } from '../HardwareConfigurator'
@@ -37,8 +38,8 @@ import type {
   DeckConfiguration,
   FlexModuleCutoutFixtureId,
 } from '@opentrons/shared-data'
+import type { ThunkDispatch } from '/protocol-designer/types'
 import type { FixtureName, Fixtures } from '..'
-import type { ThunkDispatch } from '../../../types'
 import type { InitialDeckStateModules } from '../HardwareConfigurator/AddFixtureModal'
 
 export function FlexHardware(): JSX.Element {

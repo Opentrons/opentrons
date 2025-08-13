@@ -3,8 +3,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { COLORS } from '@opentrons/components'
 
-import { renderWithProviders } from '../../../../../../../__testing-utils__'
-import { i18n } from '../../../../../../../assets/localization'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+
 import { ResetSettingsField } from '../ResetSettingsField'
 
 import type { ComponentProps } from 'react'

@@ -12,12 +12,13 @@ import {
   OVERFLOW_AUTO,
 } from '@opentrons/components'
 
+import { ExitConfirmModal } from '/ai-client/components/molecules/ExitConfirmModal'
+import { Footer } from '/ai-client/components/molecules/Footer'
+import { Header } from '/ai-client/components/molecules/Header'
+import { HeaderWithMeter } from '/ai-client/components/molecules/HeaderWithMeter'
+import { Loading } from '/ai-client/components/molecules/Loading'
+
 import { initializeMixpanel, setMixpanelTracking } from './analytics/mixpanel'
-import { ExitConfirmModal } from './molecules/ExitConfirmModal'
-import { Footer } from './molecules/Footer'
-import { Header } from './molecules/Header'
-import { HeaderWithMeter } from './molecules/HeaderWithMeter'
-import { Loading } from './molecules/Loading'
 import { OpentronsAIRoutes } from './OpentronsAIRoutes'
 import {
   featureFlagsAtom,
@@ -107,7 +108,6 @@ export function OpentronsAI(): JSX.Element | null {
             <Header />
           )}
         </StickyHeader>
-
         <Flex
           flex="1"
           flexDirection={DIRECTION_COLUMN}

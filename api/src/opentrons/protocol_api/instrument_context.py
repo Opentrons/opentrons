@@ -33,6 +33,7 @@ from opentrons.protocols.api_support.util import (
 )
 
 from .core.common import InstrumentCore, ProtocolCore, WellCore
+from .core.core_map import LoadedCoreMap
 from .core.engine import ENGINE_CORE_API_VERSION
 from .core.legacy.legacy_instrument_core import LegacyInstrumentCore
 from .config import Clearances
@@ -117,13 +118,13 @@ class InstrumentContext(publisher.CommandPublisher):
         tip_racks: List[labware.Labware],
         trash: Optional[Union[labware.Labware, TrashBin, WasteChute]],
         requested_as: str,
+        core_map: LoadedCoreMap,
     ) -> None:
         super().__init__(broker)
         self._api_version = api_version
         self._core = core
         self._protocol_core = protocol_core
         self._tip_racks = tip_racks
-        self._last_tip_picked_up_from: Union[labware.Well, None] = None
         self._starting_tip: Union[labware.Well, None] = None
         self._well_bottom_clearances = Clearances(
             default_aspirate=_DEFAULT_ASPIRATE_CLEARANCE,
@@ -133,6 +134,7 @@ class InstrumentContext(publisher.CommandPublisher):
             labware.Labware, TrashBin, WasteChute, None
         ] = trash
         self.requested_as = requested_as
+        self._core_map = core_map
 
     @property
     @requires_version(2, 0)
@@ -1070,8 +1072,9 @@ class InstrumentContext(publisher.CommandPublisher):
         if not self._core.has_tip():
             _log.warning("Pipette has no tip to return")
 
-        loc = self._last_tip_picked_up_from
+        loc = self._get_current_tip_source_well()
 
+        # TODO rewrite this error message
         if not isinstance(loc, labware.Well):
             raise TypeError(f"Last tip location should be a Well but it is: {loc}")
 
@@ -1312,8 +1315,6 @@ class InstrumentContext(publisher.CommandPublisher):
                 prep_after=prep_after,
             )
 
-        self._last_tip_picked_up_from = well
-
         return self
 
     @requires_version(2, 0)
@@ -1401,7 +1402,6 @@ class InstrumentContext(publisher.CommandPublisher):
                         home_after=home_after,
                         alternate_tip_drop=True,
                     )
-                self._last_tip_picked_up_from = None
                 return self
 
         elif isinstance(location, labware.Well):
@@ -1440,7 +1440,6 @@ class InstrumentContext(publisher.CommandPublisher):
                     home_after=home_after,
                     alternate_tip_drop=alternate_drop_location,
                 )
-            self._last_tip_picked_up_from = None
             return self
 
         else:
@@ -1462,7 +1461,6 @@ class InstrumentContext(publisher.CommandPublisher):
                 alternate_drop_location=alternate_drop_location,
             )
 
-        self._last_tip_picked_up_from = None
         return self
 
     @requires_version(2, 0)
@@ -1847,7 +1845,7 @@ class InstrumentContext(publisher.CommandPublisher):
             source=source,
             dest=dest,
             tip_policy=new_tip,
-            last_tip_well=self._last_tip_picked_up_from,
+            last_tip_well=self._get_current_tip_source_well(),
             tip_racks=self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
             group_wells_for_multi_channel=group_wells,
@@ -1887,7 +1885,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 destination=dest,
             ),
         ):
-            last_tip_location = self._core.transfer_with_liquid_class(
+            self._core.transfer_with_liquid_class(
                 liquid_class=liquid_class,
                 volume=volume,
                 source=[
@@ -1906,18 +1904,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
                 keep_last_tip=verified_keep_last_tip,
-                last_tip_location=transfer_args.last_tip_location,
             )
-
-        # TODO(jbl 2025-06-23) last_tip_picked_up_from should be removed from the public context and
-        #   moved to the engine core or engine as a simpler and more holistic solution
-        if last_tip_location is not None:
-            tip_rack_loc, tip_well_core = last_tip_location
-            self._last_tip_picked_up_from = tip_rack_loc.labware.as_labware()[
-                tip_well_core.get_name()
-            ]
-        else:
-            self._last_tip_picked_up_from = None
 
         return self
 
@@ -1983,7 +1970,7 @@ class InstrumentContext(publisher.CommandPublisher):
             source=source,
             dest=dest,
             tip_policy=new_tip,
-            last_tip_well=self._last_tip_picked_up_from,
+            last_tip_well=self._get_current_tip_source_well(),
             tip_racks=self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
             group_wells_for_multi_channel=group_wells,
@@ -2028,7 +2015,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 destination=dest,
             ),
         ):
-            last_tip_location = self._core.distribute_with_liquid_class(
+            self._core.distribute_with_liquid_class(
                 liquid_class=liquid_class,
                 volume=volume,
                 source=(
@@ -2050,18 +2037,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
                 keep_last_tip=verified_keep_last_tip,
-                last_tip_location=transfer_args.last_tip_location,
             )
-
-        # TODO(jbl 2025-06-23) last_tip_picked_up_from should be removed from the public context and
-        #   moved to the engine core or engine as a simpler and more holistic solution
-        if last_tip_location is not None:
-            tip_rack_loc, tip_well_core = last_tip_location
-            self._last_tip_picked_up_from = tip_rack_loc.labware.as_labware()[
-                tip_well_core.get_name()
-            ]
-        else:
-            self._last_tip_picked_up_from = None
 
         return self
 
@@ -2128,7 +2104,7 @@ class InstrumentContext(publisher.CommandPublisher):
             source=source,
             dest=dest,
             tip_policy=new_tip,
-            last_tip_well=self._last_tip_picked_up_from,
+            last_tip_well=self._get_current_tip_source_well(),
             tip_racks=self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
             group_wells_for_multi_channel=group_wells,
@@ -2175,7 +2151,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 destination=dest,
             ),
         ):
-            last_tip_location = self._core.consolidate_with_liquid_class(
+            self._core.consolidate_with_liquid_class(
                 liquid_class=liquid_class,
                 volume=volume,
                 source=[
@@ -2194,18 +2170,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
                 keep_last_tip=verified_keep_last_tip,
-                last_tip_location=transfer_args.last_tip_location,
             )
-
-        # TODO(jbl 2025-06-23) last_tip_picked_up_from should be removed from the public context and
-        #   moved to the engine core or engine as a simpler and more holistic solution
-        if last_tip_location is not None:
-            tip_rack_loc, tip_well_core = last_tip_location
-            self._last_tip_picked_up_from = tip_rack_loc.labware.as_labware()[
-                tip_well_core.get_name()
-            ]
-        else:
-            self._last_tip_picked_up_from = None
 
         return self
 
@@ -3128,6 +3093,35 @@ class InstrumentContext(publisher.CommandPublisher):
                 )
         if isinstance(target, validation.PointTarget):
             return target.location, None, None
+
+    def _get_current_tip_source_well(self) -> Optional[labware.Well]:
+        tip_rack_cores = self._core.get_tip_origin()
+        if tip_rack_cores is None:
+            return None
+        labware_core, well_core = tip_rack_cores
+        tip_rack_labware = self._core_map.get(labware_core)
+        return labware.Well(
+            parent=tip_rack_labware, core=well_core, api_version=self._api_version
+        )
+
+    @property
+    def _last_tip_picked_up_from(self) -> Optional[labware.Well]:
+        """
+        .. deprecated:: 2.25
+           Use :py:obj:`ProtocolContext.current_tip_source_well` instead.
+
+           If the pipette has a tip on it, returns the tip rack well it was picked up from.
+           Otherwise will return ``None``.
+        """
+        return self._get_current_tip_source_well()
+
+    @requires_version(2, 25)
+    def current_tip_source_well(self) -> Optional[labware.Well]:
+        """Returns the tip rack well the current tip has been picked up from.
+
+        If there is no tip currently on the pipette, this will return ``None``.
+        """
+        return self._get_current_tip_source_well()
 
 
 class AutoProbeDisable:

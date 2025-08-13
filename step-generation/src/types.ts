@@ -20,6 +20,9 @@ import type {
 } from '@opentrons/shared-data'
 import type { AtomicProfileStep } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type {
+  CLEAN,
+  DIRTY,
+  EMPTY,
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_DEACTIVATED,
@@ -316,7 +319,7 @@ export type SharedTransferLikeArgs = CommonArgs & {
   blowoutFlowRateUlSec: number
 
   // ===== SETTINGS INTRODUCED WITH LIQUID CLASSES =====
-  liquidClass: string | null
+  liquidClass: string | null // a liquid class name like "water" or null; "none" is not allowed
   aspiratePositionReference: PositionReference
   aspirateZOffset: number
   aspirateSubmergeSpeed: number | null
@@ -629,6 +632,7 @@ export interface InvariantContext {
   config: Config
 }
 
+export type TipState = typeof CLEAN | typeof DIRTY | typeof EMPTY
 export interface TimelineFrame {
   pipettes: {
     [pipetteId: string]: PipetteTemporalProperties
@@ -642,14 +646,14 @@ export interface TimelineFrame {
   tipState: {
     tipracks: {
       [labwareId: string]: {
-        [wellName: string]: boolean // true if tip is in there
+        [wellName: string]: TipState
       }
     }
     pipettes: {
       [pipetteId: string]: {
         hasTip: boolean
         tiprackURI: string | null
-      } // true if pipette has tip(s)
+      }
     }
   }
   liquidState: {

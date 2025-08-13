@@ -3,20 +3,21 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { fixture96Plate } from '@opentrons/shared-data'
 
-import { EditLabwareQuantityModal } from '..'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
 import {
   createContainer,
   deleteContainer,
-} from '../../../../labware-ingred/actions'
-import { getLabwareEntities } from '../../../../step-forms/selectors'
+} from '/protocol-designer/labware-ingred/actions'
+import { getLabwareEntities } from '/protocol-designer/step-forms/selectors'
+
+import { EditLabwareQuantityModal } from '..'
 
 import type { ComponentProps } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-vi.mock('../../../../labware-ingred/actions')
-vi.mock('../../../../step-forms/selectors')
+vi.mock('/protocol-designer/labware-ingred/actions')
+vi.mock('/protocol-designer/step-forms/selectors')
 const render = (props: ComponentProps<typeof EditLabwareQuantityModal>) => {
   return renderWithProviders(<EditLabwareQuantityModal {...props} />, {
     i18nInstance: i18n,

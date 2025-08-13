@@ -34,7 +34,7 @@ import {
   dispenseInTrash,
   dispenseInWasteChute,
 } from '../commandCreators/compound'
-import { ZERO_OFFSET } from '../constants'
+import { EMPTY, ZERO_OFFSET } from '../constants'
 import { curryCommandCreator } from './curryCommandCreator'
 import { reduceCommandCreators } from './index'
 
@@ -545,7 +545,10 @@ export function makeInitialRobotState(args: {
         (acc, _, labwareId) => {
           const def = invariantContext.labwareEntities[labwareId].def
           if (!getIsTiprack(def)) return acc
-          const tipState = mapValues(def.wells, () => true)
+          const tipState = mapValues(def.wells, () => ({
+            hasTip: true,
+            isTipSterile: true,
+          }))
           return { ...acc, [labwareId]: tipState }
         },
         {}
@@ -560,7 +563,7 @@ export const getTiprackHasTips = (
 ): boolean => {
   return tipState.tipracks[labwareId] != null
     ? Object.values(tipState.tipracks[labwareId]).some(
-        tipState => tipState === true
+        tipState => tipState !== EMPTY
       )
     : false
 }

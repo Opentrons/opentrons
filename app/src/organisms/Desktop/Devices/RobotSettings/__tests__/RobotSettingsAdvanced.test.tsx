@@ -12,6 +12,7 @@ import { getShellUpdateState } from '/app/redux/shell'
 
 import {
   DeviceReset,
+  DisableStackerSensors,
   DisplayRobotName,
   EnableStatusLight,
   GantryHoming,
@@ -53,6 +54,7 @@ vi.mock('../AdvancedTab/Troubleshooting')
 vi.mock('../AdvancedTab/UpdateRobotSoftware')
 vi.mock('../AdvancedTab/UsageSettings')
 vi.mock('../AdvancedTab/UseOlderAspirateBehavior')
+vi.mock('../AdvancedTab/DisableStackerSensors')
 
 const mockUpdateRobotStatus = vi.fn()
 
@@ -112,6 +114,12 @@ describe('RobotSettings Advanced tab', () => {
     when(useIsFlex).calledWith('otie').thenReturn(false)
     vi.mocked(EnableStatusLight).mockReturnValue(
       <div>mock EnableStatusLight</div>
+    )
+    vi.mocked(GantryHoming).mockReturnValue(
+      <div>Mock GantryHoming Section</div>
+    )
+    vi.mocked(DisableStackerSensors).mockReturnValue(
+      <div>Mock DisableStackerSensors Section</div>
     )
     vi.mocked(useIsRobotBusy).mockReturnValue(false)
   })
@@ -215,5 +223,18 @@ describe('RobotSettings Advanced tab', () => {
     when(useIsFlex).calledWith('otie').thenReturn(true)
     render()
     screen.getByText('mock EnableStatusLight')
+  })
+
+  it('should not render DisableStackerSensors section for OT-2', () => {
+    render()
+    expect(
+      screen.queryByText('Mock DisableStackerSensors')
+    ).not.toBeInTheDocument()
+  })
+
+  it('should render DisableStackerSensors section for Flex', () => {
+    when(useIsFlex).calledWith('otie').thenReturn(true)
+    render()
+    screen.getByText('Mock DisableStackerSensors Section')
   })
 })

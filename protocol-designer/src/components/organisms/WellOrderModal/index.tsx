@@ -16,12 +16,13 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { LINK_BUTTON_STYLE } from '../../atoms'
+import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
+
 import { getMainPagePortalEl } from '../Portal'
 import { WellOrderVisualization } from './WellOrderVisualization'
 
-import type { WellOrderOption } from '../../../form-types'
-import type { MoveLiquidPrefixType } from '../../../resources/types'
+import type { WellOrderOption } from '/protocol-designer/form-types'
+import type { MoveLiquidPrefixType } from '/protocol-designer/resources/types'
 
 const DEFAULT_FIRST: WellOrderOption = 't2b'
 const DEFAULT_SECOND: WellOrderOption = 'l2r'

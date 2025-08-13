@@ -87,7 +87,6 @@ def run(protocol: ProtocolContext) -> None:
         """Drop tip with pipette ejector extended."""
         move_pipette_plunger(api, mount, drop_tip_pos)
         api.remove_tip(mount)
-        pipette._last_tip_picked_up_from = None
 
     def clip_waste_chute_edge() -> None:
         """Knock tips off with waste chute edge."""

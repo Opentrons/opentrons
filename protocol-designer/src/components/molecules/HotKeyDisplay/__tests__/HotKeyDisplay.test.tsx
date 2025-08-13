@@ -1,14 +1,15 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { getUserOS } from '/protocol-designer/pages/Designer/ProtocolSteps/Timeline/utils'
+
 import { HotKeyDisplay } from '..'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
-import { getUserOS } from '../../../../pages/Designer/ProtocolSteps/Timeline/utils'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('../../../../pages/Designer/ProtocolSteps/Timeline/utils')
+vi.mock('/protocol-designer/pages/Designer/ProtocolSteps/Timeline/utils')
 
 const render = (props: ComponentProps<typeof HotKeyDisplay>) => {
   return renderWithProviders(<HotKeyDisplay {...props} />, {

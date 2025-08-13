@@ -103,29 +103,27 @@ figure.side-by-side img {
   margin-right: 5px;
  }
 
- .status-dot.white {
+.status-dot.white {
   background-color: #F8F6F0;
-  animation: pulse-white 3s;
-  animation-iteration-count: 3;
- }
+}
 
- .status-dot.green {
+.status-dot.green {
   background-color: green;
- }
+}
 
- .status-dot.blue {
+.status-dot.blue {
   background-color: #006CFA;
- }
+}
 
- .status-dot.red {
+.status-dot.red {
   background-color: red;
- }
+}
 
- .status-dot.yellow {
+.status-dot.yellow {
   background-color: #F09D20;
- }
+}
 
- /* Aligns status dots and text if needed*/
+/* Aligns status dots and text if needed */
 .status-dot-container {
   display: flex;
   align-items: center;

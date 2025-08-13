@@ -39,30 +39,31 @@ import {
   CLOSE_UNSAVED_STEP_FORM,
   ConfirmDeleteModal,
   getMainPagePortalEl,
-} from '../../../../components/organisms'
-import { useKitchen } from '../../../../components/organisms/Kitchen/useKitchen'
-import { OFFDECK } from '../../../../constants'
-import { getEnableComment } from '../../../../feature-flags/selectors'
+} from '/protocol-designer/components/organisms'
+import { useKitchen } from '/protocol-designer/components/organisms/Kitchen/useKitchen'
+import { OFFDECK } from '/protocol-designer/constants'
+import { getEnableComment } from '/protocol-designer/feature-flags/selectors'
 import {
   getInitialRobotState,
   getRobotStateTimeline,
-} from '../../../../file-data/selectors'
+} from '/protocol-designer/file-data/selectors'
 import {
   getIsModuleOnDeck,
   selectors as stepFormSelectors,
-} from '../../../../step-forms'
-import { getLabwareEntities } from '../../../../step-forms/selectors'
+} from '/protocol-designer/step-forms'
+import { getLabwareEntities } from '/protocol-designer/step-forms/selectors'
 import {
   getIsMultiSelectMode,
   actions as stepsActions,
-} from '../../../../ui/steps'
-import { getHasTrash, getIsAdapterFromDef } from '../../../../utils'
+} from '/protocol-designer/ui/steps'
+import { getHasTrash, getIsAdapterFromDef } from '/protocol-designer/utils'
+
 import { AddStepOverflowButton } from './AddStepOverflowButton'
 
 import type { ThunkDispatch } from 'redux-thunk'
 import type { MouseEvent } from 'react'
-import type { StepType } from '../../../../form-types'
-import type { BaseState } from '../../../../types'
+import type { StepType } from '/protocol-designer/form-types'
+import type { BaseState } from '/protocol-designer/types'
 
 interface AddStepButtonProps {
   hasText: boolean

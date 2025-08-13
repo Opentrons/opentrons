@@ -4,20 +4,21 @@ import '@testing-library/jest-dom/vitest'
 
 import { fireEvent, screen } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../assets/localization'
-import { START_TERMINAL_ITEM_ID } from '../../../../../steplist'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { START_TERMINAL_ITEM_ID } from '/protocol-designer/steplist'
 import {
   getHoveredTerminalItemId,
   getSelectedTerminalItemId,
-} from '../../../../../ui/steps'
-import { selectTerminalItem } from '../../../../../ui/steps/actions/actions'
+} from '/protocol-designer/ui/steps'
+import { selectTerminalItem } from '/protocol-designer/ui/steps/actions/actions'
+
 import { HardwareStep } from '../HardwareStep'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('../../../../../ui/steps')
-vi.mock('../../../../../ui/steps/actions/actions')
+vi.mock('/protocol-designer/ui/steps')
+vi.mock('/protocol-designer/ui/steps/actions/actions')
 const render = (props: ComponentProps<typeof HardwareStep>) => {
   return renderWithProviders(<HardwareStep {...props} />, {
     i18nInstance: i18n,

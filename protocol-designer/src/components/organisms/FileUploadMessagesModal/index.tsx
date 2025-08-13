@@ -13,8 +13,9 @@ import {
 import {
   dismissFileUploadMessage,
   undoLoadFile,
-} from '../../../load-file/actions'
-import { getFileUploadMessages } from '../../../load-file/selectors'
+} from '/protocol-designer/load-file/actions'
+import { getFileUploadMessages } from '/protocol-designer/load-file/selectors'
+
 import { useFileUploadModalContents } from './utils'
 
 export function FileUploadMessagesModal(): JSX.Element | null {

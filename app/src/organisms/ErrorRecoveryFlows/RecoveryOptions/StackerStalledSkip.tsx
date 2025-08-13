@@ -1,6 +1,7 @@
 import { RECOVERY_MAP } from '../constants'
 import {
   SkipStepInfo,
+  StackerEmptyHopper,
   StackerHomeShuttle,
   StackerHopperLwInfo,
   StackerShuttleLwInfo,
@@ -15,6 +16,8 @@ export function StackerStalledSkip(props: RecoveryContentProps): JSX.Element {
   const { STACKER_STALLED_SKIP } = RECOVERY_MAP
 
   switch (step) {
+    case STACKER_STALLED_SKIP.STEPS.EMPTY_STACKER:
+      return <StackerEmptyHopper {...props} />
     case STACKER_STALLED_SKIP.STEPS.PREPARE_TRACK_FOR_HOMING:
     case STACKER_STALLED_SKIP.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS:
       return <StackerHomeShuttle {...props} />

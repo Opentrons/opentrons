@@ -42,7 +42,7 @@ import type {
   CutoutId,
   DeckConfiguration,
 } from '@opentrons/shared-data'
-import type { ModuleSetupWizardStepProps } from './types'
+import type { ModuleSetupWizardMaybePipetteStepProps } from './types'
 
 export const BODY_STYLE = css`
   ${TYPOGRAPHY.pRegular};
@@ -52,7 +52,8 @@ export const BODY_STYLE = css`
     line-height: 1.75rem;
   }
 `
-export interface SelectLocationProps extends ModuleSetupWizardStepProps {
+export interface SelectLocationProps
+  extends ModuleSetupWizardMaybePipetteStepProps {
   deckConfig: DeckConfiguration
   createMaintenanceRun: CreateMaintenanceRunType
   isLoadedInRun: boolean
