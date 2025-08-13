@@ -1796,6 +1796,7 @@ class InstrumentContext(publisher.CommandPublisher):
         return_tip: bool = False,
         group_wells: bool = True,
         keep_last_tip: Optional[bool] = None,
+        tip_racks: Optional[List[labware.Labware]] = None,
     ) -> InstrumentContext:
         """Move a particular type of liquid from one well or group of wells to another.
 
@@ -1846,7 +1847,7 @@ class InstrumentContext(publisher.CommandPublisher):
             dest=dest,
             tip_policy=new_tip,
             last_tip_well=self._get_current_tip_source_well(),
-            tip_racks=self._tip_racks,
+            tip_racks=tip_racks or self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
             group_wells_for_multi_channel=group_wells,
             current_volume=self.current_volume,
@@ -1924,6 +1925,7 @@ class InstrumentContext(publisher.CommandPublisher):
         return_tip: bool = False,
         group_wells: bool = True,
         keep_last_tip: Optional[bool] = None,
+        tip_racks: Optional[List[labware.Labware]] = None,
     ) -> InstrumentContext:
         """
         Distribute a particular type of liquid from one well to a group of wells.
@@ -1971,7 +1973,7 @@ class InstrumentContext(publisher.CommandPublisher):
             dest=dest,
             tip_policy=new_tip,
             last_tip_well=self._get_current_tip_source_well(),
-            tip_racks=self._tip_racks,
+            tip_racks=tip_racks or self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
             group_wells_for_multi_channel=group_wells,
             current_volume=self.current_volume,
@@ -2057,6 +2059,7 @@ class InstrumentContext(publisher.CommandPublisher):
         return_tip: bool = False,
         group_wells: bool = True,
         keep_last_tip: Optional[bool] = None,
+        tip_racks: Optional[List[labware.Labware]] = None,
     ) -> InstrumentContext:
         """
         Consolidate a particular type of liquid from a group of wells to one well.
@@ -2105,7 +2108,7 @@ class InstrumentContext(publisher.CommandPublisher):
             dest=dest,
             tip_policy=new_tip,
             last_tip_well=self._get_current_tip_source_well(),
-            tip_racks=self._tip_racks,
+            tip_racks=tip_racks or self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
             group_wells_for_multi_channel=group_wells,
             current_volume=self.current_volume,
