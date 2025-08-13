@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
@@ -8,7 +8,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { ModuleSetupModal } from '/app/organisms/ModuleCard/ModuleSetupModal'
-import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
+import { handleModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import {
   mockMagneticModuleGen2,
@@ -112,9 +112,7 @@ describe('SetupModulesList', () => {
     when(useRunCalibrationStatus).calledWith(ROBOT_NAME, RUN_ID).thenReturn({
       complete: true,
     })
-    vi.mocked(ModuleWizardFlows).mockReturnValue(
-      <div>mock ModuleWizardFlows</div>
-    )
+
     vi.mocked(useChainLiveCommands).mockReturnValue({
       chainLiveCommands: mockChainLiveCommands,
     } as any)
@@ -229,9 +227,7 @@ describe('SetupModulesList', () => {
     screen.getByText('Thermocycler Module')
     screen.getByText('A1+B1')
     fireEvent.click(screen.getByRole('button', { name: 'Setup now' }))
-    await waitFor(() => {
-      screen.getByText('mock ModuleWizardFlows')
-    })
+    expect(vi.mocked(handleModuleWizardFlows)).toHaveBeenCalled()
   })
 
   it('should render disabled button when pipette and module are not calibrated', () => {

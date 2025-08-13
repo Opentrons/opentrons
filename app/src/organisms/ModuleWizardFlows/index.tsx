@@ -385,10 +385,9 @@ export function ModuleWizardFlows(
   }
 }
 
-type ModuleWizardFlowsPropsWithHost = Omit<
-  ModuleWizardFlowsProps,
-  'closeFlow'
-> & {
+interface ModuleWizardFlowsPropsWithHost
+  extends Omit<ModuleWizardFlowsProps, 'closeFlow'> {
+  onClose?: () => void
   host: HostConfig
 }
 
@@ -401,13 +400,16 @@ export const handleModuleWizardFlows = (
 const NiceModalModuleWizardFlows = NiceModal.create(
   (props: ModuleWizardFlowsPropsWithHost): JSX.Element => {
     const modal = useModal()
-    const closeFlowAndModal = (): void => {
+    const closeFlow = (): void => {
+      if (props.onClose !== undefined) {
+        props.onClose()
+      }
       modal.remove()
     }
 
     return (
       <ApiHostProvider {...props.host}>
-        <ModuleWizardFlows {...props} closeFlow={closeFlowAndModal} />
+        <ModuleWizardFlows {...props} closeFlow={closeFlow} />
       </ApiHostProvider>
     )
   }
