@@ -31,7 +31,7 @@ Opentrons has validated the Heater-Shaker’s performance in the conditions reco
     <tr>
       <td>Relative Humidity</td>
       <td>40 to 60%, non-condensing</td>
-      <td>80%</td>
+      <td>80% maximum</td>
       <td>10 to 85%, non-condensing (below 30 °C)</td>
     </tr>
     <tr>
@@ -133,3 +133,12 @@ RoHS compliant
 ### CISPR 11 Class A
 
 **Caution:** This equipment is not intended for use in residential environments and may not provide adequate protection to radio reception in such environments.
+
+## WEEE Policy
+
+<img src="../images/WEEE.svg" style="float: right;" width="10%">
+Opentrons is dedicated to adhering to the EU Directive on Waste Electrical and Electronic Equipment (WEEE – 2012/19/EU). Our goal is to ensure that our products are properly disposed of or recycled once they reach the end of their useful life.
+
+Opentrons products that fall under the WEEE directive are labeled with the <img src="../images/WEEE.svg" style="height: 1.75em; vertical-align: middle;"> symbol, signifying that they should not be thrown away with regular household waste but must be collected and handled separately.
+
+If you or your business have Opentrons products that are at end of life or need to be discarded for a separate purpose, contact Opentrons for proper disposal and recycling.

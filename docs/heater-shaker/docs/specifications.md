@@ -147,14 +147,14 @@ The Heater-Shaker has an LED status light that can display three colors: amber, 
       </td>
     </tr>
     <tr>
+      <td><span class="status-dot-container">
+        <span class="status-dot yellow"></span>Amber</span></td>
+        <td>Solid amber indicates an error.</td>
+      </td>
+    <tr>
       <td><span class="status-dot-container"> <!-- testing split color dot -->
         <span class="status-dot yellow-red-split"></span> Amber/Red</span></td>
-      <td>
-        <ul>
-          <li>Solid amber indicates an error.</li>
-          <li>Pulsing red and amber (alternating) indicates an error <em>and</em> the module is hot to the touch (>49 °C)</li>
-        </ul>
-      </td>
+      <td>Pulsing amber and red (alternating) indicates an error <em>and</em> the module is hot to the touch (>49 °C)</td>
     </tr>
     <tr>
       <td>LED off</td>
