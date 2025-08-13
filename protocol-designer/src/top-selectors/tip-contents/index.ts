@@ -1,6 +1,7 @@
-import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import { createSelector } from 'reselect'
+
+import { DIRTY, EMPTY } from '@opentrons/step-generation'
 
 import { selectors as fileDataSelectors } from '../../file-data'
 import { selectors as stepFormSelectors } from '../../step-forms'
@@ -22,7 +23,7 @@ import type { Selector } from '../../types'
 
 export const getMissingTipsByLabwareId: Selector<Record<
   string,
-  WellGroup
+  { missingTips: WellGroup; usedTips: WellGroup }
 > | null> = createSelector(
   stepFormSelectors.getOrderedStepIds,
   fileDataSelectors.getRobotStateTimeline,
@@ -93,17 +94,41 @@ export const getMissingTipsByLabwareId: Selector<Record<
       if (prevFrame) robotState = prevFrame.robotState
     }
 
-    const missingTips =
-      robotState &&
-      robotState.tipState &&
-      mapValues(robotState.tipState.tipracks, tipMap =>
-        reduce(
-          tipMap,
-          (acc, hasTip, wellName): WellGroup =>
-            hasTip ? acc : { ...acc, [wellName]: null },
-          {}
-        )
-      )
-    return missingTips
+    const missingAndUsedTips =
+      robotState && robotState.tipState
+        ? reduce(
+            robotState.tipState.tipracks,
+            (accOuter, tiprackState, tiprackId) => {
+              const tiprackMissingAndUsedTips = reduce(
+                tiprackState,
+                (accInner, tipState, wellName) => {
+                  if (tipState === EMPTY) {
+                    return {
+                      ...accInner,
+                      missingTips: {
+                        ...accInner.missingTips,
+                        [wellName]: null,
+                      },
+                    }
+                  } else if (tipState === DIRTY) {
+                    return {
+                      ...accInner,
+                      usedTips: {
+                        ...accInner.usedTips,
+                        [wellName]: null,
+                      },
+                    }
+                  }
+                  return accInner
+                },
+                { missingTips: {}, usedTips: {} }
+              )
+              return { ...accOuter, [tiprackId]: tiprackMissingAndUsedTips }
+            },
+            {}
+          )
+        : null
+
+    return missingAndUsedTips
   }
 )

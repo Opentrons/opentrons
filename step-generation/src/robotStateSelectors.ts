@@ -13,7 +13,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { COLUMN_4_SLOTS, EMPTY } from './constants'
+import { CLEAN, COLUMN_4_SLOTS } from './constants'
 import { getSlotInLocationStack } from './utils'
 
 import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
@@ -67,23 +67,23 @@ export function _getNextTip(args: {
   const tiprackWellsState = robotState.tipState.tipracks[tiprackId]
   const tiprackDef = invariantContext.labwareEntities[tiprackId]?.def
 
-  const hasTip = (wellName: string): boolean =>
-    tiprackWellsState[wellName] !== EMPTY
+  const hasCleanTip = (wellName: string): boolean =>
+    tiprackWellsState[wellName] === CLEAN
 
   const orderedWells = orderWells(tiprackDef.ordering, 't2b', 'l2r')
   if (pipetteChannels === 1 || nozzles === SINGLE) {
-    const well = orderedWells.find(hasTip)
+    const well = orderedWells.find(hasCleanTip)
     return well || null
   }
 
   if (pipetteChannels === 8 || (pipetteChannels === 96 && nozzles === COLUMN)) {
     // return first well in the column (for 96-well format, the 'A' row)
     const tiprackColumns = tiprackDef.ordering
-    const fullColumn = tiprackColumns.find(col => col.every(hasTip))
+    const fullColumn = tiprackColumns.find(col => col.every(hasCleanTip))
     return fullColumn != null ? fullColumn[0] : null
   }
   if (pipetteChannels === 96 && nozzles === ALL) {
-    const allWellsHaveTip = orderedWells.every(hasTip)
+    const allWellsHaveTip = orderedWells.every(hasCleanTip)
     return allWellsHaveTip ? orderedWells[0] : null
   }
 

@@ -48,6 +48,7 @@ describe('dropTip', () => {
         {
           pipette: DEFAULT_PIPETTE,
           dropTipLocation: mockDropTipLocation,
+          wellName: 'A1',
         },
         invariantContext,
         makeRobotState({
@@ -91,6 +92,7 @@ describe('dropTip', () => {
         {
           pipette: 'p300MultiId',
           dropTipLocation: mockDropTipLocation,
+          wellName: 'A1',
         },
         invariantContext,
         makeRobotState({

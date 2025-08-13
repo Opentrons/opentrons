@@ -337,3 +337,10 @@ export const multiDispenseValuesNotFound = (): CommandCreatorError => {
     message: 'Multi dispense values not found for liquid class',
   }
 }
+
+export const returnTipUnavailable = (): CommandCreatorError => {
+  return {
+    type: 'RETURN_TIP_UNAVAILABLE',
+    message: 'Current tip does not have a known location to return to',
+  }
+}

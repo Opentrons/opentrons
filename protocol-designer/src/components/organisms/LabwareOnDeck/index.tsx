@@ -18,7 +18,7 @@ interface LabwareOnDeckProps {
 
 export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
   const { labwareOnDeck, x, y } = props
-  const missingTipsByLabwareId = useSelector(
+  const missingAndUsedTipsByLabwareId = useSelector(
     tipContentsSelectors.getMissingTipsByLabwareId
   )
   const allWellContentsForActiveItem = useSelector(
@@ -32,9 +32,11 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
     ? allWellContentsForActiveItem[labwareOnDeck.id]
     : null
   const highlightedWells = allHighlightedWells[labwareOnDeck.id]
-  const missingTips = missingTipsByLabwareId
-    ? missingTipsByLabwareId[labwareOnDeck.id]
-    : null
+  const labwareTipInfo =
+    missingAndUsedTipsByLabwareId != null
+      ? missingAndUsedTipsByLabwareId[labwareOnDeck.id]
+      : null
+  const { missingTips } = labwareTipInfo ?? {}
 
   return (
     <g transform={`translate(${x}, ${y})`}>
