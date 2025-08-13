@@ -126,7 +126,7 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
             </StyledText>
           )}
         </Flex>
-        {active && (
+        {active && type !== 'alt' && (
           <OverflowBtn
             // todo(mm, 2025-08-13): This data-testid is duplicated with the container.
             // Not sure if this is intentional?
