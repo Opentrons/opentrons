@@ -14,6 +14,7 @@ import {
   THERMOCYCLER_MODULE_CUTOUTS,
   WASTE_CHUTE_CUTOUT,
   WASTE_CHUTE_FIXTURES,
+  WASTE_CHUTE_FLEX_STACKER_FIXTURES,
   WASTE_CHUTE_ONLY_FIXTURES_WITH_FAKES,
   WASTE_CHUTE_WITH_FAKE_FIXTURES,
 } from '.'
@@ -1541,8 +1542,7 @@ export const replaceCutoutFixtureRemove = (
   )
   if (WASTE_CHUTE_WITH_FAKE_FIXTURES.includes(cutoutFixtureRemoved)) {
     if (addressableAreaId === DEFAULT_AA_FOR_WASTE_CHUTE) {
-      return cutoutFixtureRemoved ===
-        FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE
+      return WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(cutoutFixtureRemoved)
         ? FLEX_STACKER_V1_FIXTURE
         : SINGLE_RIGHT_SLOT_FIXTURE
     } else {
