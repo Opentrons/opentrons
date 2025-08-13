@@ -89,7 +89,7 @@ To add more labware to a Stacker, use `~.ModuleContext.stacker.store()`::
 
    protocol.move_labware(
        labware="opentrons_96_wellplate_200ul_pcr_full_skirt",
-       new_location="C3",
+       new_location=stacker_2,
        use_gripper="True"
    )
    stacker_2.store()
