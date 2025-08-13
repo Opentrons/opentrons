@@ -149,14 +149,12 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
   ) => {
     const deckDef = getDeckDefFromRobotType(robotType)
     const cutoutFixtures = deckDef.cutoutFixtures
-    const hasWasteChute =
-      Object.values(additionalEquipmentEntities).find(
-        ae => ae.name === 'wasteChute'
-      ) != null
-    const hasTrashBin =
-      Object.values(additionalEquipmentEntities).find(
-        ae => ae.name === 'trashBin'
-      ) != null
+    const hasWasteChute = Object.values(additionalEquipmentEntities).some(
+      ae => ae.name === 'wasteChute'
+    )
+    const hasTrashBin = Object.values(additionalEquipmentEntities).some(
+      ae => ae.name === 'trashBin'
+    )
     const allSlotIds = deckDef.locations.addressableAreas.reduce<
       AddressableAreaName[]
     >((acc, slot) => {
@@ -280,11 +278,13 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
         robotType === FLEX_ROBOT_TYPE
           ? MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(slotId)
           : ['fixedTrash', '12'].includes(slotId)
-      const trashSlots = trashCutouts.map(cutout => cutout.split('cutout')[1])
+      const allDeckDefTrashSlots = trashCutouts.map(
+        cutout => cutout.split('cutout')[1]
+      )
       return !slotIdsOccupiedByModules.includes(slotId) &&
         !Object.values(labware).some(lw => lw.stack.includes(slotId)) &&
         !isTrashSlot &&
-        !trashSlots.includes(slotId) &&
+        !allDeckDefTrashSlots.includes(slotId) &&
         !WASTE_CHUTE_ADDRESSABLE_AREAS.includes(slotId) &&
         !notSelectedStagingAreaAddressableAreas.includes(slotId) &&
         !FLEX_MODULE_ADDRESSABLE_AREAS.includes(slotId) &&
