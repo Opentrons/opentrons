@@ -1343,16 +1343,16 @@ const createComboFixture = (
 /**
  * Determine the appropriate combo fixture for waste chute cutout
  */
-const getWasteChuteComboFixture = (
+export const getWasteChuteComboFixture = (
   aaCutoutItem: CutoutConfigMap,
   deckConfigWithAA: CutoutConfigMap[]
-): CutoutConfigMap | null => {
+): CutoutConfig | null => {
   const {
     cutoutId,
     cutoutFixtureId,
     opentronsModuleSerialNumber,
   } = aaCutoutItem
-
+  console.log("cutoutFixtureId: ", cutoutFixtureId)
   // Check if this is a valid waste chute cutout with compatible fixtures
   if (
     cutoutId !== WASTE_CHUTE_CUTOUT ||
@@ -1387,6 +1387,7 @@ const getWasteChuteComboFixture = (
 
   // Find the first matching rule and return the combo fixture
   const matchingRule = fixtureMapping.find(rule => rule.condition)
+  console.log("matchingRule: ", matchingRule)
   if (matchingRule) {
     return createComboFixture(
       cutoutId,

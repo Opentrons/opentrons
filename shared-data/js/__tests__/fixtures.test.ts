@@ -39,6 +39,7 @@ import {
   getReplacementFixtureForFixtureRemoval,
   getVisualSlotIdForAA,
   getVisualSlotIdFromAAId,
+  getWasteChuteComboFixture,
   isFixtureInUsbModules,
   isModuleAllowedOnAA,
   replaceCutoutFixtureRemove,
@@ -801,5 +802,12 @@ describe('getMainNonComboFixtureId', () => {
       'cutoutD3'
     )
     expect(result).toEqual(MAGNETIC_BLOCK_V1_FIXTURE)
+  })
+})
+
+describe('getWasteChuteComboFixture', () => {
+  it('Should get a covered waste chute', () => {
+    const result = getWasteChuteComboFixture({addressableAreaId: 'flexStackerModuleV1D4', cutoutFixtureId: FLEX_STACKER_V1_FIXTURE, 'cutoutId': 'cutoutD3', opentronsModuleSerialNumber:'123'}, [{cutoutId:'cutoutD3', cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE, addressableAreaId:'1ChannelWasteChute'}])
+    expect(result).toBe({cutoutFixtureId: FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE, 'cutoutId': 'cutoutD3', opentronsModuleSerialNumber:'123'})
   })
 })
