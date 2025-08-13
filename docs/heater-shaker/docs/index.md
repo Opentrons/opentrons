@@ -5,8 +5,6 @@ hide: toc
 
 <div style="text-align: center;" markdown>
 
-![Opentrons Flex®](../images/opentrons-flex-logo.svg "opentrons-flex-logo.svg"){style="width: 60%"}
-
 # Heater-Shaker Module GEN1 Instruction Manual
 
 ![Heater-Shaker hero image](images/heater-shaker-hero.png)
