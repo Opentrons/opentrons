@@ -43,7 +43,7 @@ title: "Plate Reader: Product Specifications"
     </tr>
     <tr>
       <th>Measurement range</th>
-      <td>0-4.0 optical density (OD)</td>
+      <td>0–4.0 optical density (OD)</td>
     </tr>
     <tr>
       <th>Resolution</th>
@@ -55,13 +55,13 @@ title: "Plate Reader: Product Specifications"
         <p>The maximum deviation between the determined value and the true value.</p>
         <p>At 405 nm:</p>
             <ul>
-                <li>≤1.5% + 0.010 OD from 0.0-2.0 OD</li>
-                <li>≤3% + 0.010 OD from 2.0-3.0 OD</li>
+                <li>≤1.5% + 0.010 OD from 0.0–2.0 OD</li>
+                <li>≤3% + 0.010 OD from 2.0–3.0 OD</li>
             </ul>
         <p>At or above 450 nm:</p>
             <ul>
-                <li>≤1% + 0.010 OD from 0.0-2.0 OD</li>
-                <li>≤1.5% + 0.010 OD from 2.0-3.0 OD</li>
+                <li>≤1% + 0.010 OD from 0.0–2.0 OD</li>
+                <li>≤1.5% + 0.010 OD from 2.0–3.0 OD</li>
             </ul>
       </td>
     </tr>
@@ -70,8 +70,8 @@ title: "Plate Reader: Product Specifications"
       <td>
         <p>The maximum deviation between the determined values when the measurement is repeated directly.</p>
             <ul>
-                <li>≤0.5% + 0.005 OD from 0.0-2.0 OD</li>
-                <li>≤1% + 0.010 OD from 2.0-3.0 OD</li>
+                <li>≤0.5% + 0.005 OD from 0.0–2.0 OD</li>
+                <li>≤1% + 0.010 OD from 2.0–3.0 OD</li>
             </ul>
       </td>
     </tr>
@@ -81,13 +81,13 @@ title: "Plate Reader: Product Specifications"
         <p>The maximum deviation between the true and the determined increase of the value.</p>
         <p>At 405 nm:</p>
             <ul>
-                <li>≤1.5% from 0.0-2.0 OD</li>
-                <li>≤3% from 2.0-3.0 OD</li>
+                <li>≤1.5% from 0.0–2.0 OD</li>
+                <li>≤3% from 2.0–3.0 OD</li>
             </ul>
         <p>At or above 450 nm:</p>
             <ul>
-                <li>≤1% from 0.0-2.0 OD</li>
-                <li>≤1.5% from 2.0-3.0 OD</li>
+                <li>≤1% from 0.0–2.0 OD</li>
+                <li>≤1.5% from 2.0–3.0 OD</li>
             </ul>
       </td>
     </tr>
