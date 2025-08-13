@@ -12,6 +12,7 @@ import {
   getDeckDefFromRobotType,
   getModuleType,
   MAGNETIC_BLOCK_TYPE,
+  WASTE_CHUTE_FLEX_STACKER_FIXTURES,
 } from '@opentrons/shared-data'
 
 import {
@@ -88,8 +89,11 @@ export const useRequiredProtocolHardwareFromAnalysis = (
       const comboFixtureId =
         moduleType === FLEX_STACKER_MODULE_TYPE &&
         location.slotName === 'D3' &&
-        fixtureD3 != null
-          ? fixtureD3.cutoutFixtureId
+        fixtureD3 != null &&
+        WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(
+          fixtureD3.compatibleCutoutFixtureIds[0]
+        )
+          ? fixtureD3.compatibleCutoutFixtureIds[0]
           : null
       const moduleFixtures = getCutoutFixturesForModuleModel(model, deckDef)
 

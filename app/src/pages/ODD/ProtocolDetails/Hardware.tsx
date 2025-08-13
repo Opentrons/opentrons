@@ -181,7 +181,6 @@ export const Hardware = (props: { protocolId: string }): JSX.Element => {
   const { requiredProtocolHardware } = useRequiredProtocolHardware(
     props.protocolId
   )
-  console.log(requiredProtocolHardware)
   const { t, i18n } = useTranslation('protocol_details')
 
   return requiredProtocolHardware.length === 0 ? (
