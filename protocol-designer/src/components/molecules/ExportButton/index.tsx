@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Btn, Icon, StyledText } from '@opentrons/components'
 
-import { GREY_BUTTON_STYLE } from '../../atoms'
+import { GREY_BUTTON_STYLE } from '/protocol-designer/components/atoms'
 
 interface ExportButtonProps {
   onClick: () => void

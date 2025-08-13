@@ -4,7 +4,7 @@ import { useDeckConfigurationEditing } from './useDeckConfigurationEditing'
 
 import type { UseFormSetValue } from 'react-hook-form'
 import type { DeckConfiguration } from '@opentrons/shared-data'
-import type { FormModules } from '../../../step-forms'
+import type { FormModules } from '/protocol-designer/step-forms'
 import type { Fixtures, WizardFormState } from '../types'
 import type {
   CutoutConfigExtended,

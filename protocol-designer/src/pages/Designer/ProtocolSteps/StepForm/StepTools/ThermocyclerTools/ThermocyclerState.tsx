@@ -10,9 +10,9 @@ import {
 import {
   ToggleExpandStepFormField,
   ToggleStepFormField,
-} from '../../../../../../components/molecules'
+} from '/protocol-designer/components/molecules'
 
-import type { FormData } from '../../../../../../form-types'
+import type { FormData } from '/protocol-designer/form-types'
 import type { FieldPropsByName } from '../../types'
 
 interface ThermocyclerStateProps {

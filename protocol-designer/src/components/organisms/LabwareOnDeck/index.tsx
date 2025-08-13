@@ -8,7 +8,7 @@ import * as highlightSelectors from '../../../top-selectors/substep-highlight'
 import * as tipContentsSelectors from '../../../top-selectors/tip-contents'
 import { getAllWellContentsForActiveItem } from '../../../top-selectors/well-contents'
 
-import type { LabwareOnDeck as LabwareOnDeckType } from '../../../step-forms'
+import type { LabwareOnDeck as LabwareOnDeckType } from '/protocol-designer/step-forms'
 
 interface LabwareOnDeckProps {
   labwareOnDeck: LabwareOnDeckType

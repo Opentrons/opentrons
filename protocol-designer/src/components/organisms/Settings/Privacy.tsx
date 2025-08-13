@@ -11,8 +11,8 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { actions as analyticsActions } from '../../../analytics'
-import { ToggleButton } from '../../atoms/ToggleButton'
+import { actions as analyticsActions } from '/protocol-designer/analytics'
+import { ToggleButton } from '/protocol-designer/components/atoms/ToggleButton'
 
 interface PrivacyProps {
   hasOptedIn: boolean

@@ -6,21 +6,22 @@ import { fireEvent, screen } from '@testing-library/react'
 
 import { COLORS } from '@opentrons/components'
 
-import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../assets/localization'
-import { getUnsavedForm } from '../../../../../step-forms/selectors'
-import { getDeckSetupForActiveItem } from '../../../../../top-selectors/labware-locations'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { getUnsavedForm } from '/protocol-designer/step-forms/selectors'
+import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
+
 import { StepContainer } from '../StepContainer'
 import { StepOverflowMenu } from '../StepOverflowMenu'
 
 import type { ComponentProps } from 'react'
 import type { OverflowBtn } from '@opentrons/components'
 
-vi.mock('../../../../../step-forms/selectors')
-vi.mock('../../../../../ui/steps/actions/actions')
-vi.mock('../../../../../ui/steps/selectors')
+vi.mock('/protocol-designer/step-forms/selectors')
+vi.mock('/protocol-designer/ui/steps/actions/actions')
+vi.mock('/protocol-designer/ui/steps/selectors')
 vi.mock('../StepOverflowMenu')
-vi.mock('../../../../../top-selectors/labware-locations')
+vi.mock('/protocol-designer/top-selectors/labware-locations')
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof OverflowBtn>()
   return {

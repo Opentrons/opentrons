@@ -10,13 +10,14 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { analyticsEvent } from '../../analytics/actions'
-import { ONBOARDING_FLOW_DURATION_EVENT } from '../../analytics/constants'
-import { HandleEnter } from '../../components/atoms'
-import { TextAreaField } from '../../components/molecules'
+import { analyticsEvent } from '/protocol-designer/analytics/actions'
+import { ONBOARDING_FLOW_DURATION_EVENT } from '/protocol-designer/analytics/constants'
+import { HandleEnter } from '/protocol-designer/components/atoms'
+import { TextAreaField } from '/protocol-designer/components/molecules'
+
 import { WizardBody } from './WizardBody'
 
-import type { AnalyticsEvent } from '../../analytics/mixpanel'
+import type { AnalyticsEvent } from '/protocol-designer/analytics/mixpanel'
 import type { WizardTileProps } from './types'
 
 interface AddMetadataProps extends WizardTileProps {

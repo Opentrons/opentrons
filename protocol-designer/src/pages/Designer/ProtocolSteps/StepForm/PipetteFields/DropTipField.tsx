@@ -4,12 +4,12 @@ import { useSelector } from 'react-redux'
 
 import { ALL } from '@opentrons/shared-data'
 
-import { DropdownStepFormField } from '../../../../../components/molecules'
-import { getEnableReturnTip } from '../../../../../feature-flags/selectors'
+import { DropdownStepFormField } from '/protocol-designer/components/molecules'
+import { getEnableReturnTip } from '/protocol-designer/feature-flags/selectors'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
-} from '../../../../../step-forms/selectors'
+} from '/protocol-designer/step-forms/selectors'
 
 import type { DropdownOption } from '@opentrons/components'
 import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
