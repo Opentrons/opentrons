@@ -52,7 +52,7 @@ const MOCK_SECOND_MAGNETIC_MODULE_COORDS = [100, 200, 0]
 const mockMagneticModule = {
   moduleId: 'someMagneticModule',
   model: 'magneticModuleV2' as ModuleModel,
-  type: 'magneticModuleType' as ModuleType,
+  moduleType: 'magneticModuleType' as ModuleType,
   labwareOffset: { x: 5, y: 5, z: 5 },
   cornerOffsetFromSlot: { x: 1, y: 1, z: 1 },
   calibrationPoint: { x: 0, y: 0 },
@@ -65,7 +65,7 @@ const mockTCModule = {
   labwareOffset: { x: 3, y: 3, z: 3 },
   moduleId: 'TCModuleId',
   model: 'thermocyclerModuleV1' as ModuleModel,
-  type: 'thermocyclerModuleType' as ModuleType,
+  moduleType: 'thermocyclerModuleType' as ModuleType,
   displayName: 'Thermocycler Module',
 }
 
@@ -217,7 +217,7 @@ describe('SetupModulesList', () => {
         nestedLabwareDef: null,
         nestedLabwareId: null,
         protocolLoadOrder: 0,
-        slotName: '7',
+        slotName: 'B1',
         attachedModuleMatch: mockThermocycler,
       },
     } as any)
@@ -278,7 +278,7 @@ describe('SetupModulesList', () => {
         nestedLabwareDef: null,
         nestedLabwareId: null,
         protocolLoadOrder: 0,
-        slotName: '7',
+        slotName: 'B1',
         attachedModuleMatch: {
           ...mockThermocycler,
           moduleOffset: mockCalibratedData,

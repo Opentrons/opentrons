@@ -9,6 +9,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import { getModuleDeckLabel } from '@opentrons/shared-data'
 
 import { ModuleCard } from '/app/organisms/ModuleCard'
 import { useModuleApiRequests } from '/app/organisms/ModuleCard/utils'
@@ -98,7 +99,6 @@ export const ProtocolRunModuleControls = ({
   const halfAttachedModulesSize = Math.ceil(attachedModules?.length / 2)
   const leftColumnModules = attachedModules?.slice(0, halfAttachedModulesSize)
   const rightColumnModules = attachedModules?.slice(halfAttachedModulesSize)
-
   return attachedModules.length === 0 ? (
     <Flex
       justifyContent={JUSTIFY_CENTER}
@@ -121,7 +121,10 @@ export const ProtocolRunModuleControls = ({
               robotName={robotName}
               runId={runId}
               module={module.attachedModuleMatch}
-              slotName={module.slotName}
+              slotName={getModuleDeckLabel(
+                module.moduleDef.moduleType,
+                module.slotName
+              )}
               isLoadedInRun={true}
               attachPipetteRequired={attachPipetteRequired}
               calibratePipetteRequired={calibratePipetteRequired}
@@ -146,7 +149,10 @@ export const ProtocolRunModuleControls = ({
               robotName={robotName}
               runId={runId}
               module={module.attachedModuleMatch}
-              slotName={module.slotName}
+              slotName={getModuleDeckLabel(
+                module.moduleDef.moduleType,
+                module.slotName
+              )}
               isLoadedInRun={true}
               attachPipetteRequired={attachPipetteRequired}
               calibratePipetteRequired={calibratePipetteRequired}
