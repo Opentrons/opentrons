@@ -28,7 +28,7 @@ line-length = 140
 indent-width = 4
 target-version = "py310"
 exclude = ["files"]
-src = ["*.py", "automation", "tests", "citools", "tools"]
+src = ["*.py", "automation", "tests", "citools"]
 
 [tool.ruff.lint]
 select = [
