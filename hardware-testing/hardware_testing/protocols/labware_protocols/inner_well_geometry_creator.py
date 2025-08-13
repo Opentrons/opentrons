@@ -22,8 +22,6 @@ from hardware_testing import data
 #  VARIABLES - START
 ###########################################
 
-ASPIRATE_MM_FROM_BOTTOM = 5
-DISPENSE_MM_FROM_BOTTOM = 5
 RESERVOIR = "nest_1_reservoir_290ml"
 DEFAULT_STEPS = 20  # change later
 
@@ -50,6 +48,7 @@ THRESHOLD = 3
 # sensitivity values for bottom and top zones:
 ALPHA_LOW = 0.2
 ALPHA_HIGH = 0.4
+DELTA_TOLERANCE = 0.15
 
 
 ###########################################
@@ -203,8 +202,6 @@ def _setup(
         meniscus_z = -0.5
         props.aspirate.aspirate_position.position_reference = lm
         props.aspirate.aspirate_position.offset.z = meniscus_z
-        #props.dispense.dispense_position.position_reference = lm
-        #props.dispense.dispense_position.offset.z = meniscus_z
 
     if not ctx.is_simulating() and DIAL_PORT is None:
         from hardware_testing.data import create_file_name, create_run_id
@@ -444,7 +441,9 @@ def run(ctx: ProtocolContext) -> None:
     dispense_volume = 0.0
     current_well = "none"
     udv_table = []
-    delta_tolerance = target_height * 0.15
+    # deadband to avoid unnecessary step volume corrections
+    lower_bound = target_height - target_height * DELTA_TOLERANCE
+    upper_bound = target_height + target_height * DELTA_TOLERANCE
     status = "pass"
 
     _store_dial_baseline(ctx, probe_pipette, dial)
@@ -471,11 +470,6 @@ def run(ctx: ProtocolContext) -> None:
     def adaptive_volume_step(
         hdelta: float, height: float, step_volume: float, target_height: float
     ) -> float:  # desired steady state height step in mm
-        nonlocal delta_tolerance
-
-        # deadband to avoid unnecessary step volume corrections
-        lower_bound = target_height - delta_tolerance
-        upper_bound = target_height + delta_tolerance
 
         alpha = get_alpha_for_height(height)
 
@@ -496,8 +490,7 @@ def run(ctx: ProtocolContext) -> None:
 
         return new_volume
 
-    def write_trial_log() -> None:
-        nonlocal udv_table
+    def write_trial_log(udv_table) -> None:
         trial_data = [
             current_well,
             round(step_volume, 5),
@@ -510,8 +503,7 @@ def run(ctx: ProtocolContext) -> None:
         udv_table.append(trial_data)
         _write_line_to_csv(ctx, [str(d) for d in trial_data])
     
-    def reload_labware() -> None:
-        nonlocal labware, labware_type
+    def reload_labware(labware, labware_type) -> None:
         print("reloading labware")
         ctx.move_labware(labware, OFF_DECK, use_gripper=False)
         labware = ctx.load_labware(
@@ -522,7 +514,7 @@ def run(ctx: ProtocolContext) -> None:
     ################ Begin Protocol
     
     num_wells = len(wells)
-    write_trial_log()
+    write_trial_log(udv_table)
 
     # probe source well
     liq_pipette.pick_up_tip()
@@ -532,6 +524,12 @@ def run(ctx: ProtocolContext) -> None:
     step_volume = first_dispense
 
     while dispense_volume < max_volume:
+
+        for liquid_rack in liquid_racks:
+            props = ethanol.get_for(liq_pipette, liquid_rack)
+            props.aspirate.aspirate_position.position_reference = "well-bottom"
+            props.aspirate.aspirate_position.offset.z = max(corrected_height - 1, 2)
+
         drop_tips()
         pick_up_tips()
 
@@ -539,7 +537,7 @@ def run(ctx: ProtocolContext) -> None:
 
         # check if out of wells
         if step > 0 and step % num_wells == 0:
-            reload_labware()
+            reload_labware(labware, labware_type)
 
         tip_z_error = _get_tip_z_error(ctx, probe_pipette, dial)
 
@@ -549,7 +547,6 @@ def run(ctx: ProtocolContext) -> None:
 
         # Dispense
         dispense_volume += step_volume
-
         liq_pipette.transfer_with_liquid_class(
             ethanol,
             dispense_volume if liq_mount == "1" else dispense_volume / 8,
@@ -573,24 +570,20 @@ def run(ctx: ProtocolContext) -> None:
         )
 
         # Check for bad hdelta
-        if step > 0 and not ctx.is_simulating():
-            if hdelta < (target_height - delta_tolerance) or hdelta > (target_height + delta_tolerance):
-                # Rollback both height & volume
-                corrected_heights.pop()
-                status = "fail"
-                write_trial_log() #log failure
-                dispense_volume -= step_volume
+        #if not ctx.is_simulating():
+        #    if step == 0: 
+        #        status = "pass" if 2.0 < hdelta < 3.0 else "fail"
+        #    else:
+        #        if hdelta <= lower_bound or hdelta >= upper_bound:
+        #            status = "fail"
+        #            write_trial_log(udv_table)
+        #            dispense_volume -= step_volume #rollback dispense volume 
+        #            corrected_heights.pop() #rollback corrected heights
+        #        else: 
+        #            status = "pass"
+        #            write_trial_log(udv_table)
 
-                # Recalculate step volume for next well based on last hdelta
-                step_volume = adaptive_volume_step(hdelta, corrected_height, step_volume, target_height)
-
-                step += 1
-                continue 
-
-        status = "pass"
-        write_trial_log()
-
-        # Recalculate step_volume for the next iteration
+        #recalculate step volume for next step 
         step_volume = adaptive_volume_step(hdelta, corrected_height, step_volume, target_height)
 
         step += 1
@@ -599,11 +592,12 @@ def run(ctx: ProtocolContext) -> None:
 
 
     #create labware def 
-    udv_data = np.array([(trial[2], trial[4]) for trial in udv_table])  # dispense_vol, corrected_height
-    new_inner_well_json = generate_frusta(ctx, udv_data, labware)
+    passed_trials = [trial for trial in udv_table if trial[6] == "pass"]
+    frusta_data = np.array([(trial[2], trial[4]) for trial in passed_trials])
+    new_inner_well_json = generate_frusta(ctx, frusta_data, labware)
 
     user_defined_volumes = data.create_folder_for_test_data("user-defined-volumes")
-    udv_def_name = f"{RUN_ID}_{labware_type}"
+    udv_def_name = f"{RUN_ID}_{labware_type}.json"
     file_path = user_defined_volumes / udv_def_name
 
     with open(file_path, "w") as f:
