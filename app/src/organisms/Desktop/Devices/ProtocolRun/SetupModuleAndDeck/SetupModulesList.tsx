@@ -20,6 +20,7 @@ import {
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
+import { useHost } from '@opentrons/react-api-client'
 import {
   ABSORBANCE_READER_TYPE,
   ABSORBANCE_READER_V1,
@@ -48,7 +49,7 @@ import {
 } from '/app/local-resources/modules'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { ModuleSetupModal } from '/app/organisms/ModuleCard/ModuleSetupModal'
-import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
+import { handleModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import {
   useChainLiveCommands,
@@ -63,7 +64,7 @@ import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
 import { getFixtureImage } from './utils'
 
 import type { TFunction } from 'i18next'
-import type { CommandData } from '@opentrons/api-client'
+import type { CommandData, HostConfig } from '@opentrons/api-client'
 import type {
   CutoutFixtureId,
   DeckDefinition,
@@ -234,6 +235,7 @@ export function ModulesListItem({
     'module_wizard_flows',
     'deck_configuration',
   ])
+  const host = useHost() as HostConfig
   const moduleConnectionStatus =
     attachedModuleMatch != null
       ? t('module_connected')
@@ -246,11 +248,16 @@ export function ModulesListItem({
     setShowLocationConflictModal,
   ] = useState<boolean>(false)
 
-  const [showModuleWizard, setShowModuleWizard] = useState<boolean>(false)
   const { parseModuleUSBPort } = useModuleUSBPort()
 
   const handleSetupModuleClick = (): void => {
-    setShowModuleWizard(true)
+    if (attachedModuleMatch !== null) {
+      handleModuleWizardFlows({
+        attachedModule: attachedModuleMatch,
+        robotName,
+        host,
+      })
+    }
   }
 
   const handleHomeStackerClick = (): void => {
@@ -408,15 +415,6 @@ export function ModulesListItem({
           requiredFixtureId={comboFixtureId}
           moduleSerialNumber={attachedModuleMatch?.serialNumber}
           deckDef={deckDef}
-          robotName={robotName}
-        />
-      ) : null}
-      {showModuleWizard && attachedModuleMatch != null ? (
-        <ModuleWizardFlows
-          attachedModule={attachedModuleMatch}
-          closeFlow={() => {
-            setShowModuleWizard(false)
-          }}
           robotName={robotName}
         />
       ) : null}

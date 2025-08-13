@@ -25,6 +25,7 @@ import { useIsEstopNotDisengaged } from '/app/resources/devices'
 
 import { ModuleCard } from '..'
 import { useIsDoorOpen } from '../../DoorOpenControl/useIsDoorOpen'
+import { handleModuleWizardFlows } from '../../ModuleWizardFlows'
 import { ErrorInfo } from '../ErrorInfo'
 import { FirmwareUpdateFailedModal } from '../FirmwareUpdateFailedModal'
 import { FlexStackerModuleData } from '../FlexStackerModuleData'
@@ -53,6 +54,7 @@ vi.mock('../HeaterShakerModuleData')
 vi.mock('../FlexStackerModuleData')
 vi.mock('/app/redux/config')
 vi.mock('../ModuleOverflowMenu')
+vi.mock('../../ModuleWizardFlows')
 vi.mock('/app/organisms/RunTimeControl')
 vi.mock('../FirmwareUpdateFailedModal')
 vi.mock('/app/redux/robot-api')
@@ -412,6 +414,7 @@ describe('ModuleCard', () => {
     screen.getByText('Setup module for use.')
     const button = screen.getByText('Setup module')
     fireEvent.click(button)
+    expect(vi.mocked(handleModuleWizardFlows)).toHaveBeenCalled()
     expect(vi.mocked(getRequestById)).toHaveBeenCalled()
   })
   it('renders module setup link for no-calibration required modules if firmware update available', () => {
@@ -424,6 +427,7 @@ describe('ModuleCard', () => {
     screen.getByText('Setup module for use.')
     const button = screen.getByText('Setup module')
     fireEvent.click(button)
+    expect(vi.mocked(handleModuleWizardFlows)).toHaveBeenCalled()
     expect(vi.mocked(getRequestById)).toHaveBeenCalled()
   })
   it('renders firmware update for no-calibration required modules only if its already in the deck config', () => {
