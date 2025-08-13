@@ -1300,16 +1300,19 @@ export const getAASlotDisplayName = (
 }
 
 /**
- * Check if a fixture has waste chute capabilities
+ * Get what fixture waste chute is in the deck config
  */
-const hasWasteChuteFixture = (
+const getWasteChuteFixtureType = (
   deckConfig: CutoutConfigMap[],
   cutoutId: CutoutId
-): boolean => {
-  return deckConfig.some(
-    fixture =>
-      WASTE_CHUTE_ONLY_FIXTURES_WITH_FAKES.includes(fixture.cutoutFixtureId) &&
-      fixture.cutoutId === cutoutId
+): CutoutFixtureIdsWithFakes | null => {
+  return (
+    deckConfig.find(
+      fixture =>
+        WASTE_CHUTE_ONLY_FIXTURES_WITH_FAKES.includes(
+          fixture.cutoutFixtureId
+        ) && fixture.cutoutId === cutoutId
+    )?.cutoutFixtureId ?? null
   )
 }
 
@@ -1352,7 +1355,6 @@ export const getWasteChuteComboFixture = (
     cutoutFixtureId,
     opentronsModuleSerialNumber,
   } = aaCutoutItem
-  console.log("cutoutFixtureId: ", cutoutFixtureId)
   // Check if this is a valid waste chute cutout with compatible fixtures
   if (
     cutoutId !== WASTE_CHUTE_CUTOUT ||
@@ -1362,37 +1364,58 @@ export const getWasteChuteComboFixture = (
     return null
   }
 
-  const hasWasteChute = hasWasteChuteFixture(deckConfigWithAA, cutoutId)
+  const wasteChuteFixture = getWasteChuteFixtureType(deckConfigWithAA, cutoutId)
   const hasFlexStacker = hasFlexStackerFixture(deckConfigWithAA, cutoutId)
 
   // Define fixture mapping rules
   const fixtureMapping = [
     {
-      condition: cutoutFixtureId === FLEX_STACKER_MODULE_V1 && hasWasteChute,
+      condition:
+        cutoutFixtureId === FLEX_STACKER_MODULE_V1 &&
+        wasteChuteFixture === WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
       comboFixtureId: FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+      comboOpentronsModuleSerialNumber: opentronsModuleSerialNumber,
+    },
+    {
+      condition:
+        cutoutFixtureId === FLEX_STACKER_MODULE_V1 &&
+        wasteChuteFixture === WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+      comboFixtureId: FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
+      comboOpentronsModuleSerialNumber: opentronsModuleSerialNumber,
     },
     {
       condition:
         cutoutFixtureId === WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE &&
         hasFlexStacker,
       comboFixtureId: FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+      comboOpentronsModuleSerialNumber: deckConfigWithAA.find(
+        dc =>
+          dc.cutoutId === cutoutId &&
+          dc.cutoutFixtureId === FLEX_STACKER_MODULE_V1
+      )?.opentronsModuleSerialNumber,
     },
     {
       condition:
         cutoutFixtureId === WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE &&
         hasFlexStacker,
       comboFixtureId: FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
+      comboOpentronsModuleSerialNumber: deckConfigWithAA.find(
+        dc =>
+          dc.cutoutId === cutoutId &&
+          dc.cutoutFixtureId === FLEX_STACKER_MODULE_V1
+      )?.opentronsModuleSerialNumber,
     },
   ]
 
   // Find the first matching rule and return the combo fixture
   const matchingRule = fixtureMapping.find(rule => rule.condition)
-  console.log("matchingRule: ", matchingRule)
+  console.log('matchingRule: ', matchingRule)
   if (matchingRule) {
     return createComboFixture(
       cutoutId,
       matchingRule.comboFixtureId,
-      opentronsModuleSerialNumber
+      opentronsModuleSerialNumber ??
+        matchingRule.comboOpentronsModuleSerialNumber
     )
   }
 
