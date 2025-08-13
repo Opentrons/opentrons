@@ -1,5 +1,5 @@
 ---
-title: "Plate Reader Module: Deck Placement"
+title: "Plate Reader: Deck Placement"
 hide: toc
 ---
 

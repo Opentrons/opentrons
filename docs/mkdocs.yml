@@ -4,15 +4,15 @@ docs_dir: ./shared
 custom_dir: ./shared
 
 nav:
-  - Opentrons Flex: '!include flex/mkdocs.yml'
-  - Modules:
-      - Modules home: modules/index.md
-      - Flex Stacker: '!include stacker-manual/mkdocs.yml'
-      - HEPA/UV Module: '!include hepa-uv/mkdocs.yml'
-      - Thermocycler Module: '!include thermocycler-manual/mkdocs.yml'
-      - Plate Reader Module: '!include plate-reader/mkdocs.yml'
-  - Protocol Designer: '!include protocol-designer/mkdocs.yml'
-  - Python API: https://docs.opentrons.com/v2/
+  - Opentrons Flex: '!include flex/mkdocs.yml'
+  - Modules:
+      - Modules home: modules/index.md
+      - Flex Stacker: '!include stacker-manual/mkdocs.yml'
+      - HEPA/UV Module: '!include hepa-uv/mkdocs.yml'
+      - Thermocycler Module: '!include thermocycler-manual/mkdocs.yml'
+      - Absorbance Plate Reader Module: '!include absorbance-plate-reader/mkdocs.yml'
+  - Protocol Designer: '!include protocol-designer/mkdocs.yml'
+  - Python API: https://docs.opentrons.com/v2/
 
 plugins:
   - monorepo

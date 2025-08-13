@@ -1,5 +1,5 @@
 ---
-title: "Plate Reader Module: Safety Information"
+title: "Plate Reader: Safety Information"
 ---
 
 # Safety Information

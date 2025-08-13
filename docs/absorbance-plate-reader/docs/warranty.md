@@ -1,5 +1,5 @@
 ---
-title: "Plate Reader Module: Additional Product Information"
+title: "Plate Reader: Additional Product Information"
 ---
 
 # Additional Product Information

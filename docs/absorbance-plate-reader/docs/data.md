@@ -1,5 +1,5 @@
 ---
-title: "Plate Reader Module: Using Plate Reader Data"
+title: "Plate Reader: Using Plate Reader Data"
 hide: toc
 ---
 

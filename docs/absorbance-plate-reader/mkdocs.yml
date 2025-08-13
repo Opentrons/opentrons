@@ -1,4 +1,4 @@
-site_name: plate-reader
+site_name: absorbance-plate-reader
 
 theme:
   name: material

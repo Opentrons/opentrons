@@ -1,5 +1,5 @@
 ---
-title: "Plate Reader Module"
+title: "Absorbance Plate Reader Module Instruction Manual"
 hide: toc
 ---
 

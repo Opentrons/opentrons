@@ -1,5 +1,5 @@
 ---
-title: "Plate Reader Module: Product Specifications"
+title: "Plate Reader: Product Specifications"
 ---
 
 # Product Specifications
@@ -95,8 +95,8 @@ title: "Plate Reader Module: Product Specifications"
 </table>
 
 ## Detection Wavelengths
-<!-- Too much? I kinda like it but can remove the colors. -->
-The Absorbance Plate Reader emits light in the visible spectrum at 450 nm (<span style="color: #0000FF;">blue</span>), 562 nm (<span style="color: #9ACD32;">green</span>), 600 nm (<span style="color: #FFA500;">orange</span>), and 650 nm (<span style="color: #FF0000;">red</span>).
+
+The Absorbance Plate Reader emits light in the visible spectrum at 450 nm (blue), 562 nm (green), 600 nm (orange), and 650 nm (red).
 
 ## Status Light
 
@@ -141,8 +141,6 @@ The Absorbance Plate Reader has a single status light on the lid. It illuminates
 ## Input and Output Connections
 
 The Absorbance Plate Reader has the following power input requirements, which are met by its USB connection to a Flex robot.
-
-### Power Supply (DC)
 
 - **Input:** Power from a USB port with 5 VDC and a maximum of 3 A.
 - **Power consumption:** 2.5 W

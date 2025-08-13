@@ -1,5 +1,5 @@
 ---
-title: "Plate Reader Module: Installation"
+title: "Plate Reader: Installation"
 hide: toc
 ---
 
