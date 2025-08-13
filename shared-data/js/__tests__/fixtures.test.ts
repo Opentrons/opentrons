@@ -106,15 +106,15 @@ describe('replaceCutoutFixtureWithComboFixture', () => {
     )
     expect(result).toEqual([
       {
+        addressableAreaId: 'flexStackerModuleV1D4',
         cutoutFixtureId: 'flexStackerModuleV1WithMagneticBlockV1',
         cutoutId: 'cutoutD3',
-        addressableAreaId: 'flexStackerModuleV1D4',
         opentronsModuleSerialNumber: undefined,
       },
       {
         cutoutFixtureId: 'stagingAreaRightSlot',
         cutoutId: 'cutoutA3',
-        addressableAreaId: 'fakeA4',
+        opentronsModuleSerialNumber: undefined,
       },
     ])
   })
@@ -165,7 +165,6 @@ describe('replaceCutoutFixtureWithComboFixture', () => {
       {
         cutoutFixtureId: 'flexStackerModuleV1',
         cutoutId: 'cutoutD3',
-        addressableAreaId: 'flexStackerModuleV1D4',
         opentronsModuleSerialNumber: '123',
       },
     ])

@@ -1409,7 +1409,6 @@ export const getWasteChuteComboFixture = (
 
   // Find the first matching rule and return the combo fixture
   const matchingRule = fixtureMapping.find(rule => rule.condition)
-  console.log('matchingRule: ', matchingRule)
   if (matchingRule) {
     return createComboFixture(
       cutoutId,
@@ -1433,7 +1432,7 @@ export const replaceCutoutFixtureWithComboFixture = (
   addedCutoutConfigs: CutoutConfigMap[],
   deckConfigWithAA: CutoutConfigMap[],
   cutoutId: CutoutId
-): CutoutConfigMap[] => {
+): CutoutConfig[] => {
   const addressableAreasById = getAAsToFixtureIdFromDeckDefWithFakes(
     cutoutId,
     getDeckDefFromRobotType('OT-3 Standard')
@@ -1456,7 +1455,13 @@ export const replaceCutoutFixtureWithComboFixture = (
         aaCutoutItem.cutoutFixtureId as CutoutFixtureId
       )
     ) {
-      return { ...aaCutoutItem }
+      return {
+        cutoutFixtureId: getReplacementFixtureForFakeFixture(
+          aaCutoutItem.cutoutFixtureId
+        ) as CutoutFixtureId,
+        cutoutId: aaCutoutItem.cutoutId,
+        opentronsModuleSerialNumber: aaCutoutItem.opentronsModuleSerialNumber,
+      }
     }
 
     // Filter potential combo fixture options
@@ -1470,7 +1475,14 @@ export const replaceCutoutFixtureWithComboFixture = (
       )
       if (match) {
         if (match[0] === aaCutoutItem.cutoutFixtureId) {
-          return { ...aaCutoutItem }
+          return {
+            cutoutFixtureId: getReplacementFixtureForFakeFixture(
+              aaCutoutItem.cutoutFixtureId
+            ) as CutoutFixtureId,
+            cutoutId: aaCutoutItem.cutoutId,
+            opentronsModuleSerialNumber:
+              aaCutoutItem.opentronsModuleSerialNumber,
+          }
         } else {
           const [fixtureId, areaList] = match
           const otherModules = areaList.filter(
@@ -1495,7 +1507,13 @@ export const replaceCutoutFixtureWithComboFixture = (
       }
     }
     // Fallback if no match found
-    return { ...aaCutoutItem }
+    return {
+      cutoutFixtureId: getReplacementFixtureForFakeFixture(
+        aaCutoutItem.cutoutFixtureId
+      ) as CutoutFixtureId,
+      cutoutId: aaCutoutItem.cutoutId,
+      opentronsModuleSerialNumber: aaCutoutItem.opentronsModuleSerialNumber,
+    }
   })
 }
 
