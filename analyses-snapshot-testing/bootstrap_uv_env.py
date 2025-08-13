@@ -221,7 +221,9 @@ def main() -> int:
 
     # Step 2: Install third-party exact pins from sibling Pipfiles
     totals: List[Tuple[str, int]] = []
-    for sibling in [("api", api_dir), ("shared-data", sd_dir)]:
+    # Install shared-data first to ensure its dependencies and package are available
+    # before api (ordering requirement).
+    for sibling in [("shared-data", sd_dir), ("api", api_dir)]:
         label, path = sibling
         pipfile = path / "Pipfile"
         count = 0
@@ -237,8 +239,9 @@ def main() -> int:
         totals.append((label, count))
 
     # Step 3: Editable installs of siblings
-    editable_install(api_dir)
+    # Editable installs: shared-data first, then api
     editable_install(sd_dir)
+    editable_install(api_dir)
 
     # Summary
     venv_path = Path(".venv").resolve()
@@ -249,7 +252,7 @@ def main() -> int:
     _print(f"Venv path: {venv_path}")
     for label, count in totals:
         _print(f"{label} third-party pins installed: {count}")
-    _print("Editable installs: -e ../api, -e ../shared-data")
+    _print("Editable installs: -e ../shared-data, -e ../api")
     _print("===========================")
     return 0
 
