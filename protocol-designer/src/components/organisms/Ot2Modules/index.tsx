@@ -322,12 +322,7 @@ export function Ot2Modules(): JSX.Element {
       ) : null}
       {changeModuleWarning}
       <Flex flexWrap={WRAP} width="100%">
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          flex="1.27"
-          minWidth="30.375rem"
-          paddingTop={SPACING.spacing120}
-        >
+        <Flex flexDirection={DIRECTION_COLUMN} flex="1.27" minWidth="30.375rem">
           {filteredSupportedModules.length > 0 ? (
             <StyledText
               desktopStyle="headingSmallBold"
@@ -416,12 +411,7 @@ export function Ot2Modules(): JSX.Element {
             </Flex>
           ) : null}
         </Flex>
-        <Flex
-          flex="1.27"
-          maxHeight="35rem"
-          minWidth="50%"
-          paddingTop={SPACING.spacing80}
-        >
+        <Flex flex="1.27" maxHeight="35rem" minWidth="50%">
           <RobotCoordinateSpaceWithRef
             height="100%"
             width="100%"

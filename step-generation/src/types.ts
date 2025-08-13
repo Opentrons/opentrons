@@ -309,7 +309,7 @@ export type SharedTransferLikeArgs = CommonArgs & {
   blowoutFlowRateUlSec: number
 
   // ===== SETTINGS INTRODUCED WITH LIQUID CLASSES =====
-  liquidClass: string | null
+  liquidClass: string | null // a liquid class name like "water" or null; "none" is not allowed
   aspiratePositionReference: PositionReference
   aspirateZOffset: number
   aspirateSubmergeSpeed: number | null
