@@ -1,5 +1,4 @@
 import {
-  escapeHtml,
   PYTHON_REGEX_PATTERNS,
   PYTHON_SYNTAX_COLORS,
 } from '/ai-client/components/molecules/CodeBlock/pythonSyntaxUtils'
@@ -13,14 +12,13 @@ interface CodeBlockProps {
   code: string
 }
 
-// Python syntax highlighting with improved pattern matching
+const FONT_WEIGHT_MEDIUM = 'font-weight: 500;'
+const FONT_STYLE_ITALIC = 'font-style: italic;'
+
 const highlightPythonSyntax = (code: string): JSX.Element[] => {
   const lines = code.split('\n')
 
   return lines.map((line, lineIndex) => {
-    // Escape HTML characters first
-    const processedLine = escapeHtml(line)
-
     // Create tokens with positions to avoid overlapping
     const tokens: SyntaxToken[] = []
 
@@ -47,25 +45,25 @@ const highlightPythonSyntax = (code: string): JSX.Element[] => {
     let match
     PYTHON_REGEX_PATTERNS.comment.lastIndex = 0
     while ((match = PYTHON_REGEX_PATTERNS.comment.exec(line)) !== null) {
-      addToken(match, PYTHON_SYNTAX_COLORS.comment, 'font-style: italic;')
+      addToken(match, PYTHON_SYNTAX_COLORS.comment, FONT_STYLE_ITALIC)
     }
 
     // 2. Strings (second highest priority)
-    PYTHON_REGEX_PATTERNS.string.lastIndex = 0
-    while ((match = PYTHON_REGEX_PATTERNS.string.exec(line)) !== null) {
-      addToken(match, PYTHON_SYNTAX_COLORS.string)
+    PYTHON_REGEX_PATTERNS.text.lastIndex = 0
+    while ((match = PYTHON_REGEX_PATTERNS.text.exec(line)) !== null) {
+      addToken(match, PYTHON_SYNTAX_COLORS.text)
     }
 
     // 3. Numbers
-    PYTHON_REGEX_PATTERNS.number.lastIndex = 0
-    while ((match = PYTHON_REGEX_PATTERNS.number.exec(line)) !== null) {
-      addToken(match, PYTHON_SYNTAX_COLORS.number)
+    PYTHON_REGEX_PATTERNS.literal.lastIndex = 0
+    while ((match = PYTHON_REGEX_PATTERNS.literal.exec(line)) !== null) {
+      addToken(match, PYTHON_SYNTAX_COLORS.literal)
     }
 
     // 4. Keywords
     PYTHON_REGEX_PATTERNS.keyword.lastIndex = 0
     while ((match = PYTHON_REGEX_PATTERNS.keyword.exec(line)) !== null) {
-      addToken(match, PYTHON_SYNTAX_COLORS.keyword, 'font-weight: 500;')
+      addToken(match, PYTHON_SYNTAX_COLORS.keyword, FONT_WEIGHT_MEDIUM)
     }
 
     // 5. Built-in functions
@@ -93,7 +91,7 @@ const highlightPythonSyntax = (code: string): JSX.Element[] => {
     // 8. Self parameter
     PYTHON_REGEX_PATTERNS.self.lastIndex = 0
     while ((match = PYTHON_REGEX_PATTERNS.self.exec(line)) !== null) {
-      addToken(match, PYTHON_SYNTAX_COLORS.self, 'font-style: italic;')
+      addToken(match, PYTHON_SYNTAX_COLORS.self, FONT_STYLE_ITALIC)
     }
 
     // 9. Dictionary keys (strings followed by colon in dict context)
@@ -105,39 +103,52 @@ const highlightPythonSyntax = (code: string): JSX.Element[] => {
     // Sort tokens by start position
     tokens.sort((a, b) => a.start - b.start)
 
-    // Build the final HTML string
-    let result = ''
+    // Build React elements for the line
+    const elements: JSX.Element[] = []
     let lastEnd = 0
 
-    tokens.forEach(token => {
+    tokens.forEach((token, tokenIndex) => {
       // Add text before this token
       if (token.start > lastEnd) {
-        result += processedLine.substring(lastEnd, token.start)
+        const text = line.substring(lastEnd, token.start)
+        if (text) {
+          elements.push(<span key={`text-${tokenIndex}`}>{text}</span>)
+        }
       }
 
       // Add the styled token
-      const styleAttr = [`color: ${token.color}`, token.style ?? '']
-        .filter((item): item is string => Boolean(item))
-        .join('; ')
+      const style: React.CSSProperties = {
+        color: token.color,
+      }
 
-      const tokenText = processedLine.substring(token.start, token.end)
-      result += `<span style="${styleAttr}">${tokenText}</span>`
+      if (token.style?.includes('italic')) {
+        style.fontStyle = 'italic'
+      }
+      if (token.style?.includes('500')) {
+        style.fontWeight = 500
+      }
+
+      const tokenText = line.substring(token.start, token.end)
+      elements.push(
+        <span key={`token-${tokenIndex}`} style={style}>
+          {tokenText}
+        </span>
+      )
 
       lastEnd = token.end
     })
 
     // Add remaining text after last token
-    if (lastEnd < processedLine.length) {
-      result += processedLine.substring(lastEnd)
+    if (lastEnd < line.length) {
+      const text = line.substring(lastEnd)
+      if (text) {
+        elements.push(<span key="text-end">{text}</span>)
+      }
     }
 
+    // Return line with content or non-breaking space for empty lines
     return (
-      <div
-        key={lineIndex}
-        dangerouslySetInnerHTML={{
-          __html: result.length > 0 ? result : '\u00A0',
-        }}
-      />
+      <div key={lineIndex}>{elements.length > 0 ? elements : '\u00A0'}</div>
     )
   })
 }

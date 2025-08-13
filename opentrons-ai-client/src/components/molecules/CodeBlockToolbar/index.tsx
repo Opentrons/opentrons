@@ -1,13 +1,15 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { Icon, SPACING } from '@opentrons/components'
+import { Icon } from '@opentrons/components'
 
 import styles from './codeblocktoolbar.module.css'
 
 interface CodeBlockToolbarProps {
   code: string
 }
+
+const COPY_FEEDBACK_DURATION_MS = 2000
 
 export function CodeBlockToolbar({ code }: CodeBlockToolbarProps): JSX.Element {
   const { t } = useTranslation('protocol_generator')
@@ -19,7 +21,7 @@ export function CodeBlockToolbar({ code }: CodeBlockToolbarProps): JSX.Element {
       setIsCopied(true)
       setTimeout(() => {
         setIsCopied(false)
-      }, 2000)
+      }, COPY_FEEDBACK_DURATION_MS)
     } catch (err) {
       console.error('Failed to copy code:', err)
     }
@@ -61,17 +63,14 @@ export function CodeBlockToolbar({ code }: CodeBlockToolbarProps): JSX.Element {
           }}
           title={isCopied ? t('copied') : t('copy_code')}
         >
-          <Icon
-            name={isCopied ? 'check' : 'content-copy'}
-            size={SPACING.spacing16}
-          />
+          <Icon name={isCopied ? 'check' : 'content-copy'} size="1rem" />
         </button>
         <button
           className={styles.copy_button}
           onClick={handleDownload}
           title={t('download')}
         >
-          <Icon name="download" size={SPACING.spacing16} />
+          <Icon name="download" size="1rem" />
         </button>
       </div>
     </div>

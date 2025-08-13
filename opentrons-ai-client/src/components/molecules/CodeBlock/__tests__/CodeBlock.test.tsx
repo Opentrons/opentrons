@@ -4,7 +4,9 @@ import { describe, expect, it } from 'vitest'
 import { renderWithProviders } from '/ai-client/__testing-utils__'
 import { i18n } from '/ai-client/i18n'
 
-import { CodeBlock } from '../index'
+import { CodeBlock } from '../'
+
+import type { ComponentProps } from 'react'
 
 const mockPythonCode = `def transfer_samples():
     # This is a comment
@@ -12,8 +14,10 @@ const mockPythonCode = `def transfer_samples():
     pipette.transfer(volume, source, dest)
     return True`
 
-const render = (props = {}) => {
-  return renderWithProviders(<CodeBlock code={mockPythonCode} {...props} />, {
+const render = (
+  props: ComponentProps<typeof CodeBlock> = { code: mockPythonCode }
+) => {
+  return renderWithProviders(<CodeBlock {...props} />, {
     i18nInstance: i18n,
   })
 }
@@ -25,24 +29,13 @@ describe('CodeBlock', () => {
     expect(screen.getByRole('code')).toBeInTheDocument()
 
     // Check that the toolbar elements are present
-    screen.getByText('Python')
-    screen.getByTitle('Copy code')
-    screen.getByTitle('Download as .py file')
-  })
-
-  it('should render copy button', () => {
-    render()
-    expect(screen.getByTitle('Copy code')).toBeInTheDocument()
-  })
-
-  it('should render download button', () => {
-    render()
-    expect(screen.getByTitle('Download as .py file')).toBeInTheDocument()
-  })
-
-  it('should display Python language badge', () => {
-    render()
-    screen.getByText('Python')
+    expect(screen.getByText('Python')).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Copy code' })
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Download as .py file' })
+    ).toBeInTheDocument()
   })
 
   it('should render empty code block when code is empty', () => {
@@ -58,6 +51,6 @@ describe('CodeBlock', () => {
     // Check that code block is rendered with proper structure
     expect(screen.getByRole('code')).toBeInTheDocument()
     screen.getByText('Python')
-    screen.getByTitle('Copy code')
+    screen.getByRole('button', { name: 'Copy code' })
   })
 })

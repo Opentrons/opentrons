@@ -33,34 +33,42 @@ describe('CodeBlockToolbar', () => {
 
   it('should display copy button', () => {
     render()
-    expect(screen.getByTitle('Copy code')).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Copy code' })
+    ).toBeInTheDocument()
   })
 
   it('should display download button', () => {
     render()
-    expect(screen.getByTitle('Download as .py file')).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Download as .py file' })
+    ).toBeInTheDocument()
   })
 
   it('should show copied confirmation when copy button is clicked', async () => {
     render()
-    const copyButton = screen.getByTitle('Copy code')
+    const copyButton = screen.getByRole('button', { name: 'Copy code' })
 
     fireEvent.click(copyButton)
 
     await waitFor(() => {
-      expect(screen.getByTitle('Copied!')).toBeInTheDocument()
+      expect(
+        screen.getByRole('button', { name: 'Copied!' })
+      ).toBeInTheDocument()
     })
   })
 
   it('should change button state when clicked', async () => {
     render()
-    const copyButton = screen.getByTitle('Copy code')
+    const copyButton = screen.getByRole('button', { name: 'Copy code' })
 
     fireEvent.click(copyButton)
 
     // Should show copied state
     await waitFor(() => {
-      expect(screen.getByTitle('Copied!')).toBeInTheDocument()
+      expect(
+        screen.getByRole('button', { name: 'Copied!' })
+      ).toBeInTheDocument()
     })
   })
 })

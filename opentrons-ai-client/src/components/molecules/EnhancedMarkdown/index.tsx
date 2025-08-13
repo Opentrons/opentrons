@@ -5,8 +5,38 @@ import { isInlineCode } from '/ai-client/components/molecules/CodeBlock/pythonSy
 
 import styles from './enhancedmarkdown.module.css'
 
+import type { Element } from 'hast'
+import type { ReactElement, ReactNode } from 'react'
+
 interface EnhancedMarkdownProps {
   content: string
+}
+
+interface CodeComponentProps {
+  node?: Element
+  inline?: boolean
+  className?: string
+  children: ReactNode
+}
+
+const renderCode = ({
+  node: _node,
+  inline,
+  className: _className,
+  children,
+}: CodeComponentProps): ReactElement => {
+  if (inline === true) {
+    return <code className={styles.inline_code}>{String(children)}</code>
+  }
+
+  const codeContent = String(children).trim()
+
+  // Check if it's a simple function call or short code snippet that should be inline
+  if (isInlineCode(codeContent)) {
+    return <code className={styles.inline_code}>{codeContent}</code>
+  }
+
+  return <CodeBlock code={codeContent} />
 }
 
 export function EnhancedMarkdown({
@@ -16,34 +46,7 @@ export function EnhancedMarkdown({
     <div className={styles.enhanced_markdown}>
       <Markdown
         components={{
-          code: ({
-            node,
-            inline,
-            className,
-            children,
-            ...props
-          }: {
-            node?: any
-            inline?: boolean
-            className?: string
-            children: React.ReactNode
-            [key: string]: any
-          }) => {
-            if (inline === true) {
-              return (
-                <code className={styles.inline_code}>{String(children)}</code>
-              )
-            }
-
-            const codeContent = String(children).trim()
-
-            // Check if it's a simple function call or short code snippet that should be inline
-            if (isInlineCode(codeContent)) {
-              return <code className={styles.inline_code}>{codeContent}</code>
-            }
-
-            return <CodeBlock code={codeContent} />
-          },
+          code: renderCode,
           // Simple styling for other elements
           p: ({ children }) => <p className={styles.paragraph}>{children}</p>,
           ul: ({ children }) => <ul className={styles.list}>{children}</ul>,

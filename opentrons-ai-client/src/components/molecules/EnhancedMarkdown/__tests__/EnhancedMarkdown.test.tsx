@@ -6,8 +6,12 @@ import { i18n } from '/ai-client/i18n'
 
 import { EnhancedMarkdown } from '../index'
 
-const render = (props = {}) => {
-  return renderWithProviders(<EnhancedMarkdown content="" {...props} />, {
+import type { ComponentProps } from 'react'
+
+const render = (
+  props: ComponentProps<typeof EnhancedMarkdown> = { content: '' }
+) => {
+  return renderWithProviders(<EnhancedMarkdown {...props} />, {
     i18nInstance: i18n,
   })
 }
@@ -71,8 +75,8 @@ describe('EnhancedMarkdown', () => {
 
     // Check for essential UI elements from CodeBlock component
     screen.getByText('Python') // Language badge
-    screen.getByTitle('Copy code') // Copy button
-    screen.getByTitle('Download as .py file') // Download button
+    screen.getByRole('button', { name: 'Copy code' }) // Copy button
+    screen.getByRole('button', { name: 'Download as .py file' }) // Download button
   })
 
   it('should render mixed markdown content', () => {
@@ -96,15 +100,14 @@ def transfer_protocol():
 
     // Check that Python code appears in the content
     screen.getByText('Python') // Language badge from CodeBlock
-    screen.getByTitle('Copy code') // Copy button from CodeBlock
+    screen.getByRole('button', { name: 'Copy code' }) // Copy button from CodeBlock
 
     screen.getByText('Step 1')
     screen.getByText('Step 2')
   })
 
-  it('should handle empty content', () => {
+  it('should render without errors even with empty content', () => {
     render({ content: '' })
-    // Component should render without errors even with empty content
     expect(screen.queryByRole('heading')).not.toBeInTheDocument()
     expect(screen.queryByRole('list')).not.toBeInTheDocument()
   })

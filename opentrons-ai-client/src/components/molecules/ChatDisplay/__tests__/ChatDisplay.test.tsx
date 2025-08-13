@@ -118,4 +118,28 @@ describe('ChatDisplay', () => {
       })
     })
   })
+
+  it('should render markdown content with EnhancedMarkdown', () => {
+    const markdownContent =
+      '# Protocol\n\nThis is **bold** text with a [link](https://opentrons.com)'
+    props.chat.reply = markdownContent
+    render(props)
+
+    // Verify markdown is rendered properly
+    screen.getByRole('heading', { level: 1, name: 'Protocol' })
+    screen.getByText(/This is/)
+    screen.getByText(/bold/)
+    screen.getByRole('link', { name: 'link' })
+  })
+
+  it('should render code blocks with syntax highlighting', () => {
+    const codeContent = '```python\ndef transfer():\n    return True\n```'
+    props.chat.reply = codeContent
+    render(props)
+
+    // Verify code block UI elements are rendered
+    screen.getByText('Python')
+    screen.getByRole('button', { name: 'Copy code' })
+    screen.getByRole('button', { name: 'Download as .py file' })
+  })
 })

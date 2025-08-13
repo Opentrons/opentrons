@@ -12,7 +12,7 @@
     'Helvetica Neue',
     Arial,
     sans-serif;
-  gap: 0.5rem;
+  gap: var(--spacing-8, 0.5rem);
   line-height: 1.5rem;
 }
 
