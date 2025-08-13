@@ -125,7 +125,7 @@ describe('replaceCutoutFixtureWithComboFixture', () => {
           cutoutFixtureId: 'flexStackerModuleV1',
           cutoutId: 'cutoutD3',
           addressableAreaId: 'flexStackerModuleV1D4',
-          opentronsModuleSerialNumber:'123'
+          opentronsModuleSerialNumber: '123',
         },
       ],
       [
@@ -141,7 +141,7 @@ describe('replaceCutoutFixtureWithComboFixture', () => {
       {
         cutoutFixtureId: 'flexStackerModuleV1WithWasteChuteRightAdapterNoCover',
         cutoutId: 'cutoutD3',
-        opentronsModuleSerialNumber:'123'
+        opentronsModuleSerialNumber: '123',
       },
     ])
   })
@@ -153,7 +153,7 @@ describe('replaceCutoutFixtureWithComboFixture', () => {
           cutoutFixtureId: 'flexStackerModuleV1',
           cutoutId: 'cutoutD3',
           addressableAreaId: 'flexStackerModuleV1D4',
-          opentronsModuleSerialNumber:'123'
+          opentronsModuleSerialNumber: '123',
         },
       ],
       [],
@@ -165,7 +165,7 @@ describe('replaceCutoutFixtureWithComboFixture', () => {
         cutoutFixtureId: 'flexStackerModuleV1',
         cutoutId: 'cutoutD3',
         addressableAreaId: 'flexStackerModuleV1D4',
-        opentronsModuleSerialNumber:'123'
+        opentronsModuleSerialNumber: '123',
       },
     ])
   })
