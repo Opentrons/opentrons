@@ -2482,7 +2482,6 @@ def test_transfer_liquid_delegates_to_engine_core(
     mock_starting_tip_well = decoy.mock(cls=Well)
     tip_racks = [decoy.mock(cls=Labware)]
     trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
-    next_tiprack = decoy.mock(cls=Labware)
     subject.starting_tip = mock_starting_tip_well
     subject._tip_racks = tip_racks
 
@@ -2490,7 +2489,6 @@ def test_transfer_liquid_delegates_to_engine_core(
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(MOCK_MAP)
     decoy.when(mock_instrument_core.get_active_channels()).then_return(2)
     decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
-    decoy.when(next_tiprack.uri).then_return("tiprack-uri")
     decoy.when(mock_instrument_core.get_pipette_name()).then_return("pipette-name")
     subject.transfer_with_liquid_class(
         liquid_class=test_liq_class,
@@ -2532,7 +2530,6 @@ def test_transfer_liquid_multi_channel_delegates_to_engine_core(
     decoy.when(mock_well.well_name).then_return("mock well")
     tip_racks = [decoy.mock(cls=Labware)]
     trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
-    next_tiprack = decoy.mock(cls=Labware)
     subject.starting_tip = None
     subject._tip_racks = tip_racks
 
@@ -2553,7 +2550,6 @@ def test_transfer_liquid_multi_channel_delegates_to_engine_core(
 
     decoy.when(mock_instrument_core.get_active_channels()).then_return(2)
     decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
-    decoy.when(next_tiprack.uri).then_return("tiprack-uri")
     decoy.when(mock_instrument_core.get_pipette_name()).then_return("pipette-name")
     subject.transfer_with_liquid_class(
         liquid_class=test_liq_class,
@@ -2596,7 +2592,6 @@ def test_transfer_liquid_delegates_to_engine_core_with_trash_destination(
     mock_trash = decoy.mock(cls=TrashBin)
     tip_racks = [decoy.mock(cls=Labware)]
     trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
-    next_tiprack = decoy.mock(cls=Labware)
     subject.starting_tip = mock_starting_tip_well
     subject._tip_racks = tip_racks
 
@@ -2604,7 +2599,6 @@ def test_transfer_liquid_delegates_to_engine_core_with_trash_destination(
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(MOCK_MAP)
     decoy.when(mock_instrument_core.get_active_channels()).then_return(2)
     decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
-    decoy.when(next_tiprack.uri).then_return("tiprack-uri")
     decoy.when(mock_instrument_core.get_pipette_name()).then_return("pipette-name")
     subject.transfer_with_liquid_class(
         liquid_class=test_liq_class,
@@ -2873,7 +2867,6 @@ def test_distribute_liquid_delegates_to_engine_core(
     mock_starting_tip_well = decoy.mock(cls=Well)
     tip_racks = [decoy.mock(cls=Labware)]
     trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
-    next_tiprack = decoy.mock(cls=Labware)
     subject.starting_tip = mock_starting_tip_well
     subject._tip_racks = tip_racks
 
@@ -2881,7 +2874,6 @@ def test_distribute_liquid_delegates_to_engine_core(
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(MOCK_MAP)
     decoy.when(mock_instrument_core.get_active_channels()).then_return(2)
     decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
-    decoy.when(next_tiprack.uri).then_return("tiprack-uri")
     decoy.when(mock_instrument_core.get_pipette_name()).then_return("pipette-name")
     subject.distribute_with_liquid_class(
         liquid_class=test_liq_class,
@@ -2923,7 +2915,6 @@ def test_distribute_liquid_multi_channel_delegates_to_engine_core(
     decoy.when(mock_well.well_name).then_return("mock well")
     tip_racks = [decoy.mock(cls=Labware)]
     trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
-    next_tiprack = decoy.mock(cls=Labware)
     subject.starting_tip = None
     subject._tip_racks = tip_racks
 
@@ -2944,7 +2935,6 @@ def test_distribute_liquid_multi_channel_delegates_to_engine_core(
 
     decoy.when(mock_instrument_core.get_active_channels()).then_return(2)
     decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
-    decoy.when(next_tiprack.uri).then_return("tiprack-uri")
     decoy.when(mock_instrument_core.get_pipette_name()).then_return("pipette-name")
     subject.distribute_with_liquid_class(
         liquid_class=test_liq_class,
@@ -3225,7 +3215,6 @@ def test_consolidate_liquid_delegates_to_engine_core(
     mock_starting_tip_well = decoy.mock(cls=Well)
     tip_racks = [decoy.mock(cls=Labware)]
     trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
-    next_tiprack = decoy.mock(cls=Labware)
     subject.starting_tip = mock_starting_tip_well
     subject._tip_racks = tip_racks
 
@@ -3233,7 +3222,6 @@ def test_consolidate_liquid_delegates_to_engine_core(
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(MOCK_MAP)
     decoy.when(mock_instrument_core.get_active_channels()).then_return(2)
     decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
-    decoy.when(next_tiprack.uri).then_return("tiprack-uri")
     decoy.when(mock_instrument_core.get_pipette_name()).then_return("pipette-name")
 
     subject.consolidate_with_liquid_class(
@@ -3276,7 +3264,6 @@ def test_consolidate_liquid_multi_channel_delegates_to_engine_core(
     decoy.when(mock_well.well_name).then_return("mock well")
     tip_racks = [decoy.mock(cls=Labware)]
     trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
-    next_tiprack = decoy.mock(cls=Labware)
     subject.starting_tip = None
     subject._tip_racks = tip_racks
 
@@ -3297,7 +3284,6 @@ def test_consolidate_liquid_multi_channel_delegates_to_engine_core(
 
     decoy.when(mock_instrument_core.get_active_channels()).then_return(2)
     decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
-    decoy.when(next_tiprack.uri).then_return("tiprack-uri")
     decoy.when(mock_instrument_core.get_pipette_name()).then_return("pipette-name")
 
     subject.consolidate_with_liquid_class(
@@ -3344,7 +3330,6 @@ def test_consolidate_liquid_delegates_to_engine_core_with_trash_destination(
     mock_waste_chute = decoy.mock(cls=WasteChute)
     tip_racks = [decoy.mock(cls=Labware)]
     trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
-    next_tiprack = decoy.mock(cls=Labware)
     subject.starting_tip = mock_starting_tip_well
     subject._tip_racks = tip_racks
 
@@ -3352,7 +3337,6 @@ def test_consolidate_liquid_delegates_to_engine_core_with_trash_destination(
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(MOCK_MAP)
     decoy.when(mock_instrument_core.get_active_channels()).then_return(2)
     decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
-    decoy.when(next_tiprack.uri).then_return("tiprack-uri")
     decoy.when(mock_instrument_core.get_pipette_name()).then_return("pipette-name")
 
     subject.consolidate_with_liquid_class(
