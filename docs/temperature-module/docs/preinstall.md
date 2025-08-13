@@ -23,9 +23,7 @@ Anchors are screw-adjustable panels on the Temperature Module caddy. They provid
 - To loosen/extend the anchors, turn the screws counterclockwise.
 - To tighten/retract the anchors, turn the screws clockwise.
 
-<br><br> <!-- a crappy, but fast, way to add padding to this image -->
-![Caddy anchors](images/caddy-anchors.png)
-<br><br>
+![Caddy anchors](images/temp-mod-anchors.svg)
 
 Before installation:
 

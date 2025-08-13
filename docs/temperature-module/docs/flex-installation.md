@@ -19,15 +19,23 @@ Installing the Temperature Module on your robot includes attaching it to the dec
 
 3. Holding the module in the caddy, use the 2.5 mm screwdriver to turn the anchor screws clockwise to tighten the anchors. The module is secure when it doesn’t move while gently pulling on it and rocking it from side to side.
 
-4. Connect the power and USB cables to the module. Route the cables through the cable management bracket on the end of the caddy’s exhaust duct.
+4. Connect the USB cable to the module.
 
-5. Insert the caddy into the deck slot, exhaust duct first, and route the power and USB cables through the Flex. Do not connect the power cable to a wall outlet yet.
+5. Connect the power cable to the module. The Temperature Module has an asymmetrical 4-pin power connector. When connecting the power cable to the module:
 
-6. Connect the free end of the USB cable to a USB port on the Flex.
+    - Match the connector's flat side to the flat side of the module's power port.
+    - Aligned cables attach easily; misaligned cables do not.
+    - _Do not_ plug the power cable into a wall outlet until instructed to do so.
 
-7. Connect the power cable to a wall outlet.
+    <figure class="screenshot" markdown>
+    ![Image of aligned power cable](images/module-power-connector.png){style="margin-left: 0;"}
+    </figure>
 
-8. Gently press the on/off switch to turn the module on.
+6. Insert the caddy into the deck slot and route the power and USB cables through a removable side cover on the Flex.
+
+7. Connect the USB cable to a USB port on the Flex.
+
+8. Connect the power cable to a wall outlet. Gently press the on/off switch to turn the module on.
 
 </div>
 
@@ -35,13 +43,11 @@ If the temperature LCD is illuminated, the module is powered on.
 
 When successfully connected, the module appears in the Pipettes and Modules section on your robot’s device detail page in the Opentrons App.
 
-Next, you’ll calibrate the module after attaching it for the first time.
-
 ## Calibrating the Temperature Module
 
 When you first install a module on Flex, you need to run automated positional calibration. This process is similar to calibrating instruments like pipettes or the gripper. Module calibration ensures that the Flex moves to the exact correct location for optimal protocol performance. You do not have to recalibrate the module if you remove and reattach it to the same Flex.
 
-To calibrate the Temperature Module, turn on the power supply. This starts the calibration workflow process on the touchscreen. Instructions on the touchscreen will guide you through the calibration procedure, which is outlined below.
+When you attach and power on a new module, the Flex automatically starts the calibration workflow on the touchscreen. Instructions on the touchscreen will guide you through the calibration procedure, which is outlined below.
 
 !!!warning
     The gantry and pipette will move during calibration. Keep your hands clear of the working area before tapping an action button on the touchscreen.

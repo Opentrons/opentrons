@@ -58,11 +58,9 @@ The Temperature Module is designed to achieve and maintain a target temperature 
 
 Additionally, Opentrons has tested the Temperature Module’s temperature profile with both the 24-well and 96-well thermal blocks. The module can generally reach its minimum temperature in 12 to 18 minutes, depending on the block and contents. The module can reach a hot temperature (65 °C) in six minutes. For more details, see the [Temperature Module White Paper](https://insights.opentrons.com/hubfs/Products/Modules/Temperature%20Module%20White%20Paper.pdf).
 
-<!-- Is this paper ⬆️ still valid/should we continue to link to it? -->
-
 ## Thermal Blocks
 
-The Temperature Module module uses aluminum thermal blocks to hold labware at temperature. The module comes with a 24-well block, a 96-well PCR block, and a flat bottom block. The blocks hold 1.5 mL and 2.0 mL tubes, 96-well PCR plates, PCR strips, deep well plates, and flat bottom plates. You can also buy these aluminum blocks from the Opentrons shop.
+The Temperature Module uses aluminum thermal blocks to hold labware at temperature. The module comes with a 24-well block, a 96-well PCR block, and a flat bottom block. The blocks hold 1.5 mL and 2.0 mL tubes, 96-well PCR plates, PCR strips, deep well plates, and flat bottom plates. You can also buy these aluminum blocks from the Opentrons shop.
 
 <div class="parts-list" markdown>
 
@@ -102,7 +100,7 @@ For Flex, the Temperature Module caddy comes with a deep well block and a flat b
 </div>
 
 The Flex flat bottom plate is compatible with various ANSI/SLAS standard well plates. It is different from the flat plate that ships with the Temperature Module and the separate three-piece set. The Flex flat plate features a wider working surface and chamfered corner clips. These features help improve the performance of the Opentrons Flex Gripper when moving labware onto or off of the
-plate. You can tell which flat bottom plate you have because the one for Flex has the words “Opentrons Flex” on its top surface. The one for OT-2 does not.
+plate. You can tell which flat bottom plate you have because the one for Flex has the words “Opentrons Flex” on its top surface. The one for the OT-2 does not.
 
 ## Thermal Block Compatibility
 

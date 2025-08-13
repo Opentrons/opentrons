@@ -5,11 +5,11 @@ hide: toc
 
 <div style="text-align: center;" markdown>
 
-# Temperature Module GEN2 Instruction Manual <!-- inside or outside the div? -->
+# Temperature Module GEN2 Instruction Manual
 
 ![Module cover image](images/temp-mod-hero.png){style="width: 60%"}
 
-Opentrons Labworks Inc.<br>
+**Opentrons Labworks Inc.**<br>
 December 2024
 
 </div>

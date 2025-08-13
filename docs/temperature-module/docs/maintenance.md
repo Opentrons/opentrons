@@ -36,7 +36,7 @@ The following table lists the chemicals you can use to clean your Temperature Mo
     <tr>
       <td>Bleach</td>
       <td>
-        Dilute to 10% (1:10 bleach/water ratio) for cleaning.<br>
+        Dilute to 10% (1 part bleach to 9 parts water) for cleaning.<br>
         Do not use 100% bleach.
       </td>
     </tr>

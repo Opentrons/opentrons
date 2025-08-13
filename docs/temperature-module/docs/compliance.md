@@ -35,7 +35,7 @@ Opentrons has validated the Temperature Module’s performance in the conditions
 
 ### Instrument Safety Warnings
 
-Warning symbols posted on the Opentrons Temperature Module refer directly to the safe use of the instrument. Refer to the previous table for symbol definitions.
+Warning symbols posted on the Opentrons Temperature Module refer directly to the safe use of the instrument.
 
 <table>
     <thead>
@@ -60,13 +60,13 @@ The Temperature Module has been tested and found to be in compliance with all ap
 
 ### Safety
 
-- IEC/UL/CSA 61010-1 Safety­ Requirements­ for­ Electrical Equipment­ for Measurement,­ Control,­ and­ Laboratory­ Use–Part­ 1:­ General Requirements
-- IEC/UL/CSA­ 61010-2-010­ Particular­ Requirements for Laboratory­ Equipment for­ the Heating­ of­ Materials
+- IEC/UL/CSA 61010-1 Safety Requirements for Electrical Equipment for Measurement, Control, and Laboratory Use–Part 1: General Requirements
+- IEC/UL/CSA 61010-2-010 Particular Requirements for Laboratory Equipment for the Heating of Materials
 
 ### Electromagnetic Compatibility
 
-- EN/BSI 61326-1­ Electrical ­Equipment­ for­ Measurement, Control­ and­ Laboratory­ Use­ –EMC Requirements–Part­ 1:­ General­ Requirements
-- EN 55011 Industrial, Scientific and Medical Equipment–Radio Frequency­ Disturbance Characteristics–­Limits and­ Methods of­ Measurement
+- EN/BSI 61326-1 Electrical Equipment for Measurement, Control and Laboratory Use –EMC Requirements–Part 1: General Requirements
+- EN 55011 Industrial, Scientific and Medical Equipment–Radio Frequency Disturbance Characteristics–Limits and Methods of Measurement
 - FCC 47CFR Part 15 Subpart B Class A: Unintentional Radiators
 - IC ICES–003 Spectrum Management and Telecommunications Interference Causing Equipment Standard–Information Technology Equipment (Including Digital Apparatus)
 
@@ -82,7 +82,7 @@ The Temperature Module has been tested and found to be in compliance with all ap
 ### Canada ISED
 
 Canada ICES-003(A)/NMB-003(A)
-This­ product­ meets­ the­ applicable­ Innovation,­ Science­ and Economic Development Canada technical specifications.
+This product meets the applicable Innovation, Science and Economic Development Canada technical specifications.
 
 Le présent produit est conforme aux spécifications techniques applicables d’Innovation, Sciences et Développement économique Canada.
 
