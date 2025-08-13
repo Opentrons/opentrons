@@ -21,7 +21,7 @@ import { TERMINAL_ITEM_SELECTION_TYPE } from '../../ui/steps/reducers'
 import type { WellGroup } from '@opentrons/components'
 import type { Selector } from '../../types'
 
-export const getMissingTipsByLabwareId: Selector<Record<
+export const getMissingAndUsedTipsByLabwareId: Selector<Record<
   string,
   { missingTips: WellGroup; usedTips: WellGroup }
 > | null> = createSelector(

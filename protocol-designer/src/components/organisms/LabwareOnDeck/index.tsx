@@ -19,7 +19,7 @@ interface LabwareOnDeckProps {
 export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
   const { labwareOnDeck, x, y } = props
   const missingAndUsedTipsByLabwareId = useSelector(
-    tipContentsSelectors.getMissingTipsByLabwareId
+    tipContentsSelectors.getMissingAndUsedTipsByLabwareId
   )
   const allWellContentsForActiveItem = useSelector(
     getAllWellContentsForActiveItem
