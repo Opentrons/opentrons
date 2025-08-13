@@ -473,6 +473,16 @@ describe('replaceCutoutFixtureRemove', () => {
     )
     expect(result).toEqual(WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE)
   })
+
+  it('should get fixture replacment for FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE when waste chute is on removed', () => {
+    const result = replaceCutoutFixtureRemove(
+      FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+      'cutoutD3',
+      '1ChannelWasteChute'
+    )
+    expect(result).toEqual(FLEX_STACKER_V1_FIXTURE)
+  })
+
   it('should get fixture replacment for ABSORBANCE_READER_V1_FIXTURE', () => {
     const result = replaceCutoutFixtureRemove(
       ABSORBANCE_READER_V1_FIXTURE,
