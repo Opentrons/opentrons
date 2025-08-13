@@ -1,7 +1,7 @@
 """Production QC User Interface."""
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.types import StatusBarState
-from typing import Optional
+from typing import Optional, Set, Union, List
 
 PRINT_HEADER_NUM_SPACES = 4
 PRINT_HEADER_DASHES = "-" * PRINT_HEADER_NUM_SPACES
@@ -121,7 +121,7 @@ def print_test_results(message: str, passval: bool) -> None:
         _output(f"\033[1;31m\n 测试结果 {dashes} \n{middle}\n{dashes}\n\033[0m")
 
 
-def print_results(message: str, passval: bool) -> None:
+def print_results(message: Union[str, Set[str], List[str]], passval: bool) -> None:
     """ "test results list"""
 
     max_length = max(len(item) for item in message)

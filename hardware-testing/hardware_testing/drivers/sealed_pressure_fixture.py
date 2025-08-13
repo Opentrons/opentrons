@@ -2,14 +2,13 @@
 
 import time
 from typing import Union
-import serial
-import serial.tools.list_ports
+import serial  # type: ignore[import-untyped]
+import serial.tools.list_ports  # type: ignore[import-untyped]
 
 ReceiveBuffer = 100
 
 
 class SerialDriver:
-
     @classmethod
     def get_com_list(cls):
         port_list = serial.tools.list_ports.comports()
@@ -38,8 +37,14 @@ class SerialDriver:
         :param baud:
         :return:
         """
-        self.com = serial.Serial(self.device, baud, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE,
-                                 bytesize=serial.EIGHTBITS, timeout=1)
+        self.com = serial.Serial(
+            self.device,
+            baud,
+            parity=serial.PARITY_NONE,
+            stopbits=serial.STOPBITS_ONE,
+            bytesize=serial.EIGHTBITS,
+            timeout=1,
+        )
         if self.com.isOpen():
             print(f"{self.device} Opened! \n")
         # settings
@@ -66,15 +71,17 @@ class SerialDriver:
         except:
             print("Can't find device")
 
-    def write_and_get_buffer(self, send: Union[str, int, bytes], only_write=False, delay=None, times=30):
+    def write_and_get_buffer(
+        self, send: Union[str, int, bytes], only_write=False, delay=None, times=30
+    ):
         """
         send cmd
         :return:
         """
         if self.com is None:
             return
-        if type(send) is not bytes:
-            send = (send + "\r\n").encode('utf-8')
+        if not isinstance(send, bytes):
+            send = (str(send) + "\r\n").encode("utf-8")
         self.com.flushInput()
         self.com.flushOutput()
         self.com.write(send)
@@ -88,12 +95,12 @@ class SerialDriver:
         for i in range(times):
             data = self.com.read(ReceiveBuffer)
             if type(data) is not bytes:
-                if "OK" not in data.decode('utf-8') or "busy" in data.decode('utf-8'):
+                if "OK" not in data.decode("utf-8") or "busy" in data.decode("utf-8"):
                     time.sleep(1)
                     continue
             else:
                 return data
-            return data.decode('utf-8')
+            return data.decode("utf-8")
 
     def read_buffer(self):
         """
@@ -110,8 +117,8 @@ class SerialDriver:
         data = self.com.read(length)
         self.com.flushInput()
         self.com.flushOutput()
-        return data.decode('utf-8')
-    
+        return data.decode("utf-8")
+
     def get_pressure(self):
         """
         analyze pressure value
@@ -119,10 +126,10 @@ class SerialDriver:
         for _i in range(5):
             try:
                 respond = self.read_buffer()
-                respond_list = respond.split('|')
+                respond_list = respond.split("|")
                 respond_value = respond_list[1]
-                
-                average_value = respond_value.split('\r\n')[0].split('\t')[1].strip()
+
+                average_value = respond_value.split("\r\n")[0].split("\t")[1].strip()
                 average_value = float(average_value)
                 return average_value
             except:
@@ -130,8 +137,7 @@ class SerialDriver:
                 pass
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     s = SerialDriver()
     s.init(9600)
     for i in range(100):

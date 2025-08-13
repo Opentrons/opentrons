@@ -1,8 +1,10 @@
 """Pipette Current/Speed Test."""
 import argparse
 import asyncio
+from typing import List
 
 from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.config.defaults_ot3 import (
     DEFAULT_RUN_CURRENT,
     DEFAULT_MAX_SPEEDS,
@@ -46,7 +48,7 @@ PLUNGER_CURRENTS_SPEED = {
 }
 
 MUST_PASS_CURRENT_TURE = 0.4
-PASS_PRINT_LIST = []
+PASS_PRINT_LIST: List[str] = []
 
 MAX_SPEED = max(TEST_SPEEDS)
 MAX_CURRENT = max(max(list(PLUNGER_CURRENTS_SPEED.keys())), 1.0)
@@ -212,8 +214,6 @@ async def _test_plunger(
     # start at HIGHEST (easiest) current
     currents = sorted(list(PLUNGER_CURRENTS_SPEED.keys()), reverse=False)
     max_failed_current = 0.0
-    global PASS_PRINT_LIST
-    PASS_PRINT_LIST = []
     for current in currents:
         ui.print_title(f"CURRENT = {current}")
         # start at LOWEST (easiest) speed
@@ -241,7 +241,7 @@ async def _test_plunger(
                         ui.print_error(
                             f"failed moving {direction} at {current} amps and {speed} mm/sec"
                         )
-                        if  _includes_result(current,speed):
+                        if _includes_result(current, speed):
                             failval = f"向{direction}移动时,在电流 {current} amps 速度 {speed} mm/sec 不通过"
                             PASS_PRINT_LIST.append(failval)
 
@@ -294,54 +294,59 @@ async def _main(is_simulating: bool, trials: int, continue_after_stall: bool) ->
         )
         # home and move to a safe position
         await _reset_gantry(api)
-        pipptype = api.get_all_attached_instr()
-        print(f"pipette type: {pipptype[types.OT3Mount.LEFT]['name']}")
+        pipptype = api.attached_pipettes
+        left_mount_inst = pipptype[types.OT3Mount.LEFT.to_mount()]
+        assert left_mount_inst is not None
+        pip_name = left_mount_inst["name"]
+        print(f"pipette type: {pip_name}")
         global MUST_PASS_CURRENT_TURE
-        if "single" in pipptype[types.OT3Mount.LEFT]['name']:
-                
+        if "single" in pip_name:
+
             MUST_PASS_CURRENT_TURE = 0.5
-        elif "multi" in pipptype[types.OT3Mount.LEFT]['name']:
+        elif "multi" in pip_name:
             MUST_PASS_CURRENT_TURE = 0.75
-        
 
         # test each attached pipette
         while True:
             mount = await _get_next_pipette_mount(api)
             dut = helpers_ot3.DeviceUnderTest.by_mount(mount)
             dut_str = helpers_ot3._get_serial_for_dut(api, dut)
-            print("dut_str:",dut_str)
-            if "multi" in pipptype[types.OT3Mount.LEFT]['name'] and str(dut_str).count("P") >=2:
+            print("dut_str:", dut_str)
+            if "multi" in pip_name and str(dut_str).count("P") >= 2:
                 MUST_PASS_CURRENT_TURE = 0.5
-            
-            if not api.is_simulator and not ui.get_user_answer(f"QC {mount.name} pipette"):
+
+            if not api.is_simulator and not ui.get_user_answer(
+                f"QC {mount.name} pipette"
+            ):
                 continue
 
             report = _build_csv_report(trials=trials)
-            
+
             helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut)
 
             await _test_plunger(
-                api, mount, report, trials=trials, continue_after_stall=continue_after_stall
+                api,
+                mount,
+                report,
+                trials=trials,
+                continue_after_stall=continue_after_stall,
             )
             ui.print_title("DONE")
             report.save_to_disk()
             report.print_results()
 
-            
             if len(PASS_PRINT_LIST) > 0:
-                ui.print_results(set(PASS_PRINT_LIST),False)
+                ui.print_results(set(PASS_PRINT_LIST), False)
             else:
-                ui.print_test_results("电流测试通过(CURRENT SPEED TESTING PASS)",True)
-                #ui.print_title("电流测试通过(CURRENT SPEED TESTING PASS)")
+                ui.print_test_results("电流测试通过(CURRENT SPEED TESTING PASS)", True)
+                # ui.print_title("电流测试通过(CURRENT SPEED TESTING PASS)")
 
             if api.is_simulator:
                 break
     except Exception as errrrr:
-        #print(f"system-error {errrrr}")
+        # print(f"system-error {errrrr}")
         printsig = f"08-01-current-system-error:系统错误,日志:{errrrr}"
         ui.print_fail(printsig)
-        
-
 
 
 if __name__ == "__main__":

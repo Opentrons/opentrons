@@ -29,8 +29,8 @@ class TestConfig:
 
     simulate: bool
     pipette: Literal[200, 1000]
-    blowout:int
-    blowoutnum:int
+    blowout: int
+    blowoutnum: int
 
 
 class TestData(TypedDict):
@@ -93,9 +93,9 @@ async def main(args: argparse.Namespace, cfg: TestConfig) -> None:
         return aligned
 
     await api.cache_instruments()
-    #await api.home_z(OT3Mount.LEFT)
+    # await api.home_z(OT3Mount.LEFT)
     # LOOP THROUGH CURRENTS + SPEEDS
-    await api.home([xxx,yyy,Z1,Z2])
+    await api.home([xxx, yyy, Z1, Z2])
     today = datetime.now().strftime("%m-%d-%y_%H-%M")
     pip_id = api.attached_pipettes[Mount.LEFT]["pipette_id"]
     with open(
@@ -115,7 +115,7 @@ async def main(args: argparse.Namespace, cfg: TestConfig) -> None:
         try:
             currents = list(CURRENTS_SPEEDS.keys())
             for cycle in range(1, args.cycles + 1):
-                
+
                 if cycle % cfg.blowoutnum == 0 and cfg.blowout == 2:
                     print(f"Cycle: {cycle}")
                     for current in sorted(currents, reverse=True):
@@ -231,8 +231,10 @@ async def main(args: argparse.Namespace, cfg: TestConfig) -> None:
                             default_max_speed=default_speed,
                             acceleration=default_acceleration,
                         )
-                        await api._backend.set_active_current({Axis.P_L: default_current})
-                
+                        await api._backend.set_active_current(
+                            {Axis.P_L: default_current}
+                        )
+
                 else:
 
                     print(f"Cycle: {cycle}")
@@ -349,7 +351,9 @@ async def main(args: argparse.Namespace, cfg: TestConfig) -> None:
                             default_max_speed=default_speed,
                             acceleration=default_acceleration,
                         )
-                        await api._backend.set_active_current({Axis.P_L: default_current})
+                        await api._backend.set_active_current(
+                            {Axis.P_L: default_current}
+                        )
 
         except Exception as e:
             test_data["error"] = str(e)
@@ -364,8 +368,13 @@ if __name__ == "__main__":
     parser.add_argument("--simulate", action="store_true")
     parser.add_argument("--pipette", type=int, choices=[200, 1000], default=200)
     parser.add_argument("--blowout", type=int, default=1)
-    parser.add_argument("--blowoutnum",type=int,default=100)
+    parser.add_argument("--blowoutnum", type=int, default=100)
     args = parser.parse_args()
-    _config = TestConfig(simulate=args.simulate, pipette=args.pipette,blowout=args.blowout,blowoutnum=args.blowoutnum)
+    _config = TestConfig(
+        simulate=args.simulate,
+        pipette=args.pipette,
+        blowout=args.blowout,
+        blowoutnum=args.blowoutnum,
+    )
 
     asyncio.run(main(args, _config))

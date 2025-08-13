@@ -6,7 +6,7 @@ from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing import data
 from typing import List, Union, Literal, Tuple
 from hardware_testing.opentrons_api.types import GantryLoad, OT3Mount, Axis, Point, Axis
-
+from time import monotonic
 from opentrons.hardware_control.ot3api import OT3API
 
 from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError

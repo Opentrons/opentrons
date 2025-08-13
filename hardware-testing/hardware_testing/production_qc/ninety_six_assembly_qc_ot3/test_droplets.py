@@ -1,6 +1,6 @@
 """Test Droplets."""
 from asyncio import sleep
-from time import time
+from time import time, monotonic
 from typing import List, Union, Tuple, Optional, Dict, Literal
 
 from opentrons.hardware_control.ot3api import OT3API
