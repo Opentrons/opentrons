@@ -57,6 +57,7 @@ describe('StackingOffsets', () => {
         gridRows: '8',
         compatibleAdapters: {},
         compatibleModules: {},
+        stackedLabwareZDimension: undefined,
       },
       touched: {
         labwareType: true,
@@ -67,6 +68,7 @@ describe('StackingOffsets', () => {
         gridRows: true,
         compatibleAdapters: {},
         compatibleModules: {},
+        stackedLabwareZDimension: true,
       },
       errors: {},
     } as any)
@@ -75,10 +77,10 @@ describe('StackingOffsets', () => {
   it('renders main text and no modules if is tiprack is true', () => {
     render(<StackingOffsets />)
     screen.getByText(
-      'Stacking offset is only required for labware that can be placed on an adapter or module. Select the compatible adapters or modules below.'
+      'Stacking offset is only required for labware that can be placed on an adapter, module, or itself.'
     )
     screen.getByText(
-      'Stack the labware onto the adapter or module and then make the required measurement with calipers.'
+      'Stack the labware onto the adapter, module, or itself and then make the required measurement with calipers.'
     )
     screen.getByText('Stacking Offset (Optional)')
     screen.getByAltText('Stacking offset image')
@@ -96,6 +98,7 @@ describe('StackingOffsets', () => {
         gridRows: '8',
         compatibleAdapters: {},
         compatibleModules: {},
+        stackedLabwareZDimension: undefined,
       },
       touched: {
         labwareType: true,
@@ -106,6 +109,7 @@ describe('StackingOffsets', () => {
         gridRows: true,
         compatibleAdapters: {},
         compatibleModules: {},
+        stackedLabwareZDimension: true,
       },
       errors: {},
       setFieldValue: mockFieldValue,

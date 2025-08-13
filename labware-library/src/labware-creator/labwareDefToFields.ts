@@ -10,6 +10,17 @@ import type { BooleanString, LabwareFields } from './fields'
 // NOTE: this is just String() with some typing for flow
 const boolToBoolString = (b: boolean): BooleanString => (b ? 'true' : 'false')
 
+export function getStackedLabwareZDimension(
+  def: LabwareDefinition2
+): number | undefined {
+  const zOffset = def.stackingOffsetWithLabware?.[def.parameters.loadName]?.z
+  if (zOffset == null) {
+    return undefined
+  } else {
+    return def.dimensions.zDimension * 2 + zOffset
+  }
+}
+
 export function labwareDefToFields(
   def: LabwareDefinition2,
   adapterDefinitions: LabwareDefinition2[]
@@ -84,7 +95,7 @@ export function labwareDefToFields(
   const firstGroup: LabwareWellGroup | undefined = def.groups[0]
   const firstGroupBrand = firstGroup?.brand
   const zDimension = def.dimensions.zDimension
-  const stackedLabwareZDimension: number | null | undefined = 0
+  const stackedLabwareZDimension = getStackedLabwareZDimension(def)
   const compatibleAdapters: Record<string, number> =
     def.stackingOffsetWithLabware != null
       ? Object.entries(
@@ -96,10 +107,6 @@ export function labwareDefToFields(
 
           if (adapterZDimension != null) {
             acc[loadName] = adapterZDimension + zDimension - offset.z
-          }
-          if (stackedLabwareZDimension != null) {
-            acc[def.parameters.loadName] =
-              zDimension * 2 - stackedLabwareZDimension
           }
           return acc
         }, {})

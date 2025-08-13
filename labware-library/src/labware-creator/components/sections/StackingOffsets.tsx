@@ -183,8 +183,7 @@ export function StackingOffsets(): JSX.Element | null {
             <div className={styles.instructions_column}>
               <p>
                 Stacking offset is only required for labware that can be placed
-                on an adapter, module, or itself. Select the compatible objects
-                below.
+                on an adapter, module, or itself.
               </p>
               <p>
                 Stack the labware onto the adapter, module, or itself and then

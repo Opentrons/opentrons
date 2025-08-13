@@ -11,21 +11,15 @@ export interface Props {
 }
 
 export const StackingAlerts = (props: Props): JSX.Element | null => {
-    const { values, touched } = props
-    const adapterValues = Object.values(values.compatibleAdapters ?? {})
-      .map(v => Number(v))
-    
-    const tooTall = adapterValues.some(z => z > MAX_SUGGESTED_GRIPPER_Z)
-  
-    if (touched.compatibleAdapters && tooTall) {
-      return (
-        <AlertItem
-          type="info"
-          title="This stacked combination may be too tall for gripper to pick up when stacked. Please test on robot."
-        />
-      )
-    }
-  
-    return null
+  const { values, touched } = props
+  const zAsNum = Number(values.stackedLabwareZDimension)
+  if (touched.stackedLabwareZDimension && zAsNum > MAX_SUGGESTED_GRIPPER_Z) {
+    return (
+      <AlertItem
+        type="info"
+        title="This labware may be too tall for gripper to pick up when stacked. Please test on robot."
+      />
+    )
   }
-  
+  return null
+}
