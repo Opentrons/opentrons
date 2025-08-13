@@ -73,7 +73,6 @@ describe('StackingOffsets', () => {
       errors: {},
     } as any)
   })
-
   it('renders main text and no modules if is tiprack is true', () => {
     render(<StackingOffsets />)
     screen.getByText(
@@ -84,6 +83,7 @@ describe('StackingOffsets', () => {
     )
     screen.getByText('Stacking Offset (Optional)')
     screen.getByAltText('Stacking offset image')
+    screen.getByAltText('Labware stacking offset image')
   })
 
   it('renders the adapters section if is tiprack is true', () => {

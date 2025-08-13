@@ -227,7 +227,6 @@ export function StackingOffsets(): JSX.Element | null {
                   const key = definition.parameters.loadName
                   const fieldName = `compatibleAdapters.${key}`
                   const isChecked = values.compatibleAdapters[key] !== undefined
-
                   return (
                     <Flex
                       flexDirection={DIRECTION_COLUMN}
@@ -386,8 +385,4 @@ export function StackingOffsets(): JSX.Element | null {
       </SectionBody>
     </div>
   )
-}
-export function useStackedLabwareZDimension(): number | null {
-  const { values } = useFormikContext<LabwareFields>()
-  return values.stackedLabwareZDimension ?? null
 }
