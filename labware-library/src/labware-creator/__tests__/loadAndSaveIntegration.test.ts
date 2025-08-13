@@ -88,6 +88,9 @@ describe('load and immediately save integrity test', () => {
           displayName: fakeDisplayName,
         },
         namespace: DEFAULT_CUSTOM_NAMESPACE, // specifying this is not yet supported
+        stackingOffsetWithLabware: {
+          [fakeLoadName]: { x: 0, y: 0, z: 2*inputDef.dimensions.zDimension },
+        },
       }
 
       expect(outputDef).toEqual(tweakedInputDef)

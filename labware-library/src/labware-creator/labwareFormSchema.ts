@@ -12,6 +12,7 @@ import {
   MAX_X_DIMENSION,
   MAX_Y_DIMENSION,
   MAX_Z_DIMENSION,
+  MAX_SUGGESTED_GRIPPER_Z,
   MIN_X_DIMENSION,
   MIN_Y_DIMENSION,
   MUST_BE_A_NUMBER_ERROR,
@@ -125,6 +126,10 @@ export const labwareFormSchemaBaseObject = Yup.object({
       }
     )
     .default({}),
+  useStackedLabwareZDimension: requiredPositiveNumber(LABELS.stackedLabwareZDimension).max(
+      MAX_SUGGESTED_GRIPPER_Z,
+      IRREGULAR_LABWARE_ERROR
+    ),
   tubeRackInsertLoadName: Yup.mixed().when('labwareType', {
     is: 'tubeRack',
     then: requiredString(LABELS.tubeRackInsertLoadName),

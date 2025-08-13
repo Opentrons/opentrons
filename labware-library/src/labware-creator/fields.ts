@@ -165,7 +165,6 @@ export interface ProcessedLabwareFields {
   footprintXDimension: number
   footprintYDimension: number
   labwareZDimension: number
-  stackedLabwareZDimension: number
 
   gridRows: number
   gridColumns: number

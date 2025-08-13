@@ -107,13 +107,13 @@ export function fieldsToLabware(
 
     const stackingOffsetWithLabware: Record<string, LabwareOffset> = {}
     // Add entry for stacking on itself
-    if (fields.stackedLabwareZDimension != null) {
+    if (compatibleAdapters[fields.loadName] != null) {
       stackingOffsetWithLabware[fields.loadName] = {
         x: 0,
         y: 0,
         z:
           2 * fields.labwareZDimension -
-          Number(fields.stackedLabwareZDimension),
+          Number(compatibleAdapters[fields.loadName]),
       }
     }
     Object.entries(compatibleAdapters).forEach(([loadName, z]) => {

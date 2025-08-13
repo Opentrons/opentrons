@@ -43,6 +43,7 @@ export const makeAutofillOnChange = ({
       ...namesToTrue,
       compatibleAdapters: {},
       compatibleModules: {},
+      stackedLabwareZDimension: undefined, 
     })
   } else {
     console.error(
