@@ -29,9 +29,9 @@ jobs:
           python-version: "3.10"
           enable-cache: true
           cache-dependency-glob: "./analyses-snapshot-testing/uv.lock"
-      - name: Sync the project
+      - name: Setup the project
         working-directory: ./analyses-snapshot-testing
-        run: make ci-setup
+        run: make setup
       - name: ruff-check
         working-directory: ./analyses-snapshot-testing
         run: make ruff-check
