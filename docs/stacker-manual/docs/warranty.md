@@ -20,7 +20,7 @@ Control your liquid handling robot and module using the Opentrons App. Download 
 
 ## Manufacturer Description
 
-Opentrons Labworks, Inc.<br>
+Opentrons Labworks Inc<br>
 45-18 Ct Square W<br>
 Long Island City, NY 11101
 
