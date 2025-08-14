@@ -100,7 +100,7 @@ export function OpentronsAI(): JSX.Element | null {
 
   return (
     <HashRouter>
-      <AppContent
+      <AppWrapper
         displayHeaderWithMeter={displayHeaderWithMeter}
         progress={progress}
       />
@@ -108,10 +108,29 @@ export function OpentronsAI(): JSX.Element | null {
   )
 }
 
+function AppWrapper({
+  displayHeaderWithMeter,
+  progress,
+}: {
+  displayHeaderWithMeter: boolean
+  progress: number
+}): JSX.Element {
+  const location = useLocation()
+  const isOnChatPage = location.pathname === '/chat'
+
+  return (
+    <AppContent
+      displayHeaderWithMeter={displayHeaderWithMeter}
+      progress={progress}
+      isOnChatPage={isOnChatPage}
+    />
+  )
+}
+
 interface AppContentProps {
   displayHeaderWithMeter: boolean
   progress: number
-  isOnChatPage?: boolean
+  isOnChatPage: boolean
 }
 
 function AppContent({
@@ -119,8 +138,6 @@ function AppContent({
   progress,
   isOnChatPage,
 }: AppContentProps): JSX.Element {
-  const location = useLocation()
-  const shouldHideFooter = isOnChatPage ?? location.pathname === '/chat'
   return (
     <Flex width="100%" height="100vh" flexDirection={DIRECTION_COLUMN}>
       <StickyHeader>
@@ -146,7 +163,7 @@ function AppContent({
           <ExitConfirmModal />
           <OpentronsAIRoutes />
         </Flex>
-        {!shouldHideFooter ? <Footer /> : null}
+        {!isOnChatPage ? <Footer /> : null}
       </Flex>
     </Flex>
   )
