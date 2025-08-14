@@ -17,6 +17,7 @@ import { EndUserAgreementFooter } from '../../components/molecules'
 import { AnnouncementModal } from '../../components/organisms'
 import { useAnnouncements } from '../../components/organisms/AnnouncementModal/announcements'
 import { useKitchen } from '../../components/organisms/Kitchen/useKitchen'
+import { ACCEPTED_PROTOCOL_FILE_TYPES } from '../../constants'
 import { getFileMetadata } from '../../file-data/selectors'
 import { actions as loadFileActions } from '../../load-file'
 import { toggleNewProtocolModal } from '../../navigation/actions'
@@ -151,6 +152,7 @@ export function Landing(): JSX.Element {
             ref={fileInputRef}
             aria-label={t('import')}
             className={styles.hiddenInput}
+            accept={ACCEPTED_PROTOCOL_FILE_TYPES}
           />
         </label>
       </div>
