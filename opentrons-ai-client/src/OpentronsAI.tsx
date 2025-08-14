@@ -31,12 +31,22 @@ import { useGetAccessToken } from './resources/hooks'
 import { useTrackEvent } from './resources/hooks/useTrackEvent'
 
 export function OpentronsAI(): JSX.Element | null {
+  return (
+    <HashRouter>
+      <OpentronsAIApp />
+    </HashRouter>
+  )
+}
+
+function OpentronsAIApp(): JSX.Element | null {
   const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0()
   const [, setToken] = useAtom(tokenAtom)
   const [{ displayHeaderWithMeter, progress }] = useAtom(headerWithMeterAtom)
   const [mixpanelState, setMixpanelState] = useAtom(mixpanelAtom)
   const { getAccessToken } = useGetAccessToken()
   const [featureFlags, setFeatureFlags] = useAtom(featureFlagsAtom)
+  const location = useLocation()
+  const isOnChatPage = location.pathname === '/chat'
 
   const trackEvent = useTrackEvent()
 
@@ -97,26 +107,6 @@ export function OpentronsAI(): JSX.Element | null {
   global.enablePrereleaseMode = () => {
     setFeatureFlags({ enablePrereleaseMode: true })
   }
-
-  return (
-    <HashRouter>
-      <AppWrapper
-        displayHeaderWithMeter={displayHeaderWithMeter}
-        progress={progress}
-      />
-    </HashRouter>
-  )
-}
-
-function AppWrapper({
-  displayHeaderWithMeter,
-  progress,
-}: {
-  displayHeaderWithMeter: boolean
-  progress: number
-}): JSX.Element {
-  const location = useLocation()
-  const isOnChatPage = location.pathname === '/chat'
 
   return (
     <AppContent
