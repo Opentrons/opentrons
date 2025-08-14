@@ -6,10 +6,7 @@ import {
   Icon,
   StyledText,
 } from '@opentrons/components'
-import {
-  FLEX_ROBOT_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
-} from '@opentrons/shared-data'
+import { getModuleDeckLabel } from '@opentrons/shared-data'
 import { getFullStackFromLabwares } from '@opentrons/step-generation'
 
 import { LabwareSlotDetails } from './LabwareSlotDetails'
@@ -74,7 +71,6 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
     Object.values(wasteChuteEntities).some(
       trash => trash.location.split('cutout')[1] === slotId
     )
-  const tcSlot = robotType === FLEX_ROBOT_TYPE ? 'A1+B1' : '7,8,10,11'
   return (
     <div className={styles.slot_container}>
       <div className={styles.command_step}>
@@ -105,10 +101,11 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
             <StyledText desktopStyle="bodyLargeSemiBold">Slot</StyledText>
             <DeckInfoLabel
               deckLabel={
-                moduleOnSlot != null &&
-                moduleEntities[moduleOnSlot[0]].type ===
-                  THERMOCYCLER_MODULE_TYPE
-                  ? tcSlot
+                moduleOnSlot != null
+                  ? getModuleDeckLabel(
+                      moduleEntities[moduleOnSlot[0]].type,
+                      slotId
+                    )
                   : slotId
               }
             />

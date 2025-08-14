@@ -11,6 +11,7 @@ nav:
       - HEPA/UV Module: '!include hepa-uv/mkdocs.yml'
       - Thermocycler Module: '!include thermocycler-manual/mkdocs.yml'
       - Temperature Module: '!include temperature-module/mkdocs.yml'
+      - Heater-Shaker Module: '!include heater-shaker/mkdocs.yml'
   - Protocol Designer: '!include protocol-designer/mkdocs.yml'
   - Python API: https://docs.opentrons.com/v2/
 
