@@ -107,7 +107,7 @@ export function SelectLabwareOnAdapter(
               return (
                 <CustomizeExpandButton
                   enableStackingFF={enableStacking}
-                  loadName={loadName}
+                  isNestedDefALid={false}
                   allowInputField={false}
                   key={`${index}_${category}_${loadName}_${tiprackDefUri}`}
                   id={`${index}_${category}_${loadName}_${tiprackDefUri}`}
@@ -186,7 +186,9 @@ export function SelectLabwareOnAdapter(
                 <Fragment key={`${loadName}_${category}`}>
                   <CustomizeExpandButton
                     enableStackingFF={enableStacking}
-                    loadName={nestedDef.parameters.loadName}
+                    isNestedDefALid={
+                      nestedDef.allowedRoles?.includes('lid') ?? false
+                    }
                     allowInputField={lidLoadNames.includes(
                       nestedDef.parameters.loadName
                     )}

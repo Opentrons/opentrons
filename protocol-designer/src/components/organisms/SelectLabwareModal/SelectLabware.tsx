@@ -181,7 +181,9 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
                       <Fragment key={`${category}_${loadName}`}>
                         <CustomizeExpandButton
                           enableStackingFF={enableStacking}
-                          loadName={loadName}
+                          isNestedDefALid={
+                            def.allowedRoles?.includes('lid') ?? false
+                          }
                           allowInputField={
                             onFlexStacker || lidLoadNames.includes(loadName)
                           }

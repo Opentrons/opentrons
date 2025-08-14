@@ -31,7 +31,7 @@ describe('CustomizeExpandButton', () => {
       buttonValue: 'mockValue',
       onChange: vi.fn(),
       allowInputField: false,
-      loadName: 'mockLoadName',
+      isNestedDefALid: false,
     }
   })
 

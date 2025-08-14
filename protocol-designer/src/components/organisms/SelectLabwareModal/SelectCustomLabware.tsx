@@ -99,7 +99,9 @@ export function SelectCustomLabware(
             return (
               <CustomizeExpandButton
                 enableStackingFF={enableStacking}
-                loadName={customLabwareDefs[uri].parameters.loadName}
+                isNestedDefALid={
+                  customLabwareDefs[uri].allowedRoles?.includes('lid') ?? false
+                }
                 allowInputField={onFlexStacker}
                 key={`${index}_${uri}`}
                 id={`${index}_${uri}`}

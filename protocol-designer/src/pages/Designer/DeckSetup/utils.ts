@@ -189,14 +189,31 @@ const getStackerDefinitionsFromLoadName = (
   defs: LabwareDefByDefURI,
   loadName: string
 ): string[] | null => {
-  const labwareDefURI = Object.entries(defs)
+  const matchingLabwares: Array<{
+    labwareDefUri: string
+    loadName: string
+  }> = Object.entries(defs)
     .filter(([, { compatibleParentLabware }]) =>
       compatibleParentLabware?.includes(loadName)
     )
     .reverse()
-    .map(([labwareDefUri]) => labwareDefUri)
+    .map(([labwareDefUri, def]) => ({
+      labwareDefUri,
+      loadName: def.parameters.loadName,
+    }))
 
-  return labwareDefURI
+  //  TODO: remove this when we allow stacking of all labware on itself
+  //  in PD
+  if (
+    loadName === 'opentrons_96_wellplate_200ul_pcr_full_skirt' &&
+    matchingLabwares.some(labware => labware.loadName === loadName)
+  ) {
+    return matchingLabwares
+      .filter(labware => labware.loadName !== loadName)
+      .map(labware => labware.labwareDefUri)
+  }
+
+  return matchingLabwares.map(labware => labware.labwareDefUri)
 }
 
 const CATEGORIES_WITH_NO_LID = [
@@ -219,9 +236,9 @@ export const getStackerDefinitions = (
     category != null && !CATEGORIES_WITH_NO_LID.includes(category)
       ? universalLidURI
       : null
-  const supportedDef = getStackerDefinitionsFromLoadName(defs, loadName)
+  const supportedDefs = getStackerDefinitionsFromLoadName(defs, loadName)
   return [
-    ...(supportedDef != null ? supportedDef : []),
+    ...(supportedDefs != null ? supportedDefs : []),
     ...(universalLid != null ? [universalLid] : []),
   ]
 }

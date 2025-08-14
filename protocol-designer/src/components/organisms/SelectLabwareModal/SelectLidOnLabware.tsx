@@ -70,7 +70,7 @@ export function SelectLidOnLabware(
           return (
             <CustomizeExpandButton
               enableStackingFF={enableStacking}
-              loadName={def.parameters.loadName}
+              isNestedDefALid={def.allowedRoles?.includes('lid') ?? false}
               allowInputField={lidLoadNames.includes(def.parameters.loadName)}
               key={`${category}_${loadName}_${defUri}`}
               id={`${category}_${loadName}_${defUri}`}
