@@ -41,6 +41,7 @@ from ...types import (
     InStackerHopperLocation,
     StackerStoredLabwareGroup,
     ModuleLocation,
+    StackerLabwareMovementStrategy,
 )
 
 if TYPE_CHECKING:
@@ -59,11 +60,11 @@ class StoreParams(BaseModel):
         ...,
         description="Unique ID of the flex stacker.",
     )
-    manualMove: bool | SkipJsonSchema[None] = Field(
-        None,
+    moveStrategy: StackerLabwareMovementStrategy | SkipJsonSchema[None] = Field(
+        StackerLabwareMovementStrategy.AUTOMATIC,
         description=(
-            "If true, indicates that the store action is being performed manually, "
-            "as done in error recovery, without moving the stacker hardware."
+            "If manual, indicates that labware has been moved to the hopper "
+            "manually by the user, as required in error recovery."
         ),
     )
 
@@ -211,7 +212,10 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
         if stacker_hw is not None:
             stacker_hw.set_stacker_identify(True)
 
-        if not params.manualMove and stacker_hw is not None:
+        if (
+            params.moveStrategy is StackerLabwareMovementStrategy.AUTOMATIC
+            and stacker_hw is not None
+        ):
             try:
                 await stacker_hw.store_labware(
                     labware_height=stacker_state.get_pool_height_minus_overlap()

@@ -37,6 +37,7 @@ from opentrons.protocol_engine.types import (
     InStackerHopperLocation,
     OnCutoutFixtureLocationSequenceComponent,
     StackerStoredLabwareGroup,
+    StackerLabwareMovementStrategy,
 )
 from opentrons.protocol_engine.errors import (
     CannotPerformModuleAction,
@@ -444,7 +445,10 @@ async def test_store_raises_if_labware_does_not_match(
         await subject.execute(data)
 
 
-@pytest.mark.parametrize("manual_move", [False, True])
+@pytest.mark.parametrize(
+    "move_strategy",
+    [StackerLabwareMovementStrategy.AUTOMATIC, StackerLabwareMovementStrategy.MANUAL],
+)
 async def test_store(
     decoy: Decoy,
     state_view: StateView,
@@ -453,10 +457,10 @@ async def test_store(
     subject: StoreImpl,
     stacker_hardware: FlexStacker,
     flex_50uL_tiprack: LabwareDefinition,
-    manual_move: bool,
+    move_strategy: StackerLabwareMovementStrategy,
 ) -> None:
     """It should store the labware on the stack."""
-    data = flex_stacker.StoreParams(moduleId=stacker_id, manualMove=manual_move)
+    data = flex_stacker.StoreParams(moduleId=stacker_id, moveStrategy=move_strategy)
 
     fs_module_substate = FlexStackerSubState(
         module_id=stacker_id,
@@ -517,7 +521,7 @@ async def test_store(
 
     decoy.verify(
         await stacker_hardware.store_labware(labware_height=4),
-        times=1 if not manual_move else 0,
+        times=1 if move_strategy == StackerLabwareMovementStrategy.AUTOMATIC else 0,
     )
 
     assert result == SuccessData(
