@@ -1,5 +1,5 @@
 ---
-title: "Stacker Module: Installing the Stacker"
+title: "Flex Stacker: Installing the Stacker"
 ---
 
 # Installing the Stacker

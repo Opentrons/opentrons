@@ -1,5 +1,5 @@
 ---
-title: "Stacker Module: Safety and Compliance"
+title: "Flex Stacker: Safety and Compliance"
 ---
 
 # Safety Information and Regulatory Compliance

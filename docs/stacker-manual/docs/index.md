@@ -1,5 +1,5 @@
 ---
-title: "Stacker Module GEN1 Instruction Manual"
+title: "Opentrons Flex Stacker Instruction Manual"
 hide: toc
 ---
 

@@ -1,5 +1,5 @@
 ---
-title: "Stacker Module: Loading Labware"
+title: "Flex Stacker: Loading Labware"
 ---
 
 ## Loading Labware

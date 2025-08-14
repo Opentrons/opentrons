@@ -1,5 +1,5 @@
 ---
-title: "Stacker Module: Additional Product Information"
+title: "Flex Stacker: Additional Product Information"
 ---
 
 # Additional Product Information

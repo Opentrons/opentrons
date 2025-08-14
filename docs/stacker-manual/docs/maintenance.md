@@ -1,5 +1,5 @@
 ---
-title: "Stacker Module: Maintenance and Cleaning"
+title: "Flex Stacker: Maintenance and Cleaning"
 ---
 
 # Maintenance and Cleaning
