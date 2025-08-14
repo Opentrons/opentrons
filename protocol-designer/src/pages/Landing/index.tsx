@@ -32,6 +32,8 @@ import type { ThunkDispatch } from '../../types'
 
 import welcomeImage from '../../assets/images/welcome_page.png'
 
+const ACCEPTED_FILE_TYPES = '.py,.json'
+
 export function Landing(): JSX.Element {
   const { t } = useTranslation('shared')
   const dispatch: ThunkDispatch<any> = useDispatch()
@@ -151,6 +153,7 @@ export function Landing(): JSX.Element {
             ref={fileInputRef}
             aria-label={t('import')}
             className={styles.hiddenInput}
+            accept={ACCEPTED_FILE_TYPES}
           />
         </label>
       </div>
