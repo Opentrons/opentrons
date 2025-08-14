@@ -48,7 +48,7 @@ THRESHOLD = 4.5
 # sensitivity values for bottom and top zones:
 ALPHA_LOW = 0.2
 ALPHA_HIGH = 0.4
-DELTA_TOLERANCE = 0.15
+DELTA_TOLERANCE = 0.2
 
 
 ###########################################
@@ -93,10 +93,11 @@ def add_parameters(parameters: ParameterContext) -> None:
         minimum=1.0,
     )
 
+    #generally, the first dispense should be 1/25 the max volume. 
     parameters.add_float(
         display_name="First Dispense",
         variable_name="first_dispense",
-        description="Set starting dispense amount",
+        description="Set a starting dispense amount that would reach 2-3mm in the well.",
         default=50.0,
         maximum=99999.0,
         minimum=1.0,
@@ -423,13 +424,6 @@ def run(ctx: ProtocolContext) -> None:
         liquid_racks
     ) = _setup(ctx)
 
-    # Constants
-    max_volume = labware["A1"].max_volume
-
-    #these are all magic numbers
-    min_step = max(max_volume * 0.01, 5) #clamped to 5uL
-    max_step = max_volume * 0.25
-
     # Initialize state
     corrected_height = 0.0
     corrected_heights = [0.0]
@@ -442,6 +436,12 @@ def run(ctx: ProtocolContext) -> None:
     current_well = "none"
     status = "pass"
     udv_table = []
+    num_wells = len(wells)
+    max_volume = labware["A1"].max_volume
+
+    # volume clamps, these can be changed to whatever. 
+    min_step = max(max_volume * 0.01, 5) #clamped to 5uL
+    max_step = max_volume * 0.25
 
     # deadband to avoid unnecessary step volume corrections
     lower_bound = target_height - target_height * DELTA_TOLERANCE
@@ -449,6 +449,8 @@ def run(ctx: ProtocolContext) -> None:
 
     _store_dial_baseline(ctx, probe_pipette, dial)
     _write_line_to_csv(ctx, CSV_HEADER)
+
+    #### Helper Functions 
 
     def pick_up_tips() -> None:
         if not probe_pipette.has_tip:
@@ -466,10 +468,10 @@ def run(ctx: ProtocolContext) -> None:
     def get_alpha_for_height(h: float) -> float:
         return ALPHA_LOW if h < THRESHOLD else ALPHA_HIGH
 
-    # Proportional Controller
+    # Proportional Controller 
     def adaptive_volume_step(
         hdelta: float, height: float, step_volume: float, target_height: float
-    ) -> float:  # desired steady state height step in mm
+    ) -> float: 
         nonlocal lower_bound, upper_bound
 
         alpha = get_alpha_for_height(height)
@@ -514,22 +516,20 @@ def run(ctx: ProtocolContext) -> None:
 
     ################ Begin Protocol
     
-    num_wells = len(wells)
+    # initial setup
     write_trial_log(udv_table)
-
-    # probe source well
     liq_pipette.pick_up_tip()
     _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating()) 
 
-    #TODO: check if first dispense under 2.5mm 
     step_volume = first_dispense
 
     while dispense_volume < max_volume:
 
+        #reposition pipette for dispense 
         for liquid_rack in liquid_racks:
             props = ethanol.get_for(liq_pipette, liquid_rack)
-            props.aspirate.aspirate_position.position_reference = "well-bottom"
-            props.aspirate.aspirate_position.offset.z = max(corrected_height - 1, 2)
+            props.dispense.dispense_position.position_reference = "well-bottom"
+            props.dispense.dispense_position.offset.z = max(corrected_height - 1, 2)
 
         drop_tips()
         pick_up_tips()
@@ -542,20 +542,18 @@ def run(ctx: ProtocolContext) -> None:
 
         tip_z_error = _get_tip_z_error(ctx, probe_pipette, dial)
 
-        # Prevent overflow before dispensing
-        if (dispense_volume + step_volume) > max_volume:
-            step_volume = max_volume - dispense_volume
-
         # Dispense
         dispense_volume += step_volume
+        liq_pipette.flow_rate.dispense = 50
         liq_pipette.transfer_with_liquid_class(
             ethanol,
-            dispense_volume if liq_mount == "1" else dispense_volume / 8,
+            dispense_volume / liq_pipette.channels,
             src["A1"],
             labware[current_well],
             new_tip="never",
             return_tip=False,
         )
+        liq_pipette.blow_out()
 
         # Measure liquid height
         height = _get_height_of_liquid_in_well(
@@ -593,7 +591,6 @@ def run(ctx: ProtocolContext) -> None:
         step += 1
 
     drop_tips()
-
 
     #create labware def 
     passed_trials = [trial for trial in udv_table if trial[6] == "pass"]
