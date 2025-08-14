@@ -1,0 +1,223 @@
+# Tutorial
+
+## Introduction
+
+This tutorial will guide you through creating a Python protocol file from scratch. At the end of this process you'll have a complete protocol that can run on a Flex or an OT-2 robot. If you don’t have a Flex or an OT-2 (or if you’re away from your lab, or if your robot is in use), you can use the same file to simulate the protocol on your computer instead.
+
+### What You'll Automate
+
+The lab task that you'll automate in this tutorial is **serial dilution**: taking a solution and progressively diluting it by transferring it stepwise across a plate from column 1 to column 12. With just a dozen or so lines of code, you can instruct your robot to perform the hundreds of individual pipetting actions necessary to fill an entire 96-well plate. And all of those liquid transfers will be done automatically, so you’ll have more time to do other work in your lab.
+
+## Before You Begin
+
+You're going to write some Python code, but you don't need to be a Python expert to get started writing Opentrons protocols. You should know some basic Python syntax, like how it uses [indentation](https://docs.python.org/3/reference/lexical_analysis.html#indentation) to group blocks of code, dot notation for [calling methods](https://docs.python.org/3/tutorial/classes.html#method-objects), and the format of [lists](https://docs.python.org/3/tutorial/introduction.html#lists) and [dictionaries](https://docs.python.org/3/tutorial/datastructures.html#dictionaries). You’ll also be using [common control structures](https://docs.python.org/3/tutorial/controlflow.html#if-statements) like `if` statements and `for` loops.
+
+You should write your code in your favorite plaintext editor or development environment and save it in a file with a `.py` extension, like `dilution-tutorial.py`.
+
+To simulate your code, you'll need [Python 3.10](https://www.python.org/downloads/) and the [pip package installer](https://pip.pypa.io/en/stable/getting-started/). Newer versions of Python aren't yet supported by the Python Protocol API. If you don't use Python 3.10 as your system Python, we recommend using [pyenv](https://github.com/pyenv/pyenv) to manage multiple Python versions.
+
+## Hardware and Labware
+
+Before running a protocol, you’ll want to have the right kind of hardware and labware ready for your Flex or OT-2.
+
+- **Flex users** should review Chapter 2: Installation and Relocation in the [instruction manual](https://insights.opentrons.com/hubfs/Products/Flex/Opentrons%20Flex%20Manual.pdf). Specifically, see the pipette information in the "Instrument Installation and Calibration" section. You can use either a 1-channel or 8-channel pipette for this tutorial. Most Flex code examples will use a [Flex 1-Channel 1000 µL pipette](https://shop.opentrons.com/opentrons-flex-1-channel-pipette/).
+
+- **OT-2 users** should review the robot setup and pipette information on the [Get Started page](https://support.opentrons.com/s/ot2-get-started). Specifically, see [attaching pipettes](https://support.opentrons.com/s/article/Get-started-Attach-pipettes) and [initial calibration](https://support.opentrons.com/s/article/Get-started-Calibrate-the-deck). You can use either a single-channel or 8-channel pipette for this tutorial. Most OT-2 code examples will use a [P300 Single-Channel GEN2](https://shop.opentrons.com/single-channel-electronic-pipette-p20/) pipette.
+
+The Flex and OT-2 use similar labware for serial dilution. The tutorial code will use the labware listed in the table below, but as long as you have labware of each type you can modify the code to run with your labware.
+
+| Labware type | Labware name | API load name |
+|--------------|-------------|---------------|
+| Reservoir | [NEST 12 Well Reservoir 15 mL](https://labware.opentrons.com/nest_12_reservoir_15ml) | `nest_12_reservoir_15ml` |
+| Well plate | [NEST 96 Well Plate 200 µL Flat](https://labware.opentrons.com/nest_96_wellplate_200ul_flat) | `nest_96_wellplate_200ul_flat` |
+| Flex tip rack | [Opentrons Flex Tips, 200 µL](https://shop.opentrons.com/opentrons-flex-tips-200-l/) | `opentrons_flex_96_tiprack_200ul` |
+| OT-2 tip rack | [Opentrons 96 Tip Rack](https://labware.opentrons.com/?category=tipRack&manufacturer=Opentrons) | `opentrons_96_tiprack_300ul` |
+
+For the liquids, you can use plain water as the diluent and water dyed with food coloring as the solution.
+
+## Create a Protocol File
+
+Let’s start from scratch to create your serial dilution protocol. Open up a new file in your editor and start with:
+```python
+from opentrons import protocol_api
+```
+Throughout this documentation, you’ll see protocols that begin with the `import` statement shown above. It identifies your code as an Opentrons protocol. This statement is not required, but including it is a good practice and allows most code editors to provide helpful autocomplete suggestions.
+
+Everything else in the protocol file is required. Next, you’ll specify the version of the API you’re using. Then comes the core of the protocol: defining a single `run()` function that provides the locations of your labware, states which kind of pipettes you’ll use, and finally issues the commands that the robot will perform.
+
+For this tutorial, you’ll write very little Python outside of the `run()` function. But for more complex applications it’s worth remembering that your protocol file *is* a Python script, so any Python code that can run on your robot can be a part of a protocol.
+
+## Metadata
+
+Every protocol needs to have a metadata dictionary with information about the protocol. At minimum, you need to specify what [version of the API](../versioning.md) the protocol requires. The scripts for this tutorial were validated against API version 2.16, so specify:
+```python
+metadata = {"apiLevel": "2.16"}
+```
+You can include any other information you like in the metadata dictionary. The fields `protocolName`, `description`, and `author` are all displayed in the Opentrons App, so it’s a good idea to expand the dictionary to include them:
+```python
+metadata = {
+    "apiLevel": "2.16",
+    "protocolName": "Serial Dilution Tutorial",
+    "description": """This protocol is the outcome of following the Python Protocol API Tutorial located at https://docs.opentrons.com/v2/tutorial.html. It takes a solution and progressively dilutes it by transferring it stepwise across a plate.""",
+    "author": "New API User"
+}
+```
+If you have a Flex, or are using an OT-2 with API v2.15 (or higher), we recommend adding a `requirements` section to your code. See the Requirements section below.
+
+## Requirements
+
+The `requirements` code block can appear before *or* after the `metadata` code block in a Python protocol. It uses the following syntax and accepts two arguments: `robotType` and `apiLevel`.
+
+- **Flex:** The `requirements` block is always required. And, the API version does not go in the `metadata` section. The API version belongs in the `requirements`.
+    ```python
+    requirements = {"robotType": "Flex", "apiLevel": "2.16"}
+    ```
+- **OT-2:** The `requirements` block is optional, but including it is a recommended best practice, particularly if you’re using API version 2.15 or greater. If you do use it, remember to remove the API version from the `metadata`.
+    ```python
+    requirements = {"robotType": "OT-2", "apiLevel": "2.16"}
+    ```
+
+## The `run()` function
+
+Now it’s time to actually instruct the Flex or OT-2 how to perform serial dilution. All of this information is contained in a single Python function, which has to be named `run`. This function takes one argument, which is the *protocol context*.
+```python
+def run(protocol: protocol_api.ProtocolContext):
+```
+With the protocol context argument named and typed, you can start calling methods on `protocol` to add labware and hardware.
+
+### Labware
+For serial dilution, you need to load a tip rack, reservoir, and 96-well plate on the deck of your Flex or OT-2. Loading labware is done with the [`ProtocolContext.load_labware`][opentrons.protocol_api.ProtocolContext.load_labware] method, which takes two arguments: the standard labware name as defined in the [Opentrons Labware Library](https://labware.opentrons.com/), and the position where you'll place the labware on the robot's deck.
+
+=== "Flex"
+```python
+def run(protocol: protocol_api.ProtocolContext):
+    tips = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "D1")
+    reservoir = protocol.load_labware("nest_12_reservoir_15ml", "D2")
+    plate = protocol.load_labware("nest_96_wellplate_200ul_flat", "D3")
+```
+Now the robot will expect to find labware in a configuration that looks like this:
+
+![Initial Deck State – Flex](../img/tutorial/initial-deck-map-flex.png)
+
+=== "OT-2"
+```python
+def run(protocol: protocol_api.ProtocolContext):
+    tips = protocol.load_labware("opentrons_96_tiprack_300ul", 1)
+    reservoir = protocol.load_labware("nest_12_reservoir_15ml", 2)
+    plate = protocol.load_labware("nest_96_wellplate_200ul_flat", 3)
+```
+Now the robot will expect to find labware in a configuration that looks like this:
+
+![Initial Deck State – OT-2](../img/tutorial/initial-deck-map.png)
+
+You may notice that these deck maps don't show where the liquids will be at the start of the protocol. Liquid definitions aren’t required in Python protocols, unlike protocols made in [Protocol Designer](https://designer.opentrons.com/). If you want to identify liquids, see [Labeling Liquids in Wells](../new_labware.md#labeling-liquids-in-wells). (Sneak peek: you’ll put the diluent in column 1 of the reservoir and the solution in column 2 of the reservoir.)
+
+### Trash Bin
+Flex and OT-2 both come with a trash bin for disposing used tips.
+
+- The OT-2 trash bin is fixed in slot 12. Since it can't go anywhere else on the deck, you don't need to write any code to tell the API where it is.
+- Flex lets you put a [trash bin](../modules/setup.md#configure-trash-bin) in multiple locations on the deck. You can even have more than one trash bin, or none at all (if you use the [waste chute](../modules/setup.md#configure-waste-chute) instead, or if your protocol never trashes any tips). For serial dilution, you'll need to dispose used tips, so you also need to tell the API where the trash container is located on your robot. Loading a trash bin on Flex is done with the `load_trash_bin` method:
+```python
+trash = protocol.load_trash_bin("A3")
+```
+
+### Pipettes
+Next you’ll specify what pipette to use in the protocol. Loading a pipette is done with the `load_instrument` method, which takes three arguments: the name of the pipette, the mount it’s installed in, and the tip racks it should use when performing transfers. Load whatever pipette you have installed in your robot by using its [standard pipette name](../new_pipette.md). Here’s how to load the pipette in the left mount and instantiate it as a variable named `left_pipette`:
+
+#### Flex
+```python
+left_pipette = protocol.load_instrument("flex_1channel_1000", "left", tip_racks=[tips])
+```
+#### OT-2
+```python
+left_pipette = protocol.load_instrument("p300_single_gen2", "left", tip_racks=[tips])
+```
+
+> [!note]
+> The value of `tip_racks` is in brackets, indicating that it’s a list. This serial dilution protocol only uses one tip rack, but some protocols require more tips, so you can assign them to a pipette all at once, like `tip_racks=[tips1, tips2]`.
+
+## Commands
+Finally, all of your labware and hardware is in place, so it’s time to give the robot pipetting commands. The required steps of the serial dilution process break down into three main phases:
+
+1. Measure out equal amounts of diluent from the reservoir to every well on the plate.
+2. Measure out equal amounts of solution from the reservoir into wells in the first column of the plate.
+3. Move a portion of the combined liquid from column 1 to 2, then from column 2 to 3, and so on all the way to column 12.
+
+Thanks to the flexibility of the API's `transfer` method, which combines many [building block commands](../new_atomic_commands.md) into one call, each of these phases can be accomplished with a single line of code! You’ll just have to write a few more lines of code to repeat the process for as many rows as you want to fill.
+
+Let’s start with the diluent. This phase takes a larger quantity of liquid and spreads it equally to many wells. `transfer()` can handle this all at once, because it accepts either a single well or a list of wells for its source and destination:
+```python
+left_pipette.transfer(100, reservoir["A1"], plate.wells())
+```
+
+In plain English, you've instructed the robot, “For every well on the plate, aspirate 100 µL of fluid from column 1 of the reservoir and dispense it in the well.” That’s how we understand this line of code as scientists, yet the robot will understand and execute it as nearly 200 discrete actions.
+
+Now it’s time to start mixing in the solution. To do this row by row, nest the commands in a `for` loop:
+```python
+for i in range(8):
+    row = plate.rows()[i]
+```
+In each row, you first need to add solution. This will be similar to what you did with the diluent, but putting it only in column 1 of the plate. It’s best to mix the combined solution and diluent thoroughly, so add the optional `mix_after` argument to `transfer()`:
+```python
+left_pipette.transfer(100, reservoir["A2"], row[0], mix_after=(3, 50))
+```
+Finally, it’s time to dilute the solution down the row. One approach would be to nest another `for` loop here, but instead let’s use another feature of the `transfer()` method, taking lists as the source and destination arguments:
+```python
+left_pipette.transfer(100, row[:11], row[1:], mix_after=(3, 50))
+```
+This condenses all of the subsequent transfers down the row into a single line of code.
+
+All that remains is for the loop to repeat these steps, filling each row down the plate.
+
+That’s it! If you’re using a single-channel pipette, you’re ready to try out your protocol.
+
+### 8-Channel Pipette
+If you’re using an 8-channel pipette, you’ll need to make a couple tweaks to the single-channel code from above. Most importantly, whenever you target a well in row A of a plate with an 8-channel pipette, it will move its topmost tip to row A, lining itself up over the entire column.
+
+Thus, when adding the diluent, instead of targeting every well on the plate, you should only target the top row:
+```python
+left_pipette.transfer(100, reservoir["A1"], plate.rows()[0])
+```
+And by accessing an entire column at once, the 8-channel pipette effectively implements the `for` loop in hardware, so you’ll need to remove it:
+```python
+row = plate.rows()[0]
+left_pipette.transfer(100, reservoir["A2"], row[0], mix_after=(3, 50))
+left_pipette.transfer(100, row[:11], row[1:], mix_after=(3, 50))
+```
+Instead of tracking the current row in the `row` variable, this code sets it to always be row A (index 0).
+
+## Try Your Protocol
+There are two ways to try out your protocol: simulation on your computer, or a live run on a Flex or OT-2. Even if you plan to run your protocol on a robot, it’s a good idea to check the simulation output first.
+
+If you get any errors in simulation, or you don't get the outcome you expected when running your protocol, you can check your code against these reference protocols on GitHub:
+- [Flex: Single-channel serial dilution](https://github.com/Opentrons/opentrons/blob/edge/api/docs/v2/example_protocols/dilution_tutorial_flex.py)
+- [Flex: 8-channel serial dilution](https://github.com/Opentrons/opentrons/blob/edge/api/docs/v2/example_protocols/dilution_tutorial_multi_flex.py)
+- [OT-2: Single-channel serial dilution](https://github.com/Opentrons/opentrons/blob/edge/api/docs/v2/example_protocols/dilution_tutorial.py)
+- [OT-2: 8-channel serial dilution](https://github.com/Opentrons/opentrons/blob/edge/api/docs/v2/example_protocols/dilution_tutorial_multi.py)
+
+### In Simulation
+Simulation doesn’t require having a robot connected to your computer. You just need to install the [Opentrons Python module](https://pypi.org/project/opentrons/) using pip (`pip install opentrons`). This will give you access to the `opentrons_simulate` command-line utility (`opentrons_simulate.exe` on Windows).
+
+To see a text preview of the steps your Flex or OT-2 will take, use the change directory (`cd`) command to navigate to the location of your saved protocol file and run:
+```bash
+opentrons_simulate dilution-tutorial.py
+```
+This should generate a lot of output! As written, the protocol has about 1000 steps. In fact, using a single-channel pipette for serial dilution across the whole plate will take about half an hour — plenty of time to grab a coffee while your robot pipettes for you! ☕️
+
+If that’s too long, you can always cancel your run partway through or modify `for i in range(8)` to loop through fewer rows.
+
+### On a Robot
+The simplest way to run your protocol on a Flex or OT-2 is to use the [Opentrons App](https://opentrons.com/ot-app). When you first launch the Opentrons App, you will see the Protocols screen. (Click **Protocols** in the left sidebar to access it at any other time.) Click **Import** in the top right corner to reveal the Import a Protocol pane. Then click **Choose File** and find your protocol in the system file picker, or drag and drop your protocol file into the well.
+
+You should see “Protocol - Serial Dilution Tutorial” (or whatever `protocolName` you entered in the metadata) in the list of protocols. Click the three-dot menu (⋮) for your protocol and choose **Start setup**.
+
+If you have any remaining calibration tasks to do, you can finish them up here. Below the calibration section is a preview of the initial deck state. Optionally you can run Labware Position Check, or you can go ahead and click **Proceed to Run**.
+
+On the Run tab, you can double-check the Run Preview, which is similar to the command-line simulation output. Make sure all your labware and liquids are in the right place, and then click **Start run**. The run log will update in real time as your robot proceeds through the steps.
+
+When it’s all done, check the results of your serial dilution procedure — you should have a beautiful dye gradient running across the plate!
+
+![Result of Serial Dilution](../img/tutorial/serial-dilution-result.jpg)
+
+## Next Steps
+This tutorial has relied heavily on the `transfer()` method, but there's much more that the Python Protocol API can do. Many advanced applications use [building block commands](../new_atomic_commands.md) for finer control over the robot. These commands let you aspirate and dispense separately, add air gaps, blow out excess liquid, move the pipette to any location, and more. For protocols that use [Opentrons hardware modules](../modules/new_modules.md), there are methods to control their behavior. And all of the API's classes and methods are catalogued in the [API Reference](../protocol-api-reference.md).

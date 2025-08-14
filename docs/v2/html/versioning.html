@@ -1,0 +1,2059 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+<meta property="og:title" content="Versioning" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://docs.opentrons.com/v2/versioning.html" />
+<meta property="og:site_name" content="Opentrons Python Protocol API" />
+<meta property="og:description" content="How to choose the right Python API version for your protocol." />
+<meta property="og:image" content="https://docs.opentrons.com/v2/_static/PythonAPI.png" />
+<meta property="og:image:alt" content="Opentrons Python Protocol API" />
+
+    <title>Versioning &#8212; Opentrons Python API V2 Documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <link rel="stylesheet" href="_static/new-nav.css" type="text/css" />
+    <link rel="stylesheet" href="_static/nav.css" type="text/css" />
+    <link rel="stylesheet" href="_static/override_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/banners.css" type="text/css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="shortcut icon" href="_static/OTfavicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Labware" href="new_labware.html" />
+    <link rel="prev" title="Tutorial" href="tutorial.html" />  
+<link
+  rel="stylesheet"
+  href="_static/custom.css"
+  type="text/css"
+/>
+ 
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=0.9, maximum-scale=0.9"
+/>
+<script src="_static/Akko-Pro-All.js"></script>
+<!-- INTERCOM -->
+<script>
+  window.intercomSettings = {
+    app_id: 'ukpodv2l',
+  }
+</script>
+
+  </head><body>
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WCDX9CX"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<header id="nav"><!doctype html>
+<html lang="en">
+<head>
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700;800&display=swap" rel="preload" as="style" onload="this.onload=null; this.rel='stylesheet';">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
+
+    
+<!-- Search Engine Optimization by Rank Math PRO - https://rankmath.com/ -->
+<title>Remote Nav - Opentrons</title>
+<meta name="robots" content="follow, noindex, noarchive"/>
+<meta property="og:locale" content="en_US" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Remote Nav - Opentrons" />
+<meta property="og:url" content="https://opentrons.com/remote-nav" />
+<meta property="og:site_name" content="Opentrons.com" />
+<meta property="og:updated_time" content="2023-07-28T19:49:55+00:00" />
+<meta property="og:image" content="https://opentrons.com/wp-content/uploads/2023/03/Social-Share-1024x538.png" />
+<meta property="og:image:secure_url" content="https://opentrons.com/wp-content/uploads/2023/03/Social-Share-1024x538.png" />
+<meta property="og:image:width" content="1024" />
+<meta property="og:image:height" content="538" />
+<meta property="og:image:alt" content="Remote Nav" />
+<meta property="og:image:type" content="image/png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Remote Nav - Opentrons" />
+<meta name="twitter:image" content="https://opentrons.com/wp-content/uploads/2023/03/Social-Share-1024x538.png" />
+<!-- /Rank Math WordPress SEO plugin -->
+
+<link rel="alternate" type="application/rss+xml" title="Opentrons &raquo; Feed" href="https://opentrons.com/feed" />
+<link rel="alternate" type="application/rss+xml" title="Opentrons &raquo; Comments Feed" href="https://opentrons.com/comments/feed" />
+<script type="text/javascript">
+/* <![CDATA[ */
+window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/15.0.3\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/15.0.3\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/opentrons.com\/wp-includes\/js\/wp-emoji-release.min.js?ver=6.5.5"}};
+/*! This file is auto-generated */
+!function(i,n){var o,s,e;function c(e){try{var t={supportTests:e,timestamp:(new Date).valueOf()};sessionStorage.setItem(o,JSON.stringify(t))}catch(e){}}function p(e,t,n){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);var t=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data),r=(e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(n,0,0),new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data));return t.every(function(e,t){return e===r[t]})}function u(e,t,n){switch(t){case"flag":return n(e,"\ud83c\udff3\ufe0f\u200d\u26a7\ufe0f","\ud83c\udff3\ufe0f\u200b\u26a7\ufe0f")?!1:!n(e,"\ud83c\uddfa\ud83c\uddf3","\ud83c\uddfa\u200b\ud83c\uddf3")&&!n(e,"\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7f","\ud83c\udff4\u200b\udb40\udc67\u200b\udb40\udc62\u200b\udb40\udc65\u200b\udb40\udc6e\u200b\udb40\udc67\u200b\udb40\udc7f");case"emoji":return!n(e,"\ud83d\udc26\u200d\u2b1b","\ud83d\udc26\u200b\u2b1b")}return!1}function f(e,t,n){var r="undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope?new OffscreenCanvas(300,150):i.createElement("canvas"),a=r.getContext("2d",{willReadFrequently:!0}),o=(a.textBaseline="top",a.font="600 32px Arial",{});return e.forEach(function(e){o[e]=t(a,e,n)}),o}function t(e){var t=i.createElement("script");t.src=e,t.defer=!0,i.head.appendChild(t)}"undefined"!=typeof Promise&&(o="wpEmojiSettingsSupports",s=["flag","emoji"],n.supports={everything:!0,everythingExceptFlag:!0},e=new Promise(function(e){i.addEventListener("DOMContentLoaded",e,{once:!0})}),new Promise(function(t){var n=function(){try{var e=JSON.parse(sessionStorage.getItem(o));if("object"==typeof e&&"number"==typeof e.timestamp&&(new Date).valueOf()<e.timestamp+604800&&"object"==typeof e.supportTests)return e.supportTests}catch(e){}return null}();if(!n){if("undefined"!=typeof Worker&&"undefined"!=typeof OffscreenCanvas&&"undefined"!=typeof URL&&URL.createObjectURL&&"undefined"!=typeof Blob)try{var e="postMessage("+f.toString()+"("+[JSON.stringify(s),u.toString(),p.toString()].join(",")+"));",r=new Blob([e],{type:"text/javascript"}),a=new Worker(URL.createObjectURL(r),{name:"wpTestEmojiSupports"});return void(a.onmessage=function(e){c(n=e.data),a.terminate(),t(n)})}catch(e){}c(n=f(s,u,p))}t(n)}).then(function(e){for(var t in e)n.supports[t]=e[t],n.supports.everything=n.supports.everything&&n.supports[t],"flag"!==t&&(n.supports.everythingExceptFlag=n.supports.everythingExceptFlag&&n.supports[t]);n.supports.everythingExceptFlag=n.supports.everythingExceptFlag&&!n.supports.flag,n.DOMReady=!1,n.readyCallback=function(){n.DOMReady=!0}}).then(function(){return e}).then(function(){var e;n.supports.everything||(n.readyCallback(),(e=n.source||{}).concatemoji?t(e.concatemoji):e.wpemoji&&e.twemoji&&(t(e.twemoji),t(e.wpemoji)))}))}((window,document),window._wpemojiSettings);
+/* ]]> */
+</script>
+<style id='wp-emoji-styles-inline-css' type='text/css'>
+
+	img.wp-smiley, img.emoji {
+		display: inline !important;
+		border: none !important;
+		box-shadow: none !important;
+		height: 1em !important;
+		width: 1em !important;
+		margin: 0 0.07em !important;
+		vertical-align: -0.1em !important;
+		background: none !important;
+		padding: 0 !important;
+	}
+</style>
+<style id='rank-math-toc-block-style-inline-css' type='text/css'>
+.wp-block-rank-math-toc-block nav ol{counter-reset:item}.wp-block-rank-math-toc-block nav ol li{display:block}.wp-block-rank-math-toc-block nav ol li:before{content:counters(item, ".") ". ";counter-increment:item}
+
+</style>
+<style id='classic-theme-styles-inline-css' type='text/css'>
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+</style>
+<style id='global-styles-inline-css' type='text/css'>
+body{--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #FFFFFF;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--color--brand-blue: #006CFA;--wp--preset--color--brand-blue-dark: #17212d;--wp--preset--color--brand-blue-medium: #ACCFFF;--wp--preset--color--brand-blue-light: #F1F8FF;--wp--preset--color--brand-yellow: #F2B53C;--wp--preset--color--brand-gray: #707075;--wp--preset--color--brand-gray-medium: #E3E3E3;--wp--preset--color--brand-gray-light: #F8F8F8;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgba(252,185,0,1) 0%,rgba(255,105,0,1) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgba(255,105,0,1) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 13px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 36px;--wp--preset--font-size--x-large: 42px;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgba(255, 255, 255, 1), 6px 6px rgba(0, 0, 0, 1);--wp--preset--shadow--crisp: 6px 6px 0px rgba(0, 0, 0, 1);}:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}
+.wp-block-navigation a:where(:not(.wp-element-button)){color: inherit;}
+:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}
+:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}
+.wp-block-pullquote{font-size: 1.5em;line-height: 1.6;}
+</style>
+<link rel='stylesheet' id='auth0-widget-css' href='https://opentrons.com/wp-content/plugins/auth0/assets/css/main.css?ver=4.6.2' type='text/css' media='all' />
+<link rel='stylesheet' id='bigcommerce-styles-css' href='https://opentrons.com/wp-content/plugins/bigcommerce/assets/css/master.min.css?ver=5.1.2-4.39.09.12.2024' type='text/css' media='all' />
+<link rel='stylesheet' id='timberland-app-css' href='https://opentrons.com/wp-content/themes/timberland/theme/assets/build/css/app.css?id=e3cd5368a82afb21e5316b601787a0e5' type='text/css' media='all' />
+<link rel='stylesheet' id='youtube-popup-style-css' href='https://opentrons.com/wp-content/themes/timberland/theme/assets/styles/YouTubePopUp.css?ver=6.7.1' type='text/css' media='all' />
+<link rel='stylesheet' id='algolia-autocomplete-css' href='https://opentrons.com/wp-content/plugins/wp-search-with-algolia/css/algolia-autocomplete.css?ver=2.8.2' type='text/css' media='all' />
+<script type="text/javascript" src="https://opentrons.com/wp-includes/js/jquery/jquery.min.js?ver=3.7.1" id="jquery-core-js"></script>
+<script type="text/javascript" src="https://opentrons.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1" id="jquery-migrate-js"></script>
+<link rel="https://api.w.org/" href="https://opentrons.com/wp-json/" /><link rel="alternate" type="application/json" href="https://opentrons.com/wp-json/wp/v2/pages/1927" /><link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://opentrons.com/xmlrpc.php?rsd" />
+<link rel='shortlink' href='https://opentrons.com/?p=1927' />
+<link rel="alternate" type="application/json+oembed" href="https://opentrons.com/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fopentrons.com%2Fremote-nav" />
+<link rel="alternate" type="text/xml+oembed" href="https://opentrons.com/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fopentrons.com%2Fremote-nav&#038;format=xml" />
+		<!-- Segment Analytics Code -->
+		<script type="text/javascript" data-js="bc-segment-tracker">
+			!function(){var analytics=window.analytics||[];if(!analytics.initialize)if(analytics.invoked)window.console&&console.error&&console.error("Segment snippet included twice.");else{analytics.invoked=!0;analytics.methods=["trackSubmit","trackClick","trackLink","trackForm","pageview","identify","reset","group","track","ready","alias","debug","page","once","off","on"];analytics.factory=function(t){return function(){var e=Array.prototype.slice.call(arguments);e.unshift(t);analytics.push(e);return analytics}};for(var t=0;t<analytics.methods.length;t++){var e=analytics.methods[t];analytics[e]=analytics.factory(e)}analytics.loadPlatform=function(t,e,a,o){window[o||"analytics"]=analytics;window._analytics_js_global_name=o;analytics.platformSettings=e;analytics.platformPlan=a;var n=("https:"===document.location.protocol?"https://":"http://")+"cdn.segment.com/analytics.js/v1";t&&(n+="/"+t);var r=document.createElement("script");r.type="text/javascript";r.async=!0;r.src=n+"/platform/analytics.min.js";var i=document.getElementsByTagName("script")[0];i.parentNode.insertBefore(r,i)};analytics.SNIPPET_VERSION="4.0.0_platform";
+				analytics.loadPlatform(null, {},{},"analytics");
+				analytics.page()
+			}}();
+		</script>
+		<!-- End Segment Analytics Code -->
+		
+<style type='text/css'>
+.bc-btn,
+button.bc-btn,
+a.bc-btn,
+.entry-content .bc-btn,
+.entry-content button.bc-btn,
+.entry-content a.bc-btn,
+.bc-mini-cart .bc-btn,
+.bc-mini-cart button.bc-btn,
+.bc-mini-cart a.bc-btn,
+.bigcommerce-cart__item-count,
+.bc-account-login__form input[type="submit"] {
+	color: #fff;
+	background-color: #5273f4;
+}
+
+.bc-btn--inverse,
+button.bc-btn--inverse,
+a.bc-btn--inverse,
+.entry-content .bc-btn--inverse,
+.entry-content button.bc-btn--inverse,
+.entry-content a.bc-btn--inverse {
+	color: #5273f4;
+	background-color: #fff;
+	border-color: #5273f4;
+}
+
+.bc-btn--inverse:hover,
+.bc-btn--inverse:focus,
+button.bc-btn--inverse:hover,
+button.bc-btn--inverse:focus,
+a.bc-btn--inverse:hover,
+a.bc-btn--inverse:focus {
+	color: #fff;
+	background-color: #5273f4;
+	border-color: #5273f4;
+}
+
+.bc-video-play-icon {
+	background-color: #5273f4;
+}
+
+.bc-video-play-icon:before {
+	color: #fff;
+}
+
+.bc-link {
+	color: #5273f4;
+}
+
+.bc-cart-item__remove-button {
+	color: #5273f4;
+}
+
+.bc-product__out_of_stock,
+.bc-product__low_inventory {
+	color: #34313f;
+}
+
+.bc-product-flag--grey {
+	color: #34313f;
+	background-color: #e0e3e9;
+}
+
+.bc-product-flag--sale {
+	color: #fff;
+	background-color: #65c68c;
+}
+
+.bc-cart-item-total-price.bc-cart-item--on-sale,
+.bc-product__price--sale {
+	color: #65c68c;
+}
+
+.bc-account-address__edit,
+.bc-account-address__delete,
+button.bc-account-address__edit,
+button.bc-account-address__delete,
+a.bc-account-address__edit,
+a.bc-account-address__delete {
+	color: #5273f4;
+}
+
+</style>
+		<script>
+			document.documentElement.className = document.documentElement.className.replace( 'no-js', 'js' );
+		</script>
+				<style>
+			.no-js img.lazyload { display: none; }
+			figure.wp-block-image img.lazyloading { min-width: 150px; }
+							.lazyload, .lazyloading { opacity: 0; }
+				.lazyloaded {
+					opacity: 1;
+					transition: opacity 100ms;
+					transition-delay: 0ms;
+				}
+					</style>
+		<link rel="icon" href="https://opentrons.com/wp-content/uploads/2024/06/cropped-FAVICON-1-32x32.png" sizes="32x32" />
+<link rel="icon" href="https://opentrons.com/wp-content/uploads/2024/06/cropped-FAVICON-1-192x192.png" sizes="192x192" />
+<link rel="apple-touch-icon" href="https://opentrons.com/wp-content/uploads/2024/06/cropped-FAVICON-1-180x180.png" />
+<meta name="msapplication-TileImage" content="https://opentrons.com/wp-content/uploads/2024/06/cropped-FAVICON-1-270x270.png" />
+		<style type="text/css" id="wp-custom-css">
+			.flex.space-x-4.mt-6 {
+	display: none !important;
+}
+
+ h1, h2, h3, h4, h5 { font-family: Public Sans !important; }		</style>
+		
+
+    <style>
+
+        .button-sm {
+    font-family:  "Akko Pro","Open Sans",sans-serif !important;
+    font-size: .75rem  !important;
+    font-weight: 400  !important;
+    letter-spacing: 1px  !important;
+    line-height: 1rem  !important;
+    text-transform: uppercase  !important;
+}
+    </style>
+
+</head>
+
+<body class="page-template-default page page-id-1927 bc-gallery-size-bc-medium" data-template="remote-nav-base.twig">
+    <style>
+	@media (min-width: 1060px) {
+		.opt-main-nav.sticky{
+			top:-32px ;
+			position:sticky ;
+			z-index: 99 ;
+		}
+	}
+	@media (max-width: 1060px) { 
+		.opt-main-nav.sticky{
+			top:0px ;
+			position:sticky ;
+			z-index: 99 ;
+		}
+
+		div#mobile-cart-dot {
+	    position: absolute;
+	    top: 12px;
+	    left: 30px;
+	    z-index: 1;
+	    pointer-events: none;
+		}
+
+		.mobile-account-links{
+			display: flex;
+			gap: 10px;
+
+		}
+
+		.mobile-account-links span{
+			font-family: AkkoPro-Regular, ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+			font-weight: 500;
+			font-size: 14px;
+			line-height: 135%;
+			text-align: center;
+			letter-spacing: 0.08em;
+			text-transform: uppercase;
+			color: #006CFA;
+		}
+
+		.mobile-account-links a {
+    display: flex;
+    gap: 10px;
+}
+	}
+
+/* Oct 18 */
+/* Fix main navigation issue with buttons going into 2 lines */
+@media screen and (max-width: 1060px){
+  .page header.opt-main-nav > div { display: block !important; }
+  .page header.opt-main-nav > div.hidden { display: none !important; }
+}
+
+@media screen and (min-width: 1061px){
+  .page header.opt-main-nav > div { display: none !important; }
+  .page header.opt-main-nav > div.hidden { display: block !important; }
+} 
+
+</style>
+
+
+
+<!-- Global header -->
+<header class="opt-main-nav sticky bg-white" id="opt-main-navigation">
+	<div class="hidden md:block">
+		<div class="max-w-7xl mx-auto py-2 px-4 flex justify-end">
+			<nav class="flex space-x-6" aria-labelledby="secondary-navigation" id="opt-utility-nav">
+									<a href="https://designer.opentrons.com/" target="_blank" class="text-xs text-brand-gray hover:text-brand-blue">Protocol Designer</a>
+									<a href="https://library.opentrons.com/" target="_blank" class="text-xs text-brand-gray hover:text-brand-blue">Protocol Library</a>
+									<a href="https://docs.opentrons.com/" target="_blank" class="text-xs text-brand-gray hover:text-brand-blue">Python API</a>
+									<a href="https://labware.opentrons.com/" target="_blank" class="text-xs text-brand-gray hover:text-brand-blue">Labware Library</a>
+									<a href="https://github.com/Opentrons" target="_blank" class="text-xs text-brand-gray hover:text-brand-blue">GitHub</a>
+									<a href="https://opentrons.com/ot-app/" target="_self" class="text-xs text-brand-gray hover:text-brand-blue">OT App</a>
+								<a href="https://support.opentrons.com/" target="_blank" class="text-xs text-brand-blue hover:text-brand-blue-dark font-semibold">Customer Support</a>
+			</nav>
+		</div>
+
+		<div class="bg-brand-blue-dark" x-data="{ searchOpen: false }">
+			<div class="max-w-7xl mx-auto flex justify-between px-4 py-3"  >
+				<div class="flex items-center space-x-16">
+					<a href="https://opentrons.com/">
+						<img class="h-8 no-lazy min-w-[130px]" src="https://opentrons.com/wp-content/uploads/2024/06/LOGO2024.svg" id="opt-logo" alt="Opentrons" />
+					</a>
+					<nav class="flex items-center space-x-4 lg:space-x-10" aria-labelledby="primary-navigation" x-show="!searchOpen" x-data="{ menuOpen: false }">
+																											<div class="-mt-[2px]">
+															<button type="button" @click="menuOpen = !menuOpen;"  :class="{ 'text-brand-yellow': menuOpen, 'text-white': !menuOpen }" class="hover:text-brand-yellow text-sm">
+									Products
+								</button>
+																									<div x-show="menuOpen" @click.away="menuOpen = false" class="absolute inset-x-0 transform mt-[21px] bg-white z-50 border-b border-brand-[#d0d3d5]" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-1" x-cloak>
+										<div class="max-w-7xl mx-auto px-2 pb-4">
+											<svg class="ml-[294px] -mt-[1px]" width="18" height="8" viewBox="0 0 18 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+												<path d="M9 8L0 0H18L9 8Z" fill="#16212D"/>
+											</svg>
+											<div class="flex justify-evenly gap-10 mt-2 py-2">
+																																																			<div x-data="{ submenuOpen: false }" @click.away="submenuOpen = false">
+														<a @click="submenuOpen = !submenuOpen" href="javascript:;" class="flex flex-col items-center group">
+															<img width="68" height="68" src="https://opentrons.com/wp-content/uploads/2023/05/Robots-1.png" alt=""  class="h-16 w-16 no-lazy" alt="" style="object-fit: contain;" />
+															<span class="mt-1 font-semibold text-xs text-center py-1 px-3 rounded" :class="{ 'text-white bg-brand-blue': submenuOpen, 'text-brand-blue-dark': !submenuOpen }">Robots</span>
+														</a>
+															<div x-show="submenuOpen" class="absolute inset-x-0 transform mt-2 bg-brand-gray-light z-50" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-1" x-cloak>
+															<div class="max-w-7xl mx-auto">
+																<svg class="text-white fill-current -mt-[1px] ml-[487px]" width="18" height="8" viewBox="0 0 18 8" xmlns="http://www.w3.org/2000/svg">
+																	<path d="M9 8L0 0H18L9 8Z" />
+																</svg>
+																<div class="grid  grid-cols-9  gap-10 pt-3 pb-7">
+																																																					<a href="https://opentrons.com/robots/flex/" target="_self" class="flex flex-col items-center group">
+																			<img width="68" height="68" src="https://opentrons.com/wp-content/uploads/2023/05/Flex-1.png" alt=""  class="h-16 w-16 no-lazy" alt="" style="object-fit: contain;" />
+																			<span class="mt-1 text-brand-blue-dark font-semibold text-xs group-hover:text-brand-blue text-center">Opentrons Flex</span>
+																		</a>
+																																																					<a href="https://opentrons.com/robots/ot-2/" target="_self" class="flex flex-col items-center group">
+																			<img width="68" height="68" src="https://opentrons.com/wp-content/uploads/2023/05/OT2-1.png" alt=""  class="h-16 w-16 no-lazy" alt="" style="object-fit: contain;" />
+																			<span class="mt-1 text-brand-blue-dark font-semibold text-xs group-hover:text-brand-blue text-center">OT-2</span>
+																		</a>
+																																																					<a href="https://opentrons.com/robots/" target="_self" class="flex flex-col items-center group">
+																			<img width="68" height="68" src="https://opentrons.com/wp-content/uploads/2023/05/CKMpare.png" alt=""  class="h-16 w-16 no-lazy" alt="" style="object-fit: contain;" />
+																			<span class="mt-1 text-brand-blue-dark font-semibold text-xs group-hover:text-brand-blue text-center">Compare</span>
+																		</a>
+																																	</div>
+															</div>
+														</div>
+													</div>
+																																																				<a href="https://opentrons.com/products/categories/workstations" target="_self" class="flex flex-col items-center group">
+															<img width="68" height="68" src="https://opentrons.com/wp-content/uploads/2023/05/WSnew.png" class="h-16 w-16 no-lazy" alt="" style="object-fit: contain;" />
+															<span class="mt-1 text-brand-blue-dark font-semibold text-xs text-center">Workstations</span>
+														</a>
+																																																																	<a href="https://opentrons.com/products/categories/pipettes" target="_self" class="flex flex-col items-center group">
+															<img width="68" height="68" src="https://opentrons.com/wp-content/uploads/2023/05/Pipettes-2.png" class="h-16 w-16 no-lazy" alt="" style="object-fit: contain;" />
+															<span class="mt-1 text-brand-blue-dark font-semibold text-xs text-center">Pipettes</span>
+														</a>
+																																																																	<a href="https://opentrons.com/products/categories/modules" target="_self" class="flex flex-col items-center group">
+															<img width="68" height="68" src="https://opentrons.com/wp-content/uploads/2023/05/Modules.png" class="h-16 w-16 no-lazy" alt="" style="object-fit: contain;" />
+															<span class="mt-1 text-brand-blue-dark font-semibold text-xs text-center">Modules</span>
+														</a>
+																																																																	<a href="https://opentrons.com/products/categories/tips-&-labware" target="_self" class="flex flex-col items-center group">
+															<img width="68" height="68" src="https://opentrons.com/wp-content/uploads/2023/05/tiprack-1.png" class="h-16 w-16 no-lazy" alt="" style="object-fit: contain;" />
+															<span class="mt-1 text-brand-blue-dark font-semibold text-xs text-center">Tips & Labware</span>
+														</a>
+																																																																	<a href="https://opentrons.com/products/categories/automation-marketplace/" target="_self" class="flex flex-col items-center group">
+															<img width="68" height="68" src="https://opentrons.com/wp-content/uploads/2024/03/Marketplace-2.png" class="h-16 w-16 no-lazy" alt="" style="object-fit: contain;" />
+															<span class="mt-1 text-brand-blue-dark font-semibold text-xs text-center">Automation Marketplace</span>
+														</a>
+																																																																	<a href="https://opentrons.com/instrument-services/" target="_self" class="flex flex-col items-center group">
+															<img width="68" height="68" src="https://opentrons.com/wp-content/uploads/2023/05/Serovce.png" class="h-16 w-16 no-lazy" alt="" style="object-fit: contain;" />
+															<span class="mt-1 text-brand-blue-dark font-semibold text-xs text-center">Services</span>
+														</a>
+																																																	</div>
+										</div>
+									</div>
+																							</div>
+																				<div class="relative -mt-[2px]" x-data="{ menuOpen: false }">
+																						<button type="button" @click="menuOpen = !menuOpen;"  @click.away="menuOpen = false"  :class="{ 'text-brand-yellow': menuOpen, 'text-white': !menuOpen }" class="hover:text-brand-yellow text-sm">
+									Applications
+								</button>
+																																	<div x-show="menuOpen" class="absolute left-1/4 transform -translate-x-1/4 mt-[21px] w-screen max-w-[230px] bg-white z-50 border-r border-l border-brand-[#d0d3d5]" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-1" x-cloak>
+										<svg class="ml-[64px] -mt-[1px]" width="18" height="8" viewBox="0 0 18 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+											<path d="M9 8L0 0H18L9 8Z" fill="#16212D"/>
+										</svg>
+										<div class="flex flex-col mt-2">
+																							<a href="https://opentrons.com/applications/ngs/" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2023/02/NGS.svg" />
+													<span>NGS</span>
+												</a>
+																							<a href="https://opentrons.com/applications/nucleic-acid-extraction/" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Nucleic-Acid-Extraction.svg" />
+													<span>Nucleic Acid Extraction</span>
+												</a>
+																							<a href="https://opentrons.com/applications/pcr/" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2023/02/PCR-1.svg" />
+													<span>PCR</span>
+												</a>
+																							<a href="https://opentrons.com/applications/protein-purification/" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Protein-Purification-1.svg" />
+													<span>Protein Purification</span>
+												</a>
+																							<a href="https://opentrons.com/applications/elisa/" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/ELISA-1.svg" />
+													<span>ELISA</span>
+												</a>
+																							<a href="https://opentrons.com/applications/proteomics/" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Proteomics.svg" />
+													<span>Proteomics</span>
+												</a>
+																																		<a href="https://opentrons.com/applications/" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue items-center space-x-3 text-center">
+													View All
+												</a>
+																					</div>
+									</div>
+															</div>
+																				<div class="relative -mt-[2px]" x-data="{ menuOpen: false }">
+																						<button type="button" @click="menuOpen = !menuOpen;"  @click.away="menuOpen = false"  :class="{ 'text-brand-yellow': menuOpen, 'text-white': !menuOpen }" class="hover:text-brand-yellow text-sm">
+									Partnerships
+								</button>
+																																	<div x-show="menuOpen" class="absolute left-1/4 transform -translate-x-1/4 mt-[21px] w-screen max-w-[230px] bg-white z-50 border-r border-l border-brand-[#d0d3d5]" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-1" x-cloak>
+										<svg class="ml-[64px] -mt-[1px]" width="18" height="8" viewBox="0 0 18 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+											<path d="M9 8L0 0H18L9 8Z" fill="#16212D"/>
+										</svg>
+										<div class="flex flex-col mt-2">
+																							<a href="https://opentrons.com/our-partners" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/07/OUR-PARTNERS.svg" />
+													<span>Our Partners</span>
+												</a>
+																							<a href="https://opentrons.com/partnerships" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2023/10/OEM.svg" />
+													<span>OEM Partnerships</span>
+												</a>
+																							<a href="https://opentrons.com/education/" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/01/Academic.svg" />
+													<span>Education</span>
+												</a>
+																							<a href="https://opentrons.com/automation-marketplace/" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/07/marketplace.svg" />
+													<span>Automation Marketplace</span>
+												</a>
+																																</div>
+									</div>
+															</div>
+																				<div class="relative -mt-[2px]" x-data="{ menuOpen: false }">
+																						<button type="button" @click="menuOpen = !menuOpen;"  @click.away="menuOpen = false"  :class="{ 'text-brand-yellow': menuOpen, 'text-white': !menuOpen }" class="hover:text-brand-yellow text-sm">
+									About
+								</button>
+																																	<div x-show="menuOpen" class="absolute left-1/4 transform -translate-x-1/4 mt-[21px] w-screen max-w-[230px] bg-white z-50 border-r border-l border-brand-[#d0d3d5]" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-1" x-cloak>
+										<svg class="ml-[64px] -mt-[1px]" width="18" height="8" viewBox="0 0 18 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+											<path d="M9 8L0 0H18L9 8Z" fill="#16212D"/>
+										</svg>
+										<div class="flex flex-col mt-2">
+																							<a href="https://opentrons.com/about/about-us" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Opentrons-App.svg" />
+													<span>About Us</span>
+												</a>
+																							<a href="https://opentrons.com/about/events/" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Calendar-2.svg" />
+													<span>Events & Webinars</span>
+												</a>
+																							<a href="https://opentrons.com/about/news" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/News.svg" />
+													<span>News</span>
+												</a>
+																							<a href="https://opentrons.com/about/jobs/" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Careers.svg" />
+													<span>Careers</span>
+												</a>
+																							<a href="https://opentrons.com/globalcontacts/" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Global.svg" />
+													<span>Global Contacts</span>
+												</a>
+																							<a href="https://opentrons.com/contact/" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/04/Chat.svg" />
+													<span>Contact Us</span>
+												</a>
+																																</div>
+									</div>
+															</div>
+																				<div class="relative -mt-[2px]" x-data="{ menuOpen: false }">
+																						<button type="button" @click="menuOpen = !menuOpen;"  @click.away="menuOpen = false"  :class="{ 'text-brand-yellow': menuOpen, 'text-white': !menuOpen }" class="hover:text-brand-yellow text-sm">
+									Resources
+								</button>
+																																	<div x-show="menuOpen" class="absolute left-1/4 transform -translate-x-1/4 mt-[21px] w-screen max-w-[230px] bg-white z-50 border-r border-l border-brand-[#d0d3d5]" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-1" x-cloak>
+										<svg class="ml-[64px] -mt-[1px]" width="18" height="8" viewBox="0 0 18 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+											<path d="M9 8L0 0H18L9 8Z" fill="#16212D"/>
+										</svg>
+										<div class="flex flex-col mt-2">
+																							<a href="https://opentrons.com/resources/knowledge-hub/" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/04/Knowledge-Hub.svg" />
+													<span>Knowledge Hub</span>
+												</a>
+																							<a href="https://opentrons.com/resources/customer-stories/" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/04/Customer-Stories.svg" />
+													<span>Customer Stories</span>
+												</a>
+																							<a href="https://opentrons.com/ai/" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Robot-Head.svg" />
+													<span>OpentronsAI</span>
+												</a>
+																							<a href="https://opentrons.com/resources/citations/" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Citation.svg" />
+													<span>Citations</span>
+												</a>
+																							<a href="https://opentrons.com/intro-to-protocol-library/" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Protocol-Library.svg" />
+													<span>Protocol Library</span>
+												</a>
+																																</div>
+									</div>
+															</div>
+						
+						
+				
+					</nav>
+
+				</div>
+				
+				<div class="flex space-x-4">
+<div x-show="searchOpen" class="bg-brand-blue-dark flex space-x-2 " style="width:700px;" >
+								<div class="border-b border-white flex items-center space-x-2 pb-2 w-full">
+									<svg class="text-white w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+									</svg>
+									<form action="https://opentrons.com/" method="get" class="flex flex-grow">
+										<input class="w-full bg-transparent text-white" name="s" type="text" placeholder="Search">
+										<button type="submit" class="bg-brand-blue hover:bg-brand-blue-medium text-white p-1 font-medium text-sm uppercase sr-only">Search</button>
+									</form>
+								</div>
+								<div class="text-white hover:text-brand-yellow flex items-center h-full">
+								<a @click.prevent="searchOpen = false" class="text-xs text-brand-gray-light mt-1 opacity-50 flex items-center" href="javascript:;">Cancel</a>
+							</div>
+							</div>
+					<div class="flex gap-4">
+						
+						
+						<div class="flex" >
+							<div class="text-white hover:text-brand-yellow flex items-center h-full">
+								<button type="button" @click.prevent="searchOpen = !searchOpen" href="javascript:;" class="text-white hover:text-brand-yellow flex items-center" x-show="!searchOpen" >
+								<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+									<path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+								</svg>
+							</button>
+						</div>
+							
+						</div>
+
+						<!-- account icon start -->
+						<a type="button"  href="https://opentrons.com/account/?v=5084002" class="text-white hover:text-brand-yellow flex items-center" x-show="!searchOpen" >
+								<svg width="18" height="19" viewBox="0 0 18 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M16.2666 16.9508H16.3131L16.3071 16.9067C15.9722 14.4087 13.7202 12.4688 10.9996 12.4688H7.00067C4.28007 12.4688 2.0229 14.4086 1.69304 16.9068L1.72852 16.9111V16.9508H1.73363H1.76969H16.2666ZM0.0410156 18.4608V17.5518C0.0410156 13.916 3.1621 10.9589 7.00067 10.9589H10.9996C14.8381 10.9589 17.9592 13.916 17.9592 17.5518V18.4608H0.0410156ZM9.00011 8.98912C6.54221 8.98912 4.54102 7.0956 4.54102 4.7641C4.54102 2.4326 6.54221 0.539062 9.00011 0.539062C11.458 0.539062 13.4592 2.4326 13.4592 4.7641C13.4592 7.0956 11.458 8.98912 9.00011 8.98912ZM9.00011 2.04904C7.42832 2.04904 6.1467 3.26472 6.1467 4.7641C6.1467 6.26348 7.42832 7.47917 9.00011 7.47917C10.5719 7.47917 11.8535 6.26348 11.8535 4.7641C11.8535 3.26472 10.5719 2.04904 9.00011 2.04904Z" fill="white"/>
+</svg>
+
+
+				</a>
+<!-- account icon end -->
+
+<!-- cart icon -->
+				<a x-show="!searchOpen"  id="cart-icon"  href="https://opentrons.com/cart" class="text-white hover:text-brand-yellow flex items-center">&nbsp;</a>
+				<!-- cart icon end -->
+</div>
+
+
+<a href="https://insights.opentrons.com/schedule-demo" class="button-sm bg-white text-brand-blue py-3 px-4 rounded hover:bg-white/60 demo_button">
+						Schedule a Demo
+					</a>
+<a href="https://opentrons.com/contact/" class="button-sm bg-brand-blue text-white py-3 px-4 rounded hover:bg-brand-blue/60 nav_contact_button">
+						Contact Sales
+					</a>
+					
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Mobile header -->
+	<div class="md:hidden" x-data="{ menuOpen: false }">
+		<div class="flex items-center justify-between py-2 px-5 bg-brand-blue-dark relative">
+				<div id="mobile-cart-dot" x-show="!menuOpen">
+					<svg id="mobile-nav-dot" width="22" height="19" viewBox="0 0 22 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<circle cx="17.5" cy="4.5" r="4.5" fill="#DE1B1B"/>
+					</svg>
+				</div>
+			<button @click="menuOpen = !menuOpen" class="text-white h-[20px] p-0">
+				<div class="w-7 flex items-center justify-center relative">
+					<span :class="{ 'translate-y-0 rotate-45': menuOpen, '-translate-y-2': !menuOpen }" class="transform transition w-full h-px bg-current absolute -translate-y-2"></span>
+					<span :class="{ 'opacity-0 translate-x-3': menuOpen, 'opacity-100': !menuOpen }" class="transform transition w-full h-px bg-current absolute opacity-100"></span>
+					<span :class="{ 'translate-y-0 -rotate-45': menuOpen, 'translate-y-2': !menuOpen }" class="transform transition w-full h-px bg-current absolute translate-y-2"></span>
+				</div>
+			</button>
+			<a href="https://opentrons.com/">
+				<img class="h-9 no-lazy" src="https://opentrons.com/wp-content/themes/timberland/theme/assets/images/logo.png" alt="Opentrons logo" />
+			</a>
+			<!-- Search -->
+			<div x-data="{ searchOpen: false }">
+				<button type="button" @click.prevent="searchOpen = !searchOpen" href="javascript:;" class="text-white flex items-center">
+					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+					</svg>
+				</button>
+				<div x-show="searchOpen" class="absolute inset-0 bg-brand-blue-dark flex space-x-2 py-3 px-5" x-transition x-cloak>
+					<div class="border-b border-white flex items-center space-x-2 pb-2 w-full">
+						<svg class="text-white w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+						</svg>
+						<form action="https://opentrons.com/" method="get" class="flex flex-grow">
+							<input class="w-full bg-transparent text-white" name="s" type="text" placeholder="Search">
+							<button type="submit" class="bg-brand-blue hover:bg-brand-blue-medium text-white p-1 font-medium text-sm uppercase sr-only">Search</button>
+						</form>
+					</div>
+					<a @click.prevent="searchOpen = false" class="text-xs text-brand-gray-light mt-1 opacity-50" href="javascript:;">Cancel</a>
+				</div>
+			</div>
+		</div>
+		<div x-show="menuOpen" class="z-50 absolute inset-x-0 origin-top-left transform transition" x-transition:enter="duration-200 ease-out" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="duration-100 ease-in" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" @click.away="menuOpen = false" x-cloak>
+							<div class="bg-brand-blue-dark border-b border-brand-blue-medium">
+					<div x-data="{ open: false }">
+						<button type="button" @click.prevent="open = !open" class="flex items-center py-4 px-5 text-white w-full text-left" aria-expanded="false" :aria-expanded="open.toString()">
+							<span class="flex-grow text-2xl">Products</span>
+							<svg class="transition duration-300 text-white fill-current" :class="{ '-rotate-180': open }" width="17" height="8" viewBox="0 0 17 8" xmlns="http://www.w3.org/2000/svg">
+								<path d="M17 0L8.5 2.8434e-05L0 0L8.5 8L17 0Z" />
+							</svg>
+						</button>
+						<div x-show="open" class="bg-brand-gray-light" x-collapse x-cloak>
+							<!-- list -->
+														<!-- Products -->
+															<div class="flex space-x-10 py-6 overflow-x-scroll overflow-hidden">
+																			
+																							<div x-data="{ submenuOpen: false }" @click.away="submenuOpen = false">
+														<a @click="submenuOpen = !submenuOpen" href="javascript:;" class="flex flex-col items-center group">
+															<img class="h-12 w-auto no-lazy" src="https://opentrons.com/wp-content/uploads/2023/05/Robots-1.png" alt="" />
+															<span class="mt-1 font-semibold text-xs text-center py-1 px-3 rounded" :class="{ 'text-white bg-brand-blue': submenuOpen, 'text-brand-blue-dark': !submenuOpen }">Robots</span>
+														</a>
+															<div x-show="submenuOpen" class="absolute inset-x-0 transform mt-2 bg-brand-gray-light z-50" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-1" x-cloak>
+															<div class="max-w-7xl mx-auto">
+																<svg class="text-white fill-current -mt-[1px]" width="18" height="8" viewBox="0 0 18 8" xmlns="http://www.w3.org/2000/svg">
+																	<path d="M9 8L0 0H18L9 8Z" />
+																</svg>
+																<div class="flex space-x-8 py-6 overflow-x-scroll overflow-hidden">
+																																			<a href="https://opentrons.com/robots/flex/" target="_self" class="flex flex-col items-center group shrink-0 grow-0 pl-3 pr-3" style="max-width:140px;">
+																			<img class="h-12 w-auto no-lazy" src="https://opentrons.com/wp-content/uploads/2023/05/Flex-1.png" alt="" />
+																			<span class="mt-1 text-brand-blue-dark font-semibold text-xs group-hover:text-brand-blue text-center">Opentrons Flex</span>
+																		</a>
+																																			<a href="https://opentrons.com/robots/ot-2/" target="_self" class="flex flex-col items-center group shrink-0 grow-0 pl-3 pr-3" style="max-width:140px;">
+																			<img class="h-12 w-auto no-lazy" src="https://opentrons.com/wp-content/uploads/2023/05/OT2-1.png" alt="" />
+																			<span class="mt-1 text-brand-blue-dark font-semibold text-xs group-hover:text-brand-blue text-center">OT-2</span>
+																		</a>
+																																			<a href="https://opentrons.com/robots/" target="_self" class="flex flex-col items-center group shrink-0 grow-0 pl-3 pr-3" style="max-width:140px;">
+																			<img class="h-12 w-auto no-lazy" src="https://opentrons.com/wp-content/uploads/2023/05/CKMpare.png" alt="" />
+																			<span class="mt-1 text-brand-blue-dark font-semibold text-xs group-hover:text-brand-blue text-center">Compare</span>
+																		</a>
+																																	</div>
+															</div>
+														</div>
+													</div>
+													
+																														<a href="https://opentrons.com/products/categories/workstations" target="_self"  class="flex flex-col items-center group shrink-0 grow-0 pl-3 pr-3">
+												<img class="w-12 h-12 no-lazy" src="https://opentrons.com/wp-content/uploads/2023/05/WSnew.png" alt="" />
+												<span class="mt-1 text-brand-blue-dark font-semibold text-xs text-center py-1">Workstations</span>
+											</a>
+										
+										
+																														<a href="https://opentrons.com/products/categories/pipettes" target="_self"  class="flex flex-col items-center group shrink-0 grow-0 pl-3 pr-3">
+												<img class="w-12 h-12 no-lazy" src="https://opentrons.com/wp-content/uploads/2023/05/Pipettes-2.png" alt="" />
+												<span class="mt-1 text-brand-blue-dark font-semibold text-xs text-center py-1">Pipettes</span>
+											</a>
+										
+										
+																														<a href="https://opentrons.com/products/categories/modules" target="_self"  class="flex flex-col items-center group shrink-0 grow-0 pl-3 pr-3">
+												<img class="w-12 h-12 no-lazy" src="https://opentrons.com/wp-content/uploads/2023/05/Modules.png" alt="" />
+												<span class="mt-1 text-brand-blue-dark font-semibold text-xs text-center py-1">Modules</span>
+											</a>
+										
+										
+																														<a href="https://opentrons.com/products/categories/tips-&-labware" target="_self"  class="flex flex-col items-center group shrink-0 grow-0 pl-3 pr-3">
+												<img class="w-12 h-12 no-lazy" src="https://opentrons.com/wp-content/uploads/2023/05/tiprack-1.png" alt="" />
+												<span class="mt-1 text-brand-blue-dark font-semibold text-xs text-center py-1">Tips & Labware</span>
+											</a>
+										
+										
+																														<a href="https://opentrons.com/products/categories/automation-marketplace/" target="_self"  class="flex flex-col items-center group shrink-0 grow-0 pl-3 pr-3">
+												<img class="w-12 h-12 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/03/Marketplace-2.png" alt="" />
+												<span class="mt-1 text-brand-blue-dark font-semibold text-xs text-center py-1">Automation Marketplace</span>
+											</a>
+										
+										
+																														<a href="https://opentrons.com/instrument-services/" target="_self"  class="flex flex-col items-center group shrink-0 grow-0 pl-3 pr-3">
+												<img class="w-12 h-12 no-lazy" src="https://opentrons.com/wp-content/uploads/2023/05/Serovce.png" alt="" />
+												<span class="mt-1 text-brand-blue-dark font-semibold text-xs text-center py-1">Services</span>
+											</a>
+										
+										
+																	</div>
+														<!-- list with icon -->
+													</div>
+					</div>
+				</div>
+							<div class="bg-brand-blue-dark border-b border-brand-blue-medium">
+					<div x-data="{ open: false }">
+						<button type="button" @click.prevent="open = !open" class="flex items-center py-4 px-5 text-white w-full text-left" aria-expanded="false" :aria-expanded="open.toString()">
+							<span class="flex-grow text-2xl">Applications</span>
+							<svg class="transition duration-300 text-white fill-current" :class="{ '-rotate-180': open }" width="17" height="8" viewBox="0 0 17 8" xmlns="http://www.w3.org/2000/svg">
+								<path d="M17 0L8.5 2.8434e-05L0 0L8.5 8L17 0Z" />
+							</svg>
+						</button>
+						<div x-show="open" class="bg-brand-gray-light" x-collapse x-cloak>
+							<!-- list -->
+														<!-- Products -->
+														<!-- list with icon -->
+																								<a href="https://opentrons.com/applications/ngs/" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2023/02/NGS.svg" />
+									<span>NGS</span>
+								</a>
+																	<a href="https://opentrons.com/applications/nucleic-acid-extraction/" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Nucleic-Acid-Extraction.svg" />
+									<span>Nucleic Acid Extraction</span>
+								</a>
+																	<a href="https://opentrons.com/applications/pcr/" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2023/02/PCR-1.svg" />
+									<span>PCR</span>
+								</a>
+																	<a href="https://opentrons.com/applications/protein-purification/" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Protein-Purification-1.svg" />
+									<span>Protein Purification</span>
+								</a>
+																	<a href="https://opentrons.com/applications/elisa/" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/ELISA-1.svg" />
+									<span>ELISA</span>
+								</a>
+																	<a href="https://opentrons.com/applications/proteomics/" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Proteomics.svg" />
+									<span>Proteomics</span>
+								</a>
+																								<a href="https://opentrons.com/applications/" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									View All
+								</a>
+																				</div>
+					</div>
+				</div>
+							<div class="bg-brand-blue-dark border-b border-brand-blue-medium">
+					<div x-data="{ open: false }">
+						<button type="button" @click.prevent="open = !open" class="flex items-center py-4 px-5 text-white w-full text-left" aria-expanded="false" :aria-expanded="open.toString()">
+							<span class="flex-grow text-2xl">Partnerships</span>
+							<svg class="transition duration-300 text-white fill-current" :class="{ '-rotate-180': open }" width="17" height="8" viewBox="0 0 17 8" xmlns="http://www.w3.org/2000/svg">
+								<path d="M17 0L8.5 2.8434e-05L0 0L8.5 8L17 0Z" />
+							</svg>
+						</button>
+						<div x-show="open" class="bg-brand-gray-light" x-collapse x-cloak>
+							<!-- list -->
+														<!-- Products -->
+														<!-- list with icon -->
+																								<a href="https://opentrons.com/our-partners" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/07/OUR-PARTNERS.svg" />
+									<span>Our Partners</span>
+								</a>
+																	<a href="https://opentrons.com/partnerships" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2023/10/OEM.svg" />
+									<span>OEM Partnerships</span>
+								</a>
+																	<a href="https://opentrons.com/education/" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/01/Academic.svg" />
+									<span>Education</span>
+								</a>
+																	<a href="https://opentrons.com/automation-marketplace/" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/07/marketplace.svg" />
+									<span>Automation Marketplace</span>
+								</a>
+																													</div>
+					</div>
+				</div>
+							<div class="bg-brand-blue-dark border-b border-brand-blue-medium">
+					<div x-data="{ open: false }">
+						<button type="button" @click.prevent="open = !open" class="flex items-center py-4 px-5 text-white w-full text-left" aria-expanded="false" :aria-expanded="open.toString()">
+							<span class="flex-grow text-2xl">About</span>
+							<svg class="transition duration-300 text-white fill-current" :class="{ '-rotate-180': open }" width="17" height="8" viewBox="0 0 17 8" xmlns="http://www.w3.org/2000/svg">
+								<path d="M17 0L8.5 2.8434e-05L0 0L8.5 8L17 0Z" />
+							</svg>
+						</button>
+						<div x-show="open" class="bg-brand-gray-light" x-collapse x-cloak>
+							<!-- list -->
+														<!-- Products -->
+														<!-- list with icon -->
+																								<a href="https://opentrons.com/about/about-us" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Opentrons-App.svg" />
+									<span>About Us</span>
+								</a>
+																	<a href="https://opentrons.com/about/events/" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Calendar-2.svg" />
+									<span>Events & Webinars</span>
+								</a>
+																	<a href="https://opentrons.com/about/news" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/News.svg" />
+									<span>News</span>
+								</a>
+																	<a href="https://opentrons.com/about/jobs/" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Careers.svg" />
+									<span>Careers</span>
+								</a>
+																	<a href="https://opentrons.com/globalcontacts/" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Global.svg" />
+									<span>Global Contacts</span>
+								</a>
+																	<a href="https://opentrons.com/contact/" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/04/Chat.svg" />
+									<span>Contact Us</span>
+								</a>
+																													</div>
+					</div>
+				</div>
+							<div class="bg-brand-blue-dark border-b border-brand-blue-medium">
+					<div x-data="{ open: false }">
+						<button type="button" @click.prevent="open = !open" class="flex items-center py-4 px-5 text-white w-full text-left" aria-expanded="false" :aria-expanded="open.toString()">
+							<span class="flex-grow text-2xl">Resources</span>
+							<svg class="transition duration-300 text-white fill-current" :class="{ '-rotate-180': open }" width="17" height="8" viewBox="0 0 17 8" xmlns="http://www.w3.org/2000/svg">
+								<path d="M17 0L8.5 2.8434e-05L0 0L8.5 8L17 0Z" />
+							</svg>
+						</button>
+						<div x-show="open" class="bg-brand-gray-light" x-collapse x-cloak>
+							<!-- list -->
+														<!-- Products -->
+														<!-- list with icon -->
+																								<a href="https://opentrons.com/resources/knowledge-hub/" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/04/Knowledge-Hub.svg" />
+									<span>Knowledge Hub</span>
+								</a>
+																	<a href="https://opentrons.com/resources/customer-stories/" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/04/Customer-Stories.svg" />
+									<span>Customer Stories</span>
+								</a>
+																	<a href="https://opentrons.com/ai/" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Robot-Head.svg" />
+									<span>OpentronsAI</span>
+								</a>
+																	<a href="https://opentrons.com/resources/citations/" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Citation.svg" />
+									<span>Citations</span>
+								</a>
+																	<a href="https://opentrons.com/intro-to-protocol-library/" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Protocol-Library.svg" />
+									<span>Protocol Library</span>
+								</a>
+																													</div>
+					</div>
+				</div>
+						<!-- new utiltiy nav items -->
+			<div class="bg-brand-blue-dark border-b border-brand-blue-medium">
+					<div x-data="{ open: false }">
+						<button type="button" @click.prevent="open = !open" class="flex items-center py-4 px-5 text-white w-full text-left" aria-expanded="false" :aria-expanded="open.toString()">
+							<span class="flex-grow text-2xl">Tools</span>
+							<svg class="transition duration-300 text-white fill-current" :class="{ '-rotate-180': open }" width="17" height="8" viewBox="0 0 17 8" xmlns="http://www.w3.org/2000/svg">
+								<path d="M17 0L8.5 2.8434e-05L0 0L8.5 8L17 0Z" />
+							</svg>
+						</button>
+						<div x-show="open" class="bg-brand-gray-light" x-collapse x-cloak>
+							<!-- list -->
+							
+																	<a href="https://designer.opentrons.com/" target="_blank" class="py-4 px-10 block text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium">Protocol Designer</a>
+																	<a href="https://library.opentrons.com/" target="_blank" class="py-4 px-10 block text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium">Protocol Library</a>
+																	<a href="https://docs.opentrons.com/" target="_blank" class="py-4 px-10 block text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium">Python API</a>
+																	<a href="https://labware.opentrons.com/" target="_blank" class="py-4 px-10 block text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium">Labware Library</a>
+																	<a href="https://github.com/Opentrons" target="_blank" class="py-4 px-10 block text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium">GitHub</a>
+																	<a href="https://opentrons.com/ot-app/" target="_self" class="py-4 px-10 block text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium">OT App</a>
+														</div>
+					</div>
+				</div>
+			
+			<div class="bg-white px-4 py-4">
+				<div class="flex space-x-4 justify-center border-b border-brand-gray-medium pt-3 pb-8">
+					<a href="https://insights.opentrons.com/schedule-demo" class="border border-brand-blue text-brand-blue text-xs leading-none font-medium py-3 px-4 uppercase rounded font-serif demo_button" target="_blank">Schedule a Demo</a>
+					<a href="https://opentrons.com/contact/" class="bg-brand-blue text-white text-xs leading-none font-medium py-3 px-4 uppercase rounded font-serif nav_contact_button">Contact Sales</a>
+				</div>
+
+				<div class="flex flex-row justify-evenly px-4 py-4">
+					
+					<!-- account icon start -->
+						<a type="button" class="mobile-account-links" href="https://opentrons.com/account/" class="text-blue-1100 hover:text-brand-yellow flex items-center">
+								<svg width="18" height="19" viewBox="0 0 18 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M16.2666 16.9508H16.3131L16.3071 16.9067C15.9722 14.4087 13.7202 12.4688 10.9996 12.4688H7.00067C4.28007 12.4688 2.0229 14.4086 1.69304 16.9068L1.72852 16.9111V16.9508H1.73363H1.76969H16.2666ZM0.0410156 18.4608V17.5518C0.0410156 13.916 3.1621 10.9589 7.00067 10.9589H10.9996C14.8381 10.9589 17.9592 13.916 17.9592 17.5518V18.4608H0.0410156ZM9.00011 8.98912C6.54221 8.98912 4.54102 7.0956 4.54102 4.7641C4.54102 2.4326 6.54221 0.539062 9.00011 0.539062C11.458 0.539062 13.4592 2.4326 13.4592 4.7641C13.4592 7.0956 11.458 8.98912 9.00011 8.98912ZM9.00011 2.04904C7.42832 2.04904 6.1467 3.26472 6.1467 4.7641C6.1467 6.26348 7.42832 7.47917 9.00011 7.47917C10.5719 7.47917 11.8535 6.26348 11.8535 4.7641C11.8535 3.26472 10.5719 2.04904 9.00011 2.04904Z" fill="#006cfa"/>
+								</svg>
+
+								<span>ACCOUNT</span>
+								</a>
+								<!-- account icon end -->
+
+								<div  class="mobile-account-links" >
+								<!-- cart icon -->
+								<div id="mobile-cart-dot-expanded" x-show="!menuOpen">
+									<svg width="22" height="19" viewBox="0 0 22 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+										<circle cx="17.5" cy="4.5" r="4.5" fill="#DE1B1B"/>
+									</svg>
+								</div>
+								<a href="https://opentrons.com/cart"><span id="cart-icon-mobile" class="text-blue-1100 hover:text-brand-yellow flex items-center">&nbsp;</span>
+								<!-- cart icon end -->
+								<span>CART</span>
+							</a>
+							</div>		
+				</div>
+
+		
+			</div>
+		</div>
+	</div>
+</header>
+
+
+<script>
+
+let cart_icon = `<svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M7.60976 16.7439C7.60976 17.0012 7.07818 17.2689 6.93525 17.4829C6.79231 17.6968 6.58915 17.8635 6.35146 17.962C6.11377 18.0604 5.85222 18.0862 5.59988 18.036C5.34755 17.9858 5.11577 17.8619 4.93385 17.68C4.75192 17.4981 4.62803 17.2663 4.57784 17.0139C4.52765 16.7616 4.55341 16.5001 4.65186 16.2624C4.75032 16.0247 4.91705 15.8215 5.13097 15.6786C5.34488 15.5356 5.59638 15.4593 5.85366 15.4593C6.19866 15.4594 6.52952 15.5964 6.77347 15.8404C7.01742 16.0843 7.60975 16.3989 7.60976 16.7439ZM15.6098 15.4593C15.3525 15.4593 15.101 15.5356 14.8871 15.6786C14.6731 15.8215 14.5064 16.0247 14.408 16.2624C14.3095 16.5001 14.2837 16.7616 14.3339 17.0139C14.3841 17.2663 14.508 17.4981 14.6899 17.68C14.8719 17.8619 15.1036 17.9858 15.356 18.036C15.6083 18.0862 15.8699 18.0604 16.1076 17.962C16.3452 17.8635 16.5484 17.6968 16.6913 17.4829C16.8343 17.2689 16.9106 17.0174 16.9106 16.7602C16.9106 16.4152 16.7735 16.0843 16.5296 15.8404C16.2856 15.5964 15.9548 15.4594 15.6098 15.4593ZM18.712 5.28543L17.2937 13.0903C17.2394 13.3901 17.0815 13.6613 16.8476 13.8565C16.6136 14.0518 16.3186 14.1587 16.0139 14.1585H5.45676C5.15222 14.1586 4.8573 14.0518 4.62344 13.8567C4.38958 13.6617 4.2316 13.3907 4.17707 13.0911L2.62282 4.5677C2.61455 4.53606 2.60866 4.50384 2.6052 4.47131L2.11827 1.80081H0.650407C0.477908 1.80081 0.312475 1.73229 0.1905 1.61031C0.0685248 1.48834 0 1.32291 0 1.15041C0 0.977908 0.0685248 0.812475 0.1905 0.6905C0.312475 0.568525 0.477908 0.5 0.650407 0.5H2.11819C2.42274 0.499907 2.71767 0.60671 2.95154 0.801787C3.18542 0.996865 3.34341 1.26784 3.39796 1.56747L3.79637 3.75203H17.4321C17.6226 3.75203 17.8108 3.79388 17.9834 3.87462C18.156 3.95537 18.3087 4.07303 18.4308 4.21931C18.5529 4.36558 18.6413 4.53688 18.6899 4.7211C18.7385 4.90533 18.746 5.09798 18.712 5.28543ZM17.4321 5.05285H4.03352L5.45676 12.8577H16.0139L17.4321 5.05285Z" fill="#FFFFFF"/>
+<path d="M7.60976 16.7439C7.60976 17.7138 6.82353 18.5 5.85366 18.5C4.88379 18.5 4.09756 17.7138 4.09756 16.7439C4.09756 15.774 4.88379 14.9878 5.85366 14.9878C6.82353 14.9878 7.60976 15.774 7.60976 16.7439Z" fill="#FFFFFF"/>
+<path d="M17.3659 16.7439C17.3659 17.7138 16.5796 18.5 15.6098 18.5C14.6399 18.5 13.8537 17.7138 13.8537 16.7439C13.8537 15.774 14.6399 14.9878 15.6098 14.9878C16.5796 14.9878 17.3659 15.774 17.3659 16.7439Z" fill="#FFFFFF"/>
+</svg>
+`;
+
+let active_cart_icon = `<svg width="22" height="19" viewBox="0 0 22 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M7.60976 16.7439C7.60976 17.0012 7.07818 17.2689 6.93525 17.4829C6.79231 17.6968 6.58915 17.8635 6.35146 17.962C6.11377 18.0604 5.85222 18.0862 5.59988 18.036C5.34755 17.9858 5.11577 17.8619 4.93385 17.68C4.75192 17.4981 4.62803 17.2663 4.57784 17.0139C4.52765 16.7616 4.55341 16.5001 4.65186 16.2624C4.75032 16.0247 4.91705 15.8215 5.13097 15.6786C5.34488 15.5356 5.59638 15.4593 5.85366 15.4593C6.19866 15.4594 6.52952 15.5964 6.77347 15.8404C7.01742 16.0843 7.60975 16.3989 7.60976 16.7439ZM15.6098 15.4593C15.3525 15.4593 15.101 15.5356 14.8871 15.6786C14.6731 15.8215 14.5064 16.0247 14.408 16.2624C14.3095 16.5001 14.2837 16.7616 14.3339 17.0139C14.3841 17.2663 14.508 17.4981 14.6899 17.68C14.8719 17.8619 15.1036 17.9858 15.356 18.036C15.6083 18.0862 15.8699 18.0604 16.1076 17.962C16.3452 17.8635 16.5484 17.6968 16.6913 17.4829C16.8343 17.2689 16.9106 17.0174 16.9106 16.7602C16.9106 16.4152 16.7735 16.0843 16.5296 15.8404C16.2856 15.5964 15.9548 15.4594 15.6098 15.4593ZM18.712 5.28543L17.2937 13.0903C17.2394 13.3901 17.0815 13.6613 16.8476 13.8565C16.6136 14.0518 16.3186 14.1587 16.0139 14.1585H5.45676C5.15222 14.1586 4.8573 14.0518 4.62344 13.8567C4.38958 13.6617 4.2316 13.3907 4.17707 13.0911L2.62282 4.5677C2.61455 4.53606 2.60866 4.50384 2.6052 4.47131L2.11827 1.80081H0.650407C0.477908 1.80081 0.312475 1.73229 0.1905 1.61031C0.0685248 1.48834 0 1.32291 0 1.15041C0 0.977908 0.0685248 0.812475 0.1905 0.6905C0.312475 0.568525 0.477908 0.5 0.650407 0.5H2.11819C2.42274 0.499907 2.71767 0.60671 2.95154 0.801787C3.18542 0.996865 3.34341 1.26784 3.39796 1.56747L3.79637 3.75203H17.4321C17.6226 3.75203 17.8108 3.79388 17.9834 3.87462C18.156 3.95537 18.3087 4.07303 18.4308 4.21931C18.5529 4.36558 18.6413 4.53688 18.6899 4.7211C18.7385 4.90533 18.746 5.09798 18.712 5.28543ZM17.4321 5.05285H4.03352L5.45676 12.8577H16.0139L17.4321 5.05285Z" fill="#FFFFFF"/>
+<path d="M7.60976 16.7439C7.60976 17.7138 6.82353 18.5 5.85366 18.5C4.88379 18.5 4.09756 17.7138 4.09756 16.7439C4.09756 15.774 4.88379 14.9878 5.85366 14.9878C6.82353 14.9878 7.60976 15.774 7.60976 16.7439Z" fill="#FFFFFF"/>
+<path d="M17.3659 16.7439C17.3659 17.7138 16.5796 18.5 15.6098 18.5C14.6399 18.5 13.8537 17.7138 13.8537 16.7439C13.8537 15.774 14.6399 14.9878 15.6098 14.9878C16.5796 14.9878 17.3659 15.774 17.3659 16.7439Z" fill="#FFFFFF"/>
+<circle cx="17.5" cy="4.5" r="4.5" fill="#DE1B1B"/>
+</svg>
+`;
+
+
+let mobile_cart_icon = `<svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M7.60976 16.7439C7.60976 17.0012 7.07818 17.2689 6.93525 17.4829C6.79231 17.6968 6.58915 17.8635 6.35146 17.962C6.11377 18.0604 5.85222 18.0862 5.59988 18.036C5.34755 17.9858 5.11577 17.8619 4.93385 17.68C4.75192 17.4981 4.62803 17.2663 4.57784 17.0139C4.52765 16.7616 4.55341 16.5001 4.65186 16.2624C4.75032 16.0247 4.91705 15.8215 5.13097 15.6786C5.34488 15.5356 5.59638 15.4593 5.85366 15.4593C6.19866 15.4594 6.52952 15.5964 6.77347 15.8404C7.01742 16.0843 7.60975 16.3989 7.60976 16.7439ZM15.6098 15.4593C15.3525 15.4593 15.101 15.5356 14.8871 15.6786C14.6731 15.8215 14.5064 16.0247 14.408 16.2624C14.3095 16.5001 14.2837 16.7616 14.3339 17.0139C14.3841 17.2663 14.508 17.4981 14.6899 17.68C14.8719 17.8619 15.1036 17.9858 15.356 18.036C15.6083 18.0862 15.8699 18.0604 16.1076 17.962C16.3452 17.8635 16.5484 17.6968 16.6913 17.4829C16.8343 17.2689 16.9106 17.0174 16.9106 16.7602C16.9106 16.4152 16.7735 16.0843 16.5296 15.8404C16.2856 15.5964 15.9548 15.4594 15.6098 15.4593ZM18.712 5.28543L17.2937 13.0903C17.2394 13.3901 17.0815 13.6613 16.8476 13.8565C16.6136 14.0518 16.3186 14.1587 16.0139 14.1585H5.45676C5.15222 14.1586 4.8573 14.0518 4.62344 13.8567C4.38958 13.6617 4.2316 13.3907 4.17707 13.0911L2.62282 4.5677C2.61455 4.53606 2.60866 4.50384 2.6052 4.47131L2.11827 1.80081H0.650407C0.477908 1.80081 0.312475 1.73229 0.1905 1.61031C0.0685248 1.48834 0 1.32291 0 1.15041C0 0.977908 0.0685248 0.812475 0.1905 0.6905C0.312475 0.568525 0.477908 0.5 0.650407 0.5H2.11819C2.42274 0.499907 2.71767 0.60671 2.95154 0.801787C3.18542 0.996865 3.34341 1.26784 3.39796 1.56747L3.79637 3.75203H17.4321C17.6226 3.75203 17.8108 3.79388 17.9834 3.87462C18.156 3.95537 18.3087 4.07303 18.4308 4.21931C18.5529 4.36558 18.6413 4.53688 18.6899 4.7211C18.7385 4.90533 18.746 5.09798 18.712 5.28543ZM17.4321 5.05285H4.03352L5.45676 12.8577H16.0139L17.4321 5.05285Z" fill="#006cfa"/>
+<path d="M7.60976 16.7439C7.60976 17.7138 6.82353 18.5 5.85366 18.5C4.88379 18.5 4.09756 17.7138 4.09756 16.7439C4.09756 15.774 4.88379 14.9878 5.85366 14.9878C6.82353 14.9878 7.60976 15.774 7.60976 16.7439Z" fill="#006cfa"/>
+<path d="M17.3659 16.7439C17.3659 17.7138 16.5796 18.5 15.6098 18.5C14.6399 18.5 13.8537 17.7138 13.8537 16.7439C13.8537 15.774 14.6399 14.9878 15.6098 14.9878C16.5796 14.9878 17.3659 15.774 17.3659 16.7439Z" fill="#006cfa"/>
+</svg>
+`;
+
+let mobile_active_cart_icon = `<svg width="22" height="19" viewBox="0 0 22 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M7.60976 16.7439C7.60976 17.0012 7.07818 17.2689 6.93525 17.4829C6.79231 17.6968 6.58915 17.8635 6.35146 17.962C6.11377 18.0604 5.85222 18.0862 5.59988 18.036C5.34755 17.9858 5.11577 17.8619 4.93385 17.68C4.75192 17.4981 4.62803 17.2663 4.57784 17.0139C4.52765 16.7616 4.55341 16.5001 4.65186 16.2624C4.75032 16.0247 4.91705 15.8215 5.13097 15.6786C5.34488 15.5356 5.59638 15.4593 5.85366 15.4593C6.19866 15.4594 6.52952 15.5964 6.77347 15.8404C7.01742 16.0843 7.60975 16.3989 7.60976 16.7439ZM15.6098 15.4593C15.3525 15.4593 15.101 15.5356 14.8871 15.6786C14.6731 15.8215 14.5064 16.0247 14.408 16.2624C14.3095 16.5001 14.2837 16.7616 14.3339 17.0139C14.3841 17.2663 14.508 17.4981 14.6899 17.68C14.8719 17.8619 15.1036 17.9858 15.356 18.036C15.6083 18.0862 15.8699 18.0604 16.1076 17.962C16.3452 17.8635 16.5484 17.6968 16.6913 17.4829C16.8343 17.2689 16.9106 17.0174 16.9106 16.7602C16.9106 16.4152 16.7735 16.0843 16.5296 15.8404C16.2856 15.5964 15.9548 15.4594 15.6098 15.4593ZM18.712 5.28543L17.2937 13.0903C17.2394 13.3901 17.0815 13.6613 16.8476 13.8565C16.6136 14.0518 16.3186 14.1587 16.0139 14.1585H5.45676C5.15222 14.1586 4.8573 14.0518 4.62344 13.8567C4.38958 13.6617 4.2316 13.3907 4.17707 13.0911L2.62282 4.5677C2.61455 4.53606 2.60866 4.50384 2.6052 4.47131L2.11827 1.80081H0.650407C0.477908 1.80081 0.312475 1.73229 0.1905 1.61031C0.0685248 1.48834 0 1.32291 0 1.15041C0 0.977908 0.0685248 0.812475 0.1905 0.6905C0.312475 0.568525 0.477908 0.5 0.650407 0.5H2.11819C2.42274 0.499907 2.71767 0.60671 2.95154 0.801787C3.18542 0.996865 3.34341 1.26784 3.39796 1.56747L3.79637 3.75203H17.4321C17.6226 3.75203 17.8108 3.79388 17.9834 3.87462C18.156 3.95537 18.3087 4.07303 18.4308 4.21931C18.5529 4.36558 18.6413 4.53688 18.6899 4.7211C18.7385 4.90533 18.746 5.09798 18.712 5.28543ZM17.4321 5.05285H4.03352L5.45676 12.8577H16.0139L17.4321 5.05285Z" fill="#006cfa"/>
+<path d="M7.60976 16.7439C7.60976 17.7138 6.82353 18.5 5.85366 18.5C4.88379 18.5 4.09756 17.7138 4.09756 16.7439C4.09756 15.774 4.88379 14.9878 5.85366 14.9878C6.82353 14.9878 7.60976 15.774 7.60976 16.7439Z" fill="#006cfa"/>
+<path d="M17.3659 16.7439C17.3659 17.7138 16.5796 18.5 15.6098 18.5C14.6399 18.5 13.8537 17.7138 13.8537 16.7439C13.8537 15.774 14.6399 14.9878 15.6098 14.9878C16.5796 14.9878 17.3659 15.774 17.3659 16.7439Z" fill="#006cfa"/>
+<circle cx="17.5" cy="4.5" r="4.5" fill="#DE1B1B"/>
+</svg>
+`;
+	
+let cart_icon_link = document.getElementById('cart-icon');
+let cart_icon_link_mobile = document.getElementById('cart-icon-mobile');
+let cart_icon_link_mobile_expanded = document.getElementById('cart-icon-mobile-expanded');
+let cart_icon_mobile_nav = document.getElementById('mobile-cart-dot');
+let mobile_nav_dot = document.getElementById('mobile-nav-dot');
+
+function getCookie(cname) {
+  let name = cname + "=";
+  let ca = document.cookie.split(';');
+  for(let i = 0; i < ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+
+function checkCookie() {
+  let cart = getCookie("wp-bigcommerce_cart_id");
+  console.log("Cart value:", cart);
+
+  if (cart !== "") {
+    console.log("Setting active cart icon");
+    cart_icon_link.innerHTML = active_cart_icon;
+    cart_icon_link_mobile.innerHTML = mobile_active_cart_icon;
+    mobile_nav_dot.style.display = "block";
+  } else {
+    console.log("Setting default cart icon");
+    cart_icon_link.innerHTML = cart_icon;
+    cart_icon_link_mobile.innerHTML = mobile_cart_icon;
+    mobile_nav_dot.style.display = "none";
+  }
+}
+
+console.log("cart_icon_link:", cart_icon_link);
+checkCookie();
+
+</script>
+</body>
+</html> 
+</header>
+<div class="document">
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Python Protocol API v2</a></h1>
+
+
+
+<p class="blurb">Python Protocol API</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=opentrons&repo=opentrons&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<!-- Navbar override for specific styling for the v2 sidebar-->
+<h3>Table of Contents</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Welcome</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Versioning</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#major-and-minor-versions">Major and Minor Versions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#specifying-versions">Specifying Versions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#maximum-supported-versions">Maximum Supported Versions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#api-and-robot-software-versions">API and Robot Software Versions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#changes-in-api-versions">Changes in API Versions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#version-2-24">Version 2.24</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#version-2-23">Version 2.23</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#version-2-22">Version 2.22</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#version-2-21">Version 2.21</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#version-2-20">Version 2.20</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#version-2-19">Version 2.19</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#version-2-18">Version 2.18</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#version-2-17">Version 2.17</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#version-2-16">Version 2.16</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#version-2-15">Version 2.15</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#version-2-14">Version 2.14</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#version-2-13">Version 2.13</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#version-2-12">Version 2.12</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#version-2-11">Version 2.11</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#version-2-10">Version 2.10</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#version-2-9">Version 2.9</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#version-2-8">Version 2.8</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#version-2-7">Version 2.7</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#version-2-6">Version 2.6</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#version-2-5">Version 2.5</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#version-2-4">Version 2.4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#version-2-3">Version 2.3</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#version-2-2">Version 2.2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#version-2-1">Version 2.1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#version-2-0">Version 2.0</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="new_labware.html">Labware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="moving_labware.html">Moving Labware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="new_modules.html">Hardware Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deck_slots.html">Deck Slots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="new_pipette.html">Pipettes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="liquid_classes.html">Liquid Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="liquid_class_definitions.html">Liquid Class Definitions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="new_atomic_commands.html">Building Block Commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="new_complex_commands.html">Complex Commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="robot_position.html">Labware and Deck Positions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="runtime_parameters.html">Runtime Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="new_advanced_running.html">Advanced Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="new_examples.html">Protocol Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="adapting_ot2_flex.html">Adapting OT-2 Protocols for Flex</a></li>
+<li class="toctree-l1"><a class="reference internal" href="new_protocol_api.html">API Version 2 Reference</a></li>
+</ul>
+
+<hr />
+<ul>
+    <li class="toctree-l1"><a href="../v1/index.html">OT-2 Python API v1</a></li>
+    <li class="toctree-l1"><a href="../ot1/index.html">OT-1 Python API</a></li>
+</ul>
+<!-- 'extra_nav_links' in the config dict if any, though there probably shoudln't be -->
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="tutorial.html" title="previous chapter">Tutorial</a></li>
+      <li>Next: <a href="new_labware.html" title="next chapter">Labware</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+  <div class="documentwrapper">
+    <div class="bodywrapper">
+      <div class="body" role="main">
+        
+  <section id="versioning">
+<span id="v2-versioning"></span><h1>Versioning<a class="headerlink" href="#versioning" title="Permalink to this heading">¶</a></h1>
+<p>The Python Protocol API has its own versioning system, which is separate from the versioning system used for the robot software and the Opentrons App. This allows protocols to run on newer robot software versions without modification.</p>
+<section id="major-and-minor-versions">
+<h2>Major and Minor Versions<a class="headerlink" href="#major-and-minor-versions" title="Permalink to this heading">¶</a></h2>
+<p>The API uses a major and minor version number and does not use patch version numbers. For instance, major version 2 and minor version 0 is written as <code class="docutils literal notranslate"><span class="pre">2.0</span></code>. Versions are not decimal numbers, so <code class="docutils literal notranslate"><span class="pre">2.10</span></code> indicates major version 2 and minor version 10. The Python Protocol API version will only increase based on changes that affect protocol behavior.</p>
+<p>The major version of the API increases whenever there are significant structural or behavioral changes to protocols. For instance, major version 2 of the API was introduced because it required protocols to have a <code class="docutils literal notranslate"><span class="pre">run</span></code> function that takes a <code class="docutils literal notranslate"><span class="pre">protocol</span></code> argument rather than importing the <code class="docutils literal notranslate"><span class="pre">robot</span></code>, <code class="docutils literal notranslate"><span class="pre">instruments</span></code>, and <code class="docutils literal notranslate"><span class="pre">labware</span></code> modules. Protocols written with major version 1 of the API will not run without modification in major version 2. A similar level of structural change would require a major version 3. This documentation only deals with features found in major version 2 of the API; see the <a class="reference external" href="https://docs.opentrons.com/v1/index.html">archived version 1 documentation</a> for information on older protocols.</p>
+<p>The minor version of the API increases whenever there is new functionality that might change the way a protocol is written, or when a behavior changes in one aspect of the API but does not affect all protocols. For instance, adding support for a new hardware module, adding new parameters for a function, or deprecating a feature would increase the minor version of the API.</p>
+</section>
+<section id="specifying-versions">
+<span id="id1"></span><h2>Specifying Versions<a class="headerlink" href="#specifying-versions" title="Permalink to this heading">¶</a></h2>
+<p>You must specify the API version you are targeting in your Python protocol. In all minor versions, you can do this with the <code class="docutils literal notranslate"><span class="pre">apiLevel</span></code> key in the <code class="docutils literal notranslate"><span class="pre">metadata</span></code> dictionary, alongside any other metadata elements:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="kn">from</span><span class="w"> </span><span class="nn">opentrons</span><span class="w"> </span><span class="kn">import</span> <span class="n">protocol_api</span>
+
+ <span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span>
+     <span class="s2">&quot;apiLevel&quot;</span><span class="p">:</span> <span class="s2">&quot;2.24&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;author&quot;</span><span class="p">:</span> <span class="s2">&quot;A. Biologist&quot;</span><span class="p">}</span>
+
+ <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="n">protocol</span><span class="p">:</span> <span class="n">protocol_api</span><span class="o">.</span><span class="n">ProtocolContext</span><span class="p">):</span>
+     <span class="n">protocol</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;Hello, world!&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>From version 2.15 onward, you can specify <code class="docutils literal notranslate"><span class="pre">apiLevel</span></code> in the <code class="docutils literal notranslate"><span class="pre">requirements</span></code> dictionary instead:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="kn">from</span><span class="w"> </span><span class="nn">opentrons</span><span class="w"> </span><span class="kn">import</span> <span class="n">protocol_api</span>
+
+ <span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;author&quot;</span><span class="p">:</span> <span class="s2">&quot;A. Biologist&quot;</span><span class="p">}</span>
+ <span class="n">requirements</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;apiLevel&quot;</span><span class="p">:</span> <span class="s2">&quot;2.24&quot;</span><span class="p">,</span> <span class="s2">&quot;robotType&quot;</span><span class="p">:</span> <span class="s2">&quot;Flex&quot;</span><span class="p">}</span>
+
+ <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="n">protocol</span><span class="p">:</span> <span class="n">protocol_api</span><span class="o">.</span><span class="n">ProtocolContext</span><span class="p">):</span>
+     <span class="n">protocol</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;Hello, Flex!&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Choose only one of these places to specify <code class="docutils literal notranslate"><span class="pre">apiLevel</span></code>. If you put it in neither or both places, you will not be able to simulate or run your protocol.</p>
+<p>The version you specify determines the features and behaviors available to your protocol. For example, support for the Heater-Shaker Module was added in version 2.13, so you can’t specify a lower version and then call <code class="docutils literal notranslate"><span class="pre">HeaterShakerContext</span></code> methods without causing an error. This protects you from accidentally using features not present in your specified API version, and keeps your protocol portable between API versions.</p>
+<p>When choosing an API level, consider what features you need and how widely you plan to share your protocol. Throughout the Python Protocol API documentation, there are version statements indicating when elements (features, function calls, available properties, etc.) were introduced. Keep these in mind when specifying your protocol’s API version. Version statements look like this:</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 2.0.</span></p>
+</div>
+<p>On the one hand, using the highest available version will give your protocol access to all the latest <a class="reference internal" href="#version-notes"><span class="std std-ref">features and fixes</span></a>. On the other hand, using the lowest possible version lets the protocol work on a wider range of robot software versions. For example, a protocol that uses the Heater-Shaker and specifies version 2.13 of the API should work equally well on a robot running version 6.1.0 or 6.2.0 of the robot software. Specifying version 2.14 would limit the protocol to robots running 6.2.0 or higher.</p>
+</section>
+<section id="maximum-supported-versions">
+<span id="max-version"></span><h2>Maximum Supported Versions<a class="headerlink" href="#maximum-supported-versions" title="Permalink to this heading">¶</a></h2>
+<p>The maximum supported API version for your robot is listed in the Opentrons App under <strong>Robots</strong> &gt; your robot &gt; <strong>Robot Settings</strong> &gt; <strong>Advanced</strong>. Before version 6.0.0 of the app, the same information was listed on your robot’s <strong>Information</strong> card.</p>
+<p>If you upload a protocol that specifies a higher API level than the maximum supported, your robot won’t be able to analyze or run your protocol. You can increase the maximum supported version by updating your robot software and Opentrons App.</p>
+<p>Opentrons robots running the latest software (8.5.0) support the following version ranges:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Flex:</strong> version 2.15–2.24.</p></li>
+<li><p><strong>OT-2:</strong> versions 2.0–2.24.</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="api-and-robot-software-versions">
+<span id="version-table"></span><h2>API and Robot Software Versions<a class="headerlink" href="#api-and-robot-software-versions" title="Permalink to this heading">¶</a></h2>
+<p>This table lists the correspondence between Protocol API versions and robot software versions.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>API Version</p></th>
+<th class="head"><p>Introduced in Robot Software</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>2.24</p></td>
+<td><p>8.5.0</p></td>
+</tr>
+<tr class="row-odd"><td><p>2.23</p></td>
+<td><p>8.4.0</p></td>
+</tr>
+<tr class="row-even"><td><p>2.22</p></td>
+<td><p>8.3.0</p></td>
+</tr>
+<tr class="row-odd"><td><p>2.21</p></td>
+<td><p>8.2.0</p></td>
+</tr>
+<tr class="row-even"><td><p>2.20</p></td>
+<td><p>8.0.0</p></td>
+</tr>
+<tr class="row-odd"><td><p>2.19</p></td>
+<td><p>7.3.1</p></td>
+</tr>
+<tr class="row-even"><td><p>2.18</p></td>
+<td><p>7.3.0</p></td>
+</tr>
+<tr class="row-odd"><td><p>2.17</p></td>
+<td><p>7.2.0</p></td>
+</tr>
+<tr class="row-even"><td><p>2.16</p></td>
+<td><p>7.1.0</p></td>
+</tr>
+<tr class="row-odd"><td><p>2.15</p></td>
+<td><p>7.0.0</p></td>
+</tr>
+<tr class="row-even"><td><p>2.14</p></td>
+<td><p>6.3.0</p></td>
+</tr>
+<tr class="row-odd"><td><p>2.13</p></td>
+<td><p>6.1.0</p></td>
+</tr>
+<tr class="row-even"><td><p>2.12</p></td>
+<td><p>5.0.0</p></td>
+</tr>
+<tr class="row-odd"><td><p>2.11</p></td>
+<td><p>4.4.0</p></td>
+</tr>
+<tr class="row-even"><td><p>2.10</p></td>
+<td><p>4.3.0</p></td>
+</tr>
+<tr class="row-odd"><td><p>2.9</p></td>
+<td><p>4.1.0</p></td>
+</tr>
+<tr class="row-even"><td><p>2.8</p></td>
+<td><p>4.0.0</p></td>
+</tr>
+<tr class="row-odd"><td><p>2.7</p></td>
+<td><p>3.21.0</p></td>
+</tr>
+<tr class="row-even"><td><p>2.6</p></td>
+<td><p>3.20.0</p></td>
+</tr>
+<tr class="row-odd"><td><p>2.5</p></td>
+<td><p>3.19.0</p></td>
+</tr>
+<tr class="row-even"><td><p>2.4</p></td>
+<td><p>3.17.1</p></td>
+</tr>
+<tr class="row-odd"><td><p>2.3</p></td>
+<td><p>3.17.0</p></td>
+</tr>
+<tr class="row-even"><td><p>2.2</p></td>
+<td><p>3.16.0</p></td>
+</tr>
+<tr class="row-odd"><td><p>2.1</p></td>
+<td><p>3.15.2</p></td>
+</tr>
+<tr class="row-even"><td><p>2.0</p></td>
+<td><p>3.14.0</p></td>
+</tr>
+<tr class="row-odd"><td><p>1.0</p></td>
+<td><p>3.0.0</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="changes-in-api-versions">
+<span id="version-notes"></span><h2>Changes in API Versions<a class="headerlink" href="#changes-in-api-versions" title="Permalink to this heading">¶</a></h2>
+<section id="version-2-24">
+<h3>Version 2.24<a class="headerlink" href="#version-2-24" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Adds the ability to perform liquid handling actions using <a class="reference internal" href="liquid_classes.html#liquid-classes"><span class="std std-ref">liquid classes</span></a>.</p>
+<ul>
+<li><p><a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.ProtocolContext.get_liquid_class" title="opentrons.protocol_api.ProtocolContext.get_liquid_class"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ProtocolContext.get_liquid_class()</span></code></a> accesses <a class="reference internal" href="liquid_class_definitions.html#liquid-class-definitions"><span class="std std-ref">Opentrons-verified liquid class definitions</span></a> for aqueous, volatile, and viscous liquids.</p></li>
+<li><p><a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.ProtocolContext.define_liquid_class" title="opentrons.protocol_api.ProtocolContext.define_liquid_class"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ProtocolContext.define_liquid_class()</span></code></a> lets you create your own liquid classes from verified classes or from scratch.</p></li>
+<li><p>New <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext" title="opentrons.protocol_api.InstrumentContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">InstrumentContext</span></code></a> methods — <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.transfer_with_liquid_class" title="opentrons.protocol_api.InstrumentContext.transfer_with_liquid_class"><code class="xref py py-meth docutils literal notranslate"><span class="pre">transfer_with_liquid_class()</span></code></a>, <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.distribute_with_liquid_class" title="opentrons.protocol_api.InstrumentContext.distribute_with_liquid_class"><code class="xref py py-meth docutils literal notranslate"><span class="pre">distribute_with_liquid_class()</span></code></a>, and <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.consolidate_with_liquid_class" title="opentrons.protocol_api.InstrumentContext.consolidate_with_liquid_class"><code class="xref py py-meth docutils literal notranslate"><span class="pre">consolidate_with_liquid_class()</span></code></a> — move liquids according to their properties.</p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.air_gap" title="opentrons.protocol_api.InstrumentContext.air_gap"><code class="xref py py-meth docutils literal notranslate"><span class="pre">air_gap()</span></code></a>, <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.blow_out" title="opentrons.protocol_api.InstrumentContext.blow_out"><code class="xref py py-meth docutils literal notranslate"><span class="pre">blow_out()</span></code></a>, <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.dispense" title="opentrons.protocol_api.InstrumentContext.dispense"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dispense()</span></code></a>, <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.mix" title="opentrons.protocol_api.InstrumentContext.mix"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mix()</span></code></a>, and <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.touch_tip" title="opentrons.protocol_api.InstrumentContext.touch_tip"><code class="xref py py-meth docutils literal notranslate"><span class="pre">touch_tip()</span></code></a> have new parameters for advanced settings that are also available in Protocol Designer.</p></li>
+</ul>
+</section>
+<section id="version-2-23">
+<h3>Version 2.23<a class="headerlink" href="#version-2-23" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Wells now have a <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.Well.meniscus" title="opentrons.protocol_api.Well.meniscus"><code class="xref py py-meth docutils literal notranslate"><span class="pre">meniscus()</span></code></a> location that corresponds to the top of the liquid, either as set in the protocol or measured by probing with a pipette tip. See <a class="reference internal" href="robot_position.html#well-meniscus"><span class="std std-ref">Meniscus</span></a>.</p></li>
+<li><p>Load and move labware lids with a new <code class="docutils literal notranslate"><span class="pre">lid</span></code> parameter of <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.ProtocolContext.load_labware" title="opentrons.protocol_api.ProtocolContext.load_labware"><code class="xref py py-meth docutils literal notranslate"><span class="pre">load_labware()</span></code></a> and standalone methods. See <a class="reference internal" href="new_labware.html#loading-lids"><span class="std std-ref">Loading Lids</span></a> and <a class="reference internal" href="moving_labware.html#moving-lids"><span class="std std-ref">Moving Lids</span></a>.</p></li>
+<li><p>Updated <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.Labware.set_offset" title="opentrons.protocol_api.Labware.set_offset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_offset()</span></code></a> to match new Labware Position Check behavior in Opentrons App v8.4.0.</p></li>
+</ul>
+</section>
+<section id="version-2-22">
+<h3>Version 2.22<a class="headerlink" href="#version-2-22" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Improvements to loading liquids. Use the new <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.Labware.load_liquid" title="opentrons.protocol_api.Labware.load_liquid"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Labware.load_liquid()</span></code></a>, <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.Labware.load_liquid_by_well" title="opentrons.protocol_api.Labware.load_liquid_by_well"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Labware.load_liquid_by_well()</span></code></a>, and <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.Labware.load_empty" title="opentrons.protocol_api.Labware.load_empty"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Labware.load_empty()</span></code></a> methods instead of <code class="docutils literal notranslate"><span class="pre">Well.load_liquid()</span></code>, which is now deprecated.</p></li>
+<li><p>Beta features for our commercial partners.</p></li>
+</ul>
+</section>
+<section id="version-2-21">
+<h3>Version 2.21<a class="headerlink" href="#version-2-21" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Adds <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.AbsorbanceReaderContext" title="opentrons.protocol_api.AbsorbanceReaderContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbsorbanceReaderContext</span></code></a> to support the <a class="reference internal" href="modules/absorbance_plate_reader.html#absorbance-plate-reader-module"><span class="std std-ref">Absorbance Plate Reader Module</span></a>. Use the load name <code class="docutils literal notranslate"><span class="pre">absorbanceReaderV1</span></code> with <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.ProtocolContext.load_module" title="opentrons.protocol_api.ProtocolContext.load_module"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ProtocolContext.load_module()</span></code></a> to add an Absorbance Plate Reader to a protocol.</p></li>
+<li><p><a class="reference internal" href="pipettes/loading.html#lpd"><span class="std std-ref">Liquid presence detection</span></a> now only checks on the first aspiration of the <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.mix" title="opentrons.protocol_api.InstrumentContext.mix"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mix()</span></code></a> cycle.</p></li>
+<li><p>Improved the run log output of <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.ThermocyclerContext.execute_profile" title="opentrons.protocol_api.ThermocyclerContext.execute_profile"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ThermocyclerContext.execute_profile()</span></code></a>.</p></li>
+</ul>
+</section>
+<section id="version-2-20">
+<h3>Version 2.20<a class="headerlink" href="#version-2-20" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Detect liquid presence within a well. The <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.detect_liquid_presence" title="opentrons.protocol_api.InstrumentContext.detect_liquid_presence"><code class="xref py py-meth docutils literal notranslate"><span class="pre">InstrumentContext.detect_liquid_presence()</span></code></a> and <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.require_liquid_presence" title="opentrons.protocol_api.InstrumentContext.require_liquid_presence"><code class="xref py py-meth docutils literal notranslate"><span class="pre">InstrumentContext.require_liquid_presence()</span></code></a> building block commands check for liquid any point in your protocol. You can also <a class="reference internal" href="pipettes/loading.html#lpd"><span class="std std-ref">enable liquid presence detection</span></a> for all aspirations when loading a pipette, although this will add significant time to your protocol.</p></li>
+<li><p>Define CSV runtime parameters and use their contents in a protocol with new <a class="reference internal" href="parameters/using_values.html#rtp-csv-data"><span class="std std-ref">data manipulation methods</span></a>. See the <a class="reference internal" href="parameters/use_case_cherrypicking.html#use-case-cherrypicking"><span class="std std-ref">cherrypicking use case</span></a> for a full example.</p></li>
+<li><p><a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.configure_nozzle_layout" title="opentrons.protocol_api.InstrumentContext.configure_nozzle_layout"><code class="xref py py-meth docutils literal notranslate"><span class="pre">configure_nozzle_layout()</span></code></a> now accepts row, single, and partial column layout constants. See <a class="reference internal" href="pipettes/partial_tip_pickup.html#partial-tip-pickup"><span class="std std-ref">Partial Tip Pickup</span></a>.</p></li>
+<li><p>You can now call <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.ProtocolContext.define_liquid" title="opentrons.protocol_api.ProtocolContext.define_liquid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProtocolContext.define_liquid()</span></code></a> without supplying a <code class="docutils literal notranslate"><span class="pre">description</span></code> or <code class="docutils literal notranslate"><span class="pre">display_color</span></code>.</p></li>
+</ul>
+</section>
+<section id="version-2-19">
+<h3>Version 2.19<a class="headerlink" href="#version-2-19" title="Permalink to this heading">¶</a></h3>
+<p>Opentrons recommends updating protocols from <code class="docutils literal notranslate"><span class="pre">apiLevel</span></code> 2.18 to 2.19 to take advantage of improved pipetting behavior.</p>
+<ul class="simple">
+<li><p>This version uses new values for how much a tip overlaps with the pipette nozzle when the pipette picks up tips. This can correct errors caused by the robot positioning the tip slightly lower than intended, potentially making contact with labware. See <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.pick_up_tip" title="opentrons.protocol_api.InstrumentContext.pick_up_tip"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pick_up_tip()</span></code></a> for additional details.</p></li>
+</ul>
+</section>
+<section id="version-2-18">
+<h3>Version 2.18<a class="headerlink" href="#version-2-18" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Define customizable parameters with the new <code class="docutils literal notranslate"><span class="pre">add_parameters()</span></code> function, and access their values on the <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.ProtocolContext.params" title="opentrons.protocol_api.ProtocolContext.params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProtocolContext.params</span></code></a> object during a protocol run. See <a class="reference internal" href="runtime_parameters.html#runtime-parameters"><span class="std std-ref">Runtime Parameters</span></a> and related pages for more information.</p></li>
+<li><p>Move the pipette to positions relative to the top of a trash container. See <a class="reference internal" href="robot_position.html#position-relative-trash"><span class="std std-ref">Position Relative to Trash Containers</span></a>. The default behavior of <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.drop_tip" title="opentrons.protocol_api.InstrumentContext.drop_tip"><code class="xref py py-meth docutils literal notranslate"><span class="pre">drop_tip()</span></code></a> also accounts for this new possibility.</p></li>
+<li><p><a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.Labware.set_offset" title="opentrons.protocol_api.Labware.set_offset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_offset()</span></code></a> has been restored to the API with new behavior that applies to labware type–location pairs.</p></li>
+<li><p>Automatic tip tracking is now available for all nozzle configurations.</p></li>
+</ul>
+</section>
+<section id="version-2-17">
+<h3>Version 2.17<a class="headerlink" href="#version-2-17" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.dispense" title="opentrons.protocol_api.InstrumentContext.dispense"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dispense()</span></code></a> now raises an error if you try to dispense more than <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.current_volume" title="opentrons.protocol_api.InstrumentContext.current_volume"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InstrumentContext.current_volume</span></code></a>.</p></li>
+</ul>
+</section>
+<section id="version-2-16">
+<h3>Version 2.16<a class="headerlink" href="#version-2-16" title="Permalink to this heading">¶</a></h3>
+<p>This version introduces new features for Flex and adds and improves methods for aspirating and dispensing. Note that when updating Flex protocols to version 2.16, you <em>must</em> load a trash container before dropping tips.</p>
+<ul class="simple">
+<li><p>New features</p>
+<ul>
+<li><p>Use <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.configure_nozzle_layout" title="opentrons.protocol_api.InstrumentContext.configure_nozzle_layout"><code class="xref py py-meth docutils literal notranslate"><span class="pre">configure_nozzle_layout()</span></code></a> to pick up a single column of tips with the 96-channel pipette. See <a class="reference internal" href="pipettes/partial_tip_pickup.html#partial-tip-pickup"><span class="std std-ref">Partial Tip Pickup</span></a>.</p></li>
+<li><p>Specify the trash containers attached to your Flex with <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.ProtocolContext.load_waste_chute" title="opentrons.protocol_api.ProtocolContext.load_waste_chute"><code class="xref py py-meth docutils literal notranslate"><span class="pre">load_waste_chute()</span></code></a> and <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.ProtocolContext.load_trash_bin" title="opentrons.protocol_api.ProtocolContext.load_trash_bin"><code class="xref py py-meth docutils literal notranslate"><span class="pre">load_trash_bin()</span></code></a>.</p></li>
+<li><p>Dispense, blow out, drop tips, and dispose labware in the waste chute. Disposing labware requires the gripper and calling <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.ProtocolContext.move_labware" title="opentrons.protocol_api.ProtocolContext.move_labware"><code class="xref py py-meth docutils literal notranslate"><span class="pre">move_labware()</span></code></a> with <code class="docutils literal notranslate"><span class="pre">use_gripper=True</span></code>.</p></li>
+<li><p>Perform actions in staging area slots by referencing slots A4 through D4. See <a class="reference internal" href="deck_slots.html#deck-slots"><span class="std std-ref">Deck Slots</span></a>.</p></li>
+<li><p>Explicitly command a pipette to <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.prepare_to_aspirate" title="opentrons.protocol_api.InstrumentContext.prepare_to_aspirate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">prepare_to_aspirate()</span></code></a>. The API usually prepares pipettes to aspirate automatically, but this is useful for certain applications, like pre-wetting routines.</p></li>
+</ul>
+</li>
+<li><p>Improved features</p>
+<ul>
+<li><p><a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.aspirate" title="opentrons.protocol_api.InstrumentContext.aspirate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">aspirate()</span></code></a>, <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.dispense" title="opentrons.protocol_api.InstrumentContext.dispense"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dispense()</span></code></a>, and <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.mix" title="opentrons.protocol_api.InstrumentContext.mix"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mix()</span></code></a> will not move any liquid when called with <code class="docutils literal notranslate"><span class="pre">volume=0</span></code>.</p></li>
+</ul>
+</li>
+<li><p>Other changes</p>
+<ul>
+<li><p><a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.ProtocolContext.fixed_trash" title="opentrons.protocol_api.ProtocolContext.fixed_trash"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProtocolContext.fixed_trash</span></code></a> and <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.trash_container" title="opentrons.protocol_api.InstrumentContext.trash_container"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InstrumentContext.trash_container</span></code></a> now return <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.TrashBin" title="opentrons.protocol_api.TrashBin"><code class="xref py py-class docutils literal notranslate"><span class="pre">TrashBin</span></code></a> objects instead of <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.Labware" title="opentrons.protocol_api.Labware"><code class="xref py py-class docutils literal notranslate"><span class="pre">Labware</span></code></a> objects.</p></li>
+<li><p>Flex will no longer automatically drop tips in the trash at the end of a protocol. You can add a <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.drop_tip" title="opentrons.protocol_api.InstrumentContext.drop_tip"><code class="xref py py-meth docutils literal notranslate"><span class="pre">drop_tip()</span></code></a> command to your protocol or use the Opentrons App to drop the tips.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="version-2-15">
+<h3>Version 2.15<a class="headerlink" href="#version-2-15" title="Permalink to this heading">¶</a></h3>
+<p>This version introduces support for the Opentrons Flex robot, instruments, modules, and labware.</p>
+<ul class="simple">
+<li><p>Flex features</p>
+<ul>
+<li><p>Write protocols for Opentrons Flex by declaring <code class="docutils literal notranslate"><span class="pre">&quot;robotType&quot;:</span> <span class="pre">&quot;Flex&quot;</span></code> in the new <code class="docutils literal notranslate"><span class="pre">requirements</span></code> dictionary. See the <a class="reference internal" href="tutorial.html#tutorial-requirements"><span class="std std-ref">examples in the Tutorial</span></a>.</p></li>
+<li><p><a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.ProtocolContext.load_instrument" title="opentrons.protocol_api.ProtocolContext.load_instrument"><code class="xref py py-meth docutils literal notranslate"><span class="pre">load_instrument()</span></code></a> supports loading Flex 1-, 8-, and 96-channel pipettes. See <a class="reference internal" href="pipettes/loading.html#new-create-pipette"><span class="std std-ref">Loading Pipettes</span></a>.</p></li>
+<li><p>The new <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.ProtocolContext.move_labware" title="opentrons.protocol_api.ProtocolContext.move_labware"><code class="xref py py-meth docutils literal notranslate"><span class="pre">move_labware()</span></code></a> method can move labware automatically using the Flex Gripper. You can also move labware manually on Flex.</p></li>
+<li><p><a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.ProtocolContext.load_module" title="opentrons.protocol_api.ProtocolContext.load_module"><code class="xref py py-meth docutils literal notranslate"><span class="pre">load_module()</span></code></a> supports loading the <a class="reference internal" href="modules/magnetic_block.html#magnetic-block"><span class="std std-ref">Magnetic Block</span></a>.</p></li>
+<li><p>The API does not enforce placement restrictions for the Heater-Shaker module on Flex, because it is installed below-deck in a module caddy. Pipetting restrictions are still in place when the Heater-Shaker is shaking or its labware latch is open.</p></li>
+<li><p>The new <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.configure_for_volume" title="opentrons.protocol_api.InstrumentContext.configure_for_volume"><code class="xref py py-meth docutils literal notranslate"><span class="pre">configure_for_volume()</span></code></a> method can place Flex 50 µL pipettes in a low-volume mode for dispensing very small volumes of liquid. See <a class="reference internal" href="pipettes/volume_modes.html#pipette-volume-modes"><span class="std std-ref">Volume Modes</span></a>.</p></li>
+</ul>
+</li>
+<li><p>Flex and OT-2 features</p>
+<ul>
+<li><p>Optionally specify <code class="docutils literal notranslate"><span class="pre">apiLevel</span></code> in the new <code class="docutils literal notranslate"><span class="pre">requirements</span></code> dictionary (otherwise, specify it in <code class="docutils literal notranslate"><span class="pre">metadata</span></code>).</p></li>
+<li><p>Optionally specify <code class="docutils literal notranslate"><span class="pre">&quot;robotType&quot;:</span> <span class="pre">&quot;OT-2&quot;</span></code> in <code class="docutils literal notranslate"><span class="pre">requirements</span></code>.</p></li>
+<li><p>Use coordinates or numbers to specify <a class="reference internal" href="deck_slots.html#deck-slots"><span class="std std-ref">deck slots</span></a>. These formats match physical labels on Flex and OT-2, but you can use either system, regardless of <code class="docutils literal notranslate"><span class="pre">robotType</span></code>.</p></li>
+<li><p>The new module context <code class="docutils literal notranslate"><span class="pre">load_adapter()</span></code> methods let you load adapters and labware separately on modules, and <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.ProtocolContext.load_adapter" title="opentrons.protocol_api.ProtocolContext.load_adapter"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ProtocolContext.load_adapter()</span></code></a> lets you load adapters directly in deck slots. See <a class="reference internal" href="new_labware.html#labware-on-adapters"><span class="std std-ref">Loading Labware on Adapters</span></a>.</p></li>
+<li><p>Move labware manually using <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.ProtocolContext.move_labware" title="opentrons.protocol_api.ProtocolContext.move_labware"><code class="xref py py-meth docutils literal notranslate"><span class="pre">move_labware()</span></code></a>, without having to stop your protocol.</p></li>
+<li><p>Manual labware moves support moving to or from the new <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.OFF_DECK" title="opentrons.protocol_api.OFF_DECK"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OFF_DECK</span></code></a> location (outside of the robot).</p></li>
+<li><p><a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.ProtocolContext.load_labware" title="opentrons.protocol_api.ProtocolContext.load_labware"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ProtocolContext.load_labware()</span></code></a> also accepts <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.OFF_DECK" title="opentrons.protocol_api.OFF_DECK"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OFF_DECK</span></code></a> as a location. This lets you prepare labware to be moved onto the deck later in a protocol.</p></li>
+<li><p>The new <code class="docutils literal notranslate"><span class="pre">push_out</span></code> parameter of the <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.dispense" title="opentrons.protocol_api.InstrumentContext.dispense"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dispense()</span></code></a> method helps ensure that the pipette dispenses all of its liquid when working with very small volumes.</p></li>
+<li><p>By default, repeated calls to <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.drop_tip" title="opentrons.protocol_api.InstrumentContext.drop_tip"><code class="xref py py-meth docutils literal notranslate"><span class="pre">drop_tip()</span></code></a> cycle through multiple locations above the trash bin to prevent tips from stacking up.</p></li>
+</ul>
+</li>
+<li><p>Bug fixes</p>
+<ul>
+<li><p><a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.starting_tip" title="opentrons.protocol_api.InstrumentContext.starting_tip"><code class="xref py py-attr docutils literal notranslate"><span class="pre">InstrumentContext.starting_tip</span></code></a> is now respected on the second and subsequent calls to <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.pick_up_tip" title="opentrons.protocol_api.InstrumentContext.pick_up_tip"><code class="xref py py-meth docutils literal notranslate"><span class="pre">InstrumentContext.pick_up_tip()</span></code></a> with no argument.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="version-2-14">
+<h3>Version 2.14<a class="headerlink" href="#version-2-14" title="Permalink to this heading">¶</a></h3>
+<p>This version introduces a new protocol runtime that offers more reliable run control
+and builds a strong foundation for future Protocol API improvements.</p>
+<p>Several older parts of the Protocol API were deprecated as part of this switchover.
+If you specify an API version of <code class="docutils literal notranslate"><span class="pre">2.13</span></code> or lower, your protocols will continue to execute on the old runtime.</p>
+<ul>
+<li><p>Feature additions</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.ProtocolContext.define_liquid" title="opentrons.protocol_api.ProtocolContext.define_liquid"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ProtocolContext.define_liquid()</span></code></a> and <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.Well.load_liquid" title="opentrons.protocol_api.Well.load_liquid"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Well.load_liquid()</span></code></a> added
+to define different liquid types and add them to wells, respectively.</p></li>
+</ul>
+</li>
+<li><p>Bug fixes</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.Labware" title="opentrons.protocol_api.Labware"><code class="xref py py-class docutils literal notranslate"><span class="pre">Labware</span></code></a> and <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.Well" title="opentrons.protocol_api.Well"><code class="xref py py-class docutils literal notranslate"><span class="pre">Well</span></code></a> now adhere to the protocol’s API level setting.
+Prior to this version, they incorrectly ignored the setting.</p></li>
+<li><p><a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.touch_tip" title="opentrons.protocol_api.InstrumentContext.touch_tip"><code class="xref py py-meth docutils literal notranslate"><span class="pre">InstrumentContext.touch_tip()</span></code></a> will end with the pipette tip in the center of the well
+instead of on the edge closest to the front of the machine.</p></li>
+<li><p><a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.ProtocolContext.load_labware" title="opentrons.protocol_api.ProtocolContext.load_labware"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ProtocolContext.load_labware()</span></code></a> now prefers loading user-provided labware definitions
+rather than built-in definitions if no explicit <code class="docutils literal notranslate"><span class="pre">namespace</span></code> is specified.</p></li>
+<li><p><a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.ProtocolContext.pause" title="opentrons.protocol_api.ProtocolContext.pause"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ProtocolContext.pause()</span></code></a> will now properly wait until you resume the protocol before moving on.
+In previous versions, the run will not pause until the first call to a different <code class="docutils literal notranslate"><span class="pre">ProtocolContext</span></code> method.</p></li>
+<li><p>Motion planning has been improved to avoid certain erroneous downward movements,
+especially when using <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.aspirate" title="opentrons.protocol_api.InstrumentContext.aspirate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">InstrumentContext.aspirate()</span></code></a>.</p></li>
+<li><p><a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.Labware.reset" title="opentrons.protocol_api.Labware.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Labware.reset()</span></code></a> and <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.Labware.tip_length" title="opentrons.protocol_api.Labware.tip_length"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Labware.tip_length</span></code></a> will raise useful errors if called on labware that is not a tip rack.</p></li>
+</ul>
+</li>
+<li><p>Removals</p>
+<ul>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">presses</span></code> and <code class="docutils literal notranslate"><span class="pre">increment</span></code> arguments of  <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.pick_up_tip" title="opentrons.protocol_api.InstrumentContext.pick_up_tip"><code class="xref py py-meth docutils literal notranslate"><span class="pre">InstrumentContext.pick_up_tip()</span></code></a> were deprecated.
+Configure your pipette pick-up settings with the Opentrons App, instead.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">InstrumentContext.speed</span></code> property was removed.
+This property tried to allow setting a pipette’s <strong>plunger</strong> speed in mm/s.
+However, it could only approximately set the plunger speed,
+because the plunger’s speed is a stepwise function of the volume.
+Use <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.flow_rate" title="opentrons.protocol_api.InstrumentContext.flow_rate"><code class="xref py py-attr docutils literal notranslate"><span class="pre">InstrumentContext.flow_rate</span></code></a> to set the flow rate in µL/s, instead.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">load_labware_object()</span></code> was removed from module contexts as an unnecessary internal method.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">geometry</span></code> was removed from module contexts in favor of
+<code class="docutils literal notranslate"><span class="pre">model</span></code> and <code class="docutils literal notranslate"><span class="pre">type</span></code> attributes.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Well.geometry</span></code> was removed as unnecessary.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MagneticModuleContext.calibrate</span></code> was removed since it was never needed nor implemented.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">height</span></code> parameter of <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.MagneticModuleContext.engage" title="opentrons.protocol_api.MagneticModuleContext.engage"><code class="xref py py-meth docutils literal notranslate"><span class="pre">MagneticModuleContext.engage()</span></code></a> was removed.
+Use <code class="docutils literal notranslate"><span class="pre">offset</span></code> or <code class="docutils literal notranslate"><span class="pre">height_from_base</span></code> instead.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Labware.separate_calibration</span></code> and <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.Labware.set_calibration" title="opentrons.protocol_api.Labware.set_calibration"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Labware.set_calibration()</span></code></a> were removed,
+since they were holdovers from a calibration system that no longer exists.</p></li>
+<li><p>Various methods and setters were removed that could modify tip state outside of
+calls to <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.pick_up_tip" title="opentrons.protocol_api.InstrumentContext.pick_up_tip"><code class="xref py py-meth docutils literal notranslate"><span class="pre">InstrumentContext.pick_up_tip()</span></code></a> and <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.drop_tip" title="opentrons.protocol_api.InstrumentContext.drop_tip"><code class="xref py py-meth docutils literal notranslate"><span class="pre">InstrumentContext.drop_tip()</span></code></a>.
+This change allows the robot to track tip usage more completely and reliably.
+You may still use <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.Labware.reset" title="opentrons.protocol_api.Labware.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Labware.reset()</span></code></a> and <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.reset_tipracks" title="opentrons.protocol_api.InstrumentContext.reset_tipracks"><code class="xref py py-meth docutils literal notranslate"><span class="pre">InstrumentContext.reset_tipracks()</span></code></a>
+to reset your tip racks’ state.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.Well.has_tip" title="opentrons.protocol_api.Well.has_tip"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Well.has_tip</span></code></a> <strong>setter</strong> was removed. <strong>The getter is still supported.</strong></p></li>
+<li><p>Internal methods <code class="docutils literal notranslate"><span class="pre">Labware.use_tips</span></code>, <code class="docutils literal notranslate"><span class="pre">Labware.previous_tip</span></code>, and <code class="docutils literal notranslate"><span class="pre">Labware.return_tips</span></code>
+were removed.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">configuration</span></code> argument of <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.ProtocolContext.load_module" title="opentrons.protocol_api.ProtocolContext.load_module"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ProtocolContext.load_module()</span></code></a> was removed
+because it made unsafe modifications to the protocol’s geometry system,
+and the Thermocycler’s “semi” configuration is not officially supported.</p></li>
+</ul>
+</li>
+<li><p>Known limitations</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.Labware.set_offset" title="opentrons.protocol_api.Labware.set_offset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Labware.set_offset()</span></code></a> is not yet supported on this API version.
+Run protocols via the Opentrons App, instead.</p></li>
+<li><p><a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.ProtocolContext.max_speeds" title="opentrons.protocol_api.ProtocolContext.max_speeds"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ProtocolContext.max_speeds</span></code></a> is not yet supported on the API version.
+Use <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.default_speed" title="opentrons.protocol_api.InstrumentContext.default_speed"><code class="xref py py-attr docutils literal notranslate"><span class="pre">InstrumentContext.default_speed</span></code></a> or the per-method <cite>speed</cite> argument, instead.</p></li>
+<li><p><a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.starting_tip" title="opentrons.protocol_api.InstrumentContext.starting_tip"><code class="xref py py-attr docutils literal notranslate"><span class="pre">InstrumentContext.starting_tip</span></code></a> is not respected on the second and subsequent calls to <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.pick_up_tip" title="opentrons.protocol_api.InstrumentContext.pick_up_tip"><code class="xref py py-meth docutils literal notranslate"><span class="pre">InstrumentContext.pick_up_tip()</span></code></a> with no argument.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="version-2-13">
+<h3>Version 2.13<a class="headerlink" href="#version-2-13" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Adds <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.HeaterShakerContext" title="opentrons.protocol_api.HeaterShakerContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">HeaterShakerContext</span></code></a> to support the Heater-Shaker Module. You can use the load name <code class="docutils literal notranslate"><span class="pre">heaterShakerModuleV1</span></code> with <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.ProtocolContext.load_module" title="opentrons.protocol_api.ProtocolContext.load_module"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ProtocolContext.load_module()</span></code></a> to add a Heater-Shaker to a protocol.</p></li>
+<li><p><a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.drop_tip" title="opentrons.protocol_api.InstrumentContext.drop_tip"><code class="xref py py-meth docutils literal notranslate"><span class="pre">InstrumentContext.drop_tip()</span></code></a> now has a <code class="docutils literal notranslate"><span class="pre">prep_after</span></code> parameter.</p></li>
+<li><p><a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.home" title="opentrons.protocol_api.InstrumentContext.home"><code class="xref py py-meth docutils literal notranslate"><span class="pre">InstrumentContext.home()</span></code></a> may home <em>both</em> pipettes as needed to avoid collision risks.</p></li>
+<li><p><a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.aspirate" title="opentrons.protocol_api.InstrumentContext.aspirate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">InstrumentContext.aspirate()</span></code></a> and <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.dispense" title="opentrons.protocol_api.InstrumentContext.dispense"><code class="xref py py-meth docutils literal notranslate"><span class="pre">InstrumentContext.dispense()</span></code></a> will avoid interacting directly with modules.</p></li>
+</ul>
+</section>
+<section id="version-2-12">
+<h3>Version 2.12<a class="headerlink" href="#version-2-12" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.ProtocolContext.resume" title="opentrons.protocol_api.ProtocolContext.resume"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ProtocolContext.resume()</span></code></a> has been deprecated.</p></li>
+<li><p><a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.Labware.set_offset" title="opentrons.protocol_api.Labware.set_offset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Labware.set_offset()</span></code></a> has been added to apply labware offsets to protocols run (exclusively) outside of the Opentrons App (Jupyter Notebook and SSH).</p></li>
+</ul>
+</section>
+<section id="version-2-11">
+<h3>Version 2.11<a class="headerlink" href="#version-2-11" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Attempting to aspirate from or dispense to tip racks will raise an error.</p></li>
+</ul>
+</section>
+<section id="version-2-10">
+<h3>Version 2.10<a class="headerlink" href="#version-2-10" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Moving to the same well twice in a row with different pipettes no longer results in strange diagonal movements.</p></li>
+</ul>
+</section>
+<section id="version-2-9">
+<h3>Version 2.9<a class="headerlink" href="#version-2-9" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>You can now access certain geometry data regarding a labware’s well via a Well Object. See <a class="reference internal" href="new_labware.html#new-labware-well-properties"><span class="std std-ref">Well Dimensions</span></a> for more information.</p></li>
+</ul>
+</section>
+<section id="version-2-8">
+<h3>Version 2.8<a class="headerlink" href="#version-2-8" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>You can now pass in a list of volumes to distribute and consolidate. See <a class="reference internal" href="complex_commands/order_operations.html#distribute-consolidate-volume-list"><span class="std std-ref">List of Volumes</span></a> for more information.</p>
+<ul>
+<li><p>Passing in a zero volume to any <a class="reference internal" href="new_complex_commands.html#v2-complex-commands"><span class="std std-ref">complex command</span></a> will result in no actions taken for aspirate or dispense</p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.Well.from_center_cartesian" title="opentrons.protocol_api.Well.from_center_cartesian"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Well.from_center_cartesian()</span></code></a> can be used to find a point within a well using normalized distance from the center in each axis.</p>
+<ul>
+<li><p>Note that you will need to create a location object to use this function in a protocol. See <a class="reference internal" href="new_protocol_api.html#protocol-api-labware"><span class="std std-ref">Labware</span></a> for more information.</p></li>
+</ul>
+</li>
+<li><p>You can now pass in a blowout location to transfer, distribute, and consolidate
+with the <code class="docutils literal notranslate"><span class="pre">blowout_location</span></code> parameter. See <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.transfer" title="opentrons.protocol_api.InstrumentContext.transfer"><code class="xref py py-meth docutils literal notranslate"><span class="pre">InstrumentContext.transfer()</span></code></a> for more detail!</p></li>
+</ul>
+</section>
+<section id="version-2-7">
+<h3>Version 2.7<a class="headerlink" href="#version-2-7" title="Permalink to this heading">¶</a></h3>
+<ul>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">InstrumentContext.pair_with()</span></code>, an experimental feature for moving both pipettes simultaneously.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This feature has been removed from the Python Protocol API.</p>
+</div>
+</li>
+<li><p>Calling <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.has_tip" title="opentrons.protocol_api.InstrumentContext.has_tip"><code class="xref py py-meth docutils literal notranslate"><span class="pre">InstrumentContext.has_tip()</span></code></a> will return whether a particular instrument
+has a tip attached or not.</p></li>
+</ul>
+</section>
+<section id="version-2-6">
+<h3>Version 2.6<a class="headerlink" href="#version-2-6" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>GEN2 Single pipettes now default to flow rates equivalent to 10 mm/s plunger
+speeds</p>
+<ul>
+<li><p>Protocols that manually configure pipette flow rates will be unaffected</p></li>
+<li><p>For a comparison between API Versions, see <a class="reference internal" href="pipettes/characteristics.html#ot2-flow-rates"><span class="std std-ref">OT-2 Pipette Flow Rates</span></a></p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="version-2-5">
+<h3>Version 2.5<a class="headerlink" href="#version-2-5" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>New <a class="reference internal" href="basic_commands/utilities.html#new-utility-commands"><span class="std std-ref">utility commands</span></a> were added:</p>
+<ul>
+<li><p><a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.ProtocolContext.set_rail_lights" title="opentrons.protocol_api.ProtocolContext.set_rail_lights"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ProtocolContext.set_rail_lights()</span></code></a>: turns robot rail lights on or off</p></li>
+<li><p><a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.ProtocolContext.rail_lights_on" title="opentrons.protocol_api.ProtocolContext.rail_lights_on"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProtocolContext.rail_lights_on</span></code></a>: describes whether or not the rail lights are on</p></li>
+<li><p><a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.ProtocolContext.door_closed" title="opentrons.protocol_api.ProtocolContext.door_closed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProtocolContext.door_closed</span></code></a>: describes whether the robot door is closed</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="version-2-4">
+<h3>Version 2.4<a class="headerlink" href="#version-2-4" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>The following improvements were made to the <code class="docutils literal notranslate"><span class="pre">touch_tip</span></code> command:</p>
+<ul>
+<li><p>The speed for <code class="docutils literal notranslate"><span class="pre">touch_tip</span></code> can now be lowered down to 1 mm/s</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">touch_tip</span></code> no longer moves diagonally from the X direction -&gt; Y direction</p></li>
+<li><p>Takes into account geometry of the deck and modules</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="version-2-3">
+<h3>Version 2.3<a class="headerlink" href="#version-2-3" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Magnetic Module GEN2 and Temperature Module GEN2 are now supported; you can load them with the names <code class="docutils literal notranslate"><span class="pre">&quot;magnetic</span>
+<span class="pre">module</span> <span class="pre">gen2&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;temperature</span> <span class="pre">module</span> <span class="pre">gen2&quot;</span></code>, respectively.</p></li>
+<li><p>All pipettes will return tips to tip racks from a higher position to avoid
+possible collisions.</p></li>
+<li><p>During a <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.InstrumentContext.mix" title="opentrons.protocol_api.InstrumentContext.mix"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mix()</span></code></a>, the pipette will no longer move up to clear the liquid in
+between every dispense and following aspirate.</p></li>
+<li><p>You can now access the Temperature Module’s status via <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.TemperatureModuleContext.status" title="opentrons.protocol_api.TemperatureModuleContext.status"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TemperatureModuleContext.status</span></code></a>.</p></li>
+</ul>
+</section>
+<section id="version-2-2">
+<h3>Version 2.2<a class="headerlink" href="#version-2-2" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>You should now specify Magnetic Module engage height using the
+<code class="docutils literal notranslate"><span class="pre">height_from_base</span></code> parameter, which specifies the height of the top of the
+magnet from the base of the labware. For more, see <a class="reference internal" href="modules/magnetic_module.html#magnetic-module-engage"><span class="std std-ref">Engaging and Disengaging</span></a>.</p></li>
+<li><p>Return tip will now use pre-defined heights from hardware testing. For more information, see <a class="reference internal" href="basic_commands/pipette_tips.html#pipette-return-tip"><span class="std std-ref">Returning a Tip</span></a>.</p></li>
+<li><p>When using the return tip function, tips are no longer added back into the tip tracker. For more information, see <a class="reference internal" href="basic_commands/pipette_tips.html#pipette-return-tip"><span class="std std-ref">Returning a Tip</span></a>.</p></li>
+</ul>
+</section>
+<section id="version-2-1">
+<h3>Version 2.1<a class="headerlink" href="#version-2-1" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>When loading labware onto a module, you can now specify a label with the <code class="docutils literal notranslate"><span class="pre">label</span></code> parameter of
+<a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.MagneticModuleContext.load_labware" title="opentrons.protocol_api.MagneticModuleContext.load_labware"><code class="xref py py-meth docutils literal notranslate"><span class="pre">MagneticModuleContext.load_labware()</span></code></a>,
+<a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.TemperatureModuleContext.load_labware" title="opentrons.protocol_api.TemperatureModuleContext.load_labware"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TemperatureModuleContext.load_labware()</span></code></a>, or
+<a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.ThermocyclerContext.load_labware" title="opentrons.protocol_api.ThermocyclerContext.load_labware"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ThermocyclerContext.load_labware()</span></code></a>,
+just like you can when loading labware onto the deck with <a class="reference internal" href="new_protocol_api.html#opentrons.protocol_api.ProtocolContext.load_labware" title="opentrons.protocol_api.ProtocolContext.load_labware"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ProtocolContext.load_labware()</span></code></a>.</p></li>
+</ul>
+</section>
+<section id="version-2-0">
+<h3>Version 2.0<a class="headerlink" href="#version-2-0" title="Permalink to this heading">¶</a></h3>
+<p>Version 2 of the API is a new way to write Python protocols, with support for new modules like the Thermocycler. To transition your protocols from version 1 to version 2 of the API, follow this <a class="reference external" href="http://support.opentrons.com/en/articles/3425727-switching-your-protocols-from-api-version-1-to-version-2">migration guide</a>.</p>
+<p>We’ve also published a <a class="reference external" href="http://support.opentrons.com/en/articles/3418212-opentrons-protocol-api-version-2">more in-depth discussion</a> of why we developed version 2 of the API and how it differs from version 1.</p>
+</section>
+</section>
+</section>
+
+
+      </div>
+    </div>
+  </div>
+  <div class="clearer"></div>
+</div>
+<footer>
+  <script charset="utf-8" type="text/javascript" src="https://js.hsforms.net/forms/v2.js"></script><!doctype html>
+<html lang="en">
+<head>
+
+
+    
+<!-- Search Engine Optimization by Rank Math PRO - https://rankmath.com/ -->
+<title>Remote Footer - Opentrons</title>
+<meta name="robots" content="follow, noindex, noarchive"/>
+<meta property="og:locale" content="en_US" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Remote Footer - Opentrons" />
+<meta property="og:url" content="https://opentrons.com/remote-footer" />
+<meta property="og:site_name" content="Opentrons.com" />
+<meta property="og:updated_time" content="2023-07-31T17:09:15+00:00" />
+<meta property="og:image" content="https://opentrons.com/wp-content/uploads/2023/03/Social-Share-1024x538.png" />
+<meta property="og:image:secure_url" content="https://opentrons.com/wp-content/uploads/2023/03/Social-Share-1024x538.png" />
+<meta property="og:image:width" content="1024" />
+<meta property="og:image:height" content="538" />
+<meta property="og:image:alt" content="Remote Footer" />
+<meta property="og:image:type" content="image/png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Remote Footer - Opentrons" />
+<meta name="twitter:image" content="https://opentrons.com/wp-content/uploads/2023/03/Social-Share-1024x538.png" />
+<!-- /Rank Math WordPress SEO plugin -->
+
+<link rel='dns-prefetch' href='//a.omappapi.com' />
+<link rel="alternate" type="application/rss+xml" title="Opentrons &raquo; Feed" href="https://opentrons.com/feed" />
+<link rel="alternate" type="application/rss+xml" title="Opentrons &raquo; Comments Feed" href="https://opentrons.com/comments/feed" />
+<script type="text/javascript">
+/* <![CDATA[ */
+window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/15.0.3\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/15.0.3\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/opentrons.com\/wp-includes\/js\/wp-emoji-release.min.js?ver=6.5.5"}};
+/*! This file is auto-generated */
+!function(i,n){var o,s,e;function c(e){try{var t={supportTests:e,timestamp:(new Date).valueOf()};sessionStorage.setItem(o,JSON.stringify(t))}catch(e){}}function p(e,t,n){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);var t=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data),r=(e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(n,0,0),new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data));return t.every(function(e,t){return e===r[t]})}function u(e,t,n){switch(t){case"flag":return n(e,"\ud83c\udff3\ufe0f\u200d\u26a7\ufe0f","\ud83c\udff3\ufe0f\u200b\u26a7\ufe0f")?!1:!n(e,"\ud83c\uddfa\ud83c\uddf3","\ud83c\uddfa\u200b\ud83c\uddf3")&&!n(e,"\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7f","\ud83c\udff4\u200b\udb40\udc67\u200b\udb40\udc62\u200b\udb40\udc65\u200b\udb40\udc6e\u200b\udb40\udc67\u200b\udb40\udc7f");case"emoji":return!n(e,"\ud83d\udc26\u200d\u2b1b","\ud83d\udc26\u200b\u2b1b")}return!1}function f(e,t,n){var r="undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope?new OffscreenCanvas(300,150):i.createElement("canvas"),a=r.getContext("2d",{willReadFrequently:!0}),o=(a.textBaseline="top",a.font="600 32px Arial",{});return e.forEach(function(e){o[e]=t(a,e,n)}),o}function t(e){var t=i.createElement("script");t.src=e,t.defer=!0,i.head.appendChild(t)}"undefined"!=typeof Promise&&(o="wpEmojiSettingsSupports",s=["flag","emoji"],n.supports={everything:!0,everythingExceptFlag:!0},e=new Promise(function(e){i.addEventListener("DOMContentLoaded",e,{once:!0})}),new Promise(function(t){var n=function(){try{var e=JSON.parse(sessionStorage.getItem(o));if("object"==typeof e&&"number"==typeof e.timestamp&&(new Date).valueOf()<e.timestamp+604800&&"object"==typeof e.supportTests)return e.supportTests}catch(e){}return null}();if(!n){if("undefined"!=typeof Worker&&"undefined"!=typeof OffscreenCanvas&&"undefined"!=typeof URL&&URL.createObjectURL&&"undefined"!=typeof Blob)try{var e="postMessage("+f.toString()+"("+[JSON.stringify(s),u.toString(),p.toString()].join(",")+"));",r=new Blob([e],{type:"text/javascript"}),a=new Worker(URL.createObjectURL(r),{name:"wpTestEmojiSupports"});return void(a.onmessage=function(e){c(n=e.data),a.terminate(),t(n)})}catch(e){}c(n=f(s,u,p))}t(n)}).then(function(e){for(var t in e)n.supports[t]=e[t],n.supports.everything=n.supports.everything&&n.supports[t],"flag"!==t&&(n.supports.everythingExceptFlag=n.supports.everythingExceptFlag&&n.supports[t]);n.supports.everythingExceptFlag=n.supports.everythingExceptFlag&&!n.supports.flag,n.DOMReady=!1,n.readyCallback=function(){n.DOMReady=!0}}).then(function(){return e}).then(function(){var e;n.supports.everything||(n.readyCallback(),(e=n.source||{}).concatemoji?t(e.concatemoji):e.wpemoji&&e.twemoji&&(t(e.twemoji),t(e.wpemoji)))}))}((window,document),window._wpemojiSettings);
+/* ]]> */
+</script>
+<style id='wp-emoji-styles-inline-css' type='text/css'>
+
+	img.wp-smiley, img.emoji {
+		display: inline !important;
+		border: none !important;
+		box-shadow: none !important;
+		height: 1em !important;
+		width: 1em !important;
+		margin: 0 0.07em !important;
+		vertical-align: -0.1em !important;
+		background: none !important;
+		padding: 0 !important;
+	}
+</style>
+<style id='rank-math-toc-block-style-inline-css' type='text/css'>
+.wp-block-rank-math-toc-block nav ol{counter-reset:item}.wp-block-rank-math-toc-block nav ol li{display:block}.wp-block-rank-math-toc-block nav ol li:before{content:counters(item, ".") ". ";counter-increment:item}
+
+</style>
+<style id='classic-theme-styles-inline-css' type='text/css'>
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+</style>
+<style id='global-styles-inline-css' type='text/css'>
+body{--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #FFFFFF;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--color--brand-blue: #006CFA;--wp--preset--color--brand-blue-dark: #17212d;--wp--preset--color--brand-blue-medium: #ACCFFF;--wp--preset--color--brand-blue-light: #F1F8FF;--wp--preset--color--brand-yellow: #F2B53C;--wp--preset--color--brand-gray: #707075;--wp--preset--color--brand-gray-medium: #E3E3E3;--wp--preset--color--brand-gray-light: #F8F8F8;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgba(252,185,0,1) 0%,rgba(255,105,0,1) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgba(255,105,0,1) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 13px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 36px;--wp--preset--font-size--x-large: 42px;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgba(255, 255, 255, 1), 6px 6px rgba(0, 0, 0, 1);--wp--preset--shadow--crisp: 6px 6px 0px rgba(0, 0, 0, 1);}:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}
+.wp-block-navigation a:where(:not(.wp-element-button)){color: inherit;}
+:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}
+:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}
+.wp-block-pullquote{font-size: 1.5em;line-height: 1.6;}
+</style>
+<link rel='stylesheet' id='auth0-widget-css' href='https://opentrons.com/wp-content/plugins/auth0/assets/css/main.css?ver=4.6.2' type='text/css' media='all' />
+<link rel='stylesheet' id='bigcommerce-styles-css' href='https://opentrons.com/wp-content/plugins/bigcommerce/assets/css/master.min.css?ver=5.1.0-11.48.12.14.2023' type='text/css' media='all' />
+<link rel='stylesheet' id='style-css' href='https://opentrons.com/wp-content/themes/timberland/theme/assets/build/app.css?id=06ae55a365bd3e1b84ee097bbfe9cb49&#038;ver=6.5.5' type='text/css' media='all' />
+<link rel='stylesheet' id='algolia-autocomplete-css' href='https://opentrons.com/wp-content/plugins/wp-search-with-algolia/css/algolia-autocomplete.css?ver=2.8.1' type='text/css' media='all' />
+<script type="text/javascript" src="https://opentrons.com/wp-includes/js/jquery/jquery.min.js?ver=3.7.1" id="jquery-core-js"></script>
+<script type="text/javascript" src="https://opentrons.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1" id="jquery-migrate-js"></script>
+<link rel="https://api.w.org/" href="https://opentrons.com/wp-json/" /><link rel="alternate" type="application/json" href="https://opentrons.com/wp-json/wp/v2/pages/801" /><link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://opentrons.com/xmlrpc.php?rsd" />
+<link rel='shortlink' href='https://opentrons.com/?p=801' />
+<link rel="alternate" type="application/json+oembed" href="https://opentrons.com/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fopentrons.com%2Fremote-footer" />
+<link rel="alternate" type="text/xml+oembed" href="https://opentrons.com/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fopentrons.com%2Fremote-footer&#038;format=xml" />
+		<!-- Segment Analytics Code -->
+		<script type="text/javascript" data-js="bc-segment-tracker">
+			!function(){var analytics=window.analytics||[];if(!analytics.initialize)if(analytics.invoked)window.console&&console.error&&console.error("Segment snippet included twice.");else{analytics.invoked=!0;analytics.methods=["trackSubmit","trackClick","trackLink","trackForm","pageview","identify","reset","group","track","ready","alias","debug","page","once","off","on"];analytics.factory=function(t){return function(){var e=Array.prototype.slice.call(arguments);e.unshift(t);analytics.push(e);return analytics}};for(var t=0;t<analytics.methods.length;t++){var e=analytics.methods[t];analytics[e]=analytics.factory(e)}analytics.loadPlatform=function(t,e,a,o){window[o||"analytics"]=analytics;window._analytics_js_global_name=o;analytics.platformSettings=e;analytics.platformPlan=a;var n=("https:"===document.location.protocol?"https://":"http://")+"cdn.segment.com/analytics.js/v1";t&&(n+="/"+t);var r=document.createElement("script");r.type="text/javascript";r.async=!0;r.src=n+"/platform/analytics.min.js";var i=document.getElementsByTagName("script")[0];i.parentNode.insertBefore(r,i)};analytics.SNIPPET_VERSION="4.0.0_platform";
+				analytics.loadPlatform(null, {},{},"analytics");
+				analytics.page()
+			}}();
+		</script>
+		<!-- End Segment Analytics Code -->
+		
+<style type='text/css'>
+.bc-btn,
+button.bc-btn,
+a.bc-btn,
+.entry-content .bc-btn,
+.entry-content button.bc-btn,
+.entry-content a.bc-btn,
+.bc-mini-cart .bc-btn,
+.bc-mini-cart button.bc-btn,
+.bc-mini-cart a.bc-btn,
+.bigcommerce-cart__item-count,
+.bc-account-login__form input[type="submit"] {
+	color: #fff;
+	background-color: #5273f4;
+}
+
+.bc-btn--inverse,
+button.bc-btn--inverse,
+a.bc-btn--inverse,
+.entry-content .bc-btn--inverse,
+.entry-content button.bc-btn--inverse,
+.entry-content a.bc-btn--inverse {
+	color: #5273f4;
+	background-color: #fff;
+	border-color: #5273f4;
+}
+
+.bc-btn--inverse:hover,
+.bc-btn--inverse:focus,
+button.bc-btn--inverse:hover,
+button.bc-btn--inverse:focus,
+a.bc-btn--inverse:hover,
+a.bc-btn--inverse:focus {
+	color: #fff;
+	background-color: #5273f4;
+	border-color: #5273f4;
+}
+
+.bc-video-play-icon {
+	background-color: #5273f4;
+}
+
+.bc-video-play-icon:before {
+	color: #fff;
+}
+
+.bc-link {
+	color: #5273f4;
+}
+
+.bc-cart-item__remove-button {
+	color: #5273f4;
+}
+
+.bc-product__out_of_stock,
+.bc-product__low_inventory {
+	color: #34313f;
+}
+
+.bc-product-flag--grey {
+	color: #34313f;
+	background-color: #e0e3e9;
+}
+
+.bc-product-flag--sale {
+	color: #fff;
+	background-color: #65c68c;
+}
+
+.bc-cart-item-total-price.bc-cart-item--on-sale,
+.bc-product__price--sale {
+	color: #65c68c;
+}
+
+.bc-account-address__edit,
+.bc-account-address__delete,
+button.bc-account-address__edit,
+button.bc-account-address__delete,
+a.bc-account-address__edit,
+a.bc-account-address__delete {
+	color: #5273f4;
+}
+
+</style>
+		<script>
+			document.documentElement.className = document.documentElement.className.replace( 'no-js', 'js' );
+		</script>
+				<style>
+			.no-js img.lazyload { display: none; }
+			figure.wp-block-image img.lazyloading { min-width: 150px; }
+							.lazyload, .lazyloading { opacity: 0; }
+				.lazyloaded {
+					opacity: 1;
+					transition: opacity 100ms;
+					transition-delay: 0ms;
+				}
+					</style>
+		<link rel="icon" href="https://opentrons.com/wp-content/uploads/2024/06/cropped-FAVICON-1-32x32.png" sizes="32x32" />
+<link rel="icon" href="https://opentrons.com/wp-content/uploads/2024/06/cropped-FAVICON-1-192x192.png" sizes="192x192" />
+<link rel="apple-touch-icon" href="https://opentrons.com/wp-content/uploads/2024/06/cropped-FAVICON-1-180x180.png" />
+<meta name="msapplication-TileImage" content="https://opentrons.com/wp-content/uploads/2024/06/cropped-FAVICON-1-270x270.png" />
+		<style type="text/css" id="wp-custom-css">
+			.flex.space-x-4.mt-6 {
+	display: none !important;
+}
+
+ h1, h2, h3, h4, h5 { font-family: Public Sans !important; }		</style>
+		
+
+   
+
+</head>
+
+<body class="page-template-default page page-id-801 bc-gallery-size-bc-medium" data-template="remote-footer-base.twig">
+     <style>
+
+        .button-sm,h5,h3 {
+    font-family:  "Akko Pro","Open Sans",sans-serif !important;
+    font-size: .75rem  !important;
+    font-weight: 400  !important;
+    letter-spacing: 1px  !important;
+    line-height: 1rem  !important;
+    text-transform: uppercase  !important;
+}
+    </style>
+    <style>
+	/*HS Override */
+	.hs_error_rollup{
+		display: none !important;
+	}
+
+</style>
+
+	<footer>
+	<div class="bg-brand-blue-dark">
+		<div class="max-w-7xl mx-auto px-4 py-10 md:py-16 grid grid-cols-1 sm:grid-cols-6 sm:space-x-8">
+			<div class="col-span-1 sm:col-span-3 md:col-span-2">
+				<p class="text-white text-left opentrons-subheading">Sign up for our newsletter</p>
+				<div class="font-sans text-white mt-4 hs-footer">
+					<script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/embed/v2.js"></script>
+					<script>
+					hbspt.forms.create({
+						region: "na1",
+						portalId: "5383285",
+						formId: "210adc2c-072f-4c9c-a812-6367469358d5"
+					});
+					</script>
+				</div>
+
+				<div class="mt-12 md:mt-20 hidden sm:block">
+					<a href="https://opentrons.com/">
+						<img class="h-8" src="https://opentrons.com/wp-content/uploads/2024/03/LOGO.svg" alt="Opentrons logo" />
+					</a>
+				</div>
+
+				<div class="flex space-x-4 mt-6">
+					<a href="" class="button-sm bg-white text-brand-blue leading-none py-3 px-4 rounded text-center w-1/2 md:w-auto hover:bg-white/60">
+						
+					</a>
+					<a href="" class="button-sm bg-brand-blue text-white leading-none py-3 px-4 rounded text-center w-1/2 md:w-auto hover:bg-brand-blue/60">
+						
+					</a>
+				</div>
+				<div class="flex justify-start space-x-6 mt-8">
+											<a href="https://twitter.com/opentrons?lang=en" style="max-width:20px;" target="_blank">
+							<img src="https://opentrons.com/wp-content/uploads/2023/05/Twitter.svg" />
+						</a>
+											<a href="https://www.linkedin.com/company/opentrons-labworks-inc./" style="max-width:20px;" target="_blank">
+							<img src="https://opentrons.com/wp-content/uploads/2023/05/Linkedin.svg" />
+						</a>
+											<a href="https://www.youtube.com/channel/UCvMRmXIxnHs3AutkVhuqaQg" style="max-width:20px;" target="_blank">
+							<img src="https://opentrons.com/wp-content/uploads/2023/05/Youtube.svg" />
+						</a>
+											<a href="https://www.instagram.com/opentrons_/" style="max-width:20px;" target="_blank">
+							<img src="https://opentrons.com/wp-content/uploads/2023/05/Instagram.svg" />
+						</a>
+									</div>
+				
+				<nav class="flex space-x-4 mt-20 md:mt-12 justify-start" id="opt-copyright-nav">
+											<a href="https://opentrons.com/privacy-policy/" target="_blank" class="opentrons-body text-white hover:text-brand-yellow" style="font-size:12px;"><strong>Privacy Policy</strong></a>
+						
+											<a href="https://opentrons.com/cookies-and-interest-based-advertising/" target="_blank" class="opentrons-body text-white hover:text-brand-yellow" style="font-size:12px;"><strong>Tracking opt-out</strong></a>
+						
+											<a href="https://opentrons.com/trademarks/" target="_blank" class="opentrons-body text-white hover:text-brand-yellow" style="font-size:12px;"><strong>Trademarks</strong></a>
+						
+									</nav>
+				<div class="flex justify-start md:space-x-6 mt-8">
+					<p class="opentrons-body text-brand-grey-dark" style="font-size:12px;">Copyright &copy; 2024 Opentrons</p>
+				</div>
+			</div>
+			<div class=" md:grid col-span-1 sm:col-span-3 md:col-span-4  grid-cols-2 sm:grid-cols-4">
+									<div class="hidden md:block col-span-2 sm:col-span-1">
+						<p class="text-white opentrons-body"><strong>Products</strong></p>
+						<div class="mt-4 flex flex-col space-y-2">
+															<a href="https://opentrons.com/products/opentrons-flex-robot/" target="_self" class="opentrons-body text-brand-grey-light hover:text-brand-yellow">Opentrons Flex</a>
+															<a href="https://opentrons.com/products/categories/modules/" target="_self" class="opentrons-body text-brand-grey-light hover:text-brand-yellow">Modules</a>
+															<a href="https://opentrons.com/products/categories/workstations/" target="_self" class="opentrons-body text-brand-grey-light hover:text-brand-yellow">Workstations</a>
+															<a href="https://opentrons.com/instrument-services/" target="_blank" class="opentrons-body text-brand-grey-light hover:text-brand-yellow">Services</a>
+															<a href="https://opentrons.com/products/ot-2-robot/" target="_self" class="opentrons-body text-brand-grey-light hover:text-brand-yellow">OT-2</a>
+													</div>
+					</div>
+									<div class="hidden md:block col-span-2 sm:col-span-1">
+						<p class="text-white opentrons-body"><strong>Resources</strong></p>
+						<div class="mt-4 flex flex-col space-y-2">
+															<a href="https://opentrons.com/resources/customer-stories/" target="_self" class="opentrons-body text-brand-grey-light hover:text-brand-yellow">Customer Stories</a>
+															<a href="https://opentrons.com/resources/knowledge-hub/" target="_self" class="opentrons-body text-brand-grey-light hover:text-brand-yellow">Knowledge Hub</a>
+															<a href="https://opentrons.com/resources/citations/" target="_self" class="opentrons-body text-brand-grey-light hover:text-brand-yellow">Citations</a>
+															<a href="https://support.opentrons.com/s/ot2-get-started" target="_blank" class="opentrons-body text-brand-grey-light hover:text-brand-yellow">Getting Started</a>
+													</div>
+					</div>
+									<div class="hidden md:block col-span-2 sm:col-span-1">
+						<p class="text-white opentrons-body"><strong>Support</strong></p>
+						<div class="mt-4 flex flex-col space-y-2">
+															<a href="https://support.opentrons.com/" target="_blank" class="opentrons-body text-brand-grey-light hover:text-brand-yellow">Customer Support</a>
+															<a href="https://opentrons.com/resources/faqs/" target="_self" class="opentrons-body text-brand-grey-light hover:text-brand-yellow">FAQs</a>
+															<a href="https://opentrons.com/contact/" target="_self" class="opentrons-body text-brand-grey-light hover:text-brand-yellow">Contact Sales</a>
+															<a href="https://support.opentrons.com/s/article/Our-warranty" target="_blank" class="opentrons-body text-brand-grey-light hover:text-brand-yellow">Warranty</a>
+															<a href="https://support.opentrons.com/s/article/Our-risk-free-return-policy" target="_blank" class="opentrons-body text-brand-grey-light hover:text-brand-yellow">Returns</a>
+													</div>
+					</div>
+									<div class="hidden md:block col-span-2 sm:col-span-1">
+						<p class="text-white opentrons-body"><strong>About</strong></p>
+						<div class="mt-4 flex flex-col space-y-2">
+															<a href="https://opentrons.com/about/mission/" target="_self" class="opentrons-body text-brand-grey-light hover:text-brand-yellow">Our Mission</a>
+															<a href="https://opentrons.com/about/events/" target="_self" class="opentrons-body text-brand-grey-light hover:text-brand-yellow">Events & Webinars</a>
+															<a href="https://opentrons.com/about/news/" target="_self" class="opentrons-body text-brand-grey-light hover:text-brand-yellow">News</a>
+															<a href="https://opentrons.com/about/jobs/" target="_self" class="opentrons-body text-brand-grey-light hover:text-brand-yellow">Careers</a>
+															<a href="https://opentrons.com/partnerships/" target="_self" class="opentrons-body text-brand-grey-light hover:text-brand-yellow">OEM Partnerships</a>
+													</div>
+					</div>
+								<div class="flex footer-app-button-container sm:col-span-4 col-span-2">
+				<a class="opentrons-outline rounded-full footer-app-button" href="https://opentrons.com/ot-app/">Download the Opentrons App</a>
+			</div>
+	
+			</div>
+
+		</div>
+		
+	</div>
+
+</footer>
+
+<script>
+function windowSize() {
+  windowWidth = window.innerWidth ? window.innerWidth : $(window).width();
+  return windowWidth;
+}
+
+$(document).ready(function(){
+    windowSize();
+
+    if( $('body.home').length >= 1 && windowWidth >= 700 ){
+	$('.bg-cover video').attr('autoplay','autoplay');
+	$('.bg-cover video').trigger('play');
+    }
+});
+</script>
+
+
+</body>
+</html>
+</footer>
+<script>
+  ;(function(w, d, s, l, i) {
+    w[l] = w[l] || []
+    w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' })
+    var f = d.getElementsByTagName(s)[0],
+      j = d.createElement(s),
+      dl = l != 'dataLayer' ? '&l=' + l : ''
+    j.async = true
+    j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl
+    f.parentNode.insertBefore(j, f)
+  })(window, document, 'script', 'dataLayer', 'GTM-WCDX9CX')
+</script>
+<script>
+  function toggleMenu(menu) {
+    var element = document.querySelector(`#${menu}`)
+    var elementList = document.querySelectorAll('.navbar-ul')
+    elementList.forEach(e => {
+      if (e !== element) {
+        e.previousElementSibling.classList.add('notActive')
+        e.classList.add('visible')
+      }
+    })
+    if (!element.classList.contains('visible')) {
+      element.classList.add('visible')
+      elementList.forEach(e => {
+        e.previousElementSibling.classList.remove('notActive')
+      })
+    } else {
+      element.classList.remove('visible')
+      element.previousElementSibling.classList.remove('notActive')
+    }
+  }
+  function close() {
+    var elementList = document.querySelectorAll('.navbar-ul')
+    var subMenu = document.querySelectorAll('.sub-menu')
+    elementList.forEach(e => {
+      e.classList.add('visible')
+      e.previousElementSibling.classList.remove('notActive')
+    })
+    subMenu.forEach(e => {
+      e.classList.remove('showmenu')
+      console.dir(e)
+    })
+  }
+  function toggleOpen() {
+    var mobile = document.querySelector('.mobile-hamburger')
+    var mobileMenu = document.querySelector('.mobile-menu')
+    var subMenu = document.querySelectorAll('.sub-menu')
+    if (mobileMenu.classList.contains('dnone')) {
+      mobileMenu.classList.remove('dnone')
+    } else {
+      mobileMenu.classList.add('dnone')
+    }
+    subMenu.forEach(e => {
+      if (e.classList.contains('showmenu')) {
+        e.classList.remove('showmenu')
+      }
+    })
+    mobile.classList.toggle('open')
+    document.body.classList.toggle('mobile-scrolling')
+  }
+  function showMenu(menu) {
+    var element = document.querySelector(`.sub-menu-${menu}`)
+    if (element.classList.contains('showmenu')) {
+      element.classList.remove('showmenu')
+    } else {
+      element.classList.add('showmenu')
+    }
+  }
+  function closeMenu() {
+    var element = document.querySelectorAll('.sub-menu')
+    element.forEach(e => {
+      if (e.classList.contains('showmenu')) {
+        e.classList.remove('showmenu')
+      }
+    })
+  }
+  var navbar = document.querySelector('.navbar-menu')
+  document.addEventListener('click', function(event) {
+    var isClickInside = navbar.contains(event.target)
+    if (!isClickInside && window.innerWidth >= 1024) {
+      close()
+    }
+  })
+</script>
+
+ 
+  </body>
+</html>

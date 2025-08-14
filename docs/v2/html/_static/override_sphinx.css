@@ -1,0 +1,405 @@
+@import url('https://fonts.googleapis.com/css?family=Public+Sans:300,400,400i,600,700');
+@import url('https://fonts.googleapis.com/css2?family=Reddit+Mono:wght@200..900&display=swap');
+
+/* OT TOP NAV */
+
+body {
+    padding: 0;
+    margin: 0;
+}
+
+/* restate button styling */
+.text-brand-blue:hover {
+  --tw-text-opacity: 1;
+  color: rgb(0 108 250 / var(--tw-text-opacity));
+}
+
+.text-white:hover {
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity));
+}
+
+/* hack out search button */
+
+div.flex.gap-4 div.text-white.flex.items-center.h-full > button {
+    display: none;
+}
+
+/* use Akko from docs site instead of from main site */
+header a.button-sm {
+    font-family: "AkkoPro-Regular", "Akko Pro", "Open Sans", sans-serif !important;
+}
+
+/* OT FOOTER */
+
+footer {
+    padding: 0;
+}
+
+.footer-app-button:hover {
+    color: #E8E9EA;
+}
+
+/* restate newsletter form styling */
+
+footer input.hs-input {
+  margin: 0;
+  max-width: 100%;
+  width: 100%;
+  height: 42px;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  font-size: 1rem;
+  --tw-text-opacity: 1;
+  color: rgb(112 112 117 / var(--tw-text-opacity));
+}
+
+footer .hs_submit input {
+    height: 40px;
+    min-width: 100% !important;
+    width: 100% !important;
+}
+
+/* DOCS */
+div.document .highlight-none, .mi, .literal {
+    color: #048f85;
+}
+
+div.document {
+    padding-top: 96px;
+    margin-top: 0;
+    font-family: "Public Sans", "sans-serif";
+}
+
+div.document [id] {
+    scroll-margin-top: 110px;
+}
+
+@media only screen and (min-device-width: 768px) and (min-width: 768px) and (max-width: 1023px) {
+    div.document {
+        padding-top: 100px;
+        margin-top: 0;
+    }
+
+    div.document [id] {
+        scroll-margin-top: 100px;
+    }
+}
+
+div.document p {
+    line-height: 20pt;
+}
+
+div.document section > p,
+div.document dl p {
+    margin: 1em 0;
+}
+
+div.document pre,
+div.document tt,
+div.document code {
+    font-size: 0.9em;
+    font-family: "Reddit Mono", "Consolas", "Lucida Console", monospace;
+}
+
+div.document dl {
+    margin-bottom: 15px;
+}
+
+/* API Reference */
+div.document .sig,
+div.document .sig-name,
+div.document code.descname,
+div.document .sig-prename,
+div.document .optional,
+div.document .sig-paren {
+    font-size: 1em;
+    font-family: "Reddit Mono", "Consolas", "Lucida Console", monospace;
+}
+
+div.document dt.field-even,
+div.document dt.field-odd {
+    margin-top: 1em;
+    line-height: 20pt;
+}
+
+div.document dd ul {
+    margin-top: 1em;
+}
+
+span.colon {
+    display: none;
+}
+
+/* all article pages */
+
+div.document h1 {
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 0;
+    font-size: 2em;
+    min-height: 78px;
+}
+
+div.document h1 + p {
+    padding-top: 24px;
+}
+
+div.document {
+    position: relative;
+}
+
+div.documentwrapper {
+    float: none;
+}
+
+div.body {
+    padding-top: 1rem;
+}
+
+a:hover {
+    color: inherit;
+    text-decoration: inherit;
+}
+
+div.body a {
+    color: #006FFF;
+}
+
+/* Don't allow inline items try to clear themselves below the sidebar */
+pre, div[class*="highlight-"], blockquote, blockquote::after, div.admonition::after {
+    clear: none;
+}
+
+/* Sticky, scrolling sidebar. Height calc leaves room for header. */
+div.sphinxsidebar {
+    position: sticky;
+    top: 96px;
+    align-self: flex-start;
+    max-height: calc(100vh - 96px);
+    overflow-y: auto;
+}
+
+div.sphinxsidebarwrapper {
+    padding-top: 1rem;
+}
+
+/* Hide the redundant 'description' tagline */
+p.blurb {
+    display: none;
+}
+
+div.sphinxsidebar h2,
+div.sphinxsidebar h3,
+div.sphinxsidebar h4,
+div.sphinxsidebar h5,
+div.sphinxsidebar h6,
+div.document h2,
+div.document h3,
+div.document h4,
+div.document h5 {
+    font-family: "Public Sans", "sans-serif" !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+}
+
+/* hide the word "Navigation" because people know what links are */
+div.sphinxsidebarwrapper > h3 {
+    display: none;
+}
+
+/* restate header sizes to avoid conflict from inline style in footer */
+div.document h3 { font-size: 150% !important; }
+div.document h4 { font-size: 130% !important; }
+
+/* Links need an extra two pixels of padding to compensate between body font height 
+being 1em and code font height being 0.9em */
+a.reference {
+    padding-bottom: 2px;
+}
+
+/* Suppressing the display of the toctrees rendered in the doc body means we
+can use the :hidden: argument to the toctree directive to control whether
+toctree elements are rendered in the sidebar, rather than having to always
+hide everything so it doesn't show up in the document
+*/
+div.toctree-wrapper.compound {
+    display: none;
+}
+
+li.toctree-l1 {
+    margin-bottom: 0.25rem;
+}
+
+/* div.sphinxsidebar h3 a,
+div.sphinxsidebar h3 a:hover,
+/*div.body h2 {
+    font-size: 22px;
+}*/
+
+@media screen and (max-width: 875px),(max-device-width: 767px) {
+
+
+/*     body{
+        padding: 20px 30px;
+    } */
+
+    div.documentwrapper {
+        float: none;
+        background: #fff;
+    }
+    div.sphinxsidebar {
+        display: block;
+        float: none;
+        width: 102.5%;
+        margin: -20px -30px 20px -30px;
+        padding: 60px 20px;
+        background: #FFF;
+        color: #111;
+    }
+    div.sphinxsidebar h3,
+    div.sphinxsidebar h4,
+    div.sphinxsidebar p,
+    div.sphinxsidebar h3 a {
+        color: #111;
+    }
+    div.sphinxsidebar a {
+        color: #111;
+    }
+    div.sphinxsidebar p.logo {
+        display: inline-block;
+    }
+    img.logo {
+        display: none;
+    }
+    div.document {
+        width: 100%;
+        margin: 0;
+    }
+    div.footer {
+        display: none;
+    }
+    div.bodywrapper {
+        margin: 0;
+    }
+    div.body {
+        min-height: 0;
+        padding: 0;
+    }
+    .rtd_doc_footer {
+        display: none;
+    }
+    .document {
+        width: auto;
+    }
+    .footer {
+        width: auto;
+    }
+    .footer {
+        width: auto;
+    }
+    /*     .github {
+        display: none;
+    } */
+    div.sphinxsidebar {
+        position: relative;
+        margin-left: 0;
+    }
+    pre,
+    tt,
+    code {
+        font-size: 1em;
+    }
+}
+
+div.body p.caption {
+    font-size: 22px;
+}
+
+div.body ul, div.body ol {
+    margin: 10px 0 10px 30px;
+    font-family: "Public Sans", "sans-serif";
+}
+
+div.body ul {
+    list-style-type: disc;
+}
+
+div.body ul p, div.body ol p {
+    margin-bottom: 0;
+}
+
+div.body ul ul {
+    list-style-type: circle;
+    margin-left: 30px;
+    font-family: "Public Sans", "sans-serif";
+}
+
+@media screen and (min-device-width: 320px)and (max-device-width: 640px) {
+    pre,
+    tt,
+    code {
+        font-size: 14px;
+    }
+}
+
+@media screen and (max-width: 875px){
+    div.body{
+        padding: 5%;
+    }
+/* In narrow viewports, order sidebar after main content using a flexbox */
+    div.document{
+        display: flex;
+        flex-direction: column;
+        padding-top: 60px;
+    }
+    div.sphinxsidebar{
+        order: 2;
+        top: 0;
+        padding-top: 0;
+        max-height: none;
+    }
+    div.documentwrapper{
+        order: 1;
+    }
+}
+/* Fixes overflowing grey box for autogenerated methods */
+table.docutils.field-list {
+    max-width: 595px;
+    background-color: white;
+}
+
+/* Makes pull-quote directives like code directives without monospace */
+.pull-quote {
+    background-color: #EEE;
+    margin-left: 0;
+    padding-left: 30px;
+}
+
+/* Adjustments to Note and Warning admonitions */
+div.admonition {
+    padding-top: 20px;
+    clear: none;
+}
+
+div.admonition p.admonition-title {
+    font-size: 18px;
+}
+
+div.note {
+    background-color: #d9e9fe;
+    border: none;
+}
+
+div.warning {
+    background-color: #f7e0e0;
+    border: none;
+}
+
+/* Tabs also in Public Sans */
+
+.sphinx-tabs-tab {
+    font-family: "Public Sans", "sans-serif" !important;
+}
