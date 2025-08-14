@@ -13,16 +13,9 @@ import {
 
 import { StackingOffsets } from '../components/sections/StackingOffsets'
 
-import type * as Formik from 'formik'
 import type * as SharedData from '@opentrons/shared-data'
 
-vi.mock('formik', async importOriginal => {
-  const actual = await importOriginal<typeof Formik>()
-  return {
-    ...actual,
-    useFormikContext: vi.fn(),
-  }
-})
+vi.mock('formik')
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actual = await importOriginal<typeof SharedData>()
@@ -55,9 +48,9 @@ describe('StackingOffsets', () => {
         labwareXDimension: '10',
         gridColumns: '12',
         gridRows: '8',
+        stackedLabwareZDimension: undefined,
         compatibleAdapters: {},
         compatibleModules: {},
-        stackedLabwareZDimension: undefined,
       },
       touched: {
         labwareType: true,
@@ -66,9 +59,9 @@ describe('StackingOffsets', () => {
         labwareXDimension: true,
         gridColumns: true,
         gridRows: true,
+        stackedLabwareZDimension: true,
         compatibleAdapters: {},
         compatibleModules: {},
-        stackedLabwareZDimension: true,
       },
       errors: {},
     } as any)

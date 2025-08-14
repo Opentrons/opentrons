@@ -209,10 +209,11 @@ export function fieldsToLabware(
 
     // overwrite loadName from createRegularLabware with ours
     def.parameters.loadName = fields.loadName
+    // Calculate stack offset for labware on itself
     stackingOffsetWithLabware[def.parameters.loadName] = {
       x: 0,
       y: 0,
-      z: 2 * fields.labwareZDimension - fields.stackedLabwareZDimension,
+      z: (2 * fields.labwareZDimension) - fields.stackedLabwareZDimension,
     }
     return def
   } else {

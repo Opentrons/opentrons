@@ -17,7 +17,7 @@ export function getStackedLabwareZDimension(
   if (zOffset == null) {
     return undefined
   } else {
-    return def.dimensions.zDimension * 2 + zOffset
+    return (def.dimensions.zDimension * 2) - zOffset
   }
 }
 
