@@ -125,15 +125,28 @@ export function DeckSetup(props: CalibrationPanelProps): JSX.Element {
                   }
 
                   const labwareDef = ((): LabwareDefinition | null => {
-                    if (tipRack?.slot === addressableAreaName) {
+                    if (
+                      tipRack?.slot != null &&
+                      Sessions.slotNameFromCalibrationSlot(tipRack?.slot) ===
+                      addressableAreaName
+                    ) {
                       return tipRack.definition
-                    } else if (calBlock?.slot === addressableAreaName) {
+                    } else if (
+                      calBlock?.slot != null &&
+                      Sessions.slotNameFromCalibrationSlot(calBlock?.slot) ===
+                      addressableAreaName
+                    ) {
                       return calBlock.definition
                     } else {
                       return null
                     }
                   })()
-
+                  console.log(
+                    `with aaname ${addressableAreaName} (${typeof addressableAreaName}) and tiprack slot ${
+                      tipRack?.slot
+                    } (${typeof tipRack?.slot}) labwaredef is null `,
+                    labwareDef == null
+                  )
                   if (labwareDef == null) {
                     return null
                   }
@@ -142,6 +155,7 @@ export function DeckSetup(props: CalibrationPanelProps): JSX.Element {
                     addressableArea.id,
                     deckDef
                   )
+                  console.log(`slotOrigin is null: `, slotOrigin == null)
                   if (slotOrigin == null) {
                     return null // Shouldn't happen.
                   }

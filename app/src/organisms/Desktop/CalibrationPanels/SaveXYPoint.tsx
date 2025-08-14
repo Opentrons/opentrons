@@ -50,7 +50,7 @@ import type {
 import type { CalibrationPanelProps } from './types'
 
 const assetMap: Record<
-  CalibrationLabware['slot'],
+  string,
   Record<Mount, Record<'multi' | 'single', string>>
 > = {
   '1': {
