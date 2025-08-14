@@ -325,7 +325,7 @@ export type SessionState = Partial<{
 // without converting. Use utils.ts slotNameFromCalibrationSlot and calibrationSlotFromSlotName
 // to convert.
 export type CalibrationLabwareSlot = {
-  readonly __brand: 'UniqueType'
+  readonly __brand: 'CalibrationLabwareSlot'
 }
 
 export interface CalibrationLabware {
