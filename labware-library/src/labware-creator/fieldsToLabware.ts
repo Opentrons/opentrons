@@ -106,7 +106,6 @@ export function fieldsToLabware(
     const isTiprack = fields.labwareType === 'tipRack'
 
     const stackingOffsetWithLabware: Record<string, LabwareOffset> = {}
-   
     Object.entries(compatibleAdapters).forEach(([loadName, z]) => {
       const zValue = Number(z) || 0
       const adapterHeight =
@@ -115,17 +114,18 @@ export function fieldsToLabware(
               definition => definition.parameters.loadName === loadName
             )?.dimensions.zDimension ?? 0
           : 0
-    
+
       stackingOffsetWithLabware[loadName] = {
         x: 0,
         y: 0,
-        z:
-          loadName === fields.loadName
-            ? 2 * fields.labwareZDimension - zValue
-            : fields.labwareZDimension + adapterHeight - zValue,
+        z: fields.labwareZDimension + adapterHeight - zValue,
       }
     })
-    console.log("stackingoffsets with labware: "+JSON.stringify(stackingOffsetWithLabware))
+
+    console.log(
+      'stackingoffsets with labware: ' +
+        JSON.stringify(stackingOffsetWithLabware)
+    )
     const stackingOffsetWithModule: Record<string, LabwareOffset> = {}
     Object.entries(compatibleModules).forEach(([moduleModel, z]) => {
       const moduleDefinition = getModuleDef(moduleModel as ModuleModel)
@@ -209,7 +209,11 @@ export function fieldsToLabware(
 
     // overwrite loadName from createRegularLabware with ours
     def.parameters.loadName = fields.loadName
-
+    stackingOffsetWithLabware[def.parameters.loadName] = {
+      x: 0,
+      y: 0,
+      z: 2 * fields.labwareZDimension - fields.stackedLabwareZDimension,
+    }
     return def
   } else {
     throw new Error('use of createIrregularLabware not yet implemented')
