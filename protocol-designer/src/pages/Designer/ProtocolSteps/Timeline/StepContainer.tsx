@@ -249,6 +249,7 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
 
             handleOverflowClick(e)
           }}
+          dataTestId={`StepContainer_${stepId}`}
         />
       </Flex>
       {stepId != null &&
