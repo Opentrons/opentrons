@@ -1,4 +1,5 @@
 {
+  "__dev_internal__camera": "Enable Camera support",
   "__dev_internal__enableLabwareCreator": "Enable App Labware Creator",
   "__dev_internal__enableRunNotes": "Display Notes During a Protocol Run",
   "__dev_internal__forceHttpPolling": "Poll all network requests instead of using MQTT",
@@ -8,7 +9,6 @@
   "__dev_internal__quickTransferExportPython": "Enable Python Export for Quick Transfer",
   "__dev_internal__reactQueryDevtools": "Enable React Query Devtools",
   "__dev_internal__reactScan": "Enable React Scan",
-  "__dev_internal__camera": "Enable Camera support",
   "add_folder_button": "Add labware source folder",
   "add_ip_button": "Add",
   "add_ip_error": "Enter an IP Address or Hostname",

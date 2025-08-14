@@ -16,7 +16,6 @@
   "confirm_placement": "确认已放置",
   "detach_probe": "卸下移液器校准探头",
   "detach_probe_description": "解锁校准探头，将其从吸嘴上卸下并放回原储存位置。",
-  "error_during_calibration": "校准过程中出现错误",
   "error_prepping_module": "模块校准出错",
   "exit": "退出",
   "firmware_up_to_date": "{{module}}固件已是最新版本。",
@@ -42,6 +41,5 @@
   "slot_unavailable": "板位不可用",
   "stand_back": "正在进行校准，请远离",
   "stand_back_robot_in_motion": "工作站正在运行，请远离",
-  "start_setup": "开始设置",
-  "successfully_calibrated": "{{module}}已成功校准"
+  "start_setup": "开始设置"
 }
