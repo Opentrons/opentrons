@@ -117,10 +117,10 @@ class LoadedLabware(BaseModel):
     )
 
 
-LabwareParentDefinition = Union[
+LabwareStackupDefinition = Union[
     DeckLocationDefinition, ModuleDefinition, LabwareDefinition
 ]
-"""Information pertaining to a labware's parent (deck slot, module, or another labware) location."""
+"""Information pertaining to a deck item that is present in a labware stackup."""
 
 
 @dataclass(frozen=True)

@@ -91,7 +91,7 @@ from ..types import (
     labware_location_is_system,
     WellLocationType,
     WellLocationFunction,
-    LabwareParentDefinition,
+    LabwareStackupDefinition,
     AddressableArea,
 )
 from ..types.liquid_level_detection import SimulatedProbeResult, LiquidTrackingType
@@ -410,7 +410,7 @@ class GeometryView:
 
     def _get_stackup_info_top_to_bottom(
         self, labware_definition: LabwareDefinition, location: LabwareLocation
-    ) -> list[tuple[LabwareParentDefinition, LabwareLocation]]:
+    ) -> list[tuple[LabwareStackupDefinition, LabwareLocation]]:
         """Returns info about each deck item in the stackup.
 
         Traverse the stackup, collecting relevant data for each level.
@@ -419,7 +419,7 @@ class GeometryView:
         The first entry will always be the definition and location of the given labware itself.
         """
         definitions_locations_top_to_bottom: list[
-            tuple[LabwareParentDefinition, LabwareLocation]
+            tuple[LabwareStackupDefinition, LabwareLocation]
         ] = []
         current_location = location
 
@@ -468,7 +468,7 @@ class GeometryView:
 
     def _get_parent_definition(
         self, location: LabwareLocation
-    ) -> LabwareParentDefinition:
+    ) -> LabwareStackupDefinition:
         """Get the parent's definition given the labware's location."""
         if isinstance(location, DeckSlotLocation):
             addressable_area_name = location.slotName.id

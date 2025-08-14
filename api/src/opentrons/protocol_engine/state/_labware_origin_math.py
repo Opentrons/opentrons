@@ -23,7 +23,7 @@ from opentrons.protocol_engine.types import AddressableArea
 from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
 from .. import errors
 from ..types import (
-    LabwareParentDefinition,
+    LabwareStackupDefinition,
     ModuleDefinition,
     ModuleModel,
     DeckLocationDefinition,
@@ -44,7 +44,7 @@ class _Labware3SupportedParentDefinition:
 
 
 def get_stackup_placement_origin_to_lw_origin(
-    stackup_info_top_to_bottom: list[tuple[LabwareParentDefinition, LabwareLocation]],
+    stackup_info_top_to_bottom: list[tuple[LabwareStackupDefinition, LabwareLocation]],
     module_parent_to_child_offset: Union[Point, None],
     deck_definition: DeckDefinitionV5,
     is_topmost_labware: bool = True,
@@ -96,7 +96,7 @@ def get_stackup_placement_origin_to_lw_origin(
 def _get_parent_placement_origin_to_lw_origin_by_location(
     labware_location: LabwareLocation,
     labware_definition: LabwareDefinition,
-    parent_definition: LabwareParentDefinition,
+    parent_definition: LabwareStackupDefinition,
     deck_definition: DeckDefinitionV5,
     module_parent_to_child_offset: Union[Point, None],
     is_topmost_labware: bool,
@@ -175,7 +175,7 @@ def _get_parent_placement_origin_to_lw_origin(
 
 def _get_parent_placement_origin_to_lw_origin(
     child_labware: LabwareDefinition,
-    parent_deck_item: LabwareParentDefinition,
+    parent_deck_item: LabwareStackupDefinition,
     module_parent_to_child_offset: Union[Point, None],
     deck_definition: DeckDefinitionV5,
     is_topmost_labware: bool,
@@ -260,7 +260,7 @@ def _get_parent_placement_origin_to_lw_origin(
 
 def _get_parent_deck_item_origin_to_child_labware_placement_origin(
     child_labware: LabwareDefinition,
-    parent_deck_item: LabwareParentDefinition,
+    parent_deck_item: LabwareStackupDefinition,
     module_parent_to_child_offset: Union[Point, None],
     deck_definition: DeckDefinitionV5,
     labware_location: LabwareLocation,
@@ -690,7 +690,7 @@ def _get_child_labware_overlap_with_parent_module(
 
 
 def _feature_exception_offsets(
-    parent_deck_item: LabwareParentDefinition,
+    parent_deck_item: LabwareStackupDefinition,
     deck_definition: DeckDefinitionV5,
 ) -> Point:
     """These offsets are intended for legacy reasons only and should generally be avoided post labware schema 2.
