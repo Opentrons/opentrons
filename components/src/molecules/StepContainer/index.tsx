@@ -1,19 +1,17 @@
 import { css } from 'styled-components'
 
+import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
+import { StyledText } from '../../atoms/StyledText'
+import { BORDERS, COLORS } from '../../helix-design-system'
+import { Icon } from '../../icons'
+import { Box, Flex } from '../../primitives'
 import {
   ALIGN_CENTER,
-  BORDERS,
-  Box,
-  COLORS,
-  Flex,
-  Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_START,
-  OverflowBtn,
-  SPACING,
-  StyledText,
-} from '../..'
+} from '../../styles'
+import { SPACING } from '../../ui-style-constants'
 
 import type { MouseEvent as ReactMouseEvent } from 'react'
 import type { CURSOR_DEFAULT, CURSOR_POINTER, IconName } from '../..'
