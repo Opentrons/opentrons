@@ -1,14 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { Trans, useTranslation } from 'react-i18next'
-import Markdown from 'react-markdown'
 import { clsx } from 'clsx'
 import { useAtom } from 'jotai'
 import delay from 'lodash/delay'
 
 import {
   Icon,
-  LegacyStyledText,
   Link,
   SPACING,
   StyledText,
@@ -18,6 +16,7 @@ import {
 
 import smallLogo from '/ai-client/assets/images/opentrons_logo_small.svg'
 import { AttachedFileItem } from '/ai-client/components/atoms/AttachedFileItem'
+import { EnhancedMarkdown } from '/ai-client/components/molecules/EnhancedMarkdown'
 import {
   chatDataAtom,
   createProtocolChatAtom,
@@ -144,9 +143,8 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
     if (protocolContent != null) {
       await navigator.clipboard.writeText(JSON.stringify(protocolContent))
     } else {
-      const lastCodeBlock = document.querySelector(`#${chatId}`)
-      const code = lastCodeBlock?.textContent ?? ''
-      await navigator.clipboard.writeText(code)
+      // Copy the entire OpentronsAI response content including markdown and code blocks
+      await navigator.clipboard.writeText(reply)
     }
 
     setIsCopied(true)
@@ -162,12 +160,6 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
         setIsCopied(false)
       }, 2000)
   }, [isCopied])
-
-  // ToDo this nested component definition should be resolved
-  // eslint-disable-next-line @eslint-react/no-nested-component-definitions
-  function CodeText(props: JSX.IntrinsicAttributes): JSX.Element {
-    return <div {...props} id={chatId} className={styles.code_wrapper} />
-  }
 
   const protocolName =
     chatdata.findLast(chat => chat.protocol_content != null)?.protocol_content
@@ -261,19 +253,7 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
       >
         {protocolContent == null && (
           <div className={styles.content_wrapper}>
-            <Markdown
-              components={{
-                div: undefined,
-                ul: UnnumberedListText,
-                h2: HeaderText,
-                li: ListItemText,
-                p: ParagraphText,
-                a: isUser ? ParagraphText : ExternalLink,
-                code: CodeText,
-              }}
-            >
-              {reply}
-            </Markdown>
+            <EnhancedMarkdown content={reply} />
           </div>
         )}
 
@@ -326,19 +306,7 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
                 {JSON.stringify(protocolContent, null, 2)}
               </div>
             )}
-            <Markdown
-              components={{
-                div: undefined,
-                ul: UnnumberedListText,
-                h2: HeaderText,
-                li: ListItemText,
-                p: ParagraphText,
-                a: isUser ? ParagraphText : ExternalLink,
-                code: CodeText,
-              }}
-            >
-              {reply}
-            </Markdown>
+            <EnhancedMarkdown content={reply} />
           </>
         )}
 
@@ -380,18 +348,6 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
                 className={styles.styled_icon}
               />
             </div>
-            <div
-              className={styles.hover_shadow}
-              onClick={() => {
-                handleFileDownload()
-              }}
-            >
-              <Icon
-                size={SPACING.spacing20}
-                name="download"
-                className={styles.styled_icon}
-              />
-            </div>
           </div>
         ) : null}
       </div>
@@ -410,27 +366,4 @@ function ExternalLink(
       rel="noopener noreferrer"
     />
   )
-}
-
-function ParagraphText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return (
-    <LegacyStyledText
-      {...props}
-      fontSize={TYPOGRAPHY.fontSize20}
-      lineHeight={TYPOGRAPHY.lineHeight24}
-      css="white-space: pre-wrap;"
-    />
-  )
-}
-
-function HeaderText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <LegacyStyledText {...props} as="h3" />
-}
-
-function ListItemText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <LegacyStyledText {...props} as="li" className={styles.list_item} />
-}
-
-function UnnumberedListText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <LegacyStyledText {...props} as="ul" />
 }
