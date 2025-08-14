@@ -121,7 +121,7 @@ The Absorbance Plate Reader has a single status light on the lid. It illuminates
       <td>Self-test after connecting to power.</td>
     </tr>
     <tr>
-      <td><span class="status-dot-container"><span class="status-dot rainbow"></span>Various</span></td>
+      <td><span class="status-dot-container"><span class="status-dot rainbow"></span> Various</span></td>
       <td>Solid</td>
       <td>Initialization/measurement in progress. The status light color corresponds to the selected light wavelength used for analysis.</td>
     </tr>
@@ -131,7 +131,7 @@ The Absorbance Plate Reader has a single status light on the lid. It illuminates
       <td>A well plate is inside the reader.</td>
     </tr>
     <tr>
-      <td><span class="status-dot-container"><span class="status-dot red"></span>Red</span></td>
+      <td><span class="status-dot-container"><span class="status-dot red"></span> Red</span></td>
       <td>Blinking</td>
       <td>An error has occurred.</td>
     </tr>
@@ -145,4 +145,3 @@ The Absorbance Plate Reader has the following power input requirements, which ar
 - **Input:** Power from a USB port with 5 VDC and a maximum of 3 A.
 - **Power consumption:** 2.5 W
 - **Fuse:** 1 A (very fast acting)
-

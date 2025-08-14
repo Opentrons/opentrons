@@ -11,4 +11,4 @@ Plate reader data is available on the Recent Protocol Runs screen in the Opentro
 ![CSV data file location](images/csv-data.png){width="90%"} <!-- 100% seems huge -->
 </figure>
 
-You can also use plate reader data immediately in a Python protocol. See the [Python Protocol API]( https://docs.opentrons.com/v2/modules/absorbance_plate_reader.html#using-plate-reader-data) for more information.
+You can also use plate reader data immediately in a Python protocol. See the [Python Protocol API](https://docs.opentrons.com/v2/modules/absorbance_plate_reader.html#using-plate-reader-data) for more information.
