@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { HashRouter } from 'react-router-dom'
+import { HashRouter, useLocation } from 'react-router-dom'
 import { useAuth0 } from '@auth0/auth0-react'
 import { useAtom } from 'jotai'
 import styled from 'styled-components'
@@ -100,33 +100,52 @@ export function OpentronsAI(): JSX.Element | null {
 
   return (
     <HashRouter>
-      <Flex width="100%" height="100vh" flexDirection={DIRECTION_COLUMN}>
-        <StickyHeader>
-          {displayHeaderWithMeter ? (
-            <HeaderWithMeter progressPercentage={progress} />
-          ) : (
-            <Header />
-          )}
-        </StickyHeader>
-        <Flex
-          flex="1"
-          flexDirection={DIRECTION_COLUMN}
-          backgroundColor={COLORS.grey10}
-          overflow={OVERFLOW_AUTO}
-        >
-          <Flex
-            width="100%"
-            maxWidth={CLIENT_MAX_WIDTH}
-            alignSelf={ALIGN_CENTER}
-            flex="1"
-          >
-            <ExitConfirmModal />
-            <OpentronsAIRoutes />
-          </Flex>
-          <Footer />
-        </Flex>
-      </Flex>
+      <AppContent
+        displayHeaderWithMeter={displayHeaderWithMeter}
+        progress={progress}
+      />
     </HashRouter>
+  )
+}
+
+function AppContent({
+  displayHeaderWithMeter,
+  progress,
+}: {
+  displayHeaderWithMeter: boolean
+  progress: number
+}): JSX.Element {
+  const location = useLocation()
+  const isOnChatPage = location.pathname === '/chat'
+
+  return (
+    <Flex width="100%" height="100vh" flexDirection={DIRECTION_COLUMN}>
+      <StickyHeader>
+        {displayHeaderWithMeter ? (
+          <HeaderWithMeter progressPercentage={progress} />
+        ) : (
+          <Header />
+        )}
+      </StickyHeader>
+
+      <Flex
+        flex="1"
+        flexDirection={DIRECTION_COLUMN}
+        backgroundColor={COLORS.grey10}
+        overflow={OVERFLOW_AUTO}
+      >
+        <Flex
+          width="100%"
+          maxWidth={CLIENT_MAX_WIDTH}
+          alignSelf={ALIGN_CENTER}
+          flex="1"
+        >
+          <ExitConfirmModal />
+          <OpentronsAIRoutes />
+        </Flex>
+        {!isOnChatPage && <Footer />}
+      </Flex>
+    </Flex>
   )
 }
 
