@@ -2,9 +2,9 @@
 # encoding:utf-8
 
 import time
-from typing import Union, Optional, Any
+from typing import Union, Optional, Any, List
 import serial  # type: ignore[import-untyped]
-from serial.tools.list_ports import comports, ListPortInfo  # type: ignore[import-untyped]
+from serial.tools.list_ports import comports  # type: ignore[import-untyped]
 
 ReceiveBuffer = 100
 
@@ -13,7 +13,7 @@ class SerialDriver:
     """Driver for serially connected pressure sensor."""
 
     @classmethod
-    def get_com_list(cls) -> ListPortInfo:
+    def get_com_list(cls) -> List[Any]:
         """List serial ports."""
         port_list = comports()
         return port_list

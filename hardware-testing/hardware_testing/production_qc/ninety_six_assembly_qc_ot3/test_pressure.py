@@ -318,9 +318,8 @@ async def run(  # NOQA: C901
 
         # DISPENSE-Pa
         dispense_pa = 0.0
-        await api.dispense(OT3Mount.LEFT, ASPIRATE_VOLUME, is_full_dispense=True)
         if not api.is_simulator:
-            await api.dispense(OT3Mount.LEFT, ASPIRATE_VOLUME)
+            await api.dispense(OT3Mount.LEFT, ASPIRATE_VOLUME, is_full_dispense=True)
             try:
                 dispense_pa = await _read_from_sensor(
                     api, sensor_id, NUM_PRESSURE_READINGS
