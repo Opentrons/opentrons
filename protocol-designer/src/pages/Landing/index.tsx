@@ -17,6 +17,7 @@ import { EndUserAgreementFooter } from '../../components/molecules'
 import { AnnouncementModal } from '../../components/organisms'
 import { useAnnouncements } from '../../components/organisms/AnnouncementModal/announcements'
 import { useKitchen } from '../../components/organisms/Kitchen/useKitchen'
+import { ACCEPTED_FILE_TYPES } from '../../constants'
 import { getFileMetadata } from '../../file-data/selectors'
 import { actions as loadFileActions } from '../../load-file'
 import { toggleNewProtocolModal } from '../../navigation/actions'
@@ -31,8 +32,6 @@ import type { ChangeEvent } from 'react'
 import type { ThunkDispatch } from '../../types'
 
 import welcomeImage from '../../assets/images/welcome_page.png'
-
-const ACCEPTED_FILE_TYPES = '.py,.json'
 
 export function Landing(): JSX.Element {
   const { t } = useTranslation('shared')

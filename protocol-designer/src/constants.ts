@@ -152,3 +152,5 @@ export const CHANNELS_MAPPED_TO_MAX_SPEED: Record<
 }
 
 export const MINIMUM_LIQUID_CLASS_VOLUME = 1
+
+export const ACCEPTED_FILE_TYPES = '.json,.py'

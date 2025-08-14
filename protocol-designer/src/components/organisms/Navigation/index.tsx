@@ -15,6 +15,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 
+import { ACCEPTED_FILE_TYPES } from '/protocol-designer/constants'
 import { actions as loadFileActions } from '/protocol-designer/load-file'
 import { getHasUnsavedChanges } from '/protocol-designer/load-file/selectors'
 import { toggleNewProtocolModal } from '/protocol-designer/navigation/actions'
@@ -74,6 +75,7 @@ export function Navigation(): JSX.Element | null {
             onChange={loadFile}
             aria-label={t('import')}
             ref={fileInputRef}
+            accept={ACCEPTED_FILE_TYPES}
           />
         </StyledLabel>
         {location.pathname === '/createNew' ? null : <SettingsIcon />}
