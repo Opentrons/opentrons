@@ -1,6 +1,6 @@
 """Public protocol run data models."""
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import List, Optional, Dict
 from datetime import datetime
 
 from ..errors import ErrorOccurrence
@@ -13,6 +13,7 @@ from ..types import (
     Liquid,
     LiquidClassRecordWithId,
     WellInfoSummary,
+    TaskSummary,
 )
 
 
@@ -34,3 +35,4 @@ class StateSummary(BaseModel):
     wells: List[WellInfoSummary] = Field(default_factory=list)
     files: List[str] = Field(default_factory=list)
     liquidClasses: List[LiquidClassRecordWithId] = Field(default_factory=list)
+    tasks: Dict[str, TaskSummary] = Field(default_factory=dict)
