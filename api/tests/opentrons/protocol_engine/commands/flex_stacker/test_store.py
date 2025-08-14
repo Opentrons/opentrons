@@ -37,6 +37,7 @@ from opentrons.protocol_engine.types import (
     InStackerHopperLocation,
     OnCutoutFixtureLocationSequenceComponent,
     StackerStoredLabwareGroup,
+    StackerLabwareMovementStrategy,
 )
 from opentrons.protocol_engine.errors import (
     CannotPerformModuleAction,
@@ -83,7 +84,9 @@ async def test_store_raises_if_full(
     flex_50uL_tiprack: LabwareDefinition,
 ) -> None:
     """It should raise if called when the stacker is full."""
-    data = flex_stacker.StoreParams(moduleId=stacker_id)
+    data = flex_stacker.StoreParams(
+        moduleId=stacker_id, strategy=StackerLabwareMovementStrategy.AUTOMATIC
+    )
 
     fs_module_substate = FlexStackerSubState(
         module_id=stacker_id,
@@ -114,7 +117,9 @@ async def test_store_raises_if_carriage_logically_empty(
     flex_50uL_tiprack: LabwareDefinition,
 ) -> None:
     """It should raise if called with a known-empty carriage."""
-    data = flex_stacker.StoreParams(moduleId=stacker_id)
+    data = flex_stacker.StoreParams(
+        moduleId=stacker_id, strategy=StackerLabwareMovementStrategy.AUTOMATIC
+    )
 
     fs_module_substate = FlexStackerSubState(
         module_id=stacker_id,
@@ -157,7 +162,9 @@ async def test_store_raises_if_not_configured(
     stacker_id: FlexStackerId,
 ) -> None:
     """It should raise if called before the stacker is configured."""
-    data = flex_stacker.StoreParams(moduleId=stacker_id)
+    data = flex_stacker.StoreParams(
+        moduleId=stacker_id, strategy=StackerLabwareMovementStrategy.AUTOMATIC
+    )
     fs_module_substate = FlexStackerSubState(
         module_id=stacker_id,
         pool_primary_definition=None,
@@ -210,7 +217,9 @@ async def test_store_raises_if_stall(
     ],
 ) -> None:
     """It should raise a stall error."""
-    data = flex_stacker.StoreParams(moduleId=stacker_id)
+    data = flex_stacker.StoreParams(
+        moduleId=stacker_id, strategy=StackerLabwareMovementStrategy.AUTOMATIC
+    )
     error_id = "error-id"
     error_timestamp = datetime(year=2020, month=1, day=2)
 
@@ -385,7 +394,9 @@ async def test_store_raises_if_labware_does_not_match(
     param_lid: LabwareDefinition | None,
 ) -> None:
     """It should raise if the labware to be stored does not match the labware pool parameters."""
-    data = flex_stacker.StoreParams(moduleId=stacker_id)
+    data = flex_stacker.StoreParams(
+        moduleId=stacker_id, strategy=StackerLabwareMovementStrategy.AUTOMATIC
+    )
 
     fs_module_substate = FlexStackerSubState(
         module_id=stacker_id,
@@ -444,6 +455,10 @@ async def test_store_raises_if_labware_does_not_match(
         await subject.execute(data)
 
 
+@pytest.mark.parametrize(
+    "move_strategy",
+    [StackerLabwareMovementStrategy.AUTOMATIC, StackerLabwareMovementStrategy.MANUAL],
+)
 async def test_store(
     decoy: Decoy,
     state_view: StateView,
@@ -452,9 +467,10 @@ async def test_store(
     subject: StoreImpl,
     stacker_hardware: FlexStacker,
     flex_50uL_tiprack: LabwareDefinition,
+    move_strategy: StackerLabwareMovementStrategy,
 ) -> None:
     """It should store the labware on the stack."""
-    data = flex_stacker.StoreParams(moduleId=stacker_id)
+    data = flex_stacker.StoreParams(moduleId=stacker_id, strategy=move_strategy)
 
     fs_module_substate = FlexStackerSubState(
         module_id=stacker_id,
@@ -513,7 +529,11 @@ async def test_store(
 
     result = await subject.execute(data)
 
-    decoy.verify(await stacker_hardware.store_labware(labware_height=4), times=1)
+    decoy.verify(
+        await stacker_hardware.store_labware(labware_height=4),
+        times=1 if move_strategy == StackerLabwareMovementStrategy.AUTOMATIC else 0,
+    )
+
     assert result == SuccessData(
         public=flex_stacker.StoreResult(
             primaryOriginLocationSequence=[
