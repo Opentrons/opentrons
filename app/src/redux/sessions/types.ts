@@ -324,7 +324,7 @@ export type SessionState = Partial<{
 // this a unique and gross type so you can't accidentally check them against a string
 // without converting. Use utils.ts slotNameFromCalibrationSlot and calibrationSlotFromSlotName
 // to convert.
-export type CalibrationLabwareSlot = {
+export interface CalibrationLabwareSlot {
   readonly __brand: 'CalibrationLabwareSlot'
 }
 
