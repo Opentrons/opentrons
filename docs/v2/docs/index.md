@@ -10,7 +10,7 @@ As a programmer, you can leverage the full power of Python for advanced automati
 
 **New to Python protocols?** Check out the [tutorial](tutorial.md) to learn about the different parts of a protocol file and build a working protocol from scratch.
 
-If you want to **dive right into code**, take a look at our [new examples](new_examples.md) and the comprehensive [Protocol API Reference][opentrons.protocol_api].
+If you want to **dive right into code**, take a look at our [examples](examples.md) and the comprehensive [Protocol API Reference][opentrons.protocol_api].
 
 When you're ready to **try out a protocol**, download the [Opentrons App](https://www.opentrons.com/ot-app), import the protocol file, and run it on your robot.
 
@@ -124,7 +124,7 @@ For example, if we wanted to transfer liquid from well A1 to well B1 on a plate,
         c. Dispensing 100 µL of liquid into well B1 of the plate.
         d. Dropping the tip in the trash.
 
-There is much more that Opentrons robots and the API can do! The [Atomic Commands](new_atomic_commands.md), [Complex Commands](new_complex_commands.md), and [Modules](new_modules.md) pages cover many of these functions.
+There is much more that Opentrons robots and the API can do! The [Atomic Commands](atomic-commands.md), [Complex Commands](complex-commands.md), and [Modules](modules.md) pages cover many of these functions.
 
 ## More Resources
 
