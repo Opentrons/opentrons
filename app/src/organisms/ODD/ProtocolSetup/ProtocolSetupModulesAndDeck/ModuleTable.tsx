@@ -74,7 +74,7 @@ export function ModuleTable(props: ModuleTableProps): JSX.Element {
               deckConfigCompatabilityD3 != null &&
               WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(
                 deckConfigCompatabilityD3?.compatibleCutoutFixtureIds[0]
-              )
+              ) || WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(deckConfigCompatabilityD3?.cutoutFixtureId)
             ) {
               const comboFixtureId =
                 deckConfigCompatabilityD3?.compatibleCutoutFixtureIds[0]
