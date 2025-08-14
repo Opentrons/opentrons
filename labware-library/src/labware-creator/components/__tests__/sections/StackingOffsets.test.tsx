@@ -11,7 +11,7 @@ import {
   getAllDefinitions,
 } from '@opentrons/shared-data'
 
-import { StackingOffsets } from '../components/sections/StackingOffsets'
+import { StackingOffsets } from '../../sections/StackingOffsets'
 
 import type * as SharedData from '@opentrons/shared-data'
 
