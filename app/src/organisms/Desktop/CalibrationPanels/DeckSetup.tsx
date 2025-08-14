@@ -128,13 +128,13 @@ export function DeckSetup(props: CalibrationPanelProps): JSX.Element {
                     if (
                       tipRack?.slot != null &&
                       Sessions.slotNameFromCalibrationSlot(tipRack?.slot) ===
-                      addressableAreaName
+                        addressableAreaName
                     ) {
                       return tipRack.definition
                     } else if (
                       calBlock?.slot != null &&
                       Sessions.slotNameFromCalibrationSlot(calBlock?.slot) ===
-                      addressableAreaName
+                        addressableAreaName
                     ) {
                       return calBlock.definition
                     } else {
