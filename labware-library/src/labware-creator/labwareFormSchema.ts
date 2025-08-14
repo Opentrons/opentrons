@@ -9,7 +9,6 @@ import {
   LABWARE_TOO_SMALL_ERROR,
   labwareTypeOptions,
   LOOSE_TIP_FIT_ERROR,
-  MAX_SUGGESTED_GRIPPER_Z,
   MAX_X_DIMENSION,
   MAX_Y_DIMENSION,
   MAX_Z_DIMENSION,
@@ -21,14 +20,12 @@ import {
   wellShapeOptions,
 } from './fields'
 import { getDefaultDisplayName, getDefaultLoadName } from './formSelectors'
-import { getStackedLabwareZDimension } from './labwareDefToFields'
 
 import type {
   LabwareFields,
   LabwareType,
   ProcessedLabwareFields,
 } from './fields'
-import { StackedLabeledControl } from '@opentrons/components/src/controls/StackedLabeledControl'
 
 // global overrides for Yup's default error messages.
 Yup.setLocale({
@@ -181,10 +178,9 @@ export const labwareFormSchemaBaseObject = Yup.object({
     MAX_Z_DIMENSION,
     IRREGULAR_LABWARE_ERROR
   ),
-  stackedLabwareZDimension: requiredPositiveNumber(LABELS.labwareZDimension).max(
-    MAX_Z_DIMENSION,
-    IRREGULAR_LABWARE_ERROR
-  ),
+  stackedLabwareZDimension: requiredPositiveNumber(
+    LABELS.labwareZDimension
+  ).max(MAX_Z_DIMENSION, IRREGULAR_LABWARE_ERROR),
 
   gridRows: requiredPositiveInteger(LABELS.gridRows),
   gridColumns: requiredPositiveInteger(LABELS.gridColumns),
