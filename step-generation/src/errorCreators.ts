@@ -337,3 +337,12 @@ export const multiDispenseValuesNotFound = (): CommandCreatorError => {
     message: 'Multi dispense values not found for liquid class',
   }
 }
+
+export const closingThermocyclerWithInvalidLid = (args: {
+  lidDisplayName: string
+}): CommandCreatorError => {
+  return {
+    type: 'CLOSING_THERMOCYCLER_WITH_INVALID_LABWARE_LID',
+    message: `Cannot close thermocycler lid with ${args.lidDisplayName}`,
+  }
+}
