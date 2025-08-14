@@ -1,5 +1,6 @@
 """Utilities for calculating the labware origin offset position."""
 import dataclasses
+import enum
 from typing import Union, overload
 
 from typing_extensions import assert_type
@@ -21,6 +22,7 @@ from opentrons_shared_data.labware.types import (
 )
 from opentrons.protocol_engine.types import AddressableArea
 from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
+from .. import errors
 from ..types import (
     LabwareParentDefinition,
     ModuleDefinition,
@@ -42,8 +44,103 @@ class _Labware3SupportedParentDefinition:
     extents: Extents
 
 
+def get_stackup_placement_origin_to_lw_origin(
+    stackup_info_top_to_bottom: list[tuple[LabwareParentDefinition, LabwareLocation]],
+    module_parent_to_child_offset: Union[Point, None],
+    deck_definition: DeckDefinitionV5,
+    is_topmost_labware: bool = True,
+) -> Point:
+    """Returns the offset from the stackup placement origin to child labware origin."""
+    definition, location = stackup_info_top_to_bottom[0]
+    parent_definition, parent_location = stackup_info_top_to_bottom[1]
+
+    """Get the offset vector from the lowest entity in a stackup to the labware."""
+    if isinstance(
+        parent_location, (AddressableAreaLocation, DeckSlotLocation, ModuleLocation)
+    ):
+        return _get_parent_placement_origin_to_lw_origin_by_location(
+            labware_location=location,
+            labware_definition=definition,  # type: ignore[arg-type]
+            parent_definition=parent_definition,
+            deck_definition=deck_definition,
+            module_parent_to_child_offset=module_parent_to_child_offset,
+            is_topmost_labware=is_topmost_labware,
+        )
+    elif isinstance(parent_location, OnLabwareLocation):
+        parent_placement_origin_to_lw_origin = (
+            _get_parent_placement_origin_to_lw_origin_by_location(
+                labware_location=location,
+                labware_definition=definition,  # type: ignore[arg-type]
+                parent_definition=parent_definition,
+                deck_definition=deck_definition,
+                module_parent_to_child_offset=module_parent_to_child_offset,
+                is_topmost_labware=is_topmost_labware,
+            )
+        )
+        remaining_definitions_locations_top_to_bottom = stackup_info_top_to_bottom[1:]
+
+        return (
+            parent_placement_origin_to_lw_origin
+            + get_stackup_placement_origin_to_lw_origin(
+                stackup_info_top_to_bottom=remaining_definitions_locations_top_to_bottom,
+                module_parent_to_child_offset=module_parent_to_child_offset,
+                deck_definition=deck_definition,
+                is_topmost_labware=False,
+            )
+        )
+    else:
+        raise errors.LabwareNotOnDeckError(
+            "Cannot access labware since it is not on the deck. "
+            "Either it has been loaded off-deck or its been moved off-deck."
+        )
+
+
+def _get_parent_placement_origin_to_lw_origin_by_location(
+    labware_location: LabwareLocation,
+    labware_definition: LabwareDefinition,
+    parent_definition: LabwareParentDefinition,
+    deck_definition: DeckDefinitionV5,
+    module_parent_to_child_offset: Union[Point, None],
+    is_topmost_labware: bool,
+) -> Point:
+    if isinstance(labware_location, ModuleLocation):
+        if module_parent_to_child_offset is None:
+            raise ValueError(
+                "Expected value for module_parent_to_child_offset, received None."
+            )
+        else:
+            return _get_parent_placement_origin_to_lw_origin(
+                child_labware=labware_definition,
+                parent_deck_item=parent_definition,  # type: ignore[arg-type]
+                module_parent_to_child_offset=module_parent_to_child_offset,
+                deck_definition=deck_definition,
+                is_topmost_labware=is_topmost_labware,
+                labware_location=labware_location,
+            )
+    elif isinstance(labware_location, OnLabwareLocation):
+        return _get_parent_placement_origin_to_lw_origin(
+            child_labware=labware_definition,
+            parent_deck_item=parent_definition,  # type: ignore[arg-type]
+            module_parent_to_child_offset=None,
+            deck_definition=deck_definition,
+            is_topmost_labware=is_topmost_labware,
+            labware_location=labware_location,
+        )
+    elif isinstance(labware_location, (DeckSlotLocation, AddressableAreaLocation)):
+        return _get_parent_placement_origin_to_lw_origin(
+            child_labware=labware_definition,
+            parent_deck_item=parent_definition,  # type: ignore[arg-type]
+            module_parent_to_child_offset=None,
+            deck_definition=deck_definition,
+            is_topmost_labware=is_topmost_labware,
+            labware_location=labware_location,
+        )
+    else:
+        raise ValueError(f"Invalid labware location: {labware_location}")
+
+
 @overload
-def get_parent_placement_origin_to_lw_origin(
+def _get_parent_placement_origin_to_lw_origin(
     child_labware: LabwareDefinition,
     parent_deck_item: ModuleDefinition,
     module_parent_to_child_offset: Point,
@@ -55,7 +152,7 @@ def get_parent_placement_origin_to_lw_origin(
 
 
 @overload
-def get_parent_placement_origin_to_lw_origin(
+def _get_parent_placement_origin_to_lw_origin(
     child_labware: LabwareDefinition,
     parent_deck_item: DeckLocationDefinition,
     module_parent_to_child_offset: None,
@@ -67,7 +164,7 @@ def get_parent_placement_origin_to_lw_origin(
 
 
 @overload
-def get_parent_placement_origin_to_lw_origin(
+def _get_parent_placement_origin_to_lw_origin(
     child_labware: LabwareDefinition,
     parent_deck_item: LabwareDefinition,
     module_parent_to_child_offset: None,
@@ -78,7 +175,7 @@ def get_parent_placement_origin_to_lw_origin(
     ...
 
 
-def get_parent_placement_origin_to_lw_origin(
+def _get_parent_placement_origin_to_lw_origin(
     child_labware: LabwareDefinition,
     parent_deck_item: LabwareParentDefinition,
     module_parent_to_child_offset: Union[Point, None],

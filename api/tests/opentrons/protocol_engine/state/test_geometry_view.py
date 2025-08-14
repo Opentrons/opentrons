@@ -454,7 +454,7 @@ _PARENT_ORIGIN_TO_LABWARE_ORIGIN = Point(x=10, y=20, z=30)
 def mock_labware_origin_math(monkeypatch: pytest.MonkeyPatch) -> None:
     """Mock labware origin math's main export."""
     monkeypatch.setattr(
-        "opentrons.protocol_engine.state.geometry.get_parent_placement_origin_to_lw_origin",
+        "opentrons.protocol_engine.state.geometry.get_stackup_placement_origin_to_lw_origin",
         lambda *args, **kwargs: _PARENT_ORIGIN_TO_LABWARE_ORIGIN,
     )
 
@@ -959,13 +959,11 @@ def test_get_obstacle_highest_z_with_lid(
     # The labware's highest z is the z dimension of the lid + labware's height
     labware_height = labware_view.get_dimensions(labware_id="labware-id").z
     monkeypatch.setattr(
-        "opentrons.protocol_engine.state.geometry.get_parent_placement_origin_to_lw_origin",
+        "opentrons.protocol_engine.state.geometry.get_stackup_placement_origin_to_lw_origin",
         lambda *args, **kwargs: Point(10, 20, labware_height),
     )
 
-    assert (
-        subject.get_all_obstacle_highest_z() == 100 + labware_height * 2
-    )  # The adapter + the labware are both labware_height
+    assert subject.get_all_obstacle_highest_z() == 100 + labware_height
 
 
 @pytest.mark.parametrize("use_mocks", [False])
@@ -1198,12 +1196,7 @@ def test_get_highest_z_in_slot_with_stacked_labware_on_slot(
         mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_3.id)
     ).then_return(Point(11, 22, 33))
 
-    expected_highest_z = (
-        33
-        + 1000
-        + 3
-        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z * 3  # The entire labware stackup.
-    )
+    expected_highest_z = 33 + 1000 + 3 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z
 
     assert (
         subject.get_highest_z_in_slot(DeckSlotLocation(slotName=DeckSlotName.SLOT_3))
@@ -1291,12 +1284,7 @@ def test_get_highest_z_in_slot_with_labware_stack_on_module(
         )
     ).then_return(Point(11, 22, 33))
 
-    expected_highest_z = (
-        33
-        + 1000
-        + 3
-        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z * 2  # Both the adapter and top labware
-    )
+    expected_highest_z = 33 + 1000 + 3 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z
 
     assert (
         subject.get_highest_z_in_slot(DeckSlotLocation(slotName=DeckSlotName.SLOT_3))
@@ -1707,7 +1695,7 @@ def test_get_well_position_with_center_offset(
 ) -> None:
     """It should be able to get the position of a well center in a labware."""
     monkeypatch.setattr(
-        "opentrons.protocol_engine.state.geometry.get_parent_placement_origin_to_lw_origin",
+        "opentrons.protocol_engine.state.geometry.get_stackup_placement_origin_to_lw_origin",
         lambda *args, **kwargs: Point(0, 0, 0),
     )
     labware_data = LoadedLabware(
@@ -2291,7 +2279,7 @@ def test_get_relative_well_location(
 ) -> None:
     """It should get the relative location of a well given an absolute position."""
     monkeypatch.setattr(
-        "opentrons.protocol_engine.state.geometry.get_parent_placement_origin_to_lw_origin",
+        "opentrons.protocol_engine.state.geometry.get_stackup_placement_origin_to_lw_origin",
         lambda *args, **kwargs: Point(0, 0, 0),
     )
     labware_data = LoadedLabware(
@@ -2860,11 +2848,11 @@ def test_get_labware_grip_point_on_labware(
     )
 
     assert grip_point == Point(
-        5.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x * 2 + expected_lw_origin_to_parent.x,
-        9.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y * 2 + expected_lw_origin_to_parent.y,
+        5.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x + expected_lw_origin_to_parent.x,
+        9.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y + expected_lw_origin_to_parent.y,
         10.0
         + 100
-        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z * 2
+        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z
         + expected_lw_origin_to_parent.z,
     )
 
@@ -3040,15 +3028,9 @@ def test_get_labware_grip_point_for_labware_stack_on_module(
     )
 
     assert result_grip_point == Point(
-        x=492.0
-        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x * 2  # The labware and module beneath it.
-        + expected_lw_origin_to_parent.x,
-        y=350.0
-        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y * 2
-        + expected_lw_origin_to_parent.y,
-        z=838.0
-        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z * 2
-        + expected_lw_origin_to_parent.z,
+        x=492.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x + expected_lw_origin_to_parent.x,
+        y=350.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y + expected_lw_origin_to_parent.y,
+        z=838.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z + expected_lw_origin_to_parent.z,
     )
 
 

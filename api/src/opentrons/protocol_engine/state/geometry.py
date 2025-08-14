@@ -108,8 +108,7 @@ from .inner_well_math_utils import (
     find_volume_user_defined_volumes,
 )
 from ._well_math import wells_covered_by_pipette_configuration, nozzles_per_well
-from ._labware_origin_math import get_parent_placement_origin_to_lw_origin
-
+from ._labware_origin_math import get_stackup_placement_origin_to_lw_origin
 
 _LOG = getLogger(__name__)
 SLOT_WIDTH = 128
@@ -383,13 +382,22 @@ class GeometryView:
         location = self._labware.get(labware_id).location
         definition = self._labware.get_definition(labware_id)
 
-        slot_front_left = self._get_labware_ancestor_position(labware_id)
-        stackup_origin_to_lw_origin = self._get_stackup_placement_origin_to_lw_origin(
-            location=location, definition=definition, is_topmost_labware=True
+        ancestor_pos = self._get_labware_ancestor_position(labware_id)
+        stackup_defs_locs = self._get_stackup_info_top_to_bottom(
+            labware_definition=definition, location=location
+        )
+        module_parent_to_child_offset = self._get_stackup_module_parent_to_child_offset(
+            location
+        )
+
+        stackup_origin_to_lw_origin = get_stackup_placement_origin_to_lw_origin(
+            module_parent_to_child_offset=module_parent_to_child_offset,
+            stackup_info_top_to_bottom=stackup_defs_locs,
+            deck_definition=self._addressable_areas.deck_definition,
         )
         module_cal_offset = self._get_calibrated_module_offset(location)
 
-        return slot_front_left + stackup_origin_to_lw_origin + module_cal_offset
+        return ancestor_pos + stackup_origin_to_lw_origin + module_cal_offset
 
     def _get_labware_ancestor_position(self, labware_id: str) -> Point:
         """Get the position of the labware's underlying ancestor."""
@@ -400,90 +408,63 @@ class GeometryView:
 
         return parent_pos
 
-    def _get_stackup_placement_origin_to_lw_origin(
-        self,
-        location: LabwareLocation,
-        definition: LabwareDefinition,
-        is_topmost_labware: bool,
-    ) -> Point:
-        """Get the offset vector from the lowest entity in a stackup to the labware."""
-        if isinstance(
-            location, (AddressableAreaLocation, DeckSlotLocation, ModuleLocation)
-        ):
-            return self._get_parent_placement_origin_to_lw_origin(
-                labware_location=location,
-                labware_definition=definition,
-                is_topmost_labware=is_topmost_labware,
-            )
-        elif isinstance(location, OnLabwareLocation):
-            parent_id = location.labwareId
-            parent_location = self._labware.get(parent_id).location
-            parent_definition = self._labware.get_definition(parent_id)
+    def _get_stackup_info_top_to_bottom(
+        self, labware_definition: LabwareDefinition, location: LabwareLocation
+    ) -> list[tuple[LabwareParentDefinition, LabwareLocation]]:
+        """Returns info about each deck item in the stackup.
 
-            parent_placement_origin_to_lw_origin = (
-                self._get_parent_placement_origin_to_lw_origin(
-                    labware_location=location,
-                    labware_definition=definition,
-                    is_topmost_labware=is_topmost_labware,
+        Traverse the stackup, collecting relevant data for each level.
+        The list is ordered from the top deck item to the bottom-most deck item.
+
+        The first entry will always be the definition and location of the given labware itself.
+        """
+        definitions_locations_top_to_bottom: list[
+            tuple[LabwareParentDefinition, LabwareLocation]
+        ] = []
+        current_location = location
+
+        definitions_locations_top_to_bottom.append(
+            (labware_definition, current_location)
+        )
+
+        while True:
+            if isinstance(current_location, OnLabwareLocation):
+                current_labware_id = current_location.labwareId
+                current_labware = self._labware.get(current_labware_id)
+                current_location = current_labware.location
+
+                parent_definition = self._get_parent_definition(current_location)
+                definitions_locations_top_to_bottom.append(
+                    (parent_definition, current_location)
                 )
-            )
+            else:
+                break
 
-            return (
-                parent_placement_origin_to_lw_origin
-                + self._get_stackup_placement_origin_to_lw_origin(
-                    location=parent_location,
-                    definition=parent_definition,
-                    is_topmost_labware=False,
+        return definitions_locations_top_to_bottom
+
+    def _get_stackup_module_parent_to_child_offset(
+        self, location: LabwareLocation
+    ) -> Union[Point, None]:
+        """Traverse the stackup to find the first parent-to-child module offset, if any."""
+        current_location = location
+
+        while True:
+            if isinstance(current_location, ModuleLocation):
+                module_parent_to_child_offset = (
+                    self._modules.get_nominal_offset_to_child_from_addressable_area(
+                        module_id=current_location.moduleId,
+                    )
                 )
-            )
-        else:
-            raise errors.LabwareNotOnDeckError(
-                "Cannot access labware since it is not on the deck. "
-                "Either it has been loaded off-deck or its been moved off-deck."
-            )
+                return module_parent_to_child_offset
 
-    def _get_parent_placement_origin_to_lw_origin(
-        self,
-        labware_location: LabwareLocation,
-        labware_definition: LabwareDefinition,
-        is_topmost_labware: bool,
-    ) -> Point:
-        parent_deck_item = self._get_parent_definition(labware_location)
+            if isinstance(current_location, OnLabwareLocation):
+                current_labware_id = current_location.labwareId
+                current_labware = self._labware.get(current_labware_id)
+                current_location = current_labware.location
+            else:
+                break
 
-        if isinstance(labware_location, ModuleLocation):
-            module_parent_to_child_offset = (
-                self._modules.get_nominal_offset_to_child_from_addressable_area(
-                    module_id=labware_location.moduleId,
-                )
-            )
-            return get_parent_placement_origin_to_lw_origin(
-                child_labware=labware_definition,
-                parent_deck_item=parent_deck_item,  # type: ignore[arg-type]
-                module_parent_to_child_offset=module_parent_to_child_offset,
-                deck_definition=self._addressable_areas.deck_definition,
-                is_topmost_labware=is_topmost_labware,
-                labware_location=labware_location,
-            )
-        elif isinstance(labware_location, OnLabwareLocation):
-            return get_parent_placement_origin_to_lw_origin(
-                child_labware=labware_definition,
-                parent_deck_item=parent_deck_item,  # type: ignore[arg-type]
-                module_parent_to_child_offset=None,
-                deck_definition=self._addressable_areas.deck_definition,
-                is_topmost_labware=is_topmost_labware,
-                labware_location=labware_location,
-            )
-        elif isinstance(labware_location, (DeckSlotLocation, AddressableAreaLocation)):
-            return get_parent_placement_origin_to_lw_origin(
-                child_labware=labware_definition,
-                parent_deck_item=parent_deck_item,  # type: ignore[arg-type]
-                module_parent_to_child_offset=None,
-                deck_definition=self._addressable_areas.deck_definition,
-                is_topmost_labware=is_topmost_labware,
-                labware_location=labware_location,
-            )
-        else:
-            raise ValueError(f"Invalid labware location: {labware_location}")
+        return None
 
     def _get_parent_definition(
         self, location: LabwareLocation
@@ -1041,12 +1022,22 @@ class GeometryView:
         It is calculated as the xy center of the slot with z as the point indicated by
         z-position of labware bottom + grip height from labware bottom.
         """
-        grip_z_from_lw_origin = self._labware.get_grip_z(labware_definition)
+        grip_z_from_lw_origin = self._labware.get_grip_z(
+            labware_definition
+        )  # Moved into the labware origin for gripper context
         aa_name = self._get_underlying_addressable_area_name(location)
-        parent_to_lw_offset = self._get_stackup_placement_origin_to_lw_origin(
-            location=location,
-            definition=labware_definition,
-            is_topmost_labware=True,  # We aren't concerned with entities above the gripped labware.
+
+        stackup_defs_locs = self._get_stackup_info_top_to_bottom(
+            labware_definition=labware_definition, location=location
+        )
+        module_parent_to_child_offset = self._get_stackup_module_parent_to_child_offset(
+            location
+        )
+
+        parent_to_lw_offset = get_stackup_placement_origin_to_lw_origin(
+            module_parent_to_child_offset=module_parent_to_child_offset,
+            stackup_info_top_to_bottom=stackup_defs_locs,
+            deck_definition=self._addressable_areas.deck_definition,
         )
         addressable_area = self._addressable_areas.get_addressable_area(aa_name)
         lw_origin_to_parent = self._get_lw_origin_to_parent(
@@ -1096,7 +1087,6 @@ class GeometryView:
             if self._modules.should_dodge_thermocycler(
                 from_slot=from_slot, to_slot=to_slot
             ):
-
                 middle_slot_fixture = (
                     self._addressable_areas.get_fixture_by_deck_slot_name(
                         DeckSlotName.SLOT_C2
