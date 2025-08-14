@@ -106,24 +106,6 @@ def add_parameters(parameters: protocol_api.ParameterContext) -> None:
         description=("Use LLD to detect liquid height."),
         default=True,
     )
-    parameters.add_int(
-        variable_name="number_of_tipracks",
-        display_name="Number of tipracks",
-        description="Choose 1 or 5 tipracks to load at the start.",
-        default=5,
-        choices=[
-            {"display_name": "1", "value": 1},
-            {"display_name": "5", "value": 5},
-        ],
-    )
-
-    parameters.add_bool(
-        variable_name="use_pip_motion_defaults",
-        display_name="Use pipette motion defaults",
-        description="Use default values for pipette motion.",
-        default=True,
-    )
-
     parameters.add_float(
         display_name="conditioning volume",
         variable_name="conditioning_volume",
@@ -282,12 +264,6 @@ def add_parameters(parameters: protocol_api.ParameterContext) -> None:
             {"display_name": "None", "value": "none"},
         ],
         default="corning_96_wellplate_360ul_flat",
-    )
-    parameters.add_bool(
-        variable_name="lld",
-        display_name="enable lld",
-        description=("Use LLD to detect liquid height."),
-        default=True,
     )
 
 
