@@ -1,5 +1,5 @@
 ---
-title: "Flex Stacker: Additional Product Information"
+title: "Stacker Module: Additional Product Information"
 ---
 
 # Additional Product Information
@@ -20,21 +20,16 @@ Control your liquid handling robot and module using the Opentrons App. Download 
 
 ## Manufacturer Description
 
-[**Opentrons Labworks Inc**](https://opentrons.com/)<br>
-45-18 Court Square West<br>
+Opentrons Labworks, Inc.<br>
+45-18 Ct Square W<br>
 Long Island City, NY 11101
 
+---
 
-<figure class="general figure-end-of-doc">
-  <img src="../images/tm-opentrons-full-blackcolor.svg" alt="opentrons-logo">
-  <figcaption>
-    <p><strong>Post-sales & contacting Opentrons</strong></p>
-    <p class="caption-text-block">
-      If you have any questions about the use of the system, 
-      abnormal phenomena, or special needs, please contact: 
-      <a href="mailto:support@opentrons.com">support@opentrons.com</a>. Also visit <a href="https://www.opentrons.com">www.opentrons.com.</a>
-    </p>
-  </figcaption>
-</figure>
+**Post-sales service & contacting Opentrons**
 
-<p class="trademark-text">Trademarks: Opentrons®, Opentrons drop logo (Opentrons Labworks, Inc.). Registered names, trademarks, etc. used in this document, even when not specifically marked as such, are not to be considered unprotected by law.</p>
+If you have any questions about the use of the system, abnormal phenomena, or special needs, please contact <support@opentrons.com>. You can also visit [www.opentrons.com](https://www.opentrons.com).
+
+Trademarks: Opentrons®, Opentrons drop logo (Opentrons Labworks, Inc.). Registered names, trademarks, etc. used in this document, even when not specifically marked as such, are not to be considered unprotected by law.
+
+AUGUST 2025 © OPENTRONS 2025. ALL RIGHTS RESERVED

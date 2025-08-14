@@ -1,5 +1,5 @@
 ---
-title: "Flex Stacker: Post-installation Procedures"
+title: "Stacker Module: Post-installation Procedures"
 ---
 
 # Post-installation Procedures

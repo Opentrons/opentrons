@@ -1,5 +1,5 @@
 ---
-title: "Flex Stacker: Pre-installation Information"
+title: "Stacker Module: Pre-installation Information"
 ---
 
 # Pre-installation Information
