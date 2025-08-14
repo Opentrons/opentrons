@@ -5395,14 +5395,12 @@
           "title": "Moduleid",
           "type": "string"
         },
-        "moveStrategy": {
+        "strategy": {
           "$ref": "#/$defs/StackerLabwareMovementStrategy",
-          "default": "automatic",
-          "description": "If manual, indicates that labware has been moved to the hopper manually by the user, as required in error recovery.",
-          "title": "Movestrategy"
+          "description": "If manual, indicates that labware has been moved to the hopper manually by the user, as required in error recovery."
         }
       },
-      "required": ["moduleId"],
+      "required": ["moduleId", "strategy"],
       "title": "StoreParams",
       "type": "object"
     },

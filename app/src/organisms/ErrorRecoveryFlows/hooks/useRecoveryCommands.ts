@@ -558,7 +558,7 @@ const buildManualStore = (
     commandType: 'flexStacker/store',
     params: {
       moduleId: storeCommand.params.moduleId,
-      manualMove: true,
+      strategy: 'manual',
     },
     intent: 'fixit',
   }

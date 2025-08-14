@@ -466,7 +466,7 @@ export interface FlexStackerStoreCreateCommand extends CommonCommandCreateInfo {
   commandType: 'flexStacker/store'
   params: {
     moduleId: string
-    manualMove?: boolean
+    strategy: 'automatic' | 'manual'
   }
 }
 

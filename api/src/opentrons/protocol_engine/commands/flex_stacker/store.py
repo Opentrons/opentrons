@@ -60,8 +60,8 @@ class StoreParams(BaseModel):
         ...,
         description="Unique ID of the flex stacker.",
     )
-    moveStrategy: StackerLabwareMovementStrategy | SkipJsonSchema[None] = Field(
-        StackerLabwareMovementStrategy.AUTOMATIC,
+    strategy: StackerLabwareMovementStrategy = Field(
+        ...,
         description=(
             "If manual, indicates that labware has been moved to the hopper "
             "manually by the user, as required in error recovery."
@@ -213,7 +213,7 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
             stacker_hw.set_stacker_identify(True)
 
         if (
-            params.moveStrategy is StackerLabwareMovementStrategy.AUTOMATIC
+            params.strategy is StackerLabwareMovementStrategy.AUTOMATIC
             and stacker_hw is not None
         ):
             try:
