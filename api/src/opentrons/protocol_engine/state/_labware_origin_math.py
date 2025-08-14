@@ -1,6 +1,5 @@
 """Utilities for calculating the labware origin offset position."""
 import dataclasses
-import enum
 from typing import Union, overload
 
 from typing_extensions import assert_type
@@ -54,7 +53,6 @@ def get_stackup_placement_origin_to_lw_origin(
     definition, location = stackup_info_top_to_bottom[0]
     parent_definition, parent_location = stackup_info_top_to_bottom[1]
 
-    """Get the offset vector from the lowest entity in a stackup to the labware."""
     if isinstance(
         parent_location, (AddressableAreaLocation, DeckSlotLocation, ModuleLocation)
     ):

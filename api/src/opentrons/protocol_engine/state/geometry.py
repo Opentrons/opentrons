@@ -428,15 +428,15 @@ class GeometryView:
         )
 
         while True:
+            parent_definition = self._get_parent_definition(current_location)
+            definitions_locations_top_to_bottom.append(
+                (parent_definition, current_location)
+            )
+
             if isinstance(current_location, OnLabwareLocation):
                 current_labware_id = current_location.labwareId
                 current_labware = self._labware.get(current_labware_id)
                 current_location = current_labware.location
-
-                parent_definition = self._get_parent_definition(current_location)
-                definitions_locations_top_to_bottom.append(
-                    (parent_definition, current_location)
-                )
             else:
                 break
 
