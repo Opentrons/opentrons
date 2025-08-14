@@ -3,6 +3,8 @@ import {
   fixtureTiprack300ul,
 } from '@opentrons/shared-data'
 
+import { calibrationSlotFromSlotName } from '../utils'
+
 import type { TipLengthCalibrationSessionParams } from '../tip-length-calibration/types'
 import type {
   CalibrationLabware,
@@ -10,7 +12,7 @@ import type {
 } from '../types'
 
 export const mockTipLengthTipRack: CalibrationLabware = {
-  slot: '8',
+  slot: calibrationSlotFromSlotName('8'),
   loadName: 'opentrons_96_tiprack_300ul',
   namespace: 'opentrons',
   version: 1,
@@ -19,7 +21,7 @@ export const mockTipLengthTipRack: CalibrationLabware = {
 }
 
 export const mockTipLengthCalBlock: CalibrationLabware = {
-  slot: '1',
+  slot: calibrationSlotFromSlotName('1'),
   loadName: 'opentrons_calibrationblock_short_side_left',
   namespace: 'opentrons',
   version: 1,

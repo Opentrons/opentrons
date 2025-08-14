@@ -7,6 +7,7 @@ import {
   CHECK_STEP_COMPARING_POINT_TWO,
   CHECK_STEP_COMPARING_TIP,
 } from '../calibration-check/constants'
+import { calibrationSlotFromSlotName } from '../utils'
 
 import type {
   CalibrationCheckComparison,
@@ -18,7 +19,7 @@ import type {
 } from '../types'
 
 export const mockCalibrationCheckLabware: CalibrationLabware = {
-  slot: '8',
+  slot: calibrationSlotFromSlotName('8'),
   loadName: 'opentrons_96_tiprack_300ul',
   namespace: 'opentrons',
   version: 1,

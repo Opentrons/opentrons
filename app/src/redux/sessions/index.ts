@@ -11,6 +11,7 @@ import type {
 export * from './actions'
 export * from './constants'
 export * from './selectors'
+export * from './utils'
 
 export type {
   Session,
