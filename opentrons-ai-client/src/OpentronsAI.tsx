@@ -143,7 +143,7 @@ function AppContent({
           <ExitConfirmModal />
           <OpentronsAIRoutes />
         </Flex>
-        {!isOnChatPage && <Footer />}
+        {!isOnChatPage ? <Footer /> : null}
       </Flex>
     </Flex>
   )
