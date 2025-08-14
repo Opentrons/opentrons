@@ -24,6 +24,7 @@ from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
 from .. import errors
 from ..types import (
     LabwareStackupDefinition,
+    LabwareStackupAncestorDefinition,
     ModuleDefinition,
     ModuleModel,
     DeckLocationDefinition,
@@ -44,43 +45,46 @@ class _Labware3SupportedParentDefinition:
 
 
 def get_stackup_placement_origin_to_lw_origin(
-    stackup_info_top_to_bottom: list[tuple[LabwareStackupDefinition, LabwareLocation]],
+    stackup_lw_info_top_to_bottom: list[tuple[LabwareDefinition, LabwareLocation]],
+    underlying_ancestor_definition: LabwareStackupAncestorDefinition,
     module_parent_to_child_offset: Union[Point, None],
     deck_definition: DeckDefinitionV5,
     is_topmost_labware: bool = True,
 ) -> Point:
     """Returns the offset from the stackup placement origin to child labware origin."""
-    definition, location = stackup_info_top_to_bottom[0]
-    parent_definition, parent_location = stackup_info_top_to_bottom[1]
+    definition, location = stackup_lw_info_top_to_bottom[0]
 
     if isinstance(
-        parent_location, (AddressableAreaLocation, DeckSlotLocation, ModuleLocation)
+        location, (AddressableAreaLocation, DeckSlotLocation, ModuleLocation)
     ):
         return _get_parent_placement_origin_to_lw_origin_by_location(
             labware_location=location,
-            labware_definition=definition,  # type: ignore[arg-type]
-            parent_definition=parent_definition,
+            labware_definition=definition,
+            parent_definition=underlying_ancestor_definition,
             deck_definition=deck_definition,
             module_parent_to_child_offset=module_parent_to_child_offset,
             is_topmost_labware=is_topmost_labware,
         )
-    elif isinstance(parent_location, OnLabwareLocation):
+    elif isinstance(location, OnLabwareLocation):
+        parent_definition = stackup_lw_info_top_to_bottom[1][0]
+
         parent_placement_origin_to_lw_origin = (
             _get_parent_placement_origin_to_lw_origin_by_location(
                 labware_location=location,
-                labware_definition=definition,  # type: ignore[arg-type]
+                labware_definition=definition,
                 parent_definition=parent_definition,
                 deck_definition=deck_definition,
                 module_parent_to_child_offset=module_parent_to_child_offset,
                 is_topmost_labware=is_topmost_labware,
             )
         )
-        remaining_definitions_locations_top_to_bottom = stackup_info_top_to_bottom[1:]
+        remaining_lw_defs_locs_top_to_bottom = stackup_lw_info_top_to_bottom[1:]
 
         return (
             parent_placement_origin_to_lw_origin
             + get_stackup_placement_origin_to_lw_origin(
-                stackup_info_top_to_bottom=remaining_definitions_locations_top_to_bottom,
+                stackup_lw_info_top_to_bottom=remaining_lw_defs_locs_top_to_bottom,
+                underlying_ancestor_definition=underlying_ancestor_definition,
                 module_parent_to_child_offset=module_parent_to_child_offset,
                 deck_definition=deck_definition,
                 is_topmost_labware=False,

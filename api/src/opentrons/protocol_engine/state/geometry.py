@@ -92,6 +92,7 @@ from ..types import (
     WellLocationType,
     WellLocationFunction,
     LabwareStackupDefinition,
+    LabwareStackupAncestorDefinition,
     AddressableArea,
 )
 from ..types.liquid_level_detection import SimulatedProbeResult, LiquidTrackingType
@@ -383,16 +384,20 @@ class GeometryView:
         definition = self._labware.get_definition(labware_id)
 
         ancestor_pos = self._get_labware_ancestor_position(labware_id)
-        stackup_defs_locs = self._get_stackup_info_top_to_bottom(
+        stackup_lw_defs_locs = self._get_stackup_lw_info_top_to_bottom(
             labware_definition=definition, location=location
+        )
+        underlying_ancestor_def = self._get_stackup_underlying_ancestor_definition(
+            location
         )
         module_parent_to_child_offset = self._get_stackup_module_parent_to_child_offset(
             location
         )
 
         stackup_origin_to_lw_origin = get_stackup_placement_origin_to_lw_origin(
+            stackup_lw_info_top_to_bottom=stackup_lw_defs_locs,
+            underlying_ancestor_definition=underlying_ancestor_def,
             module_parent_to_child_offset=module_parent_to_child_offset,
-            stackup_info_top_to_bottom=stackup_defs_locs,
             deck_definition=self._addressable_areas.deck_definition,
         )
         module_cal_offset = self._get_calibrated_module_offset(location)
@@ -408,45 +413,39 @@ class GeometryView:
 
         return parent_pos
 
-    def _get_stackup_info_top_to_bottom(
+    def _get_stackup_lw_info_top_to_bottom(
         self, labware_definition: LabwareDefinition, location: LabwareLocation
-    ) -> list[tuple[LabwareStackupDefinition, LabwareLocation]]:
-        """Returns info about each deck item in the stackup.
+    ) -> list[tuple[LabwareDefinition, LabwareLocation]]:
+        """Returns info about each labware in the stackup.
 
-        Traverse the stackup, collecting relevant data for each level.
-        The list is ordered from the top deck item to the bottom-most deck item.
-
+        The list is ordered from the top labware to the bottom-most labware.
         The first entry will always be the definition and location of the given labware itself.
         """
         definitions_locations_top_to_bottom: list[
-            tuple[LabwareStackupDefinition, LabwareLocation]
+            tuple[LabwareDefinition, LabwareLocation]
         ] = []
         current_location = location
-
-        definitions_locations_top_to_bottom.append(
-            (labware_definition, current_location)
-        )
+        current_definition = labware_definition
 
         while True:
-            parent_definition = self._get_parent_definition(current_location)
             definitions_locations_top_to_bottom.append(
-                (parent_definition, current_location)
+                (current_definition, current_location)
             )
 
             if isinstance(current_location, OnLabwareLocation):
                 current_labware_id = current_location.labwareId
-                current_labware = self._labware.get(current_labware_id)
-                current_location = current_labware.location
+                current_location = self._labware.get(current_labware_id).location
+                current_definition = self._labware.get_definition(current_labware_id)
             else:
                 break
 
         return definitions_locations_top_to_bottom
 
     def _get_stackup_module_parent_to_child_offset(
-        self, location: LabwareLocation
+        self, top_most_lw_location: LabwareLocation
     ) -> Union[Point, None]:
         """Traverse the stackup to find the first parent-to-child module offset, if any."""
-        current_location = location
+        current_location = top_most_lw_location
 
         while True:
             if isinstance(current_location, ModuleLocation):
@@ -466,42 +465,32 @@ class GeometryView:
 
         return None
 
-    def _get_parent_definition(
-        self, location: LabwareLocation
-    ) -> LabwareStackupDefinition:
-        """Get the parent's definition given the labware's location."""
-        if isinstance(location, DeckSlotLocation):
-            addressable_area_name = location.slotName.id
-            return self._addressable_areas.get_slot_definition(addressable_area_name)
+    def _get_stackup_underlying_ancestor_definition(
+        self, top_most_lw_location: LabwareLocation
+    ) -> LabwareStackupAncestorDefinition:
+        """Traverse the stackup to find the first non-labware definition."""
+        current_location = top_most_lw_location
 
-        elif isinstance(location, AddressableAreaLocation):
-            addressable_area_name = location.addressableAreaName
-            return self._addressable_areas.get_addressable_area(addressable_area_name)
-
-        elif isinstance(location, ModuleLocation):
-            module_id = location.moduleId
-            return self._modules.get_definition(module_id)
-
-        elif isinstance(location, OnLabwareLocation):
-            below_labware_id = location.labwareId
-            return self._labware.get_definition(below_labware_id)
-
-        elif location == OFF_DECK_LOCATION or location == SYSTEM_LOCATION:
-            raise errors.LabwareNotOnDeckError(
-                f"Labware location {location} does not have a slot associated with it"
-                f" since it is no longer on the deck."
-            )
-
-        elif isinstance(location, InStackerHopperLocation):
-            raise errors.LabwareNotOnDeckError(
-                "Labware does not have a slot or module associated with it"
-                " since it is no longer on the deck."
-            )
-
-        else:
-            raise errors.InvalidLabwarePositionError(
-                f"Cannot get ancestor from location {location}"
-            )
+        while True:
+            if isinstance(current_location, OnLabwareLocation):
+                current_labware_id = current_location.labwareId
+                current_labware = self._labware.get(current_labware_id)
+                current_location = current_labware.location
+            else:
+                if isinstance(current_location, ModuleLocation):
+                    return self._modules.get_definition(current_location.moduleId)
+                elif isinstance(current_location, AddressableAreaLocation):
+                    return self._addressable_areas.get_addressable_area(
+                        current_location.addressableAreaName
+                    )
+                elif isinstance(current_location, DeckSlotLocation):
+                    return self._addressable_areas.get_slot_definition(
+                        current_location.slotName.id
+                    )
+                else:
+                    raise errors.InvalidLabwarePositionError(
+                        f"Cannot get ancestor slot of location {current_location}"
+                    )
 
     def _get_underlying_addressable_area_name(self, location: LabwareLocation) -> str:
         if isinstance(location, DeckSlotLocation):
@@ -1027,16 +1016,20 @@ class GeometryView:
         )  # Moved into the labware origin for gripper context
         aa_name = self._get_underlying_addressable_area_name(location)
 
-        stackup_defs_locs = self._get_stackup_info_top_to_bottom(
+        stackup_defs_locs = self._get_stackup_lw_info_top_to_bottom(
             labware_definition=labware_definition, location=location
         )
         module_parent_to_child_offset = self._get_stackup_module_parent_to_child_offset(
             location
         )
+        underlying_ancestor_def = self._get_stackup_underlying_ancestor_definition(
+            location
+        )
 
         parent_to_lw_offset = get_stackup_placement_origin_to_lw_origin(
             module_parent_to_child_offset=module_parent_to_child_offset,
-            stackup_info_top_to_bottom=stackup_defs_locs,
+            underlying_ancestor_definition=underlying_ancestor_def,
+            stackup_lw_info_top_to_bottom=stackup_defs_locs,
             deck_definition=self._addressable_areas.deck_definition,
         )
         addressable_area = self._addressable_areas.get_addressable_area(aa_name)

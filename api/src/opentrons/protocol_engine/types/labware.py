@@ -121,6 +121,11 @@ LabwareStackupDefinition = Union[
     DeckLocationDefinition, ModuleDefinition, LabwareDefinition
 ]
 """Information pertaining to a deck item that is present in a labware stackup."""
+LabwareStackupAncestorDefinition = Union[
+    DeckLocationDefinition,
+    ModuleDefinition,
+]
+"""Information pertaining to the lowest deck item in a labware stackup."""
 
 
 @dataclass(frozen=True)
