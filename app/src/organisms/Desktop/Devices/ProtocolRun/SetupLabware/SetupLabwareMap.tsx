@@ -72,10 +72,6 @@ export function SetupLabwareMap({
       getLabwareDefinitionsByURIForProtocol(protocolAnalysis?.commands ?? []),
     [protocolAnalysis]
   )
-  const offDeckItems = Object.keys(startingDeck).includes('offDeck')
-    ? startingDeck.offDeck
-    : null
-
   // early return null if no protocol analysis
   if (protocolAnalysis == null) return null
 
@@ -229,14 +225,12 @@ export function SetupLabwareMap({
             modulesOnDeck={modulesOnDeck}
           />
         </Box>
-        {offDeckItems != null ? (
-          <OffDeckLabwareList
-            labwareItems={offDeckItems}
-            isFlex={robotType === FLEX_ROBOT_TYPE}
-            setSelectedStack={setSelectedStack}
-            definitionsByURI={labwareDefinitionsByURI}
-          />
-        ) : null}
+        <OffDeckLabwareList
+          labwareItems={startingDeck}
+          isFlex={robotType === FLEX_ROBOT_TYPE}
+          setSelectedStack={setSelectedStack}
+          definitionsByURI={labwareDefinitionsByURI}
+        />
       </Flex>
       {selectedStack != null ? (
         <SlotDetailModal
