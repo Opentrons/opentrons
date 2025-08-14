@@ -1877,6 +1877,9 @@ class InstrumentContext(publisher.CommandPublisher):
                 for well in transfer_args.dest
             ]
 
+        for tip_rack in transfer_args.tip_racks:
+            instrument.validate_tiprack(self.name, tip_rack, _log)
+
         with publisher.publish_context(
             broker=self.broker,
             command=cmds.transfer_with_liquid_class(
@@ -2007,6 +2010,9 @@ class InstrumentContext(publisher.CommandPublisher):
                 f" `distribute_with_liquid_class()` only supports `new_tip` values of"
                 f" 'once', 'never' and 'always'."
             )
+
+        for tip_rack in transfer_args.tip_racks:
+            instrument.validate_tiprack(self.name, tip_rack, _log)
 
         verified_source = transfer_args.source[0]
         with publisher.publish_context(
@@ -2146,6 +2152,9 @@ class InstrumentContext(publisher.CommandPublisher):
                 f" `consolidate_with_liquid_class()` only supports `new_tip` values of"
                 f" 'once', 'never' and 'always'."
             )
+
+        for tip_rack in transfer_args.tip_racks:
+            instrument.validate_tiprack(self.name, tip_rack, _log)
 
         with publisher.publish_context(
             broker=self.broker,
