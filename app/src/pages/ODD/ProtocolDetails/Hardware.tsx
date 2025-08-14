@@ -16,13 +16,13 @@ import {
 import {
   getCutoutDisplayName,
   getFixtureDisplayName,
+  getModuleDeckLabel,
   getModuleDisplayName,
   getModuleType,
   GRIPPER_V1_2,
   MAGNETIC_BLOCK_FIXTURES,
   MAGNETIC_BLOCK_TYPE,
-  TC_MODULE_LOCATION_OT3,
-  THERMOCYCLER_MODULE_TYPE,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
 
 import {
@@ -100,6 +100,11 @@ const useHardwareName = (
     return gripperDisplayName
   } else if (protocolHardware.hardwareType === 'pipette') {
     return pipetteDisplayName
+  } else if (
+    protocolHardware.hardwareType === 'module' &&
+    protocolHardware.comboFixtureId != null
+  ) {
+    return getFixtureDisplayName(t, protocolHardware.comboFixtureId)
   } else if (protocolHardware.hardwareType === 'module') {
     return getModuleDisplayName(protocolHardware.moduleModel)
   } else {
@@ -122,17 +127,21 @@ function HardwareItem({
     </LegacyStyledText>
   )
   if (hardware.hardwareType === 'module') {
-    const slot =
-      getModuleType(hardware.moduleModel) === THERMOCYCLER_MODULE_TYPE
-        ? TC_MODULE_LOCATION_OT3
-        : hardware.slot
-    location = <DeckInfoLabel deckLabel={slot} />
-  } else if (hardware.hardwareType === 'fixture') {
     location = (
       <DeckInfoLabel
-        deckLabel={getCutoutDisplayName(hardware.location.cutout)}
+        deckLabel={getModuleDeckLabel(
+          getModuleType(hardware.moduleModel),
+          hardware.slot
+        )}
       />
     )
+  } else if (hardware.hardwareType === 'fixture') {
+    const cutoutDisplayName = getCutoutDisplayName(hardware.location.cutout)
+    const slotName =
+      hardware.cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE
+        ? `${cutoutDisplayName[0]}4`
+        : cutoutDisplayName
+    location = <DeckInfoLabel deckLabel={slotName} />
   }
   const isMagneticBlockFixture =
     hardware.hardwareType === 'fixture' &&

@@ -21,9 +21,9 @@ import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 import { getFixtureIdByCutoutId } from './getFixtureIdByCutoutId'
 
 import type { CreateCommand, DeckConfiguration } from '@opentrons/shared-data'
-import type { ModuleSetupWizardStepProps } from './types'
+import type { ModuleSetupWizardRequiresPipetteStepProps } from './types'
 
-interface AttachProbeProps extends ModuleSetupWizardStepProps {
+interface AttachProbeProps extends ModuleSetupWizardRequiresPipetteStepProps {
   adapterId: string | null
   deckConfig: DeckConfiguration
 }

@@ -4,46 +4,47 @@ import '@testing-library/jest-dom/vitest'
 
 import { fireEvent, screen } from '@testing-library/react'
 
-import { ProtocolSteps } from '..'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
-import { getEnableHotKeysDisplay } from '../../../../feature-flags/selectors'
-import { getRobotStateTimeline } from '../../../../file-data/selectors'
-import { useProtocolExportHandler } from '../../../../resources/hooks'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { getEnableHotKeysDisplay } from '/protocol-designer/feature-flags/selectors'
+import { getRobotStateTimeline } from '/protocol-designer/file-data/selectors'
+import { useProtocolExportHandler } from '/protocol-designer/resources/hooks'
 import {
   getAdditionalEquipmentEntities,
   getSavedStepForms,
   getUnsavedForm,
-} from '../../../../step-forms/selectors'
-import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
+} from '/protocol-designer/step-forms/selectors'
+import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import {
   getActiveItem,
   getSelectedStepId,
   getSelectedSubstep,
-} from '../../../../ui/steps/selectors'
+} from '/protocol-designer/ui/steps/selectors'
+
+import { ProtocolSteps } from '..'
 import { DeckSetupContainer } from '../../DeckSetup'
 import { OffDeck } from '../../OffDeck'
 import { DraggableSidebar } from '../DraggableSidebar'
 import { SubStepsToolbox } from '../Timeline'
 import { getUserOS } from '../Timeline/utils'
 
-import type { SavedStepFormState } from '../../../../step-forms'
+import type { SavedStepFormState } from '/protocol-designer/step-forms'
 
 vi.mock('../../OffDeck')
-vi.mock('../../../../step-forms/selectors')
-vi.mock('../../../../ui/steps/selectors')
-vi.mock('../../../../ui/labware/selectors')
+vi.mock('/protocol-designer/step-forms/selectors')
+vi.mock('/protocol-designer/ui/steps/selectors')
+vi.mock('/protocol-designer/ui/labware/selectors')
 vi.mock('../StepForm')
 vi.mock('../../DeckSetup')
 vi.mock('../Timeline')
 vi.mock('../DraggableSidebar')
-vi.mock('../../../../feature-flags/selectors')
-vi.mock('../../../../file-data/selectors')
-vi.mock('../../../../components/organisms/Alerts')
-vi.mock('../../../../top-selectors/labware-locations')
+vi.mock('/protocol-designer/feature-flags/selectors')
+vi.mock('/protocol-designer/file-data/selectors')
+vi.mock('/protocol-designer/components/organisms/Alerts')
+vi.mock('/protocol-designer/top-selectors/labware-locations')
 vi.mock('../Timeline/utils')
-vi.mock('../../../../components/organisms/StepSummary')
-vi.mock('../../../../resources/hooks')
+vi.mock('/protocol-designer/components/organisms/StepSummary')
+vi.mock('/protocol-designer/resources/hooks')
 
 const render = () => {
   return renderWithProviders(

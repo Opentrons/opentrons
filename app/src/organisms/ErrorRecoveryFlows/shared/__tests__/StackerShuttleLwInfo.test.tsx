@@ -78,7 +78,7 @@ describe('Render StackerShuttleLwInfo', () => {
       expect.objectContaining({
         title: 'Load labware onto labware shuttle',
         type: 'location',
-        layout: 'stacked',
+        layout: 'default',
         showQuantity: false,
       }),
       expect.anything()

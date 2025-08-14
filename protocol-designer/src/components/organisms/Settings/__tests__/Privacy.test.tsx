@@ -1,14 +1,15 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { actions as analyticsActions } from '/protocol-designer/analytics'
+import { i18n } from '/protocol-designer/assets/localization'
+
 import { Privacy } from '..'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { actions as analyticsActions } from '../../../../analytics'
-import { i18n } from '../../../../assets/localization'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('../../../../analytics')
+vi.mock('/protocol-designer/analytics')
 
 const render = (props: ComponentProps<typeof Privacy>) => {
   return renderWithProviders(<Privacy {...props} />, {

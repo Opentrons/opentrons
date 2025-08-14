@@ -858,6 +858,7 @@ async def test_get_current_state_success(
                 valid_map_key="mock-key",
                 full_instrument_map_store={},
                 full_instrument_rows={},
+                full_instrument_columns={},
             )
         }
     )

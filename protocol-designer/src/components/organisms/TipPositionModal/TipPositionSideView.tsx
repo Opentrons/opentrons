@@ -10,9 +10,9 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import BOTTOM_LAYER from '../../../assets/images/tip_side_bottom_layer.svg'
-import MID_LAYER from '../../../assets/images/tip_side_mid_layer.svg'
-import TOP_LAYER from '../../../assets/images/tip_side_top_layer.svg'
+import BOTTOM_LAYER from '/protocol-designer/assets/images/tip_side_bottom_layer.svg'
+import MID_LAYER from '/protocol-designer/assets/images/tip_side_mid_layer.svg'
+import TOP_LAYER from '/protocol-designer/assets/images/tip_side_top_layer.svg'
 
 const WELL_HEIGHT_PIXELS = 78
 const WELL_WIDTH_PIXELS = 80

@@ -5,9 +5,10 @@ import { MemoryRouter } from 'react-router-dom'
 import { VIEWPORT } from '@opentrons/components'
 import { fixture96Plate } from '@opentrons/shared-data'
 
+import { i18n } from '/protocol-designer/assets/localization'
+import { configureStore } from '/protocol-designer/configureStore'
+
 import { LabwareCard as LabwareCardComponent } from '.'
-import { i18n } from '../../../assets/localization'
-import { configureStore } from '../../../configureStore'
 
 import type { Meta, StoryObj } from '@storybook/react'
 import type { ComponentProps } from 'react'

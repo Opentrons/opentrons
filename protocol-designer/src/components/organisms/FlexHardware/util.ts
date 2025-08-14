@@ -9,16 +9,17 @@ import {
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 
-import { deleteModule } from '../../../modules'
-import { FIXTURES } from '../../../pages/Designer/DeckSetup/constants'
+import { deleteModule } from '/protocol-designer/modules'
+import { FIXTURES } from '/protocol-designer/pages/Designer/DeckSetup/constants'
 import {
   createModule,
   editDeckConfiguration,
-} from '../../../step-forms/actions'
+} from '/protocol-designer/step-forms/actions'
 import {
   createDeckFixture,
   deleteDeckFixture,
-} from '../../../step-forms/actions/additionalItems'
+} from '/protocol-designer/step-forms/actions/additionalItems'
+
 import { getLabwareNotCompatibleWithModule, getSlotHasLabware } from '../utils'
 import { getHardwareInSlotInUse } from './getHardwareInSlotInUse'
 
@@ -27,9 +28,9 @@ import type { DeckConfiguration, ModuleModel } from '@opentrons/shared-data'
 import type {
   AllTemporalPropertiesForTimelineFrame,
   SavedStepFormState,
-} from '../../../step-forms'
-import type { DeckFixture } from '../../../step-forms/actions/additionalItems'
-import type { ThunkDispatch } from '../../../types'
+} from '/protocol-designer/step-forms'
+import type { DeckFixture } from '/protocol-designer/step-forms/actions/additionalItems'
+import type { ThunkDispatch } from '/protocol-designer/types'
 import type { CutoutConfigExtended } from '../HardwareConfigurator/AddFixtureModal'
 import type { MakeSnackbar } from '../Kitchen/KitchenContext'
 

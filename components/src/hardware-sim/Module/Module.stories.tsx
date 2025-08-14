@@ -15,7 +15,7 @@ import {
 
 import { LabwareRender } from '../Labware'
 import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
-import { Module as ModuleComponent } from './'
+import { AlignLabwareToModule, Module as ModuleComponent } from './'
 
 import type { Meta, Story } from '@storybook/react'
 import type { LabwareDefinition, ModuleModel } from '@opentrons/shared-data'
@@ -58,24 +58,35 @@ const Template: Story<{
 }> = args => {
   // Add null check and default to first module model if undefined
   const moduleModel = args.model || moduleModels[0]
+  const moduleDef = getModuleDef(moduleModel)
+  const labwareDef = args.hasLabware
+    ? (fixture96Plate as LabwareDefinition)
+    : null
 
   return (
     <RobotCoordinateSpace height="100vh" width="100vw" viewBox="0 -50 200 320">
       <ModuleComponent
-        def={getModuleDef(moduleModel)}
+        def={moduleDef}
         x={0}
         y={0}
         innerProps={args.innerProps}
         orientation={args.orientation}
         targetSlotId={null}
         targetDeckId={null}
-        childrenPositioningMode="offsetToSlot"
+        childrenPositioningMode="passThrough"
       >
-        {args.hasLabware ? (
-          <LabwareRender
-            definition={fixture96Plate as LabwareDefinition}
-            positioningMode="passThrough"
-          />
+        {labwareDef != null ? (
+          <AlignLabwareToModule
+            deckId={null}
+            slotId={null}
+            moduleDefinition={moduleDef}
+            labwareDefinition={labwareDef}
+          >
+            <LabwareRender
+              definition={labwareDef}
+              positioningMode="passThrough"
+            />
+          </AlignLabwareToModule>
         ) : null}
       </ModuleComponent>
     </RobotCoordinateSpace>

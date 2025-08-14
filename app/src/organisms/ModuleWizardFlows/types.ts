@@ -47,7 +47,7 @@ interface ModuleWizardPatchModuleAction {
   type: typeof ACTIONS.PATCH_MODULE
   attachedModule: AttachedModule
 }
-export interface ModuleSetupWizardStepProps {
+export interface ModuleSetupWizardBaseStepProps {
   proceed: () => void
   goBack: () => void
   restartSetup: () => void
@@ -60,11 +60,24 @@ export interface ModuleSetupWizardStepProps {
   setIsModuleUpdating: (updating: boolean) => void
   maintenanceRunId: string | null
   attachedModule: AttachedModule
-  attachedPipette: PipetteInformation
   errorMessage: string | null
   setErrorMessage: (message: string | null) => void
   isOnDevice: boolean
 }
+
+export interface ModuleSetupWizardRequiresPipetteStepProps
+  extends ModuleSetupWizardBaseStepProps {
+  attachedPipette: PipetteInformation
+}
+
+export interface ModuleSetupWizardMaybePipetteStepProps
+  extends ModuleSetupWizardBaseStepProps {
+  attachedPipette: PipetteInformation | null
+}
+
+export type ModuleSetupWizardStepProps =
+  | ModuleSetupWizardMaybePipetteStepProps
+  | ModuleSetupWizardRequiresPipetteStepProps
 
 export type ModuleWizardFlow = typeof FLOWS.SETUP
 

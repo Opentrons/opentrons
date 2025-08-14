@@ -16,8 +16,8 @@ import {
 import {
   actions as analyticsActions,
   selectors as analyticsSelectors,
-} from '../../../analytics'
-import { LINK_BUTTON_STYLE } from '../../atoms'
+} from '/protocol-designer/analytics'
+import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
 
 const PRIVACY_POLICY_URL = 'https://opentrons.com/privacy-policy'
 const EULA_URL = 'https://opentrons.com/eula'

@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
+import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
 import { COLORS, LegacyStyledText } from '@opentrons/components'
-import { useModulesQuery } from '@opentrons/react-api-client'
+import { ApiHostProvider, useModulesQuery } from '@opentrons/react-api-client'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import { useGetNewModules } from '/app/App/hooks'
+import { useGetModulesNeedingSetupThatCanCurrentlyBeSetUp } from '/app/App/hooks'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
@@ -29,11 +30,11 @@ import { Success } from './Success'
 import { UpdateFirmware } from './UpdateFirmware'
 import { useModuleSetupWizard } from './useModuleSetupWizard'
 
-import type { AttachedModule } from '@opentrons/api-client'
+import type { AttachedModule, HostConfig } from '@opentrons/api-client'
 
 interface ModuleWizardFlowsProps {
-  closeFlow: () => void
   robotName: string
+  closeFlow: () => void
   attachedModule?: AttachedModule
   showSetupLauncher?: boolean
   isLoadedInRun?: boolean
@@ -89,7 +90,7 @@ export function ModuleWizardFlows(
   }, [])
 
   // Close the modal if no new modules are attached
-  const newModules = useGetNewModules()
+  const newModules = useGetModulesNeedingSetupThatCanCurrentlyBeSetUp()
   useEffect(() => {
     if (newModules.length === 0 && wizardFlowBaseProps.attachedModule == null) {
       handleCleanUpAndClose()
@@ -98,7 +99,6 @@ export function ModuleWizardFlows(
 
   const doorStatus = useIsDoorOpen(robotName).isDoorOpen
 
-  if (wizardFlowBaseProps.attachedPipette == null) return null
   if (showLaunchSetup || wizardFlowBaseProps.attachedModule == null) {
     return (
       <ModuleWizardScreen
@@ -226,7 +226,7 @@ export function ModuleWizardFlows(
         </ModuleWizardScreen>
       )
     case SECTIONS.PLACE_ADAPTER:
-      return (
+      return wizardFlowBaseProps.attachedPipette == null ? null : (
         <ModuleWizardScreen
           isRobotMoving={wizardFlowBaseProps.isRobotMoving}
           isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
@@ -245,7 +245,7 @@ export function ModuleWizardFlows(
         </ModuleWizardScreen>
       )
     case SECTIONS.ATTACH_PROBE:
-      return (
+      return wizardFlowBaseProps.attachedPipette == null ? null : (
         <ModuleWizardScreen
           isRobotMoving={wizardFlowBaseProps.isRobotMoving}
           isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
@@ -264,7 +264,7 @@ export function ModuleWizardFlows(
         </ModuleWizardScreen>
       )
     case SECTIONS.DETACH_PROBE:
-      return (
+      return wizardFlowBaseProps.attachedPipette == null ? null : (
         <ModuleWizardScreen
           isRobotMoving={wizardFlowBaseProps.isRobotMoving}
           isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
@@ -384,3 +384,29 @@ export function ModuleWizardFlows(
       )
   }
 }
+
+interface ModuleWizardFlowsPropsWithHost
+  extends Omit<ModuleWizardFlowsProps, 'closeFlow'> {
+  host: HostConfig
+}
+
+export const handleModuleWizardFlows = (
+  props: ModuleWizardFlowsPropsWithHost
+): void => {
+  NiceModal.show(NiceModalModuleWizardFlows, props)
+}
+
+const NiceModalModuleWizardFlows = NiceModal.create(
+  (props: ModuleWizardFlowsPropsWithHost): JSX.Element => {
+    const modal = useModal()
+    const closeFlow = (): void => {
+      modal.remove()
+    }
+
+    return (
+      <ApiHostProvider {...props.host}>
+        <ModuleWizardFlows {...props} closeFlow={closeFlow} />
+      </ApiHostProvider>
+    )
+  }
+)

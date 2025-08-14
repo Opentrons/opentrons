@@ -7,17 +7,18 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
-import { MixTools } from '..'
-import { renderWithProviders } from '../../../../../../../__testing-utils__'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import {
   getEnablePartialTipSupport,
-  getEnableReturnTip,
-} from '../../../../../../../feature-flags/selectors'
-import { getRobotType } from '../../../../../../../file-data/selectors'
+  getEnableTipPickupLocation,
+} from '/protocol-designer/feature-flags/selectors'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
 import {
   getLabwareEntities,
   getPipetteEntities,
-} from '../../../../../../../step-forms/selectors'
+} from '/protocol-designer/step-forms/selectors'
+
+import { MixTools } from '..'
 import { getFormErrorsMappedToField } from '../../../utils'
 import { LiquidClassesStepTools } from '../../MoveLiquidTools/LiquidClassesStepTools'
 import { FirstStepMixTools } from '../FirstStepMixTools'
@@ -25,11 +26,11 @@ import { SecondStepMixTools } from '../SecondStepMixTools'
 
 import type { ComponentProps } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { FormData } from '../../../../../../../form-types'
+import type { FormData } from '/protocol-designer/form-types'
 
-vi.mock('../../../../../../../step-forms/selectors')
-vi.mock('../../../../../../../feature-flags/selectors')
-vi.mock('../../../../../../../file-data/selectors')
+vi.mock('/protocol-designer/step-forms/selectors')
+vi.mock('/protocol-designer/feature-flags/selectors')
+vi.mock('/protocol-designer/file-data/selectors')
 vi.mock('../../../utils')
 vi.mock('../FirstStepMixTools')
 vi.mock('../SecondStepMixTools')
@@ -75,7 +76,7 @@ describe('MixToolFirstStep', () => {
         pythonName: 'mockPythonName',
       },
     })
-    vi.mocked(getEnableReturnTip).mockReturnValue(false)
+    vi.mocked(getEnableTipPickupLocation).mockReturnValue(false)
     vi.mocked(getEnablePartialTipSupport).mockReturnValue(false)
     vi.mocked(getFormErrorsMappedToField).mockReturnValue({})
     vi.mocked(FirstStepMixTools).mockReturnValue(

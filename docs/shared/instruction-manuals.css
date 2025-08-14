@@ -118,6 +118,11 @@ figure.side-by-side img {
 .status-dot.rainbow {
   background-image: linear-gradient(to right, red, orange, yellow, green, blue);
   background-color: transparent; 
+
+/* Longitudinal split dot for two-color LEDs */
+.status-dot.yellow-red-split {
+  background-image: linear-gradient(to right, #F09D20 50%, red 50%);
+  background-color: transparent;
 }
 
 /* Aligns status dots and text if needed */

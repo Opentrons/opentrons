@@ -1,9 +1,11 @@
 import {
+  FLEX_STACKER_MODULE_TYPE,
   FLEX_STACKER_MODULE_V1,
   getCutoutDisplayName,
   getLabwareDefURI,
   getLabwareDisplayName,
   getModuleModelFromAddressableArea,
+  getModuleType,
   getSlotFromAddressableAreaName,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
@@ -130,9 +132,21 @@ export function getLabwareLocationFromSequence(
                 : moduleModel ?? undefined,
           }
         }
-      }
-      // TODO(tz, 4-16-25): add inHopperLocation when logic is merged
-      else if (detailLevel === 'full') {
+      } else if (sequenceItem.kind === 'inStackerHopper') {
+        const moduleModel = getModuleModel(loadedModules, sequenceItem.moduleId)
+        if (moduleModel == null) {
+          console.error('labware is located on an unknown module model')
+        } else {
+          return {
+            ...acc,
+            slotName: getModuleDisplayLocation(
+              loadedModules,
+              sequenceItem.moduleId
+            ),
+            moduleModel,
+          }
+        }
+      } else if (detailLevel === 'full') {
         const { allRunDefs } = params as SequenceFullParams
         if (sequenceItem.kind === 'onLabware' && acc.adapterName == null) {
           if (!Array.isArray(loadedLabwares)) {
@@ -195,7 +209,10 @@ export function getLabwareLocation(
 
     return {
       slotName,
-      moduleModel,
+      moduleModel:
+        getModuleType(moduleModel) === FLEX_STACKER_MODULE_TYPE
+          ? undefined
+          : moduleModel,
     }
   } else if ('labwareId' in location) {
     if (!Array.isArray(loadedLabwares)) {

@@ -4,14 +4,15 @@ import '@testing-library/jest-dom/vitest'
 
 import { fireEvent, screen } from '@testing-library/react'
 
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { getLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
+
 import { PipetteInfoItem } from '..'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
-import { getLabwareDefsByURI } from '../../../../labware-defs/selectors'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('../../../../labware-defs/selectors')
+vi.mock('/protocol-designer/labware-defs/selectors')
 
 const render = (props: ComponentProps<typeof PipetteInfoItem>) => {
   return renderWithProviders(<PipetteInfoItem {...props} />, {

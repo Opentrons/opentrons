@@ -105,6 +105,6 @@ describe('Hardware', () => {
     screen.getByRole('row', { name: '3 Temperature Module GEN2' })
     screen.getByRole('row', { name: 'A1+B1 Thermocycler Module GEN2' })
     screen.getByRole('row', { name: 'D3 Waste Chute' })
-    screen.getByRole('row', { name: 'B3 Staging Area Slot' })
+    screen.getByRole('row', { name: 'B4 Staging Area Slot' })
   })
 })

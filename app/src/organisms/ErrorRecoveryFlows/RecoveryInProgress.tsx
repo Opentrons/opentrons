@@ -32,7 +32,7 @@ export function RecoveryInProgress({
     ROBOT_PICKING_UP_TIPS,
     ROBOT_SKIPPING_STEP,
     ROBOT_RELEASING_LABWARE,
-    ROBOT_RELEASING_LABWARE_LATCH,
+    STACKER_RELEASING_LABWARE_LATCH,
   } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
   const { route } = recoveryMap
@@ -68,7 +68,7 @@ export function RecoveryInProgress({
           return t('gripper_releasing_labware')
         }
       }
-      case ROBOT_RELEASING_LABWARE_LATCH.ROUTE: {
+      case STACKER_RELEASING_LABWARE_LATCH.ROUTE: {
         if (releaseCountdown > 0) {
           return t('latch_will_release_in_s', {
             seconds: releaseCountdown,
@@ -189,7 +189,7 @@ export function useReleaseLabware({
     let intervalId: NodeJS.Timeout | null = null
     switch (recoveryMap.route) {
       case RECOVERY_MAP.ROBOT_RELEASING_LABWARE.ROUTE:
-      case RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE:
+      case RECOVERY_MAP.STACKER_RELEASING_LABWARE_LATCH.ROUTE:
         intervalId = setInterval(() => {
           setCountdown(prevCountdown => {
             const updatedCountdown = prevCountdown - 1
@@ -200,21 +200,12 @@ export function useReleaseLabware({
               }
               if (
                 recoveryMap.route ===
-                RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE
+                RECOVERY_MAP.STACKER_RELEASING_LABWARE_LATCH.ROUTE
               ) {
                 void releaseLabwareLatch().then(() => {
-                  if (isDoorOpen) {
-                    return handleMotionRouting(false).then(() => {
-                      proceedToDoorStep()
-                    })
-                  }
-
-                  return handleMotionRouting(true)
-                    .then(() => homeExceptPlungers())
-                    .then(() => handleMotionRouting(false))
-                    .then(() => {
-                      proceedToValidNextStep()
-                    })
+                  return handleMotionRouting(false).then(() => {
+                    proceedToValidNextStep()
+                  })
                 })
               } else {
                 void releaseGripperJaws().then(() => {

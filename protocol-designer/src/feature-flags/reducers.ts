@@ -27,6 +27,8 @@ const initialFlags: Flags = {
   OT_PD_ALLOW_ALL_TIPRACKS:
     process.env.OT_PD_ALLOW_ALL_TIPRACKS === '1' || false,
   OT_PD_ENABLE_COMMENT: process.env.OT_PD_ENABLE_COMMENT === '1' || false,
+  OT_PD_ENABLE_TIP_PICKUP_LOCATION:
+    process.env.OT_PD_ENABLE_TIP_PICKUP_LOCATION === '1' || false,
   OT_PD_ENABLE_RETURN_TIP: process.env.OT_PD_ENABLE_RETURN_TIP === '1' || false,
   OT_PD_ENABLE_HOT_KEYS_DISPLAY:
     process.env.OT_PD_ENABLE_HOT_KEYS_DISPLAY === '1' || true,

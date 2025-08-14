@@ -68,6 +68,7 @@ export default defineConfig({
       ),
       '/app/': path.resolve('./app/src/') + '/',
       '/ai-client/': path.resolve('./opentrons-ai-client/src/') + '/',
+      '/protocol-designer/': path.resolve('./protocol-designer/src/') + '/',
     },
   },
 })

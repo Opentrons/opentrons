@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../../../../constants'
+import {
+  THERMOCYCLER_PROFILE,
+  THERMOCYCLER_STATE,
+} from '/protocol-designer/constants'
+
 import { getDefaultsForStepType } from '../../getDefaultsForStepType'
 import { thermocyclerFormToArgs } from '../thermocyclerFormToArgs'
 
@@ -8,7 +12,7 @@ import type {
   ThermocyclerProfileStepArgs,
   ThermocyclerStateStepArgs,
 } from '@opentrons/step-generation'
-import type { HydratedThermocyclerFormData } from '../../../../form-types'
+import type { HydratedThermocyclerFormData } from '/protocol-designer/form-types'
 
 const tcModuleId = 'tcModuleId'
 

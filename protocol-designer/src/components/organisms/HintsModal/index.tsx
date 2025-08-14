@@ -17,11 +17,12 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { removeHint } from '../../../tutorial/actions'
-import { getHint } from '../../../tutorial/selectors'
+import { removeHint } from '/protocol-designer/tutorial/actions'
+import { getHint } from '/protocol-designer/tutorial/selectors'
+
 import { getMainPagePortalEl } from '../Portal'
 
-import type { HintKey } from '../../../tutorial'
+import type { HintKey } from '/protocol-designer/tutorial'
 
 export const HintsModal = (): JSX.Element | null => {
   const { t, i18n } = useTranslation(['alert', 'shared'])

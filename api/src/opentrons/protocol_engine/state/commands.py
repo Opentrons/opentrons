@@ -5,7 +5,7 @@ from __future__ import annotations
 import enum
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union, Tuple
 from typing_extensions import assert_never
 
 from opentrons_shared_data.errors import EnumeratedError, ErrorCodes, PythonException
@@ -20,6 +20,12 @@ from opentrons.protocol_engine.actions.actions import (
 )
 from opentrons.protocol_engine.commands.unsafe.unsafe_ungrip_labware import (
     UnsafeUngripLabwareCommandType,
+)
+from opentrons.protocol_engine.commands.unsafe.unsafe_stacker_close_latch import (
+    UnsafeFlexStackerCloseLatchCommandType,
+)
+from opentrons.protocol_engine.commands.unsafe.unsafe_stacker_open_latch import (
+    UnsafeFlexStackerOpenLatchCommandType,
 )
 from opentrons.protocol_engine.error_recovery_policy import (
     ErrorRecoveryPolicy,
@@ -374,7 +380,13 @@ class CommandStore(HasState[CommandState], HandlesActions):
             prev_entry.command.intent in (CommandIntent.PROTOCOL, None)
             and action.type == ErrorRecoveryType.WAIT_FOR_RECOVERY
         ):
-            self._state.queue_status = QueueStatus.AWAITING_RECOVERY
+            if (
+                self._state.queue_status == QueueStatus.PAUSED
+                or self._state.is_door_blocking
+            ):
+                self._state.queue_status = QueueStatus.AWAITING_RECOVERY_PAUSED
+            else:
+                self._state.queue_status = QueueStatus.AWAITING_RECOVERY
             self._state.recovery_target = _RecoveryTargetInfo(
                 command_id=action.command_id,
                 state_update_if_false_positive=state_update_if_false_positive,
@@ -1137,8 +1149,16 @@ class CommandView:
         # is probably a mistake in the caller's logic.
         assert fixit_command.intent == CommandIntent.FIXIT
 
-        # This type annotation is to make sure the string constant stays in sync and isn't typo'd.
-        required_command_type: UnsafeUngripLabwareCommandType = "unsafe/ungripLabware"
+        # These type annotations are to make sure the string constants stay in sync and aren't typo'd.
+        allowed_command_types: Tuple[
+            UnsafeUngripLabwareCommandType,
+            UnsafeFlexStackerCloseLatchCommandType,
+            UnsafeFlexStackerOpenLatchCommandType,
+        ] = (
+            "unsafe/ungripLabware",
+            "unsafe/flexStacker/closeLatch",
+            "unsafe/flexStacker/openLatch",
+        )
         # todo(mm, 2024-10-04): Instead of allowlisting command types, maybe we should
         # add a `mayRunWithDoorOpen: bool` field to command requests.
-        return fixit_command.commandType == required_command_type
+        return fixit_command.commandType in allowed_command_types
