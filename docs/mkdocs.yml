@@ -13,7 +13,7 @@ nav:
       - Heater-Shaker Module: '!include heater-shaker/mkdocs.yml'
       - Temperature Module: '!include temperature-module/mkdocs.yml'
   - Protocol Designer: '!include protocol-designer/mkdocs.yml'
-  - Python API: https://docs.opentrons.com/v2/
+  - Python API: '!include v2/mkdocs.yml'
 
 plugins:
   - monorepo

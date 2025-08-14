@@ -1,0 +1,4 @@
+site_name: My Docs
+
+nav:
+  - H-S: heater-shaker.md
