@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { dropTip } from '../commandCreators/atomic/dropTip'
 import {
   DEFAULT_PIPETTE,
+  getErrorResult,
   getSuccessResult,
   makeContext,
   makeState,
@@ -128,6 +129,133 @@ describe('dropTip', () => {
       )
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([])
+    })
+  })
+
+  describe('return tip', () => {
+    it('returns tip if there is a tip', () => {
+      const robotState = makeRobotState({
+        singleHasTips: true,
+        multiHasTips: true,
+      })
+      const robotStateForReturnTip = {
+        ...robotState,
+        pipettes: {
+          ...robotState.pipettes,
+          p300SingleId: {
+            ...robotState.pipettes.p300SingleId,
+            tipWell: 'A1',
+            tiprackId: 'tiprack1Id',
+          },
+        },
+      }
+      const result = dropTip(
+        {
+          pipette: 'p300SingleId',
+          isReturnTip: true,
+        },
+        invariantContext,
+        robotStateForReturnTip
+      )
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        {
+          commandType: 'dropTip',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            labwareId: 'tiprack1Id',
+            wellName: 'A1',
+          },
+        },
+      ])
+    })
+
+    it('returns correct python if there is a tip', () => {
+      const robotState = makeRobotState({
+        singleHasTips: true,
+        multiHasTips: true,
+      })
+      const robotStateForReturnTip = {
+        ...robotState,
+        pipettes: {
+          ...robotState.pipettes,
+          p300SingleId: {
+            ...robotState.pipettes.p300SingleId,
+            tipWell: 'A1',
+            tiprackId: 'tiprack1Id',
+          },
+        },
+      }
+      const result = dropTip(
+        {
+          pipette: 'p300SingleId',
+          isReturnTip: true,
+        },
+        invariantContext,
+        robotStateForReturnTip
+      )
+      const res = getSuccessResult(result)
+      expect(res.python).toEqual(
+        'mock_pipette.drop_tip(location=mock_tip_rack_1.wells_by_name()["A1"])'
+      )
+    })
+
+    it('raises error if most recent tip well is unknown', () => {
+      const robotState = makeRobotState({
+        singleHasTips: true,
+        multiHasTips: true,
+      })
+      const robotStateForReturnTip = {
+        ...robotState,
+        pipettes: {
+          ...robotState.pipettes,
+          p300SingleId: {
+            ...robotState.pipettes.p300SingleId,
+            tiprackId: 'tiprack1Id',
+          },
+        },
+      }
+
+      const result = dropTip(
+        {
+          pipette: 'p300SingleId',
+          isReturnTip: true,
+        },
+        invariantContext,
+        robotStateForReturnTip
+      )
+      const res = getErrorResult(result)
+      expect(res.errors[0].type).toEqual('RETURN_TIP_UNAVAILABLE')
+    })
+
+    it('raises error if most recent tip rack is unknown', () => {
+      const robotState = makeRobotState({
+        singleHasTips: true,
+        multiHasTips: true,
+      })
+      const robotStateForReturnTip = {
+        ...robotState,
+        pipettes: {
+          ...robotState.pipettes,
+          p300SingleId: {
+            ...robotState.pipettes.p300SingleId,
+            tipWell: 'A1',
+            tiprackId: undefined,
+          },
+        },
+      }
+
+      const result = dropTip(
+        {
+          pipette: 'p300SingleId',
+          isReturnTip: true,
+        },
+        invariantContext,
+        robotStateForReturnTip
+      )
+      const res = getErrorResult(result)
+      expect(res.errors[0].type).toEqual('RETURN_TIP_UNAVAILABLE')
     })
   })
 })
