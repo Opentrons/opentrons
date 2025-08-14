@@ -42,7 +42,6 @@ import { formatJogVector } from './utils'
 import type { Mount } from '@opentrons/components'
 import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
 import type {
-  CalibrationLabware,
   CalibrationSessionStep,
   SessionCommandString,
   SessionType,
