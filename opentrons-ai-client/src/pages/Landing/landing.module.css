@@ -54,10 +54,10 @@
   flex: 1;
   flex-direction: column;
   align-items: flex-start;
-  padding: 1.25rem;
-  border-radius: 1rem;
+  padding: var(--spacing-20, 1.25rem);
+  border-radius: var(--border-radius-16, 1rem);
   background: var(--Colors-Brand-blue-10, #f1f8ff);
-  gap: 0.625rem;
+  gap: var(--spacing-10, 0.625rem);
   text-align: left;
 }
 
