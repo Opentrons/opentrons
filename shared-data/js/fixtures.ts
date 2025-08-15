@@ -78,11 +78,7 @@ import {
   WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from './constants'
-import {
-  CutoutConfigAndCompatibility,
-  getCutoutIdForSlotName,
-  getDeckDefFromRobotType,
-} from './helpers'
+import { getCutoutIdForSlotName, getDeckDefFromRobotType } from './helpers'
 import { getModuleDisplayName } from './modules'
 
 import type { TFunction } from 'i18next'
@@ -99,6 +95,7 @@ import type {
   AreaTypeWithFakes,
   CutoutFixtureIdsWithFakes,
 } from './constants'
+import type { CutoutConfigAndCompatibility } from './helpers'
 import type {
   AddressableArea,
   AreaType,

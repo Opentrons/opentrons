@@ -17,8 +17,10 @@ import {
 
 import { ModuleTableItem } from './ModuleTableItem'
 
-import type { DeckDefinition } from '@opentrons/shared-data'
-import type { CutoutConfigAndCompatibility } from '@opentrons/shared-data'
+import type {
+  CutoutConfigAndCompatibility,
+  DeckDefinition,
+} from '@opentrons/shared-data'
 import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000

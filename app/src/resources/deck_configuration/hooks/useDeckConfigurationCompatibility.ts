@@ -1,5 +1,4 @@
 import {
-  CutoutConfigAndCompatibility,
   FLEX_ROBOT_TYPE,
   getAddressableAreasInProtocol,
   getCutoutFixturesForCutoutId,
@@ -11,6 +10,7 @@ import { useNotifyDeckConfigurationQuery } from '../useNotifyDeckConfigurationQu
 
 import type {
   CompletedProtocolAnalysis,
+  CutoutConfigAndCompatibility,
   ProtocolAnalysisOutput,
   RobotType,
 } from '@opentrons/shared-data'

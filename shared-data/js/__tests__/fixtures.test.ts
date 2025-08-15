@@ -49,7 +49,7 @@ import {
 import { getDeckDefFromRobotType } from '../helpers'
 
 import type { Mock } from 'vitest'
-import type { CutoutConfig, CutoutFixture, DeckConfiguration } from '..'
+import type { CutoutConfig, DeckConfiguration } from '..'
 
 vi.mock('react-i18next', () => ({
   useTranslation: vi.fn(),
@@ -954,6 +954,6 @@ describe('getFlexStackerD3Compatibility', () => {
         compatibleCutoutFixtureIds: [FLEX_STACKER_V1_FIXTURE],
       },
     ])
-    expect(result).toBeNull
+    expect(result).toBeNull()
   })
 })

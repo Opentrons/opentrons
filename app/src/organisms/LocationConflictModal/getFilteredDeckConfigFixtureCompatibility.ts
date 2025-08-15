@@ -13,7 +13,10 @@ import {
   THERMOCYCLER_V2_REAR_FIXTURE,
 } from '@opentrons/shared-data'
 
-import type { CutoutFixtureId, CutoutConfigAndCompatibility } from '@opentrons/shared-data'
+import type {
+  CutoutConfigAndCompatibility,
+  CutoutFixtureId,
+} from '@opentrons/shared-data'
 
 export const getFilteredDeckConfigFixtureCompatibility = (
   deckConfigCompatibility: CutoutConfigAndCompatibility[]

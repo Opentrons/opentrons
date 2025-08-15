@@ -66,13 +66,13 @@ import { getFixtureImage } from './utils'
 import type { TFunction } from 'i18next'
 import type { CommandData, HostConfig } from '@opentrons/api-client'
 import type {
+  CutoutConfigAndCompatibility,
   CutoutFixtureId,
   DeckDefinition,
   ModuleModel,
 } from '@opentrons/shared-data'
 import type { ModulePrepCommandsType } from '/app/local-resources/modules'
 import type { AttachedModule } from '/app/redux/modules/types'
-import type { CutoutConfigAndCompatibility } from '@opentrons/shared-data'
 import type {
   ModuleRenderInfoForProtocol,
   ProtocolCalibrationStatus,

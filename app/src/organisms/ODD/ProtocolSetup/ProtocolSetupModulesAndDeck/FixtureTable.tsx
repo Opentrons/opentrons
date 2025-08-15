@@ -35,10 +35,10 @@ import { getRequiredDeckConfig } from '/app/resources/deck_configuration/utils'
 
 import type { TFunction } from 'i18next'
 import type {
+  CutoutConfigAndCompatibility,
   CutoutFixtureId,
   DeckDefinition,
   RobotType,
-  CutoutConfigAndCompatibility
 } from '@opentrons/shared-data'
 
 interface FixtureTableProps {
