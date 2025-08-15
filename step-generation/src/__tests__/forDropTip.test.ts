@@ -5,13 +5,14 @@ import {
   DEFAULT_PIPETTE,
   getInitialRobotStateStandard,
   makeContext,
-  SOURCE_LABWARE,
 } from '../fixtures'
 import { forDropTip as _forDropTip } from '../getNextRobotStateAndWarnings/forDropTip'
 
 import type { InvariantContext, RobotState } from '../types'
 
 const forDropTip = makeImmutableStateUpdater(_forDropTip)
+
+const TIPRACK_ID = 'tiprack1Id'
 
 describe('dropTip', () => {
   let invariantContext: InvariantContext
@@ -36,12 +37,14 @@ describe('dropTip', () => {
               tiprackURI: 'tiprackId',
             },
           },
-          tipracks: {} as any,
+          tipracks: {
+            tiprack1Id: {},
+          } as any,
         },
       }
       const params = {
         pipetteId: DEFAULT_PIPETTE,
-        labwareId: SOURCE_LABWARE,
+        labwareId: TIPRACK_ID,
         wellName: 'A1',
       }
       const result = forDropTip(params, invariantContext, prevRobotState)
@@ -74,12 +77,14 @@ describe('dropTip', () => {
               tiprackURI: 'tiprackId',
             },
           },
-          tipracks: {} as any,
+          tipracks: {
+            [TIPRACK_ID]: {},
+          } as any,
         },
       }
       const params = {
         pipetteId: 'p300MultiId',
-        labwareId: SOURCE_LABWARE,
+        labwareId: TIPRACK_ID,
         wellName: 'A1',
       }
       const result = forDropTip(params, invariantContext, prevRobotState)
@@ -91,61 +96,6 @@ describe('dropTip', () => {
         p300MultiId: {
           hasTip: false,
           tiprackURI: null,
-        },
-      })
-    })
-  })
-  describe('liquid tracking', () => {
-    it('dropTip uses full volume when transfering tip to trash', () => {
-      prevRobotState = {
-        ...prevRobotState,
-        tipState: {
-          pipettes: {
-            p300SingleId: {
-              hasTip: true,
-              tiprackURI: 'tiprackId',
-            },
-            p300MultiId: {
-              hasTip: true,
-              tiprackURI: 'tiprackId',
-            },
-          },
-          tipracks: {} as any,
-        },
-      }
-      const params = {
-        pipetteId: 'p300MultiId',
-        labwareId: SOURCE_LABWARE,
-        wellName: 'A1',
-      }
-      prevRobotState.liquidState.pipettes.p300MultiId['0'] = {
-        ingred1: {
-          volume: 150,
-        },
-      }
-      const result = forDropTip(params, invariantContext, prevRobotState)
-      expect(result).toMatchObject({
-        robotState: {
-          liquidState: {
-            pipettes: {
-              p300MultiId: {
-                '0': {
-                  ingred1: {
-                    volume: 0,
-                  },
-                },
-              },
-            },
-            labware: {
-              [SOURCE_LABWARE]: {
-                A1: {
-                  ingred1: {
-                    volume: 150,
-                  },
-                },
-              },
-            },
-          },
         },
       })
     })

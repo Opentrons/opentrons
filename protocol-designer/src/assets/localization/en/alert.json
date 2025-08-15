@@ -162,6 +162,10 @@
       "ABSORBANCE_READER_NO_GRIPPER": {
         "title": "Cannot save Absorbance Plate Reader step without gripper",
         "body": "This step requires the gripper to open or close the Absorbance Plate Reader lid. Add a gripper or remove this step to proceed."
+      },
+      "RETURN_TIP_UNAVAILABLE": {
+        "title": "Return tip unavailable",
+        "body": "Unable to find the most pipette's most recent pickup location for return tip."
       }
     },
     "warning": {

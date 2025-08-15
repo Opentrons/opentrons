@@ -346,3 +346,10 @@ export const closingThermocyclerWithInvalidLid = (args: {
     message: `Cannot close thermocycler lid with ${args.lidDisplayName}`,
   }
 }
+
+export const returnTipUnavailable = (): CommandCreatorError => {
+  return {
+    type: 'RETURN_TIP_UNAVAILABLE',
+    message: 'Current tip does not have a known location to return to',
+  }
+}
