@@ -59,7 +59,6 @@ export const commandCreatorsTimeline = (
         stepNumber: commandCreatorResult.stepNumber,
         python: commandCreatorResult.python,
       }
-      console.log('commandCreatorResult', commandCreatorResult.stepNumber)
 
       return {
         timeline: [...acc.timeline, nextResult],
