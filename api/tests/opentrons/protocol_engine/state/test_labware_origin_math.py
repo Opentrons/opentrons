@@ -29,7 +29,7 @@ from opentrons_shared_data.labware.types import (
 
 from opentrons.types import Point
 from opentrons.protocol_engine.state._labware_origin_math import (
-    get_parent_placement_origin_to_lw_origin,
+    get_stackup_placement_origin_to_lw_origin,
 )
 from opentrons.protocol_engine.types import (
     ModuleModel,
@@ -294,7 +294,6 @@ class ModuleOverlapSpec(NamedTuple):
     module_definition: ModuleDefinition
     child_definition: LabwareDefinition2
     module_parent_to_child_offset: Point
-    is_topmost_labware: bool
     labware_location: ModuleLocation
     expected_total_offset: Point
 
@@ -304,7 +303,6 @@ class LabwareOverlapSpec(NamedTuple):
 
     child_definition: LabwareDefinition2
     parent_definition: LabwareDefinition2
-    is_topmost_labware: bool
     labware_location: OnLabwareLocation
     expected_total_offset: Point
 
@@ -314,7 +312,6 @@ class AddressableAreaSpec(NamedTuple):
 
     child_definition: LabwareDefinition2
     addressable_area: AddressableArea
-    is_topmost_labware: bool
     labware_location: AddressableAreaLocation
     expected_total_offset: Point
 
@@ -324,7 +321,6 @@ class LabwareV3Spec(NamedTuple):
 
     child_definition: LabwareDefinition3
     parent_definition: object
-    is_topmost_labware: bool
     labware_location: object
     expected_total_offset: Point
 
@@ -335,90 +331,40 @@ MODULE_OVERLAP_SPECS: List[ModuleOverlapSpec] = [
         module_definition=_MODULE_DEF_TEMP_V2,
         child_definition=_LW_V2_WITH_MODULE_STACKING,
         module_parent_to_child_offset=Point(x=450, y=550, z=650),
-        is_topmost_labware=True,
         labware_location=ModuleLocation(moduleId="module-1"),
         expected_total_offset=Point(x=550, y=700, z=850),
     ),
     ModuleOverlapSpec(
         spec_deck_definition=load_deck(STANDARD_OT2_DECK, 5),
-        module_definition=_MODULE_DEF_TEMP_V2,
-        child_definition=_LW_V2_WITH_MODULE_STACKING,
-        module_parent_to_child_offset=Point(x=450, y=550, z=650),
-        is_topmost_labware=False,
-        labware_location=ModuleLocation(moduleId="module-1"),
-        expected_total_offset=Point(x=400, y=450, z=500),
-    ),
-    ModuleOverlapSpec(
-        spec_deck_definition=load_deck(STANDARD_OT2_DECK, 5),
         module_definition=_MODULE_DEF_TC_V1,
         child_definition=_LW_V2_WITH_MODULE_STACKING,
         module_parent_to_child_offset=Point(x=450, y=550, z=650),
-        is_topmost_labware=True,
         labware_location=ModuleLocation(moduleId="module-1"),
         expected_total_offset=Point(x=400, y=500, z=600),
     ),
     ModuleOverlapSpec(
         spec_deck_definition=load_deck(STANDARD_OT2_DECK, 5),
-        module_definition=_MODULE_DEF_TC_V1,
-        child_definition=_LW_V2_WITH_MODULE_STACKING,
-        module_parent_to_child_offset=Point(x=450, y=550, z=650),
-        is_topmost_labware=False,
-        labware_location=ModuleLocation(moduleId="module-1"),
-        expected_total_offset=Point(x=250, y=250, z=250),
-    ),
-    ModuleOverlapSpec(
-        spec_deck_definition=load_deck(STANDARD_OT2_DECK, 5),
         module_definition=_MODULE_DEF_TC_V2,
         child_definition=_LW_V2,
         module_parent_to_child_offset=Point(x=450, y=550, z=650),
-        is_topmost_labware=True,
         labware_location=ModuleLocation(moduleId="module-1"),
         expected_total_offset=Point(x=600, y=800, z=989.3),
-    ),
-    ModuleOverlapSpec(
-        spec_deck_definition=load_deck(STANDARD_OT2_DECK, 5),
-        module_definition=_MODULE_DEF_TC_V2,
-        child_definition=_LW_V2,
-        module_parent_to_child_offset=Point(x=450, y=550, z=650),
-        is_topmost_labware=False,
-        labware_location=ModuleLocation(moduleId="module-1"),
-        expected_total_offset=Point(x=450, y=550, z=639.3),
     ),
     ModuleOverlapSpec(
         spec_deck_definition=load_deck(STANDARD_OT3_DECK, 5),
         module_definition=_MODULE_DEF_TC_V2,
         child_definition=_LW_V2,
         module_parent_to_child_offset=Point(x=450, y=550, z=650),
-        is_topmost_labware=True,
         labware_location=ModuleLocation(moduleId="module-1"),
         expected_total_offset=Point(x=600, y=800, z=1000),
     ),
     ModuleOverlapSpec(
         spec_deck_definition=load_deck(STANDARD_OT3_DECK, 5),
         module_definition=_MODULE_DEF_TC_V2,
-        child_definition=_LW_V2,
-        module_parent_to_child_offset=Point(x=450, y=550, z=650),
-        is_topmost_labware=False,
-        labware_location=ModuleLocation(moduleId="module-1"),
-        expected_total_offset=Point(x=450, y=550, z=650),
-    ),
-    ModuleOverlapSpec(
-        spec_deck_definition=load_deck(STANDARD_OT3_DECK, 5),
-        module_definition=_MODULE_DEF_TC_V2,
         child_definition=_LW_V2_WITH_MODULE_STACKING,
         module_parent_to_child_offset=Point(x=450, y=550, z=650),
-        is_topmost_labware=True,
         labware_location=ModuleLocation(moduleId="module-1"),
         expected_total_offset=Point(x=100, y=200, z=300),
-    ),
-    ModuleOverlapSpec(
-        spec_deck_definition=load_deck(STANDARD_OT3_DECK, 5),
-        module_definition=_MODULE_DEF_TC_V2,
-        child_definition=_LW_V2_WITH_MODULE_STACKING,
-        module_parent_to_child_offset=Point(x=450, y=550, z=650),
-        is_topmost_labware=False,
-        labware_location=ModuleLocation(moduleId="module-1"),
-        expected_total_offset=Point(x=-50, y=-50, z=-50),
     ),
 ]
 
@@ -426,30 +372,14 @@ LABWARE_OVERLAP_SPECS: List[LabwareOverlapSpec] = [
     LabwareOverlapSpec(
         child_definition=_LW_V2_WITH_LABWARE_STACKING,
         parent_definition=_LW_V2_2,
-        is_topmost_labware=True,
         labware_location=OnLabwareLocation(labwareId="parent-labware-1"),
         expected_total_offset=Point(x=250, y=400, z=1000),
     ),
     LabwareOverlapSpec(
         child_definition=_LW_V2_WITH_LABWARE_STACKING,
-        parent_definition=_LW_V2_2,
-        is_topmost_labware=False,
-        labware_location=OnLabwareLocation(labwareId="parent-labware-1"),
-        expected_total_offset=Point(x=50, y=100, z=600),
-    ),
-    LabwareOverlapSpec(
-        child_definition=_LW_V2_WITH_LABWARE_STACKING,
         parent_definition=_LW_V2_3,
-        is_topmost_labware=True,
         labware_location=OnLabwareLocation(labwareId="parent-labware-2"),
         expected_total_offset=Point(x=450, y=650, z=950),
-    ),
-    LabwareOverlapSpec(
-        child_definition=_LW_V2_WITH_LABWARE_STACKING,
-        parent_definition=_LW_V2_3,
-        is_topmost_labware=False,
-        labware_location=OnLabwareLocation(labwareId="parent-labware-2"),
-        expected_total_offset=Point(x=250, y=350, z=550),
     ),
 ]
 
@@ -457,65 +387,54 @@ ADDRESSABLE_AREA_SPECS: List[AddressableAreaSpec] = [
     AddressableAreaSpec(
         child_definition=_LW_V2,
         addressable_area=_ADDRESSABLE_AREA,
-        is_topmost_labware=True,
         labware_location=AddressableAreaLocation(addressableAreaName="test_area"),
         expected_total_offset=Point(x=150, y=250, z=350),
     ),
-    AddressableAreaSpec(
-        child_definition=_LW_V2,
-        addressable_area=_ADDRESSABLE_AREA,
-        is_topmost_labware=False,
-        labware_location=AddressableAreaLocation(addressableAreaName="test_area"),
-        expected_total_offset=Point(x=0, y=0, z=0),
-    ),
 ]
 
-LW_V3_SPECS: List[LabwareV3Spec] = [
+LW_V3_SPECS_ON_NON_LW: List[LabwareV3Spec] = [
     LabwareV3Spec(
         child_definition=_LW_V3,
         parent_definition=_ADDRESSABLE_AREA,
-        is_topmost_labware=True,
         labware_location=AddressableAreaLocation(addressableAreaName="test_area"),
         expected_total_offset=Point(x=10, y=1495, z=0),
     ),
     LabwareV3Spec(
         child_definition=_LW_V3_WITH_SLOT_FP_AS_CHILD_FEATURE,
         parent_definition=_ADDRESSABLE_AREA_WITH_PARENT_FEATURES,
-        is_topmost_labware=True,
         labware_location=AddressableAreaLocation(
             addressableAreaName="test_area_with_parent"
         ),
         expected_total_offset=Point(x=0, y=1600, z=-5),
     ),
     LabwareV3Spec(
+        child_definition=_LW_V3_WITH_FLEX_TIP_RACK_LID_AS_CHILD,
+        parent_definition=_ADDRESSABLE_AREA_WITH_FLEX_TIP_RACK_LID,
+        labware_location=AddressableAreaLocation(
+            addressableAreaName="test_area_with_flex_lid"
+        ),
+        expected_total_offset=Point(x=0, y=0, z=45),
+    ),
+]
+
+LW_V3_SPECS_ON_LW: List[LabwareV3Spec] = [
+    LabwareV3Spec(
         child_definition=_LW_V3_WITH_SLOT_FP_AS_CHILD_FEATURE,
         parent_definition=_LW_V3_WITH_SLOT_FP_AS_PARENT_FEATURE,
-        is_topmost_labware=True,
         labware_location=OnLabwareLocation(labwareId="parent-labware-v3"),
         expected_total_offset=Point(x=20.0, y=15, z=5),
     ),
     LabwareV3Spec(
         child_definition=_LW_V3_WITH_SLOT_FP_AS_CHILD_FEATURE,
         parent_definition=_LW_V3,
-        is_topmost_labware=True,
         labware_location=OnLabwareLocation(labwareId="labware-v3-basic"),
-        expected_total_offset=Point(x=0, y=0, z=1000),
+        expected_total_offset=Point(x=10, y=1495, z=1000),
     ),
     LabwareV3Spec(
         child_definition=_LW_V3_WITH_FLEX_TIP_RACK_LID_AS_CHILD,
         parent_definition=_LW_V3_WITH_FLEX_TIP_RACK_LID_AS_PARENT,
-        is_topmost_labware=True,
         labware_location=OnLabwareLocation(labwareId="flex-tip-rack-lid-parent"),
         expected_total_offset=Point(x=0, y=0, z=40),
-    ),
-    LabwareV3Spec(
-        child_definition=_LW_V3_WITH_FLEX_TIP_RACK_LID_AS_CHILD,
-        parent_definition=_ADDRESSABLE_AREA_WITH_FLEX_TIP_RACK_LID,
-        is_topmost_labware=True,
-        labware_location=AddressableAreaLocation(
-            addressableAreaName="test_area_with_flex_lid"
-        ),
-        expected_total_offset=Point(x=0, y=0, z=45),
     ),
 ]
 
@@ -529,18 +448,17 @@ def test_get_parent_placement_origin_to_lw_origin_with_module(
     module_definition: ModuleDefinition,
     child_definition: LabwareDefinition2,
     module_parent_to_child_offset: Point,
-    is_topmost_labware: bool,
     labware_location: ModuleLocation,
     expected_total_offset: Point,
 ) -> None:
     """It should calculate the correct offset from module parent to labware origin."""
-    result = get_parent_placement_origin_to_lw_origin(
-        child_labware=child_definition,
-        parent_deck_item=module_definition,
+    result = get_stackup_placement_origin_to_lw_origin(
+        stackup_lw_info_top_to_bottom=[
+            (child_definition, labware_location),
+        ],
+        underlying_ancestor_definition=module_definition,
         module_parent_to_child_offset=module_parent_to_child_offset,
         deck_definition=spec_deck_definition,
-        is_topmost_labware=is_topmost_labware,
-        labware_location=labware_location,
     )
 
     assert result == expected_total_offset
@@ -553,18 +471,21 @@ def test_get_parent_placement_origin_to_lw_origin_with_module(
 def test_get_parent_placement_origin_to_lw_origin_with_labware(
     child_definition: LabwareDefinition2,
     parent_definition: LabwareDefinition2,
-    is_topmost_labware: bool,
     labware_location: OnLabwareLocation,
     expected_total_offset: Point,
 ) -> None:
-    """It should calculate the correct offset from labware parent to labware origin."""
-    result = get_parent_placement_origin_to_lw_origin(
-        child_labware=child_definition,
-        parent_deck_item=parent_definition,
+    """It should calculate the correct offset from labware parent to labware origin for v2_schema_labware."""
+    result = get_stackup_placement_origin_to_lw_origin(
+        stackup_lw_info_top_to_bottom=[
+            (child_definition, labware_location),
+            (
+                parent_definition,
+                AddressableAreaLocation(addressableAreaName="test_area"),
+            ),
+        ],
+        underlying_ancestor_definition=_ADDRESSABLE_AREA,
         module_parent_to_child_offset=None,
         deck_definition=load_deck(STANDARD_OT3_DECK, 5),
-        is_topmost_labware=is_topmost_labware,
-        labware_location=labware_location,
     )
 
     assert result == expected_total_offset
@@ -577,18 +498,17 @@ def test_get_parent_placement_origin_to_lw_origin_with_labware(
 def test_get_parent_placement_origin_to_lw_origin_with_addressable_area(
     child_definition: LabwareDefinition2,
     addressable_area: AddressableArea,
-    is_topmost_labware: bool,
     labware_location: AddressableAreaLocation,
     expected_total_offset: Point,
 ) -> None:
     """It should calculate the correct offset from addressable area to labware origin."""
-    result = get_parent_placement_origin_to_lw_origin(
-        child_labware=child_definition,
-        parent_deck_item=addressable_area,
+    result = get_stackup_placement_origin_to_lw_origin(
+        stackup_lw_info_top_to_bottom=[
+            (child_definition, labware_location),
+        ],
+        underlying_ancestor_definition=addressable_area,
         module_parent_to_child_offset=None,
         deck_definition=load_deck(STANDARD_OT3_DECK, 5),
-        is_topmost_labware=is_topmost_labware,
-        labware_location=labware_location,
     )
 
     assert result == expected_total_offset
@@ -596,38 +516,49 @@ def test_get_parent_placement_origin_to_lw_origin_with_addressable_area(
 
 @pytest.mark.parametrize(
     argnames=LabwareV3Spec._fields,
-    argvalues=LW_V3_SPECS,
+    argvalues=LW_V3_SPECS_ON_NON_LW,
 )
-def test_get_parent_placement_origin_to_lw_origin_v3_definitions(
+def test_get_parent_placement_origin_to_lw_origin_v3_definitions_non_lw(
     child_definition: LabwareDefinition3,
-    parent_definition: object,
-    is_topmost_labware: bool,
-    labware_location: object,
+    parent_definition: AddressableArea,
+    labware_location: AddressableAreaLocation,
     expected_total_offset: Point,
 ) -> None:
-    """It should handle LabwareDefinition3 correctly with various parent configurations."""
-    result = get_parent_placement_origin_to_lw_origin(  # type: ignore[call-overload]
-        child_labware=child_definition,
-        parent_deck_item=parent_definition,
+    """It should handle LabwareDefinition3 correctly with various parent configurations (that are not labware)."""
+    result = get_stackup_placement_origin_to_lw_origin(
+        stackup_lw_info_top_to_bottom=[
+            (child_definition, labware_location),
+        ],
+        underlying_ancestor_definition=parent_definition,
         module_parent_to_child_offset=None,
         deck_definition=load_deck(STANDARD_OT3_DECK, 5),
-        is_topmost_labware=is_topmost_labware,
-        labware_location=labware_location,
     )
 
     assert result == expected_total_offset
 
 
-def test_get_parent_placement_origin_to_lw_origin_v3_with_v2_parent_raises_error() -> (
-    None
-):
-    """It should raise NotImplementedError when v3 labware is placed on v2 parent."""
-    with pytest.raises(NotImplementedError):
-        get_parent_placement_origin_to_lw_origin(
-            child_labware=_LW_V3,
-            parent_deck_item=_LW_V2_2,
-            module_parent_to_child_offset=None,
-            deck_definition=load_deck(STANDARD_OT3_DECK, 5),
-            is_topmost_labware=True,
-            labware_location=OnLabwareLocation(labwareId="v2-parent"),
-        )
+@pytest.mark.parametrize(
+    argnames=LabwareV3Spec._fields,
+    argvalues=LW_V3_SPECS_ON_LW,
+)
+def test_get_parent_placement_origin_to_lw_origin_v3_definitions(
+    child_definition: LabwareDefinition3,
+    parent_definition: LabwareDefinition3,
+    labware_location: OnLabwareLocation,
+    expected_total_offset: Point,
+) -> None:
+    """It should handle LabwareDefinition3 correctly with various labware configurations."""
+    result = get_stackup_placement_origin_to_lw_origin(
+        stackup_lw_info_top_to_bottom=[
+            (child_definition, labware_location),
+            (
+                parent_definition,
+                AddressableAreaLocation(addressableAreaName="test_area"),
+            ),
+        ],
+        underlying_ancestor_definition=_ADDRESSABLE_AREA,
+        module_parent_to_child_offset=None,
+        deck_definition=load_deck(STANDARD_OT3_DECK, 5),
+    )
+
+    assert result == expected_total_offset
