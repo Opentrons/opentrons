@@ -30,14 +30,12 @@ import {
   getDeckDefFromRobotType,
   getFixtureDisplayName,
   getFlexStackerD3Compatibility,
-  getModuleType,
   getModuleDeckLabel,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
   OT2_ROBOT_TYPE,
-  WASTE_CHUTE_FLEX_STACKER_FIXTURES,
 } from '@opentrons/shared-data'
 
 import { TertiaryButton } from '/app/atoms/buttons'
