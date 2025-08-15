@@ -18,7 +18,6 @@ export const linearInterpolate = (
   right: number | null = null
 ): number | null => {
   if (interpolationPoints.length === 0) {
-    console.warn('At least one point required for interpolation')
     return null
   }
   const sortedInterpolationPoints = interpolationPoints.sort((a, b) => {
