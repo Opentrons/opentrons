@@ -14,7 +14,8 @@ import {
 import { SPACING } from '../../ui-style-constants'
 
 import type { MouseEvent as ReactMouseEvent } from 'react'
-import type { CURSOR_DEFAULT, CURSOR_POINTER, IconName } from '../..'
+import type { IconName } from '../../icons'
+import type { CURSOR_DEFAULT, CURSOR_POINTER } from '../../styles/cursor'
 
 export interface StepContainerProps {
   text: string
