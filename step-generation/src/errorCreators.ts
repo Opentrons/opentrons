@@ -338,6 +338,15 @@ export const multiDispenseValuesNotFound = (): CommandCreatorError => {
   }
 }
 
+export const closingThermocyclerWithInvalidLid = (args: {
+  lidDisplayName: string
+}): CommandCreatorError => {
+  return {
+    type: 'CLOSING_THERMOCYCLER_WITH_INVALID_LABWARE_LID',
+    message: `Cannot close thermocycler lid with ${args.lidDisplayName}`,
+  }
+}
+
 export const returnTipUnavailable = (): CommandCreatorError => {
   return {
     type: 'RETURN_TIP_UNAVAILABLE',

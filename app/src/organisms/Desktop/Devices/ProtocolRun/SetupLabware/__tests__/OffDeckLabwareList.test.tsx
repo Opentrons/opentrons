@@ -32,7 +32,7 @@ describe('OffDeckLabwareList', () => {
   })
   it('renders null if labware items is null', () => {
     render({
-      labwareItems: [],
+      labwareItems: {},
       isFlex: false,
       definitionsByURI: {},
       setSelectedStack: vi.fn(),
@@ -41,13 +41,15 @@ describe('OffDeckLabwareList', () => {
   })
   it('renders additional offdeck labware info if there is an offdeck labware', () => {
     render({
-      labwareItems: [
-        {
-          displayName: 'nickName',
-          definitionUri: 'mock def uri',
-          labwareId: '1234',
-        },
-      ],
+      labwareItems: {
+        offDeck: [
+          {
+            displayName: 'nickName',
+            definitionUri: 'mock def uri',
+            labwareId: '1234',
+          },
+        ],
+      },
       isFlex: false,
       definitionsByURI: { 'mock def uri': {} as LabwareDefinition },
       setSelectedStack: vi.fn(),

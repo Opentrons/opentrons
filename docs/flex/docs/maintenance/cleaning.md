@@ -198,7 +198,7 @@ The following table lists labware sold by Opentrons that we have verified as aut
   <tbody>
     <tr>
       <td><strong>Reservoirs</strong></td>
-      <td>All NEST reservoirs</td>
+      <td>NEST 1-well reservoirs</td>
     </tr>
     <tr>
       <td><strong>Sample vials</strong></td>

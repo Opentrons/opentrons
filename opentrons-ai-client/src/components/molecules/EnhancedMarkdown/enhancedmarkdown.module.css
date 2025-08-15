@@ -1,0 +1,103 @@
+/* Enhanced Markdown Styles */
+.enhanced_markdown {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  color: #000;
+  font-family:
+    'Public Sans',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    'Helvetica Neue',
+    Arial,
+    sans-serif;
+  gap: var(--spacing-8, 0.5rem);
+  line-height: 1.5rem;
+}
+
+/* Inline code */
+.inline_code {
+  display: inline-block;
+  padding: var(--spacing-2, 0.125rem) var(--spacing-4, 0.25rem);
+  border: 1px solid #d0d0d0;
+  border-radius: var(--spacing-4, 0.25rem);
+  background: #f0f0f0;
+  color: #000;
+  font-family: 'Reddit Mono', monospace;
+  font-size: 0.9rem;
+  white-space: pre-wrap;
+}
+
+/* Text elements - Body default regular */
+.paragraph {
+  padding: var(--spacing-8, 0.5rem) 0;
+  margin: 0;
+  color: #000;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5rem;
+}
+
+.paragraph:first-child {
+  padding-top: 0;
+}
+
+.paragraph:last-child {
+  padding-bottom: 0;
+}
+
+.list {
+  padding: var(--spacing-4, 0.25rem) 0 var(--spacing-8, 0.5rem) var(--spacing-24, 1.5rem);
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+
+.list_item {
+  margin: var(--spacing-4, 0.25rem) 0;
+  color: #000;
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+
+/* Headings - heading small regular */
+.heading {
+  padding: var(--spacing-24, 1.5rem) 0 var(--spacing-8, 0.5rem) 0;
+  margin: 0;
+  color: #000;
+  font-weight: 400;
+}
+
+.heading:first-child {
+  padding-top: 0;
+}
+
+.heading_h1 {
+  font-size: 1.5rem;
+  line-height: 1.75rem;
+}
+
+.heading_h2 {
+  font-size: 1.25rem;
+  line-height: 1.5rem;
+}
+
+.heading_h3 {
+  font-size: 1.125rem;
+  line-height: 1.375rem;
+}
+
+.link {
+  color: #06c;
+  text-decoration: underline;
+}
+
+.link:hover {
+  color: #0052a3;
+}
+
+/* Spacing adjustments for better visual hierarchy */
+.paragraph + .list {
+  margin-top: var(--spacing-negative-12, -0.75rem); /* Pull lists much closer to preceding paragraphs */
+}

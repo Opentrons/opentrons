@@ -77,6 +77,8 @@ class NozzleMap:
     #: A map of all of the nozzles of an instrument
     full_instrument_rows: Dict[str, List[str]]
     #: A map of all the rows of an instrument
+    full_instrument_columns: Dict[str, List[str]]
+    #: A map of all the columns of an instrument
 
     @classmethod
     def determine_nozzle_configuration(
@@ -299,6 +301,7 @@ class NozzleMap:
             rows=rows,
             full_instrument_map_store=physical_nozzles,
             full_instrument_rows=physical_rows,
+            full_instrument_columns=physical_columns,
             columns=columns,
             configuration=cls.determine_nozzle_configuration(
                 physical_rows, rows, physical_columns, columns

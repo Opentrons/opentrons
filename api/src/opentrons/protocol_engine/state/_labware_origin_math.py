@@ -21,8 +21,9 @@ from opentrons_shared_data.labware.types import (
 )
 from opentrons.protocol_engine.types import AddressableArea
 from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
+from .. import errors
 from ..types import (
-    LabwareParentDefinition,
+    LabwareStackupAncestorDefinition,
     ModuleDefinition,
     ModuleModel,
     DeckLocationDefinition,
@@ -35,6 +36,11 @@ from ..types import (
 
 _OFFSET_ON_TC_OT2 = Point(x=0, y=0, z=10.7)
 
+_LabwareStackupDefinition = Union[
+    DeckLocationDefinition, ModuleDefinition, LabwareDefinition
+]
+"""Information pertaining to a deck item that is present in a labware stackup."""
+
 
 @dataclasses.dataclass
 class _Labware3SupportedParentDefinition:
@@ -42,8 +48,105 @@ class _Labware3SupportedParentDefinition:
     extents: Extents
 
 
+def get_stackup_placement_origin_to_lw_origin(
+    stackup_lw_info_top_to_bottom: list[tuple[LabwareDefinition, LabwareLocation]],
+    underlying_ancestor_definition: LabwareStackupAncestorDefinition,
+    module_parent_to_child_offset: Union[Point, None],
+    deck_definition: DeckDefinitionV5,
+    is_topmost_labware: bool = True,
+) -> Point:
+    """Returns the offset from the stackup placement origin to child labware origin."""
+    definition, location = stackup_lw_info_top_to_bottom[0]
+
+    if isinstance(
+        location, (AddressableAreaLocation, DeckSlotLocation, ModuleLocation)
+    ):
+        return _get_parent_placement_origin_to_lw_origin_by_location(
+            labware_location=location,
+            labware_definition=definition,
+            parent_definition=underlying_ancestor_definition,
+            deck_definition=deck_definition,
+            module_parent_to_child_offset=module_parent_to_child_offset,
+            is_topmost_labware=is_topmost_labware,
+        )
+    elif isinstance(location, OnLabwareLocation):
+        parent_definition = stackup_lw_info_top_to_bottom[1][0]
+
+        parent_placement_origin_to_lw_origin = (
+            _get_parent_placement_origin_to_lw_origin_by_location(
+                labware_location=location,
+                labware_definition=definition,
+                parent_definition=parent_definition,
+                deck_definition=deck_definition,
+                module_parent_to_child_offset=module_parent_to_child_offset,
+                is_topmost_labware=is_topmost_labware,
+            )
+        )
+        remaining_lw_defs_locs_top_to_bottom = stackup_lw_info_top_to_bottom[1:]
+
+        return (
+            parent_placement_origin_to_lw_origin
+            + get_stackup_placement_origin_to_lw_origin(
+                stackup_lw_info_top_to_bottom=remaining_lw_defs_locs_top_to_bottom,
+                underlying_ancestor_definition=underlying_ancestor_definition,
+                module_parent_to_child_offset=module_parent_to_child_offset,
+                deck_definition=deck_definition,
+                is_topmost_labware=False,
+            )
+        )
+    else:
+        raise errors.LabwareNotOnDeckError(
+            "Cannot access labware since it is not on the deck. "
+            "Either it has been loaded off-deck or its been moved off-deck."
+        )
+
+
+def _get_parent_placement_origin_to_lw_origin_by_location(
+    labware_location: LabwareLocation,
+    labware_definition: LabwareDefinition,
+    parent_definition: _LabwareStackupDefinition,
+    deck_definition: DeckDefinitionV5,
+    module_parent_to_child_offset: Union[Point, None],
+    is_topmost_labware: bool,
+) -> Point:
+    if isinstance(labware_location, ModuleLocation):
+        if module_parent_to_child_offset is None:
+            raise ValueError(
+                "Expected value for module_parent_to_child_offset, received None."
+            )
+        else:
+            return _get_parent_placement_origin_to_lw_origin(
+                child_labware=labware_definition,
+                parent_deck_item=parent_definition,  # type: ignore[arg-type]
+                module_parent_to_child_offset=module_parent_to_child_offset,
+                deck_definition=deck_definition,
+                is_topmost_labware=is_topmost_labware,
+                labware_location=labware_location,
+            )
+    elif isinstance(labware_location, OnLabwareLocation):
+        return _get_parent_placement_origin_to_lw_origin(
+            child_labware=labware_definition,
+            parent_deck_item=parent_definition,  # type: ignore[arg-type]
+            module_parent_to_child_offset=None,
+            deck_definition=deck_definition,
+            is_topmost_labware=is_topmost_labware,
+            labware_location=labware_location,
+        )
+    elif isinstance(labware_location, (DeckSlotLocation, AddressableAreaLocation)):
+        return _get_parent_placement_origin_to_lw_origin(
+            child_labware=labware_definition,
+            parent_deck_item=parent_definition,  # type: ignore[arg-type]
+            module_parent_to_child_offset=None,
+            deck_definition=deck_definition,
+            is_topmost_labware=is_topmost_labware,
+            labware_location=labware_location,
+        )
+    else:
+        raise ValueError(f"Invalid labware location: {labware_location}")
+
+
 @overload
-def get_parent_placement_origin_to_lw_origin(
+def _get_parent_placement_origin_to_lw_origin(
     child_labware: LabwareDefinition,
     parent_deck_item: ModuleDefinition,
     module_parent_to_child_offset: Point,
@@ -55,7 +158,7 @@ def get_parent_placement_origin_to_lw_origin(
 
 
 @overload
-def get_parent_placement_origin_to_lw_origin(
+def _get_parent_placement_origin_to_lw_origin(
     child_labware: LabwareDefinition,
     parent_deck_item: DeckLocationDefinition,
     module_parent_to_child_offset: None,
@@ -67,7 +170,7 @@ def get_parent_placement_origin_to_lw_origin(
 
 
 @overload
-def get_parent_placement_origin_to_lw_origin(
+def _get_parent_placement_origin_to_lw_origin(
     child_labware: LabwareDefinition,
     parent_deck_item: LabwareDefinition,
     module_parent_to_child_offset: None,
@@ -78,9 +181,9 @@ def get_parent_placement_origin_to_lw_origin(
     ...
 
 
-def get_parent_placement_origin_to_lw_origin(
+def _get_parent_placement_origin_to_lw_origin(
     child_labware: LabwareDefinition,
-    parent_deck_item: LabwareParentDefinition,
+    parent_deck_item: _LabwareStackupDefinition,
     module_parent_to_child_offset: Union[Point, None],
     deck_definition: DeckDefinitionV5,
     is_topmost_labware: bool,
@@ -165,7 +268,7 @@ def get_parent_placement_origin_to_lw_origin(
 
 def _get_parent_deck_item_origin_to_child_labware_placement_origin(
     child_labware: LabwareDefinition,
-    parent_deck_item: LabwareParentDefinition,
+    parent_deck_item: _LabwareStackupDefinition,
     module_parent_to_child_offset: Union[Point, None],
     deck_definition: DeckDefinitionV5,
     labware_location: LabwareLocation,
@@ -595,7 +698,7 @@ def _get_child_labware_overlap_with_parent_module(
 
 
 def _feature_exception_offsets(
-    parent_deck_item: LabwareParentDefinition,
+    parent_deck_item: _LabwareStackupDefinition,
     deck_definition: DeckDefinitionV5,
 ) -> Point:
     """These offsets are intended for legacy reasons only and should generally be avoided post labware schema 2.
