@@ -49,12 +49,12 @@ DELTA_TOLERANCE = 0.2
 # sensitivity values for bottom and top zones:
 
 # tested for 1000
-#ALPHA_LOW = 0.2
-#ALPHA_HIGH = 0.4
+ALPHA_LOW = 0.2
+ALPHA_HIGH = 0.5
 
 # test for 200uL
-ALPHA_LOW = 0.8
-ALPHA_HIGH = 0.5
+#ALPHA_LOW = 0.8
+#ALPHA_HIGH = 0.5
 
 
 ###########################################
@@ -586,7 +586,7 @@ def run(ctx: ProtocolContext) -> None:
         )
         dispense_loc = labware[current_well].bottom(z=max(corrected_height + 2.5, 3))
         liq_pipette.transfer(
-            dispense_volume / liq_pipette.channels,
+            min(dispense_volume / liq_pipette.channels, max_volume),
             src["A1"],
             dispense_loc,
             new_tip="never",
