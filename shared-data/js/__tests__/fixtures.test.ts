@@ -32,6 +32,7 @@ import {
   getCutoutConfigReplacmentForModule,
   getCutoutFixtureReplacementIfNeeded,
   getFixtureDisplayName,
+  getFlexStackerD3Compatibility,
   getMainAAForAFixture,
   getMainNonComboFixtureId,
   getMainUsbModuleFixtureIdForComboFixture,
@@ -48,7 +49,7 @@ import {
 import { getDeckDefFromRobotType } from '../helpers'
 
 import type { Mock } from 'vitest'
-import type { CutoutConfig, DeckConfiguration } from '..'
+import type { CutoutConfig, CutoutFixture, DeckConfiguration } from '..'
 
 vi.mock('react-i18next', () => ({
   useTranslation: vi.fn(),
@@ -905,5 +906,54 @@ describe('getWasteChuteComboFixture', () => {
       cutoutId: 'cutoutD3',
       opentronsModuleSerialNumber: '123',
     })
+  })
+})
+
+describe('getFlexStackerD3Compatibility', () => {
+  it('should return a conflict and flex stacker fixture', () => {
+    const result = getFlexStackerD3Compatibility([
+      {
+        cutoutId: 'cutoutD3',
+        cutoutFixtureId: FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
+        requiredAddressableAreas: ['flexStackerModuleV1D4', 'D3'],
+        compatibleCutoutFixtureIds: [FLEX_STACKER_V1_FIXTURE],
+      },
+    ])
+    expect(result).toEqual({
+      comboFixtureId: FLEX_STACKER_V1_FIXTURE,
+      comboFixtureConflict: true,
+    })
+  })
+
+  it('should return a conflict and flex stacker fixture', () => {
+    const result = getFlexStackerD3Compatibility([
+      {
+        cutoutId: 'cutoutD3',
+        cutoutFixtureId: FLEX_STACKER_V1_FIXTURE,
+        requiredAddressableAreas: [
+          'flexStackerModuleV1D4',
+          '1ChannelWasteChute',
+        ],
+        compatibleCutoutFixtureIds: [
+          FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
+        ],
+      },
+    ])
+    expect(result).toEqual({
+      comboFixtureId: FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
+      comboFixtureConflict: true,
+    })
+  })
+
+  it('should return a null for no conflict with waste chute', () => {
+    const result = getFlexStackerD3Compatibility([
+      {
+        cutoutId: 'cutoutD3',
+        cutoutFixtureId: FLEX_STACKER_V1_FIXTURE,
+        requiredAddressableAreas: ['flexStackerModuleV1D4', 'D3'],
+        compatibleCutoutFixtureIds: [FLEX_STACKER_V1_FIXTURE],
+      },
+    ])
+    expect(result).toBeNull
   })
 })
