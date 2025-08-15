@@ -3,9 +3,10 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { useAtom } from 'jotai'
 
-import { COLORS, Icon, StyledText } from '@opentrons/components'
+import { StyledText } from '@opentrons/components'
 
 import welcomeImage from '/ai-client/assets/images/welcome_dashboard.png'
+import { ActionCard } from '/ai-client/components/molecules/ActionCard'
 import {
   headerWithMeterAtom,
   updateProtocolChatAtom,
@@ -72,71 +73,24 @@ export function Landing(): JSX.Element | null {
 
         {!isMobile && (
           <div className={styles.cards_container}>
-            <div className={styles.action_card}>
-              <h3 className={styles.card_title}>
-                {t('landing_page_update_title')}
-              </h3>
-              <p className={styles.card_description}>
-                {t('landing_page_update_description')}
-              </p>
-              <a
-                href="#"
-                className={styles.card_link}
-                onClick={e => {
-                  e.preventDefault()
-                  handleUpdateProtocol()
-                }}
-              >
-                {t('landing_page_update_link')}
-                <span className={styles.card_link_icon}>
-                  <Icon name="nav-arrow" size="0.62rem" color={COLORS.blue50} />
-                </span>
-              </a>
-            </div>
-
-            <div className={styles.action_card}>
-              <h3 className={styles.card_title}>
-                {t('landing_page_create_title')}
-              </h3>
-              <p className={styles.card_description}>
-                {t('landing_page_create_description')}
-              </p>
-              <a
-                href="#"
-                className={styles.card_link}
-                onClick={e => {
-                  e.preventDefault()
-                  handleCreateNewProtocol()
-                }}
-              >
-                {t('landing_page_create_link')}
-                <span className={styles.card_link_icon}>
-                  <Icon name="nav-arrow" size="0.62rem" color={COLORS.blue50} />
-                </span>
-              </a>
-            </div>
-
-            <div className={styles.action_card}>
-              <h3 className={styles.card_title}>
-                {t('landing_page_chat_title')}
-              </h3>
-              <p className={styles.card_description}>
-                {t('landing_page_chat_description')}
-              </p>
-              <a
-                href="#"
-                className={styles.card_link}
-                onClick={e => {
-                  e.preventDefault()
-                  handleGoToChat()
-                }}
-              >
-                {t('landing_page_chat_link')}
-                <span className={styles.card_link_icon}>
-                  <Icon name="nav-arrow" size="0.62rem" color={COLORS.blue50} />
-                </span>
-              </a>
-            </div>
+            <ActionCard
+              titleKey="landing_page_update_title"
+              descriptionKey="landing_page_update_description"
+              linkKey="landing_page_update_link"
+              onClick={handleUpdateProtocol}
+            />
+            <ActionCard
+              titleKey="landing_page_create_title"
+              descriptionKey="landing_page_create_description"
+              linkKey="landing_page_create_link"
+              onClick={handleCreateNewProtocol}
+            />
+            <ActionCard
+              titleKey="landing_page_chat_title"
+              descriptionKey="landing_page_chat_description"
+              linkKey="landing_page_chat_link"
+              onClick={handleGoToChat}
+            />
           </div>
         )}
       </div>

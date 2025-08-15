@@ -60,7 +60,7 @@ describe('Landing', () => {
     expect(screen.getByText('Update an existing protocol')).toBeInTheDocument()
     expect(
       screen.getByText(
-        "Upload your existing protocol and explain what you'd like to change."
+        "Upload your existing protocol and explain what you'd like to change"
       )
     ).toBeInTheDocument()
     expect(screen.getByText('Update a protocol')).toBeInTheDocument()
@@ -78,7 +78,7 @@ describe('Landing', () => {
     expect(screen.getByText('Go to chat')).toBeInTheDocument()
     expect(
       screen.getByText(
-        'Head directly to OpentronsAI chat to ask a question or paste an existing prompt.'
+        'Head directly to OpentronsAI chat to ask a question or paste an existing prompt'
       )
     ).toBeInTheDocument()
     expect(screen.getByText('Chat now')).toBeInTheDocument()
