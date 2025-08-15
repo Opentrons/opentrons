@@ -11,11 +11,9 @@ export const moveLabwareFormToArgs = (
     newLocation,
     stepName,
     stepDetails,
-    stepNumber,
   } = hydratedFormData
 
   return {
-    stepNumber,
     commandCreatorFnName: 'moveLabware',
     name: stepName,
     description: stepDetails,

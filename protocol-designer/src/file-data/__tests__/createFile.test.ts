@@ -281,6 +281,7 @@ CUSTOM_LABWARE = json.loads("""{"fixture/fixture_trash/1":{"ordering":[["A1"]],"
               stepName: 'transfer',
               stepType: 'moveLiquid',
               volume: '5',
+              stepNumber: 1,
             },
           },
         },

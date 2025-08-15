@@ -8,13 +8,7 @@ type MagnetArgs = EngageMagnetArgs | DisengageMagnetArgs
 export const magnetFormToArgs = (
   hydratedFormData: HydratedMagnetFormData
 ): MagnetArgs => {
-  const {
-    magnetAction,
-    moduleId,
-    stepDetails,
-    stepName,
-    stepNumber,
-  } = hydratedFormData
+  const { magnetAction, moduleId, stepDetails, stepName } = hydratedFormData
   //  @ts-expect-error
   const engageHeight = parseFloat(hydratedFormData.engageHeight)
   console.assert(
@@ -24,7 +18,6 @@ export const magnetFormToArgs = (
 
   if (magnetAction === 'engage' && !Number.isNaN(engageHeight)) {
     return {
-      stepNumber,
       commandCreatorFnName: 'engageMagnet',
       moduleId,
       height: engageHeight,
@@ -33,7 +26,6 @@ export const magnetFormToArgs = (
     }
   } else {
     return {
-      stepNumber,
       commandCreatorFnName: 'disengageMagnet',
       moduleId,
       description: stepDetails,

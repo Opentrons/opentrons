@@ -35,7 +35,6 @@ export const mixFormToArgs = (
     blowout_z_offset,
     pushOut_checkbox,
     pushOut_volume,
-    stepNumber,
   } = hydratedFormData
   const matchingTipLiquidSpecs = getMatchingTipLiquidSpecs(
     pipette,
@@ -93,7 +92,6 @@ export const mixFormToArgs = (
     'dispense_delay_seconds'
   )
   return {
-    stepNumber,
     commandCreatorFnName: 'mix',
     name: hydratedFormData.stepName,
     description: hydratedFormData.stepDetails,
