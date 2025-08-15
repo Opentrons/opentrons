@@ -1122,7 +1122,9 @@ class GeometryView:
                             "providesAddressableAreas"
                         ][
                             deck_configuration_provider.get_cutout_id_by_deck_slot_name(
-                                DeckSlotName.SLOT_C2
+                                DeckSlotName.SLOT_C2.to_equivalent_for_robot_type(
+                                    self._config.robot_type
+                                )
                             )
                         ][
                             0
