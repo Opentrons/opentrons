@@ -41,7 +41,7 @@ Each Stacker can hold a labware stack of up to:
 - 48 PCR plates, like <tested load_name>
 - 16 deep well plates, like <tested load_name>
 
-You'll need to use :py:meth:`~.FlexStackerContext.set_stored_labware()` to configure the Stacker before adding or removing labware during a protocol. Only one type of labware can be stored in each Stacker at one time. 
+You'll need to use :py:meth:`~.FlexStackerContext.set_stored_labware` to configure the Stacker before adding or removing labware during a protocol. Only one type of labware can be stored in each Stacker at one time. 
 
 .. code-block:: python
 
@@ -72,7 +72,7 @@ Configuring the Stacker assigns a labware stack to this deck slot. You can use t
 
 Using Stacker Labware
 ======================
-During a protocol, use `~.ModuleContext.stacker.retrieve()` to automatically access a single piece of labware to use on the Flex deck. 
+During a protocol, use `~.FlexStackerContext.retrieve()` to automatically access a single piece of labware to use on the Flex deck. 
 
 .. code-block:: python
 
@@ -85,7 +85,7 @@ During a protocol, use `~.ModuleContext.stacker.retrieve()` to automatically acc
 
 Here, the Flex tip rack at the bottom of the labware stack is moved to the shuttle in slot A3. Then, use the Flex Gripper or manually move the new tip rack elsewhere on the deck. 
 
-To add more labware to a Stacker, use `~.ModuleContext.stacker.store()`::
+To add more labware to a Stacker, use `~.FlexStackerContext.store()`::
 
    protocol.move_labware(
        labware="opentrons_96_wellplate_200ul_pcr_full_skirt",
@@ -96,7 +96,7 @@ To add more labware to a Stacker, use `~.ModuleContext.stacker.store()`::
 
 After placing labware on the shuttle in slot C3, ``stacker_2`` stores another well plate on the bottom of the stack. 
 
-To mark a Stacker as completely full or empty, use `~.ModuleContext.stacker.fill()` or `~.StackerContext.stacker.empty()`::
+To mark a Stacker as completely full or empty, use `~.FlexStackerContext.fill()` or `~.FlexStackerContext.empty()`::
 
    # mark the second Stacker as empty
    stacker_2.empty()
