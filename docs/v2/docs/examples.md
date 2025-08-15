@@ -106,7 +106,7 @@ These protocols demonstrate how to move 100 µL of liquid from one well to anoth
 
 ## Basic Method
 
-This protocol uses some [building block commands](new_atomic_commands.md) to tell the robot, explicitly, where to go to aspirate and dispense liquid. These commands include the [`InstrumentContext.pick_up_tip`][opentrons.protocol_api.InstrumentContext.pick_up_tip], [`InstrumentContext.aspirate`][opentrons.protocol_api.InstrumentContext.aspirate], and [`InstrumentContext.dispense`][opentrons.protocol_api.InstrumentContext.dispense] methods.
+This protocol uses some [building block commands](atomic-commands.md) to tell the robot, explicitly, where to go to aspirate and dispense liquid. These commands include the [`InstrumentContext.pick_up_tip`][opentrons.protocol_api.InstrumentContext.pick_up_tip], [`InstrumentContext.aspirate`][opentrons.protocol_api.InstrumentContext.aspirate], and [`InstrumentContext.dispense`][opentrons.protocol_api.InstrumentContext.dispense] methods.
 
 === "Flex"
 ```python

@@ -270,4 +270,4 @@ Several older parts of the Protocol API were deprecated as part of this switchov
 ### Version 2.0
 Version 2 of the API is a new way to write Python protocols, with support for new modules like the Thermocycler. To transition your protocols from version 1 to version 2 of the API, follow this [migration guide](http://support.opentrons.com/en/articles/3425727-switching-your-protocols-from-api-version-1-to-version-2).
 
-We've also published a [more in-depth discussion](http://support.opentrons.com/en/articles/3418212-opentrons-protocol-api-version-2) of why we developed version 2 of the API and how it differs from version 1.
+We've also published a [more in-depth discussion](https://web.archive.org/web/20220127033143/https://support.opentrons.com/en/articles/3418212-opentrons-protocol-api-version-2) of why we developed version 2 of the API and how it differs from version 1.

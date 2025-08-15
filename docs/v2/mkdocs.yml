@@ -1,4 +1,59 @@
-site_name: My Docs
+
+site_name: v2
 
 nav:
-  - H-S: heater-shaker.md
+  - Welcome: index.md
+  - Tutorial: tutorial.md
+  - Versioning: versioning.md
+  - Labware: labware.md
+  - Moving Labware: moving-labware.md
+  - Modules:
+      - Overview: modules.md
+      - Absorbance Plate Reader: modules/absorbance-plate-reader.md
+      - Heater-Shaker: modules/heater-shaker.md
+      - Magnetic Block: modules/magnetic-block.md
+      - Magnetic Module: modules/magnetic-module.md
+      - Multiple Same Type: modules/multiple-same-type.md
+      - Setup: modules/setup.md
+      - Temperature Module: modules/temperature-module.md
+      - Thermocycler: modules/thermocycler.md
+  - Deck Slots: deck-slots.md
+  - Pipettes:
+      - Overview: pipette.md
+      - Loading: pipettes/loading.md
+      - Characteristics: pipettes/characteristics.md
+      - Partial Tip Pickup: pipettes/partial-tip-pickup.md
+      - Volume Modes: pipettes/volume-modes.md
+  - Liquid Classes: liquid-classes.md
+  - Liquid Class Definitions: liquid-class-definitions.md
+  - Atomic Commands:
+      - Overview: atomic-commands.md
+      - Pipette Tips: basic-commands/pipette-tips.md
+      - Liquids: basic-commands/liquids.md
+      - Utilities: basic-commands/utilities.md
+  - Complex Commands:
+      - Overview: complex-commands.md
+      - Sources & Destinations: complex-commands/sources-destinations.md
+      - Order of Operations: complex-commands/order-operations.md
+      - Parameters: complex-commands/parameters.md
+  - Robot Position: robot-position.md
+  - Runtime Parameters:
+      - Overview: runtime-parameters.md
+      - Choosing: parameters/choosing.md
+      - Defining: parameters/defining.md
+      - Using Values: parameters/using-values.md
+      - Use Case – Sample Count: parameters/use-case-sample-count.md
+      - Use Case – Dry Run: parameters/use-case-dry-run.md
+      - Use Case – Cherrypicking: parameters/use-case-cherrypicking.md
+      - Style: parameters/style.md
+  - Advanced Running: advanced-running.md
+  - Examples: examples.md
+  - Adapting OT-2/Flex: adapting-ot2-flex.md
+  - Protocol API Reference:
+      - Overview: api-reference/protocols.md
+      - Instruments: api-reference/instruments.md
+      - Labware: api-reference/labware.md
+      - Modules: api-reference/modules.md
+      - Types: api-reference/types.md
+      - Wells & Liquids: api-reference/wells-liquids.md
+      - Execute & Simulate: api-reference/execute-simulate.md
