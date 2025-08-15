@@ -50,7 +50,7 @@ export default defineConfig(
           telemetry: false,
           reactComponentAnnotation: {
             enabled: true,
-            ignoredComponents: [], // (kk:08/15/2025 ) ToDo add later
+            ignoredComponents: [], // (kk:08/15/2025) ToDo add later
           },
           sourcemaps: {
             assets: ['./dist/**'],
