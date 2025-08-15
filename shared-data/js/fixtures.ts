@@ -78,7 +78,11 @@ import {
   WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from './constants'
-import { getCutoutIdForSlotName, getDeckDefFromRobotType } from './helpers'
+import {
+  CutoutConfigAndCompatibility,
+  getCutoutIdForSlotName,
+  getDeckDefFromRobotType,
+} from './helpers'
 import { getModuleDisplayName } from './modules'
 
 import type { TFunction } from 'i18next'
@@ -1569,6 +1573,48 @@ export const replaceCutoutFixtureRemove = (
     // Fallback if no match found
     return cutoutFixtureRemoved
   }
+}
+
+/**
+ * Check if a flex stacker module can be placed in the D3 cutout with waste chute compatibility
+ * @param deckConfigCompatibility: array of deck configuration compatibility items
+ * @returns object with combo fixture ID and conflict status, or null if not compatible
+ */
+export const getFlexStackerD3Compatibility = (
+  deckConfigCompatibility: CutoutConfigAndCompatibility[] | undefined
+): {
+  comboFixtureId: CutoutFixtureId | undefined
+  comboFixtureConflict: boolean
+} | null => {
+  const deckConfigCompatabilityD3 = deckConfigCompatibility?.find(
+    configItem => configItem.cutoutId === 'cutoutD3'
+  )
+
+  if (
+    deckConfigCompatabilityD3 != null &&
+    (WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(
+      deckConfigCompatabilityD3?.compatibleCutoutFixtureIds[0]
+    ) ||
+      WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(
+        deckConfigCompatabilityD3?.cutoutFixtureId
+      ))
+  ) {
+    // Convert CutoutFixtureIdsWithFakes to CutoutFixtureId by filtering out fake fixtures
+    const comboFixtureId = deckConfigCompatabilityD3?.compatibleCutoutFixtureIds.find(
+      fixtureId => !fixtureId.startsWith('fake')
+    ) as CutoutFixtureId | undefined
+
+    const comboFixtureConflict = !deckConfigCompatabilityD3?.compatibleCutoutFixtureIds.includes(
+      deckConfigCompatabilityD3.cutoutFixtureId
+    )
+
+    return {
+      comboFixtureId,
+      comboFixtureConflict,
+    }
+  }
+
+  return null
 }
 
 export const isFixtureInUsbModules = (fixtureId: CutoutFixtureId): boolean => {

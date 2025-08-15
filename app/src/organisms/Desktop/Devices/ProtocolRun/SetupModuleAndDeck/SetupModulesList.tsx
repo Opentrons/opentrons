@@ -29,6 +29,7 @@ import {
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
+  getFlexStackerD3Compatibility,
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
@@ -37,7 +38,6 @@ import {
   OT2_ROBOT_TYPE,
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
-  WASTE_CHUTE_FLEX_STACKER_FIXTURES,
 } from '@opentrons/shared-data'
 
 import { TertiaryButton } from '/app/atoms/buttons'
@@ -133,24 +133,11 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
             moduleDef.moduleType === FLEX_STACKER_MODULE_TYPE &&
             slotName === 'D4'
           ) {
-            const deckConfigCompatabilityD3 = deckConfigCompatibility?.find(
-              configItem => configItem.cutoutId === 'cutoutD3'
+            const d3Compatibility = getFlexStackerD3Compatibility(
+              deckConfigCompatibility
             )
-            if (
-              (deckConfigCompatabilityD3 != null &&
-                deckConfigCompatabilityD3.compatibleCutoutFixtureIds.every(
-                  cutoutFixtureId =>
-                    WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(cutoutFixtureId)
-                )) ||
-              WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(
-                deckConfigCompatabilityD3?.cutoutFixtureId
-              )
-            ) {
-              const comboFixtureId =
-                deckConfigCompatabilityD3?.compatibleCutoutFixtureIds[0]
-              const comboFixtureConflict = !deckConfigCompatabilityD3?.compatibleCutoutFixtureIds.includes(
-                deckConfigCompatabilityD3.cutoutFixtureId
-              )
+            if (d3Compatibility) {
+              const { comboFixtureId, comboFixtureConflict } = d3Compatibility
               return (
                 <ModulesListItem
                   key={`SetupModulesList_${String(

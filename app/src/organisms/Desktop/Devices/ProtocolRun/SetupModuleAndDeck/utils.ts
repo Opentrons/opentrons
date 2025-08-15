@@ -16,6 +16,7 @@ import {
   WASTE_CHUTE_STAGING_AREA_FIXTURES,
 } from '@opentrons/shared-data'
 
+import flexStackerWithoutLabware from '/app/assets/images/flex_stacker_no_labware.png'
 import flexStackerWithWasteChute from '/app/assets/images/flex_stacker_waste_chute.png'
 import trashBin from '/app/assets/images/flex_trash_bin.png'
 import heaterShakerModule from '/app/assets/images/heater_shaker_module_transparent.png'
@@ -29,7 +30,6 @@ import temperatureModule from '/app/assets/images/temp_deck_gen_2_transparent.pn
 import thermoModuleGen2 from '/app/assets/images/thermocycler_gen_2_closed.png'
 import wasteChuteStagingArea from '/app/assets/images/waste_chute_with_staging_area.png'
 import wasteChute from '/app/assets/images/waste_chute.png'
-import flexStackerWithoutLabware from '/app/assets/images/flex_stacker_no_labware.png'
 
 import type { CutoutFixtureId } from '@opentrons/shared-data'
 
@@ -66,6 +66,7 @@ export function getFixtureImage(cutoutFixtureId: CutoutFixtureId): string {
         return flexStackerWithWasteChute
       } else if (WASTE_CHUTE_STAGING_AREA_FIXTURES.includes(cutoutFixtureId)) {
         return wasteChuteStagingArea
+      } else {
         console.log('unknown fixture: ', cutoutFixtureId)
         return 'Error: unknown fixture'
       }

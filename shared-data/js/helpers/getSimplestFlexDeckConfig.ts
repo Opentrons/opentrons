@@ -20,6 +20,10 @@ export interface CutoutConfigProtocolSpec extends CutoutConfig {
   requiredAddressableAreas: AddressableAreaName[]
 }
 
+export interface CutoutConfigAndCompatibility extends CutoutConfigProtocolSpec {
+  compatibleCutoutFixtureIds: CutoutFixtureId[]
+}
+
 export const FLEX_SIMPLEST_DECK_CONFIG: DeckConfiguration = [
   { cutoutId: 'cutoutA1', cutoutFixtureId: 'singleLeftSlot' },
   { cutoutId: 'cutoutB1', cutoutFixtureId: 'singleLeftSlot' },

@@ -1,4 +1,5 @@
 import {
+  CutoutConfigAndCompatibility,
   FLEX_ROBOT_TYPE,
   getAddressableAreasInProtocol,
   getCutoutFixturesForCutoutId,
@@ -10,8 +11,6 @@ import { useNotifyDeckConfigurationQuery } from '../useNotifyDeckConfigurationQu
 
 import type {
   CompletedProtocolAnalysis,
-  CutoutConfigProtocolSpec,
-  CutoutFixtureId,
   ProtocolAnalysisOutput,
   RobotType,
 } from '@opentrons/shared-data'
@@ -26,9 +25,6 @@ const DECK_CONFIG_REFETCH_INTERVAL = 5000
  * provide those addressable areas.
  */
 
-export interface CutoutConfigAndCompatibility extends CutoutConfigProtocolSpec {
-  compatibleCutoutFixtureIds: CutoutFixtureId[]
-}
 export function useDeckConfigurationCompatibility(
   robotType: RobotType,
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
