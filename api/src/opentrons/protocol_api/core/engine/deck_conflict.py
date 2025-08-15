@@ -304,8 +304,13 @@ def _map_module(
             ),
         )
     elif module_type == ModuleType.FLEX_STACKER:
-        # TODO: This is a placeholder. We need to implement this.
-        return None
+        return (
+            mapped_location,
+            wrapped_deck_conflict.OtherModule(
+                name_for_errors=name_for_errors,
+                highest_z_including_labware=highest_z_including_labware,
+            ),
+        )
     else:
         return (
             mapped_location,
