@@ -1,5 +1,6 @@
 """Utilities for calculating the labware origin offset position."""
 import dataclasses
+import enum
 from typing import Union, overload
 
 from typing_extensions import assert_type
@@ -42,13 +43,60 @@ _LabwareStackupDefinition = Union[
 """Information pertaining to a deck item that is present in a labware stackup."""
 
 
+class LabwareOriginContext(enum.Enum):
+    """Context for labware origin calculations."""
+
+    PIPETTING = enum.auto()
+    GRIPPER_PICKING_UP = enum.auto()
+    GRIPPER_DROPPING = enum.auto()
+
+
 @dataclasses.dataclass
 class _Labware3SupportedParentDefinition:
     features: LocatingFeatures
     extents: Extents
 
 
-def get_stackup_placement_origin_to_lw_origin(
+def get_stackup_origin_to_labware_origin(
+    context: LabwareOriginContext,
+    stackup_lw_info_top_to_bottom: list[tuple[LabwareDefinition, LabwareLocation]],
+    underlying_ancestor_definition: LabwareStackupAncestorDefinition,
+    module_parent_to_child_offset: Union[Point, None],
+    deck_definition: DeckDefinitionV5,
+) -> Point:
+    """Returns the offset from the stackup placement origin to child labware origin.
+
+    Accounts for offset differences caused by consuming context.
+    """
+    if context == LabwareOriginContext.PIPETTING:
+        return _get_stackup_origin_to_lw_origin(
+            stackup_lw_info_top_to_bottom=stackup_lw_info_top_to_bottom,
+            underlying_ancestor_definition=underlying_ancestor_definition,
+            module_parent_to_child_offset=module_parent_to_child_offset,
+            deck_definition=deck_definition,
+        )
+    elif context == LabwareOriginContext.GRIPPER_PICKING_UP:
+        # TODO: Gripper specific offsets will go here.
+        return _get_stackup_origin_to_lw_origin(
+            stackup_lw_info_top_to_bottom=stackup_lw_info_top_to_bottom,
+            underlying_ancestor_definition=underlying_ancestor_definition,
+            module_parent_to_child_offset=module_parent_to_child_offset,
+            deck_definition=deck_definition,
+        )
+    elif context == LabwareOriginContext.GRIPPER_DROPPING:
+        # TODO: Gripper specific offsets will go here.
+        return _get_stackup_origin_to_lw_origin(
+            stackup_lw_info_top_to_bottom=stackup_lw_info_top_to_bottom,
+            underlying_ancestor_definition=underlying_ancestor_definition,
+            module_parent_to_child_offset=module_parent_to_child_offset,
+            deck_definition=deck_definition,
+        )
+
+    else:
+        raise ValueError(f"Unsupported context {context}")
+
+
+def _get_stackup_origin_to_lw_origin(
     stackup_lw_info_top_to_bottom: list[tuple[LabwareDefinition, LabwareLocation]],
     underlying_ancestor_definition: LabwareStackupAncestorDefinition,
     module_parent_to_child_offset: Union[Point, None],
@@ -84,15 +132,12 @@ def get_stackup_placement_origin_to_lw_origin(
         )
         remaining_lw_defs_locs_top_to_bottom = stackup_lw_info_top_to_bottom[1:]
 
-        return (
-            parent_placement_origin_to_lw_origin
-            + get_stackup_placement_origin_to_lw_origin(
-                stackup_lw_info_top_to_bottom=remaining_lw_defs_locs_top_to_bottom,
-                underlying_ancestor_definition=underlying_ancestor_definition,
-                module_parent_to_child_offset=module_parent_to_child_offset,
-                deck_definition=deck_definition,
-                is_topmost_labware=False,
-            )
+        return parent_placement_origin_to_lw_origin + _get_stackup_origin_to_lw_origin(
+            stackup_lw_info_top_to_bottom=remaining_lw_defs_locs_top_to_bottom,
+            underlying_ancestor_definition=underlying_ancestor_definition,
+            module_parent_to_child_offset=module_parent_to_child_offset,
+            deck_definition=deck_definition,
+            is_topmost_labware=False,
         )
     else:
         raise errors.LabwareNotOnDeckError(

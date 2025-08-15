@@ -130,6 +130,7 @@ from .instrument import (
     CurrentWell,
     CurrentPipetteLocation,
     InstrumentOffsetVector,
+    GripperMoveType,
 )
 from .execution import EngineStatus, PostRunHardwareState
 from .liquid_level_detection import (
@@ -282,6 +283,7 @@ __all__ = [
     "CurrentWell",
     "CurrentPipetteLocation",
     "InstrumentOffsetVector",
+    "GripperMoveType",
     # Liquid level detection types
     "LoadedVolumeInfo",
     "ProbedHeightInfo",

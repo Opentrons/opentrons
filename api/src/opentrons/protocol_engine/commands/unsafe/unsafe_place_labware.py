@@ -20,6 +20,7 @@ from ...types import (
     DeckSlotLocation,
     ModuleModel,
     OnDeckLabwareLocation,
+    GripperMoveType,
 )
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ...errors.error_occurrence import ErrorOccurrence
@@ -156,7 +157,9 @@ class UnsafePlaceLabwareImplementation(
         )
 
         to_labware_center = self._state_view.geometry.get_labware_grip_point(
-            labware_definition=labware_definition, location=location
+            labware_definition=labware_definition,
+            location=location,
+            move_type=GripperMoveType.DROP_LABWARE,
         )
 
         movement_waypoints = get_gripper_labware_placement_waypoints(

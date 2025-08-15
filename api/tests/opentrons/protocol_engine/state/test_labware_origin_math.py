@@ -29,7 +29,8 @@ from opentrons_shared_data.labware.types import (
 
 from opentrons.types import Point
 from opentrons.protocol_engine.state._labware_origin_math import (
-    get_stackup_placement_origin_to_lw_origin,
+    get_stackup_origin_to_labware_origin,
+    LabwareOriginContext,
 )
 from opentrons.protocol_engine.types import (
     ModuleModel,
@@ -452,7 +453,8 @@ def test_get_parent_placement_origin_to_lw_origin_with_module(
     expected_total_offset: Point,
 ) -> None:
     """It should calculate the correct offset from module parent to labware origin."""
-    result = get_stackup_placement_origin_to_lw_origin(
+    result = get_stackup_origin_to_labware_origin(
+        context=LabwareOriginContext.PIPETTING,
         stackup_lw_info_top_to_bottom=[
             (child_definition, labware_location),
         ],
@@ -475,7 +477,8 @@ def test_get_parent_placement_origin_to_lw_origin_with_labware(
     expected_total_offset: Point,
 ) -> None:
     """It should calculate the correct offset from labware parent to labware origin for v2_schema_labware."""
-    result = get_stackup_placement_origin_to_lw_origin(
+    result = get_stackup_origin_to_labware_origin(
+        context=LabwareOriginContext.PIPETTING,
         stackup_lw_info_top_to_bottom=[
             (child_definition, labware_location),
             (
@@ -502,7 +505,8 @@ def test_get_parent_placement_origin_to_lw_origin_with_addressable_area(
     expected_total_offset: Point,
 ) -> None:
     """It should calculate the correct offset from addressable area to labware origin."""
-    result = get_stackup_placement_origin_to_lw_origin(
+    result = get_stackup_origin_to_labware_origin(
+        context=LabwareOriginContext.PIPETTING,
         stackup_lw_info_top_to_bottom=[
             (child_definition, labware_location),
         ],
@@ -525,7 +529,8 @@ def test_get_parent_placement_origin_to_lw_origin_v3_definitions_non_lw(
     expected_total_offset: Point,
 ) -> None:
     """It should handle LabwareDefinition3 correctly with various parent configurations (that are not labware)."""
-    result = get_stackup_placement_origin_to_lw_origin(
+    result = get_stackup_origin_to_labware_origin(
+        context=LabwareOriginContext.PIPETTING,
         stackup_lw_info_top_to_bottom=[
             (child_definition, labware_location),
         ],
@@ -548,7 +553,8 @@ def test_get_parent_placement_origin_to_lw_origin_v3_definitions(
     expected_total_offset: Point,
 ) -> None:
     """It should handle LabwareDefinition3 correctly with various labware configurations."""
-    result = get_stackup_placement_origin_to_lw_origin(
+    result = get_stackup_origin_to_labware_origin(
+        context=LabwareOriginContext.PIPETTING,
         stackup_lw_info_top_to_bottom=[
             (child_definition, labware_location),
             (

@@ -31,6 +31,7 @@ from ..types import (
     OnLabwareLocation,
     LabwareLocation,
     OnDeckLabwareLocation,
+    GripperMoveType,
 )
 
 if TYPE_CHECKING:
@@ -141,10 +142,14 @@ class LabwareMovementHandler:
             labware_definition = self._state_store.labware.get_definition(labware_id)
 
         from_labware_center = self._state_store.geometry.get_labware_grip_point(
-            labware_definition=labware_definition, location=current_location
+            labware_definition=labware_definition,
+            location=current_location,
+            move_type=GripperMoveType.PICK_UP_LABWARE,
         )
         to_labware_center = self._state_store.geometry.get_labware_grip_point(
-            labware_definition=labware_definition, location=new_location
+            labware_definition=labware_definition,
+            location=new_location,
+            move_type=GripperMoveType.DROP_LABWARE,
         )
 
         if use_virtual_gripper:
