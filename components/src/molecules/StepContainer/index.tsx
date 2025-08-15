@@ -127,9 +127,7 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
         </Flex>
         {active && type !== 'alt' && (
           <OverflowBtn
-            // todo(mm, 2025-08-13): This data-testid is duplicated with the container.
-            // Not sure if this is intentional?
-            data-testid={dataTestId}
+            data-testid="StepContainer_OverflowBtn"
             fillColor={COLORS.white}
             onClick={onOverflowMenuButtonClick}
           />
