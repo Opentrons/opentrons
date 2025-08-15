@@ -72,6 +72,8 @@ _PARTIAL_NOZZLE_CONFIGURATION_SINGLE_ROW_PARTIAL_COLUMN_ADDED_IN = APIVersion(2,
 """The version after which partial nozzle configurations of single, row, and partial column layouts became available."""
 _AIR_GAP_TRACKING_ADDED_IN = APIVersion(2, 22)
 """The version after which air gaps should be implemented with a separate call instead of an aspirate for better liquid volume tracking."""
+_LIQUID_CLASS_TRANSFER_TIP_RACKS_ARG_ADDED_IN = APIVersion(2, 25)
+"""The version after which the user can supply liquid class transfers with non-assigned tip racks."""
 
 
 AdvancedLiquidHandling = v1_transfer.AdvancedLiquidHandling
@@ -1843,6 +1845,16 @@ class InstrumentContext(publisher.CommandPublisher):
             )
             return self
 
+        if (
+            tip_racks is not None
+            and self.api_version < _LIQUID_CLASS_TRANSFER_TIP_RACKS_ARG_ADDED_IN
+        ):
+            raise APIVersionError(
+                api_element="tip_racks",
+                until_version="2.25",
+                current_version=f"{self.api_version}",
+            )
+
         transfer_args = verify_and_normalize_transfer_args(
             source=source,
             dest=dest,
@@ -1972,6 +1984,16 @@ class InstrumentContext(publisher.CommandPublisher):
                 f" Skipping."
             )
             return self
+
+        if (
+            tip_racks is not None
+            and self.api_version < _LIQUID_CLASS_TRANSFER_TIP_RACKS_ARG_ADDED_IN
+        ):
+            raise APIVersionError(
+                api_element="tip_racks",
+                until_version="2.25",
+                current_version=f"{self.api_version}",
+            )
 
         transfer_args = verify_and_normalize_transfer_args(
             source=source,
@@ -2111,6 +2133,16 @@ class InstrumentContext(publisher.CommandPublisher):
                 f" Skipping."
             )
             return self
+
+        if (
+            tip_racks is not None
+            and self.api_version < _LIQUID_CLASS_TRANSFER_TIP_RACKS_ARG_ADDED_IN
+        ):
+            raise APIVersionError(
+                api_element="tip_racks",
+                until_version="2.25",
+                current_version=f"{self.api_version}",
+            )
 
         transfer_args = verify_and_normalize_transfer_args(
             source=source,
