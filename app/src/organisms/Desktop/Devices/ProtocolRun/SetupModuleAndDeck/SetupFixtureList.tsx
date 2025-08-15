@@ -29,12 +29,12 @@ import { TertiaryButton } from '/app/atoms/buttons/TertiaryButton'
 import { StatusLabel } from '/app/atoms/StatusLabel'
 import { DeckFixtureSetupInstructionsModal } from '/app/organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
+import { NotConfiguredModal } from '/app/organisms/LocationConflictModal/NotConfiguredModal'
 import {
   getFilteredDeckConfigFixtureCompatibility,
   isConflictingFixtureConfigured,
   isFixtureCompatible,
-} from '/app/organisms/LocationConflictModal/getFilteredDeckConfigFixtureCompatibility'
-import { NotConfiguredModal } from '/app/organisms/LocationConflictModal/NotConfiguredModal'
+} from '/app/resources/deck_configuration/utils'
 
 import { getFixtureImage } from './utils'
 

@@ -41,6 +41,7 @@ from ...types import (
     InStackerHopperLocation,
     StackerStoredLabwareGroup,
     ModuleLocation,
+    StackerLabwareMovementStrategy,
 )
 
 if TYPE_CHECKING:
@@ -58,6 +59,13 @@ class StoreParams(BaseModel):
     moduleId: str = Field(
         ...,
         description="Unique ID of the flex stacker.",
+    )
+    strategy: StackerLabwareMovementStrategy = Field(
+        ...,
+        description=(
+            "If manual, indicates that labware has been moved to the hopper "
+            "manually by the user, as required in error recovery."
+        ),
     )
 
 
@@ -201,42 +209,47 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
         stacker_hw = self._equipment.get_module_hardware_api(stacker_state.module_id)
 
         state_update = update_types.StateUpdate()
-        try:
-            if stacker_hw is not None:
-                stacker_hw.set_stacker_identify(True)
+        if stacker_hw is not None:
+            stacker_hw.set_stacker_identify(True)
+
+        if (
+            params.strategy is StackerLabwareMovementStrategy.AUTOMATIC
+            and stacker_hw is not None
+        ):
+            try:
                 await stacker_hw.store_labware(
                     labware_height=stacker_state.get_pool_height_minus_overlap()
                 )
-        except FlexStackerStallError as e:
-            return DefinedErrorData(
-                public=FlexStackerStallOrCollisionError(
-                    id=self._model_utils.generate_id(),
-                    createdAt=self._model_utils.get_timestamp(),
-                    wrappedErrors=[
-                        ErrorOccurrence.from_failed(
-                            id=self._model_utils.generate_id(),
-                            createdAt=self._model_utils.get_timestamp(),
-                            error=e,
-                        )
-                    ],
-                    errorInfo={"labwareId": primary_id},
-                ),
-            )
-        except FlexStackerShuttleMissingError as e:
-            return DefinedErrorData(
-                public=FlexStackerShuttleError(
-                    id=self._model_utils.generate_id(),
-                    createdAt=self._model_utils.get_timestamp(),
-                    wrappedErrors=[
-                        ErrorOccurrence.from_failed(
-                            id=self._model_utils.generate_id(),
-                            createdAt=self._model_utils.get_timestamp(),
-                            error=e,
-                        )
-                    ],
-                    errorInfo={"labwareId": primary_id},
-                ),
-            )
+            except FlexStackerStallError as e:
+                return DefinedErrorData(
+                    public=FlexStackerStallOrCollisionError(
+                        id=self._model_utils.generate_id(),
+                        createdAt=self._model_utils.get_timestamp(),
+                        wrappedErrors=[
+                            ErrorOccurrence.from_failed(
+                                id=self._model_utils.generate_id(),
+                                createdAt=self._model_utils.get_timestamp(),
+                                error=e,
+                            )
+                        ],
+                        errorInfo={"labwareId": primary_id},
+                    ),
+                )
+            except FlexStackerShuttleMissingError as e:
+                return DefinedErrorData(
+                    public=FlexStackerShuttleError(
+                        id=self._model_utils.generate_id(),
+                        createdAt=self._model_utils.get_timestamp(),
+                        wrappedErrors=[
+                            ErrorOccurrence.from_failed(
+                                id=self._model_utils.generate_id(),
+                                createdAt=self._model_utils.get_timestamp(),
+                                error=e,
+                            )
+                        ],
+                        errorInfo={"labwareId": primary_id},
+                    ),
+                )
 
         id_list = [
             id for id in (primary_id, maybe_adapter_id, maybe_lid_id) if id is not None

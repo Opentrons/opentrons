@@ -276,6 +276,13 @@ class StackerFillEmptyStrategy(str, Enum):
     LOGICAL = "logical"
 
 
+class StackerLabwareMovementStrategy(str, Enum):
+    """Strategy to retrieve or store labware."""
+
+    AUTOMATIC = "automatic"
+    MANUAL = "manual"
+
+
 class StackerStoredLabwareGroup(BaseModel):
     """Represents one group of labware stored in a stacker hopper."""
 

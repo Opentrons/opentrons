@@ -125,15 +125,22 @@ export function DeckSetup(props: CalibrationPanelProps): JSX.Element {
                   }
 
                   const labwareDef = ((): LabwareDefinition | null => {
-                    if (tipRack?.slot === addressableAreaName) {
+                    if (
+                      tipRack?.slot != null &&
+                      Sessions.slotNameFromCalibrationSlot(tipRack?.slot) ===
+                        addressableAreaName
+                    ) {
                       return tipRack.definition
-                    } else if (calBlock?.slot === addressableAreaName) {
+                    } else if (
+                      calBlock?.slot != null &&
+                      Sessions.slotNameFromCalibrationSlot(calBlock?.slot) ===
+                        addressableAreaName
+                    ) {
                       return calBlock.definition
                     } else {
                       return null
                     }
                   })()
-
                   if (labwareDef == null) {
                     return null
                   }

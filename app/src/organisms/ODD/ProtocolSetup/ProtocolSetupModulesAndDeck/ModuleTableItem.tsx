@@ -19,10 +19,8 @@ import {
   ABSORBANCE_READER_TYPE,
   FLEX_STACKER_MODULE_TYPE,
   getFixtureDisplayName,
+  getModuleDeckLabel,
   getModuleDisplayName,
-  getModuleType,
-  TC_MODULE_LOCATION_OT3,
-  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
@@ -45,7 +43,6 @@ import type {
   CutoutConfig,
   CutoutFixtureId,
   DeckDefinition,
-  ModuleModel,
 } from '@opentrons/shared-data'
 import type { ModulePrepCommandsType } from '/app/local-resources/modules'
 import type { ProtocolCalibrationStatus } from '/app/resources/runs'
@@ -292,17 +289,6 @@ export function ModuleTableItem({
     }
   }
 
-  const getModuleLocation = (moduleModel: ModuleModel): string => {
-    const moduleType = getModuleType(moduleModel)
-    if (moduleType === THERMOCYCLER_MODULE_TYPE) {
-      return TC_MODULE_LOCATION_OT3
-    } else if (moduleType === FLEX_STACKER_MODULE_TYPE) {
-      return `${module.slotName.charAt(0)}4`
-    } else {
-      return module.slotName
-    }
-  }
-
   return (
     <>
       {showLocationConflictModal && conflictedFixture != null ? (
@@ -338,7 +324,10 @@ export function ModuleTableItem({
         </Flex>
         <Flex alignItems={ALIGN_CENTER} flex="2 0 0">
           <DeckInfoLabel
-            deckLabel={getModuleLocation(module.moduleDef.model)}
+            deckLabel={getModuleDeckLabel(
+              module.moduleDef.moduleType,
+              module.slotName
+            )}
           />
         </Flex>
         <Flex

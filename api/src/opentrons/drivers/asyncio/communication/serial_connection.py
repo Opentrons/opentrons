@@ -263,8 +263,13 @@ class SerialConnection:
             return
 
         lower = response.lower()
-        res_gcode = response.split()[0]
-        req_gcode = request.split()[0]
+        try:
+            res_gcode = response.split()[0]
+            req_gcode = request.split()[0]
+        except IndexError:
+            # this means the response is an empty string or something, which is weird
+            # but not a canonical error
+            return
 
         # Make sure this is not just a normal response that happens to contain the
         # `err` or `alarm` keyword in the message body by checking the gcode values

@@ -10,6 +10,7 @@ import {
 } from '@opentrons/components'
 import {
   getLabwareInfoByLiquidId,
+  getOffDeckRenderInfo,
   getStackedItemsOnStartingDeck,
   getStacksWithLabware,
 } from '@opentrons/shared-data'
@@ -61,9 +62,7 @@ export function SetupLabwareList(
   const sortedStartingDeckEntries = Object.entries(stacksWithLaware)
     .sort((a, b) => a[0].localeCompare(b[0]))
     .filter(([key, value]) => key !== 'offDeck')
-  const offDeckItems = Object.keys(stacksWithLaware).includes('offDeck')
-    ? startingDeck.offDeck
-    : null
+  const offDeckItems = getOffDeckRenderInfo(stacksWithLaware)
 
   return (
     <>
@@ -111,6 +110,7 @@ export function SetupLabwareList(
             extraAttentionModules={extraAttentionModules}
             slotName={'offDeck'}
             stackedItems={[item]}
+            offDeckQuantity={item.quantity}
             isFlex={isFlex}
             onClick={() => {
               setSelectedStack({ slotName: 'offDeck', stack: [item] })
