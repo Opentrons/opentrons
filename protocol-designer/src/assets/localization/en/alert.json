@@ -165,7 +165,7 @@
       },
       "RETURN_TIP_UNAVAILABLE": {
         "title": "Return tip unavailable",
-        "body": "Unable to find the most pipette's most recent pickup location for return tip"
+        "body": "Unable to find the most pipette's most recent pickup location for return tip."
       }
     },
     "warning": {
