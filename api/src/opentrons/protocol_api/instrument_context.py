@@ -1836,6 +1836,7 @@ class InstrumentContext(publisher.CommandPublisher):
             ``False``, the last tip will be dropped or returned. If not set, behavior depends on the value of
             ``new_tip``. ``new_tip="never"`` keeps the tip, and all other values of ``new_tip`` drop or return the tip.
         :param tip_racks: If provided, use the tip racks given instead of the pipette's assigned tip racks.
+            .. versionadded:: 2.25
 
         """
         if volume == 0.0:
@@ -1976,6 +1977,7 @@ class InstrumentContext(publisher.CommandPublisher):
             ``False``, the last tip will be dropped or returned. If not set, behavior depends on the value of
             ``new_tip``. ``new_tip="never"`` keeps the tip, and all other values of ``new_tip`` drop or return the tip.
         :param tip_racks: If provided, use the tip racks given instead of the pipette's assigned tip racks.
+            .. versionadded:: 2.25
 
         """
         if volume == 0.0:
@@ -2125,6 +2127,7 @@ class InstrumentContext(publisher.CommandPublisher):
             ``False``, the last tip will be dropped or returned. If not set, behavior depends on the value of
             ``new_tip``. ``new_tip="never"`` keeps the tip, and all other values of ``new_tip`` drop or return the tip.
         :param tip_racks: If provided, use the tip racks given instead of the pipette's assigned tip racks.
+            .. versionadded:: 2.25
 
         """
         if volume == 0.0:
