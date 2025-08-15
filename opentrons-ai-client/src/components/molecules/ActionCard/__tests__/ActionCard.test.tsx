@@ -1,5 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/ai-client/__testing-utils__'
 
@@ -22,6 +22,9 @@ describe('ActionCard', () => {
       linkKey: 'landing_page_update_link',
       onClick: mockOnClick,
     }
+  })
+
+  afterEach(() => {
     vi.clearAllMocks()
   })
 
@@ -33,18 +36,13 @@ describe('ActionCard', () => {
       screen.getByText('landing_page_update_description')
     ).toBeInTheDocument()
     expect(screen.getByText('landing_page_update_link')).toBeInTheDocument()
+    expect(screen.getByTestId('ActionCard_Icon')).toBeInTheDocument()
   })
 
-  it('should render the navigation icon', () => {
+  it('should call onClick when the button is clicked', () => {
     render(props)
-    const icon = screen.getByTestId('ActionCard_Icon')
-    expect(icon).toBeInTheDocument()
-  })
-
-  it('should call onClick when the link is clicked', () => {
-    render(props)
-    const link = screen.getByRole('link')
-    fireEvent.click(link)
+    const button = screen.getByRole('button')
+    fireEvent.click(button)
     expect(mockOnClick).toHaveBeenCalledTimes(1)
   })
 
