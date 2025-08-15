@@ -53,46 +53,48 @@ export function Landing(): JSX.Element | null {
   }
 
   return (
-    <div className={styles.landing_container}>
-      <div className={styles.content_wrapper}>
-        <div className={styles.header_section}>
-          <img
-            src={welcomeImage}
-            className={styles.welcome_image}
-            alt={t('landing_page_image_alt')}
-          />
-          <StyledText desktopStyle="displayBold">
-            {t('landing_page_heading')}
-          </StyledText>
-          <StyledText desktopStyle="headingLargeRegular">
-            {!isMobile
-              ? t('landing_page_body_new')
-              : t('landing_page_body_mobile')}
-          </StyledText>
-        </div>
-
-        {!isMobile && (
-          <div className={styles.cards_container}>
-            <ActionCard
-              titleKey="landing_page_update_title"
-              descriptionKey="landing_page_update_description"
-              linkKey="landing_page_update_link"
-              onClick={handleUpdateProtocol}
+    <div className={styles.landing_wrapper}>
+      <div className={styles.landing_container}>
+        <div className={styles.content_wrapper}>
+          <div className={styles.header_section}>
+            <img
+              src={welcomeImage}
+              className={styles.welcome_image}
+              alt={t('landing_page_image_alt')}
             />
-            <ActionCard
-              titleKey="landing_page_create_title"
-              descriptionKey="landing_page_create_description"
-              linkKey="landing_page_create_link"
-              onClick={handleCreateNewProtocol}
-            />
-            <ActionCard
-              titleKey="landing_page_chat_title"
-              descriptionKey="landing_page_chat_description"
-              linkKey="landing_page_chat_link"
-              onClick={handleGoToChat}
-            />
+            <StyledText desktopStyle="displayBold">
+              {t('landing_page_heading')}
+            </StyledText>
+            <StyledText desktopStyle="headingLargeRegular">
+              {!isMobile
+                ? t('landing_page_body_new')
+                : t('landing_page_body_mobile')}
+            </StyledText>
           </div>
-        )}
+
+          {!isMobile && (
+            <div className={styles.cards_container}>
+              <ActionCard
+                titleKey="landing_page_update_title"
+                descriptionKey="landing_page_update_description"
+                linkKey="landing_page_update_link"
+                onClick={handleUpdateProtocol}
+              />
+              <ActionCard
+                titleKey="landing_page_create_title"
+                descriptionKey="landing_page_create_description"
+                linkKey="landing_page_create_link"
+                onClick={handleCreateNewProtocol}
+              />
+              <ActionCard
+                titleKey="landing_page_chat_title"
+                descriptionKey="landing_page_chat_description"
+                linkKey="landing_page_chat_link"
+                onClick={handleGoToChat}
+              />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
