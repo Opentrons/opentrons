@@ -185,6 +185,7 @@ class AbstractCommandImpl(
         tip_handler: execution.TipHandler,
         run_control: execution.RunControlHandler,
         rail_lights: execution.RailLightsHandler,
+        task_handler: execution.TaskHandler,
         model_utils: ModelUtils,
         status_bar: execution.StatusBarHandler,
         command_note_adder: CommandNoteAdder,
