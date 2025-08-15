@@ -3,21 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { useAtom } from 'jotai'
 
-import {
-  ALIGN_CENTER,
-  BORDERS,
-  COLORS,
-  DIRECTION_COLUMN,
-  DIRECTION_ROW,
-  Flex,
-  JUSTIFY_CENTER,
-  LargeButton,
-  Link as LinkButton,
-  POSITION_RELATIVE,
-  SPACING,
-  StyledText,
-  TEXT_ALIGN_CENTER,
-} from '@opentrons/components'
+import { COLORS, Icon, StyledText } from '@opentrons/components'
 
 import welcomeImage from '/ai-client/assets/images/welcome_dashboard.png'
 import {
@@ -26,6 +12,8 @@ import {
 } from '/ai-client/resources/atoms'
 import { useIsMobile } from '/ai-client/resources/hooks/useIsMobile'
 import { useTrackEvent } from '/ai-client/resources/hooks/useTrackEvent'
+
+import styles from './landing.module.css'
 
 export function Landing(): JSX.Element | null {
   const navigate = useNavigate()
@@ -64,72 +52,94 @@ export function Landing(): JSX.Element | null {
   }
 
   return (
-    <Flex
-      position={POSITION_RELATIVE}
-      margin={SPACING.spacing16}
-      marginBottom={0}
-      borderRadius={BORDERS.borderRadius16}
-      backgroundColor={COLORS.white}
-      justifyContent={JUSTIFY_CENTER}
-      flex="1"
-    >
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        alignItems={ALIGN_CENTER}
-        justifyContent={JUSTIFY_CENTER}
-        width="100%"
-        maxWidth="548px"
-        minHeight="600px"
-        gridGap={SPACING.spacing16}
-        textAlign={TEXT_ALIGN_CENTER}
-      >
-        <img
-          src={welcomeImage}
-          height="132px"
-          width="548px"
-          alt={t('landing_page_image_alt')}
-        />
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-          <StyledText desktopStyle="headingLargeBold">
+    <div className={styles.landing_container}>
+      <div className={styles.content_wrapper}>
+        <div className={styles.header_section}>
+          <img
+            src={welcomeImage}
+            className={styles.welcome_image}
+            alt={t('landing_page_image_alt')}
+          />
+          <StyledText desktopStyle="displayBold">
             {t('landing_page_heading')}
           </StyledText>
-          <StyledText desktopStyle="headingSmallRegular">
-            {!isMobile ? t('landing_page_body') : t('landing_page_body_mobile')}
+          <StyledText desktopStyle="headingLargeRegular">
+            {!isMobile
+              ? t('landing_page_body_new')
+              : t('landing_page_body_mobile')}
           </StyledText>
-        </Flex>
+        </div>
+
         {!isMobile && (
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            alignItems={ALIGN_CENTER}
-            gridGap={SPACING.spacing16}
-          >
-            <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
-              <LargeButton
-                buttonText="Get help with an existing protocol"
-                onClick={handleUpdateProtocol}
-                height="3.5rem"
-                css="border-radius: 8px !important; text-align: center !important; display: flex !important; align-items: center !important; justify-content: center !important; width: auto !important; padding: 0 2rem !important; white-space: nowrap !important;"
-              />
-              <LargeButton
-                buttonText="Create a new protocol"
-                onClick={handleCreateNewProtocol}
-                height="3.5rem"
-                css="border-radius: 8px !important; text-align: center !important; display: flex !important; align-items: center !important; justify-content: center !important; width: auto !important; padding: 0 2rem !important; white-space: nowrap !important;"
-              />
-            </Flex>
-            <LinkButton
-              role="button"
-              onClick={handleGoToChat}
-              color={COLORS.grey60}
-              textDecoration="underline"
-            >
-              <StyledText desktopStyle="bodyLargeSemiBold">
-                {t('go_directly_to_chat')}
-              </StyledText>
-            </LinkButton>
-          </Flex>
+          <div className={styles.cards_container}>
+            <div className={styles.action_card}>
+              <h3 className={styles.card_title}>
+                {t('landing_page_update_title')}
+              </h3>
+              <p className={styles.card_description}>
+                {t('landing_page_update_description')}
+              </p>
+              <a
+                href="#"
+                className={styles.card_link}
+                onClick={e => {
+                  e.preventDefault()
+                  handleUpdateProtocol()
+                }}
+              >
+                {t('landing_page_update_link')}
+                <span className={styles.card_link_icon}>
+                  <Icon name="nav-arrow" size="0.62rem" color={COLORS.blue50} />
+                </span>
+              </a>
+            </div>
+
+            <div className={styles.action_card}>
+              <h3 className={styles.card_title}>
+                {t('landing_page_create_title')}
+              </h3>
+              <p className={styles.card_description}>
+                {t('landing_page_create_description')}
+              </p>
+              <a
+                href="#"
+                className={styles.card_link}
+                onClick={e => {
+                  e.preventDefault()
+                  handleCreateNewProtocol()
+                }}
+              >
+                {t('landing_page_create_link')}
+                <span className={styles.card_link_icon}>
+                  <Icon name="nav-arrow" size="0.62rem" color={COLORS.blue50} />
+                </span>
+              </a>
+            </div>
+
+            <div className={styles.action_card}>
+              <h3 className={styles.card_title}>
+                {t('landing_page_chat_title')}
+              </h3>
+              <p className={styles.card_description}>
+                {t('landing_page_chat_description')}
+              </p>
+              <a
+                href="#"
+                className={styles.card_link}
+                onClick={e => {
+                  e.preventDefault()
+                  handleGoToChat()
+                }}
+              >
+                {t('landing_page_chat_link')}
+                <span className={styles.card_link_icon}>
+                  <Icon name="nav-arrow" size="0.62rem" color={COLORS.blue50} />
+                </span>
+              </a>
+            </div>
+          </div>
         )}
-      </Flex>
-    </Flex>
+      </div>
+    </div>
   )
 }

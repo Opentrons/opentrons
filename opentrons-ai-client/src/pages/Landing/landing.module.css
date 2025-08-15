@@ -1,0 +1,108 @@
+.landing_container {
+  position: relative;
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  border-radius: var(--border-radius-16, 16px);
+  margin: var(--spacing-16, 1rem);
+  margin-bottom: 0;
+  background-color: var(--color-white, #fff);
+}
+
+.content_wrapper {
+  display: flex;
+  width: 100%;
+  max-width: 900px;
+  min-height: 600px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-32, 2rem) var(--spacing-16, 1rem);
+  gap: var(--spacing-32, 2rem);
+  text-align: center;
+}
+
+.header_section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-8, 0.5rem);
+}
+
+.welcome_image {
+  max-width: 100%;
+  height: 8.25rem;
+  align-self: stretch;
+  object-fit: contain;
+}
+
+.cards_container {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: stretch;
+  justify-content: center;
+  gap: var(--spacing-24, 1.5rem);
+}
+
+.action_card {
+  display: flex;
+  min-width: 240px;
+  max-width: 280px;
+  height: 14.125rem;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 1.25rem;
+  border-radius: 1rem;
+  background: var(--Colors-Brand-blue-10, #f1f8ff);
+  gap: 0.625rem;
+  text-align: left;
+}
+
+.card_title {
+  align-self: stretch;
+  margin: 0;
+  color: var(--color-black-90, #16212d);
+  font-family: 'Public Sans', sans-serif;
+  font-size: 1.4375rem;
+  font-weight: 600;
+  line-height: 1.75rem;
+}
+
+.card_description {
+  flex: 1;
+  align-self: stretch;
+  margin: 0;
+  color: var(--Colors-Core-black-90, #162120);
+  font-family: 'Public Sans', sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5rem;
+}
+
+.card_link {
+  display: inline-flex;
+  align-items: center;
+  color: var(--Colors-Brand-blue-50, #006cfa);
+  font-family: 'Public Sans', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  gap: var(--spacing-4, 0.25rem);
+  line-height: 1.5rem;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.card_link:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+.card_link_icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+}

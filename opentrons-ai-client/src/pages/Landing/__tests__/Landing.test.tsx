@@ -49,22 +49,45 @@ describe('Landing', () => {
     expect(screen.getByText('Welcome to OpentronsAI')).toBeInTheDocument()
     expect(
       screen.getByText(
-        'Get started building a prompt that will generate a Python protocol that you can use on your Opentrons robot. OpentronsAI lets you create and optimize your protocol by responding in natural language.'
+        'Get started creating and optimizing protocols for your Opentrons robot.'
       )
     ).toBeInTheDocument()
   })
 
-  it('should render create and update protocol buttons with correct text', () => {
+  it('should render three action cards with titles, descriptions and links', () => {
     render()
-    expect(screen.getByText('Create a new protocol')).toBeInTheDocument()
+    // Update card
+    expect(screen.getByText('Update an existing protocol')).toBeInTheDocument()
     expect(
-      screen.getByText('Get help with an existing protocol')
+      screen.getByText(
+        "Upload your existing protocol and explain what you'd like to change."
+      )
     ).toBeInTheDocument()
+    expect(screen.getByText('Update a protocol')).toBeInTheDocument()
+
+    // Create card
+    expect(screen.getByText('Help with a new protocol')).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        'Go through our wizard to create a new protocol from scratch'
+      )
+    ).toBeInTheDocument()
+    expect(screen.getByText('Create a new protocol')).toBeInTheDocument()
+
+    // Chat card
+    expect(screen.getByText('Go to chat')).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        'Head directly to OpentronsAI chat to ask a question or paste an existing prompt.'
+      )
+    ).toBeInTheDocument()
+    expect(screen.getByText('Chat now')).toBeInTheDocument()
   })
 
-  it('should render the go directly to chat link', () => {
+  it('should render the chat card with title and link', () => {
     render()
-    expect(screen.getByText('Go directly to chat')).toBeInTheDocument()
+    expect(screen.getByText('Go to chat')).toBeInTheDocument()
+    expect(screen.getByText('Chat now')).toBeInTheDocument()
   })
 
   it('should render the mobile body text if the screen width is less than 768px', () => {
@@ -85,18 +108,16 @@ describe('Landing', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/new-protocol')
   })
 
-  it('should redirect to the update protocol page when the get help with existing protocol button is clicked', () => {
+  it('should redirect to the update protocol page when the update a protocol link is clicked', () => {
     render()
-    const updateProtocolButton = screen.getByText(
-      'Get help with an existing protocol'
-    )
-    fireEvent.click(updateProtocolButton)
+    const updateProtocolLink = screen.getByText('Update a protocol')
+    fireEvent.click(updateProtocolLink)
     expect(mockNavigate).toHaveBeenCalledWith('/update-protocol')
   })
 
-  it('should redirect to the chat page when the go directly to chat link is clicked', () => {
+  it('should redirect to the chat page when the chat now link is clicked', () => {
     render()
-    const chatLink = screen.getByText('Go directly to chat')
+    const chatLink = screen.getByText('Chat now')
     fireEvent.click(chatLink)
     expect(mockNavigate).toHaveBeenCalledWith('/chat')
   })
@@ -112,12 +133,10 @@ describe('Landing', () => {
     })
   })
 
-  it('should track update protocol event when get help with existing protocol button is clicked', () => {
+  it('should track update protocol event when update a protocol link is clicked', () => {
     render()
-    const updateProtocolButton = screen.getByText(
-      'Get help with an existing protocol'
-    )
-    fireEvent.click(updateProtocolButton)
+    const updateProtocolLink = screen.getByText('Update a protocol')
+    fireEvent.click(updateProtocolLink)
 
     expect(mockUseTrackEvent).toHaveBeenCalledWith({
       name: 'update-protocol',
@@ -125,9 +144,9 @@ describe('Landing', () => {
     })
   })
 
-  it('should track go-to-chat event when go directly to chat link is clicked', () => {
+  it('should track go-to-chat event when chat now link is clicked', () => {
     render()
-    const chatLink = screen.getByText('Go directly to chat')
+    const chatLink = screen.getByText('Chat now')
     fireEvent.click(chatLink)
 
     expect(mockUseTrackEvent).toHaveBeenCalledWith({
