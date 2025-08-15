@@ -1,7 +1,7 @@
 import { FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS } from '@opentrons/shared-data'
 
 import type { CutoutFixtureId } from '@opentrons/shared-data'
-import type { CutoutConfigAndCompatibility } from './hooks'
+import type { CutoutConfigAndCompatibility } from '@opentrons/shared-data'
 
 // filter down the list of current deck configuration cutouts to include
 // only those that must provide addressable areas for the protocol

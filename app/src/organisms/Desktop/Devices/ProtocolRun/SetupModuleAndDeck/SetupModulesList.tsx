@@ -72,7 +72,7 @@ import type {
 } from '@opentrons/shared-data'
 import type { ModulePrepCommandsType } from '/app/local-resources/modules'
 import type { AttachedModule } from '/app/redux/modules/types'
-import type { CutoutConfigAndCompatibility } from '/app/resources/deck_configuration/hooks'
+import type { CutoutConfigAndCompatibility } from '@opentrons/shared-data'
 import type {
   ModuleRenderInfoForProtocol,
   ProtocolCalibrationStatus,

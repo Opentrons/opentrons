@@ -39,8 +39,7 @@ import { NotConfiguredModal } from '/app/organisms/LocationConflictModal/NotConf
 import { getFixtureImage } from './utils'
 
 import type { TFunction } from 'i18next'
-import type { CutoutFixtureId, DeckDefinition } from '@opentrons/shared-data'
-import type { CutoutConfigAndCompatibility } from '/app/resources/deck_configuration/hooks'
+import type { CutoutFixtureId, DeckDefinition, CutoutConfigAndCompatibility } from '@opentrons/shared-data'
 
 interface SetupFixtureListProps {
   deckConfigCompatibility: CutoutConfigAndCompatibility[]

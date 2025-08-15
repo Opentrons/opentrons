@@ -38,8 +38,8 @@ import type {
   CutoutFixtureId,
   DeckDefinition,
   RobotType,
+  CutoutConfigAndCompatibility
 } from '@opentrons/shared-data'
-import type { CutoutConfigAndCompatibility } from '/app/resources/deck_configuration/hooks'
 
 interface FixtureTableProps {
   robotType: RobotType
