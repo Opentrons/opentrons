@@ -9,6 +9,7 @@ import {
   LABWARE_TOO_SMALL_ERROR,
   labwareTypeOptions,
   LOOSE_TIP_FIT_ERROR,
+  MAX_SUGGESTED_GRIPPER_Z,
   MAX_X_DIMENSION,
   MAX_Y_DIMENSION,
   MAX_Z_DIMENSION,
@@ -178,9 +179,12 @@ export const labwareFormSchemaBaseObject = Yup.object({
     MAX_Z_DIMENSION,
     IRREGULAR_LABWARE_ERROR
   ),
-  stackedLabwareZDimension: requiredPositiveNumber(
-    LABELS.labwareZDimension
-  ).max(MAX_Z_DIMENSION, IRREGULAR_LABWARE_ERROR),
+  stackedLabwareZDimension: Yup.number()
+    .label(LABELS.labwareZDimension)
+    .max(MAX_SUGGESTED_GRIPPER_Z, IRREGULAR_LABWARE_ERROR)
+    .positive('stackedLabwareZDimension must be positive')
+    .nullable()
+    .notRequired(),
 
   gridRows: requiredPositiveInteger(LABELS.gridRows),
   gridColumns: requiredPositiveInteger(LABELS.gridColumns),

@@ -71,6 +71,8 @@ export function StackingOffsets(): JSX.Element | null {
   const isCircular = values.wellShape === 'circular'
   const isReservoir = values.labwareType === 'reservoir'
   const isWellPlate = values.labwareType === 'wellPlate'
+  const stackableLabware =
+    values.labwareType === 'wellPlate' || values.labwareType === 'tipRack'
   const labwareHeight = values.labwareZDimension
   const has12Columns =
     values.gridColumns != null && parseInt(values.gridColumns) === 12
@@ -189,7 +191,9 @@ export function StackingOffsets(): JSX.Element | null {
                 make the required measurement with calipers.
               </p>
             </div>
-            <LegacyStyledText
+            {stackableLabware && (
+              <>
+                <LegacyStyledText
                   as="h3"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 >
@@ -208,6 +212,8 @@ export function StackingOffsets(): JSX.Element | null {
                   />
                   <StackingAlerts values={values} touched={touched} />
                 </div>
+              </>
+            )}
             {modifiedAdapterDefinitions.length === 0 ? null : (
               <Flex gridGap={SPACING.spacing4} flexDirection={DIRECTION_COLUMN}>
                 <LegacyStyledText
