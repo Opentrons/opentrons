@@ -61,7 +61,7 @@ def get_stackup_origin_to_labware_origin(
     context: LabwareOriginContext,
     stackup_lw_info_top_to_bottom: list[tuple[LabwareDefinition, LabwareLocation]],
     underlying_ancestor_definition: LabwareStackupAncestorDefinition,
-    module_parent_to_child_offset: Union[Point, None],
+    module_parent_to_child_offset: Point | None,
     deck_definition: DeckDefinitionV5,
 ) -> Point:
     """Returns the offset from the stackup placement origin to child labware origin.
@@ -99,7 +99,7 @@ def get_stackup_origin_to_labware_origin(
 def _get_stackup_origin_to_lw_origin(
     stackup_lw_info_top_to_bottom: list[tuple[LabwareDefinition, LabwareLocation]],
     underlying_ancestor_definition: LabwareStackupAncestorDefinition,
-    module_parent_to_child_offset: Union[Point, None],
+    module_parent_to_child_offset: Point | None,
     deck_definition: DeckDefinitionV5,
     is_topmost_labware: bool = True,
 ) -> Point:
@@ -151,7 +151,7 @@ def _get_parent_placement_origin_to_lw_origin_by_location(
     labware_definition: LabwareDefinition,
     parent_definition: _LabwareStackupDefinition,
     deck_definition: DeckDefinitionV5,
-    module_parent_to_child_offset: Union[Point, None],
+    module_parent_to_child_offset: Point | None,
     is_topmost_labware: bool,
 ) -> Point:
     if isinstance(labware_location, ModuleLocation):
@@ -229,7 +229,7 @@ def _get_parent_placement_origin_to_lw_origin(
 def _get_parent_placement_origin_to_lw_origin(
     child_labware: LabwareDefinition,
     parent_deck_item: _LabwareStackupDefinition,
-    module_parent_to_child_offset: Union[Point, None],
+    module_parent_to_child_offset: Point | None,
     deck_definition: DeckDefinitionV5,
     is_topmost_labware: bool,
     labware_location: LabwareLocation,
@@ -314,7 +314,7 @@ def _get_parent_placement_origin_to_lw_origin(
 def _get_parent_deck_item_origin_to_child_labware_placement_origin(
     child_labware: LabwareDefinition,
     parent_deck_item: _LabwareStackupDefinition,
-    module_parent_to_child_offset: Union[Point, None],
+    module_parent_to_child_offset: Point | None,
     deck_definition: DeckDefinitionV5,
     labware_location: LabwareLocation,
 ) -> Point:
@@ -371,7 +371,7 @@ def _get_parent_deck_item_origin_to_child_labware_placement_origin(
 
 
 def _module_parent_to_child_offset(
-    module_parent_to_child_offset: Union[Point, None],
+    module_parent_to_child_offset: Point | None,
     labware_location: LabwareLocation,
 ) -> Point:
     """Returns the module offset if applicable."""
