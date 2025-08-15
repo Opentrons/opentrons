@@ -1586,15 +1586,23 @@ export const getFlexStackerD3Compatibility = (
   const deckConfigCompatabilityD3 = deckConfigCompatibility?.find(
     configItem => configItem.cutoutId === 'cutoutD3'
   )
-
+  const matchWithAA = getMainFixtureIdForAA(deckConfigCompatabilityD3?.compatibleCutoutFixtureIds ?? [], deckConfigCompatabilityD3?.requiredAddressableAreas ?? [], 'cutoutD3')
+  console.log("matchWithAA: ", matchWithAA)
+  const matchWithFixture = matchWithAA ?? deckConfigCompatabilityD3?.compatibleCutoutFixtureIds[0]
   if (
     deckConfigCompatabilityD3 != null &&
-    (WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(
-      deckConfigCompatabilityD3?.compatibleCutoutFixtureIds[0]
-    ) ||
+    (
+      matchWithFixture !== undefined &&
       WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(
-        deckConfigCompatabilityD3?.cutoutFixtureId
-      ))
+        matchWithFixture as CutoutFixtureIdsWithFakes
+      )
+    ) ||
+    (
+      deckConfigCompatabilityD3?.cutoutFixtureId !== undefined &&
+      WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(
+        deckConfigCompatabilityD3.cutoutFixtureId as CutoutFixtureIdsWithFakes
+      )
+    )
   ) {
     // Convert CutoutFixtureIdsWithFakes to CutoutFixtureId by filtering out fake fixtures
     const comboFixtureId = deckConfigCompatabilityD3?.compatibleCutoutFixtureIds.find(
