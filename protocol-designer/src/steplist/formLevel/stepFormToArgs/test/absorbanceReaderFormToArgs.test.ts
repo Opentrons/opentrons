@@ -138,7 +138,6 @@ describe('absorbanceReaderFormToArgs', () => {
       fileName: 'output_path.csv',
       description: '',
       name: 'absorbance reader step',
-      stepNumber: 1,
     }
     expect(absorbanceReaderFormToArgs(formData)).toEqual(expected)
   })
