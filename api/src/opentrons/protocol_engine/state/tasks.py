@@ -49,14 +49,14 @@ class TaskView:
         except KeyError as e:
             raise NoTaskFoundError(f"No task with ID {id}") from e
 
-    def get_summary(self) -> dict[str, TaskSummary]:
+    def get_summary(self) -> list[TaskSummary]:
         """Get a summary of all tasks."""
-        return {
-            id: TaskSummary(
+        return [
+            TaskSummary(
                 id=id,
                 createdAt=task.createdAt,
                 finishedAt=task.finishedAt,
                 error=task.error,
             )
             for id, task in self._state.tasks_by_id.items()
-        }
+        ]

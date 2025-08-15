@@ -63,13 +63,13 @@ async def test_get_summary(subject: TaskStore) -> None:
     summary = view.get_summary()
 
     assert len(summary) == 2
-    assert summary[task_id_1].id == task_id_1
-    assert summary[task_id_1].createdAt == timestamp_1
-    assert summary[task_id_1].finishedAt is None
-    assert summary[task_id_1].error is None
+    assert summary[0].id == task_id_1
+    assert summary[0].createdAt == timestamp_1
+    assert summary[0].finishedAt is None
+    assert summary[0].error is None
 
-    assert summary[task_id_2].id == task_id_2
-    assert summary[task_id_2].createdAt == timestamp_2
-    assert summary[task_id_2].finishedAt is None
-    assert summary[task_id_2].error is None
+    assert summary[1].id == task_id_2
+    assert summary[1].createdAt == timestamp_2
+    assert summary[1].finishedAt is None
+    assert summary[1].error is None
     await asyncio.gather(asyncio_task_1, asyncio_task_2)

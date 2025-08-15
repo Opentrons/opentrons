@@ -414,7 +414,11 @@ class WellDoesNotExistError(ProtocolEngineError):
 
 
 class NoTaskFoundError(ProtocolEngineError):
-    """Raised when referencing a task that does not exist."""
+    """Raised when referencing a task that does not exist.
+
+    This error could be raised if a protocol references a task before it
+    has been created.
+    """
 
     def __init__(
         self,
