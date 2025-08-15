@@ -50,7 +50,7 @@ const FINAL_DECK_STATE = 'Ending deck'
 const PX_HEIGHT_TO_TOP_OF_CONTAINER = 32
 export const PX_SIDEBAR_MIN_WIDTH_FOR_ICON = 170
 
-export interface StepContainerProps {
+export interface ConnectedStepContainerProps {
   title: string
   iconName: IconName
   sidebarWidth: number
@@ -68,7 +68,9 @@ export interface StepContainerProps {
   dragHovered?: boolean
 }
 
-export function StepContainer(props: StepContainerProps): JSX.Element {
+export function ConnectedStepContainer(
+  props: ConnectedStepContainerProps
+): JSX.Element {
   const {
     stepId,
     iconName,
