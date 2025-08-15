@@ -24,6 +24,7 @@ export const pauseFormToArgs = (
   switch (formData.pauseAction) {
     case PAUSE_UNTIL_TEMP:
       return {
+        stepNumber: formData.stepNumber,
         commandCreatorFnName: 'waitForTemperature',
         name: formData.stepName,
         description: formData.stepDetails ?? '',
@@ -34,6 +35,7 @@ export const pauseFormToArgs = (
 
     case PAUSE_UNTIL_TIME:
       return {
+        stepNumber: formData.stepNumber,
         commandCreatorFnName: 'delay',
         name: formData.stepName,
         description: formData.stepDetails ?? '',
@@ -48,6 +50,7 @@ export const pauseFormToArgs = (
 
     case PAUSE_UNTIL_RESUME:
       return {
+        stepNumber: formData.stepNumber,
         commandCreatorFnName: 'delay',
         name: formData.stepName,
         description: formData.stepDetails ?? '',

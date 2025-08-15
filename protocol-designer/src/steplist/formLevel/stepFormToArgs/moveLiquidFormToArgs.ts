@@ -311,7 +311,7 @@ export const moveLiquidFormToArgs = (
       : 0
 
   const commonFields = {
-    stepId: stepNumber,
+    stepNumber,
     pipette: pipetteId,
     volume,
     sourceLabware: sourceLabware.id,

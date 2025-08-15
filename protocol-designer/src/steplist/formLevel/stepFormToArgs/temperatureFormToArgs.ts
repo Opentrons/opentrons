@@ -8,7 +8,7 @@ type TemperatureArgs = SetTemperatureArgs | DeactivateTemperatureArgs
 export const temperatureFormToArgs = (
   hydratedFormData: HydratedTemperatureFormData
 ): TemperatureArgs => {
-  const { moduleId, stepName, stepDetails } = hydratedFormData
+  const { moduleId, stepName, stepDetails, stepNumber } = hydratedFormData
   // cast values
   const setTemperature = hydratedFormData.setTemperature === 'true'
   // @ts-expect-error(sa, 2021-6-14): null check targetTemperature
@@ -20,6 +20,7 @@ export const temperatureFormToArgs = (
 
   if (setTemperature && !Number.isNaN(targetTemperature)) {
     return {
+      stepNumber,
       commandCreatorFnName: 'setTemperature',
       moduleId: moduleId ?? '',
       celsius: targetTemperature,
@@ -28,6 +29,7 @@ export const temperatureFormToArgs = (
     }
   } else {
     return {
+      stepNumber,
       commandCreatorFnName: 'deactivateTemperature',
       moduleId: moduleId ?? '',
       name: stepName,

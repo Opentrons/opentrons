@@ -21,6 +21,7 @@ export const absorbanceReaderFormToArgs = (
     wavelengths,
     stepDetails,
     stepName,
+    stepNumber,
   } = hydratedFormData
 
   const baseValues = { description: stepDetails, name: stepName }
@@ -33,6 +34,7 @@ export const absorbanceReaderFormToArgs = (
         (mode === 'single' ? [wavelengths[0]] : wavelengths) ?? // only take first wavelength in single mode
         []
       return {
+        stepNumber,
         moduleId,
         commandCreatorFnName: 'absorbanceReaderInitialize',
         measureMode: mode,
@@ -48,6 +50,7 @@ export const absorbanceReaderFormToArgs = (
       }
     case ABSORBANCE_READER_READ:
       return {
+        stepNumber,
         moduleId,
         commandCreatorFnName: 'absorbanceReaderRead',
         fileName: fileName ?? null,
@@ -55,6 +58,7 @@ export const absorbanceReaderFormToArgs = (
       }
     case ABSORBANCE_READER_LID:
       return {
+        stepNumber,
         moduleId,
         commandCreatorFnName: lidAction,
         ...baseValues,

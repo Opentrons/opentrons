@@ -93,7 +93,7 @@ beforeEach(() => {
     dispenseRetractZOffset: -5,
     dispenseRetractPositionReference: POSITION_REFERENCE_TOP,
     dispenseFlowRateUlSec: 12,
-    stepId: 1,
+    stepNumber: 1,
   }
 
   invariantContext = makeContext()
