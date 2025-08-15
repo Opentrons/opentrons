@@ -2,8 +2,8 @@
 
 Labware are the durable or consumable items that you work with, reuse, or discard while running a protocol on a Flex or OT-2. Items such as pipette tips, well plates, tubes, and reservoirs are all examples of labware. This section provides a brief overview of default labware, custom labware, and how to use basic labware API methods when creating a protocol for your robot.
 
-> [!note]
-> Code snippets use coordinate deck slot locations (e.g. "D1", "D2"), like those found on Flex. If you have an OT-2 and are using API version 2.14 or earlier, replace the coordinate with its numeric OT-2 equivalent. For example, slot D1 on Flex corresponds to slot 1 on an OT-2. See [Deck Slots](deck_slots.md) for more information.
+!!!note
+    Code snippets use coordinate deck slot locations (e.g. "D1", "D2"), like those found on Flex. If you have an OT-2 and are using API version 2.14 or earlier, replace the coordinate with its numeric OT-2 equivalent. For example, slot D1 on Flex corresponds to slot 1 on an OT-2. See [Deck Slots](deck_slots.md) for more information.
 
 ## Labware Types
 
@@ -31,14 +31,15 @@ Throughout this section, we'll use the labware listed in the following table.
 
 Similar to the code sample in [API Overview](index.md), here's how you use the [`ProtocolContext.load_labware`][opentrons.protocol_api.ProtocolContext.load_labware] method to load labware on either Flex or OT-2.
 
-### Example: Flex
+
 ```python
+# Flex
 tiprack = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "D1")
 plate = protocol.load_labware("opentrons_96_wellplate_200ul_pcr_full_skirt", "D2")
 ```
 
-### Example: OT-2
 ```python
+# OT-2
 tiprack = protocol.load_labware("opentrons_96_tiprack_300ul", "1")
 plate = protocol.load_labware("opentrons_96_wellplate_200ul_pcr_full_skirt", "2")
 ```
@@ -46,15 +47,15 @@ plate = protocol.load_labware("opentrons_96_wellplate_200ul_pcr_full_skirt", "2"
 
 When the `load_labware` method loads labware into your protocol, it returns a [`Labware`][opentrons.protocol_api.labware.Labware] object.
 
-> [!tip]
-> The `load_labware` method includes an optional `label` argument. You can use it to identify labware with a descriptive name. If used, the label value is displayed in the Opentrons App. For example:
-> ```python
-> tiprack = protocol.load_labware(
->     load_name="opentrons_flex_96_tiprack_200ul",
->     location="D1",
->     label="any-name-you-want"
-> )
-> ```
+!!! tip
+    The `load_labware` method includes an optional `label` argument. You can use it to identify labware with a descriptive name. If used, the label value is displayed in the Opentrons App. For example:
+    ```python
+    tiprack = protocol.load_labware(
+        load_name="opentrons_flex_96_tiprack_200ul",
+        location="D1",
+        label="any-name-you-want"
+    )
+    ```
 
 ## Loading Lids
 
@@ -120,15 +121,16 @@ hs_plate = hs_mod.load_labware(
 ```
 *New in version 2.15*
 
-> [!note]
-> The API also has some "combination" labware definitions, which treat the adapter and labware as a unit:
-> ```python
-> hs_combo = hs_mod.load_labware(
->     "opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat"
-> )
-> ```
-> *Deprecated in version 2.15*
-> Labware loaded with combination adapters no longer support all API features, such as moving the top labware or pipetting relative to liquid meniscus. These definitions are marked as "Retired" in version 8.5.0 of the Opentrons App and later. Avoid using combination definitions unless your protocol specifies an `apiLevel` of 2.14 or lower, in which case they are required.
+!!! note
+    The API also has some "combination" labware definitions, which treat the adapter and labware as a unit:
+    ```python
+    hs_combo = hs_mod.load_labware(
+        "opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat"
+    )
+    ```
+    *Deprecated in version 2.15*
+    
+    Labware loaded with combination adapters no longer support all API features, such as moving the top labware or pipetting relative to liquid meniscus. These definitions are marked as "Retired" in version 8.5.0 of the Opentrons App and later. Avoid using combination definitions unless your protocol specifies an `apiLevel` of 2.14 or lower, in which case they are required.
 
 ## Accessing Wells in Labware
 
@@ -178,8 +180,8 @@ In addition to referencing wells by name, you can also reference them with zero-
 plate.wells()[0]   # well A1
 plate.wells()[23]  # well D6
 ```
-> [!tip]
-> You may find coordinate well names like "B3" easier to reason with, especially when working with irregular labware, e.g. `opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical` ([Opentrons 10 Tube Rack](https://labware.opentrons.com/opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical) in the Labware Library). Whichever well access method you use, your protocol will be most maintainable if you use only one access method consistently.
+    [!tip]
+    You may find coordinate well names like "B3" easier to reason with, especially when working with irregular labware, e.g. `opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical` ([Opentrons 10 Tube Rack](https://labware.opentrons.com/opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical) in the Labware Library). Whichever well access method you use, your protocol will be most maintainable if you use only one access method consistently.
 *New in version 2.0*
 
 ### Accessing Groups of Wells
@@ -279,8 +281,8 @@ You can also use [`Labware.load_empty`][opentrons.protocol_api.labware.Labware.l
 
 This information is available after you import your protocol to the app or send it to Flex. A summary of liquids appears on the protocol detail page, and well-by-well detail is available on the run setup page (under Initial Liquid Setup in the app, or under Liquids on Flex).
 
-> [!note]
-> `load_liquid` does not validate volume for your labware nor does it prevent you from adding multiple liquids to each well. For example, you could label a 40 µL well with `greenWater`, `volume=50`, and then also add blue water to the well. The API won't stop you. It's your responsibility to ensure the labels you use accurately reflect the amounts and types of liquid you plan to place into wells and reservoirs.
+!!! note
+    `load_liquid` does not validate volume for your labware nor does it prevent you from adding multiple liquids to each well. For example, you could label a 40 µL well with `greenWater`, `volume=50`, and then also add blue water to the well. The API won't stop you. It's your responsibility to ensure the labels you use accurately reflect the amounts and types of liquid you plan to place into wells and reservoirs.
 
 ### Labeling vs Handling Liquids
 

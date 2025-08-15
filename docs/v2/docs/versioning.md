@@ -140,69 +140,72 @@ Opentrons recommends updating protocols from `apiLevel` 2.18 to 2.19 to take adv
 
 ### Version 2.16
 This version introduces new features for Flex and adds and improves methods for aspirating and dispensing. Note that when updating Flex protocols to version 2.16, you *must* load a trash container before dropping tips.
+
 - New features
-  - Use `configure_nozzle_layout` to pick up a single column of tips with the 96-channel pipette. See [Partial Tip Pickup](pipettes/partial_tip_pickup.md).
-  - Specify the trash containers attached to your Flex with `load_waste_chute` and `load_trash_bin`.
-  - Dispense, blow out, drop tips, and dispose labware in the waste chute. Disposing labware requires the gripper and calling `move_labware` with `use_gripper=True`.
-  - Perform actions in staging area slots by referencing slots A4 through D4. See [deck-slots](deck_slots.md).
-  - Explicitly command a pipette to `prepare_to_aspirate`. The API usually prepares pipettes to aspirate automatically, but this is useful for certain applications, like pre-wetting routines.
+    - Use `configure_nozzle_layout` to pick up a single column of tips with the 96-channel pipette. See [Partial Tip Pickup](pipettes/partial_tip_pickup.md).
+    - Specify the trash containers attached to your Flex with `load_waste_chute` and `load_trash_bin`.
+    - Dispense, blow out, drop tips, and dispose labware in the waste chute. Disposing labware requires the gripper and calling `move_labware` with `use_gripper=True`.
+    - Perform actions in staging area slots by referencing slots A4 through D4. See [deck-slots](deck_slots.md).
+    - Explicitly command a pipette to `prepare_to_aspirate`. The API usually prepares pipettes to aspirate automatically, but this is useful for certain applications, like pre-wetting routines.
 - Improved features
-  - `aspirate`, `dispense`, and `mix` will not move any liquid when called with `volume=0`.
+    - `aspirate`, `dispense`, and `mix` will not move any liquid when called with `volume=0`.
 - Other changes
-  - `ProtocolContext.fixed_trash` and `InstrumentContext.trash_container` now return `TrashBin` objects instead of `Labware` objects.
-  - Flex will no longer automatically drop tips in the trash at the end of a protocol. You can add a `drop_tip()` command to your protocol or use the Opentrons App to drop the tips.
+    - `ProtocolContext.fixed_trash` and `InstrumentContext.trash_container` now return `TrashBin` objects instead of `Labware` objects.
+    - Flex will no longer automatically drop tips in the trash at the end of a protocol. You can add a `drop_tip()` command to your protocol or use the Opentrons App to drop the tips.
 
 ### Version 2.15
 This version introduces support for the Opentrons Flex robot, instruments, modules, and labware.
+
 - Flex features
-  - Write protocols for Opentrons Flex by declaring `"robotType": "Flex"` in the new `requirements` dictionary. See the [examples in the Tutorial](tutorial.md#requirements).
-  - `load_instrument` supports loading Flex 1-, 8-, and 96-channel pipettes. See [new-create-pipette](new_pipette.md).
-  - The new `move_labware` method can move labware automatically using the Flex Gripper. You can also move labware manually on Flex.
-  - `load_module` supports loading the [Magnetic Block](magnetic_block.md).
-  - The API does not enforce placement restrictions for the Heater-Shaker module on Flex, because it is installed below-deck in a module caddy. Pipetting restrictions are still in place when the Heater-Shaker is shaking or its labware latch is open.
-  - The new `configure_for_volume` method can place Flex 50 µL pipettes in a low-volume mode for dispensing very small volumes of liquid. See [pipette-volume-modes](pipettes/volume_modes.md).
+    - Write protocols for Opentrons Flex by declaring `"robotType": "Flex"` in the new `requirements` dictionary. See the [examples in the Tutorial](tutorial.md#requirements).
+    - `load_instrument` supports loading Flex 1-, 8-, and 96-channel pipettes. See [new-create-pipette](new_pipette.md).
+    - The new `move_labware` method can move labware automatically using the Flex Gripper. You can also move labware manually on Flex.
+    - `load_module` supports loading the [Magnetic Block](magnetic_block.md).
+    - The API does not enforce placement restrictions for the Heater-Shaker module on Flex, because it is installed below-deck in a module caddy. Pipetting restrictions are still in place when the Heater-Shaker is shaking or its labware latch is open.
+    - The new `configure_for_volume` method can place Flex 50 µL pipettes in a low-volume mode for dispensing very small volumes of liquid. See [pipette-volume-modes](pipettes/volume_modes.md).
 - Flex and OT-2 features
-  - Optionally specify `apiLevel` in the new `requirements` dictionary (otherwise, specify it in `metadata`).
-  - Optionally specify `"robotType": "OT-2"` in `requirements`.
-  - Use coordinates or numbers to specify [deck slots](deck_slots.md). These formats match physical labels on Flex and OT-2, but you can use either system, regardless of `robotType`.
-  - The new module context `load_adapter()` methods let you load adapters and labware separately on modules, and `ProtocolContext.load_adapter` lets you load adapters directly in deck slots. See [labware-on-adapters](labware_on_adapters.md).
-  - Move labware manually using `move_labware`, without having to stop your protocol.
-  - Manual labware moves support moving to or from the new `OFF_DECK` location (outside of the robot).
-  - `ProtocolContext.load_labware` also accepts `OFF_DECK` as a location. This lets you prepare labware to be moved onto the deck later in a protocol.
-  - The new `push_out` parameter of the `dispense` method helps ensure that the pipette dispenses all of its liquid when working with very small volumes.
-  - By default, repeated calls to `drop_tip` cycle through multiple locations above the trash bin to prevent tips from stacking up.
+    - Optionally specify `apiLevel` in the new `requirements` dictionary (otherwise, specify it in `metadata`).
+    - Optionally specify `"robotType": "OT-2"` in `requirements`.
+    - Use coordinates or numbers to specify [deck slots](deck_slots.md). These formats match physical labels on Flex and OT-2, but you can use either system, regardless of `robotType`.
+    - The new module context `load_adapter()` methods let you load adapters and labware separately on modules, and `ProtocolContext.load_adapter` lets you load adapters directly in deck slots. See [labware-on-adapters](labware_on_adapters.md).
+    - Move labware manually using `move_labware`, without having to stop your protocol.
+    - Manual labware moves support moving to or from the new `OFF_DECK` location (outside of the robot).
+    - `ProtocolContext.load_labware` also accepts `OFF_DECK` as a location. This lets you prepare labware to be moved onto the deck later in a protocol.
+    - The new `push_out` parameter of the `dispense` method helps ensure that the pipette dispenses all of its liquid when working with very small volumes.
+    - By default, repeated calls to `drop_tip` cycle through multiple locations above the trash bin to prevent tips from stacking up.
 - Bug fixes
-  - `InstrumentContext.starting_tip` is now respected on the second and subsequent calls to `InstrumentContext.pick_up_tip` with no argument.
+    - `InstrumentContext.starting_tip` is now respected on the second and subsequent calls to `InstrumentContext.pick_up_tip` with no argument.
 
 ### Version 2.14
 This version introduces a new protocol runtime that offers more reliable run control and builds a strong foundation for future Protocol API improvements.
 Several older parts of the Protocol API were deprecated as part of this switchover. If you specify an API version of `2.13` or lower, your protocols will continue to execute on the old runtime.
+
 - Feature additions
-  - `ProtocolContext.define_liquid` and `Well.load_liquid` added to define different liquid types and add them to wells, respectively.
-- Bug fixes
-  - `Labware` and `Well` now adhere to the protocol's API level setting. Prior to this version, they incorrectly ignored the setting.
-  - `InstrumentContext.touch_tip` will end with the pipette tip in the center of the well instead of on the edge closest to the front of the machine.
-  - `ProtocolContext.load_labware` now prefers loading user-provided labware definitions rather than built-in definitions if no explicit `namespace` is specified.
-  - `ProtocolContext.pause` will now properly wait until you resume the protocol before moving on. In previous versions, the run will not pause until the first call to a different `ProtocolContext` method.
-  - Motion planning has been improved to avoid certain erroneous downward movements, especially when using `InstrumentContext.aspirate`.
-  - `Labware.reset` and `Labware.tip_length` will raise useful errors if called on labware that is not a tip rack.
+    - `ProtocolContext.define_liquid` and `Well.load_liquid` added to define different liquid types and add them to wells, respectively.
+  - Bug fixes
+    - `Labware` and `Well` now adhere to the protocol's API level setting. Prior to this version, they incorrectly ignored the setting.
+    - `InstrumentContext.touch_tip` will end with the pipette tip in the center of the well instead of on the edge closest to the front of the machine.
+    - `ProtocolContext.load_labware` now prefers loading user-provided labware definitions rather than built-in definitions if no explicit `namespace` is specified.
+    - `ProtocolContext.pause` will now properly wait until you resume the protocol before moving on. In previous versions, the run will not pause until the first call to a different `ProtocolContext` method.
+    - Motion planning has been improved to avoid certain erroneous downward movements, especially when using `InstrumentContext.aspirate`.
+    - `Labware.reset` and `Labware.tip_length` will raise useful errors if called on labware that is not a tip rack.
 - Removals
-  - The `presses` and `increment` arguments of  `InstrumentContext.pick_up_tip` were deprecated. Configure your pipette pick-up settings with the Opentrons App, instead.
-  - `InstrumentContext.speed` property was removed. This property tried to allow setting a pipette's **plunger** speed in mm/s. However, it could only approximately set the plunger speed, because the plunger's speed is a stepwise function of the volume. Use `InstrumentContext.flow_rate` to set the flow rate in µL/s, instead.
-  - `load_labware_object()` was removed from module contexts as an unnecessary internal method.
-  - `geometry` was removed from module contexts in favor of `model` and `type` attributes.
-  - `Well.geometry` was removed as unnecessary.
-  - `MagneticModuleContext.calibrate` was removed since it was never needed nor implemented.
-  - The `height` parameter of `MagneticModuleContext.engage` was removed. Use `offset` or `height_from_base` instead.
-  - `Labware.separate_calibration` and `Labware.set_calibration` were removed, since they were holdovers from a calibration system that no longer exists.
-  - Various methods and setters were removed that could modify tip state outside of calls to `InstrumentContext.pick_up_tip` and `InstrumentContext.drop_tip`. This change allows the robot to track tip usage more completely and reliably. You may still use `Labware.reset` and `InstrumentContext.reset_tipracks` to reset your tip racks' state.
-    - The `Well.has_tip` **setter** was removed. **The getter is still supported.**
-    - Internal methods `Labware.use_tips`, `Labware.previous_tip`, and `Labware.return_tips` were removed.
-  - The `configuration` argument of `ProtocolContext.load_module` was removed because it made unsafe modifications to the protocol's geometry system, and the Thermocycler's "semi" configuration is not officially supported.
+    - The `presses` and `increment` arguments of  `InstrumentContext.pick_up_tip` were deprecated. Configure your pipette pick-up settings with the Opentrons App, instead.
+    - `InstrumentContext.speed` property was removed. This property tried to allow setting a pipette's **plunger** speed in mm/s. However, it could only approximately set the plunger speed, because the plunger's speed is a stepwise function of the volume. Use `InstrumentContext.flow_rate` to set the flow rate in µL/s, instead.
+    - `load_labware_object()` was removed from module contexts as an unnecessary internal method.
+    - `geometry` was removed from module contexts in favor of `model` and `type` attributes.
+    - `Well.geometry` was removed as unnecessary.
+    - `MagneticModuleContext.calibrate` was removed since it was never needed nor implemented.
+    - The `height` parameter of `MagneticModuleContext.engage` was removed. Use `offset` or `height_from_base` instead.
+    - `Labware.separate_calibration` and `Labware.set_calibration` were removed, since they were holdovers from a calibration system that no longer exists.
+    - Various methods and setters were removed that could modify tip state outside of calls to `InstrumentContext.pick_up_tip` and `InstrumentContext.drop_tip`. This change allows the robot to track tip usage more completely and reliably. You may still use `Labware.reset` and `InstrumentContext.reset_tipracks` to reset your tip racks' state.
+        - The `Well.has_tip` **setter** was removed. **The getter is still supported.**
+        - Internal methods `Labware.use_tips`, `Labware.previous_tip`, and `Labware.return_tips` were removed.
+    - The `configuration` argument of `ProtocolContext.load_module` was removed because it made unsafe modifications to the protocol's geometry system, and the Thermocycler's "semi" configuration is not officially supported.
 - Known limitations
-  - `Labware.set_offset` is not yet supported on this API version. Run protocols via the Opentrons App, instead.
-  - `ProtocolContext.max_speeds` is not yet supported on the API version. Use `InstrumentContext.default_speed` or the per-method `speed` argument, instead.
-  - `InstrumentContext.starting_tip` is not respected on the second and subsequent calls to `InstrumentContext.pick_up_tip` with no argument.
+    - `Labware.set_offset` is not yet supported on this API version. Run protocols via the Opentrons App, instead.
+    - `ProtocolContext.max_speeds` is not yet supported on the API version. Use `InstrumentContext.default_speed` or the per-method `speed` argument, instead.
+    - `InstrumentContext.starting_tip` is not respected on the second and subsequent calls to `InstrumentContext.pick_up_tip` with no argument.
 
 ### Version 2.13
 - Adds `HeaterShakerContext` to support the Heater-Shaker Module. You can use the load name `heaterShakerModuleV1` with `ProtocolContext.load_module` to add a Heater-Shaker to a protocol.
