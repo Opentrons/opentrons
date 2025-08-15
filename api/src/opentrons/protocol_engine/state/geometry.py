@@ -93,6 +93,7 @@ from ..types import (
     WellLocationFunction,
     LabwareStackupAncestorDefinition,
     AddressableArea,
+    GripperMoveType,
 )
 from ..types.liquid_level_detection import SimulatedProbeResult, LiquidTrackingType
 from .config import Config
@@ -108,7 +109,10 @@ from .inner_well_math_utils import (
     find_volume_user_defined_volumes,
 )
 from ._well_math import wells_covered_by_pipette_configuration, nozzles_per_well
-from ._labware_origin_math import get_stackup_placement_origin_to_lw_origin
+from ._labware_origin_math import (
+    get_stackup_origin_to_labware_origin,
+    LabwareOriginContext,
+)
 
 _LOG = getLogger(__name__)
 SLOT_WIDTH = 128
@@ -122,13 +126,6 @@ class _TipDropSection(enum.Enum):
 
     LEFT = "left"
     RIGHT = "right"
-
-
-class _GripperMoveType(enum.Enum):
-    """Types of gripper movement."""
-
-    PICK_UP_LABWARE = enum.auto()
-    DROP_LABWARE = enum.auto()
 
 
 @dataclass
@@ -393,7 +390,8 @@ class GeometryView:
             location
         )
 
-        stackup_origin_to_lw_origin = get_stackup_placement_origin_to_lw_origin(
+        stackup_origin_to_lw_origin = get_stackup_origin_to_labware_origin(
+            context=LabwareOriginContext.PIPETTING,
             stackup_lw_info_top_to_bottom=stackup_lw_defs_locs,
             underlying_ancestor_definition=underlying_ancestor_def,
             module_parent_to_child_offset=module_parent_to_child_offset,
@@ -999,6 +997,7 @@ class GeometryView:
         location: Union[
             DeckSlotLocation, ModuleLocation, OnLabwareLocation, AddressableAreaLocation
         ],
+        move_type: GripperMoveType,
     ) -> Point:
         """Get the grip point of the labware as placed on the given location.
 
@@ -1024,8 +1023,13 @@ class GeometryView:
         underlying_ancestor_def = self._get_stackup_underlying_ancestor_definition(
             location
         )
-
-        parent_to_lw_offset = get_stackup_placement_origin_to_lw_origin(
+        context_type = (
+            LabwareOriginContext.GRIPPER_PICKING_UP
+            if move_type == GripperMoveType.PICK_UP_LABWARE
+            else LabwareOriginContext.GRIPPER_DROPPING
+        )
+        parent_to_lw_offset = get_stackup_origin_to_labware_origin(
+            context=context_type,
             module_parent_to_child_offset=module_parent_to_child_offset,
             underlying_ancestor_definition=underlying_ancestor_def,
             stackup_lw_info_top_to_bottom=stackup_defs_locs,
@@ -1355,7 +1359,7 @@ class GeometryView:
         pick_up_offset = (
             self.get_total_nominal_gripper_offset_for_move_type(
                 location=from_location,
-                move_type=_GripperMoveType.PICK_UP_LABWARE,
+                move_type=GripperMoveType.PICK_UP_LABWARE,
                 current_labware=current_labware,
             )
             + additional_pick_up_offset
@@ -1363,7 +1367,7 @@ class GeometryView:
         drop_offset = (
             self.get_total_nominal_gripper_offset_for_move_type(
                 location=to_location,
-                move_type=_GripperMoveType.DROP_LABWARE,
+                move_type=GripperMoveType.DROP_LABWARE,
                 current_labware=current_labware,
             )
             + additional_drop_offset
@@ -1402,11 +1406,11 @@ class GeometryView:
     def get_total_nominal_gripper_offset_for_move_type(
         self,
         location: OnDeckLabwareLocation,
-        move_type: _GripperMoveType,
+        move_type: GripperMoveType,
         current_labware: LabwareDefinition,
     ) -> Point:
         """Get the total of the offsets to be used to pick up labware in its current location."""
-        if move_type == _GripperMoveType.PICK_UP_LABWARE:
+        if move_type == GripperMoveType.PICK_UP_LABWARE:
             if isinstance(
                 location, (ModuleLocation, DeckSlotLocation, AddressableAreaLocation)
             ):
