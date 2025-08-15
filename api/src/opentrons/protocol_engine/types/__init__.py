@@ -100,7 +100,7 @@ from .labware import (
     LegacyLabwareOffsetCreate,
     LabwareOffsetCreateInternal,
     LoadedLabware,
-    LabwareParentDefinition,
+    LabwareStackupAncestorDefinition,
     LabwareWellId,
     GripSpecs,
 )
@@ -256,7 +256,7 @@ __all__ = [
     "LabwareOffsetCreateInternal",
     "LoadedLabware",
     "LabwareOffsetVector",
-    "LabwareParentDefinition",
+    "LabwareStackupAncestorDefinition",
     "LabwareWellId",
     "GripSpecs",
     # Liquids
