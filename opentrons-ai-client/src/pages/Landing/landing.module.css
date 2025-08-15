@@ -32,6 +32,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: var(--spacing-20, 1.25rem);
+}
+
+.text_section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: var(--spacing-24, 1.5rem);
 }
 

@@ -62,14 +62,16 @@ export function Landing(): JSX.Element | null {
               className={styles.welcome_image}
               alt={t('landing_page_image_alt')}
             />
-            <StyledText desktopStyle="displayBold">
-              {t('landing_page_heading')}
-            </StyledText>
-            <StyledText desktopStyle="headingLargeRegular">
-              {!isMobile
-                ? t('landing_page_body_new')
-                : t('landing_page_body_mobile')}
-            </StyledText>
+            <div className={styles.text_section}>
+              <StyledText desktopStyle="displayBold">
+                {t('landing_page_heading')}
+              </StyledText>
+              <StyledText desktopStyle="headingLargeRegular">
+                {!isMobile
+                  ? t('landing_page_body_new')
+                  : t('landing_page_body_mobile')}
+              </StyledText>
+            </div>
           </div>
 
           {!isMobile && (
