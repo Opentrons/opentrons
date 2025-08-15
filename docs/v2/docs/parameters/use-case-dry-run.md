@@ -96,8 +96,8 @@ Then call that function throughout your protocol:
 pipette.pick_up_tip()
 return_or_drop(pipette)
 ```
-> **Note:**
-> It's generally better to define a standalone function, rather than adding a method to the `InstrumentContext` class. This makes your custom, parameterized commands stand out from API methods in your code.
+!!! note
+    It's generally better to define a standalone function, rather than adding a method to the `InstrumentContext` class. This makes your custom, parameterized commands stand out from API methods in your code.
 
 Additionally, if your protocol uses enough tips that you have to replenish tip racks, you'll need separate behavior for dry runs and live runs. In a live run, once you've used all the tips, the rack is empty, because the tips are in the trash. In a dry run, once you've used all the tips in a rack, the rack is *full*, because you returned the tips.
 

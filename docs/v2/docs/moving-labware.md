@@ -46,8 +46,8 @@ def run(protocol: protocol_api.ProtocolContext):
 
 *New in version 2.15*
 
-> [!note]
-> Don't add a `pause()` command before `move_labware()`. When `use_gripper` is unset or `False`, the protocol pauses when it reaches the movement step. The Opentrons App or the touchscreen on Flex shows an animation of the labware movement that you need to perform manually. The protocol only resumes when you press **Confirm and resume**.
+!!! note
+    Don't add a `pause()` command before `move_labware()`. When `use_gripper` is unset or `False`, the protocol pauses when it reaches the movement step. The Opentrons App or the touchscreen on Flex shows an animation of the labware movement that you need to perform manually. The protocol only resumes when you press **Confirm and resume**.
 
 The above example is a complete and valid `run()` function. You don't have to load the gripper as an instrument, and there is no `InstrumentContext` for the gripper. All you have to do to specify that a protocol requires the gripper is to include at least one `move_labware()` command with `use_gripper=True`.
 
@@ -66,8 +66,8 @@ You can manually move any standard or custom labware. Using the gripper to move 
 
 You can move compatible Opentrons lids manually or with the Flex Gripper, but some restrictions apply. For more information, see [Moving Lids](#moving-lids).
 
-> [!note]
-> The labware definitions listed above include information about the position and force that the gripper uses to pick up the labware. The gripper uses default values for labware definitions that don't include position and force information. The Python Protocol API won't raise a warning or error if you try to grip and move other types of labware.
+!!! note
+    The labware definitions listed above include information about the position and force that the gripper uses to pick up the labware. The gripper uses default values for labware definitions that don't include position and force information. The Python Protocol API won't raise a warning or error if you try to grip and move other types of labware.
 
 ## Movement with Modules
 
@@ -89,6 +89,7 @@ def run(protocol: protocol_api.ProtocolContext):
 *New in version 2.15*
 
 Also note the `hs_mod.open_labware_latch()` command in the above example. To move labware onto or off of a module, you have to make sure that it's physically accessible:
+
 - For the Heater-Shaker, use [open_labware_latch()][opentrons.protocol_api.HeaterShakerContext.open_labware_latch].
 - For the Thermocycler, use [open_lid()][opentrons.protocol_api.ThermocyclerContext.open_lid].
 

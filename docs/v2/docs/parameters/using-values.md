@@ -64,8 +64,8 @@ parsed_csv[1][2]                # second row, third column
 >     ]
 > ```
 
-> **Note:**
-> Like all Python lists, the lists representing your CSVs are zero-indexed.
+!!! note
+    Like all Python lists, the lists representing your CSVs are zero-indexed.
 
 > **New in API 2.20:**
 > The `CSVParameter.parse_as_csv()` method was added in API version 2.20.

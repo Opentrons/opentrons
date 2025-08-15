@@ -8,15 +8,15 @@ nav:
   - Labware: labware.md
   - Moving Labware: moving-labware.md
   - Modules:
-      - Overview: modules.md
+      - Overview: modules/index.md
+      - Module Setup: modules/setup.md
       - Absorbance Plate Reader: modules/absorbance-plate-reader.md
       - Heater-Shaker: modules/heater-shaker.md
       - Magnetic Block: modules/magnetic-block.md
       - Magnetic Module: modules/magnetic-module.md
-      - Multiple Same Type: modules/multiple-same-type.md
-      - Setup: modules/setup.md
       - Temperature Module: modules/temperature-module.md
       - Thermocycler: modules/thermocycler.md
+      - Multiple Modules of the Same Type: modules/multiple-same-type.md
   - Deck Slots: deck-slots.md
   - Pipettes:
       - Overview: pipette.md
@@ -57,3 +57,41 @@ nav:
       - Types: api-reference/types.md
       - Wells & Liquids: api-reference/wells-liquids.md
       - Execute & Simulate: api-reference/execute-simulate.md
+
+theme:
+  name: material
+  palette:
+    primary: custom
+    accent: custom
+  features:
+    - navigation.indexes
+  logo: images/opentrons-droplet-white.svg
+  favicon: images/opentrons-droplet-color.svg
+  icon:
+    admonition:
+      tip: material/lightbulb-on-outline
+
+plugins:
+  - search
+  - autorefs
+  - parent-css
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.inlinehilite
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: true
+      pygments_lang_class: true
+  - pymdownx.superfences
+  - sane_lists
+  - toc:
+      permalink: true
+
+extra_css:
+  - ../opentrons-theme.css

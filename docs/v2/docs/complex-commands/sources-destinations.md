@@ -117,7 +117,8 @@ This consolidate aspirates three times and dispenses one time.
 
 In addition, all liquid class commands automatically include changes like flow rate, adding an air gap, or delaying based on the liquid class definition. For more information, see [liquid classes](../liquid_classes/liquid-class-definitions.md).
 
-> **Note:** By default, all complex commands begin by picking up a tip and conclude by dropping a tip. In general, don't call `pick_up_tip` just before a complex command, or the API will raise an error. You can override this behavior with the [tip handling complex parameter](parameters.md#tip-handling), by setting `new_tip="never"`. For liquid class commands, you can also override whether the pipette drops the last tip used in the command by setting `keep_last_tip` to `True` or `False`.
+!!! note
+    By default, all complex commands begin by picking up a tip and conclude by dropping a tip. In general, don't call `pick_up_tip` just before a complex command, or the API will raise an error. You can override this behavior with the [tip handling complex parameter](parameters.md#tip-handling), by setting `new_tip="never"`. For liquid class commands, you can also override whether the pipette drops the last tip used in the command by setting `keep_last_tip` to `True` or `False`.
 
 ## Many-to-Many
 

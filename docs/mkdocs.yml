@@ -19,6 +19,26 @@ plugins:
   - monorepo
   - search
   - autorefs
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          options:
+            docstring_style: sphinx
+            show_source: false
+            show_bases: false
+            merge_init_into_class: false
+            separate_signature: true
+            annotations_path: brief
+            line_length: 80
+            group_by_category: false
+            filters: 
+              - "public"
+              - "!^__"
+            show_root_heading: true
+            show_symbol_type_toc: true
+            heading_level: 2
+            autolink: true
 
 theme:
   name: material
