@@ -280,9 +280,6 @@ def test_maps_different_module_models(
     decoy: Decoy, mock_state_view: StateView, module_model: ModuleModel
 ) -> None:
     """It should correctly map all possible kinds of hardware module."""
-    # TODO: skipping flex stacker check for now to enable evt
-    if module_model is ModuleModel.FLEX_STACKER_MODULE_V1:
-        pytest.skip("Flex stacker check not implemented yet")
 
     def get_expected_mapping_result() -> wrapped_deck_conflict.DeckItem:
         expected_name_for_errors = module_model.value
@@ -304,6 +301,11 @@ def test_maps_different_module_models(
                 name_for_errors=expected_name_for_errors,
                 highest_z_including_labware=3.14159,
                 is_semi_configuration=False,
+            )
+        elif module_model is ModuleModel.FLEX_STACKER_MODULE_V1:
+            return wrapped_deck_conflict.OtherModule(
+                name_for_errors=expected_name_for_errors,
+                highest_z_including_labware=3.14159,
             )
         else:
             return wrapped_deck_conflict.OtherModule(
