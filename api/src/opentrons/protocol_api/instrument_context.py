@@ -1835,8 +1835,12 @@ class InstrumentContext(publisher.CommandPublisher):
         :param keep_last_tip: When ``True``, the pipette keeps the last tip used in the transfer attached. When
             ``False``, the last tip will be dropped or returned. If not set, behavior depends on the value of
             ``new_tip``. ``new_tip="never"`` keeps the tip, and all other values of ``new_tip`` drop or return the tip.
-        :param tip_racks: If provided, use the tip racks given instead of the pipette's assigned tip racks.
-            .. versionadded:: 2.25
+        :param tip_racks: A list of tip racks to pick up from for this command. If not provided, the pipette will pick
+            up from its associated :py:obj:`.InstrumentContext.tip_racks`. Providing this argument does not change the
+            value of ``InstrumentContext.tip_racks``.
+
+            .. versionchanged:: 2.25
+                Added the ``tip_racks`` parameter.
 
         """
         if volume == 0.0:
@@ -1976,8 +1980,12 @@ class InstrumentContext(publisher.CommandPublisher):
         :param keep_last_tip: When ``True``, the pipette keeps the last tip used in the distribute attached. When
             ``False``, the last tip will be dropped or returned. If not set, behavior depends on the value of
             ``new_tip``. ``new_tip="never"`` keeps the tip, and all other values of ``new_tip`` drop or return the tip.
-        :param tip_racks: If provided, use the tip racks given instead of the pipette's assigned tip racks.
-            .. versionadded:: 2.25
+        :param tip_racks: A list of tip racks to pick up from for this command. If not provided, the pipette will pick
+            up from its associated :py:obj:`.InstrumentContext.tip_racks`. Providing this argument does not change the
+            value of ``InstrumentContext.tip_racks``.
+
+            .. versionchanged:: 2.25
+                Added the ``tip_racks`` parameter.
 
         """
         if volume == 0.0:
@@ -2126,8 +2134,12 @@ class InstrumentContext(publisher.CommandPublisher):
         :param keep_last_tip: When ``True``, the pipette keeps the last tip used in the consolidate attached. When
             ``False``, the last tip will be dropped or returned. If not set, behavior depends on the value of
             ``new_tip``. ``new_tip="never"`` keeps the tip, and all other values of ``new_tip`` drop or return the tip.
-        :param tip_racks: If provided, use the tip racks given instead of the pipette's assigned tip racks.
-            .. versionadded:: 2.25
+        :param tip_racks: A list of tip racks to pick up from for this command. If not provided, the pipette will pick
+            up from its associated :py:obj:`.InstrumentContext.tip_racks`. Providing this argument does not change the
+            value of ``InstrumentContext.tip_racks``.
+
+            .. versionchanged:: 2.25
+                Added the ``tip_racks`` parameter.
 
         """
         if volume == 0.0:
