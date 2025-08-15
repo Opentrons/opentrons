@@ -1,6 +1,6 @@
 """inner-well-geometry-creator Protocol."""
 
-from typing import List, Tuple, Optional, Union, Dict
+from typing import List, Tuple, Optional, Union, Any
 from opentrons.protocol_api import (
     ProtocolContext,
     ParameterContext,
@@ -11,11 +11,10 @@ from opentrons.protocol_api import (
     OFF_DECK,
 )
 from opentrons.types import Point
-from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
 from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
 import numpy as np
 import json
-from hardware_testing import data 
+from opentrons_shared_data.labware.types import LabwareDefinition3, LabwareDefinition2
 
 
 ###########################################
@@ -45,10 +44,17 @@ SLOT_DIAL = "B2"
 
 # below threshold, alpha low. above threshold, alpha high
 THRESHOLD = 4.5
-# sensitivity values for bottom and top zones:
-ALPHA_LOW = 0.2
-ALPHA_HIGH = 0.4
 DELTA_TOLERANCE = 0.2
+
+# sensitivity values for bottom and top zones:
+
+# tested for 1000
+#ALPHA_LOW = 0.2
+#ALPHA_HIGH = 0.4
+
+# test for 200uL
+ALPHA_LOW = 0.8
+ALPHA_HIGH = 0.5
 
 
 ###########################################
@@ -66,34 +72,65 @@ RUN_ID = ""
 FILE_NAME = ""
 USER_DEFINED_VOLUMES = ""
 CSV_SEPARATOR = ""
-CSV_HEADER = ["well", "step volume", "dispense volume", "tip-z-error", "height", "hdelta", "status"]
+CSV_HEADER = [
+    "well",
+    "step volume",
+    "dispense volume",
+    "tip-z-error",
+    "height",
+    "hdelta",
+    "status",
+]
+
 
 def add_parameters(parameters: ParameterContext) -> None:
     """Add parameters to the protocol."""
-    from hardware_testing import protocols
 
-    protocols.create_pipette_parameters(parameters)
-
+    parameters.add_str(
+        variable_name="left_mount",
+        display_name="Left Mount",
+        description="Pipette Type on Left Mount.",
+        choices=[
+            {"display_name": "8ch 50ul", "value": "flex_8channel_50"},
+            {"display_name": "8ch 1000ul", "value": "flex_8channel_1000"},
+            {"display_name": "1ch 50ul", "value": "flex_1channel_50"},
+            {"display_name": "1ch 1000ul", "value": "flex_1channel_1000"},
+            {"display_name": "96ch 1000ul", "value": "flex_96channel_1000"},
+            {"display_name": "None", "value": "none"},
+        ],
+        default="flex_1channel_50",
+    )
+    # Right Mount
+    parameters.add_str(
+        variable_name="right_mount",
+        display_name="Right Mount",
+        description="Pipette Type on Right Mount.",
+        choices=[
+            {"display_name": "8ch 50ul", "value": "flex_8channel_50"},
+            {"display_name": "8ch 1000ul", "value": "flex_8channel_1000"},
+            {"display_name": "1ch 50ul", "value": "flex_1channel_50"},
+            {"display_name": "1ch 1000ul", "value": "flex_1channel_1000"},
+            {"display_name": "None", "value": "none"},
+        ],
+        default="flex_1channel_1000",
+    )
     parameters.add_str(
         variable_name="labware_type",
         display_name="Labware Type",
         choices=[
-            {"display_name": "eppendorf1000 test", "value": "eppendorf_96_wellplate_1000ul_custom"},
-            {"display_name": "opentrons96", "value": "armadillo_96_wellplate_200ul_pcr_full_skirt"},
+            {
+                "display_name": "eppendorf1000 test",
+                "value": "eppendorf_96_wellplate_1000ul_custom",
+            },
+            {
+                "display_name": "opentrons96",
+                "value": "armadillo_96_wellplate_200ul_pcr_full_skirt",
+            },
         ],
-        default= "armadillo_96_wellplate_200ul_pcr_full_skirt",
+        default="eppendorf_96_wellplate_1000ul_custom",
     )
 
-    parameters.add_float(
-        variable_name="labware_version",
-        display_name="Labware Version",
-        description="Version of the labware to use.",
-        default=1,
-        maximum=10,
-        minimum=1.0,
-    )
-
-    #generally, the first dispense should be 1/25 the max volume. 
+    # generally, the first dispense should be 1/25 the max volume.
     parameters.add_float(
         display_name="First Dispense",
         variable_name="first_dispense",
@@ -145,9 +182,8 @@ def _setup(
     LiquidClass,
     float,
     str,
-    str,
     list[str],
-    Labware,
+    List[Labware],
 ]:
 
     global DIAL_PORT, RUN_ID, FILE_NAME
@@ -183,9 +219,7 @@ def _setup(
     )
 
     # load labware + dial
-    labware = ctx.load_labware(
-        labware_type, SLOT_LABWARE, version=ctx.params.labware_version
-    )
+    labware = ctx.load_labware(labware_type, SLOT_LABWARE)
     labware.load_empty(labware.wells())
     wells = list(labware.wells_by_name().keys())
     src = ctx.load_labware(RESERVOIR, SLOT_RESERVOIR)
@@ -201,7 +235,7 @@ def _setup(
     for liquid_rack in liquid_racks:
         props = ethanol.get_for(liq_pipette, liquid_rack)
         meniscus_z = -0.5
-        props.aspirate.aspirate_position.position_reference = lm
+        props.aspirate.aspirate_position.position_reference = lm  # type: ignore[assignment]
         props.aspirate.aspirate_position.offset.z = meniscus_z
 
     if not ctx.is_simulating() and DIAL_PORT is None:
@@ -217,8 +251,8 @@ def _setup(
             metadata["protocolName"], RUN_ID, f"{LIQUID_MOUNT}-{liquid_rack.load_name}"
         )
 
-        # TODO: move the return alpha function here and write to csv 
-        #also write the tolerance values, max/min step, etc
+        # TODO: move the return alpha function here and write to csv
+        # also write the tolerance values, max/min step, etc
         _write_line_to_csv(ctx, [RUN_ID])
         _write_line_to_csv(ctx, [liquid_pip_name])
         _write_line_to_csv(ctx, [probing_pip_name])
@@ -234,11 +268,10 @@ def _setup(
         labware,
         src,
         dial,
-        ethanol,
         first_dispense,
+        ethanol,
         target_height,
         labware_type,
-        liq_mount,
         wells,
         liquid_racks,
     )
@@ -306,18 +339,24 @@ def _get_tip_z_error(
 def _get_height_of_liquid_in_well(
     pipette: InstrumentContext, well: Well, simulating: bool
 ) -> float:
-    
+    """Get height of liquid in well."""
+
     def extract_float(result: Union[float | SimulatedProbeResult]) -> float:
+        """Extract float."""
         if isinstance(result, SimulatedProbeResult):
             return result.net_liquid_exchanged_after_probe
         return float(result)
+
     if not simulating:
         return extract_float(pipette.measure_liquid_height(well))
     else:
         return 0.01
 
 
-def generate_frusta(ctx, data, labware) -> List[Dict]:
+def generate_frusta(
+    ctx: ProtocolContext, data, labware: Labware
+) -> LabwareDefinition2 | LabwareDefinition3:
+    """Generate Frusta."""
     inner_well_json = labware._core.get_definition()
     depth = inner_well_json["wells"]["A1"]["depth"]
     well_shape = inner_well_json["wells"]["A1"].get("shape")
@@ -331,7 +370,7 @@ def generate_frusta(ctx, data, labware) -> List[Dict]:
 
     for well_name in inner_well_json["wells"]:
         inner_well_json["wells"][well_name]["geometryDefinitionId"] = geoID
-    
+
     frusta_data = []
     radius = 0.0
     side_length = 0.0
@@ -351,7 +390,7 @@ def generate_frusta(ctx, data, labware) -> List[Dict]:
             if not ctx.is_simulating():
                 side_length = round(np.sqrt(delta_volume / delta_height), 2)
             section = {
-                "shape": geoID[:-4], 
+                "shape": geoID[:-4],
                 "bottomXDimension": side_length,
                 "bottomYDimension": side_length,
                 "topXDimension": side_length,
@@ -361,10 +400,10 @@ def generate_frusta(ctx, data, labware) -> List[Dict]:
             }
         elif geoID == "conicalWell":
             if not ctx.is_simulating():
-                radius = round(np.sqrt(delta_volume / (np.pi * delta_height)),2)
+                radius = round(np.sqrt(delta_volume / (np.pi * delta_height)), 2)
             diameter = 2 * radius
             section = {
-                "shape": geoID[:-4],  
+                "shape": geoID[:-4],
                 "bottomDiameter": diameter,
                 "topDiameter": diameter,
                 "topHeight": round(h2, 2),
@@ -373,7 +412,7 @@ def generate_frusta(ctx, data, labware) -> List[Dict]:
 
         frusta_data.append(section)
 
-    #add one more frusta to ensure heights add up to total depth
+    # add one more frusta to ensure heights add up to total depth
     last = frusta_data[-1]
     bottom_height = last["topHeight"]
 
@@ -385,7 +424,7 @@ def generate_frusta(ctx, data, labware) -> List[Dict]:
             "bottomXDimension": side_length,
             "bottomYDimension": side_length,
             "topHeight": depth,
-            "bottomHeight": bottom_height
+            "bottomHeight": bottom_height,
         }
     elif geoID == "conicalWell":
         final_section = {
@@ -393,16 +432,12 @@ def generate_frusta(ctx, data, labware) -> List[Dict]:
             "topDiameter": diameter,
             "bottomDiameter": diameter,
             "topHeight": depth,
-            "bottomHeight": bottom_height
+            "bottomHeight": bottom_height,
         }
 
     frusta_data.append(final_section)
 
-    inner_well_json["innerLabwareGeometry"] = {
-        geoID: {
-            "sections": frusta_data
-        }
-    }
+    inner_well_json["innerLabwareGeometry"] = {geoID: {"sections": frusta_data}}
 
     return inner_well_json
 
@@ -415,13 +450,12 @@ def run(ctx: ProtocolContext) -> None:
         labware,
         src,
         dial,
-        ethanol,
         first_dispense,
+        ethanol,
         target_height,
         labware_type,
-        liq_mount,
         wells,
-        liquid_racks
+        liquid_racks,
     ) = _setup(ctx)
 
     # Initialize state
@@ -435,12 +469,12 @@ def run(ctx: ProtocolContext) -> None:
     dispense_volume = 0.0
     current_well = "none"
     status = "pass"
-    udv_table = []
+    udv_table: List[Any] = []
     num_wells = len(wells)
     max_volume = labware["A1"].max_volume
 
-    # volume clamps, these can be changed to whatever. 
-    min_step = max(max_volume * 0.01, 5) #clamped to 5uL
+    # volume clamps, these can be changed to whatever.
+    min_step = max(max_volume * 0.01, 5)  # clamped to 5uL
     max_step = max_volume * 0.25
 
     # deadband to avoid unnecessary step volume corrections
@@ -450,7 +484,7 @@ def run(ctx: ProtocolContext) -> None:
     _store_dial_baseline(ctx, probe_pipette, dial)
     _write_line_to_csv(ctx, CSV_HEADER)
 
-    #### Helper Functions 
+    # Helper Functions
 
     def pick_up_tips() -> None:
         if not probe_pipette.has_tip:
@@ -464,28 +498,32 @@ def run(ctx: ProtocolContext) -> None:
         if liq_pipette.has_tip:
             liq_pipette.drop_tip()
 
-    # TODO: return alpha value pairs based on the labware volume and expected step volume increment. 
+    # TODO: return alpha value pairs based on the labware volume and expected step volume increment.
     def get_alpha_for_height(h: float) -> float:
         return ALPHA_LOW if h < THRESHOLD else ALPHA_HIGH
 
-    # Proportional Controller 
+    # Proportional Controller
     def adaptive_volume_step(
         hdelta: float, height: float, step_volume: float, target_height: float
-    ) -> float: 
+    ) -> float:
         nonlocal lower_bound, upper_bound
 
         alpha = get_alpha_for_height(height)
 
         if lower_bound <= hdelta <= upper_bound:
             return step_volume
-        
+
         elif hdelta < lower_bound and hdelta > 0:
             error = target_height - hdelta
-            new_volume = step_volume * min(1.5, 1 + alpha * error) # increase clamped to 50% of previous volume 
-        
+            new_volume = step_volume * min(
+                1.5, 1 + alpha * error
+            )  # increase clamped to 50% of previous volume
+
         elif hdelta > upper_bound:
             error = hdelta - target_height
-            new_volume = step_volume * max(0.5, 1 - alpha * error) # decrease clamped to 50% of previous volume 
+            new_volume = step_volume * max(
+                0.8, 1 - alpha * error
+            )  # decrease clamped to 80% of previous volume
         else:
             new_volume = step_volume
 
@@ -493,7 +531,7 @@ def run(ctx: ProtocolContext) -> None:
 
         return new_volume
 
-    def write_trial_log(udv_table) -> None:
+    def write_trial_log(udv_table: List) -> None:
         trial_data = [
             current_well,
             round(step_volume, 5),
@@ -501,41 +539,39 @@ def run(ctx: ProtocolContext) -> None:
             round(tip_z_error, 5),
             round(corrected_height, 5),
             hdelta,
-            status
+            status,
         ]
         udv_table.append(trial_data)
         _write_line_to_csv(ctx, [str(d) for d in trial_data])
-    
-    def reload_labware(labware, labware_type) -> None:
+
+    def reload_labware(labware: Labware, labware_type: str) -> None:
         print("reloading labware")
         ctx.move_labware(labware, OFF_DECK, use_gripper=False)
-        labware = ctx.load_labware(
-            labware_type, SLOT_LABWARE, version=ctx.params.labware_version
-        )
+        labware = ctx.load_labware(labware_type, SLOT_LABWARE)
         labware.load_empty(labware.wells())
 
-    ################ Begin Protocol
-    
+    # Begin Protocol
+
     # initial setup
     write_trial_log(udv_table)
     liq_pipette.pick_up_tip()
-    _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating()) 
-
+    _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
     step_volume = first_dispense
 
     while dispense_volume < max_volume:
 
-        #reposition pipette for dispense 
-        for liquid_rack in liquid_racks:
-            props = ethanol.get_for(liq_pipette, liquid_rack)
-            props.dispense.dispense_position.position_reference = "well-bottom"
-            props.dispense.dispense_position.offset.z = max(corrected_height - 1, 2)
+        # reposition pipette for dispense
+        # for liquid_rack in liquid_racks:
+        #    props = ethanol.get_for(liq_pipette, liquid_rack)
+        #    props.dispense.dispense_position.position_reference = (
+        #        "well-bottom"  #  type: ignore[assignment]
+        #    )
+        #    props.dispense.dispense_position.offset.z = max(corrected_height - 1, 2)
 
         drop_tips()
         pick_up_tips()
 
         current_well = wells[step % num_wells]
-
         # check if out of wells
         if step > 0 and step % num_wells == 0:
             reload_labware(labware, labware_type)
@@ -544,16 +580,21 @@ def run(ctx: ProtocolContext) -> None:
 
         # Dispense
         dispense_volume += step_volume
-        liq_pipette.flow_rate.dispense = 50
-        liq_pipette.transfer_with_liquid_class(
-            ethanol,
+        liq_pipette.flow_rate.dispense = min(
+            max(min(liq_pipette.max_volume, dispense_volume), 10),
+            50,
+        )
+        dispense_loc = labware[current_well].bottom(z=max(corrected_height + 2.5, 3))
+        liq_pipette.transfer(
             dispense_volume / liq_pipette.channels,
             src["A1"],
-            labware[current_well],
+            dispense_loc,
             new_tip="never",
             return_tip=False,
+            blow_out = True,
+            blowout_location="destination well",
+            air_gap=5,
         )
-        liq_pipette.blow_out()
 
         # Measure liquid height
         height = _get_height_of_liquid_in_well(
@@ -565,48 +606,45 @@ def run(ctx: ProtocolContext) -> None:
         # Compute hdelta
         hdelta = (
             corrected_heights[-1] - corrected_heights[-2]
-            if len(corrected_heights) > 1 else 0.0
+            if len(corrected_heights) > 1
+            else 0.0
         )
 
         # Check for bad hdelta
         if not ctx.is_simulating():
-            if step == 0: 
+            if step == 0:
                 status = "pass" if 2.0 < hdelta < 3.0 else "fail"
                 write_trial_log(udv_table)
             else:
                 if hdelta <= lower_bound or hdelta >= upper_bound:
                     status = "fail"
                     write_trial_log(udv_table)
-                    dispense_volume -= step_volume #rollback dispense volume 
-                    corrected_heights.pop() #rollback corrected heights
+                    dispense_volume -= step_volume  # rollback dispense volume
+                    corrected_heights.pop()  # rollback corrected heights
                 else:
                     status = "pass"
                     write_trial_log(udv_table)
-        else: 
+        else:
             write_trial_log(udv_table)
 
-        #recalculate step volume for next step 
-        step_volume = adaptive_volume_step(hdelta, corrected_height, step_volume, target_height)
+        # recalculate step volume for next step
+        step_volume = adaptive_volume_step(
+            hdelta, corrected_height, step_volume, target_height
+        )
 
         step += 1
 
     drop_tips()
 
-    #create labware def 
+    # create labware def
     passed_trials = [trial for trial in udv_table if trial[6] == "pass"]
     frusta_data = np.array([(trial[2], trial[4]) for trial in passed_trials])
     new_inner_well_json = generate_frusta(ctx, frusta_data, labware)
+    if not ctx.is_simulating():
+        from hardware_testing import data
+        user_defined_volumes = data.create_folder_for_test_data("user-defined-volumes")
+        udv_def_name = f"{RUN_ID}_{labware_type}.json"
+        file_path = user_defined_volumes / udv_def_name
 
-    user_defined_volumes = data.create_folder_for_test_data("user-defined-volumes")
-    udv_def_name = f"{RUN_ID}_{labware_type}.json"
-    file_path = user_defined_volumes / udv_def_name
-
-    with open(file_path, "w") as f:
-        json.dump(new_inner_well_json, f, indent=2)
-
-
-
-    
-
-    
-
+        with open(file_path, "w") as f:
+            json.dump(new_inner_well_json, f, indent=2)
