@@ -8,10 +8,6 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field
 
-from opentrons_shared_data.labware.labware_definition import (
-    LabwareDefinition,
-)
-
 from .location import LabwareLocation
 from .labware_offset_location import (
     LegacyLabwareOffsetLocation,
@@ -117,10 +113,6 @@ class LoadedLabware(BaseModel):
     )
 
 
-LabwareStackupDefinition = Union[
-    DeckLocationDefinition, ModuleDefinition, LabwareDefinition
-]
-"""Information pertaining to a deck item that is present in a labware stackup."""
 LabwareStackupAncestorDefinition = Union[
     DeckLocationDefinition,
     ModuleDefinition,

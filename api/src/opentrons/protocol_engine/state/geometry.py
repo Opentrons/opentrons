@@ -91,7 +91,6 @@ from ..types import (
     labware_location_is_system,
     WellLocationType,
     WellLocationFunction,
-    LabwareStackupDefinition,
     LabwareStackupAncestorDefinition,
     AddressableArea,
 )

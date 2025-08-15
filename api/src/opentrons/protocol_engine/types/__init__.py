@@ -99,7 +99,6 @@ from .labware import (
     LegacyLabwareOffsetCreate,
     LabwareOffsetCreateInternal,
     LoadedLabware,
-    LabwareStackupDefinition,
     LabwareStackupAncestorDefinition,
     LabwareWellId,
 )
@@ -254,7 +253,6 @@ __all__ = [
     "LabwareOffsetCreateInternal",
     "LoadedLabware",
     "LabwareOffsetVector",
-    "LabwareStackupDefinition",
     "LabwareStackupAncestorDefinition",
     "LabwareWellId",
     # Liquids
