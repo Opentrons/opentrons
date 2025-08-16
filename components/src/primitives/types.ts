@@ -1,6 +1,5 @@
 // known style types
-import type { CSSProperties, StyledComponent } from 'styled-components'
-import type { ComponentType } from 'react'
+import type { ComponentType, CSSProperties } from 'react'
 
 export interface ColorProps {
   color?: string
@@ -117,4 +116,10 @@ export interface StyleProps
 export type PrimitiveComponent<
   Instance extends keyof JSX.IntrinsicElements | ComponentType<any>,
   Props extends StyleProps = StyleProps
-> = StyledComponent<Instance, any, Props, any>
+> = ComponentType<
+  Instance extends keyof JSX.IntrinsicElements
+    ? JSX.IntrinsicElements[Instance] & Props
+    : Instance extends ComponentType<infer P>
+    ? P & Props
+    : Props
+>
