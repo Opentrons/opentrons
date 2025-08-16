@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { COLORS, Icon, TertiaryButton } from '@opentrons/components'
+import { COLORS, Icon } from '@opentrons/components'
 
 import styles from './actioncard.module.css'
 
@@ -27,11 +27,7 @@ export function ActionCard({
     <div className={styles.action_card}>
       <h3 className={styles.card_title}>{t(titleKey)}</h3>
       <p className={styles.card_description}>{t(descriptionKey)}</p>
-      <TertiaryButton
-        buttonType="secondary"
-        className={styles.card_link}
-        onClick={handleClick}
-      >
+      <button className={styles.card_link} onClick={handleClick}>
         {t(linkKey)}
         <span className={styles.card_link_icon}>
           <Icon
@@ -41,7 +37,7 @@ export function ActionCard({
             data-testid="ActionCard_Icon"
           />
         </span>
-      </TertiaryButton>
+      </button>
     </div>
   )
 }

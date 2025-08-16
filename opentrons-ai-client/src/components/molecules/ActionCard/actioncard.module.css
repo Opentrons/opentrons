@@ -34,22 +34,23 @@
 .card_link {
   display: inline-flex;
   align-items: center;
-  padding: 0 !important;
-  border: none !important;
-  background: transparent !important;
-  color: var(--Colors-Brand-blue-50, #006cfa) !important;
-  font-family: var(--font-family-body, 'Public Sans', sans-serif) !important;
-  font-size: var(--font-size-body, 1rem) !important;
-  font-weight: var(--font-weight-semibold, 600) !important;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--Colors-Brand-blue-50, #006cfa);
+  cursor: pointer;
+  font-family: var(--font-family-body, 'Public Sans', sans-serif);
+  font-size: var(--font-size-body, 1rem);
+  font-weight: var(--font-weight-semibold, 600);
   gap: var(--spacing-4, 0.25rem);
-  line-height: var(--line-height-body, 1.5rem) !important;
-  text-decoration: none !important;
+  line-height: var(--line-height-body, 1.5rem);
+  text-decoration: none;
   transition: color 0.2s ease;
 }
 
 .card_link:hover {
-  color: var(--Colors-Brand-blue-60, #05c) !important;
-  text-decoration: underline !important;
+  color: var(--Colors-Brand-blue-60, #05c);
+  text-decoration: underline;
 }
 
 .card_link_icon {
