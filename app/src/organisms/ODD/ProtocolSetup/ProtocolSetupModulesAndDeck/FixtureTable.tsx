@@ -24,14 +24,14 @@ import {
 
 import { SmallButton } from '/app/atoms/buttons'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
-import {
-  getFilteredDeckConfigFixtureCompatibility,
-  isConflictingFixtureConfigured,
-  isFixtureCompatible,
-} from '/app/organisms/LocationConflictModal/getFilteredDeckConfigFixtureCompatibility'
 import { NotConfiguredModal } from '/app/organisms/LocationConflictModal/NotConfiguredModal'
 import { getLocalRobot } from '/app/redux/discovery'
-import { getRequiredDeckConfig } from '/app/resources/deck_configuration/utils'
+import {
+  getFilteredDeckConfigFixtureCompatibility,
+  getRequiredDeckConfig,
+  isConflictingFixtureConfigured,
+  isFixtureCompatible,
+} from '/app/resources/deck_configuration/utils'
 
 import type { TFunction } from 'i18next'
 import type {

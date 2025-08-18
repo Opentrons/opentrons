@@ -99,7 +99,7 @@ from .labware import (
     LegacyLabwareOffsetCreate,
     LabwareOffsetCreateInternal,
     LoadedLabware,
-    LabwareParentDefinition,
+    LabwareStackupAncestorDefinition,
     LabwareWellId,
 )
 from .liquid import HexColor, EmptyLiquidId, LiquidId, Liquid, FluidKind, AspiratedFluid
@@ -130,6 +130,7 @@ from .instrument import (
     CurrentWell,
     CurrentPipetteLocation,
     InstrumentOffsetVector,
+    GripperMoveType,
 )
 from .execution import EngineStatus, PostRunHardwareState
 from .liquid_level_detection import (
@@ -146,6 +147,7 @@ from .labware_movement import LabwareMovementStrategy, LabwareMovementOffsetData
 from .tip import TipGeometry
 from .hardware_passthrough import MovementAxis, MotorAxis
 from .util import Vec3f, Dimensions
+from .tasks import Task, TaskSummary
 
 __all__ = [
     # Runtime parameters
@@ -253,7 +255,7 @@ __all__ = [
     "LabwareOffsetCreateInternal",
     "LoadedLabware",
     "LabwareOffsetVector",
-    "LabwareParentDefinition",
+    "LabwareStackupAncestorDefinition",
     "LabwareWellId",
     # Liquids
     "HexColor",
@@ -282,6 +284,7 @@ __all__ = [
     "CurrentWell",
     "CurrentPipetteLocation",
     "InstrumentOffsetVector",
+    "GripperMoveType",
     # Liquid level detection types
     "LoadedVolumeInfo",
     "ProbedHeightInfo",
@@ -305,4 +308,7 @@ __all__ = [
     "Dimensions",
     # Convenience re-export
     "LabwareUri",
+    # Tasks
+    "Task",
+    "TaskSummary",
 ]

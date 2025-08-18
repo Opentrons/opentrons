@@ -24,6 +24,7 @@ from opentrons.protocol_engine.types import (
     NonStackedLocation,
     LabwareMovementOffsetData,
     Dimensions,
+    GripperMoveType,
 )
 from opentrons.protocol_engine.execution.thermocycler_plate_lifter import (
     ThermocyclerPlateLifter,
@@ -202,12 +203,15 @@ async def test_raise_error_if_gripper_pickup_failed(
         state_store.geometry.get_labware_grip_point(
             labware_definition=sentinel.my_teleporting_labware_def,
             location=starting_location,
+            move_type=GripperMoveType.PICK_UP_LABWARE,
         )
     ).then_return(Point(101, 102, 119.5))
 
     decoy.when(
         state_store.geometry.get_labware_grip_point(
-            labware_definition=sentinel.my_teleporting_labware_def, location=to_location
+            labware_definition=sentinel.my_teleporting_labware_def,
+            location=to_location,
+            move_type=GripperMoveType.DROP_LABWARE,
         )
     ).then_return(Point(201, 202, 219.5))
 
@@ -348,11 +352,14 @@ async def test_move_labware_with_gripper(
         state_store.geometry.get_labware_grip_point(
             labware_definition=sentinel.my_teleporting_labware_def,
             location=from_location,
+            move_type=GripperMoveType.PICK_UP_LABWARE,
         )
     ).then_return(Point(101, 102, 119.5))
     decoy.when(
         state_store.geometry.get_labware_grip_point(
-            labware_definition=sentinel.my_teleporting_labware_def, location=to_location
+            labware_definition=sentinel.my_teleporting_labware_def,
+            location=to_location,
+            move_type=GripperMoveType.DROP_LABWARE,
         )
     ).then_return(Point(201, 202, 219.5))
     mock_tc_context_manager = decoy.mock(name="mock_tc_context_manager")

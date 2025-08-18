@@ -2,7 +2,9 @@
 import reduce from 'lodash/reduce'
 
 import { DEFAULT_LIQUID_COLORS } from '../constants'
+import { getModuleType } from '../modules'
 import { getLabwareDefURI } from './getLabwareDefURI'
+import { getModuleDeckLabel } from './getModuleDeckLabel'
 
 import type {
   LabwareLocation,
@@ -336,7 +338,13 @@ export function parseInitialLoadedModulesBySlot(
     loadModuleCommandsReversed,
     (acc, command) =>
       'slotName' in command.params.location
-        ? { ...acc, [command.params.location.slotName]: command }
+        ? {
+            ...acc,
+            [getModuleDeckLabel(
+              getModuleType(command.params.model),
+              command.params.location.slotName
+            )]: command,
+          }
         : acc,
     {}
   )

@@ -97,6 +97,7 @@ from opentrons.protocol_engine.types import (
     AreaType,
     AddressableOffsetVector,
     WellLocationFunction,
+    GripperMoveType,
 )
 from opentrons.protocol_engine.commands import Command
 from opentrons.protocol_engine.actions import (
@@ -125,7 +126,7 @@ from opentrons.protocol_engine.state._axis_aligned_bounding_box import (
     AxisAlignedBoundingBox3D as EngineAABB,
 )
 from opentrons.protocol_engine.state import geometry
-from opentrons.protocol_engine.state.geometry import GeometryView, _GripperMoveType
+from opentrons.protocol_engine.state.geometry import GeometryView
 from opentrons.protocol_engine.state.inner_well_math_utils import (
     _height_from_volume_circular,
     _height_from_volume_rectangular,
@@ -454,7 +455,7 @@ _PARENT_ORIGIN_TO_LABWARE_ORIGIN = Point(x=10, y=20, z=30)
 def mock_labware_origin_math(monkeypatch: pytest.MonkeyPatch) -> None:
     """Mock labware origin math's main export."""
     monkeypatch.setattr(
-        "opentrons.protocol_engine.state.geometry.get_parent_placement_origin_to_lw_origin",
+        "opentrons.protocol_engine.state.geometry.get_stackup_origin_to_labware_origin",
         lambda *args, **kwargs: _PARENT_ORIGIN_TO_LABWARE_ORIGIN,
     )
 
@@ -959,13 +960,11 @@ def test_get_obstacle_highest_z_with_lid(
     # The labware's highest z is the z dimension of the lid + labware's height
     labware_height = labware_view.get_dimensions(labware_id="labware-id").z
     monkeypatch.setattr(
-        "opentrons.protocol_engine.state.geometry.get_parent_placement_origin_to_lw_origin",
+        "opentrons.protocol_engine.state.geometry.get_stackup_origin_to_labware_origin",
         lambda *args, **kwargs: Point(10, 20, labware_height),
     )
 
-    assert (
-        subject.get_all_obstacle_highest_z() == 100 + labware_height * 2
-    )  # The adapter + the labware are both labware_height
+    assert subject.get_all_obstacle_highest_z() == 100 + labware_height
 
 
 @pytest.mark.parametrize("use_mocks", [False])
@@ -1198,12 +1197,7 @@ def test_get_highest_z_in_slot_with_stacked_labware_on_slot(
         mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_3.id)
     ).then_return(Point(11, 22, 33))
 
-    expected_highest_z = (
-        33
-        + 1000
-        + 3
-        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z * 3  # The entire labware stackup.
-    )
+    expected_highest_z = 33 + 1000 + 3 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z
 
     assert (
         subject.get_highest_z_in_slot(DeckSlotLocation(slotName=DeckSlotName.SLOT_3))
@@ -1291,12 +1285,7 @@ def test_get_highest_z_in_slot_with_labware_stack_on_module(
         )
     ).then_return(Point(11, 22, 33))
 
-    expected_highest_z = (
-        33
-        + 1000
-        + 3
-        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z * 2  # Both the adapter and top labware
-    )
+    expected_highest_z = 33 + 1000 + 3 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z
 
     assert (
         subject.get_highest_z_in_slot(DeckSlotLocation(slotName=DeckSlotName.SLOT_3))
@@ -1707,7 +1696,7 @@ def test_get_well_position_with_center_offset(
 ) -> None:
     """It should be able to get the position of a well center in a labware."""
     monkeypatch.setattr(
-        "opentrons.protocol_engine.state.geometry.get_parent_placement_origin_to_lw_origin",
+        "opentrons.protocol_engine.state.geometry.get_stackup_origin_to_labware_origin",
         lambda *args, **kwargs: Point(0, 0, 0),
     )
     labware_data = LoadedLabware(
@@ -2291,7 +2280,7 @@ def test_get_relative_well_location(
 ) -> None:
     """It should get the relative location of a well given an absolute position."""
     monkeypatch.setattr(
-        "opentrons.protocol_engine.state.geometry.get_parent_placement_origin_to_lw_origin",
+        "opentrons.protocol_engine.state.geometry.get_stackup_origin_to_labware_origin",
         lambda *args, **kwargs: Point(0, 0, 0),
     )
     labware_data = LoadedLabware(
@@ -2769,6 +2758,7 @@ def test_get_labware_grip_point_v2_definition(
     labware_center = subject.get_labware_grip_point(
         labware_definition=_MOCK_LABWARE_DEFINITION2,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        move_type=GripperMoveType.PICK_UP_LABWARE,
     )
 
     assert labware_center == Point(
@@ -2807,6 +2797,7 @@ def test_get_labware_grip_point_v3_definition(
     labware_center = subject.get_labware_grip_point(
         labware_definition=_MOCK_LABWARE_DEFINITION3,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        move_type=GripperMoveType.PICK_UP_LABWARE,
     )
 
     assert labware_center == Point(
@@ -2857,14 +2848,15 @@ def test_get_labware_grip_point_on_labware(
     grip_point = subject.get_labware_grip_point(
         labware_definition=sentinel.definition,
         location=OnLabwareLocation(labwareId="below-id"),
+        move_type=GripperMoveType.PICK_UP_LABWARE,
     )
 
     assert grip_point == Point(
-        5.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x * 2 + expected_lw_origin_to_parent.x,
-        9.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y * 2 + expected_lw_origin_to_parent.y,
+        5.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x + expected_lw_origin_to_parent.x,
+        9.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y + expected_lw_origin_to_parent.y,
         10.0
         + 100
-        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z * 2
+        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z
         + expected_lw_origin_to_parent.z,
     )
 
@@ -2945,6 +2937,7 @@ def test_get_labware_grip_point_for_labware_on_module(
     result_grip_point = subject.get_labware_grip_point(
         labware_definition=sentinel.labware_definition,
         location=ModuleLocation(moduleId="module-id"),
+        move_type=GripperMoveType.PICK_UP_LABWARE,
     )
     assert result_grip_point == Point(
         x=492 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x + expected_lw_origin_to_parent.x,
@@ -3037,18 +3030,13 @@ def test_get_labware_grip_point_for_labware_stack_on_module(
     result_grip_point = subject.get_labware_grip_point(
         labware_definition=sentinel.labware_definition,
         location=OnLabwareLocation(labwareId="below-id-9"),
+        move_type=GripperMoveType.PICK_UP_LABWARE,
     )
 
     assert result_grip_point == Point(
-        x=492.0
-        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x * 2  # The labware and module beneath it.
-        + expected_lw_origin_to_parent.x,
-        y=350.0
-        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y * 2
-        + expected_lw_origin_to_parent.y,
-        z=838.0
-        + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z * 2
-        + expected_lw_origin_to_parent.z,
+        x=492.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x + expected_lw_origin_to_parent.x,
+        y=350.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y + expected_lw_origin_to_parent.y,
+        z=838.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z + expected_lw_origin_to_parent.z,
     )
 
 
@@ -3468,7 +3456,7 @@ def test_get_total_nominal_gripper_offset(
     # Case 1: labware on deck
     result1 = subject.get_total_nominal_gripper_offset_for_move_type(
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
-        move_type=_GripperMoveType.PICK_UP_LABWARE,
+        move_type=GripperMoveType.PICK_UP_LABWARE,
         current_labware=mock_labware_view.get_definition("labware-d"),
     )
     assert result1 == Point(x=1, y=2, z=3)
@@ -3476,7 +3464,7 @@ def test_get_total_nominal_gripper_offset(
     # Case 2: labware on module
     result2 = subject.get_total_nominal_gripper_offset_for_move_type(
         location=ModuleLocation(moduleId="module-id"),
-        move_type=_GripperMoveType.DROP_LABWARE,
+        move_type=GripperMoveType.DROP_LABWARE,
         current_labware=mock_labware_view.get_definition("labware-id"),
     )
     assert result2 == Point(x=33, y=22, z=11)
@@ -3521,14 +3509,14 @@ def test_get_stacked_labware_total_nominal_offset_slot_specific(
     )
     result1 = subject.get_total_nominal_gripper_offset_for_move_type(
         location=OnLabwareLocation(labwareId="adapter-id"),
-        move_type=_GripperMoveType.PICK_UP_LABWARE,
+        move_type=GripperMoveType.PICK_UP_LABWARE,
         current_labware=mock_labware_view.get_definition("labware-id"),
     )
     assert result1 == Point(x=111, y=222, z=333)
 
     result2 = subject.get_total_nominal_gripper_offset_for_move_type(
         location=OnLabwareLocation(labwareId="adapter-id"),
-        move_type=_GripperMoveType.DROP_LABWARE,
+        move_type=GripperMoveType.DROP_LABWARE,
         current_labware=mock_labware_view.get_definition("labware-id"),
     )
     assert result2 == Point(x=333, y=222, z=111)
@@ -3578,14 +3566,14 @@ def test_get_stacked_labware_total_nominal_offset_default(
     )
     result1 = subject.get_total_nominal_gripper_offset_for_move_type(
         location=OnLabwareLocation(labwareId="adapter-id"),
-        move_type=_GripperMoveType.PICK_UP_LABWARE,
+        move_type=GripperMoveType.PICK_UP_LABWARE,
         current_labware=mock_labware_view.get_definition("labware-id"),
     )
     assert result1 == Point(x=111, y=222, z=333)
 
     result2 = subject.get_total_nominal_gripper_offset_for_move_type(
         location=OnLabwareLocation(labwareId="adapter-id"),
-        move_type=_GripperMoveType.DROP_LABWARE,
+        move_type=GripperMoveType.DROP_LABWARE,
         current_labware=mock_labware_view.get_definition("labware-id"),
     )
     assert result2 == Point(x=333, y=222, z=111)

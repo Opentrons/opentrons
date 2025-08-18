@@ -28,6 +28,7 @@ import type { ModuleSetupWizardMaybePipetteStepProps } from './types'
 
 const EQUIPMENT_POLL_MS = 3000
 const MODULE_TIMEOUT_MS = 60000
+const CHECKING_UPDATE_TIMEOUT_MS = 1000
 const NO_UPDATE_FOUND_TIMEOUT_MS = 2000
 interface UpdateFirmwareProps extends ModuleSetupWizardMaybePipetteStepProps {
   robotName: string
@@ -54,6 +55,7 @@ export function UpdateFirmware(props: UpdateFirmwareProps): JSX.Element {
     moduleRequestTimeoutId,
     setModuleRequestTimeoutId,
   ] = useState<ReturnType<typeof setTimeout> | null>(null)
+  const [checkingFirmware, setCheckingFirmware] = useState(false)
   const [inProgress, setInProgress] = useState(false)
   const [shouldProceed, setShouldProceed] = useState(false)
 
@@ -77,10 +79,24 @@ export function UpdateFirmware(props: UpdateFirmwareProps): JSX.Element {
       if (moduleRequestTimeoutId != null) {
         clearTimeout(moduleRequestTimeoutId)
       }
+      // Update failed
+      if (matchingModule.hasAvailableUpdate) {
+        setIsModuleUpdating(false)
+        setInProgress(false)
+        setErrorMessage(t('firmware_update_failed') as string)
+        if (latestRequestId != null) {
+          dispatch(dismissRequest(latestRequestId))
+        }
+        return
+      }
+      // Update passed
+      setShouldProceed(true)
       setIsModuleUpdating(false)
       sendIdentifyStacker(matchingModule, true, 'blue')
       patchModuleAfterUpdate(matchingModule)
-      proceed()
+      setTimeout(() => {
+        proceed()
+      }, NO_UPDATE_FOUND_TIMEOUT_MS)
     }
   }, [
     attachedModules,
@@ -90,14 +106,18 @@ export function UpdateFirmware(props: UpdateFirmwareProps): JSX.Element {
   ])
 
   useEffect(() => {
-    if (!attachedModule.hasAvailableUpdate) {
-      setIsModuleUpdating(false)
-      setShouldProceed(true)
-      setTimeout(() => {
-        proceed()
-      }, NO_UPDATE_FOUND_TIMEOUT_MS)
-    }
-  }, [attachedModule.hasAvailableUpdate])
+    setCheckingFirmware(true)
+    setTimeout(() => {
+      setCheckingFirmware(false)
+      if (!attachedModule.hasAvailableUpdate) {
+        setIsModuleUpdating(false)
+        setShouldProceed(true)
+        setTimeout(() => {
+          proceed()
+        }, NO_UPDATE_FOUND_TIMEOUT_MS)
+      }
+    }, CHECKING_UPDATE_TIMEOUT_MS)
+  }, [])
 
   useEffect(() => {
     if (requestStatus === PENDING) {
@@ -125,7 +145,14 @@ export function UpdateFirmware(props: UpdateFirmwareProps): JSX.Element {
     handleModuleApiRequests(robotName, attachedModule.serialNumber)
   }
 
-  if (inProgress) {
+  if (checkingFirmware) {
+    const name = getModuleDisplayName(attachedModule.moduleModel)
+    return (
+      <SimpleWizardInProgressBody
+        description={t('checking_firmware', { module: name })}
+      />
+    )
+  } else if (inProgress) {
     return (
       <SimpleWizardInProgressBody
         description={t('installing_latest_firmware')}

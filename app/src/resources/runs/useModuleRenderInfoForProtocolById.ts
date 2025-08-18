@@ -1,7 +1,6 @@
 import {
   checkModuleCompatibility,
   FLEX_ROBOT_TYPE,
-  FLEX_STACKER_MODULE_TYPE,
   getCutoutFixturesForModuleModel,
   getCutoutIdsFromModuleSlotName,
   getDeckDefFromRobotType,
@@ -120,10 +119,6 @@ export function useModuleRenderInfoForProtocolById(
         ...acc,
         [moduleInfo.moduleId]: {
           ...moduleInfo,
-          slotName:
-            moduleInfo.moduleDef.moduleType === FLEX_STACKER_MODULE_TYPE
-              ? `${moduleInfo.slotName.charAt(0)}4`
-              : moduleInfo.slotName,
         },
       }),
       {}

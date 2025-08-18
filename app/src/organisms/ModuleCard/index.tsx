@@ -24,6 +24,7 @@ import {
   useMenuHandleClickOutside,
   useOnClickOutside,
 } from '@opentrons/components'
+import { useHost } from '@opentrons/react-api-client'
 import {
   ABSORBANCE_READER_TYPE,
   FLEX_STACKER_MODULE_TYPE,
@@ -37,7 +38,7 @@ import {
 
 import { useModuleUSBPort } from '/app/local-resources/modules'
 import { UpdateBanner } from '/app/molecules/UpdateBanner'
-import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
+import { handleModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useIsFlex } from '/app/redux-resources/robots'
@@ -76,6 +77,7 @@ import { ThermocyclerModuleData } from './ThermocyclerModuleData'
 import { ThermocyclerModuleSlideout } from './ThermocyclerModuleSlideout'
 import { getModuleCardImage } from './utils'
 
+import type { HostConfig } from '@opentrons/api-client'
 import type { IconProps } from '@opentrons/components'
 import type { ModuleType } from '@opentrons/shared-data'
 import type {
@@ -109,6 +111,8 @@ interface ModuleCardProps {
 
 export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const { t } = useTranslation('device_details')
+  const host = useHost() as HostConfig
+
   const {
     module,
     robotName,
@@ -139,7 +143,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [showTestShake, setShowTestShake] = useState(false)
   const [showSetupWizard, setShowSetupWizard] = useState(false)
   const [showFWBanner, setShowFWBanner] = useState(true)
-  const [showCalModal, setShowCalModal] = useState(false)
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   const runStatus = useCurrentRunStatus()
@@ -281,7 +284,13 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   }
 
   const handleSetupClick = (): void => {
-    setShowCalModal(true)
+    handleModuleWizardFlows({
+      attachedModule: module,
+      showSetupLauncher: true,
+      isLoadedInRun,
+      robotName,
+      host,
+    })
   }
 
   return (
@@ -291,17 +300,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       width="100%"
       data-testid={`ModuleCard_${module.serialNumber}`}
     >
-      {showCalModal ? (
-        <ModuleWizardFlows
-          attachedModule={module}
-          showSetupLauncher={true}
-          closeFlow={() => {
-            setShowCalModal(false)
-          }}
-          isLoadedInRun={isLoadedInRun}
-          robotName={robotName}
-        />
-      ) : null}
       {showSetupWizard &&
         HAS_SETUP_INSTRUCTIONS_TYPE.includes(module.moduleType) && (
           <ModuleSetupModal
