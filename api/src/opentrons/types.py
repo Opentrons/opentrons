@@ -362,6 +362,14 @@ AxisMapType = Dict[AxisType, float]
 StringAxisMap = Dict[str, float]
 
 
+class SlotOrientation(enum.Enum):
+    """Orientation of a deck slot."""
+
+    LEFT = enum.auto()
+    CENTER = enum.auto()
+    RIGHT = enum.auto()
+
+
 # TODO(mc, 2020-11-09): this makes sense in shared-data or other common
 # model library
 # https://github.com/Opentrons/opentrons/pull/6943#discussion_r519029833
@@ -457,6 +465,35 @@ class DeckSlotName(enum.Enum):
             return self.to_ot2_equivalent()
         elif robot_type == "OT-3 Standard":
             return self.to_ot3_equivalent()
+
+    @property
+    def orientation(self) -> SlotOrientation:
+        """Return the orientation of this slot based on its position on the deck."""
+        ot3_slot = self.to_ot3_equivalent()
+
+        if ot3_slot in {
+            DeckSlotName.SLOT_A1,
+            DeckSlotName.SLOT_B1,
+            DeckSlotName.SLOT_C1,
+            DeckSlotName.SLOT_D1,
+        }:
+            return SlotOrientation.LEFT
+        elif ot3_slot in {
+            DeckSlotName.SLOT_A2,
+            DeckSlotName.SLOT_B2,
+            DeckSlotName.SLOT_C2,
+            DeckSlotName.SLOT_D2,
+        }:
+            return SlotOrientation.CENTER
+        elif ot3_slot in {
+            DeckSlotName.SLOT_A3,
+            DeckSlotName.SLOT_B3,
+            DeckSlotName.SLOT_C3,
+            DeckSlotName.SLOT_D3,
+        }:
+            return SlotOrientation.RIGHT
+        else:
+            raise ValueError(f"Unknown slot orientation for {self.value}")
 
     @property
     def id(self) -> str:
