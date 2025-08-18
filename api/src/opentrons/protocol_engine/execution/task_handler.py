@@ -53,6 +53,19 @@ class TaskHandler:
             error=None,
         )
 
+    @staticmethod
+    def _empty_queue(
+        queue: "asyncio.Queue[asyncio.Task[None]]", this_task: asyncio.Task[None]
+    ) -> None:
+        """Empties the queue."""
+        try:
+            while True:
+                task = queue.get_nowait()
+                if task is this_task:
+                    break
+        except asyncio.QueueEmpty:
+            pass
+
     @contextlib.asynccontextmanager
     async def synchronize_cancel_latest(self, group_id: str) -> AsyncIterator[None]:
         """Cancel current task."""
@@ -65,7 +78,22 @@ class TaskHandler:
     @contextlib.asynccontextmanager
     async def synchronize_cancel_previous(self, group_id: str) -> AsyncIterator[None]:
         """Cancel previous run."""
-        yield
+        queue = self._concurrency_provider.queue_for_group(group_id)
+        while not queue.empty():
+            task = queue.get_nowait()
+            task.cancel()
+        this_task = asyncio.current_task()
+        assert this_task is not None
+        queue.put_nowait(this_task)
+        try:
+            yield
+        except asyncio.CancelledError:
+            raise
+        except BaseException:
+            self._empty_queue(queue, this_task)
+            raise
+        else:
+            self._empty_queue(queue, this_task)
 
     @contextlib.asynccontextmanager
     async def synchronize_sequential(self, group_id: str) -> AsyncIterator[None]:

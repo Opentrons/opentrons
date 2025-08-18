@@ -114,19 +114,14 @@ async def test_synchronization_cancel_previous(subject: TaskHandler) -> None:
 
     async def task_1_method(task_handler: TaskHandler) -> None:
         """First run method that will get canceled."""
-        try:
-            async with task_handler.synchronize_cancel_previous("test"):
-                task1_started.set()
-                await task1_canceled.wait()
-        except asyncio.CancelledError:
-            task1_canceled.set()
-            raise
+        async with task_handler.synchronize_cancel_previous("test"):
+            task1_started.set()
+            await task1_canceled.wait()
 
     async def task_2_method(task_handler: TaskHandler) -> None:
         """Second run method will finish."""
         await task1_started.wait()
         async with task_handler.synchronize_cancel_previous("test"):
-            task1_canceled.set()
             await asyncio.sleep(0)
 
     task1 = await subject.create_task(task_1_method)
@@ -138,7 +133,7 @@ async def test_synchronization_cancel_previous(subject: TaskHandler) -> None:
     assert task2.asyncioTask.done()
     assert task2.asyncioTask.exception() is None
     assert task1.asyncioTask.done()
-    assert isinstance(task1.asyncioTask.exception(), asyncio.CancelledError)
+    assert task1.asyncioTask.cancelled()
 
 
 async def test_synchronization_sequential(subject: TaskHandler) -> None:
