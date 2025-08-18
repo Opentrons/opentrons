@@ -654,9 +654,13 @@ async def _run_xy_motion(
     XY_AXIS_SETTINGS = _creat_xy_axis_settings(arguments)
     LOG.info(XY_AXIS_SETTINGS)
     ui.print_header("Current Setting")
-    print(f"default x: current->{DEFAULT_X_CURRENT}, speed->{DEFAULT_X_SPEED}, acc->{DEFAULT_X_ACCELERATION}")
-    print(f"default y: current->{DEFAULT_Y_CURRENT}, speed->{DEFAULT_Y_SPEED}, acc->{DEFAULT_Y_ACCELERATION}")
-    
+    print(
+        f"default x: current->{DEFAULT_X_CURRENT}, speed->{DEFAULT_X_SPEED}, acc->{DEFAULT_X_ACCELERATION}"
+    )
+    print(
+        f"default y: current->{DEFAULT_Y_CURRENT}, speed->{DEFAULT_Y_SPEED}, acc->{DEFAULT_Y_ACCELERATION}"
+    )
+
     for x_speed in DEFAULT_X_SPEEDS:
         # print_motion_settings(
         #     "X",
@@ -670,34 +674,34 @@ async def _run_xy_motion(
         #     setting[Axis.Y].acceleration,
         #     setting[Axis.Y].run_current,
         # )
-        #print(f"X: current-> {setting[Axis.X].run_current}, acc-> {setting[Axis.X].acceleration}, max_speed-> {setting[Axis.X].max_speed}")
-        #print(f"Y: current-> {setting[Axis.Y].run_current}, acc-> {setting[Axis.Y].acceleration}, max_speed-> {setting[Axis.Y].max_speed}")
-        input(f'x_speed: {x_speed}')
+        # print(f"X: current-> {setting[Axis.X].run_current}, acc-> {setting[Axis.X].acceleration}, max_speed-> {setting[Axis.X].max_speed}")
+        # print(f"Y: current-> {setting[Axis.Y].run_current}, acc-> {setting[Axis.Y].acceleration}, max_speed-> {setting[Axis.Y].max_speed}")
+        input(f"x_speed: {x_speed}")
         # res = input("应用这个配置？")
         # if 'Y' in res.upper():
-            # for ax in [Axis.X, Axis.Y]:
-            #     await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
-            #         api,
-            #         ax,
-            #         api.gantry_load,
-            #         default_max_speed=setting[ax].max_speed,
-            #         acceleration=setting[ax].acceleration,
-            #     )
-            #     await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
-            #         api,
-            #         ax,
-            #         api.gantry_load,
-            #         run_current=setting[ax].run_current,
-            #         # run_current=setting[ax].run_current,
-            #     )
-            #     LOG.info(f"Motor Current Settings: {api._backend._current_settings}")
+        # for ax in [Axis.X, Axis.Y]:
+        #     await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
+        #         api,
+        #         ax,
+        #         api.gantry_load,
+        #         default_max_speed=setting[ax].max_speed,
+        #         acceleration=setting[ax].acceleration,
+        #     )
+        #     await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
+        #         api,
+        #         ax,
+        #         api.gantry_load,
+        #         run_current=setting[ax].run_current,
+        #         # run_current=setting[ax].run_current,
+        #     )
+        #     LOG.info(f"Motor Current Settings: {api._backend._current_settings}")
         ax = Axis.X
         await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
             api,
             ax,
             api.gantry_load,
             default_max_speed=x_speed,
-            acceleration=DEFAULT_X_ACCELERATION
+            acceleration=DEFAULT_X_ACCELERATION,
         )
         await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
             api,
@@ -720,10 +724,10 @@ async def _run_xy_motion(
             api.gantry_load,
             run_current=DEFAULT_Y_CURRENT,
         )
-      
+
         fail_count = 0
         pass_count = 0
-       
+
         for i in range(max(int(arguments.cycles / 2), 1)):
 
             res_b = await _run_bowtie(
@@ -921,16 +925,6 @@ async def _main(arguments: argparse.Namespace) -> None:
 
         hour_glass_points = _create_hour_glass_points(await api.gantry_position(mount))
         bowtie_points = _create_bowtie_points(await api.gantry_position(mount))
-        mount_up_down_points_left = _create_mounts_up_down_points(
-            await api.gantry_position(OT3Mount.LEFT)
-        )
-        mount_up_down_points_right = _create_mounts_up_down_points(
-            await api.gantry_position(OT3Mount.RIGHT)
-        )
-        mount_up_down_points = {
-            OT3Mount.LEFT: mount_up_down_points_left,
-            OT3Mount.RIGHT: mount_up_down_points_right,
-        }
 
         # set high throughput hold current
         await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
@@ -944,29 +938,12 @@ async def _main(arguments: argparse.Namespace) -> None:
             f"Motor Current Settings: {cast(OT3Controller, api._backend)._current_settings}"
         )
 
-        # qc_pass = await _run_gantry_cycles(
-        #     arguments,
-        #     api,
-        #     mount,
-        #     bowtie_points,
-        #     hour_glass_points,
-        #     mount_up_down_points,
-        #     csv_cb,
-        # )
-        # if not qc_pass:
-        #     return
         ui.print_header("开始运行XY")
         qc_pass = await _run_xy_motion(
             arguments, api, mount, bowtie_points, hour_glass_points, csv_cb.write
         )
         if not qc_pass:
             return
-
-        # qc_pass = await _run_z_motion(
-        #     arguments, api, mount, mount_up_down_points, csv_cb.write
-        # )
-        # if not qc_pass:
-        #     return
 
     except KeyboardInterrupt:
         print("Cancelled")

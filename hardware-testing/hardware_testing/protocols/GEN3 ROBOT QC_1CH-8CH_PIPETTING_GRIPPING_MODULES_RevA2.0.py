@@ -16,6 +16,7 @@ metadata = {
 
 requirements = {"robotType": "OT-3", "apiLevel": "2.25"}
 
+
 def run(protocol: protocol_api.ProtocolContext):
     # LABWARE AND MODULES
 
@@ -80,20 +81,10 @@ def run(protocol: protocol_api.ProtocolContext):
     tiprack_1000 = stacker.retrieve()
     protocol.move_labware(tiprack_1000, "C2", use_gripper=True)
 
+    protocol.move_lid(source_location=tiprack_50, new_location=trash, use_gripper=True)
+    protocol.move_lid(source_location=tiprack_200, new_location=trash, use_gripper=True)
     protocol.move_lid(
-        source_location=tiprack_50,
-        new_location=trash,
-        use_gripper=True
-    )
-    protocol.move_lid(
-        source_location=tiprack_200,
-        new_location=trash,
-        use_gripper=True
-    )
-    protocol.move_lid(
-        source_location=tiprack_1000,
-        new_location=trash,
-        use_gripper=True
+        source_location=tiprack_1000, new_location=trash, use_gripper=True
     )
     # LOAD PIPETTES
     p1000 = protocol.load_instrument(
