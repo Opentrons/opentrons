@@ -396,7 +396,6 @@ export const getDefaultFormState = (): LabwareFields => ({
   gridSpacingY: null,
   gridOffsetX: null,
   gridOffsetY: null,
-  
 
   homogeneousWells: null,
   regularRowSpacing: null,
