@@ -151,7 +151,7 @@ export const WellTooltip = ({
                           <td>
                             <ColorCircle
                               color={
-                                liquidDisplayColors[Number(groupId)] ??
+                                liquidDisplayColors[groupId] ??
                                 swatchColors(groupId)
                               }
                             />
