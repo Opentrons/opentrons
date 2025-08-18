@@ -46,20 +46,6 @@ SLOT_DIAL = "B2"
 THRESHOLD = 4.5
 DELTA_TOLERANCE = 0.2
 
-# sensitivity values for bottom and top zones:
-
-# tested for 1000
-#ALPHA_LOW = 0.2
-#ALPHA_HIGH = 0.5
-
-# test for 200uL
-#ALPHA_LOW = 0.8
-#ALPHA_HIGH = 0.5
-
-# test for 384
-ALPHA_LOW = 1
-ALPHA_HIGH = 0.8
-
 
 ###########################################
 #  VARIABLES - END
@@ -131,11 +117,11 @@ def add_parameters(parameters: ParameterContext) -> None:
                 "value": "armadillo_96_wellplate_200ul_pcr_full_skirt",
             },
             {
-                "display_name": "biorad384",
-                "value": "biorad_384_wellplate_50ul_custom",
+                "display_name": "nest96 test",
+                "value": "nest_96_wellplate_2ml_deep_custom",
             },
         ],
-        default="biorad_384_wellplate_50ul_custom",
+        default="nest_96_wellplate_2ml_deep_custom",
     )
 
     # generally, the first dispense should be 1/25 the max volume.
@@ -242,9 +228,9 @@ def _setup(
 
     for liquid_rack in liquid_racks:
         props = ethanol.get_for(liq_pipette, liquid_rack)
-        meniscus_z = -0.5
-        props.aspirate.aspirate_position.position_reference = lm  # type: ignore[assignment]
-        props.aspirate.aspirate_position.offset.z = meniscus_z
+    #    meniscus_z = -0.5
+    #    props.aspirate.aspirate_position.position_reference = lm  # type: ignore[assignment]
+    #    props.aspirate.aspirate_position.offset.z = meniscus_z
 
     if not ctx.is_simulating() and DIAL_PORT is None:
         from hardware_testing.data import create_file_name, create_run_id
@@ -507,9 +493,22 @@ def run(ctx: ProtocolContext) -> None:
         if liq_pipette.has_tip:
             liq_pipette.drop_tip()
 
-    # TODO: return alpha value pairs based on the labware volume and expected step volume increment.
+    # these alpha values are alright but pretty arbitrary otherwise
     def get_alpha_for_height(h: float) -> float:
-        return ALPHA_LOW if h < THRESHOLD else ALPHA_HIGH
+        nonlocal max_volume
+
+        if max_volume >= 2000:  # 2000 and above
+            alpha_low, alpha_high = 0.15, 0.3
+        elif max_volume >= 1000: 
+            alpha_low, alpha_high = 0.2, 0.5
+        elif max_volume >= 250:  # 250–999
+            alpha_low, alpha_high = 0.5, 0.8
+        elif max_volume >= 100:  # 100–249
+            alpha_low, alpha_high = 0.8, 1.0
+        else:  # below 100
+            alpha_low, alpha_high = 1.0, 1.0
+
+        return alpha_low if h < THRESHOLD else alpha_high
 
     # Proportional Controller
     def adaptive_volume_step(
@@ -596,7 +595,7 @@ def run(ctx: ProtocolContext) -> None:
         dispense_loc = labware[current_well].bottom(z=max(corrected_height + 2.5, 3))
         liq_pipette.transfer(
             min(dispense_volume / liq_pipette.channels, max_volume),
-            src["A1"],
+            src["A1"].meniscus(z=-2, target="end"),
             dispense_loc,
             new_tip="never",
             return_tip=False,
