@@ -205,7 +205,7 @@ async def _record_plunger_alignment(
     else:
         enc = est
     _stalled_mm = est - enc
-    print(f"{position}: motor={round(est, 2)}, encoder={round(enc, 2)}")
+    #print(f"{position}: motor={round(est, 2)}, encoder={round(enc, 2)}")
     _did_pass = abs(_stalled_mm) < STALL_THRESHOLD_MM
     # NOTE: only tests that are required to PASS need to show a results in the file
     data = [round(current, 2), round(speed, 2),
@@ -339,7 +339,7 @@ async def _record_plunger_alignment_cycle(
     else:
         enc = est
     _stalled_mm = est - enc
-    print(f"{position}: motor={round(est, 2)}, encoder={round(enc, 2)}")
+    #print(f"{position}: motor={round(est, 2)}, encoder={round(enc, 2)}")
     _did_pass = abs(_stalled_mm) < STALL_THRESHOLD_MM
 
     return _did_pass
@@ -389,12 +389,14 @@ async def _cycle_plunger(
     failed_cycles = 0
 
     for trial in range(trials):
-        ui.print_header(
-            f"CURRENT = {CYCLING_CURRENT}: "
-            f"SPEED = {CYCLING_SPEED}: "
-            f"TRIAL = {trial + 1}/{trials}: "
-            f"CYCLE = {cycle}"
-        )
+
+        if trial % 1000 == 0:
+            ui.print_header(
+                f"CURRENT = {CYCLING_CURRENT}: "
+                f"SPEED = {CYCLING_SPEED}: "
+                f"TRIAL = {trial + 1}/{trials}: "
+                f"CYCLE = {cycle}"
+            )
         await _home_plunger(api, mount)
         for direction in ["down", "up"]:
             _pass = await _test_direction_cycle(
@@ -409,6 +411,8 @@ async def _cycle_plunger(
                 ui.print_error(
                     f"failed moving {direction} at {CYCLING_CURRENT} amps and {CYCLING_SPEED} mm/sec"
                 )
+                
+                
                 failed_cycles = failed_cycles + 1
                 ui.print_error(
                     f"-----failed at {trial} cycles and {failed_cycles} failed cycles"
@@ -470,7 +474,7 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
         # if not api.is_simulator and not ui.get_user_answer(f"QC {mount.name} pipette"):
         #     continue
 
-        # report = _build_csv_report(cycles=cycles, trials=trials)
+        # report = CSVReport(test_name="peek-burn-in-qc-ot3", sections=section_list)
         # dut = helpers_ot3.DeviceUnderTest.by_mount(mount)
         # helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut)
         # try:
@@ -483,20 +487,20 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
 
             # this is the old fix, we can use it if the fw reset doesn't work
             # await _move_plunger_as_cycle_settings(api, mount)
-            #await _reset_pipette_fw(api, mount)
+        await _reset_pipette_fw(api, mount)
 
         failed_cycles = await _cycle_plunger(
             api, mount,
             cycle=1, trials=cycles,
             continue_after_stall=continue_after_stall
         )
-        data = [failed_cycles, CSVResult.from_Numbool(failed_cycles)]
+        #data = [failed_cycles, CSVResult.from_Numbool(failed_cycles)]
             # report(
             #     _get_cycling_section_tag(),
             #     _get_cycling_test_tag(cycle),
             #     data,
             # )
-        # ui.print_title(data)
+        # ui.print_title(data)  
         # except Exception as errrrr:
         #     print("errrrr",errrrr)
         # await _test_plunger(
