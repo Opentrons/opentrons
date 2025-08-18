@@ -306,7 +306,7 @@ def _map_module(
     elif module_type == ModuleType.FLEX_STACKER:
         return (
             mapped_location,
-            wrapped_deck_conflict.OtherModule(
+            wrapped_deck_conflict.FlexStackerModule(
                 name_for_errors=name_for_errors,
                 highest_z_including_labware=highest_z_including_labware,
             ),

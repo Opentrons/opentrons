@@ -1,4 +1,5 @@
 """Unit tests for the deck_conflict module."""
+
 import pytest
 from typing import ContextManager, Any, NamedTuple, List, Tuple
 from decoy import Decoy
@@ -303,7 +304,7 @@ def test_maps_different_module_models(
                 is_semi_configuration=False,
             )
         elif module_model is ModuleModel.FLEX_STACKER_MODULE_V1:
-            return wrapped_deck_conflict.OtherModule(
+            return wrapped_deck_conflict.FlexStackerModule(
                 name_for_errors=expected_name_for_errors,
                 highest_z_including_labware=3.14159,
             )
