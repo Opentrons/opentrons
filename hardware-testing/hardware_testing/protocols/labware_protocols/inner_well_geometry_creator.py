@@ -49,12 +49,16 @@ DELTA_TOLERANCE = 0.2
 # sensitivity values for bottom and top zones:
 
 # tested for 1000
-ALPHA_LOW = 0.2
-ALPHA_HIGH = 0.5
+#ALPHA_LOW = 0.2
+#ALPHA_HIGH = 0.5
 
 # test for 200uL
 #ALPHA_LOW = 0.8
 #ALPHA_HIGH = 0.5
+
+# test for 384
+ALPHA_LOW = 1
+ALPHA_HIGH = 0.8
 
 
 ###########################################
@@ -126,8 +130,12 @@ def add_parameters(parameters: ParameterContext) -> None:
                 "display_name": "opentrons96",
                 "value": "armadillo_96_wellplate_200ul_pcr_full_skirt",
             },
+            {
+                "display_name": "biorad384",
+                "value": "biorad_384_wellplate_50ul_custom",
+            },
         ],
-        default="eppendorf_96_wellplate_1000ul_custom",
+        default="biorad_384_wellplate_50ul_custom",
     )
 
     # generally, the first dispense should be 1/25 the max volume.
@@ -472,9 +480,10 @@ def run(ctx: ProtocolContext) -> None:
     udv_table: List[Any] = []
     num_wells = len(wells)
     max_volume = labware["A1"].max_volume
+    margin = max_volume * 0.1
 
     # volume clamps, these can be changed to whatever.
-    min_step = max(max_volume * 0.01, 5)  # clamped to 5uL
+    min_step = max(max_volume * 0.01, 1)  # clamped to 5uL
     max_step = max_volume * 0.25
 
     # deadband to avoid unnecessary step volume corrections
@@ -558,7 +567,7 @@ def run(ctx: ProtocolContext) -> None:
     _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
     step_volume = first_dispense
 
-    while dispense_volume < max_volume:
+    while dispense_volume < (max_volume - margin):
 
         # reposition pipette for dispense
         # for liquid_rack in liquid_racks:
