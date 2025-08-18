@@ -3,7 +3,7 @@
 Labware are the durable or consumable items that you work with, reuse, or discard while running a protocol on a Flex or OT-2. Items such as pipette tips, well plates, tubes, and reservoirs are all examples of labware. This section provides a brief overview of default labware, custom labware, and how to use basic labware API methods when creating a protocol for your robot.
 
 !!!note
-    Code snippets use coordinate deck slot locations (e.g. "D1", "D2"), like those found on Flex. If you have an OT-2 and are using API version 2.14 or earlier, replace the coordinate with its numeric OT-2 equivalent. For example, slot D1 on Flex corresponds to slot 1 on an OT-2. See [Deck Slots](deck_slots.md) for more information.
+    Code snippets use coordinate deck slot locations (e.g. "D1", "D2"), like those found on Flex. If you have an OT-2 and are using API version 2.14 or earlier, replace the coordinate with its numeric OT-2 equivalent. For example, slot D1 on Flex corresponds to slot 1 on an OT-2. See [Deck Slots](deck-slots.md) for more information.
 
 ## Labware Types
 
@@ -13,9 +13,9 @@ Default labware is everything listed in the [Opentrons Labware Library](https://
 
 ### Custom Labware
 
-Custom labware is labware that is not listed in the Labware Library. If your protocol needs something that's not in the library, you can create it with the [Opentrons Labware Creator](https://labware.opentrons.com/create/). However, before using the Labware Creator, you should take a moment to review the support article [Creating Custom Labware Definitions](https://support.opentrons.com/s/article/Creating-Custom-Labware-Definitions).
+Custom labware is labware that is not listed in the Labware Library. If your protocol needs something that's not in the library, you can create it with the [Opentrons Labware Creator](https://labware.opentrons.com/create/). For more information, see the [Custom Labware Creator section][custom-labware-creator] in the Opentrons Flex instruction manual.
 
-After you've created your labware, save it as a `.json` file and add it to the Opentrons App. See [Using Labware in Your Protocols](https://support.opentrons.com/s/article/Using-labware-in-your-protocols) for instructions.
+After you've created your labware, save it as a `.json` file and add it to the Opentrons App.
 
 If other people need to use your custom labware definition, they must also add it to their Opentrons App.
 
@@ -25,11 +25,11 @@ Throughout this section, we'll use the labware listed in the following table.
 
 | Labware type   | Labware name                                                                 | API load name                  |
 |---------------|------------------------------------------------------------------------------|-------------------------------|
-| Well plate    | [Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt](https://labware.opentrons.com/opentrons_96_wellplate_200ul_pcr_full_skirt/) | `corning_96_wellplate_360ul_flat` |
-| Flex tip rack | [Opentrons Flex 96 Tips 200 µL](https://shop.opentrons.com/opentrons-flex-tips-200-l/) | `opentrons_flex_96_tiprack_200ul` |
-| OT-2 tip rack | [Opentrons 96 Tip Rack 300 µL](https://labware.opentrons.com/opentrons_96_tiprack_300ul) | `opentrons_96_tiprack_300ul`      |
+| Well plate    | [Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt](https://labware.opentrons.com/#/?loadName=opentrons_96_wellplate_200ul_pcr_full_skirt) | `corning_96_wellplate_360ul_flat` |
+| Flex tip rack | [Opentrons Flex 96 Tips 200 µL](https://labware.opentrons.com/#/?loadName=opentrons_flex_96_tiprack_200ul) | `opentrons_flex_96_tiprack_200ul` |
+| OT-2 tip rack | [Opentrons 96 Tip Rack 300 µL](https://labware.opentrons.com/#/?loadName=opentrons_96_tiprack_300ul) | `opentrons_96_tiprack_300ul`      |
 
-Similar to the code sample in [API Overview](index.md), here's how you use the [`ProtocolContext.load_labware`][opentrons.protocol_api.ProtocolContext.load_labware] method to load labware on either Flex or OT-2.
+Similar to the code sample in [How the API Works][how-the-api-works], here's how you use the [`ProtocolContext.load_labware`][opentrons.protocol_api.ProtocolContext.load_labware()] method to load labware on either Flex or OT-2.
 
 
 ```python
@@ -59,7 +59,7 @@ When the `load_labware` method loads labware into your protocol, it returns a [`
 
 ## Loading Lids
 
-You can load lids on compatible plates or tip racks with the optional `lid` parameter of [`ProtocolContext.load_labware`][opentrons.protocol_api.ProtocolContext.load_labware]. This example adds an Opentrons Tough Auto-Sealing Lid to a PCR plate:
+You can load lids on compatible plates or tip racks with the optional `lid` parameter of [`load_labware()`][opentrons.protocol_api.ProtocolContext.load_labware]. This example adds an Opentrons Tough Auto-Sealing Lid to a PCR plate:
 
 ```python
 plate = protocol.load_labware(
@@ -90,6 +90,7 @@ lid_stack = protocol.load_lid_stack(
 ```
 
 Tip rack lids can't be stacked or placed on the deck.
+
 *New in version 2.23*
 
 ## Loading Labware on Adapters
@@ -107,7 +108,7 @@ hs_mod = protocol.load_module("heaterShakerModuleV1", "D1")
 hs_adapter = hs_mod.load_adapter("opentrons_96_flat_bottom_adapter")
 hs_plate = hs_adapter.load_labware("nest_96_wellplate_200ul_flat")
 ```
-*New in version 2.15*
+*New in version 2.15:* The `load_adapter()` method.
 
 ### Loading Together
 
@@ -119,7 +120,7 @@ hs_plate = hs_mod.load_labware(
     adapter="opentrons_96_flat_bottom_adapter"
 )
 ```
-*New in version 2.15*
+*New in version 2.15:* The `adapter` parameter.
 
 !!! note
     The API also has some "combination" labware definitions, which treat the adapter and labware as a unit:
@@ -150,14 +151,14 @@ plate = protocol.load_labware("corning_24_wellplate_3.4ml_flat", location="D1")
 
 The API provides many different ways to access wells inside labware. Different methods are useful in different contexts. The table below lists out the methods available to access wells and their differences.
 
-| Method | Returns | Example |
+| `Labware` Method { width="25%" } | Returns | Example |
 |--------|---------|---------|
-| `Labware.wells()` | List of all wells. | `[labware:A1, labware:B1, labware:C1...]` |
-| `Labware.rows()` | List of lists grouped by row. | `[[labware:A1, labware:A2...], [labware:B1, labware:B2...]]` |
-| `Labware.columns()` | List of lists grouped by column. | `[[labware:A1, labware:B1...], [labware:A2, labware:B2...]]` |
-| `Labware.wells_by_name()` | Dictionary with well names as keys. | `{"A1": labware:A1, "B1": labware:B1}` |
-| `Labware.rows_by_name()` | Dictionary with row names as keys. | `{"A": [labware:A1, labware:A2...], "B": [labware:B1, labware:B2...]}` |
-| `Labware.columns_by_name()` | Dictionary with column names as keys. | `{"1": [labware:A1, labware:B1...], "2": [labware:A2, labware:B2...]}` |
+| `wells()` | List of all wells. | `[labware:A1, labware:B1, labware:C1...]` |
+| `rows()` | List of lists grouped by row. | `[[labware:A1, labware:A2...], [labware:B1, labware:B2...]]` |
+| `columns()` | List of lists grouped by column. | `[[labware:A1, labware:B1...], [labware:A2, labware:B2...]]` |
+| `wells_by_name()` | Dictionary with well names as keys. | `{"A1": labware:A1, "B1": labware:B1}` |
+| `rows_by_name()` | Dictionary with row names as keys. | `{"A": [labware:A1, labware:A2...], "B": [labware:B1, labware:B2...]}` |
+| `columns_by_name()` | Dictionary with column names as keys. | `{"1": [labware:A1, labware:B1...], "2": [labware:A2, labware:B2...]}` |
 
 ### Accessing Individual Wells
 
@@ -170,6 +171,7 @@ a1 = plate.wells_by_name()["A1"]
 d6 = plate["D6"]  # dictionary indexing
 ```
 If a well does not exist in the labware, such as `plate["H12"]` on a 24-well plate, the API will raise a `KeyError`. In contrast, it would be a valid reference on a standard 96-well plate.
+
 *New in version 2.0*
 
 #### List Access From `wells`
@@ -182,6 +184,7 @@ plate.wells()[23]  # well D6
 ```
     [!tip]
     You may find coordinate well names like "B3" easier to reason with, especially when working with irregular labware, e.g. `opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical` ([Opentrons 10 Tube Rack](https://labware.opentrons.com/opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical) in the Labware Library). Whichever well access method you use, your protocol will be most maintainable if you use only one access method consistently.
+
 *New in version 2.0*
 
 ### Accessing Groups of Wells
@@ -276,8 +279,10 @@ plate.load_liquid_by_well({'B1': 200, 'B2': 100, 'B3': 50}, blueWater)
 ```
 
 You can also use [`Labware.load_empty`][opentrons.protocol_api.labware.Labware.load_empty] to label individual wells or an entire labware as empty at the beginning of your protocol.
-*New in version 2.14*
-*New in version 2.22*
+
+*New in version 2.14:* Use `Well.load_liquid()` to label liquid in individual wells.
+
+*New in version 2.22:* Use `Labware.load_liquid()`, `Labware.load_liquid_by_well()`, or `Labware.load_empty()` to label liquid in individual wells or an entire labware.
 
 This information is available after you import your protocol to the app or send it to Flex. A summary of liquids appears on the protocol detail page, and well-by-well detail is available on the run setup page (under Initial Liquid Setup in the app, or under Liquids on Flex).
 
@@ -288,11 +293,11 @@ This information is available after you import your protocol to the app or send 
 
 The `load_liquid` arguments include a volume amount (`volume=n` in µL). This amount is just a label. It isn't a command or function that manipulates liquids. It only tells you how much liquid should be in a well at the start of the protocol. You need to use a method like [`transfer`][opentrons.protocol_api.InstrumentContext.transfer] to physically move liquids from a source to a destination.
 
-Although it's optional to define and load liquids in your protocol, you can use a starting liquid volume to specify pipette movements relative to a liquid location, like the [meniscus](well-meniscus.md), in your protocol.
+Although it's optional to define and load liquids in your protocol, you can use a starting liquid volume to specify pipette movements relative to a liquid location, like the [meniscus][meniscus] in your protocol.
 
 ## Well Dimensions
 
-The functions in the previous section return a single [`Well`][opentrons.protocol_api.labware.Well] object or a larger object representing many wells. `Well` objects have attributes that provide information about their physical shape, such as the depth or diameter, as specified in their corresponding labware definition. These properties can be used for different applications, such as calculating the volume of a well or a [position relative to the well](position-relative-labware.md).
+The functions in the previous section return a single [`Well`][opentrons.protocol_api.labware.Well] object or a larger object representing many wells. `Well` objects have attributes that provide information about their physical shape, such as the depth or diameter, as specified in their corresponding labware definition. These properties can be used for different applications, such as calculating the volume of a well or a [position relative to the well][well-positions].
 
 ### Depth
 
