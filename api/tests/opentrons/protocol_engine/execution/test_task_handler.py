@@ -104,7 +104,7 @@ async def test_synchronization_cancel_latest(subject: TaskHandler) -> None:
     assert task1.asyncioTask.done()
     assert task1.asyncioTask.exception() is None
     assert task2.asyncioTask.done()
-    assert isinstance(task2.asyncioTask.exception(), asyncio.CancelledError)
+    assert task2.asyncioTask.cancelled()
 
 
 async def test_synchronization_cancel_previous(subject: TaskHandler) -> None:

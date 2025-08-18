@@ -56,7 +56,11 @@ class TaskHandler:
     @contextlib.asynccontextmanager
     async def synchronize_cancel_latest(self, group_id: str) -> AsyncIterator[None]:
         """Cancel current task."""
-        yield
+        lock = self._concurrency_provider.lock_for_group(group_id)
+        if lock.locked():
+            raise asyncio.CancelledError()
+        async with lock:
+            yield
 
     @contextlib.asynccontextmanager
     async def synchronize_cancel_previous(self, group_id: str) -> AsyncIterator[None]:
