@@ -136,7 +136,7 @@
   "factory_mode": "Factory Mode",
   "factory_reset": "Factory Reset",
   "factory_reset_description": "Resets all settings. You’ll have to redo initial setup before using the robot again.",
-  "factory_reset_modal_description": "This data cannot be retrieved later.",
+  "factory_reset_modal_description": "Resetting will erase all saved data and restart the robot. This action is permanent and cannot be undone.",
   "factory_resets_cannot_be_undone": "Factory resets cannot be undone.",
   "failed_to_connect_to_ssid": "Failed to connect to {{ssid}}",
   "feature_flags": "Feature Flags",
@@ -361,7 +361,6 @@
   "wireless_subnet_mask": "Wireless Subnet Mask",
   "wpa2_personal": "WPA2 Personal",
   "wpa2_personal_description": "Most labs use this method",
-  "yes_clear_data_and_restart_robot": "Yes, clear data and restart robot",
   "you_should_not_downgrade": "You should not downgrade to a software version released before the manufacture date of your robot or any attached hardware.",
   "your_mac_address_is": "Your MAC Address is {{macAddress}}",
   "your_robot_is_ready_to_go": "Your robot is ready to go."

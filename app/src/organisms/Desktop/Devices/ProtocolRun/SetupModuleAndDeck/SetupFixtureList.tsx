@@ -39,8 +39,11 @@ import {
 import { getFixtureImage } from './utils'
 
 import type { TFunction } from 'i18next'
-import type { CutoutFixtureId, DeckDefinition } from '@opentrons/shared-data'
-import type { CutoutConfigAndCompatibility } from '/app/resources/deck_configuration/hooks'
+import type {
+  CutoutConfigAndCompatibility,
+  CutoutFixtureId,
+  DeckDefinition,
+} from '@opentrons/shared-data'
 
 interface SetupFixtureListProps {
   deckConfigCompatibility: CutoutConfigAndCompatibility[]

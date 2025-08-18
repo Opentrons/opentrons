@@ -68,6 +68,7 @@ from .module import (
     ModuleOffsetData,
     StackerFillEmptyStrategy,
     StackerStoredLabwareGroup,
+    StackerLabwareMovementStrategy,
 )
 from .location import (
     DeckSlotLocation,
@@ -213,6 +214,7 @@ __all__ = [
     "ModuleOffsetData",
     "StackerFillEmptyStrategy",
     "StackerStoredLabwareGroup",
+    "StackerLabwareMovementStrategy",
     # Locations of things on deck
     "DeckSlotLocation",
     "StagingSlotLocation",

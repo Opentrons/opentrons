@@ -35,11 +35,11 @@ import {
 
 import type { TFunction } from 'i18next'
 import type {
+  CutoutConfigAndCompatibility,
   CutoutFixtureId,
   DeckDefinition,
   RobotType,
 } from '@opentrons/shared-data'
-import type { CutoutConfigAndCompatibility } from '/app/resources/deck_configuration/hooks'
 
 interface FixtureTableProps {
   robotType: RobotType

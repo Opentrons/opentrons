@@ -8,6 +8,7 @@ import {
   COLORS,
   DeckFromLayers,
   DIRECTION_COLUMN,
+  FixedTrashText,
   Flex,
   ListItem,
   ListItemCustomize,
@@ -36,10 +37,7 @@ import {
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
-import {
-  FixedTrashText,
-  MagnetModuleChangeContent,
-} from '/protocol-designer/components/molecules'
+import { MagnetModuleChangeContent } from '/protocol-designer/components/molecules'
 import {
   getDisableModuleRestrictions,
   getEnableMutlipleTempsOT2,

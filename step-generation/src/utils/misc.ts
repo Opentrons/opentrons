@@ -1072,7 +1072,7 @@ export const getTransferPlanAndReferenceVolumes = (args: {
             ) ?? 0
           : 0)
   const isMultiAspirateAvailable =
-    maxWorkingVolume > minVolumeForMultiAspirateDispense
+    maxWorkingVolume >= minVolumeForMultiAspirateDispense
 
   if (path === 'multiAspirate' && numAspirateWells <= numDispenseWells) {
     console.warn(
