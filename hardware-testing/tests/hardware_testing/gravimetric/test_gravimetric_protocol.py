@@ -110,21 +110,24 @@ def test_gravimetric_test_protocol_has_max_api(pipette: str) -> None:
 
 
 @pytest.mark.parametrize(
-    argnames=["csv"],
+    argnames=["csv", "src_dir"],
     argvalues=[
-        # ["1ch1000.csv"], # Some of these are commented out just cause they take so long.
-        # ["1ch1000_extra.csv"],
-        ["1ch50.csv"],
-        # ["1ch50_extra.csv"],
-        # ["96ch1000.csv"],
-        # ["96ch200.csv"],
-        # ["8ch1000.csv"],
-        # ["8ch1000_extra.csv"],
-        ["8ch50.csv"],
-        # ["8ch50_extra.csv"],
+        # ["1ch1000.csv", GRAVIMETRIC_PROTOCOL_PARENT_FILEPATH], # Some of these are commented out just cause they take so long.
+        # ["1ch1000_extra.csv", GRAVIMETRIC_PROTOCOL_PARENT_FILEPATH],
+        # ["1ch50.csv", GRAVIMETRIC_PROTOCOL_PARENT_FILEPATH],
+        # ["1ch50_extra.csv", GRAVIMETRIC_PROTOCOL_PARENT_FILEPATH],
+        # ["96ch1000.csv", GRAVIMETRIC_PROTOCOL_PARENT_FILEPATH],
+        # ["96ch200.csv", GRAVIMETRIC_PROTOCOL_PARENT_FILEPATH],
+        # ["8ch1000.csv", GRAVIMETRIC_PROTOCOL_PARENT_FILEPATH],
+        # ["8ch1000_extra.csv", GRAVIMETRIC_PROTOCOL_PARENT_FILEPATH],
+        # ["8ch50.csv", GRAVIMETRIC_PROTOCOL_PARENT_FILEPATH],
+        # ["8ch50_extra.csv", GRAVIMETRIC_PROTOCOL_PARENT_FILEPATH],
+        ["1ch50.csv", Path(__file__).parent],
+        ["8ch50.csv", Path(__file__).parent],
+        ["96ch1000.csv", Path(__file__).parent],
     ],
 )
-def test_analasis(csv: str) -> None:
+def test_analasis(csv: str, src_dir: str) -> None:
     """Make sure each CSV can analyze successfully."""
     result = _get_analysis_result(
         [GRAVIMETRIC_PROTOCOL_FILEPATH, VIAL_LABWARE_DEF],
@@ -133,7 +136,7 @@ def test_analasis(csv: str) -> None:
         rtp_files=json.dumps(
             {
                 "qc_test_profile": str(
-                    (GRAVIMETRIC_PROTOCOL_PARENT_FILEPATH / csv).resolve()
+                    (src_dir / csv).resolve()
                 )
             }
         ),
