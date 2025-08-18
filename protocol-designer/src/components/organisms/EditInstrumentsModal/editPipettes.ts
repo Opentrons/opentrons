@@ -4,10 +4,7 @@ import last from 'lodash/last'
 import mapValues from 'lodash/mapValues'
 
 import { INITIAL_DECK_SETUP_STEP_ID } from '/protocol-designer/constants'
-import {
-  createContainer,
-  deleteContainer,
-} from '/protocol-designer/labware-ingred/actions'
+import { createContainer } from '/protocol-designer/labware-ingred/actions'
 import { actions as stepFormActions } from '/protocol-designer/step-forms'
 import { actions as steplistActions } from '/protocol-designer/steplist'
 import { uuid } from '/protocol-designer/utils'
@@ -15,10 +12,7 @@ import { uuid } from '/protocol-designer/utils'
 import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
 import type { NormalizedPipette } from '@opentrons/step-generation'
 import type { StepIdType } from '/protocol-designer/form-types'
-import type {
-  LabwareOnDeck,
-  PipetteOnDeck,
-} from '/protocol-designer/step-forms'
+import type { PipetteOnDeck } from '/protocol-designer/step-forms'
 import type { ThunkDispatch } from '/protocol-designer/types'
 
 const adapter96ChannelDefUri = 'opentrons/opentrons_flex_96_tiprack_adapter/1'
@@ -27,9 +21,7 @@ type PipetteFieldsData = Omit<
   PipetteOnDeck,
   'id' | 'spec' | 'tiprackLabwareDef' | 'pythonName'
 >
-
 export const editPipettes = (
-  labware: { [labwareId: string]: LabwareOnDeck },
   pipettes: { [pipetteId: string]: PipetteOnDeck },
   orderedStepIds: StepIdType[],
   dispatch: ThunkDispatch<any>,
@@ -88,38 +80,24 @@ export const editPipettes = (
   const newTiprackUris = new Set(
     newPipetteArray.flatMap(pipette => pipette.tiprackDefURI)
   )
-  const previousTiprackLabwares = Object.values(labware).filter(
-    lw => lw.def.parameters.isTiprack
-  )
-
-  const previousTiprackUris = new Set(
-    previousTiprackLabwares.map(labware => labware.labwareDefURI)
-  )
-
-  // Find tipracks to delete (old tipracks not in new pipettes)
-  previousTiprackLabwares
-    .filter(labware => !newTiprackUris.has(labware.labwareDefURI))
-    .forEach(labware => dispatch(deleteContainer({ labwareId: labware.id })))
 
   // Create new tipracks that are not in previous tiprackURIs
   newTiprackUris.forEach(tiprackDefUri => {
-    if (!previousTiprackUris.has(tiprackDefUri)) {
-      const adapterUnderLabwareDefURI = newPipetteArray.some(
-        pipette => pipette.name === 'p1000_96'
-      )
-        ? adapter96ChannelDefUri
-        : undefined
-      dispatch(
-        createContainer({
-          labwareDefURIStack: [
-            ...(adapterUnderLabwareDefURI != null
-              ? [adapterUnderLabwareDefURI]
-              : []),
-            tiprackDefUri,
-          ],
-        })
-      )
-    }
+    const adapterUnderLabwareDefURI = newPipetteArray.some(
+      pipette => pipette.name === 'p1000_96'
+    )
+      ? adapter96ChannelDefUri
+      : undefined
+    dispatch(
+      createContainer({
+        labwareDefURIStack: [
+          ...(adapterUnderLabwareDefURI != null
+            ? [adapterUnderLabwareDefURI]
+            : []),
+          tiprackDefUri,
+        ],
+      })
+    )
   })
   dispatch(
     stepFormActions.createPipettes(

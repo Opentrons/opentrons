@@ -353,3 +353,10 @@ export const returnTipUnavailable = (): CommandCreatorError => {
     message: 'Current tip does not have a known location to return to',
   }
 }
+
+export const tipRackLidNotAllowedOnDeck = (): CommandCreatorError => {
+  return {
+    type: 'TIPRACK_LID_NOT_ALLOWED_ON_DECK',
+    message: 'The tip rack lid is not supported directly on the deck',
+  }
+}
