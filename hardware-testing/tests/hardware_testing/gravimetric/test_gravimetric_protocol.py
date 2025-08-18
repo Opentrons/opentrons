@@ -127,19 +127,13 @@ def test_gravimetric_test_protocol_has_max_api(pipette: str) -> None:
         ["96ch1000.csv", Path(__file__).parent],
     ],
 )
-def test_analasis(csv: str, src_dir: str) -> None:
+def test_analasis(csv: str, src_dir: Path) -> None:
     """Make sure each CSV can analyze successfully."""
     result = _get_analysis_result(
         [GRAVIMETRIC_PROTOCOL_FILEPATH, VIAL_LABWARE_DEF],
         "--json-output",
         check=True,
-        rtp_files=json.dumps(
-            {
-                "qc_test_profile": str(
-                    (src_dir / csv).resolve()
-                )
-            }
-        ),
+        rtp_files=json.dumps({"qc_test_profile": str((src_dir / csv).resolve())}),
     )
     print(result.stdout_stderr)
     assert result.exit_code == 0
