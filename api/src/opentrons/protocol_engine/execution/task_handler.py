@@ -4,7 +4,7 @@ from __future__ import annotations
 import logging
 from typing import Protocol, AsyncIterator
 from ..state.state import StateStore
-from ..resources import ModelUtils
+from ..resources import ModelUtils, ConcurrencyProvider
 from ..types import Task
 import asyncio
 import contextlib
@@ -26,13 +26,18 @@ class TaskHandler:
 
     _state_store: StateStore
     _model_utils: ModelUtils
+    _concurrency_provider: ConcurrencyProvider
 
     def __init__(
-        self, state_store: StateStore, model_utils: ModelUtils | None = None
+        self,
+        state_store: StateStore,
+        model_utils: ModelUtils | None = None,
+        concurrency_provider: ConcurrencyProvider | None = None,
     ) -> None:
         """Initialize a TaskHandler instance."""
         self._state_store = state_store
         self._model_utils = model_utils if model_utils is not None else ModelUtils()
+        self._concurrency_provider = concurrency_provider or ConcurrencyProvider()
 
     async def create_task(self, task_code: TaskFunction, id: str | None = None) -> Task:
         """Create a task and immediately schedules it."""
@@ -49,21 +54,21 @@ class TaskHandler:
         )
 
     @contextlib.asynccontextmanager
-    async def synchronize_cancel_latest(self, id: str) -> AsyncIterator[None]:
+    async def synchronize_cancel_latest(self, group_id: str) -> AsyncIterator[None]:
         """Cancel current task."""
         yield
 
     @contextlib.asynccontextmanager
-    async def synchronize_cancel_previous(self, id: str) -> AsyncIterator[None]:
+    async def synchronize_cancel_previous(self, group_id: str) -> AsyncIterator[None]:
         """Cancel previous run."""
         yield
 
     @contextlib.asynccontextmanager
-    async def synchronize_sequential(self, id: str) -> AsyncIterator[None]:
+    async def synchronize_sequential(self, group_id: str) -> AsyncIterator[None]:
         """Run tasks one after the other."""
         yield
 
     @contextlib.asynccontextmanager
-    async def synchronize_concurrent(self, id: str) -> AsyncIterator[None]:
+    async def synchronize_concurrent(self, group_id: str) -> AsyncIterator[None]:
         """Run a list of tasks at the same time."""
         yield
