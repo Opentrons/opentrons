@@ -26,10 +26,6 @@ DYE_RESERVOIR_DEAD_VOLUME = 20000  # 20k uL
 
 TIPRACK_LOCATIONS = ["D1", "C1", "C2", "C3", "B1"]
 
-DYE_RESERVOIR_DEAD_VOLUME = 20000  # 20k uL
-
-TIPRACK_LOCATIONS = ["D1", "C1", "C2", "C3", "B1"]
-
 
 def add_parameters(parameters: protocol_api.ParameterContext) -> None:
     """Add test parameters."""
@@ -318,30 +314,6 @@ def aspirate_with_liquid_class(
     return contents
 
 
-def _get_well_height_at_volume(
-    labware: protocol_api.Labware,
-    volume: float,
-) -> float:
-    well_core = labware._core.get_well_core("A1")
-    geometry = well_core._engine_client.state.geometry  # type: ignore [attr-defined]
-    labware_id = well_core.labware_id  # type: ignore [attr-defined]
-    well_name = well_core._name  # type: ignore [attr-defined]
-
-    return geometry.get_well_height_at_volume(
-        labware_id=labware_id,
-        well_name=well_name,
-        volume=volume,
-    )
-
-
-def _get_current_liquid_height(labware: protocol_api.Labware) -> float:
-    source_core = labware._core.get_well_core("A1")
-    source_core_geometry = source_core._engine_client.state.geometry  # type: ignore [attr-defined]
-    source_labware_id = source_core._labware_id  # type: ignore [attr-defined]
-    source_well_name = source_core._name  # type: ignore [attr-defined]
-    return source_core_geometry.get_meniscus_height(source_labware_id, source_well_name)
-
-
 def run(ctx: protocol_api.ProtocolContext) -> None:
     """Run."""
     ctx.load_trash_bin("A3")
@@ -388,13 +360,6 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         description="Food Coloring",
         display_color="#FE0000",
     )
-    diluent = ctx.define_liquid(
-        name="Diluent",
-        description="Food Coloring",
-        display_color="#FE0000",
-    )
-    diluent_volume = 200 - ctx.params.target_volume  # type: ignore [attr-defined]
-    dye_source["A1"].load_liquid(diluent, diluent_volume)  # type: ignore [attr-defined]
 
     def _validate_dye_liquid_height(trial: int) -> None:
 
