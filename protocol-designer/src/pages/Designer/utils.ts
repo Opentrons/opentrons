@@ -294,20 +294,22 @@ export const useLabwareDropdownOptions = (
       const deckSlot = getSlotInLocationStack(
         deckSetupLabware[labwareId]?.stack
       )
+      const isOffDeck = deckSlot === 'offDeck'
       const fullStackFromLabwares = getFullStackFromLabwares(
         deckSetupLabware,
-        deckSlot
+        deckSlot,
+        labwareId
       )
-      const labwareStack = fullStackFromLabwares.filter(
-        id =>
-          deckSetupLabware[id] != null &&
-          !deckSetupLabware[id].def.allowedRoles?.includes('adapter')
-      )
+      const labwareStack =
+        fullStackFromLabwares?.filter(
+          id =>
+            deckSetupLabware[id] != null &&
+            !deckSetupLabware[id].def.allowedRoles?.includes('adapter')
+        ) ?? []
       const labwareStackLength = labwareStack.length - 1
       const allowStacking = def.stackLimit != null && def.stackLimit > 1
       const showStackOption = !useGripper && type === 'moveLabware'
-
-      const isTopOfStack = fullStackFromLabwares[0] === labwareId
+      const isTopOfStack = fullStackFromLabwares?.[0] === labwareId
       const isBottomOfStack =
         labwareStack[labwareStackLength] === labwareId &&
         allowStacking &&
@@ -327,7 +329,7 @@ export const useLabwareDropdownOptions = (
       )
       const isTiprack = getIsTiprack(def)
       const isFilterOffDeck =
-        deckSlot === 'offDeck' &&
+        isOffDeck &&
         (type === 'labware' || (type === 'moveLabware' && useGripper))
 
       //  show full stack option if moving labware manually
@@ -399,7 +401,7 @@ export const getUnoccupiedStackOptions = (args: {
   return Object.entries(labwareState).reduce<Option[]>(
     (acc, [labwareId, temporalLabwareOnDeck]) => {
       const slot = getSlotInLocationStack(temporalLabwareOnDeck.stack)
-      const fullStack = getFullStackFromLabwares(labwareState, slot)
+      const fullStack = getFullStackFromLabwares(labwareState, slot, labwareId)
       const labwareOnDeck = deckSetupLabware[labwareId]
       const isTopOfStack = fullStack[0] === labwareId
       const { def: labwareOnDeckDef } = labwareOnDeck
