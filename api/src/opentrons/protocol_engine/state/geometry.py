@@ -375,7 +375,12 @@ class GeometryView:
         location = self._labware.get(labware_id).location
         definition = self._labware.get_definition(labware_id)
         aa_name = self._get_underlying_addressable_area_name(location)
-        addressable_area = self._addressable_areas.get_addressable_area(aa_name)
+        # TODO(jh, 08-18-25): Labware locations return the underlying slot as the "on location" for the fixed trash,
+        #  but the underlying slot's name does not exist in addressable area state. Getting the addressable area from data is
+        #  a workaround. Investigate further.
+        addressable_area = self._addressable_areas._get_addressable_area_from_deck_data(
+            aa_name, do_compatibility_check=False
+        )
         stackup_lw_defs_locs = self._get_stackup_lw_info_top_to_bottom(
             labware_definition=definition, location=location
         )

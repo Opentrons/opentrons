@@ -280,6 +280,11 @@ def auto_setup_addressable_area_mocks(
             mock_addressable_area_view.get_addressable_area(slot_id)
         ).then_return(mock_area)
         decoy.when(
+            mock_addressable_area_view._get_addressable_area_from_deck_data(
+                slot_id, False
+            )
+        ).then_return(mock_area)
+        decoy.when(
             mock_addressable_area_view.get_addressable_area_position(slot_id)
         ).then_return(Point(1, 2, 3))
 
@@ -306,6 +311,11 @@ def auto_setup_addressable_area_mocks(
 
         decoy.when(
             mock_addressable_area_view.get_addressable_area(area_name)
+        ).then_return(mock_module_area)
+        decoy.when(
+            mock_addressable_area_view._get_addressable_area_from_deck_data(
+                area_name, False
+            )
         ).then_return(mock_module_area)
         decoy.when(
             mock_addressable_area_view.get_addressable_area_position(area_name)
