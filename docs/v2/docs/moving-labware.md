@@ -4,7 +4,7 @@ You can move an entire labware (and all of its contents) from one deck slot to a
 
 ## Basic Movement
 
-Use the [move_labware()][opentrons.protocol_api.ProtocolContext.move_labware] method to initiate a move, regardless of whether it uses the gripper.
+Use the [`move_labware()`][opentrons.protocol_api.ProtocolContext.move_labware] method to initiate a move, regardless of whether it uses the gripper.
 
 ```python
 def run(protocol: protocol_api.ProtocolContext):
@@ -14,7 +14,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
 *New in version 2.15*
 
-The required arguments of `move_labware()` are the `labware` you want to move and its `new_location`. You don't need to specify where the move begins, since that information is already stored in the [Labware][opentrons.protocol_api.labware.Labware] object—`plate` in this example. The destination of the move can be any empty deck slot, or a module that's ready to have labware added to it (see [Movement with Modules](#movement-with-modules) below). Movement to an occupied location, including the labware's current location, will raise an error.
+The required arguments of `move_labware()` are the `labware` you want to move and its `new_location`. You don't need to specify where the move begins, since that information is already stored in the [`Labware`][opentrons.protocol_api.labware.Labware] object—`plate` in this example. The destination of the move can be any empty deck slot, or a module that's ready to have labware added to it (see [Movement with Modules](#movement-with-modules) below). Movement to an occupied location, including the labware's current location, will raise an error.
 
 When the move step is complete, the API updates the labware's location, so you can move the plate multiple times:
 
