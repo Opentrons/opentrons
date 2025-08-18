@@ -26,6 +26,7 @@ import { getPipetteEntities } from '../../../step-forms/selectors'
 import { getHas96Channel } from '../../../utils'
 import { ADAPTER_96_CHANNEL } from '../../../utils/labwareModuleCompatibility'
 import { SelectLidOnLabware } from './SelectLidOnLabware'
+import { getIsNestedDefinitionALid } from './utils'
 
 import type { ChangeEvent } from 'react'
 import type { StackingProps } from '@opentrons/components'
@@ -186,9 +187,7 @@ export function SelectLabwareOnAdapter(
                 <Fragment key={`${loadName}_${category}`}>
                   <CustomizeExpandButton
                     enableStackingFF={enableStacking}
-                    isNestedDefALid={
-                      nestedDef.allowedRoles?.includes('lid') ?? false
-                    }
+                    isNestedDefALid={getIsNestedDefinitionALid(nestedDef)}
                     allowInputField={lidLoadNames.includes(
                       nestedDef.parameters.loadName
                     )}

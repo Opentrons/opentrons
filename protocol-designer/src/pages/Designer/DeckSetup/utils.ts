@@ -204,13 +204,13 @@ const getStackerDefinitionsFromLoadName = (
 
   //  TODO: remove this when we allow stacking of all labware on itself
   //  in PD
-  if (
-    loadName === 'opentrons_96_wellplate_200ul_pcr_full_skirt' &&
-    matchingLabwares.some(labware => labware.loadName === loadName)
-  ) {
-    return matchingLabwares
-      .filter(labware => labware.loadName !== loadName)
-      .map(labware => labware.labwareDefUri)
+  if (matchingLabwares.some(labware => labware.loadName === loadName)) {
+    return matchingLabwares.reduce((acc: string[], labware) => {
+      if (labware.loadName !== loadName) {
+        acc.push(labware.labwareDefUri)
+      }
+      return acc
+    }, [])
   }
 
   return matchingLabwares.map(labware => labware.labwareDefUri)

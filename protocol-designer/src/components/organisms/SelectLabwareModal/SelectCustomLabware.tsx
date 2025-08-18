@@ -13,6 +13,7 @@ import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { selectLid, selectTopLabware } from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
 import { CUSTOM_CATEGORY } from '../../../pages/Designer/DeckSetup/constants'
+import { getIsNestedDefinitionALid } from './utils'
 
 import type { ChangeEvent } from 'react'
 import type { StackingProps } from '@opentrons/components'
@@ -99,9 +100,9 @@ export function SelectCustomLabware(
             return (
               <CustomizeExpandButton
                 enableStackingFF={enableStacking}
-                isNestedDefALid={
-                  customLabwareDefs[uri].allowedRoles?.includes('lid') ?? false
-                }
+                isNestedDefALid={getIsNestedDefinitionALid(
+                  customLabwareDefs[uri]
+                )}
                 allowInputField={onFlexStacker}
                 key={`${index}_${uri}`}
                 id={`${index}_${uri}`}
