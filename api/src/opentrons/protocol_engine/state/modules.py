@@ -56,7 +56,6 @@ from ..types import (
     HeaterShakerLatchStatus,
     HeaterShakerMovementRestrictors,
     DeckType,
-    LabwareMovementOffsetData,
     AddressableAreaLocation,
     StackerStoredLabwareGroup,
 )
@@ -1329,19 +1328,6 @@ class ModuleView:
                 raise errors.LocationIsOccupiedError(
                     f"Module {module.model} is already present at {location}."
                 )
-
-    def is_column_4_module(self, model: ModuleModel) -> bool:
-        """Determine whether or not a module is a Column 4 Module."""
-        if model in _COLUMN_4_MODULES:
-            return True
-        return False
-
-    def get_default_gripper_offsets(
-        self, module_id: str
-    ) -> Optional[LabwareMovementOffsetData]:
-        """Get the deck's default gripper offsets."""
-        offsets = self.get_definition(module_id).gripperOffsets
-        return offsets.get("default") if offsets else None
 
     def get_overflowed_module_in_slot(
         self, slot_name: DeckSlotName

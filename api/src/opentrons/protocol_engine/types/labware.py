@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Optional, Union
+from typing import Optional
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -15,8 +15,6 @@ from .labware_offset_location import (
 )
 from .labware_offset_vector import LabwareOffsetVector
 from .util import Vec3f
-from .module import ModuleDefinition
-from .deck_configuration import DeckLocationDefinition
 
 
 @dataclass(frozen=True)
@@ -120,13 +118,6 @@ class LoadedLabware(BaseModel):
         None,
         description="A user-specified display name for this labware, if provided.",
     )
-
-
-LabwareStackupAncestorDefinition = Union[
-    DeckLocationDefinition,
-    ModuleDefinition,
-]
-"""Information pertaining to the lowest deck item in a labware stackup."""
 
 
 @dataclass(frozen=True)
