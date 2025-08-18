@@ -103,7 +103,14 @@ class OtherModule(_Module):
 
 @dataclass
 class FlexStackerModule(_Module):
-    """A stacker."""
+    """A stacker where nothing else is known to be in the "location" in column 3 that it lives."""
+
+
+@dataclass
+class FlexStackerModuleKindaButSomethingElseReally(_Module):
+    """A stacker where something else is also in the "location" in column 3 that it lives."""
+
+    original_item: "DeckItem"
 
 
 DeckItem = Union[
@@ -114,6 +121,7 @@ DeckItem = Union[
     OtherModule,
     TrashBin,
     FlexStackerModule,
+    FlexStackerModuleKindaButSomethingElseReally,
 ]
 
 
@@ -314,7 +322,7 @@ def _create_ot2_restrictions(  # noqa: C901
     return restrictions
 
 
-def _create_flex_restrictions(
+def _create_flex_restrictions(  # noqa: C901
     item: DeckItem, location: Union[DeckSlotName, StagingSlotName]
 ) -> List[_DeckRestriction]:
     restrictions: List[_DeckRestriction] = []
@@ -362,6 +370,33 @@ def _create_flex_restrictions(
         )
         # note that the stacker does NOT block use of the "slot" that it is "loaded in" because
         # it is actually loaded in that cutout, and you can put a deck slot on top just fine
+    elif isinstance(item, FlexStackerModuleKindaButSomethingElseReally):
+        if location not in _flex_slots_allowing_stacker():
+            raise DeckConflictError("Cannot place a Flex Stacker outside of column 3.")
+        # this is a typing assertion; the check above guarantees this is true
+        assert isinstance(location, DeckSlotName)
+        adjacent_staging_slot = get_adjacent_staging_slot(location)
+        assert adjacent_staging_slot is not None
+        # nothing goes in the staging slot in the row the stacker is in, because the stacker is in the
+        # way (different from blocking you because of the design of the caddy).
+        restrictions.append(
+            _NothingAllowed(
+                location=adjacent_staging_slot,
+                source_item=item,
+                source_location=location,
+            )
+        )
+        # while the stacker on its own doesn't block use of the "slot" that it is "loaded in",
+        # the kind of "flex stacker" that actually means "you loaded a labware in column 3 where a
+        # stacker is sort of also "loaded" in column 3" does
+        restrictions.append(
+            _NothingAllowed(
+                location=location,
+                source_item=item.original_item,
+                source_location=location,
+            )
+        )
+
     elif isinstance(item, ThermocyclerModule):
         for covered_location in _flex_slots_covered_by_thermocycler():
             restrictions.append(

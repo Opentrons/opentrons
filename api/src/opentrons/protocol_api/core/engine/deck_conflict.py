@@ -176,14 +176,61 @@ def check(
     for existing_location, existing_item in itertools.chain(
         mapped_existing_labware, mapped_existing_modules, mapped_disposal_locations
     ):
-        assert existing_location not in existing_items
-        existing_items[existing_location] = existing_item
+        if existing_location not in existing_items:
+            existing_items[existing_location] = existing_item
+        else:
+            existing_items[existing_location] = _check_pair_compatibility(
+                existing_items[existing_location], existing_item, existing_location
+            )
 
     wrapped_deck_conflict.check(
         existing_items=existing_items,
         new_item=new_item,
         new_location=new_location,
         robot_type=engine_state.config.robot_type,
+    )
+
+
+def _check_pair_compatibility(
+    item1: wrapped_deck_conflict.DeckItem,
+    item2: wrapped_deck_conflict.DeckItem,
+    location: Union[DeckSlotName, StagingSlotName],
+) -> wrapped_deck_conflict.DeckItem:
+    # if this is a stacker and something that can also "go" where a stacker "goes" (like a labware or magblock)
+    # then we build a combo; otherwise, we raise an error. this error in theory should never happen because to
+    # have the configuration that causes the error, it has to have passed the wrapped deck conflict checking,
+    # so there would be a bug in there, which is of course impossible.
+
+    def _check_pair_compat_once(
+        item1: wrapped_deck_conflict.DeckItem, item2: wrapped_deck_conflict.DeckItem
+    ) -> bool:
+        if isinstance(item1, wrapped_deck_conflict.FlexStackerModule) and isinstance(
+            item2,
+            (wrapped_deck_conflict.MagneticBlockModule, wrapped_deck_conflict.Labware),
+        ):
+            return True
+        return False
+
+    if _check_pair_compat_once(item1, item2) or _check_pair_compat_once(item2, item1):
+        not_stacker = (
+            item1
+            if not isinstance(item1, wrapped_deck_conflict.FlexStackerModule)
+            else item2
+        )
+        # type-only assertion: trash bins are not alowed in _check_pair_compat_once and
+        # so we would never get here
+        assert not isinstance(not_stacker, wrapped_deck_conflict.TrashBin)
+        return wrapped_deck_conflict.FlexStackerModuleKindaButSomethingElseReally(
+            name_for_errors=not_stacker.name_for_errors,
+            highest_z_including_labware=(
+                not_stacker.highest_z
+                if isinstance(not_stacker, wrapped_deck_conflict.Labware)
+                else not_stacker.highest_z_including_labware
+            ),
+            original_item=not_stacker,
+        )
+    raise wrapped_deck_conflict.DeckConflictError(
+        f"{item1.name_for_errors} and {item2.name_for_errors} cannot both be loaded in {location}"
     )
 
 
