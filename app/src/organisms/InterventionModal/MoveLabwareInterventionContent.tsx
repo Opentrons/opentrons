@@ -128,10 +128,10 @@ export function MoveLabwareInterventionContent({
             type="location-arrow-location"
             labwareName={labwareName}
             currentLocationProps={{
-              deckLabel: i18n.format(oldDisplayLabwareLocation, 'capitalize'),
+              deckLabel: i18n.format(oldDisplayLabwareLocation, 'upperCase'),
             }}
             newLocationProps={{
-              deckLabel: i18n.format(newDisplayLabwareLocation, 'capitalize'),
+              deckLabel: i18n.format(newDisplayLabwareLocation, 'upperCase'),
             }}
           />
         </Flex>

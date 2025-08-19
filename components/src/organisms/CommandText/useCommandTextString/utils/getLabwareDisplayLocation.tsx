@@ -36,6 +36,7 @@ export interface DisplayLocationFullParams
   extends Omit<LocationFullParams, 'location'> {
   t: TFunction
   isOnDevice?: boolean
+  includeSlotText?: boolean
   location?: LabwareLocation | LabwareLocationSequence | null
 }
 export type DisplayLocationParams =
@@ -47,9 +48,8 @@ export type DisplayLocationParams =
 // If 'slot-only', return only the slot name, ex "in slot C1".
 export function getLabwareDisplayLocation(
   params: DisplayLocationParams,
-  includeSlotText: boolean = true
 ): string {
-  const { t, isOnDevice = false, location } = params
+  const { t, isOnDevice = false, location, includeSlotText = true } = params
   const locationResult = Array.isArray(location)
     ? getLabwareLocationFromSequence({
         ...params,
