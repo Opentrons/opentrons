@@ -1099,7 +1099,9 @@ class GeometryView:
 
                 middle_slot_fixture = (
                     self._addressable_areas.get_fixture_by_deck_slot_name(
-                        DeckSlotName.SLOT_C2
+                        DeckSlotName.SLOT_C2.to_equivalent_for_robot_type(
+                            self._config.robot_type
+                        )
                     )
                 )
                 if middle_slot_fixture is None:

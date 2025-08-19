@@ -218,8 +218,8 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                         <ProtocolReceiptToasts />
                         {!showModuleSetupModal ? (
                           <ModuleAttachedToasts
-                            openFlow={() => {
-                              setShowModuleSetupModal(true)
+                            openFlow={(open: boolean) => {
+                              setShowModuleSetupModal(open)
                             }}
                           />
                         ) : null}
@@ -312,7 +312,11 @@ function ProtocolReceiptToasts(): null {
   return null
 }
 
-function ModuleAttachedToasts({ openFlow }: { openFlow: () => void }): null {
+function ModuleAttachedToasts({
+  openFlow,
+}: {
+  openFlow: (open: boolean) => void
+}): null {
   useModuleAttachedToast(openFlow)
   return null
 }

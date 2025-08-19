@@ -186,7 +186,7 @@ export function TwoColLwInfoAndDeck(
           {...props}
           title={buildTitle()}
           type={buildType()}
-          layout={'default'}
+          layout="default"
           bannerText={buildBannerText()}
         />
         <Flex marginTop="0.7rem">{buildDeckView()}</Flex>

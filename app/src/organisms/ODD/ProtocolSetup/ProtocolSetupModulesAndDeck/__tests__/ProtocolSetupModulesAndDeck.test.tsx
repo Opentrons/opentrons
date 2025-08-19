@@ -15,7 +15,7 @@ import { i18n } from '/app/i18n'
 import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
 import { useIsDoorOpen } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
-import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
+import { handleModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 import { mockApiHeaterShaker } from '/app/redux/modules/__fixtures__'
@@ -128,9 +128,6 @@ describe('ProtocolSetupModulesAndDeck', () => {
       .thenReturn({
         complete: true,
       })
-    vi.mocked(ModuleWizardFlows).mockReturnValue(
-      <div>mock ModuleWizardFlows</div>
-    )
     vi.mocked(useChainLiveCommands).mockReturnValue({
       chainLiveCommands: mockChainLiveCommands,
     } as any)
@@ -224,7 +221,7 @@ describe('ProtocolSetupModulesAndDeck', () => {
     render()
     screen.getByText('Heater-Shaker Module GEN1')
     fireEvent.click(screen.getByText('Calibrate'))
-    screen.getByText('mock ModuleWizardFlows')
+    expect(vi.mocked(handleModuleWizardFlows)).toHaveBeenCalled()
   })
 
   it('should render module information with text button when a protocol has module - attach pipette first', () => {

@@ -322,7 +322,7 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
     case RECOVERY_MAP.ROBOT_PICKING_UP_TIPS.ROUTE:
     case RECOVERY_MAP.ROBOT_SKIPPING_STEP.ROUTE:
     case RECOVERY_MAP.ROBOT_RELEASING_LABWARE.ROUTE:
-    case RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE:
+    case RECOVERY_MAP.STACKER_RELEASING_LABWARE_LATCH.ROUTE:
       return buildRecoveryInProgress()
     case RECOVERY_MAP.ROBOT_DOOR_OPEN.ROUTE:
       return buildManuallyRouteToDoorOpen()

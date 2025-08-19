@@ -146,6 +146,7 @@ export function DeviceDetailsDeckConfiguration({
         cutoutFixtureId,
         addressableAreaId
       )
+
       return {
         ...acc,
         displayList: [

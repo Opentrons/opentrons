@@ -16,6 +16,7 @@ import {
 import {
   getCutoutDisplayName,
   getFixtureDisplayName,
+  getModuleDeckLabel,
   getModuleDisplayName,
   getModuleType,
   GRIPPER_V1_2,
@@ -120,7 +121,14 @@ function HardwareItem({
     </LegacyStyledText>
   )
   if (hardware.hardwareType === 'module') {
-    location = <DeckInfoLabel deckLabel={hardware.slot} />
+    location = (
+      <DeckInfoLabel
+        deckLabel={getModuleDeckLabel(
+          getModuleType(hardware.moduleModel),
+          hardware.slot
+        )}
+      />
+    )
   } else if (hardware.hardwareType === 'fixture') {
     location = (
       <DeckInfoLabel

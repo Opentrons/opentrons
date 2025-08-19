@@ -51,14 +51,17 @@ export const UpdateBanner = ({
     return t('module_calibration_required')
   }
 
-  const canProceed =
-    updateType === 'firmware'
-      ? true
-      : !isEstopNotDisengaged &&
-        !isTooHot &&
-        !attachPipetteRequired &&
-        !calibratePipetteRequired &&
-        !updatePipetteFWRequired
+  const proceedChecks = {
+    firmware: () => true,
+    calibration: () =>
+      !isEstopNotDisengaged &&
+      !isTooHot &&
+      !attachPipetteRequired &&
+      !calibratePipetteRequired &&
+      !updatePipetteFWRequired,
+    setup: () => true,
+  }
+  const canProceed = proceedChecks[updateType]()
 
   const getMessage = (): string => {
     switch (updateType) {

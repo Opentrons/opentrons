@@ -49,7 +49,7 @@ export type RobotMovingRoute =
   | typeof RECOVERY_MAP['ROBOT_PICKING_UP_TIPS']['ROUTE']
   | typeof RECOVERY_MAP['ROBOT_SKIPPING_STEP']['ROUTE']
   | typeof RECOVERY_MAP['ROBOT_RELEASING_LABWARE']['ROUTE']
-  | typeof RECOVERY_MAP['ROBOT_RELEASING_LABWARE_LATCH']['ROUTE']
+  | typeof RECOVERY_MAP['STACKER_RELEASING_LABWARE_LATCH']['ROUTE']
 
 type OriginalRouteKey = keyof RecoveryMap
 type StepsForRoute<R extends RouteKey> = RecoveryMap[{

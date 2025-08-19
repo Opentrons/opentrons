@@ -10,7 +10,14 @@ By installing and using Opentrons software, you agree to the Opentrons End-User 
 
 ## Opentrons Robot Software Changes in 8.6.0
 
-### TODO
+Welcome to the v8.6.0 release of the Opentrons robot software! This release adds support for the Flex Stacker Module, along with other new features and improvements.
+
+### New Features 
+
+- Automate labware storage with the Flex Stacker Module. Use new commands like `retrieve()` and `store()` to move well plates, reservoirs, or Flex tip racks to and from the Stacker during a protocol. 
+- This release adds support for the Opentrons Flex 96-Channel Pipette (1–200 μL) to transfer as little as 1 µL in a protocol. 
+- Control individual robot motors, like the gantry, extension mount, or gripper, with new  commands.  
+
 
 ---
 
