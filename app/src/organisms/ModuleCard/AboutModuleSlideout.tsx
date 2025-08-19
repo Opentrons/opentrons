@@ -84,7 +84,7 @@ export const AboutModuleSlideout = (
               setShowBanner(false)
             }}
           >
-            {t('firmware_update_available')}
+            {`${t('firmware_update_available')}.`}
             <Btn
               textAlign={ALIGN_START}
               paddingLeft={SPACING.spacing4}
