@@ -180,6 +180,20 @@ class OpentronsFlexTipRackLidAsChildFeature(TypedDict):
     matingZ: float
 
 
+class HeaterShakerUniversalFlatAdapterDeckLeft(TypedDict):
+    wallX: float
+
+
+class HeaterShakerUniversalFlatAdapterDeckRight(TypedDict):
+    wallX: float
+
+
+class HeaterShakerUniversalFlatAdapterFeature(TypedDict):
+    flatWellSupportZ: float
+    deckLeft: HeaterShakerUniversalFlatAdapterDeckLeft
+    deckRight: HeaterShakerUniversalFlatAdapterDeckRight
+
+
 class LocatingFeatures(TypedDict):
     """A dictionary of locating features."""
 
@@ -188,6 +202,9 @@ class LocatingFeatures(TypedDict):
     springDirectionalForceAsParent: NotRequired[SpringDirectionalForce]
     opentronsFlexTipRackLidAsParent: NotRequired[OpentronsFlexTipRackLidAsParentFeature]
     opentronsFlexTipRackLidAsChild: NotRequired[OpentronsFlexTipRackLidAsChildFeature]
+    heaterShakerUniversalFlatAdapter: NotRequired[
+        HeaterShakerUniversalFlatAdapterFeature
+    ]
 
 
 class LabwareDefinition2(TypedDict):

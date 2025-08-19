@@ -700,6 +700,37 @@
               "type": "number"
             }
           }
+        },
+        "heaterShakerUniversalFlatAdapter": {
+          "description": "Designates this labware as the Opentrons Universal Flat Adapter",
+          "type": "object",
+          "required": ["flatWellSupportZ", "deckLeft", "deckRight"],
+          "properties": {
+            "flatWellSupportZ": {
+              "description": "The bottom of the labware to the top of the labware's surface that makes contact with a child labware's wells.",
+              "type": "number"
+            },
+            "deckLeft": {
+              "type": "object",
+              "required": ["wallX"],
+              "properties": {
+                "wallX": {
+                  "description": "The +X-coordinate in mm from the edge of the labware's external protrusion to the interior of the `wall` when the labware is placed on the left side of the deck.",
+                  "type": "number"
+                }
+              }
+            },
+            "deckRight": {
+              "type": "object",
+              "required": ["wallX"],
+              "properties": {
+                "wallX": {
+                  "description": "The -X-coordinate in mm from the edge of the labware's external protrusion to the interior of the `wall` when the labware is placed on the right side of the deck.",
+                  "type": "number"
+                }
+              }
+            }
+          }
         }
       }
     },
