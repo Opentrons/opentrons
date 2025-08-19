@@ -19,7 +19,7 @@ export const SUGGESTED_XY_RANGE = 1
 
 export const MAX_Z_DIMENSION = 195
 export const MAX_SUGGESTED_Z = 124
-export const MAX_SUGGESTED_GRIPPER_Z = 155
+export const MAX_SUGGESTED_GRIPPER_Z = 129
 
 export const DISPLAY_VOLUME_UNITS = 'µL'
 
