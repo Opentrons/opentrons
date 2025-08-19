@@ -3,8 +3,6 @@ title: "Temperature Module: OT-2 Attachment Steps"
 hide: toc
 ---
 
-# OT-2 Attachment Steps
-
 <div class="instruction-list" markdown>
 
 To install the Temperature Module on your OT-2:

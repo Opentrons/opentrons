@@ -2,8 +2,6 @@
 title: "Temperature Module: Maintenance and Cleaning"
 ---
 
-# Maintenance and Cleaning
-
 ## Maintenance
 
 Users should not attempt to service or repair the Temperature Module themselves. If you have concerns about the module’s performance or require maintenance, please contact Opentrons Support.
