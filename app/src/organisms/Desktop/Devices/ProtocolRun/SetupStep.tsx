@@ -90,9 +90,7 @@ export function SetupStep({
           </Flex>
         </Flex>
       </Btn>
-      <Box css={expanded ? EXPANDED_STYLE : COLLAPSED_STYLE}>
-        <Box overflow={OVERFLOW_HIDDEN}>{children}</Box>
-      </Box>
+      <Box css={expanded ? EXPANDED_STYLE : COLLAPSED_STYLE}>{children}</Box>
     </Flex>
   )
 }
