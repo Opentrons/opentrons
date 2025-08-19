@@ -1,24 +1,24 @@
 .action_card {
   display: flex;
-  min-width: 240px;
-  max-width: 280px;
+  min-width: 15rem;
+  max-width: 17.5rem;
   height: 14.125rem;
   flex: 1;
   flex-direction: column;
   align-items: flex-start;
-  padding: var(--spacing-20, 1.25rem);
-  border-radius: var(--border-radius-16, 1rem);
-  background: var(--Colors-Brand-blue-10, #f1f8ff);
-  gap: var(--spacing-10, 0.625rem);
+  padding: var(--spacing-20);
+  border-radius: var(--border-radius-16);
+  background: var(--blue-10);
+  gap: var(--spacing-10);
   text-align: left;
 }
 
 .card_title {
   align-self: stretch;
   margin: 0;
-  font-size: var(--font-size-heading-medium, 1.4375rem);
-  font-weight: var(--font-weight-semibold, 600);
-  line-height: var(--line-height-heading-medium, 1.75rem);
+  font-size: 1.4375rem;
+  font-weight: var(--font-weight-semi-bold);
+  line-height: var(--line-height-28);
 }
 
 .card_description {
@@ -26,9 +26,9 @@
   align-self: stretch;
   margin: 0;
   font-family: var(--font-family-body, 'Public Sans', sans-serif);
-  font-size: var(--font-size-body, 1rem);
-  font-weight: var(--font-weight-regular, 400);
-  line-height: var(--line-height-body, 1.5rem);
+  font-size: 1rem;
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-24);
 }
 
 .card_link {
@@ -37,19 +37,19 @@
   padding: 0;
   border: none;
   background: none;
-  color: var(--Colors-Brand-blue-50, #006cfa);
+  color: var(--blue-50);
   cursor: pointer;
   font-family: var(--font-family-body, 'Public Sans', sans-serif);
-  font-size: var(--font-size-body, 1rem);
-  font-weight: var(--font-weight-semibold, 600);
-  gap: var(--spacing-4, 0.25rem);
-  line-height: var(--line-height-body, 1.5rem);
+  font-size: 1rem;
+  font-weight: var(--font-weight-semi-bold);
+  gap: var(--spacing-4);
+  line-height: var(--line-height-24);
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 .card_link:hover {
-  color: var(--Colors-Brand-blue-60, #05c);
+  color: var(--blue-60);
   text-decoration: underline;
 }
 

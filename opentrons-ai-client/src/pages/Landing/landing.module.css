@@ -2,8 +2,8 @@
   display: flex;
   flex: 1;
   justify-content: center;
-  border-radius: var(--border-radius-16, 16px);
-  background-color: var(--color-white, #fff);
+  border-radius: var(--border-radius-16);
+  background-color: var(--white);
 }
 
 .landing_wrapper {
@@ -11,20 +11,20 @@
   width: 100%;
   height: 100%;
   justify-content: center;
-  padding: var(--spacing-16, 1rem);
+  padding: var(--spacing-16);
   padding-bottom: 0;
 }
 
 .content_wrapper {
   display: flex;
   width: 100%;
-  max-width: 900px;
-  min-height: 600px;
+  max-width: 56.25rem;
+  min-height: 37.5rem;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-32, 2rem) var(--spacing-16, 1rem);
-  gap: var(--spacing-32, 2rem);
+  padding: var(--spacing-32) var(--spacing-16);
+  gap: var(--spacing-32);
   text-align: center;
 }
 
@@ -32,14 +32,14 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-20, 1.25rem);
+  gap: var(--spacing-20);
 }
 
 .text_section {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-24, 1.5rem);
+  gap: var(--spacing-24);
 }
 
 .welcome_image {
@@ -56,5 +56,5 @@
   flex-wrap: wrap;
   align-items: stretch;
   justify-content: center;
-  gap: var(--spacing-24, 1.5rem);
+  gap: var(--spacing-24);
 }
