@@ -4,7 +4,7 @@ title: "Opentrons Flex: Absorbance Plate Reader"
 
 # Absorbance Plate Reader Module
 
-![plate reader hero](../../images/plate-reader-hero-lid-off.png)
+![plate reader hero](../images/plate-reader-hero-lid-off.png)
 
 !!! info "Additional Documentation"
     For complete instructions on module installation and use, see the Absorbance Plate Reader Instruction Manual.

@@ -4,7 +4,7 @@ title: "Opentrons Flex: App"
 
 # Opentrons App
 
-You can perform most functions of Flex either from the [touchscreen](../touchscreen/) or from a computer running the Opentrons App. This section covers using the app for features that are not available on the touchscreen.
+You can perform most functions of Flex either from the [touchscreen](touchscreen/index.md) or from a computer running the Opentrons App. This section covers using the app for features that are not available on the touchscreen.
 
 ## App installation
 
@@ -51,7 +51,7 @@ The Ubuntu version of the Opentrons App is packaged as an AppImage. To use it:
 
 ## Transferring protocols to Flex
 
-Every protocol will begin as a file on your computer, regardless of what method of [protocol development](../protocols/) you use. You need to import the protocol into the Opentrons App and then transfer it to your Flex. When transferring a protocol, you can choose to begin run setup immediately or later.
+Every protocol will begin as a file on your computer, regardless of what method of [protocol development](protocols/index.md) you use. You need to import the protocol into the Opentrons App and then transfer it to your Flex. When transferring a protocol, you can choose to begin run setup immediately or later.
 
 ### Import a protocol
 
