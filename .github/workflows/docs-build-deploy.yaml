@@ -7,7 +7,7 @@ on:
       - '.github/workflows/docs-build-deploy.yaml'
   push:
     branches:
-      - 'docs-testing-jesse'
+      - 'mkdocs-new-workflow'
     tags:
       - 'staging-MKDOCS*'
       - 'MKDOCS*'
@@ -75,4 +75,3 @@ jobs:
             echo "<http://sandbox.docs.s3-website.us-east-2.amazonaws.com/${{ env.BRANCH }}/>" >> $GITHUB_STEP_SUMMARY
           fi
 
-          
