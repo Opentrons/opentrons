@@ -1,8 +1,9 @@
 """Unit tests for the deck_conflict module."""
 
 import pytest
-from typing import ContextManager, Any, NamedTuple, List, Tuple
-from decoy import Decoy
+import random
+from typing import ContextManager, Any, NamedTuple, List, Tuple, Literal, cast
+from decoy import Decoy, matchers
 from contextlib import nullcontext as does_not_raise
 from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.robot.types import RobotType
@@ -407,6 +408,265 @@ def test_maps_trash_bins(
             robot_type=mock_state_view.config.robot_type,
         )
     )
+
+
+def _modules_non_stacker() -> list[ModuleModel]:
+    return [m for m in ModuleModel if not ModuleModel.is_flex_stacker(m)]
+
+
+def _provide_item_in_state(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    mock_sync_client: SyncClient,
+    item_type: Literal["labware", "trash-bin"] | ModuleModel,
+) -> tuple[str | None, str | None, TrashBin | None]:
+    if item_type == "labware":
+        labware_id = f"labware-id-{random.randint(0,10)}"
+        decoy.when(
+            mock_state_view.labware.get_location(labware_id=labware_id)
+        ).then_return(DeckSlotLocation(slotName=DeckSlotName.SLOT_5))
+        decoy.when(
+            mock_state_view.labware.get_load_name(labware_id=labware_id)
+        ).then_return("labware_load_name")
+        decoy.when(
+            mock_state_view.geometry.get_labware_highest_z(labware_id=labware_id)
+        ).then_return(3.14159)
+        decoy.when(
+            mock_state_view.labware.get_definition_uri(labware_id=labware_id)
+        ).then_return(LabwareUri("test/labware_load_name/123"))
+        decoy.when(
+            mock_state_view.labware.is_fixed_trash(labware_id=labware_id)
+        ).then_return(False)
+        return (labware_id, None, None)
+    elif item_type == "trash-bin":
+        decoy.when(
+            mock_sync_client.state.addressable_areas.get_fixture_height(
+                _TRASH_BIN_CUTOUT_FIXTURE
+            )
+        ).then_return(1.23)
+        return (
+            None,
+            None,
+            TrashBin(
+                location=DeckSlotName.SLOT_5,
+                addressable_area_name="blah",
+                engine_client=mock_sync_client,
+                api_version=APIVersion(2, 23),
+            ),
+        )
+    else:
+        module_id = f"module-id-{random.randint(0,10)}"
+        decoy.when(mock_state_view.modules.get_connected_model(module_id)).then_return(
+            item_type
+        )
+        decoy.when(mock_state_view.modules.get_location(module_id)).then_return(
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_5)
+        )
+        return (None, module_id, None)
+
+
+def occupancy_check_state_setup(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    request: pytest.FixtureRequest,
+    mock_sync_client: SyncClient,
+) -> dict[str, Any]:
+    """Set up the current state in the engine occupancy check."""
+    kind = cast(Literal["labware", "trash-bin"] | ModuleModel, request.param)
+    labware_id, module_id, trash_bin = _provide_item_in_state(
+        decoy, mock_state_view, mock_sync_client, kind
+    )
+
+    return {
+        "existing_labware_ids": [labware_id] if labware_id is not None else [],
+        "existing_module_ids": [module_id] if module_id is not None else [],
+        "existing_disposal_locations": [trash_bin] if trash_bin is not None else [],
+    }
+
+
+@pytest.fixture
+def occupancy_check_state_setup1(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    request: pytest.FixtureRequest,
+    mock_sync_client: SyncClient,
+) -> dict[str, Any]:
+    """First preconfigured item in the occupancy check."""
+    return occupancy_check_state_setup(
+        decoy, mock_state_view, request, mock_sync_client
+    )
+
+
+@pytest.fixture
+def occupancy_check_state_setup2(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    request: pytest.FixtureRequest,
+    mock_sync_client: SyncClient,
+) -> dict[str, Any]:
+    """Second preconfigured item in the occupancy check."""
+    return occupancy_check_state_setup(
+        decoy, mock_state_view, request, mock_sync_client
+    )
+
+
+@pytest.fixture
+def occupancy_check_new_item(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    request: pytest.FixtureRequest,
+    mock_sync_client: SyncClient,
+) -> dict[str, Any]:
+    """Set up the engine for the new-item side for the occupancy check."""
+    kind = cast(Literal["labware", "trash-bin"] | ModuleModel, request.param)
+    labware_id, module_id, trash_bin = _provide_item_in_state(
+        decoy, mock_state_view, mock_sync_client, kind
+    )
+    return {
+        "new_labware_id": labware_id,
+        "new_module_id": module_id,
+        "new_trash_bin": trash_bin,
+    }
+
+
+@pytest.mark.parametrize(
+    "occupancy_check_state_setup1",
+    ["labware", "trash-bin"] + _modules_non_stacker(),  # type: ignore[operator]
+    indirect=True,
+)
+@pytest.mark.parametrize(
+    "occupancy_check_state_setup2",
+    ["labware", "trash-bin"] + _modules_non_stacker(),  # type: ignore[operator]
+    indirect=True,
+)
+@pytest.mark.parametrize(
+    "occupancy_check_new_item",
+    ["labware"],
+    indirect=True,
+)
+@pytest.mark.parametrize(
+    ("robot_type", "deck_type"),
+    [
+        ("OT-2 Standard", DeckType.OT2_STANDARD),
+        ("OT-3 Standard", DeckType.OT3_STANDARD),
+    ],
+)
+def test_maps_default_single_occupancy(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    occupancy_check_state_setup1: dict[str, Any],
+    occupancy_check_state_setup2: dict[str, Any],
+    occupancy_check_new_item: dict[str, Any],
+) -> None:
+    """It should correctly prevent double occupancy when a stacker is not involved."""
+    setup = {**occupancy_check_state_setup1}
+    for k, v in occupancy_check_state_setup2.items():
+        setup[k].extend(v)
+    with pytest.raises(
+        wrapped_deck_conflict.DeckConflictError, match="cannot both be loaded in"
+    ):
+        deck_conflict.check(
+            engine_state=mock_state_view,
+            **setup,
+            **occupancy_check_new_item,
+        )
+
+
+@pytest.mark.parametrize(
+    "occupancy_check_state_setup1",
+    [m for m in ModuleModel if ModuleModel.is_flex_stacker(m)],
+    indirect=True,
+)
+@pytest.mark.parametrize(
+    "occupancy_check_state_setup2",
+    ["labware"] + [m for m in ModuleModel if ModuleModel.is_magnetic_block(m)],
+    indirect=True,
+)
+@pytest.mark.parametrize(
+    "occupancy_check_new_item",
+    ["labware"],
+    indirect=True,
+)
+@pytest.mark.parametrize(
+    ("robot_type", "deck_type"),
+    [
+        ("OT-3 Standard", DeckType.OT3_STANDARD),
+    ],
+)
+def test_maps_allows_stacker_labware_double_occupancy(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    occupancy_check_state_setup1: dict[str, Any],
+    occupancy_check_state_setup2: dict[str, Any],
+    occupancy_check_new_item: dict[str, Any],
+) -> None:
+    """It should correctly allow double occupancy for a stacker and labware or mag block."""
+    decoy.when(
+        wrapped_deck_conflict.check(
+            existing_items=matchers.Anything(),
+            new_item=matchers.Anything(),
+            new_location=matchers.Anything(),
+            robot_type=matchers.Anything(),
+        )
+    ).then_return(None)
+    setup_a = {k: [i for i in v] for k, v in occupancy_check_state_setup1.items()}
+    for k, v in occupancy_check_state_setup2.items():
+        setup_a[k].extend(v)
+    deck_conflict.check(  # type: ignore[call-overload]
+        engine_state=mock_state_view,
+        **setup_a,
+        **occupancy_check_new_item,
+    )
+    setup_b = {k: [i for i in v] for k, v in occupancy_check_state_setup2.items()}
+    for k, v in occupancy_check_state_setup1.items():
+        setup_b[k].extend(v)
+    deck_conflict.check(  # type: ignore[call-overload]
+        engine_state=mock_state_view,
+        **setup_b,
+        **occupancy_check_new_item,
+    )
+
+
+@pytest.mark.parametrize(
+    "occupancy_check_state_setup1",
+    [m for m in ModuleModel if ModuleModel.is_flex_stacker(m)],
+    indirect=True,
+)
+@pytest.mark.parametrize(
+    "occupancy_check_state_setup2",
+    ["trash-bin"] + [m for m in ModuleModel if not ModuleModel.is_magnetic_block(m)],
+    indirect=True,
+)
+@pytest.mark.parametrize(
+    "occupancy_check_new_item",
+    ["labware"],
+    indirect=True,
+)
+@pytest.mark.parametrize(
+    ("robot_type", "deck_type"),
+    [
+        ("OT-3 Standard", DeckType.OT3_STANDARD),
+    ],
+)
+def test_maps_prevents_stacker_non_labware_double_occupancy(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    occupancy_check_state_setup1: dict[str, Any],
+    occupancy_check_state_setup2: dict[str, Any],
+    occupancy_check_new_item: dict[str, Any],
+) -> None:
+    """It should correctly allow double occupancy for a stacker and labware or mag block."""
+    setup = {**occupancy_check_state_setup1}
+    for k, v in occupancy_check_state_setup2.items():
+        setup[k].extend(v)
+    with pytest.raises(
+        wrapped_deck_conflict.DeckConflictError, match="cannot both be loaded in"
+    ):
+        deck_conflict.check(
+            engine_state=mock_state_view,
+            **setup,
+            **occupancy_check_new_item,
+        )
 
 
 plate = LoadedLabware(
