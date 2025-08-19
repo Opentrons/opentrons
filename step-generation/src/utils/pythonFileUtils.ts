@@ -517,8 +517,10 @@ export function stepCommands(robotStateTimeline: Timeline): string {
     '# PROTOCOL STEPS\n\n' +
     robotStateTimeline.timeline
       .map(
-        (timelineFrame, idx) =>
-          `# Step ${idx + 1}:\n${timelineFrame.python || 'pass'}`
+        timelineFrame =>
+          `# Step ${timelineFrame.stepNumber}:\n${
+            timelineFrame.python || 'pass'
+          }`
       )
       .join('\n\n')
   )

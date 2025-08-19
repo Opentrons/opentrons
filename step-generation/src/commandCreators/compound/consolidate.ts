@@ -141,7 +141,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     touchTipAfterDispenseMmFromEdge,
     touchTipAfterDispenseOffsetMmFromTop,
     touchTipAfterDispenseSpeed,
-    stepId,
+    stepNumber,
     volume,
   } = args
   const {
@@ -345,7 +345,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       : null
 
   const pythonLiquidClassArgs = [
-    `name=${formatPyStr(`${args.commandCreatorFnName}_step_${stepId}`)}`,
+    `name=${formatPyStr(`${args.commandCreatorFnName}_step_${stepNumber}`)}`,
     ...(liquidClass != null
       ? [`base_liquid_class=${getLiquidClassName(liquidClass, true)}`]
       : []),
