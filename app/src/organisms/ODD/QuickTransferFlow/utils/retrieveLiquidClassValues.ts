@@ -410,7 +410,7 @@ const getLiquidClassValues = (
           state
         ) ?? state.dropTipLocation,
 
-      flowRate: flowRate.dispense,
+      flowRate: dispenseFlowRateFields.dispense_flowRate ?? 0,
     },
   }
 
