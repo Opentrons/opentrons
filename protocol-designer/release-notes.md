@@ -21,6 +21,7 @@ This hotfix release addresses several bugs.
 - Exported Python protocols include numbered commands, making it easier to identify errors.
 - Setting well volume over the limit results in a warning rather than a protocol error.
 - Crashes and protocol loss no longer occur when viewing liquids added to labware.
+- Additional refinement with assigning the correct tip rack to some liquid transfers.
 
 ## Opentrons Protocol Designer Changes in 8.5.1
 
