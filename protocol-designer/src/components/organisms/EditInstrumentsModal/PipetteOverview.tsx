@@ -123,6 +123,12 @@ export function PipetteOverview({
     lw => lw.def.parameters.loadName === TIPRACK_LID_LOADNAME
   )
 
+  const handleDeletingTipLids = (): void => {
+    allTiprackLidsOnDeck.forEach(lid =>
+      dispatch(deleteContainer({ labwareId: lid.id }))
+    )
+  }
+
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
@@ -176,7 +182,6 @@ export function PipetteOverview({
                 dispatch(deletePipettes([leftPipette.id as string]))
                 previousLeftPipetteTipracks.forEach(tip => {
                   const tipStack = tip.stack
-                  console.log('tipStack', tipStack)
                   //  to delete any tiprackAdapters + tipracks
                   tipStack.forEach(item => {
                     if (labware[item] != null) {
@@ -184,9 +189,7 @@ export function PipetteOverview({
                     }
                   })
                 })
-                allTiprackLidsOnDeck.forEach(lid =>
-                  dispatch(deleteContainer({ labwareId: lid.id }))
-                )
+                handleDeletingTipLids()
               }}
             />
           ) : null}
@@ -213,9 +216,7 @@ export function PipetteOverview({
                       dispatch(deleteContainer({ labwareId: item }))
                     }
                   })
-                  allTiprackLidsOnDeck.forEach(lid =>
-                    dispatch(deleteContainer({ labwareId: lid.id }))
-                  )
+                  handleDeletingTipLids()
                 })
               }}
             />

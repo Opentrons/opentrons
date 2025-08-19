@@ -87,7 +87,7 @@ export const editPipettes = (
       pipette => pipette.name === 'p1000_96'
     )
       ? adapter96ChannelDefUri
-      : undefined
+      : null
     dispatch(
       createContainer({
         labwareDefURIStack: [
