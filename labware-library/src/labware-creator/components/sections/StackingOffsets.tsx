@@ -20,6 +20,10 @@ import {
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 
+import {
+  STACKING_OFFSET_HOW_TO,
+  STACKING_OFFSET_PURPOSE,
+} from '../../../localization'
 import { makeMaskToDecimal } from '../../fieldMasks'
 import styles from '../../styles.module.css'
 import { isEveryFieldHidden } from '../../utils'
@@ -71,7 +75,7 @@ export function StackingOffsets(): JSX.Element | null {
   const isCircular = values.wellShape === 'circular'
   const isReservoir = values.labwareType === 'reservoir'
   const isWellPlate = values.labwareType === 'wellPlate'
-  const stackableLabware =
+  const isStackableLabware =
     values.labwareType === 'wellPlate' || values.labwareType === 'tipRack'
   const labwareHeight = values.labwareZDimension
   const has12Columns =
@@ -182,16 +186,10 @@ export function StackingOffsets(): JSX.Element | null {
           />
           <div className={styles.flex_row_no_columns}>
             <div className={styles.instructions_column}>
-              <p>
-                Stacking offset is only required for labware that can be placed
-                on an adapter, module, or itself.
-              </p>
-              <p>
-                Stack the labware onto the adapter, module, or itself and then
-                make the required measurement with calipers.
-              </p>
+              <p>{STACKING_OFFSET_PURPOSE}</p>
+              <p>{STACKING_OFFSET_HOW_TO}</p>
             </div>
-            {stackableLabware && (
+            {isStackableLabware && (
               <>
                 <LegacyStyledText
                   as="h3"
