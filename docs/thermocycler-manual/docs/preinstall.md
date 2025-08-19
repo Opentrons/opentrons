@@ -2,8 +2,6 @@
 title: "Thermocycler Module: Before You Begin"
 ---
 
-# Before You Begin
-
 Review this section for important information about the Thermocycler's deck placement, alignment, and anchor adjustments.
 
 ## Flex Caddies
