@@ -1140,6 +1140,7 @@ class FlexStackerContext(ModuleContext):
         return self._core.get_serial_number()
 
     @requires_version(2, 25)
+    @publish(command=cmds.flex_stacker_retrieve)
     def retrieve(self) -> Labware:
         """Retrieve a labware from the Flex Stacker and place it on the shuttle.
 
@@ -1158,6 +1159,7 @@ class FlexStackerContext(ModuleContext):
         )
 
     @requires_version(2, 25)
+    @publish(command=cmds.flex_stacker_store)
     def store(self) -> None:
         """Move the labware currently on the Flex Stacker shuttle into the Flex Stacker."""
         self._core.store()
@@ -1380,6 +1382,7 @@ class FlexStackerContext(ModuleContext):
         )
 
     @requires_version(2, 25)
+    @publish(command=cmds.flex_stacker_fill)
     def fill(self, count: int | None = None, message: str | None = None) -> None:
         """Pause the protocol to add more labware to the Flex Stacker.
 
@@ -1405,6 +1408,7 @@ class FlexStackerContext(ModuleContext):
         self._core.fill_items(self._labware_to_cores(labware), message)
 
     @requires_version(2, 25)
+    @publish(command=cmds.flex_stacker_empty)
     def empty(self, message: str | None = None) -> None:
         """Pause the protocol to remove labware from the Flex Stacker.
 

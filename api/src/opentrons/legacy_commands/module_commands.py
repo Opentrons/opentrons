@@ -213,3 +213,45 @@ def heater_shaker_deactivate_heater() -> command_types.HeaterShakerDeactivateHea
         "name": command_types.HEATER_SHAKER_DEACTIVATE_HEATER,
         "payload": {"text": text},
     }
+
+
+# FLex Stacker
+
+def flex_stacker_set_stored_labware(self) -> command_types.FlexStackerRetrieveCommand:
+    text = f"Retrieving labware from {self}"
+    return {
+        "name": command_types.FLEX_STACKER_RETRIEVE,
+        "payload": {"text": text},
+    }
+
+
+def flex_stacker_retrieve(self) -> command_types.FlexStackerRetrieveCommand:
+    text = f"Retrieving labware from {self}"
+    return {
+        "name": command_types.FLEX_STACKER_RETRIEVE,
+        "payload": {"text": text},
+    }
+
+
+def flex_stacker_store(self) -> command_types.FlexStackerStoreCommand:
+    text = f"Storing labware to {self}"
+    return {
+        "name": command_types.FLEX_STACKER_STORE,
+        "payload": {"text": text},
+    }
+
+
+def flex_stacker_empty(self) -> command_types.FlexStackerEmptyCommand:
+    text = f"Emptying {self}"
+    return {
+        "name": command_types.FLEX_STACKER_EMPTY,
+        "payload": {"text": text},
+    }
+
+
+def flex_stacker_fill(self) -> command_types.FlexStackerFillCommand:
+    text = f"Filling {self}"
+    return {
+        "name": command_types.FLEX_STACKER_FILL,
+        "payload": {"text": text},
+    }
