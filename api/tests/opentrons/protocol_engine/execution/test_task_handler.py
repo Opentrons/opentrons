@@ -107,6 +107,54 @@ async def test_synchronization_cancel_latest(subject: TaskHandler) -> None:
     assert task2.asyncioTask.cancelled()
 
 
+async def test_synchronization_cancel_latest_only_cancels_one_group_id(
+    subject: TaskHandler,
+) -> None:
+    """Tests cancel_latest synchronization only affects the specified group id."""
+    group_id1 = "groupid1"
+    group_id2 = "groupid2"
+
+    task1_started = asyncio.Event()
+    task2_started = asyncio.Event()
+    task3_started = asyncio.Event()
+
+    async def task_1_method(task_handler: TaskHandler) -> None:
+        """First run method should proceed (task2 gets cancelled)."""
+        async with task_handler.synchronize_cancel_latest(group_id1):
+            task1_started.set()
+            await asyncio.sleep(0.25)
+
+    async def task_2_method(task_handler: TaskHandler) -> None:
+        """Second run method will be canceled (latest)."""
+        await task1_started.wait()
+        try:
+            async with task_handler.synchronize_cancel_latest(group_id1):
+                task2_started.set()
+                await asyncio.sleep(0.1) 
+        except asyncio.CancelledError:
+            task2_started.set()  
+            raise
+
+    async def task_3_method(task_handler: TaskHandler) -> None:
+        """Third run method (different group) should still be running."""
+        async with task_handler.synchronize_cancel_latest(group_id2):
+            task3_started.set()
+            await asyncio.sleep(0.25)
+
+    task1 = await subject.create_task(task_1_method)
+    task3 = await subject.create_task(task_3_method)
+    await task1_started.wait()
+    await task3_started.wait()
+
+    task2 = await subject.create_task(task_2_method)
+    await task2_started.wait()
+
+    assert not task1.asyncioTask.cancelled()
+    assert task2.asyncioTask.cancelled()
+    assert not task3.asyncioTask.cancelled()
+    assert not task3.asyncioTask.done()
+
+
 async def test_synchronization_cancel_previous(subject: TaskHandler) -> None:
     """Test cancel_previous synchronization."""
     task1_started = asyncio.Event()
@@ -134,6 +182,50 @@ async def test_synchronization_cancel_previous(subject: TaskHandler) -> None:
     assert task2.asyncioTask.exception() is None
     assert task1.asyncioTask.done()
     assert task1.asyncioTask.cancelled()
+
+
+async def test_synchronization_cancel_previous_only_cancels_one_group_id(
+    subject: TaskHandler,
+) -> None:
+    """Tests cancel_previous synchronization only affects the specified group id."""
+    group_id1 = "groupid1"
+    group_id2 = "groupid2"
+
+    task1_started = asyncio.Event()
+    task2_started = asyncio.Event()
+    task3_started = asyncio.Event()
+
+    async def task_1_method(task_handler: TaskHandler) -> None:
+        """First run method that will get canceled."""
+        async with task_handler.synchronize_cancel_previous(group_id1):
+            task1_started.set()
+            try:
+                await asyncio.sleep(0)
+            except asyncio.CancelledError:
+                raise
+
+    async def task_2_method(task_handler: TaskHandler) -> None:
+        """Second run method will finish."""
+        async with task_handler.synchronize_cancel_previous(group_id1):
+            task2_started.set()
+
+    async def task_3_method(task_handler: TaskHandler) -> None:
+        """Third run method should still be running."""
+        async with task_handler.synchronize_cancel_previous(group_id2):
+            task3_started.set()
+            await asyncio.sleep(0.25)
+
+    task1 = await subject.create_task(task_1_method)
+    task3 = await subject.create_task(task_3_method)
+    await task1_started.wait()
+    await task3_started.wait()
+    task2 = asyncio.create_task(task_2_method(subject))
+    await task2_started.wait()
+
+    assert task1.asyncioTask.cancelled() or task1.asyncioTask.done()
+    assert not task2.cancelled()
+    assert not task3.asyncioTask.cancelled()
+    assert not task3.asyncioTask.done()
 
 
 async def test_synchronization_sequential(subject: TaskHandler) -> None:
