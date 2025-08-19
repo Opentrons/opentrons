@@ -109,19 +109,19 @@ def add_parameters(parameters: ParameterContext) -> None:
         display_name="Labware Type",
         choices=[
             {
-                "display_name": "eppendorf1000 test",
-                "value": "eppendorf_96_wellplate_1000ul_custom",
+                "display_name": "nest 12 custom",
+                "value": "nest_12_reservoir_22ml_custom",
             },
             {
                 "display_name": "opentrons96",
                 "value": "armadillo_96_wellplate_200ul_pcr_full_skirt",
             },
             {
-                "display_name": "nest96 test",
-                "value": "nest_96_wellplate_2ml_deep_custom",
+                "display_name": "nest 1 custom",
+                "value": "nest_1_reservoir_195ml_custom",
             },
         ],
-        default="nest_96_wellplate_2ml_deep_custom",
+        default="nest_1_reservoir_195ml_custom",
     )
 
     # generally, the first dispense should be 1/25 the max volume.
@@ -557,6 +557,7 @@ def run(ctx: ProtocolContext) -> None:
         ctx.move_labware(labware, OFF_DECK, use_gripper=False)
         labware = ctx.load_labware(labware_type, SLOT_LABWARE)
         labware.load_empty(labware.wells())
+        return labware 
 
     # Begin Protocol
 
@@ -568,7 +569,7 @@ def run(ctx: ProtocolContext) -> None:
 
     while dispense_volume < (max_volume - margin):
 
-        # reposition pipette for dispense
+        # removed because liquid classing wasnt working
         # for liquid_rack in liquid_racks:
         #    props = ethanol.get_for(liq_pipette, liquid_rack)
         #    props.dispense.dispense_position.position_reference = (
@@ -582,7 +583,7 @@ def run(ctx: ProtocolContext) -> None:
         current_well = wells[step % num_wells]
         # check if out of wells
         if step > 0 and step % num_wells == 0:
-            reload_labware(labware, labware_type)
+            labware = reload_labware(labware, labware_type)
 
         tip_z_error = _get_tip_z_error(ctx, probe_pipette, dial)
 
@@ -594,7 +595,7 @@ def run(ctx: ProtocolContext) -> None:
         )
         dispense_loc = labware[current_well].bottom(z=max(corrected_height + 2.5, 3))
         liq_pipette.transfer(
-            min(dispense_volume / liq_pipette.channels, max_volume),
+            (min(dispense_volume / liq_pipette.channels, max_volume))*1.033,
             src["A1"].meniscus(z=-2, target="end"),
             dispense_loc,
             new_tip="never",
