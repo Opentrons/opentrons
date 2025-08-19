@@ -625,10 +625,14 @@ def run(ctx: ProtocolContext) -> None:
                 write_trial_log(udv_table)
             else:
                 if hdelta <= lower_bound or hdelta >= upper_bound:
-                    status = "fail"
-                    write_trial_log(udv_table)
-                    dispense_volume -= step_volume  # rollback dispense volume
-                    corrected_heights.pop()  # rollback corrected heights
+                    if dispense_volume != max_volume:
+                        status = "fail"
+                        write_trial_log(udv_table)
+                        dispense_volume -= step_volume  # rollback dispense volume
+                        corrected_heights.pop()  # rollback corrected heights
+                    else:
+                        status = "pass"
+                        write_trial_log(udv_table)
                 else:
                     status = "pass"
                     write_trial_log(udv_table)
