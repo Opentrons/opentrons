@@ -11,6 +11,7 @@ import {
   getAllLabwareDefs,
   getLabwareDisplayName,
   getLoadedLabwareDefinitionsByUri,
+  getStackerLocationFromSlotName,
 } from '@opentrons/shared-data'
 
 import { ERROR_KINDS, STACKER_ERROR_KINDS } from '../constants'
@@ -536,7 +537,8 @@ export function useRelevantFailedLwLocations({
                 (m: LoadedModule) =>
                   m.id === failedCommandByRunRecord?.params.moduleId
               )?.location ?? 'offDeck',
-          }),
+              includeSlotText: false,
+            }),
           newLoc: {
             moduleId: failedCommandByRunRecord?.params.moduleId,
           },
