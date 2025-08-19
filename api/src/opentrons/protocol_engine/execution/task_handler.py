@@ -98,7 +98,9 @@ class TaskHandler:
     @contextlib.asynccontextmanager
     async def synchronize_sequential(self, group_id: str) -> AsyncIterator[None]:
         """Run tasks one after the other."""
-        yield
+        lock = self._concurrency_provider.lock_for_group(group_id)
+        async with lock:
+            yield
 
     @contextlib.asynccontextmanager
     async def synchronize_concurrent(self, group_id: str) -> AsyncIterator[None]:

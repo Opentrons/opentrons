@@ -147,19 +147,19 @@ async def test_synchronization_sequential(subject: TaskHandler) -> None:
         async with task_handler.synchronize_sequential("test"):
             task_queue.put_nowait("task1started")
             task1_started.set()
-            await task2_started.wait()
             task_queue.put_nowait("task1finishedwaiting")
-        task_queue.put_nowait("task1finished")
+            await task2_started.wait()
+            task_queue.put_nowait("task1finished")
 
     async def task_3_method() -> None:
         task2_started.set()
+        task_queue.put_nowait("task2started")
 
     async def task_2_method(task_handler: TaskHandler) -> None:
         """Second task will finish second."""
         await task1_started.wait()
         synchronizer = task_handler.synchronize_sequential("test")
         await asyncio.gather(synchronizer.__aenter__(), task_3_method())
-        task_queue.put_nowait("task2started")
         await synchronizer.__aexit__(None, None, None)
 
     task1 = await subject.create_task(task_1_method)
