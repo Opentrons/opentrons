@@ -9,6 +9,7 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
+import { sortLabwareBySlot } from '../robotStateSelectors'
 import { getLiquidClassName } from './liquidClassUtils'
 import { getSlotInLocationStack } from './misc'
 import {
@@ -27,7 +28,6 @@ import type {
   ChangeTipOptions,
   InvariantContext,
   LabwareEntities,
-  LabwareEntity,
   LabwareLiquidState,
   LiquidEntities,
   ModuleEntities,
@@ -246,17 +246,19 @@ export function getLoadPipettes(
       const pipetteName = isFlexPipette(name)
         ? getFlexNameConversion(spec)
         : name
-      const allTipracks = tiprackDefURI.reduce(
-        (acc: LabwareEntity[], defURI) => {
-          for (const lw of Object.values(labwareEntities)) {
-            if (lw.labwareDefURI === defURI) {
-              acc.push(lw)
-            }
-          }
-          return acc
-        },
-        []
-      )
+      const allTipracks = tiprackDefURI.flatMap(defURI => {
+        const matchingLabwareIds = Object.values(labwareEntities)
+          .filter(labware => labware.labwareDefURI === defURI)
+          .map(labware => labware.id)
+
+        // sort them by slot, matching getNextTiprack() logic
+        const sortedIds = sortLabwareBySlot(
+          labwareRobotState
+        ).filter(labwareId => matchingLabwareIds.includes(labwareId))
+
+        return sortedIds.map(labwareId => labwareEntities[labwareId])
+      })
+      console.log('allTipracks', allTipracks)
       const onDeckTipracks = allTipracks.filter(
         tiprack =>
           getSlotInLocationStack(labwareRobotState[tiprack.id].stack) !==
