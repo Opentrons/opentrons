@@ -122,10 +122,6 @@ export function fieldsToLabware(
       }
     })
 
-    console.log(
-      'stackingoffsets with labware: ' +
-        JSON.stringify(stackingOffsetWithLabware)
-    )
     const stackingOffsetWithModule: Record<string, LabwareOffset> = {}
     Object.entries(compatibleModules).forEach(([moduleModel, z]) => {
       const moduleDefinition = getModuleDef(moduleModel as ModuleModel)
@@ -214,7 +210,7 @@ export function fieldsToLabware(
       stackingOffsetWithLabware[def.parameters.loadName] = {
         x: 0,
         y: 0,
-        z: 2 * fields.labwareZDimension - fields.stackedLabwareZDimension,
+        z: fields.stackedLabwareZDimension - (2 * fields.labwareZDimension),
       }
     }
     return def
