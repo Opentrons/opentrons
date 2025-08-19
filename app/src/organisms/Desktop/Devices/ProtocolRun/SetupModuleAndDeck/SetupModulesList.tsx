@@ -24,18 +24,22 @@ import { useHost } from '@opentrons/react-api-client'
 import {
   ABSORBANCE_READER_TYPE,
   ABSORBANCE_READER_V1,
+  COMBO_FIXTURES,
   FLEX_ROBOT_TYPE,
   FLEX_STACKER_MODULE_TYPE,
+  getAAWithFakesFromCutoutFixtureId,
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
   getFlexStackerD3Compatibility,
+  getMainFixtureIdForAA,
   getModuleDeckLabel,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
   OT2_ROBOT_TYPE,
+  SINGLE_RIGHT_CUTOUTS,
 } from '@opentrons/shared-data'
 
 import { TertiaryButton } from '/app/atoms/buttons'
@@ -64,6 +68,7 @@ import { getFixtureImage } from './utils'
 import type { TFunction } from 'i18next'
 import type { CommandData, HostConfig } from '@opentrons/api-client'
 import type {
+  AddressableAreaName,
   CutoutConfigAndCompatibility,
   CutoutFixtureId,
   DeckDefinition,
@@ -132,11 +137,24 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
             moduleDef.moduleType === FLEX_STACKER_MODULE_TYPE &&
             slotName[0] === 'D'
           ) {
-            const d3Compatibility = getFlexStackerD3Compatibility(
-              deckConfigCompatibility
+            console.log("deckConfigCompatibility: ", deckConfigCompatibility)
+            const deckConfigCompatabilityD3 = deckConfigCompatibility?.find(
+              configItem => configItem.cutoutId === 'cutoutD3'
             )
+            const matchWithAA = getMainFixtureIdForAA(
+              deckConfigCompatabilityD3?.compatibleCutoutFixtureIds ?? [],
+              deckConfigCompatabilityD3?.requiredAddressableAreas ?? [],
+              'cutoutD3'
+            ) ?? undefined
+            const d3Compatibility = getFlexStackerD3Compatibility(
+              deckConfigCompatibility,
+              matchWithAA
+            )
+            console.log("d3Compatibility: ", d3Compatibility)
             if (d3Compatibility) {
               const { comboFixtureId, comboFixtureConflict } = d3Compatibility
+              console.log("comboFixtureId: ", comboFixtureId)
+              console.log("comboFixtureConflict: ", comboFixtureConflict)
               return (
                 <ModulesListItem
                   key={`SetupModulesList_${String(
@@ -151,13 +169,53 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
                   isFlex={isFlex}
                   calibrationStatus={calibrationStatus}
                   chainLiveCommands={chainLiveCommands}
-                  conflictedFixture={comboFixtureConflict}
+                  conflictedFixture={conflictedFixture != null}
                   deckDef={deckDef}
                   robotName={robotName}
                   comboFixtureId={comboFixtureId}
                 />
               )
             }
+            else if(deckConfigCompatibility.find(configItem => SINGLE_RIGHT_CUTOUTS.includes(configItem.cutoutId) && COMBO_FIXTURES.includes(configItem.cutoutFixtureId))) {
+
+                const currentFixtureId = deckConfigCompatibility[0]?.cutoutFixtureId
+                const currentAA = getAAWithFakesFromCutoutFixtureId(
+                  deckConfigCompatibility[0]?.cutoutId,
+                  currentFixtureId,
+                  deckDef
+                )
+    
+                const requiredAddressableAreas = [
+                  ...(deckConfigCompatibility[0]?.requiredAddressableAreas ?? []),
+                  ...(currentAA ?? []),
+                ]
+                console.log("requiredAddressableAreas: ", requiredAddressableAreas)
+                const newMatchWithAA = getMainFixtureIdForAA(
+                  deckConfigCompatibility[0]?.compatibleCutoutFixtureIds,
+                  requiredAddressableAreas as AddressableAreaName[],
+                  deckConfigCompatibility[0]?.cutoutId
+                )
+                console.log("newMatchWithAA: ", newMatchWithAA)
+                const comboFixtureId = newMatchWithAA ?? currentFixtureId
+              return (
+                <ModulesListItem
+                  key={`SetupModulesList_${String(
+                    moduleDef.model
+                  )}_slot_${slotName}`}
+                  moduleModel={moduleDef.model}
+                  moduleType={moduleDef.moduleType}
+                  displayName={moduleDef.displayName}
+                  slotName={slotName}
+                  attachedModuleMatch= {null}
+                  heaterShakerModuleFromProtocol={null}
+                  isFlex={isFlex}
+                  calibrationStatus={calibrationStatus}
+                  chainLiveCommands={chainLiveCommands}
+                  conflictedFixture={comboFixtureId != null}
+                  deckDef={deckDef}
+                  robotName={robotName}
+                />
+              )}
           }
 
           return (

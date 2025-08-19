@@ -2,8 +2,12 @@ import {
   FLEX_STACKER_FIXTURES,
   FLEX_STACKER_V1_FIXTURE,
   FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
+  getAAWithFakesFromCutoutFixtureId,
+  getDeckDefFromRobotType,
+  getMainFixtureIdForAA,
   MAGNETIC_BLOCK_V1_FIXTURE,
   SINGLE_LEFT_SLOT_FIXTURE,
+  SINGLE_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
   THERMOCYCLER_V2_FRONT_FIXTURE,
@@ -11,6 +15,7 @@ import {
 } from '@opentrons/shared-data'
 
 import type {
+  AddressableAreaName,
   CutoutFixtureId,
   CutoutId,
   DeckConfiguration,
@@ -30,10 +35,42 @@ import type {
 export const patchDeckConfigForRequiredFixture = (
   deckConfig: DeckConfiguration,
   cutoutId: CutoutId,
-  requiredFixtureId: CutoutFixtureId
+  requiredFixtureId: CutoutFixtureId,
+  compatibleCutoutFixtureIds: CutoutFixtureId[],
+
 ): DeckConfiguration => {
   const newDeckConfig = deckConfig.map(fixture => {
     if (fixture.cutoutId === cutoutId) {
+      const deckDef = getDeckDefFromRobotType('OT-3 Standard')
+      if(SINGLE_RIGHT_SLOT_FIXTURE.includes(cutoutId)){
+        console.log("patch!")
+        const requiredAA = getAAWithFakesFromCutoutFixtureId(
+          cutoutId,
+          requiredFixtureId,
+          deckDef
+        )
+        const currentAA = getAAWithFakesFromCutoutFixtureId(
+          cutoutId,
+          fixture.cutoutFixtureId,
+          deckDef
+        )
+        const requiredAddressableAreas = [
+          ...(requiredAA ?? []),
+          ...(currentAA ?? []),
+        ]
+        const newMatchWithAA = getMainFixtureIdForAA(compatibleCutoutFixtureIds,
+          requiredAddressableAreas as AddressableAreaName[],
+          cutoutId
+        )
+        console.log("new MatchWithAA: ", newMatchWithAA)
+        if(newMatchWithAA != null){
+        return {
+          ...fixture,
+          cutoutFixtureId: newMatchWithAA,
+        }
+      }
+      }
+
       if (
         requiredFixtureId === MAGNETIC_BLOCK_V1_FIXTURE &&
         fixture.cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE

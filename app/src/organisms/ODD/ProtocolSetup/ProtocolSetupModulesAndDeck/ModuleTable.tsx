@@ -5,6 +5,7 @@ import {
   getCutoutFixturesForModuleModel,
   getCutoutIdsFromModuleSlotName,
   getFlexStackerD3Compatibility,
+  getMainFixtureIdForAA,
   MAGNETIC_BLOCK_TYPE,
 } from '@opentrons/shared-data'
 
@@ -69,8 +70,17 @@ export function ModuleTable(props: ModuleTableProps): JSX.Element {
             module.moduleDef.moduleType === FLEX_STACKER_MODULE_TYPE &&
             module.slotName === 'D3'
           ) {
+            const deckConfigCompatabilityD3 = deckConfigCompatibility?.find(
+              configItem => configItem.cutoutId === 'cutoutD3'
+            )
+            const matchWithAA = getMainFixtureIdForAA(
+              deckConfigCompatabilityD3?.compatibleCutoutFixtureIds ?? [],
+              deckConfigCompatabilityD3?.requiredAddressableAreas ?? [],
+              'cutoutD3'
+            )
             const d3Compatibility = getFlexStackerD3Compatibility(
-              deckConfigCompatibility
+              deckConfigCompatibility,
+              matchWithAA
             )
             if (d3Compatibility) {
               const { comboFixtureId, comboFixtureConflict } = d3Compatibility

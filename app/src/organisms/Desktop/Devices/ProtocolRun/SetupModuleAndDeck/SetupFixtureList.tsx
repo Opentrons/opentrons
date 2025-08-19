@@ -174,6 +174,7 @@ export function FixtureListItem({
             partialRequiredCutoutFixtureId ?? compatibleCutoutFixtureIds[0]
           }
           robotName={robotName}
+          compatibleCutoutFixtureIds={compatibleCutoutFixtureIds}
         />
       ) : null}
       {showSetupInstructionsModal ? (

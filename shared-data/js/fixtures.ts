@@ -1578,7 +1578,8 @@ export const replaceCutoutFixtureRemove = (
  * @returns object with combo fixture ID and conflict status, or null if not compatible
  */
 export const getFlexStackerD3Compatibility = (
-  deckConfigCompatibility: CutoutConfigAndCompatibility[] | undefined
+  deckConfigCompatibility: CutoutConfigAndCompatibility[] | undefined,
+  matchWithAA?: CutoutFixtureId | null
 ): {
   comboFixtureId: CutoutFixtureId | undefined
   comboFixtureConflict: boolean
@@ -1586,17 +1587,12 @@ export const getFlexStackerD3Compatibility = (
   const deckConfigCompatabilityD3 = deckConfigCompatibility?.find(
     configItem => configItem.cutoutId === 'cutoutD3'
   )
-  const matchWithAA = getMainFixtureIdForAA(
-    deckConfigCompatabilityD3?.compatibleCutoutFixtureIds ?? [],
-    deckConfigCompatabilityD3?.requiredAddressableAreas ?? [],
-    'cutoutD3'
-  )
-  console.log('matchWithAA: ', matchWithAA)
   const matchWithFixture =
     matchWithAA ?? deckConfigCompatabilityD3?.compatibleCutoutFixtureIds[0]
   if (
     (deckConfigCompatabilityD3 != null &&
       matchWithFixture !== undefined &&
+      matchWithFixture !== null &&
       WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(
         matchWithFixture as CutoutFixtureIdsWithFakes
       )) ||
@@ -1614,6 +1610,8 @@ export const getFlexStackerD3Compatibility = (
       deckConfigCompatabilityD3.cutoutFixtureId
     )
 
+    console.log("comboFixtureId: ", comboFixtureId)
+    console.log("comboFixtureConflict: ", comboFixtureConflict)
     return {
       comboFixtureId,
       comboFixtureConflict,

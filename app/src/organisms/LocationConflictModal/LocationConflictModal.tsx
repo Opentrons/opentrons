@@ -60,6 +60,7 @@ interface LocationConflictModalProps {
   deckDef: DeckDefinition
   robotName: string
   requiredFixtureId?: CutoutFixtureId
+  compatibleCutoutFixtureIds: CutoutFixtureId[],
   requiredModule?: ModuleModel
   isOnDevice?: boolean
   moduleSerialNumber?: string
@@ -77,6 +78,7 @@ export const LocationConflictModal = (
     deckDef,
     moduleSerialNumber,
     isOnDevice = false,
+    compatibleCutoutFixtureIds
   } = props
   const { t, i18n } = useTranslation([
     'protocol_setup',
@@ -109,6 +111,7 @@ export const LocationConflictModal = (
       : ''
 
   const handleConfigureModule = (moduleSerialNumber?: string): void => {
+    console.log("handleConfigureModule")
     if (requiredModule != null) {
       const slotName = getCutoutDisplayName(cutoutId)
       const moduleFixtures = getCutoutFixturesForModuleModel(
@@ -195,7 +198,8 @@ export const LocationConflictModal = (
       const newRequiredFixtureDeckConfig = patchDeckConfigForRequiredFixture(
         deckConfig,
         cutoutId,
-        requiredFixtureId
+        requiredFixtureId,
+        compatibleCutoutFixtureIds
       )
 
       updateDeckConfiguration(newRequiredFixtureDeckConfig)
