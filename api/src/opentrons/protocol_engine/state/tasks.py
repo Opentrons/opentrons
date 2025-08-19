@@ -50,13 +50,13 @@ class TaskView:
             raise NoTaskFoundError(f"No task with ID {id}") from e
 
     def get_summary(self) -> list[TaskSummary]:
-            """Get a summary of all tasks."""
-            return [
-                TaskSummary(
-                    id=id,
-                    createdAt=task.createdAt,
-                    finishedAt=task.finishedAt,
-                    error=task.error,
-                )
-                for id, task in self._state.tasks_by_id.items()
-            ]
+        """Get a summary of all tasks."""
+        return [
+            TaskSummary(
+                id=id,
+                createdAt=task.createdAt,
+                finishedAt=task.finishedAt,
+                error=task.error,
+            )
+            for id, task in self._state.tasks_by_id.items()
+        ]

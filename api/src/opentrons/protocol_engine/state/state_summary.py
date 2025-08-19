@@ -1,6 +1,6 @@
 """Public protocol run data models."""
 from pydantic import BaseModel, Field
-from typing import List, Optional, Dict
+from typing import List, Optional
 from datetime import datetime
 
 from ..errors import ErrorOccurrence

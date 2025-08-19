@@ -130,9 +130,9 @@ async def test_synchronization_cancel_latest_only_cancels_one_group_id(
         try:
             async with task_handler.synchronize_cancel_latest(group_id1):
                 task2_started.set()
-                await asyncio.sleep(0.1) 
+                await asyncio.sleep(0.1)
         except asyncio.CancelledError:
-            task2_started.set()  
+            task2_started.set()
             raise
 
     async def task_3_method(task_handler: TaskHandler) -> None:
