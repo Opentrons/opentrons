@@ -86,4 +86,4 @@ The power consumption specifications are measured with the UV lights and fan on.
 
 ## Door Rollers
 
-HEPA modules manufactured after <font color="red">DATE TBD</font> include three rollers mounted along the front edge of the unit. These rollers prevent the HEPA module from scratching the robot’s front door when you open it.
+HEPA modules manufactured after <font color="red">DATE TBD</font> include three rollers mounted along the top-front edge of the unit. These rollers prevent the HEPA module from scratching the robot’s front door when you open it.
