@@ -731,6 +731,16 @@
               }
             }
           }
+        },
+        "flatWellSupportAsChild": {
+          "type": "object",
+          "required": ["wellExteriorBottomZ"],
+          "properties": {
+            "wellExteriorBottomZ": {
+              "description": "The +z-coordinate in mm from the bottom of the labware's exterior wells to the bottom of the labware.",
+              "type": "number"
+            }
+          }
         }
       }
     },

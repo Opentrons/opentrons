@@ -194,6 +194,10 @@ class HeaterShakerUniversalFlatAdapterFeature(TypedDict):
     deckRight: HeaterShakerUniversalFlatAdapterDeckRight
 
 
+class FlatWellSupportAsChildFeature(TypedDict):
+    wellExteriorBottomZ: float
+
+
 class LocatingFeatures(TypedDict):
     """A dictionary of locating features."""
 
@@ -205,6 +209,7 @@ class LocatingFeatures(TypedDict):
     heaterShakerUniversalFlatAdapter: NotRequired[
         HeaterShakerUniversalFlatAdapterFeature
     ]
+    flatWellSupportAsChild: NotRequired[FlatWellSupportAsChildFeature]
 
 
 class LabwareDefinition2(TypedDict):
