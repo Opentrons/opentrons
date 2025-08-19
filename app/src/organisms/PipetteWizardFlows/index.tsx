@@ -96,7 +96,6 @@ export const PipetteWizardFlows = (
   const totalStepCount =
     pipetteWizardSteps != null ? pipetteWizardSteps.length - 1 : 0
   const currentStep = pipetteWizardSteps?.[currentStepIndex] ?? null
-  console.log('=>(index.tsx:99) pipetteWizardSteps', pipetteWizardSteps)
   const [isFetchingPipettes, setIsFetchingPipettes] = useState<boolean>(false)
   const memoizedAttachedPipettes = useMemo(() => attachedPipettes, [])
   const hasCalData =
