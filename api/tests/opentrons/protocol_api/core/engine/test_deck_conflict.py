@@ -1,7 +1,6 @@
 """Unit tests for the deck_conflict module."""
 
 import pytest
-import random
 from typing import ContextManager, Any, NamedTuple, List, Tuple, Literal, cast
 from decoy import Decoy, matchers
 from contextlib import nullcontext as does_not_raise
@@ -414,14 +413,20 @@ def _modules_non_stacker() -> list[ModuleModel]:
     return [m for m in ModuleModel if not ModuleModel.is_flex_stacker(m)]
 
 
+_lw_index = 0
+_mod_index = 0
+
+
 def _provide_item_in_state(
     decoy: Decoy,
     mock_state_view: StateView,
     mock_sync_client: SyncClient,
     item_type: Literal["labware", "trash-bin"] | ModuleModel,
 ) -> tuple[str | None, str | None, TrashBin | None]:
+    global _lw_index, _mod_index
     if item_type == "labware":
-        labware_id = f"labware-id-{random.randint(0,10)}"
+        labware_id = f"labware-id-{_lw_index}"
+        _lw_index += 1
         decoy.when(
             mock_state_view.labware.get_location(labware_id=labware_id)
         ).then_return(DeckSlotLocation(slotName=DeckSlotName.SLOT_5))
@@ -455,7 +460,8 @@ def _provide_item_in_state(
             ),
         )
     else:
-        module_id = f"module-id-{random.randint(0,10)}"
+        module_id = f"module-id-{_mod_index}"
+        _mod_index += 1
         decoy.when(mock_state_view.modules.get_connected_model(module_id)).then_return(
             item_type
         )
