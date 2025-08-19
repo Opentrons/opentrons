@@ -278,6 +278,17 @@ const getLiquidClassValues = (
       ? multiDispense
       : singleDispense
 
+  const aspirateFlowRateFields = getFlowRateFields(
+    volume,
+    aspirate.flowRateByVolume,
+    'aspirate'
+  )
+  const dispenseFlowRateFields = getFlowRateFields(
+    volume,
+    dispense.flowRateByVolume,
+    'dispense'
+  )
+
   const {
     conditioningByVolume: rawConditioningByVolume = [],
     disposalByVolume: rawDisposalByVolume = [],
@@ -305,7 +316,7 @@ const getLiquidClassValues = (
   const { pushOut, airGap, flowRate, conditioning, disposal } = byVolumeLookup
 
   const aspirateState = {
-    aspirateFlowRate: flowRate.aspirate,
+    aspirateFlowRate: aspirateFlowRateFields.aspirate_flowRate ?? 0,
     tipPositionAspirate: aspirate?.aspiratePosition.offset.z ?? 0,
     submergeAspirate: {
       speed: aspirate?.submerge.speed ?? 0,
@@ -344,7 +355,7 @@ const getLiquidClassValues = (
   }
 
   const dispenseState = {
-    dispenseFlowRate: flowRate.dispense,
+    dispenseFlowRate: dispenseFlowRateFields.dispense_flowRate ?? 0,
     tipPositionDispense: dispense?.dispensePosition.offset.z ?? 0,
     submergeDispense: {
       speed: dispense?.submerge.speed ?? 0,
