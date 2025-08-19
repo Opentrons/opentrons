@@ -14,7 +14,7 @@ theme:
       tip: material/lightbulb-on-outline
 
 nav:
-  - Absorbance Place Reader Instruction Manual: index.md
+  - Absorbance Plate Reader Instruction Manual: index.md
   - Safety Information: safety.md
   - Product Specifications: specifications.md
   - Deck Placement: placement.md
