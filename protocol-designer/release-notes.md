@@ -16,7 +16,7 @@ This hotfix release addresses several bugs.
 
 ### Bug Fixes
 
-- Protocol Designer no longer raises an error when checking custom labware definitions for well ordering.
+- Protocol Designer no longer raises an error when checking your custom labware definitions for well ordering.
 - Transfer volumes as large as your tip limit without errors during a multi-dispense with liquid class settings applied.  
 - Exported Python protocols include numbered commands, making it easier to identify errors. 
 - Setting well volume over the limit results in a warning rather than a protocol error. 
