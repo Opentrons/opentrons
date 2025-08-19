@@ -2,17 +2,14 @@ import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
-  Box,
   Btn,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  DISPLAY_GRID,
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   NO_WRAP,
-  OVERFLOW_HIDDEN,
   SPACING,
   StyledText,
   TYPOGRAPHY,
