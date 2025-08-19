@@ -192,6 +192,7 @@
   "tip_management": "Tip management",
   "tip_position": "{{prefix}} tip position",
   "tiprack": "Tiprack",
+  "total_stacked": "Total stacked: {{amount}}",
   "touch_tip_position": "Touch tip position from top",
   "transfer": "Transfer",
   "unknown_module": "Unknown module",
