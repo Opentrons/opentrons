@@ -247,10 +247,11 @@ export function getLoadPipettes(
         ? getFlexNameConversion(spec)
         : name
       const sortedLabwareIds = sortLabwareBySlot(labwareRobotState)
-      const allTipracks = sortedLabwareIds
-        .map(id => labwareEntities[id])
-        .filter(lw => lw && tiprackDefURI.includes(lw.labwareDefURI))
-
+      const allTipracks = sortedLabwareIds.filter(
+        id =>
+          labwareEntities[id] &&
+          tiprackDefURI.includes(labwareEntities[id].labwareDefURI)
+      )
       const onDeckTipracks = allTipracks.filter(
         tiprack =>
           getSlotInLocationStack(labwareRobotState[tiprack.id].stack) !==
