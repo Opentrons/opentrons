@@ -6,14 +6,14 @@
 Flex Stacker Module
 *******************
 
-The Flex Stacker is an external module that provides automated storage of well plates, Flex tip racks, or reservoirs. The Stacker's attached shuttle moves labware from the stack to the deck for use during a protocol. 
+The Flex Stacker is an external module that provides automated storage and dispensing of Flex tip racks, well plates, or reservoirs. The Stacker's attached shuttle moves stored labware from the stack to add to the Flex deck during a protocol. 
 
-The Stacker is represented in code by a ``StackerContext`` object that includes methods for storing and retrieving labware. You can also use helper commands in your protocol to calculate how many labware the Stacker can store at once. 
+The Stacker is represented in code by a ``StackerContext`` object that includes methods for retrieving and storing labware. You can also use helper commands in your protocol to calculate how many labware the Stacker can store at once. 
 
 Loading and Deck Slots
 ========================
 
-Up to four Stacker Modules can be attached to the right side of your Flex, creating deck slots A4--D4. Each Stacker occupies a deck slot in column 4, with the shuttle in column 3. 
+Up to four Stacker Modules can be attached to the right side of your Flex, creating deck slots A4–D4. Each Stacker occupies a deck slot in column 4, with the shuttle in column 3. 
 
 Start by loading each Stacker as you would any other module: 
 
@@ -28,20 +28,20 @@ Start by loading each Stacker as you would any other module:
        location="C4"
    )
 
-Each Stacker occupies a deck slot in column 4, with the attached shuttle in column 3. In this example, Stacker shuttles occupy deck slots A3 and C3. 
+In this example, Stacker shuttles occupy deck slots A3 and C3. 
 
 Adding Labware to the Stacker
 ==============================
 
-Next, you'll need to define the *type* and amount of labware the Stacker will store. Throughout yor protocol, the Flex automatically moves labware, like well plates or tip racks, from inside the Stacker to the deck. 
+Next, you'll need to define the type and amount of labware the Stacker will store. Throughout your protocol, the Flex automatically moves labware, like well plates or tip racks, from inside the Stacker to the deck. Only one type of labware can be stored in each Stacker at one time. 
 
 Each Stacker can hold a labware stack of up to:
 
-- 7 Flex tipracks (6 in the Stacker and 1 on the shuttle)
-- 48 PCR plates, like <tested load_name>
-- 16 deep well plates, like <tested load_name>
+- 7 Flex tipracks with lids (6 in the Stacker and 1 on the shuttle)
+- 48 PCR plates, like ``opentrons_96_wellplate_200ul_pcr_full_skirt``
+- 16 deep well plates, like ``nest_96_wellplate_2ml_deep``
 
-You'll need to use :py:meth:`~.FlexStackerContext.set_stored_labware` to configure the Stacker before adding or removing labware during a protocol. Only one type of labware can be stored in each Stacker at one time. 
+You'll need to use :py:meth:`~.FlexStackerContext.set_stored_labware` to configure the Stacker before adding or removing labware during a protocol. 
 
 .. code-block:: python
 
@@ -55,24 +55,26 @@ You'll need to use :py:meth:`~.FlexStackerContext.set_stored_labware` to configu
        count=12
    )
 
-In this example, `stacker_1` is configured to hold 6 Flex tip racks, each with a compatible lid. Flex tip racks must have lids to be properly stored in the Stacker. `stacker_2` is configured to hold 12 PCR plates without lids. 
+In this example, ``stacker_1`` is configured to hold 6 Flex tip racks, each with a compatible lid. Flex tip racks must have lids to be properly stored in the Stacker. ``stacker_2`` is configured to hold 12 PCR plates without lids. 
 
 Configuring the Stacker assigns a labware stack to this deck slot. You can use the Stacker and shuttle as a normal deck slot earlier in your protocol with :py:meth:`~.ProtocolContext.load_labware()`. You'll need to move this labware elsewhere on the deck before configuring and using the Stacker for storage.  
 
-.. note:: 
-    Different labware have varying `z` heights. One well plate might be 2 mm taller than another, affecting the number of plates the Stacker can store at once. The API includes helper commands to calculate how many labware the Stacker can hold: 
+Stacker Capacity 
+-----------------
+
+Different labware have varying `z` heights. One well plate might be 2 mm taller than another, affecting the number of plates the Stacker can store at once. The API includes helper commands to calculate how many labware the Stacker can hold: 
 
     - `.ModuleContext.get_max_storable_labware()`
     - `.ModuleContext.get_current_storable_labware()` 
     - `.ModuleContext.get_stored_labware()` 
     
-    Use ``get_max_storable_labware()`` or ``get_current_storable_labware()`` to calculate the maximum or current number of labware the Stacker can store, based on either the labware definition or the Stacker's current storage conditions.
+Use ``get_max_storable_labware()`` or ``get_current_storable_labware()`` to calculate the maximum or current number of labware the Stacker can store, based on either the labware definition or the Stacker's current storage conditions.
 
-    Like other hardware modules, the Stacker doesn't verify the labware you place inside it. If your Stacker is configured correctly, you can use ``get_stored_labware()`` throughout your protocol to check an updated list of labware stored inside. 
+Like other hardware modules, the Stacker doesn't verify the labware you place inside it. If your Stacker is configured correctly, you can use ``get_stored_labware()`` throughout your protocol to check an updated list of labware stored inside. 
 
 Using Stacker Labware
 ======================
-During a protocol, use `~.FlexStackerContext.retrieve()` to automatically access a single piece of labware to use on the Flex deck. 
+During a protocol, use :py:meth:`~.FlexStackerContext.retrieve()` to automatically access a single piece of labware to use on the Flex deck. 
 
 .. code-block:: python
 
@@ -83,9 +85,9 @@ During a protocol, use `~.FlexStackerContext.retrieve()` to automatically access
        use_gripper="True"
    )
 
-Here, the Flex tip rack at the bottom of the labware stack is moved to the shuttle in slot A3. Then, use the Flex Gripper or manually move the new tip rack elsewhere on the deck. 
+Here, the Stacker's shuttle takes the Flex tip rack at the bottom of the labware stack and moves it into slot A3. Then, the Flex Gripper moves that tip rack to slot B2 on the deck. 
 
-To add more labware to a Stacker, use `~.FlexStackerContext.store()`::
+To move labware from the deck into a Stacker, use `~.FlexStackerContext.store()`::
 
    protocol.move_labware(
        labware="opentrons_96_wellplate_200ul_pcr_full_skirt",
@@ -109,16 +111,3 @@ To mark a Stacker as completely full or empty, use `~.FlexStackerContext.fill()`
    stacker_2.fill(8, "Add 8 reservoirs to stacker_2.")
 
 Both ``fill()`` and ``empty()`` pause the protocol and allow you to manually add or remove labware from the Stacker. Each method assumes labware is loaded or moved ``off_deck``. 
-
-
-
-
-
-
-
-
-
-
-
-
-
