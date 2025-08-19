@@ -8,6 +8,20 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 ---
 
+## Opentrons Protocol Designer Changes in 8.5.2
+
+**Welcome to Protocol Designer 8.5.2!**
+
+This is a hotfix release that addresses several bugs.
+
+### Bug Fixes
+
+- When clicking on "view details" on a labware to view the liquids, there is no longer a whitescreen.
+- The "multi dispenses values not found for liquid class" timeline error with a consolidate step is now resolvable.
+- Exporting a protocol with form errors now correctly numbers the generated python commands.
+- The form error when setting the volume in a well over its limit is now a form warning.
+
+
 ## Opentrons Protocol Designer Changes in 8.5.1
 
 **Welcome to Protocol Designer 8.5.1!**
