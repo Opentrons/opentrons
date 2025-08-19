@@ -246,18 +246,10 @@ export function getLoadPipettes(
       const pipetteName = isFlexPipette(name)
         ? getFlexNameConversion(spec)
         : name
-      const allTipracks = tiprackDefURI.flatMap(defURI => {
-        const matchingLabwareIds = Object.values(labwareEntities)
-          .filter(labware => labware.labwareDefURI === defURI)
-          .map(labware => labware.id)
-
-        // sort them by slot, matching getNextTiprack() logic
-        const sortedIds = sortLabwareBySlot(
-          labwareRobotState
-        ).filter(labwareId => matchingLabwareIds.includes(labwareId))
-
-        return sortedIds.map(labwareId => labwareEntities[labwareId])
-      })
+      const sortedLabwareIds = sortLabwareBySlot(labwareRobotState)
+      const allTipracks = sortedLabwareIds
+        .map(id => labwareEntities[id])
+        .filter(lw => lw && tiprackDefURI.includes(lw.labwareDefURI))
 
       const onDeckTipracks = allTipracks.filter(
         tiprack =>
