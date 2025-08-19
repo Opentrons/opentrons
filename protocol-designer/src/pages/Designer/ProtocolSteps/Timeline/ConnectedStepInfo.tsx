@@ -30,7 +30,7 @@ import {
   toggleViewSubstep,
 } from '/protocol-designer/ui/steps/actions/actions'
 
-import { StepContainer } from './StepContainer'
+import { ConnectedStepContainer } from './StepContainer'
 import {
   getMetaSelectedSteps,
   getMouseClickKeyInfo,
@@ -233,7 +233,7 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
           onCancelClick={cancel}
         />
       )}
-      <StepContainer
+      <ConnectedStepContainer
         openedOverflowMenuId={openedOverflowMenuId}
         setOpenedOverflowMenuId={setOpenedOverflowMenuId}
         hasError={hasError}
