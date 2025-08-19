@@ -17,11 +17,10 @@ This hotfix release addresses several bugs.
 ### Bug Fixes
 
 - Protocol Designer no longer raises an error when checking your custom labware definitions for well ordering.
-- Transfer volumes as large as your tip limit without errors during a multi-dispense with liquid class settings applied.  
-- Exported Python protocols include numbered commands, making it easier to identify errors. 
-- Setting well volume over the limit results in a warning rather than a protocol error. 
-- Crashes and protocol loss no longer occur when viewing liquids added to labware. 
-
+- Transfer volumes as large as your tip limit without errors during a multi-dispense with liquid class settings applied.
+- Exported Python protocols include numbered commands, making it easier to identify errors.
+- Setting well volume over the limit results in a warning rather than a protocol error.
+- Crashes and protocol loss no longer occur when viewing liquids added to labware.
 
 ## Opentrons Protocol Designer Changes in 8.5.1
 
@@ -39,7 +38,7 @@ Use Opentrons-verified liquid classes to automatically define transfer settings 
 
 ### New Features
 
-- Make edits to advanced settings like submerge and retract position and speed, touch tip, and air gap to customize each transfer. 
+- Make edits to advanced settings like submerge and retract position and speed, touch tip, and air gap to customize each transfer.
 - Customize push out volume after a dispense to ensure all liquid leaves the pipette tip.
 - Add conditioning volumes to transfer steps. After aspirating liquid, the pipette will aspirate a smaller conditioning volume for a more accurate first dispense.
 
