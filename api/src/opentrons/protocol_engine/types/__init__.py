@@ -68,6 +68,7 @@ from .module import (
     ModuleOffsetData,
     StackerFillEmptyStrategy,
     StackerStoredLabwareGroup,
+    StackerLabwareMovementStrategy,
 )
 from .location import (
     DeckSlotLocation,
@@ -99,7 +100,6 @@ from .labware import (
     LegacyLabwareOffsetCreate,
     LabwareOffsetCreateInternal,
     LoadedLabware,
-    LabwareParentDefinition,
     LabwareWellId,
 )
 from .liquid import HexColor, EmptyLiquidId, LiquidId, Liquid, FluidKind, AspiratedFluid
@@ -130,6 +130,7 @@ from .instrument import (
     CurrentWell,
     CurrentPipetteLocation,
     InstrumentOffsetVector,
+    GripperMoveType,
 )
 from .execution import EngineStatus, PostRunHardwareState
 from .liquid_level_detection import (
@@ -213,6 +214,7 @@ __all__ = [
     "ModuleOffsetData",
     "StackerFillEmptyStrategy",
     "StackerStoredLabwareGroup",
+    "StackerLabwareMovementStrategy",
     # Locations of things on deck
     "DeckSlotLocation",
     "StagingSlotLocation",
@@ -254,7 +256,6 @@ __all__ = [
     "LabwareOffsetCreateInternal",
     "LoadedLabware",
     "LabwareOffsetVector",
-    "LabwareParentDefinition",
     "LabwareWellId",
     # Liquids
     "HexColor",
@@ -283,6 +284,7 @@ __all__ = [
     "CurrentWell",
     "CurrentPipetteLocation",
     "InstrumentOffsetVector",
+    "GripperMoveType",
     # Liquid level detection types
     "LoadedVolumeInfo",
     "ProbedHeightInfo",

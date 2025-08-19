@@ -26,7 +26,7 @@ import {
   toggleViewSubstep,
 } from '/protocol-designer/ui/steps/actions/actions'
 
-import { StepContainer } from './StepContainer'
+import { ConnectedStepContainer } from './StepContainer'
 
 import type { TerminalItemId } from '/protocol-designer/steplist'
 import type { ThunkDispatch } from '/protocol-designer/types'
@@ -93,7 +93,7 @@ export function TerminalItemStep(props: TerminalItemStepProps): JSX.Element {
           onCancelClick={cancel}
         />
       )}
-      <StepContainer
+      <ConnectedStepContainer
         {...{
           stepId: `TerminalItem_${id}`,
           iconName: id === START_TERMINAL_ITEM_ID ? 'ot-start' : 'ot-end',

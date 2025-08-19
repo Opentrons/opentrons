@@ -62,6 +62,7 @@ interface LabwareListItemProps {
   slotName: string
   stackedItems: StackItem[]
   onClick: () => void
+  offDeckQuantity?: number
   labwareByLiquidId?: LabwareByLiquidId
   showLabwareSVG?: boolean
   definitionsByURI?: LabwareDefinitionsByURI
@@ -73,6 +74,7 @@ export function LabwareListItem(
   const {
     stackedItems,
     slotName,
+    offDeckQuantity,
     attachedModuleInfo,
     extraAttentionModules,
     isFlex,
@@ -259,70 +261,73 @@ export function LabwareListItem(
           width="100%"
         >
           <>
-            {labwareLiquidRenderInfo.map((labware, index) => (
-              <>
-                <Flex gridGap={SPACING.spacing24} alignItems={ALIGN_CENTER}>
-                  {showLabwareSVG && definitionsByURI != null ? (
-                    <StandaloneLabware
-                      definition={definitionsByURI[labware.definitionUri]}
+            {labwareLiquidRenderInfo.map((labware, index) => {
+              const quantityTag = offDeckQuantity ?? labware.quantity
+              return (
+                <>
+                  <Flex gridGap={SPACING.spacing24} alignItems={ALIGN_CENTER}>
+                    {showLabwareSVG && definitionsByURI != null ? (
+                      <StandaloneLabware
+                        definition={definitionsByURI[labware.definitionUri]}
+                      />
+                    ) : null}
+                    <Flex
+                      flexDirection={DIRECTION_COLUMN}
+                      gridGap={SPACING.spacing4}
+                    >
+                      <StyledText desktopStyle="bodyDefaultSemiBold">
+                        {labware.displayName}
+                      </StyledText>
+                      {labware.lidDisplayName != null ? (
+                        <StyledText
+                          desktopStyle="bodyDefaultRegular"
+                          color={COLORS.grey60}
+                        >
+                          {t('with_lid', {
+                            lidDisplayName: labware.lidDisplayName,
+                          })}
+                        </StyledText>
+                      ) : null}
+                      {quantityTag > 1 || labware.liquids > 0 ? (
+                        <Flex
+                          flexDirection={DIRECTION_ROW}
+                          gridGap={SPACING.spacing4}
+                        >
+                          {quantityTag > 1 ? (
+                            <Tag
+                              type="default"
+                              text={t('labware_quantity', {
+                                quantity: quantityTag,
+                              })}
+                            />
+                          ) : null}
+                          {labware.liquids > 0 ? (
+                            <Tag
+                              type="default"
+                              text={
+                                labware.quantity > 1
+                                  ? t('multiple_liquid_layouts')
+                                  : t('number_of_liquids', {
+                                      number: labware.liquids,
+                                      count: labware.liquids,
+                                    })
+                              }
+                            />
+                          ) : null}
+                        </Flex>
+                      ) : null}
+                    </Flex>
+                  </Flex>
+                  {index !== labwareLiquidRenderInfo.length - 1 ? (
+                    <Box
+                      borderBottom={`1px solid ${String(COLORS.grey40)}`}
+                      marginY="0"
+                      width="100%"
                     />
                   ) : null}
-                  <Flex
-                    flexDirection={DIRECTION_COLUMN}
-                    gridGap={SPACING.spacing4}
-                  >
-                    <StyledText desktopStyle="bodyDefaultSemiBold">
-                      {labware.displayName}
-                    </StyledText>
-                    {labware.lidDisplayName != null ? (
-                      <StyledText
-                        desktopStyle="bodyDefaultRegular"
-                        color={COLORS.grey60}
-                      >
-                        {t('with_lid', {
-                          lidDisplayName: labware.lidDisplayName,
-                        })}
-                      </StyledText>
-                    ) : null}
-                    {labware.quantity > 1 || labware.liquids > 0 ? (
-                      <Flex
-                        flexDirection={DIRECTION_ROW}
-                        gridGap={SPACING.spacing4}
-                      >
-                        {labware.quantity > 1 ? (
-                          <Tag
-                            type="default"
-                            text={t('labware_quantity', {
-                              quantity: labware.quantity,
-                            })}
-                          />
-                        ) : null}
-                        {labware.liquids > 0 ? (
-                          <Tag
-                            type="default"
-                            text={
-                              labware.quantity > 1
-                                ? t('multiple_liquid_layouts')
-                                : t('number_of_liquids', {
-                                    number: labware.liquids,
-                                    count: labware.liquids,
-                                  })
-                            }
-                          />
-                        ) : null}
-                      </Flex>
-                    ) : null}
-                  </Flex>
-                </Flex>
-                {index !== labwareLiquidRenderInfo.length - 1 ? (
-                  <Box
-                    borderBottom={`1px solid ${String(COLORS.grey40)}`}
-                    marginY="0"
-                    width="100%"
-                  />
-                ) : null}
-              </>
-            ))}
+                </>
+              )
+            })}
           </>
         </Flex>
         <Flex

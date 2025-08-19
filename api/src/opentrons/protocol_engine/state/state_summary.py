@@ -35,4 +35,4 @@ class StateSummary(BaseModel):
     wells: List[WellInfoSummary] = Field(default_factory=list)
     files: List[str] = Field(default_factory=list)
     liquidClasses: List[LiquidClassRecordWithId] = Field(default_factory=list)
-    tasks: Dict[str, TaskSummary] = Field(default_factory=dict)
+    tasks: List[TaskSummary] = Field(default_factory=list)

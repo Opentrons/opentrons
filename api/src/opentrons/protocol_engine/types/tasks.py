@@ -18,7 +18,7 @@ class Task:
 
 @dataclass
 class TaskSummary:
-    """A summary of a task."""
+    """Task info for use in summary lists."""
 
     id: str
     createdAt: datetime
