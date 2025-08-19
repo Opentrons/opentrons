@@ -862,6 +862,29 @@ describe('getWasteChuteComboFixture', () => {
     })
   })
 
+  it('Should get a none covered waste chute', () => {
+    const result = getWasteChuteComboFixture(
+      {
+        addressableAreaId: 'flexStackerModuleV1D4',
+        cutoutFixtureId: FLEX_STACKER_V1_FIXTURE,
+        cutoutId: 'cutoutD3',
+        opentronsModuleSerialNumber: '123',
+      },
+      [
+        {
+          cutoutId: 'cutoutD3',
+          cutoutFixtureId: FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT_FIXTURE,
+          addressableAreaId: '1ChannelWasteChute',
+        },
+      ]
+    )
+    expect(result).toEqual({
+      cutoutFixtureId: FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+      cutoutId: 'cutoutD3',
+      opentronsModuleSerialNumber: '123',
+    })
+  })
+
   it('Should get a none covered waste chute when stacker is on deck', () => {
     const result = getWasteChuteComboFixture(
       {
