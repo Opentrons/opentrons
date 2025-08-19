@@ -186,7 +186,7 @@ export const wellVolumeMax = (
 
   return dispenseLabwareMaxVolume != null &&
     typeof fields.volume === 'string' &&
-    parseInt(fields.volume) > dispenseLabwareMaxVolume
+    parseFloat(fields.volume) > dispenseLabwareMaxVolume
     ? volumeTooHighInWell()
     : null
 }
