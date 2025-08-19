@@ -4034,7 +4034,7 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false,
+                "enable": true,
                 "params": {
                   "location": "destination",
                   "flowRate": 200.0
@@ -4072,7 +4072,12 @@
                 "volume": 50
               }
             },
-            "pushOutByVolume": [[1.0, 5.0]],
+            "pushOutByVolume": [
+              [1.0, 7.0],
+              [5.0, 2.0],
+              [10.0, 2.0],
+              [50.0, 5.0]
+            ],
             "delay": {
               "enable": false,
               "params": {
@@ -4272,7 +4277,7 @@
                 [50.0, 0.0]
               ],
               "blowout": {
-                "enable": false,
+                "enable": true,
                 "params": {
                   "location": "destination",
                   "flowRate": 200.0
@@ -4310,7 +4315,12 @@
                 "volume": 50
               }
             },
-            "pushOutByVolume": [[1.0, 5.0]],
+            "pushOutByVolume": [
+              [1.0, 7.0],
+              [5.0, 2.0],
+              [10.0, 2.0],
+              [50.0, 5.0]
+            ],
             "delay": {
               "enable": false,
               "params": {
@@ -4510,7 +4520,7 @@
                 [200.0, 0.0]
               ],
               "blowout": {
-                "enable": false,
+                "enable": true,
                 "params": {
                   "location": "destination",
                   "flowRate": 200.0
@@ -4548,7 +4558,12 @@
                 "volume": 50
               }
             },
-            "pushOutByVolume": [[1.0, 5.0]],
+            "pushOutByVolume": [
+              [1.0, 5.0],
+              [5.0, 2.0],
+              [50.0, 2.0],
+              [200.0, 5.0]
+            ],
             "delay": {
               "enable": false,
               "params": {
@@ -4748,7 +4763,7 @@
                 [200.0, 0.0]
               ],
               "blowout": {
-                "enable": false,
+                "enable": true,
                 "params": {
                   "location": "destination",
                   "flowRate": 200.0
@@ -4786,7 +4801,12 @@
                 "volume": 50
               }
             },
-            "pushOutByVolume": [[1.0, 5.0]],
+            "pushOutByVolume": [
+              [1.0, 5.0],
+              [5.0, 2.0],
+              [50.0, 2.0],
+              [200.0, 5.0]
+            ],
             "delay": {
               "enable": false,
               "params": {
