@@ -1,7 +1,7 @@
 site_name: hepa-uv
 
 nav:
-  - Home: index.md
+  - HEPA/UV Module Instruction Manual: index.md
   - Safety Information and Regulatory Compliance: compliance.md
   - Product Specifications: product-specifications.md
   - HEPA Specifications: hepa-specifications.md

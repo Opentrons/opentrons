@@ -2,9 +2,7 @@
 title: "HEPA/UV Module: Product Specifications"
 ---
 
-# Product Specifications
-
-![Labeled HEPA/UV Module diagram](images/hepa-uv-diagram.svg "Labeled HEPA/UV Module diagram")
+![Labeled HEPA/UV Module diagram](images/hepa-labeled.svg)
 
 ## Included parts
 
@@ -85,3 +83,7 @@ The power consumption specifications are measured with the UV lights and fan on.
 
 - Typical power consumption: 75.5 W
 - Peak power consumption: 160 W
+
+## Door Rollers
+
+HEPA modules manufactured after <font color="red">DATE TBD</font> include three rollers mounted along the front edge of the unit. These rollers prevent the HEPA module from scratching the robot’s front door when you open it.
