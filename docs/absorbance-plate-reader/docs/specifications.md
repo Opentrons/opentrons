@@ -2,8 +2,6 @@
 title: "Plate Reader: Product Specifications"
 ---
 
-# Product Specifications
-
 ![Module parts with labels](images/plate-reader-labeled.svg)
 
 ## Included Parts

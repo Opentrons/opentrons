@@ -3,8 +3,6 @@ title: "Plate Reader: Installation"
 hide: toc
 ---
 
-# Installing the Plate Reader
-
 To attach the Absorbance Plate Reader to your Flex:
 
 <div class="instruction-list" markdown>

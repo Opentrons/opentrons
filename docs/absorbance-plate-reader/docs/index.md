@@ -5,8 +5,6 @@ hide: toc
 
 <div style="text-align: center;" markdown>
 
-# Absorbance Plate Reader Instruction Manual
-
 ![Plate reader cover image](images/plate-reader-hero.png){style="width: 60%"}
 
 **Opentrons Labworks Inc**<br>

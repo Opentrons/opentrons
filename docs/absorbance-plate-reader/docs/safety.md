@@ -2,8 +2,6 @@
 title: "Plate Reader: Safety Information"
 ---
 
-# Safety Information
-
 Opentrons recommends that you follow the safe use specifications listed in this section and throughout this manual.
 
 ## Safe Use Specifications

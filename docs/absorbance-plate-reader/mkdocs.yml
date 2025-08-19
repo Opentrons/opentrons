@@ -14,11 +14,11 @@ theme:
       tip: material/lightbulb-on-outline
 
 nav:
-  - Home: index.md
+  - Absorbance Place Reader Instruction Manual: index.md
   - Safety Information: safety.md
   - Product Specifications: specifications.md
   - Deck Placement: placement.md
-  - Installation: installation.md
+  - Installing the Plate Reader: installation.md
   - Using Plate Reader Data: data.md
   - Maintenance and Cleaning: maintenance.md
   - Additional Product Information: warranty.md

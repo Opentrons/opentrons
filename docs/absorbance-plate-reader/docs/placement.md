@@ -3,8 +3,6 @@ title: "Plate Reader: Deck Placement"
 hide: toc
 ---
 
-# Deck Placement
-
 You can put the plate reader in deck slots A3–D3 only. The module comes pre-installed in its own caddy, which attaches the unit to the deck.
 
 ![Deck locations](images/deck-map-highlighted.svg)
