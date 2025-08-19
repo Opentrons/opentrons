@@ -258,7 +258,7 @@ export function getLoadPipettes(
 
         return sortedIds.map(labwareId => labwareEntities[labwareId])
       })
-      console.log('allTipracks', allTipracks)
+
       const onDeckTipracks = allTipracks.filter(
         tiprack =>
           getSlotInLocationStack(labwareRobotState[tiprack.id].stack) !==
