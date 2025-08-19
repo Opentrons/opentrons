@@ -107,7 +107,7 @@ export function fieldsToLabware(
 
     const stackingOffsetWithLabware: Record<string, LabwareOffset> = {}
     Object.entries(compatibleAdapters).forEach(([loadName, z]) => {
-      const zValue = Number(z) || 0
+      const zValue = parseFloat(String(z))
       const adapterHeight =
         adapterDefinitions != null
           ? Object.values(adapterDefinitions).find(
@@ -206,11 +206,11 @@ export function fieldsToLabware(
     // overwrite loadName from createRegularLabware with ours
     def.parameters.loadName = fields.loadName
     // Calculate stack offset for labware on itself
-    if (fields.stackedLabwareZDimension != null) {
+    if (fields.stackedLabwareZDimension) {
       stackingOffsetWithLabware[def.parameters.loadName] = {
         x: 0,
         y: 0,
-        z: fields.stackedLabwareZDimension - (2 * fields.labwareZDimension),
+        z: fields.stackedLabwareZDimension - 2 * fields.labwareZDimension,
       }
     }
     return def

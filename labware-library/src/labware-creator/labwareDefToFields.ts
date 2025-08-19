@@ -12,12 +12,12 @@ const boolToBoolString = (b: boolean): BooleanString => (b ? 'true' : 'false')
 
 export function getStackedLabwareZDimension(
   def: LabwareDefinition2
-): number | undefined {
+): number | null {
   const zOffset = def.stackingOffsetWithLabware?.[def.parameters.loadName]?.z
-  if (zOffset == null) {
-    return undefined
-  } else {
+  if (zOffset) {
     return def.dimensions.zDimension * 2 - zOffset
+  } else {
+    return null
   }
 }
 
