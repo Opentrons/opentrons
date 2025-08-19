@@ -74,12 +74,15 @@ def deploy_docs(environment, branch=None, aws_profile=None, source_dir="site"):
         else:  # production
             url = f"https://docs.opentrons.com/"
     
+    # Preserve certain directories (v1, v2, ot1, http, hardware) in all environments
+    # so we don't use --delete flag - this ensures existing directories are not removed
     cmd = [
         "aws", "s3", "sync",
         str(source_path) + "/",
-        s3_path,
-        "--delete"
+        s3_path
     ]
+    
+    print(f"  Mode: Preserve existing directories (v1, v2, ot1, http, hardware)")
     
     # Add AWS profile if specified
     if aws_profile:
