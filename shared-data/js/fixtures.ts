@@ -1453,7 +1453,6 @@ export const replaceCutoutFixtureWithComboFixture = (
       aaCutoutItem,
       deckConfigWithAA
     )
-    console.log('wasteChuteCombo: ', wasteChuteCombo)
     if (wasteChuteCombo) {
       return wasteChuteCombo
     }
