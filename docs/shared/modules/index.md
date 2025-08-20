@@ -46,7 +46,7 @@ Opentrons hardware modules add features and capabilities to your robot.
 
     [:octicons-arrow-right-24: Instruction Manual](../thermocycler-manual/index.md)
 
--   :opentrons-platereaderout:{ .xl .middle} __Plate Reader__
+-   :opentrons-platereaderout:{ .xl .middle} __Absorbance Plate Reader__
 
     ---
 
