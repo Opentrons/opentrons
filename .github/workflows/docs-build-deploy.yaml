@@ -70,7 +70,12 @@ jobs:
         run: make setup
       - name: Setup API Dependencies
         working-directory: ./api
-        run: make setup
+        run: |
+          # Ensure we're in the right directory and Pipfile.lock exists
+          ls -la Pipfile*
+          # Regenerate lock file if needed
+          pipenv lock --clear
+          make setup
       - name: Build All Docs
         working-directory: ./docs
         run: make all-docs
