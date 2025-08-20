@@ -1189,6 +1189,7 @@ class FlexStackerContext(ModuleContext):
         stacking_offset_z: float | None = None,
     ) -> list[Labware]:
         """Limit a list of labware instances to the number that can be stored in a Flex Stacker.
+        Items will be taken from the head of the list.
 
         A Flex Stacker has a limited amount of internal space and computes the number of labware
         (or labware with lids or adapters) that it can store based on the ``z`` heights of the labware
@@ -1224,16 +1225,17 @@ class FlexStackerContext(ModuleContext):
     ) -> list[Labware]:
         """Limit a list of labware instances to the number that the Flex Stacker currently has space for,
         based on the labware that is already stored in the Flex Stacker.
+        Items will be taken from the head of the list.
 
         A Flex Stacker has a limited amount of internal space and computes the number of labware that it can store based on the ``z`` height of the labware and the amount they overlap when stacked.
 
-        Provide a list of labware to this function to return the elements that the
-        Stacker can currently store from it. The returned list is then guaranteed to be suitable
-        for passing to :py:meth:`.fill`.
+        .. note::
+            The number of elements in the returned list will change as labware is added or removed from
+            the Flex Stacker. To get a list limited to the overall maximum number of labware the Flex Stacker
+            can store, use :py:meth:`.get_max_storable_labware_from_list`.
 
-        The number of elements in the returned list will change as labware is added or removed from
-        the Flex Stacker. To get a list limited to the overall maximum number of labware the Flex Stacker
-        can store, use :py:meth:`.get_max_storable_labware_from_list`.
+        :param labware: A list of labware to limit. The returned list takes from the front of the provided list, and it is guaranteed to be suitable
+            for passing to :py:meth:`.fill_items`.
         """
         return self._cores_to_labware(
             self._core.get_current_storable_labware_from_list(
@@ -1270,24 +1272,26 @@ class FlexStackerContext(ModuleContext):
         labware: list[Labware],
         stacking_offset_z: float | None,
     ) -> None:
-        """Configure the labware the Flex Stacker will store during a protocol by providing an initial list of stored labware objects.
+        """Configure the labware the Flex Stacker will store during a protocol by providing an initial list of stored labware objects. The start of the list represents the bottom of the Stacker,
+        and the end of the list represents the top of the Stacker.
 
         The kind of labware stored by the Flex Stacker will be calculated from the list of labware
         specified here. You can use this to store labware objects that you have already created
-        so that, for instance, you can set their liquid state or nicknames. There are several
-        restrictions on the values of the ``labware`` argument:
+        so that, for instance, you can set their liquid state or nicknames.
 
-            - ``labware`` must have at least one element
-            - Elements of ``labware`` will be stored along with their lid, if any, and an adapter they
-              rest on, if any. These must be compatible with the Flex Stacker.
-            - All elements of ``labware`` must be loaded :py:obj:`OFF_DECK`.
-            - All elements of ``labware`` must be the same kind of labware. If any of them have lids, they
-              must all have lids, and the lids must be the same. If any of them are on adapters, they all
+
+        :param labware: A list of labware to load into the Stacker.
+
+            - The list must have at least one element.
+            - All labware must be loaded :py:obj:`OFF_DECK`.
+            - All labware must be of the same kind. If any of them have lids, they
+              must all have lids, and the lids must be the same.
+              If any of them are on adapters, they all
               must be on adapters, and the adapters must be the same.
-            - The number of labware objects must fit in the stacker physically. To make sure the labware
+              All lids and adapters must be compatible with the Stacker.
+            - The number of labware objects must fit in the Stacker physically. To make sure the labware
               will fit, use the return value of :py:meth:`.get_max_storable_labware_from_list`.
 
-        :param labware: A list of labware to load into the stacker.
         :param stacking_offset_z: Stacking ``z`` offset in mm of stored labware. If specified, this overrides the
             calculated value from labware definitions.
 
@@ -1352,7 +1356,7 @@ class FlexStackerContext(ModuleContext):
             values as the ``load_name`` parameter of :py:meth:`~.ProtocolContext.load_lid_stack`. The
             lid will use the same namespace as the labware, and the API will
             choose the lid's version automatically.
-        :param count: The number of labware that the Flex Stacker should store at the beginning of the protocol. If not specified, this will be the maximum amount of this kind of
+        :param count: The number of labware that the Flex Stacker should store. If not specified, this will be the maximum amount of this kind of
             labware that the Flex Stacker is capable of storing.
         :param stacking_offset_z: Stacking ``z`` offset in mm of stored labware. If specified, this overrides the
             calculated value in the labware definition.
@@ -1391,13 +1395,11 @@ class FlexStackerContext(ModuleContext):
     def fill(self, count: int | None = None, message: str | None = None) -> None:
         """Pause the protocol to add labware to the Flex Stacker.
 
-        The labware must be the same type the Stacker is configured to store using :py:meth:`.set_stored_labware()`.
+        The labware must be the same type the Stacker is configured to store using :py:meth:`.set_stored_labware()`. If no labware type has been set, the API will raise an error.
 
-        This method assumes that labware to fill the Stacker is loaded :py:obj:`OFF_DECK`.
-
-        :param message: A message to display in the Opentrons App noting what kind of labware to fill the Stacker with.
         :param count: The amount of labware the Flex Stacker should hold after this command is executed.
                       If not specified, the Flex Stacker should be full after this command is executed.
+        :param message: A message to display noting what kind of labware to fill the Stacker with.
         """
         self._core.fill(count, message)
 
@@ -1405,14 +1407,13 @@ class FlexStackerContext(ModuleContext):
     def fill_items(self, labware: list[Labware], message: str | None = None) -> None:
         """Pause the protocol to add a specific list of labware to the Flex Stacker.
 
-        The ``labware`` argument must follow certain rules:
-          - It should contain at least one item.
-          - Its elements should be the same kind of labware previously passed to
-            :py:meth:`.set_stored_labware_items` or loaded by :py:meth:`.set_stored_labware`.
-          - Its elements should all be loaded :py:obj:`OFF_DECK`.
+        :param labware: The list of labware to add. The list must:
 
-        :param message: A message to display in the Opentrons App noting the labware to fill the Stacker with.
-        :param labware: The list of labware to add, following the rules above.
+          - Contain at least one labware.
+          - Have labware of the same kind previously passed to
+            :py:meth:`.set_stored_labware_items` or loaded by :py:meth:`.set_stored_labware`.
+          - All labware should be loaded :py:obj:`OFF_DECK`.
+        :param message: A message to display noting the labware to fill the Stacker with.
         """
         self._core.fill_items(self._labware_to_cores(labware), message)
 
@@ -1420,9 +1421,9 @@ class FlexStackerContext(ModuleContext):
     def empty(self, message: str | None = None) -> None:
         """Pause the protocol to remove all labware stored in the Flex Stacker.
 
-        This method assumes that labware removed from the Stacker is moved :py:obj:`OFF_DECK`.
+        This method sets the location of all labware currently in the stacker to :py:obj:`OFF_DECK`.
 
-        :param message: A message to display in the Opentrons App to note what should be removed from
+        :param message: A message to display to note what should be removed from
                         the Flex Stacker.
         """
         self._core.empty(
