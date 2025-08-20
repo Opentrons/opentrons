@@ -5,7 +5,7 @@ from typing import Union, overload, Optional
 
 from typing_extensions import assert_type
 
-from opentrons.types import Point, DeckSlotName
+from opentrons.types import Point, DeckSlotName, SlotOrientation
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
     LabwareDefinition2,
@@ -88,6 +88,7 @@ def get_stackup_origin_to_labware_origin(
             stackup_lw_info_top_to_bottom=stackup_lw_info_top_to_bottom,
             underlying_ancestor_definition=underlying_ancestor_definition,
             module_parent_to_child_offset=module_parent_to_child_offset,
+            slot_name=slot_name,
             deck_definition=deck_definition,
         )
     else:
@@ -107,6 +108,7 @@ def get_stackup_origin_to_labware_origin(
             stackup_lw_info_top_to_bottom=stackup_lw_info_top_to_bottom,
             underlying_ancestor_definition=underlying_ancestor_definition,
             module_parent_to_child_offset=module_parent_to_child_offset,
+            slot_name=slot_name,
             deck_definition=deck_definition,
         )
 
@@ -116,6 +118,7 @@ def _get_stackup_origin_to_lw_origin(
     underlying_ancestor_definition: LabwareStackupAncestorDefinition,
     module_parent_to_child_offset: Point | None,
     deck_definition: DeckDefinitionV5,
+    slot_name: DeckSlotName,
     is_topmost_labware: bool = True,
 ) -> Point:
     """Returns the offset from the stackup placement origin to child labware origin."""
@@ -130,6 +133,7 @@ def _get_stackup_origin_to_lw_origin(
             parent_definition=underlying_ancestor_definition,
             deck_definition=deck_definition,
             module_parent_to_child_offset=module_parent_to_child_offset,
+            slot_name=slot_name,
             is_topmost_labware=is_topmost_labware,
         )
     elif isinstance(location, OnLabwareLocation):
@@ -142,6 +146,7 @@ def _get_stackup_origin_to_lw_origin(
                 parent_definition=parent_definition,
                 deck_definition=deck_definition,
                 module_parent_to_child_offset=module_parent_to_child_offset,
+                slot_name=slot_name,
                 is_topmost_labware=is_topmost_labware,
             )
         )
@@ -151,6 +156,7 @@ def _get_stackup_origin_to_lw_origin(
             stackup_lw_info_top_to_bottom=remaining_lw_defs_locs_top_to_bottom,
             underlying_ancestor_definition=underlying_ancestor_definition,
             module_parent_to_child_offset=module_parent_to_child_offset,
+            slot_name=slot_name,
             deck_definition=deck_definition,
             is_topmost_labware=False,
         )
@@ -167,6 +173,7 @@ def _get_parent_placement_origin_to_lw_origin_by_location(
     parent_definition: _LabwareStackupDefinition,
     deck_definition: DeckDefinitionV5,
     module_parent_to_child_offset: Point | None,
+    slot_name: DeckSlotName,
     is_topmost_labware: bool,
 ) -> Point:
     if isinstance(labware_location, ModuleLocation):
@@ -181,6 +188,7 @@ def _get_parent_placement_origin_to_lw_origin_by_location(
                 module_parent_to_child_offset=module_parent_to_child_offset,
                 deck_definition=deck_definition,
                 is_topmost_labware=is_topmost_labware,
+                slot_name=slot_name,
                 labware_location=labware_location,
             )
     elif isinstance(labware_location, OnLabwareLocation):
@@ -190,6 +198,7 @@ def _get_parent_placement_origin_to_lw_origin_by_location(
             module_parent_to_child_offset=None,
             deck_definition=deck_definition,
             is_topmost_labware=is_topmost_labware,
+            slot_name=slot_name,
             labware_location=labware_location,
         )
     elif isinstance(labware_location, (DeckSlotLocation, AddressableAreaLocation)):
@@ -199,6 +208,7 @@ def _get_parent_placement_origin_to_lw_origin_by_location(
             module_parent_to_child_offset=None,
             deck_definition=deck_definition,
             is_topmost_labware=is_topmost_labware,
+            slot_name=slot_name,
             labware_location=labware_location,
         )
     else:
@@ -212,6 +222,7 @@ def _get_parent_placement_origin_to_lw_origin(
     module_parent_to_child_offset: Point,
     deck_definition: DeckDefinitionV5,
     is_topmost_labware: bool,
+    slot_name: DeckSlotName,
     labware_location: ModuleLocation,
 ) -> Point:
     ...
@@ -224,6 +235,7 @@ def _get_parent_placement_origin_to_lw_origin(
     module_parent_to_child_offset: None,
     deck_definition: DeckDefinitionV5,
     is_topmost_labware: bool,
+    slot_name: DeckSlotName,
     labware_location: Union[DeckSlotLocation, AddressableAreaLocation],
 ) -> Point:
     ...
@@ -236,6 +248,7 @@ def _get_parent_placement_origin_to_lw_origin(
     module_parent_to_child_offset: None,
     deck_definition: DeckDefinitionV5,
     is_topmost_labware: bool,
+    slot_name: DeckSlotName,
     labware_location: OnLabwareLocation,
 ) -> Point:
     ...
@@ -247,6 +260,7 @@ def _get_parent_placement_origin_to_lw_origin(
     module_parent_to_child_offset: Point | None,
     deck_definition: DeckDefinitionV5,
     is_topmost_labware: bool,
+    slot_name: DeckSlotName,
     labware_location: LabwareLocation,
 ) -> Point:
     """Returns the offset from parent entity's placement origin to child labware origin.
@@ -315,6 +329,7 @@ def _get_parent_placement_origin_to_lw_origin(
             _parent_deck_item_to_child_labware_feature_offset(
                 child_labware=child_labware,
                 parent_deck_item=_get_standardized_parent_deck_item(parent_deck_item),
+                slot_name=slot_name,
             )
         ) + _feature_exception_offsets(
             deck_definition=deck_definition, parent_deck_item=parent_deck_item
@@ -412,8 +427,16 @@ def _shim_does_locating_feature_pair_exist(
         parent_deck_item.features.get("opentronsFlexTipRackLidAsParent") is not None
         and child_labware.features.get("opentronsFlexTipRackLidAsChild") is not None
     )
+    hs_universal_flat_adapter_exists = (
+        parent_deck_item.features.get("heaterShakerUniversalFlatAdapter") is not None
+        and child_labware.features.get("flatWellSupportAsChild") is not None
+    )
 
-    return slot_footprint_exists or flex_tiprack_lid_exists
+    return (
+        slot_footprint_exists
+        or flex_tiprack_lid_exists
+        or hs_universal_flat_adapter_exists
+    )
 
 
 def _get_standardized_parent_deck_item(
@@ -558,11 +581,24 @@ def _slot_def_slot_footprint_as_parent(
 
 
 def _parent_deck_item_to_child_labware_feature_offset(
+    slot_name: DeckSlotName,
     child_labware: LabwareDefinition3,
     parent_deck_item: _Labware3SupportedParentDefinition,
 ) -> Point:
     """Get the offset vector from the parent entity origin to the child labware origin."""
-    if (
+    if parent_deck_item.features.get("heaterShakerUniversalFlatAdapter") is not None:
+        if child_labware.features.get("flatWellSupportAsChild") is not None:
+            return _parent_origin_to_heater_shaker_universal_flat_adapter_feature(
+                parent_deck_item=parent_deck_item, slot_name=slot_name
+            ) + _heater_shaker_universal_flat_adapter_feature_to_child_origin(
+                child_labware=child_labware, slot_name=slot_name
+            )
+        else:
+            raise ValueError(
+                f"Expected {child_labware.metadata.displayName} to have flatWellSupportAsChild feature"
+            )
+
+    elif (
         parent_deck_item.features.get("opentronsFlexTipRackLidAsParent") is not None
         and child_labware.features.get("opentronsFlexTipRackLidAsChild") is not None
     ):
@@ -665,6 +701,39 @@ def _parent_origin_to_slot_back_left_bottom(
     return Point(x, y, z)
 
 
+def _parent_origin_to_heater_shaker_universal_flat_adapter_feature(
+    parent_deck_item: _Labware3SupportedParentDefinition,
+    slot_name: DeckSlotName,
+) -> Point:
+    """Returns the offset from a deck item's origin to the Heater Shaker Universal Flat Adapter locating feature."""
+    flat_adapter_feature = parent_deck_item.features.get(
+        "heaterShakerUniversalFlatAdapter"
+    )
+    assert flat_adapter_feature is not None
+
+    flat_well_support_z = flat_adapter_feature["flatWellSupportZ"]
+    orientation = slot_name.orientation
+    extents = parent_deck_item.extents.total
+
+    if orientation == SlotOrientation.LEFT:
+        left_wall_x = flat_adapter_feature["deckLeft"]["wallX"]
+        left_side_center_x = extents.backLeftBottom.x + left_wall_x
+        left_side_center_y = (extents.backLeftBottom.y + extents.frontRightTop.y) / 2
+
+        return Point(left_side_center_x, left_side_center_y, flat_well_support_z)
+    elif orientation == SlotOrientation.RIGHT:
+        right_wall_x = flat_adapter_feature["deckRight"]["wallX"]
+        right_side_center_x = extents.frontRightTop.x + right_wall_x
+        right_side_center_y = (extents.backLeftBottom.y + extents.frontRightTop.y) / 2
+
+        return Point(right_side_center_x, right_side_center_y, flat_well_support_z)
+
+    else:
+        raise ValueError(
+            "heaterShakerUniversalFlatAdapter feature does not support placement in a center slot."
+        )
+
+
 def _flex_tip_rack_lid_feature_to_child_origin(
     child_labware: LabwareDefinition3,
 ) -> Point:
@@ -720,6 +789,40 @@ def _child_back_left_bottom_position(child_labware: LabwareDefinition3) -> Point
         y=footprint_as_child["frontRight"]["y"],
         z=footprint_as_child["z"],
     )
+
+
+def _heater_shaker_universal_flat_adapter_feature_to_child_origin(
+    child_labware: LabwareDefinition3,
+    slot_name: DeckSlotName,
+) -> Point:
+    """Returns the offset from a Heater Shaker Universal Flat Adapter locating feature to the child origin."""
+    flat_well_support_as_child = child_labware.features.get("flatWellSupportAsChild")
+
+    assert flat_well_support_as_child is not None
+
+    well_exterior_bottom_z = flat_well_support_as_child["wellExteriorBottomZ"]
+    orientation = slot_name.orientation
+    extents = child_labware.extents.total
+
+    if orientation == SlotOrientation.LEFT:
+        left_side_center_x = extents.backLeftBottom.x
+        left_side_center_y = (extents.backLeftBottom.y + extents.frontRightTop.y) / 2
+
+        return (
+            Point(left_side_center_x, left_side_center_y, well_exterior_bottom_z) * -1
+        )
+    elif orientation == SlotOrientation.RIGHT:
+        right_side_center_x = extents.frontRightTop.x
+        right_side_center_y = (extents.backLeftBottom.y + extents.frontRightTop.y) / 2
+
+        return (
+            Point(right_side_center_x, right_side_center_y, well_exterior_bottom_z) * -1
+        )
+
+    else:
+        raise ValueError(
+            "heaterShakerUniversalFlatAdapter feature does not support placement in a center slot."
+        )
 
 
 def _get_child_labware_overlap_with_parent_labware(
