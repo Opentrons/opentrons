@@ -153,16 +153,6 @@ def add_parameters(parameters: ParameterContext) -> None:
         default="1000",
     )
 
-    parameters.add_str(
-        variable_name="liq_mount",
-        display_name="Liquid Mount",
-        choices=[
-            {"display_name": "single channel", "value": "1"},
-            {"display_name": "8 channel", "value": "8"},
-        ],
-        default="1",
-    )
-
 
 def _setup(
     ctx: ProtocolContext,
@@ -186,11 +176,8 @@ def _setup(
     target_height = ctx.params.target_height  # type: ignore[attr-defined]
     labware_type = ctx.params.labware_type  # type: ignore[attr-defined]
     liq_tip_size = ctx.params.liq_tip_size  # type: ignore[attr-defined]
-    liq_mount = ctx.params.liq_mount  # type: ignore[attr-defined]
-
-    # pipettes
-    liquid_pip_name = f"flex_{liq_mount}channel_{LIQUID_PIPETTE_SIZE}"
-    probing_pip_name = f"flex_1channel_{PROBING_PIPETTE_SIZE}"
+    left_mount = ctx.params.left_mount  # type: ignore[attr-defined]
+    right_mount = ctx.params.right_mount  # type: ignore[attr-defined]
 
     # tipracks
     liquid_rack1 = ctx.load_labware(
@@ -202,14 +189,14 @@ def _setup(
     probing_rack = ctx.load_labware(
         f"opentrons_flex_96_tiprack_{PROBING_TIP_SIZE}uL", SLOT_PROBING_TIPRACK
     )
-
     liquid_racks = [liquid_rack1, liquid_rack2]
-    # load pipettes w tipracks
-    liq_pipette = ctx.load_instrument(
-        liquid_pip_name, LIQUID_MOUNT, tip_racks=liquid_racks
-    )
+
+    # load pipettes
     probe_pipette = ctx.load_instrument(
-        probing_pip_name, PROBING_MOUNT, tip_racks=[probing_rack]
+        left_mount, PROBING_MOUNT, tip_racks=[probing_rack]
+    )
+    liq_pipette = ctx.load_instrument(
+        right_mount, LIQUID_MOUNT, tip_racks=liquid_racks
     )
 
     # load labware + dial
@@ -248,8 +235,8 @@ def _setup(
         # TODO: move the return alpha function here and write to csv
         # also write the tolerance values, max/min step, etc
         _write_line_to_csv(ctx, [RUN_ID])
-        _write_line_to_csv(ctx, [liquid_pip_name])
-        _write_line_to_csv(ctx, [probing_pip_name])
+        _write_line_to_csv(ctx, [right_mount])
+        _write_line_to_csv(ctx, [left_mount])
         _write_line_to_csv(ctx, [labware_type])
         _write_line_to_csv(ctx, ["target height", str(target_height)])
         _write_line_to_csv(ctx, ["depth", str(labware["A1"].depth)])
@@ -600,7 +587,7 @@ def run(ctx: ProtocolContext) -> None:
         liq_pipette.flow_rate.dispense = min(max_volume / 20, 400) #change later 
         dispense_loc = labware[current_well].bottom(z=max(corrected_height + 2.5, 3))
         liq_pipette.transfer(
-            (min(dispense_volume / liq_pipette.channels, max_volume))*1.033,
+            (dispense_volume / liq_pipette.channels) * 1.033,
             src["A1"].meniscus(z=-2, target="end"),
             dispense_loc,
             new_tip="never",
