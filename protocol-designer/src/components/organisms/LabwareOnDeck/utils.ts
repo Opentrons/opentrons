@@ -15,15 +15,14 @@ import type {
 
 const ingredIdsToColor = (
   groupIds: string[],
-  displayColors: string[]
+  displayColors: Record<string, string> // liquidGroupId -> color
 ): string | null | undefined => {
   const filteredIngredIds = groupIds.filter(id => id !== AIR)
   if (filteredIngredIds.length === 0) return null
 
   if (filteredIngredIds.length === 1) {
     return (
-      displayColors[Number(filteredIngredIds[0])] ??
-      swatchColors(filteredIngredIds[0])
+      displayColors[filteredIngredIds[0]] ?? swatchColors(filteredIngredIds[0])
     )
   }
 
@@ -32,7 +31,7 @@ const ingredIdsToColor = (
 
 export const wellFillFromWellContents = (
   wellContents: ContentsByWell,
-  displayColors: string[]
+  displayColors: Record<string, string> // liquidGroupId -> color
 ): WellFill =>
   reduce(
     wellContents,

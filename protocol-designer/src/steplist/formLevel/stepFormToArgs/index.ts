@@ -42,48 +42,68 @@ export const stepFormToArgs = (
   contextualState: InvariantContext
 ): StepArgs => {
   const castForm = _castForm(hydratedForm)
+  let stepArgs: StepArgs = null
   switch (castForm.stepType) {
     case 'moveLiquid': {
-      return moveLiquidFormToArgs(
+      stepArgs = moveLiquidFormToArgs(
         castForm as HydratedMoveLiquidFormData,
         contextualState
       )
+      break
     }
-
-    case 'pause':
-      return pauseFormToArgs(castForm as HydratedPauseFormData)
-
-    case 'mix':
-      return mixFormToArgs(castForm as HydratedMixFormData)
-
-    case 'magnet':
-      return magnetFormToArgs(castForm as HydratedMagnetFormData)
-
-    case 'temperature':
-      return temperatureFormToArgs(castForm as HydratedTemperatureFormData)
-
-    case 'thermocycler':
-      return thermocyclerFormToArgs(castForm as HydratedThermocyclerFormData)
-
-    case 'heaterShaker':
-      return heaterShakerFormToArgs(castForm as HydratedHeaterShakerFormData)
-
+    case 'pause': {
+      stepArgs = pauseFormToArgs(castForm as HydratedPauseFormData)
+      break
+    }
+    case 'mix': {
+      stepArgs = mixFormToArgs(castForm as HydratedMixFormData)
+      break
+    }
+    case 'magnet': {
+      stepArgs = magnetFormToArgs(castForm as HydratedMagnetFormData)
+      break
+    }
+    case 'temperature': {
+      stepArgs = temperatureFormToArgs(castForm as HydratedTemperatureFormData)
+      break
+    }
+    case 'thermocycler': {
+      stepArgs = thermocyclerFormToArgs(
+        castForm as HydratedThermocyclerFormData
+      )
+      break
+    }
+    case 'heaterShaker': {
+      stepArgs = heaterShakerFormToArgs(
+        castForm as HydratedHeaterShakerFormData
+      )
+      break
+    }
     case 'moveLabware': {
-      return moveLabwareFormToArgs(castForm as HydratedMoveLabwareFormData)
-    }
+      stepArgs = moveLabwareFormToArgs(castForm as HydratedMoveLabwareFormData)
 
+      break
+    }
     case 'comment': {
-      return commentFormToArgs(castForm as HydratedCommentFormData)
-    }
+      stepArgs = commentFormToArgs(castForm as HydratedCommentFormData)
 
+      break
+    }
     case 'absorbanceReader': {
-      return absorbanceReaderFormToArgs(
+      stepArgs = absorbanceReaderFormToArgs(
         castForm as HydratedAbsorbanceReaderFormData
       )
+      break
     }
+  }
 
-    default:
-      console.warn(`stepFormToArgs not implemented for ${castForm.stepType}`)
-      return null
+  if (stepArgs == null) {
+    console.warn(`stepFormToArgs not implemented for ${castForm.stepType}`)
+    return null
+  }
+
+  return {
+    ...stepArgs,
+    stepNumber: castForm.stepNumber,
   }
 }

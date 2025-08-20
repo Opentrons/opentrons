@@ -108,7 +108,6 @@ export const migrateAndMatchSnapshot = ({
         savedFile.designerApplication.version as string
       )
       assert(version !== null, 'PD version is not valid semver')
-      const isBelowVersion850 = semver.lt(version ?? '', '8.5.0')
 
       const files = [savedFile, expectedFile]
       files.forEach(f => {
@@ -122,10 +121,7 @@ export const migrateAndMatchSnapshot = ({
         //  a uuid is randomly generated each time you upload a protocol that is less than version 8_5_0
         //  which is the migration version that adds these keys. Due to this, we need to ignore
         //  the uuids
-        if (
-          Boolean(savedStepForms[initialDeckSetupStep]) &&
-          isBelowVersion850
-        ) {
+        if (Boolean(savedStepForms[initialDeckSetupStep])) {
           savedStepForms[initialDeckSetupStep].trashBinLocationUpdate = {
             trashBin: 'trashLocation',
           }
