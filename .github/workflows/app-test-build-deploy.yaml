@@ -230,7 +230,12 @@ jobs:
           SM_CLIENT_CERT_PASSWORD: ${{secrets.SM_CLIENT_CERT_PASSWORD_V2}}
           SM_API_KEY: ${{secrets.SM_API_KEY_V2}}
         run: |
-          curl -X GET  https://one.digicert.com/signingmanager/api-ui/v1/releases/Keylockertools-windows-x64.msi/download -H "x-api-key:${{secrets.SM_API_KEY_V2}}" -o Keylockertools-windows-x64.msi
+          curl -L --retry 5 --retry-all-errors --connect-timeout 30 --max-time 120 ^
+          -C - ^
+          -H "x-api-key:%SM_API_KEY%" ^
+          "https://one.digicert.com/signingmanager/api-ui/v1/releases/Keylockertools-windows-x64.msi/download" ^
+          -o Keylockertools-windows-x64.msi
+          for %I in (Keylockertools-windows-x64.msi) do @echo Size=%~zI bytes
           msiexec /i Keylockertools-windows-x64.msi /quiet /qn
           smksp_registrar.exe list
           smctl.exe keypair ls
