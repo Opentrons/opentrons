@@ -44,10 +44,10 @@ deploy:
 	python deploy_mkdocs.py $(ENVIRONMENT) --branch $(BRANCH)
 
 # API Documentation Build Targets
-docs/build/html/v%: api/docs/v%
+docs/build/html/v%: ../api/docs/v%
 	$(sphinx_build) -b html -d docs/build/doctrees -n $< $@
 
-docs/build/html/hardware: api/docs/hardware api/src/opentrons/hardware_control
+docs/build/html/hardware: ../api/docs/hardware ../api/src/opentrons/hardware_control
 	$(sphinx_build_allow_warnings) -b html -d docs/build/doctrees -n $< $@
 	$(SHX) mkdir $@/_images/
 
@@ -59,13 +59,13 @@ docs/dist/hardware: docs/build/html/hardware
 	$(SHX) mkdir -p $@
 	$(SHX) cp -R $^ $(@D) $(if $(CI),,|| true)
 
-docs/dist/ot1: api/docs/ot1
+docs/dist/ot1: ../api/docs/ot1
 	$(SHX) mkdir -p $@
 	$(SHX) cp -R $< $(@D)
 
-docs/dist/%: api/docs/root/%
+docs/dist/%: ../api/docs/root/%
 	$(SHX) mkdir -p $(@D)
-	$(SHX) cp -R api/docs/root/* docs/dist/
+	$(SHX) cp -R ../api/docs/root/* docs/dist/
 
 .PHONY: api-docs
 api-docs: docs/dist/v2 docs/dist/hardware docs/dist/ot1
