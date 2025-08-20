@@ -102,6 +102,7 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
         backgroundColor={backgroundColor}
         color={color}
         opacity={semiTransparent ? '50%' : '100%'}
+        data-testid="StepContainer_buttonSansPadding"
       >
         <Flex
           justifyContent={JUSTIFY_SPACE_BETWEEN}

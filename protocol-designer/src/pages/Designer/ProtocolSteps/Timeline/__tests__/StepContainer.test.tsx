@@ -78,12 +78,12 @@ describe('ConnectedStepContainer', () => {
     }
     render(props)
     screen.getByText('Transfer')
-    expect(screen.getByTestId('StepContainer_mockStepId')).toHaveStyle(
-      `background-color: ${COLORS.blue50}`
-    )
-    expect(screen.getByTestId('StepContainer_mockStepId')).toHaveStyle(
-      `color: ${COLORS.white}`
-    )
+
+    const buttonSansPadding = within(
+      screen.getByTestId('StepContainer_mockStepId')
+    ).getByTestId('StepContainer_buttonSansPadding')
+    expect(buttonSansPadding).toHaveStyle(`background-color: ${COLORS.blue50}`)
+    expect(buttonSansPadding).toHaveStyle(`color: ${COLORS.white}`)
     fireEvent.click(
       within(screen.getByTestId('StepContainer_mockStepId')).getByTestId(
         'StepContainer_OverflowBtn'
@@ -99,12 +99,11 @@ describe('ConnectedStepContainer', () => {
       selected: false,
     }
     render(props)
-    expect(screen.getByTestId('StepContainer_mockStepId')).toHaveStyle(
-      `background-color: ${COLORS.grey20}`
-    )
-    expect(screen.getByTestId('StepContainer_mockStepId')).toHaveStyle(
-      `color: ${COLORS.black90}`
-    )
+    const buttonSansPadding = within(
+      screen.getByTestId('StepContainer_mockStepId')
+    ).getByTestId('StepContainer_buttonSansPadding')
+    expect(buttonSansPadding).toHaveStyle(`background-color: ${COLORS.grey20}`)
+    expect(buttonSansPadding).toHaveStyle(`color: ${COLORS.black90}`)
   })
 
   it('render error style when hasError is true and selected is true', () => {
@@ -117,13 +116,11 @@ describe('ConnectedStepContainer', () => {
       setOpenedOverflowMenuId: vi.fn(),
     }
     render(props)
-    console.log(screen.getByTestId('StepContainer_mockStepId'))
-    expect(screen.getByTestId('StepContainer_mockStepId')).toHaveStyle(
-      `background-color: ${COLORS.red50}`
-    )
-    expect(screen.getByTestId('StepContainer_mockStepId')).toHaveStyle(
-      `color: ${COLORS.white}`
-    )
+    const buttonSansPadding = within(
+      screen.getByTestId('StepContainer_mockStepId')
+    ).getByTestId('StepContainer_buttonSansPadding')
+    expect(buttonSansPadding).toHaveStyle(`background-color: ${COLORS.red50}`)
+    expect(buttonSansPadding).toHaveStyle(`color: ${COLORS.white}`)
   })
 
   it('render non-active error style when hasError is true and selected is false', () => {
@@ -136,12 +133,11 @@ describe('ConnectedStepContainer', () => {
       setOpenedOverflowMenuId: vi.fn(),
     }
     render(props)
-    expect(screen.getByTestId('StepContainer_mockStepId')).toHaveStyle(
-      `background-color: ${COLORS.red30}`
-    )
-    expect(screen.getByTestId('StepContainer_mockStepId')).toHaveStyle(
-      `color: ${COLORS.red60}`
-    )
+    const buttonSansPadding = within(
+      screen.getByTestId('StepContainer_mockStepId')
+    ).getByTestId('StepContainer_buttonSansPadding')
+    expect(buttonSansPadding).toHaveStyle(`background-color: ${COLORS.red30}`)
+    expect(buttonSansPadding).toHaveStyle(`color: ${COLORS.red60}`)
   })
 
   it('renders the divider if hover targets that step', () => {
