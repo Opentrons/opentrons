@@ -29,10 +29,20 @@
     "heaterShakerUniversalFlatAdapter": {
       "flatWellSupportZ": 4.7,
       "deckLeft": {
-        "wallX": 7.52
+        "wallX": 7.52,
+        "screwCenter": {
+          "x": 71.7,
+          "y": -37.4,
+          "z": 0
+        }
       },
       "deckRight": {
-        "wallX": -7.52
+        "wallX": -7.52,
+        "screwCenter": {
+          "x": 55.5,
+          "y": -37.4,
+          "z": 0
+        }
       }
     }
   },
