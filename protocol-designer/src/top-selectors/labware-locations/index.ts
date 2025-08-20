@@ -149,10 +149,12 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
   ) => {
     const deckDef = getDeckDefFromRobotType(robotType)
     const cutoutFixtures = deckDef.cutoutFixtures
-    const hasWasteChute =
-      Object.values(additionalEquipmentEntities).find(
-        ae => ae.name === 'wasteChute'
-      ) != null
+    const hasWasteChute = Object.values(additionalEquipmentEntities).some(
+      ae => ae.name === 'wasteChute'
+    )
+    const hasTrashBin = Object.values(additionalEquipmentEntities).some(
+      ae => ae.name === 'trashBin'
+    )
     const allSlotIds = deckDef.locations.addressableAreas.reduce<
       AddressableAreaName[]
     >((acc, slot) => {
@@ -163,7 +165,9 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
       //  TODO(jr, 11/13/23): fix AdditionalEquipment['location'] from type string to CutoutId
       .map(aE => aE.location as CutoutId)
 
-    if (robotState == null) return null
+    if (robotState == null) {
+      return null
+    }
 
     const trashCutouts = Object.values(additionalEquipmentEntities).reduce<
       string[]
@@ -274,10 +278,13 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
         robotType === FLEX_ROBOT_TYPE
           ? MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(slotId)
           : ['fixedTrash', '12'].includes(slotId)
+      const allDeckDefTrashSlots = trashCutouts.map(
+        cutout => cutout.split('cutout')[1]
+      )
       return !slotIdsOccupiedByModules.includes(slotId) &&
         !Object.values(labware).some(lw => lw.stack.includes(slotId)) &&
         !isTrashSlot &&
-        !trashCutouts.some(cutout => cutout.includes(slotId)) &&
+        !allDeckDefTrashSlots.includes(slotId) &&
         !WASTE_CHUTE_ADDRESSABLE_AREAS.includes(slotId) &&
         !notSelectedStagingAreaAddressableAreas.includes(slotId) &&
         !FLEX_MODULE_ADDRESSABLE_AREAS.includes(slotId) &&
@@ -297,8 +304,15 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
       deckLabel: 'D3',
     }
 
+    const trashSlots = trashCutouts.map(cutout => ({
+      name: 'Trash bin',
+      value: cutout,
+      deckLabel: cutout.split('cutout')[1],
+    }))
+
     return [
       ...(hasWasteChute ? [wasteChuteSlot] : []),
+      ...(hasTrashBin ? trashSlots : []),
       ...unoccupiedAdapterOptions,
       ...unoccupiedModuleOptions,
       ...unoccupiedSlotOptions,

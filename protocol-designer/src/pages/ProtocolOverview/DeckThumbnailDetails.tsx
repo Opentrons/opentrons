@@ -121,7 +121,8 @@ export const DeckThumbnailDetails = (
         if (
           getSlotInLocationStack(labware.stack) === 'offDeck' ||
           allModules.some(m => labware.stack.includes(m.id)) ||
-          labware.def.parameters.loadName === TIPRACK_LID_LOADNAME
+          labware.def.parameters.loadName === TIPRACK_LID_LOADNAME ||
+          labware.stack.includes('fixedTrash')
         ) {
           return null
         }
