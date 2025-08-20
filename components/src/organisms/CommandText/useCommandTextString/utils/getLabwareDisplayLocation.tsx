@@ -47,7 +47,7 @@ export type DisplayLocationParams =
 // labware, ex, "in module XYZ in slot C1".
 // If 'slot-only', return only the slot name, ex "in slot C1".
 export function getLabwareDisplayLocation(
-  params: DisplayLocationParams,
+  params: DisplayLocationParams
 ): string {
   const { t, isOnDevice = false, location, includeSlotText = true } = params
   const locationResult = Array.isArray(location)
