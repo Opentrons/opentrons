@@ -106,8 +106,8 @@ The following table lists the thermal blocks recommended for use with either Fle
 
 | Thermal Block           | Flex | OT-2                  |
 |:------------------------|:-----|:----------------------|
-| 24-well                 |      | :material-check-bold: |
-| 96-well PCR             |      | :material-check-bold: |
-| Deep Well               | :material-check-bold: |      |
+| 24-well                 | :material-check-bold: | :material-check-bold: |
+| 96-well PCR             | :material-check-bold: | :material-check-bold: |
+| Deep Well               | :material-check-bold: | :octicons-x-12: |
 | Flat Bottom for Flex    | :material-check-bold: | :octicons-x-12: |
 | Flat Bottom for OT-2    | :octicons-x-12: | :material-check-bold: |
