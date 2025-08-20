@@ -14,6 +14,7 @@ export interface DeckInfoLabelProps {
   width?: string | number
   svgSize?: string | number
   transform?: string
+  stackingIconOverride?: boolean
 }
 
 export function DeckInfoLabel({
@@ -25,6 +26,7 @@ export function DeckInfoLabel({
   width,
   transform,
   svgSize,
+  stackingIconOverride = false,
 }: DeckInfoLabelProps): JSX.Element {
   const labelClass = clsx(
     styles.label,
@@ -36,6 +38,13 @@ export function DeckInfoLabel({
       [styles.has_deck_label]: deckLabel != null,
     }
   )
+
+  let iconColor = COLORS.black90
+  if (stackingIconOverride) {
+    iconColor = COLORS.blue50
+  } else if (highlight) {
+    iconColor = COLORS.white
+  }
 
   return (
     <div
@@ -52,7 +61,7 @@ export function DeckInfoLabel({
           name={iconName}
           height={svgSize ?? (size === 'large' ? '1.5rem' : '0.875rem')}
           width={svgSize ?? (size === 'large' ? '1.5rem' : '0.875rem')}
-          color={highlight ? COLORS.white : COLORS.black90}
+          color={iconColor}
           aria-label={iconName}
         />
       ) : (
