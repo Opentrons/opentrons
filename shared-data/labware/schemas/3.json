@@ -712,21 +712,29 @@
             },
             "deckLeft": {
               "type": "object",
-              "required": ["wallX"],
+              "required": ["wallX", "screwCenter"],
               "properties": {
                 "wallX": {
-                  "description": "The +X-coordinate in mm from the edge of the labware's external protrusion to the interior of the `wall` when the labware is placed on the left side of the deck.",
+                  "description": "The +x coordinate in mm from the edge of the labware's external protrusion to the interior of the `wall` when the labware is placed on the left side of the deck.",
                   "type": "number"
+                },
+                "screwCenter": {
+                  "description": "The +x,-y,+z coordinate offset from the labware origin to the bottom center of the pilot hole when the labware is placed on the left side of the deck.",
+                  "$ref": "#/definitions/vector3D"
                 }
               }
             },
             "deckRight": {
               "type": "object",
-              "required": ["wallX"],
+              "required": ["wallX", "screwCenter"],
               "properties": {
                 "wallX": {
-                  "description": "The -X-coordinate in mm from the edge of the labware's external protrusion to the interior of the `wall` when the labware is placed on the right side of the deck.",
+                  "description": "The -x coordinate in mm from the edge of the labware's external protrusion to the interior of the `wall` when the labware is placed on the right side of the deck.",
                   "type": "number"
+                },
+                "screwCenter": {
+                  "description": "The +x,-y,+z coordinate offset from the labware origin to the bottom center of the pilot hole when the labware is placed on the right side of the deck.",
+                  "$ref": "#/definitions/vector3D"
                 }
               }
             }
