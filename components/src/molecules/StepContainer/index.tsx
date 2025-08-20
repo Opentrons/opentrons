@@ -91,6 +91,9 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
       onDoubleClick={onDoubleClick}
       onClick={onClick}
       cursor={cursor}
+      // StepContainers are meant to abut each other directly, visually separating themselves
+      // with this built-in internal whitespace, so things don't flicker when the cursor
+      // moves between them.
       paddingY={SPACING.spacing2}
     >
       <Box
