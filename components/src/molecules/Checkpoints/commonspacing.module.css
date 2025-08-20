@@ -12,5 +12,5 @@ wrapper component around each one, but that would interfere with <ul> nesting se
 .chip + .chip,
 .chip + .step_container,
 .step_container + .chip {
-	margin-top: var(--spacing-8);
+  margin-top: var(--spacing-8);
 }
