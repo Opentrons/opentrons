@@ -51,8 +51,6 @@ class TaskHandler:
             id=task_id,
             createdAt=self._model_utils.get_timestamp(),
             asyncioTask=asyncio_task,
-            finishedAt=None,
-            error=None,
         )
 
     @staticmethod
