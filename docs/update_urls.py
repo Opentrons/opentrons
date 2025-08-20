@@ -25,9 +25,9 @@ def update_urls(environment, branch=None):
     if environment == "sandbox":
         # For sandbox, use the branch-specific URL
         if branch:
-            new_url = f"http://sandbox.docs.s3-website.us-east-2.amazonaws.com/{branch}/v2/"
+            new_url = f"https://sandbox.docs.opentrons.com/{branch}/v2/"
         else:
-            new_url = "http://sandbox.docs.s3-website.us-east-2.amazonaws.com/edge/v2/"
+            new_url = "https://sandbox.docs.opentrons.com/edge/v2/"
         
         # Replace the production URL with sandbox URL
         content = re.sub(
@@ -41,7 +41,7 @@ def update_urls(environment, branch=None):
         # For staging and production, ensure it uses the production URL
         production_url = "https://docs.opentrons.com/v2/"
         content = re.sub(
-            r'http://sandbox\.docs\.s3-website\.us-east-2\.amazonaws\.com/[^/]+/v2/',
+            r'https://sandbox\.docs\.opentrons\.com/[^/]+/v2/',
             production_url,
             content
         )
