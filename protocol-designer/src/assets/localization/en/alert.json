@@ -45,9 +45,9 @@
   },
   "timeline": {
     "error": {
-      "LABWARE_DISCARDED_IN_WASTE_CHUTE": {
+      "LABWARE_DISCARDED_IN_TRASH": {
         "title": "Labware not available",
-        "body": "This step uses labware that has previously been discarded into a Waste Chute."
+        "body": "This step uses labware that has previously been discarded into a trash."
       },
       "LABWARE_ON_ANOTHER_ENTITY": {
         "title": "Attempting to move labware on top of another entity",
