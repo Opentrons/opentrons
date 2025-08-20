@@ -666,7 +666,7 @@ def test_check_preloaded_labware_primary_consistency(
     )
     with pytest.raises(
         CommandPreconditionViolated,
-        match="No unspecified pool component may have an ID",
+        match="but previous labware groups specify no adapter and this one does",
     ):
         subject.check_preloaded_labware(
             sentinel.primary_definition,

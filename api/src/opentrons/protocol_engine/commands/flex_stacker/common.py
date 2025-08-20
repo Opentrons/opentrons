@@ -467,7 +467,7 @@ def _check_one_preloaded_labware(  # noqa: C901
     else:
         if group.adapterLabwareId is not None:
             raise CommandPreconditionViolated(
-                "Each labware group must be composed of the same kinds of labware, but previous labware groups specifies no adapter and this one does."
+                "Each labware group must be composed of the same kinds of labware, but previous labware groups specify no adapter and this one does."
             )
         if state_view.labware.get_location(group.primaryLabwareId) != OFF_DECK_LOCATION:
             raise CommandPreconditionViolated(
