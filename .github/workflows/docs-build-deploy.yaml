@@ -73,9 +73,9 @@ jobs:
         run: |
           # Ensure we're in the right directory and Pipfile.lock exists
           ls -la Pipfile*
-          # Regenerate lock file if needed
-          pipenv lock --clear
-          make setup
+          # Install dependencies directly without sync first
+          pipenv install --dev --python 3.10
+          pipenv run pip freeze
       - name: Build All Docs
         working-directory: ./docs
         run: make all-docs
