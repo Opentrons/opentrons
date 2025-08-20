@@ -466,11 +466,15 @@ def run(ctx: ProtocolContext) -> None:
     udv_table: List[Any] = []
     num_wells = len(wells)
     max_volume = labware["A1"].max_volume
-    margin = max_volume * 0.1
+    
+    if max_volume > 100000:
+        margin = max_volume * 0.33
+    else:
+        margin = max_volume * 0.1
 
     # volume clamps, these can be changed to whatever.
     min_step = max(max_volume * 0.01, 1)  # clamped to 5uL
-    max_step = max_volume * 0.25
+    max_step = max_volume * 0.25 
 
     # deadband to avoid unnecessary step volume corrections
     lower_bound = target_height - target_height * DELTA_TOLERANCE
@@ -497,9 +501,9 @@ def run(ctx: ProtocolContext) -> None:
     def get_alpha_for_height(h: float) -> float:
         nonlocal max_volume
 
-        if max_volume >= 2000:  # 2000 and above
-            alpha_low, alpha_high = 0.15, 0.3
-        elif max_volume >= 1000: 
+        if max_volume >= 200000:  # 200000 and above
+            alpha_low, alpha_high = 0.5, 1.5
+        elif max_volume >= 2000: 
             alpha_low, alpha_high = 0.2, 0.5
         elif max_volume >= 250:  # 250–999
             alpha_low, alpha_high = 0.5, 0.8
@@ -583,16 +587,17 @@ def run(ctx: ProtocolContext) -> None:
         current_well = wells[step % num_wells]
         # check if out of wells
         if step > 0 and step % num_wells == 0:
-            labware = reload_labware(labware, labware_type)
+            if not ctx.is_simulating():
+                labware = reload_labware(labware, labware_type)
+                _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
+            else:
+                break
 
         tip_z_error = _get_tip_z_error(ctx, probe_pipette, dial)
 
         # Dispense
         dispense_volume += step_volume
-        liq_pipette.flow_rate.dispense = min(
-            max(min(liq_pipette.max_volume, dispense_volume), 10),
-            50,
-        )
+        liq_pipette.flow_rate.dispense = min(max_volume / 20, 400) #change later 
         dispense_loc = labware[current_well].bottom(z=max(corrected_height + 2.5, 3))
         liq_pipette.transfer(
             (min(dispense_volume / liq_pipette.channels, max_volume))*1.033,
