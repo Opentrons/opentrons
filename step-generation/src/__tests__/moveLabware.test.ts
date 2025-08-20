@@ -8,6 +8,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { moveLabware } from '../commandCreators/atomic'
+import { TIPRACK_LID_LOADNAME } from '../commandCreators/atomic/moveLabware'
 import {
   DEST_LABWARE,
   getErrorResult,
@@ -498,6 +499,7 @@ describe('moveLabware', () => {
   it('should return an error for trying to move an aluminum block with a gripper', () => {
     const aluminumBlockDef = ({
       metadata: { displayCategory: 'aluminumBlock' },
+      parameters: { loadName: 'mockAluminumBlockLoadName' },
     } as any) as LabwareDefinition2
 
     invariantContext = {
@@ -1070,6 +1072,62 @@ describe('moveLabware', () => {
     expect(errors).toHaveLength(1)
     expect(errors[0]).toMatchObject({
       type: 'LABWARE_ON_ANOTHER_ENTITY',
+    })
+  })
+  it('should return an error when trying to move a tiprack lid to a slot', () => {
+    invariantContext = {
+      ...invariantContext,
+      labwareEntities: {
+        ...invariantContext.labwareEntities,
+        [SOURCE_LABWARE]: {
+          ...invariantContext.labwareEntities[SOURCE_LABWARE],
+          def: {
+            ...invariantContext.labwareEntities[SOURCE_LABWARE].def,
+            parameters: { loadName: TIPRACK_LID_LOADNAME } as any,
+            allowedRoles: ['lid'],
+          } as LabwareDefinition2,
+        },
+      },
+    } as InvariantContext
+
+    const params = {
+      labwareId: SOURCE_LABWARE,
+      newLocation: { slotName: 'A1' },
+      strategy: 'manualMoveWithPause',
+    } as MoveLabwareParams
+    const result = moveLabware(params, invariantContext, robotState)
+    const { errors } = getErrorResult(result)
+    expect(errors).toHaveLength(1)
+    expect(errors[0]).toMatchObject({
+      type: 'TIPRACK_LID_NOT_ALLOWED_ON_DECK',
+    })
+  })
+  it('should return an error when trying to move a tiprack lid to a staging area', () => {
+    invariantContext = {
+      ...invariantContext,
+      labwareEntities: {
+        ...invariantContext.labwareEntities,
+        [SOURCE_LABWARE]: {
+          ...invariantContext.labwareEntities[SOURCE_LABWARE],
+          def: {
+            ...invariantContext.labwareEntities[SOURCE_LABWARE].def,
+            parameters: { loadName: TIPRACK_LID_LOADNAME } as any,
+            allowedRoles: ['lid'],
+          } as LabwareDefinition2,
+        },
+      },
+    } as InvariantContext
+
+    const params = {
+      labwareId: SOURCE_LABWARE,
+      newLocation: { addressableAreaName: 'A4' },
+      strategy: 'manualMoveWithPause',
+    } as MoveLabwareParams
+    const result = moveLabware(params, invariantContext, robotState)
+    const { errors } = getErrorResult(result)
+    expect(errors).toHaveLength(1)
+    expect(errors[0]).toMatchObject({
+      type: 'TIPRACK_LID_NOT_ALLOWED_ON_DECK',
     })
   })
 })

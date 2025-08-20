@@ -38,6 +38,13 @@ describe('tip tracking', () => {
     expect(result.warnings).toEqual([])
     expect(result.robotState).toEqual(
       merge({}, initialRobotState, {
+        pipettes: {
+          ...initialRobotState.pipettes,
+          [p300SingleId]: {
+            ...initialRobotState.pipettes[p300SingleId],
+            tipWell: 'A1',
+          },
+        },
         tipState: {
           tipracks: {
             [tiprack1Id]: {
@@ -45,7 +52,10 @@ describe('tip tracking', () => {
             },
           },
           pipettes: {
-            [p300SingleId]: { hasTip: true, tiprackURI: tiprack1Id },
+            [p300SingleId]: {
+              hasTip: true,
+              tiprackURI: tiprack1Id,
+            },
           },
         },
       })
@@ -61,12 +71,22 @@ describe('tip tracking', () => {
     expect(result.warnings).toEqual([])
     expect(result.robotState).toEqual(
       merge({}, initialRobotState, {
+        pipettes: {
+          ...initialRobotState.pipettes,
+          [p300MultiId]: {
+            ...initialRobotState.pipettes[p300MultiId],
+            tipWell: 'A1',
+          },
+        },
         tipState: {
           tipracks: {
             [tiprack1Id]: getTipColumn(1, EMPTY),
           },
           pipettes: {
-            [p300MultiId]: { hasTip: true, tiprackURI: tiprack1Id },
+            [p300MultiId]: {
+              hasTip: true,
+              tiprackURI: tiprack1Id,
+            },
           },
         },
       })

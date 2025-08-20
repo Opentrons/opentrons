@@ -57,7 +57,7 @@ def run(protocol: ProtocolContext) -> None:
         dest: Well,
         mix_after: Optional[Tuple] = None,
     ) -> None:
-        """Custom transfer function combining asp and dsp with optional mixing and flow rate control.
+        """Custom transfer function combining asp and dsp with optional mixing & flow rate control.
 
         Args:
             pipette: The pipette object to use

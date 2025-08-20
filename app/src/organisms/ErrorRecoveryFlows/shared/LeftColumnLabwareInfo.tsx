@@ -76,7 +76,9 @@ export function LeftColumnLabwareInfo({
             labwareName: failedLabwareNames.name ?? '',
             labwareNickname: failedLabwareNames.nickName,
             currentLocationProps: {
-              deckLabel: displayNameCurrentLoc.toUpperCase(),
+              deckLabel: `STACKER ${(
+                displayNameCurrentLoc?.toUpperCase() ?? ''
+              ).charAt(0)}`,
             },
           }
         case STACKER_STALLED_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE:
@@ -86,7 +88,9 @@ export function LeftColumnLabwareInfo({
             labwareName: failedLabwareNames.name ?? '',
             labwareNickname: failedLabwareNames.nickName,
             currentLocationProps: {
-              deckLabel: displayNameNewLoc?.toUpperCase() ?? '',
+              deckLabel: `${(displayNameNewLoc?.toUpperCase() ?? '').charAt(
+                0
+              )}4`,
             },
           }
         default:

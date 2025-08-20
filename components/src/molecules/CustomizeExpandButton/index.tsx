@@ -33,7 +33,7 @@ export interface StackingProps {
 interface CustomizeExpandButtonProps extends StyleProps {
   enableStackingFF: boolean
   allowInputField: boolean
-  loadName: string
+  isNestedDefALid: boolean
   buttonText: string
   buttonValue: string | number
   onChange: ChangeEventHandler<HTMLInputElement>
@@ -56,13 +56,12 @@ export function CustomizeExpandButtonComponent(
     id = buttonText,
     stackingProps,
     allowInputField,
-    loadName,
+    isNestedDefALid,
     enableStackingFF,
   } = props
   const isLid =
     stackingProps != null &&
     stackingProps.definition.allowedRoles?.includes('lid')
-  const tcLidDef = loadName === 'opentrons_tough_pcr_auto_sealing_lid'
 
   return (
     <Flex
@@ -100,7 +99,7 @@ export function CustomizeExpandButtonComponent(
               padding={`${SPACING.spacing16} ${SPACING.spacing20}`}
               borderRadius={BORDERS.borderRadius4}
             >
-              {isLid && !tcLidDef ? (
+              {isLid && !isNestedDefALid ? (
                 <CheckboxField
                   onChange={e => {
                     e.stopPropagation()

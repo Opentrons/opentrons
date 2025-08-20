@@ -30,7 +30,7 @@ import {
   getTopmostLabwareOnModuleFromStack,
 } from '../../../utils'
 import { HighlightLabware } from '../HighlightLabware'
-import { getSlotInformation } from '../utils'
+import { getSlotInformation, TIPRACK_LID_LOADNAME } from '../utils'
 import { HighlightItems } from './HighlightItems'
 import { AdapterControls, LabwareControls, SlotControls } from './Overlays'
 import { ActiveLabwareControls } from './Overlays/ActiveLabwareControls'
@@ -430,7 +430,8 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           getSlotInLocationStack(labware.stack) === 'offDeck' ||
           allModules.some(m => labware.stack.includes(m.id)) ||
           labware.id === adjacentLabware?.id ||
-          labware.stack.includes('fixedTrash')
+          labware.stack.includes('fixedTrash') ||
+          labware.def.parameters.loadName === TIPRACK_LID_LOADNAME
         ) {
           return null
         }
@@ -508,7 +509,8 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
       {allLabware.map(labware => {
         if (
           allModules.some(m => labware.stack.includes(m.id)) ||
-          getSlotInLocationStack(labware.stack) === 'offDeck'
+          getSlotInLocationStack(labware.stack) === 'offDeck' ||
+          labware.def.parameters.loadName === TIPRACK_LID_LOADNAME
         )
           return null
         if (

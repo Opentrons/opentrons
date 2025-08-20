@@ -1,17 +1,15 @@
 """Utilities for calculating the labware origin offset position."""
 import dataclasses
-from typing import Union, overload
+import enum
+from typing import Union, overload, Optional
 
 from typing_extensions import assert_type
 
-from opentrons.types import Point
+from opentrons.types import Point, DeckSlotName
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
     LabwareDefinition2,
     LabwareDefinition3,
-    Extents,
-    AxisAlignedBoundingBox3D,
-    Vector3D,
 )
 from opentrons_shared_data.labware.types import (
     SlotFootprintAsChildFeature,
@@ -19,10 +17,14 @@ from opentrons_shared_data.labware.types import (
     SpringDirectionalForce,
     SlotFootprintAsParentFeature,
 )
+from opentrons.protocol_engine.resources.labware_validation import (
+    validate_definition_is_lid,
+    is_absorbance_reader_lid,
+)
 from opentrons.protocol_engine.types import AddressableArea
 from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
+from .. import errors
 from ..types import (
-    LabwareParentDefinition,
     ModuleDefinition,
     ModuleModel,
     DeckLocationDefinition,
@@ -31,19 +33,176 @@ from ..types import (
     DeckSlotLocation,
     AddressableAreaLocation,
     OnLabwareLocation,
+    LabwareMovementOffsetData,
+    LabwareOffsetVector,
 )
 
 _OFFSET_ON_TC_OT2 = Point(x=0, y=0, z=10.7)
+
+LabwareStackupAncestorDefinition = Union[
+    DeckLocationDefinition,
+    ModuleDefinition,
+]
+_LabwareStackupDefinition = Union[
+    DeckLocationDefinition, ModuleDefinition, LabwareDefinition
+]
+
+
+class LabwareOriginContext(enum.Enum):
+    """Context for labware origin calculations."""
+
+    PIPETTING = enum.auto()
+    GRIPPER_PICKING_UP = enum.auto()
+    GRIPPER_DROPPING = enum.auto()
 
 
 @dataclasses.dataclass
 class _Labware3SupportedParentDefinition:
     features: LocatingFeatures
-    extents: Extents
+
+
+@dataclasses.dataclass
+class _GripperOffsets:
+    pick_up_offset: Point
+    drop_offset: Point
+
+
+def get_stackup_origin_to_labware_origin(
+    context: LabwareOriginContext,
+    stackup_lw_info_top_to_bottom: list[tuple[LabwareDefinition, LabwareLocation]],
+    underlying_ancestor_definition: LabwareStackupAncestorDefinition,
+    slot_name: DeckSlotName,
+    module_parent_to_child_offset: Point | None,
+    deck_definition: DeckDefinitionV5,
+) -> Point:
+    """Returns the offset from the stackup placement origin to child labware origin.
+
+    Accounts for offset differences caused by context.
+    """
+    if context == LabwareOriginContext.PIPETTING:
+        return _get_stackup_origin_to_lw_origin(
+            stackup_lw_info_top_to_bottom=stackup_lw_info_top_to_bottom,
+            underlying_ancestor_definition=underlying_ancestor_definition,
+            module_parent_to_child_offset=module_parent_to_child_offset,
+            deck_definition=deck_definition,
+        )
+    else:
+        gripper_offsets = _total_nominal_gripper_offsets(
+            stackup_lw_info_top_to_bottom=stackup_lw_info_top_to_bottom,
+            underlying_ancestor_definition=underlying_ancestor_definition,
+            slot_name=slot_name,
+            deck_definition=deck_definition,
+        )
+        gripper_offset = (
+            gripper_offsets.pick_up_offset
+            if context == LabwareOriginContext.GRIPPER_PICKING_UP
+            else gripper_offsets.drop_offset
+        )
+
+        return gripper_offset + _get_stackup_origin_to_lw_origin(
+            stackup_lw_info_top_to_bottom=stackup_lw_info_top_to_bottom,
+            underlying_ancestor_definition=underlying_ancestor_definition,
+            module_parent_to_child_offset=module_parent_to_child_offset,
+            deck_definition=deck_definition,
+        )
+
+
+def _get_stackup_origin_to_lw_origin(
+    stackup_lw_info_top_to_bottom: list[tuple[LabwareDefinition, LabwareLocation]],
+    underlying_ancestor_definition: LabwareStackupAncestorDefinition,
+    module_parent_to_child_offset: Point | None,
+    deck_definition: DeckDefinitionV5,
+    is_topmost_labware: bool = True,
+) -> Point:
+    """Returns the offset from the stackup placement origin to child labware origin."""
+    definition, location = stackup_lw_info_top_to_bottom[0]
+
+    if isinstance(
+        location, (AddressableAreaLocation, DeckSlotLocation, ModuleLocation)
+    ):
+        return _get_parent_placement_origin_to_lw_origin_by_location(
+            labware_location=location,
+            labware_definition=definition,
+            parent_definition=underlying_ancestor_definition,
+            deck_definition=deck_definition,
+            module_parent_to_child_offset=module_parent_to_child_offset,
+            is_topmost_labware=is_topmost_labware,
+        )
+    elif isinstance(location, OnLabwareLocation):
+        parent_definition = stackup_lw_info_top_to_bottom[1][0]
+
+        parent_placement_origin_to_lw_origin = (
+            _get_parent_placement_origin_to_lw_origin_by_location(
+                labware_location=location,
+                labware_definition=definition,
+                parent_definition=parent_definition,
+                deck_definition=deck_definition,
+                module_parent_to_child_offset=module_parent_to_child_offset,
+                is_topmost_labware=is_topmost_labware,
+            )
+        )
+        remaining_lw_defs_locs_top_to_bottom = stackup_lw_info_top_to_bottom[1:]
+
+        return parent_placement_origin_to_lw_origin + _get_stackup_origin_to_lw_origin(
+            stackup_lw_info_top_to_bottom=remaining_lw_defs_locs_top_to_bottom,
+            underlying_ancestor_definition=underlying_ancestor_definition,
+            module_parent_to_child_offset=module_parent_to_child_offset,
+            deck_definition=deck_definition,
+            is_topmost_labware=False,
+        )
+    else:
+        raise errors.LabwareNotOnDeckError(
+            "Cannot access labware since it is not on the deck. "
+            "Either it has been loaded off-deck or its been moved off-deck."
+        )
+
+
+def _get_parent_placement_origin_to_lw_origin_by_location(
+    labware_location: LabwareLocation,
+    labware_definition: LabwareDefinition,
+    parent_definition: _LabwareStackupDefinition,
+    deck_definition: DeckDefinitionV5,
+    module_parent_to_child_offset: Point | None,
+    is_topmost_labware: bool,
+) -> Point:
+    if isinstance(labware_location, ModuleLocation):
+        if module_parent_to_child_offset is None:
+            raise ValueError(
+                "Expected value for module_parent_to_child_offset, received None."
+            )
+        else:
+            return _get_parent_placement_origin_to_lw_origin(
+                child_labware=labware_definition,
+                parent_deck_item=parent_definition,  # type: ignore[arg-type]
+                module_parent_to_child_offset=module_parent_to_child_offset,
+                deck_definition=deck_definition,
+                is_topmost_labware=is_topmost_labware,
+                labware_location=labware_location,
+            )
+    elif isinstance(labware_location, OnLabwareLocation):
+        return _get_parent_placement_origin_to_lw_origin(
+            child_labware=labware_definition,
+            parent_deck_item=parent_definition,  # type: ignore[arg-type]
+            module_parent_to_child_offset=None,
+            deck_definition=deck_definition,
+            is_topmost_labware=is_topmost_labware,
+            labware_location=labware_location,
+        )
+    elif isinstance(labware_location, (DeckSlotLocation, AddressableAreaLocation)):
+        return _get_parent_placement_origin_to_lw_origin(
+            child_labware=labware_definition,
+            parent_deck_item=parent_definition,  # type: ignore[arg-type]
+            module_parent_to_child_offset=None,
+            deck_definition=deck_definition,
+            is_topmost_labware=is_topmost_labware,
+            labware_location=labware_location,
+        )
+    else:
+        raise ValueError(f"Invalid labware location: {labware_location}")
 
 
 @overload
-def get_parent_placement_origin_to_lw_origin(
+def _get_parent_placement_origin_to_lw_origin(
     child_labware: LabwareDefinition,
     parent_deck_item: ModuleDefinition,
     module_parent_to_child_offset: Point,
@@ -55,7 +214,7 @@ def get_parent_placement_origin_to_lw_origin(
 
 
 @overload
-def get_parent_placement_origin_to_lw_origin(
+def _get_parent_placement_origin_to_lw_origin(
     child_labware: LabwareDefinition,
     parent_deck_item: DeckLocationDefinition,
     module_parent_to_child_offset: None,
@@ -67,7 +226,7 @@ def get_parent_placement_origin_to_lw_origin(
 
 
 @overload
-def get_parent_placement_origin_to_lw_origin(
+def _get_parent_placement_origin_to_lw_origin(
     child_labware: LabwareDefinition,
     parent_deck_item: LabwareDefinition,
     module_parent_to_child_offset: None,
@@ -78,10 +237,10 @@ def get_parent_placement_origin_to_lw_origin(
     ...
 
 
-def get_parent_placement_origin_to_lw_origin(
+def _get_parent_placement_origin_to_lw_origin(
     child_labware: LabwareDefinition,
-    parent_deck_item: LabwareParentDefinition,
-    module_parent_to_child_offset: Union[Point, None],
+    parent_deck_item: _LabwareStackupDefinition,
+    module_parent_to_child_offset: Point | None,
     deck_definition: DeckDefinitionV5,
     is_topmost_labware: bool,
     labware_location: LabwareLocation,
@@ -165,8 +324,8 @@ def get_parent_placement_origin_to_lw_origin(
 
 def _get_parent_deck_item_origin_to_child_labware_placement_origin(
     child_labware: LabwareDefinition,
-    parent_deck_item: LabwareParentDefinition,
-    module_parent_to_child_offset: Union[Point, None],
+    parent_deck_item: _LabwareStackupDefinition,
+    module_parent_to_child_offset: Point | None,
     deck_definition: DeckDefinitionV5,
     labware_location: LabwareLocation,
 ) -> Point:
@@ -223,7 +382,7 @@ def _get_parent_deck_item_origin_to_child_labware_placement_origin(
 
 
 def _module_parent_to_child_offset(
-    module_parent_to_child_offset: Union[Point, None],
+    module_parent_to_child_offset: Point | None,
     labware_location: LabwareLocation,
 ) -> Point:
     """Returns the module offset if applicable."""
@@ -267,24 +426,12 @@ def _get_standardized_parent_deck_item(
                     **parent_deck_item.features,
                     "slotFootprintAsParent": slot_footprint_as_parent,
                 },
-                extents=parent_deck_item.extents,
             )
         else:
             return _Labware3SupportedParentDefinition(
-                features=parent_deck_item.features, extents=parent_deck_item.extents
+                features=parent_deck_item.features,
             )
     elif isinstance(parent_deck_item, AddressableArea):
-        extents = Extents(
-            total=AxisAlignedBoundingBox3D(
-                backLeftBottom=Vector3D(x=0, y=0, z=0),
-                frontRightTop=Vector3D(
-                    x=parent_deck_item.bounding_box.x,
-                    y=parent_deck_item.bounding_box.y * 1,
-                    z=parent_deck_item.bounding_box.z,
-                ),
-            )
-        )
-
         slot_footprint_as_parent = _aa_slot_footprint_as_parent(parent_deck_item)
         if slot_footprint_as_parent is not None:
             return _Labware3SupportedParentDefinition(
@@ -292,35 +439,23 @@ def _get_standardized_parent_deck_item(
                     **parent_deck_item.features,
                     "slotFootprintAsParent": slot_footprint_as_parent,
                 },
-                extents=extents,
             )
         else:
             return _Labware3SupportedParentDefinition(
-                parent_deck_item.features, extents=extents
+                parent_deck_item.features,
             )
     elif isinstance(parent_deck_item, LabwareDefinition3):
         return _Labware3SupportedParentDefinition(
-            features=parent_deck_item.features, extents=parent_deck_item.extents
+            features=parent_deck_item.features,
         )
     # The slotDefV3 case.
     else:
-        extents = Extents(
-            total=AxisAlignedBoundingBox3D(
-                backLeftBottom=Vector3D(x=0, y=0, z=0),
-                frontRightTop=Vector3D(
-                    x=parent_deck_item["boundingBox"]["xDimension"],
-                    y=parent_deck_item["boundingBox"]["yDimension"] * 1,
-                    z=parent_deck_item["boundingBox"]["zDimension"],
-                ),
-            )
-        )
         slot_footprint_as_parent = _slot_def_slot_footprint_as_parent(parent_deck_item)
         return _Labware3SupportedParentDefinition(
             features={
                 **parent_deck_item["features"],
                 "slotFootprintAsParent": slot_footprint_as_parent,
             },
-            extents=extents,
         )
 
 
@@ -595,7 +730,7 @@ def _get_child_labware_overlap_with_parent_module(
 
 
 def _feature_exception_offsets(
-    parent_deck_item: LabwareParentDefinition,
+    parent_deck_item: _LabwareStackupDefinition,
     deck_definition: DeckDefinitionV5,
 ) -> Point:
     """These offsets are intended for legacy reasons only and should generally be avoided post labware schema 2.
@@ -634,3 +769,254 @@ def _get_labware_footprint_as_child(
         )
     else:
         return footprint_as_child
+
+
+def _total_nominal_gripper_offsets(
+    stackup_lw_info_top_to_bottom: list[tuple[LabwareDefinition, LabwareLocation]],
+    slot_name: DeckSlotName,
+    deck_definition: DeckDefinitionV5,
+    underlying_ancestor_definition: LabwareStackupAncestorDefinition,
+) -> _GripperOffsets:
+    """Get the total of the offsets to be used to pick up and drop labware."""
+    top_most_lw_definition, top_most_lw_location = stackup_lw_info_top_to_bottom[0]
+    special_offsets = _get_special_gripper_offsets(
+        stackup_lw_info_top_to_bottom, underlying_ancestor_definition
+    )
+
+    if isinstance(
+        top_most_lw_location,
+        (ModuleLocation, DeckSlotLocation, AddressableAreaLocation),
+    ):
+        offsets = _nominal_gripper_offsets_for_location(
+            labware_location=top_most_lw_location,
+            labware_definition=top_most_lw_definition,
+            slot_name=slot_name,
+            deck_definition=deck_definition,
+            underlying_ancestor_definition=underlying_ancestor_definition,
+        )
+
+        pick_up_offset = Point.from_xyz_attrs(offsets.pickUpOffset)
+        drop_offset = Point.from_xyz_attrs(offsets.dropOffset)
+
+        return _GripperOffsets(
+            pick_up_offset=pick_up_offset + special_offsets.pick_up_offset,
+            drop_offset=drop_offset + special_offsets.drop_offset,
+        )
+    else:
+        # If it's a labware on a labware (most likely an adapter),
+        # we calculate the offset as sum of offsets for the direct parent labware
+        # and the underlying non-labware parent location.
+        direct_parent_def, direct_parent_loc = stackup_lw_info_top_to_bottom[1]
+        direct_parent_offsets = _nominal_gripper_offsets_for_location(
+            labware_location=direct_parent_loc,
+            labware_definition=direct_parent_def,
+            slot_name=slot_name,
+            deck_definition=deck_definition,
+            underlying_ancestor_definition=underlying_ancestor_definition,
+        )
+
+        top_most_offsets = _nominal_gripper_offsets_for_location(
+            labware_location=top_most_lw_location,
+            labware_definition=top_most_lw_definition,
+            slot_name=slot_name,
+            deck_definition=deck_definition,
+            underlying_ancestor_definition=underlying_ancestor_definition,
+        )
+
+        pick_up_offset = Point.from_xyz_attrs(
+            direct_parent_offsets.pickUpOffset
+        ) + Point.from_xyz_attrs(top_most_offsets.pickUpOffset)
+        drop_offset = Point.from_xyz_attrs(
+            direct_parent_offsets.dropOffset
+        ) + Point.from_xyz_attrs(top_most_offsets.dropOffset)
+
+        return _GripperOffsets(
+            pick_up_offset=pick_up_offset + special_offsets.pick_up_offset,
+            drop_offset=drop_offset + special_offsets.drop_offset,
+        )
+
+
+# TODO(jh, 08-15-25): Return _GripperOffsets instead of LabwareMovementOffsetData.
+def _nominal_gripper_offsets_for_location(
+    labware_location: LabwareLocation,
+    labware_definition: LabwareDefinition,
+    slot_name: DeckSlotName,
+    deck_definition: DeckDefinitionV5,
+    underlying_ancestor_definition: LabwareStackupAncestorDefinition,
+) -> LabwareMovementOffsetData:
+    """Provide the default gripper offset data for the given location type."""
+    if isinstance(labware_location, (DeckSlotLocation, AddressableAreaLocation)):
+        offsets = _get_deck_default_gripper_offsets(deck_definition)
+    elif isinstance(labware_location, ModuleLocation):
+        offsets = _get_module_default_gripper_offsets(underlying_ancestor_definition)  # type: ignore[arg-type]
+    else:
+        offsets = _labware_gripper_offsets(
+            top_most_lw_definition=labware_definition, slot_name=slot_name
+        )
+    return offsets or LabwareMovementOffsetData(
+        pickUpOffset=LabwareOffsetVector(x=0, y=0, z=0),
+        dropOffset=LabwareOffsetVector(x=0, y=0, z=0),
+    )
+
+
+def _get_deck_default_gripper_offsets(
+    deck_definition: DeckDefinitionV5,
+) -> Optional[LabwareMovementOffsetData]:
+    """Get the deck's default gripper offsets."""
+    parsed_offsets = deck_definition.get("gripperOffsets", {}).get("default")
+    return (
+        LabwareMovementOffsetData(
+            pickUpOffset=LabwareOffsetVector(
+                x=parsed_offsets["pickUpOffset"]["x"],
+                y=parsed_offsets["pickUpOffset"]["y"],
+                z=parsed_offsets["pickUpOffset"]["z"],
+            ),
+            dropOffset=LabwareOffsetVector(
+                x=parsed_offsets["dropOffset"]["x"],
+                y=parsed_offsets["dropOffset"]["y"],
+                z=parsed_offsets["dropOffset"]["z"],
+            ),
+        )
+        if parsed_offsets
+        else None
+    )
+
+
+def _get_module_default_gripper_offsets(
+    module_definition: ModuleDefinition,
+) -> Optional[LabwareMovementOffsetData]:
+    """Get the deck's default gripper offsets."""
+    offsets = module_definition.gripperOffsets
+    return offsets.get("default") if offsets else None
+
+
+def _labware_gripper_offsets(
+    top_most_lw_definition: LabwareDefinition, slot_name: DeckSlotName
+) -> Optional[LabwareMovementOffsetData]:
+    """Provide the most appropriate gripper offset data for the specified labware.
+
+    We check the types of gripper offsets available for the labware ("default" or slot-based)
+    and return the most appropriate one for the overall location of the labware.
+    Currently, only module adapters (specifically, the H/S universal flat adapter)
+    have non-default offsets that are specific to location of the module on deck,
+    so, this code only checks for the presence of those known offsets.
+    """
+    slot_based_offset = _get_child_gripper_offsets(
+        top_most_lw_definition=top_most_lw_definition, slot_name=slot_name
+    )
+    return slot_based_offset or _get_child_gripper_offsets(
+        top_most_lw_definition=top_most_lw_definition, slot_name=None
+    )
+
+
+def _get_child_gripper_offsets(
+    top_most_lw_definition: LabwareDefinition,
+    slot_name: DeckSlotName | None,
+) -> Optional[LabwareMovementOffsetData]:
+    """Get the grip offsets that a labware says should be applied to children stacked atop it.
+
+    If `slot_name` is provided, returns the gripper offsets that the parent labware definition
+    specifies just for that slot, or `None` if the labware definition doesn't have an
+    exact match.
+
+    If `slot_name` is `None`, returns the gripper offsets that the parent labware
+    definition designates as "default," or `None` if it doesn't designate any as such.
+    """
+    parsed_offsets = top_most_lw_definition.gripperOffsets
+    offset_key = slot_name.id if slot_name else "default"
+
+    if parsed_offsets is None or offset_key not in parsed_offsets:
+        return None
+    else:
+        return LabwareMovementOffsetData(
+            pickUpOffset=LabwareOffsetVector.model_construct(
+                x=parsed_offsets[offset_key].pickUpOffset.x,
+                y=parsed_offsets[offset_key].pickUpOffset.y,
+                z=parsed_offsets[offset_key].pickUpOffset.z,
+            ),
+            dropOffset=LabwareOffsetVector.model_construct(
+                x=parsed_offsets[offset_key].dropOffset.x,
+                y=parsed_offsets[offset_key].dropOffset.y,
+                z=parsed_offsets[offset_key].dropOffset.z,
+            ),
+        )
+
+
+def _get_special_gripper_offsets(
+    stackup_lw_info_top_to_bottom: list[tuple[LabwareDefinition, LabwareLocation]],
+    underlying_ancestor_definition: LabwareStackupAncestorDefinition,
+) -> _GripperOffsets:
+    """Handles all special-cased gripper offsets."""
+    tc_lid_offsets = (
+        _get_tc_lid_gripper_offsets(
+            stackup_lw_info_top_to_bottom, underlying_ancestor_definition
+        )
+    ) or _GripperOffsets(drop_offset=Point(), pick_up_offset=Point())
+
+    ar_lid_offsets = (
+        _get_absorbance_reader_lid_gripper_offsets(stackup_lw_info_top_to_bottom)
+    ) or _GripperOffsets(drop_offset=Point(), pick_up_offset=Point())
+
+    return _GripperOffsets(
+        pick_up_offset=tc_lid_offsets.pick_up_offset + ar_lid_offsets.pick_up_offset,
+        drop_offset=tc_lid_offsets.pick_up_offset + ar_lid_offsets.drop_offset,
+    )
+
+
+def _get_tc_lid_gripper_offsets(
+    stackup_lw_info_top_to_bottom: list[tuple[LabwareDefinition, LabwareLocation]],
+    underlying_ancestor_definition: LabwareStackupAncestorDefinition,
+) -> _GripperOffsets | None:
+    top_most_lw_def, top_most_lw_loc = stackup_lw_info_top_to_bottom[0]
+
+    if isinstance(top_most_lw_loc, OnLabwareLocation):
+        bottom_most_lw_location = stackup_lw_info_top_to_bottom[-1][1]
+
+        # This is done as a workaround for some TC geometry inaccuracies.
+        # See PLAT-579 for context.
+        if (
+            isinstance(bottom_most_lw_location, ModuleLocation)
+            and getattr(underlying_ancestor_definition, "model", None)
+            == ModuleModel.THERMOCYCLER_MODULE_V2
+            and validate_definition_is_lid(top_most_lw_def)
+        ):
+            # It is intentional to use the `pickUpOffset` in both the gripper pick up and drop cases.
+            if "lidOffsets" in top_most_lw_def.gripperOffsets.keys():
+                offset = Point(
+                    x=top_most_lw_def.gripperOffsets["lidOffsets"].pickUpOffset.x,
+                    y=top_most_lw_def.gripperOffsets["lidOffsets"].pickUpOffset.y,
+                    z=top_most_lw_def.gripperOffsets["lidOffsets"].pickUpOffset.z,
+                )
+                return _GripperOffsets(pick_up_offset=offset, drop_offset=offset)
+            else:
+                raise errors.LabwareOffsetDoesNotExistError(
+                    f"Labware Definition {top_most_lw_def.parameters.loadName} does not contain required field 'lidOffsets' of 'gripperOffsets'."
+                )
+
+    return None
+
+
+def _get_absorbance_reader_lid_gripper_offsets(
+    stackup_lw_info_top_to_bottom: list[tuple[LabwareDefinition, LabwareLocation]],
+) -> _GripperOffsets | None:
+    top_most_lw_definition = stackup_lw_info_top_to_bottom[0][0]
+    load_name = top_most_lw_definition.parameters.loadName
+
+    if is_absorbance_reader_lid(load_name):
+        # todo(mm, 2024-11-06): This is only correct in the special case of an
+        # absorbance reader lid. Its definition currently puts the offsets for *itself*
+        # in the property that's normally meant for offsets for its *children.*
+        offsets = _get_child_gripper_offsets(top_most_lw_definition, slot_name=None)
+
+        if offsets is None:
+            raise ValueError(
+                "Expected gripper offsets for absorbance reader lid to be defined."
+            )
+        else:
+            return _GripperOffsets(
+                pick_up_offset=Point.from_xyz_attrs(offsets.pickUpOffset),
+                drop_offset=Point.from_xyz_attrs(offsets.dropOffset),
+            )
+
+    else:
+        return None

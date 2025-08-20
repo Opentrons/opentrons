@@ -377,776 +377,200 @@ exports[`makeInitialRobotState > matches snapshot 1`] = `
     },
     "tipracks": {
       "tiprack10Id": {
-        "A1": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "A10": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "A11": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "A12": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "A2": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "A3": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "A4": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "A5": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "A6": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "A7": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "A8": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "A9": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "B1": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "B10": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "B11": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "B12": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "B2": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "B3": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "B4": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "B5": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "B6": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "B7": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "B8": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "B9": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "C1": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "C10": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "C11": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "C12": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "C2": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "C3": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "C4": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "C5": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "C6": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "C7": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "C8": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "C9": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "D1": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "D10": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "D11": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "D12": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "D2": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "D3": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "D4": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "D5": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "D6": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "D7": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "D8": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "D9": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "E1": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "E10": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "E11": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "E12": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "E2": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "E3": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "E4": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "E5": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "E6": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "E7": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "E8": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "E9": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "F1": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "F10": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "F11": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "F12": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "F2": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "F3": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "F4": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "F5": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "F6": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "F7": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "F8": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "F9": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "G1": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "G10": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "G11": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "G12": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "G2": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "G3": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "G4": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "G5": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "G6": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "G7": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "G8": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "G9": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "H1": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "H10": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "H11": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "H12": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "H2": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "H3": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "H4": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "H5": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "H6": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "H7": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "H8": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "H9": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
+        "A1": "CLEAN",
+        "A10": "CLEAN",
+        "A11": "CLEAN",
+        "A12": "CLEAN",
+        "A2": "CLEAN",
+        "A3": "CLEAN",
+        "A4": "CLEAN",
+        "A5": "CLEAN",
+        "A6": "CLEAN",
+        "A7": "CLEAN",
+        "A8": "CLEAN",
+        "A9": "CLEAN",
+        "B1": "CLEAN",
+        "B10": "CLEAN",
+        "B11": "CLEAN",
+        "B12": "CLEAN",
+        "B2": "CLEAN",
+        "B3": "CLEAN",
+        "B4": "CLEAN",
+        "B5": "CLEAN",
+        "B6": "CLEAN",
+        "B7": "CLEAN",
+        "B8": "CLEAN",
+        "B9": "CLEAN",
+        "C1": "CLEAN",
+        "C10": "CLEAN",
+        "C11": "CLEAN",
+        "C12": "CLEAN",
+        "C2": "CLEAN",
+        "C3": "CLEAN",
+        "C4": "CLEAN",
+        "C5": "CLEAN",
+        "C6": "CLEAN",
+        "C7": "CLEAN",
+        "C8": "CLEAN",
+        "C9": "CLEAN",
+        "D1": "CLEAN",
+        "D10": "CLEAN",
+        "D11": "CLEAN",
+        "D12": "CLEAN",
+        "D2": "CLEAN",
+        "D3": "CLEAN",
+        "D4": "CLEAN",
+        "D5": "CLEAN",
+        "D6": "CLEAN",
+        "D7": "CLEAN",
+        "D8": "CLEAN",
+        "D9": "CLEAN",
+        "E1": "CLEAN",
+        "E10": "CLEAN",
+        "E11": "CLEAN",
+        "E12": "CLEAN",
+        "E2": "CLEAN",
+        "E3": "CLEAN",
+        "E4": "CLEAN",
+        "E5": "CLEAN",
+        "E6": "CLEAN",
+        "E7": "CLEAN",
+        "E8": "CLEAN",
+        "E9": "CLEAN",
+        "F1": "CLEAN",
+        "F10": "CLEAN",
+        "F11": "CLEAN",
+        "F12": "CLEAN",
+        "F2": "CLEAN",
+        "F3": "CLEAN",
+        "F4": "CLEAN",
+        "F5": "CLEAN",
+        "F6": "CLEAN",
+        "F7": "CLEAN",
+        "F8": "CLEAN",
+        "F9": "CLEAN",
+        "G1": "CLEAN",
+        "G10": "CLEAN",
+        "G11": "CLEAN",
+        "G12": "CLEAN",
+        "G2": "CLEAN",
+        "G3": "CLEAN",
+        "G4": "CLEAN",
+        "G5": "CLEAN",
+        "G6": "CLEAN",
+        "G7": "CLEAN",
+        "G8": "CLEAN",
+        "G9": "CLEAN",
+        "H1": "CLEAN",
+        "H10": "CLEAN",
+        "H11": "CLEAN",
+        "H12": "CLEAN",
+        "H2": "CLEAN",
+        "H3": "CLEAN",
+        "H4": "CLEAN",
+        "H5": "CLEAN",
+        "H6": "CLEAN",
+        "H7": "CLEAN",
+        "H8": "CLEAN",
+        "H9": "CLEAN",
       },
       "tiprack300Id": {
-        "A1": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "A10": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "A11": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "A12": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "A2": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "A3": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "A4": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "A5": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "A6": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "A7": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "A8": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "A9": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "B1": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "B10": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "B11": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "B12": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "B2": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "B3": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "B4": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "B5": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "B6": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "B7": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "B8": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "B9": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "C1": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "C10": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "C11": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "C12": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "C2": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "C3": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "C4": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "C5": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "C6": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "C7": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "C8": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "C9": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "D1": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "D10": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "D11": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "D12": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "D2": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "D3": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "D4": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "D5": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "D6": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "D7": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "D8": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "D9": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "E1": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "E10": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "E11": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "E12": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "E2": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "E3": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "E4": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "E5": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "E6": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "E7": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "E8": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "E9": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "F1": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "F10": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "F11": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "F12": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "F2": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "F3": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "F4": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "F5": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "F6": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "F7": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "F8": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "F9": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "G1": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "G10": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "G11": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "G12": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "G2": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "G3": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "G4": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "G5": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "G6": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "G7": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "G8": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "G9": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "H1": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "H10": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "H11": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "H12": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "H2": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "H3": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "H4": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "H5": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "H6": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "H7": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "H8": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
-        "H9": {
-          "hasTip": true,
-          "isTipSterile": true,
-        },
+        "A1": "CLEAN",
+        "A10": "CLEAN",
+        "A11": "CLEAN",
+        "A12": "CLEAN",
+        "A2": "CLEAN",
+        "A3": "CLEAN",
+        "A4": "CLEAN",
+        "A5": "CLEAN",
+        "A6": "CLEAN",
+        "A7": "CLEAN",
+        "A8": "CLEAN",
+        "A9": "CLEAN",
+        "B1": "CLEAN",
+        "B10": "CLEAN",
+        "B11": "CLEAN",
+        "B12": "CLEAN",
+        "B2": "CLEAN",
+        "B3": "CLEAN",
+        "B4": "CLEAN",
+        "B5": "CLEAN",
+        "B6": "CLEAN",
+        "B7": "CLEAN",
+        "B8": "CLEAN",
+        "B9": "CLEAN",
+        "C1": "CLEAN",
+        "C10": "CLEAN",
+        "C11": "CLEAN",
+        "C12": "CLEAN",
+        "C2": "CLEAN",
+        "C3": "CLEAN",
+        "C4": "CLEAN",
+        "C5": "CLEAN",
+        "C6": "CLEAN",
+        "C7": "CLEAN",
+        "C8": "CLEAN",
+        "C9": "CLEAN",
+        "D1": "CLEAN",
+        "D10": "CLEAN",
+        "D11": "CLEAN",
+        "D12": "CLEAN",
+        "D2": "CLEAN",
+        "D3": "CLEAN",
+        "D4": "CLEAN",
+        "D5": "CLEAN",
+        "D6": "CLEAN",
+        "D7": "CLEAN",
+        "D8": "CLEAN",
+        "D9": "CLEAN",
+        "E1": "CLEAN",
+        "E10": "CLEAN",
+        "E11": "CLEAN",
+        "E12": "CLEAN",
+        "E2": "CLEAN",
+        "E3": "CLEAN",
+        "E4": "CLEAN",
+        "E5": "CLEAN",
+        "E6": "CLEAN",
+        "E7": "CLEAN",
+        "E8": "CLEAN",
+        "E9": "CLEAN",
+        "F1": "CLEAN",
+        "F10": "CLEAN",
+        "F11": "CLEAN",
+        "F12": "CLEAN",
+        "F2": "CLEAN",
+        "F3": "CLEAN",
+        "F4": "CLEAN",
+        "F5": "CLEAN",
+        "F6": "CLEAN",
+        "F7": "CLEAN",
+        "F8": "CLEAN",
+        "F9": "CLEAN",
+        "G1": "CLEAN",
+        "G10": "CLEAN",
+        "G11": "CLEAN",
+        "G12": "CLEAN",
+        "G2": "CLEAN",
+        "G3": "CLEAN",
+        "G4": "CLEAN",
+        "G5": "CLEAN",
+        "G6": "CLEAN",
+        "G7": "CLEAN",
+        "G8": "CLEAN",
+        "G9": "CLEAN",
+        "H1": "CLEAN",
+        "H10": "CLEAN",
+        "H11": "CLEAN",
+        "H12": "CLEAN",
+        "H2": "CLEAN",
+        "H3": "CLEAN",
+        "H4": "CLEAN",
+        "H5": "CLEAN",
+        "H6": "CLEAN",
+        "H7": "CLEAN",
+        "H8": "CLEAN",
+        "H9": "CLEAN",
       },
     },
   },

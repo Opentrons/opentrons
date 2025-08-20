@@ -5,6 +5,7 @@ import { reduce } from 'lodash'
 import {
   FLEX_ROBOT_TYPE,
   getAllLabwareDefs,
+  getIsLid,
   getIsPipettableLabware,
   getIsTiprack,
   getPositionFromSlotId,
@@ -318,6 +319,7 @@ export const useLabwareDropdownOptions = (
         t
       )
       const isTiprack = getIsTiprack(def)
+      const isLid = getIsLid(def)
       const isFilterOffDeck =
         deckSlot === 'offDeck' &&
         (type === 'labware' || (type === 'moveLabware' && useGripper))
@@ -325,7 +327,7 @@ export const useLabwareDropdownOptions = (
       const options: DropdownOption[] =
         isAdapter ||
         isLabwareInTrash ||
-        (type === 'labware' && isTiprack) ||
+        (type === 'labware' && (isTiprack || isLid)) ||
         isFilterOffDeck ||
         !isTopOfStack
           ? acc

@@ -1,12 +1,20 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
+import {
+  FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS,
+  FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
+  OT2_SINGLE_SLOT_ADDRESSABLE_AREAS,
+  WASTE_CHUTE_CUTOUT,
+} from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { DropdownStepFormField } from '/protocol-designer/components/molecules'
 import { getEnableStacking } from '/protocol-designer/feature-flags/selectors'
-import { getUnoccupiedStackOptions } from '/protocol-designer/pages/Designer/utils'
+import {
+  getUnoccupiedStackOptions,
+  TIPRACK_LID_LOADNAME,
+} from '/protocol-designer/pages/Designer/utils'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
@@ -18,6 +26,7 @@ import {
 } from '/protocol-designer/top-selectors/labware-locations'
 import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
 
+import type { AddressableAreaName } from '@opentrons/shared-data'
 import type { Option } from '/protocol-designer/top-selectors/labware-locations'
 import type { FieldProps } from '../../types'
 
@@ -56,9 +65,12 @@ export function LabwareLocationField(
       : false
   const isLabwareALid =
     deckSetupLabware[labware]?.def.allowedRoles?.includes('lid') ?? false
+  const isLabwareATiprackLid =
+    deckSetupLabware[labware]?.def.parameters.loadName === TIPRACK_LID_LOADNAME
   const unoccupiedLabwareLocationsOptionsSelector =
     useSelector(getUnoccupiedLabwareLocationOptions) ?? []
 
+  // invalid offDeck move filter
   let unoccupiedLabwareLocationsOptions = [
     ...unoccupiedLabwareStackOptions,
     ...unoccupiedLabwareLocationsOptionsSelector,
@@ -83,6 +95,17 @@ export function LabwareLocationField(
   if (!isLabwareALid) {
     unoccupiedLabwareLocationsOptions = unoccupiedLabwareLocationsOptions.filter(
       option => option.name !== 'Trash bin'
+    )
+  }
+  const allSlotNames = [
+    ...FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS,
+    ...FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
+    ...OT2_SINGLE_SLOT_ADDRESSABLE_AREAS,
+  ]
+
+  if (isLabwareATiprackLid) {
+    unoccupiedLabwareLocationsOptions = unoccupiedLabwareLocationsOptions.filter(
+      option => !allSlotNames.includes(option.value as AddressableAreaName)
     )
   }
 

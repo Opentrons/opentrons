@@ -53,6 +53,8 @@ export interface PipetteTemporalProperties {
   nozzles?: NozzleConfigurationStyle
   //  current tiprack assosciated with pipette
   tiprackId?: string
+  //  last primary tip well accessed (used for return tip)
+  tipWell?: string
 }
 
 export interface MagneticModuleState {
@@ -685,6 +687,7 @@ export type ErrorType =
   | 'ABSORBANCE_READER_NO_GRIPPER'
   | 'ABSORBANCE_READER_NO_INITIALIZATION'
   | 'CANNOT_MOVE_WITH_GRIPPER'
+  | 'CLOSING_THERMOCYCLER_WITH_INVALID_LABWARE_LID'
   | 'DROP_TIP_LOCATION_DOES_NOT_EXIST'
   | 'EQUIPMENT_DOES_NOT_EXIST'
   | 'GRIPPER_REQUIRED'
@@ -717,11 +720,13 @@ export type ErrorType =
   | 'REMOVE_96_CHANNEL_TIPRACK_ADAPTER'
   | 'RETRACT_BELOW_ASPIRATE'
   | 'RETRACT_BELOW_DISPENSE'
+  | 'RETURN_TIP_UNAVAILABLE'
   | 'SUBMERGE_BELOW_ASPIRATE'
   | 'SUBMERGE_BELOW_DISPENSE'
   | 'TALL_LABWARE_EAST_WEST_OF_HEATER_SHAKER'
   | 'THERMOCYCLER_LID_CLOSED'
   | 'TIP_VOLUME_EXCEEDED'
+  | 'TIPRACK_LID_NOT_ALLOWED_ON_DECK'
 
 export interface CommandCreatorError {
   message: string

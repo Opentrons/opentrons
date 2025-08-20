@@ -47,9 +47,9 @@ jobs:
           python-version: '3.10'
           enable-cache: true
           cache-dependency-glob: './analyses-snapshot-testing/uv.lock'
-      - name: Sync the project
+      - name: Setup the project
         working-directory: ./analyses-snapshot-testing
-        run: make ci-setup
+        run: make setup
       - name: Generate Chunks
         working-directory: ./analyses-snapshot-testing
         run: make gen-chunks
@@ -102,9 +102,9 @@ jobs:
           python-version: '3.10'
           enable-cache: true
           cache-dependency-glob: './analyses-snapshot-testing/uv.lock'
-      - name: Sync the project
+      - name: Setup the project
         working-directory: ./analyses-snapshot-testing
-        run: make ci-setup
+        run: make setup
       - uses: actions/download-artifact@v4
         with:
           name: chunks
@@ -139,9 +139,9 @@ jobs:
           python-version: '3.10'
           enable-cache: true
           cache-dependency-glob: './analyses-snapshot-testing/uv.lock'
-      - name: Sync the project
+      - name: Setup the project
         working-directory: ./analyses-snapshot-testing
-        run: make ci-setup
+        run: make setup
       - name: Download All Analysis Results
         uses: actions/download-artifact@v4
         with:

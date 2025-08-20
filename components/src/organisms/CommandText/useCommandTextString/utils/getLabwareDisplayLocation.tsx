@@ -1,11 +1,10 @@
 import {
-  FLEX_STACKER_MODULE_V1,
+  FLEX_STACKER_MODULE_TYPE,
+  getModuleDeckLabel,
   getModuleDisplayName,
   getModuleType,
   getOccludedSlotCountForModule,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
-  THERMOCYCLER_MODULE_V1,
-  THERMOCYCLER_MODULE_V2,
   TRASH_BIN_FIXTURE,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
@@ -30,6 +29,7 @@ export interface DisplayLocationSlotOnlyParams
   extends Omit<LocationSlotOnlyParams, 'location'> {
   t: TFunction
   isOnDevice?: boolean
+  includeSlotText?: boolean
   location?: LabwareLocation | LabwareLocationSequence | null
 }
 export interface DisplayLocationFullParams
@@ -46,7 +46,8 @@ export type DisplayLocationParams =
 // labware, ex, "in module XYZ in slot C1".
 // If 'slot-only', return only the slot name, ex "in slot C1".
 export function getLabwareDisplayLocation(
-  params: DisplayLocationParams
+  params: DisplayLocationParams,
+  includeSlotText: boolean = true
 ): string {
   const { t, isOnDevice = false, location } = params
   const locationResult = Array.isArray(location)
@@ -62,12 +63,7 @@ export function getLabwareDisplayLocation(
     return ''
   }
 
-  const { slotName: initialSlotName, moduleModel, adapterName } = locationResult
-  const slotName =
-    moduleModel === THERMOCYCLER_MODULE_V1 ||
-    moduleModel === THERMOCYCLER_MODULE_V2
-      ? 'A1+B1'
-      : initialSlotName
+  const { slotName, moduleModel, adapterName } = locationResult
 
   if (slotName === 'offDeck' || slotName === 'systemLocation') {
     return t('off_deck')
@@ -79,41 +75,32 @@ export function getLabwareDisplayLocation(
   // Simple slot location
   else if (moduleModel == null && adapterName == null) {
     const validatedSlotCopy = handleSpecialSlotNames(slotName, t)
-    return isOnDevice ? validatedSlotCopy.odd : validatedSlotCopy.desktop
+    return isOnDevice || !includeSlotText
+      ? validatedSlotCopy.odd
+      : validatedSlotCopy.desktop
   }
   // Module location without adapter
   else if (moduleModel != null && adapterName == null) {
-    if (params.detailLevel === 'slot-only') {
-      switch (moduleModel) {
-        case THERMOCYCLER_MODULE_V1:
-        case THERMOCYCLER_MODULE_V2:
-          return t('slot', { slot_name: 'A1+B1' })
-        case FLEX_STACKER_MODULE_V1:
-          return t('stacker_display_name', {
-            stacker_slot: getSlotColumn(slotName),
-          })
-        default:
-          return t('slot', { slot_name: slotName })
-      }
-    } else {
-      switch (moduleModel) {
-        case FLEX_STACKER_MODULE_V1:
-          return t('stacker_column_display_name', {
-            stacker_slot: getSlotColumn(slotName),
-          })
-        default:
-          return isOnDevice
-            ? `${getModuleDisplayName(moduleModel)}, ${slotName}`
-            : t('module_in_slot', {
-                count: getOccludedSlotCountForModule(
-                  getModuleType(moduleModel),
-                  params.robotType
-                ),
-                module: getModuleDisplayName(moduleModel),
-                slot_name: slotName,
-              })
-      }
+    const moduleSlot = getModuleDeckLabel(getModuleType(moduleModel), slotName)
+    if (getModuleType(moduleModel) === FLEX_STACKER_MODULE_TYPE) {
+      // in hopper location always return Stacker {{row}}
+      return t('stacker_hopper_display', {
+        row: getSlotRow(moduleSlot as string),
+      })
     }
+    if (params.detailLevel === 'slot-only') {
+      return includeSlotText ? t('slot', { slot_name: moduleSlot }) : moduleSlot
+    }
+    return isOnDevice
+      ? `${getModuleDisplayName(moduleModel)}, ${moduleSlot}`
+      : t('module_in_slot', {
+          count: getOccludedSlotCountForModule(
+            getModuleType(moduleModel),
+            params.robotType
+          ),
+          module: getModuleDisplayName(moduleModel),
+          slot_name: moduleSlot,
+        })
   }
   // Adapter locations
   else if (adapterName != null) {
@@ -138,7 +125,7 @@ export function getLabwareDisplayLocation(
   }
 }
 
-function getSlotColumn(slotName: string): string {
+function getSlotRow(slotName: string): string {
   return slotName.charAt(0)
 }
 

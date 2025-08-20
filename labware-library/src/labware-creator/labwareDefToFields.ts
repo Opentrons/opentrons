@@ -10,6 +10,17 @@ import type { BooleanString, LabwareFields } from './fields'
 // NOTE: this is just String() with some typing for flow
 const boolToBoolString = (b: boolean): BooleanString => (b ? 'true' : 'false')
 
+export function getStackedLabwareZDimension(
+  def: LabwareDefinition2
+): number | null {
+  const zOffset = def.stackingOffsetWithLabware?.[def.parameters.loadName]?.z
+  if (zOffset) {
+    return def.dimensions.zDimension * 2 - zOffset
+  } else {
+    return null
+  }
+}
+
 export function labwareDefToFields(
   def: LabwareDefinition2,
   adapterDefinitions: LabwareDefinition2[]
@@ -84,6 +95,7 @@ export function labwareDefToFields(
   const firstGroup: LabwareWellGroup | undefined = def.groups[0]
   const firstGroupBrand = firstGroup?.brand
   const zDimension = def.dimensions.zDimension
+  const stackedLabwareZDimension = getStackedLabwareZDimension(def)
   const compatibleAdapters: Record<string, number> =
     def.stackingOffsetWithLabware != null
       ? Object.entries(
@@ -92,13 +104,14 @@ export function labwareDefToFields(
           const adapterZDimension = Object.values(adapterDefinitions).find(
             def => def.parameters.loadName === loadName
           )?.dimensions.zDimension
+
           if (adapterZDimension != null) {
             acc[loadName] = adapterZDimension + zDimension - offset.z
           }
-
           return acc
         }, {})
       : {}
+
   const compatibleModules: Record<string, number> =
     def.stackingOffsetWithModule != null
       ? Object.entries(
@@ -154,11 +167,11 @@ export function labwareDefToFields(
     brandId: def.brand.brandId != null ? def.brand.brandId.join(',') : null, // comma-separated values
     groupBrand: firstGroupBrand?.brand,
     groupBrandId: firstGroupBrand?.brandId?.join(',') ?? undefined,
-
     // NOTE: intentionally null these fields, do not import them
     loadName: null,
     displayName: null,
     compatibleAdapters,
     compatibleModules,
+    stackedLabwareZDimension,
   }
 }
