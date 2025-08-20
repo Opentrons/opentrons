@@ -294,7 +294,6 @@ describe('ProtocolSetupModulesAndDeck', () => {
   it('should render ModulesAndDeckMapView when tapping map view button', () => {
     render()
     fireEvent.click(screen.getByText('Map View'))
-    screen.debug()
     expect(vi.mocked(ModulesAndDeckMapView)).toHaveBeenCalled()
   })
 })

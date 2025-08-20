@@ -1122,7 +1122,9 @@ class GeometryView:
                             "providesAddressableAreas"
                         ][
                             deck_configuration_provider.get_cutout_id_by_deck_slot_name(
-                                DeckSlotName.SLOT_C2
+                                DeckSlotName.SLOT_C2.to_equivalent_for_robot_type(
+                                    self._config.robot_type
+                                )
                             )
                         ][
                             0
@@ -2359,3 +2361,48 @@ class GeometryView:
                 return pending_labware[labware_id]
             except KeyError as ke:
                 raise lnle from ke
+
+    def raise_if_labware_inaccessible_by_pipette(  # noqa: C901
+        self, labware_id: str
+    ) -> None:
+        """Raise an error if the specified location cannot be reached via a pipette."""
+        labware = self._labware.get(labware_id)
+        labware_location = labware.location
+        if isinstance(labware_location, OnLabwareLocation):
+            return self.raise_if_labware_inaccessible_by_pipette(
+                labware_location.labwareId
+            )
+        elif labware.lid_id is not None:
+            raise errors.LocationNotAccessibleByPipetteError(
+                f"Cannot move pipette to {labware.loadName} "
+                "because labware is currently covered by a lid."
+            )
+        elif isinstance(labware_location, AddressableAreaLocation):
+            if fixture_validation.is_staging_slot(labware_location.addressableAreaName):
+                raise errors.LocationNotAccessibleByPipetteError(
+                    f"Cannot move pipette to {labware.loadName},"
+                    f" labware is on staging slot {labware_location.addressableAreaName}"
+                )
+            elif fixture_validation.is_stacker_shuttle(
+                labware_location.addressableAreaName
+            ):
+                raise errors.LocationNotAccessibleByPipetteError(
+                    f"Cannot move pipette to {labware.loadName} because it is on a stacker shuttle"
+                )
+        elif (
+            labware_location == OFF_DECK_LOCATION or labware_location == SYSTEM_LOCATION
+        ):
+            raise errors.LocationNotAccessibleByPipetteError(
+                f"Cannot move pipette to {labware.loadName}, labware is off-deck."
+            )
+        elif isinstance(labware_location, ModuleLocation):
+            module = self._modules.get(labware_location.moduleId)
+            if ModuleModel.is_flex_stacker(module.model):
+                raise errors.LocationNotAccessibleByPipetteError(
+                    f"Cannot move pipette to {labware.loadName}, labware is on a stacker shuttle"
+                )
+
+        elif isinstance(labware_location, InStackerHopperLocation):
+            raise errors.LocationNotAccessibleByPipetteError(
+                f"Cannot move pipette to {labware.loadName}, labware is in a stacker hopper"
+            )
