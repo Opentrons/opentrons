@@ -321,13 +321,13 @@ def run(ctx: ProtocolContext) -> None:
             start = i * region_len
             end = (i + 1) * region_len
             corrected = all_corrected_heights[start:end]
-            expected = [labware["A1"].height_from_volume(labware["A1"].volume_from_height(region_heights[i]))] * region_len
-            errors = [abs(c - expected[0]) for c in corrected]
+            expected_val = labware["A1"].height_from_volume(labware["A1"].volume_from_height(region_heights[i]))
+            errors = [abs(c - expected_val) for c in corrected]
             avg_error = sum(errors) / len(errors) if errors else 0.0
             region_results.extend(
-                [f"{region}_corrected"] + [str(round(c, 3)) for c in corrected] +
-                [f"{region}_expected", str(round(expected[0], 3))] +
-                [f"{region}_avg_error", str(round(avg_error, 3))]
+                [str(round(c, 3)) for c in corrected] +
+                [str(round(expected_val, 3))] +
+                [str(round(avg_error, 3))]
             )
 
         # Write the summary line: labware, then all regions' results
