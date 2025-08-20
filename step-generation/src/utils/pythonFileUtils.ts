@@ -11,6 +11,7 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
+import { sortLabwareBySlot } from '../robotStateSelectors'
 import { getLiquidClassName } from './liquidClassUtils'
 import { getSlotInLocationStack } from './misc'
 import {
@@ -327,17 +328,10 @@ export function getLoadPipettes(
       const pipetteName = isFlexPipette(name)
         ? getFlexNameConversion(spec)
         : name
-      const allTipracks = tiprackDefURI.reduce(
-        (acc: LabwareEntity[], defURI) => {
-          for (const lw of Object.values(labwareEntities)) {
-            if (lw.labwareDefURI === defURI) {
-              acc.push(lw)
-            }
-          }
-          return acc
-        },
-        []
-      )
+      const sortedLabwareIds = sortLabwareBySlot(labwareRobotState)
+      const allTipracks = sortedLabwareIds
+        .map(id => labwareEntities[id])
+        .filter(lw => lw && tiprackDefURI.includes(lw.labwareDefURI))
       const onDeckTipracks = allTipracks.filter(
         tiprack =>
           getSlotInLocationStack(labwareRobotState[tiprack.id].stack) !==
@@ -517,8 +511,10 @@ export function stepCommands(robotStateTimeline: Timeline): string {
     '# PROTOCOL STEPS\n\n' +
     robotStateTimeline.timeline
       .map(
-        (timelineFrame, idx) =>
-          `# Step ${idx + 1}:\n${timelineFrame.python || 'pass'}`
+        timelineFrame =>
+          `# Step ${timelineFrame.stepNumber}:\n${
+            timelineFrame.python || 'pass'
+          }`
       )
       .join('\n\n')
   )

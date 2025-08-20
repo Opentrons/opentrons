@@ -57,7 +57,6 @@ from ..types import (
     OverlapOffset,
     OnDeckLabwareLocation,
     OFF_DECK_LOCATION,
-    SYSTEM_LOCATION,
 )
 from ..actions import (
     Action,
@@ -1034,32 +1033,6 @@ class LabwareView:
     def is_lid(self, labware_id: str) -> bool:
         """Check if labware is a lid."""
         return LabwareRole.lid in self.get_definition(labware_id).allowedRoles
-
-    def raise_if_labware_inaccessible_by_pipette(self, labware_id: str) -> None:
-        """Raise an error if the specified location cannot be reached via a pipette."""
-        labware = self.get(labware_id)
-        labware_location = labware.location
-        if isinstance(labware_location, OnLabwareLocation):
-            return self.raise_if_labware_inaccessible_by_pipette(
-                labware_location.labwareId
-            )
-        elif labware.lid_id is not None:
-            raise errors.LocationNotAccessibleByPipetteError(
-                f"Cannot move pipette to {labware.loadName} "
-                "because labware is currently covered by a lid."
-            )
-        elif isinstance(labware_location, AddressableAreaLocation):
-            if fixture_validation.is_staging_slot(labware_location.addressableAreaName):
-                raise errors.LocationNotAccessibleByPipetteError(
-                    f"Cannot move pipette to {labware.loadName},"
-                    f" labware is on staging slot {labware_location.addressableAreaName}"
-                )
-        elif (
-            labware_location == OFF_DECK_LOCATION or labware_location == SYSTEM_LOCATION
-        ):
-            raise errors.LocationNotAccessibleByPipetteError(
-                f"Cannot move pipette to {labware.loadName}, labware is off-deck."
-            )
 
     def raise_if_labware_in_location(
         self,

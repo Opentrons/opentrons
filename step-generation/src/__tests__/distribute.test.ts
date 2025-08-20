@@ -66,7 +66,7 @@ beforeEach(() => {
     pipette: DEFAULT_PIPETTE,
     sourceLabware: SOURCE_LABWARE,
     destLabware: DEST_LABWARE,
-    stepId: 1,
+    stepNumber: 1,
     preWetTip: false,
     touchTipAfterAspirate: false,
     disposalVolume: 60,
