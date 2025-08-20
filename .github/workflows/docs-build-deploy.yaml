@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - 'docs/**'
+      - 'api/docs/**'
+      - 'api/src/**'
       - '.github/workflows/docs-build-deploy.yaml'
   push:
     branches:
@@ -43,6 +45,12 @@ jobs:
           python-version: '3.10'
           enable-cache: true
           cache-dependency-glob: './docs/uv.lock'
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pipenv'
+          cache-dependency-path: api/Pipfile.lock
       - name: Set DEPLOY_ENV
         id: set-env
         run: |
@@ -53,12 +61,15 @@ jobs:
           else
             echo "DEPLOY_ENV=sandbox" >> $GITHUB_ENV
           fi
-      - name: Sync the project
+      - name: Setup Docs Dependencies
         working-directory: ./docs
         run: make setup
-      - name: Build Docs Site
+      - name: Setup API Dependencies
+        working-directory: ./api
+        run: make setup
+      - name: Build All Docs
         working-directory: ./docs
-        run: make build
+        run: make all-docs
       - name: Deploy Docs Site
         working-directory: ./docs
         run: make deploy ENVIRONMENT=${{ env.DEPLOY_ENV }} BRANCH=${{ env.BRANCH }}
