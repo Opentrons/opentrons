@@ -645,7 +645,7 @@ def test_check_preloaded_labware_primary_consistency(
 
     with pytest.raises(
         CommandPreconditionViolated,
-        match="URI.*of primary labware.*must match pool URI",
+        match="previous labware groups specify primary URI.*and this one specifies.*",
     ):
         subject.check_preloaded_labware(
             sentinel.primary_definition,
@@ -743,7 +743,7 @@ def test_check_preloaded_labware_adapter_consistency(
     )
     with pytest.raises(
         CommandPreconditionViolated,
-        match="All pool components must have an ID, but adapter has no id",
+        match="previous labware groups specify an adapter and this one does not",
     ):
         subject.check_preloaded_labware(
             sentinel.primary_definition,
@@ -763,7 +763,7 @@ def test_check_preloaded_labware_adapter_consistency(
     )
     with pytest.raises(
         CommandPreconditionViolated,
-        match="URI.*of adapter labware.*must match pool URI",
+        match="previous labware groups specify adapter URI.*and this one specifies.*",
     ):
         subject.check_preloaded_labware(
             sentinel.primary_definition,
@@ -862,7 +862,7 @@ def test_check_preloaded_labware_lid_consistency(
 
     with pytest.raises(
         CommandPreconditionViolated,
-        match="All pool components must have an ID but lid has no id",
+        match="previous labware groups specify a lid and this one does not",
     ):
         subject.check_preloaded_labware(
             sentinel.primary_definition,
@@ -880,7 +880,7 @@ def test_check_preloaded_labware_lid_consistency(
 
     with pytest.raises(
         CommandPreconditionViolated,
-        match="No unspecified pool component may have an id, but lid has an id",
+        match="previous labware groups did not specify a lid and this one does",
     ):
         subject.check_preloaded_labware(
             sentinel.primary_definition,
@@ -900,7 +900,8 @@ def test_check_preloaded_labware_lid_consistency(
         LabwareUri("other-uri")
     )
     with pytest.raises(
-        CommandPreconditionViolated, match="URI.*of lid labware.*must match pool URI"
+        CommandPreconditionViolated,
+        match="previous labware groups specify lid URI.*and this one specifies.*",
     ):
         subject.check_preloaded_labware(
             sentinel.primary_definition,
@@ -2053,9 +2054,11 @@ def test_build_ids_to_fill_builds_specified_components(
         StackerStoredLabwareGroup(
             primaryLabwareId="generated-1",
             adapterLabwareId="generated-2" if has_adapter else None,
-            lidLabwareId="generated-3"
-            if has_adapter and has_lid
-            else ("generated-2" if has_lid else None),
+            lidLabwareId=(
+                "generated-3"
+                if has_adapter and has_lid
+                else ("generated-2" if has_lid else None)
+            ),
         )
     ]
 
