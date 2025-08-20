@@ -45,15 +45,18 @@ deploy:
 
 # API Documentation Build Targets
 docs/build/html/v%: ../api/docs/v%
+	$(SHX) mkdir -p docs/build/doctrees
 	$(sphinx_build) -b html -d docs/build/doctrees -n $< $@
 
 docs/build/html/hardware: ../api/docs/hardware ../api/src/opentrons/hardware_control
+	$(SHX) mkdir -p docs/build/doctrees
 	$(sphinx_build_allow_warnings) -b html -d docs/build/doctrees -n $< $@
 	$(SHX) mkdir $@/_images/
 
 docs/dist/v%: docs/build/html/v%
 	$(SHX) mkdir -p $@
-	$(SHX) cp -R $^ $(@D) $(if $(CI),,|| true)
+	$(SHX) ls -la docs/build/html/
+	$(SHX) cp -R docs/build/html/v2 $(@D) $(if $(CI),,|| true)
 
 docs/dist/hardware: docs/build/html/hardware
 	$(SHX) mkdir -p $@
