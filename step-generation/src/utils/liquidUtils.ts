@@ -117,7 +117,7 @@ export const swatchColors = (ingredGroupId: string): string => {
 
 const ingredIdsToColor = (
   groupIds: string[],
-  displayColors: string[]
+  displayColors: Record<string, string> // liquidGroupId -> color
 ): string | null | undefined => {
   const filteredIngredIds = groupIds.filter(id => id !== AIR)
   if (filteredIngredIds.length === 0) return null
@@ -136,7 +136,7 @@ export type WellFill = Record<string, string>
 
 export const wellFillFromWellContents = (
   wellContents: ContentsByWell,
-  displayColors: string[]
+  displayColors: Record<string, string> // liquidGroupId -> color
 ): WellFill =>
   reduce(
     wellContents,
