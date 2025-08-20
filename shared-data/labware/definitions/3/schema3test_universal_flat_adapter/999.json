@@ -25,7 +25,17 @@
       }
     }
   },
-  "features": {},
+  "features": {
+    "heaterShakerUniversalFlatAdapter": {
+      "flatWellSupportZ": 4.7,
+      "deckLeft": {
+        "wallX": 7.52
+      },
+      "deckRight": {
+        "wallX": -7.52
+      }
+    }
+  },
   "wells": {},
   "groups": [
     {
