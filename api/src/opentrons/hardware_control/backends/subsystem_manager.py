@@ -91,6 +91,7 @@ class SubsystemManager:
         self._present_tools = tools.types.ToolSummary(
             left=None, right=None, gripper=None
         )
+        self._check_device_update_timeout = 10.0
 
     @property
     def ok(self) -> bool:
@@ -183,11 +184,12 @@ class SubsystemManager:
             return self._tool_task_state is True
 
     async def _check_devices_after_update(
-        self, devices: Set[SubSystem], timeout_sec: float = 10.0
+        self, devices: Set[SubSystem], timeout_sec: Optional[float] = None
     ) -> None:
         try:
             await asyncio.wait_for(
-                self._do_check_devices_after_update(devices), timeout=timeout_sec
+                self._do_check_devices_after_update(devices),
+                timeout=timeout_sec or self._check_device_update_timeout,
             )
         except asyncio.TimeoutError:
             raise RuntimeError("Device failed to come back after firmware update")
