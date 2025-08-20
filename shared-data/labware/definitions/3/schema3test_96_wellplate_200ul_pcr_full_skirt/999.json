@@ -46,6 +46,9 @@
         "x": 127.76,
         "y": -85.48
       }
+    },
+    "flatWellSupportAsChild": {
+      "wellExteriorBottomZ": 0
     }
   },
   "stackLimit": 4,
