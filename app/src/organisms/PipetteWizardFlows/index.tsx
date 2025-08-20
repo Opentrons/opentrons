@@ -205,9 +205,12 @@ export const PipetteWizardFlows = (
       onComplete()
     }
     if (maintenanceRunData != null) {
-      deleteMaintenanceRun(maintenanceRunData?.data.id)
+      deleteMaintenanceRun(maintenanceRunData?.data.id, {
+        onSettled: closeFlow,
+      })
+    } else {
+      closeFlow()
     }
-    closeFlow()
   }
 
   const {
