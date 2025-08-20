@@ -2,8 +2,6 @@
 title: "Heater-Shaker Module: Software Control"
 ---
 
-# Software Control
-
 You control the Heater-Shaker through protocols you create in [Opentrons Protocol Designer](https://designer.opentrons.com/) or the [Python API](https://docs.opentrons.com/v2/modules/heater_shaker.html#heater-shaker-module). Running these protocols requires version 6.1.0 or newer of the [Opentrons App](https://opentrons.com/ot-app) and robot server.
 
 The Opentrons App displays the current status of the Heater-Shaker and can also control the module outside of protocols. To control a Heater-Shaker, go to the **Devices** tab and select a robot that has a Heater-Shaker connected to it. Robots with a connected and powered on Heater-Shaker will display a thermometer icon <img src="../images/module-icon-dark.svg" style="width: 1.25em; height: auto; vertical-align: middle;" alt="thermometer icon"> under the modules section of the device card.
