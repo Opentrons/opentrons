@@ -11,7 +11,7 @@ import { i18n } from '/protocol-designer/assets/localization'
 import { getUnsavedForm } from '/protocol-designer/step-forms/selectors'
 import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 
-import { ConnectedStepContainer } from '../StepContainer'
+import { ConnectedStepContainer } from '../ConnectedStepContainer'
 import { StepOverflowMenu } from '../StepOverflowMenu'
 
 import type { ComponentProps } from 'react'
@@ -28,7 +28,7 @@ const render = (props: ComponentProps<typeof ConnectedStepContainer>) => {
   })[0]
 }
 
-describe('StepContainer', () => {
+describe('ConnectedStepContainer', () => {
   let props: ComponentProps<typeof ConnectedStepContainer>
 
   beforeEach(() => {

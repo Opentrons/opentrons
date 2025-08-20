@@ -12,7 +12,7 @@ import {
   Divider,
   Flex,
   SPACING,
-  StepContainer as StepContainerPresentation,
+  StepContainer,
   useConditionalConfirm,
 } from '@opentrons/components'
 
@@ -224,7 +224,7 @@ export function ConnectedStepContainer(
           />
         ) : null}
 
-        <StepContainerPresentation
+        <StepContainer
           text={capitalizeFirstLetterAfterNumber(title)}
           iconName={iconName}
           type={isStartingOrEndingState ? 'alt' : 'default'}

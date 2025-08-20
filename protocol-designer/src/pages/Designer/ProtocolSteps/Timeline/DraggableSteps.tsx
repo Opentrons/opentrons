@@ -15,8 +15,8 @@ import { DND_TYPES } from '/protocol-designer/constants'
 import { stepIconsByType } from '/protocol-designer/form-types'
 import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
 
+import { ConnectedStepContainer } from './ConnectedStepContainer'
 import { ConnectedStepInfo } from './ConnectedStepInfo'
-import { ConnectedStepContainer } from './StepContainer'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { DragLayerMonitor, DropTargetMonitor } from 'react-dnd'
