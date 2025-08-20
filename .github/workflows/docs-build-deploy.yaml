@@ -71,13 +71,8 @@ jobs:
       - name: Setup API Dependencies
         working-directory: ./api
         run: |
-          # Debug: show what's in the directory
-          pwd
-          ls -la
-          echo "Pipfile contents:"
-          cat Pipfile
-          echo "Trying to install with pip directly:"
-          pip install -r <(pipenv requirements --dev)
+          # Install API dependencies for building docs
+          pipenv install --dev --python 3.10
       - name: Build All Docs
         working-directory: ./docs
         run: make all-docs

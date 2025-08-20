@@ -14,8 +14,6 @@ sphinx_build_allow_warnings := $(pipenv) run sphinx-build
 .PHONY: setup
 setup:
 	uv sync
-	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip freeze
 
 .PHONY: clean
 clean: api-docs-clean
