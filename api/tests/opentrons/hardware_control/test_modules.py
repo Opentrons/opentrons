@@ -399,7 +399,7 @@ async def test_module_update_integration(  # noqa: C901
 
     assert not mod_absorbancereader.updating
     with mock.patch(
-        "opentrons.hardware_control.modules.absorbance_reader.asyncio", mock.AsyncMock()
+        "opentrons.hardware_control.modules.absorbance_reader.asyncio", autospec=True
     ):
         await modules.update_firmware(mod_absorbancereader, "fake_fw_file_path")
     byonoy_update_firmware_mock.assert_called_once_with("fake_fw_file_path")
