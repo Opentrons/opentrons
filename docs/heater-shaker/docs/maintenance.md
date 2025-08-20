@@ -2,8 +2,6 @@
 title: "Heater-Shaker Module: Maintenance and Cleaning"
 ---
 
-# Maintenance and Cleaning
-
 ## Maintenance
 
 Users should not attempt to service or repair the Heater-Shaker themselves. If you have concerns about the module’s performance or require maintenance, please contact Opentrons Support.

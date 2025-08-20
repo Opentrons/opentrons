@@ -37,6 +37,8 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
+import { TIPRACK_LID_LOADNAME } from '/protocol-designer/pages/Designer/utils'
+
 import { LINK_BUTTON_STYLE } from '../../../components/atoms'
 import { getEnableStacking } from '../../../feature-flags/selectors'
 import { getRobotType } from '../../../file-data/selectors'
@@ -203,7 +205,9 @@ export function SelectLabwareModal(
         (slot === 'offDeck' && isAdapter) ||
         (PLATE_READER_LOADNAME === parameters.loadName &&
           moduleType !== ABSORBANCE_READER_TYPE) ||
-        (!enableStacking && parameters.loadName === 'opentrons_flex_deck_riser')
+        (!enableStacking &&
+          parameters.loadName === 'opentrons_flex_deck_riser') ||
+        parameters.loadName === TIPRACK_LID_LOADNAME
       )
     },
     [filterRecommended, filterHeight, getIsLabwareCompatible, moduleType, slot]

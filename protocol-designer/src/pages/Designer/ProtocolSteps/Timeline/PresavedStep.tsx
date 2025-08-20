@@ -10,7 +10,7 @@ import {
   actions as stepsActions,
 } from '/protocol-designer/ui/steps'
 
-import { StepContainer } from './StepContainer'
+import { ConnectedStepContainer } from './StepContainer'
 
 interface PresavedStepProps {
   sidebarWidth: number
@@ -40,7 +40,7 @@ export function PresavedStep({
   const stepType = presavedStepForm.stepType
 
   return (
-    <StepContainer
+    <ConnectedStepContainer
       onMouseEnter={highlightStep}
       onMouseLeave={unhighlightStep}
       selected={selected}

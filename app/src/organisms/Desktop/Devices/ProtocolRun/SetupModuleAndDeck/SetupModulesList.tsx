@@ -29,13 +29,13 @@ import {
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
+  getFlexStackerD3Compatibility,
   getModuleDeckLabel,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
   OT2_ROBOT_TYPE,
-  WASTE_CHUTE_FLEX_STACKER_FIXTURES,
 } from '@opentrons/shared-data'
 
 import { TertiaryButton } from '/app/atoms/buttons'
@@ -64,6 +64,7 @@ import { getFixtureImage } from './utils'
 import type { TFunction } from 'i18next'
 import type { CommandData, HostConfig } from '@opentrons/api-client'
 import type {
+  CutoutConfigAndCompatibility,
   CutoutFixtureId,
   DeckDefinition,
   ModuleModel,
@@ -71,7 +72,6 @@ import type {
 } from '@opentrons/shared-data'
 import type { ModulePrepCommandsType } from '/app/local-resources/modules'
 import type { AttachedModule } from '/app/redux/modules/types'
-import type { CutoutConfigAndCompatibility } from '/app/resources/deck_configuration/hooks'
 import type {
   ModuleRenderInfoForProtocol,
   ProtocolCalibrationStatus,
@@ -132,21 +132,11 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
             moduleDef.moduleType === FLEX_STACKER_MODULE_TYPE &&
             slotName[0] === 'D'
           ) {
-            const deckConfigCompatabilityD3 = deckConfigCompatibility?.find(
-              configItem => configItem.cutoutId === 'cutoutD3'
+            const d3Compatibility = getFlexStackerD3Compatibility(
+              deckConfigCompatibility
             )
-            if (
-              deckConfigCompatabilityD3 != null &&
-              deckConfigCompatabilityD3.compatibleCutoutFixtureIds.every(
-                cutoutFixtureId =>
-                  WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(cutoutFixtureId)
-              )
-            ) {
-              const comboFixtureId =
-                deckConfigCompatabilityD3?.compatibleCutoutFixtureIds[0]
-              const comboFixtureConflict = !deckConfigCompatabilityD3?.compatibleCutoutFixtureIds.includes(
-                deckConfigCompatabilityD3.cutoutFixtureId
-              )
+            if (d3Compatibility) {
+              const { comboFixtureId, comboFixtureConflict } = d3Compatibility
               return (
                 <ModulesListItem
                   key={`SetupModulesList_${String(

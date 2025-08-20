@@ -31,6 +31,7 @@ from ..types import (
     OnLabwareLocation,
     LabwareLocation,
     OnDeckLabwareLocation,
+    GripperMoveType,
 )
 
 if TYPE_CHECKING:
@@ -141,10 +142,16 @@ class LabwareMovementHandler:
             labware_definition = self._state_store.labware.get_definition(labware_id)
 
         from_labware_center = self._state_store.geometry.get_labware_grip_point(
-            labware_definition=labware_definition, location=current_location
+            labware_definition=labware_definition,
+            location=current_location,
+            move_type=GripperMoveType.PICK_UP_LABWARE,
+            user_additional_offset=user_pick_up_offset,
         )
         to_labware_center = self._state_store.geometry.get_labware_grip_point(
-            labware_definition=labware_definition, location=new_location
+            labware_definition=labware_definition,
+            location=new_location,
+            move_type=GripperMoveType.DROP_LABWARE,
+            user_additional_offset=user_drop_offset,
         )
 
         if use_virtual_gripper:
@@ -193,20 +200,10 @@ class LabwareMovementHandler:
         async with self._thermocycler_plate_lifter.lift_plate_for_labware_movement(
             labware_location=current_location
         ):
-            final_offsets = (
-                self._state_store.geometry.get_final_labware_movement_offset_vectors(
-                    from_location=current_location,
-                    to_location=new_location,
-                    additional_pick_up_offset=user_pick_up_offset,
-                    additional_drop_offset=user_drop_offset,
-                    current_labware=labware_definition,
-                )
-            )
             movement_waypoints = get_gripper_labware_movement_waypoints(
                 from_labware_center=from_labware_center,
                 to_labware_center=to_labware_center,
                 gripper_home_z=gripper_homed_position.z,
-                offset_data=final_offsets,
                 post_drop_slide_offset=post_drop_slide_offset,
                 gripper_home_z_offset=gripper_z_offset,
             )
