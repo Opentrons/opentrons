@@ -17,7 +17,9 @@ class SupportedLiquid(Enum):
 
     WATER = "water"
     ETHANOL = "ethanol"
+    ETHANOL_80 = "ethanol_80"
     GLYCEROL = "glycerol"
+    GLYCEROL_50 = "glycerol_50"
     HEXANE = "hexane"
 
     @classmethod
@@ -32,7 +34,9 @@ class SupportedLiquid(Enum):
 RELATIVE_DENSITY: Dict[SupportedLiquid, float] = {
     SupportedLiquid.WATER: 1.0,
     SupportedLiquid.ETHANOL: 0.78905,  # wikipedia
+    SupportedLiquid.ETHANOL_80: 0.83124,  # calculated (0.78905*0.8)+(1.0*0.2)
     SupportedLiquid.GLYCEROL: 1.261,  # wikipedia
+    SupportedLiquid.GLYCEROL_50: 1.1305,  # calculated (1.261*0.5)+(1.0*0.5)
     SupportedLiquid.HEXANE: 0.6606,  # wikipedia
 }
 
