@@ -71,11 +71,13 @@ jobs:
       - name: Setup API Dependencies
         working-directory: ./api
         run: |
-          # Ensure we're in the right directory and Pipfile.lock exists
-          ls -la Pipfile*
-          # Install dependencies directly without sync first
-          pipenv install --dev --python 3.10
-          pipenv run pip freeze
+          # Debug: show what's in the directory
+          pwd
+          ls -la
+          echo "Pipfile contents:"
+          cat Pipfile
+          echo "Trying to install with pip directly:"
+          pip install -r <(pipenv requirements --dev)
       - name: Build All Docs
         working-directory: ./docs
         run: make all-docs
