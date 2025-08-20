@@ -91,6 +91,7 @@ class SubsystemManager:
         self._present_tools = tools.types.ToolSummary(
             left=None, right=None, gripper=None
         )
+        # This is intended to be an internal variable but is modified in unit tests to avoid long timeouts
         self._check_device_update_timeout = 10.0
 
     @property
