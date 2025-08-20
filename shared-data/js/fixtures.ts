@@ -436,7 +436,7 @@ export const getReplacementFixtureForFixtureRemoval = (
   if (cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE) {
     return SINGLE_RIGHT_SLOT_FIXTURE
   } else if (addressableAreaId && SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
-    const cutoutFixtureReplacment = replaceCutoutFixtureRemove(
+    const cutoutFixtureReplacment = replaceCutoutFixtureForFixtureRemoval(
       cutoutFixtureId,
       cutoutId,
       addressableAreaId
@@ -633,6 +633,7 @@ export function getCutoutFixturesForModuleModel(
   deckDef: DeckDefinition
 ): CutoutFixture[] {
   const moduleFixtureIds = getCutoutFixtureIdsForModuleModel(moduleModel)
+  console.log('moduleFixtureIds: ', moduleFixtureIds)
   return moduleFixtureIds.reduce<CutoutFixture[]>((acc, id) => {
     const moduleFixture = deckDef.cutoutFixtures.find(cf => cf.id === id)
     return moduleFixture != null ? [...acc, moduleFixture] : acc
@@ -644,9 +645,11 @@ export function getFixtureIdByCutoutIdFromModuleAnchorCutoutId(
   moduleFixtures: CutoutFixture[] // cutout fixtures for a specific module model
 ): { [cutoutId in CutoutId]?: CutoutFixtureId } {
   // find the first fixture for this specific module model that may mount to the cutout implied by the slotName
+  console.log('moduleFixtures: ', moduleFixtures)
   const anchorFixture = moduleFixtures.find(fixture =>
     fixture.mayMountTo.some(cutoutId => cutoutId === anchorCutoutId)
   )
+  console.log('anchorFixture: ', anchorFixture)
   if (anchorCutoutId != null && anchorFixture != null) {
     const groupedFixtures = anchorFixture.fixtureGroup[anchorCutoutId]
     return groupedFixtures?.[0] ?? { [anchorCutoutId]: anchorFixture.id }
@@ -1575,7 +1578,7 @@ export const replaceCutoutFixtureWithComboFixture = (
  * @param addressableAreaId to remove from fixture
  * @returns fixture to replace with
  */
-export const replaceCutoutFixtureRemove = (
+export const replaceCutoutFixtureForFixtureRemoval = (
   cutoutFixtureRemoved: CutoutFixtureIdsWithFakes,
   cutoutId: CutoutId,
   addressableAreaId: AddressableAreaNamesWithFakes

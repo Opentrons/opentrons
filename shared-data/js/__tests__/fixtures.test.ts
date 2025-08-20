@@ -43,7 +43,7 @@ import {
   getWasteChuteComboFixture,
   isFixtureInUsbModules,
   isModuleAllowedOnAA,
-  replaceCutoutFixtureRemove,
+  replaceCutoutFixtureForFixtureRemoval,
   replaceCutoutFixtureWithComboFixture,
 } from '../fixtures'
 import { getDeckDefFromRobotType } from '../helpers'
@@ -451,15 +451,25 @@ describe('getVisualSlotIdForAA', () => {
 
 describe('replaceCutoutFixtureRemove', () => {
   it('should get fixture replacment for FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE', () => {
-    const result = replaceCutoutFixtureRemove(
+    const result = replaceCutoutFixtureForFixtureRemoval(
       FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
       'cutoutD3',
       'magneticBlockV1D3'
     )
     expect(result).toEqual(FLEX_STACKER_V1_FIXTURE)
   })
+
+  it('should get fixture replacment for FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE without a stacker', () => {
+    const result = replaceCutoutFixtureForFixtureRemoval(
+      FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
+      'cutoutD3',
+      'flexStackerModuleV1D4'
+    )
+    expect(result).toEqual(MAGNETIC_BLOCK_V1_FIXTURE)
+  })
+
   it('should get fixture replacment for MAGNETIC_BLOCK_V1_FIXTURE', () => {
-    const result = replaceCutoutFixtureRemove(
+    const result = replaceCutoutFixtureForFixtureRemoval(
       MAGNETIC_BLOCK_V1_FIXTURE,
       'cutoutD3',
       'magneticBlockV1D3'
@@ -467,7 +477,7 @@ describe('replaceCutoutFixtureRemove', () => {
     expect(result).toEqual(SINGLE_RIGHT_SLOT_FIXTURE)
   })
   it('should get fixture replacment for FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE', () => {
-    const result = replaceCutoutFixtureRemove(
+    const result = replaceCutoutFixtureForFixtureRemoval(
       FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
       'cutoutD3',
       'flexStackerModuleV1D4'
@@ -476,7 +486,7 @@ describe('replaceCutoutFixtureRemove', () => {
   })
 
   it('should get fixture replacment for FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE when waste chute is on removed', () => {
-    const result = replaceCutoutFixtureRemove(
+    const result = replaceCutoutFixtureForFixtureRemoval(
       FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
       'cutoutD3',
       '1ChannelWasteChute'
@@ -485,7 +495,7 @@ describe('replaceCutoutFixtureRemove', () => {
   })
 
   it('should get fixture replacment for ABSORBANCE_READER_V1_FIXTURE', () => {
-    const result = replaceCutoutFixtureRemove(
+    const result = replaceCutoutFixtureForFixtureRemoval(
       ABSORBANCE_READER_V1_FIXTURE,
       'cutoutD3',
       'absorbanceReaderV1D3'
