@@ -7,9 +7,9 @@ SANDBOX_S3_BUCKET ?= sandbox.docs
 include ../scripts/python.mk
 SHX := npx shx
 
-# Sphinx build commands
-sphinx_build := $(pipenv) run sphinx-build -W --keep-going
-sphinx_build_allow_warnings := $(pipenv) run sphinx-build
+# Sphinx build commands - use pipenv from the api directory
+sphinx_build := cd ../api && $(pipenv) run sphinx-build -W --keep-going
+sphinx_build_allow_warnings := cd ../api && $(pipenv) run sphinx-build
 
 .PHONY: setup
 setup:
