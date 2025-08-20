@@ -27,6 +27,7 @@ import {
 } from '@opentrons/components'
 import {
   ABSORBANCE_READER_TYPE,
+  getIsLid,
   getIsTiprack,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
@@ -118,7 +119,8 @@ export function AddStepButton({
       labwareDef != null &&
       getSlotInLocationStack(stack) !== OFFDECK &&
       !getIsTiprack(labwareDef) &&
-      !getIsAdapterFromDef(labwareDef)
+      !getIsAdapterFromDef(labwareDef) &&
+      !getIsLid(labwareDef)
     )
   })
   const getSupportedSteps = (): Array<

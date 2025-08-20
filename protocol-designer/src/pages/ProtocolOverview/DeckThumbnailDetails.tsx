@@ -21,6 +21,7 @@ import {
   getStagingAreaAddressableAreas,
   getTopmostLabwareOnModuleFromStack,
 } from '../../utils'
+import { TIPRACK_LID_LOADNAME } from '../Designer/utils'
 import { SlotHover } from './SlotHover'
 
 import type { Dispatch, SetStateAction } from 'react'
@@ -119,7 +120,8 @@ export const DeckThumbnailDetails = (
       {allLabware.map(labware => {
         if (
           getSlotInLocationStack(labware.stack) === 'offDeck' ||
-          allModules.some(m => labware.stack.includes(m.id))
+          allModules.some(m => labware.stack.includes(m.id)) ||
+          labware.def.parameters.loadName === TIPRACK_LID_LOADNAME
         ) {
           return null
         }
