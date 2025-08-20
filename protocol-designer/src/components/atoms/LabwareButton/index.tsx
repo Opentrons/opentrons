@@ -1,4 +1,9 @@
-import { COLORS, StyledText, Tag } from '@opentrons/components'
+import { useState } from 'react'
+import clsx from 'clsx'
+
+import { StyledText, Tag } from '@opentrons/components'
+
+import styles from './labwarebutton.module.css'
 
 interface LabwareButtonProps {
   numberInStack: number
@@ -9,37 +14,32 @@ interface LabwareButtonProps {
 }
 export function LabwareButton(props: LabwareButtonProps): JSX.Element {
   const { isSelected, onClick, numberInStack, displayName, id } = props
+  //  The tagHover is annoying to keep track of state locally in this Ts component
+  //  but no other way to put it in css modules since its a tag prop
+  const [tagHover, setTagHover] = useState<boolean>(false)
+
   return (
     <button
       onClick={() => {
         onClick(id)
       }}
-      style={{
-        border: 'none',
-        borderRadius: '8px',
-        backgroundColor: isSelected ? COLORS.blue50 : COLORS.blue30,
-        cursor: 'pointer',
-      }}
+      className={clsx(styles.button, { [styles.button_active]: isSelected })}
     >
       <div
-        style={{
-          padding: '12px 16px',
-          display: 'flex',
-          gap: '4px',
-          alignItems: 'center',
+        className={styles.button_container}
+        onMouseEnter={() => {
+          setTagHover(true)
+        }}
+        onMouseLeave={() => {
+          setTagHover(false)
         }}
       >
         <Tag
-          type={isSelected ? 'onColor' : 'default'}
+          type={isSelected || tagHover ? 'onColor' : 'default'}
           text={numberInStack.toString()}
           shrinkToContent
         />
-        <StyledText
-          desktopStyle="bodyDefaultRegular"
-          color={isSelected ? COLORS.white : COLORS.black90}
-        >
-          {displayName}
-        </StyledText>
+        <StyledText desktopStyle="bodyDefaultRegular">{displayName}</StyledText>
       </div>
     </button>
   )

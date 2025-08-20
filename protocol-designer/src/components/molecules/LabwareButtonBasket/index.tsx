@@ -1,31 +1,29 @@
+import { useTranslation } from 'react-i18next'
+
 import { StyledText } from '@opentrons/components'
 
 import { LabwareButton } from '../../atoms'
+import styles from './labwarebuttonbasket.module.css'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/step-forms'
 
-interface LabwareButtonContainerProps {
+interface LabwareButtonBasketProps {
   stackOfLabware: string[]
   labware: AllTemporalPropertiesForTimelineFrame['labware']
   setSelectedLabware: Dispatch<SetStateAction<string>>
   selectedLabware: string
 }
-export function LabwareButtonContainer(
-  props: LabwareButtonContainerProps
+export function LabwareButtonBasket(
+  props: LabwareButtonBasketProps
 ): JSX.Element {
   const { stackOfLabware, labware, selectedLabware, setSelectedLabware } = props
+  const { t } = useTranslation('protocol_steps')
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '8px',
-      }}
-    >
-      <StyledText desktopStyle="captionRegular">Top of stack</StyledText>
-      <div style={{ display: 'flex', gap: '8px', flexDirection: 'column' }}>
+    <div className={styles.basket}>
+      <StyledText desktopStyle="captionRegular">{t('top_of_stack')}</StyledText>
+      <div className={styles.basket_container}>
         {stackOfLabware.map((item, index) => (
           <LabwareButton
             key={`${item}_${index}`}
@@ -39,7 +37,9 @@ export function LabwareButtonContainer(
           />
         ))}
       </div>
-      <StyledText desktopStyle="captionRegular">Bottom of Stack</StyledText>
+      <StyledText desktopStyle="captionRegular">
+        {t('bottom_of_stack')}
+      </StyledText>
     </div>
   )
 }

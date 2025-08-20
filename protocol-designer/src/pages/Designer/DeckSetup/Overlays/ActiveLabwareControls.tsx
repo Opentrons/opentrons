@@ -13,7 +13,6 @@ import {
 import { getIsLid } from '@opentrons/shared-data'
 import { getFullStackFromLabwares } from '@opentrons/step-generation'
 
-import { LabwareButtonContainer } from '/protocol-designer/components/molecules/LabwareButtonContainer'
 import { getIsWellContentsEmpty } from '/protocol-designer/components/organisms'
 import { SlotDetailModal } from '/protocol-designer/components/organisms/SlotDetailModal'
 import { END_TERMINAL_ITEM_ID } from '/protocol-designer/steplist'

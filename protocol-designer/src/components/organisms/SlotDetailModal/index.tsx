@@ -20,7 +20,6 @@ import {
   Tag,
 } from '@opentrons/components'
 import {
-  getFullStackFromLabwares,
   getLiquidIdsOnLabware,
   getSlotInLocationStack,
   getVolumesPerLiquid,
@@ -32,7 +31,7 @@ import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labw
 import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
 import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
 
-import { LabwareButtonContainer } from '../../molecules/LabwareButtonContainer'
+import { LabwareButtonBasket } from '../../molecules'
 import { WellTooltip } from '../Labware/WellTooltip'
 import { getMainPagePortalEl } from '../Portal'
 import { LiquidCardList } from './LiquidCardList'
@@ -152,7 +151,7 @@ export const SlotDetailModal = (
       >
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing24}>
           {stackOfLabware.length > 1 ? (
-            <LabwareButtonContainer
+            <LabwareButtonBasket
               stackOfLabware={stackOfLabware}
               selectedLabware={selectedLabware}
               labware={labware}

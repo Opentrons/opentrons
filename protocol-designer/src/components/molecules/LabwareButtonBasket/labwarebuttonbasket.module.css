@@ -1,0 +1,11 @@
+.basket {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.basket_container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
