@@ -7,7 +7,7 @@
   gap: var(--spacing-4);
 }
 
-.checkpoint_list {
+.list_of_children {
   display: flex;
   flex-direction: column;
   flex-grow: 1;

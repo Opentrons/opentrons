@@ -26,7 +26,7 @@ export function Checkpoint(props: PropsWithChildren<Props>): JSX.Element {
   return (
     <div className={clsx(styles.container, { [styles.active]: active })}>
       <div className={styles.ornamental_line} />
-      <ul className={styles.checkpoint_list}>{children}</ul>
+      <ul className={styles.list_of_children}>{children}</ul>
     </div>
   )
 }
