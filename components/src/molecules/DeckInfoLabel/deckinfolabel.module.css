@@ -4,6 +4,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--spacing-2) var(--spacing-4);
+  border-color: var(--black-90);
   border-width: 1px;
   border-style: solid;
   border-radius: var(--border-radius-8);
@@ -12,11 +13,11 @@
 
 .deck_info_label_highlight {
   border-color: transparent;
-  background-color: var(--color-blue50);
+  background-color: var(--blue-50);
 }
 
 .deck_info_label_no_highlight {
-  border-color: var(--color-black90);
+  border-color: var(--black-90);
 }
 
 .large {
