@@ -313,7 +313,7 @@ const getLiquidClassValues = (
     disposalByVolume,
   }).referenceVolumes
 
-  const { pushOut, airGap, flowRate, conditioning, disposal } = byVolumeLookup
+  const { pushOut, airGap, conditioning, disposal } = byVolumeLookup
 
   const aspirateState = {
     aspirateFlowRate: aspirateFlowRateFields.aspirate_flowRate ?? 0,
