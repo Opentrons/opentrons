@@ -741,6 +741,28 @@
               "type": "number"
             }
           }
+        },
+        "screwAnchoredAsParent": {
+          "description": "The labware provides a threaded hole into which a child deck item may be screwed securely.",
+          "type": "object",
+          "required": ["screwCenter"],
+          "properties": {
+            "screwCenter": {
+              "description": "The +x,-y,+z coordinate offset from the labware origin to the center of the threaded hole. The +z coordinate is zero by convention.",
+              "$ref": "#/definitions/vector3D"
+            }
+          }
+        },
+        "screwAnchoredAsChild": {
+          "description": "The labware contains a pilot hole through which the labware may be screwed securely to a parent deck item.",
+          "type": "object",
+          "required": ["screwCenter"],
+          "properties": {
+            "screwCenter": {
+              "description": "The +x,-y,+z coordinate offset from the labware origin to the center of the pilot hole. The +z coordinate is zero by convention.",
+              "$ref": "#/definitions/vector3D"
+            }
+          }
         }
       }
     },

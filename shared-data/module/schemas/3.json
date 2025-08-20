@@ -180,6 +180,17 @@
               "enum": ["backLeftBottom"]
             }
           }
+        },
+        "screwAnchoredAsParent": {
+          "description": "The module provides a threaded hole into which a child deck item may be screwed securely.",
+          "type": "object",
+          "required": ["screwCenter"],
+          "properties": {
+            "screwCenter": {
+              "description": "The +x,+y,+z coordinate offset measured from the module's X/Y labware interface dimension origin to the center of the threaded hole. The +z is 0 by convention.",
+              "$ref": "#/definitions/vector3D"
+            }
+          }
         }
       }
     },

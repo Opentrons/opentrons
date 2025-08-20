@@ -198,6 +198,14 @@ class FlatWellSupportAsChildFeature(TypedDict):
     wellExteriorBottomZ: float
 
 
+class ScrewAnchoredAsParentFeature(TypedDict):
+    screwCenter: Vector3D
+
+
+class ScrewAnchoredAsChildFeature(TypedDict):
+    screwCenter: Vector3D
+
+
 class LocatingFeatures(TypedDict):
     """A dictionary of locating features."""
 
@@ -210,6 +218,8 @@ class LocatingFeatures(TypedDict):
         HeaterShakerUniversalFlatAdapterFeature
     ]
     flatWellSupportAsChild: NotRequired[FlatWellSupportAsChildFeature]
+    screwAnchoredAsParent: NotRequired[ScrewAnchoredAsParentFeature]
+    screwAnchoredAsChild: NotRequired[ScrewAnchoredAsChildFeature]
 
 
 class LabwareDefinition2(TypedDict):
