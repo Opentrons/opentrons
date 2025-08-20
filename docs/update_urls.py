@@ -37,15 +37,40 @@ def update_urls(environment, branch=None):
         )
         print(f"Updated Python API URL to: {new_url}")
         
-    else:
-        # For staging and production, ensure it uses the production URL
-        production_url = "https://docs.opentrons.com/v2/"
+    elif environment == "staging":
+        # For staging, use the staging URL
+        staging_url = "https://staging.docs.opentrons.com/v2/"
         content = re.sub(
-            r'https://sandbox\.docs\.opentrons\.com/[^/]+/v2/',
-            production_url,
+            r'https://docs\.opentrons\.com/v2/',
+            staging_url,
             content
         )
-        print(f"Restored Python API URL to: {production_url}")
+        content = re.sub(
+            r'https://sandbox\.docs\.opentrons\.com/[^/]+/v2/',
+            staging_url,
+            content
+        )
+        print(f"Updated Python API URL to: {staging_url}")
+        
+    else:  # production
+        # For production, use relative URL since API docs are served from same domain
+        relative_url = "/v2/"
+        content = re.sub(
+            r'https://docs\.opentrons\.com/v2/',
+            relative_url,
+            content
+        )
+        content = re.sub(
+            r'https://sandbox\.docs\.opentrons\.com/[^/]+/v2/',
+            relative_url,
+            content
+        )
+        content = re.sub(
+            r'https://staging\.docs\.opentrons\.com/v2/',
+            relative_url,
+            content
+        )
+        print(f"Updated Python API URL to: {relative_url}")
     
     # Write the updated content back
     with open(index_path, 'w', encoding='utf-8') as f:
