@@ -202,9 +202,12 @@ const getStackerDefinitionsFromLoadName = (
       loadName: def.parameters.loadName,
     }))
 
-  //  TODO: remove this when we allow stacking of all labware on itself
+  //  TODO: remove this when we allow stacking of the Opentrons Tough plate on itself
   //  in PD
-  if (matchingLabwares.some(labware => labware.loadName === loadName)) {
+  if (
+    loadName === 'opentrons_96_wellplate_200ul_pcr_full_skirt' &&
+    matchingLabwares.some(labware => labware.loadName === loadName)
+  ) {
     return matchingLabwares.reduce((acc: string[], labware) => {
       if (labware.loadName !== loadName) {
         acc.push(labware.labwareDefUri)
