@@ -166,6 +166,10 @@
       "RETURN_TIP_UNAVAILABLE": {
         "title": "Return tip unavailable",
         "body": "Unable to find the most pipette's most recent pickup location for return tip."
+      },
+      "TIPRACK_LID_NOT_ALLOWED_ON_DECK": {
+        "title": "Invalid tip rack lid position",
+        "body": "The tip rack lid is not allowed directly on a deck slot"
       }
     },
     "warning": {

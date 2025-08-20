@@ -726,6 +726,7 @@ export type ErrorType =
   | 'TALL_LABWARE_EAST_WEST_OF_HEATER_SHAKER'
   | 'THERMOCYCLER_LID_CLOSED'
   | 'TIP_VOLUME_EXCEEDED'
+  | 'TIPRACK_LID_NOT_ALLOWED_ON_DECK'
 
 export interface CommandCreatorError {
   message: string
