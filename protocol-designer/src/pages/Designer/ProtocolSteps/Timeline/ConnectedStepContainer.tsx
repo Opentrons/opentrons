@@ -211,12 +211,11 @@ export function ConnectedStepContainer(
               onMouseLeave,
             }
           : {})}
-        gridGap={SPACING.spacing4}
         flexDirection={DIRECTION_COLUMN}
       >
         {dragHovered ? (
           <Divider
-            marginY="0"
+            marginY={SPACING.spacing2}
             height="0.25rem"
             width="100%"
             backgroundColor={COLORS.blue50}
