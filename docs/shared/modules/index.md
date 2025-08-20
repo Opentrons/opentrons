@@ -46,4 +46,12 @@ Opentrons hardware modules add features and capabilities to your robot.
 
     [:octicons-arrow-right-24: Instruction Manual](../thermocycler-manual/index.md)
 
+-   :opentrons-platereaderout:{ .xl .middle} __Absorbance Plate Reader__
+
+    ---
+
+    A spectrophotometer that uses light absorbance to determine sample concentrations.
+
+    [:octicons-arrow-right-24: Instruction Manual](../absorbance-plate-reader/index.md)
+
 </div>
