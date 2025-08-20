@@ -6,7 +6,7 @@ Styles to add content-dependent spacing between children within a Checkpoint.
 - Between a CheckpointStepContainer and CheckpointChip is --spacing-8.
 
 An alternative method would have been to use JS to find contiguous sequences and put a
-wrapper component around them, but that would interfere with <ul> nesting semantics.
+wrapper component around each one, but that would interfere with <ul> nesting semantics.
 */
 
 .chip + .chip,
