@@ -557,7 +557,6 @@ function StackedBadge(): JSX.Element {
         svgSize="0.875rem"
         highlight
         iconName="stacked"
-        stackingIconOverride
       />
     </RobotCoordsForeignObject>
   )

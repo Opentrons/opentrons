@@ -36,6 +36,7 @@ export function DeckInfoLabel({
       [styles.has_deck_label]: deckLabel != null,
     }
   )
+
   return (
     <div
       className={labelClass}
