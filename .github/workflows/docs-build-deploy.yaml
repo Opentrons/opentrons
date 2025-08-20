@@ -64,6 +64,10 @@ jobs:
       - name: Setup Docs Dependencies
         working-directory: ./docs
         run: make setup
+      - name: Install pipenv
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pipenv==2023.12.1
       - name: Setup API Dependencies
         working-directory: ./api
         run: make setup
