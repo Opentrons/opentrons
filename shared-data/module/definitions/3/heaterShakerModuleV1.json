@@ -7,7 +7,15 @@
     "y": 1.125,
     "z": 68.275
   },
-  "features": {},
+  "features": {
+    "screwAnchoredAsParent": {
+      "screwCenter": {
+        "x": 64,
+        "y": 43,
+        "z": 0
+      }
+    }
+  },
   "dimensions": {
     "bareOverallHeight": 82,
     "overLabwareHeight": 0,
