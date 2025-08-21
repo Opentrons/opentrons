@@ -54,7 +54,7 @@ To **dispense:**
 20. Touch tip at the blow out location
 21. Drop tip
 
-Each command may repeat some or all of these steps in order to move liquid as requested. [transfer()][opentrons.protocol_api.InstrumentContext.transfer] repeats as many times as there are wells in the longer of its `source` or `dest` arguments. Both legacy and liquid class distribute and consolidate methods try to repeat as few times as possible. See [Tip Refilling](#tip-refilling) below for how they behave when they do need to repeat.
+Each command may repeat some or all of these steps in order to move liquid as requested. [`transfer()`][opentrons.protocol_api.InstrumentContext.transfer] repeats as many times as there are wells in the longer of its `source` or `dest` arguments. Both legacy and liquid class distribute and consolidate methods try to repeat as few times as possible. See [Tip Refilling](#tip-refilling) below for how they behave when they do need to repeat.
 
 ## Example Orders
 

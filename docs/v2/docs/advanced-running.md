@@ -18,7 +18,7 @@ Once you've launched Jupyter Notebook, you can create a notebook file or edit an
 
 Jupyter Notebook is structured around cells: discrete chunks of code that can be run individually. This is nearly the opposite of Opentrons protocols, which bundle all commands into a single `run` function. Therefore, to take full advantage of Jupyter Notebook, you have to restructure your protocol.
 
-Rather than writing a `run` function and embedding commands within it, start your notebook by importing `opentrons.execute` and calling [get_protocol_api()][opentrons.execute.get_protocol_api]. This function also replaces the `metadata` block of a standalone protocol by taking the minimum [API version](versioning.md#v2-versioning) as its argument. Then you can call [ProtocolContext][opentrons.protocol_api.ProtocolContext] methods in subsequent lines or cells:
+Rather than writing a `run` function and embedding commands within it, start your notebook by importing `opentrons.execute` and calling [`get_protocol_api()`][opentrons.execute.get_protocol_api]. This function also replaces the `metadata` block of a standalone protocol by taking the minimum [API version](versioning.md#v2-versioning) as its argument. Then you can call [ProtocolContext][opentrons.protocol_api.ProtocolContext] methods in subsequent lines or cells:
 
 ```python
 import opentrons.execute
@@ -26,9 +26,9 @@ protocol = opentrons.execute.get_protocol_api("|apiLevel|")
 protocol.home()
 ```
 
-The first command you execute should always be [home()][opentrons.protocol_api.ProtocolContext.home]. If you try to execute other commands first, you will get a `MustHomeError`. (When running protocols through the Opentrons App, the robot homes automatically.)
+The first command you execute should always be [`home()`][opentrons.protocol_api.ProtocolContext.home]. If you try to execute other commands first, you will get a `MustHomeError`. (When running protocols through the Opentrons App, the robot homes automatically.)
 
-You should use the same [ProtocolContext][opentrons.protocol_api.ProtocolContext] throughout your notebook, unless you need to start over from the beginning of your protocol logic. In that case, call [get_protocol_api()][opentrons.execute.get_protocol_api] again to get a new [ProtocolContext][opentrons.protocol_api.ProtocolContext].
+You should use the same [ProtocolContext][opentrons.protocol_api.ProtocolContext] throughout your notebook, unless you need to start over from the beginning of your protocol logic. In that case, call [`get_protocol_api()`][opentrons.execute.get_protocol_api] again to get a new [ProtocolContext][opentrons.protocol_api.ProtocolContext].
 
 ### Running a Previously Written Protocol
 
@@ -59,10 +59,10 @@ For advanced control applications, do the following to calculate and apply labwa
 1. Create a "dummy" protocol that loads your labware and has each used pipette pick up a tip from a tip rack.
 2. Import the dummy protocol to the Opentrons App.
 3. Run Labware Position Check from the app or touchscreen.
-4. Add the offsets to your code with [set_offset()][opentrons.protocol_api.labware.Labware.set_offset].
+4. Add the offsets to your code with [`set_offset()`][opentrons.protocol_api.labware.Labware.set_offset].
 
 Creating the dummy protocol requires you to:
-- Use the `metadata` or `requirements` dictionary to specify the API version. (See [API versioning](versioning.md#v2-versioning) for details.) Use the same API version as you did in [get_protocol_api()][opentrons.execute.get_protocol_api].
+- Use the `metadata` or `requirements` dictionary to specify the API version. (See [API versioning](versioning.md#v2-versioning) for details.) Use the same API version as you did in [`get_protocol_api()`][opentrons.execute.get_protocol_api].
 - Define a `run()` function.
 - Load all of your labware in their initial locations.
 - Load your smallest capacity pipette and specify its `tip_racks`.
@@ -81,7 +81,7 @@ def run(protocol):
     p300.return_tip()
 ```
 
-Import your protocol in the Opentrons App. In run setup, click **Labware offsets** to run Labware Position Check and get the x, y, and z offsets for the tip rack and labware. When complete, you can click **Get Labware Offset Data** to view automatically generated code that uses [set_offset()][opentrons.protocol_api.labware.Labware.set_offset] to apply the offsets to each piece of labware.
+Import your protocol in the Opentrons App. In run setup, click **Labware offsets** to run Labware Position Check and get the x, y, and z offsets for the tip rack and labware. When complete, you can click **Get Labware Offset Data** to view automatically generated code that uses [`set_offset()`][opentrons.protocol_api.labware.Labware.set_offset] to apply the offsets to each piece of labware.
 
 ```python
 labware_1 = protocol.load_labware("opentrons_96_tiprack_300ul", location="1")
@@ -109,7 +109,7 @@ Keep in mind that `set_offset()` commands will override any labware offsets set 
 
 ## Labware Offset Behavior
 
-How the API applies labware offsets varies depending on the API level of your protocol. This section describes the latest behavior. For details on how offsets work in earlier API versions, see the API reference entry for [set_offset()][opentrons.protocol_api.labware.Labware.set_offset].
+How the API applies labware offsets varies depending on the API level of your protocol. This section describes the latest behavior. For details on how offsets work in earlier API versions, see the API reference entry for [`set_offset()`][opentrons.protocol_api.labware.Labware.set_offset].
 
 In the latest API version, labware offsets can apply to the same labware when used in different on-deck locations on the Flex. For example, if you use `set_offset()` on a tip rack, use all the tips, and replace the rack with a fresh one of the same type in any deck location on the Flex, the offsets will apply to the fresh tip rack:
 
@@ -149,7 +149,7 @@ plate.set_offset(
 
 ## Using Custom Labware
 
-If you have custom labware definitions you want to use with Jupyter, make a new directory called `labware` in Jupyter and put the definitions there. These definitions will be available when you call [load_labware()][opentrons.protocol_api.ProtocolContext.load_labware].
+If you have custom labware definitions you want to use with Jupyter, make a new directory called `labware` in Jupyter and put the definitions there. These definitions will be available when you call [`load_labware()`][opentrons.protocol_api.ProtocolContext.load_labware].
 
 ## Using Modules
 
