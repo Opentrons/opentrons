@@ -195,7 +195,6 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
               opentronsModuleSerialNumber: undefined,
             }
           }
-          // add the combo fixture calculation here
           return {
             ...cc,
             cutoutFixtureId: SINGLE_LEFT_SLOT_FIXTURE,
