@@ -297,11 +297,12 @@ export const useLabwareDropdownOptions = (
       const deckSlot = getSlotInLocationStack(
         deckSetupLabware[labwareId]?.stack
       )
+      const isOffDeck = deckSlot === 'offDeck'
       const fullStackFromLabwares = getFullStackFromLabwares(
         deckSetupLabware,
-        deckSlot
+        deckSlot,
+        labwareId
       )
-
       const isTopOfStack = fullStackFromLabwares[0] === labwareId
       const isLabwareInTrash =
         deckSlot === 'gripperWasteChute' ||
@@ -321,7 +322,7 @@ export const useLabwareDropdownOptions = (
       const isTiprack = getIsTiprack(def)
       const isLid = getIsLid(def)
       const isFilterOffDeck =
-        deckSlot === 'offDeck' &&
+        isOffDeck &&
         (type === 'labware' || (type === 'moveLabware' && useGripper))
 
       const options: DropdownOption[] =
@@ -381,7 +382,7 @@ export const getUnoccupiedStackOptions = (args: {
   return Object.entries(labwareState).reduce<Option[]>(
     (acc, [labwareId, temporalLabwareOnDeck]) => {
       const slot = getSlotInLocationStack(temporalLabwareOnDeck.stack)
-      const fullStack = getFullStackFromLabwares(labwareState, slot)
+      const fullStack = getFullStackFromLabwares(labwareState, slot, labwareId)
       const labwareOnDeck = deckSetupLabware[labwareId]
       const isTopOfStack = fullStack[0] === labwareId
       const { def: labwareOnDeckDef } = labwareOnDeck
