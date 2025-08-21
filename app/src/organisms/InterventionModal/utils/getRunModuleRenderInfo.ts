@@ -16,13 +16,18 @@ import type {
 
 export interface RunModuleInfo {
   moduleId: string
+  /**
+   * The name/ID of the slot that the module is in (on an OT-2) or replacing (on a Flex),
+   * as found in the deck definition.
+   */
+  slotName: string
   x: number
   y: number
   moduleDef: ModuleDefinition
   nestedLabwareDef: LabwareDefinition | null
   nestedLabwareId: string | null
-  targetDeckId: ComponentProps<typeof Module>['targetDeckId']
-  targetSlotId: ComponentProps<typeof Module>['targetSlotId']
+  targetDeckId: NonNullable<ComponentProps<typeof Module>['targetDeckId']>
+  targetSlotId: NonNullable<ComponentProps<typeof Module>['targetSlotId']>
 }
 
 export function getRunModuleRenderInfo(
@@ -51,6 +56,7 @@ export function getRunModuleRenderInfo(
         ...acc,
         {
           moduleId: module.id,
+          slotName,
           x: slotPosition?.[0] ?? 0,
           y: slotPosition?.[1] ?? 0,
           moduleDef,

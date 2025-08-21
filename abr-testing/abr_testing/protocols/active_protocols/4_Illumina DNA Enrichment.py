@@ -22,10 +22,12 @@ metadata = {
     "source": "Protocol Library",
 }
 
+
 requirements = {
     "robotType": "Flex",
     "apiLevel": "2.24",
 }
+
 
 # SCRIPT SETTINGS
 DRYRUN = False  # True = skip incubation times, shorten mix, for testing purposes
@@ -33,10 +35,12 @@ USE_GRIPPER = True  # True = Uses Gripper, False = Manual Move
 TIP_TRASH = False  # True = Used tips go in Trash, False = Used tips go back into rack
 HYBRID_PAUSE = True  # True = sets a pause on the Hybridization
 
+
 # PROTOCOL SETTINGS
 COLUMNS = 4  # 1-4
 HYBRIDDECK = True
 HYBRIDTIME = 1.6  # Hours
+
 
 # PROTOCOL BLOCKS
 STEP_VOLPOOL = 0
@@ -46,6 +50,7 @@ STEP_WASH = 1
 STEP_PCR = 1
 STEP_PCRDECK = 1
 STEP_CLEANUP = 1
+
 
 p200_tips = 0
 p50_tips = 0
@@ -129,7 +134,7 @@ def run(protocol: ProtocolContext) -> None:
     # ========== FOURTH ROW ==========
     tiprack_200_3 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "11")
     trash_bin = protocol.load_trash_bin("A3")
-
+    lid = protocol.load_lid_stack("custom_opentrons_tough_universal_lid", "B4", 2)
     # reagent
     AMPure = reservoir["A1"]
     SMB = reservoir["A2"]
@@ -140,6 +145,14 @@ def run(protocol: ProtocolContext) -> None:
     Liquid_trash_well_2 = reservoir["A10"]
     Liquid_trash_well_3 = reservoir["A11"]
     Liquid_trash_well_4 = reservoir["A12"]
+    reservoir.load_empty(
+        [
+            Liquid_trash_well_1,
+            Liquid_trash_well_2,
+            Liquid_trash_well_3,
+            Liquid_trash_well_4,
+        ]
+    )
     liquid_trash_list = {
         Liquid_trash_well_1: 0.0,
         Liquid_trash_well_2: 0.0,
@@ -695,7 +708,6 @@ def run(protocol: ProtocolContext) -> None:
                     p50_tips += 1
                     tipcheck()
                 protocol.move_lid(lid, reagent_plate, use_gripper=True)
-
                 # ============================================================================================
                 # GRIPPER MOVE sample_plate_2 FROM MAGPLATE TO heatershaker
                 helpers.move_labware_to_hs(
@@ -1065,6 +1077,7 @@ def run(protocol: ProtocolContext) -> None:
             Liquid_trash_well_1,
             Liquid_trash_well_2,
         ]
+        protocol.move_lid(reagent_plate, lid, use_gripper=True)
         helpers.find_liquid_height_of_all_wells(protocol, p50, liquids_to_probe_at_end)
         if deactivate_modules_bool:
             helpers.deactivate_modules(protocol)

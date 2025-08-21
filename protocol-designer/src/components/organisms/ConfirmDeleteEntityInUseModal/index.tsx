@@ -11,7 +11,8 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { HandleEnter } from '../../atoms'
+import { HandleEnter } from '/protocol-designer/components/atoms'
+
 import { getMainPagePortalEl } from '../Portal'
 
 interface ConfirmDeleteEntityInUseModalProps {

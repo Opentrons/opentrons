@@ -36,6 +36,7 @@ import {
 import {
   getCustomLiquidClassProperties,
   getLiquidClassName,
+  getPythonAssignTipRacksString,
 } from '../../utils/liquidClassUtils'
 import {
   airGapInPlace,
@@ -140,7 +141,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     touchTipAfterDispenseMmFromEdge,
     touchTipAfterDispenseOffsetMmFromTop,
     touchTipAfterDispenseSpeed,
-    stepId,
+    stepNumber,
     volume,
   } = args
   const {
@@ -344,7 +345,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       : null
 
   const pythonLiquidClassArgs = [
-    `name=${formatPyStr(`${args.commandCreatorFnName}_step_${stepId}`)}`,
+    `name=${formatPyStr(`${args.commandCreatorFnName}_step_${stepNumber}`)}`,
     ...(liquidClass != null
       ? [`base_liquid_class=${getLiquidClassName(liquidClass, true)}`]
       : []),
@@ -361,6 +362,13 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     pythonLiquidClassArgs.join(',\n')
   )},\n)`
 
+  const pythonAssignTipracks = getPythonAssignTipRacksString({
+    pipetteEntity: pipetteEntities[pipette],
+    labwareEntities,
+    labwareState: prevRobotState.labware,
+    tiprackURI: tipRack,
+  })
+
   const pythonArgs = [
     `volume=${volume}`,
     `source=[${pythonSourceWells}]`,
@@ -375,7 +383,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   ]
   const pythonCommandCreator: CurriedCommandCreator = () => ({
     commands: [],
-    python: `${pythonPipetteName}.consolidate_with_liquid_class(\n${indentPyLines(
+    python: `${pythonAssignTipracks}${pythonPipetteName}.consolidate_with_liquid_class(\n${indentPyLines(
       pythonArgs.join(',\n')
     )},\n)`,
   })

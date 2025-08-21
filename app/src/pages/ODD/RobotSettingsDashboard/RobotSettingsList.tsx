@@ -28,7 +28,10 @@ import { getRobotSettings, updateSetting } from '/app/redux/robot-settings'
 import { getRobotUpdateAvailable } from '/app/redux/robot-update'
 import { useErrorRecoverySettingsToggle } from '/app/resources/errorRecovery'
 import { useNetworkConnection } from '/app/resources/networking'
-import { useLEDLights } from '/app/resources/robot-settings'
+import {
+  useDisableStackerSensors,
+  useLEDLights,
+} from '/app/resources/robot-settings'
 
 import styles from './robotsettingslist.module.css'
 
@@ -71,6 +74,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   const isUpdateAvailable = robotUpdateType === 'upgrade'
   const devToolsOn = useSelector(getDevtoolsEnabled)
   const { lightsEnabled, toggleLights } = useLEDLights(robotName)
+  const { sensorsDisabled, toggleSensors } = useDisableStackerSensors(robotName)
   const { toggleERSettings, isEREnabled } = useErrorRecoverySettingsToggle()
 
   const appLanguage = useSelector(getAppLanguage)
@@ -199,6 +203,14 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
               updateSetting(robotName, HOME_GANTRY_SETTING_ID, !isHomeGantryOn)
             )
           }
+        />
+        <RobotSettingButton
+          settingName={t('disable_stacker_sensors')}
+          dataTestId="RobotSettingButton_disable_stacker_sensors"
+          settingInfo={t('disable_stacker_sensors_description')}
+          iconName="stacker-sensors"
+          rightElement={<OnOffToggle isOn={sensorsDisabled} />}
+          onClick={toggleSensors}
         />
         <RobotSettingButton
           settingName={t('app_settings:update_channel')}

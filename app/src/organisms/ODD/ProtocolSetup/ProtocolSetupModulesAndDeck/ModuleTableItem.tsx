@@ -14,14 +14,13 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useHost } from '@opentrons/react-api-client'
 import {
   ABSORBANCE_READER_TYPE,
   FLEX_STACKER_MODULE_TYPE,
   getFixtureDisplayName,
+  getModuleDeckLabel,
   getModuleDisplayName,
-  getModuleType,
-  TC_MODULE_LOCATION_OT3,
-  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
@@ -30,16 +29,20 @@ import { OddInfoScreen } from '/app/molecules/ODDInfoScreen'
 import { OddModal } from '/app/molecules/OddModal'
 import { useIsDoorOpen } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
-import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
+import { handleModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getModuleTooHot } from '/app/transformations/modules'
 
-import type { AttachedModule, CommandData } from '@opentrons/api-client'
+import type { TFunction } from 'i18next'
+import type {
+  AttachedModule,
+  CommandData,
+  HostConfig,
+} from '@opentrons/api-client'
 import type {
   CutoutConfig,
   CutoutFixtureId,
   DeckDefinition,
-  ModuleModel,
 } from '@opentrons/shared-data'
 import type { ModulePrepCommandsType } from '/app/local-resources/modules'
 import type { ProtocolCalibrationStatus } from '/app/resources/runs'
@@ -82,17 +85,15 @@ export const getModuleDisplayStatus = (
       return 'connected'
     }
 
-    // module is connected but instrument not calibrated
-    if (!calibrationStatus.complete) {
-      return 'calibrationBlocked'
-    }
-
     // Absorbance reader module does not require calibration
     if (
       attachedModule.moduleType !== ABSORBANCE_READER_TYPE &&
       attachedModule.moduleOffset?.last_modified == null
     ) {
-      return 'needsCalibration'
+      // check if instrument ready to perform module calibration
+      return !calibrationStatus.complete
+        ? 'calibrationBlocked'
+        : 'needsCalibration'
     }
     return 'connected'
   }
@@ -120,7 +121,12 @@ export function ModuleTableItem({
   robotName,
   comboFixtureId,
 }: ModuleTableItemProps): JSX.Element {
-  const { i18n, t } = useTranslation(['protocol_setup', 'module_wizard_flows'])
+  const { i18n, t } = useTranslation([
+    'protocol_setup',
+    'module_wizard_flows',
+    'deck_configuration',
+  ])
+  const host = useHost() as HostConfig
 
   const { makeSnackbar } = useToaster()
 
@@ -129,7 +135,11 @@ export function ModuleTableItem({
       if (getModuleTooHot(module.attachedModuleMatch)) {
         makeSnackbar(t('module_wizard_flows:module_too_hot') as string)
       } else {
-        setShowModuleWizard(true)
+        handleModuleWizardFlows({
+          attachedModule: module.attachedModuleMatch,
+          robotName,
+          host,
+        })
       }
     } else {
       makeSnackbar(t('attach_module') as string)
@@ -154,7 +164,6 @@ export function ModuleTableItem({
     calibrationStatus
   )
 
-  const [showModuleWizard, setShowModuleWizard] = useState<boolean>(false)
   const [showHomeStackerWarning, setShowHomeStackerWarning] = useState<boolean>(
     false
   )
@@ -280,28 +289,8 @@ export function ModuleTableItem({
     }
   }
 
-  const getModuleLocation = (moduleModel: ModuleModel): string => {
-    const moduleType = getModuleType(moduleModel)
-    if (moduleType === THERMOCYCLER_MODULE_TYPE) {
-      return TC_MODULE_LOCATION_OT3
-    } else if (moduleType === FLEX_STACKER_MODULE_TYPE) {
-      return `${module.slotName.charAt(0)}4`
-    } else {
-      return module.slotName
-    }
-  }
-
   return (
     <>
-      {showModuleWizard && module.attachedModuleMatch != null ? (
-        <ModuleWizardFlows
-          attachedModule={module.attachedModuleMatch}
-          closeFlow={() => {
-            setShowModuleWizard(false)
-          }}
-          robotName={robotName}
-        />
-      ) : null}
       {showLocationConflictModal && conflictedFixture != null ? (
         <LocationConflictModal
           onCloseClick={() => {
@@ -329,13 +318,16 @@ export function ModuleTableItem({
         <Flex flex="3.5 0 0" alignItems={ALIGN_CENTER}>
           <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {comboFixtureId != null
-              ? getFixtureDisplayName(comboFixtureId)
+              ? getFixtureDisplayName(t as TFunction, comboFixtureId)
               : getModuleDisplayName(module.moduleDef.model)}
           </LegacyStyledText>
         </Flex>
         <Flex alignItems={ALIGN_CENTER} flex="2 0 0">
           <DeckInfoLabel
-            deckLabel={getModuleLocation(module.moduleDef.model)}
+            deckLabel={getModuleDeckLabel(
+              module.moduleDef.moduleType,
+              module.slotName
+            )}
           />
         </Flex>
         <Flex

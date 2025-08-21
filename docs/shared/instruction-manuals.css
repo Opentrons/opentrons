@@ -3,12 +3,21 @@
 div.parts-list {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-start; 
-  gap: 5px; 
+  align-items: flex-end;
+  gap: 5px;
 }
 
 div.parts-list figure {
   width: 200px;
+}
+
+div.parts-list figure {
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  text-align: center;
 }
 
 /* Bolder darker text for parts list captions */
@@ -94,29 +103,38 @@ figure.side-by-side img {
   margin-right: 5px;
  }
 
- .status-dot.white {
+.status-dot.white {
   background-color: #F8F6F0;
-  animation: pulse-white 3s;
-  animation-iteration-count: 3;
- }
+}
 
- .status-dot.green {
+.status-dot.green {
   background-color: green;
- }
+}
 
- .status-dot.blue {
+.status-dot.blue {
   background-color: #006CFA;
- }
+}
 
- .status-dot.red {
+.status-dot.red {
   background-color: red;
- }
+}
 
- .status-dot.yellow {
+.status-dot.yellow {
   background-color: #F09D20;
- }
+}
 
- /* Aligns status dots and text if needed*/
+/* Creates dot with red to blue spectrum lines. See plate reader LED table. */
+.status-dot.rainbow {
+  background-image: linear-gradient(to right, red, orange, yellow, green, blue);
+  background-color: transparent; 
+
+/* Longitudinal split dot for two-color LEDs */
+.status-dot.yellow-red-split {
+  background-image: linear-gradient(to right, #F09D20 50%, red 50%);
+  background-color: transparent;
+}
+
+/* Aligns status dots and text if needed */
 .status-dot-container {
   display: flex;
   align-items: center;

@@ -57,8 +57,8 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
     allWellContentsForActiveItem != null
       ? allWellContentsForActiveItem[labwareId]
       : null
-  const liquidDisplayColors = liquids.map(
-    liquid => liquid.displayColor ?? COLORS.grey40
+  const liquidDisplayColors = Object.fromEntries(
+    liquids.map(liquid => [liquid.id, liquid.displayColor ?? COLORS.grey40])
   )
 
   const wellFill = wellFillFromWellContents(wellContents, liquidDisplayColors)

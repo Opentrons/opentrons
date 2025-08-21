@@ -22,6 +22,7 @@ from opentrons.protocol_engine.types import (
     StackerStoredLabwareGroup,
     ModuleModel,
     ModuleDefinition,
+    LabwareWellId,
 )
 from opentrons.types import MountType, DeckSlotName
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
@@ -65,14 +66,6 @@ Unfortunately, mypy doesn't let us write `Literal[CLEAR]`. Use this instead.
 
 
 @dataclasses.dataclass(frozen=True)
-class Well:
-    """Designates a well in a labware."""
-
-    labware_id: str
-    well_name: str
-
-
-@dataclasses.dataclass(frozen=True)
 class AddressableArea:
     """Designates an addressable area."""
 
@@ -86,7 +79,7 @@ class PipetteLocationUpdate:
     pipette_id: str
     """The ID of the already-loaded pipette."""
 
-    new_location: Well | AddressableArea | None | NoChangeType
+    new_location: LabwareWellId | AddressableArea | None | NoChangeType
     """The pipette's new logical location.
 
     Note: `new_location=None` means "change the location to `None` (unknown)",
@@ -230,6 +223,7 @@ class PipetteTipStateUpdate:
 
     pipette_id: str
     tip_geometry: TipGeometry | None
+    tip_source: LabwareWellId | None
 
 
 @dataclasses.dataclass
@@ -562,7 +556,9 @@ class StateUpdate:
         else:
             self.pipette_location = PipetteLocationUpdate(
                 pipette_id=pipette_id,
-                new_location=Well(labware_id=new_labware_id, well_name=new_well_name),
+                new_location=LabwareWellId(
+                    labware_id=new_labware_id, well_name=new_well_name
+                ),
                 new_deck_point=new_deck_point,
             )
         return self
@@ -720,11 +716,16 @@ class StateUpdate:
         return self
 
     def update_pipette_tip_state(
-        self: Self, pipette_id: str, tip_geometry: TipGeometry | None
+        self: Self,
+        pipette_id: str,
+        tip_geometry: TipGeometry | None,
+        tip_source: LabwareWellId | None,
     ) -> Self:
         """Update a pipette's tip state. See `PipetteTipStateUpdate`."""
         self.pipette_tip_state = PipetteTipStateUpdate(
-            pipette_id=pipette_id, tip_geometry=tip_geometry
+            pipette_id=pipette_id,
+            tip_geometry=tip_geometry,
+            tip_source=tip_source,
         )
         return self
 

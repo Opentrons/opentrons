@@ -107,14 +107,14 @@ describe('ReleaseLabware', () => {
       screen.getByText('The labware will be released from its current height.')
     })
 
-    it(`clicking the primary button routes to ${RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE}`, () => {
+    it(`clicking the primary button routes to ${RECOVERY_MAP.STACKER_RELEASING_LABWARE_LATCH.ROUTE}`, () => {
       render(props)
 
       clickButtonLabeled('Release')
 
       expect(mockHandleMotionRouting).toHaveBeenCalledWith(
         true,
-        RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE
+        RECOVERY_MAP.STACKER_RELEASING_LABWARE_LATCH.ROUTE
       )
     })
 

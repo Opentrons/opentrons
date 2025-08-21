@@ -119,13 +119,11 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
             targetSlotId={null}
             childrenPositioningMode="offsetToSlot"
           >
-            <>
-              <SelectedModuleLabwareRender
-                topLabwareOnDeck={matchingSelectedTopLabwareOnDeck}
-                adapterDef={selectedAdapterDef}
-                moduleModel={selectedModuleModel}
-              />
-            </>
+            <SelectedModuleLabwareRender
+              topLabwareOnDeck={matchingSelectedTopLabwareOnDeck}
+              adapterDef={selectedAdapterDef}
+              moduleModel={selectedModuleModel}
+            />
           </Module>
           {selectedModuleModel != null ? (
             <ModuleLabel

@@ -132,7 +132,7 @@ class google_sheet:
 
         requests = []
         user_entered_value: Dict[str, Any] = {}
-        if type(start_column_index) == str:
+        if isinstance(start_column_index, str):
             start_column_index = column_letter_to_index(start_column_index) - 1
 
         for col_offset, col_values in enumerate(data):

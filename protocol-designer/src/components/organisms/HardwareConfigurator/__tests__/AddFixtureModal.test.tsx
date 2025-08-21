@@ -1,16 +1,17 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
-import { editDeckConfiguration } from '../../../../step-forms/actions'
-import { getInitialDeckSetup } from '../../../../step-forms/selectors'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { editDeckConfiguration } from '/protocol-designer/step-forms/actions'
+import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
+
 import { AddFixtureModal } from '../AddFixtureModal'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('../../../../step-forms/actions')
-vi.mock('../../../../step-forms/selectors')
+vi.mock('/protocol-designer/step-forms/actions')
+vi.mock('/protocol-designer/step-forms/selectors')
 const render = (props: ComponentProps<typeof AddFixtureModal>) => {
   return renderWithProviders(<AddFixtureModal {...props} />, {
     i18nInstance: i18n,

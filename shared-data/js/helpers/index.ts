@@ -60,6 +60,7 @@ export * from './getLiquidsByIdForLabware'
 export * from './getStackedItemsOnStartingDeck'
 export * from './getStandardDeckViewLayerBlockList'
 export * from './getWellFillFromLabwareId'
+export * from './getModuleDeckLabel'
 
 export const getLabwareDefIsStandard = (def: LabwareDefinition): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE

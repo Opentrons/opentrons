@@ -24,21 +24,22 @@ import {
 
 import { SmallButton } from '/app/atoms/buttons'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
-import {
-  getFilteredDeckConfigFixtureCompatibility,
-  isConflictingFixtureConfigured,
-  isFixtureCompatible,
-} from '/app/organisms/LocationConflictModal/getFilteredDeckConfigFixtureCompatibility'
 import { NotConfiguredModal } from '/app/organisms/LocationConflictModal/NotConfiguredModal'
 import { getLocalRobot } from '/app/redux/discovery'
-import { getRequiredDeckConfig } from '/app/resources/deck_configuration/utils'
+import {
+  getFilteredDeckConfigFixtureCompatibility,
+  getRequiredDeckConfig,
+  isConflictingFixtureConfigured,
+  isFixtureCompatible,
+} from '/app/resources/deck_configuration/utils'
 
+import type { TFunction } from 'i18next'
 import type {
+  CutoutConfigAndCompatibility,
   CutoutFixtureId,
   DeckDefinition,
   RobotType,
 } from '@opentrons/shared-data'
-import type { CutoutConfigAndCompatibility } from '/app/resources/deck_configuration/hooks'
 
 interface FixtureTableProps {
   robotType: RobotType
@@ -108,7 +109,7 @@ function FixtureTableItem({
   robotName,
   partialRequiredCutoutFixtureId,
 }: FixtureTableItemProps): JSX.Element {
-  const { t, i18n } = useTranslation('protocol_setup')
+  const { t, i18n } = useTranslation(['protocol_setup', 'deck_configuration'])
 
   const [
     showLocationConflictModal,
@@ -218,9 +219,11 @@ function FixtureTableItem({
           <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {cutoutFixtureId != null && isCurrentFixtureCompatible
               ? getFixtureDisplayName(
+                  t as TFunction,
                   partialRequiredCutoutFixtureId ?? cutoutFixtureId
                 )
               : getFixtureDisplayName(
+                  t as TFunction,
                   partialRequiredCutoutFixtureId ??
                     compatibleCutoutFixtureIds?.[0]
                 )}

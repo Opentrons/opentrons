@@ -17,8 +17,8 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { FeatureFlag, Privacy } from '../../components/organisms/Settings'
-import { featureFlagsAtom } from '../../resources/atoms'
+import { FeatureFlag, Privacy } from '/ai-client/components/organisms/Settings'
+import { featureFlagsAtom } from '/ai-client/resources/atoms'
 
 const SETTINGS_MAX_WIDTH = '56rem'
 

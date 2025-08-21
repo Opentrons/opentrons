@@ -68,6 +68,7 @@ from .module import (
     ModuleOffsetData,
     StackerFillEmptyStrategy,
     StackerStoredLabwareGroup,
+    StackerLabwareMovementStrategy,
 )
 from .location import (
     DeckSlotLocation,
@@ -99,7 +100,7 @@ from .labware import (
     LegacyLabwareOffsetCreate,
     LabwareOffsetCreateInternal,
     LoadedLabware,
-    LabwareParentDefinition,
+    LabwareWellId,
 )
 from .liquid import HexColor, EmptyLiquidId, LiquidId, Liquid, FluidKind, AspiratedFluid
 from .labware_offset_location import (
@@ -129,6 +130,7 @@ from .instrument import (
     CurrentWell,
     CurrentPipetteLocation,
     InstrumentOffsetVector,
+    GripperMoveType,
 )
 from .execution import EngineStatus, PostRunHardwareState
 from .liquid_level_detection import (
@@ -145,6 +147,7 @@ from .labware_movement import LabwareMovementStrategy, LabwareMovementOffsetData
 from .tip import TipGeometry
 from .hardware_passthrough import MovementAxis, MotorAxis
 from .util import Vec3f, Dimensions
+from .tasks import Task, TaskSummary
 
 __all__ = [
     # Runtime parameters
@@ -211,6 +214,7 @@ __all__ = [
     "ModuleOffsetData",
     "StackerFillEmptyStrategy",
     "StackerStoredLabwareGroup",
+    "StackerLabwareMovementStrategy",
     # Locations of things on deck
     "DeckSlotLocation",
     "StagingSlotLocation",
@@ -252,7 +256,7 @@ __all__ = [
     "LabwareOffsetCreateInternal",
     "LoadedLabware",
     "LabwareOffsetVector",
-    "LabwareParentDefinition",
+    "LabwareWellId",
     # Liquids
     "HexColor",
     "EmptyLiquidId",
@@ -280,6 +284,7 @@ __all__ = [
     "CurrentWell",
     "CurrentPipetteLocation",
     "InstrumentOffsetVector",
+    "GripperMoveType",
     # Liquid level detection types
     "LoadedVolumeInfo",
     "ProbedHeightInfo",
@@ -303,4 +308,7 @@ __all__ = [
     "Dimensions",
     # Convenience re-export
     "LabwareUri",
+    # Tasks
+    "Task",
+    "TaskSummary",
 ]

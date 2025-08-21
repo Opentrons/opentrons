@@ -1,0 +1,108 @@
+site_name: flex
+
+nav:
+  - index.md
+  - Preface: preface.md
+  - Introduction: introduction.md
+  - Safety and Regulatory Information: safety-regulatory.md
+  - Installation and Relocation: 
+      - Installation Home: installation/index.md
+      - Installation Requirements: installation/requirements.md
+      - Unboxing: installation/unboxing.md
+      - First Run: installation/first-run.md
+      - Instrument Setup: installation/instruments.md
+      - Relocation: installation/relocation.md
+  - System Description:
+      - System Description Home: system-description/index.md
+      - Robot Components: system-description/robot.md
+      - Pipettes: system-description/pipettes.md
+      - Gripper: system-description/gripper.md
+      - Emergency Stop Pendant: system-description/e-stop.md
+      - Connections: system-description/connections.md
+      - System Specifications: system-description/specs.md
+  - Modules: 
+      - Modules Home: modules/index.md
+      - Caddy System: modules/caddy.md
+      - Module Calibration: modules/calibration.md
+      - Absorbance Plate Reader: modules/absorbance-plate-reader.md
+      - Heater-Shaker: modules/heater-shaker.md
+      - HEPA/UV Module: modules/hepa-uv.md
+      - Magnetic Block: modules/magnetic-block.md
+      - Temperature Module: modules/temperature.md
+      - Thermocycler: modules/thermocycler.md
+  - Labware: 
+      - Labware Home: labware/index.md
+      - Labware Concepts: labware/concepts.md
+      - Labware Types: labware/types.md
+      - Using the Gripper: labware/gripper.md
+      - Labware Definitions: labware/definitions.md
+  - Protocol Development: 
+      - Protocols Home: protocols/index.md
+      - Protocol Library: protocols/library.md
+      - Custom Protocol Service: protocols/development-service.md
+      - Protocol Designer: protocols/designer.md
+      - Python API: protocols/python-api.md
+      - Converting OT-2 Protocols: protocols/ot-2.md
+  - Touchscreen: 
+      - Touchscreen Home: touchscreen/index.md
+      - Dashboard: touchscreen/dashboard.md
+      - Deck Configuration: touchscreen/deck-config.md
+      - Protocol Management: touchscreen/protocol-management.md
+      - Protocol Details: touchscreen/protocol-details.md
+      - Protocol Setup: touchscreen/protocol-setup.md
+      - Protocol Run: touchscreen/protocol-run.md
+      - Quick Transfer: touchscreen/quick-transfer.md
+      - Instruments: touchscreen/instruments.md
+      - Settings: touchscreen/settings.md
+  - Opentrons App: opentrons-app.md
+  - Advanced Operation: advanced-operation.md
+  - Maintenance: 
+      - Maintenance Home: maintenance/index.md
+      - Cleaning: maintenance/cleaning.md
+      - Service: maintenance/service.md
+  - Appendices:
+      - Glossary: glossary.md
+      - Additional Documentation: additional-docs.md
+      - Open-Source Software: open-source.md
+      - Support and Contact Information: support.md
+
+theme:
+  name: material
+  palette:
+    primary: custom
+    accent: custom
+  features:
+    - navigation.indexes
+  logo: images/opentrons-droplet-white.svg
+  favicon: images/opentrons-droplet-color.svg
+  icon:
+    admonition:
+      tip: material/lightbulb-on-outline
+
+plugins:
+  - search
+  - autorefs
+  - parent-css
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.inlinehilite
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: true
+      pygments_lang_class: true
+  - pymdownx.superfences
+  - sane_lists
+  - toc:
+      permalink: true
+
+extra_css:
+  - manual.css
+  - ../opentrons-theme.css
+
+copyright: '© Opentrons 2025. All rights reserved. <br /> Trademarks: Opentrons®, Opentrons drop logo (Opentrons Labworks, Inc.). <br /> Registered names, trademarks, etc. used in this document, even when not specifically marked as such, are not to be considered unprotected by law.'

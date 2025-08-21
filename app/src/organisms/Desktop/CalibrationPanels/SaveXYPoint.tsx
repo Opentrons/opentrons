@@ -42,7 +42,6 @@ import { formatJogVector } from './utils'
 import type { Mount } from '@opentrons/components'
 import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
 import type {
-  CalibrationLabware,
   CalibrationSessionStep,
   SessionCommandString,
   SessionType,
@@ -50,7 +49,7 @@ import type {
 import type { CalibrationPanelProps } from './types'
 
 const assetMap: Record<
-  CalibrationLabware['slot'],
+  string,
   Record<Mount, Record<'multi' | 'single', string>>
 > = {
   '1': {

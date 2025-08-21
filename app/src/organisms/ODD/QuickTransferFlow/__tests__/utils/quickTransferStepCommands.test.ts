@@ -6,7 +6,10 @@ import {
   fixtureTiprack1000ul,
   POSITION_REFERENCE_BOTTOM,
 } from '@opentrons/shared-data'
-import { SOURCE_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
+import {
+  CLEAN,
+  SOURCE_WELL_BLOWOUT_DESTINATION,
+} from '@opentrons/step-generation'
 
 import { quickTransferStepCommands } from '../../utils/pythonDef'
 
@@ -85,8 +88,8 @@ const mockRobotState: TimelineFrame = {
   tipState: {
     tipracks: {
       mockTiprack: {
-        A1: true,
-        B1: true,
+        A1: CLEAN,
+        B1: CLEAN,
       },
     },
     pipettes: {
@@ -120,7 +123,7 @@ const mockRobotState: TimelineFrame = {
 describe('quickTransferStepCommands', () => {
   it('should generate a transfer step in py', () => {
     const mockStepArgs: TransferArgs = {
-      stepId: 1,
+      stepNumber: 1,
       commandCreatorFnName: 'transfer',
       sourceWells: ['A1'],
       destWells: ['B1'],
@@ -273,7 +276,7 @@ pipette.drop_tip()`.trimStart()
   })
   it('should generate a consolidate step in py', () => {
     const mockStepArgs: ConsolidateArgs = {
-      stepId: 1,
+      stepNumber: 1,
       commandCreatorFnName: 'consolidate',
       sourceWells: ['A1', 'B1'],
       destWell: 'B1',
@@ -426,7 +429,7 @@ pipette.drop_tip()`.trimStart()
   })
   it('should generate a distribute step in py', () => {
     const mockStepArgs: DistributeArgs = {
-      stepId: 1,
+      stepNumber: 1,
       commandCreatorFnName: 'distribute',
       sourceWell: 'A1',
       destWells: ['A1', 'B1'],

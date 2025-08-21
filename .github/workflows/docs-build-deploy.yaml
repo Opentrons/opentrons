@@ -20,7 +20,7 @@ defaults:
     shell: bash
 
 jobs:
-  sandbox-build-and-deploy-flex-manual:
+  sandbox-build-and-deploy-mkdocs-site:
     timeout-minutes: 5
     runs-on: 'ubuntu-24.04'
     permissions:
@@ -45,13 +45,13 @@ jobs:
       - name: Sync the project
         working-directory: ./docs
         run: make setup
-      - name: Build Flex Manual
+      - name: Build Docs Site
         working-directory: ./docs
-        run: make build-flex-manual
-      - name: Deploy Flex Manual to Sandbox
+        run: make build
+      - name: Deploy Docs Site to Sandbox
         working-directory: ./docs
-        run: make deploy-flex-manual BRANCH=${{ env.BRANCH }}
+        run: make deploy BRANCH=${{ env.BRANCH }}
       - name: Output URL to Summary
         run: |
-          echo "## Flex Manual deployed to sandbox" >> $GITHUB_STEP_SUMMARY
-          echo "<http://sandbox.docs.s3-website.us-east-2.amazonaws.com/${{ env.BRANCH }}/flex-manual/>" >> $GITHUB_STEP_SUMMARY
+          echo "## Docs site deployed to sandbox" >> $GITHUB_STEP_SUMMARY
+          echo "<http://sandbox.docs.s3-website.us-east-2.amazonaws.com/${{ env.BRANCH }}/>" >> $GITHUB_STEP_SUMMARY

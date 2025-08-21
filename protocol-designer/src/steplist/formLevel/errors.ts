@@ -495,13 +495,6 @@ const CONDITIONING_VOLUME_OUT_OF_RANGE: FormError = {
   page: 2,
   tab: 'aspirate',
 }
-const VOLUME_OUT_OF_RANGE: FormError = {
-  title: RANGE_TITLE,
-  dependentFields: ['volume'],
-  location: 'field',
-  page: 0,
-  showOnReopen: true,
-}
 const VOLUME_UNDER_MINIMUM: FormError = {
   title: RANGE_TITLE,
   dependentFields: ['volume'],
@@ -1450,38 +1443,6 @@ export const getIsOutOfRange = (
 ): boolean => {
   const castValue = Number(value)
   return castValue < min || castValue > max
-}
-
-export const transferVolumeMax = (
-  fields: HydratedMoveLiquidFormData | HydratedMixFormData
-): FormError | null => {
-  let labware
-  if (
-    'dispense_labware' in fields &&
-    fields.dispense_labware != null &&
-    fields.stepType === 'moveLiquid'
-  ) {
-    labware = fields.dispense_labware
-  } else if (
-    'labware' in fields &&
-    fields.labware != null &&
-    fields.stepType === 'mix'
-  ) {
-    labware = fields.labware
-  }
-
-  if (labware == null) {
-    return null
-  }
-
-  const dispenseLabwareMaxVolume =
-    'def' in labware ? labware.def?.wells.A1.totalLiquidVolume : null
-
-  return dispenseLabwareMaxVolume != null &&
-    typeof fields.volume === 'string' &&
-    parseInt(fields.volume) > dispenseLabwareMaxVolume
-    ? VOLUME_OUT_OF_RANGE
-    : null
 }
 
 export const transferVolumeMin = (

@@ -1,4 +1,7 @@
-import type { ModuleOnDeck, SavedStepFormState } from '../../../step-forms'
+import type {
+  ModuleOnDeck,
+  SavedStepFormState,
+} from '/protocol-designer/step-forms'
 
 interface ModuleOnSlot {
   isModuleInUse: boolean

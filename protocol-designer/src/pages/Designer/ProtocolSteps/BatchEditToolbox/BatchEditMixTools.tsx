@@ -13,7 +13,8 @@ import {
 import {
   CheckboxExpandStepFormField,
   InputStepFormField,
-} from '../../../../components/molecules'
+} from '/protocol-designer/components/molecules'
+
 import {
   BlowoutLocationField,
   FlowRateField,
@@ -25,7 +26,7 @@ import {
   getLabwareFieldForPositioningField,
 } from '../StepForm/utils'
 
-import type { WellOrderOption } from '../../../../form-types'
+import type { WellOrderOption } from '/protocol-designer/form-types'
 import type { FieldPropsByName, LiquidHandlingTab } from '../StepForm/types'
 
 interface BatchEditMixToolsProps {

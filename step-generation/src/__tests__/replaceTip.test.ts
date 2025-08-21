@@ -3,17 +3,19 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import {
   COLUMN,
+  fixture96Plate,
   fixtureTiprack300ul,
   fixtureTiprack1000ul,
   getLabwareDefURI,
 } from '@opentrons/shared-data'
 
 import { replaceTip } from '../commandCreators/compound/replaceTip'
-import { FIXED_TRASH_ID } from '../constants'
+import { EMPTY, FIXED_TRASH_ID } from '../constants'
 import {
   DEFAULT_PIPETTE,
   dropTipHelper,
   dropTipInPlaceHelper,
+  getErrorResult,
   getInitialRobotStateStandard,
   getSuccessResult,
   getTipColumn,
@@ -31,6 +33,7 @@ const tiprack1Id = 'tiprack1Id'
 const tiprack2Id = 'tiprack2Id'
 const tiprack4Id = 'tiprack4Id'
 const tiprack5Id = 'tiprack5Id'
+const lidId = 'lid1'
 const tiprackURI1 = getLabwareDefURI(fixtureTiprack300ul as LabwareDefinition2)
 const tiprackURI2 = getLabwareDefURI(fixtureTiprack1000ul as LabwareDefinition2)
 const p300SingleId = DEFAULT_PIPETTE
@@ -58,6 +61,53 @@ describe('replaceTip', () => {
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([pickUpTipHelper(0)])
     })
+    it('replace tip but tiprack has a lid', () => {
+      initialRobotState = {
+        ...initialRobotState,
+        labware: {
+          [tiprackURI1]: {
+            stack: [tiprackURI1, '1'],
+          },
+          [lidId]: {
+            stack: [tiprackURI1, '1'],
+          },
+        },
+      }
+      invariantContext = {
+        ...invariantContext,
+        labwareEntities: {
+          [tiprackURI1]: {
+            id: tiprackURI1,
+            def: {
+              ...fixtureTiprack300ul,
+            } as LabwareDefinition2,
+            labwareDefURI: 'fixture/fixture_tiprack_300_ul/1',
+            pythonName: 'mock_lid_python_name',
+          },
+          [lidId]: {
+            id: lidId,
+            def: {
+              ...fixture96Plate,
+              allowedRoles: ['lid'],
+            } as LabwareDefinition2,
+            labwareDefURI: 'mockURI',
+            pythonName: 'mock_lid_python_name',
+          },
+        },
+      }
+      const result = replaceTip(
+        {
+          pipette: p300SingleId,
+          dropTipLocation: FIXED_TRASH_ID,
+          tipRack: tiprackURI1,
+        },
+        invariantContext,
+        initialRobotState
+      )
+      expect(getErrorResult(result).errors[0]).toMatchObject({
+        type: 'NEXT_TIPRACK_HAS_LID',
+      })
+    })
     it('Single-channel: second tip B1', () => {
       const result = replaceTip(
         {
@@ -70,7 +120,7 @@ describe('replaceTip', () => {
           tipState: {
             tipracks: {
               [tiprack1Id]: {
-                A1: false,
+                A1: EMPTY,
               },
             },
             pipettes: {
@@ -86,7 +136,7 @@ describe('replaceTip', () => {
       const initialTestRobotState = merge({}, initialRobotState, {
         tipState: {
           tipracks: {
-            [tiprack1Id]: getTipColumn(1, false),
+            [tiprack1Id]: getTipColumn(1, EMPTY),
           },
           pipettes: {
             p300SingleId: { hasTip: false },
@@ -110,7 +160,7 @@ describe('replaceTip', () => {
         tipState: {
           tipracks: {
             [tiprack1Id]: {
-              A1: false,
+              A1: EMPTY,
             },
           },
           pipettes: {
@@ -138,7 +188,7 @@ describe('replaceTip', () => {
         tipState: {
           tipracks: {
             [tiprack1Id]: {
-              A1: false,
+              A1: EMPTY,
             },
           },
           pipettes: {
@@ -218,7 +268,7 @@ describe('replaceTip', () => {
         tipState: {
           tipracks: {
             [tiprack1Id]: {
-              A1: false,
+              A1: EMPTY,
             },
           },
           pipettes: {
@@ -267,7 +317,10 @@ describe('replaceTip', () => {
         tipState: {
           ...initialRobotState.tipState,
           tipracks: {
-            [tiprack1Id]: { ...getTiprackTipstate(true), A1: false },
+            [tiprack1Id]: {
+              ...getTiprackTipstate(true),
+              A1: EMPTY,
+            },
             [tiprack2Id]: getTiprackTipstate(true),
           },
         },

@@ -463,7 +463,7 @@ class ProtocolContext(CommandPublisher):
         :param lid: A lid to load on the top of the main labware. Accepts the same
             values as the ``load_name`` parameter of :py:meth:`.load_lid_stack`. The
             lid will use the same namespace as the labware, and the API will
-            choose the adapter's version automatically.
+            choose the lid's version automatically.
 
                         .. versionadded:: 2.23
         """
@@ -1092,6 +1092,7 @@ class ProtocolContext(CommandPublisher):
             tip_racks=tip_racks,
             trash=trash,
             requested_as=instrument_name,
+            core_map=self._core_map,
         )
 
         self._instruments[checked_mount] = instrument

@@ -17,8 +17,9 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { getRobotType } from '../../../../file-data/selectors'
-import { getInitialDeckSetup } from '../../../../step-forms/selectors'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
+import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
+
 import { getFlexHoverDimensions, getOT2HoverDimensions } from '../utils'
 
 import type { MutableRefObject, ReactNode } from 'react'

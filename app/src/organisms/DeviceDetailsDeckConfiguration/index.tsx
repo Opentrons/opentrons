@@ -116,7 +116,7 @@ export function DeviceDetailsDeckConfiguration({
           addressableAreaId,
           deckDef,
           t as TFunction
-        ) ?? getFixtureDisplayName(cutoutFixtureId)
+        ) ?? getFixtureDisplayName(t as TFunction, cutoutFixtureId)
       const fixtureGroup =
         deckDef.cutoutFixtures.find(cf => cf.id === cutoutFixtureId)
           ?.fixtureGroup ?? {}
@@ -146,6 +146,7 @@ export function DeviceDetailsDeckConfiguration({
         cutoutFixtureId,
         addressableAreaId
       )
+
       return {
         ...acc,
         displayList: [

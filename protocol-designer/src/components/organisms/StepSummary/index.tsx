@@ -13,7 +13,9 @@ import {
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 
-import { formatTime } from '../../../pages/Designer/utils'
+import { LINE_CLAMP_TEXT_STYLE } from '/protocol-designer/components/atoms'
+import { formatTime } from '/protocol-designer/pages/Designer/utils'
+
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
@@ -22,14 +24,13 @@ import {
 } from '../../../step-forms/selectors'
 import { getRobotStateAtActiveItem } from '../../../top-selectors/labware-locations'
 import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
-import { LINE_CLAMP_TEXT_STYLE } from '../../atoms'
 import { AbsorbanceReaderSummary } from './AbsorbanceReaderSummary'
 import { MixSummary } from './MixSummary'
 import { MoveLiquidSummary } from './MoveLiquidSummary'
 import { StyledTrans } from './StyledTrans'
 import styles from './summary.module.css'
 
-import type { FormData } from '../../../form-types'
+import type { FormData } from '/protocol-designer/form-types'
 
 interface StepSummaryProps {
   currentStep: FormData | null

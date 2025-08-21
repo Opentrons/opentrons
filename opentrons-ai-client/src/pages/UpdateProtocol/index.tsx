@@ -18,9 +18,9 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { TextAreaField } from '/ai-client/atoms/TextAreaField'
-import { FileUpload } from '/ai-client/molecules/FileUpload'
-import { UploadInput } from '/ai-client/molecules/UploadInput'
+import { TextAreaField } from '/ai-client/components/atoms/TextAreaField'
+import { FileUpload } from '/ai-client/components/molecules/FileUpload'
+import { UploadInput } from '/ai-client/components/molecules/UploadInput'
 import {
   chatDataAtom,
   chatHistoryAtom,

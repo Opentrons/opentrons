@@ -202,8 +202,8 @@ describe('TwoColLwInfoAndDeck', () => {
     props.currentRecoveryOptionUtils.selectedRecoveryOption =
       RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE
     props.deckMapUtils = {
-      movedLabwareDef: null,
-      moduleRenderInfo: null,
+      currentLoc: null,
+      newLoc: null,
       labwareRenderInfo: null,
     } as any
 

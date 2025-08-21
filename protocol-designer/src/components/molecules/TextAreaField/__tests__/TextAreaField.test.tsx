@@ -1,8 +1,9 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+
 import { TextAreaField } from '..'
-import { renderWithProviders } from '../../../../__testing-utils__'
 
 import type { ComponentProps } from 'react'
 

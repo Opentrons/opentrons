@@ -1,6 +1,7 @@
 import {
   ABSORBANCE_READER_TYPE,
   FLEX_ROBOT_TYPE,
+  FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
   getIsLid,
   HEATERSHAKER_MODULE_TYPE,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
@@ -36,7 +37,10 @@ import type {
   CommandCreator,
   CommandCreatorError,
   CommandCreatorWarning,
+  ModuleState,
 } from '../../types'
+
+export const TIPRACK_LID_LOADNAME = 'opentrons_flex_tiprack_lid'
 
 /** Move labware from one location to another, manually or via a gripper. */
 export const moveLabware: CommandCreator<MoveLabwareParams> = (
@@ -114,7 +118,13 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
       ? getSlotInLocationStack(prevRobotState.labware[labwareId].stack)
       : null
 
-  if (hasWasteChute && initialLabwareSlot === 'gripperWasteChute') {
+  if (
+    (hasWasteChute && initialLabwareSlot === 'gripperWasteChute') ||
+    MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(
+      initialLabwareSlot as AddressableAreaName
+    ) ||
+    initialLabwareSlot === 'fixedTrash'
+  ) {
     errors.push(errorCreators.labwareDiscarded())
   }
   const initialAdapterSlot =
@@ -125,10 +135,25 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
   const initialSlot =
     initialAdapterSlot != null ? initialAdapterSlot : initialLabwareSlot
 
-  const initialModuleState =
-    initialSlot != null
-      ? prevRobotState.modules[initialSlot]?.moduleState
-      : null
+  const getModuleStateFromSlotOrId = (
+    identifier: string | null
+  ): ModuleState | null => {
+    if (identifier == null) {
+      return null
+    } else if (identifier in prevRobotState.modules) {
+      // identifier is a module id
+      return prevRobotState.modules[identifier].moduleState
+    } else {
+      // identifier is a slot name
+      return (
+        Object.values(prevRobotState.modules).find(
+          ({ slot }) => slot === identifier
+        )?.moduleState ?? null
+      )
+    }
+  }
+
+  const initialModuleState = getModuleStateFromSlotOrId(initialSlot)
   if (initialModuleState != null) {
     if (
       initialModuleState.type === THERMOCYCLER_MODULE_TYPE &&
@@ -181,13 +206,8 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
     warnings.push(warningCreators.labwareInWasteChuteHasLiquid())
   }
 
-  if (
-    destinationModuleIdOrSlot != null &&
-    prevRobotState.modules[destinationModuleIdOrSlot] != null
-  ) {
-    const destModuleState =
-      prevRobotState.modules[destinationModuleIdOrSlot].moduleState
-
+  const destModuleState = getModuleStateFromSlotOrId(destinationModuleIdOrSlot)
+  if (destModuleState != null) {
     if (
       destModuleState.type === THERMOCYCLER_MODULE_TYPE &&
       destModuleState.lidOpen !== true
@@ -206,13 +226,27 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
       }
     }
   }
+  const isLabwareIdATiprackLid =
+    labwareEntities[labwareId]?.def.parameters.loadName === TIPRACK_LID_LOADNAME
+  if (
+    isLabwareIdATiprackLid &&
+    newLocation != null &&
+    newLocation !== 'offDeck' &&
+    newLocation !== 'systemLocation' &&
+    ('slotName' in newLocation ||
+      ('addressableAreaName' in newLocation &&
+        FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS.includes(
+          newLocation.addressableAreaName as AddressableAreaName
+        )))
+  ) {
+    errors.push(errorCreators.tipRackLidNotAllowedOnDeck())
+  }
 
   const params = {
     labwareId,
     strategy,
     newLocation,
   }
-
   const commands: CreateCommand[] = [
     {
       commandType: 'moveLabware',

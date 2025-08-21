@@ -12,7 +12,7 @@
   "change_robot_movement": "Change how the robot moves from well to well.",
   "close": "Close",
   "confirm_import": "Are you sure you want to upload this protocol?",
-  "confirm_reorder": "Are you sure you want to reorder these steps, it may cause errors?",
+  "confirm_reorder": "Are you sure you want to reorder these steps? It may cause errors.",
   "confirm": "Confirm",
   "consent_to_eula": "By using Protocol Designer, you consent to the Opentrons <link1>EULA</link1>.",
   "continue_with_export": "Continue with export",
