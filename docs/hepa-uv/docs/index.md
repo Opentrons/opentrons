@@ -5,7 +5,7 @@ hide: toc
 
 <div style="text-align: center;" markdown>
 
-![HEPA/UV Module hero image](images/hepa-uv-hero.png){width="90%"}
+![HEPA/UV Module hero image](images/hepa-cover-hero.png)
 
 **Opentrons Labworks Inc.**<br>
 July 2024
