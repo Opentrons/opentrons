@@ -5,8 +5,9 @@ from automation.data.protocol_with_overrides import ProtocolWithOverrides
 
 
 class ProtocolsWithOverrides:
-    Flex_2_25_96_all_module_LC_Stacker_Overrride: ProtocolWithOverrides = ProtocolWithOverrides(
-        file_stem="Flex_2_25_96_all_module_LC_Stacker_Overrride",
+    ## analyses-snapshot-testing/files/protocols/generators/Flex_2_25_S_96_all_module_LC_Stacker_Overrride.py
+    Flex_2_25_S_96_all_module_LC_Stacker_Overrride: ProtocolWithOverrides = ProtocolWithOverrides(
+        file_stem="Flex_2_25_S_96_all_module_LC_Stacker_Overrride",
         file_extension="py",
         robot="Flex",
         override_variable_name="key",
