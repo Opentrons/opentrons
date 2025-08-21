@@ -144,6 +144,16 @@ jobs:
         with:
           name: docs-artifacts
           path: docs/
+      - name: Debug Site Directory
+        working-directory: ./docs
+        run: |
+          echo "Current directory: $(pwd)"
+          echo "Contents of current directory:"
+          ls -la
+          echo "Contents of site directory (if it exists):"
+          ls -la site/ || echo "site/ directory does not exist"
+          echo "Looking for index.html files:"
+          find . -name "index.html" -type f || echo "No index.html files found"
       - name: Update URLs
         working-directory: ./docs
         run: python update_urls.py ${{ env.ENVIRONMENT }} --branch ${{ env.BRANCH }}
