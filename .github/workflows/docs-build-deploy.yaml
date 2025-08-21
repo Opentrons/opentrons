@@ -130,10 +130,18 @@ jobs:
     steps:
       - name: 'Checkout Repository'
         uses: actions/checkout@v4
+      - name: Debug Environment Variables
+        run: |
+          echo "ENVIRONMENT: ${{ env.ENVIRONMENT }}"
+          echo "BRANCH: ${{ env.BRANCH }}"
+          echo "BUCKET: ${{ env.BUCKET }}"
+          echo "URL: ${{ env.URL }}"
+          echo "AWS_ROLE: ${{ env.AWS_ROLE }}"
+          echo "AWS_ROLE from outputs: ${{ needs.determine-deploy-config.outputs.aws-role }}"
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ env.AWS_ROLE }}
+          role-to-assume: ${{ needs.determine-deploy-config.outputs.aws-role }}
           aws-region: us-east-2
       - name: Download Artifacts
         uses: actions/download-artifact@v4
