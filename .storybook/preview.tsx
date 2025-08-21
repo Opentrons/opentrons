@@ -1,5 +1,8 @@
 import { I18nextProvider } from 'react-i18next'
 
+import '../components/src/styles/global.css'
+
+// ToDo (kk: 08/20/2025) once we migrate global style, remove the following import
 import { GlobalStyle } from '../app/src/atoms/GlobalStyle'
 import { i18n } from '../app/src/i18n'
 

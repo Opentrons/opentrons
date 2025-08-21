@@ -5303,6 +5303,12 @@
       "title": "StackerFillEmptyStrategy",
       "type": "string"
     },
+    "StackerLabwareMovementStrategy": {
+      "description": "Strategy to retrieve or store labware.",
+      "enum": ["automatic", "manual"],
+      "title": "StackerLabwareMovementStrategy",
+      "type": "string"
+    },
     "StackerStoredLabwareDetails": {
       "description": "The parameters defining a labware to be stored in the stacker.",
       "properties": {
@@ -5388,9 +5394,13 @@
           "description": "Unique ID of the flex stacker.",
           "title": "Moduleid",
           "type": "string"
+        },
+        "strategy": {
+          "$ref": "#/$defs/StackerLabwareMovementStrategy",
+          "description": "If manual, indicates that labware has been moved to the hopper manually by the user, as required in error recovery."
         }
       },
-      "required": ["moduleId"],
+      "required": ["moduleId", "strategy"],
       "title": "StoreParams",
       "type": "object"
     },

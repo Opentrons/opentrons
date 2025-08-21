@@ -2,8 +2,6 @@
 title: "Heater-Shaker Module: OT-2 Installation Instructions"
 ---
 
-# OT-2 Installation Instructions
-
 To install the Heater-Shaker on your OT-2:
 
 <div class="instruction-list" markdown>

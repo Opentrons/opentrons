@@ -6,6 +6,7 @@ import {
   BORDERS,
   COLORS,
   DeckFromLayers,
+  FixedTrashText,
   Flex,
   FlexTrash,
   JUSTIFY_CENTER,
@@ -28,7 +29,6 @@ import {
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 
-import { FixedTrashText } from '../../components/molecules'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { DeckThumbnailDetails } from './DeckThumbnailDetails'
 

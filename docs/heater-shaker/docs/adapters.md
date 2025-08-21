@@ -2,8 +2,6 @@
 title: "Heater-Shaker Module: Thermal Adapters"
 ---
 
-# Thermal Adapters
-
 Aluminum thermal adapters help transfer heat from the Heater-Shaker to attached labware. The module comes with your choice of a universal flat adapter, a PCR well plate adapter, a 96-well flat bottom adapter, or a deep well adapter. You can also purchase additional adapters directly from the [modules section](https://opentrons.com/products/categories/modules) of the Opentrons website.
 
 ![Universal adapter, PCR adapter, flat bottom adapater, deep well adapter images](images/thermal-adapters.png)

@@ -41,7 +41,6 @@ describe('AppInfo', () => {
     const windowOpenButton = screen.getByRole('button', {
       name: 'Software manual',
     })
-    screen.debug(windowOpenButton)
     fireEvent.click(windowOpenButton)
     expect(window.open).toHaveBeenCalledWith(DOC_URL, '_blank')
     screen.getByRole('button', { name: 'Release notes' })

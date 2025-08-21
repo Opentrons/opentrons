@@ -90,7 +90,6 @@ export function EditInstrumentsModal(
     } else {
       setPage('overview')
       editPipettes(
-        labware,
         pipettes,
         orderedStepIds,
         dispatch,

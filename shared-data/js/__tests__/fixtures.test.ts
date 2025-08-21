@@ -32,6 +32,7 @@ import {
   getCutoutConfigReplacmentForModule,
   getCutoutFixtureReplacementIfNeeded,
   getFixtureDisplayName,
+  getFlexStackerD3Compatibility,
   getMainAAForAFixture,
   getMainNonComboFixtureId,
   getMainUsbModuleFixtureIdForComboFixture,
@@ -473,6 +474,16 @@ describe('replaceCutoutFixtureRemove', () => {
     )
     expect(result).toEqual(WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE)
   })
+
+  it('should get fixture replacment for FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE when waste chute is on removed', () => {
+    const result = replaceCutoutFixtureRemove(
+      FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+      'cutoutD3',
+      '1ChannelWasteChute'
+    )
+    expect(result).toEqual(FLEX_STACKER_V1_FIXTURE)
+  })
+
   it('should get fixture replacment for ABSORBANCE_READER_V1_FIXTURE', () => {
     const result = replaceCutoutFixtureRemove(
       ABSORBANCE_READER_V1_FIXTURE,
@@ -851,6 +862,29 @@ describe('getWasteChuteComboFixture', () => {
     })
   })
 
+  it('Should get a none covered waste chute', () => {
+    const result = getWasteChuteComboFixture(
+      {
+        addressableAreaId: 'flexStackerModuleV1D4',
+        cutoutFixtureId: FLEX_STACKER_V1_FIXTURE,
+        cutoutId: 'cutoutD3',
+        opentronsModuleSerialNumber: '123',
+      },
+      [
+        {
+          cutoutId: 'cutoutD3',
+          cutoutFixtureId: FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT_FIXTURE,
+          addressableAreaId: '1ChannelWasteChute',
+        },
+      ]
+    )
+    expect(result).toEqual({
+      cutoutFixtureId: FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+      cutoutId: 'cutoutD3',
+      opentronsModuleSerialNumber: '123',
+    })
+  })
+
   it('Should get a none covered waste chute when stacker is on deck', () => {
     const result = getWasteChuteComboFixture(
       {
@@ -895,5 +929,54 @@ describe('getWasteChuteComboFixture', () => {
       cutoutId: 'cutoutD3',
       opentronsModuleSerialNumber: '123',
     })
+  })
+})
+
+describe('getFlexStackerD3Compatibility', () => {
+  it('should return a conflict and flex stacker fixture', () => {
+    const result = getFlexStackerD3Compatibility([
+      {
+        cutoutId: 'cutoutD3',
+        cutoutFixtureId: FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
+        requiredAddressableAreas: ['flexStackerModuleV1D4', 'D3'],
+        compatibleCutoutFixtureIds: [FLEX_STACKER_V1_FIXTURE],
+      },
+    ])
+    expect(result).toEqual({
+      comboFixtureId: FLEX_STACKER_V1_FIXTURE,
+      comboFixtureConflict: true,
+    })
+  })
+
+  it('should return a conflict and flex stacker fixture', () => {
+    const result = getFlexStackerD3Compatibility([
+      {
+        cutoutId: 'cutoutD3',
+        cutoutFixtureId: FLEX_STACKER_V1_FIXTURE,
+        requiredAddressableAreas: [
+          'flexStackerModuleV1D4',
+          '1ChannelWasteChute',
+        ],
+        compatibleCutoutFixtureIds: [
+          FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
+        ],
+      },
+    ])
+    expect(result).toEqual({
+      comboFixtureId: FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
+      comboFixtureConflict: true,
+    })
+  })
+
+  it('should return a null for no conflict with waste chute', () => {
+    const result = getFlexStackerD3Compatibility([
+      {
+        cutoutId: 'cutoutD3',
+        cutoutFixtureId: FLEX_STACKER_V1_FIXTURE,
+        requiredAddressableAreas: ['flexStackerModuleV1D4', 'D3'],
+        compatibleCutoutFixtureIds: [FLEX_STACKER_V1_FIXTURE],
+      },
+    ])
+    expect(result).toBeNull()
   })
 })

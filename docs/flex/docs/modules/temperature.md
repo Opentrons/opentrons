@@ -4,7 +4,7 @@ title: "Opentrons Flex: Temperature Module"
 
 # Temperature Module GEN2
 
-![The Temperature Module as seen from the top left. The top of the module has the heating and cooling surface and temperature display. The side has the power button, USB port, and power port.](../../images/temperature-module.png "Temperature Module")
+![The Temperature Module as seen from the top left. The top of the module has the heating and cooling surface and temperature display. The side has the power button, USB port, and power port.](../images/temperature-module.png "Temperature Module")
 
 !!! info "Additional Documentation"
     For complete instructions on module installation and use, see the Temperature Module Instruction Manual.
@@ -26,22 +26,22 @@ To hold labware at temperature, the module uses aluminum thermal blocks. The mod
 <div class="parts-list" markdown>
 
 <figure markdown>
-![24-well aluminum thermal block for Temperature Module](../../images/temperature-module-block-24-well.png "24-well thermal block")
+![24-well aluminum thermal block for Temperature Module](../images/temperature-module-block-24-well.png "24-well thermal block")
 <figcaption>24-well thermal block </figcaption>
 </figure>
 
 <figure markdown>
-![96-well aluminum thermal block for Temperature Module](../../images/temperature-module-block-96-well.png "96-well thermal block")
+![96-well aluminum thermal block for Temperature Module](../images/temperature-module-block-96-well.png "96-well thermal block")
 <figcaption>96-well thermal block</figcaption>
 </figure>
 
 <figure markdown>
-![Deep well aluminum thermal block for Temperature Module](../../images/temperature-module-block-deep-well.png "Deep well thermal block")
+![Deep well aluminum thermal block for Temperature Module](../images/temperature-module-block-deep-well.png "Deep well thermal block")
 <figcaption>Deep well thermal block</figcaption>
 </figure>
 
 <figure markdown>
-![Flat bottom aluminum thermal block for Temperature Module](../../images/temperature-module-block-flat.png "Flat bottom thermal block")
+![Flat bottom aluminum thermal block for Temperature Module](../images/temperature-module-block-flat.png "Flat bottom thermal block")
 <figcaption>Flat bottom thermal block for Flex</figcaption>
 </figure>
 

@@ -298,8 +298,8 @@ export const noTipSelected = (): CommandCreatorError => {
 
 export const labwareDiscarded = (): CommandCreatorError => {
   return {
-    type: 'LABWARE_DISCARDED_IN_WASTE_CHUTE',
-    message: 'The labware was discarded in waste chute in a previous step.',
+    type: 'LABWARE_DISCARDED_IN_TRASH',
+    message: 'The labware was discarded in trash in a previous step.',
   }
 }
 
@@ -351,5 +351,12 @@ export const returnTipUnavailable = (): CommandCreatorError => {
   return {
     type: 'RETURN_TIP_UNAVAILABLE',
     message: 'Current tip does not have a known location to return to',
+  }
+}
+
+export const tipRackLidNotAllowedOnDeck = (): CommandCreatorError => {
+  return {
+    type: 'TIPRACK_LID_NOT_ALLOWED_ON_DECK',
+    message: 'The tip rack lid is not supported directly on the deck',
   }
 }
