@@ -71,7 +71,6 @@ jobs:
           path: |
             docs/site/
             docs/dist/
-            docs/update_urls.py
           retention-days: 1
 
   deploy-sandbox:
@@ -85,6 +84,8 @@ jobs:
     env:
       BRANCH: ${{ github.event.pull_request.head.ref != '' && github.event.pull_request.head.ref || github.ref_name }}
     steps:
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v4
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -126,6 +127,8 @@ jobs:
     env:
       BRANCH: ${{ github.ref_name }}
     steps:
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v4
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -167,6 +170,8 @@ jobs:
     env:
       BRANCH: ${{ github.ref_name }}
     steps:
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v4
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
