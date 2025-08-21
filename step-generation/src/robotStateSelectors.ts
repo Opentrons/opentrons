@@ -5,6 +5,7 @@ import {
   ABSORBANCE_READER_TYPE,
   ALL,
   COLUMN,
+  getIsLid,
   getLabwareDefIsStandard,
   getLabwareDefURI,
   getTiprackVolume,
@@ -98,7 +99,11 @@ interface NextTiprackInfo {
     tiprackId: string
     well: string
   } | null
-  tipracks: { totalTipracks: number; filteredTipracks: number }
+  tipracks: {
+    totalTipracks: number
+    excludedBy96Channel: number
+    excludedByLid: number
+  }
 }
 export function getNextTiprack(
   pipetteId: string,
@@ -135,24 +140,43 @@ export function getNextTiprack(
       return isOnDeck && labwareIdDefUri === tipRackUri
     }
   )
+  let filteredSortedTiprackIds = sortedTipracksIds
   const is96Channel = pipetteEntity.spec.channels === 96
-  const filteredSortedTipRackIdsFor96Channel = sortedTipracksIds.filter(
-    tiprackId => {
-      const tipRackLocation = robotState.labware[tiprackId].stack[1]
 
+  const excludedBy96Channel: string[] = []
+  const excludedByLid: string[] = []
+
+  if (is96Channel) {
+    filteredSortedTiprackIds = filteredSortedTiprackIds.filter(tiprackId => {
+      const tipRackLocation = robotState.labware[tiprackId].stack[1]
       const adapterEntity = invariantContext.labwareEntities[tipRackLocation]
       const has96TiprackAdapterId =
         adapterEntity?.def.parameters.loadName ===
           'opentrons_flex_96_tiprack_adapter' &&
         getLabwareDefIsStandard(adapterEntity?.def)
 
-      return nozzles === ALL ? has96TiprackAdapterId : !has96TiprackAdapterId
+      const keepTiprackAdapter =
+        nozzles === ALL ? has96TiprackAdapterId : !has96TiprackAdapterId
+      if (!keepTiprackAdapter) {
+        excludedBy96Channel.push(tiprackId)
+      }
+      return keepTiprackAdapter
+    })
+  }
+
+  filteredSortedTiprackIds = filteredSortedTiprackIds.filter(tiprackId => {
+    const locationHasLid = Object.entries(robotState.labware).find(
+      ([id, temporalProperties]) =>
+        temporalProperties.stack.includes(tiprackId) &&
+        getIsLid(invariantContext.labwareEntities[id].def)
+    )
+    if (locationHasLid != null) {
+      excludedByLid.push(tiprackId)
     }
-  )
-  const firstAvailableTiprack = (is96Channel
-    ? filteredSortedTipRackIdsFor96Channel
-    : sortedTipracksIds
-  ).find(tiprackId =>
+    return locationHasLid == null
+  })
+
+  const firstAvailableTiprack = filteredSortedTiprackIds.find(tiprackId =>
     _getNextTip({
       pipetteId,
       tiprackId,
@@ -180,7 +204,8 @@ export function getNextTiprack(
       },
       tipracks: {
         totalTipracks: sortedTipracksIds.length,
-        filteredTipracks: filteredSortedTipRackIdsFor96Channel.length,
+        excludedBy96Channel: excludedBy96Channel.length,
+        excludedByLid: excludedByLid.length,
       },
     }
   }
@@ -191,7 +216,8 @@ export function getNextTiprack(
     nextTiprack: null,
     tipracks: {
       totalTipracks: sortedTipracksIds.length,
-      filteredTipracks: filteredSortedTipRackIdsFor96Channel.length,
+      excludedBy96Channel: excludedBy96Channel.length,
+      excludedByLid: excludedByLid.length,
     },
   }
 }
