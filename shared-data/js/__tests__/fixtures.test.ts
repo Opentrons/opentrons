@@ -333,7 +333,7 @@ describe('getFlexDeckDefAAByFixtureIdForCutoutId', () => {
       fakeStagingAreaRightSlot: ['D3', 'fakeD4'],
       fakeStagingSlotWithMagBlockV1: ['magneticBlockV1D3', 'fakeD4'],
       fakeWasteChuteWithEmptySlot: ['1ChannelWasteChute', 'fakeD4'],
-      flexStackerModuleV1: ['D3', 'flexStackerModuleV1D4'],
+      flexStackerModuleV1: ['flexStackerModuleV1D4', 'D3'],
       flexStackerModuleV1WithMagneticBlockV1: [
         'flexStackerModuleV1D4',
         'magneticBlockV1D3',
@@ -347,8 +347,8 @@ describe('getFlexDeckDefAAByFixtureIdForCutoutId', () => {
         '1ChannelWasteChute',
         '8ChannelWasteChute',
         '96ChannelWasteChute',
-        'flexStackerModuleV1D4',
         'gripperWasteChute',
+        'flexStackerModuleV1D4',
       ],
       singleRightSlot: ['D3'],
       stagingAreaRightSlot: ['D3', 'D4'],
@@ -372,13 +372,13 @@ describe('getFlexDeckDefAAByFixtureIdForCutoutId', () => {
         '1ChannelWasteChute',
         '8ChannelWasteChute',
         '96ChannelWasteChute',
-        'D4',
         'gripperWasteChute',
+        'D4',
       ],
       heaterShakerModuleV1: ['heaterShakerV1D3'],
       temperatureModuleV2: ['temperatureModuleV2D3'],
       magneticBlockV1: ['magneticBlockV1D3'],
-      stagingAreaSlotWithMagneticBlockV1: ['D4', 'magneticBlockV1D3'],
+      stagingAreaSlotWithMagneticBlockV1: ['magneticBlockV1D3', 'D4'],
     })
   })
   it('Should return a dic of fixtures and aa for cutoutA1', () => {
