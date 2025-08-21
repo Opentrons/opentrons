@@ -109,19 +109,24 @@ def add_parameters(parameters: ParameterContext) -> None:
         display_name="Labware Type",
         choices=[
             {
-                "display_name": "nest 12 custom",
-                "value": "nest_12_reservoir_22ml_custom",
+                "display_name": "dorf150yellow",
+                "value": "eppendorf_96_wellplate_150ul_custom",
             },
             {
-                "display_name": "opentrons96",
-                "value": "armadillo_96_wellplate_200ul_pcr_full_skirt",
+                "display_name": "dorf250",
+                "value": "eppendorf_96_wellplate_250ul_custom",
             },
             {
-                "display_name": "dorf500 test",
+                "display_name": "dorf384yellow",
+                "value": "eppendorf_384_wellplate_45ul_custom",
+            },
+            {
+                "display_name": "dorf500",
                 "value": "eppendorf_96_wellplate_500ul_custom",
             },
+
         ],
-        default="eppendorf_96_wellplate_500ul_custom",
+        default="eppendorf_96_wellplate_150ul_custom",
     )
 
     # generally, the first dispense should be 1/25 the max volume.
@@ -497,7 +502,7 @@ def run(ctx: ProtocolContext) -> None:
         elif max_volume >= 100:  # 100–249
             alpha_low, alpha_high = 0.8, 1.0
         else:  # below 100
-            alpha_low, alpha_high = 1.0, 1.0
+            alpha_low, alpha_high = 1.5, 1.2
 
         return alpha_low if h < THRESHOLD else alpha_high
 
@@ -559,14 +564,6 @@ def run(ctx: ProtocolContext) -> None:
     step_volume = first_dispense
 
     while dispense_volume < (max_volume - margin):
-
-        # removed because liquid classing wasnt working
-        # for liquid_rack in liquid_racks:
-        #    props = ethanol.get_for(liq_pipette, liquid_rack)
-        #    props.dispense.dispense_position.position_reference = (
-        #        "well-bottom"  #  type: ignore[assignment]
-        #    )
-        #    props.dispense.dispense_position.offset.z = max(corrected_height - 1, 2)
 
         drop_tips()
         pick_up_tips()

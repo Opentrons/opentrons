@@ -67,15 +67,40 @@ def add_parameters(parameters: ParameterContext) -> None:
         minimum=1,
         default=3,
     )
+    
     parameters.add_str(
         variable_name="labware_type",
         display_name="Labware Type",
         choices=[
+            {
+                "display_name": "dorf150yellow",
+                "value": "eppendorf_96_wellplate_150ul_custom",
+            },
+            {
+                "display_name": "dorf250",
+                "value": "eppendorf_96_wellplate_250ul_custom",
+            },
+            {
+                "display_name": "dorf384yellow",
+                "value": "eppendorf_384_wellplate_45ul_custom",
+            },
+            {
+                "display_name": "dorf500",
+                "value": "eppendorf_96_wellplate_500ul_custom",
+            },
 
-            {"display_name": "nest96 custom", "value": "nest_96_wellplate_2ml_deep_custom"},
-            {"display_name": "dorf 500 custom", "value": "eppendorf_96_wellplate_500ul_custom"},
         ],
-        default = "eppendorf_96_wellplate_500ul_custom",
+        default="eppendorf_96_wellplate_150ul_custom",
+    )
+
+    parameters.add_str(
+        variable_name="liq_tip_size",
+        display_name="Liquid Tip Size",
+        choices=[
+            {"display_name": "1000", "value": "1000"},
+            {"display_name": "50", "value": "50"},
+        ],
+        default="1000",
     )
 
 def pick_up_tips(
@@ -160,7 +185,7 @@ def aspirate_dispense_measure(
     dial: Labware,
     probe_pipette: InstrumentContext,
     liq_pipette: InstrumentContext,
-    ethanol: LiquidClass,
+    #ethanol: LiquidClass,
 ) -> Labware:
     """Aspirate from source, dispense into labware, measure height, record."""
     all_corrected_heights: List[float] = []
@@ -233,15 +258,11 @@ def run(ctx: ProtocolContext) -> None:
     dial = ctx.load_labware("dial_indicator", SLOT_DIAL)
     left_mount = ctx.params.left_mount  # type: ignore[attr-defined]
     right_mount = ctx.params.right_mount  # type: ignore[attr-defined]
+    liq_tip_size = ctx.params.liq_tip_size  # type: ignore[attr-defined]
 
-    # LOAD TIP RACKS AND PIPETTES
-    if labware["A1"].max_volume < 100:
-        liq_rack_vol = 50
-    else:
-        liq_rack_vol = 1000
 
     liq_tip_racks = [
-        ctx.load_labware(f"opentrons_flex_96_tiprack_{liq_rack_vol}ul", slot)
+        ctx.load_labware(f"opentrons_flex_96_tiprack_{liq_tip_size}ul", slot)
         for slot in SLOT_LIQUID_TIPRACKS
     ]
     probe_tip_rack = ctx.load_labware(
@@ -259,15 +280,15 @@ def run(ctx: ProtocolContext) -> None:
     )
 
     # Assign ethanol liquid class behavior
-    ethanol = ctx.get_liquid_class("ethanol_80")
-    lm = "liquid-meniscus"
-    for liquid_rack in liq_racks:
-        props = ethanol.get_for(liq_pipette, liquid_rack)
-        meniscus_z = -0.5
-        props.aspirate.aspirate_position.position_reference = lm  # type: ignore[assignment]
-        props.aspirate.aspirate_position.offset.z = meniscus_z
-        props.dispense.dispense_position.position_reference = lm  # type: ignore[assignment]
-        props.dispense.dispense_position.offset.z = meniscus_z
+    #ethanol = ctx.get_liquid_class("ethanol_80")
+    #lm = "liquid-meniscus"
+    #for liquid_rack in liq_racks:
+    #    props = ethanol.get_for(liq_pipette, liquid_rack)
+    #    meniscus_z = -0.5
+    #    props.aspirate.aspirate_position.position_reference = lm  # type: ignore[assignment]
+    #    props.aspirate.aspirate_position.offset.z = meniscus_z
+    #    props.dispense.dispense_position.position_reference = lm  # type: ignore[assignment]
+    #    props.dispense.dispense_position.offset.z = meniscus_z
 
     # Connect dial indicator and create data sheet
     if not ctx.is_simulating() and DIAL_PORT is None:
@@ -323,7 +344,7 @@ def run(ctx: ProtocolContext) -> None:
         dial,
         probe_pipette, 
         liq_pipette,
-        ethanol,
+        #ethanol,
     )
 
     region_names = ["low", "middle", "high"]
