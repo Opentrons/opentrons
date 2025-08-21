@@ -14,6 +14,7 @@ import time as t
 import json
 import requests
 from abr_testing.tools import plate_reader
+import zipfile
 
 
 def lpc_data(
@@ -881,60 +882,68 @@ def get_calibration_offsets(
     return saved_file_path, calibration
 
 
-def get_logs(storage_directory: str, ip: str) -> List[str]:
-    """Get Robot logs."""
+def get_logs(storage_directory: str, ip: str) -> str:
+    """Get Robot logs and return a zip file path containing them."""
     log_types: List[Dict[str, Any]] = [
         {"log type": "api.log", "records": 10000},
         {"log type": "server.log", "records": 10000},
         {"log type": "serial.log", "records": 10000},
         {"log type": "touchscreen.log", "records": 10000},
     ]
-    all_paths = []
+    collected_files: List[str] = []
+
+    # Fetch HTTP logs
     for log_type in log_types:
         try:
-            log_type_name = log_type["log type"]
-            print(log_type_name)
-            log_records = int(log_type["records"])
-            print(log_records)
+            log_type_name: str = log_type["log type"]
+            log_records: int = int(log_type["records"])
+
             response = requests.get(
                 f"http://{ip}:31950/logs/{log_type_name}",
                 headers={"log_identifier": log_type_name},
                 params={"records": log_records},
             )
             response.raise_for_status()
-            log_data = response.text
-            log_name = ip + "_" + log_type_name.split(".")[0] + ".log"
-            file_path = os.path.join(storage_directory, log_name)
-            with open(file_path, mode="w", encoding="utf-8") as file:
-                file.write(log_data)
-        except RuntimeError:
-            print(f"Request exception. Did not save {log_type_name}")
+            log_data: str = response.text
+            log_name: str = f"{ip}_{log_type_name.split('.')[0]}.log"
+            file_path: str = os.path.join(storage_directory, log_name)
+
+            with open(file_path, mode="w", encoding="utf-8") as f:
+                f.write(log_data)
+
+            collected_files.append(file_path)  # ✅ store path, not file object
+        except Exception as e:
+            print(f"Failed to fetch {log_type['log type']}: {e}")
             continue
-        all_paths.append(file_path)
+
     # Get weston.log using scp
-    # Split the path into parts
-    parts = storage_directory.split(os.sep)
-    # Find the index of 'Users'
-    index = parts.index("Users")
-    user_name = parts[index + 1]
-    # Define the SCP command
-    scp_command = [
-        "scp",
-        "-r",
-        "-i",
-        f"C:\\Users\\{user_name}\\.ssh\\robot_key",
-        f"root@{ip}:/var/log/weston.log",
-        storage_directory,
-    ]
-    # Execute the SCP command
     try:
+        parts: List[str] = storage_directory.split(os.sep)
+        index: int = parts.index("Users")
+        user_name: str = parts[index + 1]
+
+        scp_command: List[str] = [
+            "scp",
+            "-r",
+            "-i",
+            f"C:\\Users\\{user_name}\\.ssh\\robot_key",
+            f"root@{ip}:/var/log/weston.log",
+            storage_directory,
+        ]
         subprocess.run(scp_command, check=True, capture_output=True, text=True)
+
         file_path = os.path.join(storage_directory, "weston.log")
-        all_paths.append(file_path)
+        collected_files.append(file_path)
     except subprocess.CalledProcessError as e:
         print("Error during SCP command execution")
         print("Return code:", e.returncode)
-        print("Output:", e.output)
         print("Error output:", e.stderr)
-        subprocess.run(["scp", "weston.log", "root@10.14.19.40:/var/log/weston.log"])
-    return all_paths
+
+    # Create a ZIP archive with all collected files
+    zip_filename: str = os.path.join(storage_directory, f"{ip}_logs.zip")
+    with zipfile.ZipFile(zip_filename, "w", zipfile.ZIP_DEFLATED) as zipf:
+        for file_path in collected_files:
+            arcname: str = os.path.basename(file_path)  # ✅ always str
+            zipf.write(file_path, arcname=arcname)
+
+    return zip_filename
