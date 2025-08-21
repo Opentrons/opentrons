@@ -71,6 +71,7 @@ jobs:
           path: |
             docs/site/
             docs/dist/
+            docs/update_urls.py
           retention-days: 1
 
   deploy-sandbox:
