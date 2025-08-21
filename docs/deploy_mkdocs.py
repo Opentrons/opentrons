@@ -48,76 +48,53 @@ def deploy_docs(environment, branch=None, aws_profile=None, source_dir="site"):
     elif aws_profile is None:
         print("Warning: AWS_PROFILE not set. Make sure you have AWS credentials configured.")
     
-    # Verify source directories exist
-    mkdocs_source_path = Path(source_dir)
-    api_source_path = Path("docs/dist")
-    
-    if not mkdocs_source_path.exists():
-        print(f"Error: MkDocs source directory {mkdocs_source_path} does not exist.")
+        # Verify source directory exists
+    source_path = Path(source_dir)
+
+    if not source_path.exists():
+        print(f"Error: Source directory {source_path} does not exist.")
         print("Make sure you've run 'make build' first.")
         sys.exit(1)
-    
-    if not api_source_path.exists():
-        print(f"Warning: API docs source directory {api_source_path} does not exist.")
-        print("API docs may not have been built.")
-    
-    # Check if source directories have content
-    mkdocs_files = list(mkdocs_source_path.glob("*"))
-    api_files = list(api_source_path.glob("*")) if api_source_path.exists() else []
-    
-    if not mkdocs_files:
-        print(f"Warning: MkDocs source directory {mkdocs_source_path} is empty.")
+
+    # Check if source directory has content
+    source_files = list(source_path.glob("*"))
+
+    if not source_files:
+        print(f"Warning: Source directory {source_path} is empty.")
         print("Make sure you've run 'make build' first.")
+
+    print(f"Source directory contents: {[f.name for f in source_files[:10]]}{'...' if len(source_files) > 10 else ''}")
     
-    print(f"MkDocs source directory contents: {[f.name for f in mkdocs_files[:10]]}{'...' if len(mkdocs_files) > 10 else ''}")
-    if api_files:
-        print(f"API docs source directory contents: {[f.name for f in api_files[:10]]}{'...' if len(api_files) > 10 else ''}")
-    
-    # Build S3 sync commands - use branch for sandbox, root for staging/production
+        # Build S3 sync command - use branch for sandbox, root for staging/production
     if environment == "sandbox":
-        mkdocs_s3_path = f"s3://{bucket}/{branch}/"
-        api_s3_path = f"s3://{bucket}/{branch}/"
+        s3_path = f"s3://{bucket}/{branch}/"
         url = f"http://sandbox.docs.s3-website.us-east-2.amazonaws.com/{branch}/"
     else:
-        mkdocs_s3_path = f"s3://{bucket}/"
-        api_s3_path = f"s3://{bucket}/"
+        s3_path = f"s3://{bucket}/"
         if environment == "staging":
             url = f"https://staging.docs.opentrons.com/"
         else:  # production
             url = f"https://docs.opentrons.com/"
-    
+
     # Preserve certain directories (v1, v2, ot1, http, hardware) in all environments
     # so we don't use --delete flag - this ensures existing directories are not removed
-    mkdocs_cmd = [
+    cmd = [
         "aws", "s3", "sync",
-        str(mkdocs_source_path) + "/",
-        mkdocs_s3_path
+        str(source_path) + "/",
+        s3_path
     ]
-    
-    api_cmd = None
-    if api_source_path.exists() and api_files:
-        api_cmd = [
-            "aws", "s3", "sync",
-            str(api_source_path) + "/",
-            api_s3_path
-        ]
-    
+
     print(f"  Mode: Preserve existing directories (v1, v2, ot1, http, hardware)")
-    
+
     # Add AWS profile if specified
     if aws_profile:
-        if mkdocs_cmd:
-            mkdocs_cmd.extend(["--profile", aws_profile])
-        if api_cmd:
-            api_cmd.extend(["--profile", aws_profile])
-    
+        cmd.extend(["--profile", aws_profile])
+
     print(f"Deploying to {environment} environment:")
     print(f"  Bucket: {bucket}")
     if environment == "sandbox":
         print(f"  Branch: {branch}")
-    print(f"  MkDocs S3 Path: {mkdocs_s3_path}")
-    if api_cmd:
-        print(f"  API Docs S3 Path: {api_s3_path}")
+    print(f"  S3 Path: {s3_path}")
     
     # Test AWS credentials
     print("Testing AWS credentials...")
@@ -185,31 +162,17 @@ def deploy_docs(environment, branch=None, aws_profile=None, source_dir="site"):
             test_file.unlink()
     
     try:
-        # Deploy MkDocs
-        print("🚀 Deploying MkDocs...")
-        result = run_command(mkdocs_cmd)
-        if result.returncode != 0:
-            print(f"❌ MkDocs deployment failed with exit code {result.returncode}")
+        result = run_command(cmd)
+        if result.returncode == 0:
+            print(f"✅ Successfully deployed to {environment}!")
+            # Print the URL where it's deployed
+            print(f"📍 Deployed to: {url}")
+        else:
+            print(f"❌ Deployment failed with exit code {result.returncode}")
             print(f"STDOUT: {result.stdout}")
             print(f"STDERR: {result.stderr}")
             sys.exit(1)
-        print("✅ MkDocs deployed successfully!")
-        
-        # Deploy API docs if they exist
-        if api_cmd:
-            print("🚀 Deploying API docs...")
-            result = run_command(api_cmd)
-            if result.returncode != 0:
-                print(f"❌ API docs deployment failed with exit code {result.returncode}")
-                print(f"STDOUT: {result.stdout}")
-                print(f"STDERR: {result.stderr}")
-                sys.exit(1)
-            print("✅ API docs deployed successfully!")
-        
-        print(f"✅ Successfully deployed to {environment}!")
-        # Print the URL where it's deployed
-        print(f"📍 Deployed to: {url}")
-        
+    
     except subprocess.CalledProcessError as e:
         print(f"❌ Deployment failed with exit code {e.returncode}")
         print(f"STDOUT: {e.stdout}")

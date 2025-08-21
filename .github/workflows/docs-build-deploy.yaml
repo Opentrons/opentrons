@@ -4,8 +4,6 @@ on:
   pull_request:
     paths:
       - 'docs/**'
-      - 'api/docs/**'
-      - 'api/src/**'
       - '.github/workflows/docs-build-deploy.yaml'
   push:
     branches:
@@ -42,27 +40,12 @@ jobs:
           python-version: '3.10'
           enable-cache: true
           cache-dependency-glob: './docs/uv.lock'
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-          cache: 'pipenv'
-          cache-dependency-path: api/Pipfile.lock
-      - name: Install pipenv
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install pipenv==2023.12.1
       - name: Setup Docs Dependencies
         working-directory: ./docs
         run: make setup
-      - name: Setup API Dependencies
-        working-directory: ./api
-        run: |
-          # Install API dependencies for building docs
-          pipenv install --dev --python 3.10
-      - name: Build All Docs
+      - name: Build Docs
         working-directory: ./docs
-        run: make all-docs
+        run: make build
       - name: Upload Artifacts
         id: upload-artifacts
         uses: actions/upload-artifact@v4
@@ -70,120 +53,100 @@ jobs:
           name: docs-artifacts
           path: |
             docs/site/
-            docs/dist/
           retention-days: 1
 
-  deploy-sandbox:
+  determine-deploy-config:
     needs: build
-    if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref_type == 'branch')
-    timeout-minutes: 5
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
     runs-on: ubuntu-24.04
-    permissions:
-      id-token: write
-      contents: read
-    env:
-      BRANCH: ${{ github.event.pull_request.head.ref != '' && github.event.pull_request.head.ref || github.ref_name }}
+    outputs:
+      environment: ${{ steps.config.outputs.environment }}
+      branch: ${{ steps.config.outputs.branch }}
+      bucket: ${{ steps.config.outputs.bucket }}
+      url: ${{ steps.config.outputs.url }}
+      aws-role: ${{ steps.config.outputs.aws-role }}
     steps:
-      - name: 'Checkout Repository'
-        uses: actions/checkout@v4
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.DOCS_SANDBOX_ROLE }}
-          aws-region: us-east-2
-      - name: Download Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: docs-artifacts
-          path: docs/
-      - name: Debug Directory Structure
-        working-directory: ./docs
+      - name: Determine deployment configuration
+        id: config
         run: |
-          pwd
-          ls -la
-          echo "Checking if update_urls.py exists:"
-          ls -la update_urls.py || echo "update_urls.py not found"
-          echo "Checking if site/index.html exists:"
-          ls -la site/index.html || echo "site/index.html not found"
-      - name: Update URLs for Sandbox
-        working-directory: ./docs
-        run: python update_urls.py sandbox --branch ${{ env.BRANCH }}
-      - name: Deploy to Sandbox
-        working-directory: ./docs
-        run: make deploy ENVIRONMENT=sandbox BRANCH=${{ env.BRANCH }}
-      - name: Output Sandbox URL
-        run: |
-          echo "## Docs site deployed to sandbox" >> $GITHUB_STEP_SUMMARY
-          echo "<http://sandbox.docs.s3-website.us-east-2.amazonaws.com/${{ env.BRANCH }}/>" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "environment=sandbox" >> $GITHUB_OUTPUT
+            echo "branch=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
+            echo "bucket=sandbox.docs" >> $GITHUB_OUTPUT
+            echo "url=http://sandbox.docs.s3-website.us-east-2.amazonaws.com/${{ github.event.pull_request.head.ref }}/" >> $GITHUB_OUTPUT
+            echo "aws-role=${{ secrets.DOCS_SANDBOX_ROLE }}" >> $GITHUB_OUTPUT
+            echo "## 📋 Deployment Configuration" >> $GITHUB_STEP_SUMMARY
+            echo "**Environment:** Sandbox" >> $GITHUB_STEP_SUMMARY
+            echo "**Branch:** ${{ github.event.pull_request.head.ref }}" >> $GITHUB_STEP_SUMMARY
+            echo "**Trigger:** Pull Request" >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref_type }}" == "branch" ]]; then
+            echo "environment=sandbox" >> $GITHUB_OUTPUT
+            echo "branch=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+            echo "bucket=sandbox.docs" >> $GITHUB_OUTPUT
+            echo "url=http://sandbox.docs.s3-website.us-east-2.amazonaws.com/${{ github.ref_name }}/" >> $GITHUB_OUTPUT
+            echo "aws-role=${{ secrets.DOCS_SANDBOX_ROLE }}" >> $GITHUB_OUTPUT
+            echo "## 📋 Deployment Configuration" >> $GITHUB_STEP_SUMMARY
+            echo "**Environment:** Sandbox" >> $GITHUB_STEP_SUMMARY
+            echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+            echo "**Trigger:** Branch Push" >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ github.ref }}" == refs/tags/staging-MKDOCS* ]]; then
+            echo "environment=staging" >> $GITHUB_OUTPUT
+            echo "branch=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+            echo "bucket=opentrons.staging.docs" >> $GITHUB_OUTPUT
+            echo "url=https://staging.docs.opentrons.com/" >> $GITHUB_OUTPUT
+            echo "aws-role=${{ secrets.DOCS_SANDBOX_ROLE }}" >> $GITHUB_OUTPUT
+            echo "## 📋 Deployment Configuration" >> $GITHUB_STEP_SUMMARY
+            echo "**Environment:** Staging" >> $GITHUB_STEP_SUMMARY
+            echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+            echo "**Trigger:** Staging Tag" >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ github.ref }}" == refs/tags/MKDOCS* ]]; then
+            echo "environment=production" >> $GITHUB_OUTPUT
+            echo "branch=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+            echo "bucket=opentrons.production.docs" >> $GITHUB_OUTPUT
+            echo "url=https://docs.opentrons.com/" >> $GITHUB_OUTPUT
+            echo "aws-role=${{ secrets.DOCS_SANDBOX_ROLE }}" >> $GITHUB_OUTPUT
+            echo "## 📋 Deployment Configuration" >> $GITHUB_STEP_SUMMARY
+            echo "**Environment:** Production" >> $GITHUB_STEP_SUMMARY
+            echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+            echo "**Trigger:** Production Tag" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No deployment configuration found for this event"
+            exit 1
+          fi
 
-  deploy-staging:
-    needs: build
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/staging-MKDOCS')
+  deploy:
+    needs: [build, determine-deploy-config]
     timeout-minutes: 5
     runs-on: ubuntu-24.04
     permissions:
       id-token: write
       contents: read
     env:
-      BRANCH: ${{ github.ref_name }}
-      STAGING_BUCKET: opentrons.staging.docs
-      SANDBOX_BUCKET: sandbox.docs
+      ENVIRONMENT: ${{ needs.determine-deploy-config.outputs.environment }}
+      BRANCH: ${{ needs.determine-deploy-config.outputs.branch }}
+      BUCKET: ${{ needs.determine-deploy-config.outputs.bucket }}
+      URL: ${{ needs.determine-deploy-config.outputs.url }}
+      AWS_ROLE: ${{ needs.determine-deploy-config.outputs.aws-role }}
     steps:
       - name: 'Checkout Repository'
         uses: actions/checkout@v4
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.DOCS_SANDBOX_ROLE }}
+          role-to-assume: ${{ env.AWS_ROLE }}
           aws-region: us-east-2
       - name: Download Artifacts
         uses: actions/download-artifact@v4
         with:
           name: docs-artifacts
           path: docs/
-      - name: Update URLs for Staging
+      - name: Update URLs
         working-directory: ./docs
-        run: python update_urls.py staging --branch ${{ env.BRANCH }}
-      - name: Deploy to Staging
+        run: python update_urls.py ${{ env.ENVIRONMENT }} --branch ${{ env.BRANCH }}
+      - name: Deploy
         working-directory: ./docs
-        run: make deploy ENVIRONMENT=staging BRANCH=${{ env.BRANCH }}
-      - name: Output Staging URL
+        run: make deploy ENVIRONMENT=${{ env.ENVIRONMENT }} BRANCH=${{ env.BRANCH }}
+      - name: Output Deployment URL
         run: |
-          echo "## Docs site deployed to staging" >> $GITHUB_STEP_SUMMARY
-          echo "<https://staging.docs.opentrons.com/>" >> $GITHUB_STEP_SUMMARY
-
-  deploy-production:
-    needs: build
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/MKDOCS') && !startsWith(github.ref, 'refs/tags/staging-MKDOCS')
-    timeout-minutes: 5
-    runs-on: ubuntu-24.04
-    permissions:
-      id-token: write
-      contents: read
-    env:
-      BRANCH: ${{ github.ref_name }}
-      STAGING_BUCKET: opentrons.staging.docs
-      PRODUCTION_BUCKET: opentrons.production.docs
-    steps:
-      - name: 'Checkout Repository'
-        uses: actions/checkout@v4
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.DOCS_SANDBOX_ROLE }}
-          aws-region: us-east-2
-      - name: Download Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: docs-artifacts
-          path: docs/
-      - name: Update URLs for Production
-        working-directory: ./docs
-        run: python update_urls.py production --branch ${{ env.BRANCH }}
-      - name: Deploy to Production
-        working-directory: ./docs
-        run: make deploy ENVIRONMENT=production BRANCH=${{ env.BRANCH }}
-      - name: Output Production URL
-        run: |
-          echo "## Docs site deployed to production" >> $GITHUB_STEP_SUMMARY
-          echo "<https://docs.opentrons.com/>" >> $GITHUB_STEP_SUMMARY
+          echo "## 🚀 Docs site deployed to ${{ env.ENVIRONMENT }}" >> $GITHUB_STEP_SUMMARY
+          echo "<${{ env.URL }}>" >> $GITHUB_STEP_SUMMARY
