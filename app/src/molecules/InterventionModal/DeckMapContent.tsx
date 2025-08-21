@@ -12,6 +12,8 @@ import {
   useDeckLocationSelect,
 } from '@opentrons/components'
 import {
+  FLEX_STACKER_MODULE_TYPE,
+  getModuleType,
   getSchema2CornerOffsetFromSlot,
   getSchema2Dimensions,
 } from '@opentrons/shared-data'
@@ -76,13 +78,17 @@ function InterventionStyleDeckMapContent(
           }
         : labwareOnDeck
     ) ?? []
+  // we should not highlight labware that matches the flex stacker slot location
   const modulesWithHighlights =
     props.modulesOnDeck?.map(module =>
-      props.highlightLabwareEventuallyIn.reduce(
-        (found, locationToMatch) =>
-          found || getIsLabwareMatch(module.moduleLocation, locationToMatch),
-        false
-      )
+      props.highlightLabwareEventuallyIn.reduce((found, locationToMatch) => {
+        const moduleType = getModuleType(module.moduleModel)
+        return (
+          found ||
+          (moduleType !== FLEX_STACKER_MODULE_TYPE &&
+            getIsLabwareMatch(module.moduleLocation, locationToMatch))
+        )
+      }, false)
         ? {
             ...module,
             moduleChildren:
