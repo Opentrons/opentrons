@@ -39,7 +39,7 @@ def run(protocol: ProtocolContext) -> None:
     meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
     helpers.comment_protocol_version(protocol, "04")
     if not protocol.is_simulating():
-        slack_bot = helpers.set_up_slack()
+        slack_bot, ip = helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
 
     rxn_vol = 50
@@ -243,5 +243,7 @@ def run(protocol: ProtocolContext) -> None:
             slack_bot.send_run_completed_message(metadata["protocolName"])
     except Exception as e:
         if not protocol.is_simulating():
-            slack_bot.send_error_message(metadata["protocolName"], str(e))
+            helpers.send_slack_error_message_with_log(
+                slack_bot, metadata["protocolName"], str(e), ip
+            )
         raise (e)

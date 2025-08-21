@@ -33,7 +33,7 @@ def run(protocol: ProtocolContext) -> None:
     data = all_data[1:]
     helpers.comment_protocol_version(protocol, "03")
     if not protocol.is_simulating():
-        slack_bot = helpers.set_up_slack()
+        slack_bot, ip = helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
 
     # DECK SETUP AND LABWARE
@@ -296,5 +296,7 @@ def run(protocol: ProtocolContext) -> None:
             slack_bot.send_run_completed_message(metadata["protocolName"])
     except Exception as e:
         if not protocol.is_simulating():
-            slack_bot.send_error_message(metadata["protocolName"], str(e))
+            helpers.send_slack_error_message_with_log(
+                slack_bot, metadata["protocolName"], str(e), ip
+            )
         raise (e)

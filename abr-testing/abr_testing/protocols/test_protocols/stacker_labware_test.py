@@ -136,6 +136,11 @@ def run(ctx: ProtocolContext) -> None:
         mount="left",
         tip_racks=[],
     )
+    if not ctx.is_simulating():
+        from abr_testing.protocols import helpers
+
+        slack_bot, ip = helpers.set_up_slack()
+        slack_bot.send_run_started_message(metadata["protocolName"])
     reservoir = ctx.load_labware("nest_1_reservoir_195ml", "D1")
     water_liq = ctx.define_liquid("water", "#C0C0C0")
     reservoir["A1"].load_liquid(water_liq, 10000)
@@ -162,49 +167,63 @@ def run(ctx: ProtocolContext) -> None:
             ctx.params.num_nest_plates,  # type: ignore[attr-defined]
         ),
     }
+    try:
+        for slot, (labware_name, count) in labware_dict.items():
+            stacker: FlexStackerContext = ctx.load_module(
+                "flexStackerModuleV1",
+                slot,
+            )  # type: ignore[assignment]
+            stacker.set_stored_labware(labware_name, count=count)
+            stackers.append(stacker)
+        stacker_50ul = stackers[0]
+        stacker_pcrplates = stackers[1]
+        stacker_384plates = stackers[2]
+        stacker_nest96deep = stackers[3]
+        water = ctx.get_liquid_class("water")
+        ctx.load_trash_bin("A3")
+        # unload tipracks
+        unload_tipracks_from_stacker(ctx, p96, stacker_50ul, tiprack_adapters)
+        move_plates_to_deck_fill_and_store(
+            stacker_pcrplates, ctx, p96, water, reservoir
+        )
+        # Move old tipracks
+        old_tipracks = p96.tip_racks
+        ctx.move_labware(old_tipracks[0], "D2", use_gripper=True)
+        ctx.move_labware(old_tipracks[1], "D3", use_gripper=True)
+        # Get new tipracks
+        unload_tipracks_from_stacker(ctx, p96, stacker_50ul, tiprack_adapters)
+        # Second labware
+        move_plates_to_deck_fill_and_store(
+            stacker_384plates, ctx, p96, water, reservoir
+        )
 
-    for slot, (labware_name, count) in labware_dict.items():
-        stacker: FlexStackerContext = ctx.load_module(
-            "flexStackerModuleV1",
-            slot,
-        )  # type: ignore[assignment]
-        stacker.set_stored_labware(labware_name, count=count)
-        stackers.append(stacker)
-    stacker_50ul = stackers[0]
-    stacker_pcrplates = stackers[1]
-    stacker_384plates = stackers[2]
-    stacker_nest96deep = stackers[3]
-    water = ctx.get_liquid_class("water")
-    ctx.load_trash_bin("A3")
-    # unload tipracks
-    unload_tipracks_from_stacker(ctx, p96, stacker_50ul, tiprack_adapters)
-    move_plates_to_deck_fill_and_store(stacker_pcrplates, ctx, p96, water, reservoir)
-    # Move old tipracks
-    old_tipracks = p96.tip_racks
-    ctx.move_labware(old_tipracks[0], "D2", use_gripper=True)
-    ctx.move_labware(old_tipracks[1], "D3", use_gripper=True)
-    # Get new tipracks
-    unload_tipracks_from_stacker(ctx, p96, stacker_50ul, tiprack_adapters)
-    # Second labware
-    move_plates_to_deck_fill_and_store(stacker_384plates, ctx, p96, water, reservoir)
+        # Unload last tip racks
+        unused_tiprack1 = stacker_50ul.retrieve()
+        ctx.move_labware(unused_tiprack1, "B1", use_gripper=True)
+        unused_tiprack2 = stacker_50ul.retrieve()
+        ctx.move_labware(unused_tiprack2, "B2", use_gripper=True)
 
-    # Unload last tip racks
-    unused_tiprack1 = stacker_50ul.retrieve()
-    ctx.move_labware(unused_tiprack1, "B1", use_gripper=True)
-    unused_tiprack2 = stacker_50ul.retrieve()
-    ctx.move_labware(unused_tiprack2, "B2", use_gripper=True)
+        # Store extra tip racks
+        for tip in p96.tip_racks:
+            ctx.move_labware(tip, stacker_50ul, use_gripper=True)
+            stacker_50ul.store()
+        # Move Tip racks to adapters
+        ctx.move_labware(unused_tiprack1, tiprack_adapters[0], use_gripper=True)
+        ctx.move_labware(unused_tiprack2, tiprack_adapters[1], use_gripper=True)
 
-    # Store extra tip racks
-    for tip in p96.tip_racks:
-        ctx.move_labware(tip, stacker_50ul, use_gripper=True)
-        stacker_50ul.store()
-    # Move Tip racks to adapters
-    ctx.move_labware(unused_tiprack1, tiprack_adapters[0], use_gripper=True)
-    ctx.move_labware(unused_tiprack2, tiprack_adapters[1], use_gripper=True)
+        # Next Labware Type
+        p96.tip_racks.clear()
+        p96.tip_racks.append(unused_tiprack1)
+        p96.tip_racks.append(unused_tiprack2)
+        set_liquid_class_behavior(ctx, p96, [unused_tiprack1, unused_tiprack2], water)
+        move_plates_to_deck_fill_and_store(
+            stacker_nest96deep, ctx, p96, water, reservoir
+        )
+    except Exception as e:
+        if not ctx.is_simulating():
+            from abr_testing.protocols import helpers
 
-    # Next Labware Type
-    p96.tip_racks.clear()
-    p96.tip_racks.append(unused_tiprack1)
-    p96.tip_racks.append(unused_tiprack2)
-    set_liquid_class_behavior(ctx, p96, [unused_tiprack1, unused_tiprack2], water)
-    move_plates_to_deck_fill_and_store(stacker_nest96deep, ctx, p96, water, reservoir)
+            helpers.send_slack_error_message_with_log(
+                slack_bot, metadata["protocolName"], str(e), ip
+            )
+        raise (e)

@@ -11,7 +11,6 @@ from opentrons.protocol_api.module_contexts import (
 )
 from opentrons.hardware_control.modules.types import ThermocyclerStep
 from typing import List
-from abr_testing.protocols import helpers
 
 
 metadata = {
@@ -199,7 +198,9 @@ def run(protocol: ProtocolContext) -> None:
     p50_flow_rate_dispense_default = 50
     p50_flow_rate_blow_out_default = 100
     if not protocol.is_simulating():
-        slack_bot = helpers.set_up_slack()
+        from abr_testing.protocols import helpers
+
+        slack_bot, ip = helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
 
     # ================================ LISTS ================================
@@ -2842,6 +2843,9 @@ def run(protocol: ProtocolContext) -> None:
         if not protocol.is_simulating():
             slack_bot.send_run_completed_message(metadata["protocolName"])
     except Exception as e:
-        if not protocol.is_simulating():
-            slack_bot.send_error_message(metadata["protocolName"], str(e))
+        from abr_testing.protocols import helpers
+
+        helpers.send_slack_error_message_with_log(
+            slack_bot, metadata["protocolName"], str(e), ip
+        )
         raise (e)
