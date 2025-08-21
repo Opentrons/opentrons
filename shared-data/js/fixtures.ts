@@ -1327,8 +1327,9 @@ const hasFlexStackerFixture = (
 ): boolean => {
   return deckConfig.some(
     fixture =>
-      FLEX_STACKER_FIXTURES.includes(fixture.cutoutFixtureId) &&
-      fixture.cutoutId === cutoutId
+      FLEX_STACKER_FIXTURES.includes(
+        fixture.cutoutFixtureId as CutoutFixtureId
+      ) && fixture.cutoutId === cutoutId
   )
 }
 
