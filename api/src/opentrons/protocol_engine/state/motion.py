@@ -1,4 +1,5 @@
 """Motion state store and getters."""
+
 from dataclasses import dataclass
 from typing import List, Optional, Union
 
@@ -85,6 +86,30 @@ class MotionView:
                 critical_point = CriticalPoint.XY_CENTER
         return PipetteLocationData(mount=mount, critical_point=critical_point)
 
+    def _get_pipette_offset_for_reservoirs(self, labware_id: str, well_name: str) -> Point:
+        subwells_96 = self._labware.get_has_96_subwells(labware_id)
+        subwells_12 = self._labware.get_has_12_subwells(labware_id)
+        if not subwells_12 and not subwells_96:
+            return Point()
+
+        well_x_dim, well_y_dim, well_z_dim = self._labware.get_well_size(
+            labware_id=labware_id, well_name=well_name
+        )
+
+        x_offset = 0.0
+        y_offset = 0.0
+        if subwells_96:
+            # move half a subwell to the left + half a subwell up
+            # half of a subwell width would be 1/12 * well_x_dim / 2
+            x_offset = -1 * well_x_dim / 24
+            # half of a subwell length would be 1/8 * well_y_dim / 2
+            y_offset = well_y_dim / 16
+        if subwells_12:
+            # move half a subwell to the left
+            # half of a subwell width would be 1/12 * well_x_dim / 2
+            x_offset = -1 * well_x_dim / 24
+        return Point(x=x_offset, y=y_offset)
+
     def get_movement_waypoints_to_well(
         self,
         pipette_id: str,
@@ -114,6 +139,10 @@ class MotionView:
             well_location=well_location,
             operation_volume=operation_volume,
             pipette_id=pipette_id,
+        )
+        destination += self._get_pipette_offset_for_reservoirs(
+            labware_id=labware_id,
+            well_name=well_name
         )
 
         move_type = _move_types.get_move_type_to_well(

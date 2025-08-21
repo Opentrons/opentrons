@@ -661,6 +661,12 @@ class LabwareView:
             or len(self.get_definition(labware_id).wells) >= 96
         )
 
+    def get_has_96_subwells(self, labware_id: str) -> bool:
+        return self.get_has_quirk(labware_id, "has96SubWells")
+
+    def get_has_12_subwells(self, labware_id: str) -> bool:
+        return self.get_has_quirk(labware_id, "has12ubWells")
+
     def get_well_definition(
         self,
         labware_id: str,
