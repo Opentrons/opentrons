@@ -7,6 +7,7 @@ import isEqual from 'lodash/isEqual'
 
 import {
   COMBO_FIXTURES,
+  FAKE_STAGING_SLOT_WITH_MAG_BLOCK_FIXTURE,
   FLEX_MODULE_AA_TYPE_BY_MODEL,
   FLEX_STACKER_FIXTURES,
   FLEX_STAGING_ADDRESSABLE_AREAS_WITH_FAKES,
@@ -46,7 +47,6 @@ import {
   D3_ADDRESSABLE_AREA,
   DEFAULT_AA_FOR_WASTE_CHUTE,
   FAKE_STAGING_AREA_RIGHT_SLOT,
-  FAKE_STAGING_SLOT_WITH_MAG_BLOCK_FIXTURE,
   FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT_FIXTURE,
   FLEX_ROBOT_TYPE,
   FLEX_STACKER_MODULE_V1,
@@ -435,7 +435,7 @@ export const getReplacementFixtureForFixtureRemoval = (
   if (cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE) {
     return SINGLE_RIGHT_SLOT_FIXTURE
   } else if (addressableAreaId && SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
-    const cutoutFixtureReplacment = replaceCutoutFixtureRemove(
+    const cutoutFixtureReplacment = replaceCutoutFixtureForFixtureRemoval(
       cutoutFixtureId,
       cutoutId,
       addressableAreaId
@@ -1327,9 +1327,100 @@ const hasFlexStackerFixture = (
 ): boolean => {
   return deckConfig.some(
     fixture =>
-      FLEX_STACKER_FIXTURES.includes(fixture.cutoutFixtureId) &&
-      fixture.cutoutId === cutoutId
+      FLEX_STACKER_FIXTURES.includes(
+        fixture.cutoutFixtureId as CutoutFixtureId
+      ) && fixture.cutoutId === cutoutId
   )
+}
+
+/**
+ * Get the replacement fixture for a given fixture ID in waste chute cutout
+ * @param cutoutFixtureId: the current fixture ID
+ * @param wasteChuteFixture: the waste chute fixture type in the cutout
+ * @param hasFlexStacker: whether there's a flex stacker in the cutout
+ * @param cutoutId: the cutout ID
+ * @param deckConfigWithAA: current deck configuration
+ * @returns replacement fixture info or null if no replacement needed
+ */
+const getWasteChuteFixtureReplacement = (
+  cutoutFixtureId: CutoutFixtureIdsWithFakes,
+  wasteChuteFixture: CutoutFixtureIdsWithFakes | null,
+  hasFlexStacker: boolean,
+  cutoutId: CutoutId,
+  deckConfigWithAA: CutoutConfigMap[]
+): {
+  comboFixtureId: CutoutFixtureId
+  comboOpentronsModuleSerialNumber?: string
+} | null => {
+  // Define fixture mapping rules
+  const fixtureMapping = [
+    {
+      condition:
+        cutoutFixtureId === FLEX_STACKER_MODULE_V1 &&
+        wasteChuteFixture === WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+      comboFixtureId: FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+      comboOpentronsModuleSerialNumber: undefined,
+    },
+    {
+      condition:
+        cutoutFixtureId === FLEX_STACKER_MODULE_V1 &&
+        wasteChuteFixture === FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT_FIXTURE,
+      comboFixtureId: FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+      comboOpentronsModuleSerialNumber: undefined,
+    },
+    {
+      condition:
+        cutoutFixtureId === FLEX_STACKER_MODULE_V1 &&
+        wasteChuteFixture === FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT_FIXTURE,
+      comboFixtureId: FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+      comboOpentronsModuleSerialNumber: deckConfigWithAA.find(
+        dc =>
+          dc.cutoutId === cutoutId &&
+          dc.cutoutFixtureId === FLEX_STACKER_MODULE_V1
+      )?.opentronsModuleSerialNumber,
+    },
+    {
+      condition:
+        cutoutFixtureId === FLEX_STACKER_MODULE_V1 &&
+        wasteChuteFixture === WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+      comboFixtureId: FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
+      comboOpentronsModuleSerialNumber: undefined,
+    },
+    {
+      condition:
+        cutoutFixtureId === WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE &&
+        hasFlexStacker,
+      comboFixtureId: FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+      comboOpentronsModuleSerialNumber: deckConfigWithAA.find(
+        dc =>
+          dc.cutoutId === cutoutId &&
+          dc.cutoutFixtureId === FLEX_STACKER_MODULE_V1
+      )?.opentronsModuleSerialNumber,
+    },
+    {
+      condition:
+        cutoutFixtureId === WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE &&
+        hasFlexStacker,
+      comboFixtureId: FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
+      comboOpentronsModuleSerialNumber: deckConfigWithAA.find(
+        dc =>
+          dc.cutoutId === cutoutId &&
+          dc.cutoutFixtureId === FLEX_STACKER_MODULE_V1
+      )?.opentronsModuleSerialNumber,
+    },
+  ]
+
+  // Find the first matching rule and return the replacement info
+  const matchingRule = fixtureMapping.find(rule => rule.condition)
+  if (matchingRule) {
+    return {
+      comboFixtureId: matchingRule.comboFixtureId,
+      comboOpentronsModuleSerialNumber:
+        matchingRule.comboOpentronsModuleSerialNumber,
+    }
+  }
+
+  return null
 }
 
 /**
@@ -1369,61 +1460,21 @@ export const getWasteChuteComboFixture = (
   const wasteChuteFixture = getWasteChuteFixtureType(deckConfigWithAA, cutoutId)
   const hasFlexStacker = hasFlexStackerFixture(deckConfigWithAA, cutoutId)
 
-  // Define fixture mapping rules
-  const fixtureMapping = [
-    {
-      condition:
-        cutoutFixtureId === FLEX_STACKER_MODULE_V1 &&
-        wasteChuteFixture === WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
-      comboFixtureId: FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
-      comboOpentronsModuleSerialNumber: opentronsModuleSerialNumber,
-    },
-    {
-      condition:
-        cutoutFixtureId === FLEX_STACKER_MODULE_V1 &&
-        wasteChuteFixture === FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT_FIXTURE,
-      comboFixtureId: FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
-      comboOpentronsModuleSerialNumber: opentronsModuleSerialNumber,
-    },
-    {
-      condition:
-        cutoutFixtureId === FLEX_STACKER_MODULE_V1 &&
-        wasteChuteFixture === WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
-      comboFixtureId: FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
-      comboOpentronsModuleSerialNumber: opentronsModuleSerialNumber,
-    },
-    {
-      condition:
-        cutoutFixtureId === WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE &&
-        hasFlexStacker,
-      comboFixtureId: FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
-      comboOpentronsModuleSerialNumber: deckConfigWithAA.find(
-        dc =>
-          dc.cutoutId === cutoutId &&
-          dc.cutoutFixtureId === FLEX_STACKER_MODULE_V1
-      )?.opentronsModuleSerialNumber,
-    },
-    {
-      condition:
-        cutoutFixtureId === WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE &&
-        hasFlexStacker,
-      comboFixtureId: FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
-      comboOpentronsModuleSerialNumber: deckConfigWithAA.find(
-        dc =>
-          dc.cutoutId === cutoutId &&
-          dc.cutoutFixtureId === FLEX_STACKER_MODULE_V1
-      )?.opentronsModuleSerialNumber,
-    },
-  ]
+  // Find the replacement fixture
+  const replacementInfo = getWasteChuteFixtureReplacement(
+    cutoutFixtureId,
+    wasteChuteFixture,
+    hasFlexStacker,
+    cutoutId,
+    deckConfigWithAA
+  )
 
-  // Find the first matching rule and return the combo fixture
-  const matchingRule = fixtureMapping.find(rule => rule.condition)
-  if (matchingRule) {
+  if (replacementInfo) {
     return createComboFixture(
       cutoutId,
-      matchingRule.comboFixtureId,
+      replacementInfo.comboFixtureId,
       opentronsModuleSerialNumber ??
-        matchingRule.comboOpentronsModuleSerialNumber
+        replacementInfo.comboOpentronsModuleSerialNumber
     )
   }
 
@@ -1533,17 +1584,17 @@ export const replaceCutoutFixtureWithComboFixture = (
  * @param addressableAreaId to remove from fixture
  * @returns fixture to replace with
  */
-export const replaceCutoutFixtureRemove = (
+export const replaceCutoutFixtureForFixtureRemoval = (
   cutoutFixtureRemoved: CutoutFixtureIdsWithFakes,
   cutoutId: CutoutId,
   addressableAreaId: AddressableAreaNamesWithFakes
 ): CutoutFixtureIdsWithFakes => {
   const deckDef = getDeckDefFromRobotType('OT-3 Standard')
-  const addressableAreasById = getAAsToFixtureIdFromDeckDefWithFakes(
+  const aaPerFixtureOptions = getAAsToFixtureIdFromDeckDefWithFakes(
     cutoutId,
     deckDef
   )
-  const aaForCutoutAndFixture = getAAWithFakesFromCutoutFixtureId(
+  const aaForFixtureRemoval = getAAWithFakesFromCutoutFixtureId(
     cutoutId,
     cutoutFixtureRemoved,
     deckDef
@@ -1558,19 +1609,27 @@ export const replaceCutoutFixtureRemove = (
     }
   } else if (cutoutFixtureRemoved === ABSORBANCE_READER_V1_FIXTURE) {
     return SINGLE_RIGHT_SLOT_FIXTURE
+  } else if (cutoutFixtureRemoved === FLEX_STACKER_V1_FIXTURE) {
+    return SINGLE_RIGHT_SLOT_FIXTURE
+  } else if (cutoutFixtureRemoved === FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE) {
+    if (getAAByAAId(addressableAreaId, deckDef).areaType === 'flexStacker') {
+      return FAKE_STAGING_SLOT_WITH_MAG_BLOCK_FIXTURE
+    } else {
+      return FLEX_STACKER_V1_FIXTURE
+    }
   } else {
-    const updated = aaForCutoutAndFixture?.map(aa => {
+    const updated = aaForFixtureRemoval?.map(aa => {
       const vsId = getVisualSlotIdForAA(cutoutId, cutoutFixtureRemoved, aa)
       return aa === addressableAreaId ? getAAWithFakesFromVSId(vsId) : aa
     })
-    const match = Object.entries(addressableAreasById).find(([, value]) =>
-      isEqual(
+    const match = Object.entries(aaPerFixtureOptions).find(([, value]) => {
+      return isEqual(
         value.sort(),
         WASTE_CHUTE_WITH_FAKE_FIXTURES.includes(cutoutFixtureRemoved)
-          ? aaForCutoutAndFixture?.sort()
+          ? aaForFixtureRemoval?.sort()
           : updated?.sort()
       )
-    )
+    })
     if (match) {
       return match[0] as CutoutFixtureIdsWithFakes
     }
@@ -1591,14 +1650,13 @@ export const getFlexStackerD3Compatibility = (
   comboFixtureConflict: boolean
 } | null => {
   const deckConfigCompatabilityD3 = deckConfigCompatibility?.find(
-    configItem => configItem.cutoutId === 'cutoutD3'
+    configItem => configItem.cutoutId === WASTE_CHUTE_CUTOUT
   )
   const matchWithAA = getMainFixtureIdForAA(
     deckConfigCompatabilityD3?.compatibleCutoutFixtureIds ?? [],
     deckConfigCompatabilityD3?.requiredAddressableAreas ?? [],
     'cutoutD3'
   )
-  console.log('matchWithAA: ', matchWithAA)
   const matchWithFixture =
     matchWithAA ?? deckConfigCompatabilityD3?.compatibleCutoutFixtureIds[0]
   if (
@@ -1612,7 +1670,20 @@ export const getFlexStackerD3Compatibility = (
         deckConfigCompatabilityD3.cutoutFixtureId as CutoutFixtureIdsWithFakes
       ))
   ) {
-    // Convert CutoutFixtureIdsWithFakes to CutoutFixtureId by filtering out fake fixtures
+    if (
+      !matchWithAA &&
+      WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(
+        deckConfigCompatabilityD3.cutoutFixtureId as CutoutFixtureIdsWithFakes
+      )
+    ) {
+      return {
+        comboFixtureId: deckConfigCompatabilityD3.cutoutFixtureId as CutoutFixtureId,
+        comboFixtureConflict: !deckConfigCompatabilityD3?.compatibleCutoutFixtureIds.includes(
+          deckConfigCompatabilityD3.cutoutFixtureId
+        ),
+      }
+    }
+
     const comboFixtureId = deckConfigCompatabilityD3?.compatibleCutoutFixtureIds.find(
       fixtureId => !fixtureId.startsWith('fake')
     ) as CutoutFixtureId | undefined
