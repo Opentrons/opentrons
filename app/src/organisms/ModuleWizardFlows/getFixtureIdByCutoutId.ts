@@ -29,7 +29,6 @@ export function getFixtureIdByCutoutId(
           deckDef
         )
       : {}
-  console.log('fixtureIdByCutoutId: ', fixtureIdByCutoutId)
   return fixtureIdByCutoutId
 }
 
