@@ -124,7 +124,6 @@ def add_parameters(parameters: ParameterContext) -> None:
                 "display_name": "dorf500",
                 "value": "eppendorf_96_wellplate_500ul_custom",
             },
-
         ],
         default="eppendorf_96_wellplate_150ul_custom",
     )
@@ -200,9 +199,7 @@ def _setup(
     probe_pipette = ctx.load_instrument(
         left_mount, PROBING_MOUNT, tip_racks=[probing_rack]
     )
-    liq_pipette = ctx.load_instrument(
-        right_mount, LIQUID_MOUNT, tip_racks=liquid_racks
-    )
+    liq_pipette = ctx.load_instrument(right_mount, LIQUID_MOUNT, tip_racks=liquid_racks)
 
     # load labware + dial
     labware = ctx.load_labware(labware_type, SLOT_LABWARE)
@@ -458,7 +455,7 @@ def run(ctx: ProtocolContext) -> None:
     udv_table: List[Any] = []
     num_wells = len(wells)
     max_volume = labware["A1"].max_volume
-    
+
     if max_volume > 100000:
         margin = max_volume * 0.33
     else:
@@ -466,7 +463,7 @@ def run(ctx: ProtocolContext) -> None:
 
     # volume clamps, these can be changed to whatever.
     min_step = max(max_volume * 0.01, 1)  # clamped to 5uL
-    max_step = max_volume * 0.25 
+    max_step = max_volume * 0.25
 
     # deadband to avoid unnecessary step volume corrections
     lower_bound = target_height - target_height * DELTA_TOLERANCE
@@ -495,7 +492,7 @@ def run(ctx: ProtocolContext) -> None:
 
         if max_volume >= 200000:  # 200000 and above
             alpha_low, alpha_high = 0.5, 1.5
-        elif max_volume >= 2000: 
+        elif max_volume >= 2000:
             alpha_low, alpha_high = 0.2, 0.5
         elif max_volume >= 250:  # 250–1999
             alpha_low, alpha_high = 0.5, 0.8
@@ -553,7 +550,7 @@ def run(ctx: ProtocolContext) -> None:
         ctx.move_labware(labware, OFF_DECK, use_gripper=False)
         labware = ctx.load_labware(labware_type, SLOT_LABWARE)
         labware.load_empty(labware.wells())
-        return labware 
+        return labware
 
     # Begin Protocol
 
@@ -573,7 +570,9 @@ def run(ctx: ProtocolContext) -> None:
         if step > 0 and step % num_wells == 0:
             if not ctx.is_simulating():
                 labware = reload_labware(labware, labware_type)
-                _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
+                _get_height_of_liquid_in_well(
+                    liq_pipette, src["A1"], ctx.is_simulating()
+                )
             else:
                 break
 
@@ -581,7 +580,7 @@ def run(ctx: ProtocolContext) -> None:
 
         # Dispense
         dispense_volume += step_volume
-        liq_pipette.flow_rate.dispense = min(max_volume / 20, 400) #change later 
+        liq_pipette.flow_rate.dispense = min(max_volume / 20, 400)  # change later
         dispense_loc = labware[current_well].bottom(z=max(corrected_height + 2.5, 3))
         liq_pipette.transfer(
             (dispense_volume / liq_pipette.channels) * 1.033,
@@ -589,7 +588,7 @@ def run(ctx: ProtocolContext) -> None:
             dispense_loc,
             new_tip="never",
             return_tip=False,
-            blow_out = True,
+            blow_out=True,
             blowout_location="destination well",
             air_gap=5,
         )
@@ -644,6 +643,7 @@ def run(ctx: ProtocolContext) -> None:
     new_inner_well_json = generate_frusta(ctx, frusta_data, labware)
     if not ctx.is_simulating():
         from hardware_testing import data
+
         user_defined_volumes = data.create_folder_for_test_data("user-defined-volumes")
         udv_def_name = f"{RUN_ID}_{labware_type}.json"
         file_path = user_defined_volumes / udv_def_name

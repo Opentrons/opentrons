@@ -17,7 +17,7 @@
       "minVolume": 0
     },
     "t50": {
-      "minHeight": 0,
+      "minHeight": 1.0,
       "minVolume": 0
     }
   }
