@@ -69,6 +69,10 @@ jobs:
       - name: Determine deployment configuration
         id: config
         run: |
+          echo "Debug: Checking secrets..."
+          echo "DOCS_SANDBOX_ROLE exists: ${{ secrets.DOCS_SANDBOX_ROLE != '' }}"
+          echo "DOCS_SANDBOX_ROLE value: ${{ secrets.DOCS_SANDBOX_ROLE }}"
+          
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
             echo "environment=sandbox" >> $GITHUB_OUTPUT
             echo "branch=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
@@ -85,6 +89,7 @@ jobs:
             echo "bucket=sandbox.docs" >> $GITHUB_OUTPUT
             echo "url=http://sandbox.docs.s3-website.us-east-2.amazonaws.com/${{ github.ref_name }}/" >> $GITHUB_OUTPUT
             echo "aws-role=${{ secrets.DOCS_SANDBOX_ROLE }}" >> $GITHUB_OUTPUT
+            echo "Debug: Set aws-role output to: ${{ secrets.DOCS_SANDBOX_ROLE }}"
             echo "## 📋 Deployment Configuration" >> $GITHUB_STEP_SUMMARY
             echo "**Environment:** Sandbox" >> $GITHUB_STEP_SUMMARY
             echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
