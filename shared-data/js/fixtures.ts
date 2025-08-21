@@ -1492,7 +1492,6 @@ export const replaceCutoutFixtureWithComboFixture = (
       aaCutoutItem,
       deckConfigWithAA
     )
-    console.log('wasteChuteCombo: ', wasteChuteCombo)
     if (wasteChuteCombo) {
       return wasteChuteCombo
     }
@@ -1646,7 +1645,6 @@ export const getFlexStackerD3Compatibility = (
     deckConfigCompatabilityD3?.requiredAddressableAreas ?? [],
     'cutoutD3'
   )
-  console.log('matchWithAA: ', matchWithAA)
   const matchWithFixture =
     matchWithAA ?? deckConfigCompatabilityD3?.compatibleCutoutFixtureIds[0]
   if (

@@ -46,6 +46,7 @@ import type { CreateMaintenanceRunType } from '@opentrons/react-api-client'
 import type {
   AreaType,
   CutoutFixtureId,
+  CutoutFixtureIdsWithFakes,
   CutoutId,
   DeckConfiguration,
 } from '@opentrons/shared-data'
@@ -80,7 +81,6 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
     attachedModule,
     deckConfig
   )
-  console.log('configuredFixtureIdByCutoutId: ', configuredFixtureIdByCutoutId)
 
   const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
     deckConfig
@@ -143,19 +143,9 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
       anchorCutoutId,
       moduleFixtures
     )
-    console.log('selectedFixtureIdByCutoutIds: ', selectedFixtureIdByCutoutIds)
-    console.log(
-      'configuredFixtureIdByCutoutId: ',
-      configuredFixtureIdByCutoutId
-    )
     if (!isEqual(selectedFixtureIdByCutoutIds, configuredFixtureIdByCutoutId)) {
-      console.log(
-        'selectedFixtureIdByCutoutIds is not equal to configuredFixtureIdByCutoutId'
-      )
       const updatedDeckConfig = deckConfig.map(cc => {
         if (cc.cutoutId in configuredFixtureIdByCutoutId) {
-          console.log('cc.cutoutId in configuredFixtureIdByCutoutId')
-          console.log('cc: ', cc)
           if (SINGLE_CENTER_CUTOUTS.includes(cc.cutoutId)) {
             return {
               ...cc,
@@ -163,8 +153,7 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
               opentronsModuleSerialNumber: undefined,
             }
           } else if (COMBO_FIXTURES.includes(cc.cutoutFixtureId)) {
-            console.log('FLEX_STACKER_FIXTURES fixture')
-            if (cc.cutoutId != Object.keys(selectedFixtureIdByCutoutIds)[0]) {
+            if (cc.cutoutId !== Object.keys(selectedFixtureIdByCutoutIds)[0]) {
               const aaForSelectedFixture = getAAWithFakesFromCutoutFixtureId(
                 Object.keys(selectedFixtureIdByCutoutIds)[0] as CutoutId,
                 selectedFixtureIdByCutoutIds[
@@ -172,7 +161,7 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
                 ] ?? cc.cutoutFixtureId,
                 deckDef
               )
-              const filteredAAForSelectedFixture = aaForSelectedFixture.find(
+              const filteredAAForSelectedFixture = aaForSelectedFixture?.find(
                 aa => {
                   const aaAreaType = getAAByAAId(aa, deckDef).areaType
                   return (
@@ -182,21 +171,19 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
                   )
                 }
               )
-              console.log(
-                'filteredAAForSelectedFixture: ',
-                filteredAAForSelectedFixture
-              )
+              if (filteredAAForSelectedFixture == null) {
+                return cc
+              }
 
               const fixtureReplacement = replaceCutoutFixtureForFixtureRemoval(
                 cc.cutoutFixtureId,
                 cc.cutoutId,
                 filteredAAForSelectedFixture
               )
-              console.log('fixtureReplacement: ', fixtureReplacement)
               return {
                 ...cc,
                 cutoutFixtureId: getReplacementFixtureForFakeFixture(
-                  fixtureReplacement
+                  fixtureReplacement as CutoutFixtureIdsWithFakes
                 ),
                 opentronsModuleSerialNumber: undefined,
               }
@@ -215,7 +202,6 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
             opentronsModuleSerialNumber: undefined,
           }
         } else if (cc.cutoutId in selectedFixtureIdByCutoutIds) {
-          console.log('cc.cutoutId in selectedFixtureIdByCutoutIds')
           const fixtureReplacement = getCutoutConfigReplacmentForModule(
             anchorCutoutId,
             selectedFixtureIdByCutoutIds[cc.cutoutId] ?? cc.cutoutFixtureId,
@@ -249,19 +235,16 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
           const removedDefaultFixture = removedFixtureIdByCutoutIds[
             cc.cutoutId
           ] as CutoutFixtureId // we know there is a match by the condition
-          console.log('removedDefaultFixture: ', removedDefaultFixture)
           const aa = getAAForModuleFixture(
             anchorCutoutId,
             removedDefaultFixture,
             attachedModule.moduleModel
           )
-          console.log('aa: ', aa)
           const replacment = getReplacementFixtureForFixtureRemoval(
             fixtureInPlace?.cutoutFixtureId ?? removedDefaultFixture,
             anchorCutoutId,
             aa
           )
-          console.log('replacment: ', replacment)
           return {
             ...cc,
             cutoutFixtureId: replacment,
