@@ -11,13 +11,7 @@ from pathlib import Path
 
 def update_urls(environment, branch=None):
     """Update URLs in index.html based on environment"""
-    # Check for temporary staging/production directories first
-    if environment == "staging" and Path("temp-staging").exists():
-        index_path = Path("temp-staging/site/index.html")
-    elif environment == "production" and Path("temp-production").exists():
-        index_path = Path("temp-production/site/index.html")
-    else:
-        index_path = Path("site/index.html")
+    index_path = Path("site/index.html")
     
     if not index_path.exists():
         print(f"Error: {index_path} does not exist")

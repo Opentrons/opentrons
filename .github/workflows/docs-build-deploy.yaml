@@ -117,7 +117,7 @@ jobs:
           echo "<http://sandbox.docs.s3-website.us-east-2.amazonaws.com/${{ env.BRANCH }}/>" >> $GITHUB_STEP_SUMMARY
 
   deploy-staging:
-    needs: deploy-sandbox
+    needs: build
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/staging-MKDOCS')
     timeout-minutes: 5
     runs-on: ubuntu-24.04
@@ -136,23 +136,24 @@ jobs:
         with:
           role-to-assume: ${{ secrets.DOCS_SANDBOX_ROLE }}
           aws-region: us-east-2
-      - name: Sync from Sandbox to Staging
-        run: |
-          aws s3 sync s3://${{ env.SANDBOX_BUCKET }}/${{ env.BRANCH }}/ s3://${{ env.STAGING_BUCKET }}/ --delete
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: docs-artifacts
+          path: docs/
       - name: Update URLs for Staging
         working-directory: ./docs
-        run: |
-          # Download the files temporarily to update URLs
-          aws s3 sync s3://${{ env.STAGING_BUCKET }}/ ./temp-staging/
-          python update_urls.py staging --branch ${{ env.BRANCH }}
-          aws s3 sync ./temp-staging/ s3://${{ env.STAGING_BUCKET }}/ --delete
+        run: python update_urls.py staging --branch ${{ env.BRANCH }}
+      - name: Deploy to Staging
+        working-directory: ./docs
+        run: make deploy ENVIRONMENT=staging BRANCH=${{ env.BRANCH }}
       - name: Output Staging URL
         run: |
           echo "## Docs site deployed to staging" >> $GITHUB_STEP_SUMMARY
           echo "<https://staging.docs.opentrons.com/>" >> $GITHUB_STEP_SUMMARY
 
   deploy-production:
-    needs: deploy-staging
+    needs: build
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/MKDOCS') && !startsWith(github.ref, 'refs/tags/staging-MKDOCS')
     timeout-minutes: 5
     runs-on: ubuntu-24.04
@@ -171,16 +172,17 @@ jobs:
         with:
           role-to-assume: ${{ secrets.DOCS_SANDBOX_ROLE }}
           aws-region: us-east-2
-      - name: Sync from Staging to Production
-        run: |
-          aws s3 sync s3://${{ env.STAGING_BUCKET }}/ s3://${{ env.PRODUCTION_BUCKET }}/ --delete
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: docs-artifacts
+          path: docs/
       - name: Update URLs for Production
         working-directory: ./docs
-        run: |
-          # Download the files temporarily to update URLs
-          aws s3 sync s3://${{ env.PRODUCTION_BUCKET }}/ ./temp-production/
-          python update_urls.py production --branch ${{ env.BRANCH }}
-          aws s3 sync ./temp-production/ s3://${{ env.PRODUCTION_BUCKET }}/ --delete
+        run: python update_urls.py production --branch ${{ env.BRANCH }}
+      - name: Deploy to Production
+        working-directory: ./docs
+        run: make deploy ENVIRONMENT=production BRANCH=${{ env.BRANCH }}
       - name: Output Production URL
         run: |
           echo "## Docs site deployed to production" >> $GITHUB_STEP_SUMMARY
