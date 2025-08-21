@@ -91,17 +91,17 @@ class Slack:
     def send_slack_message(
         self,
         message: str,
-        image_path: Optional[str] = None,
+        file_path: str | None = None,
         user_id: Optional[str] = None,
     ) -> None:
         """Send slack message with or without image."""
         tagged_user = f"<@{user_id}> " if user_id and user_id.lower() != "none" else ""
         message = tagged_user + " " + message
-        if image_path:
+        if file_path:
             response = self.client.files_upload(
                 channels=self.channel,
-                file=image_path,
-                title=os.path.basename(image_path).split(".")[0],
+                file=file_path,
+                title=os.path.basename(file_path).split(".")[0],
             )
             response.validate()
             file_permalink = response["file"]["permalink"]
