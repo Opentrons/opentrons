@@ -9141,7 +9141,8 @@
       "key": "4ba9978cc60891f72158e7b0d9f055c5",
       "notes": [],
       "params": {
-        "moduleId": "UUID"
+        "moduleId": "UUID",
+        "strategy": "automatic"
       },
       "result": {
         "eventualDestinationLocationSequence": [
@@ -12757,7 +12758,8 @@
       "key": "6a50d3fe865b20e13e79224c8be2d8af",
       "notes": [],
       "params": {
-        "moduleId": "UUID"
+        "moduleId": "UUID",
+        "strategy": "automatic"
       },
       "result": {
         "eventualDestinationLocationSequence": [
