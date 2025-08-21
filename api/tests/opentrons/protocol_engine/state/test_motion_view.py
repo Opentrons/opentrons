@@ -4,6 +4,7 @@ from typing import List
 
 import pytest
 from decoy import Decoy
+from unittest.mock import sentinel
 
 from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons.types import Point, MountType, DeckSlotName
@@ -282,6 +283,104 @@ def test_get_pipette_location_override_current_location_y_center(
         mount=MountType.RIGHT,
         critical_point=CriticalPoint.Y_CENTER,
     )
+
+
+@pytest.mark.parametrize("has_96_grid", [True, False])
+@pytest.mark.parametrize("has_12_grid", [True, False])
+def test_get_pipette_offset_for_reservoirs(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    pipette_view: PipetteView,
+    geometry_view: GeometryView,
+    mock_module_view: ModuleView,
+    subject: MotionView,
+    has_96_grid: bool,
+    has_12_grid: bool,
+) -> None:
+    """It should call get_waypoints() with the correct offset given the well's dimensions."""
+    location = CurrentWell(pipette_id="123", labware_id="456", well_name="abc")
+
+    decoy.when(pipette_view.get_current_location()).then_return(location)
+
+    fake_x_dim, fake_y_dim, fake_z_dim = 7.0, 8.0, 9.0
+    decoy.when(labware_view.get_well_size("labware-id", "well-name")).then_return(
+        (fake_x_dim, fake_y_dim, fake_z_dim)
+    )
+    decoy.when(labware_view.get_has_96_subwells("labware-id")).then_return(has_96_grid)
+    decoy.when(labware_view.get_has_12_subwells("labware-id")).then_return(has_12_grid)
+
+    decoy.when(
+        labware_view.get_should_center_column_on_target_well(
+            "labware-id",
+        )
+    ).then_return(True)
+    decoy.when(
+        labware_view.get_should_center_pipette_on_target_well(
+            "labware-id",
+        )
+    ).then_return(False)
+
+    fake_well_position = Point(x=4, y=5, z=6)
+    decoy.when(
+        geometry_view.get_well_position(
+            "labware-id", "well-name", WellLocation(), None, "pipette-id"
+        )
+    ).then_return(fake_well_position)
+
+    decoy.when(
+        _move_types.get_move_type_to_well(
+            "pipette-id", "labware-id", "well-name", location, True
+        )
+    ).then_return(motion_planning.MoveType.GENERAL_ARC)
+    decoy.when(
+        geometry_view.get_min_travel_z("pipette-id", "labware-id", location, 123)
+    ).then_return(42.0)
+
+    decoy.when(geometry_view.get_ancestor_slot_name("labware-id")).then_return(
+        DeckSlotName.SLOT_2
+    )
+
+    decoy.when(
+        geometry_view.get_extra_waypoints(location, DeckSlotName.SLOT_2)
+    ).then_return([(456, 789)])
+
+    x_offset = 0.0
+    y_offset = 0.0
+    if has_12_grid:
+        x_offset = -1 * fake_x_dim / 24
+    elif has_96_grid:
+        x_offset = -1 * fake_x_dim / 24
+        y_offset = fake_y_dim / 16
+    reservoir_offset = Point(x=x_offset, y=y_offset)
+    expected_destination = fake_well_position + reservoir_offset
+
+    # make sure get_waypoints is called with expected_destination
+    decoy.when(
+        motion_planning.get_waypoints(
+            move_type=motion_planning.MoveType.GENERAL_ARC,
+            origin=Point(x=1, y=2, z=3),
+            origin_cp=CriticalPoint.MOUNT,
+            max_travel_z=1337,
+            min_travel_z=42,
+            dest=expected_destination,
+            dest_cp=CriticalPoint.Y_CENTER,
+            xy_waypoints=[(456, 789)],
+        )
+    ).then_return(sentinel.waypoints)
+
+    result = subject.get_movement_waypoints_to_well(
+        pipette_id="pipette-id",
+        labware_id="labware-id",
+        well_name="well-name",
+        well_location=WellLocation(),
+        origin=Point(x=1, y=2, z=3),
+        origin_cp=CriticalPoint.MOUNT,
+        max_travel_z=1337,
+        force_direct=True,
+        minimum_z_height=123,
+    )
+
+    assert result is sentinel.waypoints
 
 
 def test_get_movement_waypoints_to_well_for_y_center(

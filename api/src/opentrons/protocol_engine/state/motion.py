@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 from typing import List, Optional, Union
+import logging
 
 from opentrons.types import MountType, Point, StagingSlotName
 from opentrons.hardware_control.types import CriticalPoint
@@ -28,6 +29,8 @@ from .addressable_areas import AddressableAreaView
 from .geometry import GeometryView
 from .modules import ModuleView
 from .module_substates import HeaterShakerModuleId
+
+log = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -86,7 +89,9 @@ class MotionView:
                 critical_point = CriticalPoint.XY_CENTER
         return PipetteLocationData(mount=mount, critical_point=critical_point)
 
-    def _get_pipette_offset_for_reservoirs(self, labware_id: str, well_name: str) -> Point:
+    def _get_pipette_offset_for_reservoirs(
+        self, labware_id: str, well_name: str
+    ) -> Point:
         subwells_96 = self._labware.get_has_96_subwells(labware_id)
         subwells_12 = self._labware.get_has_12_subwells(labware_id)
         if not subwells_12 and not subwells_96:
@@ -98,16 +103,20 @@ class MotionView:
 
         x_offset = 0.0
         y_offset = 0.0
-        if subwells_96:
+        if subwells_12 and subwells_96:
+            log.warning(
+                f"{labware_id} has both offsetPipetteFor96GridSubwells and offsetPipetteFor12GridSubwells quirks."
+            )
+        if subwells_12:
+            # move half a subwell to the left
+            # half of a subwell width would be 1/12 * well_x_dim / 2
+            x_offset = -1 * well_x_dim / 24
+        elif subwells_96:
             # move half a subwell to the left + half a subwell up
             # half of a subwell width would be 1/12 * well_x_dim / 2
             x_offset = -1 * well_x_dim / 24
             # half of a subwell length would be 1/8 * well_y_dim / 2
             y_offset = well_y_dim / 16
-        if subwells_12:
-            # move half a subwell to the left
-            # half of a subwell width would be 1/12 * well_x_dim / 2
-            x_offset = -1 * well_x_dim / 24
         return Point(x=x_offset, y=y_offset)
 
     def get_movement_waypoints_to_well(
@@ -141,8 +150,7 @@ class MotionView:
             pipette_id=pipette_id,
         )
         destination += self._get_pipette_offset_for_reservoirs(
-            labware_id=labware_id,
-            well_name=well_name
+            labware_id=labware_id, well_name=well_name
         )
 
         move_type = _move_types.get_move_type_to_well(
