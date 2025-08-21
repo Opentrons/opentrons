@@ -19,6 +19,7 @@ from opentrons_shared_data.labware.types import (
     LocatingFeatures,
     SpringDirectionalForce,
     SlotFootprintAsParentFeature,
+    Vector3D as LabwareVector3D,
 )
 from opentrons.protocol_engine.resources.labware_validation import (
     validate_definition_is_lid,
@@ -431,11 +432,16 @@ def _shim_does_locating_feature_pair_exist(
         parent_deck_item.features.get("heaterShakerUniversalFlatAdapter") is not None
         and child_labware.features.get("flatWellSupportAsChild") is not None
     )
+    hs_universal_flat_adapter_screw_anchored_exists = (
+        parent_deck_item.features.get("screwAnchoredAsParent") is not None
+        and child_labware.features.get("heaterShakerUniversalFlatAdapter") is not None
+    )
 
     return (
         slot_footprint_exists
         or flex_tiprack_lid_exists
         or hs_universal_flat_adapter_exists
+        or hs_universal_flat_adapter_screw_anchored_exists
     )
 
 
@@ -608,6 +614,13 @@ def _parent_deck_item_to_child_labware_feature_offset(
             parent_deck_item
         ) + _flex_tip_rack_lid_feature_to_child_origin(child_labware)
     elif (
+        parent_deck_item.features.get("screwAnchoredAsParent") is not None
+        and _get_screw_anchored_center_for_child(child_labware, slot_name) is not None
+    ):
+        return _parent_origin_to_screw_anchored_feature(
+            parent_deck_item
+        ) + _screw_anchored_feature_to_child_origin(child_labware, slot_name)
+    elif (
         parent_deck_item.features.get("slotFootprintAsParent") is not None
         and child_labware.features.get("slotFootprintAsChild") is not None
     ):
@@ -653,6 +666,36 @@ def _get_spring_force(
             )
 
     return parent_spring_force or child_spring_force
+
+
+def _get_screw_anchored_center_for_child(
+    child_labware: LabwareDefinition3,
+    slot_name: DeckSlotName,
+) -> LabwareVector3D | None:
+    """Returns the screw center if it exists in any locating feature that supports screw anchoring."""
+    hs_universal_flat_adapter_feature = child_labware.features.get(
+        "heaterShakerUniversalFlatAdapter"
+    )
+    screw_anchored_as_child_feature = child_labware.features.get("screwAnchoredAsChild")
+
+    if hs_universal_flat_adapter_feature is not None:
+        if slot_name.orientation == SlotOrientation.LEFT:
+            x = hs_universal_flat_adapter_feature["deckLeft"]["screwCenter"]["x"]
+            y = hs_universal_flat_adapter_feature["deckLeft"]["screwCenter"]["y"]
+            return LabwareVector3D(x=x, y=y, z=0)
+        elif slot_name.orientation == SlotOrientation.RIGHT:
+            x = hs_universal_flat_adapter_feature["deckRight"]["screwCenter"]["x"]
+            y = hs_universal_flat_adapter_feature["deckRight"]["screwCenter"]["y"]
+            return LabwareVector3D(x=x, y=y, z=0)
+        else:
+            raise ValueError(
+                "Expected labware containing heaterShakerUniversalFlatAdapter "
+                "to be placed on the left or right side of the deck."
+            )
+    elif screw_anchored_as_child_feature is not None:
+        return screw_anchored_as_child_feature["screwCenter"]
+    else:
+        return None
 
 
 def _parent_origin_to_flex_tip_rack_lid_feature(
@@ -732,6 +775,20 @@ def _parent_origin_to_heater_shaker_universal_flat_adapter_feature(
         raise ValueError(
             "heaterShakerUniversalFlatAdapter feature does not support placement in a center slot."
         )
+
+
+def _parent_origin_to_screw_anchored_feature(
+    parent_deck_item: _Labware3SupportedParentDefinition,
+) -> Point:
+    """Returns the offset from a deck item's origin to the `screwAnchoredAsParent` locating feature."""
+    feature = parent_deck_item.features.get("screwAnchoredAsParent")
+    assert feature is not None
+
+    screw_center_x = feature["screwCenter"]["x"]
+    screw_center_y = feature["screwCenter"]["y"]
+    screw_center_z = feature["screwCenter"]["z"]
+
+    return Point(x=screw_center_x, y=screw_center_y, z=screw_center_z)
 
 
 def _flex_tip_rack_lid_feature_to_child_origin(
@@ -823,6 +880,20 @@ def _heater_shaker_universal_flat_adapter_feature_to_child_origin(
         raise ValueError(
             "heaterShakerUniversalFlatAdapter feature does not support placement in a center slot."
         )
+
+
+def _screw_anchored_feature_to_child_origin(
+    child_labware: LabwareDefinition3, slot_name: DeckSlotName
+) -> Point:
+    """Returns the offset from a `screwAnchoredAsChild` locating feature to the child origin."""
+    screw_center = _get_screw_anchored_center_for_child(child_labware, slot_name)
+    assert screw_center is not None
+
+    screw_center_x = screw_center["x"]
+    screw_center_y = screw_center["y"]
+    screw_center_z = screw_center["z"]
+
+    return Point(x=screw_center_x, y=screw_center_y, z=screw_center_z) * -1
 
 
 def _get_child_labware_overlap_with_parent_labware(
