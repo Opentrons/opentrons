@@ -517,6 +517,12 @@ LABWARE_OVERLAP_SPECS: List[LabwareOverlapSpec] = [
         labware_location=OnLabwareLocation(labwareId="parent-labware-2"),
         expected_total_offset=Point(x=450, y=650, z=950),
     ),
+    LabwareOverlapSpec(
+        child_definition=_LW_V2_WITH_LABWARE_STACKING,
+        parent_definition=_LW_V3_WITH_SLOT_AS_PARENT_CHILD_FEATURES,
+        labware_location=OnLabwareLocation(labwareId="parent-labware-3"),
+        expected_total_offset=Point(x=440, y=2135, z=742),
+    ),
 ]
 
 ADDRESSABLE_AREA_SPECS: List[AddressableAreaSpec] = [
