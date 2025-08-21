@@ -117,7 +117,7 @@ jobs:
           echo "<http://sandbox.docs.s3-website.us-east-2.amazonaws.com/${{ env.BRANCH }}/>" >> $GITHUB_STEP_SUMMARY
 
   deploy-staging:
-    needs: build
+    needs: deploy-sandbox
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/staging-MKDOCS')
     timeout-minutes: 5
     runs-on: ubuntu-24.04
@@ -126,6 +126,8 @@ jobs:
       contents: read
     env:
       BRANCH: ${{ github.ref_name }}
+      STAGING_BUCKET: opentrons.staging.docs
+      SANDBOX_BUCKET: sandbox.docs
     steps:
       - name: 'Checkout Repository'
         uses: actions/checkout@v4
@@ -134,33 +136,23 @@ jobs:
         with:
           role-to-assume: ${{ secrets.DOCS_SANDBOX_ROLE }}
           aws-region: us-east-2
-      - name: Download Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: docs-artifacts
-          path: docs/
-      - name: Debug Directory Structure
-        working-directory: ./docs
+      - name: Sync from Sandbox to Staging
         run: |
-          pwd
-          ls -la
-          echo "Checking if update_urls.py exists:"
-          ls -la update_urls.py || echo "update_urls.py not found"
-          echo "Checking if site/index.html exists:"
-          ls -la site/index.html || echo "site/index.html not found"
+          aws s3 sync s3://${{ env.SANDBOX_BUCKET }}/${{ env.BRANCH }}/ s3://${{ env.STAGING_BUCKET }}/ --delete
       - name: Update URLs for Staging
         working-directory: ./docs
-        run: python update_urls.py staging --branch ${{ env.BRANCH }}
-      - name: Deploy to Staging
-        working-directory: ./docs
-        run: make deploy ENVIRONMENT=staging BRANCH=${{ env.BRANCH }}
+        run: |
+          # Download the files temporarily to update URLs
+          aws s3 sync s3://${{ env.STAGING_BUCKET }}/ ./temp-staging/
+          python update_urls.py staging --branch ${{ env.BRANCH }}
+          aws s3 sync ./temp-staging/ s3://${{ env.STAGING_BUCKET }}/ --delete
       - name: Output Staging URL
         run: |
           echo "## Docs site deployed to staging" >> $GITHUB_STEP_SUMMARY
-          echo "<https://staging.docs.opentrons.com/${{ env.BRANCH }}/>" >> $GITHUB_STEP_SUMMARY
+          echo "<https://staging.docs.opentrons.com/>" >> $GITHUB_STEP_SUMMARY
 
   deploy-production:
-    needs: build
+    needs: deploy-staging
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/MKDOCS') && !startsWith(github.ref, 'refs/tags/staging-MKDOCS')
     timeout-minutes: 5
     runs-on: ubuntu-24.04
@@ -169,6 +161,8 @@ jobs:
       contents: read
     env:
       BRANCH: ${{ github.ref_name }}
+      STAGING_BUCKET: opentrons.staging.docs
+      PRODUCTION_BUCKET: opentrons.production.docs
     steps:
       - name: 'Checkout Repository'
         uses: actions/checkout@v4
@@ -177,28 +171,18 @@ jobs:
         with:
           role-to-assume: ${{ secrets.DOCS_SANDBOX_ROLE }}
           aws-region: us-east-2
-      - name: Download Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: docs-artifacts
-          path: docs/
-      - name: Debug Directory Structure
-        working-directory: ./docs
+      - name: Sync from Staging to Production
         run: |
-          pwd
-          ls -la
-          echo "Checking if update_urls.py exists:"
-          ls -la update_urls.py || echo "update_urls.py not found"
-          echo "Checking if site/index.html exists:"
-          ls -la site/index.html || echo "site/index.html not found"
+          aws s3 sync s3://${{ env.STAGING_BUCKET }}/ s3://${{ env.PRODUCTION_BUCKET }}/ --delete
       - name: Update URLs for Production
         working-directory: ./docs
-        run: python update_urls.py production --branch ${{ env.BRANCH }}
-      - name: Deploy to Production
-        working-directory: ./docs
-        run: make deploy ENVIRONMENT=production BRANCH=${{ env.BRANCH }}
+        run: |
+          # Download the files temporarily to update URLs
+          aws s3 sync s3://${{ env.PRODUCTION_BUCKET }}/ ./temp-production/
+          python update_urls.py production --branch ${{ env.BRANCH }}
+          aws s3 sync ./temp-production/ s3://${{ env.PRODUCTION_BUCKET }}/ --delete
       - name: Output Production URL
         run: |
           echo "## Docs site deployed to production" >> $GITHUB_STEP_SUMMARY
-          echo "<https://docs.opentrons.com/${{ env.BRANCH }}/>" >> $GITHUB_STEP_SUMMARY
+          echo "<https://docs.opentrons.com/>" >> $GITHUB_STEP_SUMMARY
 
