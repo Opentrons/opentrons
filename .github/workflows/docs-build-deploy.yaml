@@ -68,10 +68,6 @@ jobs:
       - name: Determine deployment configuration
         id: config
         run: |
-          echo "Debug: Checking secrets..."
-          echo "DOCS_SANDBOX_ROLE exists: ${{ secrets.DOCS_SANDBOX_ROLE != '' }}"
-          echo "DOCS_SANDBOX_ROLE value: ${{ secrets.DOCS_SANDBOX_ROLE }}"
-          
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
             echo "environment=sandbox" >> $GITHUB_OUTPUT
             echo "branch=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
@@ -128,12 +124,7 @@ jobs:
     steps:
       - name: 'Checkout Repository'
         uses: actions/checkout@v4
-      - name: Debug Environment Variables
-        run: |
-          echo "ENVIRONMENT: ${{ env.ENVIRONMENT }}"
-          echo "BRANCH: ${{ env.BRANCH }}"
-          echo "BUCKET: ${{ env.BUCKET }}"
-          echo "URL: ${{ env.URL }}"
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -144,16 +135,7 @@ jobs:
         with:
           name: docs-artifacts
           path: docs/
-      - name: Debug Site Directory
-        working-directory: ./docs
-        run: |
-          echo "Current directory: $(pwd)"
-          echo "Contents of current directory:"
-          ls -la
-          echo "Contents of site directory (if it exists):"
-          ls -la site/ || echo "site/ directory does not exist"
-          echo "Looking for index.html files:"
-          find . -name "index.html" -type f || echo "No index.html files found"
+
       - name: Update URLs
         working-directory: ./docs
         run: python update_urls.py ${{ env.ENVIRONMENT }} --branch ${{ env.BRANCH }}
