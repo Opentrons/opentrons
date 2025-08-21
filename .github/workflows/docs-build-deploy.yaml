@@ -9,7 +9,7 @@ on:
       - '.github/workflows/docs-build-deploy.yaml'
   push:
     branches:
-      - 'mkdocs-new-workflow'
+      - 'edge'
     tags:
       - 'staging-MKDOCS*'
       - 'MKDOCS*'
