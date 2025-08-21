@@ -39,10 +39,7 @@ export function TwoColLwInfoAndDeck(
     MANUAL_FILL_AND_RETRY_NEW_TIPS,
   } = RECOVERY_MAP
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
-  const {
-    relevantPickUpTipWellName,
-    relevantPickUpTipLabware,
-  } = failedLabwareUtils
+  const { relevantPickUpTipWellName } = failedLabwareUtils
   const { proceedNextStep, goBackPrevStep } = routeUpdateActions
   const { failedPipetteInfo, isPartialTipConfigValid } = failedPipetteUtils
   const { t } = useTranslation('error_recovery')
@@ -126,7 +123,7 @@ export function TwoColLwInfoAndDeck(
           ...restUtils
         } = deckMapUtils
 
-        const failedLwId = relevantPickUpTipLabware?.id ?? ''
+        const failedLwId = failedLabwareUtils.failedLabware?.id ?? ''
 
         const isValidDeck =
           currentLoc != null && newLoc != null && movedLabwareDef != null
