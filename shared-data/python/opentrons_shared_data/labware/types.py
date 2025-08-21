@@ -182,7 +182,7 @@ class OpentronsFlexTipRackLidAsChildFeature(TypedDict):
 
 class HeaterShakerUniversalFlatAdapterDeckSide(TypedDict):
     wallX: float
-    screwCenter: Vector2D
+    screwCenter: Vector3D
 
 
 class HeaterShakerUniversalFlatAdapterFeature(TypedDict):

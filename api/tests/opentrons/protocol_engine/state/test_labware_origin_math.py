@@ -333,8 +333,8 @@ _LW_V3_WITH_HS_FLAT_ADAPTER = LabwareDefinition3.model_construct(  # type: ignor
     features=LocatingFeatures(
         heaterShakerUniversalFlatAdapter=HeaterShakerUniversalFlatAdapterFeature(
             flatWellSupportZ=50,
-            deckLeft={"wallX": 10, "screwCenter": {"x": 100, "y": 300}},
-            deckRight={"wallX": -10, "screwCenter": {"x": 500, "y": 700}},
+            deckLeft={"wallX": 10, "screwCenter": {"x": 100, "y": 300, "z": 10}},
+            deckRight={"wallX": -10, "screwCenter": {"x": 500, "y": 700, "z": 50}},
         )
     ),
     parameters=Parameters3.model_construct(loadName="hs-flat-adapter-parent"),  # type: ignore[call-arg]
