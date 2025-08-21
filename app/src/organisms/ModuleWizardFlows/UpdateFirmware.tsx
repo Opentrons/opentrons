@@ -92,6 +92,7 @@ export function UpdateFirmware(props: UpdateFirmwareProps): JSX.Element {
       // Update passed
       setShouldProceed(true)
       setIsModuleUpdating(false)
+      setInProgress(false)
       sendIdentifyStacker(matchingModule, true, 'blue')
       patchModuleAfterUpdate(matchingModule)
       setTimeout(() => {

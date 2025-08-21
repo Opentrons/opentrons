@@ -8,6 +8,7 @@ import {
   COLORS,
   DeckFromLayers,
   DIRECTION_COLUMN,
+  FixedTrashText,
   Flex,
   ListItem,
   ListItemCustomize,
@@ -53,7 +54,7 @@ import {
 } from '../../../step-forms/selectors'
 import { getDismissedHints } from '../../../tutorial/selectors'
 import { COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE } from '../../../utils/labwareModuleCompatibility'
-import { FixedTrashText, MagnetModuleChangeContent } from '../../molecules'
+import { MagnetModuleChangeContent } from '../../molecules'
 import { useBlockingHint } from '../BlockingHintModal'
 import { ConfirmDeleteEntityInUseModal } from '../ConfirmDeleteEntityInUseModal'
 import { useKitchen } from '../Kitchen/useKitchen'

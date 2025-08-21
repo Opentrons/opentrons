@@ -1,5 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
+import { getStackerLocationFromSlotName } from '@opentrons/shared-data'
+
 import { InterventionContent } from '/app/molecules/InterventionModal/InterventionContent'
 import { RECOVERY_MAP } from '/app/organisms/ErrorRecoveryFlows/constants'
 
@@ -76,9 +78,10 @@ export function LeftColumnLabwareInfo({
             labwareName: failedLabwareNames.name ?? '',
             labwareNickname: failedLabwareNames.nickName,
             currentLocationProps: {
-              deckLabel: `STACKER ${(
-                displayNameCurrentLoc?.toUpperCase() ?? ''
-              ).charAt(0)}`,
+              deckLabel: getStackerLocationFromSlotName(
+                failedLabwareLocations.displayNameNewLoc ??
+                  displayNameCurrentLoc
+              ),
             },
           }
         case STACKER_STALLED_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE:

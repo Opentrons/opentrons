@@ -447,8 +447,7 @@ describe('ModuleCard', () => {
         hasAvailableUpdate: true,
       },
     })
-    // FIXME: remove the extra period when InlineNotification is updated
-    screen.getByText('Firmware update available..')
+    screen.getByText('Firmware update available.')
     const button = screen.getByText('Update now')
     fireEvent.click(button)
     expect(vi.mocked(getRequestById)).toHaveBeenCalled()
@@ -467,8 +466,7 @@ describe('ModuleCard', () => {
       ...props,
       module: mockHotThermo,
     })
-    // FIXME: remove the extra period when InlineNotification is updated
-    screen.getByText('Firmware update available..')
+    screen.getByText('Firmware update available.')
     const button = screen.getByText('Update now')
     fireEvent.click(button)
     expect(vi.mocked(getRequestById)).toHaveBeenCalled()
@@ -497,8 +495,7 @@ describe('ModuleCard', () => {
       ...props,
       module: mockHotThermo,
     })
-    // FIXME: remove the extra period when InlineNotification is updated
-    screen.getByText('Firmware update available..')
+    screen.getByText('Firmware update available.')
     const button = screen.getByText('Update now')
     fireEvent.click(button)
     expect(vi.mocked(getRequestById)).toHaveBeenCalled()

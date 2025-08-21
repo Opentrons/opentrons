@@ -23,6 +23,7 @@ import {
   WASTE_CHUTE_STAGING_AREA_FIXTURES,
 } from '@opentrons/shared-data'
 
+import { FixedTrashText } from '../..'
 import { COLORS } from '../../helix-design-system'
 import { DeckInfoLabel } from '../../molecules/DeckInfoLabel'
 import { SlotLabels } from '../Deck'
@@ -198,10 +199,13 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
       {...svgProps}
     >
       {robotType === OT2_ROBOT_TYPE ? (
-        <DeckFromLayers
-          robotType={robotType}
-          layerBlocklist={deckLayerBlocklist}
-        />
+        <>
+          <DeckFromLayers
+            robotType={robotType}
+            layerBlocklist={deckLayerBlocklist}
+          />
+          <FixedTrashText />
+        </>
       ) : (
         <>
           {showSlotLabels ? (

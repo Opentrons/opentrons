@@ -120,7 +120,7 @@ const mockRobotState: TimelineFrame = {
 describe('quickTransferStepCommands', () => {
   it('should generate a transfer step in py', () => {
     const mockStepArgs: TransferArgs = {
-      stepId: 1,
+      stepNumber: 1,
       commandCreatorFnName: 'transfer',
       sourceWells: ['A1'],
       destWells: ['B1'],
@@ -273,7 +273,7 @@ pipette.drop_tip()`.trimStart()
   })
   it('should generate a consolidate step in py', () => {
     const mockStepArgs: ConsolidateArgs = {
-      stepId: 1,
+      stepNumber: 1,
       commandCreatorFnName: 'consolidate',
       sourceWells: ['A1', 'B1'],
       destWell: 'B1',
@@ -426,7 +426,7 @@ pipette.drop_tip()`.trimStart()
   })
   it('should generate a distribute step in py', () => {
     const mockStepArgs: DistributeArgs = {
-      stepId: 1,
+      stepNumber: 1,
       commandCreatorFnName: 'distribute',
       sourceWell: 'A1',
       destWells: ['A1', 'B1'],
