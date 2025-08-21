@@ -2,8 +2,6 @@
 title: "Thermocycler Module: OT-2 Attachment Steps"
 ---
 
-# OT-2 Attachment Steps
-
 To attach the Thermocycler to your OT-2:
 
 <div class="instruction-list" markdown>
