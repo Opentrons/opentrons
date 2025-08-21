@@ -90,8 +90,18 @@ class MotionView:
         return PipetteLocationData(mount=mount, critical_point=critical_point)
 
     def _get_pipette_offset_for_reservoirs(
-        self, labware_id: str, well_name: str
+        self, labware_id: str, well_name: str, pipette_id: str
     ) -> Point:
+        # - 96 channel pipettes need no adjustments, since they have an even number
+        #   of both rows and columns
+        # - 8 channel pipettes might need an adjustment in only the x direction,
+        #   since they have an odd number of columns
+        # - 1 channel pipettes might need an adjustment in x and y directions,
+        #   since they have an odd number of both rows and columns
+        pipette_channels = self._pipettes.get_config(pipette_id).channels
+        if pipette_channels == 96:
+            return Point()
+
         subwells_96 = self._labware.get_has_96_subwells(labware_id)
         subwells_12 = self._labware.get_has_12_subwells(labware_id)
         if not subwells_12 and not subwells_96:
@@ -115,8 +125,9 @@ class MotionView:
             # move half a subwell to the left + half a subwell up
             # half of a subwell width would be 1/12 * well_x_dim / 2
             x_offset = -1 * well_x_dim / 24
-            # half of a subwell length would be 1/8 * well_y_dim / 2
-            y_offset = well_y_dim / 16
+            if pipette_channels == 1:
+                # half of a subwell length would be 1/8 * well_y_dim / 2
+                y_offset = well_y_dim / 16
         return Point(x=x_offset, y=y_offset)
 
     def get_movement_waypoints_to_well(
@@ -150,7 +161,7 @@ class MotionView:
             pipette_id=pipette_id,
         )
         destination += self._get_pipette_offset_for_reservoirs(
-            labware_id=labware_id, well_name=well_name
+            labware_id=labware_id, well_name=well_name, pipette_id=pipette_id
         )
 
         move_type = _move_types.get_move_type_to_well(
