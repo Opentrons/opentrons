@@ -64,7 +64,6 @@ jobs:
       branch: ${{ steps.config.outputs.branch }}
       bucket: ${{ steps.config.outputs.bucket }}
       url: ${{ steps.config.outputs.url }}
-      aws-role: ${{ steps.config.outputs.aws-role }}
     steps:
       - name: Determine deployment configuration
         id: config
@@ -78,7 +77,6 @@ jobs:
             echo "branch=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
             echo "bucket=sandbox.docs" >> $GITHUB_OUTPUT
             echo "url=http://sandbox.docs.s3-website.us-east-2.amazonaws.com/${{ github.event.pull_request.head.ref }}/" >> $GITHUB_OUTPUT
-            echo "aws-role=${{ secrets.DOCS_SANDBOX_ROLE }}" >> $GITHUB_OUTPUT
             echo "## 📋 Deployment Configuration" >> $GITHUB_STEP_SUMMARY
             echo "**Environment:** Sandbox" >> $GITHUB_STEP_SUMMARY
             echo "**Branch:** ${{ github.event.pull_request.head.ref }}" >> $GITHUB_STEP_SUMMARY
@@ -88,8 +86,6 @@ jobs:
             echo "branch=${{ github.ref_name }}" >> $GITHUB_OUTPUT
             echo "bucket=sandbox.docs" >> $GITHUB_OUTPUT
             echo "url=http://sandbox.docs.s3-website.us-east-2.amazonaws.com/${{ github.ref_name }}/" >> $GITHUB_OUTPUT
-            echo "aws-role=${{ secrets.DOCS_SANDBOX_ROLE }}" >> $GITHUB_OUTPUT
-            echo "Debug: Set aws-role output to: ${{ secrets.DOCS_SANDBOX_ROLE }}"
             echo "## 📋 Deployment Configuration" >> $GITHUB_STEP_SUMMARY
             echo "**Environment:** Sandbox" >> $GITHUB_STEP_SUMMARY
             echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
@@ -99,7 +95,6 @@ jobs:
             echo "branch=${{ github.ref_name }}" >> $GITHUB_OUTPUT
             echo "bucket=opentrons.staging.docs" >> $GITHUB_OUTPUT
             echo "url=https://staging.docs.opentrons.com/" >> $GITHUB_OUTPUT
-            echo "aws-role=${{ secrets.DOCS_SANDBOX_ROLE }}" >> $GITHUB_OUTPUT
             echo "## 📋 Deployment Configuration" >> $GITHUB_STEP_SUMMARY
             echo "**Environment:** Staging" >> $GITHUB_STEP_SUMMARY
             echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
@@ -109,7 +104,6 @@ jobs:
             echo "branch=${{ github.ref_name }}" >> $GITHUB_OUTPUT
             echo "bucket=opentrons.production.docs" >> $GITHUB_OUTPUT
             echo "url=https://docs.opentrons.com/" >> $GITHUB_OUTPUT
-            echo "aws-role=${{ secrets.DOCS_SANDBOX_ROLE }}" >> $GITHUB_OUTPUT
             echo "## 📋 Deployment Configuration" >> $GITHUB_STEP_SUMMARY
             echo "**Environment:** Production" >> $GITHUB_STEP_SUMMARY
             echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
@@ -131,7 +125,6 @@ jobs:
       BRANCH: ${{ needs.determine-deploy-config.outputs.branch }}
       BUCKET: ${{ needs.determine-deploy-config.outputs.bucket }}
       URL: ${{ needs.determine-deploy-config.outputs.url }}
-      AWS_ROLE: ${{ needs.determine-deploy-config.outputs.aws-role }}
     steps:
       - name: 'Checkout Repository'
         uses: actions/checkout@v4
@@ -141,12 +134,10 @@ jobs:
           echo "BRANCH: ${{ env.BRANCH }}"
           echo "BUCKET: ${{ env.BUCKET }}"
           echo "URL: ${{ env.URL }}"
-          echo "AWS_ROLE: ${{ env.AWS_ROLE }}"
-          echo "AWS_ROLE from outputs: ${{ needs.determine-deploy-config.outputs.aws-role }}"
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ needs.determine-deploy-config.outputs.aws-role }}
+          role-to-assume: ${{ secrets.DOCS_SANDBOX_ROLE }}
           aws-region: us-east-2
       - name: Download Artifacts
         uses: actions/download-artifact@v4
