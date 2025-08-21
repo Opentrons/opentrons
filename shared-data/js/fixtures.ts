@@ -8,7 +8,6 @@ import isEqual from 'lodash/isEqual'
 import {
   COMBO_FIXTURES,
   FLEX_MODULE_AA_TYPE_BY_MODEL,
-  FLEX_STACKER_ADDRESSABLE_AREAS,
   FLEX_STACKER_FIXTURES,
   FLEX_STAGING_ADDRESSABLE_AREAS_WITH_FAKES,
   FLEX_USB_MODULE_FIXTURES,
@@ -18,6 +17,7 @@ import {
   WASTE_CHUTE_FLEX_STACKER_FIXTURES,
   WASTE_CHUTE_ONLY_FIXTURES_WITH_FAKES,
   WASTE_CHUTE_WITH_FAKE_FIXTURES,
+  FAKE_STAGING_SLOT_WITH_MAG_BLOCK_FIXTURE,
 } from '.'
 import {
   A1_ADDRESSABLE_AREA,
@@ -47,7 +47,6 @@ import {
   D3_ADDRESSABLE_AREA,
   DEFAULT_AA_FOR_WASTE_CHUTE,
   FAKE_STAGING_AREA_RIGHT_SLOT,
-  FAKE_STAGING_SLOT_WITH_MAG_BLOCK_FIXTURE,
   FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT_FIXTURE,
   FLEX_ROBOT_TYPE,
   FLEX_STACKER_MODULE_V1,
@@ -1583,16 +1582,21 @@ export const replaceCutoutFixtureForFixtureRemoval = (
   cutoutId: CutoutId,
   addressableAreaId: AddressableAreaNamesWithFakes
 ): CutoutFixtureIdsWithFakes => {
+  console.log('cutoutFixtureRemoved: ', cutoutFixtureRemoved)
+  console.log('cutoutId: ', cutoutId)
+  console.log('addressableAreaId: ', addressableAreaId)
   const deckDef = getDeckDefFromRobotType('OT-3 Standard')
-  const addressableAreasById = getAAsToFixtureIdFromDeckDefWithFakes(
+  const aaPerFixtureOptions = getAAsToFixtureIdFromDeckDefWithFakes(
     cutoutId,
     deckDef
   )
-  const aaForCutoutAndFixture = getAAWithFakesFromCutoutFixtureId(
+  console.log('addressableAreasById: ', aaPerFixtureOptions)
+  const aaForFixtureRemoval = getAAWithFakesFromCutoutFixtureId(
     cutoutId,
     cutoutFixtureRemoved,
     deckDef
   )
+  console.log('aaForCutoutAndFixture: ', aaForFixtureRemoval)
   if (WASTE_CHUTE_WITH_FAKE_FIXTURES.includes(cutoutFixtureRemoved)) {
     if (addressableAreaId === DEFAULT_AA_FOR_WASTE_CHUTE) {
       return WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(cutoutFixtureRemoved)
@@ -1603,19 +1607,33 @@ export const replaceCutoutFixtureForFixtureRemoval = (
     }
   } else if (cutoutFixtureRemoved === ABSORBANCE_READER_V1_FIXTURE) {
     return SINGLE_RIGHT_SLOT_FIXTURE
-  } else {
-    const updated = aaForCutoutAndFixture?.map(aa => {
+  }
+  else if (cutoutFixtureRemoved === FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE) {  
+    if (getAAByAAId(addressableAreaId, deckDef).areaType === 'flexStacker') {
+      return FAKE_STAGING_SLOT_WITH_MAG_BLOCK_FIXTURE
+    } else {
+      return FLEX_STACKER_V1_FIXTURE
+    }
+  }
+  else {
+    const aaWithoutAASToRemove = aaForFixtureRemoval?.filter(aa => aa !== addressableAreaId)
+    console.log('aaWithoutAASToRemove: ', aaWithoutAASToRemove)
+    const updated = aaForFixtureRemoval?.map(aa => {
       const vsId = getVisualSlotIdForAA(cutoutId, cutoutFixtureRemoved, aa)
+      console.log('vsId: ', vsId)
+      console.log('aa: ', aa)
+      console.log('addressableAreaId: ', addressableAreaId) 
       return aa === addressableAreaId ? getAAWithFakesFromVSId(vsId) : aa
     })
-    const match = Object.entries(addressableAreasById).find(([, value]) =>
-      isEqual(
+    const match = Object.entries(aaPerFixtureOptions).find(([, value]) =>{
+      return isEqual(
         value.sort(),
         WASTE_CHUTE_WITH_FAKE_FIXTURES.includes(cutoutFixtureRemoved)
-          ? aaForCutoutAndFixture?.sort()
+          ? aaForFixtureRemoval?.sort()
           : updated?.sort()
-      )
+      )}
     )
+    console.log('match: ', match)
     if (match) {
       return match[0] as CutoutFixtureIdsWithFakes
     }

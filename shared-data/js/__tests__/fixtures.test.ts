@@ -462,10 +462,10 @@ describe('replaceCutoutFixtureRemove', () => {
   it('should get fixture replacment for FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE without a stacker', () => {
     const result = replaceCutoutFixtureForFixtureRemoval(
       FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
-      'cutoutD3',
-      'flexStackerModuleV1D4'
+      'cutoutC3',
+      'flexStackerModuleV1C4'
     )
-    expect(result).toEqual(MAGNETIC_BLOCK_V1_FIXTURE)
+    expect(result).toEqual(FAKE_STAGING_SLOT_WITH_MAG_BLOCK_FIXTURE)
   })
 
   it('should get fixture replacment for MAGNETIC_BLOCK_V1_FIXTURE', () => {

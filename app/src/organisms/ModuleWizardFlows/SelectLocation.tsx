@@ -25,6 +25,7 @@ import {
   getDeckDefFromRobotType,
   getFixtureIdByCutoutIdFromModuleAnchorCutoutId,
   getModuleDisplayName,
+  getReplacementFixtureForFakeFixture,
   getReplacementFixtureForFixtureRemoval,
   replaceCutoutFixtureForFixtureRemoval,
   replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
@@ -178,7 +179,7 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
               console.log('fixtureReplacement: ', fixtureReplacement)
             return {
               ...cc,
-              cutoutFixtureId: fixtureReplacement,
+              cutoutFixtureId: getReplacementFixtureForFakeFixture(fixtureReplacement),
               opentronsModuleSerialNumber: undefined,
             }
           }
