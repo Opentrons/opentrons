@@ -2,8 +2,6 @@
 title: "Thermocycler Module: Safety and Compliance"
 ---
 
-# Safety Information and Regulatory Compliance
-
 Opentrons recommends that you follow the safe use specifications in this section and throughout this manual.
 
 ## Safe Use Specifications

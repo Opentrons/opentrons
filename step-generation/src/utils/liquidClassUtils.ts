@@ -2,6 +2,7 @@ import last from 'lodash/last'
 
 import { getAllLiquidClassDefs, getIsLid } from '@opentrons/shared-data'
 
+import { sortLabwareBySlot } from '../robotStateSelectors'
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
   SOURCE_WELL_BLOWOUT_DESTINATION,

@@ -76,7 +76,7 @@ describe('Module Update Banner', () => {
     screen.getByTestId('ModuleCard_firmware_update_banner_test_number')
     screen.getByTestId('InlineNotification_alert')
     screen.queryByLabelText('close_icon')
-    screen.getByText('Firmware update available..')
+    screen.getByText('Firmware update available.')
     screen.getByText('Update now')
   })
 

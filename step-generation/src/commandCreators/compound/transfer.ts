@@ -154,7 +154,7 @@ export const transfer: CommandCreator<TransferArgs> = (
     touchTipAfterDispenseOffsetMmFromTop,
     touchTipAfterDispenseSpeed,
     volume,
-    stepId,
+    stepNumber,
   } = args
   const {
     pipetteEntities,
@@ -389,7 +389,7 @@ export const transfer: CommandCreator<TransferArgs> = (
   })
 
   const pythonLiquidClassArgs = [
-    `name=${formatPyStr(`${args.commandCreatorFnName}_step_${stepId}`)}`,
+    `name=${formatPyStr(`${args.commandCreatorFnName}_step_${stepNumber}`)}`,
     ...(liquidClass != null
       ? [`base_liquid_class=${getLiquidClassName(liquidClass, true)}`]
       : []),
