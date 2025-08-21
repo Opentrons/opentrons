@@ -153,40 +153,38 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
               opentronsModuleSerialNumber: undefined,
             }
           } else if (COMBO_FIXTURES.includes(cc.cutoutFixtureId)) {
-            if (cc.cutoutId !== Object.keys(selectedFixtureIdByCutoutIds)[0]) {
-              const aaForSelectedFixture = getAAWithFakesFromCutoutFixtureId(
-                Object.keys(selectedFixtureIdByCutoutIds)[0] as CutoutId,
-                selectedFixtureIdByCutoutIds[
-                  Object.keys(selectedFixtureIdByCutoutIds)[0] as CutoutId
-                ] ?? cc.cutoutFixtureId,
-                deckDef
-              )
-              const filteredAAForSelectedFixture = aaForSelectedFixture?.find(
-                aa => {
-                  const aaAreaType = getAAByAAId(aa, deckDef).areaType
-                  return (
-                    Object.values(FLEX_MODULE_AA_TYPE_BY_MODEL).includes(
-                      aaAreaType as AreaType
-                    ) && aaAreaType !== 'magneticBlock'
-                  )
-                }
-              )
-              if (filteredAAForSelectedFixture == null) {
-                return cc
+            const aaForSelectedFixture = getAAWithFakesFromCutoutFixtureId(
+              Object.keys(selectedFixtureIdByCutoutIds)[0] as CutoutId,
+              selectedFixtureIdByCutoutIds[
+                Object.keys(selectedFixtureIdByCutoutIds)[0] as CutoutId
+              ] ?? cc.cutoutFixtureId,
+              deckDef
+            )
+            const filteredAAForSelectedFixture = aaForSelectedFixture?.find(
+              aa => {
+                const aaAreaType = getAAByAAId(aa, deckDef).areaType
+                return (
+                  Object.values(FLEX_MODULE_AA_TYPE_BY_MODEL).includes(
+                    aaAreaType as AreaType
+                  ) && aaAreaType !== 'magneticBlock'
+                )
               }
+            )
+            if (filteredAAForSelectedFixture == null) {
+              return cc
+            }
 
-              const fixtureReplacement = replaceCutoutFixtureForFixtureRemoval(
-                cc.cutoutFixtureId,
-                cc.cutoutId,
-                filteredAAForSelectedFixture
-              )
-              return {
-                ...cc,
-                cutoutFixtureId: getReplacementFixtureForFakeFixture(
-                  fixtureReplacement as CutoutFixtureIdsWithFakes
-                ),
-                opentronsModuleSerialNumber: undefined,
-              }
+            const fixtureReplacement = replaceCutoutFixtureForFixtureRemoval(
+              cc.cutoutFixtureId,
+              cc.cutoutId,
+              filteredAAForSelectedFixture
+            )
+            return {
+              ...cc,
+              cutoutFixtureId: getReplacementFixtureForFakeFixture(
+                fixtureReplacement as CutoutFixtureIdsWithFakes
+              ),
+              opentronsModuleSerialNumber: undefined,
             }
           } else if (SINGLE_RIGHT_CUTOUTS.includes(cc.cutoutId)) {
             return {
