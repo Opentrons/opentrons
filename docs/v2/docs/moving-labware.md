@@ -28,10 +28,11 @@ For the first move, the API knows to find the plate in its initial load location
 ## Automatic vs Manual Moves
 
 There are two ways to move labware:
+
 - Automatically, with the Opentrons Flex Gripper.
 - Manually, by pausing the protocol until a user confirms that they've moved the labware.
 
-The `use_gripper` parameter of [move_labware()][opentrons.protocol_api.ProtocolContext.move_labware] determines whether a movement is automatic or manual. Set its value to `True` for an automatic move. The default value is `False`, so if you don't specify a value, the protocol will pause for a manual move.
+The `use_gripper` parameter of [`move_labware()`][opentrons.protocol_api.ProtocolContext.move_labware] determines whether a movement is automatic or manual. Set its value to `True` for an automatic move. The default value is `False`, so if you don't specify a value, the protocol will pause for a manual move.
 
 ```python
 def run(protocol: protocol_api.ProtocolContext):
@@ -55,14 +56,56 @@ If you attempt to use the gripper to move labware in an OT-2 protocol, the API w
 
 ## Supported Labware
 
-You can manually move any standard or custom labware. Using the gripper to move the following labware is fully supported by Opentrons:
-
-| Labware Type              | API Load Names |
-|---------------------------|----------------|
-| Full-skirt PCR plates     | `armadillo_96_wellplate_200ul_pcr_full_skirt`, `opentrons_96_wellplate_200ul_pcr_full_skirt` |
-| NEST well plates          | `nest_96_wellplate_200ul_flat`, `nest_96_wellplate_2ml_deep` |
-| Opentrons Flex 96 Tip Racks | `opentrons_flex_96_tiprack_50ul`, `opentrons_flex_96_tiprack_200ul`, `opentrons_flex_96_tiprack_1000ul`, `opentrons_flex_96_filtertiprack_50ul`, `opentrons_flex_96_filtertiprack_200ul`, `opentrons_flex_96_filtertiprack_1000ul` |
-| Opentrons labware lids    | `opentrons_tough_pcr_auto_sealing_lid`, `opentrons_flex_tiprack_lid` |
+<table>
+    <thead>
+        <tr>
+            <th>Labware Type</th>
+            <th>API Load Names</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Full-skirt PCR plates</td>
+            <td>
+                <ul>
+                    <li><code>armadillo_96_wellplate_200ul_pcr_full_skirt</code></li>
+                    <li><code>opentrons_96_wellplate_200ul_pcr_full_skirt</code></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td>NEST well plates</td>
+            <td>
+                <ul>
+                    <li><code>nest_96_wellplate_200ul_flat</code></li>
+                    <li><code>nest_96_wellplate_2ml_deep</code></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td>Opentrons Flex 96 Tip Racks</td>
+            <td>
+                <ul>
+                    <li><code>opentrons_flex_96_tiprack_50ul</code></li>
+                    <li><code>opentrons_flex_96_tiprack_200ul</code></li>
+                    <li><code>opentrons_flex_96_tiprack_1000ul</code></li>
+                    <li><code>opentrons_flex_96_filtertiprack_50ul</code></li>
+                    <li><code>opentrons_flex_96_filtertiprack_200ul</code></li>
+                    <li><code>opentrons_flex_96_filtertiprack_1000ul</code></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td>Opentrons labware lids</td>
+            <td>
+                <ul>
+                    <li><code>opentrons_tough_pcr_auto_sealing_lid</code></li>
+                    <li><code>opentrons_flex_tiprack_lid</code></li>
+                </ul>
+            </td>
+        </tr>
+    </tbody>
+</table>
 
 You can move compatible Opentrons lids manually or with the Flex Gripper, but some restrictions apply. For more information, see [Moving Lids](#moving-lids).
 
@@ -90,14 +133,14 @@ def run(protocol: protocol_api.ProtocolContext):
 
 Also note the `hs_mod.open_labware_latch()` command in the above example. To move labware onto or off of a module, you have to make sure that it's physically accessible:
 
-- For the Heater-Shaker, use [open_labware_latch()][opentrons.protocol_api.HeaterShakerContext.open_labware_latch].
-- For the Thermocycler, use [open_lid()][opentrons.protocol_api.ThermocyclerContext.open_lid].
+- For the Heater-Shaker, use [`open_labware_latch()`][opentrons.protocol_api.HeaterShakerContext.open_labware_latch].
+- For the Thermocycler, use [`open_lid()`][opentrons.protocol_api.ThermocyclerContext.open_lid].
 
 If the labware is inaccessible, the API will raise an error.
 
 ## Movement into the Waste Chute
 
-Move used tip racks and well plates to the waste chute to dispose of them. This requires you to first [configure the waste chute](#configure-waste-chute) in your protocol. Then use the loaded [WasteChute][opentrons.protocol_api.WasteChute] object as the value of `new_location`:
+Move used tip racks and well plates to the waste chute to dispose of them. This requires you to first [configure the waste chute](deck-slots.md#waste-chute) in your protocol. Then use the loaded [`WasteChute`][opentrons.protocol_api.WasteChute] object as the value of `new_location`:
 
 ```python
 chute = protocol.load_waste_chute()
@@ -112,7 +155,7 @@ Always specify `use_gripper=True` when moving labware into the waste chute. The 
 
 ## Moving Lids
 
-You can use [move_lid()][opentrons.protocol_api.ProtocolContext.move_lid] to move labware lids around the deck manually or using the Flex Gripper. Currently supported lids include the Opentrons Tough PCR Auto-Sealing Lid (for use with the Thermocycler) and the Opentrons Flex Tip Rack Lid.
+You can use [`move_lid()`][opentrons.protocol_api.ProtocolContext.move_lid] to move labware lids around the deck manually or using the Flex Gripper. Currently supported lids include the Opentrons Tough PCR Auto-Sealing Lid (for use with the Thermocycler) and the Opentrons Flex Tip Rack Lid.
 
 You can move the auto-sealing lids between deck slots, lid stacks, or compatible labware loaded in your protocol. This example loads a stack of lids and then moves one to a PCR plate on the Thermocycler.
 
@@ -145,15 +188,15 @@ protocol.move_lid(
 )
 ```
 
-To work with tip rack lids, first [load the tip rack lid](modules/loading_lids.md) using the `lid` parameter of [load_labware()][opentrons.protocol_api.ProtocolContext.load_labware]. Once loaded, you can only move a tip rack lid to another, unlidded tip rack or to a trash container. If you try setting another `new_location`, the API will raise an error.
+To work with tip rack lids, first [load the tip rack lid][loading-lids] using the `lid` parameter of [`load_labware()`][opentrons.protocol_api.ProtocolContext.load_labware]. Once loaded, you can only move a tip rack lid to another, unlidded tip rack or to a trash container. If you try setting another `new_location`, the API will raise an error.
 
 *New in version 2.23*
 
 ## The Off-Deck Location
 
-In addition to moving labware around the deck, [move_labware()][opentrons.protocol_api.ProtocolContext.move_labware] can also prompt you to move labware off of or onto the deck.
+In addition to moving labware around the deck, [`move_labware()`][opentrons.protocol_api.ProtocolContext.move_labware] can also prompt you to move labware off of or onto the deck.
 
-Remove labware from the deck to perform tasks like retrieving samples or discarding a spent tip rack. The destination location for such moves is the special constant [OFF_DECK][opentrons.protocol_api.OFF_DECK]:
+Remove labware from the deck to perform tasks like retrieving samples or discarding a spent tip rack. The destination location for such moves is the special constant [`OFF_DECK`][opentrons.protocol_api.OFF_DECK]:
 
 ```python
 protocol.move_labware(labware=plate, new_location=protocol_api.OFF_DECK)

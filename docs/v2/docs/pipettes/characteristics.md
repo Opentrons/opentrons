@@ -12,10 +12,10 @@ Finally, the volume ranges of pipettes affect what you can do with them. The vol
 
 All [atomic commands](../new_atomic_commands.md) and [complex commands](../new_complex_commands.md) work with single- and multi-channel pipettes.
 
-To keep the protocol API consistent when using single- and multi-channel pipettes, location arguments of pipetting commands use the pipette's *primary channel*. For multi-channel pipettes picking up tips with all of their channels, the back-left channel is considered primary. When using fewer channels, the `start` parameter of the [configure_nozzle_layout()][opentrons.protocol_api.InstrumentContext.configure_nozzle_layout] method can change the pipette's primary channel. See [Partial Tip Pickup](partial_tip_pickup.md) for more information.
+To keep the protocol API consistent when using single- and multi-channel pipettes, location arguments of pipetting commands use the pipette's *primary channel*. For multi-channel pipettes picking up tips with all of their channels, the back-left channel is considered primary. When using fewer channels, the `start` parameter of the [`configure_nozzle_layout()`][opentrons.protocol_api.InstrumentContext.configure_nozzle_layout] method can change the pipette's primary channel. See [Partial Tip Pickup](partial_tip_pickup.md) for more information.
 
 > [!note]
-> Complex commands with liquid classes, like [transfer_with_liquid_class()][opentrons.protocol_api.InstrumentContext.transfer_with_liquid_class], handle multi-channel movement differently. By default, they expect a list of *all wells* that the pipette will access. If you want to only provide the wells that the primary channel will access, set `group_wells=False` when using those commands.
+> Complex commands with liquid classes, like [`transfer_with_liquid_class()`][opentrons.protocol_api.InstrumentContext.transfer_with_liquid_class], handle multi-channel movement differently. By default, they expect a list of *all wells* that the pipette will access. If you want to only provide the wells that the primary channel will access, set `group_wells=False` when using those commands.
 
 With a pipette's default settings, you can generally access the wells indicated in the table below. Moving to any other well may cause the pipette to crash.
 
@@ -25,7 +25,7 @@ With a pipette's default settings, you can generally access the wells indicated 
 | 8        | A1–A12        | A1–B24        |
 | 96       | A1 only       | A1–B2         |
 
-Also, you should apply any location offset, such as [Well.top()][opentrons.protocol_api.labware.Well.top] or [Well.bottom()][opentrons.protocol_api.labware.Well.bottom], to the well accessed by the primary channel. Since all of the pipette's channels move together, each channel will have the same offset relative to the well that it is over.
+Also, you should apply any location offset, such as [`Well.top()`][opentrons.protocol_api.labware.Well.top] or [`Well.bottom()`][opentrons.protocol_api.labware.Well.bottom], to the well accessed by the primary channel. Since all of the pipette's channels move together, each channel will have the same offset relative to the well that it is over.
 
 Finally, because each multi-channel pipette has only one motor, they always aspirate and dispense on all channels simultaneously.
 
@@ -109,7 +109,7 @@ def run(protocol: protocol_api.ProtocolContext):
     pipette.blow_out()                  # 300 µL/s
 ```
 
-These flow rates will remain in effect until you change the `flow_rate` attribute again *or* call [configure_for_volume()][opentrons.protocol_api.InstrumentContext.configure_for_volume]. Calling `configure_for_volume()` always resets all pipette flow rates to the defaults for the mode that it sets.
+These flow rates will remain in effect until you change the `flow_rate` attribute again *or* call [`configure_for_volume()`][opentrons.protocol_api.InstrumentContext.configure_for_volume]. Calling `configure_for_volume()` always resets all pipette flow rates to the defaults for the mode that it sets.
 
 > [!note]
 > In API version 2.13 and earlier, [InstrumentContext.speed][opentrons.protocol_api.InstrumentContext.speed] offered similar functionality to `.flow_rate`. It attempted to set the plunger speed in mm/s. Due to technical limitations, that speed could only be approximate. You must use `.flow_rate` in version 2.14 and later, and you should consider replacing older code that sets `.speed`.

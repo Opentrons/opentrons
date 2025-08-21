@@ -29,7 +29,7 @@ Throughout this section, we'll use the labware listed in the following table.
 | Flex tip rack | [Opentrons Flex 96 Tips 200 µL](https://labware.opentrons.com/#/?loadName=opentrons_flex_96_tiprack_200ul) | `opentrons_flex_96_tiprack_200ul` |
 | OT-2 tip rack | [Opentrons 96 Tip Rack 300 µL](https://labware.opentrons.com/#/?loadName=opentrons_96_tiprack_300ul) | `opentrons_96_tiprack_300ul`      |
 
-Similar to the code sample in [How the API Works][how-the-api-works], here's how you use the [`ProtocolContext.load_labware`][opentrons.protocol_api.ProtocolContext.load_labware()] method to load labware on either Flex or OT-2.
+Similar to the code sample in [How the API Works][how-the-api-works], here's how you use the [`ProtocolContext.load_labware`][`opentrons.protocol_api.ProtocolContext.load_labware()`] method to load labware on either Flex or OT-2.
 
 
 ```python

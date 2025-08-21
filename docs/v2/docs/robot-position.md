@@ -18,7 +18,7 @@ The top, bottom, and center positions are determined by the labware definition a
 
 #### Top
 
-Let's look at the [Well.top()][opentrons.protocol_api.labware.Well.top] method. It returns a position level with the top of the well, centered in both horizontal directions.
+Let's look at the [`Well.top()`][opentrons.protocol_api.labware.Well.top] method. It returns a position level with the top of the well, centered in both horizontal directions.
 
 ```python
 plate["A1"].top()  # the top center of the well
@@ -35,7 +35,7 @@ plate["A1"].top(z=-1) # 1 mm below the top center of the well
 
 #### Bottom
 
-Let's look at the [Well.bottom()][opentrons.protocol_api.labware.Well.bottom] method. It returns a position level with the bottom of the well, centered in both horizontal directions. 
+Let's look at the [`Well.bottom()`][opentrons.protocol_api.labware.Well.bottom] method. It returns a position level with the bottom of the well, centered in both horizontal directions. 
 
 ```python
 plate["A1"].bottom()  # the bottom center of the well
@@ -60,7 +60,7 @@ plate["A1"].bottom(z=-1) # 1 mm below the bottom center of the well
 
 #### Center
 
-Let's look at the [Well.center()][opentrons.protocol_api.labware.Well.center] method. It returns a position centered in the well both vertically and horizontally. This can be a good place to start for precise control of positions within the well for unusual or custom labware.
+Let's look at the [`Well.center()`][opentrons.protocol_api.labware.Well.center] method. It returns a position centered in the well both vertically and horizontally. This can be a good place to start for precise control of positions within the well for unusual or custom labware.
 
 ```python
 plate["A1"].center() # the vertical and horizontal center of the well
@@ -70,7 +70,7 @@ plate["A1"].center() # the vertical and horizontal center of the well
 
 #### Meniscus
 
-Let's look at the [Well.meniscus()][opentrons.protocol_api.labware.Well.meniscus] method. It returns a position at the surface of liquid, or meniscus, inside a well. Similar to the `.Well.top` and `.Well.bottom` methods, you can adjust the height of this position with the optional argument `z`, which is measured in mm. Positive `z` values move the position up, and negative ones move it down. 
+Let's look at the [`Well.meniscus()`][opentrons.protocol_api.labware.Well.meniscus] method. It returns a position at the surface of liquid, or meniscus, inside a well. Similar to the `.Well.top` and `.Well.bottom` methods, you can adjust the height of this position with the optional argument `z`, which is measured in mm. Positive `z` values move the position up, and negative ones move it down. 
 
 ```python
 plate["A1"].meniscus(
@@ -85,7 +85,7 @@ The liquid meniscus in a well changes during aspirating or dispensing, so you'll
 - Set `target="end"` to ensure the pipette stays submerged while aspirating, or to avoid touching liquid in the destination well while dispensing. 
 
 > [!note]
-> To use the [Well.meniscus()][opentrons.protocol_api.labware.Well.meniscus] method, you'll first need to specify the starting liquid volume with [Labware.load_liquid()][opentrons.protocol_api.labware.Labware.load_liquid] or probe for liquid with [InstrumentContext.measure_liquid_height()][opentrons.protocol_api.InstrumentContext.measure_liquid_height].
+> To use the [`Well.meniscus()`][opentrons.protocol_api.labware.Well.meniscus] method, you'll first need to specify the starting liquid volume with [`Labware.load_liquid()`][opentrons.protocol_api.labware.Labware.load_liquid] or probe for liquid with [`InstrumentContext.measure_liquid_height()`][opentrons.protocol_api.InstrumentContext.measure_liquid_height].
 >
 > Detecting liquid in a well requires pipette sensors, so you can only measure liquid height with a Flex pipette. 
 
@@ -93,7 +93,7 @@ The liquid meniscus in a well changes during aspirating or dispensing, so you'll
 
 ### Default Positions
 
-By default, your robot will aspirate and dispense 1 mm above the bottom of wells. This default clearance may not be suitable for some labware geometries, liquids, or protocols. You can change this value based on your labware with the [Well.bottom()][opentrons.protocol_api.labware.Well.bottom] method and the `z` argument, though it can be cumbersome to do so repeatedly.
+By default, your robot will aspirate and dispense 1 mm above the bottom of wells. This default clearance may not be suitable for some labware geometries, liquids, or protocols. You can change this value based on your labware with the [`Well.bottom()`][opentrons.protocol_api.labware.Well.bottom] method and the `z` argument, though it can be cumbersome to do so repeatedly.
 
 If you need to change the aspiration or dispensing height for multiple operations, specify the distance in mm from the well bottom with the [InstrumentContext.well_bottom_clearance][opentrons.protocol_api.InstrumentContext.well_bottom_clearance] object. It has two attributes: `well_bottom_clearance.aspirate` and `well_bottom_clearance.dispense`. These change the aspiration height and dispense height, respectively.
 
@@ -134,7 +134,7 @@ Movement to [TrashBin][opentrons.protocol_api.labware.TrashBin] or [WasteChute][
 > [!note]
 > In API version 2.15 and earlier, trash containers are [Labware][opentrons.protocol_api.labware.Labware] objects that have a single well. See [fixed_trash][opentrons.protocol_api.labware.Labware.fixed_trash] and [position relative to labware](#position-relative-labware) above.
 
-You can adjust the position of the pipette center with the [TrashBin.top()][opentrons.protocol_api.labware.TrashBin.top] and [WasteChute.top()][opentrons.protocol_api.labware.WasteChute.top] methods. These methods allow adjustments along the x-, y-, and z-axes. In contrast, `Well.top()`, [covered above](#top), only allows z-axis adjustment. With no adjustments, the "top" position is centered on the x- and y-axes and is just below the opening of the trash container.
+You can adjust the position of the pipette center with the [`TrashBin.top()`][opentrons.protocol_api.labware.TrashBin.top] and [`WasteChute.top()`][opentrons.protocol_api.labware.WasteChute.top] methods. These methods allow adjustments along the x-, y-, and z-axes. In contrast, `Well.top()`, [covered above](#top), only allows z-axis adjustment. With no adjustments, the "top" position is centered on the x- and y-axes and is just below the opening of the trash container.
 
 ```python
 trash = protocol.load_trash_bin("A3")
@@ -203,7 +203,7 @@ When instructing the robot to move, it's important to consider the difference be
 - Points are ordered tuples or named tuples: `Point(10, 20, 30)`, `Point(x=10, y=20, z=30)`, and `Point(z=30, y=20, x=10)` are all equivalent.
 - Locations are a higher-order tuple that combines a point with a reference object: a well, a piece of labware, or `None` (the deck).
 
-This distinction is important for the [Location.move()][opentrons.types.Location.move] method, which operates on a location, takes a point as an argument, and outputs an updated location. To use this method, include `from opentrons import types` at the start of your protocol. The `move()` method does not mutate the location it is called on, so to perform an action at the updated location, use it as an argument of another method or save it to a variable. For example:
+This distinction is important for the [`Location.move()`][opentrons.types.Location.move] method, which operates on a location, takes a point as an argument, and outputs an updated location. To use this method, include `from opentrons import types` at the start of your protocol. The `move()` method does not mutate the location it is called on, so to perform an action at the updated location, use it as an argument of another method or save it to a variable. For example:
 
 ```python
 # get the location at the center of well A1

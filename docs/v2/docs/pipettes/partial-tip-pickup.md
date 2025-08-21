@@ -13,7 +13,7 @@ Before getting started with partial tip pickup, make sure your protocol specifie
 
 ## Nozzle Layouts
 
-Use the [configure_nozzle_layout()][opentrons.protocol_api.InstrumentContext.configure_nozzle_layout] method to choose how many tips a pipette will pick up. The method's required `style` parameter only accepts special layout constants. You must import these constants at the top of your protocol, or you won't be able to configure the pipette for partial tip pickup.
+Use the [`configure_nozzle_layout()`][opentrons.protocol_api.InstrumentContext.configure_nozzle_layout] method to choose how many tips a pipette will pick up. The method's required `style` parameter only accepts special layout constants. You must import these constants at the top of your protocol, or you won't be able to configure the pipette for partial tip pickup.
 
 At minimum, import the API from the `opentrons` package:
 
@@ -66,7 +66,7 @@ pipette.pick_up_tip()  # picks up A2-H2 from tip rack
 ```
 
 > [!warning]
-> [pick_up_tip()][opentrons.protocol_api.InstrumentContext.pick_up_tip] always accepts a `location` argument, regardless of nozzle configuration. Do not pass a value that would lead the pipette to line up over more unused tips than specified by the current layout. For example, setting `COLUMN` layout and then calling `pipette.pick_up_tip(tip_rack["A2"])` on a full tip rack will lead to unexpected pipetting behavior and potential crashes.
+> [`pick_up_tip()`][opentrons.protocol_api.InstrumentContext.pick_up_tip] always accepts a `location` argument, regardless of nozzle configuration. Do not pass a value that would lead the pipette to line up over more unused tips than specified by the current layout. For example, setting `COLUMN` layout and then calling `pipette.pick_up_tip(tip_rack["A2"])` on a full tip rack will lead to unexpected pipetting behavior and potential crashes.
 
 ### Row Layout
 
@@ -152,7 +152,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
 *New in version 2.20*
 
-To pick up tips row by row, first construct a list of all wells in the tip rack ordered from A1, A2 … H11, H12. One way to do this is to use `sum` to flatten the list of lists returned by [Labware.rows()][opentrons.protocol_api.labware.Labware.rows]:
+To pick up tips row by row, first construct a list of all wells in the tip rack ordered from A1, A2 … H11, H12. One way to do this is to use `sum` to flatten the list of lists returned by [`Labware.rows()`][opentrons.protocol_api.labware.Labware.rows]:
 
 ```python
 tips_by_row = sum(partial_rack.rows(), [])
@@ -167,7 +167,7 @@ pipette.pick_up_tip(location=tips_by_row.pop(0))
 
 Partial column pickup is available on 8-channel pipettes only. Partial columns contain 2 to 7 consecutive tips in a single column. The pipette always picks up partial columns with its frontmost nozzles (`start="H1"`).
 
-To specify the number of tips to pick up, add the `end` parameter when calling [configure_nozzle_layout()][opentrons.protocol_api.InstrumentContext.configure_nozzle_layout]. Use the chart below to determine the ending nozzle (G1 through B1) for your desired number of tips.
+To specify the number of tips to pick up, add the `end` parameter when calling [`configure_nozzle_layout()`][opentrons.protocol_api.InstrumentContext.configure_nozzle_layout]. Use the chart below to determine the ending nozzle (G1 through B1) for your desired number of tips.
 
 | Number of tips | 2 | 3 | 4 | 5 | 6 | 7 |
 |---------------|---|---|---|---|---|---|
@@ -338,7 +338,7 @@ tips_D2 = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", "D2")
 
 Now the pipette will be able to access the racks in column 1 only. `pick_up_tip(tips_D2["A1"])` will raise an error due to the tip rack immediately to its left, in slot D1. There a couple of ways to avoid this error:
 - Load the tip rack in a different slot, with no tall labware to its left.
-- Use all the tips in slot D1 first, and then use [move_labware()][opentrons.protocol_api.ProtocolContext.move_labware] to make space for the pipette before picking up tips from D2.
+- Use all the tips in slot D1 first, and then use [`move_labware()`][opentrons.protocol_api.ProtocolContext.move_labware] to make space for the pipette before picking up tips from D2.
 
 You would get a similar error trying to aspirate from or dispense into a well plate in slot D3, since there is a tip rack to the left.
 

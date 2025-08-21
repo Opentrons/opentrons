@@ -64,7 +64,7 @@ This example converts OT-2 code that uses a P300 Single-Channel GEN2 pipette and
 
 ## Trash Container
 
-OT-2 protocols always have a [fixed_trash()][opentrons.protocol_api.ProtocolContext.fixed_trash] in slot 12. In Flex protocols specifying API version 2.16 or later, you need to [load a trash bin](moving_labware.md#configure-trash-bin). Put it in slot A3 to match the physical position of the OT-2 fixed trash:
+OT-2 protocols always have a [`fixed_trash()`][opentrons.protocol_api.ProtocolContext.fixed_trash] in slot 12. In Flex protocols specifying API version 2.16 or later, you need to [load a trash bin](moving_labware.md#configure-trash-bin). Put it in slot A3 to match the physical position of the OT-2 fixed trash:
 
 ```python
 trash = protocol.load_trash_bin("A3")
@@ -78,7 +78,7 @@ For example, the code in the previous section changed the location of the tip ra
 
 ## Module Load Names
 
-If your OT-2 protocol uses older generations of the Temperature Module or Thermocycler Module, update the load names you pass to [load_module()][opentrons.protocol_api.ProtocolContext.load_module] to ones compatible with Flex:
+If your OT-2 protocol uses older generations of the Temperature Module or Thermocycler Module, update the load names you pass to [`load_module()`][opentrons.protocol_api.ProtocolContext.load_module] to ones compatible with Flex:
 
 - `temperature module gen2`
 - `thermocycler module gen2` or `thermocyclerModuleV2`
