@@ -91,6 +91,8 @@
   "device_reset_slideout_description": "选择单独的设置以仅清除特定的数据类型。",
   "device_resets_cannot_be_undone": "重置无法撤销",
   "directly_connected_to_this_computer": "直接连接到这台计算机。",
+  "disable_stacker_sensors": "禁用外置堆栈的耗材 z 轴和 x 轴的感应器",
+  "disable_stacker_sensors_description": "禁用设备连接的所有外置堆栈的感应器",
   "disconnect": "断开连接",
   "disconnect_from_ssid": "断开与{{ssid}}的连接",
   "disconnect_from_wifi": "断开Wi-Fi连接",
