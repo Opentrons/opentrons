@@ -8,7 +8,9 @@ from ..resources import ModelUtils, ConcurrencyProvider
 from ..types import Task
 import asyncio
 import contextlib
-
+from ..actions import ActionDispatcher, FinishTaskAction
+from ..errors import ErrorOccurrence
+from opentrons_shared_data.errors.exceptions import EnumeratedError, PythonException
 
 log = logging.getLogger(__name__)
 
@@ -31,6 +33,7 @@ class TaskHandler:
     def __init__(
         self,
         state_store: StateStore,
+        action_dispatcher: ActionDispatcher,
         model_utils: ModelUtils | None = None,
         concurrency_provider: ConcurrencyProvider | None = None,
     ) -> None:
@@ -38,6 +41,7 @@ class TaskHandler:
         self._state_store = state_store
         self._model_utils = model_utils or ModelUtils()
         self._concurrency_provider = concurrency_provider or ConcurrencyProvider()
+        self._action_dispatcher = action_dispatcher
 
     async def create_task(
         self, task_function: TaskFunction, id: str | None = None
@@ -47,6 +51,38 @@ class TaskHandler:
         asyncio_task = asyncio.create_task(
             task_function(task_handler=self), name=f"engine-task-{task_id}"
         )
+
+        def _done_callback(task: asyncio.Task[None]) -> None:
+            try:
+                maybe_exception = task.exception()
+            except asyncio.CancelledError as e:
+                maybe_exception = e
+            if isinstance(maybe_exception, EnumeratedError):
+                occurence: ErrorOccurrence | None = ErrorOccurrence.from_failed(
+                    id=self._model_utils.generate_id(),
+                    createdAt=self._model_utils.get_timestamp(),
+                    error=maybe_exception,
+                )
+            elif isinstance(maybe_exception, BaseException):
+                occurence = ErrorOccurrence.from_failed(
+                    id=self._model_utils.generate_id(),
+                    createdAt=self._model_utils.get_timestamp(),
+                    error=PythonException(maybe_exception),
+                )
+            else:
+                occurence = None
+            try:
+                self._action_dispatcher.dispatch(
+                    FinishTaskAction(
+                        task_id=task_id,
+                        finished_at=self._model_utils.get_timestamp(),
+                        error=occurence,
+                    ),
+                )
+            except BaseException:
+                log.exception("Exception in task finish dispatch.")
+
+        asyncio_task.add_done_callback(_done_callback)
         return Task(
             id=task_id,
             createdAt=self._model_utils.get_timestamp(),
