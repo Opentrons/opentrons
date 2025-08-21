@@ -13,7 +13,7 @@ temp_mod = protocol.load_module(
 
 ## Loading Labware
 
-Use the Temperature Module’s [`TemperatureModuleContext.load_adapter`][opentrons.protocol_api.TemperatureModuleContext.load_adapter] and [`TemperatureModuleContext.load_labware`][opentrons.protocol_api.TemperatureModuleContext.load_labware] methods to specify what you will place on the module. You may use one or both of the methods, depending on the labware you're using. See [Labware on Adapters](../new_labware.md#loading-labware-on-adapters) for examples of loading labware on modules.
+Use the Temperature Module’s [`load_adapter()`][opentrons.protocol_api.TemperatureModuleContext.load_adapter] and [`load_labware()`][opentrons.protocol_api.TemperatureModuleContext.load_labware] methods to specify what you will place on the module. You may use one or both of the methods, depending on the labware you're using. See [Loading Labware on Adapters][loading-labware-on-adapters] for examples.
 
 The [Opentrons Labware Library](https://labware.opentrons.com/) includes definitions for both standalone adapters and adapter–labware combinations. These labware definitions help make the Temperature Module ready to use right out of the box.
 
@@ -38,8 +38,8 @@ temp_plate = temp_adapter.load_labware(
 ```
 *New in version 2.15*
 
-> [!note]
-> You can also load labware directly onto the Temperature Module. In API version 2.14 and earlier, this was the correct way to load labware on top of the flat bottom plate. In API version 2.15 and later, you should load both the adapter and the labware with separate commands.
+!!! note
+    You can also load labware directly onto the Temperature Module. In API version 2.14 and earlier, this was the correct way to load labware on top of the flat bottom plate. In API version 2.15 and later, you should load both the adapter and the labware with separate commands.
 
 ### Block-and-tube combinations
 
@@ -54,7 +54,8 @@ You can use these combination labware definitions to load various types of tubes
 | NEST 2 mL screw cap | `opentrons_24_aluminumblock_nest_2ml_screwcap` |
 | NEST 2 mL snap cap | `opentrons_24_aluminumblock_nest_2ml_snapcap` |
 
-Example:
+For example, this command loads the 24-well block with generic 2 mL tubes:
+
 ```python
 temp_tubes = temp_mod.load_labware(
     "opentrons_24_aluminumblock_generic_2ml_screwcap"
@@ -72,7 +73,8 @@ The Temperature Module supports these 96-well block and labware combinations for
 | Generic PCR strip 200 µL | `opentrons_96_aluminumblock_generic_pcr_strip_200uL` |
 | NEST well plate 100 µL | `opentrons_96_aluminumblock_nest_wellplate_100uL` |
 
-Example:
+This command loads the same physical adapter and labware as the example in the Standalone Adapters section above, but it is also compatible with earlier API versions:
+
 ```python
 temp_combo = temp_mod.load_labware(
     "opentrons_96_aluminumblock_nest_wellplate_100uL"
@@ -82,19 +84,20 @@ temp_combo = temp_mod.load_labware(
 
 ## Temperature Control
 
-The primary function of the module is to control the temperature of its deck, using [`TemperatureModuleContext.set_temperature`][opentrons.protocol_api.TemperatureModuleContext.set_temperature], which takes one parameter: `celsius`. For example, to set the Temperature Module to 4 °C:
+The primary function of the module is to control the temperature of its deck, using [`set_temperature`][opentrons.protocol_api.TemperatureModuleContext.set_temperature], which takes one parameter: `celsius`. For example, to set the Temperature Module to 4 °C:
 ```python
 temp_mod.set_temperature(celsius=4)
 ```
-When using `set_temperature()`, your protocol will wait until the target temperature is reached before proceeding to further commands. You can pipette to or from the Temperature Module when it is holding at a temperature or idle, but not while it is actively changing temperature. Whenever the module reaches its target temperature, it will hold the temperature until you set a different target or call [`TemperatureModuleContext.deactivate`][opentrons.protocol_api.TemperatureModuleContext.deactivate], which will stop heating or cooling and will turn off the fan.
+When using `set_temperature()`, your protocol will wait until the target temperature is reached before proceeding to further commands. You can pipette to or from the Temperature Module when it is holding at a temperature or idle, but not while it is actively changing temperature. Whenever the module reaches its target temperature, it will hold the temperature until you set a different target or call [`deactivate()`][opentrons.protocol_api.TemperatureModuleContext.deactivate], which will stop heating or cooling and will turn off the fan.
 
-> [!note]
-> Your robot will not automatically deactivate the Temperature Module at the end of a protocol. If you need to deactivate the module after a protocol is completed or canceled, use the Temperature Module controls on the device detail page in the Opentrons App or run `deactivate()` in Jupyter notebook.
+!!! note
+    Your robot will not automatically deactivate the Temperature Module at the end of a protocol. If you need to deactivate the module after a protocol is completed or canceled, use the Temperature Module controls on the device detail page in the Opentrons App or run `deactivate()` in Jupyter notebook.
+
 *New in version 2.0*
 
 ## Temperature Status
 
-If you need to confirm in software whether the Temperature Module is holding at a temperature or is idle, use the [`TemperatureModuleContext.status`][opentrons.protocol_api.TemperatureModuleContext.status] property:
+If you need to confirm in software whether the Temperature Module is holding at a temperature or is idle, use the [`status`][opentrons.protocol_api.TemperatureModuleContext.status] property:
 ```python
 temp_mod.set_temperature(celsius=90)
 temp_mod.status  # "holding at target"
@@ -102,6 +105,7 @@ temp_mod.deactivate()
 temp_mod.status  # "idle"
 ```
 If you don't need to use the status value in your code, and you have physical access to the module, you can read its status and temperature from the LED and display on the module.
+
 *New in version 2.0*
 
 ## Changes with the GEN2 Temperature Module
