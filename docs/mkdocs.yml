@@ -71,6 +71,8 @@ markdown_extensions:
       line_spans: true
       pygments_lang_class: true
   - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
   - sane_lists
   - toc:
       permalink: true

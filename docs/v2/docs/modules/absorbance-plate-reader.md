@@ -29,6 +29,7 @@ pr_mod = protocol.load_module(
 ## Lid Control
 
 Flex uses the gripper to move the lid between its two positions.
+
 - [`AbsorbanceReaderContext.open_lid()`][opentrons.protocol_api.AbsorbanceReaderContext.open_lid] moves the lid to the righthand side of the caddy, in deck column 4.
 - [`AbsorbanceReaderContext.close_lid()`][opentrons.protocol_api.AbsorbanceReaderContext.close_lid] moves the lid onto the detection unit, in deck column 3.
 
@@ -36,16 +37,14 @@ If you call `open_lid()` or `close_lid()` and the lid is already in the correspo
 
 You need to call `close_lid()` before initializing the reader, even if the reader was in the closed position at the start of the protocol.
 
-> [!warning]
-> Do not move the lid manually, during or outside of a protocol. The API does not allow manual lid movement because there is a risk of damaging the module.
+!!! warning
+    Do not move the lid manually, during or outside of a protocol. The API does not allow manual lid movement because there is a risk of damaging the module.
 
 ## Initialization
 
-Initializing the reader prepares it to read a plate later in your protocol. The [`AbsorbanceReaderContext.initialize`][opentrons.protocol_api.AbsorbanceReaderContext.initialize] method accepts parameters for the number of readings you want to take, the wavelengths to read, and whether you want to compare the reading to a reference wavelength. In the default hardware configuration, the supported wavelengths are 450 nm (blue), 562 nm (green), 600 nm (orange), and 650 nm (red).
+Initializing the reader prepares it to read a plate later in your protocol. The [`AbsorbanceReaderContext.initialize()`][opentrons.protocol_api.AbsorbanceReaderContext.initialize] method accepts parameters for the number of readings you want to take, the wavelengths to read, and whether you want to compare the reading to a reference wavelength. In the default hardware configuration, the supported wavelengths are 450 nm (blue), 562 nm (green), 600 nm (orange), and 650 nm (red).
 
 The module uses these parameters immediately to perform the physical initialization. Additionally, the API preserves these values and uses them when you read the plate later in your protocol.
-
-## Initialization Examples
 
 The simplest reading measures one wavelength, with no reference wavelength:
 ```python
@@ -69,7 +68,7 @@ You can't use a reference wavelength when performing multiple measurements.
 
 ## Reading a Plate
 
-Use [`AbsorbanceReaderContext.read`][opentrons.protocol_api.AbsorbanceReaderContext.read] to have the module read the plate, using the parameters that you specified during initialization:
+Use [`AbsorbanceReaderContext.read()`][opentrons.protocol_api.AbsorbanceReaderContext.read] to have the module read the plate, using the parameters that you specified during initialization:
 ```python
 pr_data = pr_mod.read()
 ```
