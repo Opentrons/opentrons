@@ -2,8 +2,8 @@
 Styles to add content-dependent spacing between children within a Checkpoint.
 
 - CheckpointStepContainers in a contiguous sequence have no space between them.
-- CheckpointChips in a contiguous sequence have --spacing-8 between them.
-- Between a CheckpointStepContainer and CheckpointChip is --spacing-8.
+- CheckpointChips in a contiguous sequence have --spacing-4 between them.
+- Between a CheckpointStepContainer and CheckpointChip is --spacing-4.
 
 An alternative method would have been to use JS to find contiguous sequences and put a
 wrapper component around each one, but that would interfere with <ul> nesting semantics.
@@ -12,5 +12,5 @@ wrapper component around each one, but that would interfere with <ul> nesting se
 .chip + .chip,
 .chip + .step_container,
 .step_container + .chip {
-  margin-top: var(--spacing-8);
+  margin-top: var(--spacing-4);
 }
