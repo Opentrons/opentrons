@@ -1,21 +1,26 @@
 import { css } from 'styled-components'
 
-import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
-import { StyledText } from '../../atoms/StyledText'
-import { BORDERS, COLORS } from '../../helix-design-system'
-import { Icon } from '../../icons'
-import { Box, Flex } from '../../primitives'
 import {
   ALIGN_CENTER,
+  BORDERS,
+  Box,
+  COLORS,
+  Flex,
+  Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_START,
-} from '../../styles'
-import { SPACING } from '../../ui-style-constants'
+  OverflowBtn,
+  SPACING,
+  StyledText,
+} from '@opentrons/components'
 
 import type { MouseEvent as ReactMouseEvent } from 'react'
-import type { IconName } from '../../icons'
-import type { CURSOR_DEFAULT, CURSOR_POINTER } from '../../styles/cursor'
+import type {
+  CURSOR_DEFAULT,
+  CURSOR_POINTER,
+  IconName,
+} from '@opentrons/components'
 
 export interface StepContainerProps {
   text: string

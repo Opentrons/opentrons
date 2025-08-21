@@ -1,4 +1,5 @@
-import { Chip } from '../../atoms'
+import { Chip } from '@opentrons/components'
+
 import styles from './commonspacing.module.css'
 
 interface Props {

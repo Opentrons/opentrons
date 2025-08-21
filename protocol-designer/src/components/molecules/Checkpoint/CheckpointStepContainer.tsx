@@ -1,4 +1,4 @@
-import { StepContainer } from '../../molecules/StepContainer'
+import { StepContainer } from '../StepContainer'
 import spacingStyles from './commonspacing.module.css'
 
 import type { ComponentProps } from 'react'
