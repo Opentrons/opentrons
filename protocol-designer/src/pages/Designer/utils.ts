@@ -303,7 +303,7 @@ export const useLabwareDropdownOptions = (
         deckSlot,
         labwareId
       )
-      const isTopOfStack = fullStackFromLabwares?.[0] === labwareId
+      const isTopOfStack = fullStackFromLabwares[0] === labwareId
       const isLabwareInTrash =
         deckSlot === 'gripperWasteChute' ||
         MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(
