@@ -94,6 +94,15 @@ jobs:
         with:
           name: docs-artifacts
           path: docs/
+      - name: Debug Directory Structure
+        working-directory: ./docs
+        run: |
+          pwd
+          ls -la
+          echo "Checking if update_urls.py exists:"
+          ls -la update_urls.py || echo "update_urls.py not found"
+          echo "Checking if site/index.html exists:"
+          ls -la site/index.html || echo "site/index.html not found"
       - name: Update URLs for Sandbox
         working-directory: ./docs
         run: python update_urls.py sandbox --branch ${{ env.BRANCH }}
@@ -126,6 +135,15 @@ jobs:
         with:
           name: docs-artifacts
           path: docs/
+      - name: Debug Directory Structure
+        working-directory: ./docs
+        run: |
+          pwd
+          ls -la
+          echo "Checking if update_urls.py exists:"
+          ls -la update_urls.py || echo "update_urls.py not found"
+          echo "Checking if site/index.html exists:"
+          ls -la site/index.html || echo "site/index.html not found"
       - name: Update URLs for Staging
         working-directory: ./docs
         run: python update_urls.py staging --branch ${{ env.BRANCH }}
@@ -158,6 +176,15 @@ jobs:
         with:
           name: docs-artifacts
           path: docs/
+      - name: Debug Directory Structure
+        working-directory: ./docs
+        run: |
+          pwd
+          ls -la
+          echo "Checking if update_urls.py exists:"
+          ls -la update_urls.py || echo "update_urls.py not found"
+          echo "Checking if site/index.html exists:"
+          ls -la site/index.html || echo "site/index.html not found"
       - name: Update URLs for Production
         working-directory: ./docs
         run: python update_urls.py production --branch ${{ env.BRANCH }}
