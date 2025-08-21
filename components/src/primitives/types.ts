@@ -15,6 +15,7 @@ export interface TypographyProps {
   textAlign?: string
   textTransform?: string
   textDecoration?: string
+  textOverflow?: string
 }
 
 export interface SpacingProps {
@@ -59,6 +60,7 @@ export interface FlexboxProps {
 export interface GridProps {
   columnGap?: string | number
   gridGap?: string | number
+  gap?: string | number
   gridTemplateAreas?: string
   gridTemplateRows?: string
   gridTemplateColumns?: string
