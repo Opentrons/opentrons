@@ -139,7 +139,7 @@ def run(ctx: ProtocolContext) -> None:
     if not ctx.is_simulating():
         from abr_testing.protocols import helpers
 
-        slack_bot, ip = helpers.set_up_slack()
+        slack_bot = helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
     reservoir = ctx.load_labware("nest_1_reservoir_195ml", "D1")
     water_liq = ctx.define_liquid("water", "#C0C0C0")
@@ -224,6 +224,6 @@ def run(ctx: ProtocolContext) -> None:
             from abr_testing.protocols import helpers
 
             helpers.send_slack_error_message_with_log(
-                slack_bot, metadata["protocolName"], str(e), ip
+                slack_bot, metadata["protocolName"], str(e)
             )
         raise (e)

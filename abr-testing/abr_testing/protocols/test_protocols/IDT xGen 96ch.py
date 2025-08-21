@@ -68,7 +68,7 @@ def run(protocol: ProtocolContext) -> None:
     DEACTIVATE_TEMP = protocol.params.deactivate_modules  # type: ignore[attr-defined]
     dot_bottom = protocol.params.dot_bottom  # type: ignore[attr-defined]
     if not protocol.is_simulating():
-        slack_bot, ip = helpers.set_up_slack()
+        slack_bot = helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
 
     #  ADVANCED PARAMETERS ======================================
@@ -1465,6 +1465,6 @@ def run(protocol: ProtocolContext) -> None:
     except Exception as e:
         if not protocol.is_simulating():
             helpers.send_slack_error_message_with_log(
-                slack_bot, metadata["protocolName"], str(e), ip
+                slack_bot, metadata["protocolName"], str(e)
             )
         raise (e)

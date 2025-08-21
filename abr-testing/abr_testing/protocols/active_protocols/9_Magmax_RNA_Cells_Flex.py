@@ -96,7 +96,7 @@ def run(protocol: ProtocolContext) -> None:
     probe_liquid_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
     meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
     if not protocol.is_simulating():
-        slack_bot, ip = helpers.set_up_slack()
+        slack_bot = helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
 
     helpers.comment_protocol_version(protocol, "03")
@@ -639,6 +639,6 @@ def run(protocol: ProtocolContext) -> None:
     except Exception as e:
         if not protocol.is_simulating():
             helpers.send_slack_error_message_with_log(
-                slack_bot, metadata["protocolName"], str(e), ip
+                slack_bot, metadata["protocolName"], str(e)
             )
         raise (e)

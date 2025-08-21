@@ -200,7 +200,7 @@ def run(protocol: ProtocolContext) -> None:
     if not protocol.is_simulating():
         from abr_testing.protocols import helpers
 
-        slack_bot, ip = helpers.set_up_slack()
+        slack_bot = helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
 
     # ================================ LISTS ================================
@@ -2846,6 +2846,6 @@ def run(protocol: ProtocolContext) -> None:
         from abr_testing.protocols import helpers
 
         helpers.send_slack_error_message_with_log(
-            slack_bot, metadata["protocolName"], str(e), ip
+            slack_bot, metadata["protocolName"], str(e)
         )
         raise (e)

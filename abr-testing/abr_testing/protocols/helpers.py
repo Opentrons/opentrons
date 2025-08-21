@@ -23,6 +23,7 @@ from abr_testing.data_collection.read_robot_logs import get_logs
 from typing import List, Union, Dict, Tuple
 from opentrons.hardware_control.modules.types import ThermocyclerStep
 from datetime import datetime
+import subprocess
 
 # FUNCTIONS FOR LOADING COMMON CONFIGURATIONS
 
@@ -574,7 +575,7 @@ def load_wells_with_custom_liquids(
                 well.load_liquid(liquid, volume)
 
 
-def set_up_slack() -> Tuple[slack.Slack, str]:
+def set_up_slack() -> slack.Slack:
     """Set up slack channel connection."""
     configs_file = "/var/lib/jupyter/notebooks/config.ini"
     configs_file_path = Path(configs_file)
@@ -598,32 +599,32 @@ def set_up_slack() -> Tuple[slack.Slack, str]:
     except KeyError:
         print("Could not find robot name")
         robot_name = "test"
-    try:
-        ip = discovery_data["robots"][0]["addresses"]["ip"]
-    except KeyError:
-        print("Could not find robot ip")
-        ip = "test_ip"
-    return (
-        slack.Slack(
-            configuration=configurations,
-            channel_name="abr-robot-alerts",
-            user_name=robot_name,
-        ),
-        ip,
+
+    return slack.Slack(
+        configuration=configurations,
+        channel_name="abr-robot-alerts",
+        user_name=robot_name,
     )
 
 
-def create_robot_log_zip(ip: str) -> str:
+def create_robot_log_zip() -> str:
     """Create a zip file of logs saved locally on robot."""
     storage_directory = "/data/testing_data"
+    result = subprocess.run(
+        "ip route show default | grep mlan0 | awk '{print $3}'",
+        shell=True,
+        capture_output=True,
+        text=True,
+    )
+    ip = result.stdout.strip()
     return get_logs(storage_directory, ip)
 
 
 def send_slack_error_message_with_log(
-    slack_bot: slack.Slack, protocol_name: str, error_str: str, ip: str
+    slack_bot: slack.Slack, protocol_name: str, error_str: str
 ) -> None:
     """Send error slack message with log files attached."""
-    log_path = create_robot_log_zip(ip)
+    log_path = create_robot_log_zip()
     slack_bot.send_error_message(protocol_name, error_str, log_path)
 
 
