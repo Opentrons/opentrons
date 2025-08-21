@@ -96,6 +96,12 @@ def add_parameters(parameters: protocol_api.ParameterContext) -> None:
         default=True,
     )
 
+    parameters.add_bool(
+        variable_name="lld",
+        display_name="enable lld",
+        description=("Use LLD to detect liquid height."),
+        default=True,
+    )
     parameters.add_float(
         display_name="conditioning volume",
         variable_name="conditioning_volume",
@@ -254,12 +260,6 @@ def add_parameters(parameters: protocol_api.ParameterContext) -> None:
             {"display_name": "None", "value": "none"},
         ],
         default="corning_96_wellplate_360ul_flat",
-    )
-    parameters.add_bool(
-        variable_name="lld",
-        display_name="enable lld",
-        description=("Use LLD to detect liquid height."),
-        default=True,
     )
 
 

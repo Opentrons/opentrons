@@ -1370,6 +1370,13 @@ const getWasteChuteFixtureReplacement = (
     {
       condition:
         cutoutFixtureId === FLEX_STACKER_MODULE_V1 &&
+        wasteChuteFixture === FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT_FIXTURE,
+      comboFixtureId: FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+      comboOpentronsModuleSerialNumber: opentronsModuleSerialNumber,
+    },
+    {
+      condition:
+        cutoutFixtureId === FLEX_STACKER_MODULE_V1 &&
         wasteChuteFixture === WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
       comboFixtureId: FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
       comboOpentronsModuleSerialNumber: undefined, // Use the current module's serial number
