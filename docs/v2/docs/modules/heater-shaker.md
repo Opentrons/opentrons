@@ -32,29 +32,34 @@ Do not place other modules next to the Heater-Shaker. Keeping adjacent deck slot
 Do not place labware taller than 53 mm to the left or right of the Heater-Shaker. This prevents the Heater-Shaker’s latch from colliding with the adjacent labware. Common labware that exceed the height limit include Opentrons tube racks and Opentrons 1000 µL tip racks. Loading tall labware to the right or left of the Heater-Shaker on OT-2 will raise a `DeckConflictError`.
 
 #### 8-Channel Pipettes
-You can't perform pipetting actions in any slots adjacent to the Heater-Shaker if you're using a GEN2 or GEN1 8-channel pipette. This prevents the pipette ejector from crashing on the module housing or labware latch. Using an 8-channel pipette will raise a `PipetteMovementRestrictedByHeaterShakerError`.
+You can't perform pipetting actions in *any* slots adjacent to the Heater-Shaker if you're using a GEN2 or GEN1 8-channel pipette. This prevents the pipette ejector from crashing on the module housing or labware latch. Using an 8-channel pipette will raise a `PipetteMovementRestrictedByHeaterShakerError`.
 
 There is one exception: to the front or back of the Heater-Shaker, an 8-channel pipette can access tip racks only. Attempting to pipette to non-tip-rack labware will also raise a `PipetteMovementRestrictedByHeaterShakerError`.
 
 ## Latch Control
 
-To add and remove labware from the Heater-Shaker, control the module's labware latch from your protocol using [`open_labware_latch`][opentrons.protocol_api.HeaterShakerContext.open_labware_latch] and [`close_labware_latch`][opentrons.protocol_api.HeaterShakerContext.close_labware_latch]. Shaking requires the labware latch to be closed:
+To add and remove labware from the Heater-Shaker, control the module's labware latch from your protocol using [`open_labware_latch()`][opentrons.protocol_api.HeaterShakerContext.open_labware_latch] and [`close_labware_latch()`][opentrons.protocol_api.HeaterShakerContext.close_labware_latch]. Shaking requires the labware latch to be closed, so you may want to issue a close command before the first shake command in your protocol:
+
 ```python
 hs_mod.close_labware_latch()
 hs_mod.set_and_wait_for_shake_speed(500)
 ```
-If the labware latch is already closed, `close_labware_latch()` will succeed immediately.
+If the labware latch is already closed, `close_labware_latch()` will succeed immediately; you don’t have to check the status of the latch before opening or closing it.
+
+To prepare the deck before running a protocol, use the labware latch controls in the Opentrons App or on the Flex touchscreen.
 
 ## Loading Labware
 
-Use [`load_adapter`][opentrons.protocol_api.HeaterShakerContext.load_adapter] and [`load_labware`][opentrons.protocol_api.HeaterShakerContext.load_labware] to specify what you will place on the module. For the Heater-Shaker, use one of the thermal adapters listed below and labware that fits on the adapter. See [Labware on Adapters](../labware-on-adapters.md) for examples.
+Use the Heater-Shaker’s [`load_adapter()`][opentrons.protocol_api.HeaterShakerContext.load_adapter] and [`load_labware()`][opentrons.protocol_api.HeaterShakerContext.load_labware] methods to specify what you will place on the module. For the Heater-Shaker, use one of the thermal adapters listed below and labware that fits on the adapter. See [Loading Labware on Adapters][loading-labware-on-adapters] for examples.
 
-The [Opentrons Labware Library](https://labware.opentrons.com/) includes definitions for both standalone adapters and adapter–labware combinations.
+The [Opentrons Labware Library](https://labware.opentrons.com/) includes definitions for both standalone adapters and adapter–labware combinations. These labware definitions help make the Heater-Shaker ready to use right out of the box.
 
 !!! note
     If you plan to [move labware](../moving-labware.md) onto or off of the Heater-Shaker during your protocol, you must use a standalone adapter definition, not an adapter–labware combination definition.
 
 ### Standalone Adapters
+
+You can use these standalone adapter definitions to load Opentrons verified or custom labware on top of the Heater-Shaker.
 
 | Adapter Type | API Load Name |
 |--------------|--------------|
@@ -64,12 +69,13 @@ The [Opentrons Labware Library](https://labware.opentrons.com/) includes definit
 | Opentrons 96 Deep Well Heater-Shaker Adapter | `opentrons_96_deep_well_adapter` |
 | Opentrons 96 Flat Bottom Heater-Shaker Adapter | `opentrons_96_flat_bottom_adapter` |
 
-Example:
+For example, these commands load a well plate on top of the flat bottom adapter:
+
 ```python
 hs_adapter = hs_mod.load_adapter("opentrons_96_flat_bottom_adapter")
 hs_plate = hs_adapter.load_labware("nest_96_wellplate_200ul_flat")
 ```
-*New in version 2.15: The `load_adapter()` method.*
+*New in version 2.15:* The `load_adapter()` method.
 
 ### Pre-configured Combinations
 
@@ -83,7 +89,8 @@ The Heater-Shaker supports these thermal adapter and labware combinations for ba
 | Opentrons 96 PCR Adapter with NEST Well Plate 100 µL | `opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt` |
 | Opentrons Universal Flat Adapter with Corning 384 Well Plate 112 µL Flat | `opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat` |
 
-Example:
+This command loads the same physical adapter and labware as the example in the previous section, but it is also compatible with API versions 2.13 and 2.14:
+
 ```python
 hs_combo = hs_mod.load_labware(
     "opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat"
@@ -93,38 +100,42 @@ hs_combo = hs_mod.load_labware(
 
 ### Custom Flat-Bottom Labware
 
-Custom flat-bottom labware can be used with the Universal Flat Adapter. See the support article [Requesting a Custom Labware Definition](https://support.opentrons.com/s/article/Requesting-a-custom-labware-definition) if you need assistance creating custom labware definitions for the Heater-Shaker.
-
----
+Custom flat-bottom labware can be used with the Universal Flat Adapter. Contact Opentrons Support if you need assistance [creating custom labware definitions][custom-labware-service] for the Heater-Shaker.
 
 ## Heating and Shaking
 
-Heating and shaking are separate, independent activities. Increasing or reducing shaking speed takes a few seconds, so the API treats these actions as *blocking* commands. All other commands cannot run until the module reaches the required speed.
+The API treats heating and shaking as separate, independent activities due to the amount of time they take.
 
-Heating the module, or letting it passively cool, takes more time than changing the shaking speed. The API allows other pipetting actions while waiting for the module to reach a target temperature. When holding at temperature, you can design your protocol to run in a blocking or non-blocking manner.
+Increasing or reducing shaking speed takes a few seconds, so the API treats these actions as *blocking* commands. All other commands cannot run until the module reaches the required speed.
+
+Heating the module, or letting it passively cool, takes more time than changing the shaking speed. As a result, the API gives you the flexibility to perform other pipetting actions while waiting for the module to reach a target temperature. When holding at temperature, you can design your protocol to run in a blocking or non-blocking manner.
 
 !!! note
     Since API version 2.13, only the Heater-Shaker Module supports non-blocking command execution. All other modules' methods are blocking commands.
 
 ### Blocking commands
 
-This example uses a blocking command and shakes a sample for one minute. No other commands will execute until a minute has elapsed:
+This example uses a blocking command and shakes a sample for one minute. No other commands will execute until a minute has elapsed. The three commands in this example start the shake, wait for one minute, and then stop the shake:
+
 ```python
 hs_mod.set_and_wait_for_shake_speed(500)
 protocol.delay(minutes=1)
 hs_mod.deactivate_shaker()
 ```
+
 These actions will take about 65 seconds total. Compare this with holding a sample at a temperature for one minute:
+
 ```python
 hs_mod.set_and_wait_for_temperature(75)
 protocol.delay(minutes=1)
 hs_mod.deactivate_heater()
 ```
-This may take much longer, depending on the thermal block, liquid volume/type, and initial temperature.
+
+This may take much longer, depending on the thermal block used, the volume and type of liquid contained in the labware, and the initial temperature of the module.
 
 ### Non-blocking commands
 
-To pipette while the Heater-Shaker is heating, use [`set_target_temperature`][opentrons.protocol_api.HeaterShakerContext.set_target_temperature] and [`wait_for_temperature`][opentrons.protocol_api.HeaterShakerContext.wait_for_temperature]:
+To pipette while the Heater-Shaker is heating, use [`set_target_temperature()`][opentrons.protocol_api.HeaterShakerContext.set_target_temperature] and [`wait_for_temperature()`][opentrons.protocol_api.HeaterShakerContext.wait_for_temperature] instead of [`set_and_wait_for_temperature()`][opentrons.protocol_api.HeaterShakerContext.set_and_wait_for_temperature]:
 ```python
 hs_mod.set_target_temperature(75)
 pipette.pick_up_tip()
@@ -135,11 +146,12 @@ hs_mod.wait_for_temperature()
 protocol.delay(minutes=1)
 hs_mod.deactivate_heater()
 ```
-Be careful when putting a lot of commands between a `set_target_temperature()` call and a `delay()` call. If the temperature has already been reached, the delay will begin later than expected and the Heater-Shaker will hold at its target temperature longer than intended.
 
-If you want to pipette while the module holds a temperature for a certain length of time, you need to track the holding time yourself. One way is with Python’s `time` module:
+This example would likely take just as long as the blocking version above; it’s unlikely that one aspirate and one dispense action would take longer than the time for the module to heat. However, be careful when putting a lot of commands between a `set_target_temperature()` call and a `delay()` call. In this situation, you’re relying on `wait_for_temperature()` to resume execution of commands once heating is complete. But if the temperature has already been reached, the delay will begin later than expected and the Heater-Shaker will hold at its target temperature longer than intended.
+
+Additionally, if you want to pipette while the module holds a temperature for a certain length of time, you need to track the holding time yourself. One of the simplest ways to do this is with Python’s `time` module. First, add `import time` at the start of your protocol. Then, use [`time.monotonic()`](https://docs.python.org/3/library/time.html#time.monotonic) to set a reference time when the target is reached. Finally, add a delay that calculates how much holding time is remaining after the pipetting actions:
+
 ```python
-import time
 hs_mod.set_and_wait_for_temperature(75)
 start_time = time.monotonic()  # set reference time
 pipette.pick_up_tip()
@@ -149,13 +161,12 @@ pipette.drop_tip()
 protocol.delay(max(0, start_time+60 - time.monotonic()))
 hs_mod.deactivate_heater()
 ```
-If more than one minute has elapsed, the value passed to `protocol.delay()` will equal 0, and the protocol will continue immediately.
 
----
+Provided that the parallel pipetting actions don’t take more than one minute, this code will deactivate the heater one minute after its target was reached. If more than one minute has elapsed, the value passed to `protocol.delay()` will equal 0, and the protocol will continue immediately.
 
 ## Deactivating
 
-Deactivate the heater and shaker separately using [`deactivate_heater`][opentrons.protocol_api.HeaterShakerContext.deactivate_heater] and [`deactivate_shaker`][opentrons.protocol_api.HeaterShakerContext.deactivate_shaker]. There is no method to deactivate both simultaneously. Call the two methods in sequence if you need to stop both heating and shaking.
+Deactivate the heater and shaker separately using [`deactivate_heater`][opentrons.protocol_api.HeaterShakerContext.deactivate_heater] and [`deactivate_shaker`][opentrons.protocol_api.HeaterShakerContext.deactivate_shaker], respectively. There is no method to deactivate both simultaneously. Call the two methods in sequence if you need to stop both heating and shaking.
 
 !!! note
     The robot will not automatically deactivate the Heater-Shaker at the end of a protocol. If you need to deactivate the module after a protocol is completed or canceled, use the Heater-Shaker module controls on the device detail page in the Opentrons App or run these methods in Jupyter notebook.
