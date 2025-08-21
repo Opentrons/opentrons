@@ -396,7 +396,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
   )},\n)`
 
   const pythonAssignTipracks = getPythonAssignTipRacksString({
-    pipetteEntity: pipetteEntities[pipette],
     labwareEntities,
     labwareState: prevRobotState.labware,
     tiprackURI: tipRack,
@@ -410,6 +409,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
     `trash_location=${trashPipetteName}`,
     ...(pipetteSpecs.channels > 1 ? [`group_wells=False`] : []),
     `keep_last_tip=True`,
+    `tip_racks=[${pythonAssignTipracks}]`,
     `liquid_class=${customLiquidClass}`,
   ]
   const pythonCommandCreator: CurriedCommandCreator = () => ({

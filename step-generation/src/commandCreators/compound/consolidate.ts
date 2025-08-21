@@ -363,7 +363,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   )},\n)`
 
   const pythonAssignTipracks = getPythonAssignTipRacksString({
-    pipetteEntity: pipetteEntities[pipette],
     labwareEntities,
     labwareState: prevRobotState.labware,
     tiprackURI: tipRack,
@@ -379,11 +378,12 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     `trash_location=${trashPipetteName}`,
     ...(pipetteSpecs.channels > 1 ? [`group_wells=False`] : []),
     `keep_last_tip=True`,
+    `tip_racks=[${pythonAssignTipracks}]`,
     `liquid_class=${customLiquidClass}`,
   ]
   const pythonCommandCreator: CurriedCommandCreator = () => ({
     commands: [],
-    python: `${pythonAssignTipracks}${pythonPipetteName}.consolidate_with_liquid_class(\n${indentPyLines(
+    python: `${pythonPipetteName}.consolidate_with_liquid_class(\n${indentPyLines(
       pythonArgs.join(',\n')
     )},\n)`,
   })

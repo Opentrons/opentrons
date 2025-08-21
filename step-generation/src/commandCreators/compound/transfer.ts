@@ -383,7 +383,6 @@ export const transfer: CommandCreator<TransferArgs> = (
       : null
 
   const pythonAssignTipracks = getPythonAssignTipRacksString({
-    pipetteEntity: pipetteEntities[pipette],
     labwareEntities,
     labwareState: prevRobotState.labware,
     tiprackURI: tipRack,
@@ -417,11 +416,12 @@ export const transfer: CommandCreator<TransferArgs> = (
     `trash_location=${trashPipetteName}`,
     ...(pipetteSpecs.channels > 1 ? [`group_wells=False`] : []),
     `keep_last_tip=True`,
+    `tip_racks=[${pythonAssignTipracks}]`,
     `liquid_class=${customLiquidClass}`,
   ]
   const pythonCommandCreator: CurriedCommandCreator = () => ({
     commands: [],
-    python: `${pythonAssignTipracks}${pythonPipetteName}.transfer_with_liquid_class(\n${indentPyLines(
+    python: `${pythonPipetteName}.transfer_with_liquid_class(\n${indentPyLines(
       pythonArgs.join(',\n')
     )},\n)`,
   })

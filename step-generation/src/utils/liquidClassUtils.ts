@@ -1,6 +1,6 @@
 import last from 'lodash/last'
 
-import { getAllLiquidClassDefs } from '@opentrons/shared-data'
+import { getAllLiquidClassDefs, getIsLid } from '@opentrons/shared-data'
 
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
@@ -14,7 +14,6 @@ import type {
   DistributeArgs,
   InnerMixArgs,
   LabwareEntities,
-  PipetteEntity,
   RobotState,
   TransferArgs,
 } from '../types'
@@ -257,27 +256,30 @@ const getBlowoutPythonLocation = (
 }
 
 export const getPythonAssignTipRacksString = (args: {
-  pipetteEntity: PipetteEntity
   labwareEntities: LabwareEntities
   labwareState: RobotState['labware']
   tiprackURI: string
 }): string => {
-  const { pipetteEntity, labwareEntities, labwareState, tiprackURI } = args
-  const { pythonName: pythonPipetteName } = pipetteEntity
-  if (pipetteEntity.tiprackDefURI.length > 1) {
-    const assignedTipRackPythonNames = Object.keys(labwareEntities).reduce<
-      string[]
-    >((acc, id) => {
-      const isOffDeck = last(labwareState[id].stack) === 'offDeck'
-      if (labwareEntities[id].labwareDefURI === tiprackURI && !isOffDeck) {
-        return [...acc, labwareEntities[id].pythonName]
-      }
-      return acc
-    }, [])
+  const { labwareEntities, labwareState, tiprackURI } = args
+  const assignedTipRackPythonNames = Object.keys(labwareEntities).reduce<
+    string[]
+  >((acc, id) => {
+    const isOffDeck = last(labwareState[id].stack) === 'offDeck'
+    const hasLidOnTop = Object.entries(labwareState).find(
+      ([allLabwareId, temporalProperties]) =>
+        temporalProperties.stack.includes(id) &&
+        getIsLid(labwareEntities[allLabwareId].def)
+    )
+    //  filter out tipracks that are off-deck or have a lid
+    if (
+      labwareEntities[id].labwareDefURI === tiprackURI &&
+      !isOffDeck &&
+      !hasLidOnTop
+    ) {
+      return [...acc, labwareEntities[id].pythonName]
+    }
+    return acc
+  }, [])
 
-    return `${pythonPipetteName}.tip_racks = [${assignedTipRackPythonNames.join(
-      ', '
-    )}]\n`
-  }
-  return ''
+  return `${assignedTipRackPythonNames.join(', ')}\n`
 }
