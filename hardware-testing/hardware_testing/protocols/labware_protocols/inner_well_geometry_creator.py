@@ -117,11 +117,11 @@ def add_parameters(parameters: ParameterContext) -> None:
                 "value": "armadillo_96_wellplate_200ul_pcr_full_skirt",
             },
             {
-                "display_name": "nest 1 custom",
-                "value": "nest_1_reservoir_195ml_custom",
+                "display_name": "dorf500 test",
+                "value": "eppendorf_96_wellplate_500ul_custom",
             },
         ],
-        default="nest_1_reservoir_195ml_custom",
+        default="eppendorf_96_wellplate_500ul_custom",
     )
 
     # generally, the first dispense should be 1/25 the max volume.
@@ -492,7 +492,7 @@ def run(ctx: ProtocolContext) -> None:
             alpha_low, alpha_high = 0.5, 1.5
         elif max_volume >= 2000: 
             alpha_low, alpha_high = 0.2, 0.5
-        elif max_volume >= 250:  # 250–999
+        elif max_volume >= 250:  # 250–1999
             alpha_low, alpha_high = 0.5, 0.8
         elif max_volume >= 100:  # 100–249
             alpha_low, alpha_high = 0.8, 1.0

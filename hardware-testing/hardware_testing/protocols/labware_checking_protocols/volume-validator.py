@@ -73,8 +73,9 @@ def add_parameters(parameters: ParameterContext) -> None:
         choices=[
 
             {"display_name": "nest96 custom", "value": "nest_96_wellplate_2ml_deep_custom"},
+            {"display_name": "dorf 500 custom", "value": "eppendorf_96_wellplate_500ul_custom"},
         ],
-        default="nest_96_wellplate_2ml_deep_custom",
+        default = "eppendorf_96_wellplate_500ul_custom",
     )
 
 def pick_up_tips(
@@ -175,16 +176,29 @@ def aspirate_dispense_measure(
             liq_pipette.measure_liquid_height(src["A1"])
 
         tip_z_error = _get_tip_z_error(ctx, probe_pipette, dial)
-        
-        liq_pipette.blow_out()
-        liq_pipette.transfer_with_liquid_class(
-            ethanol,
-            expected_vol / liq_pipette.channels,
-            src["A1"],
-            labware[well],
+    
+        #liq_pipette.transfer_with_liquid_class(
+        #    ethanol,
+        #    expected_vol / liq_pipette.channels,
+        #    src["A1"],
+        #    labware[well],
+        #    new_tip="never",
+        #    return_tip=False,
+        #)
+
+        expected_height = labware[well].height_from_volume(expected_vol)
+        dispense_loc = labware[well].bottom(z= expected_height + 2.5)
+        liq_pipette.transfer(
+            (expected_vol / liq_pipette.channels) * 1.033,
+            src["A1"].meniscus(z=-2, target="end"),
+            dispense_loc,
             new_tip="never",
             return_tip=False,
+            blow_out = True,
+            blowout_location="destination well",
+            air_gap=5,
         )
+
         height = probe_pipette.measure_liquid_height(labware[well])
         corrected_height = height + tip_z_error
         all_corrected_heights.append(corrected_height)
@@ -299,6 +313,7 @@ def run(ctx: ProtocolContext) -> None:
     # Pick up Tips
     pick_up_tips(probe_pipette, liq_pipette)
     liq_pipette.measure_liquid_height(src["A1"])
+    liq_pipette.blow_out()
 
     all_corrected_heights = aspirate_dispense_measure(
         ctx,
@@ -321,7 +336,9 @@ def run(ctx: ProtocolContext) -> None:
             start = i * region_len
             end = (i + 1) * region_len
             corrected = all_corrected_heights[start:end]
-            expected_val = labware["A1"].height_from_volume(labware["A1"].volume_from_height(region_heights[i]))
+            expected_val = labware["A1"].height_from_volume(
+                labware["A1"].volume_from_height(region_heights[i])
+            )
             errors = [abs(c - expected_val) for c in corrected]
             avg_error = sum(errors) / len(errors) if errors else 0.0
             region_results.extend(
@@ -330,8 +347,12 @@ def run(ctx: ProtocolContext) -> None:
                 [str(round(avg_error, 3))]
             )
 
-        # Write the summary line: labware, then all regions' results
-        _write_line_to_csv(ctx, [labware_type] + region_results)
+        from hardware_testing.data import append_data_to_file
+
+        line = [labware_type] + region_results
+        line_str = ",".join(line) + "\n"
+        append_data_to_file(metadata["protocolName"], RUN_ID, FILE_NAME, line_str)
+
 
     drop_tips(probe_pipette, liq_pipette)
 
