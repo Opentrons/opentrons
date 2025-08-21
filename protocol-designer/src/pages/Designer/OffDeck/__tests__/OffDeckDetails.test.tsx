@@ -68,7 +68,7 @@ describe('OffDeckDetails', () => {
         },
       },
     })
-    vi.mocked(selectors.getLiquidDisplayColors).mockReturnValue([])
+    vi.mocked(selectors.getLiquidDisplayColors).mockReturnValue({})
     vi.mocked(getAllWellContentsForActiveItem).mockReturnValue({})
     vi.mocked(HighlightOffdeckSlot).mockReturnValue(
       <div>Highlight Offdeck Slot</div>

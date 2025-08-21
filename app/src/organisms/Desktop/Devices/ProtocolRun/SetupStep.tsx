@@ -2,17 +2,14 @@ import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
-  Box,
   Btn,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  DISPLAY_GRID,
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   NO_WRAP,
-  OVERFLOW_HIDDEN,
   SPACING,
   StyledText,
   TYPOGRAPHY,
@@ -90,25 +87,40 @@ export function SetupStep({
           </Flex>
         </Flex>
       </Btn>
-      <Box
-        display={DISPLAY_GRID}
+      <div
         css={expanded ? EXPANDED_STYLE : COLLAPSED_STYLE}
+        onTransitionEnd={e => {
+          // HACK:
+          // There's some kind of Chromium bug where, when the section expands,
+          // the contents will sometimes be left only partially painted, i.e. partially
+          // missing. They'll remain that way until something like a screen resize
+          // happens to force a repaint. It seems to happen more when there are
+          // performance problems (dropped frames and partially-presented frames) and
+          // when the section contents land partially below the fold.
+          forceRepaint(e.currentTarget)
+        }}
       >
-        <Box overflow={OVERFLOW_HIDDEN}>{children}</Box>
-      </Box>
+        {children}
+      </div>
     </Flex>
   )
 }
 
 const EXPANDED_STYLE = css`
-  transition: grid-template-rows 300ms ease-in, visibility 400ms ease;
-  grid-template-rows: 1fr;
+  interpolate-size: allow-keywords;
+  overflow: hidden;
+
   visibility: visible;
+  height: auto;
+  transition: height 300ms ease-in, visibility 300ms step-start;
 `
 const COLLAPSED_STYLE = css`
-  transition: grid-template-rows 500ms ease-out, visibility 600ms ease;
-  grid-template-rows: 0fr;
+  interpolate-size: allow-keywords;
+  overflow: hidden;
+
   visibility: hidden;
+  height: 0;
+  transition: height 500ms ease-out, visibility 500ms step-end;
 `
 const ACCORDION_STYLE = css`
   border-radius: 50%;
@@ -124,3 +136,11 @@ const RIGHT_CONTENT_CONTAINER_STYLE = css`
   align-items: ${ALIGN_CENTER};
   text-wrap: ${NO_WRAP};
 `
+
+// https://stackoverflow.com/questions/3485365
+function forceRepaint(element: HTMLElement): void {
+  element.style.display = 'none'
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+  element.offsetHeight // no need to store this anywhere, the reference is enough
+  element.style.display = ''
+}

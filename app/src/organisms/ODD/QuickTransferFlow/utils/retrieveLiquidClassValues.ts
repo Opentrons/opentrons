@@ -151,7 +151,9 @@ const getNoLiquidClassValues = (
       positionFromBottom: aspirate.retract.endPosition.offset.z ?? 0,
       delayDuration: aspirate.retract.delay.params?.duration ?? 0,
     },
-    touchTipAspirate: aspirate.retract.touchTip.params?.zOffset,
+    touchTipAspirate: !aspirate.retract.touchTip.enable
+      ? undefined
+      : aspirate.retract.touchTip.params?.zOffset,
     touchTipAspirateSpeed: aspirate.retract.touchTip.params?.speed,
     airGapAspirate: airGap.aspirate,
     conditionAspirate: conditioning ?? 0,
@@ -185,7 +187,9 @@ const getNoLiquidClassValues = (
       ),
       flowRate: dispense.retract.blowout?.params?.flowRate ?? 0,
     },
-    touchTipDispense: dispense.retract.touchTip.params?.zOffset,
+    touchTipDispense: !dispense.retract.touchTip.enable
+      ? undefined
+      : dispense.retract.touchTip.params?.zOffset,
     touchTipDispenseSpeed: dispense.retract.touchTip.params?.speed,
     airGapDispense: airGap.dispense,
     disposalVolumeDispenseSettings: {

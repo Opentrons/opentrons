@@ -430,6 +430,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           getSlotInLocationStack(labware.stack) === 'offDeck' ||
           allModules.some(m => labware.stack.includes(m.id)) ||
           labware.id === adjacentLabware?.id ||
+          labware.stack.includes('fixedTrash') ||
           labware.def.parameters.loadName === TIPRACK_LID_LOADNAME
         ) {
           return null
