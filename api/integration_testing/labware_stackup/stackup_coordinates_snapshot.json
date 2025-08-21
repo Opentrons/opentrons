@@ -2050,6 +2050,25 @@
       "robot_type": "Flex"
     }
   },
+  "Flex,None,schema3test_universal_flat_adapter,schema3test_96_wellplate_200ul_pcr_full_skirt": {
+    "coordinates": [
+      334.3,
+      -5.9,
+      20.7
+    ],
+    "spec": {
+      "adapter_load_info": [
+        "schema3test_universal_flat_adapter",
+        999
+      ],
+      "labware_load_info": [
+        "schema3test_96_wellplate_200ul_pcr_full_skirt",
+        999
+      ],
+      "module_load_name": null,
+      "robot_type": "Flex"
+    }
+  },
   "Flex,absorbanceReaderV1,None,armadillo_96_wellplate_200ul_pcr_full_skirt": {
     "coordinates": [
       344.38,
@@ -4197,6 +4216,25 @@
       "robot_type": "Flex"
     }
   },
+  "Flex,flexStackerModuleV1,schema3test_universal_flat_adapter,schema3test_96_wellplate_200ul_pcr_full_skirt": {
+    "coordinates": [
+      495.3,
+      -5.9,
+      51.7
+    ],
+    "spec": {
+      "adapter_load_info": [
+        "schema3test_universal_flat_adapter",
+        999
+      ],
+      "labware_load_info": [
+        "schema3test_96_wellplate_200ul_pcr_full_skirt",
+        999
+      ],
+      "module_load_name": "flexStackerModuleV1",
+      "robot_type": "Flex"
+    }
+  },
   "Flex,heaterShakerModuleV1,None,agilent_1_reservoir_290ml": {
     "coordinates": [
       391.88,
@@ -6242,6 +6280,25 @@
       ],
       "labware_load_info": [
         "schema3test_flex_96_tiprack_200ul",
+        999
+      ],
+      "module_load_name": "heaterShakerModuleV1",
+      "robot_type": "Flex"
+    }
+  },
+  "Flex,heaterShakerModuleV1,schema3test_universal_flat_adapter,schema3test_96_wellplate_200ul_pcr_full_skirt": {
+    "coordinates": [
+      342.8,
+      74.5,
+      39.65
+    ],
+    "spec": {
+      "adapter_load_info": [
+        "schema3test_universal_flat_adapter",
+        999
+      ],
+      "labware_load_info": [
+        "schema3test_96_wellplate_200ul_pcr_full_skirt",
         999
       ],
       "module_load_name": "heaterShakerModuleV1",
@@ -8299,6 +8356,25 @@
       "robot_type": "Flex"
     }
   },
+  "Flex,magneticBlockV1,schema3test_universal_flat_adapter,schema3test_96_wellplate_200ul_pcr_full_skirt": {
+    "coordinates": [
+      334.3,
+      -5.9,
+      58.7
+    ],
+    "spec": {
+      "adapter_load_info": [
+        "schema3test_universal_flat_adapter",
+        999
+      ],
+      "labware_load_info": [
+        "schema3test_96_wellplate_200ul_pcr_full_skirt",
+        999
+      ],
+      "module_load_name": "magneticBlockV1",
+      "robot_type": "Flex"
+    }
+  },
   "Flex,temperatureModuleV2,None,agilent_1_reservoir_290ml": {
     "coordinates": [
       391.88,
@@ -10350,6 +10426,25 @@
       "robot_type": "Flex"
     }
   },
+  "Flex,temperatureModuleV2,schema3test_universal_flat_adapter,schema3test_96_wellplate_200ul_pcr_full_skirt": {
+    "coordinates": [
+      334.3,
+      -5.9,
+      29.7
+    ],
+    "spec": {
+      "adapter_load_info": [
+        "schema3test_universal_flat_adapter",
+        999
+      ],
+      "labware_load_info": [
+        "schema3test_96_wellplate_200ul_pcr_full_skirt",
+        999
+      ],
+      "module_load_name": "temperatureModuleV2",
+      "robot_type": "Flex"
+    }
+  },
   "Flex,thermocyclerModuleV2,None,agilent_1_reservoir_290ml": {
     "coordinates": [
       43.875,
@@ -12395,6 +12490,25 @@
       ],
       "labware_load_info": [
         "schema3test_flex_96_tiprack_200ul",
+        999
+      ],
+      "module_load_name": "thermocyclerModuleV2",
+      "robot_type": "Flex"
+    }
+  },
+  "Flex,thermocyclerModuleV2,schema3test_universal_flat_adapter,schema3test_96_wellplate_200ul_pcr_full_skirt": {
+    "coordinates": [
+      1.895,
+      276.06,
+      31.66
+    ],
+    "spec": {
+      "adapter_load_info": [
+        "schema3test_universal_flat_adapter",
+        999
+      ],
+      "labware_load_info": [
+        "schema3test_96_wellplate_200ul_pcr_full_skirt",
         999
       ],
       "module_load_name": "thermocyclerModuleV2",
