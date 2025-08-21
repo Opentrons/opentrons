@@ -509,7 +509,7 @@ class ProtocolContext(CommandPublisher):
             if self._api_version < validation.LID_STACK_VERSION_GATE:
                 raise APIVersionError(
                     api_element="Loading a Lid on a Labware",
-                    until_version="2.23",
+                    until_version=f"{validation.LID_STACK_VERSION_GATE}",
                     current_version=f"{self._api_version}",
                 )
             self._core.load_lid(
@@ -918,7 +918,7 @@ class ProtocolContext(CommandPublisher):
         ):
             raise APIVersionError(
                 api_element=f"Module of type {module_name}",
-                until_version=str(validation.FLEX_STACKER_VERSION_GATE),
+                until_version=f"{validation.FLEX_STACKER_VERSION_GATE}",
                 current_version=f"{self._api_version}",
             )
 
@@ -1350,8 +1350,8 @@ class ProtocolContext(CommandPublisher):
             if self._api_version < desc_and_display_color_omittable_since:
                 raise APIVersionError(
                     api_element="Calling `define_liquid()` without a `description`",
-                    current_version=str(self._api_version),
-                    until_version=str(desc_and_display_color_omittable_since),
+                    until_version=f"{desc_and_display_color_omittable_since}",
+                    current_version=f"{self._api_version}",
                     extra_message="Use a newer API version or explicitly supply `description=None`.",
                 )
             else:
@@ -1360,8 +1360,8 @@ class ProtocolContext(CommandPublisher):
             if self._api_version < desc_and_display_color_omittable_since:
                 raise APIVersionError(
                     api_element="Calling `define_liquid()` without a `display_color`",
-                    current_version=str(self._api_version),
-                    until_version=str(desc_and_display_color_omittable_since),
+                    until_version=f"{desc_and_display_color_omittable_since}",
+                    current_version=f"{self._api_version}",
                     extra_message="Use a newer API version or explicitly supply `display_color=None`.",
                 )
             else:
@@ -1498,7 +1498,7 @@ class ProtocolContext(CommandPublisher):
         if self._api_version < validation.LID_STACK_VERSION_GATE:
             raise APIVersionError(
                 api_element="Loading a Lid Stack",
-                until_version="2.23",
+                until_version=f"{validation.LID_STACK_VERSION_GATE}",
                 current_version=f"{self._api_version}",
             )
 
