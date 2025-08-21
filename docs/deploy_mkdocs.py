@@ -55,6 +55,12 @@ def deploy_docs(environment, branch=None, aws_profile=None, source_dir="site"):
         print(f"Error: Source directory {source_path} does not exist.")
         print("Make sure you've run 'make build' first.")
         sys.exit(1)
+    
+    # Check if this is a directory or if we're deploying from current directory
+    if source_path.is_file():
+        print(f"Error: {source_path} is a file, not a directory.")
+        print("Make sure you've run 'make build' first.")
+        sys.exit(1)
 
     # Check if source directory has content
     source_files = list(source_path.glob("*"))
@@ -196,8 +202,8 @@ def main():
     )
     parser.add_argument(
         "--source-dir",
-        default="site",
-        help="Source directory to deploy (default: site)"
+        default=".",
+        help="Source directory to deploy (default: current directory)"
     )
     
     args = parser.parse_args()
