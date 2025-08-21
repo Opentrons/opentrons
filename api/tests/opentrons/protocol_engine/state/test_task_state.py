@@ -2,15 +2,11 @@
 import pytest
 from opentrons.protocol_engine.state.tasks import TaskStore, TaskView
 from opentrons.protocol_engine.types import Task, FinishedTask
-from opentrons.protocol_engine.errors import ErrorOccurrence
-from opentrons.protocol_engine.errors.exceptions import ProtocolEngineError
 from datetime import datetime
 import asyncio
 from opentrons.protocol_engine.actions.actions import (
     StartTaskAction,
     FinishTaskAction,
-    CancelTaskAction,
-    CancelAllTasksAction,
 )
 
 
@@ -167,82 +163,3 @@ async def test_handle_finish_task_action(subject: TaskStore) -> None:
     assert task_finished.error is None
     assert not hasattr(task_finished, "asyncioTask")
     assert task_id_1 not in subject._state.current_tasks_by_id
-
-
-async def test_handle_cancel_task_action(subject: TaskStore) -> None:
-    """It should store data about a cancelled task action."""
-    timestamp_1 = datetime.now()
-    task_id_1 = "task123"
-    message = "task canceled"
-    asyncio_task_1 = asyncio.create_task(asyncio.sleep(0))
-    await asyncio.gather(asyncio_task_1)
-    action_started = StartTaskAction(
-        task=Task(
-            id=task_id_1,
-            createdAt=timestamp_1,
-            asyncioTask=asyncio_task_1,
-        )
-    )
-    subject.handle_action(action_started)
-    assert task_id_1 in subject._state.current_tasks_by_id
-    action_cancelled = CancelTaskAction(task_id=task_id_1, message=message)
-    subject.handle_action(action_cancelled)
-    assert task_id_1 not in subject._state.current_tasks_by_id
-    task_finished = subject._state.finished_tasks_by_id[task_id_1]
-    assert task_finished.id == task_id_1
-    assert task_finished.error == ErrorOccurrence.from_failed(
-        createdAt=timestamp_1,
-        id=task_id_1,
-        error=ProtocolEngineError(message=message),
-    )
-    assert task_finished.createdAt == timestamp_1
-    assert not hasattr(task_finished, "asyncioTask")
-
-
-async def test_handle_cancel_all_tasks_action(subject: TaskStore) -> None:
-    """It should store data about all cancelled task actions."""
-    timestamp_1 = datetime.now()
-    timestamp_2 = datetime.now()
-    task_id_1 = "task123"
-    task_id_2 = "task345"
-    message = "task cancelled"
-    asyncio_task_1 = asyncio.create_task(asyncio.sleep(0))
-    asyncio_task_2 = asyncio.create_task(asyncio.sleep(0))
-    await asyncio.gather(asyncio_task_1, asyncio_task_2)
-    action_started_1 = StartTaskAction(
-        task=Task(
-            id=task_id_1,
-            createdAt=timestamp_1,
-            asyncioTask=asyncio_task_1,
-        )
-    )
-    action_started_2 = StartTaskAction(
-        task=Task(
-            id=task_id_2,
-            createdAt=timestamp_2,
-            asyncioTask=asyncio_task_2,
-        )
-    )
-    subject.handle_action(action_started_1)
-    subject.handle_action(action_started_2)
-    assert task_id_1, task_id_2 in subject._state.current_tasks_by_id
-    action_cancelled = CancelAllTasksAction(message=message)
-    subject.handle_action(action_cancelled)
-    assert task_id_1, task_id_2 not in subject._state.current_tasks_by_id
-    view = TaskView(subject._state)
-    summary = view.get_summary()
-    assert len(summary) == 2
-    assert summary[0].id == task_id_1
-    assert summary[0].createdAt == timestamp_1
-    assert summary[0].error == ErrorOccurrence.from_failed(
-        createdAt=timestamp_1,
-        id=task_id_1,
-        error=ProtocolEngineError(message=message),
-    )
-    assert summary[1].id == task_id_2
-    assert summary[1].createdAt == timestamp_2
-    assert summary[1].error == ErrorOccurrence.from_failed(
-        createdAt=timestamp_2,
-        id=task_id_2,
-        error=ProtocolEngineError(message=message),
-    )

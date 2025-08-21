@@ -29,8 +29,6 @@ from .actions import (
     ResetTipsAction,
     SetPipetteMovementSpeedAction,
     StartTaskAction,
-    CancelAllTasksAction,
-    CancelTaskAction,
     FinishTaskAction,
 )
 from .get_state_update import get_state_updates
@@ -62,8 +60,6 @@ __all__ = [
     "ResetTipsAction",
     "SetPipetteMovementSpeedAction",
     "StartTaskAction",
-    "CancelAllTasksAction",
-    "CancelTaskAction",
     "FinishTaskAction",
     # action payload values
     "PauseSource",

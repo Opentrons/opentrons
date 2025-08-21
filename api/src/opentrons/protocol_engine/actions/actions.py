@@ -220,21 +220,6 @@ class FinishTaskAction:
 
 
 @dataclasses.dataclass(frozen=True)
-class CancelTaskAction:
-    """Cancel task in state."""
-
-    task_id: str
-    message: str | None
-
-
-@dataclasses.dataclass(frozen=True)
-class CancelAllTasksAction:
-    """Cancel all the tasks in state."""
-
-    message: str | None
-
-
-@dataclasses.dataclass(frozen=True)
 class AddLabwareOffsetAction:
     """Add a labware offset, to apply to subsequent `LoadLabwareCommand`s."""
 
@@ -333,7 +318,5 @@ Action = Union[
     SetPipetteMovementSpeedAction,
     SetErrorRecoveryPolicyAction,
     StartTaskAction,
-    CancelAllTasksAction,
-    CancelTaskAction,
     FinishTaskAction,
 ]
