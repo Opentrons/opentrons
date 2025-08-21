@@ -11,7 +11,10 @@ from pathlib import Path
 
 def update_urls(environment, branch=None):
     """Update URLs in index.html based on environment"""
-    index_path = Path("site/index.html")
+    # Check for index.html in current directory first, then in site/ subdirectory
+    index_path = Path("index.html")
+    if not index_path.exists():
+        index_path = Path("site/index.html")
     
     if not index_path.exists():
         print(f"Error: {index_path} does not exist")
