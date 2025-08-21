@@ -41,11 +41,10 @@ export function getFixtureIdByCutoutIdForModule(
     cc => cc.opentronsModuleSerialNumber === attachedModule.serialNumber
   )
   if (moduleCutoutConfig != null) {
-   return {
-    [moduleCutoutConfig.cutoutId]: moduleCutoutConfig.cutoutFixtureId
-   }
-  }
-  else{
+    return {
+      [moduleCutoutConfig.cutoutId]: moduleCutoutConfig.cutoutFixtureId,
+    }
+  } else {
     return {}
   }
 }

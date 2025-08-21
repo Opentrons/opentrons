@@ -144,9 +144,14 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
       moduleFixtures
     )
     console.log('selectedFixtureIdByCutoutIds: ', selectedFixtureIdByCutoutIds)
-    console.log('configuredFixtureIdByCutoutId: ', configuredFixtureIdByCutoutId)
+    console.log(
+      'configuredFixtureIdByCutoutId: ',
+      configuredFixtureIdByCutoutId
+    )
     if (!isEqual(selectedFixtureIdByCutoutIds, configuredFixtureIdByCutoutId)) {
-      console.log('selectedFixtureIdByCutoutIds is not equal to configuredFixtureIdByCutoutId')
+      console.log(
+        'selectedFixtureIdByCutoutIds is not equal to configuredFixtureIdByCutoutId'
+      )
       const updatedDeckConfig = deckConfig.map(cc => {
         if (cc.cutoutId in configuredFixtureIdByCutoutId) {
           console.log('cc.cutoutId in configuredFixtureIdByCutoutId')
@@ -157,34 +162,46 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
               cutoutFixtureId: SINGLE_CENTER_SLOT_FIXTURE,
               opentronsModuleSerialNumber: undefined,
             }
-          }
-          else if (COMBO_FIXTURES.includes(cc.cutoutFixtureId)){
+          } else if (COMBO_FIXTURES.includes(cc.cutoutFixtureId)) {
             console.log('FLEX_STACKER_FIXTURES fixture')
             if (cc.cutoutId != Object.keys(selectedFixtureIdByCutoutIds)[0]) {
-              const aaForSelectedFixture = getAAWithFakesFromCutoutFixtureId(Object.keys(selectedFixtureIdByCutoutIds)[0] as CutoutId, selectedFixtureIdByCutoutIds[Object.keys(selectedFixtureIdByCutoutIds)[0] as CutoutId] ?? cc.cutoutFixtureId, deckDef)
-              const filteredAAForSelectedFixture = aaForSelectedFixture.find(aa => {
-                const aaAreaType = getAAByAAId(aa, deckDef).areaType
-                return Object.values(FLEX_MODULE_AA_TYPE_BY_MODEL).includes(
-                    aaAreaType as AreaType
-                  ) && aaAreaType !== 'magneticBlock'
-              
-              })
-              console.log('filteredAAForSelectedFixture: ', filteredAAForSelectedFixture)
-     
+              const aaForSelectedFixture = getAAWithFakesFromCutoutFixtureId(
+                Object.keys(selectedFixtureIdByCutoutIds)[0] as CutoutId,
+                selectedFixtureIdByCutoutIds[
+                  Object.keys(selectedFixtureIdByCutoutIds)[0] as CutoutId
+                ] ?? cc.cutoutFixtureId,
+                deckDef
+              )
+              const filteredAAForSelectedFixture = aaForSelectedFixture.find(
+                aa => {
+                  const aaAreaType = getAAByAAId(aa, deckDef).areaType
+                  return (
+                    Object.values(FLEX_MODULE_AA_TYPE_BY_MODEL).includes(
+                      aaAreaType as AreaType
+                    ) && aaAreaType !== 'magneticBlock'
+                  )
+                }
+              )
+              console.log(
+                'filteredAAForSelectedFixture: ',
+                filteredAAForSelectedFixture
+              )
+
               const fixtureReplacement = replaceCutoutFixtureForFixtureRemoval(
                 cc.cutoutFixtureId,
                 cc.cutoutId,
                 filteredAAForSelectedFixture
               )
               console.log('fixtureReplacement: ', fixtureReplacement)
-            return {
-              ...cc,
-              cutoutFixtureId: getReplacementFixtureForFakeFixture(fixtureReplacement),
-              opentronsModuleSerialNumber: undefined,
+              return {
+                ...cc,
+                cutoutFixtureId: getReplacementFixtureForFakeFixture(
+                  fixtureReplacement
+                ),
+                opentronsModuleSerialNumber: undefined,
+              }
             }
-          }
-          }
-          else if (SINGLE_RIGHT_CUTOUTS.includes(cc.cutoutId)) {
+          } else if (SINGLE_RIGHT_CUTOUTS.includes(cc.cutoutId)) {
             return {
               ...cc,
               cutoutFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,

@@ -7,6 +7,7 @@ import isEqual from 'lodash/isEqual'
 
 import {
   COMBO_FIXTURES,
+  FAKE_STAGING_SLOT_WITH_MAG_BLOCK_FIXTURE,
   FLEX_MODULE_AA_TYPE_BY_MODEL,
   FLEX_STACKER_FIXTURES,
   FLEX_STAGING_ADDRESSABLE_AREAS_WITH_FAKES,
@@ -17,7 +18,6 @@ import {
   WASTE_CHUTE_FLEX_STACKER_FIXTURES,
   WASTE_CHUTE_ONLY_FIXTURES_WITH_FAKES,
   WASTE_CHUTE_WITH_FAKE_FIXTURES,
-  FAKE_STAGING_SLOT_WITH_MAG_BLOCK_FIXTURE,
 } from '.'
 import {
   A1_ADDRESSABLE_AREA,
@@ -632,7 +632,6 @@ export function getCutoutFixturesForModuleModel(
   deckDef: DeckDefinition
 ): CutoutFixture[] {
   const moduleFixtureIds = getCutoutFixtureIdsForModuleModel(moduleModel)
-  console.log('moduleFixtureIds: ', moduleFixtureIds)
   return moduleFixtureIds.reduce<CutoutFixture[]>((acc, id) => {
     const moduleFixture = deckDef.cutoutFixtures.find(cf => cf.id === id)
     return moduleFixture != null ? [...acc, moduleFixture] : acc
@@ -644,11 +643,9 @@ export function getFixtureIdByCutoutIdFromModuleAnchorCutoutId(
   moduleFixtures: CutoutFixture[] // cutout fixtures for a specific module model
 ): { [cutoutId in CutoutId]?: CutoutFixtureId } {
   // find the first fixture for this specific module model that may mount to the cutout implied by the slotName
-  console.log('moduleFixtures: ', moduleFixtures)
   const anchorFixture = moduleFixtures.find(fixture =>
     fixture.mayMountTo.some(cutoutId => cutoutId === anchorCutoutId)
   )
-  console.log('anchorFixture: ', anchorFixture)
   if (anchorCutoutId != null && anchorFixture != null) {
     const groupedFixtures = anchorFixture.fixtureGroup[anchorCutoutId]
     return groupedFixtures?.[0] ?? { [anchorCutoutId]: anchorFixture.id }
@@ -842,7 +839,6 @@ export function getFixtureDisplayName(
             moduleName: getModuleDisplayName(FLEX_STACKER_MODULE_V1),
           })
     case FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE:
-      console.log('waste chute no cover')
       return usbPortNumber != null
         ? t(`${translationFileName}:module_in_port_and_waste_chute`, {
             moduleName: getModuleDisplayName(FLEX_STACKER_MODULE_V1),
@@ -1582,21 +1578,16 @@ export const replaceCutoutFixtureForFixtureRemoval = (
   cutoutId: CutoutId,
   addressableAreaId: AddressableAreaNamesWithFakes
 ): CutoutFixtureIdsWithFakes => {
-  console.log('cutoutFixtureRemoved: ', cutoutFixtureRemoved)
-  console.log('cutoutId: ', cutoutId)
-  console.log('addressableAreaId: ', addressableAreaId)
   const deckDef = getDeckDefFromRobotType('OT-3 Standard')
   const aaPerFixtureOptions = getAAsToFixtureIdFromDeckDefWithFakes(
     cutoutId,
     deckDef
   )
-  console.log('addressableAreasById: ', aaPerFixtureOptions)
   const aaForFixtureRemoval = getAAWithFakesFromCutoutFixtureId(
     cutoutId,
     cutoutFixtureRemoved,
     deckDef
   )
-  console.log('aaForCutoutAndFixture: ', aaForFixtureRemoval)
   if (WASTE_CHUTE_WITH_FAKE_FIXTURES.includes(cutoutFixtureRemoved)) {
     if (addressableAreaId === DEFAULT_AA_FOR_WASTE_CHUTE) {
       return WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(cutoutFixtureRemoved)
@@ -1607,33 +1598,27 @@ export const replaceCutoutFixtureForFixtureRemoval = (
     }
   } else if (cutoutFixtureRemoved === ABSORBANCE_READER_V1_FIXTURE) {
     return SINGLE_RIGHT_SLOT_FIXTURE
-  }
-  else if (cutoutFixtureRemoved === FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE) {  
+  } else if (cutoutFixtureRemoved === FLEX_STACKER_V1_FIXTURE) {
+    return SINGLE_RIGHT_SLOT_FIXTURE
+  } else if (cutoutFixtureRemoved === FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE) {
     if (getAAByAAId(addressableAreaId, deckDef).areaType === 'flexStacker') {
       return FAKE_STAGING_SLOT_WITH_MAG_BLOCK_FIXTURE
     } else {
       return FLEX_STACKER_V1_FIXTURE
     }
-  }
-  else {
-    const aaWithoutAASToRemove = aaForFixtureRemoval?.filter(aa => aa !== addressableAreaId)
-    console.log('aaWithoutAASToRemove: ', aaWithoutAASToRemove)
+  } else {
     const updated = aaForFixtureRemoval?.map(aa => {
       const vsId = getVisualSlotIdForAA(cutoutId, cutoutFixtureRemoved, aa)
-      console.log('vsId: ', vsId)
-      console.log('aa: ', aa)
-      console.log('addressableAreaId: ', addressableAreaId) 
       return aa === addressableAreaId ? getAAWithFakesFromVSId(vsId) : aa
     })
-    const match = Object.entries(aaPerFixtureOptions).find(([, value]) =>{
+    const match = Object.entries(aaPerFixtureOptions).find(([, value]) => {
       return isEqual(
         value.sort(),
         WASTE_CHUTE_WITH_FAKE_FIXTURES.includes(cutoutFixtureRemoved)
           ? aaForFixtureRemoval?.sort()
           : updated?.sort()
-      )}
-    )
-    console.log('match: ', match)
+      )
+    })
     if (match) {
       return match[0] as CutoutFixtureIdsWithFakes
     }
@@ -1656,7 +1641,6 @@ export const getFlexStackerD3Compatibility = (
   const deckConfigCompatabilityD3 = deckConfigCompatibility?.find(
     configItem => configItem.cutoutId === WASTE_CHUTE_CUTOUT
   )
-  console.log('deckConfigCompatabilityD3: ', deckConfigCompatabilityD3)
   const matchWithAA = getMainFixtureIdForAA(
     deckConfigCompatabilityD3?.compatibleCutoutFixtureIds ?? [],
     deckConfigCompatabilityD3?.requiredAddressableAreas ?? [],
@@ -1665,7 +1649,6 @@ export const getFlexStackerD3Compatibility = (
   console.log('matchWithAA: ', matchWithAA)
   const matchWithFixture =
     matchWithAA ?? deckConfigCompatabilityD3?.compatibleCutoutFixtureIds[0]
-  console.log('matchWithFixture: ', matchWithFixture)
   if (
     (deckConfigCompatabilityD3 != null &&
       matchWithFixture !== undefined &&
@@ -1677,7 +1660,12 @@ export const getFlexStackerD3Compatibility = (
         deckConfigCompatabilityD3.cutoutFixtureId as CutoutFixtureIdsWithFakes
       ))
   ) {
-    if (WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(deckConfigCompatabilityD3.cutoutFixtureId as CutoutFixtureIdsWithFakes)){
+    if (
+      !matchWithAA &&
+      WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(
+        deckConfigCompatabilityD3.cutoutFixtureId as CutoutFixtureIdsWithFakes
+      )
+    ) {
       return {
         comboFixtureId: deckConfigCompatabilityD3.cutoutFixtureId as CutoutFixtureId,
         comboFixtureConflict: !deckConfigCompatabilityD3?.compatibleCutoutFixtureIds.includes(
