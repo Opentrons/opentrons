@@ -96,16 +96,7 @@ jobs:
       - name: 'Build docs'
         run: |
           make -C api docs
-      - name: 'Deploy docs to sandbox'
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.S3_SANDBOX_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SANDBOX_SECRET }}
-          AWS_DEFAULT_REGION: us-east-2
-        uses: './.github/actions/webstack/deploy-to-sandbox'
-        with:
-          domain: 'docs.opentrons.com'
-          distPath: './api/docs/dist'
-          destPrefix: ${{ env.ACTUAL_BRANCH }}
+
       - name: 'Configure AWS Credentials for docs bucket'
         uses: aws-actions/configure-aws-credentials@v4
         with:
