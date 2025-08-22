@@ -103,6 +103,12 @@ def main():
         # Also output as JSON for debugging
         print(f"# JSON: {json.dumps(config, indent=2)}")
         
+        # For GitHub Actions, we need to set the outputs
+        if os.environ.get('GITHUB_OUTPUT'):
+            with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+                for key, value in config.items():
+                    f.write(f"{key}={value}\n")
+        
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)

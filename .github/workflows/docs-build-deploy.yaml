@@ -70,6 +70,11 @@ jobs:
       - name: Determine deployment configuration
         id: config
         run: |
+          echo "Debug: Event name: ${{ github.event_name }}"
+          echo "Debug: Ref: ${{ github.ref }}"
+          echo "Debug: Ref name: ${{ github.ref_name }}"
+          echo "Debug: Ref type: ${{ github.ref_type }}"
+          echo "Debug: Head ref: ${{ github.event.pull_request.head.ref }}"
           python docs/deploy_config.py "${{ github.event_name }}" "${{ github.ref }}" "${{ github.ref_name }}" "${{ github.ref_type }}" "${{ github.event.pull_request.head.ref }}"
 
   deploy:
@@ -99,6 +104,12 @@ jobs:
           name: docs-artifacts
           path: docs/
 
+      - name: Debug Environment Variables
+        run: |
+          echo "ENVIRONMENT: '${{ env.ENVIRONMENT }}'"
+          echo "BRANCH: '${{ env.BRANCH }}'"
+          echo "BUCKET: '${{ env.BUCKET }}'"
+          echo "URL: '${{ env.URL }}'"
       - name: Update URLs
         working-directory: ./docs
         run: python update_urls.py ${{ env.ENVIRONMENT }} --branch ${{ env.BRANCH }}
