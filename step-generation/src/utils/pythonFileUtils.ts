@@ -11,7 +11,6 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
-import { sortLabwareBySlot } from '../robotStateSelectors'
 import { getLiquidClassName } from './liquidClassUtils'
 import { getSlotInLocationStack } from './misc'
 import {
@@ -328,10 +327,8 @@ export function getLoadPipettes(
         : name
 
       return (
-        `${pythonName} = ${PROTOCOL_CONTEXT_NAME}.load_instrument(\n` +
-        `${indentPyLines(
-          [formatPyStr(pipetteName), ...(mount ? [mount] : [])].join(', ')
-        )},\n` +
+        `${pythonName} = ${PROTOCOL_CONTEXT_NAME}.load_instrument(` +
+        `${[formatPyStr(pipetteName), ...(mount ? [mount] : [])].join(', ')}` +
         ')'
       )
     })
