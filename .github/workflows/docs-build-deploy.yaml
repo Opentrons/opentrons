@@ -65,49 +65,12 @@ jobs:
       bucket: ${{ steps.config.outputs.bucket }}
       url: ${{ steps.config.outputs.url }}
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
       - name: Determine deployment configuration
         id: config
         run: |
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            echo "environment=sandbox" >> $GITHUB_OUTPUT
-            echo "branch=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
-            echo "bucket=sandbox.docs" >> $GITHUB_OUTPUT
-            echo "url=http://sandbox.docs.s3-website.us-east-2.amazonaws.com/${{ github.event.pull_request.head.ref }}/" >> $GITHUB_OUTPUT
-            echo "## 📋 Deployment Configuration" >> $GITHUB_STEP_SUMMARY
-            echo "**Environment:** Sandbox" >> $GITHUB_STEP_SUMMARY
-            echo "**Branch:** ${{ github.event.pull_request.head.ref }}" >> $GITHUB_STEP_SUMMARY
-            echo "**Trigger:** Pull Request" >> $GITHUB_STEP_SUMMARY
-          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref_type }}" == "branch" ]]; then
-            echo "environment=sandbox" >> $GITHUB_OUTPUT
-            echo "branch=${{ github.ref_name }}" >> $GITHUB_OUTPUT
-            echo "bucket=sandbox.docs" >> $GITHUB_OUTPUT
-            echo "url=http://sandbox.docs.s3-website.us-east-2.amazonaws.com/${{ github.ref_name }}/" >> $GITHUB_OUTPUT
-            echo "## 📋 Deployment Configuration" >> $GITHUB_STEP_SUMMARY
-            echo "**Environment:** Sandbox" >> $GITHUB_STEP_SUMMARY
-            echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
-            echo "**Trigger:** Branch Push" >> $GITHUB_STEP_SUMMARY
-          elif [[ "${{ github.ref }}" == refs/tags/staging-MKDOCS* ]]; then
-            echo "environment=staging" >> $GITHUB_OUTPUT
-            echo "branch=${{ github.ref_name }}" >> $GITHUB_OUTPUT
-            echo "bucket=opentrons.staging.docs" >> $GITHUB_OUTPUT
-            echo "url=https://staging.docs.opentrons.com/" >> $GITHUB_OUTPUT
-            echo "## 📋 Deployment Configuration" >> $GITHUB_STEP_SUMMARY
-            echo "**Environment:** Staging" >> $GITHUB_STEP_SUMMARY
-            echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
-            echo "**Trigger:** Staging Tag" >> $GITHUB_STEP_SUMMARY
-          elif [[ "${{ github.ref }}" == refs/tags/MKDOCS* ]]; then
-            echo "environment=production" >> $GITHUB_OUTPUT
-            echo "branch=${{ github.ref_name }}" >> $GITHUB_OUTPUT
-            echo "bucket=opentrons.production.docs" >> $GITHUB_OUTPUT
-            echo "url=https://docs.opentrons.com/" >> $GITHUB_OUTPUT
-            echo "## 📋 Deployment Configuration" >> $GITHUB_STEP_SUMMARY
-            echo "**Environment:** Production" >> $GITHUB_STEP_SUMMARY
-            echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
-            echo "**Trigger:** Production Tag" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "No deployment configuration found for this event"
-            exit 1
-          fi
+          python docs/deploy_config.py "${{ github.event_name }}" "${{ github.ref }}" "${{ github.ref_name }}" "${{ github.ref_type }}" "${{ github.event.pull_request.head.ref }}"
 
   deploy:
     needs: [build, determine-deploy-config]
