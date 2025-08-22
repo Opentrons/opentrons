@@ -1556,6 +1556,25 @@
       "robot_type": "Flex"
     }
   },
+  "Flex,None,opentrons_96_pcr_adapter,schema3test_96_wellplate_200ul_pcr_full_skirt": {
+    "coordinates": [
+      342.38,
+      74.24,
+      18.9
+    ],
+    "spec": {
+      "adapter_load_info": [
+        "opentrons_96_pcr_adapter",
+        1
+      ],
+      "labware_load_info": [
+        "schema3test_96_wellplate_200ul_pcr_full_skirt",
+        999
+      ],
+      "module_load_name": null,
+      "robot_type": "Flex"
+    }
+  },
   "Flex,None,opentrons_96_well_aluminum_block,armadillo_96_wellplate_200ul_pcr_full_skirt": {
     "coordinates": [
       342.38,
@@ -1627,6 +1646,25 @@
       "labware_load_info": [
         "opentrons_96_wellplate_200ul_pcr_full_skirt",
         3
+      ],
+      "module_load_name": null,
+      "robot_type": "Flex"
+    }
+  },
+  "Flex,None,opentrons_96_well_aluminum_block,schema3test_96_wellplate_200ul_pcr_full_skirt": {
+    "coordinates": [
+      342.38,
+      74.24,
+      22.25
+    ],
+    "spec": {
+      "adapter_load_info": [
+        "opentrons_96_well_aluminum_block",
+        1
+      ],
+      "labware_load_info": [
+        "schema3test_96_wellplate_200ul_pcr_full_skirt",
+        999
       ],
       "module_load_name": null,
       "robot_type": "Flex"
@@ -3703,6 +3741,25 @@
       "robot_type": "Flex"
     }
   },
+  "Flex,flexStackerModuleV1,opentrons_96_pcr_adapter,schema3test_96_wellplate_200ul_pcr_full_skirt": {
+    "coordinates": [
+      503.38,
+      74.24,
+      49.9
+    ],
+    "spec": {
+      "adapter_load_info": [
+        "opentrons_96_pcr_adapter",
+        1
+      ],
+      "labware_load_info": [
+        "schema3test_96_wellplate_200ul_pcr_full_skirt",
+        999
+      ],
+      "module_load_name": "flexStackerModuleV1",
+      "robot_type": "Flex"
+    }
+  },
   "Flex,flexStackerModuleV1,opentrons_96_well_aluminum_block,armadillo_96_wellplate_200ul_pcr_full_skirt": {
     "coordinates": [
       503.38,
@@ -3774,6 +3831,25 @@
       "labware_load_info": [
         "opentrons_96_wellplate_200ul_pcr_full_skirt",
         3
+      ],
+      "module_load_name": "flexStackerModuleV1",
+      "robot_type": "Flex"
+    }
+  },
+  "Flex,flexStackerModuleV1,opentrons_96_well_aluminum_block,schema3test_96_wellplate_200ul_pcr_full_skirt": {
+    "coordinates": [
+      503.38,
+      74.24,
+      53.25
+    ],
+    "spec": {
+      "adapter_load_info": [
+        "opentrons_96_well_aluminum_block",
+        1
+      ],
+      "labware_load_info": [
+        "schema3test_96_wellplate_200ul_pcr_full_skirt",
+        999
       ],
       "module_load_name": "flexStackerModuleV1",
       "robot_type": "Flex"
@@ -5754,6 +5830,25 @@
       "robot_type": "Flex"
     }
   },
+  "Flex,heaterShakerModuleV1,opentrons_96_pcr_adapter,schema3test_96_wellplate_200ul_pcr_full_skirt": {
+    "coordinates": [
+      342.38,
+      74.24,
+      37.85
+    ],
+    "spec": {
+      "adapter_load_info": [
+        "opentrons_96_pcr_adapter",
+        1
+      ],
+      "labware_load_info": [
+        "schema3test_96_wellplate_200ul_pcr_full_skirt",
+        999
+      ],
+      "module_load_name": "heaterShakerModuleV1",
+      "robot_type": "Flex"
+    }
+  },
   "Flex,heaterShakerModuleV1,opentrons_96_well_aluminum_block,armadillo_96_wellplate_200ul_pcr_full_skirt": {
     "coordinates": [
       342.38,
@@ -5825,6 +5920,25 @@
       "labware_load_info": [
         "opentrons_96_wellplate_200ul_pcr_full_skirt",
         3
+      ],
+      "module_load_name": "heaterShakerModuleV1",
+      "robot_type": "Flex"
+    }
+  },
+  "Flex,heaterShakerModuleV1,opentrons_96_well_aluminum_block,schema3test_96_wellplate_200ul_pcr_full_skirt": {
+    "coordinates": [
+      342.38,
+      74.24,
+      41.2
+    ],
+    "spec": {
+      "adapter_load_info": [
+        "opentrons_96_well_aluminum_block",
+        1
+      ],
+      "labware_load_info": [
+        "schema3test_96_wellplate_200ul_pcr_full_skirt",
+        999
       ],
       "module_load_name": "heaterShakerModuleV1",
       "robot_type": "Flex"
@@ -7805,6 +7919,25 @@
       "robot_type": "Flex"
     }
   },
+  "Flex,magneticBlockV1,opentrons_96_pcr_adapter,schema3test_96_wellplate_200ul_pcr_full_skirt": {
+    "coordinates": [
+      342.38,
+      74.24,
+      56.9
+    ],
+    "spec": {
+      "adapter_load_info": [
+        "opentrons_96_pcr_adapter",
+        1
+      ],
+      "labware_load_info": [
+        "schema3test_96_wellplate_200ul_pcr_full_skirt",
+        999
+      ],
+      "module_load_name": "magneticBlockV1",
+      "robot_type": "Flex"
+    }
+  },
   "Flex,magneticBlockV1,opentrons_96_well_aluminum_block,armadillo_96_wellplate_200ul_pcr_full_skirt": {
     "coordinates": [
       342.38,
@@ -7876,6 +8009,25 @@
       "labware_load_info": [
         "opentrons_96_wellplate_200ul_pcr_full_skirt",
         3
+      ],
+      "module_load_name": "magneticBlockV1",
+      "robot_type": "Flex"
+    }
+  },
+  "Flex,magneticBlockV1,opentrons_96_well_aluminum_block,schema3test_96_wellplate_200ul_pcr_full_skirt": {
+    "coordinates": [
+      342.38,
+      74.24,
+      60.25
+    ],
+    "spec": {
+      "adapter_load_info": [
+        "opentrons_96_well_aluminum_block",
+        1
+      ],
+      "labware_load_info": [
+        "schema3test_96_wellplate_200ul_pcr_full_skirt",
+        999
       ],
       "module_load_name": "magneticBlockV1",
       "robot_type": "Flex"
@@ -9856,6 +10008,25 @@
       "robot_type": "Flex"
     }
   },
+  "Flex,temperatureModuleV2,opentrons_96_pcr_adapter,schema3test_96_wellplate_200ul_pcr_full_skirt": {
+    "coordinates": [
+      342.38,
+      74.24,
+      27.9
+    ],
+    "spec": {
+      "adapter_load_info": [
+        "opentrons_96_pcr_adapter",
+        1
+      ],
+      "labware_load_info": [
+        "schema3test_96_wellplate_200ul_pcr_full_skirt",
+        999
+      ],
+      "module_load_name": "temperatureModuleV2",
+      "robot_type": "Flex"
+    }
+  },
   "Flex,temperatureModuleV2,opentrons_96_well_aluminum_block,armadillo_96_wellplate_200ul_pcr_full_skirt": {
     "coordinates": [
       342.38,
@@ -9927,6 +10098,25 @@
       "labware_load_info": [
         "opentrons_96_wellplate_200ul_pcr_full_skirt",
         3
+      ],
+      "module_load_name": "temperatureModuleV2",
+      "robot_type": "Flex"
+    }
+  },
+  "Flex,temperatureModuleV2,opentrons_96_well_aluminum_block,schema3test_96_wellplate_200ul_pcr_full_skirt": {
+    "coordinates": [
+      342.38,
+      74.24,
+      31.25
+    ],
+    "spec": {
+      "adapter_load_info": [
+        "opentrons_96_well_aluminum_block",
+        1
+      ],
+      "labware_load_info": [
+        "schema3test_96_wellplate_200ul_pcr_full_skirt",
+        999
       ],
       "module_load_name": "temperatureModuleV2",
       "robot_type": "Flex"
@@ -11907,6 +12097,25 @@
       "robot_type": "Flex"
     }
   },
+  "Flex,thermocyclerModuleV2,opentrons_96_pcr_adapter,schema3test_96_wellplate_200ul_pcr_full_skirt": {
+    "coordinates": [
+      -5.625,
+      356.2,
+      29.86
+    ],
+    "spec": {
+      "adapter_load_info": [
+        "opentrons_96_pcr_adapter",
+        1
+      ],
+      "labware_load_info": [
+        "schema3test_96_wellplate_200ul_pcr_full_skirt",
+        999
+      ],
+      "module_load_name": "thermocyclerModuleV2",
+      "robot_type": "Flex"
+    }
+  },
   "Flex,thermocyclerModuleV2,opentrons_96_well_aluminum_block,armadillo_96_wellplate_200ul_pcr_full_skirt": {
     "coordinates": [
       -5.625,
@@ -11978,6 +12187,25 @@
       "labware_load_info": [
         "opentrons_96_wellplate_200ul_pcr_full_skirt",
         3
+      ],
+      "module_load_name": "thermocyclerModuleV2",
+      "robot_type": "Flex"
+    }
+  },
+  "Flex,thermocyclerModuleV2,opentrons_96_well_aluminum_block,schema3test_96_wellplate_200ul_pcr_full_skirt": {
+    "coordinates": [
+      -5.625,
+      356.2,
+      33.21
+    ],
+    "spec": {
+      "adapter_load_info": [
+        "opentrons_96_well_aluminum_block",
+        1
+      ],
+      "labware_load_info": [
+        "schema3test_96_wellplate_200ul_pcr_full_skirt",
+        999
       ],
       "module_load_name": "thermocyclerModuleV2",
       "robot_type": "Flex"
@@ -13901,6 +14129,25 @@
       "robot_type": "OT-2"
     }
   },
+  "OT-2,None,opentrons_96_well_aluminum_block,schema3test_96_wellplate_200ul_pcr_full_skirt": {
+    "coordinates": [
+      279.38,
+      74.24,
+      22.25
+    ],
+    "spec": {
+      "adapter_load_info": [
+        "opentrons_96_well_aluminum_block",
+        1
+      ],
+      "labware_load_info": [
+        "schema3test_96_wellplate_200ul_pcr_full_skirt",
+        999
+      ],
+      "module_load_name": null,
+      "robot_type": "OT-2"
+    }
+  },
   "OT-2,heaterShakerModuleV1,None,agilent_1_reservoir_290ml": {
     "coordinates": [
       329.005,
@@ -15396,6 +15643,25 @@
       "labware_load_info": [
         "opentrons_96_wellplate_200ul_pcr_full_skirt",
         3
+      ],
+      "module_load_name": "heaterShakerModuleV1",
+      "robot_type": "OT-2"
+    }
+  },
+  "OT-2,heaterShakerModuleV1,opentrons_96_well_aluminum_block,schema3test_96_wellplate_200ul_pcr_full_skirt": {
+    "coordinates": [
+      279.505,
+      73.115,
+      90.525
+    ],
+    "spec": {
+      "adapter_load_info": [
+        "opentrons_96_well_aluminum_block",
+        1
+      ],
+      "labware_load_info": [
+        "schema3test_96_wellplate_200ul_pcr_full_skirt",
+        999
       ],
       "module_load_name": "heaterShakerModuleV1",
       "robot_type": "OT-2"
