@@ -856,12 +856,14 @@ describe('moveLabware', () => {
             ...invariantContext.labwareEntities[SOURCE_LABWARE].def,
             allowedRoles: ['lid'],
             compatibleParentLabware: ['fixture_96_plate'],
+            stackLimit: 4,
           } as LabwareDefinition2,
         },
         stackingLabware: {
           def: {
             ...invariantContext.labwareEntities[SOURCE_LABWARE].def,
             allowedRoles: ['lid'],
+            stackLimit: 4,
           } as LabwareDefinition2,
         } as any,
       },

@@ -367,3 +367,10 @@ export const nextTiprackHasLid = (): CommandCreatorError => {
     message: 'A pipette cannot pick up tips from a tip rack with a lid',
   }
 }
+
+export const stackTooHigh = (args: { slot: string }): CommandCreatorError => {
+  return {
+    type: 'STACK_TOO_HIGH',
+    message: `The stack on slot ${args.slot} is too high`,
+  }
+}
