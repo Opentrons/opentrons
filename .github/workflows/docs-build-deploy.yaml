@@ -87,7 +87,6 @@ jobs:
     steps:
       - name: 'Checkout Repository'
         uses: actions/checkout@v4
-
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -99,10 +98,6 @@ jobs:
           name: docs-artifacts
           path: docs/
 
-
-      - name: Update URLs
-        working-directory: ./docs
-        run: python update_urls.py ${{ env.ENVIRONMENT }} --branch ${{ env.BRANCH }}
       - name: Deploy
         working-directory: ./docs
         run: make deploy ENVIRONMENT=${{ env.ENVIRONMENT }} BRANCH=${{ env.BRANCH }}
