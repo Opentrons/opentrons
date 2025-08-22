@@ -82,7 +82,7 @@ def test_validate_definition_is_adapter(
     ],
 )
 def test_validate_labware_can_be_stacked(
-    definition: LabwareDefinition, expected_result: bool
+    definition: LabwareDefinition2, expected_result: bool
 ) -> None:
     """It should validate if definition allows it to stack on given labware."""
     assert (

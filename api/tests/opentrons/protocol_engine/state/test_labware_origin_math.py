@@ -474,8 +474,8 @@ class ModuleOverlapSpec(NamedTuple):
 class LabwareOverlapSpec(NamedTuple):
     """Spec data to test labware stacking behavior."""
 
-    child_definition: LabwareDefinition2
-    parent_definition: LabwareDefinition2
+    child_definition: LabwareDefinition
+    parent_definition: LabwareDefinition
     labware_location: OnLabwareLocation
     expected_total_offset: Point
 

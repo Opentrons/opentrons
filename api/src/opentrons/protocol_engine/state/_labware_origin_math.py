@@ -398,9 +398,7 @@ def _get_parent_deck_item_origin_to_child_labware_placement_origin(
 
 
 def _get_corner_offset_from_extents(child_labware: LabwareDefinition3) -> Point:
-    """
-    Derive the corner offset from slot from a LabwareDefinition3's extents.
-    """
+    """Derive the corner offset from slot from a LabwareDefinition3's extents."""
     back_left_bottom = child_labware.extents.total.backLeftBottom
 
     x = back_left_bottom.x
