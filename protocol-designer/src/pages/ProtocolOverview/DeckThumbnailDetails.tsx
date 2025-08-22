@@ -22,7 +22,6 @@ import {
   getTopmostLabwareOnModuleFromStack,
 } from '../../utils'
 import { TIPRACK_LID_LOADNAME } from '../Designer/utils'
-import { TIPRACK_LID_LOADNAME } from '../Designer/utils'
 import { SlotHover } from './SlotHover'
 
 import type { Dispatch, SetStateAction } from 'react'
