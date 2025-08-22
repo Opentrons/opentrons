@@ -56,7 +56,7 @@ The Temperature Module is designed to achieve and maintain a target temperature 
 
 Additionally, Opentrons has tested the Temperature Module’s temperature profile with both the 24-well and 96-well thermal blocks. The module can generally reach its minimum temperature in 12 to 18 minutes, depending on the block and contents. The module can reach a hot temperature (65 °C) in six minutes. For more details, see the [Temperature Module White Paper](https://insights.opentrons.com/hubfs/Products/Modules/Temperature%20Module%20White%20Paper.pdf).
 
-## Thermal Blocks
+## Thermal Blocks { #thermal-blocks-temperature }
 
 The Temperature Module uses aluminum thermal blocks to hold labware at temperature. The module comes with a 24-well block, a 96-well PCR block, and a flat bottom block. The blocks hold 1.5 mL and 2.0 mL tubes, 96-well PCR plates, PCR strips, deep well plates, and flat bottom plates. You can also buy these aluminum blocks from the Opentrons shop.
 
