@@ -67,32 +67,6 @@ jobs:
           script: |
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
-            
-            // Set the actual branch name (not tag name)
-            let actualBranch
-            if (context.ref.startsWith('refs/tags/')) {
-              // For tags, use git to find which branch contains this tag
-              const tagName = context.ref.replace(/^refs\/tags\//, '')
-              try {
-                const { execSync } = require('child_process')
-                // First, fetch all remote branches
-                execSync('git fetch --all', { encoding: 'utf8' })
-                // Get remote branches that contain this tag
-                const branches = execSync(`git branch -r --contains ${tagName}`, { encoding: 'utf8' })
-                const branchList = branches.trim().split('\n')
-                  .map(b => b.replace(/^\*?\s*/, '').replace(/^origin\//, ''))
-                  .filter(b => b.trim() !== '' && !b.includes('HEAD'))
-                actualBranch = branchList[0] || context.payload.repository.default_branch
-                console.log(`Found remote branches for tag ${tagName}: ${branchList.join(', ')}`)
-              } catch (error) {
-                console.log(`Error finding branch for tag ${tagName}: ${error.message}`)
-                actualBranch = context.payload.repository.default_branch
-              }
-            } else {
-              actualBranch = context.ref.replace(/^refs\/heads\//, '')
-            }
-            core.exportVariable('ACTUAL_BRANCH', actualBranch)
-            console.log(`Using branch: ${actualBranch} (ref: ${context.ref})`)
       - name: 'Build docs'
         run: |
           make -C api docs
@@ -104,4 +78,4 @@ jobs:
           aws-region: us-east-2
       - name: 'Deploy docs to sandbox.docs bucket'
         run: |
-          aws s3 sync ./api/docs/dist/ s3://sandbox.docs/${{ env.ACTUAL_BRANCH }}/
+          aws s3 sync ./api/docs/dist/ s3://sandbox.docs/${{ github.ref_name }}/
