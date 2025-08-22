@@ -357,7 +357,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
     tipRack,
     invariantContext,
     prevRobotState,
-    nozzles ?? undefined
+    ...(nozzles != null ? [nozzles] : [])
   )
 
   const dispenseCorrectionVolumeForDestination =

@@ -321,7 +321,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     tipRack,
     invariantContext,
     prevRobotState,
-    nozzles ?? undefined
+    ...(nozzles != null ? [nozzles] : [])
   )
 
   const aspirateCorrectionVolumeForSampleAspiration =

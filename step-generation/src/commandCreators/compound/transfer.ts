@@ -337,7 +337,7 @@ export const transfer: CommandCreator<TransferArgs> = (
     tipRack,
     invariantContext,
     prevRobotState,
-    nozzles ?? undefined
+    ...(nozzles != null ? [nozzles] : [])
   )
   const liquidClassValuesForTip =
     getAllLiquidClassDefs()
