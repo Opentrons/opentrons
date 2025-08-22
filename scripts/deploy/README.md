@@ -36,7 +36,7 @@ For example, to bump Protocol Designer to version 3.0.0:
 
 ```shell
 git tag -a protocol-designer@3.0.0 -m "chore(release): protocol-designer 3.0.0" origin/chore_release-pd-3.0.0
-git push protocol-designer@3.0.0
+git push origin protocol-designer@3.0.0
 ```
 
 When the tag is pushed to CI, it will build the release artifact and place it in:
