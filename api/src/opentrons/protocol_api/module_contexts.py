@@ -123,7 +123,7 @@ class ModuleContext(CommandPublisher):
 
         return core.geometry.add_labware(labware)
 
-    def load_labware(
+    def load_labware(  # noqa: C901
         self,
         name: str,
         label: Optional[str] = None,

@@ -405,7 +405,7 @@ class ProtocolContext(CommandPublisher):
         )
 
     @requires_version(2, 0)
-    def load_labware(
+    def load_labware(  # noqa: C901
         self,
         load_name: str,
         location: Union[DeckLocation, OffDeckType],
