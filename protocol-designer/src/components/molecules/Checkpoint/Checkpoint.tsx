@@ -1,6 +1,4 @@
-import { clsx } from 'clsx'
-
-import styles from './checkpoint.module.css'
+import { Box, COLORS, Flex, SPACING } from '@opentrons/components'
 
 import type { PropsWithChildren } from 'react'
 
@@ -24,9 +22,35 @@ interface Props {
 export function Checkpoint(props: PropsWithChildren<Props>): JSX.Element {
   const { active, children } = props
   return (
-    <div className={clsx(styles.container, { [styles.active]: active })}>
-      <div className={styles.ornamental_line} />
-      <ul className={styles.list_of_children}>{children}</ul>
-    </div>
+    <Flex
+      flexDirection="row"
+      paddingY={SPACING.spacing4}
+      gridGap={SPACING.spacing4}
+    >
+      <OrnamentalLine active={active} />
+      <Box as="ul" flex="1">
+        {children}
+      </Box>
+    </Flex>
+  )
+}
+
+function OrnamentalLine(props: { active: boolean }): JSX.Element {
+  const { active } = props
+  return (
+    <Box
+      flex="none"
+      // Note: Designs say padding=spacing4, but there it's measured to the center
+      // of a spacing4 stroke. We're measuring to the outside of the stroke
+      // so we gotta do (spacing4 - [spacing4 / 2]).
+      padding={SPACING.spacing2}
+    >
+      <Box
+        width={SPACING.spacing4}
+        height="100%"
+        borderRadius={SPACING.spacing2}
+        backgroundColor={active ? COLORS.blue50 : COLORS.grey50}
+      />
+    </Box>
   )
 }
