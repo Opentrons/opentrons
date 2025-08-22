@@ -1059,6 +1059,7 @@ async def _test_diagnostics_capacitive(  # noqa: C901
 ) -> bool:
     #print("testing capacitance")
     LOG_GING.info("testing capacitance")
+    await api.home([Axis.of_main_tool_actuator(mount)])
     results: List[bool] = []
     pip = api.hardware_pipettes[mount.to_mount()]
     assert pip
