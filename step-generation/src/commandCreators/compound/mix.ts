@@ -273,6 +273,7 @@ export const mix: CommandCreator<MixArgs> = (
     finalPushOut,
     nozzles,
   } = data
+
   const aspirateDelaySeconds = data.aspirateDelaySeconds ?? 0
   const dispenseDelaySeconds = data.dispenseDelaySeconds ?? 0
 
@@ -304,6 +305,7 @@ export const mix: CommandCreator<MixArgs> = (
       ],
     }
   }
+
   const initialLabwareSlot = getSlotInLocationStack(
     prevRobotState.labware[labware]?.stack
   )
@@ -348,6 +350,7 @@ export const mix: CommandCreator<MixArgs> = (
       }
     }
   }
+
   const shouldConfigureForVolume = LOW_VOLUME_PIPETTES.includes(
     invariantContext.pipetteEntities[pipette].name
   )

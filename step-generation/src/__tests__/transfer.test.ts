@@ -1182,7 +1182,7 @@ describe('single transfer exceeding pipette max', () => {
     ])
   })
 
-  it.only('changeTip="always"', () => {
+  it('changeTip="always"', () => {
     transferArgs = {
       ...transferArgs,
       changeTip: 'always',
@@ -5517,6 +5517,7 @@ mock_pipette.transfer_with_liquid_class(
     new_tip="never",
     trash_location=trash_bin_1,
     keep_last_tip=True,
+    tip_racks=[mock_tip_rack_1],
     liquid_class=protocol.define_liquid_class(
         name="transfer_step_1",
         properties={"p300_single": {"fixture/fixture_tiprack_300_ul/1": {
