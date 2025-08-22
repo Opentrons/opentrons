@@ -25,15 +25,30 @@ export default {
 
 interface IconState {
   name: IconName
+  showCopied: boolean
 }
 
 const Template: Story<React.ComponentProps<typeof IconComponent>> = args => {
   // const { backgroundColor } = args
-  const [icons] = React.useState<IconState[]>(() =>
+  const [icons, setIcons] = React.useState<IconState[]>(() =>
     Object.keys(ICON_DATA_BY_NAME).map(name => ({
       name,
+      showCopied: false,
     }))
   )
+
+  // copy icon name to clipboard
+  const handleCopy = async (iconName: IconName): Promise<void> => {
+    await navigator.clipboard.writeText(iconName)
+    setIcons(prevIcons =>
+      prevIcons.map(icon => {
+        if (icon.name === iconName) {
+          return { ...icon, showCopied: true }
+        }
+        return { ...icon, showCopied: false }
+      })
+    )
+  }
 
   // download icon as SVG
   const handleDownload = (iconName: IconName): void => {
@@ -55,9 +70,21 @@ const Template: Story<React.ComponentProps<typeof IconComponent>> = args => {
     URL.revokeObjectURL(url)
   }
 
+  // reset copied state after 2 seconds
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setIcons(prevIcons =>
+        prevIcons.map(icon => ({ ...icon, showCopied: false }))
+      )
+    }, 2000)
+    return () => {
+      clearTimeout(timer)
+    }
+  }, [icons])
+
   return (
     <Flex flexWrap={WRAP} gap={SPACING.spacing8}>
-      {icons.map(({ name }) => (
+      {icons.map(({ name, showCopied }) => (
         <Flex
           key={`icon_${name}`}
           width="8.75rem"
@@ -65,14 +92,7 @@ const Template: Story<React.ComponentProps<typeof IconComponent>> = args => {
           alignItems={ALIGN_CENTER}
           borderRadius={BORDERS.borderRadius12}
           padding={SPACING.spacing16}
-          onClick={() => {
-            handleDownload(name)
-          }}
           border={`2px solid ${COLORS.black90}`}
-          cursor="pointer"
-          _hover={{
-            border: `2px solid ${COLORS.blue50}`,
-          }}
         >
           <IconComponent name={name} size="4rem" />
           <Text
@@ -82,6 +102,51 @@ const Template: Story<React.ComponentProps<typeof IconComponent>> = args => {
           >
             {name}
           </Text>
+          <Flex
+            paddingTop={SPACING.spacing8}
+            gap={SPACING.spacing4}
+            alignItems={ALIGN_CENTER}
+          >
+            <Text
+              fontSize={TYPOGRAPHY.fontSizeCaption}
+              color={COLORS.blue50}
+              cursor="pointer"
+              onClick={() => {
+                void handleCopy(name)
+              }}
+              _hover={{
+                textDecoration: 'underline',
+              }}
+            >
+              copy
+            </Text>
+            <Text fontSize={TYPOGRAPHY.fontSizeCaption} color={COLORS.grey50}>
+              |
+            </Text>
+            <Text
+              fontSize={TYPOGRAPHY.fontSizeCaption}
+              color={COLORS.blue50}
+              cursor="pointer"
+              onClick={() => {
+                handleDownload(name)
+              }}
+              _hover={{
+                textDecoration: 'underline',
+              }}
+            >
+              download
+            </Text>
+          </Flex>
+          <Flex height="1rem" alignItems={ALIGN_CENTER}>
+            {showCopied ? (
+              <Text
+                fontSize={TYPOGRAPHY.fontSizeCaption}
+                color={COLORS.green50}
+              >
+                copied!
+              </Text>
+            ) : null}
+          </Flex>
         </Flex>
       ))}
     </Flex>
