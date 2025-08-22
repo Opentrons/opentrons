@@ -11,7 +11,7 @@ This directory contains scripts to perform steps 2, 3, and 4.
 
 ## Usage
 
-Before running any of these scripts, the release in question must be tagged and that tag must have been built by Travis and deployed to the sandbox.
+Before running any of these scripts, the release in question must be tagged and that tag must have been built by CI and deployed to the sandbox.
 
 **IMPORTANT**: All scripts will do a dryrun by default. **Always** do a dryrun before deploying for real. After you have inspected your dryrun, run the actual deploy by passing the optional `--deploy` flag.
 
@@ -25,7 +25,7 @@ This process is still manual:
 git fetch  # make sure your local git knows about all remote changes
 git tag -a ${name}@${version} -m "chore(release): ${name} ${version}" origin/${branchname}
 git log ${name}@${version}  # confirm that you applied the tag to the right commit
-git push ${name}@${version}
+git push origin ${name}@${version}
 ```
 
 - `name` - The name of the project in the monorepo. Make sure this matches the directory name exactly, as it determines what actions are triggered when the tag is pushed.
@@ -39,7 +39,7 @@ git tag -a protocol-designer@3.0.0 -m "chore(release): protocol-designer 3.0.0" 
 git push protocol-designer@3.0.0
 ```
 
-When the tag is pushed to Travis, it will build the release artifact and place it in:
+When the tag is pushed to CI, it will build the release artifact and place it in:
 
 ```shell
 http://sandbox.${project_domain}/${name}@${version}
