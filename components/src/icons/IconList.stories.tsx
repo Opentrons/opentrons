@@ -25,79 +25,63 @@ export default {
 
 interface IconState {
   name: IconName
-  showText: boolean
 }
 
 const Template: Story<React.ComponentProps<typeof IconComponent>> = args => {
   // const { backgroundColor } = args
-  const [icons, setIcons] = React.useState<IconState[]>(() =>
+  const [icons] = React.useState<IconState[]>(() =>
     Object.keys(ICON_DATA_BY_NAME).map(name => ({
-      name: name as IconName,
-      showText: false,
+      name,
     }))
   )
-  const [selectedIcon, setSelectedIcon] = React.useState<IconName | null>(null)
 
-  // copy icon name
-  const handleCopy = async (
-    iconName: IconName,
-    index: number
-  ): Promise<void> => {
-    await navigator.clipboard.writeText(iconName)
-    setIcons(prevIcons =>
-      prevIcons.map((icon, i) => {
-        if (i === index) {
-          return { ...icon, showText: true }
-        } else {
-          return icon
-        }
-      })
-    )
-    setSelectedIcon(iconName)
+  // download icon as SVG
+  const handleDownload = (iconName: IconName): void => {
+    const iconData = ICON_DATA_BY_NAME[iconName]
+    if (iconData == null) return
+
+    const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${iconData.viewBox}" fill="currentColor">
+  <path fill-rule="evenodd" d="${iconData.path}" />
+</svg>`
+
+    const blob = new Blob([svgContent], { type: 'image/svg+xml' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `${iconName}.svg`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
   }
 
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setIcons(prevIcons =>
-        prevIcons.map(icon => ({ ...icon, showText: false }))
-      )
-      setSelectedIcon(null)
-    }, 2000)
-    return () => {
-      clearTimeout(timer)
-    }
-  }, [icons])
-
   return (
-    <Flex flexWrap={WRAP}>
-      {icons.map(({ name, showText }, index) => (
+    <Flex flexWrap={WRAP} gap={SPACING.spacing8}>
+      {icons.map(({ name }) => (
         <Flex
           key={`icon_${name}`}
           width="8.75rem"
           flexDirection={DIRECTION_COLUMN}
           alignItems={ALIGN_CENTER}
           borderRadius={BORDERS.borderRadius12}
-          marginRight={SPACING.spacing8}
-          marginBottom={SPACING.spacing8}
           padding={SPACING.spacing16}
-          onClick={() => handleCopy(name, index)}
-          border={
-            selectedIcon === name
-              ? `2px solid ${COLORS.blue50}`
-              : `2px solid ${COLORS.black90}`
-          }
+          onClick={() => {
+            handleDownload(name)
+          }}
+          border={`2px solid ${COLORS.black90}`}
+          cursor="pointer"
+          _hover={{
+            border: `2px solid ${COLORS.blue50}`,
+          }}
         >
-          <IconComponent name={name as IconName} size="4rem" />
+          <IconComponent name={name} size="4rem" />
           <Text
             textAlign={TYPOGRAPHY.textAlignCenter}
-            marginTop={SPACING.spacing8}
+            paddingTop={SPACING.spacing8}
             fontSize={TYPOGRAPHY.fontSizeP}
           >
             {name}
           </Text>
-          <Flex height="1.5rem">
-            {showText ? <Text color={COLORS.blue50}> {'copied'}</Text> : null}
-          </Flex>
         </Flex>
       ))}
     </Flex>
