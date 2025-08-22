@@ -74,10 +74,8 @@ export function DeviceDetailsDeckConfiguration({
       refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
     }).data ?? []
 
-  const deckConfigWithAA = useMemo(() =>
-    replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
-      deckConfig
-    ),
+  const deckConfigWithAA = useMemo(
+    () => replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(deckConfig),
     [deckConfig]
   )
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)

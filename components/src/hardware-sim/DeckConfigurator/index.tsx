@@ -1,3 +1,5 @@
+import { useMemo } from 'react'
+
 import {
   filterAAByAreaType,
   FLEX_ROBOT_TYPE,
@@ -22,7 +24,7 @@ import { ThermocyclerItem } from './ThermocyclerItem'
 import { TrashBinConfigItem } from './TrashBinConfigItem'
 import { WasteChuteConfigFixture } from './WasteChuteConfigItem'
 
-import { useMemo, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import type {
   AddressableAreaNamesWithFakes,
   CutoutFixtureIdsWithFakes,
@@ -69,12 +71,10 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     moduleModel,
   } = props
 
-  
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
-  const deckConfigWithAA = useMemo(() =>
-    replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
-      deckConfig),
+  const deckConfigWithAA = useMemo(
+    () => replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(deckConfig),
     [deckConfig]
   )
 
