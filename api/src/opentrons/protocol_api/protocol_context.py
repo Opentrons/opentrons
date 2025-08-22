@@ -414,6 +414,11 @@ class ProtocolContext(CommandPublisher):
         version: Optional[int] = None,
         adapter: Optional[str] = None,
         lid: Optional[str] = None,
+        *,
+        adapter_namespace: Optional[str] = None,
+        adapter_version: Optional[int] = None,
+        lid_namespace: Optional[str] = None,
+        lid_version: Optional[int] = None,
     ) -> Labware:
         """Load a labware onto a location.
 
@@ -475,6 +480,32 @@ class ProtocolContext(CommandPublisher):
                 current_version=f"{self._api_version}",
             )
 
+        if self._api_version < APIVersion(2, 25):
+            if adapter_namespace is not None:
+                raise APIVersionError(
+                    api_element="The `adapter_namespace` parameter",
+                    until_version="2.25",
+                    current_version=f"{self._api_version}",
+                )
+            if adapter_version is not None:
+                raise APIVersionError(
+                    api_element="The `adapter_version` parameter",
+                    until_version="2.25",
+                    current_version=f"{self._api_version}",
+                )
+            if lid_namespace is not None:
+                raise APIVersionError(
+                    api_element="The `lid_namespace` parameter",
+                    until_version="2.25",
+                    current_version=f"{self._api_version}",
+                )
+            if lid_version is not None:
+                raise APIVersionError(
+                    api_element="The `lid_version` parameter",
+                    until_version="2.25",
+                    current_version=f"{self._api_version}",
+                )
+
         load_name = validation.ensure_lowercase_name(load_name)
         load_location: Union[OffDeckType, DeckSlotName, StagingSlotName, LabwareCore]
         if adapter is not None:
@@ -484,10 +515,19 @@ class ProtocolContext(CommandPublisher):
                     until_version="2.15",
                     current_version=f"{self._api_version}",
                 )
+
+            if self._api_version < APIVersion(2, 25):
+                checked_adapter_namespace = namespace
+                checked_adapter_version = None
+            else:
+                checked_adapter_namespace = adapter_namespace
+                checked_adapter_version = adapter_version
+
             loaded_adapter = self.load_adapter(
                 load_name=adapter,
                 location=location,
-                namespace=namespace,
+                namespace=checked_adapter_namespace,
+                version=checked_adapter_version,
             )
             load_location = loaded_adapter._core
         elif isinstance(location, OffDeckType):
@@ -512,11 +552,19 @@ class ProtocolContext(CommandPublisher):
                     until_version=f"{validation.LID_STACK_VERSION_GATE}",
                     current_version=f"{self._api_version}",
                 )
+
+            if self._api_version < APIVersion(2, 25):
+                checked_lid_namespace = namespace
+                checked_lid_version = version
+            else:
+                checked_lid_namespace = lid_namespace
+                checked_lid_version = lid_version
+
             self._core.load_lid(
                 load_name=lid,
                 location=labware_core,
-                namespace=namespace,
-                version=version,
+                namespace=checked_lid_namespace,
+                version=checked_lid_version,
             )
 
         labware = Labware(

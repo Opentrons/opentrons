@@ -131,6 +131,11 @@ class ModuleContext(CommandPublisher):
         version: Optional[int] = None,
         adapter: Optional[str] = None,
         lid: Optional[str] = None,
+        *,
+        adapter_namespace: Optional[str] = None,
+        adapter_version: Optional[int] = None,
+        lid_namespace: Optional[str] = None,
+        lid_version: Optional[int] = None,
     ) -> Labware:
         """Load a labware onto the module using its load parameters.
 
@@ -152,6 +157,32 @@ class ModuleContext(CommandPublisher):
                 "are trying to utilize new load_labware parameters in 2.1"
             )
 
+        if self._api_version < APIVersion(2, 25):
+            if adapter_namespace is not None:
+                raise APIVersionError(
+                    api_element="The `adapter_namespace` parameter",
+                    until_version="2.25",
+                    current_version=f"{self._api_version}",
+                )
+            if adapter_version is not None:
+                raise APIVersionError(
+                    api_element="The `adapter_version` parameter",
+                    until_version="2.25",
+                    current_version=f"{self._api_version}",
+                )
+            if lid_namespace is not None:
+                raise APIVersionError(
+                    api_element="The `lid_namespace` parameter",
+                    until_version="2.25",
+                    current_version=f"{self._api_version}",
+                )
+            if lid_version is not None:
+                raise APIVersionError(
+                    api_element="The `lid_version` parameter",
+                    until_version="2.25",
+                    current_version=f"{self._api_version}",
+                )
+
         load_location: Union[ModuleCore, LabwareCore]
         if adapter is not None:
             if self._api_version < APIVersion(2, 15):
@@ -160,9 +191,18 @@ class ModuleContext(CommandPublisher):
                     until_version="2.15",
                     current_version=f"{self._api_version}",
                 )
+
+            if self._api_version < APIVersion(2, 25):
+                checked_adapter_namespace = namespace
+                checked_adapter_version = None
+            else:
+                checked_adapter_namespace = adapter_namespace
+                checked_adapter_version = adapter_version
+
             loaded_adapter = self.load_adapter(
                 name=adapter,
-                namespace=namespace,
+                namespace=checked_adapter_namespace,
+                version=checked_adapter_version,
             )
             load_location = loaded_adapter._core
         else:
@@ -193,11 +233,19 @@ class ModuleContext(CommandPublisher):
                     until_version="2.23",
                     current_version=f"{self._api_version}",
                 )
+
+            if self._api_version < APIVersion(2, 25):
+                checked_lid_namespace = namespace
+                checked_lid_version = None
+            else:
+                checked_lid_namespace = lid_namespace
+                checked_lid_version = lid_version
+
             self._protocol_core.load_lid(
                 load_name=lid,
                 location=labware_core,
-                namespace=namespace,
-                version=version,
+                namespace=checked_lid_namespace,
+                version=checked_lid_version,
             )
 
         if isinstance(self._core, LegacyModuleCore):
@@ -1313,6 +1361,11 @@ class FlexStackerContext(ModuleContext):
         lid: str | None = None,
         count: int | None = None,
         stacking_offset_z: float | None = None,
+        *,
+        adapter_namespace: str | None = None,
+        adapter_version: int | None = None,
+        lid_namespace: str | None = None,
+        lid_version: int | None = None,
     ) -> None:
         """Configure what kind of labware the Flex Stacker will store.
 
@@ -1365,16 +1418,17 @@ class FlexStackerContext(ModuleContext):
                 lid (topside) of the unit below.
 
         """
+
         self._core.set_stored_labware(
             main_load_name=load_name,
             main_namespace=namespace,
             main_version=version,
             lid_load_name=lid,
-            lid_namespace=namespace,
-            lid_version=version,
+            lid_namespace=lid_namespace,
+            lid_version=lid_version,
             adapter_load_name=adapter,
-            adapter_namespace=namespace,
-            adapter_version=version,
+            adapter_namespace=adapter_namespace,
+            adapter_version=adapter_version,
             count=count,
             stacking_offset_z=stacking_offset_z,
         )

@@ -640,6 +640,9 @@ class Labware:
         lid: Optional[str] = None,
         namespace: Optional[str] = None,
         version: Optional[int] = None,
+        *,
+        lid_namespace: Optional[str] = None,
+        lid_version: Optional[int] = None,
     ) -> Labware:
         """Load a compatible labware onto the labware using its load parameters.
 
@@ -650,6 +653,20 @@ class Labware:
 
         :returns: The initialized and loaded labware object.
         """
+        if self._api_version < APIVersion(2, 25):
+            if lid_namespace is not None:
+                raise APIVersionError(
+                    api_element="The `lid_namespace` parameter",
+                    until_version="2.25",
+                    current_version=f"{self._api_version}",
+                )
+            if lid_version is not None:
+                raise APIVersionError(
+                    api_element="The `lid_version` parameter",
+                    until_version="2.25",
+                    current_version=f"{self._api_version}",
+                )
+
         labware_core = self._protocol_core.load_labware(
             load_name=name,
             label=label,
@@ -674,11 +691,17 @@ class Labware:
                     until_version="2.23",
                     current_version=f"{self._api_version}",
                 )
+            if self._api_version < APIVersion(2, 25):
+                checked_lid_namespace = namespace
+                checked_lid_version = version
+            else:
+                checked_lid_namespace = lid_namespace
+                checked_lid_version = lid_version
             self._protocol_core.load_lid(
                 load_name=lid,
                 location=labware_core,
-                namespace=namespace,
-                version=version,
+                namespace=checked_lid_namespace,
+                version=checked_lid_version,
             )
 
         return labware
