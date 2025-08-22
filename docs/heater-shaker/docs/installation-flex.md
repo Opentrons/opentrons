@@ -42,7 +42,7 @@ Installing the Heater-Shaker on your robot includes attaching it to the deck and
 
 If the temperature and status LCDs are illuminated, the module is powered on.
 
-When successfully connected, the module appears in the Pipettes and Modules section on your robot’s device detail page in the Opentrons App. From there, you can control the module’s labware latch or run a test shake. See the [Software Control section](software-control.md) below.
+When successfully connected, the module appears in the Pipettes and Modules section on your robot’s device detail page in the Opentrons App. From there, you can control the module’s labware latch or run a test shake. See the [Software Control section](software.md) below.
 
 Next, you’ll calibrate the module.
 

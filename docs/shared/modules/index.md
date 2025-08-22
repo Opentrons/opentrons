@@ -20,7 +20,7 @@ Opentrons hardware modules add features and capabilities to your robot.
 
     High-capacity labware storage and retrieval for Flex.
 
-    [:octicons-arrow-right-24: Instruction Manual](../stacker-manual/index.md)
+    [:octicons-arrow-right-24: Instruction Manual](../stacker/index.md)
 
 -   :opentrons-hepa:{ .xl .middle } __HEPA/UV Module__
 
@@ -44,7 +44,7 @@ Opentrons hardware modules add features and capabilities to your robot.
 
     An automated on-deck thermocycler in a 96-well plate format.
 
-    [:octicons-arrow-right-24: Instruction Manual](../thermocycler-manual/index.md)
+    [:octicons-arrow-right-24: Instruction Manual](../thermocycler/index.md)
 
 -   :opentrons-temperature:{ .xl .middle } __Temperature Module__
 

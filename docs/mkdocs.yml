@@ -6,9 +6,9 @@ nav:
   - Opentrons Flex: '!include flex/mkdocs.yml'
   - Modules:
       - Modules home: modules/index.md
-      - Flex Stacker: '!include stacker-manual/mkdocs.yml'
+      - Flex Stacker: '!include stacker/mkdocs.yml'
       - HEPA/UV Module: '!include hepa-uv/mkdocs.yml'
-      - Thermocycler Module: '!include thermocycler-manual/mkdocs.yml'
+      - Thermocycler Module: '!include thermocycler/mkdocs.yml'
       - Temperature Module: '!include temperature-module/mkdocs.yml'
       - Absorbance Plate Reader Module: '!include absorbance-plate-reader/mkdocs.yml'
       - Heater-Shaker Module: '!include heater-shaker/mkdocs.yml'

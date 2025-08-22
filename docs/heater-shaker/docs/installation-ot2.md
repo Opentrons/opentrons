@@ -29,4 +29,4 @@ To install the Heater-Shaker on your OT-2:
 
 If the temperature and status LCDs are illuminated, the module is powered on.
 
-When successfully connected, the module appears in the Instruments and Modules section on your robot’s device detail page in the Opentrons App. From there, you can control the module’s labware latch or run a test shake (see the [Software Control section](software-control.md) below). The Heater-Shaker does not require calibration on an OT-2. At this point, the module is ready to use.
+When successfully connected, the module appears in the Instruments and Modules section on your robot’s device detail page in the Opentrons App. From there, you can control the module’s labware latch or run a test shake (see the [Software Control section](software.md) below). The Heater-Shaker does not require calibration on an OT-2. At this point, the module is ready to use.

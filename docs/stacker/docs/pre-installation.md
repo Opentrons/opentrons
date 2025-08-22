@@ -18,7 +18,7 @@ After your Stacker is attached to the deck and powered on, instructions and anim
     <img src="../images/deck-map.png" alt="Touchscreen deck map">
 </figure>
 
-Because you can install a Stacker anywhere in column 4, and connect it to any port on the power/data hub, the touchscreen setup process gives you the opportunity to tell Flex where this module is on the deck. See [Post-Installation Procedures](postinstall.md).
+Because you can install a Stacker anywhere in column 4, and connect it to any port on the power/data hub, the touchscreen setup process gives you the opportunity to tell Flex where this module is on the deck. See [Post-Installation Procedures](post-installation.md).
 
 ## Deck Adapters
 

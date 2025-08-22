@@ -4,7 +4,7 @@ title: "Flex Stacker: Installing the Stacker"
 
 # Installing the Stacker
 
-Before you begin, make sure you've read and are familiar with the information provided in the [Pre-Installation Information section](preinstall.md).
+Before you begin, make sure you've read and are familiar with the information provided in the [Pre-Installation Information section](pre-installation.md).
 
 ## Part 1: Unboxing the Stacker
 
@@ -88,7 +88,7 @@ To install the deck adapter and attach the Stacker:
 
 ## Part 4: Connecting the Hub and Cables
 
-After attaching the Stacker to the robot, you can connect all the cables and turn on the power. See [Physical Connections](preinstall.md#physical-connections) for more information about the type and purpose of each cable. To connect the power and data cables to the hub:
+After attaching the Stacker to the robot, you can connect all the cables and turn on the power. See [Physical Connections](pre-installation.md#physical-connections) for more information about the type and purpose of each cable. To connect the power and data cables to the hub:
 
 <div class="instruction-list" markdown>
 
@@ -148,4 +148,4 @@ After attaching the Stacker to the robot, you can connect all the cables and tur
 
 ## Next Steps
 
-See [Post-Installation Procedures](postinstall.md). The information in that section will help you finish setting up your Stacker.
+See [Post-Installation Procedures](post-installation.md). The information in that section will help you finish setting up your Stacker.
