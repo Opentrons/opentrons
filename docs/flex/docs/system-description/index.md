@@ -2,8 +2,6 @@
 title: "Opentrons Flex: System Description"
 ---
 
-# System Description
-
 This chapter describes the hardware systems of Opentrons Flex, which underlie its core lab automation features. 
 
 - The [deck][deck-and-working-area], [gantry](robot.md#gantry), and instrument mounts of Opentrons Flex enable the use of precision liquid handling and labware movement components. 

@@ -2,8 +2,6 @@
 title: "Opentrons Flex: Labware Concepts"
 ---
 
-# Labware concepts 
-
 Labware encompasses more than just the objects placed on the deck and used in a protocol. For the Opentrons Flex, labware includes:
 
 - The physical items in your lab that you place on the deck.

@@ -2,8 +2,6 @@
 title: "Opentrons Flex: Pipettes"
 ---
 
-# Pipettes
-
 Opentrons *pipettes* are configurable devices used to move liquids throughout the working area during the execution of protocols. There are several Opentrons Flex pipettes, which can handle volumes from 1 µL to 1000 µL in 1, 8, or 96 channels:
 
 - Opentrons Flex 1-Channel Pipette (1–50 µL)

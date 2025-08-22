@@ -2,8 +2,6 @@
 title: "Opentrons Flex: Glossary"
 ---
 
-# Glossary
-
 This appendix defines terms related to Opentrons Flex. It omits industry-standard terms like "labware" unless the term has a special meaning in relation to Flex. For example, the definition for *pipette* describes the narrower meaning that the term has when using Flex, as opposed to any pipette you might find elsewhere in a lab.
 
 The glossary is formatted to help you navigate within it and to other places in this manual. Words in italics indicate terms that are also defined in the glossary. Extremely common terms like "deck", "module", "pipette", and "protocol" aren't italicized, to improve readability. Links within definitions take you to the most relevant section that includes additional discussion of the term. And you can always search for every occurrence of a term to find even more information.

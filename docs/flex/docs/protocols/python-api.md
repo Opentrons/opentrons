@@ -2,8 +2,6 @@
 title: "Opentrons Flex: Python Protocol API"
 ---
 
-# Python Protocol API
-
 Writing protocol scripts in Python gives you the most fine-grained control of Opentrons Flex. Version 2 of the Python Protocol API is a single Python package that exposes a wide range of liquid handling features on Opentrons robots. 
 
 !!! info "Additional Documentation"

@@ -2,8 +2,6 @@
 title: "Protocol Designer: Editing Steps"
 ---
 
-# Editing Steps
-
 Each step in your protocol appears in the protocol timeline in the order you've added them. After adding steps the robot will perform in your protocol, you can make edits to finalize your protocol. 
 
 Hover over each step in the protocol timeline to view a description of the step and changes to the robot deck, like labware moves or liquid transfers. 

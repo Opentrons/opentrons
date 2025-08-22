@@ -2,8 +2,6 @@
 title: "Opentrons Flex: Heater-Shaker Module"
 ---
 
-# Heater-Shaker Module GEN1
-
 ![The Heater-Shaker module as seen from the front left. The top of the module has the heating and shaking platform and labware latch. The left side of the module has the power button, USB port, and power port.](../images/heater-shaker-module.png "Heater-Shaker Module")
 
 !!! info "Additional Documentation"

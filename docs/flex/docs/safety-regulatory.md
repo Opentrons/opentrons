@@ -2,8 +2,6 @@
 title: "Opentrons Flex: Safety and Regulatory Information"
 ---
 
-# Safety and Regulatory Information
-
 ## Safety information
 
 The Opentrons Flex liquid handling robot has been designed for safe operation. Refer to the specifications and compliance guidelines in this section to ensure safe usage of your Flex. These guidelines cover safe use of input and output connections for the product, including the power and data connections, as well as warning labels found on the Flex robot and related hardware. Using the device in a manner other than those specified in this manual may put the user and equipment at risk.

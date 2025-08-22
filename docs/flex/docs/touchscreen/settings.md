@@ -2,8 +2,6 @@
 title: "Opentrons Flex: Settings"
 ---
 
-# Robot Settings
-
 The Settings screen lists all the ways you can customize the behavior of your Flex.
 
 <figure class="screenshot" markdown>

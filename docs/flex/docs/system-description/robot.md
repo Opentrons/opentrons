@@ -2,8 +2,6 @@
 title: "Opentrons Flex: Robot Components"
 ---
 
-# Robot Components
-
 <figure markdown>
 ![The frame, front door, and side windows enclose Flex. The deck is the inside bottom surface of the robot. The gantry runs across the working space of the robot. The status light is on the front top, and the touchscreen is on the front right. The internal camera is located in the top right corner. Handle caps are on the side of the robot on each outside bottom corner.](../images/flex-physical-components.png "flex-physical-components.svg")
 <figcaption>Locations of the physical components of Opentrons Flex.</figcaption>
