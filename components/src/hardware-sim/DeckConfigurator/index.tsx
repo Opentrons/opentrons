@@ -1,3 +1,5 @@
+import { useMemo } from 'react'
+
 import {
   filterAAByAreaType,
   FLEX_ROBOT_TYPE,
@@ -71,8 +73,9 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
 
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
-  const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
-    deckConfig
+  const deckConfigWithAA = useMemo(
+    () => replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(deckConfig),
+    [deckConfig]
   )
 
   const stagingAreaItems = filterAAByAreaType(
