@@ -332,7 +332,7 @@ export const transfer: CommandCreator<TransferArgs> = (
   } = pipetteEntities[args.pipette]
 
   const { labwareDefURI: tiprackDefUri } = tiprack ?? {}
-  const { nextTiprack } = getNextTiprack(
+  const { tipracks } = getNextTiprack(
     pipette,
     tipRack,
     invariantContext,
@@ -420,11 +420,11 @@ export const transfer: CommandCreator<TransferArgs> = (
     `trash_location=${trashPipetteName}`,
     ...(pipetteSpecs.channels > 1 ? [`group_wells=False`] : []),
     `keep_last_tip=True`,
-    ...(nextTiprack != null
+    ...(tipracks.filteredSortedTiprackIds.length > 0
       ? [
           getPythonAssignTipRacksString({
             labwareEntities,
-            tiprackId: nextTiprack.tiprackId,
+            tiprackIds: tipracks.filteredSortedTiprackIds,
           }),
         ]
       : []),

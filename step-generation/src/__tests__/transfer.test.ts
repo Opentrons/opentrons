@@ -169,7 +169,7 @@ mock_pipette.transfer_with_liquid_class(
     new_tip="always",
     trash_location=waste_chute,
     keep_last_tip=True,
-    tip_racks=[mock_tip_rack_1],
+    tip_racks=[mock_tip_rack_1, mock_tip_rack_2],
     liquid_class=protocol.define_liquid_class(
         name="transfer_step_1",
         properties={"p300_single": {"fixture/fixture_tiprack_300_ul/1": {
@@ -361,7 +361,7 @@ mock_pipette.transfer_with_liquid_class(
     new_tip="never",
     trash_location=trash_bin_1,
     keep_last_tip=True,
-    tip_racks=[mock_tip_rack_1],
+    tip_racks=[mock_tip_rack_1, mock_tip_rack_2],
     liquid_class=protocol.define_liquid_class(
         name="transfer_step_1",
         properties={"p300_single": {"fixture/fixture_tiprack_300_ul/1": {
@@ -615,7 +615,7 @@ mock_pipette.transfer_with_liquid_class(
     new_tip="never",
     trash_location=trash_bin_1,
     keep_last_tip=True,
-    tip_racks=[mock_tip_rack_1],
+    tip_racks=[mock_tip_rack_1, mock_tip_rack_2],
     liquid_class=protocol.define_liquid_class(
         name="transfer_step_1",
         properties={"p300_single": {"fixture/fixture_tiprack_300_ul/1": {
@@ -5517,7 +5517,7 @@ mock_pipette.transfer_with_liquid_class(
     new_tip="never",
     trash_location=trash_bin_1,
     keep_last_tip=True,
-    tip_racks=[mock_tip_rack_1],
+    tip_racks=[mock_tip_rack_1, mock_tip_rack_2],
     liquid_class=protocol.define_liquid_class(
         name="transfer_step_1",
         properties={"p300_single": {"fixture/fixture_tiprack_300_ul/1": {

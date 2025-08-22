@@ -254,9 +254,11 @@ const getBlowoutPythonLocation = (
 
 export const getPythonAssignTipRacksString = (args: {
   labwareEntities: LabwareEntities
-  tiprackId: string
+  tiprackIds: string[]
 }): string => {
-  const { labwareEntities, tiprackId } = args
-  const tiprackPythonName = labwareEntities[tiprackId].pythonName
-  return `tip_racks=[${tiprackPythonName}]`
+  const { labwareEntities, tiprackIds } = args
+  const tiprackPythonNames = tiprackIds.map(
+    id => labwareEntities[id].pythonName
+  )
+  return `tip_racks=[${tiprackPythonNames.join(', ')}]`
 }
