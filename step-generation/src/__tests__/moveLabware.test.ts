@@ -895,6 +895,57 @@ describe('moveLabware', () => {
     )
   })
 
+  it('should error with the stack too high error', () => {
+    invariantContext = {
+      ...invariantContext,
+      labwareEntities: {
+        ...invariantContext.labwareEntities,
+        [SOURCE_LABWARE]: {
+          ...invariantContext.labwareEntities[SOURCE_LABWARE],
+          def: {
+            ...invariantContext.labwareEntities[SOURCE_LABWARE].def,
+            allowedRoles: ['lid'],
+            compatibleParentLabware: ['fixture_96_plate'],
+            stackLimit: 4,
+          } as LabwareDefinition2,
+        },
+        stackingLabware: {
+          def: {
+            ...invariantContext.labwareEntities[SOURCE_LABWARE].def,
+            allowedRoles: ['lid'],
+          } as LabwareDefinition2,
+        } as any,
+      },
+    } as InvariantContext
+
+    robotState = {
+      ...robotState,
+      labware: {
+        ...robotState.labware,
+        [SOURCE_LABWARE]: {
+          ...robotState.labware[SOURCE_LABWARE],
+          stack: [SOURCE_LABWARE, 'A2'],
+        },
+        stackingLabware: {
+          stack: ['stackingLabware', 'A1'],
+        },
+      },
+    }
+
+    const params = {
+      labwareId: SOURCE_LABWARE,
+      newLocation: { slotName: 'A1' },
+      strategy: 'usingGripper',
+    } as MoveLabwareParams
+
+    const result = moveLabware(params, invariantContext, robotState)
+    const { errors } = getErrorResult(result)
+    expect(errors).toHaveLength(1)
+    expect(errors[0]).toMatchObject({
+      type: 'STACK_TOO_HIGH',
+    })
+  })
+
   it('should return a move_lid command when moving a lid from a stack to a slot', () => {
     invariantContext = {
       ...invariantContext,
