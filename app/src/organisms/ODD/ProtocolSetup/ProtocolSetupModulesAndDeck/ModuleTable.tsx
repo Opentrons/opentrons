@@ -40,6 +40,10 @@ export function ModuleTable(props: ModuleTableProps): JSX.Element {
     deckConfigCompatibility,
   } = props
 
+  const attachedProtocolModuleMatchesSortedBySlotName = attachedProtocolModuleMatches.sort(
+    (a, b) => a.slotName.localeCompare(b.slotName)
+  )
+
   const { data: deckConfig } = useNotifyDeckConfigurationQuery({
     refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
   })
@@ -50,7 +54,7 @@ export function ModuleTable(props: ModuleTableProps): JSX.Element {
 
   return (
     <>
-      {attachedProtocolModuleMatches
+      {attachedProtocolModuleMatchesSortedBySlotName
         // filter out the magnetic block here, because it is a non-connected module
         // and is handled by the fixture table
         .filter(module => module.moduleDef.moduleType !== MAGNETIC_BLOCK_TYPE)
