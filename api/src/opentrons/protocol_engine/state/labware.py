@@ -1093,7 +1093,9 @@ class LabwareView:
                 raise errors.LabwareCannotBeStackedError(
                     f"Labware {lid_labware_definition.parameters.loadName} cannot be used as a lid in the Flex Stacker."
                 )
-            if not labware_validation.validate_labware_can_be_stacked(
+            if isinstance(
+                lid_labware_definition, LabwareDefinition2
+            ) and not labware_validation.validate_legacy_labware_can_be_stacked(
                 lid_labware_definition, primary_labware_definition.parameters.loadName
             ):
                 raise errors.LabwareCannotBeStackedError(
@@ -1106,7 +1108,9 @@ class LabwareView:
                 raise errors.LabwareCannotBeStackedError(
                     f"Labware {adapter_labware_definition.parameters.loadName} cannot be used as an adapter in the Flex Stacker."
                 )
-            if not labware_validation.validate_labware_can_be_stacked(
+            if isinstance(
+                primary_labware_definition, LabwareDefinition2
+            ) and not labware_validation.validate_legacy_labware_can_be_stacked(
                 primary_labware_definition,
                 adapter_labware_definition.parameters.loadName,
             ):
@@ -1160,9 +1164,9 @@ class LabwareView:
         below_labware = self.get(bottom_labware_id)
         if isinstance(
             top_labware_definition, LabwareDefinition2
-        ) and not labware_validation.validate_labware_can_be_stacked(
-            top_labware_definition=top_labware_definition,
-            below_labware_load_name=below_labware.loadName,
+        ) and not labware_validation.validate_legacy_labware_can_be_stacked(
+            child_labware_definition=top_labware_definition,
+            parent_labware_load_name=below_labware.loadName,
         ):
             raise errors.LabwareCannotBeStackedError(
                 f"Labware {top_labware_definition.parameters.loadName} cannot be loaded onto labware {below_labware.loadName}"
