@@ -284,6 +284,7 @@ export const getRunCurrentModulesInfo = ({
         const moduleDef = getModuleDef(module.model)
         const moduleType = getModuleType(moduleDef.model)
 
+        // Get the labware that is placed on/in the module.
         // for stacker, we only want to consider labware in the hopper as "nested"
         const nestedLabware = runRecord.data.labware.find(
           lw =>
@@ -393,6 +394,7 @@ export function getRunCurrentLabwareInfo({
     // For each slot, return either:
     // 1. The first labware where no other labware has its 'labwareId' as a location
     // 2. The first labware in the slot if no labware matches criteria 1
+    // TODO: (sarah, 8-22-25) revisit this logic and reduce complexity when we have location sequences
     return Object.values(labwareBySlot).map(slotLabware => {
       const topMostLabware = slotLabware.find(lw => {
         const labwareOnCurrentLabware = slotLabware.find(
