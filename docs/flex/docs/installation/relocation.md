@@ -85,7 +85,7 @@ Reattaching the deck slots for short moves around the lab is optional.
 
 ### Post-move recalibration
 
-You should recalibrate any instruments and modules after reinstalling them. For more details on [module calibration][module-calibration], see the Modules chapter.
+You should recalibrate any instruments and modules after reinstalling them. For more details on [module calibration](../modules/calibration.md), see the Modules chapter.
 
 ## Final thoughts about moving
 

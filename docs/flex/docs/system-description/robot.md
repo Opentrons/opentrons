@@ -64,7 +64,7 @@ locations for each fixture.
 
 Fixtures are unpowered. They do not contain electronic or mechanical components that communicate their current state and deck location to the robot. This means you have to use the deck configuration feature to let the Flex know what fixtures are attached to the deck and where they're located.
 
-You can access the deck configuration settings from the touchscreen via the three-dot (⋮) menu and from the Opentrons App. See the [Deck Configuration section][deck-configuration] of the Touchscreen chapter for more information.
+You can access the deck configuration settings from the touchscreen via the three-dot (⋮) menu and from the Opentrons App. See the [Deck Configuration section](../touchscreen/deck-config.md) of the Touchscreen chapter for more information.
 
 ## Waste chute
 
@@ -102,7 +102,7 @@ Staging area slots are compatible with the Flex instruments, modules, and labwar
 | **Gripper**        | The Flex Gripper can move labware to or from staging area slots.                                                     |
 | **Pipettes**       | Flex pipettes cannot reach the staging area. Use the gripper to move tip racks and labware from the staging area to the working area before pipetting. |
 | **Modules**        | The Magnetic Block GEN1 can be placed in column 3 on top of a staging area slot. Modules are not supported in column 4.<br><br>Powered modules such as the Heater-Shaker and Temperature Module fit into caddies that can be placed in column 3. You can't add a staging area slot to a position occupied by a module caddy. |
-| **Labware**        | Staging area slots have the same ANSI/SLAS dimensions as standard deck slots. Use [gripper-compatible labware][labware-and-the-opentrons-flex-gripper] in the staging area, or manually add and remove labware from this location. |
+| **Labware**        | Staging area slots have the same ANSI/SLAS dimensions as standard deck slots. Use [gripper-compatible labware](../labware/gripper.md) in the staging area, or manually add and remove labware from this location. |
 
 ## Gantry
 

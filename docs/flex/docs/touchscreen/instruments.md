@@ -24,7 +24,7 @@ For an occupied mount, the row lists its current contents. Tap anywhere on the r
 
 ## Attach an instrument
 
-Choose an empty mount and then choose the type of instrument to install. Then connect and secure the instrument using its captive mounting screws. For more details, follow the instructions on the touchscreen or see the [Instrument Installation and Calibration section][instrument-installation-and-calibration] of the Installation and Relocation chapter.
+Choose an empty mount and then choose the type of instrument to install. Then connect and secure the instrument using its captive mounting screws. For more details, follow the instructions on the touchscreen or see the [Instrument Installation and Calibration section](../installation/instruments.md) of the Installation and Relocation chapter.
 
 Exact installation steps depend on the instrument you choose and the current setup of your robot. For example, if you have an 8-channel pipette already attached and you attempt to install the 96-channel pipette on the other mount, the touchscreen will give you instructions for detaching the 8-channel so the 96-channel can occupy both mounts.
 
@@ -34,7 +34,7 @@ Choose an attached instrument that you want to detach. Then loosen the instrumen
 
 ## Recalibrate an instrument
 
-Choose an attached instrument that you want to recalibrate. Then connect the instrument's calibration probe or pin and begin the automated calibration process. For more details, follow the instructions on the touchscreen or see the [Instrument Installation and Calibration section][instrument-installation-and-calibration] of the Installation and Relocation chapter.
+Choose an attached instrument that you want to recalibrate. Then connect the instrument's calibration probe or pin and begin the automated calibration process. For more details, follow the instructions on the touchscreen or see the [Instrument Installation and Calibration section](../installation/instruments.md) of the Installation and Relocation chapter.
 
 !!! note
     The new calibration data will overwrite any previous calibration data for that instrument.

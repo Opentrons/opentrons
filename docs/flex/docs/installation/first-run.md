@@ -84,4 +84,4 @@ Attaching and enabling the E-stop is *mandatory* for attaching instruments and r
 
 ## Give your robot a name
 
-Naming your robot lets you easily identify it in your lab environment. If you have multiple Opentrons robots on your network, make sure to give them unique names. Once you've confirmed your robot's name, you'll be taken to your Opentrons Flex Dashboard. Likely the next step you'll want to take is [attaching instruments][instrument-installation-and-calibration].
+Naming your robot lets you easily identify it in your lab environment. If you have multiple Opentrons robots on your network, make sure to give them unique names. Once you've confirmed your robot's name, you'll be taken to your Opentrons Flex Dashboard. Likely the next step you'll want to take is [attaching instruments](instruments.md).
