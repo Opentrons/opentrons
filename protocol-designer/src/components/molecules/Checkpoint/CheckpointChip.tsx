@@ -1,6 +1,6 @@
-import { Chip } from '@opentrons/components'
+import { Flex, SPACING, StyledText } from '@opentrons/components'
 
-import styles from './commonspacing.module.css'
+import spacingStyles from './commonspacing.module.css'
 
 interface Props {
   text: string
@@ -10,17 +10,25 @@ interface Props {
 export function CheckpointChip(props: Props): JSX.Element {
   const { text } = props
   return (
-    <div className={styles.chip}>
-      <Chip
-        background={false}
-        chipSize="small"
-        type="neutral"
-        text={text}
-        // We're using connection-status as a generic bullet icon.
-        // This is semantically weird, but it matches how it works in Figma,
-        // and <Chip> has special handling to size it properly.
-        iconName="connection-status"
-      />
+    <div className={spacingStyles.chip}>
+      <Flex gap={SPACING.spacing4} paddingY={SPACING.spacing2}>
+        <Flex
+          paddingX={SPACING.spacing2}
+          paddingTop={SPACING.spacing6}
+          flexDirection="column"
+        >
+          <Bullet />
+        </Flex>
+        <StyledText desktopStyle="captionSemiBold">{text}</StyledText>
+      </Flex>
     </div>
+  )
+}
+
+function Bullet(): JSX.Element {
+  return (
+    <svg width={SPACING.spacing4} height={SPACING.spacing4} viewBox="-1 -1 2 2">
+      <circle cx="0" cy="0" r="1" />
+    </svg>
   )
 }
