@@ -90,7 +90,7 @@ const getNoLiquidClassValues = (
 
   const aspirateFlowRateFields = getFlowRateFields(
     volume,
-    aspirate?.flowRateByVolume,
+    aspirate.flowRateByVolume,
     'aspirate'
   )
   const dispenseFlowRateFields = getFlowRateFields(
