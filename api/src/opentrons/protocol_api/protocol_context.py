@@ -1509,6 +1509,9 @@ class ProtocolContext(CommandPublisher):
         adapter: Optional[str] = None,
         namespace: Optional[str] = None,
         version: Optional[int] = None,
+        *,
+        adapter_namespace: Optional[str] = None,
+        adapter_version: Optional[int] = None,
     ) -> Labware:
         """
         Load a stack of Opentrons Tough Auto-Sealing Lids onto a valid deck location or adapter.
@@ -1550,6 +1553,20 @@ class ProtocolContext(CommandPublisher):
                 current_version=f"{self._api_version}",
             )
 
+        if self._api_version < APIVersion(2, 25):
+            if adapter_namespace is not None:
+                raise APIVersionError(
+                    api_element="The `adapter_namespace` parameter",
+                    until_version="2.25",
+                    current_version=f"{self._api_version}",
+                )
+            if adapter_version is not None:
+                raise APIVersionError(
+                    api_element="The `adapter_version` parameter",
+                    until_version="2.25",
+                    current_version=f"{self._api_version}",
+                )
+
         load_location: Union[DeckSlotName, StagingSlotName, LabwareCore]
         if isinstance(location, Labware):
             load_location = location._core
@@ -1562,10 +1579,18 @@ class ProtocolContext(CommandPublisher):
             if isinstance(load_location, DeckSlotName) or isinstance(
                 load_location, StagingSlotName
             ):
+                if self._api_version < APIVersion(2, 25):
+                    checked_adapter_namespace = namespace
+                    checked_adapter_version = None
+                else:
+                    checked_adapter_namespace = adapter_namespace
+                    checked_adapter_version = adapter_version
+
                 loaded_adapter = self.load_adapter(
                     load_name=adapter,
                     location=load_location.value,
-                    namespace=namespace,
+                    namespace=checked_adapter_namespace,
+                    version=checked_adapter_version,
                 )
                 load_location = loaded_adapter._core
             else:
