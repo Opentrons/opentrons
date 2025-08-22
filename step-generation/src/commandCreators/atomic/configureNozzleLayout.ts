@@ -3,16 +3,12 @@ import { formatPyStr, indentPyLines, uuid } from '../../utils'
 import type { ConfigureNozzleLayoutParams } from '@opentrons/shared-data'
 import type { CommandCreator } from '../../types'
 
-interface ConfigureNozzleLayoutAtomicParams
-  extends ConfigureNozzleLayoutParams {
-  tiprackId: string
-}
-export const configureNozzleLayout: CommandCreator<ConfigureNozzleLayoutAtomicParams> = (
+export const configureNozzleLayout: CommandCreator<ConfigureNozzleLayoutParams> = (
   args,
   invariantContext,
   prevRobotState
 ) => {
-  const { pipetteId, configurationParams, tiprackId } = args
+  const { pipetteId, configurationParams } = args
   const { style, primaryNozzle } = configurationParams
   const commands = [
     {
@@ -25,13 +21,10 @@ export const configureNozzleLayout: CommandCreator<ConfigureNozzleLayoutAtomicPa
     },
   ]
   const pythonName = invariantContext.pipetteEntities[pipetteId].pythonName
-  const pythonTiprackName =
-    invariantContext.labwareEntities[tiprackId].pythonName
 
   const pythonArgs = [
     `protocol_api.${style}`,
     ...(primaryNozzle != null ? [`start=${formatPyStr(primaryNozzle)}`] : []),
-    `tip_racks=[${pythonTiprackName}]`,
   ]
 
   return {
