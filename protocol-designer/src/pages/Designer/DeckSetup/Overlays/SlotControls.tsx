@@ -142,8 +142,8 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
   const draggedDef = draggedItem?.labwareOnDeck?.def
 
   const isCustomLabware =
-    draggedItem != null
-      ? getLabwareIsCustom(customLabwareDefs, draggedItem.labwareOnDeck)
+    draggedItem?.labwareOnDeck != null
+      ? getLabwareIsCustom(customLabwareDefs, draggedItem?.labwareOnDeck)
       : false
 
   const isSlotBlocked =

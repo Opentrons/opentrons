@@ -123,9 +123,10 @@ export const AdapterControls = (
     return null
   }
   const draggedDef = draggedItem?.labwareOnDeck?.def
-  const isCustomLabware = draggedItem
-    ? getLabwareIsCustom(customLabwareDefs, draggedItem.labwareOnDeck)
-    : false
+  const isCustomLabware =
+    draggedItem.labwareOnDeck != null
+      ? getLabwareIsCustom(customLabwareDefs, draggedItem.labwareOnDeck)
+      : false
 
   const isSlotBlocked =
     isOver &&
