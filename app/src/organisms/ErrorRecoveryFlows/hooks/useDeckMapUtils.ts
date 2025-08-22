@@ -285,8 +285,8 @@ export const getRunCurrentModulesInfo = ({
         const moduleType = getModuleType(moduleDef.model)
 
         // for stacker, we only want to consider labware in the hopper as "nested"
-        const nestedLabware = runRecord.data.labware.find(lw => {
-          return (
+        const nestedLabware = runRecord.data.labware.find(
+          lw =>
             typeof lw.location === 'object' &&
             'moduleId' in lw.location &&
             lw.location.moduleId === module.id &&
@@ -294,8 +294,7 @@ export const getRunCurrentModulesInfo = ({
               (FLEX_STACKER_MODULE_TYPE === moduleType &&
                 'kind' in lw.location &&
                 lw.location.kind === 'inStackerHopper'))
-          )
-        })
+        )
 
         const nestedLabwareDef =
           nestedLabware != null
