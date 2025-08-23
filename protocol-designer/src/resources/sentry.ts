@@ -1,5 +1,6 @@
 import {
   browserTracingIntegration,
+  captureConsoleIntegration,
   init,
   replayIntegration,
 } from '@sentry/react'
@@ -33,7 +34,11 @@ export const initializeSentry = (state: BaseState): void => {
     try {
       init({
         dsn: sentryDsn,
-        integrations: [replayIntegration(), browserTracingIntegration()],
+        integrations: [
+          captureConsoleIntegration({ levels: ['assert'] }),
+          replayIntegration(),
+          browserTracingIntegration(),
+        ],
         tracesSampleRate: 1.0,
         tracePropagationTargets: [
           'localhost',
