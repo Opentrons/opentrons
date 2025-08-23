@@ -46,6 +46,7 @@ export const initializeSentry = (state: BaseState): void => {
         ],
         replaysSessionSampleRate: 0.0, // No Session Replay
         replaysOnErrorSampleRate: 0.0, // No Session Replay
+        ignoreErrors: [/Failed to fetch/i], // Ignore the fetch since PD doesn't use fetch
       })
       isSentryInitialized = true
       console.log('Sentry.init done')
