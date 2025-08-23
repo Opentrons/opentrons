@@ -141,6 +141,8 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
 
   const draggedDef = draggedItem?.labwareOnDeck?.def
 
+  // when dragging labware over a slot many times quickly
+  // labwareOnDeck could be null/undefined and cause the white screen
   const isCustomLabware =
     draggedItem?.labwareOnDeck != null
       ? getLabwareIsCustom(customLabwareDefs, draggedItem?.labwareOnDeck)
