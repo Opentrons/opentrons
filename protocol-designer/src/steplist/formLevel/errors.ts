@@ -762,12 +762,13 @@ export const volumeTooHigh = (
   fields: HydratedMixFormData
 ): FormError | null => {
   const { pipette, tipRack } = fields
+  if (!pipette) {
+    // pipette is null if user deletes pipette
+    return null
+  }
   const volume = Number(fields.volume)
 
-  const pipetteCapacity = getPipetteCapacity(
-    pipette as PipetteEntity,
-    tipRack as string
-  )
+  const pipetteCapacity = getPipetteCapacity(pipette, tipRack)
   if (
     !Number.isNaN(volume) &&
     !Number.isNaN(pipetteCapacity) &&
