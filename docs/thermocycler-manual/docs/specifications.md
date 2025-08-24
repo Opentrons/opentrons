@@ -2,8 +2,6 @@
 title: "Thermocycler Module: Product Specifications"
 ---
 
-# Product Specifications
-
 ![Thermocycler with labeled main features](images/specifications.png)
 
 ## Model Number

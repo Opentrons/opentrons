@@ -14,8 +14,10 @@ import {
   THERMOCYCLER_V2_REAR_FIXTURE,
 } from '@opentrons/shared-data'
 
-import type { CutoutFixtureId } from '@opentrons/shared-data'
-import type { CutoutConfigAndCompatibility } from './hooks'
+import type {
+  CutoutConfigAndCompatibility,
+  CutoutFixtureId,
+} from '@opentrons/shared-data'
 
 // filter down the list of current deck configuration cutouts to include
 // only those that must provide addressable areas for the protocol

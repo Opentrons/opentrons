@@ -72,6 +72,8 @@ _PARTIAL_NOZZLE_CONFIGURATION_SINGLE_ROW_PARTIAL_COLUMN_ADDED_IN = APIVersion(2,
 """The version after which partial nozzle configurations of single, row, and partial column layouts became available."""
 _AIR_GAP_TRACKING_ADDED_IN = APIVersion(2, 22)
 """The version after which air gaps should be implemented with a separate call instead of an aspirate for better liquid volume tracking."""
+_LIQUID_CLASS_TRANSFER_TIP_RACKS_ARG_ADDED_IN = APIVersion(2, 25)
+"""The version after which the user can supply liquid class transfers with non-assigned tip racks."""
 
 
 AdvancedLiquidHandling = v1_transfer.AdvancedLiquidHandling
@@ -1796,6 +1798,7 @@ class InstrumentContext(publisher.CommandPublisher):
         return_tip: bool = False,
         group_wells: bool = True,
         keep_last_tip: Optional[bool] = None,
+        tip_racks: Optional[List[labware.Labware]] = None,
     ) -> InstrumentContext:
         """Move a particular type of liquid from one well or group of wells to another.
 
@@ -1832,6 +1835,12 @@ class InstrumentContext(publisher.CommandPublisher):
         :param keep_last_tip: When ``True``, the pipette keeps the last tip used in the transfer attached. When
             ``False``, the last tip will be dropped or returned. If not set, behavior depends on the value of
             ``new_tip``. ``new_tip="never"`` keeps the tip, and all other values of ``new_tip`` drop or return the tip.
+        :param tip_racks: A list of tip racks to pick up from for this command. If not provided, the pipette will pick
+            up from its associated :py:obj:`.InstrumentContext.tip_racks`. Providing this argument does not change the
+            value of ``InstrumentContext.tip_racks``.
+
+            .. versionchanged:: 2.25
+                Added the ``tip_racks`` parameter.
 
         """
         if volume == 0.0:
@@ -1841,12 +1850,22 @@ class InstrumentContext(publisher.CommandPublisher):
             )
             return self
 
+        if (
+            tip_racks is not None
+            and self.api_version < _LIQUID_CLASS_TRANSFER_TIP_RACKS_ARG_ADDED_IN
+        ):
+            raise APIVersionError(
+                api_element="tip_racks",
+                until_version=f"{_LIQUID_CLASS_TRANSFER_TIP_RACKS_ARG_ADDED_IN}",
+                current_version=f"{self.api_version}",
+            )
+
         transfer_args = verify_and_normalize_transfer_args(
             source=source,
             dest=dest,
             tip_policy=new_tip,
             last_tip_well=self._get_current_tip_source_well(),
-            tip_racks=self._tip_racks,
+            tip_racks=tip_racks or self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
             group_wells_for_multi_channel=group_wells,
             current_volume=self.current_volume,
@@ -1874,6 +1893,9 @@ class InstrumentContext(publisher.CommandPublisher):
                 (types.Location(types.Point(), labware=well), well._core)
                 for well in transfer_args.dest
             ]
+
+        for tip_rack in transfer_args.tip_racks:
+            instrument.validate_tiprack(self.name, tip_rack, _log)
 
         with publisher.publish_context(
             broker=self.broker,
@@ -1924,6 +1946,7 @@ class InstrumentContext(publisher.CommandPublisher):
         return_tip: bool = False,
         group_wells: bool = True,
         keep_last_tip: Optional[bool] = None,
+        tip_racks: Optional[List[labware.Labware]] = None,
     ) -> InstrumentContext:
         """
         Distribute a particular type of liquid from one well to a group of wells.
@@ -1957,6 +1980,12 @@ class InstrumentContext(publisher.CommandPublisher):
         :param keep_last_tip: When ``True``, the pipette keeps the last tip used in the distribute attached. When
             ``False``, the last tip will be dropped or returned. If not set, behavior depends on the value of
             ``new_tip``. ``new_tip="never"`` keeps the tip, and all other values of ``new_tip`` drop or return the tip.
+        :param tip_racks: A list of tip racks to pick up from for this command. If not provided, the pipette will pick
+            up from its associated :py:obj:`.InstrumentContext.tip_racks`. Providing this argument does not change the
+            value of ``InstrumentContext.tip_racks``.
+
+            .. versionchanged:: 2.25
+                Added the ``tip_racks`` parameter.
 
         """
         if volume == 0.0:
@@ -1966,12 +1995,22 @@ class InstrumentContext(publisher.CommandPublisher):
             )
             return self
 
+        if (
+            tip_racks is not None
+            and self.api_version < _LIQUID_CLASS_TRANSFER_TIP_RACKS_ARG_ADDED_IN
+        ):
+            raise APIVersionError(
+                api_element="tip_racks",
+                until_version=f"{_LIQUID_CLASS_TRANSFER_TIP_RACKS_ARG_ADDED_IN}",
+                current_version=f"{self.api_version}",
+            )
+
         transfer_args = verify_and_normalize_transfer_args(
             source=source,
             dest=dest,
             tip_policy=new_tip,
             last_tip_well=self._get_current_tip_source_well(),
-            tip_racks=self._tip_racks,
+            tip_racks=tip_racks or self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
             group_wells_for_multi_channel=group_wells,
             current_volume=self.current_volume,
@@ -2003,6 +2042,9 @@ class InstrumentContext(publisher.CommandPublisher):
                 f" `distribute_with_liquid_class()` only supports `new_tip` values of"
                 f" 'once', 'never' and 'always'."
             )
+
+        for tip_rack in transfer_args.tip_racks:
+            instrument.validate_tiprack(self.name, tip_rack, _log)
 
         verified_source = transfer_args.source[0]
         with publisher.publish_context(
@@ -2057,6 +2099,7 @@ class InstrumentContext(publisher.CommandPublisher):
         return_tip: bool = False,
         group_wells: bool = True,
         keep_last_tip: Optional[bool] = None,
+        tip_racks: Optional[List[labware.Labware]] = None,
     ) -> InstrumentContext:
         """
         Consolidate a particular type of liquid from a group of wells to one well.
@@ -2091,6 +2134,12 @@ class InstrumentContext(publisher.CommandPublisher):
         :param keep_last_tip: When ``True``, the pipette keeps the last tip used in the consolidate attached. When
             ``False``, the last tip will be dropped or returned. If not set, behavior depends on the value of
             ``new_tip``. ``new_tip="never"`` keeps the tip, and all other values of ``new_tip`` drop or return the tip.
+        :param tip_racks: A list of tip racks to pick up from for this command. If not provided, the pipette will pick
+            up from its associated :py:obj:`.InstrumentContext.tip_racks`. Providing this argument does not change the
+            value of ``InstrumentContext.tip_racks``.
+
+            .. versionchanged:: 2.25
+                Added the ``tip_racks`` parameter.
 
         """
         if volume == 0.0:
@@ -2100,12 +2149,22 @@ class InstrumentContext(publisher.CommandPublisher):
             )
             return self
 
+        if (
+            tip_racks is not None
+            and self.api_version < _LIQUID_CLASS_TRANSFER_TIP_RACKS_ARG_ADDED_IN
+        ):
+            raise APIVersionError(
+                api_element="tip_racks",
+                until_version=f"{_LIQUID_CLASS_TRANSFER_TIP_RACKS_ARG_ADDED_IN}",
+                current_version=f"{self.api_version}",
+            )
+
         transfer_args = verify_and_normalize_transfer_args(
             source=source,
             dest=dest,
             tip_policy=new_tip,
             last_tip_well=self._get_current_tip_source_well(),
-            tip_racks=self._tip_racks,
+            tip_racks=tip_racks or self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
             group_wells_for_multi_channel=group_wells,
             current_volume=self.current_volume,
@@ -2140,6 +2199,9 @@ class InstrumentContext(publisher.CommandPublisher):
                 f" `consolidate_with_liquid_class()` only supports `new_tip` values of"
                 f" 'once', 'never' and 'always'."
             )
+
+        for tip_rack in transfer_args.tip_racks:
+            instrument.validate_tiprack(self.name, tip_rack, _log)
 
         with publisher.publish_context(
             broker=self.broker,
@@ -2937,10 +2999,8 @@ class InstrumentContext(publisher.CommandPublisher):
         ) and (style not in original_enabled_layouts):
             raise APIVersionError(
                 api_element=f"Nozzle layout configuration of style {style.value}",
-                until_version=str(
-                    _PARTIAL_NOZZLE_CONFIGURATION_SINGLE_ROW_PARTIAL_COLUMN_ADDED_IN
-                ),
-                current_version=str(self._api_version),
+                until_version=f"{_PARTIAL_NOZZLE_CONFIGURATION_SINGLE_ROW_PARTIAL_COLUMN_ADDED_IN}",
+                current_version=f"{self._api_version}",
             )
 
         front_right_resolved = front_right

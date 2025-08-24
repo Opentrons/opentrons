@@ -74,7 +74,6 @@ from opentrons.protocol_engine.types import (
     CurrentWell,
     CurrentAddressableArea,
     CurrentPipetteLocation,
-    LabwareMovementOffsetData,
     LoadedPipette,
     TipGeometry,
     ModuleDefinition,
@@ -106,7 +105,10 @@ from opentrons.protocol_engine.actions import (
 )
 from opentrons.protocol_engine.state import _move_types
 from opentrons.protocol_engine.state.config import Config
-from opentrons.protocol_engine.state.labware import LabwareView, LabwareStore
+from opentrons.protocol_engine.state.labware import (
+    LabwareView,
+    LabwareStore,
+)
 from opentrons.protocol_engine.state.wells import WellView, WellStore
 from opentrons.protocol_engine.state.modules import ModuleView, ModuleStore
 from opentrons.protocol_engine.state.pipettes import (
@@ -254,6 +256,77 @@ def mock_pipette_view(decoy: Decoy) -> PipetteView:
 def mock_addressable_area_view(decoy: Decoy) -> AddressableAreaView:
     """Get a mock in the shape of a AddressableAreaView."""
     return decoy.mock(cls=AddressableAreaView)
+
+
+@pytest.fixture(autouse=True)
+def auto_setup_addressable_area_mocks(
+    decoy: Decoy, mock_addressable_area_view: AddressableAreaView, use_mocks: bool
+) -> None:
+    """Addressable area mocks for all tests."""
+    if not use_mocks:
+        return
+
+    for slot_id in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]:
+        mock_area = AddressableArea(
+            area_name=slot_id,
+            area_type=AreaType.SLOT,
+            base_slot=DeckSlotName(slot_id),
+            display_name=f"Slot {slot_id}",
+            bounding_box=Dimensions(x=128, y=86, z=0),
+            position=AddressableOffsetVector(x=0, y=0, z=0),
+            compatible_module_types=[],
+            features=LocatingFeatures(),
+            mating_surface_unit_vector=[-1, 1, -1],
+        )
+
+        decoy.when(
+            mock_addressable_area_view.get_addressable_area(slot_id)
+        ).then_return(mock_area)
+        decoy.when(
+            mock_addressable_area_view._get_addressable_area_from_deck_data(
+                slot_id, False
+            )
+        ).then_return(mock_area)
+        decoy.when(
+            mock_addressable_area_view.get_addressable_area_position(slot_id)
+        ).then_return(Point(1, 2, 3))
+
+    module_areas = [
+        "magneticModuleV2Slot3",
+        "temperatureModuleV2A3",
+        "thermocyclerModuleV2",
+        "flexStackerModuleV1A4",
+        "flexStackerModuleV1D4",
+    ]
+
+    for area_name in module_areas:
+        mock_module_area = AddressableArea(
+            area_name=area_name,
+            area_type=AreaType.SLOT,
+            base_slot=DeckSlotName.SLOT_3,
+            display_name=f"Module Area {area_name}",
+            bounding_box=Dimensions(x=128, y=86, z=0),
+            position=AddressableOffsetVector(x=0, y=0, z=0),
+            compatible_module_types=[],
+            features=LocatingFeatures(),
+            mating_surface_unit_vector=[-1, 1, -1],
+        )
+
+        decoy.when(
+            mock_addressable_area_view.get_addressable_area(area_name)
+        ).then_return(mock_module_area)
+        decoy.when(
+            mock_addressable_area_view._get_addressable_area_from_deck_data(
+                area_name, False
+            )
+        ).then_return(mock_module_area)
+        decoy.when(
+            mock_addressable_area_view.get_addressable_area_position(area_name)
+        ).then_return(Point(1, 2, 3))
+
+    decoy.when(mock_addressable_area_view.deck_definition).then_return(
+        sentinel.deck_definition
+    )
 
 
 @pytest.fixture(autouse=True)
@@ -798,9 +871,6 @@ def test_get_module_labware_highest_z(
     decoy.when(mock_module_view.get_provided_addressable_area("module-id")).then_return(
         "magneticModuleV2Slot3"
     )
-    decoy.when(
-        mock_addressable_area_view.get_addressable_area("magneticModuleV2Slot3")
-    ).then_return(sentinel.module_addressable_area)
 
     highest_z = subject.get_labware_highest_z("labware-id")
 
@@ -2759,6 +2829,7 @@ def test_get_labware_grip_point_v2_definition(
         labware_definition=_MOCK_LABWARE_DEFINITION2,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         move_type=GripperMoveType.PICK_UP_LABWARE,
+        user_additional_offset=None,
     )
 
     assert labware_center == Point(
@@ -2798,6 +2869,7 @@ def test_get_labware_grip_point_v3_definition(
         labware_definition=_MOCK_LABWARE_DEFINITION3,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         move_type=GripperMoveType.PICK_UP_LABWARE,
+        user_additional_offset=None,
     )
 
     assert labware_center == Point(
@@ -2849,6 +2921,7 @@ def test_get_labware_grip_point_on_labware(
         labware_definition=sentinel.definition,
         location=OnLabwareLocation(labwareId="below-id"),
         move_type=GripperMoveType.PICK_UP_LABWARE,
+        user_additional_offset=None,
     )
 
     assert grip_point == Point(
@@ -2938,11 +3011,12 @@ def test_get_labware_grip_point_for_labware_on_module(
         labware_definition=sentinel.labware_definition,
         location=ModuleLocation(moduleId="module-id"),
         move_type=GripperMoveType.PICK_UP_LABWARE,
+        user_additional_offset=Point(x=1, y=2, z=3),
     )
     assert result_grip_point == Point(
-        x=492 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x + expected_lw_origin_to_parent.x,
-        y=350 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y + expected_lw_origin_to_parent.y,
-        z=838 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z + expected_lw_origin_to_parent.z,
+        x=492 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x + expected_lw_origin_to_parent.x + 1,
+        y=350 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y + expected_lw_origin_to_parent.y + 2,
+        z=838 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z + expected_lw_origin_to_parent.z + 3,
     )
 
 
@@ -3031,6 +3105,7 @@ def test_get_labware_grip_point_for_labware_stack_on_module(
         labware_definition=sentinel.labware_definition,
         location=OnLabwareLocation(labwareId="below-id-9"),
         move_type=GripperMoveType.PICK_UP_LABWARE,
+        user_additional_offset=None,
     )
 
     assert result_grip_point == Point(
@@ -3371,44 +3446,6 @@ def test_get_next_drop_tip_location_in_non_trash_labware(
     )
 
 
-def test_get_final_labware_movement_offset_vectors(
-    decoy: Decoy,
-    mock_module_view: ModuleView,
-    mock_labware_view: LabwareView,
-    subject: GeometryView,
-    well_plate_def: LabwareDefinition,
-) -> None:
-    """It should provide the final labware movement offset data based on locations."""
-    decoy.when(mock_labware_view.get_deck_default_gripper_offsets()).then_return(
-        LabwareMovementOffsetData(
-            pickUpOffset=LabwareOffsetVector(x=1, y=2, z=3),
-            dropOffset=LabwareOffsetVector(x=3, y=2, z=1),
-        )
-    )
-    decoy.when(mock_module_view.get_default_gripper_offsets("module-id")).then_return(
-        LabwareMovementOffsetData(
-            pickUpOffset=LabwareOffsetVector(x=11, y=22, z=33),
-            dropOffset=LabwareOffsetVector(x=33, y=22, z=11),
-        )
-    )
-
-    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
-        well_plate_def
-    )
-
-    final_offsets = subject.get_final_labware_movement_offset_vectors(
-        from_location=DeckSlotLocation(slotName=DeckSlotName("D2")),
-        to_location=ModuleLocation(moduleId="module-id"),
-        additional_pick_up_offset=Point(x=100, y=200, z=300),
-        additional_drop_offset=Point(x=400, y=500, z=600),
-        current_labware=mock_labware_view.get_definition("labware-id"),
-    )
-    assert final_offsets == LabwareMovementOffsetData(
-        pickUpOffset=LabwareOffsetVector(x=101, y=202, z=303),
-        dropOffset=LabwareOffsetVector(x=433, y=522, z=611),
-    )
-
-
 def test_ensure_valid_gripper_location(subject: GeometryView) -> None:
     """It should raise error if it's not a valid labware movement location for gripper."""
     slot_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_3)
@@ -3425,158 +3462,6 @@ def test_ensure_valid_gripper_location(subject: GeometryView) -> None:
 
     with pytest.raises(errors.LabwareMovementNotAllowedError):
         subject.ensure_valid_gripper_location(off_deck_location)
-
-
-def test_get_total_nominal_gripper_offset(
-    decoy: Decoy,
-    mock_labware_view: LabwareView,
-    mock_module_view: ModuleView,
-    subject: GeometryView,
-    well_plate_def: LabwareDefinition,
-) -> None:
-    """It should calculate the correct gripper offsets given the location and move type.."""
-    decoy.when(mock_labware_view.get_deck_default_gripper_offsets()).then_return(
-        LabwareMovementOffsetData(
-            pickUpOffset=LabwareOffsetVector(x=1, y=2, z=3),
-            dropOffset=LabwareOffsetVector(x=3, y=2, z=1),
-        )
-    )
-
-    decoy.when(mock_module_view.get_default_gripper_offsets("module-id")).then_return(
-        LabwareMovementOffsetData(
-            pickUpOffset=LabwareOffsetVector(x=11, y=22, z=33),
-            dropOffset=LabwareOffsetVector(x=33, y=22, z=11),
-        )
-    )
-
-    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
-        well_plate_def
-    )
-
-    # Case 1: labware on deck
-    result1 = subject.get_total_nominal_gripper_offset_for_move_type(
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
-        move_type=GripperMoveType.PICK_UP_LABWARE,
-        current_labware=mock_labware_view.get_definition("labware-d"),
-    )
-    assert result1 == Point(x=1, y=2, z=3)
-
-    # Case 2: labware on module
-    result2 = subject.get_total_nominal_gripper_offset_for_move_type(
-        location=ModuleLocation(moduleId="module-id"),
-        move_type=GripperMoveType.DROP_LABWARE,
-        current_labware=mock_labware_view.get_definition("labware-id"),
-    )
-    assert result2 == Point(x=33, y=22, z=11)
-
-
-def test_get_stacked_labware_total_nominal_offset_slot_specific(
-    decoy: Decoy,
-    mock_labware_view: LabwareView,
-    mock_module_view: ModuleView,
-    subject: GeometryView,
-    well_plate_def: LabwareDefinition,
-) -> None:
-    """Get nominal offset for stacked labware."""
-    # Case: labware on adapter on module, adapter has slot-specific offsets
-    decoy.when(mock_module_view.get_default_gripper_offsets("module-id")).then_return(
-        LabwareMovementOffsetData(
-            pickUpOffset=LabwareOffsetVector(x=11, y=22, z=33),
-            dropOffset=LabwareOffsetVector(x=33, y=22, z=11),
-        )
-    )
-    decoy.when(mock_module_view.get_location("module-id")).then_return(
-        DeckSlotLocation(slotName=DeckSlotName.SLOT_C1)
-    )
-    decoy.when(
-        mock_labware_view.get_child_gripper_offsets(
-            labware_id="adapter-id", slot_name=DeckSlotName.SLOT_C1
-        )
-    ).then_return(
-        LabwareMovementOffsetData(
-            pickUpOffset=LabwareOffsetVector(x=100, y=200, z=300),
-            dropOffset=LabwareOffsetVector(x=300, y=200, z=100),
-        )
-    )
-    decoy.when(mock_labware_view.get_parent_location("adapter-id")).then_return(
-        ModuleLocation(moduleId="module-id")
-    )
-    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
-        well_plate_def
-    )
-    decoy.when(mock_module_view._state.requested_model_by_id).then_return(
-        {"module-id": ModuleModel.HEATER_SHAKER_MODULE_V1}
-    )
-    result1 = subject.get_total_nominal_gripper_offset_for_move_type(
-        location=OnLabwareLocation(labwareId="adapter-id"),
-        move_type=GripperMoveType.PICK_UP_LABWARE,
-        current_labware=mock_labware_view.get_definition("labware-id"),
-    )
-    assert result1 == Point(x=111, y=222, z=333)
-
-    result2 = subject.get_total_nominal_gripper_offset_for_move_type(
-        location=OnLabwareLocation(labwareId="adapter-id"),
-        move_type=GripperMoveType.DROP_LABWARE,
-        current_labware=mock_labware_view.get_definition("labware-id"),
-    )
-    assert result2 == Point(x=333, y=222, z=111)
-
-
-def test_get_stacked_labware_total_nominal_offset_default(
-    decoy: Decoy,
-    mock_labware_view: LabwareView,
-    mock_module_view: ModuleView,
-    subject: GeometryView,
-    well_plate_def: LabwareDefinition,
-) -> None:
-    """Get nominal offset for stacked labware."""
-    # Case: labware on adapter on module, adapter has only default offsets
-    decoy.when(mock_module_view.get_default_gripper_offsets("module-id")).then_return(
-        LabwareMovementOffsetData(
-            pickUpOffset=LabwareOffsetVector(x=11, y=22, z=33),
-            dropOffset=LabwareOffsetVector(x=33, y=22, z=11),
-        )
-    )
-    decoy.when(mock_module_view.get_location("module-id")).then_return(
-        DeckSlotLocation(slotName=DeckSlotName.SLOT_4)
-    )
-    decoy.when(
-        mock_labware_view.get_child_gripper_offsets(
-            labware_id="adapter-id", slot_name=DeckSlotName.SLOT_C1
-        )
-    ).then_return(None)
-    decoy.when(
-        mock_labware_view.get_child_gripper_offsets(
-            labware_id="adapter-id", slot_name=None
-        )
-    ).then_return(
-        LabwareMovementOffsetData(
-            pickUpOffset=LabwareOffsetVector(x=100, y=200, z=300),
-            dropOffset=LabwareOffsetVector(x=300, y=200, z=100),
-        )
-    )
-    decoy.when(mock_labware_view.get_parent_location("adapter-id")).then_return(
-        ModuleLocation(moduleId="module-id")
-    )
-    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
-        well_plate_def
-    )
-    decoy.when(mock_module_view._state.requested_model_by_id).then_return(
-        {"module-id": ModuleModel.HEATER_SHAKER_MODULE_V1}
-    )
-    result1 = subject.get_total_nominal_gripper_offset_for_move_type(
-        location=OnLabwareLocation(labwareId="adapter-id"),
-        move_type=GripperMoveType.PICK_UP_LABWARE,
-        current_labware=mock_labware_view.get_definition("labware-id"),
-    )
-    assert result1 == Point(x=111, y=222, z=333)
-
-    result2 = subject.get_total_nominal_gripper_offset_for_move_type(
-        location=OnLabwareLocation(labwareId="adapter-id"),
-        move_type=GripperMoveType.DROP_LABWARE,
-        current_labware=mock_labware_view.get_definition("labware-id"),
-    )
-    assert result2 == Point(x=333, y=222, z=111)
 
 
 def test_check_gripper_labware_tip_collision(
@@ -4671,3 +4556,142 @@ def test_get_liquid_handling_z_change(
         operation_volume=operation_volume,
     )
     assert isclose(change, expected_change, abs_tol=0.0001)
+
+
+def test_raise_if_labware_inaccessible_by_pipette_staging_area(
+    subject: GeometryView, mock_labware_view: LabwareView, decoy: Decoy
+) -> None:
+    """It should raise if the labware is on a staging slot."""
+    decoy.when(mock_labware_view.get("labware-id")).then_return(
+        LoadedLabware(
+            id="labware-id",
+            loadName="test",
+            definitionUri="def-uri",
+            location=AddressableAreaLocation(addressableAreaName="B4"),
+        )
+    )
+
+    with pytest.raises(
+        errors.LocationNotAccessibleByPipetteError, match="on staging slot"
+    ):
+        subject.raise_if_labware_inaccessible_by_pipette("labware-id")
+
+
+def test_raise_if_labware_inaccessible_by_pipette_off_deck(
+    subject: GeometryView, mock_labware_view: LabwareView, decoy: Decoy
+) -> None:
+    """It should raise if the labware is off-deck."""
+    decoy.when(mock_labware_view.get("labware-id")).then_return(
+        LoadedLabware(
+            id="labware-id",
+            loadName="test",
+            definitionUri="def-uri",
+            location=OFF_DECK_LOCATION,
+        )
+    )
+
+    with pytest.raises(errors.LocationNotAccessibleByPipetteError, match="off-deck"):
+        subject.raise_if_labware_inaccessible_by_pipette("labware-id")
+
+
+def test_raise_if_labware_inaccessible_by_pipette_stacked_labware_on_staging_area(
+    subject: GeometryView, mock_labware_view: LabwareView, decoy: Decoy
+) -> None:
+    """It should raise if the labware is stacked on a staging slot."""
+    decoy.when(mock_labware_view.get("labware-id")).then_return(
+        LoadedLabware(
+            id="labware-id",
+            loadName="test",
+            definitionUri="def-uri",
+            location=OnLabwareLocation(labwareId="lower-labware-id"),
+        )
+    )
+    decoy.when(mock_labware_view.get("lower-labware-id")).then_return(
+        LoadedLabware(
+            id="lower-labware-id",
+            loadName="test",
+            definitionUri="def-uri",
+            location=AddressableAreaLocation(addressableAreaName="B4"),
+        )
+    )
+
+    with pytest.raises(
+        errors.LocationNotAccessibleByPipetteError, match="on staging slot"
+    ):
+        subject.raise_if_labware_inaccessible_by_pipette("labware-id")
+
+
+@pytest.mark.parametrize(
+    "addressable_area",
+    [
+        "flexStackerModuleV1A4",
+        "flexStackerModuleV1B4",
+        "flexStackerModuleV1C4",
+        "flexStackerModuleV1D4",
+    ],
+)
+def test_raise_if_labware_on_stacker_aa(
+    subject: GeometryView,
+    mock_labware_view: LabwareView,
+    decoy: Decoy,
+    addressable_area: str,
+) -> None:
+    """It should raise if the labware is on a stacker shuttle aa."""
+    decoy.when(mock_labware_view.get("labware-id")).then_return(
+        LoadedLabware(
+            id="labware-id",
+            loadName="test",
+            definitionUri="def-uri",
+            location=AddressableAreaLocation(addressableAreaName=addressable_area),
+        )
+    )
+    with pytest.raises(
+        errors.LocationNotAccessibleByPipetteError, match="on a stacker shuttle"
+    ):
+        subject.raise_if_labware_inaccessible_by_pipette("labware-id")
+
+
+@pytest.mark.parametrize(
+    "model", [m for m in ModuleModel if ModuleModel.is_flex_stacker(m)]
+)
+def test_raise_if_labware_on_stacker_module(
+    subject: GeometryView,
+    mock_labware_view: LabwareView,
+    mock_module_view: ModuleView,
+    decoy: Decoy,
+    model: ModuleModel,
+) -> None:
+    """It should raise if the labware is on a stacker module."""
+    decoy.when(mock_labware_view.get("labware-id")).then_return(
+        LoadedLabware(
+            id="labware-id",
+            loadName="test",
+            definitionUri="def-uri",
+            location=ModuleLocation(moduleId="module-id"),
+        )
+    )
+    decoy.when(mock_module_view.get("module-id")).then_return(
+        LoadedModule(id="module-id", model=model, location=None, serialNumber=None)
+    )
+    with pytest.raises(
+        errors.LocationNotAccessibleByPipetteError, match="on a stacker shuttle"
+    ):
+        subject.raise_if_labware_inaccessible_by_pipette("labware-id")
+
+
+def test_raise_if_labware_in_stacker_hopper(
+    subject: GeometryView, mock_labware_view: LabwareView, decoy: Decoy
+) -> None:
+    """It should raise if the labware is in a stacker hopper."""
+    decoy.when(mock_labware_view.get("labware-id")).then_return(
+        LoadedLabware(
+            id="labware-id",
+            loadName="test",
+            definitionUri="def-uri",
+            location=InStackerHopperLocation(moduleId="module-id"),
+        )
+    )
+    with pytest.raises(
+        errors.LocationNotAccessibleByPipetteError, match="in a stacker hopper"
+    ):
+        subject.raise_if_labware_inaccessible_by_pipette("labware-id")

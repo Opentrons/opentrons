@@ -56,7 +56,6 @@ from ..types import (
     HeaterShakerLatchStatus,
     HeaterShakerMovementRestrictors,
     DeckType,
-    LabwareMovementOffsetData,
     AddressableAreaLocation,
     StackerStoredLabwareGroup,
 )
@@ -1261,7 +1260,22 @@ class ModuleView:
             if existing_def.model == model or model in existing_def.compatibleWith:
                 return existing_mod_in_slot
 
-            else:
+            # FIXME(sfoster): This is a bad hack. This code should check that these can coexist
+            # through some data-driven means. Or this code should, in fact, not exist at all,
+            # since it's probably for setup commands that we don't use anymore, and doesn't
+            # check serial numbers and therefore would fail if there was mroe than one of
+            # a given module loaded across the deck and the one in this location was not the
+            # one that was being requested.
+            elif not (
+                (
+                    ModuleModel.is_flex_stacker(existing_def.model)
+                    and ModuleModel.is_magnetic_block(model)
+                )
+                or (
+                    ModuleModel.is_magnetic_block(existing_def.model)
+                    and ModuleModel.is_flex_stacker(model)
+                )
+            ):
                 _err = f" present in {location}"
                 raise errors.ModuleAlreadyPresentError(
                     f"A {existing_def.model.value} is already" + _err
@@ -1314,13 +1328,6 @@ class ModuleView:
                 raise errors.LocationIsOccupiedError(
                     f"Module {module.model} is already present at {location}."
                 )
-
-    def get_default_gripper_offsets(
-        self, module_id: str
-    ) -> Optional[LabwareMovementOffsetData]:
-        """Get the deck's default gripper offsets."""
-        offsets = self.get_definition(module_id).gripperOffsets
-        return offsets.get("default") if offsets else None
 
     def get_overflowed_module_in_slot(
         self, slot_name: DeckSlotName

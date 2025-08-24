@@ -2,8 +2,6 @@
 title: "Heater-Shaker Module: Product Specifications"
 ---
 
-# Product Specifications
-
 ![Heater-Shaker with external features labeled](images/hs-with-labels.svg)
 
 ## Model Number

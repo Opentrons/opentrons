@@ -12,11 +12,11 @@
 
 .deck_info_label_highlight {
   border-color: transparent;
-  background-color: var(--color-blue50);
+  background-color: var(--blue-50);
 }
 
 .deck_info_label_no_highlight {
-  border-color: var(--color-black90);
+  border-color: var(--black-90);
 }
 
 .large {

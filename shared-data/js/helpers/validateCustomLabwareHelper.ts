@@ -10,7 +10,7 @@ import type { LabwareDefinition } from '..'
 export const validateCustomLabwareHelper = (
   definition?: LabwareDefinition | null
 ): boolean => {
-  if (definition == null) {
+  if (definition?.ordering == null) {
     return false
   }
   const wellSet = new Set(definition.ordering.flat())

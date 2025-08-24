@@ -23,6 +23,7 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
 import { INITIAL_DECK_SETUP_STEP_ID } from '/protocol-designer/constants'
 import { deleteContainer } from '/protocol-designer/labware-ingred/actions'
+import { TIPRACK_LID_LOADNAME } from '/protocol-designer/pages/Designer/utils'
 import { deletePipettes } from '/protocol-designer/step-forms/actions'
 import { toggleIsGripperRequired } from '/protocol-designer/step-forms/actions/additionalItems'
 import { getAdditionalEquipmentEntities } from '/protocol-designer/step-forms/selectors'
@@ -118,6 +119,15 @@ export function PipetteOverview({
     setMount(targetPipetteMount)
     setSaveAttemptFailed(false)
   }
+  const allTiprackLidsOnDeck = Object.values(labware).filter(
+    lw => lw.def.parameters.loadName === TIPRACK_LID_LOADNAME
+  )
+
+  const handleDeletingTipLids = (): void => {
+    allTiprackLidsOnDeck.forEach(lid =>
+      dispatch(deleteContainer({ labwareId: lid.id }))
+    )
+  }
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
@@ -170,9 +180,16 @@ export function PipetteOverview({
               }}
               cleanForm={() => {
                 dispatch(deletePipettes([leftPipette.id as string]))
-                previousLeftPipetteTipracks.forEach(tip =>
-                  dispatch(deleteContainer({ labwareId: tip.id }))
-                )
+                previousLeftPipetteTipracks.forEach(tip => {
+                  const tipStack = tip.stack
+                  //  to delete any tiprackAdapters + tipracks
+                  tipStack.forEach(item => {
+                    if (labware[item] != null) {
+                      dispatch(deleteContainer({ labwareId: item }))
+                    }
+                  })
+                })
+                handleDeletingTipLids()
               }}
             />
           ) : null}
@@ -191,9 +208,16 @@ export function PipetteOverview({
               }}
               cleanForm={() => {
                 dispatch(deletePipettes([rightPipette.id as string]))
-                previousRightPipetteTipracks.forEach(tip =>
-                  dispatch(deleteContainer({ labwareId: tip.id }))
-                )
+                previousRightPipetteTipracks.forEach(tip => {
+                  const tipStack = tip.stack
+                  //  to delete any tiprackAdapters + tipracks
+                  tipStack.forEach(item => {
+                    if (labware[item] != null) {
+                      dispatch(deleteContainer({ labwareId: item }))
+                    }
+                  })
+                  handleDeletingTipLids()
+                })
               }}
             />
           ) : null}

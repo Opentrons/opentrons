@@ -2,8 +2,6 @@
 title: "Thermocycler Module: Safety and Compliance"
 ---
 
-# Safety Information and Regulatory Compliance
-
 Opentrons recommends that you follow the safe use specifications in this section and throughout this manual.
 
 ## Safe Use Specifications
@@ -22,7 +20,7 @@ The Thermocycler requires the following power input, met by the included power s
 - **Current**: 8.5–5 A
 - **Overvoltage**: Category II
 
-### Environmental Conditions { #thermocycler-environmental-conditions }
+### Environmental Conditions { #environmental-conditions-thermocycler }
 
 The Thermocycler should only be used indoors on a sturdy, dry, flat horizontal surface. Install this module in a low-vibration environment with stable ambient conditions. Keep it away from direct sunlight or HVAC systems that may cause significant temperature or humidity changes.
 

@@ -1,7 +1,6 @@
 site_name: Opentrons Documentation
 
 docs_dir: ./shared
-custom_dir: ./shared
 
 nav:
   - Opentrons Flex: '!include flex/mkdocs.yml'
@@ -10,6 +9,8 @@ nav:
       - Flex Stacker: '!include stacker-manual/mkdocs.yml'
       - HEPA/UV Module: '!include hepa-uv/mkdocs.yml'
       - Thermocycler Module: '!include thermocycler-manual/mkdocs.yml'
+      - Temperature Module: '!include temperature-module/mkdocs.yml'
+      - Absorbance Plate Reader Module: '!include absorbance-plate-reader/mkdocs.yml'
       - Heater-Shaker Module: '!include heater-shaker/mkdocs.yml'
   - Protocol Designer: '!include protocol-designer/mkdocs.yml'
   - Python API: https://docs.opentrons.com/v2/
@@ -32,6 +33,7 @@ theme:
   icon:
     admonition:
       tip: material/lightbulb-on-outline
+  custom_dir: ./shared
 
 markdown_extensions:
   - admonition

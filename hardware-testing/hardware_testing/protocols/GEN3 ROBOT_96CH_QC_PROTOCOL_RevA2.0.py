@@ -6,7 +6,7 @@ from opentrons import types
 import random
 
 metadata = {
-    "protocolName": "QC_Protocol",
+    "protocolName": "GEN3 ROBOT_96CH_QC_PROTOCOL_RevA2.0",
     "author": "Jon Klar <jonathan.klar@opentrons.com> (updated by RSS)",
 }
 requirements = {"robotType": "Flex", "apiLevel": "2.16"}
