@@ -1,17 +1,18 @@
-import styled from 'styled-components'
+import { withStyleProps } from '../hocs/withStyleProps'
 
-import { isntStyleProp, styleProps } from './style-props'
-
-import type { PrimitiveComponent } from './types'
+import type { ComponentProps, FC } from 'react'
+import type { StyleProps } from './types'
 
 /**
  * Simple Box atom. Renders a `div` by default and accepts all primitive styling props.
  *
  * @component
  */
-export const Box: PrimitiveComponent<'div'> = styled.div.withConfig({
-  shouldForwardProp: isntStyleProp,
-})`
-  min-width: 0;
-  ${styleProps}
-`
+
+const BoxComponent = (props: ComponentProps<'div'>): JSX.Element => (
+  <div {...props} style={{ minWidth: 0, ...props.style }} />
+)
+
+export const Box: FC<ComponentProps<'div'> & StyleProps> = withStyleProps(
+  BoxComponent
+) as FC<ComponentProps<'div'> & StyleProps>
