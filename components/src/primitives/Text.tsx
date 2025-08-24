@@ -1,18 +1,18 @@
-import styled from 'styled-components'
+import { withStyleProps } from '../hocs/withStyleProps'
 
-import { isntStyleProp, styleProps } from './style-props'
-
-import type { PrimitiveComponent } from './types'
+import type { ComponentProps, FC } from 'react'
+import type { StyleProps } from './types'
 
 /**
  * Text primitive
  *
  * @component
  */
-export const Text: PrimitiveComponent<'p'> = styled.p.withConfig({
-  shouldForwardProp: isntStyleProp,
-})`
-  margin-top: 0;
-  margin-bottom: 0;
-  ${styleProps}
-`
+
+const TextComponent = (props: ComponentProps<'p'>): JSX.Element => (
+  <p {...props} style={{ marginTop: 0, marginBottom: 0, ...props.style }} />
+)
+
+export const Text: FC<ComponentProps<'p'> & StyleProps> = withStyleProps(
+  TextComponent
+) as FC<ComponentProps<'p'> & StyleProps>
