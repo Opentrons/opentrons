@@ -2,8 +2,6 @@
 title: "Opentrons Flex: Glossary"
 ---
 
-# Glossary
-
 This appendix defines terms related to Opentrons Flex. It omits industry-standard terms like "labware" unless the term has a special meaning in relation to Flex. For example, the definition for *pipette* describes the narrower meaning that the term has when using Flex, as opposed to any pipette you might find elsewhere in a lab.
 
 The glossary is formatted to help you navigate within it and to other places in this manual. Words in italics indicate terms that are also defined in the glossary. Extremely common terms like "deck", "module", "pipette", and "protocol" aren't italicized, to improve readability. Links within definitions take you to the most relevant section that includes additional discussion of the term. And you can always search for every occurrence of a term to find even more information.
@@ -22,7 +20,7 @@ LEDs that illuminate the interior of Flex, which you can toggle on and off from 
 
 ##### Auxiliary ports
 
-Ports on the back of the Flex labeled AUX-1 and AUX-2. The port connection type is an [IEC M12 metric screw connector](https://en.wikipedia.org/wiki/IEC_metric_screw_sized_connectors). See the [Connections section][connections] in the System Description chapter.
+Ports on the back of the Flex labeled AUX-1 and AUX-2. The port connection type is an [IEC M12 metric screw connector](https://en.wikipedia.org/wiki/IEC_metric_screw_sized_connectors). See the [Connections section](system-description/connections.md) in the System Description chapter.
 
 ##### A1 expansion slot
 
@@ -42,7 +40,7 @@ A metal pin you attach to the *gripper's jaws* during gripper calibration. See t
 
 ##### Calibration probe
 
-A metal collar you attach to the *nozzle* of a pipette during pipette calibration, module calibration, and *Labware Position Check*. See the [Pipette calibration section][pipette-calibration] in the System Description chapter and the [Module calibration section][module-calibration] in the Modules chapter. See also the [Labware Position Check section](touchscreen/protocol-setup.md#labware-position-check) of the Touchscreen chapter.
+A metal collar you attach to the *nozzle* of a pipette during pipette calibration, module calibration, and *Labware Position Check*. See the [Pipette calibration section][pipette-calibration] in the System Description chapter and the [Module calibration section](modules/calibration.md) in the Modules chapter. See also the [Labware Position Check section](touchscreen/protocol-setup.md#labware-position-check) of the Touchscreen chapter.
 
 ##### Calibration square
 
@@ -58,7 +56,7 @@ One of four aluminum handles that screw into the bottom corners of the robot. Th
 
 ##### Carrying handle cap
 
-A flat metal cover that goes over the attachment point for a *carrying handle*. The caps close the handle openings in the *frame* and give the robot a clean appearance. See the [Robot Components section][robot-components] in the System Description chapter.
+A flat metal cover that goes over the attachment point for a *carrying handle*. The caps close the handle openings in the *frame* and give the robot a clean appearance. See the [Robot Components section](system-description/robot.md) in the System Description chapter.
 
 ##### Dashboard
 
@@ -82,7 +80,7 @@ A detachable panel on the deck area. Remove deck slots to install modules and fo
 
 ##### Ejector
 
-The mechanism that automatically pushes tips off the *nozzle* of a pipette. See the [Pipettes section][pipettes] in the System Description chapter.
+The mechanism that automatically pushes tips off the *nozzle* of a pipette. See the [Pipettes section](system-description/pipettes.md) in the System Description chapter.
 
 ##### Emergency Stop Pendant
 
@@ -198,7 +196,7 @@ See *96-channel mounting plate*.
 
 ##### Nozzle
 
-The working end of a pipette. Flex pipettes pick up disposable tips by pressing the nozzles down into them. See the [Pipettes section][pipettes] in the System Description chapter.
+The working end of a pipette. Flex pipettes pick up disposable tips by pressing the nozzles down into them. See the [Pipettes section](system-description/pipettes.md) in the System Description chapter.
 
 ##### Opentrons App
 
@@ -210,11 +208,11 @@ Part of the *gripper* that grasps and holds labware. Paddles are replaceable wea
 
 ##### Pinned protocol
 
-Protocols you have saved for easy access at the top of the All Protocols tab on the *touchscreen*. See the [Protocol management section][protocol-management] in the Touchscreen chapter.
+Protocols you have saved for easy access at the top of the All Protocols tab on the *touchscreen*. See the [Protocol management section](touchscreen/protocol-management.md) in the Touchscreen chapter.
 
 ##### Pipette
 
-[Opentrons Flex Pipettes](https://opentrons.com/products/categories/pipettes) are configurable devices used to move liquids throughout the *working area* during the execution of protocols. There are several Flex pipettes, which can handle volumes from 1 µL to 1000 µL in 1, 8, or 96 channels. See the [Pipettes section][pipettes] in the System Description chapter.
+[Opentrons Flex Pipettes](https://opentrons.com/products/categories/pipettes) are configurable devices used to move liquids throughout the *working area* during the execution of protocols. There are several Flex pipettes, which can handle volumes from 1 µL to 1000 µL in 1, 8, or 96 channels. See the [Pipettes section](system-description/pipettes.md) in the System Description chapter.
 
 ##### Pipette mount
 
@@ -258,7 +256,7 @@ See *protocol run*.
 
 ##### Side covers
 
-Detachable panels on the side of the robot, used for module exhaust and external cable routing. See the [Connections section][connections] in the System Description chapter.
+Detachable panels on the side of the robot, used for module exhaust and external cable routing. See the [Connections section](system-description/connections.md) in the System Description chapter.
 
 ##### Side windows
 

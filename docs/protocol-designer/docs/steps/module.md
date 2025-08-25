@@ -1,8 +1,6 @@
 ---
-title: "Protocol Designer: Modules"
+title: "Protocol Designer: Module steps"
 ---
-
-# Module Steps
 
 When you add modules to the robot deck, available module steps appear in the "Add step" menu. Protocol Designer supports the use of the following modules:
 

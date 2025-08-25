@@ -2,8 +2,6 @@
 title: "Opentrons Flex: Labware Definitions"
 ---
 
-# Labware definitions 
-
 Every labware you use on Flex requires a _labware definition_ that contains all the information Flex needs to work with the labware. This includes information about the physical shape of the labware, how pipettes and the gripper should interact with it, and what the labware should be called on the touchscreen and in the Opentrons App.
 
 The Flex robot software and Opentrons App include the labware definitions for everything available in the [Opentrons Labware Library](https://labware.opentrons.com/). 

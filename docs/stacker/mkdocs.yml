@@ -1,4 +1,4 @@
-site_name: stacker-manual
+site_name: stacker
 
 theme:
   name: material
@@ -24,12 +24,12 @@ markdown_extensions:
   - sane_lists
 
 nav:
-  - Product Description: index.md
+  - Opentrons Flex Stacker Instruction Manual: index.md
   - Safety and Compliance: compliance.md
-  - Product Specifications: specifications.md
-  - Pre-installation Information: preinstall.md
+  - Product Specifications: product-specs.md
+  - Pre-installation Information: pre-installation.md
   - Installing the Stacker: installation.md
-  - Post-installation Procedures: postinstall.md
+  - Post-installation Procedures: post-installation.md
   - Loading Labware: loading-labware.md
   - Maintenance and Cleaning: maintenance.md
-  - Additional Product Information: warranty.md
+  - Additional Product Information: additional-info.md

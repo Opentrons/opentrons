@@ -2,8 +2,6 @@
 title: "Opentrons Flex: Magnetic Block"
 ---
 
-# Magnetic Block GEN1
-
 ![The Magnetic Block has an array of 96 high-strength magnets.](../images/magnetic-block.png "Magnetic Block")
 
 ## Magnetic Block features

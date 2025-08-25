@@ -2,8 +2,6 @@
 title: "Opentrons Flex: Labware"
 ---
 
-# Labware 
-
 This chapter covers how Opentrons Flex works with labware, both in software and on the robot deck itself.
 
 - [Labware concepts](./concepts.md) describes how Opentrons software encodes and uses information about physical labware items in your lab.

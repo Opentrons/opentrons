@@ -2,8 +2,6 @@
 title: "Flex Stacker: Maintenance and Cleaning"
 ---
 
-# Maintenance and Cleaning
-
 ## Maintenance
 
 You should not attempt to service or repair the Stacker. If you have concerns about the Stacker’s performance, please contact Opentrons Support at <support@opentrons.com>.

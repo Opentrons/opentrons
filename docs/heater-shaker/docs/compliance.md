@@ -97,7 +97,7 @@ To reduce the risk of burns, always check the color of the status light before t
 
 ### Powering Down
 
-When powering down the Heater-Shaker, ensure that it is idle (not shaking) and not hot to the touch. If the module’s status light is solid white, it is safe to handle. If the status light is red, the module is hot. Allow the Heater-Shaker to cool until the status light is white before powering it down. Turning off the power while the status light is red prevents other users from determining whether the module is hot to the touch. See the [LED Status Light section](specifications.md#led-status) for more information about these visual status indicators.
+When powering down the Heater-Shaker, ensure that it is idle (not shaking) and not hot to the touch. If the module’s status light is solid white, it is safe to handle. If the status light is red, the module is hot. Allow the Heater-Shaker to cool until the status light is white before powering it down. Turning off the power while the status light is red prevents other users from determining whether the module is hot to the touch. See the [LED Status Light section](product-specs.md#led-status) for more information about these visual status indicators.
 
 Press the power button above the USB connector to turn off the module. You can unplug the power adapter once the module is powered down.
 

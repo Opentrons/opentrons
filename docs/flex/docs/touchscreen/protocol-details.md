@@ -2,8 +2,6 @@
 title: "Opentrons Flex: Protocol Details"
 ---
 
-# Protocol Details
-
 Tap on any protocol to view its detail screen. This screen displays all of the types of information included in the protocol file, as well as common protocol actions. An indicator at the top left of the screen shows whether the protocol is ready to run, or whether you need to perform additional setup.
 
 ## Summary tab
