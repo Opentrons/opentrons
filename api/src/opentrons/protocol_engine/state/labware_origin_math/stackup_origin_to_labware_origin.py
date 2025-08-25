@@ -186,7 +186,7 @@ def _get_underlying_ancestor_orientation(
     slot_id: DeckSlotName,
 ) -> ModuleOrientation:
     if isinstance(underlying_ancestor_definition, ModuleDefinition):
-        orientation = underlying_ancestor_definition.orientation.get(str(slot_id))
+        orientation = underlying_ancestor_definition.orientation.get(slot_id.id)
         if orientation == "left":
             return ModuleOrientation.LEFT
         elif orientation == "right":
