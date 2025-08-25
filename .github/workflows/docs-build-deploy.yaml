@@ -7,13 +7,13 @@ on:
       - '.github/workflows/docs-build-deploy.yaml'
   push:
     branches:
-      - 'mkdocs-new-workflow'
+      - 'edge'
     tags:
       - 'staging-MKDOCS*'
       - 'MKDOCS*'
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'mkdocs-new-workflow' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
   cancel-in-progress: true
 
 defaults:
