@@ -147,11 +147,11 @@ class ModuleContext(CommandPublisher):
         :returns: The initialized and loaded labware object.
 
         .. versionadded:: 2.1
-            The *label,* *namespace,* and *version* parameters.
+            The ``label``, ``namespace``, and ``version`` parameters.
 
         .. versionadded:: 2.26
-            The *adapter_namespace*, *adapter_version,*
-            *lid_namespace,* and *lid_version* parameters.
+            The ``adapter_namespace``, ``adapter_version``,
+            ``lid_namespace``, and ``lid_version`` parameters.
         """
         if self._api_version < APIVersion(2, 1) and (
             label is not None or namespace is not None or version != 1
