@@ -1,5 +1,6 @@
 import { Box } from './Box'
-import { NewPrimaryBtn, NewSecondaryBtn, TertiaryBtn } from './Btn'
+// import { NewPrimaryBtn, NewSecondaryBtn, TertiaryBtn } from './Btn'
+import { NewPrimaryBtn } from './Buttons/NewPrimaryBtn'
 
 import type { Meta, Story } from '@storybook/react'
 import type * as React from 'react'
@@ -18,27 +19,27 @@ AppPrimary.args = {
   title: 'app primary button title',
 }
 
-const AppSecondaryTemplate: Story<
-  React.ComponentProps<typeof NewSecondaryBtn>
-> = args => <NewSecondaryBtn {...args} />
-export const AppSecondary = AppSecondaryTemplate.bind({})
-AppSecondary.args = {
-  children: 'Confirm and Proceed',
-  title: 'app secondary button title',
-}
+// const AppSecondaryTemplate: Story<
+//   React.ComponentProps<typeof NewSecondaryBtn>
+// > = args => <NewSecondaryBtn {...args} />
+// export const AppSecondary = AppSecondaryTemplate.bind({})
+// AppSecondary.args = {
+//   children: 'Confirm and Proceed',
+//   title: 'app secondary button title',
+// }
 
-const TertiaryTemplate: Story<
-  React.ComponentProps<typeof TertiaryBtn>
-> = args => <TertiaryBtn {...args} />
-export const Tertiary = TertiaryTemplate.bind({})
-Tertiary.decorators = [
-  Story => (
-    <Box backgroundColor="black" size="20rem" padding="2rem" id="hello">
-      <Story />
-    </Box>
-  ),
-]
-Tertiary.args = {
-  children: 'Perform Side-Effect',
-  title: 'tertiary button title',
-}
+// const TertiaryTemplate: Story<
+//   React.ComponentProps<typeof TertiaryBtn>
+// > = args => <TertiaryBtn {...args} />
+// export const Tertiary = TertiaryTemplate.bind({})
+// Tertiary.decorators = [
+//   Story => (
+//     <Box backgroundColor="black" size="20rem" padding="2rem" id="hello">
+//       <Story />
+//     </Box>
+//   ),
+// ]
+// Tertiary.args = {
+//   children: 'Perform Side-Effect',
+//   title: 'tertiary button title',
+// }

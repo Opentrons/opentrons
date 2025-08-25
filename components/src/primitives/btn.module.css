@@ -1,0 +1,16 @@
+btn_container {
+  padding: 0;
+  border-width: 0;
+  border-style: solid;
+  appearance: none;
+  background-color: transparent;
+  cursor: pointer;
+
+  *:disabled {
+    cursor: default;
+  }
+
+  @media (height: 600px) and (width: 1024px) {
+    cursor: default;
+  }
+}

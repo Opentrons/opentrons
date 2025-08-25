@@ -1,0 +1,47 @@
+.new_primary_btn {
+  /* Base button variant styles */
+  border-color: inherit;
+  border-radius: 4px;
+  display: inline-block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.4;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  text-align: center;
+  text-transform: uppercase;
+
+  /* Primary button specific styles */
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+  background-color: #0070f3;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+}
+
+.new_primary_btn:hover,
+.new_primary_btn:focus {
+  background-color: #0070f3;
+  box-shadow: 0px 3px 6px 0px rgba(0, 0, 0, 0.23);
+}
+
+.new_primary_btn:active {
+  background-color: #004aaa;
+  box-shadow: none;
+}
+
+.new_primary_btn:disabled,
+.new_primary_btn.disabled {
+  background-color: #9ca3af;
+  color: #ffffff;
+  box-shadow: none;
+  cursor: default;
+}
+
+@media (height: 600px) and (width: 1024px) {
+  .new_primary_btn {
+    cursor: default;
+  }
+}
