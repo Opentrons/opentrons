@@ -705,7 +705,7 @@ class Labware:
                 # This is currently impossible to reach because of the
                 # `if self._api_version < validation.validation.LID_STACK_VERSION_GATE`
                 # check above. This is here for now in case that check is removed in
-                # the future and for symmetry with the other labware load methods.
+                # the future, and for symmetry with the other labware load methods.
                 checked_lid_namespace = lid_namespace
                 checked_lid_version = lid_version
             self._protocol_core.load_lid(
