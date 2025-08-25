@@ -1,3 +1,5 @@
+import * as fs from 'fs'
+import * as path from 'path'
 import { describe, expect, it } from 'vitest'
 
 import { getAllLabwareDefs, labwareImages } from '../labware'
@@ -31,5 +33,35 @@ describe('labwareImages mapping', () => {
         !(loadName in labwareImages) && !ignoredLoadNames.has(loadName)
     )
     expect(missingLoadNames).toEqual([])
+  })
+})
+
+const IMAGES_DIR = '/Users/abr/opentrons/shared-data/labware/images'
+const MAX_FILE_SIZE_BYTES = 200 * 1024
+
+function getAllFiles(dir: string): string[] {
+  return fs.readdirSync(dir).flatMap(file => {
+    if (file.startsWith('.')) return []
+    const fullPath = path.join(dir, file)
+    const stat = fs.statSync(fullPath)
+    return stat.isDirectory() ? getAllFiles(fullPath) : [fullPath]
+  })
+}
+
+describe('labwareImages format', () => {
+  const imageFiles = getAllFiles(IMAGES_DIR)
+  it('should all be .png files', () => {
+    const offenders = imageFiles.filter(
+      file => path.extname(file).toLowerCase() !== '.png'
+    )
+    expect(offenders).toEqual([])
+  })
+
+  it(`should all be smaller than ${MAX_FILE_SIZE_BYTES / 1024} KB`, () => {
+    const offenders = imageFiles.filter(file => {
+      const { size } = fs.statSync(file)
+      return size >= MAX_FILE_SIZE_BYTES
+    })
+    expect(offenders).toEqual([])
   })
 })

@@ -11,7 +11,6 @@ from PIL import Image
 import argparse
 import os
 
-
 def crop_image(path: str) -> str:
     """Crop image to a rectangular object region by removing surrounding white space."""
     print("✂️ Beginning Crop Steps.")
@@ -61,17 +60,12 @@ def crop_image(path: str) -> str:
     print(f"✅ Image cropped and saved: {path}")
     return path
 
-
-from PIL import Image
-import os
-
 def resize_image(path: str, target_kb: int = 200) -> str:
     """Resize PNG image by downscaling until it's under target size (in KB)."""
     print("📏 Beginning Resize Steps.")
 
     img = Image.open(path).convert("RGBA")
     target_bytes = target_kb * 1024
-    quality_tolerance = 10 * 1024  # 10 KB tolerance
     factor = 0.8  # Resize factor per iteration — try larger steps
     min_size = 170  # Don't resize below this dimension
 
@@ -84,7 +78,7 @@ def resize_image(path: str, target_kb: int = 200) -> str:
         print(f"Current size: {size // 1024} KB, dimensions: {img.size}")
 
         # Stop if size is below target or image is too small to resize further
-        if size <= target_bytes + quality_tolerance or min(img.size) < min_size:
+        if size <= target_bytes or min(img.size) < min_size:
             break
 
         # Resize image for next iteration
@@ -93,9 +87,6 @@ def resize_image(path: str, target_kb: int = 200) -> str:
 
     print(f"✅ Final image size: {os.path.getsize(path) // 1024} KB")
     return path
-
-
-
 
 def convert_to_png(path: str) -> str:
     """Convert image to PNG if it's not already PNG."""
@@ -120,7 +111,6 @@ def convert_to_png(path: str) -> str:
             exit(1)
     else:
         return path
-
 
 def image_sequence(path: str) -> str:
     """Run conversion, crop, and resize on image, overwriting original."""

@@ -10,6 +10,7 @@
    - Converts the image to `.png` format
 
    In order to run this script
+
    - Run brew install uv
    - From shard-data, then run uv run tools/format_image.py "insert image path here"
 
