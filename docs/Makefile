@@ -32,6 +32,6 @@ serve-flex-manual:
 
 .PHONY: deploy
 deploy:
-	python deploy_mkdocs.py $(ENVIRONMENT) --branch $(BRANCH)
+	uv run python deploy_mkdocs.py $(ENVIRONMENT) --branch $(BRANCH)
 
 
