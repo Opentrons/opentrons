@@ -199,7 +199,7 @@ def test_get_next_tip_skips_picked_up_tip(
         tips_state=update_types.TipsStateUpdate(
             tip_state=TipRackWellState.EMPTY,
             labware_id="cool-labware",
-            well_names=TipView(subject.state).compute_tips_to_mark_as_used(
+            well_names=TipView(subject.state).compute_tips_to_mark_as_used_or_empty(
                 labware_id="cool-labware", well_name="A1", nozzle_map=nozzle_map
             ),
         )
@@ -242,7 +242,7 @@ def test_get_next_tip_with_starting_tip(
         tips_state=update_types.TipsStateUpdate(
             tip_state=TipRackWellState.EMPTY,
             labware_id="cool-labware",
-            well_names=TipView(subject.state).compute_tips_to_mark_as_used(
+            well_names=TipView(subject.state).compute_tips_to_mark_as_used_or_empty(
                 labware_id="cool-labware", well_name="B2", nozzle_map=nozzle_map
             ),
         )
@@ -284,7 +284,7 @@ def test_get_next_tip_with_starting_tip_8_channel(
         tips_state=update_types.TipsStateUpdate(
             tip_state=TipRackWellState.EMPTY,
             labware_id="cool-labware",
-            well_names=TipView(subject.state).compute_tips_to_mark_as_used(
+            well_names=TipView(subject.state).compute_tips_to_mark_as_used_or_empty(
                 labware_id="cool-labware", well_name="A2", nozzle_map=nozzle_map
             ),
         )
@@ -328,7 +328,7 @@ def test_get_next_tip_with_1_channel_followed_by_8_channel(
         tips_state=update_types.TipsStateUpdate(
             tip_state=TipRackWellState.EMPTY,
             labware_id="cool-labware",
-            well_names=TipView(subject.state).compute_tips_to_mark_as_used(
+            well_names=TipView(subject.state).compute_tips_to_mark_as_used_or_empty(
                 labware_id="cool-labware",
                 well_name="A1",
                 nozzle_map=nozzle_map_1_channel,
@@ -370,7 +370,7 @@ def test_get_next_tip_with_starting_tip_out_of_tips(
         tips_state=update_types.TipsStateUpdate(
             tip_state=TipRackWellState.EMPTY,
             labware_id="cool-labware",
-            well_names=TipView(subject.state).compute_tips_to_mark_as_used(
+            well_names=TipView(subject.state).compute_tips_to_mark_as_used_or_empty(
                 labware_id="cool-labware",
                 well_name="H12",
                 nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
@@ -495,7 +495,7 @@ def test_next_tip_automatic_tip_tracking_with_partial_configurations(
             tips_state=update_types.TipsStateUpdate(
                 tip_state=TipRackWellState.EMPTY,
                 labware_id="cool-labware",
-                well_names=TipView(subject.state).compute_tips_to_mark_as_used(
+                well_names=TipView(subject.state).compute_tips_to_mark_as_used_or_empty(
                     labware_id="cool-labware", well_name=result, nozzle_map=nozzle_map
                 ),
             )
@@ -602,7 +602,9 @@ def test_next_tip_automatic_tip_tracking_tiprack_limits(
                 tips_state=update_types.TipsStateUpdate(
                     tip_state=TipRackWellState.EMPTY,
                     labware_id="cool-labware",
-                    well_names=TipView(subject.state).compute_tips_to_mark_as_used(
+                    well_names=TipView(
+                        subject.state
+                    ).compute_tips_to_mark_as_used_or_empty(
                         labware_id="cool-labware",
                         well_name=result,
                         nozzle_map=nozzle_map,
@@ -693,7 +695,9 @@ def test_96_column_after_row_returns_none(
                 tips_state=update_types.TipsStateUpdate(
                     tip_state=TipRackWellState.EMPTY,
                     labware_id="cool-labware",
-                    well_names=TipView(subject.state).compute_tips_to_mark_as_used(
+                    well_names=TipView(
+                        subject.state
+                    ).compute_tips_to_mark_as_used_or_empty(
                         labware_id="cool-labware",
                         well_name=result,
                         nozzle_map=nozzle_map,

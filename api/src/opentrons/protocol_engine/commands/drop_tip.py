@@ -12,7 +12,7 @@ from opentrons.protocol_engine.errors.exceptions import TipAttachedError
 from opentrons.protocol_engine.resources.model_utils import ModelUtils
 
 from ..state.update_types import StateUpdate
-from ..types import DropTipWellLocation
+from ..types import DropTipWellLocation, TipRackWellState
 from .pipetting_common import (
     PipetteIdMixin,
     TipPhysicallyAttachedError,
@@ -140,6 +140,25 @@ class DropTipImplementation(AbstractCommandImpl[DropTipParams, _ExecuteReturn]):
             partially_configured=is_partially_configured,
         )
 
+        is_tip_rack = self._state_view.labware.get_definition(
+            labware_id
+        ).parameters.isTiprack
+
+        # It's possible that we are dropping tips into a labware trash for pre API v2.14 OT-2 protocols
+        # (or something else unexpected), so if it is not a tip rack mark no wells as used
+        if is_tip_rack:
+            tips_to_mark_as_used = (
+                self._state_view.tips.compute_tips_to_mark_as_used_or_empty(
+                    labware_id=labware_id,
+                    well_name=well_name,
+                    nozzle_map=self._state_view.pipettes.get_nozzle_configuration(
+                        pipette_id
+                    ),
+                )
+            )
+        else:
+            tips_to_mark_as_used = []
+
         move_result = await move_to_well(
             movement=self._movement_handler,
             model_utils=self._model_utils,
@@ -152,12 +171,7 @@ class DropTipImplementation(AbstractCommandImpl[DropTipParams, _ExecuteReturn]):
             return move_result
 
         scrape_type = TipScrapeType.NONE
-        if (
-            params.scrape_tips
-            and self._state_view.geometry._labware.get_definition(
-                labware_id
-            ).parameters.isTiprack
-        ):
+        if params.scrape_tips and is_tip_rack:
             if int("".join(filter(str.isdigit, well_name))) <= 6:
                 scrape_type = TipScrapeType.RIGHT_ONE_COL
             else:
@@ -201,10 +215,16 @@ class DropTipImplementation(AbstractCommandImpl[DropTipParams, _ExecuteReturn]):
                 public=DropTipResult(position=move_result.public.position),
                 state_update=move_result.state_update.set_fluid_unknown(
                     pipette_id=pipette_id
-                ).update_pipette_tip_state(
+                )
+                .update_pipette_tip_state(
                     pipette_id=params.pipetteId,
                     tip_geometry=None,
                     tip_source=None,
+                )
+                .update_tip_rack_well_state(
+                    tip_state=TipRackWellState.USED,
+                    labware_id=labware_id,
+                    well_names=tips_to_mark_as_used,
                 ),
             )
 

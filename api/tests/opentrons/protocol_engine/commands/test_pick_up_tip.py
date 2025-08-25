@@ -82,7 +82,7 @@ async def test_success(
         sentinel.nozzle_configuration
     )
     decoy.when(
-        state_view.tips.compute_tips_to_mark_as_used(
+        state_view.tips.compute_tips_to_mark_as_used_or_empty(
             "labware-id", "A3", sentinel.nozzle_configuration
         )
     ).then_return(sentinel.tips_to_mark_as_used)
@@ -181,7 +181,7 @@ async def test_tip_physically_missing_error(
         sentinel.nozzle_configuration
     )
     decoy.when(
-        state_view.tips.compute_tips_to_mark_as_used(
+        state_view.tips.compute_tips_to_mark_as_used_or_empty(
             labware_id, well_name, sentinel.nozzle_configuration
         )
     ).then_return(sentinel.tips_to_mark_as_used)

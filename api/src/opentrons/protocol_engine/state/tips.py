@@ -240,10 +240,10 @@ class TipView:
 
         return well_state == TipRackWellState.CLEAN
 
-    def compute_tips_to_mark_as_used(
+    def compute_tips_to_mark_as_used_or_empty(
         self, labware_id: str, well_name: str, nozzle_map: NozzleMap
     ) -> list[str]:
-        """Compute which tips a hypothetical tip pickup should mark as "used".
+        """Compute which tips a hypothetical tip pickup/drop should mark as "used" or "empty".
 
         Params:
             labware_id: The labware ID of the tip rack.
