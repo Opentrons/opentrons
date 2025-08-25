@@ -914,6 +914,7 @@ interface CompatibleWithStack {
 
 export const getIsLabwareCompatibleWithStack = (
   labwareId: string,
+  //  stack is the full stack on the slot, including the slotName, modules, adapters
   stack: string[],
   labwareEntities: LabwareEntities,
   moduleEntities: ModuleEntities
