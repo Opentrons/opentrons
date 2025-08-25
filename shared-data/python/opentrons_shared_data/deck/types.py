@@ -113,7 +113,7 @@ class AddressableAreaV5(_RequiredAddressableArea, total=False):
     ableToDropTips: bool
     ableToDropLabware: bool
     features: LocatingFeatures
-    orientation: ModuleOrientation
+    orientation: Union[ModuleOrientation, None]
 
 
 class Cutout(TypedDict):

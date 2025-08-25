@@ -444,12 +444,12 @@ _MODULE_DEF_HS = ModuleDefinition.model_construct(  # type: ignore[call-arg]
         labwareInterfaceYDimension=700,
     ),
     gripperOffsets={},
-    extents={
-        "total": {
-            "backLeftBottom": {"x": -18, "y": 1.8, "z": 0},
-            "frontRightTop": {"x": 138.25, "y": -89.95, "z": 82},
-        }
-    },
+    extents=Extents(
+        total=AxisAlignedBoundingBox3D(
+            backLeftBottom=Vector3D(x=-18, y=1.8, z=0),
+            frontRightTop=Vector3D(x=138.25, y=-89.95, z=82),
+        )
+    ),
     orientation={
         "3": "right",
         "6": "right",
