@@ -29,7 +29,7 @@ from opentrons_shared_data.labware.types import (
     OpentronsFlexTipRackLidAsChildFeature,
     OpentronsFlexTipRackLidAsParentFeature,
     HeaterShakerUniversalFlatAdapterFeature,
-    FlatWellSupportAsChildFeature,
+    FlatSupportThermalCouplingAsChildFeature,
     ScrewAnchoredAsParentFeature,
     ScrewAnchoredAsChildFeature,
 )
@@ -332,7 +332,7 @@ _LW_V3_WITH_HS_FLAT_ADAPTER = LabwareDefinition3.model_construct(  # type: ignor
     ),
     features=LocatingFeatures(
         heaterShakerUniversalFlatAdapter=HeaterShakerUniversalFlatAdapterFeature(
-            flatWellSupportZ=50,
+            flatSupportThermalCouplingZ=50,
             deckLeft={"wallX": 10, "screwCenter": {"x": 100, "y": 300, "z": 10}},
             deckRight={"wallX": -10, "screwCenter": {"x": 500, "y": 700, "z": 50}},
         )
@@ -352,7 +352,9 @@ _LW_V3_WITH_FLAT_WELL_SUPPORT = LabwareDefinition3.model_construct(  # type: ign
         ),
     ),
     features=LocatingFeatures(
-        flatWellSupportAsChild=FlatWellSupportAsChildFeature(wellExteriorBottomZ=25)
+        flatSupportThermalCouplingAsChild=FlatSupportThermalCouplingAsChildFeature(
+            wellExteriorBottomZ=25
+        )
     ),
     stackingOffsetWithLabware={
         "default": Vector3D(x=0, y=0, z=0),

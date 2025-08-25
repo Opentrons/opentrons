@@ -186,12 +186,12 @@ class HeaterShakerUniversalFlatAdapterDeckSide(TypedDict):
 
 
 class HeaterShakerUniversalFlatAdapterFeature(TypedDict):
-    flatWellSupportZ: float
+    flatSupportThermalCouplingZ: float
     deckLeft: HeaterShakerUniversalFlatAdapterDeckSide
     deckRight: HeaterShakerUniversalFlatAdapterDeckSide
 
 
-class FlatWellSupportAsChildFeature(TypedDict):
+class FlatSupportThermalCouplingAsChildFeature(TypedDict):
     wellExteriorBottomZ: float
 
 
@@ -214,7 +214,9 @@ class LocatingFeatures(TypedDict):
     heaterShakerUniversalFlatAdapter: NotRequired[
         HeaterShakerUniversalFlatAdapterFeature
     ]
-    flatWellSupportAsChild: NotRequired[FlatWellSupportAsChildFeature]
+    flatSupportThermalCouplingAsChild: NotRequired[
+        FlatSupportThermalCouplingAsChildFeature
+    ]
     screwAnchoredAsParent: NotRequired[ScrewAnchoredAsParentFeature]
     screwAnchoredAsChild: NotRequired[ScrewAnchoredAsChildFeature]
 

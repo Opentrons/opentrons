@@ -430,7 +430,7 @@ def _shim_does_locating_feature_pair_exist(
     )
     hs_universal_flat_adapter_exists = (
         parent_deck_item.features.get("heaterShakerUniversalFlatAdapter") is not None
-        and child_labware.features.get("flatWellSupportAsChild") is not None
+        and child_labware.features.get("flatSupportThermalCouplingAsChild") is not None
     )
     hs_universal_flat_adapter_screw_anchored_exists = (
         parent_deck_item.features.get("screwAnchoredAsParent") is not None
@@ -593,7 +593,7 @@ def _parent_deck_item_to_child_labware_feature_offset(
 ) -> Point:
     """Get the offset vector from the parent entity origin to the child labware origin."""
     if parent_deck_item.features.get("heaterShakerUniversalFlatAdapter") is not None:
-        if child_labware.features.get("flatWellSupportAsChild") is not None:
+        if child_labware.features.get("flatSupportThermalCouplingAsChild") is not None:
             return _parent_origin_to_heater_shaker_universal_flat_adapter_feature(
                 parent_deck_item=parent_deck_item, slot_name=slot_name
             ) + _heater_shaker_universal_flat_adapter_feature_to_child_origin(
@@ -601,7 +601,7 @@ def _parent_deck_item_to_child_labware_feature_offset(
             )
         else:
             raise ValueError(
-                f"Expected {child_labware.metadata.displayName} to have flatWellSupportAsChild feature"
+                f"Expected {child_labware.metadata.displayName} to have flatSupportThermalCouplingAsChild feature"
             )
 
     elif (
@@ -754,7 +754,7 @@ def _parent_origin_to_heater_shaker_universal_flat_adapter_feature(
     )
     assert flat_adapter_feature is not None
 
-    flat_well_support_z = flat_adapter_feature["flatWellSupportZ"]
+    flat_well_support_z = flat_adapter_feature["flatSupportThermalCouplingZ"]
     orientation = slot_name.orientation
     extents = parent_deck_item.extents.total
 
@@ -853,7 +853,9 @@ def _heater_shaker_universal_flat_adapter_feature_to_child_origin(
     slot_name: DeckSlotName,
 ) -> Point:
     """Returns the offset from a Heater Shaker Universal Flat Adapter locating feature to the child origin."""
-    flat_well_support_as_child = child_labware.features.get("flatWellSupportAsChild")
+    flat_well_support_as_child = child_labware.features.get(
+        "flatSupportThermalCouplingAsChild"
+    )
 
     assert flat_well_support_as_child is not None
 

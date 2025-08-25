@@ -27,7 +27,7 @@
   },
   "features": {
     "heaterShakerUniversalFlatAdapter": {
-      "flatWellSupportZ": 4.7,
+      "flatSupportThermalCouplingZ": 4.7,
       "deckLeft": {
         "wallX": 7.52,
         "screwCenter": {

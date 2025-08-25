@@ -704,9 +704,9 @@
         "heaterShakerUniversalFlatAdapter": {
           "description": "Designates this labware as the Opentrons Universal Flat Adapter",
           "type": "object",
-          "required": ["flatWellSupportZ", "deckLeft", "deckRight"],
+          "required": ["flatSupportThermalCouplingZ", "deckLeft", "deckRight"],
           "properties": {
-            "flatWellSupportZ": {
+            "flatSupportThermalCouplingZ": {
               "description": "The bottom of the labware to the top of the labware's surface that makes contact with a child labware's wells.",
               "type": "number"
             },
@@ -740,7 +740,7 @@
             }
           }
         },
-        "flatWellSupportAsChild": {
+        "flatSupportThermalCouplingAsChild": {
           "type": "object",
           "required": ["wellExteriorBottomZ"],
           "properties": {
