@@ -5,6 +5,7 @@ from typing import Union, overload, Optional
 
 from typing_extensions import assert_type
 
+import opentrons.protocol_engine.errors as errors
 from opentrons.types import Point, DeckSlotName, SlotOrientation
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
@@ -27,8 +28,7 @@ from opentrons.protocol_engine.resources.labware_validation import (
 )
 from opentrons.protocol_engine.types import AddressableArea
 from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
-from .. import errors
-from ..types import (
+from opentrons.protocol_engine.types import (
     ModuleDefinition,
     ModuleModel,
     DeckLocationDefinition,
