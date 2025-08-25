@@ -62,6 +62,10 @@ LID_STACK_VERSION_GATE = APIVersion(2, 23)
 # The first APIVersion where Python protocols can use the Flex Stacker module.
 FLEX_STACKER_VERSION_GATE = APIVersion(2, 23)
 
+# The first APIVersion where various "multi labware load" methods allow you to specify
+# the namespace and version of adapters and lids separately from the main labware.
+NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE = APIVersion(2, 25)
+
 
 class InvalidPipetteMountError(ValueError):
     """An error raised when attempting to load pipettes on an invalid mount."""

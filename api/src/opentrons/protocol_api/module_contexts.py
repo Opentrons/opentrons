@@ -161,30 +161,38 @@ class ModuleContext(CommandPublisher):
                 "are trying to utilize new load_labware parameters in 2.1"
             )
 
-        if self._api_version < APIVersion(2, 25):
+        if self._api_version < validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE:
             if adapter_namespace is not None:
                 raise APIVersionError(
                     api_element="The `adapter_namespace` parameter",
-                    until_version="2.25",
-                    current_version=f"{self._api_version}",
+                    until_version=str(
+                        validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                    ),
+                    current_version=str(self._api_version),
                 )
             if adapter_version is not None:
                 raise APIVersionError(
                     api_element="The `adapter_version` parameter",
-                    until_version="2.25",
-                    current_version=f"{self._api_version}",
+                    until_version=str(
+                        validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                    ),
+                    current_version=str(self._api_version),
                 )
             if lid_namespace is not None:
                 raise APIVersionError(
                     api_element="The `lid_namespace` parameter",
-                    until_version="2.25",
-                    current_version=f"{self._api_version}",
+                    until_version=str(
+                        validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                    ),
+                    current_version=str(self._api_version),
                 )
             if lid_version is not None:
                 raise APIVersionError(
                     api_element="The `lid_version` parameter",
-                    until_version="2.25",
-                    current_version=f"{self._api_version}",
+                    until_version=str(
+                        validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                    ),
+                    current_version=str(self._api_version),
                 )
 
         load_location: Union[ModuleCore, LabwareCore]
@@ -196,7 +204,10 @@ class ModuleContext(CommandPublisher):
                     current_version=f"{self._api_version}",
                 )
 
-            if self._api_version < APIVersion(2, 25):
+            if (
+                self._api_version
+                < validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+            ):
                 checked_adapter_namespace = namespace
                 checked_adapter_version = None
             else:
@@ -238,7 +249,10 @@ class ModuleContext(CommandPublisher):
                     current_version=f"{self._api_version}",
                 )
 
-            if self._api_version < APIVersion(2, 25):
+            if (
+                self._api_version
+                < validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+            ):
                 checked_lid_namespace = namespace
                 checked_lid_version = None
             else:
