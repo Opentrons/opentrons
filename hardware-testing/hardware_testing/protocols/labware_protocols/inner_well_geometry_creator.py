@@ -124,9 +124,13 @@ def add_parameters(parameters: ParameterContext) -> None:
                 "display_name": "dorf500",
                 "value": "eppendorf_96_wellplate_500ul_custom",
             },
+            {
+                "display_name": "dorf1000",
+                "value": "eppendorf_96_wellplate_1000ul_custom",
+            },
 
         ],
-        default="eppendorf_96_wellplate_150ul_custom",
+        default="eppendorf_96_wellplate_1000ul_custom",
     )
 
     # generally, the first dispense should be 1/25 the max volume.
@@ -502,7 +506,7 @@ def run(ctx: ProtocolContext) -> None:
         elif max_volume >= 100:  # 100–249
             alpha_low, alpha_high = 0.8, 1.0
         else:  # below 100
-            alpha_low, alpha_high = 1.5, 1.2
+            alpha_low, alpha_high = 1.0, 0.8
 
         return alpha_low if h < THRESHOLD else alpha_high
 
@@ -521,7 +525,7 @@ def run(ctx: ProtocolContext) -> None:
             error = target_height - hdelta
             new_volume = step_volume * min(
                 1.5, 1 + alpha * error
-            )  # increase clamped to 50% of previous volume
+            )  # increase clamped to 150% of previous volume
 
         elif hdelta > upper_bound:
             error = hdelta - target_height

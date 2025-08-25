@@ -88,9 +88,13 @@ def add_parameters(parameters: ParameterContext) -> None:
                 "display_name": "dorf500",
                 "value": "eppendorf_96_wellplate_500ul_custom",
             },
+            {
+                "display_name": "dorf1000",
+                "value": "eppendorf_96_wellplate_1000ul_custom",
+            },
 
         ],
-        default="eppendorf_96_wellplate_150ul_custom",
+        default="eppendorf_96_wellplate_1000ul_custom",
     )
 
     parameters.add_str(
@@ -213,6 +217,7 @@ def aspirate_dispense_measure(
 
         expected_height = labware[well].height_from_volume(expected_vol)
         dispense_loc = labware[well].bottom(z= expected_height + 2.5)
+        liq_pipette.flow_rate.dispense = min(labware["A1"].max_volume/ 20, 400) #change later 
         liq_pipette.transfer(
             (expected_vol / liq_pipette.channels) * 1.033,
             src["A1"].meniscus(z=-2, target="end"),
