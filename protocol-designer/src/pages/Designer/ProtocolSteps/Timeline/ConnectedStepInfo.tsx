@@ -227,7 +227,7 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
         iconName={hasError || hasWarnings ? 'alert-circle' : iconName}
         title={`${stepNumber}. ${
           // add empty check to avoid causing undefined issue when calling titleCase
-          step.stepName.trim() !== ''
+          step.stepName !== undefined || step.stepName !== ''
             ? i18n.format(step.stepName, 'titleCase')
             : t(`stepType.${step.stepType}`)
         }`}
