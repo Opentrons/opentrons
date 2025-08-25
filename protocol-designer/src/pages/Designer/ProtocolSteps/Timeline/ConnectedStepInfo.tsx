@@ -226,6 +226,7 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
         onMouseEnter={highlightStep}
         iconName={hasError || hasWarnings ? 'alert-circle' : iconName}
         title={`${stepNumber}. ${
+          // add empty check to avoid causing undefined issue when calling titleCase
           step.stepName.trim() !== ''
             ? i18n.format(step.stepName, 'titleCase')
             : t(`stepType.${step.stepType}`)
