@@ -120,7 +120,7 @@ jobs:
 
       - name: Deploy
         working-directory: ./docs
-        run: make deploy ENVIRONMENT=${{ env.ENVIRONMENT }} BRANCH=${{ env.BRANCH }}
+        run: make deploy ENVIRONMENT=${{ env.ENVIRONMENT }} BRANCH=${{ env.BRANCH }} -- --source-dir site
       - name: Output Deployment URL
         run: |
           echo "## 🚀 Docs site deployed to ${{ env.ENVIRONMENT }}" >> $GITHUB_STEP_SUMMARY
