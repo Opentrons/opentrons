@@ -1,10 +1,11 @@
 .button {
-  background-color: var(--blue-30);
   border: none;
   border-radius: var(--border-radius-8);
-  cursor: pointer;
+  background-color: var(--blue-30);
   color: var(--black-90);
+  cursor: pointer;
 }
+
 .button:hover {
   background-color: var(--blue-50);
   color: white;
@@ -17,7 +18,7 @@
 
 .button_container {
   display: flex;
-  padding: var(--spacing-12) var(--spacing-16);
   align-items: center;
+  padding: var(--spacing-12) var(--spacing-16);
   gap: var(--spacing-4);
 }
