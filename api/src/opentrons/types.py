@@ -365,9 +365,9 @@ StringAxisMap = Dict[str, float]
 class SlotOrientation(enum.Enum):
     """Orientation of a deck slot."""
 
-    LEFT = enum.auto()
-    CENTER = enum.auto()
-    RIGHT = enum.auto()
+    LEFT = "LEFT"
+    CENTER = "CENTER"
+    RIGHT = "RIGHT"
 
 
 # TODO(mc, 2020-11-09): this makes sense in shared-data or other common

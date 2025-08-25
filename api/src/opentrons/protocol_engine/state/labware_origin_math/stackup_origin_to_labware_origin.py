@@ -5,7 +5,6 @@ from typing import Union, overload, Optional
 
 from typing_extensions import assert_type
 
-import opentrons.protocol_engine.errors as errors
 from opentrons.types import Point, DeckSlotName, SlotOrientation
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
@@ -25,6 +24,15 @@ from opentrons_shared_data.labware.types import (
 from opentrons.protocol_engine.resources.labware_validation import (
     validate_definition_is_lid,
     is_absorbance_reader_lid,
+)
+from opentrons.protocol_engine.errors import (
+    LabwareNotOnDeckError,
+    LabwareOffsetDoesNotExistError,
+)
+from .errors import (
+    MissingLocatingFeatureError,
+    IncompatibleLocatingFeatureError,
+    InvalidLabwarePlacementError,
 )
 from opentrons.protocol_engine.types import AddressableArea
 from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
@@ -162,7 +170,7 @@ def _get_stackup_origin_to_lw_origin(
             is_topmost_labware=False,
         )
     else:
-        raise errors.LabwareNotOnDeckError(
+        raise LabwareNotOnDeckError(
             "Cannot access labware since it is not on the deck. "
             "Either it has been loaded off-deck or its been moved off-deck."
         )
@@ -600,8 +608,9 @@ def _parent_deck_item_to_child_labware_feature_offset(
                 child_labware=child_labware, slot_name=slot_name
             )
         else:
-            raise ValueError(
-                f"Expected {child_labware.metadata.displayName} to have flatSupportThermalCouplingAsChild feature"
+            raise MissingLocatingFeatureError(
+                labware_name=child_labware.metadata.displayName,
+                required_feature="flatSupportThermalCouplingAsChild",
             )
 
     elif (
@@ -661,8 +670,9 @@ def _get_spring_force(
 
     if parent_spring_force is not None and child_spring_force is not None:
         if parent_spring_force != child_spring_force:
-            raise ValueError(
-                f"Parent spring force: {parent_spring_force} does not match child spring force: {child_spring_force}"
+            raise IncompatibleLocatingFeatureError(
+                parent_feature=f"slotFootprintAsParent spring force: {parent_spring_force}",
+                child_feature=f"slotFootprintAsChild spring force: {child_spring_force}",
             )
 
     return parent_spring_force or child_spring_force
@@ -688,9 +698,9 @@ def _get_screw_anchored_center_for_child(
             y = hs_universal_flat_adapter_feature["deckRight"]["screwCenter"]["y"]
             return LabwareVector3D(x=x, y=y, z=0)
         else:
-            raise ValueError(
-                "Expected labware containing heaterShakerUniversalFlatAdapter "
-                "to be placed on the left or right side of the deck."
+            raise InvalidLabwarePlacementError(
+                feature_name="heaterShakerUniversalFlatAdapter",
+                invalid_placement=SlotOrientation.CENTER.value,
             )
     elif screw_anchored_as_child_feature is not None:
         return screw_anchored_as_child_feature["screwCenter"]
@@ -772,8 +782,9 @@ def _parent_origin_to_heater_shaker_universal_flat_adapter_feature(
         return Point(right_side_center_x, right_side_center_y, flat_well_support_z)
 
     else:
-        raise ValueError(
-            "heaterShakerUniversalFlatAdapter feature does not support placement in a center slot."
+        raise InvalidLabwarePlacementError(
+            feature_name="heaterShakerUniversalFlatAdapter",
+            invalid_placement=SlotOrientation.CENTER.value,
         )
 
 
@@ -879,8 +890,9 @@ def _heater_shaker_universal_flat_adapter_feature_to_child_origin(
         )
 
     else:
-        raise ValueError(
-            "heaterShakerUniversalFlatAdapter feature does not support placement in a center slot."
+        raise InvalidLabwarePlacementError(
+            feature_name="heaterShakerUniversalFlatAdapter",
+            invalid_placement=SlotOrientation.CENTER.value,
         )
 
 
@@ -968,8 +980,9 @@ def _get_labware_footprint_as_child(
     """Get the SlotFootprintAsChildFeature for labware definitions."""
     footprint_as_child = labware.features.get("slotFootprintAsChild")
     if footprint_as_child is None:
-        raise ValueError(
-            f"Expected labware {labware.metadata.displayName} to have a SlotFootprintAsChild feature"
+        raise MissingLocatingFeatureError(
+            labware_name=labware.metadata.displayName,
+            required_feature="slotFootprintAsChild",
         )
     else:
         return footprint_as_child
@@ -1193,7 +1206,7 @@ def _get_tc_lid_gripper_offsets(
                 )
                 return _GripperOffsets(pick_up_offset=offset, drop_offset=offset)
             else:
-                raise errors.LabwareOffsetDoesNotExistError(
+                raise LabwareOffsetDoesNotExistError(
                     f"Labware Definition {top_most_lw_def.parameters.loadName} does not contain required field 'lidOffsets' of 'gripperOffsets'."
                 )
 
