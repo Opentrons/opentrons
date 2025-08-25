@@ -36,7 +36,7 @@ from opentrons_shared_data.labware.types import (
 
 from opentrons.types import Point, DeckSlotName
 from opentrons_shared_data.module.types import ModuleOrientation
-from opentrons.protocol_engine.state.labware_origin_math import (
+from opentrons.protocol_engine.state.labware_origin_math.stackup_origin_to_labware_origin import (
     get_stackup_origin_to_labware_origin,
     LabwareOriginContext,
     LabwareStackupAncestorDefinition,
