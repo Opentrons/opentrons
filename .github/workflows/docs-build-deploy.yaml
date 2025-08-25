@@ -7,7 +7,7 @@ on:
       - '.github/workflows/docs-build-deploy.yaml'
   push:
     branches:
-      - 'edge'
+      - 'mkdocs-not-case-sensitive'
     tags:
       - 'staging-MKDOCS*'
       - 'staging-mkdocs*'
@@ -15,7 +15,7 @@ on:
       - 'mkdocs*'
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'mkdocs-not-case-sensitive' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
   cancel-in-progress: true
 
 defaults:
