@@ -154,6 +154,12 @@
       }
     }
   },
+  "orientation": {
+    "A4": "right",
+    "B4": "right",
+    "C4": "right",
+    "D4": "right"
+  },
   "compatibleWith": [],
   "incompatibleWithDecks": ["ot2_standard", "ot2_short_trash"],
   "uniqueModuleData": {

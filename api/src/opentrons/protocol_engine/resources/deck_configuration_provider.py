@@ -124,6 +124,7 @@ def get_addressable_area_from_name(
                 z=addressable_area["boundingBox"]["zDimension"],
             )
             features = addressable_area["features"]
+            orientation = addressable_area["orientation"]
             mating_surface_unit_vector = addressable_area.get("matingSurfaceUnitVector")
 
             return AddressableArea(
@@ -138,6 +139,7 @@ def get_addressable_area_from_name(
                     "compatibleModuleTypes", []
                 ),
                 features=features,
+                orientation=orientation,
             )
     raise AddressableAreaDoesNotExistError(
         f"Could not find addressable area with name {addressable_area_name}"

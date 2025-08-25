@@ -26,6 +26,7 @@
         "features": {
           "springDirectionalForceAsParent": "backLeftBottom"
         },
+        "orientation": null,
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -46,6 +47,7 @@
         "features": {
           "springDirectionalForceAsParent": "backLeftBottom"
         },
+        "orientation": null,
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -66,6 +68,7 @@
         "features": {
           "springDirectionalForceAsParent": "backLeftBottom"
         },
+        "orientation": null,
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -86,6 +89,7 @@
         "features": {
           "springDirectionalForceAsParent": "backLeftBottom"
         },
+        "orientation": null,
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -106,6 +110,7 @@
         "features": {
           "springDirectionalForceAsParent": "backLeftBottom"
         },
+        "orientation": null,
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -126,6 +131,7 @@
         "features": {
           "springDirectionalForceAsParent": "backLeftBottom"
         },
+        "orientation": null,
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -146,6 +152,7 @@
         "features": {
           "springDirectionalForceAsParent": "backLeftBottom"
         },
+        "orientation": null,
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -167,6 +174,7 @@
         "features": {
           "springDirectionalForceAsParent": "backLeftBottom"
         },
+        "orientation": null,
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -187,6 +195,7 @@
         "features": {
           "springDirectionalForceAsParent": "backLeftBottom"
         },
+        "orientation": null,
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -207,6 +216,7 @@
         "features": {
           "springDirectionalForceAsParent": "backLeftBottom"
         },
+        "orientation": null,
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -227,6 +237,7 @@
         "features": {
           "springDirectionalForceAsParent": "backLeftBottom"
         },
+        "orientation": null,
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -259,6 +270,7 @@
         },
         "displayName": "Slot 12/Fixed Trash",
         "features": {},
+        "orientation": null,
         "ableToDropTips": true
       }
     ],

@@ -111,6 +111,7 @@
     "displayName",
     "quirks",
     "slotTransforms",
+    "orientation",
     "compatibleWith",
     "incompatibleWithDecks"
   ],
@@ -307,6 +308,17 @@
           }
         }
       }
+    },
+    "orientation": {
+      "type": "object",
+      "description": "The orientation of the module when placed in a particular deck id.",
+      "patternProperties": {
+        "^([1-9]|[A-D][1-4])$": {
+          "type": "string",
+          "enum": ["left", "right", "center"]
+        }
+      },
+      "additionalProperties": false
     },
     "compatibleWith": {
       "type": "array",

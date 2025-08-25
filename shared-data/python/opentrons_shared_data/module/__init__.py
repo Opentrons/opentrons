@@ -17,6 +17,7 @@ from .types import (
     ModuleDefinitionV3,
     ModuleModel,
     TOFSensorBaseline,
+    ModuleOrientation,
 )
 
 

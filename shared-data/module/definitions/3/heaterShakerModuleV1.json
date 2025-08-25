@@ -192,6 +192,19 @@
       }
     }
   },
+  "orientation": {
+    "3": "right",
+    "6": "right",
+    "9": "right",
+    "A1": "left",
+    "A3": "right",
+    "B1": "left",
+    "B3": "right",
+    "C1": "left",
+    "C3": "right",
+    "D1": "left",
+    "D3": "right"
+  },
   "compatibleWith": [],
   "incompatibleWithDecks": []
 }

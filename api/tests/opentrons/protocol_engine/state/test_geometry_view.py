@@ -21,6 +21,7 @@ from opentrons_shared_data import get_shared_data_root, load_shared_data
 from opentrons_shared_data.deck.types import DeckDefinitionV5, CutoutFixture
 from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.labware.types import LabwareUri, LocatingFeatures
+from opentrons_shared_data.module.types import ModuleOrientation
 from opentrons_shared_data.pipette import pipette_definition
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.types import (
@@ -214,6 +215,7 @@ MOCK_ADDRESSABLE_AREA = AddressableArea(
     compatible_module_types=[],
     features=LocatingFeatures(),
     mating_surface_unit_vector=[-1, 1, -1],
+    orientation=ModuleOrientation.NOT_APPLICABLE,
 )
 
 
@@ -274,6 +276,7 @@ def auto_setup_addressable_area_mocks(
             compatible_module_types=[],
             features=LocatingFeatures(),
             mating_surface_unit_vector=[-1, 1, -1],
+            orientation=ModuleOrientation.NOT_APPLICABLE,
         )
 
         decoy.when(
@@ -307,6 +310,7 @@ def auto_setup_addressable_area_mocks(
             compatible_module_types=[],
             features=LocatingFeatures(),
             mating_surface_unit_vector=[-1, 1, -1],
+            orientation=ModuleOrientation.NOT_APPLICABLE,
         )
 
         decoy.when(
@@ -3200,6 +3204,7 @@ def test_get_slot_item(
         compatible_module_types=[],
         features=LocatingFeatures(),
         mating_surface_unit_vector=[-1, 1, -1],
+        orientation=ModuleOrientation.NOT_APPLICABLE,
     )
     subject._addressable_areas = AddressableAreaView(
         state=AddressableAreaState(

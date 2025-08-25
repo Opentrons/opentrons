@@ -101,6 +101,11 @@
       }
     }
   },
+  "orientation": {
+    "3": "right",
+    "6": "right",
+    "9": "right"
+  },
   "compatibleWith": [],
   "incompatibleWithDecks": ["ot3_standard"],
   "uniqueModuleData": {}

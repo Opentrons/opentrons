@@ -48,6 +48,7 @@
   "displayName": "Magnetic Module GEN1",
   "quirks": [],
   "slotTransforms": {},
+  "orientation": {},
   "compatibleWith": [],
   "incompatibleWithDecks": ["ot3_standard"],
   "uniqueModuleData": {}

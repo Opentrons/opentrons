@@ -49,6 +49,7 @@
   "displayName": "Temperature Module GEN1",
   "quirks": [],
   "slotTransforms": {},
+  "orientation": {},
   "compatibleWith": ["temperatureModuleV2"],
   "incompatibleWithDecks": ["ot3_standard"],
   "uniqueModuleData": {}
