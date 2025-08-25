@@ -77,7 +77,11 @@ export function LabwareCardOverflowMenu(
     'adapter'
   )
   const slotName = getSlotInLocationStack(deckSetupLabware[topLabwareId].stack)
-  const fullStack = getFullStackFromLabwares(deckSetupLabware, slotName)
+  const fullStack = getFullStackFromLabwares(
+    deckSetupLabware,
+    slotName,
+    topLabwareId
+  )
   const moduleId = getModuleIdFromStack(fullStack, deckSetupModules)
   const moduleType = moduleId != null ? deckSetupModules[moduleId].type : null
   const labwareAboveAdapter = fullStack[fullStack.indexOf(topLabwareId) - 1]

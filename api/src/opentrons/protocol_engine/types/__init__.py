@@ -68,6 +68,7 @@ from .module import (
     ModuleOffsetData,
     StackerFillEmptyStrategy,
     StackerStoredLabwareGroup,
+    StackerLabwareMovementStrategy,
 )
 from .location import (
     DeckSlotLocation,
@@ -99,7 +100,6 @@ from .labware import (
     LegacyLabwareOffsetCreate,
     LabwareOffsetCreateInternal,
     LoadedLabware,
-    LabwareStackupAncestorDefinition,
     LabwareWellId,
 )
 from .liquid import HexColor, EmptyLiquidId, LiquidId, Liquid, FluidKind, AspiratedFluid
@@ -214,6 +214,7 @@ __all__ = [
     "ModuleOffsetData",
     "StackerFillEmptyStrategy",
     "StackerStoredLabwareGroup",
+    "StackerLabwareMovementStrategy",
     # Locations of things on deck
     "DeckSlotLocation",
     "StagingSlotLocation",
@@ -255,7 +256,6 @@ __all__ = [
     "LabwareOffsetCreateInternal",
     "LoadedLabware",
     "LabwareOffsetVector",
-    "LabwareStackupAncestorDefinition",
     "LabwareWellId",
     # Liquids
     "HexColor",

@@ -30,6 +30,7 @@ export function useAspirateSettingsConfig({
   const { makeSnackbar } = useToaster()
 
   const touchTipEnabled = getIsTouchTipEnabled(state.source)
+  const hasLiquidClass = state.liquidClassName !== 'none'
 
   const aspirateSettingsItems: SettingItem[] = [
     {
@@ -82,7 +83,7 @@ export function useAspirateSettingsConfig({
       option: SETTING_OPTIONS.ASPIRATE_MIX,
       copy: t('mix'),
       value:
-        state.mixOnAspirate !== undefined
+        state.mixOnAspirate !== undefined && hasLiquidClass
           ? t('mix_value', {
               volume: state.mixOnAspirate?.mixVolume,
               reps: state.mixOnAspirate?.repetitions,
@@ -118,7 +119,7 @@ export function useAspirateSettingsConfig({
       option: SETTING_OPTIONS.ASPIRATE_DELAY,
       copy: t('delay'),
       value:
-        state.delayAspirate !== undefined
+        state.delayAspirate !== undefined && hasLiquidClass
           ? t('delay_value', {
               delay: state.delayAspirate.delayDuration,
             })
@@ -167,7 +168,7 @@ export function useAspirateSettingsConfig({
       option: SETTING_OPTIONS.ASPIRATE_AIR_GAP,
       copy: t('air_gap'),
       value:
-        state.airGapAspirate !== undefined
+        state.airGapAspirate !== undefined && hasLiquidClass
           ? t('air_gap_value', { volume: state.airGapAspirate })
           : t('option_disabled'),
       enabled: true,

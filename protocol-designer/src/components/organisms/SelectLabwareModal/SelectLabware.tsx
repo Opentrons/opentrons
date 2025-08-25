@@ -24,6 +24,7 @@ import { getStackerDefinitions } from '../../../pages/Designer/DeckSetup/utils'
 import { TIPRACK_LID_LOADNAME } from '../../../pages/Designer/utils'
 import { SelectLabwareOnAdapter } from './SelectLabwareOnAdapter'
 import { SelectLidOnLabware } from './SelectLidOnLabware'
+import { getIsNestedDefinitionALid } from './utils'
 
 import type { ChangeEvent } from 'react'
 import type { StackingProps } from '@opentrons/components'
@@ -181,7 +182,7 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
                       <Fragment key={`${category}_${loadName}`}>
                         <CustomizeExpandButton
                           enableStackingFF={enableStacking}
-                          loadName={loadName}
+                          isNestedDefALid={getIsNestedDefinitionALid(def)}
                           allowInputField={
                             onFlexStacker || lidLoadNames.includes(loadName)
                           }

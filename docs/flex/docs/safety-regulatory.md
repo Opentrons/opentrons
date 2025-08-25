@@ -49,7 +49,7 @@ Always observe the following electrical safety warnings:
 | ![Symbol for electrical shock](images/regulatory-marks/warning-label-electrical-shock.svg "Electrical shock") | Do not connect (plug in), disconnect (unplug), or use AC power cables if: <ul><li>The cable is frayed or damaged.</li><li>Other attached cables, cords, or receptacles are frayed or damaged.</li></ul> Using damaged power cords can cause an electric shock hazard resulting in serious injury or damage to the robot.                                                           |
 | ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | Do not replace the AC power cable unless at the direction of Opentrons Support.                                                                                            |
 
-For more information on electrical requirements, see the [Power Consumption section][power-consumption] of the Installation and Relocation chapter.
+For more information on electrical requirements, see the [Power Consumption section][power-consumption-flex] of the Installation and Relocation chapter.
 
 ### Additional safety warnings
 

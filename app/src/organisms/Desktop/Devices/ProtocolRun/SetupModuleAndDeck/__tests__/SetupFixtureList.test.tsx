@@ -19,7 +19,7 @@ import { NotConfiguredModal } from '/app/organisms/LocationConflictModal/NotConf
 import { SetupFixtureList } from '../SetupFixtureList'
 
 import type { ComponentProps } from 'react'
-import type { CutoutConfigAndCompatibility } from '/app/resources/deck_configuration/hooks'
+import type { CutoutConfigAndCompatibility } from '@opentrons/shared-data'
 
 vi.mock('/app/resources/deck_configuration/hooks')
 vi.mock('/app/organisms/LocationConflictModal')

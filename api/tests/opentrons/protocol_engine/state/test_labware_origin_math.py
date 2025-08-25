@@ -1,5 +1,5 @@
 """Test suite for _labware_origin_math.py module."""
-from typing import NamedTuple, List
+from typing import NamedTuple, List, Optional
 import pytest
 
 from opentrons.protocols.api_support.deck_type import (
@@ -8,6 +8,7 @@ from opentrons.protocols.api_support.deck_type import (
 )
 from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.labware.labware_definition import (
+    LabwareDefinition,
     LabwareDefinition2,
     LabwareDefinition3,
     Vector3D,
@@ -16,6 +17,8 @@ from opentrons_shared_data.labware.labware_definition import (
     Dimensions,
     Parameters2,
     Parameters3,
+    GripperOffsets,
+    LabwareRole,
 )
 from opentrons_shared_data.deck.types import DeckDefinitionV5
 from opentrons_shared_data.labware.types import (
@@ -27,10 +30,11 @@ from opentrons_shared_data.labware.types import (
     OpentronsFlexTipRackLidAsParentFeature,
 )
 
-from opentrons.types import Point
+from opentrons.types import Point, DeckSlotName
 from opentrons.protocol_engine.state._labware_origin_math import (
     get_stackup_origin_to_labware_origin,
     LabwareOriginContext,
+    LabwareStackupAncestorDefinition,
 )
 from opentrons.protocol_engine.types import (
     ModuleModel,
@@ -43,16 +47,33 @@ from opentrons.protocol_engine.types import (
     ModuleLocation,
     AddressableAreaLocation,
     OnLabwareLocation,
+    DeckSlotLocation,
+    LabwareMovementOffsetData,
+    LabwareOffsetVector,
+    LabwareLocation,
 )
-from opentrons.types import DeckSlotName
 
 
+# Test fixtures for labware definitions
 _LW_V2 = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
     namespace="test",
     version=1,
     schemaVersion=2,
     cornerOffsetFromSlot=Vector3D(x=150, y=250, z=350),
     stackingOffsetWithModule={},
+    gripperOffsets={
+        "default": GripperOffsets(
+            pickUpOffset=Vector3D(x=100, y=200, z=300),
+            dropOffset=Vector3D(x=300, y=200, z=100),
+        ),
+    },
+    stackingOffsetWithLabware={
+        "labware-name": Vector3D(x=0, y=0, z=0),
+        "default": Vector3D(x=0, y=0, z=0),
+        "adapter-labware": Vector3D(x=0, y=0, z=0),
+    },
+    dimensions=Dimensions(xDimension=1000, yDimension=1200, zDimension=750),
+    parameters=Parameters2.model_construct(loadName="labware-name"),  # type: ignore[call-arg]
 )
 
 _LW_V2_WITH_MODULE_STACKING = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
@@ -65,6 +86,7 @@ _LW_V2_WITH_MODULE_STACKING = LabwareDefinition2.model_construct(  # type: ignor
         str(ModuleModel.THERMOCYCLER_MODULE_V1.value): Vector3D(x=200, y=300, z=400),
         str(ModuleModel.THERMOCYCLER_MODULE_V2.value): Vector3D(x=500, y=600, z=700),
     },
+    gripperOffsets={},
 )
 
 _LW_V2_WITH_LABWARE_STACKING = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
@@ -76,6 +98,44 @@ _LW_V2_WITH_LABWARE_STACKING = LabwareDefinition2.model_construct(  # type: igno
         "labware-name": Vector3D(x=50, y=100, z=150),
         "default": Vector3D(x=250, y=350, z=450),
     },
+    gripperOffsets={},
+)
+
+_LW_V2_WITH_DEFAULT_GRIPPER_OFFSETS = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+    namespace="test",
+    version=1,
+    schemaVersion=2,
+    cornerOffsetFromSlot=Vector3D(x=0, y=0, z=0),
+    stackingOffsetWithModule={},
+    dimensions=Dimensions(xDimension=1000, yDimension=1200, zDimension=750),
+    gripperOffsets={
+        "default": GripperOffsets(
+            pickUpOffset=Vector3D(x=10, y=20, z=30),
+            dropOffset=Vector3D(x=40, y=50, z=60),
+        )
+    },
+    stackingOffsetWithLabware={
+        "labware-name": Vector3D(x=50, y=100, z=150),
+        "default": Vector3D(x=250, y=350, z=450),
+    },
+    parameters=Parameters2.model_construct(loadName="labware-name"),  # type: ignore[call-arg]
+)
+
+_LW_V2_WITH_SLOT_SPECIFIC_GRIPPER_OFFSETS = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+    namespace="test",
+    version=1,
+    schemaVersion=2,
+    cornerOffsetFromSlot=Vector3D(x=0, y=0, z=0),
+    stackingOffsetWithLabware={"default": Vector3D(x=0, y=0, z=0)},
+    stackingOffsetWithModule={},
+    dimensions=Dimensions(xDimension=1000, yDimension=1200, zDimension=750),
+    gripperOffsets={
+        "A1": GripperOffsets(
+            pickUpOffset=Vector3D(x=111, y=222, z=333),
+            dropOffset=Vector3D(x=333, y=222, z=111),
+        ),
+    },
+    parameters=Parameters2.model_construct(loadName="adapter-labware"),  # type: ignore[call-arg]
 )
 
 _LW_V2_2 = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
@@ -84,6 +144,7 @@ _LW_V2_2 = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
     schemaVersion=2,
     dimensions=Dimensions(xDimension=1000, yDimension=1200, zDimension=750),
     parameters=Parameters2.model_construct(loadName="labware-name"),  # type: ignore[call-arg]
+    gripperOffsets={},
 )
 
 _LW_V2_3 = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
@@ -96,8 +157,43 @@ _LW_V2_3 = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
         zDimension=1000,
     ),
     parameters=Parameters3.model_construct(loadName="unknown-labware-name"),  # type: ignore[call-arg]
+    gripperOffsets={},
 )
 
+_TC_LID_V2 = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+    namespace="test",
+    version=1,
+    schemaVersion=2,
+    cornerOffsetFromSlot=Vector3D(x=0, y=0, z=0),
+    stackingOffsetWithLabware={"default": Vector3D(x=0, y=0, z=0)},
+    dimensions=Dimensions(xDimension=1000, yDimension=1200, zDimension=750),
+    stackingOffsetWithModule={},
+    parameters=Parameters2.model_construct(loadName="tc_lid"),  # type: ignore[call-arg]
+    allowedRoles=[LabwareRole.lid],
+    gripperOffsets={
+        "lidOffsets": GripperOffsets(
+            pickUpOffset=Vector3D(x=5, y=10, z=15),
+            dropOffset=Vector3D(x=5, y=10, z=15),  # Intentionally same as pickup
+        )
+    },
+)
+
+_AR_LID_V2 = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+    namespace="test",
+    version=1,
+    schemaVersion=2,
+    cornerOffsetFromSlot=Vector3D(x=0, y=0, z=0),
+    stackingOffsetWithLabware={"default": Vector3D(x=0, y=0, z=0)},
+    dimensions=Dimensions(xDimension=1000, yDimension=1200, zDimension=750),
+    stackingOffsetWithModule={},
+    parameters=Parameters2.model_construct(loadName="opentrons_flex_lid_absorbance_plate_reader_module"),  # type: ignore[call-arg]
+    gripperOffsets={
+        "default": GripperOffsets(
+            pickUpOffset=Vector3D(x=7, y=14, z=21),
+            dropOffset=Vector3D(x=28, y=35, z=42),
+        )
+    },
+)
 
 _LW_V3 = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
     namespace="test",
@@ -115,6 +211,7 @@ _LW_V3 = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
         )
     ),
     parameters=Parameters3.model_construct(loadName="labware-v3-basic"),  # type: ignore[call-arg]
+    gripperOffsets={},
 )
 
 _LW_V3_WITH_SLOT_FP_AS_CHILD_FEATURE = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
@@ -132,10 +229,11 @@ _LW_V3_WITH_SLOT_FP_AS_CHILD_FEATURE = LabwareDefinition3.model_construct(  # ty
             backLeft=Vector2D(x=0, y=0), frontRight=Vector2D(x=80, y=60), z=5
         )
     ),
-    stackingOffsetWithLabware={
+    legacyStackingOffsetWithLabware={
         "default": Vector3D(x=0, y=0, z=0),
     },
     parameters=Parameters3.model_construct(loadName="labware-v3-child"),  # type: ignore[call-arg]
+    gripperOffsets={},
 )
 
 _LW_V3_WITH_SLOT_FP_AS_PARENT_FEATURE = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
@@ -154,6 +252,7 @@ _LW_V3_WITH_SLOT_FP_AS_PARENT_FEATURE = LabwareDefinition3.model_construct(  # t
         )
     ),
     parameters=Parameters3.model_construct(loadName="parent-labware-v3"),  # type: ignore[call-arg]
+    gripperOffsets={},
 )
 
 _LW_V3_WITH_SLOT_AS_PARENT_CHILD_FEATURES = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
@@ -175,6 +274,7 @@ _LW_V3_WITH_SLOT_AS_PARENT_CHILD_FEATURES = LabwareDefinition3.model_construct( 
         ),
     ),
     parameters=Parameters3.model_construct(loadName="dual-feature-labware"),  # type: ignore[call-arg]
+    gripperOffsets={},
 )
 
 _LW_V3_WITH_FLEX_TIP_RACK_LID_AS_PARENT = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
@@ -193,6 +293,7 @@ _LW_V3_WITH_FLEX_TIP_RACK_LID_AS_PARENT = LabwareDefinition3.model_construct(  #
         )
     ),
     parameters=Parameters3.model_construct(loadName="flex-tip-rack-lid-parent"),  # type: ignore[call-arg]
+    gripperOffsets={},
 )
 
 _LW_V3_WITH_FLEX_TIP_RACK_LID_AS_CHILD = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
@@ -212,6 +313,57 @@ _LW_V3_WITH_FLEX_TIP_RACK_LID_AS_CHILD = LabwareDefinition3.model_construct(  # 
         "default": Vector3D(x=0, y=0, z=0),
     },
     parameters=Parameters3.model_construct(loadName="flex-tip-rack-lid-child"),  # type: ignore[call-arg]
+    gripperOffsets={},
+)
+
+_LW_V3_WITH_LEGACY_STACKING = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
+    namespace="test",
+    version=1,
+    schemaVersion=3,
+    extents=Extents(
+        total=AxisAlignedBoundingBox3D(
+            backLeftBottom=Vector3D(x=75, y=125, z=175),
+            frontRightTop=Vector3D(x=875, y=-475, z=975),
+        ),
+    ),
+    features=LocatingFeatures(
+        slotFootprintAsChild=SlotFootprintAsChildFeature(
+            backLeft=Vector2D(x=5, y=10), frontRight=Vector2D(x=85, y=50), z=3
+        )
+    ),
+    legacyStackingOffsetWithLabware={
+        "labware-name": Vector3D(x=25, y=35, z=45),
+        "default": Vector3D(x=125, y=225, z=325),
+    },
+    parameters=Parameters3.model_construct(loadName="labware-v3-with-legacy-stacking"),  # type: ignore[call-arg]
+    gripperOffsets={},
+)
+
+_LW_V3_WITH_GRIPPER_OFFSETS = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
+    namespace="test",
+    version=1,
+    schemaVersion=3,
+    extents=Extents(
+        total=AxisAlignedBoundingBox3D(
+            backLeftBottom=Vector3D(x=75, y=125, z=175),
+            frontRightTop=Vector3D(x=875, y=-475, z=975),
+        ),
+    ),
+    features=LocatingFeatures(
+        slotFootprintAsChild=SlotFootprintAsChildFeature(
+            backLeft=Vector2D(x=5, y=10), frontRight=Vector2D(x=85, y=50), z=3
+        )
+    ),
+    legacyStackingOffsetWithLabware={
+        "default": Vector3D(x=125, y=225, z=325),
+    },
+    gripperOffsets={
+        "default": GripperOffsets(
+            pickUpOffset=Vector3D(x=15, y=25, z=35),
+            dropOffset=Vector3D(x=45, y=55, z=65),
+        )
+    },
+    parameters=Parameters3.model_construct(loadName="labware-v3-with-gripper"),  # type: ignore[call-arg]
 )
 
 _MODULE_DEF_TEMP_V2 = ModuleDefinition.model_construct(  # type: ignore[call-arg]
@@ -223,6 +375,24 @@ _MODULE_DEF_TEMP_V2 = ModuleDefinition.model_construct(  # type: ignore[call-arg
         labwareInterfaceXDimension=1000,
         labwareInterfaceYDimension=700,
     ),
+    gripperOffsets={},
+)
+
+_MODULE_DEF_WITH_GRIPPER_OFFSETS = ModuleDefinition.model_construct(  # type: ignore[call-arg]
+    schemaVersion=2,
+    model=ModuleModel.HEATER_SHAKER_MODULE_V1,
+    dimensions=ModuleDimensions(
+        bareOverallHeight=500,
+        overLabwareHeight=600,
+        labwareInterfaceXDimension=1000,
+        labwareInterfaceYDimension=700,
+    ),
+    gripperOffsets={
+        "default": LabwareMovementOffsetData(
+            pickUpOffset=LabwareOffsetVector(x=11, y=22, z=33),
+            dropOffset=LabwareOffsetVector(x=33, y=22, z=11),
+        )
+    },
 )
 
 _MODULE_DEF_TC_V1 = ModuleDefinition.model_construct(  # type: ignore[call-arg]
@@ -232,6 +402,7 @@ _MODULE_DEF_TC_V1 = ModuleDefinition.model_construct(  # type: ignore[call-arg]
         bareOverallHeight=800,
         overLabwareHeight=900,
     ),
+    gripperOffsets={},
 )
 
 _MODULE_DEF_TC_V2 = ModuleDefinition.model_construct(  # type: ignore[call-arg]
@@ -241,6 +412,7 @@ _MODULE_DEF_TC_V2 = ModuleDefinition.model_construct(  # type: ignore[call-arg]
         bareOverallHeight=1000,
         overLabwareHeight=1100,
     ),
+    gripperOffsets={},
 )
 
 _ADDRESSABLE_AREA = AddressableArea(
@@ -302,8 +474,8 @@ class ModuleOverlapSpec(NamedTuple):
 class LabwareOverlapSpec(NamedTuple):
     """Spec data to test labware stacking behavior."""
 
-    child_definition: LabwareDefinition2
-    parent_definition: LabwareDefinition2
+    child_definition: LabwareDefinition
+    parent_definition: LabwareDefinition
     labware_location: OnLabwareLocation
     expected_total_offset: Point
 
@@ -324,6 +496,18 @@ class LabwareV3Spec(NamedTuple):
     parent_definition: object
     labware_location: object
     expected_total_offset: Point
+
+
+class GripperOffsetSpec(NamedTuple):
+    """Spec data to test gripper offset behavior."""
+
+    stackup_lw_info_top_to_bottom: List[tuple[LabwareDefinition, object]]
+    underlying_ancestor_definition: object
+    slot_name: DeckSlotName
+    deck_definition: DeckDefinitionV5
+    module_parent_to_child_offset: Optional[Point]
+    expected_pick_up_offset: Point
+    expected_drop_offset: Point
 
 
 MODULE_OVERLAP_SPECS: List[ModuleOverlapSpec] = [
@@ -381,6 +565,18 @@ LABWARE_OVERLAP_SPECS: List[LabwareOverlapSpec] = [
         parent_definition=_LW_V2_3,
         labware_location=OnLabwareLocation(labwareId="parent-labware-2"),
         expected_total_offset=Point(x=450, y=650, z=950),
+    ),
+    LabwareOverlapSpec(
+        child_definition=_LW_V2_WITH_LABWARE_STACKING,
+        parent_definition=_LW_V3_WITH_SLOT_AS_PARENT_CHILD_FEATURES,
+        labware_location=OnLabwareLocation(labwareId="parent-labware-3"),
+        expected_total_offset=Point(x=440, y=2135, z=742),
+    ),
+    LabwareOverlapSpec(
+        child_definition=_LW_V3_WITH_LEGACY_STACKING,
+        parent_definition=_LW_V2_2,
+        labware_location=OnLabwareLocation(labwareId="parent-v2-labware"),
+        expected_total_offset=Point(x=100, y=385, z=880),
     ),
 ]
 
@@ -440,6 +636,100 @@ LW_V3_SPECS_ON_LW: List[LabwareV3Spec] = [
 ]
 
 
+GRIPPER_OFFSET_SPECS: List[GripperOffsetSpec] = [
+    GripperOffsetSpec(
+        stackup_lw_info_top_to_bottom=[
+            (_LW_V2, DeckSlotLocation(slotName=DeckSlotName.SLOT_3)),
+        ],
+        underlying_ancestor_definition=_ADDRESSABLE_AREA,
+        slot_name=DeckSlotName.SLOT_3,
+        deck_definition=load_deck(STANDARD_OT3_DECK, 5),
+        module_parent_to_child_offset=None,
+        expected_pick_up_offset=Point(x=0, y=0, z=0),
+        expected_drop_offset=Point(x=0, y=0, z=-0.75),
+    ),
+    GripperOffsetSpec(
+        stackup_lw_info_top_to_bottom=[
+            (_LW_V2, ModuleLocation(moduleId="module-id")),
+        ],
+        underlying_ancestor_definition=_MODULE_DEF_WITH_GRIPPER_OFFSETS,
+        slot_name=DeckSlotName.SLOT_1,
+        deck_definition=load_deck(STANDARD_OT3_DECK, 5),
+        module_parent_to_child_offset=Point(x=0, y=0, z=0),
+        expected_pick_up_offset=Point(x=11, y=22, z=33),
+        expected_drop_offset=Point(x=33, y=22, z=11),
+    ),
+    GripperOffsetSpec(
+        stackup_lw_info_top_to_bottom=[
+            (
+                _LW_V2_WITH_DEFAULT_GRIPPER_OFFSETS,
+                OnLabwareLocation(labwareId="parent-id"),
+            ),
+            (_LW_V2, DeckSlotLocation(slotName=DeckSlotName.SLOT_1)),
+        ],
+        underlying_ancestor_definition=_ADDRESSABLE_AREA,
+        slot_name=DeckSlotName.SLOT_1,
+        deck_definition=load_deck(STANDARD_OT3_DECK, 5),
+        module_parent_to_child_offset=None,
+        expected_pick_up_offset=Point(x=10, y=20, z=30),
+        expected_drop_offset=Point(x=40, y=50, z=59.25),
+    ),
+    GripperOffsetSpec(
+        stackup_lw_info_top_to_bottom=[
+            (_LW_V2, OnLabwareLocation(labwareId="adapter-id")),
+            (
+                _LW_V2_WITH_SLOT_SPECIFIC_GRIPPER_OFFSETS,
+                ModuleLocation(moduleId="module-id"),
+            ),
+        ],
+        underlying_ancestor_definition=_MODULE_DEF_WITH_GRIPPER_OFFSETS,
+        slot_name=DeckSlotName.SLOT_C1,
+        deck_definition=load_deck(STANDARD_OT3_DECK, 5),
+        module_parent_to_child_offset=Point(x=0, y=0, z=0),
+        expected_pick_up_offset=Point(x=111, y=222, z=333),
+        expected_drop_offset=Point(x=333, y=222, z=111),
+    ),
+    GripperOffsetSpec(
+        stackup_lw_info_top_to_bottom=[
+            (_TC_LID_V2, OnLabwareLocation(labwareId="adapter-id")),
+            (_LW_V2, ModuleLocation(moduleId="module-id")),
+        ],
+        underlying_ancestor_definition=_MODULE_DEF_TC_V2,
+        slot_name=DeckSlotName.SLOT_B1,
+        deck_definition=load_deck(STANDARD_OT3_DECK, 5),
+        module_parent_to_child_offset=Point(x=0, y=0, z=0),
+        expected_pick_up_offset=Point(x=5, y=10, z=15),
+        expected_drop_offset=Point(x=5, y=10, z=15),
+    ),
+    GripperOffsetSpec(
+        stackup_lw_info_top_to_bottom=[
+            (_AR_LID_V2, DeckSlotLocation(slotName=DeckSlotName.SLOT_3)),
+        ],
+        underlying_ancestor_definition=_ADDRESSABLE_AREA,
+        slot_name=DeckSlotName.SLOT_3,
+        deck_definition=load_deck(STANDARD_OT3_DECK, 5),
+        module_parent_to_child_offset=None,
+        expected_pick_up_offset=Point(x=7, y=14, z=21),
+        expected_drop_offset=Point(x=28, y=35, z=41.25),
+    ),
+    GripperOffsetSpec(
+        stackup_lw_info_top_to_bottom=[
+            (_LW_V3_WITH_GRIPPER_OFFSETS, OnLabwareLocation(labwareId="parent-id")),
+            (
+                _LW_V2_WITH_DEFAULT_GRIPPER_OFFSETS,
+                DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            ),
+        ],
+        underlying_ancestor_definition=_ADDRESSABLE_AREA,
+        slot_name=DeckSlotName.SLOT_1,
+        deck_definition=load_deck(STANDARD_OT3_DECK, 5),
+        module_parent_to_child_offset=None,
+        expected_pick_up_offset=Point(x=15.0, y=25.0, z=35.0),
+        expected_drop_offset=Point(x=45.0, y=55.0, z=64.25),
+    ),
+]
+
+
 @pytest.mark.parametrize(
     argnames=ModuleOverlapSpec._fields,
     argvalues=MODULE_OVERLAP_SPECS,
@@ -459,6 +749,7 @@ def test_get_parent_placement_origin_to_lw_origin_with_module(
             (child_definition, labware_location),
         ],
         underlying_ancestor_definition=module_definition,
+        slot_name=DeckSlotName.SLOT_1,
         module_parent_to_child_offset=module_parent_to_child_offset,
         deck_definition=spec_deck_definition,
     )
@@ -487,6 +778,7 @@ def test_get_parent_placement_origin_to_lw_origin_with_labware(
             ),
         ],
         underlying_ancestor_definition=_ADDRESSABLE_AREA,
+        slot_name=DeckSlotName.SLOT_A1,
         module_parent_to_child_offset=None,
         deck_definition=load_deck(STANDARD_OT3_DECK, 5),
     )
@@ -511,6 +803,7 @@ def test_get_parent_placement_origin_to_lw_origin_with_addressable_area(
             (child_definition, labware_location),
         ],
         underlying_ancestor_definition=addressable_area,
+        slot_name=DeckSlotName.SLOT_A1,
         module_parent_to_child_offset=None,
         deck_definition=load_deck(STANDARD_OT3_DECK, 5),
     )
@@ -535,6 +828,7 @@ def test_get_parent_placement_origin_to_lw_origin_v3_definitions_non_lw(
             (child_definition, labware_location),
         ],
         underlying_ancestor_definition=parent_definition,
+        slot_name=DeckSlotName.SLOT_A1,
         module_parent_to_child_offset=None,
         deck_definition=load_deck(STANDARD_OT3_DECK, 5),
     )
@@ -563,8 +857,210 @@ def test_get_parent_placement_origin_to_lw_origin_v3_definitions(
             ),
         ],
         underlying_ancestor_definition=_ADDRESSABLE_AREA,
+        slot_name=DeckSlotName.SLOT_A1,
         module_parent_to_child_offset=None,
         deck_definition=load_deck(STANDARD_OT3_DECK, 5),
     )
 
     assert result == expected_total_offset
+
+
+def test_v3_child_on_v2_parent_labware() -> None:
+    """Test that v3 labware can stack on v2 labware correctly."""
+    deck_def = load_deck(STANDARD_OT3_DECK, 5)
+
+    # Top-most labware case
+    result = get_stackup_origin_to_labware_origin(
+        context=LabwareOriginContext.PIPETTING,
+        stackup_lw_info_top_to_bottom=[
+            (_LW_V3_WITH_LEGACY_STACKING, OnLabwareLocation(labwareId="parent-id")),
+            (_LW_V2_2, AddressableAreaLocation(addressableAreaName="test_area")),
+        ],
+        underlying_ancestor_definition=_ADDRESSABLE_AREA,
+        slot_name=DeckSlotName.SLOT_A1,
+        module_parent_to_child_offset=None,
+        deck_definition=deck_def,
+    )
+
+    assert result == Point(x=100, y=385, z=880)
+
+    # Non-topmost labware case
+    result_non_topmost = get_stackup_origin_to_labware_origin(
+        context=LabwareOriginContext.PIPETTING,
+        stackup_lw_info_top_to_bottom=[
+            (_LW_V2, OnLabwareLocation(labwareId="adapter-id")),
+            (_LW_V3_WITH_LEGACY_STACKING, OnLabwareLocation(labwareId="parent-id")),
+            (_LW_V2_2, AddressableAreaLocation(addressableAreaName="test_area")),
+        ],
+        underlying_ancestor_definition=_ADDRESSABLE_AREA,
+        slot_name=DeckSlotName.SLOT_A1,
+        module_parent_to_child_offset=None,
+        deck_definition=deck_def,
+    )
+
+    expected_total = Point(x=175, y=760, z=1855)
+
+    assert result_non_topmost == expected_total
+
+
+@pytest.mark.parametrize(
+    argnames=GripperOffsetSpec._fields,
+    argvalues=GRIPPER_OFFSET_SPECS,
+)
+def test_gripper_offsets_for_pickup(
+    stackup_lw_info_top_to_bottom: List[tuple[LabwareDefinition, LabwareLocation]],
+    underlying_ancestor_definition: LabwareStackupAncestorDefinition,
+    slot_name: DeckSlotName,
+    deck_definition: DeckDefinitionV5,
+    module_parent_to_child_offset: Optional[Point],
+    expected_pick_up_offset: Point,
+    expected_drop_offset: Point,
+) -> None:
+    """It should calculate the correct gripper offsets for pick up context."""
+    pick_up_result = get_stackup_origin_to_labware_origin(
+        context=LabwareOriginContext.GRIPPER_PICKING_UP,
+        stackup_lw_info_top_to_bottom=stackup_lw_info_top_to_bottom,
+        underlying_ancestor_definition=underlying_ancestor_definition,
+        slot_name=slot_name,
+        module_parent_to_child_offset=module_parent_to_child_offset,
+        deck_definition=deck_definition,
+    )
+
+    # Baseline without gripper offsets
+    pipetting_result = get_stackup_origin_to_labware_origin(
+        context=LabwareOriginContext.PIPETTING,
+        stackup_lw_info_top_to_bottom=stackup_lw_info_top_to_bottom,
+        underlying_ancestor_definition=underlying_ancestor_definition,
+        slot_name=slot_name,
+        module_parent_to_child_offset=module_parent_to_child_offset,
+        deck_definition=deck_definition,
+    )
+
+    actual_pick_up_offset = pick_up_result - pipetting_result
+
+    assert actual_pick_up_offset == expected_pick_up_offset
+
+
+@pytest.mark.parametrize(
+    argnames=GripperOffsetSpec._fields,
+    argvalues=GRIPPER_OFFSET_SPECS,
+)
+def test_gripper_offsets_for_drop(
+    stackup_lw_info_top_to_bottom: List[tuple[LabwareDefinition, LabwareLocation]],
+    underlying_ancestor_definition: LabwareStackupAncestorDefinition,
+    slot_name: DeckSlotName,
+    deck_definition: DeckDefinitionV5,
+    module_parent_to_child_offset: Optional[Point],
+    expected_drop_offset: Point,
+    expected_pick_up_offset: Point,
+) -> None:
+    """It should calculate the correct gripper offsets for drop context."""
+    drop_result = get_stackup_origin_to_labware_origin(
+        context=LabwareOriginContext.GRIPPER_DROPPING,
+        stackup_lw_info_top_to_bottom=stackup_lw_info_top_to_bottom,
+        underlying_ancestor_definition=underlying_ancestor_definition,
+        slot_name=slot_name,
+        module_parent_to_child_offset=module_parent_to_child_offset,
+        deck_definition=deck_definition,
+    )
+
+    # Baseline without gripper offsets
+    pipetting_result = get_stackup_origin_to_labware_origin(
+        context=LabwareOriginContext.PIPETTING,
+        stackup_lw_info_top_to_bottom=stackup_lw_info_top_to_bottom,
+        underlying_ancestor_definition=underlying_ancestor_definition,
+        slot_name=slot_name,
+        module_parent_to_child_offset=module_parent_to_child_offset,
+        deck_definition=deck_definition,
+    )
+
+    actual_drop_offset = drop_result - pipetting_result
+
+    assert actual_drop_offset == expected_drop_offset
+
+
+def test_gripper_offsets_stacked_labware_with_module() -> None:
+    """Test labware on adapter on module with slot-specific offsets."""
+    deck_def = load_deck(STANDARD_OT3_DECK, 5)
+
+    stackup_lw_info: list[tuple[LabwareDefinition, LabwareLocation]] = [
+        (_LW_V2, OnLabwareLocation(labwareId="adapter-id")),
+        (
+            _LW_V2_WITH_SLOT_SPECIFIC_GRIPPER_OFFSETS,
+            ModuleLocation(moduleId="module-id"),
+        ),
+    ]
+
+    pick_up_result = get_stackup_origin_to_labware_origin(
+        context=LabwareOriginContext.GRIPPER_PICKING_UP,
+        stackup_lw_info_top_to_bottom=stackup_lw_info,
+        underlying_ancestor_definition=_MODULE_DEF_WITH_GRIPPER_OFFSETS,
+        slot_name=DeckSlotName.SLOT_C1,
+        module_parent_to_child_offset=Point(x=0, y=0, z=0),
+        deck_definition=deck_def,
+    )
+
+    pipetting_result = get_stackup_origin_to_labware_origin(
+        context=LabwareOriginContext.PIPETTING,
+        stackup_lw_info_top_to_bottom=stackup_lw_info,
+        underlying_ancestor_definition=_MODULE_DEF_WITH_GRIPPER_OFFSETS,
+        slot_name=DeckSlotName.SLOT_C1,
+        module_parent_to_child_offset=Point(x=0, y=0, z=0),
+        deck_definition=deck_def,
+    )
+
+    expected_pick_up_offset = Point(x=111, y=222, z=333)
+    actual_pick_up_offset = pick_up_result - pipetting_result
+
+    assert actual_pick_up_offset == expected_pick_up_offset
+
+    drop_result = get_stackup_origin_to_labware_origin(
+        context=LabwareOriginContext.GRIPPER_DROPPING,
+        stackup_lw_info_top_to_bottom=stackup_lw_info,
+        underlying_ancestor_definition=_MODULE_DEF_WITH_GRIPPER_OFFSETS,
+        slot_name=DeckSlotName.SLOT_C1,
+        module_parent_to_child_offset=Point(x=0, y=0, z=0),
+        deck_definition=deck_def,
+    )
+
+    expected_drop_offset = Point(x=333, y=222, z=111)
+    actual_drop_offset = drop_result - pipetting_result
+
+    assert actual_drop_offset == expected_drop_offset
+
+
+def test_gripper_offsets_fallback_to_default() -> None:
+    """Test that gripper offsets fall back to default when slot-specific not available."""
+    deck_def = load_deck(STANDARD_OT3_DECK, 5)
+
+    stackup_lw_info: list[tuple[LabwareDefinition, LabwareLocation]] = [
+        (_LW_V2, OnLabwareLocation(labwareId="adapter-id")),
+        (
+            _LW_V2_WITH_DEFAULT_GRIPPER_OFFSETS,
+            ModuleLocation(moduleId="module-id"),
+        ),
+    ]
+
+    pick_up_result = get_stackup_origin_to_labware_origin(
+        context=LabwareOriginContext.GRIPPER_PICKING_UP,
+        stackup_lw_info_top_to_bottom=stackup_lw_info,
+        underlying_ancestor_definition=_MODULE_DEF_WITH_GRIPPER_OFFSETS,
+        slot_name=DeckSlotName.SLOT_D2,
+        module_parent_to_child_offset=Point(x=0, y=0, z=0),
+        deck_definition=deck_def,
+    )
+
+    # Baseline without gripper offsets
+    pipetting_result = get_stackup_origin_to_labware_origin(
+        context=LabwareOriginContext.PIPETTING,
+        stackup_lw_info_top_to_bottom=stackup_lw_info,
+        underlying_ancestor_definition=_MODULE_DEF_WITH_GRIPPER_OFFSETS,
+        slot_name=DeckSlotName.SLOT_D2,
+        module_parent_to_child_offset=Point(x=0, y=0, z=0),
+        deck_definition=deck_def,
+    )
+
+    expected_pick_up_offset = Point(x=111, y=222, z=333)
+    actual_pick_up_offset = pick_up_result - pipetting_result
+
+    assert actual_pick_up_offset == expected_pick_up_offset

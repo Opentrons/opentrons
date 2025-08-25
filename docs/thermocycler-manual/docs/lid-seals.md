@@ -2,8 +2,6 @@
 title: "Thermocycler Module: Thermocycler Lid Seals"
 ---
 
-# Thermocycler Lid Seals
-
 The Thermocycler GEN2 accepts two different plate seals to help protect PCR samples: the disposable [Opentrons Tough PCR Auto-sealing Lid](https://opentrons.com/products/opentrons-flex-tough-auto-sealing-lids-20-count) and the reusable [GEN2 automation seals](https://opentrons.com/products/gen2-thermocycler-seals).
 
 ## Disposable PCR Lids

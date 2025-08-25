@@ -5,17 +5,29 @@ import random
 
 from opentrons import protocol_api
 from opentrons import types
+from opentrons.protocol_api import ProtocolContext, ParameterContext
+from opentrons.protocol_api.module_contexts import (
+    FlexStackerContext,
+)
 
 metadata = {
-    "ctxName": "gripper test with modules",
+    "ctxName": "pipette gripper test with modules",
 }
 
-requirements = {"robotType": "OT-3", "apiLevel": "2.15"}
+requirements = {"robotType": "OT-3", "apiLevel": "2.25"}
 
 
 def run(protocol: protocol_api.ProtocolContext):
     # LABWARE AND MODULES
 
+    # Trash
+    trash = protocol.load_trash_bin(location="A3")
+
+    # STACKERS
+    stacker: FlexStackerContext = protocol.load_module(
+        "flexStackerModuleV1",
+        "B4",  # type: ignore[attr-defined]
+    )
     heatershaker = protocol.load_module("heaterShakerModuleV1", location="D1")
     hs_pcr_adapter = heatershaker.load_adapter("opentrons_96_pcr_adapter")
     hs_deepwell_adapter = protocol.load_adapter(
@@ -37,14 +49,43 @@ def run(protocol: protocol_api.ProtocolContext):
 
     plate_384_1 = protocol.load_labware("biorad_384_wellplate_50ul", location="C1")
     reservoir = protocol.load_labware("nest_12_reservoir_15ml", location="B3")
-    tiprack_50 = protocol.load_labware("opentrons_flex_96_tiprack_50ul", location="A2")
-    tiprack_200 = protocol.load_labware(
-        "opentrons_flex_96_tiprack_200ul", location="B2"
-    )
-    tiprack_1000 = protocol.load_labware(
-        "opentrons_flex_96_tiprack_1000ul", location="C2"
-    )
+    # tiprack_50 = protocol.load_labware("opentrons_flex_96_tiprack_50ul", location="A2")
+    # tiprack_200 = protocol.load_labware(
+    #     "opentrons_flex_96_tiprack_200ul", location="B2"
+    # )
+    # tiprack_1000 = protocol.load_labware(
+    #     "opentrons_flex_96_tiprack_1000ul", location="C2"
+    # )
 
+    stacker.set_stored_labware(
+        load_name="opentrons_flex_96_tiprack_50ul",
+        count=1,
+        lid="opentrons_flex_tiprack_lid",
+    )
+    tiprack_50 = stacker.retrieve()
+    protocol.move_labware(tiprack_50, "A2", use_gripper=True)
+
+    stacker.set_stored_labware(
+        load_name="opentrons_flex_96_tiprack_200ul",
+        count=1,
+        lid="opentrons_flex_tiprack_lid",
+    )
+    tiprack_200 = stacker.retrieve()
+    protocol.move_labware(tiprack_200, "B2", use_gripper=True)
+
+    stacker.set_stored_labware(
+        load_name="opentrons_flex_96_tiprack_1000ul",
+        count=1,
+        lid="opentrons_flex_tiprack_lid",
+    )
+    tiprack_1000 = stacker.retrieve()
+    protocol.move_labware(tiprack_1000, "C2", use_gripper=True)
+
+    protocol.move_lid(source_location=tiprack_50, new_location=trash, use_gripper=True)
+    protocol.move_lid(source_location=tiprack_200, new_location=trash, use_gripper=True)
+    protocol.move_lid(
+        source_location=tiprack_1000, new_location=trash, use_gripper=True
+    )
     # LOAD PIPETTES
     p1000 = protocol.load_instrument(
         "flex_1channel_1000", "left", tip_racks=[tiprack_1000, tiprack_200, tiprack_50]

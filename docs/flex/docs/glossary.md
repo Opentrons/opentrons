@@ -282,7 +282,7 @@ Aluminum blocks that attach to the Heater-Shaker and hold labware. See the [Ther
 
 ##### Thermal block
 
-Aluminum blocks that attach to the Temperature Module and hold labware to facilitate heating, cooling, and maintaining temperature. See the [Thermal blocks section][thermal-blocks] in the Modules chapter.
+Aluminum blocks that attach to the Temperature Module and hold labware to facilitate heating, cooling, and maintaining temperature. See the [Thermal blocks section][thermal-blocks-flex] in the Modules chapter.
 
 ##### Thermocycler profile
 

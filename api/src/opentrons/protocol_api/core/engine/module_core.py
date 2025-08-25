@@ -24,6 +24,7 @@ from opentrons.protocol_engine.types import (
     ABSMeasureMode,
     StackerFillEmptyStrategy,
     StackerStoredLabwareGroup,
+    StackerLabwareMovementStrategy,
 )
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
@@ -747,6 +748,7 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore[LabwareCore]):
         self._engine_client.execute_command(
             cmd.flex_stacker.StoreParams(
                 moduleId=self.module_id,
+                strategy=StackerLabwareMovementStrategy.AUTOMATIC,
             )
         )
 

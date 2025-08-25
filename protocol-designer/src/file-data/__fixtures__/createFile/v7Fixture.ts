@@ -251,6 +251,7 @@ export const robotStateTimeline: Timeline = {
       ],
       robotState: initialRobotState,
       warnings: [],
+      stepNumber: 1,
     },
   ],
   errors: null,
@@ -271,6 +272,7 @@ export const savedStepForms: SavedStepFormState = {
   },
   moveLiquidStepId: {
     id: 'moveLiquidStepId',
+    stepNumber: 1,
     stepType: 'moveLiquid',
     stepName: 'transfer',
     stepDetails: '',

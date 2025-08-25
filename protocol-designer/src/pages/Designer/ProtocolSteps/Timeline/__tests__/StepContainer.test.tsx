@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen, within } from '@testing-library/react'
 
 import { COLORS } from '@opentrons/components'
 
@@ -11,33 +11,25 @@ import { i18n } from '/protocol-designer/assets/localization'
 import { getUnsavedForm } from '/protocol-designer/step-forms/selectors'
 import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 
-import { StepContainer } from '../StepContainer'
+import { ConnectedStepContainer } from '../StepContainer'
 import { StepOverflowMenu } from '../StepOverflowMenu'
 
 import type { ComponentProps } from 'react'
-import type { OverflowBtn } from '@opentrons/components'
 
 vi.mock('/protocol-designer/step-forms/selectors')
 vi.mock('/protocol-designer/ui/steps/actions/actions')
 vi.mock('/protocol-designer/ui/steps/selectors')
 vi.mock('../StepOverflowMenu')
 vi.mock('/protocol-designer/top-selectors/labware-locations')
-vi.mock('@opentrons/components', async importOriginal => {
-  const actual = await importOriginal<typeof OverflowBtn>()
-  return {
-    ...actual,
-    OverflowBtn: () => <div>mock OverflowBtn</div>,
-  }
-})
 
-const render = (props: ComponentProps<typeof StepContainer>) => {
-  return renderWithProviders(<StepContainer {...props} />, {
+const render = (props: ComponentProps<typeof ConnectedStepContainer>) => {
+  return renderWithProviders(<ConnectedStepContainer {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
 describe('StepContainer', () => {
-  let props: ComponentProps<typeof StepContainer>
+  let props: ComponentProps<typeof ConnectedStepContainer>
 
   beforeEach(() => {
     props = {
@@ -92,8 +84,11 @@ describe('StepContainer', () => {
     expect(screen.getByTestId('StepContainer_mockStepId')).toHaveStyle(
       `color: ${COLORS.white}`
     )
-    screen.getByText('mock OverflowBtn')
-    fireEvent.click(screen.getByText('mock OverflowBtn'))
+    fireEvent.click(
+      within(screen.getByTestId('StepContainer_mockStepId')).getByTestId(
+        'StepContainer_OverflowBtn'
+      )
+    )
     screen.getByText('mock StepOverflowMenu')
   })
 
@@ -122,6 +117,7 @@ describe('StepContainer', () => {
       setOpenedOverflowMenuId: vi.fn(),
     }
     render(props)
+    console.log(screen.getByTestId('StepContainer_mockStepId'))
     expect(screen.getByTestId('StepContainer_mockStepId')).toHaveStyle(
       `background-color: ${COLORS.red50}`
     )

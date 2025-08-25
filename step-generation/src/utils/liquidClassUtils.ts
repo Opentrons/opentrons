@@ -1,5 +1,3 @@
-import last from 'lodash/last'
-
 import { getAllLiquidClassDefs } from '@opentrons/shared-data'
 
 import {
@@ -14,8 +12,6 @@ import type {
   DistributeArgs,
   InnerMixArgs,
   LabwareEntities,
-  PipetteEntity,
-  RobotState,
   TransferArgs,
 } from '../types'
 
@@ -257,27 +253,12 @@ const getBlowoutPythonLocation = (
 }
 
 export const getPythonAssignTipRacksString = (args: {
-  pipetteEntity: PipetteEntity
   labwareEntities: LabwareEntities
-  labwareState: RobotState['labware']
-  tiprackURI: string
+  tiprackIds: string[]
 }): string => {
-  const { pipetteEntity, labwareEntities, labwareState, tiprackURI } = args
-  const { pythonName: pythonPipetteName } = pipetteEntity
-  if (pipetteEntity.tiprackDefURI.length > 1) {
-    const assignedTipRackPythonNames = Object.keys(labwareEntities).reduce<
-      string[]
-    >((acc, id) => {
-      const isOffDeck = last(labwareState[id].stack) === 'offDeck'
-      if (labwareEntities[id].labwareDefURI === tiprackURI && !isOffDeck) {
-        return [...acc, labwareEntities[id].pythonName]
-      }
-      return acc
-    }, [])
-
-    return `${pythonPipetteName}.tip_racks = [${assignedTipRackPythonNames.join(
-      ', '
-    )}]\n`
-  }
-  return ''
+  const { labwareEntities, tiprackIds } = args
+  const tiprackPythonNames = tiprackIds.map(
+    id => labwareEntities[id].pythonName
+  )
+  return `tip_racks=[${tiprackPythonNames.join(', ')}]`
 }

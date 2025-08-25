@@ -2,8 +2,6 @@
 title: "Heater-Shaker Module: Before You Begin"
 ---
 
-# Before You Begin
-
 Review this section for important information about deck placement, alignment, and anchor adjustments for the Heater-Shaker.
 
 ## Flex Caddies
