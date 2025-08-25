@@ -283,7 +283,7 @@ async def _test_plunger(
     continue_after_stall: bool,
 ) -> float:
     # start at HIGHEST (easiest) current
-    currents = sorted(list(PLUNGER_CURRENTS_SPEED.keys()), reverse=True)
+    currents = sorted(list(PLUNGER_CURRENTS_SPEED.keys()), reverse=False)
     max_failed_current = 0.0
     for current in currents:
         ui.print_title(f"CURRENT = {current}")
