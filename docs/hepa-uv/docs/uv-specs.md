@@ -2,8 +2,6 @@
 title: "HEPA/UV Module: UV Specifications"
 ---
 
-# UV Specifications
-
 The HEPA/UV Module holds two compact fluorescent UV bulbs. When on, the bulbs emit UV-C at the 254 nm wavelength. At this wavelength, UV-C disinfects by killing or damaging the genetic material found in various microorganisms. After a 15-minute exposure cycle, the ultraviolet light produced is sufficient to achieve log-4 (99.99%) inactivation of commonly targeted microorganisms within the enclosure.
 
 ## Safety features

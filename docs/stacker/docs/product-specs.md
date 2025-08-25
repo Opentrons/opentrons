@@ -2,8 +2,6 @@
 title: "Flex Stacker: Product Specifications"
 ---
 
-# Product Specifications
-
 ![Stacker with labels identifying main features](images/parts-map4.png)
 
 ## Stacker Box Parts

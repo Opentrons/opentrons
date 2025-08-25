@@ -2,8 +2,6 @@
 title: "Flex Stacker: Pre-installation Information"
 ---
 
-# Pre-installation Information
-
 Review this section for important information about Stacker placement, deck adapters, the power/data hub, and other components.
 
 ## Deck Locations
@@ -18,7 +16,7 @@ After your Stacker is attached to the deck and powered on, instructions and anim
     <img src="../images/deck-map.png" alt="Touchscreen deck map">
 </figure>
 
-Because you can install a Stacker anywhere in column 4, and connect it to any port on the power/data hub, the touchscreen setup process gives you the opportunity to tell Flex where this module is on the deck. See [Post-Installation Procedures](postinstall.md).
+Because you can install a Stacker anywhere in column 4, and connect it to any port on the power/data hub, the touchscreen setup process gives you the opportunity to tell Flex where this module is on the deck. See [Post-Installation Procedures](post-installation.md).
 
 ## Deck Adapters
 
@@ -59,7 +57,7 @@ The following table lists and describes the function of each cable.
     </tr>
     <tr>
         <td>AUX</td>
-        <td><a href="https://insights.opentrons.com/hubfs/Products/Flex/Opentrons%20Flex%20manual%20REV3.pdf#page=61">Emergency Stop Pendant</a> (E-stop) and power/data hub connections.</td>
+        <td><a href="../../flex/system-description/e-stop/">Emergency Stop Pendant</a> (E-stop) and power/data hub connections.</td>
         <td>
             <p>This is a 12-pin threaded connector that connects the E-stop to the hub and the hub to the robot.</p>
             <p>When attaching the E-stop or AUX cable, look for an arrow on the connector. This is an alignment mark. This mark should be facing up and towards the AUX port.</p>

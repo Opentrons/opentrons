@@ -2,8 +2,6 @@
 title: "HEPA/UV Module: Additional Product Information"
 ---
 
-# Additional Product Information
-
 ## Warranty
 
 All hardware purchased from Opentrons is covered under a 1-year standard warranty. Opentrons warrants to the end-user of the products that they will be free of manufacturing defects due to part quality issues or poor workmanship and also warrants that the products will materially conform to Opentrons’ published specifications.

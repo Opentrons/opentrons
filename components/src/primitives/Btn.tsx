@@ -67,35 +67,6 @@ export const Btn: StyledComponent<
 `
 
 /**
- * Secondary button variant
- *
- * @component
- */
-// export const SecondaryBtn = styled(Btn)`
-//   ${BUTTON_VARIANT_STYLE}
-//   background-color: ${Styles.C_WHITE};
-//   border-width: ${Styles.BORDER_WIDTH_DEFAULT};
-//   color: ${Styles.C_DARK_GRAY};
-
-//   &:hover,
-//   &:focus {
-//     background-color: ${Styles.C_LIGHT_GRAY};
-//   }
-
-//   &:active {
-//     background-color: ${Styles.C_MED_LIGHT_GRAY};
-//   }
-
-//   &:disabled,
-//   &.disabled {
-//     background-color: ${Styles.C_WHITE};
-//     color: ${Styles.C_MED_GRAY};
-//   }
-
-//   ${styleProps}
-// `
-
-/**
  * New primary button variant used in app
  *
  * @component
