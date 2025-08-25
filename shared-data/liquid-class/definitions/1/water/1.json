@@ -3983,7 +3983,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[1.0, 200.0]],
+            "flowRateByVolume": [[1.0, 6.5]],
             "correctionByVolume": [[0.0, 0.0]],
             "preWet": false,
             "mix": {
@@ -4037,7 +4037,7 @@
                 "enable": true,
                 "params": {
                   "location": "destination",
-                  "flowRate": 200.0
+                  "flowRate": 80.0
                 }
               },
               "touchTip": {
@@ -4063,7 +4063,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[1.0, 200.0]],
+            "flowRateByVolume": [[1.0, 80.0]],
             "correctionByVolume": [[0.0, 0.0]],
             "mix": {
               "enable": false,
@@ -4073,10 +4073,7 @@
               }
             },
             "pushOutByVolume": [
-              [1.0, 7.0],
-              [5.0, 2.0],
-              [10.0, 2.0],
-              [50.0, 5.0]
+              [1.0, 5.0]
             ],
             "delay": {
               "enable": false,
@@ -4122,7 +4119,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 200.0
+                  "flowRate": 80.0
                 }
               },
               "touchTip": {
@@ -4148,7 +4145,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[1.0, 200.0]],
+            "flowRateByVolume": [[1.0, 80.0]],
             "correctionByVolume": [[0.0, 0.0]],
             "conditioningByVolume": [
               [1.0, 5.0],
@@ -4199,8 +4196,8 @@
               },
               "speed": 35,
               "airGapByVolume": [
-                [1.0, 1.0],
-                [49.0, 1.0],
+                [1.0, 0.1],
+                [49.0, 0.1],
                 [50.0, 0.0]
               ],
               "touchTip": {
@@ -4226,7 +4223,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[1.0, 200.0]],
+            "flowRateByVolume": [[1.0, 6.5]],
             "correctionByVolume": [[0.0, 0.0]],
             "preWet": false,
             "mix": {
@@ -4280,7 +4277,7 @@
                 "enable": true,
                 "params": {
                   "location": "destination",
-                  "flowRate": 200.0
+                  "flowRate": 80.0
                 }
               },
               "touchTip": {
@@ -4306,7 +4303,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[1.0, 200.0]],
+            "flowRateByVolume": [[1.0, 80.0]],
             "correctionByVolume": [[0.0, 0.0]],
             "mix": {
               "enable": false,
@@ -4365,7 +4362,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 200.0
+                  "flowRate": 80.0
                 }
               },
               "touchTip": {
@@ -4391,7 +4388,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[1.0, 200.0]],
+            "flowRateByVolume": [[1.0, 80.0]],
             "correctionByVolume": [[0.0, 0.0]],
             "conditioningByVolume": [
               [1.0, 5.0],
@@ -4442,8 +4439,9 @@
               },
               "speed": 35,
               "airGapByVolume": [
-                [1.0, 5.0],
-                [195.0, 5.0],
+                [1.0, 2],
+                [50, 3.5],
+                [198.0, 2.0],
                 [200.0, 0.0]
               ],
               "touchTip": {
@@ -4469,7 +4467,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[1.0, 200.0]],
+            "flowRateByVolume": [[1.0, 80.0]],
             "correctionByVolume": [[0.0, 0.0]],
             "preWet": false,
             "mix": {
@@ -4523,7 +4521,7 @@
                 "enable": true,
                 "params": {
                   "location": "destination",
-                  "flowRate": 200.0
+                  "flowRate": 80.0
                 }
               },
               "touchTip": {
@@ -4549,7 +4547,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[1.0, 200.0]],
+            "flowRateByVolume": [[1.0, 80.0]],
             "correctionByVolume": [[0.0, 0.0]],
             "mix": {
               "enable": false,
@@ -4560,8 +4558,8 @@
             },
             "pushOutByVolume": [
               [1.0, 5.0],
-              [5.0, 2.0],
-              [50.0, 2.0],
+              [5.0, 5.0],
+              [50.0, 5.0],
               [200.0, 5.0]
             ],
             "delay": {
@@ -4608,7 +4606,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 200.0
+                  "flowRate": 80.0
                 }
               },
               "touchTip": {
@@ -4712,7 +4710,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[1.0, 200.0]],
+            "flowRateByVolume": [[1.0, 80.0]],
             "correctionByVolume": [[0.0, 0.0]],
             "preWet": false,
             "mix": {
@@ -4766,7 +4764,7 @@
                 "enable": true,
                 "params": {
                   "location": "destination",
-                  "flowRate": 200.0
+                  "flowRate": 80.0
                 }
               },
               "touchTip": {
@@ -4792,7 +4790,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[1.0, 200.0]],
+            "flowRateByVolume": [[1.0, 80.0]],
             "correctionByVolume": [[0.0, 0.0]],
             "mix": {
               "enable": false,
@@ -4803,7 +4801,7 @@
             },
             "pushOutByVolume": [
               [1.0, 5.0],
-              [5.0, 2.0],
+              [5.0, 5.0],
               [50.0, 2.0],
               [200.0, 5.0]
             ],
@@ -4851,7 +4849,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 200.0
+                  "flowRate": 80.0
                 }
               },
               "touchTip": {
@@ -4877,7 +4875,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[1.0, 200.0]],
+            "flowRateByVolume": [[1.0, 80.0]],
             "correctionByVolume": [[0.0, 0.0]],
             "conditioningByVolume": [
               [1.0, 5.0],
