@@ -2,8 +2,6 @@
 title: "Opentrons Flex: Quick Transfer"
 ---
 
-# Quick Transfer
-
 Quick transfer is a touchscreen-only feature that lets you create, save, and run simple procedures that move liquid from a source to a destination, all without creating a protocol or writing code. Available starting in robot software version 8.0.0, this feature is ideal for preparing labware you need to use in other, more complex procedures. For example, you can use quick transfers to:
 
 - Provision well plates with a reagent, buffer, or other liquid.
@@ -32,7 +30,7 @@ From the Quick Transfer tab on the touchscreen, tap **+ Quick transfer.** This s
 
 ## Deck slots and hardware requirements
 
-Quick transfers require a Flex pipette, a tip rack in slot B2, source labware in slot C2, and destination labware in slot D2. For tip disposal, quick transfer relies on the robot's [deck configuration][deck-configuration] to determine where the trash bin or waste chute is on the deck. It shows the trash bin in slot A3 if no trash container is configured. You cannot use the gripper, modules, and custom labware in a quick transfer.
+Quick transfers require a Flex pipette, a tip rack in slot B2, source labware in slot C2, and destination labware in slot D2. For tip disposal, quick transfer relies on the robot's [deck configuration](deck-config.md) to determine where the trash bin or waste chute is on the deck. It shows the trash bin in slot A3 if no trash container is configured. You cannot use the gripper, modules, and custom labware in a quick transfer.
 
 <figure class="screenshot" markdown>
 ![Quick transfer deck setup with trash bin in A3, tip rack in B2, source labware in C2, and destination labware in D2.](../images/quick-transfer-deck.png "Quick transfer deck setup")

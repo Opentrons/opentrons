@@ -2,8 +2,6 @@
 title: "HEPA/UV Module: Unboxing and Installation"
 ---
 
-# Unboxing and installation
-
 Ask a lab partner for help with unboxing, lifting, and attaching the module. For tools, you will need scissors and the 2.5 mm hex screwdriver that comes in the Module User Kit.
 
 !!! note

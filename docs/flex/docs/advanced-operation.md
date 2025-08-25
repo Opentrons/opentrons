@@ -2,8 +2,6 @@
 title: "Opentrons Flex: Advanced Operation"
 ---
 
-# Advanced Operation
-
 Flex provides methods of advanced control that let you directly manipulate files on the robot and execute commands outside of protocols.
 
 ## Command line operation over SSH

@@ -2,8 +2,6 @@
 title: "Flex Stacker: Post-installation Procedures"
 ---
 
-# Post-installation Procedures
-
 ## Touchscreen Instructions
 
 After attaching and powering on the robot and Stacker, instructions on the touchscreen will guide you through these final steps:
