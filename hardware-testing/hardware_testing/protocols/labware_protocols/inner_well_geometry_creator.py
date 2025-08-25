@@ -124,14 +124,6 @@ def add_parameters(parameters: ParameterContext) -> None:
                 "display_name": "dorf500",
                 "value": "eppendorf_96_wellplate_500ul_custom",
             },
-<<<<<<< HEAD
-            {
-                "display_name": "dorf1000",
-                "value": "eppendorf_96_wellplate_1000ul_custom",
-            },
-
-=======
->>>>>>> c19b1419a3de2da39d0080b772cb28f4c4e21935
         ],
         default="eppendorf_96_wellplate_1000ul_custom",
     )
@@ -553,12 +545,12 @@ def run(ctx: ProtocolContext) -> None:
         udv_table.append(trial_data)
         _write_line_to_csv(ctx, [str(d) for d in trial_data])
 
-    def reload_labware(labware: Labware, labware_type: str) -> None:
+    def reload_labware(labware: Labware, labware_type: str) -> Labware :
         print("reloading labware")
         ctx.move_labware(labware, OFF_DECK, use_gripper=False)
-        labware = ctx.load_labware(labware_type, SLOT_LABWARE)
-        labware.load_empty(labware.wells())
-        return labware
+        new_labware = ctx.load_labware(labware_type, SLOT_LABWARE)
+        new_labware.load_empty(labware.wells())
+        return new_labware
 
     # Begin Protocol
 
