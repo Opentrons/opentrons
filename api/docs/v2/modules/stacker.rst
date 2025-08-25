@@ -37,17 +37,17 @@ Next, you'll need to define the type and amount of labware the Stacker will stor
 
 Each Stacker can hold a labware stack of up to:
 
-- 7 Flex tipracks with lids (6 in the Stacker and 1 on the shuttle)
+- 7 Flex tip racks with lids (6 in the Stacker and 1 on the shuttle)
 - 48 PCR plates, like ``opentrons_96_wellplate_200ul_pcr_full_skirt``
 - 16 deep well plates, like ``nest_96_wellplate_2ml_deep``
 
-You'll need to use :py:meth:`~.FlexStackerContext.set_stored_labware` to configure the Stacker before adding or removing labware during a protocol. 
+You'll need to use :py:meth:`~.FlexStackerContext.set_stored_labware` to configure and load the type of labware you want to store in the Stacker. 
 
 .. code-block:: python
 
    stacker_1.set_stored_labware(
        load_name="opentrons_flex_96_tiprack_200ul",
-       count=6,
+       count=5,
        lid="opentrons_flex_tiprack_lid"
    )
    stacker_2.set_stored_labware(
@@ -55,9 +55,9 @@ You'll need to use :py:meth:`~.FlexStackerContext.set_stored_labware` to configu
        count=12
    )
 
-In this example, ``stacker_1`` is configured to hold 6 Flex tip racks, each with a compatible lid. Flex tip racks must have lids to be properly stored in the Stacker. ``stacker_2`` is configured to hold 12 PCR plates without lids. 
+In this example, ``stacker_1`` is configured to hold 6 Flex tip racks, each with a compatible lid. Flex tip racks must have lids to be properly stored in the Stacker. ``stacker_2`` is configured to hold 12 PCR plates without lids. You must configure each Stacker in your protocol before using :py:meth:`.FlexStackerContext.store` or :py:meth:`.FlexStackerContext.retrieve`. 
 
-Configuring the Stacker assigns a labware stack to this deck slot. You can use the Stacker and shuttle as a normal deck slot earlier in your protocol with :py:meth:`~.ProtocolContext.load_labware()`. You'll need to move this labware elsewhere on the deck before configuring and using the Stacker for storage.  
+:py:meth:`~.FlexStackerContext.set_stored_labware` assigns a labware stack to the Stacker in this deck slot. You can use the Stacker and shuttle as a normal deck slot earlier in your protocol with :py:meth:`~.ProtocolContext.load_labware()`. You'll need to move this labware elsewhere on the deck before configuring and using the Stacker for storage.  
 
 Stacker Capacity 
 -----------------
@@ -66,7 +66,6 @@ Different labware have varying `z` heights. One well plate might be 2 mm taller 
 
     - `.ModuleContext.get_max_storable_labware()`
     - `.ModuleContext.get_current_storable_labware()` 
-    - `.ModuleContext.get_stored_labware()` 
     
 Use ``get_max_storable_labware()`` or ``get_current_storable_labware()`` to calculate the maximum or current number of labware the Stacker can store, based on either the labware definition or the Stacker's current storage conditions.
 
@@ -98,7 +97,7 @@ To move labware from the deck into a Stacker, use `~.FlexStackerContext.store()`
 
 After placing labware on the shuttle in slot C3, ``stacker_2`` stores another well plate on the bottom of the stack. 
 
-To mark a Stacker as completely full or empty, use `~.FlexStackerContext.fill()` or `~.FlexStackerContext.empty()`::
+You can use :py:meth:`~.FlexStackerContext.fill` to fill the Stacker with as many of its configured labware as it can store. Alternatively, use :py:meth:`~.FlexStackerContext.empty` to remove all labware from the Stacker:: 
 
    # mark the second Stacker as empty
    stacker_2.empty()
@@ -108,6 +107,8 @@ To mark a Stacker as completely full or empty, use `~.FlexStackerContext.fill()`
        load_name="nest_12_reservoir_15ml",
        count=8
    )
-   stacker_2.fill(8, "Add 8 reservoirs to stacker_2.")
+   stacker_1.fill(1, "Add another tip rack to stacker_1.")
 
-Both ``fill()`` and ``empty()`` pause the protocol and allow you to manually add or remove labware from the Stacker. Each method assumes labware is loaded or moved ``off_deck``. 
+Here, ``stacker_2`` is emptied and reconfigured to store NEST reservoirs with ``set_stored_labware()`` and the ``fill`` method adds another Flex tip rack to ``stacker_1``. 
+
+Both ``fill()`` and ``empty()`` methods pause the protocol and allow you to manually add or remove labware from the Stacker. Each method assumes labware is loaded or moved off deck. 
