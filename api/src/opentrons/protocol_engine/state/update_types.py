@@ -5,7 +5,7 @@ from __future__ import annotations
 import dataclasses
 import enum
 import typing
-from typing_extensions import Self, Optional
+from typing_extensions import Self
 from datetime import datetime
 
 from opentrons.hardware_control.nozzle_manager import NozzleMap
@@ -15,6 +15,7 @@ from opentrons.protocol_engine.types import (
     LabwareLocation,
     OnLabwareLocation,
     TipGeometry,
+    TipRackWellState,
     AspiratedFluid,
     LiquidClassRecord,
     ABSMeasureMode,
@@ -250,6 +251,23 @@ class TipsUsedUpdate:
 
 
 @dataclasses.dataclass
+class TipsStateUpdate:
+    """Represents an update that marks tips in a tip rack as the requested state."""
+
+    tip_state: TipRackWellState
+
+    labware_id: str
+    """The labware ID of the tip rack."""
+
+    well_names: list[str]
+    """The exact wells in the tip rack that should be marked as used.
+
+    This is the *full* list, which is probably more than what appeared in the pickUpTip
+    command's params, for multi-channel reasons.
+    """
+
+
+@dataclasses.dataclass
 class LiquidLoadedUpdate:
     """An update from loading a liquid."""
 
@@ -413,7 +431,7 @@ class LoadModuleUpdate:
     definition: ModuleDefinition
     slot_name: DeckSlotName
     requested_model: ModuleModel
-    serial_number: Optional[str]
+    serial_number: typing.Optional[str]
 
 
 @dataclasses.dataclass
@@ -453,6 +471,8 @@ class StateUpdate:
     labware_lid: LabwareLidUpdate | NoChangeType = NO_CHANGE
 
     tips_used: TipsUsedUpdate | NoChangeType = NO_CHANGE
+
+    tips_state: TipsStateUpdate | NoChangeType = NO_CHANGE
 
     liquid_loaded: LiquidLoadedUpdate | NoChangeType = NO_CHANGE
 
@@ -682,7 +702,7 @@ class StateUpdate:
         definition: ModuleDefinition,
         slot_name: DeckSlotName,
         requested_model: ModuleModel,
-        serial_number: Optional[str],
+        serial_number: typing.Optional[str],
     ) -> Self:
         """Add a new module to state. See `LoadModuleUpdate`."""
         self.loaded_module = LoadModuleUpdate(
@@ -726,6 +746,15 @@ class StateUpdate:
             pipette_id=pipette_id,
             tip_geometry=tip_geometry,
             tip_source=tip_source,
+        )
+        return self
+
+    def update_tip_rack_well_state(
+        self: Self, tip_state: TipRackWellState, labware_id: str, well_name: list[str]
+    ) -> Self:
+        """Marks tips in a tip rack to provided tip state. See `TipsStateUpdate`."""
+        self.tips_state = TipsStateUpdate(
+            tip_state=tip_state, labware_id=labware_id, well_names=well_name
         )
         return self
 
