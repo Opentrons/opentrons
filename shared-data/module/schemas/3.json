@@ -188,7 +188,7 @@
           "required": ["screwCenter"],
           "properties": {
             "screwCenter": {
-              "description": "The +x,+y,+z coordinate offset measured from the module's X/Y labware interface dimension origin to the center of the threaded hole. The +z is 0 by convention.",
+              "description": "The +x,+y,+z coordinate offset measured from the module's X/Y labware interface dimension origin to the center of the threaded hole. The +z is 0 by convention. When the threaded hole is located in a spring-loaded plate, the z represents the top of the threaded hole when the plate is compressed.",
               "$ref": "#/definitions/vector3D"
             }
           }
