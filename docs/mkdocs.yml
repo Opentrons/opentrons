@@ -7,11 +7,11 @@ nav:
   - Modules:
       - Modules home: modules/index.md
       - Flex Stacker: '!include stacker/mkdocs.yml'
+      - Absorbance Plate Reader Module: '!include absorbance-plate-reader/mkdocs.yml'
       - HEPA/UV Module: '!include hepa-uv/mkdocs.yml'
       - Thermocycler Module: '!include thermocycler/mkdocs.yml'
-      - Temperature Module: '!include temperature-module/mkdocs.yml'
-      - Absorbance Plate Reader Module: '!include absorbance-plate-reader/mkdocs.yml'
       - Heater-Shaker Module: '!include heater-shaker/mkdocs.yml'
+      - Temperature Module: '!include temperature-module/mkdocs.yml'
   - Protocol Designer: '!include protocol-designer/mkdocs.yml'
   - Python API: https://docs.opentrons.com/v2/
 
