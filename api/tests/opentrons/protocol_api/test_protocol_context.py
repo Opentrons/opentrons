@@ -769,7 +769,7 @@ def test_load_labware_on_adapter(
         mock_core.load_adapter(
             load_name="lowercase_adapter",
             location=DeckSlotName.SLOT_5,
-            namespace="some_namespace",
+            namespace=None,
             version=None,
         )
     ).then_return(mock_adapter_core)
