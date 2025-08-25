@@ -2,8 +2,6 @@
 title: "Thermocycler Module: Flex Attachment Steps"
 ---
 
-# Flex Attachment Steps
-
 Setting up the Thermocycler on your robot includes attaching it to the deck and running a first-time calibration process. The instructions here and on the touchscreen will help you get started. The tools you need are included in the User Kit that came with your Flex.
 
 ## Attaching the Thermocycler

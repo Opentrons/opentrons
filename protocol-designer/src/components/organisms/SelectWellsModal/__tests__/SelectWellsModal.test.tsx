@@ -50,7 +50,7 @@ describe('SelectWellsModal', () => {
     vi.mocked(SelectableLabware).mockReturnValue(
       <div>mock SelectableLabware</div>
     )
-    vi.mocked(selectors.getLiquidDisplayColors).mockReturnValue([])
+    vi.mocked(selectors.getLiquidDisplayColors).mockReturnValue({})
     vi.mocked(getAllWellContentsForActiveItem).mockReturnValue({})
     vi.mocked(selectors.getLiquidNamesById).mockReturnValue({})
     vi.mocked(getLabwareEntities).mockReturnValue({

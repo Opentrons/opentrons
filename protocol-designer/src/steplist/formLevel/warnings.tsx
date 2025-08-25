@@ -31,6 +31,7 @@ export type FormWarningType =
   | 'MIX_TIP_POSITIONED_LOW_IN_TUBE'
   | 'OVER_MAX_WELL_VOLUME'
   | 'TIP_POSITIONED_LOW_IN_TUBE'
+  | 'VOLUME_OUT_OF_RANGE'
 export type FormWarning = FormError & {
   type: FormWarningType
 }
@@ -64,6 +65,13 @@ const mixTipPositionedLowInTube = (): FormWarning => ({
   title:
     'The default mix height is 1mm from the bottom of the well, which could cause liquid overflow or pipette damage. Edit tip position in advanced settings.',
   dependentFields: ['labware'],
+  location: 'form',
+})
+
+const volumeTooHighInWell = (): FormWarning => ({
+  type: 'VOLUME_OUT_OF_RANGE',
+  title: 'Well volume is out of range',
+  dependentFields: ['volume'],
   location: 'form',
 })
 
@@ -149,6 +157,38 @@ export const maxDispenseWellVolume = (
     return maximum && effectiveVolume > maximum
   })
   return hasExceeded ? overMaxWellVolumeWarning() : null
+}
+
+export const wellVolumeMax = (
+  fields: HydratedMoveLiquidFormData | HydratedMixFormData
+): FormWarning | null => {
+  let labware
+  if (
+    'dispense_labware' in fields &&
+    fields.dispense_labware != null &&
+    fields.stepType === 'moveLiquid'
+  ) {
+    labware = fields.dispense_labware
+  } else if (
+    'labware' in fields &&
+    fields.labware != null &&
+    fields.stepType === 'mix'
+  ) {
+    labware = fields.labware
+  }
+
+  if (labware == null) {
+    return null
+  }
+
+  const dispenseLabwareMaxVolume =
+    'def' in labware ? labware.def?.wells.A1.totalLiquidVolume : null
+
+  return dispenseLabwareMaxVolume != null &&
+    typeof fields.volume === 'string' &&
+    parseFloat(fields.volume) > dispenseLabwareMaxVolume
+    ? volumeTooHighInWell()
+    : null
 }
 
 export const _lowVolumeTransferWarning = (): FormWarning => ({

@@ -849,6 +849,13 @@
         "$ref": "#/definitions/vector3D"
       }
     },
+    "legacyStackingOffsetWithLabware": {
+      "type": "object",
+      "description": "Legacy labware stacking offsets for Labware Schema 2 compatibility. See Labware Schema 2 `stackingOffsetWithLabware` documentation.",
+      "additionalProperties": {
+        "$ref": "#/definitions/vector3D"
+      }
+    },
     "stackingOffsetWithModule": {
       "type": "object",
       "description": "Supported module that can be stacked upon, with overlap height between labware and module.",

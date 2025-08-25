@@ -57,7 +57,6 @@ from ..types import (
     OverlapOffset,
     OnDeckLabwareLocation,
     OFF_DECK_LOCATION,
-    SYSTEM_LOCATION,
 )
 from ..actions import (
     Action,
@@ -1035,32 +1034,6 @@ class LabwareView:
         """Check if labware is a lid."""
         return LabwareRole.lid in self.get_definition(labware_id).allowedRoles
 
-    def raise_if_labware_inaccessible_by_pipette(self, labware_id: str) -> None:
-        """Raise an error if the specified location cannot be reached via a pipette."""
-        labware = self.get(labware_id)
-        labware_location = labware.location
-        if isinstance(labware_location, OnLabwareLocation):
-            return self.raise_if_labware_inaccessible_by_pipette(
-                labware_location.labwareId
-            )
-        elif labware.lid_id is not None:
-            raise errors.LocationNotAccessibleByPipetteError(
-                f"Cannot move pipette to {labware.loadName} "
-                "because labware is currently covered by a lid."
-            )
-        elif isinstance(labware_location, AddressableAreaLocation):
-            if fixture_validation.is_staging_slot(labware_location.addressableAreaName):
-                raise errors.LocationNotAccessibleByPipetteError(
-                    f"Cannot move pipette to {labware.loadName},"
-                    f" labware is on staging slot {labware_location.addressableAreaName}"
-                )
-        elif (
-            labware_location == OFF_DECK_LOCATION or labware_location == SYSTEM_LOCATION
-        ):
-            raise errors.LocationNotAccessibleByPipetteError(
-                f"Cannot move pipette to {labware.loadName}, labware is off-deck."
-            )
-
     def raise_if_labware_in_location(
         self,
         location: OnDeckLabwareLocation,
@@ -1120,7 +1093,9 @@ class LabwareView:
                 raise errors.LabwareCannotBeStackedError(
                     f"Labware {lid_labware_definition.parameters.loadName} cannot be used as a lid in the Flex Stacker."
                 )
-            if not labware_validation.validate_labware_can_be_stacked(
+            if isinstance(
+                lid_labware_definition, LabwareDefinition2
+            ) and not labware_validation.validate_legacy_labware_can_be_stacked(
                 lid_labware_definition, primary_labware_definition.parameters.loadName
             ):
                 raise errors.LabwareCannotBeStackedError(
@@ -1133,7 +1108,9 @@ class LabwareView:
                 raise errors.LabwareCannotBeStackedError(
                     f"Labware {adapter_labware_definition.parameters.loadName} cannot be used as an adapter in the Flex Stacker."
                 )
-            if not labware_validation.validate_labware_can_be_stacked(
+            if isinstance(
+                primary_labware_definition, LabwareDefinition2
+            ) and not labware_validation.validate_legacy_labware_can_be_stacked(
                 primary_labware_definition,
                 adapter_labware_definition.parameters.loadName,
             ):
@@ -1187,9 +1164,9 @@ class LabwareView:
         below_labware = self.get(bottom_labware_id)
         if isinstance(
             top_labware_definition, LabwareDefinition2
-        ) and not labware_validation.validate_labware_can_be_stacked(
-            top_labware_definition=top_labware_definition,
-            below_labware_load_name=below_labware.loadName,
+        ) and not labware_validation.validate_legacy_labware_can_be_stacked(
+            child_labware_definition=top_labware_definition,
+            parent_labware_load_name=below_labware.loadName,
         ):
             raise errors.LabwareCannotBeStackedError(
                 f"Labware {top_labware_definition.parameters.loadName} cannot be loaded onto labware {below_labware.loadName}"

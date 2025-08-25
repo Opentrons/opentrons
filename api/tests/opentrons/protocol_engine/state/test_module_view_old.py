@@ -1042,6 +1042,31 @@ def test_select_hardware_module_to_load_rejects_location_reassignment(
         )
 
 
+def test_select_hardware_module_to_load_allows_stacker_magblock_coexistence(
+    flex_stacker_v1_def: ModuleDefinition,
+    mag_block_v1_def: ModuleDefinition,
+) -> None:
+    """It should allow a stacker to be loaded where a magblock is."""
+    subject = make_module_view(
+        slot_by_module_id={"module-1": DeckSlotName.SLOT_C3},
+        hardware_by_module_id={
+            "module-1": HardwareModule(definition=mag_block_v1_def, serial_number=None)
+        },
+    )
+    attached_modules = [
+        HardwareModule(serial_number="serial-1", definition=flex_stacker_v1_def),
+        HardwareModule(serial_number="serial-2", definition=flex_stacker_v1_def),
+    ]
+    assert subject.select_hardware_module_to_load(
+        model=ModuleModel.FLEX_STACKER_MODULE_V1,
+        location=deck_configuration_provider.get_cutout_id_by_deck_slot_name(
+            DeckSlotName.SLOT_C3
+        ),
+        attached_modules=attached_modules,
+        expected_serial_number="serial-2",
+    ) == HardwareModule(serial_number="serial-2", definition=flex_stacker_v1_def)
+
+
 class _CalculateMagnetHardwareHeightTestParams(NamedTuple):
     definition: ModuleDefinition
     mm_from_base: float

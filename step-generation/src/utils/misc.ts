@@ -955,14 +955,34 @@ export const getModuleIdFromRobotStateStack = (
   return stack?.find(id => modules[id] != null) ?? null
 }
 
+/**
+ * Get the full stack in a slot given labware state
+ * If the slot is offDeck, the offDeckOverrideId must be provided to override the offDeck slot,
+ * since different offDeck stacks specify the same base "slot" being offDeck
+ * @param labware - The labware object containing all labware entities
+ * @param slot - The slot to get the full stack from
+ * @param offDeckOverrideId - Labware ID for an offDeck stack
+ * @returns The full stack from the labware object
+ */
 export const getFullStackFromLabwares = (
   labware: {
     [labwareId: string]: LabwareTemporalProperties
   },
-  slot: string
+  slot: string,
+  offDeckOverrideId?: string
 ): string[] => {
+  if (slot === 'offDeck' && offDeckOverrideId == null) {
+    console.error(
+      'offDeck slot is not allowed to be used without an offDeckOverrideId'
+    )
+    return []
+  }
   return Object.values(labware)
-    .filter(lw => lw.stack.includes(slot))
+    .filter(
+      lw =>
+        lw.stack.includes(slot) &&
+        (offDeckOverrideId == null || lw.stack.includes(offDeckOverrideId))
+    )
     .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack
 }
 

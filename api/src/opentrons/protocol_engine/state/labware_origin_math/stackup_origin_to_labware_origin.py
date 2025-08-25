@@ -309,7 +309,9 @@ def _get_parent_placement_origin_to_lw_origin(
     Only parent-child specific offsets are calculated. Offsets that apply to a single entity
     (ex., module cal) or the entire stackup (ex., LPC) are handled elsewhere.
     """
-    if isinstance(child_labware, LabwareDefinition2):
+    if isinstance(child_labware, LabwareDefinition2) or isinstance(
+        parent_deck_item, LabwareDefinition2
+    ):
         parent_deck_item_origin_to_child_labware_placement_origin = (
             _get_parent_deck_item_origin_to_child_labware_placement_origin(
                 child_labware=child_labware,
@@ -323,22 +325,36 @@ def _get_parent_placement_origin_to_lw_origin(
         # For v2 definitions, cornerOffsetFromSlot is the parent entity placement origin to child labware origin offset.
         # For compatibility with historical (buggy?) behavior,
         # we only consider it when the child labware is the topmost labware in a stackup.
-        parent_deck_item_to_child_labware_offset = (
-            Point.from_xyz_attrs(child_labware.cornerOffsetFromSlot)
-            if is_topmost_labware
-            else Point(0, 0, 0)
-        )
+        if isinstance(child_labware, LabwareDefinition2):
+            parent_deck_item_to_child_labware_offset = (
+                Point.from_xyz_attrs(child_labware.cornerOffsetFromSlot)
+                if is_topmost_labware
+                else Point(0, 0, 0)
+            )
 
-        return (
-            parent_deck_item_origin_to_child_labware_placement_origin
-            + parent_deck_item_to_child_labware_offset
-        )
+            return (
+                parent_deck_item_origin_to_child_labware_placement_origin
+                + parent_deck_item_to_child_labware_offset
+            )
+        else:
+            assert isinstance(child_labware, LabwareDefinition3)
+            parent_deck_item_to_child_labware_back_left = Point(
+                x=0, y=child_labware.extents.total.frontRightTop.y * -1, z=0
+            )
+            child_labware_back_left_to_child_labware_origin = (
+                _get_corner_offset_from_extents(child_labware)
+                if is_topmost_labware
+                else Point(0, 0, 0)
+            )
+
+            return (
+                parent_deck_item_origin_to_child_labware_placement_origin  # Only the Z-offset in this case.
+                + parent_deck_item_to_child_labware_back_left
+                + child_labware_back_left_to_child_labware_origin
+            )
     else:
         # For v3 definitions, get the vector from the back left bottom to the front right bottom.
         assert_type(child_labware, LabwareDefinition3)
-
-        if isinstance(parent_deck_item, LabwareDefinition2):
-            raise NotImplementedError()
 
         # TODO(jh, 06-25-25): This code is entirely temporary and only exists for the purposes of more useful
         #  snapshot testing. This code should exist in NO capacity after features are implemented outside of the
@@ -438,6 +454,17 @@ def _get_parent_deck_item_origin_to_child_labware_placement_origin(
         raise TypeError(f"Unsupported labware location type: {labware_location}")
 
 
+def _get_corner_offset_from_extents(child_labware: LabwareDefinition3) -> Point:
+    """Derive the corner offset from slot from a LabwareDefinition3's extents."""
+    back_left_bottom = child_labware.extents.total.backLeftBottom
+
+    x = back_left_bottom.x
+    y = back_left_bottom.y * -1
+    z = back_left_bottom.z
+
+    return Point(x, y, z)
+
+
 def _module_parent_to_child_offset(
     module_parent_to_child_offset: Point | None,
     labware_location: LabwareLocation,
@@ -473,12 +500,17 @@ def _shim_does_locating_feature_pair_exist(
         parent_deck_item.features.get("screwAnchoredAsParent") is not None
         and child_labware.features.get("heaterShakerUniversalFlatAdapter") is not None
     )
+    screw_anchored_exists = (
+        parent_deck_item.features.get("screwAnchoredAsParent") is not None
+        and child_labware.features.get("screwAnchoredAsChild") is not None
+    )
 
     return (
         slot_footprint_exists
         or flex_tiprack_lid_exists
         or hs_universal_flat_adapter_exists
         or hs_universal_flat_adapter_screw_anchored_exists
+        or screw_anchored_exists
     )
 
 
@@ -951,15 +983,38 @@ def _get_child_labware_overlap_with_parent_labware(
     child_labware: LabwareDefinition, parent_labware_name: str
 ) -> Point:
     """Get the child labware's overlap with the parent labware's load name."""
-    overlap = child_labware.stackingOffsetWithLabware.get(parent_labware_name)
-
-    if overlap is None:
-        overlap = child_labware.stackingOffsetWithLabware.get("default")
-
-    if overlap is None:
-        raise ValueError(
-            f"No default labware overlap specified for parent labware: {parent_labware_name}"
+    if isinstance(child_labware, LabwareDefinition3) and not hasattr(
+        child_labware, "legacyStackingOffsetWithLabware"
+    ):
+        raise NotImplementedError(
+            f"Labware {child_labware.metadata.displayName} contains no legacyStackingOffsetWithLabware. "
+            f"Either add this property explictly on the definition or update your protocol's API Level."
         )
+
+    overlap = (
+        child_labware.stackingOffsetWithLabware.get(parent_labware_name)
+        if isinstance(child_labware, LabwareDefinition2)
+        else child_labware.legacyStackingOffsetWithLabware.get(parent_labware_name)
+    )
+
+    if overlap is None:
+        overlap = (
+            child_labware.stackingOffsetWithLabware.get("default")
+            if isinstance(child_labware, LabwareDefinition2)
+            else child_labware.legacyStackingOffsetWithLabware.get("default")
+        )
+
+    if overlap is None:
+        if isinstance(child_labware, LabwareDefinition3):
+            raise ValueError(
+                f"No default labware overlap specified for parent labware: {parent_labware_name} "
+                f"in legacyStackingOffsetWithLabware."
+            )
+        else:
+            raise ValueError(
+                f"No default labware overlap specified for parent labware: {parent_labware_name} "
+                f"in stackingOffsetWithLabware."
+            )
     else:
         return Point.from_xyz_attrs(overlap)
 

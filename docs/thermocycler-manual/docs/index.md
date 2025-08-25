@@ -5,10 +5,6 @@ hide: toc
 
 <div style="text-align: center;" markdown>
 
-![Opentrons Flex®](../images/opentrons-flex-logo.svg "opentrons-flex-logo.svg"){style="width: 60%"}
-
-# Thermocycler GEN2 Instruction Manual
-
 ![Thermocycler hero cover image](images/thermocycler-hero-cover.png){style="width: 60%"}
 
 **Opentrons Labworks Inc.**<br>

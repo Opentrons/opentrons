@@ -1955,25 +1955,6 @@
       "robot_type": "Flex"
     }
   },
-  "Flex,None,schema3test_96_well_aluminum_block,schema3test_96_wellplate_200ul_pcr_full_skirt": {
-    "coordinates": [
-      342.38,
-      74.76,
-      22.25
-    ],
-    "spec": {
-      "adapter_load_info": [
-        "schema3test_96_well_aluminum_block",
-        999
-      ],
-      "labware_load_info": [
-        "schema3test_96_wellplate_200ul_pcr_full_skirt",
-        999
-      ],
-      "module_load_name": null,
-      "robot_type": "Flex"
-    }
-  },
   "Flex,None,schema3test_aluminum_flat_bottom_plate,schema3test_96_wellplate_200ul_pcr_full_skirt": {
     "coordinates": [
       345.5,
@@ -4121,25 +4102,6 @@
       "robot_type": "Flex"
     }
   },
-  "Flex,flexStackerModuleV1,schema3test_96_well_aluminum_block,schema3test_96_wellplate_200ul_pcr_full_skirt": {
-    "coordinates": [
-      503.5,
-      74.5,
-      53.25
-    ],
-    "spec": {
-      "adapter_load_info": [
-        "schema3test_96_well_aluminum_block",
-        999
-      ],
-      "labware_load_info": [
-        "schema3test_96_wellplate_200ul_pcr_full_skirt",
-        999
-      ],
-      "module_load_name": "flexStackerModuleV1",
-      "robot_type": "Flex"
-    }
-  },
   "Flex,flexStackerModuleV1,schema3test_aluminum_flat_bottom_plate,schema3test_96_wellplate_200ul_pcr_full_skirt": {
     "coordinates": [
       506.5,
@@ -6186,25 +6148,6 @@
       "labware_load_info": [
         "corning_96_wellplate_360ul_flat",
         3
-      ],
-      "module_load_name": "heaterShakerModuleV1",
-      "robot_type": "Flex"
-    }
-  },
-  "Flex,heaterShakerModuleV1,schema3test_96_well_aluminum_block,schema3test_96_wellplate_200ul_pcr_full_skirt": {
-    "coordinates": [
-      342.5,
-      74.5,
-      41.2
-    ],
-    "spec": {
-      "adapter_load_info": [
-        "schema3test_96_well_aluminum_block",
-        999
-      ],
-      "labware_load_info": [
-        "schema3test_96_wellplate_200ul_pcr_full_skirt",
-        999
       ],
       "module_load_name": "heaterShakerModuleV1",
       "robot_type": "Flex"
@@ -8261,25 +8204,6 @@
       "robot_type": "Flex"
     }
   },
-  "Flex,magneticBlockV1,schema3test_96_well_aluminum_block,schema3test_96_wellplate_200ul_pcr_full_skirt": {
-    "coordinates": [
-      342.375,
-      74.375,
-      60.25
-    ],
-    "spec": {
-      "adapter_load_info": [
-        "schema3test_96_well_aluminum_block",
-        999
-      ],
-      "labware_load_info": [
-        "schema3test_96_wellplate_200ul_pcr_full_skirt",
-        999
-      ],
-      "module_load_name": "magneticBlockV1",
-      "robot_type": "Flex"
-    }
-  },
   "Flex,magneticBlockV1,schema3test_aluminum_flat_bottom_plate,schema3test_96_wellplate_200ul_pcr_full_skirt": {
     "coordinates": [
       345.375,
@@ -10331,25 +10255,6 @@
       "robot_type": "Flex"
     }
   },
-  "Flex,temperatureModuleV2,schema3test_96_well_aluminum_block,schema3test_96_wellplate_200ul_pcr_full_skirt": {
-    "coordinates": [
-      342.5,
-      74.5,
-      31.25
-    ],
-    "spec": {
-      "adapter_load_info": [
-        "schema3test_96_well_aluminum_block",
-        999
-      ],
-      "labware_load_info": [
-        "schema3test_96_wellplate_200ul_pcr_full_skirt",
-        999
-      ],
-      "module_load_name": "temperatureModuleV2",
-      "robot_type": "Flex"
-    }
-  },
   "Flex,temperatureModuleV2,schema3test_aluminum_flat_bottom_plate,schema3test_96_wellplate_200ul_pcr_full_skirt": {
     "coordinates": [
       345.5,
@@ -12396,25 +12301,6 @@
       "labware_load_info": [
         "corning_96_wellplate_360ul_flat",
         3
-      ],
-      "module_load_name": "thermocyclerModuleV2",
-      "robot_type": "Flex"
-    }
-  },
-  "Flex,thermocyclerModuleV2,schema3test_96_well_aluminum_block,schema3test_96_wellplate_200ul_pcr_full_skirt": {
-    "coordinates": [
-      -5.625,
-      356.2,
-      33.21
-    ],
-    "spec": {
-      "adapter_load_info": [
-        "schema3test_96_well_aluminum_block",
-        999
-      ],
-      "labware_load_info": [
-        "schema3test_96_wellplate_200ul_pcr_full_skirt",
-        999
       ],
       "module_load_name": "thermocyclerModuleV2",
       "robot_type": "Flex"

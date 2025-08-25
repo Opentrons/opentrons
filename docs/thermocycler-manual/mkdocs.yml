@@ -14,8 +14,8 @@ theme:
       tip: material/lightbulb-on-outline
 
 nav:
-  - Product Description: index.md
-  - Safety and Compliance: compliance.md
+  - Thermocycler GEN2 Instruction Manual: index.md
+  - Safety and Regulatory Compliance: compliance.md
   - Product Specifications: specifications.md
   - Installing the Thermocycler:
       - Before You Begin: preinstall.md

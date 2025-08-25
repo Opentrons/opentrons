@@ -45,7 +45,6 @@ import type {
 import type { CalibrateTipLengthParentProps } from './types'
 
 export { AskForCalibrationBlockModal } from './AskForCalibrationBlockModal'
-export { ConfirmRecalibrationModal } from './ConfirmRecalibrationModal'
 
 const PANEL_BY_STEP: Partial<
   Record<CalibrationSessionStep, ComponentType<CalibrationPanelProps>>
