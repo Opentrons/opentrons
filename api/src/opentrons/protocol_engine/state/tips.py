@@ -93,11 +93,6 @@ class TipStore(HasState[TipState], HandlesActions):
         for well_name in well_names:
             well_states[well_name] = TipRackWellState.USED
 
-    def _set_empty_tips(self, labware_id: str, well_names: Iterable[str]) -> None:
-        well_states = self._state.tips_by_labware_id.get(labware_id, {})
-        for well_name in well_names:
-            well_states[well_name] = TipRackWellState.EMPTY
-
 
 class TipView:
     """Read-only tip state view."""
@@ -141,15 +136,15 @@ class TipView:
                                 starting_column_index = idx
 
                 for column in columns[starting_column_index:]:
-                    if not any(wells[well] == TipRackWellState.USED for well in column):
+                    if all(wells[well] == TipRackWellState.CLEAN for well in column):
                         return column[0]
 
             elif num_tips == len(wells.keys()):  # Get next tips for 96 channel
                 if starting_tip_name and starting_tip_name != columns[0][0]:
                     return None
 
-                if not any(
-                    tip_state == TipRackWellState.USED for tip_state in wells.values()
+                if all(
+                    tip_state == TipRackWellState.CLEAN for tip_state in wells.values()
                 ):
                     return next(iter(wells))
 
@@ -194,8 +189,10 @@ class TipView:
                     tip_well_states[well_name]
                     for well_name in wells_covered_physically.difference(well_list)
                 ]
-                if not all(
-                    well_state == TipRackWellState.USED
+                # TODO(jbl 2025-08-25) this should be changed to ensure all these extra wells are EMPTY when further
+                #   tip return work occurs
+                if any(
+                    well_state == TipRackWellState.CLEAN
                     for well_state in wells_in_way_well_state
                 ):
                     return False
