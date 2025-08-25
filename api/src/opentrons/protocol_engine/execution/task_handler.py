@@ -36,14 +36,16 @@ class TaskHandler:
     ) -> None:
         """Initialize a TaskHandler instance."""
         self._state_store = state_store
-        self._model_utils = model_utils if model_utils is not None else ModelUtils()
+        self._model_utils = model_utils or ModelUtils()
         self._concurrency_provider = concurrency_provider or ConcurrencyProvider()
 
-    async def create_task(self, task_code: TaskFunction, id: str | None = None) -> Task:
+    async def create_task(
+        self, task_function: TaskFunction, id: str | None = None
+    ) -> Task:
         """Create a task and immediately schedules it."""
         task_id = self._model_utils.ensure_id(id)
         asyncio_task = asyncio.create_task(
-            task_code(task_handler=self), name=f"engine-task-{task_id}"
+            task_function(task_handler=self), name=f"engine-task-{task_id}"
         )
         return Task(
             id=task_id,
