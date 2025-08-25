@@ -7,6 +7,9 @@ from decoy import Decoy
 from unittest.mock import sentinel
 
 from opentrons_shared_data.pipette.types import PipetteNameType
+from opentrons_shared_data.pipette.pipette_definition import (
+    AvailableSensorDefinition,
+)
 from opentrons.types import Point, MountType, DeckSlotName
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons import motion_planning
@@ -24,13 +27,19 @@ from opentrons.protocol_engine.types import (
 from opentrons.protocol_engine.state import _move_types
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.labware import LabwareView
-from opentrons.protocol_engine.state.pipettes import PipetteView
+from opentrons.protocol_engine.state.pipettes import (
+    PipetteView,
+    StaticPipetteConfig,
+    BoundingNozzlesOffsets,
+    PipetteBoundingBoxOffsets,
+)
 from opentrons.protocol_engine.state.addressable_areas import AddressableAreaView
 from opentrons.protocol_engine.state.geometry import GeometryView
 from opentrons.protocol_engine.state.motion import MotionView, PipetteLocationData
 from opentrons.protocol_engine.state.modules import ModuleView
 from opentrons.protocol_engine.state.module_substates import HeaterShakerModuleId
 from opentrons_shared_data.robot.types import RobotType
+from ..pipette_fixtures import get_default_nozzle_map
 
 
 @pytest.fixture
@@ -51,6 +60,41 @@ def patch_mock__move_types(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> Non
     """Mock out _move_types.py functions."""
     for name, func in inspect.getmembers(_move_types, inspect.isfunction):
         monkeypatch.setattr(_move_types, name, decoy.mock(func=func))
+
+
+def _fake_static_pipette_config(channels: int) -> StaticPipetteConfig:
+    return StaticPipetteConfig(
+        min_volume=1,
+        max_volume=9001,
+        channels=channels,
+        model="blah",
+        display_name="bleh",
+        serial_number="",
+        tip_configuration_lookup_table={},
+        nominal_tip_overlap={},
+        home_position=0,
+        nozzle_offset_z=0,
+        bounding_nozzle_offsets=BoundingNozzlesOffsets(
+            back_left_offset=Point(x=10, y=20, z=30),
+            front_right_offset=Point(x=40, y=50, z=60),
+        ),
+        default_nozzle_map=get_default_nozzle_map(PipetteNameType.P1000_96),
+        pipette_bounding_box_offsets=PipetteBoundingBoxOffsets(
+            back_left_corner=Point(x=10, y=20, z=30),
+            front_right_corner=Point(x=40, y=50, z=60),
+            front_left_corner=Point(x=10, y=50, z=60),
+            back_right_corner=Point(x=40, y=20, z=60),
+        ),
+        lld_settings={},
+        plunger_positions={
+            "top": 0.0,
+            "bottom": 5.0,
+            "blow_out": 19.0,
+            "drop_tip": 20.0,
+        },
+        shaft_ul_per_mm=5.0,
+        available_sensors=AvailableSensorDefinition(sensors=[]),
+    )
 
 
 @pytest.fixture
@@ -287,6 +331,7 @@ def test_get_pipette_location_override_current_location_y_center(
 
 @pytest.mark.parametrize("has_96_grid", [True, False])
 @pytest.mark.parametrize("has_12_grid", [True, False])
+@pytest.mark.parametrize("channels", [1, 8, 96])
 def test_get_pipette_offset_for_reservoirs(
     decoy: Decoy,
     labware_view: LabwareView,
@@ -296,11 +341,15 @@ def test_get_pipette_offset_for_reservoirs(
     subject: MotionView,
     has_96_grid: bool,
     has_12_grid: bool,
+    channels: int,
 ) -> None:
     """It should call get_waypoints() with the correct offset given the well's dimensions."""
     location = CurrentWell(pipette_id="123", labware_id="456", well_name="abc")
 
     decoy.when(pipette_view.get_current_location()).then_return(location)
+    decoy.when(pipette_view.get_config("pipette-id")).then_return(
+        _fake_static_pipette_config(channels)
+    )
 
     fake_x_dim, fake_y_dim, fake_z_dim = 7.0, 8.0, 9.0
     decoy.when(labware_view.get_well_size("labware-id", "well-name")).then_return(
@@ -346,11 +395,12 @@ def test_get_pipette_offset_for_reservoirs(
 
     x_offset = 0.0
     y_offset = 0.0
-    if has_12_grid:
+    if has_12_grid and channels != 96:
         x_offset = -1 * fake_x_dim / 24
-    elif has_96_grid:
+    elif has_96_grid and channels != 96:
         x_offset = -1 * fake_x_dim / 24
-        y_offset = fake_y_dim / 16
+        if channels == 1:
+            y_offset = fake_y_dim / 16
     reservoir_offset = Point(x=x_offset, y=y_offset)
     expected_destination = fake_well_position + reservoir_offset
 
@@ -424,6 +474,9 @@ def test_get_movement_waypoints_to_well_for_y_center(
 
     decoy.when(geometry_view.get_ancestor_slot_name("labware-id")).then_return(
         DeckSlotName.SLOT_2
+    )
+    decoy.when(pipette_view.get_config("pipette-id")).then_return(
+        _fake_static_pipette_config(1)
     )
 
     decoy.when(
@@ -505,6 +558,9 @@ def test_get_movement_waypoints_to_well_for_xy_center(
     decoy.when(
         geometry_view.get_min_travel_z("pipette-id", "labware-id", location, 123)
     ).then_return(42.0)
+    decoy.when(pipette_view.get_config("pipette-id")).then_return(
+        _fake_static_pipette_config(1)
+    )
 
     decoy.when(geometry_view.get_ancestor_slot_name("labware-id")).then_return(
         DeckSlotName.SLOT_2
@@ -571,6 +627,9 @@ def test_get_movement_waypoints_to_well_raises(
     decoy.when(
         geometry_view.get_min_travel_z("pipette-id", "labware-id", None, None)
     ).then_return(456)
+    decoy.when(pipette_view.get_config("pipette-id")).then_return(
+        _fake_static_pipette_config(1)
+    )
     decoy.when(
         # TODO(mm, 2022-06-22): We should use decoy.matchers.Anything() for all
         # arguments. For some reason, Decoy does not match the call unless we

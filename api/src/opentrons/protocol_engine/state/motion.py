@@ -1,5 +1,4 @@
 """Motion state store and getters."""
-
 from dataclasses import dataclass
 from typing import List, Optional, Union
 import logging
