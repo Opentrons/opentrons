@@ -18,6 +18,7 @@ import {
 } from '@opentrons/shared-data'
 
 import * as errorCreators from '../../errorCreators'
+import { getNextTiprack } from '../../robotStateSelectors'
 import {
   curryCommandCreator,
   curryWithoutPython,
@@ -315,6 +316,13 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       errors,
     }
   }
+  const { tipracks } = getNextTiprack(
+    pipette,
+    tipRack,
+    invariantContext,
+    prevRobotState,
+    ...(nozzles != null ? [nozzles] : [])
+  )
 
   const aspirateCorrectionVolumeForSampleAspiration =
     getByVolumeValue({
@@ -362,13 +370,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     pythonLiquidClassArgs.join(',\n')
   )},\n)`
 
-  const pythonAssignTipracks = getPythonAssignTipRacksString({
-    pipetteEntity: pipetteEntities[pipette],
-    labwareEntities,
-    labwareState: prevRobotState.labware,
-    tiprackURI: tipRack,
-  })
-
   const pythonArgs = [
     `volume=${volume}`,
     `source=[${pythonSourceWells}]`,
@@ -379,11 +380,19 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     `trash_location=${trashPipetteName}`,
     ...(pipetteSpecs.channels > 1 ? [`group_wells=False`] : []),
     `keep_last_tip=True`,
+    ...(tipracks.filteredSortedTiprackIds.length > 0
+      ? [
+          getPythonAssignTipRacksString({
+            labwareEntities,
+            tiprackIds: tipracks.filteredSortedTiprackIds,
+          }),
+        ]
+      : []),
     `liquid_class=${customLiquidClass}`,
   ]
   const pythonCommandCreator: CurriedCommandCreator = () => ({
     commands: [],
-    python: `${pythonAssignTipracks}${pythonPipetteName}.consolidate_with_liquid_class(\n${indentPyLines(
+    python: `${pythonPipetteName}.consolidate_with_liquid_class(\n${indentPyLines(
       pythonArgs.join(',\n')
     )},\n)`,
   })

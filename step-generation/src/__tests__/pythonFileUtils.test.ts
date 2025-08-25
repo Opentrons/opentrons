@@ -387,9 +387,6 @@ well_plate_3 = protocol.load_labware_from_definition(
 describe('getLoadPipettes', () => {
   it('should generate loadPipette for 2 pipettes using the same tipracks and off-deck labware last', () => {
     const mockTiprackDefURI = 'fixture/fixture_flex_96_tiprack_1000ul/1'
-    const tiprack1 = 'tiprack1'
-    const tiprack2 = 'tiprack2'
-    const tiprack3 = 'tiprack3'
     const pipette1 = 'pipette1'
     const pipette2 = 'pipette2'
     const mockPipetteEntities: PipetteEntities = {
@@ -410,52 +407,16 @@ describe('getLoadPipettes', () => {
         tiprackLabwareDef: [fixtureTiprack1000ul as LabwareDefinition2],
       },
     }
-    const mockTiprackEntities: LabwareEntities = {
-      [tiprack1]: {
-        id: tiprack1,
-        def: fixtureTiprack1000ul as LabwareDefinition2,
-        labwareDefURI: mockTiprackDefURI,
-        pythonName: 'tip_rack_1',
-      },
-      [tiprack2]: {
-        id: tiprack2,
-        def: fixtureTiprack1000ul as LabwareDefinition2,
-        labwareDefURI: mockTiprackDefURI,
-        pythonName: 'tip_rack_2',
-      },
-      [tiprack3]: {
-        id: tiprack3,
-        def: fixtureTiprack1000ul as LabwareDefinition2,
-        labwareDefURI: mockTiprackDefURI,
-        pythonName: 'tip_rack_3',
-      },
-    }
     const pipetteRobotState: TimelineFrame['pipettes'] = {
       [pipette1]: { mount: 'left' },
       [pipette2]: { mount: 'right' },
     }
-    const labwareRobotState: TimelineFrame['labware'] = {
-      [tiprack1]: { stack: [tiprack1, 'offDeck'] },
-      [tiprack2]: { stack: [tiprack2, '3'] },
-      [tiprack3]: { stack: [tiprack3, '1'] },
-    }
 
-    expect(
-      getLoadPipettes(
-        mockPipetteEntities,
-        mockTiprackEntities,
-        labwareRobotState,
-        pipetteRobotState
-      )
-    ).toBe(
+    expect(getLoadPipettes(mockPipetteEntities, pipetteRobotState)).toBe(
       `
 # Load Pipettes:
-pipette_left = protocol.load_instrument(
-    "p300_multi_gen2", "left", tip_racks=[tip_rack_3, tip_rack_2, tip_rack_1],
-)
-pipette_left = protocol.load_instrument(
-    "flex_1channel_1000", "right", tip_racks=[tip_rack_3, tip_rack_2, tip_rack_1],
-)`.trimStart()
+pipette_left = protocol.load_instrument("p300_multi_gen2", "left")
+pipette_left = protocol.load_instrument("flex_1channel_1000", "right")`.trimStart()
     )
   })
 
@@ -471,24 +432,14 @@ pipette_left = protocol.load_instrument(
         tiprackLabwareDef: [],
       },
     }
-    const mockTiprackEntities: LabwareEntities = {}
     const pipetteRobotState: TimelineFrame['pipettes'] = {
       [pipette1]: { mount: 'left' },
     }
 
-    expect(
-      getLoadPipettes(
-        mockPipetteEntities,
-        mockTiprackEntities,
-        labwareRobotState,
-        pipetteRobotState
-      )
-    ).toBe(
+    expect(getLoadPipettes(mockPipetteEntities, pipetteRobotState)).toBe(
       `
 # Load Pipettes:
-pipette_left = protocol.load_instrument(
-    "p300_multi_gen2", "left",
-)`.trimStart()
+pipette_left = protocol.load_instrument("p300_multi_gen2", "left")`.trimStart()
     )
   })
 
@@ -505,24 +456,14 @@ pipette_left = protocol.load_instrument(
       },
     }
 
-    const mockTiprackEntities: LabwareEntities = {}
     const pipetteRobotState: TimelineFrame['pipettes'] = {
       [pipette1]: { mount: 'left' },
     }
 
-    expect(
-      getLoadPipettes(
-        mockPipetteEntities,
-        mockTiprackEntities,
-        labwareRobotState,
-        pipetteRobotState
-      )
-    ).toBe(
+    expect(getLoadPipettes(mockPipetteEntities, pipetteRobotState)).toBe(
       `
 # Load Pipettes:
-pipette = protocol.load_instrument(
-    "flex_96channel_1000",
-)`.trimStart()
+pipette = protocol.load_instrument("flex_96channel_1000")`.trimStart()
     )
   })
 })
