@@ -313,7 +313,7 @@
       "type": "object",
       "description": "The orientation of the module when placed in a particular cutout id.",
       "patternProperties": {
-        "^([1-9]|[A-D][1-4])$": {
+        "^([1-9]|10|11|[A-D][1-4])$": {
           "description": "The keys are the id of cutouts.",
           "type": "string",
           "enum": ["left", "right", "center"]

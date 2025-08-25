@@ -140,6 +140,7 @@ ModuleDefinitionV3 = TypedDict(
         "uniqueModuleData": Dict[str, Any],
         "incompatibleWithDecks": List[str],
         "gripperOffsets": Dict[str, GripperOffsets],
+        "orientation": Dict[str, str],
     },
     total=False,
 )

@@ -417,6 +417,7 @@ def test_get_slot_definition() -> None:
         "displayName": "fancy name",
         "compatibleModuleTypes": ["magneticModuleType"],
         "features": {},
+        "orientation": ModuleOrientation.NOT_APPLICABLE,
     }
 
 

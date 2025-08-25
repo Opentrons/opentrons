@@ -155,9 +155,13 @@
     }
   },
   "orientation": {
+    "A3": "right",
     "A4": "right",
+    "B3": "right",
     "B4": "right",
+    "C3": "right",
     "C4": "right",
+    "D3": "right",
     "D4": "right"
   },
   "compatibleWith": [],

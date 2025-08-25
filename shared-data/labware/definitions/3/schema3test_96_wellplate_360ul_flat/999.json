@@ -56,6 +56,7 @@
     "displayVolumeUnits": "µL",
     "tags": []
   },
+  "$otSharedSchema": "#/labware/schemas/3",
   "extents": {
     "total": {
       "backLeftBottom": { "x": 0, "y": 0, "z": 0 },
@@ -73,7 +74,7 @@
     }
   },
   "gripForce": 15,
-  "gripHeightFromLabwareBottom": 12.2,
+  "gripHeightFromLabwareOrigin": 12.2,
   "wells": {
     "H1": {
       "depth": 10.668,
@@ -1148,8 +1149,8 @@
     "loadName": "schema3test_96_wellplate_360ul_flat"
   },
   "namespace": "opentrons",
-  "version": 5,
-  "schemaVersion": 2,
+  "version": 999,
+  "schemaVersion": 3,
   "stackingOffsetWithLabware": {
     "opentrons_universal_flat_adapter": {
       "x": 0,
