@@ -103,6 +103,7 @@ interface NextTiprackInfo {
     totalTipracks: number
     excludedBy96Channel: number
     excludedByLid: number
+    filteredSortedTiprackIds: string[]
   }
 }
 export function getNextTiprack(
@@ -206,6 +207,7 @@ export function getNextTiprack(
         totalTipracks: sortedTipracksIds.length,
         excludedBy96Channel: excludedBy96Channel.length,
         excludedByLid: excludedByLid.length,
+        filteredSortedTiprackIds,
       },
     }
   }
@@ -218,6 +220,7 @@ export function getNextTiprack(
       totalTipracks: sortedTipracksIds.length,
       excludedBy96Channel: excludedBy96Channel.length,
       excludedByLid: excludedByLid.length,
+      filteredSortedTiprackIds,
     },
   }
 }

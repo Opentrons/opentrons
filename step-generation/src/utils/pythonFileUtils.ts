@@ -11,7 +11,6 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
-import { sortLabwareBySlot } from '../robotStateSelectors'
 import { getLiquidClassName } from './liquidClassUtils'
 import { getSlotInLocationStack } from './misc'
 import {
@@ -316,47 +315,20 @@ export function getLoadLabware(
 
 export function getLoadPipettes(
   pipetteEntities: PipetteEntities,
-  labwareEntities: LabwareEntities,
-  labwareRobotState: TimelineFrame['labware'],
   pipetteRobotState: TimelineFrame['pipettes']
 ): string {
   const pythonPipette = Object.values(pipetteEntities)
     .map(pipette => {
-      const { name, id, spec, pythonName, tiprackDefURI } = pipette
+      const { name, id, spec, pythonName } = pipette
       const mount =
         spec.channels === 96 ? '' : formatPyStr(pipetteRobotState[id].mount)
       const pipetteName = isFlexPipette(name)
         ? getFlexNameConversion(spec)
         : name
-      const sortedLabwareIds = sortLabwareBySlot(labwareRobotState)
-      const allTipracks = sortedLabwareIds
-        .map(id => labwareEntities[id])
-        .filter(lw => lw && tiprackDefURI.includes(lw.labwareDefURI))
-      const onDeckTipracks = allTipracks.filter(
-        tiprack =>
-          getSlotInLocationStack(labwareRobotState[tiprack.id].stack) !==
-          'offDeck'
-      )
-      const offDeckTipracks = allTipracks.filter(
-        tiprack =>
-          getSlotInLocationStack(labwareRobotState[tiprack.id].stack) ===
-          'offDeck'
-      )
-      const tiprackPythonNames = [...onDeckTipracks, ...offDeckTipracks]
-        .map(tiprack => tiprack.pythonName)
-        .join(', ')
-      const pythonTipRacks =
-        tiprackDefURI.length === 0 ? '' : `tip_racks=[${tiprackPythonNames}]`
 
       return (
-        `${pythonName} = ${PROTOCOL_CONTEXT_NAME}.load_instrument(\n` +
-        `${indentPyLines(
-          [
-            formatPyStr(pipetteName),
-            ...(mount ? [mount] : []),
-            ...(pythonTipRacks ? [pythonTipRacks] : []),
-          ].join(', ')
-        )},\n` +
+        `${pythonName} = ${PROTOCOL_CONTEXT_NAME}.load_instrument(` +
+        `${[formatPyStr(pipetteName), ...(mount ? [mount] : [])].join(', ')}` +
         ')'
       )
     })
@@ -548,7 +520,7 @@ export function pythonDefRun(
       labware,
       labwareNicknamesById
     ),
-    getLoadPipettes(pipetteEntities, labwareEntities, labware, pipettes),
+    getLoadPipettes(pipetteEntities, pipettes),
     ...(robotType === FLEX_ROBOT_TYPE
       ? [
           getLoadTrashBins(trashBinEntities),
