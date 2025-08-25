@@ -468,7 +468,7 @@ class ProtocolContext(CommandPublisher):
         :param adapter_namespace: The namespace of the adapter being loaded.
             Applies to ``adapter`` the same way that ``namespace`` applies to ``load_name``.
 
-            .. versionchanged:: 2.25
+            .. versionchanged:: 2.26
                ``adapter_namespace`` may now be specified explicitly.
                Also, when you've specified ``namespace`` but not ``adapter_namespace``,
                ``adapter_namespace`` will now independently follow the same search rules
@@ -477,7 +477,7 @@ class ProtocolContext(CommandPublisher):
         :param adapter_version: The version of the adapter being loaded.
             Applies to ``adapter`` the same way that ``version`` applies to ``load_name``.
 
-            .. versionchanged:: 2.25
+            .. versionchanged:: 2.26
                ``adapter_version`` may now be specified explicitly. Also, when it's unspecified,
                the algorithm to select a version automatically has improved to avoid
                selecting versions that do not exist.
@@ -492,7 +492,7 @@ class ProtocolContext(CommandPublisher):
         :param lid_namespace: The namespace of the lid being loaded.
             Applies to ``lid`` the same way that ``namespace`` applies to ``load_name``.
 
-            .. versionchanged:: 2.25
+            .. versionchanged:: 2.26
                ``lid_namespace`` may now be specified explicitly.
                Also, when you've specified ``namespace`` but not ``lid_namespace``,
                ``lid_namespace`` will now independently follow the same search rules
@@ -501,7 +501,7 @@ class ProtocolContext(CommandPublisher):
         :param lid_version: The version of the adapter being loaded.
             Applies to ``lid`` the same way that ``version`` applies to ``load_name``.
 
-            .. versionchanged:: 2.25
+            .. versionchanged:: 2.26
                ``lid_version`` may now be specified explicitly. Also, when it's unspecified,
                the algorithm to select a version automatically has improved to avoid
                selecting versions that do not exist.
@@ -1596,7 +1596,7 @@ class ProtocolContext(CommandPublisher):
         :param adapter_namespace: The namespace of the adapter being loaded.
             Applies to ``adapter`` the same way that ``namespace`` applies to ``load_name``.
 
-            .. versionchanged:: 2.25
+            .. versionchanged:: 2.26
                ``adapter_namespace`` may now be specified explicitly.
                Also, when you've specified ``namespace`` but not ``adapter_namespace``,
                ``adapter_namespace`` will now independently follow the same search rules
@@ -1605,7 +1605,7 @@ class ProtocolContext(CommandPublisher):
         :param adapter_version: The version of the adapter being loaded.
             Applies to ``adapter`` the same way that ``version`` applies to ``load_name``.
 
-            .. versionadded:: 2.25
+            .. versionadded:: 2.26
                ``adapter_version`` may now be specified explicitly.
 
         :return:  The initialized and loaded labware object representing the lid stack.

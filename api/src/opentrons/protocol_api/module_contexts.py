@@ -149,7 +149,7 @@ class ModuleContext(CommandPublisher):
         .. versionadded:: 2.1
             The *label,* *namespace,* and *version* parameters.
 
-        .. versionadded:: 2.25
+        .. versionadded:: 2.26
             The *adapter_namespace*, *adapter_version,*
             *lid_namespace,* and *lid_version* parameters.
         """

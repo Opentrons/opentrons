@@ -64,7 +64,7 @@ FLEX_STACKER_VERSION_GATE = APIVersion(2, 23)
 
 # The first APIVersion where various "multi labware load" methods allow you to specify
 # the namespace and version of adapters and lids separately from the main labware.
-NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE = APIVersion(2, 25)
+NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE = APIVersion(2, 26)
 
 
 class InvalidPipetteMountError(ValueError):
