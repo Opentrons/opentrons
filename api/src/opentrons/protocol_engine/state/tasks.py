@@ -76,6 +76,10 @@ class TaskView:
         except KeyError as e:
             raise NoTaskFoundError(f"No current task with ID {id}") from e
 
+    def get_all_current(self) -> list[Task]:
+        """Get all currently running tasks."""
+        return [task for task in self._state.current_tasks_by_id.values()]
+
     def get_finished(self, id: str) -> FinishedTask:
         """Get a finished task by ID."""
         try:

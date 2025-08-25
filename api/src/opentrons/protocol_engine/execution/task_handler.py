@@ -142,3 +142,14 @@ class TaskHandler:
     async def synchronize_concurrent(self, group_id: str) -> AsyncIterator[None]:
         """Run a list of tasks at the same time."""
         yield
+
+    def cancel_all(self, message: str | None = None) -> None:
+        """Cancel all asyncio tasks immediately.
+
+        Do not call this more than once synchronously because
+        that could lead to tasks cancelling more than once.
+        It can be called if there are no current tasks. In that case
+        nothing will happen.
+        """
+        for task in self._state_store.tasks.get_all_current():
+            task.asyncioTask.cancel(msg=message)

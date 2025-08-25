@@ -16,6 +16,7 @@ from opentrons.protocol_engine.resources import (
     ModelUtils,
 )
 from opentrons.protocol_engine.actions import ActionDispatcher, FinishTaskAction
+from opentrons.protocol_engine.types import Task
 
 
 @pytest.fixture
@@ -450,3 +451,14 @@ async def test_synchronize_concurrent(subject: TaskHandler) -> None:
     assert max(events.index("task1started"), events.index("task2started")) < min(
         events.index("task1finished"), events.index("task2finished")
     )
+
+
+async def test_cancel_all(
+    subject: TaskHandler, decoy: Decoy, state_store: StateStore
+) -> None:
+    """Test cancel all."""
+    mock_tasks = [decoy.mock(cls=Task) for i in range(3)]
+    decoy.when(state_store.tasks.get_all_current()).then_return(mock_tasks)
+    subject.cancel_all("cancel all")
+    for task in mock_tasks:
+        decoy.verify(task.asyncioTask.cancel(msg="cancel all"))
