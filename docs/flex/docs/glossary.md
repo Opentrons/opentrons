@@ -56,7 +56,7 @@ One of four aluminum handles that screw into the bottom corners of the robot. Th
 
 ##### Carrying handle cap
 
-A flat metal cover that goes over the attachment point for a *carrying handle*. The caps close the handle openings in the *frame* and give the robot a clean appearance. See the [Robot Components section](system-description/robot.md)] in the System Description chapter.
+A flat metal cover that goes over the attachment point for a *carrying handle*. The caps close the handle openings in the *frame* and give the robot a clean appearance. See the [Robot Components section](system-description/robot.md) in the System Description chapter.
 
 ##### Dashboard
 
