@@ -1327,6 +1327,22 @@
       "robot_type": "Flex"
     }
   },
+  "Flex,None,None,schema3test_96_wellplate_360ul_flat": {
+    "coordinates": [
+      342.37,
+      74.77,
+      14.22
+    ],
+    "spec": {
+      "adapter_load_info": null,
+      "labware_load_info": [
+        "schema3test_96_wellplate_360ul_flat",
+        999
+      ],
+      "module_load_name": null,
+      "robot_type": "Flex"
+    }
+  },
   "Flex,None,None,schema3test_flex_96_tiprack_200ul": {
     "coordinates": [
       342.38,
@@ -1974,6 +1990,25 @@
       "robot_type": "Flex"
     }
   },
+  "Flex,None,schema3test_aluminum_flat_bottom_plate,schema3test_96_wellplate_360ul_flat": {
+    "coordinates": [
+      345.49,
+      71.505,
+      25.42
+    ],
+    "spec": {
+      "adapter_load_info": [
+        "schema3test_aluminum_flat_bottom_plate",
+        999
+      ],
+      "labware_load_info": [
+        "schema3test_96_wellplate_360ul_flat",
+        999
+      ],
+      "module_load_name": null,
+      "robot_type": "Flex"
+    }
+  },
   "Flex,None,schema3test_aluminum_flat_bottom_plate,schema3test_flex_96_tiprack_200ul": {
     "coordinates": [
       345.505,
@@ -2012,6 +2047,25 @@
       "robot_type": "Flex"
     }
   },
+  "Flex,None,schema3test_flex_96_tiprack_adapter,schema3test_96_wellplate_360ul_flat": {
+    "coordinates": [
+      342.49,
+      74.505,
+      25.22
+    ],
+    "spec": {
+      "adapter_load_info": [
+        "schema3test_flex_96_tiprack_adapter",
+        999
+      ],
+      "labware_load_info": [
+        "schema3test_96_wellplate_360ul_flat",
+        999
+      ],
+      "module_load_name": null,
+      "robot_type": "Flex"
+    }
+  },
   "Flex,None,schema3test_flex_96_tiprack_adapter,schema3test_flex_96_tiprack_200ul": {
     "coordinates": [
       342.505,
@@ -2025,25 +2079,6 @@
       ],
       "labware_load_info": [
         "schema3test_flex_96_tiprack_200ul",
-        999
-      ],
-      "module_load_name": null,
-      "robot_type": "Flex"
-    }
-  },
-  "Flex,None,schema3test_universal_flat_adapter,schema3test_96_wellplate_200ul_pcr_full_skirt": {
-    "coordinates": [
-      334.3,
-      -5.9,
-      20.7
-    ],
-    "spec": {
-      "adapter_load_info": [
-        "schema3test_universal_flat_adapter",
-        999
-      ],
-      "labware_load_info": [
-        "schema3test_96_wellplate_200ul_pcr_full_skirt",
         999
       ],
       "module_load_name": null,
@@ -2140,6 +2175,22 @@
       "adapter_load_info": null,
       "labware_load_info": [
         "schema3test_96_wellplate_200ul_pcr_full_skirt",
+        999
+      ],
+      "module_load_name": "absorbanceReaderV1",
+      "robot_type": "Flex"
+    }
+  },
+  "Flex,absorbanceReaderV1,None,schema3test_96_wellplate_360ul_flat": {
+    "coordinates": [
+      344.37,
+      74.245,
+      14.87
+    ],
+    "spec": {
+      "adapter_load_info": null,
+      "labware_load_info": [
+        "schema3test_96_wellplate_360ul_flat",
         999
       ],
       "module_load_name": "absorbanceReaderV1",
@@ -3474,6 +3525,22 @@
       "robot_type": "Flex"
     }
   },
+  "Flex,flexStackerModuleV1,None,schema3test_96_wellplate_360ul_flat": {
+    "coordinates": [
+      503.49,
+      74.505,
+      45.22
+    ],
+    "spec": {
+      "adapter_load_info": null,
+      "labware_load_info": [
+        "schema3test_96_wellplate_360ul_flat",
+        999
+      ],
+      "module_load_name": "flexStackerModuleV1",
+      "robot_type": "Flex"
+    }
+  },
   "Flex,flexStackerModuleV1,None,schema3test_flex_96_tiprack_200ul": {
     "coordinates": [
       503.505,
@@ -4121,6 +4188,25 @@
       "robot_type": "Flex"
     }
   },
+  "Flex,flexStackerModuleV1,schema3test_aluminum_flat_bottom_plate,schema3test_96_wellplate_360ul_flat": {
+    "coordinates": [
+      506.49,
+      71.505,
+      56.42
+    ],
+    "spec": {
+      "adapter_load_info": [
+        "schema3test_aluminum_flat_bottom_plate",
+        999
+      ],
+      "labware_load_info": [
+        "schema3test_96_wellplate_360ul_flat",
+        999
+      ],
+      "module_load_name": "flexStackerModuleV1",
+      "robot_type": "Flex"
+    }
+  },
   "Flex,flexStackerModuleV1,schema3test_aluminum_flat_bottom_plate,schema3test_flex_96_tiprack_200ul": {
     "coordinates": [
       506.505,
@@ -4159,6 +4245,25 @@
       "robot_type": "Flex"
     }
   },
+  "Flex,flexStackerModuleV1,schema3test_flex_96_tiprack_adapter,schema3test_96_wellplate_360ul_flat": {
+    "coordinates": [
+      503.49,
+      74.505,
+      56.22
+    ],
+    "spec": {
+      "adapter_load_info": [
+        "schema3test_flex_96_tiprack_adapter",
+        999
+      ],
+      "labware_load_info": [
+        "schema3test_96_wellplate_360ul_flat",
+        999
+      ],
+      "module_load_name": "flexStackerModuleV1",
+      "robot_type": "Flex"
+    }
+  },
   "Flex,flexStackerModuleV1,schema3test_flex_96_tiprack_adapter,schema3test_flex_96_tiprack_200ul": {
     "coordinates": [
       503.505,
@@ -4178,11 +4283,11 @@
       "robot_type": "Flex"
     }
   },
-  "Flex,flexStackerModuleV1,schema3test_universal_flat_adapter,schema3test_96_wellplate_200ul_pcr_full_skirt": {
+  "Flex,flexStackerModuleV1,schema3test_universal_flat_adapter,schema3test_96_wellplate_360ul_flat": {
     "coordinates": [
-      495.3,
-      -5.9,
-      51.7
+      495.29,
+      -5.895,
+      49.92
     ],
     "spec": {
       "adapter_load_info": [
@@ -4190,7 +4295,7 @@
         999
       ],
       "labware_load_info": [
-        "schema3test_96_wellplate_200ul_pcr_full_skirt",
+        "schema3test_96_wellplate_360ul_flat",
         999
       ],
       "module_load_name": "flexStackerModuleV1",
@@ -5525,6 +5630,22 @@
       "robot_type": "Flex"
     }
   },
+  "Flex,heaterShakerModuleV1,None,schema3test_96_wellplate_360ul_flat": {
+    "coordinates": [
+      342.49,
+      74.505,
+      33.17
+    ],
+    "spec": {
+      "adapter_load_info": null,
+      "labware_load_info": [
+        "schema3test_96_wellplate_360ul_flat",
+        999
+      ],
+      "module_load_name": "heaterShakerModuleV1",
+      "robot_type": "Flex"
+    }
+  },
   "Flex,heaterShakerModuleV1,None,schema3test_flex_96_tiprack_200ul": {
     "coordinates": [
       342.505,
@@ -5653,25 +5774,6 @@
       ],
       "labware_load_info": [
         "nest_96_wellplate_2ml_deep",
-        3
-      ],
-      "module_load_name": "heaterShakerModuleV1",
-      "robot_type": "Flex"
-    }
-  },
-  "Flex,heaterShakerModuleV1,opentrons_96_flat_bottom_adapter,nest_96_wellplate_200ul_flat": {
-    "coordinates": [
-      342.28,
-      74.18,
-      34.45
-    ],
-    "spec": {
-      "adapter_load_info": [
-        "opentrons_96_flat_bottom_adapter",
-        1
-      ],
-      "labware_load_info": [
-        "nest_96_wellplate_200ul_flat",
         3
       ],
       "module_load_name": "heaterShakerModuleV1",
@@ -6172,6 +6274,25 @@
       "robot_type": "Flex"
     }
   },
+  "Flex,heaterShakerModuleV1,schema3test_aluminum_flat_bottom_plate,schema3test_96_wellplate_360ul_flat": {
+    "coordinates": [
+      345.49,
+      71.505,
+      44.37
+    ],
+    "spec": {
+      "adapter_load_info": [
+        "schema3test_aluminum_flat_bottom_plate",
+        999
+      ],
+      "labware_load_info": [
+        "schema3test_96_wellplate_360ul_flat",
+        999
+      ],
+      "module_load_name": "heaterShakerModuleV1",
+      "robot_type": "Flex"
+    }
+  },
   "Flex,heaterShakerModuleV1,schema3test_aluminum_flat_bottom_plate,schema3test_flex_96_tiprack_200ul": {
     "coordinates": [
       345.505,
@@ -6210,6 +6331,25 @@
       "robot_type": "Flex"
     }
   },
+  "Flex,heaterShakerModuleV1,schema3test_flex_96_tiprack_adapter,schema3test_96_wellplate_360ul_flat": {
+    "coordinates": [
+      342.49,
+      74.505,
+      44.17
+    ],
+    "spec": {
+      "adapter_load_info": [
+        "schema3test_flex_96_tiprack_adapter",
+        999
+      ],
+      "labware_load_info": [
+        "schema3test_96_wellplate_360ul_flat",
+        999
+      ],
+      "module_load_name": "heaterShakerModuleV1",
+      "robot_type": "Flex"
+    }
+  },
   "Flex,heaterShakerModuleV1,schema3test_flex_96_tiprack_adapter,schema3test_flex_96_tiprack_200ul": {
     "coordinates": [
       342.505,
@@ -6229,11 +6369,11 @@
       "robot_type": "Flex"
     }
   },
-  "Flex,heaterShakerModuleV1,schema3test_universal_flat_adapter,schema3test_96_wellplate_200ul_pcr_full_skirt": {
+  "Flex,heaterShakerModuleV1,schema3test_universal_flat_adapter,schema3test_96_wellplate_360ul_flat": {
     "coordinates": [
-      342.8,
-      74.5,
-      39.65
+      342.79,
+      74.505,
+      37.87
     ],
     "spec": {
       "adapter_load_info": [
@@ -6241,7 +6381,7 @@
         999
       ],
       "labware_load_info": [
-        "schema3test_96_wellplate_200ul_pcr_full_skirt",
+        "schema3test_96_wellplate_360ul_flat",
         999
       ],
       "module_load_name": "heaterShakerModuleV1",
@@ -7576,6 +7716,22 @@
       "robot_type": "Flex"
     }
   },
+  "Flex,magneticBlockV1,None,schema3test_96_wellplate_360ul_flat": {
+    "coordinates": [
+      342.365,
+      74.38,
+      52.22
+    ],
+    "spec": {
+      "adapter_load_info": null,
+      "labware_load_info": [
+        "schema3test_96_wellplate_360ul_flat",
+        999
+      ],
+      "module_load_name": "magneticBlockV1",
+      "robot_type": "Flex"
+    }
+  },
   "Flex,magneticBlockV1,None,schema3test_flex_96_tiprack_200ul": {
     "coordinates": [
       342.38,
@@ -8223,6 +8379,25 @@
       "robot_type": "Flex"
     }
   },
+  "Flex,magneticBlockV1,schema3test_aluminum_flat_bottom_plate,schema3test_96_wellplate_360ul_flat": {
+    "coordinates": [
+      345.365,
+      71.38,
+      63.42
+    ],
+    "spec": {
+      "adapter_load_info": [
+        "schema3test_aluminum_flat_bottom_plate",
+        999
+      ],
+      "labware_load_info": [
+        "schema3test_96_wellplate_360ul_flat",
+        999
+      ],
+      "module_load_name": "magneticBlockV1",
+      "robot_type": "Flex"
+    }
+  },
   "Flex,magneticBlockV1,schema3test_aluminum_flat_bottom_plate,schema3test_flex_96_tiprack_200ul": {
     "coordinates": [
       345.38,
@@ -8261,6 +8436,25 @@
       "robot_type": "Flex"
     }
   },
+  "Flex,magneticBlockV1,schema3test_flex_96_tiprack_adapter,schema3test_96_wellplate_360ul_flat": {
+    "coordinates": [
+      342.365,
+      74.38,
+      63.22
+    ],
+    "spec": {
+      "adapter_load_info": [
+        "schema3test_flex_96_tiprack_adapter",
+        999
+      ],
+      "labware_load_info": [
+        "schema3test_96_wellplate_360ul_flat",
+        999
+      ],
+      "module_load_name": "magneticBlockV1",
+      "robot_type": "Flex"
+    }
+  },
   "Flex,magneticBlockV1,schema3test_flex_96_tiprack_adapter,schema3test_flex_96_tiprack_200ul": {
     "coordinates": [
       342.38,
@@ -8274,25 +8468,6 @@
       ],
       "labware_load_info": [
         "schema3test_flex_96_tiprack_200ul",
-        999
-      ],
-      "module_load_name": "magneticBlockV1",
-      "robot_type": "Flex"
-    }
-  },
-  "Flex,magneticBlockV1,schema3test_universal_flat_adapter,schema3test_96_wellplate_200ul_pcr_full_skirt": {
-    "coordinates": [
-      334.3,
-      -5.9,
-      58.7
-    ],
-    "spec": {
-      "adapter_load_info": [
-        "schema3test_universal_flat_adapter",
-        999
-      ],
-      "labware_load_info": [
-        "schema3test_96_wellplate_200ul_pcr_full_skirt",
         999
       ],
       "module_load_name": "magneticBlockV1",
@@ -9627,6 +9802,22 @@
       "robot_type": "Flex"
     }
   },
+  "Flex,temperatureModuleV2,None,schema3test_96_wellplate_360ul_flat": {
+    "coordinates": [
+      342.49,
+      74.505,
+      23.22
+    ],
+    "spec": {
+      "adapter_load_info": null,
+      "labware_load_info": [
+        "schema3test_96_wellplate_360ul_flat",
+        999
+      ],
+      "module_load_name": "temperatureModuleV2",
+      "robot_type": "Flex"
+    }
+  },
   "Flex,temperatureModuleV2,None,schema3test_flex_96_tiprack_200ul": {
     "coordinates": [
       342.505,
@@ -10274,6 +10465,25 @@
       "robot_type": "Flex"
     }
   },
+  "Flex,temperatureModuleV2,schema3test_aluminum_flat_bottom_plate,schema3test_96_wellplate_360ul_flat": {
+    "coordinates": [
+      345.49,
+      71.505,
+      34.42
+    ],
+    "spec": {
+      "adapter_load_info": [
+        "schema3test_aluminum_flat_bottom_plate",
+        999
+      ],
+      "labware_load_info": [
+        "schema3test_96_wellplate_360ul_flat",
+        999
+      ],
+      "module_load_name": "temperatureModuleV2",
+      "robot_type": "Flex"
+    }
+  },
   "Flex,temperatureModuleV2,schema3test_aluminum_flat_bottom_plate,schema3test_flex_96_tiprack_200ul": {
     "coordinates": [
       345.505,
@@ -10312,6 +10522,25 @@
       "robot_type": "Flex"
     }
   },
+  "Flex,temperatureModuleV2,schema3test_flex_96_tiprack_adapter,schema3test_96_wellplate_360ul_flat": {
+    "coordinates": [
+      342.49,
+      74.505,
+      34.22
+    ],
+    "spec": {
+      "adapter_load_info": [
+        "schema3test_flex_96_tiprack_adapter",
+        999
+      ],
+      "labware_load_info": [
+        "schema3test_96_wellplate_360ul_flat",
+        999
+      ],
+      "module_load_name": "temperatureModuleV2",
+      "robot_type": "Flex"
+    }
+  },
   "Flex,temperatureModuleV2,schema3test_flex_96_tiprack_adapter,schema3test_flex_96_tiprack_200ul": {
     "coordinates": [
       342.505,
@@ -10331,11 +10560,11 @@
       "robot_type": "Flex"
     }
   },
-  "Flex,temperatureModuleV2,schema3test_universal_flat_adapter,schema3test_96_wellplate_200ul_pcr_full_skirt": {
+  "Flex,temperatureModuleV2,schema3test_universal_flat_adapter,schema3test_96_wellplate_360ul_flat": {
     "coordinates": [
-      334.3,
-      -5.9,
-      29.7
+      334.29,
+      -5.895,
+      27.92
     ],
     "spec": {
       "adapter_load_info": [
@@ -10343,7 +10572,7 @@
         999
       ],
       "labware_load_info": [
-        "schema3test_96_wellplate_200ul_pcr_full_skirt",
+        "schema3test_96_wellplate_360ul_flat",
         999
       ],
       "module_load_name": "temperatureModuleV2",
@@ -11678,6 +11907,22 @@
       "robot_type": "Flex"
     }
   },
+  "Flex,thermocyclerModuleV2,None,schema3test_96_wellplate_360ul_flat": {
+    "coordinates": [
+      -5.635,
+      356.205,
+      25.18
+    ],
+    "spec": {
+      "adapter_load_info": null,
+      "labware_load_info": [
+        "schema3test_96_wellplate_360ul_flat",
+        999
+      ],
+      "module_load_name": "thermocyclerModuleV2",
+      "robot_type": "Flex"
+    }
+  },
   "Flex,thermocyclerModuleV2,None,schema3test_flex_96_tiprack_200ul": {
     "coordinates": [
       -5.62,
@@ -12325,6 +12570,25 @@
       "robot_type": "Flex"
     }
   },
+  "Flex,thermocyclerModuleV2,schema3test_aluminum_flat_bottom_plate,schema3test_96_wellplate_360ul_flat": {
+    "coordinates": [
+      -2.635,
+      353.205,
+      36.38
+    ],
+    "spec": {
+      "adapter_load_info": [
+        "schema3test_aluminum_flat_bottom_plate",
+        999
+      ],
+      "labware_load_info": [
+        "schema3test_96_wellplate_360ul_flat",
+        999
+      ],
+      "module_load_name": "thermocyclerModuleV2",
+      "robot_type": "Flex"
+    }
+  },
   "Flex,thermocyclerModuleV2,schema3test_aluminum_flat_bottom_plate,schema3test_flex_96_tiprack_200ul": {
     "coordinates": [
       -2.62,
@@ -12363,6 +12627,25 @@
       "robot_type": "Flex"
     }
   },
+  "Flex,thermocyclerModuleV2,schema3test_flex_96_tiprack_adapter,schema3test_96_wellplate_360ul_flat": {
+    "coordinates": [
+      -5.635,
+      356.205,
+      36.18
+    ],
+    "spec": {
+      "adapter_load_info": [
+        "schema3test_flex_96_tiprack_adapter",
+        999
+      ],
+      "labware_load_info": [
+        "schema3test_96_wellplate_360ul_flat",
+        999
+      ],
+      "module_load_name": "thermocyclerModuleV2",
+      "robot_type": "Flex"
+    }
+  },
   "Flex,thermocyclerModuleV2,schema3test_flex_96_tiprack_adapter,schema3test_flex_96_tiprack_200ul": {
     "coordinates": [
       -5.62,
@@ -12382,11 +12665,11 @@
       "robot_type": "Flex"
     }
   },
-  "Flex,thermocyclerModuleV2,schema3test_universal_flat_adapter,schema3test_96_wellplate_200ul_pcr_full_skirt": {
+  "Flex,thermocyclerModuleV2,schema3test_universal_flat_adapter,schema3test_96_wellplate_360ul_flat": {
     "coordinates": [
-      1.895,
-      276.06,
-      31.66
+      1.885,
+      276.065,
+      29.88
     ],
     "spec": {
       "adapter_load_info": [
@@ -12394,7 +12677,7 @@
         999
       ],
       "labware_load_info": [
-        "schema3test_96_wellplate_200ul_pcr_full_skirt",
+        "schema3test_96_wellplate_360ul_flat",
         999
       ],
       "module_load_name": "thermocyclerModuleV2",
@@ -13723,6 +14006,22 @@
       "adapter_load_info": null,
       "labware_load_info": [
         "schema3test_96_wellplate_200ul_pcr_full_skirt",
+        999
+      ],
+      "module_load_name": null,
+      "robot_type": "OT-2"
+    }
+  },
+  "OT-2,None,None,schema3test_96_wellplate_360ul_flat": {
+    "coordinates": [
+      279.37,
+      74.77,
+      14.22
+    ],
+    "spec": {
+      "adapter_load_info": null,
+      "labware_load_info": [
+        "schema3test_96_wellplate_360ul_flat",
         999
       ],
       "module_load_name": null,
@@ -15223,6 +15522,22 @@
       "adapter_load_info": null,
       "labware_load_info": [
         "schema3test_96_wellplate_200ul_pcr_full_skirt",
+        999
+      ],
+      "module_load_name": "heaterShakerModuleV1",
+      "robot_type": "OT-2"
+    }
+  },
+  "OT-2,heaterShakerModuleV1,None,schema3test_96_wellplate_360ul_flat": {
+    "coordinates": [
+      279.615,
+      73.38,
+      82.495
+    ],
+    "spec": {
+      "adapter_load_info": null,
+      "labware_load_info": [
+        "schema3test_96_wellplate_360ul_flat",
         999
       ],
       "module_load_name": "heaterShakerModuleV1",
