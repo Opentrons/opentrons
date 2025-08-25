@@ -204,7 +204,6 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
               style: args.nozzles,
             },
             pipetteId: args.pipette,
-            tiprackId: nextTiprack.tiprackId,
           }),
         ]
       : []

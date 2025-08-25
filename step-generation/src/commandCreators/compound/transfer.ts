@@ -17,7 +17,10 @@ import {
 } from '@opentrons/shared-data'
 
 import * as errorCreators from '../../errorCreators'
-import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
+import {
+  getNextTiprack,
+  getPipetteWithTipMaxVol,
+} from '../../robotStateSelectors'
 import {
   curryCommandCreator,
   curryWithoutPython,
@@ -247,10 +250,23 @@ export const transfer: CommandCreator<TransferArgs> = (
     errors.push(errorCreators.dropTipLocationDoesNotExist())
   }
 
-  if (errors.length > 0)
+  const tiprack = Object.values(labwareEntities).find(
+    ({ labwareDefURI }) => labwareDefURI === tipRack
+  )
+  if (tiprack == null) {
+    errors.push(
+      errorCreators.labwareDoesNotExist({
+        actionName,
+        labware: tipRack,
+      })
+    )
+  }
+
+  if (errors.length > 0) {
     return {
       errors,
     }
+  }
 
   const aspirateAirGapVol = aspirateAirGapVolume || 0
   const dispenseAirGapVol = dispenseAirGapVolume || 0
@@ -315,20 +331,14 @@ export const transfer: CommandCreator<TransferArgs> = (
     pythonName: pythonPipetteName,
   } = pipetteEntities[args.pipette]
 
-  const tiprack = Object.values(labwareEntities).find(
-    ({ labwareDefURI }) => labwareDefURI === tipRack
-  )
-  if (tiprack == null) {
-    errors.push(
-      errorCreators.labwareDoesNotExist({
-        actionName,
-        labware: tipRack,
-      })
-    )
-  }
-
   const { labwareDefURI: tiprackDefUri } = tiprack ?? {}
-
+  const { tipracks } = getNextTiprack(
+    pipette,
+    tipRack,
+    invariantContext,
+    prevRobotState,
+    ...(nozzles != null ? [nozzles] : [])
+  )
   const liquidClassValuesForTip =
     getAllLiquidClassDefs()
       [
@@ -382,13 +392,6 @@ export const transfer: CommandCreator<TransferArgs> = (
           .join(', ')
       : null
 
-  const pythonAssignTipracks = getPythonAssignTipRacksString({
-    pipetteEntity: pipetteEntities[pipette],
-    labwareEntities,
-    labwareState: prevRobotState.labware,
-    tiprackURI: tipRack,
-  })
-
   const pythonLiquidClassArgs = [
     `name=${formatPyStr(`${args.commandCreatorFnName}_step_${stepNumber}`)}`,
     ...(liquidClass != null
@@ -417,11 +420,19 @@ export const transfer: CommandCreator<TransferArgs> = (
     `trash_location=${trashPipetteName}`,
     ...(pipetteSpecs.channels > 1 ? [`group_wells=False`] : []),
     `keep_last_tip=True`,
+    ...(tipracks.filteredSortedTiprackIds.length > 0
+      ? [
+          getPythonAssignTipRacksString({
+            labwareEntities,
+            tiprackIds: tipracks.filteredSortedTiprackIds,
+          }),
+        ]
+      : []),
     `liquid_class=${customLiquidClass}`,
   ]
   const pythonCommandCreator: CurriedCommandCreator = () => ({
     commands: [],
-    python: `${pythonAssignTipracks}${pythonPipetteName}.transfer_with_liquid_class(\n${indentPyLines(
+    python: `${pythonPipetteName}.transfer_with_liquid_class(\n${indentPyLines(
       pythonArgs.join(',\n')
     )},\n)`,
   })
