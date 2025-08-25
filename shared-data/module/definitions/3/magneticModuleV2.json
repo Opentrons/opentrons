@@ -102,9 +102,13 @@
     }
   },
   "orientation": {
+    "1": "left",
     "3": "right",
+    "4": "left",
     "6": "right",
-    "9": "right"
+    "7": "left",
+    "9": "right",
+    "10": "left"
   },
   "compatibleWith": [],
   "incompatibleWithDecks": ["ot3_standard"],
