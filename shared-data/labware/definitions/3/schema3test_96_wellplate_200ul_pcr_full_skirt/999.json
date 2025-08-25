@@ -46,9 +46,6 @@
         "x": 127.76,
         "y": -85.48
       }
-    },
-    "flatSupportThermalCouplingAsChild": {
-      "wellExteriorBottomZ": 0
     }
   },
   "stackLimit": 4,
