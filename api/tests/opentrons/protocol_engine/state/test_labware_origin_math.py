@@ -229,7 +229,7 @@ _LW_V3_WITH_SLOT_FP_AS_CHILD_FEATURE = LabwareDefinition3.model_construct(  # ty
             backLeft=Vector2D(x=0, y=0), frontRight=Vector2D(x=80, y=60), z=5
         )
     ),
-    stackingOffsetWithLabware={
+    legacyStackingOffsetWithLabware={
         "default": Vector3D(x=0, y=0, z=0),
     },
     parameters=Parameters3.model_construct(loadName="labware-v3-child"),  # type: ignore[call-arg]
@@ -316,7 +316,56 @@ _LW_V3_WITH_FLEX_TIP_RACK_LID_AS_CHILD = LabwareDefinition3.model_construct(  # 
     gripperOffsets={},
 )
 
-# Module definitions
+_LW_V3_WITH_LEGACY_STACKING = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
+    namespace="test",
+    version=1,
+    schemaVersion=3,
+    extents=Extents(
+        total=AxisAlignedBoundingBox3D(
+            backLeftBottom=Vector3D(x=75, y=125, z=175),
+            frontRightTop=Vector3D(x=875, y=-475, z=975),
+        ),
+    ),
+    features=LocatingFeatures(
+        slotFootprintAsChild=SlotFootprintAsChildFeature(
+            backLeft=Vector2D(x=5, y=10), frontRight=Vector2D(x=85, y=50), z=3
+        )
+    ),
+    legacyStackingOffsetWithLabware={
+        "labware-name": Vector3D(x=25, y=35, z=45),
+        "default": Vector3D(x=125, y=225, z=325),
+    },
+    parameters=Parameters3.model_construct(loadName="labware-v3-with-legacy-stacking"),  # type: ignore[call-arg]
+    gripperOffsets={},
+)
+
+_LW_V3_WITH_GRIPPER_OFFSETS = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
+    namespace="test",
+    version=1,
+    schemaVersion=3,
+    extents=Extents(
+        total=AxisAlignedBoundingBox3D(
+            backLeftBottom=Vector3D(x=75, y=125, z=175),
+            frontRightTop=Vector3D(x=875, y=-475, z=975),
+        ),
+    ),
+    features=LocatingFeatures(
+        slotFootprintAsChild=SlotFootprintAsChildFeature(
+            backLeft=Vector2D(x=5, y=10), frontRight=Vector2D(x=85, y=50), z=3
+        )
+    ),
+    legacyStackingOffsetWithLabware={
+        "default": Vector3D(x=125, y=225, z=325),
+    },
+    gripperOffsets={
+        "default": GripperOffsets(
+            pickUpOffset=Vector3D(x=15, y=25, z=35),
+            dropOffset=Vector3D(x=45, y=55, z=65),
+        )
+    },
+    parameters=Parameters3.model_construct(loadName="labware-v3-with-gripper"),  # type: ignore[call-arg]
+)
+
 _MODULE_DEF_TEMP_V2 = ModuleDefinition.model_construct(  # type: ignore[call-arg]
     schemaVersion=2,
     model=ModuleModel.TEMPERATURE_MODULE_V2,
@@ -425,8 +474,8 @@ class ModuleOverlapSpec(NamedTuple):
 class LabwareOverlapSpec(NamedTuple):
     """Spec data to test labware stacking behavior."""
 
-    child_definition: LabwareDefinition2
-    parent_definition: LabwareDefinition2
+    child_definition: LabwareDefinition
+    parent_definition: LabwareDefinition
     labware_location: OnLabwareLocation
     expected_total_offset: Point
 
@@ -516,6 +565,18 @@ LABWARE_OVERLAP_SPECS: List[LabwareOverlapSpec] = [
         parent_definition=_LW_V2_3,
         labware_location=OnLabwareLocation(labwareId="parent-labware-2"),
         expected_total_offset=Point(x=450, y=650, z=950),
+    ),
+    LabwareOverlapSpec(
+        child_definition=_LW_V2_WITH_LABWARE_STACKING,
+        parent_definition=_LW_V3_WITH_SLOT_AS_PARENT_CHILD_FEATURES,
+        labware_location=OnLabwareLocation(labwareId="parent-labware-3"),
+        expected_total_offset=Point(x=440, y=2135, z=742),
+    ),
+    LabwareOverlapSpec(
+        child_definition=_LW_V3_WITH_LEGACY_STACKING,
+        parent_definition=_LW_V2_2,
+        labware_location=OnLabwareLocation(labwareId="parent-v2-labware"),
+        expected_total_offset=Point(x=100, y=385, z=880),
     ),
 ]
 
@@ -650,6 +711,21 @@ GRIPPER_OFFSET_SPECS: List[GripperOffsetSpec] = [
         module_parent_to_child_offset=None,
         expected_pick_up_offset=Point(x=7, y=14, z=21),
         expected_drop_offset=Point(x=28, y=35, z=41.25),
+    ),
+    GripperOffsetSpec(
+        stackup_lw_info_top_to_bottom=[
+            (_LW_V3_WITH_GRIPPER_OFFSETS, OnLabwareLocation(labwareId="parent-id")),
+            (
+                _LW_V2_WITH_DEFAULT_GRIPPER_OFFSETS,
+                DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            ),
+        ],
+        underlying_ancestor_definition=_ADDRESSABLE_AREA,
+        slot_name=DeckSlotName.SLOT_1,
+        deck_definition=load_deck(STANDARD_OT3_DECK, 5),
+        module_parent_to_child_offset=None,
+        expected_pick_up_offset=Point(x=15.0, y=25.0, z=35.0),
+        expected_drop_offset=Point(x=45.0, y=55.0, z=64.25),
     ),
 ]
 
@@ -787,6 +863,44 @@ def test_get_parent_placement_origin_to_lw_origin_v3_definitions(
     )
 
     assert result == expected_total_offset
+
+
+def test_v3_child_on_v2_parent_labware() -> None:
+    """Test that v3 labware can stack on v2 labware correctly."""
+    deck_def = load_deck(STANDARD_OT3_DECK, 5)
+
+    # Top-most labware case
+    result = get_stackup_origin_to_labware_origin(
+        context=LabwareOriginContext.PIPETTING,
+        stackup_lw_info_top_to_bottom=[
+            (_LW_V3_WITH_LEGACY_STACKING, OnLabwareLocation(labwareId="parent-id")),
+            (_LW_V2_2, AddressableAreaLocation(addressableAreaName="test_area")),
+        ],
+        underlying_ancestor_definition=_ADDRESSABLE_AREA,
+        slot_name=DeckSlotName.SLOT_A1,
+        module_parent_to_child_offset=None,
+        deck_definition=deck_def,
+    )
+
+    assert result == Point(x=100, y=385, z=880)
+
+    # Non-topmost labware case
+    result_non_topmost = get_stackup_origin_to_labware_origin(
+        context=LabwareOriginContext.PIPETTING,
+        stackup_lw_info_top_to_bottom=[
+            (_LW_V2, OnLabwareLocation(labwareId="adapter-id")),
+            (_LW_V3_WITH_LEGACY_STACKING, OnLabwareLocation(labwareId="parent-id")),
+            (_LW_V2_2, AddressableAreaLocation(addressableAreaName="test_area")),
+        ],
+        underlying_ancestor_definition=_ADDRESSABLE_AREA,
+        slot_name=DeckSlotName.SLOT_A1,
+        module_parent_to_child_offset=None,
+        deck_definition=deck_def,
+    )
+
+    expected_total = Point(x=175, y=760, z=1855)
+
+    assert result_non_topmost == expected_total
 
 
 @pytest.mark.parametrize(

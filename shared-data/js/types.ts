@@ -335,6 +335,7 @@ export interface LabwareDefinition3 {
   groups: LabwareWellGroup[]
   allowedRoles?: LabwareRoles[]
   stackingOffsetWithLabware?: Record<string, LabwareOffset>
+  legacyStackingOffsetWithLabware?: Record<string, LabwareOffset>
   stackingOffsetWithModule?: Record<string, LabwareOffset>
   stackLimit?: number
   compatibleParentLabware?: string[]
