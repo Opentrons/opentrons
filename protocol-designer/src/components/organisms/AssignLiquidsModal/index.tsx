@@ -123,7 +123,7 @@ export function AssignLiquidsModal(
               />
               <StyledText
                 desktopStyle="headingLargeBold"
-                css={LINE_CLAMP_TEXT_STYLE(3)}
+                css={LINE_CLAMP_TEXT_STYLE(3, true)}
               >
                 {t('add_liquids_to_labware', {
                   labwareName: nickNames[labwareId],

@@ -9,7 +9,7 @@ Opentrons Flex integrates with several Opentrons hardware modules that add featu
 This chapter summarizes the functions and physical specifications of modules that are compatible with Opentrons Flex. It also covers the caddy attachment system and module calibration.
 
 !!! tip
-    - For complete instructions on module installation and use, refer to the quickstart guide that shipped with your unit or find its manual in the [Modules category](/modules/) of the Opentrons Documentation website.
+    - For complete instructions on module installation and use, refer to the quickstart guide that shipped with your unit or find its manual in the [Modules category](../../modules/index.md) of the Opentrons Documentation website.
 
     - For details on integrating modules into your protocols, see the [Protocol Designer section](../protocols/designer.md) of the Protocol Development chapter or the [Hardware Modules section](https://docs.opentrons.com/v2/new_modules.html) of our Python API documentation.
 

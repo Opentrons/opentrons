@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
@@ -74,8 +74,9 @@ export function DeviceDetailsDeckConfiguration({
       refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
     }).data ?? []
 
-  const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
-    deckConfig
+  const deckConfigWithAA = useMemo(
+    () => replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(deckConfig),
+    [deckConfig]
   )
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const { isRunRunning } = useRunStatuses()
@@ -146,6 +147,7 @@ export function DeviceDetailsDeckConfiguration({
         cutoutFixtureId,
         addressableAreaId
       )
+
       return {
         ...acc,
         displayList: [

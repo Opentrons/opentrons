@@ -66,7 +66,7 @@ beforeEach(() => {
     pipette: DEFAULT_PIPETTE,
     sourceLabware: SOURCE_LABWARE,
     destLabware: DEST_LABWARE,
-    stepId: 1,
+    stepNumber: 1,
     preWetTip: false,
     touchTipAfterAspirate: false,
     disposalVolume: 60,
@@ -165,6 +165,7 @@ mock_pipette.distribute_with_liquid_class(
     new_tip="never",
     trash_location=trash_bin_1,
     keep_last_tip=True,
+    tip_racks=[mock_tip_rack_1, mock_tip_rack_2],
     liquid_class=protocol.define_liquid_class(
         name="distribute_step_1",
         properties={"p300_single": {"fixture/fixture_tiprack_300_ul/1": {
@@ -1033,6 +1034,7 @@ mock_pipette.distribute_with_liquid_class(
     new_tip="never",
     trash_location=trash_bin_1,
     keep_last_tip=True,
+    tip_racks=[mock_tip_rack_1, mock_tip_rack_2],
     liquid_class=protocol.define_liquid_class(
         name="distribute_step_1",
         properties={"p300_single": {"fixture/fixture_tiprack_300_ul/1": {

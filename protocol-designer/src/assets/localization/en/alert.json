@@ -45,9 +45,9 @@
   },
   "timeline": {
     "error": {
-      "LABWARE_DISCARDED_IN_WASTE_CHUTE": {
+      "LABWARE_DISCARDED_IN_TRASH": {
         "title": "Labware not available",
-        "body": "This step uses labware that has previously been discarded into a Waste Chute."
+        "body": "This step uses labware that has previously been discarded into a trash."
       },
       "LABWARE_ON_ANOTHER_ENTITY": {
         "title": "Attempting to move labware on top of another entity",
@@ -162,6 +162,18 @@
       "ABSORBANCE_READER_NO_GRIPPER": {
         "title": "Cannot save Absorbance Plate Reader step without gripper",
         "body": "This step requires the gripper to open or close the Absorbance Plate Reader lid. Add a gripper or remove this step to proceed."
+      },
+      "RETURN_TIP_UNAVAILABLE": {
+        "title": "Return tip unavailable",
+        "body": "Unable to find the most pipette's most recent pickup location for return tip."
+      },
+      "TIPRACK_LID_NOT_ALLOWED_ON_DECK": {
+        "title": "Invalid tip rack lid position",
+        "body": "The tip rack lid is not allowed directly on a deck slot"
+      },
+      "NEXT_TIPRACK_HAS_LID": {
+        "title": "Lid on tip rack",
+        "body": "The next available tip rack has a lid"
       }
     },
     "warning": {

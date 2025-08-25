@@ -4,7 +4,7 @@ title: "Opentrons Flex: Temperature Module"
 
 # Temperature Module GEN2
 
-![The Temperature Module as seen from the top left. The top of the module has the heating and cooling surface and temperature display. The side has the power button, USB port, and power port.](../../images/temperature-module.png "Temperature Module")
+![The Temperature Module as seen from the top left. The top of the module has the heating and cooling surface and temperature display. The side has the power button, USB port, and power port.](../images/temperature-module.png "Temperature Module")
 
 !!! info "Additional Documentation"
     For complete instructions on module installation and use, see the Temperature Module Instruction Manual.
@@ -15,7 +15,7 @@ title: "Opentrons Flex: Temperature Module"
 
 The Opentrons Temperature Module GEN2 is a hot and cold plate module. It is often used in protocols that require heating, cooling, or temperature changes. The module can reach and maintain temperatures ranging from 4 °C to 95 °C within minutes, depending on the module's configuration and contents.
 
-### Thermal blocks
+### Thermal blocks { #thermal-blocks-flex }
 
 To hold labware at temperature, the module uses aluminum thermal blocks. The module comes with 24- well and 96-well thermal blocks. The Temperature Module caddy comes with a deep well block and a flat bottom block designed for use with the Flex Gripper. The blocks hold 1.5 mL and 2.0 mL tubes, 96-well PCR plates, PCR strips, deep well plates, and flat bottom plates.
 
@@ -26,22 +26,22 @@ To hold labware at temperature, the module uses aluminum thermal blocks. The mod
 <div class="parts-list" markdown>
 
 <figure markdown>
-![24-well aluminum thermal block for Temperature Module](../../images/temperature-module-block-24-well.png "24-well thermal block")
+![24-well aluminum thermal block for Temperature Module](../images/temperature-module-block-24-well.png "24-well thermal block")
 <figcaption>24-well thermal block </figcaption>
 </figure>
 
 <figure markdown>
-![96-well aluminum thermal block for Temperature Module](../../images/temperature-module-block-96-well.png "96-well thermal block")
+![96-well aluminum thermal block for Temperature Module](../images/temperature-module-block-96-well.png "96-well thermal block")
 <figcaption>96-well thermal block</figcaption>
 </figure>
 
 <figure markdown>
-![Deep well aluminum thermal block for Temperature Module](../../images/temperature-module-block-deep-well.png "Deep well thermal block")
+![Deep well aluminum thermal block for Temperature Module](../images/temperature-module-block-deep-well.png "Deep well thermal block")
 <figcaption>Deep well thermal block</figcaption>
 </figure>
 
 <figure markdown>
-![Flat bottom aluminum thermal block for Temperature Module](../../images/temperature-module-block-flat.png "Flat bottom thermal block")
+![Flat bottom aluminum thermal block for Temperature Module](../images/temperature-module-block-flat.png "Flat bottom thermal block")
 <figcaption>Flat bottom thermal block for Flex</figcaption>
 </figure>
 

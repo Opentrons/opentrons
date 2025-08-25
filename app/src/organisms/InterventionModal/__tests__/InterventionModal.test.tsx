@@ -172,7 +172,6 @@ describe('InterventionModal', () => {
     }
     render(props)
     screen.getByText('Move labware on Otie')
-    screen.getByText('Labware name')
     screen.getByText('mockLabware')
     screen.queryAllByText('A1')
     screen.queryAllByText('D3')
@@ -211,7 +210,6 @@ describe('InterventionModal', () => {
     }
     render(props)
     screen.getByText('Move labware on Otie')
-    screen.getByText('Labware name')
     screen.getByText('mockLabwareInStagingArea')
     screen.queryAllByText('B4')
     screen.queryAllByText('C4')
@@ -246,7 +244,6 @@ describe('InterventionModal', () => {
     }
     render(props)
     screen.getByText('Move labware on Otie')
-    screen.getByText('Labware name')
     screen.getByText('mockLabware')
     screen.queryAllByText('A1')
     screen.queryAllByText('C1')
@@ -284,7 +281,6 @@ describe('InterventionModal', () => {
       } as any,
     }
     render(props)
-    screen.getByText('Labware name')
     screen.getByText('mockLabwareInStagingArea')
     screen.queryAllByText('B4')
     screen.queryAllByText('Waste Chute')

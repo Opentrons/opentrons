@@ -4,26 +4,18 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
 import {
-  ALIGN_CENTER,
   BORDERS,
-  Box,
   COLORS,
   CURSOR_DEFAULT,
   CURSOR_POINTER,
   DIRECTION_COLUMN,
   Divider,
   Flex,
-  Icon,
-  JUSTIFY_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
-  JUSTIFY_START,
-  OverflowBtn,
   SPACING,
-  StyledText,
+  StepContainer as StepContainerPresentation,
   useConditionalConfirm,
 } from '@opentrons/components'
 
-import { LINE_CLAMP_TEXT_STYLE } from '/protocol-designer/components/atoms'
 import {
   ConfirmDeleteModal,
   DELETE_MULTIPLE_STEP_FORMS,
@@ -58,14 +50,13 @@ const FINAL_DECK_STATE = 'Ending deck'
 const PX_HEIGHT_TO_TOP_OF_CONTAINER = 32
 export const PX_SIDEBAR_MIN_WIDTH_FOR_ICON = 170
 
-export interface StepContainerProps {
+export interface ConnectedStepContainerProps {
   title: string
   iconName: IconName
   sidebarWidth: number
   openedOverflowMenuId?: string | null
   setOpenedOverflowMenuId?: Dispatch<SetStateAction<string | null>>
   stepId?: string
-  iconColor?: string
   onClick?: (event: ReactMouseEvent) => void
   onDoubleClick?: (event: ReactMouseEvent) => void
   onMouseEnter?: (event: ReactMouseEvent) => void
@@ -77,7 +68,9 @@ export interface StepContainerProps {
   dragHovered?: boolean
 }
 
-export function StepContainer(props: StepContainerProps): JSX.Element {
+export function ConnectedStepContainer(
+  props: ConnectedStepContainerProps
+): JSX.Element {
   const {
     stepId,
     iconName,
@@ -87,7 +80,6 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
     selected,
     onClick,
     hovered,
-    iconColor,
     title,
     hasError = false,
     isStepAfterError = false,
@@ -108,24 +100,6 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
   const hasTrash = getHasTrash(additionalEquipmentOnDeck)
 
   const hasText = sidebarWidth > PX_SIDEBAR_MIN_WIDTH_FOR_ICON
-  let backgroundColor = isStartingOrEndingState ? COLORS.blue20 : COLORS.grey20
-  let color = COLORS.black90
-  if (selected) {
-    backgroundColor = COLORS.blue50
-    color = COLORS.white
-  }
-  if (hovered && !selected) {
-    backgroundColor = isStartingOrEndingState ? COLORS.blue30 : COLORS.grey30
-    color = COLORS.black90
-  }
-  if (hasError && selected) {
-    backgroundColor = COLORS.red50
-    color = COLORS.white
-  }
-  if (hasError && !selected) {
-    backgroundColor = COLORS.red30
-    color = COLORS.red60
-  }
 
   const handleClick = (event: MouseEvent): void => {
     const wasOutside = !(
@@ -249,70 +223,36 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
             borderRadius={BORDERS.borderRadius2}
           />
         ) : null}
-        <Box
-          role="button"
-          data-testid={`StepContainer_${stepId}`}
-          onDoubleClick={(e: ReactMouseEvent) => {
-            handleOpenForm(1, e)
-          }}
-          onClick={(e: ReactMouseEvent) => {
+
+        <StepContainerPresentation
+          text={capitalizeFirstLetterAfterNumber(title)}
+          iconName={iconName}
+          type={isStartingOrEndingState ? 'alt' : 'default'}
+          size={hasText ? 'iconAndText' : 'iconOnly'}
+          cursor={isStepAfterError ? CURSOR_DEFAULT : CURSOR_POINTER}
+          active={selected ?? false}
+          error={hasError}
+          hover={hovered ?? false}
+          semiTransparent={isStepAfterError}
+          onClick={e => {
             handleOpenForm(0, e)
           }}
-          padding={`${SPACING.spacing4} ${SPACING.spacing12}`}
-          borderRadius={BORDERS.borderRadius8}
-          width="100%"
-          backgroundColor={backgroundColor}
-          color={color}
-          opacity={isStepAfterError ? '50%' : '100%'}
-          cursor={isStepAfterError ? CURSOR_DEFAULT : CURSOR_POINTER}
-        >
-          <Flex
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
-            alignItems={ALIGN_CENTER}
-            height="1.9375rem"
-          >
-            <Flex
-              alignItems={ALIGN_CENTER}
-              gridGap={SPACING.spacing8}
-              justifyContent={hasText ? JUSTIFY_START : JUSTIFY_CENTER}
-              width="100%"
-            >
-              {iconName != null && (
-                <Icon
-                  size="1.25rem"
-                  name={iconName}
-                  color={iconColor ?? color}
-                  minWidth="1.25rem"
-                />
-              )}
-              {hasText ? (
-                <StyledText
-                  desktopStyle="bodyDefaultRegular"
-                  css={LINE_CLAMP_TEXT_STYLE(1)}
-                >
-                  {capitalizeFirstLetterAfterNumber(title)}
-                </StyledText>
-              ) : null}
-            </Flex>
-            {selected && !isStartingOrEndingState ? (
-              <OverflowBtn
-                data-testid={`StepContainer_${stepId}`}
-                fillColor={COLORS.white}
-                onClick={(e: ReactMouseEvent) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  if (openedOverflowMenuId === stepId) {
-                    setOpenedOverflowMenuId?.(null)
-                  } else {
-                    setOpenedOverflowMenuId?.(stepId ?? null)
-                  }
+          onDoubleClick={e => {
+            handleOpenForm(1, e)
+          }}
+          onOverflowMenuButtonClick={e => {
+            e.preventDefault()
+            e.stopPropagation()
+            if (openedOverflowMenuId === stepId) {
+              setOpenedOverflowMenuId?.(null)
+            } else {
+              setOpenedOverflowMenuId?.(stepId ?? null)
+            }
 
-                  handleOverflowClick(e)
-                }}
-              />
-            ) : null}
-          </Flex>
-        </Box>
+            handleOverflowClick(e)
+          }}
+          dataTestId={`StepContainer_${stepId}`}
+        />
       </Flex>
       {stepId != null &&
       openedOverflowMenuId === stepId &&
