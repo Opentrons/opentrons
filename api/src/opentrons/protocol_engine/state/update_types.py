@@ -236,21 +236,6 @@ class PipetteAspirateReadyUpdate:
 
 
 @dataclasses.dataclass
-class TipsUsedUpdate:
-    """Represents an update that marks tips in a tip rack as used."""
-
-    labware_id: str
-    """The labware ID of the tip rack."""
-
-    well_names: list[str]
-    """The exact wells in the tip rack that should be marked as used.
-
-    This is the *full* list, which is probably more than what appeared in the pickUpTip
-    command's params, for multi-channel reasons.
-    """
-
-
-@dataclasses.dataclass
 class TipsStateUpdate:
     """Represents an update that marks tips in a tip rack as the requested state."""
 
@@ -469,8 +454,6 @@ class StateUpdate:
     loaded_lid_stack: LoadedLidStackUpdate | NoChangeType = NO_CHANGE
 
     labware_lid: LabwareLidUpdate | NoChangeType = NO_CHANGE
-
-    tips_used: TipsUsedUpdate | NoChangeType = NO_CHANGE
 
     tips_state: TipsStateUpdate | NoChangeType = NO_CHANGE
 
@@ -750,17 +733,12 @@ class StateUpdate:
         return self
 
     def update_tip_rack_well_state(
-        self: Self, tip_state: TipRackWellState, labware_id: str, well_name: list[str]
+        self: Self, tip_state: TipRackWellState, labware_id: str, well_names: list[str]
     ) -> Self:
         """Marks tips in a tip rack to provided tip state. See `TipsStateUpdate`."""
         self.tips_state = TipsStateUpdate(
-            tip_state=tip_state, labware_id=labware_id, well_names=well_name
+            tip_state=tip_state, labware_id=labware_id, well_names=well_names
         )
-        return self
-
-    def mark_tips_as_used(self: Self, labware_id: str, well_names: list[str]) -> Self:
-        """Mark tips in a tip rack as used. See `TipsUsedUpdate`."""
-        self.tips_used = TipsUsedUpdate(labware_id=labware_id, well_names=well_names)
         return self
 
     def set_liquid_loaded(

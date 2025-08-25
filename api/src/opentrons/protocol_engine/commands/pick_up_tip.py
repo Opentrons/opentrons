@@ -10,7 +10,7 @@ from typing_extensions import Literal
 from ..errors import ErrorOccurrence, PickUpTipTipNotAttachedError
 from ..resources import ModelUtils
 from ..state import update_types
-from ..types import PickUpTipWellLocation, LabwareWellId
+from ..types import PickUpTipWellLocation, LabwareWellId, TipRackWellState
 from .pipetting_common import (
     PipetteIdMixin,
 )
@@ -160,16 +160,20 @@ class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, _ExecuteRetur
                     ),
                 )
                 .set_fluid_empty(pipette_id=pipette_id, clean_tip=True)
-                .mark_tips_as_used(
-                    labware_id=labware_id, well_names=tips_to_mark_as_used
+                .update_tip_rack_well_state(
+                    tip_state=TipRackWellState.EMPTY,
+                    labware_id=labware_id,
+                    well_names=tips_to_mark_as_used,
                 )
             )
             state_update = (
                 update_types.StateUpdate.reduce(
                     update_types.StateUpdate(), move_result.state_update
                 )
-                .mark_tips_as_used(
-                    labware_id=labware_id, well_names=tips_to_mark_as_used
+                .update_tip_rack_well_state(
+                    tip_state=TipRackWellState.EMPTY,
+                    labware_id=labware_id,
+                    well_names=tips_to_mark_as_used,
                 )
                 .set_fluid_unknown(pipette_id=pipette_id)
             )
@@ -197,8 +201,10 @@ class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, _ExecuteRetur
                         labware_id=labware_id, well_name=well_name
                     ),
                 )
-                .mark_tips_as_used(
-                    labware_id=labware_id, well_names=tips_to_mark_as_used
+                .update_tip_rack_well_state(
+                    tip_state=TipRackWellState.EMPTY,
+                    labware_id=labware_id,
+                    well_names=tips_to_mark_as_used,
                 )
                 .set_fluid_empty(pipette_id=pipette_id, clean_tip=True)
                 .set_pipette_ready_to_aspirate(

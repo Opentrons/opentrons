@@ -55,10 +55,11 @@ class TipStore(HasState[TipState], HandlesActions):
                 ] = TipRackWellState.CLEAN
 
     def _handle_state_update(self, state_update: update_types.StateUpdate) -> None:
-        if state_update.tips_used != update_types.NO_CHANGE:
-            self._set_used_tips(
-                labware_id=state_update.tips_used.labware_id,
-                well_names=state_update.tips_used.well_names,
+        if state_update.tips_state != update_types.NO_CHANGE:
+            self._set_tip_state(
+                labware_id=state_update.tips_state.labware_id,
+                well_names=state_update.tips_state.well_names,
+                tip_state=state_update.tips_state.tip_state,
             )
 
         if state_update.loaded_labware != update_types.NO_CHANGE:
@@ -88,10 +89,12 @@ class TipStore(HasState[TipState], HandlesActions):
                         column for column in definition.ordering
                     ]
 
-    def _set_used_tips(self, labware_id: str, well_names: Iterable[str]) -> None:
+    def _set_tip_state(
+        self, labware_id: str, well_names: Iterable[str], tip_state: TipRackWellState
+    ) -> None:
         well_states = self._state.tips_by_labware_id.get(labware_id, {})
         for well_name in well_names:
-            well_states[well_name] = TipRackWellState.USED
+            well_states[well_name] = tip_state
 
 
 class TipView:
