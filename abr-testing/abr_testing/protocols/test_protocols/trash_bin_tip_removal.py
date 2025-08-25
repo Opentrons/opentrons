@@ -109,7 +109,7 @@ def run(protocol: ProtocolContext) -> None:
         """Drop tip with pipette ejector extended."""
         move_pipette_plunger(api, mount, drop_tip_pos)
         api.remove_tip(mount)
-        pipette._last_tip_picked_up_from = None  # type: ignore[misc]
+
     def clip_trash_edge() -> None:
         """Knock tips off with trash bin edge."""
         hwapi.move_rel(mount, types.Point(x=clip_offset + x_travel))
