@@ -67,10 +67,19 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.10'
+          enable-cache: true
+          cache-dependency-glob: './docs/uv.lock'
+      - name: Setup Docs Dependencies
+        working-directory: ./docs
+        run: make setup
       - name: Determine deployment configuration
         id: config
         run: |
-          python docs/deploy_config.py "${{ github.event_name }}" "${{ github.ref }}" "${{ github.ref_name }}" "${{ github.ref_type }}" "${{ github.event.pull_request.head.ref }}"
+          uv run python docs/deploy_config.py "${{ github.event_name }}" "${{ github.ref }}" "${{ github.ref_name }}" "${{ github.ref_type }}" "${{ github.event.pull_request.head.ref }}"
 
   deploy:
     needs: [build, determine-deploy-config]
@@ -87,6 +96,15 @@ jobs:
     steps:
       - name: 'Checkout Repository'
         uses: actions/checkout@v4
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.10'
+          enable-cache: true
+          cache-dependency-glob: './docs/uv.lock'
+      - name: Setup Docs Dependencies
+        working-directory: ./docs
+        run: make setup
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
