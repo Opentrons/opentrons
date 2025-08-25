@@ -273,6 +273,10 @@
     "4011": {
       "detail": "Incorrect API Version",
       "category": "generalError"
+    },
+    "4012": {
+      "detail": "Labware Locating Feature Error",
+      "category": "generalError"
     }
   }
 }
