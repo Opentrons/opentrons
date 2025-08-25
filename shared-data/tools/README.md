@@ -9,6 +9,10 @@
    - Reduces the image file size
    - Converts the image to `.png` format
 
+   In order to run this script
+   - Run brew install uv
+   - From shard-data, then run uv run tools/format_image.py "insert image path here"
+
 2. **Name the image file**
 
    - Include the **labware load name** in the file name.

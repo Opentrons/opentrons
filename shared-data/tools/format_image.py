@@ -1,6 +1,13 @@
+# /// script
+# requires-python = ">=3.8"
+# dependencies = [
+#   "pillow"
+# ]
+# ///
+
 """Crop Images so that Labware is Centered and Change File Size and Type to PNG."""
 
-from PIL import Image, ImageEnhance
+from PIL import Image
 import argparse
 import os
 
