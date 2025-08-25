@@ -526,13 +526,13 @@ def run(ctx: ProtocolContext) -> None:
             error = target_height - hdelta
             new_volume = step_volume * min(
                 1.5, 1 + alpha * error
-            )  # increase clamped to 150% of previous volume
+            )  # increase clamped to 150% of previous step volume
 
         elif hdelta > upper_bound:
             error = hdelta - target_height
             new_volume = step_volume * max(
-                0.8, 1 - alpha * error
-            )  # decrease clamped to 80% of previous volume
+                0.5, 1 - alpha * error
+            )  # decrease clamped to 50% of previous step volume
         else:
             new_volume = step_volume
 
