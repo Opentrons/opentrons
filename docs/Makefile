@@ -25,13 +25,13 @@ build:
 		uv run mkdocs build -f ./mkdocs.yml; \
 	fi
 
-
+	
 .PHONY: serve-flex-manual
 serve-flex-manual:
 	uv run mkdocs serve -f $(FLEX_MANUAL_PREFIX)/mkdocs.yml
 
 .PHONY: deploy
 deploy:
-	uv run python deploy_mkdocs.py $(ENVIRONMENT) --branch $(BRANCH)
+	uv run python deploy_mkdocs.py $(ENVIRONMENT) --branch $(BRANCH) $(ARGS)
 
 

@@ -118,9 +118,17 @@ jobs:
           name: docs-artifacts
           path: docs/
 
+      - name: Debug - List files before deploy
+        working-directory: ./docs
+        run: |
+          echo "Current directory: $(pwd)"
+          echo "Files in current directory:"
+          ls -la
+          echo "Files in site directory (if it exists):"
+          ls -la site/ || echo "site/ directory does not exist"
       - name: Deploy
         working-directory: ./docs
-        run: make deploy ENVIRONMENT=${{ env.ENVIRONMENT }} BRANCH=${{ env.BRANCH }} -- --source-dir site
+        run: make deploy ENVIRONMENT=${{ env.ENVIRONMENT }} BRANCH=${{ env.BRANCH }} ARGS="--source-dir site"
       - name: Output Deployment URL
         run: |
           echo "## 🚀 Docs site deployed to ${{ env.ENVIRONMENT }}" >> $GITHUB_STEP_SUMMARY
