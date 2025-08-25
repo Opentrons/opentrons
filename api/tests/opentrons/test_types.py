@@ -1,11 +1,5 @@
 import pytest
-from opentrons.types import (
-    DeckSlotName,
-    Point,
-    Location,
-    MeniscusTrackingTarget,
-    SlotOrientation,
-)
+from opentrons.types import DeckSlotName, Point, Location, MeniscusTrackingTarget
 from opentrons.protocol_api.labware import Labware
 
 
@@ -97,42 +91,6 @@ def test_deck_slot_name_equivalencies(
         == input.to_equivalent_for_robot_type("OT-3 Standard")
         == expected_ot3_equivalent
     )
-
-
-@pytest.mark.parametrize(
-    ("slot", "expected_orientation"),
-    [
-        (DeckSlotName.SLOT_1, SlotOrientation.LEFT),
-        (DeckSlotName.SLOT_4, SlotOrientation.LEFT),
-        (DeckSlotName.SLOT_7, SlotOrientation.LEFT),
-        (DeckSlotName.SLOT_10, SlotOrientation.LEFT),
-        (DeckSlotName.SLOT_2, SlotOrientation.CENTER),
-        (DeckSlotName.SLOT_5, SlotOrientation.CENTER),
-        (DeckSlotName.SLOT_8, SlotOrientation.CENTER),
-        (DeckSlotName.SLOT_11, SlotOrientation.CENTER),
-        (DeckSlotName.SLOT_3, SlotOrientation.RIGHT),
-        (DeckSlotName.SLOT_6, SlotOrientation.RIGHT),
-        (DeckSlotName.SLOT_9, SlotOrientation.RIGHT),
-        (DeckSlotName.FIXED_TRASH, SlotOrientation.RIGHT),
-        (DeckSlotName.SLOT_A1, SlotOrientation.LEFT),
-        (DeckSlotName.SLOT_B1, SlotOrientation.LEFT),
-        (DeckSlotName.SLOT_C1, SlotOrientation.LEFT),
-        (DeckSlotName.SLOT_D1, SlotOrientation.LEFT),
-        (DeckSlotName.SLOT_A2, SlotOrientation.CENTER),
-        (DeckSlotName.SLOT_B2, SlotOrientation.CENTER),
-        (DeckSlotName.SLOT_C2, SlotOrientation.CENTER),
-        (DeckSlotName.SLOT_D2, SlotOrientation.CENTER),
-        (DeckSlotName.SLOT_A3, SlotOrientation.RIGHT),
-        (DeckSlotName.SLOT_B3, SlotOrientation.RIGHT),
-        (DeckSlotName.SLOT_C3, SlotOrientation.RIGHT),
-        (DeckSlotName.SLOT_D3, SlotOrientation.RIGHT),
-    ],
-)
-def test_deck_slot_orientation(
-    slot: DeckSlotName, expected_orientation: SlotOrientation
-) -> None:
-    """Test that all deck slots return the correct orientation."""
-    assert slot.orientation == expected_orientation
 
 
 @pytest.mark.parametrize(
