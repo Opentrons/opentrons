@@ -459,18 +459,52 @@ class ProtocolContext(CommandPublisher):
         :param version: The version of the labware definition. You should normally
             leave this unspecified to let ``load_labware()`` choose a version
             automatically.
-        :param adapter: An adapter to load the labware on top of. Accepts the same
-            values as the ``load_name`` parameter of :py:meth:`.load_adapter`. The
-            adapter will use the same namespace as the labware, and the API will
-            choose the adapter's version automatically.
 
-                        .. versionadded:: 2.15
+        :param adapter: The load name of an adapter to load the labware on top of. Accepts
+            the same values as the ``load_name`` parameter of :py:meth:`.load_adapter`.
+
+            .. versionadded:: 2.15
+
+        :param adapter_namespace: The namespace of the adapter being loaded.
+            Applies to ``adapter`` the same way that ``namespace`` applies to ``load_name``.
+
+            .. versionchanged:: 2.25
+               ``adapter_namespace`` may now be specified explicitly.
+               Also, when you've specified ``namespace`` but not ``adapter_namespace``,
+               ``adapter_namespace`` will now independently follow the same search rules
+               described in ``namespace``. Formerly, it took ``namespace``'s exact value.
+
+        :param adapter_version: The version of the adapter being loaded.
+            Applies to ``adapter`` the same way that ``version`` applies to ``load_name``.
+
+            .. versionchanged:: 2.25
+               ``adapter_version`` may now be specified explicitly. Also, when it's unspecified,
+               the algorithm to select a version automatically has improved to avoid
+               selecting versions that do not exist.
+
         :param lid: A lid to load on the top of the main labware. Accepts the same
             values as the ``load_name`` parameter of :py:meth:`.load_lid_stack`. The
             lid will use the same namespace as the labware, and the API will
             choose the lid's version automatically.
 
-                        .. versionadded:: 2.23
+            .. versionadded:: 2.23
+
+        :param lid_namespace: The namespace of the lid being loaded.
+            Applies to ``lid`` the same way that ``namespace`` applies to ``load_name``.
+
+            .. versionchanged:: 2.25
+               ``lid_namespace`` may now be specified explicitly.
+               Also, when you've specified ``namespace`` but not ``lid_namespace``,
+               ``lid_namespace`` will now independently follow the same search rules
+               described in ``namespace``. Formerly, it took ``namespace``'s exact value.
+
+        :param lid_version: The version of the adapter being loaded.
+            Applies to ``lid`` the same way that ``version`` applies to ``load_name``.
+
+            .. versionchanged:: 2.25
+               ``lid_version`` may now be specified explicitly. Also, when it's unspecified,
+               the algorithm to select a version automatically has improved to avoid
+               selecting versions that do not exist.
         """
 
         if isinstance(location, OffDeckType) and self._api_version < APIVersion(2, 15):
@@ -1519,13 +1553,17 @@ class ProtocolContext(CommandPublisher):
         :param str load_name: A string to use for looking up a lid definition.
             You can find the ``load_name`` for any compatible lid on the Opentrons
             `Labware Library <https://labware.opentrons.com>`_.
+
         :param location: Either a :ref:`deck slot <deck-slots>`,
             like ``1``, ``"1"``, or ``"D1"``, or a valid Opentrons Adapter.
+
         :param int quantity: The quantity of lids to be loaded in the stack.
+
         :param adapter: An adapter to load the lid stack on top of. Accepts the same
             values as the ``load_name`` parameter of :py:meth:`.load_adapter`. The
             adapter will use the same namespace as the lid labware, and the API will
             choose the adapter's version automatically.
+
         :param str namespace: The namespace that the lid labware definition belongs to.
             If unspecified, the API will automatically search two namespaces:
 
@@ -1540,6 +1578,21 @@ class ProtocolContext(CommandPublisher):
         :param version: The version of the labware definition. You should normally
             leave this unspecified to let ``load_lid_stack()`` choose a version
             automatically.
+
+        :param adapter_namespace: The namespace of the adapter being loaded.
+            Applies to ``adapter`` the same way that ``namespace`` applies to ``load_name``.
+
+            .. versionchanged:: 2.25
+               ``adapter_namespace`` may now be specified explicitly.
+               Also, when you've specified ``namespace`` but not ``adapter_namespace``,
+               ``adapter_namespace`` will now independently follow the same search rules
+               described in ``namespace``. Formerly, it took ``namespace``'s exact value.
+
+        :param adapter_version: The version of the adapter being loaded.
+            Applies to ``adapter`` the same way that ``version`` applies to ``load_name``.
+
+            .. versionadded:: 2.25
+               ``adapter_version`` may now be specified explicitly.
 
         :return:  The initialized and loaded labware object representing the lid stack.
 

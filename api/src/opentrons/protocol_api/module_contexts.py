@@ -148,6 +148,10 @@ class ModuleContext(CommandPublisher):
 
         .. versionadded:: 2.1
             The *label,* *namespace,* and *version* parameters.
+
+        .. versionadded:: 2.25
+            The *adapter_namespace*, *adapter_version,*
+            *lid_namespace,* and *lid_version* parameters.
         """
         if self._api_version < APIVersion(2, 1) and (
             label is not None or namespace is not None or version != 1
@@ -1372,6 +1376,7 @@ class FlexStackerContext(ModuleContext):
         :param str load_name: A string to use for looking up a labware definition.
             You can find the ``load_name`` for any Opentrons-verified labware on the
             `Labware Library <https://labware.opentrons.com>`__.
+
         :param str namespace: The namespace that the labware definition belongs to.
             If unspecified, the API will automatically search two namespaces:
 
@@ -1382,20 +1387,35 @@ class FlexStackerContext(ModuleContext):
             You might need to specify an explicit ``namespace`` if you have a custom
             definition whose ``load_name`` is the same as an Opentrons-verified
             definition, and you want to explicitly choose one or the other.
+
         :param version: The version of the labware definition. You should normally
-            leave this unspecified to let ``load_labware()`` choose a version
+            leave this unspecified to let ``set_stored_labware()`` choose a version
             automatically.
+
         :param adapter: An adapter to load the labware on top of. Accepts the same
-            values as the ``load_name`` parameter of :py:meth:`.load_adapter`. The
-            adapter will use the same namespace as the labware, and the API will
-            choose the adapter's version automatically.
+            values as the ``load_name`` parameter of :py:meth:`.load_adapter`.
+
+        :param adapter_namespace: Applies to ``adapter`` the same way that ``namespace``
+            applies to ``load_name``.
+
+        :param adapter_version: Applies to ``adapter`` the same way that ``version``
+            applies to ``load_name``.
+
         :param lid: A lid to load the on top of the main labware. Accepts the same
             values as the ``load_name`` parameter of :py:meth:`.load_lid_stack`. The
             lid will use the same namespace as the labware, and the API will
             choose the lid's version automatically.
+
+        :param lid_namespace: Applies to ``lid`` the same way that ``namespace``
+            applies to ``load_name``.
+
+        :param lid_version: Applies to ``lid`` the same way that ``version``
+            applies to ``load_name``.
+
         :param count: The number of labware that the Flex Stacker should start the protocol
             storing. If not specified, this will be the maximum amount of this kind of
             labware that the Flex Stacker is capable of storing.
+
         :param stacking_offset_z: Stacking offset in mm between labware units to override the
             calculated value from labware definitions.
 
@@ -1416,7 +1436,6 @@ class FlexStackerContext(ModuleContext):
                 of the unit below.
             - Labware with lid and adapter: the adapter (bottomside) of the upper unit overlaps the
                 lid (topside) of the unit below.
-
         """
 
         self._core.set_stored_labware(
