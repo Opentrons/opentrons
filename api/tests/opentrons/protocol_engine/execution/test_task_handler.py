@@ -216,6 +216,48 @@ async def test_generates_enumerated_error(
     )
 
 
+async def test_generates_cancelled_error(
+    subject: TaskHandler,
+    decoy: Decoy,
+    model_utils: ModelUtils,
+    action_dispatcher: ActionDispatcher,
+) -> None:
+    """It should generate an cancelled error."""
+
+    async def _task(task_handler: TaskHandler) -> None:
+        await asyncio.Event().wait()
+
+    finished_at = datetime.now()
+    decoy.when(model_utils.get_timestamp()).then_return(finished_at)
+    decoy.when(model_utils.generate_id()).then_return("errorid")
+    decoy.when(model_utils.ensure_id(None)).then_return("testid2")
+    task = await subject.create_task(_task)
+    task.asyncioTask.cancel(msg="Cancel task")
+    try:
+        await asyncio.wait_for(task.asyncioTask, timeout=0.25)
+    except (asyncio.CancelledError):
+        pass
+    decoy.verify(
+        action_dispatcher.dispatch(
+            FinishTaskAction(
+                task_id="testid2",
+                finished_at=finished_at,
+                error=ErrorOccurrence.model_construct(
+                    id="errorid",
+                    createdAt=finished_at,
+                    isDefined=False,
+                    errorType=matchers.Anything(),
+                    errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+                    detail=matchers.StringMatching(r"(CancelledError)|(Cancel Task)"),
+                    errorInfo=matchers.Anything(),
+                    wrappedErrors=matchers.Anything(),
+                ),
+            )
+        ),
+        times=1,
+    )
+
+
 async def test_synchronization_cancel_latest(subject: TaskHandler) -> None:
     """Test cancel_lastest synchronization."""
     task1_started = asyncio.Event()
