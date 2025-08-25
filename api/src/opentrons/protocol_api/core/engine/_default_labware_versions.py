@@ -1,5 +1,10 @@
 """The versions of standard labware that the Protocol API should load by default."""
 
+import json
+from opentrons_shared_data import get_shared_data_root
+from opentrons.protocols.api_support.constants import (
+    LABWARE_DEF_VERSIONS_BY_API_LEVEL_PATH,
+)
 from typing import TypeAlias
 from opentrons.protocols.api_support.types import APIVersion
 
@@ -7,6 +12,11 @@ from opentrons.protocols.api_support.types import APIVersion
 DefaultLabwareVersions: TypeAlias = dict[APIVersion, dict[str, int]]
 
 
+VERSIONS_BY_API_LEVEL_2_26_PATH = (
+    get_shared_data_root() / LABWARE_DEF_VERSIONS_BY_API_LEVEL_PATH / "2_26.json"
+)
+with open(VERSIONS_BY_API_LEVEL_2_26_PATH) as file:
+    labware_data_2_26 = json.load(file)
 # This:
 #
 # {
@@ -112,37 +122,7 @@ DEFAULT_LABWARE_VERSIONS: DefaultLabwareVersions = {
         "thermoscientificnunc_96_wellplate_2000ul": 3,
         "usascientific_96_wellplate_2.4ml_deep": 3,
     },
-    APIVersion(2, 26): {
-        "agilent_1_reservoir_290ml": 4,
-        "axygen_1_reservoir_90ml": 3,
-        "biorad_96_wellplate_200ul_pcr": 5,
-        "corning_12_wellplate_6.9ml_flat": 5,
-        "corning_24_wellplate_3.4ml_flat": 5,
-        "corning_384_wellplate_112ul_flat": 5,
-        "corning_48_wellplate_1.6ml_flat": 6,
-        "corning_6_wellplate_16.8ml_flat": 5,
-        "corning_96_wellplate_360ul_flat": 5,
-        "nest_12_reservoir_15ml": 3,
-        "nest_1_reservoir_195ml": 4,
-        "nest_1_reservoir_290ml": 4,
-        "nest_96_wellplate_100ul_pcr_full_skirt": 5,
-        "nest_96_wellplate_200ul_flat": 5,
-        "nest_96_wellplate_2ml_deep": 5,
-        "opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical": 3,
-        "opentrons_15_tuberack_falcon_15ml_conical": 3,
-        "opentrons_24_aluminumblock_nest_0.5ml_screwcap": 4,
-        "opentrons_24_aluminumblock_nest_1.5ml_screwcap": 3,
-        "opentrons_24_aluminumblock_nest_1.5ml_snapcap": 3,
-        "opentrons_24_aluminumblock_nest_2ml_screwcap": 3,
-        "opentrons_24_aluminumblock_nest_2ml_snapcap": 3,
-        "opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap": 3,
-        "opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap": 3,
-        "opentrons_24_tuberack_nest_0.5ml_screwcap": 4,
-        "opentrons_6_tuberack_nest_50ml_conical": 3,
-        "opentrons_96_aluminumblock_generic_pcr_strip_200ul": 4,
-        "usascientific_12_reservoir_22ml": 4,
-        "usascientific_96_wellplate_2.4ml_deep": 4,
-    },
+    APIVersion(2, 26): labware_data_2_26,
 }
 
 

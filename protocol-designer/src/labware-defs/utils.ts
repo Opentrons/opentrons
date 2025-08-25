@@ -3,9 +3,11 @@ import groupBy from 'lodash/groupBy'
 import {
   getAllDefinitions as _getAllDefinitions,
   getAllLegacyDefinitions,
+  getGreaterThanVersions,
   getLabwareDefURI,
   PD_DO_NOT_LIST,
 } from '@opentrons/shared-data'
+import { PAPI_VERSION } from '@opentrons/step-generation'
 
 import type {
   LabwareDefinition1,
@@ -34,6 +36,9 @@ export function getAllDefinitions(): LabwareDefByDefURI {
 // has the {labwareDefURI: def} shape, instead of an array of labware defs
 let _latestDefs: LabwareDefByDefURI | null = null
 export function getOnlyLatestDefs(): LabwareDefByDefURI {
+  // pick latest acceptable JSON, example comparing: "2.25" vs "2_26"
+  const unacceptableDefVersions = getGreaterThanVersions(PAPI_VERSION)
+
   if (!_latestDefs) {
     const allDefs = getAllDefinitions()
     const allURIs = Object.keys(allDefs)
@@ -44,10 +49,31 @@ export function getOnlyLatestDefs(): LabwareDefByDefURI {
     _latestDefs = Object.keys(labwareDefGroups).reduce(
       (acc, groupKey: string) => {
         const group = labwareDefGroups[groupKey]
-        const allVersions = group.map(d => d.version)
-        const highestVersionNum = Math.max(...allVersions)
-        const resultIdx = group.findIndex(d => d.version === highestVersionNum)
-        const latestDefInGroup = group[resultIdx]
+
+        // filter out any defs that are disallowed at the specific api level
+        const unAcceptableDefs = group.filter(def => {
+          const disallowedVersionForLoadName: number | null =
+            unacceptableDefVersions?.[def.parameters.loadName]
+          // if loadName is not include, then allow it still
+          if (disallowedVersionForLoadName == null) {
+            return true
+          }
+          // if this specific version is disallowed, then skip
+          return def.version !== disallowedVersionForLoadName
+        })
+
+        if (unAcceptableDefs.length === 0) {
+          return acc
+        }
+        console.log('unAcceptableDefs', unAcceptableDefs)
+        const highestVersionNum = Math.max(
+          ...unAcceptableDefs.map(def => def.version)
+        )
+        console.log('highestVersionNum', highestVersionNum)
+        const latestDefInGroup = unAcceptableDefs.find(
+          def => def.version === highestVersionNum
+        )!
+
         return {
           ...acc,
           [getLabwareDefURI(latestDefInGroup)]: latestDefInGroup,

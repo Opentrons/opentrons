@@ -102,6 +102,53 @@ export function getAllLegacyDefinitions(): LegacyLabwareDefByName {
   return schema1DefinitionsByName
 }
 
+//  for returning the labware def versions gated by api version
+const versionModules: Record<string, number> = import.meta.glob(
+  '../labware/versionsByAPILevel/*.json',
+  {
+    eager: true,
+  }
+)
+
+const versions: Record<string, number> = Object.fromEntries(
+  Object.entries(versionModules).map(([path, module]) => {
+    // filename without extension, ex: 2_25
+    const match = path.match(/(\d+)_(\d+)\.json$/)
+    if (match == null) {
+      return []
+    }
+    const key = `${match[1]}_${match[2]}`
+    return [key, (module as any).default]
+  })
+)
+
+function parseAPIVersion(version: string): [number, number] {
+  const [major, minor] = version.split('.').map(Number)
+  return [major, minor]
+}
+
+function isGreaterThan(a: [number, number], b: [number, number]): boolean {
+  return a[0] > b[0] || (a[0] === b[0] && a[1] > b[1])
+}
+
+export function getGreaterThanVersions(
+  currentPAPIVersion: string
+): Record<string, number> {
+  const current = parseAPIVersion(currentPAPIVersion)
+  // find all JSONs with API version greater than current
+  const unAcceptableKeys = Object.keys(versions).filter(k => {
+    const [maj, min] = k.split('_').map(Number)
+    return isGreaterThan([maj, min], current)
+  })
+  // merge all Record<loadName: version> pairs from the JSONs
+  const unAcceptables: Record<string, number> = {}
+  unAcceptableKeys.forEach(key => {
+    const defs = versions[key]
+    Object.assign(unAcceptables, defs)
+  })
+  return unAcceptables
+}
+
 export {
   labwareSchemaV2,
   labwareSchemaV3,

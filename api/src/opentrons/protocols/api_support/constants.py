@@ -6,3 +6,4 @@ OPENTRONS_NAMESPACE = "opentrons"
 CUSTOM_NAMESPACE = "custom_beta"
 STANDARD_DEFS_PATH = Path("labware/definitions")
 USER_DEFS_PATH = get_opentrons_path("labware_user_definitions_dir_v2")
+LABWARE_DEF_VERSIONS_BY_API_LEVEL_PATH = Path("labware/versionsByAPILevel")
