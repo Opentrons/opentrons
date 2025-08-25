@@ -5,7 +5,7 @@ title: "Opentrons Flex: Temperature Module"
 ![The Temperature Module as seen from the top left. The top of the module has the heating and cooling surface and temperature display. The side has the power button, USB port, and power port.](../images/temperature-module.png "Temperature Module")
 
 !!! info "Additional Documentation"
-    For complete instructions on module installation and use, see the Temperature Module Instruction Manual.
+    For complete instructions on module installation and use, see the [Temperature Module Instruction Manual](../../temperature-module/index.md).
 
 ## Temperature Module features
 
