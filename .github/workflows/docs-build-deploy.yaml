@@ -116,7 +116,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: docs-artifacts
-          path: docs/
+          path: docs/site/
 
       - name: Debug - List files before deploy
         working-directory: ./docs
