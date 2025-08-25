@@ -29,6 +29,7 @@ DIAL_POS_WITHOUT_TIP: List[Optional[float]] = [None, None]
 metadata = {"protocolName": "volume-validator"}
 requirements = {"robotType": "Flex", "apiLevel": "2.24"}
 
+
 def add_parameters(parameters: ParameterContext) -> None:
     """Add parameters."""
     parameters.add_str(
@@ -67,7 +68,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         minimum=1,
         default=3,
     )
-    
+
     parameters.add_str(
         variable_name="labware_type",
         display_name="Labware Type",
@@ -88,11 +89,14 @@ def add_parameters(parameters: ParameterContext) -> None:
                 "display_name": "dorf500",
                 "value": "eppendorf_96_wellplate_500ul_custom",
             },
+<<<<<<< HEAD
             {
                 "display_name": "dorf1000",
                 "value": "eppendorf_96_wellplate_1000ul_custom",
             },
 
+=======
+>>>>>>> c19b1419a3de2da39d0080b772cb28f4c4e21935
         ],
         default="eppendorf_96_wellplate_1000ul_custom",
     )
@@ -106,6 +110,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         ],
         default="1000",
     )
+
 
 def pick_up_tips(
     probe_pipette: InstrumentContext, liq_pipette: InstrumentContext
@@ -124,6 +129,7 @@ def drop_tips(probe_pipette: InstrumentContext, liq_pipette: InstrumentContext) 
     if liq_pipette.has_tip:
         liq_pipette.drop_tip()
 
+
 def _store_dial_baseline(
     ctx: ProtocolContext,
     pipette: InstrumentContext,
@@ -137,6 +143,7 @@ def _store_dial_baseline(
     DIAL_POS_WITHOUT_TIP[idx] = _read_dial_indicator(ctx, pipette, dial, front_channel)
     tag = f"DIAL-BASELINE-{idx}"
     _write_line_to_csv(ctx, [tag, str(DIAL_POS_WITHOUT_TIP[idx])])
+
 
 def _get_tip_z_error(
     ctx: ProtocolContext,
@@ -171,6 +178,7 @@ def _read_dial_indicator(
     pipette.move_to(target.move(Point(z=5)))
     return dial_port
 
+
 def _write_line_to_csv(ctx: ProtocolContext, line: List[str]) -> None:
     if ctx.is_simulating():
         return
@@ -189,13 +197,13 @@ def aspirate_dispense_measure(
     dial: Labware,
     probe_pipette: InstrumentContext,
     liq_pipette: InstrumentContext,
-    #ethanol: LiquidClass,
+    # ethanol: LiquidClass,
 ) -> Labware:
     """Aspirate from source, dispense into labware, measure height, record."""
     all_corrected_heights: List[float] = []
     i = 0
     num_of_individual_wells = len(volumes_dict.keys())
-   
+
     for well, expected_vol in volumes_dict.items():
         expected_vol = expected_vol[0]
         pick_up_tips(probe_pipette, liq_pipette)
@@ -205,15 +213,15 @@ def aspirate_dispense_measure(
             liq_pipette.measure_liquid_height(src["A1"])
 
         tip_z_error = _get_tip_z_error(ctx, probe_pipette, dial)
-    
-        #liq_pipette.transfer_with_liquid_class(
+
+        # liq_pipette.transfer_with_liquid_class(
         #    ethanol,
         #    expected_vol / liq_pipette.channels,
         #    src["A1"],
         #    labware[well],
         #    new_tip="never",
         #    return_tip=False,
-        #)
+        # )
 
         expected_height = labware[well].height_from_volume(expected_vol)
         dispense_loc = labware[well].bottom(z= expected_height + 2.5)
@@ -224,7 +232,7 @@ def aspirate_dispense_measure(
             dispense_loc,
             new_tip="never",
             return_tip=False,
-            blow_out = True,
+            blow_out=True,
             blowout_location="destination well",
             air_gap=5,
         )
@@ -265,7 +273,6 @@ def run(ctx: ProtocolContext) -> None:
     right_mount = ctx.params.right_mount  # type: ignore[attr-defined]
     liq_tip_size = ctx.params.liq_tip_size  # type: ignore[attr-defined]
 
-
     liq_tip_racks = [
         ctx.load_labware(f"opentrons_flex_96_tiprack_{liq_tip_size}ul", slot)
         for slot in SLOT_LIQUID_TIPRACKS
@@ -277,17 +284,13 @@ def run(ctx: ProtocolContext) -> None:
         liq_racks = liq_tip_racks
     else:
         liq_racks = liq_tip_racks[:1]
-    liq_pipette = ctx.load_instrument(
-        right_mount, "right", tip_racks=liq_racks
-    )
-    probe_pipette = ctx.load_instrument(
-        left_mount, "left", tip_racks=[probe_tip_rack]
-    )
+    liq_pipette = ctx.load_instrument(right_mount, "right", tip_racks=liq_racks)
+    probe_pipette = ctx.load_instrument(left_mount, "left", tip_racks=[probe_tip_rack])
 
     # Assign ethanol liquid class behavior
-    #ethanol = ctx.get_liquid_class("ethanol_80")
-    #lm = "liquid-meniscus"
-    #for liquid_rack in liq_racks:
+    # ethanol = ctx.get_liquid_class("ethanol_80")
+    # lm = "liquid-meniscus"
+    # for liquid_rack in liq_racks:
     #    props = ethanol.get_for(liq_pipette, liquid_rack)
     #    meniscus_z = -0.5
     #    props.aspirate.aspirate_position.position_reference = lm  # type: ignore[assignment]
@@ -347,9 +350,9 @@ def run(ctx: ProtocolContext) -> None:
         labware,
         src,
         dial,
-        probe_pipette, 
+        probe_pipette,
         liq_pipette,
-        #ethanol,
+        # ethanol,
     )
 
     region_names = ["low", "middle", "high"]
@@ -368,9 +371,9 @@ def run(ctx: ProtocolContext) -> None:
             errors = [abs(c - expected_val) for c in corrected]
             avg_error = sum(errors) / len(errors) if errors else 0.0
             region_results.extend(
-                [str(round(c, 3)) for c in corrected] +
-                [str(round(expected_val, 3))] +
-                [str(round(avg_error, 3))]
+                [str(round(c, 3)) for c in corrected]
+                + [str(round(expected_val, 3))]
+                + [str(round(avg_error, 3))]
             )
 
         from hardware_testing.data import append_data_to_file
@@ -379,6 +382,4 @@ def run(ctx: ProtocolContext) -> None:
         line_str = ",".join(line) + "\n"
         append_data_to_file(metadata["protocolName"], RUN_ID, FILE_NAME, line_str)
 
-
     drop_tips(probe_pipette, liq_pipette)
-
