@@ -1,5 +1,5 @@
 ---
-title: "Opentrons Flex: Touchscreen dashboard"
+title: "Opentrons Flex: Touchscreen Dashboard"
 ---
 
 <figure class="screenshot" markdown>

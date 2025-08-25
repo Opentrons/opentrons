@@ -1,5 +1,5 @@
 ---
-title: Modules
+title: Opentrons Modules
 ---
 
 # Modules

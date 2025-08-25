@@ -1,5 +1,5 @@
 ---
-title: "Plate Reader: Using Plate Reader Data"
+title: "Plate Reader: Using Data"
 hide: toc
 ---
 

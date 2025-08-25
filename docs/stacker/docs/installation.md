@@ -1,5 +1,5 @@
 ---
-title: "Flex Stacker: Installing the Stacker"
+title: "Flex Stacker: Installation"
 ---
 
 Before you begin, make sure you've read and are familiar with the information provided in the [Pre-Installation Information section](pre-installation.md).
