@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import { fixture96Plate } from '@opentrons/shared-data'
 
 import { LabwareButtonBasket as LabwareButtonBasketComponent } from '.'

@@ -7,5 +7,6 @@
 .basket_container {
   display: flex;
   flex-direction: column;
+  width: 11.6875rem;
   gap: var(--spacing-8);
 }

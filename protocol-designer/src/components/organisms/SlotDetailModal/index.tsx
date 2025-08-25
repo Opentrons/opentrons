@@ -129,11 +129,7 @@ export const SlotDetailModal = (
       onClose={closeModal}
       closeOnOutsideClick
       childrenPadding={0}
-      width={
-        selectedLiquidId != null || stackOfLabware.length > 1
-          ? '47rem'
-          : '31.25rem'
-      }
+      width="47rem"
       overflowY="hidden"
       headerTagElement={
         stackOfLabware.length > 1 ? (
@@ -147,7 +143,7 @@ export const SlotDetailModal = (
       <Box
         backgroundColor={COLORS.grey10}
         padding={SPACING.spacing16}
-        height={selectedLiquidId != null ? '28rem' : '25rem'}
+        height="28rem"
       >
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing24}>
           {stackOfLabware.length > 1 ? (
