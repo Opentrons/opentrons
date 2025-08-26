@@ -271,6 +271,14 @@ from .wait_for_duration import (
     WaitForDurationCommandType,
 )
 
+from .create_timer import (
+    CreateTimer,
+    CreateTimerCreate,
+    CreateTimerParams,
+    CreateTimerResult,
+    CreateTimerCommandType,
+)
+
 from .pick_up_tip import (
     PickUpTip,
     PickUpTipParams,
@@ -619,6 +627,12 @@ __all__ = [
     "WaitForDurationCreate",
     "WaitForDurationResult",
     "WaitForDurationCommandType",
+    # Timer command models
+    "CreateTimer",
+    "CreateTimerCreate",
+    "CreateTimerParams",
+    "CreateTimerResult",
+    "CreateTimerCommandType",
     # pick up tip command models
     "PickUpTip",
     "PickUpTipCreate",

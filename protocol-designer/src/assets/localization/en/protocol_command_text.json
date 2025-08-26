@@ -18,6 +18,7 @@
   "configure_for_volume": "Configure {{pipette}} to aspirate {{volume}} µL",
   "configure_nozzle_layout": "Configure {{pipette}} to use {{layout}}",
   "confirm_and_resume": "Confirm and resume",
+  "create_timer": "Create background timer of {{seconds}} seconds",
   "deactivate_hs_shake": "Deactivating shaker",
   "deactivate_temperature_module": "Deactivating Temperature Module",
   "deactivating_hs_heater": "Deactivating heater",

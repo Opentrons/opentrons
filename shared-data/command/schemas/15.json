@@ -1039,6 +1039,59 @@
       "title": "Coordinate",
       "type": "object"
     },
+    "CreateTimerCreate": {
+      "description": "CreateTimer command request model.",
+      "properties": {
+        "commandType": {
+          "const": "createTimer",
+          "default": "createTimer",
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/CreateTimerParams"
+        }
+      },
+      "required": ["params"],
+      "title": "CreateTimerCreate",
+      "type": "object"
+    },
+    "CreateTimerParams": {
+      "description": "Payload required to annotate execution with a CreateTimer.",
+      "properties": {
+        "task_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The id of the timer task",
+          "title": "Task Id"
+        },
+        "time": {
+          "description": "The time before the timer should elapse in seconds",
+          "title": "Time",
+          "type": "number"
+        }
+      },
+      "required": ["time"],
+      "title": "CreateTimerParams",
+      "type": "object"
+    },
     "CustomCreate": {
       "description": "A request to create a custom command.",
       "properties": {
@@ -6777,6 +6830,7 @@
       "comment": "#/$defs/CommentCreate",
       "configureForVolume": "#/$defs/ConfigureForVolumeCreate",
       "configureNozzleLayout": "#/$defs/ConfigureNozzleLayoutCreate",
+      "createTimer": "#/$defs/CreateTimerCreate",
       "custom": "#/$defs/CustomCreate",
       "dispense": "#/$defs/DispenseCreate",
       "dispenseInPlace": "#/$defs/DispenseInPlaceCreate",
@@ -6967,6 +7021,9 @@
     },
     {
       "$ref": "#/$defs/WaitForDurationCreate"
+    },
+    {
+      "$ref": "#/$defs/CreateTimerCreate"
     },
     {
       "$ref": "#/$defs/PickUpTipCreate"

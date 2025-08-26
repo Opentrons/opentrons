@@ -320,7 +320,12 @@ export function useCommandTextString(
         kind: 'generic',
         commandText: utils.getRobotCommandText({ ...fullParams, command }),
       }
-
+    case 'createTimer': {
+      return {
+        kind: 'generic',
+        commandText: utils.getConcurrentCommandText({ ...fullParams, command }),
+      }
+    }
     case undefined:
     case null:
       return { kind: 'generic', commandText: '' }
