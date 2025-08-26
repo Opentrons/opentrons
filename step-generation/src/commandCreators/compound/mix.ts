@@ -1,7 +1,8 @@
-import flatMap from 'lodash/flatMap'
+import { flatMap } from 'lodash'
 
 import {
   getByVolumeValue,
+  getIsTiprack,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
   LOW_VOLUME_PIPETTES,
   WELL_ORIGIN_BOTTOM,
@@ -24,6 +25,7 @@ import {
   configureForVolume,
   delay,
   dispenseInPlace,
+  dropTip,
   moveToWell,
   prepareToAspirate,
   touchTip,
@@ -319,10 +321,28 @@ export const mix: CommandCreator<MixArgs> = (
     return { errors: [errorCreators.labwareDiscarded()] }
   }
 
+  const trashLikeIds = [
+    ...Object.keys(invariantContext.trashBinEntities),
+    ...Object.keys(invariantContext.wasteChuteEntities),
+  ]
+
+  const fallBackTrashLikeId = trashLikeIds.length > 0 ? trashLikeIds[0] : null
+
+  // tiprack for return tip
+  const dropTipLabware = Object.values(invariantContext.labwareEntities).find(
+    ({ labwareDefURI }) => labwareDefURI === dropTipLocation
+  )
+  const isReturnTip = dropTipLabware != null && getIsTiprack(dropTipLabware.def)
+
+  const isWasteChuteDropLocation =
+    invariantContext.wasteChuteEntities[dropTipLocation] != null
+  const isTrashBinDropLocation =
+    invariantContext.trashBinEntities[dropTipLocation] != null
+
   if (
-    !dropTipLocation ||
-    (invariantContext.wasteChuteEntities[dropTipLocation] == null &&
-      invariantContext.trashBinEntities[dropTipLocation] == null)
+    dropTipLocation == null ||
+    (isReturnTip && fallBackTrashLikeId == null && changeTip !== 'never') ||
+    (!isReturnTip && !isWasteChuteDropLocation && !isTrashBinDropLocation)
   ) {
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
   }
@@ -362,6 +382,7 @@ export const mix: CommandCreator<MixArgs> = (
         }),
       ]
     : []
+
   // Command generation
   const commandCreators = flatMap(
     wells,
@@ -372,7 +393,11 @@ export const mix: CommandCreator<MixArgs> = (
         tipCommands = [
           curryCommandCreator(replaceTip, {
             pipette,
-            dropTipLocation,
+            // the tip will only be dropped on the first time through this loop if we are returning tip to tiprack
+            dropTipLocation:
+              isReturnTip && fallBackTrashLikeId != null
+                ? fallBackTrashLikeId
+                : dropTipLocation,
             tipRack,
             ...(nozzles != null ? { nozzles } : {}),
             isFromMixCommand: true,
@@ -423,6 +448,18 @@ export const mix: CommandCreator<MixArgs> = (
         ? [...touchTipCommands, ...blowoutCommand]
         : [...blowoutCommand, ...touchTipCommands]
 
+      const returnTipCommands: CurriedCommandCreator[] =
+        isReturnTip &&
+        (wellIndex === wells.length - 1 || changeTip === 'always')
+          ? [
+              curryCommandCreator(dropTip, {
+                pipette,
+                dropTipLocation: tipRack,
+                isReturnTip,
+              }),
+            ]
+          : []
+
       const mixCommands = mixInPlaceUtil({
         pipette,
         volume,
@@ -450,15 +487,18 @@ export const mix: CommandCreator<MixArgs> = (
         },
         generatePython: true,
       })
-      return [
+      const newCommands = [
         ...tipCommands,
         ...configureForVolumeCommand,
         ...prepareToAspirateCommand,
         ...mixCommands,
         ...advancedDispenseCommands,
+        ...returnTipCommands,
       ]
+      return newCommands
     }
   )
+
   return reduceCommandCreators(
     commandCreators,
     invariantContext,
