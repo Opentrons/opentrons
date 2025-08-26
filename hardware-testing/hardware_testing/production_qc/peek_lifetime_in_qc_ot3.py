@@ -384,57 +384,61 @@ async def _cycle_plunger(
     cycle: int,
     trials: int,
     continue_after_stall: bool,
-    writer
 ) -> float:
     """Cycle the plunger at the set current and speed. Return number of failed cycles"""
 
     failed_cycles = 0
+    today = datetime.now().strftime("%m-%d-%y_%H-%M")
+    pip_id = mount.name#api.attached_pipettes[mount]["pipette_id"]
+    with open(
+        f"/data/testing_data/PEEK_LT_{pip_id}_{today}.csv", "w", newline=""
+    ) as csvfile:
+        writer = csv.writer(csvfile)
+        for trial in range(trials):
 
-    for trial in range(trials):
-
-        if trial % 100 == 0:
-            ui.print_header(
-                f"CURRENT = {CYCLING_CURRENT}: "
-                f"SPEED = {CYCLING_SPEED}: "
-                f"TRIAL = {trial + 1}/{trials}: "
-                f"CYCLE = {cycle}"
-            )
-            failval1=[f"CURRENT = {CYCLING_CURRENT}: ",f"SPEED = {CYCLING_SPEED}: ",f"TRIAL = {trial + 1}/{trials}: ",f"CYCLE = {cycle}"]
-            csv_line = ','.join(str(item) for item in failval1) + '\n'
-            writer.writerow(csv_line)
-
-
-        await _home_plunger(api, mount)
-        for direction in ["down", "up"]:
-            _pass = await _test_direction_cycle(
-                api,
-                mount,
-                CYCLING_CURRENT,
-                CYCLING_SPEED,
-                TEST_ACCELERATION,
-                direction,
-            )
-            if not _pass:
-                failval1=[f"failed moving {direction} at {CYCLING_CURRENT} amps and {CYCLING_SPEED} mm/sec"]
+            if trial % 100 == 0:
+                ui.print_header(
+                    f"CURRENT = {CYCLING_CURRENT}: "
+                    f"SPEED = {CYCLING_SPEED}: "
+                    f"TRIAL = {trial + 1}/{trials}: "
+                    f"CYCLE = {cycle}"
+                )
+                failval1=[f"CURRENT = {CYCLING_CURRENT}: ",f"SPEED = {CYCLING_SPEED}: ",f"TRIAL = {trial + 1}/{trials}: ",f"CYCLE = {cycle}"]
                 csv_line = ','.join(str(item) for item in failval1) + '\n'
                 writer.writerow(csv_line)
-                ui.print_error(
-                    f"failed moving {direction} at {CYCLING_CURRENT} amps and {CYCLING_SPEED} mm/sec"
-                )
-                
 
-                failval2=[f"-----failed at {trial} cycles and {failed_cycles} failed cycles"]
-                csv_line = ','.join(str(item) for item in failval2) + '\n'
-                writer.writerow(csv_line)
-                
-                failed_cycles = failed_cycles + 1
-                ui.print_error(
-                    f"-----failed at {trial} cycles and {failed_cycles} failed cycles"
+
+            await _home_plunger(api, mount)
+            for direction in ["down", "up"]:
+                _pass = await _test_direction_cycle(
+                    api,
+                    mount,
+                    CYCLING_CURRENT,
+                    CYCLING_SPEED,
+                    TEST_ACCELERATION,
+                    direction,
                 )
-                if continue_after_stall:
-                    continue
-                else:
-                    return failed_cycles
+                if not _pass:
+                    failval1=[f"failed moving {direction} at {CYCLING_CURRENT} amps and {CYCLING_SPEED} mm/sec"]
+                    csv_line = ','.join(str(item) for item in failval1) + '\n'
+                    writer.writerow(csv_line)
+                    ui.print_error(
+                        f"failed moving {direction} at {CYCLING_CURRENT} amps and {CYCLING_SPEED} mm/sec"
+                    )
+                    
+
+                    failval2=[f"-----failed at {trial} cycles and {failed_cycles} failed cycles"]
+                    csv_line = ','.join(str(item) for item in failval2) + '\n'
+                    writer.writerow(csv_line)
+                    
+                    failed_cycles = failed_cycles + 1
+                    ui.print_error(
+                        f"-----failed at {trial} cycles and {failed_cycles} failed cycles"
+                    )
+                    if continue_after_stall:
+                        continue
+                    else:
+                        return failed_cycles
 
     return failed_cycles
 
@@ -502,19 +506,15 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
             # this is the old fix, we can use it if the fw reset doesn't work
             # await _move_plunger_as_cycle_settings(api, mount)
         await _reset_pipette_fw(api, mount)
-        today = datetime.now().strftime("%m-%d-%y_%H-%M")
-        pip_id = api.attached_pipettes[mount]["pipette_id"]
-        with open(
-            f"/data/testing_data/PEEK_LT_{pip_id}_{today}.csv", "w", newline=""
-        ) as csvfile:
+        
             
-            writer = csv.writer(csvfile)
-            failed_cycles = await _cycle_plunger(
-                api, mount,
-                cycle=1, trials=cycles,
-                continue_after_stall=continue_after_stall,
-                writer=writer
-            )
+        
+        failed_cycles = await _cycle_plunger(
+            api, mount,
+            cycle=1, trials=cycles,
+            continue_after_stall=continue_after_stall,
+            
+        )
         #data = [failed_cycles, CSVResult.from_Numbool(failed_cycles)]
             # report(
             #     _get_cycling_section_tag(),
