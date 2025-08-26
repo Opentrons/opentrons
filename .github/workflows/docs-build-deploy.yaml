@@ -126,9 +126,9 @@ jobs:
         run: |
           # Get the CloudFront distribution ID based on environment
           if [ "${{ env.ENVIRONMENT }}" = "staging" ]; then
-            DISTRIBUTION_ID="E8IWASMDOWHYP"
+            DISTRIBUTION_ID="E2DBE0K9VT8YB9"
           elif [ "${{ env.ENVIRONMENT }}" = "production" ]; then
-            DISTRIBUTION_ID="E16BZZXDTINN0S"
+            DISTRIBUTION_ID="E2PSPUXND1RQWG"
           fi
           
           # Create invalidation
