@@ -178,8 +178,8 @@ def add_parameters(parameters: ParameterContext) -> None:
         display_name="Step Height Target",
         description="Specify the desired target step height, i.e 1mm",
         default=1.0,
-        maximum=10.0,
-        minimum=0.01,
+        maximum=3.0,
+        minimum=0.1,
     )
 
     parameters.add_str(

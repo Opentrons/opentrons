@@ -73,11 +73,35 @@ def add_parameters(parameters: ParameterContext) -> None:
         display_name="Labware Type",
         choices=[
             {
-                "display_name": "dorf384",
-                "value": "eppendorf_384_wellplate_45ul_custom",
+                "display_name": "falcon384",
+                "value": "corning_falcon_384_well_plate_130ul_square_flat",
+            },
+            {
+                "display_name": "costar96_2200",
+                "value": "costar_96_wellplate_2200ul",
+            },
+            {
+                "display_name": "greiner323",
+                "value": "greiner_96_wellplate_323ul",
+            },
+            {
+                "display_name": "greiner340",
+                "value": "greiner_96_wellplate_340ul",
+            },
+            {
+                "display_name": "nunc96_250",
+                "value": "nunc_96_wellplate_250ul",
+            },
+            {
+                "display_name": "thermo_abgene_1.2ml",
+                "value": "thermoscientific_abgene_96_wellplate_1.2ml",
+            },
+            {
+                "display_name": "thermo_96_800",
+                "value": "thermoscientific_96_wellplate_800ul",
             },
         ],
-        default="eppendorf_384_wellplate_45ul_custom",
+        default="greiner_96_wellplate_340ul",
     )
 
     parameters.add_str(
@@ -130,8 +154,9 @@ def _setup(
         liq_racks = liq_tip_racks
     else:
         liq_racks = liq_tip_racks[:1]
-    liq_pipette = ctx.load_instrument(right_mount, "right", tip_racks=liq_racks)
+
     probe_pipette = ctx.load_instrument(left_mount, "left", tip_racks=[probe_tip_rack])
+    liq_pipette = ctx.load_instrument(right_mount, "right", tip_racks=liq_racks)
 
     # Connect dial indicator and create data sheet
 
@@ -317,8 +342,8 @@ def aspirate_dispense_measure(
 def run(ctx: ProtocolContext) -> None:
     """Protocol."""
     (
-        probe_pipette,
         liq_pipette,
+        probe_pipette,
         src,
         labware,
         expected_heights,
