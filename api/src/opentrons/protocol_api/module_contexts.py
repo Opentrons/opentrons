@@ -1339,7 +1339,7 @@ class FlexStackerContext(ModuleContext):
             definition whose ``load_name`` is the same as an Opentrons-verified
             definition, and you want to explicitly choose one or the other.
         :param version: The version of the labware definition. You should normally
-            leave this unspecified to let ``load_labware()`` choose a version
+            leave this unspecified to let the method choose a version
             automatically.
         :param adapter: An adapter to load the labware on top of. Accepts the same
             values as the ``load_name`` parameter of :py:meth:`.load_adapter`. The
