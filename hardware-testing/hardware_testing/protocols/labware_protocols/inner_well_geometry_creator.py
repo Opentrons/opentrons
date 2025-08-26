@@ -600,7 +600,7 @@ def geometry_creator(ctx: ProtocolContext, state: SetupState) -> List[TrialResul
 
         # Dispense
         dispense_volume += step_volume
-        liq_pipette.flow_rate.dispense = max(min(dispense_volume/3, 500), 30)
+        liq_pipette.flow_rate.dispense = max(min(dispense_volume / 3, 500), 30)
         dispense_loc = labware[current_well].bottom(z=max(corrected_height + 3, 3))
         liq_pipette.transfer(
             (dispense_volume / liq_pipette.channels) * 1.033,

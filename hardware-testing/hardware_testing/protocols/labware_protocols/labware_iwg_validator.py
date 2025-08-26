@@ -279,11 +279,10 @@ def aspirate_dispense_measure(
 
         tip_z_error = _get_tip_z_error(ctx, probe_pipette, dial)
 
-        dispense_vol = 0.0
-        expected_vol / liq_pipette.channels = dispense_vol
+        dispense_vol = float(expected_vol / liq_pipette.channels)
 
         expected_height = expected_heights[i]
-        liq_pipette.flow_rate.dispense = max(min(dispense_vol/3, 500), 30)
+        liq_pipette.flow_rate.dispense = max(min(dispense_vol / 3, 500), 30)
         dispense_loc = labware[well].bottom(z=expected_height + 3)
         liq_pipette.transfer(
             dispense_vol * 1.033,
