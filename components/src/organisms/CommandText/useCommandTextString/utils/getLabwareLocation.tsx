@@ -210,7 +210,8 @@ export function getLabwareLocation(
     return {
       slotName,
       moduleModel:
-        getModuleType(moduleModel) === FLEX_STACKER_MODULE_TYPE
+        getModuleType(moduleModel) === FLEX_STACKER_MODULE_TYPE &&
+        !('kind' in location && location.kind === 'inStackerHopper')
           ? undefined
           : moduleModel,
     }
