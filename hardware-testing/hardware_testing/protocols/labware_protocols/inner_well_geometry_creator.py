@@ -545,7 +545,7 @@ def geometry_creator(ctx: ProtocolContext, state: SetupState) -> List[TrialResul
     if max_volume > 100000:
         margin = max_volume * 0.33
     else:
-        margin = max_volume * 0.1
+        margin = max_volume * 0.15
 
     _store_dial_baseline(ctx, probe_pipette, state.dial)
     _write_line_to_csv(ctx, CSV_HEADER)
@@ -600,8 +600,8 @@ def geometry_creator(ctx: ProtocolContext, state: SetupState) -> List[TrialResul
 
         # Dispense
         dispense_volume += step_volume
-        liq_pipette.flow_rate.dispense = min(max_volume / 20, 400)
-        dispense_loc = labware[current_well].bottom(z=max(corrected_height + 2.5, 3))
+        liq_pipette.flow_rate.dispense = max(min(dispense_volume/3, 500), 30)
+        dispense_loc = labware[current_well].bottom(z=max(corrected_height + 3, 3))
         liq_pipette.transfer(
             (dispense_volume / liq_pipette.channels) * 1.033,
             src["A1"].meniscus(z=-2, target="end"),
