@@ -37,6 +37,11 @@ export function FileUploadMessagesModal(): JSX.Element | null {
 
   const isMigration = title === t('migration_header')
 
+  const showButtons =
+    title !== t('invalid_json_file') &&
+    title !== t('incorrect_file_header') &&
+    title !== t('incorrect_python_file_header')
+
   const handleClose = (): void => {
     if (isMigration) {
       dispatch(undoLoadFile())
@@ -44,11 +49,6 @@ export function FileUploadMessagesModal(): JSX.Element | null {
       dismissModal()
     }
   }
-
-  const showButtons =
-    title !== t('invalid_json_file') &&
-    title !== t('incorrect_file_header') &&
-    title !== t('incorrect_python_file_header')
 
   return (
     <Modal
