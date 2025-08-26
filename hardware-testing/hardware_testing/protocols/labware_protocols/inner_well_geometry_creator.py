@@ -134,27 +134,35 @@ def add_parameters(parameters: ParameterContext) -> None:
         display_name="Labware Type",
         choices=[
             {
-                "display_name": "dorf150yellow",
-                "value": "eppendorf_96_wellplate_150ul_custom",
+                "display_name": "falcon384",
+                "value": "corning_falcon_384_well_plate_130ul_square_flat",
             },
             {
-                "display_name": "dorf250",
-                "value": "eppendorf_96_wellplate_250ul_custom",
+                "display_name": "costar96_2200",
+                "value": "costar_96_wellplate_2200ul",
             },
             {
-                "display_name": "dorf384yellow",
-                "value": "eppendorf_384_wellplate_45ul_custom",
+                "display_name": "greiner323",
+                "value": "greiner_96_wellplate_323ul",
             },
             {
-                "display_name": "dorf500",
-                "value": "eppendorf_96_wellplate_500ul_custom",
+                "display_name": "greiner340",
+                "value": "greiner_96_wellplate_340ul",
             },
             {
-                "display_name": "dorf1000",
-                "value": "eppendorf_96_wellplate_1000ul_custom",
+                "display_name": "nunc96_250",
+                "value": "nunc_96_wellplate_250ul",
+            },
+            {
+                "display_name": "thermo_abgene_1.2ml",
+                "value": "thermoscientific_abgene_96_wellplate_1.2ml",
+            },
+            {
+                "display_name": "thermo_96_800",
+                "value": "thermoscientific_96_wellplate_800ul",
             },
         ],
-        default="eppendorf_96_wellplate_1000ul_custom",
+        default="corning_falcon_384_well_plate_130ul_square_flat",
     )
 
     # generally, the first dispense should be 1/25 the max volume.
@@ -327,25 +335,6 @@ def _write_line_to_csv(ctx: ProtocolContext, line: List[str]) -> None:
     formatted_line = [str(item).ljust(23) for item in line]
     line_str = f"{CSV_SEPARATOR.join(formatted_line)}\n"
     append_data_to_file(metadata["protocolName"], RUN_ID, FILE_NAME, line_str)
-
-
-def write_trial_log(
-    ctx: ProtocolContext, udv_table: List[TrialResult], trial_data: TrialResult
-) -> None:
-    """Append the trial result to a table and write to CSV."""
-    udv_table.append(trial_data)
-    _write_line_to_csv(
-        ctx,
-        [
-            trial_data.well,
-            str(trial_data.step_volume),
-            str(trial_data.total_volume),
-            str(trial_data.tip_z_error),
-            str(trial_data.height),
-            str(trial_data.hdelta),
-            trial_data.status,
-        ],
-    )
 
 
 def _get_tip_z_error(
@@ -563,18 +552,32 @@ def geometry_creator(ctx: ProtocolContext, state: SetupState) -> List[TrialResul
     _store_dial_baseline(ctx, probe_pipette, state.dial)
     _write_line_to_csv(ctx, CSV_HEADER)
 
-    trial_data = TrialResult(
-        well=current_well,
-        step_volume=round(step_volume, 5),
-        total_volume=round(dispense_volume, 5),
-        tip_z_error=round(tip_z_error, 5),
-        height=round(corrected_height, 5),
-        hdelta=hdelta,
-        status=status,
-    )
+    def write_trial_log(udv_table: List[TrialResult]) -> None:
+        trial_data = TrialResult(
+            well=current_well,
+            step_volume=round(step_volume, 5),
+            total_volume=round(dispense_volume, 5),
+            tip_z_error=round(tip_z_error, 5),
+            height=round(corrected_height, 5),
+            hdelta=hdelta,
+            status=status,
+        )
+        udv_table.append(trial_data)
+        _write_line_to_csv(
+            ctx,
+            [
+                trial_data.well,
+                str(trial_data.step_volume),
+                str(trial_data.total_volume),
+                str(trial_data.tip_z_error),
+                str(trial_data.height),
+                str(trial_data.hdelta),
+                trial_data.status,
+            ],
+        )
 
     # initial protocol steps
-    write_trial_log(ctx, udv_table, trial_data)
+    write_trial_log(udv_table)
     liq_pipette.pick_up_tip()
     _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
     step_volume = state.first_dispense
@@ -630,22 +633,22 @@ def geometry_creator(ctx: ProtocolContext, state: SetupState) -> List[TrialResul
         if not ctx.is_simulating():
             if step == 0:
                 status = "pass" if 2.0 < hdelta < 3.0 else "fail"
-                write_trial_log(ctx, udv_table, trial_data)
+                write_trial_log(udv_table)
             else:
                 if hdelta <= state.lower_bound or hdelta >= state.upper_bound:
                     if dispense_volume != max_volume:
                         status = "fail"
-                        write_trial_log(ctx, udv_table, trial_data)
+                        write_trial_log(udv_table)
                         dispense_volume -= step_volume  # rollback dispense volume
                         corrected_heights.pop()  # rollback corrected heights
                     else:
                         status = "pass"
-                        write_trial_log(ctx, udv_table, trial_data)
+                        write_trial_log(udv_table)
                 else:
                     status = "pass"
-                    write_trial_log(ctx, udv_table, trial_data)
+                    write_trial_log(udv_table)
         else:
-            write_trial_log(ctx, udv_table, trial_data)
+            write_trial_log(udv_table)
 
         # recalculate step volume for next step
         step_volume = adaptive_volume_step(hdelta, corrected_height, step_volume, state)
