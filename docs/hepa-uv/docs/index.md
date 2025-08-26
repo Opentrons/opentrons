@@ -5,8 +5,6 @@ hide: toc
 
 <div style="text-align: center;" markdown>
 
-![Opentrons Flex®](../images/opentrons-flex-logo.svg "opentrons-flex-logo.svg"){style="width: 60%"}
-
 # HEPA/UV Module Instruction Manual
 
 ![HEPA/UV Module hero image](images/hepa-uv-hero.png "HEPA/UV Module hero image")
