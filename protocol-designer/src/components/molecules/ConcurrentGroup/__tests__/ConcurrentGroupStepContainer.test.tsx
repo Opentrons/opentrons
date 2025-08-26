@@ -4,17 +4,17 @@ import { describe, expect, it } from 'vitest'
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
 
-import { CheckpointStepContainer } from '../CheckpointStepContainer'
+import { ConcurrentGroupStepContainer } from '../ConcurrentGroupStepContainer'
 
 import type { ComponentProps } from 'react'
 
-const render = (props: ComponentProps<typeof CheckpointStepContainer>) => {
-  return renderWithProviders(<CheckpointStepContainer {...props} />, {
+const render = (props: ComponentProps<typeof ConcurrentGroupStepContainer>) => {
+  return renderWithProviders(<ConcurrentGroupStepContainer {...props} />, {
     i18nInstance: i18n,
   })
 }
 
-describe('CheckpointStepContainer', () => {
+describe('ConcurrentGroupStepContainer', () => {
   it('renders a StepContainer inside a list item', () => {
     render({
       text: 'Test step text',

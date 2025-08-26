@@ -6,17 +6,17 @@ import { COLORS } from '@opentrons/components'
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
 
-import { Checkpoint } from '..'
+import { ConcurrentGroup } from '..'
 
 import type { ComponentProps } from 'react'
 
-const render = (props: ComponentProps<typeof Checkpoint>) => {
-  return renderWithProviders(<Checkpoint {...props} />, {
+const render = (props: ComponentProps<typeof ConcurrentGroup>) => {
+  return renderWithProviders(<ConcurrentGroup {...props} />, {
     i18nInstance: i18n,
   })
 }
 
-describe('Checkpoint', () => {
+describe('ConcurrentGroup', () => {
   it('renders children inside a list', () => {
     render({
       active: false,
@@ -37,13 +37,13 @@ describe('Checkpoint', () => {
 
   it('renders a gray line when not active', () => {
     render({ active: false })
-    const ornamentalLine = screen.getByTestId('Checkpoint_OrnamentalLine')
+    const ornamentalLine = screen.getByTestId('ConcurrentGroup_OrnamentalLine')
     expect(ornamentalLine).toHaveStyle(`background-color: ${COLORS.grey50}`)
   })
 
   it('renders a blue line when active', () => {
     render({ active: true })
-    const ornamentalLine = screen.getByTestId('Checkpoint_OrnamentalLine')
+    const ornamentalLine = screen.getByTestId('ConcurrentGroup_OrnamentalLine')
     expect(ornamentalLine).toHaveStyle(`background-color: ${COLORS.blue50}`)
   })
 })

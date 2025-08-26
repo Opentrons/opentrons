@@ -1,0 +1,20 @@
+/*
+Styles to add content-dependent spacing between children within a ConcurrentGroup.
+
+- ConcurrentGroupStepContainers in a contiguous sequence do NOT have space between them.
+- ConcurrentGroupCheckpoints in a contiguous sequence DO have space between them.
+- An adjacent ConcurrentGroupStepContainer and ConcurrentGroupCheckpoint (in either order)
+  DO have space between them.
+
+An alternative method would have been to use JS to find contiguous sequences and put a
+wrapper component around each one, but that would interfere with <ul> nesting semantics.
+*/
+.checkpoint_spacing + .checkpoint_spacing,
+.checkpoint_spacing + .step_container_spacing,
+.step_container_spacing + .checkpoint_spacing {
+  margin-top: var(--spacing-4);
+}
+
+.no_li_bullet {
+  list-style-type: none;
+}

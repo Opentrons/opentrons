@@ -5,14 +5,11 @@ import styles from './childrencommon.module.css'
 
 import type { ComponentProps } from 'react'
 
-// todo(mm, 2025-08-26): Revisit the names of Checkpoint/CheckpointChip/CheckpointStepContainer,
-// pending discussion with the design team.
-
 /**
- * A `StepContainer` nested within a `Checkpoint`.
- * This wrapper component provides `Checkpoint`-specific spacing.
+ * A `StepContainer` to nest within a `ConcurrentGroup`.
+ * This wrapper component provides `ConcurrentGroup`-specific spacing.
  */
-export function CheckpointStepContainer(
+export function ConcurrentGroupStepContainer(
   props: ComponentProps<typeof StepContainer>
 ): JSX.Element {
   return (

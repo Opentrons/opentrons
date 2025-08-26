@@ -4,18 +4,17 @@ import { Flex, SPACING, StyledText } from '@opentrons/components'
 
 import styles from './childrencommon.module.css'
 
-// todo(mm, 2025-08-26): Revisit the names of Checkpoint/CheckpointChip/CheckpointStepContainer,
-// pending discussion with the design team.
-
-interface CheckpointChipProps {
+interface ConcurrentGroupCheckpointProps {
   text: string
 }
 
-/** A non-interactable, system-provided step within a `Checkpoint`. */
-export function CheckpointChip(props: CheckpointChipProps): JSX.Element {
+/** A non-interactable, system-provided step within a `ConcurrentGroup`. */
+export function ConcurrentGroupCheckpoint(
+  props: ConcurrentGroupCheckpointProps
+): JSX.Element {
   const { text } = props
   return (
-    <li className={clsx(styles.chip_spacing, styles.no_li_bullet)}>
+    <li className={clsx(styles.checkpoint_spacing, styles.no_li_bullet)}>
       <Flex gap={SPACING.spacing4} paddingY={SPACING.spacing2}>
         <Flex
           paddingX={SPACING.spacing2}

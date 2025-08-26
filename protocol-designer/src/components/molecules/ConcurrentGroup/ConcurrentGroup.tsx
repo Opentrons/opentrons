@@ -2,11 +2,8 @@ import { Box, COLORS, Flex, SPACING } from '@opentrons/components'
 
 import type { PropsWithChildren } from 'react'
 
-// todo(mm, 2025-08-26): Revisit the names of Checkpoint/CheckpointChip/CheckpointStepContainer,
-// pending discussion with the design team.
-
-interface CheckpointProps {
-  /** Whether this `Checkpoint` is part of the active step in the timeline. */
+interface ConcurrentGroupProps {
+  /** Whether this `ConcurrentGroup` is part of the active step in the timeline. */
   active: boolean
 }
 
@@ -18,12 +15,12 @@ interface CheckpointProps {
  *
  * Each child may be:
  *
- * - A `CheckpointChip`.
- * - A `CheckpointStepContainer`.
+ * - A `ConcurrentGroupCheckpoint`.
+ * - A `ConcurrentGroupStepContainer`.
  * - A drag-and-drop indicator.
  */
-export function Checkpoint(
-  props: PropsWithChildren<CheckpointProps>
+export function ConcurrentGroup(
+  props: PropsWithChildren<ConcurrentGroupProps>
 ): JSX.Element {
   const { active, children } = props
   return (
@@ -55,7 +52,7 @@ function OrnamentalLine(props: { active: boolean }): JSX.Element {
         height="100%"
         borderRadius={SPACING.spacing2}
         backgroundColor={active ? COLORS.blue50 : COLORS.grey50}
-        data-testid="Checkpoint_OrnamentalLine"
+        data-testid="ConcurrentGroup_OrnamentalLine"
       />
     </Box>
   )
