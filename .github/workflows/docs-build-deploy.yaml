@@ -7,7 +7,7 @@ on:
       - '.github/workflows/docs-build-deploy.yaml'
   push:
     branches:
-      - 'mkdocs-cache-invalidation'
+      - 'edge'
     tags:
       - 'staging-MKDOCS*'
       - 'staging-mkdocs*'
@@ -15,7 +15,7 @@ on:
       - 'mkdocs*'
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'mkdocs-cache-invalidation' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
   cancel-in-progress: true
 
 defaults:
@@ -123,12 +123,15 @@ jobs:
         run: make deploy ENVIRONMENT=${{ env.ENVIRONMENT }} BRANCH=${{ env.BRANCH }} ARGS="--source-dir site"
       - name: Invalidate CloudFront Cache
         if: env.ENVIRONMENT == 'staging' || env.ENVIRONMENT == 'production'
+        env:
+          STAGING_CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.STAGING_CLOUDFRONT_DISTRIBUTION_ID }}
+          PRODUCTION_CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.PRODUCTION_CLOUDFRONT_DISTRIBUTION_ID }}
         run: |
           # Get the CloudFront distribution ID based on environment
           if [ "${{ env.ENVIRONMENT }}" = "staging" ]; then
-            DISTRIBUTION_ID="E2DBE0K9VT8YB9"
+            DISTRIBUTION_ID="$STAGING_DOCS_CLOUDFRONT_DISTRIBUTION_ID"
           elif [ "${{ env.ENVIRONMENT }}" = "production" ]; then
-            DISTRIBUTION_ID="E2PSPUXND1RQWG"
+            DISTRIBUTION_ID="$PRODUCTION_DOCS_CLOUDFRONT_DISTRIBUTION_ID"
           fi
           
           # Create invalidation
