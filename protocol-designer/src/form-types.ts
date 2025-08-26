@@ -373,7 +373,7 @@ export interface HydratedMixFormData extends AnnotationFields {
   mix_wellOrder_first: WellOrderOption
   mix_wellOrder_second: WellOrderOption
   nozzles: NozzleConfigurationStyle | null
-  pipette: PipetteEntity
+  pipette: PipetteEntity // can be null if user deletes pipette
   stepType: 'mix'
   tipRack: string
   volume: number
