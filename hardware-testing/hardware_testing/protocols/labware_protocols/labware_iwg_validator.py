@@ -263,7 +263,6 @@ def aspirate_dispense_measure(
     probe_pipette: InstrumentContext,
     liq_pipette: InstrumentContext,
     expected_heights: List[float],
-    # ethanol: LiquidClass,
 ) -> List[float]:
     """Aspirate from source, dispense into labware, measure height, record."""
     all_corrected_heights: List[float] = []
