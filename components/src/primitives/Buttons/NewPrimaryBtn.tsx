@@ -13,10 +13,5 @@ export const NewPrimaryBtn: FC<ComponentProps<'button'> & StyleProps> = ({
   className,
   ...props
 }) => {
-  const combinedClassName =
-    className != null && className !== ''
-      ? `${styles.new_primary_btn} ${className}`
-      : styles.new_primary_btn
-
-  return <Btn {...props} className={combinedClassName} />
+  return <Btn {...props} className={styles.new_primary_btn} />
 }
