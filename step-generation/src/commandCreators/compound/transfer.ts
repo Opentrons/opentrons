@@ -5,6 +5,7 @@ import {
   getAllLiquidClassDefs,
   getByVolumeValue,
   getFlexNameConversion,
+  getIsTiprack,
   getMmFromBottom,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
   isFlexPipette,
@@ -47,6 +48,7 @@ import {
   configureForVolume,
   delay,
   dispenseInPlace,
+  dropTip,
   moveToAddressableArea,
   moveToWell,
   prepareToAspirate,
@@ -234,6 +236,32 @@ export const transfer: CommandCreator<TransferArgs> = (
     errors.push(errorCreators.labwareDiscarded())
   }
 
+  const trashLikeIds = [
+    ...Object.keys(invariantContext.trashBinEntities),
+    ...Object.keys(invariantContext.wasteChuteEntities),
+  ]
+
+  const fallBackTrashLikeId = trashLikeIds.length > 0 ? trashLikeIds[0] : null
+
+  // tiprack for return tip
+  const dropTipLabware = Object.values(invariantContext.labwareEntities).find(
+    ({ labwareDefURI }) => labwareDefURI === dropTipLocation
+  )
+  const isReturnTip = dropTipLabware != null && getIsTiprack(dropTipLabware.def)
+
+  const hasTip = prevRobotState.pipettes[pipette]?.tipWell != null
+
+  if (
+    dropTipLocation == null ||
+    (isReturnTip &&
+      fallBackTrashLikeId == null &&
+      changeTip !== 'never' &&
+      hasTip) ||
+    (!isReturnTip && !isWasteChuteDropLocation && !isTrashBinDropLocation)
+  ) {
+    return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
+  }
+
   if (
     !args.destLabware ||
     (!labwareEntities[destLabware] &&
@@ -241,13 +269,6 @@ export const transfer: CommandCreator<TransferArgs> = (
       !trashBinEntities[destLabware])
   ) {
     errors.push(errorCreators.equipmentDoesNotExist())
-  }
-
-  if (
-    !dropTipLocation ||
-    (!isWasteChuteDropLocation && !isTrashBinDropLocation)
-  ) {
-    errors.push(errorCreators.dropTipLocationDoesNotExist())
   }
 
   const tiprack = Object.values(labwareEntities).find(
@@ -417,9 +438,10 @@ export const transfer: CommandCreator<TransferArgs> = (
       pythonDestWells != null ? `[${pythonDestWells}]` : destTrashPipetteName
     }`,
     `new_tip=${formatPyStr(formatChangeTipArg(changeTip))}`,
-    `trash_location=${trashPipetteName}`,
+    ...(isReturnTip
+      ? [`return_tip=True`]
+      : [`trash_location=${trashPipetteName}`, `keep_last_tip=True`]),
     ...(pipetteSpecs.channels > 1 ? [`group_wells=False`] : []),
-    `keep_last_tip=True`,
     ...(tipracks.filteredSortedTiprackIds.length > 0
       ? [
           getPythonAssignTipRacksString({
@@ -531,7 +553,10 @@ export const transfer: CommandCreator<TransferArgs> = (
             ? [
                 curryCommandCreator(replaceTip, {
                   pipette,
-                  dropTipLocation,
+                  dropTipLocation:
+                    isReturnTip && fallBackTrashLikeId != null
+                      ? fallBackTrashLikeId
+                      : dropTipLocation,
                   tipRack,
                   ...(nozzles != null ? { nozzles } : {}),
                 }),
@@ -1142,6 +1167,17 @@ export const transfer: CommandCreator<TransferArgs> = (
               }
               break
           }
+          const returnTipCommands: CurriedCommandCreator[] =
+            isReturnTip &&
+            (pairIdx === sourceDestPairs.length - 1 || changeTip === 'always')
+              ? [
+                  curryWithoutPython(dropTip, {
+                    pipette,
+                    dropTipLocation: tipRack,
+                    isReturnTip,
+                  }),
+                ]
+              : []
 
           // if using dispense > air gap, drop or change the tip at the end
           const nextCommands = [
@@ -1159,6 +1195,7 @@ export const transfer: CommandCreator<TransferArgs> = (
             ...mixAfterDispenseCommands,
             ...postDispenseRetractCommands,
             ...advancedDispenseArgsCommands,
+            ...returnTipCommands,
           ]
           // NOTE: side-effecting
           prevSourceWell = sourceWell
