@@ -42,21 +42,11 @@ export function FileUploadMessagesModal(): JSX.Element | null {
     title !== t('incorrect_file_header') &&
     title !== t('incorrect_python_file_header')
 
-  const handleClose = (): void => {
-    if (isMigration) {
-      dispatch(undoLoadFile())
-    } else {
-      dismissModal()
-    }
-  }
-
   return (
     <Modal
       marginLeft="0"
       type={message?.isError ? 'error' : 'info'}
       title={title}
-      closeOnOutsideClick
-      onClose={handleClose}
       footer={
         showButtons && (
           <Flex
