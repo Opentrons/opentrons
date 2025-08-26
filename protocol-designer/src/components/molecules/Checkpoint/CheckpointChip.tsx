@@ -2,12 +2,15 @@ import { Flex, SPACING, StyledText } from '@opentrons/components'
 
 import spacingStyles from './commonspacing.module.css'
 
-interface Props {
+// todo(mm, 2025-08-26): Revisit the names of Checkpoint/CheckpointChip/CheckpointStepContainer,
+// pending discussion with the design team.
+
+interface CheckpointChipProps {
   text: string
 }
 
 /** A non-interactable, system-provided step within a `Checkpoint`. */
-export function CheckpointChip(props: Props): JSX.Element {
+export function CheckpointChip(props: CheckpointChipProps): JSX.Element {
   const { text } = props
   return (
     <div className={spacingStyles.chip}>

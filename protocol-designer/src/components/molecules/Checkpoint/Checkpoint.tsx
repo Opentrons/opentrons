@@ -2,7 +2,10 @@ import { Box, COLORS, Flex, SPACING } from '@opentrons/components'
 
 import type { PropsWithChildren } from 'react'
 
-interface Props {
+// todo(mm, 2025-08-26): Revisit the names of Checkpoint/CheckpointChip/CheckpointStepContainer,
+// pending discussion with the design team.
+
+interface CheckpointProps {
   /** Whether this `Checkpoint` is part of the active step in the timeline. */
   active: boolean
 }
@@ -19,7 +22,9 @@ interface Props {
  * - A `CheckpointStepContainer`.
  * - A drag-and-drop indicator.
  */
-export function Checkpoint(props: PropsWithChildren<Props>): JSX.Element {
+export function Checkpoint(
+  props: PropsWithChildren<CheckpointProps>
+): JSX.Element {
   const { active, children } = props
   return (
     <Flex

@@ -3,6 +3,9 @@ import spacingStyles from './commonspacing.module.css'
 
 import type { ComponentProps } from 'react'
 
+// todo(mm, 2025-08-26): Revisit the names of Checkpoint/CheckpointChip/CheckpointStepContainer,
+// pending discussion with the design team.
+
 /**
  * A `StepContainer` nested within a `Checkpoint`.
  * This wrapper component provides `Checkpoint`-specific spacing.
