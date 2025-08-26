@@ -208,6 +208,10 @@ class DropTipImplementation(AbstractCommandImpl[DropTipParams, _ExecuteReturn]):
                     pipette_id=params.pipetteId,
                     tip_geometry=None,
                     tip_source=None,
+                ).update_tip_rack_well_state(
+                    tip_state=TipRackWellState.USED,
+                    labware_id=labware_id,
+                    well_names=tips_to_mark_as_used,
                 ),
             )
         else:

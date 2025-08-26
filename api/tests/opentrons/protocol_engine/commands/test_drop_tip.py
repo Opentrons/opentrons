@@ -396,6 +396,11 @@ async def test_tip_attached_error(
                 ),
                 new_deck_point=DeckPoint(x=111, y=222, z=333),
             ),
+            tips_state=update_types.TipsStateUpdate(
+                tip_state=TipRackWellState.USED,
+                labware_id="123",
+                well_names=sentinel.tips_to_mark_as_used,
+            ),
         ),
     )
 
