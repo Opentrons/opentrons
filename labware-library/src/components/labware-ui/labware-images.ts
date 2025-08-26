@@ -483,6 +483,9 @@ export const labwareImages: Record<string, string[]> = {
       import.meta.url
     ).href,
   ],
+  opentrons_flex_tiprack_lid: [
+    new URL('../../images/opentrons_flex_tiprack_lid.png', import.meta.url).href,
+  ],
   opentrons_96_wellplate_200ul_pcr_full_skirt: [
     new URL(
       '../../images/opentrons_96_wellplate_200ul_pcr_full_skirt.jpg',
