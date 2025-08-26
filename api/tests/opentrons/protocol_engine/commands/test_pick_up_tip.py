@@ -21,7 +21,7 @@ from opentrons.protocol_engine.execution import MovementHandler, TipHandler
 from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.types import TipGeometry, LabwareWellId
+from opentrons.protocol_engine.types import TipGeometry, LabwareWellId, TipRackWellState
 
 from opentrons.protocol_engine.commands.movement_common import StallOrCollisionError
 from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
@@ -82,7 +82,7 @@ async def test_success(
         sentinel.nozzle_configuration
     )
     decoy.when(
-        state_view.tips.compute_tips_to_mark_as_used(
+        state_view.tips.compute_tips_to_mark_as_used_or_empty(
             "labware-id", "A3", sentinel.nozzle_configuration
         )
     ).then_return(sentinel.tips_to_mark_as_used)
@@ -114,8 +114,10 @@ async def test_success(
                 tip_geometry=TipGeometry(length=42, diameter=5, volume=300),
                 tip_source=LabwareWellId(labware_id="labware-id", well_name="A3"),
             ),
-            tips_used=update_types.TipsUsedUpdate(
-                labware_id="labware-id", well_names=sentinel.tips_to_mark_as_used
+            tips_state=update_types.TipsStateUpdate(
+                tip_state=TipRackWellState.EMPTY,
+                labware_id="labware-id",
+                well_names=sentinel.tips_to_mark_as_used,
             ),
             pipette_aspirated_fluid=update_types.PipetteEmptyFluidUpdate(
                 pipette_id="pipette-id", clean_tip=True
@@ -179,7 +181,7 @@ async def test_tip_physically_missing_error(
         sentinel.nozzle_configuration
     )
     decoy.when(
-        state_view.tips.compute_tips_to_mark_as_used(
+        state_view.tips.compute_tips_to_mark_as_used_or_empty(
             labware_id, well_name, sentinel.nozzle_configuration
         )
     ).then_return(sentinel.tips_to_mark_as_used)
@@ -200,8 +202,10 @@ async def test_tip_physically_missing_error(
                 ),
                 new_deck_point=DeckPoint(x=111, y=222, z=333),
             ),
-            tips_used=update_types.TipsUsedUpdate(
-                labware_id="labware-id", well_names=sentinel.tips_to_mark_as_used
+            tips_state=update_types.TipsStateUpdate(
+                tip_state=TipRackWellState.EMPTY,
+                labware_id="labware-id",
+                well_names=sentinel.tips_to_mark_as_used,
             ),
             pipette_aspirated_fluid=update_types.PipetteUnknownFluidUpdate(
                 pipette_id="pipette-id"
@@ -218,8 +222,10 @@ async def test_tip_physically_missing_error(
             pipette_aspirated_fluid=update_types.PipetteEmptyFluidUpdate(
                 pipette_id="pipette-id", clean_tip=True
             ),
-            tips_used=update_types.TipsUsedUpdate(
-                labware_id="labware-id", well_names=sentinel.tips_to_mark_as_used
+            tips_state=update_types.TipsStateUpdate(
+                tip_state=TipRackWellState.EMPTY,
+                labware_id="labware-id",
+                well_names=sentinel.tips_to_mark_as_used,
             ),
             pipette_location=update_types.PipetteLocationUpdate(
                 pipette_id="pipette-id",
