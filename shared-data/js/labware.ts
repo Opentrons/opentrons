@@ -1,3 +1,4 @@
+import defaultLabwareVersionsRaw from '../labware/default_labware_versions.json'
 import fixture12Trough from '../labware/fixtures/2/fixture_12_trough.json'
 import fixture24Tuberack from '../labware/fixtures/2/fixture_24_tuberack.json'
 import fixture96Plate from '../labware/fixtures/2/fixture_96_plate.json'
@@ -102,25 +103,10 @@ export function getAllLegacyDefinitions(): LegacyLabwareDefByName {
   return schema1DefinitionsByName
 }
 
-//  for returning the labware def versions gated by api version
-const versionModules: Record<string, number> = import.meta.glob(
-  '../labware/versionsByAPILevel/*.json',
-  {
-    eager: true,
-  }
-)
-
-const versions: Record<string, number> = Object.fromEntries(
-  Object.entries(versionModules).map(([path, module]) => {
-    // filename without extension, ex: 2_25
-    const match = path.match(/(\d+)_(\d+)\.json$/)
-    if (match == null) {
-      return []
-    }
-    const key = `${match[1]}_${match[2]}`
-    return [key, (module as any).default]
-  })
-)
+const defaultLabwareVersions: Record<
+  string,
+  Record<string, number>
+> = defaultLabwareVersionsRaw
 
 function parseAPIVersion(version: string): [number, number] {
   const [major, minor] = version.split('.').map(Number)
@@ -135,15 +121,16 @@ export function getGreaterThanVersions(
   currentPAPIVersion: string
 ): Record<string, number> {
   const current = parseAPIVersion(currentPAPIVersion)
-  // find all JSONs with API version greater than current
-  const unAcceptableKeys = Object.keys(versions).filter(k => {
-    const [maj, min] = k.split('_').map(Number)
-    return isGreaterThan([maj, min], current)
+
+  // filter keys in the JSON that are > current
+  const unAcceptableKeys = Object.keys(defaultLabwareVersions).filter(k => {
+    const parsed = parseAPIVersion(k)
+    return isGreaterThan(parsed, current)
   })
-  // merge all Record<loadName: version> pairs from the JSONs
+
   const unAcceptables: Record<string, number> = {}
-  unAcceptableKeys.forEach(key => {
-    const defs = versions[key]
+  unAcceptableKeys.forEach(k => {
+    const defs = defaultLabwareVersions[k]
     Object.assign(unAcceptables, defs)
   })
   return unAcceptables
