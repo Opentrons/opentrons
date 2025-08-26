@@ -35,8 +35,7 @@ describe('labwareImages mapping', () => {
     expect(missingLoadNames).toEqual([])
   })
 })
-
-const IMAGES_DIR = '/Users/abr/opentrons/shared-data/labware/images'
+const IMAGES_DIR = path.join(__dirname, '..', '..', 'labware', 'images')
 const MAX_FILE_SIZE_BYTES = 200 * 1024
 
 function getAllFiles(dir: string): string[] {
