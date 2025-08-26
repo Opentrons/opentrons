@@ -536,7 +536,6 @@ export function useRelevantFailedLwLocations({
                 (m: LoadedModule) =>
                   m.id === failedCommandByRunRecord?.params.moduleId
               )?.location ?? 'offDeck',
-            includeSlotText: false,
           }),
           newLoc: {
             moduleId: failedCommandByRunRecord?.params.moduleId,
