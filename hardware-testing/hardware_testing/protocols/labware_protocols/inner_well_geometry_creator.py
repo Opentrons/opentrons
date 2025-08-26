@@ -164,8 +164,6 @@ def add_parameters(parameters: ParameterContext) -> None:
         ],
         default="corning_falcon_384_well_plate_130ul_square_flat",
     )
-
-    # generally, the first dispense should be 1/25 the max volume.
     parameters.add_float(
         display_name="First Dispense",
         variable_name="first_dispense",
@@ -180,7 +178,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         display_name="Step Height Target",
         description="Specify the desired target step height, i.e 1mm",
         default=1.0,
-        maximum=10.0,  # clamp this off so that dispense amount equals at least 1ul
+        maximum=10.0, 
         minimum=0.01,
     )
 
