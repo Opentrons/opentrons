@@ -8,9 +8,12 @@ Styles to add content-dependent spacing between children within a Checkpoint.
 An alternative method would have been to use JS to find contiguous sequences and put a
 wrapper component around each one, but that would interfere with <ul> nesting semantics.
 */
-
-.chip + .chip,
-.chip + .step_container,
-.step_container + .chip {
+.chip_spacing + .chip_spacing,
+.chip_spacing + .step_container_spacing,
+.step_container_spacing + .chip_spacing {
   margin-top: var(--spacing-4);
+}
+
+.no_li_bullet {
+  list-style-type: none;
 }

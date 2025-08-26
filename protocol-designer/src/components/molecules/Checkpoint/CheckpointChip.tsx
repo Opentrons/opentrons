@@ -1,6 +1,8 @@
+import clsx from 'clsx'
+
 import { Flex, SPACING, StyledText } from '@opentrons/components'
 
-import spacingStyles from './commonspacing.module.css'
+import styles from './childrencommon.module.css'
 
 // todo(mm, 2025-08-26): Revisit the names of Checkpoint/CheckpointChip/CheckpointStepContainer,
 // pending discussion with the design team.
@@ -13,7 +15,7 @@ interface CheckpointChipProps {
 export function CheckpointChip(props: CheckpointChipProps): JSX.Element {
   const { text } = props
   return (
-    <div className={spacingStyles.chip}>
+    <li className={clsx(styles.chip_spacing, styles.no_li_bullet)}>
       <Flex gap={SPACING.spacing4} paddingY={SPACING.spacing2}>
         <Flex
           paddingX={SPACING.spacing2}
@@ -24,7 +26,7 @@ export function CheckpointChip(props: CheckpointChipProps): JSX.Element {
         </Flex>
         <StyledText desktopStyle="captionSemiBold">{text}</StyledText>
       </Flex>
-    </div>
+    </li>
   )
 }
 

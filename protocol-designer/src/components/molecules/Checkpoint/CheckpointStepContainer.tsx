@@ -1,5 +1,7 @@
+import clsx from 'clsx'
+
 import { StepContainer } from '../StepContainer'
-import spacingStyles from './commonspacing.module.css'
+import styles from './childrencommon.module.css'
 
 import type { ComponentProps } from 'react'
 
@@ -14,8 +16,8 @@ export function CheckpointStepContainer(
   props: ComponentProps<typeof StepContainer>
 ): JSX.Element {
   return (
-    <div className={spacingStyles.step_container}>
+    <li className={clsx(styles.step_container_spacing, styles.no_li_bullet)}>
       <StepContainer {...props} />
-    </div>
+    </li>
   )
 }
