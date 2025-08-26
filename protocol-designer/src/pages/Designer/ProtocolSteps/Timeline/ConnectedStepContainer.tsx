@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import {
   BORDERS,
+  Box,
   COLORS,
   CURSOR_DEFAULT,
   CURSOR_POINTER,
@@ -213,15 +214,18 @@ export function ConnectedStepContainer(
           : {})}
         flexDirection={DIRECTION_COLUMN}
       >
-        {dragHovered ? (
-          <Divider
-            marginY={SPACING.spacing2}
-            height="0.25rem"
-            width="100%"
-            backgroundColor={COLORS.blue50}
-            borderRadius={BORDERS.borderRadius2}
-          />
-        ) : null}
+        {dragHovered && (
+          <Box paddingY={SPACING.spacing2}>
+            <Divider
+              // eslint-disable-next-line opentrons/no-margins-inline
+              marginY="0"
+              height="0.25rem"
+              width="100%"
+              backgroundColor={COLORS.blue50}
+              borderRadius={BORDERS.borderRadius2}
+            />
+          </Box>
+        )}
 
         <StepContainer
           text={capitalizeFirstLetterAfterNumber(title)}
