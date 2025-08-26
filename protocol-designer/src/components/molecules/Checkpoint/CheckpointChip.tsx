@@ -30,7 +30,7 @@ export function CheckpointChip(props: CheckpointChipProps): JSX.Element {
 
 function Bullet(): JSX.Element {
   return (
-    <svg width={SPACING.spacing4} height={SPACING.spacing4} viewBox="-1 -1 2 2">
+    <svg width="0.25rem" height="0.25rem" viewBox="-1 -1 2 2">
       <circle cx="0" cy="0" r="1" />
     </svg>
   )

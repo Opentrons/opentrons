@@ -51,7 +51,7 @@ function OrnamentalLine(props: { active: boolean }): JSX.Element {
       padding={SPACING.spacing2}
     >
       <Box
-        width={SPACING.spacing4}
+        width="0.25rem"
         height="100%"
         borderRadius={SPACING.spacing2}
         backgroundColor={active ? COLORS.blue50 : COLORS.grey50}
