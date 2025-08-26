@@ -24,6 +24,7 @@ You can clean and reuse the pre-filter but not the HEPA filter. Always replace y
 To access, replace, and clean the filters:
 
 <div class="instruction-list" markdown>
+
 1. Turn off power to the HEPA/UV Module.
 2. Using the 2.5 mm hex screwdriver, loosen the captive screws that secure the filter panel to the top of the module. Lift the panel off the module and set it aside.
 3. Remove the old HEPA filter and throw it away.
@@ -35,4 +36,5 @@ To access, replace, and clean the filters:
 6. Install the pre-filter with the airflow direction arrow pointing towards the HEPA filter.
 7. Set the filter cover on top of the module and fasten the screws.
 8. Turn the power on. Press the Fan button for 3 seconds to reset the filter status.
+
 </div>
