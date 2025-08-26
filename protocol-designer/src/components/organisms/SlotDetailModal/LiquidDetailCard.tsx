@@ -95,7 +95,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
             flexDirection={DIRECTION_COLUMN}
             gap={description != null ? SPACING.spacing4 : 0}
           >
-            <StyledText desktopStyle="headingMediumSemiBold">
+            <StyledText desktopStyle="bodyDefaultSemiBold">
               {displayName}
             </StyledText>
             <StyledText desktopStyle="captionRegular" color={COLORS.grey50}>
