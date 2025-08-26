@@ -121,6 +121,24 @@ jobs:
       - name: Deploy
         working-directory: ./docs
         run: make deploy ENVIRONMENT=${{ env.ENVIRONMENT }} BRANCH=${{ env.BRANCH }} ARGS="--source-dir site"
+      - name: Invalidate CloudFront Cache
+        if: env.ENVIRONMENT == 'staging' || env.ENVIRONMENT == 'production'
+        run: |
+          # Get the CloudFront distribution ID based on environment
+          if [ "${{ env.ENVIRONMENT }}" = "staging" ]; then
+            DISTRIBUTION_ID="${{ secrets.STAGING_CLOUDFRONT_DISTRIBUTION_ID }}"
+          elif [ "${{ env.ENVIRONMENT }}" = "production" ]; then
+            DISTRIBUTION_ID="${{ secrets.PRODUCTION_CLOUDFRONT_DISTRIBUTION_ID }}"
+          fi
+          
+          # Create invalidation
+          aws cloudfront create-invalidation \
+            --distribution-id "$DISTRIBUTION_ID" \
+            --paths "/*" \
+            --query 'Invalidation.Id' \
+            --output text
+          
+          echo "CloudFront cache invalidated for ${{ env.ENVIRONMENT }}"
       - name: Output Deployment URL
         run: |
           echo "## 🚀 Docs site deployed to ${{ env.ENVIRONMENT }}" >> $GITHUB_STEP_SUMMARY
