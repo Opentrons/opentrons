@@ -7,7 +7,7 @@ hide: toc
 
 # HEPA/UV Module Instruction Manual
 
-![HEPA/UV Module hero image](images/hepa-uv-hero.png "HEPA/UV Module hero image")
+![HEPA/UV Module hero image](images/hepa-cover-hero.svg "HEPA/UV Module hero image")
 
 **Opentrons Labworks Inc.**
 
