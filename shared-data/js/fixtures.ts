@@ -53,7 +53,7 @@ import {
   FLEX_STACKER_V1_FIXTURE,
   FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
   FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
-  FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+  FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
   HEATERSHAKER_MODULE_V1,
   HEATERSHAKER_MODULE_V1_FIXTURE,
   LEFT_AND_CENTER_CUTOUTS,
@@ -719,7 +719,7 @@ export function getAAComboFixtureDisplayName(
   const aaItem = getAAByAAId(addressableAreaId, deckDef)
   const translationFileName = 'deck_configuration'
   switch (cutoutFixtureId) {
-    case FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE:
+    case FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE:
     case FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE:
       if (aaItem.areaType === 'flexStacker') {
         return usbPortNumber != null
@@ -838,7 +838,7 @@ export function getFixtureDisplayName(
         : t(`${translationFileName}:module_with_waste_chute_and_cover`, {
             moduleName: getModuleDisplayName(FLEX_STACKER_MODULE_V1),
           })
-    case FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE:
+    case FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE:
       return usbPortNumber != null
         ? t(`${translationFileName}:module_in_port_and_waste_chute`, {
             moduleName: getModuleDisplayName(FLEX_STACKER_MODULE_V1),
@@ -1358,21 +1358,21 @@ const getWasteChuteFixtureReplacement = (
       condition:
         cutoutFixtureId === FLEX_STACKER_MODULE_V1 &&
         wasteChuteFixture === WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
-      comboFixtureId: FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+      comboFixtureId: FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
       comboOpentronsModuleSerialNumber: undefined,
     },
     {
       condition:
         cutoutFixtureId === FLEX_STACKER_MODULE_V1 &&
         wasteChuteFixture === FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT_FIXTURE,
-      comboFixtureId: FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+      comboFixtureId: FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
       comboOpentronsModuleSerialNumber: undefined,
     },
     {
       condition:
         cutoutFixtureId === FLEX_STACKER_MODULE_V1 &&
         wasteChuteFixture === FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT_FIXTURE,
-      comboFixtureId: FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+      comboFixtureId: FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
       comboOpentronsModuleSerialNumber: deckConfigWithAA.find(
         dc =>
           dc.cutoutId === cutoutId &&
@@ -1390,7 +1390,7 @@ const getWasteChuteFixtureReplacement = (
       condition:
         cutoutFixtureId === WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE &&
         hasFlexStacker,
-      comboFixtureId: FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+      comboFixtureId: FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
       comboOpentronsModuleSerialNumber: deckConfigWithAA.find(
         dc =>
           dc.cutoutId === cutoutId &&

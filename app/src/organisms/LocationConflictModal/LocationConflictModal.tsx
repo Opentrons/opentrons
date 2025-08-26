@@ -25,7 +25,7 @@ import {
   FLEX_STACKER_V1_FIXTURE,
   FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
   FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
-  FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+  FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
   getCutoutDisplayName,
   getCutoutFixturesForModuleModel,
   getFixtureDisplayName,
@@ -33,7 +33,6 @@ import {
   getModuleDisplayName,
   MAGNETIC_BLOCK_V1_FIXTURE,
   SINGLE_LEFT_SLOT_FIXTURE,
-  SINGLE_RIGHT_SLOT_FIXTURE,
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
   THERMOCYCLER_V2_FRONT_FIXTURE,
@@ -98,7 +97,7 @@ export const LocationConflictModal = (
   )?.cutoutFixtureId
 
   // skip past fix conflict screen if D3 can remain the same when you attach
-  // a flex stacker module, ie single slot, mag block or waste chute only fixture
+  // a flex stacker module, ie mag block or waste chute only fixture
   useEffect(() => {
     if (requiredModule != null && requiredModule === FLEX_STACKER_MODULE_V1) {
       if (
@@ -167,13 +166,13 @@ export const LocationConflictModal = (
             ) &&
             replacementCutoutFixtureId === FLEX_STACKER_V1_FIXTURE
           ) {
+            // if current fixture is a waste chute and we are adding a flex stacker,
+            // don't remove the waste chute
             const replacementCutoutFixtureId =
               existingCutoutConfig.cutoutFixtureId ===
               WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE
                 ? FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE
-                : FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE
-            // if current fixture is a waste chute and we are adding a flex stacker, don't remove
-            // the waste chute
+                : FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE
             return {
               ...existingCutoutConfig,
               cutoutFixtureId: replacementCutoutFixtureId,
@@ -184,8 +183,8 @@ export const LocationConflictModal = (
               MAGNETIC_BLOCK_V1_FIXTURE &&
             replacementCutoutFixtureId === FLEX_STACKER_V1_FIXTURE
           ) {
-            // if current fixture is a magnetic block and we are adding a flex stacker, don't remove
-            // the mag block
+            // if current fixture is a magnetic block and we are adding a flex stacker,
+            // don't remove the mag block
             return {
               ...existingCutoutConfig,
               cutoutFixtureId: FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
