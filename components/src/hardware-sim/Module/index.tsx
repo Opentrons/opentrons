@@ -3,13 +3,15 @@ import {
   FLEX_STACKER_MODULE_TYPE,
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
+  IDENTITY_AFFINE_TRANSFORM,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_MODULE_TYPE,
-  OT2_STANDARD_DECKID,
+  multiplyMatrices,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
+import { AlignControlToModule } from '../..'
 import {
   ALIGN_CENTER,
   C_DARK_GRAY,
@@ -21,7 +23,6 @@ import {
   SPACING_1,
 } from '../../styles'
 import { RobotCoordsForeignObject } from '../Deck'
-import { multiplyMatrices } from '../utils'
 import { FlexStacker } from './FlexStacker'
 import { HeaterShaker } from './HeaterShaker'
 import { MagneticBlock } from './MagneticBlock'
@@ -30,30 +31,78 @@ import { PlateReader } from './PlateReader'
 import { Temperature } from './Temperature'
 import { Thermocycler } from './Thermocycler'
 
-import type { ComponentProps, ReactNode } from 'react'
+import type { ComponentProps, Dispatch, ReactNode, SetStateAction } from 'react'
 import type {
   ModuleDefinition,
   ThermocyclerModuleModel,
 } from '@opentrons/shared-data'
+import type { FlexDirection } from '../Deck'
 
+export * from './alignToModule'
 export * from './Thermocycler'
 
-const LABWARE_OFFSET_DISPLAY_THRESHOLD = 2
-
 interface Props {
+  /**
+   * The x-coordinate of the module origin,
+   * which is the -x,-y corner of the slot that the module is in.
+   */
   x: number
+  /**
+   * The y-coordinate of the module origin,
+   * which is the -x,-y corner of the slot that the module is in.
+   */
   y: number
+
   def: ModuleDefinition
+
+  /**
+   * How child components should be positioned. Use `passThrough` for new code.
+   *
+   * `passThrough` - The SVG origin of each child will be at the origin of the module,
+   *   which is the front-left (-x, -y) corner of the slot that the module is in.
+   *   From there, use a helper component like `AlignLabwareToModule` or
+   *   `AlignControlToModule` to move the child where you want it.
+   *
+   * `offsetToSlot - The SVG origin of each child will be at the "labware mating interface"
+   *   of the module, which is the front-left (-x, -y) corner of the slot on top of the
+   *   module.
+   *
+   *   This is deprecated because it can't scale to support labware schema 3's many
+   *   ideas of how labware can fit on things. This will not position a child labware
+   *   properly if it has labware schema 3.
+   *
+   * todo(mm, 2025-07-21):
+   * 1. Migrate all existing call sites to use "passThrough".
+   * 2. Remove "offsetToSlot".
+   */
+  childrenPositioningMode: 'passThrough' | 'offsetToSlot'
+
+  /**
+   * Used for applying slot-specific positioning adjustments.
+   * If you're rendering the module on a deck, supply this for correct positioning.
+   */
+  targetSlotId: string | null
+  /**
+   * Used for applying slot-specific positioning adjustments.
+   * If you're rendering the module on a deck, supply this for correct positioning.
+   */
+  targetDeckId: string | null
   orientation?: 'left' | 'right'
   innerProps?:
     | ComponentProps<typeof Thermocycler>
     | ComponentProps<typeof HeaterShaker>
     | ComponentProps<typeof Temperature>
     | {}
-  statusInfo?: ReactNode // contents of small status rectangle, not displayed if absent
-  children?: ReactNode // contents to be rendered on top of the labware mating surface of the module
-  targetSlotId?: string
-  targetDeckId?: string
+  statusInfo?: ReactNode /** contents of small status rectangle, not displayed if absent */
+
+  /**
+   * Contents to be rendered above and as part of the module, typically labware.
+   * See `childrenPositioningMode`.
+   */
+  children?: ReactNode
+
+  setSelectedSlot?: Dispatch<SetStateAction<string | null>>
+  setHoveredSlot?: Dispatch<SetStateAction<string | null>>
 }
 
 const statusInfoWrapperProps = {
@@ -61,7 +110,7 @@ const statusInfoWrapperProps = {
   alignItems: ALIGN_CENTER,
 }
 const statusInfoFlexProps = {
-  flexDirection: DIRECTION_COLUMN,
+  flexDirection: DIRECTION_COLUMN as FlexDirection,
   justifyContent: JUSTIFY_CENTER,
   backgroundColor: C_MED_LIGHT_GRAY,
   padding: SPACING_1,
@@ -79,17 +128,15 @@ export const Module = (props: Props): JSX.Element => {
     innerProps = {},
     statusInfo,
     children,
+    childrenPositioningMode,
     targetSlotId,
-    targetDeckId = OT2_STANDARD_DECKID,
+    targetDeckId,
+    setSelectedSlot,
+    setHoveredSlot,
   } = props
+
   const moduleType = getModuleType(def.model)
 
-  const { x: labwareOffsetX, y: labwareOffsetY } = def.labwareOffset
-  const {
-    x: translateX,
-    y: translateY,
-    z: translateZ,
-  } = def.cornerOffsetFromSlot
   const {
     xDimension,
     yDimension,
@@ -100,49 +147,28 @@ export const Module = (props: Props): JSX.Element => {
   } = def.dimensions
 
   // apply translation to position module in viewport
-  const positionTransform = `translate(${x}, ${y})`
+  const parentSlotPositionTransform = `translate(${x}, ${y})`
+
+  const transformsForLocation =
+    targetSlotId != null && targetDeckId != null
+      ? def.slotTransforms[targetDeckId]?.[targetSlotId] ?? {}
+      : {}
 
   // apply translation to compensate for the offset of the overall module's
   // left-bottom-front corner, from the footprint's left-bottom-front corner (slot interface)
-  let offsetTransform = `translate(${translateX}, ${translateY})`
-
-  let nestedLabwareOffsetX = labwareOffsetX
-  let nestedLabwareOffsetY = labwareOffsetY
-
-  // additional transforms to apply to vectors in certain deck/slot combinations
-  const transformsForDeckBySlot = def?.slotTransforms?.[targetDeckId]
-  const slotTransformsForDeckSlot =
-    targetSlotId != null &&
-    transformsForDeckBySlot != null &&
-    targetSlotId in transformsForDeckBySlot
-      ? transformsForDeckBySlot[targetSlotId]
-      : null
-  const deckSpecificTransforms = slotTransformsForDeckSlot ?? {}
-  if (deckSpecificTransforms?.cornerOffsetFromSlot != null) {
-    const [
-      [slotTranslateX],
-      [slotTranslateY],
-    ] = multiplyMatrices(deckSpecificTransforms.cornerOffsetFromSlot, [
-      [translateX],
-      [translateY],
-      [translateZ],
+  const [
+    [slotTranslateX],
+    [slotTranslateY],
+  ] = multiplyMatrices(
+    transformsForLocation.cornerOffsetFromSlot ?? IDENTITY_AFFINE_TRANSFORM,
+    [
+      [def.cornerOffsetFromSlot.x],
+      [def.cornerOffsetFromSlot.y],
+      [def.cornerOffsetFromSlot.z],
       [1],
-    ])
-    offsetTransform = `translate(${slotTranslateX}, ${slotTranslateY})`
-  }
-  if (deckSpecificTransforms?.labwareOffset != null) {
-    const [
-      [slotLabwareOffsetX],
-      [slotLabwareOffsetY],
-    ] = multiplyMatrices(deckSpecificTransforms.labwareOffset, [
-      [labwareOffsetX],
-      [labwareOffsetY],
-      [1],
-      [1],
-    ])
-    nestedLabwareOffsetX = slotLabwareOffsetX
-    nestedLabwareOffsetY = slotLabwareOffsetY
-  }
+    ]
+  )
+  const offsetTransform = `translate(${slotTranslateX}, ${slotTranslateY})`
 
   // find coordinates of center of footprint, fallback to overall center if not defined
   const rotationCenterX = (footprintXDimension ?? xDimension) / 2
@@ -155,18 +181,6 @@ export const Module = (props: Props): JSX.Element => {
       ? 'rotate(0, 0, 0)'
       : `rotate(180, ${rotationCenterX}, ${rotationCenterY})`
 
-  // labwareOffset values are more accurate than our SVG renderings, so ignore any deviations under a certain threshold
-  const clampedLabwareOffsetX =
-    Math.abs(nestedLabwareOffsetX) > LABWARE_OFFSET_DISPLAY_THRESHOLD
-      ? nestedLabwareOffsetX
-      : 0
-  const clampedLabwareOffsetY =
-    Math.abs(nestedLabwareOffsetY) > LABWARE_OFFSET_DISPLAY_THRESHOLD
-      ? nestedLabwareOffsetY
-      : 0
-  // transform to be applied to children which render within the labware interfacing surface of the module
-  const childrenTransform = `translate(${clampedLabwareOffsetX}, ${clampedLabwareOffsetY})`
-
   const renderStatusInfo = (): JSX.Element | null => {
     if (statusInfo == null) return null
     const statusWidth = (labwareInterfaceXDimension ?? xDimension) / 2
@@ -174,10 +188,10 @@ export const Module = (props: Props): JSX.Element => {
       <RobotCoordsForeignObject
         x={
           orientation === 'left'
-            ? labwareOffsetX - statusWidth
-            : labwareOffsetX + (labwareInterfaceXDimension ?? xDimension)
+            ? def.labwareOffset.x - statusWidth
+            : def.labwareOffset.x + (labwareInterfaceXDimension ?? xDimension)
         }
-        y={labwareOffsetY}
+        y={def.labwareOffset.y}
         height={labwareInterfaceYDimension ?? yDimension}
         width={statusWidth}
         foreignObjectProps={statusInfoWrapperProps}
@@ -215,16 +229,39 @@ export const Module = (props: Props): JSX.Element => {
     moduleViz = <FlexStacker />
   }
   return (
-    <g transform={positionTransform} data-test={`Module_${moduleType}`}>
+    <g
+      transform={parentSlotPositionTransform}
+      data-test={`Module_${moduleType}`}
+      onMouseEnter={() => {
+        setHoveredSlot?.(targetSlotId)
+      }}
+      onMouseLeave={() => {
+        setHoveredSlot?.(null)
+      }}
+      onClick={() => {
+        setSelectedSlot?.(targetSlotId)
+      }}
+      cursor={
+        setHoveredSlot != null || setSelectedSlot != null ? 'pointer' : 'auto'
+      }
+    >
       <g transform={orientationTransform}>
         <g transform={offsetTransform} style={{ fill: C_DARK_GRAY }}>
           {moduleViz}
         </g>
       </g>
       {renderStatusInfo()}
-      {children != null ? (
-        <g transform={childrenTransform}>{children}</g>
-      ) : null}
+      {childrenPositioningMode === 'offsetToSlot' ? (
+        <AlignControlToModule
+          moduleDefinition={def}
+          slotId={targetSlotId}
+          deckId={targetDeckId}
+        >
+          {children}
+        </AlignControlToModule>
+      ) : (
+        children
+      )}
     </g>
   )
 }

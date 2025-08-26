@@ -45,7 +45,6 @@ class TargetProtocol:
     host_analysis_file: Path
     container_analysis_file: Path
     tag: str
-    custom_labware_paths: List[str]
     analysis_execution_time: Optional[float] = None
     command_exit_code: Optional[int] = None
     command_output: Optional[str] = None
@@ -126,8 +125,8 @@ def start_containers(image_name: str, num_containers: int, timeout: int = 60) ->
         containers.append(container)
 
     # Wait for containers to be ready
-    start_time = time.time()
-    while time.time() - start_time < timeout:
+    start_time = time.monotonic()
+    while time.monotonic() - start_time < timeout:
         all_ready = True
         for container in containers:
             exit_code, _ = container.exec_run(f"ls -al {CONTAINER_LABWARE}")
@@ -167,23 +166,13 @@ def container_analysis_path(protocol_file: Path, tag: str) -> Path:
     return Path(CONTAINER_RESULTS, f"{protocol_file.stem}_{tag}_{ANALYSIS_SUFFIX}")
 
 
-def protocol_custom_labware_paths_in_container(protocol: Protocol) -> List[str]:
-    if not HOST_LABWARE.is_dir() or protocol.custom_labware is None:
-        return []
-
-    return [
-        str(os.path.join(CONTAINER_LABWARE, f"{file}.json"))
-        for file in protocol.custom_labware
-        if f"{file}.json" in os.listdir(HOST_LABWARE)
-    ]
-
-
 def analyze(protocol: TargetProtocol, container: docker.models.containers.Container) -> bool:
-    command = (
-        f"python -I -m opentrons.cli analyze --json-output {protocol.container_analysis_file} "
-        f"{protocol.container_protocol_file} {' '.join(protocol.custom_labware_paths)}"
-    )
-    start_time = time.time()
+    # Gather all labware JSON files in the container labware directory
+    labware_files = list(Path(CONTAINER_LABWARE).glob("*.json"))
+    # Build the command with all relevant file paths
+    all_files = [str(protocol.container_protocol_file)] + [str(lw) for lw in labware_files]
+    command = f"python -I -m opentrons.cli analyze --json-output {protocol.container_analysis_file} " + " ".join(all_files)
+    start_time = time.monotonic()
     result = None
     exit_code = None
     console.print(f"Beginning analysis of {protocol.host_protocol_file.name}")
@@ -202,7 +191,7 @@ def analyze(protocol: TargetProtocol, container: docker.models.containers.Contai
         protocol.set_analysis()
         return False
     finally:
-        protocol.set_analysis_execution_time(time.time() - start_time)
+        protocol.set_analysis_execution_time(time.monotonic() - start_time)
         console.print(f"Analysis of {protocol.host_protocol_file.name} completed in {protocol.analysis_execution_time:.2f} seconds.")
 
 
@@ -249,7 +238,7 @@ def get_container_instances(protocol_len: int) -> int:
 
 def generate_analyses_from_test(tag: str, protocols: List[Protocol]) -> List[TargetProtocol]:
     """Generate analyses from the tests."""
-    start_time = time.time()
+    start_time = time.monotonic()
     protocols_to_process: List[TargetProtocol] = []
     for test_protocol in protocols:
         host_protocol_file = Path(test_protocol.file_path)
@@ -263,11 +252,10 @@ def generate_analyses_from_test(tag: str, protocols: List[Protocol]) -> List[Tar
                 host_analysis_file,
                 container_analysis_file,
                 tag,
-                protocol_custom_labware_paths_in_container(test_protocol),
             )
         )
     instance_count = get_container_instances(len(protocols_to_process))
     analyze_against_image(tag, protocols_to_process, instance_count)
-    end_time = time.time()
+    end_time = time.monotonic()
     console.print(f"Clock time to generate analyses: {end_time - start_time:.2f} seconds.")
     return protocols_to_process

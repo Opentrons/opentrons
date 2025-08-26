@@ -283,6 +283,10 @@ def check_safe_for_tip_pickup_and_return(
         adapter_height = engine_state.labware.get_dimensions(
             labware_id=tiprack_parent.labwareId
         ).z
+        # todo(mm, 2025-07-31): This looks like it needs to be something like
+        # `tiprack_top_plane < adapter_top_plane` instead of `tiprack_height < adapter_height`.
+        # In other words, take into account the stacking offset between the tip rack
+        # and its adapter.
         if is_partial_config and tiprack_height < adapter_height:
             raise PartialTipMovementNotAllowedError(
                 f"{tiprack_name} cannot be on an adapter taller than the tip rack"

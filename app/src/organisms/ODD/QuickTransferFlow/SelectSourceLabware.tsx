@@ -83,18 +83,18 @@ export function SelectSourceLabware(
       />
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
+        padding={`${SPACING.spacing32} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
         width="100%"
       >
         <Flex
           gridGap={SPACING.spacing8}
-          height={SPACING.spacing80}
+          height="5rem"
+          padding={`${SPACING.spacing24} 0 ${SPACING.spacing24}`}
           backgroundColor={COLORS.white}
           width="100%"
           flexDirection={DIRECTION_ROW}
           position={POSITION_FIXED}
           top={SPACING.spacing120}
-          marginBottom={SPACING.spacing24}
           alignItems={ALIGN_CENTER}
         >
           <Tabs
@@ -109,7 +109,7 @@ export function SelectSourceLabware(
           />
         </Flex>
         <Flex
-          gridGap={SPACING.spacing4}
+          gridGap={SPACING.spacing8}
           flexDirection={DIRECTION_COLUMN}
           marginTop="175px"
         >

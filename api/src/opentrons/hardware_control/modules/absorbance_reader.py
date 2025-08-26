@@ -103,8 +103,8 @@ class AbsorbanceReader(mod_abc.AbstractModule):
         cls,
         port: str,
         usb_port: USBPort,
-        execution_manager: ExecutionManager,
         hw_control_loop: asyncio.AbstractEventLoop,
+        execution_manager: Optional[ExecutionManager] = None,
         poll_interval_seconds: Optional[float] = None,
         simulating: bool = False,
         sim_model: Optional[str] = None,
@@ -117,8 +117,8 @@ class AbsorbanceReader(mod_abc.AbstractModule):
         Args:
             port: The port to connect to
             usb_port: USB Port
-            execution_manager: Execution manager.
             hw_control_loop: The event loop running in the hardware control thread.
+            execution_manager: Execution manager.
             poll_interval_seconds: Poll interval override.
             simulating: whether to build a simulating driver
             sim_model: The model name used by simulator
@@ -169,8 +169,8 @@ class AbsorbanceReader(mod_abc.AbstractModule):
         reader: AbsorbanceReaderReader,
         poller: Poller,
         device_info: Mapping[str, str],
-        execution_manager: ExecutionManager,
         hw_control_loop: asyncio.AbstractEventLoop,
+        execution_manager: Optional[ExecutionManager] = None,
         disconnected_callback: ModuleDisconnectedCallback = None,
     ) -> None:
         """
@@ -179,12 +179,12 @@ class AbsorbanceReader(mod_abc.AbstractModule):
         Args:
             port: The port the absorbance is connected to.
             usb_port: The USB port.
-            execution_manager: The hardware execution manager.
             driver: The Absorbance driver.
             reader: An interface to read data from the Absorbance Reader.
             poller: A poll controller for reads.
             device_info: The Absorbance device info.
             hw_control_loop: The event loop running in the hardware control thread.
+            execution_manager: The hardware execution manager.
         """
         self._driver = driver
         super().__init__(
@@ -276,10 +276,6 @@ class AbsorbanceReader(mod_abc.AbstractModule):
     async def deactivate(self, must_be_running: bool = True) -> None:
         """Deactivate the module."""
         pass
-
-    async def wait_for_is_running(self) -> None:
-        if not self.is_simulated:
-            await self._execution_manager.wait_for_is_running()
 
     async def prep_for_update(self) -> str:
         """Prepare for an update.

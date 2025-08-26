@@ -1,7 +1,13 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getAllLiquidClassDefs } from '@opentrons/shared-data'
+import {
+  ETHANOL_LIQUID_CLASS_NAME,
+  getAllLiquidClassDefs,
+  GLYCEROL_LIQUID_CLASS_NAME,
+  NONE_LIQUID_CLASS_NAME,
+  WATER_LIQUID_CLASS_NAME,
+} from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -22,15 +28,6 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
   }
 })
 const mockMakeSnackbar = vi.fn()
-
-const mockNoLiquidClass = {
-  byPipette: [],
-  description: 'Default',
-  displayName: "Don't use liquid class settings",
-  liquidClassName: 'none',
-  namespace: 'opentrons',
-  schemaVersion: 1,
-}
 
 const mockByPipette = [
   {
@@ -58,25 +55,25 @@ const mockByPipette = [
 ]
 
 const mockLiquidClasses = {
-  ethanol: {
-    liquidClassName: 'mock ethanol',
+  [ETHANOL_LIQUID_CLASS_NAME]: {
+    liquidClassName: 'ethanol_80',
     displayName: 'Volatile',
     description: '80% ethanol',
     schemaVersion: 0,
     namespace: '',
     byPipette: mockByPipette,
   },
-  glyeral: {
-    liquidClassName: 'mock glyeral',
+  [GLYCEROL_LIQUID_CLASS_NAME]: {
+    liquidClassName: 'glycerol_50',
     displayName: 'Viscous',
     description: '50% glycerol',
     schemaVersion: 0,
     namespace: '',
     byPipette: mockByPipette,
   },
-  water: {
+  [WATER_LIQUID_CLASS_NAME]: {
     displayName: 'Aqueous',
-    liquidClassName: 'mock water',
+    liquidClassName: 'water',
     description: 'Deionized water',
     schemaVersion: 0,
     namespace: '',
@@ -211,7 +208,7 @@ describe('SelectLiquidClass', () => {
     expect(props.onNext).toHaveBeenCalled()
     expect(props.dispatch).toHaveBeenCalledWith({
       type: 'SET_LIQUID_CLASS',
-      liquidClass: mockNoLiquidClass,
+      liquidClassName: NONE_LIQUID_CLASS_NAME,
     })
   })
 
@@ -223,7 +220,7 @@ describe('SelectLiquidClass', () => {
     expect(props.onNext).toHaveBeenCalled()
     expect(props.dispatch).toHaveBeenCalledWith({
       type: 'SET_LIQUID_CLASS',
-      liquidClass: mockLiquidClasses.water,
+      liquidClassName: WATER_LIQUID_CLASS_NAME,
     })
   })
 

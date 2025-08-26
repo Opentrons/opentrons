@@ -7,7 +7,7 @@ import {
 
 import type { AttachedModule } from '@opentrons/api-client'
 import type {
-  CutoutFixtureId,
+  CutoutFixtureIdsWithFakes,
   CutoutId,
   DeckConfiguration,
 } from '@opentrons/shared-data'
@@ -15,7 +15,7 @@ import type {
 export function getFixtureIdByCutoutId(
   attachedModule: AttachedModule,
   deckConfig: DeckConfiguration
-): { [cutoutId in CutoutId]?: CutoutFixtureId } {
+): { [cutoutId in CutoutId]?: CutoutFixtureIdsWithFakes } {
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const moduleCutoutConfig = deckConfig.find(
     cc => cc.opentronsModuleSerialNumber === attachedModule.serialNumber
@@ -29,6 +29,21 @@ export function getFixtureIdByCutoutId(
           deckDef
         )
       : {}
-
   return fixtureIdByCutoutId
+}
+
+export function getFixtureIdByCutoutIdForModule(
+  attachedModule: AttachedModule,
+  deckConfig: DeckConfiguration
+): { [cutoutId in CutoutId]?: CutoutFixtureIdsWithFakes } {
+  const moduleCutoutConfig = deckConfig.find(
+    cc => cc.opentronsModuleSerialNumber === attachedModule.serialNumber
+  )
+  if (moduleCutoutConfig != null) {
+    return {
+      [moduleCutoutConfig.cutoutId]: moduleCutoutConfig.cutoutFixtureId,
+    }
+  } else {
+    return {}
+  }
 }

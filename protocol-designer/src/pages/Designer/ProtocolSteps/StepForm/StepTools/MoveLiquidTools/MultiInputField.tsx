@@ -13,11 +13,12 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
-import { InputStepFormField } from '../../../../../../components/molecules'
+import { InputStepFormField } from '/protocol-designer/components/molecules'
+
 import { PositionField } from '../../PipetteFields'
 
-import type { ReferenceFields } from '../../../../../../form-types'
-import type { MoveLiquidPrefixType } from '../../../../../../resources/types'
+import type { FormData, ReferenceFields } from '/protocol-designer/form-types'
+import type { MoveLiquidPrefixType } from '/protocol-designer/resources/types'
 import type { FieldPropsByName } from '../../types'
 
 export interface StepInputFieldProps {
@@ -26,6 +27,7 @@ export interface StepInputFieldProps {
   units: string
 }
 interface MultiInputFieldProps {
+  formData: FormData
   name: string
   tooltipContent: string
   propsForFields: FieldPropsByName
@@ -38,6 +40,7 @@ interface MultiInputFieldProps {
 
 export function MultiInputField(props: MultiInputFieldProps): JSX.Element {
   const {
+    formData,
     name,
     tooltipContent,
     isWellPosition,
@@ -88,6 +91,7 @@ export function MultiInputField(props: MultiInputFieldProps): JSX.Element {
           ))}
           {(isWellPosition ?? false) && (
             <PositionField
+              formData={formData}
               padding="0"
               prefix={prefix}
               propsForFields={propsForFields}

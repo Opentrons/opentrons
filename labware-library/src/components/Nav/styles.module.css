@@ -6,11 +6,11 @@
 
 .nav {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
   z-index: 999;
+  top: 0;
+  right: 0;
+  left: 0;
+  width: 100%;
 }
 
 /* TODO (ka 20194-16): Keeping wrapper and containers separate
@@ -24,8 +24,8 @@ are project specific  */
 .main_nav_wrapper {
   width: 100%;
   height: var(--size-mobile-nav);
-  background-color: var(--c-white);
   border-bottom: var(--bd-light);
+  background-color: var(--c-white);
 }
 
 .nav_container {
@@ -36,32 +36,33 @@ are project specific  */
 
 .breadcrumbs {
   position: fixed;
-  top: var(--size-mobile-nav);
-  left: 0;
-  right: 0;
   z-index: 888;
+  top: var(--size-mobile-nav);
+  right: 0;
+  left: 0;
   width: 100%;
+  background-color: var(--c-lightest-gray);
   font-size: var(--fs-default);
   font-weight: var(--fw-semibold);
   line-height: var(--lh-copy);
-  background-color: var(--c-lightest-gray);
 }
 
 .breadcrumbs_contents {
   display: flex;
-  align-items: center;
-  height: var(--size-2);
-  padding: 0 var(--spacing-5);
   overflow: visible;
+  height: var(--size-2);
+  align-items: center;
+  padding: 0 var(--spacing-5);
 }
 
 .breadcrumbs_link {
+  overflow: hidden;
+  color: var(--c-blue);
+  text-overflow: ellipsis;
+
   /* pulled from legacy --transition-color */
   transition: color 0.15s ease-in-out;
-  color: var(--c-blue);
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 
   &:hover,
   &:active {
@@ -85,8 +86,8 @@ are project specific  */
 
   .nav_container,
   .breadcrumbs_contents {
-    padding-left: var(--spacing-7);
     padding-right: var(--spacing-7);
+    padding-left: var(--spacing-7);
   }
 }
 
@@ -95,8 +96,8 @@ are project specific  */
     display: block;
     width: 100%;
     height: var(--size-subdomain-nav);
-    background-color: var(--c-white);
     border-bottom: var(--bd-light);
+    background-color: var(--c-white);
   }
 
   .main_nav_wrapper {
@@ -110,7 +111,7 @@ are project specific  */
 
   .nav_container,
   .breadcrumbs_contents {
-    margin: auto;
     max-width: var(--screen-width-xlarge);
+    margin: auto;
   }
 }

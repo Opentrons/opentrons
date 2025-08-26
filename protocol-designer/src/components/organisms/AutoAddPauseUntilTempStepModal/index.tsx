@@ -50,12 +50,12 @@ export const AutoAddPauseUntilTempStepModal = (
         >
           <SecondaryButton onClick={handleCancelClick}>
             <StyledText desktopStyle="bodyDefaultSemiBold">
-              {t('auto_add_pause_until_temp_step.redesign.build_pause_later')}
+              {t('auto_add_pause_until_temp_step.redesign.skip_pause_step')}
             </StyledText>
           </SecondaryButton>
           <PrimaryButton onClick={handleContinueClick}>
             <StyledText desktopStyle="bodyDefaultSemiBold">
-              {t('auto_add_pause_until_temp_step.redesign.pause_protocol')}
+              {t('auto_add_pause_until_temp_step.redesign.add_pause_step')}
             </StyledText>
           </PrimaryButton>
         </Flex>
@@ -63,13 +63,7 @@ export const AutoAddPauseUntilTempStepModal = (
     >
       <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
         <StyledText desktopStyle="bodyDefaultRegular">
-          {t('auto_add_pause_until_temp_step.redesign.body1', {
-            module: displayModule,
-            temp: displayTemperature,
-          })}
-        </StyledText>
-        <StyledText desktopStyle="bodyDefaultRegular">
-          {t('auto_add_pause_until_temp_step.redesign.body2', {
+          {t('auto_add_pause_until_temp_step.redesign.body', {
             module: displayModule,
             temp: displayTemperature,
           })}

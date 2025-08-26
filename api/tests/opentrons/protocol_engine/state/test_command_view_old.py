@@ -7,7 +7,7 @@ treating CommandState as a private implementation detail.
 
 
 import pytest
-from contextlib import nullcontext as does_not_raise
+from contextlib import nullcontext as does_not_raise, AbstractContextManager
 from datetime import datetime
 from typing import Any, Dict, List, NamedTuple, Optional, Sequence, Type, Union
 
@@ -626,7 +626,10 @@ def test_validate_action_allowed(
     expected_error: Optional[Type[Exception]],
 ) -> None:
     """It should validate allowed play/pause/stop actions."""
-    expectation = pytest.raises(expected_error) if expected_error else does_not_raise()
+    if expected_error is not None:
+        expectation: AbstractContextManager[object] = pytest.raises(expected_error)
+    else:
+        expectation = does_not_raise()
 
     with expectation:
         result = subject.validate_action_allowed(action)

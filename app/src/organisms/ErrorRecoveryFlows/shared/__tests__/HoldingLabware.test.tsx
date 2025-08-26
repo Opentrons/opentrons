@@ -162,7 +162,7 @@ describe('HoldingLabware', () => {
     await waitFor(() => {
       expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
         RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE,
-        RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.STEPS.CONFIRM_RETRY
+        RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.STEPS.FILL_HOPPER
       )
     })
   })
@@ -193,7 +193,7 @@ describe('HoldingLabware', () => {
     await waitFor(() => {
       expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
         RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE,
-        RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.STEPS.CONFIRM_RETRY
+        RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE
       )
     })
   })

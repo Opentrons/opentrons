@@ -78,6 +78,7 @@ from .exceptions import (
     LiquidHeightUnknownError,
     LiquidVolumeUnknownError,
     IncompleteLabwareDefinitionError,
+    InvalidUserDefinedVolumesError,
     IncompleteWellDefinitionError,
     OperationLocationNotInWellError,
     InvalidDispenseVolumeError,
@@ -89,6 +90,7 @@ from .exceptions import (
     FlexStackerLabwarePoolNotYetDefinedError,
     FlexStackerNotLogicallyEmptyError,
     InvalidLabwarePositionError,
+    InvalidModuleOrientation,
 )
 
 from .error_occurrence import ErrorOccurrence, ProtocolCommandFailedError
@@ -173,6 +175,7 @@ __all__ = [
     "FlexStackerLabwarePoolNotYetDefinedError",
     "FlexStackerNotLogicallyEmptyError",
     "InvalidLabwarePositionError",
+    "InvalidModuleOrientation",
     # error occurrence models
     "ErrorOccurrence",
     "CommandNotAllowedError",
@@ -180,6 +183,7 @@ __all__ = [
     "LiquidHeightUnknownError",
     "LiquidVolumeUnknownError",
     "IncompleteLabwareDefinitionError",
+    "InvalidUserDefinedVolumesError",
     "IncompleteWellDefinitionError",
     "OperationLocationNotInWellError",
     "InvalidDispenseVolumeError",

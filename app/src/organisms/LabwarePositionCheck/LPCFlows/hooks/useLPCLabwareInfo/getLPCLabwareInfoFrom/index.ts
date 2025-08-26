@@ -1,4 +1,8 @@
-import { getLabwareDefURI, getLabwareDisplayName } from '@opentrons/shared-data'
+import {
+  getLabwareDefURI,
+  getLabwareDisplayName,
+  splitLabwareDefURI,
+} from '@opentrons/shared-data'
 
 import {
   getTotalCountNonHardCodedLocationSpecificOffsets,
@@ -64,6 +68,7 @@ function getLabwareInfoRecords(
       labwareDetails[uri] = {
         id: getALabwareIdFromUri({ ...params, uri }),
         displayName: getDisplayNameFromUri({ ...params, uri }),
+        version: splitLabwareDefURI(uri).version,
         defaultOffsetDetails: getDefaultOffsetDetailsForLabware({
           ...params,
           uri,

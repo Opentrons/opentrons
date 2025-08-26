@@ -9,6 +9,7 @@ import postCssPresetEnv from 'postcss-preset-env'
 import { defineConfig } from 'vite'
 
 import { versionForProject } from '../scripts/git-version.mjs'
+import { cssModuleSideEffect } from './cssModuleSideEffect'
 
 import type { UserConfig } from 'vite'
 
@@ -35,6 +36,7 @@ export default defineConfig(
             configFile: true,
           },
         }),
+        cssModuleSideEffect(),
         {
           name: 'markdown-loader',
           transform(code, id) {
@@ -48,6 +50,10 @@ export default defineConfig(
           project: 'protocol-designer',
           authToken: process.env.OT_SENTRY_AUTH_TOKEN,
           telemetry: false,
+          reactComponentAnnotation: {
+            enabled: true,
+            ignoredComponents: [], // (kk:08/15/2025) ToDo add later
+          },
           sourcemaps: {
             assets: ['./dist/**'],
             ignore: ['./node_modules/**'],
@@ -78,14 +84,15 @@ export default defineConfig(
       },
       resolve: {
         alias: {
-          '@opentrons/components/styles': path.resolve(
-            '../components/src/index.module.css'
+          '@opentrons/components/styles/global': path.resolve(
+            '../components/src/styles/global.css'
           ),
           '@opentrons/components': path.resolve('../components/src/index.ts'),
           '@opentrons/shared-data': path.resolve('../shared-data/js/index.ts'),
           '@opentrons/step-generation': path.resolve(
             '../step-generation/src/index.ts'
           ),
+          '/protocol-designer/': path.resolve('./src/') + '/',
         },
       },
       server: {

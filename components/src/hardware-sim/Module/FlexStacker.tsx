@@ -1,4 +1,15 @@
 export function FlexStacker(): JSX.Element {
+  // The given SVG is visually a little misaligned from where we expect it to be.
+  // Translate it, by eye, to compensate.
+  return (
+    <g transform="translate(0, -6)">
+      <UnadjustedSVG />
+    </g>
+  )
+}
+
+// The unadjusted SVG, straight from design.
+function UnadjustedSVG(): JSX.Element {
   return (
     <svg
       width="374"

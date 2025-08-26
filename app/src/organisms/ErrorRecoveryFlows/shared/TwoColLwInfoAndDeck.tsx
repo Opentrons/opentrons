@@ -4,10 +4,8 @@ import {
   COLORS,
   Flex,
   LabwareRender,
-  Module,
   MoveLabwareOnDeck,
 } from '@opentrons/components'
-import { inferModuleOrientationFromXCoordinate } from '@opentrons/shared-data'
 
 import { DeckMapContent, TwoColumn } from '/app/molecules/InterventionModal'
 
@@ -30,8 +28,7 @@ export function TwoColLwInfoAndDeck(
     deckMapUtils,
     currentRecoveryOptionUtils,
     isOnDevice,
-    recoveryMap,
-    recoveryCommands,
+    allRunDefs,
   } = props
   const {
     RETRY_NEW_TIPS,
@@ -40,38 +37,12 @@ export function TwoColLwInfoAndDeck(
     MANUAL_REPLACE_AND_RETRY,
     HOME_AND_RETRY,
     MANUAL_FILL_AND_RETRY_NEW_TIPS,
-    STACKER_STALLED_RETRY,
-    STACKER_STALLED_SKIP,
-    STACKER_SHUTTLE_MISSING_RETRY,
-    STACKER_HOPPER_EMPTY_RETRY,
-    STACKER_HOPPER_EMPTY_SKIP,
-    STACKER_SHUTTLE_EMPTY_RETRY,
-    STACKER_SHUTTLE_EMPTY_SKIP,
   } = RECOVERY_MAP
-  const { manualRetrieve } = recoveryCommands
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
-  const {
-    relevantPickUpTipWellName,
-    relevantPickUpTipLabware,
-    labwareQuantity,
-  } = failedLabwareUtils
+  const { relevantPickUpTipWellName } = failedLabwareUtils
   const { proceedNextStep, goBackPrevStep } = routeUpdateActions
-  const { route, step } = recoveryMap
   const { failedPipetteInfo, isPartialTipConfigValid } = failedPipetteUtils
   const { t } = useTranslation('error_recovery')
-
-  const primaryOnClick = (): void => {
-    if (
-      (route === STACKER_HOPPER_EMPTY_SKIP.ROUTE &&
-        step === STACKER_HOPPER_EMPTY_SKIP.STEPS.HOPPER_MANUAL_REPLACE) ||
-      (route === STACKER_STALLED_SKIP.ROUTE &&
-        step === STACKER_STALLED_SKIP.STEPS.MANUAL_REPLACE)
-    ) {
-      void manualRetrieve().then(() => proceedNextStep())
-    } else {
-      void proceedNextStep()
-    }
-  }
 
   const {
     displayNameCurrentLoc: slot,
@@ -100,25 +71,6 @@ export function TwoColLwInfoAndDeck(
           })
         }
       }
-      case STACKER_STALLED_RETRY.ROUTE:
-      case STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
-        return t('ensure_stacker_has_labware')
-      case STACKER_STALLED_SKIP.ROUTE:
-      case STACKER_HOPPER_EMPTY_SKIP.ROUTE:
-      case STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
-        if (
-          step === STACKER_STALLED_SKIP.STEPS.MANUAL_REPLACE ||
-          step === STACKER_HOPPER_EMPTY_SKIP.STEPS.HOPPER_MANUAL_REPLACE ||
-          step === STACKER_SHUTTLE_EMPTY_SKIP.STEPS.CONFIRM_RETRY
-        ) {
-          return t('load_labware_into_labware_shuttle')
-        } else {
-          return t('ensure_stacker_has_labware')
-        }
-      case STACKER_SHUTTLE_MISSING_RETRY.ROUTE:
-        return t('ensure_stacker_has_labware')
-      case STACKER_HOPPER_EMPTY_RETRY.ROUTE:
-        return t('load_labware_into_stacker', { quantity: labwareQuantity })
       default:
         console.error(
           `TwoColLwInfoAndDeck: Unexpected recovery option: ${selectedRecoveryOption}. Handle retry step copy explicitly.`
@@ -140,22 +92,6 @@ export function TwoColLwInfoAndDeck(
           ? t('replace_tips_and_select_loc_partial_tip')
           : t('replace_tips_and_select_location')
       }
-      case STACKER_STALLED_RETRY.ROUTE:
-      case STACKER_HOPPER_EMPTY_RETRY.ROUTE:
-        return t('make_sure_loaded_correct_number_of_labware_stacker')
-      case STACKER_STALLED_SKIP.ROUTE:
-      case STACKER_HOPPER_EMPTY_SKIP.ROUTE:
-        if (
-          step === STACKER_STALLED_SKIP.STEPS.MANUAL_REPLACE ||
-          step === STACKER_HOPPER_EMPTY_SKIP.STEPS.HOPPER_MANUAL_REPLACE
-        ) {
-          return null
-        } else {
-          return t('make_sure_loaded_correct_number_of_labware_stacker')
-        }
-      case STACKER_SHUTTLE_MISSING_RETRY.ROUTE:
-      case STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
-        return t('make_sure_loaded_correct_number_of_labware_stacker')
       default:
         console.error(
           `TwoColLwInfoAndDeck:buildBannerText: Unexpected recovery option ${selectedRecoveryOption}. Handle retry step copy explicitly.`
@@ -175,23 +111,6 @@ export function TwoColLwInfoAndDeck(
     }
   }
 
-  const buildLayoutType = (): ComponentProps<
-    typeof InterventionContent
-  >['infoProps']['layout'] => {
-    switch (selectedRecoveryOption) {
-      case STACKER_STALLED_SKIP.ROUTE:
-      case STACKER_STALLED_RETRY.ROUTE:
-      case STACKER_SHUTTLE_MISSING_RETRY.ROUTE:
-      case STACKER_HOPPER_EMPTY_RETRY.ROUTE:
-      case STACKER_HOPPER_EMPTY_SKIP.ROUTE:
-      case STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
-      case STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
-        return 'stacked'
-      default:
-        return 'default'
-    }
-  }
-
   // TODO(jh, 10-22-24): Componentize an app-only abstraction above MoveLabwareOnDeck. EXEC-788.
   const buildDeckView = (): JSX.Element => {
     switch (selectedRecoveryOption) {
@@ -204,50 +123,43 @@ export function TwoColLwInfoAndDeck(
           ...restUtils
         } = deckMapUtils
 
-        const failedLwId = relevantPickUpTipLabware?.id ?? ''
+        const failedLwId = failedLabwareUtils.failedLabware?.id ?? ''
 
         const isValidDeck =
           currentLoc != null && newLoc != null && movedLabwareDef != null
 
+        const modulesOnDeck = moduleRenderInfo?.map(module => {
+          return {
+            moduleModel: module.moduleDef.model,
+            moduleLocation: { slotName: module.targetSlotId },
+            nestedLabwareDef:
+              module.nestedLabwareId !== failedLwId
+                ? module.nestedLabwareDef
+                : null,
+          }
+        })
         return isValidDeck ? (
           <MoveLabwareOnDeck
             deckFill={isOnDevice ? COLORS.grey35 : '#e6e6e6'}
             initialLabwareLocation={currentLoc}
             finalLabwareLocation={newLoc}
             movedLabwareDef={movedLabwareDef}
+            labwareDefinitions={allRunDefs}
             {...restUtils}
+            modulesOnDeck={modulesOnDeck}
             backgroundItems={
               <>
-                {moduleRenderInfo.map(
-                  ({
-                    x,
-                    y,
-                    moduleId,
-                    moduleDef,
-                    nestedLabwareDef,
-                    nestedLabwareId,
-                  }) => (
-                    <Module
-                      key={moduleId}
-                      def={moduleDef}
-                      x={x}
-                      y={y}
-                      orientation={inferModuleOrientationFromXCoordinate(x)}
-                    >
-                      {nestedLabwareDef != null &&
-                      nestedLabwareId !== failedLwId ? (
-                        <LabwareRender definition={nestedLabwareDef} />
-                      ) : null}
-                    </Module>
-                  )
-                )}
                 {labwareRenderInfo
                   .filter(l => l.labwareId !== failedLwId)
-                  .map(({ x, y, labwareDef, labwareId }) => (
-                    <g key={labwareId} transform={`translate(${x},${y})`}>
-                      {labwareDef != null && labwareId !== failedLwId ? (
-                        <LabwareRender definition={labwareDef} />
-                      ) : null}
+                  .map(({ labwareOrigin, labwareDef, labwareId }) => (
+                    <g
+                      key={labwareId}
+                      transform={`translate(${labwareOrigin.x},${labwareOrigin.y})`}
+                    >
+                      <LabwareRender
+                        definition={labwareDef}
+                        positioningMode="passThrough"
+                      />
                     </g>
                   ))}
               </>
@@ -269,13 +181,13 @@ export function TwoColLwInfoAndDeck(
           {...props}
           title={buildTitle()}
           type={buildType()}
-          layout={buildLayoutType()}
+          layout="default"
           bannerText={buildBannerText()}
         />
         <Flex marginTop="0.7rem">{buildDeckView()}</Flex>
       </TwoColumn>
       <RecoveryFooterButtons
-        primaryBtnOnClick={primaryOnClick}
+        primaryBtnOnClick={proceedNextStep}
         secondaryBtnOnClick={goBackPrevStep}
       />
     </RecoverySingleColumnContentWrapper>

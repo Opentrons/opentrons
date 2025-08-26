@@ -25,7 +25,10 @@ export function useAuthorization(
   const authorizationToken = useRef<AuthorizationToken | null>(null)
 
   useEffect(() => {
-    createRegistration(host as HostConfig, createRegistrationParams)
+    if (host == null) {
+      return
+    }
+    createRegistration(host, createRegistrationParams)
       .then(response => {
         registrationToken.current = response.data
         return createAuthorization(host as HostConfig, response.data)
@@ -33,8 +36,7 @@ export function useAuthorization(
       .then(response => {
         authorizationToken.current = response.data
       })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [host])
 
   return {
     authorizationToken: authorizationToken.current,

@@ -35,7 +35,7 @@ from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.module_substates.absorbance_reader_substate import (
     AbsorbanceReaderMeasureMode,
 )
-from opentrons.types import DeckSlotName, MountType, StagingSlotName
+from opentrons.types import DeckSlotName, MountType, Point, StagingSlotName
 from .update_types import (
     AbsorbanceReaderStateUpdate,
     FlexStackerStateUpdate,
@@ -53,11 +53,9 @@ from ..types import (
     ModuleDefinition,
     DeckSlotLocation,
     ModuleDimensions,
-    LabwareOffsetVector,
     HeaterShakerLatchStatus,
     HeaterShakerMovementRestrictors,
     DeckType,
-    LabwareMovementOffsetData,
     AddressableAreaLocation,
     StackerStoredLabwareGroup,
 )
@@ -140,6 +138,8 @@ _OT2_THERMOCYCLER_ADDITIONAL_SLOTS = [
     DeckSlotName.SLOT_11,
 ]
 _OT3_THERMOCYCLER_ADDITIONAL_SLOTS = [DeckSlotName.SLOT_A1]
+
+_COLUMN_4_MODULES = [ModuleModel.FLEX_STACKER_MODULE_V1]
 
 
 @dataclass(frozen=True)
@@ -932,7 +932,7 @@ class ModuleView:
         # addressable area info, can we do that computation in GeometryView instead of
         # here?
         addressable_areas: AddressableAreaView,
-    ) -> LabwareOffsetVector:
+    ) -> Point:
         """Get the nominal offset from a module's location to its child labware's location.
 
         Includes the slot-specific transform. Does not include the child's
@@ -946,17 +946,13 @@ class ModuleView:
                     module_addressable_area
                 )
             )
-            return base + LabwareOffsetVector(
-                x=module_addressable_area_position.x,
-                y=module_addressable_area_position.y,
-                z=module_addressable_area_position.z,
-            )
+            return base + module_addressable_area_position
         else:
             return base
 
     def get_nominal_offset_to_child_from_addressable_area(
         self, module_id: str
-    ) -> LabwareOffsetVector:
+    ) -> Point:
         """Get the position offset for a child of this module from the nearest AA.
 
         On the Flex, this is always (0, 0, 0); on the OT-2, since modules load on top
@@ -965,11 +961,7 @@ class ModuleView:
         slotTransform if appropriate.
         """
         if self.get_deck_supports_module_fixtures():
-            return LabwareOffsetVector(
-                x=0,
-                y=0,
-                z=0,
-            )
+            return Point(0, 0, 0)
         else:
             definition = self.get_definition(module_id)
             slot = self.get_location(module_id).slotName.id
@@ -1000,7 +992,7 @@ class ModuleView:
             # Apply the slot transform, if any
             xform: NDArray[npdouble] = array(xforms_ser_offset)
             xformed = dot(xform, pre_transform)
-            return LabwareOffsetVector(
+            return Point(
                 x=xformed[0],
                 y=xformed[1],
                 z=xformed[2],
@@ -1268,7 +1260,22 @@ class ModuleView:
             if existing_def.model == model or model in existing_def.compatibleWith:
                 return existing_mod_in_slot
 
-            else:
+            # FIXME(sfoster): This is a bad hack. This code should check that these can coexist
+            # through some data-driven means. Or this code should, in fact, not exist at all,
+            # since it's probably for setup commands that we don't use anymore, and doesn't
+            # check serial numbers and therefore would fail if there was mroe than one of
+            # a given module loaded across the deck and the one in this location was not the
+            # one that was being requested.
+            elif not (
+                (
+                    ModuleModel.is_flex_stacker(existing_def.model)
+                    and ModuleModel.is_magnetic_block(model)
+                )
+                or (
+                    ModuleModel.is_magnetic_block(existing_def.model)
+                    and ModuleModel.is_flex_stacker(model)
+                )
+            ):
                 _err = f" present in {location}"
                 raise errors.ModuleAlreadyPresentError(
                     f"A {existing_def.model.value} is already" + _err
@@ -1313,17 +1320,14 @@ class ModuleView:
     ) -> None:
         """Raise if the given location has a module in it."""
         for module in self.get_all():
+            if module.model in _COLUMN_4_MODULES and module.location == location:
+                raise errors.LocationIsOccupiedError(
+                    f"Module {module.model} is already present at {location.slotName.value[:1]}4."
+                )
             if module.location == location:
                 raise errors.LocationIsOccupiedError(
                     f"Module {module.model} is already present at {location}."
                 )
-
-    def get_default_gripper_offsets(
-        self, module_id: str
-    ) -> Optional[LabwareMovementOffsetData]:
-        """Get the deck's default gripper offsets."""
-        offsets = self.get_definition(module_id).gripperOffsets
-        return offsets.get("default") if offsets else None
 
     def get_overflowed_module_in_slot(
         self, slot_name: DeckSlotName

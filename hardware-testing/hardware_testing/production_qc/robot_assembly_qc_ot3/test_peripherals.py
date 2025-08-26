@@ -4,7 +4,7 @@ from pathlib import Path
 from subprocess import run as run_subprocess, Popen, CalledProcessError
 from typing import List, Union, Optional, Dict
 from urllib.request import urlopen
-from time import time
+from time import monotonic
 from typing import Tuple
 
 from opentrons_hardware.hardware_control.rear_panel_settings import set_ui_color
@@ -28,7 +28,7 @@ SERVER_CMD = "{0} -m http.server {1} --directory {2}"
 CAM_PIC_FILE_NAME = "camera_{0}.jpg"
 
 CAM_CMD_OT3 = (
-    "v4l2-ctl --device /dev/video0 --set-fmt-video=width=640,height=480,pixelformat=MJPG "
+    "v4l2-ctl --device /dev/video2 --set-fmt-video=width=640,height=480,pixelformat=MJPG "
     "--stream-mmap --stream-to={0} --stream-count=1"
 )
 
@@ -223,19 +223,19 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     ui.print_header("DOOR SWITCH")
     door_timeout_seconds = 10
     print("CLOSE the front door")
-    start_time_seconds = time()
+    start_time_seconds = monotonic()
     while not api.is_simulator and api.door_state != DoorState.CLOSED:
         await asyncio.sleep(0.1)
-        if time() - start_time_seconds > door_timeout_seconds:
+        if monotonic() - start_time_seconds > door_timeout_seconds:
             ui.print_error("timed out waiting for door to close")
             break
     print(api.door_state)
     is_closed = api.door_state == DoorState.CLOSED
     print("OPEN the front door")
-    start_time_seconds = time()
+    start_time_seconds = monotonic()
     while not api.is_simulator and api.door_state != DoorState.OPEN:
         await asyncio.sleep(0.1)
-        if time() - start_time_seconds > door_timeout_seconds:
+        if monotonic() - start_time_seconds > door_timeout_seconds:
             ui.print_error("timed out waiting for door to open")
             break
     print(api.door_state)
@@ -244,7 +244,10 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
 
     # CAMERA
     ui.print_header("CAMERA")
-    cam_pic_path = await _take_picture(api, report, section)
+    try:
+        cam_pic_path = await _take_picture(api, report, section)
+    except Exception as e:
+        print(f"Take a picture failed with the following error: {e}")
     if cam_pic_path:
         await _run_image_check_server(api, report, section, cam_pic_path)
         cam_pic_path.unlink()

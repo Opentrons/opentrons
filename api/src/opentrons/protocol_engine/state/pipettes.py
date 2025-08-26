@@ -38,6 +38,7 @@ from ..types import (
     CurrentAddressableArea,
     CurrentPipetteLocation,
     TipGeometry,
+    LabwareWellId,
 )
 from ..actions import (
     Action,
@@ -127,6 +128,7 @@ class PipetteState:
     liquid_presence_detection_by_id: Dict[str, bool]
     ready_to_aspirate_by_id: Dict[str, bool]
     has_clean_tips_by_id: Dict[str, bool]
+    tip_source_by_id: Dict[str, Optional[LabwareWellId]]
 
 
 class PipetteStore(HasState[PipetteState], HandlesActions):
@@ -149,6 +151,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             liquid_presence_detection_by_id={},
             ready_to_aspirate_by_id={},
             has_clean_tips_by_id={},
+            tip_source_by_id={},
         )
 
     def handle_action(self, action: Action) -> None:
@@ -180,6 +183,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._state.movement_speed_by_id[pipette_id] = None
             self._state.attached_tip_by_id[pipette_id] = None
             self._state.ready_to_aspirate_by_id[pipette_id] = False
+            self._state.tip_source_by_id[pipette_id] = None
 
     def _update_tip_state(self, state_update: update_types.StateUpdate) -> None:
         if state_update.pipette_tip_state != update_types.NO_CHANGE:
@@ -188,6 +192,9 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 attached_tip = state_update.pipette_tip_state.tip_geometry
 
                 self._state.attached_tip_by_id[pipette_id] = attached_tip
+                self._state.tip_source_by_id[
+                    pipette_id
+                ] = state_update.pipette_tip_state.tip_source
 
                 static_config = self._state.static_config_by_id.get(pipette_id)
                 if static_config:
@@ -216,6 +223,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 pipette_id = state_update.pipette_tip_state.pipette_id
                 self._state.attached_tip_by_id[pipette_id] = None
                 self._state.has_clean_tips_by_id[pipette_id] = False
+                self._state.tip_source_by_id[pipette_id] = None
 
                 static_config = self._state.static_config_by_id.get(pipette_id)
                 if static_config:
@@ -243,7 +251,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             new_logical_location = location_update.new_location
             new_deck_point = location_update.new_deck_point
             match new_logical_location:
-                case update_types.Well(labware_id=labware_id, well_name=well_name):
+                case LabwareWellId(labware_id=labware_id, well_name=well_name):
                     self._state.current_location = CurrentWell(
                         pipette_id=location_update.pipette_id,
                         labware_id=labware_id,
@@ -475,6 +483,17 @@ class PipetteView:
             for pipette_id, tip in self._state.attached_tip_by_id.items()
             if tip is not None
         ]
+
+    def get_tip_rack_well_picked_up_from(
+        self, pipette_id: str
+    ) -> Optional[LabwareWellId]:
+        """Get the tip rack well a tip has been has picked up from, if there currently is a tip attached."""
+        try:
+            return self._state.tip_source_by_id[pipette_id]
+        except KeyError as e:
+            raise errors.PipetteNotLoadedError(
+                f"Pipette {pipette_id} no found; unable to get last tip rack well accessed."
+            ) from e
 
     def get_aspirated_volume(self, pipette_id: str) -> Optional[float]:
         """Get the currently aspirated volume of a pipette by ID.

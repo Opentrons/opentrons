@@ -54,7 +54,8 @@ export function Dispense(props: DispenseProps): JSX.Element | null {
       {showResetAdvancedSettingsModal ? (
         <ResetAdvancedSettingsModal
           kind="dispense"
-          liquidClass={state.liquidClass}
+          state={state}
+          dispatch={dispatch}
           onClose={handleClose}
         />
       ) : null}

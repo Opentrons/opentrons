@@ -49,10 +49,22 @@ interface LPCContentContainerTertiaryBtnProps {
 }
 
 export type LPCContentContainerProps = LPCWizardContentProps &
-  Partial<ChildNavigationProps> & {
+  Pick<
+    ChildNavigationProps,
+    | 'onClickButton'
+    | 'buttonIsDisabled'
+    | 'secondaryButtonProps'
+    | 'onClickBack'
+  > & {
     children: JSX.Element
     /* The ODD view header. The desktop header is hard-coded. */
     header: string
+    /* The copy for the ODD header button. */
+    oddHeaderBtnCopy: string
+    /* The copy for the desktop header button. */
+    desktopHeaderBtnCopy: string
+    /* The copy for the desktop footer button. */
+    desktopFooterBtnCopy: string
     /* An optional style override for the content container. */
     contentStyle?: FlattenSimpleInterpolation
     /* An optional style override for the container. */
@@ -67,7 +79,16 @@ export function LPCContentContainer(
   props: LPCContentContainerProps
 ): JSX.Element {
   const { t } = useTranslation('labware_position_check')
-  const { runId, children, contentStyle, containerStyle, ...rest } = props
+  const {
+    runId,
+    children,
+    contentStyle,
+    containerStyle,
+    oddHeaderBtnCopy,
+    desktopHeaderBtnCopy,
+    desktopFooterBtnCopy,
+    ...rest
+  } = props
   const { commandUtils } = rest
   const { currentStepIndex, totalStepCount, currentSubstep } = useSelector(
     selectStepInfo(runId)
@@ -100,6 +121,7 @@ export function LPCContentContainer(
             />
             <ChildNavigation
               {...rest}
+              buttonText={oddHeaderBtnCopy}
               css={CHILD_NAV_STYLE}
               buttonIsDisabled={rest.buttonIsDisabled}
               header={truncateString(rest.header, 40)}
@@ -125,6 +147,7 @@ export function LPCContentContainer(
                 currentStep={currentStepIndex + 1}
                 totalSteps={totalStepCount}
                 hideStepText={true}
+                exitButtonCopy={desktopHeaderBtnCopy}
               />
             }
           >
@@ -142,13 +165,13 @@ export function LPCContentContainer(
 
 function DesktopFooterContent({
   runId,
-  buttonText,
   buttonIsDisabled,
   tertiaryBtnProps,
   onClickButton,
   primaryBtnAlert,
   commandUtils,
-}: Omit<LPCContentContainerProps, 'children'>): JSX.Element {
+  desktopFooterBtnCopy,
+}: Omit<LPCContentContainerProps, 'children' | 'buttonText'>): JSX.Element {
   const step = useSelector(selectCurrentStep(runId))
   const { currentSubstep } = useSelector(selectStepInfo(runId))
   const showHelpLink =
@@ -170,11 +193,11 @@ function DesktopFooterContent({
             disabled={buttonIsDisabled}
             onClick={onClickButton}
           >
-            {buttonText}
+            {desktopFooterBtnCopy}
           </AlertPrimaryButton>
         ) : (
           <PrimaryButton disabled={buttonIsDisabled} onClick={onClickButton}>
-            {buttonText}
+            {desktopFooterBtnCopy}
           </PrimaryButton>
         )}
       </Flex>

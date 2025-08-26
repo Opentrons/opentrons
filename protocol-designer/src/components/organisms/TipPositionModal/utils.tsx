@@ -2,6 +2,7 @@ import floor from 'lodash/floor'
 import round from 'lodash/round'
 
 import {
+  getMmFromBottom,
   POSITION_REFERENCE_CENTER,
   POSITION_REFERENCE_TOP,
 } from '@opentrons/shared-data'
@@ -9,12 +10,13 @@ import {
 import {
   DEFAULT_MM_OFFSET_FROM_BOTTOM,
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
-} from '../../../constants'
-import { getIsTouchTipField } from '../../../form-types'
+} from '/protocol-designer/constants'
+import { getIsTouchTipField } from '/protocol-designer/form-types'
+
 import { DECIMALS_ALLOWED, TOO_MANY_DECIMALS } from './constants'
 
 import type { PositionReference } from '@opentrons/shared-data'
-import type { StepFieldName } from '../../../form-types'
+import type { StepFieldName } from '/protocol-designer/form-types'
 
 export function getDefaultMmFromEdge(args: {
   name: StepFieldName
@@ -155,4 +157,16 @@ export const getIsZValueAtBottom = (
       break
   }
   return round(parseFloat(zValue), 1) === round(minZValue, 1)
+}
+
+export const getIsTipInWell = (
+  z: number,
+  positionReference: PositionReference,
+  wellDepth: number | null
+): boolean => {
+  if (wellDepth == null) {
+    return false
+  }
+  const mmFromBottom = getMmFromBottom(z, positionReference, wellDepth)
+  return mmFromBottom != null && mmFromBottom <= wellDepth
 }

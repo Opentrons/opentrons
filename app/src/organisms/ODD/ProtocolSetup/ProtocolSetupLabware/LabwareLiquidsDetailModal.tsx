@@ -23,9 +23,9 @@ import {
 
 import type {
   CompletedProtocolAnalysis,
+  LabwareByLiquidId,
   LabwareDefinition,
 } from '@opentrons/shared-data'
-import type { LabwareByLiquidId } from '/app/transformations/commands'
 
 interface LabwareLiquidsDetailModalProps {
   labwareId: string

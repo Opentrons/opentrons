@@ -1,17 +1,14 @@
 import { useSelector } from 'react-redux'
 
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-
 import {
-  getEnableLiquidClasses,
   getEnablePartialTipSupport,
-  getEnableReturnTip,
-} from '../../../../../../feature-flags/selectors'
-import { getRobotType } from '../../../../../../file-data/selectors'
+  getEnableTipPickupLocation,
+} from '/protocol-designer/feature-flags/selectors'
 import {
   getLabwareEntities,
   getPipetteEntities,
-} from '../../../../../../step-forms/selectors'
+} from '/protocol-designer/step-forms/selectors'
+
 import { useAssignLiquidClass } from '../MoveLiquidTools/hooks/useAssignLiquidClass'
 import { useSupportedLiquidClassOptions } from '../MoveLiquidTools/hooks/useSupportedLiquidClassOptions'
 import { LiquidClassesStepTools } from '../MoveLiquidTools/LiquidClassesStepTools'
@@ -35,11 +32,9 @@ export function MixTools(
     setShowFormErrors,
   } = props
   const pipettes = useSelector(getPipetteEntities)
-  const enableReturnTip = useSelector(getEnableReturnTip)
+  const enableTipPickupLocation = useSelector(getEnableTipPickupLocation)
   const enablePartialTip = useSelector(getEnablePartialTipSupport)
   const labwares = useSelector(getLabwareEntities)
-  const enableLiquidClasses = useSelector(getEnableLiquidClasses)
-  const robotType = useSelector(getRobotType)
 
   const pickUpTipLocationValue = propsForFields.pickUpTip_location?.value
   const userSelectedPickUpTipLocation =
@@ -70,29 +65,20 @@ export function MixTools(
         formData={formData}
         enablePartialTip={enablePartialTip}
         pipettes={pipettes}
-        enableReturnTip={enableReturnTip}
+        enableTipPickupLocation={enableTipPickupLocation}
         userSelectedPickUpTipLocation={userSelectedPickUpTipLocation}
         userSelectedDropTipLocation={userSelectedDropTipLocation}
       />
     ),
     1: () => (
       <>
-        {enableLiquidClasses && robotType === FLEX_ROBOT_TYPE ? (
-          <LiquidClassesStepTools
-            propsForFields={propsForFields}
-            setShowFormErrors={setShowFormErrors}
-            formData={formData}
-            orderedLiquidClassOptions={orderedSupportedLiquidClassOptions}
-            type="mix"
-          />
-        ) : (
-          <SecondStepMixTools
-            propsForFields={propsForFields}
-            formData={formData}
-            tab={tab}
-            setTab={setTab}
-          />
-        )}
+        <LiquidClassesStepTools
+          propsForFields={propsForFields}
+          setShowFormErrors={setShowFormErrors}
+          formData={formData}
+          orderedLiquidClassOptions={orderedSupportedLiquidClassOptions}
+          type="mix"
+        />
       </>
     ),
 

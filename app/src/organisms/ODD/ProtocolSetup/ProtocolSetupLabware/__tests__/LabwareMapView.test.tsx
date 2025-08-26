@@ -1,5 +1,5 @@
 import { MemoryRouter } from 'react-router-dom'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
 import { BaseDeck, EXTENDED_DECK_CONFIG_FIXTURE } from '@opentrons/components'
@@ -8,7 +8,6 @@ import { fixtureTiprack300ul, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
-import { getLabwareRenderInfo } from '/app/transformations/analysis'
 
 import { mockProtocolModuleInfo } from '../__fixtures__'
 import { LabwareMapView } from '../LabwareMapView'
@@ -27,8 +26,6 @@ vi.mock('@opentrons/components/src/hardware-sim/BaseDeck')
 vi.mock('@opentrons/shared-data/js/helpers/getSimplestFlexDeckConfig')
 vi.mock('/app/resources/deck_configuration/utils')
 vi.mock('/app/redux/config')
-
-const MOCK_300_UL_TIPRACK_COORDS = [30, 40, 0]
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actual = await importOriginal<typeof getSimplestDeckConfigForProtocol>()
@@ -58,10 +55,6 @@ const render = (props: ComponentProps<typeof LabwareMapView>) => {
 }
 
 describe('LabwareMapView', () => {
-  beforeEach(() => {
-    vi.mocked(getLabwareRenderInfo).mockReturnValue({})
-  })
-
   afterEach(() => {
     vi.resetAllMocks()
   })
@@ -96,16 +89,6 @@ describe('LabwareMapView', () => {
         modulesOnDeck: mockModulesOnDeck,
       })
       .thenReturn(<div>mock base deck</div>)
-    vi.mocked(getLabwareRenderInfo).mockReturnValue({
-      '300_ul_tiprack_id': {
-        labwareDef: fixtureTiprack300ul as LabwareDefinition,
-        displayName: 'fresh tips',
-        x: MOCK_300_UL_TIPRACK_COORDS[0],
-        y: MOCK_300_UL_TIPRACK_COORDS[1],
-        z: MOCK_300_UL_TIPRACK_COORDS[2],
-        slotName: 'C1',
-      },
-    })
     render({
       handleLabwareClick: vi.fn(),
       mostRecentAnalysis: ({} as unknown) as CompletedProtocolAnalysis,

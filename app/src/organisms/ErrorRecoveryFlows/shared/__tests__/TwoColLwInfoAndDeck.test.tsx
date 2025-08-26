@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { MoveLabwareOnDeck } from '@opentrons/components'
@@ -93,20 +93,6 @@ describe('TwoColLwInfoAndDeck', () => {
     expect(mockProceedNextStep).toHaveBeenCalled()
   })
 
-  it('calls manualRetrieve and then proceedNextStep when primary button is clicked for flex stacker retrieve options', async () => {
-    props.recoveryMap.route = RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.ROUTE
-    props.recoveryMap.step =
-      RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.STEPS.HOPPER_MANUAL_REPLACE
-    render(props)
-    clickButtonLabeled('Continue')
-    await waitFor(() => {
-      expect(mockManualRetrieve).toHaveBeenCalled()
-    })
-    await waitFor(() => {
-      expect(mockProceedNextStep).toHaveBeenCalled()
-    })
-  })
-
   it(`passes correct title to LeftColumnLabwareInfo for ${RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE}`, () => {
     render(props)
     expect(vi.mocked(LeftColumnLabwareInfo)).toHaveBeenCalledWith(
@@ -165,71 +151,6 @@ describe('TwoColLwInfoAndDeck', () => {
     )
   })
 
-  it(`passes correct title to LeftColumnLabwareInfo for ${RECOVERY_MAP.STACKER_STALLED_RETRY.ROUTE}`, () => {
-    props.currentRecoveryOptionUtils.selectedRecoveryOption =
-      RECOVERY_MAP.STACKER_STALLED_RETRY.ROUTE
-    render(props)
-    expect(vi.mocked(LeftColumnLabwareInfo)).toHaveBeenCalledWith(
-      expect.objectContaining({
-        title: 'Ensure stacker has labware',
-        type: 'location',
-        bannerText:
-          'Make sure you load the correct number of labware into the stacker.',
-      }),
-      expect.anything()
-    )
-  })
-
-  it(`passes correct title to LeftColumnLabwareInfo for ${RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE} with manual replace step`, () => {
-    props.currentRecoveryOptionUtils.selectedRecoveryOption =
-      RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE
-    props.recoveryMap.step =
-      RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.MANUAL_REPLACE
-    render(props)
-    expect(vi.mocked(LeftColumnLabwareInfo)).toHaveBeenCalledWith(
-      expect.objectContaining({
-        title: 'Load labware onto labware shuttle',
-        type: 'location',
-        bannerText: null,
-      }),
-      expect.anything()
-    )
-  })
-
-  it(`passes correct title to LeftColumnLabwareInfo for ${RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE} with NOT manual replace step`, () => {
-    props.currentRecoveryOptionUtils.selectedRecoveryOption =
-      RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE
-    props.recoveryMap.step =
-      RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.MANUAL_REPLACE
-    render(props)
-    expect(vi.mocked(LeftColumnLabwareInfo)).toHaveBeenCalledWith(
-      expect.objectContaining({
-        title: 'Ensure stacker has labware',
-        type: 'location',
-        bannerText:
-          'Make sure you load the correct number of labware into the stacker.',
-      }),
-      expect.anything()
-    )
-  })
-
-  it(`passes correct title to LeftColumnLabwareInfo for ${RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE} with NOT manual replace step`, () => {
-    props.currentRecoveryOptionUtils.selectedRecoveryOption =
-      RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE
-    props.recoveryMap.step =
-      RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.STEPS.CONFIRM_RETRY
-    render(props)
-    expect(vi.mocked(LeftColumnLabwareInfo)).toHaveBeenCalledWith(
-      expect.objectContaining({
-        title: 'Ensure stacker has labware',
-        type: 'location',
-        bannerText:
-          'Make sure you load the correct number of labware into the stacker.',
-      }),
-      expect.anything()
-    )
-  })
-
   it('passes correct title to LeftColumnLabwareInfo for 96-channel pipette', () => {
     props.currentRecoveryOptionUtils.selectedRecoveryOption =
       RECOVERY_MAP.RETRY_NEW_TIPS.ROUTE
@@ -281,8 +202,8 @@ describe('TwoColLwInfoAndDeck', () => {
     props.currentRecoveryOptionUtils.selectedRecoveryOption =
       RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE
     props.deckMapUtils = {
-      movedLabwareDef: null,
-      moduleRenderInfo: null,
+      currentLoc: null,
+      newLoc: null,
       labwareRenderInfo: null,
     } as any
 

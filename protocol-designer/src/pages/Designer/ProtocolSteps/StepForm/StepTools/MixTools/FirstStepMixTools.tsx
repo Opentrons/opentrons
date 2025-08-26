@@ -8,7 +8,8 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { InputStepFormField } from '../../../../../../components/molecules'
+import { InputStepFormField } from '/protocol-designer/components/molecules'
+
 import {
   ChangeTipField,
   DropTipField,
@@ -23,7 +24,7 @@ import {
 } from '../../PipetteFields'
 
 import type { PipetteEntities } from '@opentrons/step-generation'
-import type { FormData } from '../../../../../../form-types'
+import type { FormData } from '/protocol-designer/form-types'
 import type { FieldPropsByName } from '../../types'
 
 interface FirstStepMixToolsProps {
@@ -31,7 +32,7 @@ interface FirstStepMixToolsProps {
   formData: FormData
   enablePartialTip: boolean
   pipettes: PipetteEntities
-  enableReturnTip: boolean
+  enableTipPickupLocation: boolean
   userSelectedPickUpTipLocation: boolean
   userSelectedDropTipLocation: boolean
 }
@@ -41,7 +42,7 @@ export function FirstStepMixTools({
   formData,
   enablePartialTip,
   pipettes,
-  enableReturnTip,
+  enableTipPickupLocation,
   userSelectedPickUpTipLocation,
   userSelectedDropTipLocation,
 }: FirstStepMixToolsProps): JSX.Element {
@@ -115,11 +116,13 @@ export function FirstStepMixTools({
         />
         <DropTipField
           {...propsForFields.dropTip_location}
+          nozzles={formData.nozzles}
           tooltipContent={null}
           padding="0"
+          tiprackDefUri={formData.tipRack}
         />
       </Flex>
-      {enableReturnTip ? (
+      {enableTipPickupLocation ? (
         <>
           <PickUpTipField {...propsForFields.pickUpTip_location} />
           {userSelectedPickUpTipLocation ? (
@@ -139,7 +142,7 @@ export function FirstStepMixTools({
           ) : null}
         </>
       ) : null}
-      {userSelectedDropTipLocation && enableReturnTip ? (
+      {userSelectedDropTipLocation && enableTipPickupLocation ? (
         <>
           <Divider marginY="0" />
           <TipWellSelectionField

@@ -58,7 +58,9 @@ export const waitForTemperature: CommandCreator<TemperatureParams> = (
 
   if (
     unreachableTemp ||
-    ('status' in moduleState && moduleState.status === TEMPERATURE_DEACTIVATED)
+    ('status' in moduleState &&
+      moduleState.status === TEMPERATURE_DEACTIVATED) ||
+    ('targetTemp' in moduleState && moduleState.targetTemp == null)
   ) {
     return {
       errors: [errorCreators.missingTemperatureStep()],

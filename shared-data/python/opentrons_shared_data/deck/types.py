@@ -7,7 +7,7 @@ This should only be imported if typing.TYPE_CHECKING is True
 from typing import Any, Dict, List, NewType, Union
 from typing_extensions import Literal, TypedDict
 
-from ..module.types import ModuleType
+from ..module.types import ModuleType, ModuleOrientation
 from opentrons_shared_data.labware.types import LocatingFeatures
 
 
@@ -45,7 +45,8 @@ class SlotDefV3(TypedDict, total=False):
     displayName: str
     compatibleModuleTypes: List[ModuleType]
     matingSurfaceUnitVector: List[Union[Literal[1], Literal[-1]]]
-    locatingFeaturesAsParent: LocatingFeatures
+    features: LocatingFeatures
+    orientation: ModuleOrientation
 
 
 class CalibrationPoint(TypedDict):
@@ -111,7 +112,8 @@ class AddressableAreaV5(_RequiredAddressableArea, total=False):
     matingSurfaceUnitVector: List[Union[Literal[1], Literal[-1]]]
     ableToDropTips: bool
     ableToDropLabware: bool
-    locatingFeaturesAsParent: LocatingFeatures
+    features: LocatingFeatures
+    orientation: Union[ModuleOrientation, None]
 
 
 class Cutout(TypedDict):

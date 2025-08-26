@@ -105,9 +105,7 @@ def _get_racks(ctx: ProtocolContext) -> Dict[int, Labware]:
     }
 
 
-def _unused_tips_for_racks(
-    ctx: ProtocolContext, pipette_mount: str, racks: List[Labware]
-) -> List[Well]:
+def _unused_tips_for_racks(ctx: ProtocolContext, racks: List[Labware]) -> List[Well]:
     wells: List[Well] = []
     rows = "ABCDEFGH"
     for rack in racks:
@@ -123,21 +121,17 @@ def _unused_tips_for_racks(
     return wells
 
 
-def get_unused_tips(
-    ctx: ProtocolContext, tip_volume: int, pipette_mount: str
-) -> List[Well]:
+def get_unused_tips(ctx: ProtocolContext, tip_volume: int) -> List[Well]:
     """Use the labware's tip tracker to get a list of all unused tips for a given tip volume."""
     racks = [
         r for r in _get_racks(ctx).values() if r.wells()[0].max_volume == tip_volume
     ]
-    return _unused_tips_for_racks(ctx, pipette_mount, racks)
+    return _unused_tips_for_racks(ctx, racks)
 
 
-def get_tips_for_single(
-    ctx: ProtocolContext, tip_volume: int, pipette_mount: str
-) -> List[Well]:
+def get_tips_for_single(ctx: ProtocolContext, tip_volume: int) -> List[Well]:
     """Get tips for single channel."""
-    return get_unused_tips(ctx, tip_volume, pipette_mount)
+    return get_unused_tips(ctx, tip_volume)
 
 
 def get_tips_for_individual_channel_on_multi(
@@ -145,7 +139,6 @@ def get_tips_for_individual_channel_on_multi(
     channel: int,
     tip_volume: int,
     pipette_volume: int,
-    pipette_mount: str,
 ) -> List[Well]:
     """Get tips for a multi's channel."""
     print(f"getting {tip_volume} tips for channel {channel}")
@@ -157,8 +150,12 @@ def get_tips_for_individual_channel_on_multi(
     all_racks = _get_racks(ctx)
     specific_racks: List[Labware] = []
     for slot in slots:
-        specific_racks.append(all_racks[slot])
-    unused_tips = _unused_tips_for_racks(ctx, pipette_mount, specific_racks)
+        try:
+            specific_racks.append(all_racks[slot])
+        except KeyError:
+            # we may not be loading all the tips and thats OK
+            pass
+    unused_tips = _unused_tips_for_racks(ctx, specific_racks)
     tips = [
         tip
         for tip in unused_tips
@@ -189,14 +186,14 @@ def get_tips(
 ) -> Dict[int, List[Well]]:
     """Get tips."""
     if pipette.channels == 1:
-        return {0: get_tips_for_single(ctx, tip_volume, pipette.mount)}
+        return {0: get_tips_for_single(ctx, tip_volume)}
     elif pipette.channels == 8:
         if all_channels:
             return {0: get_tips_for_all_channels_on_multi(ctx, tip_volume)}
         else:
             return {
                 channel: get_tips_for_individual_channel_on_multi(
-                    ctx, channel, tip_volume, int(pipette.max_volume), pipette.mount
+                    ctx, channel, tip_volume, int(pipette.max_volume)
                 )
                 for channel in range(pipette.channels)
             }

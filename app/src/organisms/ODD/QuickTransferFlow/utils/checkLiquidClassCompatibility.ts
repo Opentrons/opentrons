@@ -3,7 +3,7 @@ import { getFlexNameConversion } from '@opentrons/shared-data'
 import type { LiquidClass } from '@opentrons/shared-data'
 import type { QuickTransferWizardState } from '../types'
 
-const MINIMUM_LIQUID_CLASS_VOLUME = 10
+const MINIMUM_LIQUID_CLASS_VOLUME = 1
 export interface Compatibility {
   pipetteIncompatible?: boolean
   tipRackIncompatible?: boolean

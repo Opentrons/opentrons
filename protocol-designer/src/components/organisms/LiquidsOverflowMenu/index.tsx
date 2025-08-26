@@ -21,15 +21,18 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { OVERFLOW_MENU_POSITION_ADJUSTMENT } from '../../../constants'
-import * as labwareIngredActions from '../../../labware-ingred/actions'
-import { getLiquidEntities } from '../../../step-forms/selectors'
-import { LINE_CLAMP_TEXT_STYLE, NAV_BAR_HEIGHT_REM } from '../../atoms'
+import {
+  LINE_CLAMP_TEXT_STYLE,
+  NAV_BAR_HEIGHT_REM,
+} from '/protocol-designer/components/atoms'
+import { OVERFLOW_MENU_POSITION_ADJUSTMENT } from '/protocol-designer/constants'
+import * as labwareIngredActions from '/protocol-designer/labware-ingred/actions'
+import { getLiquidEntities } from '/protocol-designer/step-forms/selectors'
 
 import type { MouseEvent, RefObject } from 'react'
-import type { ThunkDispatch } from '../../../types'
+import type { ThunkDispatch } from '/protocol-designer/types'
 
-const TOP_POSITION = '13.6875rem'
+const TOP_POSITION = '14.2rem'
 const RIGHT_POSITION_FOR_LIQUIDS_PAGE = '25.675rem'
 interface LiquidsOverflowMenuProps {
   onClose: () => void
@@ -60,7 +63,7 @@ export function LiquidsOverflowMenu({
     right = undefined
     left =
       targetWidth !== undefined
-        ? `${targetWidth - OVERFLOW_MENU_POSITION_ADJUSTMENT}px`
+        ? `${targetWidth + OVERFLOW_MENU_POSITION_ADJUSTMENT}px`
         : undefined
   }
 

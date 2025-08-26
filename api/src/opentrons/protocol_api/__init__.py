@@ -1,9 +1,10 @@
-""" protocol_api: The user-facing API for OT2 protocols.
+"""protocol_api: The user-facing API for Opentrons OT-2 and Opentrons Flex protocols.
 
-This package defines classes and functions for access through a protocol to
-control the OT2.
+This package defines classes and functions for Python protocols to
+control an OT-2 or Flex robot.
 
 """
+
 from opentrons.protocols.api_support.definitions import (
     MAX_SUPPORTED_VERSION,
     MIN_SUPPORTED_VERSION,

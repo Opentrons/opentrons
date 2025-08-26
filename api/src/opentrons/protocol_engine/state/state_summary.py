@@ -13,6 +13,7 @@ from ..types import (
     Liquid,
     LiquidClassRecordWithId,
     WellInfoSummary,
+    TaskSummary,
 )
 
 
@@ -34,3 +35,4 @@ class StateSummary(BaseModel):
     wells: List[WellInfoSummary] = Field(default_factory=list)
     files: List[str] = Field(default_factory=list)
     liquidClasses: List[LiquidClassRecordWithId] = Field(default_factory=list)
+    tasks: List[TaskSummary] = Field(default_factory=list)

@@ -91,7 +91,9 @@ export function DetachProbe(props: LPCWizardContentProps): JSX.Element {
     <LPCContentContainer
       {...props}
       header={t('labware_position_check_title')}
-      buttonText={t('confirm_removal')}
+      desktopFooterBtnCopy={t('confirm_removal')}
+      desktopHeaderBtnCopy={t('exit')}
+      oddHeaderBtnCopy={t('confirm_removal')}
       onClickButton={() => {
         proceedStep()
       }}

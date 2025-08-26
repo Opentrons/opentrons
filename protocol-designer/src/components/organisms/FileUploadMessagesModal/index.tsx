@@ -13,8 +13,9 @@ import {
 import {
   dismissFileUploadMessage,
   undoLoadFile,
-} from '../../../load-file/actions'
-import { getFileUploadMessages } from '../../../load-file/selectors'
+} from '/protocol-designer/load-file/actions'
+import { getFileUploadMessages } from '/protocol-designer/load-file/selectors'
+
 import { useFileUploadModalContents } from './utils'
 
 export function FileUploadMessagesModal(): JSX.Element | null {
@@ -33,10 +34,21 @@ export function FileUploadMessagesModal(): JSX.Element | null {
   }
 
   const { title, body } = modalContents
+
+  const isMigration = title === t('migration_header')
+
   const showButtons =
     title !== t('invalid_json_file') &&
     title !== t('incorrect_file_header') &&
     title !== t('incorrect_python_file_header')
+
+  const handleClose = (): void => {
+    if (isMigration) {
+      dispatch(undoLoadFile())
+    } else {
+      dismissModal()
+    }
+  }
 
   return (
     <Modal
@@ -44,7 +56,7 @@ export function FileUploadMessagesModal(): JSX.Element | null {
       type={message?.isError ? 'error' : 'info'}
       title={title}
       closeOnOutsideClick
-      onClose={dismissModal}
+      onClose={handleClose}
       footer={
         showButtons && (
           <Flex
@@ -59,7 +71,9 @@ export function FileUploadMessagesModal(): JSX.Element | null {
             >
               {t('cancel')}
             </SecondaryButton>
-            <PrimaryButton onClick={dismissModal}>{t('confirm')}</PrimaryButton>
+            <PrimaryButton onClick={dismissModal}>
+              {isMigration ? t('import') : t('confirm')}
+            </PrimaryButton>
           </Flex>
         )
       }

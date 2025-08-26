@@ -41,9 +41,7 @@ const DeckLabelSetComponent = (
       x={x}
       y={y}
       innerDivProps={{
-        style: {
-          transform: `rotate(180deg) scaleX(-1) scaleY(${invert ? '-1' : '1'})`,
-        },
+        transform: `rotate(180deg) scaleX(-1) scaleY(${invert ? '-1' : '1'})`,
       }}
     >
       <Box position={POSITION_RELATIVE} width="100%" height="100%">

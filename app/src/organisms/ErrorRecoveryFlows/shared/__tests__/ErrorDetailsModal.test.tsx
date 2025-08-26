@@ -15,6 +15,7 @@ import {
   LabwareMissingOnShuttleErrorBanner,
   NoLiquidDetectedBanner,
   OverpressureBanner,
+  StackerShuttleMissingErrorBanner,
   StackerStallErrorBanner,
   StallErrorBanner,
   TipNotDetectedBanner,
@@ -269,6 +270,20 @@ describe('renders the InlineNotification', () => {
           'Stacker latch jammed errors occur when labware gets stuck in between the stacker latch. This is usually caused by improperly placed labware or inaccurate labware definitions',
         message:
           'If the issue persists, cancel the run and reach out to Opentrons support',
+      }),
+      {}
+    )
+  })
+
+  it('renders the InlineNotification for StackerShuttleMissingErrorBanner', () => {
+    renderWithProviders(<StackerShuttleMissingErrorBanner />, {
+      i18nInstance: i18n,
+    })
+    expect(vi.mocked(InlineNotification)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'alert',
+        heading:
+          'Stacker shuttle missing errors occur when the shuttle is not placed correctly on the track. Load the stacker shuttle onto the track to proceed.',
       }),
       {}
     )

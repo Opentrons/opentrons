@@ -1590,14 +1590,14 @@ heaterShaker has the following fields:
   "setHeaterShakerTemperature": boolean, // Whether to set temperature
   "setShake": boolean, // Whether to shake
   // TEMPERATURE CONTROL
-  "targetHeaterShakerTemperature": "number-as-string" | null, // Temperature in °C (37-95°C)
+  "targetHeaterShakerTemperature": "number-as-string" | null, // Temperature in °C (20-95°C)
   "targetSpeed": "number-as-string" | null, // RPM for shaking (200-3000 RPM)
 }
 ```
 
 Additonal notes:
 
-- Temperature range: 37-95°C
+- Temperature range: 20-95°C
 - Speed range: 200-3000 RPM
 - The latch cannot be open while shaking
 - Timer can be set to control duration of shaking/heating

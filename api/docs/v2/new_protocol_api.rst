@@ -49,7 +49,7 @@ Wells and Liquids
 .. autoclass:: opentrons.protocol_api.Liquid
 
 .. autoclass:: opentrons.protocol_api.LiquidClass
-   :members:
+   :members: get_for
 
 .. _protocol-api-modules:
 

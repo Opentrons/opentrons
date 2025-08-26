@@ -30,7 +30,7 @@ export interface LabwareProps {
   /** Labware definition to render */
   definition: LabwareDefinition
   /* See docs on LabwareRender. */
-  positioningMode?: 'passThrough' | 'offsetInSlot'
+  positioningMode: 'passThrough' | 'offsetInSlot'
   /** See docs on LabwareRender. */
   shouldRotateAdapterOrientation?: boolean
   /** boolean to show well labels */
@@ -89,7 +89,7 @@ const LabwareDetailGroup = styled.g`
 export const Labware = (props: LabwareProps): JSX.Element => {
   const {
     definition,
-    positioningMode = 'offsetInSlot',
+    positioningMode,
     gRef,
     hideOutline = false,
     highlight,

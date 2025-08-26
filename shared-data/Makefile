@@ -103,8 +103,13 @@ push-no-restart-ot3:
 push-ot3:
 	$(MAKE) -f Makefile-python.mk push-ot3
 
-.PHONY: deploy-py
-deploy-py:
+# NOTE: This Python-only recipe is intentionally generically named "deploy" as opposed
+# to something like "deploy-py". Our GitHub Actions workflows for Python projects
+# currently hard-code "deploy". If we add a JS deploy recipe to this Makefile, we
+# should probably rename this to "deploy-py" to avoid confusion, and reconsider the way
+# the GitHub Actions stuff works.
+.PHONY: deploy
+deploy:
 	$(MAKE) -f Makefile-python.mk deploy
 
 .PHONY: test-py

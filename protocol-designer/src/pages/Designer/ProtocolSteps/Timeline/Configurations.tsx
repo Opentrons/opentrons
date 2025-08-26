@@ -8,8 +8,9 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { LINE_CLAMP_TEXT_STYLE } from '../../../../components/atoms'
-import { LiquidButton } from '../../../../components/molecules'
+import { LINE_CLAMP_TEXT_STYLE } from '/protocol-designer/components/atoms'
+import { LiquidButton } from '/protocol-designer/components/molecules'
+
 import { HardwareStep } from './HardwareStep'
 
 import type { Dispatch, SetStateAction } from 'react'
@@ -28,8 +29,7 @@ export function Configurations({
     <>
       <Flex
         gridGap={SPACING.spacing8}
-        paddingX={SPACING.spacing12}
-        paddingTop={SPACING.spacing12}
+        padding={SPACING.spacing12}
         flexDirection={DIRECTION_COLUMN}
       >
         <StyledText

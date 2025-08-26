@@ -171,7 +171,7 @@ def run(protocol: ProtocolContext) -> None:
         drop_height: int = -20,
     ) -> None:
         """Transfer from well to plate."""
-        if liquid == 5 and type(start) == List:
+        if liquid == 5 and isinstance(start, List):
             p1000.pick_up_tip()
             for j in range(NUM_COL):
                 start_loc = start[j]
@@ -183,7 +183,7 @@ def run(protocol: ProtocolContext) -> None:
                 p1000.blow_out()
             p1000.return_tip() if not TIP_TRASH else p1000.drop_tip()
 
-        elif type(start) == Well:
+        elif isinstance(start, Well):
             p1000_single.pick_up_tip()
             vol = vol2 * 8
             p1000_single.mix(5, vol * 0.75, start.bottom(z=ASP_HEIGHT * 5), rate=2)

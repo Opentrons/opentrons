@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 from datetime import datetime
 
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
+from pytest_lazy_fixtures import lf as lazy_fixture
 from decoy import Decoy
 from typing import Union, Generator
 

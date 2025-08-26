@@ -8,9 +8,9 @@ import {
   Flex,
   InputField,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   POSITION_FIXED,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -67,22 +67,20 @@ export function NameQuickTransfer(props: NameQuickTransferProps): JSX.Element {
             value={name}
             textAlign={TYPOGRAPHY.textAlignCenter}
           />
-          <LegacyStyledText
-            as="p"
+          <StyledText
+            oddStyle="bodyTextRegular"
             color={COLORS.grey60}
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
             textAlign={TYPOGRAPHY.textAlignCenter}
           >
             {t('enter_characters')}
-          </LegacyStyledText>
-          <LegacyStyledText
-            as="p"
+          </StyledText>
+          <StyledText
+            oddStyle="bodyTextRegular"
             color={COLORS.red50}
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
             textAlign={TYPOGRAPHY.textAlignCenter}
           >
             {error}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
       </Flex>
       <Flex width="100%" position={POSITION_FIXED} left="0" bottom="0">

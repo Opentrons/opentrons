@@ -22,6 +22,8 @@ import { StepMeter } from '/app/atoms/StepMeter'
 interface WizardHeaderProps {
   title: string
   onExit?: (() => void) | null
+  /* Optional copy override for the exit button. */
+  exitButtonCopy?: string
   totalSteps?: number | null
   currentStep?: number | null
   exitDisabled?: boolean
@@ -81,6 +83,7 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
     title,
     onExit,
     exitDisabled,
+    exitButtonCopy,
   } = props
   const { t } = useTranslation('shared')
 
@@ -111,7 +114,7 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
         {onExit != null ? (
           <Btn onClick={onExit} aria-label="Exit" disabled={exitDisabled}>
             <LegacyStyledText css={EXIT_BUTTON_STYLE}>
-              {t('exit')}
+              {exitButtonCopy ?? t('exit')}
             </LegacyStyledText>
           </Btn>
         ) : null}

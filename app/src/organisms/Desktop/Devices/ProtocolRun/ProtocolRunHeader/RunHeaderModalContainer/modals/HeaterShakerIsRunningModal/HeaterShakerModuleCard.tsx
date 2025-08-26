@@ -1,5 +1,3 @@
-import { useTranslation } from 'react-i18next'
-
 import {
   ALIGN_FLEX_START,
   COLORS,
@@ -15,6 +13,7 @@ import {
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import heaterShakerModule from '/app/assets/images/heater_shaker_module_transparent.png'
+import { useModuleUSBPort } from '/app/local-resources/modules'
 import { HeaterShakerModuleData } from '/app/organisms/ModuleCard/HeaterShakerModuleData'
 
 import type { HeaterShakerModule } from '/app/redux/modules/types'
@@ -27,7 +26,7 @@ export const HeaterShakerModuleCard = (
   props: HeaterShakerModuleCardProps
 ): JSX.Element | null => {
   const { module } = props
-  const { t } = useTranslation('device_details')
+  const { parseModuleUSBPort } = useModuleUSBPort()
 
   return (
     <Flex
@@ -51,11 +50,7 @@ export const HeaterShakerModuleCard = (
             fontSize={TYPOGRAPHY.fontSizeCaption}
             paddingBottom={SPACING.spacing4}
           >
-            {module?.usbPort !== null
-              ? t('usb_port', {
-                  port: module?.usbPort?.port,
-                })
-              : t('usb_port_not_connected')}
+            {parseModuleUSBPort(module)}
           </LegacyStyledText>
           <Flex paddingBottom={SPACING.spacing4}>
             <Icon

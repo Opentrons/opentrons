@@ -31,6 +31,10 @@ export const getEnableComment: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_COMMENT ?? false
 )
+export const getEnableTipPickupLocation: Selector<boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ENABLE_TIP_PICKUP_LOCATION ?? false
+)
 export const getEnableReturnTip: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_RETURN_TIP ?? false
@@ -42,10 +46,6 @@ export const getEnableHotKeysDisplay: Selector<boolean> = createSelector(
 export const getEnableReactScan: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_REACT_SCAN ?? false
-)
-export const getEnableLiquidClasses: Selector<boolean> = createSelector(
-  getFeatureFlagData,
-  flags => flags.OT_PD_ENABLE_LIQUID_CLASSES ?? false
 )
 export const getEnableMutlipleTempsOT2: Selector<boolean> = createSelector(
   getFeatureFlagData,

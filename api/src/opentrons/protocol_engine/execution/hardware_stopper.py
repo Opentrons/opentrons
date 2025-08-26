@@ -128,15 +128,20 @@ class HardwareStopper:
         post_run_hardware_state: PostRunHardwareState,
         drop_tips_after_run: bool = False,
     ) -> None:
-        """Stop and reset the HardwareAPI, homing and dropping tips independently if specified."""
+        """Stop and reset the HardwareAPI, homing and dropping tips independently if specified. If modules are attached that require recovery handle them."""
         home_after_stop = post_run_hardware_state in (
             PostRunHardwareState.HOME_AND_STAY_ENGAGED,
             PostRunHardwareState.HOME_THEN_DISENGAGE,
         )
-        if drop_tips_after_run:
-            await self._try_to_drop_tips()
+        try:
+            if drop_tips_after_run:
+                await self._try_to_drop_tips()
 
-        await self._hardware_api.stop(home_after=False)
+            await self._hardware_api.stop(home_after=False)
 
-        if home_after_stop:
-            await self._home_everything_except_plungers()
+            if home_after_stop:
+                await self._home_everything_except_plungers()
+        finally:
+            # Ensure module state recovery is handled
+            for module in self._hardware_api.attached_modules:
+                module.cleanup_persistent()

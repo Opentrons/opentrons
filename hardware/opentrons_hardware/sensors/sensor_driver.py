@@ -5,6 +5,7 @@ import asyncio
 from typing import Optional, AsyncIterator, Any, Sequence, List, Union
 from contextlib import asynccontextmanager, suppress
 from logging import getLogger
+from struct import unpack
 
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
@@ -303,13 +304,9 @@ class LogListener:
         if isinstance(message, message_definitions.BatchReadFromSensorResponse):
             data_length = message.payload.data_length.value
             data_bytes = message.payload.sensor_data.value
-            data_ints = [
-                int.from_bytes(data_bytes[i * 4 : i * 4 + 4], byteorder="little")
-                for i in range(data_length)
-            ]
             data_floats = [
-                sensor_types.SensorDataType.build(d, message.payload.sensor)
-                for d in data_ints
+                unpack(">l", data_bytes[i * 4 : i * 4 + 4])[0] / 65536
+                for i in range(data_length)
             ]
 
             for d in data_floats:

@@ -29,6 +29,7 @@ import { Text } from '../../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
+import type { TFunction } from 'i18next'
 import type {
   AddressableArea,
   CoordinateTuple,
@@ -97,7 +98,7 @@ export function DeckLocationSelect({
 }: DeckLocationSelectProps): JSX.Element {
   const robotType = deckDef.robot.model
 
-  const { t } = useTranslation('module_wizard_flows')
+  const { t } = useTranslation(['module_wizard_flows', 'deck_configuration'])
 
   const [hoveredData, setHoveredData] = useState<{
     slot: AddressableArea
@@ -313,6 +314,7 @@ export function DeckLocationSelect({
               {hoveredData.disabledReason != null
                 ? t('location_occupied', {
                     fixture: getFixtureDisplayName(
+                      t as TFunction,
                       hoveredData.disabledReason
                     ).toLowerCase(),
                   })

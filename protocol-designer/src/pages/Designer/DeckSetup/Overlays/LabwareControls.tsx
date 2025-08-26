@@ -17,16 +17,17 @@ import {
 } from '@opentrons/components'
 import { getTopLocationInStack } from '@opentrons/step-generation'
 
-import { DND_TYPES } from '../../../../constants'
-import { moveDeckItem } from '../../../../labware-ingred/actions'
-import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
+import { DND_TYPES } from '/protocol-designer/constants'
+import { moveDeckItem } from '/protocol-designer/labware-ingred/actions'
+import { START_TERMINAL_ITEM_ID } from '/protocol-designer/steplist'
+
 import { DECK_CONTROLS_STYLE } from '../constants'
 import { BlockedSlot } from './BlockedSlot'
 import { SlotOverlay } from './SlotOverlay'
 
 import type { DropTargetMonitor } from 'react-dnd'
-import type { LabwareOnDeck } from '../../../../step-forms'
-import type { ThunkDispatch } from '../../../../types'
+import type { LabwareOnDeck } from '/protocol-designer/step-forms'
+import type { ThunkDispatch } from '/protocol-designer/types'
 import type { DroppedItem, SharedControlsType } from '../types'
 
 interface LabwareControlsProps extends SharedControlsType {
@@ -150,9 +151,9 @@ export const LabwareControls = (
     }
   }
 
-  let hoverOpacity = '0'
+  let hoverOpacity = 0
   if ((isOver && canDrop) || hover === itemId) {
-    hoverOpacity = '1'
+    hoverOpacity = 1
   }
 
   const hoverInfo = (
@@ -186,16 +187,16 @@ export const LabwareControls = (
       {...{ x, y, width, height }}
       dataTestId={itemId}
       innerDivProps={{
-        style: {
-          opacity: hoverOpacity,
-          ...DECK_CONTROLS_STYLE,
-          zIndex: isOver && canDrop ? 10 : 'auto',
-          // NOTE: cursor is inconsistent when dragging due to an active
-          // react dnd bug: https://github.com/react-dnd/react-dnd/issues/325
-          cursor: CURSOR_GRAB,
-          backgroundColor:
-            draggedLabware != null ? COLORS.white : `${COLORS.black90}cc`,
-        },
+        opacity: hoverOpacity,
+        ...DECK_CONTROLS_STYLE,
+        zIndex: isOver && canDrop ? 10 : 'auto',
+        // NOTE: cursor is inconsistent when dragging due to an active
+        // react dnd bug: https://github.com/react-dnd/react-dnd/issues/325
+        cursor: CURSOR_GRAB,
+        backgroundColor:
+          draggedLabware != null ? COLORS.white : `${COLORS.black90}cc`,
+      }}
+      innerDivEvents={{
         onMouseEnter: () => {
           setHover(itemId)
         },
@@ -221,7 +222,7 @@ export const LabwareControls = (
         slotId={itemId}
         slotPosition={slotPosition}
         slotFillColor={`${COLORS.black90}cc`}
-        slotFillOpacity={hoverOpacity}
+        slotFillOpacity={hoverOpacity.toString()}
       >
         {hoverInfo}
       </SlotOverlay>

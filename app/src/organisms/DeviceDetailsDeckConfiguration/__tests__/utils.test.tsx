@@ -2,13 +2,16 @@ import { describe, expect, it } from 'vitest'
 
 import {
   DEFAULT_AA_FOR_WASTE_CHUTE,
+  FAKE_STAGING_AREA_RIGHT_SLOT,
   FLEX_STACKER_MODULE_TYPE,
   FLEX_STACKER_MODULE_V1,
+  getDeckDefFromRobotType,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_V1_FIXTURE,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
+  WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
 
@@ -21,6 +24,8 @@ import {
 } from '../utils'
 
 import type { AttachedModule } from '@opentrons/api-client'
+
+const deckDef = getDeckDefFromRobotType('OT-3 Standard')
 
 describe('getModuleOptions', () => {
   const attachedModules = [
@@ -44,7 +49,7 @@ describe('getModuleOptions', () => {
     },
   ] as AttachedModule[]
   it('should get mag block and heater shaker to place on AA A3', () => {
-    const result = getModuleOptions('cutoutA3', attachedModules, 'A3')
+    const result = getModuleOptions('cutoutA3', attachedModules, 'A3', deckDef)
     expect(result).toEqual([
       [
         {
@@ -64,7 +69,7 @@ describe('getModuleOptions', () => {
     ])
   })
   it('should get mag block to place on AA A3', () => {
-    const result = getModuleOptions('cutoutA3', [], 'A3')
+    const result = getModuleOptions('cutoutA3', [], 'A3', deckDef)
     expect(result).toEqual([
       [
         {
@@ -103,7 +108,8 @@ describe('getModuleUnconfiguredFixtures', () => {
       attachedModules,
       'cutoutB3',
       FLEX_STACKER_MODULE_V1,
-      'fakeB4'
+      'fakeB4',
+      deckDef
     )
     expect(result).toEqual([
       [
@@ -130,7 +136,8 @@ describe('getModuleUnconfiguredFixtures', () => {
       attachedModules,
       'cutoutD1',
       HEATERSHAKER_MODULE_V1,
-      'D1'
+      'D1',
+      deckDef
     )
     expect(result).toEqual([
       [
@@ -205,8 +212,16 @@ describe('getFixtureOptions', () => {
       ],
     ])
   })
+  it('Should not get a trash bin for cutoutD3 and aa D3 with a stacker in the slot', () => {
+    const result = getFixtureOptions('cutoutD3', 'D3', FLEX_STACKER_MODULE_V1)
+    expect(result).toEqual([])
+  })
   it('Should get staging area for cutoutD3 and aa fakeD4', () => {
-    const result = getFixtureOptions('cutoutD3', 'fakeD4')
+    const result = getFixtureOptions(
+      'cutoutD3',
+      'fakeD4',
+      FAKE_STAGING_AREA_RIGHT_SLOT
+    )
     expect(result).toEqual([
       [
         {
@@ -235,6 +250,13 @@ describe('getWasteChuteOptions', () => {
         {
           cutoutId: 'cutoutD3',
           cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+          addressableAreaId: DEFAULT_AA_FOR_WASTE_CHUTE,
+        },
+      ],
+      [
+        {
+          cutoutId: 'cutoutD3',
+          cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
           addressableAreaId: DEFAULT_AA_FOR_WASTE_CHUTE,
         },
       ],

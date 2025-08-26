@@ -45,10 +45,12 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
 
   const viewBox = getLabwareViewBox(definition)
 
-  const xDimensionOverride =
-    definition.parameters.loadName === 'opentrons_universal_flat_adapter'
-      ? UNIVERSAL_FLAT_ADAPTER_X_DIMENSION
-      : viewBox.xDimension
+  const xDimensionOverride = [
+    'opentrons_universal_flat_adapter',
+    'opentrons_universal_flat_adapter_type_b',
+  ].includes(definition.parameters.loadName)
+    ? UNIVERSAL_FLAT_ADAPTER_X_DIMENSION
+    : viewBox.xDimension
 
   return (
     <Box

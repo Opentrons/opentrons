@@ -118,7 +118,10 @@ describe('thermocycler atomic commands', () => {
     expectedType: string
   }): void => {
     it(`creates a single "${expectedType}" command with the given params`, () => {
-      const robotInitialState = getRobotInitialState()
+      const robotInitialState = {
+        ...getRobotInitialState(),
+        labware: {},
+      }
 
       // Use params directly from the test case
       const result = commandCreator(params, invariantContext, robotInitialState)

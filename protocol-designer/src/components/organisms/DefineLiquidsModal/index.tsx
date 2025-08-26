@@ -26,20 +26,23 @@ import {
   FLEX_ROBOT_TYPE,
   getSortedLiquidClassDefs,
 } from '@opentrons/shared-data'
+import { swatchColors } from '@opentrons/step-generation'
 
-import { getEnableLiquidClasses } from '../../../feature-flags/selectors'
-import { getRobotType } from '../../../file-data/selectors'
-import * as labwareIngredActions from '../../../labware-ingred/actions'
-import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
-import { HandleEnter, LINE_CLAMP_TEXT_STYLE } from '../../atoms'
-import { TextAreaField } from '../../molecules'
+import {
+  HandleEnter,
+  LINE_CLAMP_TEXT_STYLE,
+} from '/protocol-designer/components/atoms'
+import { TextAreaField } from '/protocol-designer/components/molecules'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
+import * as labwareIngredActions from '/protocol-designer/labware-ingred/actions'
+import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
+
 import { LiquidClassDropdown } from './LiquidClassDropdown'
 import { LiquidColorPicker } from './LiquidColorPicker'
-import { swatchColors } from './swatchColors'
 
 import type { ThunkDispatch } from 'redux-thunk'
 import type { Ingredient } from '@opentrons/step-generation'
-import type { BaseState } from '../../../types'
+import type { BaseState } from '/protocol-designer/types'
 
 const liquidEditFormSchema: any = Yup.object().shape({
   displayName: Yup.string().required('liquid name is required'),
@@ -73,7 +76,6 @@ export function DefineLiquidsModal(
   const allIngredientGroupFields = useSelector(
     labwareIngredSelectors.allIngredientGroupFields
   )
-  const enableLiquidClasses = useSelector(getEnableLiquidClasses)
   const robotType = useSelector(getRobotType)
   const sortedLiquidClassDefs = getSortedLiquidClassDefs()
 
@@ -240,7 +242,7 @@ export function DefineLiquidsModal(
                     height="4.75rem"
                   />
                 </Flex>
-                {enableLiquidClasses && robotType === FLEX_ROBOT_TYPE ? (
+                {robotType === FLEX_ROBOT_TYPE ? (
                   <LiquidClassDropdown
                     control={control}
                     setValue={setValue}

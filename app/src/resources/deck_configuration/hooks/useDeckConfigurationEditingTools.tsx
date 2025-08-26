@@ -5,6 +5,7 @@ import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
   getReplacementFixtureForFixtureRemoval,
+  isFixtureInUsbModules,
 } from '@opentrons/shared-data'
 
 // TODO: return the arguments or something - don't instantiate ui in helper code like this
@@ -16,6 +17,7 @@ import { useNotifyDeckConfigurationQuery } from '../useNotifyDeckConfigurationQu
 import type { ReactNode } from 'react'
 import type {
   AddressableAreaNamesWithFakes,
+  CutoutFixtureId,
   CutoutFixtureIdsWithFakes,
   CutoutId,
 } from '@opentrons/shared-data'
@@ -29,7 +31,8 @@ interface DeckConfigurationEditingTools {
   ) => void
   removeFixtureFromCutout: (
     cutoutId: CutoutId,
-    cutoutFixtureId: CutoutFixtureIdsWithFakes
+    cutoutFixtureId: CutoutFixtureIdsWithFakes,
+    addressableAreaId: AddressableAreaNamesWithFakes
   ) => void
   addFixtureModal: ReactNode
 }
@@ -48,22 +51,34 @@ export function useDeckConfigurationEditingTools(
     setAddressableAreaId,
   ] = useState<AddressableAreaNamesWithFakes | null>(null)
 
+  const [
+    existingCutoutFixtureId,
+    setExistingCutoutFixtureId,
+  ] = useState<CutoutFixtureId | null>(null)
+
   const addFixtureToCutout = (
     cutoutId: CutoutId,
     addressableAreaId: AddressableAreaNamesWithFakes
   ): void => {
     setTargetCutoutId(cutoutId)
     setAddressableAreaId(addressableAreaId)
+    const foundFixtureId =
+      deckConfig.find(config => config.cutoutId === cutoutId)
+        ?.cutoutFixtureId ?? null
+    setExistingCutoutFixtureId(foundFixtureId ?? null)
   }
 
   const removeFixtureFromCutout = (
     cutoutId: CutoutId,
-    cutoutFixtureId: CutoutFixtureIdsWithFakes
+    cutoutFixtureId: CutoutFixtureIdsWithFakes,
+    addressableAreaId: AddressableAreaNamesWithFakes
   ): void => {
     const replacementFixtureId = getReplacementFixtureForFixtureRemoval(
       cutoutFixtureId,
-      cutoutId
+      cutoutId,
+      addressableAreaId
     )
+
     const fixtureGroup =
       deckDef.cutoutFixtures.find(cf => cf.id === cutoutFixtureId)
         ?.fixtureGroup ?? {}
@@ -89,15 +104,19 @@ export function useDeckConfigurationEditingTools(
           : cutoutConfig
       )
     } else {
-      newDeckConfig = deckConfig.map(cutoutConfig =>
-        cutoutConfig.cutoutId === cutoutId
+      newDeckConfig = deckConfig.map(cutoutConfig => {
+        return cutoutConfig.cutoutId === cutoutId
           ? {
               ...cutoutConfig,
               cutoutFixtureId: replacementFixtureId,
-              opentronsModuleSerialNumber: undefined,
+              opentronsModuleSerialNumber: isFixtureInUsbModules(
+                replacementFixtureId
+              )
+                ? cutoutConfig.opentronsModuleSerialNumber
+                : undefined,
             }
           : cutoutConfig
-      )
+      })
     }
     updateDeckConfiguration(newDeckConfig)
   }
@@ -114,6 +133,8 @@ export function useDeckConfigurationEditingTools(
             setTargetCutoutId(null)
           }}
           isOnDevice={isOnDevice}
+          deckDef={deckDef}
+          existingCutoutFixtureId={existingCutoutFixtureId ?? undefined}
         />
       ) : null,
   }

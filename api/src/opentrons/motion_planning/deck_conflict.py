@@ -1,4 +1,5 @@
 """Check a deck layout for conflicts."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -97,7 +98,19 @@ class ThermocyclerModule(_Module):
 
 @dataclass
 class OtherModule(_Module):
-    """A module that's not a Heater-Shaker or Thermocycler."""
+    """A module that's not a Heater-Shaker or Thermocycler or stacker."""
+
+
+@dataclass
+class FlexStackerModule(_Module):
+    """A stacker where nothing else is known to be in the "location" in column 3 that it lives."""
+
+
+@dataclass
+class FlexStackerModuleKindaButSomethingElseReally(_Module):
+    """A stacker where something else is also in the "location" in column 3 that it lives."""
+
+    original_item: "DeckItem"
 
 
 DeckItem = Union[
@@ -107,6 +120,8 @@ DeckItem = Union[
     ThermocyclerModule,
     OtherModule,
     TrashBin,
+    FlexStackerModule,
+    FlexStackerModuleKindaButSomethingElseReally,
 ]
 
 
@@ -118,6 +133,19 @@ class _NothingAllowed(NamedTuple):
     source_location: Union[DeckSlotName, StagingSlotName]
 
     def is_allowed(self, item: DeckItem) -> bool:
+        return False
+
+
+class _NothingButStackerAllowed(NamedTuple):
+    """Nothing (in the Odyssean sense) is allowed in this slot."""
+
+    location: Union[DeckSlotName, StagingSlotName]
+    source_item: DeckItem
+    source_location: Union[DeckSlotName, StagingSlotName]
+
+    def is_allowed(self, item: DeckItem) -> bool:
+        if isinstance(item, FlexStackerModule):
+            return True
         return False
 
 
@@ -169,6 +197,7 @@ _DeckRestriction = Union[
     _MaxHeight,
     _NoModule,
     _NoHeaterShakerModule,
+    _NothingButStackerAllowed,
 ]
 """A restriction on what is allowed in a given slot."""
 
@@ -293,16 +322,10 @@ def _create_ot2_restrictions(  # noqa: C901
     return restrictions
 
 
-def _create_flex_restrictions(
+def _create_flex_restrictions(  # noqa: C901
     item: DeckItem, location: Union[DeckSlotName, StagingSlotName]
 ) -> List[_DeckRestriction]:
-    restrictions: List[_DeckRestriction] = [
-        _NothingAllowed(
-            location=location,
-            source_item=item,
-            source_location=location,
-        )
-    ]
+    restrictions: List[_DeckRestriction] = []
 
     if isinstance(item, (HeaterShakerModule, OtherModule)):
         if isinstance(location, StagingSlotName):
@@ -321,6 +344,58 @@ def _create_flex_restrictions(
                     source_location=location,
                 )
             )
+        restrictions.append(
+            _NothingAllowed(
+                location=location,
+                source_item=item,
+                source_location=location,
+            )
+        )
+    elif isinstance(item, FlexStackerModule):
+        if location not in _flex_slots_allowing_stacker():
+            raise DeckConflictError("Cannot place a Flex Stacker outside of column 3.")
+        # this is a typing assertion; the check above guarantees this is true
+        assert isinstance(location, DeckSlotName)
+        adjacent_staging_slot = get_adjacent_staging_slot(location)
+        # this is a typing assertion; the check above guarantees this isn't none
+        assert adjacent_staging_slot is not None
+        # nothing goes in the staging slot in the row the stacker is in, because the stacker is in the
+        # way (different from blocking you because of the design of the caddy).
+        restrictions.append(
+            _NothingAllowed(
+                location=adjacent_staging_slot,
+                source_item=item,
+                source_location=location,
+            )
+        )
+        # note that the stacker does NOT block use of the "slot" that it is "loaded in" because
+        # it is actually loaded in that cutout, and you can put a deck slot on top just fine
+    elif isinstance(item, FlexStackerModuleKindaButSomethingElseReally):
+        if location not in _flex_slots_allowing_stacker():
+            raise DeckConflictError("Cannot place a Flex Stacker outside of column 3.")
+        # this is a typing assertion; the check above guarantees this is true
+        assert isinstance(location, DeckSlotName)
+        adjacent_staging_slot = get_adjacent_staging_slot(location)
+        assert adjacent_staging_slot is not None
+        # nothing goes in the staging slot in the row the stacker is in, because the stacker is in the
+        # way (different from blocking you because of the design of the caddy).
+        restrictions.append(
+            _NothingAllowed(
+                location=adjacent_staging_slot,
+                source_item=item,
+                source_location=location,
+            )
+        )
+        # while the stacker on its own doesn't block use of the "slot" that it is "loaded in",
+        # the kind of "flex stacker" that actually means "you loaded a labware in column 3 where a
+        # stacker is sort of also "loaded" in column 3" does
+        restrictions.append(
+            _NothingAllowed(
+                location=location,
+                source_item=item.original_item,
+                source_location=location,
+            )
+        )
 
     elif isinstance(item, ThermocyclerModule):
         for covered_location in _flex_slots_covered_by_thermocycler():
@@ -331,6 +406,27 @@ def _create_flex_restrictions(
                     source_location=location,
                 )
             )
+        restrictions.append(
+            _NothingAllowed(
+                location=location,
+                source_item=item,
+                source_location=location,
+            )
+        )
+    elif location in _flex_slots_allowing_stacker():
+        restrictions.append(
+            _NothingButStackerAllowed(
+                location=location,
+                source_item=item,
+                source_location=location,
+            )
+        )
+    else:
+        restrictions.append(
+            _NothingAllowed(
+                location=location, source_item=item, source_location=location
+            )
+        )
 
     return restrictions
 
@@ -388,6 +484,15 @@ def _ot2_slots_covered_by_thermocycler(
 
 def _flex_slots_covered_by_thermocycler() -> Set[DeckSlotName]:
     return {DeckSlotName.SLOT_B1, DeckSlotName.SLOT_A1}
+
+
+def _flex_slots_allowing_stacker() -> Set[DeckSlotName]:
+    return {
+        DeckSlotName.SLOT_A3,
+        DeckSlotName.SLOT_B3,
+        DeckSlotName.SLOT_C3,
+        DeckSlotName.SLOT_D3,
+    }
 
 
 def _is_ot2_fixed_trash(item: DeckItem) -> bool:

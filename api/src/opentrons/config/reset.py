@@ -175,6 +175,7 @@ def reset_pipette_offset(robot_type: RobotTypeEnum) -> None:
 
 def reset_gripper_offset() -> None:
     gripper_offset.clear_gripper_calibration_offsets()
+    gripper_offset.clear_gripper_jaw_width_data()
 
 
 def reset_tip_length_calibrations(robot_type: RobotTypeEnum) -> None:

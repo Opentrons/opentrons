@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useToaster } from '/app/organisms/ToasterOven'
 
 import { ASPIRATE_SETTING_OPTIONS as SETTING_OPTIONS } from '../../constants'
+import { getIsTouchTipEnabled } from '../../utils/getIsTouchTipEnabled'
 
 import type { Dispatch } from 'react'
 import type {
@@ -28,8 +29,8 @@ export function useAspirateSettingsConfig({
   const { t } = useTranslation(['quick_transfer', 'shared'])
   const { makeSnackbar } = useToaster()
 
-  const sourceIsReservoir =
-    state.source.metadata.displayCategory === 'reservoir'
+  const touchTipEnabled = getIsTouchTipEnabled(state.source)
+  const hasLiquidClass = state.liquidClassName !== 'none'
 
   const aspirateSettingsItems: SettingItem[] = [
     {
@@ -47,7 +48,7 @@ export function useAspirateSettingsConfig({
       value:
         state.tipPositionAspirate !== null
           ? t('tip_position_value', { position: state.tipPositionAspirate })
-          : '',
+          : t('option_disabled'),
       enabled: true,
       onClick: () => {
         setSelectedSetting(SETTING_OPTIONS.ASPIRATE_TIP_POSITION)
@@ -60,9 +61,10 @@ export function useAspirateSettingsConfig({
         state.submergeAspirate !== undefined
           ? t('submerge_value', {
               speed: state.submergeAspirate.speed,
+              delayDuration: state.submergeAspirate.delayDuration,
               position: state.submergeAspirate.positionFromBottom,
             })
-          : '',
+          : t('option_disabled'),
       enabled: true,
       onClick: () => {
         setSelectedSetting(SETTING_OPTIONS.ASPIRATE_SUBMERGE)
@@ -81,12 +83,12 @@ export function useAspirateSettingsConfig({
       option: SETTING_OPTIONS.ASPIRATE_MIX,
       copy: t('mix'),
       value:
-        state.mixOnAspirate !== undefined
+        state.mixOnAspirate !== undefined && hasLiquidClass
           ? t('mix_value', {
               volume: state.mixOnAspirate?.mixVolume,
               reps: state.mixOnAspirate?.repetitions,
             })
-          : '',
+          : t('option_disabled'),
       enabled:
         state.transferType === 'transfer' ||
         state.transferType === 'distribute',
@@ -97,7 +99,7 @@ export function useAspirateSettingsConfig({
         ) {
           setSelectedSetting(SETTING_OPTIONS.ASPIRATE_MIX)
         } else {
-          makeSnackbar(t('advanced_setting_disabled') as string)
+          makeSnackbar(t('aspirate_setting_disabled') as string)
         }
       },
     },
@@ -107,7 +109,7 @@ export function useAspirateSettingsConfig({
       value:
         state.conditionAspirate != null || state.conditionAspirate !== 0
           ? t('volume', { volume: state.conditionAspirate })
-          : '',
+          : t('option_disabled'),
       enabled: isMultiTransfer,
       onClick: () => {
         setSelectedSetting(SETTING_OPTIONS.ASPIRATE_CONDITION)
@@ -117,10 +119,9 @@ export function useAspirateSettingsConfig({
       option: SETTING_OPTIONS.ASPIRATE_DELAY,
       copy: t('delay'),
       value:
-        state.delayAspirate !== undefined
+        state.delayAspirate !== undefined && hasLiquidClass
           ? t('delay_value', {
               delay: state.delayAspirate.delayDuration,
-              position: state.delayAspirate.positionFromBottom,
             })
           : '',
       enabled: true,
@@ -135,6 +136,7 @@ export function useAspirateSettingsConfig({
         state.retractAspirate !== undefined
           ? t('retract_value', {
               speed: state.retractAspirate.speed,
+              delayDuration: state.retractAspirate.delayDuration,
               position: state.retractAspirate.positionFromBottom,
             })
           : '',
@@ -147,18 +149,18 @@ export function useAspirateSettingsConfig({
       option: SETTING_OPTIONS.ASPIRATE_TOUCH_TIP,
       copy: t('touch_tip'),
       value:
-        state.touchTipAspirate !== undefined
+        state.touchTipAspirate !== undefined && touchTipEnabled
           ? t('touch_tip_value', {
               speed: state.touchTipAspirateSpeed,
               position: state.touchTipAspirate,
             })
-          : '',
-      enabled: !sourceIsReservoir,
+          : t('option_disabled'),
+      enabled: touchTipEnabled,
       onClick: () => {
-        if (!sourceIsReservoir) {
+        if (touchTipEnabled) {
           setSelectedSetting(SETTING_OPTIONS.ASPIRATE_TOUCH_TIP)
         } else {
-          makeSnackbar(t('advanced_setting_disabled') as string)
+          makeSnackbar(t('aspirate_setting_disabled') as string)
         }
       },
     },
@@ -166,7 +168,7 @@ export function useAspirateSettingsConfig({
       option: SETTING_OPTIONS.ASPIRATE_AIR_GAP,
       copy: t('air_gap'),
       value:
-        state.airGapAspirate !== undefined
+        state.airGapAspirate !== undefined && hasLiquidClass
           ? t('air_gap_value', { volume: state.airGapAspirate })
           : t('option_disabled'),
       enabled: true,

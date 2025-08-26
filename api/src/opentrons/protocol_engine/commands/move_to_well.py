@@ -70,8 +70,12 @@ class MoveToWellImplementation(
         well_name = params.wellName
         well_location = params.wellLocation
         # TODO(cm): implement move_to_well with meniscus + volume offset
-        if well_location.volumeOffset and well_location.volumeOffset != 0:
-            raise ValueError("volume offset not supported with MoveToWell")
+        if well_location.volumeOffset:
+            if (
+                well_location.volumeOffset != 0
+                and well_location.volumeOffset != "operationVolume"
+            ):
+                raise ValueError("volume offset not supported with MoveToWell")
 
         move_result = await move_to_well(
             model_utils=self._model_utils,
@@ -83,6 +87,7 @@ class MoveToWellImplementation(
             force_direct=params.forceDirect,
             minimum_z_height=params.minimumZHeight,
             speed=params.speed,
+            operation_volume=None,
         )
         if isinstance(move_result, DefinedErrorData):
             return move_result

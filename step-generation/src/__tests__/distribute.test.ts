@@ -66,7 +66,7 @@ beforeEach(() => {
     pipette: DEFAULT_PIPETTE,
     sourceLabware: SOURCE_LABWARE,
     destLabware: DEST_LABWARE,
-    stepId: 1,
+    stepNumber: 1,
     preWetTip: false,
     touchTipAfterAspirate: false,
     disposalVolume: 60,
@@ -164,6 +164,8 @@ mock_pipette.distribute_with_liquid_class(
     dest=[mock_dest_plate["A2"], mock_dest_plate["A3"]],
     new_tip="never",
     trash_location=trash_bin_1,
+    keep_last_tip=True,
+    tip_racks=[mock_tip_rack_1, mock_tip_rack_2],
     liquid_class=protocol.define_liquid_class(
         name="distribute_step_1",
         properties={"p300_single": {"fixture/fixture_tiprack_300_ul/1": {
@@ -187,11 +189,8 @@ mock_pipette.distribute_with_liquid_class(
             },
             "dispense": {
                 "dispense_position": {"offset": {"x": 0, "y": 0, "z": 0}},
-                "push_out_by_volume": [(0, 0)],
                 "flow_rate_by_volume": [(0, 2.2)],
-                "correction_by_volume": [(0, 0)],
                 "delay": {"enabled": False},
-                "mix": {"enabled": False},
                 "submerge": {
                     "delay": {"enabled": False},
                     "start_position": {"offset": {}},
@@ -202,9 +201,29 @@ mock_pipette.distribute_with_liquid_class(
                     "end_position": {"offset": {}},
                     "touch_tip": {"enabled": False},
                     "blowout": {"enabled": True, "location": "trash", "flow_rate": 2.3},
-                    "conditioning_by_volume": [(0, 0)],
-                    "disposal_by_volume": [(0, 60)],
                 },
+                "correction_by_volume": [(0, 0)],
+                "push_out_by_volume": [(0, 0)],
+                "mix": {"enabled": False},
+            },
+            "multi_dispense": {
+                "dispense_position": {"offset": {"x": 0, "y": 0, "z": 0}},
+                "flow_rate_by_volume": [(0, 2.2)],
+                "delay": {"enabled": False},
+                "submerge": {
+                    "delay": {"enabled": False},
+                    "start_position": {"offset": {}},
+                },
+                "retract": {
+                    "air_gap_by_volume": [(0, 0)],
+                    "delay": {"enabled": False},
+                    "end_position": {"offset": {}},
+                    "touch_tip": {"enabled": False},
+                    "blowout": {"enabled": True, "location": "trash", "flow_rate": 2.3},
+                },
+                "correction_by_volume": [(0, 0)],
+                "conditioning_by_volume": [(0, 0)],
+                "disposal_by_volume": [(0, 60)],
             },
         }}},
     ),
@@ -363,7 +382,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       volume: 120,
       mixBeforeAspirate: { times: 2, volume: 50 },
       disposalVolume: 12,
-      blowoutLocation: SOURCE_LABWARE,
+      blowoutLocation: 'source_well',
     } as DistributeArgs
     const result = distribute(
       distributeArgs,
@@ -802,13 +821,53 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       aspirateHelper('A1', aspirateVol),
       dispenseHelper('A2', volume),
       dispenseHelper('A3', volume),
-      blowoutSingleToSourceA1,
+      {
+        commandType: 'moveToAddressableArea',
+        key: expect.anything(),
+        params: {
+          addressableAreaName: 'movableTrashA3',
+          offset: {
+            x: 0,
+            y: 0,
+            z: 0,
+          },
+          pipetteId: 'p300SingleId',
+        },
+      },
+      {
+        commandType: 'blowOutInPlace',
+        key: expect.anything(),
+        params: {
+          flowRate: 2.3,
+          pipetteId: 'p300SingleId',
+        },
+      },
 
       ...mixCommands,
       aspirateHelper('A1', aspirateVol),
       dispenseHelper('A4', volume),
       dispenseHelper('A5', volume),
-      blowoutSingleToSourceA1,
+      {
+        commandType: 'moveToAddressableArea',
+        key: expect.anything(),
+        params: {
+          addressableAreaName: 'movableTrashA3',
+          offset: {
+            x: 0,
+            y: 0,
+            z: 0,
+          },
+          pipetteId: 'p300SingleId',
+        },
+      },
+      {
+        commandType: 'blowOutInPlace',
+        key: expect.anything(),
+        params: {
+          flowRate: 2.3,
+          pipetteId: 'p300SingleId',
+        },
+      },
     ])
   })
 
@@ -927,11 +986,11 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
           volume: 35,
           times: 1,
         },
-        aspirateDelay: { seconds: 11, mmFromBottom: 15 },
+        aspirateDelay: { seconds: 11 },
         touchTipAfterAspirate: true,
         aspirateAirGapVolume: 31,
         // dispense column
-        dispenseDelay: { seconds: 12, mmFromBottom: 14 },
+        dispenseDelay: { seconds: 12 },
         touchTipAfterDispense: true,
         blowoutFlowRateUlSec: 2.3,
         dispenseAirGapVolume: 3,
@@ -974,6 +1033,8 @@ mock_pipette.distribute_with_liquid_class(
     dest=[mock_dest_plate["B1"], mock_dest_plate["B2"]],
     new_tip="never",
     trash_location=trash_bin_1,
+    keep_last_tip=True,
+    tip_racks=[mock_tip_rack_1, mock_tip_rack_2],
     liquid_class=protocol.define_liquid_class(
         name="distribute_step_1",
         properties={"p300_single": {"fixture/fixture_tiprack_300_ul/1": {
@@ -998,11 +1059,8 @@ mock_pipette.distribute_with_liquid_class(
             },
             "dispense": {
                 "dispense_position": {"offset": {"x": 0, "y": 0, "z": 0}},
-                "push_out_by_volume": [(0, 0)],
                 "flow_rate_by_volume": [(0, 2.2)],
-                "correction_by_volume": [(0, 0)],
                 "delay": {"enabled": True, "duration": 12},
-                "mix": {"enabled": False},
                 "submerge": {
                     "delay": {"enabled": False},
                     "start_position": {"offset": {}},
@@ -1013,9 +1071,29 @@ mock_pipette.distribute_with_liquid_class(
                     "end_position": {"offset": {}},
                     "touch_tip": {"enabled": True, "z_offset": -3.4},
                     "blowout": {"enabled": True, "location": "trash", "flow_rate": 2.3},
-                    "conditioning_by_volume": [(0, 10)],
-                    "disposal_by_volume": [(0, 60)],
                 },
+                "correction_by_volume": [(0, 0)],
+                "push_out_by_volume": [(0, 0)],
+                "mix": {"enabled": False},
+            },
+            "multi_dispense": {
+                "dispense_position": {"offset": {"x": 0, "y": 0, "z": 0}},
+                "flow_rate_by_volume": [(0, 2.2)],
+                "delay": {"enabled": True, "duration": 12},
+                "submerge": {
+                    "delay": {"enabled": False},
+                    "start_position": {"offset": {}},
+                },
+                "retract": {
+                    "air_gap_by_volume": [(0, 0)],
+                    "delay": {"enabled": False},
+                    "end_position": {"offset": {}},
+                    "touch_tip": {"enabled": True, "z_offset": -3.4},
+                    "blowout": {"enabled": True, "location": "trash", "flow_rate": 2.3},
+                },
+                "correction_by_volume": [(0, 0)],
+                "conditioning_by_volume": [(0, 10)],
+                "disposal_by_volume": [(0, 60)],
             },
         }}},
     ),

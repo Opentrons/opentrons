@@ -11,7 +11,8 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { HandleEnter } from '../../atoms'
+import { HandleEnter } from '/protocol-designer/components/atoms'
+
 import { getMainPagePortalEl } from '../Portal'
 
 interface ConfirmDeleteEntityInUseModalProps {
@@ -36,7 +37,7 @@ export function ConfirmDeleteEntityInUseModal(
           <Flex
             justifyContent={JUSTIFY_END}
             gridGap={SPACING.spacing8}
-            padding={SPACING.spacing24}
+            padding={`0 ${SPACING.spacing24} ${SPACING.spacing24} ${SPACING.spacing24}`}
           >
             <SecondaryButton
               onClick={() => {

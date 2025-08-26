@@ -11,7 +11,7 @@ import pytest
 from opentrons.protocol_engine.state import update_types
 from opentrons_shared_data.robot.types import RobotType
 from opentrons_shared_data.deck.types import DeckDefinitionV5
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
+from pytest_lazy_fixtures import lf as lazy_fixture
 
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine import commands, actions

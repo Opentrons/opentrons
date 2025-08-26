@@ -1,12 +1,14 @@
+import { MemoryRouter } from 'react-router-dom'
+
 import { VIEWPORT } from '@opentrons/components'
 
 import { DeckConfigurationDiscardChangesModal } from './DeckConfigurationDiscardChangesModal'
 
 import type { Meta, Story } from '@storybook/react'
-import type * as React from 'react'
 
 export default {
-  title: 'ODD/Organisms/DeckConfigurationDiscardChangesModalProps',
+  title: 'ODD/Organisms/DeckConfigurationDiscardChangesModal',
+  component: DeckConfigurationDiscardChangesModal,
   argTypes: {
     modalSize: {
       options: ['small', 'medium', 'large'],
@@ -15,11 +17,19 @@ export default {
     onOutsideClick: { action: 'clicked' },
   },
   parameters: VIEWPORT.touchScreenViewport,
+  decorators: [
+    Story => (
+      <MemoryRouter>
+        <Story />
+      </MemoryRouter>
+    ),
+  ],
 } as Meta
 
 const Template: Story<
   React.ComponentProps<typeof DeckConfigurationDiscardChangesModal>
 > = args => <DeckConfigurationDiscardChangesModal {...args} />
+
 export const Default = Template.bind({})
 Default.args = {
   setShowConfirmationModal: () => {},

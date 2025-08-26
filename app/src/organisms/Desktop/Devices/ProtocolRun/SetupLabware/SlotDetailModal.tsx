@@ -19,29 +19,27 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  getLabwareDefinitionsByURIForProtocol,
   getLabwareViewBox,
+  getWellFillFromLabwareId,
   parseLiquidsInLoadOrder,
 } from '@opentrons/shared-data'
 
 import { LabwareStackContents } from '/app/molecules/LabwareStackContents'
 import { LiquidCardList } from '/app/molecules/LiquidDetailCard'
-import { getWellFillFromLabwareId } from '/app/organisms/ProtocolDeck'
 import {
   getDisabledWellGroupForLiquidId,
   getLiquidsByIdForLabware,
   getWellGroupForLiquidId,
 } from '/app/transformations/analysis'
-import { getLabwareDefinitionsByURIForProtocol } from '/app/transformations/commands'
 
 import type {
   CompletedProtocolAnalysis,
-  ProtocolAnalysisOutput,
-} from '@opentrons/shared-data'
-import type {
   LabwareByLiquidId,
   LabwareInStack,
+  ProtocolAnalysisOutput,
   StackItem,
-} from '/app/transformations/commands'
+} from '@opentrons/shared-data'
 
 interface SlotDetailModalProps {
   closeModal: () => void

@@ -237,9 +237,7 @@ async def test_handle_aspirate_while_tracking_request_not_ready_to_aspirate(
     )
     with pytest.raises(
         PipetteNotReadyToAspirateError,
-        match="Pipette cannot aspirate while tracking because of a previous blow out."
-        " The first aspirate following a blow-out must be from a specific well"
-        " so the plunger can be reset in a known safe position.",
+        match="Pipette cannot aspirate while tracking because a previous",
     ):
         await subject.execute(params=data)
 

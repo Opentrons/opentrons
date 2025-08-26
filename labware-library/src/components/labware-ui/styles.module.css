@@ -13,30 +13,30 @@
   right: 0;
   bottom: 0;
   left: 0;
+  display: flex;
   width: 100%;
   height: 100%;
-  display: flex;
-
-  /* from legacy --center-children */
-  justify-content: center;
 
   /* from legacy --center-children */
   align-items: center;
+
+  /* from legacy --center-children */
+  justify-content: center;
 
   /* from legacy --center-children */
 }
 
 .gallery_thumbnail_row {
   display: flex;
-  justify-content: center;
   width: 100%;
+  justify-content: center;
   margin-top: var(--spacing-5);
 }
 
 .gallery_thumbnail_container {
-  cursor: pointer;
   width: calc(var(--size-third) - var(--spacing-5) * 2 / 3);
   margin-right: var(--spacing-5);
+  cursor: pointer;
 
   &:last-of-type {
     margin-right: 0;
@@ -61,13 +61,13 @@
 }
 
 .load_name_input {
-  font-size: var(--fs-body-1);
-  line-height: var(--lh-title);
   width: calc(100% + 2 * var(--spacing-2));
-  margin-left: -var(--spacing-2);
   padding: var(--spacing-1) var(--spacing-2);
   border: var(--bd-light);
+  margin-left: -var(--spacing-2);
   color: var(--c-font-dark);
+  font-size: var(--fs-body-1);
+  line-height: var(--lh-title);
 }
 
 /*
@@ -75,17 +75,17 @@
  * this rule more specific
  */
 button.load_name_button {
-  flex: none;
   width: var(--size-2);
-  border-radius: 0;
-  background-color: var(--c-dark-gray);
+  flex: none;
+  padding-right: calc(var(--spacing-5) - 0.25rem);
 
   /*
    * perceived center of the copy icon is a few pixels off center, so
    * adjust padding accordingly
    */
   padding-left: var(--spacing-5);
-  padding-right: calc(var(--spacing-5) - 0.25rem);
+  border-radius: 0;
+  background-color: var(--c-dark-gray);
 
   & svg {
     stroke: none;
@@ -115,14 +115,14 @@ button.load_name_button {
   display: flex;
 
   /* from legacy --flex-between */
-  justify-content: space-between;
+
+  width: 100%;
 
   /* from legacy --flex-between */
   align-items: center;
 
   /* from legacy --flex-between */
-
-  width: 100%;
+  justify-content: space-between;
   padding: 0 var(--spacing-1);
 }
 
@@ -130,37 +130,37 @@ button.load_name_button {
   display: flex;
 
   /* from legacy --flex-between */
-  justify-content: space-between;
+
+  flex-wrap: wrap;
 
   /* from legacy --flex-between */
   align-items: center;
 
   /* from legacy --flex-between */
-
-  flex-wrap: wrap;
-  margin-top: var(--spacing-5);
+  justify-content: space-between;
   padding: var(--spacing-5) var(--spacing-5) 0;
   border: var(--bd-light);
+  margin-top: var(--spacing-5);
 }
 
 .well_properties_title {
-  font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
-  color: var(--c-font-dark); /* from legacy --font-body-2-dark */
   width: 100%;
   margin-bottom: var(--spacing-5);
+  color: var(--c-font-dark); /* from legacy --font-body-2-dark */
+  font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
   font-weight: var(--fw-semibold);
   line-height: var(--lh-title);
 }
 
 .well_properties_column {
-  flex: none;
   display: flex;
+  flex: none;
   align-items: center;
   margin-bottom: var(--spacing-5);
 
   &:first-child {
-    margin-right: auto;
     padding-right: var(--spacing-5);
+    margin-right: auto;
   }
 }
 
@@ -171,10 +171,10 @@ button.load_name_button {
 }
 
 .well_bottom_icon {
-  align-self: flex-end;
-  width: var(--spacing-6);
-  margin-left: var(--spacing-5);
-  padding-bottom: calc(var(--spacing-1));
   overflow: visible;
+  width: var(--spacing-6);
+  align-self: flex-end;
+  padding-bottom: calc(var(--spacing-1));
+  margin-left: var(--spacing-5);
   color: var(--c-font-icon);
 }

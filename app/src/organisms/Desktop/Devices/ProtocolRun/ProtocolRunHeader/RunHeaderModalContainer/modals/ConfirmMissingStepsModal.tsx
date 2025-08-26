@@ -1,15 +1,20 @@
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  DISPLAY_FLEX,
   Flex,
+  Icon,
   JUSTIFY_FLEX_END,
   LegacyStyledText,
   Modal,
   PrimaryButton,
   SecondaryButton,
+  SIZE_1,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -34,11 +39,12 @@ export interface ConfirmMissingStepsModalProps {
   onCloseClick: () => void
   onConfirmClick: () => void
   missingSteps: StepKey[]
+  isRunStarting: boolean
 }
 export const ConfirmMissingStepsModal = (
   props: ConfirmMissingStepsModalProps
 ): JSX.Element | null => {
-  const { missingSteps, onCloseClick, onConfirmClick } = props
+  const { missingSteps, onCloseClick, onConfirmClick, isRunStarting } = props
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
 
   const confirmAttached = (): void => {
@@ -72,10 +78,19 @@ export const ConfirmMissingStepsModal = (
         <SecondaryButton onClick={onCloseClick}>
           {i18n.format(t('shared:go_back'), 'capitalize')}
         </SecondaryButton>
-        <PrimaryButton onClick={confirmAttached}>
+        <PrimaryButton onClick={confirmAttached} css={PRIMARY_BUTTON_STYLE}>
+          {isRunStarting && (
+            <Icon name="ot-spinner" spin size={SIZE_1} color={COLORS.white} />
+          )}
           {t('start_run')}
         </PrimaryButton>
       </Flex>
     </Modal>
   )
 }
+
+const PRIMARY_BUTTON_STYLE = css`
+  display: ${DISPLAY_FLEX};
+  gap: ${SPACING.spacing4};
+  align-items: ${ALIGN_CENTER};
+`

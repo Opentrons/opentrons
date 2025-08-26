@@ -4,7 +4,7 @@ import values from 'lodash/values'
 import { Module } from '@opentrons/components'
 import {
   getAddressableAreaFromSlotId,
-  getModuleDef2,
+  getModuleDef,
   getPositionFromSlotId,
   inferModuleOrientationFromXCoordinate,
   isAddressableAreaStandardSlot,
@@ -21,8 +21,8 @@ import {
   getStagingAreaAddressableAreas,
   getTopmostLabwareOnModuleFromStack,
 } from '../../utils'
+import { TIPRACK_LID_LOADNAME } from '../Designer/utils'
 import { SlotHover } from './SlotHover'
-import { getShowTCLid } from './utils'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type {
@@ -70,7 +70,7 @@ export const DeckThumbnailDetails = (
           console.warn(`no slot ${slotId} for module ${id}`)
           return null
         }
-        const moduleDef = getModuleDef2(model)
+        const moduleDef = getModuleDef(model)
         const labwareLoadedOnModuleId = getTopmostLabwareOnModuleFromStack(
           id,
           allLabware
@@ -92,9 +92,10 @@ export const DeckThumbnailDetails = (
               }
               targetSlotId={slotId}
               targetDeckId={deckDef.otId}
+              childrenPositioningMode="offsetToSlot"
             >
-              {labwareLoadedOnModuleId != null ? (
-                <>
+              <>
+                {labwareLoadedOnModuleId != null ? (
                   <LabwareOnDeck
                     x={0}
                     y={0}
@@ -102,15 +103,7 @@ export const DeckThumbnailDetails = (
                       initialDeckSetup.labware[labwareLoadedOnModuleId]
                     }
                   />
-                  <SlotHover
-                    robotType={robotType}
-                    hover={hover}
-                    setHover={setHover}
-                    slotPosition={[0, 0, 0]}
-                    slotId={slotId}
-                  />
-                </>
-              ) : (
+                ) : null}
                 <SlotHover
                   robotType={robotType}
                   hover={hover}
@@ -118,7 +111,7 @@ export const DeckThumbnailDetails = (
                   slotPosition={[0, 0, 0]}
                   slotId={slotId}
                 />
-              )}
+              </>
             </Module>
           </Fragment>
         )
@@ -128,7 +121,8 @@ export const DeckThumbnailDetails = (
         if (
           getSlotInLocationStack(labware.stack) === 'offDeck' ||
           allModules.some(m => labware.stack.includes(m.id)) ||
-          getShowTCLid(labware)
+          labware.def.parameters.loadName === TIPRACK_LID_LOADNAME ||
+          labware.stack.includes('fixedTrash')
         ) {
           return null
         }

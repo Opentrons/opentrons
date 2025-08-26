@@ -152,6 +152,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
               <>
                 <LabwareRender
                   definition={labwareDef}
+                  positioningMode="offsetInSlot"
                   wellStroke={wellStroke}
                   wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_OUTSIDE}
                   highlightedWellLabels={{ wells: wellsToHighlight }}

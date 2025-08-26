@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
@@ -11,15 +12,16 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { getRobotType } from '../../../file-data/selectors'
-import { selectors as stepFormSelectors } from '../../../step-forms'
+import { HandleEnter } from '/protocol-designer/components/atoms'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
+import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
 import {
   getAdditionalEquipment,
   getInitialDeckSetup,
   getPipetteEntities,
-} from '../../../step-forms/selectors'
-import { getHas96Channel } from '../../../utils'
-import { HandleEnter } from '../../atoms'
+} from '/protocol-designer/step-forms/selectors'
+import { getHas96Channel } from '/protocol-designer/utils'
+
 import { getMainPagePortalEl } from '../Portal'
 import { editPipettes } from './editPipettes'
 import { PipetteConfiguration } from './PipetteConfiguration'
@@ -27,7 +29,7 @@ import { PipetteOverview } from './PipetteOverview'
 import { usePipetteConfig } from './usePipetteConfig'
 
 import type { PipetteName } from '@opentrons/shared-data'
-import type { ThunkDispatch } from '../../../types'
+import type { ThunkDispatch } from '/protocol-designer/types'
 
 interface EditInstrumentsModalProps {
   onClose: () => void
@@ -45,6 +47,7 @@ export function EditInstrumentsModal(
   const initialDeckSetup = useSelector(getInitialDeckSetup)
   const additionalEquipment = useSelector(getAdditionalEquipment)
   const pipetteEntities = useSelector(getPipetteEntities)
+  const [saveAttemptFailed, setSaveAttemptFailed] = useState<boolean>(false)
   const { pipettes, labware } = initialDeckSetup
   const pipettesOnDeck = Object.values(pipettes)
   const has96Channel = getHas96Channel(pipetteEntities)
@@ -69,13 +72,24 @@ export function EditInstrumentsModal(
       ? `${pipetteVolume}_${pipetteType}`
       : `${pipetteVolume}_${pipetteType}_${pipetteGen.toLowerCase()}`
 
+  const canSave =
+    (page === 'add' &&
+      pipetteVolume != null &&
+      pipetteType != null &&
+      pipetteGen != null &&
+      selectedTips.length > 0) ||
+    (page === 'overview' && pipettesOnDeck.length > 0)
   const handleOnSave = (): void => {
+    if (!canSave) {
+      setSaveAttemptFailed(true)
+      return
+    }
+
     if (page === 'overview') {
       onClose()
     } else {
       setPage('overview')
       editPipettes(
-        labware,
         pipettes,
         orderedStepIds,
         dispatch,
@@ -118,19 +132,7 @@ export function EditInstrumentsModal(
             >
               {page === 'overview' ? t('cancel') : t('back')}
             </SecondaryButton>
-            <PrimaryButton
-              disabled={
-                (page === 'add' &&
-                  (pipetteVolume == null ||
-                    pipetteType == null ||
-                    pipetteGen == null ||
-                    selectedTips.length === 0)) ||
-                (page === 'overview' && pipettesOnDeck.length === 0)
-              }
-              onClick={handleOnSave}
-            >
-              {t('save')}
-            </PrimaryButton>
+            <PrimaryButton onClick={handleOnSave}>{t('save')}</PrimaryButton>
           </Flex>
         }
       >
@@ -144,6 +146,8 @@ export function EditInstrumentsModal(
             rightPipette={rightPipette}
             gripper={gripper}
             pipetteConfig={pipetteConfig}
+            showNoPipetteError={saveAttemptFailed && !canSave}
+            setSaveAttemptFailed={setSaveAttemptFailed}
           />
         ) : (
           <PipetteConfiguration

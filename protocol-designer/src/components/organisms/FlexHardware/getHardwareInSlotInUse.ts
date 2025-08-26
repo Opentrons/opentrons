@@ -1,11 +1,11 @@
-import { getIsLabwareInUse } from '../../../pages/Designer/DeckSetup/utils'
+import { getIsLabwareInUse } from '/protocol-designer/pages/Designer/DeckSetup/utils'
 
 import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
 import type {
   LabwareOnDeck,
   ModuleOnDeck,
   SavedStepFormState,
-} from '../../../step-forms'
+} from '/protocol-designer/step-forms'
 
 interface HardwareInSlotInfo {
   moduleId: string | null

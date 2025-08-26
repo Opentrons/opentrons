@@ -148,6 +148,17 @@ class FlexStackerLabwareRetrieveError(ErrorOccurrence):
     errorInfo: FailedLabware
 
 
+class FlexStackerShuttleOccupiedError(ErrorOccurrence):
+    """Returned when the Flex Stacker Shuttle is occupied when it shouldn't be."""
+
+    isDefined: bool = True
+    errorType: Literal["flexStackerShuttleOccupied"] = "flexStackerShuttleOccupied"
+
+    errorCode: str = ErrorCodes.STACKER_SHUTTLE_OCCUPIED.value.code
+    detail: str = ErrorCodes.STACKER_SHUTTLE_OCCUPIED.value.detail
+    errorInfo: FailedLabware
+
+
 @dataclass
 class _LabwareDefPair:
     definition: LabwareDefinition
@@ -426,12 +437,12 @@ def _check_one_preloaded_labware(  # noqa: C901
 
     if pool_primary_uri != stored_primary_uri:
         raise CommandPreconditionViolated(
-            f"URI {stored_primary_uri} of primary labware {group.primaryLabwareId} must match pool URI {pool_primary_uri} but does not"
+            f"Each labware group must be composed of the same kinds of labware, but previous labware groups specify primary URI {stored_primary_uri} and this one specifies {pool_primary_uri}."
         )
     if pool_adapter_definition:
         if group.adapterLabwareId is None:
             raise CommandPreconditionViolated(
-                "All pool components must have an ID, but adapter has no id"
+                "Each labware group must be composed of the same kinds of labware, but previous labware groups specify an adapter and this one does not."
             )
         stored_adapter_uri = state_view.labware.get_definition_uri(
             group.adapterLabwareId
@@ -441,7 +452,7 @@ def _check_one_preloaded_labware(  # noqa: C901
         )
         if stored_adapter_uri != pool_adapter_uri:
             raise CommandPreconditionViolated(
-                f"URI {stored_adapter_uri} of adapter labware {group.adapterLabwareId} must match pool URI {pool_adapter_uri} but does not"
+                f"Each labware group must be composed of the same kinds of labware, but previous labware groups specify adapter URI {stored_adapter_uri} and this one specifies {pool_adapter_uri}."
             )
         if state_view.labware.get_location(group.adapterLabwareId) != OFF_DECK_LOCATION:
             raise CommandPreconditionViolated(
@@ -456,7 +467,7 @@ def _check_one_preloaded_labware(  # noqa: C901
     else:
         if group.adapterLabwareId is not None:
             raise CommandPreconditionViolated(
-                "No unspecified pool component may have an ID, but adapter has an id"
+                "Each labware group must be composed of the same kinds of labware, but previous labware groups specify no adapter and this one does."
             )
         if state_view.labware.get_location(group.primaryLabwareId) != OFF_DECK_LOCATION:
             raise CommandPreconditionViolated(
@@ -465,13 +476,13 @@ def _check_one_preloaded_labware(  # noqa: C901
     if pool_lid_definition:
         if group.lidLabwareId is None:
             raise CommandPreconditionViolated(
-                "All pool components must have an ID but lid has no id"
+                "Each labware group must be composed of the same kinds of labware, but previous labware groups specify a lid and this one does not."
             )
         stored_lid_uri = state_view.labware.get_definition_uri(group.lidLabwareId)
         pool_lid_uri = state_view.labware.get_uri_from_definition(pool_lid_definition)
         if stored_lid_uri != pool_lid_uri:
             raise CommandPreconditionViolated(
-                f"URI {stored_lid_uri} of lid labware {group.lidLabwareId} must match pool URI {pool_lid_uri} but does not"
+                f"Each labware group must be composed of the same kinds of labware, but previous labware groups specify lid URI {stored_lid_uri} and this one specifies {pool_lid_uri}."
             )
 
         if (
@@ -486,7 +497,7 @@ def _check_one_preloaded_labware(  # noqa: C901
     else:
         if group.lidLabwareId is not None:
             raise CommandPreconditionViolated(
-                "No unspecified pool component may have an id, but lid has an id"
+                "Each labware group must be composed of the same kinds of labware, but previous labware groups did not specify a lid and this one does."
             )
 
 

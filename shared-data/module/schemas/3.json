@@ -51,6 +51,50 @@
           "description": "Attributes for the element"
         }
       }
+    },
+    "vector3D": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "z"],
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "z": {
+          "type": "number"
+        }
+      }
+    },
+    "vector2D": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y"],
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        }
+      }
+    },
+    "axisAlignedBoundingBox3D": {
+      "type": "object",
+      "required": ["backLeftBottom", "frontRightTop"],
+      "additionalProperties": false,
+      "properties": {
+        "backLeftBottom": {
+          "description": "(-x, +y, -z) relative to the labware origin.",
+          "$ref": "#/definitions/vector3D"
+        },
+        "frontRightTop": {
+          "description": "(+x, -y, +z) relative to the labware origin.",
+          "$ref": "#/definitions/vector3D"
+        }
+      }
     }
   },
   "description": "Module specification",
@@ -61,14 +105,14 @@
     "model",
     "labwareOffset",
     "cornerOffsetFromSlot",
-    "locatingFeaturesAsParent",
+    "features",
     "dimensions",
     "calibrationPoint",
     "displayName",
     "quirks",
     "slotTransforms",
+    "orientation",
     "compatibleWith",
-    "twoDimensionalRendering",
     "incompatibleWithDecks"
   ],
   "additionalProperties": false,
@@ -93,12 +137,63 @@
       "type": "string",
       "pattern": "^(temperatureModule|magneticModule|thermocyclerModule|heaterShakerModule|magneticBlock|absorbanceReader|flexStackerModule)V[0-9]+$"
     },
-    "labwareOffset": { "$ref": "#/definitions/coordinates" },
-    "locatingFeaturesAsParent": {
+    "labwareOffset": {
+      "$ref": "#/definitions/coordinates",
+      "description": "The offset from the left-front-bottom corner of the slot holding this module, to the left-front-bottom corner of the labware interface atop this module."
+    },
+    "extents": {
+      "description": "The outer dimensions of the addressable area. Includes offsets from `cornerOffsetFromSlot`.",
       "type": "object",
-      "description": "Explict locating features when this module acts as the parent in a stackup.",
+      "required": ["total"],
+      "additionalProperties": false,
+      "properties": {
+        "total": {
+          "description": "The all-encompassing outer dimensions of the labware.",
+          "$ref": "#/definitions/axisAlignedBoundingBox3D"
+        }
+      }
+    },
+    "features": {
+      "type": "object",
+      "description": "Locating features when this module is a part of a stackup.",
       "required": [],
-      "properties": {}
+      "properties": {
+        "slotFootprintAsChild": {
+          "description": "The 3D plane of the module that makes physical contact with a parent entity. Constrained by the dimensions of a slot.",
+          "type": "object",
+          "required": ["backLeft", "frontRight", "z"],
+          "properties": {
+            "backLeft": {
+              "description": "(-x, +y) relative to the labware origin.",
+              "$ref": "#/definitions/vector2D"
+            },
+            "frontRight": {
+              "description": "(+x, -y) relative to the labware origin.",
+              "$ref": "#/definitions/vector2D"
+            },
+            "z": {
+              "description": "Always zero by convention. Z-coordinate of the footprint plane.",
+              "type": "number"
+            },
+            "springDirectionalForce": {
+              "description": "Applicable when the module contains a spring that influences its position when placed on a parent deck item.",
+              "type": "string",
+              "enum": ["backLeftBottom"]
+            }
+          }
+        },
+        "screwAnchoredAsParent": {
+          "description": "The module provides a threaded hole into which a child deck item may be screwed securely.",
+          "type": "object",
+          "required": ["screwCenter"],
+          "properties": {
+            "screwCenter": {
+              "description": "The +x,+y,+z coordinate offset measured from the module's X/Y labware interface dimension origin to the center of the threaded hole. The +z is 0 by convention. When the threaded hole is located in a spring-loaded plate, the z represents the top of the threaded hole when the plate is compressed.",
+              "$ref": "#/definitions/vector3D"
+            }
+          }
+        }
+      }
     },
     "dimensions": {
       "type": "object",
@@ -214,11 +309,23 @@
         }
       }
     },
+    "orientation": {
+      "type": "object",
+      "description": "The orientation of the module when placed in a particular cutout id.",
+      "patternProperties": {
+        "^([1-9]|10|11|[A-D][1-4])$": {
+          "description": "The keys are the id of cutouts.",
+          "type": "string",
+          "enum": ["left", "right", "center"]
+        }
+      },
+      "additionalProperties": false
+    },
     "compatibleWith": {
       "type": "array",
       "items": {
         "type": "string",
-        "description": "A compatible module model (e.g. temperatureModuleV1)"
+        "description": "List of module models this model is compatible with (e.g. temperatureModuleV1)"
       }
     },
     "incompatibleWithDecks": {
@@ -231,11 +338,6 @@
     "uniqueModuleData": {
       "type": "object",
       "description": "Unique data used by the module, (e.g. TOF sensor baseline data)"
-    },
-    "twoDimensionalRendering": {
-      "type": "object",
-      "description": "SVG rendering of the module represented as svgson",
-      "items": { "$ref": "#/definitions/svgsonNode" }
     }
   }
 }

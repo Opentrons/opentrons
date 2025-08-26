@@ -1,5 +1,7 @@
 import type { CoordinateTuple, Vector3D } from '../types'
 
+export const IDENTITY_VECTOR: Vector3D = { x: 0, y: 0, z: 0 }
+
 /**
  * Add an arbitrary number of vectors.
  * e.g. `getVectorSum(a, b, c)` is a + b + c.

@@ -1,7 +1,9 @@
-import { Box } from '../../primitives'
+import { withStyleProps } from '../../hocs/withStyleProps'
 
-import type { ComponentProps, ReactNode } from 'react'
+import type { HTMLAttributes, ReactNode } from 'react'
+import type { StyleProps } from '../../primitives'
 
+export type PositionType = 'absolute' | 'relative' | 'fixed'
 export interface RobotCoordsForeignDivProps {
   width?: string | number
   height?: string | number
@@ -9,43 +11,49 @@ export interface RobotCoordsForeignDivProps {
   y?: string | number
   children?: ReactNode
   outerProps?: any
-  innerDivProps?: ComponentProps<typeof Box>
+  innerDivProps?: StyleProps
+  innerDivEvents?: HTMLAttributes<HTMLDivElement>
   transformWithSVG?: boolean
   extraTransform?: string
-  /** optional data-testid to test foreignObjects in cypress */
   dataTestId?: string
 }
 
-export const RobotCoordsForeignDiv = (
-  props: RobotCoordsForeignDivProps
-): JSX.Element => {
-  const {
-    children,
-    x = 0,
-    y = 0,
-    height = '100%',
-    width = '100%',
-    outerProps,
-    innerDivProps,
-    transformWithSVG = false,
-    extraTransform = '',
-    dataTestId = '',
-  } = props
+const StyledDiv = withStyleProps('div' as any)
 
-  const transform = `scale(1, -1) ${extraTransform}`
+export const RobotCoordsForeignDiv = ({
+  children,
+  x = 0,
+  y = 0,
+  height = '100%',
+  width = '100%',
+  outerProps,
+  innerDivProps = {},
+  transformWithSVG = false,
+  extraTransform = '',
+  dataTestId = '',
+  innerDivEvents,
+}: RobotCoordsForeignDivProps): JSX.Element => {
+  const svgTransform = `scale(1, -1) ${extraTransform}`
+
   return (
     <foreignObject
       data-testid={dataTestId}
-      {...{ x, y, height, width, ...outerProps }}
-      transform={transformWithSVG ? transform : extraTransform}
+      x={x}
+      y={y}
+      height={height}
+      width={width}
+      transform={transformWithSVG ? svgTransform : extraTransform}
+      {...outerProps}
     >
-      <Box
-        style={transformWithSVG ? {} : { transform }}
-        xmlns="http://www.w3.org/1999/xhtml"
-        {...innerDivProps}
+      <StyledDiv
+        {...innerDivEvents}
+        style={{
+          ...innerDivProps,
+          ...(transformWithSVG ? { transform: svgTransform } : {}),
+        }}
       >
         {children}
-      </Box>
+      </StyledDiv>
     </foreignObject>
   )
 }

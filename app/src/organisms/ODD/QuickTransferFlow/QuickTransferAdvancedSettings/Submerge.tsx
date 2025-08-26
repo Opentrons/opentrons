@@ -50,6 +50,9 @@ export function Submerge({
   const [speed, setSpeed] = useState<number | null>(
     submergeSettings?.speed ?? null
   )
+  const [delayDuration, setDelayDuration] = useState<number | null>(
+    submergeSettings?.delayDuration ?? null
+  )
   const [position, setPosition] = useState<number | null>(
     submergeSettings?.positionFromBottom ?? null
   )
@@ -64,37 +67,48 @@ export function Submerge({
   }
 
   const handleClickSaveOrContinue = (): void => {
-    if (currentStep === 1) {
-      setCurrentStep(2)
-    }
-    if (currentStep === 2) {
-      if (speed != null && position != null) {
-        dispatch({
-          type: action,
-          submergeSettings: {
-            speed,
-            positionFromBottom: position,
-          },
-        })
-        trackEventWithRobotSerial({
-          name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
-          properties: {
-            setting: `Submerge_${kind}`,
-          },
-        })
-        onBack()
-      }
+    switch (currentStep) {
+      case 1:
+        setCurrentStep(2)
+        break
+      case 2:
+        setCurrentStep(3)
+        break
+      case 3:
+        if (speed != null && position != null && delayDuration != null) {
+          dispatch({
+            type: action,
+            submergeSettings: {
+              speed,
+              delayDuration,
+              positionFromBottom: position,
+            },
+          })
+          trackEventWithRobotSerial({
+            name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+            properties: {
+              setting: `Submerge_${kind}`,
+            },
+          })
+          onBack()
+        }
+        break
     }
   }
 
   const setSaveOrContinueButtonText =
-    currentStep === 1 ? t('shared:continue') : t('shared:save')
+    currentStep === 1 || currentStep === 2
+      ? t('shared:continue')
+      : t('shared:save')
 
   let buttonIsDisabled = false
   if (speed == null && currentStep === 1) {
     buttonIsDisabled = true
   }
-  if (position == null && currentStep === 2) {
+  if (delayDuration == null && currentStep === 2) {
+    buttonIsDisabled = true
+  }
+  if (position == null && currentStep === 3) {
     buttonIsDisabled = true
   }
 
@@ -126,6 +140,8 @@ export function Submerge({
           state={state}
           setSpeed={setSpeed}
           setPosition={setPosition}
+          delayDuration={delayDuration}
+          setDelayDuration={setDelayDuration}
           speed={speed}
           position={position}
           currentStep={currentStep}
@@ -139,8 +155,10 @@ export function Submerge({
 interface SubmergeSettingComponentProps {
   kind: FlowRateKind
   state: QuickTransferSummaryState
-  setSpeed: (speed: number) => void
-  setPosition: (position: number) => void
+  setSpeed: (speed: number | null) => void
+  setPosition: (position: number | null) => void
+  delayDuration: number | null
+  setDelayDuration: (delayDuration: number | null) => void
   speed: number | null
   position: number | null
   currentStep: number
@@ -151,6 +169,8 @@ function SubmergeSettingComponent({
   state,
   speed,
   setSpeed,
+  delayDuration,
+  setDelayDuration,
   position,
   setPosition,
   currentStep,
@@ -194,6 +214,33 @@ function SubmergeSettingComponent({
         })
       : null
 
+  const handleSpeedChange = (userInput: string): void => {
+    if (userInput === '') {
+      setSpeed(null)
+    } else {
+      const parsedValue = Number(userInput)
+      setSpeed(!isNaN(parsedValue) ? parsedValue : null)
+    }
+  }
+
+  const handleDelayDurationChange = (userInput: string): void => {
+    if (userInput === '') {
+      setDelayDuration(null)
+    } else {
+      const parsedValue = Number(userInput)
+      setDelayDuration(!isNaN(parsedValue) ? parsedValue : null)
+    }
+  }
+
+  const handlePositionChange = (userInput: string): void => {
+    if (userInput === '') {
+      setPosition(null)
+    } else {
+      const parsedValue = Number(userInput)
+      setPosition(!isNaN(parsedValue) ? parsedValue : null)
+    }
+  }
+
   const speedSetting = (): JSX.Element => {
     return (
       <>
@@ -205,7 +252,7 @@ function SubmergeSettingComponent({
           marginTop={SPACING.spacing68}
         >
           <StyledText oddStyle="level4HeaderRegular">
-            {t('submerge_aspirating_description')}
+            {t(`submerge_${kind}_description`)}
           </StyledText>
           <InputField type="number" value={speed} title={t('speed')} readOnly />
         </Flex>
@@ -218,10 +265,44 @@ function SubmergeSettingComponent({
           <NumericalKeyboard
             key={`${kind}_speed_keyboard`}
             keyboardRef={keyboardRef}
+            isDecimal
             initialValue={String(speed ?? '')}
-            onChange={e => {
-              setSpeed(Number(e))
-            }}
+            onChange={handleSpeedChange}
+          />
+        </Flex>
+      </>
+    )
+  }
+
+  const delayDurationSetting = (): JSX.Element => {
+    return (
+      <>
+        <Flex
+          width="30.5rem"
+          height="100%"
+          gridGap={SPACING.spacing24}
+          flexDirection={DIRECTION_COLUMN}
+          marginTop={SPACING.spacing68}
+        >
+          <InputField
+            type="number"
+            value={delayDuration}
+            title={t('delay_duration_s')}
+            readOnly
+          />
+        </Flex>
+        <Flex
+          paddingX={SPACING.spacing24}
+          height="21.25rem"
+          marginTop="7.75rem"
+          borderRadius="0"
+        >
+          <NumericalKeyboard
+            key={`${kind}_delay_duration_keyboard`}
+            keyboardRef={keyboardRef}
+            isDecimal
+            initialValue={String(delayDuration ?? '')}
+            onChange={handleDelayDurationChange}
           />
         </Flex>
       </>
@@ -261,9 +342,7 @@ function SubmergeSettingComponent({
             key={`${kind}_position_keyboard`}
             keyboardRef={keyboardRef}
             initialValue={String(position ?? '')}
-            onChange={e => {
-              setPosition(Number(e))
-            }}
+            onChange={handlePositionChange}
           />
         </Flex>
       </>
@@ -274,6 +353,8 @@ function SubmergeSettingComponent({
     case 1:
       return speedSetting()
     case 2:
+      return delayDurationSetting()
+    case 3:
       return positionSetting()
     default:
       console.error('step not found')

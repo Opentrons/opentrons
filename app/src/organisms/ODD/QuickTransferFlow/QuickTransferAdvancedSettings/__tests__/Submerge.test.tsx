@@ -52,10 +52,35 @@ describe('Submerge', () => {
     screen.getByRole('button', { name: 'del' })
   })
 
+  it('renders text, buttons, input field, and keyboard for submerge before aspirating - delay duration', () => {
+    render(props)
+    fireEvent.click(screen.getByRole('button', { name: '1' }))
+    fireEvent.click(screen.getByRole('button', { name: '1' }))
+    fireEvent.click(screen.getByText('Continue'))
+    screen.getByText('Continue')
+    screen.getByText('Delay duration (seconds)')
+    screen.getByRole('button', { name: '1' })
+    screen.getByRole('button', { name: '5' })
+    screen.getByRole('button', { name: '9' })
+    screen.getByRole('button', { name: 'del' })
+    screen.getByRole('button', { name: '.' })
+  })
+
   it('renders text, buttons, input field, and keyboard for submerge before aspirating - position', () => {
     render(props)
     fireEvent.click(screen.getByRole('button', { name: '1' }))
     fireEvent.click(screen.getByRole('button', { name: '1' }))
+    fireEvent.click(screen.getByText('Continue'))
+    screen.getByText('Continue')
+    screen.getByText('Delay duration (seconds)')
+    screen.getByRole('button', { name: '1' })
+    screen.getByRole('button', { name: '5' })
+    screen.getByRole('button', { name: '9' })
+    screen.getByRole('button', { name: 'del' })
+    screen.getByRole('button', { name: '.' })
+    fireEvent.click(screen.getByRole('button', { name: '0' }))
+    fireEvent.click(screen.getByRole('button', { name: '.' }))
+    fireEvent.click(screen.getByRole('button', { name: '5' }))
     fireEvent.click(screen.getByText('Continue'))
     screen.getByText('Save')
     screen.getByText('Distance from bottom of well (mm)')
@@ -71,6 +96,10 @@ describe('Submerge', () => {
     fireEvent.click(screen.getByRole('button', { name: '1' }))
     fireEvent.click(screen.getByRole('button', { name: '1' }))
     fireEvent.click(screen.getByText('Continue'))
+    fireEvent.click(screen.getByRole('button', { name: '0' }))
+    fireEvent.click(screen.getByRole('button', { name: '.' }))
+    fireEvent.click(screen.getByRole('button', { name: '5' }))
+    fireEvent.click(screen.getByText('Continue'))
     fireEvent.click(screen.getByRole('button', { name: '2' }))
     fireEvent.click(screen.getByRole('button', { name: '2' }))
     fireEvent.click(screen.getByText('Save'))
@@ -78,6 +107,7 @@ describe('Submerge', () => {
       type: 'SET_SUBMERGE_ASPIRATE',
       submergeSettings: {
         speed: 11,
+        delayDuration: 0.5,
         positionFromBottom: 22,
       },
     })

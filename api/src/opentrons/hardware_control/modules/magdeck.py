@@ -48,8 +48,8 @@ class MagDeck(mod_abc.AbstractModule):
         cls,
         port: str,
         usb_port: USBPort,
-        execution_manager: ExecutionManager,
         hw_control_loop: asyncio.AbstractEventLoop,
+        execution_manager: Optional[ExecutionManager] = None,
         poll_interval_seconds: Optional[float] = None,
         simulating: bool = False,
         sim_model: Optional[str] = None,
@@ -80,10 +80,10 @@ class MagDeck(mod_abc.AbstractModule):
         self,
         port: str,
         usb_port: USBPort,
-        execution_manager: ExecutionManager,
         hw_control_loop: asyncio.AbstractEventLoop,
         driver: AbstractMagDeckDriver,
         device_info: Dict[str, str],
+        execution_manager: Optional[ExecutionManager] = None,
         disconnected_callback: types.ModuleDisconnectedCallback = None,
     ) -> None:
         """Constructor"""

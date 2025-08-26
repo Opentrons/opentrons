@@ -11,12 +11,13 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
 } from '@opentrons/shared-data'
 
-import { deleteModule } from '../../../../modules'
-import { createModule } from '../../../../step-forms/actions'
+import { deleteModule } from '/protocol-designer/modules'
+import { createModule } from '/protocol-designer/step-forms/actions'
 import {
   createDeckFixture,
   deleteDeckFixture,
-} from '../../../../step-forms/actions/additionalItems'
+} from '/protocol-designer/step-forms/actions/additionalItems'
+
 import { updateInitialDeckState } from '../util'
 
 import type {
@@ -26,11 +27,11 @@ import type {
 import type {
   AllTemporalPropertiesForTimelineFrame,
   SavedStepFormState,
-} from '../../../../step-forms'
+} from '/protocol-designer/step-forms'
 
-vi.mock('../../../../step-forms/actions')
-vi.mock('../../../../modules')
-vi.mock('../../../../step-forms/actions/additionalItems')
+vi.mock('/protocol-designer/step-forms/actions')
+vi.mock('/protocol-designer/modules')
+vi.mock('/protocol-designer/step-forms/actions/additionalItems')
 
 const mockDispatch = vi.fn()
 const mockEmptyIntialDeckSetup: AllTemporalPropertiesForTimelineFrame = {

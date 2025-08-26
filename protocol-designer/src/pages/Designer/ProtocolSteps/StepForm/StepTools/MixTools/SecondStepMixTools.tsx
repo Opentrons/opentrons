@@ -10,21 +10,21 @@ import {
   StyledText,
   Tabs,
 } from '@opentrons/components'
+import { getMaxPushOutVolume } from '@opentrons/shared-data'
 
 import {
   CheckboxExpandStepFormField,
   InputStepFormField,
-} from '../../../../../../components/molecules'
-import { ResetSettingsModal } from '../../../../../../components/organisms/ResetSettingsModal'
-import { getEnableLiquidClasses } from '../../../../../../feature-flags/selectors'
-import { getRobotType } from '../../../../../../file-data/selectors'
+} from '/protocol-designer/components/molecules'
+import { ResetSettingsModal } from '/protocol-designer/components/organisms/ResetSettingsModal'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
+
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
   getPipetteEntities,
 } from '../../../../../../step-forms/selectors'
 import { updateFieldsForLiquidClass } from '../../../../../../steplist/formLevel/handleFormChange/utils'
-import { getMaxPushOutVolume } from '../../../../../../utils'
 import {
   BlowoutLocationField,
   BlowoutOffsetField,
@@ -39,7 +39,7 @@ import {
 import { ResetSettingsField } from '../MoveLiquidTools/ResetSettingsField'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { FormData } from '../../../../../../form-types'
+import type { FormData } from '/protocol-designer/form-types'
 import type { FieldPropsByName, LiquidHandlingTab } from '../../types'
 
 interface SecondStepMixToolsProps {
@@ -58,7 +58,6 @@ export function SecondStepMixTools({
 }: SecondStepMixToolsProps): JSX.Element {
   const { t, i18n } = useTranslation(['application', 'form'])
   const toolsComponentRef = useRef<HTMLDivElement | null>(null)
-  const enableLiquidClasses = useSelector(getEnableLiquidClasses)
   const pipetteEntities = useSelector(getPipetteEntities)
   const labwareEntities = useSelector(getLabwareEntities)
   const additionalEquipmentEntities = useSelector(
@@ -160,6 +159,7 @@ export function SecondStepMixTools({
             />
             <Divider marginY="0" />
             <PositionField
+              formData={formData}
               prefix="mix"
               propsForFields={propsForFields}
               zField="mix_mmFromBottom"
@@ -272,6 +272,7 @@ export function SecondStepMixTools({
               >
                 {formData.mix_touchTip_checkbox === true ? (
                   <PositionField
+                    formData={formData}
                     prefix={tab}
                     propsForFields={propsForFields}
                     zField="mix_touchTip_mmFromTop"
@@ -288,14 +289,12 @@ export function SecondStepMixTools({
             </>
           ) : null}
         </Flex>
-        {enableLiquidClasses ? (
-          <ResetSettingsField
-            tab={tab}
-            onClick={() => {
-              setShowResetModal(true)
-            }}
-          />
-        ) : null}
+        <ResetSettingsField
+          tab={tab}
+          onClick={() => {
+            setShowResetModal(true)
+          }}
+        />
       </Flex>
     </>
   )

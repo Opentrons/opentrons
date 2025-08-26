@@ -25,6 +25,7 @@ import { useIsEstopNotDisengaged } from '/app/resources/devices'
 
 import { ModuleCard } from '..'
 import { useIsDoorOpen } from '../../DoorOpenControl/useIsDoorOpen'
+import { handleModuleWizardFlows } from '../../ModuleWizardFlows'
 import { ErrorInfo } from '../ErrorInfo'
 import { FirmwareUpdateFailedModal } from '../FirmwareUpdateFailedModal'
 import { FlexStackerModuleData } from '../FlexStackerModuleData'
@@ -53,12 +54,13 @@ vi.mock('../HeaterShakerModuleData')
 vi.mock('../FlexStackerModuleData')
 vi.mock('/app/redux/config')
 vi.mock('../ModuleOverflowMenu')
+vi.mock('../../ModuleWizardFlows')
 vi.mock('/app/organisms/RunTimeControl')
 vi.mock('../FirmwareUpdateFailedModal')
 vi.mock('/app/redux/robot-api')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/organisms/ToasterOven')
-vi.mock('/app/resources/devices')
+vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
 vi.mock('/app/resources/deck_configuration')
 vi.mock('../../DoorOpenControl/useIsDoorOpen')
 vi.mock('/app/redux/discovery')
@@ -194,6 +196,7 @@ const mockFlexStacker = {
     path: '/dev/ot_module_flex_stacker',
     hub: false,
     port: 1,
+    hubPort: 1,
     portGroup: 'unknown',
   },
   data: {
@@ -281,7 +284,7 @@ describe('ModuleCard', () => {
     render(props)
     screen.getByText('Magnetic Module GEN1')
     screen.getByText('Mock Magnetic Module Data')
-    screen.getByText('usb-1')
+    screen.getByText('USB-1')
     screen.getByAltText('magneticModuleV1')
   })
   it('renders information for a temperature module with mocked status', () => {
@@ -295,7 +298,7 @@ describe('ModuleCard', () => {
     })
     screen.getByText('Temperature Module GEN2')
     screen.getByText('Mock Temperature Module Data')
-    screen.getByText('usb-1')
+    screen.getByText('USB-1')
     screen.getByAltText('temperatureModuleV2')
   })
 
@@ -307,7 +310,7 @@ describe('ModuleCard', () => {
 
     screen.getByText('Thermocycler Module GEN1')
     screen.getByText('Mock Thermocycler Module Data')
-    screen.getByText('usb-1')
+    screen.getByText('USB-1')
     screen.getByAltText('thermocyclerModuleV1')
   })
 
@@ -320,7 +323,7 @@ describe('ModuleCard', () => {
 
     screen.getByText('Heater-Shaker Module GEN1')
     screen.getByText('Mock Heater Shaker Module Data')
-    screen.getByText('usb-1')
+    screen.getByText('USB-1')
     screen.getByAltText('heaterShakerModuleV1')
   })
 
@@ -333,7 +336,7 @@ describe('ModuleCard', () => {
 
     screen.getByText('Flex Stacker Module GEN1')
     screen.getByText('Mock Flex Stacker Module Data')
-    screen.getByText('usb-1')
+    screen.getByText('S-1')
     screen.getByAltText('flexStackerModuleV1')
   })
 
@@ -411,6 +414,7 @@ describe('ModuleCard', () => {
     screen.getByText('Setup module for use.')
     const button = screen.getByText('Setup module')
     fireEvent.click(button)
+    expect(vi.mocked(handleModuleWizardFlows)).toHaveBeenCalled()
     expect(vi.mocked(getRequestById)).toHaveBeenCalled()
   })
   it('renders module setup link for no-calibration required modules if firmware update available', () => {
@@ -423,6 +427,7 @@ describe('ModuleCard', () => {
     screen.getByText('Setup module for use.')
     const button = screen.getByText('Setup module')
     fireEvent.click(button)
+    expect(vi.mocked(handleModuleWizardFlows)).toHaveBeenCalled()
     expect(vi.mocked(getRequestById)).toHaveBeenCalled()
   })
   it('renders firmware update for no-calibration required modules only if its already in the deck config', () => {
@@ -442,8 +447,7 @@ describe('ModuleCard', () => {
         hasAvailableUpdate: true,
       },
     })
-    // FIXME: remove the extra period when InlineNotification is updated
-    screen.getByText('Firmware update available..')
+    screen.getByText('Firmware update available.')
     const button = screen.getByText('Update now')
     fireEvent.click(button)
     expect(vi.mocked(getRequestById)).toHaveBeenCalled()
@@ -462,8 +466,7 @@ describe('ModuleCard', () => {
       ...props,
       module: mockHotThermo,
     })
-    // FIXME: remove the extra period when InlineNotification is updated
-    screen.getByText('Firmware update available..')
+    screen.getByText('Firmware update available.')
     const button = screen.getByText('Update now')
     fireEvent.click(button)
     expect(vi.mocked(getRequestById)).toHaveBeenCalled()
@@ -492,8 +495,7 @@ describe('ModuleCard', () => {
       ...props,
       module: mockHotThermo,
     })
-    // FIXME: remove the extra period when InlineNotification is updated
-    screen.getByText('Firmware update available..')
+    screen.getByText('Firmware update available.')
     const button = screen.getByText('Update now')
     fireEvent.click(button)
     expect(vi.mocked(getRequestById)).toHaveBeenCalled()

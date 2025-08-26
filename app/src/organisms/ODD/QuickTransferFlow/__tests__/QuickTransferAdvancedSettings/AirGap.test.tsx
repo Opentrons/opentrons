@@ -49,6 +49,9 @@ describe('AirGap', () => {
           ] as any,
         } as any,
         tipRack: {
+          parameters: {
+            isTiprack: true,
+          },
           wells: {
             A1: {
               totalLiquidVolume: 200,
@@ -119,15 +122,16 @@ describe('AirGap', () => {
     fireEvent.click(enabledBtn)
     const continueBtn = screen.getByText('Continue')
     fireEvent.click(continueBtn)
-    const numButton = screen.getByText('0')
-    fireEvent.click(numButton)
+    fireEvent.click(screen.getByText('2'))
+    fireEvent.click(screen.getByText('0'))
+    fireEvent.click(screen.getByText('0'))
     expect(vi.mocked(InputField)).toHaveBeenCalledWith(
       {
         title: 'Air gap volume (µL)',
-        error: 'Value must be between 1 to 180',
+        error: 'Value must be between 0 to 195',
         readOnly: true,
         type: 'number',
-        value: 0,
+        value: 200,
       },
       {}
     )
@@ -153,7 +157,7 @@ describe('AirGap', () => {
     expect(vi.mocked(InputField)).toHaveBeenCalledWith(
       {
         title: 'Air gap volume (µL)',
-        error: 'Value must be between 1 to 80',
+        error: null,
         readOnly: true,
         type: 'number',
         value: 0,
@@ -180,7 +184,7 @@ describe('AirGap', () => {
     expect(vi.mocked(InputField)).toHaveBeenCalledWith(
       {
         title: 'Air gap volume (µL)',
-        error: 'Value must be between 1 to 140',
+        error: null,
         readOnly: true,
         type: 'number',
         value: 0,
@@ -205,7 +209,7 @@ describe('AirGap', () => {
     expect(vi.mocked(InputField)).toHaveBeenCalledWith(
       {
         title: 'Air gap volume (µL)',
-        error: 'Value must be between 1 to 200',
+        error: null,
         readOnly: true,
         type: 'number',
         value: 0,

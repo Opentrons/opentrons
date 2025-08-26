@@ -64,7 +64,7 @@ export function RecoveryDoorOpen({
       case RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE:
       case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
       case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
-      case RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE:
+      case RECOVERY_MAP.STACKER_RELEASING_LABWARE_LATCH.ROUTE:
         return t('stacker_door_open_robot_home')
       default:
         return t('close_the_robot_door')
@@ -80,7 +80,7 @@ export function RecoveryDoorOpen({
       case RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE:
       case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
       case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
-      case RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE:
+      case RECOVERY_MAP.STACKER_RELEASING_LABWARE_LATCH.ROUTE:
         return t('close_robot_and_stacker_door')
       default:
         return t('robot_door_is_open')
@@ -96,7 +96,7 @@ export function RecoveryDoorOpen({
       case RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE:
       case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
       case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
-      case RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE:
+      case RECOVERY_MAP.STACKER_RELEASING_LABWARE_LATCH.ROUTE:
         return t('continue')
       default:
         return t('resume')

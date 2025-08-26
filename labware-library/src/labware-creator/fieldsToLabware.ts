@@ -1,4 +1,4 @@
-import { createRegularLabware, getModuleDef2 } from '@opentrons/shared-data'
+import { createRegularLabware, getModuleDef } from '@opentrons/shared-data'
 
 import { DISPLAY_VOLUME_UNITS } from './fields'
 import { getIsCustomTubeRack } from './utils'
@@ -107,22 +107,24 @@ export function fieldsToLabware(
 
     const stackingOffsetWithLabware: Record<string, LabwareOffset> = {}
     Object.entries(compatibleAdapters).forEach(([loadName, z]) => {
+      const zValue = parseFloat(String(z))
       const adapterHeight =
         adapterDefinitions != null
           ? Object.values(adapterDefinitions).find(
               definition => definition.parameters.loadName === loadName
             )?.dimensions.zDimension ?? 0
           : 0
-      return (stackingOffsetWithLabware[loadName] = {
+
+      stackingOffsetWithLabware[loadName] = {
         x: 0,
         y: 0,
-        //  ensure that z is a number!
-        z: fields.labwareZDimension + adapterHeight - parseFloat(String(z)),
-      })
+        z: fields.labwareZDimension + adapterHeight - zValue,
+      }
     })
+
     const stackingOffsetWithModule: Record<string, LabwareOffset> = {}
     Object.entries(compatibleModules).forEach(([moduleModel, z]) => {
-      const moduleDefinition = getModuleDef2(moduleModel as ModuleModel)
+      const moduleDefinition = getModuleDef(moduleModel as ModuleModel)
       return (stackingOffsetWithModule[moduleModel] = {
         x: 0,
         y: 0,
@@ -203,7 +205,14 @@ export function fieldsToLabware(
 
     // overwrite loadName from createRegularLabware with ours
     def.parameters.loadName = fields.loadName
-
+    // Calculate stack offset for labware on itself
+    if (fields.stackedLabwareZDimension) {
+      stackingOffsetWithLabware[def.parameters.loadName] = {
+        x: 0,
+        y: 0,
+        z: fields.stackedLabwareZDimension - 2 * fields.labwareZDimension,
+      }
+    }
     return def
   } else {
     throw new Error('use of createIrregularLabware not yet implemented')

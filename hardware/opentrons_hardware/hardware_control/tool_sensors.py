@@ -300,7 +300,7 @@ async def liquid_probe(
     )
     p_prep_distance = float(plunger_impulse_time * plunger_speed)
     p_pass_distance = float(max_p_distance - p_prep_distance)
-    max_z_distance = (p_pass_distance / plunger_speed) * mount_speed
+    max_z_distance = (p_pass_distance / abs(plunger_speed)) * mount_speed
 
     lower_plunger = create_step(
         distance={tool: float64(p_prep_distance)},

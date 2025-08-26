@@ -5,7 +5,7 @@ import { DeckLabelSet } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   FLEX_STANDARD_DECKID,
-  getModuleDef2,
+  getModuleDef,
   HEATERSHAKER_MODULE_TYPE,
   OT2_STANDARD_DECKID,
   TEMPERATURE_MODULE_TYPE,
@@ -53,7 +53,7 @@ export const ModuleLabel = (props: ModuleLabelProps): JSX.Element => {
     }
   }, [labwareInfos])
 
-  const def = getModuleDef2(moduleModel)
+  const def = getModuleDef(moduleModel)
   const slotTransformKey =
     robotType === FLEX_ROBOT_TYPE ? FLEX_STANDARD_DECKID : OT2_STANDARD_DECKID
   const cornerOffsetsFromSlotFromTransform =

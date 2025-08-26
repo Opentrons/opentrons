@@ -20,29 +20,30 @@ import {
   Tag,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { getLiquidIdsOnLabware } from '@opentrons/step-generation'
 
-import { getEnableStacking } from '../../../feature-flags/selectors'
-import { openIngredientSelector } from '../../../labware-ingred/actions'
-import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
-import * as wellContentsSelectors from '../../../top-selectors/well-contents'
-import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
-import { getAllLabwareIdsOfCertainURIOnStack } from '../../../utils'
-import { LINK_BUTTON_STYLE } from '../../atoms'
+import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
+import { getEnableStacking } from '/protocol-designer/feature-flags/selectors'
+import { openIngredientSelector } from '/protocol-designer/labware-ingred/actions'
+import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
+import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
+import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
+import { getAllLabwareIdsOfCertainURIOnStack } from '/protocol-designer/utils'
+
 import { EditLabwareQuantityModal } from '../EditLabwareQuantityModal'
 import { LabwareCardOverflowMenu } from '../LabwareCardOverflowMenu'
-import { getLiquidIdsOnLabware } from '../utils'
 
-import type { LabwareOnDeck } from '../../../step-forms'
-import type { ThunkDispatch } from '../../../types'
+import type { LabwareOnDeck } from '/protocol-designer/step-forms'
+import type { ThunkDispatch } from '/protocol-designer/types'
 
 interface LabwareCardProps {
   labware: LabwareOnDeck
   quantity: number
-  lidDisplayName?: string
+  lidId?: string
 }
 
 export function LabwareCard(props: LabwareCardProps): JSX.Element {
-  const { labware, lidDisplayName, quantity } = props
+  const { labware, lidId, quantity } = props
   const navigate = useNavigate()
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const { t } = useTranslation('starting_deck_state')
@@ -106,6 +107,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
           <LabwareCardOverflowMenu
             setShowOverflowMenu={setShowOverflowMenu}
             labwareIds={allLabwareIdsOnStack}
+            lidId={lidId}
           />
         ) : null}
         <ListItem type="default" backgroundColor={COLORS.grey30}>
@@ -133,12 +135,14 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
                     {displayName}
                   </StyledText>
                 ) : null}
-                {lidDisplayName != null ? (
+                {lidId != null && deckSetupLabware[lidId] != null ? (
                   <StyledText
                     desktopStyle="captionRegular"
                     color={COLORS.grey60}
                   >
-                    {t('with_lid', { name: lidDisplayName })}
+                    {t('with_lid', {
+                      name: deckSetupLabware[lidId].def.metadata.displayName,
+                    })}
                   </StyledText>
                 ) : null}
 

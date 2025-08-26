@@ -1,12 +1,12 @@
 import round from 'lodash/round'
 
-import { CHANNELS_MAPPED_TO_MAX_SPEED } from '../../../../../constants'
-import { getPipetteCapacity } from '../../../../../pipettes/pipetteData'
+import { CHANNELS_MAPPED_TO_MAX_SPEED } from '/protocol-designer/constants'
+import { getPipetteCapacity } from '/protocol-designer/pipettes/pipetteData'
 import {
   volumeInCapacityForMultiAspirate,
   volumeInCapacityForMultiDispense,
-} from '../../../../../steplist/formLevel/handleFormChange/utils'
-import { getWellRatio } from '../../../../../steplist/utils'
+} from '/protocol-designer/steplist/formLevel/handleFormChange/utils'
+import { getWellRatio } from '/protocol-designer/steplist/utils'
 
 import type {
   PipetteChannels,
@@ -17,8 +17,8 @@ import type {
   ChangeTipOptions,
   PipetteEntities,
 } from '@opentrons/step-generation'
-import type { PathOption, StepType } from '../../../../../form-types'
-import type { FlowRateType } from '../../../../../resources/types'
+import type { PathOption, StepType } from '/protocol-designer/form-types'
+import type { FlowRateType } from '/protocol-designer/resources/types'
 
 export interface DisabledChangeTipArgs {
   aspirateWells?: string[]
@@ -187,14 +187,14 @@ export function getDisabledPathMap(
   return disabledPathMap
 }
 
-const _getPipetteAccuracyUlPerMm = (
-  targetVolume: number,
-  tipLiquidSpecs: SupportedTip,
-  flowRateType: FlowRateType
-): number => {
-  const transformedFlowRateType =
-    flowRateType === 'blowout' ? 'dispense' : flowRateType
-  const flowRateFunction = tipLiquidSpecs[transformedFlowRateType].default['1']
+const _getPipetteAccuracyUlPerMm = (args: {
+  targetVolume: number
+  tipLiquidSpecs: SupportedTip
+  flowRateType: Exclude<FlowRateType, 'blowout'>
+}): number => {
+  const { targetVolume, tipLiquidSpecs, flowRateType } = args
+
+  const flowRateFunction = tipLiquidSpecs[flowRateType].default['1']
   let pipetteAccuracyUlPerMm = null
   for (let i = 0; i < flowRateFunction.length; i++) {
     const [x, y, z] = flowRateFunction[i]
@@ -207,29 +207,36 @@ const _getPipetteAccuracyUlPerMm = (
   return lastEntry[1] * targetVolume + lastEntry[2]
 }
 
-export const getMaxUiFlowRate = (args: {
-  targetVolume: number
+interface BaseGetMaxUiFlowRateArgs {
   channels: PipetteChannels
   robotType: RobotType
+  shaftULperMM: number
+}
+interface BlowoutMaxUiFlowRateArgs extends BaseGetMaxUiFlowRateArgs {
+  flowRateType: 'blowout'
+}
+interface AspirateDispenseMaxUiFlowRateArgs extends BaseGetMaxUiFlowRateArgs {
+  flowRateType: 'aspirate' | 'dispense'
   tipLiquidSpecs: SupportedTip
-  flowRateType: FlowRateType
-  correctionVolume: number
-}): number => {
-  const {
-    targetVolume,
-    channels,
-    robotType,
-    tipLiquidSpecs,
-    flowRateType,
-    correctionVolume,
-  } = args
-  const pipetteAccuracyUlPerMm = _getPipetteAccuracyUlPerMm(
-    targetVolume,
-    tipLiquidSpecs,
-    flowRateType
-  )
+  targetVolume: number
+  correctionVolume?: number
+}
+export const getMaxUiFlowRate = (
+  args: BlowoutMaxUiFlowRateArgs | AspirateDispenseMaxUiFlowRateArgs
+): number => {
+  const { channels, robotType, flowRateType, shaftULperMM } = args
+
   const maxPlungerSpeed =
     CHANNELS_MAPPED_TO_MAX_SPEED[robotType][channels].plunger
+  if (flowRateType === 'blowout') {
+    return round(shaftULperMM * maxPlungerSpeed)
+  }
+  const { targetVolume, tipLiquidSpecs, correctionVolume = 0 } = args
+  const pipetteAccuracyUlPerMm = _getPipetteAccuracyUlPerMm({
+    targetVolume,
+    tipLiquidSpecs,
+    flowRateType,
+  })
   const correctionMultiplier = 1.0 + correctionVolume / targetVolume
   const travelMm = targetVolume / pipetteAccuracyUlPerMm
   const travelMmCorrected = travelMm * correctionMultiplier

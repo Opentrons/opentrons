@@ -16,12 +16,13 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { renameStep } from '../../../labware-ingred/actions'
-import { capitalizeFirstLetter } from '../../../pages/Designer/ProtocolSteps/StepForm/utils'
-import { TextAreaField } from '../../molecules'
+import { TextAreaField } from '/protocol-designer/components/molecules'
+import { renameStep } from '/protocol-designer/labware-ingred/actions'
+import { capitalizeFirstLetter } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/utils'
+
 import { getMainPagePortalEl } from '../Portal'
 
-import type { FormData } from '../../../form-types'
+import type { FormData } from '/protocol-designer/form-types'
 
 const MAX_STEP_NAME_LENGTH = 60
 interface RenameStepModalProps {
@@ -99,6 +100,7 @@ export function RenameStepModal(props: RenameStepModalProps): JSX.Element {
                 setStepName(e.target.value)
               }}
               type="text"
+              name="stepName_input"
             />
           </Flex>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>

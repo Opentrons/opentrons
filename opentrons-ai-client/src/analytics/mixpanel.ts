@@ -2,7 +2,7 @@ import mixpanel from 'mixpanel-browser'
 
 import { getHasOptedIn } from './selectors'
 
-import type { Mixpanel } from '../resources/types'
+import type { Mixpanel } from '/ai-client/resources/types'
 
 export type AnalyticsEvent =
   | {

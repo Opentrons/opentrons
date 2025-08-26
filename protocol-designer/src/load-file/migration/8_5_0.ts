@@ -1,28 +1,39 @@
+import first from 'lodash/first'
 import floor from 'lodash/floor'
 import min from 'lodash/min'
+import round from 'lodash/round'
 
 import {
   FLEX_ROBOT_TYPE,
+  getAllLabwareDefs,
+  getAllLiquidClassDefs,
+  getFlexNameConversion,
   getPipetteSpecsV2,
+  linearInterpolate,
   POSITION_REFERENCE_BOTTOM,
   POSITION_REFERENCE_TOP,
   SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
 } from '@opentrons/shared-data'
+import { getTransferPlanAndReferenceVolumes } from '@opentrons/step-generation'
 
 import {
   CHANNELS_MAPPED_TO_MAX_SPEED,
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_EDGE,
   PROTOCOL_DESIGNER_SOURCE,
 } from '../../constants'
-import { getDefaultBlowoutFlowRate, getDefaultPushOutVolume } from '../../utils'
-import { getEquipmentLoadInfoFromCommands } from './utils/getEquipmentLoadInfoFromCommands'
+import { getMaxUiFlowRate } from '../../pages/Designer/ProtocolSteps/StepForm/PipetteFields/utils'
+import {
+  getDefaultBlowoutFlowRate,
+  getDefaultPushOutVolume,
+  getMatchingTipLiquidSpecsFromSpec,
+} from '../../utils'
 import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
 
 import type {
   LabwareDefinition2,
-  LoadLabwareCreateCommand,
   PipetteV2Specs,
   ProtocolFile,
+  RobotType,
 } from '@opentrons/shared-data'
 import type { Ingredients } from '@opentrons/step-generation'
 import type { PDMetadata } from '../../file-types'
@@ -40,24 +51,139 @@ const getMigratedBlowoutFlowRate = (
     ? getDefaultBlowoutFlowRate(Number(form.volume), pipetteSpecs, tipRackDef)
     : null
 
+const getMigratedBlowoutLocation = (
+  form: FormData,
+  firstTrashBinOrWasteChuteId: string | null
+): string | null => {
+  const { blowout_checkbox, blowout_location, disposalVolume_checkbox } = form
+  const doesBlowoutNeedMigration =
+    (blowout_checkbox === true || disposalVolume_checkbox === true) &&
+    blowout_location == null
+  return doesBlowoutNeedMigration && firstTrashBinOrWasteChuteId != null
+    ? firstTrashBinOrWasteChuteId
+    : blowout_location
+}
+
+const getClippedFlowRateForMoveLiquid = (args: {
+  formData: FormData
+  rawFlowRate: number | null
+  flowRateType: 'aspirate' | 'dispense' | 'blowout'
+  robotType: RobotType
+  pipetteSpecs: PipetteV2Specs | null
+}): number | null => {
+  const { formData, rawFlowRate, flowRateType, robotType, pipetteSpecs } = args
+  if (pipetteSpecs == null) {
+    console.warn('No pipette specs found. Using old flow rate.')
+    return null
+  }
+  const rawFlowRateNumber = Number(rawFlowRate)
+  const volume = Number(formData.volume)
+  const path = 'path' in formData ? formData.path : 'singleDispense'
+  const liquidClasses = getAllLiquidClassDefs()
+  const liquidClass = liquidClasses[formData.liquidClass]
+  const pipetteName = getFlexNameConversion(pipetteSpecs)
+  const tiprack = formData.tipRack
+  const tipLiquidSpecs = liquidClass?.byPipette
+    .find(byPipette => byPipette.pipetteModel === pipetteName)
+    ?.byTipType.find(byTipType => byTipType.tiprack === tiprack)
+  const tiprackDef = getAllLabwareDefs()[tiprack]
+  let correctionVolume: number = 0
+  if (tipLiquidSpecs != null && flowRateType !== 'blowout') {
+    const liquidClassLookup =
+      flowRateType === 'dispense'
+        ? path === 'multiDispense'
+          ? tipLiquidSpecs.multiDispense ?? tipLiquidSpecs.singleDispense
+          : tipLiquidSpecs.singleDispense
+        : tipLiquidSpecs.aspirate
+    const conditioningByVolume =
+      path === 'multiDispense'
+        ? tipLiquidSpecs.multiDispense?.conditioningByVolume ?? []
+        : []
+    const disposalByVolume =
+      path === 'multiDispense'
+        ? tipLiquidSpecs.multiDispense?.disposalByVolume ?? []
+        : []
+
+    const { referenceVolumes } = getTransferPlanAndReferenceVolumes({
+      pipetteSpecs,
+      tiprackDefinition: tiprackDef,
+      volume,
+      path,
+      numAspirateWells:
+        'aspirate_wells' in formData ? formData.aspirate_wells : formData.wells,
+      numDispenseWells:
+        'dispense_wells' in formData ? formData.dispense_wells : formData.wells,
+      aspirateAirGapByVolume: tipLiquidSpecs.aspirate.retract
+        .airGapByVolume as Array<[number, number]>,
+      conditioningByVolume: conditioningByVolume as Array<[number, number]>,
+      disposalByVolume: disposalByVolume as Array<[number, number]>,
+    })
+
+    correctionVolume =
+      linearInterpolate(
+        referenceVolumes.correction[flowRateType],
+        liquidClassLookup.correctionByVolume as Array<[number, number]>
+      ) ?? 0
+  }
+
+  const matchingTipLiquidSpecs = getMatchingTipLiquidSpecsFromSpec(
+    pipetteSpecs,
+    volume,
+    formData.tipRack as string
+  )
+
+  const shaftULperMM = pipetteSpecs?.shaftULperMM
+  const maxFlowRate = getMaxUiFlowRate({
+    targetVolume: volume,
+    channels: pipetteSpecs.channels,
+    tipLiquidSpecs: matchingTipLiquidSpecs,
+    flowRateType,
+    robotType,
+    shaftULperMM,
+    correctionVolume,
+  })
+  let defaultFlowRate: number | null
+  switch (flowRateType) {
+    case 'aspirate':
+      defaultFlowRate = matchingTipLiquidSpecs.defaultAspirateFlowRate.default
+      break
+    case 'dispense':
+      defaultFlowRate = matchingTipLiquidSpecs.defaultDispenseFlowRate.default
+      break
+    default:
+      // flowRateType is blowout
+      defaultFlowRate = matchingTipLiquidSpecs.defaultBlowOutFlowRate.default
+      break
+  }
+
+  return Math.min(
+    rawFlowRate == null ? round(defaultFlowRate, 2) : rawFlowRateNumber,
+    maxFlowRate
+  )
+}
+
 export const migrateFile = (
   appData: ProtocolFile<PDMetadata>
 ): ProtocolFile<PDMetadata> => {
-  const { designerApplication, commands, labwareDefinitions, robot } = appData
+  const { designerApplication, robot, labwareDefinitions } = appData
   if (designerApplication == null || designerApplication?.data == null) {
     throw Error('The designerApplication key in your file is corrupt.')
   }
-  const { savedStepForms, ingredients } = designerApplication.data
+  const {
+    savedStepForms,
+    ingredients,
+    labware,
+    pipettes,
+  } = designerApplication.data
   const { model: robotType } = robot
-  const loadLabwareCommands = commands.filter(
-    (command): command is LoadLabwareCreateCommand =>
-      command.commandType === 'loadLabware'
-  )
-  const equipmentLoadInfoFromCommands = getEquipmentLoadInfoFromCommands(
-    commands,
-    labwareDefinitions
-  )
 
+  const allLabwareDefsByURI =
+    //  read the labware definitions key first
+    //  otherwise map to all labware defs as a fallback
+    //  for OpentronsAI
+    Object.values(labwareDefinitions).length > 0
+      ? labwareDefinitions
+      : getAllLabwareDefs()
   const migratedIngredients: Ingredients = Object.entries(
     ingredients
   ).reduce<Ingredients>((acc, [id, ingredient]) => {
@@ -67,6 +193,31 @@ export const migrateFile = (
     }
     return acc
   }, {})
+
+  const initialDeckSetupStep = Object.values(savedStepForms).find(
+    form => form.id === '__INITIAL_DECK_SETUP_STEP__'
+  )
+  const firstTrashBinOrWasteChuteId =
+    first([
+      ...Object.keys(
+        (initialDeckSetupStep?.trashBinLocationUpdate as Record<
+          string,
+          string
+        >) ?? {}
+      ),
+      ...Object.keys(
+        (initialDeckSetupStep?.wasteChuteLocationUpdate as Record<
+          string,
+          string
+        >) ?? {}
+      ),
+    ]) ?? null
+
+  if (firstTrashBinOrWasteChuteId == null) {
+    console.error(
+      'No trash bin or waste chute found in the initial deck setup step. Protocol file may have been corrupted.'
+    )
+  }
 
   const savedStepsWithUpdatedMoveLiquidFields = Object.values(
     savedStepForms
@@ -82,40 +233,45 @@ export const migrateFile = (
         liquidClass,
         aspirate_touchTip_checkbox,
         dispense_touchTip_checkbox,
+        blowout_location,
+        // intentionally destructure but do not pass these deprecated fields
+        aspirate_delay_mmFromBottom,
+        dispense_delay_mmFromBottom,
+        blowout_z_offset,
         ...rest
       } = form
-      const aspirateLabwareUri =
-        equipmentLoadInfoFromCommands.labware[aspirate_labware].labwareDefURI
-      const isAspirateLabwareTouchtipDisabled = labwareDefinitions[
+      const aspirateLabwareUri = labware[aspirate_labware].labwareDefURI
+      const isAspirateLabwareTouchtipDisabled = allLabwareDefsByURI[
         aspirateLabwareUri
       ].parameters.quirks?.includes('touchTipDisabled')
-      const dispenseLabwareUri =
-        equipmentLoadInfoFromCommands.labware[dispense_labware]?.labwareDefURI
+      const dispenseLabwareUri = labware[dispense_labware]?.labwareDefURI
 
       const isDispenseLabwareTouchtipDisabled =
         //  dispense is in a waste chute/trash bin
-        labwareDefinitions[dispenseLabwareUri] == null
+        allLabwareDefsByURI[dispenseLabwareUri] == null
           ? true
-          : labwareDefinitions[dispenseLabwareUri].parameters.quirks?.includes(
+          : allLabwareDefsByURI[dispenseLabwareUri].parameters.quirks?.includes(
               'touchTipDisabled'
             )
 
+      const migratedBlowoutLocation = getMigratedBlowoutLocation(
+        form,
+        firstTrashBinOrWasteChuteId
+      )
       const matchingAspirateLabwareWellDepth = getMigratedPositionFromTop(
-        labwareDefinitions,
-        loadLabwareCommands,
+        allLabwareDefsByURI,
         aspirate_labware as string,
+        labware,
         'aspirate'
       )
       const matchingDispenseLabwareWellDepth = getMigratedPositionFromTop(
-        labwareDefinitions,
-        loadLabwareCommands,
+        allLabwareDefsByURI,
         dispense_labware as string,
+        labware,
         'dispense'
       )
-      const tipRackDef = labwareDefinitions[form.tipRack]
-      const pipetteName =
-        equipmentLoadInfoFromCommands.pipettes?.[form.pipette]?.pipetteName ??
-        null
+      const tipRackDef = allLabwareDefsByURI[form.tipRack]
+      const pipetteName = pipettes?.[form.pipette]?.pipetteName ?? null
       const pipetteSpecs =
         pipetteName != null ? getPipetteSpecsV2(pipetteName) : null
       const defaultPushOutVolume =
@@ -140,6 +296,34 @@ export const migrateFile = (
         CHANNELS_MAPPED_TO_MAX_SPEED[robotType][channelsForSpeed].x,
         CHANNELS_MAPPED_TO_MAX_SPEED[robotType][channelsForSpeed].y,
       ])
+
+      const migratedAspirateFlowRate = getClippedFlowRateForMoveLiquid({
+        formData: form,
+        rawFlowRate: form.aspirate_flowRate,
+        flowRateType: 'aspirate',
+        robotType,
+        pipetteSpecs,
+      })
+
+      const migratedDispenseFlowRate = getClippedFlowRateForMoveLiquid({
+        formData: form,
+        rawFlowRate: form.dispense_flowRate,
+        flowRateType: 'dispense',
+        robotType,
+        pipetteSpecs,
+      })
+
+      const migratedClippedBlowoutFlowRate = getClippedFlowRateForMoveLiquid({
+        formData: form,
+        rawFlowRate:
+          // migratedBlowoutFlowRate is only returned if the input form data has that field as null
+          migratedBlowoutFlowRate == null
+            ? form.blowout_flowRate
+            : migratedBlowoutFlowRate,
+        flowRateType: 'blowout',
+        robotType,
+        pipetteSpecs,
+      })
 
       return {
         ...acc,
@@ -172,12 +356,14 @@ export const migrateFile = (
                     matchingDispenseLabwareWellDepth,
                   1
                 ),
-          aspirate_retract_delay_seconds: null,
-          dispense_retract_delay_seconds: null,
+          aspirate_flowRate: migratedAspirateFlowRate,
+          dispense_flowRate: migratedDispenseFlowRate,
+          aspirate_retract_delay_seconds: 0,
+          dispense_retract_delay_seconds: 0,
           aspirate_retract_speed: maxZSpeed,
           dispense_retract_speed: maxZSpeed,
-          aspirate_submerge_delay_seconds: null,
-          dispense_submerge_delay_seconds: null,
+          aspirate_submerge_delay_seconds: 0,
+          dispense_submerge_delay_seconds: 0,
           aspirate_submerge_speed: maxZSpeed,
           dispense_submerge_speed: maxZSpeed,
           aspirate_touchTip_speed: maxXYSpeed,
@@ -209,9 +395,10 @@ export const migrateFile = (
           pushOut_volume: defaultPushOutVolume,
           conditioning_checkbox: false,
           conditioning_volume: null,
-          ...(migratedBlowoutFlowRate != null
-            ? { blowout_flowRate: migratedBlowoutFlowRate }
+          ...(migratedClippedBlowoutFlowRate != null
+            ? { blowout_flowRate: migratedClippedBlowoutFlowRate }
             : {}),
+          blowout_location: migratedBlowoutLocation,
         },
       }
     }
@@ -224,20 +411,17 @@ export const migrateFile = (
         const {
           id,
           mix_touchTip_mmFromBottom,
-          labware,
+          labware: formLabware,
           liquidClassesSupported,
           mix_touchTip_checkbox,
           ...rest
         } = form
-        const tipRackDef = labwareDefinitions[form.tipRack]
-        const mixLabwareUri =
-          equipmentLoadInfoFromCommands.labware[labware].labwareDefURI
-        const isLabwareTouchtipDisabled = labwareDefinitions[
+        const tipRackDef = allLabwareDefsByURI[form.tipRack]
+        const mixLabwareUri = labware[formLabware].labwareDefURI
+        const isLabwareTouchtipDisabled = allLabwareDefsByURI[
           mixLabwareUri
         ].parameters.quirks?.includes('touchTipDisabled')
-        const pipetteName =
-          equipmentLoadInfoFromCommands.pipettes?.[form.pipette]?.pipetteName ??
-          null
+        const pipetteName = pipettes?.[form.pipette]?.pipetteName ?? null
         const pipetteSpecs =
           pipetteName != null ? getPipetteSpecsV2(pipetteName) : null
         const defaultPushOutVolume =
@@ -250,9 +434,9 @@ export const migrateFile = (
               )
 
         const matchingLabwareWellDepth = getMigratedPositionFromTop(
-          labwareDefinitions,
-          loadLabwareCommands,
-          labware as string,
+          allLabwareDefsByURI,
+          formLabware as string,
+          labware,
           'mix'
         )
 
@@ -262,12 +446,46 @@ export const migrateFile = (
           pipetteSpecs,
           tipRackDef
         )
+
+        const migratedBlowoutLocation = getMigratedBlowoutLocation(
+          form,
+          firstTrashBinOrWasteChuteId
+        )
+
+        const migratedAspirateFlowRate = getClippedFlowRateForMoveLiquid({
+          formData: form,
+          rawFlowRate: form.aspirate_flowRate,
+          flowRateType: 'aspirate',
+          robotType,
+          pipetteSpecs,
+        })
+
+        const migratedDispenseFlowRate = getClippedFlowRateForMoveLiquid({
+          formData: form,
+          rawFlowRate: form.dispense_flowRate,
+          flowRateType: 'dispense',
+          robotType,
+          pipetteSpecs,
+        })
+
+        const migratedClippedBlowoutFlowRate = getClippedFlowRateForMoveLiquid({
+          formData: form,
+          rawFlowRate:
+            // migratedBlowoutFlowRate is only returned if the input form data has that field as null
+            migratedBlowoutFlowRate == null
+              ? form.blowout_flowRate
+              : migratedBlowoutFlowRate,
+          flowRateType: 'blowout',
+          robotType,
+          pipetteSpecs,
+        })
+
         return {
           ...acc,
           [id]: {
             ...rest,
             id,
-            labware,
+            labware: formLabware,
             mix_touchTip_checkbox: isLabwareTouchtipDisabled
               ? false
               : mix_touchTip_checkbox,
@@ -284,9 +502,12 @@ export const migrateFile = (
             pushOut_checkbox:
               defaultPushOutVolume != null && defaultPushOutVolume > 0,
             pushOut_volume: defaultPushOutVolume,
-            ...(migratedBlowoutFlowRate != null
-              ? { blowout_flowRate: migratedBlowoutFlowRate }
+            ...(migratedClippedBlowoutFlowRate != null
+              ? { blowout_flowRate: migratedClippedBlowoutFlowRate }
               : {}),
+            blowout_location: migratedBlowoutLocation,
+            aspirate_flowRate: migratedAspirateFlowRate,
+            dispense_flowRate: migratedDispenseFlowRate,
           },
         }
       }

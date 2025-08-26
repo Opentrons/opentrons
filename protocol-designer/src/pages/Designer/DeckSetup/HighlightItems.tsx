@@ -75,17 +75,23 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
     labware,
     modules
   )
-
   const hoveredItemTrash: {
     name: AdditionalEquipmentName
     id: string
     location?: string | undefined
   } | null =
-    hoveredItem?.id != null && additionalEquipmentOnDeck[hoveredItem.id] != null
-      ? additionalEquipmentOnDeck[hoveredItem.id]
+    hoveredItem?.id != null
+      ? Object.values(additionalEquipmentOnDeck).find(
+          ae => ae.location === hoveredItem.id
+        ) ?? null
       : null
+
   const selectedItemTrash = selectedDropdownItems.find(
-    selected => selected.id != null && additionalEquipmentOnDeck[selected.id]
+    selected =>
+      selected.id != null &&
+      Object.values(additionalEquipmentOnDeck).find(
+        ae => ae.location === selected.id
+      ) != null
   )
 
   const hoveredDeckItem: string | null =
@@ -238,32 +244,52 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
 
     return items
   }
-
   const getDeckItems = (): JSX.Element[] => {
     const items: JSX.Element[] = []
 
     if (hoveredDeckItem != null || selectedItemSlot != null) {
       const slot = hoveredDeckItem ?? selectedItemSlot?.id
 
-      if (slot === WASTE_CHUTE_CUTOUT) {
-        items.push(
-          <FixtureRender
-            key={`${slot}_wasteChute_selected`}
-            fixture={'wasteChute' as Fixture}
-            cutout={WASTE_CHUTE_CUTOUT as CutoutId}
-            robotType={robotType}
-            deckDef={deckDef}
-            showHighlight={true}
-            tagInfo={[
-              {
-                text: t('location'),
-                isSelected: true,
-                isLast: true,
-                isZoomed: false,
-              },
-            ]}
-          />
-        )
+      if (hoveredItemTrash != null || selectedItemTrash != null) {
+        if (slot === WASTE_CHUTE_CUTOUT) {
+          items.push(
+            <FixtureRender
+              key={`${slot}_wasteChute_selected`}
+              fixture={'wasteChute' as Fixture}
+              cutout={WASTE_CHUTE_CUTOUT as CutoutId}
+              robotType={robotType}
+              deckDef={deckDef}
+              showHighlight={true}
+              tagInfo={[
+                {
+                  text: t('new_location'),
+                  isSelected: selectedItemSlot?.id != null,
+                  isLast: true,
+                  isZoomed: false,
+                },
+              ]}
+            />
+          )
+        } else if (slot != null) {
+          items.push(
+            <FixtureRender
+              key={`${slot}_trashBin_selected`}
+              fixture={'trashBin' as Fixture}
+              cutout={'cutoutA3' as CutoutId}
+              robotType={robotType}
+              deckDef={deckDef}
+              showHighlight={true}
+              tagInfo={[
+                {
+                  text: t('new_location'),
+                  isSelected: true,
+                  isLast: true,
+                  isZoomed: false,
+                },
+              ]}
+            />
+          )
+        }
       } else {
         const addressableArea =
           slot != null && slot !== WASTE_CHUTE_CUTOUT

@@ -76,7 +76,7 @@ describe('Module Update Banner', () => {
     screen.getByTestId('ModuleCard_firmware_update_banner_test_number')
     screen.getByTestId('InlineNotification_alert')
     screen.queryByLabelText('close_icon')
-    screen.getByText('Firmware update available..')
+    screen.getByText('Firmware update available.')
     screen.getByText('Update now')
   })
 
@@ -121,6 +121,21 @@ describe('Module Update Banner', () => {
       'Module setup required. Calibrate pipette before running module setup.'
     )
     expect(screen.queryByText('Setup module')).not.toBeInTheDocument()
+  })
+
+  it('should render module setup banner even if pipette calibration is required', () => {
+    props = {
+      ...props,
+      updateType: 'setup',
+      calibratePipetteRequired: true,
+    }
+    render(props)
+    expect(
+      screen.queryByLabelText(
+        'ModuleCard_calibration_update_banner_test_number'
+      )
+    ).not.toBeInTheDocument()
+    screen.getByText('Setup module')
   })
 
   it('should not render a module setup link if pipette firmware update is required', () => {

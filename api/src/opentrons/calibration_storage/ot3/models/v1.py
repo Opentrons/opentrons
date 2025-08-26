@@ -81,6 +81,22 @@ class InstrumentOffsetModel(BaseModel):
     )
 
 
+class GripperJawWidthModel(BaseModel):
+    encoderPositionAtJawClosed: float = Field(
+        ..., description="The encoder position when the gripper jaw is closed."
+    )
+    lastModified: DatetimeType = Field(
+        ..., description="The last time this instrument was calibrated."
+    )
+    source: types.SourceType = Field(
+        default=types.SourceType.factory, description="The source of calibration."
+    )
+    status: CalibrationStatus = Field(
+        default_factory=CalibrationStatus,
+        description="The status of the calibration data.",
+    )
+
+
 class ModuleOffsetModel(BaseModel):
     offset: Point = Field(..., description="Module offset found from calibration.")
     mount: OT3Mount = Field(..., description="The mount used to calibrate this module.")

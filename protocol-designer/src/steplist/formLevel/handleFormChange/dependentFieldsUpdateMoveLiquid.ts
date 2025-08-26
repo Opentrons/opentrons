@@ -22,7 +22,7 @@ import {
   getAllWellsFromPrimaryWells,
   getChannels,
   getDefaultWells,
-  getMaxDisposalVolumeForMultidispense,
+  getMaxDisposalVolumeForMultiDispense,
 } from './utils'
 
 import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
@@ -416,7 +416,7 @@ const clampDisposalVolume = (
   const isDecimalString = appliedPatch.disposalVolume_volume === '.'
   // @ts-expect-error(sa, 2021-6-14): appliedPatch isn't well-typed, address in #3161
   if (appliedPatch.path !== 'multiDispense' || isDecimalString) return patch
-  const maxDisposalVolume = getMaxDisposalVolumeForMultidispense(
+  const maxDisposalVolume = getMaxDisposalVolumeForMultiDispense(
     // @ts-expect-error(sa, 2021-6-14): appliedPatch isn't well-typed, address in #3161
     appliedPatch,
     pipetteEntities

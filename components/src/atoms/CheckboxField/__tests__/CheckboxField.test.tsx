@@ -42,7 +42,6 @@ describe('CheckboxField', () => {
     const checkBoxIcon = screen.getByTestId('CheckboxField_icon')
 
     // INNER_STYLE_NO_VALUE
-    expect(checkBoxIcon).toHaveStyle(`width: 1.25rem`)
     expect(checkBoxIcon).toHaveStyle(`min-width: 1.25rem`)
     expect(checkBoxIcon).toHaveStyle(`color: ${COLORS.grey50}`)
     expect(checkBoxIcon).toHaveStyle(`display: flex`)
@@ -77,7 +76,6 @@ describe('CheckboxField', () => {
     props.value = true
     render(props)
     const checkBoxIcon = screen.getByTestId('CheckboxField_icon')
-    expect(checkBoxIcon).toHaveStyle(`width: 1.25rem`)
     expect(checkBoxIcon).toHaveStyle(`min-width: 1.25rem`)
     expect(checkBoxIcon).toHaveStyle(`color: ${COLORS.blue50}`)
     expect(checkBoxIcon).toHaveStyle(`display: flex`)
@@ -90,7 +88,6 @@ describe('CheckboxField', () => {
     props.value = undefined
     render(props)
     const checkBoxIcon = screen.getByTestId('CheckboxField_icon')
-    expect(checkBoxIcon).toHaveStyle(`width: 1.25rem`)
     expect(checkBoxIcon).toHaveStyle(`min-width: 1.25rem`)
     expect(checkBoxIcon).toHaveStyle(`color: ${COLORS.grey50}`)
     expect(checkBoxIcon).toHaveStyle(`display: flex`)

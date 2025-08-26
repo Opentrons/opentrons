@@ -490,3 +490,7 @@ class RunOrchestrator:
             return PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS
         else:
             raise UnknownProtocolParseMode()
+
+    def clear_command_history(self) -> None:
+        """Force cleanup of command history."""
+        self._protocol_engine.clear_command_history()

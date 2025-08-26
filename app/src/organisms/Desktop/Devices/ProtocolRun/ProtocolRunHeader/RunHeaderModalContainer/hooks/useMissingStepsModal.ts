@@ -27,7 +27,8 @@ interface UseMissingStepsModalProps {
   runStatus: RunStatus | null
   attachedModules: AttachedModule[]
   runId: string
-  handleProceedToRunClick: () => void
+  handleProceedToRunClick: () => Promise<void>
+  isRunStarting: boolean
 }
 
 export type UseMissingStepsModalResult =
@@ -47,6 +48,7 @@ export function useMissingStepsModal({
   runStatus,
   runId,
   handleProceedToRunClick,
+  isRunStarting,
 }: UseMissingStepsModalProps): UseMissingStepsModalResult {
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
   const isHeaterShakerShaking = isAnyHeaterShakerShaking(attachedModules)
@@ -76,6 +78,7 @@ export function useMissingStepsModal({
         : handleProceedToRunClick()
     },
     missingSteps: reportableMissingSetupSteps,
+    isRunStarting,
   }
 
   return conditionalConfirmUtils.showConfirmation

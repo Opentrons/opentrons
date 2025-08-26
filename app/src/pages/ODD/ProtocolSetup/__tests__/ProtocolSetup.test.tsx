@@ -27,7 +27,10 @@ import {
   NOT_CONFIGURED,
   useIsDoorOpen,
 } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
-import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
+import {
+  useApplyOffsets,
+  useLPCFlows,
+} from '/app/organisms/LabwarePositionCheck'
 import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
 import {
   getUnmatchedModulesForProtocol,
@@ -133,6 +136,7 @@ vi.mock('/app/redux/protocol-runs')
 vi.mock('/app/resources/maintenance_runs')
 vi.mock('/app/local-resources/instruments')
 vi.mock('/app/organisms/DoorOpenControl/useIsDoorOpen')
+vi.mock('/app/organisms/LabwarePositionCheck')
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -343,6 +347,10 @@ describe('ProtocolSetup', () => {
       selectIsAnyNecessaryDefaultOffsetMissing
     ).mockImplementation(() => () => false)
     vi.mocked(selectOffsetSource).mockImplementation(() => () => 'fromDatabase')
+    vi.mocked(useApplyOffsets).mockReturnValue({
+      isApplyingOffsets: false,
+      applyOffsets: vi.fn(),
+    })
   })
 
   it('should render text, image, and buttons', () => {
@@ -565,5 +573,11 @@ describe('ProtocolSetup', () => {
     vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_STOPPED)
     render(`/runs/${RUN_ID}/setup/`)
     expect(mockNavigate).toHaveBeenCalledWith('/protocols')
+  })
+
+  it('should show action needed when modules are not calibrated', () => {
+    vi.mocked(useModuleCalibrationStatus).mockReturnValue({ complete: false })
+    render(`/runs/${RUN_ID}/setup/`)
+    expect(screen.getByText('Action needed')).toBeInTheDocument()
   })
 })

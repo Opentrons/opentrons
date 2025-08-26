@@ -1,23 +1,23 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
+import { getLiquidEntities } from '/protocol-designer/step-forms/selectors'
 
 import { MoveLiquidTools } from '../'
-import { renderWithProviders } from '../../../../../../../__testing-utils__'
-import { getEnableLiquidClasses } from '../../../../../../../feature-flags/selectors'
-import { getRobotType } from '../../../../../../../file-data/selectors'
-import { getLiquidEntities } from '../../../../../../../step-forms/selectors'
 import { FirstStepMoveLiquidTools } from '../FirstStepMoveLiquidTools'
 import { LiquidClassesStepTools } from '../LiquidClassesStepTools'
 import { SecondStepsMoveLiquidTools } from '../SecondStepsMoveLiquidTools'
 
 import type { ComponentProps } from 'react'
-import type { FormData } from '../../../../../../../form-types'
+import type { FormData } from '/protocol-designer/form-types'
 
-vi.mock('../../../../../../../feature-flags/selectors')
-vi.mock('../../../../../../../file-data/selectors')
-vi.mock('../../../../../../../step-forms/selectors')
+vi.mock('/protocol-designer/feature-flags/selectors')
+vi.mock('/protocol-designer/file-data/selectors')
+vi.mock('/protocol-designer/step-forms/selectors')
 vi.mock('../FirstStepMoveLiquidTools')
 vi.mock('../SecondStepsMoveLiquidTools')
 vi.mock('../LiquidClassesStepTools')
@@ -43,7 +43,6 @@ describe('MoveLiquidTools', () => {
       focusHandlers: {} as any,
       showFormErrors: false,
     }
-    vi.mocked(getEnableLiquidClasses).mockReturnValue(false)
     vi.mocked(getLiquidEntities).mockReturnValue({})
     vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
 
@@ -58,27 +57,20 @@ describe('MoveLiquidTools', () => {
     )
   })
 
-  it('renders SingleStepMoveLiquidTools when there is only one step', () => {
+  it('renders FirstStepMoveLiquidTools when toolboxStep is 0', () => {
     render(props)
     screen.getByText('mock FirstStepMoveLiquidTools')
   })
 
-  it('renders MultipleStepsMoveLiquidTools when there are multiple steps', () => {
-    props.toolboxStep = 1
-    render(props)
-    screen.getByText('mock SecondStepsMoveLiquidTools')
-  })
-
-  it('renders LiquidClassesStepMoveLiquidTools when feature flag is on', () => {
-    vi.mocked(getEnableLiquidClasses).mockReturnValue(true)
+  it('renders LiquidClassesStepTools when toolboxStep is 1 and robot is Flex', () => {
     props.toolboxStep = 1
     render(props)
     screen.getByText('mock LiquidClassesStepMoveLiquidTools')
   })
 
-  it('renders SecondStepsMoveLiquidTools when feature flag off', () => {
-    vi.mocked(getEnableLiquidClasses).mockReturnValue(false)
-    props.toolboxStep = 1
+  it('renders SecondStepsMoveLiquidTools when toolboxStep is 1 and robot is OT-2', () => {
+    vi.mocked(getRobotType).mockReturnValue(OT2_ROBOT_TYPE)
+    props.toolboxStep = 2
     render(props)
     screen.getByText('mock SecondStepsMoveLiquidTools')
   })

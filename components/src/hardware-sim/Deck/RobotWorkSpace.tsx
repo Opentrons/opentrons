@@ -2,12 +2,10 @@ import { useRef } from 'react'
 
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { Svg } from '../../primitives'
 import { DeckFromLayers } from './DeckFromLayers'
 
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import type { AddressableArea, DeckDefinition } from '@opentrons/shared-data'
-import type { StyleProps } from '../../primitives'
 
 export interface RobotWorkSpaceRenderProps {
   // todo(mm, 2025-06-05): Is this API still worthwhile? The parent of RobotWorkSpace
@@ -39,7 +37,7 @@ type BaseProps = {
     }
 )
 
-export type RobotWorkSpaceProps = BaseProps & StyleProps
+export type RobotWorkSpaceProps = BaseProps & CSSProperties
 
 /**
  * A wrapper for rendering the robot deck, labware, etc. from a top-down perspective.
@@ -62,7 +60,12 @@ export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element {
   const wrapperRef = useRef<SVGSVGElement>(null)
 
   return (
-    <Svg viewBox={activeViewBox} ref={wrapperRef} id={id} {...styleProps}>
+    <svg
+      viewBox={activeViewBox}
+      ref={wrapperRef}
+      id={id}
+      style={{ ...styleProps }}
+    >
       <g
         transform={
           activeViewBox
@@ -82,7 +85,7 @@ export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element {
         ) : null}
         {children?.({ addressableAreasById })}
       </g>
-    </Svg>
+    </svg>
   )
 }
 

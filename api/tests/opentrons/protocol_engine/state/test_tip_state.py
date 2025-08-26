@@ -18,6 +18,7 @@ from opentrons.protocol_engine.state.tips import TipStore, TipView
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     OFF_DECK_LOCATION,
+    TipRackWellState,
 )
 from opentrons.types import DeckSlotName
 from opentrons_shared_data.pipette.types import PipetteNameType
@@ -178,7 +179,6 @@ def test_get_next_tip_skips_picked_up_tip(
     subject.handle_action(load_labware_action)
 
     if input_starting_tip is not None:
-        pipette_name_type = PipetteNameType.P1000_96
         if input_tip_amount == 1:
             pipette_name_type = PipetteNameType.P300_SINGLE_GEN2
         elif input_tip_amount == 8:
@@ -186,7 +186,6 @@ def test_get_next_tip_skips_picked_up_tip(
         else:
             pipette_name_type = PipetteNameType.P1000_96
     else:
-        pipette_name_type = PipetteNameType.P1000_96
         if get_next_tip_tips == 1:
             pipette_name_type = PipetteNameType.P300_SINGLE_GEN2
         elif get_next_tip_tips == 8:
@@ -197,9 +196,10 @@ def test_get_next_tip_skips_picked_up_tip(
     nozzle_map = get_default_nozzle_map(pipette_name_type)
 
     pick_up_tip_state_update = update_types.StateUpdate(
-        tips_used=update_types.TipsUsedUpdate(
+        tips_state=update_types.TipsStateUpdate(
+            tip_state=TipRackWellState.EMPTY,
             labware_id="cool-labware",
-            well_names=TipView(subject.state).compute_tips_to_mark_as_used(
+            well_names=TipView(subject.state).compute_tips_to_mark_as_used_or_empty(
                 labware_id="cool-labware", well_name="A1", nozzle_map=nozzle_map
             ),
         )
@@ -239,9 +239,10 @@ def test_get_next_tip_with_starting_tip(
     assert result == "B2"
 
     pick_up_tip_state_update = update_types.StateUpdate(
-        tips_used=update_types.TipsUsedUpdate(
+        tips_state=update_types.TipsStateUpdate(
+            tip_state=TipRackWellState.EMPTY,
             labware_id="cool-labware",
-            well_names=TipView(subject.state).compute_tips_to_mark_as_used(
+            well_names=TipView(subject.state).compute_tips_to_mark_as_used_or_empty(
                 labware_id="cool-labware", well_name="B2", nozzle_map=nozzle_map
             ),
         )
@@ -280,9 +281,10 @@ def test_get_next_tip_with_starting_tip_8_channel(
     assert result == "A2"
 
     pick_up_tip_state_update = update_types.StateUpdate(
-        tips_used=update_types.TipsUsedUpdate(
+        tips_state=update_types.TipsStateUpdate(
+            tip_state=TipRackWellState.EMPTY,
             labware_id="cool-labware",
-            well_names=TipView(subject.state).compute_tips_to_mark_as_used(
+            well_names=TipView(subject.state).compute_tips_to_mark_as_used_or_empty(
                 labware_id="cool-labware", well_name="A2", nozzle_map=nozzle_map
             ),
         )
@@ -323,9 +325,10 @@ def test_get_next_tip_with_1_channel_followed_by_8_channel(
     assert result == "A1"
 
     pick_up_tip_1_channel_state_update = update_types.StateUpdate(
-        tips_used=update_types.TipsUsedUpdate(
+        tips_state=update_types.TipsStateUpdate(
+            tip_state=TipRackWellState.EMPTY,
             labware_id="cool-labware",
-            well_names=TipView(subject.state).compute_tips_to_mark_as_used(
+            well_names=TipView(subject.state).compute_tips_to_mark_as_used_or_empty(
                 labware_id="cool-labware",
                 well_name="A1",
                 nozzle_map=nozzle_map_1_channel,
@@ -364,9 +367,10 @@ def test_get_next_tip_with_starting_tip_out_of_tips(
     assert result == "H12"
 
     pick_up_tip_state_update = update_types.StateUpdate(
-        tips_used=update_types.TipsUsedUpdate(
+        tips_state=update_types.TipsStateUpdate(
+            tip_state=TipRackWellState.EMPTY,
             labware_id="cool-labware",
-            well_names=TipView(subject.state).compute_tips_to_mark_as_used(
+            well_names=TipView(subject.state).compute_tips_to_mark_as_used_or_empty(
                 labware_id="cool-labware",
                 well_name="H12",
                 nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
@@ -418,7 +422,8 @@ def test_reset_tips(
         actions.SucceedCommandAction(
             command=_dummy_command(),
             state_update=update_types.StateUpdate(
-                tips_used=update_types.TipsUsedUpdate(
+                tips_state=update_types.TipsStateUpdate(
+                    tip_state=TipRackWellState.EMPTY,
                     labware_id="cool-labware",
                     well_names=["A1", "A2", "A3"],
                 )
@@ -487,9 +492,10 @@ def test_next_tip_automatic_tip_tracking_with_partial_configurations(
         assert result is not None and result == expected_next_tip
 
         pick_up_tip_state_update = update_types.StateUpdate(
-            tips_used=update_types.TipsUsedUpdate(
+            tips_state=update_types.TipsStateUpdate(
+                tip_state=TipRackWellState.EMPTY,
                 labware_id="cool-labware",
-                well_names=TipView(subject.state).compute_tips_to_mark_as_used(
+                well_names=TipView(subject.state).compute_tips_to_mark_as_used_or_empty(
                     labware_id="cool-labware", well_name=result, nozzle_map=nozzle_map
                 ),
             )
@@ -560,27 +566,27 @@ def test_next_tip_automatic_tip_tracking_with_partial_configurations(
             ),
         )
 
-    map = _build_nozzle_map("A1", "A1", "H3")
-    _assert_and_pickup("A10", map)
-    map = _build_nozzle_map("A1", "A1", "F2")
-    _assert_and_pickup("C8", map)
+    pipette_nozzle_map = _build_nozzle_map("A1", "A1", "H3")
+    _assert_and_pickup("A10", pipette_nozzle_map)
+    pipette_nozzle_map = _build_nozzle_map("A1", "A1", "F2")
+    _assert_and_pickup("C8", pipette_nozzle_map)
 
     # Configure to single tip pickups
-    map = _build_nozzle_map("H12", "H12", "H12")
-    _assert_and_pickup("A1", map)
-    map = _build_nozzle_map("H1", "H1", "H1")
-    _assert_and_pickup("A9", map)
-    map = _build_nozzle_map("A12", "A12", "A12")
-    _assert_and_pickup("H1", map)
-    map = _build_nozzle_map("A1", "A1", "A1")
-    _assert_and_pickup("B9", map)
+    pipette_nozzle_map = _build_nozzle_map("H12", "H12", "H12")
+    _assert_and_pickup("A1", pipette_nozzle_map)
+    pipette_nozzle_map = _build_nozzle_map("H1", "H1", "H1")
+    _assert_and_pickup("A9", pipette_nozzle_map)
+    pipette_nozzle_map = _build_nozzle_map("A12", "A12", "A12")
+    _assert_and_pickup("H1", pipette_nozzle_map)
+    pipette_nozzle_map = _build_nozzle_map("A1", "A1", "A1")
+    _assert_and_pickup("B9", pipette_nozzle_map)
 
 
 def test_next_tip_automatic_tip_tracking_tiprack_limits(
     subject: TipStore,
     load_labware_action: actions.SucceedCommandAction,
 ) -> None:
-    """Test tip tracking logic to ensure once a tiprack is consumed it returns None when consuming tips using multiple pipette configurations."""
+    """Ensure once a tip rack is consumed it returns None when consuming tips using multiple pipette configurations."""
     # Load labware
     subject.handle_action(load_labware_action)
 
@@ -593,9 +599,12 @@ def test_next_tip_automatic_tip_tracking_tiprack_limits(
         )
         if result is not None:
             pick_up_tip_state_update = update_types.StateUpdate(
-                tips_used=update_types.TipsUsedUpdate(
+                tips_state=update_types.TipsStateUpdate(
+                    tip_state=TipRackWellState.EMPTY,
                     labware_id="cool-labware",
-                    well_names=TipView(subject.state).compute_tips_to_mark_as_used(
+                    well_names=TipView(
+                        subject.state
+                    ).compute_tips_to_mark_as_used_or_empty(
                         labware_id="cool-labware",
                         well_name=result,
                         nozzle_map=nozzle_map,
@@ -643,28 +652,89 @@ def test_next_tip_automatic_tip_tracking_tiprack_limits(
             ),
         )
 
-    map = _build_nozzle_map("A1", "A1", "A1")
+    pipette_nozzle_map = _build_nozzle_map("A1", "A1", "A1")
     for _ in range(96):
-        assert _get_next_and_pickup(map) is not None
-    assert _get_next_and_pickup(map) is None
+        assert _get_next_and_pickup(pipette_nozzle_map) is not None
+    assert _get_next_and_pickup(pipette_nozzle_map) is None
 
     subject.handle_action(actions.ResetTipsAction(labware_id="cool-labware"))
-    map = _build_nozzle_map("A12", "A12", "A12")
+    pipette_nozzle_map = _build_nozzle_map("A12", "A12", "A12")
     for _ in range(96):
-        assert _get_next_and_pickup(map) is not None
-    assert _get_next_and_pickup(map) is None
+        assert _get_next_and_pickup(pipette_nozzle_map) is not None
+    assert _get_next_and_pickup(pipette_nozzle_map) is None
 
     subject.handle_action(actions.ResetTipsAction(labware_id="cool-labware"))
-    map = _build_nozzle_map("H1", "H1", "H1")
+    pipette_nozzle_map = _build_nozzle_map("H1", "H1", "H1")
     for _ in range(96):
-        assert _get_next_and_pickup(map) is not None
-    assert _get_next_and_pickup(map) is None
+        assert _get_next_and_pickup(pipette_nozzle_map) is not None
+    assert _get_next_and_pickup(pipette_nozzle_map) is None
 
     subject.handle_action(actions.ResetTipsAction(labware_id="cool-labware"))
-    map = _build_nozzle_map("H12", "H12", "H12")
+    pipette_nozzle_map = _build_nozzle_map("H12", "H12", "H12")
     for _ in range(96):
-        assert _get_next_and_pickup(map) is not None
-    assert _get_next_and_pickup(map) is None
+        assert _get_next_and_pickup(pipette_nozzle_map) is not None
+    assert _get_next_and_pickup(pipette_nozzle_map) is None
+
+
+def test_96_column_after_row_returns_none(
+    subject: TipStore,
+    load_labware_action: actions.SucceedCommandAction,
+) -> None:
+    """It should return None when there's no valid columns to pick up."""
+    subject.handle_action(load_labware_action)
+
+    def _get_next_and_pickup(nozzle_map: NozzleMap) -> str | None:
+        result = TipView(subject.state).get_next_tip(
+            labware_id="cool-labware",
+            num_tips=0,
+            starting_tip_name=None,
+            nozzle_map=nozzle_map,
+        )
+        if result is not None:
+            pick_up_tip_state_update = update_types.StateUpdate(
+                tips_state=update_types.TipsStateUpdate(
+                    tip_state=TipRackWellState.EMPTY,
+                    labware_id="cool-labware",
+                    well_names=TipView(
+                        subject.state
+                    ).compute_tips_to_mark_as_used_or_empty(
+                        labware_id="cool-labware",
+                        well_name=result,
+                        nozzle_map=nozzle_map,
+                    ),
+                )
+            )
+
+            subject.handle_action(
+                actions.SucceedCommandAction(
+                    command=_dummy_command(),
+                    state_update=pick_up_tip_state_update,
+                )
+            )
+
+        return result
+
+    row_nozzle_map = NozzleMap.build(
+        physical_nozzles=NINETY_SIX_MAP,
+        physical_rows=NINETY_SIX_ROWS,
+        physical_columns=NINETY_SIX_COLS,
+        starting_nozzle="A1",
+        back_left_nozzle="A1",
+        front_right_nozzle="A12",
+        valid_nozzle_maps=ValidNozzleMaps(maps={"RowA": NINETY_SIX_ROWS["A"]}),
+    )
+    assert _get_next_and_pickup(row_nozzle_map) is not None
+
+    col_nozzle_map = NozzleMap.build(
+        physical_nozzles=NINETY_SIX_MAP,
+        physical_rows=NINETY_SIX_ROWS,
+        physical_columns=NINETY_SIX_COLS,
+        starting_nozzle="A1",
+        back_left_nozzle="A1",
+        front_right_nozzle="H1",
+        valid_nozzle_maps=ValidNozzleMaps(maps={"Column1": NINETY_SIX_COLS["1"]}),
+    )
+    assert _get_next_and_pickup(col_nozzle_map) is None
 
 
 def test_handle_batch_labware_loaded_update(

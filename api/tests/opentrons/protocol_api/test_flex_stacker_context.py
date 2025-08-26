@@ -71,7 +71,7 @@ def subject(
 
 
 @pytest.mark.parametrize(
-    "api_version", versions_at_or_above(from_version=APIVersion(2, 23))
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 25))
 )
 def test_get_serial_number(
     decoy: Decoy, mock_core: FlexStackerCore, subject: FlexStackerContext
@@ -82,24 +82,8 @@ def test_get_serial_number(
     assert result == "12345"
 
 
-@pytest.mark.parametrize("api_version", [APIVersion(2, 23)])
 @pytest.mark.parametrize(
-    "message,count", [("hello", 2), ("hello", None), (None, 2), (None, None)]
-)
-def test_fill_old_args(
-    decoy: Decoy,
-    mock_core: FlexStackerCore,
-    subject: FlexStackerContext,
-    message: str | None,
-    count: int | None,
-) -> None:
-    """It should pass args to the core."""
-    subject.fill(message, count)  # type: ignore[arg-type]
-    decoy.verify(mock_core.fill(count, message))
-
-
-@pytest.mark.parametrize(
-    "api_version", versions_at_or_above(from_version=APIVersion(2, 23))
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 25))
 )
 def test_fill(
     decoy: Decoy, mock_core: FlexStackerCore, subject: FlexStackerContext
@@ -110,7 +94,7 @@ def test_fill(
 
 
 @pytest.mark.parametrize(
-    "api_version", versions_at_or_above(from_version=APIVersion(2, 23))
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 25))
 )
 def test_empty(
     decoy: Decoy, mock_core: FlexStackerCore, subject: FlexStackerContext
@@ -121,7 +105,7 @@ def test_empty(
 
 
 @pytest.mark.parametrize(
-    "api_version", versions_at_or_above(from_version=APIVersion(2, 23))
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 25))
 )
 def test_set_stored_labware(
     decoy: Decoy, mock_core: FlexStackerCore, subject: FlexStackerContext
@@ -148,7 +132,7 @@ def test_set_stored_labware(
 
 
 @pytest.mark.parametrize(
-    "api_version", versions_at_or_above(from_version=APIVersion(2, 24))
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 25))
 )
 def test_get_max_storable_labware_from_list(
     decoy: Decoy,
@@ -168,7 +152,7 @@ def test_get_max_storable_labware_from_list(
     base_lw = [
         Labware(
             core=core,
-            api_version=APIVersion(2, 24),
+            api_version=APIVersion(2, 25),
             protocol_core=mock_protocol_core,
             core_map=subject._core_map,
         )
@@ -181,7 +165,7 @@ def test_get_max_storable_labware_from_list(
 
 
 @pytest.mark.parametrize(
-    "api_version", versions_at_or_above(from_version=APIVersion(2, 24))
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 25))
 )
 def test_get_current_storable_labware_from_list(
     decoy: Decoy,
@@ -201,7 +185,7 @@ def test_get_current_storable_labware_from_list(
     base_lw = [
         Labware(
             core=core,
-            api_version=APIVersion(2, 24),
+            api_version=APIVersion(2, 25),
             protocol_core=mock_protocol_core,
             core_map=subject._core_map,
         )
@@ -214,7 +198,7 @@ def test_get_current_storable_labware_from_list(
 
 
 @pytest.mark.parametrize(
-    "api_version", versions_at_or_above(from_version=APIVersion(2, 24))
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 25))
 )
 def test_get_max_storable_labware(
     decoy: Decoy,
@@ -227,7 +211,7 @@ def test_get_max_storable_labware(
 
 
 @pytest.mark.parametrize(
-    "api_version", versions_at_or_above(from_version=APIVersion(2, 24))
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 25))
 )
 def test_get_current_storable_labware(
     decoy: Decoy,
@@ -240,7 +224,7 @@ def test_get_current_storable_labware(
 
 
 @pytest.mark.parametrize(
-    "api_version", versions_at_or_above(from_version=APIVersion(2, 24))
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 25))
 )
 def test_get_stored_labware(
     decoy: Decoy,
@@ -260,7 +244,7 @@ def test_get_stored_labware(
     base_lw = [
         Labware(
             core=core,
-            api_version=APIVersion(2, 24),
+            api_version=APIVersion(2, 25),
             protocol_core=mock_protocol_core,
             core_map=subject._core_map,
         )
@@ -271,7 +255,7 @@ def test_get_stored_labware(
 
 
 @pytest.mark.parametrize(
-    "api_version", versions_at_or_above(from_version=APIVersion(2, 24))
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 25))
 )
 @pytest.mark.parametrize("message", ["hello", None])
 def test_fill_items(
@@ -291,7 +275,7 @@ def test_fill_items(
     base_lw = [
         Labware(
             core=core,
-            api_version=APIVersion(2, 24),
+            api_version=APIVersion(2, 25),
             protocol_core=mock_protocol_core,
             core_map=subject._core_map,
         )
@@ -302,7 +286,7 @@ def test_fill_items(
 
 
 @pytest.mark.parametrize(
-    "api_version", versions_at_or_above(from_version=APIVersion(2, 24))
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 25))
 )
 def test_set_stored_labware_items(
     decoy: Decoy,
@@ -320,7 +304,7 @@ def test_set_stored_labware_items(
     base_lw = [
         Labware(
             core=core,
-            api_version=APIVersion(2, 24),
+            api_version=APIVersion(2, 25),
             protocol_core=mock_protocol_core,
             core_map=subject._core_map,
         )

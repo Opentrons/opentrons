@@ -2441,12 +2441,7 @@
       ]
     }
   ],
-  "files": [
-    {
-      "name": "OT2_X_v2_20_8_Overrides_InvalidConfigs_Override_eight_partial_column_bottom_left.py",
-      "role": "main"
-    }
-  ],
+  "files": [],
   "labware": [
     {
       "definitionUri": "opentrons/opentrons_96_tiprack_20ul/1",

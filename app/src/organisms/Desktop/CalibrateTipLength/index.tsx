@@ -45,7 +45,6 @@ import type {
 import type { CalibrateTipLengthParentProps } from './types'
 
 export { AskForCalibrationBlockModal } from './AskForCalibrationBlockModal'
-export { ConfirmRecalibrationModal } from './ConfirmRecalibrationModal'
 
 const PANEL_BY_STEP: Partial<
   Record<CalibrationSessionStep, ComponentType<CalibrationPanelProps>>
@@ -190,9 +189,7 @@ export function CalibrateTipLength({
   )
 }
 
-const blockRemovalAssetBySlot: {
-  [slot in CalibrationLabware['slot']]: string
-} = {
+const blockRemovalAssetBySlot: Record<string, string> = {
   '1': slotOneRemoveBlockAsset,
   '3': slotThreeRemoveBlockAsset,
 }
@@ -206,13 +203,23 @@ function TipLengthCalibrationComplete(
   const visualAid =
     calBlock != null ? (
       <AnimationVideo
-        key={blockRemovalAssetBySlot[calBlock.slot]}
+        key={
+          blockRemovalAssetBySlot[
+            Sessions.slotNameFromCalibrationSlot(calBlock.slot)
+          ]
+        }
         css={css`
           max-width: 100%;
           max-height: 15rem;
         `}
       >
-        <source src={blockRemovalAssetBySlot[calBlock.slot]} />
+        <source
+          src={
+            blockRemovalAssetBySlot[
+              Sessions.slotNameFromCalibrationSlot(calBlock.slot)
+            ]
+          }
+        />
       </AnimationVideo>
     ) : null
 

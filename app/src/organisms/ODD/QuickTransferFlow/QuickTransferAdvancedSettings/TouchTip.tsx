@@ -49,7 +49,9 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
       : state.touchTipDispense != null
   )
   const initialSpeed =
-    kind === 'aspirate' ? state.touchTipAspirate : state.touchTipDispense
+    kind === 'aspirate'
+      ? state.touchTipAspirateSpeed
+      : state.touchTipDispenseSpeed
   const [speed, setSpeed] = useState<number | null>(initialSpeed ?? null)
   const [currentStep, setCurrentStep] = useState<number>(1)
   const touchTipAspirate =
@@ -268,7 +270,7 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
           <Flex
             width="30.5rem"
             height="100%"
-            gridGap={SPACING.spacing24}
+            gridGap={SPACING.spacing8}
             flexDirection={DIRECTION_COLUMN}
             marginTop={SPACING.spacing68}
           >
@@ -279,6 +281,12 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
               error={positionError}
               readOnly
             />
+            <StyledText oddStyle="bodyTextRegular" color={COLORS.grey60}>
+              {t('touch_tip_from_top', {
+                min: positionRange.min,
+                max: positionRange.max,
+              })}
+            </StyledText>
           </Flex>
           <Flex
             paddingX={SPACING.spacing24}

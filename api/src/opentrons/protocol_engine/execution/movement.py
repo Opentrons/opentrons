@@ -1,4 +1,5 @@
 """Movement command handling."""
+
 from __future__ import annotations
 
 import logging
@@ -84,7 +85,7 @@ class MovementHandler:
         operation_volume: Optional[float] = None,
     ) -> Point:
         """Move to a specific well."""
-        self._state_store.labware.raise_if_labware_inaccessible_by_pipette(
+        self._state_store.geometry.raise_if_labware_inaccessible_by_pipette(
             labware_id=labware_id
         )
 

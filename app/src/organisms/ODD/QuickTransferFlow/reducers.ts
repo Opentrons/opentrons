@@ -111,7 +111,7 @@ export function quickTransferWizardReducer(
     case 'SET_LIQUID_CLASS': {
       return {
         ...state,
-        liquidClass: action.liquidClass,
+        liquidClassName: action.liquidClassName,
       }
     }
   }
@@ -140,7 +140,10 @@ export function quickTransferSummaryReducer(
           ...state,
           path: action.path,
           disposalVolume: action.disposalVolume,
-          blowOut: action.blowOutLocation,
+          blowOutDispense: {
+            location: action.blowOutLocation,
+            flowRate: state.dispenseFlowRate,
+          },
         }
       } else {
         return {
@@ -239,7 +242,7 @@ export function quickTransferSummaryReducer(
     case 'SET_BLOW_OUT': {
       return {
         ...state,
-        blowOut: action.location,
+        blowOutDispense: action.blowOutSettings,
       }
     }
     case 'SET_AIR_GAP_DISPENSE': {
@@ -263,7 +266,7 @@ export function quickTransferSummaryReducer(
     case 'SET_PUSH_OUT': {
       return {
         ...state,
-        pushOut: action.pushOut,
+        pushOutDispense: action.pushOutSettings,
       }
     }
     case 'SET_CONDITION_ASPIRATE': {
@@ -276,6 +279,12 @@ export function quickTransferSummaryReducer(
       return {
         ...state,
         disposalVolumeDispenseSettings: action.disposalVolumeDispenseSettings,
+      }
+    }
+    case 'SET_LIQUID_CLASS_VALUES': {
+      return {
+        ...state,
+        ...action.liquidClassValues,
       }
     }
   }

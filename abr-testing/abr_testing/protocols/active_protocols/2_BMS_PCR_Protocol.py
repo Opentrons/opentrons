@@ -14,7 +14,7 @@ metadata = {
     "protocolName": "PCR Protocol with TC Auto Sealing Lid",
     "author": "Rami Farawi <ndiehl@opentrons.com",
 }
-requirements = {"robotType": "Flex", "apiLevel": "2.23"}
+requirements = {"robotType": "Flex", "apiLevel": "2.24"}
 
 
 def add_parameters(parameters: ParameterContext) -> None:
@@ -37,7 +37,7 @@ def run(protocol: ProtocolContext) -> None:
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
     probe_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
     meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
-    helpers.comment_protocol_version(protocol, "03")
+    helpers.comment_protocol_version(protocol, "04")
     if not protocol.is_simulating():
         slack_bot = helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])

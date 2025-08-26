@@ -20,17 +20,19 @@ import {
 } from '@opentrons/components'
 import {
   getFullStackFromLabwares,
+  getLiquidIdsOnLabware,
   getSlotInLocationStack,
+  getVolumesPerLiquid,
+  wellFillFromWellContents,
 } from '@opentrons/step-generation'
 
-import { selectors } from '../../../labware-ingred/selectors'
-import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
-import * as wellContentsSelectors from '../../../top-selectors/well-contents'
-import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
+import { selectors } from '/protocol-designer/labware-ingred/selectors'
+import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
+import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
+import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
+
 import { WellTooltip } from '../Labware/WellTooltip'
-import { wellFillFromWellContents } from '../LabwareOnDeck/utils'
 import { getMainPagePortalEl } from '../Portal'
-import { getLiquidIdsOnLabware, getVolumesPerLiquid } from '../utils'
 import { LiquidCardList } from './LiquidCardList'
 
 import type { WellGroup } from '@opentrons/components'
@@ -159,6 +161,7 @@ export const SlotDetailModal = (
                           }
                         }}
                         definition={labwareOnDeck.def}
+                        positioningMode="offsetInSlot"
                         wellFill={allWellFill}
                         highlightedWells={wellContentsWithLiquidId}
                       />

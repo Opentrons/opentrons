@@ -11,9 +11,9 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { DropdownStepFormField } from '../../../../../components/molecules'
-import { getPipetteEntities } from '../../../../../step-forms/selectors'
-import { getTiprackOptions } from '../../../../../ui/labware/selectors'
+import { DropdownStepFormField } from '/protocol-designer/components/molecules'
+import { getPipetteEntities } from '/protocol-designer/step-forms/selectors'
+import { getTiprackOptions } from '/protocol-designer/ui/labware/selectors'
 
 import type { FieldProps } from '../types'
 
@@ -39,7 +39,10 @@ export function TiprackField(props: TiprackFieldProps): JSX.Element {
   useEffect(() => {
     //  if default value is not included in the pipette's tiprack uris then
     //  change it so it is
-    if (!defaultTiprackUris.includes(value as string)) {
+    if (
+      !defaultTiprackUris.includes(value as string) &&
+      defaultTiprackUris.length > 0
+    ) {
       updateValue(defaultTiprackUris[0])
     }
   }, [defaultTiprackUris, value, updateValue])

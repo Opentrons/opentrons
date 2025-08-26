@@ -1,5 +1,5 @@
 import {
-  getModuleDef2,
+  getModuleDef,
   SPAN7_8_10_11_SLOT,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
@@ -228,7 +228,7 @@ export const mockModuleRenderInfoWithLabware = [
     moduleId: 'mockTCModuleID',
     x: 100,
     y: 100,
-    moduleDef: getModuleDef2(THERMOCYCLER_MODULE_V1),
+    moduleDef: getModuleDef(THERMOCYCLER_MODULE_V1),
     nestedLabwareDef: mockLabwareDefinition,
     nestedLabwareId: 'mockLabwareID',
   },
@@ -239,7 +239,7 @@ export const mockModuleRenderInfoWithoutLabware = [
     moduleId: 'mockTCModuleID',
     x: 100,
     y: 100,
-    moduleDef: getModuleDef2(THERMOCYCLER_MODULE_V1),
+    moduleDef: getModuleDef(THERMOCYCLER_MODULE_V1),
     nestedLabwareDef: null,
     nestedLabwareId: null,
   },

@@ -28,7 +28,7 @@ describe('generateRobotStateTimeline', () => {
       a: {
         errors: false,
         stepArgs: {
-          stepId: 1,
+          stepNumber: 1,
           dropTipLocation: FIXED_TRASH_ID,
           pipette: DEFAULT_PIPETTE,
           volume: 5,
@@ -102,7 +102,7 @@ describe('generateRobotStateTimeline', () => {
       b: {
         errors: false,
         stepArgs: {
-          stepId: 1,
+          stepNumber: 1,
           dropTipLocation: FIXED_TRASH_ID,
           pipette: MULTI_PIPETTE,
           volume: 5,
@@ -292,10 +292,12 @@ describe('generateRobotStateTimeline', () => {
       // Step a:
       `
 mock_pipette.transfer_with_liquid_class(...)
+mock_pipette.drop_tip()
 `.trim(),
       // Step b:
       `
 mock_pipette_p300_multi.transfer_with_liquid_class(...)
+mock_pipette_p300_multi.drop_tip()
 `.trim(),
       // Step c:
       `
