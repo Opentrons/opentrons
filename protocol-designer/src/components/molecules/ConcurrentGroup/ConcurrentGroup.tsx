@@ -1,4 +1,10 @@
-import { Box, COLORS, Flex, SPACING } from '@opentrons/components'
+import {
+  Box,
+  COLORS,
+  DIRECTION_ROW,
+  Flex,
+  SPACING,
+} from '@opentrons/components'
 
 import type { PropsWithChildren } from 'react'
 
@@ -25,7 +31,7 @@ export function ConcurrentGroup(
   const { active, children } = props
   return (
     <Flex
-      flexDirection="row"
+      flexDirection={DIRECTION_ROW}
       paddingY={SPACING.spacing4}
       gridGap={SPACING.spacing4}
     >
