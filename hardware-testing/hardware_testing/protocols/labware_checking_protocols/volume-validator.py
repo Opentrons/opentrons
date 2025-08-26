@@ -1,16 +1,14 @@
-"""Volume Validator Protocol"""
+"""Volume Validator Protocol."""
 
 from opentrons.protocol_api import (
     ProtocolContext,
     Labware,
     InstrumentContext,
     ParameterContext,
-    LiquidClass,
-    OFF_DECK,
+    # LiquidClass,
     Well,
 )
-from itertools import cycle
-from typing import List, Dict, Optional, Any, Union, Tuple
+from typing import List, Dict, Optional, Union, Tuple
 from opentrons.types import Point
 from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
 
@@ -351,7 +349,7 @@ def run(ctx: ProtocolContext) -> None:
     ) = _setup(ctx)
 
     wells = [str(w).split(" ")[0] for w in labware.wells()]
-    volumes: dict[str, list[float]] = {}
+    volumes: dict[str, List[float | SimulatedProbeResult]] = {}
     for i, height in enumerate(expected_heights):
         well = wells[i % len(wells)]
         volume = labware["A1"].volume_from_height(height)
