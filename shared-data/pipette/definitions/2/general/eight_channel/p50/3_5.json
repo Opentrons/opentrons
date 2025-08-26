@@ -33,9 +33,9 @@
                 "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.05
               },
               "v1": {
-                "default": 10.08,
-                "opentrons/opentrons_flex_96_tiprack_50ul/1": 10.08,
-                "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 10.08
+                "default": 9.52,
+                "opentrons/opentrons_flex_96_tiprack_50ul/1": 9.52,
+                "opentrons/opentrons_flex_96_filtertiprack_50ul/1": 9.52
               }
             }
           }
