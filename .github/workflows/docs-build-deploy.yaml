@@ -10,7 +10,9 @@ on:
       - 'edge'
     tags:
       - 'staging-MKDOCS*'
+      - 'staging-mkdocs*'
       - 'MKDOCS*'
+      - 'mkdocs*'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
@@ -114,11 +116,11 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: docs-artifacts
-          path: docs/
+          path: docs/site/
 
       - name: Deploy
         working-directory: ./docs
-        run: make deploy ENVIRONMENT=${{ env.ENVIRONMENT }} BRANCH=${{ env.BRANCH }}
+        run: make deploy ENVIRONMENT=${{ env.ENVIRONMENT }} BRANCH=${{ env.BRANCH }} ARGS="--source-dir site"
       - name: Output Deployment URL
         run: |
           echo "## 🚀 Docs site deployed to ${{ env.ENVIRONMENT }}" >> $GITHUB_STEP_SUMMARY
