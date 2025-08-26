@@ -37,6 +37,14 @@ export function FileUploadMessagesModal(): JSX.Element | null {
 
   const isMigration = title === t('migration_header')
 
+  const handleClose = (): void => {
+    if (isMigration) {
+      dispatch(undoLoadFile())
+    } else {
+      dismissModal()
+    }
+  }
+
   const showButtons =
     title !== t('invalid_json_file') &&
     title !== t('incorrect_file_header') &&
@@ -47,6 +55,9 @@ export function FileUploadMessagesModal(): JSX.Element | null {
       marginLeft="0"
       type={message?.isError ? 'error' : 'info'}
       title={title}
+      {...(!isMigration
+        ? { onClose: handleClose, closeOnOutsideClick: true }
+        : {})}
       footer={
         showButtons && (
           <Flex
