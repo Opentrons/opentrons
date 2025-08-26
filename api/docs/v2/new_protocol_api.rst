@@ -70,7 +70,7 @@ Flex Stacker
 
 .. autoclass:: opentrons.protocol_api.FlexStackerContext
    :members:
-   :exclude-members: calibrate, broker, geometry, load_labware_object, load_labware
+   :exclude-members: calibrate, broker, geometry, load_labware_object
    :inherited-members:
 
 Heater-Shaker
