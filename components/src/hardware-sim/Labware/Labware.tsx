@@ -8,7 +8,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { COLORS } from '../../helix-design-system'
-import { LabwareAdapter, labwareAdapterLoadNames } from './LabwareAdapter'
+import { customSVGLoadNames, LabwareAdapter } from './LabwareAdapter'
 import {
   LabwareOutline,
   LabwareWellLabels,
@@ -106,9 +106,12 @@ export const Labware = (props: LabwareProps): JSX.Element => {
 
   const cornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(definition)
   const labwareLoadName = definition.parameters.loadName
-  const isAdapter = labwareAdapterLoadNames.includes(labwareLoadName)
+  const isNeedingCustomSVG = customSVGLoadNames.includes(labwareLoadName)
+  const isGenericLid =
+    definition.allowedRoles?.includes('lid') &&
+    labwareLoadName !== 'opentrons_tough_pcr_auto_sealing_lid'
 
-  if (isAdapter) {
+  if (isNeedingCustomSVG || isGenericLid) {
     const { shouldRotateAdapterOrientation = false } = props
     const { xDimension, yDimension } = getSchema2Dimensions(definition)
 
@@ -130,6 +133,7 @@ export const Labware = (props: LabwareProps): JSX.Element => {
         >
           <LabwareAdapter
             labwareLoadName={labwareLoadName as LabwareAdapterLoadName}
+            isGenericLid={isGenericLid}
           />
         </g>
       </g>

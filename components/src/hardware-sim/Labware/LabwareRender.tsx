@@ -3,7 +3,7 @@ import {
   getSchema2Dimensions,
 } from '@opentrons/shared-data'
 
-import { LabwareAdapter, labwareAdapterLoadNames } from './LabwareAdapter'
+import { customSVGLoadNames, LabwareAdapter } from './LabwareAdapter'
 import {
   FilledWells,
   StaticLabware,
@@ -116,9 +116,12 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
 
   const cornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(definition)
   const labwareLoadName = definition.parameters.loadName
-  const isAdapter = labwareAdapterLoadNames.includes(labwareLoadName)
+  const isNeedingCustomSVG = customSVGLoadNames.includes(labwareLoadName)
+  const isGenericLid =
+    definition.allowedRoles?.includes('lid') &&
+    definition.parameters.loadName !== 'opentrons_tough_pcr_auto_sealing_lid'
 
-  if (isAdapter) {
+  if (isNeedingCustomSVG || isGenericLid) {
     const { shouldRotateAdapterOrientation } = props
     const { xDimension, yDimension } = getSchema2Dimensions(definition)
 
@@ -146,6 +149,7 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
             definition={definition}
             highlight={props.highlight}
             highlightShadow={props.highlightShadow}
+            isGenericLid={isGenericLid}
           />
         </g>
       </g>

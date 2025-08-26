@@ -79,6 +79,8 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
     getLabwareOnDeck(startingDeck)
   ).map(([slotName, stackedItems]) => {
     const topLabwareInfo = getTopLabwareFromStack(stackedItems)
+    console.log('topLabwareInfo', topLabwareInfo, stackedItems)
+    // const test = topLabwareInfo?.lidId != null ? labwareDefinitionsByURI
     const topLabwareDefinition =
       topLabwareInfo != null
         ? labwareDefinitionsByURI[topLabwareInfo.definitionUri]

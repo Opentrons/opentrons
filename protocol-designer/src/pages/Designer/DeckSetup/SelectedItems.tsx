@@ -37,7 +37,9 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
     selectedAdapterDefURI,
     selectedFixture,
     selectedModuleModel,
+    selectedLidLabware,
   } = selectedSlotInfo
+  console.log('selectedLidLabware', selectedLidLabware)
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
   const defs = getAllLabwareDefs()
   const deckSetup = useSelector(getInitialDeckSetup)
@@ -88,6 +90,10 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
     }
     labwareInfos.push(selectedAdapterLabel)
   }
+  const lengthOfStack =
+    (selectedLidLabware ? 1 : 0) +
+    (selectedAdapterDefURI ? 1 : 0) +
+    (selectedTopLabware?.labwareDefURI ? 1 : 0)
 
   return (
     <>
@@ -139,8 +145,7 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
         </>
       ) : null}
       <SelectedLabwareRender
-        showModuleIcon={selectedTopLabware.amount > 1}
-        labwareOnDeck={matchingSelectedTopLabwareOnDeck}
+        showModuleIcon={selectedTopLabware.amount > 1 || lengthOfStack > 1}
         labwareDef={selectedTopLabwareDef ?? selectedAdapterDef}
         slotPosition={slotPosition}
         moduleModel={selectedModuleModel ?? null}
