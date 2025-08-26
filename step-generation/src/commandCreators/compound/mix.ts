@@ -1,4 +1,4 @@
-import { flatMap } from 'lodash'
+import flatMap from 'lodash/flatMap'
 
 import {
   getByVolumeValue,
@@ -492,7 +492,7 @@ export const mix: CommandCreator<MixArgs> = (
         },
         generatePython: true,
       })
-      const newCommands = [
+      return [
         ...tipCommands,
         ...configureForVolumeCommand,
         ...prepareToAspirateCommand,
@@ -500,7 +500,6 @@ export const mix: CommandCreator<MixArgs> = (
         ...advancedDispenseCommands,
         ...returnTipCommands,
       ]
-      return newCommands
     }
   )
 
