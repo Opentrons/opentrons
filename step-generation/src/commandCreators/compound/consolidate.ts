@@ -212,9 +212,14 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   const isTrashBinDropLocation =
     invariantContext.trashBinEntities[dropTipLocation] != null
 
+  const hasTip = prevRobotState.pipettes[pipette]?.tipWell != null
+
   if (
     dropTipLocation == null ||
-    (isReturnTip && fallBackTrashLikeId == null && changeTip !== 'never') ||
+    (isReturnTip &&
+      fallBackTrashLikeId == null &&
+      changeTip !== 'never' &&
+      hasTip) ||
     (!isReturnTip && !isWasteChuteDropLocation && !isTrashBinDropLocation)
   ) {
     errors.push(errorCreators.dropTipLocationDoesNotExist())

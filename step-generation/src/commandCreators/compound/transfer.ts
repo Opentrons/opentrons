@@ -249,9 +249,14 @@ export const transfer: CommandCreator<TransferArgs> = (
   )
   const isReturnTip = dropTipLabware != null && getIsTiprack(dropTipLabware.def)
 
+  const hasTip = prevRobotState.pipettes[pipette]?.tipWell != null
+
   if (
     dropTipLocation == null ||
-    (isReturnTip && fallBackTrashLikeId == null && changeTip !== 'never') ||
+    (isReturnTip &&
+      fallBackTrashLikeId == null &&
+      changeTip !== 'never' &&
+      hasTip) ||
     (!isReturnTip && !isWasteChuteDropLocation && !isTrashBinDropLocation)
   ) {
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
