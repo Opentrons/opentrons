@@ -1,6 +1,7 @@
 import { Box } from './Box'
 // import { NewPrimaryBtn, NewSecondaryBtn, TertiaryBtn } from './Btn'
 import { NewPrimaryBtn } from './Buttons/NewPrimaryBtn'
+import { NewSecondaryBtn } from './Buttons/NewSecondaryBtn'
 
 import type { Meta, Story } from '@storybook/react'
 import type * as React from 'react'
@@ -19,14 +20,14 @@ AppPrimary.args = {
   title: 'app primary button title',
 }
 
-// const AppSecondaryTemplate: Story<
-//   React.ComponentProps<typeof NewSecondaryBtn>
-// > = args => <NewSecondaryBtn {...args} />
-// export const AppSecondary = AppSecondaryTemplate.bind({})
-// AppSecondary.args = {
-//   children: 'Confirm and Proceed',
-//   title: 'app secondary button title',
-// }
+const AppSecondaryTemplate: Story<
+  React.ComponentProps<typeof NewSecondaryBtn>
+> = args => <NewSecondaryBtn {...args} />
+export const AppSecondary = AppSecondaryTemplate.bind({})
+AppSecondary.args = {
+  children: 'Confirm and Proceed',
+  title: 'app secondary button title',
+}
 
 // const TertiaryTemplate: Story<
 //   React.ComponentProps<typeof TertiaryBtn>

@@ -39,9 +39,3 @@
   box-shadow: none;
   cursor: default;
 }
-
-@media (height: 600px) and (width: 1024px) {
-  .new_primary_btn {
-    cursor: default;
-  }
-}
