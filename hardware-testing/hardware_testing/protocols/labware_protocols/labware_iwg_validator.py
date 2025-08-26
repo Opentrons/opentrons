@@ -1,16 +1,13 @@
-"""Volume Validator Protocol"""
+"""Volume Validator Protocol."""
 
 from opentrons.protocol_api import (
     ProtocolContext,
     Labware,
     InstrumentContext,
     ParameterContext,
-    LiquidClass,
-    OFF_DECK,
     Well,
 )
-from itertools import cycle
-from typing import List, Dict, Optional, Any, Union, Tuple
+from typing import List, Dict, Optional, Union, Tuple
 from opentrons.types import Point
 from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
 
@@ -104,13 +101,12 @@ def _setup(
     List[float],
     Labware,
     int,
-    str
-    # LiquidClass,
+    str,
 ]:
     global DIAL_PORT, RUN_ID, FILE_NAME
     labware_type = ctx.params.labware_type  # type: ignore[attr-defined]
 
-    # LOAD FRUSTUM LABWARE AND DIAL
+    # LOAD LABWARE AND DIAL
     labware = ctx.load_labware(labware_type, SLOT_LABWARE)
     number_of_trials = ctx.params.number_of_trials  # type: ignore[attr-defined]
     labware.load_empty(labware.wells())
@@ -136,17 +132,6 @@ def _setup(
         liq_racks = liq_tip_racks[:1]
     liq_pipette = ctx.load_instrument(right_mount, "right", tip_racks=liq_racks)
     probe_pipette = ctx.load_instrument(left_mount, "left", tip_racks=[probe_tip_rack])
-
-    # Assign ethanol liquid class behavior
-    # ethanol = ctx.get_liquid_class("ethanol_80")
-    # lm = "liquid-meniscus"
-    # for liquid_rack in liq_racks:
-    #    props = ethanol.get_for(liq_pipette, liquid_rack)
-    #    meniscus_z = -0.5
-    #    props.aspirate.aspirate_position.position_reference = lm  # type: ignore[assignment]
-    #    props.aspirate.aspirate_position.offset.z = meniscus_z
-    #    props.dispense.dispense_position.position_reference = lm  # type: ignore[assignment]
-    #    props.dispense.dispense_position.offset.z = meniscus_z
 
     # Connect dial indicator and create data sheet
 
@@ -192,8 +177,7 @@ def _setup(
         expected_heights,
         dial,
         number_of_trials,
-        labware_type
-        # ethanol,
+        labware_type,
     )
 
 
@@ -296,15 +280,6 @@ def aspirate_dispense_measure(
 
         tip_z_error = _get_tip_z_error(ctx, probe_pipette, dial)
 
-        # liq_pipette.transfer_with_liquid_class(
-        #    ethanol,
-        #    expected_vol / liq_pipette.channels,
-        #    src["A1"],
-        #    labware[well],
-        #    new_tip="never",
-        #    return_tip=False,
-        # )
-
         expected_height = expected_heights[i]
         dispense_loc = labware[well].bottom(z=expected_height + 2.5)
         liq_pipette.transfer(
@@ -351,7 +326,7 @@ def run(ctx: ProtocolContext) -> None:
     ) = _setup(ctx)
 
     wells = [str(w).split(" ")[0] for w in labware.wells()]
-    volumes: dict[str, list[float]] = {}
+    volumes: dict[str, List[float | SimulatedProbeResult]] = {}
     for i, height in enumerate(expected_heights):
         well = wells[i % len(wells)]
         volume = labware["A1"].volume_from_height(height)
@@ -372,7 +347,6 @@ def run(ctx: ProtocolContext) -> None:
         probe_pipette,
         liq_pipette,
         expected_heights,
-        # ethanol,
     )
 
     region_names = ["low", "middle", "high"]
