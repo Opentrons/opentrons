@@ -23,6 +23,8 @@ import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
   FLEX_STACKER_V1_FIXTURE,
   FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
+  FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
+  FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
   getCutoutDisplayName,
   getCutoutFixturesForModuleModel,
   getFixtureDisplayName,
@@ -35,6 +37,8 @@ import {
   THERMOCYCLER_V2_FRONT_FIXTURE,
   THERMOCYCLER_V2_REAR_FIXTURE,
   WASTE_CHUTE_FLEX_STACKER_FIXTURES,
+  WASTE_CHUTE_ONLY_FIXTURES,
+  WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
@@ -137,6 +141,24 @@ export const LocationConflictModal = (
             return {
               ...existingCutoutConfig,
               cutoutFixtureId: requiredFixtureId,
+              opentronsModuleSerialNumber: moduleSerialNumber,
+            }
+          } else if (
+            WASTE_CHUTE_ONLY_FIXTURES.includes(
+              existingCutoutConfig.cutoutFixtureId
+            ) &&
+            replacementCutoutFixtureId === FLEX_STACKER_V1_FIXTURE
+          ) {
+            const replacementCutoutFixtureId =
+              existingCutoutConfig.cutoutFixtureId ===
+              WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE
+                ? FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE
+                : FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE
+            // if current fixture is a waste chute and we are adding a flex stacker, don't remove
+            // the waste chute
+            return {
+              ...existingCutoutConfig,
+              cutoutFixtureId: replacementCutoutFixtureId,
               opentronsModuleSerialNumber: moduleSerialNumber,
             }
           } else if (

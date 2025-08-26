@@ -1660,15 +1660,11 @@ export const getFlexStackerD3Compatibility = (
   const matchWithFixture =
     matchWithAA ?? deckConfigCompatabilityD3?.compatibleCutoutFixtureIds[0]
   if (
-    (deckConfigCompatabilityD3 != null &&
-      matchWithFixture !== undefined &&
-      WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(
-        matchWithFixture as CutoutFixtureIdsWithFakes
-      )) ||
-    (deckConfigCompatabilityD3?.cutoutFixtureId !== undefined &&
-      WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(
-        deckConfigCompatabilityD3.cutoutFixtureId as CutoutFixtureIdsWithFakes
-      ))
+    deckConfigCompatabilityD3 != null &&
+    matchWithFixture !== undefined &&
+    WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(
+      matchWithFixture as CutoutFixtureIdsWithFakes
+    )
   ) {
     if (
       !matchWithAA &&
