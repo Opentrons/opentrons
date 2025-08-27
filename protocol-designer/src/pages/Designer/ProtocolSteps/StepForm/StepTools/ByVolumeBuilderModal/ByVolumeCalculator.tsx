@@ -1,19 +1,16 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { round } from 'lodash'
+import round from 'lodash/round'
 
 import {
-  ALIGN_CENTER,
-  DIRECTION_COLUMN,
-  Flex,
   FLEX_MIN_CONTENT,
   InputField,
   PrimaryButton,
-  SPACING,
 } from '@opentrons/components'
 import { linearInterpolate } from '@opentrons/shared-data'
 
 import { maskToFloat } from '../../../../../../steplist/fieldLevel/processing'
+import styles from './styles.module.css'
 
 import type { ByVolumeType } from './types'
 
@@ -38,13 +35,8 @@ export function ByVolumeCalculator(props: {
     }
   }, [volumeToInterpolate, points])
   return (
-    <Flex
-      gridGap={SPACING.spacing4}
-      flexDirection={DIRECTION_COLUMN}
-      alignSelf={ALIGN_CENTER}
-      width="20rem"
-    >
-      <Flex gridGap={SPACING.spacing4}>
+    <div className={styles.calculator_container}>
+      <div className={styles.calculator_input_container}>
         <InputField
           title={t(`by_volume_builder:calculator.volume_to_calculate`)}
           value={maskToFloat(volumeToInterpolate)}
@@ -63,7 +55,7 @@ export function ByVolumeCalculator(props: {
           readOnly
           units={t(`by_volume_builder:${type}.axes.y.units`)}
         />
-      </Flex>
+      </div>
       <PrimaryButton
         height={FLEX_MIN_CONTENT}
         onClick={() => {
@@ -73,10 +65,9 @@ export function ByVolumeCalculator(props: {
           }
         }}
         disabled={!canInterpolate}
-        width="100%"
       >
         {t('by_volume_builder:calculator.calculate')}
       </PrimaryButton>
-    </Flex>
+    </div>
   )
 }

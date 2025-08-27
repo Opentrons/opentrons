@@ -59,6 +59,7 @@ import { MultiInputField } from './MultiInputField'
 import { ResetSettingsField } from './ResetSettingsField'
 
 import type { Dispatch, SetStateAction } from 'react'
+import type { LiquidHandlingPropertyByVolume } from '@opentrons/shared-data'
 import type { FormData, StepFieldName } from '/protocol-designer/form-types'
 import type { FieldPropsByName, LiquidHandlingTab } from '../../types'
 import type { StepInputFieldProps } from './MultiInputField'
@@ -99,7 +100,8 @@ export const SecondStepsMoveLiquidTools = ({
     invariantContext,
     formData.tipRack as string
   )
-  const byTipValues = getAllLiquidClassDefs()
+  // TODO: replace this with the actual individual byVolume values, separated by aspirate/dispense etc.
+  const stubbedByTipValues = getAllLiquidClassDefs()
     [
       formData.liquidClass !== NONE_LIQUID_CLASS_NAME
         ? formData.liquidClass
@@ -109,7 +111,9 @@ export const SecondStepsMoveLiquidTools = ({
     )
     ?.byTipType.find(({ tiprack }) => tiprack === formData.tipRack)?.aspirate
     .flowRateByVolume
-  const highestY = Math.max(...(byTipValues?.map(point => point[1]) ?? []))
+  const highestY = Math.max(
+    ...(stubbedByTipValues?.map(point => point[1]) ?? [])
+  )
   const maxY = Math.max(pipetteWithTipMaxVol, highestY)
 
   const robotType = useSelector(getRobotType)
@@ -120,7 +124,7 @@ export const SecondStepsMoveLiquidTools = ({
   // TODO: replace this state/setter with propsForFields value/updateValue
   // should remove the need for byTipValues (handled in form change utils)
   const [flowRates, setFlowRates] = useState<LiquidHandlingPropertyByVolume>(
-    byTipValues ?? []
+    stubbedByTipValues ?? []
   )
   // need presaved and deep equality check logic here
   const addFieldNamePrefix = addPrefix(tab)
@@ -324,7 +328,7 @@ export const SecondStepsMoveLiquidTools = ({
           <Tabs tabs={[aspirateTab, dispenseTab]} />
         </Flex>
         <Divider marginY="0" />
-        {enableByVolumeBuilder && byTipValues != null ? (
+        {enableByVolumeBuilder && stubbedByTipValues != null ? (
           <Flex
             paddingX={SPACING.spacing16}
             gridGap={SPACING.spacing4}
@@ -345,7 +349,7 @@ export const SecondStepsMoveLiquidTools = ({
                 }}
                 type={FLOW_RATE}
                 setByVolume={setFlowRates}
-                defaultFlowRates={byTipValues ?? []}
+                defaultFlowRates={stubbedByTipValues ?? []}
                 maxX={pipetteWithTipMaxVol}
                 maxY={maxY}
               />

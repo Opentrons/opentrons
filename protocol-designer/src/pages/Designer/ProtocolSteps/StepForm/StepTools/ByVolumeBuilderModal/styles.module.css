@@ -1,0 +1,29 @@
+.calculator_button {
+  height: 'min-content';
+  width: 100%;
+}
+
+.calculator_container {
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+  grid-gap: var(--spacing-4);
+  width: 20rem;
+}
+
+.calculator_input_container {
+  display: flex;
+  grid-gap: var(--spacing-4);
+}
+
+.modal_container {
+  display: flex;
+  flex-direction: column;
+  grid-gap: var(--spacing-8);
+}
+
+.modal_footer {
+  display: flex;
+  grid-gap: var(--spacing-4);
+  justify-content: flex-end;
+}

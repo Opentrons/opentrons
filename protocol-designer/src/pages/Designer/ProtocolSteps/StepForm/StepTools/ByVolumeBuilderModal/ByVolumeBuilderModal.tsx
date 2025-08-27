@@ -3,20 +3,17 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
 import {
-  DIRECTION_COLUMN,
-  Flex,
   FLEX_MIN_CONTENT,
-  JUSTIFY_FLEX_END,
   Modal,
   PrimaryButton,
   SecondaryButton,
-  SPACING,
 } from '@opentrons/components'
 import { linearInterpolate } from '@opentrons/shared-data'
 
 import { getMainPagePortalEl } from '../../../../../../components/organisms'
 import { ByVolumeBuilder } from './ByVolumeBuilder'
 import { ByVolumeCalculator } from './ByVolumeCalculator'
+import styles from './styles.module.css'
 import { getByVolumeMappedToXY } from './utils'
 
 import type { Dispatch, SetStateAction } from 'react'
@@ -68,7 +65,7 @@ export function ByVolumeBuilderModal(props: {
       closeOnOutsideClick
       width={FLEX_MIN_CONTENT}
     >
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+      <div className={styles.modal_container}>
         <ByVolumeBuilder
           type={type}
           dataPoints={dataPoints}
@@ -81,7 +78,7 @@ export function ByVolumeBuilderModal(props: {
           type={type}
           points={dataPoints.map(p => [p.x, p.y])}
         />
-        <Flex justifyContent={JUSTIFY_FLEX_END} gridGap={SPACING.spacing4}>
+        <div className={styles.modal_footer}>
           <SecondaryButton
             onClick={() => {
               setDataPoints(getByVolumeMappedToXY(defaultFlowRates))
@@ -89,7 +86,6 @@ export function ByVolumeBuilderModal(props: {
           >
             {t(`by_volume_builder:reset`)}
           </SecondaryButton>
-
           <PrimaryButton onClick={handleAddPoint}>
             {t('by_volume_builder:add_point')}
           </PrimaryButton>
@@ -101,8 +97,8 @@ export function ByVolumeBuilderModal(props: {
           >
             {t('shared:save')}
           </PrimaryButton>
-        </Flex>
-      </Flex>
+        </div>
+      </div>
     </Modal>,
     getMainPagePortalEl()
   )

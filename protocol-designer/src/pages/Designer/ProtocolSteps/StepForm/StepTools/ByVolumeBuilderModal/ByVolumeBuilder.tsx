@@ -22,7 +22,7 @@ export function ByVolumeBuilder(props: {
 }): JSX.Element {
   const { type, dataPoints, setDataPoints, maxX, maxY } = props
 
-  const { t } = useTranslation(['by_volume_builder'])
+  const { t } = useTranslation('by_volume_builder')
 
   const handleRelayout = (eventData: any): void => {
     const updatedPoints = [...dataPoints]
@@ -105,13 +105,13 @@ export function ByVolumeBuilder(props: {
         layout={{
           ...BASE_LAYOUT,
           title: {
-            text: t(`by_volume_builder:instructions`),
+            text: t('instructions'),
             xanchor: 'right',
           },
           xaxis: {
             title: {
-              text: t(`by_volume_builder:${type}.axes.x.label`, {
-                units: t(`by_volume_builder:${type}.axes.x.units`),
+              text: t(`${type}.axes.x.label`, {
+                units: t(`${type}.axes.x.units`),
               }),
               editable: false,
             },
@@ -119,8 +119,8 @@ export function ByVolumeBuilder(props: {
           },
           yaxis: {
             title: {
-              text: t(`by_volume_builder:${type}.axes.y.label`, {
-                units: t(`by_volume_builder:${type}.axes.y.units`),
+              text: t(`${type}.axes.y.label`, {
+                units: t(`${type}.axes.y.units`),
               }),
               editable: false,
             },
