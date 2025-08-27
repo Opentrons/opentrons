@@ -15,6 +15,7 @@ export interface ProtocolPipette {
 export interface ProtocolModule {
   hardwareType: 'module'
   moduleModel: ModuleModel
+  comboFixtureId?: CutoutFixtureId | null
   slot: string
   connected: boolean
   hasSlotConflict: boolean

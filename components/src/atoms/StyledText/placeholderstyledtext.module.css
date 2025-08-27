@@ -11,9 +11,9 @@
   }
 
   .body_default_semi_bold {
-    font-size: var(--font-size-h3);
+    font-size: var(--font-size-16);
     font-weight: var(--font-weight-semi-bold);
-    line-height: var(--line-height-20);
+    line-height: var(--line-height-24);
   }
 }
 

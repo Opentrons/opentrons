@@ -7,32 +7,33 @@ import {
   CLOSE_STEP_FORM_WITH_CHANGES,
   CLOSE_UNSAVED_STEP_FORM,
   ConfirmDeleteModal,
-} from '../../../../components/organisms'
+} from '/protocol-designer/components/organisms'
 import {
   getCurrentFormHasUnsavedChanges,
   getCurrentFormIsPresaved,
-} from '../../../../step-forms/selectors'
-import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
+} from '/protocol-designer/step-forms/selectors'
+import { START_TERMINAL_ITEM_ID } from '/protocol-designer/steplist'
 import {
   getHoveredTerminalItemId,
   getIsMultiSelectMode,
   getSelectedTerminalItemId,
   actions as stepsActions,
-} from '../../../../ui/steps'
+} from '/protocol-designer/ui/steps'
 import {
   deselectAllSteps,
   hoverOnStep,
   selectDropdownItem,
   toggleViewSubstep,
-} from '../../../../ui/steps/actions/actions'
-import { StepContainer } from './StepContainer'
+} from '/protocol-designer/ui/steps/actions/actions'
 
-import type { TerminalItemId } from '../../../../steplist'
-import type { ThunkDispatch } from '../../../../types'
+import { ConnectedStepContainer } from './ConnectedStepContainer'
+
+import type { TerminalItemId } from '/protocol-designer/steplist'
+import type { ThunkDispatch } from '/protocol-designer/types'
 import type {
   HoverOnTerminalItemAction,
   SelectTerminalItemAction,
-} from '../../../../ui/steps'
+} from '/protocol-designer/ui/steps'
 
 export interface TerminalItemStepProps {
   id: TerminalItemId
@@ -92,7 +93,7 @@ export function TerminalItemStep(props: TerminalItemStepProps): JSX.Element {
           onCancelClick={cancel}
         />
       )}
-      <StepContainer
+      <ConnectedStepContainer
         {...{
           stepId: `TerminalItem_${id}`,
           iconName: id === START_TERMINAL_ITEM_ID ? 'ot-start' : 'ot-end',

@@ -24,6 +24,8 @@ export interface ModalContentOneColSimpleButtonsProps {
   buttons: ButtonProps[]
   onSelect?: ChangeEventHandler<HTMLInputElement>
   initialSelected?: string
+  subText?: string
+  scroll?: boolean
 }
 
 export function ModalContentOneColSimpleButtons(
@@ -33,16 +35,26 @@ export function ModalContentOneColSimpleButtons(
     props.initialSelected ?? null
   )
   return (
-    <OneColumn>
-      <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing16}>
-        <LegacyStyledText
-          fontSize={TYPOGRAPHY.fontSize28}
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          lineHeight={TYPOGRAPHY.lineHeight36}
+    <OneColumn height="100%">
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gap={SPACING.spacing16}
+        height="100%"
+      >
+        <Flex>
+          <LegacyStyledText
+            fontSize={TYPOGRAPHY.fontSize28}
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            lineHeight={TYPOGRAPHY.lineHeight36}
+          >
+            {props.headline}
+          </LegacyStyledText>
+        </Flex>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gap={SPACING.spacing4}
+          overflowY={props.scroll === true ? 'auto' : null}
         >
-          {props.headline}
-        </LegacyStyledText>
-        <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing4}>
           {props.buttons.map((buttonProps, idx) => (
             <RadioButton
               key={`button${idx}-${buttonProps.value}`}
@@ -56,6 +68,15 @@ export function ModalContentOneColSimpleButtons(
               }}
             />
           ))}
+          {props.subText != null ? (
+            <LegacyStyledText
+              fontSize={TYPOGRAPHY.fontSize22}
+              fontWeight={TYPOGRAPHY.fontWeightRegular}
+              lineHeight={TYPOGRAPHY.lineHeight28}
+            >
+              {props.subText}
+            </LegacyStyledText>
+          ) : null}
         </Flex>
       </Flex>
     </OneColumn>

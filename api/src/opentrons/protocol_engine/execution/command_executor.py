@@ -35,6 +35,7 @@ from .tip_handler import TipHandler
 from .run_control import RunControlHandler
 from .rail_lights import RailLightsHandler
 from .status_bar import StatusBarHandler
+from .task_handler import TaskHandler
 
 
 log = getLogger(__name__)
@@ -85,6 +86,7 @@ class CommandExecutor:
         run_control: RunControlHandler,
         rail_lights: RailLightsHandler,
         status_bar: StatusBarHandler,
+        task_handler: TaskHandler,
         model_utils: Optional[ModelUtils] = None,
         command_note_tracker_provider: Optional[CommandNoteTrackerProvider] = None,
     ) -> None:
@@ -106,6 +108,7 @@ class CommandExecutor:
         self._command_note_tracker_provider = (
             command_note_tracker_provider or _NoteTracker
         )
+        self._task_handler = task_handler
 
     async def execute(self, command_id: str) -> None:
         """Run a given command's execution procedure.
@@ -131,6 +134,7 @@ class CommandExecutor:
             model_utils=self._model_utils,
             status_bar=self._status_bar,
             command_note_adder=note_tracker,
+            task_handler=self._task_handler,
         )
 
         started_at = self._model_utils.get_timestamp()

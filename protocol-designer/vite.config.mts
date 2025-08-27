@@ -50,6 +50,10 @@ export default defineConfig(
           project: 'protocol-designer',
           authToken: process.env.OT_SENTRY_AUTH_TOKEN,
           telemetry: false,
+          reactComponentAnnotation: {
+            enabled: true,
+            ignoredComponents: [], // (kk:08/15/2025) ToDo add later
+          },
           sourcemaps: {
             assets: ['./dist/**'],
             ignore: ['./node_modules/**'],
@@ -88,6 +92,7 @@ export default defineConfig(
           '@opentrons/step-generation': path.resolve(
             '../step-generation/src/index.ts'
           ),
+          '/protocol-designer/': path.resolve('./src/') + '/',
         },
       },
       server: {

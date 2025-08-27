@@ -574,4 +574,10 @@ describe('ProtocolSetup', () => {
     render(`/runs/${RUN_ID}/setup/`)
     expect(mockNavigate).toHaveBeenCalledWith('/protocols')
   })
+
+  it('should show action needed when modules are not calibrated', () => {
+    vi.mocked(useModuleCalibrationStatus).mockReturnValue({ complete: false })
+    render(`/runs/${RUN_ID}/setup/`)
+    expect(screen.getByText('Action needed')).toBeInTheDocument()
+  })
 })

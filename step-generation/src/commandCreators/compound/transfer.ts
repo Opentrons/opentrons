@@ -5,6 +5,7 @@ import {
   getAllLiquidClassDefs,
   getByVolumeValue,
   getFlexNameConversion,
+  getIsTiprack,
   getMmFromBottom,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
   isFlexPipette,
@@ -17,7 +18,10 @@ import {
 } from '@opentrons/shared-data'
 
 import * as errorCreators from '../../errorCreators'
-import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
+import {
+  getNextTiprack,
+  getPipetteWithTipMaxVol,
+} from '../../robotStateSelectors'
 import {
   curryCommandCreator,
   curryWithoutPython,
@@ -35,6 +39,7 @@ import {
 import {
   getCustomLiquidClassProperties,
   getLiquidClassName,
+  getPythonAssignTipRacksString,
 } from '../../utils/liquidClassUtils'
 import {
   airGapInPlace,
@@ -43,6 +48,7 @@ import {
   configureForVolume,
   delay,
   dispenseInPlace,
+  dropTip,
   moveToAddressableArea,
   moveToWell,
   prepareToAspirate,
@@ -153,7 +159,7 @@ export const transfer: CommandCreator<TransferArgs> = (
     touchTipAfterDispenseOffsetMmFromTop,
     touchTipAfterDispenseSpeed,
     volume,
-    stepId,
+    stepNumber,
   } = args
   const {
     pipetteEntities,
@@ -230,6 +236,32 @@ export const transfer: CommandCreator<TransferArgs> = (
     errors.push(errorCreators.labwareDiscarded())
   }
 
+  const trashLikeIds = [
+    ...Object.keys(invariantContext.trashBinEntities),
+    ...Object.keys(invariantContext.wasteChuteEntities),
+  ]
+
+  const fallBackTrashLikeId = trashLikeIds.length > 0 ? trashLikeIds[0] : null
+
+  // tiprack for return tip
+  const dropTipLabware = Object.values(invariantContext.labwareEntities).find(
+    ({ labwareDefURI }) => labwareDefURI === dropTipLocation
+  )
+  const isReturnTip = dropTipLabware != null && getIsTiprack(dropTipLabware.def)
+
+  const hasTip = prevRobotState.tipState.pipettes[pipette]?.hasTip
+
+  if (
+    dropTipLocation == null ||
+    (isReturnTip &&
+      fallBackTrashLikeId == null &&
+      changeTip !== 'never' &&
+      hasTip) ||
+    (!isReturnTip && !isWasteChuteDropLocation && !isTrashBinDropLocation)
+  ) {
+    return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
+  }
+
   if (
     !args.destLabware ||
     (!labwareEntities[destLabware] &&
@@ -239,17 +271,23 @@ export const transfer: CommandCreator<TransferArgs> = (
     errors.push(errorCreators.equipmentDoesNotExist())
   }
 
-  if (
-    !dropTipLocation ||
-    (!isWasteChuteDropLocation && !isTrashBinDropLocation)
-  ) {
-    errors.push(errorCreators.dropTipLocationDoesNotExist())
+  const tiprack = Object.values(labwareEntities).find(
+    ({ labwareDefURI }) => labwareDefURI === tipRack
+  )
+  if (tiprack == null) {
+    errors.push(
+      errorCreators.labwareDoesNotExist({
+        actionName,
+        labware: tipRack,
+      })
+    )
   }
 
-  if (errors.length > 0)
+  if (errors.length > 0) {
     return {
       errors,
     }
+  }
 
   const aspirateAirGapVol = aspirateAirGapVolume || 0
   const dispenseAirGapVol = dispenseAirGapVolume || 0
@@ -314,20 +352,14 @@ export const transfer: CommandCreator<TransferArgs> = (
     pythonName: pythonPipetteName,
   } = pipetteEntities[args.pipette]
 
-  const tiprack = Object.values(labwareEntities).find(
-    ({ labwareDefURI }) => labwareDefURI === tipRack
-  )
-  if (tiprack == null) {
-    errors.push(
-      errorCreators.labwareDoesNotExist({
-        actionName,
-        labware: tipRack,
-      })
-    )
-  }
-
   const { labwareDefURI: tiprackDefUri } = tiprack ?? {}
-
+  const { tipracks } = getNextTiprack(
+    pipette,
+    tipRack,
+    invariantContext,
+    prevRobotState,
+    ...(nozzles != null ? [nozzles] : [])
+  )
   const liquidClassValuesForTip =
     getAllLiquidClassDefs()
       [
@@ -382,7 +414,7 @@ export const transfer: CommandCreator<TransferArgs> = (
       : null
 
   const pythonLiquidClassArgs = [
-    `name=${formatPyStr(`${args.commandCreatorFnName}_step_${stepId}`)}`,
+    `name=${formatPyStr(`${args.commandCreatorFnName}_step_${stepNumber}`)}`,
     ...(liquidClass != null
       ? [`base_liquid_class=${getLiquidClassName(liquidClass, true)}`]
       : []),
@@ -406,9 +438,18 @@ export const transfer: CommandCreator<TransferArgs> = (
       pythonDestWells != null ? `[${pythonDestWells}]` : destTrashPipetteName
     }`,
     `new_tip=${formatPyStr(formatChangeTipArg(changeTip))}`,
-    `trash_location=${trashPipetteName}`,
+    ...(isReturnTip
+      ? [`return_tip=True`]
+      : [`trash_location=${trashPipetteName}`, `keep_last_tip=True`]),
     ...(pipetteSpecs.channels > 1 ? [`group_wells=False`] : []),
-    `keep_last_tip=True`,
+    ...(tipracks.filteredSortedTiprackIds.length > 0
+      ? [
+          getPythonAssignTipRacksString({
+            labwareEntities,
+            tiprackIds: tipracks.filteredSortedTiprackIds,
+          }),
+        ]
+      : []),
     `liquid_class=${customLiquidClass}`,
   ]
   const pythonCommandCreator: CurriedCommandCreator = () => ({
@@ -512,7 +553,10 @@ export const transfer: CommandCreator<TransferArgs> = (
             ? [
                 curryCommandCreator(replaceTip, {
                   pipette,
-                  dropTipLocation,
+                  dropTipLocation:
+                    isReturnTip && fallBackTrashLikeId != null
+                      ? fallBackTrashLikeId
+                      : dropTipLocation,
                   tipRack,
                   ...(nozzles != null ? { nozzles } : {}),
                 }),
@@ -1123,6 +1167,17 @@ export const transfer: CommandCreator<TransferArgs> = (
               }
               break
           }
+          const returnTipCommands: CurriedCommandCreator[] =
+            isReturnTip &&
+            (pairIdx === sourceDestPairs.length - 1 || changeTip === 'always')
+              ? [
+                  curryWithoutPython(dropTip, {
+                    pipette,
+                    dropTipLocation: tipRack,
+                    isReturnTip,
+                  }),
+                ]
+              : []
 
           // if using dispense > air gap, drop or change the tip at the end
           const nextCommands = [
@@ -1140,6 +1195,7 @@ export const transfer: CommandCreator<TransferArgs> = (
             ...mixAfterDispenseCommands,
             ...postDispenseRetractCommands,
             ...advancedDispenseArgsCommands,
+            ...returnTipCommands,
           ]
           // NOTE: side-effecting
           prevSourceWell = sourceWell

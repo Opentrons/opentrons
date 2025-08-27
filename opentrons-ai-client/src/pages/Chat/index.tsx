@@ -7,9 +7,9 @@ import styled from 'styled-components'
 
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 
-import { ChatDisplay } from '/ai-client/molecules/ChatDisplay'
-import { ChatFooter } from '/ai-client/molecules/ChatFooter'
-import { FeedbackModal } from '/ai-client/molecules/FeedbackModal'
+import { ChatDisplay } from '/ai-client/components/molecules/ChatDisplay'
+import { ChatFooter } from '/ai-client/components/molecules/ChatFooter'
+import { FeedbackModal } from '/ai-client/components/molecules/FeedbackModal'
 import {
   chatDataAtom,
   createProtocolChatAtom,

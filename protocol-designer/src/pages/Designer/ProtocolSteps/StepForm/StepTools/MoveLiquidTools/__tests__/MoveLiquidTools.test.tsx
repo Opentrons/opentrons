@@ -3,20 +3,21 @@ import { beforeEach, describe, it, vi } from 'vitest'
 
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
+import { getLiquidEntities } from '/protocol-designer/step-forms/selectors'
+
 import { MoveLiquidTools } from '../'
-import { renderWithProviders } from '../../../../../../../__testing-utils__'
-import { getRobotType } from '../../../../../../../file-data/selectors'
-import { getLiquidEntities } from '../../../../../../../step-forms/selectors'
 import { FirstStepMoveLiquidTools } from '../FirstStepMoveLiquidTools'
 import { LiquidClassesStepTools } from '../LiquidClassesStepTools'
 import { SecondStepsMoveLiquidTools } from '../SecondStepsMoveLiquidTools'
 
 import type { ComponentProps } from 'react'
-import type { FormData } from '../../../../../../../form-types'
+import type { FormData } from '/protocol-designer/form-types'
 
-vi.mock('../../../../../../../feature-flags/selectors')
-vi.mock('../../../../../../../file-data/selectors')
-vi.mock('../../../../../../../step-forms/selectors')
+vi.mock('/protocol-designer/feature-flags/selectors')
+vi.mock('/protocol-designer/file-data/selectors')
+vi.mock('/protocol-designer/step-forms/selectors')
 vi.mock('../FirstStepMoveLiquidTools')
 vi.mock('../SecondStepsMoveLiquidTools')
 vi.mock('../LiquidClassesStepTools')

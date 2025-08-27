@@ -82,6 +82,9 @@ class LegacyInstrumentCoreSimulator(
             protocol_interface.get_hardware().get_instrument_max_height(self._mount)
         )
         self._liquid_presence_detection = False
+        self._last_tip_rack_and_well: Optional[
+            Tuple[LegacyLabwareCore, LegacyWellCore]
+        ] = None
 
     def get_default_speed(self) -> float:
         return self._default_speed
@@ -224,6 +227,7 @@ class LegacyInstrumentCoreSimulator(
             num_channels=self.get_channels(),
             fail_if_full=self._api_version < APIVersion(2, 2),
         )
+        self._last_tip_rack_and_well = tip_rack_core, well_core
 
     def drop_tip(
         self,
@@ -264,6 +268,7 @@ class LegacyInstrumentCoreSimulator(
         self._pipette_dict["has_tip"] = False
         self._pipette_dict["tip_length"] = 0.0
         self._update_volume(0)
+        self._last_tip_rack_and_well = None
 
         if self._api_version < APIVersion(2, 2) and labware_core.is_tip_rack():
             # If this is a tiprack we can try and add the dirty tip back to the tracker
@@ -423,6 +428,11 @@ class LegacyInstrumentCoreSimulator(
     def get_blow_out_flow_rate(self, rate: float = 1.0) -> float:
         return self._pipette_dict["blow_out_flow_rate"] * rate
 
+    def get_tip_origin(
+        self,
+    ) -> Optional[Tuple[LegacyLabwareCore, LegacyWellCore]]:
+        return self._last_tip_rack_and_well
+
     def set_flow_rate(
         self,
         aspirate: Optional[float] = None,
@@ -526,8 +536,7 @@ class LegacyInstrumentCoreSimulator(
         trash_location: Union[types.Location, TrashBin, WasteChute],
         return_tip: bool,
         keep_last_tip: bool,
-        last_tip_location: Optional[Tuple[types.Location, LegacyWellCore]],
-    ) -> Optional[Tuple[types.Location, LegacyWellCore]]:
+    ) -> None:
         """This will never be called because it was added in API 2.23."""
         assert False, "transfer_liquid is not supported in legacy context"
 
@@ -543,8 +552,7 @@ class LegacyInstrumentCoreSimulator(
         trash_location: Union[types.Location, TrashBin, WasteChute],
         return_tip: bool,
         keep_last_tip: bool,
-        last_tip_location: Optional[Tuple[types.Location, LegacyWellCore]],
-    ) -> Optional[Tuple[types.Location, LegacyWellCore]]:
+    ) -> None:
         """This will never be called because it was added in API 2.23."""
         assert False, "distribute_liquid is not supported in legacy context"
 
@@ -560,8 +568,7 @@ class LegacyInstrumentCoreSimulator(
         trash_location: Union[types.Location, TrashBin, WasteChute],
         return_tip: bool,
         keep_last_tip: bool,
-        last_tip_location: Optional[Tuple[types.Location, LegacyWellCore]],
-    ) -> Optional[Tuple[types.Location, LegacyWellCore]]:
+    ) -> None:
         """This will never be called because it was added in API 2.23."""
         assert False, "consolidate_liquid is not supported in legacy context"
 

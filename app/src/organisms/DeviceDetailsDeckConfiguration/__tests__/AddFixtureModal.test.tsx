@@ -89,6 +89,17 @@ describe('Touchscreen AddFixtureModal', () => {
     fireEvent.click(screen.getAllByText('select_options')[1])
     fireEvent.click(screen.getAllByText('add')[0])
   })
+
+  it('should render text and buttons without modules', () => {
+    props = { ...props, addressableAreaId: 'D4' }
+    render(props)
+
+    screen.getByText('add_to')
+    screen.getByText('add_fixture_description')
+    screen.getByText('Fixtures')
+    expect(screen.queryByText('Modules')).not.toBeInTheDocument()
+    expect(screen.getAllByText('select_options').length).toBe(1)
+  })
 })
 
 describe('Desktop AddFixtureModal', () => {

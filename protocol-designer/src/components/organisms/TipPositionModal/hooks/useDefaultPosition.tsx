@@ -1,16 +1,16 @@
 import { useSelector } from 'react-redux'
 
-import { getRobotType } from '../../../../file-data/selectors'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
   getPipetteEntities,
-} from '../../../../step-forms/selectors'
-import { getLiquidClassesValues } from '../../../../steplist/formLevel/handleFormChange/utils'
+} from '/protocol-designer/step-forms/selectors'
+import { getLiquidClassesValues } from '/protocol-designer/steplist/formLevel/handleFormChange/utils'
 
 import type { WellLocation } from '@opentrons/shared-data'
-import type { FormData } from '../../../../form-types'
-import type { MoveLiquidPrefixType } from '../../../../resources/types'
+import type { FormData } from '/protocol-designer/form-types'
+import type { MoveLiquidPrefixType } from '/protocol-designer/resources/types'
 
 export function useDefaultPosition(
   formData: FormData | null,

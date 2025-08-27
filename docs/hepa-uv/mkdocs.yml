@@ -1,11 +1,11 @@
 site_name: hepa-uv
 
 nav:
-  - Home: index.md
+  - HEPA/UV Module Instruction Manual: index.md
   - Safety Information and Regulatory Compliance: compliance.md
-  - Product Specifications: product-specifications.md
-  - HEPA Specifications: hepa-specifications.md
-  - UV Specifications: uv-specifications.md
+  - Product Specifications: product-specs.md
+  - HEPA Specifications: hepa-specs.md
+  - UV Specifications: uv-specs.md
   - Unboxing and Installation: installation.md
   - Hardware Controls: hardware-controls.md
   - Maintenance: maintenance.md

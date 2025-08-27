@@ -11,6 +11,7 @@ import type {
   ConsolidateArgs,
   DistributeArgs,
   InnerMixArgs,
+  LabwareEntities,
   TransferArgs,
 } from '../types'
 
@@ -249,4 +250,15 @@ const getBlowoutPythonLocation = (
   } else {
     return 'trash'
   }
+}
+
+export const getPythonAssignTipRacksString = (args: {
+  labwareEntities: LabwareEntities
+  tiprackIds: string[]
+}): string => {
+  const { labwareEntities, tiprackIds } = args
+  const tiprackPythonNames = tiprackIds.map(
+    id => labwareEntities[id].pythonName
+  )
+  return `tip_racks=[${tiprackPythonNames.join(', ')}]`
 }

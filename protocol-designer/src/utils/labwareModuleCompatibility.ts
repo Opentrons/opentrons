@@ -65,6 +65,7 @@ export const COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE: Record<
     'opentrons_96_flat_bottom_adapter',
     'opentrons_96_pcr_adapter',
     'opentrons_universal_flat_adapter',
+    'opentrons_universal_flat_adapter_type_b',
   ],
   [MAGNETIC_BLOCK_TYPE]: [
     'nest_96_wellplate_100ul_pcr_full_skirt',

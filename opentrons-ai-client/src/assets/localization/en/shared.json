@@ -1,3 +1,6 @@
 {
+  "error_boundary_description": "You need to reload the app. Contact support with the following error message:",
+  "error_boundary_title": "An unknown error has occurred",
+  "reload_app": "Reload app",
   "send": "Send"
 }

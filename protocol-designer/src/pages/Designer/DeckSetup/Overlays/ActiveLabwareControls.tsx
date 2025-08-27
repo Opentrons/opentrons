@@ -12,11 +12,12 @@ import {
 } from '@opentrons/components'
 import { getFullStackFromLabwares } from '@opentrons/step-generation'
 
-import { getIsWellContentsEmpty } from '../../../../components/organisms'
-import { SlotDetailModal } from '../../../../components/organisms/SlotDetailModal'
-import { END_TERMINAL_ITEM_ID } from '../../../../steplist'
-import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
-import * as wellContentsSelectors from '../../../../top-selectors/well-contents'
+import { getIsWellContentsEmpty } from '/protocol-designer/components/organisms'
+import { SlotDetailModal } from '/protocol-designer/components/organisms/SlotDetailModal'
+import { END_TERMINAL_ITEM_ID } from '/protocol-designer/steplist'
+import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
+import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
+
 import { DECK_CONTROLS_STYLE } from '../constants'
 
 import type { Dispatch, SetStateAction } from 'react'

@@ -1,6 +1,7 @@
 import { useAtom } from 'jotai'
 
-import { trackEvent } from '../../analytics/mixpanel'
+import { trackEvent } from '/ai-client/analytics/mixpanel'
+
 import { featureFlagsAtom, mixpanelAtom } from '../atoms'
 
 import type { AnalyticsEvent } from '../types'

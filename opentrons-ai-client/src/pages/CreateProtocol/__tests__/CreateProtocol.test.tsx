@@ -32,7 +32,7 @@ vi.mock('react-router-dom', async importOriginal => {
   }
 })
 
-vi.mock('../../../hooks/useTrackEvent', () => ({
+vi.mock('/ai-client/resources/hooks/useTrackEvent', () => ({
   useTrackEvent: () => mockUseTrackEvent,
 }))
 

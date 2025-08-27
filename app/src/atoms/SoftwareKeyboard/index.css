@@ -7,8 +7,14 @@
   padding: 5px;
   border-radius: 5px;
   background-color: #ececec;
-  font-family: HelveticaNeue-Light, Helvetica Neue Light, Helvetica Neue,
-    Helvetica, Arial, Lucida Grande, sans-serif;
+  font-family:
+    HelveticaNeue-Light,
+    Helvetica Neue Light,
+    Helvetica Neue,
+    Helvetica,
+    Arial,
+    Lucida Grande,
+    sans-serif;
   touch-action: manipulation;
   -webkit-user-select: none;
   -moz-user-select: none;

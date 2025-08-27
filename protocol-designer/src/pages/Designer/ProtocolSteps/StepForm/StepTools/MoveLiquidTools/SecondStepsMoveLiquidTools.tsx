@@ -29,10 +29,11 @@ import {
   CheckboxExpandStepFormField,
   InputStepFormField,
   ToggleStepFormField,
-} from '../../../../../../components/molecules'
-import { ResetSettingsModal } from '../../../../../../components/organisms/ResetSettingsModal'
-import { getEnableByVolumeBuilder } from '../../../../../../feature-flags/selectors'
-import { getRobotType } from '../../../../../../file-data/selectors'
+} from '/protocol-designer/components/molecules'
+import { ResetSettingsModal } from '/protocol-designer/components/organisms/ResetSettingsModal'
+import { getEnableByVolumeBuilder } from '/protocol-designer/feature-flags/selectors'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
+
 import {
   getAdditionalEquipmentEntities,
   getInvariantContext,
@@ -58,8 +59,7 @@ import { MultiInputField } from './MultiInputField'
 import { ResetSettingsField } from './ResetSettingsField'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { LiquidHandlingPropertyByVolume } from '@opentrons/shared-data'
-import type { FormData, StepFieldName } from '../../../../../../form-types'
+import type { FormData, StepFieldName } from '/protocol-designer/form-types'
 import type { FieldPropsByName, LiquidHandlingTab } from '../../types'
 import type { StepInputFieldProps } from './MultiInputField'
 

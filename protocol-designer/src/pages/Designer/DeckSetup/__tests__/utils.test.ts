@@ -21,7 +21,10 @@ import {
   getSVGContainerWidth,
 } from '../utils'
 
-import type { LabwareOnDeck, SavedStepFormState } from '../../../../step-forms'
+import type {
+  LabwareOnDeck,
+  SavedStepFormState,
+} from '/protocol-designer/step-forms'
 
 describe('getModuleModelsBySlot', () => {
   it('renders no modules for ot-2 middle slot', () => {

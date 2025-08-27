@@ -39,6 +39,9 @@ jobs:
   build:
     name: opentrons documentation build
     runs-on: 'ubuntu-24.04'
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - uses: 'actions/checkout@v4'
         with:
@@ -51,7 +54,7 @@ jobs:
           git checkout ${{ github.ref }}
       - uses: 'actions/setup-node@v4'
         with:
-          node-version: '22.11.0'
+          node-version: '22.12.0'
       - uses: 'actions/setup-python@v3'
         with:
           python-version: '3.10'
@@ -67,13 +70,12 @@ jobs:
       - name: 'Build docs'
         run: |
           make -C api docs
-      - name: 'Deploy docs to sandbox'
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.S3_SANDBOX_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SANDBOX_SECRET }}
-          AWS_DEFAULT_REGION: us-east-2
-        uses: './.github/actions/webstack/deploy-to-sandbox'
+
+      - name: 'Configure AWS Credentials for docs bucket'
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          domain: 'docs.opentrons.com'
-          distPath: './api/docs/dist'
-          destPrefix: ${{ env.OT_BRANCH }}
+          role-to-assume: ${{ secrets.DOCS_SANDBOX_ROLE }}
+          aws-region: us-east-2
+      - name: 'Deploy docs to sandbox.docs bucket'
+        run: |
+          aws s3 sync ./api/docs/dist/ s3://sandbox.docs/${{ github.ref_name }}/

@@ -44,7 +44,6 @@ from ..errors.exceptions import (
 )
 from ..resources import (
     fixture_validation,
-    labware_validation,
     deck_configuration_provider,
 )
 from ..types import (
@@ -63,12 +62,10 @@ from ..types import (
     ModuleLocation,
     OnLabwareLocation,
     LabwareLocation,
-    LabwareOffsetVector,
     ModuleOffsetData,
     CurrentWell,
     CurrentPipetteLocation,
     TipGeometry,
-    LabwareMovementOffsetData,
     InStackerHopperLocation,
     OnDeckLabwareLocation,
     AddressableAreaLocation,
@@ -91,8 +88,7 @@ from ..types import (
     labware_location_is_system,
     WellLocationType,
     WellLocationFunction,
-    LabwareParentDefinition,
-    AddressableArea,
+    GripperMoveType,
 )
 from ..types.liquid_level_detection import SimulatedProbeResult, LiquidTrackingType
 from .config import Config
@@ -108,8 +104,11 @@ from .inner_well_math_utils import (
     find_volume_user_defined_volumes,
 )
 from ._well_math import wells_covered_by_pipette_configuration, nozzles_per_well
-from ._labware_origin_math import get_parent_placement_origin_to_lw_origin
-
+from .labware_origin_math.stackup_origin_to_labware_origin import (
+    get_stackup_origin_to_labware_origin,
+    LabwareOriginContext,
+    LabwareStackupAncestorDefinition,
+)
 
 _LOG = getLogger(__name__)
 SLOT_WIDTH = 128
@@ -123,13 +122,6 @@ class _TipDropSection(enum.Enum):
 
     LEFT = "left"
     RIGHT = "right"
-
-
-class _GripperMoveType(enum.Enum):
-    """Types of gripper movement."""
-
-    PICK_UP_LABWARE = enum.auto()
-    DROP_LABWARE = enum.auto()
 
 
 @dataclass
@@ -382,145 +374,114 @@ class GeometryView:
         """
         location = self._labware.get(labware_id).location
         definition = self._labware.get_definition(labware_id)
+        aa_name = self._get_underlying_addressable_area_name(location)
+        # TODO(jh, 08-18-25): Labware locations return the underlying slot as the "on location" for the fixed trash,
+        #  but the underlying slot's name does not exist in addressable area state. Getting the addressable area from data is
+        #  a workaround. Investigate further.
+        addressable_area = self._addressable_areas._get_addressable_area_from_deck_data(
+            aa_name, do_compatibility_check=False
+        )
+        stackup_lw_defs_locs = self._get_stackup_lw_info_top_to_bottom(
+            labware_definition=definition, location=location
+        )
+        underlying_ancestor_def = self._get_stackup_underlying_ancestor_definition(
+            location
+        )
+        module_parent_to_child_offset = self._get_stackup_module_parent_to_child_offset(
+            location
+        )
 
-        slot_front_left = self._get_labware_ancestor_position(labware_id)
-        stackup_origin_to_lw_origin = self._get_stackup_placement_origin_to_lw_origin(
-            location=location, definition=definition, is_topmost_labware=True
+        slot_front_left = self._addressable_areas.get_addressable_area_position(aa_name)
+        stackup_origin_to_lw_origin = get_stackup_origin_to_labware_origin(
+            context=LabwareOriginContext.PIPETTING,
+            stackup_lw_info_top_to_bottom=stackup_lw_defs_locs,
+            underlying_ancestor_definition=underlying_ancestor_def,
+            module_parent_to_child_offset=module_parent_to_child_offset,
+            deck_definition=self._addressable_areas.deck_definition,
+            slot_name=addressable_area.base_slot,
         )
         module_cal_offset = self._get_calibrated_module_offset(location)
 
         return slot_front_left + stackup_origin_to_lw_origin + module_cal_offset
 
-    def _get_labware_ancestor_position(self, labware_id: str) -> Point:
-        """Get the position of the labware's underlying ancestor."""
-        slot_name = self._get_underlying_addressable_area_name(
-            self._labware.get(labware_id).location
-        )
-        parent_pos = self._addressable_areas.get_addressable_area_position(slot_name)
+    def _get_stackup_lw_info_top_to_bottom(
+        self, labware_definition: LabwareDefinition, location: LabwareLocation
+    ) -> list[tuple[LabwareDefinition, LabwareLocation]]:
+        """Returns info about each labware in the stackup.
 
-        return parent_pos
+        The list is ordered from the top labware to the bottom-most labware.
+        The first entry will always be the definition and location of the given labware itself.
+        """
+        definitions_locations_top_to_bottom: list[
+            tuple[LabwareDefinition, LabwareLocation]
+        ] = []
+        current_location = location
+        current_definition = labware_definition
 
-    def _get_stackup_placement_origin_to_lw_origin(
-        self,
-        location: LabwareLocation,
-        definition: LabwareDefinition,
-        is_topmost_labware: bool,
-    ) -> Point:
-        """Get the offset vector from the lowest entity in a stackup to the labware."""
-        if isinstance(
-            location, (AddressableAreaLocation, DeckSlotLocation, ModuleLocation)
-        ):
-            return self._get_parent_placement_origin_to_lw_origin(
-                labware_location=location,
-                labware_definition=definition,
-                is_topmost_labware=is_topmost_labware,
+        while True:
+            definitions_locations_top_to_bottom.append(
+                (current_definition, current_location)
             )
-        elif isinstance(location, OnLabwareLocation):
-            parent_id = location.labwareId
-            parent_location = self._labware.get(parent_id).location
-            parent_definition = self._labware.get_definition(parent_id)
 
-            parent_placement_origin_to_lw_origin = (
-                self._get_parent_placement_origin_to_lw_origin(
-                    labware_location=location,
-                    labware_definition=definition,
-                    is_topmost_labware=is_topmost_labware,
+            if isinstance(current_location, OnLabwareLocation):
+                current_labware_id = current_location.labwareId
+                current_location = self._labware.get(current_labware_id).location
+                current_definition = self._labware.get_definition(current_labware_id)
+            else:
+                break
+
+        return definitions_locations_top_to_bottom
+
+    def _get_stackup_module_parent_to_child_offset(
+        self, top_most_lw_location: LabwareLocation
+    ) -> Union[Point, None]:
+        """Traverse the stackup to find the first parent-to-child module offset, if any."""
+        current_location = top_most_lw_location
+
+        while True:
+            if isinstance(current_location, ModuleLocation):
+                module_parent_to_child_offset = (
+                    self._modules.get_nominal_offset_to_child_from_addressable_area(
+                        module_id=current_location.moduleId,
+                    )
                 )
-            )
+                return module_parent_to_child_offset
 
-            return (
-                parent_placement_origin_to_lw_origin
-                + self._get_stackup_placement_origin_to_lw_origin(
-                    location=parent_location,
-                    definition=parent_definition,
-                    is_topmost_labware=False,
-                )
-            )
-        else:
-            raise errors.LabwareNotOnDeckError(
-                "Cannot access labware since it is not on the deck. "
-                "Either it has been loaded off-deck or its been moved off-deck."
-            )
+            if isinstance(current_location, OnLabwareLocation):
+                current_labware_id = current_location.labwareId
+                current_labware = self._labware.get(current_labware_id)
+                current_location = current_labware.location
+            else:
+                break
 
-    def _get_parent_placement_origin_to_lw_origin(
-        self,
-        labware_location: LabwareLocation,
-        labware_definition: LabwareDefinition,
-        is_topmost_labware: bool,
-    ) -> Point:
-        parent_deck_item = self._get_parent_definition(labware_location)
+        return None
 
-        if isinstance(labware_location, ModuleLocation):
-            module_parent_to_child_offset = (
-                self._modules.get_nominal_offset_to_child_from_addressable_area(
-                    module_id=labware_location.moduleId,
-                )
-            )
-            return get_parent_placement_origin_to_lw_origin(
-                child_labware=labware_definition,
-                parent_deck_item=parent_deck_item,  # type: ignore[arg-type]
-                module_parent_to_child_offset=module_parent_to_child_offset,
-                deck_definition=self._addressable_areas.deck_definition,
-                is_topmost_labware=is_topmost_labware,
-                labware_location=labware_location,
-            )
-        elif isinstance(labware_location, OnLabwareLocation):
-            return get_parent_placement_origin_to_lw_origin(
-                child_labware=labware_definition,
-                parent_deck_item=parent_deck_item,  # type: ignore[arg-type]
-                module_parent_to_child_offset=None,
-                deck_definition=self._addressable_areas.deck_definition,
-                is_topmost_labware=is_topmost_labware,
-                labware_location=labware_location,
-            )
-        elif isinstance(labware_location, (DeckSlotLocation, AddressableAreaLocation)):
-            return get_parent_placement_origin_to_lw_origin(
-                child_labware=labware_definition,
-                parent_deck_item=parent_deck_item,  # type: ignore[arg-type]
-                module_parent_to_child_offset=None,
-                deck_definition=self._addressable_areas.deck_definition,
-                is_topmost_labware=is_topmost_labware,
-                labware_location=labware_location,
-            )
-        else:
-            raise ValueError(f"Invalid labware location: {labware_location}")
+    def _get_stackup_underlying_ancestor_definition(
+        self, top_most_lw_location: LabwareLocation
+    ) -> LabwareStackupAncestorDefinition:
+        """Traverse the stackup to find the first non-labware definition."""
+        current_location = top_most_lw_location
 
-    def _get_parent_definition(
-        self, location: LabwareLocation
-    ) -> LabwareParentDefinition:
-        """Get the parent's definition given the labware's location."""
-        if isinstance(location, DeckSlotLocation):
-            addressable_area_name = location.slotName.id
-            return self._addressable_areas.get_slot_definition(addressable_area_name)
-
-        elif isinstance(location, AddressableAreaLocation):
-            addressable_area_name = location.addressableAreaName
-            return self._addressable_areas.get_addressable_area(addressable_area_name)
-
-        elif isinstance(location, ModuleLocation):
-            module_id = location.moduleId
-            return self._modules.get_definition(module_id)
-
-        elif isinstance(location, OnLabwareLocation):
-            below_labware_id = location.labwareId
-            return self._labware.get_definition(below_labware_id)
-
-        elif location == OFF_DECK_LOCATION or location == SYSTEM_LOCATION:
-            raise errors.LabwareNotOnDeckError(
-                f"Labware location {location} does not have a slot associated with it"
-                f" since it is no longer on the deck."
-            )
-
-        elif isinstance(location, InStackerHopperLocation):
-            raise errors.LabwareNotOnDeckError(
-                "Labware does not have a slot or module associated with it"
-                " since it is no longer on the deck."
-            )
-
-        else:
-            raise errors.InvalidLabwarePositionError(
-                f"Cannot get ancestor from location {location}"
-            )
+        while True:
+            if isinstance(current_location, OnLabwareLocation):
+                current_labware_id = current_location.labwareId
+                current_labware = self._labware.get(current_labware_id)
+                current_location = current_labware.location
+            else:
+                if isinstance(current_location, ModuleLocation):
+                    return self._modules.get_definition(current_location.moduleId)
+                elif isinstance(current_location, AddressableAreaLocation):
+                    return self._addressable_areas.get_addressable_area(
+                        current_location.addressableAreaName
+                    )
+                elif isinstance(current_location, DeckSlotLocation):
+                    return self._addressable_areas.get_slot_definition(
+                        current_location.slotName.id
+                    )
+                else:
+                    raise errors.InvalidLabwarePositionError(
+                        f"Cannot get ancestor slot of location {current_location}"
+                    )
 
     def _get_underlying_addressable_area_name(self, location: LabwareLocation) -> str:
         if isinstance(location, DeckSlotLocation):
@@ -1030,6 +991,8 @@ class GeometryView:
         location: Union[
             DeckSlotLocation, ModuleLocation, OnLabwareLocation, AddressableAreaLocation
         ],
+        move_type: GripperMoveType,
+        user_additional_offset: Point | None,
     ) -> Point:
         """Get the grip point of the labware as placed on the given location.
 
@@ -1041,44 +1004,71 @@ class GeometryView:
         It is calculated as the xy center of the slot with z as the point indicated by
         z-position of labware bottom + grip height from labware bottom.
         """
-        grip_z_from_lw_origin = self._labware.get_grip_z(labware_definition)
         aa_name = self._get_underlying_addressable_area_name(location)
-        parent_to_lw_offset = self._get_stackup_placement_origin_to_lw_origin(
-            location=location,
-            definition=labware_definition,
-            is_topmost_labware=True,  # We aren't concerned with entities above the gripped labware.
-        )
         addressable_area = self._addressable_areas.get_addressable_area(aa_name)
-        lw_origin_to_parent = self._get_lw_origin_to_parent(
-            labware_definition=labware_definition, addressable_area=addressable_area
+        slot_front_left = self._addressable_areas.get_addressable_area_position(aa_name)
+
+        stackup_defs_locs = self._get_stackup_lw_info_top_to_bottom(
+            labware_definition=labware_definition, location=location
+        )
+        module_parent_to_child_offset = self._get_stackup_module_parent_to_child_offset(
+            location
+        )
+        underlying_ancestor_def = self._get_stackup_underlying_ancestor_definition(
+            location
+        )
+        context_type = (
+            LabwareOriginContext.GRIPPER_PICKING_UP
+            if move_type == GripperMoveType.PICK_UP_LABWARE
+            else LabwareOriginContext.GRIPPER_DROPPING
+        )
+
+        stackup_placement_origin_to_lw_origin = get_stackup_origin_to_labware_origin(
+            context=context_type,
+            module_parent_to_child_offset=module_parent_to_child_offset,
+            underlying_ancestor_definition=underlying_ancestor_def,
+            stackup_lw_info_top_to_bottom=stackup_defs_locs,
+            slot_name=addressable_area.base_slot,
+            deck_definition=self._addressable_areas.deck_definition,
         )
         mod_cal_offset = self._get_calibrated_module_offset(location)
-        location_center = self._addressable_areas.get_addressable_area_center(aa_name)
 
-        return (
-            location_center
-            + parent_to_lw_offset
-            + lw_origin_to_parent
-            + mod_cal_offset
-            + Point(0, 0, grip_z_from_lw_origin)
+        lw_origin_to_lw_center = self._get_labware_center(labware_definition)
+        grip_z_from_lw_origin = self._labware.get_grip_z(labware_definition)
+        lw_origin_to_lw_grip_center = Point(
+            x=lw_origin_to_lw_center.x,
+            y=lw_origin_to_lw_center.y,
+            z=grip_z_from_lw_origin,
         )
 
-    def _get_lw_origin_to_parent(
-        self, labware_definition: LabwareDefinition, addressable_area: AddressableArea
-    ) -> Point:
+        user_additional_offset = user_additional_offset or Point()
+
+        return (
+            slot_front_left
+            + stackup_placement_origin_to_lw_origin
+            + lw_origin_to_lw_grip_center
+            + mod_cal_offset
+            + user_additional_offset
+        )
+
+    def _get_labware_center(self, labware_definition: LabwareDefinition) -> Point:
+        """Get the x,y,z center of the labware."""
         if isinstance(labware_definition, LabwareDefinition2):
-            return Point(0, 0, 0)
+            dimensions = labware_definition.dimensions
+            x = dimensions.xDimension / 2
+            y = dimensions.yDimension / 2
+            z = dimensions.zDimension / 2
+
+            return Point(x, y, z)
         else:
-            bb_y = addressable_area.bounding_box.y
-            bb_z = addressable_area.bounding_box.z
-            return (
-                Point(
-                    x=0,
-                    y=bb_y,
-                    z=bb_z,
-                )
-                * -1
-            )
+            front_right_top = labware_definition.extents.total.frontRightTop
+            back_left_bottom = labware_definition.extents.total.backLeftBottom
+
+            x = (front_right_top.x - back_left_bottom.x) / 2
+            y = (front_right_top.y - back_left_bottom.y) / 2
+            z = (front_right_top.z - back_left_bottom.z) / 2
+
+            return Point(x, y, z)
 
     def get_extra_waypoints(
         self,
@@ -1096,10 +1086,11 @@ class GeometryView:
             if self._modules.should_dodge_thermocycler(
                 from_slot=from_slot, to_slot=to_slot
             ):
-
                 middle_slot_fixture = (
                     self._addressable_areas.get_fixture_by_deck_slot_name(
-                        DeckSlotName.SLOT_C2
+                        DeckSlotName.SLOT_C2.to_equivalent_for_robot_type(
+                            self._config.robot_type
+                        )
                     )
                 )
                 if middle_slot_fixture is None:
@@ -1120,7 +1111,9 @@ class GeometryView:
                             "providesAddressableAreas"
                         ][
                             deck_configuration_provider.get_cutout_id_by_deck_slot_name(
-                                DeckSlotName.SLOT_C2
+                                DeckSlotName.SLOT_C2.to_equivalent_for_robot_type(
+                                    self._config.robot_type
+                                )
                             )
                         ][
                             0
@@ -1361,41 +1354,6 @@ class GeometryView:
                     x_well_offset = 0
         return x_well_offset
 
-    def get_final_labware_movement_offset_vectors(
-        self,
-        from_location: OnDeckLabwareLocation,
-        to_location: OnDeckLabwareLocation,
-        additional_pick_up_offset: Point,
-        additional_drop_offset: Point,
-        current_labware: LabwareDefinition,
-    ) -> LabwareMovementOffsetData:
-        """Calculate the final labware offset vector to use in labware movement."""
-        pick_up_offset = (
-            self.get_total_nominal_gripper_offset_for_move_type(
-                location=from_location,
-                move_type=_GripperMoveType.PICK_UP_LABWARE,
-                current_labware=current_labware,
-            )
-            + additional_pick_up_offset
-        )
-        drop_offset = (
-            self.get_total_nominal_gripper_offset_for_move_type(
-                location=to_location,
-                move_type=_GripperMoveType.DROP_LABWARE,
-                current_labware=current_labware,
-            )
-            + additional_drop_offset
-        )
-
-        return LabwareMovementOffsetData(
-            pickUpOffset=LabwareOffsetVector(
-                x=pick_up_offset.x, y=pick_up_offset.y, z=pick_up_offset.z
-            ),
-            dropOffset=LabwareOffsetVector(
-                x=drop_offset.x, y=drop_offset.y, z=drop_offset.z
-            ),
-        )
-
     @staticmethod
     def ensure_valid_gripper_location(
         location: LabwareLocation,
@@ -1416,130 +1374,6 @@ class GeometryView:
                 "Off-deck labware movements are not supported using the gripper."
             )
         return location
-
-    def get_total_nominal_gripper_offset_for_move_type(
-        self,
-        location: OnDeckLabwareLocation,
-        move_type: _GripperMoveType,
-        current_labware: LabwareDefinition,
-    ) -> Point:
-        """Get the total of the offsets to be used to pick up labware in its current location."""
-        if move_type == _GripperMoveType.PICK_UP_LABWARE:
-            if isinstance(
-                location, (ModuleLocation, DeckSlotLocation, AddressableAreaLocation)
-            ):
-                return Point.from_xyz_attrs(
-                    self._nominal_gripper_offsets_for_location(location).pickUpOffset
-                )
-            else:
-                # If it's a labware on a labware (most likely an adapter),
-                # we calculate the offset as sum of offsets for the direct parent labware
-                # and the underlying non-labware parent location.
-                direct_parent_offset = self._nominal_gripper_offsets_for_location(
-                    location
-                )
-                ancestor = self._labware.get_parent_location(location.labwareId)
-                extra_offset = Point(x=0, y=0, z=0)
-                if (
-                    isinstance(ancestor, ModuleLocation)
-                    # todo(mm, 2025-06-20): Avoid this private attribute access.
-                    and self._modules._state.requested_model_by_id[ancestor.moduleId]
-                    == ModuleModel.THERMOCYCLER_MODULE_V2
-                    and labware_validation.validate_definition_is_lid(current_labware)
-                ):
-                    if "lidOffsets" in current_labware.gripperOffsets.keys():
-                        extra_offset = Point(
-                            x=current_labware.gripperOffsets[
-                                "lidOffsets"
-                            ].pickUpOffset.x,
-                            y=current_labware.gripperOffsets[
-                                "lidOffsets"
-                            ].pickUpOffset.y,
-                            z=current_labware.gripperOffsets[
-                                "lidOffsets"
-                            ].pickUpOffset.z,
-                        )
-                    else:
-                        raise errors.LabwareOffsetDoesNotExistError(
-                            f"Labware Definition {current_labware.parameters.loadName} does not contain required field 'lidOffsets' of 'gripperOffsets'."
-                        )
-
-                assert isinstance(
-                    ancestor,
-                    (
-                        DeckSlotLocation,
-                        ModuleLocation,
-                        OnLabwareLocation,
-                        AddressableAreaLocation,
-                    ),
-                ), "No gripper offsets for off-deck labware"
-                return (
-                    Point.from_xyz_attrs(direct_parent_offset.pickUpOffset)
-                    + Point.from_xyz_attrs(
-                        self._nominal_gripper_offsets_for_location(
-                            location=ancestor
-                        ).pickUpOffset
-                    )
-                    + extra_offset
-                )
-        else:
-            if isinstance(
-                location, (ModuleLocation, DeckSlotLocation, AddressableAreaLocation)
-            ):
-                return Point.from_xyz_attrs(
-                    self._nominal_gripper_offsets_for_location(location).dropOffset
-                )
-            else:
-                # If it's a labware on a labware (most likely an adapter),
-                # we calculate the offset as sum of offsets for the direct parent labware
-                # and the underlying non-labware parent location.
-                direct_parent_offset = self._nominal_gripper_offsets_for_location(
-                    location
-                )
-                ancestor = self._labware.get_parent_location(location.labwareId)
-                extra_offset = Point(x=0, y=0, z=0)
-                if (
-                    isinstance(ancestor, ModuleLocation)
-                    # todo(mm, 2024-11-06): Do not access private module state; only use public ModuleView methods.
-                    and self._modules._state.requested_model_by_id[ancestor.moduleId]
-                    == ModuleModel.THERMOCYCLER_MODULE_V2
-                    and labware_validation.validate_definition_is_lid(current_labware)
-                ):
-                    if "lidOffsets" in current_labware.gripperOffsets.keys():
-                        extra_offset = Point(
-                            x=current_labware.gripperOffsets[
-                                "lidOffsets"
-                            ].pickUpOffset.x,
-                            y=current_labware.gripperOffsets[
-                                "lidOffsets"
-                            ].pickUpOffset.y,
-                            z=current_labware.gripperOffsets[
-                                "lidOffsets"
-                            ].pickUpOffset.z,
-                        )
-                    else:
-                        raise errors.LabwareOffsetDoesNotExistError(
-                            f"Labware Definition {current_labware.parameters.loadName} does not contain required field 'lidOffsets' of 'gripperOffsets'."
-                        )
-
-                assert isinstance(
-                    ancestor,
-                    (
-                        DeckSlotLocation,
-                        ModuleLocation,
-                        OnLabwareLocation,
-                        AddressableAreaLocation,
-                    ),
-                ), "No gripper offsets for off-deck labware"
-                return (
-                    Point.from_xyz_attrs(direct_parent_offset.dropOffset)
-                    + Point.from_xyz_attrs(
-                        self._nominal_gripper_offsets_for_location(
-                            location=ancestor
-                        ).dropOffset
-                    )
-                    + extra_offset
-                )
 
     # todo(mm, 2024-11-05): This may be incorrect because it does not take the following
     # offsets into account, which *are* taken into account for the actual gripper movement:
@@ -1591,64 +1425,6 @@ class GeometryView:
                 raise LabwareMovementNotAllowedError(
                     f"Cannot move labware '{labware_definition.parameters.loadName}' when {int(tip.volume)} µL tips are attached."
                 )
-
-    def _nominal_gripper_offsets_for_location(
-        self, location: OnDeckLabwareLocation
-    ) -> LabwareMovementOffsetData:
-        """Provide the default gripper offset data for the given location type."""
-        if isinstance(location, (DeckSlotLocation, AddressableAreaLocation)):
-            # TODO we might need a separate type of gripper offset for addressable areas but that also might just
-            #   be covered by the drop labware offset/location
-            offsets = self._labware.get_deck_default_gripper_offsets()
-        elif isinstance(location, ModuleLocation):
-            offsets = self._modules.get_default_gripper_offsets(location.moduleId)
-        else:
-            # Labware is on a labware/adapter
-            offsets = self._labware_gripper_offsets(location.labwareId)
-        return offsets or LabwareMovementOffsetData(
-            pickUpOffset=LabwareOffsetVector(x=0, y=0, z=0),
-            dropOffset=LabwareOffsetVector(x=0, y=0, z=0),
-        )
-
-    def _labware_gripper_offsets(
-        self, labware_id: str
-    ) -> Optional[LabwareMovementOffsetData]:
-        """Provide the most appropriate gripper offset data for the specified labware.
-
-        We check the types of gripper offsets available for the labware ("default" or slot-based)
-        and return the most appropriate one for the overall location of the labware.
-        Currently, only module adapters (specifically, the H/S universal flat adapter)
-        have non-default offsets that are specific to location of the module on deck,
-        so, this code only checks for the presence of those known offsets.
-        """
-        parent_location = self._labware.get_parent_location(labware_id)
-        assert isinstance(
-            parent_location,
-            (
-                DeckSlotLocation,
-                ModuleLocation,
-                AddressableAreaLocation,
-                OnLabwareLocation,
-            ),
-        ), "No gripper offsets for off-deck labware"
-
-        if isinstance(parent_location, DeckSlotLocation):
-            slot_name = parent_location.slotName
-        elif isinstance(parent_location, AddressableAreaLocation):
-            slot_name = self._addressable_areas.get_addressable_area_base_slot(
-                parent_location.addressableAreaName
-            )
-        else:
-            module_loc = self._modules.get_location(parent_location.moduleId)
-            slot_name = module_loc.slotName
-
-        slot_based_offset = self._labware.get_child_gripper_offsets(
-            labware_id=labware_id, slot_name=slot_name.to_ot3_equivalent()
-        )
-
-        return slot_based_offset or self._labware.get_child_gripper_offsets(
-            labware_id=labware_id, slot_name=None
-        )
 
     def get_location_sequence(self, labware_id: str) -> LabwareLocationSequence:
         """Provide the LocationSequence specifying the current position of the labware.
@@ -2357,3 +2133,48 @@ class GeometryView:
                 return pending_labware[labware_id]
             except KeyError as ke:
                 raise lnle from ke
+
+    def raise_if_labware_inaccessible_by_pipette(  # noqa: C901
+        self, labware_id: str
+    ) -> None:
+        """Raise an error if the specified location cannot be reached via a pipette."""
+        labware = self._labware.get(labware_id)
+        labware_location = labware.location
+        if isinstance(labware_location, OnLabwareLocation):
+            return self.raise_if_labware_inaccessible_by_pipette(
+                labware_location.labwareId
+            )
+        elif labware.lid_id is not None:
+            raise errors.LocationNotAccessibleByPipetteError(
+                f"Cannot move pipette to {labware.loadName} "
+                "because labware is currently covered by a lid."
+            )
+        elif isinstance(labware_location, AddressableAreaLocation):
+            if fixture_validation.is_staging_slot(labware_location.addressableAreaName):
+                raise errors.LocationNotAccessibleByPipetteError(
+                    f"Cannot move pipette to {labware.loadName},"
+                    f" labware is on staging slot {labware_location.addressableAreaName}"
+                )
+            elif fixture_validation.is_stacker_shuttle(
+                labware_location.addressableAreaName
+            ):
+                raise errors.LocationNotAccessibleByPipetteError(
+                    f"Cannot move pipette to {labware.loadName} because it is on a stacker shuttle"
+                )
+        elif (
+            labware_location == OFF_DECK_LOCATION or labware_location == SYSTEM_LOCATION
+        ):
+            raise errors.LocationNotAccessibleByPipetteError(
+                f"Cannot move pipette to {labware.loadName}, labware is off-deck."
+            )
+        elif isinstance(labware_location, ModuleLocation):
+            module = self._modules.get(labware_location.moduleId)
+            if ModuleModel.is_flex_stacker(module.model):
+                raise errors.LocationNotAccessibleByPipetteError(
+                    f"Cannot move pipette to {labware.loadName}, labware is on a stacker shuttle"
+                )
+
+        elif isinstance(labware_location, InStackerHopperLocation):
+            raise errors.LocationNotAccessibleByPipetteError(
+                f"Cannot move pipette to {labware.loadName}, labware is in a stacker hopper"
+            )

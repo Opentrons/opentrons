@@ -41,6 +41,7 @@ describe('getInitialSummaryState', () => {
       volume: 25,
       path: 'single',
       liquidClassValuesInitialized: false,
+      changeTip: 'always',
     } as any,
     deckConfig: [
       {
@@ -297,6 +298,7 @@ describe('getInitialSummaryState', () => {
       state: {
         ...props.state,
         destinationWells: destWells,
+        changeTip: 'once',
       },
     })
     expect(initialSummaryState).toEqual({

@@ -229,6 +229,7 @@ export function getRelevantFailedLabwareCmdFrom({
     case ERROR_KINDS.STACKER_HOPPER_EMPTY:
     case ERROR_KINDS.STACKER_SHUTTLE_EMPTY:
     case ERROR_KINDS.STACKER_SHUTTLE_OCCUPIED:
+    case ERROR_KINDS.STACKER_HOPPER_OR_SHUTTLE_EMPTY:
       return failedCommandByRunRecord as FlexStackerRetrieveRunTimeCommand
     default:
       console.error(
@@ -535,6 +536,7 @@ export function useRelevantFailedLwLocations({
                 (m: LoadedModule) =>
                   m.id === failedCommandByRunRecord?.params.moduleId
               )?.location ?? 'offDeck',
+            includeSlotText: false,
           }),
           newLoc: {
             moduleId: failedCommandByRunRecord?.params.moduleId,

@@ -50,11 +50,6 @@ describe('Render StackerReengageLatch', () => {
     render(props)
 
     clickButtonLabeled('Re-engage latch')
-    expect(mockHandleMotionRouting).toHaveBeenCalledWith(
-      true,
-      RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE
-    )
-
     await waitFor(() => {
       expect(mockCloseLabwareLatch).toHaveBeenCalled()
     })

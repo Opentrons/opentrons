@@ -33,9 +33,9 @@ import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 import { LEFT_SLOTS } from './constants'
 
 import type { CreateCommand, DeckConfiguration } from '@opentrons/shared-data'
-import type { ModuleSetupWizardStepProps } from './types'
+import type { ModuleSetupWizardRequiresPipetteStepProps } from './types'
 
-interface PlaceAdapterProps extends ModuleSetupWizardStepProps {
+interface PlaceAdapterProps extends ModuleSetupWizardRequiresPipetteStepProps {
   deckConfig: DeckConfiguration
   setCreatedAdapterId: (adapterId: string) => void
 }

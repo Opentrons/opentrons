@@ -83,7 +83,7 @@ export interface QuickTransferSummaryState {
   delayAspirate?: {
     delayDuration: number
   }
-  touchTipAspirate?: number
+  touchTipAspirate?: number // specifies the tip position from the top of the well
   touchTipAspirateSpeed?: number
   airGapAspirate?: number
   tipPositionDispense: number
@@ -104,7 +104,7 @@ export interface QuickTransferSummaryState {
   delayDispense?: {
     delayDuration: number
   }
-  touchTipDispense?: number
+  touchTipDispense?: number // specifies the tip position from the top of the well
   touchTipDispenseSpeed?: number
   disposalVolume?: number
   blowOutDispense?: {

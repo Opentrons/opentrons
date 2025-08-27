@@ -33,7 +33,7 @@
     "targetHeaterShakerTemperature": "Valid range between 20 and 95˚C",
     "targetSpeed": "Valid range between 200 and 3000 rpm",
     "targetTemperature": "Valid range between 4 and 95˚C",
-    "volume": "Valid range between 0.1 and {{max}}"
+    "volume": "Recommended between 0.1 and {{max}}"
   },
   "change_tips": "Change tips",
   "column": "Column",

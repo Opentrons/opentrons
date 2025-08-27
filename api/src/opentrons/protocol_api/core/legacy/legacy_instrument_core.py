@@ -67,6 +67,9 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
             api_level=self._api_version,
         )
         self._liquid_presence_detection = False
+        self._last_tip_rack_and_well: Optional[
+            Tuple[LegacyLabwareCore, LegacyWellCore]
+        ] = None
 
     def get_default_speed(self) -> float:
         """Gets the speed at which the robot's gantry moves."""
@@ -252,6 +255,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
             num_channels=self.get_channels(),
             fail_if_full=self._api_version < APIVersion(2, 2),
         )
+        self._last_tip_rack_and_well = tip_rack_core, well_core
 
     def drop_tip(
         self,
@@ -298,6 +302,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
         hw = self._protocol_interface.get_hardware()
         self.move_to(location=location)
         hw.drop_tip(self._mount, home_after=True if home_after is None else home_after)
+        self._last_tip_rack_and_well = None
 
         if self._api_version < APIVersion(2, 2) and labware_core.is_tip_rack():
             # If this is a tiprack we can try and add the dirty tip back to the tracker
@@ -532,6 +537,11 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
     def get_speed(self) -> PlungerSpeeds:
         return self._speeds
 
+    def get_tip_origin(
+        self,
+    ) -> Optional[Tuple[LegacyLabwareCore, LegacyWellCore]]:
+        return self._last_tip_rack_and_well
+
     def set_flow_rate(
         self,
         aspirate: Optional[float] = None,
@@ -612,8 +622,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
         trash_location: Union[types.Location, TrashBin, WasteChute],
         return_tip: bool,
         keep_last_tip: bool,
-        last_tip_location: Optional[Tuple[types.Location, LegacyWellCore]],
-    ) -> Optional[Tuple[types.Location, LegacyWellCore]]:
+    ) -> None:
         """This will never be called because it was added in API 2.23"""
         assert False, "transfer_liquid is not supported in legacy context"
 
@@ -629,8 +638,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
         trash_location: Union[types.Location, TrashBin, WasteChute],
         return_tip: bool,
         keep_last_tip: bool,
-        last_tip_location: Optional[Tuple[types.Location, LegacyWellCore]],
-    ) -> Optional[Tuple[types.Location, LegacyWellCore]]:
+    ) -> None:
         """This will never be called because it was added in API 2.23"""
         assert False, "distribute_liquid is not supported in legacy context"
 
@@ -646,8 +654,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
         trash_location: Union[types.Location, TrashBin, WasteChute],
         return_tip: bool,
         keep_last_tip: bool,
-        last_tip_location: Optional[Tuple[types.Location, LegacyWellCore]],
-    ) -> Optional[Tuple[types.Location, LegacyWellCore]]:
+    ) -> None:
         """This will never be called because it was added in API 2.23."""
         assert False, "consolidate_liquid is not supported in legacy context"
 

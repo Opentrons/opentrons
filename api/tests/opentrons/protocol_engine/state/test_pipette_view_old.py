@@ -31,6 +31,7 @@ from opentrons.protocol_engine.types import (
     DeckPoint,
     CurrentPipetteLocation,
     TipGeometry,
+    LabwareWellId,
 )
 from opentrons.protocol_engine.state.pipettes import (
     PipetteState,
@@ -89,6 +90,7 @@ def get_pipette_view(
         Dict[str, Optional[fluid_stack.FluidStack]]
     ] = None,
     has_clean_tips_by_id: Optional[Dict[str, bool]] = None,
+    last_tip_rack_well_by_id: Optional[Dict[str, Optional[LabwareWellId]]] = None,
 ) -> PipetteView:
     """Get a pipette view test subject with the specified state."""
     state = PipetteState(
@@ -104,6 +106,7 @@ def get_pipette_view(
         liquid_presence_detection_by_id=liquid_presence_detection_by_id or {},
         ready_to_aspirate_by_id=ready_to_aspirate_by_id or {},
         has_clean_tips_by_id=has_clean_tips_by_id or {},
+        tip_source_by_id=last_tip_rack_well_by_id or {},
     )
 
     return PipetteView(state=state)

@@ -4,10 +4,8 @@ import {
   COLORS,
   Flex,
   LabwareRender,
-  Module,
   MoveLabwareOnDeck,
 } from '@opentrons/components'
-import { inferModuleOrientationFromXCoordinate } from '@opentrons/shared-data'
 
 import { DeckMapContent, TwoColumn } from '/app/molecules/InterventionModal'
 
@@ -41,10 +39,7 @@ export function TwoColLwInfoAndDeck(
     MANUAL_FILL_AND_RETRY_NEW_TIPS,
   } = RECOVERY_MAP
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
-  const {
-    relevantPickUpTipWellName,
-    relevantPickUpTipLabware,
-  } = failedLabwareUtils
+  const { relevantPickUpTipWellName } = failedLabwareUtils
   const { proceedNextStep, goBackPrevStep } = routeUpdateActions
   const { failedPipetteInfo, isPartialTipConfigValid } = failedPipetteUtils
   const { t } = useTranslation('error_recovery')
@@ -128,11 +123,21 @@ export function TwoColLwInfoAndDeck(
           ...restUtils
         } = deckMapUtils
 
-        const failedLwId = relevantPickUpTipLabware?.id ?? ''
+        const failedLwId = failedLabwareUtils.failedLabware?.id ?? ''
 
         const isValidDeck =
           currentLoc != null && newLoc != null && movedLabwareDef != null
 
+        const modulesOnDeck = moduleRenderInfo?.map(module => {
+          return {
+            moduleModel: module.moduleDef.model,
+            moduleLocation: { slotName: module.targetSlotId },
+            nestedLabwareDef:
+              module.nestedLabwareId !== failedLwId
+                ? module.nestedLabwareDef
+                : null,
+          }
+        })
         return isValidDeck ? (
           <MoveLabwareOnDeck
             deckFill={isOnDevice ? COLORS.grey35 : '#e6e6e6'}
@@ -141,39 +146,9 @@ export function TwoColLwInfoAndDeck(
             movedLabwareDef={movedLabwareDef}
             labwareDefinitions={allRunDefs}
             {...restUtils}
+            modulesOnDeck={modulesOnDeck}
             backgroundItems={
               <>
-                {moduleRenderInfo.map(
-                  ({
-                    x,
-                    y,
-                    moduleId,
-                    moduleDef,
-                    nestedLabwareDef,
-                    nestedLabwareId,
-                    targetDeckId,
-                    targetSlotId,
-                  }) => (
-                    <Module
-                      key={moduleId}
-                      def={moduleDef}
-                      x={x}
-                      y={y}
-                      orientation={inferModuleOrientationFromXCoordinate(x)}
-                      targetDeckId={targetDeckId}
-                      targetSlotId={targetSlotId}
-                      childrenPositioningMode="offsetToSlot"
-                    >
-                      {nestedLabwareDef != null &&
-                      nestedLabwareId !== failedLwId ? (
-                        <LabwareRender
-                          definition={nestedLabwareDef}
-                          positioningMode="offsetInSlot"
-                        />
-                      ) : null}
-                    </Module>
-                  )
-                )}
                 {labwareRenderInfo
                   .filter(l => l.labwareId !== failedLwId)
                   .map(({ labwareOrigin, labwareDef, labwareId }) => (
@@ -206,7 +181,7 @@ export function TwoColLwInfoAndDeck(
           {...props}
           title={buildTitle()}
           type={buildType()}
-          layout={'default'}
+          layout="default"
           bannerText={buildBannerText()}
         />
         <Flex marginTop="0.7rem">{buildDeckView()}</Flex>
