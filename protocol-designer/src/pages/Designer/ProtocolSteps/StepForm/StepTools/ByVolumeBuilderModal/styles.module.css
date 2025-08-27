@@ -1,14 +1,14 @@
 .calculator_button {
-  height: 'min-content';
   width: 100%;
+  height: 'min-content';
 }
 
 .calculator_container {
   display: flex;
+  width: 20rem;
   flex-direction: column;
   align-self: center;
   grid-gap: var(--spacing-4);
-  width: 20rem;
 }
 
 .calculator_input_container {
@@ -24,6 +24,6 @@
 
 .modal_footer {
   display: flex;
-  grid-gap: var(--spacing-4);
   justify-content: flex-end;
+  grid-gap: var(--spacing-4);
 }
