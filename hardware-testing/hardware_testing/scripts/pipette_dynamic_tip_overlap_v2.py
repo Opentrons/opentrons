@@ -70,12 +70,12 @@ def getch():
 
     def _getch():
         fd = sys.stdin.fileno()
-        old_settings = termios.tcgetattr(fd)
+        old_settings = termios.tcgetattr(fd) # pyright: ignore[reportAttributeAccessIssue]
         try:
-            tty.setraw(fd)
+            tty.setraw(fd) # pyright: ignore[reportAttributeAccessIssue]
             ch = sys.stdin.read(1)
         finally:
-            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings) # pyright: ignore[reportAttributeAccessIssue]
         return ch
 
     return _getch()
@@ -283,7 +283,7 @@ def load_config_(filename: str) -> Dict:
         data = {}
     return data
 
-def save_config_(filename: str, data: str) -> Dict:
+def save_config_(filename: str, data: str):
     """This function saves a given config file with data"""
     try:
         with open(filename, 'w') as file:
@@ -292,11 +292,8 @@ def save_config_(filename: str, data: str) -> Dict:
                     )
     except FileNotFoundError:
         print('Warning: {0} not found'.format(filename))
-        data = {}
     except json.decoder.JSONDecodeError:
         print('Error: {0} is corrupt'.format(filename))
-        data = {}
-    return data
 
 async def calibrate_tiprack(api, home_position, mount):
     cp = CriticalPoint.NOZZLE
