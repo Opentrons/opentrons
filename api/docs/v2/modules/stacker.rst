@@ -13,7 +13,7 @@ The Stacker is represented in code by a :py:class:`.FlexStackerContext` object t
 Loading and Deck Slots
 ========================
 
-Up to four Stacker Modules can be attached to the right side of your Flex, creating deck slots A4–D4. Each Stacker occupies a deck slot in column 4, with the shuttle in column 3. 
+Up to four Stacker Modules can be attached to the right side of your Flex. Each Stacker's shuttle occupies a deck slot in column 4.
 
 Start by loading each Stacker as you would any other module: 
 
@@ -64,8 +64,8 @@ Stacker Capacity
 
 Different labware have varying `z` heights. One well plate might be 2 mm taller than another, affecting the number of plates the Stacker can store at once. The API includes helper commands to calculate how many labware the Stacker can hold: 
 
-    - `.ModuleContext.get_max_storable_labware`
-    - `.ModuleContext.get_current_storable_labware` 
+    - :py:meth:`.FlexStackerContext.get_max_storable_labware`
+    - :py:meth:`.FlexStackerContext.get_current_storable_labware` 
     
 Use ``get_max_storable_labware()`` or ``get_current_storable_labware()`` to calculate the maximum or current number of labware the Stacker can store, based on either the labware definition or the Stacker's current storage conditions.
 
@@ -77,21 +77,20 @@ During a protocol, use :py:meth:`~.FlexStackerContext.retrieve` to automatically
 
 .. code-block:: python
 
-   stacker_1.retrieve()
    protocol.move_labware(
-       labware="opentrons_flex_96_tiprack_200ul",
+       labware=stacker_1.retrieve(),
        new_location="B2",
-       use_gripper="True"
+       use_gripper=True
    )
 
 Here, the Stacker's shuttle takes the Flex tip rack at the bottom of the labware stack and moves it into slot A3. Then, the Flex Gripper moves that tip rack to slot B2 on the deck. 
 
-To move labware from the deck into a Stacker, use `~.FlexStackerContext.store()`::
+To move labware from the deck into a Stacker, use :py:meth:`~.FlexStackerContext.store()`::
 
    protocol.move_labware(
-       labware="opentrons_96_wellplate_200ul_pcr_full_skirt",
+       labware=plate,
        new_location=stacker_2,
-       use_gripper="True"
+       use_gripper=True
    )
    stacker_2.store()
 
