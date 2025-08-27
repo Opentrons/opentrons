@@ -50,7 +50,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
     border: 1px solid ${COLORS.blue50};
     border-radius: ${BORDERS.borderRadius8};
   `
-  const volumeByWell = volumesPerLiquid[parseInt(selectedValue ?? '0')]
+  const volumeByWell = volumesPerLiquid[liquidId]
   const volumePerWellRange = getWellRangeForLiquidLabwarePair(
     volumeByWell,
     labwareWellOrdering
@@ -60,7 +60,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
     setSelectedValue(liquidId)
   }
 
-  const totalVolume = sum(Object.values(volumesPerLiquid[parseInt(liquidId)]))
+  const totalVolume = sum(Object.values(volumesPerLiquid[liquidId]))
 
   return (
     <Box
