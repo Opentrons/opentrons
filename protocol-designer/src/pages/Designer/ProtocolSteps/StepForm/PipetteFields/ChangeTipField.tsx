@@ -49,7 +49,6 @@ export function ChangeTipField(
       value={value}
       title={t('tip_handling.title')}
       width="100%"
-      tooltipContent={t('tip_handling.tooltip')}
     />
   )
 }
