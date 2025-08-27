@@ -5,22 +5,22 @@
 Robot Motor Control
 ====================
 
-In a typical protocol, you use commands like ``transfer_with_liquid_class()`` or ``move_labware()`` to interact with and move hardware attached to the robot, like pipettes or the Flex Gripper. Robot motor control is an advanced feature that allows you to control individual robot components, like the gantry arm, pipette plunger, and gripper jaws. We'll take a look at robot motor commands in three categories: movement, gripper, and helper commands. 
+In a typical protocol, you use commands like ``transfer_with_liquid_class()`` or ``move_labware()`` to interact with and move hardware attached to the robot, like pipettes or the Flex Gripper. Robot motor control is an advanced feature that allows you to control individual robot components, like the gantry, pipette plunger, and gripper jaws. We'll take a look at robot motor commands in three categories: movement, gripper, and helper commands. 
 
 Movement Commands
 -----------------
 
-Movement commands allow you to move individual robot components:
+Movement commands allow you to move individual robot motors to specific deck positions:
 
 - :py:meth:`~.RobotContext.move_to`
 - :py:meth:`~.RobotContext.move_axes_to`
 - :py:meth:`~.RobotContext.move_axes_relative`
   
-Use the :py:meth:`~.RobotContext.move_to` method to change the position of the gantry arm, where a pipette is attached, or the extension mount, where the Flex Gripper attaches. 
+Use the :py:meth:`~.RobotContext.move_to` method to change the position of the gantry or instrument mounts for pipettes or the Flex Gripper. 
 
 The other two movement commands change the position of the robot's axes:
 
-- ``Axis.X`` and ``Axis.Y``
+- ``Axis.X`` and ``Axis.Y``: X and Y axis of the gantry 
 - ``Axis.Z_L`` and ``Axis.Z_R``: Z axis of the left or right instrument mount
 - ``Axis.Z_G`` and ``Axis.G``: Z axis and jaw motor of the Flex Gripper
 - ``Axis.P_L`` and ``Axis.P_R``: pipette plunger axes in the left or right instrument mount 
@@ -28,13 +28,16 @@ The other two movement commands change the position of the robot's axes:
 
 The :py:meth:`~.RobotContext.move_axes_to` and :py:meth:`~.RobotContext.move_axes_relative` methods move any axis to an absolute or relative position on the deck, respectively. 
 
-In this example, ``Axis.Q`` moves linearly to drop tips attached to a Flex pipette.
+This example moves ``Axis.Q`` to drop tips attached to a Flex 96-channel pipette.
 
 .. code_block:: python
+    :substitutions:
+
+    from opentrons import protocol_api 
 
     requirements = {
-        "robotType": "Flex",
-        "apiLevel": 2.24
+        'robotType': 'Flex',
+        'apiLevel': '2.25'
     }
 
     def run(protocol: protocol_api.ProtocolContext): 
@@ -44,11 +47,12 @@ In this example, ``Axis.Q`` moves linearly to drop tips attached to a Flex pipet
         def drop_tips():
             plunger_distance = -30
 
-            protocol.robot.move_axes_relative(
+            api = protocol.robot
+            api.move_axes_relative(
                 axis_map={"q": -1 * plunger_distance},
                 speed=5.5
             )
-            protocol.robot.move_axes_relative(
+            api.move_axes_relative(
                 axis_map={"q": plunger_distance},
                 speed=5.5
             )
@@ -57,6 +61,9 @@ In this example, ``Axis.Q`` moves linearly to drop tips attached to a Flex pipet
         drop_tips()
         pipette.home()
 
+.. versionadded:: 2.25
+
+Here, the 96-channel pipette moves to a specific position above the tip rack, including a ``z`` height. Then, the tip pickup motor moves -30 mm relative to its current position to drop attached pipettes. Before and after these movements, the instrument mount the pipette is attached to returns to it's ``home`` position. 
 
 .. warning::
 
@@ -71,6 +78,8 @@ Gripper Commands
 
 The Flex Gripper methods :py:meth:`~.RobotContext.open_gripper_jaw` and :py:meth:`~.RobotContext.close_gripper_jaw` let you handle custom labware or hardware on the deck. 
 
+You can also control the Gripper while other commands run. For example, use a mixture of move and gripper commands to pick up labware while pipetting liquids. 
+
 Helper Commands 
 ----------------
 To move a robot axis, you'll need to provide a position in the form of an axis coordinate map. Helper commands return axis or plunger coordinates you can use in a movement command. 
@@ -82,10 +91,3 @@ Use the :py:meth:`~.RobotContext.plunger_coordinates_for_volume` to change the p
 .. warning:: 
 
     Moving your pipette's plunger to an extreme position can damage the instrument. Avoid moves outside of known positions, like below the blowout location. 
-
-
-TODOs: 
--test that code (simplified a protocol from Jon K)
--does the pipette plunger move linearly? 
--need a language check, am I clear enough with how I discuss axes, positions re: coordinates etc? 
--blowout warning is maybe a bit nonsense 
