@@ -1,4 +1,8 @@
-# Cursor Rules
+---
+description: React component for Protocol Designer
+globs: protocol-designer/src/**/*.tsx
+alwaysApply: true
+---
 
 ## Whenever you need a React component
 
@@ -11,6 +15,9 @@
    1. components/src/atoms
    2. components/src/molecules
    3. components/src/organisms
+   4. protocol-designer/src/components/atoms
+   5. protocol-designer/src/components/molecules
+   6. protocol-designer/src/components/organisms
 
 4. If it doesn't exist, generate a detailed prompt for the component, including:
 
