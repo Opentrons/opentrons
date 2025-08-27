@@ -1,7 +1,6 @@
 ---
 description: React component for Protocol Designer
 globs: protocol-designer/src/**/*.tsx
-alwaysApply: true
 ---
 
 ## Whenever you need a React component
