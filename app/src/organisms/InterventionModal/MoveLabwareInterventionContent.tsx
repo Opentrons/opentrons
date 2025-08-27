@@ -97,7 +97,6 @@ export function MoveLabwareInterventionContent({
     loadedLabwares: run.labware,
     robotType: 'OT-3 Standard',
     detailLevel: 'slot-only',
-    includeSlotText: false,
     t,
   })
   const newDisplayLabwareLocation = getLabwareDisplayLocation({
@@ -106,7 +105,6 @@ export function MoveLabwareInterventionContent({
     loadedLabwares: run.labware,
     robotType: 'OT-3 Standard',
     detailLevel: 'slot-only',
-    includeSlotText: false,
     t,
   })
   return (

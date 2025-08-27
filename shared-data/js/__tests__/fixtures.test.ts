@@ -9,7 +9,7 @@ import {
   FLEX_STACKER_V1_FIXTURE,
   FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
   FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
-  FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+  FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
   HEATERSHAKER_MODULE_V1_FIXTURE,
   MAGNETIC_BLOCK_V1_FIXTURE,
   SINGLE_CENTER_SLOT_FIXTURE,
@@ -478,7 +478,7 @@ describe('replaceCutoutFixtureRemove', () => {
   })
   it('should get fixture replacment for FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE', () => {
     const result = replaceCutoutFixtureForFixtureRemoval(
-      FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+      FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
       'cutoutD3',
       'flexStackerModuleV1D4'
     )
@@ -487,7 +487,7 @@ describe('replaceCutoutFixtureRemove', () => {
 
   it('should get fixture replacment for FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE when waste chute is on removed', () => {
     const result = replaceCutoutFixtureForFixtureRemoval(
-      FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+      FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
       'cutoutD3',
       '1ChannelWasteChute'
     )
@@ -514,7 +514,7 @@ describe('getAAFixtureDisplayName', () => {
   })
   it('Should return flex stacker name when using combo fixtures and aa for stacker', () => {
     const name = getAAComboFixtureDisplayName(
-      FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+      FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
       'flexStackerModuleV1D4',
       deckDef,
       t,
@@ -707,7 +707,7 @@ describe('getFixtureDisplayName', () => {
   it('should get fixture display name for flex stacker with waste chute', () => {
     const result = getFixtureDisplayName(
       t,
-      FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE
+      FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE
     )
     expect(result).toEqual('deck_configuration:module_with_waste_chute')
   })
@@ -753,7 +753,7 @@ describe('getMainModuleFixtureIdForComboFixture', () => {
     const result = getMainUsbModuleFixtureIdForComboFixture([
       FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
       FLEX_STACKER_V1_FIXTURE,
-      FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+      FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
     ])
     expect(result).toEqual('flexStackerModuleV1')
   })
@@ -775,7 +775,7 @@ describe('getMainNonComboFixtureId', () => {
         WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
         STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
         STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
-        FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+        FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
       ],
       ['gripperWasteChute'],
       'cutoutD3'
@@ -802,7 +802,7 @@ describe('getMainNonComboFixtureId', () => {
       [
         FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
         FLEX_STACKER_V1_FIXTURE,
-        FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+        FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
         FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
       ],
       ['flexStackerModuleV1D4'],
@@ -866,7 +866,7 @@ describe('getWasteChuteComboFixture', () => {
       ]
     )
     expect(result).toEqual({
-      cutoutFixtureId: FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+      cutoutFixtureId: FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
       cutoutId: 'cutoutD3',
       opentronsModuleSerialNumber: '123',
     })
@@ -889,7 +889,7 @@ describe('getWasteChuteComboFixture', () => {
       ]
     )
     expect(result).toEqual({
-      cutoutFixtureId: FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+      cutoutFixtureId: FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
       cutoutId: 'cutoutD3',
       opentronsModuleSerialNumber: '123',
     })
@@ -912,7 +912,7 @@ describe('getWasteChuteComboFixture', () => {
       ]
     )
     expect(result).toEqual({
-      cutoutFixtureId: FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+      cutoutFixtureId: FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
       cutoutId: 'cutoutD3',
       opentronsModuleSerialNumber: '123',
     })
@@ -948,12 +948,17 @@ describe('getFlexStackerD3Compatibility', () => {
       {
         cutoutId: 'cutoutD3',
         cutoutFixtureId: FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
-        requiredAddressableAreas: ['flexStackerModuleV1D4', 'D3'],
-        compatibleCutoutFixtureIds: [FLEX_STACKER_V1_FIXTURE],
+        requiredAddressableAreas: [
+          'flexStackerModuleV1D4',
+          'gripperWasteChute',
+        ],
+        compatibleCutoutFixtureIds: [
+          FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+        ],
       },
     ])
     expect(result).toEqual({
-      comboFixtureId: FLEX_STACKER_V1_FIXTURE,
+      comboFixtureId: FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
       comboFixtureConflict: true,
     })
   })
