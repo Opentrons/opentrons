@@ -67,7 +67,7 @@
   "share_display_usage_description": "关于您如何在Flex上与触摸屏交互的数据。",
   "share_logs_with_opentrons": "向opentrons共享工作站日志",
   "share_logs_with_opentrons_description": "通过自动发送匿名的工作站日志，帮助Opentrons改进产品和服务。Opentrons使用这些日志来解决工作站问题并发现错误趋势。",
-  "show_labware_offset_snippets_description": "仅适用于需要在Opentrons应用程序之外应用耗材校准数据的用户。启用后，在设置协议过程中可访问Jupyter Notebook和SSH的代码片段。",
+  "show_labware_offset_snippets_description": "仅适用于需要在 Opentrons App 之外应用实验室器具偏移数据的用户。启用后，在配置所有必需偏移量后，可在协议设置期间使用 Jupyter Notebook 和 SSH 的代码片段。",
   "something_seems_wrong": "您的移液器可能有问题。退出设置并联系Opentrons支持人员以获取帮助。",
   "storage_limit_reached_description": "您的 Opentrons Flex 已达到可存储的快速移液数量上限。在创建新的快速移液之前，您必须删除一个现有的快速移液。",
   "system_language_preferences_update_description": "您的系统语言最近已更新。您想将更新后的语言用作 Opentrons APP的默认语言吗？",
