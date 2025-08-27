@@ -25,7 +25,7 @@ metadata = {
 
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.24",
+    "apiLevel": "2.25",
 }
 
 
@@ -112,7 +112,6 @@ def run(protocol: ProtocolContext) -> None:
     reagent_plate, temp_adapter = helpers.load_temp_adapter_and_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", temp_block, "Reagent Plate"
     )
-    lid = protocol.load_lid_stack("opentrons_tough_universal_lid", "B4", 2)
     # ========== SECOND ROW ==========
     MAG_PLATE_SLOT: MagneticBlockContext = protocol.load_module(
         helpers.mag_str, "C1"
@@ -134,7 +133,7 @@ def run(protocol: ProtocolContext) -> None:
     # ========== FOURTH ROW ==========
     tiprack_200_3 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "11")
     trash_bin = protocol.load_trash_bin("A3")
-    lid = protocol.load_lid_stack("custom_opentrons_tough_universal_lid", "B4", 2)
+    lid = protocol.load_lid_stack("opentrons_tough_universal_lid", "B4", 2)
     # reagent
     AMPure = reservoir["A1"]
     SMB = reservoir["A2"]
@@ -1078,7 +1077,10 @@ def run(protocol: ProtocolContext) -> None:
             Liquid_trash_well_2,
         ]
         protocol.move_lid(reagent_plate, lid, use_gripper=True)
-        helpers.find_liquid_height_of_all_wells(protocol, p50, liquids_to_probe_at_end)
+        if probe_liquid_height_bool:
+            helpers.find_liquid_height_of_all_wells(
+                protocol, p50, liquids_to_probe_at_end
+            )
         if deactivate_modules_bool:
             helpers.deactivate_modules(protocol)
         if not protocol.is_simulating():
