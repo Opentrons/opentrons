@@ -146,5 +146,10 @@ describe(`test labware definitions with schema v3`, () => {
         expect(well.z).toBeGreaterThan(0)
       }
     })
+
+    // Consult documentation if it is unclear why this is the case.
+    test('should not contain the legacyStackingOffsetWithLabware property', () => {
+      expect(labwareDef.legacyStackingOffsetWithLabware).toBe(undefined)
+    })
   })
 })

@@ -11,6 +11,7 @@ from .labware_data_provider import LabwareDataProvider
 from .module_data_provider import ModuleDataProvider
 from .file_provider import FileProvider
 from .ot3_validation import ensure_ot3_hardware
+from .concurrency_provider import ConcurrencyProvider
 
 
 __all__ = [
@@ -18,6 +19,7 @@ __all__ = [
     "LabwareDataProvider",
     "DeckDataProvider",
     "DeckFixedLabware",
+    "ConcurrencyProvider",
     "ModuleDataProvider",
     "FileProvider",
     "ensure_ot3_hardware",

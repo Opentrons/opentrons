@@ -123,7 +123,7 @@ const mockRobotState: TimelineFrame = {
 describe('quickTransferStepCommands', () => {
   it('should generate a transfer step in py', () => {
     const mockStepArgs: TransferArgs = {
-      stepId: 1,
+      stepNumber: 1,
       commandCreatorFnName: 'transfer',
       sourceWells: ['A1'],
       destWells: ['B1'],
@@ -210,6 +210,7 @@ pipette.transfer_with_liquid_class(
     new_tip="always",
     trash_location=mock_trash_bin_1,
     keep_last_tip=True,
+    tip_racks=[mock_tiprack_1],
     liquid_class=protocol.define_liquid_class(
         name="transfer_step_1",
         properties={"flex_1channel_1000": {"fixture/fixture_flex_96_tiprack_1000ul/1": {
@@ -276,7 +277,7 @@ pipette.drop_tip()`.trimStart()
   })
   it('should generate a consolidate step in py', () => {
     const mockStepArgs: ConsolidateArgs = {
-      stepId: 1,
+      stepNumber: 1,
       commandCreatorFnName: 'consolidate',
       sourceWells: ['A1', 'B1'],
       destWell: 'B1',
@@ -363,6 +364,7 @@ pipette.consolidate_with_liquid_class(
     new_tip="always",
     trash_location=mock_trash_bin_1,
     keep_last_tip=True,
+    tip_racks=[mock_tiprack_1],
     liquid_class=protocol.define_liquid_class(
         name="consolidate_step_1",
         properties={"flex_1channel_1000": {"fixture/fixture_flex_96_tiprack_1000ul/1": {
@@ -429,7 +431,7 @@ pipette.drop_tip()`.trimStart()
   })
   it('should generate a distribute step in py', () => {
     const mockStepArgs: DistributeArgs = {
-      stepId: 1,
+      stepNumber: 1,
       commandCreatorFnName: 'distribute',
       sourceWell: 'A1',
       destWells: ['A1', 'B1'],
@@ -517,6 +519,7 @@ pipette.distribute_with_liquid_class(
     new_tip="always",
     trash_location=mock_trash_bin_1,
     keep_last_tip=True,
+    tip_racks=[mock_tiprack_1],
     liquid_class=protocol.define_liquid_class(
         name="distribute_step_1",
         properties={"flex_1channel_1000": {"fixture/fixture_flex_96_tiprack_1000ul/1": {

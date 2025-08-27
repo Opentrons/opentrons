@@ -13,8 +13,10 @@ import {
   useDeckLocationSelect,
 } from '@opentrons/components'
 import {
+  FLEX_STACKER_MODULE_TYPE,
   getDeckDefFromRobotType,
   getModuleDef,
+  getModuleType,
   getSchema2CornerOffsetFromSlot,
   getSchema2Dimensions,
 } from '@opentrons/shared-data'
@@ -82,9 +84,13 @@ function InterventionStyleDeckMapContent(
 
   const modulesWithHighlights =
     props.modulesOnDeck?.map(module => {
-      const found = props.highlightLabwareEventuallyIn.some(locationToMatch =>
-        getIsLabwareMatch(module.moduleLocation, locationToMatch)
-      )
+      const found = props.highlightLabwareEventuallyIn.some(locationToMatch => {
+        const moduleType = getModuleType(module.moduleModel)
+        return (
+          moduleType !== FLEX_STACKER_MODULE_TYPE &&
+          getIsLabwareMatch(module.moduleLocation, locationToMatch)
+        )
+      })
       return found
         ? {
             ...module,

@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
 import {
@@ -23,15 +22,12 @@ import {
   DELETE_STEP_FORM,
   getMainPagePortalEl,
 } from '/protocol-designer/components/organisms'
-import { useKitchen } from '/protocol-designer/components/organisms/Kitchen/useKitchen'
 import { actions as steplistActions } from '/protocol-designer/steplist'
-import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import {
   deselectAllSteps,
   populateForm,
 } from '/protocol-designer/ui/steps/actions/actions'
 import { getMultiSelectItemIds } from '/protocol-designer/ui/steps/selectors'
-import { getHasTrash } from '/protocol-designer/utils'
 
 import { StepOverflowMenu } from './StepOverflowMenu'
 import { capitalizeFirstLetterAfterNumber } from './utils'
@@ -89,16 +85,12 @@ export function ConnectedStepContainer(
     openedOverflowMenuId,
     sidebarWidth,
   } = props
-  const { t } = useTranslation('starting_deck_state')
-  const { makeSnackbar } = useKitchen()
   const [top, setTop] = useState<number>(0)
   const menuRootRef = useRef<HTMLDivElement | null>(null)
   const isStartingOrEndingState =
     title === STARTING_DECK_STATE || title === FINAL_DECK_STATE
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const multiSelectItemIds = useSelector(getMultiSelectItemIds)
-  const { additionalEquipmentOnDeck } = useSelector(getDeckSetupForActiveItem)
-  const hasTrash = getHasTrash(additionalEquipmentOnDeck)
 
   const hasText = sidebarWidth > PX_SIDEBAR_MIN_WIDTH_FOR_ICON
 
@@ -178,10 +170,6 @@ export function ConnectedStepContainer(
   } = useConditionalConfirm(handleDelete, true)
 
   const handleOpenForm = (clickNum: number, e: ReactMouseEvent): void => {
-    if (!hasTrash) {
-      makeSnackbar(t('trash_required') as string)
-    }
-
     if (clickNum === 0) {
       onClick?.(e)
     } else {

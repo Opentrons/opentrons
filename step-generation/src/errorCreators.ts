@@ -360,3 +360,17 @@ export const tipRackLidNotAllowedOnDeck = (): CommandCreatorError => {
     message: 'The tip rack lid is not supported directly on the deck',
   }
 }
+
+export const nextTiprackHasLid = (): CommandCreatorError => {
+  return {
+    type: 'NEXT_TIPRACK_HAS_LID',
+    message: 'A pipette cannot pick up tips from a tip rack with a lid',
+  }
+}
+
+export const stackTooHigh = (args: { slot: string }): CommandCreatorError => {
+  return {
+    type: 'STACK_TOO_HIGH',
+    message: `The stack on slot ${args.slot} is too high`,
+  }
+}

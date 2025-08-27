@@ -1,8 +1,6 @@
 ---
-title: "Opentrons Flex: Touchscreen dashboard"
+title: "Opentrons Flex: Touchscreen Dashboard"
 ---
-
-# Touchscreen Dashboard
 
 <figure class="screenshot" markdown>
 ![The robot dashboard, showing main navigation and recently run protocols.  ](../images/touchscreen-dashboard.png "Robot dashboard")

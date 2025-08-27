@@ -140,7 +140,8 @@
               "offsetFromCutoutFixture",
               "boundingBox",
               "displayName",
-              "features"
+              "features",
+              "orientation"
             ],
             "properties": {
               "id": {
@@ -226,6 +227,11 @@
               "ableToDropLabware": {
                 "description": "Whether labware is allowed to be dropped (different from being placed) into this area. If `true`, the top-center of the `boundingBox` should be a good location for the bottom-center of the labware when it's dropped.",
                 "type": "boolean"
+              },
+              "orientation": {
+                "description": "The orientation of the underlying module when this addressable area overlays a module.",
+                "type": "string",
+                "enum": ["left", "right", "center", null]
               }
             }
           }

@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import {
   COLUMN,
+  fixture96Plate,
   fixtureTiprack300ul,
   fixtureTiprack1000ul,
   getLabwareDefURI,
@@ -14,6 +15,7 @@ import {
   DEFAULT_PIPETTE,
   dropTipHelper,
   dropTipInPlaceHelper,
+  getErrorResult,
   getInitialRobotStateStandard,
   getSuccessResult,
   getTipColumn,
@@ -31,6 +33,7 @@ const tiprack1Id = 'tiprack1Id'
 const tiprack2Id = 'tiprack2Id'
 const tiprack4Id = 'tiprack4Id'
 const tiprack5Id = 'tiprack5Id'
+const lidId = 'lid1'
 const tiprackURI1 = getLabwareDefURI(fixtureTiprack300ul as LabwareDefinition2)
 const tiprackURI2 = getLabwareDefURI(fixtureTiprack1000ul as LabwareDefinition2)
 const p300SingleId = DEFAULT_PIPETTE
@@ -57,6 +60,53 @@ describe('replaceTip', () => {
       )
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([pickUpTipHelper(0)])
+    })
+    it('replace tip but tiprack has a lid', () => {
+      initialRobotState = {
+        ...initialRobotState,
+        labware: {
+          [tiprackURI1]: {
+            stack: [tiprackURI1, '1'],
+          },
+          [lidId]: {
+            stack: [tiprackURI1, '1'],
+          },
+        },
+      }
+      invariantContext = {
+        ...invariantContext,
+        labwareEntities: {
+          [tiprackURI1]: {
+            id: tiprackURI1,
+            def: {
+              ...fixtureTiprack300ul,
+            } as LabwareDefinition2,
+            labwareDefURI: 'fixture/fixture_tiprack_300_ul/1',
+            pythonName: 'mock_lid_python_name',
+          },
+          [lidId]: {
+            id: lidId,
+            def: {
+              ...fixture96Plate,
+              allowedRoles: ['lid'],
+            } as LabwareDefinition2,
+            labwareDefURI: 'mockURI',
+            pythonName: 'mock_lid_python_name',
+          },
+        },
+      }
+      const result = replaceTip(
+        {
+          pipette: p300SingleId,
+          dropTipLocation: FIXED_TRASH_ID,
+          tipRack: tiprackURI1,
+        },
+        invariantContext,
+        initialRobotState
+      )
+      expect(getErrorResult(result).errors[0]).toMatchObject({
+        type: 'NEXT_TIPRACK_HAS_LID',
+      })
     })
     it('Single-channel: second tip B1', () => {
       const result = replaceTip(
@@ -241,6 +291,58 @@ describe('replaceTip', () => {
         dropTipInPlaceHelper(),
         pickUpTipHelper('B1'),
       ])
+    })
+    it('Single-channel: no error if pipette does not have tip, and no waste chute or trash bin is found', () => {
+      invariantContext = {
+        ...invariantContext,
+        wasteChuteEntities: {},
+        trashBinEntities: {},
+      }
+      const result = replaceTip(
+        {
+          pipette: p300SingleId,
+          dropTipLocation: FIXED_TRASH_ID,
+          tipRack: tiprackURI1,
+        },
+        invariantContext,
+        {
+          ...initialRobotState,
+          tipState: {
+            ...initialRobotState.tipState,
+            pipettes: {
+              p300SingleId: { hasTip: false, tiprackURI: tiprackURI1 },
+            },
+          },
+        }
+      )
+      expect(getSuccessResult(result))
+    })
+    it('Single-channel: error if pipette does have tip, and no waste chute or trash bin is found', () => {
+      invariantContext = {
+        ...invariantContext,
+        wasteChuteEntities: {},
+        trashBinEntities: {},
+      }
+      const result = replaceTip(
+        {
+          pipette: p300SingleId,
+          dropTipLocation: FIXED_TRASH_ID,
+          tipRack: tiprackURI1,
+        },
+        invariantContext,
+        {
+          ...initialRobotState,
+          tipState: {
+            ...initialRobotState.tipState,
+            pipettes: {
+              p300SingleId: { hasTip: true, tiprackURI: tiprackURI1 },
+            },
+          },
+        }
+      )
+      expect(getErrorResult(result).errors[0]).toMatchObject({
+        type: 'DROP_TIP_LOCATION_DOES_NOT_EXIST',
+      })
     })
   })
   describe('replaceTip: multi-channel', () => {
