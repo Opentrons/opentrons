@@ -469,7 +469,7 @@ async def _read_pressure_and_check_results(
         
         ui.print_header(f"{i + 1}/{pressure_event_config.sample_count}: {tag.value}")
         print_pressure_datas(_sample_as_strings)
-        if tag.value == "holding" or tag.value == "dispensed":
+        if tag.value == "holding" or tag.value == "dispensed" or tag.value == "insert":
             csv_data_sample = [tag.value +"-"+ str(aspirate_dispense)+"ul"] + _sample_as_strings
         else:
             csv_data_sample = [tag.value] + _sample_as_strings
