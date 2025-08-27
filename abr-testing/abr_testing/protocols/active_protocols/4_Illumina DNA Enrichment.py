@@ -1077,7 +1077,8 @@ def run(protocol: ProtocolContext) -> None:
             Liquid_trash_well_2,
         ]
         protocol.move_lid(reagent_plate, lid, use_gripper=True)
-        helpers.find_liquid_height_of_all_wells(protocol, p50, liquids_to_probe_at_end)
+        if probe_liquid_height_bool:
+            helpers.find_liquid_height_of_all_wells(protocol, p50, liquids_to_probe_at_end)
         if deactivate_modules_bool:
             helpers.deactivate_modules(protocol)
         if not protocol.is_simulating():
