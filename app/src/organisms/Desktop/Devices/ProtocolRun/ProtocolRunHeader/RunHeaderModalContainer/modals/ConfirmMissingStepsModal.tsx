@@ -52,6 +52,20 @@ export const ConfirmMissingStepsModal = (
     onCloseClick()
   }
 
+  const isMissingLPCStep = missingSteps.includes(LPC_STEP_KEY)
+
+  const buildMissingStepsCopy = (): string => {
+    const formattedSteps = new Intl.ListFormat('en', {
+      style: 'short',
+      type: 'conjunction',
+    }).format(missingSteps.map(step => t(STEP_KEY_TO_I18N_KEY[step])))
+
+    const i18nKey = isMissingLPCStep
+      ? 'you_havent_confirmed_lpc_missing'
+      : 'you_havent_confirmed'
+    return t(i18nKey, { missingSteps: formattedSteps })
+  }
+
   return (
     <Modal
       title={t('are_you_sure_you_want_to_proceed')}
@@ -60,12 +74,7 @@ export const ConfirmMissingStepsModal = (
     >
       <Flex flexDirection={DIRECTION_COLUMN} fontSize={TYPOGRAPHY.fontSizeP}>
         <LegacyStyledText paddingBottom={SPACING.spacing4}>
-          {t('you_havent_confirmed', {
-            missingSteps: new Intl.ListFormat('en', {
-              style: 'short',
-              type: 'conjunction',
-            }).format(missingSteps.map(step => t(STEP_KEY_TO_I18N_KEY[step]))),
-          })}
+          {buildMissingStepsCopy()}
         </LegacyStyledText>
       </Flex>
       <Flex

@@ -356,5 +356,6 @@
   "with_lid": "With {{lidDisplayName}}",
   "with_the_chosen_value": "With the chosen values, the following error occurred:",
   "you_can_still_adjust_offsets": "You can still adjust offsets by running Labware Position Check.",
-  "you_havent_confirmed": "You haven't confirmed the {{missingSteps}} yet. Ensure these are correct before proceeding to run the protocol."
+  "you_havent_confirmed": "You haven't confirmed the {{missingSteps}} yet. Ensure these are correct before proceeding to run the protocol.",
+  "you_havent_confirmed_lpc_missing": "You haven't confirmed the {{missingSteps}} yet. Ensure these are correct before proceeding to run the protocol. Starting the run will apply existing offsets."
 }
