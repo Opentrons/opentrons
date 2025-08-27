@@ -132,7 +132,8 @@ const labwareId4 = 'labwareId4'
 const labwareId5 = 'labwareId5'
 const labwareId6 = 'labwareId6'
 const labwareId7 = 'labwareId7'
-
+const labwareId8 = 'labwareId8'
+const deckRiserId = 'deckRiserId'
 const mockLabwareEntities: LabwareEntities = {
   [labwareId1]: {
     id: labwareId1,
@@ -260,9 +261,32 @@ describe('getLoadLidStacks', () => {
         parameters: { loadName: 'mock_lid' } as any,
       },
     } as LabwareEntity,
+    [labwareId8]: {
+      id: labwareId8,
+      labwareDefURI: 'opentrons/mock_lid/1',
+      def: {
+        ...opentrons96Plate,
+        allowedRoles: ['lid'],
+        parameters: { loadName: 'mock_lid' } as any,
+      },
+    } as LabwareEntity,
+    [deckRiserId]: {
+      id: deckRiserId,
+      labwareDefURI: 'opentrons/opentrons_flex_deck_riser/1',
+      def: {
+        ...opentrons96Plate,
+        allowedRoles: ['adapter'],
+        parameters: { loadName: 'opentrons_flex_deck_riser' } as any,
+      },
+      pythonName: 'mock_adapter_1',
+    } as LabwareEntity,
   }
   const labwareRobotStateWithLids = {
     ...labwareRobotState,
+    [deckRiserId]: {
+      ...labwareRobotState[labwareId6],
+      stack: [deckRiserId, 'B2'],
+    },
     [labwareId6]: {
       ...labwareRobotState[labwareId6],
       stack: [labwareId6, 'D1'],
@@ -271,9 +295,13 @@ describe('getLoadLidStacks', () => {
       ...labwareRobotState[labwareId7],
       stack: [labwareId7, labwareId6, 'D1'],
     },
+    [labwareId8]: {
+      ...labwareRobotState[labwareId8],
+      stack: [labwareId8, deckRiserId, 'B2'],
+    },
   }
 
-  it('should generate load_lid_stack for 2 lids in a stack', () => {
+  it('should generate load_lid_stack for 2 lids in a stack on the deck and 1 lid for a stack on an adapter', () => {
     expect(
       getLoadLidStacks(labwareEntitiesWithLid, labwareRobotStateWithLids)
     ).toBe(
@@ -281,6 +309,11 @@ describe('getLoadLidStacks', () => {
 lid_stack_D1 = protocol.load_lid_stack(
     load_name="mock_lid",
     location="D1",
+    quantity=2,
+)
+lid_stack_mock_adapter_1 = protocol.load_lid_stack(
+    load_name="mock_lid",
+    location=mock_adapter_1,
     quantity=2,
 )`
     )

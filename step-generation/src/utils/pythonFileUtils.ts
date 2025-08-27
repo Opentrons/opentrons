@@ -174,15 +174,25 @@ const _getLidStacks = (
       const { stack } = labwareState[id]
       const nonSlotStackLength = stack.length - 1
       const parentLabware = stack.slice(1, nonSlotStackLength) // excluding stack
-      const isLidStack = parentLabware.every(
+      const deckRiserParentLabware = parentLabware.find(
         parentLabwareId =>
-          allLabwareEntities[parentLabwareId].labwareDefURI === labwareDefURI
+          allLabwareEntities[parentLabwareId].def.parameters.loadName ===
+          'opentrons_flex_deck_riser'
       )
+      const isLidStack =
+        parentLabware.every(
+          parentLabwareId =>
+            allLabwareEntities[parentLabwareId].labwareDefURI === labwareDefURI
+        ) || deckRiserParentLabware != null
+
       const loadName = def.parameters.loadName
       if (!isLidStack) {
         return acc
       }
-      const lidSlot = getSlotInLocationStack(stack)
+      const lidSlot =
+        deckRiserParentLabware != null
+          ? allLabwareEntities[deckRiserParentLabware].pythonName
+          : getSlotInLocationStack(stack)
       if (!(lidSlot in acc)) {
         return {
           ...acc,
@@ -213,8 +223,13 @@ export const getLoadLidStacks = (
 
   const pythonLidStacks = Object.entries(lidStacks)
     .map<string>(([slot, { loadName, quantity }]) => {
+      const isLidSlotOnAdapter = Object.values(allLabwareEntities).some(
+        entity => entity.pythonName === slot
+      )
       const loadNameArg = `load_name=${formatPyStr(loadName)}`
-      const locationArg = `location=${formatPyStr(slot)}`
+      const locationArg = `location=${
+        isLidSlotOnAdapter ? slot : formatPyStr(slot)
+      }`
       const quantityArg = `quantity=${quantity}`
       const allArgs = [loadNameArg, locationArg, quantityArg].join(',\n')
       const allArgsIndented = indentPyLines(allArgs)
