@@ -141,7 +141,7 @@ export const getMigratedLabwareId = (
   allLabwareDefs: Record<string, LabwareDefinition2>,
   latestDefs: LabwareDefByDefURI
 ): string => {
-  const defURI = labware[oldLabwareId].labwareDefURI
+  const defURI = labware[oldLabwareId]?.labwareDefURI
   const loadName = allLabwareDefs[defURI]?.parameters.loadName
   const latestURI = Object.entries(latestDefs).find(
     ([_, def]) => def.parameters.loadName === loadName

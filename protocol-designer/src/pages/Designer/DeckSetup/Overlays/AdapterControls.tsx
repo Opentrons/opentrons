@@ -124,9 +124,13 @@ export const AdapterControls = (
     return null
   }
   const draggedDef = draggedItem?.labwareOnDeck?.def
-  const isCustomLabware = draggedItem
-    ? getLabwareIsCustom(customLabwareDefs, draggedItem.labwareOnDeck)
-    : false
+
+  // when dragging labware over a slot many times quickly
+  // labwareOnDeck could be null/undefined and cause the white screen
+  const isCustomLabware =
+    draggedItem?.labwareOnDeck != null
+      ? getLabwareIsCustom(customLabwareDefs, draggedItem?.labwareOnDeck)
+      : false
 
   const isSlotBlocked =
     isOver &&

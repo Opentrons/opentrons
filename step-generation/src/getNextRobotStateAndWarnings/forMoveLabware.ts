@@ -18,7 +18,8 @@ export function forMoveLabware(
   const initialDeckSlot = getSlotInLocationStack(labware[labwareId].stack)
   const fullStackFromLabwares = getFullStackFromLabwares(
     labware,
-    initialDeckSlot
+    initialDeckSlot,
+    labwareId
   )
   const index = fullStackFromLabwares.indexOf(labwareId)
   const labwareToMove = fullStackFromLabwares.slice(0, index + 1) // includes labwareId you're moving

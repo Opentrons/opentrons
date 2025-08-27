@@ -76,6 +76,7 @@ from ..types import (
     OnAddressableAreaOffsetLocationSequenceComponent,
     OnLabwareOffsetLocationSequenceComponent,
     OnLabwareLocationSequenceComponent,
+    ModuleModel,
     PotentialCutoutFixture,
     LabwareLocationSequence,
     OnModuleLocationSequenceComponent,
@@ -87,7 +88,6 @@ from ..types import (
     labware_location_is_system,
     WellLocationType,
     WellLocationFunction,
-    AddressableArea,
     GripperMoveType,
 )
 from ..types.liquid_level_detection import SimulatedProbeResult, LiquidTrackingType
@@ -104,7 +104,7 @@ from .inner_well_math_utils import (
     find_volume_user_defined_volumes,
 )
 from ._well_math import wells_covered_by_pipette_configuration, nozzles_per_well
-from ._labware_origin_math import (
+from .labware_origin_math.stackup_origin_to_labware_origin import (
     get_stackup_origin_to_labware_origin,
     LabwareOriginContext,
     LabwareStackupAncestorDefinition,
@@ -1006,6 +1006,7 @@ class GeometryView:
         """
         aa_name = self._get_underlying_addressable_area_name(location)
         addressable_area = self._addressable_areas.get_addressable_area(aa_name)
+        slot_front_left = self._addressable_areas.get_addressable_area_position(aa_name)
 
         stackup_defs_locs = self._get_stackup_lw_info_top_to_bottom(
             labware_definition=labware_definition, location=location
@@ -1030,39 +1031,44 @@ class GeometryView:
             slot_name=addressable_area.base_slot,
             deck_definition=self._addressable_areas.deck_definition,
         )
-        lw_origin_to_stackup_placement_origin = self._get_lw_origin_to_parent(
-            labware_definition=labware_definition, addressable_area=addressable_area
-        )
         mod_cal_offset = self._get_calibrated_module_offset(location)
-        location_center = self._addressable_areas.get_addressable_area_center(aa_name)
+
+        lw_origin_to_lw_center = self._get_labware_center(labware_definition)
         grip_z_from_lw_origin = self._labware.get_grip_z(labware_definition)
+        lw_origin_to_lw_grip_center = Point(
+            x=lw_origin_to_lw_center.x,
+            y=lw_origin_to_lw_center.y,
+            z=grip_z_from_lw_origin,
+        )
+
         user_additional_offset = user_additional_offset or Point()
 
         return (
-            location_center
+            slot_front_left
             + stackup_placement_origin_to_lw_origin
-            + lw_origin_to_stackup_placement_origin
+            + lw_origin_to_lw_grip_center
             + mod_cal_offset
-            + Point(0, 0, grip_z_from_lw_origin)
             + user_additional_offset
         )
 
-    def _get_lw_origin_to_parent(
-        self, labware_definition: LabwareDefinition, addressable_area: AddressableArea
-    ) -> Point:
+    def _get_labware_center(self, labware_definition: LabwareDefinition) -> Point:
+        """Get the x,y,z center of the labware."""
         if isinstance(labware_definition, LabwareDefinition2):
-            return Point(0, 0, 0)
+            dimensions = labware_definition.dimensions
+            x = dimensions.xDimension / 2
+            y = dimensions.yDimension / 2
+            z = dimensions.zDimension / 2
+
+            return Point(x, y, z)
         else:
-            bb_y = addressable_area.bounding_box.y
-            bb_z = addressable_area.bounding_box.z
-            return (
-                Point(
-                    x=0,
-                    y=bb_y,
-                    z=bb_z,
-                )
-                * -1
-            )
+            front_right_top = labware_definition.extents.total.frontRightTop
+            back_left_bottom = labware_definition.extents.total.backLeftBottom
+
+            x = (front_right_top.x - back_left_bottom.x) / 2
+            y = (front_right_top.y - back_left_bottom.y) / 2
+            z = (front_right_top.z - back_left_bottom.z) / 2
+
+            return Point(x, y, z)
 
     def get_extra_waypoints(
         self,
@@ -2127,3 +2133,48 @@ class GeometryView:
                 return pending_labware[labware_id]
             except KeyError as ke:
                 raise lnle from ke
+
+    def raise_if_labware_inaccessible_by_pipette(  # noqa: C901
+        self, labware_id: str
+    ) -> None:
+        """Raise an error if the specified location cannot be reached via a pipette."""
+        labware = self._labware.get(labware_id)
+        labware_location = labware.location
+        if isinstance(labware_location, OnLabwareLocation):
+            return self.raise_if_labware_inaccessible_by_pipette(
+                labware_location.labwareId
+            )
+        elif labware.lid_id is not None:
+            raise errors.LocationNotAccessibleByPipetteError(
+                f"Cannot move pipette to {labware.loadName} "
+                "because labware is currently covered by a lid."
+            )
+        elif isinstance(labware_location, AddressableAreaLocation):
+            if fixture_validation.is_staging_slot(labware_location.addressableAreaName):
+                raise errors.LocationNotAccessibleByPipetteError(
+                    f"Cannot move pipette to {labware.loadName},"
+                    f" labware is on staging slot {labware_location.addressableAreaName}"
+                )
+            elif fixture_validation.is_stacker_shuttle(
+                labware_location.addressableAreaName
+            ):
+                raise errors.LocationNotAccessibleByPipetteError(
+                    f"Cannot move pipette to {labware.loadName} because it is on a stacker shuttle"
+                )
+        elif (
+            labware_location == OFF_DECK_LOCATION or labware_location == SYSTEM_LOCATION
+        ):
+            raise errors.LocationNotAccessibleByPipetteError(
+                f"Cannot move pipette to {labware.loadName}, labware is off-deck."
+            )
+        elif isinstance(labware_location, ModuleLocation):
+            module = self._modules.get(labware_location.moduleId)
+            if ModuleModel.is_flex_stacker(module.model):
+                raise errors.LocationNotAccessibleByPipetteError(
+                    f"Cannot move pipette to {labware.loadName}, labware is on a stacker shuttle"
+                )
+
+        elif isinstance(labware_location, InStackerHopperLocation):
+            raise errors.LocationNotAccessibleByPipetteError(
+                f"Cannot move pipette to {labware.loadName}, labware is in a stacker hopper"
+            )

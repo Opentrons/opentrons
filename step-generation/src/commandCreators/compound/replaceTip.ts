@@ -72,11 +72,11 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
   const channels = pipetteSpec?.channels
 
-  const hasMoreTipracksOnDeck =
-    tipracks?.totalTipracks > tipracks?.filteredTipracks
+  const excludedBy96Channel = tipracks?.excludedBy96Channel
+  const excludedByLid = tipracks?.excludedByLid
 
   const is96ChannelTipracksAvailable =
-    nextTiprack == null && channels === 96 && hasMoreTipracksOnDeck
+    nextTiprack == null && channels === 96 && excludedBy96Channel > 0
   if (nozzles === ALL && is96ChannelTipracksAvailable) {
     return {
       errors: [errorCreators.missingAdapter()],
@@ -86,6 +86,11 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   if (nozzles === COLUMN && is96ChannelTipracksAvailable) {
     return {
       errors: [errorCreators.removeAdapter()],
+    }
+  }
+  if (excludedByLid > 0 && nextTiprack == null) {
+    return {
+      errors: [errorCreators.nextTiprackHasLid()],
     }
   }
 
@@ -125,7 +130,10 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
       ],
     }
   }
-  if (!args.dropTipLocation || (!isWasteChute && !isTrashBin)) {
+
+  const hasTip = prevRobotState.tipState.pipettes[pipette]?.hasTip
+
+  if (!args.dropTipLocation || (!isWasteChute && !isTrashBin && hasTip)) {
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
   }
 
@@ -199,7 +207,6 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
               style: args.nozzles,
             },
             pipetteId: args.pipette,
-            tiprackId: nextTiprack.tiprackId,
           }),
         ]
       : []

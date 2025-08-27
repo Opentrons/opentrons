@@ -1,17 +1,17 @@
 site_name: heater-shaker
 
 nav:
-  - Home: index.md
+  - Heater-Shaker Module GEN1 Instruction Manual: index.md
   - Safety Information and Regulatory Compliance: compliance.md
-  - Product Specifications: specifications.md
+  - Product Specifications: product-specs.md
   - Thermal Adapters: adapters.md
   - Installing the Heater-Shaker:
-      - Before You Begin: preinstall.md
-      - Flex Attachment Steps: flex-installation.md
-      - OT-2 Attachment Steps: ot2-installation.md
-  - Software Control: software-control.md
+      - Before You Begin: pre-installation.md
+      - Flex Attachment Steps: installation-flex.md
+      - OT-2 Attachment Steps: installation-ot2.md
+  - Software Control: software.md
   - Maintenance and Cleaning: maintenance.md
-  - Additional Product Information: warranty.md
+  - Additional Product Information: additional-info.md
 
 theme:
   name: material

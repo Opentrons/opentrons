@@ -247,16 +247,21 @@ export interface InnerDelayArgs {
 }
 
 interface CommonArgs {
+  /** NOTE: stepNumber probably shouldn't be optional but making it optional
+   * for the sake of not having to make too many changes for PD 8.5.2
+   * this should be refactored to not be optional for PD 8.6.0
+   * making it optional saves a lot of changes in unit tests
+   */
+  stepNumber?: number
   /** Optional user-readable name for this step */
-  name: string | null | undefined
+  name?: string | null
   /** Optional user-readable description/notes for this step */
-  description: string | null | undefined
+  description?: string | null
 }
 
 // ===== Processed form types. Used as args to call command creator fns =====
 
 export type SharedTransferLikeArgs = CommonArgs & {
-  stepId: number
   tipRack: string // tipRackDefUri
   pipette: string // PipetteId
   nozzles: NozzleConfigurationStyle | null // setting for 96-channel
@@ -518,7 +523,7 @@ interface ProfileCycleItem {
 // TODO IMMEDIATELY: ProfileStepItem -> ProfileStep, ProfileCycleItem -> ProfileCycle
 export type ProfileItem = ProfileStepItem | ProfileCycleItem
 
-export interface ThermocyclerProfileStepArgs {
+export interface ThermocyclerProfileStepArgs extends CommonArgs {
   moduleId: string
   commandCreatorFnName: THERMOCYCLER_PROFILE
   blockTargetTempHold: number | null
@@ -533,7 +538,7 @@ export interface ThermocyclerProfileStepArgs {
   }
 }
 
-export interface ThermocyclerStateStepArgs {
+export interface ThermocyclerStateStepArgs extends CommonArgs {
   moduleId: string
   commandCreatorFnName: THERMOCYCLER_STATE
   blockTargetTemp: number | null
@@ -710,6 +715,7 @@ export type ErrorType =
   | 'MISSING_TEMPERATURE_STEP'
   | 'MODULE_PIPETTE_COLLISION_DANGER'
   | 'MULTI_DISPENSE_VALUES_NOT_FOUND'
+  | 'NEXT_TIPRACK_HAS_LID'
   | 'NO_TIP_ON_PIPETTE'
   | 'NO_TIP_SELECTED'
   | 'PIPETTE_DOES_NOT_EXIST'
@@ -721,6 +727,7 @@ export type ErrorType =
   | 'RETRACT_BELOW_ASPIRATE'
   | 'RETRACT_BELOW_DISPENSE'
   | 'RETURN_TIP_UNAVAILABLE'
+  | 'STACK_TOO_HIGH'
   | 'SUBMERGE_BELOW_ASPIRATE'
   | 'SUBMERGE_BELOW_DISPENSE'
   | 'TALL_LABWARE_EAST_WEST_OF_HEATER_SHAKER'
@@ -745,7 +752,12 @@ export interface CommandCreatorWarning {
   type: WarningType
 }
 
-export interface CommandsAndRobotState {
+interface StepInfo {
+  stepNumber?: number
+  //  TODO: can extend to include stepName and stepDetails
+}
+
+export interface CommandsAndRobotState extends StepInfo {
   commands: CreateCommand[]
   robotState: RobotState
   warnings?: CommandCreatorWarning[]
@@ -757,7 +769,7 @@ export interface CommandCreatorErrorResponse {
   warnings?: CommandCreatorWarning[]
 }
 
-export interface CommandsAndWarnings {
+export interface CommandsAndWarnings extends StepInfo {
   commands: CreateCommand[]
   warnings?: CommandCreatorWarning[]
   python?: string
