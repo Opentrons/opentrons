@@ -28,7 +28,7 @@ Start by loading each Stacker as you would any other module:
        location="C4"
    )
 
-In this example, Stacker shuttles occupy deck slots A3 and C3. 
+In this example, Stacker shuttles occupy deck slots A4 and C4. 
 
 Adding Labware to the Stacker
 ==============================
@@ -106,7 +106,8 @@ You can use :py:meth:`~.FlexStackerContext.fill` to fill the Stacker with as man
        load_name="nest_12_reservoir_15ml",
        count=8
    )
-   stacker_1.fill(1, "Add another tip rack to stacker_1.")
+   stacker_1.fill(count=1, message="Add another tip rack to Stacker 1.")
+
 
 Here, ``stacker_2`` is emptied and reconfigured to store NEST reservoirs with ``set_stored_labware()`` and the ``fill`` method adds another Flex tip rack to ``stacker_1``. 
 
