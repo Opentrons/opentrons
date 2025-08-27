@@ -32,7 +32,7 @@ interface LiquidDetailCardProps {
   labwareWellOrdering: string[][]
   volumesPerLiquid: Record<string, WellContentsByNumber>
   setSelectedValue: Dispatch<SetStateAction<string | undefined>>
-  selectedValue?: string
+  selectedValue: string
 }
 
 export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
