@@ -20,6 +20,8 @@ from dataclasses import dataclass
 #  GLOBAL VARIABLES - START
 ###########################################
 
+LABWARE = "eppendorf_96_wellplate_2000ul"
+
 RESERVOIR = "nest_1_reservoir_290ml"
 
 LIQUID_MOUNT = "right"
@@ -129,41 +131,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         ],
         default="flex_1channel_1000",
     )
-    parameters.add_str(
-        variable_name="labware_type",
-        display_name="Labware Type",
-        choices=[
-            {
-                "display_name": "falcon384",
-                "value": "corning_falcon_384_well_plate_130ul_square_flat",
-            },
-            {
-                "display_name": "costar96_2200",
-                "value": "costar_96_wellplate_2200ul",
-            },
-            {
-                "display_name": "greiner323",
-                "value": "greiner_96_wellplate_323ul",
-            },
-            {
-                "display_name": "greiner340",
-                "value": "greiner_96_wellplate_340ul",
-            },
-            {
-                "display_name": "nunc96_250",
-                "value": "nunc_96_wellplate_250ul",
-            },
-            {
-                "display_name": "thermo_abgene_1.2ml",
-                "value": "thermoscientific_abgene_96_wellplate_1.2ml",
-            },
-            {
-                "display_name": "thermo_96_800",
-                "value": "thermoscientific_96_wellplate_800ul",
-            },
-        ],
-        default="corning_falcon_384_well_plate_130ul_square_flat",
-    )
+
     parameters.add_float(
         display_name="First Dispense",
         variable_name="first_dispense",
@@ -194,11 +162,11 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 
 def _setup(ctx: ProtocolContext) -> SetupState:
-    global DIAL_PORT, RUN_ID, FILE_NAME
+    global DIAL_PORT, RUN_ID, FILE_NAME, LABWARE
 
     first_dispense = ctx.params.first_dispense  # type: ignore[attr-defined]
     target_height = ctx.params.target_height  # type: ignore[attr-defined]
-    labware_type = ctx.params.labware_type  # type: ignore[attr-defined]
+    labware_type = LABWARE
     liq_tip_size = ctx.params.liq_tip_size  # type: ignore[attr-defined]
     left_mount = ctx.params.left_mount  # type: ignore[attr-defined]
     right_mount = ctx.params.right_mount  # type: ignore[attr-defined]
@@ -677,3 +645,5 @@ def run(ctx: ProtocolContext) -> None:
 
         with open(file_path, "w") as f:
             json.dump(new_inner_well_json, f, indent=2)
+
+        ctx.pause(f"User defined volume file created: data/testng_data/{file_path}")

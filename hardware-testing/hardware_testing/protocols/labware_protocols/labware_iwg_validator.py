@@ -11,6 +11,8 @@ from typing import List, Dict, Optional, Union, Tuple
 from opentrons.types import Point
 from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
 
+# LABWARE TYPE
+LABWARE = "eppendorf_96_wellplate_2000ul"
 
 # SLOTS
 SLOT_LIQUID_TIPRACKS = ["C3", "B3", "A2"]
@@ -60,49 +62,6 @@ def add_parameters(parameters: ParameterContext) -> None:
         default="flex_1channel_1000",
     )
 
-    parameters.add_int(
-        variable_name="number_of_trials",
-        display_name="Number of Trials",
-        maximum=6,
-        minimum=1,
-        default=3,
-    )
-
-    parameters.add_str(
-        variable_name="labware_type",
-        display_name="Labware Type",
-        choices=[
-            {
-                "display_name": "falcon384",
-                "value": "corning_falcon_384_well_plate_130ul_square_flat",
-            },
-            {
-                "display_name": "costar96_2200",
-                "value": "costar_96_wellplate_2200ul",
-            },
-            {
-                "display_name": "greiner323",
-                "value": "greiner_96_wellplate_323ul",
-            },
-            {
-                "display_name": "greiner340",
-                "value": "greiner_96_wellplate_340ul",
-            },
-            {
-                "display_name": "nunc96_250",
-                "value": "nunc_96_wellplate_250ul",
-            },
-            {
-                "display_name": "thermo_abgene_1.2ml",
-                "value": "thermoscientific_abgene_96_wellplate_1.2ml",
-            },
-            {
-                "display_name": "thermo_96_800",
-                "value": "thermoscientific_96_wellplate_800ul",
-            },
-        ],
-        default="greiner_96_wellplate_340ul",
-    )
 
     parameters.add_str(
         variable_name="liq_tip_size",
@@ -127,12 +86,12 @@ def _setup(
     int,
     str,
 ]:
-    global DIAL_PORT, RUN_ID, FILE_NAME
-    labware_type = ctx.params.labware_type  # type: ignore[attr-defined]
+    global DIAL_PORT, RUN_ID, FILE_NAME, LABWARE 
+    labware_type = LABWARE  
 
     # LOAD LABWARE AND DIAL
     labware = ctx.load_labware(labware_type, SLOT_LABWARE)
-    number_of_trials = ctx.params.number_of_trials  # type: ignore[attr-defined]
+    number_of_trials = int(3)
     labware.load_empty(labware.wells())
     src = ctx.load_labware("nest_1_reservoir_290ml", SLOT_RESERVOIR)
     ethanol_liq = ctx.define_liquid("Ethanol", display_color="#FFFFC5")
@@ -400,6 +359,7 @@ def run(ctx: ProtocolContext) -> None:
         line = [labware_type] + region_results
         line_str = ",".join(line) + "\n"
         append_data_to_file(metadata["protocolName"], RUN_ID, FILE_NAME, line_str)
+        ctx.pause(f"Results: {line_str}")
 
     drop_tips(probe_pipette, liq_pipette)
 
