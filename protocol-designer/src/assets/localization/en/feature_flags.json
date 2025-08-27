@@ -47,6 +47,10 @@
     "title": "Enable more labware capabilities",
     "description": "Ability to stack labware, add lids, etc"
   },
+  "OT_PD_ENABLE_CONCURRENT_MODULE_ACTIONS": {
+    "title": "Enable concurrent module actions",
+    "description": "Features and design changes for running steps while waiting for modules to do stuff."
+  },
   "OT_PD_ENABLE_JSON_EXPORT": {
     "title": "Enable exporting JSON",
     "description": "Enables the ability to export JSON for internal usages only"
