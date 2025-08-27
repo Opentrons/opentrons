@@ -39,7 +39,6 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
     selectedModuleModel,
     selectedLidLabware,
   } = selectedSlotInfo
-  console.log('selectedLidLabware', selectedLidLabware)
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
   const defs = getAllLabwareDefs()
   const deckSetup = useSelector(getInitialDeckSetup)
@@ -49,6 +48,16 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
       const matchingSlot = getSlotInLocationStack(stack)
       return (
         labwareDefURI === selectedTopLabware.labwareDefURI &&
+        matchingSlot === selectedSlot.slot
+      )
+    }
+  )
+
+  const matchingSelectedLidOnDeck = Object.values(labware).find(
+    ({ stack, labwareDefURI }) => {
+      const matchingSlot = getSlotInLocationStack(stack)
+      return (
+        labwareDefURI === selectedLidLabware &&
         matchingSlot === selectedSlot.slot
       )
     }
@@ -129,6 +138,7 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
               topLabwareOnDeck={matchingSelectedTopLabwareOnDeck}
               adapterDef={selectedAdapterDef}
               moduleModel={selectedModuleModel}
+              lidOnDeck={matchingSelectedLidOnDeck}
             />
           </Module>
           {selectedModuleModel != null ? (
@@ -140,6 +150,9 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
               isSelected={true}
               labwareInfos={labwareInfos}
               slot={selectedSlot.slot}
+              showModuleIcon={
+                selectedTopLabware.amount > 1 || lengthOfStack > 1
+              }
             />
           ) : null}
         </>

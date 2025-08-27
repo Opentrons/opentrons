@@ -193,7 +193,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
     modulesOnDeck,
     module => getModuleType(module.moduleModel) !== FLEX_STACKER_MODULE_TYPE
   )
-
+console.log('labwareOnDeck',labwareOnDeck)
   return (
     <RobotCoordinateSpace
       viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${
@@ -461,6 +461,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
             onLabwareClick,
             highlight,
             highlightShadow,
+          
           }) => {
             if (
               labwareLocation === 'offDeck' ||

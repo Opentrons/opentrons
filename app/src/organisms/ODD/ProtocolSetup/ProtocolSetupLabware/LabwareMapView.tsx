@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 
-import { BaseDeck, Flex } from '@opentrons/components'
+import { BaseDeck, Flex, LabwareRender } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   getLabwareDefinitionsByURIForProtocol,
@@ -88,6 +88,9 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
       topLabwareInfo != null
         ? definitionsByURI[topLabwareInfo.definitionUri]
         : null
+    const matchingLidDef = Object.values(definitionsByURI).find(
+      uri => uri.metadata.displayName === topLabwareInfo?.lidDisplayName
+    )
     if (topLabwareInfo == null || topLabwareDefinition == null) return null
 
     const isLabwareInStack = stackedItems.length > 1
@@ -106,6 +109,13 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
       wellFill: wellFill,
       highlight: true,
       stacked: isLabwareInStack,
+      labwareChildren:
+        matchingLidDef != null ? (
+          <LabwareRender
+            definition={matchingLidDef}
+            positioningMode="passThrough"
+          />
+        ) : null,
     }
   })
 

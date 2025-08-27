@@ -26,8 +26,8 @@ import {
 } from '../../../step-forms'
 import { START_TERMINAL_ITEM_ID } from '../../../steplist'
 import {
+  getLabwaresOnModuleFromStack,
   getStagingAreaAddressableAreas,
-  getTopmostLabwareOnModuleFromStack,
 } from '../../../utils'
 import { HighlightLabware } from '../HighlightLabware'
 import { getSlotInformation } from '../utils'
@@ -232,7 +232,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           }
         }
 
-        const labwareLoadedOnModuleId = getTopmostLabwareOnModuleFromStack(
+        const { topMostId, rightBelowTopId } = getLabwaresOnModuleFromStack(
           moduleOnDeck.id,
           allLabware
         )
@@ -259,7 +259,11 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                     : 'open',
               }
             : tempInnerProps
-        const labwareOnModule = activeDeckSetup.labware[labwareLoadedOnModuleId]
+        const labwareOnModule = activeDeckSetup.labware[topMostId]
+        const labwareRightBelowTopMostLabware =
+          rightBelowTopId != null
+            ? activeDeckSetup.labware[rightBelowTopId]
+            : null
         const isAdapter = labwareOnModule?.def.allowedRoles?.includes('adapter')
 
         return moduleOnDeck.slot !== selectedSlot.slot ? (
@@ -280,6 +284,13 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
               {labwareOnModule != null &&
               !isLabwareOccludedByThermocyclerLid ? (
                 <>
+                  {labwareRightBelowTopMostLabware != null ? (
+                    <LabwareOnDeck
+                      x={0}
+                      y={0}
+                      labwareOnDeck={labwareRightBelowTopMostLabware}
+                    />
+                  ) : null}
                   <LabwareOnDeck x={0} y={0} labwareOnDeck={labwareOnModule} />
                   <HighlightLabware
                     labwareOnDeck={labwareOnModule}

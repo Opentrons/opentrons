@@ -451,13 +451,23 @@ export function getLocationStackTopToBottom(
   return stack
 }
 
-export const getTopmostLabwareOnModuleFromStack = (
+export const getLabwaresOnModuleFromStack = (
   moduleId: string,
   labware: LabwareOnDeck[]
-): string => {
-  return labware
-    .filter(lw => lw.stack.includes(moduleId)) // all stacks involving this module
-    .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack[0] // return topmost labware from largest stack
+): { topMostId: string | null; rightBelowTopId: string | null } => {
+  // all stacks involving this module
+  const allStacks = labware.filter(lw => lw.stack.includes(moduleId))
+  const largestStack = allStacks.sort(
+    (a, b) => b.stack.length - a.stack.length
+  )[0]
+  const topMostId = largestStack?.stack[0]
+  const isTopMostIdALid = labware.find(
+    lw => lw.id === topMostId && lw.def.allowedRoles?.includes('lid')
+  )
+  return {
+    topMostId: largestStack?.stack[0],
+    rightBelowTopId: isTopMostIdALid ? largestStack?.stack[1] : null,
+  }
 }
 
 export const getFullStackFromLabwaresOnDeck = (

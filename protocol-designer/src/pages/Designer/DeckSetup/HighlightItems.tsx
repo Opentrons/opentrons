@@ -13,6 +13,8 @@ import {
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
+import { getLabwaresOnModuleFromStack } from '/protocol-designer/utils'
+
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import {
   getHoveredDropdownItem,
@@ -156,6 +158,10 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
       if (moduleOnDeck == null) {
         return acc
       }
+      const { topMostId, rightBelowTopId } = getLabwaresOnModuleFromStack(
+        moduleOnDeck.id,
+        Object.values(labware)
+      )
       const position = getPositionFromSlotId(moduleOnDeck.slot, deckDef)
       if (position != null) {
         return [
@@ -170,6 +176,7 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
             isZoomed={false}
             labelName={text ?? ''}
             slot={moduleOnDeck.slot}
+            showModuleIcon={topMostId != null && rightBelowTopId != null}
           />,
         ]
       }

@@ -6,6 +6,7 @@ import {
   Box,
   DIRECTION_COLUMN,
   Flex,
+  LabwareRender,
   SPACING,
   STACKER_HOPPER_LABWARE_X_OFFSET,
 } from '@opentrons/components'
@@ -171,6 +172,9 @@ export function SetupLabwareMap({
       topLabwareInfo != null
         ? labwareDefinitionsByURI[topLabwareInfo.definitionUri]
         : null
+    const matchingLidDef = Object.values(labwareDefinitionsByURI).find(
+      uri => uri.metadata.displayName === topLabwareInfo?.lidDisplayName
+    )
     if (topLabwareInfo == null || topLabwareDefinition == null) return null
     const isLabwareInStack = stackedItems.length > 1
     const wellFill = getWellFillFromLabwareId(
@@ -186,26 +190,34 @@ export function SetupLabwareMap({
       stacked: isLabwareInStack,
       wellFill,
       labwareChildren: (
-        <g
-          cursor="pointer"
-          onClick={() => {
-            setSelectedStack({ slotName, stack: stackedItems })
-          }}
-          onMouseEnter={() => {
-            setHoverLabwareId(() => topLabwareInfo.labwareId)
-          }}
-          onMouseLeave={() => {
-            setHoverLabwareId(null)
-          }}
-        >
-          <LabwareInfoOverlay
-            definition={topLabwareDefinition}
-            labwareId={topLabwareInfo.labwareId}
-            displayName={topLabwareInfo.displayName}
-            runId={runId}
-            labwareHasLiquid={Object.values(wellFill).length > 0}
-          />
-        </g>
+        <>
+          {matchingLidDef != null ? (
+            <LabwareRender
+              definition={matchingLidDef}
+              positioningMode="passThrough"
+            />
+          ) : null}
+          <g
+            cursor="pointer"
+            onClick={() => {
+              setSelectedStack({ slotName, stack: stackedItems })
+            }}
+            onMouseEnter={() => {
+              setHoverLabwareId(() => topLabwareInfo.labwareId)
+            }}
+            onMouseLeave={() => {
+              setHoverLabwareId(null)
+            }}
+          >
+            <LabwareInfoOverlay
+              definition={topLabwareDefinition}
+              labwareId={topLabwareInfo.labwareId}
+              displayName={topLabwareInfo.displayName}
+              runId={runId}
+              labwareHasLiquid={Object.values(wellFill).length > 0}
+            />
+          </g>
+        </>
       ),
     }
   })

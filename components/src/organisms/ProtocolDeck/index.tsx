@@ -13,6 +13,7 @@ import {
   getWellFillFromLabwareId,
 } from '@opentrons/shared-data'
 
+import { LabwareRender } from '../..'
 import { BaseDeck } from '../../hardware-sim/BaseDeck'
 
 import type { ComponentProps } from 'react'
@@ -74,17 +75,17 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
       }
     }
   )
-
   const labwareOnDeck: Array<LabwareOnDeck | null> = Object.entries(
     getLabwareOnDeck(startingDeck)
   ).map(([slotName, stackedItems]) => {
     const topLabwareInfo = getTopLabwareFromStack(stackedItems)
-    console.log('topLabwareInfo', topLabwareInfo, stackedItems)
-    // const test = topLabwareInfo?.lidId != null ? labwareDefinitionsByURI
     const topLabwareDefinition =
       topLabwareInfo != null
         ? labwareDefinitionsByURI[topLabwareInfo.definitionUri]
         : null
+    const matchingLidDef = Object.values(labwareDefinitionsByURI).find(
+      uri => uri.metadata.displayName === topLabwareInfo?.lidDisplayName
+    )
     return topLabwareDefinition != null && topLabwareInfo != null
       ? {
           definition: topLabwareDefinition,
@@ -94,6 +95,13 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
             protocolAnalysis.liquids,
             labwareByLiquidId
           ),
+          labwareChildren:
+            matchingLidDef != null ? (
+              <LabwareRender
+                definition={matchingLidDef}
+                positioningMode="passThrough"
+              />
+            ) : null,
         }
       : null
   })
