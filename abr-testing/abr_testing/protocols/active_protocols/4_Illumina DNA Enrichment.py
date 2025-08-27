@@ -112,7 +112,6 @@ def run(protocol: ProtocolContext) -> None:
     reagent_plate, temp_adapter = helpers.load_temp_adapter_and_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", temp_block, "Reagent Plate"
     )
-    lid = protocol.load_lid_stack("opentrons_tough_universal_lid", "B4", 2)
     # ========== SECOND ROW ==========
     MAG_PLATE_SLOT: MagneticBlockContext = protocol.load_module(
         helpers.mag_str, "C1"
