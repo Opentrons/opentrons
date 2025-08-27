@@ -69,17 +69,17 @@ def getch():
 
     def _getch():
         fd = sys.stdin.fileno()
-        old_settings = termios.tcgetattr(fd)
+        old_settings = termios.tcgetattr(fd) # pyright: ignore[reportAttributeAccessIssue]
         try:
-            tty.setraw(fd)
+            tty.setraw(fd) # pyright: ignore[reportAttributeAccessIssue]
             ch = sys.stdin.read(1)
         finally:
-            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings) # pyright: ignore[reportAttributeAccessIssue]
         return ch
 
     return _getch()
 
-async def jog(api, position, cp) -> Dict[Axis, float]:
+async def jog(api, position, cp) -> Point:
     step_size = [0.01, 0.05, 0.1, 0.5, 1, 10, 20, 50]
     step_length_index = 3
     step = step_size[step_length_index]
@@ -166,7 +166,10 @@ async def jog(api, position, cp) -> Dict[Axis, float]:
                 mount, critical_point=cp, refresh=True
             )
             print("\r\n")
-            return position
+            point_position = Point(x=position[Axis.X],
+                                   y=position[Axis.Y],
+                                   z=position[Axis.by_mount(mount)])
+            return point_position
         await api._update_position_estimation([Axis.by_mount(mount)])
         position = await api.encoder_current_position_ot3(
             mount, critical_point=cp, refresh = True
@@ -202,19 +205,19 @@ async def move_to_point(api, mount, point, cp):
                         pos[Axis.Y],
                         home_pos-home_offset),
                     speed=None,
-                    expect_stalls=False)
+                    _expect_stalls=False)
     await api.move_to(mount,
                     Point(point.x,
                         point.y,
                         home_pos-home_offset),
                     speed=None,
-                    expect_stalls=False)
+                    _expect_stalls=False)
     await api.move_to(mount,
                     Point(point.x,
                         point.y,
                         point.z),
                     speed=None,
-                    expect_stalls=False)
+                    _expect_stalls=False)
     
 async def move_direct(api, mount, point, cp):
     offset = 5
@@ -225,21 +228,21 @@ async def move_direct(api, mount, point, cp):
                         pos[Axis.Y],
                         pos[Axis.by_mount(mount)] + offset),
                     speed=None,
-                    expect_stalls=False)
+                    _expect_stalls=False)
     # input("Press Enter to continue 1")
     await api.move_to(mount,
                     Point(point.x,
                         point.y,
                         pos[Axis.by_mount(mount)] + offset),
                     speed=None,
-                    expect_stalls=False)
+                    _expect_stalls=False)
     # input("Press Enter to Continue 2")
     await api.move_to(mount,
                     Point(point.x,
                         point.y,
                         point.z),
                     speed=None,
-                    expect_stalls=False
+                    _expect_stalls=False
                     )
 
 def load_config_(filename: str) -> Dict:
@@ -255,7 +258,7 @@ def load_config_(filename: str) -> Dict:
         data = {}
     return data
 
-def save_config_(filename: str, data: str) -> Dict:
+def save_config_(filename: str, data: str) -> None:
     """This function saves a given config file with data"""
     try:
         with open(filename, 'w') as file:
@@ -263,14 +266,11 @@ def save_config_(filename: str, data: str) -> Dict:
                 data, file, sort_keys=True, indent=4, separators=(',', ': ')
                     )
     except FileNotFoundError:
-        print('Warning: {0} not found'.format(filename))
-        data = {}
+        raise Exception('Error: {0} not found'.format(filename))
     except json.decoder.JSONDecodeError:
-        print('Error: {0} is corrupt'.format(filename))
-        data = {}
-    return data
+        raise Exception('Error: {0} is corrupt'.format(filename))
 
-async def calibrate_tiprack(api, home_position, mount):
+async def calibrate_tiprack(api, home_position, mount) -> Point:
     cp = CriticalPoint.NOZZLE
     tiprack_loc = Point(
                     deck_slot['deck_slot'][args.tiprack_slot]['X'],
@@ -280,11 +280,8 @@ async def calibrate_tiprack(api, home_position, mount):
     print("Calibrate for Pick up tip")
     await move_to_point(api, mount, tiprack_loc, cp)
     current_position = await api.current_position_ot3(mount, cp)
-    tiprack_loc = await jog(api, current_position, cp)
-    tiprack_loc = Point(tiprack_loc[Axis.X],
-                        tiprack_loc[Axis.Y],
-                        tiprack_loc[Axis.by_mount(mount)])
-    return tiprack_loc
+    new_point = await jog(api, current_position, cp)
+    return new_point
 
 async def update_pick_up_current(api, mount, tip_count, current) -> None:
     """Update pick-up-tip current."""
@@ -313,7 +310,11 @@ async def _main(args: argparse.Namespace, cfg: TestConfig) -> None:
                                                                         Axis.by_mount(mount))
     default_current = settings.run_current
     print(f"Default run Current: {default_current}")
-    pipette_model = hw_api.get_all_attached_instr()[OT3Mount.LEFT]["pipette_id"]
+    attached_instr = hw_api.get_all_attached_instr()[OT3Mount.LEFT]
+    if attached_instr is not None and "pipette_id" in attached_instr:
+        pipette_model = attached_instr["pipette_id"]
+    else:
+        raise RuntimeError("no pipette attached on LEFT mount or pipette_id")
     instrument = hw_api._pipette_handler.get_pipette(mount)
     spec = hw_api._pipette_handler.plan_lt_pick_up_tip(
         mount,
@@ -351,26 +352,7 @@ async def _main(args: argparse.Namespace, cfg: TestConfig) -> None:
                 'Tip 7': None,
                 'Tip 8': None
                 }
-    nozzle_data = {
-                    'Nozzle 1': None,
-                    'Nozzle 2': None,
-                    'Nozzle 3': None,
-                    'Nozzle 4': None,
-                    'Nozzle 5': None,
-                    'Nozzle 6': None,
-                    'Nozzle 7': None,
-                    'Nozzle 8': None
-    }
-    tip_data = {
-                'Tip 1': None,
-                'Tip 2': None,
-                'Tip 3': None,
-                'Tip 4': None,
-                'Tip 5': None,
-                'Tip 6': None,
-                'Tip 7': None,
-                'Tip 8': None
-    }
+    
     print(f'Dictionary: {dial_data}')
     instrument = hw_api._pipette_handler.get_pipette(OT3Mount.LEFT)
     details = [pipette_model, 'default-current']
@@ -382,7 +364,7 @@ async def _main(args: argparse.Namespace, cfg: TestConfig) -> None:
         start_time = time.perf_counter()
         cp = CriticalPoint.NOZZLE
         measurements = []
-
+        tip_overlap_measurements = []
         if (args.measure_nozzles):
             home_wo_tip = await hw_api.current_position_ot3(mount, cp)
             initial_dial_loc = Point(
@@ -395,10 +377,6 @@ async def _main(args: argparse.Namespace, cfg: TestConfig) -> None:
             await move_to_point(hw_api, mount, initial_dial_loc, cp)
             current_position = await hw_api.current_position_ot3(mount, cp)
             nozzle_loc = await jog(hw_api, current_position, cp)
-            nozzle_loc = Point(
-                                nozzle_loc[Axis.X],
-                                nozzle_loc[Axis.Y],
-                                nozzle_loc[Axis.by_mount(mount)])
             deck_slot['deck_slot'][args.dial_slot][Axis.X.name] = nozzle_loc.x
             deck_slot['deck_slot'][args.dial_slot][Axis.Y.name] = nozzle_loc.y
             deck_slot['deck_slot'][args.dial_slot]['Z'] = nozzle_loc.z
@@ -426,6 +404,9 @@ async def _main(args: argparse.Namespace, cfg: TestConfig) -> None:
                 if noz % num_of_columns == 0:
                     x_offset = 0
             print(f'Nozzle Measurements: {nozzle_measurement_map}')
+        pickup_loc = Point(x=deck_slot['deck_slot'][args.tiprack_slot][Axis.X.name],
+                              y=deck_slot['deck_slot'][args.tiprack_slot][Axis.Y.name],
+                              z=deck_slot['deck_slot'][args.tiprack_slot][Axis.Z.name])
         # Calibrate to tiprack
         if (args.calibrate):
             pickup_loc = await calibrate_tiprack(hw_api, home_position, mount)
@@ -433,62 +414,63 @@ async def _main(args: argparse.Namespace, cfg: TestConfig) -> None:
             deck_slot['deck_slot'][args.tiprack_slot][Axis.Y.name] = pickup_loc.y
             deck_slot['deck_slot'][args.tiprack_slot]['Z'] = pickup_loc.z
             save_config_(path+cal_fn, deck_slot)
-            # Target should be the top of the side of the tip
-            prep_target = Point(x=pickup_loc.x-RADIUS, 
-                                y=pickup_loc.y, 
-                                z=pickup_loc.z+PREP_PRESS_DISTANCE)
-            
-            await move_direct(hw_api, mount, prep_target, cp)
-            async with hw_api._backend.motor_current(run_currents={Axis.by_mount(mount): 0.15}):
-                target = Point(x=pickup_loc.x-RADIUS, 
-                                y=pickup_loc.y, 
-                                z=pickup_loc.z-PRESS_DISTANCE)
-                await hw_api.move_to(mount=mount, 
-                                    abs_position=target, 
-                                    speed=10, 
-                                    critical_point=CriticalPoint.NOZZLE,
-                                    max_speeds=None,
-                                    expect_stalls=True)
-            tip_overlap_measurements = []
-            await hw_api._update_position_estimation([Axis.by_mount(mount)])
-            init_tipoverlap = (await hw_api.encoder_current_position_ot3(mount, cp, refresh=True))[Axis.by_mount(mount)]
-            print(f'init_tipoverlap: {init_tipoverlap}')
-            pick_up_location = Point(x=pickup_loc.x, y=pickup_loc.y,z=init_tipoverlap) 
-            # Let's pressed onto the tip -> stall and measure the encoder position
-            await move_direct(hw_api, mount, pick_up_location, cp)
-            # This would be my initial press position
-            # the first tip overlap value passed to pickup tip is a placeholder
-            tip_overlap_dict = await hw_api.pick_up_tip(
-                                        mount, 
-                                        tip_length=(tip_length[args.tip_size]-tip_overlap))
-            print(f'Init Position: {init_tipoverlap}')
-            print(f'tip_overlap_dict: {tip_overlap_dict}')
-            enc_tipoverlap =  (tip_overlap_dict['init'] - tip_overlap_dict['final'])+args.press_comp
-            print(f'TipOverlap(mm): {enc_tipoverlap}')
-            tip_overlap_measurements.append(enc_tipoverlap)
-            instr = hw_api._pipette_handler.get_pipette(mount)
-            current_tipL = instr.current_tip_length
-            print(f'current_tip end effector: {current_tipL}')
-            instr.remove_tip()
-            current_position = await hw_api.current_position_ot3(mount)
-            print(current_position)
-            instr.add_tip((tip_length[args.tip_size]-enc_tipoverlap))
-            new_tipL = instr.current_tip_length
-            print(f'new_current end effector: {new_tipL}')
+        # Target should be the top of the side of the tip
+        prep_target = Point(x=pickup_loc.x-RADIUS, 
+                            y=pickup_loc.y, 
+                            z=pickup_loc.z+PREP_PRESS_DISTANCE)
+        
+        await move_direct(hw_api, mount, prep_target, cp)
+        async with hw_api._backend.motor_current(run_currents={Axis.by_mount(mount): 0.15}):
+            target = Point(x=pickup_loc.x-RADIUS, 
+                            y=pickup_loc.y, 
+                            z=pickup_loc.z-PRESS_DISTANCE)
+            await hw_api.move_to(mount=mount, 
+                                abs_position=target, 
+                                speed=10, 
+                                critical_point=CriticalPoint.NOZZLE,
+                                max_speeds=None,
+                                _expect_stalls=True)
+        
+        await hw_api._update_position_estimation([Axis.by_mount(mount)])
+        init_tipoverlap = (await hw_api.encoder_current_position_ot3(mount, cp, refresh=True))[Axis.by_mount(mount)]
+        print(f'init_tipoverlap: {init_tipoverlap}')
+        pick_up_location = Point(x=pickup_loc.x, y=pickup_loc.y,z=init_tipoverlap) 
+        # Let's pressed onto the tip -> stall and measure the encoder position
+        await move_direct(hw_api, mount, pick_up_location, cp)
+        # This would be my initial press position
+        # the first tip overlap value passed to pickup tip is a placeholder
+        tip_overlap_dict = {}
+        tip_overlap_dict = await hw_api.pick_up_tip(
+                                    mount, 
+                                    tip_length=(tip_length[args.tip_size]-tip_overlap))
+        print(f'Init Position: {init_tipoverlap}')
+        print(f'tip_overlap_dict: {tip_overlap_dict}')
+        if tip_overlap_dict is not None and 'init' in tip_overlap_dict and 'final' in tip_overlap_dict:
+            enc_tipoverlap = (tip_overlap_dict['init'] - tip_overlap_dict['final']) + args.press_comp
+        else:
+            raise ValueError("tip_overlap_dict is None or missing required keys 'init' and 'final'")
+        print(f'TipOverlap(mm): {enc_tipoverlap}')
+        tip_overlap_measurements.append(enc_tipoverlap)
+        instr = hw_api._pipette_handler.get_pipette(mount)
+        current_tipL = instr.current_tip_length
+        print(f'current_tip end effector: {current_tipL}')
+        instr.remove_tip()
+        current_position = await hw_api.current_position_ot3(mount)
+        print(current_position)
+        instr.add_tip((tip_length[args.tip_size]-enc_tipoverlap))
+        new_tipL = instr.current_tip_length
+        print(f'new_current end effector: {new_tipL}')
 
         cp = CriticalPoint.TIP
         #Calibrate Dial Indicator with single tip
+        dial_loc = Point(x=deck_slot['deck_slot'][args.dial_slot][Axis.X.name],
+                         y=deck_slot['deck_slot'][args.dial_slot][Axis.X.name],
+                         z=deck_slot['deck_slot'][args.dial_slot][Axis.X.name]) 
         if (args.calibrate):
-            initial_dial_loc = Point(nozzle_loc.x,
-                                    nozzle_loc.y,
-                                    nozzle_loc.z)
             print("Move to Dial Indicator")
-            await move_to_point(hw_api, mount, initial_dial_loc, cp)
+            await move_to_point(hw_api, mount, dial_loc, cp)
             current_position = await hw_api.current_position_ot3(mount, cp)
             dial_loc = await jog(hw_api, current_position, cp)
-            dial_loc = Point(dial_loc[Axis.X],
-                                dial_loc[Axis.Y],
-                                dial_loc[Axis.by_mount(mount)])
             deck_slot['deck_slot'][args.dial_slot][Axis.X.name] = dial_loc.x
             deck_slot['deck_slot'][args.dial_slot][Axis.Y.name] = dial_loc.y
             deck_slot['deck_slot'][args.dial_slot]['Z'] = dial_loc.z
@@ -512,9 +494,9 @@ async def _main(args: argparse.Namespace, cfg: TestConfig) -> None:
                 tip_measurement_map = []
                 for tip_count in range(1, tips_to_use + 1):
                     cp = CriticalPoint.TIP
-                    tip_position = Point(dial_loc[0] + x_offset,
-                                            dial_loc[1] + y_offset,
-                                            dial_loc[2])
+                    tip_position = Point(dial_loc.x + x_offset,
+                                            dial_loc.y + y_offset,
+                                            dial_loc.z)
                     await move_to_point(hw_api, mount, tip_position, cp)
                     tip_dist = await hw_api.encoder_current_position_ot3(mount, CriticalPoint.NOZZLE)
                     encoder_pos.append(tip_dist[Axis.by_mount(mount)])
@@ -589,7 +571,7 @@ async def _main(args: argparse.Namespace, cfg: TestConfig) -> None:
                                     speed=10, 
                                     critical_point=CriticalPoint.NOZZLE,
                                     max_speeds=None,
-                                    expect_stalls=True)
+                                    _expect_stalls=True)
             await hw_api._update_position_estimation([Axis.by_mount(mount)])
             init_tipoverlap = (await hw_api.encoder_current_position_ot3(mount, cp, refresh=True))[Axis.by_mount(mount)]
             # init_tipoverlap = init_tipoverlap[Axis.by_mount(mount)]
