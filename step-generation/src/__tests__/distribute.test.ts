@@ -2248,3 +2248,100 @@ describe('distribute volume exceeds pipette max volume', () => {
     expect(res.errors[0].type).toEqual('PIPETTE_VOLUME_EXCEEDED')
   })
 })
+
+describe('distribute: return tip', () => {
+  let allArgs: DistributeArgs
+  beforeEach(() => {
+    allArgs = {
+      ...mixinArgs,
+      volume: 60,
+      sourceWell: 'A1',
+      destWells: ['A2', 'A3', 'A4'],
+      tipRack: getLabwareDefURI(fixtureTiprack300ul as LabwareDefinition2),
+      dropTipLocation: 'fixture/fixture_tiprack_300_ul/1',
+      changeTip: 'always',
+    } as DistributeArgs
+  })
+
+  it('emits python correctly for a simple 1 to 3, single channel distribute', () => {
+    const distributeArgs = allArgs as DistributeArgs
+    const result = distribute(
+      distributeArgs,
+      invariantContext,
+      robotStateWithTip
+    )
+    const res = getSuccessResult(result)
+    expect(res.python).toEqual(
+      `
+mock_pipette.distribute_with_liquid_class(
+    volume=60,
+    source=[mock_source_plate["A1"]],
+    dest=[mock_dest_plate["A2"], mock_dest_plate["A3"], mock_dest_plate["A4"]],
+    new_tip="always",
+    return_tip=True,
+    tip_racks=[mock_tip_rack_1, mock_tip_rack_2],
+    liquid_class=protocol.define_liquid_class(
+        name="distribute_step_1",
+        properties={"p300_single": {"fixture/fixture_tiprack_300_ul/1": {
+            "aspirate": {
+                "aspirate_position": {"offset": {"x": 0, "y": 0, "z": 0}},
+                "flow_rate_by_volume": [(0, 2.1)],
+                "pre_wet": False,
+                "correction_by_volume": [(0, 0)],
+                "delay": {"enabled": False},
+                "mix": {"enabled": False},
+                "submerge": {
+                    "delay": {"enabled": False},
+                    "start_position": {"offset": {}},
+                },
+                "retract": {
+                    "air_gap_by_volume": [(0, 0)],
+                    "delay": {"enabled": False},
+                    "end_position": {"offset": {}},
+                    "touch_tip": {"enabled": False},
+                },
+            },
+            "dispense": {
+                "dispense_position": {"offset": {"x": 0, "y": 0, "z": 0}},
+                "flow_rate_by_volume": [(0, 2.2)],
+                "delay": {"enabled": False},
+                "submerge": {
+                    "delay": {"enabled": False},
+                    "start_position": {"offset": {}},
+                },
+                "retract": {
+                    "air_gap_by_volume": [(0, 0)],
+                    "delay": {"enabled": False},
+                    "end_position": {"offset": {}},
+                    "touch_tip": {"enabled": False},
+                    "blowout": {"enabled": True, "location": "trash", "flow_rate": 2.3},
+                },
+                "correction_by_volume": [(0, 0)],
+                "push_out_by_volume": [(0, 0)],
+                "mix": {"enabled": False},
+            },
+            "multi_dispense": {
+                "dispense_position": {"offset": {"x": 0, "y": 0, "z": 0}},
+                "flow_rate_by_volume": [(0, 2.2)],
+                "delay": {"enabled": False},
+                "submerge": {
+                    "delay": {"enabled": False},
+                    "start_position": {"offset": {}},
+                },
+                "retract": {
+                    "air_gap_by_volume": [(0, 0)],
+                    "delay": {"enabled": False},
+                    "end_position": {"offset": {}},
+                    "touch_tip": {"enabled": False},
+                    "blowout": {"enabled": True, "location": "trash", "flow_rate": 2.3},
+                },
+                "correction_by_volume": [(0, 0)],
+                "conditioning_by_volume": [(0, 0)],
+                "disposal_by_volume": [(0, 60)],
+            },
+        }}},
+    ),
+)`.trimStart()
+    )
+  })
+})
