@@ -137,13 +137,19 @@ const getDeckHasLiquid: Selector<RootSlice, boolean> = createSelector(
   getLiquidGroupsOnDeck,
   liquidGroups => liquidGroups.length > 0
 )
-const getLiquidDisplayColors: Selector<RootSlice, string[]> = createSelector(
+const getLiquidDisplayColors: Selector<
+  RootSlice,
+  Record<string, string>
+> = createSelector(
   getLiquidGroupsById,
+  // returns liquidGroupId -> color
   liquids =>
-    Object.values(liquids).reduce<string[]>((acc, curr) => {
-      acc.push(curr.displayColor)
-      return acc
-    }, [])
+    Object.fromEntries(
+      Object.values(liquids).map(liquid => [
+        liquid.liquidGroupId,
+        liquid.displayColor,
+      ])
+    )
 )
 
 const getZoomedInSlotInfo: Selector<

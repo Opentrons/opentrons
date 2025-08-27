@@ -99,7 +99,6 @@ export function MoveLabwareInterventionContent({
     loadedLabwares: run.labware,
     robotType: 'OT-3 Standard',
     detailLevel: 'slot-only',
-    includeSlotText: false,
     t,
   })
   const newDisplayLabwareLocation = getLabwareDisplayLocation({
@@ -108,7 +107,6 @@ export function MoveLabwareInterventionContent({
     loadedLabwares: run.labware,
     robotType: 'OT-3 Standard',
     detailLevel: 'slot-only',
-    includeSlotText: false,
     t,
   })
   return (
@@ -128,10 +126,10 @@ export function MoveLabwareInterventionContent({
             type="location-arrow-location"
             labwareName={labwareName}
             currentLocationProps={{
-              deckLabel: i18n.format(oldDisplayLabwareLocation, 'capitalize'),
+              deckLabel: i18n.format(oldDisplayLabwareLocation, 'upperCase'),
             }}
             newLocationProps={{
-              deckLabel: i18n.format(newDisplayLabwareLocation, 'capitalize'),
+              deckLabel: i18n.format(newDisplayLabwareLocation, 'upperCase'),
             }}
           />
         </Flex>

@@ -226,8 +226,10 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
         onMouseEnter={highlightStep}
         iconName={hasError || hasWarnings ? 'alert-circle' : iconName}
         title={`${stepNumber}. ${
-          i18n.format(step.stepName, 'titleCase') ||
-          t(`stepType.${step.stepType}`)
+          // add empty check to avoid causing undefined issue when calling titleCase
+          step.stepName !== undefined || step.stepName !== ''
+            ? i18n.format(step.stepName, 'titleCase')
+            : t(`stepType.${step.stepType}`)
         }`}
         dragHovered={dragHovered}
         sidebarWidth={sidebarWidth}

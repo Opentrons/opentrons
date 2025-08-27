@@ -71,7 +71,7 @@ export function Navigation(): JSX.Element | null {
           <input
             type="file"
             onChange={loadFile}
-            aria-label={t('import')}
+            aria-label={`${t('import')}_from_navigation`}
             ref={fileInputRef}
           />
         </StyledLabel>

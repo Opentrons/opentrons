@@ -67,8 +67,8 @@ export function LabwareSlotDetails(
   const labwareDef = labwareEntities[topLabwareOnSlotId].def
   const labwareDisplayName = labwareDef.metadata.displayName
 
-  const liquidDisplayColors = liquids.map(
-    liquid => liquid.displayColor ?? COLORS.grey40
+  const liquidDisplayColors = Object.fromEntries(
+    liquids.map(liquid => [liquid.id, liquid.displayColor ?? COLORS.grey40])
   )
   const allWellContentsForActiveItem = getAllWellContentsAtFrame(
     robotState.liquidState,

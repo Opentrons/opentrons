@@ -105,7 +105,10 @@ from opentrons.protocol_engine.actions import (
 )
 from opentrons.protocol_engine.state import _move_types
 from opentrons.protocol_engine.state.config import Config
-from opentrons.protocol_engine.state.labware import LabwareView, LabwareStore
+from opentrons.protocol_engine.state.labware import (
+    LabwareView,
+    LabwareStore,
+)
 from opentrons.protocol_engine.state.wells import WellView, WellStore
 from opentrons.protocol_engine.state.modules import ModuleView, ModuleStore
 from opentrons.protocol_engine.state.pipettes import (
@@ -4683,3 +4686,142 @@ def test_get_liquid_handling_z_change(
         operation_volume=operation_volume,
     )
     assert isclose(change, expected_change, abs_tol=0.0001)
+
+
+def test_raise_if_labware_inaccessible_by_pipette_staging_area(
+    subject: GeometryView, mock_labware_view: LabwareView, decoy: Decoy
+) -> None:
+    """It should raise if the labware is on a staging slot."""
+    decoy.when(mock_labware_view.get("labware-id")).then_return(
+        LoadedLabware(
+            id="labware-id",
+            loadName="test",
+            definitionUri="def-uri",
+            location=AddressableAreaLocation(addressableAreaName="B4"),
+        )
+    )
+
+    with pytest.raises(
+        errors.LocationNotAccessibleByPipetteError, match="on staging slot"
+    ):
+        subject.raise_if_labware_inaccessible_by_pipette("labware-id")
+
+
+def test_raise_if_labware_inaccessible_by_pipette_off_deck(
+    subject: GeometryView, mock_labware_view: LabwareView, decoy: Decoy
+) -> None:
+    """It should raise if the labware is off-deck."""
+    decoy.when(mock_labware_view.get("labware-id")).then_return(
+        LoadedLabware(
+            id="labware-id",
+            loadName="test",
+            definitionUri="def-uri",
+            location=OFF_DECK_LOCATION,
+        )
+    )
+
+    with pytest.raises(errors.LocationNotAccessibleByPipetteError, match="off-deck"):
+        subject.raise_if_labware_inaccessible_by_pipette("labware-id")
+
+
+def test_raise_if_labware_inaccessible_by_pipette_stacked_labware_on_staging_area(
+    subject: GeometryView, mock_labware_view: LabwareView, decoy: Decoy
+) -> None:
+    """It should raise if the labware is stacked on a staging slot."""
+    decoy.when(mock_labware_view.get("labware-id")).then_return(
+        LoadedLabware(
+            id="labware-id",
+            loadName="test",
+            definitionUri="def-uri",
+            location=OnLabwareLocation(labwareId="lower-labware-id"),
+        )
+    )
+    decoy.when(mock_labware_view.get("lower-labware-id")).then_return(
+        LoadedLabware(
+            id="lower-labware-id",
+            loadName="test",
+            definitionUri="def-uri",
+            location=AddressableAreaLocation(addressableAreaName="B4"),
+        )
+    )
+
+    with pytest.raises(
+        errors.LocationNotAccessibleByPipetteError, match="on staging slot"
+    ):
+        subject.raise_if_labware_inaccessible_by_pipette("labware-id")
+
+
+@pytest.mark.parametrize(
+    "addressable_area",
+    [
+        "flexStackerModuleV1A4",
+        "flexStackerModuleV1B4",
+        "flexStackerModuleV1C4",
+        "flexStackerModuleV1D4",
+    ],
+)
+def test_raise_if_labware_on_stacker_aa(
+    subject: GeometryView,
+    mock_labware_view: LabwareView,
+    decoy: Decoy,
+    addressable_area: str,
+) -> None:
+    """It should raise if the labware is on a stacker shuttle aa."""
+    decoy.when(mock_labware_view.get("labware-id")).then_return(
+        LoadedLabware(
+            id="labware-id",
+            loadName="test",
+            definitionUri="def-uri",
+            location=AddressableAreaLocation(addressableAreaName=addressable_area),
+        )
+    )
+    with pytest.raises(
+        errors.LocationNotAccessibleByPipetteError, match="on a stacker shuttle"
+    ):
+        subject.raise_if_labware_inaccessible_by_pipette("labware-id")
+
+
+@pytest.mark.parametrize(
+    "model", [m for m in ModuleModel if ModuleModel.is_flex_stacker(m)]
+)
+def test_raise_if_labware_on_stacker_module(
+    subject: GeometryView,
+    mock_labware_view: LabwareView,
+    mock_module_view: ModuleView,
+    decoy: Decoy,
+    model: ModuleModel,
+) -> None:
+    """It should raise if the labware is on a stacker module."""
+    decoy.when(mock_labware_view.get("labware-id")).then_return(
+        LoadedLabware(
+            id="labware-id",
+            loadName="test",
+            definitionUri="def-uri",
+            location=ModuleLocation(moduleId="module-id"),
+        )
+    )
+    decoy.when(mock_module_view.get("module-id")).then_return(
+        LoadedModule(id="module-id", model=model, location=None, serialNumber=None)
+    )
+    with pytest.raises(
+        errors.LocationNotAccessibleByPipetteError, match="on a stacker shuttle"
+    ):
+        subject.raise_if_labware_inaccessible_by_pipette("labware-id")
+
+
+def test_raise_if_labware_in_stacker_hopper(
+    subject: GeometryView, mock_labware_view: LabwareView, decoy: Decoy
+) -> None:
+    """It should raise if the labware is in a stacker hopper."""
+    decoy.when(mock_labware_view.get("labware-id")).then_return(
+        LoadedLabware(
+            id="labware-id",
+            loadName="test",
+            definitionUri="def-uri",
+            location=InStackerHopperLocation(moduleId="module-id"),
+        )
+    )
+    with pytest.raises(
+        errors.LocationNotAccessibleByPipetteError, match="in a stacker hopper"
+    ):
+        subject.raise_if_labware_inaccessible_by_pipette("labware-id")
