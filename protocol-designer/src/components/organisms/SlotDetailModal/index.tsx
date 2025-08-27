@@ -171,7 +171,7 @@ export const SlotDetailModal = (
           {selectedLiquidId != null ? (
             <LiquidCardList
               selectedLabware={labwareOnDeck}
-              selectedLiquidId={selectedLiquidId ?? ''}
+              selectedLiquidId={selectedLiquidId}
               setSelectedLiquidId={setSelectedLiquidId}
               allIngredGroupFields={allIngredientGroupFields}
               individualIds={individualIds}
