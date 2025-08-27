@@ -30,7 +30,7 @@ import {
   toggleViewSubstep,
 } from '/protocol-designer/ui/steps/actions/actions'
 
-import { ConnectedStepContainer } from './StepContainer'
+import { ConnectedStepContainer } from './ConnectedStepContainer'
 import {
   getMetaSelectedSteps,
   getMouseClickKeyInfo,

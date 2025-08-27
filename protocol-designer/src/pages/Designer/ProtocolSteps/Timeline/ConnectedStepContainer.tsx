@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import {
   BORDERS,
+  Box,
   COLORS,
   CURSOR_DEFAULT,
   CURSOR_POINTER,
@@ -11,7 +12,7 @@ import {
   Divider,
   Flex,
   SPACING,
-  StepContainer as StepContainerPresentation,
+  StepContainer,
   useConditionalConfirm,
 } from '@opentrons/components'
 
@@ -199,20 +200,22 @@ export function ConnectedStepContainer(
               onMouseLeave,
             }
           : {})}
-        gridGap={SPACING.spacing4}
         flexDirection={DIRECTION_COLUMN}
       >
-        {dragHovered ? (
-          <Divider
-            marginY="0"
-            height="0.25rem"
-            width="100%"
-            backgroundColor={COLORS.blue50}
-            borderRadius={BORDERS.borderRadius2}
-          />
-        ) : null}
+        {dragHovered && (
+          <Box paddingY={SPACING.spacing2}>
+            <Divider
+              // eslint-disable-next-line opentrons/no-margins-inline
+              marginY="0"
+              height="0.25rem"
+              width="100%"
+              backgroundColor={COLORS.blue50}
+              borderRadius={BORDERS.borderRadius2}
+            />
+          </Box>
+        )}
 
-        <StepContainerPresentation
+        <StepContainer
           text={capitalizeFirstLetterAfterNumber(title)}
           iconName={iconName}
           type={isStartingOrEndingState ? 'alt' : 'default'}
