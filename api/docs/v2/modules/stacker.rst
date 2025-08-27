@@ -30,6 +30,8 @@ Start by loading each Stacker as you would any other module:
 
 In this example, Stacker shuttles occupy deck slots A4 and C4. 
 
+.. versionadded:: 2.25
+
 Adding Labware to the Stacker
 ==============================
 
