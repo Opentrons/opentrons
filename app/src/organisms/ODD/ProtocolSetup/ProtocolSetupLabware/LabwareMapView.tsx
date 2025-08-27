@@ -50,6 +50,9 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
         topLabwareInfo != null
           ? definitionsByURI[topLabwareInfo.definitionUri]
           : null
+      const matchingLidDef = Object.values(definitionsByURI).find(
+        uri => uri.metadata.displayName === topLabwareInfo?.lidDisplayName
+      )
       const isLabwareStacked = topLabwareInfo != null && stackedItems.length > 2
       const wellFill =
         topLabwareInfo != null
@@ -76,6 +79,13 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
             : undefined,
         highlightLabware: true,
         stacked: isLabwareStacked,
+        lidChildren:
+          matchingLidDef != null ? (
+            <LabwareRender
+              definition={matchingLidDef}
+              positioningMode="passThrough"
+            />
+          ) : null,
       }
     }
   )

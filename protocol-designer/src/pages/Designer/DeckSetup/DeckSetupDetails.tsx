@@ -259,7 +259,8 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                     : 'open',
               }
             : tempInnerProps
-        const labwareOnModule = activeDeckSetup.labware[topMostId]
+        const labwareOnModule =
+          topMostId != null ? activeDeckSetup.labware[topMostId] : null
         const labwareRightBelowTopMostLabware =
           rightBelowTopId != null
             ? activeDeckSetup.labware[rightBelowTopId]

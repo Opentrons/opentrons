@@ -47,7 +47,6 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
   )
   if (protocolAnalysis == null || (protocolAnalysis?.errors ?? []).length > 0)
     return null
-
   const robotType = protocolAnalysis.robotType ?? FLEX_ROBOT_TYPE
   const deckConfig = getSimplestDeckConfigForProtocol(protocolAnalysis)
   const labwareByLiquidId = getLabwareInfoByLiquidId(protocolAnalysis.commands)
@@ -59,7 +58,9 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
         topLabwareInfo != null
           ? labwareDefinitionsByURI[topLabwareInfo.definitionUri]
           : null
-
+      const matchingLidDef = Object.values(labwareDefinitionsByURI).find(
+        uri => uri.metadata.displayName === topLabwareInfo?.lidDisplayName
+      )
       return {
         moduleModel: module.moduleModel,
         moduleLocation: { slotName: module.moduleSlotName },
@@ -72,6 +73,13 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
                 labwareByLiquidId
               )
             : undefined,
+        lidChildren:
+          matchingLidDef != null ? (
+            <LabwareRender
+              definition={matchingLidDef}
+              positioningMode="passThrough"
+            />
+          ) : null,
       }
     }
   )

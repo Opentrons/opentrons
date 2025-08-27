@@ -86,6 +86,8 @@ export interface ModuleOnDeck {
   highlightShadowLabware?: boolean
   stacked?: boolean
   hopperLabware?: HopperLabwareProps
+  /** additional children for rendering the lid svg on top of the nested labware */
+  lidChildren?: ReactNode
 }
 export interface HopperLabwareProps {
   hopperLabwareDef: LabwareDefinition | null
@@ -193,7 +195,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
     modulesOnDeck,
     module => getModuleType(module.moduleModel) !== FLEX_STACKER_MODULE_TYPE
   )
-console.log('labwareOnDeck',labwareOnDeck)
+
   return (
     <RobotCoordinateSpace
       viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${
@@ -401,6 +403,7 @@ console.log('labwareOnDeck',labwareOnDeck)
             onLabwareClick,
             highlightLabware,
             highlightShadowLabware,
+            lidChildren,
           }) => {
             const slotPosition = getPositionFromSlotId(
               moduleLocation.slotName,
@@ -443,6 +446,7 @@ console.log('labwareOnDeck',labwareOnDeck)
                         highlightShadow={highlightShadowLabware}
                       />
                     </g>
+                    {lidChildren}
                   </AlignLabwareToModule>
                 ) : null}
                 {moduleChildren}
@@ -461,7 +465,6 @@ console.log('labwareOnDeck',labwareOnDeck)
             onLabwareClick,
             highlight,
             highlightShadow,
-          
           }) => {
             if (
               labwareLocation === 'offDeck' ||

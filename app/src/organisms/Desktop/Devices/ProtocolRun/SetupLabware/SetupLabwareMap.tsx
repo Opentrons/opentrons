@@ -87,7 +87,9 @@ export function SetupLabwareMap({
         topLabwareInfo != null
           ? labwareDefinitionsByURI[topLabwareInfo.definitionUri]
           : null
-
+      const matchingLidDef = Object.values(labwareDefinitionsByURI).find(
+        uri => uri.metadata.displayName === topLabwareInfo?.lidDisplayName
+      )
       const isLabwareStacked = topLabwareInfo != null && stackedItems.length > 2
       const wellFill =
         topLabwareInfo != null
@@ -113,6 +115,13 @@ export function SetupLabwareMap({
         nestedLabwareWellFill: wellFill,
         highlightLabware: hoverLabwareId === topLabwareInfo?.labwareId,
         stacked: isLabwareStacked,
+        lidChildren:
+          matchingLidDef != null ? (
+            <LabwareRender
+              definition={matchingLidDef}
+              positioningMode="passThrough"
+            />
+          ) : null,
         moduleChildren: (
           // open modal
           <g
