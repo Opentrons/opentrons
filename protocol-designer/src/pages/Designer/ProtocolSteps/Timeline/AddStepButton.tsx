@@ -41,7 +41,6 @@ import {
   ConfirmDeleteModal,
   getMainPagePortalEl,
 } from '/protocol-designer/components/organisms'
-import { useKitchen } from '/protocol-designer/components/organisms/Kitchen/useKitchen'
 import { OFFDECK } from '/protocol-designer/constants'
 import { getEnableComment } from '/protocol-designer/feature-flags/selectors'
 import {
@@ -57,7 +56,7 @@ import {
   getIsMultiSelectMode,
   actions as stepsActions,
 } from '/protocol-designer/ui/steps'
-import { getHasTrash, getIsAdapterFromDef } from '/protocol-designer/utils'
+import { getIsAdapterFromDef } from '/protocol-designer/utils'
 
 import { AddStepOverflowButton } from './AddStepOverflowButton'
 
@@ -75,9 +74,8 @@ export function AddStepButton({
   hasText,
   sidebarWidth,
 }: AddStepButtonProps): JSX.Element {
-  const { t } = useTranslation(['tooltip', 'button', 'starting_deck_state'])
+  const { t } = useTranslation(['tooltip', 'button'])
   const enableComment = useSelector(getEnableComment)
-  const { makeSnackbar } = useKitchen()
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_TOP,
@@ -90,10 +88,7 @@ export function AddStepButton({
     stepFormSelectors.getCurrentFormHasUnsavedChanges
   )
   const isStepCreationDisabled = useSelector(getIsMultiSelectMode)
-  const { modules, additionalEquipmentOnDeck } = useSelector(
-    stepFormSelectors.getInitialDeckSetup
-  )
-  const hasTrash = getHasTrash(additionalEquipmentOnDeck)
+  const { modules } = useSelector(stepFormSelectors.getInitialDeckSetup)
   const [showStepOverflowMenu, setShowStepOverflowMenu] = useState<boolean>(
     false
   )
@@ -176,11 +171,7 @@ export function AddStepButton({
     ))
 
   const handleAddClick = (): void => {
-    if (hasTrash) {
-      setShowStepOverflowMenu(true)
-    } else {
-      makeSnackbar(t('starting_deck_state:trash_required') as string)
-    }
+    setShowStepOverflowMenu(true)
   }
 
   return (

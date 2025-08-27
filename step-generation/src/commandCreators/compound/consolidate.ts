@@ -212,7 +212,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   const isTrashBinDropLocation =
     invariantContext.trashBinEntities[dropTipLocation] != null
 
-  const hasTip = prevRobotState.pipettes[pipette]?.tipWell != null
+  const hasTip = prevRobotState.tipState.pipettes[pipette]?.hasTip
 
   if (
     dropTipLocation == null ||

@@ -253,7 +253,7 @@ export const transfer: CommandCreator<TransferArgs> = (
   )
   const isReturnTip = dropTipLabware != null && getIsTiprack(dropTipLabware.def)
 
-  const hasTip = prevRobotState.pipettes[pipette]?.tipWell != null
+  const hasTip = prevRobotState.tipState.pipettes[pipette]?.hasTip
 
   if (
     dropTipLocation == null ||
