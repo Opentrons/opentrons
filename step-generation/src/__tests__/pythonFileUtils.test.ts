@@ -314,7 +314,7 @@ lid_stack_D1 = protocol.load_lid_stack(
 lid_stack_mock_adapter_1 = protocol.load_lid_stack(
     load_name="mock_lid",
     location=mock_adapter_1,
-    quantity=2,
+    quantity=1,
 )`
     )
   })

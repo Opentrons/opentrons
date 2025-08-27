@@ -176,13 +176,13 @@ const _getLidStacks = (
       const parentLabware = stack.slice(1, nonSlotStackLength) // excluding stack
       const deckRiserParentLabware = parentLabware.find(
         parentLabwareId =>
-          allLabwareEntities[parentLabwareId].def.parameters.loadName ===
+          allLabwareEntities[parentLabwareId]?.def.parameters.loadName ===
           'opentrons_flex_deck_riser'
       )
       const isLidStack =
         parentLabware.every(
           parentLabwareId =>
-            allLabwareEntities[parentLabwareId].labwareDefURI === labwareDefURI
+            allLabwareEntities[parentLabwareId]?.labwareDefURI === labwareDefURI
         ) || deckRiserParentLabware != null
 
       const loadName = def.parameters.loadName
@@ -191,16 +191,19 @@ const _getLidStacks = (
       }
       const lidSlot =
         deckRiserParentLabware != null
-          ? allLabwareEntities[deckRiserParentLabware].pythonName
+          ? allLabwareEntities[deckRiserParentLabware]?.pythonName
           : getSlotInLocationStack(stack)
+      const nonSlotAndAdapterLength =
+        stack.length - (deckRiserParentLabware != null ? 2 : 1)
+
       if (!(lidSlot in acc)) {
         return {
           ...acc,
-          [lidSlot]: { loadName, quantity: nonSlotStackLength },
+          [lidSlot]: { loadName, quantity: nonSlotAndAdapterLength },
         }
       }
       const { quantity } = acc[lidSlot]
-      const newQuantity = max([quantity, nonSlotStackLength]) ?? quantity
+      const newQuantity = max([quantity, nonSlotAndAdapterLength]) ?? quantity
       return { ...acc, [lidSlot]: { loadName, quantity: newQuantity } }
     },
     {}
@@ -222,19 +225,19 @@ export const getLoadLidStacks = (
   )
 
   const pythonLidStacks = Object.entries(lidStacks)
-    .map<string>(([slot, { loadName, quantity }]) => {
+    .map<string>(([location, { loadName, quantity }]) => {
       const isLidSlotOnAdapter = Object.values(allLabwareEntities).some(
-        entity => entity.pythonName === slot
+        ({ pythonName }) => pythonName === location
       )
       const loadNameArg = `load_name=${formatPyStr(loadName)}`
       const locationArg = `location=${
-        isLidSlotOnAdapter ? slot : formatPyStr(slot)
+        isLidSlotOnAdapter ? location : formatPyStr(location)
       }`
       const quantityArg = `quantity=${quantity}`
       const allArgs = [loadNameArg, locationArg, quantityArg].join(',\n')
       const allArgsIndented = indentPyLines(allArgs)
       return (
-        `lid_stack_${slot} = ${PROTOCOL_CONTEXT_NAME}.load_lid_stack(\n` +
+        `lid_stack_${location} = ${PROTOCOL_CONTEXT_NAME}.load_lid_stack(\n` +
         `${allArgsIndented},\n` +
         `)`
       )
