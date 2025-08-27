@@ -16,7 +16,7 @@ metadata = {
     "author": "Zachary Galluzzo <zachary.galluzzo@opentrons.com>",
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.23"}
+requirements = {"robotType": "Flex", "apiLevel": "2.25"}
 
 open_location: Any = "A4"
 
