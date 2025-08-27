@@ -115,7 +115,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
         {
           commandType: 'unsafe/updatePositionEstimators' as const,
           params: {
-            axes: ['x', 'y'],
+            axes: ['x', 'y', 'rightZ'],
           },
         },
         {
