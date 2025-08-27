@@ -68,10 +68,11 @@ export function MoveLabwareInterventionContent({
     return {
       moduleModel: module.moduleDef.model,
       moduleLocation: { slotName: module.targetSlotId },
-      nestedLabwareDef:
-        module.nestedLabwareId !== command.params.labwareId
-          ? module.nestedLabwareDef
-          : null,
+      nestedLabwareDefsBottomToTop:
+        module.nestedLabwareId !== command.params.labwareId &&
+        module.nestedLabwareDef != null
+          ? [module.nestedLabwareDef]
+          : [],
     }
   })
 

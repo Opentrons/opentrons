@@ -95,7 +95,7 @@ function InterventionStyleDeckMapContent(
         ? {
             ...module,
             moduleChildren:
-              module?.nestedLabwareDef != null ? (
+              module?.nestedLabwareDefsBottomToTop.length > 0 ? (
                 <AlignControlToModule
                   // todo(mm, 2025-07-14): This <AlignControlToModule> ought to be a
                   // <AlignLabwareToModule>; right now, this will misalign the highlight
@@ -108,7 +108,7 @@ function InterventionStyleDeckMapContent(
                 >
                   <LabwareHighlight
                     highlight={true}
-                    definition={module.nestedLabwareDef}
+                    definition={module.nestedLabwareDefsBottomToTop[0]}
                   />
                 </AlignControlToModule>
               ) : undefined,

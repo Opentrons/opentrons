@@ -110,18 +110,13 @@ export function SetupLabwareMap({
           module.moduleModel === THERMOCYCLER_MODULE_V1
             ? { lidMotorState: 'open' }
             : {},
-
-        nestedLabwareDef: topLabwareDefinition,
+        nestedLabwareDefsBottomToTop: [
+          ...(topLabwareDefinition != null ? [topLabwareDefinition] : []),
+          ...(matchingLidDef != null ? [matchingLidDef] : []),
+        ],
         nestedLabwareWellFill: wellFill,
         highlightLabware: hoverLabwareId === topLabwareInfo?.labwareId,
         stacked: isLabwareStacked,
-        lidChildren:
-          matchingLidDef != null ? (
-            <LabwareRender
-              definition={matchingLidDef}
-              positioningMode="passThrough"
-            />
-          ) : null,
         moduleChildren: (
           // open modal
           <g

@@ -64,7 +64,10 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
       return {
         moduleModel: module.moduleModel,
         moduleLocation: { slotName: module.moduleSlotName },
-        nestedLabwareDef: topLabwareDefinition,
+        nestedLabwareDefsBottomToTop: [
+          ...(topLabwareDefinition != null ? [topLabwareDefinition] : []),
+          ...(matchingLidDef != null ? [matchingLidDef] : []),
+        ],
         nestedLabwareWellFill:
           topLabwareInfo != null
             ? getWellFillFromLabwareId(
@@ -73,13 +76,6 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
                 labwareByLiquidId
               )
             : undefined,
-        lidChildren:
-          matchingLidDef != null ? (
-            <LabwareRender
-              definition={matchingLidDef}
-              positioningMode="passThrough"
-            />
-          ) : null,
       }
     }
   )

@@ -69,7 +69,10 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
           module.moduleModel === THERMOCYCLER_MODULE_V1
             ? { lidMotorState: 'open' }
             : {},
-        nestedLabwareDef: topLabwareDefinition,
+        nestedLabwareDefsBottomToTop: [
+          ...(topLabwareDefinition != null ? [topLabwareDefinition] : []),
+          ...(matchingLidDef != null ? [matchingLidDef] : []),
+        ],
         nestedLabwareWellFill: wellFill,
         onLabwareClick:
           topLabwareInfo != null
@@ -79,13 +82,6 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
             : undefined,
         highlightLabware: true,
         stacked: isLabwareStacked,
-        lidChildren:
-          matchingLidDef != null ? (
-            <LabwareRender
-              definition={matchingLidDef}
-              positioningMode="passThrough"
-            />
-          ) : null,
       }
     }
   )
