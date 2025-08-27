@@ -151,7 +151,9 @@ const getNoLiquidClassValues = (
       positionFromBottom: aspirate.retract.endPosition.offset.z ?? 0,
       delayDuration: aspirate.retract.delay.params?.duration ?? 0,
     },
-    touchTipAspirate: aspirate.retract.touchTip.params?.zOffset,
+    touchTipAspirate: !aspirate.retract.touchTip.enable
+      ? undefined
+      : aspirate.retract.touchTip.params?.zOffset,
     touchTipAspirateSpeed: aspirate.retract.touchTip.params?.speed,
     airGapAspirate: airGap.aspirate,
     conditionAspirate: conditioning ?? 0,
@@ -185,7 +187,9 @@ const getNoLiquidClassValues = (
       ),
       flowRate: dispense.retract.blowout?.params?.flowRate ?? 0,
     },
-    touchTipDispense: dispense.retract.touchTip.params?.zOffset,
+    touchTipDispense: !dispense.retract.touchTip.enable
+      ? undefined
+      : dispense.retract.touchTip.params?.zOffset,
     touchTipDispenseSpeed: dispense.retract.touchTip.params?.speed,
     airGapDispense: airGap.dispense,
     disposalVolumeDispenseSettings: {
@@ -278,6 +282,17 @@ const getLiquidClassValues = (
       ? multiDispense
       : singleDispense
 
+  const aspirateFlowRateFields = getFlowRateFields(
+    volume,
+    aspirate?.flowRateByVolume ?? [],
+    'aspirate'
+  )
+  const dispenseFlowRateFields = getFlowRateFields(
+    volume,
+    dispense?.flowRateByVolume ?? [],
+    'dispense'
+  )
+
   const {
     conditioningByVolume: rawConditioningByVolume = [],
     disposalByVolume: rawDisposalByVolume = [],
@@ -302,10 +317,10 @@ const getLiquidClassValues = (
     disposalByVolume,
   }).referenceVolumes
 
-  const { pushOut, airGap, flowRate, conditioning, disposal } = byVolumeLookup
+  const { pushOut, airGap, conditioning, disposal } = byVolumeLookup
 
   const aspirateState = {
-    aspirateFlowRate: flowRate.aspirate,
+    aspirateFlowRate: aspirateFlowRateFields.aspirate_flowRate ?? 0,
     tipPositionAspirate: aspirate?.aspiratePosition.offset.z ?? 0,
     submergeAspirate: {
       speed: aspirate?.submerge.speed ?? 0,
@@ -344,7 +359,7 @@ const getLiquidClassValues = (
   }
 
   const dispenseState = {
-    dispenseFlowRate: flowRate.dispense,
+    dispenseFlowRate: dispenseFlowRateFields.dispense_flowRate ?? 0,
     tipPositionDispense: dispense?.dispensePosition.offset.z ?? 0,
     submergeDispense: {
       speed: dispense?.submerge.speed ?? 0,
@@ -399,7 +414,7 @@ const getLiquidClassValues = (
           state
         ) ?? state.dropTipLocation,
 
-      flowRate: flowRate.dispense,
+      flowRate: dispense?.retract.blowout?.params?.flowRate ?? 0,
     },
   }
 

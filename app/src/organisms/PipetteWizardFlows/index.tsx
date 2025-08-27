@@ -135,7 +135,12 @@ export const PipetteWizardFlows = (
         if (currentStepIndex <= 2) {
           setCurrentStepIndex(0)
         } else {
-          setCurrentStepIndex(3)
+          const stepIdx =
+            pipetteWizardSteps?.findIndex(
+              step => step.section === SECTIONS.CARRIAGE
+            ) ?? 3 // Safe fallback that at least allows users to proceed.
+
+          setCurrentStepIndex(stepIdx)
         }
       } else {
         setCurrentStepIndex(0)
@@ -205,9 +210,12 @@ export const PipetteWizardFlows = (
       onComplete()
     }
     if (maintenanceRunData != null) {
-      deleteMaintenanceRun(maintenanceRunData?.data.id)
+      deleteMaintenanceRun(maintenanceRunData?.data.id, {
+        onSettled: closeFlow,
+      })
+    } else {
+      closeFlow()
     }
-    closeFlow()
   }
 
   const {

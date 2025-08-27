@@ -56,6 +56,7 @@ export function useDispenseSettingsConfig({
   }
 
   const touchTipEnabled = getIsTouchTipEnabled(state.destination)
+  const hasLiquidClass = state.liquidClassName !== 'none'
 
   const dispenseSettingsItems = [
     {
@@ -165,7 +166,7 @@ export function useDispenseSettingsConfig({
       option: 'dispense_blow_out',
       copy: t('blow_out'),
       value:
-        state.transferType === 'distribute'
+        state.transferType === 'distribute' && hasLiquidClass
           ? t('disabled')
           : i18n.format(getBlowoutValueCopy(), 'capitalize'),
       enabled: state.transferType !== 'distribute',
@@ -205,7 +206,9 @@ export function useDispenseSettingsConfig({
       option: 'dispense_touch_tip',
       copy: t('touch_tip'),
       value:
-        state.touchTipDispense !== undefined && touchTipEnabled
+        state.touchTipDispense !== undefined &&
+        touchTipEnabled &&
+        hasLiquidClass
           ? t('touch_tip_value', {
               speed: state.touchTipDispenseSpeed,
               position: state.touchTipDispense,

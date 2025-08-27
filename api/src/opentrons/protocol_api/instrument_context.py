@@ -1856,7 +1856,7 @@ class InstrumentContext(publisher.CommandPublisher):
         ):
             raise APIVersionError(
                 api_element="tip_racks",
-                until_version="2.25",
+                until_version=f"{_LIQUID_CLASS_TRANSFER_TIP_RACKS_ARG_ADDED_IN}",
                 current_version=f"{self.api_version}",
             )
 
@@ -2001,7 +2001,7 @@ class InstrumentContext(publisher.CommandPublisher):
         ):
             raise APIVersionError(
                 api_element="tip_racks",
-                until_version="2.25",
+                until_version=f"{_LIQUID_CLASS_TRANSFER_TIP_RACKS_ARG_ADDED_IN}",
                 current_version=f"{self.api_version}",
             )
 
@@ -2155,7 +2155,7 @@ class InstrumentContext(publisher.CommandPublisher):
         ):
             raise APIVersionError(
                 api_element="tip_racks",
-                until_version="2.25",
+                until_version=f"{_LIQUID_CLASS_TRANSFER_TIP_RACKS_ARG_ADDED_IN}",
                 current_version=f"{self.api_version}",
             )
 
@@ -2999,10 +2999,8 @@ class InstrumentContext(publisher.CommandPublisher):
         ) and (style not in original_enabled_layouts):
             raise APIVersionError(
                 api_element=f"Nozzle layout configuration of style {style.value}",
-                until_version=str(
-                    _PARTIAL_NOZZLE_CONFIGURATION_SINGLE_ROW_PARTIAL_COLUMN_ADDED_IN
-                ),
-                current_version=str(self._api_version),
+                until_version=f"{_PARTIAL_NOZZLE_CONFIGURATION_SINGLE_ROW_PARTIAL_COLUMN_ADDED_IN}",
+                current_version=f"{self._api_version}",
             )
 
         front_right_resolved = front_right

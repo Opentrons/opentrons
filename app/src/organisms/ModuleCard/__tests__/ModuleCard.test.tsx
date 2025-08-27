@@ -411,8 +411,8 @@ describe('ModuleCard', () => {
       ...props,
       module: mockFlexStacker,
     })
-    screen.getByText('Setup module for use.')
-    const button = screen.getByText('Setup module')
+    screen.getByText('Set up module for use.')
+    const button = screen.getByText('Set up module')
     fireEvent.click(button)
     expect(vi.mocked(handleModuleWizardFlows)).toHaveBeenCalled()
     expect(vi.mocked(getRequestById)).toHaveBeenCalled()
@@ -424,8 +424,8 @@ describe('ModuleCard', () => {
       ...props,
       module: mockFlexStacker,
     })
-    screen.getByText('Setup module for use.')
-    const button = screen.getByText('Setup module')
+    screen.getByText('Set up module for use.')
+    const button = screen.getByText('Set up module')
     fireEvent.click(button)
     expect(vi.mocked(handleModuleWizardFlows)).toHaveBeenCalled()
     expect(vi.mocked(getRequestById)).toHaveBeenCalled()
@@ -447,8 +447,7 @@ describe('ModuleCard', () => {
         hasAvailableUpdate: true,
       },
     })
-    // FIXME: remove the extra period when InlineNotification is updated
-    screen.getByText('Firmware update available..')
+    screen.getByText('Firmware update available.')
     const button = screen.getByText('Update now')
     fireEvent.click(button)
     expect(vi.mocked(getRequestById)).toHaveBeenCalled()
@@ -467,8 +466,7 @@ describe('ModuleCard', () => {
       ...props,
       module: mockHotThermo,
     })
-    // FIXME: remove the extra period when InlineNotification is updated
-    screen.getByText('Firmware update available..')
+    screen.getByText('Firmware update available.')
     const button = screen.getByText('Update now')
     fireEvent.click(button)
     expect(vi.mocked(getRequestById)).toHaveBeenCalled()
@@ -497,8 +495,7 @@ describe('ModuleCard', () => {
       ...props,
       module: mockHotThermo,
     })
-    // FIXME: remove the extra period when InlineNotification is updated
-    screen.getByText('Firmware update available..')
+    screen.getByText('Firmware update available.')
     const button = screen.getByText('Update now')
     fireEvent.click(button)
     expect(vi.mocked(getRequestById)).toHaveBeenCalled()

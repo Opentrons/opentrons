@@ -512,8 +512,8 @@ def _parse_can_device_info_response(
 def _listener(message: MessageDefinition, arb_id: ArbitrationId) -> None:
     if isinstance(message, GetMotorUsageResponse):
         usage_elements = message.payload.usage_elements
-        node = arb_id.parts.originating_node_id
-        logline = f"Usage from {node}: "
+        node = NodeId(arb_id.parts.originating_node_id)
+        logline = f"Usage from {node.name}: "
         for m in usage_elements:
             data_name = MotorUsageValueType(m.key).name
             data_value = m.usage_value
