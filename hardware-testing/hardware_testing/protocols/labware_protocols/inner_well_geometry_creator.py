@@ -646,4 +646,4 @@ def run(ctx: ProtocolContext) -> None:
         with open(file_path, "w") as f:
             json.dump(new_inner_well_json, f, indent=2)
 
-        ctx.pause(f"User defined volume file created: data/testng_data/{file_path}")
+        ctx.pause(f"User defined volume file created: {file_path}")
