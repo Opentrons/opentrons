@@ -36,7 +36,7 @@ export interface LabwareAdapterProps {
   definition?: LabwareDefinition
   highlight?: boolean
   highlightShadow?: boolean
-  isGenericLid?: boolean
+  isLid?: boolean
 }
 
 export const LabwareAdapter = (
@@ -47,7 +47,7 @@ export const LabwareAdapter = (
     definition,
     highlight = false,
     highlightShadow,
-    isGenericLid = false,
+    isLid = false,
     lidDimensions,
   } = props
   const highlightOutline =
@@ -67,6 +67,12 @@ export const LabwareAdapter = (
         fill={COLORS.transparent}
       />
     ) : null
+
+  //  TODO(ja, 27.8.25): find a way to simplify this logic more?
+  //  but the PCR auto-sealing lid will always be special-cased here
+  const isGenericLid =
+    isLid && labwareLoadName !== 'opentrons_tough_pcr_auto_sealing_lid'
+
   const SVGElement = isGenericLid
     ? GenericLid
     : CUSTOM_SVG_LOADNAME_PATHS[labwareLoadName]

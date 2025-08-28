@@ -117,11 +117,9 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
   const cornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(definition)
   const labwareLoadName = definition.parameters.loadName
   const isNeedingCustomSVG = customSVGLoadNames.includes(labwareLoadName)
-  const isGenericLid =
-    definition.allowedRoles?.includes('lid') &&
-    definition.parameters.loadName !== 'opentrons_tough_pcr_auto_sealing_lid'
+  const isLid = definition.allowedRoles?.includes('lid')
 
-  if (isNeedingCustomSVG || isGenericLid) {
+  if (isNeedingCustomSVG || isLid) {
     const { shouldRotateAdapterOrientation } = props
     const { xDimension, yDimension } = getSchema2Dimensions(definition)
     const lidDimensions =
@@ -151,7 +149,7 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
             definition={definition}
             highlight={props.highlight}
             highlightShadow={props.highlightShadow}
-            isGenericLid={isGenericLid}
+            isLid={isLid}
             lidDimensions={lidDimensions}
           />
         </g>
