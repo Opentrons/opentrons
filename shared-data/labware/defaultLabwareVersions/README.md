@@ -30,9 +30,9 @@ This:
 
 Means this:
 
-apiLevels        Load name         Default labware version
-----------------------------------------------------------
-<2.100           foo_well_plate    1
->=2.100,<2.105   foo_well_plate    3
->=2.105          foo_well_plate    7
-[any]            [anything else]   1
+| API Level Range  | Load Name      | Default Labware Version |
+| ---------------- | -------------- | ----------------------- |
+| < 2.100          | foo_well_plate | 1                       |
+| >= 2.100,< 2.105 | foo_well_plate | 3                       |
+| >= 2.105         | foo_well_plate | 7                       |
+| [any]            | anything else  | 1                       |
