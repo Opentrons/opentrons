@@ -12,13 +12,15 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 **Welcome to Protocol Designer 8.5.3!**
 
-This hotfix release addresses several bugs related to deletion.
+This hotfix release addresses several bugs.
 
 ### Bug Fixes
 
-- Deleting a pipette involved in a pipetting step no longer results in an error.
-- Deleting the title of a step no longer results in an error.
-- Futher refinement when deleting a liquid and checking the labware details.
+Crashes and protocol loss no longer occur when:
+
+- deleting a pipette involved in a mix step. 
+- deleting a Protocol Designer step title. 
+- checking labware details after deleting a liquid.
 
 ## Opentrons Protocol Designer Changes in 8.5.2
 
