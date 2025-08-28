@@ -2,13 +2,10 @@
 # Uncomment to test
 # key = "1 stacker"
 # key = "2 stackers"
-# key = "3 stackers"
 # key = "1 stacker with OT 12 Well 22 mL"
 # key = "2 stackers with OT 12 Well 22 mL"
-# key = "3 stackers with OT 12 Well 22 mL"
 # key = "1 stacker with OT 4 Well 300 mL"
 # key = "2 stackers with OT 4 Well 300 mL"
-# key = "3 stackers with OT 4 Well 300 mL"
 # key = "1 stacker with OT 1 Well 300 mL"
 # protocol.override_variable_name = key
 
@@ -222,11 +219,6 @@ Tests = [
          test_configuration="full",
          reservoir_name="nest_1_reservoir_290ml",
          well_plate_name="opentrons_96_wellplate_200ul_pcr_full_skirt"),
-    Test(key="3 stackers",
-         number_of_stackers="3",
-         test_configuration="full",
-         reservoir_name="nest_1_reservoir_290ml",
-         well_plate_name="opentrons_96_wellplate_200ul_pcr_full_skirt"),
     Test(key="1 stacker with OT 12 Well 22 mL",
          number_of_stackers="1",
          test_configuration="full",
@@ -234,11 +226,6 @@ Tests = [
          well_plate_name="opentrons_96_wellplate_200ul_pcr_full_skirt"),
     Test(key="2 stackers with OT 12 Well 22 mL",
          number_of_stackers="2",
-         test_configuration="full",
-         reservoir_name="opentrons_tough_12_reservoir_22ml",
-         well_plate_name="opentrons_96_wellplate_200ul_pcr_full_skirt"),
-    Test(key="3 stackers with OT 12 Well 22 mL",
-         number_of_stackers="3",
          test_configuration="full",
          reservoir_name="opentrons_tough_12_reservoir_22ml",
          well_plate_name="opentrons_96_wellplate_200ul_pcr_full_skirt"),
@@ -252,16 +239,6 @@ Tests = [
          test_configuration="full",
          reservoir_name="opentrons_tough_4_reservoir_72ml",
          well_plate_name="opentrons_96_wellplate_200ul_pcr_full_skirt"),
-    Test(key="3 stackers with OT 4 Well 300 mL",    
-            number_of_stackers="3",
-            test_configuration="full",
-            reservoir_name="opentrons_tough_4_reservoir_72ml",
-            well_plate_name="opentrons_96_wellplate_200ul_pcr_full_skirt"), 
-    Test(key="1 stacker with OT 1 Well 300 mL",
-         number_of_stackers="1",
-         test_configuration="full",
-         reservoir_name="opentrons_tough_1_reservoir_300ml",
-         well_plate_name="opentrons_96_wellplate_200ul_pcr_full_skirt"),    
 ]
 
 

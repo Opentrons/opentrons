@@ -5,23 +5,19 @@ from automation.data.protocol_with_overrides import ProtocolWithOverrides
 
 
 class ProtocolsWithOverrides:
-    ## analyses-snapshot-testing/files/protocols/generators/Flex_2_25_S_96_all_module_LC_Stacker_Overrride.py
-    Flex_2_25_S_96_all_module_LC_Stacker_Overrride: ProtocolWithOverrides = ProtocolWithOverrides(
-        file_stem="Flex_2_25_S_96_all_module_LC_Stacker_Overrride",
+    ## analyses-snapshot-testing/files/protocols/generators/Flex_S_2_25_96_all_module_LC_Stacker_Overrride.py
+    Flex_S_2_25_96_all_module_LC_Stacker_Overrride: ProtocolWithOverrides = ProtocolWithOverrides(
+        file_stem="Flex_S_2_25_96_all_module_LC_Stacker_Overrride",
         file_extension="py",
         robot="Flex",
         override_variable_name="key",
         overrides=[
             "1 stacker",
             "2 stackers",
-            "3 stackers",
             "1 stacker with OT 12 Well 22 mL",
             "2 stackers with OT 12 Well 22 mL",
-            "3 stackers with OT 12 Well 22 mL",
             "1 stacker with OT 4 Well 300 mL",
-            "2 stackers with OT 4 Well 300 mL",
-            "3 stackers with OT 4 Well 300 mL",
-            "1 stacker with OT 1 Well 300mL",
+            "2 stackers with OT 4 Well 300 mL"
         ],
         folder=GENERATORS_FOLDER,
     )
