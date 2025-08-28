@@ -704,7 +704,7 @@ async def test_finish(
     """It should be able to gracefully tell the engine it's done."""
     completed_at = datetime(2021, 1, 1, 0, 0)
 
-    decoy.when(state_store.commands.get_is_stopped_by_estop()).then_return(False)
+    decoy.when(state_store.commands.get_is_stopped_by_async_error()).then_return(False)
     decoy.when(model_utils.get_timestamp()).then_return(completed_at)
 
     await subject.finish(
@@ -739,7 +739,7 @@ async def test_finish_with_defaults(
     state_store: StateStore,
 ) -> None:
     """It should be able to gracefully tell the engine it's done."""
-    decoy.when(state_store.commands.get_is_stopped_by_estop()).then_return(False)
+    decoy.when(state_store.commands.get_is_stopped_by_async_error()).then_return(False)
     await subject.finish()
 
     decoy.verify(
@@ -781,7 +781,7 @@ async def test_finish_with_error(
         error=error,
     )
 
-    decoy.when(state_store.commands.get_is_stopped_by_estop()).then_return(
+    decoy.when(state_store.commands.get_is_stopped_by_async_error()).then_return(
         stopped_by_estop
     )
     decoy.when(model_utils.generate_id()).then_return("error-id")
@@ -881,7 +881,7 @@ async def test_finish_stops_hardware_if_queue_worker_join_fails(
         await queue_worker.join(),
     ).then_raise(exception)
 
-    decoy.when(state_store.commands.get_is_stopped_by_estop()).then_return(False)
+    decoy.when(state_store.commands.get_is_stopped_by_async_error()).then_return(False)
 
     error_id = "error-id"
     completed_at = datetime(2021, 1, 1, 0, 0)
@@ -979,6 +979,96 @@ async def test_stop_for_legacy_core_protocols(
     )
 
 
+async def test_async_module_error_stops_on_match(
+    decoy: Decoy,
+    action_dispatcher: ActionDispatcher,
+    queue_worker: QueueWorker,
+    state_store: StateStore,
+    subject: ProtocolEngine,
+) -> None:
+    """It should be stop the engine if a matching module exists."""
+    module_model = ModuleModel.THERMOCYCLER_MODULE_V1
+    serial = "hello"
+    expected_action = StopAction(from_asynchronous_error=True)
+    validated_action = sentinel.validated_action
+    decoy.when(
+        state_store.commands.validate_action_allowed(expected_action),
+    ).then_return(validated_action)
+    decoy.when(
+        state_store.modules.get_has_module_probably_matching_hardware_details(
+            module_model, serial
+        )
+    ).then_return(True)
+
+    assert await subject.async_module_error(module_model, serial) is True
+
+    decoy.verify(
+        action_dispatcher.dispatch(action=validated_action),
+        queue_worker.cancel(),
+    )
+
+
+async def test_async_module_error_noops_on_no_match(
+    decoy: Decoy,
+    action_dispatcher: ActionDispatcher,
+    queue_worker: QueueWorker,
+    state_store: StateStore,
+    subject: ProtocolEngine,
+) -> None:
+    """It should be stop the engine if a matching module exists."""
+    module_model = ModuleModel.THERMOCYCLER_MODULE_V1
+    serial = "hello"
+    validated_action = sentinel.validated_action
+    decoy.when(
+        state_store.modules.get_has_module_probably_matching_hardware_details(
+            module_model, serial
+        )
+    ).then_return(False)
+
+    assert await subject.async_module_error(module_model, serial) is False
+
+    decoy.verify(
+        action_dispatcher.dispatch(action=validated_action),
+        queue_worker.cancel(),
+        times=0,
+    )
+
+
+async def test_async_module_error_noops_if_invalid(
+    decoy: Decoy,
+    action_dispatcher: ActionDispatcher,
+    queue_worker: QueueWorker,
+    state_store: StateStore,
+    subject: ProtocolEngine,
+) -> None:
+    """It should no-op if a stop is invalid right now.."""
+    module_model = ModuleModel.THERMOCYCLER_MODULE_V1
+    serial = "hello"
+    expected_action = StopAction(from_asynchronous_error=True)
+    decoy.when(
+        state_store.modules.get_has_module_probably_matching_hardware_details(
+            module_model, serial
+        )
+    ).then_return(True)
+    decoy.when(
+        state_store.commands.validate_action_allowed(expected_action),
+    ).then_raise(RuntimeError("unable to stop; this machine craves flesh"))
+
+    assert (
+        await subject.async_module_error(module_model, serial) is True
+    )  # Should not raise, should act as-if it worked
+
+    decoy.verify(
+        action_dispatcher.dispatch(expected_action),
+        times=0,
+    )
+    decoy.verify(
+        queue_worker.cancel(),
+        ignore_extra_args=True,
+        times=0,
+    )
+
+
 async def test_estop(
     decoy: Decoy,
     action_dispatcher: ActionDispatcher,
@@ -987,7 +1077,7 @@ async def test_estop(
     subject: ProtocolEngine,
 ) -> None:
     """It should be able to stop the engine."""
-    expected_action = StopAction(from_estop=True)
+    expected_action = StopAction(from_asynchronous_error=True)
     validated_action = sentinel.validated_action
     decoy.when(
         state_store.commands.validate_action_allowed(expected_action),
@@ -1009,7 +1099,7 @@ async def test_estop_noops_if_invalid(
     subject: ProtocolEngine,
 ) -> None:
     """It should no-op if a stop is invalid right now.."""
-    expected_action = StopAction(from_estop=True)
+    expected_action = StopAction(from_asynchronous_error=True)
     decoy.when(
         state_store.commands.validate_action_allowed(expected_action),
     ).then_raise(RuntimeError("unable to stop; this machine craves flesh"))
