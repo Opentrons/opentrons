@@ -55,8 +55,9 @@ export function FileUploadMessagesModal(): JSX.Element | null {
       marginLeft="0"
       type={message?.isError ? 'error' : 'info'}
       title={title}
-      closeOnOutsideClick
-      onClose={handleClose}
+      {...(!isMigration
+        ? { onClose: handleClose, closeOnOutsideClick: true }
+        : {})}
       footer={
         showButtons && (
           <Flex

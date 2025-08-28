@@ -2,8 +2,6 @@
 title: "Opentrons Flex: Installation Requirements"
 ---
 
-# Installation Requirements
-
 Before setting up Opentrons Flex, make sure that your installation site meets all of the requirements in this section. And follow all of the safety guidance here and throughout the installation instructions.
 
 ## Where to place Opentrons Flex

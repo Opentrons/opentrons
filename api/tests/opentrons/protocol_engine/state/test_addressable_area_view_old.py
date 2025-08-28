@@ -15,6 +15,7 @@ from typing import Dict, Set, Optional, cast
 from opentrons_shared_data.labware.types import LocatingFeatures
 from opentrons_shared_data.robot.types import RobotType
 from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.module.types import ModuleOrientation
 from opentrons.types import Point, DeckSlotName
 
 from opentrons.protocol_engine.errors import (
@@ -127,6 +128,7 @@ def test_get_loaded_addressable_area() -> None:
         features=LocatingFeatures(),
         compatible_module_types=["magneticModuleType"],
         mating_surface_unit_vector=[-1, 1, -1],
+        orientation=ModuleOrientation.NOT_APPLICABLE,
     )
     subject = get_addressable_area_view(
         loaded_addressable_areas_by_name={"abc": addressable_area}
@@ -155,6 +157,7 @@ def test_get_addressable_area_for_simulation_already_loaded() -> None:
         compatible_module_types=["magneticModuleType"],
         features=LocatingFeatures(),
         mating_surface_unit_vector=[-1, 1, -1],
+        orientation=ModuleOrientation.NOT_APPLICABLE,
     )
     subject = get_addressable_area_view(
         loaded_addressable_areas_by_name={"abc": addressable_area},
@@ -190,6 +193,7 @@ def test_get_addressable_area_for_simulation_not_loaded(decoy: Decoy) -> None:
         compatible_module_types=["magneticModuleType"],
         features=LocatingFeatures(),
         mating_surface_unit_vector=[-1, 1, -1],
+        orientation=ModuleOrientation.NOT_APPLICABLE,
     )
 
     decoy.when(
@@ -285,6 +289,7 @@ def test_get_addressable_area_position() -> None:
                 compatible_module_types=[],
                 features=LocatingFeatures(),
                 mating_surface_unit_vector=[-1, 1, -1],
+                orientation=ModuleOrientation.NOT_APPLICABLE,
             )
         }
     )
@@ -307,6 +312,7 @@ def test_get_addressable_area_move_to_location() -> None:
                 compatible_module_types=[],
                 features=LocatingFeatures(),
                 mating_surface_unit_vector=[-1, 1, -1],
+                orientation=ModuleOrientation.NOT_APPLICABLE,
             )
         }
     )
@@ -329,6 +335,7 @@ def test_get_addressable_area_center() -> None:
                 compatible_module_types=[],
                 features=LocatingFeatures(),
                 mating_surface_unit_vector=[-1, 1, -1],
+                orientation=ModuleOrientation.NOT_APPLICABLE,
             )
         }
     )
@@ -392,6 +399,7 @@ def test_get_slot_definition() -> None:
                 compatible_module_types=["magneticModuleType"],
                 features=LocatingFeatures(),
                 mating_surface_unit_vector=[-1, 1, -1],
+                orientation=ModuleOrientation.NOT_APPLICABLE,
             )
         }
     )
@@ -409,6 +417,7 @@ def test_get_slot_definition() -> None:
         "displayName": "fancy name",
         "compatibleModuleTypes": ["magneticModuleType"],
         "features": {},
+        "orientation": ModuleOrientation.NOT_APPLICABLE,
     }
 
 

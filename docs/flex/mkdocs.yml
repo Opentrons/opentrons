@@ -1,19 +1,19 @@
 site_name: flex
 
 nav:
-  - index.md
+  - Opentrons Flex Instruction Manual: index.md
   - Preface: preface.md
   - Introduction: introduction.md
   - Safety and Regulatory Information: safety-regulatory.md
   - Installation and Relocation: 
-      - Installation Home: installation/index.md
+      - Installation and Relocation: installation/index.md
       - Installation Requirements: installation/requirements.md
       - Unboxing: installation/unboxing.md
       - First Run: installation/first-run.md
-      - Instrument Setup: installation/instruments.md
+      - Instrument Installation and Calibration: installation/instruments.md
       - Relocation: installation/relocation.md
   - System Description:
-      - System Description Home: system-description/index.md
+      - System Description: system-description/index.md
       - Robot Components: system-description/robot.md
       - Pipettes: system-description/pipettes.md
       - Gripper: system-description/gripper.md
@@ -21,8 +21,8 @@ nav:
       - Connections: system-description/connections.md
       - System Specifications: system-description/specs.md
   - Modules: 
-      - Modules Home: modules/index.md
-      - Caddy System: modules/caddy.md
+      - Modules: modules/index.md
+      - Module Caddy System: modules/caddy.md
       - Module Calibration: modules/calibration.md
       - Absorbance Plate Reader: modules/absorbance-plate-reader.md
       - Heater-Shaker: modules/heater-shaker.md
@@ -31,20 +31,20 @@ nav:
       - Temperature Module: modules/temperature.md
       - Thermocycler: modules/thermocycler.md
   - Labware: 
-      - Labware Home: labware/index.md
+      - Labware: labware/index.md
       - Labware Concepts: labware/concepts.md
       - Labware Types: labware/types.md
-      - Using the Gripper: labware/gripper.md
+      - Using Labware with the Gripper: labware/gripper.md
       - Labware Definitions: labware/definitions.md
   - Protocol Development: 
-      - Protocols Home: protocols/index.md
+      - Protocol Development: protocols/index.md
       - Protocol Library: protocols/library.md
       - Custom Protocol Service: protocols/development-service.md
       - Protocol Designer: protocols/designer.md
-      - Python API: protocols/python-api.md
+      - Python Protocol API: protocols/python-api.md
       - Converting OT-2 Protocols: protocols/ot-2.md
   - Touchscreen: 
-      - Touchscreen Home: touchscreen/index.md
+      - Touchscreen Operation: touchscreen/index.md
       - Dashboard: touchscreen/dashboard.md
       - Deck Configuration: touchscreen/deck-config.md
       - Protocol Management: touchscreen/protocol-management.md
@@ -52,13 +52,13 @@ nav:
       - Protocol Setup: touchscreen/protocol-setup.md
       - Protocol Run: touchscreen/protocol-run.md
       - Quick Transfer: touchscreen/quick-transfer.md
-      - Instruments: touchscreen/instruments.md
-      - Settings: touchscreen/settings.md
+      - Instrument Management: touchscreen/instruments.md
+      - Robot Settings: touchscreen/settings.md
   - Opentrons App: opentrons-app.md
   - Advanced Operation: advanced-operation.md
   - Maintenance: 
-      - Maintenance Home: maintenance/index.md
-      - Cleaning: maintenance/cleaning.md
+      - Maintenance and Service: maintenance/index.md
+      - Cleaning Flex: maintenance/cleaning.md
       - Service: maintenance/service.md
   - Appendices:
       - Glossary: glossary.md

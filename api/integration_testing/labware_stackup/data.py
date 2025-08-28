@@ -13,6 +13,7 @@ TEST_LATEST_LABWARE: list[tuple[str, int]] = [
     ("schema3test_tough_pcr_auto_sealing_lid", 999),
     ("schema3test_flex_96_tiprack_200ul", 999),
     ("schema3test_96_wellplate_200ul_pcr_full_skirt", 999),
+    ("schema3test_96_wellplate_360ul_flat", 999),
     ("agilent_1_reservoir_290ml", 3),
     ("appliedbiosystemsmicroamp_384_wellplate_40ul", 2),
     ("armadillo_96_wellplate_200ul_pcr_full_skirt", 3),

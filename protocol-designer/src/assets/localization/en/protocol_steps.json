@@ -187,7 +187,7 @@
   "time_in": "{{times}} times in",
   "timeline": "Timeline",
   "tip_handling": {
-    "title": "Tip pickup behavior",
+    "title": "Tip usage",
     "tooltip": "Choose tip pickup frequency for aspirations"
   },
   "tip_management": "Tip management",

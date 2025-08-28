@@ -2,8 +2,6 @@
 title: "Opentrons Flex: Connections"
 ---
 
-# Connections
-
 ![Locations of connections on Flex. USB-A ports and covers for cable routing are on either side of the robot. Facing the rear of the robot, on the left are the AUX-1, AUX-2, USB-B and Ethernet ports. On the right are the IEC power inlet and on/off switch.](../images/flex-connections.png "Flex connections")
 
 ## Power connection

@@ -16,12 +16,12 @@ theme:
 nav:
   - Absorbance Plate Reader Instruction Manual: index.md
   - Safety Information: safety.md
-  - Product Specifications: specifications.md
+  - Product Specifications: product-specs.md
   - Deck Placement: placement.md
   - Installing the Plate Reader: installation.md
   - Using Plate Reader Data: data.md
   - Maintenance and Cleaning: maintenance.md
-  - Additional Product Information: warranty.md
+  - Additional Product Information: additional-info.md
 
 plugins:
   - search

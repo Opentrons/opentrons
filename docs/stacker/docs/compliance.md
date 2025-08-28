@@ -2,8 +2,6 @@
 title: "Flex Stacker: Safety and Compliance"
 ---
 
-# Safety Information and Regulatory Compliance
-
 Opentrons recommends that you follow the safe use specifications listed in this section and throughout this manual.
 
 ## General Safety Guidelines

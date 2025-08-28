@@ -13,7 +13,7 @@ metadata = {
     "source": "Protocol Designer",
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.24"}
+requirements = {"robotType": "Flex", "apiLevel": "2.25"}
 
 
 def run(protocol: protocol_api.ProtocolContext) -> None:
@@ -23,20 +23,29 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         "thermocyclerModuleV2", "B1"
     )  # type: ignore[assignment]
 
-    # PROTOCOL STEPS
+    try:
+        if not protocol.is_simulating():
+            from abr_testing.protocols import helpers
 
-    # Step 1:
-    thermocycler_module_1.open_lid()
+            slack_bot = helpers.set_up_slack()
+            slack_bot.send_run_started_message(metadata["protocolName"])
 
-    # Step 2:
-    thermocycler_module_1.close_lid()
-    thermocycler_module_1.set_lid_temperature(37)
-    thermocycler_module_1.execute_profile(
-        [
-            {"temperature": 75, "hold_time_seconds": 15},
-        ],
-        480,
-        block_max_volume=10,
-    )
-    thermocycler_module_1.deactivate_block()
-    thermocycler_module_1.deactivate_lid()
+        # PROTOCOL STEPS
+        # Step 1:
+        thermocycler_module_1.open_lid()
+
+        # Step 2:
+        thermocycler_module_1.close_lid()
+        thermocycler_module_1.set_lid_temperature(37)
+        thermocycler_module_1.execute_profile(
+            [
+                {"temperature": 75, "hold_time_seconds": 15},
+            ],
+            480,
+            block_max_volume=10,
+        )
+        thermocycler_module_1.deactivate_block()
+        thermocycler_module_1.deactivate_lid()
+    except Exception as e:
+        if not protocol.is_simulating():
+            slack_bot.send_error_message(metadata["protocolName"], str(e))

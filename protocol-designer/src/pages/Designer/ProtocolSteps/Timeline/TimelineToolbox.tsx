@@ -181,7 +181,12 @@ export function TimelineToolbox({
           <StyledText desktopStyle="bodyDefaultSemiBold">
             {t('timeline')}
           </StyledText>
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            // Negative margin to undo the first and last steps' built-in y-padding.
+            // eslint-disable-next-line opentrons/no-margins-inline
+            marginY={`-${SPACING.spacing2}`}
+          >
             <TerminalItemStep
               id={START_TERMINAL_ITEM_ID}
               sidebarWidth={sidebarWidth}

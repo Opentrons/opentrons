@@ -16,13 +16,13 @@ theme:
 nav:
   - Temperature Module GEN2 Instruction Manual: index.md
   - Safety Information and Regulatory Compliance: compliance.md
-  - Product Specifications: specifications.md
+  - Product Specifications: product-specs.md
   - Installing the Temperature Module:
-      - Before You Begin: preinstall.md
-      - Flex Installation Steps: flex-installation.md
-      - OT-2 Installation Steps: ot2-installation.md
+      - Before You Begin: pre-installation.md
+      - Flex Installation Steps: installation-flex.md
+      - OT-2 Installation Steps: installation-ot2.md
   - Maintenance and Cleaning: maintenance.md
-  - Additional Product Information: warranty.md
+  - Additional Product Information: additional-info.md
 
 plugins:
   - search

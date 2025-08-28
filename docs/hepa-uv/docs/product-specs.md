@@ -2,8 +2,6 @@
 title: "HEPA/UV Module: Product Specifications"
 ---
 
-# Product Specifications
-
 ![Labeled HEPA/UV Module diagram](images/hepa-uv-diagram.svg "Labeled HEPA/UV Module diagram")
 
 ## Included parts

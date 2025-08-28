@@ -1,4 +1,4 @@
-site_name: thermocycler-manual
+site_name: thermocycler
 
 theme:
   name: material
@@ -16,14 +16,14 @@ theme:
 nav:
   - Thermocycler GEN2 Instruction Manual: index.md
   - Safety and Regulatory Compliance: compliance.md
-  - Product Specifications: specifications.md
+  - Product Specifications: product-specs.md
   - Installing the Thermocycler:
-      - Before You Begin: preinstall.md
-      - Flex Attachment Steps: flex-installation.md
-      - OT-2 Attachment Steps: ot2-installation.md
+      - Before You Begin: pre-installation.md
+      - Flex Attachment Steps: installation-flex.md
+      - OT-2 Attachment Steps: installation-ot2.md
   - Thermocycler Lid Seals: lid-seals.md
   - Maintenance and Cleaning: maintenance.md
-  - Additional Product Information: warranty.md
+  - Additional Product Information: additional-info.md
 
 
 plugins:

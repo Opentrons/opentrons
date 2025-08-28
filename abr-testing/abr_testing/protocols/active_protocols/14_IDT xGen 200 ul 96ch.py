@@ -1,4 +1,4 @@
-"""IDT xGEn 96x with Flex Stacker."""
+"""IDT xGEn 1000ul 96x with Flex Stacker."""
 
 from opentrons.protocol_api import ProtocolContext, ParameterContext
 from abr_testing.protocols import helpers
@@ -12,7 +12,7 @@ from opentrons.protocol_api.module_contexts import (
 from opentrons.hardware_control.modules.types import ThermocyclerStep
 
 metadata = {
-    "protocolName": "IDT xGen 96x 1000ul v9 ",
+    "protocolName": "IDT xGen 200 ul 96x v9 ",
     "author": "Opentrons <protocols@opentrons.com>",
     "source": "Protocol Library",
 }
@@ -97,7 +97,7 @@ def run(protocol: ProtocolContext) -> None:
     NOLABEL = False  # Default False   | True = Do not include Liquid Labeling,
 
     # =============================== PIPETTE ===============================
-    p1000 = protocol.load_instrument("flex_96channel_1000", "left")
+    p1000 = protocol.load_instrument("flex_96channel_200", "left")
     p96x_200_flow_rate_aspirate_default = 716
     p96x_200_flow_rate_dispense_default = 716
     p96x_200_flow_rate_blow_out_default = 716

@@ -9,8 +9,6 @@ title: "HEPA/UV Module: Maintenance"
     }
 </style>
 
-# Maintenance
-
 Aside from replacing the UV bulbs and filters, users should not attempt to service or repair the HEPA/UV Module themselves. If you have concerns about the module’s performance or require maintenance, please [contact Opentrons Support](mailto:support@opentrons.com).
 
 ## Bulb replacement

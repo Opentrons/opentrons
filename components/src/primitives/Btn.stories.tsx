@@ -1,10 +1,5 @@
 import { Box } from './Box'
-import {
-  NewPrimaryBtn,
-  NewSecondaryBtn,
-  SecondaryBtn,
-  TertiaryBtn,
-} from './Btn'
+import { NewPrimaryBtn, NewSecondaryBtn, TertiaryBtn } from './Btn'
 
 import type { Meta, Story } from '@storybook/react'
 import type * as React from 'react'
@@ -13,15 +8,6 @@ export default {
   title: 'Library/Atoms/Btn',
   argTypes: { onClick: { action: 'clicked' } },
 } as Meta
-
-const SecondaryTemplate: Story<
-  React.ComponentProps<typeof SecondaryBtn>
-> = args => <SecondaryBtn {...args} />
-export const Secondary = SecondaryTemplate.bind({})
-Secondary.args = {
-  children: 'Cancel',
-  title: 'secondary button title',
-}
 
 const AppPrimaryTemplate: Story<
   React.ComponentProps<typeof NewPrimaryBtn>
