@@ -2,7 +2,11 @@ import { useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { RUN_STATUS_FINISHING, RUN_STATUS_RUNNING } from '@opentrons/api-client'
+import {
+  RUN_STATUS_FAILED,
+  RUN_STATUS_IDLE,
+  RUN_STATUS_SUCCEEDED,
+} from '@opentrons/api-client'
 import {
   ALIGN_START,
   Banner,
@@ -180,7 +184,10 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
 
   const isPending = latestRequest?.status === PENDING
   const runInProgress =
-    runStatus === RUN_STATUS_RUNNING || runStatus === RUN_STATUS_FINISHING
+    runStatus != null &&
+    runStatus !== RUN_STATUS_SUCCEEDED &&
+    runStatus !== RUN_STATUS_FAILED &&
+    runStatus !== RUN_STATUS_IDLE
 
   const hideBanners = isPending || runInProgress
   const hotToTouch: IconProps = { name: 'ot-hot-to-touch' }
