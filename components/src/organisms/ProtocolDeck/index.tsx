@@ -58,6 +58,8 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
         topLabwareInfo != null
           ? labwareDefinitionsByURI[topLabwareInfo.definitionUri]
           : null
+      // TODO: ja 8.27.25: find a better way to find the matching lid def without
+      // relying on the lidDisplayNames
       const matchingLidDef = Object.values(labwareDefinitionsByURI).find(
         uri => uri.metadata.displayName === topLabwareInfo?.lidDisplayName
       )

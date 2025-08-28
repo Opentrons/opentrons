@@ -1,6 +1,20 @@
-export function GenericLid(): JSX.Element {
+interface GenericLidProps {
+  lidDimensions: {
+    xDimension: number
+    yDimension: number
+    zDimension: number
+  } | null
+}
+export function GenericLid(props: GenericLidProps): JSX.Element {
   return (
-    <svg id="TcDisposable" xmlns="http://www.w3.org/2000/svg" version="1.1">
+    <svg
+      id="GenericLid"
+      xmlns="http://www.w3.org/2000/svg"
+      version="1.1"
+      width={props.lidDimensions?.xDimension ?? 128.76}
+      height={props.lidDimensions?.yDimension ?? 85.8}
+      viewBox="0 0 127.68 85.8"
+    >
       <g id="BgFill">
         <path
           stroke="#4a4a4a"

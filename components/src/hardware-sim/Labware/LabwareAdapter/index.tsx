@@ -28,6 +28,11 @@ export const customSVGLoadNames = Object.keys(CUSTOM_SVG_LOADNAME_PATHS)
 
 export interface LabwareAdapterProps {
   labwareLoadName: LabwareAdapterLoadName
+  lidDimensions: {
+    xDimension: number
+    yDimension: number
+    zDimension: number
+  } | null
   definition?: LabwareDefinition
   highlight?: boolean
   highlightShadow?: boolean
@@ -43,6 +48,7 @@ export const LabwareAdapter = (
     highlight = false,
     highlightShadow,
     isGenericLid = false,
+    lidDimensions,
   } = props
   const highlightOutline =
     highlight && definition != null ? (
@@ -72,7 +78,7 @@ export const LabwareAdapter = (
        * does not layer over the inside of the SVG labware adapter
        */}
       {highlightShadowOutline}
-      <SVGElement />
+      <SVGElement lidDimensions={lidDimensions} />
       {highlightOutline}
     </g>
   )

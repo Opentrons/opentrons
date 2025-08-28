@@ -108,7 +108,11 @@ function InterventionStyleDeckMapContent(
                 >
                   <LabwareHighlight
                     highlight={true}
-                    definition={module.nestedLabwareDefsBottomToTop[0]}
+                    definition={
+                      module.nestedLabwareDefsBottomToTop[
+                        module.nestedLabwareDefsBottomToTop.length - 1
+                      ]
+                    }
                   />
                 </AlignControlToModule>
               ) : undefined,

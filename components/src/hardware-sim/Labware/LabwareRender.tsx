@@ -124,6 +124,8 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
   if (isNeedingCustomSVG || isGenericLid) {
     const { shouldRotateAdapterOrientation } = props
     const { xDimension, yDimension } = getSchema2Dimensions(definition)
+    const lidDimensions =
+      'dimensions' in definition ? definition.dimensions : null
 
     return (
       <g
@@ -150,6 +152,7 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
             highlight={props.highlight}
             highlightShadow={props.highlightShadow}
             isGenericLid={isGenericLid}
+            lidDimensions={lidDimensions}
           />
         </g>
       </g>

@@ -353,6 +353,16 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                   targetSlotId={moduleLocation.slotName}
                   childrenPositioningMode="passThrough"
                 >
+                  {/* TODO(ja, 8.27.25): create a <AlignLabwareToLabware/> component to align the lid
+                      to the labware. We want to make something like this:
+                      <Module ...>
+                      <AlignLabwareToModule ...> <!-- Align 1st labware to module. -->
+                      <AlignLabwareToLabware ...> <!-- Align 2nd labware to 1st labware. This doesn't exist yet. -->
+                      <LabwareRender ... /> <!-- Render 2nd labware. -->
+                      </AlignLabwareToLabware>
+                      </AlignLabwareToModule>
+                      </Module ...>
+                      */}
                   {nestedLabwareDefsBottomToTop.length > 0 ? (
                     <AlignLabwareToModule
                       // todo(mm, 2025-07-16): Investigate whether <AlignLabwareToModule> is correct to use
