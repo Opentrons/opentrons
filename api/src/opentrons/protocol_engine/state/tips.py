@@ -1,11 +1,11 @@
 """Tip state tracking."""
 
 from dataclasses import dataclass
-from enum import Enum
 from typing import Dict, Iterable, Optional, List, Set
 
 from opentrons.types import NozzleMapInterface, NozzleConfigurationType
 from opentrons.protocol_engine.state import update_types
+from opentrons.protocol_engine.types import TipRackWellState
 
 from ._abstract_store import HasState, HandlesActions
 from ._well_math import (
@@ -18,14 +18,7 @@ from ..actions import Action, ResetTipsAction, get_state_updates
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 
 
-class _TipRackWellState(Enum):
-    """The state of a single tip in a tip rack's well."""
-
-    CLEAN = "clean"
-    USED = "used"
-
-
-_TipRackStateByWellName = Dict[str, _TipRackWellState]
+_TipRackStateByWellName = Dict[str, TipRackWellState]
 
 
 @dataclass
@@ -59,13 +52,14 @@ class TipStore(HasState[TipState], HandlesActions):
             for well_name in self._state.tips_by_labware_id[labware_id].keys():
                 self._state.tips_by_labware_id[labware_id][
                     well_name
-                ] = _TipRackWellState.CLEAN
+                ] = TipRackWellState.CLEAN
 
     def _handle_state_update(self, state_update: update_types.StateUpdate) -> None:
-        if state_update.tips_used != update_types.NO_CHANGE:
-            self._set_used_tips(
-                labware_id=state_update.tips_used.labware_id,
-                well_names=state_update.tips_used.well_names,
+        if state_update.tips_state != update_types.NO_CHANGE:
+            self._set_tip_state(
+                labware_id=state_update.tips_state.labware_id,
+                well_names=state_update.tips_state.well_names,
+                tip_state=state_update.tips_state.tip_state,
             )
 
         if state_update.loaded_labware != update_types.NO_CHANGE:
@@ -73,7 +67,7 @@ class TipStore(HasState[TipState], HandlesActions):
             definition = state_update.loaded_labware.definition
             if definition.parameters.isTiprack:
                 self._state.tips_by_labware_id[labware_id] = {
-                    well_name: _TipRackWellState.CLEAN
+                    well_name: TipRackWellState.CLEAN
                     for column in definition.ordering
                     for well_name in column
                 }
@@ -87,7 +81,7 @@ class TipStore(HasState[TipState], HandlesActions):
                 ]
                 if definition.parameters.isTiprack:
                     self._state.tips_by_labware_id[labware_id] = {
-                        well_name: _TipRackWellState.CLEAN
+                        well_name: TipRackWellState.CLEAN
                         for column in definition.ordering
                         for well_name in column
                     }
@@ -95,10 +89,12 @@ class TipStore(HasState[TipState], HandlesActions):
                         column for column in definition.ordering
                     ]
 
-    def _set_used_tips(self, labware_id: str, well_names: Iterable[str]) -> None:
+    def _set_tip_state(
+        self, labware_id: str, well_names: Iterable[str], tip_state: TipRackWellState
+    ) -> None:
         well_states = self._state.tips_by_labware_id.get(labware_id, {})
         for well_name in well_names:
-            well_states[well_name] = _TipRackWellState.USED
+            well_states[well_name] = tip_state
 
 
 class TipView:
@@ -143,17 +139,15 @@ class TipView:
                                 starting_column_index = idx
 
                 for column in columns[starting_column_index:]:
-                    if not any(
-                        wells[well] == _TipRackWellState.USED for well in column
-                    ):
+                    if all(wells[well] == TipRackWellState.CLEAN for well in column):
                         return column[0]
 
             elif num_tips == len(wells.keys()):  # Get next tips for 96 channel
                 if starting_tip_name and starting_tip_name != columns[0][0]:
                     return None
 
-                if not any(
-                    tip_state == _TipRackWellState.USED for tip_state in wells.values()
+                if all(
+                    tip_state == TipRackWellState.CLEAN for tip_state in wells.values()
                 ):
                     return next(iter(wells))
 
@@ -162,7 +156,7 @@ class TipView:
                     wells = _drop_wells_before_starting_tip(wells, starting_tip_name)
 
                 for well_name, tip_state in wells.items():
-                    if tip_state == _TipRackWellState.CLEAN:
+                    if tip_state == TipRackWellState.CLEAN:
                         return well_name
         return None
 
@@ -181,9 +175,7 @@ class TipView:
                 return False
             # If not all the tips we'll be picking up are clean it's not valid
             target_well_states = [tip_well_states[well_name] for well_name in well_list]
-            if not all(
-                state == _TipRackWellState.CLEAN for state in target_well_states
-            ):
+            if not all(state == TipRackWellState.CLEAN for state in target_well_states):
                 return False
             # Since we know a full configuration will always produce zero non-active overlapping wells
             # we can skip the following checks if it is a full configuration.
@@ -200,8 +192,10 @@ class TipView:
                     tip_well_states[well_name]
                     for well_name in wells_covered_physically.difference(well_list)
                 ]
-                if not all(
-                    well_state == _TipRackWellState.USED
+                # TODO(jbl 2025-08-25) this should be changed to ensure all these extra wells are EMPTY when further
+                #   tip return work occurs
+                if any(
+                    well_state == TipRackWellState.CLEAN
                     for well_state in wells_in_way_well_state
                 ):
                     return False
@@ -214,7 +208,7 @@ class TipView:
         for well in target_well_list:
             # If the target well/tip isn't clean, skip to the next one. This will be checked
             # again in _validate_wells, but we can short circuit the following checks if this is False
-            if tip_well_states[well] != _TipRackWellState.CLEAN:
+            if tip_well_states[well] != TipRackWellState.CLEAN:
                 continue
             # Get list of all wells (i.e. tips) that would be covered by the active nozzles
             targeted_wells = set(
@@ -244,12 +238,12 @@ class TipView:
         tip_rack = self._state.tips_by_labware_id.get(labware_id)
         well_state = tip_rack.get(well_name) if tip_rack else None
 
-        return well_state == _TipRackWellState.CLEAN
+        return well_state == TipRackWellState.CLEAN
 
-    def compute_tips_to_mark_as_used(
+    def compute_tips_to_mark_as_used_or_empty(
         self, labware_id: str, well_name: str, nozzle_map: NozzleMap
     ) -> list[str]:
-        """Compute which tips a hypothetical tip pickup should mark as "used".
+        """Compute which tips a hypothetical tip pickup/drop should mark as "used" or "empty".
 
         Params:
             labware_id: The labware ID of the tip rack.
@@ -276,7 +270,7 @@ def _drop_wells_before_starting_tip(
 ) -> _TipRackStateByWellName:
     """Drop any wells that come before the starting tip and return the remaining ones after."""
     seen_starting_well = False
-    remaining_wells: dict[str, _TipRackWellState] = {}
+    remaining_wells: dict[str, TipRackWellState] = {}
     for well_name, tip_state in wells.items():
         if well_name == starting_tip_name:
             seen_starting_well = True

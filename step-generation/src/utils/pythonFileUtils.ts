@@ -11,7 +11,6 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
-import { sortLabwareBySlot } from '../robotStateSelectors'
 import { getLiquidClassName } from './liquidClassUtils'
 import { getSlotInLocationStack } from './misc'
 import {
@@ -175,23 +174,36 @@ const _getLidStacks = (
       const { stack } = labwareState[id]
       const nonSlotStackLength = stack.length - 1
       const parentLabware = stack.slice(1, nonSlotStackLength) // excluding stack
-      const isLidStack = parentLabware.every(
+      const deckRiserParentLabware = parentLabware.find(
         parentLabwareId =>
-          allLabwareEntities[parentLabwareId].labwareDefURI === labwareDefURI
+          allLabwareEntities[parentLabwareId]?.def.parameters.loadName ===
+          'opentrons_flex_deck_riser'
       )
+      const isLidStack =
+        parentLabware.every(
+          parentLabwareId =>
+            allLabwareEntities[parentLabwareId]?.labwareDefURI === labwareDefURI
+        ) || deckRiserParentLabware != null
+
       const loadName = def.parameters.loadName
       if (!isLidStack) {
         return acc
       }
-      const lidSlot = getSlotInLocationStack(stack)
+      const lidSlot =
+        deckRiserParentLabware != null
+          ? allLabwareEntities[deckRiserParentLabware]?.pythonName
+          : getSlotInLocationStack(stack)
+      const nonSlotAndAdapterLength =
+        stack.length - (deckRiserParentLabware != null ? 2 : 1)
+
       if (!(lidSlot in acc)) {
         return {
           ...acc,
-          [lidSlot]: { loadName, quantity: nonSlotStackLength },
+          [lidSlot]: { loadName, quantity: nonSlotAndAdapterLength },
         }
       }
       const { quantity } = acc[lidSlot]
-      const newQuantity = max([quantity, nonSlotStackLength]) ?? quantity
+      const newQuantity = max([quantity, nonSlotAndAdapterLength]) ?? quantity
       return { ...acc, [lidSlot]: { loadName, quantity: newQuantity } }
     },
     {}
@@ -213,14 +225,19 @@ export const getLoadLidStacks = (
   )
 
   const pythonLidStacks = Object.entries(lidStacks)
-    .map<string>(([slot, { loadName, quantity }]) => {
+    .map<string>(([location, { loadName, quantity }]) => {
+      const isLidSlotOnAdapter = Object.values(allLabwareEntities).some(
+        ({ pythonName }) => pythonName === location
+      )
       const loadNameArg = `load_name=${formatPyStr(loadName)}`
-      const locationArg = `location=${formatPyStr(slot)}`
+      const locationArg = `location=${
+        isLidSlotOnAdapter ? location : formatPyStr(location)
+      }`
       const quantityArg = `quantity=${quantity}`
       const allArgs = [loadNameArg, locationArg, quantityArg].join(',\n')
       const allArgsIndented = indentPyLines(allArgs)
       return (
-        `lid_stack_${slot} = ${PROTOCOL_CONTEXT_NAME}.load_lid_stack(\n` +
+        `lid_stack_${location} = ${PROTOCOL_CONTEXT_NAME}.load_lid_stack(\n` +
         `${allArgsIndented},\n` +
         `)`
       )
@@ -316,47 +333,20 @@ export function getLoadLabware(
 
 export function getLoadPipettes(
   pipetteEntities: PipetteEntities,
-  labwareEntities: LabwareEntities,
-  labwareRobotState: TimelineFrame['labware'],
   pipetteRobotState: TimelineFrame['pipettes']
 ): string {
   const pythonPipette = Object.values(pipetteEntities)
     .map(pipette => {
-      const { name, id, spec, pythonName, tiprackDefURI } = pipette
+      const { name, id, spec, pythonName } = pipette
       const mount =
         spec.channels === 96 ? '' : formatPyStr(pipetteRobotState[id].mount)
       const pipetteName = isFlexPipette(name)
         ? getFlexNameConversion(spec)
         : name
-      const sortedLabwareIds = sortLabwareBySlot(labwareRobotState)
-      const allTipracks = sortedLabwareIds
-        .map(id => labwareEntities[id])
-        .filter(lw => lw && tiprackDefURI.includes(lw.labwareDefURI))
-      const onDeckTipracks = allTipracks.filter(
-        tiprack =>
-          getSlotInLocationStack(labwareRobotState[tiprack.id].stack) !==
-          'offDeck'
-      )
-      const offDeckTipracks = allTipracks.filter(
-        tiprack =>
-          getSlotInLocationStack(labwareRobotState[tiprack.id].stack) ===
-          'offDeck'
-      )
-      const tiprackPythonNames = [...onDeckTipracks, ...offDeckTipracks]
-        .map(tiprack => tiprack.pythonName)
-        .join(', ')
-      const pythonTipRacks =
-        tiprackDefURI.length === 0 ? '' : `tip_racks=[${tiprackPythonNames}]`
 
       return (
-        `${pythonName} = ${PROTOCOL_CONTEXT_NAME}.load_instrument(\n` +
-        `${indentPyLines(
-          [
-            formatPyStr(pipetteName),
-            ...(mount ? [mount] : []),
-            ...(pythonTipRacks ? [pythonTipRacks] : []),
-          ].join(', ')
-        )},\n` +
+        `${pythonName} = ${PROTOCOL_CONTEXT_NAME}.load_instrument(` +
+        `${[formatPyStr(pipetteName), ...(mount ? [mount] : [])].join(', ')}` +
         ')'
       )
     })
@@ -548,7 +538,7 @@ export function pythonDefRun(
       labware,
       labwareNicknamesById
     ),
-    getLoadPipettes(pipetteEntities, labwareEntities, labware, pipettes),
+    getLoadPipettes(pipetteEntities, pipettes),
     ...(robotType === FLEX_ROBOT_TYPE
       ? [
           getLoadTrashBins(trashBinEntities),

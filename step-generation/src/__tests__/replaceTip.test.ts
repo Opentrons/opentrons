@@ -292,6 +292,58 @@ describe('replaceTip', () => {
         pickUpTipHelper('B1'),
       ])
     })
+    it('Single-channel: no error if pipette does not have tip, and no waste chute or trash bin is found', () => {
+      invariantContext = {
+        ...invariantContext,
+        wasteChuteEntities: {},
+        trashBinEntities: {},
+      }
+      const result = replaceTip(
+        {
+          pipette: p300SingleId,
+          dropTipLocation: FIXED_TRASH_ID,
+          tipRack: tiprackURI1,
+        },
+        invariantContext,
+        {
+          ...initialRobotState,
+          tipState: {
+            ...initialRobotState.tipState,
+            pipettes: {
+              p300SingleId: { hasTip: false, tiprackURI: tiprackURI1 },
+            },
+          },
+        }
+      )
+      expect(getSuccessResult(result))
+    })
+    it('Single-channel: error if pipette does have tip, and no waste chute or trash bin is found', () => {
+      invariantContext = {
+        ...invariantContext,
+        wasteChuteEntities: {},
+        trashBinEntities: {},
+      }
+      const result = replaceTip(
+        {
+          pipette: p300SingleId,
+          dropTipLocation: FIXED_TRASH_ID,
+          tipRack: tiprackURI1,
+        },
+        invariantContext,
+        {
+          ...initialRobotState,
+          tipState: {
+            ...initialRobotState.tipState,
+            pipettes: {
+              p300SingleId: { hasTip: true, tiprackURI: tiprackURI1 },
+            },
+          },
+        }
+      )
+      expect(getErrorResult(result).errors[0]).toMatchObject({
+        type: 'DROP_TIP_LOCATION_DOES_NOT_EXIST',
+      })
+    })
   })
   describe('replaceTip: multi-channel', () => {
     it('multi-channel, all tipracks have tips', () => {

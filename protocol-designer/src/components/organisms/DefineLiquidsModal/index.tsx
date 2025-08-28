@@ -217,6 +217,7 @@ export function DefineLiquidsModal(
                     name="displayName"
                     render={({ field }) => (
                       <InputField
+                        autoFocus
                         name="displayName"
                         error={
                           touchedFields.displayName != null

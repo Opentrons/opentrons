@@ -52,6 +52,7 @@ KNOWN_EXCEPTIONS_FOR_TESTS: set[str] = {
     "schema3test_flex_tiprack_lid",
     "schema3test_tough_pcr_auto_sealing_lid",
     "schema3test_universal_flat_adapter",
+    "schema3test_96_wellplate_360ul_flat",
 }
 
 

@@ -10,7 +10,7 @@ import {
   actions as stepsActions,
 } from '/protocol-designer/ui/steps'
 
-import { ConnectedStepContainer } from './StepContainer'
+import { ConnectedStepContainer } from './ConnectedStepContainer'
 
 interface PresavedStepProps {
   sidebarWidth: number

@@ -143,11 +143,16 @@ export function useDeckMapUtils({
   return {
     deckConfig,
     modulesOnDeck: updatedModules.map(
-      ({ moduleModel, moduleLocation, innerProps, nestedLabwareDef }) => ({
+      ({
         moduleModel,
         moduleLocation,
         innerProps,
-        nestedLabwareDef,
+        nestedLabwareDefsBottomToTop,
+      }) => ({
+        moduleModel,
+        moduleLocation,
+        innerProps,
+        nestedLabwareDefsBottomToTop,
       })
     ),
     labwareOnDeck: runCurrentLabware.map(({ labwareLocation, definition }) => ({
@@ -179,7 +184,7 @@ interface RunCurrentModulesOnDeck {
     | {
         lidMotorState?: undefined
       }
-  nestedLabwareDef: LabwareDefinition | null
+  nestedLabwareDefsBottomToTop: LabwareDefinition[]
 }
 
 // Builds the necessary module object expected by BaseDeck.
@@ -203,7 +208,8 @@ export function getRunCurrentModulesOnDeck({
           ? { lidMotorState: 'open' }
           : {},
 
-      nestedLabwareDef,
+      nestedLabwareDefsBottomToTop:
+        nestedLabwareDef != null ? [nestedLabwareDef] : [],
       highlight: getIsLabwareMatch(
         nestedLabwareSlotName,
         runRecord,
@@ -282,13 +288,19 @@ export const getRunCurrentModulesInfo = ({
     return runRecord.data.modules.reduce<RunCurrentModuleInfo[]>(
       (acc, module) => {
         const moduleDef = getModuleDef(module.model)
+        const moduleType = getModuleType(moduleDef.model)
 
-        // Get the labware that is placed on top of the module.
+        // Get the labware that is placed on/in the module.
+        // for stacker, we only want to consider labware in the hopper as "nested"
         const nestedLabware = runRecord.data.labware.find(
           lw =>
             typeof lw.location === 'object' &&
             'moduleId' in lw.location &&
-            lw.location.moduleId === module.id
+            lw.location.moduleId === module.id &&
+            (!(FLEX_STACKER_MODULE_TYPE === moduleType) ||
+              (FLEX_STACKER_MODULE_TYPE === moduleType &&
+                'kind' in lw.location &&
+                lw.location.kind === 'inStackerHopper'))
         )
 
         const nestedLabwareDef =
@@ -332,6 +344,7 @@ interface RunCurrentLabwareInfo {
   labwareDef: LabwareDefinition
   labwareLocation: LabwareLocation
   slotName: string
+  labwareId?: string
 }
 
 // Derive the labware info necessary to render labware on the deck.
@@ -364,6 +377,7 @@ export function getRunCurrentLabwareInfo({
               labwareDef,
               slotName,
               labwareLocation: labwareLocation,
+              labwareId: lw.id,
             },
           ]
         }
@@ -384,18 +398,24 @@ export function getRunCurrentLabwareInfo({
     }, {})
 
     // For each slot, return either:
-    // 1. The first labware with 'labwareId' in its location if it exists
-    // 2. The first labware in the slot if no labware has 'labwareId'
+    // 1. The first labware where no other labware has its 'labwareId' as a location
+    // 2. The first labware in the slot if no labware matches criteria 1
+    // TODO: (sarah, 8-22-25) revisit this logic and reduce complexity when we have location sequences
     return Object.values(labwareBySlot).map(slotLabware => {
-      const labwareWithId = slotLabware.find(
-        lw =>
-          typeof lw.labwareLocation !== 'string' &&
-          'labwareId' in lw.labwareLocation
-      )
-      return labwareWithId != null
+      const topMostLabware = slotLabware.find(lw => {
+        const labwareOnCurrentLabware = slotLabware.find(
+          otherLw =>
+            typeof otherLw.labwareLocation !== 'string' &&
+            'labwareId' in otherLw.labwareLocation &&
+            otherLw.labwareLocation.labwareId === lw.labwareId
+        )
+        return labwareOnCurrentLabware == null
+      })
+
+      return topMostLabware != null
         ? {
-            ...labwareWithId,
-            labwareLocation: { slotName: labwareWithId.slotName },
+            ...topMostLabware,
+            labwareLocation: { slotName: topMostLabware.slotName },
           }
         : slotLabware[0]
     })
@@ -419,15 +439,22 @@ export function getSlotNameAndLwLocFrom(
   runRecord: UseDeckMapUtilsProps['runRecord'],
   excludeModules: boolean
 ): [string | null, LabwareLocation | null] {
-  const baseSlot =
-    getLabwareLocation({
-      location,
-      detailLevel: 'slot-only',
-      loadedLabwares: runRecord?.data?.labware ?? [],
-      loadedModules: runRecord?.data?.modules ?? [],
-      robotType: FLEX_ROBOT_TYPE,
-    })?.slotName ?? null
+  const labwareLocationObject = getLabwareLocation({
+    location,
+    detailLevel: 'slot-only',
+    loadedLabwares: runRecord?.data?.labware ?? [],
+    loadedModules: runRecord?.data?.modules ?? [],
+    robotType: FLEX_ROBOT_TYPE,
+  })
+  const onModuleModel = labwareLocationObject?.moduleModel ?? null
 
+  // change base slot to just be the column for hopper labware, leave shuttle
+  // labware in the fourth row since we consolidate by slot name later
+  const baseSlot =
+    onModuleModel != null &&
+    getModuleType(onModuleModel) === FLEX_STACKER_MODULE_TYPE
+      ? labwareLocationObject?.slotName.charAt(0) ?? null
+      : labwareLocationObject?.slotName ?? null
   if (
     location == null ||
     location === 'offDeck' ||
@@ -435,7 +462,7 @@ export function getSlotNameAndLwLocFrom(
   ) {
     return [null, null]
   } else if ('moduleId' in location) {
-    if (excludeModules) {
+    if (excludeModules && onModuleModel != null) {
       return [null, null]
     } else {
       const moduleId = location.moduleId

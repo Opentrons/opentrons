@@ -130,7 +130,10 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
       ],
     }
   }
-  if (!args.dropTipLocation || (!isWasteChute && !isTrashBin)) {
+
+  const hasTip = prevRobotState.tipState.pipettes[pipette]?.hasTip
+
+  if (!args.dropTipLocation || (!isWasteChute && !isTrashBin && hasTip)) {
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
   }
 
@@ -204,7 +207,6 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
               style: args.nozzles,
             },
             pipetteId: args.pipette,
-            tiprackId: nextTiprack.tiprackId,
           }),
         ]
       : []

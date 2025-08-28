@@ -2,8 +2,6 @@
 title: "Opentrons Flex: Support and Contact Information"
 ---
 
-# Support and Contact Information
-
 Contact us if you have any questions about the Opentrons Flex liquid handling robot. Opentrons teams are here to help you with:
 
 - Sales

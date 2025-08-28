@@ -12,7 +12,7 @@ import type { WellContentsByNumber } from './index'
 
 interface LiquidCardListProps {
   selectedLabware: LabwareOnDeck
-  selectedLiquidId: string | undefined
+  selectedLiquidId: string
   setSelectedLiquidId: Dispatch<SetStateAction<string | undefined>>
   allIngredGroupFields: AllIngredGroupFields
   individualIds: string[]

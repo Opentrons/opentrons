@@ -14,7 +14,7 @@ import {
 
 import {
   getLabwareIdAfterModuleIdInStack,
-  getTopmostLabwareOnModuleFromStack,
+  getLabwaresOnModuleFromStack,
 } from '../../utils'
 
 import type { DropdownOption } from '@opentrons/components'
@@ -88,13 +88,13 @@ export function getModuleLabwareOptions(
 
   if (modulesOnDeck != null) {
     options = modulesOnDeck.map(moduleOnDeck => {
-      const topmostLabwareId = getTopmostLabwareOnModuleFromStack(
+      const { topMostId } = getLabwaresOnModuleFromStack(
         moduleOnDeck.id,
         Object.values(labwares)
       )
-      if (topmostLabwareId != null) {
+      if (topMostId != null) {
         return {
-          name: nicknamesById[topmostLabwareId],
+          name: nicknamesById[topMostId],
           deckLabel: moduleOnDeck.slot,
           subtext: module,
           value: moduleOnDeck.id,

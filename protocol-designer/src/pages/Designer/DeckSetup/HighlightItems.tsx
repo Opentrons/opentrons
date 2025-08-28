@@ -13,6 +13,8 @@ import {
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
+import { getLabwaresOnModuleFromStack } from '/protocol-designer/utils'
+
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import {
   getHoveredDropdownItem,
@@ -116,11 +118,7 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
     }
     const labwareSlot = getSlotInLocationStack(labwareOnDeck.stack)
     const labwareIdsFromFullStack =
-      labwareOnDeck.stack?.filter(
-        id =>
-          labware[id] != null &&
-          !labware[id].def.allowedRoles?.includes('adapter')
-      ) ?? []
+      labwareOnDeck.stack?.filter(id => labware[id] != null) ?? []
     const tcModel = Object.values(modules).find(
       module => module.type === THERMOCYCLER_MODULE_TYPE
     )?.model
@@ -160,6 +158,10 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
       if (moduleOnDeck == null) {
         return acc
       }
+      const { topMostId, rightBelowTopId } = getLabwaresOnModuleFromStack(
+        moduleOnDeck.id,
+        Object.values(labware)
+      )
       const position = getPositionFromSlotId(moduleOnDeck.slot, deckDef)
       if (position != null) {
         return [
@@ -174,6 +176,7 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
             isZoomed={false}
             labelName={text ?? ''}
             slot={moduleOnDeck.slot}
+            showModuleIcon={topMostId != null && rightBelowTopId != null}
           />,
         ]
       }
