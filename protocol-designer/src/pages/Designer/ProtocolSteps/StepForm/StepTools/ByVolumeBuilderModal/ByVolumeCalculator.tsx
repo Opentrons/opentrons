@@ -10,7 +10,7 @@ import {
 import { linearInterpolate } from '@opentrons/shared-data'
 
 import { maskToFloat } from '../../../../../../steplist/fieldLevel/processing'
-import styles from './styles.module.css'
+import styles from './byvolumebuilder.module.css'
 
 import type { ByVolumeType } from './types'
 

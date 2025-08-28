@@ -12,8 +12,8 @@ import { linearInterpolate } from '@opentrons/shared-data'
 
 import { getMainPagePortalEl } from '../../../../../../components/organisms'
 import { ByVolumeBuilder } from './ByVolumeBuilder'
+import styles from './byvolumebuilder.module.css'
 import { ByVolumeCalculator } from './ByVolumeCalculator'
-import styles from './styles.module.css'
 import { getByVolumeMappedToXY } from './utils'
 
 import type { Dispatch, SetStateAction } from 'react'
