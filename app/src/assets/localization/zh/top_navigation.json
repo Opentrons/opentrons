@@ -13,6 +13,7 @@
   "pipettes_not_calibrated": "请校准加载的协议中指定的所有移液器以继续",
   "please_connect_to_a_robot": "请连接到工作站以继续",
   "please_load_a_protocol": "请加载协议以继续",
+  "preview": "预览",
   "protocol_details": "协议详细信息",
   "protocol_runs": "协议运行",
   "protocol_timeline": "协议时间线",

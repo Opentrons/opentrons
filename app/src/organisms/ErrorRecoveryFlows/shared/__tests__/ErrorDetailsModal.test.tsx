@@ -253,7 +253,7 @@ describe('renders the InlineNotification', () => {
         heading:
           'Stacker empty errors occur when the robot tries to retrieve labware from an empty stacker',
         message:
-          'Load the stacker with the correct labware to complete the stacker retrieve step.',
+          'Load the stacker with the correct labware to complete the stacker retrieve step',
       }),
       {}
     )
@@ -283,7 +283,8 @@ describe('renders the InlineNotification', () => {
       expect.objectContaining({
         type: 'alert',
         heading:
-          'Stacker shuttle missing errors occur when the shuttle is not placed correctly on the track. Load the stacker shuttle onto the track to proceed.',
+          'Stacker shuttle missing errors occur when the shuttle is not placed correctly on the track',
+        message: 'Load the stacker shuttle onto the track to proceed',
       }),
       {}
     )

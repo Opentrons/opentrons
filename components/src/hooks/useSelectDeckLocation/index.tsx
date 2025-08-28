@@ -332,4 +332,5 @@ const INNER_DIV_PROPS = {
   justifyContent: JUSTIFY_CENTER,
   height: '100%',
   gridGap: SPACING.spacing4,
+  transform: 'scaleY(-1)',
 }

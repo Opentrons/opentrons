@@ -15,7 +15,6 @@ import {
   FAKE_FIXTURE_IDS,
   FLEX_MODULE_AA_TYPE_BY_MODEL,
   FLEX_ROBOT_TYPE,
-  FLEX_STACKER_FIXTURES,
   FLEX_STACKER_MODULE_TYPE,
   getAAByAAId,
   getAAForModuleFixture,
@@ -123,13 +122,12 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
         ) && attachedModule.serialNumber === opentronsModuleSerialNumber
       if (
         // in run setup, module calibration only available when module location is already correctly configured
-        (!isLoadedInRun &&
-          mayMountToCutoutIds.includes(cutoutId) &&
-          (isCurrentConfiguration ||
-            SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId) ||
-            // fake fixtures include mag block next to an empty staging slot and a waste chute next to an empty staging slot
-            FAKE_FIXTURE_IDS.includes(cutoutFixtureId))) ||
-        FLEX_STACKER_FIXTURES.includes(cutoutFixtureId as CutoutFixtureId)
+        !isLoadedInRun &&
+        mayMountToCutoutIds.includes(cutoutId) &&
+        (isCurrentConfiguration ||
+          SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId) ||
+          // fake fixtures include mag block next to an empty staging slot and a waste chute next to an empty staging slot
+          FAKE_FIXTURE_IDS.includes(cutoutFixtureId))
       ) {
         return [...acc, cutoutId]
       }
