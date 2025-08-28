@@ -22,6 +22,10 @@ Instruments
    :members:
    :exclude-members: delay
 
+.. autoclass:: opentrons.protocol_api.RobotContext
+   :members: 
+   :exclude-members: 
+
 .. _protocol-api-labware:
 
 Labware
