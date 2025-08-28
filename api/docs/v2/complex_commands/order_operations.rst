@@ -59,6 +59,9 @@ To **dispense:**
 20. Touch tip at the blow out location
 21. Drop tip
 
+.. note:: 
+    If you specify a blowout at a location other than the destination well, the pipette will touch the tip at the destination well and add an air gap before continuing to the blowout location. 
+
 Each command may repeat some or all of these steps in order to move liquid as requested. :py:meth:`.transfer` repeats as many times as there are wells in the longer of its ``source`` or ``dest`` arguments. Both legacy and liquid class distribute and consolidate methods try to repeat as few times as possible. See :ref:`complex-tip-refilling` below for how they behave when they do need to repeat. 
 
 Example Orders
