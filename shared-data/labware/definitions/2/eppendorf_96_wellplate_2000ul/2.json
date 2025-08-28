@@ -52,8 +52,8 @@
       "totalLiquidVolume": 2000,
       "x": 14.4,
       "z": 2.9,
-      "y": 74.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 74.3
     },
     "B1": {
       "shape": "rectangular",
@@ -63,8 +63,8 @@
       "totalLiquidVolume": 2000,
       "x": 14.4,
       "z": 2.9,
-      "y": 65.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 65.3
     },
     "C1": {
       "shape": "rectangular",
@@ -74,8 +74,8 @@
       "totalLiquidVolume": 2000,
       "x": 14.4,
       "z": 2.9,
-      "y": 56.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 56.3
     },
     "D1": {
       "shape": "rectangular",
@@ -85,8 +85,8 @@
       "totalLiquidVolume": 2000,
       "x": 14.4,
       "z": 2.9,
-      "y": 47.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 47.3
     },
     "E1": {
       "shape": "rectangular",
@@ -96,8 +96,8 @@
       "totalLiquidVolume": 2000,
       "x": 14.4,
       "z": 2.9,
-      "y": 38.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 38.3
     },
     "F1": {
       "shape": "rectangular",
@@ -107,8 +107,8 @@
       "totalLiquidVolume": 2000,
       "x": 14.4,
       "z": 2.9,
-      "y": 29.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 29.3
     },
     "G1": {
       "shape": "rectangular",
@@ -118,8 +118,8 @@
       "totalLiquidVolume": 2000,
       "x": 14.4,
       "z": 2.9,
-      "y": 20.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 20.3
     },
     "H1": {
       "shape": "rectangular",
@@ -129,8 +129,8 @@
       "totalLiquidVolume": 2000,
       "x": 14.4,
       "z": 2.9,
-      "y": 11.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 11.3
     },
     "A2": {
       "shape": "rectangular",
@@ -140,8 +140,8 @@
       "totalLiquidVolume": 2000,
       "x": 23.4,
       "z": 2.9,
-      "y": 74.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 74.3
     },
     "B2": {
       "shape": "rectangular",
@@ -151,8 +151,8 @@
       "totalLiquidVolume": 2000,
       "x": 23.4,
       "z": 2.9,
-      "y": 65.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 65.3
     },
     "C2": {
       "shape": "rectangular",
@@ -162,8 +162,8 @@
       "totalLiquidVolume": 2000,
       "x": 23.4,
       "z": 2.9,
-      "y": 56.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 56.3
     },
     "D2": {
       "shape": "rectangular",
@@ -173,8 +173,8 @@
       "totalLiquidVolume": 2000,
       "x": 23.4,
       "z": 2.9,
-      "y": 47.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 47.3
     },
     "E2": {
       "shape": "rectangular",
@@ -184,8 +184,8 @@
       "totalLiquidVolume": 2000,
       "x": 23.4,
       "z": 2.9,
-      "y": 38.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 38.3
     },
     "F2": {
       "shape": "rectangular",
@@ -195,8 +195,8 @@
       "totalLiquidVolume": 2000,
       "x": 23.4,
       "z": 2.9,
-      "y": 29.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 29.3
     },
     "G2": {
       "shape": "rectangular",
@@ -206,8 +206,8 @@
       "totalLiquidVolume": 2000,
       "x": 23.4,
       "z": 2.9,
-      "y": 20.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 20.3
     },
     "H2": {
       "shape": "rectangular",
@@ -217,8 +217,8 @@
       "totalLiquidVolume": 2000,
       "x": 23.4,
       "z": 2.9,
-      "y": 11.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 11.3
     },
     "A3": {
       "shape": "rectangular",
@@ -228,8 +228,8 @@
       "totalLiquidVolume": 2000,
       "x": 32.4,
       "z": 2.9,
-      "y": 74.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 74.3
     },
     "B3": {
       "shape": "rectangular",
@@ -239,8 +239,8 @@
       "totalLiquidVolume": 2000,
       "x": 32.4,
       "z": 2.9,
-      "y": 65.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 65.3
     },
     "C3": {
       "shape": "rectangular",
@@ -250,8 +250,8 @@
       "totalLiquidVolume": 2000,
       "x": 32.4,
       "z": 2.9,
-      "y": 56.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 56.3
     },
     "D3": {
       "shape": "rectangular",
@@ -261,8 +261,8 @@
       "totalLiquidVolume": 2000,
       "x": 32.4,
       "z": 2.9,
-      "y": 47.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 47.3
     },
     "E3": {
       "shape": "rectangular",
@@ -272,8 +272,8 @@
       "totalLiquidVolume": 2000,
       "x": 32.4,
       "z": 2.9,
-      "y": 38.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 38.3
     },
     "F3": {
       "shape": "rectangular",
@@ -283,8 +283,8 @@
       "totalLiquidVolume": 2000,
       "x": 32.4,
       "z": 2.9,
-      "y": 29.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 29.3
     },
     "G3": {
       "shape": "rectangular",
@@ -294,8 +294,8 @@
       "totalLiquidVolume": 2000,
       "x": 32.4,
       "z": 2.9,
-      "y": 20.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 20.3
     },
     "H3": {
       "shape": "rectangular",
@@ -305,8 +305,8 @@
       "totalLiquidVolume": 2000,
       "x": 32.4,
       "z": 2.9,
-      "y": 11.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 11.3
     },
     "A4": {
       "shape": "rectangular",
@@ -316,8 +316,8 @@
       "totalLiquidVolume": 2000,
       "x": 41.4,
       "z": 2.9,
-      "y": 74.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 74.3
     },
     "B4": {
       "shape": "rectangular",
@@ -327,8 +327,8 @@
       "totalLiquidVolume": 2000,
       "x": 41.4,
       "z": 2.9,
-      "y": 65.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 65.3
     },
     "C4": {
       "shape": "rectangular",
@@ -338,8 +338,8 @@
       "totalLiquidVolume": 2000,
       "x": 41.4,
       "z": 2.9,
-      "y": 56.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 56.3
     },
     "D4": {
       "shape": "rectangular",
@@ -349,8 +349,8 @@
       "totalLiquidVolume": 2000,
       "x": 41.4,
       "z": 2.9,
-      "y": 47.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 47.3
     },
     "E4": {
       "shape": "rectangular",
@@ -360,8 +360,8 @@
       "totalLiquidVolume": 2000,
       "x": 41.4,
       "z": 2.9,
-      "y": 38.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 38.3
     },
     "F4": {
       "shape": "rectangular",
@@ -371,8 +371,8 @@
       "totalLiquidVolume": 2000,
       "x": 41.4,
       "z": 2.9,
-      "y": 29.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 29.3
     },
     "G4": {
       "shape": "rectangular",
@@ -382,8 +382,8 @@
       "totalLiquidVolume": 2000,
       "x": 41.4,
       "z": 2.9,
-      "y": 20.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 20.3
     },
     "H4": {
       "shape": "rectangular",
@@ -393,8 +393,8 @@
       "totalLiquidVolume": 2000,
       "x": 41.4,
       "z": 2.9,
-      "y": 11.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 11.3
     },
     "A5": {
       "shape": "rectangular",
@@ -404,8 +404,8 @@
       "totalLiquidVolume": 2000,
       "x": 50.4,
       "z": 2.9,
-      "y": 74.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 74.3
     },
     "B5": {
       "shape": "rectangular",
@@ -415,8 +415,8 @@
       "totalLiquidVolume": 2000,
       "x": 50.4,
       "z": 2.9,
-      "y": 65.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 65.3
     },
     "C5": {
       "shape": "rectangular",
@@ -426,8 +426,8 @@
       "totalLiquidVolume": 2000,
       "x": 50.4,
       "z": 2.9,
-      "y": 56.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 56.3
     },
     "D5": {
       "shape": "rectangular",
@@ -437,8 +437,8 @@
       "totalLiquidVolume": 2000,
       "x": 50.4,
       "z": 2.9,
-      "y": 47.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 47.3
     },
     "E5": {
       "shape": "rectangular",
@@ -448,8 +448,8 @@
       "totalLiquidVolume": 2000,
       "x": 50.4,
       "z": 2.9,
-      "y": 38.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 38.3
     },
     "F5": {
       "shape": "rectangular",
@@ -459,8 +459,8 @@
       "totalLiquidVolume": 2000,
       "x": 50.4,
       "z": 2.9,
-      "y": 29.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 29.3
     },
     "G5": {
       "shape": "rectangular",
@@ -470,8 +470,8 @@
       "totalLiquidVolume": 2000,
       "x": 50.4,
       "z": 2.9,
-      "y": 20.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 20.3
     },
     "H5": {
       "shape": "rectangular",
@@ -481,8 +481,8 @@
       "totalLiquidVolume": 2000,
       "x": 50.4,
       "z": 2.9,
-      "y": 11.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 11.3
     },
     "A6": {
       "shape": "rectangular",
@@ -492,8 +492,8 @@
       "totalLiquidVolume": 2000,
       "x": 59.4,
       "z": 2.9,
-      "y": 74.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 74.3
     },
     "B6": {
       "shape": "rectangular",
@@ -503,8 +503,8 @@
       "totalLiquidVolume": 2000,
       "x": 59.4,
       "z": 2.9,
-      "y": 65.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 65.3
     },
     "C6": {
       "shape": "rectangular",
@@ -514,8 +514,8 @@
       "totalLiquidVolume": 2000,
       "x": 59.4,
       "z": 2.9,
-      "y": 56.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 56.3
     },
     "D6": {
       "shape": "rectangular",
@@ -525,8 +525,8 @@
       "totalLiquidVolume": 2000,
       "x": 59.4,
       "z": 2.9,
-      "y": 47.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 47.3
     },
     "E6": {
       "shape": "rectangular",
@@ -536,8 +536,8 @@
       "totalLiquidVolume": 2000,
       "x": 59.4,
       "z": 2.9,
-      "y": 38.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 38.3
     },
     "F6": {
       "shape": "rectangular",
@@ -547,8 +547,8 @@
       "totalLiquidVolume": 2000,
       "x": 59.4,
       "z": 2.9,
-      "y": 29.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 29.3
     },
     "G6": {
       "shape": "rectangular",
@@ -558,8 +558,8 @@
       "totalLiquidVolume": 2000,
       "x": 59.4,
       "z": 2.9,
-      "y": 20.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 20.3
     },
     "H6": {
       "shape": "rectangular",
@@ -569,8 +569,8 @@
       "totalLiquidVolume": 2000,
       "x": 59.4,
       "z": 2.9,
-      "y": 11.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 11.3
     },
     "A7": {
       "shape": "rectangular",
@@ -580,8 +580,8 @@
       "totalLiquidVolume": 2000,
       "x": 68.4,
       "z": 2.9,
-      "y": 74.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 74.3
     },
     "B7": {
       "shape": "rectangular",
@@ -591,8 +591,8 @@
       "totalLiquidVolume": 2000,
       "x": 68.4,
       "z": 2.9,
-      "y": 65.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 65.3
     },
     "C7": {
       "shape": "rectangular",
@@ -602,8 +602,8 @@
       "totalLiquidVolume": 2000,
       "x": 68.4,
       "z": 2.9,
-      "y": 56.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 56.3
     },
     "D7": {
       "shape": "rectangular",
@@ -613,8 +613,8 @@
       "totalLiquidVolume": 2000,
       "x": 68.4,
       "z": 2.9,
-      "y": 47.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 47.3
     },
     "E7": {
       "shape": "rectangular",
@@ -624,8 +624,8 @@
       "totalLiquidVolume": 2000,
       "x": 68.4,
       "z": 2.9,
-      "y": 38.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 38.3
     },
     "F7": {
       "shape": "rectangular",
@@ -635,8 +635,8 @@
       "totalLiquidVolume": 2000,
       "x": 68.4,
       "z": 2.9,
-      "y": 29.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 29.3
     },
     "G7": {
       "shape": "rectangular",
@@ -646,8 +646,8 @@
       "totalLiquidVolume": 2000,
       "x": 68.4,
       "z": 2.9,
-      "y": 20.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 20.3
     },
     "H7": {
       "shape": "rectangular",
@@ -657,8 +657,8 @@
       "totalLiquidVolume": 2000,
       "x": 68.4,
       "z": 2.9,
-      "y": 11.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 11.3
     },
     "A8": {
       "shape": "rectangular",
@@ -668,8 +668,8 @@
       "totalLiquidVolume": 2000,
       "x": 77.4,
       "z": 2.9,
-      "y": 74.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 74.3
     },
     "B8": {
       "shape": "rectangular",
@@ -679,8 +679,8 @@
       "totalLiquidVolume": 2000,
       "x": 77.4,
       "z": 2.9,
-      "y": 65.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 65.3
     },
     "C8": {
       "shape": "rectangular",
@@ -690,8 +690,8 @@
       "totalLiquidVolume": 2000,
       "x": 77.4,
       "z": 2.9,
-      "y": 56.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 56.3
     },
     "D8": {
       "shape": "rectangular",
@@ -701,8 +701,8 @@
       "totalLiquidVolume": 2000,
       "x": 77.4,
       "z": 2.9,
-      "y": 47.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 47.3
     },
     "E8": {
       "shape": "rectangular",
@@ -712,8 +712,8 @@
       "totalLiquidVolume": 2000,
       "x": 77.4,
       "z": 2.9,
-      "y": 38.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 38.3
     },
     "F8": {
       "shape": "rectangular",
@@ -723,8 +723,8 @@
       "totalLiquidVolume": 2000,
       "x": 77.4,
       "z": 2.9,
-      "y": 29.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 29.3
     },
     "G8": {
       "shape": "rectangular",
@@ -734,8 +734,8 @@
       "totalLiquidVolume": 2000,
       "x": 77.4,
       "z": 2.9,
-      "y": 20.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 20.3
     },
     "H8": {
       "shape": "rectangular",
@@ -745,8 +745,8 @@
       "totalLiquidVolume": 2000,
       "x": 77.4,
       "z": 2.9,
-      "y": 11.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 11.3
     },
     "A9": {
       "shape": "rectangular",
@@ -756,8 +756,8 @@
       "totalLiquidVolume": 2000,
       "x": 86.4,
       "z": 2.9,
-      "y": 74.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 74.3
     },
     "B9": {
       "shape": "rectangular",
@@ -767,8 +767,8 @@
       "totalLiquidVolume": 2000,
       "x": 86.4,
       "z": 2.9,
-      "y": 65.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 65.3
     },
     "C9": {
       "shape": "rectangular",
@@ -778,8 +778,8 @@
       "totalLiquidVolume": 2000,
       "x": 86.4,
       "z": 2.9,
-      "y": 56.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 56.3
     },
     "D9": {
       "shape": "rectangular",
@@ -789,8 +789,8 @@
       "totalLiquidVolume": 2000,
       "x": 86.4,
       "z": 2.9,
-      "y": 47.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 47.3
     },
     "E9": {
       "shape": "rectangular",
@@ -800,8 +800,8 @@
       "totalLiquidVolume": 2000,
       "x": 86.4,
       "z": 2.9,
-      "y": 38.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 38.3
     },
     "F9": {
       "shape": "rectangular",
@@ -811,8 +811,8 @@
       "totalLiquidVolume": 2000,
       "x": 86.4,
       "z": 2.9,
-      "y": 29.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 29.3
     },
     "G9": {
       "shape": "rectangular",
@@ -822,8 +822,8 @@
       "totalLiquidVolume": 2000,
       "x": 86.4,
       "z": 2.9,
-      "y": 20.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 20.3
     },
     "H9": {
       "shape": "rectangular",
@@ -833,8 +833,8 @@
       "totalLiquidVolume": 2000,
       "x": 86.4,
       "z": 2.9,
-      "y": 11.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 11.3
     },
     "A10": {
       "shape": "rectangular",
@@ -844,8 +844,8 @@
       "totalLiquidVolume": 2000,
       "x": 95.4,
       "z": 2.9,
-      "y": 74.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 74.3
     },
     "B10": {
       "shape": "rectangular",
@@ -855,8 +855,8 @@
       "totalLiquidVolume": 2000,
       "x": 95.4,
       "z": 2.9,
-      "y": 65.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 65.3
     },
     "C10": {
       "shape": "rectangular",
@@ -866,8 +866,8 @@
       "totalLiquidVolume": 2000,
       "x": 95.4,
       "z": 2.9,
-      "y": 56.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 56.3
     },
     "D10": {
       "shape": "rectangular",
@@ -877,8 +877,8 @@
       "totalLiquidVolume": 2000,
       "x": 95.4,
       "z": 2.9,
-      "y": 47.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 47.3
     },
     "E10": {
       "shape": "rectangular",
@@ -888,8 +888,8 @@
       "totalLiquidVolume": 2000,
       "x": 95.4,
       "z": 2.9,
-      "y": 38.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 38.3
     },
     "F10": {
       "shape": "rectangular",
@@ -899,8 +899,8 @@
       "totalLiquidVolume": 2000,
       "x": 95.4,
       "z": 2.9,
-      "y": 29.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 29.3
     },
     "G10": {
       "shape": "rectangular",
@@ -910,8 +910,8 @@
       "totalLiquidVolume": 2000,
       "x": 95.4,
       "z": 2.9,
-      "y": 20.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 20.3
     },
     "H10": {
       "shape": "rectangular",
@@ -921,8 +921,8 @@
       "totalLiquidVolume": 2000,
       "x": 95.4,
       "z": 2.9,
-      "y": 11.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 11.3
     },
     "A11": {
       "shape": "rectangular",
@@ -932,8 +932,8 @@
       "totalLiquidVolume": 2000,
       "x": 104.4,
       "z": 2.9,
-      "y": 74.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 74.3
     },
     "B11": {
       "shape": "rectangular",
@@ -943,8 +943,8 @@
       "totalLiquidVolume": 2000,
       "x": 104.4,
       "z": 2.9,
-      "y": 65.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 65.3
     },
     "C11": {
       "shape": "rectangular",
@@ -954,8 +954,8 @@
       "totalLiquidVolume": 2000,
       "x": 104.4,
       "z": 2.9,
-      "y": 56.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 56.3
     },
     "D11": {
       "shape": "rectangular",
@@ -965,8 +965,8 @@
       "totalLiquidVolume": 2000,
       "x": 104.4,
       "z": 2.9,
-      "y": 47.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 47.3
     },
     "E11": {
       "shape": "rectangular",
@@ -976,8 +976,8 @@
       "totalLiquidVolume": 2000,
       "x": 104.4,
       "z": 2.9,
-      "y": 38.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 38.3
     },
     "F11": {
       "shape": "rectangular",
@@ -987,8 +987,8 @@
       "totalLiquidVolume": 2000,
       "x": 104.4,
       "z": 2.9,
-      "y": 29.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 29.3
     },
     "G11": {
       "shape": "rectangular",
@@ -998,8 +998,8 @@
       "totalLiquidVolume": 2000,
       "x": 104.4,
       "z": 2.9,
-      "y": 20.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 20.3
     },
     "H11": {
       "shape": "rectangular",
@@ -1009,8 +1009,8 @@
       "totalLiquidVolume": 2000,
       "x": 104.4,
       "z": 2.9,
-      "y": 11.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 11.3
     },
     "A12": {
       "shape": "rectangular",
@@ -1020,8 +1020,8 @@
       "totalLiquidVolume": 2000,
       "x": 113.4,
       "z": 2.9,
-      "y": 74.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 74.3
     },
     "B12": {
       "shape": "rectangular",
@@ -1031,8 +1031,8 @@
       "totalLiquidVolume": 2000,
       "x": 113.4,
       "z": 2.9,
-      "y": 65.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 65.3
     },
     "C12": {
       "shape": "rectangular",
@@ -1042,8 +1042,8 @@
       "totalLiquidVolume": 2000,
       "x": 113.4,
       "z": 2.9,
-      "y": 56.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 56.3
     },
     "D12": {
       "shape": "rectangular",
@@ -1053,8 +1053,8 @@
       "totalLiquidVolume": 2000,
       "x": 113.4,
       "z": 2.9,
-      "y": 47.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 47.3
     },
     "E12": {
       "shape": "rectangular",
@@ -1064,8 +1064,8 @@
       "totalLiquidVolume": 2000,
       "x": 113.4,
       "z": 2.9,
-      "y": 38.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 38.3
     },
     "F12": {
       "shape": "rectangular",
@@ -1075,8 +1075,8 @@
       "totalLiquidVolume": 2000,
       "x": 113.4,
       "z": 2.9,
-      "y": 29.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 29.3
     },
     "G12": {
       "shape": "rectangular",
@@ -1086,8 +1086,8 @@
       "totalLiquidVolume": 2000,
       "x": 113.4,
       "z": 2.9,
-      "y": 20.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 20.3
     },
     "H12": {
       "shape": "rectangular",
@@ -1097,8 +1097,8 @@
       "totalLiquidVolume": 2000,
       "x": 113.4,
       "z": 2.9,
-      "y": 11.3,
-      "geometryDefinitionId": "cuboidalWell"
+      "geometryDefinitionId": "cuboidalWell",
+      "y": 11.3
     }
   },
   "groups": [
@@ -1215,48 +1215,93 @@
       "sections": [
         {
           "shape": "cuboidal",
-          "bottomXDimension": 4.76,
-          "bottomYDimension": 4.76,
-          "topXDimension": 4.76,
-          "topYDimension": 4.76,
-          "topHeight": 2.21,
+          "bottomXDimension": 4.74,
+          "bottomYDimension": 4.74,
+          "topXDimension": 4.74,
+          "topYDimension": 4.74,
+          "topHeight": 2.22,
           "bottomHeight": 0.0
         },
         {
           "shape": "cuboidal",
-          "bottomXDimension": 7.15,
-          "bottomYDimension": 7.15,
-          "topXDimension": 7.15,
-          "topYDimension": 7.15,
-          "topHeight": 5.06,
-          "bottomHeight": 2.21
+          "bottomXDimension": 7.17,
+          "bottomYDimension": 7.17,
+          "topXDimension": 7.17,
+          "topYDimension": 7.17,
+          "topHeight": 3.89,
+          "bottomHeight": 2.22
         },
         {
           "shape": "cuboidal",
-          "bottomXDimension": 7.88,
-          "bottomYDimension": 7.88,
-          "topXDimension": 7.88,
-          "topYDimension": 7.88,
-          "topHeight": 8.23,
-          "bottomHeight": 5.06
+          "bottomXDimension": 7.2,
+          "bottomYDimension": 7.2,
+          "topXDimension": 7.2,
+          "topYDimension": 7.2,
+          "topHeight": 5.55,
+          "bottomHeight": 3.89
         },
         {
           "shape": "cuboidal",
-          "bottomXDimension": 7.74,
-          "bottomYDimension": 7.74,
-          "topXDimension": 7.74,
-          "topYDimension": 7.74,
-          "topHeight": 11.52,
-          "bottomHeight": 8.23
+          "bottomXDimension": 7.75,
+          "bottomYDimension": 7.75,
+          "topXDimension": 7.75,
+          "topYDimension": 7.75,
+          "topHeight": 7.3,
+          "bottomHeight": 5.55
         },
         {
           "shape": "cuboidal",
-          "bottomXDimension": 7.6,
-          "bottomYDimension": 7.6,
-          "topXDimension": 7.6,
-          "topYDimension": 7.6,
-          "topHeight": 14.93,
-          "bottomHeight": 11.52
+          "bottomXDimension": 7.03,
+          "bottomYDimension": 7.03,
+          "topXDimension": 7.03,
+          "topYDimension": 7.03,
+          "topHeight": 9.42,
+          "bottomHeight": 7.3
+        },
+        {
+          "shape": "cuboidal",
+          "bottomXDimension": 7.56,
+          "bottomYDimension": 7.56,
+          "topXDimension": 7.56,
+          "topYDimension": 7.56,
+          "topHeight": 11.26,
+          "bottomHeight": 9.42
+        },
+        {
+          "shape": "cuboidal",
+          "bottomXDimension": 7.81,
+          "bottomYDimension": 7.81,
+          "topXDimension": 7.81,
+          "topYDimension": 7.81,
+          "topHeight": 12.98,
+          "bottomHeight": 11.26
+        },
+        {
+          "shape": "cuboidal",
+          "bottomXDimension": 8.18,
+          "bottomYDimension": 8.18,
+          "topXDimension": 8.18,
+          "topYDimension": 8.18,
+          "topHeight": 14.88,
+          "bottomHeight": 12.98
+        },
+        {
+          "shape": "cuboidal",
+          "bottomXDimension": 7.48,
+          "bottomYDimension": 7.48,
+          "topXDimension": 7.48,
+          "topYDimension": 7.48,
+          "topHeight": 17.15,
+          "bottomHeight": 14.88
+        },
+        {
+          "shape": "cuboidal",
+          "bottomXDimension": 7.53,
+          "bottomYDimension": 7.53,
+          "topXDimension": 7.53,
+          "topYDimension": 7.53,
+          "topHeight": 19.4,
+          "bottomHeight": 17.15
         },
         {
           "shape": "cuboidal",
@@ -1264,53 +1309,62 @@
           "bottomYDimension": 7.64,
           "topXDimension": 7.64,
           "topYDimension": 7.64,
-          "topHeight": 18.3,
-          "bottomHeight": 14.93
+          "topHeight": 21.03,
+          "bottomHeight": 19.4
         },
         {
           "shape": "cuboidal",
-          "bottomXDimension": 7.46,
-          "bottomYDimension": 7.46,
-          "topXDimension": 7.46,
-          "topYDimension": 7.46,
-          "topHeight": 21.84,
-          "bottomHeight": 18.3
+          "bottomXDimension": 7.49,
+          "bottomYDimension": 7.49,
+          "topXDimension": 7.49,
+          "topYDimension": 7.49,
+          "topHeight": 22.73,
+          "bottomHeight": 21.03
         },
         {
           "shape": "cuboidal",
-          "bottomXDimension": 7.89,
-          "bottomYDimension": 7.89,
-          "topXDimension": 7.89,
-          "topYDimension": 7.89,
-          "topHeight": 25.0,
-          "bottomHeight": 21.84
+          "bottomXDimension": 7.23,
+          "bottomYDimension": 7.23,
+          "topXDimension": 7.23,
+          "topYDimension": 7.23,
+          "topHeight": 24.55,
+          "bottomHeight": 22.73
         },
         {
           "shape": "cuboidal",
-          "bottomXDimension": 8.49,
-          "bottomYDimension": 8.49,
-          "topXDimension": 8.49,
-          "topYDimension": 8.49,
-          "topHeight": 27.73,
-          "bottomHeight": 25.0
+          "bottomXDimension": 8.54,
+          "bottomYDimension": 8.54,
+          "topXDimension": 8.54,
+          "topYDimension": 8.54,
+          "topHeight": 26.4,
+          "bottomHeight": 24.55
         },
         {
           "shape": "cuboidal",
-          "bottomXDimension": 8.03,
-          "bottomYDimension": 8.03,
-          "topXDimension": 8.03,
-          "topYDimension": 8.03,
-          "topHeight": 30.79,
-          "bottomHeight": 27.73
+          "bottomXDimension": 7.57,
+          "bottomYDimension": 7.57,
+          "topXDimension": 7.57,
+          "topYDimension": 7.57,
+          "topHeight": 28.74,
+          "bottomHeight": 26.4
         },
         {
           "shape": "cuboidal",
-          "topXDimension": 8.03,
-          "topYDimension": 8.03,
-          "bottomXDimension": 8.03,
-          "bottomYDimension": 8.03,
+          "bottomXDimension": 8.33,
+          "bottomYDimension": 8.33,
+          "topXDimension": 8.33,
+          "topYDimension": 8.33,
+          "topHeight": 30.77,
+          "bottomHeight": 28.74
+        },
+        {
+          "shape": "cuboidal",
+          "topXDimension": 8.33,
+          "topYDimension": 8.33,
+          "bottomXDimension": 8.33,
+          "bottomYDimension": 8.33,
           "topHeight": 41.2,
-          "bottomHeight": 30.79
+          "bottomHeight": 30.77
         }
       ]
     }
