@@ -63,6 +63,12 @@ def patch_mock__move_types(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> Non
 
 
 def _fake_static_pipette_config(channels: int) -> StaticPipetteConfig:
+    names_from_channels = {
+        1: PipetteNameType.P1000_SINGLE_FLEX,
+        8: PipetteNameType.P1000_MULTI_FLEX,
+        96: PipetteNameType.P1000_96,
+    }
+
     return StaticPipetteConfig(
         min_volume=1,
         max_volume=9001,
@@ -78,7 +84,7 @@ def _fake_static_pipette_config(channels: int) -> StaticPipetteConfig:
             back_left_offset=Point(x=10, y=20, z=30),
             front_right_offset=Point(x=40, y=50, z=60),
         ),
-        default_nozzle_map=get_default_nozzle_map(PipetteNameType.P1000_96),
+        default_nozzle_map=get_default_nozzle_map(names_from_channels[channels]),
         pipette_bounding_box_offsets=PipetteBoundingBoxOffsets(
             back_left_corner=Point(x=10, y=20, z=30),
             front_right_corner=Point(x=40, y=50, z=60),
@@ -393,14 +399,18 @@ def test_get_pipette_offset_for_reservoirs(
         geometry_view.get_extra_waypoints(location, DeckSlotName.SLOT_2)
     ).then_return([(456, 789)])
 
-    x_offset = 0.0
-    y_offset = 0.0
-    if has_12_grid and channels != 96:
-        x_offset = -1 * fake_x_dim / 24
-    elif has_96_grid and channels != 96:
-        x_offset = -1 * fake_x_dim / 24
+    has_x_offset = has_y_offset = False
+    if has_12_grid:
+        if channels == 1 or channels == 8:
+            has_x_offset = True
+    if has_96_grid:
         if channels == 1:
-            y_offset = fake_y_dim / 16
+            has_x_offset = has_y_offset = True
+        if channels == 8:
+            has_x_offset = True
+
+    x_offset = -1 * fake_x_dim / 24 if has_x_offset else 0.0
+    y_offset = fake_y_dim / 16 if has_y_offset else 0.0
     reservoir_offset = Point(x=x_offset, y=y_offset)
     expected_destination = fake_well_position + reservoir_offset
 
