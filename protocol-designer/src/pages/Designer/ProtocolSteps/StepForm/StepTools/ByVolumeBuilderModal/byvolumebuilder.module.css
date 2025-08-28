@@ -1,6 +1,6 @@
 .calculator_button {
   width: 100%;
-  height: 'min-content';
+  height: min-content;
 }
 
 .calculator_container {
