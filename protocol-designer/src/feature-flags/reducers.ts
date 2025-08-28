@@ -39,6 +39,8 @@ const initialFlags: Flags = {
   OT_PD_ENABLE_PARTIAL_TIP_SUPPORT:
     process.env.OT_PD_ENABLE_PARTIAL_TIP_SUPPORT === '1' || false,
   OT_PD_ENABLE_STACKING: process.env.OT_PD_ENABLE_STACKING === '1' || false,
+  OT_PD_ENABLE_CONCURRENT_MODULE_ACTIONS:
+    process.env.OT_PD_ENABLE_CONCURRENT_MODULE_ACTIONS === '1' || false,
   OT_PD_ENABLE_JSON_EXPORT:
     process.env.OT_PD_ENABLE_JSON_EXPORT === '1' || false,
 }
