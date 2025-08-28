@@ -8,10 +8,7 @@ from opentrons.protocol_engine.state.labware import LabwareLoadParams
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocols.api_support.types import APIVersion
 
-from tests.opentrons.protocol_api import (
-    versions_at_or_above,
-    versions_between,
-)
+from tests.opentrons.protocol_api import versions_between
 
 
 @pytest.mark.parametrize(
@@ -95,7 +92,13 @@ def test_resolve_load_labware_params(
                 high_inclusive_bound=APIVersion(2, 22),
             )
         ],
-        *[(api_version, 4) for api_version in versions_at_or_above(APIVersion(2, 25))],
+        *[
+            (api_version, 4)
+            for api_version in versions_between(
+                low_inclusive_bound=APIVersion(2, 25),
+                high_exclusive_bound=(APIVersion(2, 26)),
+            )
+        ],
     ],
 )
 def test_default_labware_version_dependent_on_api_version(
