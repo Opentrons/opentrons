@@ -280,7 +280,7 @@ export function DeckSetupToolbox(
             <Flex width={FLEX_MAX_CONTENT}>
               <EmptySelectorButton
                 textAlignment="left"
-                text={t('add_labware')}
+                text={hasNoLabware ? t('add_labware') : t('replace_labware')}
                 iconName="plus"
                 onClick={() => {
                   setShowSelectLabwareModal(true)

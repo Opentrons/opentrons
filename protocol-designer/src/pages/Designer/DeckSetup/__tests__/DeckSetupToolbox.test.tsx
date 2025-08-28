@@ -186,8 +186,8 @@ describe('DeckSetupToolbox', () => {
     fireEvent.click(screen.getByText('Edit liquid'))
     expect(mockNavigate).toHaveBeenCalled()
     expect(vi.mocked(openIngredientSelector)).toHaveBeenCalled()
-    // add labware when there is no space
-    fireEvent.click(screen.getAllByText('Add labware')[0])
+    // replace labware when there is no space
+    fireEvent.click(screen.getByText('Replace labware'))
     screen.getByText('mock SelectLabwareModal')
     // click done
     fireEvent.click(screen.getByText('Done'))
