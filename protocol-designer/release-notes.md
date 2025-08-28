@@ -18,8 +18,8 @@ This hotfix release addresses several bugs.
 
 Crashes and protocol loss no longer occur when:
 
-- deleting a pipette involved in a mix step. 
-- deleting a Protocol Designer step title. 
+- deleting a pipette involved in a mix step.
+- deleting a Protocol Designer step title.
 - checking labware details after deleting a liquid.
 
 ## Opentrons Protocol Designer Changes in 8.5.2
