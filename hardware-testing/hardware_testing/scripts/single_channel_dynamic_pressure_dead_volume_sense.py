@@ -738,10 +738,11 @@ async def _main(args: argparse.Namespace, cfg: TestConfig) -> None:
             
     except Exception as e:
         await hw_api.disengage_axes([Axis.X, Axis.Y])
-        raise("Error: {e}")
+        print(f"Error: {e}")
+        raise
     except KeyboardInterrupt:
         await hw_api.disengage_axes([Axis.X, Axis.Y])
-        raise("Error: {e}")
+        raise
     finally:
         await hw_api.home()
         await hw_api.clean_up()    
