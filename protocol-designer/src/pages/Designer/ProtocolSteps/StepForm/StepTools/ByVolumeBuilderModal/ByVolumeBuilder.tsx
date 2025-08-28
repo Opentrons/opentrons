@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
-import Plot from 'react-plotly.js'
+import createPlotlyComponent from 'react-plotly.js/factory'
+import Plotly from 'plotly.js-cartesian-dist'
 
 import {
   AXIS_OFFSET_PERCENTAGE,
@@ -11,6 +12,8 @@ import { getAnnotations, getShapes } from './utils'
 
 import type { LiquidHandlingPropertyByVolume } from '@opentrons/shared-data'
 import type { ByVolumeType, DataPoint } from './types'
+
+const Plot = createPlotlyComponent(Plotly)
 
 export function ByVolumeBuilder(props: {
   type: ByVolumeType
