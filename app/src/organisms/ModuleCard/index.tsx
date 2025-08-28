@@ -3,11 +3,6 @@ import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
 import {
-  RUN_STATUS_FAILED,
-  RUN_STATUS_IDLE,
-  RUN_STATUS_SUCCEEDED,
-} from '@opentrons/api-client'
-import {
   ALIGN_START,
   Banner,
   BORDERS,
@@ -43,7 +38,6 @@ import {
 import { useModuleUSBPort } from '/app/local-resources/modules'
 import { UpdateBanner } from '/app/molecules/UpdateBanner'
 import { handleModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
-import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useIsFlex } from '/app/redux-resources/robots'
 import {
@@ -56,6 +50,7 @@ import {
 } from '/app/redux/robot-api'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useIsEstopNotDisengaged } from '/app/resources/devices'
+import { useRunStatuses } from '/app/resources/runs'
 import { getModuleTooHot } from '/app/transformations/modules'
 
 import { AboutModuleSlideout } from './AboutModuleSlideout'
@@ -149,7 +144,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [showFWBanner, setShowFWBanner] = useState(true)
   const [targetProps, tooltipProps] = useHoverTooltip()
 
-  const runStatus = useCurrentRunStatus()
+  const { isRunRunning } = useRunStatuses()
   const { parseModuleUSBPort } = useModuleUSBPort()
 
   const isPipetteReady =
@@ -183,13 +178,8 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   }
 
   const isPending = latestRequest?.status === PENDING
-  const runInProgress =
-    runStatus != null &&
-    runStatus !== RUN_STATUS_SUCCEEDED &&
-    runStatus !== RUN_STATUS_FAILED &&
-    runStatus !== RUN_STATUS_IDLE
 
-  const hideBanners = isPending || runInProgress
+  const hideBanners = isPending || isRunRunning
   const hotToTouch: IconProps = { name: 'ot-hot-to-touch' }
   const isFlex = useIsFlex(robotName)
   const deckConfig = useNotifyDeckConfigurationQuery().data
@@ -481,11 +471,11 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       >
         <OverflowBtn
           aria-label="overflow"
-          disabled={runInProgress || isEstopNotDisengaged}
+          disabled={isRunRunning || isEstopNotDisengaged}
           {...targetProps}
           onClick={handleOverflowClick}
         />
-        {runInProgress && (
+        {isRunRunning && (
           <Tooltip tooltipProps={tooltipProps}>
             {t('module_actions_unavailable')}
           </Tooltip>
