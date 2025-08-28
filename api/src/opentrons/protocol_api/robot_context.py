@@ -119,8 +119,7 @@ class RobotContext(publisher.CommandPublisher):
         Move a set of axes to an absolute position on the deck.
 
         :param axis_map: A dictionary mapping axes to an absolute position on the deck in mm.
-        :param critical_point: The critical point, or specific point on the object being moved,  to move the axes with. It should only
-        specify the gantry axes (i.e. `x`, `y`, `z`).
+        :param critical_point: The critical point, or specific point on the object being moved, to move the axes with. It should only specify the gantry axes (i.e. `x`, `y`, `z`).
 
         When you specify a critical point, you're specifying the object on the gantry to be moved. If not specified, the critical point defaults to the center of the carriage attached to the gantry. 
         :param float speed: The maximum speed with which to move all axes in mm/s. 
@@ -306,7 +305,7 @@ class RobotContext(publisher.CommandPublisher):
     def build_axis_map(self, axis_map: StringAxisMap) -> AxisMapType:
         """Take in a :py:class:`.types.StringAxisMap` and output a :py:class:`.types.AxisMapType`.
 
-        The input :py:class:`.types.StringAxisMap` is allowed to contain any of the following strings:
+        The :py:class:`.types.StringAxisMap` is allowed to contain any of the following strings:
         ``"x"``, ``"y"``, "``z_l"``, "``z_r"``, "``z_g"``, ``"q"``.
 
         An example of a valid axis map could be:

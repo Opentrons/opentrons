@@ -30,7 +30,7 @@ The :py:meth:`~.RobotContext.move_axes_to` and :py:meth:`~.RobotContext.move_axe
 
 This example moves ``Axis.Q`` to drop tips attached to a Flex 96-channel pipette.
 
-.. code_block:: python
+.. code-block:: python
     :substitutions:
 
     from opentrons import protocol_api 
