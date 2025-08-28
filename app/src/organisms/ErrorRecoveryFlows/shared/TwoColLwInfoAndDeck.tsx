@@ -127,10 +127,11 @@ export function TwoColLwInfoAndDeck(
           return {
             moduleModel: module.moduleDef.model,
             moduleLocation: { slotName: module.targetSlotId },
-            nestedLabwareDef:
-              module.nestedLabwareId !== failedLwId
-                ? module.nestedLabwareDef
-                : null,
+            nestedLabwareDefsBottomToTop:
+              module.nestedLabwareId !== failedLwId &&
+              module.nestedLabwareDef != null
+                ? [module.nestedLabwareDef]
+                : [],
           }
         })
         return isValidDeck ? (

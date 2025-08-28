@@ -13,6 +13,7 @@ import {
   getWellFillFromLabwareId,
 } from '@opentrons/shared-data'
 
+import { LabwareRender } from '../..'
 import { BaseDeck } from '../../hardware-sim/BaseDeck'
 
 import type { ComponentProps } from 'react'
@@ -46,7 +47,6 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
   )
   if (protocolAnalysis == null || (protocolAnalysis?.errors ?? []).length > 0)
     return null
-
   const robotType = protocolAnalysis.robotType ?? FLEX_ROBOT_TYPE
   const deckConfig = getSimplestDeckConfigForProtocol(protocolAnalysis)
   const labwareByLiquidId = getLabwareInfoByLiquidId(protocolAnalysis.commands)
@@ -58,11 +58,18 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
         topLabwareInfo != null
           ? labwareDefinitionsByURI[topLabwareInfo.definitionUri]
           : null
-
+      // TODO: ja 8.27.25: find a better way to find the matching lid def without
+      // relying on the lidDisplayNames
+      const matchingLidDef = Object.values(labwareDefinitionsByURI).find(
+        uri => uri.metadata.displayName === topLabwareInfo?.lidDisplayName
+      )
       return {
         moduleModel: module.moduleModel,
         moduleLocation: { slotName: module.moduleSlotName },
-        nestedLabwareDef: topLabwareDefinition,
+        nestedLabwareDefsBottomToTop: [
+          ...(topLabwareDefinition != null ? [topLabwareDefinition] : []),
+          ...(matchingLidDef != null ? [matchingLidDef] : []),
+        ],
         nestedLabwareWellFill:
           topLabwareInfo != null
             ? getWellFillFromLabwareId(
@@ -75,7 +82,6 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
       }
     }
   )
-
   const labwareOnDeck: Array<LabwareOnDeck | null> = Object.entries(
     getLabwareOnDeck(startingDeck)
   ).map(([slotName, stackedItems]) => {
@@ -84,6 +90,9 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
       topLabwareInfo != null
         ? labwareDefinitionsByURI[topLabwareInfo.definitionUri]
         : null
+    const matchingLidDef = Object.values(labwareDefinitionsByURI).find(
+      uri => uri.metadata.displayName === topLabwareInfo?.lidDisplayName
+    )
     return topLabwareDefinition != null && topLabwareInfo != null
       ? {
           definition: topLabwareDefinition,
@@ -94,6 +103,13 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
             labwareByLiquidId,
             protocolAnalysis.commands
           ),
+          labwareChildren:
+            matchingLidDef != null ? (
+              <LabwareRender
+                definition={matchingLidDef}
+                positioningMode="passThrough"
+              />
+            ) : null,
         }
       : null
   })
