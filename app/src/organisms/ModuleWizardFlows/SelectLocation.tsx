@@ -11,17 +11,22 @@ import {
 } from '@opentrons/components'
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
+  COMBO_FIXTURES,
   FAKE_FIXTURE_IDS,
+  FLEX_MODULE_AA_TYPE_BY_MODEL,
   FLEX_ROBOT_TYPE,
-  FLEX_STACKER_FIXTURES,
   FLEX_STACKER_MODULE_TYPE,
+  getAAByAAId,
   getAAForModuleFixture,
+  getAAWithFakesFromCutoutFixtureId,
   getCutoutConfigReplacmentForModule,
   getCutoutFixturesForModuleModel,
   getDeckDefFromRobotType,
   getFixtureIdByCutoutIdFromModuleAnchorCutoutId,
   getModuleDisplayName,
+  getReplacementFixtureForFakeFixture,
   getReplacementFixtureForFixtureRemoval,
+  replaceCutoutFixtureForFixtureRemoval,
   replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   SINGLE_CENTER_CUTOUTS,
   SINGLE_CENTER_SLOT_FIXTURE,
@@ -34,11 +39,13 @@ import {
 import { useModuleUSBPort } from '/app/local-resources/modules'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 
-import { getFixtureIdByCutoutId } from './getFixtureIdByCutoutId'
+import { getFixtureIdByCutoutIdForModule } from './getFixtureIdByCutoutId'
 
 import type { CreateMaintenanceRunType } from '@opentrons/react-api-client'
 import type {
+  AreaType,
   CutoutFixtureId,
+  CutoutFixtureIdsWithFakes,
   CutoutId,
   DeckConfiguration,
 } from '@opentrons/shared-data'
@@ -69,7 +76,7 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
     setErrorMessage,
   } = props
 
-  const configuredFixtureIdByCutoutId = getFixtureIdByCutoutId(
+  const configuredFixtureIdByCutoutId = getFixtureIdByCutoutIdForModule(
     attachedModule,
     deckConfig
   )
@@ -115,13 +122,12 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
         ) && attachedModule.serialNumber === opentronsModuleSerialNumber
       if (
         // in run setup, module calibration only available when module location is already correctly configured
-        (!isLoadedInRun &&
-          mayMountToCutoutIds.includes(cutoutId) &&
-          (isCurrentConfiguration ||
-            SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId) ||
-            // fake fixtures include mag block next to an empty staging slot and a waste chute next to an empty staging slot
-            FAKE_FIXTURE_IDS.includes(cutoutFixtureId))) ||
-        FLEX_STACKER_FIXTURES.includes(cutoutFixtureId)
+        !isLoadedInRun &&
+        mayMountToCutoutIds.includes(cutoutId) &&
+        (isCurrentConfiguration ||
+          SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId) ||
+          // fake fixtures include mag block next to an empty staging slot and a waste chute next to an empty staging slot
+          FAKE_FIXTURE_IDS.includes(cutoutFixtureId))
       ) {
         return [...acc, cutoutId]
       }
@@ -142,6 +148,40 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
             return {
               ...cc,
               cutoutFixtureId: SINGLE_CENTER_SLOT_FIXTURE,
+              opentronsModuleSerialNumber: undefined,
+            }
+          } else if (COMBO_FIXTURES.includes(cc.cutoutFixtureId)) {
+            const aaForSelectedFixture = getAAWithFakesFromCutoutFixtureId(
+              Object.keys(selectedFixtureIdByCutoutIds)[0] as CutoutId,
+              selectedFixtureIdByCutoutIds[
+                Object.keys(selectedFixtureIdByCutoutIds)[0] as CutoutId
+              ] ?? cc.cutoutFixtureId,
+              deckDef
+            )
+            const filteredAAForSelectedFixture = aaForSelectedFixture?.find(
+              aa => {
+                const aaAreaType = getAAByAAId(aa, deckDef).areaType
+                return (
+                  Object.values(FLEX_MODULE_AA_TYPE_BY_MODEL).includes(
+                    aaAreaType as AreaType
+                  ) && aaAreaType !== 'magneticBlock'
+                )
+              }
+            )
+            if (filteredAAForSelectedFixture == null) {
+              return cc
+            }
+
+            const fixtureReplacement = replaceCutoutFixtureForFixtureRemoval(
+              cc.cutoutFixtureId,
+              cc.cutoutId,
+              filteredAAForSelectedFixture
+            )
+            return {
+              ...cc,
+              cutoutFixtureId: getReplacementFixtureForFakeFixture(
+                fixtureReplacement as CutoutFixtureIdsWithFakes
+              ),
               opentronsModuleSerialNumber: undefined,
             }
           } else if (SINGLE_RIGHT_CUTOUTS.includes(cc.cutoutId)) {

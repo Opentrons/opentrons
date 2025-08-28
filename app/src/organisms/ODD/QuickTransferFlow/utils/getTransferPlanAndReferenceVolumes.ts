@@ -83,7 +83,7 @@ export const getTransferPlanAndReferenceVolumes = (args: {
     return {
       referenceVolumes: {
         airGap: {
-          aspirate: volumePerAspiration,
+          aspirate: aspirateAirGapAtSpecifiedVolume,
           dispense: 0,
         },
         correction: {
