@@ -1,0 +1,7 @@
+---
+description: Ensures CSS Modules file follows stylelint
+globs: '**/*.module.css'
+---
+
+- Check CSS Modules files follow the stylelint by using `make lint-css`
+- Use variables in "components/src/styles/global.css" for color, background-color, padding, gap, margin, border-radius, font-size, line-height, and font-weight
