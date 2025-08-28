@@ -1,6 +1,7 @@
 """Task state tracking."""
 from dataclasses import dataclass
 from itertools import chain
+from typing import Iterable
 from ..types import Task, TaskSummary, FinishedTask
 from ._abstract_store import HasState, HandlesActions
 from opentrons.protocol_engine.state import update_types
@@ -87,6 +88,15 @@ class TaskView:
         except KeyError as e:
             raise NoTaskFoundError(f"No finished task with ID {id}") from e
 
+    def get(self, id: str) -> Task | FinishedTask:
+        """Get a single task by id."""
+        if id in self._state.current_tasks_by_id:
+            return self._state.current_tasks_by_id[id]
+        elif id in self._state.finished_tasks_by_id:
+            return self._state.finished_tasks_by_id[id]
+        else:
+            raise NoTaskFoundError(message=f"Task {id} not found.")
+
     def get_summary(self) -> list[TaskSummary]:
         """Get a summary of all tasks."""
         return [
@@ -101,3 +111,30 @@ class TaskView:
                 self._state.finished_tasks_by_id.items(),
             )
         ]
+
+    def all_tasks_finished_or_any_task_failed(self, task_ids: Iterable[str]) -> bool:
+        """Implements wait semantics of asyncio.gather(return_exceptions = False).
+
+        This returns true when any of the following are true:
+        - All tasks in task_ids are complete with or without an error
+        - Any task in task_ids is complete with an error.
+
+        NOTE: Does not raise the error that the errored task has.
+        """
+        finished = set(self._state.finished_tasks_by_id.keys())
+        task_ids = set(task_ids)
+        if task_ids.issubset(finished):
+            return True
+        if self.get_failed_tasks(task_ids):
+            return True
+        return False
+
+    def get_failed_tasks(self, task_ids: Iterable[str]) -> list[str]:
+        """Return a list of failed task ids of the ones that were passed."""
+        failed_tasks: list[str] = []
+        for task_id in task_ids:
+            if task_id in self._state.finished_tasks_by_id:
+                finished_task = self._state.finished_tasks_by_id[task_id]
+                if finished_task.error:
+                    failed_tasks.append(task_id)
+        return failed_tasks
