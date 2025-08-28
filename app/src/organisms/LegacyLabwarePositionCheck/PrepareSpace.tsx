@@ -107,10 +107,10 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
             modulesOnDeck={protocolData.modules.map(mod => ({
               moduleModel: mod.model,
               moduleLocation: mod.location,
-              nestedLabwareDef:
+              nestedLabwareDefsBottomToTop:
                 'moduleModel' in location && location.moduleModel != null
-                  ? labwareDef
-                  : null,
+                  ? [labwareDef]
+                  : [],
               innerProps:
                 'moduleModel' in location &&
                 location.moduleModel != null &&
