@@ -125,6 +125,7 @@ dependencies = [
     { name = "mkdocs-material" },
     { name = "mkdocs-monorepo-plugin" },
     { name = "mkdocs-parent-css-plugin" },
+    { name = "mkdocstrings", extra = ["python"] },
 ]
 
 [package.metadata]
@@ -134,6 +135,7 @@ requires-dist = [
     { name = "mkdocs-material", specifier = ">=9.6.14" },
     { name = "mkdocs-monorepo-plugin", specifier = ">=1.1.2" },
     { name = "mkdocs-parent-css-plugin", editable = "mkdocs-parent-css-plugin" },
+    { name = "mkdocstrings", extras = ["python"], specifier = ">=0.29.1" },
 ]
 
 [[package]]
@@ -146,6 +148,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/d9/29/d40217cbe2f6b1359e00c6c307bb3fc876ba74068cbab3dde77f03ca0dc4/ghp-import-2.1.0.tar.gz", hash = "sha256:9c535c4c61193c2df8871222567d7fd7e5014d835f97dc7b7439069e2413d343", size = 10943, upload-time = "2022-05-02T15:47:16.11Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f7/ec/67fbef5d497f86283db54c22eec6f6140243aae73265799baaaa19cd17fb/ghp_import-2.1.0-py3-none-any.whl", hash = "sha256:8337dd7b50877f163d4c0289bc1f1c7f127550241988d568c1db512c4324a619", size = 11034, upload-time = "2022-05-02T15:47:14.552Z" },
+]
+
+[[package]]
+name = "griffe"
+version = "1.13.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "colorama" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c6/b5/23b91f22b7b3a7f8f62223f6664946271c0f5cb4179605a3e6bbae863920/griffe-1.13.0.tar.gz", hash = "sha256:246ea436a5e78f7fbf5f24ca8a727bb4d2a4b442a2959052eea3d0bfe9a076e0", size = 412759, upload-time = "2025-08-26T13:27:11.422Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/aa/8c/b7cfdd8dfe48f6b09f7353323732e1a290c388bd14f216947928dc85f904/griffe-1.13.0-py3-none-any.whl", hash = "sha256:470fde5b735625ac0a36296cd194617f039e9e83e301fcbd493e2b58382d0559", size = 139365, upload-time = "2025-08-26T13:27:09.882Z" },
 ]
 
 [[package]]
@@ -353,6 +367,43 @@ dependencies = [
 requires-dist = [{ name = "mkdocs", specifier = ">=1.0" }]
 
 [[package]]
+name = "mkdocstrings"
+version = "0.30.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "jinja2" },
+    { name = "markdown" },
+    { name = "markupsafe" },
+    { name = "mkdocs" },
+    { name = "mkdocs-autorefs" },
+    { name = "pymdown-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/e2/0a/7e4776217d4802009c8238c75c5345e23014a4706a8414a62c0498858183/mkdocstrings-0.30.0.tar.gz", hash = "sha256:5d8019b9c31ddacd780b6784ffcdd6f21c408f34c0bd1103b5351d609d5b4444", size = 106597, upload-time = "2025-07-22T23:48:45.998Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/de/b4/3c5eac68f31e124a55d255d318c7445840fa1be55e013f507556d6481913/mkdocstrings-0.30.0-py3-none-any.whl", hash = "sha256:ae9e4a0d8c1789697ac776f2e034e2ddd71054ae1cf2c2bb1433ccfd07c226f2", size = 36579, upload-time = "2025-07-22T23:48:44.152Z" },
+]
+
+[package.optional-dependencies]
+python = [
+    { name = "mkdocstrings-python" },
+]
+
+[[package]]
+name = "mkdocstrings-python"
+version = "1.18.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "griffe" },
+    { name = "mkdocs-autorefs" },
+    { name = "mkdocstrings" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/95/ae/58ab2bfbee2792e92a98b97e872f7c003deb903071f75d8d83aa55db28fa/mkdocstrings_python-1.18.2.tar.gz", hash = "sha256:4ad536920a07b6336f50d4c6d5603316fafb1172c5c882370cbbc954770ad323", size = 207972, upload-time = "2025-08-28T16:11:19.847Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d5/8f/ce008599d9adebf33ed144e7736914385e8537f5fc686fdb7cceb8c22431/mkdocstrings_python-1.18.2-py3-none-any.whl", hash = "sha256:944fe6deb8f08f33fa936d538233c4036e9f53e840994f6146e8e94eb71b600d", size = 138215, upload-time = "2025-08-28T16:11:18.176Z" },
+]
+
+[[package]]
 name = "packaging"
 version = "25.0"
 source = { registry = "https://pypi.org/simple" }
@@ -521,6 +572,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/ab/e2/e9a00f0ccb71718418230718b3d900e71a5d16e701a3dae079a21e9cd8f8/text-unidecode-1.3.tar.gz", hash = "sha256:bad6603bb14d279193107714b288be206cac565dfa49aa5b105294dd5c4aab93", size = 76885, upload-time = "2019-08-30T21:36:45.405Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a6/a5/c0b6468d3824fe3fde30dbb5e1f687b291608f9473681bbf7dabbf5a87d7/text_unidecode-1.3-py2.py3-none-any.whl", hash = "sha256:1311f10e8b895935241623731c2ba64f4c455287888b18189350b67134a822e8", size = 78154, upload-time = "2019-08-30T21:37:03.543Z" },
+]
+
+[[package]]
+name = "typing-extensions"
+version = "4.15.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/72/94/1a15dd82efb362ac84269196e94cf00f187f7ed21c242792a923cdb1c61f/typing_extensions-4.15.0.tar.gz", hash = "sha256:0cea48d173cc12fa28ecabc3b837ea3cf6f38c6d1136f85cbaaf598984861466", size = 109391, upload-time = "2025-08-25T13:49:26.313Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/18/67/36e9267722cc04a6b9f15c7f3441c2363321a3ea07da7ae0c0707beb2a9c/typing_extensions-4.15.0-py3-none-any.whl", hash = "sha256:f0fa19c6845758ab08074a0cfa8b7aecb71c999ca73d62883bc25cc018c4e548", size = 44614, upload-time = "2025-08-25T13:49:24.86Z" },
 ]
 
 [[package]]
