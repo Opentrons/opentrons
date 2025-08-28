@@ -3,8 +3,8 @@ import groupBy from 'lodash/groupBy'
 import {
   getAllDefinitions as _getAllDefinitions,
   getAllLegacyDefinitions,
-  getGreaterThanVersions,
   getLabwareDefURI,
+  getUnsupportedLabwareDefVersionsByApiLevel,
   PD_DO_NOT_LIST,
 } from '@opentrons/shared-data'
 import { PAPI_VERSION } from '@opentrons/step-generation'
@@ -37,7 +37,9 @@ export function getAllDefinitions(): LabwareDefByDefURI {
 let _latestDefs: LabwareDefByDefURI | null = null
 export function getOnlyLatestDefs(): LabwareDefByDefURI {
   // pick latest acceptable JSON, example comparing: "2.25" vs "2_26"
-  const unacceptableDefVersions = getGreaterThanVersions(PAPI_VERSION)
+  const unacceptableDefVersions = getUnsupportedLabwareDefVersionsByApiLevel(
+    PAPI_VERSION
+  )
 
   if (!_latestDefs) {
     const allDefs = getAllDefinitions()

@@ -1,4 +1,4 @@
-import defaultLabwareVersionsRaw from '../labware/default_labware_versions.json'
+import defaultLabwareVersionsRaw from '../labware/defaultLabwareVersions/default_labware_versions.json'
 import fixture12Trough from '../labware/fixtures/2/fixture_12_trough.json'
 import fixture24Tuberack from '../labware/fixtures/2/fixture_24_tuberack.json'
 import fixture96Plate from '../labware/fixtures/2/fixture_96_plate.json'
@@ -117,7 +117,7 @@ function isGreaterThan(a: [number, number], b: [number, number]): boolean {
   return a[0] > b[0] || (a[0] === b[0] && a[1] > b[1])
 }
 
-export function getGreaterThanVersions(
+export function getUnsupportedLabwareDefVersionsByApiLevel(
   currentPAPIVersion: string
 ): Record<string, number> {
   const current = parseAPIVersion(currentPAPIVersion)

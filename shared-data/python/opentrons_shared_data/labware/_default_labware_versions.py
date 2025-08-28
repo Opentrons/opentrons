@@ -11,30 +11,14 @@ from opentrons.protocols.api_support.types import APIVersion
 DefaultLabwareVersions: TypeAlias = dict[APIVersion, dict[str, int]]
 
 
-DEFAULT_LABWARE_VERSIONS = Path("./default_labware_versions.json")
+DEFAULT_LABWARE_VERSIONS_FILE = Path(
+    "../../labware/defaultLabwareVersions/default_labware_versions.json"
+)
 
-# This:
-#
-# {
-#     APIVersion(2, 100): {
-#         "foo_well_plate": 3,
-#     },
-#     APIVersion(2, 105): {
-#         "foo_well_plate": 7
-#     }
-# }
-#
-# Means this:
-#
-# apiLevels        Load name         Default labware version
-# ----------------------------------------------------------
-# <2.100           foo_well_plate    1
-# >=2.100,<2.105   foo_well_plate    3
-# >=2.105          foo_well_plate    7
-# [any]            [anything else]   1
+
 @functools.cache
 def _parse_json_from_filesystem() -> DefaultLabwareVersions:
-    with open(JSON_FILE) as file:
+    with open(DEFAULT_LABWARE_VERSIONS_FILE) as file:
         raw_versions = json.load(file)
 
     # convert "2.14" to APIVersion(2, 14)
@@ -43,8 +27,6 @@ def _parse_json_from_filesystem() -> DefaultLabwareVersions:
         for version_str, labware_map in raw_versions.items()
     }
 
-
-DEFAULT_LABWARE_VERSIONS: DefaultLabwareVersions = _parse_json_from_filesystem()
 
 # Labware where, for whatever reason, we don't want `opentrons.protocol_api` to load
 # the latest available version.
@@ -76,13 +58,16 @@ KNOWN_EXCEPTIONS_FOR_TESTS: set[str] = {
 def get_standard_labware_default_version(
     api_version: APIVersion,
     load_name: str,
-    default_labware_versions: DefaultLabwareVersions = DEFAULT_LABWARE_VERSIONS,
+    default_labware_versions: DefaultLabwareVersions | None = None,
 ) -> int:
     """Return what version of a standard labware the Protocol API should load by default.
 
     The `default_labware_versions` param is exposed for testability and should be left
     unspecified.
     """
+    if default_labware_versions is None:
+        default_labware_versions = _parse_json_from_filesystem()
+
     default_labware_versions_newest_to_oldest = sorted(
         default_labware_versions.items(), key=lambda kv: kv[0], reverse=True
     )
