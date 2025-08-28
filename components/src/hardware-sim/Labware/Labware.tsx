@@ -111,6 +111,8 @@ export const Labware = (props: LabwareProps): JSX.Element => {
   if (isNeedingCustomSVG || isLid) {
     const { shouldRotateAdapterOrientation = false } = props
     const { xDimension, yDimension } = getSchema2Dimensions(definition)
+    const lidDimensions =
+      'dimensions' in definition ? definition.dimensions : null
 
     return (
       <g
@@ -131,6 +133,7 @@ export const Labware = (props: LabwareProps): JSX.Element => {
           <LabwareAdapter
             labwareLoadName={labwareLoadName as LabwareAdapterLoadName}
             isLid={isLid}
+            lidDimensions={lidDimensions}
           />
         </g>
       </g>
