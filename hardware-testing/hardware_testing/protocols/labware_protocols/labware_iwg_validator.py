@@ -73,7 +73,6 @@ def add_parameters(parameters: ParameterContext) -> None:
         default="1000",
     )
 
-
 def _setup(
     ctx: ProtocolContext,
 ) -> Tuple[
@@ -145,7 +144,7 @@ def _setup(
 
     low_height = 3
     middle_height = depth / 2
-    high_height = depth - 3
+    high_height = depth - 5
 
     expected_heights = (
         [low_height] * number_of_trials  # low height
@@ -266,8 +265,8 @@ def aspirate_dispense_measure(
         dispense_vol = float(expected_vol / liq_pipette.channels)
 
         expected_height = expected_heights[i]
-        liq_pipette.flow_rate.dispense = max(min(dispense_vol / 3, 500), 30)
-        dispense_loc = labware[well].bottom(z=expected_height + 3)
+        liq_pipette.flow_rate.dispense = max(min(dispense_vol / 10, 100), 20)
+        dispense_loc = labware[well].bottom(z=expected_height + 3.5)
         liq_pipette.transfer(
             dispense_vol * 1.033,
             src["A1"].meniscus(z=-2, target="end"),

@@ -568,8 +568,8 @@ def geometry_creator(ctx: ProtocolContext, state: SetupState) -> List[TrialResul
 
         # Dispense
         dispense_volume += step_volume
-        liq_pipette.flow_rate.dispense = max(min(dispense_volume / 3, 500), 30)
-        dispense_loc = labware[current_well].bottom(z=max(corrected_height + 3, 3))
+        liq_pipette.flow_rate.dispense = max(min(dispense_volume / 10, 100), 20)
+        dispense_loc = labware[current_well].bottom(z=max(corrected_height + 3.5, 3))
         liq_pipette.transfer(
             (dispense_volume / liq_pipette.channels) * 1.033,
             src["A1"].meniscus(z=-2, target="end"),
@@ -580,6 +580,7 @@ def geometry_creator(ctx: ProtocolContext, state: SetupState) -> List[TrialResul
             blowout_location="destination well",
             air_gap=5,
         )
+        
 
         # Measure liquid height
         height = _get_height_of_liquid_in_well(
@@ -646,4 +647,4 @@ def run(ctx: ProtocolContext) -> None:
         with open(file_path, "w") as f:
             json.dump(new_inner_well_json, f, indent=2)
 
-        ctx.pause(f"User defined volume file created: {file_path}")
+        ctx.pause(f"User Defined Definition file: {file_path}")
