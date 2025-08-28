@@ -210,6 +210,7 @@ pipette.transfer_with_liquid_class(
     new_tip="always",
     trash_location=mock_trash_bin_1,
     keep_last_tip=True,
+    tip_racks=[mock_tiprack_1],
     liquid_class=protocol.define_liquid_class(
         name="transfer_step_1",
         properties={"flex_1channel_1000": {"fixture/fixture_flex_96_tiprack_1000ul/1": {
@@ -363,6 +364,7 @@ pipette.consolidate_with_liquid_class(
     new_tip="always",
     trash_location=mock_trash_bin_1,
     keep_last_tip=True,
+    tip_racks=[mock_tiprack_1],
     liquid_class=protocol.define_liquid_class(
         name="consolidate_step_1",
         properties={"flex_1channel_1000": {"fixture/fixture_flex_96_tiprack_1000ul/1": {
@@ -517,6 +519,7 @@ pipette.distribute_with_liquid_class(
     new_tip="always",
     trash_location=mock_trash_bin_1,
     keep_last_tip=True,
+    tip_racks=[mock_tiprack_1],
     liquid_class=protocol.define_liquid_class(
         name="distribute_step_1",
         properties={"flex_1channel_1000": {"fixture/fixture_flex_96_tiprack_1000ul/1": {

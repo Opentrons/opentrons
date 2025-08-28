@@ -26,7 +26,7 @@ metadata = {
 
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.24",
+    "apiLevel": "2.25",
 }
 """
 Slot A1: Tips 200

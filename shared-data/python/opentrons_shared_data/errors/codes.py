@@ -98,6 +98,7 @@ class ErrorCodes(Enum):
     MISSING_CONFIGURATION_DATA = _code_from_dict_entry("4009")
     RUNTIME_PARAMETER_VALUE_REQUIRED = _code_from_dict_entry("4010")
     INCORRECT_API_VERSION = _code_from_dict_entry("4011")
+    LABWARE_LOCATING_FEATURE_ERROR = _code_from_dict_entry("4012")
 
     @classmethod
     @lru_cache(25)

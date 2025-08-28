@@ -2,8 +2,6 @@
 title: "Opentrons Flex: OT-2 Protocols"
 ---
 
-# OT-2 Protocols
-
 There are hundreds of OT-2 protocols in the Protocol Library, and you may have created your own OT-2 protocols for your lab. Opentrons Flex can perform all the basic actions that the OT-2 can, but OT-2 protocols aren't directly compatible with Flex. However, with a little effort, you can adapt an OT-2 protocol so it will run on Flex. This lets you have parity across different Opentrons robots in your lab, or you can extend older protocols to take advantage of new features only offered on Flex.
 
 ## OT-2 Python protocols

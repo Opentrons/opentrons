@@ -2,8 +2,6 @@
 title: "Opentrons Flex: System Specifications"
 ---
 
-# System Specifications
-
 ## General specifications
 
 | Specification | Details |

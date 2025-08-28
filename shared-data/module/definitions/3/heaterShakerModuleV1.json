@@ -7,7 +7,15 @@
     "y": 1.125,
     "z": 68.275
   },
-  "features": {},
+  "features": {
+    "screwAnchoredAsParent": {
+      "screwCenter": {
+        "x": 64,
+        "y": 43,
+        "z": 0
+      }
+    }
+  },
   "dimensions": {
     "bareOverallHeight": 82,
     "overLabwareHeight": 0,
@@ -183,6 +191,27 @@
         ]
       }
     }
+  },
+  "orientation": {
+    "1": "left",
+    "2": "center",
+    "3": "right",
+    "4": "left",
+    "5": "center",
+    "6": "right",
+    "7": "left",
+    "8": "center",
+    "9": "right",
+    "10": "left",
+    "11": "center",
+    "A1": "left",
+    "A3": "right",
+    "B1": "left",
+    "B3": "right",
+    "C1": "left",
+    "C3": "right",
+    "D1": "left",
+    "D3": "right"
   },
   "compatibleWith": [],
   "incompatibleWithDecks": []

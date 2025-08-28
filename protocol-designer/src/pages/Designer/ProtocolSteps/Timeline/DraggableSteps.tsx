@@ -3,20 +3,14 @@ import { useDrag, useDrop } from 'react-dnd'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import {
-  Box,
-  COLORS,
-  DIRECTION_COLUMN,
-  Flex,
-  SPACING,
-} from '@opentrons/components'
+import { Box, COLORS, DIRECTION_COLUMN, Flex } from '@opentrons/components'
 
 import { DND_TYPES } from '/protocol-designer/constants'
 import { stepIconsByType } from '/protocol-designer/form-types'
 import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
 
+import { ConnectedStepContainer } from './ConnectedStepContainer'
 import { ConnectedStepInfo } from './ConnectedStepInfo'
-import { ConnectedStepContainer } from './StepContainer'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { DragLayerMonitor, DropTargetMonitor } from 'react-dnd'
@@ -146,11 +140,7 @@ export function DraggableSteps(props: DraggableStepsProps): JSX.Element | null {
   }
 
   return (
-    <Flex
-      gridGap={SPACING.spacing4}
-      flexDirection={DIRECTION_COLUMN}
-      width="100%"
-    >
+    <Flex flexDirection={DIRECTION_COLUMN} width="100%">
       {orderedStepIds.map((stepId: StepIdType, index: number) => (
         <DragDropStep
           key={`${stepId}_${index}`}

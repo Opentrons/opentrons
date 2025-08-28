@@ -2,8 +2,6 @@
 title: "Opentrons Flex: Settings"
 ---
 
-# Robot Settings
-
 The Settings screen lists all the ways you can customize the behavior of your Flex.
 
 <figure class="screenshot" markdown>
@@ -15,7 +13,7 @@ Although they are presented in a single list, they roughly break down into four 
 
 ## Setup
 
-All of these settings are covered when you [first set up your Flex][first-run]. However, you can change them at any time.
+All of these settings are covered when you [first set up your Flex](../installation/first-run.md). However, you can change them at any time.
 
 - **Network Settings:** View the status of or set up a Wi-Fi, Ethernet, or USB connection. Multiple connections can be active simultaneously.
 

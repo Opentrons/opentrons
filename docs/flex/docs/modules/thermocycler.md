@@ -2,12 +2,10 @@
 title: "Opentrons Flex: Thermocycler"
 ---
 
-# Thermocycler Module GEN2
-
 ![The Thermocycler as seen from the top right. The lid is open to show the thermal block inside.](../images/thermocycler.png "Thermocycler")
 
 !!! info "Additional Documentation"
-    For complete instructions on module installation and use, see the [Thermocycler Module Instruction Manual](../../../thermocycler/).
+    For complete instructions on module installation and use, see the [Thermocycler Module Instruction Manual](../../thermocycler/index.md).
 
 ## Thermocycler features
 

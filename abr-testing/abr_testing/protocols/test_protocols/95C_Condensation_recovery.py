@@ -22,23 +22,31 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
     thermocycler_module_1: ThermocyclerContext = protocol.load_module(
         "thermocyclerModuleV2", "B1"
     )  # type: ignore[assignment]
+    try:
+        if not protocol.is_simulating():
+            from abr_testing.protocols import helpers
 
-    # PROTOCOL STEPS
+            slack_bot = helpers.set_up_slack()
+            slack_bot.send_run_started_message(metadata["protocolName"])
+        # PROTOCOL STEPS
 
-    # Step 1:
-    thermocycler_module_1.open_lid()
+        # Step 1:
+        thermocycler_module_1.open_lid()
 
-    # Step 2:
-    thermocycler_module_1.close_lid()
-    thermocycler_module_1.set_lid_temperature(37)
-    thermocycler_module_1.execute_profile(
-        [
-            {"temperature": 96, "hold_time_seconds": 15},
-            {"temperature": 95, "hold_time_seconds": 15},
-        ],
-        120,
-        block_max_volume=10,
-    )
-    thermocycler_module_1.open_lid()
-    thermocycler_module_1.deactivate_block()
-    thermocycler_module_1.deactivate_lid()
+        # Step 2:
+        thermocycler_module_1.close_lid()
+        thermocycler_module_1.set_lid_temperature(37)
+        thermocycler_module_1.execute_profile(
+            [
+                {"temperature": 96, "hold_time_seconds": 15},
+                {"temperature": 95, "hold_time_seconds": 15},
+            ],
+            120,
+            block_max_volume=10,
+        )
+        thermocycler_module_1.open_lid()
+        thermocycler_module_1.deactivate_block()
+        thermocycler_module_1.deactivate_lid()
+    except Exception as e:
+        if not protocol.is_simulating():
+            slack_bot.send_error_message(metadata["protocolName"], str(e))

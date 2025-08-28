@@ -154,23 +154,25 @@ export function FirstStepMoveLiquidTools({
         <StyledText desktopStyle="bodyDefaultSemiBold">
           {t('tip_management')}
         </StyledText>
-        <ChangeTipField
-          {...propsForFields.changeTip}
-          aspirateWells={formData.aspirate_wells}
-          dispenseWells={formData.dispense_wells}
-          path={formData.path}
-          stepType={formData.stepType}
-          isDisposalLocation={isDisposalLocation}
-          tooltipContent={null}
-          padding="0"
-        />
-        <DropTipField
-          {...propsForFields.dropTip_location}
-          nozzles={formData.nozzles}
-          tiprackDefUri={formData.tipRack}
-          tooltipContent={null}
-          padding="0"
-        />
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
+          <ChangeTipField
+            {...propsForFields.changeTip}
+            aspirateWells={formData.aspirate_wells}
+            dispenseWells={formData.dispense_wells}
+            path={formData.path}
+            stepType={formData.stepType}
+            isDisposalLocation={isDisposalLocation}
+            tooltipContent={null}
+            padding="0"
+          />
+          <DropTipField
+            {...propsForFields.dropTip_location}
+            nozzles={formData.nozzles}
+            tiprackDefUri={formData.tipRack}
+            tooltipContent={null}
+            padding="0"
+          />
+        </Flex>
       </Flex>
       {enableTipPickupLocation ? (
         <>

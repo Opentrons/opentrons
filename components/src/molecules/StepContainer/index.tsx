@@ -90,49 +90,59 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
       data-testid={dataTestId}
       onDoubleClick={onDoubleClick}
       onClick={onClick}
-      padding={`${SPACING.spacing4} ${SPACING.spacing12}`}
-      borderRadius={BORDERS.borderRadius8}
-      width="100%"
-      backgroundColor={backgroundColor}
-      color={color}
-      opacity={semiTransparent ? '50%' : '100%'}
       cursor={cursor}
+      // StepContainers are meant to abut each other directly, visually separating themselves
+      // with this built-in internal whitespace, so things don't flicker when the cursor
+      // moves between them.
+      paddingY={SPACING.spacing2}
     >
-      <Flex
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        alignItems={ALIGN_CENTER}
-        height="1.9375rem"
+      <Box
+        padding={`${SPACING.spacing4} ${SPACING.spacing12}`}
+        borderRadius={BORDERS.borderRadius8}
+        backgroundColor={backgroundColor}
+        color={color}
+        opacity={semiTransparent ? '50%' : '100%'}
+        data-testid="StepContainer_buttonSansPadding"
       >
         <Flex
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
           alignItems={ALIGN_CENTER}
-          gridGap={SPACING.spacing8}
-          justifyContent={
-            size === 'iconAndText' ? JUSTIFY_START : JUSTIFY_CENTER
-          }
-          width="100%"
+          height="1.9375rem"
         >
-          {iconName != null && (
-            <Icon
-              size="1.25rem"
-              name={iconName}
-              color={color}
-              minWidth="1.25rem"
+          <Flex
+            alignItems={ALIGN_CENTER}
+            gridGap={SPACING.spacing8}
+            justifyContent={
+              size === 'iconAndText' ? JUSTIFY_START : JUSTIFY_CENTER
+            }
+            width="100%"
+          >
+            {iconName != null && (
+              <Icon
+                size="1.25rem"
+                name={iconName}
+                color={color}
+                minWidth="1.25rem"
+              />
+            )}
+            {size === 'iconAndText' && (
+              <StyledText
+                desktopStyle="bodyDefaultRegular"
+                css={ELLIPSIZE_STYLE}
+              >
+                {text}
+              </StyledText>
+            )}
+          </Flex>
+          {active && type !== 'alt' && (
+            <OverflowBtn
+              data-testid="StepContainer_OverflowBtn"
+              fillColor={COLORS.white}
+              onClick={onOverflowMenuButtonClick}
             />
           )}
-          {size === 'iconAndText' && (
-            <StyledText desktopStyle="bodyDefaultRegular" css={ELLIPSIZE_STYLE}>
-              {text}
-            </StyledText>
-          )}
         </Flex>
-        {active && type !== 'alt' && (
-          <OverflowBtn
-            data-testid="StepContainer_OverflowBtn"
-            fillColor={COLORS.white}
-            onClick={onOverflowMenuButtonClick}
-          />
-        )}
-      </Flex>
+      </Box>
     </Box>
   )
 }

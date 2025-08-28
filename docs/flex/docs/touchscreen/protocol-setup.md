@@ -2,8 +2,6 @@
 title: "Opentrons Flex: Protocol Setup"
 ---
 
-# Protocol Setup
-
 When you start setup for a protocol, you'll see the "Prepare to run" screen, which summarizes all of the requirements for the protocol.
 
 <figure class="screenshot" markdown>

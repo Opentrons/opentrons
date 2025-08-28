@@ -19,7 +19,7 @@ metadata = {
 }
 
 
-requirements = {"robotType": "Flex", "apiLevel": "2.24"}
+requirements = {"robotType": "Flex", "apiLevel": "2.25"}
 """
 Slot A1: Tips 1000
 Slot A2: Tips 1000

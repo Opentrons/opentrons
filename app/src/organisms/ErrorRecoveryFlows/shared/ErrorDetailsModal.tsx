@@ -74,6 +74,7 @@ export function ErrorDetailsModal(props: ErrorDetailsModalProps): JSX.Element {
       case ERROR_KINDS.STACKER_STALLED:
       case ERROR_KINDS.STACKER_HOPPER_EMPTY:
       case ERROR_KINDS.STACKER_SHUTTLE_EMPTY:
+      case ERROR_KINDS.STACKER_SHUTTLE_MISSING:
         return true
       default:
         return false
@@ -320,6 +321,7 @@ export function StackerShuttleMissingErrorBanner(): JSX.Element {
     <InlineNotification
       type="alert"
       heading={t('stacker_shuttle_missing_error_occurs_when')}
+      message={t('load_stacker_shuttle_to_proceed')}
     />
   )
 }
