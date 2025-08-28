@@ -59,6 +59,10 @@ export const getEnableStacking: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_STACKING ?? false
 )
+export const getEnableConcurrentModuleActions: Selector<boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ENABLE_CONCURRENT_MODULE_ACTIONS ?? false
+)
 export const getEnableJsonExport: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_JSON_EXPORT ?? false
