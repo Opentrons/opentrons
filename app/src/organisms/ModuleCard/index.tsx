@@ -179,6 +179,10 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   }
 
   const isPending = latestRequest?.status === PENDING
+  const runInProgress =
+    runStatus === RUN_STATUS_RUNNING || runStatus === RUN_STATUS_FINISHING
+
+  const hideBanners = isPending || runInProgress
   const hotToTouch: IconProps = { name: 'ot-hot-to-touch' }
   const isFlex = useIsFlex(robotName)
   const deckConfig = useNotifyDeckConfigurationQuery().data
@@ -206,9 +210,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     }
   }
   const { requireModuleCalibration, requireModuleSetup } = getSetupWizardFlow()
-
-  const isOverflowBtnDisabled =
-    runStatus === RUN_STATUS_RUNNING || runStatus === RUN_STATUS_FINISHING
 
   const isTooHot = getModuleTooHot(module)
 
@@ -366,7 +367,8 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 errorMessage={getErrorResponseMessage(latestRequest.error)}
               />
             )}
-            {!isPending && (requireModuleCalibration || requireModuleSetup) ? (
+            {!hideBanners &&
+            (requireModuleCalibration || requireModuleSetup) ? (
               <UpdateBanner
                 robotName={robotName}
                 updateType={requireModuleCalibration ? 'calibration' : 'setup'}
@@ -377,7 +379,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 updatePipetteFWRequired={updatePipetteFWRequired}
                 isTooHot={isTooHot}
               />
-            ) : !isPending && module.hasAvailableUpdate && showFWBanner ? (
+            ) : !hideBanners && module.hasAvailableUpdate && showFWBanner ? (
               <UpdateBanner
                 robotName={robotName}
                 updateType="firmware"
@@ -472,11 +474,11 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       >
         <OverflowBtn
           aria-label="overflow"
-          disabled={isOverflowBtnDisabled || isEstopNotDisengaged}
+          disabled={runInProgress || isEstopNotDisengaged}
           {...targetProps}
           onClick={handleOverflowClick}
         />
-        {isOverflowBtnDisabled && (
+        {runInProgress && (
           <Tooltip tooltipProps={tooltipProps}>
             {t('module_actions_unavailable')}
           </Tooltip>
