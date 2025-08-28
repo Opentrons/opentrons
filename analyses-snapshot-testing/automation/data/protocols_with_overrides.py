@@ -17,7 +17,7 @@ class ProtocolsWithOverrides:
             "1 stacker with OT 12 Well 22 mL",
             "2 stackers with OT 12 Well 22 mL",
             "1 stacker with OT 4 Well 300 mL",
-            "2 stackers with OT 4 Well 300 mL"
+            "2 stackers with OT 4 Well 300 mL",
         ],
         folder=GENERATORS_FOLDER,
     )
