@@ -47,7 +47,7 @@ export function MoveLabwareInterventionContent({
   robotType,
   isOnDevice,
 }: MoveLabwareInterventionProps): JSX.Element | null {
-  const { t } = useTranslation('protocol_command_text')
+  const { t, i18n } = useTranslation('protocol_command_text')
 
   const analysisCommands = analysis?.commands ?? []
   const labwareDefsByUri = getLoadedLabwareDefinitionsByUri(analysisCommands)
@@ -126,10 +126,10 @@ export function MoveLabwareInterventionContent({
             type="location-arrow-location"
             labwareName={labwareName}
             currentLocationProps={{
-              deckLabel: oldDisplayLabwareLocation,
+              deckLabel: i18n.format(oldDisplayLabwareLocation, 'upperCase'),
             }}
             newLocationProps={{
-              deckLabel: newDisplayLabwareLocation,
+              deckLabel: i18n.format(newDisplayLabwareLocation, 'upperCase'),
             }}
           />
         </Flex>
