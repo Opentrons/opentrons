@@ -562,29 +562,29 @@ def geometry_creator(ctx: ProtocolContext, state: SetupState) -> List[TrialResul
                     liq_pipette, src["A1"], ctx.is_simulating()
                 )
             else:
-                break
+                return udv_table 
 
         tip_z_error = _get_tip_z_error(ctx, probe_pipette, state.dial)
 
         # Dispense
         dispense_volume += step_volume
-        liq_pipette.flow_rate.dispense = 50
-        dispense_loc = labware[current_well].bottom(z=max(corrected_height + 3.5, 3))
+        liq_pipette.flow_rate.dispense = min(max(dispense_volume / 10, 100), 25)
+        liq_pipette.flow_rate.blow_out = 1000
+        if len(wells) <= 96:
+            dispense_loc = labware[current_well].bottom(z=max(corrected_height + 10, 10))
+        else:
+            dispense_loc = labware[current_well].bottom(z=max(corrected_height + 3, 3))
         liq_pipette.transfer(
             (dispense_volume / liq_pipette.channels) * 1.033,
             src["A1"].meniscus(z=-2, target="end"),
             dispense_loc,
             new_tip="never",
             return_tip=False,
-            blow_out=False,
+            blow_out=True,
             blowout_location="destination well",
-            air_gap=5,
+            air_gap=15,
         )
-        liq_pipette.flow_rate.blow_out = 500
-        liq_pipette.blow_out(dispense_loc.move(Point(z=5)))
-        liq_pipette.blow_out(dispense_loc.move(Point(z=10)))
         
-
         # Measure liquid height
         height = _get_height_of_liquid_in_well(
             probe_pipette, labware[current_well], ctx.is_simulating()
@@ -606,33 +606,34 @@ def geometry_creator(ctx: ProtocolContext, state: SetupState) -> List[TrialResul
                     ctx.pause(
                         f"First dispense volume {state.first_dispense}uL too low. Height was {hdelta}mm. Adjust and restart."
                     )
-                    raise Exception("Liquid height out of range")
+                    return udv_table
                 elif hdelta > 3.0:
                     ctx.pause(
                         f"First dispense volume {state.first_dispense}uL too high. Height was {hdelta}mm. Adjust and restart."
                     )
-                    raise Exception("Liquid height out of range")
+                    return udv_table
                 else:
                     status = "pass"
-                    write_trial_log(udv_table)
             else:
                 if hdelta <= state.lower_bound or hdelta >= state.upper_bound:
-                    if dispense_volume != max_volume:
-                        status = "fail"
-                        write_trial_log(udv_table)
-                        dispense_volume -= step_volume  # rollback dispense volume
-                        corrected_heights.pop()  # rollback corrected heights
-                    else:
-                        status = "pass"
-                        write_trial_log(udv_table)
+                    status = "fail"
                 else:
                     status = "pass"
-                    write_trial_log(udv_table)
+        else:
+            status = "sim"
+        
+        if status == "fail":
+            write_trial_log(udv_table)
+            dispense_volume -= step_volume  # rollback dispense volume
+            corrected_heights.pop()  # rollback corrected heights
         else:
             write_trial_log(udv_table)
 
         # recalculate step volume for next step
         step_volume = adaptive_volume_step(hdelta, corrected_height, step_volume, state)
+        #prevent overflow of well
+        if step_volume + dispense_volume > max_volume:
+            return udv_table
 
         step += 1
 
@@ -644,13 +645,18 @@ def run(ctx: ProtocolContext) -> None:
     """Run the protocol."""
     state = _setup(ctx)
     udv_table = geometry_creator(ctx, state)
+    drop_tips(state.probe_pipette, state.liq_pipette)
 
     # Save results
     passed_trials = [trial for trial in udv_table if trial.status == "pass"]
     frusta_data = np.array(
         [(trial.total_volume, trial.height) for trial in passed_trials]
     )
-    new_inner_well_json = generate_frusta(ctx, frusta_data.tolist(), state.labware)
+    if len(frusta_data) > 1:
+        new_inner_well_json = generate_frusta(ctx, frusta_data.tolist(), state.labware)
+    else:
+        return
+    
     if not ctx.is_simulating():
         from hardware_testing import data
 

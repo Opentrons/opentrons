@@ -144,7 +144,7 @@ def _setup(
 
     low_height = 3
     middle_height = depth / 2
-    high_height = depth - 5
+    high_height = depth - 3
 
     expected_heights = (
         [low_height] * number_of_trials  # low height
@@ -265,21 +265,19 @@ def aspirate_dispense_measure(
         dispense_vol = float(expected_vol / liq_pipette.channels)
 
         expected_height = expected_heights[i]
-        liq_pipette.flow_rate.dispense = 50
-        dispense_loc = labware[well].bottom(z=expected_height + 3.5)
+        liq_pipette.flow_rate.dispense = 100
+        liq_pipette.flow_rate.blow_out = 1000
+        dispense_loc = labware[well].bottom(z=expected_height + 8)
         liq_pipette.transfer(
             dispense_vol * 1.033,
             src["A1"].meniscus(z=-2, target="end"),
             dispense_loc,
             new_tip="never",
             return_tip=False,
-            blow_out=False,
+            blow_out=True,
             blowout_location="destination well",
-            air_gap=5,
+            air_gap=15,
         )
-        liq_pipette.flow_rate.blow_out = 500
-        liq_pipette.blow_out(dispense_loc.move(Point(z=5)))
-        liq_pipette.blow_out(dispense_loc.move(Point(z=10)))
 
         height = _get_height_of_liquid_in_well(
             probe_pipette, labware[well], ctx.is_simulating()
