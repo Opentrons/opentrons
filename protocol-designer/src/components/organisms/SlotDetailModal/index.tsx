@@ -75,6 +75,8 @@ export const SlotDetailModal = (
     wellContents,
     liquidDisplayColors
   )
+  const ingedInputs = Object.values(allIngredientGroupFields)
+  const wellFill = Object.values(allWellFill)
   const individualIds = getLiquidIdsOnLabware(wellContents)
 
   const volumesPerLiquid = getVolumesPerLiquid(wellContents, individualIds)
@@ -82,6 +84,23 @@ export const SlotDetailModal = (
   const [selectedLiquidId, setSelectedLiquidId] = useState<string | undefined>(
     individualIds.length > 0 ? individualIds[0] : undefined
   )
+
+  //  NOTE: this is used for setting the selected liquid when selecting from
+  //  a lid to a labware with liquids in the stack.
+  useEffect(() => {
+    if (wellFill.length > 0) {
+      const match = ingedInputs.find(ingred =>
+        wellFill.includes(ingred.displayColor)
+      )
+      if (match) {
+        setSelectedLiquidId(match.liquidGroupId)
+      } else if (individualIds.length > 0) {
+        setSelectedLiquidId(individualIds[0])
+      }
+    } else {
+      setSelectedLiquidId(undefined)
+    }
+  }, [selectedLabware, wellFill, ingedInputs])
 
   const wellContentsWithLiquidId: WellGroup =
     wellContents != null && selectedLiquidId != null
