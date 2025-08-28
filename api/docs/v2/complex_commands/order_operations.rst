@@ -35,6 +35,7 @@ In a ``transfer_with_liquid_class()``, your chosen liquid class definition speci
 A liquid class definition with every action enabled would proceed in this order: 
 
 To **aspirate:**
+
 1. Pick up tip
 2. Submerge into the source well to the aspirate position
 3. Delay for an amount of time
@@ -47,6 +48,7 @@ To **aspirate:**
 10. Add an air gap 
 
 To **dispense:**
+
 11. Move to and submerge into the destination well to the dispense position
 12. Delay for an amount of time 
 13. Dispense into the destination well
