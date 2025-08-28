@@ -602,8 +602,19 @@ def geometry_creator(ctx: ProtocolContext, state: SetupState) -> List[TrialResul
         # Check for bad hdelta
         if not ctx.is_simulating():
             if step == 0:
-                status = "pass" if 2.0 < hdelta < 3.0 else "fail"
-                write_trial_log(udv_table)
+                if hdelta < 2.0:
+                    ctx.pause(
+                        f"First dispense volume {state.first_dispense}uL too low. Height was {hdelta}mm. Adjust and restart."
+                    )
+                    raise Exception("Liquid height out of range")
+                elif hdelta > 3.0:
+                    ctx.pause(
+                        f"First dispense volume {state.first_dispense}uL too high. Height was {hdelta}mm. Adjust and restart."
+                    )
+                    raise Exception("Liquid height out of range")
+                else:
+                    status = "pass"
+                    write_trial_log(udv_table)
             else:
                 if hdelta <= state.lower_bound or hdelta >= state.upper_bound:
                     if dispense_volume != max_volume:
