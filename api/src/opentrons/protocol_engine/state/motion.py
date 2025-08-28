@@ -136,6 +136,7 @@ class MotionView:
         force_direct: bool = False,
         minimum_z_height: Optional[float] = None,
         operation_volume: Optional[float] = None,
+        offset_pipette_for_reservoir_subwells: bool = False,
     ) -> List[motion_planning.Waypoint]:
         """Calculate waypoints to a destination that's specified as a well."""
         location = current_well or self._pipettes.get_current_location()
@@ -153,9 +154,10 @@ class MotionView:
             operation_volume=operation_volume,
             pipette_id=pipette_id,
         )
-        destination += self._get_pipette_offset_for_reservoirs(
-            labware_id=labware_id, well_name=well_name, pipette_id=pipette_id
-        )
+        if offset_pipette_for_reservoir_subwells:
+            destination += self._get_pipette_offset_for_reservoirs(
+                labware_id=labware_id, well_name=well_name, pipette_id=pipette_id
+            )
 
         move_type = _move_types.get_move_type_to_well(
             pipette_id, labware_id, well_name, location, force_direct
