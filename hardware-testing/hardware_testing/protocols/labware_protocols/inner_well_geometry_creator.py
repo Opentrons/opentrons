@@ -203,8 +203,8 @@ def _setup(ctx: ProtocolContext) -> SetupState:
 
     # volume deadband for the controller
     max_volume = labware["A1"].max_volume
-    lower_bound = target_height - target_height * delta_tolerance
-    upper_bound = target_height + target_height * delta_tolerance
+    lower_bound = target_height - delta_tolerance
+    upper_bound = target_height + delta_tolerance
 
     # volume clamps for the controller
     min_step = max(max_volume * 0.01, 1)  # clamped to 5uL
