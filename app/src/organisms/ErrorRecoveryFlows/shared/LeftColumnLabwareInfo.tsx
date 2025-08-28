@@ -42,14 +42,12 @@ export function LeftColumnLabwareInfo({
     STACKER_HOPPER_EMPTY_SKIP,
     STACKER_SHUTTLE_EMPTY_SKIP,
   } = RECOVERY_MAP
-  const { t } = useTranslation('error_recovery')
+  const { t } = useTranslation(['error_recovery', 'shared'])
 
   const buildNewLocation = (): ComponentProps<
     typeof InterventionContent
   >['infoProps']['newLocationProps'] =>
-    displayNameNewLoc != null
-      ? { deckLabel: displayNameNewLoc.toUpperCase() }
-      : undefined
+    displayNameNewLoc != null ? { deckLabel: displayNameNewLoc } : undefined
 
   const buildInfoNames = (): {
     labwareName: string
@@ -91,9 +89,9 @@ export function LeftColumnLabwareInfo({
             labwareName: failedLabwareNames.name ?? '',
             labwareNickname: failedLabwareNames.nickName,
             currentLocationProps: {
-              deckLabel: `${(displayNameNewLoc?.toUpperCase() ?? '').charAt(
-                0
-              )}4`,
+              deckLabel: t('shared:slot', {
+                slot: `${(displayNameNewLoc ?? '').slice(0, -1)}4`,
+              }),
             },
           }
         default:
@@ -101,7 +99,7 @@ export function LeftColumnLabwareInfo({
             labwareName: failedLabwareNames.name ?? '',
             labwareNickname: failedLabwareNames.nickName,
             currentLocationProps: {
-              deckLabel: failedLabwareLocations.displayNameCurrentLoc.toUpperCase(),
+              deckLabel: failedLabwareLocations.displayNameCurrentLoc,
             },
           }
       }
