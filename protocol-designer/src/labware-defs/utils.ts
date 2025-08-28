@@ -72,7 +72,11 @@ export function getOnlyLatestDefs(): LabwareDefByDefURI {
         )
         const latestDefInGroup = unAcceptableDefs.find(
           def => def.version === highestVersionNum
-        )!
+        )
+
+        if (latestDefInGroup == null) {
+          return acc
+        }
 
         return {
           ...acc,
