@@ -78,7 +78,12 @@ from .module_core import (
     FlexStackerCore,
 )
 from .exceptions import InvalidModuleLocationError
-from . import load_labware_params, deck_conflict, overlap_versions
+from . import (
+    load_labware_params,
+    deck_conflict,
+    overlap_versions,
+    _default_liquid_class_versions,
+)
 from opentrons.protocol_engine.resources import labware_validation
 
 if TYPE_CHECKING:
@@ -1068,8 +1073,12 @@ class ProtocolCore(
             display_color=(liquid.displayColor.root if liquid.displayColor else None),
         )
 
-    def get_liquid_class(self, name: str, version: int) -> LiquidClass:
+    def get_liquid_class(self, name: str, version: Optional[int]) -> LiquidClass:
         """Get an instance of a built-in liquid class."""
+        if version is None:
+            version = _default_liquid_class_versions.get_liquid_class_version(
+                self._api_version, name
+            )
         try:
             # Check if we have already loaded this liquid class' definition
             liquid_class_def = self._liquid_class_def_cache[(name, version)]
