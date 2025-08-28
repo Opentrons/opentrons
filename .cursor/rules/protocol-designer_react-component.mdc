@@ -26,7 +26,7 @@ globs: protocol-designer/src/**/*.tsx
    - Mention of using CSS Modules for styling
    - CSS Modules name must be <component name>.module.css and <component name> is always lower case
    - Request for TypeScript usage
-   - User proper types for props
+   - Use proper types for props
    - Use @opentrons/components if there is available component to create a new component
 
 5. After generating, adapt the component to fit our project structure:
