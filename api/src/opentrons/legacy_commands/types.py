@@ -89,7 +89,7 @@ THERMOCYCLER_SET_LID_TEMP: Final = "command.THERMOCYCLER_SET_LID_TEMP"
 THERMOCYCLER_DEACTIVATE_LID: Final = "command.THERMOCYCLER_DEACTIVATE_LID"
 THERMOCYCLER_DEACTIVATE_BLOCK: Final = "command.THERMOCYCLER_DEACTIVATE_BLOCK"
 
-FLEX_STACKER_SET_STORED_LABWARE: Final = "command.FLEX_STACKER_RETRIEVE"
+FLEX_STACKER_SET_STORED_LABWARE: Final = "command.FLEX_STACKER_SET_STORED_LABWARE"
 FLEX_STACKER_RETRIEVE: Final = "command.FLEX_STACKER_RETRIEVE"
 FLEX_STACKER_STORE: Final = "command.FLEX_STACKER_STORE"
 FLEX_STACKER_EMPTY: Final = "command.FLEX_STACKER_EMPTY"
@@ -161,6 +161,7 @@ class ResumeCommand(TypedDict):
 
 
 # Module commands
+
 
 class HeaterShakerSetTargetTemperaturePayload(TextOnlyPayload):
     pass
@@ -379,6 +380,11 @@ class ThermocyclerCloseCommand(TypedDict):
     payload: ThermocyclerCloseCommandPayload
 
 
+class FlexStackerSetStoredLabwareCommand(TypedDict):
+    name: Literal["command.FLEX_STACKER_SET_STORED_LABWARE"]
+    payload: TextOnlyPayload
+
+
 class FlexStackerRetrieveCommand(TypedDict):
     name: Literal["command.FLEX_STACKER_RETRIEVE"]
     payload: TextOnlyPayload
@@ -398,7 +404,9 @@ class FlexStackerFillCommand(TypedDict):
     name: Literal["command.FLEX_STACKER_FILL"]
     payload: TextOnlyPayload
 
+
 # Module command end
+
 
 class HomeCommandPayload(TextOnlyPayload):
     axis: str
@@ -769,6 +777,7 @@ Command = Union[
     RobotOpenGripperJawCommand,
     RobotCloseGripperJawCommand,
     # Flex Stacker commands
+    FlexStackerSetStoredLabwareCommand,
     FlexStackerRetrieveCommand,
     FlexStackerStoreCommand,
     FlexStackerEmptyCommand,
@@ -1053,6 +1062,12 @@ class MagdeckEngageMessage(CommandMessageFields, MagdeckEngageCommand):
     pass
 
 
+class FlexStackerSetStoredLabwareMessage(
+    CommandMessageFields, FlexStackerSetStoredLabwareCommand
+):
+    pass
+
+
 class FlexStackerRetrieveMessage(CommandMessageFields, FlexStackerRetrieveCommand):
     pass
 
@@ -1163,6 +1178,7 @@ CommandMessage = Union[
     RobotOpenGripperJawMessage,
     RobotCloseGripperJawMessage,
     # Flex Stacker Messages
+    FlexStackerSetStoredLabwareMessage,
     FlexStackerRetrieveMessage,
     FlexStackerStoreMessage,
     FlexStackerEmptyMessage,

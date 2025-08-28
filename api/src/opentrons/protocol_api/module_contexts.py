@@ -1306,6 +1306,7 @@ class FlexStackerContext(ModuleContext):
         )
 
     @requires_version(2, 25)
+    @publish(command=cmds.flex_stacker_set_stored_labware)
     def set_stored_labware(
         self,
         load_name: str,
