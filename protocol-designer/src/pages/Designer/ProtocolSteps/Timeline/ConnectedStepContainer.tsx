@@ -12,10 +12,10 @@ import {
   Divider,
   Flex,
   SPACING,
-  StepContainer,
   useConditionalConfirm,
 } from '@opentrons/components'
 
+import { StepContainer } from '/protocol-designer/components/molecules'
 import {
   ConfirmDeleteModal,
   DELETE_MULTIPLE_STEP_FORMS,
