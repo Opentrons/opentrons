@@ -86,7 +86,7 @@ The power consumption specifications are measured with the UV lights and fan on.
 
 ## Door Protection Rollers
 
-With early model HEPA/UV modules, fully opening the robot's front door meant scraping it across the top of that module. Eventually, the edge of the HEPA module would scratch and leave scuff marks on the surface of the door.
+With early model HEPA/UV Modules, fully opening the robot's front door could cause it to scrape against the top of the module. The edge of the HEPA/UV Module could scratch and leave scuff marks on the surface of the door.
 
 ![Module without door rollers](images/hepa-without-rollers.png)
 
