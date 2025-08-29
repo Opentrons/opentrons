@@ -4,6 +4,7 @@ import {
   filterAAByAreaType,
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
+  isModuleAllowedOnAA,
   replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
   THERMOCYCLER_MODULE_CUTOUTS,
@@ -144,22 +145,26 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
       viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
     >
       {stagingAreaItems.map(
-        ({ cutoutId, cutoutFixtureId, addressableAreaId }) => (
-          <StagingAreaConfigItem
-            data-testid={cutoutId}
-            key={addressableAreaId}
-            deckDefinition={deckDef}
-            handleClickRemove={
-              editableCutoutIds.includes(cutoutId)
-                ? handleClickRemove
-                : undefined
-            }
-            fixtureLocation={cutoutId}
-            cutoutFixtureId={cutoutFixtureId}
-            addressableAreaId={addressableAreaId}
-            selected={cutoutId === selectedCutoutId}
-          />
-        )
+        ({ cutoutId, cutoutFixtureId, addressableAreaId }) => {
+          const shouldAllowRemove =
+            moduleModel != null
+              ? isModuleAllowedOnAA(cutoutId, addressableAreaId, moduleModel)
+              : editableCutoutIds.includes(cutoutId)
+          return (
+            <StagingAreaConfigItem
+              data-testid={cutoutId}
+              key={addressableAreaId}
+              deckDefinition={deckDef}
+              handleClickRemove={
+                shouldAllowRemove ? handleClickRemove : undefined
+              }
+              fixtureLocation={cutoutId}
+              cutoutFixtureId={cutoutFixtureId}
+              addressableAreaId={addressableAreaId}
+              selected={cutoutId === selectedCutoutId}
+            />
+          )
+        }
       )}
       {emptySlotLikeItems.map(({ cutoutId, addressableAreaId }) => (
         <EmptyConfigItem
@@ -174,21 +179,25 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
         />
       ))}
       {wasteChuteItems.map(
-        ({ cutoutId, cutoutFixtureId, addressableAreaId }) => (
-          <WasteChuteConfigFixture
-            data-testid={cutoutId}
-            key={addressableAreaId}
-            deckDefinition={deckDef}
-            handleClickRemove={
-              editableCutoutIds.includes(cutoutId)
-                ? handleClickRemove
-                : undefined
-            }
-            fixtureLocation={cutoutId}
-            cutoutFixtureId={cutoutFixtureId}
-            selected={cutoutId === selectedCutoutId}
-          />
-        )
+        ({ cutoutId, cutoutFixtureId, addressableAreaId }) => {
+          const shouldAllowRemove =
+            moduleModel != null
+              ? isModuleAllowedOnAA(cutoutId, addressableAreaId, moduleModel)
+              : editableCutoutIds.includes(cutoutId)
+          return (
+            <WasteChuteConfigFixture
+              data-testid={cutoutId}
+              key={addressableAreaId}
+              deckDefinition={deckDef}
+              handleClickRemove={
+                shouldAllowRemove ? handleClickRemove : undefined
+              }
+              fixtureLocation={cutoutId}
+              cutoutFixtureId={cutoutFixtureId}
+              selected={cutoutId === selectedCutoutId}
+            />
+          )
+        }
       )}
       {trashBinItems.map(({ cutoutId, cutoutFixtureId, addressableAreaId }) => (
         <TrashBinConfigItem
@@ -241,26 +250,30 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
         )
       )}
       {magneticBlockItems.map(
-        ({ cutoutId, cutoutFixtureId, addressableAreaId }) => (
-          <MagneticBlockItem
-            data-testid={cutoutId}
-            key={addressableAreaId}
-            deckDefinition={deckDef}
-            handleClickRemove={
-              editableCutoutIds.includes(cutoutId)
-                ? handleClickRemove
-                : undefined
-            }
-            fixtureLocation={cutoutId}
-            cutoutFixtureId={cutoutFixtureId}
-            addressableAreaId={addressableAreaId}
-            selected={cutoutId === selectedCutoutId}
-            hasStagingArea={
-              cutoutFixtureId ===
-              STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE
-            }
-          />
-        )
+        ({ cutoutId, cutoutFixtureId, addressableAreaId }) => {
+          const shouldAllowRemove =
+            moduleModel != null
+              ? isModuleAllowedOnAA(cutoutId, addressableAreaId, moduleModel)
+              : editableCutoutIds.includes(cutoutId)
+          return (
+            <MagneticBlockItem
+              data-testid={cutoutId}
+              key={addressableAreaId}
+              deckDefinition={deckDef}
+              handleClickRemove={
+                shouldAllowRemove ? handleClickRemove : undefined
+              }
+              fixtureLocation={cutoutId}
+              cutoutFixtureId={cutoutFixtureId}
+              addressableAreaId={addressableAreaId}
+              selected={cutoutId === selectedCutoutId}
+              hasStagingArea={
+                cutoutFixtureId ===
+                STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE
+              }
+            />
+          )
+        }
       )}
       {thermocyclerItems.map(
         ({ cutoutId, cutoutFixtureId, addressableAreaId }) => {
