@@ -3,20 +3,34 @@
 import pytest
 import asyncio
 from datetime import datetime
-from decoy import Decoy
+from decoy import Decoy, matchers
 from opentrons.protocol_engine.execution.task_handler import TaskHandler
 from opentrons.protocol_engine.state.state import (
     StateStore,
 )
+from opentrons.protocol_engine.errors import ErrorOccurrence
+from opentrons_shared_data.errors.codes import ErrorCodes
+from opentrons_shared_data.errors.exceptions import RoboticsInteractionError
+
 from opentrons.protocol_engine.resources import (
     ModelUtils,
 )
+from opentrons.protocol_engine.actions import ActionDispatcher, FinishTaskAction
+from opentrons.protocol_engine.types import Task
 
 
 @pytest.fixture
-def subject(state_store: StateStore, model_utils: ModelUtils) -> TaskHandler:
+def subject(
+    state_store: StateStore,
+    model_utils: ModelUtils,
+    action_dispatcher: ActionDispatcher,
+) -> TaskHandler:
     """Get a task handler to test."""
-    return TaskHandler(state_store=state_store, model_utils=model_utils)
+    return TaskHandler(
+        state_store=state_store,
+        model_utils=model_utils,
+        action_dispatcher=action_dispatcher,
+    )
 
 
 @pytest.fixture
@@ -31,8 +45,17 @@ def model_utils(decoy: Decoy) -> ModelUtils:
     return decoy.mock(cls=ModelUtils)
 
 
+@pytest.fixture
+def action_dispatcher(decoy: Decoy) -> ActionDispatcher:
+    """Get a mock action dispatcher."""
+    return decoy.mock(cls=ActionDispatcher)
+
+
 async def test_create_task(
-    subject: TaskHandler, decoy: Decoy, model_utils: ModelUtils
+    subject: TaskHandler,
+    decoy: Decoy,
+    model_utils: ModelUtils,
+    action_dispatcher: ActionDispatcher,
 ) -> None:
     """Create a task and run it."""
     task_ran = asyncio.Event()
@@ -42,36 +65,197 @@ async def test_create_task(
 
     created_timestamp = datetime.now()
     decoy.when(model_utils.get_timestamp()).then_return(created_timestamp)
+    decoy.when(model_utils.ensure_id(None)).then_return("create_timestamp")
+
     task = await subject.create_task(_task)
     await asyncio.wait_for(task_ran.wait(), timeout=0.25)
     await task.asyncioTask
     assert task.createdAt == created_timestamp
+    decoy.verify(
+        action_dispatcher.dispatch(
+            FinishTaskAction(
+                task_id=matchers.Anything(), finished_at=matchers.Anything(), error=None
+            )
+        ),
+        times=1,
+    )
 
 
 async def test_uses_passed_id(
-    subject: TaskHandler, decoy: Decoy, model_utils: ModelUtils
+    subject: TaskHandler,
+    decoy: Decoy,
+    model_utils: ModelUtils,
+    action_dispatcher: ActionDispatcher,
 ) -> None:
     """Should use provided id."""
 
     async def _task(task_handler: TaskHandler) -> None:
         await asyncio.sleep(0)
 
+    finished_at = datetime.now()
+    decoy.when(model_utils.get_timestamp()).then_return(finished_at)
     decoy.when(model_utils.ensure_id("testid1")).then_return("checked testid1")
     task = await subject.create_task(_task, id="testid1")
     assert task.id == "checked testid1"
+    await task.asyncioTask
+    decoy.verify(
+        action_dispatcher.dispatch(
+            FinishTaskAction(
+                task_id="checked testid1", finished_at=finished_at, error=None
+            )
+        ),
+        times=1,
+    )
 
 
 async def test_generates_id(
-    subject: TaskHandler, decoy: Decoy, model_utils: ModelUtils
+    subject: TaskHandler,
+    decoy: Decoy,
+    model_utils: ModelUtils,
+    action_dispatcher: ActionDispatcher,
 ) -> None:
     """It should generate an id if no id is provided."""
 
     async def _task(task_handler: TaskHandler) -> None:
         await asyncio.sleep(0)
 
+    finished_at = datetime.now()
+    decoy.when(model_utils.get_timestamp()).then_return(finished_at)
     decoy.when(model_utils.ensure_id(None)).then_return("testid2")
     task = await subject.create_task(_task)
     assert task.id == "testid2"
+    await task.asyncioTask
+    decoy.verify(
+        action_dispatcher.dispatch(
+            FinishTaskAction(task_id="testid2", finished_at=finished_at, error=None)
+        ),
+        times=1,
+    )
+
+
+async def test_generates_error(
+    subject: TaskHandler,
+    decoy: Decoy,
+    model_utils: ModelUtils,
+    action_dispatcher: ActionDispatcher,
+) -> None:
+    """It should generate an error."""
+
+    async def _task(task_handler: TaskHandler) -> None:
+        await asyncio.Event().wait()
+
+    finished_at = datetime.now()
+    decoy.when(model_utils.get_timestamp()).then_return(finished_at)
+    decoy.when(model_utils.generate_id()).then_return("errorid")
+    decoy.when(model_utils.ensure_id(None)).then_return("testid2")
+    task = await subject.create_task(_task)
+    task.asyncioTask.cancel(msg="hello")
+    try:
+        await asyncio.wait_for(task.asyncioTask, timeout=0.25)
+    except asyncio.CancelledError:
+        pass
+    decoy.verify(
+        action_dispatcher.dispatch(
+            FinishTaskAction(
+                task_id="testid2",
+                finished_at=finished_at,
+                error=ErrorOccurrence.model_construct(
+                    id="errorid",
+                    createdAt=finished_at,
+                    isDefined=False,
+                    errorType=matchers.Anything(),
+                    errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+                    detail=matchers.Anything(),
+                    errorInfo=matchers.Anything(),
+                    wrappedErrors=matchers.Anything(),
+                ),
+            )
+        ),
+        times=1,
+    )
+
+
+async def test_generates_enumerated_error(
+    subject: TaskHandler,
+    decoy: Decoy,
+    model_utils: ModelUtils,
+    action_dispatcher: ActionDispatcher,
+) -> None:
+    """It should generate an enumerated error."""
+
+    async def _task(task_handler: TaskHandler) -> None:
+        raise RoboticsInteractionError()
+
+    finished_at = datetime.now()
+    decoy.when(model_utils.get_timestamp()).then_return(finished_at)
+    decoy.when(model_utils.generate_id()).then_return("errorid")
+    decoy.when(model_utils.ensure_id(None)).then_return("testid2")
+    task = await subject.create_task(_task)
+    try:
+        await asyncio.wait_for(task.asyncioTask, timeout=0.25)
+    except (asyncio.CancelledError, RoboticsInteractionError):
+        pass
+    decoy.verify(
+        action_dispatcher.dispatch(
+            FinishTaskAction(
+                task_id="testid2",
+                finished_at=finished_at,
+                error=ErrorOccurrence.model_construct(
+                    id="errorid",
+                    createdAt=finished_at,
+                    isDefined=False,
+                    errorType=matchers.Anything(),
+                    errorCode=ErrorCodes.ROBOTICS_INTERACTION_ERROR.value.code,
+                    detail=matchers.Anything(),
+                    errorInfo=matchers.Anything(),
+                    wrappedErrors=matchers.Anything(),
+                ),
+            )
+        ),
+        times=1,
+    )
+
+
+async def test_generates_cancelled_error(
+    subject: TaskHandler,
+    decoy: Decoy,
+    model_utils: ModelUtils,
+    action_dispatcher: ActionDispatcher,
+) -> None:
+    """It should generate an cancelled error."""
+
+    async def _task(task_handler: TaskHandler) -> None:
+        await asyncio.Event().wait()
+
+    finished_at = datetime.now()
+    decoy.when(model_utils.get_timestamp()).then_return(finished_at)
+    decoy.when(model_utils.generate_id()).then_return("errorid")
+    decoy.when(model_utils.ensure_id(None)).then_return("testid2")
+    task = await subject.create_task(_task)
+    task.asyncioTask.cancel(msg="Cancel task")
+    try:
+        await asyncio.wait_for(task.asyncioTask, timeout=0.25)
+    except (asyncio.CancelledError):
+        pass
+    decoy.verify(
+        action_dispatcher.dispatch(
+            FinishTaskAction(
+                task_id="testid2",
+                finished_at=finished_at,
+                error=ErrorOccurrence.model_construct(
+                    id="errorid",
+                    createdAt=finished_at,
+                    isDefined=False,
+                    errorType=matchers.Anything(),
+                    errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+                    detail=matchers.StringMatching(r"(CancelledError)|(Cancel Task)"),
+                    errorInfo=matchers.Anything(),
+                    wrappedErrors=matchers.Anything(),
+                ),
+            )
+        ),
+        times=1,
+    )
 
 
 async def test_synchronization_cancel_latest(subject: TaskHandler) -> None:
@@ -309,3 +493,14 @@ async def test_synchronize_concurrent(subject: TaskHandler) -> None:
     assert max(events.index("task1started"), events.index("task2started")) < min(
         events.index("task1finished"), events.index("task2finished")
     )
+
+
+async def test_cancel_all(
+    subject: TaskHandler, decoy: Decoy, state_store: StateStore
+) -> None:
+    """Test cancel all."""
+    mock_tasks = [decoy.mock(cls=Task) for i in range(3)]
+    decoy.when(state_store.tasks.get_all_current()).then_return(mock_tasks)
+    subject.cancel_all("cancel all")
+    for task in mock_tasks:
+        decoy.verify(task.asyncioTask.cancel(msg="cancel all"))

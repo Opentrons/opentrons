@@ -218,3 +218,7 @@ class CommandExecutor:
                         type=error_recovery_type,
                     )
                 )
+
+    def cancel_tasks(self, message: str | None = None) -> None:
+        """Cancel all concurrent tasks."""
+        self._task_handler.cancel_all(message=message)
