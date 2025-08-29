@@ -1,10 +1,7 @@
 import { useRef } from 'react'
-import { css } from 'styled-components'
 
-import { COLORS } from '../../helix-design-system'
 import { Box } from '../../primitives'
-import { POSITION_ABSOLUTE, POSITION_RELATIVE } from '../../styles'
-import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
+import styles from './stepmeter.module.css'
 
 interface StepMeterProps {
   totalSteps: number
@@ -14,46 +11,30 @@ interface StepMeterProps {
 export const StepMeter = (props: StepMeterProps): JSX.Element => {
   const { totalSteps, currentStep } = props
   const prevPercentComplete = useRef(0)
-  const progress = currentStep != null ? currentStep : 0
+  const progress = currentStep ?? 0
   const percentComplete =
     //    this logic puts a cap at 100% percentComplete which we should never run into
     currentStep != null && currentStep > totalSteps
       ? 100
       : (progress / totalSteps) * 100
 
-  const StepMeterContainer = css`
-    position: ${POSITION_RELATIVE};
-    height: ${SPACING.spacing4};
-    background-color: ${COLORS.grey30};
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      height: ${SPACING.spacing12};
-    }
-  `
-
-  const ODD_ANIMATION_OPTIMIZATIONS = `
-  backface-visibility: hidden;
-  perspective: 1000;
-  will-change: transform;
-  `
-
-  const StepMeterBar = css`
-    ${ODD_ANIMATION_OPTIMIZATIONS}
-    position: ${POSITION_ABSOLUTE};
-    top: 0;
-    height: 100%;
-    background-color: ${COLORS.blue50};
-    width: ${percentComplete}%;
-    transform: translateX(0);
-    transition: ${prevPercentComplete.current <= percentComplete
-      ? 'width 0.5s ease-in-out'
-      : ''};
-  `
-
+  const shouldAnimate = prevPercentComplete.current <= percentComplete
   prevPercentComplete.current = percentComplete
 
+  const stepMeterBarClasses = shouldAnimate
+    ? `${styles.step_meter_bar} ${styles.step_meter_bar_animated}`
+    : styles.step_meter_bar
+
   return (
-    <Box data-testid="StepMeter_StepMeterContainer" css={StepMeterContainer}>
-      <Box data-testid="StepMeter_StepMeterBar" css={StepMeterBar} />
+    <Box
+      data-testid="StepMeter_StepMeterContainer"
+      className={styles.step_meter_container}
+    >
+      <Box
+        data-testid="StepMeter_StepMeterBar"
+        className={stepMeterBarClasses}
+        style={{ width: `${percentComplete}%` }}
+      />
     </Box>
   )
 }
