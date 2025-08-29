@@ -1,19 +1,21 @@
-import { StepMeter } from './index'
+import { VIEWPORT } from '../../ui-style-constants'
+import { StepMeter as StepMeterComponent } from './index'
 
-import type { Meta, Story } from '@storybook/react'
-import type * as React from 'react'
+import type { Meta, StoryObj } from '@storybook/react'
 
-export default {
+const meta: Meta<typeof StepMeterComponent> = {
   title: 'Helix/Atoms/StepMeter',
-  component: StepMeter,
-} as Meta
+  component: StepMeterComponent,
+  parameters: VIEWPORT.touchScreenViewport,
+}
 
-const Template: Story<React.ComponentProps<typeof StepMeter>> = args => (
-  <StepMeter {...args} />
-)
+export default meta
 
-export const Primary = Template.bind({})
-Primary.args = {
-  totalSteps: 5,
-  currentStep: 2,
+type Story = StoryObj<typeof StepMeterComponent>
+
+export const StepMeter: Story = {
+  args: {
+    totalSteps: 5,
+    currentStep: 2,
+  },
 }

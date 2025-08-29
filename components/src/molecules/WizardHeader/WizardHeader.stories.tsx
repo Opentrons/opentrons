@@ -4,7 +4,7 @@ import type { Meta, Story } from '@storybook/react'
 import type * as React from 'react'
 
 export default {
-  title: 'App/Molecules/WizardHeader',
+  title: 'Helix/Molecules/WizardHeader',
   component: WizardHeader,
 } as Meta
 
