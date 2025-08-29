@@ -1377,6 +1377,7 @@ class ProtocolContext(CommandPublisher):
     def get_liquid_class(
         self,
         name: str,
+        version: Optional[int] = None,
     ) -> LiquidClass:
         """
         Get an instance of an Opentrons-verified liquid class for use in a Flex protocol.
@@ -1386,12 +1387,14 @@ class ProtocolContext(CommandPublisher):
             - ``"water"``: an Opentrons-verified liquid class based on deionized water.
             - ``"glycerol_50"``: an Opentrons-verified liquid class for viscous liquid. Based on 50% glycerol.
             - ``"ethanol_80"``: an Opentrons-verified liquid class for volatile liquid. Based on 80% ethanol.
+        :param version: The version of the liquid class to retrieve. If left unspecified, the latest definition for the
+            protocol's API version will be loaded.
 
         :raises: ``LiquidClassDefinitionDoesNotExist``: if the specified liquid class does not exist.
 
         :returns: A new LiquidClass object.
         """
-        return self._core.get_liquid_class(name=name, version=DEFAULT_LC_VERSION)
+        return self._core.get_liquid_class(name=name, version=version)
 
     @requires_version(2, 24)
     def define_liquid_class(

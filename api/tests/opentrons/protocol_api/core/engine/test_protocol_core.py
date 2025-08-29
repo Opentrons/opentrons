@@ -75,6 +75,7 @@ from opentrons.protocol_api.core.engine import (
     LabwareCore,
     ModuleCore,
     load_labware_params,
+    _default_liquid_class_versions,
 )
 from opentrons.protocol_api._liquid import Liquid, LiquidClass
 from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
@@ -116,6 +117,17 @@ def patch_mock_load_labware_params(
     """Mock out load_labware_params.py functions."""
     for name, func in inspect.getmembers(load_labware_params, inspect.isfunction):
         monkeypatch.setattr(load_labware_params, name, decoy.mock(func=func))
+
+
+@pytest.fixture(autouse=True)
+def patch_default_liquid_class_versions(
+    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Mock out _default_liquid_class_versions.py functions."""
+    for name, func in inspect.getmembers(
+        _default_liquid_class_versions, inspect.isfunction
+    ):
+        monkeypatch.setattr(_default_liquid_class_versions, name, decoy.mock(func=func))
 
 
 @pytest.fixture(autouse=True)
@@ -1884,6 +1896,42 @@ def test_define_liquid_class(
         minimal_liquid_class_def2
     )
     assert subject.get_liquid_class("water", 123) == expected_liquid_class
+
+
+def test_define_liquid_class_without_version_provided(
+    decoy: Decoy,
+    subject: ProtocolCore,
+    minimal_liquid_class_def1: LiquidClassSchemaV1,
+    minimal_liquid_class_def2: LiquidClassSchemaV1,
+) -> None:
+    """It should create a LiquidClass with the most recent version and cache the definition."""
+    expected_liquid_class = LiquidClass(
+        _name="water1", _display_name="water 1", _by_pipette_setting={}
+    )
+    decoy.when(
+        _default_liquid_class_versions.get_liquid_class_version(
+            subject.api_version, "water"
+        )
+    ).then_return(987)
+    decoy.when(liquid_classes.load_definition("water", version=987)).then_return(
+        minimal_liquid_class_def1
+    )
+
+    assert subject.get_liquid_class("water", version=None) == expected_liquid_class
+
+    # Test that specified version number works too
+    decoy.when(liquid_classes.load_definition("water", version=654)).then_return(
+        minimal_liquid_class_def2
+    )
+    different_liquid_class = subject.get_liquid_class("water", 654)
+    assert different_liquid_class.name == "water2"
+    assert different_liquid_class.display_name == "water 2"
+
+    # Test that definition caching works
+    decoy.when(liquid_classes.load_definition("water", version=987)).then_return(
+        minimal_liquid_class_def2
+    )
+    assert subject.get_liquid_class("water", version=None) == expected_liquid_class
 
 
 def test_get_labware_location_deck_slot(
