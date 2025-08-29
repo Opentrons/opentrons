@@ -8,7 +8,6 @@ import {
   ListButtonAccordionContainer,
 } from '@opentrons/components'
 
-import { getEnableStacking } from '../../../feature-flags/selectors'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { selectLid, selectTopLabware } from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
@@ -41,7 +40,6 @@ export function SelectCustomLabware(
     filteredLabwareByCategory,
     universalLid,
   } = props
-  const enableStacking = useSelector(getEnableStacking)
   const { t } = useTranslation(['starting_deck_state', 'shared'])
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
   const dispatch = useDispatch<ThunkDispatch<any>>()
@@ -72,7 +70,6 @@ export function SelectCustomLabware(
           {filteredLabwareByCategory[CUSTOM_CATEGORY].map(({ uri }, index) => {
             const lidProps: StackingProps | null =
               slot !== 'offDeck' &&
-              enableStacking &&
               universalLid != null &&
               customLabwareDefs[uri].metadata.displayCategory !== 'tubeRack'
                 ? {
@@ -99,7 +96,6 @@ export function SelectCustomLabware(
 
             return (
               <CustomizeExpandButton
-                enableStackingFF={enableStacking}
                 isNestedDefALid={getIsNestedDefinitionALid(
                   customLabwareDefs[uri]
                 )}
