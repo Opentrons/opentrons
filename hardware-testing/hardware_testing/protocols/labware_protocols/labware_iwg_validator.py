@@ -12,7 +12,7 @@ from opentrons.types import Point
 from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
 
 # LABWARE TYPE
-LABWARE = "nunc_96_wellplate_450ul"
+LABWARE = "eppendorf_384_wellplate_45ul"
 
 # SLOTS
 SLOT_LIQUID_TIPRACKS = ["C3", "B3", "A2"]
@@ -265,19 +265,24 @@ def aspirate_dispense_measure(
         dispense_vol = float(expected_vol / liq_pipette.channels)
 
         expected_height = expected_heights[i]
-        liq_pipette.flow_rate.dispense = 100
+        liq_pipette.flow_rate.dispense = min(max(dispense_vol / 10, 100), 25)
         liq_pipette.flow_rate.blow_out = 1000
-        dispense_loc = labware[well].bottom(z=expected_height + 8)
+        if len(list(labware.wells_by_name().keys())) <= 96:
+            dispense_loc = labware[well].bottom(z=expected_height + 8)
+        else:
+            dispense_loc = labware[well].bottom(z=expected_height + 1)
+
         liq_pipette.transfer(
             dispense_vol * 1.033,
             src["A1"].meniscus(z=-2, target="end"),
             dispense_loc,
             new_tip="never",
             return_tip=False,
-            blow_out=True,
+            blow_out=False,
             blowout_location="destination well",
             air_gap=15,
         )
+        liq_pipette.blow_out(dispense_loc.move(Point(z=3)))
 
         height = _get_height_of_liquid_in_well(
             probe_pipette, labware[well], ctx.is_simulating()

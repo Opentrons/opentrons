@@ -20,7 +20,7 @@ from dataclasses import dataclass
 #  GLOBAL VARIABLES - START
 ###########################################
 
-LABWARE = "nunc_96_wellplate_450ul"
+LABWARE = "eppendorf_384_wellplate_45ul"
 
 RESERVOIR = "nest_1_reservoir_290ml"
 
