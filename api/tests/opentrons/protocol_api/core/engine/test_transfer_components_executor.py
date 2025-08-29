@@ -1,4 +1,6 @@
 """Tests for complex commands executor."""
+from typing import Literal, Union
+
 import pytest
 from decoy import Decoy, matchers
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
@@ -8,7 +10,7 @@ from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     BlowoutLocation,
 )
 
-from opentrons.protocol_api import TrashBin, WasteChute
+from opentrons.protocol_api import TrashBin, WasteChute, Labware
 from opentrons.protocol_api._liquid import LiquidClass
 from opentrons.protocol_api._liquid_properties import TransferProperties
 from opentrons.protocol_api.core.engine.well import WellCore
@@ -1843,6 +1845,113 @@ def test_retract_after_dispense_in_trash_with_blowout_in_disposal_location(
             ]
             or []
         ),
+    )
+
+
+@pytest.mark.parametrize(
+    argnames=["dest_type", "blowout_location", "source_touchable"],
+    argvalues=[
+        # Try all combinations of destination type, blowout location, and touchability
+        ("well", BlowoutLocation.SOURCE, True),
+        ("well", BlowoutLocation.SOURCE, False),
+        ("well", BlowoutLocation.DESTINATION, True),
+        ("well", BlowoutLocation.DESTINATION, False),
+        ("well", BlowoutLocation.TRASH, True),
+        ("well", BlowoutLocation.TRASH, False),
+        ("trash", BlowoutLocation.SOURCE, True),
+        ("trash", BlowoutLocation.SOURCE, False),
+        ("trash", BlowoutLocation.DESTINATION, True),
+        ("trash", BlowoutLocation.DESTINATION, False),
+        ("trash", BlowoutLocation.TRASH, True),
+        ("trash", BlowoutLocation.TRASH, False),
+    ],
+)
+def test_retract_after_dispense_touch_tip(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    sample_transfer_props: TransferProperties,
+    dest_type: Literal["well", "trash"],
+    blowout_location: BlowoutLocation,
+    source_touchable: bool,
+) -> None:
+    """Should not fail if touchTipDisabled at the blowout location if blowing out to SOURCE."""
+    source_location_labware = decoy.mock(cls=Labware)
+    source_location = Location(Point(1, 2, 3), labware=source_location_labware)
+    source_well = decoy.mock(cls=WellCore)
+    dest_well = decoy.mock(cls=WellCore)
+    well_top_point = Point(1, 2, 3)
+    trash_location = decoy.mock(cls=TrashBin)
+    trash_top = decoy.mock(cls=TrashBin)
+
+    target_location: Union[Location, TrashBin, WasteChute]
+    if dest_type == "trash":
+        target_location = trash_location
+        target_well = None
+    else:  # dest_type == "well"
+        target_location = Location(Point(1, 1, 1), labware=None)
+        target_well = dest_well
+
+    sample_transfer_props.dispense.retract.touch_tip.enabled = True
+    sample_transfer_props.dispense.retract.blowout.enabled = True
+    sample_transfer_props.dispense.retract.blowout.location = blowout_location
+
+    subject = TransferComponentsExecutor(
+        instrument_core=mock_instrument_core,
+        transfer_properties=sample_transfer_props,
+        target_location=target_location,
+        target_well=target_well,
+        tip_state=TipState(
+            ready_to_aspirate=True,
+            last_liquid_and_air_gap_in_tip=LiquidAndAirGapPair(liquid=0, air_gap=0),
+        ),
+        transfer_type=TransferType.ONE_TO_ONE,
+    )
+
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
+    decoy.when(source_location_labware.quirks).then_return(
+        [] if source_touchable else ["touchTipDisabled"]
+    )
+    decoy.when(source_well.get_top(0)).then_return(well_top_point)
+    decoy.when(source_well.get_top(AIR_GAP_LOC_Z_OFFSET_FROM_WELL_TOP)).then_return(
+        well_top_point + Point(0, 0, AIR_GAP_LOC_Z_OFFSET_FROM_WELL_TOP)
+    )
+    decoy.when(dest_well.get_top(0)).then_return(well_top_point)
+    decoy.when(dest_well.get_top(AIR_GAP_LOC_Z_OFFSET_FROM_WELL_TOP)).then_return(
+        well_top_point + Point(0, 0, AIR_GAP_LOC_Z_OFFSET_FROM_WELL_TOP)
+    )
+    decoy.when(trash_location.offset).then_return(DisposalOffset(x=0, y=0, z=0))
+    decoy.when(
+        trash_location.top(x=0, y=0, z=AIR_GAP_LOC_Z_OFFSET_FROM_WELL_TOP)
+    ).then_return(trash_top)
+    decoy.when(trash_top.offset).then_return(
+        DisposalOffset(x=0, y=0, z=AIR_GAP_LOC_Z_OFFSET_FROM_WELL_TOP)
+    )
+
+    subject.retract_after_dispensing(
+        trash_location=trash_location,
+        source_location=source_location,
+        source_well=source_well,
+        add_final_air_gap=False,
+    )
+
+    decoy.verify(
+        mock_instrument_core.touch_tip(),  # type: ignore[call-arg]
+        ignore_extra_args=True,
+        times={
+            # (destination type, blowout location, source is touchable):
+            ("well", BlowoutLocation.SOURCE, True): 2,  # touch dest, touch source
+            ("well", BlowoutLocation.SOURCE, False): 1,  # touch dest, no touch source
+            ("well", BlowoutLocation.DESTINATION, True): 1,  # touch dest
+            ("well", BlowoutLocation.DESTINATION, False): 1,  # touch dest
+            ("well", BlowoutLocation.TRASH, True): 1,  # touch dest
+            ("well", BlowoutLocation.TRASH, False): 1,  # touch dest
+            ("trash", BlowoutLocation.SOURCE, True): 1,  # touch source
+            ("trash", BlowoutLocation.SOURCE, False): 0,  # don't touch source
+            ("trash", BlowoutLocation.DESTINATION, True): 0,
+            ("trash", BlowoutLocation.DESTINATION, False): 0,
+            ("trash", BlowoutLocation.TRASH, True): 0,
+            ("trash", BlowoutLocation.TRASH, False): 0,
+        }[dest_type, blowout_location, source_touchable],
     )
 
 
