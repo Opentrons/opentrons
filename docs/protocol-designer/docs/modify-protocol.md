@@ -16,7 +16,7 @@ As of Protocol Designer 8.5.0, Protocol Designer *only* exports Python protocol 
 !!! warning
     Liquid class settings are available to optimize your liquid handling steps. When you import an existing protocol in Protocol Designer 8.5.0 or later: 
     
-    - custom settings like blowout locations or delay positions may be erased. 
+    - custom settings like blowout locations or delay positions are removed. 
     - any steps with errors won't be exported in your new protocol. 
 
     Be sure to enter new positions for your advanced settings. We always recommend fixing all errors before exporting any Protocol Designer protocol. 
