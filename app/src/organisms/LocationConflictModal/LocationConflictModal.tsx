@@ -131,11 +131,11 @@ export const LocationConflictModal = (
     ) {
       return getFixtureDisplayName(t as TFunction, MAGNETIC_BLOCK_V1_FIXTURE)
     } else if (
-      (requiredFixtureId === SINGLE_RIGHT_SLOT_FIXTURE &&
+      requiredFixtureId === SINGLE_RIGHT_SLOT_FIXTURE &&
+      (deckConfigurationAtLocationFixtureId ===
+        FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE ||
         deckConfigurationAtLocationFixtureId ===
-          FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE) ||
-      deckConfigurationAtLocationFixtureId ===
-        FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE
+          FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE)
     ) {
       return getFixtureDisplayName(
         t as TFunction,
