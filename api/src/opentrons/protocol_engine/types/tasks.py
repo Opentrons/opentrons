@@ -6,13 +6,25 @@ import asyncio
 
 
 @dataclass
-class Task:
-    """A task representation."""
+class _BaseTask:
+    """A base task representation."""
 
     id: str
     createdAt: datetime
+
+
+@dataclass
+class Task(_BaseTask):
+    """A task representation."""
+
     asyncioTask: asyncio.Task[None]
-    finishedAt: datetime | None
+
+
+@dataclass
+class FinishedTask(_BaseTask):
+    """A finished task representation."""
+
+    finishedAt: datetime
     error: ErrorOccurrence | None
 
 

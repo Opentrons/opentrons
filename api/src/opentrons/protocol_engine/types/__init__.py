@@ -148,7 +148,7 @@ from .labware_movement import LabwareMovementStrategy, LabwareMovementOffsetData
 from .tip import TipGeometry, TipRackWellState
 from .hardware_passthrough import MovementAxis, MotorAxis
 from .util import Vec3f, Dimensions
-from .tasks import Task, TaskSummary
+from .tasks import Task, TaskSummary, FinishedTask
 
 __all__ = [
     # Runtime parameters
@@ -314,4 +314,5 @@ __all__ = [
     # Tasks
     "Task",
     "TaskSummary",
+    "FinishedTask",
 ]

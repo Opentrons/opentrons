@@ -1,9 +1,13 @@
 """Tests for TaskState+TaskStore+TaskView trifecta."""
 import pytest
 from opentrons.protocol_engine.state.tasks import TaskStore, TaskView
-from opentrons.protocol_engine.types import Task
+from opentrons.protocol_engine.types import Task, FinishedTask
 from datetime import datetime
 import asyncio
+from opentrons.protocol_engine.actions.actions import (
+    StartTaskAction,
+    FinishTaskAction,
+)
 
 
 @pytest.fixture
@@ -12,27 +16,50 @@ def subject() -> TaskStore:
     return TaskStore()
 
 
-async def test_get(subject: TaskStore) -> None:
-    """It should get a task by ID."""
+async def test_get_current(subject: TaskStore) -> None:
+    """It should get a current task by ID."""
     task_id = "task-123"
     timestamp = datetime.now()
     asyncio_task = asyncio.create_task(asyncio.sleep(0))
-    subject._state.tasks_by_id[task_id] = Task(
+    subject._state.current_tasks_by_id[task_id] = Task(
         id=task_id,
         createdAt=timestamp,
-        finishedAt=None,
         asyncioTask=asyncio_task,
-        error=None,
     )
 
     view = TaskView(subject._state)
-    result = view.get(task_id)
+    result = view.get_current(task_id)
 
+    assert isinstance(result, Task)
     assert result.id == task_id
     assert result.createdAt == timestamp
     assert result.asyncioTask is asyncio_task
-    assert result.finishedAt is None
-    assert result.error is None
+    assert not hasattr(result, "finishedAt")
+    assert not hasattr(result, "error")
+    await asyncio_task
+
+
+async def test_get_finished(subject: TaskStore) -> None:
+    """It should get a finished task by ID."""
+    task_id = "task-123"
+    timestamp = datetime.now()
+    timestamp2 = datetime.now()
+    error = None
+    asyncio_task = asyncio.create_task(asyncio.sleep(0))
+
+    subject._state.finished_tasks_by_id[task_id] = FinishedTask(
+        id=task_id, createdAt=timestamp, finishedAt=timestamp2, error=error
+    )
+
+    view = TaskView(subject._state)
+    result = view.get_finished(task_id)
+
+    assert isinstance(result, FinishedTask)
+    assert result.id == task_id
+    assert result.createdAt == timestamp
+    assert not hasattr(result, "asyncioTask")
+    assert result.finishedAt == timestamp2
+    assert result.error == error
     await asyncio_task
 
 
@@ -40,29 +67,35 @@ async def test_get_summary(subject: TaskStore) -> None:
     """It should get a summary of all tasks."""
     task_id_1 = "task-123"
     task_id_2 = "task-456"
+    task_id_3 = "task-789"
     timestamp_1 = datetime.now()
     timestamp_2 = datetime.now()
+    timestamp_3 = datetime.now()
+    timestamp_4 = datetime.now()
     asyncio_task_1 = asyncio.create_task(asyncio.sleep(0))
     asyncio_task_2 = asyncio.create_task(asyncio.sleep(0))
-    subject._state.tasks_by_id[task_id_1] = Task(
+
+    subject._state.current_tasks_by_id[task_id_1] = Task(
         id=task_id_1,
         createdAt=timestamp_1,
-        finishedAt=None,
         asyncioTask=asyncio_task_1,
-        error=None,
     )
-    subject._state.tasks_by_id[task_id_2] = Task(
+    subject._state.current_tasks_by_id[task_id_2] = Task(
         id=task_id_2,
         createdAt=timestamp_2,
-        finishedAt=None,
         asyncioTask=asyncio_task_2,
+    )
+    subject._state.finished_tasks_by_id[task_id_3] = FinishedTask(
+        id=task_id_1,
+        createdAt=timestamp_3,
+        finishedAt=timestamp_4,
         error=None,
     )
 
     view = TaskView(subject._state)
     summary = view.get_summary()
 
-    assert len(summary) == 2
+    assert len(summary) == 3
     assert summary[0].id == task_id_1
     assert summary[0].createdAt == timestamp_1
     assert summary[0].finishedAt is None
@@ -72,4 +105,61 @@ async def test_get_summary(subject: TaskStore) -> None:
     assert summary[1].createdAt == timestamp_2
     assert summary[1].finishedAt is None
     assert summary[1].error is None
+
+    assert summary[2].id == task_id_3
+    assert summary[2].createdAt == timestamp_3
+    assert summary[2].finishedAt is timestamp_4
+    assert summary[2].error is None
+
     await asyncio.gather(asyncio_task_1, asyncio_task_2)
+
+
+async def test_handle_start_task_action(subject: TaskStore) -> None:
+    """It should store data about a start task action."""
+    timestamp_1 = datetime.now()
+    task_id_1 = "task123"
+    asyncio_task_1 = asyncio.create_task(asyncio.sleep(0))
+    await asyncio.gather(asyncio_task_1)
+
+    action_started = StartTaskAction(
+        task=Task(
+            id=task_id_1,
+            createdAt=timestamp_1,
+            asyncioTask=asyncio_task_1,
+        )
+    )
+    subject.handle_action(action_started)
+    task = subject._state.current_tasks_by_id[task_id_1]
+    assert task.id == task_id_1
+    assert task.createdAt == timestamp_1
+    assert task.asyncioTask == asyncio_task_1
+
+
+async def test_handle_finish_task_action(subject: TaskStore) -> None:
+    """It should store data about a finish task action."""
+    timestamp_1 = datetime.now()
+    timestamp_2 = datetime.now()
+    task_id_1 = "task123"
+    asyncio_task_1 = asyncio.create_task(asyncio.sleep(0))
+    await asyncio.gather(asyncio_task_1)
+
+    action_started = StartTaskAction(
+        task=Task(
+            id=task_id_1,
+            createdAt=timestamp_1,
+            asyncioTask=asyncio_task_1,
+        )
+    )
+    subject.handle_action(action_started)
+    assert task_id_1 in subject._state.current_tasks_by_id
+    action_finished = FinishTaskAction(
+        task_id=task_id_1, finished_at=timestamp_2, error=None
+    )
+    subject.handle_action(action_finished)
+    task_finished = subject._state.finished_tasks_by_id[task_id_1]
+    assert task_finished.id == task_id_1
+    assert task_finished.createdAt == timestamp_1
+    assert task_finished.finishedAt == timestamp_2
+    assert task_finished.error is None
+    assert not hasattr(task_finished, "asyncioTask")
+    assert task_id_1 not in subject._state.current_tasks_by_id
