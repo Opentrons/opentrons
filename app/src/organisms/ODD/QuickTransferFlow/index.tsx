@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
 import {
-  POSITION_STICKY,
+  // POSITION_STICKY,
   StepMeter,
   useConditionalConfirm,
 } from '@opentrons/components'
