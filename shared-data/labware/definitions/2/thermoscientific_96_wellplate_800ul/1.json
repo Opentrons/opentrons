@@ -1006,7 +1006,7 @@
     "isMagneticModuleCompatible": false,
     "loadName": "thermoscientific_96_wellplate_800ul"
   },
-  "namespace": "opentrons",
+  "namespace": "custom_beta",
   "version": 1,
   "schemaVersion": 2,
   "cornerOffsetFromSlot": {

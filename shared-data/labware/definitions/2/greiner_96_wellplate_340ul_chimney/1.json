@@ -1006,7 +1006,7 @@
     "isMagneticModuleCompatible": false,
     "loadName": "greiner_96_wellplate_340ul_chimney"
   },
-  "namespace": "custom_beta ",
+  "namespace": "custom_beta",
   "version": 1,
   "schemaVersion": 2,
   "cornerOffsetFromSlot": {
