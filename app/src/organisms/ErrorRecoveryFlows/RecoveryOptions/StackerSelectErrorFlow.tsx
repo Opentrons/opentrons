@@ -57,9 +57,11 @@ export function StackerHopperOrShuttleEmptyOptions(
     getRecoveryOptionCopy,
     isOnDevice,
     currentRecoveryOptionUtils,
+    recoveryCommands,
   } = props
-  const { proceedToRouteAndStep } = routeUpdateActions
+  const { proceedToRouteAndStep, handleMotionRouting } = routeUpdateActions
   const { setSelectedRecoveryOption } = currentRecoveryOptionUtils
+  const { homeShuttle } = recoveryCommands
   const { t } = useTranslation('error_recovery')
 
   const [showErrorOptions, setShowErrorOptions] = useState<boolean>(true)
@@ -70,14 +72,23 @@ export function StackerHopperOrShuttleEmptyOptions(
     undefined
   )
 
-  const handlePrimaryClick = (): void => {
+  const handlePrimaryClick = (): Promise<void> => {
     if (showErrorOptions) {
       const options = getRecoveryOptions(selectedError)
       setSelectedRoute(options[0])
       setShowErrorOptions(false)
+      return Promise.resolve()
     } else if (selectedRoute != null) {
       setSelectedRecoveryOption(selectedRoute)
-      void proceedToRouteAndStep(selectedRoute)
+      return handleMotionRouting(true).then(() => {
+        void homeShuttle().finally(() => {
+          void handleMotionRouting(false).then(() => {
+            void proceedToRouteAndStep(selectedRoute)
+          })
+        })
+      })
+    } else {
+      return Promise.resolve()
     }
   }
 
