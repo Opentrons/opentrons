@@ -279,6 +279,14 @@ from .create_timer import (
     CreateTimerCommandType,
 )
 
+from .wait_for_tasks import (
+    WaitForTasks,
+    WaitForTasksCreate,
+    WaitForTasksParams,
+    WaitForTasksResult,
+    WaitForTasksCommandType,
+)
+
 from .pick_up_tip import (
     PickUpTip,
     PickUpTipParams,
@@ -768,4 +776,10 @@ __all__ = [
     "PressureDispenseCreate",
     "PressureDispenseResult",
     "PressureDispenseCommandType",
+    # wait for tasks command bundle
+    "WaitForTasks",
+    "WaitForTasksCreate",
+    "WaitForTasksParams",
+    "WaitForTasksResult",
+    "WaitForTasksCommandType",
 ]
