@@ -84,6 +84,8 @@ def _setup(
     Labware,
     int,
     str,
+    List[Labware],
+    InstrumentContext
 ]:
     global DIAL_PORT, RUN_ID, FILE_NAME, LABWARE 
     labware_type = LABWARE  
@@ -161,6 +163,8 @@ def _setup(
         dial,
         number_of_trials,
         labware_type,
+        liq_tip_racks,
+        right_mount
     )
 
 
@@ -246,6 +250,8 @@ def aspirate_dispense_measure(
     probe_pipette: InstrumentContext,
     liq_pipette: InstrumentContext,
     expected_heights: List[float],
+    liq_tip_racks: List[Labware],
+    right_mount: InstrumentContext
 ) -> List[float]:
     """Aspirate from source, dispense into labware, measure height, record."""
     all_corrected_heights: List[float] = []
@@ -265,25 +271,39 @@ def aspirate_dispense_measure(
         dispense_vol = float(expected_vol / liq_pipette.channels)
 
         expected_height = expected_heights[i]
-        liq_pipette.flow_rate.dispense = min(max(dispense_vol / 10, 100), 25)
+
         liq_pipette.flow_rate.blow_out = 1000
+    
         if len(list(labware.wells_by_name().keys())) <= 96:
-            dispense_loc = labware[well].bottom(z=expected_height + 8)
-            air_gap = 15.0
+            dispense_offset = expected_height + 5
+            
         else:
-            dispense_loc = labware[well].bottom(z=expected_height + 1.5)
-            air_gap = 5.0
-        liq_pipette.transfer(
-            dispense_vol * 1.033,
-            src["A1"].meniscus(z=-2, target="end"),
-            dispense_loc,
-            new_tip="never",
-            return_tip=False,
-            blow_out=False,
-            blowout_location="destination well",
-            air_gap=air_gap,
-        )
-        liq_pipette.blow_out(dispense_loc.move(Point(z=3)))
+            dispense_offset = expected_height + 2.5
+
+        meniscus_z = -0.5
+
+        ethanol = ctx.get_liquid_class(name="ethanol_80")
+
+        for rack in liq_tip_racks:
+            ethanol_props = ethanol.get_for(right_mount, rack)
+            ethanol_props.aspirate.aspirate_position.position_reference = "liquid-meniscus"
+            ethanol_props.aspirate.aspirate_position.offset.z = meniscus_z
+            ethanol_props.dispense.dispense_position.position_reference = "well-bottom"
+            ethanol_props.dispense.dispense_position.offset.z = dispense_offset
+            pushout = ethanol_props.dispense.push_out_by_volume.get_for_volume(dispense_vol*1.25)
+            ethanol_props.dispense.push_out_by_volume.set_for_volume(dispense_vol, pushout)
+
+        liq_pipette.transfer_with_liquid_class(                      
+            liquid_class=ethanol,
+            volume=dispense_vol,
+            source=src["A1"],
+            dest=labware[well],
+            new_tip='never',
+            return_tip=False
+            )
+        liq_pipette.touch_tip()
+        liq_pipette.blow_out(labware[well].bottom(z=dispense_offset + 5))
+        
 
         height = _get_height_of_liquid_in_well(
             probe_pipette, labware[well], ctx.is_simulating()
@@ -315,6 +335,8 @@ def run(ctx: ProtocolContext) -> None:
         dial,
         number_of_trials,
         labware_type,
+        liq_tip_racks,
+        right_mount
     ) = _setup(ctx)
 
     wells = [str(w).split(" ")[0] for w in labware.wells()]
@@ -339,6 +361,8 @@ def run(ctx: ProtocolContext) -> None:
         probe_pipette,
         liq_pipette,
         expected_heights,
+        liq_tip_racks,
+        right_mount
     )
 
     region_names = ["low", "middle", "high"]

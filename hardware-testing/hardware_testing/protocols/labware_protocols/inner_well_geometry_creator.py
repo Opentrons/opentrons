@@ -8,6 +8,7 @@ from opentrons.protocol_api import (
     InstrumentContext,
     Well,
     Labware,
+    LiquidClass,
 )
 from opentrons.types import Point
 from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
@@ -86,7 +87,11 @@ class SetupState:
     max_step: float
     threshold: float
     delta_tolerance: float
-
+    liquid_racks: list[Labware]
+    liquid_mount: InstrumentContext
+    liquid_tip: str
+    ethanol: LiquidClass
+    
 
 @dataclass
 class TrialResult:
@@ -210,9 +215,10 @@ def _setup(ctx: ProtocolContext) -> SetupState:
     min_step = max(max_volume * 0.01, 1)  # clamped to 5uL
     max_step = max_volume * 0.25
 
-    # liquid classing
+    # liquid 
     ethanol_liq = ctx.define_liquid("Ethanol", display_color="#FFFFC5")
     src["A1"].load_liquid(ethanol_liq, src["A1"].max_volume - 1000)
+    ethanol = ctx.get_liquid_class(name="ethanol_80")
 
     if not ctx.is_simulating() and DIAL_PORT is None:
         from hardware_testing.data import create_file_name, create_run_id
@@ -251,6 +257,10 @@ def _setup(ctx: ProtocolContext) -> SetupState:
         max_step=max_step,
         threshold=threshold,
         delta_tolerance=delta_tolerance,
+        liquid_racks=liquid_racks,
+        liquid_mount = right_mount,
+        liquid_tip = liq_tip_size,
+        ethanol = ethanol,
     )
 
 
@@ -487,13 +497,14 @@ def adaptive_volume_step(
 # Inner Well Geometry Creator
 def geometry_creator(ctx: ProtocolContext, state: SetupState) -> List[TrialResult]:
     """Run liquid dispense + measure loop and return trial results."""
-    liq_pipette, probe_pipette, labware, src, wells, max_volume = (
+    liq_pipette, probe_pipette, labware, src, wells, max_volume, ethanol = (
         state.liq_pipette,
         state.probe_pipette,
         state.labware,
         state.src,
         state.wells,
         state.max_volume,
+        state.ethanol,
     )
 
     # Initialize local state
@@ -550,9 +561,6 @@ def geometry_creator(ctx: ProtocolContext, state: SetupState) -> List[TrialResul
 
     while dispense_volume < (max_volume - margin):
 
-        drop_tips(probe_pipette, liq_pipette)
-        pick_up_tips(probe_pipette, liq_pipette)
-
         current_well = wells[step % len(wells)]
         # check if out of wells
         if step > 0 and step % len(wells) == 0:
@@ -564,30 +572,40 @@ def geometry_creator(ctx: ProtocolContext, state: SetupState) -> List[TrialResul
             else:
                 return udv_table 
 
-        tip_z_error = _get_tip_z_error(ctx, probe_pipette, state.dial)
+        drop_tips(probe_pipette, liq_pipette)
 
-        # Dispense
+        # Set Dispense Parameters 
         dispense_volume += step_volume
-        liq_pipette.flow_rate.dispense = min(max(dispense_volume / 10, 100), 25)
-        liq_pipette.flow_rate.blow_out = 1000
         if len(wells) <= 96:
-            dispense_loc = labware[current_well].bottom(z=max(corrected_height + 10, 10))
-            air_gap = 15.0
+            dispense_offset = corrected_height + state.target_height + 10
+            liq_pipette.flow_rate.blow_out = 200
         else:
-            dispense_loc = labware[current_well].bottom(z=max(corrected_height + 2.5, 3))
-            air_gap = 5.0
-        liq_pipette.transfer(
-            (dispense_volume / liq_pipette.channels) * 1.033,
-            src["A1"].meniscus(z=-2, target="end"),
-            dispense_loc,
-            new_tip="never",
-            return_tip=False,
-            blow_out=False,
-            blowout_location="destination well",
-            air_gap=air_gap,
-        )
-        liq_pipette.blow_out(dispense_loc.move(Point(z=3)))
+            dispense_offset = corrected_height + state.target_height + 5
+            liq_pipette.flow_rate.blow_out = 1000
+        meniscus_z = -0.5
+        for rack in state.liquid_racks:
+            ethanol_props = ethanol.get_for(state.liquid_mount, rack)
+            ethanol_props.aspirate.aspirate_position.position_reference = "liquid-meniscus"
+            ethanol_props.aspirate.aspirate_position.offset.z = meniscus_z
+            ethanol_props.dispense.dispense_position.position_reference = "well-bottom"
+            ethanol_props.dispense.dispense_position.offset.z = dispense_offset
+            pushout = ethanol_props.dispense.push_out_by_volume.get_for_volume(dispense_volume*1.25)
+            ethanol_props.dispense.push_out_by_volume.set_for_volume(dispense_volume, pushout)
         
+        pick_up_tips(probe_pipette, liq_pipette)
+        tip_z_error = _get_tip_z_error(ctx, probe_pipette, state.dial)
+    
+        liq_pipette.transfer_with_liquid_class(                      
+            liquid_class=ethanol,
+            volume=dispense_volume / liq_pipette.channels,
+            source=src["A1"],
+            dest=labware[current_well],
+            new_tip='never',
+            return_tip=False
+            )
+        #liq_pipette.touch_tip()
+        liq_pipette.blow_out(labware[current_well].bottom(z=dispense_offset + 5))
+
         # Measure liquid height
         height = _get_height_of_liquid_in_well(
             probe_pipette, labware[current_well], ctx.is_simulating()
