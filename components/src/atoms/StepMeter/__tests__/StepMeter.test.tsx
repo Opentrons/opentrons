@@ -6,6 +6,7 @@ import { screen } from '@testing-library/react'
 
 import { StepMeter } from '..'
 import { renderWithProviders } from '../../../testing/utils'
+import styles from '../stepmeter.module.css'
 
 import type { ComponentProps } from 'react'
 
@@ -41,7 +42,6 @@ describe('StepMeter', () => {
     expect(bar).toHaveStyle('width: 40%')
   })
 
-  //  this case should never happen
   it('renders StepMeterBar at 100% width when currentStep is above totalStep', () => {
     props = {
       ...props,
@@ -58,15 +58,24 @@ describe('StepMeter', () => {
       ...props,
       currentStep: 2,
     }
-    render(props)
-    screen.getByTestId('StepMeter_StepMeterContainer')
+    const [{ rerender }] = render(props)
+
+    props = {
+      ...props,
+      currentStep: 3,
+    }
+    rerender(<StepMeter {...props} />)
+
     const bar = screen.getByTestId('StepMeter_StepMeterBar')
-    expect(bar).toHaveStyle('transition: width 0.5s ease-in-out;')
+    expect(bar).toHaveClass(styles.step_meter_bar_animated)
 
     props = {
       ...props,
       currentStep: 1,
     }
-    expect(bar).not.toHaveStyle('transition: ;')
+    rerender(<StepMeter {...props} />)
+
+    const barAfterBackward = screen.getByTestId('StepMeter_StepMeterBar')
+    expect(barAfterBackward).not.toHaveClass(styles.step_meter_bar_animated)
   })
 })
