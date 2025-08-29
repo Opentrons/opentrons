@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import { LegacyStyledText, StepMeter, StyledText } from '../../atoms'
@@ -30,6 +29,7 @@ const EXIT_BUTTON_STYLE = css`
   &:hover {
     color: ${COLORS.grey50};
   }
+
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     margin-right: 1.75rem;
     font-size: ${TYPOGRAPHY.fontSize22};
@@ -44,6 +44,7 @@ const EXIT_BUTTON_STYLE = css`
 `
 const BOX_STYLE = css`
   background-color: ${COLORS.white};
+
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     border-radius: ${BORDERS.borderRadius16};
   }
@@ -52,6 +53,7 @@ const HEADER_CONTAINER_STYLE = css`
   flex-direction: ${DIRECTION_ROW};
   justify-content: ${JUSTIFY_SPACE_BETWEEN};
   padding: ${SPACING.spacing16} ${SPACING.spacing32};
+
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     padding: 1.75rem ${SPACING.spacing32};
     border-radius: ${BORDERS.borderRadius16};
@@ -61,6 +63,7 @@ const HEADER_CONTAINER_STYLE = css`
 const STEP_TEXT_STYLE = css`
   ${TYPOGRAPHY.pSemiBold}
   color: ${COLORS.grey60};
+
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-size: 1.375rem;
     margin-left: ${SPACING.spacing16};
@@ -77,7 +80,6 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
     exitDisabled,
     exitButtonCopy,
   } = props
-  const { t } = useTranslation('shared')
 
   return (
     <Box css={BOX_STYLE}>
