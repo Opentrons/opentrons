@@ -22,7 +22,7 @@ packages = ["."]
 line-length = 140
 # Like Black
 indent-width = 4
-target-version = "py313"
+target-version = "py310"
 exclude = ["files"]
 src = ["*.py", "test"]
 
