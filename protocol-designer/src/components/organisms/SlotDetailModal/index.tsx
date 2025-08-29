@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
@@ -17,9 +17,9 @@ import {
   RobotWorkSpace,
   SPACING,
   StyledText,
+  Tag,
 } from '@opentrons/components'
 import {
-  getFullStackFromLabwares,
   getLiquidIdsOnLabware,
   getSlotInLocationStack,
   getVolumesPerLiquid,
@@ -31,6 +31,7 @@ import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labw
 import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
 import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
 
+import { LabwareButtonBasket } from '../../molecules'
 import { WellTooltip } from '../Labware/WellTooltip'
 import { getMainPagePortalEl } from '../Portal'
 import { LiquidCardList } from './LiquidCardList'
@@ -43,15 +44,17 @@ export interface WellContentsByNumber {
 
 interface SlotDetailModalProps {
   closeModal: () => void
-  // slotId or labwareId for off-deck labware
-  itemId: string
+  stackOfLabware: string[]
 }
 
 export const SlotDetailModal = (
   props: SlotDetailModalProps
 ): JSX.Element | null => {
-  const { closeModal, itemId } = props
+  const { closeModal, stackOfLabware } = props
   const { t } = useTranslation('protocol_steps')
+  const [selectedLabware, setSelectedLabware] = useState<string>(
+    stackOfLabware[0]
+  )
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
   const nickNames = useSelector(getLabwareNicknamesById)
   const allWellContentsForActiveItem = useSelector(
@@ -63,27 +66,42 @@ export const SlotDetailModal = (
     selectors.allIngredientGroupFields
   )
   const { labware } = activeDeckSetup
-  const fullStackFromLabwares =
-    labware[itemId] != null
-      ? labware[itemId].stack
-      : getFullStackFromLabwares(labware, itemId)
-  const labwareId = fullStackFromLabwares[0]
-  const labwareOnDeck = labware[labwareId]
+  const labwareOnDeck = labware[selectedLabware]
   const wellContents =
     allWellContentsForActiveItem != null
-      ? allWellContentsForActiveItem[labwareId]
+      ? allWellContentsForActiveItem[selectedLabware]
       : null
   const allWellFill = wellFillFromWellContents(
     wellContents,
     liquidDisplayColors
   )
+  const ingedInputs = Object.values(allIngredientGroupFields)
+  const wellFill = Object.values(allWellFill)
   const individualIds = getLiquidIdsOnLabware(wellContents)
 
   const volumesPerLiquid = getVolumesPerLiquid(wellContents, individualIds)
 
   const [selectedLiquidId, setSelectedLiquidId] = useState<string | undefined>(
-    individualIds[0] // default to the first liquidId in this labware
+    individualIds.length > 0 ? individualIds[0] : undefined
   )
+
+  //  NOTE: this is used for setting the selected liquid when selecting from
+  //  a lid to a labware with liquids in the stack.
+  useEffect(() => {
+    if (wellFill.length > 0) {
+      const match = ingedInputs.find(ingred =>
+        wellFill.includes(ingred.displayColor)
+      )
+      if (match) {
+        setSelectedLiquidId(match.liquidGroupId)
+      } else if (individualIds.length > 0) {
+        setSelectedLiquidId(individualIds[0])
+      }
+    } else {
+      setSelectedLiquidId(undefined)
+    }
+  }, [selectedLabware, wellFill, ingedInputs])
+
   const wellContentsWithLiquidId: WellGroup =
     wellContents != null && selectedLiquidId != null
       ? Object.values(wellContents).reduce((acc: WellGroup, wellContents) => {
@@ -105,6 +123,7 @@ export const SlotDetailModal = (
       />
     </Flex>
   )
+
   return createPortal(
     <Modal
       title={modalTitle}
@@ -112,15 +131,31 @@ export const SlotDetailModal = (
       onClose={closeModal}
       closeOnOutsideClick
       childrenPadding={0}
-      width={selectedLiquidId != null ? '47rem' : '31.25rem'}
+      width="47rem"
       overflowY="hidden"
+      headerTagElement={
+        stackOfLabware.length > 1 ? (
+          <Tag
+            text={t('total_stacked', { amount: stackOfLabware.length })}
+            type="default"
+          />
+        ) : undefined
+      }
     >
       <Box
         backgroundColor={COLORS.grey10}
         padding={SPACING.spacing16}
-        height={selectedLiquidId != null ? '28rem' : '25rem'}
+        height="28rem"
       >
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing24}>
+          {stackOfLabware.length > 1 ? (
+            <LabwareButtonBasket
+              stackOfLabware={stackOfLabware}
+              selectedLabware={selectedLabware}
+              labware={labware}
+              setSelectedLabware={setSelectedLabware}
+            />
+          ) : null}
           <Flex
             flexDirection={DIRECTION_COLUMN}
             height="24rem"
@@ -131,7 +166,7 @@ export const SlotDetailModal = (
           >
             <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_CENTER}>
               <StyledText desktopStyle="bodyDefaultRegular">
-                {nickNames[labwareId]}
+                {nickNames[selectedLabware]}
               </StyledText>
             </Flex>
             <RobotWorkSpace
