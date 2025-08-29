@@ -53,7 +53,7 @@ class WaitForTasksImplementation(
     async def execute(
         self, params: WaitForTasksParams
     ) -> SuccessData[WaitForTasksResult]:
-        """No operation taken other than capturing message in command."""
+        """Checks for existance of task id and then asynchronously waits for the valid, specified tasks to finish."""
         # Raises the exception if we don't have a valid task id.
         for task_id in params.task_ids:
             _ = self._state_view.tasks.get(task_id)

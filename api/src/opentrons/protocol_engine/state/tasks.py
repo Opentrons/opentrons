@@ -133,8 +133,7 @@ class TaskView:
         """Return a list of failed task ids of the ones that were passed."""
         failed_tasks: list[str] = []
         for task_id in task_ids:
-            if task_id in self._state.finished_tasks_by_id:
-                finished_task = self._state.finished_tasks_by_id[task_id]
-                if finished_task.error:
-                    failed_tasks.append(task_id)
+            task = self._state.finished_tasks_by_id.get(task_id, None)
+            if task and task.error:
+                failed_tasks.append(task_id)
         return failed_tasks

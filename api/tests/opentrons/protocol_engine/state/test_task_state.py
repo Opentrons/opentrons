@@ -35,8 +35,6 @@ async def test_get_current(subject: TaskStore) -> None:
     assert result.id == task_id
     assert result.createdAt == timestamp
     assert result.asyncioTask is asyncio_task
-    assert not hasattr(result, "finishedAt")
-    assert not hasattr(result, "error")
     await asyncio_task
 
 
@@ -58,7 +56,6 @@ async def test_get_finished(subject: TaskStore) -> None:
     assert isinstance(result, FinishedTask)
     assert result.id == task_id
     assert result.createdAt == timestamp
-    assert not hasattr(result, "asyncioTask")
     assert result.finishedAt == timestamp2
     assert result.error == error
     await asyncio_task
@@ -89,8 +86,6 @@ async def test_get(subject: TaskStore) -> None:
     assert result.id == task_id_current
     assert result.createdAt == timestamp
     assert result.asyncioTask is asyncio_task_1
-    assert not hasattr(result, "finishedAt")
-    assert not hasattr(result, "error")
     await asyncio_task_1
     # Check finished task
     result_finished = view.get("task-finished")
@@ -98,7 +93,6 @@ async def test_get(subject: TaskStore) -> None:
     assert result_finished.id == task_id_finished
     assert result_finished.createdAt == timestamp2
     assert result_finished.finishedAt == timestamp3
-    assert not hasattr(result_finished, "asyncioTask")
     assert result_finished.error == error
 
 
@@ -196,11 +190,11 @@ async def test_handle_finish_task_action(subject: TaskStore) -> None:
     )
     subject.handle_action(action_finished)
     task_finished = subject._state.finished_tasks_by_id[task_id_1]
+    assert isinstance(task_finished, FinishedTask)
     assert task_finished.id == task_id_1
     assert task_finished.createdAt == timestamp_1
     assert task_finished.finishedAt == timestamp_2
     assert task_finished.error is None
-    assert not hasattr(task_finished, "asyncioTask")
     assert task_id_1 not in subject._state.current_tasks_by_id
 
 

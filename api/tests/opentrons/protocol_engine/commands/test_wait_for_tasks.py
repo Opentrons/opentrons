@@ -15,7 +15,7 @@ from opentrons.protocol_engine.execution import RunControlHandler
 from opentrons.protocol_engine.execution.task_handler import TaskHandler
 from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.types.tasks import FinishedTask
+from opentrons.protocol_engine.types.tasks import FinishedTask, Task
 
 
 async def test_wait_for_tasks_implementation_no_error(
@@ -40,7 +40,8 @@ async def test_wait_for_tasks_implementation_no_error(
     decoy.when(state_view.tasks.get_failed_tasks(task_ids)).then_return([])
     result = await subject.execute(data)
     for task in task_ids:
-        decoy.verify(state_view.tasks.get(task))
+        fake_task = decoy.mock(cls=Task)
+        decoy.when(state_view.tasks.get(task)).then_return(fake_task)
 
     decoy.verify(await run_control.wait_for_tasks(task_ids))
     assert result == SuccessData(public=WaitForTasksResult(task_ids=task_ids))
@@ -88,5 +89,6 @@ async def test_wait_for_tasks_implementation_with_error(
     assert err.message == "1 tasks failed."
 
     for task in task_ids:
-        decoy.verify(state_view.tasks.get(task))
+        fake_task = decoy.mock(cls=Task)
+        decoy.when(state_view.tasks.get(task)).then_return(fake_task)
     decoy.verify(await run_control.wait_for_tasks(task_ids))

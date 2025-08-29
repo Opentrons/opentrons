@@ -31,7 +31,7 @@ class CreateTimerResult(BaseModel):
 
     task_id: str = Field(..., description="The id of the timer task")
     time: float = Field(
-        ..., description="The time before the timer should elapse in seconds"
+        ..., description="The minimum time before the timer should elapse in seconds"
     )
 
 
