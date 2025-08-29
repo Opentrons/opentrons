@@ -217,8 +217,9 @@ def heater_shaker_deactivate_heater() -> command_types.HeaterShakerDeactivateHea
 
 # FLex Stacker
 
+
 def flex_stacker_set_stored_labware(
-    self,
+    self: Any,
     load_name: str,
     namespace: str | None = None,
     version: int | None = None,
