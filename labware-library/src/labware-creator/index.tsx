@@ -15,7 +15,6 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   ModalShell,
   PrimaryButton,
-  WizardHeader,
 } from '@opentrons/components'
 import { getAllDefinitions, labwareSchemaV2 } from '@opentrons/shared-data'
 
@@ -60,6 +59,7 @@ import { labwareFormSchema } from './labwareFormSchema'
 import styles from './styles.module.css'
 import { getIsXYGeometryChanged } from './utils/getIsXYGeometryChanged'
 import { makeAutofillOnChange } from './utils/makeAutofillOnChange'
+import { WizardHeader } from './WizardHeader'
 
 import type { FormikErrors } from 'formik'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
