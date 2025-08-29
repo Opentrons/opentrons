@@ -2,7 +2,7 @@
 title: "HEPA/UV Module: Product Specifications"
 ---
 
-![Labeled HEPA/UV Module diagram](images/hepa-features-labeled.svg)
+![Labeled HEPA/UV Module diagram](images/hepa-features-labeled.png)
 
 ## Included parts
 
@@ -86,10 +86,6 @@ The power consumption specifications are measured with the UV lights and fan on.
 
 ## Door Protection Rollers
 
-With early model HEPA/UV Modules, fully opening the robot's front door could cause it to scrape against the top of the module. The edge of the HEPA/UV Module could scratch and leave scuff marks on the surface of the door.
+With early model HEPA/UV Modules, fully opening the robot's front door could cause it to scrape against the top of the module. HEPA modules manufactured on or after July 2025 include three rollers mounted along its top-front edge. These rollers help prevent the HEPA module from damaging the front door when you open it.
 
-![Module without door rollers](images/hepa-without-rollers.png)
-
-HEPA modules manufactured on or after July 2025 include three rollers mounted along its top-front edge. These rollers prevent the HEPA module from damaging the front door when you open it.
-
-![Module with door rollers](images/hepa-with-rollers.png)
+![Modules without and with rollers](images/hepa-comparison.png)
