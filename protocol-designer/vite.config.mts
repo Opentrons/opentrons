@@ -62,7 +62,7 @@ export default defineConfig(
               mode === 'production' ? ['./dist/**/*.js.map'] : undefined,
           },
         }),
-        analyzer(),
+        ...(process.env.ANALYZE_DEBUG === 'true' ? [analyzer()] : []),
       ],
       optimizeDeps: {
         esbuildOptions: {
