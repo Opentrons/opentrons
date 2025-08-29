@@ -1,3 +1,11 @@
+<style>
+.no-min-width td {
+  min-width: none;
+  padding-left: 0.5 em;
+  padding-right: 0.5 em;
+}
+</style>
+
 # Deck Slots
 
 Deck slots are where you place hardware items on the deck surface of your Opentrons robot. In the API, you load the corresponding items into your protocol with methods like [`ProtocolContext.load_labware`][opentrons.protocol_api.ProtocolContext.load_labware], [`ProtocolContext.load_module`][opentrons.protocol_api.ProtocolContext.load_module], or [`ProtocolContext.load_trash_bin`][opentrons.protocol_api.ProtocolContext.load_trash_bin]. When you call these methods, you need to specify which slot to load the item in.
@@ -39,10 +47,38 @@ Both of these commands would require you to load the well plate in the back left
 
 The correspondence between deck labels is based on the relative locations of the slots. The full list of slot equivalencies is as follows:
 
-| Flex | A1 | A2 | A3 | B1 | B2 | B3 | C1 | C2 | C3 | D1 | D2 | D3 |
-|------|----|----|----|----|----|----|----|----|----|----|----|----|
-| OT-2 | 10 | 11 | Trash | 7 | 8 | 9 | 4 | 5 | 6 | 1 | 2 | 3 |
-
+<table>
+  <tr class="no-min-width">
+    <th>Flex</th>
+    <td>A1</td>
+    <td>A2</td>
+    <td>A3</td>
+    <td>B1</td>
+    <td>B2</td>
+    <td>B3</td>
+    <td>C1</td>
+    <td>C2</td>
+    <td>C3</td>
+    <td>D1</td>
+    <td>D2</td>
+    <td>D3</td>
+  </tr>
+  <tr class="no-min-width">
+    <th>OT-2</th>
+    <td>10</td>
+    <td>11</td>
+    <td>Trash</td>
+    <td>7</td>
+    <td>8</td>
+    <td>9</td>
+    <td>4</td>
+    <td>5</td>
+    <td>6</td>
+    <td>1</td>
+    <td>2</td>
+    <td>3</td>
+  </tr>
+</table>
 Slots A4, B4, C4, and D4 on Flex have no equivalent on OT-2.
 
 ## Deck Configuration
