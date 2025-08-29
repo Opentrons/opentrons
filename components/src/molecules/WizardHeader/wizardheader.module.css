@@ -12,7 +12,7 @@
 
 @media (min-width: 600px) and (max-height: 1024px) {
   .exit_button {
-    margin-right: var(--spacing-44); /* 1.75rem */
+    margin-right: 1.75rem;
     font-size: var(--font-size-22);
     font-weight: var(--font-weight-bold);
   }
@@ -45,7 +45,7 @@
 
 @media (min-width: 600px) and (max-height: 1024px) {
   .header_container {
-    padding: var(--spacing-44) var(--spacing-32);
+    padding: 1.75rem var(--spacing-32);
     border-radius: var(--border-radius-16);
   }
 }
