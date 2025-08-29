@@ -11,7 +11,9 @@ from opentrons.protocols.api_support.types import APIVersion
 DefaultLabwareVersions: TypeAlias = dict[APIVersion, dict[str, int]]
 
 
-DEFAULT_LABWARE_VERSIONS_FILE = Path("labware") / "defaultLabwareVersions" / "default_labware_versions.json"
+DEFAULT_LABWARE_VERSIONS_FILE = (
+    Path("labware") / "defaultLabwareVersions" / "default_labware_versions.json"
+)
 
 
 @functools.cache

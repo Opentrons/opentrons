@@ -21,7 +21,7 @@ _TEST_DEFAULT_LABWARE_VERSIONS = {
     },
     APIVersion(1, 120): {
         "well_plate_a": 5,
-    "well_plate_b": 6,
+        "well_plate_b": 6,
     },
 }
 
@@ -37,6 +37,7 @@ def _get_available_load_names_and_highest_versions() -> list[tuple[str, int]]:
             ):
                 highest_available_version_by_load_name[load_name] = version
     return sorted(highest_available_version_by_load_name.items())
+
 
 def _highest_possible_default_version(load_name: str) -> int:
     """Return the highest default version for a labware across all api levels"""
@@ -91,6 +92,7 @@ def test_get_standard_labware_default_version(
         )
         == expected_labware_version
     )
+
 
 @pytest.mark.parametrize(
     ("load_name", "highest_available_version"),
