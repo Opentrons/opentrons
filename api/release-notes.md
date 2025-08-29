@@ -22,6 +22,7 @@ Welcome to the v8.6.0 release of the Opentrons robot software! This release adds
 
 - The Opentrons Flex 96-Channel Pipette (1–200 μL) does not yet support liquid classes. Use legacy liquid-handling commands from the Python Protocol API.
 - The Flex Gripper can't currently sense if it has failed to pick up a labware lid.
+- Certain partial tip pickup actions adjacent to a Flex Stacker raise an error, even though no collision would occur.
 - Certain robot motor control commands don't appear properly in the run log. The commands are still functional.
 
 ---
