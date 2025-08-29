@@ -4,7 +4,7 @@ import type { Meta, Story } from '@storybook/react'
 import type * as React from 'react'
 
 export default {
-  title: 'App/Atoms/StepMeter',
+  title: 'Helix/Atoms/StepMeter',
   component: StepMeter,
 } as Meta
 

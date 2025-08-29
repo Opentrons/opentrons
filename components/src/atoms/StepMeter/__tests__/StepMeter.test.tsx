@@ -1,13 +1,15 @@
-import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it } from 'vitest'
 
-import { StepMeter } from '../'
-import { COLORS } from '../../../helix-design-system'
+import '@testing-library/jest-dom/vitest'
+
+import { screen } from '@testing-library/react'
+
+import { StepMeter } from '..'
 import { renderWithProviders } from '../../../testing/utils'
 
 import type { ComponentProps } from 'react'
 
-const renderer = (props: ComponentProps<typeof StepMeter>) => {
+const render = (props: ComponentProps<typeof StepMeter>) => {
   return renderWithProviders(<StepMeter {...props} />)
 }
 
@@ -16,30 +18,55 @@ describe('StepMeter', () => {
 
   beforeEach(() => {
     props = {
-      totalSteps: 10,
-      currentStep: 5,
+      totalSteps: 5,
+      currentStep: 0,
     }
   })
 
-  it('should render StepMeterContainer', () => {
-    renderer(props)
-
-    const stepMeterContainer = screen.getByTestId(
-      'StepMeter_StepMeterContainer'
-    )
-    expect(stepMeterContainer).toHaveStyle({
-      height: '0.25rem',
-      backgroundColor: COLORS.grey30,
-    })
+  it('renders StepMeterBar at 0% width', () => {
+    render(props)
+    screen.getByTestId('StepMeter_StepMeterContainer')
+    const bar = screen.getByTestId('StepMeter_StepMeterBar')
+    expect(bar).toHaveStyle('width: 0%')
   })
-  it('should render StepMeterBar 50%', () => {
-    renderer(props)
 
-    const stepMeterBar = screen.getByTestId('StepMeter_StepMeterBar')
-    expect(stepMeterBar).toHaveStyle({
-      width: '50%',
-      height: '100%',
-      backgroundColor: COLORS.blue50,
-    })
+  it('renders StepMeterBar at 40% width', () => {
+    props = {
+      ...props,
+      currentStep: 2,
+    }
+    render(props)
+    screen.getByTestId('StepMeter_StepMeterContainer')
+    const bar = screen.getByTestId('StepMeter_StepMeterBar')
+    expect(bar).toHaveStyle('width: 40%')
+  })
+
+  //  this case should never happen
+  it('renders StepMeterBar at 100% width when currentStep is above totalStep', () => {
+    props = {
+      ...props,
+      currentStep: 6,
+    }
+    render(props)
+    screen.getByTestId('StepMeter_StepMeterContainer')
+    const bar = screen.getByTestId('StepMeter_StepMeterBar')
+    expect(bar).toHaveStyle('width: 100%')
+  })
+
+  it('should transition with style when progressing forward and no style if progressing backward', () => {
+    props = {
+      ...props,
+      currentStep: 2,
+    }
+    render(props)
+    screen.getByTestId('StepMeter_StepMeterContainer')
+    const bar = screen.getByTestId('StepMeter_StepMeterBar')
+    expect(bar).toHaveStyle('transition: width 0.5s ease-in-out;')
+
+    props = {
+      ...props,
+      currentStep: 1,
+    }
+    expect(bar).not.toHaveStyle('transition: ;')
   })
 })

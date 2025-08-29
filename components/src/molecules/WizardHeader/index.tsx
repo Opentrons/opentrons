@@ -1,23 +1,15 @@
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
+import { LegacyStyledText, StepMeter, StyledText } from '../../atoms'
+import { BORDERS, COLORS } from '../../helix-design-system'
+import { Box, Btn, Flex } from '../../primitives'
 import {
   ALIGN_CENTER,
-  BORDERS,
-  Box,
-  Btn,
-  COLORS,
   DIRECTION_ROW,
-  Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
-  RESPONSIVENESS,
-  SPACING,
-  StyledText,
-  TYPOGRAPHY,
-} from '@opentrons/components'
-
-import { StepMeter } from '/app/atoms/StepMeter'
+} from '../../styles'
+import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
 interface WizardHeaderProps {
   title: string
@@ -107,14 +99,14 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
           totalSteps != null &&
           currentStep > 0 ? (
             <LegacyStyledText css={STEP_TEXT_STYLE}>
-              {t('step', { current: currentStep, max: totalSteps })}
+              {`Step ${currentStep} / ${totalSteps}`}
             </LegacyStyledText>
           ) : null}
         </Flex>
         {onExit != null ? (
           <Btn onClick={onExit} aria-label="Exit" disabled={exitDisabled}>
             <LegacyStyledText css={EXIT_BUTTON_STYLE}>
-              {exitButtonCopy ?? t('exit')}
+              {exitButtonCopy ?? 'Exit'}
             </LegacyStyledText>
           </Btn>
         ) : null}

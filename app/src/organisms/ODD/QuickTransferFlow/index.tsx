@@ -113,8 +113,8 @@ export const QuickTransferFlow = (): JSX.Element => {
             <StepMeter
               totalSteps={QUICK_TRANSFER_WIZARD_STEPS}
               currentStep={currentStep + 1}
-              position={POSITION_STICKY}
-              top="0"
+              // position={POSITION_STICKY}
+              // top="0"
             />
           ) : null}
           {contentInOrder[currentStep]}
