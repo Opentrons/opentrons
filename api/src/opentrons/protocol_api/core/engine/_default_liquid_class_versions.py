@@ -39,22 +39,18 @@ def get_liquid_class_version(
     api_version: APIVersion,
     liquid_class_name: str,
 ) -> int:
-    """Return what version of a standard labware the Protocol API should load by default.
-
-    The `default_labware_versions` param is exposed for testability and should be left
-    unspecified.
-    """
-    default_labware_versions_newest_to_oldest = sorted(
+    """Return what version of a liquid class the Protocol API should load by default."""
+    default_lc_versions_newest_to_oldest = sorted(
         DEFAULT_LIQUID_CLASS_VERSIONS.items(), key=lambda kv: kv[0], reverse=True
     )
     for (
         breakpoint_api_version,
-        breakpoint_labware_versions,
-    ) in default_labware_versions_newest_to_oldest:
+        breakpoint_liquid_class_versions,
+    ) in default_lc_versions_newest_to_oldest:
         if (
             api_version >= breakpoint_api_version
-            and liquid_class_name in breakpoint_labware_versions
+            and liquid_class_name in breakpoint_liquid_class_versions
         ):
-            return breakpoint_labware_versions[liquid_class_name]
+            return breakpoint_liquid_class_versions[liquid_class_name]
 
     return 1

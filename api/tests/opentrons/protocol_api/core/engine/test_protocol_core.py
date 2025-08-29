@@ -124,7 +124,9 @@ def patch_default_liquid_class_versions(
     decoy: Decoy, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Mock out _default_liquid_class_versions.py functions."""
-    for name, func in inspect.getmembers(_default_liquid_class_versions, inspect.isfunction):
+    for name, func in inspect.getmembers(
+        _default_liquid_class_versions, inspect.isfunction
+    ):
         monkeypatch.setattr(_default_liquid_class_versions, name, decoy.mock(func=func))
 
 
@@ -1906,7 +1908,11 @@ def test_define_liquid_class_without_version_provided(
     expected_liquid_class = LiquidClass(
         _name="water1", _display_name="water 1", _by_pipette_setting={}
     )
-    decoy.when(_default_liquid_class_versions.get_liquid_class_version(subject.api_version, "water")).then_return(987)
+    decoy.when(
+        _default_liquid_class_versions.get_liquid_class_version(
+            subject.api_version, "water"
+        )
+    ).then_return(987)
     decoy.when(liquid_classes.load_definition("water", version=987)).then_return(
         minimal_liquid_class_def1
     )
