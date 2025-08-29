@@ -4,8 +4,8 @@ import pytest
 
 from opentrons_shared_data.labware import list_definitions as list_labware_definitions
 
-from opentrons.protocol_api.core.engine._default_labware_versions import (
-    DEFAULT_LABWARE_VERSIONS,
+from opentrons_shared_data.labware._default_labware_versions import (
+    _parse_json_from_filesystem,
     KNOWN_EXCEPTIONS_FOR_TESTS,
     get_standard_labware_default_version,
 )
@@ -27,24 +27,29 @@ _TEST_DEFAULT_LABWARE_VERSIONS = {
 
 
 def _get_available_load_names_and_highest_versions() -> list[tuple[str, int]]:
+    versions_by_api = _parse_json_from_filesystem()
     highest_available_version_by_load_name: dict[str, int] = {}
-    for load_name, version, _ in list_labware_definitions():
-        if (
-            load_name not in highest_available_version_by_load_name
-            or version > highest_available_version_by_load_name[load_name]
-        ):
-            highest_available_version_by_load_name[load_name] = version
+    for labware_map in versions_by_api.values():
+        for load_name, version in labware_map.items():
+            if (
+                load_name not in highest_available_version_by_load_name
+                or version > highest_available_version_by_load_name[load_name]
+            ):
+                highest_available_version_by_load_name[load_name] = version
     return sorted(highest_available_version_by_load_name.items())
 
 
 def _highest_possible_default_version(load_name: str) -> int:
-    """For a given labware, return the highest version that will ever be loaded by default, across all apiLevels."""
-    default_versions_for_this_labware = [
-        default_versions_by_load_name[load_name]
-        for default_versions_by_load_name in DEFAULT_LABWARE_VERSIONS.values()
-        if load_name in default_versions_by_load_name
-    ]
-    return max(default_versions_for_this_labware, default=1)
+    """Return the highest default version for a labware across all api levels"""
+    versions_by_api = _parse_json_from_filesystem()
+    return max(
+        (
+            labware_map[load_name]
+            for labware_map in versions_by_api.values()
+            if load_name in labware_map
+        ),
+        default=1,
+    )
 
 
 @pytest.mark.parametrize(
