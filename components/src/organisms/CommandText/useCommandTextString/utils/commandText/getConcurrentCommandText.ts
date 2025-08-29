@@ -1,23 +1,15 @@
-import type {
-  ConcurrentRunTimeCommand,
-  CreateTimerRunTimeCommand,
-} from '@opentrons/shared-data/command'
+import type { ConcurrentRunTimeCommand } from '@opentrons/shared-data/command'
 import type { HandlesCommands } from '../types'
 
-export function getCreateTimerCommandText({
+export function getConcurrentCommandText({
   command,
   t,
-}: HandlesCommands<CreateTimerRunTimeCommand>): string {
-  const { time } = command.params
-  return t('create_timer', { seconds: time })
-}
-
-export function getConcurrentCommandText(
-  params: HandlesCommands<ConcurrentRunTimeCommand>
-): string {
-  const { command } = params
+}: HandlesCommands<ConcurrentRunTimeCommand>): string {
   switch (command.commandType) {
     case 'createTimer':
-      return getCreateTimerCommandText(params)
+      const { time } = command.params
+      return t('create_timer', { seconds: time })
+    case 'waitForTasks':
+      return t('wait_for_tasks')
   }
 }

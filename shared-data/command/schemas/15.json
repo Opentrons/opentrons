@@ -6420,6 +6420,49 @@
       "title": "WaitForResumeParams",
       "type": "object"
     },
+    "WaitForTasksCreate": {
+      "description": "WaitForTasks command request model.",
+      "properties": {
+        "commandType": {
+          "const": "waitForTasks",
+          "default": "waitForTasks",
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/WaitForTasksParams"
+        }
+      },
+      "required": ["params"],
+      "title": "WaitForTasksCreate",
+      "type": "object"
+    },
+    "WaitForTasksParams": {
+      "description": "Payload required to annotate execution with a WaitForTasks.",
+      "properties": {
+        "task_ids": {
+          "description": "The list of task ids to wait for.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Task Ids",
+          "type": "array"
+        }
+      },
+      "required": ["task_ids"],
+      "title": "WaitForTasksParams",
+      "type": "object"
+    },
     "WellLocation": {
       "description": "A relative location in reference to a well's location.",
       "properties": {
@@ -6912,7 +6955,8 @@
       "unsealPipetteFromTip": "#/$defs/UnsealPipetteFromTipCreate",
       "verifyTipPresence": "#/$defs/VerifyTipPresenceCreate",
       "waitForDuration": "#/$defs/WaitForDurationCreate",
-      "waitForResume": "#/$defs/WaitForResumeCreate"
+      "waitForResume": "#/$defs/WaitForResumeCreate",
+      "waitForTasks": "#/$defs/WaitForTasksCreate"
     },
     "propertyName": "commandType"
   },
@@ -7021,6 +7065,9 @@
     },
     {
       "$ref": "#/$defs/WaitForDurationCreate"
+    },
+    {
+      "$ref": "#/$defs/WaitForTasksCreate"
     },
     {
       "$ref": "#/$defs/CreateTimerCreate"
