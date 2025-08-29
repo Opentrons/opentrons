@@ -1,11 +1,7 @@
 import { LegacyStyledText, StepMeter, StyledText } from '../../atoms'
 import { Box, Btn, Flex } from '../../primitives'
-import {
-  ALIGN_CENTER,
-  DIRECTION_ROW,
-} from '../../styles'
+import { ALIGN_CENTER, DIRECTION_ROW } from '../../styles'
 import { SPACING } from '../../ui-style-constants'
-
 import styles from './wizardheader.module.css'
 
 interface WizardHeaderProps {
@@ -18,8 +14,6 @@ interface WizardHeaderProps {
   exitDisabled?: boolean
   hideStepText?: boolean
 }
-
-
 
 export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
   const {
