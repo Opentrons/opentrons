@@ -9,7 +9,6 @@ import {
   ListButtonAccordionContainer,
 } from '@opentrons/components'
 
-import { getEnableStacking } from '../../../feature-flags/selectors'
 import { getOnlyLatestDefs } from '../../../labware-defs'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import {
@@ -56,7 +55,6 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
   } = props
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const { t } = useTranslation(['starting_deck_state', 'shared'])
-  const enableStacking = useSelector(getEnableStacking)
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
   const defs = getOnlyLatestDefs()
   const zoomedInSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
@@ -139,9 +137,7 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
                       category
                     )
                     const stackingProps: StackingProps | null =
-                      stackingLabwareDefUris.length === 1 &&
-                      slot !== 'offDeck' &&
-                      enableStacking
+                      stackingLabwareDefUris.length === 1 && slot !== 'offDeck'
                         ? {
                             inputTitle: t('labware_quantity'),
                             errorMessage: t('unsupported_range'),
@@ -181,7 +177,6 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
                       !getIsLabwareFiltered(def) ? (
                       <Fragment key={`${category}_${loadName}`}>
                         <CustomizeExpandButton
-                          enableStackingFF={enableStacking}
                           isNestedDefALid={getIsNestedDefinitionALid(def)}
                           allowInputField={
                             onFlexStacker || lidLoadNames.includes(loadName)

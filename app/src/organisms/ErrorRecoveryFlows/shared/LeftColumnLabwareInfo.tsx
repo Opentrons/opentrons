@@ -42,7 +42,7 @@ export function LeftColumnLabwareInfo({
     STACKER_HOPPER_EMPTY_SKIP,
     STACKER_SHUTTLE_EMPTY_SKIP,
   } = RECOVERY_MAP
-  const { t } = useTranslation('error_recovery')
+  const { t, i18n } = useTranslation(['error_recovery', 'shared'])
 
   const buildNewLocation = (): ComponentProps<
     typeof InterventionContent
@@ -91,9 +91,12 @@ export function LeftColumnLabwareInfo({
             labwareName: failedLabwareNames.name ?? '',
             labwareNickname: failedLabwareNames.nickName,
             currentLocationProps: {
-              deckLabel: `${(displayNameNewLoc?.toUpperCase() ?? '').charAt(
-                0
-              )}4`,
+              deckLabel: i18n.format(
+                t('shared:slot', {
+                  slot: `${(displayNameNewLoc ?? '').slice(0, -1)}4`,
+                }),
+                'upperCase'
+              ),
             },
           }
         default:

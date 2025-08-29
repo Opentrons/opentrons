@@ -13,7 +13,6 @@ import {
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
-import { getEnableStacking } from '/protocol-designer/feature-flags/selectors'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
 import { createCustomLabwareDef } from '/protocol-designer/labware-defs/actions'
 import { getCustomLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
@@ -39,7 +38,6 @@ vi.mock('/protocol-designer/labware-defs/selectors')
 vi.mock('/protocol-designer/labware-defs/actions')
 vi.mock('/protocol-designer/file-data/selectors')
 vi.mock('/protocol-designer/labware-ingred/actions')
-vi.mock('/protocol-designer/feature-flags/selectors')
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof InfoScreen>()
   return {
@@ -64,7 +62,6 @@ describe('SelectLabwareModal', () => {
       onConfirm: vi.fn(),
       slotFull: false,
     }
-    vi.mocked(getEnableStacking).mockReturnValue(true)
     vi.mocked(getCustomLabwareDefsByURI).mockReturnValue({})
     vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
     vi.mocked(getPermittedTipracks).mockReturnValue([])

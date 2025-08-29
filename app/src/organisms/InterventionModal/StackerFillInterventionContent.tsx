@@ -45,31 +45,21 @@ export function StackerFillInterventionContent({
   const { data: runCurrentState } = useRunCurrentState(run.id)
   const flexStacker =
     runCurrentState?.data.flexStackerStates?.[command.params.moduleId] ?? null
+  const moduleLocation =
+    run?.modules.find(m => m.id === command.params.moduleId)?.location ?? null
+
+  if (moduleLocation?.slotName == null || flexStacker == null) return null
 
   const analysisCommands = analysis?.commands ?? []
   const labwareDefsByUri = getLoadedLabwareDefinitionsByUri(analysisCommands)
 
   // Get the name of the labware to be removed from the stacker
-  let labwareName: string | null = null
-  let quantity = command.params.count ?? null
-  if (flexStacker) {
-    const labwareDef = labwareDefsByUri?.[flexStacker.primaryLabwareURI] ?? null
-    labwareName = labwareDef?.metadata.displayName ?? null
-    if (quantity == null) {
-      quantity = flexStacker.maxCount
-    }
-  }
-
-  const moduleLocation =
-    run?.modules.find(m => m.id === command.params.moduleId)?.location ?? null
-
-  if (
-    moduleLocation?.slotName == null ||
-    labwareName == null ||
-    flexStacker == null ||
-    quantity == null
-  )
-    return null
+  const labwareDef = labwareDefsByUri?.[flexStacker.primaryLabwareURI] ?? null
+  const labwareName = labwareDef?.metadata.displayName ?? null
+  const quantity =
+    command.params.labwareToStore?.length ??
+    command.params.count ??
+    flexStacker.maxCount
 
   const infoProps: ComponentProps<typeof InterventionInfo> = {
     layout: 'stacked',
