@@ -1,4 +1,4 @@
-from typing import List
+from typing import Any, List
 from math import trunc
 
 from opentrons.drivers import utils
@@ -211,5 +211,66 @@ def heater_shaker_deactivate_heater() -> command_types.HeaterShakerDeactivateHea
     text = "Deactivating Heater"
     return {
         "name": command_types.HEATER_SHAKER_DEACTIVATE_HEATER,
+        "payload": {"text": text},
+    }
+
+
+# FLex Stacker
+
+
+def flex_stacker_set_stored_labware(
+    self: Any,
+    load_name: str,
+    namespace: str | None = None,
+    version: int | None = None,
+    adapter: str | None = None,
+    lid: str | None = None,
+    count: int | None = None,
+    stacking_offset_z: float | None = None,
+) -> command_types.FlexStackerSetStoredLabwareCommand:
+    uri = f"{namespace}/{load_name}/{version}"
+    text = f"Configuring {self} with {count} labware {uri}, adapter: {adapter}, lid: {lid}, stacking_offset_z: {stacking_offset_z}"
+    return {
+        "name": command_types.FLEX_STACKER_SET_STORED_LABWARE,
+        "payload": {"text": text},
+    }
+
+
+def flex_stacker_retrieve(
+    self: Any,
+) -> command_types.FlexStackerRetrieveCommand:
+    text = f"Retrieving labware from {self}"
+    return {
+        "name": command_types.FLEX_STACKER_RETRIEVE,
+        "payload": {"text": text},
+    }
+
+
+def flex_stacker_store(
+    self: Any,
+) -> command_types.FlexStackerStoreCommand:
+    text = f"Storing labware to {self}"
+    return {
+        "name": command_types.FLEX_STACKER_STORE,
+        "payload": {"text": text},
+    }
+
+
+def flex_stacker_empty(
+    self: Any,
+) -> command_types.FlexStackerEmptyCommand:
+    text = f"Emptying {self}"
+    return {
+        "name": command_types.FLEX_STACKER_EMPTY,
+        "payload": {"text": text},
+    }
+
+
+def flex_stacker_fill(
+    self: Any, count: int | None = None
+) -> command_types.FlexStackerFillCommand:
+    text = f"Filling {self} with {count} labware"
+    return {
+        "name": command_types.FLEX_STACKER_FILL,
         "payload": {"text": text},
     }
