@@ -1,0 +1,36 @@
+name: Deploy Scripts Lint and Test
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/deploy/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  lint-and-test:
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v4
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.10'
+          enable-cache: true
+          cache-dependency-glob: 'scripts/deploy/uv.lock'
+      - name: Setup Deploy Dependencies
+        working-directory: ./scripts/deploy
+        run: make setup
+
+      - name: Lint Check
+        working-directory: ./scripts/deploy
+        run: make lint
+
+      - name: Run tests
+        working-directory: ./scripts/deploy
+        run: make test
