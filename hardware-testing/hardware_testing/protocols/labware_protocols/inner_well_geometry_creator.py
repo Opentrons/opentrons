@@ -20,7 +20,7 @@ from dataclasses import dataclass
 #  GLOBAL VARIABLES - START
 ###########################################
 
-LABWARE = "corning_96_wellplate_330ul"
+LABWARE = "nunc_384_wellplate_100ul"  # change to desired labware
 
 RESERVOIR = "nest_1_reservoir_290ml"
 
@@ -573,17 +573,18 @@ def geometry_creator(ctx: ProtocolContext, state: SetupState) -> List[TrialResul
         if len(wells) <= 96:
             dispense_loc = labware[current_well].bottom(z=max(corrected_height + 10, 10))
         else:
-            dispense_loc = labware[current_well].bottom(z=max(corrected_height + 1, 3))
+            dispense_loc = labware[current_well].bottom(z=max(corrected_height + 2.5, 3))
         liq_pipette.transfer(
             (dispense_volume / liq_pipette.channels) * 1.033,
             src["A1"].meniscus(z=-2, target="end"),
             dispense_loc,
             new_tip="never",
             return_tip=False,
-            blow_out=True,
+            blow_out=False,
             blowout_location="destination well",
             air_gap=15,
         )
+        liq_pipette.blow_out(dispense_loc.move(Point(z=3)))
         
         # Measure liquid height
         height = _get_height_of_liquid_in_well(
