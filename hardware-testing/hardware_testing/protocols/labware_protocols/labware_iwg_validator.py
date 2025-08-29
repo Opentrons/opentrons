@@ -269,9 +269,10 @@ def aspirate_dispense_measure(
         liq_pipette.flow_rate.blow_out = 1000
         if len(list(labware.wells_by_name().keys())) <= 96:
             dispense_loc = labware[well].bottom(z=expected_height + 8)
+            air_gap = 15.0
         else:
             dispense_loc = labware[well].bottom(z=expected_height + 1.5)
-
+            air_gap = 5.0
         liq_pipette.transfer(
             dispense_vol * 1.033,
             src["A1"].meniscus(z=-2, target="end"),
@@ -280,7 +281,7 @@ def aspirate_dispense_measure(
             return_tip=False,
             blow_out=False,
             blowout_location="destination well",
-            air_gap=15,
+            air_gap=air_gap,
         )
         liq_pipette.blow_out(dispense_loc.move(Point(z=3)))
 

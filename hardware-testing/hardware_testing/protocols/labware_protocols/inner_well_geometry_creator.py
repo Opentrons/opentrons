@@ -572,8 +572,10 @@ def geometry_creator(ctx: ProtocolContext, state: SetupState) -> List[TrialResul
         liq_pipette.flow_rate.blow_out = 1000
         if len(wells) <= 96:
             dispense_loc = labware[current_well].bottom(z=max(corrected_height + 10, 10))
+            air_gap = 15.0
         else:
             dispense_loc = labware[current_well].bottom(z=max(corrected_height + 2.5, 3))
+            air_gap = 5.0
         liq_pipette.transfer(
             (dispense_volume / liq_pipette.channels) * 1.033,
             src["A1"].meniscus(z=-2, target="end"),
@@ -582,7 +584,7 @@ def geometry_creator(ctx: ProtocolContext, state: SetupState) -> List[TrialResul
             return_tip=False,
             blow_out=False,
             blowout_location="destination well",
-            air_gap=15,
+            air_gap=air_gap,
         )
         liq_pipette.blow_out(dispense_loc.move(Point(z=3)))
         
