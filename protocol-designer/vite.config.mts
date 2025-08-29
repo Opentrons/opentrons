@@ -7,6 +7,7 @@ import postColorModFunction from 'postcss-color-mod-function'
 import postCssImport from 'postcss-import'
 import postCssPresetEnv from 'postcss-preset-env'
 import { defineConfig } from 'vite'
+import { analyzer } from 'vite-bundle-analyzer'
 
 import { versionForProject } from '../scripts/git-version.mjs'
 import { cssModuleSideEffect } from './cssModuleSideEffect'
@@ -61,6 +62,7 @@ export default defineConfig(
               mode === 'production' ? ['./dist/**/*.js.map'] : undefined,
           },
         }),
+        analyzer(),
       ],
       optimizeDeps: {
         esbuildOptions: {
