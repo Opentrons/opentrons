@@ -61,7 +61,8 @@ export function LPCDeck({ runId }: EditOffsetContentProps): JSX.Element {
       return {
         moduleModel: mod.model,
         moduleLocation: mod.location,
-        nestedLabwareDef: closestBeneathModuleId === mod.id ? labwareDef : null,
+        nestedLabwareDefsBottomToTop:
+          closestBeneathModuleId === mod.id ? [labwareDef] : [],
         innerProps:
           closestBeneathModuleModel != null &&
           getModuleType(closestBeneathModuleModel) === THERMOCYCLER_MODULE_TYPE

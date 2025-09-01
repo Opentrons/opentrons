@@ -37,6 +37,7 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
     selectedAdapterDefURI,
     selectedFixture,
     selectedModuleModel,
+    selectedLidLabware,
   } = selectedSlotInfo
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
   const defs = getAllLabwareDefs()
@@ -47,6 +48,16 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
       const matchingSlot = getSlotInLocationStack(stack)
       return (
         labwareDefURI === selectedTopLabware.labwareDefURI &&
+        matchingSlot === selectedSlot.slot
+      )
+    }
+  )
+
+  const matchingSelectedLidOnDeck = Object.values(labware).find(
+    ({ stack, labwareDefURI }) => {
+      const matchingSlot = getSlotInLocationStack(stack)
+      return (
+        labwareDefURI === selectedLidLabware &&
         matchingSlot === selectedSlot.slot
       )
     }
@@ -88,6 +99,10 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
     }
     labwareInfos.push(selectedAdapterLabel)
   }
+  const lengthOfStack =
+    (selectedLidLabware ? 1 : 0) +
+    (selectedAdapterDefURI ? 1 : 0) +
+    (selectedTopLabware?.labwareDefURI ? 1 : 0)
 
   return (
     <>
@@ -123,6 +138,7 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
               topLabwareOnDeck={matchingSelectedTopLabwareOnDeck}
               adapterDef={selectedAdapterDef}
               moduleModel={selectedModuleModel}
+              lidOnDeck={matchingSelectedLidOnDeck}
             />
           </Module>
           {selectedModuleModel != null ? (
@@ -134,13 +150,15 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
               isSelected={true}
               labwareInfos={labwareInfos}
               slot={selectedSlot.slot}
+              showModuleIcon={
+                selectedTopLabware.amount > 1 || lengthOfStack > 1
+              }
             />
           ) : null}
         </>
       ) : null}
       <SelectedLabwareRender
-        showModuleIcon={selectedTopLabware.amount > 1}
-        labwareOnDeck={matchingSelectedTopLabwareOnDeck}
+        showModuleIcon={selectedTopLabware.amount > 1 || lengthOfStack > 1}
         labwareDef={selectedTopLabwareDef ?? selectedAdapterDef}
         slotPosition={slotPosition}
         moduleModel={selectedModuleModel ?? null}

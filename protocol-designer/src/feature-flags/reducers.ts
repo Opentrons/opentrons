@@ -29,7 +29,6 @@ const initialFlags: Flags = {
   OT_PD_ENABLE_COMMENT: process.env.OT_PD_ENABLE_COMMENT === '1' || false,
   OT_PD_ENABLE_TIP_PICKUP_LOCATION:
     process.env.OT_PD_ENABLE_TIP_PICKUP_LOCATION === '1' || false,
-  OT_PD_ENABLE_RETURN_TIP: process.env.OT_PD_ENABLE_RETURN_TIP === '1' || false,
   OT_PD_ENABLE_HOT_KEYS_DISPLAY:
     process.env.OT_PD_ENABLE_HOT_KEYS_DISPLAY === '1' || true,
   OT_PD_ENABLE_REACT_SCAN: process.env.OT_PD_ENABLE_REACT_SCAN === '1' || false,
@@ -40,6 +39,8 @@ const initialFlags: Flags = {
   OT_PD_ENABLE_PARTIAL_TIP_SUPPORT:
     process.env.OT_PD_ENABLE_PARTIAL_TIP_SUPPORT === '1' || false,
   OT_PD_ENABLE_STACKING: process.env.OT_PD_ENABLE_STACKING === '1' || false,
+  OT_PD_ENABLE_CONCURRENT_MODULE_ACTIONS:
+    process.env.OT_PD_ENABLE_CONCURRENT_MODULE_ACTIONS === '1' || false,
   OT_PD_ENABLE_JSON_EXPORT:
     process.env.OT_PD_ENABLE_JSON_EXPORT === '1' || false,
 }

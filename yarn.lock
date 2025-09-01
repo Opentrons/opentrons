@@ -23312,6 +23312,11 @@ vfile@^6.0.0:
     unist-util-stringify-position "^4.0.0"
     vfile-message "^4.0.0"
 
+vite-bundle-analyzer@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/vite-bundle-analyzer/-/vite-bundle-analyzer-1.2.2.tgz#c324d0cdec9a6516a9a3660b3f97e6c94e7fd4fe"
+  integrity sha512-87z5nGD87CAN0XruEaysJKZKiuwoQA19sdXk4c8RbXYwwxXi3mmFJ8G0ntSACPLbZJyGfQVa+UEmGCGe9iBobA==
+
 vite-node@2.1.8:
   version "2.1.8"
   resolved "https://registry.yarnpkg.com/vite-node/-/vite-node-2.1.8.tgz#9495ca17652f6f7f95ca7c4b568a235e0c8dbac5"

@@ -65,6 +65,14 @@ Absorbance Plate Reader
    :inherited-members:
 
 
+Flex Stacker
+------------
+
+.. autoclass:: opentrons.protocol_api.FlexStackerContext
+   :members:
+   :exclude-members: calibrate, broker, geometry, load_labware_object
+   :inherited-members:
+
 Heater-Shaker
 -------------
 

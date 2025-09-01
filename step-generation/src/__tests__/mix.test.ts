@@ -825,3 +825,85 @@ describe('mix: errors', () => {
   it.todo('"times" arg non-integer')
   it.todo('"times" arg negative')
 })
+
+describe('mix: return tip', () => {
+  let args: MixArgs
+  beforeEach(() => {
+    args = {
+      ...mixinArgs,
+      volume: 8,
+      times: 2,
+      dropTipLocation: 'fixture/fixture_tiprack_300_ul/1',
+      wells: ['A1', 'B1', 'C1'],
+      changeTip: 'always',
+    } as MixArgs
+  })
+  it('should return tip if changeTip is always', () => {
+    args.dropTipLocation = 'fixture/fixture_tiprack_300_ul/1'
+    args.wells = ['A1', 'B1', 'C1']
+    args.changeTip = 'always'
+    const result = mix(args, invariantContext, robotStateWithTip)
+    expect(getSuccessResult(result).python).toBe(
+      `mock_pipette.drop_tip()
+mock_pipette.pick_up_tip(location=mock_tip_rack_1)
+mock_pipette.mix(
+    repetitions=2,
+    volume=8,
+    location=mock_source_plate["A1"].bottom(z=3.2),
+    aspirate_flow_rate=2.1,
+    dispense_flow_rate=2.2,
+)
+mock_pipette.drop_tip(location=mock_tip_rack_1.wells_by_name()["A1"])
+mock_pipette.pick_up_tip(location=mock_tip_rack_1)
+mock_pipette.mix(
+    repetitions=2,
+    volume=8,
+    location=mock_source_plate["B1"].bottom(z=3.2),
+    aspirate_flow_rate=2.1,
+    dispense_flow_rate=2.2,
+)
+mock_pipette.drop_tip(location=mock_tip_rack_1.wells_by_name()["B1"])
+mock_pipette.pick_up_tip(location=mock_tip_rack_1)
+mock_pipette.mix(
+    repetitions=2,
+    volume=8,
+    location=mock_source_plate["C1"].bottom(z=3.2),
+    aspirate_flow_rate=2.1,
+    dispense_flow_rate=2.2,
+)
+mock_pipette.drop_tip(location=mock_tip_rack_1.wells_by_name()["C1"])`
+    )
+  })
+  it('should return tip if changeTip is once', () => {
+    args.dropTipLocation = 'fixture/fixture_tiprack_300_ul/1'
+    args.wells = ['A1', 'B1', 'C1']
+    args.changeTip = 'once'
+    const result = mix(args, invariantContext, robotStateWithTip)
+    expect(getSuccessResult(result).python).toBe(
+      `mock_pipette.drop_tip()
+mock_pipette.pick_up_tip(location=mock_tip_rack_1)
+mock_pipette.mix(
+    repetitions=2,
+    volume=8,
+    location=mock_source_plate["A1"].bottom(z=3.2),
+    aspirate_flow_rate=2.1,
+    dispense_flow_rate=2.2,
+)
+mock_pipette.mix(
+    repetitions=2,
+    volume=8,
+    location=mock_source_plate["B1"].bottom(z=3.2),
+    aspirate_flow_rate=2.1,
+    dispense_flow_rate=2.2,
+)
+mock_pipette.mix(
+    repetitions=2,
+    volume=8,
+    location=mock_source_plate["C1"].bottom(z=3.2),
+    aspirate_flow_rate=2.1,
+    dispense_flow_rate=2.2,
+)
+mock_pipette.drop_tip(location=mock_tip_rack_1.wells_by_name()["A1"])`
+    )
+  })
+})

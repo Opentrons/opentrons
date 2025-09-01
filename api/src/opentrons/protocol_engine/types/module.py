@@ -193,6 +193,10 @@ class ModuleDefinition(BaseModel):
         ...,
     )
 
+    orientation: Dict[str, str] = Field(
+        ...,
+    )
+
     compatibleWith: List[ModuleModel] = Field(
         ...,
     )

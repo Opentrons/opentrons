@@ -180,7 +180,6 @@ describe('SelectedItems', () => {
     })
     render(props)
     screen.getByText('mock FixtureRender')
-    screen.getByText('mock LabwareOnDeck')
     expect(
       screen.getAllByText(
         'Fixture Opentrons Universal Flat Heater-Shaker Adapter'

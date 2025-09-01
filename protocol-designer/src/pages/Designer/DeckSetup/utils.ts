@@ -160,29 +160,18 @@ export const getLabwareIsRecommended = (
 //  purely for labware<>adapter combos
 export const getLabwareCompatibleWithAdapter = (
   defs: LabwareDefByDefURI,
-  enableStackingFF: boolean,
   adapterLoadName?: string
 ): string[] => {
   if (adapterLoadName == null) {
     return []
   }
 
-  if (enableStackingFF) {
-    return Object.entries(defs)
-      .filter(
-        ([, { stackingOffsetWithLabware }]) =>
-          stackingOffsetWithLabware?.[adapterLoadName] != null
-      )
-      .map(([labwareDefUri]) => labwareDefUri)
-  } else {
-    return Object.entries(defs)
-      .filter(
-        ([, { stackingOffsetWithLabware, compatibleParentLabware }]) =>
-          stackingOffsetWithLabware?.[adapterLoadName] != null &&
-          !compatibleParentLabware?.includes(adapterLoadName)
-      )
-      .map(([labwareDefUri]) => labwareDefUri)
-  }
+  return Object.entries(defs)
+    .filter(
+      ([, { stackingOffsetWithLabware }]) =>
+        stackingOffsetWithLabware?.[adapterLoadName] != null
+    )
+    .map(([labwareDefUri]) => labwareDefUri)
 }
 
 const getStackerDefinitionsFromLoadName = (

@@ -6544,3 +6544,103 @@ mock_pipette.transfer_with_liquid_class(
     })
   })
 })
+
+describe('transfer: return tip', () => {
+  let allArgs: TransferArgs
+  beforeEach(() => {
+    allArgs = {
+      ...mixinArgs,
+      volume: 175,
+      sourceWells: ['A1'],
+      destWells: ['B1'],
+      tipRack: getLabwareDefURI(fixtureTiprack300ul as LabwareDefinition2),
+      dropTipLocation: 'fixture/fixture_tiprack_300_ul/1',
+      changeTip: 'always',
+    } as TransferArgs
+  })
+
+  it('should return tip', () => {
+    const args = {
+      ...allArgs,
+      changeTip: 'always',
+    } as TransferArgs
+
+    const result = transfer(args, invariantContext, robotStateWithTip)
+    const res = getSuccessResult(result)
+    expect(res.python).toEqual(
+      `
+mock_pipette.transfer_with_liquid_class(
+    volume=175,
+    source=[mock_source_plate["A1"]],
+    dest=[mock_dest_plate["B1"]],
+    new_tip="always",
+    return_tip=True,
+    tip_racks=[mock_tip_rack_1, mock_tip_rack_2],
+    liquid_class=protocol.define_liquid_class(
+        name="transfer_step_1",
+        properties={"p300_single": {"fixture/fixture_tiprack_300_ul/1": {
+            "aspirate": {
+                "aspirate_position": {
+                    "offset": {"x": 0, "y": 0, "z": 2},
+                    "position_reference": "well-bottom",
+                },
+                "flow_rate_by_volume": [(0, 10)],
+                "pre_wet": False,
+                "correction_by_volume": [(0, 0)],
+                "delay": {"enabled": False},
+                "mix": {"enabled": False},
+                "submerge": {
+                    "delay": {"enabled": False},
+                    "speed": 50,
+                    "start_position": {
+                        "offset": {"x": 1, "y": 0, "z": 5},
+                        "position_reference": "well-bottom",
+                    },
+                },
+                "retract": {
+                    "air_gap_by_volume": [(0, 0)],
+                    "delay": {"enabled": False},
+                    "end_position": {
+                        "offset": {"x": 2, "y": -1, "z": -4},
+                        "position_reference": "well-top",
+                    },
+                    "speed": 51,
+                    "touch_tip": {"enabled": False},
+                },
+            },
+            "dispense": {
+                "dispense_position": {
+                    "offset": {"x": 0, "y": 0, "z": 3},
+                    "position_reference": "well-bottom",
+                },
+                "flow_rate_by_volume": [(0, 12)],
+                "delay": {"enabled": False},
+                "submerge": {
+                    "delay": {"enabled": False},
+                    "speed": 52,
+                    "start_position": {
+                        "offset": {"x": 2, "y": 1, "z": -2},
+                        "position_reference": "well-center",
+                    },
+                },
+                "retract": {
+                    "air_gap_by_volume": [(0, 0)],
+                    "delay": {"enabled": False},
+                    "end_position": {
+                        "offset": {"x": 3, "y": -2, "z": -5},
+                        "position_reference": "well-top",
+                    },
+                    "speed": 53,
+                    "touch_tip": {"enabled": False},
+                    "blowout": {"enabled": False},
+                },
+                "correction_by_volume": [(0, 0)],
+                "push_out_by_volume": [(0, 0)],
+                "mix": {"enabled": False},
+            },
+        }}},
+    ),
+)`.trimStart()
+    )
+  })
+})

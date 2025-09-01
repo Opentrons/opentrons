@@ -26,7 +26,7 @@ import {
   toggleViewSubstep,
 } from '/protocol-designer/ui/steps/actions/actions'
 
-import { ConnectedStepContainer } from './StepContainer'
+import { ConnectedStepContainer } from './ConnectedStepContainer'
 
 import type { TerminalItemId } from '/protocol-designer/steplist'
 import type { ThunkDispatch } from '/protocol-designer/types'

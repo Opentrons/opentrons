@@ -13,5 +13,12 @@ export const SETUP_STEP_KEYS = [
   LABWARE_SETUP_STEP_KEY,
 ] as const
 
+export const STEP_KEY_TO_I18N_KEY = {
+  [LPC_STEP_KEY]: 'applied_labware_offsets',
+  [LABWARE_SETUP_STEP_KEY]: 'labware_placement',
+  [MODULE_SETUP_STEP_KEY]: 'module_setup',
+  [ROBOT_CALIBRATION_STEP_KEY]: 'robot_calibration',
+}
+
 export const UPDATE_RUN_SETUP_STEPS_COMPLETE = 'protocolRuns:UPDATE_RUN_SETUP_STEPS_COMPLETE' as const
 export const UPDATE_RUN_SETUP_STEPS_REQUIRED = 'protocolRuns:UPDATE_RUN_SETUP_STEPS_REQUIRED' as const

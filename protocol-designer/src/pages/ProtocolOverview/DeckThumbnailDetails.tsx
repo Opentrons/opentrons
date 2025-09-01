@@ -18,10 +18,9 @@ import {
   getSlotIsEmpty,
 } from '../../step-forms'
 import {
+  getLabwaresOnModuleFromStack,
   getStagingAreaAddressableAreas,
-  getTopmostLabwareOnModuleFromStack,
 } from '../../utils'
-import { TIPRACK_LID_LOADNAME } from '../Designer/utils'
 import { SlotHover } from './SlotHover'
 
 import type { Dispatch, SetStateAction } from 'react'
@@ -71,7 +70,7 @@ export const DeckThumbnailDetails = (
           return null
         }
         const moduleDef = getModuleDef(model)
-        const labwareLoadedOnModuleId = getTopmostLabwareOnModuleFromStack(
+        const { topMostId, rightBelowTopId } = getLabwaresOnModuleFromStack(
           id,
           allLabware
         )
@@ -95,13 +94,18 @@ export const DeckThumbnailDetails = (
               childrenPositioningMode="offsetToSlot"
             >
               <>
-                {labwareLoadedOnModuleId != null ? (
+                {rightBelowTopId != null ? (
                   <LabwareOnDeck
                     x={0}
                     y={0}
-                    labwareOnDeck={
-                      initialDeckSetup.labware[labwareLoadedOnModuleId]
-                    }
+                    labwareOnDeck={initialDeckSetup.labware[rightBelowTopId]}
+                  />
+                ) : null}
+                {topMostId != null ? (
+                  <LabwareOnDeck
+                    x={0}
+                    y={0}
+                    labwareOnDeck={initialDeckSetup.labware[topMostId]}
                   />
                 ) : null}
                 <SlotHover
@@ -121,7 +125,6 @@ export const DeckThumbnailDetails = (
         if (
           getSlotInLocationStack(labware.stack) === 'offDeck' ||
           allModules.some(m => labware.stack.includes(m.id)) ||
-          labware.def.parameters.loadName === TIPRACK_LID_LOADNAME ||
           labware.stack.includes('fixedTrash')
         ) {
           return null

@@ -24,6 +24,7 @@
   "batch_edits_saved": "Batch edits saved",
   "blowout_location": "Blowout location",
   "blowout_position": "Blowout position from top",
+  "bottom_of_stack": "Bottom of stack",
   "captions_for_fields": {
     "blockTargetTemp": "Valid range between 4 and 99˚C",
     "blockTargetTempHold": "Valid range between 4 and 99˚C",
@@ -186,12 +187,14 @@
   "time_in": "{{times}} times in",
   "timeline": "Timeline",
   "tip_handling": {
-    "title": "Tip pickup behavior",
+    "title": "Tip usage",
     "tooltip": "Choose tip pickup frequency for aspirations"
   },
   "tip_management": "Tip management",
   "tip_position": "{{prefix}} tip position",
   "tiprack": "Tiprack",
+  "top_of_stack": "Top of stack",
+  "total_stacked": "Total stacked: {{amount}}",
   "touch_tip_position": "Touch tip position from top",
   "transfer": "Transfer",
   "unknown_module": "Unknown module",

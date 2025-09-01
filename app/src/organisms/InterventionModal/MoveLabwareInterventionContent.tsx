@@ -68,10 +68,11 @@ export function MoveLabwareInterventionContent({
     return {
       moduleModel: module.moduleDef.model,
       moduleLocation: { slotName: module.targetSlotId },
-      nestedLabwareDef:
-        module.nestedLabwareId !== command.params.labwareId
-          ? module.nestedLabwareDef
-          : null,
+      nestedLabwareDefsBottomToTop:
+        module.nestedLabwareId !== command.params.labwareId &&
+        module.nestedLabwareDef != null
+          ? [module.nestedLabwareDef]
+          : [],
     }
   })
 
@@ -97,7 +98,6 @@ export function MoveLabwareInterventionContent({
     loadedLabwares: run.labware,
     robotType: 'OT-3 Standard',
     detailLevel: 'slot-only',
-    includeSlotText: false,
     t,
   })
   const newDisplayLabwareLocation = getLabwareDisplayLocation({
@@ -106,7 +106,6 @@ export function MoveLabwareInterventionContent({
     loadedLabwares: run.labware,
     robotType: 'OT-3 Standard',
     detailLevel: 'slot-only',
-    includeSlotText: false,
     t,
   })
   return (

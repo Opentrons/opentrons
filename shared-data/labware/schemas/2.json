@@ -684,7 +684,7 @@
     },
     "stackingOffsetWithLabware": {
       "type": "object",
-      "description": "Supported labware that can be stacked upon, with overlap height between both labware.",
+      "description": "Supported labware that this one can be stacked atop, with overlaps between both labware. x=0,y=0,z=0 means the front-left-bottom corner of this labware is at the front-left-top corner of the labware below it. +x, +y, and +z move this labware right, back, and down, respectively.",
       "additionalProperties": {
         "$ref": "#/definitions/vector"
       }
