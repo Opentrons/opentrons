@@ -8,6 +8,7 @@ import type { ComponentProps, ReactNode } from 'react'
 
 export interface LegacyProps extends ComponentProps<typeof Text> {
   children?: ReactNode
+  as?: keyof JSX.IntrinsicElements | React.ComponentType<any> // Note this would be temporary
 }
 
 const styleMap: { [tag: string]: FlattenSimpleInterpolation } = {
