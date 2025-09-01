@@ -1,67 +1,54 @@
-import styled from 'styled-components'
+import { forwardRef } from 'react'
 
-import { isntStyleProp, styleProps } from './style-props'
+import { withStyleProps } from '../hocs/withStyleProps'
 
-import type { ComponentProps } from 'react'
-import type { PrimitiveComponent, StyleProps } from './types'
+import type { ComponentProps, FC, ForwardedRef } from 'react'
+import type { StyleProps } from './types'
 
 export interface SvgProps extends StyleProps {
   /** attach a width attribute to the <svg> element */
   svgWidth?: string | number
   /** attach a height attribute to the <svg> element */
   svgHeight?: string | number
-  /**
-   * internal helper prop to remap width style-prop to CSS
-   * @internal
-   */
-  _cssWidth?: string | number
-  /**
-   * internal helper prop to remap height style-prop to CSS
-   * @internal
-   */
-  _cssHeight?: string | number
 }
 
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg'
 
-const SVG_PROPS = ['svgWidth', 'svgHeight', '_cssWidth', '_cssHeight']
-
 /**
- * SVG primitive
+ * SVG primitive component that supports style props
  *
  * @component
  */
-export const Svg: PrimitiveComponent<'svg', SvgProps> = styled.svg
-  .withConfig({
-    shouldForwardProp: p => {
-      return (
-        // do not forward style-props or Svg-props to the underlying <svg>
-        (isntStyleProp(p) && !SVG_PROPS.includes(p)) ||
-        // unlike other primitives, allow width and height to be forwarded
-        p === 'width' ||
-        p === 'height'
-      )
-    },
-  })
-  .attrs(
-    (props: SvgProps): ComponentProps<PrimitiveComponent<'svg'>> => ({
-      xmlns: SVG_NAMESPACE,
-      // map the explicit svgWidth/Height props to width/height attrs
-      width: props.svgWidth,
-      height: props.svgHeight,
-      // map width and height style props to internal style props
-      _cssWidth: props.width,
-      _cssHeight: props.height,
-    })
-  )`
-  ${(props: Partial<SvgProps>) => {
-    const { width, height, ...otherProps } = props
+const SvgComponent = forwardRef<
+  SVGSVGElement,
+  SvgProps & ComponentProps<'svg'>
+>(
+  (
+    { svgWidth, svgHeight, className, children, ...props },
+    ref: ForwardedRef<SVGSVGElement>
+  ) => {
+    return (
+      <svg
+        ref={ref}
+        xmlns={SVG_NAMESPACE}
+        width={svgWidth}
+        height={svgHeight}
+        className={`${styles.svg} ${className ?? ''}`}
+        {...props}
+      >
+        {children}
+      </svg>
+    )
+  }
+)
 
-    // replace width and height attrs with internal style props
-    return styleProps({
-      ...otherProps,
-      width: otherProps._cssWidth,
-      height: otherProps._cssHeight,
-    })
-  }}
-`
+SvgComponent.displayName = 'Svg'
+
+/**
+ * SVG primitive with style props support
+ *
+ * @component
+ */
+export const Svg: FC<ComponentProps<'svg'> & SvgProps> = withStyleProps(
+  SvgComponent
+) as FC<ComponentProps<'svg'> & SvgProps>
