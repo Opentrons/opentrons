@@ -70,7 +70,7 @@ jobs:
   backend-unit-test:
     strategy:
       matrix:
-        os: ['windows-2022', 'ubuntu-22.04', 'macos-latest']
+        os: ['windows-2022', 'ubuntu-24.04', 'macos-latest']
         shell: ['app-shell', 'app-shell-odd', 'discovery-client']
         exclude:
           - os: 'windows-2022'
@@ -175,7 +175,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ['windows-2022', 'ubuntu-22.04', 'macos-latest']
+        os: ['windows-2022', 'ubuntu-24.04', 'macos-latest']
         variant: ${{fromJSON(needs.determine-build-type.outputs.variants)}}
         target: ['desktop', 'odd']
         exclude:

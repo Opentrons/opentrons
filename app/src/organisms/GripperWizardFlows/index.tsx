@@ -12,6 +12,7 @@ import {
   ModalShell,
   POSITION_ABSOLUTE,
   useConditionalConfirm,
+  WizardHeader,
 } from '@opentrons/components'
 import {
   useCreateMaintenanceCommandMutation,
@@ -20,7 +21,6 @@ import {
 
 import { getTopPortalEl } from '/app/App/portal'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
-import { WizardHeader } from '/app/molecules/WizardHeader'
 import { getIsOnDevice } from '/app/redux/config'
 import {
   useChainMaintenanceCommands,

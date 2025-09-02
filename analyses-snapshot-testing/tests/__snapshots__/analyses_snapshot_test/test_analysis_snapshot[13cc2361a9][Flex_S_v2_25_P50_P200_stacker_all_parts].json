@@ -3848,7 +3848,7 @@
             "z": 0
           },
           "dimensions": {
-            "xDimension": 127.7,
+            "xDimension": 121,
             "yDimension": 78.75,
             "zDimension": 17
           },
@@ -3906,43 +3906,43 @@
           "stackLimit": 1,
           "stackingOffsetWithLabware": {
             "default": {
-              "x": 0,
-              "y": 0,
+              "x": 3.375,
+              "y": 3.5,
               "z": 14.25
             },
             "opentrons_flex_96_filtertiprack_1000ul": {
-              "x": 0,
-              "y": 0,
+              "x": 3.375,
+              "y": 3.5,
               "z": 14.25
             },
             "opentrons_flex_96_filtertiprack_200ul": {
-              "x": 0,
-              "y": 0,
+              "x": 3.375,
+              "y": 3.5,
               "z": 14.25
             },
             "opentrons_flex_96_filtertiprack_50ul": {
-              "x": 0,
-              "y": 0,
+              "x": 3.375,
+              "y": 3.5,
               "z": 14.25
             },
             "opentrons_flex_96_tiprack_1000ul": {
-              "x": 0,
-              "y": 0,
+              "x": 3.375,
+              "y": 3.5,
               "z": 14.25
             },
             "opentrons_flex_96_tiprack_200ul": {
-              "x": 0,
-              "y": 0,
+              "x": 3.375,
+              "y": 3.5,
               "z": 14.25
             },
             "opentrons_flex_96_tiprack_20ul": {
-              "x": 0,
-              "y": 0,
+              "x": 3.375,
+              "y": 3.5,
               "z": 14.25
             },
             "opentrons_flex_96_tiprack_50ul": {
-              "x": 0,
-              "y": 0,
+              "x": 3.375,
+              "y": 3.5,
               "z": 14.25
             }
           },
@@ -4430,8 +4430,8 @@
               "z": 121
             },
             "opentrons_flex_tiprack_lid": {
-              "x": 0,
-              "y": 0,
+              "x": -3.375,
+              "y": -3.5,
               "z": 0.25
             }
           },
@@ -5702,8 +5702,8 @@
               "z": 121
             },
             "opentrons_flex_tiprack_lid": {
-              "x": 0,
-              "y": 0,
+              "x": -3.375,
+              "y": -3.5,
               "z": 0.25
             }
           },
@@ -11460,7 +11460,7 @@
             "z": 0
           },
           "dimensions": {
-            "xDimension": 127.7,
+            "xDimension": 121,
             "yDimension": 78.75,
             "zDimension": 17
           },
@@ -11518,43 +11518,43 @@
           "stackLimit": 1,
           "stackingOffsetWithLabware": {
             "default": {
-              "x": 0,
-              "y": 0,
+              "x": 3.375,
+              "y": 3.5,
               "z": 14.25
             },
             "opentrons_flex_96_filtertiprack_1000ul": {
-              "x": 0,
-              "y": 0,
+              "x": 3.375,
+              "y": 3.5,
               "z": 14.25
             },
             "opentrons_flex_96_filtertiprack_200ul": {
-              "x": 0,
-              "y": 0,
+              "x": 3.375,
+              "y": 3.5,
               "z": 14.25
             },
             "opentrons_flex_96_filtertiprack_50ul": {
-              "x": 0,
-              "y": 0,
+              "x": 3.375,
+              "y": 3.5,
               "z": 14.25
             },
             "opentrons_flex_96_tiprack_1000ul": {
-              "x": 0,
-              "y": 0,
+              "x": 3.375,
+              "y": 3.5,
               "z": 14.25
             },
             "opentrons_flex_96_tiprack_200ul": {
-              "x": 0,
-              "y": 0,
+              "x": 3.375,
+              "y": 3.5,
               "z": 14.25
             },
             "opentrons_flex_96_tiprack_20ul": {
-              "x": 0,
-              "y": 0,
+              "x": 3.375,
+              "y": 3.5,
               "z": 14.25
             },
             "opentrons_flex_96_tiprack_50ul": {
-              "x": 0,
-              "y": 0,
+              "x": 3.375,
+              "y": 3.5,
               "z": 14.25
             }
           },
@@ -12042,8 +12042,8 @@
               "z": 121
             },
             "opentrons_flex_tiprack_lid": {
-              "x": 0,
-              "y": 0,
+              "x": -3.375,
+              "y": -3.5,
               "z": 0.25
             }
           },
@@ -13399,7 +13399,7 @@
             "z": 0
           },
           "dimensions": {
-            "xDimension": 127.7,
+            "xDimension": 121,
             "yDimension": 78.75,
             "zDimension": 17
           },
@@ -13457,43 +13457,43 @@
           "stackLimit": 1,
           "stackingOffsetWithLabware": {
             "default": {
-              "x": 0,
-              "y": 0,
+              "x": 3.375,
+              "y": 3.5,
               "z": 14.25
             },
             "opentrons_flex_96_filtertiprack_1000ul": {
-              "x": 0,
-              "y": 0,
+              "x": 3.375,
+              "y": 3.5,
               "z": 14.25
             },
             "opentrons_flex_96_filtertiprack_200ul": {
-              "x": 0,
-              "y": 0,
+              "x": 3.375,
+              "y": 3.5,
               "z": 14.25
             },
             "opentrons_flex_96_filtertiprack_50ul": {
-              "x": 0,
-              "y": 0,
+              "x": 3.375,
+              "y": 3.5,
               "z": 14.25
             },
             "opentrons_flex_96_tiprack_1000ul": {
-              "x": 0,
-              "y": 0,
+              "x": 3.375,
+              "y": 3.5,
               "z": 14.25
             },
             "opentrons_flex_96_tiprack_200ul": {
-              "x": 0,
-              "y": 0,
+              "x": 3.375,
+              "y": 3.5,
               "z": 14.25
             },
             "opentrons_flex_96_tiprack_20ul": {
-              "x": 0,
-              "y": 0,
+              "x": 3.375,
+              "y": 3.5,
               "z": 14.25
             },
             "opentrons_flex_96_tiprack_50ul": {
-              "x": 0,
-              "y": 0,
+              "x": 3.375,
+              "y": 3.5,
               "z": 14.25
             }
           },
@@ -13981,8 +13981,8 @@
               "z": 121
             },
             "opentrons_flex_tiprack_lid": {
-              "x": 0,
-              "y": 0,
+              "x": -3.375,
+              "y": -3.5,
               "z": 0.25
             }
           },
@@ -19986,8 +19986,8 @@
               "z": 121
             },
             "opentrons_flex_tiprack_lid": {
-              "x": 0,
-              "y": 0,
+              "x": -3.375,
+              "y": -3.5,
               "z": 0.25
             }
           },
@@ -22363,7 +22363,7 @@
             "z": 0
           },
           "dimensions": {
-            "xDimension": 127.7,
+            "xDimension": 121,
             "yDimension": 78.75,
             "zDimension": 17
           },
@@ -22421,43 +22421,43 @@
           "stackLimit": 1,
           "stackingOffsetWithLabware": {
             "default": {
-              "x": 0,
-              "y": 0,
+              "x": 3.375,
+              "y": 3.5,
               "z": 14.25
             },
             "opentrons_flex_96_filtertiprack_1000ul": {
-              "x": 0,
-              "y": 0,
+              "x": 3.375,
+              "y": 3.5,
               "z": 14.25
             },
             "opentrons_flex_96_filtertiprack_200ul": {
-              "x": 0,
-              "y": 0,
+              "x": 3.375,
+              "y": 3.5,
               "z": 14.25
             },
             "opentrons_flex_96_filtertiprack_50ul": {
-              "x": 0,
-              "y": 0,
+              "x": 3.375,
+              "y": 3.5,
               "z": 14.25
             },
             "opentrons_flex_96_tiprack_1000ul": {
-              "x": 0,
-              "y": 0,
+              "x": 3.375,
+              "y": 3.5,
               "z": 14.25
             },
             "opentrons_flex_96_tiprack_200ul": {
-              "x": 0,
-              "y": 0,
+              "x": 3.375,
+              "y": 3.5,
               "z": 14.25
             },
             "opentrons_flex_96_tiprack_20ul": {
-              "x": 0,
-              "y": 0,
+              "x": 3.375,
+              "y": 3.5,
               "z": 14.25
             },
             "opentrons_flex_96_tiprack_50ul": {
-              "x": 0,
-              "y": 0,
+              "x": 3.375,
+              "y": 3.5,
               "z": 14.25
             }
           },
@@ -22945,8 +22945,8 @@
               "z": 121
             },
             "opentrons_flex_tiprack_lid": {
-              "x": 0,
-              "y": 0,
+              "x": -3.375,
+              "y": -3.5,
               "z": 0.25
             }
           },

@@ -78,7 +78,7 @@ def create_queue_worker(
         hardware_api=hardware_api,
     )
     task_handler = TaskHandler(
-        state_store=state_store,
+        state_store=state_store, action_dispatcher=action_dispatcher
     )
     status_bar_handler = StatusBarHandler(hardware_api=hardware_api)
 

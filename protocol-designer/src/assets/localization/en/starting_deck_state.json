@@ -72,6 +72,7 @@
   "read_more_gen1_gen2": "Read more about the differences between GEN1 and GEN2 Magnetic Modules",
   "remove_existing_labware": "Remove existing labware to add new labware",
   "rename_lab": "Rename labware",
+  "replace_labware": "Replace labware",
   "reservoir": "Reservoirs",
   "search_labware": "Search for labware...",
   "select_before_proceeding": "Select labware to add it to the deck",
