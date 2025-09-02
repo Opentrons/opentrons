@@ -49,7 +49,7 @@ describe('ApplicationSection', () => {
   it('should render 96-channel pipette dropdown when 96-Channel pipette radio is selected', () => {
     render()
 
-    const pipettesRadioButton = screen.getByLabelText('96-Channel pipette')
+    const pipettesRadioButton = screen.getByLabelText('96-Channel pipettes')
     fireEvent.click(pipettesRadioButton)
 
     expect(screen.queryByText('Left mount')).not.toBeInTheDocument()
@@ -60,19 +60,19 @@ describe('ApplicationSection', () => {
   it('should be able to select 96-channel pipette options from dropdown', async () => {
     render()
 
-    const pipettesRadioButton = screen.getByLabelText('96-Channel pipette')
+    const pipettesRadioButton = screen.getByLabelText('96-Channel pipettes')
     fireEvent.click(pipettesRadioButton)
 
     const dropdown = screen.getByText('Choose pipette')
     fireEvent.click(dropdown)
 
-    expect(screen.getByText('96-Channel 1000uL')).toBeInTheDocument()
-    expect(screen.getByText('96-Channel Low Volume')).toBeInTheDocument()
+    expect(screen.getByText('96-Channel 1000uL pipette')).toBeInTheDocument()
+    expect(screen.getByText('96-Channel 200uL pipette')).toBeInTheDocument()
 
-    fireEvent.click(screen.getByText('96-Channel 1000uL'))
+    fireEvent.click(screen.getByText('96-Channel 1000uL pipette'))
 
     await waitFor(() => {
-      expect(screen.getByText('96-Channel 1000uL')).toBeInTheDocument()
+      expect(screen.getByText('96-Channel 1000uL pipette')).toBeInTheDocument()
     })
   })
 
@@ -89,7 +89,7 @@ describe('ApplicationSection', () => {
     expect(screen.getByText('Right mount')).toBeInTheDocument()
 
     expect(screen.queryByText('Two pipettes')).not.toBeInTheDocument()
-    expect(screen.queryByText('96-Channel pipette')).not.toBeInTheDocument()
+    expect(screen.queryByText('96-Channel pipettes')).not.toBeInTheDocument()
     expect(
       screen.queryByText('Do you want to use the Flex Gripper')
     ).not.toBeInTheDocument()

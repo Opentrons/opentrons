@@ -1,7 +1,7 @@
 {
-  "96_channel_pipette_label": "96-Channel pipette",
-  "96_channel_1000ul": "96-Channel 1000uL",
-  "96_channel_low_volume": "96-Channel Low Volume",
+  "96_channel_pipette_label": "96-Channel pipettes",
+  "96_channel_200ul": "96-Channel 200uL pipette",
+  "96_channel_1000ul": "96-Channel 1000uL pipette",
   "absorbance_plate_reader_module_v1": "Absorbance Plate Reader Module GEN1",
   "adapter": "Adapter",
   "add_individual_step": "Add individual steps",

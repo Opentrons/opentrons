@@ -96,8 +96,8 @@ export function InstrumentsSection(): JSX.Element | null {
   ]
 
   const ninetySixChannelOptions = [
-    { name: t('96_channel_1000ul'), value: 'flex_96channel_1000' },
-    { name: t('96_channel_low_volume'), value: 'flex_96channel_low_volume' },
+    { name: t('96_channel_200ul'), value: 'Flex 96-Channel 200uL pipette' },
+    { name: t('96_channel_1000ul'), value: 'Flex 96-Channel 1000uL pipette' },
   ]
 
   const pipetteOptions = useMemo(() => {
