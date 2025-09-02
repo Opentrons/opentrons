@@ -10,7 +10,6 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  FLEX_MAX_CONTENT,
   InlineNotification,
   InputField,
   JUSTIFY_END,
@@ -293,16 +292,15 @@ export function DefineLiquidsModal(
                 gridGap={SPACING.spacing8}
               >
                 {selectedIngredFields != null ? (
-                  <Flex gap={SPACING.spacing4}>
+                  <Flex>
                     <Btn
                       css={LINK_BUTTON_STYLE}
+                      padding={SPACING.spacing4}
                       onClick={deleteLiquidGroup}
+                      width="7.1875rem"
                       textDecoration={TYPOGRAPHY.textDecorationUnderline}
                     >
-                      <StyledText
-                        desktopStyle="bodyDefaultRegular"
-                        width={FLEX_MAX_CONTENT}
-                      >
+                      <StyledText desktopStyle="bodyDefaultRegular">
                         {t('delete_liquid')}
                       </StyledText>
                     </Btn>
