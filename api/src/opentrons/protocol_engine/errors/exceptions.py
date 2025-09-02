@@ -842,6 +842,19 @@ class InvalidTargetTemperatureError(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
+class InvalidRampRateError(ProtocolEngineError):
+    """Raised when attempting to set an invalid ramp rate."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a InvalidRampRateError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class InvalidBlockVolumeError(ProtocolEngineError):
     """Raised when attempting to set an invalid block max volume."""
 

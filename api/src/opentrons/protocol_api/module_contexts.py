@@ -620,6 +620,7 @@ class ThermocyclerContext(ModuleContext):
             celsius=temperature,
             hold_time_seconds=seconds,
             block_max_volume=block_max_volume,
+            ramp_rate=ramp_rate,
         )
         self._core.wait_for_block_temperature()
 
