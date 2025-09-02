@@ -320,7 +320,10 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                   fixtureBaseColor={lightFill}
                 />
                 {wasteChuteStackerFixtures.map(fixture => {
-                  if (fixture.cutoutId === WASTE_CHUTE_CUTOUT) {
+                  if (
+                    fixture.cutoutId === WASTE_CHUTE_CUTOUT &&
+                    moduleLocation.slotName === 'D3'
+                  ) {
                     return (
                       <WasteChuteFixture
                         key={fixture.cutoutId}
