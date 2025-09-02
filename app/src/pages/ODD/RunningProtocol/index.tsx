@@ -20,6 +20,7 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
+  StepMeter,
   useSwipe,
 } from '@opentrons/components'
 import {
@@ -27,7 +28,6 @@ import {
   useRunActionMutations,
 } from '@opentrons/react-api-client'
 
-import { StepMeter } from '/app/atoms/StepMeter'
 import { useIsDoorOpen } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 import {
   ErrorRecoveryFlows,

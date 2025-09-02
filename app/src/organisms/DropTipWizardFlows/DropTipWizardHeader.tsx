@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { WizardHeader } from '/app/molecules/WizardHeader'
+import { WizardHeader } from '@opentrons/components'
 
 import type { DropTipWizardProps } from './DropTipWizard'
 import type { ErrorDetails } from './types'
