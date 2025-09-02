@@ -450,7 +450,7 @@ ${t('application_title')}:\n${scientificApplication}
 ${t('description')}:\n${description}
 
 ${t(
-  'pipette_mounts'
+  'pipette'
 )}:\n\n${pipetteMounts}${flexGripper}${moduleSection}${fixtureSection}
 
 \n${t('labware_section_title')}:\n${labwares}

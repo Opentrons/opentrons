@@ -193,7 +193,7 @@ export function InstrumentsSection(): JSX.Element | null {
             <ControlledDropdownMenu
               width="100%"
               dropdownType="neutral"
-              title={t('pipette_mounts')}
+              title={t('pipette')}
               name={NINETY_SIX_CHANNEL_PIPETTE_FIELD_NAME}
               options={ninetySixChannelOptions}
               placeholder={t('choose_pipette_placeholder')}

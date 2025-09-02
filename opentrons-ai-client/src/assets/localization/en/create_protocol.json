@@ -74,7 +74,7 @@
   "pcr": "PCR",
   "pd_prompt_warning": "Not all prompts will be possible to output to Protocol Designer. If OpentronsAI produces errors, you can correct them in OpentronsAI chat.",
   "pd_protocol": "Protocol Designer protocol",
-  "pipette_mounts": "Pipette",
+  "pipette": "Pipette",
   "protocol_format_title": "Protocol Format",
   "protocol_format": "What file format should OpentronsAI use to generate the protocol?",
   "python_protocol": "Python protocol",
