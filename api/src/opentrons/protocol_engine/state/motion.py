@@ -100,8 +100,8 @@ class MotionView:
                 f"{labware_id} has both offsetPipetteFor96GridSubwells and offsetPipetteFor12GridSubwells quirks."
             )
 
-        pipette_rows = self._pipettes.get_config(pipette_id).default_nozzle_map.rows
-        pipette_cols = self._pipettes.get_config(pipette_id).default_nozzle_map.columns
+        pipette_rows = self._pipettes.get_nozzle_configuration(pipette_id).rows
+        pipette_cols = self._pipettes.get_nozzle_configuration(pipette_id).columns
 
         even_labware_rows = subwells_96
         even_labware_columns = subwells_96 or subwells_12

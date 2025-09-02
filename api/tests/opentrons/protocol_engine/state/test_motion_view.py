@@ -351,10 +351,19 @@ def test_get_pipette_offset_for_reservoirs(
 ) -> None:
     """It should call get_waypoints() with the correct offset given the well's dimensions."""
     location = CurrentWell(pipette_id="123", labware_id="456", well_name="abc")
+    decoy.when(
+        geometry_view.get_min_travel_z("pipette-id", "labware-id", location, 123)
+    ).then_return(42.0)
 
     decoy.when(pipette_view.get_current_location()).then_return(location)
-    decoy.when(pipette_view.get_config("pipette-id")).then_return(
-        _fake_static_pipette_config(channels)
+
+    names_from_channels = {
+        1: PipetteNameType.P1000_SINGLE_FLEX,
+        8: PipetteNameType.P1000_MULTI_FLEX,
+        96: PipetteNameType.P1000_96,
+    }
+    decoy.when(pipette_view.get_nozzle_configuration("pipette-id")).then_return(
+        get_default_nozzle_map(names_from_channels[channels])
     )
 
     fake_x_dim, fake_y_dim, fake_z_dim = 7.0, 8.0, 9.0
@@ -569,9 +578,6 @@ def test_get_movement_waypoints_to_well_for_xy_center(
     decoy.when(
         geometry_view.get_min_travel_z("pipette-id", "labware-id", location, 123)
     ).then_return(42.0)
-    decoy.when(pipette_view.get_config("pipette-id")).then_return(
-        _fake_static_pipette_config(1)
-    )
 
     decoy.when(geometry_view.get_ancestor_slot_name("labware-id")).then_return(
         DeckSlotName.SLOT_2
