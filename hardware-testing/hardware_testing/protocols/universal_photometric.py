@@ -402,7 +402,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     target_volume = ctx.params.target_volume  # type: ignore [attr-defined]
 
     def _get_transfer_settings(tiprack: Labware, first_trial: bool) -> LiquidClass:
-        liquid_class = ctx.get_liquid_class("water")
+        liquid_class = ctx.get_liquid_class("water", version=2)
         transfer_properties = liquid_class.get_for(pip, tiprack)
 
         asp_offset = Coordinate(x=0, y=0, z=-1 * ctx.params.asp_sub_depth)  # type: ignore [attr-defined]
