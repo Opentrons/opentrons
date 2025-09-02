@@ -8,7 +8,6 @@ import { IDENTITY_AFFINE_TRANSFORM, multiplyMatrices } from './matrixMath'
 import { pairsFromArray } from './pairsFromArray'
 import {
   coordinateTupleToVector3D,
-  getVectorDifference,
   getVectorInverse,
   getVectorSum,
   IDENTITY_VECTOR,
@@ -398,8 +397,11 @@ export function getLabwareOriginToLabwareOrigin(
     childDefinition.stackingOffsetWithLabware?.[
       parentDefinition.parameters.loadName
     ] ?? IDENTITY_VECTOR
-  const total = getVectorDifference(base, adjustment)
-  return total
+  return getVectorSum(base, {
+    x: adjustment.x,
+    y: adjustment.y,
+    z: -adjustment.z,
+  })
 }
 
 /**
