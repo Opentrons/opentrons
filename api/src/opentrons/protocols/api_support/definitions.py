@@ -1,6 +1,5 @@
 from .types import APIVersion
 
-# TODO
 MAX_SUPPORTED_VERSION = APIVersion(2, 26)
 """The maximum supported protocol API version in this release."""
 
