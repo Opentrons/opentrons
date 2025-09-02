@@ -19,7 +19,7 @@ nav:
       - Multiple Modules of the Same Type: modules/multiple-same-type.md
   - Deck Slots: deck-slots.md
   - Pipettes:
-      - Overview: pipette.md
+      - Overview: pipettes/index.md
       - Loading: pipettes/loading.md
       - Characteristics: pipettes/characteristics.md
       - Partial Tip Pickup: pipettes/partial-tip-pickup.md
@@ -27,12 +27,12 @@ nav:
   - Liquid Classes: liquid-classes.md
   - Liquid Class Definitions: liquid-class-definitions.md
   - Atomic Commands:
-      - Overview: atomic-commands.md
-      - Pipette Tips: basic-commands/pipette-tips.md
-      - Liquids: basic-commands/liquids.md
-      - Utilities: basic-commands/utilities.md
+      - Overview: atomic-commands/index.md
+      - Pipette Tips: atomic-commands/pipette-tips.md
+      - Liquids: atomic-commands/liquids.md
+      - Utilities: atomic-commands/utilities.md
   - Complex Commands:
-      - Overview: complex-commands.md
+      - Overview: complex-commands/index.md
       - Sources & Destinations: complex-commands/sources-destinations.md
       - Order of Operations: complex-commands/order-operations.md
       - Parameters: complex-commands/parameters.md

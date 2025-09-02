@@ -4,7 +4,7 @@ description: How the Opentrons Python API moves liquids between wells when using
 
 # Sources and Destinations
 
-The legacy and liquid class transfer methods form the family of complex liquid handling commands. These methods require `source` and `dest` (destination) arguments to move liquid from one well, or group of wells, to another. In contrast, the [building block commands](../basic_commands/liquids.md) `aspirate` and `dispense` only operate in a single location.
+The legacy and liquid class transfer methods form the family of complex liquid handling commands. These methods require `source` and `dest` (destination) arguments to move liquid from one well, or group of wells, to another. In contrast, the [building block commands](../building-block-commands/liquids.md) `aspirate` and `dispense` only operate in a single location.
 
 This example uses `transfer` to perform a transfer between two wells on a plate:
 
@@ -220,7 +220,7 @@ pipette.transfer(50, plate["A2"], plate.columns()[3][3:6])
 pipette.transfer(50, plate["A3"], plate.columns()[3][6:])
 ```
 
-Finally, be aware of the ordering of source and destination lists when constructing them with [well accessor methods](../basic_commands/liquids.md#well-accessor-methods). For example, at first glance this code may appear to take liquid from each well in the first row of a plate and move it to each of the other wells in the same column:
+Finally, be aware of the ordering of source and destination lists when constructing them with [well accessor methods](../building-block-commands/liquids.md#well-accessor-methods). For example, at first glance this code may appear to take liquid from each well in the first row of a plate and move it to each of the other wells in the same column:
 
 ```python
 pipette.transfer(

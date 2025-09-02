@@ -124,7 +124,7 @@ For example, if we wanted to transfer liquid from well A1 to well B1 on a plate,
         c. Dispensing 100 µL of liquid into well B1 of the plate.
         d. Dropping the tip in the trash.
 
-There is much more that Opentrons robots and the API can do! The [Atomic Commands](atomic-commands.md), [Complex Commands](complex-commands.md), and [Modules](modules.md) pages cover many of these functions.
+There is much more that Opentrons robots and the API can do! The [Atomic Commands](building-block-commands.md), [Complex Commands](complex-commands.md), and [Modules](modules.md) pages cover many of these functions.
 
 ## More Resources
 
