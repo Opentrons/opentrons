@@ -814,7 +814,7 @@ export const SetupSteps = {
         .find('button[type="button"]')
         .click()
       cy.contains('Choose option').click()
-      cy.contains('Destination Well').click()
+      cy.contains('Destination well').click()
     },
   }),
 
