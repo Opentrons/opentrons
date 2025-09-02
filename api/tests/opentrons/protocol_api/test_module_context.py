@@ -294,7 +294,7 @@ def test_load_labware_with_adapter(
     decoy.when(
         mock_protocol_core.load_adapter(
             load_name="adaptation",
-            namespace="ideal",
+            namespace=None,
             version=None,
             location=mock_core,
         )
