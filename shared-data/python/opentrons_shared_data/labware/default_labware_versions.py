@@ -5,10 +5,9 @@ import functools
 from pathlib import Path
 
 from typing import TypeAlias
-from opentrons.protocols.api_support.types import APIVersion
+from .. import get_shared_data_root
 
-
-DefaultLabwareVersions: TypeAlias = dict[APIVersion, dict[str, int]]
+DefaultLabwareVersions: TypeAlias = dict[tuple[int, int], dict[str, int]]
 
 
 DEFAULT_LABWARE_VERSIONS_FILE = (
@@ -18,12 +17,12 @@ DEFAULT_LABWARE_VERSIONS_FILE = (
 
 @functools.cache
 def _parse_json_from_filesystem() -> DefaultLabwareVersions:
-    with open(DEFAULT_LABWARE_VERSIONS_FILE) as file:
+    with open(get_shared_data_root() / DEFAULT_LABWARE_VERSIONS_FILE) as file:
         raw_versions = json.load(file)
 
-    # convert "2.14" to APIVersion(2, 14)
+    # convert "2.14" to (2, 14)
     return {
-        APIVersion(*(map(int, version_str.split(".")))): labware_map
+        tuple(map(int, version_str.split("."))): labware_map
         for version_str, labware_map in raw_versions.items()
     }
 
@@ -57,7 +56,7 @@ KNOWN_EXCEPTIONS_FOR_TESTS: set[str] = {
 
 
 def get_standard_labware_default_version(
-    api_version: APIVersion,
+    api_version: tuple[int, int],
     load_name: str,
     default_labware_versions: DefaultLabwareVersions | None = None,
 ) -> int:
