@@ -6,9 +6,9 @@
  *   ZH: ./src/assets/localization/zh
  *
  * CLI:
- *   npx tsx scripts/compare-l10n.ts
+ *   npx tsx scripts/localizationCompare.ts
  *   # or
- *   npx ts-node scripts/compare-l10n.ts
+ *   npx ts-node scripts/localizationCompare.ts
  *
  * Optional args:
  *   --en <path>  --zh <path>
@@ -29,126 +29,196 @@ import { promises as fs } from 'node:fs'
 import * as path from 'node:path'
 import process from 'node:process'
 
-type Dict = Record<string, unknown>
+// More specific types for i18n data
+type I18nValue = string | number | boolean | null
+interface I18nObject {
+  [key: string]: I18nValue | I18nObject
+}
+type FlattenedI18nData = Record<string, I18nValue>
+type GlobalKeyMap = Record<string, I18nValue>
 
 interface CompareResult {
-  missingInZh: string[]
-  extraInZh: string[]
-  emptyEn: string[]
-  emptyZh: string[]
+  readonly missingInZh: readonly string[]
+  readonly extraInZh: readonly string[]
+  readonly emptyEn: readonly string[]
+  readonly emptyZh: readonly string[]
 }
+
+interface ParsedArgs {
+  readonly enDir: string
+  readonly zhDir: string
+}
+
+// Exit codes for better error handling
+const EXIT_CODES = {
+  SUCCESS: 0,
+  VALIDATION_FAILED: 1,
+  RUNTIME_ERROR: 2,
+} as const
 
 const DEFAULT_EN_DIR = path.resolve('src/assets/localization/en')
 const DEFAULT_ZH_DIR = path.resolve('src/assets/localization/zh')
 
 /** Parse CLI args for --en and --zh overrides */
-const parseArgs = (): { enDir: string; zhDir: string } => {
+const parseArgs = (): ParsedArgs => {
   const args = process.argv.slice(2)
   let enDir = DEFAULT_EN_DIR
   let zhDir = DEFAULT_ZH_DIR
 
   for (let i = 0; i < args.length; i++) {
-    const a = args[i]
-    if (a === '--en') {
-      enDir = path.resolve(args[i + 1])
+    const arg = args[i]
+    const nextArg = args[i + 1]
+
+    if (arg === '--en' && nextArg !== undefined && nextArg.length > 0) {
+      enDir = path.resolve(nextArg)
       i++
-    } else if (a === '--zh') {
-      zhDir = path.resolve(args[i + 1])
+    } else if (arg === '--zh' && nextArg !== undefined && nextArg.length > 0) {
+      zhDir = path.resolve(nextArg)
       i++
     }
   }
-  return { enDir, zhDir }
+  return { enDir, zhDir } as const
 }
 
-/** Recursively collect all .json files under a dir */
+/**
+ * Recursively collect all .json files under a directory.
+ * @param dir - The directory to search
+ * @returns Promise resolving to sorted array of file paths
+ */
 const collectJsonFiles = async (dir: string): Promise<string[]> => {
-  const out: string[] = []
+  const jsonFiles: string[] = []
   const entries = await fs.readdir(dir, { withFileTypes: true })
-  for (const e of entries) {
-    const p = path.join(dir, e.name)
-    if (e.isDirectory()) {
-      out.push(...(await collectJsonFiles(p)))
-    } else if (e.isFile() && e.name.toLowerCase().endsWith('.json')) {
-      out.push(p)
+
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name)
+    if (entry.isDirectory()) {
+      jsonFiles.push(...(await collectJsonFiles(fullPath)))
+    } else if (entry.isFile() && entry.name.toLowerCase().endsWith('.json')) {
+      jsonFiles.push(fullPath)
     }
   }
-  return out.sort()
+  return jsonFiles.sort()
 }
 
-/** Read and parse JSON. Returns {} if file missing (when allowedMissing=true). */
-const readJson = async (file: string, allowMissing = false): Promise<Dict> => {
+/**
+ * Read and parse JSON file with error handling.
+ * @param file - Path to the JSON file
+ * @param allowMissing - If true, returns empty object when file is missing
+ * @returns Promise resolving to parsed JSON as I18nObject
+ */
+const readJson = async (
+  file: string,
+  allowMissing = false
+): Promise<I18nObject> => {
   try {
     const raw = await fs.readFile(file, 'utf8')
-    return JSON.parse(raw) as Dict
-  } catch (err: any) {
-    if (allowMissing && err?.code === 'ENOENT') return {}
-    throw new Error(`Failed reading ${file}: ${err?.message ?? String(err)}`)
+    return JSON.parse(raw) as I18nObject
+  } catch (err) {
+    if (
+      allowMissing &&
+      err instanceof Error &&
+      'code' in err &&
+      err.code === 'ENOENT'
+    ) {
+      return {}
+    }
+    const message = err instanceof Error ? err.message : String(err)
+    throw new Error(`Failed reading ${file}: ${message}`)
   }
 }
 
-/** Flatten nested objects into dotted keys */
-const flatten = (obj: Dict, prefix = ''): Record<string, unknown> => {
-  const out: Record<string, unknown> = {}
-  for (const [k, v] of Object.entries(obj ?? {})) {
-    const key = prefix ? `${prefix}.${k}` : k
-    if (v && typeof v === 'object' && !Array.isArray(v)) {
-      Object.assign(out, flatten(v as Dict, key))
+/**
+ * Type guard to check if a value is an I18nObject.
+ * @param value - Value to check
+ * @returns True if value is an I18nObject
+ */
+const isI18nObject = (value: unknown): value is I18nObject => {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+}
+
+/**
+ * Flatten nested objects into dotted keys.
+ * @param obj - The object to flatten
+ * @param prefix - Key prefix for nested keys
+ * @returns Flattened object with dotted keys
+ */
+const flatten = (obj: I18nObject, prefix = ''): FlattenedI18nData => {
+  const result: FlattenedI18nData = {}
+
+  for (const [key, value] of Object.entries(obj)) {
+    const fullKey = prefix.length > 0 ? `${prefix}.${key}` : key
+    if (isI18nObject(value)) {
+      Object.assign(result, flatten(value, fullKey))
     } else {
-      out[key] = v
+      result[fullKey] = value as I18nValue
     }
   }
-  return out
+  return result
 }
 
-/** Build a global key map: "<namespace>.<flattenedKey>" -> value */
-const buildGlobalMap = async (
-  dir: string
-): Promise<Record<string, unknown>> => {
+/**
+ * Build a global key map from all JSON files in a directory.
+ * @param dir - Directory containing JSON localization files
+ * @returns Promise resolving to global key map
+ */
+const buildGlobalMap = async (dir: string): Promise<GlobalKeyMap> => {
   const files = await collectJsonFiles(dir)
-  const map: Record<string, unknown> = {}
+  const globalMap: GlobalKeyMap = {}
 
   for (const file of files) {
-    // namespace = file name without extension (keep subdir part to avoid collisions)
+    // Use filename (without extension) as namespace
     // e.g., ".../en/common.json" -> "common"
-    // If you want subdirs in namespace, you can use relative path without extension:
-    //   const rel = path.relative(dir, file).replace(/\.json$/i, '').replaceAll(path.sep, '/')
-    const ns = path.basename(file, '.json')
-    const json = await readJson(file)
-    const flat = flatten(json)
-    for (const [k, v] of Object.entries(flat)) {
-      const gk = `${ns}.${k}`
-      map[gk] = v
+    const namespace = path.basename(file, '.json')
+    const jsonContent = await readJson(file)
+    const flattenedContent = flatten(jsonContent)
+
+    for (const [key, value] of Object.entries(flattenedContent)) {
+      const globalKey = `${namespace}.${key}`
+      globalMap[globalKey] = value
     }
   }
-  return map
+  return globalMap
 }
 
-const compare = (
-  enMap: Record<string, unknown>,
-  zhMap: Record<string, unknown>
-): CompareResult => {
+/**
+ * Compare English and Chinese localization maps.
+ * @param enMap - English localization key-value map
+ * @param zhMap - Chinese localization key-value map
+ * @returns Comparison result with differences and issues
+ */
+const compare = (enMap: GlobalKeyMap, zhMap: GlobalKeyMap): CompareResult => {
   const enKeys = new Set(Object.keys(enMap))
   const zhKeys = new Set(Object.keys(zhMap))
 
-  const missingInZh = enKeys.difference(zhKeys)
-  const extraInZh = zhKeys.difference(enKeys)
+  // Use manual set difference since Set.difference might not be available
+  const missingInZh: string[] = []
+  const extraInZh: string[] = []
   const emptyEn: string[] = []
   const emptyZh: string[] = []
 
-  // Missing in zh + empty strings in en
-  for (const k of enKeys) {
-    if (!zhKeys.has(k)) missingInZh.push(k)
-    const v = enMap[k]
-    if (v === '') emptyEn.push(k)
+  // Find keys missing in zh and empty strings in en
+  for (const key of enKeys) {
+    if (!zhKeys.has(key)) {
+      missingInZh.push(key)
+    }
+    const value = enMap[key]
+    if (value === '') {
+      emptyEn.push(key)
+    }
   }
 
-  // Extra in zh + empty strings in zh
-  for (const k of zhKeys) {
-    if (!enKeys.has(k)) extraInZh.push(k)
-    const v = zhMap[k]
-    if (v === '') emptyZh.push(k)
+  // Find keys extra in zh and empty strings in zh
+  for (const key of zhKeys) {
+    if (!enKeys.has(key)) {
+      extraInZh.push(key)
+    }
+    const value = zhMap[key]
+    if (value === '') {
+      emptyZh.push(key)
+    }
   }
 
+  // Sort all arrays for consistent output
   missingInZh.sort()
   extraInZh.sort()
   emptyEn.sort()
@@ -157,26 +227,35 @@ const compare = (
   return { missingInZh, extraInZh, emptyEn, emptyZh }
 }
 
-/** Pretty print a section with count and items */
-const printSection = (title: string, items: string[]) => {
+/**
+ * Pretty print a section with count and items.
+ * @param title - Section title
+ * @param items - Array of items to display
+ */
+const printSection = (title: string, items: readonly string[]): void => {
   const count = items.length
   const header = `${title} (${count})`
   console.log('\n' + header)
   console.log(''.padEnd(header.length, '-'))
-  if (count) {
-    for (const k of items) console.log(k)
+  if (count > 0) {
+    for (const item of items) {
+      console.log(item)
+    }
   } else {
     console.log('none')
   }
 }
 
+/**
+ * Main execution function.
+ */
 const main = async (): Promise<void> => {
   const { enDir, zhDir } = parseArgs()
 
   console.log(`EN dir: ${enDir}`)
   console.log(`ZH dir: ${zhDir}`)
 
-  // Build global key spaces
+  // Build global key maps for both locales
   const [enMap, zhMap] = await Promise.all([
     buildGlobalMap(enDir),
     buildGlobalMap(zhDir),
@@ -189,12 +268,16 @@ const main = async (): Promise<void> => {
   printSection('Empty strings in en', emptyEn)
   printSection('Empty strings in zh', emptyZh)
 
+  // Exit with error code if any issues were found
   const hasProblems =
-    missingInZh.length || extraInZh.length || emptyEn.length || emptyZh.length
-  process.exit(hasProblems ? 1 : 0)
+    missingInZh.length > 0 ||
+    extraInZh.length > 0 ||
+    emptyEn.length > 0 ||
+    emptyZh.length > 0
+  process.exit(hasProblems ? EXIT_CODES.VALIDATION_FAILED : EXIT_CODES.SUCCESS)
 }
 
 main().catch(err => {
   console.error(err)
-  process.exit(2)
+  process.exit(EXIT_CODES.RUNTIME_ERROR)
 })
