@@ -197,7 +197,7 @@ describe('dropTip', () => {
       )
       const res = getSuccessResult(result)
       expect(res.python).toEqual(
-        'mock_pipette.drop_tip(location=mock_tip_rack_1.wells_by_name()["A1"])'
+        'mock_pipette.drop_tip(location=mock_tip_rack_1["A1"])'
       )
     })
 
