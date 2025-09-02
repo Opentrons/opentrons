@@ -20,7 +20,7 @@ from opentrons.protocol_api.core.engine import (
 
 
 metadata = {"protocolName": "96ch Universal Photometric Protocol"}
-requirements = {"robotType": "Flex", "apiLevel": "2.24"}
+requirements = {"robotType": "Flex", "apiLevel": "2.26"}
 
 DYE_RESERVOIR_DEAD_VOLUME = 20000  # 20k uL
 
