@@ -13,6 +13,7 @@ import type {
   SettingItem,
 } from '../../types'
 
+const DIGIT = 1
 interface UseAspirateSettingsConfigProps {
   state: QuickTransferSummaryState
   dispatch: Dispatch<QuickTransferSummaryAction>
@@ -36,7 +37,9 @@ export function useAspirateSettingsConfig({
     {
       option: SETTING_OPTIONS.ASPIRATE_FLOW_RATE,
       copy: t('aspirate_flow_rate'),
-      value: t('flow_rate_value', { flow_rate: state.aspirateFlowRate }),
+      value: t('flow_rate_value', {
+        flow_rate: state.aspirateFlowRate.toFixed(DIGIT),
+      }),
       enabled: true,
       onClick: () => {
         setSelectedSetting(SETTING_OPTIONS.ASPIRATE_FLOW_RATE)

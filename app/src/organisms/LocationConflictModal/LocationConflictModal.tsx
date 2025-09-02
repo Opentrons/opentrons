@@ -33,6 +33,7 @@ import {
   getModuleDisplayName,
   MAGNETIC_BLOCK_V1_FIXTURE,
   SINGLE_LEFT_SLOT_FIXTURE,
+  SINGLE_RIGHT_SLOT_FIXTURE,
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
   THERMOCYCLER_V2_FRONT_FIXTURE,
@@ -40,6 +41,7 @@ import {
   WASTE_CHUTE_FLEX_STACKER_FIXTURES,
   WASTE_CHUTE_ONLY_FIXTURES,
   WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
@@ -121,13 +123,34 @@ export const LocationConflictModal = (
     deckConfigurationAtLocationFixtureId === THERMOCYCLER_V2_REAR_FIXTURE ||
     deckConfigurationAtLocationFixtureId === THERMOCYCLER_V2_FRONT_FIXTURE
 
-  const currentFixtureDisplayName =
-    deckConfigurationAtLocationFixtureId != null
-      ? getFixtureDisplayName(
-          t as TFunction,
-          deckConfigurationAtLocationFixtureId
-        )
-      : ''
+  const getCurrentFixtureDisplayName = (): string => {
+    if (
+      requiredFixtureId === SINGLE_RIGHT_SLOT_FIXTURE &&
+      deckConfigurationAtLocationFixtureId ===
+        FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE
+    ) {
+      return getFixtureDisplayName(t as TFunction, MAGNETIC_BLOCK_V1_FIXTURE)
+    } else if (
+      requiredFixtureId === SINGLE_RIGHT_SLOT_FIXTURE &&
+      (deckConfigurationAtLocationFixtureId ===
+        FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE ||
+        deckConfigurationAtLocationFixtureId ===
+          FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE)
+    ) {
+      return getFixtureDisplayName(
+        t as TFunction,
+        WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
+      )
+    } else {
+      return deckConfigurationAtLocationFixtureId != null
+        ? getFixtureDisplayName(
+            t as TFunction,
+            deckConfigurationAtLocationFixtureId
+          )
+        : ''
+    }
+  }
+  const currentFixtureDisplayName = getCurrentFixtureDisplayName()
 
   const handleConfigureModule = (moduleSerialNumber?: string): void => {
     if (requiredModule != null) {

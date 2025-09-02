@@ -136,7 +136,7 @@
   "factory_mode": "工厂模式",
   "factory_reset": "工厂重置",
   "factory_reset_description": "重置所有设置。在再次使用工作站之前，您必须重新进行初始设置。",
-  "factory_reset_modal_description": "这些数据以后无法被检索。",
+  "factory_reset_modal_description": "重置将删除所有保存的数据并重新启动机器人。此操作是永久性的，无法撤销。",
   "factory_resets_cannot_be_undone": "工厂重置无法撤销。",
   "failed_to_connect_to_ssid": "无法连接到{{ssid}}",
   "feature_flags": "功能标志",
