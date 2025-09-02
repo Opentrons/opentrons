@@ -88,4 +88,8 @@ The power consumption specifications are measured with the UV lights and fan on.
 
 With early model HEPA/UV Modules, fully opening the robot's front door could cause it to scrape against the top of the module. HEPA modules manufactured on or after July 2025 include three rollers mounted along its top-front edge. These rollers help prevent the HEPA module from damaging the front door when you open it.
 
-![Modules without and with rollers](images/hepa-comparison.png)
+<figure class="side-by-side" markdown>
+  ![Module with door rollers](images/hepa-rollers.png)
+  ![Module without door rollers](images/hepa-no-rollers.png)
+  <figcaption>Newer models have door rollers. Older models do not.</figcaption>
+</figure>
