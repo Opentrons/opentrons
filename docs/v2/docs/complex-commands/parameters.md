@@ -24,7 +24,7 @@ The `new_tip` parameter controls if and when complex commands pick up new tips f
 
 ### Tip Handling Requirements
 
-`"once"` and `"always"` require that the pipette has an [associated tip rack](../basic_commands/pipette_tips.md), or the API will raise an error (because it doesn't know where to pick up a tip from). If the pipette already has a tip attached, the API will also raise an error when it tries to pick up a tip.
+`"once"` and `"always"` require that the pipette has an [associated tip rack](../building-block-commands/pipette_tips.md), or the API will raise an error (because it doesn't know where to pick up a tip from). If the pipette already has a tip attached, the API will also raise an error when it tries to pick up a tip.
 
 ```python
 pipette.pick_up_tip()
@@ -61,7 +61,7 @@ If this poses a contamination risk, you can work around it in a few ways:
 - Use `transfer()` or `transfer_with_liquid_class()` with `new_tip="always"` instead.
 - Set `well_bottom_clearance` high enough that the tip doesn't contact liquid in the destination well.
 - [Customize your liquid class](../liquid_classes/customizing.md) to change dispense heights or add touch tip behavior.
-- Use [building block commands](../basic_commands/liquids.md) instead of complex commands.
+- Use [building block commands](../building-block-commands/liquids.md) instead of complex commands.
 
 ## Mix Before
 
@@ -143,7 +143,7 @@ pipette.transfer(
 
 Touch tip occurs after every aspiration, including when [tip refilling](#tip-refilling) is required.
 
-This parameter always uses default motion behavior for touch tip. Use the [touch tip building block command](../basic_commands/liquids.md#touch-tip) if you need to:
+This parameter always uses default motion behavior for touch tip. Use the [touch tip building block command](../building-block-commands/liquids.md#touch-tip) if you need to:
 - Only touch the tip after aspirating or dispensing, but not both.
 - Control the speed, radius, or height of the touch tip motion.
 
@@ -251,7 +251,7 @@ pipette.transfer(
 
 Set `blowout_location` when you don't want to waste any liquid by blowing it out into the trash. For example, you may want to make sure that every last bit of a sample is moved into a destination well. Or you may want to return every last bit of an expensive reagent to the source for use in later pipetting.
 
-If you need to blow out in a different well, or at a specific location within a well, use the [blow out building block command](../basic_commands/liquids.md#blow-out) instead.
+If you need to blow out in a different well, or at a specific location within a well, use the [blow out building block command](../building-block-commands/liquids.md#blow-out) instead.
 
 When setting a blowout location, you *must* also set `blow_out=True`, or the location will be ignored:
 

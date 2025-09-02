@@ -1,6 +1,6 @@
 # Complex Commands
 
-Complex liquid handling commands combine multiple [building block commands](atomic-commands.md) into a single method call. These commands make it easier to handle larger groups of wells and repeat actions without having to write your own control flow code. They integrate tip-handling behavior and can pick up, use, and drop multiple tips depending on how you want to handle your liquids.
+Complex liquid handling commands combine multiple [building block commands](building-block-commands.md) into a single method call. These commands make it easier to handle larger groups of wells and repeat actions without having to write your own control flow code. They integrate tip-handling behavior and can pick up, use, and drop multiple tips depending on how you want to handle your liquids.
 
 There are six complex liquid handling commands, each optimized for a different liquid handling scenario:
 

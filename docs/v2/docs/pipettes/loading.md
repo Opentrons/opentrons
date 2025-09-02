@@ -1,6 +1,6 @@
 # Loading Pipettes
 
-When writing a protocol, you must inform the Protocol API about the pipettes you will be using on your robot. The [`load_instrument()`][opentrons.protocol_api.ProtocolContext.load_instrument] function provides this information and returns an [InstrumentContext][opentrons.protocol_api.InstrumentContext] object.
+When writing a protocol, you must inform the Protocol API about the pipettes you will be using on your robot. The [`ProtocolContext.load_instrument()`][opentrons.protocol_api.ProtocolContext.load_instrument] function provides this information and returns an [`InstrumentContext`][opentrons.protocol_api.InstrumentContext] object.
 
 As noted above, you call the [`load_instrument()`][opentrons.protocol_api.ProtocolContext.load_instrument] method to load a pipette. This method also requires the pipette's API load name, its left or right mount position, and (optionally) a list of associated tip racks. Even if you don't use the pipette anywhere else in your protocol, the Opentrons App and the robot won't let you start the protocol run until all pipettes loaded by `load_instrument()` are attached properly.
 
@@ -9,13 +9,40 @@ As noted above, you call the [`load_instrument()`][opentrons.protocol_api.Protoc
 The pipette's API load name (`instrument_name`) is the first parameter of the `load_instrument()` method. It tells your robot which attached pipette you're going to use in a protocol. The tables below list the API load names for the currently available Flex and OT-2 pipettes.
 
 === "Flex Pipettes"
-    | Pipette Model           | Volume (µL)   | API Load Name           |
-    |------------------------|---------------|------------------------|
-    | Flex 1-Channel Pipette | 1–50          | `flex_1channel_50`     |
-    |                        | 5–1000        | `flex_1channel_1000`   |
-    | Flex 8-Channel Pipette | 1–50          | `flex_8channel_50`     |
-    |                        | 5–1000        | `flex_8channel_1000`   |
-    | Flex 96-Channel Pipette| 5–1000        | `flex_96channel_1000`  |
+    <table>
+        <thead>
+            <tr>
+                <th>Pipette Model</th>
+                <th>Volume (µL)</th>
+                <th>API Load Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td rowspan="2">Flex 1-Channel Pipette</td>
+                <td>1–50</td>
+                <td><code>flex_1channel_50</code></td>
+            </tr>
+            <tr>
+                <td>5–1000</td>
+                <td><code>flex_1channel_1000</code></td>
+            </tr>
+            <tr>
+                <td rowspan="2">Flex 8-Channel Pipette</td>
+                <td>1–50</td>
+                <td><code>flex_8channel_50</code></td>
+            </tr>
+            <tr>
+                <td>5–1000</td>
+                <td><code>flex_8channel_1000</code></td>
+            </tr>
+            <tr>
+                <td>Flex 96-Channel Pipette</td>
+                <td>5–1000</td>
+                <td><code>flex_96channel_1000</code></td>
+            </tr>
+        </tbody>
+    </table>
 
 === "OT-2 Pipettes"
     | Pipette Model               | Volume (µL)        | API Load Name         |
@@ -26,7 +53,7 @@ The pipette's API load name (`instrument_name`) is the first parameter of the `l
     | P300 Multi-Channel GEN2     |                    | `p300_multi_gen2`     |
     | P1000 Single-Channel GEN2   | 100-1000           | `p1000_single_gen2`   |
 
-See the [OT-2 Pipette Generations](characteristics.md#ot2-pipette-generations) section if you're using GEN1 pipettes on an OT-2. The GEN1 family includes the P10, P50, and P300 single- and multi-channel pipettes, along with the P1000 single-channel model.
+    See the [OT-2 Pipette Generations](characteristics.md#ot-2-pipette-generations) section if you're using GEN1 pipettes on an OT-2. The GEN1 family includes the P10, P50, and P300 single- and multi-channel pipettes, along with the P1000 single-channel model.
 
 ## Loading Flex 1- and 8-Channel Pipettes
 
@@ -50,7 +77,7 @@ def run(protocol: protocol_api.ProtocolContext):
         tip_racks=[tiprack2])
 ```
 
-If you're writing a protocol that uses the Flex Gripper, you might think that this would be the place in your protocol to declare that. However, the gripper doesn't require `load_instrument`! Whether your gripper requires a protocol is determined by the presence of [`move_labware()`][opentrons.protocol_api.ProtocolContext.move_labware] commands. See [Moving Labware](../moving_labware.md) for more details.
+If you're writing a protocol that uses the Flex Gripper, you might think that this would be the place in your protocol to declare that. However, the gripper doesn't require `load_instrument`! Whether your gripper requires a protocol is determined by the presence of [`ProtocolContext.move_labware()`][opentrons.protocol_api.ProtocolContext.move_labware] commands. See [Moving Labware](../moving-labware.md) for more details.
 
 ## Loading a Flex 96-Channel Pipette
 
@@ -64,6 +91,7 @@ def run(protocol: protocol_api.ProtocolContext):
 ```
 
 *New in version 2.15*
+
 *Changed in version 2.16: The `mount` parameter is optional.*
 
 ## Loading OT-2 Pipettes
@@ -92,10 +120,10 @@ def run(protocol: protocol_api.ProtocolContext):
 
 ## Adding Tip Racks
 
-The `load_instrument()` method includes the optional argument `tip_racks`. This parameter accepts a list of tip rack labware objects, which lets you to specify as many tip racks as you want. You can also edit a pipette's tip racks after loading it by setting its [InstrumentContext.tip_racks][opentrons.protocol_api.InstrumentContext.tip_racks] property.
+The `load_instrument()` method includes the optional argument `tip_racks`. This parameter accepts a list of tip rack labware objects, which lets you to specify as many tip racks as you want. You can also edit a pipette's tip racks after loading it by setting its [`InstrumentContext.tip_racks`][opentrons.protocol_api.InstrumentContext.tip_racks] property.
 
-> [!note]
-> Some methods, like [`configure_nozzle_layout()`][opentrons.protocol_api.InstrumentContext.configure_nozzle_layout], reset a pipette's tip racks. See [Partial Tip Pickup](partial_tip_pickup.md) for more information.
+!!! note
+    Some methods, like [`configure_nozzle_layout()`][opentrons.protocol_api.InstrumentContext.configure_nozzle_layout], reset a pipette's tip racks. See [Partial Tip Pickup](partial-tip-pickup.md) for more information.
 
 The advantage of using `tip_racks` is twofold. First, associating tip racks with your pipette allows for automatic tip tracking throughout your protocol. Second, it removes the need to specify tip locations in the [`pick_up_tip()`][opentrons.protocol_api.InstrumentContext.pick_up_tip] method. For example, let's start by loading some labware and instruments like this:
 
@@ -147,11 +175,11 @@ right_pipette.drop_tip()
 
 *New in version 2.0*
 
-See also [Atomic Commands](../new_atomic_commands.md) and [Complex Commands](../new_complex_commands.md).
+See also [Atomic Commands](../building-block-commands/index.md) and [Complex Commands](../complex-commands/index.md).
 
 ## Adding Trash Containers
 
-The API automatically assigns a [trash_container][opentrons.protocol_api.InstrumentContext.trash_container] to pipettes, if one is available in your protocol. The `trash_container` is where the pipette will dispose tips when you call [`drop_tip()`][opentrons.protocol_api.InstrumentContext.drop_tip] with no arguments. You can change the trash container, if you don't want to use the default.
+The API automatically assigns a [`trash_container`][opentrons.protocol_api.InstrumentContext.trash_container] to pipettes, if one is available in your protocol. The `trash_container` is where the pipette will dispose tips when you call [`drop_tip()`][opentrons.protocol_api.InstrumentContext.drop_tip] with no arguments. You can change the trash container, if you don't want to use the default.
 
 One example of when you might want to change the trash container is a Flex protocol that goes through a lot of tips. In a case where the protocol uses two pipettes, you could load two trash bins and assign one to each pipette:
 
@@ -181,6 +209,7 @@ pipette.trash_container = trash  # overrides default
 ```
 
 *New in version 2.0*
+
 *Changed in version 2.16: Added support for `TrashBin` and `WasteChute` objects.*
 
 ## Liquid Presence Detection
@@ -189,7 +218,7 @@ Liquid presence detection is a pressure-based feature that allows Opentrons Flex
 
 When detecting liquid, the pipette slowly moves a fresh, empty tip downward from the top of the well until it contacts the liquid. The downward probing motion can take anywhere from 5 to 50 seconds, depending on the depth of the well and how much liquid it contains. For example, it will take much less time to detect liquid in a full flat well plate than in an empty (or nearly empty) large tube.
 
-You can enable this feature for an entire protocol run or toggle it on and off as required. Consider the amount of time automatic detection will add to your protocol. If you only need to detect liquid infrequently, use the corresponding building block commands instead. Automatic liquid presence detection is disabled by default.
+You can enable this feature for an entire protocol run or toggle it on and off as required. Consider the amount of time automatic detection will add to your protocol. If you only need to detect liquid infrequently, use the [corresponding building block commands][detect-liquids] instead. Automatic liquid presence detection is disabled by default.
 
 ### Pipette Compatibility
 
@@ -208,10 +237,10 @@ right = protocol.load_instrument(
 )
 ```
 
-> [!note]
-> Accurate liquid detection requires fresh, dry pipette tips. Protocols using this feature must discard used tips after an aspirate/dispense cycle and pick up new tips before the next cycle. Complex commands may include aspirate steps after a tip is already wet. When global liquid detection is enabled, use building block commands to ensure that your protocol picks up a tip immediately before aspiration.
->
-> The API will not raise an error during liquid detection if a tip is empty but wet. It will raise an error if liquid detection is active and your protocol attempts to aspirate with liquid in the tip.
+!!! note
+    Accurate liquid detection requires fresh, dry pipette tips. Protocols using this feature must discard used tips after an aspirate/dispense cycle and pick up new tips before the next cycle. [Complex commands](../complex-commands/index.md) may include aspirate steps after a tip is already wet. When global liquid detection is enabled, use [building block commands](../building-block-commands/index.md) to ensure that your protocol picks up a tip immediately before aspiration.
+    
+    The API will not raise an error during liquid detection if a tip is empty but wet. It will raise an error if liquid detection is active and your protocol attempts to aspirate with liquid in the tip.
 
 Let's take a look at how all this works. With automatic liquid detection enabled, tell the robot to pick up a clean tip, aspirate 100 µL from a reservoir, and dispense that volume into a well plate:
 
@@ -223,7 +252,7 @@ right.dispense(100, plate["A1"])
 
 Liquid detection takes place prior to aspiration. Upon detecting a liquid, the pipette stops, raises itself above the liquid's surface, and then aspirates according to your protocol. Checking for a liquid adds time to your protocol run, so be aware of that before using it. If Flex doesn't detect liquid, it raises an error and stops the protocol until the problem is resolved.
 
-However, aspiration isn't required for liquid level detection. Three standalone methods, [`detect_liquid_presence()`][opentrons.protocol_api.InstrumentContext.detect_liquid_presence], [`require_liquid_presence()`][opentrons.protocol_api.InstrumentContext.require_liquid_presence], and [`measure_liquid_height()`][opentrons.protocol_api.InstrumentContext.measure_liquid_height], let you add liquid detection to a protocol with or without aspirating. Automatic detection is the same as calling `require_liquid_presence()` before every aspiration. See the API reference for details.
+However, aspiration isn't required for liquid level detection. Three standalone methods, [`detect_liquid_presence()`][opentrons.protocol_api.InstrumentContext.detect_liquid_presence], [`require_liquid_presence()`][opentrons.protocol_api.InstrumentContext.require_liquid_presence], and [`measure_liquid_height()`][opentrons.protocol_api.InstrumentContext.measure_liquid_height], let you add liquid detection to a protocol with or without aspirating. Automatic detection is the same as calling `require_liquid_presence()` before every aspiration. See [Detect Liquids][detect-liquids], [Require Liquids][require-liquids], or [Measure Liquids][measure-liquids] for details.
 
 *New in version 2.20*
 

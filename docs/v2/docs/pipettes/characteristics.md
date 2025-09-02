@@ -10,7 +10,7 @@ Finally, the volume ranges of pipettes affect what you can do with them. The vol
 
 ## Multi-Channel Movement
 
-All [atomic commands](../new_atomic_commands.md) and [complex commands](../new_complex_commands.md) work with single- and multi-channel pipettes.
+All [atomic commands](../new_building-block-commands.md) and [complex commands](../new_complex_commands.md) work with single- and multi-channel pipettes.
 
 To keep the protocol API consistent when using single- and multi-channel pipettes, location arguments of pipetting commands use the pipette's *primary channel*. For multi-channel pipettes picking up tips with all of their channels, the back-left channel is considered primary. When using fewer channels, the `start` parameter of the [`configure_nozzle_layout()`][opentrons.protocol_api.InstrumentContext.configure_nozzle_layout] method can change the pipette's primary channel. See [Partial Tip Pickup](partial_tip_pickup.md) for more information.
 
