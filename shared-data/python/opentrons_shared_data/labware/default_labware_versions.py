@@ -22,8 +22,10 @@ def _parse_json_from_filesystem() -> DefaultLabwareVersions:
 
     # convert "2.14" to (2, 14)
     return {
-        tuple(map(int, version_str.split("."))): labware_map
+        (major, minor): labware_map
         for version_str, labware_map in raw_versions.items()
+        if (major := int(version_str.split(".")[0])) is not None
+        and (minor := int(version_str.split(".")[1])) is not None
     }
 
 
