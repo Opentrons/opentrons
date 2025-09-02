@@ -63,7 +63,10 @@ async def test_set_target_block_temperature(
 
     decoy.verify(
         await tc_hardware.set_target_block_temperature(
-            celsius=45.6, volume=77.6, hold_time_seconds=654321
+            celsius=45.6,
+            volume=77.6,
+            hold_time_seconds=654321,
+            ramp_rate=None,
         ),
         times=1,
     )
