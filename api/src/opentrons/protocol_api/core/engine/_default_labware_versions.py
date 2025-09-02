@@ -112,7 +112,7 @@ DEFAULT_LABWARE_VERSIONS: DefaultLabwareVersions = {
         "thermoscientificnunc_96_wellplate_2000ul": 3,
         "usascientific_96_wellplate_2.4ml_deep": 3,
     },
-    APIVersion(2, 26): {
+    APIVersion(2, 27): {
         "agilent_1_reservoir_290ml": 4,
         "axygen_1_reservoir_90ml": 3,
         "biorad_96_wellplate_200ul_pcr": 5,
