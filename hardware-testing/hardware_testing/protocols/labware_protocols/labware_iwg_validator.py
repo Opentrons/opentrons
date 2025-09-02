@@ -290,8 +290,11 @@ def aspirate_dispense_measure(
             ethanol_props.aspirate.aspirate_position.offset.z = meniscus_z
             ethanol_props.dispense.dispense_position.position_reference = "well-bottom"
             ethanol_props.dispense.dispense_position.offset.z = dispense_offset
-            pushout = ethanol_props.dispense.push_out_by_volume.get_for_volume(dispense_vol*1.25)
-            ethanol_props.dispense.push_out_by_volume.set_for_volume(dispense_vol, pushout)
+            ethanol_props.dispense.push_out_by_volume.set_for_all_volumes(0.0)
+            ethanol_props.dispense.flow_rate_by_volume.set_for_all_volumes(max(min(dispense_vol / 10, 200),20))
+            ethanol_props.dispense.retract.blowout.location = "destination"
+            ethanol_props.dispense.retract.blowout.flow_rate = liq_pipette.flow_rate.blow_out
+            ethanol_props.dispense.retract.blowout.enabled = True
 
         liq_pipette.transfer_with_liquid_class(                      
             liquid_class=ethanol,
@@ -301,10 +304,7 @@ def aspirate_dispense_measure(
             new_tip='never',
             return_tip=False
             )
-        liq_pipette.touch_tip()
-        liq_pipette.blow_out(labware[well].bottom(z=dispense_offset + 5))
         
-
         height = _get_height_of_liquid_in_well(
             probe_pipette, labware[well], ctx.is_simulating()
         )

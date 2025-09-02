@@ -519,6 +519,7 @@ def geometry_creator(ctx: ProtocolContext, state: SetupState) -> List[TrialResul
     status = "pass"
     current_well = "none"
     udv_table: List[TrialResult] = []
+    meniscus_z = -0.5
 
     # Stops the protocol once the dispensed volume reaches a certain point
     if max_volume > 100000:
@@ -576,36 +577,38 @@ def geometry_creator(ctx: ProtocolContext, state: SetupState) -> List[TrialResul
 
         # Set Dispense Parameters 
         dispense_volume += step_volume
+        volume_per_channel = dispense_volume / liq_pipette.channels
+
         if len(wells) <= 96:
             dispense_offset = corrected_height + state.target_height + 10
-            liq_pipette.flow_rate.blow_out = 200
+            liq_pipette.flow_rate.blow_out = 1000
         else:
             dispense_offset = corrected_height + state.target_height + 5
-            liq_pipette.flow_rate.blow_out = 1000
-        meniscus_z = -0.5
+            liq_pipette.flow_rate.blow_out = 200
+    
         for rack in state.liquid_racks:
             ethanol_props = ethanol.get_for(state.liquid_mount, rack)
             ethanol_props.aspirate.aspirate_position.position_reference = "liquid-meniscus"
             ethanol_props.aspirate.aspirate_position.offset.z = meniscus_z
             ethanol_props.dispense.dispense_position.position_reference = "well-bottom"
             ethanol_props.dispense.dispense_position.offset.z = dispense_offset
-            pushout = ethanol_props.dispense.push_out_by_volume.get_for_volume(dispense_volume*1.25)
-            ethanol_props.dispense.push_out_by_volume.set_for_volume(dispense_volume, pushout)
-            ethanol_props.dispense.flow_rate_by_volume.set_for_volume = [(dispense_volume, 50.0)]
-        
+            ethanol_props.dispense.push_out_by_volume.set_for_all_volumes(0.0)
+            ethanol_props.dispense.flow_rate_by_volume.set_for_all_volumes(max(min(volume_per_channel / 10, 200),20))
+            ethanol_props.dispense.retract.blowout.location = "destination"
+            ethanol_props.dispense.retract.blowout.flow_rate = liq_pipette.flow_rate.blow_out
+            ethanol_props.dispense.retract.blowout.enabled = True
+
         pick_up_tips(probe_pipette, liq_pipette)
         tip_z_error = _get_tip_z_error(ctx, probe_pipette, state.dial)
-    
+        
         liq_pipette.transfer_with_liquid_class(                      
             liquid_class=ethanol,
-            volume=dispense_volume / liq_pipette.channels,
+            volume=volume_per_channel,
             source=src["A1"],
             dest=labware[current_well],
             new_tip='never',
             return_tip=False
             )
-        #liq_pipette.touch_tip()
-        liq_pipette.blow_out(labware[current_well].bottom(z=dispense_offset + 5))
 
         # Measure liquid height
         height = _get_height_of_liquid_in_well(
