@@ -112,7 +112,7 @@ def run(protocol: ProtocolContext) -> None:
     reagent_plate, temp_adapter = helpers.load_temp_adapter_and_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", temp_block, "Reagent Plate"
     )
-    lid = protocol.load_lid_stack("opentrons_tough_universal_lid", "B4", 2)
+    lid = helpers.load_disposable_lids(protocol, 2, "B4", deck_riser)
     # ========== SECOND ROW ==========
     MAG_PLATE_SLOT: MagneticBlockContext = protocol.load_module(
         helpers.mag_str, "C1"
@@ -134,7 +134,7 @@ def run(protocol: ProtocolContext) -> None:
     # ========== FOURTH ROW ==========
     tiprack_200_3 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "11")
     trash_bin = protocol.load_trash_bin("A3")
-    lid = protocol.load_lid_stack("custom_opentrons_tough_universal_lid", "B4", 2)
+    #lid = protocol.load_lid_stack("custom_opentrons_tough_universal_lid", "B4", 2)
     # reagent
     AMPure = reservoir["A1"]
     SMB = reservoir["A2"]
