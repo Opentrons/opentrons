@@ -496,16 +496,32 @@ export function getLoadWasteChute(
     : ''
 }
 
+const formatDescription = (description?: string | null): string => {
+  // Keep valid printable Unicode
+  const safeDescription = description
+    ?.replace(/[\u0000-\u001F\u007F]/g, '')
+    .replace(/\r\n?/g, '\n')
+
+  return safeDescription != null && safeDescription.trim() !== ''
+    ? '\n' +
+        safeDescription
+          .split('\n')
+          .map(line => `# ${line}`)
+          .join('\n')
+    : ''
+}
+
 export function stepCommands(robotStateTimeline: Timeline): string {
   return (
     '# PROTOCOL STEPS\n\n' +
     robotStateTimeline.timeline
-      .map(
-        timelineFrame =>
-          `# Step ${timelineFrame.stepNumber}:\n${
-            timelineFrame.python || 'pass'
-          }`
-      )
+      .map(timelineFrame => {
+        const { stepInfo } = timelineFrame
+        const description = stepInfo?.description
+        return `# Step ${stepInfo?.stepNumber}: ${
+          stepInfo?.name
+        }${formatDescription(description)}\n${timelineFrame.python || 'pass'}`
+      })
       .join('\n\n')
   )
 }
