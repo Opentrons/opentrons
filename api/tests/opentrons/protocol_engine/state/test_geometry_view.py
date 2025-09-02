@@ -2825,7 +2825,7 @@ def test_get_labware_grip_point_v2_definition(
     mock_addressable_area_view: AddressableAreaView,
     subject: GeometryView,
 ) -> None:
-    """It should get the grip point of a LabwareDefinition2 labware at the specified location."""
+    """It should get the grip point of a LabwareDefinition2 labware at the specified location using addressable area center."""
     decoy.when(mock_labware_view.get_grip_z(_MOCK_LABWARE_DEFINITION2)).then_return(100)
 
     decoy.when(
@@ -2836,6 +2836,10 @@ def test_get_labware_grip_point_v2_definition(
         mock_addressable_area_view.get_addressable_area(DeckSlotName.SLOT_1.id)
     ).then_return(MOCK_ADDRESSABLE_AREA)
 
+    decoy.when(
+        mock_addressable_area_view.get_addressable_area_center(DeckSlotName.SLOT_1.id)
+    ).then_return(Point(x=64, y=43, z=0))
+
     labware_center = subject.get_labware_grip_point(
         labware_definition=_MOCK_LABWARE_DEFINITION2,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
@@ -2843,11 +2847,13 @@ def test_get_labware_grip_point_v2_definition(
         user_additional_offset=None,
     )
 
-    assert labware_center == Point(
-        101.0 + 500 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x,
-        102.0 + 600 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y,
-        103 + 100 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z,
+    expected = Point(
+        x=64 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x,
+        y=43 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y,
+        z=0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z + 100,
     )
+
+    assert labware_center == expected
 
 
 def test_get_labware_grip_point_v3_definition(
@@ -2856,7 +2862,7 @@ def test_get_labware_grip_point_v3_definition(
     mock_addressable_area_view: AddressableAreaView,
     subject: GeometryView,
 ) -> None:
-    """It should get the grip point of a LabwareDefinition3 labware at the specified location."""
+    """It should get the grip point of a LabwareDefinition3 labware at the specified location using labware center."""
     decoy.when(mock_labware_view.get_grip_z(_MOCK_LABWARE_DEFINITION3)).then_return(100)
 
     decoy.when(
@@ -2874,20 +2880,22 @@ def test_get_labware_grip_point_v3_definition(
         user_additional_offset=None,
     )
 
-    assert labware_center == Point(
-        101.0 + 100 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x,
-        102.0 - 25 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y,
-        203 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z,
+    expected = Point(
+        x=101.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x + 100,
+        y=102.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y + (-25),
+        z=103 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z + 100,
     )
 
+    assert labware_center == expected
 
-def test_get_labware_grip_point_on_labware(
+
+def test_get_labware_grip_point_v2_on_labware(
     decoy: Decoy,
     mock_labware_view: LabwareView,
     mock_addressable_area_view: AddressableAreaView,
     subject: GeometryView,
 ) -> None:
-    """It should get the grip point of a labware on another labware."""
+    """It should get the grip point of a LabwareDefinition2 labware on another labware."""
     decoy.when(mock_labware_view.get(labware_id="below-id")).then_return(
         LoadedLabware(
             id="below-id",
@@ -2899,10 +2907,62 @@ def test_get_labware_grip_point_on_labware(
     decoy.when(mock_labware_view.get_definition("below-id")).then_return(
         sentinel.below_definition
     )
-    test_definition = _MOCK_LABWARE_DEFINITION2
+
     decoy.when(
-        mock_labware_view.get_grip_z(labware_definition=test_definition)
+        mock_labware_view.get_grip_z(labware_definition=_MOCK_LABWARE_DEFINITION2)
     ).then_return(100)
+
+    decoy.when(
+        mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_4.id)
+    ).then_return(Point(x=5, y=9, z=10))
+
+    decoy.when(
+        mock_addressable_area_view.get_addressable_area(DeckSlotName.SLOT_4.id)
+    ).then_return(MOCK_ADDRESSABLE_AREA)
+
+    decoy.when(
+        mock_addressable_area_view.get_addressable_area_center(DeckSlotName.SLOT_4.id)
+    ).then_return(Point(x=64, y=43, z=0))
+
+    grip_point = subject.get_labware_grip_point(
+        labware_definition=_MOCK_LABWARE_DEFINITION2,
+        location=OnLabwareLocation(labwareId="below-id"),
+        move_type=GripperMoveType.PICK_UP_LABWARE,
+        user_additional_offset=None,
+    )
+
+    expected = Point(
+        x=64 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x,
+        y=43 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y,
+        z=0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z + 100,
+    )
+
+    assert grip_point == expected
+
+
+def test_get_labware_grip_point_v3_on_labware(
+    decoy: Decoy,
+    mock_labware_view: LabwareView,
+    mock_addressable_area_view: AddressableAreaView,
+    subject: GeometryView,
+) -> None:
+    """It should get the grip point of a LabwareDefinition3 labware on another labware."""
+    decoy.when(mock_labware_view.get(labware_id="below-id")).then_return(
+        LoadedLabware(
+            id="below-id",
+            loadName="below-name",
+            definitionUri="1234",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+        )
+    )
+    decoy.when(mock_labware_view.get_definition("below-id")).then_return(
+        sentinel.below_definition
+    )
+
+    decoy.when(
+        mock_labware_view.get_grip_z(labware_definition=_MOCK_LABWARE_DEFINITION3)
+    ).then_return(100)
+
     decoy.when(
         mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_4.id)
     ).then_return(Point(x=5, y=9, z=10))
@@ -2912,25 +2972,47 @@ def test_get_labware_grip_point_on_labware(
     ).then_return(MOCK_ADDRESSABLE_AREA)
 
     grip_point = subject.get_labware_grip_point(
-        labware_definition=test_definition,
+        labware_definition=_MOCK_LABWARE_DEFINITION3,
         location=OnLabwareLocation(labwareId="below-id"),
         move_type=GripperMoveType.PICK_UP_LABWARE,
         user_additional_offset=None,
     )
 
-    assert grip_point == Point(
-        5 + 500 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x,
-        9 + 600 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y,
-        10.0 + 100 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z,
+    expected = Point(
+        x=5 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x + 100,
+        y=9 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y + (-25),
+        z=10.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z + 100,
     )
 
+    assert grip_point == expected
 
+
+@pytest.mark.parametrize(
+    ["test_definition", "expected_x", "expected_y"],
+    [
+        pytest.param(
+            _MOCK_LABWARE_DEFINITION2,
+            503.0,
+            372.0,
+            id="labware_definition_v2",
+        ),
+        pytest.param(
+            _MOCK_LABWARE_DEFINITION3,
+            539.0,
+            304.0,
+            id="labware_definition_v3",
+        ),
+    ],
+)
 def test_get_labware_grip_point_for_labware_on_module(
     decoy: Decoy,
     mock_labware_view: LabwareView,
     mock_module_view: ModuleView,
     ot3_standard_deck_def: DeckDefinitionV5,
     subject: GeometryView,
+    test_definition: LabwareDefinition,
+    expected_x: float,
+    expected_y: float,
 ) -> None:
     """It should return the grip point for labware directly on a module."""
     addressable_area_view = AddressableAreaView(
@@ -2965,7 +3047,6 @@ def test_get_labware_grip_point_for_labware_on_module(
         pipette_view=subject._pipettes,
         addressable_area_view=addressable_area_view,
     )
-    test_definition = _MOCK_LABWARE_DEFINITION2
     decoy.when(mock_labware_view.get_grip_z(test_definition)).then_return(500)
     decoy.when(mock_module_view.get_location("module-id")).then_return(
         DeckSlotLocation(slotName=DeckSlotName.SLOT_C3)
@@ -2994,20 +3075,42 @@ def test_get_labware_grip_point_for_labware_on_module(
         move_type=GripperMoveType.PICK_UP_LABWARE,
         user_additional_offset=Point(x=1, y=2, z=3),
     )
-    assert result_grip_point == Point(
-        x=929 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x,
-        y=909 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y,
-        z=841 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z,
+
+    expected = Point(
+        x=expected_x,
+        y=expected_y,
+        z=871.0,
     )
 
+    assert result_grip_point == expected
 
+
+@pytest.mark.parametrize(
+    "test_definition,expected_x,expected_y",
+    [
+        pytest.param(
+            _MOCK_LABWARE_DEFINITION2,
+            502.0,
+            370.0,
+            id="labware_definition_v2",
+        ),
+        pytest.param(
+            _MOCK_LABWARE_DEFINITION3,
+            538.0,
+            302.0,
+            id="labware_definition_v3",
+        ),
+    ],
+)
 def test_get_labware_grip_point_for_labware_stack_on_module(
     decoy: Decoy,
     mock_labware_view: LabwareView,
     mock_module_view: ModuleView,
     ot3_standard_deck_def: DeckDefinitionV5,
     subject: GeometryView,
-    monkeypatch: pytest.MonkeyPatch,
+    test_definition: LabwareDefinition,
+    expected_x: float,
+    expected_y: float,
 ) -> None:
     """It should return the grip point for labware stack on a module."""
     addressable_area_view = AddressableAreaView(
@@ -3042,7 +3145,6 @@ def test_get_labware_grip_point_for_labware_stack_on_module(
         pipette_view=subject._pipettes,
         addressable_area_view=addressable_area_view,
     )
-    test_definition = _MOCK_LABWARE_DEFINITION2
     decoy.when(mock_labware_view.get_grip_z(test_definition)).then_return(500)
     decoy.when(mock_module_view.get_location("module-id")).then_return(
         DeckSlotLocation(slotName=DeckSlotName.SLOT_C3)
@@ -3079,11 +3181,13 @@ def test_get_labware_grip_point_for_labware_stack_on_module(
         user_additional_offset=None,
     )
 
-    assert result_grip_point == Point(
-        x=928.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.x,
-        y=907.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.y,
-        z=838.0 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z,
+    expected = Point(
+        x=expected_x,
+        y=expected_y,
+        z=868.0,
     )
+
+    assert result_grip_point == expected
 
 
 @pytest.mark.parametrize(
