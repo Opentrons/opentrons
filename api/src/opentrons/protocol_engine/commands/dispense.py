@@ -101,6 +101,7 @@ class DispenseImplementation(AbstractCommandImpl[DispenseParams, _ExecuteReturn]
             well_name=well_name,
             well_location=well_location,
             operation_volume=volume,
+            offset_pipette_for_reservoir_subwells=False,
         )
         if isinstance(move_result, DefinedErrorData):
             return move_result
