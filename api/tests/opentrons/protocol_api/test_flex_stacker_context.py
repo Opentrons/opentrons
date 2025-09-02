@@ -120,11 +120,38 @@ def test_set_stored_labware(
             main_namespace="namespace",
             main_version=1,
             lid_load_name="lid",
-            lid_namespace="namespace",
-            lid_version=1,
+            lid_namespace=None,
+            lid_version=None,
             adapter_load_name="adapter",
-            adapter_namespace="namespace",
-            adapter_version=1,
+            adapter_namespace=None,
+            adapter_version=None,
+            count=2,
+            stacking_offset_z=1.0,
+        )
+    )
+
+    subject.set_stored_labware(
+        "load_name",
+        "namespace",
+        1,
+        "adapter",
+        "lid",
+        2,
+        stacking_offset_z=1.0,
+        adapter_namespace="adapter_namespace",
+        adapter_version=3,
+    )
+    decoy.verify(
+        mock_core.set_stored_labware(
+            main_load_name="load_name",
+            main_namespace="namespace",
+            main_version=1,
+            lid_load_name="lid",
+            lid_namespace=None,
+            lid_version=None,
+            adapter_load_name="adapter",
+            adapter_namespace="adapter_namespace",
+            adapter_version=3,
             count=2,
             stacking_offset_z=1.0,
         )

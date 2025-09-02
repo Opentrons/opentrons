@@ -123,7 +123,7 @@ class ModuleContext(CommandPublisher):
 
         return core.geometry.add_labware(labware)
 
-    def load_labware(
+    def load_labware(  # noqa: C901
         self,
         name: str,
         label: Optional[str] = None,
@@ -131,6 +131,11 @@ class ModuleContext(CommandPublisher):
         version: Optional[int] = None,
         adapter: Optional[str] = None,
         lid: Optional[str] = None,
+        *,
+        adapter_namespace: Optional[str] = None,
+        adapter_version: Optional[int] = None,
+        lid_namespace: Optional[str] = None,
+        lid_version: Optional[int] = None,
     ) -> Labware:
         """Load a labware onto the module using its load parameters.
 
@@ -142,7 +147,11 @@ class ModuleContext(CommandPublisher):
         :returns: The initialized and loaded labware object.
 
         .. versionadded:: 2.1
-            The *label,* *namespace,* and *version* parameters.
+            The ``label``, ``namespace``, and ``version`` parameters.
+
+        .. versionadded:: 2.26
+            The ``adapter_namespace``, ``adapter_version``,
+            ``lid_namespace``, and ``lid_version`` parameters.
         """
         if self._api_version < APIVersion(2, 1) and (
             label is not None or namespace is not None or version != 1
@@ -152,6 +161,40 @@ class ModuleContext(CommandPublisher):
                 "are trying to utilize new load_labware parameters in 2.1"
             )
 
+        if self._api_version < validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE:
+            if adapter_namespace is not None:
+                raise APIVersionError(
+                    api_element="The `adapter_namespace` parameter",
+                    until_version=str(
+                        validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                    ),
+                    current_version=str(self._api_version),
+                )
+            if adapter_version is not None:
+                raise APIVersionError(
+                    api_element="The `adapter_version` parameter",
+                    until_version=str(
+                        validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                    ),
+                    current_version=str(self._api_version),
+                )
+            if lid_namespace is not None:
+                raise APIVersionError(
+                    api_element="The `lid_namespace` parameter",
+                    until_version=str(
+                        validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                    ),
+                    current_version=str(self._api_version),
+                )
+            if lid_version is not None:
+                raise APIVersionError(
+                    api_element="The `lid_version` parameter",
+                    until_version=str(
+                        validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                    ),
+                    current_version=str(self._api_version),
+                )
+
         load_location: Union[ModuleCore, LabwareCore]
         if adapter is not None:
             if self._api_version < APIVersion(2, 15):
@@ -160,9 +203,21 @@ class ModuleContext(CommandPublisher):
                     until_version="2.15",
                     current_version=f"{self._api_version}",
                 )
+
+            if (
+                self._api_version
+                < validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+            ):
+                checked_adapter_namespace = namespace
+                checked_adapter_version = None
+            else:
+                checked_adapter_namespace = adapter_namespace
+                checked_adapter_version = adapter_version
+
             loaded_adapter = self.load_adapter(
                 name=adapter,
-                namespace=namespace,
+                namespace=checked_adapter_namespace,
+                version=checked_adapter_version,
             )
             load_location = loaded_adapter._core
         else:
@@ -193,11 +248,22 @@ class ModuleContext(CommandPublisher):
                     until_version="2.23",
                     current_version=f"{self._api_version}",
                 )
+
+            if (
+                self._api_version
+                < validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+            ):
+                checked_lid_namespace = namespace
+                checked_lid_version = None
+            else:
+                checked_lid_namespace = lid_namespace
+                checked_lid_version = lid_version
+
             self._protocol_core.load_lid(
                 load_name=lid,
                 location=labware_core,
-                namespace=namespace,
-                version=version,
+                namespace=checked_lid_namespace,
+                version=checked_lid_version,
             )
 
         if isinstance(self._core, LegacyModuleCore):
@@ -1327,6 +1393,11 @@ class FlexStackerContext(ModuleContext):
         lid: str | None = None,
         count: int | None = None,
         stacking_offset_z: float | None = None,
+        *,
+        adapter_namespace: str | None = None,
+        adapter_version: int | None = None,
+        lid_namespace: str | None = None,
+        lid_version: int | None = None,
     ) -> None:
         """Configure the type and starting quantity of labware the Flex Stacker will store during a protocol. This is the only type of labware you'll be able to store in the Stacker until it's reconfigured.
 
@@ -1335,6 +1406,7 @@ class FlexStackerContext(ModuleContext):
         :param str load_name: A string to use for looking up a labware definition.
             You can find the ``load_name`` for any Opentrons-verified labware on the
             `Labware Library <https://labware.opentrons.com>`__.
+
         :param str namespace: The namespace that the labware definition belongs to.
             If unspecified, the API will automatically search two namespaces:
 
@@ -1345,19 +1417,34 @@ class FlexStackerContext(ModuleContext):
             You might need to specify an explicit ``namespace`` if you have a custom
             definition whose ``load_name`` is the same as an Opentrons-verified
             definition, and you want to explicitly choose one or the other.
+
         :param version: The version of the labware definition. You should normally
             leave this unspecified to let the method choose a version
             automatically.
+
         :param adapter: An adapter to load the labware on top of. Accepts the same
-            values as the ``load_name`` parameter of :py:meth:`.load_adapter`. The
-            adapter will use the same namespace as the labware, and the API will
-            choose the adapter's version automatically.
+            values as the ``load_name`` parameter of :py:meth:`.load_adapter`.
+
+        :param adapter_namespace: Applies to ``adapter`` the same way that ``namespace``
+            applies to ``load_name``.
+
+        :param adapter_version: Applies to ``adapter`` the same way that ``version``
+            applies to ``load_name``.
+
         :param lid: A lid to load the on top of the main labware. Accepts the same
             values as the ``load_name`` parameter of :py:meth:`~.ProtocolContext.load_lid_stack`. The
             lid will use the same namespace as the labware, and the API will
             choose the lid's version automatically.
+
+        :param lid_namespace: Applies to ``lid`` the same way that ``namespace``
+            applies to ``load_name``.
+
+        :param lid_version: Applies to ``lid`` the same way that ``version``
+            applies to ``load_name``.
+
         :param count: The number of labware that the Flex Stacker should store. If not specified, this will be the maximum amount of this kind of
             labware that the Flex Stacker is capable of storing.
+
         :param stacking_offset_z: Stacking ``z`` offset in mm of stored labware. If specified, this overrides the
             calculated value in the labware definition.
 
@@ -1375,18 +1462,18 @@ class FlexStackerContext(ModuleContext):
               - Labware on adapter: the adapter (bottom side) of the upper labware unit overlaps with the top side of the labware below.
               - Labware with lid: the labware (bottom side) of the upper labware unit overlaps with the lid (top side) of the unit below.
               - Labware with lid and adapter: the adapter (bottom side) of the upper labware unit overlaps with the lid (top side) of the unit below.
-
         """
+
         self._core.set_stored_labware(
             main_load_name=load_name,
             main_namespace=namespace,
             main_version=version,
             lid_load_name=lid,
-            lid_namespace=namespace,
-            lid_version=version,
+            lid_namespace=lid_namespace,
+            lid_version=lid_version,
             adapter_load_name=adapter,
-            adapter_namespace=namespace,
-            adapter_version=version,
+            adapter_namespace=adapter_namespace,
+            adapter_version=adapter_version,
             count=count,
             stacking_offset_z=stacking_offset_z,
         )
