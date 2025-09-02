@@ -8,7 +8,6 @@ import { IDENTITY_AFFINE_TRANSFORM, multiplyMatrices } from './matrixMath'
 import { pairsFromArray } from './pairsFromArray'
 import {
   coordinateTupleToVector3D,
-  getVectorDifference,
   getVectorInverse,
   getVectorSum,
   IDENTITY_VECTOR,
