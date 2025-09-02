@@ -1,4 +1,5 @@
 """CreateTimer command request, result, and implementation models."""
+
 from __future__ import annotations
 from pydantic import BaseModel, Field
 from typing import Optional, Type, TYPE_CHECKING
@@ -18,7 +19,8 @@ class CreateTimerParams(BaseModel):
     """Payload required to annotate execution with a CreateTimer."""
 
     time: float = Field(
-        ..., description="The time before the timer should elapse in seconds"
+        ...,
+        description="The time before the timer should elapse in seconds. This is the minimum time before the timer elapses; it may in practice take longer than this.",
     )
     task_id: str | None = Field(
         None,
@@ -30,9 +32,7 @@ class CreateTimerResult(BaseModel):
     """Result data from the execution of a CreateTimer command."""
 
     task_id: str = Field(..., description="The id of the timer task")
-    time: float = Field(
-        ..., description="The minimum time before the timer should elapse in seconds"
-    )
+    time: float = Field(..., description="The same time as the parameter.")
 
 
 class CreateTimerImplementation(
