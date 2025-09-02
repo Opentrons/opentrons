@@ -17,6 +17,7 @@ import type {
   SettingItem,
 } from '../../types'
 
+const DIGIT = 1
 interface UseDispenseSettingsConfigProps {
   state: QuickTransferSummaryState
   setSelectedSetting: (setting: DispenseSettingOption | null) => void
@@ -62,7 +63,9 @@ export function useDispenseSettingsConfig({
     {
       option: 'dispense_flow_rate',
       copy: t('dispense_flow_rate'),
-      value: t('flow_rate_value', { flow_rate: state.dispenseFlowRate }),
+      value: t('flow_rate_value', {
+        flow_rate: state.dispenseFlowRate.toFixed(DIGIT),
+      }),
       enabled: true,
       onClick: () => {
         setSelectedSetting('dispense_flow_rate')
