@@ -95,7 +95,7 @@ Which fixtures you need to configure depend on both load methods and the effects
 
 ### Staging Area Slots
 
-Slots A4 through D4 are the staging area slots. Pipettes can't reach the staging area, but these slots are always available in the API for loading and moving labware. Using a slot in column 4 as the `location` argument of [`ProtocolContext.load_labware`][opentrons.protocol_api.ProtocolContext.load_labware] or the `new_location` argument of [`move_labware`][opentrons.protocol_api.ProtocolContext.move_labware] will require the corresponding staging area slot in the robot's deck configuration:
+Slots A4 through D4 are the staging area slots. Pipettes can't reach the staging area, but these slots are always available in the API for loading and moving labware. Using a slot in column 4 as the `location` argument of [`load_labware()`][opentrons.protocol_api.ProtocolContext.load_labware] or the `new_location` argument of [`move_labware()`][opentrons.protocol_api.ProtocolContext.move_labware] will require the corresponding staging area slot in the robot's deck configuration:
 
 ```python
 plate_1 = protocol.load_labware(
@@ -130,20 +130,20 @@ In version 2.15 of the API, Flex can only have a single trash bin in slot A3. Yo
 
 *New in version 2.16*
 
-Starting in API version 2.16, you must load trash bin fixtures in your protocol in order to use them. Use [`load_trash_bin`][opentrons.protocol_api.ProtocolContext.load_trash_bin] to load a movable trash bin. This example loads a single bin in the default location:
+Starting in API version 2.16, you must load trash bin fixtures in your protocol in order to use them. Use [`load_trash_bin()`][opentrons.protocol_api.ProtocolContext.load_trash_bin] to load a movable trash bin. This example loads a single bin in the default location:
 
 ```python
 default_trash = protocol.load_trash_bin(location = "A3")
 ```
 *New in version 2.16*
 
-Call `load_trash_bin()` multiple times to add more than one bin. See [Pipette Trash Containers](pipettes.md#pipette-trash-containers) for more information on using pipettes with multiple trash bins.
+Call `load_trash_bin()` multiple times to add more than one bin. See [Adding Trash Containers][adding-trash-containers] for more information on using pipettes with multiple trash bins.
 
 ### Waste Chute
 
 The waste chute accepts various materials from Flex pipettes or the Flex Gripper and uses gravity to transport them outside of the robot for disposal. Pipettes can dispose of liquid or drop tips into the chute. The gripper can drop tip racks and other labware into the chute.
 
-To use the waste chute, first use [`load_waste_chute`][opentrons.protocol_api.ProtocolContext.load_waste_chute] to load it in slot D3:
+To use the waste chute, first use [`load_waste_chute()`][opentrons.protocol_api.ProtocolContext.load_waste_chute] to load it in slot D3:
 
 ```python
 chute = protocol.load_waste_chute()
@@ -152,16 +152,17 @@ chute = protocol.load_waste_chute()
 
 The `load_waste_chute()` method takes no arguments, since D3 is the only valid location for the chute. However, there are multiple variant configurations of the waste chute, depending on how other methods in your protocol use it.
 
-The waste chute is installed either on a standard deck plate adapter or on a deck plate adapter with a staging area. If any [`ProtocolContext.load_labware`][opentrons.protocol_api.ProtocolContext.load_labware] or [`move_labware`][opentrons.protocol_api.ProtocolContext.move_labware] calls in your protocol reference slot D4, you have to use the deck plate adapter with staging area.
+The waste chute is installed either on a standard deck plate adapter or on a deck plate adapter with a staging area. If any [`load_labware()`][opentrons.protocol_api.ProtocolContext.load_labware] or [`move_labware()`][opentrons.protocol_api.ProtocolContext.move_labware] calls in your protocol reference slot D4, you have to use the deck plate adapter with staging area.
 
 The waste chute has a removable cover with a narrow opening which helps prevent aerosols and droplets from contaminating the working area. 1- and 8-channel pipettes can dispense liquid, blow out, or drop tips through the opening in the cover. Any of the following require you to remove the cover:
 
-- [`dispense`][opentrons.protocol_api.InstrumentContext.dispense], [`blow_out`][opentrons.protocol_api.InstrumentContext.blow_out], or [`drop_tip`][opentrons.protocol_api.InstrumentContext.drop_tip] with a 96-channel pipette.
-- [`move_labware`][opentrons.protocol_api.ProtocolContext.move_labware] with the chute as `new_location` and `use_gripper=True`.
+- [`dispense()`][opentrons.protocol_api.InstrumentContext.dispense], [`blow_out()`][opentrons.protocol_api.InstrumentContext.blow_out], or [`drop_tip()`][opentrons.protocol_api.InstrumentContext.drop_tip] with a 96-channel pipette.
+- [`move_labware()`][opentrons.protocol_api.ProtocolContext.move_labware] with the chute as `new_location` and `use_gripper=True`.
 
 If your protocol *does not* call any of these methods, your deck configuration should include the cover.
 
 In total, there are four possible deck configurations for the waste chute:
+
 - Waste chute only
 - Waste chute with cover
 - Waste chute with staging area slot
