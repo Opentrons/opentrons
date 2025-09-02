@@ -9,7 +9,9 @@
           "type": "string"
         }
       },
-      "required": ["addressableAreaName"],
+      "required": [
+        "addressableAreaName"
+      ],
       "title": "AddressableAreaLocation",
       "type": "object"
     },
@@ -29,7 +31,11 @@
           "type": "number"
         }
       },
-      "required": ["x", "y", "z"],
+      "required": [
+        "x",
+        "y",
+        "z"
+      ],
       "title": "AddressableOffsetVector",
       "type": "object"
     },
@@ -56,7 +62,9 @@
           "$ref": "#/$defs/AirGapInPlaceParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "AirGapInPlaceCreate",
       "type": "object"
     },
@@ -94,7 +102,11 @@
           "type": "number"
         }
       },
-      "required": ["flowRate", "volume", "pipetteId"],
+      "required": [
+        "flowRate",
+        "volume",
+        "pipetteId"
+      ],
       "title": "AirGapInPlaceParams",
       "type": "object"
     },
@@ -134,7 +146,9 @@
           "$ref": "#/$defs/AspirateParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "AspirateCreate",
       "type": "object"
     },
@@ -161,7 +175,9 @@
           "$ref": "#/$defs/AspirateInPlaceParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "AspirateInPlaceCreate",
       "type": "object"
     },
@@ -199,7 +215,11 @@
           "type": "number"
         }
       },
-      "required": ["flowRate", "volume", "pipetteId"],
+      "required": [
+        "flowRate",
+        "volume",
+        "pipetteId"
+      ],
       "title": "AspirateInPlaceParams",
       "type": "object"
     },
@@ -251,7 +271,13 @@
           "type": "string"
         }
       },
-      "required": ["labwareId", "wellName", "flowRate", "volume", "pipetteId"],
+      "required": [
+        "labwareId",
+        "wellName",
+        "flowRate",
+        "volume",
+        "pipetteId"
+      ],
       "title": "AspirateParams",
       "type": "object"
     },
@@ -391,7 +417,9 @@
           "$ref": "#/$defs/AspirateWhileTrackingParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "AspirateWhileTrackingCreate",
       "type": "object"
     },
@@ -443,7 +471,13 @@
           "type": "string"
         }
       },
-      "required": ["labwareId", "wellName", "flowRate", "volume", "pipetteId"],
+      "required": [
+        "labwareId",
+        "wellName",
+        "flowRate",
+        "volume",
+        "pipetteId"
+      ],
       "title": "AspirateWhileTrackingParams",
       "type": "object"
     },
@@ -470,7 +504,9 @@
           "$ref": "#/$defs/BlowOutParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "BlowOutCreate",
       "type": "object"
     },
@@ -497,7 +533,9 @@
           "$ref": "#/$defs/BlowOutInPlaceParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "BlowOutInPlaceCreate",
       "type": "object"
     },
@@ -516,7 +554,10 @@
           "type": "string"
         }
       },
-      "required": ["flowRate", "pipetteId"],
+      "required": [
+        "flowRate",
+        "pipetteId"
+      ],
       "title": "BlowOutInPlaceParams",
       "type": "object"
     },
@@ -549,13 +590,22 @@
           "type": "string"
         }
       },
-      "required": ["labwareId", "wellName", "flowRate", "pipetteId"],
+      "required": [
+        "labwareId",
+        "wellName",
+        "flowRate",
+        "pipetteId"
+      ],
       "title": "BlowOutParams",
       "type": "object"
     },
     "BlowoutLocation": {
       "description": "Location for blowout during a transfer function.",
-      "enum": ["source", "destination", "trash"],
+      "enum": [
+        "source",
+        "destination",
+        "trash"
+      ],
       "title": "BlowoutLocation",
       "type": "string"
     },
@@ -582,7 +632,10 @@
           "description": "Location well or trash entity for blow out."
         }
       },
-      "required": ["location", "flowRate"],
+      "required": [
+        "location",
+        "flowRate"
+      ],
       "title": "BlowoutParams",
       "type": "object"
     },
@@ -601,7 +654,9 @@
           "title": "Params"
         }
       },
-      "required": ["enable"],
+      "required": [
+        "enable"
+      ],
       "title": "BlowoutProperties",
       "type": "object"
     },
@@ -628,7 +683,9 @@
           "$ref": "#/$defs/CalibrateGripperParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "CalibrateGripperCreate",
       "type": "object"
     },
@@ -645,12 +702,17 @@
           "title": "Otherjawoffset"
         }
       },
-      "required": ["jaw"],
+      "required": [
+        "jaw"
+      ],
       "title": "CalibrateGripperParams",
       "type": "object"
     },
     "CalibrateGripperParamsJaw": {
-      "enum": ["front", "rear"],
+      "enum": [
+        "front",
+        "rear"
+      ],
       "title": "CalibrateGripperParamsJaw",
       "type": "string"
     },
@@ -677,7 +739,9 @@
           "$ref": "#/$defs/CalibrateModuleParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "CalibrateModuleCreate",
       "type": "object"
     },
@@ -699,7 +763,11 @@
           "description": "The instrument mount used to calibrate the module."
         }
       },
-      "required": ["moduleId", "labwareId", "mount"],
+      "required": [
+        "moduleId",
+        "labwareId",
+        "mount"
+      ],
       "title": "CalibrateModuleParams",
       "type": "object"
     },
@@ -726,7 +794,9 @@
           "$ref": "#/$defs/CalibratePipetteParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "CalibratePipetteCreate",
       "type": "object"
     },
@@ -738,7 +808,9 @@
           "description": "Instrument mount to calibrate."
         }
       },
-      "required": ["mount"],
+      "required": [
+        "mount"
+      ],
       "title": "CalibratePipetteParams",
       "type": "object"
     },
@@ -765,7 +837,9 @@
           "$ref": "#/$defs/CloseGripperJawParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "CloseGripperJawCreate",
       "type": "object"
     },
@@ -804,7 +878,9 @@
           "$ref": "#/$defs/CloseLabwareLatchParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "CloseLabwareLatchCreate",
       "type": "object"
     },
@@ -817,7 +893,9 @@
           "type": "string"
         }
       },
-      "required": ["moduleId"],
+      "required": [
+        "moduleId"
+      ],
       "title": "CloseLabwareLatchParams",
       "type": "object"
     },
@@ -826,7 +904,12 @@
       "properties": {
         "primaryNozzle": {
           "description": "The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
-          "enum": ["A1", "H1", "A12", "H12"],
+          "enum": [
+            "A1",
+            "H1",
+            "A12",
+            "H12"
+          ],
           "title": "Primarynozzle",
           "type": "string"
         },
