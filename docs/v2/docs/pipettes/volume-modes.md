@@ -4,7 +4,7 @@ description: How to work with very small volumes of liquid on Opentrons Flex.
 
 # Volume Modes
 
-The Flex 1-Channel 50 µL and Flex 8-Channel 50 µL pipettes must operate in a low-volume mode to accurately dispense very small volumes of liquid. Set the volume mode by calling [InstrumentContext.configure_for_volume][opentrons.protocol_api.InstrumentContext.configure_for_volume] with the amount of liquid you plan to aspirate, in µL:
+The Flex 1-Channel 50 µL and Flex 8-Channel 50 µL pipettes must operate in a low-volume mode to accurately dispense very small volumes of liquid. Set the volume mode by calling [`InstrumentContext.configure_for_volume()`][opentrons.protocol_api.InstrumentContext.configure_for_volume] with the amount of liquid you plan to aspirate, in µL:
 
 ```python
 pipette50.configure_for_volume(1)
@@ -26,12 +26,12 @@ When you use `configure_for_volume()` for a Flex 50 µL pipette, you also define
 - For low volume mode (1-4.9 µL): 7 µL
 - For 5-50 µL: 2 µL
 
-For more, see [Push Out Dispense](../push_out_dispense.md).
+For more, see [Push Out After Dispense][push-out-after-dispense].
 
-> [!note]
-> The pipette must not contain liquid when you call `configure_for_volume()`, or the API will raise an error.
->
-> Also, if the pipette is in a well location that may contain liquid, it will move upward to ensure it is not immersed in liquid before changing its mode. Calling `configure_for_volume()` *before* `pick_up_tip()` helps to avoid this situation.
+!!! note
+    The pipette must not contain liquid when you call `configure_for_volume()`, or the API will raise an error.
+    
+    Also, if the pipette is in a well location that may contain liquid, it will move upward to ensure it is not immersed in liquid before changing its mode. Calling `configure_for_volume()` *before* `pick_up_tip()` helps to avoid this situation.
 
 In a protocol that handles many different volumes, it's a good practice to call `configure_for_volume()` once for each [transfer][opentrons.protocol_api.InstrumentContext.transfer] or [aspirate][opentrons.protocol_api.InstrumentContext.aspirate], specifying the volume that you are about to handle. When operating with a list of volumes, nest `configure_for_volume()` inside a `for` loop to ensure that the pipette is properly configured for each volume:
 
