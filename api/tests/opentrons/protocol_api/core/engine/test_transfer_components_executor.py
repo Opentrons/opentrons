@@ -1848,24 +1848,10 @@ def test_retract_after_dispense_in_trash_with_blowout_in_disposal_location(
     )
 
 
-@pytest.mark.parametrize(
-    argnames=["dest_type", "blowout_location", "source_touchable"],
-    argvalues=[
-        # Try all combinations of destination type, blowout location, and touchability
-        ("well", BlowoutLocation.SOURCE, True),
-        ("well", BlowoutLocation.SOURCE, False),
-        ("well", BlowoutLocation.DESTINATION, True),
-        ("well", BlowoutLocation.DESTINATION, False),
-        ("well", BlowoutLocation.TRASH, True),
-        ("well", BlowoutLocation.TRASH, False),
-        ("trash", BlowoutLocation.SOURCE, True),
-        ("trash", BlowoutLocation.SOURCE, False),
-        ("trash", BlowoutLocation.DESTINATION, True),
-        ("trash", BlowoutLocation.DESTINATION, False),
-        ("trash", BlowoutLocation.TRASH, True),
-        ("trash", BlowoutLocation.TRASH, False),
-    ],
-)
+# Try all combinations of destination type, blowout location, and touchability
+@pytest.mark.parametrize("dest_type", ["well", "trash"])
+@pytest.mark.parametrize("blowout_location", [bl for bl in BlowoutLocation])
+@pytest.mark.parametrize("source_touchable", [True, False])
 def test_retract_after_dispense_touch_tip(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
@@ -1938,7 +1924,7 @@ def test_retract_after_dispense_touch_tip(
         mock_instrument_core.touch_tip(),  # type: ignore[call-arg]
         ignore_extra_args=True,
         times={
-            # (destination type, blowout location, source is touchable):
+            # (destination type, blowout location, source touchable):
             ("well", BlowoutLocation.SOURCE, True): 2,  # touch dest, touch source
             ("well", BlowoutLocation.SOURCE, False): 1,  # touch dest, no touch source
             ("well", BlowoutLocation.DESTINATION, True): 1,  # touch dest
