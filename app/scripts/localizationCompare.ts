@@ -130,7 +130,7 @@ const compare = (
   const enKeys = new Set(Object.keys(enMap))
   const zhKeys = new Set(Object.keys(zhMap))
 
-  const missingInZh: string[] = []
+  const missingInZh = enKeys.difference(zhKeys)
   const extraInZh: string[] = []
   const emptyEn: string[] = []
   const emptyZh: string[] = []
