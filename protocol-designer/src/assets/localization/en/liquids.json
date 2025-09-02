@@ -14,6 +14,7 @@
   "description": "Description",
   "display_color": "Color",
   "dont_use_liquid_class": "Don't use a liquid class",
+  "liquid_in_use": "Liquid in use. Deletion might cause errors",
   "liquid_required": "Liquid required",
   "liquid_volume_nonzero": "Liquid volume must be larger than zero",
   "liquid_volume_required": "Liquid volume required",
