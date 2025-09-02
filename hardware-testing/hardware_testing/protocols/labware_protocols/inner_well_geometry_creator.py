@@ -21,7 +21,7 @@ from dataclasses import dataclass
 #  GLOBAL VARIABLES - START
 ###########################################
 
-LABWARE = "nunc_384_wellplate_100ul"  # change to desired labware
+LABWARE = "greiner_96_wellplate_382ul"  # change to desired labware
 
 RESERVOIR = "nest_1_reservoir_290ml"
 
@@ -591,6 +591,7 @@ def geometry_creator(ctx: ProtocolContext, state: SetupState) -> List[TrialResul
             ethanol_props.dispense.dispense_position.offset.z = dispense_offset
             pushout = ethanol_props.dispense.push_out_by_volume.get_for_volume(dispense_volume*1.25)
             ethanol_props.dispense.push_out_by_volume.set_for_volume(dispense_volume, pushout)
+            ethanol_props.dispense.flow_rate_by_volume.set_for_volume = [(dispense_volume, 50.0)]
         
         pick_up_tips(probe_pipette, liq_pipette)
         tip_z_error = _get_tip_z_error(ctx, probe_pipette, state.dial)
