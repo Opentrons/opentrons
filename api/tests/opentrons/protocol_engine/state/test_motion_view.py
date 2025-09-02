@@ -438,6 +438,7 @@ def test_get_pipette_offset_for_reservoirs(
         max_travel_z=1337,
         force_direct=True,
         minimum_z_height=123,
+        offset_pipette_for_reservoir_subwells=True,
     )
 
     assert result is sentinel.waypoints
