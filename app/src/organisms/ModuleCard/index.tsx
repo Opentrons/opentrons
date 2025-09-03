@@ -23,7 +23,10 @@ import {
   useMenuHandleClickOutside,
   useOnClickOutside,
 } from '@opentrons/components'
-import { useHost } from '@opentrons/react-api-client'
+import {
+  useCurrentAllSubsystemUpdatesQuery,
+  useHost,
+} from '@opentrons/react-api-client'
 import {
   ABSORBANCE_READER_TYPE,
   FLEX_STACKER_MODULE_TYPE,
@@ -94,6 +97,8 @@ const NO_CALIBRATION_TYPE: ModuleType[] = [
   ABSORBANCE_READER_TYPE,
   FLEX_STACKER_MODULE_TYPE,
 ]
+
+const POLL_INTERVAL_MS = 5000
 
 interface ModuleCardProps {
   module: AttachedModule
@@ -177,9 +182,20 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     }
   }
 
+  const {
+    data: currentSubsystemsUpdatesData,
+  } = useCurrentAllSubsystemUpdatesQuery({
+    refetchInterval: POLL_INTERVAL_MS,
+  })
+  const ongoingSubsystemUpdate = currentSubsystemsUpdatesData?.data.find(
+    update =>
+      update.updateStatus === 'queued' || update.updateStatus === 'updating'
+  )
+
   const isPending = latestRequest?.status === PENDING
 
-  const hideBanners = isPending || isRunRunning
+  const hideBanners =
+    isPending || isRunRunning || ongoingSubsystemUpdate != null
   const hotToTouch: IconProps = { name: 'ot-hot-to-touch' }
   const isFlex = useIsFlex(robotName)
   const deckConfig = useNotifyDeckConfigurationQuery().data
