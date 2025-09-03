@@ -853,7 +853,7 @@ mock_pipette.mix(
     aspirate_flow_rate=2.1,
     dispense_flow_rate=2.2,
 )
-mock_pipette.drop_tip(location=mock_tip_rack_1.wells_by_name()["A1"])
+mock_pipette.drop_tip(location=mock_tip_rack_1["A1"])
 mock_pipette.pick_up_tip(location=mock_tip_rack_1)
 mock_pipette.mix(
     repetitions=2,
@@ -862,7 +862,7 @@ mock_pipette.mix(
     aspirate_flow_rate=2.1,
     dispense_flow_rate=2.2,
 )
-mock_pipette.drop_tip(location=mock_tip_rack_1.wells_by_name()["B1"])
+mock_pipette.drop_tip(location=mock_tip_rack_1["B1"])
 mock_pipette.pick_up_tip(location=mock_tip_rack_1)
 mock_pipette.mix(
     repetitions=2,
@@ -871,7 +871,7 @@ mock_pipette.mix(
     aspirate_flow_rate=2.1,
     dispense_flow_rate=2.2,
 )
-mock_pipette.drop_tip(location=mock_tip_rack_1.wells_by_name()["C1"])`
+mock_pipette.drop_tip(location=mock_tip_rack_1["C1"])`
     )
   })
   it('should return tip if changeTip is once', () => {
@@ -903,7 +903,7 @@ mock_pipette.mix(
     aspirate_flow_rate=2.1,
     dispense_flow_rate=2.2,
 )
-mock_pipette.drop_tip(location=mock_tip_rack_1.wells_by_name()["A1"])`
+mock_pipette.drop_tip(location=mock_tip_rack_1["A1"])`
     )
   })
 })
