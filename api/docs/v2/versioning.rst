@@ -68,7 +68,7 @@ The maximum supported API version for your robot is listed in the Opentrons App 
 
 If you upload a protocol that specifies a higher API level than the maximum supported, your robot won't be able to analyze or run your protocol. You can increase the maximum supported version by updating your robot software and Opentrons App. 
 
-Opentrons robots running the latest software (8.5.0) support the following version ranges: 
+Opentrons robots running the latest software (8.6.0) support the following version ranges: 
 
     * **Flex:** version 2.15–|apiLevel|.
     * **OT-2:** versions 2.0–|apiLevel|.
@@ -84,6 +84,8 @@ This table lists the correspondence between Protocol API versions and robot soft
 +-------------+------------------------------+
 | API Version | Introduced in Robot Software |
 +=============+==============================+
+|     2.25    |          8.6.0               |
++-------------+------------------------------+
 |     2.24    |          8.5.0               |
 +-------------+------------------------------+
 |     2.23    |          8.4.0               |
@@ -142,6 +144,12 @@ This table lists the correspondence between Protocol API versions and robot soft
 Changes in API Versions
 =======================
 
+Version 2.25
+-------------
+
+- Adds :py:class:`.FlexStackerContext` to support the :ref:`Flex Stacker Module <stacker>`. Use the load name ``flexStackerModuleV1`` with :py:meth:`.ProtocolContext.load_module` to add a Flex Stacker and automate labware storage in a protocol.
+- Use the load name ``flex_96channel_200`` with :py:meth:`.load_instrument` to add the Opentrons Flex 96-Channel Pipette (1–200 μL) to a protocol. 
+
 Version 2.24
 -------------
 - Adds the ability to perform liquid handling actions using :ref:`liquid classes <liquid-classes>`.
@@ -160,6 +168,10 @@ Version 2.23
 Version 2.22
 -------------
 - Improvements to loading liquids. Use the new :py:meth:`.Labware.load_liquid`, :py:meth:`.Labware.load_liquid_by_well`, and :py:meth:`.Labware.load_empty` methods instead of ``Well.load_liquid()``, which is now deprecated.
+- Use new :ref:`robot motor control <motor-control>` methods to control individual robot motors. 
+    - The :py:meth:`.RobotContext.move_to`, :py:meth:`.RobotContext.move_axes_to`, and :py:meth:`.RobotContext.move_axes_relative` methods move robot motors to specific deck positions. 
+    - Calculate specific deck positions with the :py:meth:`.RobotContext.axis_coordinates_for` method, and pipette plunger positions with :py:meth:`.RobotContext.plunger_coordinates_for_volume` and :py:meth:`.RobotContext.plunger_coordinates_for_named_position`. 
+    - Control the Flex Gripper with the :py:meth:`.RobotContext.open_gripper_jaw` and :py:meth:`.RobotContext.close_gripper_jaw` methods. 
 - Beta features for our commercial partners.
 
 Version 2.21
