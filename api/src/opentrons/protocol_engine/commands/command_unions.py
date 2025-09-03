@@ -371,6 +371,14 @@ from .get_next_tip import (
     GetNextTipCommandType,
 )
 
+from .set_tip_state import (
+    SetTipState,
+    SetTipStateCreate,
+    SetTipStateParams,
+    SetTipStateResult,
+    SetTipStateCommandType,
+)
+
 from .liquid_probe import (
     LiquidProbe,
     LiquidProbeParams,
@@ -461,6 +469,7 @@ Command = Annotated[
         VerifyTipPresence,
         GetTipPresence,
         GetNextTip,
+        SetTipState,
         LiquidProbe,
         TryLiquidProbe,
         SealPipetteToTip,
@@ -564,6 +573,7 @@ CommandParams = Union[
     VerifyTipPresenceParams,
     GetTipPresenceParams,
     GetNextTipParams,
+    SetTipStateParams,
     LiquidProbeParams,
     TryLiquidProbeParams,
     SealPipetteToTipParams,
@@ -665,6 +675,7 @@ CommandType = Union[
     VerifyTipPresenceCommandType,
     GetTipPresenceCommandType,
     GetNextTipCommandType,
+    SetTipStateCommandType,
     LiquidProbeCommandType,
     TryLiquidProbeCommandType,
     SealPipetteToTipCommandType,
@@ -767,6 +778,7 @@ CommandCreate = Annotated[
         VerifyTipPresenceCreate,
         GetTipPresenceCreate,
         GetNextTipCreate,
+        SetTipStateCreate,
         LiquidProbeCreate,
         TryLiquidProbeCreate,
         SealPipetteToTipCreate,
@@ -877,6 +889,7 @@ CommandResult = Union[
     VerifyTipPresenceResult,
     GetTipPresenceResult,
     GetNextTipResult,
+    SetTipStateResult,
     LiquidProbeResult,
     TryLiquidProbeResult,
     SealPipetteToTipResult,

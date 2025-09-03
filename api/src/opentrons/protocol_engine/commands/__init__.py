@@ -384,6 +384,14 @@ from .get_next_tip import (
     GetNextTipCommandType,
 )
 
+from .set_tip_state import (
+    SetTipState,
+    SetTipStateCreate,
+    SetTipStateParams,
+    SetTipStateResult,
+    SetTipStateCommandType,
+)
+
 from .liquid_probe import (
     LiquidProbe,
     LiquidProbeParams,
@@ -725,6 +733,12 @@ __all__ = [
     "GetNextTipParams",
     "GetNextTipResult",
     "GetNextTipCommandType",
+    # set tip state command bundle
+    "SetTipState",
+    "SetTipStateCreate",
+    "SetTipStateParams",
+    "SetTipStateResult",
+    "SetTipStateCommandType",
     # liquid probe command bundle
     "LiquidProbe",
     "LiquidProbeParams",
