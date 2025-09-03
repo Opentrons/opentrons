@@ -446,8 +446,10 @@ nitpick_ignore_regex = [
     ("py:class", r".*opentrons_shared_data.*"),
     ("py:class", r".*protocol_api._parameters.Parameters.*"),
     ("py:class", r".*protocol_api._liquid_properties.TransferProperties*"),
-    ("py:class", r".*RobotContext"),  # shh it's a secret (for now)
-    ("py:class", r".*FlexStackerContext"),  # ssh it's a secret (for now)
+    ("py:class", r".*(String)?Axis(Map|Type)*"),
+    ("py:class", r".*protocol_api._types.PlungerPositionTypes*"),
+    ("py:class", r".*protocol_api._types.PipetteActionTypes*"),
+    ("py:class", r".*opentrons.protocol_api.module_contexts.ModuleContext*"),
     (
         "py:class",
         r".*AbstractLabware|APIVersion|LabwareLike|LoadedCoreMap|ModuleTypes|NoneType|OffDeckType|ProtocolCore|WellCore",
