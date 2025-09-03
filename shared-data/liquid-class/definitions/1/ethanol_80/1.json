@@ -5957,7 +5957,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 60.0]],
+            "flowRateByVolume": [[0.0, 7.0]],
             "correctionByVolume": [
               [0.0, -0.1],
               [5.0, -0.35],
@@ -5980,7 +5980,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 0.2
               }
             }
           },
@@ -6221,7 +6221,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 60.0]],
+            "flowRateByVolume": [[0.0, 7.0]],
             "correctionByVolume": [
               [0.0, -0.1],
               [5.0, -0.35],
@@ -6244,7 +6244,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 2.0
+                "duration": 0.2
               }
             }
           },
