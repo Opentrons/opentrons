@@ -22,6 +22,8 @@ Crashes and protocol loss no longer occur when:
 - deleting a Protocol Designer step title.
 - checking labware details after deleting a liquid.
 
+- Adding a Staging Area slot after initial deck setup retains all previous Staging Area slots.
+
 ## Opentrons Protocol Designer Changes in 8.5.2
 
 **Welcome to Protocol Designer 8.5.2!**
