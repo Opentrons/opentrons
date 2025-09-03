@@ -29,7 +29,7 @@ describe('useProtocolExportHandler', () => {
     }
     vi.mocked(getArgsAndErrorsByStepId).mockReturnValue({})
     vi.mocked(getRobotStateTimeline).mockReturnValue({
-      timeline: {} as any,
+      timeline: [],
       errors: null,
     })
     vi.mocked(useBlockingHint).mockImplementation(({ enabled }) => {

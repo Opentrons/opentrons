@@ -5,10 +5,7 @@ import { useSelector } from 'react-redux'
 import { StyledText } from '@opentrons/components'
 
 import { getRobotStateTimeline } from '/protocol-designer/file-data/selectors'
-import {
-  _hasFormLevelErrors,
-  getArgsAndErrorsByStepId,
-} from '/protocol-designer/step-forms/selectors'
+import { getArgsAndErrorsByStepId } from '/protocol-designer/step-forms/selectors'
 
 import { useBlockingHint } from '../../components/organisms'
 
