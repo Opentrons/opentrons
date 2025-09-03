@@ -163,16 +163,14 @@ class ThermocyclerModuleSubState:
         """
         heating = target_temp > self.get_target_block_temperature()
         if (heating and ramp_rate > MAX_HEATING_RATE) or (
-           not heating and ramp_rate > MAX_COOLING_RATE
+            not heating and ramp_rate > MAX_COOLING_RATE
         ):
             raise InvalidRampRateError(
                 f"Thermocycler ramp rate cannot exceed {MAX_HEATING_RATE}°C/s"
                 f" while heating or {MAX_COOLING_RATE}°C/s when cooling."
             )
-        if (ramp_rate <= 0):
-            raise InvalidRampRateError(
-                "Thermocycler ramp rate cannot be negative or 0"
-            )
+        if ramp_rate <= 0:
+            raise InvalidRampRateError("Thermocycler ramp rate cannot be negative or 0")
         return ramp_rate
 
     @classmethod
