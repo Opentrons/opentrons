@@ -21,7 +21,7 @@ from dataclasses import dataclass
 #  GLOBAL VARIABLES - START
 ###########################################
 
-LABWARE = "greiner_96_wellplate_382ul"  # change to desired labware
+LABWARE = "corning_falcon_384_wellplate_130ul_flat"  # change to desired labware
 
 RESERVOIR = "nest_1_reservoir_290ml"
 
@@ -212,7 +212,7 @@ def _setup(ctx: ProtocolContext) -> SetupState:
     upper_bound = target_height + delta_tolerance
 
     # volume clamps for the controller
-    min_step = max(max_volume * 0.01, 1)  # clamped to 5uL
+    min_step = max(max_volume * 0.01, 1)  # clamped to 1uL
     max_step = max_volume * 0.25
 
     # liquid 
@@ -579,12 +579,12 @@ def geometry_creator(ctx: ProtocolContext, state: SetupState) -> List[TrialResul
         dispense_volume += step_volume
         volume_per_channel = dispense_volume / liq_pipette.channels
 
-        if len(wells) <= 96:
+        if state.liquid_tip == "1000":
             dispense_offset = corrected_height + state.target_height + 10
             liq_pipette.flow_rate.blow_out = 1000
         else:
-            dispense_offset = corrected_height + state.target_height + 5
-            liq_pipette.flow_rate.blow_out = 200
+            dispense_offset = corrected_height + state.target_height + 3
+            liq_pipette.flow_rate.blow_out = 500
     
         for rack in state.liquid_racks:
             ethanol_props = ethanol.get_for(state.liquid_mount, rack)
@@ -593,7 +593,7 @@ def geometry_creator(ctx: ProtocolContext, state: SetupState) -> List[TrialResul
             ethanol_props.dispense.dispense_position.position_reference = "well-bottom"
             ethanol_props.dispense.dispense_position.offset.z = dispense_offset
             ethanol_props.dispense.push_out_by_volume.set_for_all_volumes(0.0)
-            ethanol_props.dispense.flow_rate_by_volume.set_for_all_volumes(max(min(volume_per_channel / 10, 200),20))
+            ethanol_props.dispense.flow_rate_by_volume.set_for_all_volumes(60)
             ethanol_props.dispense.retract.blowout.location = "destination"
             ethanol_props.dispense.retract.blowout.flow_rate = liq_pipette.flow_rate.blow_out
             ethanol_props.dispense.retract.blowout.enabled = True

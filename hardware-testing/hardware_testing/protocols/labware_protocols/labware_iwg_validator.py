@@ -12,7 +12,7 @@ from opentrons.types import Point
 from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
 
 # LABWARE TYPE
-LABWARE = "greiner_96_wellplate_382ul" # change to desired labware
+LABWARE = "corning_falcon_384_wellplate_130ul_flat" # change to desired labware
 
 # SLOTS
 SLOT_LIQUID_TIPRACKS = ["C3", "B3", "A2"]
@@ -85,7 +85,8 @@ def _setup(
     int,
     str,
     List[Labware],
-    InstrumentContext
+    InstrumentContext,
+    str
 ]:
     global DIAL_PORT, RUN_ID, FILE_NAME, LABWARE 
     labware_type = LABWARE  
@@ -146,7 +147,7 @@ def _setup(
 
     low_height = 3
     middle_height = depth / 2
-    high_height = depth - 3
+    high_height = depth * 4/5 
 
     expected_heights = (
         [low_height] * number_of_trials  # low height
@@ -164,7 +165,8 @@ def _setup(
         number_of_trials,
         labware_type,
         liq_tip_racks,
-        right_mount
+        right_mount,
+        liq_tip_size
     )
 
 
@@ -251,7 +253,8 @@ def aspirate_dispense_measure(
     liq_pipette: InstrumentContext,
     expected_heights: List[float],
     liq_tip_racks: List[Labware],
-    right_mount: InstrumentContext
+    right_mount: InstrumentContext,
+    liq_tip_size: str,
 ) -> List[float]:
     """Aspirate from source, dispense into labware, measure height, record."""
     all_corrected_heights: List[float] = []
@@ -272,13 +275,14 @@ def aspirate_dispense_measure(
 
         expected_height = expected_heights[i]
 
-        liq_pipette.flow_rate.blow_out = 1000
     
-        if len(list(labware.wells_by_name().keys())) <= 96:
-            dispense_offset = expected_height + 20
-            
+    
+        if liq_tip_size == "1000":
+            dispense_offset = expected_height + 10
+            liq_pipette.flow_rate.blow_out = 1000
         else:
-            dispense_offset = expected_height + 2.5
+            dispense_offset = expected_height + 3
+            liq_pipette.flow_rate.blow_out = 500
 
         meniscus_z = -0.5
 
@@ -291,7 +295,7 @@ def aspirate_dispense_measure(
             ethanol_props.dispense.dispense_position.position_reference = "well-bottom"
             ethanol_props.dispense.dispense_position.offset.z = dispense_offset
             ethanol_props.dispense.push_out_by_volume.set_for_all_volumes(0.0)
-            ethanol_props.dispense.flow_rate_by_volume.set_for_all_volumes(max(min(dispense_vol / 10, 200),20))
+            ethanol_props.dispense.flow_rate_by_volume.set_for_all_volumes(60)
             ethanol_props.dispense.retract.blowout.location = "destination"
             ethanol_props.dispense.retract.blowout.flow_rate = liq_pipette.flow_rate.blow_out
             ethanol_props.dispense.retract.blowout.enabled = True
@@ -336,7 +340,8 @@ def run(ctx: ProtocolContext) -> None:
         number_of_trials,
         labware_type,
         liq_tip_racks,
-        right_mount
+        right_mount,
+        liq_tip_size
     ) = _setup(ctx)
 
     wells = [str(w).split(" ")[0] for w in labware.wells()]
@@ -362,7 +367,8 @@ def run(ctx: ProtocolContext) -> None:
         liq_pipette,
         expected_heights,
         liq_tip_racks,
-        right_mount
+        right_mount,
+        liq_tip_size
     )
 
     region_names = ["low", "middle", "high"]
