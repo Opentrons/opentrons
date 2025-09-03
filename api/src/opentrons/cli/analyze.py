@@ -372,7 +372,7 @@ async def _do_analyze(
     return await orchestrator.run(deck_configuration=[])
 
 
-async def _analyze(
+async def _analyze(  # noqa: C901
     files_and_dirs: Sequence[Path],
     rtp_values: str,
     rtp_files: str,
@@ -403,7 +403,7 @@ async def _analyze(
     if fail_on_leak or debug_on_leak:
         gc.collect()
         try:
-            leaked_engine = [
+            leaked_engine = [  # noqa: F841
                 obj for obj in gc.get_objects() if isinstance(obj, ProtocolEngine)
             ][0]
         except IndexError:
@@ -411,24 +411,18 @@ async def _analyze(
         else:
             if fail_on_leak:
                 print(
-                    "A ProtocolEngine instance exists even after garbage collection; ",
+                    (
+                        "A ProtocolEngine instance exists even after garbage collection; "
+                        "some thing (likely in the protocol) has caused it to be leaked, ",
+                        "likely by reference to the engine or something that refers to the ",
+                        "engine after the run function ends.",
+                    ),
                     file=sys.stderr,
                 )
-                print(
-                    "some thing (likely in the protocol) has caused it to be leaked, ",
-                    file=sys.stderr,
-                )
-                print(
-                    "likely by reference to the engine or something that refers to the ",
-                    file=sys.stderr,
-                )
-                print("engine after the run function ends.", file=sys.stderr)
                 return_code = -2
             if debug_on_leak:
                 print(
-                    f"You are now in an interactive PDB (https://docs.python.org/3.10/library/pdb.html) "
-                )
-                print(
+                    "You are now in an interactive PDB (https://docs.python.org/3.10/library/pdb.html) "
                     "session; the leaked engine is bound to the variable leaked_engine."
                 )
                 breakpoint()
