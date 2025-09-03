@@ -272,13 +272,6 @@ class AddModuleAction:
 
 
 @dataclasses.dataclass(frozen=True)
-class ResetTipsAction:
-    """Reset the tip tracking state of a given tip rack."""
-
-    labware_id: str
-
-
-@dataclasses.dataclass(frozen=True)
 class SetPipetteMovementSpeedAction:
     """Set the speed of a pipette's X/Y/Z movements. Does not affect plunger speed.
 
@@ -314,7 +307,6 @@ Action = Union[
     SetDeckConfigurationAction,
     AddAddressableAreaAction,
     AddLiquidAction,
-    ResetTipsAction,
     SetPipetteMovementSpeedAction,
     SetErrorRecoveryPolicyAction,
     StartTaskAction,
