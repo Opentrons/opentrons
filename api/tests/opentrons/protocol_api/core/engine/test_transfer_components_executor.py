@@ -1921,13 +1921,7 @@ def test_retract_after_dispense_touch_tip(
     )
 
     decoy.verify(
-        mock_instrument_core.touch_tip(
-            location=matchers.Anything(),
-            well_core=matchers.Anything(),
-            radius=matchers.Anything(),
-            z_offset=matchers.Anything(),
-            speed=matchers.Anything(),
-        ),
+        mock_instrument_core.touch_tip(),  # type: ignore[call-arg,func-returns-value]
         ignore_extra_args=True,
         times={
             # (destination type, blowout location, source touchable):
