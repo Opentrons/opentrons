@@ -166,7 +166,7 @@ class ThermocyclerModuleSubState:
             not heating and ramp_rate < MAX_COOLING_RATE
         ):
             raise InvalidRampRateError(
-                f"Thermocycler ramp rate cannot excede {MAX_HEATING_RATE}°C/s"
+                f"Thermocycler ramp rate cannot exceed {MAX_HEATING_RATE}°C/s"
                 f" while heating or {MAX_COOLING_RATE}°C/s when cooling."
             )
         return ramp_rate
