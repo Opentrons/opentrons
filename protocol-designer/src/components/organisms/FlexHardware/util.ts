@@ -160,7 +160,6 @@ export const updateInitialDeckState = (
         ) {
           makeSnackbar(t('conflict_on_slot_labware_fixture') as string)
         } else {
-          console.log('createFixture', value.type)
           dispatch(createDeckFixture(value.type as DeckFixture, value.cutoutId))
         }
       }
