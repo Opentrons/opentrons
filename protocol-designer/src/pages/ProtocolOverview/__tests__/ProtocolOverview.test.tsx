@@ -14,6 +14,7 @@ import {
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import {
   getAdditionalEquipmentEntities,
+  getArgsAndErrorsByStepId,
   getInitialDeckSetup,
   getSavedStepForms,
 } from '../../../step-forms/selectors'
@@ -67,6 +68,7 @@ describe('ProtocolOverview', () => {
     vi.mocked(labwareIngredSelectors.allIngredientGroupFields).mockReturnValue(
       {}
     )
+    vi.mocked(getArgsAndErrorsByStepId).mockReturnValue({})
     vi.mocked(getDismissedHints).mockReturnValue([])
     vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
     vi.mocked(getInitialDeckSetup).mockReturnValue({
