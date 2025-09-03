@@ -24,6 +24,8 @@ This hotfix release addresses several bugs.
 
 - All staging area slots remain when adding new staging areas after initial deck setup.
 
+- Adding a Staging Area slot after initial deck setup retains all previous Staging Area slots.
+
 ## Opentrons Protocol Designer Changes in 8.5.2
 
 **Welcome to Protocol Designer 8.5.2!**
