@@ -13,6 +13,7 @@ import {
 } from '@opentrons/components'
 import {
   ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   getModuleDisplayName,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
@@ -64,6 +65,7 @@ export const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
     'opentrons_96_wellplate_200ul_pcr_full_skirt',
   ],
   [ABSORBANCE_READER_TYPE]: [],
+  [FLEX_STACKER_MODULE_TYPE]: [],
 }
 
 export function ModuleListItemGroup(): JSX.Element | null {
@@ -96,6 +98,7 @@ export function ModuleListItemGroup(): JSX.Element | null {
             MAGNETIC_MODULE_TYPE,
             MAGNETIC_BLOCK_TYPE,
             ABSORBANCE_READER_TYPE,
+            FLEX_STACKER_MODULE_TYPE,
           ].includes(module.type)
 
         return (
