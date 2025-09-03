@@ -525,7 +525,7 @@ def _get_tips_for_test_96_single(
         for slot in loaded_labwares.keys()
     ]
     partially_used = [slot for slot in fixture_settings.tips[tip] if slot in used_slots]
-    tipracks_lw = [
+    _ = [
         fixture_settings.ctx.load_labware(f"opentrons_flex_96_tiprack_{tip}uL", slot)
         for slot in fixture_settings.tips[tip]
         if slot not in partially_used
