@@ -80,7 +80,7 @@ This code sample loads a Flex 1-Channel Pipette in the left mount and a Flex 8-C
             mount="right",
             tip_racks=[tiprack2]) 
 
-If you're writing a protocol that uses the Flex Gripper, you might think that this would be the place in your protocol to declare that. However, the gripper doesn't require ``load_instrument``! Whether your gripper requires a protocol is determined by the presence of :py:meth:`.ProtocolContext.move_labware` commands. See :ref:`moving-labware` for more details.
+If you're writing a protocol that uses the Flex Gripper, you might think that this would be the place in your protocol to declare that. However, the gripper doesn't require ``load_instrument``! Whether your protocol requires a gripper is determined by the presence of :py:meth:`.ProtocolContext.move_labware` commands. See :ref:`moving-labware` for more details.
 
 Loading a Flex 96-Channel Pipette
 =================================
