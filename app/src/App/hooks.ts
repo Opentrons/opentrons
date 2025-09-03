@@ -13,6 +13,7 @@ import {
 import {
   useAllProtocolIdsQuery,
   useCreateLiveCommandMutation,
+  useCurrentAllSubsystemUpdatesQuery,
   useHost,
 } from '@opentrons/react-api-client'
 import {
@@ -41,6 +42,7 @@ const PROTOCOL_IDS_RECHECK_INTERVAL_MS = 3000
 const ATTACHED_MODULE_POLL_MS = 5000
 const DECK_CONFIG_POLL_MS = 5000
 const CURRENT_RUN_POLL = 5000
+const SUBSYSTEM_UPDATE_POLL = 5000
 
 export function useSoftwareUpdatePoll(): void {
   const dispatch = useDispatch<Dispatch>()
@@ -182,6 +184,16 @@ export function useModuleAttachedToast(
   const currentlySetuppableModules = useGetModulesNeedingSetupThatCanCurrentlyBeSetUp()
 
   const currentRunId = useCurrentRunId({ refetchInterval: CURRENT_RUN_POLL })
+  const {
+    data: currentSubsystemsUpdatesData,
+  } = useCurrentAllSubsystemUpdatesQuery({
+    refetchInterval: SUBSYSTEM_UPDATE_POLL,
+  })
+  const ongoingSubsystemUpdate = currentSubsystemsUpdatesData?.data.find(
+    update =>
+      update.updateStatus === 'queued' || update.updateStatus === 'updating'
+  )
+
   const { t, i18n } = useTranslation(['module_wizard_flows', 'shared'])
   const { makeToast, eatToast } = useToaster()
   const moduleSerials = currentlySetuppableModules.map(m => m.serialNumber)
@@ -193,7 +205,11 @@ export function useModuleAttachedToast(
 
   useEffect(() => {
     const newModuleSerials = difference(moduleSerials, moduleSerialsRef.current)
-    if (!runInProgress && newModuleSerials.length > 0) {
+    if (
+      !runInProgress &&
+      ongoingSubsystemUpdate == null &&
+      newModuleSerials.length > 0
+    ) {
       setToastID(
         makeToast(t('module_added') as string, 'info', {
           buttonText: i18n.format(t('shared:close'), 'capitalize'),
