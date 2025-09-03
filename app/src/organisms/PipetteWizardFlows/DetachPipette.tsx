@@ -104,6 +104,12 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
     chainRunCommands?.(
       [
         {
+          commandType: 'unsafe/updatePositionEstimators' as const,
+          params: {
+            axes: ['x', 'y', 'rightZ', 'leftZ'],
+          },
+        },
+        {
           commandType: 'home' as const,
           params: {
             axes: ['leftZ'],
