@@ -1,4 +1,5 @@
 """Opentrons analyze CLI."""
+
 import click
 
 from anyio import run
@@ -365,6 +366,16 @@ async def _analyze(
 
     analysis = await _do_analyze(protocol_source, parsed_rtp_values, rtp_paths)
     return_code = _get_return_code(analysis)
+    import gc
+    from opentrons.protocol_engine import ProtocolEngine
+
+    gc.collect()
+    leaked_engine = [e for e in gc.get_objects() if isinstance(e, ProtocolEngine)]
+    if leaked_engine:
+        print("leak, check leaked_engine")
+        breakpoint()
+    else:
+        print("no leak")
 
     if not outputs:
         return return_code
