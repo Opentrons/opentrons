@@ -9,8 +9,8 @@ import {
 
 import { OTHER } from '/ai-client/components/organisms/ApplicationSection'
 import {
-  _96_CHANNEL_PIPETTE,
   FLEX_GRIPPER,
+  NINETY_SIX_CHANNEL_PIPETTE,
   NO_PIPETTES,
   OPENTRONS_FLEX,
   OPENTRONS_OT2,
@@ -83,7 +83,7 @@ export function generatePromptPreviewInstrumentItems(
     rightPipette !== '' &&
       rightPipette !== NO_PIPETTES &&
       items.push(getPipetteSpecsV2(rightPipette as PipetteName)?.displayName)
-  } else if (pipettes === _96_CHANNEL_PIPETTE) {
+  } else if (pipettes === NINETY_SIX_CHANNEL_PIPETTE) {
     ninetySixChannelPipette !== '' && items.push(t(ninetySixChannelPipette))
   } else {
     items.push(pipettes !== '' && t(pipettes))
@@ -369,7 +369,7 @@ export function generateChatPrompt(
             ? `right pipette ${rightPipettePromptName}`
             : '',
         ].filter(Boolean)
-      : values.instruments.pipettes === _96_CHANNEL_PIPETTE
+      : values.instruments.pipettes === NINETY_SIX_CHANNEL_PIPETTE
       ? [values.instruments.ninetySixChannelPipette]
       : [values.instruments.pipettes]
 
@@ -383,7 +383,7 @@ export function generateChatPrompt(
         ]
           .filter(Boolean)
           .join('\n')
-      : values.instruments.pipettes === _96_CHANNEL_PIPETTE
+      : values.instruments.pipettes === NINETY_SIX_CHANNEL_PIPETTE
       ? `- ${t(values.instruments.ninetySixChannelPipette)}`
       : `- ${t(values.instruments.pipettes)}`
   const flexGripper =
