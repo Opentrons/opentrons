@@ -17,9 +17,10 @@ This hotfix release addresses several bugs.
 ### Bug Fixes
 
 - Crashes and protocol loss no longer occur when:
-    - deleting a pipette involved in a mix step.
-    - deleting a Protocol Designer step title.
-    - checking labware details after deleting a liquid.
+
+  - deleting a pipette involved in a mix step.
+  - deleting a Protocol Designer step title.
+  - checking labware details after deleting a liquid.
 
 - Add additional staging area slots to your robot deck without removing any added during setup.
 
