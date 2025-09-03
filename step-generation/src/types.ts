@@ -754,12 +754,14 @@ export interface CommandCreatorWarning {
 
 interface StepInfo {
   stepNumber?: number
-  //  TODO: can extend to include stepName and stepDetails
+  name?: string | null
+  description?: string | null
 }
 
-export interface CommandsAndRobotState extends StepInfo {
+export interface CommandsAndRobotState {
   commands: CreateCommand[]
   robotState: RobotState
+  stepInfo?: StepInfo
   warnings?: CommandCreatorWarning[]
   python?: string
 }

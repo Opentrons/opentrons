@@ -496,16 +496,30 @@ export function getLoadWasteChute(
     : ''
 }
 
+const formatDescription = (description?: string | null): string => {
+  if (description == null) {
+    return ''
+  }
+  return (
+    `\n` +
+    description
+      .split(/\r\n|\r|\n/)
+      .map(line => `# ${line}`)
+      .join('\n')
+  )
+}
+
 export function stepCommands(robotStateTimeline: Timeline): string {
   return (
     '# PROTOCOL STEPS\n\n' +
     robotStateTimeline.timeline
-      .map(
-        timelineFrame =>
-          `# Step ${timelineFrame.stepNumber}:\n${
-            timelineFrame.python || 'pass'
-          }`
-      )
+      .map(timelineFrame => {
+        const { stepInfo } = timelineFrame
+        const description = stepInfo?.description
+        return `# Step ${stepInfo?.stepNumber}: ${
+          stepInfo?.name
+        }${formatDescription(description)}\n${timelineFrame.python || 'pass'}`
+      })
       .join('\n\n')
   )
 }
