@@ -402,21 +402,16 @@ async def _analyze(  # noqa: C901
     # the debug option.
     if fail_on_leak or debug_on_leak:
         gc.collect()
-        try:
-            leaked_engine = [  # noqa: F841
-                obj for obj in gc.get_objects() if isinstance(obj, ProtocolEngine)
-            ][0]
-        except IndexError:
-            pass
-        else:
+        leaked_engine = next(
+            (obj for obj in gc.get_objects() if isinstance(obj, ProtocolEngine)), None
+        )
+        if leaked_engine:
             if fail_on_leak:
                 print(
-                    (
-                        "A ProtocolEngine instance exists even after garbage collection; "
-                        "some thing (likely in the protocol) has caused it to be leaked, ",
-                        "likely by reference to the engine or something that refers to the ",
-                        "engine after the run function ends.",
-                    ),
+                    "A ProtocolEngine instance exists even after garbage collection; "
+                    "some thing (likely in the protocol) has caused it to be leaked, "
+                    "likely by reference to the engine or something that refers to the "
+                    "engine after the run function ends.",
                     file=sys.stderr,
                 )
                 return_code = -2
