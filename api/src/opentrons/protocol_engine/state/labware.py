@@ -661,6 +661,14 @@ class LabwareView:
             or len(self.get_definition(labware_id).wells) >= 96
         )
 
+    def get_has_96_subwells(self, labware_id: str) -> bool:
+        """True if a labware is a reservoir with a 96-grid of sub-wells."""
+        return self.get_has_quirk(labware_id, "offsetPipetteFor96GridSubwells")
+
+    def get_has_12_subwells(self, labware_id: str) -> bool:
+        """True if a labware is a reservoir with a 12-grid of sub-wells."""
+        return self.get_has_quirk(labware_id, "offsetPipetteFor12GridSubwells")
+
     def get_well_definition(
         self,
         labware_id: str,

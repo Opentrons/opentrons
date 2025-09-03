@@ -63,7 +63,7 @@ enum MixContent {
   SideView = 'Side view',
   BlowoutLocation = 'Blowout location',
   BlowoutPos = 'Blowout position from top',
-  DestinationWell = 'Destination Well',
+  DestinationWell = 'Destination well',
   BlowoutFlowRate = 'Blowout position from top',
   EditBlowoutPos = 'Edit blowout position',
   BlowoutPosDescrip = 'Change where in the well the robot performs the blowout.',
