@@ -20,7 +20,7 @@ deploy:
 	@if [ -n "$$CI" ]; then \
 		echo "If you need to run this locally, set the variable AWS_PROFILE."; \
 	fi
-	aws s3 sync ./site/ s3://$(SANDBOX_S3_BUCKET)/$(BRANCH)/ --acl public-read $(if $(AWS_PROFILE),--profile $(AWS_PROFILE))
+	aws s3 sync ./site/ s3://$(SANDBOX_S3_BUCKET)/$(BRANCH)/  $(if $(AWS_PROFILE),--profile $(AWS_PROFILE))
 
 .PHONY: serve-flex-manual
 serve-flex-manual:
@@ -35,4 +35,4 @@ deploy-flex-manual:
 	@if [ -n "$$CI" ]; then \
 		echo "If you need to run this locally, set the variable AWS_PROFILE."; \
 	fi
-	aws s3 sync $(FLEX_MANUAL_PREFIX)/site/ s3://$(SANDBOX_S3_BUCKET)/$(BRANCH)/$(FLEX_MANUAL_PREFIX)/ --delete --acl public-read $(if $(AWS_PROFILE),--profile $(AWS_PROFILE))
+	aws s3 sync $(FLEX_MANUAL_PREFIX)/site/ s3://$(SANDBOX_S3_BUCKET)/$(BRANCH)/$(FLEX_MANUAL_PREFIX)/ --delete  $(if $(AWS_PROFILE),--profile $(AWS_PROFILE))
