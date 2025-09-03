@@ -31,7 +31,7 @@ export const FLEX_GRIPPER = 'flex_gripper'
 export const NO_FLEX_GRIPPER = 'no_flex_gripper'
 export const OPENTRONS_FLEX = 'opentrons_flex'
 export const OPENTRONS_OT2 = 'opentrons_ot2'
-export const _96_CHANNEL_PIPETTE = '96_channel_pipette'
+export const NINETY_SIX_CHANNEL_PIPETTE = '96_channel_pipette'
 export const TWO_PIPETTES = 'two_pipettes'
 export const NO_PIPETTES = 'none'
 
@@ -53,7 +53,8 @@ export function InstrumentsSection(): JSX.Element | null {
 
   const robotType = watch(ROBOT_FIELD_NAME)
   const isOtherPipettesSelected = watch(PIPETTES_FIELD_NAME) === TWO_PIPETTES
-  const is96ChannelSelected = watch(PIPETTES_FIELD_NAME) === _96_CHANNEL_PIPETTE
+  const is96ChannelSelected =
+    watch(PIPETTES_FIELD_NAME) === NINETY_SIX_CHANNEL_PIPETTE
   const isOpentronsOT2Selected = robotType === OPENTRONS_OT2
 
   const robotRadioButtons = [
@@ -76,9 +77,9 @@ export function InstrumentsSection(): JSX.Element | null {
       buttonValue: TWO_PIPETTES,
     },
     {
-      id: _96_CHANNEL_PIPETTE,
+      id: NINETY_SIX_CHANNEL_PIPETTE,
       buttonLabel: t('96_channel_pipette_label'),
-      buttonValue: _96_CHANNEL_PIPETTE,
+      buttonValue: NINETY_SIX_CHANNEL_PIPETTE,
     },
   ]
 
