@@ -41,7 +41,7 @@ export const generateRobotStateTimeline = (
       args: StepGeneration.CommandCreatorArgs,
       stepIndex
     ): StepGeneration.CurriedCommandCreator[] => {
-      const { stepNumber, description, name } = args
+      const { stepNumber, name, description } = args
       const baseCreator = commandCreatorFromStepArgs(args)
       // unsupported command creator in args.commandCreatorFnName
       if (baseCreator === null) {
