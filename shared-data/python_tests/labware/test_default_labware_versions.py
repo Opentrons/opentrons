@@ -40,6 +40,7 @@ def _get_available_load_names_and_highest_versions() -> list[tuple[str, int]]:
 
 def _highest_possible_default_version(load_name: str) -> int:
     """Return the highest default version for a labware across all api levels"""
+    # todo(ja, 9/3/25): Avoid this private fn access
     versions_by_api = _parse_json_from_filesystem()
     return max(
         (

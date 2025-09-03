@@ -44,33 +44,36 @@ export function getOnlyLatestDefs(): LabwareDefByDefURI {
   if (!_latestDefs) {
     const allDefs = getAllDefinitions()
     const allURIs = Object.keys(allDefs)
+
     const labwareDefGroups: Record<string, LabwareDefinition2[]> = groupBy(
       allURIs.map((uri: string) => allDefs[uri]),
       d => `${d.namespace}/${d.parameters.loadName}`
     )
+
     _latestDefs = Object.keys(labwareDefGroups).reduce(
       (acc, groupKey: string) => {
         const group = labwareDefGroups[groupKey]
 
-        // filter out any defs that are disallowed at the specific api level
-        const unAcceptableDefs = group.filter(def => {
-          const disallowedVersionForLoadName: number | null =
-            unacceptableDefVersions?.[def.parameters.loadName]
-          // if loadName is not include, then allow it still
-          if (disallowedVersionForLoadName == null) {
-            return true
-          }
-          // if this specific version is disallowed, then skip
-          return def.version !== disallowedVersionForLoadName
-        })
+        // get disallowed versions for this loadName, if it exists
+        const loadName = group[0].parameters.loadName
+        const disallowedVersions: number[] =
+          unacceptableDefVersions?.[loadName] ?? []
 
-        if (unAcceptableDefs.length === 0) {
+        // filter out defs that are disallowed for the current API level
+        const allowedDefs = group.filter(
+          def => !disallowedVersions.includes(def.version)
+        )
+
+        // if no allowed defs left, skip this group
+        if (allowedDefs.length === 0) {
           return acc
         }
+
+        // find the highest version number among the allowed defs
         const highestVersionNum = Math.max(
-          ...unAcceptableDefs.map(def => def.version)
+          ...allowedDefs.map(def => def.version)
         )
-        const latestDefInGroup = unAcceptableDefs.find(
+        const latestDefInGroup = allowedDefs.find(
           def => def.version === highestVersionNum
         )
 

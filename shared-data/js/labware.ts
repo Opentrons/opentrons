@@ -117,23 +117,25 @@ function isGreaterThan(a: [number, number], b: [number, number]): boolean {
   return a[0] > b[0] || (a[0] === b[0] && a[1] > b[1])
 }
 
+// Returns the labware def versions keyed by the loadName, so <loadName, versions[]>
+// that are unsupported based on the Api level
 export function getUnsupportedLabwareDefVersionsByApiLevel(
   currentPAPIVersion: string
-): Record<string, number> {
+): Record<string, number[]> {
   const current = parseAPIVersion(currentPAPIVersion)
 
   // filter keys in the JSON that are > current
-  const unAcceptableKeys = Object.keys(defaultLabwareVersions).filter(k => {
-    const parsed = parseAPIVersion(k)
-    return isGreaterThan(parsed, current)
-  })
+  const unsupportedDefs: Record<string, number[]> = {}
 
-  const unAcceptables: Record<string, number> = {}
-  unAcceptableKeys.forEach(k => {
-    const defs = defaultLabwareVersions[k]
-    Object.assign(unAcceptables, defs)
+  Object.entries(defaultLabwareVersions).forEach(([apiVersion, defs]) => {
+    if (isGreaterThan(parseAPIVersion(apiVersion), current)) {
+      Object.entries(defs).forEach(([labware, version]) => {
+        unsupportedDefs[labware] ??= []
+        unsupportedDefs[labware].push(version)
+      })
+    }
   })
-  return unAcceptables
+  return unsupportedDefs
 }
 
 export {

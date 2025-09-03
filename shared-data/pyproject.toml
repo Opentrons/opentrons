@@ -73,6 +73,7 @@ include = [
    'deck/definitions',
    'gripper',
    'labware/schemas',
+   'labware/defaultLabwareVersions',
    'labware/definitions',
    'labware/repository/schemas',
    'liquid/schemas',

@@ -10,22 +10,24 @@ from .. import get_shared_data_root
 DefaultLabwareVersions: TypeAlias = dict[tuple[int, int], dict[str, int]]
 
 
-DEFAULT_LABWARE_VERSIONS_FILE = (
+_DEFAULT_LABWARE_VERSIONS_FILE = (
     Path("labware") / "defaultLabwareVersions" / "default_labware_versions.json"
 )
 
 
 @functools.cache
 def _parse_json_from_filesystem() -> DefaultLabwareVersions:
-    with open(get_shared_data_root() / DEFAULT_LABWARE_VERSIONS_FILE) as file:
+    with open(get_shared_data_root() / _DEFAULT_LABWARE_VERSIONS_FILE) as file:
         raw_versions = json.load(file)
 
     # convert "2.14" to (2, 14)
+    def parse_version_str(version_str: str) -> tuple[int, int]:
+        parts = version_str.split(".")
+        return int(parts[0]), int(parts[1])
+
     return {
-        (major, minor): labware_map
+        parse_version_str(version_str): labware_map
         for version_str, labware_map in raw_versions.items()
-        if (major := int(version_str.split(".")[0])) is not None
-        and (minor := int(version_str.split(".")[1])) is not None
     }
 
 
