@@ -1,4 +1,4 @@
-:og:description: How to control individual robot componenets in a protocol using robot motor commands. 
+:og:description: How to control individual robot components in a protocol using robot motor commands. 
 
 .. _motor-control: 
 
@@ -47,12 +47,11 @@ This example moves ``Axis.Q`` to drop tips attached to a Flex 96-channel pipette
         def drop_tips():
             plunger_distance = -30
 
-            api = protocol.robot
-            api.move_axes_relative(
+            protocol.robot.move_axes_relative(
                 axis_map={"q": -1 * plunger_distance},
                 speed=5.5
             )
-            api.move_axes_relative(
+            protocol.robot.move_axes_relative(
                 axis_map={"q": plunger_distance},
                 speed=5.5
             )
@@ -63,25 +62,25 @@ This example moves ``Axis.Q`` to drop tips attached to a Flex 96-channel pipette
 
 .. versionadded:: 2.25
 
-Here, the 96-channel pipette moves to a specific position above the tip rack, including a ``z`` height. Then, the tip pickup motor moves -30 mm relative to its current position to drop attached pipettes. Before and after these movements, the instrument mount the pipette is attached to returns to it's ``home`` position. 
+Here, the 96-channel pipette moves to a specific position above the tip rack, including a ``z`` height. Then, the tip pickup motor moves -30 mm relative to its current position to drop attached tips. Before and after these movements, the instrument mount the pipette is attached to returns to it's ``home`` position. 
 
-.. warning::
+When you use a command like ``transfer_with_liquid_class()`` in a protocol, the robot tracks where the pipette's mount moves, how far the plunger moves, and how much liquid has been moved from each well. 
 
-    When you use a command like ``transfer_with_liquid_class()`` in a protocol, the robot tracks where the pipette's mount moves, how far the plunger moves, and how much liquid has been moved from each well. 
+Robot motor control commands won't track changes to liquids, labware, and  instruments like a pipette or the Gripper. For example, if you use a motor control command to move a well plate to a new slot, a subsequent :py:meth:`~.ProtocolContext.move_labware` command won't move the well plate from the correct location. 
 
-    Robot motor control commands won't track changes to liquids, labware, and  instruments like a pipette or the Gripper. For example, if you use a motor control command to move a well plate to a new slot, a subsequent :py:meth:`~.ProtocolContext.move_labware` command won't move the well plate from the correct location. 
+.. warning:: 
 
     As in the example above, be sure to home (or return to their previous position) any pipettes, the gantry, and other instruments that you've moved with a motor control command. Use caution to avoid collisions, especially when moving mounts with a pipette or Flex Gripper lowered towards the deck. 
 
 Gripper Commands
 -----------------
 
-The Flex Gripper methods :py:meth:`~.RobotContext.open_gripper_jaw` and :py:meth:`~.RobotContext.close_gripper_jaw` let you handle custom labware or hardware on the deck. 
+The :py:meth:`~.RobotContext.open_gripper_jaw` and :py:meth:`~.RobotContext.close_gripper_jaw` methods let you control the Flex Gripper jaws to handle custom labware or hardware on the deck. 
 
 You can also control the Gripper while other commands run. For example, use a mixture of move and gripper commands to pick up labware while pipetting liquids. 
 
-Helper Commands 
-----------------
+Axis and Plunger Coordinates 
+-----------------------------
 To move a robot axis, you'll need to provide a position in the form of an axis coordinate map. Helper commands return axis or plunger coordinates you can use in a movement command. 
 
 For example, you can use :py:meth:`~.RobotContext.axis_coordinates_for` to return a coordinate map for any mount and deck position. Then, pass the axis map to a ``move_axes_to()`` command. 
