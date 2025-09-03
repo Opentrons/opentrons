@@ -1,7 +1,14 @@
 import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 import { StyledText } from '@opentrons/components'
+
+import { getRobotStateTimeline } from '/protocol-designer/file-data/selectors'
+import {
+  _hasFormLevelErrors,
+  getArgsAndErrorsByStepId,
+} from '/protocol-designer/step-forms/selectors'
 
 import { useBlockingHint } from '../../components/organisms'
 
@@ -23,12 +30,20 @@ export const useProtocolExportHandler = ({
   const [showModalWithWarning, setShowModalWithWarning] = useState<boolean>(
     false
   )
+  const argsAndErrorsByStepId = useSelector(getArgsAndErrorsByStepId)
+  const timeline = useSelector(getRobotStateTimeline)
+  const hasFormErrors = Object.values(argsAndErrorsByStepId).some(
+    step => step.errors
+  )
+  const hasTimelineErrors = timeline?.errors != null
 
-  const hasWarning = !hasCommands
+  const hasWarning = !hasCommands || hasFormErrors || hasTimelineErrors
 
   const content = (
     <StyledText desktopStyle="bodyDefaultRegular">
-      {t('alert:export_warnings.redesign.no_commands.body1')}
+      {!hasCommands
+        ? t('alert:export_warnings.redesign.no_commands.body1')
+        : t('alert:hint.has_errors.body1')}
     </StyledText>
   )
 
@@ -42,7 +57,7 @@ export const useProtocolExportHandler = ({
   }, [])
 
   const exportWarningModalElement = useBlockingHint({
-    hintKey: 'no_commands',
+    hintKey: hasFormErrors || hasTimelineErrors ? 'has_errors' : 'no_commands',
     enabled: showModalWithWarning,
     content: content,
     handleCancel: cancelExportWarning,

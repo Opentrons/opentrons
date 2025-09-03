@@ -11,6 +11,7 @@ type HintKey =
   // blocking hints
   | 'change_magnet_module_model'
   | 'no_commands'
+  | 'has_errors'
 
 // DEPRECATED HINTS (keep a record to avoid name collisions with old persisted dismissal states)
 // | 'export_v4_protocol'
