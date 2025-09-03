@@ -58,7 +58,7 @@ export function renderWithProviders<State>(
 export function getProviderWrapperForHooks<State>(
   initialState: State, // this is the state you need redux to be in, often times an empty state {} is fine
   i18nInstance?: ComponentProps<typeof I18nextProvider>['i18n'] // if your hook uses i18n
-) {
+): ComponentType<PropsWithChildren<{}>> {
   const store: Store<State> = legacy_createStore(vi.fn(), initialState)
   store.dispatch = vi.fn()
   store.getState = vi.fn(() => initialState) as () => State
