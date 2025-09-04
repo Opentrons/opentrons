@@ -419,6 +419,7 @@ class Thermocycler(mod_abc.AbstractModule):
         celsius: float,
         hold_time_seconds: Optional[float] = None,
         volume: Optional[float] = None,
+        ramp_rate: Optional[float] = None,
     ) -> None:
         """Set the Thermocycler's target block temperature.
 
