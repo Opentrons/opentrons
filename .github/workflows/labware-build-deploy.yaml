@@ -37,15 +37,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
           cache: 'yarn'
-
-      - name: Setup UV
-        uses: astral-sh/setup-uv@v6
-        with:
-          python-version: '3.10'
-          enable-cache: true
-          cache-dependency-glob: './labware-library/uv.lock'
 
       - name: Install Dependencies
         working-directory: ./labware-library
@@ -78,21 +71,14 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup UV
-        uses: astral-sh/setup-uv@v6
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-          enable-cache: true
-          cache-dependency-glob: './labware-library/uv.lock'
-
-      - name: Setup Labware Dependencies
-        working-directory: ./labware-library
-        run: uv sync
 
       - name: Determine deployment configuration
         id: deploy-config
-        working-directory: ./labware-library
-        run: uv run python ../docs/deploy_config.py
+        run: python scripts/static-deploy/labware_deploy_config.py "${{ github.event_name }}" "${{ github.ref }}" "${{ github.ref_name }}" "${{ github.ref_type }}" "${{ github.event.pull_request.head_ref }}"
 
   deploy:
     name: Deploy
@@ -110,16 +96,10 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup UV
-        uses: astral-sh/setup-uv@v6
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-          enable-cache: true
-          cache-dependency-glob: './labware-library/uv.lock'
-
-      - name: Setup Labware Dependencies
-        working-directory: ./labware-library
-        run: uv sync
 
       - name: Download Artifacts
         uses: actions/download-artifact@v4
@@ -141,7 +121,7 @@ jobs:
           BRANCH: ${{ needs.determine-deploy-config.outputs.branch }}
           BUCKET: ${{ needs.determine-deploy-config.outputs.bucket }}
           URL: ${{ needs.determine-deploy-config.outputs.url }}
-        run: make deploy ENVIRONMENT=${{ env.ENVIRONMENT }} BRANCH=${{ env.BRANCH }} ARGS="--source-dir dist"
+        run: python ../scripts/static-deploy/deploy_labware.py ${{ env.ENVIRONMENT }} --branch ${{ env.BRANCH }} --source-dir dist
       - name: Output Deployment URL
         run: |
           echo "## 🚀 Labware Library deployed to ${{ env.ENVIRONMENT }}" >> $GITHUB_STEP_SUMMARY
