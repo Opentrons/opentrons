@@ -239,3 +239,19 @@ class PipetteSettingsUpdate(BaseModel):
                 else:
                     raise ValueError(f"{key} is not a valid field or quirk name")
         return v
+
+
+class LiveStreamSettings(BaseModel):
+    """Configuration values of Opentrons Live Stream service."""
+
+    source: Optional[str] = Field(
+        None, description="Source video device for the live stream feed."
+    )
+    resolution: Optional[str] = Field(
+        None, description="Video resolution for the live stream."
+    )
+    framerate: Optional[int] = Field(None, description="Framerate of the live stream.")
+    bitrate: Optional[str] = Field(
+        None,
+        description="Bitrate to use when broadcasting the live stream video over the network.",
+    )
