@@ -34,6 +34,7 @@ export type ProtocolRunDetailsTab =
   | 'module-controls'
   | 'run-preview'
   | 'runtime-parameters'
+  | 'camera'
 
 /**
  * desktop app route params type definition
