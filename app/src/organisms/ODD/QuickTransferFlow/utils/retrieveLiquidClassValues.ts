@@ -90,11 +90,6 @@ const getNoLiquidClassValues = (
       ? multiDispense
       : singleDispense
 
-  const pushOutVolume = linearInterpolate(
-    volume,
-    (singleDispense.pushOutByVolume as Array<[number, number]>) ?? 0
-  )
-
   const {
     conditioningByVolume: rawConditioningByVolume = [],
     disposalByVolume: rawDisposalByVolume = [],
@@ -305,26 +300,12 @@ const getLiquidClassValues = (
 
   const { aspirate, singleDispense, multiDispense } = tipTypeSettings ?? {}
 
-  const {
-    flowRateByVolume: aspirateFlowRateByVolume,
-    aspiratePosition,
-    preWet,
-    mix: aspirateMix,
-    delay: aspirateDelay,
-  } = aspirate ?? {}
+  const { preWet } = aspirate ?? {}
 
   const dispense =
     multiDispense != null && path === 'multiDispense'
       ? multiDispense
       : singleDispense
-
-  const {
-    flowRateByVolume: dispenseFlowRateByVolume,
-    dispensePosition,
-    delay: dispenseDelay,
-  } = dispense ?? {}
-
-  const { pushOutByVolume } = singleDispense ?? {}
 
   const {
     conditioningByVolume: rawConditioningByVolume = [],
@@ -400,7 +381,7 @@ const getLiquidClassValues = (
     dispenseMaxUiFlowRate
   )
 
-  const { pushOut, airGap, conditioning, disposal } = byVolumeLookup
+  const { conditioning, disposal } = byVolumeLookup
 
   const aspirateState = {
     aspirateFlowRate: aspirateFlowRateFields.aspirate_flowRate ?? 0,
