@@ -8,6 +8,9 @@ import {
 
 describe('computeLabwareOrigin()', () => {
   test('legacy behavior of x and y when labware are stacked', () => {
+    // The adapter has a nonzero cornerOffsetFromSlot and the tip rack has a zero
+    // stackingOffsetWithLabware x and y. The x and y of the tip rack follow the
+    // x and y of the underlying slot, NOT of the adapter.
     const adapter = getAllDefinitions()[
       'opentrons/opentrons_flex_96_tiprack_adapter/1'
     ]
