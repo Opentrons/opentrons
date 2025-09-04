@@ -97,7 +97,8 @@ class MotionView:
         subwells_12 = self._labware.get_has_12_subwells(labware_id)
         if subwells_12 and subwells_96:
             log.warning(
-                f"{labware_id} has both offsetPipetteFor96GridSubwells and offsetPipetteFor12GridSubwells quirks."
+                f"{self._labware.get_display_name(labware_id)} has both offsetPipetteFor96GridSubwells and"
+                " offsetPipetteFor12GridSubwells quirks."
             )
 
         pipette_rows = self._pipettes.get_nozzle_configuration(pipette_id).rows
