@@ -75,7 +75,7 @@ def _subprocess_entrypoint():
     json_output_stream = io.BytesIO()
     outputs = [_Output(to_file=json_output_stream, kind="json")]
     try:
-        exit_code = asyncio.run(_analyze(files, args.rtp_values, args.rtp_files, outputs, args.check))
+        exit_code = asyncio.run(_analyze(files, args.rtp_values, args.rtp_files, outputs, args.check, False, False))
     except Exception as e:
         print(json.dumps({"error": f"Exception: {str(e)}"}), file=sys.stdout)
         sys.exit(1)
