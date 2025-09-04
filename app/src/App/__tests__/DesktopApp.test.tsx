@@ -14,6 +14,7 @@ import { DeviceDetails } from '/app/pages/Desktop/Devices/DeviceDetails'
 import { DevicesLanding } from '/app/pages/Desktop/Devices/DevicesLanding'
 import { ProtocolRunDetails } from '/app/pages/Desktop/Devices/ProtocolRunDetails'
 import { RobotSettings } from '/app/pages/Desktop/Devices/RobotSettings'
+import { LivestreamViewer } from '/app/pages/Desktop/LivestreamViewer'
 import { ProtocolsLanding } from '/app/pages/Desktop/Protocols/ProtocolsLanding'
 
 // TODO(jh, 04-23-25): Prettier import order affects testing. Investigate further.
@@ -45,6 +46,7 @@ vi.mock('/app/redux/config')
 vi.mock('/app/redux-resources/robots')
 vi.mock('../hooks')
 vi.mock('/app/pages/Desktop/Protocols/ProtocolPreview')
+vi.mock('/app/pages/Desktop/LivestreamViewer')
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -74,6 +76,9 @@ describe('DesktopApp', () => {
     vi.mocked(ProtocolPreview).mockReturnValue(<div>Mock Preview</div>)
     vi.mocked(RobotSettings).mockReturnValue(<div>Mock RobotSettings</div>)
     vi.mocked(GeneralSettings).mockReturnValue(<div>Mock AppSettings</div>)
+    vi.mocked(LivestreamViewer).mockReturnValue(
+      <div>Mock LivestreamViewer</div>
+    )
     vi.mocked(Breadcrumbs).mockReturnValue(<div>Mock Breadcrumbs</div>)
     vi.mocked(SystemLanguagePreferenceModal).mockReturnValue(
       <div>Mock SystemLanguagePreferenceModal</div>
@@ -133,6 +138,11 @@ describe('DesktopApp', () => {
   it('renders a ProtocolsTimeline component from /preview', () => {
     render(`/protocols/95e67900-bc9f-4fbf-92c6-cc4d7226a51b/preview`)
     screen.getByText('Mock Preview')
+  })
+
+  it('renders the livestream viewer component from /camera-stream', () => {
+    render('/camera-stream')
+    screen.getByText('Mock LivestreamViewer')
   })
 
   it('renders a ProtocolRunDetails component from /devices/:robotName/protocol-runs/:runId/:protocolRunDetailsTab', () => {
