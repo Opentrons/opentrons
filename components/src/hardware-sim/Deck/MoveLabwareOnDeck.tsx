@@ -168,6 +168,7 @@ export function MoveLabwareOnDeck(
         ...styleProps,
       }}
       animatedSVG
+      deckLayerBlocklist={['fixedTrash']}
     >
       {backgroundItems}
       <AnimatedG style={{ x: springProps.x, y: springProps.y }}>
