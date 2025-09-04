@@ -21,10 +21,11 @@ describe('computeLabwareOrigin()', () => {
       deckDefinition: ot3StandardDeckV5 as any,
     })
     const expected = {
-      // Bottom-left of slot A1.
+      // x and y are the front-left of slot A1.
+      // z is on the surface of the adapter.
       x: 0.0,
       y: 321.0,
-      z: 0.0,
+      z: 11.0,
     }
     expect(result).toStrictEqual(expected)
   })
