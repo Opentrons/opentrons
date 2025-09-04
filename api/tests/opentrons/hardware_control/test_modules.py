@@ -19,6 +19,8 @@ from opentrons.hardware_control.modules.types import (
     AbsorbanceReaderModel,
     FlexStackerModuleModel,
     ModuleType,
+    ModuleDisconnectedCallback,
+    ModuleErrorCallback,
 )
 from opentrons.hardware_control.modules import (
     TempDeck,
@@ -137,7 +139,11 @@ async def test_create_simulating_module(
 
 
 @pytest.fixture
-async def mod_tempdeck() -> AsyncIterator[AbstractModule]:
+async def mod_tempdeck(
+    module_disconnected_callback: ModuleDisconnectedCallback,
+    module_error_callback: ModuleErrorCallback,
+    mock_execution_manager: ExecutionManager,
+) -> AsyncIterator[AbstractModule]:
 
     usb_port = USBPort(
         name="",
@@ -152,7 +158,9 @@ async def mod_tempdeck() -> AsyncIterator[AbstractModule]:
         type=ModuleType.TEMPERATURE,
         simulating=True,
         hw_control_loop=asyncio.get_running_loop(),
-        execution_manager=ExecutionManager(),
+        execution_manager=mock_execution_manager,
+        disconnected_callback=module_disconnected_callback,
+        error_callback=module_error_callback,
         sim_model="temperatureModuleV2",
     )
     yield tempdeck
@@ -160,7 +168,11 @@ async def mod_tempdeck() -> AsyncIterator[AbstractModule]:
 
 
 @pytest.fixture
-async def mod_magdeck() -> AsyncIterator[AbstractModule]:
+async def mod_magdeck(
+    module_disconnected_callback: ModuleDisconnectedCallback,
+    module_error_callback: ModuleErrorCallback,
+    mock_execution_manager: ExecutionManager,
+) -> AsyncIterator[AbstractModule]:
     usb_port = USBPort(
         name="",
         hub=False,
@@ -174,14 +186,20 @@ async def mod_magdeck() -> AsyncIterator[AbstractModule]:
         type=ModuleType.MAGNETIC,
         simulating=True,
         hw_control_loop=asyncio.get_running_loop(),
-        execution_manager=ExecutionManager(),
+        execution_manager=mock_execution_manager,
+        disconnected_callback=module_disconnected_callback,
+        error_callback=module_error_callback,
     )
     yield magdeck
     await magdeck.cleanup()
 
 
 @pytest.fixture
-async def mod_thermocycler() -> AsyncIterator[AbstractModule]:
+async def mod_thermocycler(
+    module_disconnected_callback: ModuleDisconnectedCallback,
+    module_error_callback: ModuleErrorCallback,
+    mock_execution_manager: ExecutionManager,
+) -> AsyncIterator[AbstractModule]:
     usb_port = USBPort(
         name="",
         hub=False,
@@ -195,14 +213,20 @@ async def mod_thermocycler() -> AsyncIterator[AbstractModule]:
         type=ModuleType.THERMOCYCLER,
         simulating=True,
         hw_control_loop=asyncio.get_running_loop(),
-        execution_manager=ExecutionManager(),
+        execution_manager=mock_execution_manager,
+        disconnected_callback=module_disconnected_callback,
+        error_callback=module_error_callback,
     )
     yield thermocycler
     await thermocycler.cleanup()
 
 
 @pytest.fixture
-async def mod_thermocycler_gen2() -> AsyncIterator[AbstractModule]:
+async def mod_thermocycler_gen2(
+    module_disconnected_callback: ModuleDisconnectedCallback,
+    module_error_callback: ModuleErrorCallback,
+    mock_execution_manager: ExecutionManager,
+) -> AsyncIterator[AbstractModule]:
     usb_port = USBPort(
         name="",
         hub=False,
@@ -216,7 +240,9 @@ async def mod_thermocycler_gen2() -> AsyncIterator[AbstractModule]:
         type=ModuleType.THERMOCYCLER,
         simulating=True,
         hw_control_loop=asyncio.get_running_loop(),
-        execution_manager=ExecutionManager(),
+        execution_manager=mock_execution_manager,
+        disconnected_callback=module_disconnected_callback,
+        error_callback=module_error_callback,
         sim_model="thermocyclerModuleV2",
     )
     yield thermocycler
@@ -224,7 +250,11 @@ async def mod_thermocycler_gen2() -> AsyncIterator[AbstractModule]:
 
 
 @pytest.fixture
-async def mod_heatershaker() -> AsyncIterator[AbstractModule]:
+async def mod_heatershaker(
+    module_disconnected_callback: ModuleDisconnectedCallback,
+    module_error_callback: ModuleErrorCallback,
+    mock_execution_manager: ExecutionManager,
+) -> AsyncIterator[AbstractModule]:
     usb_port = USBPort(
         name="",
         hub=False,
@@ -238,14 +268,20 @@ async def mod_heatershaker() -> AsyncIterator[AbstractModule]:
         type=ModuleType.HEATER_SHAKER,
         simulating=True,
         hw_control_loop=asyncio.get_running_loop(),
-        execution_manager=ExecutionManager(),
+        execution_manager=mock_execution_manager,
+        disconnected_callback=module_disconnected_callback,
+        error_callback=module_error_callback,
     )
     yield heatershaker
     await heatershaker.cleanup()
 
 
 @pytest.fixture
-async def mod_absorbancereader() -> AsyncIterator[AbstractModule]:
+async def mod_absorbancereader(
+    module_disconnected_callback: ModuleDisconnectedCallback,
+    module_error_callback: ModuleErrorCallback,
+    mock_execution_manager: ExecutionManager,
+) -> AsyncIterator[AbstractModule]:
     usb_port = USBPort(
         name="",
         hub=False,
@@ -259,14 +295,20 @@ async def mod_absorbancereader() -> AsyncIterator[AbstractModule]:
         type=ModuleType.ABSORBANCE_READER,
         simulating=True,
         hw_control_loop=asyncio.get_running_loop(),
-        execution_manager=ExecutionManager(),
+        execution_manager=mock_execution_manager,
+        disconnected_callback=module_disconnected_callback,
+        error_callback=module_error_callback,
     )
     yield absorbancereader
     await absorbancereader.cleanup()
 
 
 @pytest.fixture
-async def mod_flexstacker() -> AsyncIterator[AbstractModule]:
+async def mod_flexstacker(
+    module_disconnected_callback: ModuleDisconnectedCallback,
+    module_error_callback: ModuleErrorCallback,
+    mock_execution_manager: ExecutionManager,
+) -> AsyncIterator[AbstractModule]:
     usb_port = USBPort(
         name="",
         hub=False,
@@ -280,7 +322,9 @@ async def mod_flexstacker() -> AsyncIterator[AbstractModule]:
         type=ModuleType.FLEX_STACKER,
         simulating=True,
         hw_control_loop=asyncio.get_running_loop(),
-        execution_manager=ExecutionManager(),
+        execution_manager=mock_execution_manager,
+        disconnected_callback=module_disconnected_callback,
+        error_callback=module_error_callback,
     )
     yield flexstacker
     await flexstacker.cleanup()
