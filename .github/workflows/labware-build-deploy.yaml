@@ -1,0 +1,148 @@
+name: Labware Library Build and Deploy
+
+on:
+  push:
+    branches:
+      - 'labware-deploy'
+    tags:
+      - 'tmp-staging-labware-library*'
+      - 'tmp-labware-library*'
+  pull_request:
+    branches:
+      - 'labware-deploy'
+    paths:
+      - 'labware-library/**'
+      - '.github/workflows/labware-build-deploy.yaml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'labware-deploy' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
+  cancel-in-progress: true
+
+env:
+  UV_CACHE_DIR: ${{ github.workspace }}/.uv-cache
+
+jobs:
+  build:
+    name: Build and Upload Artifacts
+    runs-on: ubuntu-24.04
+    permissions:
+      id-token: write
+      contents: read
+    outputs:
+      artifacts-path: ${{ steps.upload-artifacts.outputs.path }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'yarn'
+
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.10'
+          enable-cache: true
+          cache-dependency-glob: './labware-library/uv.lock'
+
+      - name: Install Dependencies
+        working-directory: ./labware-library
+        run: yarn install --frozen-lockfile
+
+      - name: Build Labware Library
+        working-directory: ./labware-library
+        run: make dist
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: labware-build
+          path: labware-library/dist
+          retention-days: 1
+
+  determine-deploy-config:
+    name: Determine Deployment Configuration
+    runs-on: ubuntu-24.04
+    permissions:
+      id-token: write
+      contents: read
+    if: github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/labware-deploy')
+    outputs:
+      environment: ${{ steps.deploy-config.outputs.environment }}
+      branch: ${{ steps.deploy-config.outputs.branch }}
+      bucket: ${{ steps.deploy-config.outputs.bucket }}
+      url: ${{ steps.deploy-config.outputs.url }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.10'
+          enable-cache: true
+          cache-dependency-glob: './labware-library/uv.lock'
+
+      - name: Setup Labware Dependencies
+        working-directory: ./labware-library
+        run: uv sync
+
+      - name: Determine deployment configuration
+        id: deploy-config
+        working-directory: ./labware-library
+        run: uv run python ../docs/deploy_config.py
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-24.04
+    permissions:
+      id-token: write
+      contents: read
+    needs: [build, determine-deploy-config]
+    timeout-minutes: 5
+    if: github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/labware-deploy')
+    environment:
+      name: ${{ needs.determine-deploy-config.outputs.environment }}
+      url: ${{ needs.determine-deploy-config.outputs.url }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.10'
+          enable-cache: true
+          cache-dependency-glob: './labware-library/uv.lock'
+
+      - name: Setup Labware Dependencies
+        working-directory: ./labware-library
+        run: uv sync
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: labware-build
+          path: labware-library/dist
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: us-east-2
+          role-to-assume: ${{ secrets.DOCS_SANDBOX_ROLE }}
+          audience: sts.amazonaws.com
+
+      - name: Deploy
+        working-directory: ./labware-library
+        env:
+          ENVIRONMENT: ${{ needs.determine-deploy-config.outputs.environment }}
+          BRANCH: ${{ needs.determine-deploy-config.outputs.branch }}
+          BUCKET: ${{ needs.determine-deploy-config.outputs.bucket }}
+          URL: ${{ needs.determine-deploy-config.outputs.url }}
+        run: make deploy ENVIRONMENT=${{ env.ENVIRONMENT }} BRANCH=${{ env.BRANCH }} ARGS="--source-dir dist"
+      - name: Output Deployment URL
+        run: |
+          echo "## 🚀 Labware Library deployed to ${{ env.ENVIRONMENT }}" >> $GITHUB_STEP_SUMMARY
+          echo "<${{ env.URL }}>" >> $GITHUB_STEP_SUMMARY
