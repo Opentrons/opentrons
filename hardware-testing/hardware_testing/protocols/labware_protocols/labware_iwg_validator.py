@@ -12,7 +12,7 @@ from opentrons.types import Point
 from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
 
 # LABWARE TYPE
-LABWARE = "corning_falcon_384_wellplate_130ul_flat" # change to desired labware
+LABWARE = "costar_96_wellplate_2200ul" # change to desired labware
 
 # SLOTS
 SLOT_LIQUID_TIPRACKS = ["C3", "B3", "A2"]
@@ -24,7 +24,7 @@ CSV_SEPARATOR = ""
 RUN_ID = ""
 FILE_NAME = ""
 DIAL_PORT = None
-DIAL_PORT_NAME = "/dev/ttyUSB0"
+DIAL_PORT_NAME = "/dev/ttyUSB1"
 DIAL_POS_WITHOUT_TIP: List[Optional[float]] = [None, None]
 
 metadata = {"protocolName": "volume-validator"}
@@ -295,10 +295,11 @@ def aspirate_dispense_measure(
             ethanol_props.dispense.dispense_position.position_reference = "well-bottom"
             ethanol_props.dispense.dispense_position.offset.z = dispense_offset
             ethanol_props.dispense.push_out_by_volume.set_for_all_volumes(0.0)
-            ethanol_props.dispense.flow_rate_by_volume.set_for_all_volumes(60)
+            ethanol_props.dispense.flow_rate_by_volume.set_for_all_volumes(50)
             ethanol_props.dispense.retract.blowout.location = "destination"
             ethanol_props.dispense.retract.blowout.flow_rate = liq_pipette.flow_rate.blow_out
             ethanol_props.dispense.retract.blowout.enabled = True
+
 
         liq_pipette.transfer_with_liquid_class(                      
             liquid_class=ethanol,

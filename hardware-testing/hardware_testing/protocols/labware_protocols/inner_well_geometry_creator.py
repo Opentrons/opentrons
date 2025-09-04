@@ -21,7 +21,7 @@ from dataclasses import dataclass
 #  GLOBAL VARIABLES - START
 ###########################################
 
-LABWARE = "corning_falcon_384_wellplate_130ul_flat"  # change to desired labware
+LABWARE = "costar_96_wellplate_2200ul"  # change to desired labware
 
 RESERVOIR = "nest_1_reservoir_290ml"
 
@@ -593,7 +593,7 @@ def geometry_creator(ctx: ProtocolContext, state: SetupState) -> List[TrialResul
             ethanol_props.dispense.dispense_position.position_reference = "well-bottom"
             ethanol_props.dispense.dispense_position.offset.z = dispense_offset
             ethanol_props.dispense.push_out_by_volume.set_for_all_volumes(0.0)
-            ethanol_props.dispense.flow_rate_by_volume.set_for_all_volumes(60)
+            ethanol_props.dispense.flow_rate_by_volume.set_for_all_volumes(50)
             ethanol_props.dispense.retract.blowout.location = "destination"
             ethanol_props.dispense.retract.blowout.flow_rate = liq_pipette.flow_rate.blow_out
             ethanol_props.dispense.retract.blowout.enabled = True
@@ -601,7 +601,7 @@ def geometry_creator(ctx: ProtocolContext, state: SetupState) -> List[TrialResul
         pick_up_tips(probe_pipette, liq_pipette)
         tip_z_error = _get_tip_z_error(ctx, probe_pipette, state.dial)
         
-        liq_pipette.transfer_with_liquid_class(                      
+        liq_pipette.transfer_with_liquid_class(
             liquid_class=ethanol,
             volume=volume_per_channel,
             source=src["A1"],
