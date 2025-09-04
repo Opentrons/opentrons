@@ -114,7 +114,7 @@ const getNoLiquidClassValues = (
     disposalByVolume,
   }).referenceVolumes
 
-  const { airGap, conditioning, correction, flowRate } = byVolumeLookup
+  const { conditioning, correction, flowRate } = byVolumeLookup
 
   const aspirateCorrectionVolume = linearInterpolate(
     correction.aspirate,
