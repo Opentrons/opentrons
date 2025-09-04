@@ -402,9 +402,6 @@ const getLiquidClassValues = (
 
   const { pushOut, airGap, conditioning, disposal } = byVolumeLookup
 
-  console.log('pushOut', pushOut)
-  console.log('airGap', airGap)
-
   const aspirateState = {
     aspirateFlowRate: aspirateFlowRateFields.aspirate_flowRate ?? 0,
     tipPositionAspirate: aspirate?.aspiratePosition.offset.z ?? 0,
