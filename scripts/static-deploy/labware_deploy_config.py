@@ -57,12 +57,12 @@ def determine_deploy_config(
         branch = ref_name
         bucket = "opentrons.sandbox.labware"
         url = f"http://opentrons.sandbox.labware.s3-website.us-east-2.amazonaws.com/{branch}/"
-    elif ref.startswith("refs/tags/staging-labware-library"):
+    elif ref.startswith("refs/tags/tmp-staging-labware-library") or ref.startswith("refs/tags/staging-labware-library"):
         environment = "staging"
         branch = ref_name
         bucket = "opentrons.staging.labware"
         url = "https://staging.labware.opentrons.com/"
-    elif ref.startswith("refs/tags/labware-library"):
+    elif ref.startswith("refs/tags/tmp-labware-library") or ref.startswith("refs/tags/labware-library"):
         environment = "production"
         branch = ref_name
         bucket = "opentrons.production.labware"
