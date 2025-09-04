@@ -225,31 +225,3 @@ If, for any reason, your pipette firmware and robot software versions get out of
 </div>
 
 You can view the currently installed firmware version of any attached pipette. On the touchscreen, go to **Instruments** and tap the pipette name. In the Opentrons App, find the pipette card under Instruments and Modules, click the three-dot menu (⋮), and then click **About pipette**.
-
-<!-- Putting this here for now, can move if there's a better place for it -->
-## Pipette O-Ring Replacement
-
-You can replace the O-rings on Flex 1- and 8-channel pipettes if they become worn or broken. Each pipette ships with a set of replacement O-rings and a special two-piece tool to help with this procedure.
-
-You should not try to change the O-rings on a 96-channel pipette. The limited clearance between tips can make replacement difficult and may damage the instrument. Contact Opentrons Support if you believe the O-rings on your 96-channel pipette are worn or damaged and need to be replaced.
-
-!!!note
-    Flex and OT-2 pipette O-rings are not interchangeable.
-
-Follow these instructions to replace the O-rings on your Flex Flex 1- and 8-channel pipettes:
-
-<div class="instruction-list" markdown>
-
-1. Attach the O-ring removal tool to the tip of the pipette.
-
-  IMAGE PLACEHOLDER
-
-2. Rotate and pull gently to remove the O-ring. The O-ring may break during removal, which is common.
-
-3. Place the wide base of the O-ring installation tool against the pipette tip and roll the new O-ring onto the pipette.
-
-  IMAGE PLACEHOLDER
-
-
-
-</div>
