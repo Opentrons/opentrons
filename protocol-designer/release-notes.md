@@ -17,14 +17,16 @@ This hotfix release addresses several bugs.
 ### Bug Fixes
 
 - Crashes and protocol loss no longer occur when:
+- Crashes and protocol loss no longer occur when:
 
+  - deleting a pipette involved in a mix step.
+  - deleting a Protocol Designer step title.
+  - checking labware details after deleting a liquid.
   - deleting a pipette involved in a mix step.
   - deleting a Protocol Designer step title.
   - checking labware details after deleting a liquid.
 
 - All staging area slots remain when adding new staging areas after initial deck setup.
-
-- Adding a Staging Area slot after initial deck setup retains all previous Staging Area slots.
 
 ## Opentrons Protocol Designer Changes in 8.5.2
 
