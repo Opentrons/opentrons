@@ -46,7 +46,7 @@ class RobotContext(publisher.CommandPublisher):
     Objects in this class should not be instantiated directly. Instead, instances are
     returned by :py:meth:`ProtocolContext.robot`.
 
-    .. versionadded:: 2.20
+    .. versionadded:: 2.22
 
     """
 
@@ -91,6 +91,7 @@ class RobotContext(publisher.CommandPublisher):
                       that the gripper mount can be referred to either as ``"extension"`` or ``"gripper"``.
         :type mount: types.Mount or str
         :param destination: Any location on the deck, specified as:
+        
               -  a slot, like ``"A1"``
               -  a defined location, like labware in a deck slot
               -  an absolute location, like a point {x=10 , y=10, z=10} or a deck location and point ("A1" + point {x=10 , y=10, z=10})
@@ -119,10 +120,9 @@ class RobotContext(publisher.CommandPublisher):
         Move a set of axes to an absolute position on the deck.
 
         :param axis_map: A dictionary mapping axes to an absolute position on the deck in mm.
-        :param critical_point: The critical point, or specific point on the object being moved, to move the axes with. It should only specify the gantry axes (i.e. `x`, `y`, `z`).
-
-        When you specify a critical point, you're specifying the object on the gantry to be moved. If not specified, the critical point defaults to the center of the carriage attached to the gantry. 
+        :param critical_point: The critical point, or specific point on the object being moved, to move the axes with. It should only specify the gantry axes (i.e. `x`, `y`, `z`). When you specify a critical point, you're specifying the object on the gantry to be moved. If not specified, the critical point defaults to the center of the carriage attached to the gantry. 
         :param float speed: The maximum speed with which to move all axes in mm/s. 
+
         """
         instrument_on_left = self._core.get_pipette_type_from_engine(Mount.LEFT)
         is_96_channel = instrument_on_left == PipetteNameType.P1000_96
@@ -180,7 +180,7 @@ class RobotContext(publisher.CommandPublisher):
     def close_gripper_jaw(self, force: Optional[float] = None) -> None:
         """Closes the Flex Gripper jaws with a specified force.
         
-        :param force: Force with which to open the Gripper jaws in newtons. 
+        :param force: Force with which to close the gripper jaws in newtons. 
         """
         with publisher.publish_context(
             broker=self.broker,
@@ -193,7 +193,7 @@ class RobotContext(publisher.CommandPublisher):
     def open_gripper_jaw(self) -> None:
         """Opens the Flex Gripper jaws with a specified force. 
         
-        :param force: Force with which to close the Gripper jaws in newtons. 
+        :param force: Force with which to open the gripper jaws in newtons. 
         """
         with publisher.publish_context(
             broker=self.broker,
@@ -207,7 +207,7 @@ class RobotContext(publisher.CommandPublisher):
         location: Union[Location, ModuleContext, DeckLocation],
     ) -> AxisMapType:
         """
-        Build a :py:class:`.types.AxisMapType` from a location to provide to
+        Build an axis map from a location to provide to
         either :py:meth:`.RobotContext.move_axes_to` or :py:meth:`.RobotContext.move_axes_relative`.
         You must provide only one of either a `location`, `slot`, or `module` to build
         the axis map.
@@ -218,9 +218,9 @@ class RobotContext(publisher.CommandPublisher):
                       that the gripper mount can be referred to either as ``"extension"`` or ``"gripper"``.
         :type mount: types.Mount or str
         :param location: Any location on the deck, specified as:
-              -  a deck location, like slot ``"A1"``
-              -  a defined location, like labware in a deck slot or a well in a labware
-              -  an absolute location, like a point {x=10 , y=10, z=10} or a deck location and point ("A1" + point {x=10 , y=10, z=10}).
+            
+              -  a deck location, like slot ``"A1"``.
+              -  a defined location, like a module on the deck. 
         :type location: `Well`, `ModuleContext`, `DeckLocation` or `OffDeckType`
         """
         mount = validation.ensure_instrument_mount(mount)
@@ -258,11 +258,10 @@ class RobotContext(publisher.CommandPublisher):
         self, mount: Union[Mount, str], volume: float, action: PipetteActionTypes
     ) -> AxisMapType:
         """
-        Build a :py:class:`.types.AxisMapType` to move a pipette plunger motor to complete liquid handling actions. 
+        Build an axis map to move a pipette plunger motor to complete liquid handling actions. 
          
         :param volume: A volume to convert to an axis map for linear plunger displacement.
-        :parm action: Choose to ``aspirate`` or ``dispense``. 
-        :type action: ##INSERT actions here. 
+        :param action: Choose to ``aspirate`` or ``dispense``. 
 
         """
         pipette_name = self._core.get_pipette_type_from_engine(mount)
@@ -282,12 +281,9 @@ class RobotContext(publisher.CommandPublisher):
         self, mount: Union[Mount, str], position_name: PlungerPositionTypes
     ) -> AxisMapType:
         """
-        Build a :py:class:`.types.AxisMapType` to move a pipette plunger motor to a named position position_name.
+        Build an axis map to move a pipette plunger motor to a named position. 
 
-        :param postion_name: A named position to move the pipette plunger to. 
-        :type position_name: A ``top``, ``bottom``, ``blowout``, or ``drop`` plunger position.
-
-
+        :param postion_name: A named position to move the pipette plunger to. Choose from ``top``, ``bottom``, ``blowout``, or ``drop`` plunger positions. 
 
         """
         pipette_name = self._core.get_pipette_type_from_engine(mount)
@@ -303,7 +299,7 @@ class RobotContext(publisher.CommandPublisher):
         return {pipette_axis: pipette_position}
 
     def build_axis_map(self, axis_map: StringAxisMap) -> AxisMapType:
-        """Take in a :py:class:`.types.StringAxisMap` and output a :py:class:`.types.AxisMapType`.
+        """Take in a :py:class:`.types.StringAxisMap` and output an axis map. 
 
         The :py:class:`.types.StringAxisMap` is allowed to contain any of the following strings:
         ``"x"``, ``"y"``, "``z_l"``, "``z_r"``, "``z_g"``, ``"q"``.
