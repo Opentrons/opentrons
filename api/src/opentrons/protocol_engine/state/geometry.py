@@ -738,7 +738,7 @@ class GeometryView:
 
         if well_def.shape != "circular":
             raise errors.LabwareIsNotTipRackError(
-                f"Well {well_name} in labware {labware_id} is not circular."
+                f"Well {well_name} in labware {self._labware.get_display_name(labware_id)} is not circular."
             )
 
         return TipGeometry(
@@ -829,7 +829,7 @@ class GeometryView:
                 slot_name = DeckSlotName.from_primitive(area_name)
         elif labware.location == OFF_DECK_LOCATION:
             raise errors.LabwareNotOnDeckError(
-                f"Labware {labware_id} does not have a slot associated with it"
+                f"Labware {self._labware.get_display_name(labware_id)} does not have a slot associated with it"
                 f" since it is no longer on the deck."
             )
         else:
@@ -2113,7 +2113,8 @@ class GeometryView:
             except InvalidLiquidHeightFound as _exception:
                 raise InvalidLiquidHeightFound(
                     message=_exception.message
-                    + f"for well {well_name} of {self._labware.get_display_name(labware_id)} on slot {self.get_ancestor_slot_name(labware_id)}"
+                    + f"for well {well_name} of {self._labware.get_display_name(labware_id)}"
+                    f" on slot {self.get_ancestor_slot_name(labware_id)}"
                 )
             # if meniscus volume is a simulated value, comparisons aren't meaningful
             if isinstance(meniscus_volume, SimulatedProbeResult):
@@ -2121,13 +2122,16 @@ class GeometryView:
             remaining_volume = well_volumetric_capacity - meniscus_volume
             if volume > remaining_volume:
                 raise errors.InvalidDispenseVolumeError(
-                    f"Attempting to dispense {volume}µL of liquid into a well that can currently only hold {remaining_volume}µL (well {well_name} in labware_id: {labware_id})"
+                    f"Attempting to dispense {volume}µL of liquid into a well that can currently only hold"
+                    f" {remaining_volume}µL (well {well_name} in labware {self._labware.get_display_name(labware_id)})"
                 )
         else:
             # TODO(pbm, 10-08-24): factor in well (LabwareStore) state volume
             if volume > well_volumetric_capacity:
                 raise errors.InvalidDispenseVolumeError(
-                    f"Attempting to dispense {volume}µL of liquid into a well that can only hold {well_volumetric_capacity}µL (well {well_name} in labware_id: {labware_id})"
+                    f"Attempting to dispense {volume}µL of liquid into a well that can only hold"
+                    f" {well_volumetric_capacity}µL (well {well_name} in"
+                    f" labware {self._labware.get_display_name(labware_id)})"
                 )
 
     def get_wells_covered_by_pipette_with_active_well(

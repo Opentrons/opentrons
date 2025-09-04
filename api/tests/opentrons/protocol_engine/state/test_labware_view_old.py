@@ -204,7 +204,7 @@ def test_get_id_by_labware() -> None:
 
 
 def test_get_id_by_labware_raises_error() -> None:
-    """Should raise error that labware not found."""
+    """Should raise an error that labware not found."""
     subject = get_labware_view(
         labware_by_id={
             "labware-id": LoadedLabware(
@@ -212,11 +212,12 @@ def test_get_id_by_labware_raises_error() -> None:
                 loadName="test",
                 definitionUri="test-uri",
                 location=OnLabwareLocation(labwareId="other-labware-id"),
-            )
-        }
+                displayName="The Labware",
+            ),
+        },
     )
     with pytest.raises(errors.exceptions.LabwareNotLoadedOnLabwareError):
-        subject.get_id_by_labware(labware_id="no-labware-id")
+        subject.get_id_by_labware(labware_id="labware-id")
 
 
 def test_raise_if_labware_has_non_lid_labware_on_top() -> None:
@@ -228,6 +229,7 @@ def test_raise_if_labware_has_non_lid_labware_on_top() -> None:
                 loadName="test",
                 definitionUri="test-uri",
                 location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+                displayName="lorem",
             ),
             "bottom-labware-2": LoadedLabware(
                 id="bottom-labware-2",
@@ -235,24 +237,28 @@ def test_raise_if_labware_has_non_lid_labware_on_top() -> None:
                 definitionUri="test-uri",
                 location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
                 lid_id="lid-labware-a",
+                displayName="ipsum",
             ),
             "bottom-labware-3": LoadedLabware(
                 id="bottom-labware-3",
                 loadName="test",
                 definitionUri="test-uri",
                 location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+                displayName="dolor",
             ),
             "lid-labware-a": LoadedLabware(
                 id="lid-labware-a",
                 loadName="lid",
                 definitionUri="lid-uri",
                 location=OnLabwareLocation(labwareId="bottom-labware-2"),
+                displayName="sit",
             ),
             "top-labware-b": LoadedLabware(
                 id="top-labware-b",
                 loadName="test",
                 definitionUri="test-uri",
                 location=OnLabwareLocation(labwareId="bottom-labware-3"),
+                displayName="amet",
             ),
         }
     )
@@ -273,6 +279,7 @@ def test_raise_if_labware_has_labware_on_top() -> None:
                 loadName="test",
                 definitionUri="test-uri",
                 location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+                displayName="lorem",
             ),
             "bottom-labware-2": LoadedLabware(
                 id="bottom-labware-2",
@@ -280,24 +287,28 @@ def test_raise_if_labware_has_labware_on_top() -> None:
                 definitionUri="test-uri",
                 location=ModuleLocation(moduleId="module-id"),
                 lid_id="lid-labware-a",
+                displayName="ipsum",
             ),
             "bottom-labware-3": LoadedLabware(
                 id="bottom-labware-3",
                 loadName="test",
                 definitionUri="test-uri",
                 location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+                displayName="dolor",
             ),
             "lid-labware-a": LoadedLabware(
                 id="lid-labware-a",
                 loadName="test-lid",
                 definitionUri="lid-uri",
                 location=OnLabwareLocation(labwareId="bottom-labware-2"),
+                displayName="sit",
             ),
             "top-labware-b": LoadedLabware(
                 id="top-labware-b",
                 loadName="test",
                 definitionUri="test-uri",
                 location=OnLabwareLocation(labwareId="bottom-labware-3"),
+                displayName="amet",
             ),
         }
     )
@@ -619,12 +630,14 @@ def test_validate_liquid_allowed_raises_incompatible_labware() -> None:
                 loadName="test1",
                 definitionUri="some-tiprack-uri",
                 location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+                displayName="Tip Rack",
             ),
             "adapter-id": LoadedLabware(
                 id="adapter-id",
                 loadName="test2",
                 definitionUri="some-adapter-uri",
                 location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
+                displayName="Some adapter",
             ),
         },
         definitions_by_uri={
