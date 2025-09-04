@@ -272,6 +272,7 @@ class LegacyThermocyclerCore(
             celsius=celsius,
             hold_time_seconds=hold_time_seconds,
             volume=block_max_volume,
+            ramp_rate=ramp_rate,
         )
 
     def wait_for_block_temperature(self) -> None:

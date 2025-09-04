@@ -328,6 +328,7 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
                 celsius=celsius,
                 blockMaxVolumeUl=block_max_volume,
                 holdTimeSeconds=hold_time_seconds,
+                ramp_rate=ramp_rate,
             )
         )
 
