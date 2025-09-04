@@ -9,6 +9,7 @@ from opentrons.hardware_control.modules.lid_temp_status import LidTemperatureSta
 from opentrons.hardware_control.modules.plate_temp_status import PlateTemperatureStatus
 from opentrons.hardware_control.modules.types import (
     ModuleDisconnectedCallback,
+    ModuleErrorCallback,
     TemperatureStatus,
 )
 from opentrons.hardware_control.poller import Reader, Poller
@@ -68,6 +69,7 @@ class Thermocycler(mod_abc.AbstractModule):
         sim_model: Optional[str] = None,
         sim_serial_number: Optional[str] = None,
         disconnected_callback: ModuleDisconnectedCallback = None,
+        error_callback: ModuleErrorCallback = None,
     ) -> "Thermocycler":
         """
         Build and connect to a Thermocycler
@@ -108,6 +110,7 @@ class Thermocycler(mod_abc.AbstractModule):
             hw_control_loop=hw_control_loop,
             execution_manager=execution_manager,
             disconnected_callback=disconnected_callback,
+            error_callback=error_callback,
         )
 
         try:
@@ -128,6 +131,7 @@ class Thermocycler(mod_abc.AbstractModule):
         hw_control_loop: asyncio.AbstractEventLoop,
         execution_manager: Optional[ExecutionManager] = None,
         disconnected_callback: ModuleDisconnectedCallback = None,
+        error_callback: ModuleErrorCallback = None,
     ) -> None:
         """
         Constructor
@@ -150,6 +154,7 @@ class Thermocycler(mod_abc.AbstractModule):
             hw_control_loop=hw_control_loop,
             execution_manager=execution_manager,
             disconnected_callback=disconnected_callback,
+            error_callback=error_callback,
         )
         self._device_info = device_info
         self._reader = reader
@@ -159,10 +164,13 @@ class Thermocycler(mod_abc.AbstractModule):
         self._total_step_count: Optional[int] = None
         self._current_step_index: Optional[int] = None
         self._error: Optional[str] = None
-        self._reader.register_error_handler(self._enter_error_state)
+        self._unsubscribe_reader = self._reader.register_error_handler(
+            self._enter_error_state
+        )
 
     async def cleanup(self) -> None:
         """Stop the poller task."""
+        self._unsubscribe_reader()
         await self._poller.stop()
         await self._driver.disconnect()
 
@@ -674,6 +682,7 @@ class Thermocycler(mod_abc.AbstractModule):
             f" for troubleshooting."
         )
         asyncio.run_coroutine_threadsafe(self.cleanup(), self._loop)
+        self.error_callback(error)
 
 
 class ThermocyclerReader(Reader):
@@ -711,8 +720,14 @@ class ThermocyclerReader(Reader):
         if self._handle_error is not None:
             self._handle_error(exception)
 
-    def register_error_handler(self, handle_error: Callable[[Exception], None]) -> None:
+    def register_error_handler(
+        self, handle_error: Callable[[Exception], None]
+    ) -> Callable[[], None]:
         self._handle_error = handle_error
+        return self._unsubscribe_error_handler
+
+    def _unsubscribe_error_handler(self) -> None:
+        self._handle_error = None
 
     async def read(self) -> None:
         """Poll the thermocycler."""

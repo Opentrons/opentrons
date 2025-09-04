@@ -21,6 +21,7 @@ from opentrons.hardware_control.poller import Poller, Reader
 from opentrons.hardware_control.modules import mod_abc
 from opentrons.hardware_control.modules.types import (
     ModuleDisconnectedCallback,
+    ModuleErrorCallback,
     ModuleType,
     AbsorbanceReaderStatus,
     LiveData,
@@ -110,6 +111,7 @@ class AbsorbanceReader(mod_abc.AbstractModule):
         sim_model: Optional[str] = None,
         sim_serial_number: Optional[str] = None,
         disconnected_callback: ModuleDisconnectedCallback = None,
+        error_callback: ModuleErrorCallback = None,
     ) -> "AbsorbanceReader":
         """
         Build and connect to an AbsorbanceReader
@@ -152,6 +154,7 @@ class AbsorbanceReader(mod_abc.AbstractModule):
             hw_control_loop=hw_control_loop,
             execution_manager=execution_manager,
             disconnected_callback=disconnected_callback,
+            error_callback=error_callback,
         )
 
         try:
@@ -172,6 +175,7 @@ class AbsorbanceReader(mod_abc.AbstractModule):
         hw_control_loop: asyncio.AbstractEventLoop,
         execution_manager: Optional[ExecutionManager] = None,
         disconnected_callback: ModuleDisconnectedCallback = None,
+        error_callback: ModuleErrorCallback = None,
     ) -> None:
         """
         Constructor
@@ -193,6 +197,7 @@ class AbsorbanceReader(mod_abc.AbstractModule):
             hw_control_loop=hw_control_loop,
             execution_manager=execution_manager,
             disconnected_callback=disconnected_callback,
+            error_callback=error_callback,
         )
         self._device_info = device_info
         self._reader = reader
