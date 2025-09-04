@@ -22,7 +22,7 @@ This hotfix release addresses several bugs.
   - deleting a Protocol Designer step title.
   - checking labware details after deleting a liquid.
 
-- Add additional staging area slots to your robot deck without removing any added during setup.
+- All staging area slots remain when adding new staging areas after initial deck setup.
 
 ## Opentrons Protocol Designer Changes in 8.5.2
 
