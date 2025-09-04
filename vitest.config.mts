@@ -67,6 +67,7 @@ export default mergeConfig(
         // https://nodejs.org/api/path.html#pathresolvepaths
         '/app/': path.resolve('./app/src/') + '/',
         '/protocol-designer/': path.resolve('./protocol-designer/src/') + '/',
+        '/ai-client/': path.resolve('./opentrons-ai-client/src/') + '/',
       },
     },
   })
