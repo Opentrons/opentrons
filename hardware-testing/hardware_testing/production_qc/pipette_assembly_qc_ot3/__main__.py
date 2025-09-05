@@ -115,6 +115,7 @@ class TestConfig:
     skip_plunger: bool
     skip_tip_presence: bool
     skip_liquid_probe: bool
+    skip_encoder_clean: bool
     fixture_port: str
     fixture_side: str
     fixture_aspirate_sample_count: int
@@ -1488,26 +1489,6 @@ async def _test_diagnostics(api: OT3API, mount: OT3Mount, write_cb: Callable) ->
     # print(f"encoder: {_bool_to_pass_fail(encoder_pass)}")
     LOG_GING.info(f"encoder: {_bool_to_pass_fail(encoder_pass)}")
     write_cb(["diagnostics-encoder", _bool_to_pass_fail(encoder_pass)])
-    (
-        encoder_clean_pass,
-        cumulative_drift,
-        avg_drift,
-        max_error_mm,
-        max_error_pulses,
-        max_error_ticks,
-    ) = await test_encoder(api, mount)
-    LOG_GING.info(f"encoder: {_bool_to_pass_fail(encoder_clean_pass)}")
-    write_cb(
-        [
-            "diagnostics-encoder-clean",
-            cumulative_drift,
-            avg_drift,
-            max_error_mm,
-            max_error_pulses,
-            max_error_ticks,
-            _bool_to_pass_fail(encoder_clean_pass),
-        ]
-    )
     # CAPACITIVE SENSOR
     # print("SKIPPING CAPACITIVE TESTS")
     LOG_GING.info("SKIPPING CAPACITIVE TESTS")
@@ -1523,13 +1504,7 @@ async def _test_diagnostics(api: OT3API, mount: OT3Mount, write_cb: Callable) ->
     LOG_GING.info(f"pressure: {_bool_to_pass_fail(pressure_pass)}")
     write_cb(["diagnostics-pressure", _bool_to_pass_fail(pressure_pass)])
 
-    return (
-        environment_pass
-        and pressure_pass
-        and encoder_pass
-        and capacitance_pass
-        and encoder_clean_pass
-    )
+    return environment_pass and pressure_pass and encoder_pass and capacitance_pass
 
 
 async def _test_plunger_positions(
@@ -2205,6 +2180,29 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
                     )
                     csv_cb.results("plunger", test_passed)
 
+            if not test_config.skip_encoder_clean:
+                report_dir = str(Path(csv_props.path).parent)
+                (
+                    encoder_clean_pass,
+                    cumulative_drift,
+                    avg_drift,
+                    max_error_mm,
+                    max_error_pulses,
+                    max_error_ticks,
+                ) = await test_encoder(api, mount, report_dir)
+                LOG_GING.info(f"encoder: {_bool_to_pass_fail(encoder_clean_pass)}")
+                csv_cb.write(
+                    [
+                        "diagnostics-encoder-clean",
+                        cumulative_drift,
+                        avg_drift,
+                        max_error_mm,
+                        max_error_pulses,
+                        max_error_ticks,
+                        _bool_to_pass_fail(encoder_clean_pass),
+                    ]
+                )
+
             if not test_config.skip_liquid_probe:
                 """fail code 03"""
                 LOG_GING.info("test-liquid_probe")
@@ -2407,6 +2405,7 @@ if __name__ == "__main__":
     arg_parser.add_argument("--skip-plunger", action="store_true")
     arg_parser.add_argument("--skip-tip-presence", action="store_true")
     arg_parser.add_argument("--skip-liquid-probe", action="store_true")
+    arg_parser.add_argument("--skip-encoder-clean", action="store_true")
     arg_parser.add_argument("--fixture-side", choices=["left", "right"], default="left")
     arg_parser.add_argument("--port", type=str, default="")
     arg_parser.add_argument("--num-trials", type=int, default=2)
@@ -2447,6 +2446,7 @@ if __name__ == "__main__":
         skip_plunger=args.skip_plunger,
         skip_tip_presence=args.skip_tip_presence,
         skip_liquid_probe=args.skip_liquid_probe,
+        skip_encoder_clean=args.skip_encoder_clean,
         fixture_port=args.port,
         fixture_side=args.fixture_side,
         fixture_aspirate_sample_count=args.aspirate_sample_count,
