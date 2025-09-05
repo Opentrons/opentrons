@@ -168,6 +168,7 @@ export function MoveLabwareOnDeck(
         ...styleProps,
       }}
       animatedSVG
+      // add fixedTrash not to display trash bin on OT-2 deck
       deckLayerBlocklist={['fixedTrash']}
     >
       {backgroundItems}
