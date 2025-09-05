@@ -222,7 +222,7 @@ jobs:
         with:
           aws-region: us-east-2
           audience: sts.amazonaws.com
-          role-to-assume: ${{ secrets.LABWARE_SANDBOX_ROLE }}
+          role-to-assume: ${{ secrets.DOCS_SANDBOX_ROLE }}
       - name: Download Artifacts
         uses: actions/download-artifact@v4
         with:
