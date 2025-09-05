@@ -212,7 +212,7 @@ def parse_github_event_context(
             application = "docs"
     elif ref_type == "branch":
         # Branch-based application detection
-        if ref_name in ["labware-deploy", "edge"]:
+        if ref_name in ["labware-deploy-clean", "edge"]:
             application = "labware_library"
         elif ref_name in ["mkdocs-new-workflow", "edge"]:
             application = "mkdocs"
