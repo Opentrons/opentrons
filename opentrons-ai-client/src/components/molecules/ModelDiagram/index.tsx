@@ -77,7 +77,7 @@ export function ModuleDiagram(props: Props): JSX.Element {
 
   return (
     <img
-      className={isFlexStacker ? styles.flexStackerImage : styles.image}
+      className={isFlexStacker ? styles.flex_stacker_image : styles.image}
       src={model}
       alt={props.type}
     />
