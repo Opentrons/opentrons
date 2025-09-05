@@ -1,5 +1,3 @@
-import { css } from 'styled-components'
-
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -14,6 +12,8 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+
+import styles from './stepcontainer.module.css'
 
 import type { MouseEvent as ReactMouseEvent } from 'react'
 import type {
@@ -133,7 +133,7 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
             {size === 'iconAndText' && (
               <StyledText
                 desktopStyle="bodyDefaultRegular"
-                css={ELLIPSIZE_STYLE}
+                className={styles.ellipsize}
               >
                 {text}
               </StyledText>
@@ -151,9 +151,3 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
     </Box>
   )
 }
-
-const ELLIPSIZE_STYLE = css`
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`
