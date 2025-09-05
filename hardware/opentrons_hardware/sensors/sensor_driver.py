@@ -304,13 +304,17 @@ class LogListener:
         if isinstance(message, message_definitions.BatchReadFromSensorResponse):
             data_length = message.payload.data_length.value
             data_bytes = message.payload.sensor_data.value
+            # TODO(cm): this is just the first datapoint out of every packet.
+            #   Would displaying all the data be too much processing ?
             data_floats = [
                 unpack(">l", data_bytes[i * 4 : i * 4 + 4])[0] / 65536
                 for i in range(data_length)
             ]
 
-            for d in data_floats:
-                self.response_queue.put_nowait(d)
+            for sensor_reading in data_floats:
+                self.response_queue.put_nowait(
+                    SensorDataType.build(sensor_reading, message.payload.sensor)
+                )
             SENSOR_LOG.info(
                 f"Revieved from {arbitration_id}: {message.payload.sensor_id}:{message.payload.sensor}: {data_floats}"
             )
