@@ -1,5 +1,3 @@
-import { css } from 'styled-components'
-
 import {
   ABSORBANCE_READER_TYPE,
   ABSORBANCE_READER_V1,
@@ -30,6 +28,8 @@ import temp_deck_gen_2_transparent from '/ai-client/assets/images/modules/temp_d
 import tempdeck_gen1 from '/ai-client/assets/images/modules/tempdeck_gen1.png'
 import thermocycler_gen2 from '/ai-client/assets/images/modules/thermocycler_gen2.png'
 import thermocycler from '/ai-client/assets/images/modules/thermocycler.png'
+
+import styles from './modeldiagram.module.css'
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
@@ -71,27 +71,15 @@ const MODULE_IMG_BY_TYPE: ModuleImg = {
   },
 }
 
-const IMAGE_MAX_WIDTH = '96px'
-
 export function ModuleDiagram(props: Props): JSX.Element {
   const model = MODULE_IMG_BY_TYPE[props.type][props.model]
   const isFlexStacker = props.type === FLEX_STACKER_MODULE_TYPE
 
-  // Use different scaling for Flex Stacker since it's much taller
-  const imageStyle = isFlexStacker
-    ? css`
-        height: 54px;
-        width: auto;
-        object-fit: contain;
-        max-width: ${IMAGE_MAX_WIDTH};
-        display: block;
-        transform: translateX(-10px);
-      `
-    : css`
-        max-width: ${IMAGE_MAX_WIDTH};
-        width: 100%;
-        height: auto;
-      `
-
-  return <img css={imageStyle} src={model} alt={props.type} />
+  return (
+    <img
+      className={isFlexStacker ? styles.flexStackerImage : styles.image}
+      src={model}
+      alt={props.type}
+    />
+  )
 }
