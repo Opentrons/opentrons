@@ -241,6 +241,24 @@ class PipetteSettingsUpdate(BaseModel):
         return v
 
 
+class LiveStreamEnable(BaseModel):
+    """Configuration value for enabling and disabling the Opentrons Live Stream."""
+
+    enabled: bool = Field(
+        ..., description="Enable or disable the Opentrons Live Stream."
+    )
+
+
+class LiveStreamData(BaseModel):
+    """Opentrons Live Stream enablement and URL values."""
+
+    enabled: bool = Field(
+        ..., description="Enable status of the Opentrons Live Stream."
+    )
+    hls: str = Field(..., description="URL for the HLS browser-compatible stream.")
+    rtmp: str = Field(..., description="URL for the RTMP raw stream in FLV format.")
+
+
 class LiveStreamSettings(BaseModel):
     """Configuration values of Opentrons Live Stream service."""
 
