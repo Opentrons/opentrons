@@ -360,11 +360,13 @@ class Controller:
         """Run a probe and return the new position dict"""
         return await self._smoothie_driver.probe_axis(axis, distance)
 
-    async def clean_up(self) -> None:
+    async def clean_up(self) -> None:  # noqa: C901
         try:
             loop = asyncio.get_event_loop()
         except RuntimeError:
             return
+        if hasattr(self, "_module_controls") and self._module_controls is not None:
+            await self._module_controls.clean_up()
         if hasattr(self, "_event_watcher"):
             if loop.is_running() and self._event_watcher:
                 self._event_watcher.close()
