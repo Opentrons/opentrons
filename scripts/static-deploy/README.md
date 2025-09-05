@@ -4,7 +4,7 @@ This directory contains Python scripts for deploying static assets to S3 buckets
 
 ## Labware Library Deployment
 
-The `deploy_labware.py` script deploys the labware library build artifacts to S3 buckets.
+The `deploy.py` script deploys application build artifacts to S3 buckets using boto3.
 
 ### Usage
 
@@ -29,16 +29,16 @@ make deploy ENVIRONMENT=sandbox ARGS="--source-dir custom-dist"
 
 ```bash
 # Deploy to sandbox
-python scripts/static-deploy/deploy_labware.py sandbox --branch edge
+python scripts/static-deploy/deploy.py sandbox labware_library dist --branch edge
 
 # Deploy to staging
-python scripts/static-deploy/deploy_labware.py staging
+python scripts/static-deploy/deploy.py staging labware_library dist
 
 # Deploy to production
-python scripts/static-deploy/deploy_labware.py production
+python scripts/static-deploy/deploy.py production labware_library dist
 
 # Deploy with custom source directory
-python scripts/static-deploy/deploy_labware.py sandbox --source-dir dist --branch edge
+python scripts/static-deploy/deploy.py sandbox labware_library dist --branch edge
 ```
 
 ### Environment Variables
@@ -70,7 +70,7 @@ The `.github/workflows/labware-build-deploy.yaml` workflow automatically:
 
 ```bash
 # Test the deployment logic (without AWS)
-python scripts/static-deploy/test_deploy_labware.py
+python scripts/static-deploy/tests/test_deploy_labware.py
 ```
 
 ### Prerequisites

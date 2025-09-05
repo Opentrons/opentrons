@@ -2,15 +2,17 @@
 """
 Deployment configuration logic for Labware Library.
 
-This script determines the deployment environment, bucket, URL, and other
-configuration based on the GitHub event context. It can be used both in
-GitHub Actions and locally for testing.
+This script is a wrapper around the centralized deploy_config.py logic,
+specifically for labware library deployments.
 """
 
 import os
 import sys
 import json
 from typing import Dict, Optional
+
+# Import the centralized configuration logic
+from deploy_config import determine_deploy_config as _determine_deploy_config
 
 
 def determine_deploy_config(
@@ -24,6 +26,9 @@ def determine_deploy_config(
 ) -> Dict[str, str]:
     """
     Determine deployment configuration based on GitHub event context.
+    
+    This function delegates to the centralized deploy_config.py logic
+    and filters the results to only include labware library deployments.
     
     Args:
         event_name: GitHub event name (e.g., 'push', 'pull_request')
@@ -42,39 +47,15 @@ def determine_deploy_config(
         - url: Full URL for the deployed site
     """
     
-    # Determine environment and branch based on event type
-    if event_name == "pull_request":
-        environment = "sandbox"
-        # Handle empty or null head_ref values
-        if head_ref and head_ref.lower() not in ["", "null", "none"]:
-            branch = head_ref
-        else:
-            branch = "unknown"
-        bucket = "opentrons.sandbox.labware"
-        url = f"http://opentrons.sandbox.labware.s3-website.us-east-2.amazonaws.com/{branch}/"
-    elif event_name == "push" and ref_type == "branch":
-        environment = "sandbox"
-        branch = ref_name
-        bucket = "opentrons.sandbox.labware"
-        url = f"http://opentrons.sandbox.labware.s3-website.us-east-2.amazonaws.com/{branch}/"
-    elif ref.startswith("refs/tags/tmp-staging-labware-library") or ref.startswith("refs/tags/staging-labware-library"):
-        environment = "staging"
-        branch = ref_name
-        bucket = "opentrons.staging.labware"
-        url = "https://staging.labware.opentrons.com/"
-    elif ref.startswith("refs/tags/tmp-labware-library") or ref.startswith("refs/tags/labware-library"):
-        environment = "production"
-        branch = ref_name
-        bucket = "opentrons.production.labware"
-        url = "https://labware.opentrons.com/"
-    else:
-        raise ValueError(f"No deployment configuration found for event: {event_name}, ref: {ref}")
+    # Get the centralized configuration
+    config = _determine_deploy_config(event_name, ref, ref_name, ref_type, head_ref)
     
+    # Filter to only return the fields expected by the labware deployment
     return {
-        "environment": environment,
-        "branch": branch,
-        "bucket": bucket,
-        "url": url,
+        "environment": config["environment"],
+        "branch": config["branch"],
+        "bucket": config["bucket"],
+        "url": config["url"],
     }
 
 

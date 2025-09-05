@@ -12,10 +12,6 @@ tests ?=
 cov_opts ?= --coverage=true
 test_opts ?=
 
-# Deployment variables
-ENVIRONMENT ?= sandbox
-BRANCH ?= edge
-ARGS ?=
 
 .PHONY: all
 all: clean dist
@@ -72,20 +68,3 @@ test:
 .PHONY: test-cov
 test-cov:
 	make -C .. test-js-labware-library tests=$(tests) test_opts="$(test_opts)" cov_opts="$(cov_opts)"
-
-# Deployment targets
-.PHONY: deploy
-deploy: dist
-	uv run python ../scripts/static-deploy/deploy_labware.py $(ENVIRONMENT) --branch $(BRANCH) $(ARGS)
-
-.PHONY: deploy-sandbox
-deploy-sandbox:
-	$(MAKE) deploy ENVIRONMENT=sandbox BRANCH=$(BRANCH)
-
-.PHONY: deploy-staging
-deploy-staging:
-	$(MAKE) deploy ENVIRONMENT=staging
-
-.PHONY: deploy-production
-deploy-production:
-	$(MAKE) deploy ENVIRONMENT=production

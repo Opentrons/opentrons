@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Test script for deploy_labware.py
+Test script for deploy.py
 """
 
 import os
