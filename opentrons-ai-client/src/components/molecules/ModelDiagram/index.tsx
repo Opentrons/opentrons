@@ -20,12 +20,12 @@ import {
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 
+import flex_stacker from '/ai-client/assets/images/modules/flex_stacker_no_labware.png'
 import heater_shaker_module_transparent from '/ai-client/assets/images/modules/heater_shaker_module_transparent.png'
 import magdeck_gen1 from '/ai-client/assets/images/modules/magdeck_gen1.png'
 import magdeck_gen2 from '/ai-client/assets/images/modules/magdeck_gen2.png'
 import mag_block from '/ai-client/assets/images/modules/MagneticBlock_GEN1_HERO.png'
 import opentrons_plate_reader from '/ai-client/assets/images/modules/opentrons_plate_reader.png'
-import flex_stacker from '/ai-client/assets/images/modules/flex_stacker_no_labware.png'
 import temp_deck_gen_2_transparent from '/ai-client/assets/images/modules/temp_deck_gen_2_transparent.png'
 import tempdeck_gen1 from '/ai-client/assets/images/modules/tempdeck_gen1.png'
 import thermocycler_gen2 from '/ai-client/assets/images/modules/thermocycler_gen2.png'
@@ -72,17 +72,26 @@ const MODULE_IMG_BY_TYPE: ModuleImg = {
 }
 
 const IMAGE_MAX_WIDTH = '96px'
+
 export function ModuleDiagram(props: Props): JSX.Element {
   const model = MODULE_IMG_BY_TYPE[props.type][props.model]
-  return (
-    <img
-      css={css`
+  const isFlexStacker = props.type === FLEX_STACKER_MODULE_TYPE
+
+  // Use different scaling for Flex Stacker since it's much taller
+  const imageStyle = isFlexStacker
+    ? css`
+        height: 54px;
+        width: auto;
+        object-fit: contain;
+        max-width: ${IMAGE_MAX_WIDTH};
+        display: block;
+        transform: translateX(-10px);
+      `
+    : css`
         max-width: ${IMAGE_MAX_WIDTH};
         width: 100%;
         height: auto;
-      `}
-      src={model}
-      alt={props.type}
-    />
-  )
+      `
+
+  return <img css={imageStyle} src={model} alt={props.type} />
 }
