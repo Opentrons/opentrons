@@ -147,7 +147,7 @@ jobs:
     runs-on: 'ubuntu-24.04'
     needs: ['build-ll', 'determine-deploy-config']
     timeout-minutes: 5
-    if: github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/labware-deploy')
+    if: always() && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/labware-deploy') && needs.build-ll.result == 'success' && needs.determine-deploy-config.result == 'success'
     permissions:
       id-token: write
       contents: read
@@ -155,6 +155,18 @@ jobs:
       name: ${{ needs.determine-deploy-config.outputs.environment }}
       url: ${{ needs.determine-deploy-config.outputs.url }}
     steps:
+      - name: Debug Deploy Job Condition
+        if: always()
+        run: |
+          echo "=== Deploy Job Condition Debug ==="
+          echo "Event name: ${{ github.event_name }}"
+          echo "Ref: ${{ github.ref }}"
+          echo "Starts with refs/tags/: ${{ startsWith(github.ref, 'refs/tags/') }}"
+          echo "build-ll result: ${{ needs.build-ll.result }}"
+          echo "determine-deploy-config result: ${{ needs.determine-deploy-config.result }}"
+          echo "build-ll success: ${{ needs.build-ll.result == 'success' }}"
+          echo "determine-deploy-config success: ${{ needs.determine-deploy-config.result == 'success' }}"
+          echo "=================================="
       - name: Debug Deploy Job
         run: |
           echo "Deploy job is running!"
