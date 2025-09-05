@@ -106,6 +106,10 @@ function getOrCreateHandlerSet(window: BrowserWindow): HandlerSet | null {
       : // Only register necessary subset for secondary windows.
         [
           registerConfig(dispatch),
+          registerDiscovery(dispatch),
+          registerUsb(dispatch),
+          registerSystemInfo(dispatch),
+          registerNotify(dispatch, window),
           registerReloadUi(window),
           registerSystemLanguage(dispatch),
           registerCameraStream(dispatch),

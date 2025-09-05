@@ -13,12 +13,17 @@ interface CameraStreamDetails extends SecondaryWindowDetails {
   type: 'camera-stream'
 }
 
-export function openCameraStream(
-  robotIp: string,
+interface OpenCameraStreamParams {
+  robotIp: string
+  robotName: string
   log: Logger
+}
+
+export function openCameraStream(
+  params: OpenCameraStreamParams
 ): CameraStreamDetails {
-  const createUi = (): BrowserWindow => createCameraStreamUi(robotIp, log)
-  const windowId = getWindowIdCameraStream(robotIp)
+  const createUi = (): BrowserWindow => createCameraStreamUi(params)
+  const windowId = getWindowIdCameraStream(params.robotIp)
 
   return { createUi, windowId, type: 'camera-stream' }
 }
@@ -27,9 +32,18 @@ function getWindowIdCameraStream(robotIp: string): string {
   return `camera-stream-${robotIp}`
 }
 
-const STREAM_URL = `${SECONDARY_WINDOW_CONFIG.url.protocol}//${SECONDARY_WINDOW_URL_PATH}#/camera-stream`
+const STREAM_URL = (robotName: string): string =>
+  `${
+    SECONDARY_WINDOW_CONFIG.url.protocol
+  }//${SECONDARY_WINDOW_URL_PATH}#/devices/${encodeURIComponent(
+    robotName
+  )}/camera-stream`
 
-function createCameraStreamUi(robotIp: string, log: Logger): BrowserWindow {
+function createCameraStreamUi({
+  log,
+  robotName,
+  robotIp,
+}: OpenCameraStreamParams): BrowserWindow {
   log.debug('Creating camera stream window', {
     robotIp,
     options: SECONDARY_WINDOW_OPTS,
@@ -42,18 +56,12 @@ function createCameraStreamUi(robotIp: string, log: Logger): BrowserWindow {
       log.debug('Camera stream window ready to show')
       cameraStreamWindow.setTitle('Live camera view')
       cameraStreamWindow.show()
-
-      log.debug('Sending camera stream config to renderer', { robotIp })
-      cameraStreamWindow.webContents.send(
-        'camera-stream-config',
-        `http://${robotIp}:31950/hls/stream.m3u8`
-      )
     }
   )
 
-  log.info(`Loading camera stream from ${STREAM_URL}`)
+  log.info(`Loading camera stream from ${STREAM_URL(robotName)}`)
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
-  cameraStreamWindow.loadURL(STREAM_URL, {
+  cameraStreamWindow.loadURL(STREAM_URL(robotName), {
     extraHeaders: 'pragma: no-cache\n',
   })
 

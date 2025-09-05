@@ -16,7 +16,12 @@ export function LaunchLivestreamBtn(): JSX.Element {
     host?.robotName != null && host?.hostname != null
 
   const handleOpenCameraStream = (): void => {
-    dispatch(cameraStreamOpenAction(host?.hostname ?? 'UNKNOWN'))
+    dispatch(
+      cameraStreamOpenAction(
+        host?.hostname ?? 'UNKNOWN',
+        host?.robotName ?? 'UNKNOWN'
+      )
+    )
   }
 
   return (

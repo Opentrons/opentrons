@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import Hls from 'hls.js'
 
-import { remote } from '/app/redux/shell/remote'
+import { useHost } from '@opentrons/react-api-client'
 
-import type { IpcMainEvent } from 'electron'
 import type { RefObject } from 'react'
+
+// TODO(jh, 09-05-25): /GET this from the /stream endpoint eventually.
+const STREAM_URL = (robotIp: string): string =>
+  `http://${robotIp}:31950/hls/stream.m3u8`
 
 export interface UseHlsVideoResult {
   videoRef: RefObject<HTMLVideoElement>
@@ -14,29 +17,14 @@ export interface UseHlsVideoResult {
 // Sets up and manages an HLS video stream player that receives
 // camera stream URLs from the main Electron process and displays them.
 export function useHlsVideo(): UseHlsVideoResult {
+  const host = useHost()
+  console.log('=>(useHlsVideo.ts:21) host', host)
   const videoRef = useRef<HTMLVideoElement>(null)
   const hlsRef = useRef<Hls | null>(null)
-  const [streamUrl, setStreamUrl] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  // Listen for the first camera stream url.
   useEffect(() => {
-    const handleConfig = (_: IpcMainEvent, ipcStreamUrl: string): void => {
-      if (streamUrl == null) {
-        setStreamUrl(ipcStreamUrl)
-        setError(null)
-      }
-    }
-
-    remote.ipcRenderer.on('camera-stream-config', handleConfig)
-
-    return () => {
-      remote.ipcRenderer.off('camera-stream-config', handleConfig)
-    }
-  }, [])
-
-  useEffect(() => {
-    if (streamUrl == null || videoRef.current == null) {
+    if (videoRef.current == null || host == null) {
       return
     }
 
@@ -63,7 +51,7 @@ export function useHlsVideo(): UseHlsVideoResult {
 
       hlsRef.current = hls
 
-      hls.loadSource(streamUrl)
+      hls.loadSource(STREAM_URL(host.hostname))
       hls.attachMedia(video)
 
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
@@ -78,7 +66,9 @@ export function useHlsVideo(): UseHlsVideoResult {
         if (data.fatal) {
           switch (data.type) {
             case Hls.ErrorTypes.NETWORK_ERROR:
-              setError(`Network error: Cannot connect to ${streamUrl}`)
+              setError(
+                `Network error: Cannot connect to ${STREAM_URL(host.hostname)}`
+              )
               break
             case Hls.ErrorTypes.MEDIA_ERROR:
               setError('Media error in stream')
@@ -106,7 +96,7 @@ export function useHlsVideo(): UseHlsVideoResult {
     } else {
       setError('HLS streaming not supported in this browser.')
     }
-  }, [streamUrl])
+  }, [host])
 
   return { videoRef, videoError: error }
 }

@@ -53,7 +53,7 @@ describe('LaunchLivestreamBtn', () => {
 
     expect(mockDispatch).toHaveBeenCalledWith({
       type: CAMERA_STREAM_OPEN,
-      payload: { hostname: 'test-hostname' },
+      payload: { hostname: 'test-hostname', robotName: 'test-robot' },
       meta: { shell: true },
     })
   })

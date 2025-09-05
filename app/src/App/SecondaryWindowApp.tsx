@@ -1,6 +1,6 @@
 import { Fragment } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes, useMatch } from 'react-router-dom'
 
 import {
   Box,
@@ -8,14 +8,19 @@ import {
   OVERFLOW_AUTO,
   POSITION_RELATIVE,
 } from '@opentrons/components'
+import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { LocalizationProvider } from '/app/LocalizationProvider'
 // eslint-disable-next-line opentrons/no-imports-across-applications
 import { LivestreamViewer } from '/app/pages/Desktop/LivestreamViewer'
+import { useRobot } from '/app/redux-resources/robots'
+import { OPENTRONS_USB } from '/app/redux/discovery'
+import { appShellRequestor } from '/app/redux/shell/remote'
 
 import { DesktopAppFallback } from './DesktopAppFallback'
 import { ReactQueryDevtools } from './tools'
 
+import type { ReactNode } from 'react'
 import type { RouteProps } from './types'
 
 // UI root for secondary windows in the desktop app.
@@ -24,7 +29,7 @@ export const SecondaryWindowApp = (): JSX.Element => {
     {
       Component: LivestreamViewer,
       name: 'Camera Stream',
-      path: '/camera-stream',
+      path: '/devices/:robotName/camera-stream',
     },
   ]
 
@@ -51,7 +56,9 @@ export const SecondaryWindowApp = (): JSX.Element => {
                           backgroundColor={COLORS.grey10}
                           overflow={OVERFLOW_AUTO}
                         >
-                          <Component />
+                          <HostProvider>
+                            <Component />
+                          </HostProvider>
                         </Box>
                       </Box>
                     </Fragment>
@@ -65,5 +72,26 @@ export const SecondaryWindowApp = (): JSX.Element => {
         </Box>
       </ErrorBoundary>
     </LocalizationProvider>
+  )
+}
+
+interface HostProviderProps {
+  children: ReactNode
+}
+
+function HostProvider({ children }: HostProviderProps): JSX.Element | null {
+  const deviceRouteMatch = useMatch('/devices/:robotName/*')
+  const params = deviceRouteMatch?.params
+  const robotName = params?.robotName ?? null
+  const robot = useRobot(robotName)
+
+  return (
+    <ApiHostProvider
+      key={robot?.name}
+      hostname={robot?.ip ?? null}
+      requestor={robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined}
+    >
+      {children}
+    </ApiHostProvider>
   )
 }
