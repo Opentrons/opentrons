@@ -94,9 +94,10 @@ jobs:
     if: github.event_name != 'pull_request'
     steps:
       - uses: 'actions/checkout@v4'
-      - uses: 'actions/setup-node@v4'
         with:
-          node-version: '22.12.0'
+          fetch-depth: 0
+      - uses: ./.github/actions/git/resolve-tag
+      - uses: ./.github/actions/environment/complex-variables
       - name: 'download LL build'
         uses: 'actions/download-artifact@v4'
         with:
@@ -111,4 +112,5 @@ jobs:
         with:
           domain: 'labware.opentrons.com'
           distPath: './dist'
-          destPrefix: ${{ env.OT_BRANCH }}
+          # These variables are set in the complex-variables action
+          destPrefix: ${{ env.OT_TAG != '' && env.OT_TAG || env.OT_BRANCH }}
