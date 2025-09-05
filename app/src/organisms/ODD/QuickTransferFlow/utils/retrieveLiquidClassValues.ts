@@ -359,6 +359,7 @@ const getLiquidClassValues = (
     robotType: FLEX_ROBOT_TYPE,
   })
 
+  // Note(kk:2025-09-05): use robotType since we will move the same functions from (app&pd) to shared-data after the release of 8.6
   const dispenseMaxUiFlowRate = getMaxUiFlowRate({
     targetVolume: byVolumeLookup.flowRate.dispense,
     channels: pipetteSpecs.channels,
