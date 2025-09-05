@@ -1,5 +1,4 @@
 """Manager for the :py:class:`.hardware_control.API` thread."""
-
 import functools
 import threading
 import logging
