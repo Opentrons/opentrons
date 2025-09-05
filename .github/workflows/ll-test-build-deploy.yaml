@@ -148,7 +148,7 @@ jobs:
     runs-on: 'ubuntu-24.04'
     needs: ['build-ll', 'determine-deploy-config']
     timeout-minutes: 5
-    if: always() && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/labware-deploy') && needs.build-ll.result == 'success' && needs.determine-deploy-config.result == 'success'
+    if: always() && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/labware-deploy') && (needs.build-ll.result == 'success' || needs.build-ll.result == 'skipped') && needs.determine-deploy-config.result == 'success'
     permissions:
       id-token: write
       contents: read
