@@ -43,12 +43,12 @@ class Mitutoyo_Digimatic_Indicator:
         self.gauge.close()
 
     def _send_packet(self, packet: str) -> None:
-        self.gauge.flush()
-        self.gauge.flushInput()
+        self.gauge.reset_input_buffer()
+        self.gauge.reset_output_buffer()
         self.gauge.write(packet.encode("utf-8"))
 
     def _get_packet(self) -> str:
-        self.gauge.flushOutput()
+        self.gauge.reset_output_buffer()
         packet = self.gauge.readline().decode("utf-8")
         return packet
 
@@ -60,9 +60,13 @@ class Mitutoyo_Digimatic_Indicator:
         reading = True
         while reading:
             data = self._get_packet()
+            time.sleep(0.01)
             if data != "":
-                reading = False
-        return float(data)
+                for value in data.split():
+                    try:
+                        return float(value)
+                    except ValueError:
+                        continue
 
     def read_stable(self, timeout: float = 5) -> float:
         """Reads dial indicator with stable reading."""
