@@ -57,3 +57,9 @@ export interface OnDeviceRouteParams {
   runId: string
   quickTransferId: string
 }
+
+/* The type of electron-created window.
+ * Main: Renders DesktopApp/OnDeviceDisplay
+ * Secondary: Renders SecondaryWindowApp
+ * */
+export type WindowType = 'main' | 'secondary' | null
