@@ -12,13 +12,13 @@ import {
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
   getLiquidClassName,
+  getTransferPlanAndReferenceVolumes,
   SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
 
 import { getFlowRateFields } from './getFlowRaiteFields'
 import { getMatchingTipLiquidSpecsFromSpec } from './getMatchingTipLiquidSpecsFromSpec'
 import { getMaxUiFlowRate } from './getMaxUiFlowRate'
-import { getTransferPlanAndReferenceVolumes } from './getTransferPlanAndReferenceVolumes'
 
 import type { BlowOutLocation, QuickTransferSummaryState } from '../types'
 
@@ -102,16 +102,18 @@ const getNoLiquidClassValues = (
   const aspirateAirGapByVolume = aspirate?.retract.airGapByVolume as Array<
     [number, number]
   >
+  const numAspirateWells = state.sourceWells.length
   const numDispenseWells = state.destinationWells.length
   const byVolumeLookup = getTransferPlanAndReferenceVolumes({
     pipetteSpecs: pipette,
-    maxWorkingVolumeTip,
-    volume,
-    path,
-    numDispenseWells,
-    aspirateAirGapByVolume,
-    conditioningByVolume,
-    disposalByVolume,
+    tiprackDefinition: tipRack,
+    numAspirateWells: numAspirateWells,
+    volume: volume,
+    path: path,
+    numDispenseWells: numDispenseWells,
+    aspirateAirGapByVolume: aspirateAirGapByVolume,
+    conditioningByVolume: conditioningByVolume,
+    disposalByVolume: disposalByVolume,
   }).referenceVolumes
 
   const { conditioning, correction, flowRate } = byVolumeLookup
@@ -315,23 +317,23 @@ const getLiquidClassValues = (
     [number, number]
   >
   const disposalByVolume = rawDisposalByVolume as Array<[number, number]>
-  const maxWorkingVolumeTip = tipRack.wells.A1.totalLiquidVolume
   const aspirateAirGapByVolume = aspirate?.retract.airGapByVolume as Array<
     [number, number]
   >
+  const numAspirateWells = state.sourceWells.length
   const numDispenseWells = destinationWells.length
   const byVolumeLookup = getTransferPlanAndReferenceVolumes({
     pipetteSpecs,
-    maxWorkingVolumeTip,
-    volume,
-    path,
-    numDispenseWells,
-    aspirateAirGapByVolume,
-    conditioningByVolume,
-    disposalByVolume,
+    tiprackDefinition: tipRack,
+    numAspirateWells: numAspirateWells,
+    volume: volume,
+    path: path,
+    numDispenseWells: numDispenseWells,
+    aspirateAirGapByVolume: aspirateAirGapByVolume,
+    conditioningByVolume: conditioningByVolume,
+    disposalByVolume: disposalByVolume,
   }).referenceVolumes
 
-  const { flowRate } = byVolumeLookup
   const tiprackUri = getLabwareDefURI(tipRack)
 
   const matchingTipLiquidSpecs = getMatchingTipLiquidSpecsFromSpec(
@@ -341,16 +343,16 @@ const getLiquidClassValues = (
   )
 
   const aspirateCorrectionVolume = linearInterpolate(
-    flowRate.aspirate,
+    byVolumeLookup.correction.aspirate,
     aspirate?.correctionByVolume as Array<[number, number]>
   )
   const dispenseCorrectionVolume = linearInterpolate(
-    flowRate.dispense,
+    byVolumeLookup.correction.dispense,
     dispense?.correctionByVolume as Array<[number, number]>
   )
 
   const aspirateMaxUiFlowRate = getMaxUiFlowRate({
-    targetVolume: flowRate.aspirate,
+    targetVolume: byVolumeLookup.flowRate.aspirate,
     channels: pipetteSpecs.channels,
     tipLiquidSpecs: matchingTipLiquidSpecs,
     flowRateType: 'aspirate',
@@ -359,7 +361,7 @@ const getLiquidClassValues = (
   })
 
   const dispenseMaxUiFlowRate = getMaxUiFlowRate({
-    targetVolume: flowRate.dispense,
+    targetVolume: byVolumeLookup.flowRate.dispense,
     channels: pipetteSpecs.channels,
     tipLiquidSpecs: matchingTipLiquidSpecs,
     flowRateType: 'dispense',
@@ -368,14 +370,14 @@ const getLiquidClassValues = (
   })
 
   const aspirateFlowRateFields = getFlowRateFields(
-    volume,
+    byVolumeLookup.flowRate.aspirate,
     aspirate?.flowRateByVolume ?? [],
     'aspirate',
     aspirateMaxUiFlowRate
   )
 
   const dispenseFlowRateFields = getFlowRateFields(
-    volume,
+    byVolumeLookup.flowRate.dispense,
     dispense?.flowRateByVolume ?? [],
     'dispense',
     dispenseMaxUiFlowRate
