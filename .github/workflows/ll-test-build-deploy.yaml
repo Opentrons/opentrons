@@ -118,6 +118,13 @@ jobs:
         run: |
           cd scripts/static-deploy
           uv sync --frozen
+      - name: Debug GitHub Context
+        run: |
+          echo "Event name: ${{ github.event_name }}"
+          echo "Ref: ${{ github.ref }}"
+          echo "Ref name: ${{ github.ref_name }}"
+          echo "Ref type: ${{ github.ref_type }}"
+          echo "Head ref: ${{ github.event.pull_request.head.ref || '' }}"
       - name: Determine Deployment Configuration
         id: deploy-config
         run: |
