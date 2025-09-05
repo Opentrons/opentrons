@@ -59,16 +59,24 @@ jobs:
           # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
           sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
           sudo apt-get update && sudo apt-get install libudev-dev
-      - name: 'cache yarn cache'
+      - name: 'cache yarn cache and native modules'
         uses: actions/cache@v4
         with:
           path: |
             ${{ github.workspace }}/.yarn-cache
             ${{ github.workspace }}/.npm-cache
+            ${{ github.workspace }}/node_modules/.cache
+            ${{ github.workspace }}/app-shell/node_modules/.cache
+            ${{ github.workspace }}/app-shell-odd/node_modules/.cache
           key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
       - name: 'setup-js'
+        env:
+          # Speed up native module builds
+          npm_config_cache: ${{ github.workspace }}/.npm-cache
+          npm_config_build_from_source: false
+          npm_config_prefer_offline: true
         run: |
           npm config set cache ./.npm-cache
           yarn config set cache-folder ./.yarn-cache
@@ -103,16 +111,24 @@ jobs:
           # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
           sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
           sudo apt-get update && sudo apt-get install libudev-dev
-      - name: 'cache yarn cache'
+      - name: 'cache yarn cache and native modules'
         uses: actions/cache@v4
         with:
           path: |
             ${{ github.workspace }}/.yarn-cache
             ${{ github.workspace }}/.npm-cache
+            ${{ github.workspace }}/node_modules/.cache
+            ${{ github.workspace }}/app-shell/node_modules/.cache
+            ${{ github.workspace }}/app-shell-odd/node_modules/.cache
           key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
       - name: 'setup-js'
+        env:
+          # Speed up native module builds
+          npm_config_cache: ${{ github.workspace }}/.npm-cache
+          npm_config_build_from_source: false
+          npm_config_prefer_offline: true
         run: |
           npm config set cache ./.npm-cache
           yarn config set cache-folder ./.yarn-cache
@@ -146,16 +162,24 @@ jobs:
           # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
           sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
           sudo apt-get update && sudo apt-get install libudev-dev
-      - name: 'cache yarn cache'
+      - name: 'cache yarn cache and native modules'
         uses: actions/cache@v4
         with:
           path: |
             ${{ github.workspace }}/.yarn-cache
             ${{ github.workspace }}/.npm-cache
+            ${{ github.workspace }}/node_modules/.cache
+            ${{ github.workspace }}/app-shell/node_modules/.cache
+            ${{ github.workspace }}/app-shell-odd/node_modules/.cache
           key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
       - name: 'setup-js'
+        env:
+          # Speed up native module builds
+          npm_config_cache: ${{ github.workspace }}/.npm-cache
+          npm_config_build_from_source: false
+          npm_config_prefer_offline: true
         run: |
           npm config set cache ./.npm-cache
           yarn config set cache-folder ./.yarn-cache
