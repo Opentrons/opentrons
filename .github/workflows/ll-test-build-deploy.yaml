@@ -22,7 +22,8 @@ on:
     branches:
       - '**'
     tags:
-      - 'labware-library*'
+      - 'tmp-staging-labware-library*'
+      - 'tmp-labware-library*'
   workflow_dispatch:
 
 concurrency:
@@ -41,6 +42,7 @@ jobs:
     name: 'labware library unit tests'
     timeout-minutes: 10
     runs-on: 'ubuntu-24.04'
+    if: github.event_name != 'push' || !startsWith(github.ref, 'refs/tags/')
     steps:
       - uses: 'actions/checkout@v4'
       - uses: ./.github/actions/js/setup
@@ -57,6 +59,7 @@ jobs:
     needs: ['js-unit-test']
     timeout-minutes: 20
     runs-on: 'ubuntu-24.04'
+    if: github.event_name != 'push' || !startsWith(github.ref, 'refs/tags/')
     steps:
       - uses: 'actions/checkout@v4'
       - uses: ./.github/actions/js/setup
@@ -67,11 +70,18 @@ jobs:
         run: make -C labware-library test-e2e
   build-ll:
     name: 'build labware library artifact'
-    needs: ['js-unit-test']
+    needs: ['js-unit-test', 'e2e-test']
     timeout-minutes: 10
     runs-on: 'ubuntu-24.04'
-    if: github.event_name != 'pull_request'
+    if: always() && (needs.js-unit-test.result == 'success' || needs.js-unit-test.result == 'skipped') && (needs.e2e-test.result == 'success' || needs.e2e-test.result == 'skipped') && github.event_name != 'pull_request'
     steps:
+      - name: Debug Build Job
+        run: |
+          echo "Build job is running!"
+          echo "js-unit-test result: ${{ needs.js-unit-test.result }}"
+          echo "e2e-test result: ${{ needs.e2e-test.result }}"
+          echo "Event name: ${{ github.event_name }}"
+          echo "Ref: ${{ github.ref }}"
       - uses: 'actions/checkout@v4'
         with:
           fetch-depth: 0
@@ -87,30 +97,121 @@ jobs:
         with:
           name: 'll-artifact'
           path: labware-library/dist
+
+  determine-deploy-config:
+    name: Determine Deployment Configuration
+    runs-on: ubuntu-24.04
+    permissions:
+      id-token: write
+      contents: read
+    if: github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/labware-deploy')
+    outputs:
+      environment: ${{ steps.deploy-config.outputs.environment }}
+      branch: ${{ steps.deploy-config.outputs.branch }}
+      bucket: ${{ steps.deploy-config.outputs.bucket }}
+      url: ${{ steps.deploy-config.outputs.url }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.10'
+      - name: Setup Deploy Dependencies
+        run: |
+          cd scripts/static-deploy
+          uv sync --frozen
+      - name: Debug GitHub Context
+        run: |
+          echo "Event name: ${{ github.event_name }}"
+          echo "Ref: ${{ github.ref }}"
+          echo "Ref name: ${{ github.ref_name }}"
+          echo "Ref type: ${{ github.ref_type }}"
+          echo "Head ref: ${{ github.event.pull_request.head.ref || '' }}"
+      - name: Determine Deployment Configuration
+        id: deploy-config
+        run: |
+          cd scripts/static-deploy
+          uv run python labware_deploy_config.py \
+            "${{ github.event_name }}" \
+            "${{ github.ref }}" \
+            "${{ github.ref_name }}" \
+            "${{ github.ref_type }}" \
+            "${{ github.event.pull_request.head.ref || '' }}"
+
   deploy-ll:
     name: 'deploy LL artifact to S3'
     runs-on: 'ubuntu-24.04'
-    needs: ['js-unit-test', 'e2e-test', 'build-ll']
-    if: github.event_name != 'pull_request'
+    needs: ['build-ll', 'determine-deploy-config']
+    timeout-minutes: 5
+    if: always() && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/labware-deploy') && needs.build-ll.result == 'success' && needs.determine-deploy-config.result == 'success'
+    permissions:
+      id-token: write
+      contents: read
+    environment:
+      name: ${{ needs.determine-deploy-config.outputs.environment }}
+      url: ${{ needs.determine-deploy-config.outputs.url }}
     steps:
-      - uses: 'actions/checkout@v4'
+      - name: Debug Deploy Job Condition
+        if: always()
+        run: |
+          echo "=== Deploy Job Condition Debug ==="
+          echo "Event name: ${{ github.event_name }}"
+          echo "Ref: ${{ github.ref }}"
+          echo "Starts with refs/tags/: ${{ startsWith(github.ref, 'refs/tags/') }}"
+          echo "build-ll result: ${{ needs.build-ll.result }}"
+          echo "determine-deploy-config result: ${{ needs.determine-deploy-config.result }}"
+          echo "build-ll success: ${{ needs.build-ll.result == 'success' }}"
+          echo "determine-deploy-config success: ${{ needs.determine-deploy-config.result == 'success' }}"
+          echo "=================================="
+      - name: Debug Deploy Job
+        run: |
+          echo "Deploy job is running!"
+          echo "build-ll result: ${{ needs.build-ll.result }}"
+          echo "determine-deploy-config result: ${{ needs.determine-deploy-config.result }}"
+          echo "Environment: ${{ needs.determine-deploy-config.outputs.environment }}"
+          echo "Branch: ${{ needs.determine-deploy-config.outputs.branch }}"
+          echo "Bucket: ${{ needs.determine-deploy-config.outputs.bucket }}"
+          echo "URL: ${{ needs.determine-deploy-config.outputs.url }}"
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          fetch-depth: 0
-      - uses: ./.github/actions/git/resolve-tag
-      - uses: ./.github/actions/environment/complex-variables
-      - name: 'download LL build'
-        uses: 'actions/download-artifact@v4'
+          python-version: '3.10'
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.10'
+      - name: Setup Deploy Dependencies
+        run: |
+          cd scripts/static-deploy
+          uv sync --frozen
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: us-east-2
+          audience: sts.amazonaws.com
+          role-to-assume: ${{ secrets.DOCS_SANDBOX_ROLE }}
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
         with:
           name: ll-artifact
           path: ./dist
-      - name: 'deploy builds to s3'
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.S3_SANDBOX_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SANDBOX_SECRET }}
-          AWS_DEFAULT_REGION: us-east-2
-        uses: './.github/actions/webstack/deploy-to-sandbox'
-        with:
-          domain: 'labware.opentrons.com'
-          distPath: './dist'
-          # These variables are set in the complex-variables action
-          destPrefix: ${{ env.OT_TAG != '' && env.OT_TAG || env.OT_BRANCH }}
+      - name: Deploy to S3
+        run: |
+          cd scripts/static-deploy
+          uv run python deploy.py \
+            "${{ needs.determine-deploy-config.outputs.environment }}" \
+            labware_library \
+            ../../dist \
+            --branch "${{ needs.determine-deploy-config.outputs.branch }}"
+      - name: Output Deployment URL
+        run: |
+          echo "Deployed to: ${{ needs.determine-deploy-config.outputs.url }}"
+
+          
