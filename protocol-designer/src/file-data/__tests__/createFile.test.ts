@@ -152,7 +152,7 @@ metadata = {
     "source": "Protocol Designer",
 }
 
-requirements = {"robotType": "OT-2", "apiLevel": "2.25"}
+requirements = {"robotType": "OT-2", "apiLevel": "2.26"}
 
 def run(protocol: protocol_api.ProtocolContext) -> None:
     # Load Labware:
