@@ -368,7 +368,11 @@ class Controller:
         if hasattr(self, "_module_controls") and self._module_controls is not None:
             await self._module_controls.clean_up()
         if hasattr(self, "_event_watcher"):
-            if loop.is_running() and self._event_watcher:
+            if (
+                loop.is_running()
+                and self._event_watcher
+                and not self._event_watcher.closed
+            ):
                 self._event_watcher.close()
         if hasattr(self, "gpio_chardev"):
             try:
