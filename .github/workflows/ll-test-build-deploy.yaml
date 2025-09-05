@@ -75,6 +75,12 @@ jobs:
     runs-on: 'ubuntu-24.04'
     if: always() && (needs.js-unit-test.result == 'success' || needs.js-unit-test.result == 'skipped') && github.event_name != 'pull_request'
     steps:
+      - name: Debug Build Job
+        run: |
+          echo "Build job is running!"
+          echo "js-unit-test result: ${{ needs.js-unit-test.result }}"
+          echo "Event name: ${{ github.event_name }}"
+          echo "Ref: ${{ github.ref }}"
       - uses: 'actions/checkout@v4'
         with:
           fetch-depth: 0
@@ -149,6 +155,15 @@ jobs:
       name: ${{ needs.determine-deploy-config.outputs.environment }}
       url: ${{ needs.determine-deploy-config.outputs.url }}
     steps:
+      - name: Debug Deploy Job
+        run: |
+          echo "Deploy job is running!"
+          echo "build-ll result: ${{ needs.build-ll.result }}"
+          echo "determine-deploy-config result: ${{ needs.determine-deploy-config.result }}"
+          echo "Environment: ${{ needs.determine-deploy-config.outputs.environment }}"
+          echo "Branch: ${{ needs.determine-deploy-config.outputs.branch }}"
+          echo "Bucket: ${{ needs.determine-deploy-config.outputs.bucket }}"
+          echo "URL: ${{ needs.determine-deploy-config.outputs.url }}"
       - name: Checkout Repository
         uses: actions/checkout@v4
       - name: Setup Python
