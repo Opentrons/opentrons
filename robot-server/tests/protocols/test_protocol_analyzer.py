@@ -1,4 +1,5 @@
 """Tests for the ProtocolAnalyzer."""
+
 import pytest
 from decoy import Decoy
 from datetime import datetime
@@ -93,7 +94,7 @@ async def test_load_orchestrator(
         analysis_store=analysis_store, protocol_resource=protocol_resource
     )
 
-    run_orchestrator = decoy.mock(cls=protocol_runner.RunOrchestrator)
+    run_orchestrator = decoy.mock(cls=protocol_runner.SimulatingRunOrchestrator)
     decoy.when(
         await simulating_runner.create_simulating_orchestrator(
             robot_type=robot_type,
@@ -167,7 +168,7 @@ async def test_analyze(
 
     command_annotation = pe_types.CustomCommandAnnotation(commandKeys=["abc", "xyz"])
 
-    orchestrator = decoy.mock(cls=protocol_runner.RunOrchestrator)
+    orchestrator = decoy.mock(cls=protocol_runner.SimulatingRunOrchestrator)
     decoy.when(
         await simulating_runner.create_simulating_orchestrator(
             robot_type=robot_type,
@@ -258,7 +259,7 @@ async def test_analyze_updates_pending_on_error(
         message="You got me!!",
     )
 
-    orchestrator = decoy.mock(cls=protocol_runner.RunOrchestrator)
+    orchestrator = decoy.mock(cls=protocol_runner.SimulatingRunOrchestrator)
     decoy.when(
         await simulating_runner.create_simulating_orchestrator(
             robot_type=robot_type,
