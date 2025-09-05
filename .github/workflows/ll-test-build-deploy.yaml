@@ -70,15 +70,16 @@ jobs:
         run: make -C labware-library test-e2e
   build-ll:
     name: 'build labware library artifact'
-    needs: ['js-unit-test']
+    needs: ['js-unit-test', 'e2e-test']
     timeout-minutes: 10
     runs-on: 'ubuntu-24.04'
-    if: always() && (needs.js-unit-test.result == 'success' || needs.js-unit-test.result == 'skipped') && github.event_name != 'pull_request'
+    if: always() && (needs.js-unit-test.result == 'success' || needs.js-unit-test.result == 'skipped') && (needs.e2e-test.result == 'success' || needs.e2e-test.result == 'skipped') && github.event_name != 'pull_request'
     steps:
       - name: Debug Build Job
         run: |
           echo "Build job is running!"
           echo "js-unit-test result: ${{ needs.js-unit-test.result }}"
+          echo "e2e-test result: ${{ needs.e2e-test.result }}"
           echo "Event name: ${{ github.event_name }}"
           echo "Ref: ${{ github.ref }}"
       - uses: 'actions/checkout@v4'
