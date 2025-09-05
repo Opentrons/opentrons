@@ -179,8 +179,8 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
               <img
                 src={smallLogo}
                 alt="Opentrons logo"
-                width="1.5rem"
-                height="1.5rem"
+                width="24px"
+                height="24px"
               />
             </div>
             <span className={styles.file_name}>{protocolName}</span>

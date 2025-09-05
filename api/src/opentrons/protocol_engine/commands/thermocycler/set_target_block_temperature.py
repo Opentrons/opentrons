@@ -39,6 +39,12 @@ class SetTargetBlockTemperatureParams(BaseModel):
         " the given hold time has elapsed.",
         json_schema_extra=_remove_default,
     )
+    ramp_rate: float | SkipJsonSchema[None] = Field(
+        None,
+        description="The rate in C°/second to change temperature from the current target."
+        " If unspecified, the Thermocycler will change temperature at the fastest possible rate.",
+        json_schema_extra=_remove_default,
+    )
 
 
 class SetTargetBlockTemperatureResult(BaseModel):
@@ -90,6 +96,13 @@ class SetTargetBlockTemperatureImpl(
             hold_time = thermocycler_state.validate_hold_time(params.holdTimeSeconds)
         else:
             hold_time = None
+        target_ramp_rate: Optional[float]
+        if params.ramp_rate is not None:
+            target_ramp_rate = thermocycler_state.validate_ramp_rate(
+                params.ramp_rate, target_temperature
+            )
+        else:
+            target_ramp_rate = None
 
         thermocycler_hardware = self._equipment.get_module_hardware_api(
             thermocycler_state.module_id
@@ -97,7 +110,10 @@ class SetTargetBlockTemperatureImpl(
 
         if thermocycler_hardware is not None:
             await thermocycler_hardware.set_target_block_temperature(
-                target_temperature, volume=target_volume, hold_time_seconds=hold_time
+                target_temperature,
+                volume=target_volume,
+                hold_time_seconds=hold_time,
+                ramp_rate=target_ramp_rate,
             )
 
         return SuccessData(

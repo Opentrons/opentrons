@@ -152,7 +152,7 @@ metadata = {
     "source": "Protocol Designer",
 }
 
-requirements = {"robotType": "OT-2", "apiLevel": "2.25"}
+requirements = {"robotType": "OT-2", "apiLevel": "2.26"}
 
 def run(protocol: protocol_api.ProtocolContext) -> None:
     # Load Labware:
@@ -181,7 +181,8 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
 
     # PROTOCOL STEPS
 
-    # Step 1:
+    # Step 1: transfer
+    # v7 fixture
     pass
 
 CUSTOM_LABWARE = json.loads("""{"fixture/fixture_trash/1":{"ordering":[["A1"]],"schemaVersion":2,"version":1,"namespace":"fixture","metadata":{"displayCategory":"trash","displayVolumeUnits":"L","displayName":"Tall Fixed Trash","tags":["trash","opentrons","tall"]},"dimensions":{"xDimension":172.86,"yDimension":165.86,"zDimension":82},"parameters":{"format":"trash","isTiprack":false,"loadName":"fixture_trash","isMagneticModuleCompatible":false,"quirks":["fixedTrash","centerMultichannelOnWells","touchTipDisabled"]},"wells":{"A1":{"shape":"rectangular","yDimension":165.67,"xDimension":107.11,"totalLiquidVolume":1100000,"depth":77,"x":82.84,"y":53.56,"z":5}},"brand":{"brand":"Opentrons"},"groups":[{"wells":["A1"],"metadata":{}}],"cornerOffsetFromSlot":{"x":0,"y":0,"z":0}}}""")
