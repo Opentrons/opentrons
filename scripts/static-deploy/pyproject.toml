@@ -9,6 +9,7 @@ description = "Tools for deploying our static web applications Labware Library a
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
+    "boto3>=1.40.24",
     "pytest>=8.4.1",
     "rich>=14.1.0",
     "ruff>=0.12.11",
