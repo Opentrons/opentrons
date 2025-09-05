@@ -24,7 +24,12 @@ import {
   PROTOCOL_CONTEXT_NAME,
 } from './pythonFormat'
 
-import type { CutoutId, ProtocolFile, RobotType } from '@opentrons/shared-data'
+import type {
+  CutoutId,
+  LabwareDefinition2,
+  ProtocolFile,
+  RobotType,
+} from '@opentrons/shared-data'
 import type {
   ChangeTipOptions,
   InvariantContext,
@@ -246,6 +251,15 @@ export const getLoadLidStacks = (
   return pythonLidStacks ? `# Load Lid Stacks:\n${pythonLidStacks}` : ''
 }
 
+const getFormatLidParams = (def: LabwareDefinition2): string[] => {
+  const { parameters, namespace, version } = def
+  return [
+    `lid=${formatPyStr(parameters.loadName)}`,
+    `lid_namespace=${formatPyStr(namespace)}`,
+    `lid_version=${version}`,
+  ]
+}
+
 export function getLoadLabware(
   moduleEntities: ModuleEntities,
   allLabwareEntities: LabwareEntities,
@@ -300,10 +314,8 @@ export function getLoadLabware(
           ...(locationArg ? [locationArg] : []),
           ...(labelArg ? [labelArg] : []),
           `namespace=${formatPyStr(namespace)}`,
-          ...(lidEntity != null
-            ? [`lid=${formatPyStr(lidEntity.def.parameters.loadName)}`]
-            : []),
           `version=${version}`,
+          ...(lidEntity != null ? getFormatLidParams(lidEntity.def) : []),
         ].join(',\n')
         return [
           ...acc,
