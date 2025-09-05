@@ -1,12 +1,6 @@
 import { Fragment, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
-import {
-  Navigate,
-  Route,
-  Routes,
-  useLocation,
-  useMatch,
-} from 'react-router-dom'
+import { Navigate, Route, Routes, useMatch } from 'react-router-dom'
 import NiceModal from '@ebay/nice-modal-react'
 
 import {
@@ -34,7 +28,6 @@ import { DevicesLanding } from '/app/pages/Desktop/Devices/DevicesLanding'
 import { ProtocolRunDetails } from '/app/pages/Desktop/Devices/ProtocolRunDetails'
 import { RobotSettings } from '/app/pages/Desktop/Devices/RobotSettings'
 import { Labware } from '/app/pages/Desktop/Labware'
-import { LivestreamViewer } from '/app/pages/Desktop/LivestreamViewer'
 import { ProtocolDetails } from '/app/pages/Desktop/Protocols/ProtocolDetails'
 import { ProtocolPreview } from '/app/pages/Desktop/Protocols/ProtocolPreview'
 import { ProtocolsLanding } from '/app/pages/Desktop/Protocols/ProtocolsLanding'
@@ -57,8 +50,6 @@ export const DesktopApp = (): JSX.Element => {
     isEmergencyStopModalDismissed,
     setIsEmergencyStopModalDismissed,
   ] = useState<boolean>(false)
-  const location = useLocation()
-  const isCameraStream = location.pathname === '/camera-stream'
 
   // note for react-scan
   const enableReactScan = useFeatureFlag('reactScan')
@@ -130,11 +121,6 @@ export const DesktopApp = (): JSX.Element => {
       name: 'App Settings',
       path: '/app-settings/:appSettingsTab?',
     },
-    {
-      Component: LivestreamViewer,
-      name: 'Camera Stream',
-      path: '/camera-stream',
-    },
   ]
 
   return (
@@ -143,7 +129,7 @@ export const DesktopApp = (): JSX.Element => {
         <ErrorBoundary FallbackComponent={DesktopAppFallback}>
           <ReactQueryDevtools />
           <SystemLanguagePreferenceModal />
-          {!isCameraStream && <Navbar routes={desktopRoutes} />}
+          <Navbar routes={desktopRoutes} />
           <ToasterOven>
             <EmergencyStopContext.Provider
               value={{
