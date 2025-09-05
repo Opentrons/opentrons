@@ -1,6 +1,10 @@
-import { getAllLabwareDefs } from '@opentrons/shared-data'
+import { getAllLabwareDefs, LOW_VOLUME_PIPETTES } from '@opentrons/shared-data'
+
+import { getPipetteNameFromSpecs } from './getPipetteNameFromSpecs'
 
 import type { PipetteV2Specs, SupportedTip } from '@opentrons/shared-data'
+
+const LOW_PIPETTE_VOLUME = 5
 
 export function getMatchingTipLiquidSpecsFromSpec(
   pipetteSpecs: PipetteV2Specs,
@@ -8,6 +12,7 @@ export function getMatchingTipLiquidSpecsFromSpec(
   tiprackUri: string
 ): SupportedTip {
   const matchingLabwareDef = getAllLabwareDefs()[tiprackUri]
+  const pipetteName = getPipetteNameFromSpecs(pipetteSpecs)
 
   console.assert(
     matchingLabwareDef,
@@ -24,13 +29,12 @@ export function getMatchingTipLiquidSpecsFromSpec(
     )
   }
 
-  const isLowVolumePipette = Object.keys(pipetteSpecs.liquids).some(
-    key => key === 'lowVolumeDefault'
-  )
+  const isLowVolumePipette = LOW_VOLUME_PIPETTES.includes(pipetteName)
 
-  const isUsingLowVolume = volume < 5
+  const isUsingLowVolume = volume < LOW_PIPETTE_VOLUME
   const liquidType =
     isLowVolumePipette && isUsingLowVolume ? 'lowVolumeDefault' : 'default'
+
   const liquidSupportedTips = Object.values(
     pipetteSpecs.liquids[liquidType].supportedTips
   )
@@ -42,6 +46,7 @@ export function getMatchingTipLiquidSpecsFromSpec(
     const differenceB = Math.abs(tipB.defaultTipLength - tipLength)
     return differenceA - differenceB
   })[0]
+
   console.assert(
     matchingTipLiquidSpecs,
     `expected to find the tip liquid specs but could not with pipette tiprack displayname ${

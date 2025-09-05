@@ -1,5 +1,6 @@
 import {
   ETHANOL_LIQUID_CLASS_NAME,
+  FLEX_ROBOT_TYPE,
   getAllLiquidClassDefs,
   getFlexNameConversion,
   getLabwareDefURI,
@@ -116,7 +117,7 @@ const getNoLiquidClassValues = (
     disposalByVolume: disposalByVolume,
   }).referenceVolumes
 
-  const { conditioning, correction, flowRate } = byVolumeLookup
+  const { conditioning, correction } = byVolumeLookup
 
   const aspirateCorrectionVolume = linearInterpolate(
     correction.aspirate,
@@ -134,21 +135,23 @@ const getNoLiquidClassValues = (
   )
 
   const aspirateMaxUiFlowRate = getMaxUiFlowRate({
-    targetVolume: flowRate.aspirate,
+    targetVolume: volume,
     channels: pipette.channels,
     tipLiquidSpecs: matchingTipLiquidSpecs,
     flowRateType: 'aspirate',
     correctionVolume: aspirateCorrectionVolume ?? 0,
     shaftULperMM: pipette.shaftULperMM,
+    robotType: FLEX_ROBOT_TYPE,
   })
 
   const dispenseMaxUiFlowRate = getMaxUiFlowRate({
-    targetVolume: flowRate.dispense,
+    targetVolume: volume,
     channels: pipette.channels,
     tipLiquidSpecs: matchingTipLiquidSpecs,
     flowRateType: 'dispense',
     correctionVolume: dispenseCorrectionVolume ?? 0,
     shaftULperMM: pipette.shaftULperMM,
+    robotType: FLEX_ROBOT_TYPE,
   })
 
   const aspirateFlowRateFields = getFlowRateFields(
@@ -292,13 +295,10 @@ const getLiquidClassValues = (
   const liquidClassDef =
     allLiquidClassDefs[selectedLiquidClass ?? NONE_LIQUID_CLASS_NAME]
 
-  const { loadName: currentTiprackLoadName } = state.tipRack.parameters
+  const tiprackUri = getLabwareDefURI(tipRack)
   const tipTypeSettings = liquidClassDef?.byPipette
     ?.find(({ pipetteModel }) => convertedPipetteName === pipetteModel)
-    ?.byTipType.find(tipObject => {
-      const tiprackLoadName = tipObject.tiprack.split('/')[1]
-      return tiprackLoadName === currentTiprackLoadName
-    })
+    ?.byTipType.find(tipObject => tipObject.tiprack === tiprackUri)
 
   const { aspirate, singleDispense, multiDispense } = tipTypeSettings ?? {}
 
@@ -334,8 +334,6 @@ const getLiquidClassValues = (
     disposalByVolume: disposalByVolume,
   }).referenceVolumes
 
-  const tiprackUri = getLabwareDefURI(tipRack)
-
   const matchingTipLiquidSpecs = getMatchingTipLiquidSpecsFromSpec(
     pipetteSpecs,
     volume,
@@ -358,6 +356,7 @@ const getLiquidClassValues = (
     flowRateType: 'aspirate',
     correctionVolume: aspirateCorrectionVolume ?? 0,
     shaftULperMM: pipetteSpecs.shaftULperMM,
+    robotType: FLEX_ROBOT_TYPE,
   })
 
   const dispenseMaxUiFlowRate = getMaxUiFlowRate({
@@ -367,6 +366,7 @@ const getLiquidClassValues = (
     flowRateType: 'dispense',
     correctionVolume: dispenseCorrectionVolume ?? 0,
     shaftULperMM: pipetteSpecs.shaftULperMM,
+    robotType: FLEX_ROBOT_TYPE,
   })
 
   const aspirateFlowRateFields = getFlowRateFields(
