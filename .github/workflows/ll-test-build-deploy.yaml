@@ -231,6 +231,9 @@ jobs:
     needs: ['build-ll', 'determine-deploy-config']
     timeout-minutes: 5
     if: github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/labware-deploy')
+    permissions:
+      id-token: write
+      contents: read
     environment:
       name: ${{ needs.determine-deploy-config.outputs.environment }}
       url: ${{ needs.determine-deploy-config.outputs.url }}
