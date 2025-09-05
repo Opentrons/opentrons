@@ -215,10 +215,19 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.10'
+      - name: Setup Deploy Dependencies
+        run: |
+          cd scripts/static-deploy
+          uv sync --frozen
       - name: Determine Deployment Configuration
         id: deploy-config
         run: |
-          python scripts/static-deploy/labware_deploy_config.py \
+          cd scripts/static-deploy
+          uv run python labware_deploy_config.py \
             "${{ github.event_name }}" \
             "${{ github.ref }}" \
             "${{ github.ref_name }}" \
