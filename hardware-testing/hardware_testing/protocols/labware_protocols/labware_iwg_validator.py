@@ -12,7 +12,7 @@ from opentrons.types import Point
 from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
 
 # LABWARE TYPE
-LABWARE = "costar_96_wellplate_2200ul" # change to desired labware
+LABWARE = "costar_96_wellplate_2200ul"  # change to desired labware
 
 # SLOTS
 SLOT_LIQUID_TIPRACKS = ["C3", "B3", "A2"]
@@ -62,7 +62,6 @@ def add_parameters(parameters: ParameterContext) -> None:
         default="flex_1channel_1000",
     )
 
-
     parameters.add_str(
         variable_name="liq_tip_size",
         display_name="Liquid Tip Size",
@@ -72,6 +71,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         ],
         default="1000",
     )
+
 
 def _setup(
     ctx: ProtocolContext,
@@ -86,10 +86,10 @@ def _setup(
     str,
     List[Labware],
     InstrumentContext,
-    str
+    str,
 ]:
-    global DIAL_PORT, RUN_ID, FILE_NAME, LABWARE 
-    labware_type = LABWARE  
+    global DIAL_PORT, RUN_ID, FILE_NAME, LABWARE
+    labware_type = LABWARE
 
     # LOAD LABWARE AND DIAL
     labware = ctx.load_labware(labware_type, SLOT_LABWARE)
@@ -147,7 +147,7 @@ def _setup(
 
     low_height = 3
     middle_height = depth / 2
-    high_height = depth * 4/5 
+    high_height = depth * 4 / 5
 
     expected_heights = (
         [low_height] * number_of_trials  # low height
@@ -166,7 +166,7 @@ def _setup(
         labware_type,
         liq_tip_racks,
         right_mount,
-        liq_tip_size
+        liq_tip_size,
     )
 
 
@@ -275,8 +275,6 @@ def aspirate_dispense_measure(
 
         expected_height = expected_heights[i]
 
-    
-    
         if liq_tip_size == "1000":
             dispense_offset = expected_height + 10
             liq_pipette.flow_rate.blow_out = 1000
@@ -288,28 +286,32 @@ def aspirate_dispense_measure(
 
         ethanol = ctx.get_liquid_class(name="ethanol_80")
 
+        wb = "well-bottom"
+        lm = "liquid-meniscus"
+        dest = "destination"
         for rack in liq_tip_racks:
             ethanol_props = ethanol.get_for(right_mount, rack)
-            ethanol_props.aspirate.aspirate_position.position_reference = "liquid-meniscus"
+            ethanol_props.aspirate.aspirate_position.position_reference = lm  # type: ignore[assignment]
             ethanol_props.aspirate.aspirate_position.offset.z = meniscus_z
-            ethanol_props.dispense.dispense_position.position_reference = "well-bottom"
+            ethanol_props.dispense.dispense_position.position_reference = wb  # type: ignore[assignment]
             ethanol_props.dispense.dispense_position.offset.z = dispense_offset
             ethanol_props.dispense.push_out_by_volume.set_for_all_volumes(0.0)
             ethanol_props.dispense.flow_rate_by_volume.set_for_all_volumes(50)
-            ethanol_props.dispense.retract.blowout.location = "destination"
-            ethanol_props.dispense.retract.blowout.flow_rate = liq_pipette.flow_rate.blow_out
+            ethanol_props.dispense.retract.blowout.location = dest  # type: ignore[assignment]
+            ethanol_props.dispense.retract.blowout.flow_rate = (
+                liq_pipette.flow_rate.blow_out
+            )
             ethanol_props.dispense.retract.blowout.enabled = True
 
-
-        liq_pipette.transfer_with_liquid_class(                      
+        liq_pipette.transfer_with_liquid_class(
             liquid_class=ethanol,
             volume=dispense_vol,
             source=src["A1"],
             dest=labware[well],
-            new_tip='never',
-            return_tip=False
-            )
-        
+            new_tip="never",
+            return_tip=False,
+        )
+
         height = _get_height_of_liquid_in_well(
             probe_pipette, labware[well], ctx.is_simulating()
         )
@@ -342,7 +344,7 @@ def run(ctx: ProtocolContext) -> None:
         labware_type,
         liq_tip_racks,
         right_mount,
-        liq_tip_size
+        liq_tip_size,
     ) = _setup(ctx)
 
     wells = [str(w).split(" ")[0] for w in labware.wells()]
@@ -369,7 +371,7 @@ def run(ctx: ProtocolContext) -> None:
         expected_heights,
         liq_tip_racks,
         right_mount,
-        liq_tip_size
+        liq_tip_size,
     )
 
     region_names = ["low", "middle", "high"]

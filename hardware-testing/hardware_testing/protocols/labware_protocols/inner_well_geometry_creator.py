@@ -50,7 +50,7 @@ metadata = {"protocolName": "inner-well-geometry-creator", "author": "ABR"}
 requirements = {"robotType": "Flex", "apiLevel": "2.24"}
 
 DIAL_PORT = None
-DIAL_PORT_NAME = "/dev/ttyUSB0"
+DIAL_PORT_NAME = "/dev/ttyUSB1"
 DIAL_POS_WITHOUT_TIP: List[Optional[float]] = [None, None]
 RUN_ID = ""
 FILE_NAME = ""
@@ -91,7 +91,7 @@ class SetupState:
     liquid_mount: InstrumentContext
     liquid_tip: str
     ethanol: LiquidClass
-    
+
 
 @dataclass
 class TrialResult:
@@ -215,7 +215,7 @@ def _setup(ctx: ProtocolContext) -> SetupState:
     min_step = max(max_volume * 0.01, 1)  # clamped to 1uL
     max_step = max_volume * 0.25
 
-    # liquid 
+    # liquid
     ethanol_liq = ctx.define_liquid("Ethanol", display_color="#FFFFC5")
     src["A1"].load_liquid(ethanol_liq, src["A1"].max_volume - 1000)
     ethanol = ctx.get_liquid_class(name="ethanol_80")
@@ -258,9 +258,9 @@ def _setup(ctx: ProtocolContext) -> SetupState:
         threshold=threshold,
         delta_tolerance=delta_tolerance,
         liquid_racks=liquid_racks,
-        liquid_mount = right_mount,
-        liquid_tip = liq_tip_size,
-        ethanol = ethanol,
+        liquid_mount=right_mount,
+        liquid_tip=liq_tip_size,
+        ethanol=ethanol,
     )
 
 
@@ -571,11 +571,11 @@ def geometry_creator(ctx: ProtocolContext, state: SetupState) -> List[TrialResul
                     liq_pipette, src["A1"], ctx.is_simulating()
                 )
             else:
-                return udv_table 
+                return udv_table
 
         drop_tips(probe_pipette, liq_pipette)
 
-        # Set Dispense Parameters 
+        # Set Dispense Parameters
         dispense_volume += step_volume
         volume_per_channel = dispense_volume / liq_pipette.channels
 
@@ -585,30 +585,35 @@ def geometry_creator(ctx: ProtocolContext, state: SetupState) -> List[TrialResul
         else:
             dispense_offset = corrected_height + state.target_height + 3
             liq_pipette.flow_rate.blow_out = 500
-    
+
+        wb = "well-bottom"
+        lm = "liquid-meniscus"
+        dest = "destination"
         for rack in state.liquid_racks:
             ethanol_props = ethanol.get_for(state.liquid_mount, rack)
-            ethanol_props.aspirate.aspirate_position.position_reference = "liquid-meniscus"
+            ethanol_props.aspirate.aspirate_position.position_reference = lm  # type: ignore[assignment]
             ethanol_props.aspirate.aspirate_position.offset.z = meniscus_z
-            ethanol_props.dispense.dispense_position.position_reference = "well-bottom"
+            ethanol_props.dispense.dispense_position.position_reference = wb  # type: ignore[assignment]
             ethanol_props.dispense.dispense_position.offset.z = dispense_offset
             ethanol_props.dispense.push_out_by_volume.set_for_all_volumes(0.0)
             ethanol_props.dispense.flow_rate_by_volume.set_for_all_volumes(50)
-            ethanol_props.dispense.retract.blowout.location = "destination"
-            ethanol_props.dispense.retract.blowout.flow_rate = liq_pipette.flow_rate.blow_out
+            ethanol_props.dispense.retract.blowout.location = dest  # type: ignore[assignment]
+            ethanol_props.dispense.retract.blowout.flow_rate = (
+                liq_pipette.flow_rate.blow_out
+            )
             ethanol_props.dispense.retract.blowout.enabled = True
 
         pick_up_tips(probe_pipette, liq_pipette)
         tip_z_error = _get_tip_z_error(ctx, probe_pipette, state.dial)
-        
+
         liq_pipette.transfer_with_liquid_class(
             liquid_class=ethanol,
             volume=volume_per_channel,
             source=src["A1"],
             dest=labware[current_well],
-            new_tip='never',
-            return_tip=False
-            )
+            new_tip="never",
+            return_tip=False,
+        )
 
         # Measure liquid height
         height = _get_height_of_liquid_in_well(
@@ -646,7 +651,7 @@ def geometry_creator(ctx: ProtocolContext, state: SetupState) -> List[TrialResul
                     status = "pass"
         else:
             status = "sim"
-        
+
         if status == "fail":
             write_trial_log(udv_table)
             dispense_volume -= step_volume  # rollback dispense volume
@@ -656,7 +661,7 @@ def geometry_creator(ctx: ProtocolContext, state: SetupState) -> List[TrialResul
 
         # recalculate step volume for next step
         step_volume = adaptive_volume_step(hdelta, corrected_height, step_volume, state)
-        #prevent overflow of well
+        # prevent overflow of well
         if step_volume + dispense_volume > max_volume:
             return udv_table
 
@@ -681,7 +686,7 @@ def run(ctx: ProtocolContext) -> None:
         new_inner_well_json = generate_frusta(ctx, frusta_data.tolist(), state.labware)
     else:
         return
-    
+
     if not ctx.is_simulating():
         from hardware_testing import data
 
