@@ -189,6 +189,8 @@ jobs:
           echo "URL: ${{ needs.determine-deploy-config.outputs.url }}"
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Debug Directory Structure
         run: |
           echo "Current directory: $(pwd)"
@@ -198,6 +200,12 @@ jobs:
           ls -la scripts/ || echo "scripts/ directory not found"
           echo "scripts/static-deploy contents:"
           ls -la scripts/static-deploy/ || echo "scripts/static-deploy/ directory not found"
+          echo "Git status:"
+          git status
+          echo "Git branch:"
+          git branch -a
+          echo "Git log (last 3 commits):"
+          git log --oneline -3
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
