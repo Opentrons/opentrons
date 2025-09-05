@@ -1,5 +1,6 @@
 import type {
   AppRestartAction,
+  CameraStreamOpenAction,
   NotifySubscribeAction,
   NotifyTopic,
   ReloadUiAction,
@@ -31,6 +32,7 @@ export const ROBOT_MASS_STORAGE_DEVICE_ENUMERATED: 'shell:ROBOT_MASS_STORAGE_DEV
 export const NOTIFY_SUBSCRIBE: 'shell:NOTIFY_SUBSCRIBE' =
   'shell:NOTIFY_SUBSCRIBE'
 export const SEND_FILE_PATHS: 'shell:SEND_FILE_PATHS' = 'shell:SEND_FILE_PATHS'
+export const CAMERA_STREAM_OPEN = 'shell:CAMERA_STREAM_OPEN' as const
 
 export const uiInitialized = (): UiInitializedAction => ({
   type: UI_INITIALIZED,
@@ -120,5 +122,13 @@ export const notifySubscribeAction = (
     hostname,
     topic,
   },
+  meta: { shell: true },
+})
+
+export const cameraStreamOpenAction = (
+  hostname: string
+): CameraStreamOpenAction => ({
+  type: CAMERA_STREAM_OPEN,
+  payload: { hostname },
   meta: { shell: true },
 })
