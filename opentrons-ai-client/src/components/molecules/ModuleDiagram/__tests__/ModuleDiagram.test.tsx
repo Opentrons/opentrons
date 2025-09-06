@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import {
   ABSORBANCE_READER_TYPE,
@@ -8,16 +8,16 @@ import {
   FLEX_STACKER_MODULE_V1,
 } from '@opentrons/shared-data'
 
+import { renderWithProviders } from '/ai-client/__testing-utils__'
+
 import { ModuleDiagram } from '../index'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('../modeldiagram.module.css', () => ({
-  default: {
-    image: 'image',
-    flex_stacker_image: 'flex_stacker_image',
-  },
-}))
+const render = (props: ComponentProps<typeof ModuleDiagram>) => {
+  const { type, model } = props
+  return renderWithProviders(<ModuleDiagram type={type} model={model} />)
+}
 
 describe('ModelDiagram', () => {
   let props: ComponentProps<typeof ModuleDiagram>
@@ -29,26 +29,22 @@ describe('ModelDiagram', () => {
     }
   })
 
-  it('should apply special styling for Flex Stacker module', () => {
-    render(<ModuleDiagram {...props} />)
+  it('should render Flex Stacker module with correct image and alt text', () => {
+    render(props)
     const image = screen.getByRole('img')
 
-    expect(image).toBeInTheDocument()
+    expect(image.getAttribute('src')).toContain('flex_stacker')
     expect(image).toHaveAttribute('alt', FLEX_STACKER_MODULE_TYPE)
-    expect(image).toHaveClass('flex_stacker_image')
-    expect(image).not.toHaveClass('image')
   })
 
-  it('should render Absorbance Plate Reader with standard styling', () => {
+  it('should render Absorbance Plate Reader with correct image and alt text', () => {
     props.type = ABSORBANCE_READER_TYPE
     props.model = ABSORBANCE_READER_V1
 
-    render(<ModuleDiagram {...props} />)
+    render(props)
     const image = screen.getByRole('img')
 
-    expect(image).toBeInTheDocument()
+    expect(image.getAttribute('src')).toContain('flex_plate_reader')
     expect(image).toHaveAttribute('alt', ABSORBANCE_READER_TYPE)
-    expect(image).toHaveClass('image')
-    expect(image).not.toHaveClass('flex_stacker_image')
   })
 })

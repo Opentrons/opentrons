@@ -25,7 +25,7 @@ import {
 import { MODULES_FIELD_NAME } from '/ai-client/components/organisms/ModulesAndFixturesSection'
 import { getOnlyLatestDefs } from '/ai-client/resources/utils'
 
-import { ModuleDiagram } from '../ModelDiagram'
+import { ModuleDiagram } from '../ModuleDiagram'
 
 import type { DropdownBorder } from '@opentrons/components'
 import type { ModuleType } from '@opentrons/shared-data'
@@ -73,10 +73,11 @@ export function ModuleListItemGroup(): JSX.Element | null {
   const { t } = useTranslation('create_protocol')
   const modulesWatch: DisplayModule[] = watch(MODULES_FIELD_NAME) ?? []
 
-  const allDefinitionsValues = useMemo(
-    () => Object.values(getOnlyLatestDefs()),
-    []
-  )
+  const allDefinitionsValues = useMemo(() => {
+    const defs = getOnlyLatestDefs()
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    return Object.values(defs)
+  }, [])
 
   const getDefDisplayName = (value: string): string => {
     return (
