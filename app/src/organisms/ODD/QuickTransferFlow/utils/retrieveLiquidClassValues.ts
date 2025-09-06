@@ -99,7 +99,6 @@ const getNoLiquidClassValues = (
     [number, number]
   >
   const disposalByVolume = rawDisposalByVolume as Array<[number, number]>
-  const maxWorkingVolumeTip = tipRack.wells.A1.totalLiquidVolume
   const aspirateAirGapByVolume = aspirate?.retract.airGapByVolume as Array<
     [number, number]
   >
