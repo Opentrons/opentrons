@@ -350,10 +350,7 @@ const getLiquidClassValues = (
       aspirate?.retract.touchTip.enable === false
         ? undefined
         : aspirate?.retract.touchTip.params?.zOffset,
-    touchTipAspirateSpeed:
-      aspirate?.retract.touchTip.enable === false
-        ? undefined
-        : aspirate?.retract.touchTip.params?.speed,
+    touchTipAspirateSpeed: aspirate?.retract.touchTip.params?.speed,
     airGapAspirate: airGap.aspirate,
     conditionAspirate: conditioning ?? 0,
   }
@@ -401,10 +398,7 @@ const getLiquidClassValues = (
       dispense?.retract.touchTip.enable === false
         ? undefined
         : dispense?.retract.touchTip.params?.zOffset,
-    touchTipDispenseSpeed:
-      dispense?.retract.touchTip.enable === false
-        ? undefined
-        : dispense?.retract.touchTip.params?.speed,
+    touchTipDispenseSpeed: dispense?.retract.touchTip.params?.speed,
     airGapDispense: airGap.dispense,
     disposalVolumeDispenseSettings: {
       volume: disposal ?? 0,

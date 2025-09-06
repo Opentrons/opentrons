@@ -48,6 +48,7 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
       ? state.touchTipAspirate != null
       : state.touchTipDispense != null
   )
+
   const initialSpeed =
     kind === 'aspirate'
       ? state.touchTipAspirateSpeed
