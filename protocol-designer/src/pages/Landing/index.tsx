@@ -31,7 +31,7 @@ import styles from './landing.module.css'
 import type { ChangeEvent } from 'react'
 import type { ThunkDispatch } from '../../types'
 
-import welcomeImage from '../../assets/images/welcome_page.png'
+import welcomeImage from '../../assets/images/welcome_page.svg'
 
 export function Landing(): JSX.Element {
   const { t } = useTranslation('shared')
