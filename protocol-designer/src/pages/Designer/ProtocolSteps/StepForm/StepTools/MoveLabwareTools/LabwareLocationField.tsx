@@ -125,6 +125,7 @@ export function LabwareLocationField(
         dispatch(hoverSelection({ id: null, text: null }))
       }}
       tooltipContent={null}
+      menuPlacement="bottom"
     />
   )
 }
