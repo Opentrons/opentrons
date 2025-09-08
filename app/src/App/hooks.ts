@@ -271,6 +271,7 @@ export function useScrollRef(): {
   }
 }
 
+// TODO(jh, 09-08-25): Ensure window type is retrievable after window instantiation. EXEC-1823.
 // Returns the type of window spawned by the shell.
 export function useWindowType(): WindowType {
   const [windowType, setWindowType] = useState<WindowType>(null)
