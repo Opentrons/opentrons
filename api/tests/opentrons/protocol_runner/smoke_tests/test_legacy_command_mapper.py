@@ -3,10 +3,10 @@
 Legacy ProtocolContext objects are prohibitively difficult to instansiate
 and mock in an isolated unit test environment.
 """
+
 from datetime import datetime
 from pathlib import Path
 from textwrap import dedent
-from typing import List
 
 import pytest
 from decoy import matchers
@@ -24,11 +24,12 @@ from opentrons.protocol_runner.create_simulating_orchestrator import (
     create_simulating_orchestrator,
 )
 from opentrons.protocol_runner.legacy_command_mapper import LegacyCommandParams
+from opentrons.protocol_engine.types import PostRunHardwareState
 from opentrons.types import MountType, DeckSlotName
 from opentrons_shared_data.pipette.types import PipetteNameType
 
 
-async def simulate_and_get_commands(protocol_file: Path) -> List[commands.Command]:
+async def simulate_and_get_commands(protocol_file: Path) -> list[commands.Command]:
     """Simulate a protocol, make sure it succeeds, and return its commands."""
     protocol_reader = ProtocolReader()
     protocol_source = await protocol_reader.read_saved(
@@ -41,7 +42,13 @@ async def simulate_and_get_commands(protocol_file: Path) -> List[commands.Comman
     result = await subject.run(deck_configuration=[], protocol_source=protocol_source)
     assert result.state_summary.errors == []
     assert result.state_summary.status == EngineStatus.SUCCEEDED
-    return result.commands
+    commands = [command for command in result.commands]
+    await subject.finish(
+        drop_tips_after_run=False,
+        set_run_status=False,
+        post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
+    )
+    return commands
 
 
 # TODO(mm, 2023-01-09): Split this up into smaller, more focused tests.

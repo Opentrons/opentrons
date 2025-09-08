@@ -85,7 +85,6 @@ class RunOrchestrator:
     def __init__(
         self,
         protocol_engine: ProtocolEngine,
-        # todo(mm, 2024-07-05): This hardware_api param looks unused?
         hardware_api: HardwareControlAPI,
         fixit_runner: protocol_runner.LiveRunner,
         setup_runner: protocol_runner.LiveRunner,
@@ -115,6 +114,8 @@ class RunOrchestrator:
         self._fixit_runner.prepare()
         self._setup_runner.prepare()
         self._protocol_engine.set_and_start_queue_worker(self.command_generator)
+        # used by SimulatingRunOrchestrator to clean up the simulating hardware controller
+        self._hardware_api = hardware_api
 
     @property
     def run_id(self) -> str:
