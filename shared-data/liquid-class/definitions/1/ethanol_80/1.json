@@ -5890,7 +5890,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 2.0
               }
             }
           },
@@ -5980,7 +5980,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 2.0
               }
             }
           },
@@ -6154,7 +6154,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 2.0
               }
             }
           },
@@ -6244,7 +6244,7 @@
             "delay": {
               "enable": true,
               "params": {
-                "duration": 0.2
+                "duration": 2.0
               }
             }
           },
