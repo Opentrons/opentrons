@@ -47,7 +47,7 @@ export function PresavedStep({
       hovered={hovered}
       stepNumber={stepNumber}
       iconName={stepIconsByType[stepType]}
-      title={t(`stepType.${stepType}`)}
+      text={t(`stepType.${stepType}`)}
       sidebarWidth={sidebarWidth}
     />
   )

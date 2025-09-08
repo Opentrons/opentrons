@@ -100,7 +100,7 @@ export function TerminalItemStep(props: TerminalItemStepProps): JSX.Element {
           hovered,
           selected,
           stepNumber: null,
-          title:
+          text:
             id === START_TERMINAL_ITEM_ID
               ? t('starting_deck')
               : t('ending_deck'),

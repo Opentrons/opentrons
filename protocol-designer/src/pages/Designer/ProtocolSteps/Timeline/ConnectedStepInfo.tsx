@@ -249,7 +249,7 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
         stepNumber={stepNumber}
         // add empty check to avoid causing undefined issue when calling titleCase
         // todo(mm, 2025-09-05): `stepName !== undefined || stepName !== ''` will always evaluate to true, won't it?
-        title={
+        text={
           step.stepName !== undefined || step.stepName !== ''
             ? i18n.format(step.stepName, 'titleCase')
             : t(`stepType.${step.stepType}`)
