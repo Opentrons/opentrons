@@ -6201,7 +6201,7 @@
                 "volume": 50
               }
             },
-            "pushOutByVolume": [[0.0, 20.0]],
+            "pushOutByVolume": [[0.0, 3.9]],
             "delay": {
               "enable": true,
               "params": {
@@ -6434,7 +6434,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 50.0]],
+            "flowRateByVolume": [[0.0, 25.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [5.0, -0.2],
@@ -6448,7 +6448,7 @@
                 "volume": 50
               }
             },
-            "pushOutByVolume": [[0.0, 20.0]],
+            "pushOutByVolume": [[0.0, 3.9]],
             "delay": {
               "enable": true,
               "params": {
