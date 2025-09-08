@@ -339,18 +339,8 @@ it('should handle empty data', () => {
    const icon = screen.getByTestId('ComponentName_Icon')
    ```
 
-3. **Method Chaining for Assertions:**
 
-   ```ts
-   // ✅ Preferred - concise
-   expect(screen.getByRole('button', { name: 'Send' })).toBeDisabled()
-
-   // ❌ Avoid unnecessary variables
-   const sendButton = screen.getByRole('button', { name: 'Send' })
-   expect(sendButton).toBeDisabled()
-   ```
-
-4. **Test ID Naming Convention:**
+3. **Test ID Naming Convention:**
    - Format: `ComponentName_ElementType`
    - Examples: `ActionCard_Icon`, `PrimaryFloatingButton_Icon`
 
@@ -482,7 +472,7 @@ function AppContent({ isOnChatPage }: { isOnChatPage: boolean }) {
 
 ### Never Do These
 
-1. **Console logs in production code:**
+1. **Console logs in code:**
 
    ```ts
    // ❌ Remove all debug code
@@ -495,24 +485,10 @@ function AppContent({ isOnChatPage }: { isOnChatPage: boolean }) {
    ```ts
    // ❌ Never use inline styles
    <button style="background: blue;">Click</button>
-   <div style={{backgroundColor: 'red'}}>Content</div>
    ```
 
-3. **Missing hook dependencies:**
 
-   ```ts
-   // ❌ Missing dependencies
-   useEffect(() => {
-     fetchData(userId)
-   }, []) // userId missing
-
-   // ✅ Complete dependencies
-   useEffect(() => {
-     fetchData(userId)
-   }, [userId])
-   ```
-
-4. **Conditional hooks:**
+3. **Conditional hooks:**
 
    ```ts
    // ❌ Never conditionally call hooks
