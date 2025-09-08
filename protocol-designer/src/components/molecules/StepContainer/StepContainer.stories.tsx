@@ -51,3 +51,14 @@ export const Truncation: Story = {
     </Box>
   ),
 }
+
+export const Alt: Story = {
+  args: {
+    iconName: 'transfer',
+    stepNumber: null,
+    text: 'Starting deck',
+    type: 'alt',
+    size: 'iconAndText',
+    cursor: 'default',
+  },
+}

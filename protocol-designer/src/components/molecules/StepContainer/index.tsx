@@ -26,7 +26,8 @@ import type {
 
 export interface StepContainerProps {
   iconName: IconName
-  stepNumber: number
+  /** The number of this step in the timeline (1-based indexing), or `null` to not show a number. */
+  stepNumber: number | null
   /** The first line of text. */
   text: string
   /** The second line of text. */
@@ -147,13 +148,15 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
                   flex="1"
                   minWidth="0"
                 >
-                  <StyledText
-                    desktopStyle="bodyDefaultRegular"
-                    color={textColor}
-                    flex="none"
-                  >
-                    {stepNumber}.
-                  </StyledText>
+                  {stepNumber != null && (
+                    <StyledText
+                      desktopStyle="bodyDefaultRegular"
+                      color={textColor}
+                      flex="none"
+                    >
+                      {stepNumber}.
+                    </StyledText>
+                  )}
                   <Flex flexDirection={DIRECTION_COLUMN} flex="1" minWidth="0">
                     <StyledText
                       desktopStyle="bodyDefaultRegular"
