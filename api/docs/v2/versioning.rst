@@ -168,7 +168,7 @@ Version 2.23
 Version 2.22
 -------------
 - Improvements to loading liquids. Use the new :py:meth:`.Labware.load_liquid`, :py:meth:`.Labware.load_liquid_by_well`, and :py:meth:`.Labware.load_empty` methods instead of ``Well.load_liquid()``, which is now deprecated.
-- Use new :ref:`robot motor control <motor-control>` methods to control individual robot motors. 
+- Use new robot motor control methods to control individual robot motors. 
     - The :py:meth:`.RobotContext.move_to`, :py:meth:`.RobotContext.move_axes_to`, and :py:meth:`.RobotContext.move_axes_relative` methods move robot motors to specific deck positions. 
     - Calculate specific deck positions with the :py:meth:`.RobotContext.axis_coordinates_for` method, and pipette plunger positions with :py:meth:`.RobotContext.plunger_coordinates_for_volume` and :py:meth:`.RobotContext.plunger_coordinates_for_named_position`. 
     - Control the Flex Gripper with the :py:meth:`.RobotContext.open_gripper_jaw` and :py:meth:`.RobotContext.close_gripper_jaw` methods. 
