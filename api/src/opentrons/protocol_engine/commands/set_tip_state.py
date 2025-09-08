@@ -60,14 +60,20 @@ class SetTipStateImplementation(
         self, params: SetTipStateParams
     ) -> SuccessData[SetTipStateResult]:
         """Set the tip rack wells to the requested state."""
-        # TODO maybe do a bit of validation here? Things to validate would be that the requested labware is a tip rack
-        #   and that the listed wells are real (i.e. A1-H12)
+        labware_id = params.labwareId
+        well_names = params.wellNames
+
+        self._state_view.labware.raise_if_not_tip_rack(labware_id=labware_id)
+        self._state_view.labware.raise_if_wells_are_invalid(
+            labware_id=labware_id, well_names=well_names
+        )
+
         return SuccessData(
             public=SetTipStateResult(),
             state_update=StateUpdate().update_tip_rack_well_state(
                 tip_state=params.tipWellState,
-                labware_id=params.labwareId,
-                well_names=params.wellNames,
+                labware_id=labware_id,
+                well_names=well_names,
             ),
         )
 

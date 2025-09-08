@@ -33,6 +33,14 @@ async def test_set_tip_state(decoy: Decoy, mock_state_view: StateView) -> None:
 
     result = await subject.execute(params)
 
+    decoy.verify(
+        mock_state_view.labware.raise_if_not_tip_rack("labware-id"),
+        mock_state_view.labware.raise_if_wells_are_invalid(
+            labware_id="labware-id",
+            well_names=["well-1", "well-2"],
+        ),
+    )
+
     assert result == SuccessData(
         public=SetTipStateResult(),
         state_update=update_types.StateUpdate(
