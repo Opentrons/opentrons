@@ -34,6 +34,8 @@ export const initializeSentry = (state: BaseState): void => {
     try {
       init({
         dsn: sentryDsn,
+        environment: 'production',
+        release: process.env.OT_PD_VERSION,
         integrations: [
           captureConsoleIntegration({ levels: ['assert'] }),
           replayIntegration(),

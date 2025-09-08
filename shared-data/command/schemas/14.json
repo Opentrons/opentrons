@@ -5082,6 +5082,11 @@
           "description": "Unique ID of the Thermocycler Module.",
           "title": "Moduleid",
           "type": "string"
+        },
+        "ramp_rate": {
+          "description": "The rate in C\u00b0/second to change temperature from the current target. If unspecified, the Thermocycler will change temperature at the fastest possible rate.",
+          "title": "Ramp Rate",
+          "type": "number"
         }
       },
       "required": ["moduleId", "celsius"],

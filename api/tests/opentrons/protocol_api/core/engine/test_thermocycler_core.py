@@ -148,6 +148,7 @@ def test_set_target_block_temperature(
         celsius=42.0,
         hold_time_seconds=1.2,
         block_max_volume=3.4,
+        ramp_rate=None,
     )
 
     decoy.verify(
@@ -157,6 +158,7 @@ def test_set_target_block_temperature(
                 celsius=42.0,
                 blockMaxVolumeUl=3.4,
                 holdTimeSeconds=1.2,
+                ramp_rate=None,
             )
         ),
         times=1,

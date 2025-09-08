@@ -41,6 +41,10 @@
     "waste_chute_warning": {
       "title": "Disposing labware",
       "body1": "Moving labware to the Waste Chute permanently discards it. You can’t use this labware in later steps. During a protocol run, the labware will be dropped in the chute and become irretrievable."
+    },
+    "has_errors": {
+      "title": "Protocol has errors",
+      "body1": "Some steps in this protocol have errors. The exported file will omit these steps. You should fix the errors before exporting."
     }
   },
   "timeline": {

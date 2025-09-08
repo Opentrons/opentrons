@@ -3800,6 +3800,7 @@
     events "3.0.0"
     file-saver "2.0.1"
     history "4.7.2"
+    hls.js "1.6.11"
     i18next "^19.8.3"
     is-ip "3.1.0"
     jszip "3.2.2"
@@ -6094,6 +6095,13 @@
   integrity sha512-WPs+bbQw5aCj+x6laNGWLH3wviHtoCv/P3+otBhbOhJgG8qtpdAMlTCxLtsTWA7LH1Oh/bFCHsBn0TPS5m30EQ==
   dependencies:
     "@types/unist" "*"
+
+"@types/hls.js@1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@types/hls.js/-/hls.js-1.0.0.tgz#47a03f97217461d279e4dc89481ddff86def5a36"
+  integrity sha512-EGY2QJefX+Z9XH4PAxI7RFoNqBlQEk16UpYR3kbr82CIgMX5SlMe0PjFdFV0JytRhyVPQCiwSyONuI6S1KdSag==
+  dependencies:
+    hls.js "*"
 
 "@types/hoist-non-react-statics@*", "@types/hoist-non-react-statics@^3.3.0", "@types/hoist-non-react-statics@^3.3.1":
   version "3.3.5"
@@ -13736,6 +13744,11 @@ history@4.7.2:
     resolve-pathname "^2.2.0"
     value-equal "^0.4.0"
     warning "^3.0.0"
+
+hls.js@*, hls.js@1.6.11:
+  version "1.6.11"
+  resolved "https://registry.yarnpkg.com/hls.js/-/hls.js-1.6.11.tgz#643cf98f93701accdcff3b912d712b2387e8ca3e"
+  integrity sha512-tdDwOAgPGXohSiNE4oxGr3CI9Hx9lsGLFe6TULUvRk2TfHS+w1tSAJntrvxsHaxvjtr6BXsDZM7NOqJFhU4mmg==
 
 hmac-drbg@^1.0.1:
   version "1.0.1"
