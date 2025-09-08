@@ -1398,6 +1398,9 @@ class OT3Controller(FlexBackend):
         except RuntimeError:
             return
 
+        if hasattr(self, "_module_controls") and self._module_controls is not None:
+            await self._module_controls.clean_up()
+
         if hasattr(self, "_event_watcher"):
             if (
                 loop.is_running()
