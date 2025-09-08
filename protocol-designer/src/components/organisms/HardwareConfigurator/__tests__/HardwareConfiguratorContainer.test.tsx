@@ -7,7 +7,7 @@ import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
 
 import { HardwareConfiguratorContainer } from '../HardwareConfiguratorContainer'
-import { useDeckConfigurationEditing } from '../useDeckConfigurationEditing'
+import { useDeckConfigurationEditing } from '../utils'
 
 import type { ComponentProps } from 'react'
 import type * as OpentronsComponents from '@opentrons/components'

@@ -1,6 +1,6 @@
 import { DeckConfigurator } from '@opentrons/components'
 
-import { useDeckConfigurationEditing } from './useDeckConfigurationEditing'
+import { useDeckConfigurationEditing } from './utils'
 
 import type { UseFormSetValue } from 'react-hook-form'
 import type { DeckConfiguration } from '@opentrons/shared-data'
@@ -46,6 +46,7 @@ export function HardwareConfiguratorContainer(
     setValue,
     updateInitialDeckState
   )
+  console.log('deckConfig', deckConfig)
   return (
     <>
       {addFixtureModal}

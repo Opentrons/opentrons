@@ -6,6 +6,7 @@ import { createSelector } from 'reselect'
 
 import {
   ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   getLabwareDefURI,
   getPipetteSpecsV2,
   HEATERSHAKER_MODULE_TYPE,
@@ -71,6 +72,7 @@ import type {
 } from '../reducers'
 import type {
   AbsorbanceReaderState,
+  FlexStackerModuleState,
   FormPipettesByMount,
   HeaterShakerModuleState,
   InitialDeckSetup,
@@ -242,6 +244,9 @@ const ABSORBANCE_READER_INITIAL_STATE: AbsorbanceReaderState = {
   lidOpen: null,
   initialization: null,
 }
+const FLEX_STACKER_INITIAL_STATE: FlexStackerModuleState = {
+  type: FLEX_STACKER_MODULE_TYPE,
+}
 
 const _getInitialDeckSetup = (
   initialSetupStep: FormData,
@@ -289,7 +294,6 @@ const _getInitialDeckSetup = (
     ),
     modules: mapValues<Record<DeckSlot, string>, ModuleOnDeck>(
       moduleLocations as Record<DeckSlot, string>,
-      // @ts-expect-error Flex stacker not yet supported in PD
       (slot: DeckSlot, moduleId: string): ModuleOnDeck => {
         const moduleEntity = moduleEntities[moduleId]
 
@@ -346,6 +350,15 @@ const _getInitialDeckSetup = (
               type: ABSORBANCE_READER_TYPE,
               slot,
               moduleState: ABSORBANCE_READER_INITIAL_STATE,
+              pythonName: moduleEntity.pythonName,
+            }
+          case FLEX_STACKER_MODULE_TYPE:
+            return {
+              id: moduleEntity.id,
+              model: moduleEntity.model,
+              type: FLEX_STACKER_MODULE_TYPE,
+              slot,
+              moduleState: FLEX_STACKER_INITIAL_STATE,
               pythonName: moduleEntity.pythonName,
             }
         }
