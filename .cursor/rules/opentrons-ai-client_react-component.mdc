@@ -217,34 +217,34 @@ Every new component MUST include ALL of the following test categories:
 
 #### 1. Basic Rendering Tests
 
+For components, use `renderWithProviders` instead of using `render`
+
 ```ts
+import { renderWithProviders } from '/ai-client/__testing-utils__'
+const render = (props: ComponentProps<typeof ComponentName>) => {
+  return renderWithProviders(<ComponentName {...props} />)
+}
 describe('ComponentName', () => {
   let props: ComponentProps<typeof ComponentName>
-
   beforeEach(() => {
     props = {
       /* default props */
     }
   })
-
   afterEach(() => {
     vi.clearAllMocks()
   })
-
   it('should render without crashing', () => {
-    render(<ComponentName {...props} />)
+    render(props)
     expect(screen.getByRole('...')).toBeInTheDocument()
   })
-
   it('should render with custom props', () => {
-    props.title = 'Custom Title'
-    render(<ComponentName {...props} />)
+    props = { ...props, title: 'Custom Title' }
+    render(props)
     expect(screen.getByText('Custom Title')).toBeInTheDocument()
   })
-
   it('should render with default values', () => {
-    render(<ComponentName {...props} />)
-    // Test default behavior
+    render(props)
   })
 })
 ```
