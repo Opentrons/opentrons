@@ -33,9 +33,9 @@ The pipette's API load name (``instrument_name``) is the first parameter of the 
         +                         +---------------+-------------------------+
         |                         | 5–1000        | ``flex_8channel_1000``  |
         +-------------------------+---------------+-------------------------+
-        | Flex 96-Channel Pipette | 5–1000        | ``flex_96channel_1000`` |
+        | Flex 96-Channel Pipette | 1–200         | ``flex_96channel_200``  |
         +                         +---------------+-------------------------+
-        |                         | 1–200         | ``flex_96channel_200``  |
+        |                         | 5–1000        | ``flex_96channel_1000`` |
         +-------------------------+---------------+-------------------------+
 
     .. tab:: OT-2 Pipettes

@@ -148,7 +148,7 @@ Version 2.25
 -------------
 
 - Adds :py:class:`.FlexStackerContext` to support the :ref:`Flex Stacker Module <stacker>`. Use the load name ``flexStackerModuleV1`` with :py:meth:`.ProtocolContext.load_module` to add a Flex Stacker and automate labware storage in a protocol.
-- Use the load name ``flex_96channel_200`` with :py:meth:`.load_instrument` to add the Opentrons Flex 96-Channel Pipette (1–200 μL) to a protocol. 
+- Use the load name ``flex_96channel_200`` with :py:meth:`.load_instrument` to add the Opentrons Flex 96-Channel Pipette (1–200 μL) to a protocol. Note that this pipette does not work with liquid class commands in this API version. 
 
 Version 2.24
 -------------
