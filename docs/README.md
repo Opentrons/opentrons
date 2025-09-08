@@ -2,6 +2,7 @@
 
 > [!NOTE]
 > If you're looking to read the Opentrons Documentation, visit <https://docs.opentrons.com>.
+>
 > This document contains information on how the documentation is generated, and how to contribute to it.
 
 Opentrons Documentation is written in [Markdown](https://daringfireball.net/projects/markdown/) and built with [MkDocs](https://www.mkdocs.org).
@@ -22,7 +23,7 @@ This directory contains:
 
 To build a static, local copy of the documentation, run `make build`.
 
-To build and serve the documentation, so you can navigate it in your browser, run `make build`. When running, the documentation is available at `http://127.0.0.1:8000/`. If you need to run the server on a different port or IP address, use `uv run mkdocs serve` with the appropriate options.
+To build and serve the documentation, so you can navigate it in your browser, run `make serve`. When running, the documentation is available at `http://127.0.0.1:8000/`. If you need to run the server on a different port or IP address, use `uv run mkdocs serve` with the appropriate options.
 
 ## Project conventions
 
