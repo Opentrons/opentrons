@@ -57,12 +57,12 @@ def determine_deploy_config(
         branch = ref_name
         bucket = "sandbox.docs"
         url = f"http://sandbox.docs.s3-website.us-east-2.amazonaws.com/{branch}/"
-    elif ref.startswith("refs/tags/staging-MKDOCS"):
+    elif ref.startswith("refs/tags/staging-MKDOCS") or ref.startswith("refs/tags/staging-mkdocs"):
         environment = "staging"
         branch = ref_name
         bucket = "opentrons.staging.docs"
         url = "https://staging.docs.opentrons.com/"
-    elif ref.startswith("refs/tags/MKDOCS"):
+    elif ref.startswith("refs/tags/MKDOCS") or ref.startswith("refs/tags/mkdocs"):
         environment = "production"
         branch = ref_name
         bucket = "opentrons.production.docs"
