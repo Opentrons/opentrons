@@ -3,6 +3,7 @@ from typing_extensions import Final
 import enum
 
 
+# Implemented with an enum to support type narrowing via `== OFF_DECK`.
 class OffDeckType(enum.Enum):
     """The type of the :py:obj:`OFF_DECK` constant.
 
