@@ -73,7 +73,7 @@ jobs:
     needs: ['js-unit-test', 'e2e-test']
     timeout-minutes: 10
     runs-on: 'ubuntu-24.04'
-    if: always() && (needs.js-unit-test.result == 'success' || needs.js-unit-test.result == 'skipped') && (needs.e2e-test.result == 'success' || needs.e2e-test.result == 'skipped') && github.event_name != 'pull_request'
+    if: always() && (needs.js-unit-test.result == 'success' || needs.js-unit-test.result == 'skipped') && (needs.e2e-test.result == 'success' || needs.e2e-test.result == 'skipped') && (github.event_name != 'pull_request' || (github.event_name == 'pull_request' && github.head_ref == 'labware-deploy-clean'))
     steps:
       - name: Debug Build Job
         run: |
