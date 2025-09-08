@@ -31,11 +31,11 @@ const BASE_VISIBLE_FORM_ERROR = {
 
 describe('getBlowoutLocationOptionsForForm', () => {
   const destOption = {
-    name: 'Destination Well',
+    name: 'Destination well',
     value: DEST_WELL_BLOWOUT_DESTINATION,
   }
   const sourceOption = {
-    name: 'Source Well',
+    name: 'Source well',
     value: SOURCE_WELL_BLOWOUT_DESTINATION,
   }
 

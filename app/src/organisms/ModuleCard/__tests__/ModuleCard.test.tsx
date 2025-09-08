@@ -2,6 +2,8 @@ import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
+import { useCurrentAllSubsystemUpdatesQuery } from '@opentrons/react-api-client'
+
 import { nestedTextMatcher, renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useToaster } from '/app/organisms/ToasterOven'
@@ -51,6 +53,7 @@ vi.mock('../ThermocyclerModuleData')
 vi.mock('../HeaterShakerModuleData')
 vi.mock('../FlexStackerModuleData')
 vi.mock('/app/redux/config')
+vi.mock('@opentrons/react-api-client')
 vi.mock('../ModuleOverflowMenu')
 vi.mock('../../ModuleWizardFlows')
 vi.mock('/app/resources/runs')
@@ -275,6 +278,9 @@ describe('ModuleCard', () => {
       isDoorOpen: true,
       moduleDoorLocation: null,
     })
+    vi.mocked(useCurrentAllSubsystemUpdatesQuery).mockReturnValue({
+      data: { data: [] },
+    } as any)
   })
   afterEach(() => {
     vi.resetAllMocks()

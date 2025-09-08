@@ -4,22 +4,16 @@ import '@testing-library/jest-dom/vitest'
 
 import { fireEvent, screen } from '@testing-library/react'
 
-import { renderWithProviders } from '/app/__testing-utils__'
-import { StepMeter } from '/app/atoms/StepMeter'
-import { i18n } from '/app/i18n'
-import { getIsOnDevice } from '/app/redux/config'
-
 import { WizardHeader } from '..'
+import { StepMeter } from '../../../atoms/StepMeter'
+import { renderWithProviders } from '../../../testing/utils'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('/app/atoms/StepMeter')
-vi.mock('/app/redux/config')
+vi.mock('../../../atoms/StepMeter')
 
 const render = (props: ComponentProps<typeof WizardHeader>) => {
-  return renderWithProviders(<WizardHeader {...props} />, {
-    i18nInstance: i18n,
-  })[0]
+  return renderWithProviders(<WizardHeader {...props} />)
 }
 
 describe('WizardHeader', () => {
@@ -33,7 +27,6 @@ describe('WizardHeader', () => {
       currentStep: 1,
     }
     vi.mocked(StepMeter).mockReturnValue(<div>step meter</div>)
-    vi.mocked(getIsOnDevice).mockReturnValue(false)
   })
 
   it('renders correct information with step count visible and pressing on button calls props', () => {
@@ -47,7 +40,6 @@ describe('WizardHeader', () => {
   })
 
   it('renders correct information when on device display is true', () => {
-    vi.mocked(getIsOnDevice).mockReturnValue(true)
     render(props)
     screen.getByText('Tip Length Calibrations')
     const exit = screen.getByRole('button', { name: 'Exit' })

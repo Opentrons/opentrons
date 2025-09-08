@@ -24,6 +24,7 @@ from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
     LabwareDefinition2,
+    LabwareDefinition3,
     InnerWellGeometry,
 )
 from opentrons_shared_data.deck.types import CutoutFixture
@@ -89,6 +90,7 @@ from ..types import (
     WellLocationType,
     WellLocationFunction,
     GripperMoveType,
+    AddressableArea,
 )
 from ..types.liquid_level_detection import SimulatedProbeResult, LiquidTrackingType
 from .config import Config
@@ -709,7 +711,7 @@ class GeometryView:
 
         if well_def.shape != "circular":
             raise errors.LabwareIsNotTipRackError(
-                f"Well {well_name} in labware {labware_id} is not circular."
+                f"Well {well_name} in labware {self._labware.get_display_name(labware_id)} is not circular."
             )
 
         return TipGeometry(
@@ -800,7 +802,7 @@ class GeometryView:
                 slot_name = DeckSlotName.from_primitive(area_name)
         elif labware.location == OFF_DECK_LOCATION:
             raise errors.LabwareNotOnDeckError(
-                f"Labware {labware_id} does not have a slot associated with it"
+                f"Labware {self._labware.get_display_name(labware_id)} does not have a slot associated with it"
                 f" since it is no longer on the deck."
             )
         else:
@@ -1004,10 +1006,31 @@ class GeometryView:
         It is calculated as the xy center of the slot with z as the point indicated by
         z-position of labware bottom + grip height from labware bottom.
         """
+        mod_cal_offset = self._get_calibrated_module_offset(location)
+        user_additional_offset = user_additional_offset or Point()
+        aa_origin_to_nominal_grip_point = self._get_aa_origin_to_nominal_grip_point(
+            labware_definition=labware_definition,
+            location=location,
+            move_type=move_type,
+        )
+
+        return aa_origin_to_nominal_grip_point + mod_cal_offset + user_additional_offset
+
+    def _get_aa_origin_to_nominal_grip_point(
+        self,
+        labware_definition: LabwareDefinition,
+        location: Union[
+            DeckSlotLocation, ModuleLocation, OnLabwareLocation, AddressableAreaLocation
+        ],
+        move_type: GripperMoveType,
+    ) -> Point:
+        """Get the nominal grip point of a labware.
+
+        Does not include module calibration offsets or user additional offsets.
+        """
+        grip_z_from_lw_origin = self._labware.get_grip_z(labware_definition)
         aa_name = self._get_underlying_addressable_area_name(location)
         addressable_area = self._addressable_areas.get_addressable_area(aa_name)
-        slot_front_left = self._addressable_areas.get_addressable_area_position(aa_name)
-
         stackup_defs_locs = self._get_stackup_lw_info_top_to_bottom(
             labware_definition=labware_definition, location=location
         )
@@ -1023,7 +1046,7 @@ class GeometryView:
             else LabwareOriginContext.GRIPPER_DROPPING
         )
 
-        stackup_placement_origin_to_lw_origin = get_stackup_origin_to_labware_origin(
+        aa_origin_to_lw_origin = get_stackup_origin_to_labware_origin(
             context=context_type,
             module_parent_to_child_offset=module_parent_to_child_offset,
             underlying_ancestor_definition=underlying_ancestor_def,
@@ -1031,27 +1054,41 @@ class GeometryView:
             slot_name=addressable_area.base_slot,
             deck_definition=self._addressable_areas.deck_definition,
         )
-        mod_cal_offset = self._get_calibrated_module_offset(location)
 
-        lw_origin_to_lw_center = self._get_labware_center(labware_definition)
-        grip_z_from_lw_origin = self._labware.get_grip_z(labware_definition)
-        lw_origin_to_lw_grip_center = Point(
-            x=lw_origin_to_lw_center.x,
-            y=lw_origin_to_lw_center.y,
-            z=grip_z_from_lw_origin,
-        )
+        if isinstance(labware_definition, LabwareDefinition2):
+            lw_origin_to_aa_origin = self._get_lw_origin_to_parent(
+                labware_definition=labware_definition, addressable_area=addressable_area
+            )
+            aa_origin_to_aa_center = (
+                self._addressable_areas.get_addressable_area_center(aa_name)
+            )
+            aa_center_to_nominal_grip_point = Point(0, 0, grip_z_from_lw_origin)
 
-        user_additional_offset = user_additional_offset or Point()
+            return (
+                aa_origin_to_lw_origin
+                + lw_origin_to_aa_origin
+                + aa_origin_to_aa_center
+                + aa_center_to_nominal_grip_point
+            )
 
-        return (
-            slot_front_left
-            + stackup_placement_origin_to_lw_origin
-            + lw_origin_to_lw_grip_center
-            + mod_cal_offset
-            + user_additional_offset
-        )
+        else:
+            assert isinstance(labware_definition, LabwareDefinition3)
 
-    def _get_labware_center(self, labware_definition: LabwareDefinition) -> Point:
+            aa_origin = self._addressable_areas.get_addressable_area_position(aa_name)
+            lw_origin_to_lw_center = self._get_lw_origin_to_lw_center(
+                labware_definition
+            )
+            lw_origin_to_lw_grip_center = Point(
+                x=lw_origin_to_lw_center.x,
+                y=lw_origin_to_lw_center.y,
+                z=grip_z_from_lw_origin,
+            )
+
+            return aa_origin + aa_origin_to_lw_origin + lw_origin_to_lw_grip_center
+
+    def _get_lw_origin_to_lw_center(
+        self, labware_definition: LabwareDefinition
+    ) -> Point:
         """Get the x,y,z center of the labware."""
         if isinstance(labware_definition, LabwareDefinition2):
             dimensions = labware_definition.dimensions
@@ -1069,6 +1106,23 @@ class GeometryView:
             z = (front_right_top.z - back_left_bottom.z) / 2
 
             return Point(x, y, z)
+
+    def _get_lw_origin_to_parent(
+        self, labware_definition: LabwareDefinition, addressable_area: AddressableArea
+    ) -> Point:
+        if isinstance(labware_definition, LabwareDefinition2):
+            return Point(0, 0, 0)
+        else:
+            bb_y = addressable_area.bounding_box.y
+            bb_z = addressable_area.bounding_box.z
+            return (
+                Point(
+                    x=0,
+                    y=bb_y,
+                    z=bb_z,
+                )
+                * -1
+            )
 
     def get_extra_waypoints(
         self,
@@ -2032,7 +2086,8 @@ class GeometryView:
             except InvalidLiquidHeightFound as _exception:
                 raise InvalidLiquidHeightFound(
                     message=_exception.message
-                    + f"for well {well_name} of {self._labware.get_display_name(labware_id)} on slot {self.get_ancestor_slot_name(labware_id)}"
+                    + f"for well {well_name} of {self._labware.get_display_name(labware_id)}"
+                    f" on slot {self.get_ancestor_slot_name(labware_id)}"
                 )
             # if meniscus volume is a simulated value, comparisons aren't meaningful
             if isinstance(meniscus_volume, SimulatedProbeResult):
@@ -2040,13 +2095,16 @@ class GeometryView:
             remaining_volume = well_volumetric_capacity - meniscus_volume
             if volume > remaining_volume:
                 raise errors.InvalidDispenseVolumeError(
-                    f"Attempting to dispense {volume}µL of liquid into a well that can currently only hold {remaining_volume}µL (well {well_name} in labware_id: {labware_id})"
+                    f"Attempting to dispense {volume}µL of liquid into a well that can currently only hold"
+                    f" {remaining_volume}µL (well {well_name} in labware {self._labware.get_display_name(labware_id)})"
                 )
         else:
             # TODO(pbm, 10-08-24): factor in well (LabwareStore) state volume
             if volume > well_volumetric_capacity:
                 raise errors.InvalidDispenseVolumeError(
-                    f"Attempting to dispense {volume}µL of liquid into a well that can only hold {well_volumetric_capacity}µL (well {well_name} in labware_id: {labware_id})"
+                    f"Attempting to dispense {volume}µL of liquid into a well that can only hold"
+                    f" {well_volumetric_capacity}µL (well {well_name} in"
+                    f" labware {self._labware.get_display_name(labware_id)})"
                 )
 
     def get_wells_covered_by_pipette_with_active_well(

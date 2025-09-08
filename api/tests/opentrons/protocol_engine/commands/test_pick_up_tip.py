@@ -67,6 +67,7 @@ async def test_success(
             minimum_z_height=None,
             speed=None,
             operation_volume=None,
+            offset_pipette_for_reservoir_subwells=False,
         )
     ).then_return(Point(x=111, y=222, z=333))
 
@@ -167,6 +168,7 @@ async def test_tip_physically_missing_error(
             minimum_z_height=None,
             speed=None,
             operation_volume=None,
+            offset_pipette_for_reservoir_subwells=False,
         )
     ).then_return(Point(x=111, y=222, z=333))
     decoy.when(
@@ -276,6 +278,7 @@ async def test_stall_error(
             minimum_z_height=None,
             speed=None,
             operation_volume=None,
+            offset_pipette_for_reservoir_subwells=False,
         )
     ).then_raise(StallOrCollisionDetectedError())
 

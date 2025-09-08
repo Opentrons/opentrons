@@ -153,7 +153,7 @@ describe('thermocyclerFormToArgs', () => {
       expected: {
         commandCreatorFnName: THERMOCYCLER_PROFILE,
         moduleId: tcModuleId,
-
+        description: 'mock details',
         blockTargetTempHold: null,
         lidOpenHold: true,
         lidTargetTempHold: 5,

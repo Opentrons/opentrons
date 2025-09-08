@@ -101,9 +101,10 @@ export const stepFormToArgs = (
     console.warn(`stepFormToArgs not implemented for ${castForm.stepType}`)
     return null
   }
-
   return {
     ...stepArgs,
     stepNumber: castForm.stepNumber,
+    name: castForm.stepName,
+    description: castForm.stepDetails,
   }
 }

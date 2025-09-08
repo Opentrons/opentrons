@@ -5,13 +5,12 @@ import { StyledText } from '@opentrons/components'
 import { LabwareButton } from '../../atoms'
 import styles from './labwarebuttonbasket.module.css'
 
-import type { Dispatch, SetStateAction } from 'react'
 import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/step-forms'
 
 interface LabwareButtonBasketProps {
   stackOfLabware: string[]
   labware: AllTemporalPropertiesForTimelineFrame['labware']
-  setSelectedLabware: Dispatch<SetStateAction<string>>
+  setSelectedLabware: (selectedLabwareId: string) => void
   selectedLabware: string
 }
 export function LabwareButtonBasket(

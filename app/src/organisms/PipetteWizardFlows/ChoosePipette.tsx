@@ -26,6 +26,7 @@ import {
   RESPONSIVENESS,
   SPACING,
   TYPOGRAPHY,
+  WizardHeader,
 } from '@opentrons/components'
 import {
   EIGHT_CHANNEL,
@@ -41,7 +42,6 @@ import ninetySixChannel from '/app/assets/images/change-pip/ninety-six-channel.p
 import { SmallButton } from '/app/atoms/buttons'
 import { i18n } from '/app/i18n'
 import { ModalContentOneColSimpleButtons } from '/app/molecules/InterventionModal'
-import { WizardHeader } from '/app/molecules/WizardHeader'
 import { getIsOnDevice } from '/app/redux/config'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 

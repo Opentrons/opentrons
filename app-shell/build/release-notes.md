@@ -22,6 +22,10 @@ Welcome to the v8.6.0 release of the Opentrons App! This release adds support fo
 - Easily tell your tip racks apart during run setup. Colored tip racks now appear in the app to match different tip volume ranges.
 - Improvements to Labware Position Check include new prompts to apply offsets before a protocol run.
 
+### Known Issues
+
+- Error recovery may fail when trying to store labware in the Stacker.
+
 ---
 
 ## Opentrons App Changes in 8.5.1

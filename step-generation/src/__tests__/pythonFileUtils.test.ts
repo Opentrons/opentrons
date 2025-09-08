@@ -93,11 +93,11 @@ metadata = {
 describe('pythonRequirements', () => {
   it('should generate requirements section', () => {
     expect(pythonRequirements(OT2_ROBOT_TYPE)).toBe(
-      `requirements = {"robotType": "OT-2", "apiLevel": "2.25"}`
+      `requirements = {"robotType": "OT-2", "apiLevel": "2.26"}`
     )
 
     expect(pythonRequirements(FLEX_ROBOT_TYPE)).toBe(
-      `requirements = {"robotType": "Flex", "apiLevel": "2.25"}`
+      `requirements = {"robotType": "Flex", "apiLevel": "2.26"}`
     )
   })
 })
@@ -189,7 +189,7 @@ const labwareRobotState: TimelineFrame['labware'] = {
   //  labware on a slot
   [labwareId5]: { stack: [labwareId5, 'C2'] },
   // lid on labware
-  [labwareId6]: { stack: [labwareId6, labwareId3, labwareId2, 'B2'] },
+  [labwareId6]: { stack: [labwareId6, labwareId4, moduleId3, 'A2'] },
 }
 
 const mockLabwareNicknames: Record<string, string> = {
@@ -335,13 +335,15 @@ well_plate_1 = adapter_2.load_labware(
     "fixture_96_plate",
     label="reagent plate",
     namespace="opentrons",
-    lid="mock_lid",
     version=1,
 )
 well_plate_2 = magnetic_block_2.load_labware(
     "fixture_96_plate",
     namespace="opentrons",
     version=1,
+    lid="mock_lid",
+    lid_namespace="opentrons",
+    lid_version=1,
 )
 well_plate_3 = protocol.load_labware_from_definition(
     CUSTOM_LABWARE["fixture/fixture_96_plate/1"],
