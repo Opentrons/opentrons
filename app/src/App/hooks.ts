@@ -23,6 +23,7 @@ import {
 
 import { useToaster } from '/app/organisms/ToasterOven'
 import { checkShellUpdate } from '/app/redux/shell'
+import { remote } from '/app/redux/shell/remote'
 
 import { useNotifyDeckConfigurationQuery } from '../resources/deck_configuration'
 import { useAttachedPipettes } from '../resources/instruments'
@@ -30,11 +31,13 @@ import { useAttachedModules } from '../resources/modules'
 import { useCurrentRunId } from '../resources/runs'
 import { SharedScrollRefContext } from './ODDProviders/ScrollRefProvider'
 
+import type { IpcMainEvent } from 'electron'
 import type { AttachedModule } from '@opentrons/api-client'
 import type {
   ModuleType,
   SetStatusBarCreateCommand,
 } from '@opentrons/shared-data'
+import type { WindowType } from '/app/App/types'
 import type { Dispatch } from '/app/redux/types'
 
 const UPDATE_RECHECK_INTERVAL_MS = 60000
@@ -263,4 +266,35 @@ export function useScrollRef(): {
     isScrolling,
     element,
   }
+}
+
+// TODO(jh, 09-08-25): Ensure window type is retrievable after window instantiation. EXEC-1823.
+// Returns the type of window spawned by the shell.
+export function useWindowType(): WindowType {
+  const [windowType, setWindowType] = useState<WindowType>(null)
+
+  useEffect(() => {
+    try {
+      // Listen for window type from main process
+      const handleWindowType = (_: IpcMainEvent, type: string): void => {
+        if (type === 'main' || type === 'secondary') {
+          setWindowType(type)
+        } else {
+          console.error(`Received unhandled window type from shell ${type}`)
+        }
+      }
+
+      remote.ipcRenderer.on('window-type', handleWindowType)
+
+      return () => {
+        remote.ipcRenderer.off('window-type', handleWindowType)
+      }
+    } catch (error) {
+      console.error('Failed to setup window type listener:', error)
+      // Fallback to main window if electron APIs not available
+      setWindowType('main')
+    }
+  }, [])
+
+  return windowType
 }

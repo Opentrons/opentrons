@@ -34,6 +34,7 @@ export type ProtocolRunDetailsTab =
   | 'module-controls'
   | 'run-preview'
   | 'runtime-parameters'
+  | 'camera'
 
 /**
  * desktop app route params type definition
@@ -56,3 +57,9 @@ export interface OnDeviceRouteParams {
   runId: string
   quickTransferId: string
 }
+
+/* The type of electron-created window.
+ * Main: Renders DesktopApp/OnDeviceDisplay
+ * Secondary: Renders SecondaryWindowApp
+ * */
+export type WindowType = 'main' | 'secondary' | null

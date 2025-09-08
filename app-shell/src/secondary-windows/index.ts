@@ -45,7 +45,11 @@ export function registerCameraStream(
 function detailsByActionType(action: Action): SecondaryWindowDetails | null {
   switch (action.type) {
     case CAMERA_STREAM_OPEN:
-      return openCameraStream(action.payload.hostname, log)
+      return openCameraStream({
+        robotIp: action.payload.hostname,
+        robotName: action.payload.robotName,
+        log,
+      })
     default:
       return null
   }
@@ -67,6 +71,10 @@ function openWindow(details: SecondaryWindowDetails): void {
     const window = createUi()
     secondaryWindows.set(windowId, window)
 
+    window.webContents.once('did-finish-load', () => {
+      log.debug(`Did finish load for ${type}`)
+      window.webContents.send('window-type', 'secondary')
+    })
     window.once('closed', () => {
       log.debug('Camera stream window closed')
       secondaryWindows.delete(windowId)
