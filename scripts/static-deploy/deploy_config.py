@@ -1,20 +1,18 @@
 """Deployment configuration for Opentrons applications."""
 
+import json
 import os
 import sys
-import json
 from dataclasses import dataclass
-from typing import Literal, Dict, Optional, Tuple
+from typing import Dict, Literal, Optional, Tuple
 
-try:
-    from rich.console import Console
-    from rich.panel import Panel
-    from rich.tree import Tree
-    RICH_AVAILABLE = True
-except ImportError:
-    RICH_AVAILABLE = False
+from rich.console import Console
+from rich.panel import Panel
+from rich.tree import Tree
 
 DEFAULT = "not_set"
+
+console = Console()
 
 
 class InvalidEnvironmentError(ValueError):
@@ -171,7 +169,7 @@ def get_config(environment: str, application: str) -> ApplicationConfig:
     return getattr(env_config, application)
 
 
-def parse_github_event_context(
+def parse_github_event_context(  # noqa: C901
     event_name: str,
     ref: str,
     ref_name: str,
@@ -180,46 +178,36 @@ def parse_github_event_context(
 ) -> Tuple[str, str, str]:
     """
     Parse GitHub event context to determine application, environment, and branch.
-    
+
     Args:
         event_name: GitHub event name (e.g., 'push', 'pull_request')
         ref: Full git reference (e.g., 'refs/heads/main', 'refs/tags/staging-labware-library-v1.0.0')
         ref_name: Reference name (e.g., 'main', 'staging-labware-library-v1.0.0')
         ref_type: Reference type ('branch' or 'tag')
         head_ref: Head reference for pull requests
-        
+
     Returns:
         Tuple of (application, environment, branch)
     """
-    
-    # Determine application based on tag patterns or ref patterns
+
+    # Determine application based on tag patterns
     application = "labware_library"  # default
-    
+
     if ref_type == "tag":
         # Tag-based application detection
-        if any(ref_name.startswith(prefix) for prefix in [
-            "tmp-staging-labware-library", "staging-labware-library",
-            "tmp-labware-library", "labware-library"
-        ]):
+        if any(
+            ref_name.startswith(prefix)
+            for prefix in ["tmp-staging-labware-library", "staging-labware-library", "tmp-labware-library", "labware-library"]
+        ):
             application = "labware_library"
-        elif any(ref_name.startswith(prefix) for prefix in [
-            "staging-mkdocs", "mkdocs"
-        ]):
+        elif any(ref_name.startswith(prefix) for prefix in ["staging-mkdocs", "mkdocs"]):
             application = "mkdocs"
-        elif any(ref_name.startswith(prefix) for prefix in [
-            "staging-docs", "docs"
-        ]):
+        elif any(ref_name.startswith(prefix) for prefix in ["staging-docs", "docs"]):
             application = "docs"
-    elif ref_type == "branch":
-        # Branch-based application detection
-        if ref_name in ["labware-deploy-clean", "edge"]:
-            application = "labware_library"
-        elif ref_name in ["mkdocs-new-workflow", "edge"]:
-            application = "mkdocs"
-        elif ref_name in ["docs-deploy"]:
-            application = "docs"
-    
+    # TODO: If not a tag, determine the application based on the name of the workflow.
+
     # Determine environment and branch based on event type and application
+    # TODO: let us change branch to sandbox_prefix we will publish to sandbox on push of tag and PR
     if event_name == "pull_request":
         environment = "sandbox"
         # Handle empty or null head_ref values
@@ -245,7 +233,7 @@ def parse_github_event_context(
             branch = ref_name
     else:
         raise ValueError(f"No deployment configuration found for event: {event_name}, ref: {ref}")
-    
+
     return application, environment, branch
 
 
@@ -258,14 +246,14 @@ def determine_deploy_config(
 ) -> Dict[str, str]:
     """
     Determine deployment configuration based on GitHub event context.
-    
+
     Args:
         event_name: GitHub event name (e.g., 'push', 'pull_request')
         ref: Full git reference (e.g., 'refs/heads/main', 'refs/tags/staging-labware-library-v1.0.0')
         ref_name: Reference name (e.g., 'main', 'staging-labware-library-v1.0.0')
         ref_type: Reference type ('branch' or 'tag')
         head_ref: Head reference for pull requests
-        
+
     Returns:
         Dictionary containing deployment configuration:
         - application: Application name (e.g., 'labware_library', 'mkdocs')
@@ -275,21 +263,19 @@ def determine_deploy_config(
         - url: Full URL for the deployed site
         - cloudfront_id: CloudFront distribution ID (empty for sandbox)
     """
-    
+
     # Parse the GitHub event context
-    application, environment, branch = parse_github_event_context(
-        event_name, ref, ref_name, ref_type, head_ref
-    )
-    
+    application, environment, branch = parse_github_event_context(event_name, ref, ref_name, ref_type, head_ref)
+
     # Get the configuration for this application and environment
     config = get_config(environment, application)
-    
+
     # Build the URL with branch path for sandbox
     if environment == "sandbox":
         url = f"{config.url}{branch}/"
     else:
         url = config.url
-    
+
     return {
         "application": application,
         "environment": environment,
@@ -301,30 +287,7 @@ def determine_deploy_config(
 
 
 def print_deploy_config() -> None:
-    """Pretty print the complete deployment configuration using rich if available, otherwise plain text."""
-
-    if not RICH_AVAILABLE:
-        # Fallback to plain text output
-        config = get_deploy_config()
-        print("🚀 Deploy Configuration")
-        print("=" * 50)
-        
-        for env_name in ["sandbox", "staging", "production"]:
-            env_config = getattr(config, env_name)
-            emoji = {"sandbox": "🏗️", "staging": "🧪", "production": "🌟"}[env_name]
-            print(f"\n{emoji} {env_name.title()}")
-            print("-" * 20)
-            
-            for app_name in ["labware_library", "protocol_designer", "docs", "mkdocs"]:
-                app_config = getattr(env_config, app_name)
-                app_display_name = app_name.replace("_", " ").title()
-                print(f"  📦 {app_display_name}")
-                print(f"    🪣 S3 Bucket: {app_config.s3_bucket}")
-                print(f"    ☁️  CloudFront: {app_config.cloudfront_id or 'None'}")
-                print(f"    🌐 URL: {app_config.url}")
-        return
-
-    console = Console()
+    """Pretty print the complete deployment configuration using rich."""
     config = get_deploy_config()
 
     # Create the main tree
@@ -357,16 +320,20 @@ def main() -> None:
     if len(sys.argv) > 1:
         # Command-line usage for testing deployment configuration
         if len(sys.argv) < 5:
-            print("Usage: python deploy_config.py <event_name> <ref> <ref_name> <ref_type> [head_ref]")
-            print("Example: python deploy_config.py push refs/tags/tmp-staging-labware-library-202509041016 tmp-staging-labware-library-202509041016 tag")
+            console.print("Usage: python deploy_config.py <event_name> <ref> <ref_name> <ref_type> [head_ref]")
+            console.print(
+                "Example: python deploy_config.py push "
+                "refs/tags/tmp-staging-labware-library-202509041016 "
+                "tmp-staging-labware-library-202509041016 tag"
+            )
             sys.exit(1)
-        
+
         event_name = sys.argv[1]
         ref = sys.argv[2]
         ref_name = sys.argv[3]
         ref_type = sys.argv[4]
         head_ref = sys.argv[5] if len(sys.argv) > 5 else None
-        
+
         try:
             config = determine_deploy_config(
                 event_name=event_name,
@@ -375,25 +342,24 @@ def main() -> None:
                 ref_type=ref_type,
                 head_ref=head_ref,
             )
-            
-            # Output in GitHub Actions format
+
+            # Output in GitHub Actions format using rich for better formatting
             for key, value in config.items():
-                print(f"{key}={value}")
-                
-            # Also output as JSON for debugging
-            print(f"# JSON: {json.dumps(config, indent=2)}")
-            
+                console.print(f"{key}={value}")
+
+            # Also output as JSON for debugging using rich
+            console.print(f"# JSON: {json.dumps(config, indent=2)}")
+
             # For GitHub Actions, we need to set the outputs
-            if os.environ.get('GITHUB_OUTPUT'):
-                with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+            if os.environ.get("GITHUB_OUTPUT"):
+                with open(os.environ["GITHUB_OUTPUT"], "a") as f:
                     for key, value in config.items():
                         f.write(f"{key}={value}\n")
-            
-        except Exception as e:
-            print(f"Error: {e}", file=sys.stderr)
+
+        except Exception:
+            console.print_exception()
             sys.exit(1)
     else:
-        # Default behavior: print the complete configuration
         print_deploy_config()
 
 

@@ -1,16 +1,15 @@
 """Tests for deploy_config module."""
 
-import os
 from unittest.mock import patch
 
 import pytest
 from deploy_config import (
-    DEFAULT,
     ApplicationConfig,
     InvalidApplicationError,
     InvalidEnvironmentError,
     get_config,
     main,
+    parse_github_event_context,
 )
 
 
@@ -69,70 +68,219 @@ def test_environment_error_message_format():
 def test_application_error_message_format():
     """Test that application error messages are well formatted."""
     with pytest.raises(InvalidApplicationError) as excinfo:
-        get_config("sandbox", "docs")
+        get_config("sandbox", "invalid_app")
 
     error_msg = str(excinfo.value)
-    assert "Invalid application 'docs'" in error_msg
-    assert "Valid applications are: labware_library, protocol_designer" in error_msg
+    assert "Invalid application 'invalid_app'" in error_msg
+    assert "Valid applications are: labware_library, protocol_designer, docs, mkdocs" in error_msg
 
 
 def test_main_function():
-    """Test that main function runs without error."""
-    # Test that main doesn't crash
+    """Test that main function runs without error when called with no arguments."""
+    # Test that main doesn't crash when called with no arguments (should print config)
     try:
-        main()
+        with patch("sys.argv", ["deploy_config.py"]):  # Simulate no arguments
+            main()
+    except SystemExit:
+        # SystemExit is expected when there are insufficient arguments
+        pass
     except Exception as e:
-        pytest.fail(f"main() raised an exception: {e}")
+        pytest.fail(f"main() raised an unexpected exception: {e}")
 
 
 def test_get_deploy_config_with_env_vars():
-    """Test that get_deploy_config uses environment variables when available."""
-    sandbox_bucket = "test-sandbox-labware-bucket"
-    sandbox_cf = "test-sandbox-labware-cf"
-    production_bucket = "test-prod-designer-bucket"
+    """Test that get_deploy_config returns static configuration (env vars not currently used)."""
+    # Current implementation uses static configuration, not environment variables
+    # This test verifies the actual behavior
+    sandbox_labware = get_config("sandbox", "labware_library")
+    production_designer = get_config("production", "protocol_designer")
+    sandbox_designer = get_config("sandbox", "protocol_designer")
 
-    test_env_vars = {
-        "SANDBOX_LABWARE_LIBRARY_S3_BUCKET": sandbox_bucket,
-        "SANDBOX_LABWARE_LIBRARY_CLOUDFRONT_ID": sandbox_cf,
-        "PRODUCTION_PROTOCOL_DESIGNER_S3_BUCKET": production_bucket,
-    }
-
-    with patch.dict(os.environ, test_env_vars, clear=False):
-        # Test via get_config function
-        sandbox_labware = get_config("sandbox", "labware_library")
-        production_designer = get_config("production", "protocol_designer")
-        sandbox_designer = get_config("sandbox", "protocol_designer")
-
-        # Check that env vars are used
-        assert sandbox_labware.s3_bucket == sandbox_bucket
-        assert sandbox_labware.cloudfront_id == sandbox_cf
-        assert production_designer.s3_bucket == production_bucket
-
-    # Check that defaults are used when env vars not set
-    assert sandbox_designer.s3_bucket == "not_set"  # Using DEFAULT constant
+    # Check that static configuration is returned
+    assert sandbox_labware.s3_bucket == "opentrons.sandbox.labware"
+    assert sandbox_labware.cloudfront_id == ""  # No CloudFront for sandbox
+    assert production_designer.s3_bucket == "opentrons.production.protocol-designer"
+    assert sandbox_designer.s3_bucket == "opentrons.sandbox.protocol-designer"
 
 
 def test_get_deploy_config_with_defaults():
-    """Test that get_deploy_config uses defaults when no env vars are set."""
-    # Clear any existing env vars that might affect the test
-    env_vars_to_clear = [
-        "SANDBOX_LABWARE_LIBRARY_S3_BUCKET",
-        "SANDBOX_LABWARE_LIBRARY_CLOUDFRONT_ID",
-        "SANDBOX_PROTOCOL_DESIGNER_S3_BUCKET",
-        "SANDBOX_PROTOCOL_DESIGNER_CLOUDFRONT_ID",
-    ]
+    """Test that get_deploy_config returns static configuration values."""
+    # Current implementation uses static configuration, not environment variables
+    # Test via get_config function
+    sandbox_labware = get_config("sandbox", "labware_library")
+    sandbox_designer = get_config("sandbox", "protocol_designer")
 
-    # Remove the environment variables entirely
-    with patch.dict(os.environ, {}, clear=False):
-        # Make sure the vars are not in the environment
-        for var in env_vars_to_clear:
-            os.environ.pop(var, None)
+    # Check that static configuration values are returned
+    assert sandbox_labware.s3_bucket == "opentrons.sandbox.labware"
+    assert sandbox_labware.cloudfront_id == ""  # No CloudFront for sandbox
+    assert sandbox_designer.s3_bucket == "opentrons.sandbox.protocol-designer"
+    assert sandbox_designer.cloudfront_id == ""  # No CloudFront for sandbox
 
-        # Test via get_config function
-        sandbox_labware = get_config("sandbox", "labware_library")
-        sandbox_designer = get_config("sandbox", "protocol_designer")
 
-        assert sandbox_labware.s3_bucket == DEFAULT
-        assert sandbox_labware.cloudfront_id == DEFAULT
-        assert sandbox_designer.s3_bucket == DEFAULT
-        assert sandbox_designer.cloudfront_id == DEFAULT
+class TestParseGithubEventContext:
+    """Tests for the parse_github_event_context function."""
+
+    def test_pull_request_with_valid_head_ref(self):
+        """Test pull request event with valid head_ref."""
+        app, env, branch = parse_github_event_context(
+            event_name="pull_request", ref="refs/pull/123/merge", ref_name="123/merge", ref_type="branch", head_ref="feature-branch"
+        )
+
+        assert app == "labware_library"  # default application
+        assert env == "sandbox"
+        assert branch == "feature-branch"
+
+    def test_pull_request_with_empty_head_ref(self):
+        """Test pull request event with empty head_ref."""
+        app, env, branch = parse_github_event_context(
+            event_name="pull_request", ref="refs/pull/123/merge", ref_name="123/merge", ref_type="branch", head_ref=""
+        )
+
+        assert app == "labware_library"
+        assert env == "sandbox"
+        assert branch == "unknown"
+
+    def test_pull_request_with_none_head_ref(self):
+        """Test pull request event with None head_ref."""
+        app, env, branch = parse_github_event_context(
+            event_name="pull_request", ref="refs/pull/123/merge", ref_name="123/merge", ref_type="branch", head_ref=None
+        )
+
+        assert app == "labware_library"
+        assert env == "sandbox"
+        assert branch == "unknown"
+
+    def test_push_branch_event(self):
+        """Test push event to a branch."""
+        app, env, branch = parse_github_event_context(event_name="push", ref="refs/heads/edge", ref_name="edge", ref_type="branch")
+
+        assert app == "labware_library"
+        assert env == "sandbox"
+        assert branch == "edge"
+
+    def test_push_tag_staging_labware_library(self):
+        """Test push event for staging labware library tag."""
+        app, env, branch = parse_github_event_context(
+            event_name="push",
+            ref="refs/tags/tmp-staging-labware-library-202509041016",
+            ref_name="tmp-staging-labware-library-202509041016",
+            ref_type="tag",
+        )
+
+        assert app == "labware_library"
+        assert env == "staging"
+        assert branch == "tmp-staging-labware-library-202509041016"
+
+    def test_push_tag_production_labware_library(self):
+        """Test push event for production labware library tag."""
+        app, env, branch = parse_github_event_context(
+            event_name="push", ref="refs/tags/tmp-labware-library-202509041016", ref_name="tmp-labware-library-202509041016", ref_type="tag"
+        )
+
+        assert app == "labware_library"
+        assert env == "production"
+        assert branch == "tmp-labware-library-202509041016"
+
+    def test_push_tag_staging_mkdocs(self):
+        """Test push event for staging mkdocs tag."""
+        app, env, branch = parse_github_event_context(
+            event_name="push", ref="refs/tags/staging-mkdocs-v1.0.0", ref_name="staging-mkdocs-v1.0.0", ref_type="tag"
+        )
+
+        assert app == "mkdocs"
+        assert env == "staging"
+        assert branch == "staging-mkdocs-v1.0.0"
+
+    def test_push_tag_production_mkdocs(self):
+        """Test push event for production mkdocs tag."""
+        app, env, branch = parse_github_event_context(
+            event_name="push", ref="refs/tags/mkdocs-v1.0.0", ref_name="mkdocs-v1.0.0", ref_type="tag"
+        )
+
+        assert app == "mkdocs"
+        assert env == "production"
+        assert branch == "mkdocs-v1.0.0"
+
+    def test_push_tag_staging_docs(self):
+        """Test push event for staging docs tag."""
+        app, env, branch = parse_github_event_context(
+            event_name="push", ref="refs/tags/staging-docs-v1.0.0", ref_name="staging-docs-v1.0.0", ref_type="tag"
+        )
+
+        assert app == "docs"
+        assert env == "staging"
+        assert branch == "staging-docs-v1.0.0"
+
+    def test_push_tag_production_docs(self):
+        """Test push event for production docs tag."""
+        app, env, branch = parse_github_event_context(
+            event_name="push", ref="refs/tags/docs-v1.0.0", ref_name="docs-v1.0.0", ref_type="tag"
+        )
+
+        assert app == "docs"
+        assert env == "production"
+        assert branch == "docs-v1.0.0"
+
+    def test_push_tag_unrecognized_defaults_to_sandbox(self):
+        """Test push event for unrecognized tag defaults to sandbox."""
+        app, env, branch = parse_github_event_context(
+            event_name="push", ref="refs/tags/random-tag-name", ref_name="random-tag-name", ref_type="tag"
+        )
+
+        assert app == "labware_library"  # default application
+        assert env == "sandbox"  # default for unrecognized tags
+        assert branch == "random-tag-name"
+
+    def test_branch_based_application_detection_mkdocs(self):
+        """Test branch-based application detection defaults to labware_library (not implemented yet)."""
+        # Note: Branch-based application detection is not yet implemented
+        # Currently defaults to labware_library for all branch events
+        app, env, branch = parse_github_event_context(
+            event_name="push", ref="refs/heads/mkdocs-new-workflow", ref_name="mkdocs-new-workflow", ref_type="branch"
+        )
+
+        assert app == "labware_library"  # Default application (branch detection not implemented)
+        assert env == "sandbox"
+        assert branch == "mkdocs-new-workflow"
+
+    def test_branch_based_application_detection_docs(self):
+        """Test branch-based application detection defaults to labware_library (not implemented yet)."""
+        # Note: Branch-based application detection is not yet implemented
+        # Currently defaults to labware_library for all branch events
+        app, env, branch = parse_github_event_context(
+            event_name="push", ref="refs/heads/docs-deploy", ref_name="docs-deploy", ref_type="branch"
+        )
+
+        assert app == "labware_library"  # Default application (branch detection not implemented)
+        assert env == "sandbox"
+        assert branch == "docs-deploy"
+
+    def test_invalid_event_raises_error(self):
+        """Test that invalid event combinations raise ValueError."""
+        with pytest.raises(ValueError) as excinfo:
+            parse_github_event_context(event_name="invalid_event", ref="refs/heads/main", ref_name="main", ref_type="branch")
+
+        assert "No deployment configuration found" in str(excinfo.value)
+        assert "invalid_event" in str(excinfo.value)
+
+    def test_tag_prefixes_labware_library(self):
+        """Test various tag prefixes for labware library application detection."""
+        test_cases = ["tmp-staging-labware-library-123", "staging-labware-library-456", "tmp-labware-library-789", "labware-library-abc"]
+
+        for tag_name in test_cases:
+            app, env, branch = parse_github_event_context(event_name="push", ref=f"refs/tags/{tag_name}", ref_name=tag_name, ref_type="tag")
+
+            assert app == "labware_library", f"Failed for tag: {tag_name}"
+
+    def test_case_sensitivity_head_ref(self):
+        """Test case sensitivity handling for head_ref special values."""
+        test_cases = ["", "NULL", "null", "NONE", "none"]
+
+        for head_ref_value in test_cases:
+            app, env, branch = parse_github_event_context(
+                event_name="pull_request", ref="refs/pull/123/merge", ref_name="123/merge", ref_type="branch", head_ref=head_ref_value
+            )
+
+            assert app == "labware_library"
+            assert env == "sandbox"
+            assert branch == "unknown", f"Failed for head_ref: '{head_ref_value}'"

@@ -123,11 +123,8 @@ jobs:
       - name: Checkout Repository
         if: (github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/labware-deploy-clean')) || (github.event_name == 'pull_request' && github.head_ref == 'labware-deploy-clean')
         uses: actions/checkout@v4
-      - name: Setup Python
-        if: (github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/labware-deploy-clean')) || (github.event_name == 'pull_request' && github.head_ref == 'labware-deploy-clean')
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
+      - uses: ./.github/actions/git/resolve-tag
+      - uses: ./.github/actions/environment/complex-variables
       - name: Setup UV
         if: (github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/labware-deploy-clean')) || (github.event_name == 'pull_request' && github.head_ref == 'labware-deploy-clean')
         uses: astral-sh/setup-uv@v6
@@ -135,9 +132,9 @@ jobs:
           python-version: '3.10'
       - name: Setup Deploy Dependencies
         if: (github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/labware-deploy-clean')) || (github.event_name == 'pull_request' && github.head_ref == 'labware-deploy-clean')
+        working-directory: scripts/static-deploy
         run: |
-          cd scripts/static-deploy
-          uv sync --frozen
+          make setup
       - name: Debug GitHub Context
         run: |
           echo "Event name: ${{ github.event_name }}"
@@ -145,11 +142,15 @@ jobs:
           echo "Ref name: ${{ github.ref_name }}"
           echo "Ref type: ${{ github.ref_type }}"
           echo "Head ref: ${{ github.event.pull_request.head.ref || '' }}"
+          echo "=================================="
+          echo 'OT_BRANCH': $OT_BRANCH
+          echo 'OT_TAG': $OT_TAG
+          echo 'OT_BUILD': $OT_BUILD
       - name: Determine Deployment Configuration
         if: (github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/labware-deploy-clean')) || (github.event_name == 'pull_request' && github.head_ref == 'labware-deploy-clean')
         id: deploy-config
+        working-directory: scripts/static-deploy
         run: |
-          cd scripts/static-deploy
           uv run python labware_deploy_config.py \
             "${{ github.event_name }}" \
             "${{ github.ref }}" \
@@ -195,6 +196,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - uses: ./.github/actions/git/resolve-tag
+      - uses: ./.github/actions/environment/complex-variables
       - name: Debug Directory Structure
         run: |
           echo "Current directory: $(pwd)"
@@ -210,18 +213,18 @@ jobs:
           git branch -a
           echo "Git log (last 3 commits):"
           git log --oneline -3
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
+          echo "=================================="
+          echo 'OT_BRANCH': $OT_BRANCH
+          echo 'OT_TAG': $OT_TAG
+          echo 'OT_BUILD': $OT_BUILD
       - name: Setup UV
         uses: astral-sh/setup-uv@v6
         with:
           python-version: '3.10'
       - name: Setup Deploy Dependencies
+        working-directory: scripts/static-deploy
         run: |
-          cd scripts/static-deploy
-          uv sync --frozen
+          make setup
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -234,15 +237,13 @@ jobs:
           name: ll-artifact
           path: ./dist
       - name: Deploy to S3
+        working-directory: scripts/static-deploy
         run: |
-          cd scripts/static-deploy
-          uv run python deploy.py \
-            "${{ needs.determine-deploy-config.outputs.environment }}" \
-            labware_library \
-            ../../dist \
-            --branch "${{ needs.determine-deploy-config.outputs.branch }}"
+          make deploy-ci \
+            ENVIRONMENT="${{ needs.determine-deploy-config.outputs.environment }}" \
+            APPLICATION="labware_library" \
+            BRANCH="${{ needs.determine-deploy-config.outputs.branch }}" \
+            SOURCE_DIR="../../dist"
       - name: Output Deployment URL
         run: |
           echo "Deployed to: ${{ needs.determine-deploy-config.outputs.url }}"
-
-          
