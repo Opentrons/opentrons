@@ -126,23 +126,15 @@ You should not try to change the O-rings on a 96-channel pipette. The limited cl
 
 Follow these instructions to replace the O-rings on your Flex 1- and 8-channel pipettes:
 
-<div class="instruction-list" markdown>
-
 1.  Attach the O-ring removal tool to the pipette nozzle.
 
-  <figure class="screenshot" markdown>
-  ![o-ring removal tool](../images/o-ring-removal-tool.png)
-  </figure>
+  ![o-ring removal tool](../images/o-ring-removal-tool.png){width="50%"}
 
 2.  Rotate and pull gently to remove the O-ring. The O-ring may break during removal, which is common.
 
 3.  Place the wide base of the O-ring installation tool against the pipette nozzle and roll the new O-ring onto the nozzle.
 
-  <figure class="screenshot" markdown>
-  ![o-ring attachment tool](../images/o-ring-attachment-tool.png)
-  </figure>
-
-</div>
+  ![o-ring attachment tool](../images/o-ring-attachment-tool.png){width="50%"}
 
 ## Pipette tip cleaning
 
