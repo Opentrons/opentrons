@@ -1,15 +1,11 @@
 import { useRef, useState } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
 
-import { Box, COLORS, DIRECTION_COLUMN, Flex } from '@opentrons/components'
+import { Box, DIRECTION_COLUMN, Flex } from '@opentrons/components'
 
 import { DND_TYPES } from '/protocol-designer/constants'
-import { stepIconsByType } from '/protocol-designer/form-types'
-import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
 
-import { ConnectedStepContainer } from './ConnectedStepContainer'
 import { ConnectedStepInfo } from './ConnectedStepInfo'
 
 import type { Dispatch, SetStateAction } from 'react'
