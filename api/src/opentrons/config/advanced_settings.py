@@ -232,8 +232,8 @@ settings = [
     ),
     SettingDefinition(
         _id="enableCamera",
-        title="Enable Flex Camera",
-        description="This setting enables the use of the Flex Embedded Camera.",
+        title="Enable OT-2 or Flex Camera",
+        description="This setting enables the use of the OT-2 or Flex Embedded Camera.",
         robot_type=[RobotTypeEnum.OT2, RobotTypeEnum.FLEX],
         default_true_on_robot_types=[RobotTypeEnum.OT2, RobotTypeEnum.FLEX],
     ),

@@ -241,11 +241,11 @@ class PipetteSettingsUpdate(BaseModel):
         return v
 
 
-class LiveStreamEnable(BaseModel):
-    """Configuration value for enabling and disabling the Opentrons Live Stream."""
+class CameraEnable(BaseModel):
+    """Configuration value for enabling and disabling the Opentrons Camera or Live Stream."""
 
     enabled: bool = Field(
-        ..., description="Enable or disable the Opentrons Live Stream."
+        ..., description="Enable or disable the Opentrons Camera or Live Stream."
     )
 
 
