@@ -6,8 +6,10 @@ import { GlobalStyle } from '/app/atoms/GlobalStyle'
 import { getConfig, getIsOnDevice } from '/app/redux/config'
 
 import { DesktopApp } from './DesktopApp'
+import { useWindowType } from './hooks'
 import { OnDeviceDisplayApp } from './OnDeviceDisplayApp'
 import { TopPortalRoot } from './portal'
+import { SecondaryWindowApp } from './SecondaryWindowApp'
 
 import type { MouseEvent } from 'react'
 
@@ -18,9 +20,32 @@ const stopEvent = (event: MouseEvent): void => {
 export const App = (): JSX.Element | null => {
   const hasConfigLoaded = useSelector(getConfig) != null
   const isOnDevice = useSelector(getIsOnDevice)
+  const windowType = useWindowType()
 
-  // render null until getIsOnDevice returns the isOnDevice value from config
-  return hasConfigLoaded ? (
+  // render null until both config and window type are loaded
+  if (!hasConfigLoaded || windowType === null) {
+    return null
+  }
+
+  if (windowType === 'secondary') {
+    return (
+      <>
+        <GlobalStyle />
+        <Flex
+          position={POSITION_FIXED}
+          flexDirection={DIRECTION_ROW}
+          width="100%"
+          height="100vh"
+          onDragOver={stopEvent}
+          onDrop={stopEvent}
+        >
+          <SecondaryWindowApp />
+        </Flex>
+      </>
+    )
+  }
+
+  return (
     <>
       <GlobalStyle />
       <Flex
@@ -35,5 +60,5 @@ export const App = (): JSX.Element | null => {
         {isOnDevice ? <OnDeviceDisplayApp /> : <DesktopApp />}
       </Flex>
     </>
-  ) : null
+  )
 }

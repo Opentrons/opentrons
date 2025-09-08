@@ -168,6 +168,8 @@ export function MoveLabwareOnDeck(
         ...styleProps,
       }}
       animatedSVG
+      // add fixedTrash not to display trash bin on OT-2 deck
+      deckLayerBlocklist={robotType === 'OT-2 Standard' ? ['fixedTrash'] : []}
     >
       {backgroundItems}
       <AnimatedG style={{ x: springProps.x, y: springProps.y }}>
