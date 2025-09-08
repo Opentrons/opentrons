@@ -1,7 +1,6 @@
 import {
   getAreSlotsVerticallyAdjacent,
   getModuleType,
-  MAGNETIC_BLOCK_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { MODULES_WITH_COLLISION_ISSUES } from '@opentrons/step-generation'
@@ -96,11 +95,7 @@ export const getLabwareCompatibleForEditHardware = (
   const labwareDef = getLabwareOnSlot(labware, cutoutId)
   const labwareDefB1 = getLabwareOnSlot(labware, 'cutoutB1')
   const moduleType =
-    newModule != null
-      ? newModule.type === 'stagingAreaAndMagneticBlock'
-        ? MAGNETIC_BLOCK_TYPE
-        : getModuleType(newModule.type as ModuleModel)
-      : null
+    newModule != null ? getModuleType(newModule.type as ModuleModel) : null
 
   let labwareCompatible = true
   if (moduleType != null && moduleType === THERMOCYCLER_MODULE_TYPE) {

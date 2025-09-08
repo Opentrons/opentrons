@@ -87,6 +87,7 @@ describe('updateInitialDeckState', () => {
         {
           cutoutId: 'cutoutD1',
           cutoutFixtureId: HEATERSHAKER_MODULE_V1,
+          addressableAreaId: 'heaterShakerV1D1',
           type: HEATERSHAKER_MODULE_V1,
         },
       ],
@@ -114,6 +115,7 @@ describe('updateInitialDeckState', () => {
         {
           cutoutId: 'cutoutD1',
           cutoutFixtureId: HEATERSHAKER_MODULE_V1,
+          addressableAreaId: 'heaterShakerV1D1',
           type: HEATERSHAKER_MODULE_V1,
         },
       ],
@@ -146,6 +148,7 @@ describe('updateInitialDeckState', () => {
         {
           cutoutId: 'cutoutD1',
           cutoutFixtureId: HEATERSHAKER_MODULE_V1,
+          addressableAreaId: 'heaterShakerV1D1',
           type: HEATERSHAKER_MODULE_V1,
         },
       ],
@@ -171,6 +174,7 @@ describe('updateInitialDeckState', () => {
         {
           cutoutId: 'cutoutD1',
           cutoutFixtureId: HEATERSHAKER_MODULE_V1,
+          addressableAreaId: 'heaterShakerV1D1',
           type: HEATERSHAKER_MODULE_V1,
         },
       ],
@@ -191,6 +195,7 @@ describe('updateInitialDeckState', () => {
         {
           cutoutId: 'cutoutA3',
           cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
+          addressableAreaId: 'movableTrashA3',
           type: 'trashBin',
         },
       ],
@@ -212,6 +217,7 @@ describe('updateInitialDeckState', () => {
         {
           cutoutId: 'cutoutA3',
           cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
+          addressableAreaId: 'movableTrashA3',
           type: 'trashBin',
         },
       ],
@@ -244,6 +250,7 @@ describe('updateInitialDeckState', () => {
         {
           cutoutId: 'cutoutA3',
           cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
+          addressableAreaId: 'movableTrashA3',
           type: 'trashBin',
         },
       ],
@@ -265,7 +272,8 @@ describe('updateInitialDeckState', () => {
         {
           cutoutId: 'cutoutB3',
           cutoutFixtureId: STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
-          type: 'stagingAreaAndMagneticBlock',
+          addressableAreaId: 'magneticBlockV1B3',
+          type: 'magneticBlockV1',
         },
       ],
       initialDeckSetup: mockEmptyIntialDeckSetup,
@@ -295,7 +303,8 @@ describe('updateInitialDeckState', () => {
         {
           cutoutId: 'cutoutB3',
           cutoutFixtureId: STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
-          type: 'stagingAreaAndMagneticBlock',
+          addressableAreaId: 'magneticBlockV1B3',
+          type: 'magneticBlockV1',
         },
       ],
       initialDeckSetup: mockInitialDeckSetup,
@@ -324,7 +333,8 @@ describe('updateInitialDeckState', () => {
         {
           cutoutId: 'cutoutB3',
           cutoutFixtureId: STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
-          type: 'stagingAreaAndMagneticBlock',
+          addressableAreaId: 'B4',
+          type: 'stagingArea',
         },
       ],
       initialDeckSetup: {
@@ -355,7 +365,8 @@ describe('updateInitialDeckState', () => {
         {
           cutoutId: 'cutoutD3',
           cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
-          type: 'stagingAreaAndWasteChute',
+          addressableAreaId: 'D4',
+          type: 'stagingArea',
         },
       ],
       initialDeckSetup: mockEmptyIntialDeckSetup,
@@ -381,7 +392,8 @@ describe('updateInitialDeckState', () => {
         {
           cutoutId: 'cutoutD3',
           cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
-          type: 'stagingAreaAndWasteChute',
+          addressableAreaId: 'D4',
+          type: 'stagingArea',
         },
       ],
       initialDeckSetup: mockInitialDeckSetup,
@@ -406,7 +418,8 @@ describe('updateInitialDeckState', () => {
         {
           cutoutId: 'cutoutD3',
           cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
-          type: 'stagingAreaAndWasteChute',
+          addressableAreaId: 'D4',
+          type: 'stagingArea',
         },
       ],
       initialDeckSetup: {
@@ -437,7 +450,8 @@ describe('updateInitialDeckState', () => {
         {
           cutoutId: 'cutoutD3',
           cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
-          type: 'stagingAreaAndWasteChute',
+          addressableAreaId: 'D4',
+          type: 'stagingArea',
         },
       ],
 

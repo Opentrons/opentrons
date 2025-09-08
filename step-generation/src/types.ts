@@ -1,6 +1,7 @@
 import type {
   ABSORBANCE_READER_TYPE,
   CreateCommand,
+  FLEX_STACKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   LabwareDefinition2,
   LabwareLocation,
@@ -101,6 +102,10 @@ export interface AbsorbanceReaderState {
   initialization: Initialization | null
 }
 
+export interface FlexStackerState {
+  type: typeof FLEX_STACKER_MODULE_TYPE
+}
+
 export type ModuleState =
   | MagneticModuleState
   | TemperatureModuleState
@@ -108,6 +113,7 @@ export type ModuleState =
   | HeaterShakerModuleState
   | MagneticBlockState
   | AbsorbanceReaderState
+  | FlexStackerState
 export interface ModuleTemporalProperties {
   slot: DeckSlot
   moduleState: ModuleState

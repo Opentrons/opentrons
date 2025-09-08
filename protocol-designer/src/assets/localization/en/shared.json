@@ -1,6 +1,6 @@
 {
   "add_gripper_for_plate": "Gripper required to add absorbance reader.",
-  "add_to_slot": "Add to slot {{slotName}}",
+  "add_to_slot": "Add to {{slotName}}",
   "add": "add",
   "agree": "Agree",
   "amount": "Amount:",

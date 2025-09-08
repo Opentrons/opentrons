@@ -94,12 +94,7 @@ export interface CutoutConfigExtended extends CutoutConfig {
   type?: DeckFixture | ModuleModel
 }
 
-const FIXTURES = [
-  'wasteChute',
-  'trashBin',
-  'stagingArea',
-  'stagingAreaAndWasteChute',
-]
+const FIXTURES = ['wasteChute', 'trashBin', 'stagingArea']
 
 //  TODO: this is similar to the AddFixtureModal in the app but logic varies
 //  quite a bit. Would be ideal to merge them together but not sure how to do
@@ -143,6 +138,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
       ...getFixtureOptions(
         cutoutId,
         addressableAreaId,
+        fixtures,
         existingCutoutFixtureId
       ),
       ...getWasteChuteOptions(cutoutId),
@@ -153,7 +149,8 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
         cutoutId,
         addressableAreaId,
         deckDef,
-        enableStackerFF
+        enableStackerFF,
+        fixtures
       ),
     ]
     setAllModuleOptions(moduleOptions)
@@ -175,6 +172,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     deckDefinition: deckDef,
     addressableAreaId,
     enableStackerFF,
+    fixtures,
   })
 
   let nextStageOptions = null

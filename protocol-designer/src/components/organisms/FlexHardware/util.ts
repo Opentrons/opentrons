@@ -74,7 +74,6 @@ export const updateInitialDeckState = (
     t,
     deckConfig,
   } = props
-  console.log('deckConfig', deckConfig)
   const {
     additionalEquipmentOnDeck,
     modules: moduleOnDeck,
@@ -119,6 +118,7 @@ export const updateInitialDeckState = (
       matchingModule,
       matchingFixture != null ? [matchingFixture] : undefined
     )
+    console.log('value type', value.type)
     //  updating fixtures only
     if (FIXTURES.includes(value.type as DeckFixture)) {
       if (matchingFixture != null) {
@@ -145,9 +145,9 @@ export const updateInitialDeckState = (
           //  if deleting fixture that is not in use
         } else {
           dispatch(deleteDeckFixture(matchingFixture.id))
-          // if (deckConfig != null) {
-          //   dispatch(editDeckConfiguration({ deckConfig }))
-          // }
+          if (deckConfig != null) {
+            dispatch(editDeckConfiguration({ deckConfig }))
+          }
         }
         //  creating fixture
       } else {
@@ -169,9 +169,9 @@ export const updateInitialDeckState = (
           //   if deleting module
         } else {
           dispatch(deleteModule({ moduleId: matchingModule.id }))
-          // if (deckConfig != null) {
-          //   dispatch(editDeckConfiguration({ deckConfig }))
-          // }
+          if (deckConfig != null) {
+            dispatch(editDeckConfiguration({ deckConfig }))
+          }
         }
       } else {
         const type = getModuleType(value.type as ModuleModel)

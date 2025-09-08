@@ -12,7 +12,7 @@ import { useDeckConfigurationEditing } from '../utils'
 import type { ComponentProps } from 'react'
 import type * as OpentronsComponents from '@opentrons/components'
 
-vi.mock('../useDeckConfigurationEditing')
+vi.mock('../utils')
 vi.mock('/protocol-designer/step-forms/actions')
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof OpentronsComponents>()

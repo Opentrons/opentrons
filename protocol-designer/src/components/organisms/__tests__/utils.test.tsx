@@ -26,6 +26,7 @@ describe('getLabwareCompatibleForEditHardware', () => {
         {
           cutoutId: 'cutoutB1',
           cutoutFixtureId: 'thermocyclerModuleV2Front',
+          addressableAreaId: 'thermocyclerModuleV2',
           type: 'thermocyclerModuleV2',
         }
       )
@@ -47,6 +48,7 @@ describe('getLabwareCompatibleForEditHardware', () => {
         {
           cutoutId: 'cutoutA1',
           cutoutFixtureId: 'thermocyclerModuleV2Front',
+          addressableAreaId: 'thermocyclerModuleV2',
           type: 'thermocyclerModuleV2',
         }
       )
@@ -68,6 +70,7 @@ describe('getLabwareCompatibleForEditHardware', () => {
         {
           cutoutId: 'cutoutA3',
           cutoutFixtureId: 'heaterShakerModuleV1',
+          addressableAreaId: 'heaterShakerV1A3',
           type: 'heaterShakerModuleV1',
         }
       )
@@ -91,6 +94,7 @@ describe('getLabwareCompatibleForEditHardware', () => {
           type: 'trashBin',
           cutoutId: 'cutoutA3',
           cutoutFixtureId: 'trashBinAdapter',
+          addressableAreaId: 'movableTrashA3',
         }
       )
     ).toBe(false)
@@ -101,6 +105,7 @@ describe('getLabwareCompatibleForEditHardware', () => {
         type: 'trashBin',
         cutoutId: 'cutoutA3',
         cutoutFixtureId: 'trashBinAdapter',
+        addressableAreaId: 'movableTrashA3',
       })
     ).toBe(true)
   })
