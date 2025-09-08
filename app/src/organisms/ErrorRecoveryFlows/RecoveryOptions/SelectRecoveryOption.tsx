@@ -60,6 +60,7 @@ export function SelectRecoveryOptionHome({
   const { determineTipStatus } = tipStatusUtils
   const { setSelectedRecoveryOption } = currentRecoveryOptionUtils
   const validRecoveryOptions = getRecoveryOptions(errorKind, failedCommand?.byRunRecord.commandType)
+  console.log('validRecoveryOptions', validRecoveryOptions)
   const [selectedRoute, setSelectedRoute] = useState<RecoveryRoute>(
     head(validRecoveryOptions) as RecoveryRoute
   )
@@ -140,6 +141,7 @@ export function RecoveryOptions({
   getRecoveryOptionCopy,
   isOnDevice,
 }: RecoveryOptionsProps): JSX.Element {
+  console.log('validRecoveryOptions', validRecoveryOptions)
   return (
     <Flex css={RECOVERY_OPTION_CONTAINER_STYLE}>
       {validRecoveryOptions.map((recoveryOption: RecoveryRoute) => {
@@ -208,6 +210,7 @@ export function getRecoveryOptions(
       const isStore =
         errorKind === ERROR_KINDS.STACKER_STALLED &&
         commandType === 'flexStacker/store'
+        console.log('isStore', isStore)
       if (isStore) {
         return STACKER_STALLED_STORE_OPTIONS
       } else {
