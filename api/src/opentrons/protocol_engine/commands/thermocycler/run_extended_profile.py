@@ -71,6 +71,7 @@ def _transform_profile_step(
     return ThermocyclerStep(
         temperature=thermocycler_state.validate_target_block_temperature(step.celsius),
         hold_time_seconds=step.holdSeconds,
+        ramp_rate=thermocycler_state.validate_ramp_rate(step.rampRate, step.celsius),
     )
 
 

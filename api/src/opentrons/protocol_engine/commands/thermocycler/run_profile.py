@@ -84,6 +84,9 @@ class RunProfileImpl(
                     profile_step.celsius
                 ),
                 hold_time_seconds=profile_step.holdSeconds,
+                ramp_rate=thermocycler_state.validate_ramp_rate(
+                    profile_step.rampRate, profile_step.celsius
+                ),
             )
             for profile_step in params.profile
         ]
