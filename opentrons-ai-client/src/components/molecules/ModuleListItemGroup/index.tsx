@@ -75,7 +75,7 @@ export function ModuleListItemGroup(): JSX.Element | null {
 
   const allDefinitionsValues = useMemo(() => {
     const defs = getOnlyLatestDefs()
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
     return Object.values(defs)
   }, [])
 
