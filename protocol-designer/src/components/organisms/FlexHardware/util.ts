@@ -118,7 +118,7 @@ export const updateInitialDeckState = (
       matchingModule,
       matchingFixture != null ? [matchingFixture] : undefined
     )
-    console.log('value type', value.type)
+
     //  updating fixtures only
     if (FIXTURES.includes(value.type as DeckFixture)) {
       if (matchingFixture != null) {

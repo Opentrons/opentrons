@@ -104,6 +104,7 @@ export interface AbsorbanceReaderState {
 
 export interface FlexStackerState {
   type: typeof FLEX_STACKER_MODULE_TYPE
+  //  TODO: extend this state
 }
 
 export type ModuleState =
