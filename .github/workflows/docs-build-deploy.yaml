@@ -120,6 +120,9 @@ jobs:
 
       - name: Deploy
         working-directory: ./docs
+        env:
+          STAGING_DOCS_CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.STAGING_DOCS_CLOUDFRONT_DISTRIBUTION_ID }}
+          PRODUCTION_DOCS_CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.PRODUCTION_DOCS_CLOUDFRONT_DISTRIBUTION_ID }}
         run: make deploy ENVIRONMENT=${{ env.ENVIRONMENT }} BRANCH=${{ env.BRANCH }} ARGS="--source-dir site"
       - name: Output Deployment URL
         run: |
