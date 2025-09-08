@@ -962,7 +962,7 @@ class HeaterShakerContext(ModuleContext):
         No other protocol commands will execute while waiting for the temperature.
 
         .. versionchanged:: 2.25
-            Remove the minimum temperature limit of 37 °C. Note that temperatures under ambient are
+            Removed the minimum temperature limit of 37 °C. Note that temperatures under ambient are
             not achievable.
 
         :param celsius: A value under 95, representing the target temperature in °C.
