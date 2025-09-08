@@ -132,6 +132,8 @@ Useful Types
 .. autodata:: opentrons.protocol_api.OFF_DECK
    :no-value:
 
+.. autoclass:: opentrons.protocol_api.OffDeckType
+
 Executing and Simulating Protocols
 ==================================
 
