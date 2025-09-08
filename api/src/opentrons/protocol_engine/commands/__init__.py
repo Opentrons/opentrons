@@ -271,6 +271,22 @@ from .wait_for_duration import (
     WaitForDurationCommandType,
 )
 
+from .create_timer import (
+    CreateTimer,
+    CreateTimerCreate,
+    CreateTimerParams,
+    CreateTimerResult,
+    CreateTimerCommandType,
+)
+
+from .wait_for_tasks import (
+    WaitForTasks,
+    WaitForTasksCreate,
+    WaitForTasksParams,
+    WaitForTasksResult,
+    WaitForTasksCommandType,
+)
+
 from .pick_up_tip import (
     PickUpTip,
     PickUpTipParams,
@@ -619,6 +635,12 @@ __all__ = [
     "WaitForDurationCreate",
     "WaitForDurationResult",
     "WaitForDurationCommandType",
+    # Timer command models
+    "CreateTimer",
+    "CreateTimerCreate",
+    "CreateTimerParams",
+    "CreateTimerResult",
+    "CreateTimerCommandType",
     # pick up tip command models
     "PickUpTip",
     "PickUpTipCreate",
@@ -754,4 +776,10 @@ __all__ = [
     "PressureDispenseCreate",
     "PressureDispenseResult",
     "PressureDispenseCommandType",
+    # wait for tasks command bundle
+    "WaitForTasks",
+    "WaitForTasksCreate",
+    "WaitForTasksParams",
+    "WaitForTasksResult",
+    "WaitForTasksCommandType",
 ]

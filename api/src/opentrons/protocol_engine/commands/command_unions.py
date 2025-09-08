@@ -267,6 +267,22 @@ from .wait_for_duration import (
     WaitForDurationCommandType,
 )
 
+from .create_timer import (
+    CreateTimer,
+    CreateTimerCreate,
+    CreateTimerParams,
+    CreateTimerResult,
+    CreateTimerCommandType,
+)
+
+from .wait_for_tasks import (
+    WaitForTasks,
+    WaitForTasksCreate,
+    WaitForTasksParams,
+    WaitForTasksResult,
+    WaitForTasksCommandType,
+)
+
 from .pick_up_tip import (
     PickUpTip,
     PickUpTipParams,
@@ -454,6 +470,8 @@ Command = Annotated[
         PrepareToAspirate,
         WaitForResume,
         WaitForDuration,
+        WaitForTasks,
+        CreateTimer,
         PickUpTip,
         SavePosition,
         SetRailLights,
@@ -557,6 +575,8 @@ CommandParams = Union[
     PrepareToAspirateParams,
     WaitForResumeParams,
     WaitForDurationParams,
+    WaitForTasksParams,
+    CreateTimerParams,
     PickUpTipParams,
     SavePositionParams,
     SetRailLightsParams,
@@ -658,6 +678,8 @@ CommandType = Union[
     PrepareToAspirateCommandType,
     WaitForResumeCommandType,
     WaitForDurationCommandType,
+    WaitForTasksCommandType,
+    CreateTimerCommandType,
     PickUpTipCommandType,
     SavePositionCommandType,
     SetRailLightsCommandType,
@@ -760,6 +782,8 @@ CommandCreate = Annotated[
         PrepareToAspirateCreate,
         WaitForResumeCreate,
         WaitForDurationCreate,
+        WaitForTasksCreate,
+        CreateTimerCreate,
         PickUpTipCreate,
         SavePositionCreate,
         SetRailLightsCreate,
@@ -870,6 +894,8 @@ CommandResult = Union[
     PrepareToAspirateResult,
     WaitForResumeResult,
     WaitForDurationResult,
+    WaitForTasksResult,
+    CreateTimerResult,
     PickUpTipResult,
     SavePositionResult,
     SetRailLightsResult,
