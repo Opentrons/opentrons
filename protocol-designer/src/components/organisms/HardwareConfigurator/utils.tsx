@@ -35,6 +35,7 @@ import type { ReactNode } from 'react'
 import type { UseFormSetValue } from 'react-hook-form'
 import type {
   AddressableAreaNamesWithFakes,
+  CutoutFixtureGroup,
   CutoutFixtureId,
   CutoutFixtureIdsWithFakes,
   CutoutId,
@@ -82,12 +83,21 @@ export function useDeckConfigurationEditing(
     setAddressableAreaId,
   ] = useState<AddressableAreaNamesWithFakes | null>(null)
 
+  const [
+    existingCutoutFixtureId,
+    setExistingCutoutFixtureId,
+  ] = useState<CutoutFixtureId | null>(null)
+
   const addFixtureToCutout = (
     cutoutId: CutoutId,
     addressableAreaId: AddressableAreaNamesWithFakes
   ): void => {
     setTargetCutoutId(cutoutId)
     setAddressableAreaId(addressableAreaId)
+    const foundFixtureId =
+      deckConfig.find(config => config.cutoutId === cutoutId)
+        ?.cutoutFixtureId ?? null
+    setExistingCutoutFixtureId(foundFixtureId ?? null)
   }
 
   //  removing fixture from changing configuration in the
@@ -97,6 +107,12 @@ export function useDeckConfigurationEditing(
     cutoutFixtureId: CutoutFixtureIdsWithFakes,
     addressableAreaId: AddressableAreaNamesWithFakes
   ): void => {
+    const replacementFixtureId = getReplacementFixtureForFixtureRemoval(
+      cutoutFixtureId,
+      cutoutId,
+      addressableAreaId
+    )
+
     const thermocyclerCutoutFixtureId =
       cutoutFixtureId === THERMOCYCLER_V2_REAR_FIXTURE ||
       cutoutFixtureId === THERMOCYCLER_V2_FRONT_FIXTURE
@@ -122,10 +138,12 @@ export function useDeckConfigurationEditing(
 
     const newDeckConfig = getNewConfig(
       cutoutId,
-      deckConfig,
       cutoutFixtureId,
+      replacementFixtureId,
+      deckConfig,
       deckDef
     )
+
     dispatch(editDeckConfiguration({ deckConfig: newDeckConfig }))
   }
 
@@ -158,15 +176,17 @@ export function useDeckConfigurationEditing(
     cutoutFixtureId: CutoutFixtureIdsWithFakes,
     addressableAreaId: AddressableAreaNamesWithFakes
   ): void => {
+    const replacementFixtureId = getReplacementFixtureForFixtureRemoval(
+      cutoutFixtureId,
+      cutoutId,
+      addressableAreaId
+    )
     const newDeckConfig = getNewConfig(
       cutoutId,
-      deckConfig,
       cutoutFixtureId,
+      replacementFixtureId,
+      deckConfig,
       deckDef
-    )
-    // if cutoutFixtureId is a fake one get the translation
-    const replacementFixtureId = getReplacementFixtureForFakeFixture(
-      cutoutFixtureId
     )
     const type = getCutoutFixtureType(replacementFixtureId)
     updateInitialDeckState?.(
@@ -202,6 +222,7 @@ export function useDeckConfigurationEditing(
           setValue={setValue}
           hasGripper={hasGripper}
           updateInitialDeckState={updateInitialDeckState}
+          existingCutoutFixtureId={existingCutoutFixtureId ?? undefined}
         />
       ) : null,
   }
@@ -495,17 +516,13 @@ export const getAvailableOptions = (
 
 export const getNewConfig = (
   cutoutId: CutoutId,
-  deckConfig: DeckConfiguration,
   cutoutFixtureId: CutoutFixtureIdsWithFakes,
+  replacementFixtureId: CutoutFixtureId,
+  deckConfig: DeckConfiguration,
   deckDef: DeckDefinition
 ): DeckConfiguration => {
-  const replacementFixtureId = getReplacementFixtureForFixtureRemoval(
-    cutoutFixtureId,
-    cutoutId
-  )
-
   const fixtureGroup =
-    deckDef.cutoutFixtures.find(({ id }) => id === cutoutFixtureId)
+    deckDef.cutoutFixtures.find(cf => cf.id === cutoutFixtureId)
       ?.fixtureGroup ?? {}
 
   let newDeckConfig = deckConfig
@@ -523,20 +540,18 @@ export const getNewConfig = (
         ? {
             ...cutoutConfig,
             cutoutFixtureId: replacementFixtureId,
-            type: undefined,
           }
         : cutoutConfig
     )
   } else {
-    newDeckConfig = deckConfig.map(cutoutConfig =>
-      cutoutConfig.cutoutId === cutoutId
+    newDeckConfig = deckConfig.map(cutoutConfig => {
+      return cutoutConfig.cutoutId === cutoutId
         ? {
             ...cutoutConfig,
             cutoutFixtureId: replacementFixtureId,
-            type: undefined,
           }
         : cutoutConfig
-    )
+    })
   }
   return newDeckConfig
 }

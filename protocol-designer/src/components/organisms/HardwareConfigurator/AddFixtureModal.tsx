@@ -19,21 +19,17 @@ import {
   ABSORBANCE_READER_V1,
   FLEX_ROBOT_TYPE,
   getAADisplayName,
-  getCutoutDisplayName,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
   getModuleType,
-  MAGNETIC_BLOCK_V1,
   MODULE_MODELS,
+  replaceCutoutFixtureWithComboFixture,
+  replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   SINGLE_CENTER_CUTOUTS,
   THERMOCYCLER_MODULE_V2,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import {
-  getCutoutIdByAddressableArea,
-  getSlotInLocationStack,
-  uuid,
-} from '@opentrons/step-generation'
+import { getSlotInLocationStack, uuid } from '@opentrons/step-generation'
 
 import { getEnableStacking } from '/protocol-designer/feature-flags/selectors'
 import { editDeckConfiguration } from '/protocol-designer/step-forms/actions'
@@ -53,9 +49,9 @@ import type { TFunction } from 'i18next'
 import type { UseFormSetValue } from 'react-hook-form'
 import type { ModalProps } from '@opentrons/components'
 import type {
-  AddressableAreaName,
   AddressableAreaNamesWithFakes,
   CutoutConfig,
+  CutoutFixtureId,
   CutoutId,
   DeckConfiguration,
   FlexModuleCutoutFixtureId,
@@ -85,6 +81,7 @@ interface AddFixtureModalProps {
   //  used for updating the initialDeckState in redux in overview and
   //  starting deck state
   updateInitialDeckState?: (value: CutoutConfigExtended[]) => void
+  existingCutoutFixtureId?: CutoutFixtureId
 }
 export type OptionStage =
   | 'modulesOrFixtures'
@@ -118,6 +115,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     hasGripper,
     updateInitialDeckState,
     addressableAreaId,
+    existingCutoutFixtureId,
   } = props
   const { t, i18n } = useTranslation(['shared', 'deck_configuration'])
   const initialDeckSetup = useSelector(getInitialDeckSetup)
@@ -130,7 +128,9 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     ? 'moduleOptions'
     : 'modulesOrFixtures'
   const [optionStage, setOptionStage] = useState<OptionStage>(initialStage)
-
+  const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
+    deckConfig
+  )
   // Bind allFixtureOptions with useEffect
   const [allFixtureOptions, setAllFixtureOptions] = useState<
     CutoutConfigExtended[][]
@@ -140,7 +140,11 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
   >([])
   useEffect(() => {
     const options = [
-      ...getFixtureOptions(cutoutId, addressableAreaId),
+      ...getFixtureOptions(
+        cutoutId,
+        addressableAreaId,
+        existingCutoutFixtureId
+      ),
       ...getWasteChuteOptions(cutoutId),
     ]
     setAllFixtureOptions(options)
@@ -153,7 +157,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
       ),
     ]
     setAllModuleOptions(moduleOptions)
-  }, [cutoutId, addressableAreaId])
+  }, [cutoutId, addressableAreaId, existingCutoutFixtureId])
 
   const modalProps: ModalProps = {
     title: t('add_to_slot', {
@@ -251,12 +255,18 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     ) {
       makeSnackbar(t('thermocycler_blocked') as string)
     } else {
-      const newDeckConfig = deckConfig.map(fixture => {
-        const replacementCutoutConfig = addedCutoutConfigs.find(
-          c => c.cutoutId === fixture.cutoutId
+      const addedCutoutConfigsWithCombo = replaceCutoutFixtureWithComboFixture(
+        addedCutoutConfigs,
+        deckConfigWithAA,
+        cutoutId
+      )
+      const newDeckConfig: CutoutConfig[] = deckConfig.map(fixture => {
+        return (
+          addedCutoutConfigsWithCombo.find(
+            c => c.cutoutId === fixture.cutoutId
+          ) ?? fixture
         )
-        return replacementCutoutConfig ?? fixture
-      })
+      }) as CutoutConfig[]
       const newModule = addedCutoutConfigs.find(cutoutConfig =>
         MODULE_MODELS.includes(cutoutConfig.type as ModuleModel)
       )

@@ -46,7 +46,6 @@ export function HardwareConfiguratorContainer(
     setValue,
     updateInitialDeckState
   )
-  console.log('deckConfig', deckConfig)
   return (
     <>
       {addFixtureModal}
