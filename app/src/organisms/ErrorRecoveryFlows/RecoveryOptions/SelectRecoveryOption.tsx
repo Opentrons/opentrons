@@ -20,7 +20,11 @@ import {
 import { RecoverySingleColumnContentWrapper } from '../shared'
 
 import type { PipetteWithTip } from '/app/resources/instruments'
-import type { ErrorKind, RecoveryContentProps, RecoveryRoute } from '../types'
+import type {
+  ErrorKind,
+  RecoveryContentProps,
+  RecoveryRoute,
+} from '../types'
 
 // The "home" route within Error Recovery. When a user completes a non-terminal flow or presses "Go back" enough
 // to escape the boundaries of any route, they will be redirected here.
@@ -49,12 +53,13 @@ export function SelectRecoveryOptionHome({
   getRecoveryOptionCopy,
   analytics,
   isOnDevice,
+  failedCommand,
 }: RecoveryContentProps): JSX.Element | null {
   const { t } = useTranslation('error_recovery')
   const { proceedToRouteAndStep } = routeUpdateActions
   const { determineTipStatus } = tipStatusUtils
   const { setSelectedRecoveryOption } = currentRecoveryOptionUtils
-  const validRecoveryOptions = getRecoveryOptions(errorKind)
+  const validRecoveryOptions = getRecoveryOptions(errorKind, failedCommand?.byRunRecord.commandType)
   const [selectedRoute, setSelectedRoute] = useState<RecoveryRoute>(
     head(validRecoveryOptions) as RecoveryRoute
   )
@@ -176,7 +181,10 @@ export function useCurrentTipStatus(
   }, [])
 }
 
-export function getRecoveryOptions(errorKind: ErrorKind): RecoveryRoute[] {
+export function getRecoveryOptions(
+  errorKind: ErrorKind,
+  commandType?: string
+): RecoveryRoute[] {
   switch (errorKind) {
     case ERROR_KINDS.NO_LIQUID_DETECTED:
       return NO_LIQUID_DETECTED_OPTIONS
@@ -197,7 +205,14 @@ export function getRecoveryOptions(errorKind: ErrorKind): RecoveryRoute[] {
     case ERROR_KINDS.STALL_OR_COLLISION:
       return STALL_OR_COLLISION_OPTIONS
     case ERROR_KINDS.STACKER_STALLED:
-      return STACKER_STALLED_OPTIONS
+      const isStore =
+        errorKind === ERROR_KINDS.STACKER_STALLED &&
+        commandType === 'flexStacker/store'
+      if (isStore) {
+        return STACKER_STALLED_STORE_OPTIONS
+      } else {
+        return STACKER_STALLED_RETRIEVE_OPTIONS
+      }
     case ERROR_KINDS.STACKER_HOPPER_EMPTY:
       return STACKER_HOPPER_EMPTY_OPTIONS
     case ERROR_KINDS.STACKER_SHUTTLE_MISSING:
@@ -233,9 +248,15 @@ export const STACKER_HOPPER_EMPTY_OPTIONS: RecoveryRoute[] = [
   RECOVERY_MAP.CANCEL_RUN.ROUTE,
 ]
 
-export const STACKER_STALLED_OPTIONS: RecoveryRoute[] = [
+export const STACKER_STALLED_RETRIEVE_OPTIONS: RecoveryRoute[] = [
   RECOVERY_MAP.STACKER_STALLED_RETRY.ROUTE,
   RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE,
+  RECOVERY_MAP.CANCEL_RUN.ROUTE,
+]
+
+export const STACKER_STALLED_STORE_OPTIONS: RecoveryRoute[] = [
+  RECOVERY_MAP.STACKER_STALLED_STORE_RETRY.ROUTE,
+  RECOVERY_MAP.STACKER_STALLED_STORE_SKIP.ROUTE,
   RECOVERY_MAP.CANCEL_RUN.ROUTE,
 ]
 
