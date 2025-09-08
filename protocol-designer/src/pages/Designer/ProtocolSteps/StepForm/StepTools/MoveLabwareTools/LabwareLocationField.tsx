@@ -125,6 +125,7 @@ export function LabwareLocationField(
         dispatch(hoverSelection({ id: null, text: null }))
       }}
       tooltipContent={null}
+      // to force menu to be positioned below field instead of above
       menuPlacement="bottom"
     />
   )
