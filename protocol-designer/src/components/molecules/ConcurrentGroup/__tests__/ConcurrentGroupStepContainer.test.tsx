@@ -17,6 +17,7 @@ const render = (props: ComponentProps<typeof ConcurrentGroupStepContainer>) => {
 describe('ConcurrentGroupStepContainer', () => {
   it('renders a StepContainer inside a list item', () => {
     render({
+      stepNumber: null,
       text: 'Test step text',
       iconName: 'transfer',
       type: 'default',

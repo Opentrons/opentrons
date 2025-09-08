@@ -33,6 +33,7 @@ describe('ConnectedStepContainer', () => {
 
   beforeEach(() => {
     props = {
+      stepNumber: null,
       title: 'Starting deck state',
       iconName: 'add',
       onClick: vi.fn(),

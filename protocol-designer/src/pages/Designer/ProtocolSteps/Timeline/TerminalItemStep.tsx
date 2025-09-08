@@ -99,6 +99,7 @@ export function TerminalItemStep(props: TerminalItemStepProps): JSX.Element {
           iconName: id === START_TERMINAL_ITEM_ID ? 'ot-start' : 'ot-end',
           hovered,
           selected,
+          stepNumber: null,
           title:
             id === START_TERMINAL_ITEM_ID
               ? t('starting_deck')

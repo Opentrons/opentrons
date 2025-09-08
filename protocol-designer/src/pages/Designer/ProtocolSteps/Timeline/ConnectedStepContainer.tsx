@@ -48,6 +48,7 @@ const PX_HEIGHT_TO_TOP_OF_CONTAINER = 32
 export const PX_SIDEBAR_MIN_WIDTH_FOR_ICON = 170
 
 export interface ConnectedStepContainerProps {
+  stepNumber: number
   title: string
   iconName: IconName
   sidebarWidth: number
@@ -77,6 +78,7 @@ export function ConnectedStepContainer(
     selected,
     onClick,
     hovered,
+    stepNumber,
     title,
     hasError = false,
     isStepAfterError = false,
@@ -216,6 +218,9 @@ export function ConnectedStepContainer(
         )}
 
         <StepContainer
+          stepNumber={stepNumber}
+          // todo(mm, 2025-09-05): This can be simplified now that stepNumber has been
+          // pulled into its own property. We no longer need to skip leading numbers.
           text={capitalizeFirstLetterAfterNumber(title)}
           iconName={iconName}
           type={isStartingOrEndingState ? 'alt' : 'default'}
