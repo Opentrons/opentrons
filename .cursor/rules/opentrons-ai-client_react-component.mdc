@@ -53,27 +53,30 @@ Example prompt template:
 ### CSS Modules Migration (Required for New Components)
 
 1. **File Naming Convention:**
+
    - Use lowercase, no separators: `componentname.module.css`
    - Must match component folder structure
    - Example: `AttachFileButton/attachfilebutton.module.css`
 
 2. **Class Naming Rules:**
+
    ```css
    /* ✅ Use snake_case per stylelint configuration */
    .button {
      display: flex;
    }
-   
+
    .button_text {
      font-size: var(--font-size-h3);
    }
-   
+
    .hidden_input {
      display: none;
    }
    ```
 
 3. **Design System Token Usage:**
+
    ```css
    /* Always use CSS custom properties from the design system */
    .container {
@@ -81,41 +84,42 @@ Example prompt template:
      padding: var(--spacing-16);
      margin: var(--spacing-24);
      gap: var(--spacing-8);
-     
+
      /* Colors - use design system color variables */
      background: var(--white);
      color: var(--grey-60);
      border: 1px solid var(--grey-30);
-     
+
      /* Typography - mix of direct rem and variables */
-     font-size: 1rem;  /* Use rem directly for font sizes */
+     font-size: 1rem; /* Use rem directly for font sizes */
      font-weight: var(--font-weight-semi-bold);
      line-height: var(--line-height-24);
-     font-family: 'Public Sans', sans-serif;  /* Always include fallback */
-     
+     font-family: 'Public Sans', sans-serif; /* Always include fallback */
+
      /* Dimensions - use rem units */
-     max-width: 56.25rem;  /* 900px ÷ 16 = 56.25rem */
+     max-width: 56.25rem; /* 900px ÷ 16 = 56.25rem */
      min-height: 2rem;
-     
+
      /* Border radius - use variables */
      border-radius: var(--border-radius-8);
-     
+
      /* Box shadows - use px (not rem) */
      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
    }
    ```
 
 4. **State Handling:**
+
    ```css
    .button:focus {
      outline: none;
      box-shadow: 0 0 0 2px var(--blue-50);
    }
-   
+
    .button:hover:not(:disabled) {
      background: var(--grey-10);
    }
-   
+
    .button:disabled {
      opacity: 0.5;
      cursor: not-allowed;
@@ -134,30 +138,34 @@ Example prompt template:
 ### Type Definitions and Imports
 
 1. **Import Types Directly:**
-   ```typescript
-   // ✅ Preferred
+
+   ```ts
+    ✅ Preferred
+   i
    import type { CSSProperties, ReactNode } from 'react'
    import type { ValidFileType } from '/ai-client/resources/types'
-   
-   // ❌ Avoid
+   id
+   const s
    const style: React.CSSProperties = {}
    ```
 
 2. **Use Defined Types:**
-   ```typescript
+
+   ```ts
    // ✅ Use existing types
    const fileType: ValidFileType = getFileType(file)
-   
+
    // ❌ Avoid inline assertions
    const fileType = getFileType(file) as 'pdf' | 'csv' | 'python'
    ```
 
 3. **Explicit Null Checks:**
-   ```typescript
+
+   ```ts
    // ✅ Explicit checks
    if (fileType === null) return false
    if (extension != null && extension !== '') return `.${extension}`
-   
+
    // ❌ Avoid implicit truthiness
    if (!fileType) return false
    ```
@@ -165,24 +173,25 @@ Example prompt template:
 ### Event Handling Patterns
 
 1. **Named Event Handlers:**
-   ```typescript
+
+   ```ts
    // ✅ Named handlers for complex logic
    const handleClick = (e: React.MouseEvent<HTMLButtonElement>): void => {
      e.preventDefault()
      onClick()
    }
-   
+
    return <button onClick={handleClick}>Click me</button>
-   
+
    // ✅ Direct reference for simple cases
    return <button onClick={onClick}>Click me</button>
-   
+
    // ❌ Avoid unnecessary wrappers
    return <button onClick={() => onClick()}>Click me</button>
    ```
 
 2. **Form Button Types:**
-   ```typescript
+   ```ts
    // Always specify button type in forms
    <button type="button" onClick={handleAttach}>Attach</button>
    <button type="submit">Submit Form</button>
@@ -193,7 +202,8 @@ Example prompt template:
 ### Test File Structure and Organization
 
 Every component MUST have a test file with this structure:
-```
+
+```shell
 ComponentName/
 ├── index.tsx
 ├── componentname.module.css
@@ -206,29 +216,32 @@ ComponentName/
 Every new component MUST include ALL of the following test categories:
 
 #### 1. Basic Rendering Tests
-```typescript
+
+```ts
 describe('ComponentName', () => {
   let props: ComponentProps<typeof ComponentName>
-  
+
   beforeEach(() => {
-    props = { /* default props */ }
+    props = {
+      /* default props */
+    }
   })
-  
+
   afterEach(() => {
     vi.clearAllMocks()
   })
-  
+
   it('should render without crashing', () => {
     render(<ComponentName {...props} />)
     expect(screen.getByRole('...')).toBeInTheDocument()
   })
-  
+
   it('should render with custom props', () => {
     props.title = 'Custom Title'
     render(<ComponentName {...props} />)
     expect(screen.getByText('Custom Title')).toBeInTheDocument()
   })
-  
+
   it('should render with default values', () => {
     render(<ComponentName {...props} />)
     // Test default behavior
@@ -237,12 +250,13 @@ describe('ComponentName', () => {
 ```
 
 #### 2. Interaction Tests (if interactive)
-```typescript
+
+```ts
 it('should handle user interactions', () => {
   const mockOnClick = vi.fn()
   props.onClick = mockOnClick
   render(<ComponentName {...props} />)
-  
+
   fireEvent.click(screen.getByRole('button'))
   expect(mockOnClick).toHaveBeenCalledTimes(1)
 })
@@ -250,7 +264,7 @@ it('should handle user interactions', () => {
 it('should update state on user action', () => {
   render(<ToggleComponent {...props} />)
   const toggle = screen.getByRole('switch')
-  
+
   expect(toggle).not.toBeChecked()
   fireEvent.click(toggle)
   expect(toggle).toBeChecked()
@@ -258,7 +272,8 @@ it('should update state on user action', () => {
 ```
 
 #### 3. Accessibility Tests
-```typescript
+
+```ts
 it('should have proper accessibility attributes', () => {
   render(<ComponentName {...props} />)
   const button = screen.getByRole('button')
@@ -274,7 +289,8 @@ it('should support keyboard navigation', () => {
 ```
 
 #### 4. Error and Edge Case Tests
-```typescript
+
+```ts
 it('should handle errors gracefully', () => {
   props.data = null
   render(<ComponentName {...props} />)
@@ -297,33 +313,38 @@ it('should handle empty data', () => {
 ### Testing Best Practices
 
 1. **Props Pattern:**
-   ```typescript
+
+   ```ts
    let props: ComponentProps<typeof ComponentName>
-   
+
    beforeEach(() => {
-     props = { /* reset to defaults */ }
+     props = {
+       /* reset to defaults */
+     }
    })
-   
+
    afterEach(() => {
-     vi.clearAllMocks()  // Use afterEach for cleanup
+     vi.clearAllMocks() // Use afterEach for cleanup
    })
    ```
 
 2. **Avoid Direct DOM Access:**
-   ```typescript
+
+   ```ts
    // ❌ Never use querySelector
    const icon = container.querySelector('.icon-wrapper')
-   
+
    // ✅ Use data-testid for non-interactive elements
    <Icon name="arrow" data-testid="ComponentName_Icon" />
    const icon = screen.getByTestId('ComponentName_Icon')
    ```
 
 3. **Method Chaining for Assertions:**
-   ```typescript
+
+   ```ts
    // ✅ Preferred - concise
    expect(screen.getByRole('button', { name: 'Send' })).toBeDisabled()
-   
+
    // ❌ Avoid unnecessary variables
    const sendButton = screen.getByRole('button', { name: 'Send' })
    expect(sendButton).toBeDisabled()
@@ -337,7 +358,7 @@ it('should handle empty data', () => {
 
 ### Constants and Magic Numbers
 
-```typescript
+```ts
 // ✅ Extract all constants
 const UNIT_MB = 1024 * 1024
 const ACCEPT_EXTENSIONS = '.pdf,.csv,.py'
@@ -346,7 +367,7 @@ const MAX_FILES_PER_MESSAGE = 5
 export const FILE_SIZE_LIMITS = {
   pdf: 10 * UNIT_MB,
   csv: 2 * UNIT_MB,
-  python: 1 * UNIT_MB
+  python: 1 * UNIT_MB,
 } as const
 
 // ❌ Avoid magic numbers inline
@@ -355,12 +376,12 @@ const sizeMB = Math.round(sizeLimit / (1024 * 1024))
 
 ### Object Lookups vs Switch Statements
 
-```typescript
+```ts
 // ✅ Use object lookups for simple mappings
 const fileTypeLabels: Record<FileType, string> = {
   pdf: 'PDF file',
   csv: 'CSV file',
-  python: 'Python file'
+  python: 'Python file',
 }
 
 export const getFileTypeLabel = (type: FileType): string => fileTypeLabels[type]
@@ -370,7 +391,7 @@ export const getFileTypeLabel = (type: FileType): string => fileTypeLabels[type]
 
 ### Import Path Standards
 
-```typescript
+```ts
 // ✅ Use absolute imports
 import type { ChatData } from '/ai-client/resources/types'
 import { AttachedFileItem } from '/ai-client/atoms/AttachedFileItem'
@@ -383,7 +404,7 @@ import type { ChatData } from '../../resources/types'
 
 ### ARIA Labels
 
-```typescript
+```ts
 // ✅ Use underscores in dynamic aria-labels
 <button aria-label={`Remove_${file.name}`}>×</button>
 
@@ -401,30 +422,32 @@ import type { ChatData } from '../../resources/types'
 
 ### Validation Pattern
 
-```typescript
+```ts
 const ALLOWED_FILE_TYPES = {
   pdf: ['.pdf'],
   csv: ['.csv'],
-  python: ['.py']
+  python: ['.py'],
 } as const
 
 const ALLOWED_MIME_TYPES = {
   pdf: ['application/pdf'],
   csv: ['text/csv', 'application/csv'],
-  python: ['text/x-python', 'text/plain']
+  python: ['text/x-python', 'text/plain'],
 } as const
 
-export const validateFile = (file: File): { isValid: boolean; error?: string } => {
+export const validateFile = (
+  file: File
+): { isValid: boolean; error?: string } => {
   const fileType = getFileType(file)
   if (fileType === null) {
     return { isValid: false, error: 'File type not supported' }
   }
-  
+
   if (file.size > FILE_SIZE_LIMITS[fileType]) {
     const sizeMB = Math.round(FILE_SIZE_LIMITS[fileType] / UNIT_MB)
     return { isValid: false, error: `File too large. Max ${sizeMB}MB.` }
   }
-  
+
   return { isValid: true }
 }
 ```
@@ -433,7 +456,7 @@ export const validateFile = (file: File): { isValid: boolean; error?: string } =
 
 ### Separation of Concerns
 
-```typescript
+```ts
 // ✅ Separate router logic from presentation
 function App() {
   return (
@@ -451,11 +474,7 @@ function AppWithRouter() {
 
 // Pure presentation component (easily testable)
 function AppContent({ isOnChatPage }: { isOnChatPage: boolean }) {
-  return (
-    <div>
-      {!isOnChatPage ? <Footer /> : null}
-    </div>
-  )
+  return <div>{!isOnChatPage ? <Footer /> : null}</div>
 }
 ```
 
@@ -464,26 +483,29 @@ function AppContent({ isOnChatPage }: { isOnChatPage: boolean }) {
 ### Never Do These
 
 1. **Console logs in production code:**
-   ```typescript
+
+   ```ts
    // ❌ Remove all debug code
    console.log('debug:', data)
    debugger
    ```
 
 2. **Inline styles in components:**
-   ```typescript
+
+   ```ts
    // ❌ Never use inline styles
    <button style="background: blue;">Click</button>
    <div style={{backgroundColor: 'red'}}>Content</div>
    ```
 
 3. **Missing hook dependencies:**
-   ```typescript
+
+   ```ts
    // ❌ Missing dependencies
    useEffect(() => {
      fetchData(userId)
-   }, [])  // userId missing
-   
+   }, []) // userId missing
+
    // ✅ Complete dependencies
    useEffect(() => {
      fetchData(userId)
@@ -491,12 +513,13 @@ function AppContent({ isOnChatPage }: { isOnChatPage: boolean }) {
    ```
 
 4. **Conditional hooks:**
-   ```typescript
+
+   ```ts
    // ❌ Never conditionally call hooks
    if (condition) {
      const [state, setState] = useState(false)
    }
-   
+
    // ✅ Hooks at top level only
    const [state, setState] = useState(false)
    ```
@@ -527,6 +550,7 @@ Before submitting any component:
 ## Quick Reference
 
 ### CSS Variables
+
 ```css
 /* Colors */
 --white, --blue-50, --blue-60, --grey-30, --grey-60, --red-50
@@ -543,6 +567,8 @@ Before submitting any component:
 ```
 
 ### Unit Conversion
+
 - Divide px by 16 to get rem: `240px ÷ 16 = 15rem`
 - Use rem for all dimensions except box-shadow
 - Use px for box-shadow values only
+- Use px for img tag
