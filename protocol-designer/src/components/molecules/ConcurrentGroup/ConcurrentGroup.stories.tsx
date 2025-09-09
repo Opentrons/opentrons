@@ -40,7 +40,8 @@ export const CheckpointsAndStepContainers: Story = {
       }}
     >
       <StepContainer
-        text="1. Thermocycler"
+        stepNumber={1}
+        text="Thermocycler"
         type="default"
         size="iconAndText"
         iconName="transfer"
@@ -53,7 +54,8 @@ export const CheckpointsAndStepContainers: Story = {
       <ConcurrentGroup {...args}>
         <ConcurrentGroupCheckpoint text="Start profile" />
         <ConcurrentGroupStepContainer
-          text="2. Transfer"
+          stepNumber={2}
+          text="Transfer"
           type="default"
           size="iconAndText"
           iconName="transfer"
@@ -64,7 +66,8 @@ export const CheckpointsAndStepContainers: Story = {
           semiTransparent={false}
         />
         <ConcurrentGroupStepContainer
-          text="3. Transfer"
+          stepNumber={3}
+          text="Transfer"
           type="default"
           size="iconAndText"
           iconName="transfer"
@@ -80,7 +83,8 @@ export const CheckpointsAndStepContainers: Story = {
         <ConcurrentGroupCheckpoint text="...for example text" />
       </ConcurrentGroup>
       <StepContainer
-        text="4. Transfer"
+        stepNumber={4}
+        text="Transfer"
         type="default"
         size="iconAndText"
         iconName="transfer"
