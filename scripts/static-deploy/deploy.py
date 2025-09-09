@@ -191,7 +191,7 @@ def deploy_application(  # noqa: C901
         else:
             console.print("Using 'aws s3 sync --delete' to remove remote files not present locally", style="blue")
 
-        # Upload new artifacts using AWS CLI for faster sync and automatic content-type
+        # Upload new artifacts using AWS CLI instead of boto3 for faster sync and automatic content-type
         try:
             s3_uri = f"s3://{config.s3_bucket}/{s3_prefix}"
             cmd = [
