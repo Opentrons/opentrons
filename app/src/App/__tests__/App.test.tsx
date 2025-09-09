@@ -4,7 +4,7 @@ import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { getConfig, getIsOnDevice } from '/app/redux/config'
+import { getConfig } from '/app/redux/config'
 
 import { App } from '../'
 import { DesktopApp } from '../DesktopApp'
@@ -42,11 +42,10 @@ describe('App', () => {
     vi.mocked(SecondaryWindowApp).mockReturnValue(
       <div>mock SecondaryWindowApp</div>
     )
-    vi.mocked(useWindowType).mockReturnValue('main')
+    vi.mocked(useWindowType).mockReturnValue('desktop-main')
     when(vi.mocked(getConfig))
       .calledWith(MOCK_STATE)
       .thenReturn(MOCK_STATE.config)
-    when(vi.mocked(getIsOnDevice)).calledWith(MOCK_STATE).thenReturn(false)
   })
 
   it('renders null before config initializes', () => {
@@ -70,7 +69,7 @@ describe('App', () => {
   })
 
   it('renders an OnDeviceDisplayApp component when on device and window type is main', () => {
-    when(vi.mocked(getIsOnDevice)).calledWith(MOCK_STATE).thenReturn(true)
+    vi.mocked(useWindowType).mockReturnValue('odd-main')
 
     render()
 
