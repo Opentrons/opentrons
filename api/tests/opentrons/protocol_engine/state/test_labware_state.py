@@ -147,7 +147,9 @@ def test_raise_if_wells_are_invalid(ot3_standard_deck_def: DeckDefinitionV5) -> 
 
     with pytest.raises(errors.WellDoesNotExistError):
         subject_view.raise_if_wells_are_invalid("labware-id", ["well-1, well-3"])
+    with pytest.raises(errors.WellDoesNotExistError):
         subject_view.raise_if_wells_are_invalid(
             "labware-id", ["well-1, well-2", "well-4"]
         )
+    with pytest.raises(errors.WellDoesNotExistError):
         subject_view.raise_if_wells_are_invalid("labware-id", ["well-5"])
