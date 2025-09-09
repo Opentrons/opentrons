@@ -256,7 +256,7 @@ def write_github_summary(config: CIConfig) -> None:
 - **Workflow**: {os.environ.get("GITHUB_WORKFLOW", "unknown")}
 
 ---
-*Configuration resolved by `resolve_ci_config.py`*
+*Configuration resolved by `deploy_ci_config.py`*
 """
 
     try:

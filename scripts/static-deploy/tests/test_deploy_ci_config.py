@@ -21,6 +21,7 @@ def test_parse_github_env_branch_push():
         "GITHUB_REF": "refs/heads/test-branch",
         "GITHUB_REF_NAME": "test-branch",
         "GITHUB_WORKFLOW": "Labware Library test, build, and deploy",
+        "GITHUB_HEAD_REF": "",  # Explicitly set to empty to override any existing value
     }
 
     with patch.dict(os.environ, env, clear=False):
@@ -40,6 +41,7 @@ def test_parse_github_env_tag_push():
         "GITHUB_REF": "refs/tags/staging-labware-library-v1.0.0",
         "GITHUB_REF_NAME": "staging-labware-library-v1.0.0",
         "GITHUB_WORKFLOW": "Labware Library test, build, and deploy",
+        "GITHUB_HEAD_REF": "",  # Explicitly set to empty to override any existing value
     }
 
     with patch.dict(os.environ, env, clear=False):
@@ -60,6 +62,7 @@ def test_resolve_ci_config_sandbox():
         "GITHUB_REF_NAME": "feature-branch",
         "GITHUB_WORKFLOW": "Labware Library test, build, and deploy",
         "RELATIVE_ARTIFACT_DIR": "/test/artifacts",
+        "GITHUB_HEAD_REF": "",  # Explicitly set to empty to override any existing value
     }
 
     with patch.dict(os.environ, env, clear=False):
@@ -80,6 +83,7 @@ def test_resolve_ci_config_staging():
         "GITHUB_REF_NAME": "staging-mkdocs-v1.0.0",
         "GITHUB_WORKFLOW": "Docs build and deploy",
         "RELATIVE_ARTIFACT_DIR": "/build/docs",
+        "GITHUB_HEAD_REF": "",  # Explicitly set to empty to override any existing value
     }
 
     with patch.dict(os.environ, env, clear=False):
@@ -100,6 +104,7 @@ def test_resolve_ci_config_production():
         "GITHUB_REF_NAME": "docs-v2.0.0",
         "GITHUB_WORKFLOW": "Docs build and deploy",
         "RELATIVE_ARTIFACT_DIR": "/dist",
+        "GITHUB_HEAD_REF": "",  # Explicitly set to empty to override any existing value
     }
 
     with patch.dict(os.environ, env, clear=False):

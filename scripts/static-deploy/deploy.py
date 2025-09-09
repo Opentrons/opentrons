@@ -257,8 +257,8 @@ def deploy_application(  # noqa: C901
                 s3_uri,
                 "--only-show-errors",
                 "--exact-timestamps",
+                "--delete",
             ]
-            cmd.append("--delete")
             # Dry run simulation
             if dry_run:
                 cmd.append("--dryrun")
