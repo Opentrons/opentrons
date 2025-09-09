@@ -2,79 +2,60 @@
 
 This directory contains Python scripts for deploying static assets to S3 buckets.
 
-## Labware Library Deployment
+## Tag Patterns
 
-The `deploy.py` script deploys application build artifacts to S3 buckets using boto3.
+The deployment system recognizes the following tag patterns to determine the application and target environment:
 
-### Usage
+| Application         | Environment | Tag Pattern                | Examples                             |
+| ------------------- | ----------- | -------------------------- | ------------------------------------ |
+| **Labware Library** | Staging     | `staging-labware-library*` | `staging-labware-library@20250827.1` |
+| **Labware Library** | Production  | `labware-library*`         | `labware-library@20250827.1`         |
+| **MkDocs**          | Staging     | `staging-mkdocs*`          | `staging-mkdocs-v2.1.0`              |
+| **MkDocs**          | Production  | `mkdocs*`                  | `mkdocs-v2.1.0`                      |
+| **Docs**            | Staging     | `staging-docs*`            | `staging-docs-v1.0.0`                |
+| **Docs**            | Production  | `docs*`                    | `docs-v1.0.0`                        |
 
-#### From the labware-library directory:
+**Notes:**
 
-```bash
-# Deploy to sandbox (default)
-make deploy
+- Any unrecognized tag pattern defaults to **sandbox** environment
+- Branch pushes always deploy to **sandbox** environment
 
-# Deploy to specific environment
-make deploy ENVIRONMENT=staging
-make deploy ENVIRONMENT=production
+## Standard Deployment Steps
 
-# Deploy with custom branch
-make deploy ENVIRONMENT=sandbox BRANCH=feature-branch
+1. Test your PRs in the sandbox environment. They deploy there automatically with a prefix of your branch name.
+2. Test edge or chore_release\* branches in the sandbox environment, as they also deploy there automatically.
+3. Once ready, create and push a tag with the appropriate pattern for staging (e.g., `staging-labware-library@<version>`).
+4. After staging verification, create and push a production tag (e.g., `labware-library@<version>`) on the same commit that was used for staging.
 
-# Deploy with custom source directory
-make deploy ENVIRONMENT=sandbox ARGS="--source-dir custom-dist"
-```
-
-#### Direct script usage:
-
-```bash
-# Deploy to sandbox
-python scripts/static-deploy/deploy.py sandbox labware_library dist --branch edge
-
-# Deploy to staging
-python scripts/static-deploy/deploy.py staging labware_library dist
-
-# Deploy to production
-python scripts/static-deploy/deploy.py production labware_library dist
-
-# Deploy with custom source directory
-python scripts/static-deploy/deploy.py sandbox labware_library dist --branch edge
-```
-
-### Environment Variables
-
-- `AWS_PROFILE`: AWS profile to use (for local development)
-- `CI`: Set automatically in GitHub Actions
-
-### Bucket Configuration
-
-- **Sandbox**: `opentrons.sandbox.labware` (deploys to `/{branch}/`)
-- **Staging**: `opentrons.staging.labware` (deploys to root `/`)
-- **Production**: `opentrons.production.labware` (deploys to root `/`)
-
-### Tag Patterns
-
-- **Staging**: `staging-labware-library*` (e.g., `staging-labware-library@20250827.1`)
-- **Production**: `labware-library*` (e.g., `labware-library@20250827.1`)
-
-### GitHub Actions Workflow
-
-The `.github/workflows/labware-build-deploy.yaml` workflow automatically:
-
-1. Builds the labware library on pushes to `edge` branch
-2. Deploys to sandbox on pushes to `edge` branch
-3. Deploys to staging on tags matching `staging-labware-library*`
-4. Deploys to production on tags matching `labware-library*`
-
-### Local Testing
-
-```bash
-# Test the deployment logic (without AWS)
-python scripts/static-deploy/tests/test_deploy_labware.py
-```
-
-### Prerequisites
+### Prerequisites for local runs
 
 - AWS CLI configured with appropriate credentials
-- Labware library built (`make dist` in labware-library directory)
-- Python 3.10+ with required dependencies
+- uv installed for managing Python environments
+- make installed for using the Makefile
+- run `make setup` to install dependencies in the scripts/static-deploy directory
+
+## Local Example
+
+> This is only for emergency testing and debugging. Normal deployments should be done via CI by pushing tags.
+
+To deploy to the staging environment locally, run:
+
+1. Build the application (example Labware Library build command):
+
+```bash
+# In the root directory of the project
+make -C labware-library
+```
+
+1. Dry run Deploy the application
+
+```bash
+# In the scripts/static-deploy directory
+make deploy ENVIRONMENT=sandbox APPLICATION=labware_library SANDBOX_PREFIX=local-test RELATIVE_ARTIFACT_DIR="../../labware-library/dist" AWS_PROFILE=robotics-protocol-library-prod DRY_RUN=1
+```
+
+1. Actually Deploy the application
+
+```bash
+make deploy ENVIRONMENT=sandbox APPLICATION=labware_library SANDBOX_PREFIX=local-test RELATIVE_ARTIFACT_DIR="../../labware-library/dist" AWS_PROFILE=robotics-protocol-library-prod
+```
