@@ -449,6 +449,7 @@ nitpick_ignore_regex = [
     ("py:class", r".*(String)?Axis(Map|Type)*"),
     ("py:class", r".*protocol_api._types.PlungerPositionTypes*"),
     ("py:class", r".*protocol_api._types.PipetteActionTypes*"),
+    ("py:class", r".*protocol_api.module_contexts.ModuleContext*"),
     (
         "py:class",
         r".*AbstractLabware|APIVersion|LabwareLike|LoadedCoreMap|ModuleTypes|NoneType|OffDeckType|ProtocolCore|WellCore",
