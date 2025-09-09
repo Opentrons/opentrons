@@ -81,6 +81,7 @@ import type {
   MagneticModuleState,
   ModuleOnDeck,
   ModulesForEditModulesCard,
+  ModuleTemporalProperties,
   NormalizedLabware,
   NormalizedLabwareById,
   PipetteOnDeck,
@@ -248,6 +249,19 @@ const FLEX_STACKER_INITIAL_STATE: FlexStackerModuleState = {
   type: FLEX_STACKER_MODULE_TYPE,
 }
 
+const MODULE_INITIAL_STATES_MAP: Record<
+  string,
+  ModuleTemporalProperties['moduleState']
+> = {
+  [MAGNETIC_MODULE_TYPE]: MAGNETIC_MODULE_INITIAL_STATE,
+  [TEMPERATURE_MODULE_TYPE]: TEMPERATURE_MODULE_INITIAL_STATE,
+  [THERMOCYCLER_MODULE_TYPE]: THERMOCYCLER_MODULE_INITIAL_STATE,
+  [HEATERSHAKER_MODULE_TYPE]: HEATERSHAKER_MODULE_INITIAL_STATE,
+  [MAGNETIC_BLOCK_TYPE]: MAGNETIC_BLOCK_INITIAL_STATE,
+  [ABSORBANCE_READER_TYPE]: ABSORBANCE_READER_INITIAL_STATE,
+  [FLEX_STACKER_MODULE_TYPE]: FLEX_STACKER_INITIAL_STATE,
+}
+
 const _getInitialDeckSetup = (
   initialSetupStep: FormData,
   labwareEntities: LabwareEntities,
@@ -296,71 +310,20 @@ const _getInitialDeckSetup = (
       moduleLocations as Record<DeckSlot, string>,
       (slot: DeckSlot, moduleId: string): ModuleOnDeck => {
         const moduleEntity = moduleEntities[moduleId]
+        const { id, model, type, pythonName } = moduleEntity
+        const moduleState = MODULE_INITIAL_STATES_MAP[type]
 
-        switch (moduleEntity.type) {
-          case MAGNETIC_MODULE_TYPE:
-            return {
-              id: moduleEntity.id,
-              model: moduleEntity.model,
-              type: MAGNETIC_MODULE_TYPE,
-              slot,
-              moduleState: MAGNETIC_MODULE_INITIAL_STATE,
-              pythonName: moduleEntity.pythonName,
-            }
-          case TEMPERATURE_MODULE_TYPE:
-            return {
-              id: moduleEntity.id,
-              model: moduleEntity.model,
-              type: TEMPERATURE_MODULE_TYPE,
-              slot,
-              moduleState: TEMPERATURE_MODULE_INITIAL_STATE,
-              pythonName: moduleEntity.pythonName,
-            }
-          case THERMOCYCLER_MODULE_TYPE:
-            return {
-              id: moduleEntity.id,
-              model: moduleEntity.model,
-              type: THERMOCYCLER_MODULE_TYPE,
-              slot,
-              moduleState: THERMOCYCLER_MODULE_INITIAL_STATE,
-              pythonName: moduleEntity.pythonName,
-            }
-          case HEATERSHAKER_MODULE_TYPE:
-            return {
-              id: moduleEntity.id,
-              model: moduleEntity.model,
-              type: HEATERSHAKER_MODULE_TYPE,
-              slot,
-              moduleState: HEATERSHAKER_MODULE_INITIAL_STATE,
-              pythonName: moduleEntity.pythonName,
-            }
-          case MAGNETIC_BLOCK_TYPE:
-            return {
-              id: moduleEntity.id,
-              model: moduleEntity.model,
-              type: MAGNETIC_BLOCK_TYPE,
-              slot,
-              moduleState: MAGNETIC_BLOCK_INITIAL_STATE,
-              pythonName: moduleEntity.pythonName,
-            }
-          case ABSORBANCE_READER_TYPE:
-            return {
-              id: moduleEntity.id,
-              model: moduleEntity.model,
-              type: ABSORBANCE_READER_TYPE,
-              slot,
-              moduleState: ABSORBANCE_READER_INITIAL_STATE,
-              pythonName: moduleEntity.pythonName,
-            }
-          case FLEX_STACKER_MODULE_TYPE:
-            return {
-              id: moduleEntity.id,
-              model: moduleEntity.model,
-              type: FLEX_STACKER_MODULE_TYPE,
-              slot,
-              moduleState: FLEX_STACKER_INITIAL_STATE,
-              pythonName: moduleEntity.pythonName,
-            }
+        if (moduleState == null) {
+          console.error(`Unknown module type: ${type}`)
+        }
+
+        return {
+          id,
+          model,
+          type,
+          slot,
+          moduleState,
+          pythonName,
         }
       }
     ),
