@@ -509,7 +509,7 @@ export function getLoadWasteChute(
 }
 
 const formatDescription = (description?: string | null): string => {
-  if (description == null) {
+  if (!description) {
     return ''
   }
   return (
