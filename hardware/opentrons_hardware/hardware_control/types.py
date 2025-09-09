@@ -23,6 +23,10 @@ class PCBARevision:
     tertiary: Optional[str] = None
     #: An often-not-present tertiary
 
+    def __repr__(self) -> str:
+        """Readable representation of the PCB revision."""
+        return f"{self.main}.{self.tertiary or 0}".upper()
+
 
 class MoveCompleteAck(Enum):
     """Move Complete Ack."""

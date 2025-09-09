@@ -157,9 +157,10 @@ export function useGetModulesNeedingSetup(): AttachedModule[] {
       .map(m => m.opentronsModuleSerialNumber)
     return attachedModules.filter(
       m =>
-        !modulesInDeckConfig.includes(m.serialNumber) ||
-        (!MODULES_NOT_REQUIRING_CALIBRATION.includes(m.moduleType) &&
-          m.moduleOffset === undefined)
+        m.compatibleWithRobot &&
+        (!modulesInDeckConfig.includes(m.serialNumber) ||
+          (!MODULES_NOT_REQUIRING_CALIBRATION.includes(m.moduleType) &&
+            m.moduleOffset === undefined))
     )
   }
   return []

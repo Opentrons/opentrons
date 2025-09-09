@@ -1,13 +1,18 @@
 """Tests for robot_server.modules.module_data_mapper."""
+from decoy import Decoy
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.types import SubSystem, SubSystemState
 import pytest
 
 from opentrons.protocol_engine import ModuleModel, DeckType
 from opentrons.protocol_engine.types import Vec3f
 from opentrons.drivers.rpi_drivers.types import USBPort as HardwareUSBPort, PortGroup
 from opentrons.hardware_control.modules import (
+    FlexStackerStatus,
     LiveData,
     ModuleType,
     MagneticStatus,
+    PlatformState,
     TemperatureStatus,
     HeaterShakerStatus,
     types as hc_types,
@@ -18,6 +23,8 @@ from robot_server.modules.module_identifier import ModuleIdentity
 from robot_server.modules.module_data_mapper import ModuleDataMapper
 
 from robot_server.modules.module_models import (
+    FlexStackerModule,
+    FlexStackerModuleData,
     UsbPort,
     MagneticModule,
     MagneticModuleData,
@@ -114,6 +121,7 @@ def test_maps_magnetic_module_data(
     input_data: LiveData,
     expected_output_data: MagneticModuleData,
     expected_compatible: bool,
+    hardware_api: HardwareControlAPI,
 ) -> None:
     """It should map hardware data to a magnetic module."""
     module_identity = ModuleIdentity(
@@ -132,7 +140,7 @@ def test_maps_magnetic_module_data(
         device_path="/dev/null",
     )
 
-    subject = ModuleDataMapper(deck_type=deck_type)
+    subject = ModuleDataMapper(deck_type=deck_type, hardware=hardware_api)
     result = subject.map_data(
         model=input_model,
         module_identity=module_identity,
@@ -187,6 +195,7 @@ def test_maps_temperature_module_data(
     expected_compatible: bool,
     status: str,
     data: hc_types.TemperatureModuleData,
+    hardware_api: HardwareControlAPI,
 ) -> None:
     """It should map hardware data to a magnetic module."""
     input_data: LiveData = {"status": status, "data": data}
@@ -206,7 +215,7 @@ def test_maps_temperature_module_data(
         device_path="/dev/null",
     )
 
-    subject = ModuleDataMapper(deck_type=deck_type)
+    subject = ModuleDataMapper(deck_type=deck_type, hardware=hardware_api)
     result = subject.map_data(
         model=input_model,
         module_identity=module_identity,
@@ -297,6 +306,7 @@ def test_maps_thermocycler_module_data(
     expected_compatible: bool,
     status: str,
     data: hc_types.ThermocyclerData,
+    hardware_api: HardwareControlAPI,
 ) -> None:
     """It should map hardware data to a magnetic module."""
     input_data: LiveData = {"status": status, "data": data}
@@ -316,7 +326,7 @@ def test_maps_thermocycler_module_data(
         device_path="/dev/null",
     )
 
-    subject = ModuleDataMapper(deck_type=deck_type)
+    subject = ModuleDataMapper(deck_type=deck_type, hardware=hardware_api)
     result = subject.map_data(
         model=input_model,
         module_identity=module_identity,
@@ -402,7 +412,11 @@ def test_maps_thermocycler_module_data(
     ],
 )
 def test_maps_heater_shaker_module_data(
-    input_model: str, deck_type: DeckType, status: str, data: hc_types.HeaterShakerData
+    input_model: str,
+    deck_type: DeckType,
+    status: str,
+    data: hc_types.HeaterShakerData,
+    hardware_api: HardwareControlAPI,
 ) -> None:
     """It should map hardware data to a magnetic module."""
     input_data: LiveData = {"status": status, "data": data}
@@ -422,7 +436,7 @@ def test_maps_heater_shaker_module_data(
         device_path="/dev/null",
     )
 
-    subject = ModuleDataMapper(deck_type=deck_type)
+    subject = ModuleDataMapper(deck_type=deck_type, hardware=hardware_api)
     result = subject.map_data(
         model=input_model,
         module_identity=module_identity,
@@ -460,6 +474,118 @@ def test_maps_heater_shaker_module_data(
             temperatureStatus=data["temperatureStatus"],  # type: ignore[arg-type]
             currentTemperature=data["currentTemp"],
             targetTemperature=data["targetTemp"],
+            errorDetails=data["errorDetails"],
+        ),
+    )
+
+
+@pytest.mark.parametrize(
+    "input_model,deck_type,rear_panel_rev,compatible",
+    [
+        ("flexStackerModuleV1", DeckType("ot2_standard"), "", False),
+        ("flexStackerModuleV1", DeckType("ot3_standard"), "C1", False),
+        ("flexStackerModuleV1", DeckType("ot3_standard"), "D1", True),
+    ],
+)
+@pytest.mark.parametrize(
+    "status,data",
+    [
+        (
+            "idle",
+            {
+                "latchState": "closed",
+                "platformState": "extended",
+                "hopperDoorState": "closed",
+                "installDetected": True,
+                "errorDetails": "",
+            },
+        ),
+        (
+            "dispensing",
+            {
+                "latchState": "closed",
+                "platformState": "retracted",
+                "hopperDoorState": "closed",
+                "installDetected": True,
+                "errorDetails": "",
+            },
+        ),
+    ],
+)
+def test_maps_flex_stacker_module_data(
+    input_model: str,
+    deck_type: DeckType,
+    rear_panel_rev: str,
+    compatible: bool,
+    status: str,
+    data: hc_types.FlexStackerData,
+    hardware_api: HardwareControlAPI,
+    decoy: Decoy,
+) -> None:
+    """It should map hardware data to a flex stacker."""
+    input_data: LiveData = {"status": status, "data": data}
+    module_identity = ModuleIdentity(
+        module_id="module-id",
+        serial_number="serial-number",
+        firmware_version="1.2.3",
+        hardware_revision="4.5.6",
+    )
+
+    hardware_usb_port = HardwareUSBPort(
+        name="abc",
+        port_number=101,
+        port_group=PortGroup.RIGHT,
+        hub=True,
+        hub_port=1,
+        device_path="1.0/tty/ttyACM1/dev",
+    )
+    decoy.when(hardware_api.attached_subsystems).then_return(
+        {
+            SubSystem.rear_panel: SubSystemState(
+                ok=True,
+                current_fw_version=63,
+                next_fw_version=63,
+                fw_update_needed=False,
+                current_fw_sha="",
+                pcba_revision=rear_panel_rev,
+                update_state=None,
+            )
+        }
+    )
+
+    subject = ModuleDataMapper(deck_type=deck_type, hardware=hardware_api)
+    result = subject.map_data(
+        model=input_model,
+        module_identity=module_identity,
+        has_available_update=False,
+        live_data=input_data,
+        usb_port=hardware_usb_port,
+        module_offset=None,
+    )
+
+    assert result == FlexStackerModule(
+        id="module-id",
+        serialNumber="serial-number",
+        firmwareVersion="1.2.3",
+        hardwareRevision="4.5.6",
+        hasAvailableUpdate=False,
+        moduleType=ModuleType.FLEX_STACKER,
+        compatibleWithRobot=compatible,
+        moduleModel=ModuleModel(input_model),  # type: ignore[arg-type]
+        usbPort=UsbPort(
+            port=101,
+            portGroup=PortGroup.RIGHT,
+            hub=True,
+            hubPort=1,
+            path="1.0/tty/ttyACM1/dev",
+        ),
+        moduleOffset=None,
+        data=FlexStackerModuleData(
+            status=FlexStackerStatus(status),
+            latchState=hc_types.LatchState(data["latchState"]),
+            platformState=PlatformState(data["platformState"]),
+            hopperDoorState=hc_types.HopperDoorState(data["hopperDoorState"]),
+            installDetected=data["installDetected"],
             errorDetails=data["errorDetails"],
         ),
     )

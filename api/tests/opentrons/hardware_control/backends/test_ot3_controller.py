@@ -258,7 +258,7 @@ def _subsystems_entry(info: DeviceInfoCache) -> Tuple[SubSystem, SubSystemState]
         current_fw_version=info.version,
         next_fw_version=2,
         current_fw_sha=info.shortsha,
-        pcba_revision="A1",
+        pcba_revision="A1.0",
         update_state=None,
         fw_update_needed=False,
     )

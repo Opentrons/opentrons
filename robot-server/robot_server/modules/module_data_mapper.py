@@ -2,6 +2,8 @@
 from typing import Annotated, List, Type, cast, Optional
 from fastapi import Depends
 
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.types import SubSystem
 from opentrons_shared_data.module import load_definition
 
 from opentrons.hardware_control.modules import (
@@ -48,14 +50,19 @@ from .module_models import (
     UsbPort,
 )
 
-from robot_server.hardware import get_deck_type
+from robot_server.hardware import get_deck_type, get_hardware
 
 
 class ModuleDataMapper:
     """Map hardware control modules to module response."""
 
-    def __init__(self, deck_type: Annotated[DeckType, Depends(get_deck_type)]) -> None:
+    def __init__(
+        self,
+        deck_type: Annotated[DeckType, Depends(get_deck_type)],
+        hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
+    ) -> None:
         self.deck_type = deck_type
+        self.hardware = hardware
 
     def map_data(
         self,
@@ -73,6 +80,9 @@ class ModuleDataMapper:
         module_cls: Type[AttachedModule]
         module_data: AttachedModuleData
         module_definition = load_definition(model_or_loadname=model, version="3")
+        compatible_with_robot = (
+            self.deck_type.value not in module_definition["incompatibleWithDecks"]
+        )
 
         # rely on Pydantic to check/coerce data fields from dicts at run time
         if module_type == ModuleType.MAGNETIC:
@@ -164,6 +174,7 @@ class ModuleDataMapper:
                 referenceWavelength=cast(
                     int, live_data["data"].get("referenceWavelength")
                 ),
+                errorDetails=cast(str, live_data["data"].get("errorDetails")),
             )
         elif module_type == ModuleType.FLEX_STACKER:
             module_cls = FlexStackerModule
@@ -178,7 +189,20 @@ class ModuleDataMapper:
                     HopperDoorState, live_data["data"].get("hopperDoorState")
                 ),
                 installDetected=cast(bool, live_data["data"].get("installDetected")),
+                errorDetails=cast(str, live_data["data"].get("errorDetails")),
             )
+
+            # Make sure this robot is compatible with the Flex Stacker by
+            # checking the rear panel revision, which has been updated to D1 to
+            # support the Stacker.
+            compatible_with_robot = False
+            if self.deck_type == DeckType.OT3_STANDARD:
+                compatible_with_robot = (
+                    self.hardware.attached_subsystems[
+                        SubSystem.rear_panel
+                    ].pcba_revision
+                    >= "D1.0"
+                )
         else:
             assert False, f"Invalid module type {module_type}"
 
@@ -188,9 +212,7 @@ class ModuleDataMapper:
             firmwareVersion=module_identity.firmware_version,
             hardwareRevision=module_identity.hardware_revision,
             hasAvailableUpdate=has_available_update,
-            compatibleWithRobot=(
-                not (self.deck_type.value in module_definition["incompatibleWithDecks"])
-            ),
+            compatibleWithRobot=compatible_with_robot,
             usbPort=UsbPort(
                 port=usb_port.port_number,
                 portGroup=usb_port.port_group,
