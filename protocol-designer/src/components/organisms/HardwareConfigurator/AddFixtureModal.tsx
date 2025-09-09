@@ -61,6 +61,7 @@ import type { FormModules, ModuleOnDeck } from '/protocol-designer/step-forms'
 import type { DeckFixture } from '/protocol-designer/step-forms/actions/additionalItems'
 import type { Fixtures, WizardFormState } from '../types'
 
+const ADDRESSABLE_AREA_D3 = 'D3'
 export interface ModuleExtended extends ModuleOnDeck {
   cutoutId: CutoutId
 }
@@ -112,7 +113,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     addressableAreaId,
     existingCutoutFixtureId,
   } = props
-  const { t, i18n } = useTranslation(['shared', 'deck_configuration'])
+  const { t, i18n } = useTranslation('shared')
   const initialDeckSetup = useSelector(getInitialDeckSetup)
   const enableStackerFF = useSelector(getEnableStacking)
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
@@ -205,7 +206,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
   } else if (
     optionStage === 'fixtureOptions' &&
     cutoutId === WASTE_CHUTE_CUTOUT &&
-    addressableAreaId === 'D3'
+    addressableAreaId === ADDRESSABLE_AREA_D3
   ) {
     nextStageOptions = (
       <FixtureOption
@@ -264,7 +265,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
             c => c.cutoutId === fixture.cutoutId
           ) ?? fixture
         )
-      }) as CutoutConfig[]
+      })
       const newModule = addedCutoutConfigs.find(cutoutConfig =>
         MODULE_MODELS.includes(cutoutConfig.type as ModuleModel)
       )
