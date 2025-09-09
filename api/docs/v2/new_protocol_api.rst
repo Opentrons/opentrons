@@ -22,6 +22,9 @@ Instruments
    :members:
    :exclude-members: delay
 
+Robot Motors
+============
+
 .. autoclass:: opentrons.protocol_api.RobotContext
    :members: 
    :exclude-members: 
