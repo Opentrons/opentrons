@@ -22,9 +22,6 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
 import { INITIAL_DECK_SETUP_STEP_ID } from '/protocol-designer/constants'
-import { deleteContainer } from '/protocol-designer/labware-ingred/actions'
-import { TIPRACK_LID_LOADNAME } from '/protocol-designer/pages/Designer/utils'
-import { deletePipettes } from '/protocol-designer/step-forms/actions'
 import { toggleIsGripperRequired } from '/protocol-designer/step-forms/actions/additionalItems'
 import { getAdditionalEquipmentEntities } from '/protocol-designer/step-forms/selectors'
 import { changeSavedStepForm } from '/protocol-designer/steplist/actions'
@@ -98,13 +95,6 @@ export function PipetteOverview({
       ? getSectionsFromPipetteName(leftPipette.name, leftPipette.spec)
       : null
 
-  const previousLeftPipetteTipracks = Object.values(labware)
-    .filter(lw => lw.def.parameters.isTiprack)
-    .filter(tip => leftPipette?.tiprackDefURI.includes(tip.labwareDefURI))
-  const previousRightPipetteTipracks = Object.values(labware)
-    .filter(lw => lw.def.parameters.isTiprack)
-    .filter(tip => rightPipette?.tiprackDefURI.includes(tip.labwareDefURI))
-
   const {
     setPage,
     setMount,
@@ -112,21 +102,24 @@ export function PipetteOverview({
     setPipetteGen,
     setPipetteVolume,
     setSelectedTips,
+    temporarilyDeletedPipettes,
+    setTemporarilyDeletedPipettes,
   } = pipetteConfig
+
+  const visibleLeftPipette =
+    leftPipette != null && !temporarilyDeletedPipettes.includes(leftPipette.id)
+      ? leftPipette
+      : null
+  const visibleRightPipette =
+    rightPipette != null &&
+    !temporarilyDeletedPipettes.includes(rightPipette.id)
+      ? rightPipette
+      : null
 
   const handleAddPipette = (): void => {
     setPage('add')
     setMount(targetPipetteMount)
     setSaveAttemptFailed(false)
-  }
-  const allTiprackLidsOnDeck = Object.values(labware).filter(
-    lw => lw.def.parameters.loadName === TIPRACK_LID_LOADNAME
-  )
-
-  const handleDeletingTipLids = (): void => {
-    allTiprackLidsOnDeck.forEach(lid =>
-      dispatch(deleteContainer({ labwareId: lid.id }))
-    )
   }
 
   return (
@@ -165,7 +158,9 @@ export function PipetteOverview({
           )}
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-          {leftPipette?.tiprackDefURI != null && leftInfo != null ? (
+          {visibleLeftPipette?.tiprackDefURI != null &&
+          leftInfo != null &&
+          leftPipette != null ? (
             <PipetteInfoItem
               mount="left"
               pipetteName={leftPipette.name}
@@ -179,21 +174,13 @@ export function PipetteOverview({
                 setSelectedTips(leftPipette.tiprackDefURI as string[])
               }}
               cleanForm={() => {
-                dispatch(deletePipettes([leftPipette.id as string]))
-                previousLeftPipetteTipracks.forEach(tip => {
-                  const tipStack = tip.stack
-                  //  to delete any tiprackAdapters + tipracks
-                  tipStack.forEach(item => {
-                    if (labware[item] != null) {
-                      dispatch(deleteContainer({ labwareId: item }))
-                    }
-                  })
-                })
-                handleDeletingTipLids()
+                setTemporarilyDeletedPipettes(prev => [...prev, leftPipette.id])
               }}
             />
           ) : null}
-          {rightPipette?.tiprackDefURI != null && rightInfo != null ? (
+          {visibleRightPipette?.tiprackDefURI != null &&
+          rightInfo != null &&
+          rightPipette != null ? (
             <PipetteInfoItem
               mount="right"
               pipetteName={rightPipette.name}
@@ -207,17 +194,10 @@ export function PipetteOverview({
                 setSelectedTips(rightPipette.tiprackDefURI as string[])
               }}
               cleanForm={() => {
-                dispatch(deletePipettes([rightPipette.id as string]))
-                previousRightPipetteTipracks.forEach(tip => {
-                  const tipStack = tip.stack
-                  //  to delete any tiprackAdapters + tipracks
-                  tipStack.forEach(item => {
-                    if (labware[item] != null) {
-                      dispatch(deleteContainer({ labwareId: item }))
-                    }
-                  })
-                  handleDeletingTipLids()
-                })
+                setTemporarilyDeletedPipettes(prev => [
+                  ...prev,
+                  rightPipette.id,
+                ])
               }}
             />
           ) : null}
