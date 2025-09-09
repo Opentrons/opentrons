@@ -5,8 +5,7 @@
 1. Follow the instructions in [DEV_SETUP.md](../DEV_SETUP.md) for javascript
 1. `cd analyses-snapshot-testing`
 1. have uv installed
-1. `make setup install-ot`
-1. Have docker installed and the daemon running
+1. `make setup`
 
 ## Concepts
 

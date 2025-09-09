@@ -19,11 +19,11 @@ import {
   TEXT_ALIGN_CENTER,
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
+  WizardHeader,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { i18n } from '/app/i18n'
-import { WizardHeader } from '/app/molecules/WizardHeader'
 
 const SUPPORT_EMAIL = 'support@opentrons.com'
 interface FatalErrorProps {

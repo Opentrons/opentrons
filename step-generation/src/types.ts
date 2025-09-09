@@ -20,6 +20,9 @@ import type {
 } from '@opentrons/shared-data'
 import type { AtomicProfileStep } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type {
+  CLEAN,
+  DIRTY,
+  EMPTY,
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_DEACTIVATED,
@@ -29,8 +32,15 @@ import type {
 export type DeckSlot = string
 type THERMOCYCLER_STATE = 'thermocyclerState'
 type THERMOCYCLER_PROFILE = 'thermocyclerProfile'
+
+export const TOUCHED_PIPETTABLE_LABWARE: 'TOUCHED_PIPETTABLE_LABWARE' =
+  'TOUCHED_PIPETTABLE_LABWARE'
 export interface LabwareTemporalProperties {
-  stack: string[] // a stack of ids from top to bottom
+  // a stack of ids from top to bottom
+  stack: string[]
+  // we currently use this property only to track if a lid has been placed on a "pipettable" labware that could presumably contain liquid
+  // we can expand this type in the future to track other types of sterility for various labware types
+  sterility?: typeof TOUCHED_PIPETTABLE_LABWARE
 }
 
 export interface PipetteTemporalProperties {
@@ -43,6 +53,8 @@ export interface PipetteTemporalProperties {
   nozzles?: NozzleConfigurationStyle
   //  current tiprack assosciated with pipette
   tiprackId?: string
+  //  last primary tip well accessed (used for return tip)
+  tipWell?: string
 }
 
 export interface MagneticModuleState {
@@ -235,16 +247,21 @@ export interface InnerDelayArgs {
 }
 
 interface CommonArgs {
+  /** NOTE: stepNumber probably shouldn't be optional but making it optional
+   * for the sake of not having to make too many changes for PD 8.5.2
+   * this should be refactored to not be optional for PD 8.6.0
+   * making it optional saves a lot of changes in unit tests
+   */
+  stepNumber?: number
   /** Optional user-readable name for this step */
-  name: string | null | undefined
+  name?: string | null
   /** Optional user-readable description/notes for this step */
-  description: string | null | undefined
+  description?: string | null
 }
 
 // ===== Processed form types. Used as args to call command creator fns =====
 
 export type SharedTransferLikeArgs = CommonArgs & {
-  stepId: number
   tipRack: string // tipRackDefUri
   pipette: string // PipetteId
   nozzles: NozzleConfigurationStyle | null // setting for 96-channel
@@ -309,7 +326,7 @@ export type SharedTransferLikeArgs = CommonArgs & {
   blowoutFlowRateUlSec: number
 
   // ===== SETTINGS INTRODUCED WITH LIQUID CLASSES =====
-  liquidClass: string | null
+  liquidClass: string | null // a liquid class name like "water" or null; "none" is not allowed
   aspiratePositionReference: PositionReference
   aspirateZOffset: number
   aspirateSubmergeSpeed: number | null
@@ -479,6 +496,7 @@ export interface HeaterShakerArgs extends CommonArgs {
   commandCreatorFnName: 'heaterShaker'
   targetTemperature: number | null
   latchOpen: boolean
+  timerHours: number | null
   timerMinutes: number | null
   timerSeconds: number | null
   message?: string
@@ -506,7 +524,7 @@ interface ProfileCycleItem {
 // TODO IMMEDIATELY: ProfileStepItem -> ProfileStep, ProfileCycleItem -> ProfileCycle
 export type ProfileItem = ProfileStepItem | ProfileCycleItem
 
-export interface ThermocyclerProfileStepArgs {
+export interface ThermocyclerProfileStepArgs extends CommonArgs {
   moduleId: string
   commandCreatorFnName: THERMOCYCLER_PROFILE
   blockTargetTempHold: number | null
@@ -521,7 +539,7 @@ export interface ThermocyclerProfileStepArgs {
   }
 }
 
-export interface ThermocyclerStateStepArgs {
+export interface ThermocyclerStateStepArgs extends CommonArgs {
   moduleId: string
   commandCreatorFnName: THERMOCYCLER_STATE
   blockTargetTemp: number | null
@@ -622,6 +640,7 @@ export interface InvariantContext {
   config: Config
 }
 
+export type TipState = typeof CLEAN | typeof DIRTY | typeof EMPTY
 export interface TimelineFrame {
   pipettes: {
     [pipetteId: string]: PipetteTemporalProperties
@@ -635,14 +654,14 @@ export interface TimelineFrame {
   tipState: {
     tipracks: {
       [labwareId: string]: {
-        [wellName: string]: boolean // true if tip is in there
+        [wellName: string]: TipState
       }
     }
     pipettes: {
       [pipetteId: string]: {
         hasTip: boolean
         tiprackURI: string | null
-      } // true if pipette has tip(s)
+      }
     }
   }
   liquidState: {
@@ -674,6 +693,7 @@ export type ErrorType =
   | 'ABSORBANCE_READER_NO_GRIPPER'
   | 'ABSORBANCE_READER_NO_INITIALIZATION'
   | 'CANNOT_MOVE_WITH_GRIPPER'
+  | 'CLOSING_THERMOCYCLER_WITH_INVALID_LABWARE_LID'
   | 'DROP_TIP_LOCATION_DOES_NOT_EXIST'
   | 'EQUIPMENT_DOES_NOT_EXIST'
   | 'GRIPPER_REQUIRED'
@@ -686,7 +706,7 @@ export type ErrorType =
   | 'HEATER_SHAKER_NORTH_SOUTH_EAST_WEST_SHAKING'
   | 'INSUFFICIENT_TIPS'
   | 'INVALID_SLOT'
-  | 'LABWARE_DISCARDED_IN_WASTE_CHUTE'
+  | 'LABWARE_DISCARDED_IN_TRASH'
   | 'LABWARE_DOES_NOT_EXIST'
   | 'LABWARE_OFF_DECK'
   | 'LABWARE_ON_ANOTHER_ENTITY'
@@ -696,6 +716,7 @@ export type ErrorType =
   | 'MISSING_TEMPERATURE_STEP'
   | 'MODULE_PIPETTE_COLLISION_DANGER'
   | 'MULTI_DISPENSE_VALUES_NOT_FOUND'
+  | 'NEXT_TIPRACK_HAS_LID'
   | 'NO_TIP_ON_PIPETTE'
   | 'NO_TIP_SELECTED'
   | 'PIPETTE_DOES_NOT_EXIST'
@@ -706,11 +727,14 @@ export type ErrorType =
   | 'REMOVE_96_CHANNEL_TIPRACK_ADAPTER'
   | 'RETRACT_BELOW_ASPIRATE'
   | 'RETRACT_BELOW_DISPENSE'
+  | 'RETURN_TIP_UNAVAILABLE'
+  | 'STACK_TOO_HIGH'
   | 'SUBMERGE_BELOW_ASPIRATE'
   | 'SUBMERGE_BELOW_DISPENSE'
   | 'TALL_LABWARE_EAST_WEST_OF_HEATER_SHAKER'
   | 'THERMOCYCLER_LID_CLOSED'
   | 'TIP_VOLUME_EXCEEDED'
+  | 'TIPRACK_LID_NOT_ALLOWED_ON_DECK'
 
 export interface CommandCreatorError {
   message: string
@@ -729,9 +753,16 @@ export interface CommandCreatorWarning {
   type: WarningType
 }
 
+interface StepInfo {
+  stepNumber?: number
+  name?: string | null
+  description?: string | null
+}
+
 export interface CommandsAndRobotState {
   commands: CreateCommand[]
   robotState: RobotState
+  stepInfo?: StepInfo
   warnings?: CommandCreatorWarning[]
   python?: string
 }
@@ -741,7 +772,7 @@ export interface CommandCreatorErrorResponse {
   warnings?: CommandCreatorWarning[]
 }
 
-export interface CommandsAndWarnings {
+export interface CommandsAndWarnings extends StepInfo {
   commands: CreateCommand[]
   warnings?: CommandCreatorWarning[]
   python?: string

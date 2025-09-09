@@ -193,6 +193,10 @@ class ModuleDefinition(BaseModel):
         ...,
     )
 
+    orientation: Dict[str, str] = Field(
+        ...,
+    )
+
     compatibleWith: List[ModuleModel] = Field(
         ...,
     )
@@ -274,6 +278,13 @@ class StackerFillEmptyStrategy(str, Enum):
 
     MANUAL_WITH_PAUSE = "manualWithPause"
     LOGICAL = "logical"
+
+
+class StackerLabwareMovementStrategy(str, Enum):
+    """Strategy to retrieve or store labware."""
+
+    AUTOMATIC = "automatic"
+    MANUAL = "manual"
 
 
 class StackerStoredLabwareGroup(BaseModel):

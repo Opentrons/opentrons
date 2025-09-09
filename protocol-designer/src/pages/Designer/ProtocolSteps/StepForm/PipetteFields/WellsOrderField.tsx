@@ -14,10 +14,10 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
-import { WellOrderModal } from '../../../../../components/organisms'
+import { WellOrderModal } from '/protocol-designer/components/organisms'
 
-import type { WellOrderOption } from '../../../../../form-types'
-import type { MoveLiquidPrefixType } from '../../../../../resources/types'
+import type { WellOrderOption } from '/protocol-designer/form-types'
+import type { MoveLiquidPrefixType } from '/protocol-designer/resources/types'
 import type { FieldProps } from '../types'
 
 export interface WellsOrderFieldProps {

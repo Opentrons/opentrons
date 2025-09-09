@@ -22,6 +22,13 @@ Instruments
    :members:
    :exclude-members: delay
 
+Robot Motors
+============
+
+.. autoclass:: opentrons.protocol_api.RobotContext
+   :members: 
+   :exclude-members: 
+
 .. _protocol-api-labware:
 
 Labware
@@ -64,6 +71,14 @@ Absorbance Plate Reader
    :exclude-members: broker, geometry, load_labware_object, load_adapter, load_adapter_from_definition
    :inherited-members:
 
+
+Flex Stacker
+------------
+
+.. autoclass:: opentrons.protocol_api.FlexStackerContext
+   :members:
+   :exclude-members: calibrate, broker, geometry, load_labware_object
+   :inherited-members:
 
 Heater-Shaker
 -------------
@@ -123,6 +138,8 @@ Useful Types
 
 .. autodata:: opentrons.protocol_api.OFF_DECK
    :no-value:
+
+.. autoclass:: opentrons.protocol_api.OffDeckType
 
 Executing and Simulating Protocols
 ==================================

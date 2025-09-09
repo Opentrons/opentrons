@@ -7,15 +7,16 @@ import {
   splitLabwareDefURI,
 } from '@opentrons/shared-data'
 
-import { OTHER } from '/ai-client/organisms/ApplicationSection'
+import { OTHER } from '/ai-client/components/organisms/ApplicationSection'
 import {
   FLEX_GRIPPER,
+  NINETY_SIX_CHANNEL_PIPETTE,
   NO_PIPETTES,
   OPENTRONS_FLEX,
   OPENTRONS_OT2,
   ROBOT_FIELD_NAME,
   TWO_PIPETTES,
-} from '/ai-client/organisms/InstrumentsSection'
+} from '/ai-client/components/organisms/InstrumentsSection'
 import { PROTOCOL_FORMAT, PYTHON } from '/ai-client/resources/constants'
 
 import { getOnlyLatestDefs } from './labware'
@@ -60,7 +61,14 @@ export function generatePromptPreviewInstrumentItems(
   t: any
 ): string[] {
   const {
-    instruments: { robot, pipettes, leftPipette, rightPipette, flexGripper },
+    instruments: {
+      robot,
+      pipettes,
+      leftPipette,
+      rightPipette,
+      ninetySixChannelPipette,
+      flexGripper,
+    },
   } = watch()
 
   const items = []
@@ -75,6 +83,8 @@ export function generatePromptPreviewInstrumentItems(
     rightPipette !== '' &&
       rightPipette !== NO_PIPETTES &&
       items.push(getPipetteSpecsV2(rightPipette as PipetteName)?.displayName)
+  } else if (pipettes === NINETY_SIX_CHANNEL_PIPETTE) {
+    ninetySixChannelPipette !== '' && items.push(t(ninetySixChannelPipette))
   } else {
     items.push(pipettes !== '' && t(pipettes))
   }
@@ -359,6 +369,8 @@ export function generateChatPrompt(
             ? `right pipette ${rightPipettePromptName}`
             : '',
         ].filter(Boolean)
+      : values.instruments.pipettes === NINETY_SIX_CHANNEL_PIPETTE
+      ? [values.instruments.ninetySixChannelPipette]
       : [values.instruments.pipettes]
 
   const pipetteMounts =
@@ -371,6 +383,8 @@ export function generateChatPrompt(
         ]
           .filter(Boolean)
           .join('\n')
+      : values.instruments.pipettes === NINETY_SIX_CHANNEL_PIPETTE
+      ? `- ${t(values.instruments.ninetySixChannelPipette)}`
       : `- ${t(values.instruments.pipettes)}`
   const flexGripper =
     values.instruments.flexGripper === FLEX_GRIPPER &&
@@ -436,7 +450,7 @@ ${t('application_title')}:\n${scientificApplication}
 ${t('description')}:\n${description}
 
 ${t(
-  'pipette_mounts'
+  'pipette'
 )}:\n\n${pipetteMounts}${flexGripper}${moduleSection}${fixtureSection}
 
 \n${t('labware_section_title')}:\n${labwares}

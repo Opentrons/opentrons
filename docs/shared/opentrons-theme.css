@@ -55,6 +55,15 @@ th, td {
   color: #4A4C4E;
 }
 
+.green {
+  color: green;
+}
+
+.red {
+  color: red;
+}
+
+
 /* Applying colors to elements */
 
 th {

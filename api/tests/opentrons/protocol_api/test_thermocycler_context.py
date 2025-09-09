@@ -295,6 +295,7 @@ def test_set_block_temperature(
             celsius=42.0,
             hold_time_seconds=5.6,
             block_max_volume=7.8,
+            ramp_rate=5.6,
         ),
         mock_core.wait_for_block_temperature(),
         mock_broker.publish(

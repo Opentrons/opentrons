@@ -18,6 +18,7 @@ import type {
   ModuleEntity,
   PipetteEntity,
   TemperatureStatus,
+  TOUCHED_PIPETTABLE_LABWARE,
 } from '@opentrons/step-generation'
 import type { DeckSlot } from '../types'
 
@@ -107,6 +108,9 @@ export type NormalizedLabware = NormalizedLabwareById[keyof NormalizedLabwareByI
 // Temporal properties (eg location) that are time-variant
 export interface LabwareTemporalProperties {
   stack: string[] // a stack of ids from top to bottom
+  // we currently use this property only to track if a lid has been placed on a "pipettable" labware that could presumably contain liquid
+  // we can expand this type in the future to track other types of sterility for various labware types
+  sterility?: typeof TOUCHED_PIPETTABLE_LABWARE
 }
 export interface PipetteTemporalProperties {
   mount: Mount

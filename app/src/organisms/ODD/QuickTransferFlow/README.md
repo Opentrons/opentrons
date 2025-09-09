@@ -75,10 +75,10 @@ export interface QuickTransferWizardState {
   destinationWells?: string[]
   transferType?: TransferType
   volume?: number
-  path?: PathOption // this has been added
-  changeTip?: ChangeTipOptions // this has been added
-  dropTipLocation?: CutoutConfig // this has been added
-  liquidClassName?: string // this has been added
+  path?: PathOption // from version 1.2.0
+  changeTip?: ChangeTipOptions // from version 1.2.0
+  dropTipLocation?: CutoutConfig // from version 1.2.0
+  liquidClassName?: string // from version 1.2.0
 }
 ```
 
@@ -99,7 +99,7 @@ export interface QuickTransferSummaryState {
   tipPositionAspirate: number
   preWetTip: boolean
   pushOutDispense?: {
-    // this has been update - pushOut boolean
+    // from version 1.2.0
     volume: number
   }
   mixOnAspirate?: {
@@ -107,19 +107,19 @@ export interface QuickTransferSummaryState {
     repetitions: number
   }
   submergeAspirate?: {
-    // this has been added
+    // from version 1.2.0
     speed: number
     delayDuration: number
     positionFromBottom: number
   }
   retractAspirate?: {
-    // this has been added
+    // from version 1.2.0
     speed: number
     delayDuration: number
     positionFromBottom: number
   }
   delayAspirate?: {
-    // this has been updated - removed positionFromBottom
+    // updated in version 1.2.0
     delayDuration: number
   }
   touchTipAspirate?: number
@@ -131,40 +131,40 @@ export interface QuickTransferSummaryState {
     repetitions: number
   }
   submergeDispense?: {
-    // this has been added
+    // from version 1.2.0
     speed: number
     delayDuration: number
     positionFromBottom: number
   }
   retractDispense?: {
-    // this has been added
+    // from version 1.2.0
     speed: number
     delayDuration: number
     positionFromBottom: number
   }
   delayDispense?: {
-    // this has been updated - removed positionFromBottom
+    // updated in version 1.2.0
     delayDuration: number
   }
   touchTipDispense?: number
   touchTipDispenseSpeed?: number
   disposalVolume?: number
   blowOutDispense?: {
-    // this has been added - updated from blowOut
+    // updated in version 1.2.0
     location?: BlowOutLocation
     flowRate?: number
   }
   airGapDispense?: number
   changeTip: ChangeTipOptions
   dropTipLocation: CutoutConfig
-  liquidClassName: string // this has been added
-  conditionAspirate?: number // this has been added
+  liquidClassName: string // from version 1.2.0
+  conditionAspirate?: number // from version 1.2.0
   disposalVolumeDispenseSettings?: {
+    // from version 1.2.0
     volume: number
     blowOutLocation: BlowOutLocation
     flowRate: number
   }
-  conditionAspirate?: number // this has been added
-  liquidClassValuesInitialized: boolean // this has been added
+  liquidClassValuesInitialized: boolean // from version 1.2.0
 }
 ```

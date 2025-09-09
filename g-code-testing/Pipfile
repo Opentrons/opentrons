@@ -10,7 +10,7 @@ server-utils = { editable = true, path = "./../server-utils" }
 opentrons-shared-data = { editable = true, path = "../shared-data" }
 opentrons_hardware = { editable = true, path = "../hardware" }
 g-code-testing = { editable = true, path = "." }
-anyio = "==3.7.1"
+anyio = "==4.9.0"
 pydantic = "==2.9.0"
 # opentrons dependency on linux, spec'd here to force lockfile inclusion
 # https://github.com/pypa/pipenv/issues/4408#issuecomment-668324177

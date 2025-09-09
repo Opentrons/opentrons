@@ -34,7 +34,7 @@ import {
   dispenseInTrash,
   dispenseInWasteChute,
 } from '../commandCreators/compound'
-import { ZERO_OFFSET } from '../constants'
+import { CLEAN, EMPTY, ZERO_OFFSET } from '../constants'
 import { curryCommandCreator } from './curryCommandCreator'
 import { reduceCommandCreators } from './index'
 
@@ -545,7 +545,7 @@ export function makeInitialRobotState(args: {
         (acc, _, labwareId) => {
           const def = invariantContext.labwareEntities[labwareId].def
           if (!getIsTiprack(def)) return acc
-          const tipState = mapValues(def.wells, () => true)
+          const tipState = mapValues(def.wells, () => CLEAN)
           return { ...acc, [labwareId]: tipState }
         },
         {}
@@ -560,7 +560,7 @@ export const getTiprackHasTips = (
 ): boolean => {
   return tipState.tipracks[labwareId] != null
     ? Object.values(tipState.tipracks[labwareId]).some(
-        tipState => tipState === true
+        tipState => tipState !== EMPTY
       )
     : false
 }
@@ -907,24 +907,40 @@ export const getLargestStackInSlot = (
     return acc
   }, [])
 
+interface CompatibleWithStack {
+  isCompatible: boolean
+  isAboveStackLimit: boolean
+}
+
 export const getIsLabwareCompatibleWithStack = (
   labwareId: string,
+  //  stack is the full stack on the slot, including the slotName, modules, adapters
   stack: string[],
   labwareEntities: LabwareEntities,
   moduleEntities: ModuleEntities
-): boolean => {
+): CompatibleWithStack => {
   // if stack is empty, moving directly to empty slot
   if (stack.length === 0) {
-    return true
+    return { isCompatible: true, isAboveStackLimit: false }
   }
   const topIdInStack = getTopLocationInStack(stack)
+  let isCompatible: boolean = true
+  let isAboveStackLimit: boolean = false
 
   // check compatibility with labware
   if (topIdInStack in labwareEntities) {
     const movingLabwareEntity = labwareEntities[labwareId]
     const topLabwareEntity = labwareEntities[topIdInStack]
     const loadNameToCheck = topLabwareEntity.def.parameters.loadName
-    return (
+    const topLabwareEntityStackLimit = topLabwareEntity.def.stackLimit ?? 1
+    const isSameLoadName =
+      loadNameToCheck === movingLabwareEntity.def.parameters.loadName
+    const currentStackAmount = stack.filter(
+      item => labwareEntities[item]?.def.parameters.loadName === loadNameToCheck
+    )?.length
+    isAboveStackLimit =
+      isSameLoadName && currentStackAmount >= topLabwareEntityStackLimit
+    isCompatible =
       // check compatible labware key
       movingLabwareEntity.def.compatibleParentLabware?.some(
         loadName => loadName === loadNameToCheck
@@ -933,19 +949,17 @@ export const getIsLabwareCompatibleWithStack = (
       Object.keys(movingLabwareEntity.def.stackingOffsetWithLabware ?? {}).some(
         lw => lw === loadNameToCheck
       )
-    )
     // check compatibility with module
   } else if (topIdInStack in moduleEntities) {
     const topModuleEntity = moduleEntities[topIdInStack]
     const { model: stackingModel } = topModuleEntity
-    return (
+    isCompatible =
       // check compatible labware key
       Object.keys(
         labwareEntities[labwareId].def.stackingOffsetWithModule ?? {}
       ).some(model => stackingModel === model)
-    )
   }
-  return false
+  return { isCompatible, isAboveStackLimit }
 }
 
 export const getModuleIdFromRobotStateStack = (
@@ -955,14 +969,34 @@ export const getModuleIdFromRobotStateStack = (
   return stack?.find(id => modules[id] != null) ?? null
 }
 
+/**
+ * Get the full stack in a slot given labware state
+ * If the slot is offDeck, the offDeckOverrideId must be provided to override the offDeck slot,
+ * since different offDeck stacks specify the same base "slot" being offDeck
+ * @param labware - The labware object containing all labware entities
+ * @param slot - The slot to get the full stack from
+ * @param offDeckOverrideId - Labware ID for an offDeck stack
+ * @returns The full stack from the labware object
+ */
 export const getFullStackFromLabwares = (
   labware: {
     [labwareId: string]: LabwareTemporalProperties
   },
-  slot: string
+  slot: string,
+  offDeckOverrideId?: string
 ): string[] => {
+  if (slot === 'offDeck' && offDeckOverrideId == null) {
+    console.error(
+      'offDeck slot is not allowed to be used without an offDeckOverrideId'
+    )
+    return []
+  }
   return Object.values(labware)
-    .filter(lw => lw.stack.includes(slot))
+    .filter(
+      lw =>
+        lw.stack.includes(slot) &&
+        (offDeckOverrideId == null || lw.stack.includes(offDeckOverrideId))
+    )
     .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack
 }
 
@@ -1072,7 +1106,7 @@ export const getTransferPlanAndReferenceVolumes = (args: {
             ) ?? 0
           : 0)
   const isMultiAspirateAvailable =
-    maxWorkingVolume > minVolumeForMultiAspirateDispense
+    maxWorkingVolume >= minVolumeForMultiAspirateDispense
 
   if (path === 'multiAspirate' && numAspirateWells <= numDispenseWells) {
     console.warn(

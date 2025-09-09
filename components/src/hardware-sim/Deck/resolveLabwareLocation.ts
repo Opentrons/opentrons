@@ -42,14 +42,12 @@ export function resolveLabwareLocation({
     otherLoadedLabware,
     otherLabwareDefinitions,
   })
-  const labwareBottomToTop =
-    labwareTopToBottom !== 'error' ? labwareTopToBottom.toReversed() : 'error'
 
-  if (labwareBottomToTop === 'error' || labwareBottomToTop.length < 1) {
+  if (labwareTopToBottom === 'error' || labwareTopToBottom.length < 1) {
     return 'error'
   }
-
-  const bottomLabwareLocation = labwareBottomToTop[0].location
+  const bottomLabwareLocation =
+    labwareTopToBottom[labwareTopToBottom.length - 1].location
 
   if (
     bottomLabwareLocation === 'offDeck' ||
@@ -96,7 +94,7 @@ export function resolveLabwareLocation({
     deckDefinition: deckDef,
     slotId: bottom.slotId,
     moduleDefinition: bottom.moduleDefinition,
-    labwareDefinitionsBottomToTop: labwareBottomToTop.map(l => l.definition),
+    labwareDefinitionsTopToBottom: labwareTopToBottom.map(l => l.definition),
   }
 }
 

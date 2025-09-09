@@ -8,6 +8,43 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 ---
 
+## Opentrons Protocol Designer Changes in 8.5.3
+
+**Welcome to Protocol Designer 8.5.3!**
+
+This hotfix release addresses several bugs.
+
+### Bug Fixes
+
+- Crashes and protocol loss no longer occur when:
+
+  - deleting a pipette involved in a mix step.
+  - deleting a Protocol Designer step title.
+  - checking labware details after deleting a liquid.
+
+- All staging area slots remain when adding new staging areas after initial deck setup.
+
+## Opentrons Protocol Designer Changes in 8.5.2
+
+**Welcome to Protocol Designer 8.5.2!**
+
+This hotfix release addresses several bugs.
+
+### Bug Fixes
+
+- Protocol Designer no longer raises an error when checking your custom labware definitions for well ordering.
+- Transfer volumes as large as your tip limit without errors during a multi-dispense with liquid class settings applied.
+- Exported Python protocols include numbered commands, making it easier to identify errors.
+- Setting well volume over the limit results in a warning rather than a protocol error.
+- Crashes and protocol loss no longer occur when viewing liquids added to labware.
+- Additional refinement with assigning the correct tip rack to some liquid transfers.
+
+## Opentrons Protocol Designer Changes in 8.5.1
+
+**Welcome to Protocol Designer 8.5.1!**
+
+This hotfix release addresses a bug that caused the incorrect tip rack to be assigned to some liquid transfers.
+
 ## Opentrons Protocol Designer Changes in 8.5.0
 
 **Welcome to Protocol Designer v8.5.0!**

@@ -2437,7 +2437,7 @@
       "createdAt": "TIMESTAMP",
       "error": {
         "createdAt": "TIMESTAMP",
-        "detail": "Cannot move 'thermoscientificnunc_96_wellplate_2000ul' into plate reader because the maximum allowed labware height is 16mm.",
+        "detail": "Cannot move 'thermoscientificnunc_96_wellplate_2000ul' into plate reader because the maximum allowed labware height is 16.0mm.",
         "errorCode": "4000",
         "errorInfo": {},
         "errorType": "LabwareMovementNotAllowedError",
@@ -2477,7 +2477,7 @@
   "errors": [
     {
       "createdAt": "TIMESTAMP",
-      "detail": "ProtocolCommandFailedError [line 23]: Error 4000 GENERAL_ERROR (ProtocolCommandFailedError): LabwareMovementNotAllowedError: Cannot move 'thermoscientificnunc_96_wellplate_2000ul' into plate reader because the maximum allowed labware height is 16mm.",
+      "detail": "ProtocolCommandFailedError [line 23]: Error 4000 GENERAL_ERROR (ProtocolCommandFailedError): LabwareMovementNotAllowedError: Cannot move 'thermoscientificnunc_96_wellplate_2000ul' into plate reader because the maximum allowed labware height is 16.0mm.",
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
@@ -2486,7 +2486,7 @@
       "wrappedErrors": [
         {
           "createdAt": "TIMESTAMP",
-          "detail": "LabwareMovementNotAllowedError: Cannot move 'thermoscientificnunc_96_wellplate_2000ul' into plate reader because the maximum allowed labware height is 16mm.",
+          "detail": "LabwareMovementNotAllowedError: Cannot move 'thermoscientificnunc_96_wellplate_2000ul' into plate reader because the maximum allowed labware height is 16.0mm.",
           "errorCode": "4000",
           "errorInfo": {},
           "errorType": "ProtocolCommandFailedError",
@@ -2495,7 +2495,7 @@
           "wrappedErrors": [
             {
               "createdAt": "TIMESTAMP",
-              "detail": "Cannot move 'thermoscientificnunc_96_wellplate_2000ul' into plate reader because the maximum allowed labware height is 16mm.",
+              "detail": "Cannot move 'thermoscientificnunc_96_wellplate_2000ul' into plate reader because the maximum allowed labware height is 16.0mm.",
               "errorCode": "4000",
               "errorInfo": {},
               "errorType": "LabwareMovementNotAllowedError",

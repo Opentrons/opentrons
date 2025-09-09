@@ -9,6 +9,7 @@ import { SOURCE_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
 import { useToaster } from '/app/organisms/ToasterOven'
 
 import { DISPENSE_SETTING_OPTIONS as SETTING_OPTIONS } from '../../constants'
+import { getIsTouchTipEnabled } from '../../utils/getIsTouchTipEnabled'
 
 import type {
   DispenseSettingOption,
@@ -16,6 +17,7 @@ import type {
   SettingItem,
 } from '../../types'
 
+const DIGIT = 1
 interface UseDispenseSettingsConfigProps {
   state: QuickTransferSummaryState
   setSelectedSetting: (setting: DispenseSettingOption | null) => void
@@ -31,6 +33,9 @@ export function useDispenseSettingsConfig({
   const { makeSnackbar } = useToaster()
 
   const getBlowoutValueCopy = (): string | undefined => {
+    if (state.blowOutDispense == null) {
+      return t('option_disabled')
+    }
     if (state.blowOutDispense?.location === 'dest_well') {
       return t('blow_out_into_destination_well')
     } else if (state.blowOutDispense?.location === 'source_well') {
@@ -51,11 +56,16 @@ export function useDispenseSettingsConfig({
     }
   }
 
+  const touchTipEnabled = getIsTouchTipEnabled(state.destination)
+  const hasLiquidClass = state.liquidClassName !== 'none'
+
   const dispenseSettingsItems = [
     {
       option: 'dispense_flow_rate',
       copy: t('dispense_flow_rate'),
-      value: t('flow_rate_value', { flow_rate: state.dispenseFlowRate }),
+      value: t('flow_rate_value', {
+        flow_rate: state.dispenseFlowRate.toFixed(DIGIT),
+      }),
       enabled: true,
       onClick: () => {
         setSelectedSetting('dispense_flow_rate')
@@ -67,7 +77,7 @@ export function useDispenseSettingsConfig({
       value:
         state.tipPositionDispense !== undefined
           ? t('tip_position_value', { position: state.tipPositionDispense })
-          : '',
+          : t('option_disabled'),
       enabled: true,
       onClick: () => {
         setSelectedSetting('dispense_tip_position')
@@ -83,7 +93,7 @@ export function useDispenseSettingsConfig({
               delayDuration: state.submergeDispense.delayDuration,
               position: state.submergeDispense.positionFromBottom,
             })
-          : '',
+          : t('option_disabled'),
       enabled: true,
       onClick: () => {
         setSelectedSetting(SETTING_OPTIONS.DISPENSE_SUBMERGE)
@@ -112,7 +122,7 @@ export function useDispenseSettingsConfig({
               volume: state.mixOnDispense?.mixVolume,
               reps: state.mixOnDispense?.repetitions,
             })
-          : '',
+          : t('option_disabled'),
       enabled:
         state.transferType === 'transfer' ||
         state.transferType === 'consolidate',
@@ -123,7 +133,7 @@ export function useDispenseSettingsConfig({
         ) {
           setSelectedSetting('dispense_mix')
         } else {
-          makeSnackbar(t('advanced_setting_disabled') as string)
+          makeSnackbar(t('dispense_setting_disabled') as string)
         }
       },
     },
@@ -149,7 +159,7 @@ export function useDispenseSettingsConfig({
               delayDuration: state.retractDispense.delayDuration,
               position: state.retractDispense.positionFromBottom,
             })
-          : '',
+          : t('option_disabled'),
       enabled: true,
       onClick: () => {
         setSelectedSetting('dispense_retract')
@@ -159,13 +169,13 @@ export function useDispenseSettingsConfig({
       option: 'dispense_blow_out',
       copy: t('blow_out'),
       value:
-        state.transferType === 'distribute'
+        state.transferType === 'distribute' && hasLiquidClass
           ? t('disabled')
           : i18n.format(getBlowoutValueCopy(), 'capitalize'),
       enabled: state.transferType !== 'distribute',
       onClick: () => {
         if (state.transferType === 'distribute') {
-          makeSnackbar(t('advanced_setting_disabled') as string)
+          makeSnackbar(t('dispense_setting_disabled') as string)
         } else {
           setSelectedSetting('dispense_blow_out')
         }
@@ -185,25 +195,35 @@ export function useDispenseSettingsConfig({
                   : t('trashBin'),
               flowRate: state.disposalVolumeDispenseSettings.flowRate,
             })
-          : '',
+          : t('option_disabled'),
       enabled: isMultiTransfer,
       onClick: () => {
-        setSelectedSetting('dispense_disposal_volume')
+        if (isMultiTransfer) {
+          setSelectedSetting('dispense_disposal_volume')
+        } else {
+          makeSnackbar(t('dispense_setting_disabled') as string)
+        }
       },
     },
     {
       option: 'dispense_touch_tip',
       copy: t('touch_tip'),
       value:
-        state.touchTipDispense !== undefined
+        state.touchTipDispense !== undefined &&
+        touchTipEnabled &&
+        hasLiquidClass
           ? t('touch_tip_value', {
               speed: state.touchTipDispenseSpeed,
               position: state.touchTipDispense,
             })
-          : '',
-      enabled: true,
+          : t('option_disabled'),
+      enabled: touchTipEnabled,
       onClick: () => {
-        setSelectedSetting('dispense_touch_tip')
+        if (touchTipEnabled) {
+          setSelectedSetting('dispense_touch_tip')
+        } else {
+          makeSnackbar(t('dispense_setting_disabled') as string)
+        }
       },
     },
     {

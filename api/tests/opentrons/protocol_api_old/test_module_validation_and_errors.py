@@ -29,7 +29,7 @@ def test_validate_heater_shaker_temperature_raises_under_api_225(
         )
 
 
-@pytest.mark.parametrize("invalid_celsius_value", [95.01])
+@pytest.mark.parametrize("invalid_celsius_value", [-1, 95.01])
 def test_validate_heater_shaker_temperature_raises_over_api_225(
     invalid_celsius_value: float,
 ) -> None:

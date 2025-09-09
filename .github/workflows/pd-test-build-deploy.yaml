@@ -91,6 +91,7 @@ jobs:
         run: |
           make -C protocol-designer NODE_ENV=development
       - name: 'upload sourcemaps to Sentry'
+        if: github.ref_type == 'tag'
         uses: getsentry/action-release@v3
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
@@ -139,10 +140,8 @@ jobs:
         shell: bash
         run: |
           aws s3 sync ./dist "s3://sandbox.designer.opentrons.com/${OT_BRANCH}" --acl=public-read
-          # invalidate both sandbox.opentrons.com and www.sandbox.opentrons.com cloudfront caches
-          aws cloudfront create-invalidation --distribution-id ${{ secrets.PD_CLOUDFRONT_SANDBOX_DISTRIBUTION_ID }} --paths "/*"
-          aws cloudfront create-invalidation --distribution-id ${{ secrets.PD_CLOUDFRONT_SANDBOX_WWW_DISTRIBUTION_ID }} --paths "/*"
       - name: 'notify Sentry of prod deploy'
+        if: github.ref_type == 'tag'
         uses: getsentry/action-release@v3
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}

@@ -214,7 +214,7 @@ const SHAKE_TIME_REQUIRED: FormError = {
   location: 'field',
 }
 const SHAKER_TIME_FORMAT: FormError = {
-  title: TIME_TITLE,
+  title: 'Must be a valid time (hh:mm:ss)',
   dependentFields: ['heaterShakerTimer'],
   location: 'field',
 }
@@ -495,13 +495,6 @@ const CONDITIONING_VOLUME_OUT_OF_RANGE: FormError = {
   page: 2,
   tab: 'aspirate',
 }
-const VOLUME_OUT_OF_RANGE: FormError = {
-  title: RANGE_TITLE,
-  dependentFields: ['volume'],
-  location: 'field',
-  page: 0,
-  showOnReopen: true,
-}
 const VOLUME_UNDER_MINIMUM: FormError = {
   title: RANGE_TITLE,
   dependentFields: ['volume'],
@@ -767,12 +760,13 @@ export const volumeTooHigh = (
   fields: HydratedMixFormData
 ): FormError | null => {
   const { pipette, tipRack } = fields
+  if (!pipette) {
+    // pipette is null if user deletes pipette
+    return null
+  }
   const volume = Number(fields.volume)
 
-  const pipetteCapacity = getPipetteCapacity(
-    pipette as PipetteEntity,
-    tipRack as string
-  )
+  const pipetteCapacity = getPipetteCapacity(pipette, tipRack)
   if (
     !Number.isNaN(volume) &&
     !Number.isNaN(pipetteCapacity) &&
@@ -938,18 +932,10 @@ export const shakeTimeRequired = (
   let error = null
   if (heaterShakerSetTimer && !heaterShakerTimer) {
     error = SHAKE_TIME_REQUIRED
-  } else if (
-    heaterShakerSetTimer &&
-    !isTimeFormatMinutesSeconds(heaterShakerTimer)
-  ) {
+  } else if (heaterShakerSetTimer && !isTimeFormat(heaterShakerTimer)) {
     error = SHAKER_TIME_FORMAT
   }
   return error
-}
-
-const isTimeFormatMinutesSeconds = (value: string | null): boolean => {
-  const timeRegex = /^(?:[0-9]?\d):(?:[0-5]\d|[0-9])$/g
-  return value != null && timeRegex.test(value)
 }
 
 export const temperatureRequired = (
@@ -1450,38 +1436,6 @@ export const getIsOutOfRange = (
 ): boolean => {
   const castValue = Number(value)
   return castValue < min || castValue > max
-}
-
-export const transferVolumeMax = (
-  fields: HydratedMoveLiquidFormData | HydratedMixFormData
-): FormError | null => {
-  let labware
-  if (
-    'dispense_labware' in fields &&
-    fields.dispense_labware != null &&
-    fields.stepType === 'moveLiquid'
-  ) {
-    labware = fields.dispense_labware
-  } else if (
-    'labware' in fields &&
-    fields.labware != null &&
-    fields.stepType === 'mix'
-  ) {
-    labware = fields.labware
-  }
-
-  if (labware == null) {
-    return null
-  }
-
-  const dispenseLabwareMaxVolume =
-    'def' in labware ? labware.def?.wells.A1.totalLiquidVolume : null
-
-  return dispenseLabwareMaxVolume != null &&
-    typeof fields.volume === 'string' &&
-    parseInt(fields.volume) > dispenseLabwareMaxVolume
-    ? VOLUME_OUT_OF_RANGE
-    : null
 }
 
 export const transferVolumeMin = (

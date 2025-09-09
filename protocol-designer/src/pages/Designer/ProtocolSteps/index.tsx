@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import round from 'lodash/round'
@@ -13,6 +13,7 @@ import {
   JUSTIFY_END,
   JUSTIFY_SPACE_BETWEEN,
   OVERFLOW_AUTO,
+  POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
   StyledText,
@@ -24,14 +25,12 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
-import { NAV_BAR_HEIGHT_REM } from '../../../components/atoms'
 import { ExportButton, HotKeyDisplay } from '../../../components/molecules'
 import {
   SlotDetailsContainer,
   StepSummary,
   TimelineAlerts,
 } from '../../../components/organisms'
-import { useKitchen } from '../../../components/organisms/Kitchen/useKitchen'
 import { DECK_SETUP_TOOLS_WIDTH_REM } from '../../../constants'
 import { getEnableHotKeysDisplay } from '../../../feature-flags/selectors'
 import {
@@ -55,7 +54,6 @@ import {
   getSelectedSubstep,
   getSelectedTerminalItemId,
 } from '../../../ui/steps/selectors'
-import { getHasTrash } from '../../../utils'
 import { DeckSetupContainer } from '../DeckSetup'
 import { zoomInOnCoordinate } from '../DeckSetup/utils'
 import { OffDeck } from '../OffDeck'
@@ -87,7 +85,6 @@ export function ProtocolSteps({
 }: ProtocolStepsProps): JSX.Element {
   const { i18n, t } = useTranslation('starting_deck_state')
   const formData = useSelector(getUnsavedForm)
-  const { makeSnackbar } = useKitchen()
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const selectedTerminalItemId = useSelector(getSelectedTerminalItemId)
   const hoveredTerminalItem = useSelector(getHoveredTerminalItemId)
@@ -102,7 +99,6 @@ export function ProtocolSteps({
   const [hoverSlot, setHoverSlot] = useState<DeckSlot | null>(null)
   const savedStepForms = useSelector(getSavedStepForms)
   const deckDef = useMemo(() => getDeckDefFromRobotType(robotType), [robotType])
-  const hasTrash = getHasTrash(additionalEquipmentOnDeck)
   const viewBoxX = deckDef.cornerOffsetFromOrigin[0]
   const windowInnerWidthRem = window.innerWidth / 16
   const deckMapRatio = round(
@@ -144,14 +140,6 @@ export function ProtocolSteps({
     },
   })
 
-  const handleExporting = (): void => {
-    if (hasTrash) {
-      handleExportClick()
-    } else {
-      makeSnackbar(t('trash_required') as string)
-    }
-  }
-
   let currentStep
   if (hoveredTerminalItem === HARDWARE_ID && selectedStepId != null) {
     currentStep = savedStepForms[selectedStepId]
@@ -168,6 +156,23 @@ export function ProtocolSteps({
     activeItem?.id !== START_TERMINAL_ITEM_ID &&
     activeItem?.id !== HARDWARE_ID
   const stepDetails = currentStep?.stepDetails ?? null
+
+  const stepComponentRef = useRef<HTMLDivElement>(null)
+
+  const handleScrollToTop = (): void => {
+    if (stepComponentRef.current && hasTimelineErrors) {
+      stepComponentRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      })
+    }
+  }
+
+  useEffect(() => {
+    if (selectedStepId != null) {
+      handleScrollToTop()
+    }
+  }, [selectedStepId])
 
   let header: string = t(activeItem?.id)
   if (currentStep != null) {
@@ -216,7 +221,6 @@ export function ProtocolSteps({
 
       <Flex
         backgroundColor={COLORS.grey10}
-        maxHeight={`calc(100vh - ${NAV_BAR_HEIGHT_REM}rem)`}
         width="100%"
         minHeight={FLEX_MAX_CONTENT}
       >
@@ -251,8 +255,13 @@ export function ProtocolSteps({
             {isZoomedIn ||
             formData != null ||
             selectedSubstep != null ? null : (
-              <Flex justifyContent={JUSTIFY_END}>
-                <ExportButton onClick={handleExporting} />
+              <Flex
+                justifyContent={JUSTIFY_END}
+                position={POSITION_ABSOLUTE}
+                right={SPACING.spacing24}
+                zIndex={1000}
+              >
+                <ExportButton onClick={handleExportClick} />
               </Flex>
             )}
             <Flex
@@ -268,18 +277,24 @@ export function ProtocolSteps({
                   : CONTENT_MAX_WIDTH
               }
               justifyContent={JUSTIFY_CENTER}
-              paddingTop={isZoomedIn ? '0' : SPACING.spacing60}
+              paddingTop={
+                isZoomedIn || showTimelineAlerts ? '0' : SPACING.spacing60
+              }
               marginX="auto"
             >
               {isZoomedIn || selectedTerminalItemId === HARDWARE_ID ? null : (
                 <>
                   {showTimelineAlerts ? (
-                    <TimelineAlerts
-                      justifyContent={JUSTIFY_CENTER}
-                      width="100%"
-                      flexDirection={DIRECTION_COLUMN}
-                      gridGap={SPACING.spacing4}
-                    />
+                    <>
+                      {/* empty div to scroll to top of timeline alerts */}
+                      <div ref={stepComponentRef} />
+                      <TimelineAlerts
+                        justifyContent={JUSTIFY_CENTER}
+                        width="100%"
+                        flexDirection={DIRECTION_COLUMN}
+                        gridGap={SPACING.spacing4}
+                      />
+                    </>
                   ) : null}
                   <Flex
                     justifyContent={JUSTIFY_SPACE_BETWEEN}

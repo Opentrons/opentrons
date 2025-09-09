@@ -12,9 +12,12 @@ from opentrons.protocol_engine.types import AddressableAreaLocation
 
 from ...state.update_types import StateUpdate
 
+from .common import LID_Z_CLEARANCE
+
 from opentrons.types import Point
 
 from opentrons.drivers.types import AbsorbanceReaderLidStatus
+
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state.state import StateView
@@ -99,26 +102,14 @@ class CloseLidImpl(AbstractCommandImpl[CloseLidParams, SuccessData[CloseLidResul
                 )
             )
 
-            # The lid's labware definition stores gripper offsets for itself in the
-            # space normally meant for offsets for labware stacked atop it.
-            lid_gripper_offsets = self._state_view.labware.get_child_gripper_offsets(
-                labware_definition=lid_definition,
-                slot_name=None,
-            )
-            if lid_gripper_offsets is None:
-                raise ValueError(
-                    "Gripper Offset values for Absorbance Reader Lid labware must not be None."
-                )
-
             await self._labware_movement.move_labware_with_gripper(
                 labware_definition=lid_definition,
                 current_location=current_location,
                 new_location=new_location,
-                user_pick_up_offset=Point.from_xyz_attrs(
-                    lid_gripper_offsets.pickUpOffset
-                ),
-                user_drop_offset=Point.from_xyz_attrs(lid_gripper_offsets.dropOffset),
+                user_pick_up_offset=Point(),
+                user_drop_offset=Point(),
                 post_drop_slide_offset=None,
+                gripper_z_offset=LID_Z_CLEARANCE,
             )
             state_update.set_absorbance_reader_lid(
                 module_id=mod_substate.module_id,

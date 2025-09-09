@@ -136,7 +136,7 @@ async def test_tof_sensors_labware_detection(
         [
             baseline_result,
             "HISTOGRAM",
-            CSVResult.from_bool(runtime_result),
+            CSVResult.from_bool(baseline_result and runtime_result),
             histogram_string,
         ],
     )
@@ -154,11 +154,13 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
         "Make sure there is NO labware in the stacker tower or gripper position"
     )
     print("Getting runtime baseline.")
-    runtime_baseline_x = await create_runtime_baseline(stacker, TOFSensor.X)
+    await stacker.home_axis(StackerAxis.X, Direction.EXTEND)
     runtime_baseline_z = await create_runtime_baseline(stacker, TOFSensor.Z)
 
-    print("Test that we have no labware on the X")
     await stacker.home_axis(StackerAxis.X, Direction.RETRACT)
+    runtime_baseline_x = await create_runtime_baseline(stacker, TOFSensor.X)
+
+    print("Test that we have no labware on the X")
     await test_tof_sensors_labware_detection(
         stacker,
         report,

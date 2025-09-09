@@ -14,14 +14,14 @@ import {
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import { useGetNewModules } from '/app/App/hooks'
+import { useGetModulesNeedingSetupThatCanCurrentlyBeSetUp } from '/app/App/hooks'
 import { SmallButton } from '/app/atoms/buttons'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 
 import { useSendIdentifyStacker } from './hooks'
 
 import type { AttachedModule } from '@opentrons/api-client'
-import type { ModuleSetupWizardStepProps } from './types'
+import type { ModuleSetupWizardMaybePipetteStepProps } from './types'
 
 export const BODY_STYLE = css`
   ${TYPOGRAPHY.pRegular};
@@ -32,7 +32,7 @@ export const BODY_STYLE = css`
   }
 `
 
-interface SuccessProps extends ModuleSetupWizardStepProps {
+interface SuccessProps extends ModuleSetupWizardMaybePipetteStepProps {
   setSelectedModule: (module: AttachedModule | null) => void
   attachedModuleOnLaunch?: AttachedModule | null
 }
@@ -50,7 +50,7 @@ export function Success(props: SuccessProps): JSX.Element {
   const { t } = useTranslation('module_wizard_flows')
   const sendIdentifyStacker = useSendIdentifyStacker()
   const moduleDisplayName = getModuleDisplayName(attachedModule.moduleModel)
-  const newModules = useGetNewModules()
+  const newModules = useGetModulesNeedingSetupThatCanCurrentlyBeSetUp()
 
   const handleOnClick = (restart: boolean): void => {
     if (restart) {

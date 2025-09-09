@@ -66,10 +66,10 @@ it('should resolve a labware location', () => {
     deckDefinition,
     slotId,
     moduleDefinition,
-    labwareDefinitionsBottomToTop: [
-      labwareCDefinition,
-      labwareBDefinition,
+    labwareDefinitionsTopToBottom: [
       labwareADefinition,
+      labwareBDefinition,
+      labwareCDefinition,
     ],
   }
 

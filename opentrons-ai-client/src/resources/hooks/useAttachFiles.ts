@@ -1,20 +1,10 @@
 import { useState } from 'react'
-import { v4 as uuidv4 } from 'uuid'
 
 import {
-  getFileType,
   MAX_FILES_PER_MESSAGE,
   prepareFilesForMultipart,
   validateFile,
 } from '../utils/fileUtils'
-
-export interface FileAttachmentForBackend {
-  id: string
-  filename: string
-  file_type: string
-  content: string // Empty for multipart uploads, populated by backend
-  media_type: string
-}
 
 interface UseAttachFilesReturn {
   attachedFiles: File[]
@@ -22,7 +12,6 @@ interface UseAttachFilesReturn {
   handleFileSelect: (files: FileList) => void
   handleRemoveFile: (index: number) => void
   prepareFilesForUpload: () => File[] | null
-  processFilesForHistory: (validatedFiles: File[]) => FileAttachmentForBackend[]
   clearFiles: () => void
   clearError: () => void
 }
@@ -73,27 +62,6 @@ export function useAttachFiles(): UseAttachFilesReturn {
     return result
   }
 
-  const processFilesForHistory = (
-    validatedFiles: File[]
-  ): FileAttachmentForBackend[] => {
-    const fileAttachmentsWithContent: FileAttachmentForBackend[] = []
-
-    for (const file of validatedFiles) {
-      const fileType = getFileType(file)
-      if (fileType !== null) {
-        fileAttachmentsWithContent.push({
-          id: uuidv4(),
-          filename: file.name,
-          file_type: fileType,
-          content: '',
-          media_type: file.type || 'text/plain',
-        })
-      }
-    }
-
-    return fileAttachmentsWithContent
-  }
-
   const clearFiles = (): void => {
     setAttachedFiles([])
     setFileError(null)
@@ -109,7 +77,6 @@ export function useAttachFiles(): UseAttachFilesReturn {
     handleFileSelect,
     handleRemoveFile,
     prepareFilesForUpload,
-    processFilesForHistory,
     clearFiles,
     clearError,
   }

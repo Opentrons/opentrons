@@ -20,21 +20,21 @@ import { getWellDimension, getWellsDepth } from '@opentrons/shared-data'
 import {
   TipPositionModal,
   ZTipPositionModal,
-} from '../../../../../components/organisms'
-import { MoveLiquidPrefixToAction } from '../../../../../components/organisms/TipPositionModal/constants'
-import { getDefaultMmFromEdge } from '../../../../../components/organisms/TipPositionModal/utils'
-import { getIsDelayPositionField } from '../../../../../form-types'
-import { selectors as stepFormSelectors } from '../../../../../step-forms'
+} from '/protocol-designer/components/organisms'
+import { MoveLiquidPrefixToAction } from '/protocol-designer/components/organisms/TipPositionModal/constants'
+import { getDefaultMmFromEdge } from '/protocol-designer/components/organisms/TipPositionModal/utils'
+import { getIsDelayPositionField } from '/protocol-designer/form-types'
+import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
 
-import type { PositionSpecs } from '../../../../../components/organisms'
+import type { PositionSpecs } from '/protocol-designer/components/organisms'
 import type {
   FormData,
   ReferenceFields,
   TipXOffsetFields,
   TipYOffsetFields,
   TipZOffsetFields,
-} from '../../../../../form-types'
-import type { MoveLiquidPrefixType } from '../../../../../resources/types'
+} from '/protocol-designer/form-types'
+import type { MoveLiquidPrefixType } from '/protocol-designer/resources/types'
 import type { FieldPropsByName } from '../types'
 
 interface PositionFieldProps {
@@ -109,8 +109,8 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
 
   const handleOpen = (has3Specs: boolean): void => {
     if (
-      wellDepthMm != null &&
-      (has3Specs ? wellXWidthMm != null && wellYWidthMm != null : true)
+      (has3Specs && wellDepthMm && wellXWidthMm && wellYWidthMm) ||
+      (!has3Specs && wellDepthMm)
     ) {
       setIsModalOpen(true)
     }

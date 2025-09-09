@@ -4,29 +4,30 @@ import '@testing-library/jest-dom/vitest'
 
 import { fireEvent, screen } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
 import {
   dismissFormWarning,
   dismissTimelineWarning,
-} from '../../../../dismiss/actions'
-import { getFormWarningsForSelectedStep } from '../../../../dismiss/selectors'
+} from '/protocol-designer/dismiss/actions'
+import { getFormWarningsForSelectedStep } from '/protocol-designer/dismiss/selectors'
 import {
   getDynamicFieldFormErrorsForUnsavedForm,
   getFormLevelErrorsForUnsavedForm,
   getHydratedUnsavedForm,
-} from '../../../../step-forms/selectors'
-import { getTimelineWarningsForSelectedStep } from '../../../../top-selectors/timelineWarnings'
-import { getSelectedStepId } from '../../../../ui/steps'
+} from '/protocol-designer/step-forms/selectors'
+import { getTimelineWarningsForSelectedStep } from '/protocol-designer/top-selectors/timelineWarnings'
+import { getSelectedStepId } from '/protocol-designer/ui/steps'
+
 import { FormAlerts } from '../FormAlerts'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('../../../../dismiss/actions')
-vi.mock('../../../../ui/steps')
-vi.mock('../../../../top-selectors/timelineWarnings')
-vi.mock('../../../../dismiss/selectors')
-vi.mock('../../../../step-forms/selectors')
+vi.mock('/protocol-designer/dismiss/actions')
+vi.mock('/protocol-designer/ui/steps')
+vi.mock('/protocol-designer/top-selectors/timelineWarnings')
+vi.mock('/protocol-designer/dismiss/selectors')
+vi.mock('/protocol-designer/step-forms/selectors')
 
 const render = (props: ComponentProps<typeof FormAlerts>) => {
   return renderWithProviders(<FormAlerts {...props} />, {

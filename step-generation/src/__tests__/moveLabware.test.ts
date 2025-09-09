@@ -8,6 +8,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { moveLabware } from '../commandCreators/atomic'
+import { TIPRACK_LID_LOADNAME } from '../commandCreators/atomic/moveLabware'
 import {
   DEST_LABWARE,
   getErrorResult,
@@ -454,7 +455,7 @@ describe('moveLabware', () => {
       type: 'LABWARE_ON_ANOTHER_ENTITY',
     })
   })
-  it('should return an error for the labware already being discarded in previous step', () => {
+  it('should return an error for the labware already being discarded in previous step in a waste chute', () => {
     const wasteChuteInvariantContext = {
       ...invariantContext,
       wasteChuteEntities: {
@@ -479,7 +480,7 @@ describe('moveLabware', () => {
     const result = moveLabware(params, wasteChuteInvariantContext, robotState)
     expect(getErrorResult(result).errors).toHaveLength(1)
     expect(getErrorResult(result).errors[0]).toMatchObject({
-      type: 'LABWARE_DISCARDED_IN_WASTE_CHUTE',
+      type: 'LABWARE_DISCARDED_IN_TRASH',
     })
   })
   it('should return an error for trying to move the labware off deck with a gripper', () => {
@@ -498,6 +499,7 @@ describe('moveLabware', () => {
   it('should return an error for trying to move an aluminum block with a gripper', () => {
     const aluminumBlockDef = ({
       metadata: { displayCategory: 'aluminumBlock' },
+      parameters: { loadName: 'mockAluminumBlockLoadName' },
     } as any) as LabwareDefinition2
 
     invariantContext = {
@@ -704,7 +706,7 @@ describe('moveLabware', () => {
       ...robotState,
       tipState: {
         tipracks: {
-          tiprack1Id: { A1: true },
+          tiprack1Id: { A1: { hasTip: true } },
         },
         pipettes: {
           p10SingleId: false,
@@ -854,6 +856,57 @@ describe('moveLabware', () => {
             ...invariantContext.labwareEntities[SOURCE_LABWARE].def,
             allowedRoles: ['lid'],
             compatibleParentLabware: ['fixture_96_plate'],
+            stackLimit: 4,
+          } as LabwareDefinition2,
+        },
+        stackingLabware: {
+          def: {
+            ...invariantContext.labwareEntities[SOURCE_LABWARE].def,
+            allowedRoles: ['lid'],
+            stackLimit: 4,
+          } as LabwareDefinition2,
+        } as any,
+      },
+    } as InvariantContext
+
+    robotState = {
+      ...robotState,
+      labware: {
+        ...robotState.labware,
+        [SOURCE_LABWARE]: {
+          ...robotState.labware[SOURCE_LABWARE],
+          stack: [SOURCE_LABWARE, 'A2'],
+        },
+        stackingLabware: {
+          stack: ['stackingLabware', 'A1'],
+        },
+      },
+    }
+
+    const params = {
+      labwareId: SOURCE_LABWARE,
+      newLocation: { slotName: 'A1' },
+      strategy: 'usingGripper',
+    } as MoveLabwareParams
+
+    const result = moveLabware(params, invariantContext, robotState)
+    expect(getSuccessResult(result).python).toBe(
+      `protocol.move_lid("A2", "A1", use_gripper=True)`
+    )
+  })
+
+  it('should error with the stack too high error', () => {
+    invariantContext = {
+      ...invariantContext,
+      labwareEntities: {
+        ...invariantContext.labwareEntities,
+        [SOURCE_LABWARE]: {
+          ...invariantContext.labwareEntities[SOURCE_LABWARE],
+          def: {
+            ...invariantContext.labwareEntities[SOURCE_LABWARE].def,
+            allowedRoles: ['lid'],
+            compatibleParentLabware: ['fixture_96_plate'],
+            stackLimit: 4,
           } as LabwareDefinition2,
         },
         stackingLabware: {
@@ -886,9 +939,11 @@ describe('moveLabware', () => {
     } as MoveLabwareParams
 
     const result = moveLabware(params, invariantContext, robotState)
-    expect(getSuccessResult(result).python).toBe(
-      `protocol.move_lid("A2", "A1", use_gripper=True)`
-    )
+    const { errors } = getErrorResult(result)
+    expect(errors).toHaveLength(1)
+    expect(errors[0]).toMatchObject({
+      type: 'STACK_TOO_HIGH',
+    })
   })
 
   it('should return a move_lid command when moving a lid from a stack to a slot', () => {
@@ -1070,6 +1125,62 @@ describe('moveLabware', () => {
     expect(errors).toHaveLength(1)
     expect(errors[0]).toMatchObject({
       type: 'LABWARE_ON_ANOTHER_ENTITY',
+    })
+  })
+  it('should return an error when trying to move a tiprack lid to a slot', () => {
+    invariantContext = {
+      ...invariantContext,
+      labwareEntities: {
+        ...invariantContext.labwareEntities,
+        [SOURCE_LABWARE]: {
+          ...invariantContext.labwareEntities[SOURCE_LABWARE],
+          def: {
+            ...invariantContext.labwareEntities[SOURCE_LABWARE].def,
+            parameters: { loadName: TIPRACK_LID_LOADNAME } as any,
+            allowedRoles: ['lid'],
+          } as LabwareDefinition2,
+        },
+      },
+    } as InvariantContext
+
+    const params = {
+      labwareId: SOURCE_LABWARE,
+      newLocation: { slotName: 'A1' },
+      strategy: 'manualMoveWithPause',
+    } as MoveLabwareParams
+    const result = moveLabware(params, invariantContext, robotState)
+    const { errors } = getErrorResult(result)
+    expect(errors).toHaveLength(1)
+    expect(errors[0]).toMatchObject({
+      type: 'TIPRACK_LID_NOT_ALLOWED_ON_DECK',
+    })
+  })
+  it('should return an error when trying to move a tiprack lid to a staging area', () => {
+    invariantContext = {
+      ...invariantContext,
+      labwareEntities: {
+        ...invariantContext.labwareEntities,
+        [SOURCE_LABWARE]: {
+          ...invariantContext.labwareEntities[SOURCE_LABWARE],
+          def: {
+            ...invariantContext.labwareEntities[SOURCE_LABWARE].def,
+            parameters: { loadName: TIPRACK_LID_LOADNAME } as any,
+            allowedRoles: ['lid'],
+          } as LabwareDefinition2,
+        },
+      },
+    } as InvariantContext
+
+    const params = {
+      labwareId: SOURCE_LABWARE,
+      newLocation: { addressableAreaName: 'A4' },
+      strategy: 'manualMoveWithPause',
+    } as MoveLabwareParams
+    const result = moveLabware(params, invariantContext, robotState)
+    const { errors } = getErrorResult(result)
+    expect(errors).toHaveLength(1)
+    expect(errors[0]).toMatchObject({
+      type: 'TIPRACK_LID_NOT_ALLOWED_ON_DECK',
     })
   })
 })

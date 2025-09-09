@@ -29,17 +29,21 @@ import { TertiaryButton } from '/app/atoms/buttons/TertiaryButton'
 import { StatusLabel } from '/app/atoms/StatusLabel'
 import { DeckFixtureSetupInstructionsModal } from '/app/organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
+import { NotConfiguredModal } from '/app/organisms/LocationConflictModal/NotConfiguredModal'
 import {
   getFilteredDeckConfigFixtureCompatibility,
   isConflictingFixtureConfigured,
   isFixtureCompatible,
-} from '/app/organisms/LocationConflictModal/getFilteredDeckConfigFixtureCompatibility'
-import { NotConfiguredModal } from '/app/organisms/LocationConflictModal/NotConfiguredModal'
+} from '/app/resources/deck_configuration/utils'
 
 import { getFixtureImage } from './utils'
 
-import type { CutoutFixtureId, DeckDefinition } from '@opentrons/shared-data'
-import type { CutoutConfigAndCompatibility } from '/app/resources/deck_configuration/hooks'
+import type { TFunction } from 'i18next'
+import type {
+  CutoutConfigAndCompatibility,
+  CutoutFixtureId,
+  DeckDefinition,
+} from '@opentrons/shared-data'
 
 interface SetupFixtureListProps {
   deckConfigCompatibility: CutoutConfigAndCompatibility[]
@@ -86,7 +90,7 @@ export function FixtureListItem({
   robotName,
   partialRequiredCutoutFixtureId,
 }: FixtureListItemProps): JSX.Element {
-  const { t } = useTranslation('protocol_setup')
+  const { t } = useTranslation(['protocol_setup', 'deck_configuration'])
 
   const isCurrentFixtureCompatible = isFixtureCompatible(
     cutoutFixtureId,
@@ -103,7 +107,11 @@ export function FixtureListItem({
   if (!isCurrentFixtureCompatible) {
     statusLabel = (
       <StatusLabel
-        status={hasConflict ? t('location_conflict') : t('not_configured')}
+        status={
+          hasConflict
+            ? t('protocol_setup:location_conflict')
+            : t('protocol_setup:not_configured')
+        }
         backgroundColor={COLORS.yellow30}
         iconColor={COLORS.yellow60}
         textColor={COLORS.yellow60}
@@ -112,7 +120,7 @@ export function FixtureListItem({
   } else {
     statusLabel = (
       <StatusLabel
-        status={t('configured')}
+        status={t('protocol_setup:configured')}
         backgroundColor={COLORS.green30}
         iconColor={COLORS.green60}
         textColor={COLORS.green60}
@@ -213,9 +221,11 @@ export function FixtureListItem({
               >
                 {isCurrentFixtureCompatible
                   ? getFixtureDisplayName(
+                      t as TFunction,
                       partialRequiredCutoutFixtureId ?? cutoutFixtureId
                     )
                   : getFixtureDisplayName(
+                      t as TFunction,
                       partialRequiredCutoutFixtureId ??
                         compatibleCutoutFixtureIds?.[0]
                     )}
@@ -235,7 +245,7 @@ export function FixtureListItem({
                 }}
               >
                 <LegacyStyledText marginLeft={SPACING.spacing4} as="p">
-                  {t('view_setup_instructions')}
+                  {t('protocol_setup:view_setup_instructions')}
                 </LegacyStyledText>
               </Btn>
             </Flex>
@@ -259,7 +269,7 @@ export function FixtureListItem({
                 }}
               >
                 <LegacyStyledText as="label" cursor="pointer">
-                  {t('resolve')}
+                  {t('protocol_setup:resolve')}
                 </LegacyStyledText>
               </TertiaryButton>
             ) : null}

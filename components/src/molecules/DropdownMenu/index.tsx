@@ -48,7 +48,7 @@ export interface DropdownOption {
 
 export type DropdownBorder = 'rounded' | 'neutral'
 
-type MenuPlacement = 'auto' | 'top' | 'bottom'
+export type MenuPlacement = 'auto' | 'top' | 'bottom'
 
 export interface DropdownMenuProps {
   /** dropdown options */
@@ -260,7 +260,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
       gridGap={SPACING.spacing8}
       width={width}
     >
-      {title !== null ? (
+      {title != null ? (
         <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
           <StyledText
             desktopStyle="bodyDefaultRegular"

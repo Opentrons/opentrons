@@ -79,8 +79,12 @@ def add_parameters(parameters: ParameterContext) -> None:
                 "display_name": "USA Scientific 96 2.4ml Deep",
                 "value": "usascientific_96_wellplate_2.4ml_deep",
             },
+            {
+                "display_name": "eppendorf_96_wellplate_1000ul",
+                "value": "eppendorf_96_wellplate_1000ul",
+            },
         ],
-        default="opentrons_96_wellplate_200ul_pcr_full_skirt",
+        default="eppendorf_96_wellplate_1000ul",
     )
     parameters.add_int(
         variable_name="number_of_labware",
@@ -114,7 +118,7 @@ def add_parameters(parameters: ParameterContext) -> None:
     parameters.add_bool(
         variable_name="no_gripper",
         display_name="Only Test Stacker",
-        default=True,
+        default=False,
         description="If True, the protocol will only store and retrieve.",
     )
     parameters.add_float(
@@ -136,9 +140,7 @@ def run(protocol: ProtocolContext) -> None:
     no_gripper = protocol.params.no_gripper  # type: ignore[attr-defined]
     offset = protocol.params.offset  # type: ignore[attr-defined]
     # Load first labware on deck
-    initial_labware = protocol.load_labware(
-        labware_type, location=labware_location, version=2
-    )
+    initial_labware = protocol.load_labware(labware_type, location=labware_location)
     list_of_labware: List[Labware] = [initial_labware]
 
     # Load additional labware stacked on top
@@ -148,11 +150,10 @@ def run(protocol: ProtocolContext) -> None:
             list_of_labware.append(next_labware)
 
     # Load stacker module
-
-    stacker: FlexStackerContext = protocol.load_module(
-        "flexStackerModuleV1", stacker_location
-    )  # type: ignore[assignment]
     if no_gripper:
+        stacker: FlexStackerContext = protocol.load_module(
+            "flexStackerModuleV1", stacker_location
+        )  # type: ignore[assignment]
         if offset > 0:
             stacker.set_stored_labware(
                 load_name=labware_type,

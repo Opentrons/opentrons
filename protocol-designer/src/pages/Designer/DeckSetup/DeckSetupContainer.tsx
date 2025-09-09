@@ -8,6 +8,7 @@ import {
   COLORS,
   DeckFromLayers,
   DIRECTION_COLUMN,
+  FixedTrashText,
   Flex,
   FlexTrash,
   JUSTIFY_CENTER,
@@ -28,7 +29,6 @@ import {
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 
-import { FixedTrashText } from '../../../components/molecules'
 import { DECK_SETUP_TOOLS_WIDTH_REM } from '../../../constants'
 import { getDisableModuleRestrictions } from '../../../feature-flags/selectors'
 import {
@@ -241,7 +241,11 @@ export function DeckSetupContainer(
               minWidth="auto"
               deckDef={deckDef}
               viewBox={viewBoxAdjusted}
-              transform={'scale(1.3, -1.3)'}
+              transform={
+                robotType === OT2_ROBOT_TYPE
+                  ? 'scale(1.3, -1.3)'
+                  : 'scale(1, -1)'
+              }
               outline="auto"
               zoomed={zoomIn.slot != null}
               borderRadius={BORDERS.borderRadius12}

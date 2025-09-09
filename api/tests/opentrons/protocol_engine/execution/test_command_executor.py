@@ -48,6 +48,7 @@ from opentrons.protocol_engine.execution import (
     RunControlHandler,
     RailLightsHandler,
     StatusBarHandler,
+    TaskHandler,
 )
 from opentrons.protocol_engine.execution.command_executor import (
     CommandNoteTrackerProvider,
@@ -136,6 +137,12 @@ def status_bar(decoy: Decoy) -> StatusBarHandler:
 
 
 @pytest.fixture
+def task_handler(decoy: Decoy) -> TaskHandler:
+    """Get a mocked out TaskHandler."""
+    return decoy.mock(cls=TaskHandler)
+
+
+@pytest.fixture
 def command_note_tracker_provider(decoy: Decoy) -> CommandNoteTrackerProvider:
     """Get a mock tracker provider."""
     return decoy.mock(cls=CommandNoteTrackerProvider)
@@ -185,6 +192,7 @@ def subject(
     run_control: RunControlHandler,
     rail_lights: RailLightsHandler,
     status_bar: StatusBarHandler,
+    task_handler: TaskHandler,
     model_utils: ModelUtils,
     command_note_tracker_provider: CommandNoteTrackerProvider,
 ) -> CommandExecutor:
@@ -204,6 +212,7 @@ def subject(
         model_utils=model_utils,
         rail_lights=rail_lights,
         status_bar=status_bar,
+        task_handler=task_handler,
         command_note_tracker_provider=command_note_tracker_provider,
     )
 
@@ -247,6 +256,7 @@ async def test_execute(
     run_control: RunControlHandler,
     rail_lights: RailLightsHandler,
     status_bar: StatusBarHandler,
+    task_handler: TaskHandler,
     model_utils: ModelUtils,
     command_note_tracker: CommandNoteTracker,
     subject: CommandExecutor,
@@ -352,6 +362,7 @@ async def test_execute(
             rail_lights=rail_lights,
             model_utils=model_utils,
             status_bar=status_bar,
+            task_handler=task_handler,
             command_note_adder=command_note_tracker,
         )
     ).then_return(
@@ -416,6 +427,7 @@ async def test_execute_undefined_error(
     run_control: RunControlHandler,
     rail_lights: RailLightsHandler,
     status_bar: StatusBarHandler,
+    task_handler: TaskHandler,
     model_utils: ModelUtils,
     subject: CommandExecutor,
     command_note_tracker: CommandNoteTracker,
@@ -503,6 +515,7 @@ async def test_execute_undefined_error(
             rail_lights=rail_lights,
             model_utils=model_utils,
             status_bar=status_bar,
+            task_handler=task_handler,
             command_note_adder=command_note_tracker,
         )
     ).then_return(
@@ -556,6 +569,7 @@ async def test_execute_defined_error(
     run_control: RunControlHandler,
     rail_lights: RailLightsHandler,
     status_bar: StatusBarHandler,
+    task_handler: TaskHandler,
     model_utils: ModelUtils,
     command_note_tracker: CommandNoteTracker,
     error_recovery_policy: ErrorRecoveryPolicy,
@@ -639,6 +653,7 @@ async def test_execute_defined_error(
             labware_movement=labware_movement,
             pipetting=pipetting,
             tip_handler=mock_tip_handler,
+            task_handler=task_handler,
             run_control=run_control,
             rail_lights=rail_lights,
             model_utils=model_utils,

@@ -29,6 +29,21 @@ export function getFixtureIdByCutoutId(
           deckDef
         )
       : {}
-
   return fixtureIdByCutoutId
+}
+
+export function getFixtureIdByCutoutIdForModule(
+  attachedModule: AttachedModule,
+  deckConfig: DeckConfiguration
+): { [cutoutId in CutoutId]?: CutoutFixtureIdsWithFakes } {
+  const moduleCutoutConfig = deckConfig.find(
+    cc => cc.opentronsModuleSerialNumber === attachedModule.serialNumber
+  )
+  if (moduleCutoutConfig != null) {
+    return {
+      [moduleCutoutConfig.cutoutId]: moduleCutoutConfig.cutoutFixtureId,
+    }
+  } else {
+    return {}
+  }
 }

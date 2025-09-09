@@ -71,7 +71,6 @@ import {
   targetTemperatureRequired,
   temperatureRequired,
   timesRequired,
-  transferVolumeMax,
   transferVolumeMin,
   volumeRequired,
   volumeTooHigh,
@@ -85,6 +84,7 @@ import {
   maxDispenseWellVolume,
   mixTipPositionInTube,
   tipPositionInTube,
+  wellVolumeMax,
 } from './warnings'
 
 import type {
@@ -179,11 +179,14 @@ const stepFormHelperMap: {
       pushOutVolumeOutOfRange,
       pushOutVolumeRequired,
       blowoutFlowRateRequired,
-      transferVolumeMax,
       transferVolumeMin,
       pipetteRequired
     ),
-    getWarnings: composeWarnings(mixTipPositionInTube, incompatibleLiquidClass),
+    getWarnings: composeWarnings(
+      mixTipPositionInTube,
+      incompatibleLiquidClass,
+      wellVolumeMax
+    ),
   },
   pause: {
     getErrors: composeErrors(
@@ -227,7 +230,6 @@ const stepFormHelperMap: {
       conditioningVolumeRequired,
       conditioningVolumeOutOfRange,
       blowoutFlowRateRequired,
-      transferVolumeMax,
       transferVolumeMin,
       pipetteRequired,
       aspirateSubmergeSpeedRequired,
@@ -239,7 +241,8 @@ const stepFormHelperMap: {
     getWarnings: composeWarnings(
       maxDispenseWellVolume,
       tipPositionInTube,
-      incompatibleLiquidClass
+      incompatibleLiquidClass,
+      wellVolumeMax
     ),
   },
   magnet: {

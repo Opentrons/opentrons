@@ -5,6 +5,7 @@ import {
   fixture96Plate,
   getLoadedLabwareDefinitionsByUri,
   getModuleDef,
+  getModuleType,
   getPositionFromSlotId,
   TEMPERATURE_MODULE_V2,
 } from '@opentrons/shared-data'
@@ -22,7 +23,7 @@ import {
   updateLabwareInModules,
 } from '../useDeckMapUtils'
 
-import type { LabwareDefinition } from '@opentrons/shared-data'
+import type { LabwareDefinition, ModuleModel } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actual = await importOriginal<typeof getLoadedLabwareDefinitionsByUri>()
@@ -31,6 +32,7 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
     getLoadedLabwareDefinitionsByUri: vi.fn(),
     getPositionFromSlotId: vi.fn(),
     getModuleDef: vi.fn(),
+    getModuleType: vi.fn(),
   }
 })
 vi.mock('@opentrons/components')
@@ -83,7 +85,7 @@ describe('getRunCurrentModulesOnDeck', () => {
         moduleModel: 'MOCK_MODEL',
         moduleLocation: { slotName: 'A1' },
         innerProps: {},
-        nestedLabwareDef: mockLabwareDef,
+        nestedLabwareDefsBottomToTop: [mockLabwareDef],
         highlight: 'A1',
       },
     ])
@@ -275,6 +277,7 @@ describe('getRunCurrentModulesInfo', () => {
     } as any)
     vi.mocked(getPositionFromSlotId).mockReturnValue('position' as any)
     vi.mocked(getModuleDef).mockReturnValue('MOCK_MODULE_DEF' as any)
+    vi.mocked(getModuleType).mockReturnValue('MOCK_MODULE_TYPE' as any)
   })
 
   it('should return an empty array if runRecord is null', () => {
@@ -391,6 +394,7 @@ describe('getRunCurrentLabwareInfo', () => {
       {
         labwareDef: mockLabwareDef,
         slotName: 'A1',
+        labwareId: 'MOCK_PickUpTipLabware_ID',
         labwareLocation: { slotName: 'A1' },
       },
     ])
@@ -408,7 +412,11 @@ describe('getSlotNameAndLwLocFrom', () => {
     expect(result).toEqual([null, null])
   })
 
-  it('should return [null, null] if location has a moduleId and excludeModules is true', () => {
+  it('should return [null, null] if location has a moduleId and moduleModel and excludeModules is true', () => {
+    vi.mocked(getLabwareLocation).mockReturnValue({
+      slotName: 'A1',
+      moduleModel: 'MOCK_MODULE_MODEL' as ModuleModel,
+    })
     const result = getSlotNameAndLwLocFrom(
       { moduleId: 'MOCK_MODULE_ID' },
       {} as any,

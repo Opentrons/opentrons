@@ -33,6 +33,10 @@ describe('Render StackerEmptyHopper', () => {
       recoveryCommands: {
         skipFailedCommand: mockSkipFailedCommand,
       } as any,
+      recoveryMap: {
+        route: RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE,
+        step: RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.STEPS.EMPTY_STACKER,
+      },
       currentRecoveryOptionUtils: {
         selectedRecoveryOption: RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE,
       } as any,
@@ -72,6 +76,7 @@ describe('Render StackerEmptyHopper', () => {
   ])(`renders correct title for step $step`, step => {
     props.recoveryMap = {
       ...props.recoveryMap,
+      route: RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE,
       step: step,
     }
     render(props)
@@ -81,5 +86,21 @@ describe('Render StackerEmptyHopper', () => {
     screen.getByText(
       'Labware stuck on the latch will be retrieved later in recovery.'
     )
+  })
+
+  it.each([
+    RECOVERY_MAP.STACKER_STALLED_RETRY.STEPS.EMPTY_STACKER,
+    RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.EMPTY_STACKER,
+  ])(`renders correct title for step $step`, step => {
+    props.recoveryMap = {
+      ...props.recoveryMap,
+      route: RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE,
+      step: step,
+    }
+    render(props)
+
+    screen.getByText('Empty stacker of labware above latch')
+    screen.getByText('Empty the stacker of all labware above the latch.')
+    screen.getByText('Close the robot and stacker door before proceeding.')
   })
 })

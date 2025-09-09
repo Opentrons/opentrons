@@ -41,12 +41,14 @@ export const generateRobotStateTimeline = (
       args: StepGeneration.CommandCreatorArgs,
       stepIndex
     ): StepGeneration.CurriedCommandCreator[] => {
-      const curriedCommandCreator = commandCreatorFromStepArgs(args)
-
-      if (curriedCommandCreator === null) {
-        // unsupported command creator in args.commandCreatorFnName
+      const { stepNumber, name, description } = args
+      const baseCreator = commandCreatorFromStepArgs(args)
+      // unsupported command creator in args.commandCreatorFnName
+      if (baseCreator === null) {
         return acc
       }
+
+      let finalCreator: StepGeneration.CurriedCommandCreator = baseCreator
 
       // Drop tips eagerly, per pipette
       //
@@ -101,19 +103,29 @@ export const generateRobotStateTimeline = (
         }
 
         if (!willReuseTip) {
-          return [
-            ...acc,
-            (_invariantContext, _prevRobotState) =>
-              reduceCommandCreators(
-                [curriedCommandCreator, ...dropTipCommands],
-                _invariantContext,
-                _prevRobotState
-              ),
-          ]
+          finalCreator = (_invariantContext, _prevRobotState) =>
+            reduceCommandCreators(
+              [baseCreator, ...dropTipCommands],
+              _invariantContext,
+              _prevRobotState
+            )
         }
       }
 
-      return [...acc, curriedCommandCreator]
+      const wrappedWithStepInfo: StepGeneration.CurriedCommandCreator = (
+        _invariantContext,
+        _prevRobotState
+      ) => {
+        const result = finalCreator(_invariantContext, _prevRobotState)
+        return {
+          ...result,
+          stepNumber,
+          name,
+          description,
+        }
+      }
+
+      return [...acc, wrappedWithStepInfo]
     },
     []
   )

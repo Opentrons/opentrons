@@ -5082,6 +5082,11 @@
           "description": "Unique ID of the Thermocycler Module.",
           "title": "Moduleid",
           "type": "string"
+        },
+        "ramp_rate": {
+          "description": "The rate in C\u00b0/second to change temperature from the current target. If unspecified, the Thermocycler will change temperature at the fastest possible rate.",
+          "title": "Ramp Rate",
+          "type": "number"
         }
       },
       "required": ["moduleId", "celsius"],
@@ -5303,6 +5308,12 @@
       "title": "StackerFillEmptyStrategy",
       "type": "string"
     },
+    "StackerLabwareMovementStrategy": {
+      "description": "Strategy to retrieve or store labware.",
+      "enum": ["automatic", "manual"],
+      "title": "StackerLabwareMovementStrategy",
+      "type": "string"
+    },
     "StackerStoredLabwareDetails": {
       "description": "The parameters defining a labware to be stored in the stacker.",
       "properties": {
@@ -5388,9 +5399,13 @@
           "description": "Unique ID of the flex stacker.",
           "title": "Moduleid",
           "type": "string"
+        },
+        "strategy": {
+          "$ref": "#/$defs/StackerLabwareMovementStrategy",
+          "description": "If manual, indicates that labware has been moved to the hopper manually by the user, as required in error recovery."
         }
       },
-      "required": ["moduleId"],
+      "required": ["moduleId", "strategy"],
       "title": "StoreParams",
       "type": "object"
     },

@@ -234,10 +234,7 @@ class ProtocolContext(CommandPublisher):
     @property
     @requires_version(2, 22)
     def robot(self) -> RobotContext:
-        """The :py:class:`.RobotContext` for the protocol.
-
-        :meta private:
-        """
+        """The :py:class:`.RobotContext` for the protocol."""
         if self._core.robot_type != "OT-3 Standard" or not self._robot:
             raise RobotTypeError("The RobotContext is only available on Flex robots.")
         return self._robot
@@ -337,23 +334,24 @@ class ProtocolContext(CommandPublisher):
         if self._unsubscribe_commands:
             self._unsubscribe_commands()
 
-        def on_command(message: cmd_types.CommandMessage) -> None:
-            payload = message.get("payload")
-
-            if payload is None:
-                return
-
-            text = payload.get("text")
-
-            if text is None:
-                return
-
-            if message["$"] == "before":
-                self._commands.append(text)
-
         self._unsubscribe_commands = self.broker.subscribe(
-            cmd_types.COMMAND, on_command
+            cmd_types.COMMAND, self._on_command_callback
         )
+
+    def _on_command_callback(self, message: cmd_types.CommandMessage) -> None:
+        """Callback for command messages."""
+        payload = message.get("payload")
+
+        if payload is None:
+            return
+
+        text = payload.get("text")
+
+        if text is None:
+            return
+
+        if message["$"] == "before":
+            self._commands.append(text)
 
     @requires_version(2, 0)
     def is_simulating(self) -> bool:
@@ -404,7 +402,7 @@ class ProtocolContext(CommandPublisher):
         )
 
     @requires_version(2, 0)
-    def load_labware(
+    def load_labware(  # noqa: C901
         self,
         load_name: str,
         location: Union[DeckLocation, OffDeckType],
@@ -413,6 +411,11 @@ class ProtocolContext(CommandPublisher):
         version: Optional[int] = None,
         adapter: Optional[str] = None,
         lid: Optional[str] = None,
+        *,
+        adapter_namespace: Optional[str] = None,
+        adapter_version: Optional[int] = None,
+        lid_namespace: Optional[str] = None,
+        lid_version: Optional[int] = None,
     ) -> Labware:
         """Load a labware onto a location.
 
@@ -453,18 +456,52 @@ class ProtocolContext(CommandPublisher):
         :param version: The version of the labware definition. You should normally
             leave this unspecified to let ``load_labware()`` choose a version
             automatically.
-        :param adapter: An adapter to load the labware on top of. Accepts the same
-            values as the ``load_name`` parameter of :py:meth:`.load_adapter`. The
-            adapter will use the same namespace as the labware, and the API will
-            choose the adapter's version automatically.
 
-                        .. versionadded:: 2.15
+        :param adapter: The load name of an adapter to load the labware on top of. Accepts
+            the same values as the ``load_name`` parameter of :py:meth:`.load_adapter`.
+
+            .. versionadded:: 2.15
+
+        :param adapter_namespace: The namespace of the adapter being loaded.
+            Applies to ``adapter`` the same way that ``namespace`` applies to ``load_name``.
+
+            .. versionchanged:: 2.26
+               ``adapter_namespace`` may now be specified explicitly.
+               Also, when you've specified ``namespace`` but not ``adapter_namespace``,
+               ``adapter_namespace`` will now independently follow the same search rules
+               described in ``namespace``. Formerly, it took ``namespace``'s exact value.
+
+        :param adapter_version: The version of the adapter being loaded.
+            Applies to ``adapter`` the same way that ``version`` applies to ``load_name``.
+
+            .. versionchanged:: 2.26
+               ``adapter_version`` may now be specified explicitly. Also, when it's unspecified,
+               the algorithm to select a version automatically has improved to avoid
+               selecting versions that do not exist.
+
         :param lid: A lid to load on the top of the main labware. Accepts the same
             values as the ``load_name`` parameter of :py:meth:`.load_lid_stack`. The
             lid will use the same namespace as the labware, and the API will
-            choose the adapter's version automatically.
+            choose the lid's version automatically.
 
-                        .. versionadded:: 2.23
+            .. versionadded:: 2.23
+
+        :param lid_namespace: The namespace of the lid being loaded.
+            Applies to ``lid`` the same way that ``namespace`` applies to ``load_name``.
+
+            .. versionchanged:: 2.26
+               ``lid_namespace`` may now be specified explicitly.
+               Also, when you've specified ``namespace`` but not ``lid_namespace``,
+               ``lid_namespace`` will now independently follow the same search rules
+               described in ``namespace``. Formerly, it took ``namespace``'s exact value.
+
+        :param lid_version: The version of the adapter being loaded.
+            Applies to ``lid`` the same way that ``version`` applies to ``load_name``.
+
+            .. versionchanged:: 2.26
+               ``lid_version`` may now be specified explicitly. Also, when it's unspecified,
+               the algorithm to select a version automatically has improved to avoid
+               selecting versions that do not exist.
         """
 
         if isinstance(location, OffDeckType) and self._api_version < APIVersion(2, 15):
@@ -473,6 +510,40 @@ class ProtocolContext(CommandPublisher):
                 until_version="2.15",
                 current_version=f"{self._api_version}",
             )
+
+        if self._api_version < validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE:
+            if adapter_namespace is not None:
+                raise APIVersionError(
+                    api_element="The `adapter_namespace` parameter",
+                    until_version=str(
+                        validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                    ),
+                    current_version=str(self._api_version),
+                )
+            if adapter_version is not None:
+                raise APIVersionError(
+                    api_element="The `adapter_version` parameter",
+                    until_version=str(
+                        validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                    ),
+                    current_version=str(self._api_version),
+                )
+            if lid_namespace is not None:
+                raise APIVersionError(
+                    api_element="The `lid_namespace` parameter",
+                    until_version=str(
+                        validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                    ),
+                    current_version=str(self._api_version),
+                )
+            if lid_version is not None:
+                raise APIVersionError(
+                    api_element="The `lid_version` parameter",
+                    until_version=str(
+                        validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                    ),
+                    current_version=str(self._api_version),
+                )
 
         load_name = validation.ensure_lowercase_name(load_name)
         load_location: Union[OffDeckType, DeckSlotName, StagingSlotName, LabwareCore]
@@ -483,10 +554,22 @@ class ProtocolContext(CommandPublisher):
                     until_version="2.15",
                     current_version=f"{self._api_version}",
                 )
+
+            if (
+                self._api_version
+                < validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+            ):
+                checked_adapter_namespace = namespace
+                checked_adapter_version = None
+            else:
+                checked_adapter_namespace = adapter_namespace
+                checked_adapter_version = adapter_version
+
             loaded_adapter = self.load_adapter(
                 load_name=adapter,
                 location=location,
-                namespace=namespace,
+                namespace=checked_adapter_namespace,
+                version=checked_adapter_version,
             )
             load_location = loaded_adapter._core
         elif isinstance(location, OffDeckType):
@@ -508,14 +591,25 @@ class ProtocolContext(CommandPublisher):
             if self._api_version < validation.LID_STACK_VERSION_GATE:
                 raise APIVersionError(
                     api_element="Loading a Lid on a Labware",
-                    until_version="2.23",
+                    until_version=f"{validation.LID_STACK_VERSION_GATE}",
                     current_version=f"{self._api_version}",
                 )
+
+            if (
+                self._api_version
+                < validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+            ):
+                checked_lid_namespace = namespace
+                checked_lid_version = version
+            else:
+                checked_lid_namespace = lid_namespace
+                checked_lid_version = lid_version
+
             self._core.load_lid(
                 load_name=lid,
                 location=labware_core,
-                namespace=namespace,
-                version=version,
+                namespace=checked_lid_namespace,
+                version=checked_lid_version,
             )
 
         labware = Labware(
@@ -917,7 +1011,7 @@ class ProtocolContext(CommandPublisher):
         ):
             raise APIVersionError(
                 api_element=f"Module of type {module_name}",
-                until_version=str(validation.FLEX_STACKER_VERSION_GATE),
+                until_version=f"{validation.FLEX_STACKER_VERSION_GATE}",
                 current_version=f"{self._api_version}",
             )
 
@@ -1091,6 +1185,7 @@ class ProtocolContext(CommandPublisher):
             tip_racks=tip_racks,
             trash=trash,
             requested_as=instrument_name,
+            core_map=self._core_map,
         )
 
         self._instruments[checked_mount] = instrument
@@ -1348,8 +1443,8 @@ class ProtocolContext(CommandPublisher):
             if self._api_version < desc_and_display_color_omittable_since:
                 raise APIVersionError(
                     api_element="Calling `define_liquid()` without a `description`",
-                    current_version=str(self._api_version),
-                    until_version=str(desc_and_display_color_omittable_since),
+                    until_version=f"{desc_and_display_color_omittable_since}",
+                    current_version=f"{self._api_version}",
                     extra_message="Use a newer API version or explicitly supply `description=None`.",
                 )
             else:
@@ -1358,8 +1453,8 @@ class ProtocolContext(CommandPublisher):
             if self._api_version < desc_and_display_color_omittable_since:
                 raise APIVersionError(
                     api_element="Calling `define_liquid()` without a `display_color`",
-                    current_version=str(self._api_version),
-                    until_version=str(desc_and_display_color_omittable_since),
+                    until_version=f"{desc_and_display_color_omittable_since}",
+                    current_version=f"{self._api_version}",
                     extra_message="Use a newer API version or explicitly supply `display_color=None`.",
                 )
             else:
@@ -1375,6 +1470,7 @@ class ProtocolContext(CommandPublisher):
     def get_liquid_class(
         self,
         name: str,
+        version: Optional[int] = None,
     ) -> LiquidClass:
         """
         Get an instance of an Opentrons-verified liquid class for use in a Flex protocol.
@@ -1384,12 +1480,14 @@ class ProtocolContext(CommandPublisher):
             - ``"water"``: an Opentrons-verified liquid class based on deionized water.
             - ``"glycerol_50"``: an Opentrons-verified liquid class for viscous liquid. Based on 50% glycerol.
             - ``"ethanol_80"``: an Opentrons-verified liquid class for volatile liquid. Based on 80% ethanol.
+        :param version: The version of the liquid class to retrieve. If left unspecified, the latest definition for the
+            protocol's API version will be loaded.
 
         :raises: ``LiquidClassDefinitionDoesNotExist``: if the specified liquid class does not exist.
 
         :returns: A new LiquidClass object.
         """
-        return self._core.get_liquid_class(name=name, version=DEFAULT_LC_VERSION)
+        return self._core.get_liquid_class(name=name, version=version)
 
     @requires_version(2, 24)
     def define_liquid_class(
@@ -1459,6 +1557,9 @@ class ProtocolContext(CommandPublisher):
         adapter: Optional[str] = None,
         namespace: Optional[str] = None,
         version: Optional[int] = None,
+        *,
+        adapter_namespace: Optional[str] = None,
+        adapter_version: Optional[int] = None,
     ) -> Labware:
         """
         Load a stack of Opentrons Tough Auto-Sealing Lids onto a valid deck location or adapter.
@@ -1466,13 +1567,17 @@ class ProtocolContext(CommandPublisher):
         :param str load_name: A string to use for looking up a lid definition.
             You can find the ``load_name`` for any compatible lid on the Opentrons
             `Labware Library <https://labware.opentrons.com>`_.
+
         :param location: Either a :ref:`deck slot <deck-slots>`,
             like ``1``, ``"1"``, or ``"D1"``, or a valid Opentrons Adapter.
+
         :param int quantity: The quantity of lids to be loaded in the stack.
+
         :param adapter: An adapter to load the lid stack on top of. Accepts the same
             values as the ``load_name`` parameter of :py:meth:`.load_adapter`. The
             adapter will use the same namespace as the lid labware, and the API will
             choose the adapter's version automatically.
+
         :param str namespace: The namespace that the lid labware definition belongs to.
             If unspecified, the API will automatically search two namespaces:
 
@@ -1488,6 +1593,21 @@ class ProtocolContext(CommandPublisher):
             leave this unspecified to let ``load_lid_stack()`` choose a version
             automatically.
 
+        :param adapter_namespace: The namespace of the adapter being loaded.
+            Applies to ``adapter`` the same way that ``namespace`` applies to ``load_name``.
+
+            .. versionchanged:: 2.26
+               ``adapter_namespace`` may now be specified explicitly.
+               Also, when you've specified ``namespace`` but not ``adapter_namespace``,
+               ``adapter_namespace`` will now independently follow the same search rules
+               described in ``namespace``. Formerly, it took ``namespace``'s exact value.
+
+        :param adapter_version: The version of the adapter being loaded.
+            Applies to ``adapter`` the same way that ``version`` applies to ``load_name``.
+
+            .. versionadded:: 2.26
+               ``adapter_version`` may now be specified explicitly.
+
         :return:  The initialized and loaded labware object representing the lid stack.
 
         .. versionadded:: 2.23
@@ -1496,9 +1616,27 @@ class ProtocolContext(CommandPublisher):
         if self._api_version < validation.LID_STACK_VERSION_GATE:
             raise APIVersionError(
                 api_element="Loading a Lid Stack",
-                until_version="2.23",
+                until_version=f"{validation.LID_STACK_VERSION_GATE}",
                 current_version=f"{self._api_version}",
             )
+
+        if self._api_version < validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE:
+            if adapter_namespace is not None:
+                raise APIVersionError(
+                    api_element="The `adapter_namespace` parameter",
+                    until_version=str(
+                        validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                    ),
+                    current_version=str(self._api_version),
+                )
+            if adapter_version is not None:
+                raise APIVersionError(
+                    api_element="The `adapter_version` parameter",
+                    until_version=str(
+                        validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                    ),
+                    current_version=str(self._api_version),
+                )
 
         load_location: Union[DeckSlotName, StagingSlotName, LabwareCore]
         if isinstance(location, Labware):
@@ -1512,10 +1650,21 @@ class ProtocolContext(CommandPublisher):
             if isinstance(load_location, DeckSlotName) or isinstance(
                 load_location, StagingSlotName
             ):
+                if (
+                    self._api_version
+                    < validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                ):
+                    checked_adapter_namespace = namespace
+                    checked_adapter_version = None
+                else:
+                    checked_adapter_namespace = adapter_namespace
+                    checked_adapter_version = adapter_version
+
                 loaded_adapter = self.load_adapter(
                     load_name=adapter,
                     location=load_location.value,
-                    namespace=namespace,
+                    namespace=checked_adapter_namespace,
+                    version=checked_adapter_version,
                 )
                 load_location = loaded_adapter._core
             else:

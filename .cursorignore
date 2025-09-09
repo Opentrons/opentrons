@@ -83,6 +83,7 @@ api/docs/dist/v2/
 *.sublime-workspace
 
 # build artifacts
+api-client/dist/
 app/dist/
 app-shell/dist/
 app-shell-odd/dist/
@@ -90,5 +91,14 @@ components/lib
 discovery-client/lib
 labware-designer/dist/
 labware-library/dist/
-protocol-designer/dist/
 opentrons-ai-client/dist/
+protocol-designer/dist/
+react-api-client/dist/
+shared-data/lib/
+step-generation/lib/
+
+# docker
+Dockerfile
+DOCKER.md
+docker-compose.yml
+.dockerignore

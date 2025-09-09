@@ -343,7 +343,7 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   pickUpTip_location?: string | null
   pickUpTip_wellNames?: string[] | null
   preWetTip?: boolean | null
-  liquidClass?: string | null
+  liquidClass?: string | null // a liquid class name like "water" or "none" or null
 }
 
 export interface HydratedMoveLabwareFormData extends AnnotationFields {
@@ -373,7 +373,7 @@ export interface HydratedMixFormData extends AnnotationFields {
   mix_wellOrder_first: WellOrderOption
   mix_wellOrder_second: WellOrderOption
   nozzles: NozzleConfigurationStyle | null
-  pipette: PipetteEntity
+  pipette: PipetteEntity // can be null if user deletes pipette
   stepType: 'mix'
   tipRack: string
   volume: number

@@ -3,16 +3,17 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { COLORS } from '@opentrons/components'
 
-import { renderWithProviders } from '../../../../../../../__testing-utils__'
-import { i18n } from '../../../../../../../assets/localization'
-import { InputStepFormField } from '../../../../../../../components/molecules'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { InputStepFormField } from '/protocol-designer/components/molecules'
+
 import { PositionField } from '../../../PipetteFields'
 import { MultiInputField } from '../MultiInputField'
 
 import type { ComponentProps } from 'react'
 
 vi.mock('../../../PipetteFields')
-vi.mock('../../../../../../../components/molecules')
+vi.mock('/protocol-designer/components/molecules')
 
 const render = (props: ComponentProps<typeof MultiInputField>) => {
   return renderWithProviders(<MultiInputField {...props} />, {

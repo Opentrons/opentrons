@@ -4,6 +4,7 @@ DEPRECATED: Testing ModuleView independently of ModuleView is no longer helpful.
 Try to add new tests to test_module_state.py, where they can be tested together,
 treating ModuleState as a private implementation detail.
 """
+
 import pytest
 from math import isclose
 from pytest_lazy_fixtures import lf as lazy_fixture
@@ -37,7 +38,6 @@ from opentrons.protocol_engine.types import (
     DeckType,
     ModuleOffsetData,
     HeaterShakerLatchStatus,
-    LabwareMovementOffsetData,
     AddressableArea,
     DeckConfigurationType,
     PotentialCutoutFixture,
@@ -1042,6 +1042,31 @@ def test_select_hardware_module_to_load_rejects_location_reassignment(
         )
 
 
+def test_select_hardware_module_to_load_allows_stacker_magblock_coexistence(
+    flex_stacker_v1_def: ModuleDefinition,
+    mag_block_v1_def: ModuleDefinition,
+) -> None:
+    """It should allow a stacker to be loaded where a magblock is."""
+    subject = make_module_view(
+        slot_by_module_id={"module-1": DeckSlotName.SLOT_C3},
+        hardware_by_module_id={
+            "module-1": HardwareModule(definition=mag_block_v1_def, serial_number=None)
+        },
+    )
+    attached_modules = [
+        HardwareModule(serial_number="serial-1", definition=flex_stacker_v1_def),
+        HardwareModule(serial_number="serial-2", definition=flex_stacker_v1_def),
+    ]
+    assert subject.select_hardware_module_to_load(
+        model=ModuleModel.FLEX_STACKER_MODULE_V1,
+        location=deck_configuration_provider.get_cutout_id_by_deck_slot_name(
+            DeckSlotName.SLOT_C3
+        ),
+        attached_modules=attached_modules,
+        expected_serial_number="serial-2",
+    ) == HardwareModule(serial_number="serial-2", definition=flex_stacker_v1_def)
+
+
 class _CalculateMagnetHardwareHeightTestParams(NamedTuple):
     definition: ModuleDefinition
     mm_from_base: float
@@ -1159,7 +1184,7 @@ def test_magnetic_module_view_calculate_magnet_hardware_height(
         assert result == expected_result
 
 
-@pytest.mark.parametrize("target_temp", [36.8, 95.1])
+@pytest.mark.parametrize("target_temp", [-1, 95.1])
 def test_validate_heater_shaker_target_temperature_raises(
     heater_shaker_v1_def: ModuleDefinition,
     target_temp: float,
@@ -1877,51 +1902,6 @@ def test_is_edge_move_unsafe(
     result = subject.is_edge_move_unsafe(mount=mount, target_slot=target_slot)
 
     assert result is expected_result
-
-
-@pytest.mark.parametrize(
-    argnames=["module_def", "expected_offset_data"],
-    argvalues=[
-        (
-            lazy_fixture("thermocycler_v2_def"),
-            LabwareMovementOffsetData(
-                pickUpOffset=LabwareOffsetVector(x=0, y=0, z=4.6),
-                dropOffset=LabwareOffsetVector(x=0, y=0, z=5.6),
-            ),
-        ),
-        (
-            lazy_fixture("heater_shaker_v1_def"),
-            LabwareMovementOffsetData(
-                pickUpOffset=LabwareOffsetVector(x=0, y=0, z=0),
-                dropOffset=LabwareOffsetVector(x=0, y=0, z=1.0),
-            ),
-        ),
-        (
-            lazy_fixture("tempdeck_v1_def"),
-            None,
-        ),
-    ],
-)
-def test_get_default_gripper_offsets(
-    module_def: ModuleDefinition,
-    expected_offset_data: Optional[LabwareMovementOffsetData],
-) -> None:
-    """It should return the correct gripper offsets, if present."""
-    subject = make_module_view(
-        slot_by_module_id={
-            "module-1": DeckSlotName.SLOT_1,
-        },
-        requested_model_by_module_id={
-            "module-1": ModuleModel.TEMPERATURE_MODULE_V1,  # Does not matter
-        },
-        hardware_by_module_id={
-            "module-1": HardwareModule(
-                serial_number="serial-1",
-                definition=module_def,
-            ),
-        },
-    )
-    assert subject.get_default_gripper_offsets("module-1") == expected_offset_data
 
 
 @pytest.mark.parametrize(

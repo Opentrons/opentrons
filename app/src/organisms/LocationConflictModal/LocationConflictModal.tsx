@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Trans, useTranslation } from 'react-i18next'
 
@@ -21,8 +21,11 @@ import {
 } from '@opentrons/components'
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
+  FLEX_STACKER_MODULE_V1,
   FLEX_STACKER_V1_FIXTURE,
   FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
+  FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
+  FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
   getCutoutDisplayName,
   getCutoutFixturesForModuleModel,
   getFixtureDisplayName,
@@ -30,11 +33,15 @@ import {
   getModuleDisplayName,
   MAGNETIC_BLOCK_V1_FIXTURE,
   SINGLE_LEFT_SLOT_FIXTURE,
+  SINGLE_RIGHT_SLOT_FIXTURE,
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
   THERMOCYCLER_V2_FRONT_FIXTURE,
   THERMOCYCLER_V2_REAR_FIXTURE,
   WASTE_CHUTE_FLEX_STACKER_FIXTURES,
+  WASTE_CHUTE_ONLY_FIXTURES,
+  WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
@@ -45,6 +52,7 @@ import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configurati
 import { ChooseModuleToConfigureModal } from './ChooseModuleToConfigureModal'
 import { patchDeckConfigForRequiredFixture } from './patchDeckConfigForRequiredFixture'
 
+import type { TFunction } from 'i18next'
 import type {
   CutoutConfig,
   CutoutFixtureId,
@@ -77,7 +85,11 @@ export const LocationConflictModal = (
     moduleSerialNumber,
     isOnDevice = false,
   } = props
-  const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
+  const { t, i18n } = useTranslation([
+    'protocol_setup',
+    'shared',
+    'deck_configuration',
+  ])
 
   const [showModuleSelect, setShowModuleSelect] = useState(false)
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
@@ -85,6 +97,22 @@ export const LocationConflictModal = (
   const deckConfigurationAtLocationFixtureId = deckConfig.find(
     (deckFixture: CutoutConfig) => deckFixture.cutoutId === cutoutId
   )?.cutoutFixtureId
+
+  // skip past fix conflict screen if D3 can remain the same when you attach
+  // a flex stacker module, ie mag block or waste chute only fixture
+  useEffect(() => {
+    if (requiredModule != null && requiredModule === FLEX_STACKER_MODULE_V1) {
+      if (
+        deckConfigurationAtLocationFixtureId != null &&
+        (deckConfigurationAtLocationFixtureId === MAGNETIC_BLOCK_V1_FIXTURE ||
+          WASTE_CHUTE_ONLY_FIXTURES.includes(
+            deckConfigurationAtLocationFixtureId
+          ))
+      ) {
+        setShowModuleSelect(true)
+      }
+    }
+  }, [])
 
   const isThermocyclerRequired =
     requiredModule === THERMOCYCLER_MODULE_V1 ||
@@ -95,10 +123,34 @@ export const LocationConflictModal = (
     deckConfigurationAtLocationFixtureId === THERMOCYCLER_V2_REAR_FIXTURE ||
     deckConfigurationAtLocationFixtureId === THERMOCYCLER_V2_FRONT_FIXTURE
 
-  const currentFixtureDisplayName =
-    deckConfigurationAtLocationFixtureId != null
-      ? getFixtureDisplayName(deckConfigurationAtLocationFixtureId)
-      : ''
+  const getCurrentFixtureDisplayName = (): string => {
+    if (
+      requiredFixtureId === SINGLE_RIGHT_SLOT_FIXTURE &&
+      deckConfigurationAtLocationFixtureId ===
+        FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE
+    ) {
+      return getFixtureDisplayName(t as TFunction, MAGNETIC_BLOCK_V1_FIXTURE)
+    } else if (
+      requiredFixtureId === SINGLE_RIGHT_SLOT_FIXTURE &&
+      (deckConfigurationAtLocationFixtureId ===
+        FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE ||
+        deckConfigurationAtLocationFixtureId ===
+          FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE)
+    ) {
+      return getFixtureDisplayName(
+        t as TFunction,
+        WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
+      )
+    } else {
+      return deckConfigurationAtLocationFixtureId != null
+        ? getFixtureDisplayName(
+            t as TFunction,
+            deckConfigurationAtLocationFixtureId
+          )
+        : ''
+    }
+  }
+  const currentFixtureDisplayName = getCurrentFixtureDisplayName()
 
   const handleConfigureModule = (moduleSerialNumber?: string): void => {
     if (requiredModule != null) {
@@ -132,12 +184,30 @@ export const LocationConflictModal = (
               opentronsModuleSerialNumber: moduleSerialNumber,
             }
           } else if (
+            WASTE_CHUTE_ONLY_FIXTURES.includes(
+              existingCutoutConfig.cutoutFixtureId
+            ) &&
+            replacementCutoutFixtureId === FLEX_STACKER_V1_FIXTURE
+          ) {
+            // if current fixture is a waste chute and we are adding a flex stacker,
+            // don't remove the waste chute
+            const replacementCutoutFixtureId =
+              existingCutoutConfig.cutoutFixtureId ===
+              WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE
+                ? FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE
+                : FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE
+            return {
+              ...existingCutoutConfig,
+              cutoutFixtureId: replacementCutoutFixtureId,
+              opentronsModuleSerialNumber: moduleSerialNumber,
+            }
+          } else if (
             existingCutoutConfig.cutoutFixtureId ===
               MAGNETIC_BLOCK_V1_FIXTURE &&
             replacementCutoutFixtureId === FLEX_STACKER_V1_FIXTURE
           ) {
-            // if current fixture is a magnetic block and we are adding a flex stacker, don't remove
-            // the mag block
+            // if current fixture is a magnetic block and we are adding a flex stacker,
+            // don't remove the mag block
             return {
               ...existingCutoutConfig,
               cutoutFixtureId: FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
@@ -199,7 +269,10 @@ export const LocationConflictModal = (
 
   let protocolSpecifiesDisplayName = ''
   if (requiredFixtureId != null) {
-    protocolSpecifiesDisplayName = getFixtureDisplayName(requiredFixtureId)
+    protocolSpecifiesDisplayName = getFixtureDisplayName(
+      t as TFunction,
+      requiredFixtureId
+    )
   } else if (requiredModule != null) {
     protocolSpecifiesDisplayName = getModuleDisplayName(requiredModule)
   }

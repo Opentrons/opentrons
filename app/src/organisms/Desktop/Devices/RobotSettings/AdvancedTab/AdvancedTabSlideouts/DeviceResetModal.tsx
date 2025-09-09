@@ -90,7 +90,7 @@ export function DeviceResetModal({
                 onClick={triggerReset}
                 disabled={PENDING_STATUS}
               >
-                {t('yes_clear_data_and_restart_robot')}
+                {t('shared:confirm')}
               </AlertPrimaryButton>
             </Flex>
           </Flex>

@@ -63,53 +63,6 @@
       "z": 0
     }
   },
-  "stackingOffsetWithLabware": {
-    "default": {
-      "x": 0,
-      "y": 0,
-      "z": 8.193
-    },
-    "opentrons_tough_pcr_auto_sealing_lid": {
-      "x": 0,
-      "y": 0,
-      "z": 6.492
-    },
-    "schema3test_tough_pcr_auto_sealing_lid": {
-      "x": 0,
-      "y": 0,
-      "z": 6.492
-    },
-    "armadillo_96_wellplate_200ul_pcr_full_skirt": {
-      "x": 0,
-      "y": 0,
-      "z": 8.193
-    },
-    "opentrons_96_wellplate_200ul_pcr_full_skirt": {
-      "x": 0,
-      "y": 0,
-      "z": 8.193
-    },
-    "schema3test_96_wellplate_200ul_pcr_full_skirt": {
-      "x": 0,
-      "y": 0,
-      "z": 8.193
-    },
-    "biorad_96_wellplate_200ul_pcr": {
-      "x": 0,
-      "y": 0,
-      "z": 8.08
-    },
-    "opentrons_flex_deck_riser": {
-      "x": 0,
-      "y": 0,
-      "z": 34
-    },
-    "protocol_engine_lid_stack_object": {
-      "x": 0,
-      "y": 0,
-      "z": 0
-    }
-  },
   "stackLimit": 5,
   "compatibleParentLabware": [
     "armadillo_96_wellplate_200ul_pcr_full_skirt",
@@ -120,7 +73,7 @@
     "protocol_engine_lid_stack_object"
   ],
   "gripForce": 15,
-  "gripHeightFromLabwareBottom": 7.91,
+  "gripHeightFromLabwareOrigin": 7.91,
   "gripperOffsets": {
     "default": {
       "pickUpOffset": {

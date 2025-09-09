@@ -21,7 +21,7 @@ dependencies = [
     "opentrons==0.0.0",
     "opentrons-shared-data==0.0.0",
     "server-utils==0.0.0",
-    "anyio==3.7.1",
+    "anyio==4.9.0",
     "fastapi==0.100.0",
     "python-dotenv==1.0.1",
     "python-multipart==0.0.6",

@@ -1,25 +1,16 @@
 import { useRef, useState } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
 
-import {
-  Box,
-  COLORS,
-  DIRECTION_COLUMN,
-  Flex,
-  SPACING,
-} from '@opentrons/components'
+import { Box, DIRECTION_COLUMN, Flex } from '@opentrons/components'
 
-import { DND_TYPES } from '../../../../constants'
-import { stepIconsByType } from '../../../../form-types'
-import { selectors as stepFormSelectors } from '../../../../step-forms'
+import { DND_TYPES } from '/protocol-designer/constants'
+
 import { ConnectedStepInfo } from './ConnectedStepInfo'
-import { StepContainer } from './StepContainer'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { DragLayerMonitor, DropTargetMonitor } from 'react-dnd'
-import type { StepIdType } from '../../../../form-types'
+import type { StepIdType } from '/protocol-designer/form-types'
 
 export interface ConnectedStepItemProps {
   stepId: StepIdType
@@ -145,11 +136,7 @@ export function DraggableSteps(props: DraggableStepsProps): JSX.Element | null {
   }
 
   return (
-    <Flex
-      gridGap={SPACING.spacing4}
-      flexDirection={DIRECTION_COLUMN}
-      width="100%"
-    >
+    <Flex flexDirection={DIRECTION_COLUMN} width="100%">
       {orderedStepIds.map((stepId: StepIdType, index: number) => (
         <DragDropStep
           key={`${stepId}_${index}`}
@@ -163,48 +150,6 @@ export function DraggableSteps(props: DraggableStepsProps): JSX.Element | null {
           sidebarWidth={sidebarWidth}
         />
       ))}
-      <StepDragPreview sidebarWidth={sidebarWidth} />
-    </Flex>
-  )
-}
-
-interface StepDragPreviewProps {
-  sidebarWidth: number
-}
-
-function StepDragPreview({
-  sidebarWidth,
-}: StepDragPreviewProps): JSX.Element | null {
-  const [{ isDragging, itemType, item, currentOffset }] = useDrag(() => ({
-    type: DND_TYPES.STEP_ITEM,
-    collect: (monitor: DragLayerMonitor) => ({
-      currentOffset: monitor.getSourceClientOffset(),
-      isDragging: monitor.isDragging(),
-      itemType: monitor.getItemType(),
-      item: monitor.getItem() as { stepId: StepIdType },
-    }),
-  }))
-
-  const savedStepForms = useSelector(stepFormSelectors.getSavedStepForms)
-  const savedForm = item && savedStepForms[item.stepId]
-  const { stepType, stepName } = savedForm || {}
-
-  if (
-    itemType !== DND_TYPES.STEP_ITEM ||
-    !isDragging ||
-    stepType == null ||
-    currentOffset == null
-  ) {
-    return null
-  }
-
-  return (
-    <Flex cursor="grabbing" backgroundColor={COLORS.transparent}>
-      <StepContainer
-        iconName={stepIconsByType[stepType]}
-        title={stepName || ''}
-        sidebarWidth={sidebarWidth}
-      />
     </Flex>
   )
 }

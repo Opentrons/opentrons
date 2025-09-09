@@ -31,9 +31,9 @@ export const getEnableComment: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_COMMENT ?? false
 )
-export const getEnableReturnTip: Selector<boolean> = createSelector(
+export const getEnableTipPickupLocation: Selector<boolean> = createSelector(
   getFeatureFlagData,
-  flags => flags.OT_PD_ENABLE_RETURN_TIP ?? false
+  flags => flags.OT_PD_ENABLE_TIP_PICKUP_LOCATION ?? false
 )
 export const getEnableHotKeysDisplay: Selector<boolean> = createSelector(
   getFeatureFlagData,
@@ -58,6 +58,10 @@ export const getEnablePartialTipSupport: Selector<boolean> = createSelector(
 export const getEnableStacking: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_STACKING ?? false
+)
+export const getEnableConcurrentModuleActions: Selector<boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ENABLE_CONCURRENT_MODULE_ACTIONS ?? false
 )
 export const getEnableJsonExport: Selector<boolean> = createSelector(
   getFeatureFlagData,

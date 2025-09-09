@@ -18,9 +18,9 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { TextAreaField } from '/ai-client/atoms/TextAreaField'
-import { FileUpload } from '/ai-client/molecules/FileUpload'
-import { UploadInput } from '/ai-client/molecules/UploadInput'
+import { TextAreaField } from '/ai-client/components/atoms/TextAreaField'
+import { FileUpload } from '/ai-client/components/molecules/FileUpload'
+import { UploadInput } from '/ai-client/components/molecules/UploadInput'
 import {
   chatDataAtom,
   chatHistoryAtom,
@@ -111,6 +111,10 @@ export function UpdateProtocol(): JSX.Element {
     {
       name: t('update_option_adapt_python_protocol'),
       value: 'adapt_python_protocol',
+    },
+    {
+      name: t('update_option_add_flex_stackers'),
+      value: 'add_flex_stackers',
     },
     {
       name: t('update_option_add_runtime_parameters'),

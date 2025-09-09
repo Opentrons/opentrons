@@ -57,7 +57,7 @@ function getOrderedWells(
   return intersection(allWellsOrdered, unorderedWells)
 }
 
-function getInvariantContextAndRobotState(
+export function getInvariantContextAndRobotState(
   quickTransferState: QuickTransferSummaryState
 ): { invariantContext: InvariantContext; robotState: RobotState } {
   const tipRackDefURI = getLabwareDefURI(quickTransferState.tipRack)
@@ -435,7 +435,10 @@ export function generateQuickTransferArgs(
     description: null,
     nozzles,
     pushOut: null,
-    liquidClass: quickTransferState.liquidClassName,
+    liquidClass:
+      quickTransferState.liquidClassName !== 'none'
+        ? quickTransferState.liquidClassName
+        : null,
     aspiratePositionReference: POSITION_REFERENCE_BOTTOM,
     aspirateZOffset: 0,
     aspirateSubmergeSpeed: null,

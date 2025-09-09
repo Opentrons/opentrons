@@ -18,7 +18,7 @@ keywords = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
 description = "Common utilities for various Opentrons Python servers."
 
 dependencies = [
-    "anyio==3.7.1",
+    "anyio==4.9.0",
     "fastapi==0.100.0",
     "python-dotenv==1.0.1",
     "python-multipart==0.0.6",

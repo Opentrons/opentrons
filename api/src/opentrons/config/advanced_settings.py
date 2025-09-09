@@ -222,6 +222,14 @@ settings = [
         robot_type=[RobotTypeEnum.OT2, RobotTypeEnum.FLEX],
         internal_only=True,
     ),
+    SettingDefinition(
+        _id="disableFlexStackerLabwareDetection",
+        title="Disable Flex Stacker's labware detection features",
+        description=(
+            "Flex Stackers will ignore labware's presence in the hopper and on the shuttle. Protocol runs will no longer raise the following recoverable errors: Hopper Empty, Shuttle Empty and Shuttle Occupied."
+        ),
+        robot_type=[RobotTypeEnum.FLEX],
+    ),
 ]
 
 
@@ -733,6 +741,16 @@ def _migrate36to37(previous: SettingsMap) -> SettingsMap:
     return {k: v for k, v in previous.items() if "allowLiquidClasses" != k}
 
 
+def _migrate37to38(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 36 of the feature flags file.
+
+    -  Adds the disableFlexStackerLabwareDetection config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["disableFlexStackerLabwareDetection"] = None
+    return newmap
+
+
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -771,6 +789,7 @@ _MIGRATIONS = [
     _migrate34to35,
     _migrate35to36,
     _migrate36to37,
+    _migrate37to38,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below

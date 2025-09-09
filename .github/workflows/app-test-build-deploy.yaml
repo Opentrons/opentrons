@@ -70,7 +70,7 @@ jobs:
   backend-unit-test:
     strategy:
       matrix:
-        os: ['windows-2022', 'ubuntu-22.04', 'macos-latest']
+        os: ['windows-2022', 'ubuntu-24.04', 'macos-latest']
         shell: ['app-shell', 'app-shell-odd', 'discovery-client']
         exclude:
           - os: 'windows-2022'
@@ -175,7 +175,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ['windows-2022', 'ubuntu-22.04', 'macos-latest']
+        os: ['windows-2022', 'ubuntu-24.04', 'macos-latest']
         variant: ${{fromJSON(needs.determine-build-type.outputs.variants)}}
         target: ['desktop', 'odd']
         exclude:
@@ -230,7 +230,15 @@ jobs:
           SM_CLIENT_CERT_PASSWORD: ${{secrets.SM_CLIENT_CERT_PASSWORD_V2}}
           SM_API_KEY: ${{secrets.SM_API_KEY_V2}}
         run: |
-          curl -X GET  https://one.digicert.com/signingmanager/api-ui/v1/releases/Keylockertools-windows-x64.msi/download -H "x-api-key:${{secrets.SM_API_KEY_V2}}" -o Keylockertools-windows-x64.msi
+          REM Download DigiCert Keylocker Tools installer (quiet curl: -s silent, -S show errors, -f fail on HTTP errors, -L follow redirects)
+          curl -sSfL ^
+            --retry 5 --retry-all-errors ^
+            --connect-timeout 30 --max-time 120 ^
+            -X GET ^
+            -H "x-api-key:%SM_API_KEY%" ^
+            -o Keylockertools-windows-x64.msi ^
+            --write-out "Download complete: %%{filename_effective} (%%{size_download} bytes) in %%{time_total}s @ %%{speed_download} bytes/s\n" ^
+            "https://one.digicert.com/signingmanager/api-ui/v1/releases/Keylockertools-windows-x64.msi/download"
           msiexec /i Keylockertools-windows-x64.msi /quiet /qn
           smksp_registrar.exe list
           smctl.exe keypair ls

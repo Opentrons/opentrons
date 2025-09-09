@@ -11,6 +11,7 @@ import type {
   ConsolidateArgs,
   DistributeArgs,
   InnerMixArgs,
+  LabwareEntities,
   TransferArgs,
 } from '../types'
 
@@ -229,7 +230,7 @@ export const getCustomLiquidClassProperties = (
 }
 
 export const getLiquidClassName = (
-  liquidClass: string,
+  liquidClass: string, // a liquid class name like "water", "none" is not allowed
   showBase?: boolean
 ): string => {
   const allLiquidClassDefs = getAllLiquidClassDefs()
@@ -249,4 +250,15 @@ const getBlowoutPythonLocation = (
   } else {
     return 'trash'
   }
+}
+
+export const getPythonAssignTipRacksString = (args: {
+  labwareEntities: LabwareEntities
+  tiprackIds: string[]
+}): string => {
+  const { labwareEntities, tiprackIds } = args
+  const tiprackPythonNames = tiprackIds.map(
+    id => labwareEntities[id].pythonName
+  )
+  return `tip_racks=[${tiprackPythonNames.join(', ')}]`
 }

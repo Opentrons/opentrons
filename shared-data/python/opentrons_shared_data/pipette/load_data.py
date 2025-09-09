@@ -66,7 +66,7 @@ def _get_configuration_dictionary(
     return json.loads(load_shared_data(config_path))
 
 
-@lru_cache(maxsize=None)
+@lru_cache(maxsize=10)
 def _geometry(
     channels: PipetteChannelType,
     model: PipetteModelType,
@@ -76,7 +76,7 @@ def _geometry(
     return _get_configuration_dictionary("geometry", channels, model, version, oem)
 
 
-@lru_cache(maxsize=None)
+@lru_cache(maxsize=10)
 def _liquid(
     channels: PipetteChannelType,
     model: PipetteModelType,
@@ -95,7 +95,7 @@ def _liquid(
     return liquid_dict
 
 
-@lru_cache(maxsize=None)
+@lru_cache(maxsize=10)
 def _physical(
     channels: PipetteChannelType,
     model: PipetteModelType,
@@ -111,7 +111,7 @@ def _dirs_in(path: Path) -> Iterator[Path]:
             yield child
 
 
-@lru_cache(maxsize=None)
+@lru_cache(maxsize=1)
 def load_serial_lookup_table() -> Dict[str, str]:
     """Load a serial abbreviation lookup table mapped to model name."""
     config_path = get_shared_data_root() / "pipette" / "definitions" / "2" / "general"

@@ -20,14 +20,14 @@ import {
   DropdownStepFormField,
   InputStepFormField,
   TextAreaField,
-} from '../../../../../../components/molecules'
+} from '/protocol-designer/components/molecules'
 import {
   PAUSE_UNTIL_RESUME,
   PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_TIME,
-} from '../../../../../../constants'
-import { getInitialDeckSetup } from '../../../../../../step-forms/selectors'
-import { selectors as uiModuleSelectors } from '../../../../../../ui/modules'
+} from '/protocol-designer/constants'
+import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
+import { selectors as uiModuleSelectors } from '/protocol-designer/ui/modules'
 
 import type { ChangeEvent } from 'react'
 import type { StepFormProps } from '../../types'

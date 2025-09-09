@@ -19,26 +19,26 @@ import {
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { analyticsEvent } from '../../../../analytics/actions'
+import { analyticsEvent } from '/protocol-designer/analytics/actions'
 import {
   FORM_ERRORS_EVENT,
   FORM_WARNINGS_EVENT,
-} from '../../../../analytics/constants'
+} from '/protocol-designer/analytics/constants'
 import {
   LINE_CLAMP_TEXT_STYLE,
   LINK_BUTTON_STYLE,
   NAV_BAR_HEIGHT_REM,
-} from '../../../../components/atoms'
-import { FormAlerts } from '../../../../components/organisms'
-import { AdvancedSettingsUpdateConfirmationModal } from '../../../../components/organisms/AdvancedSettingsUpdateConfirmationModal'
-import { useKitchen } from '../../../../components/organisms/Kitchen/useKitchen'
-import { RenameStepModal } from '../../../../components/organisms/RenameStepModal'
-import { getFormWarningsForSelectedStep } from '../../../../dismiss/selectors'
+} from '/protocol-designer/components/atoms'
+import { FormAlerts } from '/protocol-designer/components/organisms'
+import { AdvancedSettingsUpdateConfirmationModal } from '/protocol-designer/components/organisms/AdvancedSettingsUpdateConfirmationModal'
+import { useKitchen } from '/protocol-designer/components/organisms/Kitchen/useKitchen'
+import { RenameStepModal } from '/protocol-designer/components/organisms/RenameStepModal'
+import { getFormWarningsForSelectedStep } from '/protocol-designer/dismiss/selectors'
 import {
   getRobotStateTimeline,
   getRobotType,
-} from '../../../../file-data/selectors'
-import { stepIconsByType } from '../../../../form-types'
+} from '/protocol-designer/file-data/selectors'
+import { stepIconsByType } from '/protocol-designer/form-types'
 import {
   getAdditionalEquipmentEntities,
   getCurrentFormIsPresaved,
@@ -46,15 +46,16 @@ import {
   getFormLevelErrorsForUnsavedForm,
   getInvariantContext,
   getSavedStepForms,
-} from '../../../../step-forms/selectors'
-import { actions } from '../../../../steplist'
-import { maskField } from '../../../../steplist/fieldLevel'
-import { updateFieldsForLiquidClass } from '../../../../steplist/formLevel/handleFormChange/utils'
-import { getTimelineWarningsForSelectedStep } from '../../../../top-selectors/timelineWarnings'
+} from '/protocol-designer/step-forms/selectors'
+import { actions } from '/protocol-designer/steplist'
+import { maskField } from '/protocol-designer/steplist/fieldLevel'
+import { updateFieldsForLiquidClass } from '/protocol-designer/steplist/formLevel/handleFormChange/utils'
+import { getTimelineWarningsForSelectedStep } from '/protocol-designer/top-selectors/timelineWarnings'
 import {
   hoverSelection,
   selectDropdownItem,
-} from '../../../../ui/steps/actions/actions'
+} from '/protocol-designer/ui/steps/actions/actions'
+
 import { useAbsorbanceReaderCommandType } from './hooks'
 import {
   AbsorbanceReaderTools,
@@ -78,14 +79,14 @@ import {
 } from './utils'
 
 import type { ComponentType } from 'react'
-import type { AnalyticsEvent } from '../../../../analytics/mixpanel'
+import type { AnalyticsEvent } from '/protocol-designer/analytics/mixpanel'
 import type {
   FormData,
   HydratedFormData,
   StepType,
-} from '../../../../form-types'
-import type { FormWarningType } from '../../../../steplist'
-import type { StepFieldName } from '../../../../steplist/fieldLevel'
+} from '/protocol-designer/form-types'
+import type { FormWarningType } from '/protocol-designer/steplist'
+import type { StepFieldName } from '/protocol-designer/steplist/fieldLevel'
 import type { FocusHandlers, LiquidHandlingTab, StepFormProps } from './types'
 
 type StepFormMap = {

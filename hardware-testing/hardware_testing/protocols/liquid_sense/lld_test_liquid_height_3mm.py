@@ -61,8 +61,12 @@ def add_parameters(parameters: ParameterContext) -> None:
             {"display_name": "nest 8", "value": "nest_8_reservoir_22ml"},
             {"display_name": "nest 12", "value": "nest_12_reservoir_22ml"},
             {"display_name": "nest 24", "value": "nest_24_wellplate_10.4ml"},
+            {
+                "display_name": "eppendorf 96 1000 ul",
+                "value": "eppendorf_96_wellplate_1000ul",
+            },
         ],
-        default="nest_24_wellplate_10.4ml",
+        default="eppendorf_96_wellplate_1000ul",
     )
     protocols.create_trials_parameter(parameters)
     parameters.add_float(

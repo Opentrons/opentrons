@@ -4,8 +4,8 @@ import {
   FLEX_STACKER_MODULE_TYPE,
   getCutoutFixturesForModuleModel,
   getCutoutIdsFromModuleSlotName,
+  getFlexStackerD3Compatibility,
   MAGNETIC_BLOCK_TYPE,
-  WASTE_CHUTE_FLEX_STACKER_FIXTURES,
 } from '@opentrons/shared-data'
 
 import { getLocalRobot } from '/app/redux/discovery'
@@ -17,8 +17,10 @@ import {
 
 import { ModuleTableItem } from './ModuleTableItem'
 
-import type { DeckDefinition } from '@opentrons/shared-data'
-import type { CutoutConfigAndCompatibility } from '/app/resources/deck_configuration/hooks'
+import type {
+  CutoutConfigAndCompatibility,
+  DeckDefinition,
+} from '@opentrons/shared-data'
 import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
@@ -38,6 +40,10 @@ export function ModuleTable(props: ModuleTableProps): JSX.Element {
     deckConfigCompatibility,
   } = props
 
+  const attachedProtocolModuleMatchesSortedBySlotName = attachedProtocolModuleMatches.sort(
+    (a, b) => a.slotName.localeCompare(b.slotName)
+  )
+
   const { data: deckConfig } = useNotifyDeckConfigurationQuery({
     refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
   })
@@ -48,7 +54,7 @@ export function ModuleTable(props: ModuleTableProps): JSX.Element {
 
   return (
     <>
-      {attachedProtocolModuleMatches
+      {attachedProtocolModuleMatchesSortedBySlotName
         // filter out the magnetic block here, because it is a non-connected module
         // and is handled by the fixture table
         .filter(module => module.moduleDef.moduleType !== MAGNETIC_BLOCK_TYPE)
@@ -67,20 +73,11 @@ export function ModuleTable(props: ModuleTableProps): JSX.Element {
             module.moduleDef.moduleType === FLEX_STACKER_MODULE_TYPE &&
             module.slotName === 'D3'
           ) {
-            const deckConfigCompatabilityD3 = deckConfigCompatibility?.find(
-              configItem => configItem.cutoutId === 'cutoutD3'
+            const d3Compatibility = getFlexStackerD3Compatibility(
+              deckConfigCompatibility
             )
-            if (
-              deckConfigCompatabilityD3 != null &&
-              WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(
-                deckConfigCompatabilityD3?.compatibleCutoutFixtureIds[0]
-              )
-            ) {
-              const comboFixtureId =
-                deckConfigCompatabilityD3?.compatibleCutoutFixtureIds[0]
-              const comboFixtureConflict = !deckConfigCompatabilityD3?.compatibleCutoutFixtureIds.includes(
-                deckConfigCompatabilityD3.cutoutFixtureId
-              )
+            if (d3Compatibility) {
+              const { comboFixtureId, comboFixtureConflict } = d3Compatibility
               return (
                 <ModuleTableItem
                   key={module.moduleId}
@@ -89,7 +86,11 @@ export function ModuleTable(props: ModuleTableProps): JSX.Element {
                   chainLiveCommands={chainLiveCommands}
                   comboFixtureId={comboFixtureId}
                   conflictedFixture={
-                    comboFixtureConflict ? deckConfigCompatabilityD3 : null
+                    comboFixtureConflict
+                      ? deckConfigCompatibility.find(
+                          configItem => configItem.cutoutId === 'cutoutD3'
+                        ) ?? null
+                      : null
                   }
                   deckDef={deckDef}
                   robotName={robotName}
