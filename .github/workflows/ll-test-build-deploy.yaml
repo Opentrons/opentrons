@@ -11,6 +11,7 @@ on:
       - 'package.json'
       - '.github/workflows/ll-test-build-deploy.yaml'
       - '.github/workflows/utils.js'
+      - 'scripts/static-deploy/**'
   push:
     paths:
       - 'labware-library/**'
@@ -18,11 +19,12 @@ on:
       - 'components/**'
       - 'package.json'
       - '.github/workflows/ll-test-build-deploy.yaml'
+      - '.github/workflows/utils.js'
+      - 'scripts/static-deploy/**'
     branches:
-      - '**'
+      - 'edge'
+      - 'chore_release*'
     tags:
-      - 'tmp-staging-labware-library*'
-      - 'tmp-labware-library*'
       - 'staging-labware-library*'
       - 'labware-library*'
   workflow_dispatch: {}
