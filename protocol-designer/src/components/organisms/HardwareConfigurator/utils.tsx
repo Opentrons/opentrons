@@ -3,7 +3,6 @@ import { useDispatch } from 'react-redux'
 
 import {
   DEFAULT_AA_FOR_WASTE_CHUTE,
-  FLEX_MODULE_ADDRESSABLE_AREAS,
   FLEX_ROBOT_TYPE,
   getAAsToFixtureIdFromDeckDefWithFakes,
   getDeckDefFromRobotType,
@@ -157,12 +156,7 @@ export function useDeckConfigurationEditing(
     const moduleModel = getModuleModelFromAddressableArea(
       addressableAreaId as AddressableAreaName
     )
-    if (
-      FLEX_MODULE_ADDRESSABLE_AREAS.includes(
-        addressableAreaId as AddressableAreaName
-      ) &&
-      moduleModel != null
-    ) {
+    if (moduleModel != null) {
       return moduleModel
     } else if (cutoutFixtureId === 'trashBinAdapter') {
       return 'trashBin'
@@ -239,7 +233,7 @@ export function useDeckConfigurationEditing(
   }
 }
 
-export const getFixtureOptions = (
+export const getAllFixtureOptions = (
   cutoutId: CutoutId,
   addressableAreaId: AddressableAreaNamesWithFakes,
   fixtures: Fixtures,
@@ -254,12 +248,6 @@ export const getFixtureOptions = (
     TRASH_BIN_ADAPTER_FIXTURE,
     addressableAreaId,
     existingCutoutFixtureId
-  )
-  console.log(
-    'existingCutoutFixtureId',
-    existingCutoutFixtureId,
-    addressableAreaId,
-    cutoutId
   )
   if (
     TrashBinAA != null &&
@@ -544,7 +532,7 @@ export const getAvailableOptions = (
 
   let availableOptions: CutoutConfigExtended[][] = []
   if (optionStage === 'fixtureOptions') {
-    availableOptions = getFixtureOptions(
+    availableOptions = getAllFixtureOptions(
       cutoutId,
       addressableAreaId,
       fixtures,

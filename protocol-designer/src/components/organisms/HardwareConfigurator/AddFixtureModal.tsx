@@ -39,8 +39,8 @@ import { useKitchen } from '../Kitchen/useKitchen'
 import { getMainPagePortalEl } from '../Portal'
 import { getLabwareCompatibleForEditHardware } from '../utils'
 import {
+  getAllFixtureOptions,
   getAvailableOptions,
-  getFixtureOptions,
   getModuleOptions,
   getWasteChuteOptions,
 } from './utils'
@@ -136,7 +136,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
   >([])
   useEffect(() => {
     const options = [
-      ...getFixtureOptions(
+      ...getAllFixtureOptions(
         cutoutId,
         addressableAreaId,
         fixtures,
