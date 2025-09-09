@@ -57,6 +57,9 @@ async def test_run_profile(
     # Stub volume validation from hs module view
     decoy.when(tc_module_substate.validate_max_block_volume(56.7)).then_return(76.5)
 
+    decoy.when(tc_module_substate.validate_ramp_rate(0.0, 12.3)).then_return(0.0)
+    decoy.when(tc_module_substate.validate_ramp_rate(0.0, 45.6)).then_return(0.0)
+
     # Get attached hardware modules
     decoy.when(
         equipment.get_module_hardware_api(ThermocyclerModuleId("thermocycler-id"))
@@ -67,8 +70,8 @@ async def test_run_profile(
     decoy.verify(
         await tc_hardware.cycle_temperatures(
             steps=[
-                {"temperature": 32.1, "hold_time_seconds": 45},
-                {"temperature": 65.4, "hold_time_seconds": 78},
+                {"temperature": 32.1, "hold_time_seconds": 45, "ramp_rate": 0.0},
+                {"temperature": 65.4, "hold_time_seconds": 78, "ramp_rate": 0.0},
             ],
             repetitions=1,
             volume=76.5,
