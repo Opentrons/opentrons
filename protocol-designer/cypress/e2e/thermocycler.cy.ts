@@ -24,7 +24,7 @@ describe('Redesigned Thermocycler Set Up Steps - Happy Path', () => {
   it('It should verify the working function of thermocycler set up', () => {
     const steps = new StepBuilder()
     steps.add(
-      TimelineSteps.SelectItemMenuOption('1. Thermocycler', 'Edit step')
+      TimelineSteps.SelectItemMenuOption(1, 'Thermocycler', 'Edit step')
     )
     steps.add(ThermoVerifications.VerifyPartOne())
     steps.add(ThermocyclerEditor.SelectProfileOrState('state'))
