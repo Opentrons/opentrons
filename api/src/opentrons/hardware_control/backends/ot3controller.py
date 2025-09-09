@@ -686,9 +686,9 @@ class OT3Controller(FlexBackend):
         return (
             MoveGroupRunner(
                 move_groups=[move_group],
-                ignore_stalls=True
-                if not self._feature_flags.stall_detection_enabled
-                else False,
+                ignore_stalls=(
+                    True if not self._feature_flags.stall_detection_enabled else False
+                ),
             ),
             False,
         )
@@ -712,9 +712,9 @@ class OT3Controller(FlexBackend):
         return (
             MoveGroupRunner(
                 move_groups=[tip_motor_move_group],
-                ignore_stalls=True
-                if not self._feature_flags.stall_detection_enabled
-                else False,
+                ignore_stalls=(
+                    True if not self._feature_flags.stall_detection_enabled else False
+                ),
             ),
             True,
         )
@@ -939,9 +939,9 @@ class OT3Controller(FlexBackend):
 
         runner = MoveGroupRunner(
             move_groups=[move_group],
-            ignore_stalls=True
-            if not self._feature_flags.stall_detection_enabled
-            else False,
+            ignore_stalls=(
+                True if not self._feature_flags.stall_detection_enabled else False
+            ),
         )
         try:
             positions = await runner.run(can_messenger=self._messenger)
@@ -976,9 +976,9 @@ class OT3Controller(FlexBackend):
         move_group = self._build_tip_action_group(origin, targets)
         runner = MoveGroupRunner(
             move_groups=[move_group],
-            ignore_stalls=True
-            if not self._feature_flags.stall_detection_enabled
-            else False,
+            ignore_stalls=(
+                True if not self._feature_flags.stall_detection_enabled else False
+            ),
         )
         try:
             positions = await runner.run(can_messenger=self._messenger)
@@ -1397,6 +1397,9 @@ class OT3Controller(FlexBackend):
             loop = asyncio.get_event_loop()
         except RuntimeError:
             return
+
+        if hasattr(self, "_module_controls") and self._module_controls is not None:
+            await self._module_controls.clean_up()
 
         if hasattr(self, "_event_watcher"):
             if (

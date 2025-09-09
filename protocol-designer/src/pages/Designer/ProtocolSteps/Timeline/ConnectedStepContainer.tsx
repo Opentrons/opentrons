@@ -48,7 +48,9 @@ const PX_HEIGHT_TO_TOP_OF_CONTAINER = 32
 export const PX_SIDEBAR_MIN_WIDTH_FOR_ICON = 170
 
 export interface ConnectedStepContainerProps {
-  title: string
+  stepNumber: number | null
+  text: string
+  subtext?: string | null
   iconName: IconName
   sidebarWidth: number
   openedOverflowMenuId?: string | null
@@ -77,7 +79,9 @@ export function ConnectedStepContainer(
     selected,
     onClick,
     hovered,
-    title,
+    stepNumber,
+    text,
+    subtext,
     hasError = false,
     isStepAfterError = false,
     dragHovered = false,
@@ -88,7 +92,7 @@ export function ConnectedStepContainer(
   const [top, setTop] = useState<number>(0)
   const menuRootRef = useRef<HTMLDivElement | null>(null)
   const isStartingOrEndingState =
-    title === STARTING_DECK_STATE || title === FINAL_DECK_STATE
+    text === STARTING_DECK_STATE || text === FINAL_DECK_STATE
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const multiSelectItemIds = useSelector(getMultiSelectItemIds)
 
@@ -216,7 +220,11 @@ export function ConnectedStepContainer(
         )}
 
         <StepContainer
-          text={capitalizeFirstLetterAfterNumber(title)}
+          stepNumber={stepNumber}
+          // todo(mm, 2025-09-05): This can be simplified now that stepNumber has been
+          // pulled into its own property. We no longer need to skip leading numbers.
+          text={capitalizeFirstLetterAfterNumber(text)}
+          subtext={subtext}
           iconName={iconName}
           type={isStartingOrEndingState ? 'alt' : 'default'}
           size={hasText ? 'iconAndText' : 'iconOnly'}

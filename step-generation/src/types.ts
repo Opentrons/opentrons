@@ -496,6 +496,7 @@ export interface HeaterShakerArgs extends CommonArgs {
   commandCreatorFnName: 'heaterShaker'
   targetTemperature: number | null
   latchOpen: boolean
+  timerHours: number | null
   timerMinutes: number | null
   timerSeconds: number | null
   message?: string

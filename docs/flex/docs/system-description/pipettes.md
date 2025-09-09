@@ -214,10 +214,14 @@ Opentrons Flex automatically updates pipette firmware to keep it in sync with th
 
 If, for any reason, your pipette firmware and robot software versions get out of sync, you can manually update the firmware in the Opentrons App.
 
+<div class="instruction-list" markdown>
+
 1.  Click **Devices**.
 
 2.  Click on your Flex in the device list.
 
 3.  Under Instruments and Modules, the out-of-sync pipette will show a warning banner reading "Firmware update available." Click **Update now** to begin the update.
+
+</div>
 
 You can view the currently installed firmware version of any attached pipette. On the touchscreen, go to **Instruments** and tap the pipette name. In the Opentrons App, find the pipette card under Instruments and Modules, click the three-dot menu (⋮), and then click **About pipette**.
