@@ -82,7 +82,7 @@ async def test_run_extended_profile(
     decoy.when(tc_module_substate.validate_max_block_volume(56.7)).then_return(76.5)
     decoy.when(tc_module_substate.validate_ramp_rate(0.0, 12.3)).then_return(0.0)
     decoy.when(tc_module_substate.validate_ramp_rate(2.0, 78.9)).then_return(2.0)
-    decoy.when(tc_module_substate.validate_ramp_rate(0.0,12.0)).then_return(0.0)
+    decoy.when(tc_module_substate.validate_ramp_rate(0.0, 12.0)).then_return(0.0)
     decoy.when(tc_module_substate.validate_ramp_rate(2.0, 45.6)).then_return(2.0)
     decoy.when(tc_module_substate.validate_ramp_rate(0.0, 56.0)).then_return(0.0)
     decoy.when(tc_module_substate.validate_ramp_rate(2.0, 34.0)).then_return(2.0)
@@ -100,7 +100,11 @@ async def test_run_extended_profile(
                 {"temperature": 32.1, "hold_time_seconds": 45, "ramp_rate": 0.0},
                 {
                     "steps": [
-                        {"temperature": 78.9, "hold_time_seconds": 910, "ramp_rate": 2.0},
+                        {
+                            "temperature": 78.9,
+                            "hold_time_seconds": 910,
+                            "ramp_rate": 2.0,
+                        },
                         {"temperature": 12, "hold_time_seconds": 1, "ramp_rate": 0.0},
                     ],
                     "repetitions": 2,
