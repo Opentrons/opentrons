@@ -36,7 +36,8 @@ export function getAllDefinitions(): LabwareDefByDefURI {
 // has the {labwareDefURI: def} shape, instead of an array of labware defs
 let _latestDefs: LabwareDefByDefURI | null = null
 export function getOnlyLatestDefs(): LabwareDefByDefURI {
-  // pick latest acceptable JSON, example comparing: "2.25" vs "2_26"
+  // takes in the given api version and returns a list of labware def versions
+  // that are not acceptable: {loadName: [version4, version5, version6]}
   const unacceptableDefVersions = getUnsupportedLabwareDefVersionsByApiLevel(
     PAPI_VERSION
   )
@@ -59,10 +60,8 @@ export function getOnlyLatestDefs(): LabwareDefByDefURI {
         const disallowedVersions: number[] =
           unacceptableDefVersions?.[loadName] ?? []
 
-        // filter out defs that are disallowed for the current API level
-        const allowedDefs = group.filter(
-          def => !disallowedVersions.includes(def.version)
-        )
+        const disallowed = new Set(disallowedVersions)
+        const allowedDefs = group.filter(def => !disallowed.has(def.version))
 
         // if no allowed defs left, skip this group
         if (allowedDefs.length === 0) {
