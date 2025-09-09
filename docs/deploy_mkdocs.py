@@ -32,6 +32,12 @@ def deploy_docs(environment, branch=None, aws_profile=None, source_dir="site"):
         "staging": "opentrons.staging.docs",     # Replace with your staging bucket
         "production": "opentrons.production.docs" # Replace with your production bucket
     }
+    
+    # CloudFront distribution IDs for cache invalidation
+    cloudfront_distributions = {
+        "staging": os.getenv("STAGING_DOCS_CLOUDFRONT_DISTRIBUTION_ID"),
+        "production": os.getenv("PRODUCTION_DOCS_CLOUDFRONT_DISTRIBUTION_ID")
+    }
     if environment not in buckets:
         print(f"Error: Environment must be one of {list(buckets.keys())}")
         sys.exit(1)
@@ -184,6 +190,44 @@ def deploy_docs(environment, branch=None, aws_profile=None, source_dir="site"):
         print(f"STDOUT: {e.stdout}")
         print(f"STDERR: {e.stderr}")
         sys.exit(1)
+    
+    # Invalidate CloudFront cache for staging and production
+    if environment in ["staging", "production"]:
+        invalidate_cloudfront_cache(environment, cloudfront_distributions[environment], aws_profile)
+
+def invalidate_cloudfront_cache(environment, distribution_id, aws_profile=None):
+    """Invalidate CloudFront cache for the specified environment"""
+    if not distribution_id:
+        print(f"⚠️  No CloudFront distribution ID found for {environment}, skipping cache invalidation")
+        return
+    
+    print(f"Invalidating CloudFront cache for {environment}...")
+    
+    cmd = [
+        "aws", "cloudfront", "create-invalidation",
+        "--distribution-id", distribution_id,
+        "--paths", "/*"
+    ]
+    
+    if aws_profile:
+        cmd.extend(["--profile", aws_profile])
+    
+    try:
+        result = run_command(cmd)
+        if result.returncode == 0:
+            # Extract invalidation ID from output
+            invalidation_id = result.stdout.strip()
+            print(f"✅ CloudFront cache invalidation initiated for {environment}")
+            print(f"   Invalidation ID: {invalidation_id}")
+        else:
+            print(f"❌ CloudFront cache invalidation failed for {environment}")
+            print(f"STDOUT: {result.stdout}")
+            print(f"STDERR: {result.stderr}")
+            # Don't exit on CloudFront invalidation failure, just warn
+            print(f"⚠️  Deployment succeeded but cache invalidation failed")
+    except Exception as e:
+        print(f"❌ Error during CloudFront cache invalidation: {e}")
+        print(f"⚠️  Deployment succeeded but cache invalidation failed")
 
 def main():
     parser = argparse.ArgumentParser(description="Deploy Docs to S3")

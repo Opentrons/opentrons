@@ -33,6 +33,7 @@ from .module_contexts import (
 from .disposal_locations import TrashBin, WasteChute
 from ._liquid import Liquid, LiquidClass
 from ._types import (
+    OffDeckType,
     OFF_DECK,
     PLUNGER_BLOWOUT,
     PLUNGER_TOP,
@@ -88,6 +89,7 @@ __all__ = [
     "ROW",
     "ALL",
     # Deck location types
+    "OffDeckType",
     "OFF_DECK",
     # Pipette plunger types
     "PLUNGER_BLOWOUT",
