@@ -1,8 +1,10 @@
-import { css } from 'styled-components'
+import { clsx } from 'clsx'
 
 import {
   ABSORBANCE_READER_TYPE,
   ABSORBANCE_READER_V1,
+  FLEX_STACKER_MODULE_TYPE,
+  FLEX_STACKER_MODULE_V1,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_TYPE,
@@ -18,6 +20,8 @@ import {
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 
+import flex_plate_reader from '/ai-client/assets/images/modules/flex_plate_reader.png'
+import flex_stacker from '/ai-client/assets/images/modules/flex_stacker_no_labware.png'
 import heater_shaker_module_transparent from '/ai-client/assets/images/modules/heater_shaker_module_transparent.png'
 import magdeck_gen1 from '/ai-client/assets/images/modules/magdeck_gen1.png'
 import magdeck_gen2 from '/ai-client/assets/images/modules/magdeck_gen2.png'
@@ -27,9 +31,11 @@ import tempdeck_gen1 from '/ai-client/assets/images/modules/tempdeck_gen1.png'
 import thermocycler_gen2 from '/ai-client/assets/images/modules/thermocycler_gen2.png'
 import thermocycler from '/ai-client/assets/images/modules/thermocycler.png'
 
+import styles from './modulediagram.module.css'
+
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
-interface Props {
+interface ModuleDiagramProps {
   type: ModuleType
   model: ModuleModel
 }
@@ -60,23 +66,28 @@ const MODULE_IMG_BY_TYPE: ModuleImg = {
     [MAGNETIC_BLOCK_V1]: mag_block,
   },
   [ABSORBANCE_READER_TYPE]: {
-    // TODO (AA): update absorbance reader image
-    [ABSORBANCE_READER_V1]: heater_shaker_module_transparent,
+    [ABSORBANCE_READER_V1]: flex_plate_reader,
+  },
+  [FLEX_STACKER_MODULE_TYPE]: {
+    [FLEX_STACKER_MODULE_V1]: flex_stacker,
   },
 }
 
-const IMAGE_MAX_WIDTH = '96px'
-export function ModuleDiagram(props: Props): JSX.Element {
-  const model = MODULE_IMG_BY_TYPE[props.type][props.model]
+export function ModuleDiagram({
+  type,
+  model,
+}: ModuleDiagramProps): JSX.Element {
+  const imageSrc = MODULE_IMG_BY_TYPE[type][model]
+  const isFlexStacker = type === FLEX_STACKER_MODULE_TYPE
+
   return (
     <img
-      css={css`
-        max-width: ${IMAGE_MAX_WIDTH};
-        width: 100%;
-        height: auto;
-      `}
-      src={model}
-      alt={props.type}
+      className={clsx({
+        [styles.flex_stacker_image]: isFlexStacker,
+        [styles.image]: !isFlexStacker,
+      })}
+      src={imageSrc}
+      alt={type}
     />
   )
 }
