@@ -1,6 +1,6 @@
 ---
-description: React component for Opentrons ai-client
-globs: opentrons-ai-client/src/**/*.tsx
+globs: opentrons-ai-client/src/**/*.tsx, protocol-designer/src/**/*.tsx
+alwaysApply: false
 ---
 
 ## Whenever you need a React component
@@ -14,9 +14,16 @@ globs: opentrons-ai-client/src/**/*.tsx
    1. components/src/atoms
    2. components/src/molecules
    3. components/src/organisms
-   4. opentrons-ai-client/src/components/atoms
-   5. opentrons-ai-client/src/components/molecules
-   6. opentrons-ai-client/src/components/organisms
+
+   for `opentrons-ai-client`
+   a. opentrons-ai-client/src/components/atoms
+   b. opentrons-ai-client/src/components/molecules
+   c. opentrons-ai-client/src/components/organisms
+
+   for `protocol-designer`
+   a. protocol-designer/src/components/atoms
+   b. protocol-designer/src/components/molecules
+   c. protocol-designer/src/components/organisms
 
 4. If it doesn't exist, generate a detailed prompt for the component, including:
 
