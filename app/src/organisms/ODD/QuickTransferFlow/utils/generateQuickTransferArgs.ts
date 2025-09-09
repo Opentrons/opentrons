@@ -57,7 +57,7 @@ function getOrderedWells(
   return intersection(allWellsOrdered, unorderedWells)
 }
 
-function getInvariantContextAndRobotState(
+export function getInvariantContextAndRobotState(
   quickTransferState: QuickTransferSummaryState
 ): { invariantContext: InvariantContext; robotState: RobotState } {
   const tipRackDefURI = getLabwareDefURI(quickTransferState.tipRack)
