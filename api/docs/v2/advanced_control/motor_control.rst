@@ -102,4 +102,4 @@ In this example, ``plunger_coordinates_for_volume`` calculcates an axis map for 
 
 .. warning:: 
 
-    Moving your pipette's plunger to an extreme position can damage the instrument. Avoid moves outside of known positions, like below the blowout location. 
+    Moving your pipette's plunger to an extreme position can damage the instrument. Avoid moves outside of known positions, like below the blowout location. For example, the `blowout location for the Flex 96-Channel 1000 µL <https://github.com/Opentrons/opentrons/blob/edge/shared-data/pipette/definitions/2/general/ninety_six_channel/p1000/3_6.json#L786>`_ is 73.5 mm below its highest position.
