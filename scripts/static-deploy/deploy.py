@@ -284,7 +284,7 @@ def deploy_application(  # noqa: C901
             sys.exit(1)
 
         # Invalidate CloudFront cache if configured
-        if config.cloudfront_id:
+        if config.cloudfront_id and config.cloudfront_id != "":
             console.print(f"Invalidating CloudFront cache for distribution {config.cloudfront_id}...")
             try:
                 if dry_run:

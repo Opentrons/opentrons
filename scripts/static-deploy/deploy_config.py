@@ -36,7 +36,7 @@ class ApplicationConfig:
     """Configuration for a single application deployment."""
 
     s3_bucket: str
-    cloudfront_id: str
+    cloudfront_id: Optional[str]
     url: str
 
 
@@ -110,22 +110,22 @@ def get_deploy_config() -> DeployConfig:
     sandbox_config = EnvironmentConfig(
         labware_library=ApplicationConfig(
             s3_bucket="opentrons.sandbox.labware",
-            cloudfront_id="",  # No CloudFront for sandbox
+            cloudfront_id=None,  # No CloudFront for sandbox
             url="http://opentrons.sandbox.labware.s3-website.us-east-2.amazonaws.com/",
         ),
         protocol_designer=ApplicationConfig(
             s3_bucket="opentrons.sandbox.protocol-designer",
-            cloudfront_id="",  # No CloudFront for sandbox
+            cloudfront_id=None,  # No CloudFront for sandbox
             url="http://opentrons.sandbox.protocol-designer.s3-website.us-east-2.amazonaws.com/",
         ),
         docs=ApplicationConfig(
             s3_bucket="sandbox.docs",
-            cloudfront_id="",  # No CloudFront for sandbox
+            cloudfront_id=None,  # No CloudFront for sandbox
             url="http://sandbox.docs.s3-website.us-east-2.amazonaws.com/",
         ),
         mkdocs=ApplicationConfig(
             s3_bucket="sandbox.docs",
-            cloudfront_id="",  # No CloudFront for sandbox
+            cloudfront_id=None,  # No CloudFront for sandbox
             url="http://sandbox.docs.s3-website.us-east-2.amazonaws.com/",
         ),
     )
@@ -134,7 +134,7 @@ def get_deploy_config() -> DeployConfig:
     staging_config = EnvironmentConfig(
         labware_library=ApplicationConfig(
             s3_bucket="opentrons.staging.labware",
-            cloudfront_id="E8IWASMDOWHYP",  # Staging CloudFront distribution
+            cloudfront_id="E8IWASMDOWHYP",
             url="https://staging.labware.opentrons.com/",
         ),
         protocol_designer=ApplicationConfig(
@@ -144,12 +144,12 @@ def get_deploy_config() -> DeployConfig:
         ),
         docs=ApplicationConfig(
             s3_bucket="opentrons.staging.docs",
-            cloudfront_id="E8IWASMDOWHYP",  # Staging CloudFront distribution
+            cloudfront_id="E8IWASMDOWHYP",
             url="https://staging.docs.opentrons.com/",
         ),
         mkdocs=ApplicationConfig(
             s3_bucket="opentrons.staging.docs",
-            cloudfront_id="E8IWASMDOWHYP",  # Staging CloudFront distribution
+            cloudfront_id="E8IWASMDOWHYP",
             url="https://staging.docs.opentrons.com/",
         ),
     )
@@ -158,7 +158,7 @@ def get_deploy_config() -> DeployConfig:
     production_config = EnvironmentConfig(
         labware_library=ApplicationConfig(
             s3_bucket="opentrons.production.labware",
-            cloudfront_id="E16BZZXDTINN0S",  # Production CloudFront distribution
+            cloudfront_id="E16BZZXDTINN0S",
             url="https://labware.opentrons.com/",
         ),
         protocol_designer=ApplicationConfig(
@@ -168,12 +168,12 @@ def get_deploy_config() -> DeployConfig:
         ),
         docs=ApplicationConfig(
             s3_bucket="opentrons.production.docs",
-            cloudfront_id="E16BZZXDTINN0S",  # Production CloudFront distribution
+            cloudfront_id="E16BZZXDTINN0S",
             url="https://docs.opentrons.com/",
         ),
         mkdocs=ApplicationConfig(
             s3_bucket="opentrons.production.docs",
-            cloudfront_id="E16BZZXDTINN0S",  # Production CloudFront distribution
+            cloudfront_id="E16BZZXDTINN0S",
             url="https://docs.opentrons.com/",
         ),
     )

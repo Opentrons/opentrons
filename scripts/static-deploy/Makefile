@@ -34,21 +34,5 @@ deploy:
 	@CMD="uv run python deploy.py $(ENVIRONMENT) $(APPLICATION) $(RELATIVE_ARTIFACT_DIR)"; \
 	if [ "$(ENVIRONMENT)" = "sandbox" ]; then CMD="$$CMD --sandbox-prefix $(SANDBOX_PREFIX)"; fi; \
 	if [ -n "$(AWS_PROFILE)" ]; then CMD="$$CMD --aws-profile $(AWS_PROFILE)"; fi; \
-	$$CMD
-
-deploy-ci:
-	@echo "Deploying from CI environment..."
-	@if [ -z "$(SOURCE_DIR)" ]; then echo "Error: SOURCE_DIR is required for CI deployment"; exit 1; fi
-	@if [ -z "$(GITHUB_OUTPUT)" ]; then echo "Error: GITHUB_OUTPUT not set - run resolve-ci first"; exit 1; fi
-	@eval $$(grep '^APPLICATION=' $(GITHUB_OUTPUT) 2>/dev/null || echo "APPLICATION=") && \
-	eval $$(grep '^ENVIRONMENT=' $(GITHUB_OUTPUT) 2>/dev/null || echo "ENVIRONMENT=") && \
-	eval $$(grep '^SANDBOX_PREFIX=' $(GITHUB_OUTPUT) 2>/dev/null || echo "SANDBOX_PREFIX=") && \
-	if [ -z "$$APPLICATION" ] || [ -z "$$ENVIRONMENT" ]; then \
-		echo "Error: APPLICATION and ENVIRONMENT must be set in GITHUB_OUTPUT"; exit 1; \
-	fi && \
-	CMD="uv run python deploy.py $$ENVIRONMENT $$APPLICATION $(SOURCE_DIR)" && \
-	if [ "$$ENVIRONMENT" = "sandbox" ] && [ -n "$$SANDBOX_PREFIX" ]; then \
-		CMD="$$CMD --sandbox-prefix $$SANDBOX_PREFIX"; \
-	fi && \
-	echo "Running: $$CMD" && \
+	if [ -n "$(DRY_RUN)" ]; then CMD="$$CMD --dry-run"; fi; \
 	$$CMD
