@@ -1,7 +1,7 @@
 """Tests for deploy module - focusing on parsing and configuration logic only."""
 
 import pytest
-from deploy import parse_and_validate_args
+from deploy import DeployArgs, parse_all_args, parse_and_validate_args
 from deploy_config import ApplicationConfig
 
 
@@ -9,30 +9,30 @@ def test_parse_valid_production_args():
     """Test parsing valid production arguments."""
     args = ["production", "labware_library", "/path/to/artifacts"]
 
-    config, artifact_root, branch, environment = parse_and_validate_args(args)
+    parsed: DeployArgs = parse_and_validate_args(args)
 
     # Check that we get the real config back
-    assert isinstance(config, ApplicationConfig)
-    assert config.s3_bucket == "opentrons.production.labware"
-    assert config.url == "https://labware.opentrons.com/"
-    assert artifact_root == "/path/to/artifacts"
-    assert branch is None
-    assert environment == "production"
+    assert isinstance(parsed.config, ApplicationConfig)
+    assert parsed.config.s3_bucket == "opentrons.production.labware"
+    assert parsed.config.url == "https://labware.opentrons.com/"
+    assert parsed.artifact_root == "/path/to/artifacts"
+    assert parsed.sandbox_prefix is None
+    assert parsed.environment == "production"
 
 
 def test_parse_valid_sandbox_args_with_branch():
     """Test parsing valid sandbox arguments with branch."""
-    args = ["sandbox", "protocol_designer", "/path/to/artifacts", "--branch", "feature-branch"]
+    args = ["sandbox", "protocol_designer", "/path/to/artifacts", "--sandbox-prefix", "feature-branch"]
 
-    config, artifact_root, branch, environment = parse_and_validate_args(args)
+    parsed: DeployArgs = parse_and_validate_args(args)
 
     # Check that we get the real config back
-    assert isinstance(config, ApplicationConfig)
-    assert config.s3_bucket == "opentrons.sandbox.protocol-designer"
-    assert config.url == "http://opentrons.sandbox.protocol-designer.s3-website.us-east-2.amazonaws.com/"
-    assert artifact_root == "/path/to/artifacts"
-    assert branch == "feature-branch"
-    assert environment == "sandbox"
+    assert isinstance(parsed.config, ApplicationConfig)
+    assert parsed.config.s3_bucket == "opentrons.sandbox.protocol-designer"
+    assert parsed.config.url == "http://opentrons.sandbox.protocol-designer.s3-website.us-east-2.amazonaws.com/"
+    assert parsed.artifact_root == "/path/to/artifacts"
+    assert parsed.sandbox_prefix == "feature-branch"
+    assert parsed.environment == "sandbox"
 
 
 def test_parse_sandbox_without_branch_fails():
@@ -67,18 +67,18 @@ def test_parse_all_valid_environments():
     for env in environments:
         args = [env, "labware_library", "/path/to/artifacts"]
         if env == "sandbox":
-            args.extend(["--branch", "test-branch"])
+            args.extend(["--sandbox-prefix", "test-branch"])
 
-        config, artifact_root, branch, environment = parse_and_validate_args(args)
+        parsed: DeployArgs = parse_and_validate_args(args)
 
-        assert isinstance(config, ApplicationConfig)
-        assert config.s3_bucket  # Should have a bucket name
-        assert artifact_root == "/path/to/artifacts"
-        assert environment == env
+        assert isinstance(parsed.config, ApplicationConfig)
+        assert parsed.config.s3_bucket  # Should have a bucket name
+        assert parsed.artifact_root == "/path/to/artifacts"
+        assert parsed.environment == env
         if env == "sandbox":
-            assert branch == "test-branch"
+            assert parsed.sandbox_prefix == "test-branch"
         else:
-            assert branch is None
+            assert parsed.sandbox_prefix is None
 
 
 def test_parse_all_valid_applications():
@@ -88,23 +88,42 @@ def test_parse_all_valid_applications():
     for app in applications:
         args = ["production", app, "/path/to/artifacts"]
 
-        config, artifact_root, branch, environment = parse_and_validate_args(args)
+    parsed: DeployArgs = parse_and_validate_args(args)
 
-        assert isinstance(config, ApplicationConfig)
-        assert config.s3_bucket  # Should have a bucket name
-        assert artifact_root == "/path/to/artifacts"
-        assert branch is None
-        assert environment == "production"
+    assert isinstance(parsed.config, ApplicationConfig)
+    assert parsed.config.s3_bucket  # Should have a bucket name
+    assert parsed.artifact_root == "/path/to/artifacts"
+    assert parsed.sandbox_prefix is None
+    assert parsed.environment == "production"
 
 
 def test_parse_with_aws_profile_argument():
     """Test parsing with AWS profile argument (should be ignored by parse function)."""
     args = ["production", "labware_library", "/path/to/artifacts", "--aws-profile", "test-profile"]
 
-    config, artifact_root, branch, environment = parse_and_validate_args(args)
+    parsed: DeployArgs = parse_and_validate_args(args)
 
-    assert isinstance(config, ApplicationConfig)
-    assert config.s3_bucket == "opentrons.production.labware"
-    assert artifact_root == "/path/to/artifacts"
-    assert branch is None
-    assert environment == "production"
+    assert isinstance(parsed.config, ApplicationConfig)
+    assert parsed.config.s3_bucket == "opentrons.production.labware"
+    assert parsed.artifact_root == "/path/to/artifacts"
+    assert parsed.sandbox_prefix is None
+    assert parsed.environment == "production"
+
+
+def test_parse_all_args_includes_dry_run_flag():
+    """Test that parse_all_args captures the --dry-run flag as True."""
+    args = [
+        "production",
+        "labware_library",
+        "/path/to/artifacts",
+        "--dry-run",
+    ]
+
+    parsed: DeployArgs = parse_all_args(args)
+
+    assert isinstance(parsed.config, ApplicationConfig)
+    assert parsed.environment == "production"
+    assert parsed.config.s3_bucket == "opentrons.production.labware"
+    assert parsed.artifact_root == "/path/to/artifacts"
+    assert parsed.sandbox_prefix is None
+    assert parsed.dry_run is True

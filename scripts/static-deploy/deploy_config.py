@@ -1,10 +1,17 @@
-"""Deployment configuration for Opentrons applications."""
+"""Deployment configuration for Opentrons applications.
 
-import json
+Includes:
+- Static, typed configuration for environments and applications.
+- Pure helpers to parse GitHub event context (for CI) into an easy-to-test shape.
+- A small CLI that can either pretty-print the config tree or compute deploy config
+    from provided event args or from GitHub Actions environment.
+"""
+
+import argparse
 import os
 import sys
-from dataclasses import dataclass
-from typing import Dict, Literal, Optional, Tuple
+from dataclasses import asdict, dataclass
+from typing import Literal, Optional
 
 from rich.console import Console
 from rich.panel import Panel
@@ -53,6 +60,50 @@ class DeployConfig:
     sandbox: EnvironmentConfig
     staging: EnvironmentConfig
     production: EnvironmentConfig
+
+
+@dataclass(frozen=True)
+class GitHubEventArgs:
+    """Typed arguments describing a GitHub event context.
+
+    Attributes:
+        event_name: GitHub event name (e.g., 'push', 'pull_request').
+        ref: Full git reference (e.g., 'refs/heads/main').
+        ref_name: Short reference name (e.g., 'main').
+        ref_type: Reference type ('branch' or 'tag').
+        head_ref: Head reference for pull requests.
+    """
+
+    event_name: str
+    ref: str
+    ref_name: str
+    ref_type: str
+    head_ref: Optional[str] = None
+
+
+@dataclass(frozen=True)
+class ParsedEvent:
+    """Result of parsing a GitHub event into application, environment, and sandbox prefix.
+
+    The sandbox_prefix is used as the path segment for sandbox deployments. For branch pushes,
+    this is the branch name; for tag pushes, this is the tag name.
+    """
+
+    application: Application
+    environment: Environment
+    sandbox_prefix: str
+
+
+@dataclass(frozen=True)
+class ResolvedDeployConfig:
+    """Fully resolved deployment configuration for a release action."""
+
+    application: Application
+    environment: Environment
+    sandbox_prefix: str
+    bucket: str
+    url: str
+    cloudfront_id: str
 
 
 def get_deploy_config() -> DeployConfig:
@@ -175,9 +226,9 @@ def parse_github_event_context(  # noqa: C901
     ref_name: str,
     ref_type: str,
     head_ref: Optional[str] = None,
-) -> Tuple[str, str, str]:
+) -> ParsedEvent:
     """
-    Parse GitHub event context to determine application, environment, and branch.
+    Parse GitHub event context to determine application, environment, and sandbox prefix.
 
     Args:
         event_name: GitHub event name (e.g., 'push', 'pull_request')
@@ -187,7 +238,7 @@ def parse_github_event_context(  # noqa: C901
         head_ref: Head reference for pull requests
 
     Returns:
-        Tuple of (application, environment, branch)
+        ParsedEvent(application, environment, sandbox_prefix)
     """
 
     # Determine application based on tag patterns
@@ -204,37 +255,43 @@ def parse_github_event_context(  # noqa: C901
             application = "mkdocs"
         elif any(ref_name.startswith(prefix) for prefix in ["staging-docs", "docs"]):
             application = "docs"
-    # TODO: If not a tag, determine the application based on the name of the workflow.
+    else:
+        # If not a tag, determine application from workflow name.
+        workflow_name = os.environ.get("GITHUB_WORKFLOW", "")
+        if "Docs build and deploy" in workflow_name:
+            application = "mkdocs"
+        elif "PD test, build, and deploy" in workflow_name:
+            application = "protocol_designer"
+        elif "Labware Library test, build, and deploy" in workflow_name:
+            application = "labware_library"
 
-    # Determine environment and branch based on event type and application
-    # TODO: let us change branch to sandbox_prefix we will publish to sandbox on push of tag and PR
     if event_name == "pull_request":
         environment = "sandbox"
         # Handle empty or null head_ref values
         if head_ref and head_ref.lower() not in ["", "null", "none"]:
-            branch = head_ref
+            sandbox_prefix = head_ref
         else:
-            branch = "unknown"
+            sandbox_prefix = "unknown"
     elif event_name == "push" and ref_type == "branch":
         environment = "sandbox"
-        branch = ref_name
+        sandbox_prefix = ref_name
     elif event_name == "push" and ref_type == "tag":
         # Tag-based environment detection
         if ref_name.startswith(("tmp-staging-", "staging-")):
             environment = "staging"
-            branch = ref_name
+            sandbox_prefix = ref_name
         elif ref_name.startswith(("tmp-labware-library", "labware-library", "mkdocs", "docs")):
             # Production tag patterns (only labware uses tmp- prefix)
             environment = "production"
-            branch = ref_name
+            sandbox_prefix = ref_name
         else:
             # Default to sandbox for unrecognized tags
             environment = "sandbox"
-            branch = ref_name
+            sandbox_prefix = ref_name
     else:
         raise ValueError(f"No deployment configuration found for event: {event_name}, ref: {ref}")
 
-    return application, environment, branch
+    return ParsedEvent(application=application, environment=environment, sandbox_prefix=sandbox_prefix)
 
 
 def determine_deploy_config(
@@ -243,7 +300,7 @@ def determine_deploy_config(
     ref_name: str,
     ref_type: str,
     head_ref: Optional[str] = None,
-) -> Dict[str, str]:
+) -> ResolvedDeployConfig:
     """
     Determine deployment configuration based on GitHub event context.
 
@@ -255,35 +312,104 @@ def determine_deploy_config(
         head_ref: Head reference for pull requests
 
     Returns:
-        Dictionary containing deployment configuration:
+        ResolvedDeployConfig containing deployment configuration:
         - application: Application name (e.g., 'labware_library', 'mkdocs')
         - environment: 'sandbox', 'staging', or 'production'
-        - branch: Branch name for deployment
+        - sandbox_prefix: Path segment for sandbox (branch or tag)
         - bucket: S3 bucket name
         - url: Full URL for the deployed site
         - cloudfront_id: CloudFront distribution ID (empty for sandbox)
     """
 
     # Parse the GitHub event context
-    application, environment, branch = parse_github_event_context(event_name, ref, ref_name, ref_type, head_ref)
+    parsed = parse_github_event_context(event_name, ref, ref_name, ref_type, head_ref)
 
     # Get the configuration for this application and environment
-    config = get_config(environment, application)
+    config = get_config(parsed.environment, parsed.application)
 
-    # Build the URL with branch path for sandbox
-    if environment == "sandbox":
-        url = f"{config.url}{branch}/"
+    # Build the URL with sandbox_prefix path for sandbox
+    if parsed.environment == "sandbox":
+        url = f"{config.url}{parsed.sandbox_prefix}/"
     else:
         url = config.url
 
-    return {
-        "application": application,
-        "environment": environment,
-        "branch": branch,
-        "bucket": config.s3_bucket,
-        "url": url,
-        "cloudfront_id": config.cloudfront_id,
-    }
+    return ResolvedDeployConfig(
+        application=parsed.application,
+        environment=parsed.environment,
+        sandbox_prefix=parsed.sandbox_prefix,
+        bucket=config.s3_bucket,
+        url=url,
+        cloudfront_id=config.cloudfront_id,
+    )
+
+
+def determine_deploy_config_from_args(event: GitHubEventArgs) -> ResolvedDeployConfig:
+    """Determine deployment configuration from a GitHubEventArgs instance.
+
+    This is a thin wrapper around ``determine_deploy_config`` to enable better testability.
+    """
+
+    return determine_deploy_config(
+        event_name=event.event_name,
+        ref=event.ref,
+        ref_name=event.ref_name,
+        ref_type=event.ref_type,
+        head_ref=event.head_ref,
+    )
+
+
+def parse_ci_event_args() -> GitHubEventArgs:
+    """Parse GitHub Actions environment into event args.
+
+    Reads standard GitHub Actions environment variables and infers missing fields.
+    """
+
+    event_name = os.environ.get("GITHUB_EVENT_NAME", "").strip()
+    ref = os.environ.get("GITHUB_REF", "").strip()
+    ref_name = os.environ.get("GITHUB_REF_NAME", "").strip()
+    head_ref = os.environ.get("GITHUB_HEAD_REF") or None
+
+    if not ref_name and ref:
+        # Derive ref_name from ref if not provided
+        ref_name = ref.split("/")[-1]
+
+    # Infer ref_type
+    if ref.startswith("refs/tags/"):
+        ref_type = "tag"
+    elif ref.startswith("refs/heads/") or ref.startswith("refs/pull/"):
+        ref_type = "branch"
+    else:
+        # Default to branch if unknown
+        ref_type = "branch"
+
+    if not event_name or not ref:
+        raise ValueError("Missing required GitHub environment variables for event parsing")
+
+    return GitHubEventArgs(event_name=event_name, ref=ref, ref_name=ref_name, ref_type=ref_type, head_ref=head_ref)
+
+
+def parse_cli_event_args(argv: Optional[list] = None) -> GitHubEventArgs:
+    """Parse CLI args into GitHubEventArgs.
+
+    Args:
+        argv: Optional raw argv list for testing.
+    """
+
+    parser = argparse.ArgumentParser(description="Compute deploy config from GitHub event args")
+    parser.add_argument("event_name", help="GitHub event name (push, pull_request)")
+    parser.add_argument("ref", help="Full git ref (e.g., refs/heads/main or refs/tags/v1.0.0)")
+    parser.add_argument("ref_name", help="Reference name (e.g., main or v1.0.0)")
+    parser.add_argument("ref_type", choices=["branch", "tag"], help="Reference type")
+    parser.add_argument("--head-ref", dest="head_ref", default=None, help="Head ref for pull requests")
+
+    ns = parser.parse_args(argv)
+    return GitHubEventArgs(
+        event_name=ns.event_name,
+        ref=ns.ref,
+        ref_name=ns.ref_name,
+        ref_type=ns.ref_type,
+        head_ref=ns.head_ref,
+    )
 
 
 def print_deploy_config() -> None:
@@ -316,51 +442,38 @@ def print_deploy_config() -> None:
 
 
 def main() -> None:
-    """Main entry point for the deploy configuration module."""
-    if len(sys.argv) > 1:
-        # Command-line usage for testing deployment configuration
-        if len(sys.argv) < 5:
-            console.print("Usage: python deploy_config.py <event_name> <ref> <ref_name> <ref_type> [head_ref]")
-            console.print(
-                "Example: python deploy_config.py push "
-                "refs/tags/tmp-staging-labware-library-202509041016 "
-                "tmp-staging-labware-library-202509041016 tag"
-            )
-            sys.exit(1)
+    """Main entry point for the deploy configuration module.
 
-        event_name = sys.argv[1]
-        ref = sys.argv[2]
-        ref_name = sys.argv[3]
-        ref_type = sys.argv[4]
-        head_ref = sys.argv[5] if len(sys.argv) > 5 else None
+    Behavior:
+    - No args: pretty-print full deploy config tree.
+    - With args: parse event args and print computed deploy config (and JSON),
+      also write to GITHUB_OUTPUT when present.
+    """
 
-        try:
-            config = determine_deploy_config(
-                event_name=event_name,
-                ref=ref,
-                ref_name=ref_name,
-                ref_type=ref_type,
-                head_ref=head_ref,
-            )
-
-            # Output in GitHub Actions format using rich for better formatting
-            for key, value in config.items():
-                console.print(f"{key}={value}")
-
-            # Also output as JSON for debugging using rich
-            console.print(f"# JSON: {json.dumps(config, indent=2)}")
-
-            # For GitHub Actions, we need to set the outputs
-            if os.environ.get("GITHUB_OUTPUT"):
-                with open(os.environ["GITHUB_OUTPUT"], "a") as f:
-                    for key, value in config.items():
-                        f.write(f"{key}={value}\n")
-
-        except Exception:
-            console.print_exception()
-            sys.exit(1)
-    else:
+    if len(sys.argv) == 1:
         print_deploy_config()
+        return
+
+    try:
+        event_args = parse_cli_event_args(sys.argv[1:])
+        config = determine_deploy_config_from_args(event_args)
+
+        # Output in GitHub Actions format using rich for better formatting
+        for key, value in asdict(config).items():
+            console.print(f"{key}={value}")
+
+        # For GitHub Actions, set the outputs if available
+        if os.environ.get("GITHUB_OUTPUT"):
+            with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+                for key, value in asdict(config).items():
+                    f.write(f"{key}={value}\n")
+
+    except SystemExit:
+        # argparse will already have printed usage; propagate exit
+        raise
+    except Exception:
+        console.print_exception()
+        sys.exit(1)
 
 
 if __name__ == "__main__":

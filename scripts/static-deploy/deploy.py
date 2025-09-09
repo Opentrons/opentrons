@@ -8,9 +8,11 @@ any application to the appropriate AWS resources.
 
 import argparse
 import os
+import subprocess
 import sys
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import Optional
 
 import boto3
 from botocore.exceptions import ClientError, NoCredentialsError
@@ -20,12 +22,60 @@ from rich.console import Console
 console = Console()
 
 
+@dataclass(frozen=True)
+class DeployArgs:
+    """Parsed deploy CLI arguments.
+
+    Attributes:
+        config: Application configuration resolved for the environment/app.
+        artifact_root: Path to built artifacts to sync.
+    sandbox_prefix: Optional sandbox path prefix (branch or tag name).
+        environment: Target environment name.
+        dry_run: Whether to run without making changes.
+    """
+
+    config: ApplicationConfig
+    artifact_root: str
+    sandbox_prefix: Optional[str]
+    environment: str
+    dry_run: bool = False
+
+
+def _build_parser() -> argparse.ArgumentParser:
+    """Build the CLI argument parser.
+
+    Returns:
+        Configured ArgumentParser instance.
+    """
+    parser = argparse.ArgumentParser(description="Deploy application artifacts to S3")
+    parser.add_argument("environment", choices=["sandbox", "staging", "production"], help="Deployment environment")
+    parser.add_argument(
+        "application",
+        choices=["labware_library", "protocol_designer", "docs", "mkdocs"],
+        help="Application to deploy",
+    )
+    parser.add_argument("artifact_root", help="Path to the directory containing artifacts to deploy")
+    parser.add_argument(
+        "--sandbox-prefix",
+        dest="sandbox_prefix",
+        help="Sandbox path prefix (branch or tag); required for sandbox deployments",
+    )
+    parser.add_argument("--aws-profile", help="AWS profile to use (defaults to AWS_PROFILE env var)")
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Show what would change without making any changes (adds aws s3 sync --dryrun and skips writes)",
+    )
+    return parser
+
+
 def deploy_application(  # noqa: C901
     config: ApplicationConfig,
     artifact_root: str,
-    branch: Optional[str] = None,
+    sandbox_prefix: Optional[str] = None,
     aws_profile: Optional[str] = None,
     environment: str = "unknown",
+    dry_run: bool = False,
 ) -> None:
     """
     Deploy application artifacts to S3 using boto3.
@@ -33,7 +83,7 @@ def deploy_application(  # noqa: C901
     Args:
         config: ApplicationConfig object containing S3 bucket, CloudFront ID, and URL
         artifact_root: Path to the directory containing artifacts to deploy
-        branch: Branch name for sandbox deployments (optional)
+        sandbox_prefix: prefix for sandbox deployments (optional)
         aws_profile: AWS profile to use (optional)
         environment: Environment name for logging (optional)
     """
@@ -113,118 +163,87 @@ def deploy_application(  # noqa: C901
         console.print(f"❌ Error checking bucket: {e}", style="red")
         sys.exit(1)
 
-    # Test write permissions to bucket
-    console.print("Testing write permissions...")
-    test_key = "test-write-permission.txt"
-    try:
-        s3_client.put_object(Bucket=config.s3_bucket, Key=test_key, Body=b"test")
-        console.print("✅ Write permissions confirmed", style="green")
-        # Clean up test file
-        s3_client.delete_object(Bucket=config.s3_bucket, Key=test_key)
-    except ClientError as e:
-        console.print(f"❌ Write permission denied: {e}", style="red")
-        sys.exit(1)
-    except Exception as e:
-        console.print(f"❌ Error testing write permissions: {e}", style="red")
-        sys.exit(1)
+    # Skipping explicit write-permission probe; aws s3 sync will surface errors if writes are not permitted
 
     # Determine S3 prefix based on environment
-    if environment == "sandbox" and branch:
-        s3_prefix = f"{branch}/"
-        deployment_url = f"{config.url}{branch}/"
+    if environment == "sandbox" and sandbox_prefix:
+        s3_prefix = f"{sandbox_prefix}/"
+        deployment_url = f"{config.url}{sandbox_prefix}/"
     else:
         s3_prefix = ""
         deployment_url = config.url
 
     console.print(f"Deploying to {environment} environment:")
     console.print(f"  Bucket: {config.s3_bucket}")
-    if environment == "sandbox" and branch:
-        console.print(f"  Branch: {branch}")
+    if environment == "sandbox" and sandbox_prefix:
+        console.print(f"  Sandbox prefix: {sandbox_prefix}")
     console.print(f"  S3 Prefix: {s3_prefix or '(root)'}")
     console.print(f"  Deployment URL: {deployment_url}")
 
     # Deploy artifacts to S3
     console.print("Deploying artifacts...")
-    uploaded_count = 0
-    failed_count = 0
+    # Upload progress is handled by AWS CLI output
 
     try:
-        # First, delete existing objects if this is a clean deployment
-        if environment != "sandbox":  # Only clean deploy for staging/production
-            console.print("Cleaning existing objects...")
-            paginator = s3_client.get_paginator("list_objects_v2")
-            pages = paginator.paginate(Bucket=config.s3_bucket, Prefix=s3_prefix)
+        # No manual pre-clean: rely on aws s3 sync --delete in all environments
+        if dry_run:
+            console.print("Dry run: will simulate deletions via 'aws s3 sync --delete --dryrun'", style="blue")
+        else:
+            console.print("Using 'aws s3 sync --delete' to remove remote files not present locally", style="blue")
 
-            objects_to_delete = []
-            for page in pages:
-                if "Contents" in page:
-                    for obj in page["Contents"]:
-                        objects_to_delete.append({"Key": obj["Key"]})
+        # Upload new artifacts using AWS CLI for faster sync and automatic content-type
+        try:
+            s3_uri = f"s3://{config.s3_bucket}/{s3_prefix}"
+            cmd = [
+                "aws",
+                "s3",
+                "sync",
+                str(artifact_path),
+                s3_uri,
+                "--only-show-errors",
+                "--exact-timestamps",
+            ]
+            cmd.append("--delete")
+            # Dry run simulation
+            if dry_run:
+                cmd.append("--dryrun")
+            # Use provided profile if any
+            if aws_profile:
+                cmd.extend(["--profile", aws_profile])
 
-            if objects_to_delete:
-                # Delete in batches of 1000 (S3 limit)
-                for i in range(0, len(objects_to_delete), 1000):
-                    batch = objects_to_delete[i : i + 1000]
-                    s3_client.delete_objects(Bucket=config.s3_bucket, Delete={"Objects": batch})
-                console.print(f"✅ Deleted {len(objects_to_delete)} existing objects", style="green")
-
-        # Upload new artifacts
-        for file_path in artifact_path.rglob("*"):
-            if file_path.is_file():
-                # Calculate relative path from artifact_root
-                relative_path = file_path.relative_to(artifact_path)
-                s3_key = f"{s3_prefix}{relative_path}".replace("\\", "/")  # Ensure forward slashes
-
-                try:
-                    # Determine content type
-                    content_type = None
-                    if file_path.suffix == ".html":
-                        content_type = "text/html"
-                    elif file_path.suffix == ".css":
-                        content_type = "text/css"
-                    elif file_path.suffix == ".js":
-                        content_type = "application/javascript"
-                    elif file_path.suffix == ".json":
-                        content_type = "application/json"
-                    elif file_path.suffix == ".png":
-                        content_type = "image/png"
-                    elif file_path.suffix == ".jpg" or file_path.suffix == ".jpeg":
-                        content_type = "image/jpeg"
-                    elif file_path.suffix == ".svg":
-                        content_type = "image/svg+xml"
-
-                    # Upload file
-                    extra_args = {}
-                    if content_type:
-                        extra_args["ContentType"] = content_type
-
-                    s3_client.upload_file(str(file_path), config.s3_bucket, s3_key, ExtraArgs=extra_args)
-                    uploaded_count += 1
-
-                    if uploaded_count % 100 == 0:
-                        console.print(f"  Uploaded {uploaded_count} files...")
-
-                except Exception as e:
-                    console.print(f"❌ Failed to upload {file_path}: {e}", style="red")
-                    failed_count += 1
-
-        console.print(f"✅ Successfully uploaded {uploaded_count} files", style="green")
-        if failed_count > 0:
-            console.print(f"⚠️  Failed to upload {failed_count} files", style="yellow")
+            console.print(f"Running: {' '.join(cmd)}", style="blue")
+            result = subprocess.run(cmd, check=True, text=True, capture_output=True)
+            # aws s3 sync doesn't return a count; we surface its output for visibility
+            if result.stdout.strip():
+                console.print(result.stdout.strip())
+            console.print("✅ Sync completed", style="green")
+        except FileNotFoundError:
+            console.print("❌ 'aws' CLI not found. Please install AWS CLI v2 and ensure it's on PATH.", style="red")
+            sys.exit(1)
+        except subprocess.CalledProcessError as e:
+            if e.stdout:
+                console.print(e.stdout, style="red")
+            if e.stderr:
+                console.print(e.stderr, style="red")
+            console.print(f"❌ AWS CLI sync failed with exit code {e.returncode}", style="red")
+            sys.exit(1)
 
         # Invalidate CloudFront cache if configured
         if config.cloudfront_id:
             console.print(f"Invalidating CloudFront cache for distribution {config.cloudfront_id}...")
             try:
-                cloudfront_client = session.client("cloudfront")
-                cloudfront_client.create_invalidation(
-                    DistributionId=config.cloudfront_id,
-                    InvalidationBatch={
-                        "Paths": {"Quantity": 1, "Items": ["/*"]},
-                        "CallerReference": f"deploy-{environment}-{int(os.getenv('GITHUB_RUN_ID', 0))}",
-                    },
-                )
-                console.print("✅ CloudFront cache invalidation initiated", style="green")
+                if dry_run:
+                    console.print("Dry run: skipping CloudFront invalidation", style="blue")
+                else:
+                    cloudfront_client = session.client("cloudfront")
+                    cloudfront_client.create_invalidation(
+                        DistributionId=config.cloudfront_id,
+                        InvalidationBatch={
+                            "Paths": {"Quantity": 1, "Items": ["/*"]},
+                            "CallerReference": f"deploy-{environment}-{int(os.getenv('GITHUB_RUN_ID', 0))}",
+                        },
+                    )
+                    console.print("✅ CloudFront cache invalidation initiated", style="green")
             except Exception as e:
                 console.print(f"⚠️  CloudFront cache invalidation failed: {e}", style="yellow")
                 # Don't fail the deployment for CloudFront issues
@@ -237,31 +256,24 @@ def deploy_application(  # noqa: C901
         sys.exit(1)
 
 
-def parse_and_validate_args(args: Optional[list] = None) -> Tuple[ApplicationConfig, str, Optional[str], str]:
-    """
-    Parse command line arguments and validate configuration.
+def parse_and_validate_args(args: Optional[list] = None) -> DeployArgs:
+    """Parse CLI arguments needed for tests (without side-effect flags).
 
     Args:
-        args: Optional list of arguments to parse (for testing)
+        args: Optional list of arguments to parse (for testing).
 
     Returns:
-        Tuple of (config, artifact_root, branch, environment)
+    DeployArgs value object (frozen) with config, artifact_root, sandbox_prefix, environment.
 
     Raises:
-        SystemExit: If validation fails or configuration cannot be loaded
+        SystemExit: If validation fails or configuration cannot be loaded.
     """
-    parser = argparse.ArgumentParser(description="Deploy application artifacts to S3")
-    parser.add_argument("environment", choices=["sandbox", "staging", "production"], help="Deployment environment")
-    parser.add_argument("application", choices=["labware_library", "protocol_designer", "docs", "mkdocs"], help="Application to deploy")
-    parser.add_argument("artifact_root", help="Path to the directory containing artifacts to deploy")
-    parser.add_argument("--branch", help="Branch name (required for sandbox deployments)")
-    parser.add_argument("--aws-profile", help="AWS profile to use (defaults to AWS_PROFILE env var)")
-
+    parser = _build_parser()
     parsed_args = parser.parse_args(args)
 
     # Validate branch requirement for sandbox
-    if parsed_args.environment == "sandbox" and not parsed_args.branch:
-        console.print("❌ Error: --branch is required for sandbox deployments", style="red")
+    if parsed_args.environment == "sandbox" and not parsed_args.sandbox_prefix:
+        console.print("❌ Error: --sandbox-prefix is required for sandbox deployments", style="red")
         sys.exit(1)
 
     # Get configuration for the application and environment
@@ -273,17 +285,103 @@ def parse_and_validate_args(args: Optional[list] = None) -> Tuple[ApplicationCon
         console.print(f"❌ Error getting configuration: {e}", style="red")
         sys.exit(1)
 
-    return config, parsed_args.artifact_root, parsed_args.branch, parsed_args.environment
+    return DeployArgs(
+        config=config,
+        artifact_root=parsed_args.artifact_root,
+        sandbox_prefix=parsed_args.sandbox_prefix,
+        environment=parsed_args.environment,
+        dry_run=False,
+    )
+
+
+def parse_all_args(args: Optional[list] = None) -> DeployArgs:
+    """Parse all CLI arguments including the dry-run flag.
+
+    Args:
+        args: Optional list of arguments to parse (for testing).
+
+    Returns:
+        DeployArgs value object (frozen) including dry_run.
+    """
+    parser = _build_parser()
+    parsed_args = parser.parse_args(args)
+
+    # Validate branch requirement for sandbox
+    if parsed_args.environment == "sandbox" and not parsed_args.sandbox_prefix:
+        console.print("❌ Error: --sandbox-prefix is required for sandbox deployments", style="red")
+        sys.exit(1)
+
+    # Get configuration for the application and environment
+    try:
+        from deploy_config import get_config
+
+        config = get_config(parsed_args.environment, parsed_args.application)
+    except Exception as e:
+        console.print(f"❌ Error getting configuration: {e}", style="red")
+        sys.exit(1)
+
+    return DeployArgs(
+        config=config,
+        artifact_root=parsed_args.artifact_root,
+        sandbox_prefix=parsed_args.sandbox_prefix,
+        environment=parsed_args.environment,
+        dry_run=parsed_args.dry_run,
+    )
 
 
 def main():
     """Main entry point for the deployment script."""
-    config, artifact_root, branch, environment = parse_and_validate_args()
+    # CI mode: no CLI args -> resolve from GitHub env and required SOURCE_DIR/ARTIFACT_ROOT
+    if len(sys.argv) == 1:
+        try:
+            from deploy_config import (
+                determine_deploy_config_from_args,
+                get_config,
+                parse_ci_event_args,
+            )
 
-    # Get AWS profile
+            event_args = parse_ci_event_args()
+            resolved = determine_deploy_config_from_args(event_args)
+
+            artifact_root = os.environ.get("SOURCE_DIR") or os.environ.get("ARTIFACT_ROOT")
+            if not artifact_root:
+                console.print(
+                    "❌ CI mode requires SOURCE_DIR or ARTIFACT_ROOT environment variable for artifact path",
+                    style="red",
+                )
+                sys.exit(1)
+
+            config = get_config(resolved.environment, resolved.application)
+
+            aws_profile = os.getenv("AWS_PROFILE")
+            deploy_application(
+                config=config,
+                artifact_root=artifact_root,
+                sandbox_prefix=resolved.sandbox_prefix,
+                aws_profile=aws_profile,
+                environment=resolved.environment,
+                dry_run=False,
+            )
+            return
+        except SystemExit:
+            raise
+        except Exception:
+            console.print_exception()
+            sys.exit(1)
+
+    # CLI mode: use full parser that includes the dry-run flag
+    parsed = parse_all_args()
+
     aws_profile = os.getenv("AWS_PROFILE")
 
-    deploy_application(config=config, artifact_root=artifact_root, branch=branch, aws_profile=aws_profile, environment=environment)
+    deploy_application(
+        config=parsed.config,
+        artifact_root=parsed.artifact_root,
+        sandbox_prefix=parsed.sandbox_prefix,
+        aws_profile=aws_profile,
+        environment=parsed.environment,
+        dry_run=parsed.dry_run,
+    )
 
 
 if __name__ == "__main__":
