@@ -67,7 +67,7 @@ setup-py-toolchain:
 setup-js:
 setup-js: setup-py-toolchain
 	yarn config set network-timeout 60000
-	yarn install --prefer-offline
+	yarn
 	$(MAKE) -C $(APP_SHELL_DIR) setup
 	$(MAKE) -C $(APP_SHELL_ODD_DIR) setup
 
