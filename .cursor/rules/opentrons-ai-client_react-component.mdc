@@ -127,11 +127,19 @@ Example prompt template:
    ```
 
 5. **Important Rules:**
+
    - NEVER use inline styles except in stories.tsx files
    - Prefer padding over margin for wrapper elements
    - Use rem units instead of px for dimensions
    - Avoid complex calc() expressions
    - Remove unnecessary CSS resets if already controlled
+
+6. **Linting Rules:**
+   This monorepo uses Stylelint. The configuration file is located at the root as .stylelintrc.js.
+   To run linting on a specific file, use the following command:
+   ```shell
+   yarn stylelint opentrons-ai-client/src/file_path
+   ```
 
 ## TypeScript Best Practices
 
@@ -312,6 +320,18 @@ it('should handle empty data', () => {
 
 ### Testing Best Practices
 
+To run tests for a specific file (assuming the current directory is the project root), use:
+
+```shell
+yarn vitest opentrons-ai-client/src/file_path
+```
+
+To run multiple tests within a folder, use:
+
+```shell
+yarn vitest opentrons-ai-client/src/folder_path
+```
+
 1. **Props Pattern:**
 
    ```ts
@@ -338,7 +358,6 @@ it('should handle empty data', () => {
    <Icon name="arrow" data-testid="ComponentName_Icon" />
    const icon = screen.getByTestId('ComponentName_Icon')
    ```
-
 
 3. **Test ID Naming Convention:**
    - Format: `ComponentName_ElementType`
@@ -486,7 +505,6 @@ function AppContent({ isOnChatPage }: { isOnChatPage: boolean }) {
    // ❌ Never use inline styles
    <button style="background: blue;">Click</button>
    ```
-
 
 3. **Conditional hooks:**
 
