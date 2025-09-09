@@ -11,8 +11,9 @@ import argparse
 import os
 import sys
 from dataclasses import asdict, dataclass
-from typing import Literal, Optional
+from typing import Optional
 
+from deploy_types import Application, Environment
 from rich.console import Console
 from rich.panel import Panel
 from rich.tree import Tree
@@ -28,10 +29,6 @@ class InvalidEnvironmentError(ValueError):
 
 class InvalidApplicationError(ValueError):
     """Raised when an invalid application is requested."""
-
-
-Environment = Literal["sandbox", "staging", "production"]
-Application = Literal["labware_library", "protocol_designer", "docs", "mkdocs"]
 
 
 @dataclass(frozen=True)
@@ -356,36 +353,6 @@ def determine_deploy_config_from_args(event: GitHubEventArgs) -> ResolvedDeployC
         ref_type=event.ref_type,
         head_ref=event.head_ref,
     )
-
-
-def parse_ci_event_args() -> GitHubEventArgs:
-    """Parse GitHub Actions environment into event args.
-
-    Reads standard GitHub Actions environment variables and infers missing fields.
-    """
-
-    event_name = os.environ.get("GITHUB_EVENT_NAME", "").strip()
-    ref = os.environ.get("GITHUB_REF", "").strip()
-    ref_name = os.environ.get("GITHUB_REF_NAME", "").strip()
-    head_ref = os.environ.get("GITHUB_HEAD_REF") or None
-
-    if not ref_name and ref:
-        # Derive ref_name from ref if not provided
-        ref_name = ref.split("/")[-1]
-
-    # Infer ref_type
-    if ref.startswith("refs/tags/"):
-        ref_type = "tag"
-    elif ref.startswith("refs/heads/") or ref.startswith("refs/pull/"):
-        ref_type = "branch"
-    else:
-        # Default to branch if unknown
-        ref_type = "branch"
-
-    if not event_name or not ref:
-        raise ValueError("Missing required GitHub environment variables for event parsing")
-
-    return GitHubEventArgs(event_name=event_name, ref=ref, ref_name=ref_name, ref_type=ref_type, head_ref=head_ref)
 
 
 def parse_cli_event_args(argv: Optional[list] = None) -> GitHubEventArgs:

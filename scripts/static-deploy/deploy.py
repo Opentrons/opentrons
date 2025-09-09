@@ -2,7 +2,7 @@
 """
 Generic deployment script for Opentrons applications.
 
-This script consumes a configuration object and artifact_root to deploy
+This script consumes a configuration object and relative_artifact_dir to deploy
 any application to the appropriate AWS resources.
 """
 
@@ -22,22 +22,94 @@ from rich.console import Console
 console = Console()
 
 
+def _validate_artifact_directory(relative_artifact_dir: str) -> Path:
+    """Validate that the artifact directory exists and is a directory.
+
+    Args:
+        relative_artifact_dir: Path to the directory containing artifacts to deploy
+
+    Returns:
+        Path object for the validated directory
+
+    Raises:
+        SystemExit: If validation fails
+    """
+    artifact_path = Path(relative_artifact_dir)
+
+    if not artifact_path.exists():
+        console.print(f"❌ Error: Artifact directory {artifact_path} does not exist.", style="red")
+        console.print("Make sure you've built the application first.", style="red")
+        sys.exit(1)
+
+    # Check if this is a directory (not a file)
+    if not artifact_path.is_dir():
+        console.print(f"❌ Error: {artifact_path} is not a directory.", style="red")
+        console.print("The artifact path must be a directory containing built artifacts.", style="red")
+        sys.exit(1)
+
+    # Check if artifact directory has content
+    artifact_files = list(artifact_path.glob("*"))
+    if not artifact_files:
+        console.print(f"⚠️  Warning: Artifact directory {artifact_path} is empty.", style="yellow")
+        console.print("Make sure you've built the application first.", style="yellow")
+
+    console.print(f"Artifact directory contents: {[f.name for f in artifact_files[:10]]}{'...' if len(artifact_files) > 10 else ''}")
+
+    return artifact_path
+
+
+def _resolve_aws_profile(cli_aws_profile: Optional[str]) -> Optional[str]:
+    """Resolve AWS profile with proper priority: CLI flag > ENV var > error in non-CI.
+
+    Args:
+        cli_aws_profile: AWS profile from --aws-profile CLI argument
+
+    Returns:
+        Resolved AWS profile name or None for CI environments
+
+    Raises:
+        SystemExit: If no AWS profile is available in non-CI environments
+    """
+    # Check if we're in CI environment
+    is_ci = os.getenv("CI") is not None
+
+    # Priority 1: --aws-profile flag
+    if cli_aws_profile:
+        return cli_aws_profile
+
+    # Priority 2: AWS_PROFILE environment variable
+    env_aws_profile = os.getenv("AWS_PROFILE")
+    if env_aws_profile:
+        return env_aws_profile
+
+    # In CI, we can use default credentials (IAM roles, etc.)
+    if is_ci:
+        return None
+
+    # In local environments, require explicit AWS profile
+    console.print("❌ Error: AWS profile required for local deployment", style="red")
+    console.print("  Use --aws-profile <profile> or set AWS_PROFILE environment variable", style="red")
+    sys.exit(1)
+
+
 @dataclass(frozen=True)
 class DeployArgs:
     """Parsed deploy CLI arguments.
 
     Attributes:
         config: Application configuration resolved for the environment/app.
-        artifact_root: Path to built artifacts to sync.
-    sandbox_prefix: Optional sandbox path prefix (branch or tag name).
+        relative_artifact_dir: Path to built artifacts to sync.
+        sandbox_prefix: Optional sandbox path prefix (branch or tag name).
         environment: Target environment name.
+        aws_profile: AWS profile to use for authentication.
         dry_run: Whether to run without making changes.
     """
 
     config: ApplicationConfig
-    artifact_root: str
+    relative_artifact_dir: str
     sandbox_prefix: Optional[str]
     environment: str
+    aws_profile: Optional[str]
     dry_run: bool = False
 
 
@@ -54,7 +126,7 @@ def _build_parser() -> argparse.ArgumentParser:
         choices=["labware_library", "protocol_designer", "docs", "mkdocs"],
         help="Application to deploy",
     )
-    parser.add_argument("artifact_root", help="Path to the directory containing artifacts to deploy")
+    parser.add_argument("relative_artifact_dir", help="Path to the directory containing artifacts to deploy")
     parser.add_argument(
         "--sandbox-prefix",
         dest="sandbox_prefix",
@@ -71,7 +143,7 @@ def _build_parser() -> argparse.ArgumentParser:
 
 def deploy_application(  # noqa: C901
     config: ApplicationConfig,
-    artifact_root: str,
+    relative_artifact_dir: str,
     sandbox_prefix: Optional[str] = None,
     aws_profile: Optional[str] = None,
     environment: str = "unknown",
@@ -82,39 +154,22 @@ def deploy_application(  # noqa: C901
 
     Args:
         config: ApplicationConfig object containing S3 bucket, CloudFront ID, and URL
-        artifact_root: Path to the directory containing artifacts to deploy
+        relative_artifact_dir: Path to the directory containing artifacts to deploy
         sandbox_prefix: prefix for sandbox deployments (optional)
         aws_profile: AWS profile to use (optional)
         environment: Environment name for logging (optional)
+        dry_run: Whether to run without making changes
     """
 
     # Check if we're in CI
     is_ci = os.getenv("CI") is not None
     if is_ci:
         console.print("Running in CI environment", style="blue")
-    elif aws_profile is None and not os.getenv("AWS_PROFILE"):
-        console.print("Warning: No AWS profile specified. Make sure you have AWS credentials configured.", style="yellow")
+    else:
+        console.print(f"Using AWS profile: {aws_profile or 'default'}", style="blue")
 
-    # Verify artifact directory exists
-    artifact_path = Path(artifact_root)
-    if not artifact_path.exists():
-        console.print(f"❌ Error: Artifact directory {artifact_path} does not exist.", style="red")
-        console.print("Make sure you've built the application first.", style="red")
-        sys.exit(1)
-
-    # Check if this is a directory
-    if artifact_path.is_file():
-        console.print(f"❌ Error: {artifact_path} is a file, not a directory.", style="red")
-        console.print("Make sure you've built the application first.", style="red")
-        sys.exit(1)
-
-    # Check if artifact directory has content
-    artifact_files = list(artifact_path.glob("*"))
-    if not artifact_files:
-        console.print(f"⚠️  Warning: Artifact directory {artifact_path} is empty.", style="yellow")
-        console.print("Make sure you've built the application first.", style="yellow")
-
-    console.print(f"Artifact directory contents: {[f.name for f in artifact_files[:10]]}{'...' if len(artifact_files) > 10 else ''}")
+    # Use the already-validated artifact directory
+    artifact_path = Path(relative_artifact_dir)
 
     # Initialize boto3 session
     try:
@@ -263,7 +318,7 @@ def parse_and_validate_args(args: Optional[list] = None) -> DeployArgs:
         args: Optional list of arguments to parse (for testing).
 
     Returns:
-    DeployArgs value object (frozen) with config, artifact_root, sandbox_prefix, environment.
+        DeployArgs value object (frozen) with config, relative_artifact_dir, sandbox_prefix, environment, aws_profile.
 
     Raises:
         SystemExit: If validation fails or configuration cannot be loaded.
@@ -276,6 +331,12 @@ def parse_and_validate_args(args: Optional[list] = None) -> DeployArgs:
         console.print("❌ Error: --sandbox-prefix is required for sandbox deployments", style="red")
         sys.exit(1)
 
+    # Validate artifact directory
+    _validate_artifact_directory(parsed_args.relative_artifact_dir)
+
+    # Resolve AWS profile with proper priority
+    aws_profile = _resolve_aws_profile(parsed_args.aws_profile)
+
     # Get configuration for the application and environment
     try:
         from deploy_config import get_config
@@ -287,9 +348,10 @@ def parse_and_validate_args(args: Optional[list] = None) -> DeployArgs:
 
     return DeployArgs(
         config=config,
-        artifact_root=parsed_args.artifact_root,
+        relative_artifact_dir=parsed_args.relative_artifact_dir,
         sandbox_prefix=parsed_args.sandbox_prefix,
         environment=parsed_args.environment,
+        aws_profile=aws_profile,
         dry_run=False,
     )
 
@@ -311,6 +373,12 @@ def parse_all_args(args: Optional[list] = None) -> DeployArgs:
         console.print("❌ Error: --sandbox-prefix is required for sandbox deployments", style="red")
         sys.exit(1)
 
+    # Validate artifact directory
+    _validate_artifact_directory(parsed_args.relative_artifact_dir)
+
+    # Resolve AWS profile with proper priority
+    aws_profile = _resolve_aws_profile(parsed_args.aws_profile)
+
     # Get configuration for the application and environment
     try:
         from deploy_config import get_config
@@ -322,63 +390,24 @@ def parse_all_args(args: Optional[list] = None) -> DeployArgs:
 
     return DeployArgs(
         config=config,
-        artifact_root=parsed_args.artifact_root,
+        relative_artifact_dir=parsed_args.relative_artifact_dir,
         sandbox_prefix=parsed_args.sandbox_prefix,
         environment=parsed_args.environment,
+        aws_profile=aws_profile,
         dry_run=parsed_args.dry_run,
     )
 
 
 def main():
     """Main entry point for the deployment script."""
-    # CI mode: no CLI args -> resolve from GitHub env and required SOURCE_DIR/ARTIFACT_ROOT
-    if len(sys.argv) == 1:
-        try:
-            from deploy_config import (
-                determine_deploy_config_from_args,
-                get_config,
-                parse_ci_event_args,
-            )
-
-            event_args = parse_ci_event_args()
-            resolved = determine_deploy_config_from_args(event_args)
-
-            artifact_root = os.environ.get("SOURCE_DIR") or os.environ.get("ARTIFACT_ROOT")
-            if not artifact_root:
-                console.print(
-                    "❌ CI mode requires SOURCE_DIR or ARTIFACT_ROOT environment variable for artifact path",
-                    style="red",
-                )
-                sys.exit(1)
-
-            config = get_config(resolved.environment, resolved.application)
-
-            aws_profile = os.getenv("AWS_PROFILE")
-            deploy_application(
-                config=config,
-                artifact_root=artifact_root,
-                sandbox_prefix=resolved.sandbox_prefix,
-                aws_profile=aws_profile,
-                environment=resolved.environment,
-                dry_run=False,
-            )
-            return
-        except SystemExit:
-            raise
-        except Exception:
-            console.print_exception()
-            sys.exit(1)
-
-    # CLI mode: use full parser that includes the dry-run flag
+    # Parse CLI arguments - all arguments are required now
     parsed = parse_all_args()
-
-    aws_profile = os.getenv("AWS_PROFILE")
 
     deploy_application(
         config=parsed.config,
-        artifact_root=parsed.artifact_root,
+        relative_artifact_dir=parsed.relative_artifact_dir,
         sandbox_prefix=parsed.sandbox_prefix,
-        aws_profile=aws_profile,
+        aws_profile=parsed.aws_profile,
         environment=parsed.environment,
         dry_run=parsed.dry_run,
     )

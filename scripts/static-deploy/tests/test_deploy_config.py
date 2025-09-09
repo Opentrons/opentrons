@@ -1,6 +1,5 @@
 """Tests for deploy_config module."""
 
-import os
 from unittest.mock import patch
 
 import pytest
@@ -12,7 +11,6 @@ from deploy_config import (
     determine_deploy_config_from_args,
     get_config,
     main,
-    parse_ci_event_args,
     parse_cli_event_args,
     parse_github_event_context,
 )
@@ -346,21 +344,3 @@ def test_determine_deploy_config_from_args_sandbox_branch_url_suffix():
     assert cfg.sandbox_prefix == "edge"
     assert cfg.bucket == "opentrons.sandbox.labware"
     assert cfg.url == "http://opentrons.sandbox.labware.s3-website.us-east-2.amazonaws.com/edge/"
-
-
-def test_parse_ci_event_args_reads_env_and_infers_type():
-    """CI parser should read env vars and infer ref_type from ref."""
-    env = {
-        "GITHUB_EVENT_NAME": "push",
-        "GITHUB_REF": "refs/heads/edge",
-        "GITHUB_REF_NAME": "edge",
-        # no GITHUB_HEAD_REF
-    }
-    with patch.dict(os.environ, env, clear=False):
-        event = parse_ci_event_args()
-
-    assert event.event_name == "push"
-    assert event.ref == "refs/heads/edge"
-    assert event.ref_name == "edge"
-    assert event.ref_type == "branch"
-    assert event.head_ref is None
