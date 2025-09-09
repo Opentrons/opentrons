@@ -29,19 +29,19 @@ async def test_run_extended_profile(
     subject = RunExtendedProfileImpl(state_view=state_view, equipment=equipment)
 
     step_data: List[Union[ProfileStep, ProfileCycle]] = [
-        ProfileStep(celsius=12.3, holdSeconds=45),
+        ProfileStep(celsius=12.3, holdSeconds=45, rampRate=0.0),
         ProfileCycle(
             steps=[
-                ProfileStep(celsius=78.9, holdSeconds=910),
-                ProfileStep(celsius=12, holdSeconds=1),
+                ProfileStep(celsius=78.9, holdSeconds=910, rampRate=2.0),
+                ProfileStep(celsius=12, holdSeconds=1, rampRate=0.0),
             ],
             repetitions=2,
         ),
-        ProfileStep(celsius=45.6, holdSeconds=78),
+        ProfileStep(celsius=45.6, holdSeconds=78, rampRate=2.0),
         ProfileCycle(
             steps=[
-                ProfileStep(celsius=56, holdSeconds=11),
-                ProfileStep(celsius=34, holdSeconds=10),
+                ProfileStep(celsius=56, holdSeconds=11, rampRate=0.0),
+                ProfileStep(celsius=34, holdSeconds=10, rampRate=2.0),
             ],
             repetitions=1,
         ),

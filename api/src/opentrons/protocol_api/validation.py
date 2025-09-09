@@ -489,6 +489,7 @@ def ensure_thermocycler_profile_steps(
         temperature = step.get("temperature")
         hold_mins = step.get("hold_time_minutes")
         hold_secs = step.get("hold_time_seconds")
+        ramp_rate = step.get("ramp_rate")
         if temperature is None:
             raise ValueError("temperature must be defined for each step in cycle")
         if hold_mins is None and hold_secs is None:
@@ -496,10 +497,16 @@ def ensure_thermocycler_profile_steps(
                 "either hold_time_minutes or hold_time_seconds must be"
                 "defined for each step in cycle"
             )
+        if ramp_rate is None:
+            validated_ramp_rate = 0.0
+        else:
+            validated_ramp_rate = ramp_rate
         validated_seconds = ensure_hold_time_seconds(hold_secs, hold_mins)
         validated_steps.append(
             ThermocyclerStep(
-                temperature=temperature, hold_time_seconds=validated_seconds
+                temperature=temperature,
+                hold_time_seconds=validated_seconds,
+                ramp_rate=validated_ramp_rate,
             )
         )
     return validated_steps

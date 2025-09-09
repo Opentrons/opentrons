@@ -33,6 +33,9 @@ class ProfileStep(BaseModel):
     holdSeconds: float = Field(
         ..., description="Time to hold target temperature in seconds."
     )
+    rampRate: float = Field(
+        ..., description="How quickly to change temperature in °C/second."
+    )
 
 
 class ProfileCycle(BaseModel):

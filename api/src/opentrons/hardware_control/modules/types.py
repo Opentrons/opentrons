@@ -44,6 +44,7 @@ class ThermocyclerStepBase(TypedDict):
 class ThermocyclerStep(ThermocyclerStepBase, total=False):
     hold_time_seconds: float
     hold_time_minutes: float
+    ramp_rate: float
 
 
 class ThermocyclerCycle(TypedDict):

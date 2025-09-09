@@ -25,8 +25,8 @@ async def test_run_profile(
     subject = RunProfileImpl(state_view=state_view, equipment=equipment)
 
     step_data = [
-        tc_commands.RunProfileStepParams(celsius=12.3, holdSeconds=45),
-        tc_commands.RunProfileStepParams(celsius=45.6, holdSeconds=78),
+        tc_commands.RunProfileStepParams(celsius=12.3, holdSeconds=45, rampRate=0.0),
+        tc_commands.RunProfileStepParams(celsius=45.6, holdSeconds=78, rampRate=0.0),
     ]
     data = tc_commands.RunProfileParams(
         moduleId="input-thermocycler-id",
