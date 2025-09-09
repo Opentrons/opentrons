@@ -11,7 +11,9 @@ The Opentrons Flex® Stacker is an external module that provides automated, high
 
 ## Stacker features
 
-### 
+### Supported Stackers
+
+You can attach up to four Stackers on a single Flex.
 
 ### Supported Labware
 
