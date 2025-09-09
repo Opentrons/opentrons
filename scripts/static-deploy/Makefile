@@ -1,13 +1,10 @@
-.PHONY: setup teardown install format lint test deploy resolve-ci deploy-ci
+.PHONY: setup teardown install format lint test deploy resolve-ci deploy
 
 setup:
 	uv sync --frozen
 
 teardown:
 	rm -rf .venv
-
-install:
-	uv install
 
 format:
 	uv run ruff format
