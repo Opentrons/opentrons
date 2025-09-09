@@ -30,8 +30,10 @@ class RunProfileStepParams(BaseModel):
     holdSeconds: float = Field(
         ..., description="Time to hold target temperature at in seconds."
     )
-    rampRate: float = Field(
-        ..., description="How quickly to change temperature in °C/second."
+    rampRate: float | SkipJsonSchema[None] = Field(
+        ...,
+        description="How quickly to change temperature in °C/second.",
+        json_schema_extra=_remove_default,
     )
 
 

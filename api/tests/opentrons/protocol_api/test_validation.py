@@ -405,7 +405,7 @@ def test_ensure_thermocycler_repetition_count_raises(repetitions: int) -> None:
                     "hold_time_seconds": 45.6,
                 }
             ],
-            [{"temperature": 42.0, "hold_time_seconds": 783.6, "ramp_rate": 0.0}],
+            [{"temperature": 42.0, "hold_time_seconds": 783.6, "ramp_rate": None}],
         ),
         (
             [{"temperature": 42.0, "hold_time_seconds": 45.6, "ramp_rate": 1.0}],
@@ -413,7 +413,7 @@ def test_ensure_thermocycler_repetition_count_raises(repetitions: int) -> None:
         ),
         (
             [{"temperature": 42.0, "hold_time_minutes": 12.3}],
-            [{"temperature": 42.0, "hold_time_seconds": 738.0, "ramp_rate": 0.0}],
+            [{"temperature": 42.0, "hold_time_seconds": 738.0, "ramp_rate": None}],
         ),
         (
             [
@@ -421,8 +421,8 @@ def test_ensure_thermocycler_repetition_count_raises(repetitions: int) -> None:
                 {"temperature": 52.0, "hold_time_minutes": 12.3},
             ],
             [
-                {"temperature": 42.0, "hold_time_seconds": 12.3, "ramp_rate": 0.0},
-                {"temperature": 52.0, "hold_time_seconds": 738.0, "ramp_rate": 0.0},
+                {"temperature": 42.0, "hold_time_seconds": 12.3, "ramp_rate": None},
+                {"temperature": 52.0, "hold_time_seconds": 738.0, "ramp_rate": None},
             ],
         ),
         ([], []),

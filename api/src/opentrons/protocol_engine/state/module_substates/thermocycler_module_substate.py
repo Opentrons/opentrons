@@ -148,7 +148,9 @@ class ThermocyclerModuleSubState:
             )
         return target
 
-    def validate_ramp_rate(self, ramp_rate: float, target_temp: float) -> float:
+    def validate_ramp_rate(
+        self, ramp_rate: Optional[float], target_temp: float
+    ) -> Optional[float]:
         """Validate a given temperature ramp rate.
 
         Args:
@@ -161,6 +163,9 @@ class ThermocyclerModuleSubState:
         Returns:
             The validated ramp rate in °C/second
         """
+        if ramp_rate is None:
+            return ramp_rate
+
         heating = target_temp > self.get_target_block_temperature()
         if (heating and ramp_rate > MAX_HEATING_RATE) or (
             not heating and ramp_rate > MAX_COOLING_RATE
@@ -168,6 +173,10 @@ class ThermocyclerModuleSubState:
             raise InvalidRampRateError(
                 f"Thermocycler ramp rate cannot exceed {MAX_HEATING_RATE}°C/s"
                 f" while heating or {MAX_COOLING_RATE}°C/s when cooling."
+            )
+        if ramp_rate <= 0:
+            raise InvalidRampRateError(
+                f"Thermocycler ramp rate cannot be less than or equalt to 0, got {ramp_rate}"
             )
         return ramp_rate
 
