@@ -9,9 +9,9 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { stepIconsByType } from '../../../../form-types'
+import { stepIconsByType } from '/protocol-designer/form-types'
 
-import type { StepType } from '../../../../form-types'
+import type { StepType } from '/protocol-designer/form-types'
 
 export interface AddStepOverflowButtonProps {
   onClick: () => void

@@ -98,6 +98,7 @@ export const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
     'opentrons_96_flat_bottom_adapter',
     'opentrons_96_pcr_adapter',
     'opentrons_universal_flat_adapter',
+    'opentrons_universal_flat_adapter_type_b',
   ],
   [MAGNETIC_BLOCK_TYPE]: [
     'nest_96_wellplate_100ul_pcr_full_skirt',

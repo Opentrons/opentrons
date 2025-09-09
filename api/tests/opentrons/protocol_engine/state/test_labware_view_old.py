@@ -17,7 +17,6 @@ from opentrons_shared_data.labware.labware_definition import (
     AxisAlignedBoundingBox3D,
     Dimensions as LabwareDimensions,
     Extents,
-    GripperOffsets,
     labware_definition_type_adapter,
     LabwareDefinition,
     LabwareDefinition2,
@@ -42,7 +41,6 @@ from opentrons.protocol_engine.types import (
     OnLabwareLocation,
     LabwareLocation,
     OFF_DECK_LOCATION,
-    LabwareMovementOffsetData,
     OnAddressableAreaOffsetLocationSequenceComponent,
     OnModuleOffsetLocationSequenceComponent,
 )
@@ -203,7 +201,7 @@ def test_get_id_by_labware() -> None:
 
 
 def test_get_id_by_labware_raises_error() -> None:
-    """Should raise error that labware not found."""
+    """Should raise an error that labware not found."""
     subject = get_labware_view(
         labware_by_id={
             "labware-id": LoadedLabware(
@@ -211,11 +209,12 @@ def test_get_id_by_labware_raises_error() -> None:
                 loadName="test",
                 definitionUri="test-uri",
                 location=OnLabwareLocation(labwareId="other-labware-id"),
-            )
-        }
+                displayName="The Labware",
+            ),
+        },
     )
     with pytest.raises(errors.exceptions.LabwareNotLoadedOnLabwareError):
-        subject.get_id_by_labware(labware_id="no-labware-id")
+        subject.get_id_by_labware(labware_id="labware-id")
 
 
 def test_raise_if_labware_has_non_lid_labware_on_top() -> None:
@@ -227,6 +226,7 @@ def test_raise_if_labware_has_non_lid_labware_on_top() -> None:
                 loadName="test",
                 definitionUri="test-uri",
                 location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+                displayName="lorem",
             ),
             "bottom-labware-2": LoadedLabware(
                 id="bottom-labware-2",
@@ -234,24 +234,28 @@ def test_raise_if_labware_has_non_lid_labware_on_top() -> None:
                 definitionUri="test-uri",
                 location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
                 lid_id="lid-labware-a",
+                displayName="ipsum",
             ),
             "bottom-labware-3": LoadedLabware(
                 id="bottom-labware-3",
                 loadName="test",
                 definitionUri="test-uri",
                 location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+                displayName="dolor",
             ),
             "lid-labware-a": LoadedLabware(
                 id="lid-labware-a",
                 loadName="lid",
                 definitionUri="lid-uri",
                 location=OnLabwareLocation(labwareId="bottom-labware-2"),
+                displayName="sit",
             ),
             "top-labware-b": LoadedLabware(
                 id="top-labware-b",
                 loadName="test",
                 definitionUri="test-uri",
                 location=OnLabwareLocation(labwareId="bottom-labware-3"),
+                displayName="amet",
             ),
         }
     )
@@ -272,6 +276,7 @@ def test_raise_if_labware_has_labware_on_top() -> None:
                 loadName="test",
                 definitionUri="test-uri",
                 location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+                displayName="lorem",
             ),
             "bottom-labware-2": LoadedLabware(
                 id="bottom-labware-2",
@@ -279,24 +284,28 @@ def test_raise_if_labware_has_labware_on_top() -> None:
                 definitionUri="test-uri",
                 location=ModuleLocation(moduleId="module-id"),
                 lid_id="lid-labware-a",
+                displayName="ipsum",
             ),
             "bottom-labware-3": LoadedLabware(
                 id="bottom-labware-3",
                 loadName="test",
                 definitionUri="test-uri",
                 location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+                displayName="dolor",
             ),
             "lid-labware-a": LoadedLabware(
                 id="lid-labware-a",
                 loadName="test-lid",
                 definitionUri="lid-uri",
                 location=OnLabwareLocation(labwareId="bottom-labware-2"),
+                displayName="sit",
             ),
             "top-labware-b": LoadedLabware(
                 id="top-labware-b",
                 loadName="test",
                 definitionUri="test-uri",
                 location=OnLabwareLocation(labwareId="bottom-labware-3"),
+                displayName="amet",
             ),
         }
     )
@@ -618,12 +627,14 @@ def test_validate_liquid_allowed_raises_incompatible_labware() -> None:
                 loadName="test1",
                 definitionUri="some-tiprack-uri",
                 location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+                displayName="Tip Rack",
             ),
             "adapter-id": LoadedLabware(
                 id="adapter-id",
                 loadName="test2",
                 definitionUri="some-adapter-uri",
                 location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
+                displayName="Some adapter",
             ),
         },
         definitions_by_uri={
@@ -1711,83 +1722,6 @@ def test_labware_stacking_height_passes_or_raises(
             ),
             bottom_labware_id="labware-id4",
         )
-
-
-def test_get_deck_gripper_offsets(ot3_standard_deck_def: DeckDefinitionV5) -> None:
-    """It should get the deck's gripper offsets."""
-    subject = get_labware_view(deck_definition=ot3_standard_deck_def)
-
-    assert subject.get_deck_default_gripper_offsets() == LabwareMovementOffsetData(
-        pickUpOffset=LabwareOffsetVector(x=0, y=0, z=0),
-        dropOffset=LabwareOffsetVector(x=0, y=0, z=-0.75),
-    )
-
-
-def test_get_labware_gripper_offsets(
-    well_plate_def: LabwareDefinition,
-    adapter_plate_def: LabwareDefinition,
-) -> None:
-    """It should get the labware's gripper offsets."""
-    subject = get_labware_view(
-        labware_by_id={"plate-id": plate, "adapter-plate-id": adapter_plate},
-        definitions_by_uri={
-            "some-plate-uri": well_plate_def,
-            "some-adapter-uri": adapter_plate_def,
-        },
-    )
-
-    assert (
-        subject.get_child_gripper_offsets(labware_id="plate-id", slot_name=None) is None
-    )
-    assert subject.get_child_gripper_offsets(
-        labware_id="adapter-plate-id", slot_name=DeckSlotName.SLOT_D1
-    ) == LabwareMovementOffsetData(
-        pickUpOffset=LabwareOffsetVector(x=0, y=0, z=0),
-        dropOffset=LabwareOffsetVector(x=2, y=0, z=0),
-    )
-
-
-def test_get_labware_gripper_offsets_default_no_slots(
-    well_plate_def: LabwareDefinition,
-    adapter_plate_def: LabwareDefinition,
-) -> None:
-    """It should get the labware's gripper offsets with only a default gripper offset entry."""
-    subject = get_labware_view(
-        labware_by_id={
-            "labware-id": LoadedLabware(
-                id="labware-id",
-                loadName="labware-load-name",
-                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-                definitionUri="some-labware-uri",
-                offsetId=None,
-                displayName="Fancy Labware Name",
-            )
-        },
-        definitions_by_uri={
-            "some-labware-uri": LabwareDefinition2.model_construct(  # type: ignore[call-arg]
-                gripperOffsets={
-                    "default": GripperOffsets(
-                        pickUpOffset=Vector3D(x=1, y=2, z=3),
-                        dropOffset=Vector3D(x=4, y=5, z=6),
-                    )
-                }
-            ),
-        },
-    )
-
-    assert (
-        subject.get_child_gripper_offsets(
-            labware_id="labware-id", slot_name=DeckSlotName.SLOT_D1
-        )
-        is None
-    )
-
-    assert subject.get_child_gripper_offsets(
-        labware_id="labware-id", slot_name=None
-    ) == LabwareMovementOffsetData(
-        pickUpOffset=LabwareOffsetVector(x=1, y=2, z=3),
-        dropOffset=LabwareOffsetVector(x=4, y=5, z=6),
-    )
 
 
 def test_get_grip_force(

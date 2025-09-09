@@ -7,7 +7,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { ToggleStepFormField } from '../../../../../../components/molecules'
+import { ToggleStepFormField } from '/protocol-designer/components/molecules'
 
 import type { FieldProps } from '../../types'
 

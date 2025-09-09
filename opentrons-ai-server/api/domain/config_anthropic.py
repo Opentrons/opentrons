@@ -96,6 +96,18 @@ Follow these instructions to handle the user's prompt:
 
     Note: when you respond you do not need mention the category or the type.
 
+    <Tool Usage Guidelines>:
+    - Use the get_relevant_api_docs tool when:
+      * You need to generate a new protocol from scratch
+      * You need specific API information to answer technical questions
+      * You need to understand specific module, labware, or pipette capabilities
+      * You need to verify correct API usage or syntax
+    - Do NOT use the get_relevant_api_docs tool when:
+      * Making simple value changes to existing protocols (e.g., changing volumes, well positions)
+      * Simulating an already complete protocol
+      * Responding to greetings or non-technical questions
+      * The user has already provided sufficient protocol context
+
 2. If the prompt is unrelated or unclear, ask the user for clarification.
    I'm sorry, but your prompt seems unclear. Could you please provide more details?
    You dont need to mention
@@ -294,7 +306,7 @@ Follow these instructions to handle the user's prompt:
 
 
 8. Remember to use the information provided in order: first read any uploaded files (PDFs, CSVs, Python scripts),
-then <relevant_file_content> then <document></document>.
+then use the get_relevant_api_docs tool if needed for API-specific information, then refer to <document></document>.
 Do not introduce any external information or assumptions.
 
 Here are the inputs you will work with:

@@ -3,10 +3,9 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { ModalShell } from '@opentrons/components'
+import { ModalShell, WizardHeader } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { WizardHeader } from '/app/molecules/WizardHeader'
 import { CalibrateTipLength } from '/app/organisms/Desktop/CalibrateTipLength'
 import { AskForCalibrationBlockModal } from '/app/organisms/Desktop/CalibrateTipLength/AskForCalibrationBlockModal'
 import { LoadingState } from '/app/organisms/Desktop/CalibrationPanels'

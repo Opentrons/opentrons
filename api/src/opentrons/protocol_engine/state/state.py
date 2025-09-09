@@ -34,6 +34,7 @@ from .files import FileView, FileState, FileStore
 from .config import Config
 from .state_summary import StateSummary
 from ..types import DeckConfigurationType
+from .tasks import TaskState, TaskView, TaskStore
 
 
 _ParamsT = ParamSpec("_ParamsT")
@@ -54,6 +55,7 @@ class State:
     tips: TipState
     wells: WellState
     files: FileState
+    tasks: TaskState
 
 
 class StateView(HasState[State]):
@@ -73,6 +75,7 @@ class StateView(HasState[State]):
     _motion: MotionView
     _files: FileView
     _config: Config
+    _tasks: TaskView
 
     @property
     def commands(self) -> CommandView:
@@ -139,6 +142,11 @@ class StateView(HasState[State]):
         """Get ProtocolEngine configuration."""
         return self._config
 
+    @property
+    def tasks(self) -> TaskView:
+        """Get state view selectors for task state."""
+        return self._tasks
+
     def get_summary(self) -> StateSummary:
         """Get protocol run data."""
         error = self._commands.get_error()
@@ -162,6 +170,7 @@ class StateView(HasState[State]):
                 )
                 for liquid_class_id, liquid_class_record in self._liquid_classes.get_all().items()
             ],
+            tasks=self._tasks.get_summary(),
         )
 
 
@@ -231,6 +240,7 @@ class StateStore(StateView, ActionHandler):
         self._tip_store = TipStore()
         self._well_store = WellStore()
         self._file_store = FileStore()
+        self._task_store = TaskStore()
 
         self._substores: List[HandlesActions] = [
             self._command_store,
@@ -243,6 +253,7 @@ class StateStore(StateView, ActionHandler):
             self._tip_store,
             self._well_store,
             self._file_store,
+            self._task_store,
         ]
         self._config = config
         self._change_notifier = change_notifier or ChangeNotifier()
@@ -366,6 +377,7 @@ class StateStore(StateView, ActionHandler):
             tips=self._tip_store.state,
             wells=self._well_store.state,
             files=self._file_store.state,
+            tasks=self._task_store.state,
         )
 
     def _initialize_state(self) -> None:
@@ -384,6 +396,7 @@ class StateStore(StateView, ActionHandler):
         self._tips = TipView(state.tips)
         self._wells = WellView(state.wells)
         self._files = FileView(state.files)
+        self._tasks = TaskView(state.tasks)
 
         # Derived states
         self._geometry = GeometryView(
@@ -416,6 +429,7 @@ class StateStore(StateView, ActionHandler):
         self._liquid_classes._state = next_state.liquid_classes
         self._tips._state = next_state.tips
         self._wells._state = next_state.wells
+        self._tasks._state = next_state.tasks
         self._change_notifier.notify()
         if self._notify_robot_server is not None:
             self._notify_robot_server()

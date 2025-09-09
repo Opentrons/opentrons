@@ -32,7 +32,8 @@ import {
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
 
-import { editDeckConfiguration } from '../../../step-forms/actions'
+import { editDeckConfiguration } from '/protocol-designer/step-forms/actions'
+
 import { AddFixtureModal } from './AddFixtureModal'
 
 import type { ReactNode } from 'react'
@@ -45,7 +46,7 @@ import type {
   DeckDefinition,
   ModuleModel,
 } from '@opentrons/shared-data'
-import type { FormModules } from '../../../step-forms'
+import type { FormModules } from '/protocol-designer/step-forms'
 import type { Fixtures, WizardFormState } from '../types'
 import type {
   CutoutConfigExtended,

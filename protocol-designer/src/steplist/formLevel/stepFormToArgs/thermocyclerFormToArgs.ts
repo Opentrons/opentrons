@@ -51,7 +51,7 @@ const _flattenProfileSteps = (args: {
 export const thermocyclerFormToArgs = (
   formData: HydratedThermocyclerFormData
 ): ThermocyclerProfileStepArgs | ThermocyclerStateStepArgs | null => {
-  const { thermocyclerFormType } = formData
+  const { thermocyclerFormType, stepDetails } = formData
 
   switch (thermocyclerFormType) {
     case THERMOCYCLER_STATE: {
@@ -96,6 +96,7 @@ export const thermocyclerFormToArgs = (
         profileSteps,
         profileTargetLidTemp: Number(formData.profileTargetLidTemp),
         profileVolume: Number(formData.profileVolume),
+        description: stepDetails,
       }
     }
   }

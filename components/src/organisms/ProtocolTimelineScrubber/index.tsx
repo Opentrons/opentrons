@@ -195,7 +195,8 @@ export function ProtocolTimelineScrubber(
               return {
                 moduleModel: invariantContext.moduleEntities[moduleId].model,
                 moduleLocation: { slotName: module.slot },
-                nestedLabwareDef: topLabwareEntity?.def,
+                nestedLabwareDefsBottomToTop:
+                  topLabwareEntity != null ? [topLabwareEntity.def] : [],
                 nestedLabwareWellFill: nestedFill,
                 innerProps: getModuleInnerProps(module.moduleState),
               }

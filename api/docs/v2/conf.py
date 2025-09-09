@@ -99,7 +99,7 @@ extensions += ['sphinx-prompt', 'sphinx_substitution_extensions']
 # use rst_prolog to hold the subsitution
 # update the apiLevel value whenever a new minor version is released
 rst_prolog = f"""
-.. |apiLevel| replace:: 2.24
+.. |apiLevel| replace:: 2.25
 .. |release| replace:: {release}
 """
 
@@ -449,7 +449,7 @@ nitpick_ignore_regex = [
     ("py:class", r".*(String)?Axis(Map|Type)*"),
     ("py:class", r".*protocol_api._types.PlungerPositionTypes*"),
     ("py:class", r".*protocol_api._types.PipetteActionTypes*"),
-    ("py:class", r".*opentrons.protocol_api.module_contexts.ModuleContext*"),
+    ("py:class", r".*protocol_api.module_contexts.ModuleContext*"),
     (
         "py:class",
         r".*AbstractLabware|APIVersion|LabwareLike|LoadedCoreMap|ModuleTypes|NoneType|OffDeckType|ProtocolCore|WellCore",

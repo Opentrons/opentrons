@@ -57,6 +57,7 @@ from .exceptions import (
     InvalidTargetSpeedError,
     InvalidTargetTemperatureError,
     InvalidBlockVolumeError,
+    InvalidRampRateError,
     InvalidHoldTimeError,
     InvalidWavelengthError,
     CannotPerformModuleAction,
@@ -90,6 +91,7 @@ from .exceptions import (
     FlexStackerLabwarePoolNotYetDefinedError,
     FlexStackerNotLogicallyEmptyError,
     InvalidLabwarePositionError,
+    InvalidModuleOrientation,
 )
 
 from .error_occurrence import ErrorOccurrence, ProtocolCommandFailedError
@@ -151,6 +153,7 @@ __all__ = [
     "NoTargetTemperatureSetError",
     "InvalidTargetTemperatureError",
     "InvalidTargetSpeedError",
+    "InvalidRampRateError",
     "InvalidBlockVolumeError",
     "InvalidHoldTimeError",
     "InvalidLiquidError",
@@ -174,6 +177,7 @@ __all__ = [
     "FlexStackerLabwarePoolNotYetDefinedError",
     "FlexStackerNotLogicallyEmptyError",
     "InvalidLabwarePositionError",
+    "InvalidModuleOrientation",
     # error occurrence models
     "ErrorOccurrence",
     "CommandNotAllowedError",

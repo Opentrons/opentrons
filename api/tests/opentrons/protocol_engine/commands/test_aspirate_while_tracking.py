@@ -161,6 +161,7 @@ async def test_aspirate_while_tracking_implementation(
             minimum_z_height=None,
             speed=None,
             operation_volume=-123,
+            offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_return(Point(x=4, y=5, z=6))
 
@@ -299,6 +300,7 @@ async def test_aspirate_raises_volume_error(
             minimum_z_height=None,
             speed=None,
             operation_volume=-50,
+            offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_return(Point(x=4, y=5, z=6))
 
@@ -403,6 +405,7 @@ async def test_overpressure_error(
             minimum_z_height=None,
             speed=None,
             operation_volume=-50,
+            offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_return(Point(x=4, y=5, z=6))
 

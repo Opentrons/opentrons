@@ -4,15 +4,16 @@ import { useSelector } from 'react-redux'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import { getTopLocationInStack } from '@opentrons/step-generation'
 
-import { getLiquidEntities } from '../../../step-forms/selectors'
-import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
-import * as wellContentsSelectors from '../../../top-selectors/well-contents'
-import { selectors as uiLabwareSelectors } from '../../../ui/labware'
-import { getFullStackFromLabwaresOnDeck } from '../../../utils'
+import { getLiquidEntities } from '/protocol-designer/step-forms/selectors'
+import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
+import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
+import { selectors as uiLabwareSelectors } from '/protocol-designer/ui/labware'
+import { getFullStackFromLabwaresOnDeck } from '/protocol-designer/utils'
+
 import { SlotInformation } from '../SlotInformation'
 
 import type { DeckSlotId, RobotType } from '@opentrons/shared-data'
-import type { ContentsByWell } from '../../../labware-ingred/types'
+import type { ContentsByWell } from '/protocol-designer/labware-ingred/types'
 
 interface SlotDetailContainerProps {
   robotType: RobotType

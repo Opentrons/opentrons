@@ -48,7 +48,7 @@ export interface DropdownOption {
 
 export type DropdownBorder = 'rounded' | 'neutral'
 
-type MenuPlacement = 'auto' | 'top' | 'bottom'
+export type MenuPlacement = 'auto' | 'top' | 'bottom'
 
 export interface DropdownMenuProps {
   /** dropdown options */

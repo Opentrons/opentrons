@@ -31,7 +31,7 @@ import { DeckFromLayers } from '../Deck/DeckFromLayers'
 import { FlexTrash } from '../Deck/FlexTrash'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import { LabwareRender } from '../Labware'
-import { Module } from '../Module'
+import { AlignLabwareToModule, Module } from '../Module'
 import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
 import { SingleSlotFixture } from './SingleSlotFixture'
 import { StagingAreaFixture } from './StagingAreaFixture'
@@ -57,7 +57,11 @@ export interface LabwareOnDeck {
   definition: LabwareDefinition
   wellFill?: WellFill
   missingTips?: WellGroup
-  /** generic prop to render self-positioned children for each labware */
+  /**
+   * Additional children to render alongside this labware.
+   * The SVG origin of these children is the front-left (-x,-y) corner of
+   * the slot that the labware is in.
+   */
   labwareChildren?: ReactNode
   onLabwareClick?: () => void
   highlight?: boolean
@@ -68,10 +72,14 @@ export interface LabwareOnDeck {
 export interface ModuleOnDeck {
   moduleModel: ModuleModel
   moduleLocation: ModuleLocation
-  nestedLabwareDef?: LabwareDefinition | null
+  nestedLabwareDefsBottomToTop: LabwareDefinition[]
   nestedLabwareWellFill?: WellFill
   innerProps?: ComponentProps<typeof Module>['innerProps']
-  /** generic prop to render self-positioned children for each module */
+  /**
+   * Additional children to render atop this module, after `nestedLabwareDef`.
+   * The SVG origin of these children is the front-left (-x,-y) corner of the slot that
+   * the module is in.
+   */
   moduleChildren?: ReactNode
   onLabwareClick?: () => void
   highlightLabware?: boolean
@@ -296,7 +304,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
           ({
             moduleModel,
             moduleLocation,
-            nestedLabwareDef,
+            nestedLabwareDefsBottomToTop,
             nestedLabwareWellFill,
             innerProps,
             moduleChildren,
@@ -320,7 +328,10 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                   fixtureBaseColor={lightFill}
                 />
                 {wasteChuteStackerFixtures.map(fixture => {
-                  if (fixture.cutoutId === WASTE_CHUTE_CUTOUT) {
+                  if (
+                    fixture.cutoutId === WASTE_CHUTE_CUTOUT &&
+                    moduleLocation.slotName === 'D3'
+                  ) {
                     return (
                       <WasteChuteFixture
                         key={fixture.cutoutId}
@@ -343,27 +354,47 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                   innerProps={innerProps}
                   targetDeckId={deckDef.otId}
                   targetSlotId={moduleLocation.slotName}
-                  childrenPositioningMode="offsetToSlot"
+                  childrenPositioningMode="passThrough"
                 >
-                  {nestedLabwareDef != null ? (
-                    <g
-                      cursor={onLabwareClick != null ? 'pointer' : ''}
-                      transform={`translate(${STACKER_HOPPER_LABWARE_X_OFFSET}, 0)`}
+                  {/* TODO(ja, 8.27.25): create a <AlignLabwareToLabware/> component to align the lid
+                      to the labware. We want to make something like this:
+                      <Module ...>
+                      <AlignLabwareToModule ...> <!-- Align 1st labware to module. -->
+                      <AlignLabwareToLabware ...> <!-- Align 2nd labware to 1st labware. This doesn't exist yet. -->
+                      <LabwareRender ... /> <!-- Render 2nd labware. -->
+                      </AlignLabwareToLabware>
+                      </AlignLabwareToModule>
+                      </Module ...>
+                      */}
+                  {nestedLabwareDefsBottomToTop.length > 0 ? (
+                    <AlignLabwareToModule
+                      // todo(mm, 2025-07-16): Investigate whether <AlignLabwareToModule> is correct to use
+                      // in the face of STACKER_HOPPER_LABWARE_X_OFFSET.
+                      deckId={deckDef.otId}
+                      slotId={moduleLocation.slotName}
+                      moduleDefinition={moduleDef}
+                      labwareDefinition={nestedLabwareDefsBottomToTop[0]}
                     >
-                      <LabwareRender
-                        definition={nestedLabwareDef}
-                        positioningMode="offsetInSlot"
-                        onLabwareClick={onLabwareClick}
-                        wellFill={nestedLabwareWellFill}
-                        shouldRotateAdapterOrientation={
-                          inferModuleOrientationFromXCoordinate(
-                            slotPosition[0]
-                          ) === 'left' && moduleModel === HEATERSHAKER_MODULE_V1
-                        }
-                        highlight={highlightLabware}
-                        highlightShadow={highlightShadowLabware}
-                      />
-                    </g>
+                      <g
+                        cursor={onLabwareClick != null ? 'pointer' : ''}
+                        transform={`translate(${STACKER_HOPPER_LABWARE_X_OFFSET}, 0)`}
+                      >
+                        <LabwareRender
+                          definition={nestedLabwareDefsBottomToTop[0]}
+                          positioningMode="passThrough"
+                          onLabwareClick={onLabwareClick}
+                          wellFill={nestedLabwareWellFill}
+                          shouldRotateAdapterOrientation={
+                            inferModuleOrientationFromXCoordinate(
+                              slotPosition[0]
+                            ) === 'left' &&
+                            moduleModel === HEATERSHAKER_MODULE_V1
+                          }
+                          highlight={highlightLabware}
+                          highlightShadow={highlightShadowLabware}
+                        />
+                      </g>
+                    </AlignLabwareToModule>
                   ) : null}
                   {moduleChildren}
                 </Module>
@@ -376,7 +407,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
           ({
             moduleModel,
             moduleLocation,
-            nestedLabwareDef,
+            nestedLabwareDefsBottomToTop,
             nestedLabwareWellFill,
             innerProps,
             moduleChildren,
@@ -401,24 +432,37 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                 innerProps={innerProps}
                 targetDeckId={deckDef.otId}
                 targetSlotId={moduleLocation.slotName}
-                childrenPositioningMode="offsetToSlot"
+                childrenPositioningMode="passThrough"
               >
-                {nestedLabwareDef != null ? (
-                  <g cursor={onLabwareClick != null ? 'pointer' : ''}>
-                    <LabwareRender
-                      definition={nestedLabwareDef}
-                      positioningMode="offsetInSlot"
-                      onLabwareClick={onLabwareClick}
-                      wellFill={nestedLabwareWellFill}
-                      shouldRotateAdapterOrientation={
-                        inferModuleOrientationFromXCoordinate(
-                          slotPosition[0]
-                        ) === 'left' && moduleModel === HEATERSHAKER_MODULE_V1
-                      }
-                      highlight={highlightLabware}
-                      highlightShadow={highlightShadowLabware}
-                    />
-                  </g>
+                {nestedLabwareDefsBottomToTop.length > 0 ? (
+                  <AlignLabwareToModule
+                    deckId={deckDef.otId}
+                    slotId={moduleLocation.slotName}
+                    moduleDefinition={moduleDef}
+                    labwareDefinition={nestedLabwareDefsBottomToTop[0]}
+                  >
+                    <g cursor={onLabwareClick != null ? 'pointer' : ''}>
+                      {nestedLabwareDefsBottomToTop.map((def, index) => (
+                        <LabwareRender
+                          key={`${index}_${def.parameters.loadName}`}
+                          definition={def}
+                          positioningMode="passThrough"
+                          onLabwareClick={onLabwareClick}
+                          wellFill={
+                            index === 0 ? nestedLabwareWellFill : undefined
+                          }
+                          shouldRotateAdapterOrientation={
+                            inferModuleOrientationFromXCoordinate(
+                              slotPosition[0]
+                            ) === 'left' &&
+                            moduleModel === HEATERSHAKER_MODULE_V1
+                          }
+                          highlight={highlightLabware}
+                          highlightShadow={highlightShadowLabware}
+                        />
+                      ))}
+                    </g>
+                  </AlignLabwareToModule>
                 ) : null}
                 {moduleChildren}
               </Module>

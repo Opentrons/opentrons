@@ -156,6 +156,7 @@ const ICON_STYLE = (
 ): FlattenSimpleInterpolation => css`
   width: ${chipSize === 'medium' ? '1rem' : smallSize};
   height: ${chipSize === 'medium' ? '1rem' : smallSize};
+  flex-shrink: 0;
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     width: ${chipSize === 'medium' ? '1.5rem' : '1.25rem'};

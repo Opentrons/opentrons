@@ -55,7 +55,6 @@ from ..types import (
     LoadedLabware,
     ModuleLocation,
     OverlapOffset,
-    LabwareMovementOffsetData,
     OnDeckLabwareLocation,
     OFF_DECK_LOCATION,
 )
@@ -400,7 +399,7 @@ class LabwareView:
             return self._state.labware_by_id[labware_id]
         except KeyError as e:
             raise errors.LabwareNotLoadedError(
-                f"Labware {labware_id} not found."
+                f"Labware with id {labware_id} not found."
             ) from e
 
     def known(self, labware_id: str) -> bool:
@@ -429,7 +428,7 @@ class LabwareView:
             ):
                 return labware.id
         raise errors.exceptions.LabwareNotLoadedOnLabwareError(
-            f"There is not labware loaded onto labware {labware_id}"
+            f"There is not labware loaded onto labware {self.get_display_name(labware_id)}"
         )
 
     def raise_if_labware_has_non_lid_labware_on_top(self, labware_id: str) -> None:
@@ -442,7 +441,8 @@ class LabwareView:
                 and candidate_id != lid_id
             ):
                 raise errors.LabwareIsInStackError(
-                    f"Cannot access labware {labware_id} because it has a non-lid labware stacked on top."
+                    f"Cannot access labware {self.get_display_name(labware_id)} because it has"
+                    " a non-lid labware stacked on top."
                 )
 
     def raise_if_labware_has_labware_on_top(self, labware_id: str) -> None:
@@ -453,7 +453,8 @@ class LabwareView:
                 and labware.location.labwareId == labware_id
             ):
                 raise errors.LabwareIsInStackError(
-                    f"Cannot access labware {labware_id} because it has another labware stacked on top."
+                    f"Cannot access labware {self.get_display_name(labware_id)} because it has"
+                    " another labware stacked on top."
                 )
 
     def get_by_slot(
@@ -662,6 +663,14 @@ class LabwareView:
             or len(self.get_definition(labware_id).wells) >= 96
         )
 
+    def get_has_96_subwells(self, labware_id: str) -> bool:
+        """True if a labware is a reservoir with a 96-grid of sub-wells."""
+        return self.get_has_quirk(labware_id, "offsetPipetteFor96GridSubwells")
+
+    def get_has_12_subwells(self, labware_id: str) -> bool:
+        """True if a labware is a reservoir with a 12-grid of sub-wells."""
+        return self.get_has_quirk(labware_id, "offsetPipetteFor12GridSubwells")
+
     def get_well_definition(
         self,
         labware_id: str,
@@ -680,7 +689,7 @@ class LabwareView:
             return definition.wells[well_name]
         except KeyError as e:
             raise errors.WellDoesNotExistError(
-                f"{well_name} does not exist in {labware_id}."
+                f"{well_name} does not exist in {self.get_display_name(labware_id)}."
             ) from e
 
     def get_well_geometry(
@@ -690,19 +699,21 @@ class LabwareView:
         labware_def = self.get_definition(labware_id)
         if labware_def.innerLabwareGeometry is None:
             raise errors.IncompleteLabwareDefinitionError(
-                message=f"No innerLabwareGeometry found in labware definition for labware_id: {labware_id}."
+                message=f"No innerLabwareGeometry found in labware definition for {self.get_display_name(labware_id)}."
             )
         well_def = self.get_well_definition(labware_id, well_name)
         geometry_id = well_def.geometryDefinitionId
         if geometry_id is None:
             raise errors.IncompleteWellDefinitionError(
-                message=f"No geometryDefinitionId found in well definition for well: {well_name} in labware_id: {labware_id}"
+                message=f"No geometryDefinitionId found in well definition for well {well_name}"
+                f" for {self.get_display_name(labware_id)}"
             )
         else:
             well_geometry = labware_def.innerLabwareGeometry.get(geometry_id)
             if well_geometry is None:
                 raise errors.IncompleteLabwareDefinitionError(
-                    message=f"No innerLabwareGeometry found in labware definition for well_id: {geometry_id} in labware_id: {labware_id}"
+                    message=f"No innerLabwareGeometry found in labware definition for geometry id {geometry_id}"
+                    f" for {self.get_display_name(labware_id)}"
                 )
             return well_geometry
 
@@ -771,15 +782,15 @@ class LabwareView:
         contains_wells = all(well_name in labware_wells for well_name in iter(wells))
         if labware_definition.parameters.isTiprack:
             raise errors.LabwareIsTipRackError(
-                f"Given labware: {labware_id} is a tiprack. Can not load liquid."
+                f"Given labware {self.get_display_name(labware_id)} is a tip rack. Can not load liquid."
             )
         if LabwareRole.adapter in labware_definition.allowedRoles:
             raise errors.LabwareIsAdapterError(
-                f"Given labware: {labware_id} is an adapter. Can not load liquid."
+                f"Given labware {self.get_display_name(labware_id)} is an adapter. Can not load liquid."
             )
         if not contains_wells:
             raise errors.WellDoesNotExistError(
-                f"Some of the supplied wells do not match the labwareId: {labware_id}."
+                f"Some of the supplied wells do not match the labware {self.get_display_name(labware_id)}."
             )
         return list(wells)
 
@@ -788,7 +799,7 @@ class LabwareView:
         definition = self.get_definition(labware_id)
         if definition.parameters.tipLength is None:
             raise errors.LabwareIsNotTipRackError(
-                f"Labware {labware_id} has no tip length defined."
+                f"Labware {self.get_display_name(labware_id)} has no tip length defined."
             )
 
         return definition.parameters.tipLength - overlap
@@ -1094,7 +1105,9 @@ class LabwareView:
                 raise errors.LabwareCannotBeStackedError(
                     f"Labware {lid_labware_definition.parameters.loadName} cannot be used as a lid in the Flex Stacker."
                 )
-            if not labware_validation.validate_labware_can_be_stacked(
+            if isinstance(
+                lid_labware_definition, LabwareDefinition2
+            ) and not labware_validation.validate_legacy_labware_can_be_stacked(
                 lid_labware_definition, primary_labware_definition.parameters.loadName
             ):
                 raise errors.LabwareCannotBeStackedError(
@@ -1107,7 +1120,9 @@ class LabwareView:
                 raise errors.LabwareCannotBeStackedError(
                     f"Labware {adapter_labware_definition.parameters.loadName} cannot be used as an adapter in the Flex Stacker."
                 )
-            if not labware_validation.validate_labware_can_be_stacked(
+            if isinstance(
+                primary_labware_definition, LabwareDefinition2
+            ) and not labware_validation.validate_legacy_labware_can_be_stacked(
                 primary_labware_definition,
                 adapter_labware_definition.parameters.loadName,
             ):
@@ -1161,9 +1176,9 @@ class LabwareView:
         below_labware = self.get(bottom_labware_id)
         if isinstance(
             top_labware_definition, LabwareDefinition2
-        ) and not labware_validation.validate_labware_can_be_stacked(
-            top_labware_definition=top_labware_definition,
-            below_labware_load_name=below_labware.loadName,
+        ) and not labware_validation.validate_legacy_labware_can_be_stacked(
+            child_labware_definition=top_labware_definition,
+            parent_labware_load_name=below_labware.loadName,
         ):
             raise errors.LabwareCannotBeStackedError(
                 f"Labware {top_labware_definition.parameters.loadName} cannot be loaded onto labware {below_labware.loadName}"
@@ -1224,28 +1239,6 @@ class LabwareView:
         uri = self.get_uri_from_definition(self.get_definition(labware_id))
         return uri in _MAGDECK_HALF_MM_LABWARE
 
-    def get_deck_default_gripper_offsets(self) -> Optional[LabwareMovementOffsetData]:
-        """Get the deck's default gripper offsets."""
-        parsed_offsets = (
-            self.get_deck_definition().get("gripperOffsets", {}).get("default")
-        )
-        return (
-            LabwareMovementOffsetData(
-                pickUpOffset=LabwareOffsetVector(
-                    x=parsed_offsets["pickUpOffset"]["x"],
-                    y=parsed_offsets["pickUpOffset"]["y"],
-                    z=parsed_offsets["pickUpOffset"]["z"],
-                ),
-                dropOffset=LabwareOffsetVector(
-                    x=parsed_offsets["dropOffset"]["x"],
-                    y=parsed_offsets["dropOffset"]["y"],
-                    z=parsed_offsets["dropOffset"]["z"],
-                ),
-            )
-            if parsed_offsets
-            else None
-        )
-
     def get_absorbance_reader_lid_definition(self) -> LabwareDefinition:
         """Return the special labware definition for the plate reader lid.
 
@@ -1255,68 +1248,6 @@ class LabwareView:
         return self._state.definitions_by_uri[
             "opentrons/opentrons_flex_lid_absorbance_plate_reader_module/1"
         ]
-
-    @overload
-    def get_child_gripper_offsets(
-        self,
-        *,
-        labware_definition: LabwareDefinition,
-        slot_name: Optional[DeckSlotName],
-    ) -> Optional[LabwareMovementOffsetData]:
-        pass
-
-    @overload
-    def get_child_gripper_offsets(
-        self, *, labware_id: str, slot_name: Optional[DeckSlotName]
-    ) -> Optional[LabwareMovementOffsetData]:
-        pass
-
-    def get_child_gripper_offsets(
-        self,
-        *,
-        labware_definition: Optional[LabwareDefinition] = None,
-        labware_id: Optional[str] = None,
-        slot_name: Optional[DeckSlotName],
-    ) -> Optional[LabwareMovementOffsetData]:
-        """Get the grip offsets that a labware says should be applied to children stacked atop it.
-
-        Params:
-            labware_id: The ID of a parent labware (atop which another labware, the child, will be stacked).
-            slot_name: The ancestor slot that the parent labware is ultimately loaded into,
-                       perhaps after going through a module in the middle.
-
-        Returns:
-            If `slot_name` is provided, returns the gripper offsets that the parent labware definition
-            specifies just for that slot, or `None` if the labware definition doesn't have an
-            exact match.
-
-            If `slot_name` is `None`, returns the gripper offsets that the parent labware
-            definition designates as "default," or `None` if it doesn't designate any as such.
-        """
-        if labware_id is not None:
-            labware_definition = self.get_definition(labware_id)
-        else:
-            # Should be ensured by our @overloads.
-            assert labware_definition is not None
-
-        parsed_offsets = labware_definition.gripperOffsets
-        offset_key = slot_name.id if slot_name else "default"
-
-        if parsed_offsets is None or offset_key not in parsed_offsets:
-            return None
-        else:
-            return LabwareMovementOffsetData(
-                pickUpOffset=LabwareOffsetVector.model_construct(
-                    x=parsed_offsets[offset_key].pickUpOffset.x,
-                    y=parsed_offsets[offset_key].pickUpOffset.y,
-                    z=parsed_offsets[offset_key].pickUpOffset.z,
-                ),
-                dropOffset=LabwareOffsetVector.model_construct(
-                    x=parsed_offsets[offset_key].dropOffset.x,
-                    y=parsed_offsets[offset_key].dropOffset.y,
-                    z=parsed_offsets[offset_key].dropOffset.z,
-                ),
-            )
 
     def get_grip_force(self, labware_definition: LabwareDefinition) -> float:
         """Get the recommended grip force for gripping labware using gripper."""

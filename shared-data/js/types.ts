@@ -204,7 +204,7 @@ export interface CuboidalFrustum {
 
 export interface SquaredConeSegment {
   shape: 'squaredcone'
-  bottomCrossSection: string
+  bottomCrossSection: 'circular' | 'rectangular'
   circleDiameter: number
   rectangleXDimension: number
   rectangleYDimension: number
@@ -214,7 +214,7 @@ export interface SquaredConeSegment {
 
 export interface RoundedCuboidSegment {
   shape: 'roundedcuboid'
-  bottomCrossSection: string
+  bottomCrossSection: 'circular' | 'rectangular'
   circleDiameter: number
   rectangleXDimension: number
   rectangleYDimension: number
@@ -335,6 +335,7 @@ export interface LabwareDefinition3 {
   groups: LabwareWellGroup[]
   allowedRoles?: LabwareRoles[]
   stackingOffsetWithLabware?: Record<string, LabwareOffset>
+  legacyStackingOffsetWithLabware?: Record<string, LabwareOffset>
   stackingOffsetWithModule?: Record<string, LabwareOffset>
   stackLimit?: number
   compatibleParentLabware?: string[]
