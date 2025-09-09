@@ -16,19 +16,19 @@ Movement commands allow you to move individual robot motors to specific deck pos
 - :py:meth:`~.RobotContext.move_axes_to`
 - :py:meth:`~.RobotContext.move_axes_relative`
   
-Use the :py:meth:`~.RobotContext.move_to` method to change the position of the gantry or instrument mounts for pipettes or the Flex Gripper. 
+Use the :py:meth:`~.RobotContext.move_to` method to change the position of the gantry or instrument mounts for pipettes or the Flex Gripper. This method accepts a location, like a well ``A1`` and position (like ``top(z=100)``) within a plate. 
 
 The other two movement commands change the position of the robot's axes:
 
-- ``Axis.X`` and ``Axis.Y``: X and Y axis of the gantry 
-- ``Axis.Z_L`` and ``Axis.Z_R``: Z axis of the left or right instrument mount
-- ``Axis.Z_G`` and ``Axis.G``: Z axis and jaw motor of the Flex Gripper
-- ``Axis.P_L`` and ``Axis.P_R``: pipette plunger axes in the left or right instrument mount 
-- ``Axis_Q``: Flex 96-channel pipette tip pickup motor 
+- ``X`` and ``Y``: X and Y axis of the gantry 
+- ``Z_L`` and ``Z_R``: Z axis of the left or right instrument mount
+- ``Z_G`` and ``G``: Z axis and jaw motor of the Flex Gripper
+- ``P_L`` and ``P_R``: pipette plunger axes in the left or right instrument mount 
+- ``Q``: Flex 96-channel pipette tip pickup motor 
 
-The :py:meth:`~.RobotContext.move_axes_to` and :py:meth:`~.RobotContext.move_axes_relative` methods move any axis to an absolute or relative position on the deck, respectively. 
+The :py:meth:`~.RobotContext.move_axes_to` and :py:meth:`~.RobotContext.move_axes_relative` methods move any axis to an absolute or relative position on the deck, respectively. You can also provide a group of axes to either method to program a diagonal movement on the deck, for example. 
 
-This example moves ``Axis.Q`` to drop tips attached to a Flex 96-channel pipette.
+This example moves the ``Q`` axis to drop tips attached to a Flex 96-channel pipette.
 
 .. code-block:: python
     :substitutions:
@@ -62,7 +62,7 @@ This example moves ``Axis.Q`` to drop tips attached to a Flex 96-channel pipette
 
 .. versionadded:: 2.25
 
-Here, the 96-channel pipette moves to a specific position above the tip rack, including a ``z`` height. Then, the tip pickup motor moves -30 mm relative to its current position to drop attached tips. Before and after these movements, the instrument mount the pipette is attached to returns to it's ``home`` position. 
+Here, the 96-channel pipette moves to a specific position above the tip rack, including a ``z`` height. Then, the tip pickup motor moves -30 mm relative to its current position to drop attached tips. Before and after these movements, the instrument mount the pipette is attached to returns to its ``home`` position. 
 
 When you use a command like ``transfer_with_liquid_class()`` in a protocol, the robot tracks where the pipette's mount moves, how far the plunger moves, and how much liquid has been moved from each well. 
 
@@ -83,9 +83,22 @@ Axis and Plunger Coordinates
 -----------------------------
 To move a robot axis, you'll need to provide a position in the form of an axis coordinate map. Helper commands return axis or plunger coordinates you can use in a movement command. 
 
-For example, you can use :py:meth:`~.RobotContext.axis_coordinates_for` to return a coordinate map for any mount and deck position. Then, pass the axis map to a ``move_axes_to()`` command. 
+Start by providing a method like :py:meth:`~.RobotContext.axis_coordinates_for` a deck location to return a coordinate map for any mount and deck position. Then, pass the axis map to a ``move_axes_to()`` command. 
 
-Use the :py:meth:`~.RobotContext.plunger_coordinates_for_volume` to change the position of a pipette plunger to aspirate or dispense. To move the plunger to a known position like the bottom of a well or blowout location, use  :py:meth:`~.RobotContext.plunger_coordinates_for_named_position`.
+Use the :py:meth:`~.RobotContext.plunger_coordinates_for_volume` to change the position of a pipette plunger to aspirate, dispense, or blowout. To move the plunger to a known position like the bottom of a well or blowout location, use  :py:meth:`~.RobotContext.plunger_coordinates_for_named_position`.
+
+.. code-block:: python
+    volume_position = protocol.robot.plunger_coordinates_for_volume(
+        mount="left",
+        volume=30,
+        action=PipetteActionTypes.ASPIRATE_ACTION
+    )
+
+    protocol.robot.move_axes_to(
+        axis_map=volume_position
+    )
+
+In this example, ``plunger_coordinates_for_volume`` calculcates an axis map for aspirating 30 µL of liquid. Then, the ``move_axes_to`` method uses the axis map to move the ``Q`` axis of the 96-channel pipette loaded earlier in the protocol. You should always specify the ``left`` mount when moving the 96-channel pipette. 
 
 .. warning:: 
 

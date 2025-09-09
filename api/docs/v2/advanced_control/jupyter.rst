@@ -127,7 +127,7 @@ Keep in mind that ``set_offset()`` commands will override any labware offsets se
 
 .. warning::
 
-	Improperly reusing offset data may cause your robot to move to an unexpected position or crash against labware, which can lead to incorrect protocol execution or damage your equipment. When in doubt: run Labware Position Check again and update your code!
+	Improperly reusing offset data may cause your robot to move to an unexpected position or crash against labware, which can lead to incorrect protocol execution or damage your equipment. When in doubt, run Labware Position Check again and update your code!
 
 .. _labware-offset-behavior:
 
