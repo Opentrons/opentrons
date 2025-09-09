@@ -5138,58 +5138,6 @@
       "title": "SetTargetLidTemperatureParams",
       "type": "object"
     },
-    "SetTipStateCreate": {
-      "description": "Set tip state command creation request model.",
-      "properties": {
-        "commandType": {
-          "const": "setTipState",
-          "default": "setTipState",
-          "title": "Commandtype",
-          "type": "string"
-        },
-        "intent": {
-          "$ref": "#/$defs/CommandIntent",
-          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
-          "title": "Intent"
-        },
-        "key": {
-          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
-          "title": "Key",
-          "type": "string"
-        },
-        "params": {
-          "$ref": "#/$defs/SetTipStateParams"
-        }
-      },
-      "required": ["params"],
-      "title": "SetTipStateCreate",
-      "type": "object"
-    },
-    "SetTipStateParams": {
-      "description": "Payload needed to set tip wells of a tip rack to the requested state.",
-      "properties": {
-        "labwareId": {
-          "description": "Identifier of tip rack labware to set tip wells in.",
-          "title": "Labwareid",
-          "type": "string"
-        },
-        "tipWellState": {
-          "$ref": "#/$defs/TipRackWellState",
-          "description": "State to set tip wells to."
-        },
-        "wellNames": {
-          "description": "Names of the well to set tip well state for.",
-          "items": {
-            "type": "string"
-          },
-          "title": "Wellnames",
-          "type": "array"
-        }
-      },
-      "required": ["labwareId", "wellNames", "tipWellState"],
-      "title": "SetTipStateParams",
-      "type": "object"
-    },
     "SingleDispenseProperties": {
       "additionalProperties": false,
       "description": "Properties specific to the single-dispense function.",
@@ -5538,12 +5486,6 @@
       "description": "Tip presence status reported by a pipette.",
       "enum": ["present", "absent", "unknown"],
       "title": "TipPresenceStatus",
-      "type": "string"
-    },
-    "TipRackWellState": {
-      "description": "The state of a single tip in a tip rack's well.",
-      "enum": ["clean", "used", "empty"],
-      "title": "TipRackWellState",
       "type": "string"
     },
     "TouchTipCreate": {
@@ -6893,7 +6835,6 @@
       "sealPipetteToTip": "#/$defs/SealPipetteToTipCreate",
       "setRailLights": "#/$defs/SetRailLightsCreate",
       "setStatusBar": "#/$defs/SetStatusBarCreate",
-      "setTipState": "#/$defs/SetTipStateCreate",
       "temperatureModule/deactivate": "#/$defs/DeactivateTemperatureCreate",
       "temperatureModule/setTargetTemperature": "#/$defs/opentrons__protocol_engine__commands__temperature_module__set_target_temperature__SetTargetTemperatureCreate",
       "temperatureModule/waitForTemperature": "#/$defs/opentrons__protocol_engine__commands__temperature_module__wait_for_temperature__WaitForTemperatureCreate",
@@ -7055,9 +6996,6 @@
     },
     {
       "$ref": "#/$defs/GetNextTipCreate"
-    },
-    {
-      "$ref": "#/$defs/SetTipStateCreate"
     },
     {
       "$ref": "#/$defs/LiquidProbeCreate"
