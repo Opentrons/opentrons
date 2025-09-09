@@ -15,6 +15,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 import {
+  FLEX_ROBOT_TYPE,
   FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
   getAllLiquidClassDefs,
   getFlexNameConversion,
@@ -284,6 +285,7 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
     flowRateType: 'blowout',
     correctionVolume: correctionVolume ?? 0,
     shaftULperMM: state.pipette.shaftULperMM,
+    robotType: FLEX_ROBOT_TYPE,
   })
 
   const speedError =

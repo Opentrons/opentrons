@@ -8,6 +8,7 @@ from opentrons.protocol_engine.actions.actions import (
     StartTaskAction,
     FinishTaskAction,
 )
+from opentrons.protocol_engine.errors import ErrorOccurrence
 
 
 @pytest.fixture
@@ -34,8 +35,6 @@ async def test_get_current(subject: TaskStore) -> None:
     assert result.id == task_id
     assert result.createdAt == timestamp
     assert result.asyncioTask is asyncio_task
-    assert not hasattr(result, "finishedAt")
-    assert not hasattr(result, "error")
     await asyncio_task
 
 
@@ -57,10 +56,44 @@ async def test_get_finished(subject: TaskStore) -> None:
     assert isinstance(result, FinishedTask)
     assert result.id == task_id
     assert result.createdAt == timestamp
-    assert not hasattr(result, "asyncioTask")
     assert result.finishedAt == timestamp2
     assert result.error == error
     await asyncio_task
+
+
+async def test_get(subject: TaskStore) -> None:
+    """It should get all tasks (finished and current)."""
+    task_id_current = "task-current"
+    timestamp = datetime.now()
+    asyncio_task_1 = asyncio.create_task(asyncio.sleep(0))
+    subject._state.current_tasks_by_id[task_id_current] = Task(
+        id=task_id_current,
+        createdAt=timestamp,
+        asyncioTask=asyncio_task_1,
+    )
+
+    task_id_finished = "task-finished"
+    timestamp2 = datetime.now()
+    timestamp3 = datetime.now()
+    error = None
+    subject._state.finished_tasks_by_id[task_id_finished] = FinishedTask(
+        id=task_id_finished, createdAt=timestamp2, finishedAt=timestamp3, error=error
+    )
+    view = TaskView(subject._state)
+    # Check current task
+    result = view.get("task-current")
+    assert isinstance(result, Task)
+    assert result.id == task_id_current
+    assert result.createdAt == timestamp
+    assert result.asyncioTask is asyncio_task_1
+    await asyncio_task_1
+    # Check finished task
+    result_finished = view.get("task-finished")
+    assert isinstance(result_finished, FinishedTask)
+    assert result_finished.id == task_id_finished
+    assert result_finished.createdAt == timestamp2
+    assert result_finished.finishedAt == timestamp3
+    assert result_finished.error == error
 
 
 async def test_get_summary(subject: TaskStore) -> None:
@@ -157,9 +190,97 @@ async def test_handle_finish_task_action(subject: TaskStore) -> None:
     )
     subject.handle_action(action_finished)
     task_finished = subject._state.finished_tasks_by_id[task_id_1]
+    assert isinstance(task_finished, FinishedTask)
     assert task_finished.id == task_id_1
     assert task_finished.createdAt == timestamp_1
     assert task_finished.finishedAt == timestamp_2
     assert task_finished.error is None
-    assert not hasattr(task_finished, "asyncioTask")
     assert task_id_1 not in subject._state.current_tasks_by_id
+
+
+async def test_all_tasks_finished_or_any_task_failed(subject: TaskStore) -> None:
+    """It should return false if there are no finished tasks and true if there are."""
+    # Returns False because only task is current
+    task_id_current = "task-current"
+    timestamp = datetime.now()
+    asyncio_task = asyncio.create_task(asyncio.sleep(0))
+    subject._state.current_tasks_by_id[task_id_current] = Task(
+        id=task_id_current,
+        createdAt=timestamp,
+        asyncioTask=asyncio_task,
+    )
+    view = TaskView(subject._state)
+    result = view.all_tasks_finished_or_any_task_failed(task_id_current)
+    assert result is False
+    await asyncio_task
+    # returns true because task is finished
+    task_id_finished = "task-finished"
+    timestamp2 = datetime.now()
+    timestamp3 = datetime.now()
+    error = None
+    asyncio_task = asyncio.create_task(asyncio.sleep(0))
+
+    subject._state.finished_tasks_by_id[task_id_finished] = FinishedTask(
+        id=task_id_finished, createdAt=timestamp2, finishedAt=timestamp3, error=error
+    )
+    view = TaskView(subject._state)
+    result = view.all_tasks_finished_or_any_task_failed({task_id_finished})
+    assert result
+
+    # returns true because 1 task has error
+    subject._state.finished_tasks_by_id[task_id_finished] = FinishedTask(
+        id=task_id_finished, createdAt=timestamp2, finishedAt=timestamp3, error=error
+    )
+    task_id_error = "task-error"
+    timestamp2 = datetime.now()
+    timestamp3 = datetime.now()
+    error = ErrorOccurrence(
+        id="error",
+        createdAt=datetime.now(),
+        errorType="TaskFailedError",
+        detail="detail",
+    )
+    asyncio_task = asyncio.create_task(asyncio.sleep(0))
+
+    subject._state.finished_tasks_by_id[task_id_error] = FinishedTask(
+        id=task_id_error, createdAt=timestamp2, finishedAt=timestamp3, error=error
+    )
+
+    view = TaskView(subject._state)
+    result = view.all_tasks_finished_or_any_task_failed(
+        {task_id_finished, task_id_error}
+    )
+    assert result
+
+
+def test_get_failed_tasks(subject: TaskStore) -> None:
+    """It should return a list of failed tasks."""
+    task_id_error = "task-error"
+    timestamp2 = datetime.now()
+    timestamp3 = datetime.now()
+    error = ErrorOccurrence(
+        id="error",
+        createdAt=datetime.now(),
+        errorType="TaskFailedError",
+        detail="detail",
+    )
+    subject._state.finished_tasks_by_id[task_id_error] = FinishedTask(
+        id=task_id_error, createdAt=timestamp2, finishedAt=timestamp3, error=error
+    )
+    task_id_error_2 = "task-error-2"
+    timestamp2 = datetime.now()
+    timestamp3 = datetime.now()
+    error = ErrorOccurrence(
+        id="error",
+        createdAt=datetime.now(),
+        errorType="TaskFailedError",
+        detail="detail",
+    )
+    subject._state.finished_tasks_by_id[task_id_error_2] = FinishedTask(
+        id=task_id_error_2, createdAt=timestamp2, finishedAt=timestamp3, error=error
+    )
+    view = TaskView(subject._state)
+    result = view.get_failed_tasks({task_id_error})
+
+    assert len(result) == 1
+    assert result[0] == task_id_error

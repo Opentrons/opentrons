@@ -1,15 +1,11 @@
 import { useRef, useState } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
 
-import { Box, COLORS, DIRECTION_COLUMN, Flex } from '@opentrons/components'
+import { Box, DIRECTION_COLUMN, Flex } from '@opentrons/components'
 
 import { DND_TYPES } from '/protocol-designer/constants'
-import { stepIconsByType } from '/protocol-designer/form-types'
-import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
 
-import { ConnectedStepContainer } from './ConnectedStepContainer'
 import { ConnectedStepInfo } from './ConnectedStepInfo'
 
 import type { Dispatch, SetStateAction } from 'react'
@@ -154,48 +150,6 @@ export function DraggableSteps(props: DraggableStepsProps): JSX.Element | null {
           sidebarWidth={sidebarWidth}
         />
       ))}
-      <StepDragPreview sidebarWidth={sidebarWidth} />
-    </Flex>
-  )
-}
-
-interface StepDragPreviewProps {
-  sidebarWidth: number
-}
-
-function StepDragPreview({
-  sidebarWidth,
-}: StepDragPreviewProps): JSX.Element | null {
-  const [{ isDragging, itemType, item, currentOffset }] = useDrag(() => ({
-    type: DND_TYPES.STEP_ITEM,
-    collect: (monitor: DragLayerMonitor) => ({
-      currentOffset: monitor.getSourceClientOffset(),
-      isDragging: monitor.isDragging(),
-      itemType: monitor.getItemType(),
-      item: monitor.getItem() as { stepId: StepIdType },
-    }),
-  }))
-
-  const savedStepForms = useSelector(stepFormSelectors.getSavedStepForms)
-  const savedForm = item && savedStepForms[item.stepId]
-  const { stepType, stepName } = savedForm || {}
-
-  if (
-    itemType !== DND_TYPES.STEP_ITEM ||
-    !isDragging ||
-    stepType == null ||
-    currentOffset == null
-  ) {
-    return null
-  }
-
-  return (
-    <Flex cursor="grabbing" backgroundColor={COLORS.transparent}>
-      <ConnectedStepContainer
-        iconName={stepIconsByType[stepType]}
-        title={stepName || ''}
-        sidebarWidth={sidebarWidth}
-      />
     </Flex>
   )
 }

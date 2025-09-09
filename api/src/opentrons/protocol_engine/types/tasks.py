@@ -34,5 +34,5 @@ class TaskSummary:
 
     id: str
     createdAt: datetime
-    finishedAt: datetime | None
-    error: ErrorOccurrence | None
+    finishedAt: datetime | None = None
+    error: ErrorOccurrence | None = None
