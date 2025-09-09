@@ -10,7 +10,7 @@ describe('Plate Reader Happy Path Single-Wavelength', () => {
     cy.closeAnalyticsModal()
   })
 
-  it('Scans one wavelegth for plate reader and checks erros', () => {
+  it('Scans one wavelegth for plate reader and checks errors', () => {
     cy.clickCreateNew()
     cy.verifyCreateNewHeader()
     const se = new StepExecutor()
