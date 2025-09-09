@@ -39,6 +39,8 @@ export function LeftColumnLabwareInfo({
   const {
     STACKER_STALLED_RETRY,
     STACKER_STALLED_SKIP,
+    STACKER_STALLED_STORE_SKIP,
+    STACKER_STALLED_STORE_RETRY,
     STACKER_HOPPER_EMPTY_SKIP,
     STACKER_SHUTTLE_EMPTY_SKIP,
   } = RECOVERY_MAP
@@ -72,6 +74,8 @@ export function LeftColumnLabwareInfo({
     } else {
       switch (step) {
         case STACKER_STALLED_RETRY.STEPS.CHECK_HOPPER:
+        case STACKER_STALLED_STORE_RETRY.STEPS.CHECK_HOPPER:
+        case STACKER_STALLED_STORE_SKIP.STEPS.CHECK_HOPPER:
         case STACKER_STALLED_SKIP.STEPS.CHECK_HOPPER:
         case STACKER_SHUTTLE_EMPTY_SKIP.STEPS.FILL_HOPPER:
           return {
@@ -85,6 +89,8 @@ export function LeftColumnLabwareInfo({
             },
           }
         case STACKER_STALLED_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE:
+        case STACKER_STALLED_STORE_RETRY.STEPS.PLACE_LABWARE_ON_SHUTTLE:
+        // case STACKER_STALLED_STORE_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE:
         case STACKER_HOPPER_EMPTY_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE:
         case STACKER_SHUTTLE_EMPTY_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE:
           return {
@@ -121,7 +127,9 @@ export function LeftColumnLabwareInfo({
       (route === RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE &&
         step === RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.STEPS.FILL_HOPPER) ||
       (route === RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE &&
-        step === RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.CHECK_HOPPER)
+        step === RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.CHECK_HOPPER) ||
+      (route === RECOVERY_MAP.STACKER_STALLED_STORE_SKIP.ROUTE &&
+        step === RECOVERY_MAP.STACKER_STALLED_STORE_SKIP.STEPS.CHECK_HOPPER)
     ) {
       return labwareQuantity != null && labwareQuantity > 0
         ? labwareQuantity - 1 // one has been moved manually onto the shuttle
