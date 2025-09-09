@@ -260,6 +260,7 @@ class RobotContext(publisher.CommandPublisher):
         """
         Build an axis map to move a pipette plunger motor to complete liquid handling actions.
 
+        :mount: The left or right instrument mount the pipette is attached to.
         :param volume: A volume to convert to an axis map for linear plunger displacement.
         :param action: Choose to ``aspirate`` or ``dispense``.
 
@@ -283,7 +284,7 @@ class RobotContext(publisher.CommandPublisher):
         """
         Build an axis map to move a pipette plunger motor to a named position.
 
-        :param postion_name: A named position to move the pipette plunger to. Choose from ``top``, ``bottom``, ``blowout``, or ``drop`` plunger positions.
+        :param position_name: A named position to move the pipette plunger to. Choose from ``top``, ``bottom``, ``blowout``, or ``drop`` plunger positions.
 
         """
         pipette_name = self._core.get_pipette_type_from_engine(mount)
