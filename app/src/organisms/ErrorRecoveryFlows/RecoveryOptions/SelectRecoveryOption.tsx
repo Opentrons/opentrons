@@ -20,11 +20,7 @@ import {
 import { RecoverySingleColumnContentWrapper } from '../shared'
 
 import type { PipetteWithTip } from '/app/resources/instruments'
-import type {
-  ErrorKind,
-  RecoveryContentProps,
-  RecoveryRoute,
-} from '../types'
+import type { ErrorKind, RecoveryContentProps, RecoveryRoute } from '../types'
 
 // The "home" route within Error Recovery. When a user completes a non-terminal flow or presses "Go back" enough
 // to escape the boundaries of any route, they will be redirected here.
@@ -59,7 +55,10 @@ export function SelectRecoveryOptionHome({
   const { proceedToRouteAndStep } = routeUpdateActions
   const { determineTipStatus } = tipStatusUtils
   const { setSelectedRecoveryOption } = currentRecoveryOptionUtils
-  const validRecoveryOptions = getRecoveryOptions(errorKind, failedCommand?.byRunRecord.commandType)
+  const validRecoveryOptions = getRecoveryOptions(
+    errorKind,
+    failedCommand?.byRunRecord.commandType
+  )
   console.log('validRecoveryOptions', validRecoveryOptions)
   const [selectedRoute, setSelectedRoute] = useState<RecoveryRoute>(
     head(validRecoveryOptions) as RecoveryRoute
@@ -210,7 +209,7 @@ export function getRecoveryOptions(
       const isStore =
         errorKind === ERROR_KINDS.STACKER_STALLED &&
         commandType === 'flexStacker/store'
-        console.log('isStore', isStore)
+      console.log('isStore', isStore)
       if (isStore) {
         return STACKER_STALLED_STORE_OPTIONS
       } else {

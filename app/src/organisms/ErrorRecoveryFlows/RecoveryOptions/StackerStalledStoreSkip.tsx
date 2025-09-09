@@ -5,23 +5,21 @@ import {
   StackerEnsureShuttleEmpty,
   StackerHomeShuttle,
   StackerHopperLwInfo,
-  StackerShuttleLwInfo,
 } from '../shared'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { RecoveryContentProps } from '../types'
 
-export function StackerStalledStoreSkip(props: RecoveryContentProps): JSX.Element {
+export function StackerStalledStoreSkip(
+  props: RecoveryContentProps
+): JSX.Element {
   const { recoveryMap } = props
   const { step, route } = recoveryMap
   const { STACKER_STALLED_STORE_SKIP } = RECOVERY_MAP
-  console.log('STACKER_STALLED_STORE_SKIP', STACKER_STALLED_STORE_SKIP)
-  console.log('step', step)
-  console.log('route', route)
+
   switch (step) {
     case STACKER_STALLED_STORE_SKIP.STEPS.EMPTY_STACKER:
       return <StackerEmptyHopper {...props} />
-    case STACKER_STALLED_STORE_SKIP.STEPS.PREPARE_TRACK_FOR_HOMING:
     case STACKER_STALLED_STORE_SKIP.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS:
       return <StackerHomeShuttle {...props} />
     case STACKER_STALLED_STORE_SKIP.STEPS.ENSURE_SHUTTLE_EMPTY:

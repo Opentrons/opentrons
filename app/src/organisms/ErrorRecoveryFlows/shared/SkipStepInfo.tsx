@@ -9,7 +9,6 @@ import type { RecoveryContentProps } from '../types'
 
 export function SkipStepInfo(props: RecoveryContentProps): JSX.Element {
   const {
-    failedCommand,
     recoveryCommands,
     routeUpdateActions,
     currentRecoveryOptionUtils,
@@ -22,7 +21,7 @@ export function SkipStepInfo(props: RecoveryContentProps): JSX.Element {
     STACKER_STALLED_SKIP,
     STACKER_HOPPER_EMPTY_SKIP,
     STACKER_SHUTTLE_EMPTY_SKIP,
-    STACKER_STALLED_STORE_SKIP
+    STACKER_STALLED_STORE_SKIP,
   } = RECOVERY_MAP
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { skipFailedCommand } = recoveryCommands
@@ -46,9 +45,9 @@ export function SkipStepInfo(props: RecoveryContentProps): JSX.Element {
         case STACKER_HOPPER_EMPTY_SKIP.ROUTE:
         case STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
         case STACKER_STALLED_SKIP.ROUTE:
-            void manualRetrieve().then(() => {
-              skipFailedCommand()
-            })
+          void manualRetrieve().then(() => {
+            skipFailedCommand()
+          })
           break
         case STACKER_STALLED_STORE_SKIP.ROUTE:
           void manualStore().then(() => {

@@ -11,7 +11,9 @@ import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { RecoveryContentProps } from '../types'
 
-export function StackerStalledStoreRetry(props: RecoveryContentProps): JSX.Element {
+export function StackerStalledStoreRetry(
+  props: RecoveryContentProps
+): JSX.Element {
   const { recoveryMap } = props
   const { step, route } = recoveryMap
   const { STACKER_STALLED_STORE_RETRY } = RECOVERY_MAP
@@ -19,7 +21,6 @@ export function StackerStalledStoreRetry(props: RecoveryContentProps): JSX.Eleme
   switch (step) {
     case STACKER_STALLED_STORE_RETRY.STEPS.EMPTY_STACKER:
       return <StackerEmptyHopper {...props} />
-    case STACKER_STALLED_STORE_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING:
     case STACKER_STALLED_STORE_RETRY.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS:
       return <StackerHomeShuttle {...props} />
     case STACKER_STALLED_STORE_RETRY.STEPS.CHECK_HOPPER:
