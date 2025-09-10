@@ -208,8 +208,8 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
         file_name = data.create_file_name(test_name=test_name, run_id=data.create_run_id(), tag=test_tag)
         header = ['Time (W:H:M:S)', 'Test Robot', 'Test Pipette', 'Tip Rack', 'Tip Number', 'Total Tip Pick Ups',
                     'Tip Presence - Tip Pick Up (P/F)', 'Tip Presence - Tip Eject (P/F)', 'Total Failures']
-        header_str = data.convert_list_to_csv_line(header)
-        data.append_data_to_file(test_name=test_name,run_id=test_pip["pipette_id"], file_name=file_name, data=header_str)
+        header_str = header#data.convert_list_to_csv_line(header)
+        data.append_data_to_file_list(test_name=test_name,run_id=test_pip["pipette_id"], file_name=file_name, data=','.join(header_str)+'\n')
 
 
 
@@ -224,15 +224,15 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
         multi_pip = False
         check_tip_presence = True
         if args.pick_up_num == 60:
-            PICKUPS_PER_TIP = 60
+            PICKUPS_PER_TIP = 1920
         else:
             PICKUPS_PER_TIP = args.pick_up_num
     else:
         multi_pip = True
         ROWS = 1
-        CYCLES = 32
+        CYCLES = 1
         if args.pick_up_num == 60:
-            PICKUPS_PER_TIP = 60
+            PICKUPS_PER_TIP = 1920
         else:
             PICKUPS_PER_TIP = args.pick_up_num
         check_tip_presence = True
@@ -423,10 +423,10 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
 
                         ### save test data and continue loop/exit based on tip eject success
 
-                        cycle_data = [convert(time.perf_counter()-elapsed_time-start_time), test_robot, test_pip["pipette_id"], rack, pick_up+1,
-                            total_pick_ups, tip_presence_pick_up_flag, tip_presence_eject_flag, total_failures]
-                        cycle_data_str = data.convert_list_to_csv_line(cycle_data)
-                        data.append_data_to_file(test_name=test_name,run_id=test_pip["pipette_id"], file_name=file_name, data=cycle_data_str)
+                        cycle_data = [str(convert(time.perf_counter()-elapsed_time-start_time)), str(test_robot), str(test_pip["pipette_id"]), str(rack), str(pick_up+1),
+                            str(total_pick_ups), str(tip_presence_pick_up_flag), str(tip_presence_eject_flag), str(total_failures)]
+                        cycle_data_str = cycle_data#data.convert_list_to_csv_line(cycle_data)
+                        data.append_data_to_file_list(test_name=test_name,run_id=test_pip["pipette_id"], file_name=file_name, data=','.join(cycle_data_str )+ "\n")
 
                         ### save the last complate information
 

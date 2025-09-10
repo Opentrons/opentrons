@@ -110,6 +110,15 @@ def _save_data(
         f.write(data)
     return data_path
 
+def _save_data_list(
+    test_name: str, run_id: str, file_name: str, data: list, perm: str = "w+"
+) -> Path:
+    test_path = create_folder_for_test_data(test_name)
+    run_path = create_folder_for_test_data(test_path / run_id)
+    data_path = test_path / run_path / file_name
+    with open(data_path, perm) as f:
+        f.writelines(data)
+    return data_path
 
 def dump_data_to_file(test_name: str, run_id: str, file_name: str, data: str) -> Path:
     """Save entire file contents to a file on disk."""
@@ -120,6 +129,9 @@ def append_data_to_file(test_name: str, run_id: str, file_name: str, data: str) 
     """Append new content to an already existing file on disk."""
     return _save_data(test_name, run_id, file_name, data, perm="a+")
 
+def append_data_to_file_list(test_name: str, run_id: str, file_name: str, data: list) -> Path:
+    """Append new content to an already existing file on disk."""
+    return _save_data_list(test_name, run_id, file_name, data, perm="a+")
 
 def insert_data_to_file(
     test_name: str, run_id: str, file_name: str, data: str, line: int
