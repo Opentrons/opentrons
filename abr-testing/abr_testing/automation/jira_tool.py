@@ -25,9 +25,9 @@ class JiraTicket:
 
     def issues_on_board(self, project_key: str) -> List[List[Any]]:
         """Print Issues on board."""
-        params = {"jql": f"project = {project_key}"}
+        params = {"jql": f"project = {project_key}", "fields": "*all"}
         response = requests.get(
-            f"{self.url}/rest/api/3/search",
+            f"{self.url}/rest/api/3/search/jql",
             headers=self.headers,
             params=params,
             auth=self.auth,
@@ -205,10 +205,10 @@ class JiraTicket:
         """Retrieve all issues for the given project key."""
         # TODO: add field for ticket type.
         headers = {"Accept": "application/json"}
-        query = {"jql": f"project={project_key}"}
+        query = {"jql": f"project={project_key}", "fields": "*all"}
         response = requests.request(
             "GET",
-            f"{self.url}/rest/api/3/search",
+            f"{self.url}/rest/api/3/search/jql",
             headers=headers,
             params=query,
             auth=self.auth,
