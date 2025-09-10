@@ -23,6 +23,7 @@ import './global.css'
 const rootElement = document.getElementById('root')
 
 const getClientId = (): string => {
+  // TODO
   switch (process.env.NODE_ENV) {
     case 'production':
       return PROD_AUTH0_CLIENT_ID
@@ -34,6 +35,7 @@ const getClientId = (): string => {
 }
 
 const getDomain = (): string => {
+  // TODO
   return process.env.NODE_ENV === 'development'
     ? LOCAL_AUTH0_DOMAIN
     : AUTH0_DOMAIN

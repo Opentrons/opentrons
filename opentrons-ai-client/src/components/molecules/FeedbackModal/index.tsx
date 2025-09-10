@@ -44,6 +44,7 @@ export function FeedbackModal(): JSX.Element {
     }
 
     const getEndpoint = (): string => {
+      // TODO
       switch (process.env.NODE_ENV) {
         case 'production':
           return PROD_FEEDBACK_END_POINT

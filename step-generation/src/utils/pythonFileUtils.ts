@@ -69,6 +69,7 @@ export function pythonMetadata(
       category: fileMetadata.category,
       subcategory: fileMetadata.subcategory,
       tags: fileMetadata.tags?.length && fileMetadata.tags.join(', '),
+      // TODO
       protocolDesigner: process.env.OT_PD_VERSION,
       source: fileMetadata.source,
     }).filter(([key, value]) => value) // drop blank entries

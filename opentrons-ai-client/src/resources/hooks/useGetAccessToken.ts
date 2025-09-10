@@ -14,6 +14,7 @@ export const useGetAccessToken = (): UseGetAccessTokenResult => {
   const { getAccessTokenSilently } = useAuth0()
 
   const auth0Audience = (): string => {
+    // TODO
     switch (process.env.NODE_ENV) {
       case 'production':
         return PROD_AUTH0_AUDIENCE
@@ -24,6 +25,7 @@ export const useGetAccessToken = (): UseGetAccessTokenResult => {
       default:
         console.error(
           'Error: NODE_ENV variable is not valid:',
+          // TODO
           process.env.NODE_ENV
         )
         return STAGING_AUTH0_AUDIENCE

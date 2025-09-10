@@ -21,6 +21,7 @@ import type { Flags, FlagTypes } from './types'
 // will initialize PRERELEASE_MODE to true (but as per the note above, that
 // initial value is only relevant if there is no persisted value already)
 const initialFlags: Flags = {
+  // TODO: All of these
   PRERELEASE_MODE: process.env.OT_PD_PRERELEASE_MODE === '1' || false,
   OT_PD_DISABLE_MODULE_RESTRICTIONS:
     process.env.OT_PD_DISABLE_MODULE_RESTRICTIONS === '1' || false,

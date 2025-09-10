@@ -27,6 +27,7 @@ const i18nConfig: InitOptions = {
   resources,
   lng: 'en',
   fallbackLng: 'en',
+  // TODO
   debug: process.env.NODE_ENV === 'development',
   defaultNS: 'shared',
   interpolation: {
@@ -43,6 +44,7 @@ const i18nConfig: InitOptions = {
   keySeparator: false, // use namespaces and context instead
   saveMissing: true,
   missingKeyHandler: (lng, ns, key) => {
+    // TODO
     process.env.NODE_ENV === 'test'
       ? console.error(`Missing ${lng} Translation: key={${key}} ns={${ns}}`)
       : console.warn(`Missing ${lng} Translation: key={${key}} ns={${ns}}`)
