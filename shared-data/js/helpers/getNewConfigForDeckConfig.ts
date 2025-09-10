@@ -4,6 +4,8 @@ import type { CutoutFixtureId, CutoutId } from '../../deck'
 import type { CutoutFixtureIdsWithFakes } from '../constants'
 import type { DeckConfiguration, DeckDefinition } from '../types'
 
+//  used in both PD and the app for getting the new deck configuration
+//  the usb info is only needed for the app
 export const getNewConfigForDeckConfig = (
   cutoutId: CutoutId,
   cutoutFixtureId: CutoutFixtureIdsWithFakes,
