@@ -13,7 +13,7 @@ The Opentrons Flex® Stacker is an external module that provides automated, high
 
 ### Deck locations
 
-You attach each Stacker to the right side of a Flex with its deck slot adapter. The adapter fits in any available column 3 deck slot (A3 to D3). The adapter also provides labware storage in column 3, so you don't lose any deck space. You can attach up to four Stackers on a single Flex. See the instruction manual (linked above) for step-by-step installation instructions.
+You attach each Stacker to the right side of a Flex with its deck slot adapter. The adapter fits in any available column 3 deck slot (A3 to D3). The adapter also provides labware storage in column 3, so you don't lose any deck space. You can attach up to four Stackers on a single Flex. See the instruction manual for [step-by-step installation instructions](../../stacker/installation.md).
 
 ### Supported Labware
 
@@ -59,7 +59,7 @@ The Stacker accepts Opentrons Flex tip racks, selected items in our [Labware Lib
 
 The Stacker is compatible with all other Flex modules.
 
-However, if you want to use a HEPA/UV module with a Stacker on a Flex robot manufactured before September 2025, you will need an upgrade kit. This kit, which adds new hardware and electronics to your Flex, prevents the HEPA/UV module from operating if the Stacker is improperly installed. Robots manufactured after September 2025 have these safety features built-in and do not require this upgrade. _The upgrade must be performed by an Opentrons field service technician_.
+If you want to use a Stacker on a Flex robot manufactured before September 2025, you will need an upgrade kit. This kit, which adds new hardware and electronics to your Flex, prevents the HEPA/UV module from operating if the Stacker is improperly installed. Robots manufactured after September 2025 have these safety features built-in and do not require this upgrade. _The upgrade must be performed by an Opentrons field service technician_.
 
 For additional information, see the [HEPA/UV compatibility section](../../stacker/compliance.md#stacker-and-hepauv-compatibility) of the Stacker instruction manual. You can also contact [Opentrons Sales](https://opentrons.com/contact) if you're unsure about a robot's manufacture date and/or have a model that needs to be upgraded.
 
