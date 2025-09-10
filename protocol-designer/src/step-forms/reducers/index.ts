@@ -811,7 +811,7 @@ export const savedStepForms = (
         const updatedFields = handleFormChange(
           {
             pipette: substitutionMap[prevStepForm.pipette],
-            // tipRack: newTiprackURI,
+            tipRack: newTiprackURI,
           },
           prevStepForm,
           _getPipetteEntitiesRootState(rootState),
