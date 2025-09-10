@@ -24,10 +24,7 @@ import {
 import { useKitchen } from '/protocol-designer/components/organisms/Kitchen/useKitchen'
 import { getFileMetadata } from '/protocol-designer/file-data/selectors'
 import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
-import {
-  getInitialDeckSetup,
-  getUnsavedForm,
-} from '/protocol-designer/step-forms/selectors'
+import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 import {
   END_TERMINAL_ITEM_ID,
   START_TERMINAL_ITEM_ID,
@@ -66,7 +63,6 @@ export function TimelineToolbox({
     'starting_deck_state',
   ])
   const orderedStepIds = useSelector(stepFormSelectors.getOrderedStepIds)
-  const formData = useSelector(getUnsavedForm)
   const fileMetadata = useSelector(getFileMetadata)
   const navigate = useNavigate()
   const dispatch = useDispatch<ThunkDispatch<any>>()
@@ -156,12 +152,10 @@ export function TimelineToolbox({
       titlePadding={SPACING.spacing12}
       childrenPadding="0px"
       confirmButton={
-        formData != null ? undefined : (
-          <AddStepButton
-            hasText={sidebarWidth > SIDEBAR_MIN_WIDTH_FOR_ICON}
-            sidebarWidth={sidebarWidth}
-          />
-        )
+        <AddStepButton
+          hasText={sidebarWidth > SIDEBAR_MIN_WIDTH_FOR_ICON}
+          sidebarWidth={sidebarWidth}
+        />
       }
     >
       <Flex
