@@ -204,14 +204,9 @@ export function getRecoveryOptions(
     case ERROR_KINDS.STALL_OR_COLLISION:
       return STALL_OR_COLLISION_OPTIONS
     case ERROR_KINDS.STACKER_STALLED:
-      const isStore =
-        errorKind === ERROR_KINDS.STACKER_STALLED &&
-        commandType === 'flexStacker/store'
-      if (isStore) {
-        return STACKER_STALLED_STORE_OPTIONS
-      } else {
-        return STACKER_STALLED_RETRIEVE_OPTIONS
-      }
+      return commandType === 'flexStacker/store'
+        ? STACKER_STALLED_STORE_OPTIONS
+        : STACKER_STALLED_RETRIEVE_OPTIONS
     case ERROR_KINDS.STACKER_HOPPER_EMPTY:
       return STACKER_HOPPER_EMPTY_OPTIONS
     case ERROR_KINDS.STACKER_SHUTTLE_MISSING:
