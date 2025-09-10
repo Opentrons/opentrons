@@ -121,6 +121,66 @@ describe('LeftColumnLabwareInfo', () => {
     )
   })
 
+  it(`renders with correct props for ${RECOVERY_MAP.STACKER_STALLED_STORE_RETRY.STEPS.CHECK_HOPPER} step`, () => {
+    props.recoveryMap = {
+      route: RECOVERY_MAP.STACKER_STALLED_STORE_RETRY.ROUTE,
+      step: RECOVERY_MAP.STACKER_STALLED_STORE_RETRY.STEPS.CHECK_HOPPER,
+    }
+    props.failedLabwareUtils.labwareQuantity = 5
+    render(props)
+
+    expect(vi.mocked(InterventionContent)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        headline: 'MOCK_TITLE',
+        infoProps: {
+          layout: 'default',
+          type: 'location',
+          labwareName: 'MOCK_LW_NAME',
+          labwareNickname: 'MOCK_LW_NICKNAME',
+          currentLocationProps: { deckLabel: 'STACKER s' },
+          newLocationProps: { deckLabel: 'SLOT B2' },
+          subText: undefined,
+          tagText: 'Quantity: 4',
+        },
+        notificationProps: {
+          type: 'alert',
+          heading: 'MOCK_BANNER_TEXT',
+        },
+      }),
+      {}
+    )
+  })
+
+  it(`renders with correct props for ${RECOVERY_MAP.STACKER_STALLED_STORE_RETRY.STEPS.CHECK_HOPPER} step`, () => {
+    props.recoveryMap = {
+      route: RECOVERY_MAP.STACKER_STALLED_STORE_SKIP.ROUTE,
+      step: RECOVERY_MAP.STACKER_STALLED_STORE_SKIP.STEPS.CHECK_HOPPER,
+    }
+    props.failedLabwareUtils.labwareQuantity = 5
+    render(props)
+
+    expect(vi.mocked(InterventionContent)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        headline: 'MOCK_TITLE',
+        infoProps: {
+          layout: 'default',
+          type: 'location',
+          labwareName: 'MOCK_LW_NAME',
+          labwareNickname: 'MOCK_LW_NICKNAME',
+          currentLocationProps: { deckLabel: 'STACKER s' },
+          newLocationProps: { deckLabel: 'SLOT B2' },
+          subText: undefined,
+          tagText: 'Quantity: 5',
+        },
+        notificationProps: {
+          type: 'alert',
+          heading: 'MOCK_BANNER_TEXT',
+        },
+      }),
+      {}
+    )
+  })
+
   it('does not include notificationProps when bannerText is not provided', () => {
     props.bannerText = undefined
     render(props)
