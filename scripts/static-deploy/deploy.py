@@ -56,7 +56,7 @@ def write_github_summary(
     app_display = {
         "labware_library": "Labware Library",
         "protocol_designer": "Protocol Designer",
-        "docs": "Docs",
+        "docs": "API Docs",
         "mkdocs": "MkDocs",
     }
 
@@ -88,41 +88,24 @@ def write_github_summary(
 | 🗑️ **Delete Sync** | Enabled (removes remote files not in local) |"""
 
     markdown_summary += f"""
-| 🌐 **Deployment URL** | [{deployment_url}]({deployment_url}/{sandbox_prefix}) |"""
+| 🌐 **Deployment URL** | [{deployment_url}]({deployment_url}) |"""
 
     if config.cloudfront_id:
         cache_status = "✅ Invalidated" if cloudfront_invalidated and not dry_run else ("🧪 Skipped (dry run)" if dry_run else "❌ Failed")
         markdown_summary += f"""
 | ☁️ **CloudFront** | `{config.cloudfront_id}` - {cache_status} |"""
 
+    markdown_summary += """
+---
+*Deployment executed by `deploy.py`*"""
+
     if dry_run:
         markdown_summary += """
-
 ### 🧪 Dry Run Notes
 - No files were actually uploaded or modified
 - S3 sync operations were simulated with `--dryrun`
 - CloudFront cache invalidation was skipped
 - All AWS operations were read-only"""
-
-    # Build GitHub Actions run URL
-    github_url = (
-        f"{os.environ.get('GITHUB_SERVER_URL', '')}"
-        f"/{os.environ.get('GITHUB_REPOSITORY', '')}"
-        f"/actions/runs/{os.environ.get('GITHUB_RUN_ID', '')}"
-    )
-
-    markdown_summary += f"""
-
-### Deployment Details
-
-- **AWS CLI Sync**: `aws s3 sync --exact-timestamps --only-show-errors{"" if config.name in ["docs", "mkdocs"] else " --delete"}`
-- **Content Type**: Automatic detection by AWS CLI
-- **GitHub Run ID**: `{os.environ.get("GITHUB_RUN_ID", "unknown")}`
-- **Run Details**: [{github_url}]({github_url})
-
----
-*Deployment executed by `deploy.py`*
-"""
 
     try:
         with open(github_step_summary, "a") as f:
@@ -340,6 +323,9 @@ def deploy_application(  # noqa: C901
     else:
         s3_prefix = ""
         deployment_url = config.url
+
+    if config.name == "docs":
+        deployment_url = f"{deployment_url}v2/index.html"
 
     console.print(f"Deploying to {environment} environment:")
     console.print(f"  Bucket: {config.s3_bucket}")
