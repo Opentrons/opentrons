@@ -343,4 +343,4 @@ def test_determine_deploy_config_from_args_sandbox_branch_url_suffix():
     assert cfg.environment == "sandbox"
     assert cfg.sandbox_prefix == "edge"
     assert cfg.bucket == "opentrons.sandbox.labware"
-    assert cfg.url == "http://opentrons.sandbox.labware.s3-website.us-east-2.amazonaws.com/edge/"
+    assert cfg.url == "http://sandbox.labware.opentrons.com/edge/"
