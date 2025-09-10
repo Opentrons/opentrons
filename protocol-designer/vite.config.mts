@@ -81,7 +81,12 @@ export default defineConfig(
         },
       },
       define: {
-        'process.env': { ...process.env, OT_PD_VERSION, OT_PD_BUILD_DATE },
+        'process.env': {
+          // NOTE: For security, do not spread in the entirety of process.env.
+          ...getFeatureFlagEnvVars(),
+          OT_PD_VERSION,
+          OT_PD_BUILD_DATE,
+        },
         global: 'globalThis',
       },
       resolve: {
@@ -106,3 +111,28 @@ export default defineConfig(
     }
   }
 )
+
+function getFeatureFlagEnvVars(): Record<string, string | undefined> {
+  // If we change the prefix to something like "OT_PD_FF_...", we could automatically
+  // scrape process.env instead of having this explicit list. We don't want to scrape
+  // process.env as long as the prefix is just "OT_PD_..." because it might accidentally
+  // include something like "OT_PD_SUPER_SECRET_DEPLOY_KEY".
+  const envVarNames = new Set([
+    'OT_PD_PRERELEASE_MODE',
+    'OT_PD_DISABLE_MODULE_RESTRICTIONS',
+    'OT_PD_ALLOW_ALL_TIPRACKS',
+    'OT_PD_ENABLE_COMMENT',
+    'OT_PD_ENABLE_TIP_PICKUP_LOCATION',
+    'OT_PD_ENABLE_HOT_KEYS_DISPLAY',
+    'OT_PD_ENABLE_REACT_SCAN',
+    'OT_PD_ENABLE_MULTIPLE_TEMPS_OT',
+    'OT_PD_ENABLE_TIMELINE_SCRUBBER',
+    'OT_PD_ENABLE_PARTIAL_TIP_SUPPORT',
+    'OT_PD_ENABLE_STACKING',
+    'OT_PD_ENABLE_CONCURRENT_MODULE_ACTIONS',
+    'OT_PD_ENABLE_JSON_EXPORT',
+  ])
+  return Object.fromEntries(
+    Object.entries(process.env).filter(([key, _value]) => envVarNames.has(key))
+  )
+}

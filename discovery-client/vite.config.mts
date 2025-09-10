@@ -51,8 +51,6 @@ export default defineConfig(
         },
       },
       define: {
-        'process.env': process.env,
-        global: 'globalThis',
         _PKG_VERSION_: JSON.stringify(version),
         _PKG_BUGS_URL_: JSON.stringify(pkg.bugs.url),
         _OPENTRONS_PROJECT_: JSON.stringify(project),

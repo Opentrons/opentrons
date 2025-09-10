@@ -49,7 +49,12 @@ export default defineConfig({
     },
   },
   define: {
-    'process.env': process.env,
+    'process.env': {
+      // NOTE: For security, do not spread in the entirety of process.env.
+      OT_LL_MIXPANEL_ID: process.env.OT_LL_MIXPANEL_ID,
+      OT_LL_MIXPANEL_DEV_ID: process.env.OT_LL_MIXPANEL_DEV_ID,
+      NODE_ENV: process.env.NODE_ENV
+    },
     global: 'globalThis',
   },
   resolve: {

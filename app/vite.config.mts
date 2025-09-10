@@ -52,6 +52,7 @@ export default defineConfig(
       },
       define: {
         'process.env': {
+          // NOTE: For security, do not spread in the entirety of process.env.
           NODE_ENV: process.env.NODE_ENV,
           OT_APP_MIXPANEL_ID: process.env.OT_APP_MIXPANEL_ID,
           OPENTRONS_PROJECT: process.env.OPENTRONS_PROJECT,

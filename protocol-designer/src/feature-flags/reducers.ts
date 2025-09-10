@@ -20,6 +20,8 @@ import type { Flags, FlagTypes } from './types'
 // initial values. Eg `OT_PD_PRERELEASE_MODE=1 make -C protocol-designer dev`
 // will initialize PRERELEASE_MODE to true (but as per the note above, that
 // initial value is only relevant if there is no persisted value already)
+//
+// If you add/remove an environment variable here, also update vite.config.mts.
 const initialFlags: Flags = {
   // TODO: All of these
   PRERELEASE_MODE: process.env.OT_PD_PRERELEASE_MODE === '1' || false,
