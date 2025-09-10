@@ -2,8 +2,9 @@
 from typing import Annotated, List, Type, cast, Optional
 from fastapi import Depends
 
-from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import SubSystem
+from opentrons_hardware.hardware_control.types import PCBARevision
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons_shared_data.module import load_definition
 
 from opentrons.hardware_control.modules import (
@@ -197,12 +198,12 @@ class ModuleDataMapper:
             # support the Stacker.
             compatible_with_robot = False
             if self.deck_type == DeckType.OT3_STANDARD:
-                compatible_with_robot = (
+                rear_panel_rev = PCBARevision.from_string(
                     self.hardware.attached_subsystems[
                         SubSystem.rear_panel
                     ].pcba_revision
-                    >= "D1.0"
                 )
+                compatible_with_robot = rear_panel_rev >= PCBARevision("D1")
         else:
             assert False, f"Invalid module type {module_type}"
 

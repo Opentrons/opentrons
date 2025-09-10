@@ -1,7 +1,9 @@
 """Types and definitions for hardware bindings."""
-from typing import Mapping, TypeVar, Dict, List, Optional, Tuple
+import re
 from dataclasses import dataclass
 from enum import Enum
+from typing import Mapping, TypeVar, Dict, List, Optional, Tuple
+from functools import total_ordering
 
 from opentrons_hardware.firmware_bindings.constants import NodeId, MoveAckId
 
@@ -14,7 +16,8 @@ NodeList = List[NodeId]
 NodeDict = Dict[NodeId, MapPayload]
 
 
-@dataclass
+@total_ordering
+@dataclass(frozen=True)
 class PCBARevision:
     """The electrical revision of a PCBA."""
 
@@ -23,9 +26,35 @@ class PCBARevision:
     tertiary: Optional[str] = None
     #: An often-not-present tertiary
 
+    @classmethod
+    def from_string(cls, rev: str) -> "PCBARevision":
+        """Parse a revision string of the form 'xy.z'."""
+        match = re.match(r"^([A-Za-z]\d+)(?:\.(\d+))?$", rev)
+        if not match:
+            raise ValueError(f"Invalid revision format: {rev}")
+        main, tertiary = match.groups()
+        return cls(main, tertiary)
+
     def __repr__(self) -> str:
         """Readable representation of the PCB revision."""
         return f"{self.main}.{self.tertiary or 0}".upper()
+
+    def _as_tuple(self) -> Tuple[str, int, int]:
+        if not self.main:
+            return ("", 0, 0)
+
+        prim = self.main[0]
+        sec = int(self.main[1:]) if len(self.main) > 1 else 0
+        tert = int(self.tertiary) if self.tertiary else 0
+        return (prim, sec, tert)
+
+    def __gt__(self, other: "PCBARevision") -> bool:
+        return self._as_tuple() > other._as_tuple()
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, PCBARevision):
+            return False
+        return self._as_tuple() == other._as_tuple()
 
 
 class MoveCompleteAck(Enum):
