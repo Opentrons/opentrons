@@ -233,14 +233,14 @@ settings = [
     SettingDefinition(
         _id="enableCamera",
         title="Enable OT-2 or Flex Camera",
-        description="This setting enables the use of the OT-2 or Flex Embedded Camera.",
+        description="This setting enables the use of the OT-2 or Flex Embedded Camera. Disabling this setting also disables the Opentrons Live Stream.",
         robot_type=[RobotTypeEnum.OT2, RobotTypeEnum.FLEX],
         default_true_on_robot_types=[RobotTypeEnum.OT2, RobotTypeEnum.FLEX],
     ),
     SettingDefinition(
         _id="enableLiveStream",
         title="Enable Opentrons Live Stream",
-        description="This setting enabled the Opentrons Live Stream service.",
+        description="This setting enables the Opentrons Live Stream service.",
         robot_type=[RobotTypeEnum.FLEX],
     ),
 ]

@@ -242,10 +242,11 @@ class PipetteSettingsUpdate(BaseModel):
 
 
 class CameraEnable(BaseModel):
-    """Configuration value for enabling and disabling the Opentrons Camera or Live Stream."""
+    """Configuration value for Opentrons Camera and Live Stream enablement. Disabling the Camera also disables the Live Stream. Enabling the Camera retains the existing Live Stream enablement setting."""
 
     enabled: bool = Field(
-        ..., description="Enable or disable the Opentrons Camera or Live Stream."
+        ...,
+        description="Enable or disable the Opentrons Camera or Opentrons Live Stream.",
     )
 
 
@@ -263,7 +264,7 @@ class LiveStreamSettings(BaseModel):
     """Configuration values of Opentrons Live Stream service."""
 
     source: Optional[str] = Field(
-        None, description="Source video device for the live stream feed."
+        ..., description="Source video device for the live stream feed."
     )
     resolution: Optional[str] = Field(
         None, description="Video resolution for the live stream."

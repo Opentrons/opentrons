@@ -7,6 +7,9 @@ from opentrons_shared_data.errors.exceptions import CommunicationError
 from opentrons_shared_data.errors.codes import ErrorCodes
 
 
+STREAM_CONF_FILE = "opentrons-live-stream/opentrons-live-stream.conf"
+
+
 class CameraException(CommunicationError):
     def __init__(self, message: str, system_error: str) -> None:
         super().__init__(
@@ -49,3 +52,14 @@ async def take_picture(filename: Path) -> None:
         raise CameraException("Failed to communicate with camera", res)
     if not filename.exists():
         raise CameraException("Failed to save image", "")
+
+
+def get_stream_configuration_filepath() -> Path:
+    """Return the file path to the Opentrons Live Stream Configuraiton file."""
+    if ARCHITECTURE == SystemArchitecture.YOCTO:
+        return Path(f"/var/lib/{STREAM_CONF_FILE}")
+    else:
+        # TODO: This is the dummy file state
+        # If the dummy file already exists, return it
+        # If not, create it with some dummy values
+        return Path(f"/{STREAM_CONF_FILE}")
