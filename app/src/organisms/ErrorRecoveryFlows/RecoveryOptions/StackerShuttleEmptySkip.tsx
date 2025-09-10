@@ -4,7 +4,6 @@ import {
   ReleaseLabware,
   SkipStepInfo,
   StackerEmptyHopper,
-  StackerHomeShuttle,
   StackerHopperLwInfo,
   StackerReengageLatch,
   StackerShuttleLwInfo,
