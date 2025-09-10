@@ -10,7 +10,7 @@ import {
   actions as stepsActions,
 } from '/protocol-designer/ui/steps'
 
-import { ConnectedStepContainer } from './StepContainer'
+import { ConnectedStepContainer } from './ConnectedStepContainer'
 
 interface PresavedStepProps {
   sidebarWidth: number
@@ -45,8 +45,9 @@ export function PresavedStep({
       onMouseLeave={unhighlightStep}
       selected={selected}
       hovered={hovered}
+      stepNumber={stepNumber}
       iconName={stepIconsByType[stepType]}
-      title={`${stepNumber}. ${t(`stepType.${stepType}`)}`}
+      text={t(`stepType.${stepType}`)}
       sidebarWidth={sidebarWidth}
     />
   )

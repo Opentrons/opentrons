@@ -93,11 +93,11 @@ metadata = {
 describe('pythonRequirements', () => {
   it('should generate requirements section', () => {
     expect(pythonRequirements(OT2_ROBOT_TYPE)).toBe(
-      `requirements = {"robotType": "OT-2", "apiLevel": "2.25"}`
+      `requirements = {"robotType": "OT-2", "apiLevel": "2.26"}`
     )
 
     expect(pythonRequirements(FLEX_ROBOT_TYPE)).toBe(
-      `requirements = {"robotType": "Flex", "apiLevel": "2.25"}`
+      `requirements = {"robotType": "Flex", "apiLevel": "2.26"}`
     )
   })
 })
@@ -132,7 +132,8 @@ const labwareId4 = 'labwareId4'
 const labwareId5 = 'labwareId5'
 const labwareId6 = 'labwareId6'
 const labwareId7 = 'labwareId7'
-
+const labwareId8 = 'labwareId8'
+const deckRiserId = 'deckRiserId'
 const mockLabwareEntities: LabwareEntities = {
   [labwareId1]: {
     id: labwareId1,
@@ -188,7 +189,7 @@ const labwareRobotState: TimelineFrame['labware'] = {
   //  labware on a slot
   [labwareId5]: { stack: [labwareId5, 'C2'] },
   // lid on labware
-  [labwareId6]: { stack: [labwareId6, labwareId3, labwareId2, 'B2'] },
+  [labwareId6]: { stack: [labwareId6, labwareId4, moduleId3, 'A2'] },
 }
 
 const mockLabwareNicknames: Record<string, string> = {
@@ -260,9 +261,32 @@ describe('getLoadLidStacks', () => {
         parameters: { loadName: 'mock_lid' } as any,
       },
     } as LabwareEntity,
+    [labwareId8]: {
+      id: labwareId8,
+      labwareDefURI: 'opentrons/mock_lid/1',
+      def: {
+        ...opentrons96Plate,
+        allowedRoles: ['lid'],
+        parameters: { loadName: 'mock_lid' } as any,
+      },
+    } as LabwareEntity,
+    [deckRiserId]: {
+      id: deckRiserId,
+      labwareDefURI: 'opentrons/opentrons_flex_deck_riser/1',
+      def: {
+        ...opentrons96Plate,
+        allowedRoles: ['adapter'],
+        parameters: { loadName: 'opentrons_flex_deck_riser' } as any,
+      },
+      pythonName: 'mock_adapter_1',
+    } as LabwareEntity,
   }
   const labwareRobotStateWithLids = {
     ...labwareRobotState,
+    [deckRiserId]: {
+      ...labwareRobotState[labwareId6],
+      stack: [deckRiserId, 'B2'],
+    },
     [labwareId6]: {
       ...labwareRobotState[labwareId6],
       stack: [labwareId6, 'D1'],
@@ -271,9 +295,13 @@ describe('getLoadLidStacks', () => {
       ...labwareRobotState[labwareId7],
       stack: [labwareId7, labwareId6, 'D1'],
     },
+    [labwareId8]: {
+      ...labwareRobotState[labwareId8],
+      stack: [labwareId8, deckRiserId, 'B2'],
+    },
   }
 
-  it('should generate load_lid_stack for 2 lids in a stack', () => {
+  it('should generate load_lid_stack for 2 lids in a stack on the deck and 1 lid for a stack on an adapter', () => {
     expect(
       getLoadLidStacks(labwareEntitiesWithLid, labwareRobotStateWithLids)
     ).toBe(
@@ -282,6 +310,11 @@ lid_stack_D1 = protocol.load_lid_stack(
     load_name="mock_lid",
     location="D1",
     quantity=2,
+)
+lid_stack_mock_adapter_1 = protocol.load_lid_stack(
+    load_name="mock_lid",
+    location=mock_adapter_1,
+    quantity=1,
 )`
     )
   })
@@ -302,13 +335,15 @@ well_plate_1 = adapter_2.load_labware(
     "fixture_96_plate",
     label="reagent plate",
     namespace="opentrons",
-    lid="mock_lid",
     version=1,
 )
 well_plate_2 = magnetic_block_2.load_labware(
     "fixture_96_plate",
     namespace="opentrons",
     version=1,
+    lid="mock_lid",
+    lid_namespace="opentrons",
+    lid_version=1,
 )
 well_plate_3 = protocol.load_labware_from_definition(
     CUSTOM_LABWARE["fixture/fixture_96_plate/1"],

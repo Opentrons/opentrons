@@ -104,23 +104,25 @@ export function FirstStepMixTools({
         <StyledText desktopStyle="bodyDefaultSemiBold">
           {t('protocol_steps:tip_management')}
         </StyledText>
-        <ChangeTipField
-          {...propsForFields.changeTip}
-          aspirateWells={formData.aspirate_wells}
-          dispenseWells={formData.dispense_wells}
-          path={formData.path}
-          stepType={formData.stepType}
-          isDisposalLocation={false}
-          tooltipContent={null}
-          padding="0"
-        />
-        <DropTipField
-          {...propsForFields.dropTip_location}
-          nozzles={formData.nozzles}
-          tooltipContent={null}
-          padding="0"
-          tiprackDefUri={formData.tipRack}
-        />
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
+          <ChangeTipField
+            {...propsForFields.changeTip}
+            aspirateWells={formData.aspirate_wells}
+            dispenseWells={formData.dispense_wells}
+            path={formData.path}
+            stepType={formData.stepType}
+            isDisposalLocation={false}
+            tooltipContent={null}
+            padding="0"
+          />
+          <DropTipField
+            {...propsForFields.dropTip_location}
+            nozzles={formData.nozzles}
+            tooltipContent={null}
+            padding="0"
+            tiprackDefUri={formData.tipRack}
+          />
+        </Flex>
       </Flex>
       {enableTipPickupLocation ? (
         <>

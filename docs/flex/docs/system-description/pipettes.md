@@ -2,8 +2,6 @@
 title: "Opentrons Flex: Pipettes"
 ---
 
-# Pipettes
-
 Opentrons *pipettes* are configurable devices used to move liquids throughout the working area during the execution of protocols. There are several Opentrons Flex pipettes, which can handle volumes from 1 µL to 1000 µL in 1, 8, or 96 channels:
 
 - Opentrons Flex 1-Channel Pipette (1–50 µL)
@@ -16,7 +14,7 @@ Opentrons *pipettes* are configurable devices used to move liquids throughout th
 
 - Opentrons Flex 96-Channel Pipette (5–1000 µL)
 
-Pipettes attach to the gantry using captive screws on the front of the pipette. 1-channel and 8-channel pipettes each occupy one *pipette mount* (left or right); the 96-channel pipette occupies both mounts. For details on installing pipettes, see [Instrument Installation and Calibration][instrument-installation-and-calibration].
+Pipettes attach to the gantry using captive screws on the front of the pipette. 1-channel and 8-channel pipettes each occupy one *pipette mount* (left or right); the 96-channel pipette occupies both mounts. For details on installing pipettes, see [Instrument Installation and Calibration](../installation/instruments.md).
 
 <figure markdown>
 ![Each capacity of pipette has captive attachment screws on its front. Pipette ejectors are at the bottom of each pipette, above the nozzles. The 1- and 8-channel pipettes have replaceable O-rings, and the 96-channel pipette has fixed O-rings.](../images/pipette-components.png "Pipette components")
@@ -164,7 +162,7 @@ that meet the needs of your protocol.
 !!! note
     Opentrons performs volumetric testing of Flex pipettes to ensure that they meet the accuracy and precision specifications listed above. You *do not* have to calibrate the volume that your pipettes dispense before use. You only have to perform positional calibration. See the next section, as well as the [Pipette Installation section][pipette-installation] of the Installation and Relocation chapter, for details.
 
-    The Opentrons Care and Opentrons Care Plus services include yearly pipette replacement and certificates of calibration. See the [Servicing Flex section][servicing-flex] of the Maintenance and Service chapter for details.
+    The Opentrons Care and Opentrons Care Plus services include yearly pipette replacement and certificates of calibration. See the [Servicing Flex section](../maintenance/service.md) of the Maintenance and Service chapter for details.
 
 ## Pipette calibration
 
@@ -192,7 +190,7 @@ Opentrons Flex pipettes have a number of sensors that detect and record data abo
 
 ### Capacitance sensors
 
-In combination with a metal probe or conductive tip, the capacitance sensors detect when the pipette makes contact with something. Detection of contact between the metal probe and the deck is used in the automated [pipette calibration][pipette-calibration] and [module calibration][module-calibration] processes.
+In combination with a metal probe or conductive tip, the capacitance sensors detect when the pipette makes contact with something. Detection of contact between the metal probe and the deck is used in the automated [pipette calibration][pipette-calibration] and [module calibration](../modules/calibration.md) processes.
 
 1-channel pipettes have one capacitance sensor, while multi-channel pipettes have two: on channels 1 and 8 of 8-channel pipettes, and on channels 1 and 96 (positions A1 and H12) of the 96-channel pipette.
 
@@ -216,10 +214,14 @@ Opentrons Flex automatically updates pipette firmware to keep it in sync with th
 
 If, for any reason, your pipette firmware and robot software versions get out of sync, you can manually update the firmware in the Opentrons App.
 
+<div class="instruction-list" markdown>
+
 1.  Click **Devices**.
 
 2.  Click on your Flex in the device list.
 
 3.  Under Instruments and Modules, the out-of-sync pipette will show a warning banner reading "Firmware update available." Click **Update now** to begin the update.
+
+</div>
 
 You can view the currently installed firmware version of any attached pipette. On the touchscreen, go to **Instruments** and tap the pipette name. In the Opentrons App, find the pipette card under Instruments and Modules, click the three-dot menu (⋮), and then click **About pipette**.

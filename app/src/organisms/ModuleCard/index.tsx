@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { RUN_STATUS_FINISHING, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import {
   ALIGN_START,
   Banner,
@@ -24,7 +23,10 @@ import {
   useMenuHandleClickOutside,
   useOnClickOutside,
 } from '@opentrons/components'
-import { useHost } from '@opentrons/react-api-client'
+import {
+  useCurrentAllSubsystemUpdatesQuery,
+  useHost,
+} from '@opentrons/react-api-client'
 import {
   ABSORBANCE_READER_TYPE,
   FLEX_STACKER_MODULE_TYPE,
@@ -39,7 +41,6 @@ import {
 import { useModuleUSBPort } from '/app/local-resources/modules'
 import { UpdateBanner } from '/app/molecules/UpdateBanner'
 import { handleModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
-import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useIsFlex } from '/app/redux-resources/robots'
 import {
@@ -52,6 +53,7 @@ import {
 } from '/app/redux/robot-api'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useIsEstopNotDisengaged } from '/app/resources/devices'
+import { useRunStatuses } from '/app/resources/runs'
 import { getModuleTooHot } from '/app/transformations/modules'
 
 import { AboutModuleSlideout } from './AboutModuleSlideout'
@@ -95,6 +97,8 @@ const NO_CALIBRATION_TYPE: ModuleType[] = [
   ABSORBANCE_READER_TYPE,
   FLEX_STACKER_MODULE_TYPE,
 ]
+
+const POLL_INTERVAL_MS = 5000
 
 interface ModuleCardProps {
   module: AttachedModule
@@ -145,7 +149,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [showFWBanner, setShowFWBanner] = useState(true)
   const [targetProps, tooltipProps] = useHoverTooltip()
 
-  const runStatus = useCurrentRunStatus()
+  const { isRunRunning } = useRunStatuses()
   const { parseModuleUSBPort } = useModuleUSBPort()
 
   const isPipetteReady =
@@ -178,7 +182,20 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     }
   }
 
+  const {
+    data: currentSubsystemsUpdatesData,
+  } = useCurrentAllSubsystemUpdatesQuery({
+    refetchInterval: POLL_INTERVAL_MS,
+  })
+  const ongoingSubsystemUpdate = currentSubsystemsUpdatesData?.data.find(
+    update =>
+      update.updateStatus === 'queued' || update.updateStatus === 'updating'
+  )
+
   const isPending = latestRequest?.status === PENDING
+
+  const hideBanners =
+    isPending || isRunRunning || ongoingSubsystemUpdate != null
   const hotToTouch: IconProps = { name: 'ot-hot-to-touch' }
   const isFlex = useIsFlex(robotName)
   const deckConfig = useNotifyDeckConfigurationQuery().data
@@ -206,9 +223,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     }
   }
   const { requireModuleCalibration, requireModuleSetup } = getSetupWizardFlow()
-
-  const isOverflowBtnDisabled =
-    runStatus === RUN_STATUS_RUNNING || runStatus === RUN_STATUS_FINISHING
 
   const isTooHot = getModuleTooHot(module)
 
@@ -366,7 +380,8 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 errorMessage={getErrorResponseMessage(latestRequest.error)}
               />
             )}
-            {!isPending && (requireModuleCalibration || requireModuleSetup) ? (
+            {!hideBanners &&
+            (requireModuleCalibration || requireModuleSetup) ? (
               <UpdateBanner
                 robotName={robotName}
                 updateType={requireModuleCalibration ? 'calibration' : 'setup'}
@@ -377,7 +392,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 updatePipetteFWRequired={updatePipetteFWRequired}
                 isTooHot={isTooHot}
               />
-            ) : !isPending && module.hasAvailableUpdate && showFWBanner ? (
+            ) : !hideBanners && module.hasAvailableUpdate && showFWBanner ? (
               <UpdateBanner
                 robotName={robotName}
                 updateType="firmware"
@@ -472,11 +487,11 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       >
         <OverflowBtn
           aria-label="overflow"
-          disabled={isOverflowBtnDisabled || isEstopNotDisengaged}
+          disabled={isRunRunning || isEstopNotDisengaged}
           {...targetProps}
           onClick={handleOverflowClick}
         />
-        {isOverflowBtnDisabled && (
+        {isRunRunning && (
           <Tooltip tooltipProps={tooltipProps}>
             {t('module_actions_unavailable')}
           </Tooltip>

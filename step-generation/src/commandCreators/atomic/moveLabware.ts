@@ -342,14 +342,18 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
       prevRobotState.labware,
       parentSlotForSlotCompatibility
     )
-    const isCompatibleStack = getIsLabwareCompatibleWithStack(
+    const slot = getSlotInLocationStack(largestStackInSlot)
+    const { isCompatible, isAboveStackLimit } = getIsLabwareCompatibleWithStack(
       labwareId,
       largestStackInSlot,
       labwareEntities,
       moduleEntities
     )
-    if (!isCompatibleStack) {
+    if (!isCompatible) {
       errors.push(errorCreators.multipleEntitiesOnSameSlotName())
+    }
+    if (isAboveStackLimit) {
+      errors.push(errorCreators.stackTooHigh({ slot }))
     }
   }
 

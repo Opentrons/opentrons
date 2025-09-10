@@ -10,6 +10,7 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  InlineNotification,
   InputField,
   JUSTIFY_END,
   JUSTIFY_SPACE_BETWEEN,
@@ -31,6 +32,7 @@ import { swatchColors } from '@opentrons/step-generation'
 import {
   HandleEnter,
   LINE_CLAMP_TEXT_STYLE,
+  LINK_BUTTON_STYLE,
 } from '/protocol-designer/components/atoms'
 import { TextAreaField } from '/protocol-designer/components/molecules'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
@@ -63,6 +65,9 @@ export function DefineLiquidsModal(
   const selectedLiquid = useSelector(
     labwareIngredSelectors.getSelectedLiquidGroupState
   )
+  const allLabwareWellContents = useSelector(
+    labwareIngredSelectors.getLiquidsByLabwareId
+  )
   const nextGroupId = useSelector(labwareIngredSelectors.getNextLiquidGroupId)
   const selectedLiquidGroupState = useSelector(
     labwareIngredSelectors.getSelectedLiquidGroupState
@@ -80,6 +85,15 @@ export function DefineLiquidsModal(
   const sortedLiquidClassDefs = getSortedLiquidClassDefs()
 
   const liquidGroupId = selectedLiquidGroupState.liquidGroupId
+  const volumePerWell = Object.values(
+    allLabwareWellContents
+  ).flatMap(labwareWithIngred =>
+    Object.values(labwareWithIngred).map(ingred =>
+      liquidGroupId != null ? ingred[liquidGroupId]?.volume : 0
+    )
+  )
+  const liquidHasAssignedWell = volumePerWell.some(volume => volume > 0)
+
   const deleteLiquidGroup = (): void => {
     if (liquidGroupId != null) {
       dispatch(labwareIngredActions.deleteLiquidGroup(liquidGroupId))
@@ -217,6 +231,7 @@ export function DefineLiquidsModal(
                     name="displayName"
                     render={({ field }) => (
                       <InputField
+                        autoFocus
                         name="displayName"
                         error={
                           touchedFields.displayName != null
@@ -277,14 +292,25 @@ export function DefineLiquidsModal(
                 gridGap={SPACING.spacing8}
               >
                 {selectedIngredFields != null ? (
-                  <Btn
-                    onClick={deleteLiquidGroup}
-                    textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                  >
-                    <StyledText desktopStyle="bodyDefaultRegular">
-                      {t('delete_liquid')}
-                    </StyledText>
-                  </Btn>
+                  <Flex>
+                    <Btn
+                      css={LINK_BUTTON_STYLE}
+                      padding={SPACING.spacing4}
+                      onClick={deleteLiquidGroup}
+                      width="7.1875rem"
+                      textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                    >
+                      <StyledText desktopStyle="bodyDefaultRegular">
+                        {t('delete_liquid')}
+                      </StyledText>
+                    </Btn>
+                    {liquidHasAssignedWell ? (
+                      <InlineNotification
+                        type="alert"
+                        message={t('liquid_in_use')}
+                      />
+                    ) : null}
+                  </Flex>
                 ) : (
                   <SecondaryButton onClick={cancelForm}>
                     {t('shared:close')}

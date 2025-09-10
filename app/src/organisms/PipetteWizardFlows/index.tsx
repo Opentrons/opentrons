@@ -9,6 +9,7 @@ import {
   COLORS,
   ModalShell,
   useConditionalConfirm,
+  WizardHeader,
 } from '@opentrons/components'
 import {
   ApiHostProvider,
@@ -19,7 +20,6 @@ import { LEFT, NINETY_SIX_CHANNEL, RIGHT } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
-import { WizardHeader } from '/app/molecules/WizardHeader'
 import { getIsOnDevice } from '/app/redux/config'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import {
@@ -135,7 +135,12 @@ export const PipetteWizardFlows = (
         if (currentStepIndex <= 2) {
           setCurrentStepIndex(0)
         } else {
-          setCurrentStepIndex(3)
+          const stepIdx =
+            pipetteWizardSteps?.findIndex(
+              step => step.section === SECTIONS.CARRIAGE
+            ) ?? 3 // Safe fallback that at least allows users to proceed.
+
+          setCurrentStepIndex(stepIdx)
         }
       } else {
         setCurrentStepIndex(0)

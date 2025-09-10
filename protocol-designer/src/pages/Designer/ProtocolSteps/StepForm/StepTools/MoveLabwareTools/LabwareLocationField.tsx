@@ -10,7 +10,6 @@ import {
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { DropdownStepFormField } from '/protocol-designer/components/molecules'
-import { getEnableStacking } from '/protocol-designer/feature-flags/selectors'
 import {
   getUnoccupiedStackOptions,
   TIPRACK_LID_LOADNAME,
@@ -40,7 +39,6 @@ export function LabwareLocationField(
 ): JSX.Element {
   const { t } = useTranslation(['form', 'protocol_steps'])
   const { labware, useGripper } = props
-  const enableStacking = useSelector(getEnableStacking)
   const { labware: deckSetupLabware } = useSelector(getDeckSetupForActiveItem)
   const dispatch = useDispatch()
   const labwareEntities = useSelector(getLabwareEntities)
@@ -48,16 +46,15 @@ export function LabwareLocationField(
     getAdditionalEquipmentEntities
   )
   const robotState = useSelector(getRobotStateAtActiveItem)
-  const unoccupiedLabwareStackOptions: Option[] =
-    robotState && enableStacking
-      ? getUnoccupiedStackOptions({
-          robotState,
-          deckSetupLabware,
-          labwareIdFromDropdown: labware,
-          labwareEntities,
-          t,
-        })
-      : []
+  const unoccupiedLabwareStackOptions: Option[] = robotState
+    ? getUnoccupiedStackOptions({
+        robotState,
+        deckSetupLabware,
+        labwareIdFromDropdown: labware,
+        labwareEntities,
+        t,
+      })
+    : []
   const isLabwareOffDeck =
     labware != null
       ? getSlotInLocationStack(robotState?.labware[labware]?.stack ?? []) ===
@@ -128,6 +125,8 @@ export function LabwareLocationField(
         dispatch(hoverSelection({ id: null, text: null }))
       }}
       tooltipContent={null}
+      // to force menu to be positioned below field instead of above
+      menuPlacement="bottom"
     />
   )
 }

@@ -5,21 +5,24 @@ name: 'Components test, build, and deploy'
 on:
   pull_request:
     paths:
-      - 'Makefile'
-      - 'components/**'
-      - 'app/**.stories.*'
-      - 'app/src/atoms/**'
-      - 'app/src/molecules/**'
+      - Makefile
       - 'package.json'
       - '.github/workflows/components-test-build-deploy.yaml'
+      - '**.stories.*'
+      - 'components/**'
+      - 'app/src/atoms/**'
+      - 'app/src/molecules/**'
+      - 'protocol-designer/src/components/**'
   push:
     paths:
-      - 'components/**'
-      - 'app/**.stories.*'
-      - 'app/src/atoms/**'
-      - 'app/src/molecules/**'
+      - Makefile
       - 'package.json'
       - '.github/workflows/components-test-build-deploy.yaml'
+      - '**.stories.*'
+      - 'components/**'
+      - 'app/src/atoms/**'
+      - 'app/src/molecules/**'
+      - 'protocol-designer/src/components/**'
     branches:
       - '**'
     tags:

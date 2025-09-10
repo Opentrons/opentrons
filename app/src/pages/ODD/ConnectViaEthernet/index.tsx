@@ -6,10 +6,10 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
+  StepMeter,
   useInterval,
 } from '@opentrons/components'
 
-import { StepMeter } from '/app/atoms/StepMeter'
 import { NetworkDetailsModal } from '/app/organisms/ODD/RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal'
 import { getLocalRobot } from '/app/redux/discovery'
 import { fetchStatus, getNetworkInterfaces } from '/app/redux/networking'

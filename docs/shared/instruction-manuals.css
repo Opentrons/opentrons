@@ -11,15 +11,6 @@ div.parts-list figure {
   width: 200px;
 }
 
-div.parts-list figure {
-  width: 200px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  text-align: center;
-}
-
 /* Bolder darker text for parts list captions */
 div.parts-list figcaption {
   font-weight: 600;

@@ -124,8 +124,8 @@ export const DesktopApp = (): JSX.Element => {
   ]
 
   return (
-    <NiceModal.Provider>
-      <LocalizationProvider>
+    <LocalizationProvider>
+      <NiceModal.Provider>
         <ErrorBoundary FallbackComponent={DesktopAppFallback}>
           <ReactQueryDevtools />
           <SystemLanguagePreferenceModal />
@@ -176,8 +176,8 @@ export const DesktopApp = (): JSX.Element => {
             </EmergencyStopContext.Provider>
           </ToasterOven>
         </ErrorBoundary>
-      </LocalizationProvider>
-    </NiceModal.Provider>
+      </NiceModal.Provider>
+    </LocalizationProvider>
   )
 }
 

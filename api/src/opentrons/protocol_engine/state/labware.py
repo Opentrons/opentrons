@@ -399,7 +399,7 @@ class LabwareView:
             return self._state.labware_by_id[labware_id]
         except KeyError as e:
             raise errors.LabwareNotLoadedError(
-                f"Labware {labware_id} not found."
+                f"Labware with id {labware_id} not found."
             ) from e
 
     def known(self, labware_id: str) -> bool:
@@ -428,7 +428,7 @@ class LabwareView:
             ):
                 return labware.id
         raise errors.exceptions.LabwareNotLoadedOnLabwareError(
-            f"There is not labware loaded onto labware {labware_id}"
+            f"There is not labware loaded onto labware {self.get_display_name(labware_id)}"
         )
 
     def raise_if_labware_has_non_lid_labware_on_top(self, labware_id: str) -> None:
@@ -441,7 +441,8 @@ class LabwareView:
                 and candidate_id != lid_id
             ):
                 raise errors.LabwareIsInStackError(
-                    f"Cannot access labware {labware_id} because it has a non-lid labware stacked on top."
+                    f"Cannot access labware {self.get_display_name(labware_id)} because it has"
+                    " a non-lid labware stacked on top."
                 )
 
     def raise_if_labware_has_labware_on_top(self, labware_id: str) -> None:
@@ -452,7 +453,8 @@ class LabwareView:
                 and labware.location.labwareId == labware_id
             ):
                 raise errors.LabwareIsInStackError(
-                    f"Cannot access labware {labware_id} because it has another labware stacked on top."
+                    f"Cannot access labware {self.get_display_name(labware_id)} because it has"
+                    " another labware stacked on top."
                 )
 
     def get_by_slot(
@@ -661,6 +663,14 @@ class LabwareView:
             or len(self.get_definition(labware_id).wells) >= 96
         )
 
+    def get_has_96_subwells(self, labware_id: str) -> bool:
+        """True if a labware is a reservoir with a 96-grid of sub-wells."""
+        return self.get_has_quirk(labware_id, "offsetPipetteFor96GridSubwells")
+
+    def get_has_12_subwells(self, labware_id: str) -> bool:
+        """True if a labware is a reservoir with a 12-grid of sub-wells."""
+        return self.get_has_quirk(labware_id, "offsetPipetteFor12GridSubwells")
+
     def get_well_definition(
         self,
         labware_id: str,
@@ -679,7 +689,7 @@ class LabwareView:
             return definition.wells[well_name]
         except KeyError as e:
             raise errors.WellDoesNotExistError(
-                f"{well_name} does not exist in {labware_id}."
+                f"{well_name} does not exist in {self.get_display_name(labware_id)}."
             ) from e
 
     def get_well_geometry(
@@ -689,19 +699,21 @@ class LabwareView:
         labware_def = self.get_definition(labware_id)
         if labware_def.innerLabwareGeometry is None:
             raise errors.IncompleteLabwareDefinitionError(
-                message=f"No innerLabwareGeometry found in labware definition for labware_id: {labware_id}."
+                message=f"No innerLabwareGeometry found in labware definition for {self.get_display_name(labware_id)}."
             )
         well_def = self.get_well_definition(labware_id, well_name)
         geometry_id = well_def.geometryDefinitionId
         if geometry_id is None:
             raise errors.IncompleteWellDefinitionError(
-                message=f"No geometryDefinitionId found in well definition for well: {well_name} in labware_id: {labware_id}"
+                message=f"No geometryDefinitionId found in well definition for well {well_name}"
+                f" for {self.get_display_name(labware_id)}"
             )
         else:
             well_geometry = labware_def.innerLabwareGeometry.get(geometry_id)
             if well_geometry is None:
                 raise errors.IncompleteLabwareDefinitionError(
-                    message=f"No innerLabwareGeometry found in labware definition for well_id: {geometry_id} in labware_id: {labware_id}"
+                    message=f"No innerLabwareGeometry found in labware definition for geometry id {geometry_id}"
+                    f" for {self.get_display_name(labware_id)}"
                 )
             return well_geometry
 
@@ -770,15 +782,15 @@ class LabwareView:
         contains_wells = all(well_name in labware_wells for well_name in iter(wells))
         if labware_definition.parameters.isTiprack:
             raise errors.LabwareIsTipRackError(
-                f"Given labware: {labware_id} is a tiprack. Can not load liquid."
+                f"Given labware {self.get_display_name(labware_id)} is a tip rack. Can not load liquid."
             )
         if LabwareRole.adapter in labware_definition.allowedRoles:
             raise errors.LabwareIsAdapterError(
-                f"Given labware: {labware_id} is an adapter. Can not load liquid."
+                f"Given labware {self.get_display_name(labware_id)} is an adapter. Can not load liquid."
             )
         if not contains_wells:
             raise errors.WellDoesNotExistError(
-                f"Some of the supplied wells do not match the labwareId: {labware_id}."
+                f"Some of the supplied wells do not match the labware {self.get_display_name(labware_id)}."
             )
         return list(wells)
 
@@ -787,7 +799,7 @@ class LabwareView:
         definition = self.get_definition(labware_id)
         if definition.parameters.tipLength is None:
             raise errors.LabwareIsNotTipRackError(
-                f"Labware {labware_id} has no tip length defined."
+                f"Labware {self.get_display_name(labware_id)} has no tip length defined."
             )
 
         return definition.parameters.tipLength - overlap
@@ -1093,7 +1105,9 @@ class LabwareView:
                 raise errors.LabwareCannotBeStackedError(
                     f"Labware {lid_labware_definition.parameters.loadName} cannot be used as a lid in the Flex Stacker."
                 )
-            if not labware_validation.validate_labware_can_be_stacked(
+            if isinstance(
+                lid_labware_definition, LabwareDefinition2
+            ) and not labware_validation.validate_legacy_labware_can_be_stacked(
                 lid_labware_definition, primary_labware_definition.parameters.loadName
             ):
                 raise errors.LabwareCannotBeStackedError(
@@ -1106,7 +1120,9 @@ class LabwareView:
                 raise errors.LabwareCannotBeStackedError(
                     f"Labware {adapter_labware_definition.parameters.loadName} cannot be used as an adapter in the Flex Stacker."
                 )
-            if not labware_validation.validate_labware_can_be_stacked(
+            if isinstance(
+                primary_labware_definition, LabwareDefinition2
+            ) and not labware_validation.validate_legacy_labware_can_be_stacked(
                 primary_labware_definition,
                 adapter_labware_definition.parameters.loadName,
             ):
@@ -1160,9 +1176,9 @@ class LabwareView:
         below_labware = self.get(bottom_labware_id)
         if isinstance(
             top_labware_definition, LabwareDefinition2
-        ) and not labware_validation.validate_labware_can_be_stacked(
-            top_labware_definition=top_labware_definition,
-            below_labware_load_name=below_labware.loadName,
+        ) and not labware_validation.validate_legacy_labware_can_be_stacked(
+            child_labware_definition=top_labware_definition,
+            parent_labware_load_name=below_labware.loadName,
         ):
             raise errors.LabwareCannotBeStackedError(
                 f"Labware {top_labware_definition.parameters.loadName} cannot be loaded onto labware {below_labware.loadName}"

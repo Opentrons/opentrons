@@ -1,5 +1,5 @@
 ---
-title: Modules
+title: Opentrons Modules
 ---
 
 # Modules
@@ -20,7 +20,15 @@ Opentrons hardware modules add features and capabilities to your robot.
 
     High-capacity labware storage and retrieval for Flex.
 
-    [:octicons-arrow-right-24: Instruction Manual](../stacker-manual/index.md)
+    [:octicons-arrow-right-24: Instruction Manual](../stacker/index.md)
+
+-   :opentrons-platereaderout:{ .xl .middle} __Absorbance Plate Reader__
+
+    ---
+
+    On-deck microplate spectrophotometer for measuring sample concentration.
+
+    [:octicons-arrow-right-24: Instruction Manual](../absorbance-plate-reader/index.md)
 
 -   :opentrons-hepa:{ .xl .middle } __HEPA/UV Module__
 
@@ -30,6 +38,14 @@ Opentrons hardware modules add features and capabilities to your robot.
 
     [:octicons-arrow-right-24: Instruction Manual](../hepa-uv/index.md)
 
+-   :opentrons-thermocycler:{ .xl .middle } __Thermocycler Module__
+
+    ---
+
+    An automated on-deck thermocycler in a 96-well plate format.
+
+    [:octicons-arrow-right-24: Instruction Manual](../thermocycler/index.md)
+
 -   :opentrons-heater-shaker:{ .xl .middle } __Heater-Shaker__
 
     ---
@@ -38,28 +54,12 @@ Opentrons hardware modules add features and capabilities to your robot.
 
     [:octicons-arrow-right-24: Instruction Manual](../heater-shaker/index.md)
 
--   :opentrons-thermocycler:{ .xl .middle } __Thermocycler Module__
-
-    ---
-
-    An automated on-deck thermocycler in a 96-well plate format.
-
-    [:octicons-arrow-right-24: Instruction Manual](../thermocycler-manual/index.md)
-
 -   :opentrons-temperature:{ .xl .middle } __Temperature Module__
 
     ---
 
-    A hot and cold plate module with a temperature range between 4°C and 95°C.
+    A hot and cold plate module with a range between 4°C and 95°C.
 
     [:octicons-arrow-right-24: Instruction Manual](../temperature-module/index.md)
-
--   :opentrons-platereaderout:{ .xl .middle} __Absorbance Plate Reader__
-
-    ---
-
-    A spectrophotometer that uses light absorbance to determine sample concentrations.
-
-    [:octicons-arrow-right-24: Instruction Manual](../absorbance-plate-reader/index.md)
 
 </div>

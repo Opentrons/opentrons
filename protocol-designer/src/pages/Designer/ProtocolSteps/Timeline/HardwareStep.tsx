@@ -26,7 +26,7 @@ import {
   selectTerminalItem,
 } from '/protocol-designer/ui/steps/actions/actions'
 
-import { PX_SIDEBAR_MIN_WIDTH_FOR_ICON } from './StepContainer'
+import { PX_SIDEBAR_MIN_WIDTH_FOR_ICON } from './ConnectedStepContainer'
 
 import type { ThunkDispatch } from '/protocol-designer/types'
 

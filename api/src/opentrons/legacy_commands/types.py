@@ -89,6 +89,12 @@ THERMOCYCLER_SET_LID_TEMP: Final = "command.THERMOCYCLER_SET_LID_TEMP"
 THERMOCYCLER_DEACTIVATE_LID: Final = "command.THERMOCYCLER_DEACTIVATE_LID"
 THERMOCYCLER_DEACTIVATE_BLOCK: Final = "command.THERMOCYCLER_DEACTIVATE_BLOCK"
 
+FLEX_STACKER_SET_STORED_LABWARE: Final = "command.FLEX_STACKER_SET_STORED_LABWARE"
+FLEX_STACKER_RETRIEVE: Final = "command.FLEX_STACKER_RETRIEVE"
+FLEX_STACKER_STORE: Final = "command.FLEX_STACKER_STORE"
+FLEX_STACKER_EMPTY: Final = "command.FLEX_STACKER_EMPTY"
+FLEX_STACKER_FILL: Final = "command.FLEX_STACKER_FILL"
+
 # Robot #
 ROBOT_MOVE_TO: Final = "command.ROBOT_MOVE_TO"
 ROBOT_MOVE_AXES_TO: Final = "command.ROBOT_MOVE_AXES_TO"
@@ -152,6 +158,9 @@ class ResumeCommandPayload(TextOnlyPayload):
 class ResumeCommand(TypedDict):
     name: Literal["command.RESUME"]
     payload: ResumeCommandPayload
+
+
+# Module commands
 
 
 class HeaterShakerSetTargetTemperaturePayload(TextOnlyPayload):
@@ -369,6 +378,34 @@ class ThermocyclerCloseCommandPayload(TextOnlyPayload):
 class ThermocyclerCloseCommand(TypedDict):
     name: Literal["command.THERMOCYCLER_CLOSE"]
     payload: ThermocyclerCloseCommandPayload
+
+
+class FlexStackerSetStoredLabwareCommand(TypedDict):
+    name: Literal["command.FLEX_STACKER_SET_STORED_LABWARE"]
+    payload: TextOnlyPayload
+
+
+class FlexStackerRetrieveCommand(TypedDict):
+    name: Literal["command.FLEX_STACKER_RETRIEVE"]
+    payload: TextOnlyPayload
+
+
+class FlexStackerStoreCommand(TypedDict):
+    name: Literal["command.FLEX_STACKER_STORE"]
+    payload: TextOnlyPayload
+
+
+class FlexStackerEmptyCommand(TypedDict):
+    name: Literal["command.FLEX_STACKER_EMPTY"]
+    payload: TextOnlyPayload
+
+
+class FlexStackerFillCommand(TypedDict):
+    name: Literal["command.FLEX_STACKER_FILL"]
+    payload: TextOnlyPayload
+
+
+# Module command end
 
 
 class HomeCommandPayload(TextOnlyPayload):
@@ -739,6 +776,12 @@ Command = Union[
     RobotMoveAxisRelativeCommand,
     RobotOpenGripperJawCommand,
     RobotCloseGripperJawCommand,
+    # Flex Stacker commands
+    FlexStackerSetStoredLabwareCommand,
+    FlexStackerRetrieveCommand,
+    FlexStackerStoreCommand,
+    FlexStackerEmptyCommand,
+    FlexStackerFillCommand,
 ]
 
 
@@ -1019,6 +1062,28 @@ class MagdeckEngageMessage(CommandMessageFields, MagdeckEngageCommand):
     pass
 
 
+class FlexStackerSetStoredLabwareMessage(
+    CommandMessageFields, FlexStackerSetStoredLabwareCommand
+):
+    pass
+
+
+class FlexStackerRetrieveMessage(CommandMessageFields, FlexStackerRetrieveCommand):
+    pass
+
+
+class FlexStackerStoreMessage(CommandMessageFields, FlexStackerStoreCommand):
+    pass
+
+
+class FlexStackerEmptyMessage(CommandMessageFields, FlexStackerEmptyCommand):
+    pass
+
+
+class FlexStackerFillMessage(CommandMessageFields, FlexStackerFillCommand):
+    pass
+
+
 class ResumeMessage(CommandMessageFields, ResumeCommand):
     pass
 
@@ -1112,4 +1177,10 @@ CommandMessage = Union[
     RobotMoveAxisRelativeMessage,
     RobotOpenGripperJawMessage,
     RobotCloseGripperJawMessage,
+    # Flex Stacker Messages
+    FlexStackerSetStoredLabwareMessage,
+    FlexStackerRetrieveMessage,
+    FlexStackerStoreMessage,
+    FlexStackerEmptyMessage,
+    FlexStackerFillMessage,
 ]

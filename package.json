@@ -27,7 +27,7 @@
   },
   "packageManager": "yarn@1.22.19",
   "engines": {
-    "node": ">=22.11.0"
+    "node": ">=22.12.0"
   },
   "resolutions": {
     "@storybook/react-docgen-typescript-plugin": "1.0.6--canary.9.cd77847.0"

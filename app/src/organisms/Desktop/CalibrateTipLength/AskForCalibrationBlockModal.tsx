@@ -18,6 +18,7 @@ import {
   SPACING,
   TYPOGRAPHY,
   WizardHeader,
+  WizardHeader,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'

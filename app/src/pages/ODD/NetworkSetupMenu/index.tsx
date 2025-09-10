@@ -9,10 +9,10 @@ import {
   JUSTIFY_CENTER,
   LegacyStyledText,
   SPACING,
+  StepMeter,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StepMeter } from '/app/atoms/StepMeter'
 import { CardButton } from '/app/molecules/CardButton'
 
 import type { IconName } from '@opentrons/components'

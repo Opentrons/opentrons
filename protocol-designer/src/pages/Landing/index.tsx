@@ -150,7 +150,7 @@ export function Landing(): JSX.Element {
             type="file"
             onChange={loadFile}
             ref={fileInputRef}
-            aria-label={t('import')}
+            aria-label={`${t('import')}_from_landing`}
             className={styles.hiddenInput}
             accept={ACCEPTED_PROTOCOL_FILE_TYPES}
           />

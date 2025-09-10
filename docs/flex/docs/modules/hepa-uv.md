@@ -2,8 +2,6 @@
 title: "Opentrons Flex: HEPA/UV Module"
 ---
 
-# HEPA/UV Module
-
 ![hepa-uv hero](../images/hepa-uv-hero.png)
 
 !!! info "Additional Documentation"

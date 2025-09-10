@@ -5,7 +5,6 @@ import { useSelector } from 'react-redux'
 import { ALL } from '@opentrons/shared-data'
 
 import { DropdownStepFormField } from '/protocol-designer/components/molecules'
-import { getEnableReturnTip } from '/protocol-designer/feature-flags/selectors'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
@@ -25,7 +24,6 @@ export function DropTipField(props: DropTipFieldProps): JSX.Element {
   const { t, i18n } = useTranslation(['form', 'shared'])
   const additionalEquipment = useSelector(getAdditionalEquipmentEntities)
   const labwareEntities = useSelector(getLabwareEntities)
-  const enableReturnTip = useSelector(getEnableReturnTip)
 
   const wasteChute = Object.values(additionalEquipment).find(
     aE => aE.name === 'wasteChute'
@@ -51,8 +49,7 @@ export function DropTipField(props: DropTipFieldProps): JSX.Element {
     value: tiprackDefUri,
   }
 
-  const isReturnTipValid =
-    enableReturnTip && (nozzles === ALL || nozzles == null)
+  const isReturnTipValid = nozzles === ALL || nozzles == null
 
   const isTipDropLocationReturnTip = Object.values(labwareEntities).some(
     ({ labwareDefURI }) => labwareDefURI === tiprackDefUri

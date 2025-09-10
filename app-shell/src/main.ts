@@ -1,6 +1,6 @@
 // electron main entry point
 import dns from 'dns'
-import { app, ipcMain } from 'electron'
+import { app, BrowserWindow, ipcMain } from 'electron'
 import contextMenu from 'electron-context-menu'
 import electronDebug from 'electron-debug'
 import * as electronDevtoolsInstaller from 'electron-devtools-installer'
@@ -14,12 +14,15 @@ import { closeAllNotifyConnections, registerNotify } from './notifications'
 import { registerProtocolAnalysis } from './protocol-analysis'
 import { registerProtocolStorage } from './protocol-storage'
 import { registerRobotUpdate } from './robot-update'
+import {
+  closeSecondaryWindows,
+  registerCameraStream,
+} from './secondary-windows'
 import { registerSystemInfo } from './system-info'
 import { createUi, registerReloadUi, registerSystemLanguage } from './ui'
 import { registerUpdate } from './update'
 import { registerUsb } from './usb'
 
-import type { BrowserWindow } from 'electron'
 import type { LogEntry } from 'winston'
 import type { Action, Dispatch, Logger } from './types'
 
@@ -48,6 +51,13 @@ if (config.devtools) {
 let mainWindow: BrowserWindow | null | undefined
 let rendererLogger: Logger
 
+interface HandlerSet {
+  handlers: Dispatch[]
+  dispatch: Dispatch
+}
+// Handler caching using window ID as key
+const handlerSets = new Map<string, HandlerSet>()
+
 // prepended listener is important here to work around Electron issue
 // https://github.com/electron/electron/issues/19468#issuecomment-623529556
 app.prependOnceListener('ready', startUp)
@@ -67,6 +77,64 @@ app.once('window-all-closed', () => {
     })
 })
 
+function isMainWindow(window: BrowserWindow): boolean {
+  return mainWindow != null && window.id === mainWindow.id
+}
+
+function getOrCreateHandlerSet(window: BrowserWindow): HandlerSet | null {
+  const windowId = `${window.id}`
+
+  if (!handlerSets.has(windowId)) {
+    const dispatch = createDispatchForWindow(window)
+
+    const handlers: Dispatch[] = isMainWindow(window)
+      ? [
+          registerConfig(dispatch),
+          registerDiscovery(dispatch),
+          registerProtocolAnalysis(dispatch, window),
+          registerUpdate(dispatch),
+          registerRobotUpdate(dispatch),
+          registerLabware(dispatch, window),
+          registerSystemInfo(dispatch),
+          registerProtocolStorage(dispatch),
+          registerUsb(dispatch),
+          registerNotify(dispatch, window),
+          registerReloadUi(window),
+          registerSystemLanguage(dispatch),
+          registerCameraStream(dispatch),
+        ]
+      : // Only register necessary subset for secondary windows.
+        [
+          registerConfig(dispatch),
+          registerDiscovery(dispatch),
+          registerUsb(dispatch),
+          registerSystemInfo(dispatch),
+          registerNotify(dispatch, window),
+          registerReloadUi(window),
+          registerSystemLanguage(dispatch),
+          registerCameraStream(dispatch),
+        ]
+
+    handlerSets.set(windowId, { handlers, dispatch })
+
+    window.on('closed', () => {
+      handlerSets.delete(windowId)
+      log.debug(`Cleaned up handlers for ${windowId}`)
+    })
+
+    log.debug(
+      `Created handler set for ${windowId}, isMain: ${isMainWindow(window)}`
+    )
+  }
+
+  const handlerSet = handlerSets.get(windowId)
+  if (handlerSet == null) {
+    log.error('Attempted to access dispatches for unhandled window.')
+  }
+
+  return handlerSet ?? null
+}
+
 function startUp(): void {
   log.info('Starting App')
   process.on('uncaughtException', error => log.error('Uncaught: ', { error }))
@@ -77,7 +145,10 @@ function startUp(): void {
   mainWindow = createUi()
   rendererLogger = createRendererLogger()
 
-  mainWindow.once('closed', () => (mainWindow = null))
+  mainWindow.once('closed', () => {
+    mainWindow = null
+    closeSecondaryWindows()
+  })
 
   contextMenu({
     menu: actions => {
@@ -89,35 +160,28 @@ function startUp(): void {
 
   initializeMenu()
 
-  // wire modules to UI dispatches
-  const dispatch: Dispatch = action => {
-    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-    if (mainWindow) {
-      log.silly('Sending action via IPC to renderer', { action })
-      mainWindow.webContents.send('dispatch', action)
-    }
-  }
-
-  const actionHandlers: Dispatch[] = [
-    registerConfig(dispatch),
-    registerDiscovery(dispatch),
-    registerProtocolAnalysis(dispatch, mainWindow),
-    registerUpdate(dispatch),
-    registerRobotUpdate(dispatch),
-    registerLabware(dispatch, mainWindow),
-    registerSystemInfo(dispatch),
-    registerProtocolStorage(dispatch),
-    registerUsb(dispatch),
-    registerNotify(dispatch, mainWindow),
-    registerReloadUi(mainWindow),
-    registerSystemLanguage(dispatch),
-  ]
-
-  ipcMain.on('dispatch', (_, action) => {
+  ipcMain.on('dispatch', (event, action) => {
     log.debug('Received action via IPC from renderer', { action })
-    actionHandlers.forEach(handler => {
-      handler(action as Action)
-    })
+
+    const senderWindow = BrowserWindow.getAllWindows().find(
+      win => win.webContents === event.sender
+    )
+
+    if (senderWindow != null) {
+      const handlerSet = getOrCreateHandlerSet(senderWindow)
+
+      if (handlerSet != null) {
+        const { handlers } = handlerSet
+
+        handlers.forEach(handler => {
+          handler(action as Action)
+        })
+      }
+    } else {
+      log.error(
+        `Could not find requested window from IPC dispatch: ${event.sender.getURL()}`
+      )
+    }
   })
 
   log.silly('Global references', { mainWindow, rendererLogger })
@@ -162,5 +226,16 @@ function installDevtools(): Promise<Logger> {
     return Promise.reject(
       new Error('could not resolve electron dev tools installer')
     )
+  }
+}
+
+const createDispatchForWindow = (
+  targetWindow: BrowserWindow | null | undefined
+): Dispatch => {
+  return (action: Action) => {
+    if (targetWindow && !targetWindow.isDestroyed()) {
+      log.silly('Sending action via IPC to renderer', { action })
+      targetWindow.webContents.send('dispatch', action)
+    }
   }
 }

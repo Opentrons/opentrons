@@ -120,6 +120,7 @@ async def test_aspirate_implementation_no_prep(
             minimum_z_height=None,
             speed=None,
             operation_volume=-50,
+            offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_return(Point(x=1, y=2, z=3))
 
@@ -212,6 +213,7 @@ async def test_aspirate_implementation_with_prep(
             minimum_z_height=None,
             speed=None,
             operation_volume=None,
+            offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_return(Point())
 
@@ -230,6 +232,7 @@ async def test_aspirate_implementation_with_prep(
             minimum_z_height=None,
             speed=None,
             operation_volume=-volume,
+            offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_return(Point(x=1, y=2, z=3))
 
@@ -323,6 +326,7 @@ async def test_aspirate_raises_volume_error(
             minimum_z_height=None,
             speed=None,
             operation_volume=-50,
+            offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_return(Point(1, 2, 3))
 
@@ -401,6 +405,7 @@ async def test_overpressure_error(
             minimum_z_height=None,
             speed=None,
             operation_volume=-50,
+            offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_return(position)
 
@@ -501,6 +506,7 @@ async def test_aspirate_implementation_meniscus(
             minimum_z_height=None,
             speed=None,
             operation_volume=-50,
+            offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_return(Point(x=1, y=2, z=3))
 
@@ -580,6 +586,7 @@ async def test_stall_during_final_movement(
             minimum_z_height=None,
             speed=None,
             operation_volume=-50,
+            offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_raise(StallOrCollisionDetectedError())
 
@@ -642,6 +649,7 @@ async def test_stall_during_preparation(
             minimum_z_height=None,
             speed=None,
             operation_volume=None,
+            offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_raise(StallOrCollisionDetectedError())
     decoy.when(model_utils.generate_id()).then_return(error_id)
@@ -715,6 +723,7 @@ async def test_overpressure_during_preparation(
             minimum_z_height=None,
             speed=None,
             operation_volume=None,
+            offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_return(prep_location)
 

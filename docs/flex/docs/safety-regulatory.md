@@ -2,8 +2,6 @@
 title: "Opentrons Flex: Safety and Regulatory Information"
 ---
 
-# Safety and Regulatory Information
-
 ## Safety information
 
 The Opentrons Flex liquid handling robot has been designed for safe operation. Refer to the specifications and compliance guidelines in this section to ensure safe usage of your Flex. These guidelines cover safe use of input and output connections for the product, including the power and data connections, as well as warning labels found on the Flex robot and related hardware. Using the device in a manner other than those specified in this manual may put the user and equipment at risk.
@@ -59,9 +57,9 @@ Always observe the following additional safety warnings:
 | :------- | :----------- |
 | ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | Opentrons Flex has not been certified for use with explosive or flammable liquids. Do not load plates, tubes, or vials containing explosive or flammable liquids into the robot or otherwise operate the instrument with explosive or flammable liquids in the enclosure. |
 | ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | Use good laboratory practices and follow the manufacturer's precautions when working with chemicals. Opentrons is not responsible or liable for any damages because of, or as a result of, the use of hazardous chemicals.           |
-| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | The Flex weighs 88.5 kg (195 lbs). As a result, it requires two people to lift and move it safely. See the [Relocation section][relocation] in the Installation and Relocation chapter.                                                                        |
-| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | The Flex should be placed on a surface capable of supporting its weight of 88.5 kg (195 lbs) with sufficient surface area to accommodate the robot plus its minimum clearance distance (20 cm/8 in). See the [Installation Requirements section][installation-requirements] in the Installation and Relocation chapter. |
-| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | The Flex can emit vibrations while in operation. Place the robot on a surface that is sturdy, level, and water-resistant with cross-bracing or welded joints. See the [Installation Requirements section][installation-requirements] in the Installation and Relocation chapter.                |
+| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | The Flex weighs 88.5 kg (195 lbs). As a result, it requires two people to lift and move it safely. See the [Relocation section](installation/relocation.md) in the Installation and Relocation chapter.                                                                        |
+| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | The Flex should be placed on a surface capable of supporting its weight of 88.5 kg (195 lbs) with sufficient surface area to accommodate the robot plus its minimum clearance distance (20 cm/8 in). See the [Installation Requirements section](installation/requirements.md) in the Installation and Relocation chapter. |
+| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | The Flex can emit vibrations while in operation. Place the robot on a surface that is sturdy, level, and water-resistant with cross-bracing or welded joints. See the [Installation Requirements section](installation/requirements.md) in the Installation and Relocation chapter.                |
 
 ### Safety cautions
 

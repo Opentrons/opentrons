@@ -48,8 +48,6 @@ export const LABWAREV2_DO_NOT_LIST = [
   // temporarily blocking 20 uL Flex tip racks until they launch
   'opentrons_flex_96_tiprack_20ul',
   'opentrons_flex_96_filtertiprack_20ul',
-  // temporarily blocking tough lids until geometry and collateral is finalized
-  'opentrons_tough_universal_lid',
 ]
 // NOTE(sa, 2020-7-14): in PD we do not want to list calibration blocks
 // or the adapter/labware combos since we migrated to splitting them up

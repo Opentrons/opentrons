@@ -116,3 +116,8 @@ clean-downloads:
 .PHONY: clean-screenshots
 clean-screenshots:
 	shx rm -rf cypress/screenshots
+
+# analyze bundle
+.PHONY: bundle-analyzer
+bundle-analyzer:
+	ANALYZE_DEBUG=true make build

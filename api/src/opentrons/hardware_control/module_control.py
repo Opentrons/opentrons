@@ -55,6 +55,15 @@ class AttachedModulesControl:
         self._available_modules: List[modules.AbstractModule] = []
         self._api = api
         self._usb = usb
+        if not IS_ROBOT and not api.is_simulator:
+            # Start task that registers emulated modules.
+            self._emulation_listen_task: asyncio.Task[
+                None
+            ] | None = api.loop.create_task(
+                listen_module_connection(self.register_modules)
+            )
+        else:
+            self._emulation_listen_task = None
 
     def subscribe_to_api_event(self, module: modules.AbstractModule) -> None:
         self._api.add_status_bar_listener(module.event_listener)
@@ -75,17 +84,43 @@ class AttachedModulesControl:
         if not api_instance.is_simulator:
             # Do an initial scan of modules.
             await mc_instance.register_modules(mc_instance.scan())
-            if not IS_ROBOT:
-                # Start task that registers emulated modules.
-                api_instance.loop.create_task(
-                    listen_module_connection(mc_instance.register_modules)
-                )
 
         return mc_instance
 
     @property
     def available_modules(self) -> List[modules.AbstractModule]:
         return self._available_modules
+
+    async def clean_up(self) -> None:
+        """Clean up all registered modules and emulator scanning tasks (if any)."""
+        for module in self._available_modules:
+            await module.cleanup()
+        if self._emulation_listen_task is not None:
+            self._emulation_listen_task.cancel("cleanup")
+            try:
+                await self._emulation_listen_task
+            except asyncio.CancelledError:
+                pass
+            except Exception:
+                log.exception("Exception cleaning up emulation listen task")
+            finally:
+                self._emulation_listen_task = None
+
+    async def register_simulated_module(
+        self,
+        simulated_usb_port: types.USBPort,
+        type: modules.ModuleType,
+        sim_model: str,
+    ) -> modules.AbstractModule:
+        """Register a simulated module."""
+        module = await self.build_module(
+            "", simulated_usb_port, type, sim_model, sim_serial_number=None
+        )
+        self._available_modules.append(module)
+        self._available_modules = sorted(
+            self._available_modules, key=modules.AbstractModule.sort_key
+        )
+        return module
 
     async def build_module(
         self,

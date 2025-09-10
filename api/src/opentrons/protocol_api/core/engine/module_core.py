@@ -317,6 +317,7 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
     def set_target_block_temperature(
         self,
         celsius: float,
+        ramp_rate: Optional[float],
         hold_time_seconds: Optional[float] = None,
         block_max_volume: Optional[float] = None,
     ) -> None:
@@ -327,6 +328,7 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
                 celsius=celsius,
                 blockMaxVolumeUl=block_max_volume,
                 holdTimeSeconds=hold_time_seconds,
+                ramp_rate=ramp_rate,
             )
         )
 

@@ -1,5 +1,6 @@
 import {
   browserTracingIntegration,
+  captureConsoleIntegration,
   init,
   replayIntegration,
 } from '@sentry/react'
@@ -33,7 +34,13 @@ export const initializeSentry = (state: BaseState): void => {
     try {
       init({
         dsn: sentryDsn,
-        integrations: [replayIntegration(), browserTracingIntegration()],
+        environment: 'production',
+        release: process.env.OT_PD_VERSION,
+        integrations: [
+          captureConsoleIntegration({ levels: ['assert'] }),
+          replayIntegration(),
+          browserTracingIntegration(),
+        ],
         tracesSampleRate: 1.0,
         tracePropagationTargets: [
           'localhost',
@@ -41,6 +48,7 @@ export const initializeSentry = (state: BaseState): void => {
         ],
         replaysSessionSampleRate: 0.0, // No Session Replay
         replaysOnErrorSampleRate: 0.0, // No Session Replay
+        ignoreErrors: [/Failed to fetch/i], // Ignore the fetch since PD doesn't use fetch
       })
       isSentryInitialized = true
       console.log('Sentry.init done')

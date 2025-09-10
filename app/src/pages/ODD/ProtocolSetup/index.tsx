@@ -73,6 +73,8 @@ import {
 import { getIsHeaterShakerAttached } from '/app/redux/config'
 import { getLocalRobot, getRobotSerialNumber } from '/app/redux/discovery'
 import {
+  LABWARE_SETUP_STEP_KEY,
+  LPC_STEP_KEY,
   OFFSETS_CONFLICT,
   selectAreOffsetsApplied,
   selectCountMissingLSOffsetsWithoutDefault,
@@ -112,6 +114,7 @@ import type {
   ProtocolSetupStepProps,
   SetupScreens,
 } from '/app/organisms/ODD/ProtocolSetup'
+import type { StepKey } from '/app/redux/protocol-runs'
 import type { ProtocolModuleInfo } from '/app/transformations/analysis'
 import type {
   ProtocolFixture,
@@ -702,7 +705,6 @@ export function ProtocolSetup(): JSX.Element {
   >() as OnDeviceRouteParams
   const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
-  const { t } = useTranslation(['protocol_setup'])
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const robotSerialNumber =
@@ -824,9 +826,9 @@ export function ProtocolSetup(): JSX.Element {
   // TODO(jh 10-31-24): Refactor the below to utilize useMissingStepsModal.
   const [labwareConfirmed, setLabwareConfirmed] = useState<boolean>(false)
   const missingSteps = [
-    !labwareConfirmed ? t('labware_placement') : null,
-    !offsetsConfirmed ? t('applied_labware_offsets') : null,
-  ].filter(s => s != null)
+    !labwareConfirmed ? LABWARE_SETUP_STEP_KEY : null,
+    !offsetsConfirmed ? LPC_STEP_KEY : null,
+  ].filter(s => s != null) as StepKey[]
   const {
     confirm: confirmMissingSteps,
     showConfirmation: showMissingStepsConfirmation,

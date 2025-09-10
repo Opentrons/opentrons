@@ -2,8 +2,6 @@
 title: "Opentrons Flex: Cleaning"
 ---
 
-# Cleaning your Flex
-
 Routine cleaning helps keep Flex free of contaminants that can affect your protocols. Cleaning also gives you a chance to inspect the robot for wear and damage. You should review this section for information, instructions, and resources about how to clean your Flex, pipettes, gripper, modules, and other hardware.
 
 If you have any questions about cleaning your Flex and its related components, contact the support team at <support@opentrons.com>.
@@ -90,7 +88,7 @@ To clean a 1-, 8-, or 96-channel pipette:
     - *Do not* disassemble Flex pipettes for cleaning or attempt to clean their internal electronic components.
     - *Do not* put Flex pipettes in an autoclave. The high temperatures, pressures, and steam used inside an autoclave can damage the electronics, circuit boards, small electric motors, and other sensitive components.
 
-### Pipette decontamination
+## Pipette decontamination
 
 The routine cleaning steps described above may not clean your pipette if it becomes contaminated with substances like nucleic acids, proteins, or radioactive material. When a pipette becomes contaminated, try the decontamination steps described in this section. You can also contact support if your pipette gets contaminated and these cleaning procedures do not work.
 
@@ -117,8 +115,28 @@ Filtered pipette tips help prevent contaminating the barrel or inside of the pip
 5. Let the pipette air dry.
 6. Reattach the pipette to the gantry. When prompted, recalibrate the pipette (optional, but recommended).
 
+## Pipette O-ring replacement
 
-## Tip cleaning
+You can replace the O-rings on Flex 1- and 8-channel pipettes if they become worn or broken. Each pipette ships with a set of replacement O-rings and a special two-piece tool to help with this procedure.
+
+You should not try to change the O-rings on a 96-channel pipette. The limited clearance between nozzles can make replacement difficult and may damage the instrument. Contact Opentrons Support if you believe the O-rings on your 96-channel pipette are worn or damaged and need to be replaced.
+
+!!!note
+    Flex and OT-2 pipette O-rings are not interchangeable.
+
+Follow these instructions to replace the O-rings on your Flex 1- and 8-channel pipettes:
+
+1.  Attach the O-ring removal tool to the pipette nozzle.
+
+  ![o-ring removal tool](../images/o-ring-removal-tool.png){width="50%"}
+
+2.  Rotate and pull gently to remove the O-ring. The O-ring may break during removal, which is common.
+
+3.  Place the wide base of the O-ring installation tool against the pipette nozzle and roll the new O-ring onto the nozzle.
+
+  ![o-ring attachment tool](../images/o-ring-attachment-tool.png){width="50%"}
+
+## Pipette tip cleaning
 
 Flex pipette tips are disposable items. You can autoclave and reuse them if your protocol allows it. For best results, we recommend using clean, fresh tips. Discard pipette tips after you no longer need them. You can purchase [replacement tips](https://opentrons.com/products/categories/tips-&-labware) directly from Opentrons.
 

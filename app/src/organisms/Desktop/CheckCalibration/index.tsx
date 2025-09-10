@@ -2,11 +2,14 @@ import { useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
-import { ModalShell, useConditionalConfirm } from '@opentrons/components'
+import {
+  ModalShell,
+  useConditionalConfirm,
+  WizardHeader,
+} from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { WizardHeader } from '/app/molecules/WizardHeader'
 import {
   ConfirmExit,
   DeckSetup,

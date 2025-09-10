@@ -1,0 +1,51 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "static-deploy"
+version = "0.0.0"
+description = "Tools for deploying our static web applications Labware Library and Protocol Designer"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "pytest>=8.4.1",
+    "rich>=14.1.0",
+    "ruff>=0.12.11",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
+
+[tool.ruff]
+# Like Black
+line-length = 140
+# Like Black
+indent-width = 4
+target-version = "py310"
+exclude = ["files"]
+src = ["*.py", "test"]
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "C",  # flake8-comprehensions
+    "B",  # flake8-bugbear
+]
+fixable = ["ALL"]
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"

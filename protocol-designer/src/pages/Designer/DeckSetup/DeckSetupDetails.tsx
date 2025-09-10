@@ -26,11 +26,11 @@ import {
 } from '../../../step-forms'
 import { START_TERMINAL_ITEM_ID } from '../../../steplist'
 import {
+  getLabwaresOnModuleFromStack,
   getStagingAreaAddressableAreas,
-  getTopmostLabwareOnModuleFromStack,
 } from '../../../utils'
 import { HighlightLabware } from '../HighlightLabware'
-import { getSlotInformation, TIPRACK_LID_LOADNAME } from '../utils'
+import { getSlotInformation } from '../utils'
 import { HighlightItems } from './HighlightItems'
 import { AdapterControls, LabwareControls, SlotControls } from './Overlays'
 import { ActiveLabwareControls } from './Overlays/ActiveLabwareControls'
@@ -232,7 +232,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           }
         }
 
-        const labwareLoadedOnModuleId = getTopmostLabwareOnModuleFromStack(
+        const { topMostId, rightBelowTopId } = getLabwaresOnModuleFromStack(
           moduleOnDeck.id,
           allLabware
         )
@@ -259,7 +259,12 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                     : 'open',
               }
             : tempInnerProps
-        const labwareOnModule = activeDeckSetup.labware[labwareLoadedOnModuleId]
+        const labwareOnModule =
+          topMostId != null ? activeDeckSetup.labware[topMostId] : null
+        const labwareRightBelowTopMostLabware =
+          rightBelowTopId != null
+            ? activeDeckSetup.labware[rightBelowTopId]
+            : null
         const isAdapter = labwareOnModule?.def.allowedRoles?.includes('adapter')
 
         return moduleOnDeck.slot !== selectedSlot.slot ? (
@@ -280,6 +285,13 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
               {labwareOnModule != null &&
               !isLabwareOccludedByThermocyclerLid ? (
                 <>
+                  {labwareRightBelowTopMostLabware != null ? (
+                    <LabwareOnDeck
+                      x={0}
+                      y={0}
+                      labwareOnDeck={labwareRightBelowTopMostLabware}
+                    />
+                  ) : null}
                   <LabwareOnDeck x={0} y={0} labwareOnDeck={labwareOnModule} />
                   <HighlightLabware
                     labwareOnDeck={labwareOnModule}
@@ -430,8 +442,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           getSlotInLocationStack(labware.stack) === 'offDeck' ||
           allModules.some(m => labware.stack.includes(m.id)) ||
           labware.id === adjacentLabware?.id ||
-          labware.stack.includes('fixedTrash') ||
-          labware.def.parameters.loadName === TIPRACK_LID_LOADNAME
+          labware.stack.includes('fixedTrash')
         ) {
           return null
         }
@@ -509,8 +520,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
       {allLabware.map(labware => {
         if (
           allModules.some(m => labware.stack.includes(m.id)) ||
-          getSlotInLocationStack(labware.stack) === 'offDeck' ||
-          labware.def.parameters.loadName === TIPRACK_LID_LOADNAME
+          getSlotInLocationStack(labware.stack) === 'offDeck'
         )
           return null
         if (
