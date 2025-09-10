@@ -65,7 +65,7 @@ class ModuleDataMapper:
         self.deck_type = deck_type
         self.hardware = hardware
 
-    def map_data(
+    def map_data(  # noqa: C901
         self,
         model: str,
         module_identity: ModuleIdentity,
@@ -198,12 +198,11 @@ class ModuleDataMapper:
             # support the Stacker.
             compatible_with_robot = False
             if self.deck_type == DeckType.OT3_STANDARD:
-                rear_panel_rev = PCBARevision.from_string(
-                    self.hardware.attached_subsystems[
-                        SubSystem.rear_panel
-                    ].pcba_revision
-                )
-                compatible_with_robot = rear_panel_rev >= PCBARevision("D1")
+                compatible_with_robot = self.hardware.is_simulator
+                rear_panel = self.hardware.attached_subsystems.get(SubSystem.rear_panel)
+                if rear_panel is not None:
+                    rear_panel_rev = PCBARevision.from_string(rear_panel.pcba_revision)
+                    compatible_with_robot = rear_panel_rev >= PCBARevision("D1")
         else:
             assert False, f"Invalid module type {module_type}"
 
