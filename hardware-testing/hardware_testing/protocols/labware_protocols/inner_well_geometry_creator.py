@@ -575,7 +575,7 @@ def check_hdelta(ctx, state: SetupState, ts: TrialState) -> str:
                 ctx.pause(
                     f"First dispense volume {state.first_dispense}uL too "
                     f"{'low' if ts.hdelta < 2.0 else 'high'}. "
-                    f"Height was {ts.hdelta}mm. Adjust and restart."
+                    f"Height was {ts.corrected_height}mm. Adjust and restart."
                 )
                 status = "fail"
         else:
