@@ -13,14 +13,6 @@ on:
       - '.github/workflows/utils.js'
       - 'scripts/static-deploy/**'
   push:
-    paths:
-      - 'labware-library/**'
-      - 'shared-data/labware/**'
-      - 'components/**'
-      - 'package.json'
-      - '.github/workflows/ll-test-build-deploy.yaml'
-      - '.github/workflows/utils.js'
-      - 'scripts/static-deploy/**'
     branches:
       - 'edge'
       - 'chore_release*'
