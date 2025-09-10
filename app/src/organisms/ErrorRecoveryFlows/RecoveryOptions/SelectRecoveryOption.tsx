@@ -207,7 +207,6 @@ export function getRecoveryOptions(
       const isStore =
         errorKind === ERROR_KINDS.STACKER_STALLED &&
         commandType === 'flexStacker/store'
-      console.log('isStore', isStore)
       if (isStore) {
         return STACKER_STALLED_STORE_OPTIONS
       } else {
