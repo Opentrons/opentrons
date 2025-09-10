@@ -112,26 +112,26 @@ def get_deploy_config() -> DeployConfig:
         labware_library=ApplicationConfig(
             name="labware_library",
             s3_bucket="opentrons.sandbox.labware",
-            cloudfront_id=None,  # No CloudFront for sandbox
-            url="http://opentrons.sandbox.labware.s3-website.us-east-2.amazonaws.com/",
+            cloudfront_id=None,  # No CloudFront invalidation on sandbox
+            url="http://sandbox.labware.opentrons.com/",
         ),
         protocol_designer=ApplicationConfig(
             name="protocol_designer",
             s3_bucket="opentrons.sandbox.protocol-designer",
-            cloudfront_id=None,  # No CloudFront for sandbox
-            url="http://opentrons.sandbox.protocol-designer.s3-website.us-east-2.amazonaws.com/",
+            cloudfront_id=None,  # No CloudFront invalidation on sandbox
+            url="http://sandbox.designer.opentrons.com/",
         ),
         docs=ApplicationConfig(
             name="docs",
             s3_bucket="sandbox.docs",
-            cloudfront_id=None,  # No CloudFront for sandbox
-            url="http://sandbox.docs.s3-website.us-east-2.amazonaws.com/",
+            cloudfront_id=None,  # No CloudFront invalidation on sandbox
+            url="http://sandbox.docs.opentrons.com/",
         ),
         mkdocs=ApplicationConfig(
             name="mkdocs",
             s3_bucket="sandbox.docs",
-            cloudfront_id=None,  # No CloudFront for sandbox
-            url="http://sandbox.docs.s3-website.us-east-2.amazonaws.com/",
+            cloudfront_id=None,  # No CloudFront invalidation on sandbox
+            url="http://sandbox.docs.opentrons.com/",
         ),
     )
 

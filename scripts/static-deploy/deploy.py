@@ -88,7 +88,7 @@ def write_github_summary(
 | 🗑️ **Delete Sync** | Enabled (removes remote files not in local) |"""
 
     markdown_summary += f"""
-| 🌐 **Deployment URL** | [{deployment_url}]({deployment_url}) |"""
+| 🌐 **Deployment URL** | [{deployment_url}]({deployment_url}/{sandbox_prefix}) |"""
 
     if config.cloudfront_id:
         cache_status = "✅ Invalidated" if cloudfront_invalidated and not dry_run else ("🧪 Skipped (dry run)" if dry_run else "❌ Failed")
