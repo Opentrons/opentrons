@@ -140,7 +140,6 @@ export function RecoveryOptions({
   getRecoveryOptionCopy,
   isOnDevice,
 }: RecoveryOptionsProps): JSX.Element {
-  console.log('validRecoveryOptions', validRecoveryOptions)
   return (
     <Flex css={RECOVERY_OPTION_CONTAINER_STYLE}>
       {validRecoveryOptions.map((recoveryOption: RecoveryRoute) => {
