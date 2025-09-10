@@ -35,7 +35,7 @@ It uses [shared-data](../shared-data) for data about labware and pipettes and fo
 
 ## Environment variable feature flags
 
-Any env var that starts with `OT_PD_` will be picked up by `webpack.EnvironmentPlugin` and made available to use in the app code with `process.env`. Webpack bakes the values of these env vars **at compile time, as strings**.
+Any env var that starts with `OT_PD_` will be picked up by the build system and made available to use in the app code, as strings, through `process.env`. These are baked in at compile time.
 
 Right now we are using them as feature flags for development, to avoid introducing regressions when we add new features that aren't fully ready to be "live" on `edge`.
 
