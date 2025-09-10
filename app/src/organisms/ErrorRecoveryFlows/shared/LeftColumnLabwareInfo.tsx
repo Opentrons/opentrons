@@ -129,7 +129,9 @@ export function LeftColumnLabwareInfo({
       (route === RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE &&
         step === RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.CHECK_HOPPER) ||
       (route === RECOVERY_MAP.STACKER_STALLED_STORE_SKIP.ROUTE &&
-        step === RECOVERY_MAP.STACKER_STALLED_STORE_SKIP.STEPS.CHECK_HOPPER)
+        step === RECOVERY_MAP.STACKER_STALLED_STORE_SKIP.STEPS.CHECK_HOPPER) ||
+      (route === RECOVERY_MAP.STACKER_STALLED_STORE_RETRY.ROUTE &&
+        step === RECOVERY_MAP.STACKER_STALLED_STORE_RETRY.STEPS.CHECK_HOPPER)
     ) {
       return labwareQuantity != null && labwareQuantity > 0
         ? labwareQuantity - 1 // one has been moved manually onto the shuttle

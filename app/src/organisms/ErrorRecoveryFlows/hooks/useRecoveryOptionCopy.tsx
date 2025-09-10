@@ -53,9 +53,10 @@ export function useRecoveryOptionCopy(): (
       case RECOVERY_MAP.STACKER_HOPPER_EMPTY_RETRY.ROUTE:
         return t('load_labware_into_stacker_and_retry_step')
       case RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE:
-      case RECOVERY_MAP.STACKER_STALLED_STORE_SKIP.ROUTE:
       case RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.ROUTE:
         return t('manually_load_labware_into_labware_shuttle_and_skip_step')
+      case RECOVERY_MAP.STACKER_STALLED_STORE_SKIP.ROUTE:
+        return t('clear_obstruction_in_stacker_and_skip_step')
       case RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.ROUTE:
         return t('load_labware_shuttle_and_retry_step')
       case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
