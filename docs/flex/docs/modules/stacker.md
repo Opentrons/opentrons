@@ -7,13 +7,13 @@ title: "Opentrons Flex: Stacker"
 !!!info "Additional Documentation"
     For complete instructions on module installation and use, see the [Stacker Module Instruction Manual](../../stacker/index.md).
 
-The Opentrons Flex® Stacker is an external module that provides automated, high-capacity storage for ANSI/SLAS compatible labware such as well plates, tip racks, and reservoirs. It also includes a shuttle that moves labware from the Stacker to the deck where it can be accessed manually or by the Flex Gripper. While ideal for high-throughput NGS workflows, the Stacker can help streamline a wide range of automated liquid handling protocols. When attached, the Stacker increases your robot’s labware storage capacity and throughput, allowing you to run longer, more complex protocols without interruption.
+The Opentrons Flex® Stacker is an external module that provides automated, high-capacity storage for ANSI/SLAS compatible labware such as well plates, tip racks, and reservoirs. It also includes a shuttle that moves labware from the Stacker to the deck where it can be accessed manually or by the Flex Gripper. When attached, the Stacker increases your robot's labware storage capacity and throughput, allowing you to run longer, more complex protocols without interruption.
 
 ## Stacker features
 
-### Supported Stackers
+### Deck locations
 
-You can attach up to four Stackers on a single Flex.
+You attach each Stacker to the right side of a Flex with its deck slot adapter. The adapter fits in any available column 3 deck slot (A3 to D3). The adapter also provides labware storage in column 3, so you don't lose any deck space. You can attach up to four Stackers on a single Flex. See the instruction manual (linked above) for step-by-step installation instructions.
 
 ### Supported Labware
 
@@ -59,7 +59,7 @@ The Stacker accepts Opentrons Flex tip racks, selected items in our [Labware Lib
 
 The Stacker is compatible with all other Flex modules.
 
-However, a special upgrade kit is required to use a HEPA/UV module with a Stacker on a Flex robot manufactured before September 2025. This kit, which adds new hardware to your Flex, prevents the HEPA/UV module from operating if the Stacker is improperly installed. Flex models manufactured after September 2025 have these safety features built-in and do not require this upgrade. _The upgrade must be performed by an Opentrons field service technician_.
+However, if you want to use a HEPA/UV module with a Stacker on a Flex robot manufactured before September 2025, you will need an upgrade kit. This kit, which adds new hardware and electronics to your Flex, prevents the HEPA/UV module from operating if the Stacker is improperly installed. Robots manufactured after September 2025 have these safety features built-in and do not require this upgrade. _The upgrade must be performed by an Opentrons field service technician_.
 
 For additional information, see the [HEPA/UV compatibility section](../../stacker/compliance.md#stacker-and-hepauv-compatibility) of the Stacker instruction manual. You can also contact [Opentrons Sales](https://opentrons.com/contact) if you're unsure about a robot's manufacture date and/or have a model that needs to be upgraded.
 
@@ -71,7 +71,7 @@ The Stacker is fully programmable in Protocol Designer and the Python Protocol A
 
 | Specification | Details |
 |----|----|
-| **Tower and track dimensions** | 385.5 mm L x 106 mm W x 955.5 mm H (~15” L x 4” W x 37” H) |
-| **Tower dimensions** | 194.5 mm L x 106 mm W x 955.5 mm H (~8” L x 4” W x 37” H). Measurements are taken from the base of the tower and exclude the track. |
-| **Side clearance** | When attached, this module extends approximately 20 cm (8”) from the side of the robot. You’ll also need additional clearance for the Stacker’s loading door, which requires slightly more space to open fully and to allow for easy labware loading. |
+| **Tower and track dimensions** | 385.5 mm L x 106 mm W x 955.5 mm H (~15" L x 4" W x 37" H) |
+| **Tower dimensions** | 194.5 mm L x 106 mm W x 955.5 mm H (~8" L x 4" W x 37" H). Measurements are taken from the base of the tower and exclude the track. |
+| **Side clearance** | When attached, this module extends approximately 20 cm (8") from the side of the robot. You'll also need additional clearance for the Stacker's loading door, which requires slightly more space to open fully and to allow for easy labware loading. |
 | **Weight** | 13.6 kg (~30 lbs). Installation may require the assistance of a lab partner. |
