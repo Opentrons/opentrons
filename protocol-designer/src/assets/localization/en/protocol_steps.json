@@ -114,7 +114,10 @@
   "pause": {
     "pausingUntilResume": "Pausing until manually told to resume",
     "pausingUntilTemperature": "<text>Pausing until</text><semiBoldText>{{module}}</semiBoldText><text>reaches</text><tag/>",
-    "pausingForDuration": "<text>Pausing for</text><tag/>"
+    "pausingForDuration": "<text>Pausing for</text><tag/>",
+    "untilResume": "Until told to resume",
+    "untilTemperature": "Until {{temperature}} °C reached",
+    "forDuration": "For {{duration}}"
   },
   "pipette": "Pipette",
   "pipette_path": "Pipette path",

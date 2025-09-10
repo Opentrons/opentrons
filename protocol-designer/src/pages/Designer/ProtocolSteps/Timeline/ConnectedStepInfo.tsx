@@ -10,7 +10,13 @@ import {
   CLOSE_UNSAVED_STEP_FORM,
   ConfirmDeleteModal,
 } from '/protocol-designer/components/organisms'
+import {
+  PAUSE_UNTIL_RESUME,
+  PAUSE_UNTIL_TEMP,
+  PAUSE_UNTIL_TIME,
+} from '/protocol-designer/constants'
 import { selectors as dismissSelectors } from '/protocol-designer/dismiss'
+import { getEnableConcurrentModuleActions } from '/protocol-designer/feature-flags/selectors'
 import { selectors as fileDataSelectors } from '/protocol-designer/file-data'
 import { stepIconsByType } from '/protocol-designer/form-types'
 import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
@@ -30,6 +36,7 @@ import {
   toggleViewSubstep,
 } from '/protocol-designer/ui/steps/actions/actions'
 
+import { formatTime } from '../../utils'
 import { ConnectedStepContainer } from './ConnectedStepContainer'
 import {
   getMetaSelectedSteps,
@@ -41,7 +48,7 @@ import {
 import type { ThunkDispatch } from 'redux-thunk'
 import type { Dispatch, MouseEvent, SetStateAction } from 'react'
 import type { DeleteModalType } from '/protocol-designer/components/organisms'
-import type { StepIdType } from '/protocol-designer/form-types'
+import type { FormData, StepIdType } from '/protocol-designer/form-types'
 import type { BaseState, ThunkAction } from '/protocol-designer/types'
 import type { SelectMultipleStepsAction } from '/protocol-designer/ui/steps'
 
@@ -65,7 +72,6 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
     setOpenedOverflowMenuId,
     sidebarWidth,
   } = props
-  const { i18n, t } = useTranslation('application')
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const stepIds = useSelector(getOrderedStepIds)
   const step = useSelector(stepFormSelectors.getSavedStepForms)[stepId]
@@ -85,6 +91,7 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
     errorStepId != null ? stepIds.slice(stepIds.indexOf(errorStepId) + 1) : []
   const stepAfterError =
     stepId != null ? stepListAfterErrors.includes(stepId) : false
+  const { text, subtext } = useStepText(step)
 
   const hasWarnings =
     hasTimelineWarningsPerStep[stepId] || hasFormLevelWarningsPerStep[stepId]
@@ -247,15 +254,42 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
         onMouseEnter={handleMouseEnter}
         iconName={hasError || hasWarnings ? 'alert-circle' : iconName}
         stepNumber={stepNumber}
-        // add empty check to avoid causing undefined issue when calling titleCase
-        text={
-          step.stepName !== undefined && step.stepName !== ''
-            ? i18n.format(step.stepName, 'titleCase')
-            : t(`stepType.${step.stepType}`)
-        }
+        text={text}
+        subtext={subtext}
         dragHovered={dragHovered}
         sidebarWidth={sidebarWidth}
       />
     </>
   )
+}
+
+function useStepText(step: FormData): { text: string; subtext: string | null } {
+  const { i18n, t } = useTranslation(['application', 'protocol_steps'])
+  const enableConcurrentModuleActions = useSelector(
+    getEnableConcurrentModuleActions
+  )
+
+  // add empty check to avoid causing undefined issue when calling titleCase
+  const text =
+    step.stepName !== undefined && step.stepName !== ''
+      ? i18n.format(step.stepName, 'titleCase')
+      : t(`stepType.${step.stepType}`)
+
+  let subtext = null
+  if (enableConcurrentModuleActions && step.stepType === 'pause') {
+    // todo(mm, 2025-09-10): Improve FormData typing to make this type-safe.`
+    if (step.pauseAction === PAUSE_UNTIL_RESUME) {
+      subtext = t('protocol_steps:pause.untilResume')
+    } else if (step.pauseAction === PAUSE_UNTIL_TEMP) {
+      subtext = t('protocol_steps:pause.untilTemperature', {
+        temperature: step.pauseTemperature,
+      })
+    } else if (step.pauseAction === PAUSE_UNTIL_TIME) {
+      subtext = t('protocol_steps:pause.forDuration', {
+        duration: formatTime(step.pauseTime as string),
+      })
+    }
+  }
+
+  return { text, subtext }
 }
