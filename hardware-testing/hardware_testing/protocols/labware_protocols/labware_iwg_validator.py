@@ -12,7 +12,7 @@ from opentrons.types import Point
 from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
 
 # LABWARE TYPE
-LABWARE = "costar_96_wellplate_2200ul"  # change to desired labware
+LABWARE = "eppendorf_96_wellplate_500ul"  # change to desired labware
 
 # SLOTS
 SLOT_LIQUID_TIPRACKS = ["C3", "B3", "A2"]
@@ -24,7 +24,7 @@ CSV_SEPARATOR = ""
 RUN_ID = ""
 FILE_NAME = ""
 DIAL_PORT = None
-DIAL_PORT_NAME = "/dev/ttyUSB1"
+DIAL_PORT_NAME = "/dev/ttyUSB0"
 DIAL_POS_WITHOUT_TIP: List[Optional[float]] = [None, None]
 
 metadata = {"protocolName": "volume-validator"}
@@ -62,6 +62,15 @@ def add_parameters(parameters: ParameterContext) -> None:
         default="flex_1channel_1000",
     )
 
+    parameters.add_int(
+        variable_name="n_regions",
+        display_name="Number of Regions",
+        description="Number of dispense regions to test (splits depth into intervals).",
+        default=5,
+        minimum=1,
+        maximum=20,
+    )
+
     parameters.add_str(
         variable_name="liq_tip_size",
         display_name="Liquid Tip Size",
@@ -72,6 +81,8 @@ def add_parameters(parameters: ParameterContext) -> None:
         default="1000",
     )
 
+
+# ...existing code...
 
 def _setup(
     ctx: ProtocolContext,
@@ -87,19 +98,23 @@ def _setup(
     List[Labware],
     InstrumentContext,
     str,
+    int,  # <-- add n_regions to return
 ]:
     global DIAL_PORT, RUN_ID, FILE_NAME, LABWARE
+
+    n_regions = int(getattr(ctx.params, "n_regions", 5)) 
+
     labware_type = LABWARE
 
     # LOAD LABWARE AND DIAL
     labware = ctx.load_labware(labware_type, SLOT_LABWARE)
-    number_of_trials = int(3)
+    number_of_trials = int(2)
     labware.load_empty(labware.wells())
     src = ctx.load_labware("nest_1_reservoir_290ml", SLOT_RESERVOIR)
     ethanol_liq = ctx.define_liquid("Ethanol", display_color="#FFFFC5")
     src["A1"].load_liquid(ethanol_liq, src["A1"].max_volume - 1000)
     ctx.load_trash_bin("A3")
-    dial = ctx.load_labware("dial_indicator", SLOT_DIAL)
+    dial = ctx.load_labware("nest_1_reservoir_290ml", SLOT_DIAL)
     left_mount = ctx.params.left_mount  # type: ignore[attr-defined]
     right_mount = ctx.params.right_mount  # type: ignore[attr-defined]
     liq_tip_size = ctx.params.liq_tip_size  # type: ignore[attr-defined]
@@ -142,18 +157,15 @@ def _setup(
         ]
         _write_line_to_csv(ctx, heading_for_csv)
 
-    # Find expected heights for each labware definition
     depth = labware["A1"].depth
 
-    low_height = 3
-    middle_height = depth / 2
-    high_height = depth * 4 / 5
+    # Calculate region heights based on n_regions
+    region_heights = [(depth * (i + 1) / n_regions) for i in range(n_regions)]
 
-    expected_heights = (
-        [low_height] * number_of_trials  # low height
-        + [middle_height] * number_of_trials  # mid height
-        + [high_height] * number_of_trials  # high height
-    )
+    # Each region will be tested number_of_trials times
+    expected_heights = []
+    for h in region_heights:
+        expected_heights.extend([h] * number_of_trials)
 
     return (
         liq_pipette,
@@ -167,8 +179,8 @@ def _setup(
         liq_tip_racks,
         right_mount,
         liq_tip_size,
+        n_regions,  
     )
-
 
 def pick_up_tips(
     probe_pipette: InstrumentContext, liq_pipette: InstrumentContext
@@ -345,6 +357,7 @@ def run(ctx: ProtocolContext) -> None:
         liq_tip_racks,
         right_mount,
         liq_tip_size,
+        n_regions,  # <-- unpack n_regions
     ) = _setup(ctx)
 
     wells = [str(w).split(" ")[0] for w in labware.wells()]
@@ -355,7 +368,6 @@ def run(ctx: ProtocolContext) -> None:
         volumes.setdefault(well, []).append(volume)
 
     _store_dial_baseline(ctx, probe_pipette, dial)
-    # Pick up Tips
     pick_up_tips(probe_pipette, liq_pipette)
     _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
     liq_pipette.blow_out()
@@ -374,13 +386,12 @@ def run(ctx: ProtocolContext) -> None:
         liq_tip_size,
     )
 
-    region_names = ["low", "middle", "high"]
-    region_heights = list(dict.fromkeys(expected_heights))
     region_results = []
-
     region_len = number_of_trials
+    region_heights = list(dict.fromkeys(expected_heights))  # unique region heights
+
     if not ctx.is_simulating():
-        for i, region in enumerate(region_names):
+        for i in range(n_regions):
             start = i * region_len
             end = (i + 1) * region_len
             corrected = all_corrected_heights[start:end]

@@ -15,13 +15,13 @@ from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProb
 import numpy as np
 import json
 from opentrons_shared_data.labware.types import LabwareDefinition3, LabwareDefinition2
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 ###########################################
 #  GLOBAL VARIABLES - START
 ###########################################
 
-LABWARE = "costar_96_wellplate_2200ul"  # change to desired labware
+LABWARE = "eppendorf_96_wellplate_500ul"  # change to desired labware
 
 RESERVOIR = "nest_1_reservoir_290ml"
 
@@ -50,7 +50,7 @@ metadata = {"protocolName": "inner-well-geometry-creator", "author": "ABR"}
 requirements = {"robotType": "Flex", "apiLevel": "2.24"}
 
 DIAL_PORT = None
-DIAL_PORT_NAME = "/dev/ttyUSB1"
+DIAL_PORT_NAME = "/dev/ttyUSB0"
 DIAL_POS_WITHOUT_TIP: List[Optional[float]] = [None, None]
 RUN_ID = ""
 FILE_NAME = ""
@@ -67,9 +67,9 @@ CSV_HEADER = [
 ]
 
 
-@dataclass
+@dataclass(frozen=True)
 class SetupState:
-    """Internal components."""
+    """Configure static runtime parameters"""
 
     liq_pipette: InstrumentContext
     probe_pipette: InstrumentContext
@@ -93,17 +93,57 @@ class SetupState:
     ethanol: LiquidClass
 
 
-@dataclass
+@dataclass(frozen=True)
 class TrialResult:
-    """Data that represent the results of each trial."""
+    """Snapshot result of each trial."""
 
     well: str
     step_volume: float
-    total_volume: float
+    dispense_volume: float
     tip_z_error: float
     height: float
     hdelta: float
     status: str
+
+
+@dataclass
+class TrialState:
+    """Information that changes per-trial"""
+
+    current_well: str = "none"
+    status: str = "pass"
+    step_volume: float = 0.0
+    dispense_volume: float = 0.0
+    hdelta: float = 0.0
+    corrected_height: float = 0.0
+    tip_z_error: float = 0.0
+    corrected_heights: List[float] = field(default_factory=lambda: [0.0])
+    results: List[TrialResult] = field(default_factory=list)
+    step: int = 0
+
+    def add_result(self) -> None:
+        self.results.append(
+            TrialResult(
+                well=self.current_well,
+                step_volume=round(self.step_volume, 5),
+                dispense_volume=round(self.dispense_volume, 5),
+                tip_z_error=round(self.tip_z_error, 5),
+                height=round(self.corrected_height, 5),
+                hdelta=self.hdelta,
+                status=self.status,
+            )
+        )
+
+    def rollback_last_data_point(self) -> None:
+        self.dispense_volume -= self.step_volume  # rollback dispense volume
+        self.corrected_heights.pop()  # rollback corrected heights
+
+    def compute_hdelta(self) -> None:
+        self.hdelta = (
+            self.corrected_heights[-1] - self.corrected_heights[-2]
+            if len(self.corrected_heights) > 1
+            else 0.0
+        )
 
 
 def add_parameters(parameters: ParameterContext) -> None:
@@ -122,7 +162,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         ],
         default="flex_1channel_50",
     )
-    # Right Mount
+
     parameters.add_str(
         variable_name="right_mount",
         display_name="Right Mount",
@@ -326,9 +366,7 @@ def _get_tip_z_error(
     return (new_val - baseline) * -1.0
 
 
-def pick_up_tips(
-    probe_pipette: InstrumentContext, liq_pipette: InstrumentContext
-) -> None:
+def pick_up_tips(liq_pipette, probe_pipette) -> None:
     """Pick up tips."""
     if not probe_pipette.has_tip:
         probe_pipette.pick_up_tip()
@@ -336,7 +374,7 @@ def pick_up_tips(
         liq_pipette.pick_up_tip()
 
 
-def drop_tips(probe_pipette: InstrumentContext, liq_pipette: InstrumentContext) -> None:
+def drop_tips(liq_pipette, probe_pipette) -> None:
     """Drop tips."""
     if probe_pipette.has_tip:
         probe_pipette.drop_tip()
@@ -450,237 +488,197 @@ def generate_frusta(
     return inner_well_json
 
 
-def get_alpha_for_height(height: float, max_volume: float, threshold: float) -> float:
+def get_dispense_props(state: SetupState, ts: TrialState) -> None:
+    if state.liquid_tip == "1000":
+        dispense_offset = ts.corrected_height + state.target_height + 10
+        state.liq_pipette.flow_rate.blow_out = 1000
+    else:
+        dispense_offset = ts.corrected_height + state.target_height + 3
+        state.liq_pipette.flow_rate.blow_out = 500
+
+    wb = "well-bottom"
+    lm = "liquid-meniscus"
+    dest = "destination"
+    meniscus_z = -0.5
+
+    for rack in state.liquid_racks:
+        ethanol_props = state.ethanol.get_for(state.liquid_mount, rack)
+        ethanol_props.aspirate.aspirate_position.position_reference = lm  # type: ignore[assignment]
+        ethanol_props.aspirate.aspirate_position.offset.z = meniscus_z
+        ethanol_props.dispense.dispense_position.position_reference = wb  # type: ignore[assignment]
+        ethanol_props.dispense.dispense_position.offset.z = dispense_offset
+        ethanol_props.dispense.push_out_by_volume.set_for_all_volumes(0.0)
+        ethanol_props.dispense.flow_rate_by_volume.set_for_all_volumes(50)
+        ethanol_props.dispense.retract.blowout.location = dest  # type: ignore[assignment]
+        ethanol_props.dispense.retract.blowout.flow_rate = (
+            state.liq_pipette.flow_rate.blow_out
+        )
+        ethanol_props.dispense.retract.blowout.enabled = True
+
+
+def get_alpha_for_height(state: SetupState, ts: TrialState) -> float:
     """Return adaptive proportional factor depending on well size & current height."""
-    if max_volume >= 200000:
+    if state.max_volume >= 200000:
         alpha_low, alpha_high = 0.5, 1.5
-    elif max_volume >= 2000:
+    elif state.max_volume >= 2000:
         alpha_low, alpha_high = 0.2, 0.5
-    elif max_volume >= 250:
+    elif state.max_volume >= 250:
         alpha_low, alpha_high = 0.5, 0.8
-    elif max_volume >= 100:
+    elif state.max_volume >= 100:
         alpha_low, alpha_high = 0.8, 1.0
     else:
         alpha_low, alpha_high = 1.0, 0.8
-    return alpha_low if height < threshold else alpha_high
+    return alpha_low if ts.corrected_height < state.threshold else alpha_high
 
 
 # Proportional Controller
-def adaptive_volume_step(
-    hdelta: float, height: float, step_volume: float, state: SetupState
-) -> float:
+def adaptive_volume_step(ts: TrialState, state: SetupState) -> float:
     """Return a new step volume based on the hdelta error from target."""
-    alpha = get_alpha_for_height(height, state.max_volume, state.threshold)
+    alpha = get_alpha_for_height(state, ts)
 
-    if state.lower_bound <= hdelta <= state.upper_bound:
-        return step_volume
+    if state.lower_bound <= ts.hdelta <= state.upper_bound:
+        return ts.step_volume
 
-    elif hdelta < state.lower_bound and hdelta > 0:
-        error = state.target_height - hdelta
-        new_volume = step_volume * min(
+    elif ts.hdelta < state.lower_bound and ts.hdelta > 0:
+        error = state.target_height - ts.hdelta
+        new_volume = ts.step_volume * min(
             1.5, 1 + alpha * error
         )  # increase clamped to 150% of previous step volume
 
-    elif hdelta > state.upper_bound:
-        error = hdelta - state.target_height
-        new_volume = step_volume * max(
+    elif ts.hdelta > state.upper_bound:
+        error = ts.hdelta - state.target_height
+        new_volume = ts.step_volume * max(
             0.5, 1 - alpha * error
         )  # decrease clamped to 50% of previous step volume
     else:
-        new_volume = step_volume
+        new_volume = ts.step_volume
 
     new_volume = max(state.min_step, min(state.max_step, new_volume))
 
     return new_volume
 
 
-# Inner Well Geometry Creator
-def geometry_creator(ctx: ProtocolContext, state: SetupState) -> List[TrialResult]:
-    """Run liquid dispense + measure loop and return trial results."""
-    liq_pipette, probe_pipette, labware, src, wells, max_volume, ethanol = (
-        state.liq_pipette,
-        state.probe_pipette,
-        state.labware,
-        state.src,
-        state.wells,
-        state.max_volume,
-        state.ethanol,
-    )
+def write_trial_log(ctx, ts: TrialState) -> None:
+    ts.add_result()
+    trial_data = ts.results[-1]
+    _write_line_to_csv(ctx, [str(v) for v in vars(trial_data).values()])
 
-    # Initialize local state
-    corrected_height = 0.0
-    corrected_heights = [0.0]
-    tip_z_error = 0.0
-    step = 0
-    hdelta = 0.0
-    height = 0.0
-    step_volume = 0.0
-    dispense_volume = 0.0
-    status = "pass"
-    current_well = "none"
-    udv_table: List[TrialResult] = []
-    meniscus_z = -0.5
+
+def check_hdelta(ctx, state: SetupState, ts: TrialState) -> str:
+    if ctx.is_simulating():
+        status = "sim"
+    else:
+        if ts.step == 0:
+            if 2.0 < ts.hdelta < 3.0:
+                status = "pass"
+            else:
+                ctx.pause(
+                    f"First dispense volume {state.first_dispense}uL too "
+                    f"{'low' if ts.hdelta < 2.0 else 'high'}. "
+                    f"Height was {ts.hdelta}mm. Adjust and restart."
+                )
+                status = "fail"
+        else:
+            status = (
+                "pass" if state.lower_bound < ts.hdelta < state.upper_bound else "fail"
+            )
+    return status
+
+
+# Inner Well Geometry Creator
+def geometry_creator(
+    ctx: ProtocolContext, state: SetupState, ts: TrialState
+) -> List[TrialResult]:
+    """Run liquid dispense + measure loop and return trial results."""
 
     # Stops the protocol once the dispensed volume reaches a certain point
-    if max_volume > 100000:
-        margin = max_volume * 0.33
-    else:
-        margin = max_volume * 0.15
+    stop_volume = state.max_volume * 0.85
 
-    _store_dial_baseline(ctx, probe_pipette, state.dial)
+    _store_dial_baseline(ctx, state.probe_pipette, state.dial)
     _write_line_to_csv(ctx, CSV_HEADER)
 
-    def write_trial_log(udv_table: List[TrialResult]) -> None:
-        trial_data = TrialResult(
-            well=current_well,
-            step_volume=round(step_volume, 5),
-            total_volume=round(dispense_volume, 5),
-            tip_z_error=round(tip_z_error, 5),
-            height=round(corrected_height, 5),
-            hdelta=hdelta,
-            status=status,
-        )
-        udv_table.append(trial_data)
-        _write_line_to_csv(
-            ctx,
-            [
-                trial_data.well,
-                str(trial_data.step_volume),
-                str(trial_data.total_volume),
-                str(trial_data.tip_z_error),
-                str(trial_data.height),
-                str(trial_data.hdelta),
-                trial_data.status,
-            ],
-        )
-
     # initial protocol steps
-    write_trial_log(udv_table)
-    liq_pipette.pick_up_tip()
-    _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
-    step_volume = state.first_dispense
+    write_trial_log(ctx, ts)
+    state.liq_pipette.pick_up_tip()
+    _get_height_of_liquid_in_well(
+        state.liq_pipette, state.src["A1"], ctx.is_simulating()
+    )
+    ts.step_volume = state.first_dispense
 
-    while dispense_volume < (max_volume - margin):
+    while ts.dispense_volume < stop_volume:
 
-        current_well = wells[step % len(wells)]
+        ts.current_well = state.wells[ts.step % len(state.wells)]
         # check if out of wells
-        if step > 0 and step % len(wells) == 0:
+        no_more_wells = ts.step > 0 and ts.step % len(state.wells) == 0
+        if no_more_wells:
             if not ctx.is_simulating():
                 ctx.pause("Reload the labware.")
-                _get_height_of_liquid_in_well(
-                    liq_pipette, src["A1"], ctx.is_simulating()
-                )
             else:
-                return udv_table
+                break
 
-        drop_tips(probe_pipette, liq_pipette)
+        drop_tips(state.liq_pipette, state.probe_pipette)
 
         # Set Dispense Parameters
-        dispense_volume += step_volume
-        volume_per_channel = dispense_volume / liq_pipette.channels
+        ts.dispense_volume += ts.step_volume
+        volume_per_channel = ts.dispense_volume / state.liq_pipette.channels
+        get_dispense_props(state, ts)
 
-        if state.liquid_tip == "1000":
-            dispense_offset = corrected_height + state.target_height + 10
-            liq_pipette.flow_rate.blow_out = 1000
-        else:
-            dispense_offset = corrected_height + state.target_height + 3
-            liq_pipette.flow_rate.blow_out = 500
+        pick_up_tips(state.liq_pipette, state.probe_pipette)
+        tip_z_error = _get_tip_z_error(ctx, state.probe_pipette, state.dial)
 
-        wb = "well-bottom"
-        lm = "liquid-meniscus"
-        dest = "destination"
-        for rack in state.liquid_racks:
-            ethanol_props = ethanol.get_for(state.liquid_mount, rack)
-            ethanol_props.aspirate.aspirate_position.position_reference = lm  # type: ignore[assignment]
-            ethanol_props.aspirate.aspirate_position.offset.z = meniscus_z
-            ethanol_props.dispense.dispense_position.position_reference = wb  # type: ignore[assignment]
-            ethanol_props.dispense.dispense_position.offset.z = dispense_offset
-            ethanol_props.dispense.push_out_by_volume.set_for_all_volumes(0.0)
-            ethanol_props.dispense.flow_rate_by_volume.set_for_all_volumes(50)
-            ethanol_props.dispense.retract.blowout.location = dest  # type: ignore[assignment]
-            ethanol_props.dispense.retract.blowout.flow_rate = (
-                liq_pipette.flow_rate.blow_out
-            )
-            ethanol_props.dispense.retract.blowout.enabled = True
-
-        pick_up_tips(probe_pipette, liq_pipette)
-        tip_z_error = _get_tip_z_error(ctx, probe_pipette, state.dial)
-
-        liq_pipette.transfer_with_liquid_class(
-            liquid_class=ethanol,
+        state.liq_pipette.transfer_with_liquid_class(
+            liquid_class=state.ethanol,
             volume=volume_per_channel,
-            source=src["A1"],
-            dest=labware[current_well],
+            source=state.src["A1"],
+            dest=state.labware[ts.current_well],
             new_tip="never",
             return_tip=False,
         )
 
         # Measure liquid height
         height = _get_height_of_liquid_in_well(
-            probe_pipette, labware[current_well], ctx.is_simulating()
+            state.probe_pipette, state.labware[ts.current_well], ctx.is_simulating()
         )
-        corrected_height = height + tip_z_error
-        corrected_heights.append(corrected_height)
+        ts.corrected_height = height + tip_z_error
 
         # Compute hdelta
-        hdelta = (
-            corrected_heights[-1] - corrected_heights[-2]
-            if len(corrected_heights) > 1
-            else 0.0
-        )
+        ts.compute_hdelta()
 
         # Check for bad hdelta
-        if not ctx.is_simulating():
-            if step == 0:
-                if hdelta < 2.0:
-                    ctx.pause(
-                        f"First dispense volume {state.first_dispense}uL too low. Height was {hdelta}mm. Adjust and restart."
-                    )
-                    return udv_table
-                elif hdelta > 3.0:
-                    ctx.pause(
-                        f"First dispense volume {state.first_dispense}uL too high. Height was {hdelta}mm. Adjust and restart."
-                    )
-                    return udv_table
-                else:
-                    status = "pass"
-            else:
-                if hdelta <= state.lower_bound or hdelta >= state.upper_bound:
-                    status = "fail"
-                else:
-                    status = "pass"
-        else:
-            status = "sim"
+        ts.status = check_hdelta(ctx, state, ts)
 
-        if status == "fail":
-            write_trial_log(udv_table)
-            dispense_volume -= step_volume  # rollback dispense volume
-            corrected_heights.pop()  # rollback corrected heights
-        else:
-            write_trial_log(udv_table)
+        if ts.status == "fail":
+            if ts.step == 0:
+                break
+            else:
+                write_trial_log(ctx, ts)
+                ts.rollback_last_data_point()
+        elif ts.status == "pass":
+            write_trial_log(ctx, ts)
 
         # recalculate step volume for next step
-        step_volume = adaptive_volume_step(hdelta, corrected_height, step_volume, state)
+        ts.step_volume = adaptive_volume_step(ts, state)
         # prevent overflow of well
-        if step_volume + dispense_volume > max_volume:
-            return udv_table
+        if ts.step_volume + ts.dispense_volume > state.max_volume:
+            break
 
-        step += 1
+        ts.step += 1
 
-    drop_tips(probe_pipette, liq_pipette)
-    return udv_table
+    drop_tips(state.liq_pipette, state.probe_pipette)
+    return ts.results
 
 
 def run(ctx: ProtocolContext) -> None:
     """Run the protocol."""
     state = _setup(ctx)
-    udv_table = geometry_creator(ctx, state)
-    drop_tips(state.probe_pipette, state.liq_pipette)
+    ts = TrialState()
+    trial_results = geometry_creator(ctx, state, ts)
+    drop_tips(state.liq_pipette, state.probe_pipette)
 
     # Save results
-    passed_trials = [trial for trial in udv_table if trial.status == "pass"]
+    passed_trials = [trial for trial in trial_results if trial.status == "pass"]
     frusta_data = np.array(
-        [(trial.total_volume, trial.height) for trial in passed_trials]
+        [(trial.dispense_volume, trial.height) for trial in passed_trials]
     )
     if len(frusta_data) > 1:
         new_inner_well_json = generate_frusta(ctx, frusta_data.tolist(), state.labware)
