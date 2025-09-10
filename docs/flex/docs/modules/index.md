@@ -42,6 +42,7 @@ Some modules originally designed for the OT-2 are compatible with Flex, as summa
 | Magnetic Block GEN1        | :octicons-x-12:{ .red } | :material-check-bold:{ .green } |
 | Magnetic Module GEN1       | :material-check-bold:{ .green } | :octicons-x-12:{ .red } |
 | Magnetic Module GEN2       | :material-check-bold:{ .green } | :octicons-x-12:{ .red } |
+| Stacker Module GEN1        | :octicons-x-12:{ .red } | :material-check-bold:{ .green } |
 | Temperature Module GEN1    | :material-check-bold:{ .green } | :octicons-x-12:{ .red } |
 | Temperature Module GEN2    | :material-check-bold:{ .green } | :material-check-bold:{ .green } |
 | Thermocycler Module GEN1   | :material-check-bold:{ .green } | :octicons-x-12:{ .red } |
