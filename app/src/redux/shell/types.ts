@@ -178,6 +178,19 @@ export interface CameraStreamOpenAction {
   meta: { shell: true }
 }
 
+export interface CameraPhotoOpenAction {
+  type: 'shell:CAMERA_PHOTO_OPEN'
+  payload: {
+    robotName: string
+    windowTitle: string
+    photoUrl: string
+    dimensions: { width: number; height: number }
+  }
+  meta: {
+    shell: true
+  }
+}
+
 export type ShellAction =
   | UiInitializedAction
   | ShellUpdateAction
@@ -194,6 +207,7 @@ export type ShellAction =
   | SendFilePathsAction
   | SystemLanguageAction
   | CameraStreamOpenAction
+  | CameraPhotoOpenAction
 
 export type IPCSafeFormDataEntry =
   | {
