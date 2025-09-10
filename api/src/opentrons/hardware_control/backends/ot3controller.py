@@ -1777,6 +1777,9 @@ class OT3Controller(FlexBackend):
             expected_grip_width + grip_width_uncertainty_wider
         )
         current_gripper_position = jaw_width
+        log.info(
+            f"Checking gripper position: current {jaw_width}; hard limits {hard_limit_lower}, {hard_limit_upper}; expected {expected_gripper_position_min}, {expected_grip_width}, {expected_gripper_position_max}; uncertainty {grip_width_uncertainty_narrower}, {grip_width_uncertainty_wider}"
+        )
         if isclose(current_gripper_position, hard_limit_lower):
             raise FailedGripperPickupError(
                 message="Failed to grip: jaws all the way closed",
