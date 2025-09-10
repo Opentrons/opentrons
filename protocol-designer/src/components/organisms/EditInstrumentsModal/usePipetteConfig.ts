@@ -23,6 +23,7 @@ export interface PipetteConfig {
   temporarilyDeletedPipettes: string[]
   setTemporarilyDeletedPipettes: Dispatch<SetStateAction<string[]>>
   resetFields: () => void
+  resetTemporarilyDeletedPipettes: () => void
 }
 
 export const usePipetteConfig = (): PipetteConfig => {
@@ -43,6 +44,10 @@ export const usePipetteConfig = (): PipetteConfig => {
     setSelectedTips([])
   }
 
+  const resetTemporarilyDeletedPipettes = (): void => {
+    setTemporarilyDeletedPipettes([])
+  }
+
   return {
     page,
     setPage,
@@ -59,5 +64,6 @@ export const usePipetteConfig = (): PipetteConfig => {
     temporarilyDeletedPipettes,
     setTemporarilyDeletedPipettes,
     resetFields,
+    resetTemporarilyDeletedPipettes,
   }
 }

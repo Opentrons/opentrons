@@ -69,6 +69,7 @@ export function EditInstrumentsModal(
     setPage,
     temporarilyDeletedPipettes,
     resetFields,
+    resetTemporarilyDeletedPipettes,
   } = pipetteConfig
 
   const activePipettesCount = pipettesOnDeck.filter(
@@ -160,9 +161,8 @@ export function EditInstrumentsModal(
             <SecondaryButton
               onClick={() => {
                 if (page === 'overview') {
-                  if (temporarilyDeletedPipettes.length > 0) {
-                    dispatch(deletePipettes(temporarilyDeletedPipettes))
-                  }
+                  resetTemporarilyDeletedPipettes()
+                  resetFields()
                   onClose()
                 } else {
                   setPage('overview')

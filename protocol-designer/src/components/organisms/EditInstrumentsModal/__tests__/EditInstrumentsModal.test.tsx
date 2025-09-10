@@ -6,8 +6,6 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
-import { deleteContainer } from '/protocol-designer/labware-ingred/actions'
-import { deletePipettes } from '/protocol-designer/step-forms/actions'
 import {
   getAdditionalEquipment,
   getInitialDeckSetup,
@@ -70,6 +68,7 @@ describe('EditInstrumentsModal', () => {
       temporarilyDeletedPipettes: [],
       setTemporarilyDeletedPipettes: vi.fn(),
       resetFields: vi.fn(),
+      resetTemporarilyDeletedPipettes: vi.fn(),
     })
     vi.mocked(PipetteOverview).mockReturnValue(<div>mock PipetteOverview</div>)
     vi.mocked(PipetteConfiguration).mockReturnValue(
@@ -114,6 +113,7 @@ describe('EditInstrumentsModal', () => {
       temporarilyDeletedPipettes: [],
       setTemporarilyDeletedPipettes: vi.fn(),
       resetFields: vi.fn(),
+      resetTemporarilyDeletedPipettes: vi.fn(),
     })
     render(props)
     screen.getByText('Edit Instruments')
@@ -139,6 +139,7 @@ describe('EditInstrumentsModal', () => {
       temporarilyDeletedPipettes: [],
       setTemporarilyDeletedPipettes: vi.fn(),
       resetFields: vi.fn(),
+      resetTemporarilyDeletedPipettes: vi.fn(),
     })
     render(props)
     fireEvent.click(screen.getByText('Save'))
@@ -162,13 +163,15 @@ describe('EditInstrumentsModal', () => {
       temporarilyDeletedPipettes: [],
       setTemporarilyDeletedPipettes: vi.fn(),
       resetFields: vi.fn(),
+      resetTemporarilyDeletedPipettes: vi.fn(),
     })
     render(props)
     fireEvent.click(screen.getByText('Cancel'))
     expect(mockOnClose).toHaveBeenCalled()
   })
 
-  it('should call a mock function when clicking cancel button if temporarilyDeletedPipettes is not empty', () => {
+  it('should call resetTemporarilyDeletedPipettes when clicking cancel button if temporarilyDeletedPipettes is not empty', () => {
+    const mockResetTemporarilyDeletedPipettes = vi.fn()
     vi.mocked(usePipetteConfig).mockReturnValue({
       page: 'overview',
       mount: 'left',
@@ -185,12 +188,11 @@ describe('EditInstrumentsModal', () => {
       temporarilyDeletedPipettes: ['mockPipetteId'],
       setTemporarilyDeletedPipettes: vi.fn(),
       resetFields: vi.fn(),
+      resetTemporarilyDeletedPipettes: mockResetTemporarilyDeletedPipettes,
     })
     render(props)
     fireEvent.click(screen.getByText('Cancel'))
-    expect(mockDispatch).toHaveBeenCalledWith(deletePipettes(['mockPipetteId']))
-    expect(mockDispatch).toHaveBeenCalledWith(
-      deleteContainer({ labwareId: 'mockPipetteId' })
-    )
+    expect(mockResetTemporarilyDeletedPipettes).toHaveBeenCalled()
+    expect(mockOnClose).toHaveBeenCalled()
   })
 })
