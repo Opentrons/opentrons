@@ -22,6 +22,119 @@ from rich.console import Console
 console = Console()
 
 
+def write_github_summary(
+    config: ApplicationConfig,
+    environment: str,
+    deployment_url: str,
+    sandbox_prefix: Optional[str] = None,
+    dry_run: bool = False,
+    cloudfront_invalidated: bool = False,
+) -> None:
+    """Write deployment summary to GitHub Actions summary.
+
+    Args:
+        config: Application configuration used for deployment
+        environment: Environment deployed to
+        deployment_url: Final deployment URL
+        sandbox_prefix: Sandbox prefix if applicable
+        dry_run: Whether this was a dry run
+        cloudfront_invalidated: Whether CloudFront cache was invalidated
+    """
+    github_step_summary = os.environ.get("GITHUB_STEP_SUMMARY")
+    if not github_step_summary:
+        console.print("⚠️  GITHUB_STEP_SUMMARY not set, skipping summary", style="yellow")
+        return
+
+    # Environment emoji mapping
+    env_emoji = {
+        "sandbox": "🏗️",
+        "staging": "🧪",
+        "production": "🌟",
+    }
+
+    # Application display name mapping
+    app_display = {
+        "labware_library": "Labware Library",
+        "protocol_designer": "Protocol Designer",
+        "docs": "Docs",
+        "mkdocs": "MkDocs",
+    }
+
+    # Determine deployment type icon and title
+    if dry_run:
+        deploy_icon = "🧪"
+        deploy_title = "Deployment Simulation (Dry Run)"
+    else:
+        deploy_icon = "🚀"
+        deploy_title = "Deployment Completed"
+
+    markdown_summary = f"""## {deploy_icon} {deploy_title}
+
+| Setting | Value |
+|---------|--------|
+| 📦 **Application** | {app_display.get(config.name, config.name)} |
+| {env_emoji.get(environment, "🔧")} **Environment** | {environment.title()} |
+| 🪣 **S3 Bucket** | `{config.s3_bucket}` |"""
+
+    if environment == "sandbox" and sandbox_prefix:
+        markdown_summary += f"""
+| 🌿 **Sandbox Prefix** | `{sandbox_prefix}` |"""
+
+    if config.name in ["docs", "mkdocs"]:
+        markdown_summary += """
+| 🗑️ **Delete Protection** | Enabled (preserves existing files) |"""
+    else:
+        markdown_summary += """
+| 🗑️ **Delete Sync** | Enabled (removes remote files not in local) |"""
+
+    markdown_summary += f"""
+| 🌐 **Deployment URL** | [{deployment_url}]({deployment_url}) |"""
+
+    if config.cloudfront_id:
+        cache_status = "✅ Invalidated" if cloudfront_invalidated and not dry_run else ("🧪 Skipped (dry run)" if dry_run else "❌ Failed")
+        markdown_summary += f"""
+| ☁️ **CloudFront** | `{config.cloudfront_id}` - {cache_status} |"""
+
+    if dry_run:
+        markdown_summary += """
+
+### 🧪 Dry Run Notes
+- No files were actually uploaded or modified
+- S3 sync operations were simulated with `--dryrun`
+- CloudFront cache invalidation was skipped
+- All AWS operations were read-only"""
+
+    # Build GitHub Actions run URL
+    github_url = (
+        f"{os.environ.get('GITHUB_SERVER_URL', '')}"
+        f"/{os.environ.get('GITHUB_REPOSITORY', '')}"
+        f"/actions/runs/{os.environ.get('GITHUB_RUN_ID', '')}"
+    )
+
+    markdown_summary += f"""
+
+### Deployment Details
+
+- **AWS CLI Sync**: `aws s3 sync --exact-timestamps --only-show-errors{"" if config.name in ["docs", "mkdocs"] else " --delete"}`
+- **Content Type**: Automatic detection by AWS CLI
+- **GitHub Run ID**: `{os.environ.get("GITHUB_RUN_ID", "unknown")}`
+- **Run Details**: [{github_url}]({github_url})
+
+---
+*Deployment executed by `deploy.py`*
+"""
+
+    try:
+        with open(github_step_summary, "a") as f:
+            f.write(markdown_summary)
+
+        console.print("✅ Wrote deployment summary to GitHub Actions", style="green")
+
+    except Exception as e:
+        console.print(f"❌ Failed to write GitHub summary: {e}", style="red")
+        # Don't exit here - summary is nice-to-have, not critical
+
+
 def _validate_artifact_directory(relative_artifact_dir: str) -> Path:
     """Validate that the artifact directory exists and is a directory.
 
@@ -240,11 +353,16 @@ def deploy_application(  # noqa: C901
     # Upload progress is handled by AWS CLI output
 
     try:
-        # No manual pre-clean: rely on aws s3 sync --delete in all environments
-        if dry_run:
-            console.print("Dry run: will simulate deletions via 'aws s3 sync --delete --dryrun'", style="blue")
+        # Determine if we should use --delete flag (skip for docs/mkdocs applications)
+        use_delete_flag = config.name not in ["docs", "mkdocs"]
+
+        if use_delete_flag:
+            if dry_run:
+                console.print("Dry run: will simulate deletions via 'aws s3 sync --delete --dryrun'", style="blue")
+            else:
+                console.print("Using 'aws s3 sync --delete' to remove remote files not present locally", style="blue")
         else:
-            console.print("Using 'aws s3 sync --delete' to remove remote files not present locally", style="blue")
+            console.print(f"Skipping --delete flag for {config.name} deployment to preserve existing remote files", style="blue")
 
         # Upload new artifacts using AWS CLI instead of boto3 for faster sync and automatic content-type
         try:
@@ -257,8 +375,11 @@ def deploy_application(  # noqa: C901
                 s3_uri,
                 "--only-show-errors",
                 "--exact-timestamps",
-                "--delete",
             ]
+
+            # Add --delete flag only for non-docs applications
+            if use_delete_flag:
+                cmd.append("--delete")
             # Dry run simulation
             if dry_run:
                 cmd.append("--dryrun")
@@ -284,6 +405,7 @@ def deploy_application(  # noqa: C901
             sys.exit(1)
 
         # Invalidate CloudFront cache if configured
+        cloudfront_invalidated = False
         if config.cloudfront_id and config.cloudfront_id != "":
             console.print(f"Invalidating CloudFront cache for distribution {config.cloudfront_id}...")
             try:
@@ -299,12 +421,23 @@ def deploy_application(  # noqa: C901
                         },
                     )
                     console.print("✅ CloudFront cache invalidation initiated", style="green")
+                    cloudfront_invalidated = True
             except Exception as e:
                 console.print(f"⚠️  CloudFront cache invalidation failed: {e}", style="yellow")
                 # Don't fail the deployment for CloudFront issues
 
         console.print(f"✅ Successfully deployed to {environment}!", style="green bold")
         console.print(f"📍 Deployed to: {deployment_url}", style="blue")
+
+        # Write GitHub Actions summary
+        write_github_summary(
+            config=config,
+            environment=environment,
+            deployment_url=deployment_url,
+            sandbox_prefix=sandbox_prefix,
+            dry_run=dry_run,
+            cloudfront_invalidated=cloudfront_invalidated,
+        )
 
     except Exception as e:
         console.print(f"❌ Deployment failed: {e}", style="red")

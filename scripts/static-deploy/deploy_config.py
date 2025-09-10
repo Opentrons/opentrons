@@ -35,6 +35,7 @@ class InvalidApplicationError(ValueError):
 class ApplicationConfig:
     """Configuration for a single application deployment."""
 
+    name: Application
     s3_bucket: str
     cloudfront_id: Optional[str]
     url: str
@@ -109,21 +110,25 @@ def get_deploy_config() -> DeployConfig:
     # Sandbox configuration
     sandbox_config = EnvironmentConfig(
         labware_library=ApplicationConfig(
+            name="labware_library",
             s3_bucket="opentrons.sandbox.labware",
             cloudfront_id=None,  # No CloudFront for sandbox
             url="http://opentrons.sandbox.labware.s3-website.us-east-2.amazonaws.com/",
         ),
         protocol_designer=ApplicationConfig(
+            name="protocol_designer",
             s3_bucket="opentrons.sandbox.protocol-designer",
             cloudfront_id=None,  # No CloudFront for sandbox
             url="http://opentrons.sandbox.protocol-designer.s3-website.us-east-2.amazonaws.com/",
         ),
         docs=ApplicationConfig(
+            name="docs",
             s3_bucket="sandbox.docs",
             cloudfront_id=None,  # No CloudFront for sandbox
             url="http://sandbox.docs.s3-website.us-east-2.amazonaws.com/",
         ),
         mkdocs=ApplicationConfig(
+            name="mkdocs",
             s3_bucket="sandbox.docs",
             cloudfront_id=None,  # No CloudFront for sandbox
             url="http://sandbox.docs.s3-website.us-east-2.amazonaws.com/",
@@ -133,21 +138,25 @@ def get_deploy_config() -> DeployConfig:
     # Staging configuration
     staging_config = EnvironmentConfig(
         labware_library=ApplicationConfig(
+            name="labware_library",
             s3_bucket="opentrons.staging.labware",
             cloudfront_id="E8IWASMDOWHYP",
             url="https://staging.labware.opentrons.com/",
         ),
         protocol_designer=ApplicationConfig(
+            name="protocol_designer",
             s3_bucket="opentrons.staging.protocol-designer",
             cloudfront_id="",  # Add CloudFront ID when available
             url="https://staging.protocol-designer.opentrons.com/",
         ),
         docs=ApplicationConfig(
+            name="docs",
             s3_bucket="opentrons.staging.docs",
             cloudfront_id="E8IWASMDOWHYP",
             url="https://staging.docs.opentrons.com/",
         ),
         mkdocs=ApplicationConfig(
+            name="mkdocs",
             s3_bucket="opentrons.staging.docs",
             cloudfront_id="E8IWASMDOWHYP",
             url="https://staging.docs.opentrons.com/",
@@ -157,21 +166,25 @@ def get_deploy_config() -> DeployConfig:
     # Production configuration
     production_config = EnvironmentConfig(
         labware_library=ApplicationConfig(
+            name="labware_library",
             s3_bucket="opentrons.production.labware",
             cloudfront_id="E16BZZXDTINN0S",
             url="https://labware.opentrons.com/",
         ),
         protocol_designer=ApplicationConfig(
+            name="protocol_designer",
             s3_bucket="opentrons.production.protocol-designer",
             cloudfront_id="",  # Add CloudFront ID when available
             url="https://protocol-designer.opentrons.com/",
         ),
         docs=ApplicationConfig(
+            name="docs",
             s3_bucket="opentrons.production.docs",
             cloudfront_id="E16BZZXDTINN0S",
             url="https://docs.opentrons.com/",
         ),
         mkdocs=ApplicationConfig(
+            name="mkdocs",
             s3_bucket="opentrons.production.docs",
             cloudfront_id="E16BZZXDTINN0S",
             url="https://docs.opentrons.com/",

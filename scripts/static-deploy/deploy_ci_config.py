@@ -55,8 +55,15 @@ def _determine_application(ref_type: str, ref_name: str) -> str:
             return "protocol_designer"
         elif "Labware Library test, build, and deploy" in workflow_name:
             return "labware_library"
+        elif "API docs build" in workflow_name:
+            return "docs"
 
-    return "labware_library"  # default
+    # No application could be determined - exit with error
+    raise ValueError(
+        f"Could not determine application from ref_type='{ref_type}', ref_name='{ref_name}', "
+        f"workflow (GITHUB_WORKFLOW)='{os.environ.get('GITHUB_WORKFLOW', 'unknown')}'. "
+        f"Please check tag naming or workflow configuration."
+    )
 
 
 def _determine_environment_and_prefix(event_name: str, ref_type: str, ref_name: str, head_ref: Optional[str]) -> tuple[str, str]:
