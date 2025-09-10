@@ -24,6 +24,8 @@ Opentrons Flex is compatible with with the following Opentrons modules:
 
 - The [**Magnetic Block**](magnetic-block.md) is a passive device that holds labware close to its high-strength neodymium magnets. The OT-2 Magnetic Module GEN1 and GEN2, which actively move their magnets up and down relative to labware, are not supported on Opentrons Flex.
 
+- The [**Stacker Module**](stacker.md) is an externally mounted device that provides automated, high-capacity storage and delivery for ANSI/SLAS compatible labware such as well plates, tip racks, and reservoirs.
+
 - The [**Temperature Module**](temperature.md) is a hot and cold plate module that is able to maintain steady state temperatures between 4 and 95 °C.
 
 - The [**Thermocycler Module**](thermocycler.md) provides on-deck, fully automated thermocycling, enabling automation of upstream and downstream workflow steps. Thermocycler GEN2 is fully compatible with the gripper. Thermocycler GEN1 cannot be used with the gripper, and is therefore not supported on Opentrons Flex.

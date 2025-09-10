@@ -29,7 +29,7 @@ The Stacker accepts Opentrons Flex tip racks, selected items in our [Labware Lib
   <tbody>
     <tr>
       <td>Pipette tips</td>
-      <td>A maximum of six <a href="https://opentrons.com/products/categories/tips-&-labware">Opentrons Flex tip racks</a> in each stacker. This includes: 
+      <td>Stores a maximum of six <a href="https://opentrons.com/products/categories/tips-&-labware">Opentrons Flex tip racks</a> in each Stacker. This includes: 
         <ul>
             <li>50 µL, 200 µL, or 1000 µL tips</li>
             <li>Filtered or unfiltered tips</li>
