@@ -8,6 +8,7 @@ import {
   getDeckDefFromRobotType,
   getMainAAForAFixture,
   getModuleModelFromAddressableArea,
+  getNewConfigForDeckConfig,
   getReplacementFixtureForFixtureRemoval,
   MAGNETIC_BLOCK_V1,
   MODULE_FIXTURES_BY_MODEL,
@@ -136,12 +137,13 @@ export function useDeckConfigurationEditing(
     )
     setValue?.('modules', fixturedModules)
 
-    const newDeckConfig = getNewConfig(
+    const newDeckConfig = getNewConfigForDeckConfig(
       cutoutId,
       cutoutFixtureId,
       replacementFixtureId,
       deckConfig,
-      deckDef
+      deckDef,
+      false
     )
     dispatch(editDeckConfiguration({ deckConfig: newDeckConfig }))
   }
@@ -185,12 +187,13 @@ export function useDeckConfigurationEditing(
       cutoutId,
       addressableAreaId
     )
-    const newDeckConfig = getNewConfig(
+    const newDeckConfig = getNewConfigForDeckConfig(
       cutoutId,
       cutoutFixtureId,
       replacementFixtureId,
       deckConfig,
-      deckDef
+      deckDef,
+      false
     )
     const type = getCutoutFixtureType(cutoutFixtureId, addressableAreaId)
     updateInitialDeckState?.(
@@ -552,46 +555,4 @@ export const getAvailableOptions = (
     availableOptions = getWasteChuteOptions(cutoutId)
   }
   return availableOptions
-}
-
-export const getNewConfig = (
-  cutoutId: CutoutId,
-  cutoutFixtureId: CutoutFixtureIdsWithFakes,
-  replacementFixtureId: CutoutFixtureId,
-  deckConfig: DeckConfiguration,
-  deckDef: DeckDefinition
-): DeckConfiguration => {
-  const fixtureGroup =
-    deckDef.cutoutFixtures.find(cf => cf.id === cutoutFixtureId)
-      ?.fixtureGroup ?? {}
-
-  let newDeckConfig = deckConfig
-  if (cutoutId in fixtureGroup) {
-    const groupMap =
-      fixtureGroup[cutoutId]?.find(group =>
-        Object.entries(group).every(([cId, cfId]) =>
-          deckConfig.find(
-            config => config.cutoutId === cId && config.cutoutFixtureId === cfId
-          )
-        )
-      ) ?? {}
-    newDeckConfig = deckConfig.map(cutoutConfig =>
-      cutoutConfig.cutoutId in groupMap
-        ? {
-            ...cutoutConfig,
-            cutoutFixtureId: replacementFixtureId,
-          }
-        : cutoutConfig
-    )
-  } else {
-    newDeckConfig = deckConfig.map(cutoutConfig => {
-      return cutoutConfig.cutoutId === cutoutId
-        ? {
-            ...cutoutConfig,
-            cutoutFixtureId: replacementFixtureId,
-          }
-        : cutoutConfig
-    })
-  }
-  return newDeckConfig
 }
