@@ -5,7 +5,7 @@
 >
 > This document contains information on how the documentation is generated, and how to contribute to it.
 
-Opentrons Documentation is written in [Markdown](https://daringfireball.net/projects/markdown/) and built with [MkDocs](https://www.mkdocs.org).
+Opentrons Documentation is written in [Markdown](https://daringfireball.net/projects/markdown/) and built with [MkDocs](https://www.mkdocs.org) and the [Material](https://squidfunk.github.io/mkdocs-material/) documentation framework.
 
 This directory contains:
 
