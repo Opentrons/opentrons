@@ -59,7 +59,6 @@ export function SelectRecoveryOptionHome({
     errorKind,
     failedCommand?.byRunRecord.commandType
   )
-  console.log('validRecoveryOptions', validRecoveryOptions)
   const [selectedRoute, setSelectedRoute] = useState<RecoveryRoute>(
     head(validRecoveryOptions) as RecoveryRoute
   )
