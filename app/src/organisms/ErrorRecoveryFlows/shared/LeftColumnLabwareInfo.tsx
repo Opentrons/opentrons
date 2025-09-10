@@ -117,36 +117,48 @@ export function LeftColumnLabwareInfo({
   }
 
   const buildQuantity = (): number | null => {
-    if (!showQuantity) {
+    if (!showQuantity || labwareQuantity == null) {
       return null
     }
-    if (
-      (route === RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.ROUTE &&
-        step === RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.STEPS.FILL_HOPPER) ||
-      (route === RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE &&
-        step === RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.STEPS.FILL_HOPPER) ||
-      (route === RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE &&
-        step === RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.CHECK_HOPPER) ||
-      (route === RECOVERY_MAP.STACKER_STALLED_STORE_RETRY.ROUTE &&
-        step === RECOVERY_MAP.STACKER_STALLED_STORE_RETRY.STEPS.CHECK_HOPPER)
-    ) {
-      return labwareQuantity != null && labwareQuantity > 0
-        ? labwareQuantity - 1 // one has been moved manually onto the shuttle
-        : null
-    } else {
-      return labwareQuantity ?? null
-    }
+
+    // Define routes and steps that require quantity adjustment
+    const requiresQuantityAdjustment = [
+      {
+        route: RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.ROUTE,
+        step: RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.STEPS.FILL_HOPPER,
+      },
+      {
+        route: RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE,
+        step: RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.STEPS.FILL_HOPPER,
+      },
+      {
+        route: RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE,
+        step: RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.CHECK_HOPPER,
+      },
+      {
+        route: RECOVERY_MAP.STACKER_STALLED_STORE_RETRY.ROUTE,
+        step: RECOVERY_MAP.STACKER_STALLED_STORE_RETRY.STEPS.CHECK_HOPPER,
+      },
+    ]
+
+    const needsAdjustment = requiresQuantityAdjustment.some(
+      ({ route: expectedRoute, step: expectedStep }) =>
+        route === expectedRoute && step === expectedStep
+    )
+
+    return needsAdjustment && labwareQuantity > 0
+      ? labwareQuantity - 1 // one has been moved manually onto the shuttle
+      : labwareQuantity
   }
 
   // build info props
+  const quantity = buildQuantity()
   return (
     <InterventionContent
       headline={title}
       infoProps={{
         layout: layout,
-        tagText: buildQuantity()
-          ? t('quantity', { quantity: buildQuantity() })
-          : null,
+        tagText: quantity ? t('quantity', { quantity }) : null,
         subText: undefined, // TODO (tz, 5-1-2025): get lid name
         type,
         newLocationProps: buildNewLocation(),
