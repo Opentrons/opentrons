@@ -1,4 +1,5 @@
 """Test labware movement command execution side effects."""
+
 from __future__ import annotations
 
 from datetime import datetime
@@ -24,6 +25,7 @@ from opentrons.protocol_engine.types import (
     NonStackedLocation,
     LabwareMovementOffsetData,
     Dimensions,
+    GripSpecs,
 )
 from opentrons.protocol_engine.execution.thermocycler_plate_lifter import (
     ThermocyclerPlateLifter,
@@ -212,16 +214,10 @@ async def test_raise_error_if_gripper_pickup_failed(
     ).then_return(Point(201, 202, 219.5))
 
     decoy.when(
-        state_store.labware.get_dimensions(
+        state_store.labware.get_gripper_width_specs(
             labware_definition=sentinel.my_teleporting_labware_def
         )
-    ).then_return(Dimensions(x=100, y=85, z=0))
-
-    decoy.when(
-        state_store.labware.get_well_bbox(
-            labware_definition=sentinel.my_teleporting_labware_def
-        )
-    ).then_return(Dimensions(x=99, y=80, z=1))
+    ).then_return(GripSpecs(targetY=100, uncertaintyNarrower=5, uncertaintyWider=10))
 
     await subject.move_labware_with_gripper(
         labware_id="my-teleporting-labware",
@@ -239,20 +235,20 @@ async def test_raise_error_if_gripper_pickup_failed(
         await ot3_hardware_api.ungrip(),
         await ot3_hardware_api.grip(force_newtons=100),
         ot3_hardware_api.raise_error_if_gripper_pickup_failed(
-            expected_grip_width=85,
-            grip_width_uncertainty_wider=0,
+            expected_grip_width=100,
+            grip_width_uncertainty_wider=10,
             grip_width_uncertainty_narrower=5,
         ),
         await ot3_hardware_api.grip(force_newtons=100),
         ot3_hardware_api.raise_error_if_gripper_pickup_failed(
-            expected_grip_width=85,
-            grip_width_uncertainty_wider=0,
+            expected_grip_width=100,
+            grip_width_uncertainty_wider=10,
             grip_width_uncertainty_narrower=5,
         ),
         await ot3_hardware_api.grip(force_newtons=100),
         ot3_hardware_api.raise_error_if_gripper_pickup_failed(
-            expected_grip_width=85,
-            grip_width_uncertainty_wider=0,
+            expected_grip_width=100,
+            grip_width_uncertainty_wider=10,
             grip_width_uncertainty_narrower=5,
         ),
         await ot3_hardware_api.disengage_axes([Axis.Z_G]),
@@ -361,6 +357,12 @@ async def test_move_labware_with_gripper(
             labware_location=from_location
         )
     ).then_return(mock_tc_context_manager)
+
+    decoy.when(
+        state_store.labware.get_gripper_width_specs(
+            labware_definition=sentinel.my_teleporting_labware_def
+        )
+    ).then_return(GripSpecs(targetY=100, uncertaintyNarrower=5, uncertaintyWider=10))
 
     expected_waypoints = [
         Point(100, 100, 999),  # move to above slot 1
@@ -515,6 +517,7 @@ async def test_labware_movement_raises_without_gripper(
     """It should raise an error when attempting a gripper movement without a gripper."""
     decoy.when(state_store.config.use_virtual_gripper).then_return(False)
     decoy.when(ot3_hardware_api.has_gripper()).then_return(False)
+
     with pytest.raises(GripperNotAttachedError):
         await subject.move_labware_with_gripper(
             labware_id="labware-id",

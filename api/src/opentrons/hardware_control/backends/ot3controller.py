@@ -1780,7 +1780,13 @@ class OT3Controller(FlexBackend):
         log.info(
             f"Checking gripper position: current {jaw_width}; hard limits {hard_limit_lower}, {hard_limit_upper}; expected {expected_gripper_position_min}, {expected_grip_width}, {expected_gripper_position_max}; uncertainty {grip_width_uncertainty_narrower}, {grip_width_uncertainty_wider}"
         )
-        if isclose(current_gripper_position, hard_limit_lower):
+        if (
+            isclose(current_gripper_position, hard_limit_lower)
+            # this odd check handles internal backlash that can lead the position to read as if
+            # the gripper has overshot its lower bound; this is physically impossible and an
+            # artifact of the gearing, so it always indicates a hard stop
+            or current_gripper_position < hard_limit_lower
+        ):
             raise FailedGripperPickupError(
                 message="Failed to grip: jaws all the way closed",
                 details={
