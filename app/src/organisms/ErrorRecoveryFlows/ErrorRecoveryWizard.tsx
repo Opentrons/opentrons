@@ -32,6 +32,8 @@ import {
   StackerStalledRetry,
   StackerStalledSkip,
 } from './RecoveryOptions'
+import { ShuttleFullRetry } from './RecoveryOptions/ShuttleFullRetry'
+import { ShuttleFullSkip } from './RecoveryOptions/ShuttleFullSkip'
 import { StackerStalledStoreRetry } from './RecoveryOptions/StackerStalledStoreRetry'
 import { StackerStalledStoreSkip } from './RecoveryOptions/StackerStalledStoreSkip'
 import {
@@ -260,6 +262,12 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
   const buildStackerShuttleMissing = (): JSX.Element => {
     return <StackerShuttleMissing {...props} />
   }
+  const buildShuttleFullRetry = (): JSX.Element => {
+    return <ShuttleFullRetry {...props} />
+  }
+  const buildShuttleFullSkip = (): JSX.Element => {
+    return <ShuttleFullSkip {...props} />
+  }
   const buildStackerStalledRetry = (): JSX.Element => {
     return <StackerStalledRetry {...props} />
   }
@@ -311,6 +319,10 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
       return buildStackerHopperEmptyRetry()
     case RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.ROUTE:
       return buildStackerHopperEmptySkip()
+    case RECOVERY_MAP.SHUTTLE_FULL_RETRY.ROUTE:
+      return buildShuttleFullRetry()
+    case RECOVERY_MAP.SHUTTLE_FULL_SKIP.ROUTE:
+      return buildShuttleFullSkip()
     case RECOVERY_MAP.STACKER_STALLED_RETRY.ROUTE:
       return buildStackerStalledRetry()
     case RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE:
