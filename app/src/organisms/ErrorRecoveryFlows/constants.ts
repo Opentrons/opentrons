@@ -205,6 +205,26 @@ export const RECOVERY_MAP = {
       RETRY: 'retry',
     },
   },
+  SHUTTLE_FULL_RETRY: {
+    ROUTE: 'shuttle-full-retry',
+    STEPS: {
+      EMPTY_STACKER: 'empty-stacker',
+      CLEAR_TRACK_OF_OBSTRUCTIONS: 'clear-track-of-obstructions',
+      CHECK_HOPPER: 'check-hopper',
+      ENSURE_SHUTTLE_EMPTY: 'ensure-shuttle-empty',
+      RETRY: 'retry',
+    },
+  },
+  SHUTTLE_FULL_SKIP: {
+    ROUTE: 'shuttle-full-skip',
+    STEPS: {
+      EMPTY_STACKER: 'empty-stacker',
+      CLEAR_TRACK_OF_OBSTRUCTIONS: 'clear-track-of-obstructions',
+      PLACE_LABWARE_ON_SHUTTLE: 'place-labware-on-shuttle',
+      CHECK_HOPPER: 'check-hopper',
+      SKIP: 'skip',
+    },
+  },
   STACKER_STALLED_RETRY: {
     ROUTE: 'stacker-stalled-retry',
     STEPS: {
@@ -360,6 +380,8 @@ const {
   MANUAL_FILL_AND_RETRY_NEW_TIPS,
   MANUAL_MOVE_AND_SKIP,
   MANUAL_REPLACE_AND_RETRY,
+  SHUTTLE_FULL_RETRY,
+  SHUTTLE_FULL_SKIP,
   STACKER_STALLED_RETRY,
   STACKER_STALLED_SKIP,
   STACKER_STALLED_STORE_RETRY,
@@ -443,6 +465,20 @@ export const STEP_ORDER: StepOrder = {
     MANUAL_REPLACE_AND_RETRY.STEPS.CLOSE_DOOR_GRIPPER_Z_HOME,
     MANUAL_REPLACE_AND_RETRY.STEPS.MANUAL_REPLACE,
     MANUAL_REPLACE_AND_RETRY.STEPS.RETRY,
+  ],
+  [SHUTTLE_FULL_RETRY.ROUTE]: [
+    SHUTTLE_FULL_RETRY.STEPS.EMPTY_STACKER,
+    SHUTTLE_FULL_RETRY.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS,
+    SHUTTLE_FULL_RETRY.STEPS.CHECK_HOPPER,
+    SHUTTLE_FULL_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY,
+    SHUTTLE_FULL_RETRY.STEPS.RETRY,
+  ],
+  [SHUTTLE_FULL_SKIP.ROUTE]: [
+    SHUTTLE_FULL_SKIP.STEPS.EMPTY_STACKER,
+    SHUTTLE_FULL_SKIP.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS,
+    SHUTTLE_FULL_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE,
+    SHUTTLE_FULL_SKIP.STEPS.CHECK_HOPPER,
+    SHUTTLE_FULL_SKIP.STEPS.SKIP,
   ],
   [STACKER_STALLED_RETRY.ROUTE]: [
     STACKER_STALLED_RETRY.STEPS.EMPTY_STACKER,
@@ -663,6 +699,36 @@ export const RECOVERY_MAP_METADATA: RecoveryRouteStepMetadata = {
     },
     [MANUAL_REPLACE_AND_RETRY.STEPS.MANUAL_REPLACE]: { allowDoorOpen: true },
     [MANUAL_REPLACE_AND_RETRY.STEPS.RETRY]: { allowDoorOpen: true },
+  },
+  [SHUTTLE_FULL_RETRY.ROUTE]: {
+    [SHUTTLE_FULL_RETRY.STEPS.EMPTY_STACKER]: {
+      allowDoorOpen: true,
+    },
+    [SHUTTLE_FULL_RETRY.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS]: {
+      allowDoorOpen: true,
+    },
+    [SHUTTLE_FULL_RETRY.STEPS.CHECK_HOPPER]: {
+      allowDoorOpen: true,
+    },
+    [SHUTTLE_FULL_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY]: {
+      allowDoorOpen: true,
+    },
+    [SHUTTLE_FULL_RETRY.STEPS.RETRY]: { allowDoorOpen: false },
+  },
+  [SHUTTLE_FULL_SKIP.ROUTE]: {
+    [SHUTTLE_FULL_SKIP.STEPS.EMPTY_STACKER]: {
+      allowDoorOpen: true,
+    },
+    [SHUTTLE_FULL_SKIP.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS]: {
+      allowDoorOpen: true,
+    },
+    [SHUTTLE_FULL_SKIP.STEPS.CHECK_HOPPER]: {
+      allowDoorOpen: true,
+    },
+    [SHUTTLE_FULL_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE]: {
+      allowDoorOpen: true,
+    },
+    [SHUTTLE_FULL_SKIP.STEPS.SKIP]: { allowDoorOpen: false },
   },
   [STACKER_STALLED_RETRY.ROUTE]: {
     [STACKER_STALLED_RETRY.STEPS.EMPTY_STACKER]: {
