@@ -1,4 +1,4 @@
-import stubCameraImage from './stubCameraImage.webp'
+import stubCameraImage from './stubCameraImage.jpg'
 
 export interface UseStubImagesInfoResult {
   imagePath: string
