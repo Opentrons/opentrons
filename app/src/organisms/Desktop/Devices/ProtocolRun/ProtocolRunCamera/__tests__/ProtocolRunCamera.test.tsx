@@ -5,9 +5,11 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 
 import { ProtocolRunCamera } from '..'
+import { ImageGalleryContainer } from '../ImageGalleryContainer'
 import { LaunchLivestreamBtn } from '../LaunchLivestreamBtn'
 
 vi.mock('../LaunchLivestreamBtn')
+vi.mock('../ImageGalleryContainer')
 
 const render = () => {
   return renderWithProviders(<ProtocolRunCamera />, {
@@ -19,6 +21,9 @@ describe('ProtocolRunCamera', () => {
   beforeEach(() => {
     vi.mocked(LaunchLivestreamBtn).mockReturnValue(
       <div>MOCK_LIVE_STREAM_BTN</div>
+    )
+    vi.mocked(ImageGalleryContainer).mockReturnValue(
+      <div>MOCK_IMAGE_GALLERY_CONTAINER</div>
     )
   })
 
@@ -32,6 +37,12 @@ describe('ProtocolRunCamera', () => {
     render()
 
     screen.getByText('MOCK_LIVE_STREAM_BTN')
+  })
+
+  it('renders ImageGalleryContainer component', () => {
+    render()
+
+    screen.getByText('MOCK_IMAGE_GALLERY_CONTAINER')
   })
 
   it('renders chip with enabled status and text', () => {
