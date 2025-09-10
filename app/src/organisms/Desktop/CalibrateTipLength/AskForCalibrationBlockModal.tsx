@@ -17,11 +17,11 @@ import {
   SecondaryButton,
   SPACING,
   TYPOGRAPHY,
+  WizardHeader,
 } from '@opentrons/components'
-import { labwareImages } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { WizardHeader } from '/app/molecules/WizardHeader'
+import { labwareImages } from '@opentrons/shared-data'
 import { setUseTrashSurfaceForTipCal } from '/app/redux/calibration'
 
 import styles from './styles.module.css'
@@ -95,8 +95,9 @@ export function AskForCalibrationBlockModal(props: Props): JSX.Element {
           </Flex>
           <Flex flex="1" justifyContent={JUSTIFY_CENTER}>
             <img
+              alt="Calibration Block"
               className={styles.block_image}
-              src={labwareImages[CAL_BLOCK_LOAD_NAME][0]}
+              src={labwareImages[CAL_BLOCK_LOAD_NAME]}
             />
           </Flex>
         </Flex>
