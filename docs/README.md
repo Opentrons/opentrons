@@ -11,7 +11,7 @@ This directory contains:
 
 - Subdirectories for each publication within the documentation site, such as `flex/` and `protocol-designer/`. Each of these is a full MkDocs project that you can build or serve separately.
 - The `mkdocs.yml` configuration file for the entire documentation site. It specifies the [mkdocs-monorepo-plugin](https://github.com/backstage/mkdocs-monorepo-plugin) for including individual publications in its navigation.
-- A single-purpose custom plugin, `mkdocs-parent-css-plugin`. All this plugin does is allow the individual publication MkDocs sites load CSS files that are higher in the file hierarchy than their root. (These files are in `docs/shared/`.)
+- A single-purpose custom plugin, `mkdocs-parent-css-plugin`. All this plugin does is allow the individual publication MkDocs sites to load CSS files that are higher in the file hierarchy than their root. (These files are in `docs/shared/`.)
 
 ## Development setup
 
