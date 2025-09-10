@@ -216,8 +216,7 @@ const updatePatchOnPipetteChange = (
         'dispense_mix_volume',
         'disposalVolume_volume',
         'aspirate_mmFromBottom',
-        'dispense_mmFromBottom',
-        'tipRack'
+        'dispense_mmFromBottom'
       ),
       nozzles,
       aspirate_airGap_volume: airGapVolume,
@@ -705,6 +704,7 @@ export function dependentFieldsUpdateMoveLiquid(
   pipetteEntities: PipetteEntities,
   labwareEntities: LabwareEntities
 ): FormPatch {
+  console.log('calling in here', originalPatch, rawForm)
   // sequentially modify parts of the patch until it's fully updated
   return chainPatchUpdaters(originalPatch, [
     chainPatch =>
