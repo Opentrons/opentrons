@@ -32,6 +32,8 @@ import {
   StackerStalledRetry,
   StackerStalledSkip,
 } from './RecoveryOptions'
+import { StackerStalledStoreRetry } from './RecoveryOptions/StackerStalledStoreRetry'
+import { StackerStalledStoreSkip } from './RecoveryOptions/StackerStalledStoreSkip'
 import {
   ErrorDetailsModal,
   RecoveryDoorOpenSpecial,
@@ -267,6 +269,12 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
   const buildStackerSelectErrorFlow = (): JSX.Element => {
     return <StackerSelectErrorFlow {...props} />
   }
+  const buildStackerStalledStoreRetry = (): JSX.Element => {
+    return <StackerStalledStoreRetry {...props} />
+  }
+  const buildStackerStalledStoreSkip = (): JSX.Element => {
+    return <StackerStalledStoreSkip {...props} />
+  }
 
   switch (props.recoveryMap.route) {
     case RECOVERY_MAP.OPTION_SELECTION.ROUTE:
@@ -307,6 +315,10 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
       return buildStackerStalledRetry()
     case RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE:
       return buildStackerStalledSkip()
+    case RECOVERY_MAP.STACKER_STALLED_STORE_RETRY.ROUTE:
+      return buildStackerStalledStoreRetry()
+    case RECOVERY_MAP.STACKER_STALLED_STORE_SKIP.ROUTE:
+      return buildStackerStalledStoreSkip()
     case RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.ROUTE:
       return buildStackerShuttleMissing()
     case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:

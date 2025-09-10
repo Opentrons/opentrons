@@ -49,12 +49,16 @@ export function SelectRecoveryOptionHome({
   getRecoveryOptionCopy,
   analytics,
   isOnDevice,
+  failedCommand,
 }: RecoveryContentProps): JSX.Element | null {
   const { t } = useTranslation('error_recovery')
   const { proceedToRouteAndStep } = routeUpdateActions
   const { determineTipStatus } = tipStatusUtils
   const { setSelectedRecoveryOption } = currentRecoveryOptionUtils
-  const validRecoveryOptions = getRecoveryOptions(errorKind)
+  const validRecoveryOptions = getRecoveryOptions(
+    errorKind,
+    failedCommand?.byRunRecord.commandType
+  )
   const [selectedRoute, setSelectedRoute] = useState<RecoveryRoute>(
     head(validRecoveryOptions) as RecoveryRoute
   )
@@ -176,7 +180,10 @@ export function useCurrentTipStatus(
   }, [])
 }
 
-export function getRecoveryOptions(errorKind: ErrorKind): RecoveryRoute[] {
+export function getRecoveryOptions(
+  errorKind: ErrorKind,
+  commandType?: string
+): RecoveryRoute[] {
   switch (errorKind) {
     case ERROR_KINDS.NO_LIQUID_DETECTED:
       return NO_LIQUID_DETECTED_OPTIONS
@@ -197,7 +204,9 @@ export function getRecoveryOptions(errorKind: ErrorKind): RecoveryRoute[] {
     case ERROR_KINDS.STALL_OR_COLLISION:
       return STALL_OR_COLLISION_OPTIONS
     case ERROR_KINDS.STACKER_STALLED:
-      return STACKER_STALLED_OPTIONS
+      return commandType === 'flexStacker/store'
+        ? STACKER_STALLED_STORE_OPTIONS
+        : STACKER_STALLED_RETRIEVE_OPTIONS
     case ERROR_KINDS.STACKER_HOPPER_EMPTY:
       return STACKER_HOPPER_EMPTY_OPTIONS
     case ERROR_KINDS.STACKER_SHUTTLE_MISSING:
@@ -233,9 +242,15 @@ export const STACKER_HOPPER_EMPTY_OPTIONS: RecoveryRoute[] = [
   RECOVERY_MAP.CANCEL_RUN.ROUTE,
 ]
 
-export const STACKER_STALLED_OPTIONS: RecoveryRoute[] = [
+export const STACKER_STALLED_RETRIEVE_OPTIONS: RecoveryRoute[] = [
   RECOVERY_MAP.STACKER_STALLED_RETRY.ROUTE,
   RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE,
+  RECOVERY_MAP.CANCEL_RUN.ROUTE,
+]
+
+export const STACKER_STALLED_STORE_OPTIONS: RecoveryRoute[] = [
+  RECOVERY_MAP.STACKER_STALLED_STORE_RETRY.ROUTE,
+  RECOVERY_MAP.STACKER_STALLED_STORE_SKIP.ROUTE,
   RECOVERY_MAP.CANCEL_RUN.ROUTE,
 ]
 
