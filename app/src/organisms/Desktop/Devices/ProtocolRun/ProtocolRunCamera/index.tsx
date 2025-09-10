@@ -2,6 +2,9 @@ import { useTranslation } from 'react-i18next'
 
 import { Chip, StyledText } from '@opentrons/components'
 
+import { Divider } from '/app/atoms/structure'
+
+import { ImageGalleryContainer } from './ImageGalleryContainer'
 import { LaunchLivestreamBtn } from './LaunchLivestreamBtn'
 import styles from './runcamera.module.css'
 
@@ -23,6 +26,8 @@ export function ProtocolRunCamera(): JSX.Element {
         </div>
         <LaunchLivestreamBtn />
       </div>
+      <Divider width="100%" />
+      <ImageGalleryContainer />
     </div>
   )
 }

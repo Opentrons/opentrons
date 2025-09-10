@@ -42,7 +42,7 @@ describe('LaunchLivestreamBtn', () => {
   it('renders button text', () => {
     render()
 
-    screen.getByText('Live camera view')
+    screen.getByText('Live camera')
   })
 
   it('dispatches a camera stream open action when clicked', () => {
