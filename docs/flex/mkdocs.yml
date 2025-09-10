@@ -28,7 +28,7 @@ nav:
       - Heater-Shaker: modules/heater-shaker.md
       - HEPA/UV Module: modules/hepa-uv.md
       - Magnetic Block: modules/magnetic-block.md
-      - Stacker: modules/stacker.md
+      - Stacker Module: modules/stacker.md
       - Temperature Module: modules/temperature.md
       - Thermocycler: modules/thermocycler.md
   - Labware: 
