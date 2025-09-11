@@ -322,24 +322,10 @@ class ProtocolEngine:
         )
         return completed_command
 
-    def estop(self) -> None:
-        """Signal to the engine that an E-stop event occurred.
-
-        If an estop happens while the robot is moving, lower layers physically stop
-        motion and raise the event as an exception, which fails the Protocol Engine
-        command. No action from the `ProtocolEngine` caller is needed to handle that.
-
-        However, if an estop happens in between commands, or in the middle of
-        a command like `comment` or `waitForDuration` that doesn't access the hardware,
-        `ProtocolEngine` needs to be told about it so it can interrupt the command
-        and stop executing any more. This method is how to do that.
-
-        This acts roughly like `request_stop()`. After calling this, you should call
-        `finish()` with an EStopActivatedError.
-        """
+    def _stop_from_asynchronous_error(self) -> None:
         try:
             action = self._state_store.commands.validate_action_allowed(
-                StopAction(from_estop=True)
+                StopAction(from_asynchronous_error=True)
             )
         except Exception:  # todo(mm, 2024-04-16): Catch a more specific type.
             # This is likely called from some hardware API callback that doesn't care
@@ -358,9 +344,72 @@ class ProtocolEngine:
         # do this because we want to make sure non-hardware commands, like
         # `waitForDuration`, are also interrupted.
         self._get_queue_worker.cancel()
+
+    def estop(self) -> None:
+        """Signal to the engine that an E-stop event occurred.
+
+        If an estop happens while the robot is moving, lower layers physically stop
+        motion and raise the event as an exception, which fails the Protocol Engine
+        command. No action from the `ProtocolEngine` caller is needed to handle that.
+
+        However, if an estop happens in between commands, or in the middle of
+        a command like `comment` or `waitForDuration` that doesn't access the hardware,
+        `ProtocolEngine` needs to be told about it so it can interrupt the command
+        and stop executing any more. This method is how to do that.
+
+        This acts roughly like `request_stop()`. After calling this, you should call
+        `finish()` with an EStopActivatedError.
+        """
         # Unlike self.request_stop(), we don't need to do
         # self._hardware_api.cancel_execution_and_running_tasks(). Since this was an
         # E-stop event, the hardware API already knows.
+        self._stop_from_asynchronous_error()
+
+    async def async_module_error(
+        self, module_model: ModuleModel, serial: str | None
+    ) -> bool:
+        """Signal to the engine that an asynchronous module error occured.
+
+        The return value of this function signals whether the error is relevant to the protocol
+        or not. If the function returns True, the error is relevant. The engine will stop, and
+        the caller should call `finish()` with the error object that signaled the error. If
+        the function returns False, the error is not relevant. The engine will not stop, and the
+        caller should not call `finish()`.
+
+        Asynchronous module errors are signaled when a module enters a hardware error state
+        - for instance, a thermocycler's thermistors fail because of condensation, or a
+        heater-shaker's wires fray and snap, or a module is accidentally disconnected. These
+        errors are not related to a particular command, even a currently-happening module
+        control command for the module in the error state.
+
+        Similar to an estop error, the error can occur at any time relative to the lifecycle
+        of the engine run or of any particular command.
+
+        Unlike an estop, the motion control hardware will not be raising an error and will not
+        stop on its own; the stop action derived from this call will do that.
+        """
+        if not self._state_store.modules.get_has_module_probably_matching_hardware_details(
+            module_model, serial
+        ):
+            return False
+        self._stop_from_asynchronous_error()
+        # like self.request_stop, and unlike self.estop(), we must explicitly request that the
+        # hardware stops execution, since not all asynchronous errors will cause the hardware
+        # to know that it should stop.
+        await self._do_hardware_stop()
+        return True
+
+    async def _do_hardware_stop(self) -> None:
+        """Make the hardware stop now."""
+        if self._hardware_api.is_movement_execution_taskified():
+            # We 'taskify' hardware controller movement functions when running protocols
+            # that are not backed by the engine. Such runs cannot be stopped by cancelling
+            # the queue worker and hence need to be stopped via the execution manager.
+            # `cancel_execution_and_running_tasks()` sets the execution manager in a CANCELLED state
+            # and cancels the running tasks, which raises an error and gets us out of the
+            # run function execution, just like `_queue_worker.cancel()` does for
+            # engine-backed runs.
+            await self._hardware_api.cancel_execution_and_running_tasks()
 
     async def request_stop(self) -> None:
         """Make command execution stop soon.
@@ -378,15 +427,7 @@ class ProtocolEngine:
         action = self._state_store.commands.validate_action_allowed(StopAction())
         self._action_dispatcher.dispatch(action)
         self._get_queue_worker.cancel()
-        if self._hardware_api.is_movement_execution_taskified():
-            # We 'taskify' hardware controller movement functions when running protocols
-            # that are not backed by the engine. Such runs cannot be stopped by cancelling
-            # the queue worker and hence need to be stopped via the execution manager.
-            # `cancel_execution_and_running_tasks()` sets the execution manager in a CANCELLED state
-            # and cancels the running tasks, which raises an error and gets us out of the
-            # run function execution, just like `_queue_worker.cancel()` does for
-            # engine-backed runs.
-            await self._hardware_api.cancel_execution_and_running_tasks()
+        await self._do_hardware_stop()
 
     async def wait_until_complete(self) -> None:
         """Wait until there are no more commands to execute.
@@ -429,7 +470,7 @@ class ProtocolEngine:
             post_run_hardware_state: The state in which to leave the gantry and motors in
                 after the run is over.
         """
-        if self._state_store.commands.get_is_stopped_by_estop():
+        if self._state_store.commands.get_is_stopped_by_async_error():
             # This handles the case where the E-stop was pressed while we were *not* in the middle
             # of some hardware interaction that would raise it as an exception. For example, imagine
             # we were paused between two commands, or imagine we were executing a waitForDuration.
