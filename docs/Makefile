@@ -3,12 +3,6 @@ FLEX_MANUAL_PREFIX ?= flex
 BRANCH ?= edge
 SANDBOX_S3_BUCKET ?= sandbox.docs
 
-
-
-.PHONY: setup
-setup:
-	uv sync
-
 .PHONY: clean
 clean:
 	rm -rf site
@@ -25,7 +19,6 @@ build:
 		uv run mkdocs build -f ./mkdocs.yml; \
 	fi
 
-	
 .PHONY: serve-flex-manual
 serve-flex-manual:
 	uv run mkdocs serve -f $(FLEX_MANUAL_PREFIX)/mkdocs.yml
@@ -33,5 +26,3 @@ serve-flex-manual:
 .PHONY: deploy
 deploy:
 	uv run python deploy_mkdocs.py $(ENVIRONMENT) --branch $(BRANCH) $(ARGS)
-
-

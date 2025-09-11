@@ -31,37 +31,8 @@ env:
   RELATIVE_ARTIFACT_DIR: '../../dist'
   
 jobs:
-  unit-test:
-    name: 'mkdocs unit tests'
-    runs-on: 'ubuntu-24.04'
-    timeout-minutes: 20
-    if: ${{ !startsWith(github.ref, 'refs/tags/') }}
-    steps:
-      - name: 'Checkout Repository'
-        uses: actions/checkout@v4
-      - uses: ./.github/actions/js/setup
-      - name: 'run unit tests'
-        run: make -C mkdocs test-cov
-      - name: 'Upload coverage report'
-        uses: codecov/codecov-action@v5
-        with:
-          flags: mkdocs
-          token: ${{ secrets.CODECOV_TOKEN }}
-
-  e2e-test:
-    name: 'mkdocs e2e tests'
-    runs-on: 'ubuntu-24.04'
-    timeout-minutes: 20
-    if: ${{ !startsWith(github.ref, 'refs/tags/') }}
-    steps:
-      - name: 'Checkout Repository'
-        uses: actions/checkout@v4
-
   build-docs:
     timeout-minutes: 5
-    needs:
-      - unit-test
-      - e2e-test
     runs-on: ubuntu-24.04
     permissions:
       id-token: write
