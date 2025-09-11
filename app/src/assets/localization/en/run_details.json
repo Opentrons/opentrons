@@ -56,6 +56,7 @@
   "files_available_robot_details": "All files associated with the protocol run are available on the robot detail screen.",
   "final_step": "Final Step",
   "ignore_stored_data": "Ignore stored data",
+  "image_capture_window_title": "Image capture of {{step}} at {{timestamp}}",
   "image_gallery": "Image Gallery",
   "labware": "labware",
   "labware_offset_data": "labware offset data",
@@ -174,6 +175,7 @@
   "view_current_step": "View current step",
   "view_error": "View error",
   "view_error_details": "View error details",
+  "view_image": "View image",
   "view_warning_details": "View warning details",
   "warning_details": "Warning details"
 }
