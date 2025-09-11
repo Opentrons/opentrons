@@ -1,36 +1,49 @@
+import matplotlib.pyplot as plt
 import pyvista as pv
-from shapely.geometry import box
 import networkx as nx
+from shapely.geometry import box
+from shapely.geometry.base import BaseGeometry
+from typing import List, Dict, Any
+
 
 class Geometry:
     def __init__(
-        self, name: str, polygon: pv.Polygon,
-        zmin: float = 0, zmax: float = 1
+        self,
+        name: str,
+        polygon: BaseGeometry,
+        zmin: float = 0,
+        zmax: float = 1
     ) -> None:
-        self.name = name
-        self.shape = polygon
-        self.zmin = zmin
-        self.zmax = zmax
+        self.name: str = name
+        self.shape: BaseGeometry = polygon
+        self.zmin: float = zmin
+        self.zmax: float = zmax
 
 
 class GeometryQueryAPI:
-    def __init__(self, graph: nx.DiGraph):
-        self.G = graph
+    def __init__(self, graph: nx.DiGraph) -> None:
+        self.G: nx.DiGraph = graph
 
-    def get_children(self, node, relation):
+    def get_children(self, node: str, relation: str) -> List[str]:
         return [v for u, v, d in self.G.out_edges(node, data=True) if d["relation"] == relation]
 
-    def get_parents(self, node, relation):
+    def get_parents(self, node: str, relation: str) -> List[str]:
         return [u for u, v, d in self.G.in_edges(node, data=True) if d["relation"] == relation]
 
-    def get_related(self, node, relation, direction="out", transitive=False):
+    def get_related(
+        self, 
+        node: str, 
+        relation: str, 
+        direction: str = "out", 
+        transitive: bool = False
+    ) -> List[str]:
         """
         Generic relation query.
         direction = "out" (children), "in" (parents), "both" (undirected).
         transitive = whether to follow edges recursively.
         """
-        results = set()
-        stack = [node]
+        results: set[str] = set()
+        stack: List[str] = [node]
 
         while stack:
             current = stack.pop()
@@ -53,84 +66,83 @@ class GeometryQueryAPI:
 
         return list(results)
 
-    def contains(self, node, transitive=False):
+    def contains(self, node: str, transitive: bool = False) -> List[str]:
         return self.get_related(node, "contains", "out", transitive)
 
-    def inside_of(self, node, transitive=False):
+    def inside_of(self, node: str, transitive: bool = False) -> List[str]:
         return self.get_related(node, "inside_of", "in", transitive)
 
-    def on_top_of(self, node, transitive=False):
-        return self.get_related(node, "on_top_of", "out", transitive)
-
-    def below(self, node, transitive=False):
+    def on_top_of(self, node: str, transitive: bool = False) -> List[str]:
         return self.get_related(node, "on_top_of", "in", transitive)
 
-    def adjacent_to(self, node):
+    def below(self, node: str, transitive: bool = False) -> List[str]:
+        return self.get_related(node, "on_top_of", "out", transitive)
+
+    def adjacent_to(self, node: str) -> List[str]:
         return self.get_related(node, "adjacent_to", "both", False)
 
-    def collides_with(self, node):
-        self.get_related(node, relation="collides", direction="both")
+    def collides_with(self, node: str) -> List[str]:
+        return self.get_related(node, relation="collides", direction="both")
 
 
-def contains(A, B):
+def contains(A: Geometry, B: Geometry) -> bool:
     return A.shape.contains(B.shape) and A.zmin <= B.zmin and A.zmax >= B.zmax
 
-def inside_of(A, B):
+def inside_of(A: Geometry, B: Geometry) -> bool:
     return contains(B, A)
 
-def on_top_of(A, B, tol=0.01):
+def on_top_of(A: Geometry, B: Geometry, tol: float = 0.01) -> bool:
     overlap = A.shape.intersects(B.shape)
     return overlap and abs(A.zmin - B.zmax) <= tol
 
-def adjacent_to(A, B):
+def adjacent_to(A: Geometry, B: Geometry) -> bool:
     return A.shape.touches(B.shape) and A.zmin == B.zmin and A.zmax == B.zmax
 
-def colliding(A, B, z_tol=0.01):
+def colliding(A: Geometry, B: Geometry, z_tol: float = 0.01) -> bool:
     xy_overlap = A.shape.intersects(B.shape)
     neither_contains = not contains(A,B) and not contains(B,A)
     not_stacked = abs(A.zmin - B.zmax) > z_tol and abs(B.zmin - A.zmax) > z_tol
     return xy_overlap and neither_contains and not_stacked
 
 
-def build_relationship_graph(geometries):
+def build_relationship_graph(geometries: List[Geometry]) -> nx.DiGraph:
     G = nx.DiGraph()
     for g in geometries:
         G.add_node(g.name)
-    for i,A in enumerate(geometries):
+    for i, A in enumerate(geometries):
         for B in geometries[i+1:]:
             if contains(A,B):
-                G.add_edge(A.name,B.name,relation="contains")
-                G.add_edge(B.name,A.name,relation="inside_of")
+                G.add_edge(A.name, B.name, relation="contains")
+                G.add_edge(B.name, A.name, relation="inside_of")
             elif contains(B,A):
-                G.add_edge(B.name,A.name,relation="contains")
-                G.add_edge(A.name,B.name,relation="inside_of")
+                G.add_edge(B.name, A.name, relation="contains")
+                G.add_edge(A.name, B.name, relation="inside_of")
             if on_top_of(A,B):
-                G.add_edge(A.name,B.name,relation="on_top_of")
+                G.add_edge(A.name, B.name, relation="on_top_of")
+                print(A.name, "is ontop of", B.name)
             elif on_top_of(B,A):
-                G.add_edge(B.name,A.name,relation="on_top_of")
+                G.add_edge(B.name, A.name, relation="on_top_of")
+                print(A.name, "is below of", B.name)
             if adjacent_to(A,B):
-                G.add_edge(A.name,B.name,relation="adjacent_to")
-                G.add_edge(B.name,A.name,relation="adjacent_to")
+                G.add_edge(A.name, B.name, relation="adjacent_to")
+                G.add_edge(B.name, A.name, relation="adjacent_to")
             if colliding(A,B):
-                G.add_edge(A.name,B.name,relation="collides")
-                G.add_edge(B.name,A.name,relation="collides")
+                G.add_edge(A.name, B.name, relation="collides")
+                G.add_edge(B.name, A.name, relation="collides")
     return G
 
 
 def render_dag(graph: nx.DiGraph) -> None:
-    """
-    Render the DAG graph of geometrical relationships.
-    """
-    p = pv.Plotter()
-    pos = nx.spring_layout(graph, seed=42)
-    nx.draw(graph, pos, with_labels=True, node_size=2000, node_color="lightblue", font_size=10)
-    edge_labels = nx.get_edge_attributes(graph, "relation")
+    pos: Dict[str, Any] = nx.spring_layout(graph, seed=42)
+    nx.draw(graph, pos, with_labels=True, node_size=2000,
+            node_color="lightblue", font_size=10)
+    edge_labels: Dict[tuple[str, str], str] = nx.get_edge_attributes(graph, "relation")
     nx.draw_networkx_edge_labels(graph, pos, edge_labels=edge_labels, font_size=8)
-    p.show()
+    plt.show()
 
 
-def render_3d_scene(geometries, G):
-    relation_colors = {
+def render_3d_scene(geometries: List[Geometry], G: nx.DiGraph) -> None:
+    relation_colors: Dict[str, str] = {
         "contains": "skyblue",
         "inside_of": "lightgreen",
         "on_top_of": "orange",
@@ -139,7 +151,7 @@ def render_3d_scene(geometries, G):
         "default": "lightgray"
     }
 
-    colors = {}
+    colors: Dict[str, str] = {}
     for geom in geometries:
         node = geom.name
         relations = [d["relation"] for _,_,d in G.edges(node,data=True)] + \
@@ -155,21 +167,24 @@ def render_3d_scene(geometries, G):
         else:
             colors[node] = relation_colors["default"]
 
-    # Create plotter
+    # Draw the bounding boxes
     p = pv.Plotter()
-    
-    # Add cuboids
     for geom in geometries:
         x0,y0,x1,y1 = geom.shape.bounds
         z0,z1 = geom.zmin, geom.zmax
         dx,dy,dz = x1-x0, y1-y0, z1-z0
-        cube = pv.Cube(center=((x0+x1)/2,(y0+y1)/2,(z0+z1)/2), x_length=dx, y_length=dy, z_length=dz)
+        cube = pv.Cube(center=((x0+x1)/2,(y0+y1)/2,(z0+z1)/2),
+                       x_length=dx, y_length=dy, z_length=dz)
         print(geom.name, colors[geom.name])
-        p.add_mesh(cube, color=colors[geom.name], opacity=0.5, show_edges=True, edge_color="black")
+        p.add_mesh(cube, color=colors[geom.name], opacity=0.5,
+                   show_edges=True, edge_color="black")
         
-        p.add_point_labels([[ (x0+x1)/2, (y0+y1)/2, (z0+z1)/2 ]], [geom.name], font_size=24)
+        p.add_point_labels(
+            [[(x0+x1)/2, (y0+y1)/2, (z0+z1)/2]],
+            [geom.name], font_size=24
+        )
 
-    # --- Draw collisions as 2D outlines on top of the bottom object ---
+    # Draw collisions as 2D outlines on top of the bottom object 
     for i, A in enumerate(geometries):
         for B in geometries[i+1:]:
             if colliding(A, B):
@@ -178,12 +193,9 @@ def render_3d_scene(geometries, G):
                     continue
 
                 # Determine which object is lower
-                if A.zmax <= B.zmax:
-                    z_top = A.zmax
-                else:
-                    z_top = B.zmax
+                z_top = A.zmax if A.zmax <= B.zmax else B.zmax
 
-                polygons = []
+                polygons: List[BaseGeometry] = []
                 if inter.geom_type == "Polygon":
                     polygons = [inter]
                 elif inter.geom_type == "MultiPolygon":
@@ -204,6 +216,7 @@ def render_3d_scene(geometries, G):
     p.show_grid()
     p.show()
 
+
 if __name__=="__main__":
     base = Geometry("Base", box(0,0,4,4), zmin=0, zmax=2)
     obj1 = Geometry("Obj1", box(1,1,3,3), zmin=2, zmax=3)
@@ -214,16 +227,12 @@ if __name__=="__main__":
     G = build_relationship_graph(geometries)
     api = GeometryQueryAPI(G)
 
-    # Example queries
     print("Base contains (direct):", api.contains("Base"))
     print("Base contains (all):", api.contains("Base", transitive=True))
-    print("Inside Object1:", api.inside_of("obj1", transitive=True))
-    print("Obj1a inside_of (all):", api.inside_of("obj1", transitive=True))
-    print("Above Object2:", api.on_top_of("obj2", transitive=True))
-    print("Below Obj1a (all):", api.below("Obj1", transitive=True))
-    print("Obj1 adjacent_to:", api.adjacent_to("obj1"))
+    print("Above Base:", api.on_top_of("Base", transitive=False))
+    print("Above Base (all):", api.on_top_of("Base", transitive=True))
+    print("Below Obj1:", api.below("Obj1", transitive=True))
 
-    # Visualize
-    #render_dag(G)
+    # render_dag(G)
     render_3d_scene(geometries, G)
 
