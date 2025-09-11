@@ -1,4 +1,5 @@
 import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -40,5 +41,15 @@ describe('GalleryItemCard', () => {
     screen.getByText(MOCK_CMD_TEXT)
     screen.getByText(MOCK_PREV_CMD_TEXT)
     screen.getByText(MOCK_TIMESTAMP)
+  })
+
+  it('shows "View image" on hover', async () => {
+    const user = userEvent.setup()
+    render(mockProps)
+
+    const image = screen.getByAltText('camera-photo')
+    await user.hover(image)
+
+    screen.getByText('View image')
   })
 })
