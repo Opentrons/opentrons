@@ -1,4 +1,5 @@
 """FLEX Stacker QC."""
+
 from os import environ
 
 # NOTE: this is required to get WIFI test to work
@@ -16,6 +17,7 @@ from hardware_testing.data.csv_report import CSVReport
 
 from .config import TestSection, TestConfig, build_report, TESTS
 from .utils import find_stacker_port, get_estop
+from opentrons.hardware_control.execution_manager import ExecutionManager
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control.modules.flex_stacker import FlexStacker
 
@@ -34,6 +36,9 @@ async def build_stacker_report(
         hw_control_loop=asyncio.get_running_loop(),
         simulating=is_simulating,
         sim_serial_number="FLEX1234" if is_simulating else None,
+        execution_manager=ExecutionManager(),
+        disconnected_callback=lambda *args: None,
+        error_callback=lambda *args: None,
     )
     report = build_report(test_name)
     report.set_operator(
