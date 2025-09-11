@@ -1480,8 +1480,8 @@ class OT3API(
             grip_width_uncertainty_narrower,
             gripper.jaw_width,
             gripper.max_allowed_grip_error,
-            gripper.max_jaw_width,
             gripper.min_jaw_width,
+            gripper.max_jaw_width,
         )
 
     def gripper_jaw_can_home(self) -> bool:
