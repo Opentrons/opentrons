@@ -351,8 +351,10 @@ interface LoadLidResult {
   locationSequence?: LabwareLocationSequence
 }
 
+export type TipWellState = 'clean' | 'used' | 'empty'
+
 export interface SetTipStateParams {
   labwareId: string
   wellNames: string[]
-  tipWellState?: 'clean' | 'used' | 'empty'
+  tipWellState?: TipWellState
 }
