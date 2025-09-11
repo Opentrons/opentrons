@@ -1,7 +1,4 @@
 FLEX_MANUAL_PREFIX ?= flex
-# AWS_PROFILE is intentionally left undefined by default
-BRANCH ?= edge
-SANDBOX_S3_BUCKET ?= sandbox.docs
 
 .PHONY: build
 build:	
@@ -10,3 +7,15 @@ build:
 	else \
 		uv run mkdocs build -f ./mkdocs.yml; \
 	fi
+
+.PHONY: setup
+setup:
+	uv sync
+
+.PHONY: clean
+clean:
+	rm -rf site
+
+.PHONY: serve
+serve:
+	uv run mkdocs serve -f ./mkdocs.yml
