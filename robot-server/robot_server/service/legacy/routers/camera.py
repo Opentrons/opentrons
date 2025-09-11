@@ -54,20 +54,7 @@ async def post_camera(
         stream_settings = _get_stream_settings()
         stream_settings.source = "NONE"
         _write_stream_settings(stream_settings)
-
-        command = ["systemctl", "stop", "opentrons-live-stream"]
-        subprocess = await asyncio.create_subprocess_exec(
-            *command,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-        stdout, stderr = await subprocess.communicate()
-        if subprocess.returncode == 0:
-            log.info("Disabled opentrons-live-stream service")
-        else:
-            log.info(
-                f"Failed to stop opentrons-live-stream, returncode:{ subprocess.returncode}, stdout: {stdout.decode()}, stderr: {stderr.decode()}"
-            )
+        _restart_live_stream(settings=stream_settings)
 
     return CameraEnable(enabled=request_body.data.enabled)
 
@@ -180,24 +167,7 @@ async def post_live_stream(
             stream_settings.source = "NONE"
             _write_stream_settings(stream_settings)
 
-            command = ["systemctl", "stop", "opentrons-live-stream"]
-            subprocess = await asyncio.create_subprocess_exec(
-                *command,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-            )
-            stdout, stderr = await subprocess.communicate()
-            if subprocess.returncode == 0:
-                log.info("Disabled opentrons-live-stream service")
-            else:
-                raise RuntimeError(
-                    "Error stopping opentrons-live-stream.",
-                    {
-                        "returncode": subprocess.returncode,
-                        "stdout": stdout,
-                        "stderr": stderr,
-                    },
-                )
+            _restart_live_stream(settings=stream_settings)
 
     return LiveStreamData(
         enabled=request_body.data.enabled,
