@@ -51,10 +51,6 @@ describe('StackerStalledRetry', () => {
     )
   })
 
-  afterEach(() => {
-    vi.resetAllMocks()
-  })
-
   it(`renders StackerHomeShuttle when step is ${RECOVERY_MAP.SHUTTLE_FULL_RETRY.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS}`, () => {
     props.recoveryMap.step =
       RECOVERY_MAP.SHUTTLE_FULL_RETRY.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS

@@ -63,10 +63,6 @@ describe('ShuttleFullSkip', () => {
     vi.mocked(SkipStepInfo).mockReturnValue(<div>MOCK_SKIP_STEP_INFO</div>)
   })
 
-  afterEach(() => {
-    vi.resetAllMocks()
-  })
-
   it(`renders StackerHomeShuttle when step is ${RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS}`, () => {
     props.recoveryMap.step =
       RECOVERY_MAP.SHUTTLE_FULL_SKIP.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS
