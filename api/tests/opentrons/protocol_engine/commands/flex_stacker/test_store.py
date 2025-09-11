@@ -200,6 +200,14 @@ async def test_store_raises_if_not_configured(
             ),
             FlexStackerShuttleError,
         ),
+        (
+            FlexStackerShuttleLabwareError(
+                serial="123",
+                expected_state=PlatformState.EXTENDED,
+                shuttle_state=PlatformState.UNKNOWN,
+            ),
+            FlexStackerLabwareStoreError,
+        ),
     ],
 )
 async def test_store_raises_if_stall(
