@@ -7,7 +7,7 @@
 
    - Crops the image
    - Reduces the image file size
-   - Converts the image to `.png` format
+   - Converts the image to `.jpg` format
 
    In order to run this script
 
@@ -17,7 +17,7 @@
 2. **Name the image file**
 
    - Include the **labware load name** in the file name.
-   - If there are multiple images for a single labware, append a descriptive **`_suffix`** (e.g., `_side_view`, `_top_view`).
+   - If there are multiple images for a single labware, append a **`_suffix`** (e.g., `_0`, `_1`) that indicates which image should appear first.
 
 3. **Upload the image**
    - Place the image file(s) in the `../images` directory.

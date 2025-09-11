@@ -99,7 +99,7 @@ def resize_image(image_path: str, new_width: int = 1024) -> str:
     # Resize the image
     resized_img = img.resize((new_width, new_height), Image.LANCZOS) # LANCZOS for high-quality downsampling
     resize_image_path = rename_image_path(image_path, "resize")
-    resized_img.save(resize_image_path, "JPEG", quality=95, optimize=True)
+    resized_img.save(resize_image_path, "JPEG", quality=98, optimize=True)
     print(f"✅ Final image size: {os.path.getsize(image_path) // 1024} KB")
     return resize_image_path
 
@@ -115,6 +115,12 @@ def convert_to_jpg(mage_path: str) -> str:
         print("📷 Converting image to JPG...")
         image_jpg = rename_image_path(image_path, "jpg")
         try:
+            if img.mode == 'RGBA':
+                background = Image.new("RGB", img.size, (255, 255, 255))  # white background
+                background.paste(img, mask=img.split()[3])  # 3 is the alpha channel
+                img = background
+            elif img.mode != 'RGB':
+                img = img.convert('RGB')
             img.save(image_jpg, "JPEG")
             print(f"Image converted successfully to {image_jpg}")
             return image_jpg
@@ -128,13 +134,13 @@ def image_sequence(image_path: str) -> str:
     """Run conversion, crop, and resize on image, overwriting original."""
     image_path = convert_to_jpg(image_path)  
     if len(image_path) > 0:
-        image_path = remove_background_and_replace_with_white(image_path)
+        #image_path = remove_background_and_replace_with_white(image_path)
         image_path = crop_image(image_path) 
         image_path = resize_image(image_path)    
     return image_path
 
 def is_image_file(filename):
-    valid_extensions = ('.jpg', '.png', '.jpeg', '.bmp', '.gif', '.tiff', '.webp')
+    valid_extensions = ('.jpg', '.png', '.jpeg', '.bmp', '.gif', '.tiff', '.webp', '.psd')
     return filename.lower().endswith(valid_extensions)
 
 def process_image_path(image_path):
