@@ -319,6 +319,7 @@ const getLiquidClassValues = (
   >
   const numAspirateWells = state.sourceWells.length
   const numDispenseWells = destinationWells.length
+
   const byVolumeLookup = getTransferPlanAndReferenceVolumes({
     pipetteSpecs,
     tiprackDefinition: tipRack,
@@ -330,7 +331,6 @@ const getLiquidClassValues = (
     conditioningByVolume: conditioningByVolume,
     disposalByVolume: disposalByVolume,
   }).referenceVolumes
-
   const matchingTipLiquidSpecs = getMatchingTipLiquidSpecsFromSpec(
     pipetteSpecs,
     volume,
