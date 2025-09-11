@@ -1,10 +1,15 @@
 import asyncio
 import mock
 from typing import Any, AsyncGenerator, cast
-from opentrons.drivers.types import Temperature, PlateTemperature, ThermocyclerLidStatus
 
 import pytest
+from decoy import Decoy
 
+from opentrons.hardware_control.modules.types import (
+    ModuleErrorCallback,
+    ModuleDisconnectedCallback,
+)
+from opentrons.drivers.types import Temperature, PlateTemperature, ThermocyclerLidStatus
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.thermocycler import SimulatingDriver
 from opentrons.hardware_control import modules, ExecutionManager
@@ -19,6 +24,7 @@ SIMULATING_POLL_PERIOD = POLL_PERIOD / 20.0
 
 @pytest.fixture
 def usb_port() -> USBPort:
+    """Token USB port."""
     return USBPort(
         name="",
         port_number=0,
@@ -27,30 +33,44 @@ def usb_port() -> USBPort:
 
 
 @pytest.fixture
-async def subject(usb_port: USBPort) -> AsyncGenerator[modules.Thermocycler, None]:
-    """Test subject"""
+async def subject(
+    usb_port: USBPort,
+    module_error_callback: ModuleErrorCallback,
+    module_disconnected_callback: ModuleDisconnectedCallback,
+    mock_execution_manager: ExecutionManager,
+) -> AsyncGenerator[modules.Thermocycler, None]:
+    """V1 test subject."""
     therm = await modules.build(
         port="/dev/ot_module_sim_thermocycler0",
         usb_port=usb_port,
         type=modules.ModuleType["THERMOCYCLER"],
         simulating=True,
         hw_control_loop=asyncio.get_running_loop(),
-        execution_manager=ExecutionManager(),
+        execution_manager=mock_execution_manager,
+        error_callback=module_error_callback,
+        disconnected_callback=module_disconnected_callback,
     )
     yield cast(modules.Thermocycler, therm)
     await therm.cleanup()
 
 
 @pytest.fixture
-async def subject_v2(usb_port: USBPort) -> AsyncGenerator[modules.Thermocycler, None]:
-    """Test subject"""
+async def subject_v2(
+    usb_port: USBPort,
+    module_error_callback: ModuleErrorCallback,
+    module_disconnected_callback: ModuleDisconnectedCallback,
+    mock_execution_manager: ExecutionManager,
+) -> AsyncGenerator[modules.Thermocycler, None]:
+    """V2 test subject."""
     therm = await modules.build(
         port="/dev/ot_module_sim_thermocycler0",
         usb_port=usb_port,
         type=modules.ModuleType["THERMOCYCLER"],
         simulating=True,
         hw_control_loop=asyncio.get_running_loop(),
-        execution_manager=ExecutionManager(),
+        execution_manager=mock_execution_manager,
+        error_callback=module_error_callback,
+        disconnected_callback=module_disconnected_callback,
         sim_model="thermocyclerModuleV2",
     )
     yield cast(modules.Thermocycler, therm)
@@ -58,10 +78,12 @@ async def subject_v2(usb_port: USBPort) -> AsyncGenerator[modules.Thermocycler, 
 
 
 async def test_sim_initialization(subject: modules.Thermocycler) -> None:
+    """It should build a sim object."""
     assert isinstance(subject, modules.AbstractModule)
 
 
 async def test_lid(subject: modules.Thermocycler) -> None:
+    """It should handle lid status."""
     await subject.open()
     assert subject.lid_status == "open"
 
@@ -78,6 +100,7 @@ async def test_lid(subject: modules.Thermocycler) -> None:
 async def test_plate_lift(
     subject: modules.Thermocycler, subject_v2: modules.Thermocycler
 ) -> None:
+    """It should handle plate lift."""
     # First test Gen1 behavior
     await subject.close()
     with pytest.raises(NotImplementedError):
@@ -99,6 +122,7 @@ async def test_plate_lift(
 async def test_raise_plate(
     subject: modules.Thermocycler, subject_v2: modules.Thermocycler
 ) -> None:
+    """It should handle plate raise."""
     # First test Gen1 behavior
     await subject.open()
     with pytest.raises(NotImplementedError):
@@ -122,6 +146,7 @@ async def test_raise_plate(
 
 
 async def test_sim_state(subject: modules.Thermocycler) -> None:
+    """It should forward simulated state."""
     assert subject.temperature == 23
     assert subject.target is None
     assert subject.status == "idle"
@@ -137,6 +162,7 @@ async def test_sim_state(subject: modules.Thermocycler) -> None:
 
 
 async def test_sim_update(subject: modules.Thermocycler) -> None:
+    """It should update simulated state."""
     await subject.set_temperature(
         temperature=10, hold_time_seconds=None, hold_time_minutes=None, volume=50
     )
@@ -183,11 +209,13 @@ async def test_sim_update(subject: modules.Thermocycler) -> None:
 
 @pytest.fixture
 def simulator() -> SimulatingDriver:
+    """Build a driver simulator."""
     return SimulatingDriver()
 
 
 @pytest.fixture
 def set_plate_temp_spy(simulator: SimulatingDriver) -> mock.AsyncMock:
+    """Build a spy for set plate temp."""
     return mock.AsyncMock(wraps=simulator.set_plate_temperature)
 
 
@@ -202,7 +230,11 @@ def simulator_set_plate_spy(
 
 @pytest.fixture
 async def set_temperature_subject(
-    usb_port: USBPort, simulator_set_plate_spy: SimulatingDriver
+    usb_port: USBPort,
+    simulator_set_plate_spy: SimulatingDriver,
+    mock_execution_manager: ExecutionManager,
+    module_error_callback: ModuleErrorCallback,
+    module_disconnected_callback: ModuleDisconnectedCallback,
 ) -> AsyncGenerator[modules.Thermocycler, None]:
     """Fixture that spys on set_plate_temperature"""
     reader = ThermocyclerReader(driver=simulator_set_plate_spy)
@@ -212,11 +244,13 @@ async def set_temperature_subject(
         port="/dev/ot_module_sim_thermocycler0",
         usb_port=usb_port,
         hw_control_loop=asyncio.get_running_loop(),
-        execution_manager=ExecutionManager(),
         driver=simulator_set_plate_spy,
         reader=reader,
         poller=poller,
         device_info={},
+        execution_manager=mock_execution_manager,
+        error_callback=module_error_callback,
+        disconnected_callback=module_disconnected_callback,
     )
 
     await poller.start()
@@ -226,6 +260,7 @@ async def set_temperature_subject(
 
 @pytest.fixture
 def mock_driver(simulator: SimulatingDriver) -> mock.AsyncMock:
+    """Build a fully mocked driver."""
     return mock.AsyncMock(spec=simulator)
 
 
@@ -233,6 +268,9 @@ def mock_driver(simulator: SimulatingDriver) -> mock.AsyncMock:
 async def subject_mocked_driver(
     usb_port: USBPort,
     mock_driver: mock.AsyncMock,
+    mock_execution_manager: ExecutionManager,
+    module_disconnected_callback: ModuleDisconnectedCallback,
+    module_error_callback: ModuleErrorCallback,
 ) -> AsyncGenerator[modules.Thermocycler, None]:
     """Test subject with mocked driver"""
     reader = ThermocyclerReader(driver=mock_driver)
@@ -249,7 +287,9 @@ async def subject_mocked_driver(
             "version": "dummyVersionTC",
         },
         hw_control_loop=asyncio.get_running_loop(),
-        execution_manager=ExecutionManager(),
+        execution_manager=mock_execution_manager,
+        disconnected_callback=module_disconnected_callback,
+        error_callback=module_error_callback,
     )
     mock_driver.get_lid_temperature.return_value = Temperature(current=10, target=None)
     mock_driver.get_lid_status.return_value = ThermocyclerLidStatus.OPEN
@@ -419,12 +459,24 @@ async def test_sync_error_response_to_poller(
 async def test_async_error_response_to_poller(
     subject_mocked_driver: modules.Thermocycler,
     mock_driver: mock.AsyncMock,
+    module_error_callback: ModuleErrorCallback,
+    decoy: Decoy,
 ) -> None:
     """Test that asynchronous error is detected by poller and module live data and status are updated."""
     mock_driver.get_lid_temperature.return_value = Temperature(current=50, target=50)
     mock_driver.get_lid_status.return_value = ThermocyclerLidStatus.OPEN
-    mock_driver.get_plate_temperature.side_effect = Exception()
+    mock_driver.model.return_value = "some-model"
+    exc = Exception("oh no!")
+    mock_driver.get_plate_temperature.side_effect = exc
     with pytest.raises(Exception):
         await subject_mocked_driver._poller.wait_next_poll()
     assert subject_mocked_driver.live_data["status"] == "error"
     assert subject_mocked_driver.status == modules.TemperatureStatus.ERROR
+    decoy.verify(
+        module_error_callback(
+            exc,
+            "some-model",
+            "/dev/ot_module_sim_thermocycler0",
+            "dummySerialTC",
+        )
+    )

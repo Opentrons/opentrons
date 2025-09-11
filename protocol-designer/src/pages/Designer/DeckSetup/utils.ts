@@ -222,7 +222,8 @@ export const getStackerDefinitions = (
     return []
   }
   const universalLid =
-    category != null && !CATEGORIES_WITH_NO_LID.includes(category)
+    (category != null && !CATEGORIES_WITH_NO_LID.includes(category)) ||
+    loadName === 'opentrons_tough_universal_lid'
       ? universalLidURI
       : null
   const supportedDefs = getStackerDefinitionsFromLoadName(defs, loadName)

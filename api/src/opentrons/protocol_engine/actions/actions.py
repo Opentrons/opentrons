@@ -3,6 +3,7 @@
 Actions can be passed to the ActionDispatcher, where they will trigger
 reactions in objects that subscribe to the pipeline, like the StateStore.
 """
+
 import dataclasses
 from datetime import datetime
 from enum import Enum
@@ -62,7 +63,7 @@ class PauseAction:
 class StopAction:
     """Request engine execution to stop soon."""
 
-    from_estop: bool = False
+    from_asynchronous_error: bool = False
 
 
 @dataclasses.dataclass(frozen=True)
