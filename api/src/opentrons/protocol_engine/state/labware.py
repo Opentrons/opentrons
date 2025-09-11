@@ -1449,7 +1449,7 @@ class LabwareView:
         """
         if well_bbox.y == 0:
             # This labware has no wells; use a fixed minimum
-            return 5
+            return 10
         if well_bbox.y > labware_bbox.y:
             # This labware has a very odd definition with wells outside its dimensions.
             # Return the smaller value.
