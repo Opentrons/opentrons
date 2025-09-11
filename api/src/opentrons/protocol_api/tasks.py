@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 
 class Task:
-    """A concurrent protocol task created by a protocol api function.
+    """A concurrent protocol task created by a protocol API function.
 
     .. versionadded:: 2.27
     """
@@ -28,18 +28,21 @@ class Task:
     @property
     @requires_version(2, 27)
     def done(self) -> bool:
-        """Whether the task is done."""
+        """Returns ``True`` if the task is done."""
         return self._core.is_done()
 
     @property
     @requires_version(2, 27)
     def started(self) -> bool:
-        """Whether the task has started."""
+        """WReturns ``True`` if the task is started."""
         return self._core.is_started()
         ...
 
     @property
     @requires_version(2, 27)
     def finished_at(self) -> datetime | None:
-        """The timestamp of the when the task is finished, none if not finished."""
+        """The timestamp of the when the task finished.
+
+        Returns ``None`` if the task hasn't finished yet.
+        """
         return self._core.get_finished_at_timestamp()
