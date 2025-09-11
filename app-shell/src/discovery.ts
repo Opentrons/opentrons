@@ -50,6 +50,8 @@ interface DiscoveryStore {
 let config: ConfigV1['discovery']
 let store: Store<DiscoveryStore>
 let client: DiscoveryClient
+let isClientInitialized = false
+const dispatchers = new Set<Dispatch>()
 
 const makeManualAddresses = (addrs: string | string[]): Address[] => {
   return ['fd00:0:cafe:fefe::1']
@@ -61,7 +63,6 @@ const migrateLegacyServices = (
   legacyServices: LegacyService[]
 ): DiscoveryClientRobot[] => {
   const servicesByName = groupBy<LegacyService>(legacyServices, 'name')
-
   return Object.keys(servicesByName).map((name: string) => {
     const services = servicesByName[name]
     const addresses = services.flatMap((service: LegacyService) => {
@@ -81,7 +82,6 @@ const migrateLegacyServices = (
           ]
         : []
     })
-
     return { name, health: null, serverHealth: null, addresses }
   })
 }
@@ -91,62 +91,78 @@ export function registerDiscovery(
 ): (action: Action) => unknown {
   const handleRobotListChange = throttle(handleRobots, UPDATE_THROTTLE_MS)
 
-  config = getFullConfig().discovery
-  store = new Store({
-    name: 'discovery',
-    defaults: { robots: [] as DiscoveryClientRobot[] },
-  })
+  dispatchers.add(dispatch)
 
-  let disableCache = config.disableCache
-  let initialRobots: DiscoveryClientRobot[] = []
+  if (!isClientInitialized) {
+    config = getFullConfig().discovery
+    store = new Store({
+      name: 'discovery',
+      defaults: { robots: [] as DiscoveryClientRobot[] },
+    })
 
-  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-  if (!disableCache) {
-    const legacyCachedServices: LegacyService[] | undefined = store.get(
-      'services',
-      // @ts-expect-error(mc, 2021-02-16): tweak these type definitions
-      null
-    )
+    let initialRobots: DiscoveryClientRobot[] = []
 
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-    if (legacyCachedServices) {
-      initialRobots = migrateLegacyServices(legacyCachedServices)
-      store.delete('services')
-    } else {
-      initialRobots = store.get('robots', [])
+    if (!config.disableCache) {
+      const legacyCachedServices: LegacyService[] | undefined = store.get(
+        'services',
+        // @ts-expect-error(mc, 2021-02-16): tweak these type definitions
+        null
+      )
+      // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+      if (legacyCachedServices) {
+        initialRobots = migrateLegacyServices(legacyCachedServices)
+        store.delete('services')
+      } else {
+        initialRobots = store.get('robots', [])
+      }
     }
+
+    client = createDiscoveryClient({
+      onListChange: handleRobotListChange,
+      logger: log,
+    })
+
+    client.start({
+      initialRobots,
+      healthPollInterval: SLOW_POLL_INTERVAL_MS,
+      manualAddresses: makeManualAddresses(config.candidates),
+    })
+
+    handleConfigChange('discovery.candidates', (value: string | string[]) => {
+      client.start({ manualAddresses: makeManualAddresses(value) })
+    })
+
+    handleConfigChange('discovery.disableCache', (value: boolean) => {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-boolean-literal-compare
+      if (value === true) {
+        config.disableCache = value
+        store.set('robots', [])
+        clearCache()
+      }
+    })
+
+    app.once('will-quit', () => {
+      client.stop()
+    })
+
+    isClientInitialized = true
+  } else {
+    const robots = client.getRobots()
+    dispatch({
+      type: 'discovery:UPDATE_LIST',
+      payload: { robots },
+    })
   }
-
-  client = createDiscoveryClient({
-    onListChange: handleRobotListChange,
-    logger: log,
-  })
-
-  client.start({
-    initialRobots,
-    healthPollInterval: SLOW_POLL_INTERVAL_MS,
-    manualAddresses: makeManualAddresses(config.candidates),
-  })
-
-  handleConfigChange('discovery.candidates', (value: string | string[]) => {
-    client.start({ manualAddresses: makeManualAddresses(value) })
-  })
-
-  handleConfigChange('discovery.disableCache', (value: boolean) => {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-boolean-literal-compare
-    if (value === true) {
-      disableCache = value
-      store.set('robots', [])
-      clearCache()
-    }
-  })
-
-  app.once('will-quit', () => {
-    client.stop()
-  })
 
   return function handleIncomingAction(action: Action) {
     log.debug('handling action in discovery', { action })
+
+    // Only first dispatcher handles client control actions
+    const isMainDispatcher = dispatchers.values().next().value === dispatch
+    if (!isMainDispatcher) {
+      return
+    }
 
     switch (action.type) {
       case UI_INITIALIZED:
@@ -204,16 +220,26 @@ export function registerDiscovery(
   function handleRobots(): void {
     const robots = client.getRobots()
     handleNotificationConnectionsFor(robots)
+    if (!config.disableCache) store.set('robots', robots)
 
-    if (!disableCache) store.set('robots', robots)
-
-    dispatch({
-      type: 'discovery:UPDATE_LIST',
-      payload: { robots },
+    dispatchers.forEach(dispatcher => {
+      dispatcher({
+        type: 'discovery:UPDATE_LIST',
+        payload: { robots },
+      })
     })
   }
 
   function clearCache(): void {
     client.start({ initialRobots: [], manualAddresses: [] })
   }
+}
+
+export function unregisterDiscovery(dispatch: Dispatch): void {
+  dispatchers.delete(dispatch)
+}
+
+export function __resetDiscoveryForTesting(): void {
+  isClientInitialized = false
+  dispatchers.clear()
 }

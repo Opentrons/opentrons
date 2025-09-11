@@ -11,7 +11,11 @@ import {
 import * as DiscoveryClient from '@opentrons/discovery-client'
 
 import * as Cfg from '../config'
-import { registerDiscovery } from '../discovery'
+import {
+  __resetDiscoveryForTesting,
+  registerDiscovery,
+  unregisterDiscovery,
+} from '../discovery'
 import * as SysInfo from '../system-info'
 import { getSerialPortHttpAgent } from '../usb'
 
@@ -38,6 +42,7 @@ let mockDelete = vi.fn()
 let mockSet = vi.fn()
 describe('app-shell/discovery', () => {
   const dispatch = vi.fn()
+  const dispatch2 = vi.fn()
   const mockClient = {
     start: vi.fn(),
     stop: vi.fn(),
@@ -50,11 +55,15 @@ describe('app-shell/discovery', () => {
       .calls[
       vi.mocked(DiscoveryClient.createDiscoveryClient).mock.calls.length - 1
     ]
-    const { onListChange } = lastCall[0]
-    onListChange([])
+    if (lastCall && lastCall[0]) {
+      const { onListChange } = lastCall[0]
+      onListChange([])
+    }
   }
 
   beforeEach(() => {
+    __resetDiscoveryForTesting()
+
     mockGet = vi.fn(property => {
       return []
     })
@@ -97,6 +106,15 @@ describe('app-shell/discovery', () => {
     )
   })
 
+  it('registerDiscovery creates a DiscoveryClient only once for multiple dispatchers', () => {
+    registerDiscovery(dispatch)
+    registerDiscovery(dispatch2)
+
+    expect(
+      vi.mocked(DiscoveryClient.createDiscoveryClient)
+    ).toHaveBeenCalledTimes(1)
+  })
+
   it('calls client.start on discovery registration', () => {
     registerDiscovery(dispatch)
 
@@ -106,6 +124,19 @@ describe('app-shell/discovery', () => {
       initialRobots: [],
       // support for legacy (pre-v3.3.0) IPv6 wired robots
       manualAddresses: [{ ip: 'fd00:0:cafe:fefe::1', port: 31950 }],
+    })
+  })
+
+  it('sends current robots to secondary dispatchers immediately', () => {
+    const robots = [{ name: 'robot1' }, { name: 'robot2' }]
+    mockClient.getRobots.mockReturnValue(robots)
+
+    registerDiscovery(dispatch)
+    registerDiscovery(dispatch2)
+
+    expect(dispatch2).toHaveBeenCalledWith({
+      type: 'discovery:UPDATE_LIST',
+      payload: { robots },
     })
   })
 
@@ -139,6 +170,25 @@ describe('app-shell/discovery', () => {
     })
   })
 
+  it('sets poll speed on "discovery:START" and "discovery:FINISH" only for main dispatcher', () => {
+    const handleAction1 = registerDiscovery(dispatch)
+    const handleAction2 = registerDiscovery(dispatch2)
+
+    const initialCallCount = mockClient.start.mock.calls.length
+
+    handleAction1(startDiscovery())
+    expect(mockClient.start).toHaveBeenCalledTimes(initialCallCount + 1)
+
+    handleAction2(startDiscovery())
+    expect(mockClient.start).toHaveBeenCalledTimes(initialCallCount + 1)
+
+    handleAction1(finishDiscovery())
+    expect(mockClient.start).toHaveBeenCalledTimes(initialCallCount + 2)
+
+    handleAction2(finishDiscovery())
+    expect(mockClient.start).toHaveBeenCalledTimes(initialCallCount + 2)
+  })
+
   it('sets poll speed on "shell:UI_INTIALIZED"', () => {
     const handleAction = registerDiscovery(dispatch)
 
@@ -146,6 +196,19 @@ describe('app-shell/discovery', () => {
     expect(mockClient.start).toHaveBeenLastCalledWith({
       healthPollInterval: 3000,
     })
+  })
+
+  it('sets poll speed on "shell:UI_INTIALIZED" only for main dispatcher', () => {
+    const handleAction1 = registerDiscovery(dispatch)
+    const handleAction2 = registerDiscovery(dispatch2)
+
+    const initialCallCount = mockClient.start.mock.calls.length
+
+    handleAction1({ type: 'shell:UI_INITIALIZED', meta: { shell: true } })
+    expect(mockClient.start).toHaveBeenCalledTimes(initialCallCount + 1)
+
+    handleAction2({ type: 'shell:UI_INITIALIZED', meta: { shell: true } })
+    expect(mockClient.start).toHaveBeenCalledTimes(initialCallCount + 1)
   })
 
   it('always sends "discovery:UPDATE_LIST" on "discovery:START"', () => {
@@ -161,6 +224,27 @@ describe('app-shell/discovery', () => {
     })
   })
 
+  it('sends "discovery:UPDATE_LIST" to all dispatchers on "discovery:START"', () => {
+    const expected = [
+      { name: 'opentrons', health: null, serverHealth: null, addresses: [] },
+    ]
+
+    mockClient.getRobots.mockReturnValue(expected)
+    const handleAction1 = registerDiscovery(dispatch)
+    registerDiscovery(dispatch2)
+
+    handleAction1(startDiscovery())
+
+    expect(dispatch).toHaveBeenCalledWith({
+      type: 'discovery:UPDATE_LIST',
+      payload: { robots: expected },
+    })
+    expect(dispatch2).toHaveBeenCalledWith({
+      type: 'discovery:UPDATE_LIST',
+      payload: { robots: expected },
+    })
+  })
+
   it('calls client.removeRobot on discovery:REMOVE', () => {
     const handleAction = registerDiscovery(dispatch)
     handleAction({
@@ -170,6 +254,45 @@ describe('app-shell/discovery', () => {
     })
 
     expect(mockClient.removeRobot).toHaveBeenCalledWith('robot-name')
+  })
+
+  it('calls client.removeRobot on discovery:REMOVE only for main dispatcher', () => {
+    const handleAction1 = registerDiscovery(dispatch)
+    const handleAction2 = registerDiscovery(dispatch2)
+
+    handleAction1({
+      type: 'discovery:REMOVE',
+      payload: { robotName: 'robot-name' },
+      meta: { shell: true },
+    })
+    expect(mockClient.removeRobot).toHaveBeenCalledWith('robot-name')
+
+    mockClient.removeRobot.mockClear()
+    handleAction2({
+      type: 'discovery:REMOVE',
+      payload: { robotName: 'robot-name' },
+      meta: { shell: true },
+    })
+    expect(mockClient.removeRobot).not.toHaveBeenCalled()
+  })
+
+  it('unregisterDiscovery removes dispatcher from the set', () => {
+    const robots = [{ name: 'robot1' }]
+    mockClient.getRobots.mockReturnValue(robots)
+
+    registerDiscovery(dispatch)
+    registerDiscovery(dispatch2)
+
+    unregisterDiscovery(dispatch2)
+
+    emitListChange()
+
+    expect(dispatch).toHaveBeenCalledWith({
+      type: 'discovery:UPDATE_LIST',
+      payload: { robots },
+    })
+    // dispatch2 should only have been called once during registration, not from emitListChange
+    expect(dispatch2).toHaveBeenCalledTimes(1)
   })
 
   describe('robot list caching', () => {
@@ -187,6 +310,23 @@ describe('app-shell/discovery', () => {
         { name: 'foo' },
         { name: 'bar' },
       ])
+    })
+
+    it('sends updates to all dispatchers when robot list changes', () => {
+      registerDiscovery(dispatch)
+      registerDiscovery(dispatch2)
+
+      mockClient.getRobots.mockReturnValue([{ name: 'foo' }, { name: 'bar' }])
+      emitListChange()
+
+      expect(dispatch).toHaveBeenCalledWith({
+        type: 'discovery:UPDATE_LIST',
+        payload: { robots: [{ name: 'foo' }, { name: 'bar' }] },
+      })
+      expect(dispatch2).toHaveBeenCalledWith({
+        type: 'discovery:UPDATE_LIST',
+        payload: { robots: [{ name: 'foo' }, { name: 'bar' }] },
+      })
     })
 
     it('loads robots from cache on client initialization', () => {
@@ -352,6 +492,31 @@ describe('app-shell/discovery', () => {
       )
     })
 
+    it('can delete cached robots only via main dispatcher', () => {
+      const handleAction1 = registerDiscovery(dispatch)
+      const handleAction2 = registerDiscovery(dispatch2)
+      mockClient.start.mockReset()
+
+      handleAction1({
+        type: 'discovery:CLEAR_CACHE',
+        meta: { shell: true },
+      })
+
+      expect(mockClient.start).toHaveBeenCalledWith(
+        expect.objectContaining({
+          initialRobots: [],
+        })
+      )
+
+      mockClient.start.mockReset()
+      handleAction2({
+        type: 'discovery:CLEAR_CACHE',
+        meta: { shell: true },
+      })
+
+      expect(mockClient.start).not.toHaveBeenCalled()
+    })
+
     it('does not update services from store when caching disabled', () => {
       // cache has been disabled
       vi.mocked(Cfg.getFullConfig).mockReturnValue(({
@@ -394,10 +559,14 @@ describe('app-shell/discovery', () => {
 
       registerDiscovery(dispatch)
 
-      // the 'discovery.disableCache' change handler
-      const changeHandler = vi.mocked(Cfg.handleConfigChange).mock.calls[1][1]
+      const disableCacheCall = vi
+        .mocked(Cfg.handleConfigChange)
+        .mock.calls.find(call => call[0] === 'discovery.disableCache')
+      expect(disableCacheCall).toBeDefined()
+
+      const changeHandler = disableCacheCall?.[1]
       const disableCache = true
-      changeHandler(disableCache, false)
+      changeHandler?.(disableCache, false)
 
       expect(mockSet).toHaveBeenCalledWith('robots', [])
 

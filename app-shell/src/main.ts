@@ -6,7 +6,7 @@ import electronDebug from 'electron-debug'
 import * as electronDevtoolsInstaller from 'electron-devtools-installer'
 
 import { getConfig, getOverrides, getStore, registerConfig } from './config'
-import { registerDiscovery } from './discovery'
+import { registerDiscovery, unregisterDiscovery } from './discovery'
 import { registerLabware } from './labware'
 import { createLogger } from './log'
 import { initializeMenu } from './menu'
@@ -118,6 +118,7 @@ function getOrCreateHandlerSet(window: BrowserWindow): HandlerSet | null {
     handlerSets.set(windowId, { handlers, dispatch })
 
     window.on('closed', () => {
+      unregisterDiscovery(dispatch)
       handlerSets.delete(windowId)
       log.debug(`Cleaned up handlers for ${windowId}`)
     })
