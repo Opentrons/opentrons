@@ -176,7 +176,7 @@ class ThermocyclerModuleSubState:
             )
         if ramp_rate <= 0:
             raise InvalidRampRateError(
-                f"Thermocycler ramp rate cannot be less than or equalt to 0, got {ramp_rate}"
+                f"Thermocycler ramp rate cannot be less than or equal to 0, got {ramp_rate}"
             )
         return ramp_rate
 
