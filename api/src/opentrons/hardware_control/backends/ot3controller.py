@@ -686,9 +686,9 @@ class OT3Controller(FlexBackend):
         return (
             MoveGroupRunner(
                 move_groups=[move_group],
-                ignore_stalls=True
-                if not self._feature_flags.stall_detection_enabled
-                else False,
+                ignore_stalls=(
+                    True if not self._feature_flags.stall_detection_enabled else False
+                ),
             ),
             False,
         )
@@ -712,9 +712,9 @@ class OT3Controller(FlexBackend):
         return (
             MoveGroupRunner(
                 move_groups=[tip_motor_move_group],
-                ignore_stalls=True
-                if not self._feature_flags.stall_detection_enabled
-                else False,
+                ignore_stalls=(
+                    True if not self._feature_flags.stall_detection_enabled else False
+                ),
             ),
             True,
         )
@@ -939,9 +939,9 @@ class OT3Controller(FlexBackend):
 
         runner = MoveGroupRunner(
             move_groups=[move_group],
-            ignore_stalls=True
-            if not self._feature_flags.stall_detection_enabled
-            else False,
+            ignore_stalls=(
+                True if not self._feature_flags.stall_detection_enabled else False
+            ),
         )
         try:
             positions = await runner.run(can_messenger=self._messenger)
@@ -976,9 +976,9 @@ class OT3Controller(FlexBackend):
         move_group = self._build_tip_action_group(origin, targets)
         runner = MoveGroupRunner(
             move_groups=[move_group],
-            ignore_stalls=True
-            if not self._feature_flags.stall_detection_enabled
-            else False,
+            ignore_stalls=(
+                True if not self._feature_flags.stall_detection_enabled else False
+            ),
         )
         try:
             positions = await runner.run(can_messenger=self._messenger)
@@ -1778,7 +1778,7 @@ class OT3Controller(FlexBackend):
         )
         current_gripper_position = jaw_width
         log.info(
-            f"Checking gripper position: current {jaw_width}; hard limits {hard_limit_lower}, {hard_limit_upper}; expected {expected_gripper_position_min}, {expected_grip_width}, {expected_gripper_position_max}; uncertainty {grip_width_uncertainty_narrower}, {grip_width_uncertainty_wider}"
+            f"Checking gripper position: current {jaw_width}; max error {max_allowed_grip_error}; hard limits {hard_limit_lower}, {hard_limit_upper}; expected {expected_gripper_position_min}, {expected_grip_width}, {expected_gripper_position_max}; uncertainty {grip_width_uncertainty_narrower}, {grip_width_uncertainty_wider}"
         )
         if (
             isclose(current_gripper_position, hard_limit_lower)

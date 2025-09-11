@@ -1865,7 +1865,7 @@ def test_calculates_well_bounding_box(
     [
         (
             "opentrons_universal_flat_adapter",
-            GripSpecs(targetY=75, uncertaintyNarrower=10, uncertaintyWider=0),
+            GripSpecs(targetY=75, uncertaintyNarrower=5, uncertaintyWider=0),
         ),
         # well min: 7.81
         # well max: 77.67
@@ -1883,11 +1883,11 @@ def test_calculates_well_bounding_box(
         ),
         (
             "opentrons_tough_universal_lid",
-            GripSpecs(targetY=85.48, uncertaintyNarrower=10, uncertaintyWider=0),
+            GripSpecs(targetY=85.48, uncertaintyNarrower=5, uncertaintyWider=0),
         ),
         (
             "opentrons_flex_tiprack_lid",
-            GripSpecs(targetY=78.75, uncertaintyNarrower=10, uncertaintyWider=0),
+            GripSpecs(targetY=78.75, uncertaintyNarrower=5, uncertaintyWider=0),
         ),
         # well min 7.175
         # well max 78.305

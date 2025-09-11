@@ -1316,8 +1316,8 @@ def test_grip_error_detection(
             narrower,
             actual_grip_width,
             allowed_error,
-            hard_max,
             hard_min,
+            hard_max,
         )
 
 
