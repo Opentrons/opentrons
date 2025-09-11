@@ -277,7 +277,7 @@ function useStepText(step: FormData): { text: string; subtext: string | null } {
 
   let subtext = null
   if (enableConcurrentModuleActions && step.stepType === 'pause') {
-    // todo(mm, 2025-09-10): Improve FormData typing to make this type-safe.`
+    // todo(mm, 2025-09-10): Improve FormData typing to make this type-safe.
     if (step.pauseAction === PAUSE_UNTIL_RESUME) {
       subtext = t('protocol_steps:pause.untilResume')
     } else if (step.pauseAction === PAUSE_UNTIL_TEMP) {
