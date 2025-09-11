@@ -34,7 +34,7 @@ class ProfileStep(BaseModel):
         ..., description="Time to hold target temperature in seconds."
     )
     rampRate: float | SkipJsonSchema[None] = Field(
-        ...,
+        None,
         description="How quickly to change temperature in °C/second.",
         json_schema_extra=_remove_default,
     )
