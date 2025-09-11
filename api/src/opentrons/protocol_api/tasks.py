@@ -34,7 +34,7 @@ class Task:
     @property
     @requires_version(2, 27)
     def started(self) -> bool:
-        """WReturns ``True`` if the task is started."""
+        """Returns ``True`` if the task has started."""
         return self._core.is_started()
         ...
 
