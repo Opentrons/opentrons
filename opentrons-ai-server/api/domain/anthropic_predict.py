@@ -171,6 +171,7 @@ class AnthropicPredict:
                 # Skip directories
                 if file_path.is_dir():
                     continue
+                print(f"Load doc file: {file_path}")
 
                 content = file_path.read_text(encoding="utf-8")
                 document_xml = [
