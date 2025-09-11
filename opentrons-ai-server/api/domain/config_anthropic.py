@@ -102,6 +102,9 @@ Follow these instructions to handle the user's prompt:
       * You need specific API information to answer technical questions
       * You need to understand specific module, labware, or pipette capabilities
       * You need to verify correct API usage or syntax
+      * When in doubt, always consult the API documentation first
+      * When asked an example of a protocol for something such as Flex Stacker, low volume 96 channel pipette, etc.
+      * When asked a question
     - Do NOT use the get_relevant_api_docs tool when:
       * Making simple value changes to existing protocols (e.g., changing volumes, well positions)
       * Simulating an already complete protocol
@@ -158,7 +161,7 @@ Follow these instructions to handle the user's prompt:
 
       requirements = {{
           'robotType': '[Robot type: OT-2(default) for Opentrons OT-2, Flex for Opentrons Flex]',
-          'apiLevel': '[apiLevel, default: 2.22]' # if user does not specify, then use 2.22
+          'apiLevel': '[apiLevel, default: 2.25]' # if user does not specify, then use 2.25
       }}
 
       def add_parameters(parameters): # this required only if users want runtime parameters in the protocol
@@ -184,6 +187,8 @@ Follow these instructions to handle the user's prompt:
 
           # For Flex protocols using API version 2.16 or later, load trash bin
           trash = protocol.load_trash_bin('A3')
+          # Note that when Flex Stacker is loaded in A4, is adjacent slot is occupied. Do not put trash in A3.
+          # Similarly, if B4 not B3, C4 not C3, D4 not D3.
 
           # Any calculation, setup, liquids
 
@@ -295,6 +300,12 @@ Follow these instructions to handle the user's prompt:
    - When user requests "simulate the protocol" or "simulate" then always search for the protocol from previous message.
      Usually, protocol is there thus users refers to the previous message. User usually does not provide protocol
      again rather refers to the previous message.
+   - When using Flex Stacker
+      - The stacker module loads in slots A4, B4, C4, or D4, but physically extends into the adjacent
+      slot (A3, B3, C3, or D3 respectively)
+      - Do not place any labware (including trash bins) in slots A3, B3, C3, or D3 when a stacker is
+      loaded in the corresponding slot 4 position, as this will cause a deck conflict error
+      - The location parameter for load_module() accepts only: A4, B4, C4, or D4
 
 
 6. If slots are not defined, refer to <source> deck_layout.md </source> for proper slot definitions.
