@@ -2,12 +2,13 @@ import {
   FLEX_ROBOT_TYPE,
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
+  getModuleModelFromAddressableArea,
   getModuleType,
+  THERMOCYCLER_MODULE_V2,
   THERMOCYCLER_V2_REAR_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { deleteModule } from '/protocol-designer/modules'
-import { FIXTURES } from '/protocol-designer/pages/Designer/DeckSetup/constants'
 import {
   createModule,
   editDeckConfiguration,
@@ -17,18 +18,26 @@ import {
   deleteDeckFixture,
 } from '/protocol-designer/step-forms/actions/additionalItems'
 
+import {
+  getFixtureNameFromAddresableArea,
+  getModuleModel,
+} from '../HardwareConfigurator/utils'
 import { getLabwareNotCompatibleWithModule, getSlotHasLabware } from '../utils'
 import { getHardwareInSlotInUse } from './getHardwareInSlotInUse'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { DeckConfiguration, ModuleModel } from '@opentrons/shared-data'
+import type {
+  AddressableAreaName,
+  AddressableAreaNamesWithFakes,
+  CutoutConfigMap,
+  DeckConfiguration,
+  ModuleModel,
+} from '@opentrons/shared-data'
 import type {
   AllTemporalPropertiesForTimelineFrame,
   SavedStepFormState,
 } from '/protocol-designer/step-forms'
-import type { DeckFixture } from '/protocol-designer/step-forms/actions/additionalItems'
 import type { ThunkDispatch } from '/protocol-designer/types'
-import type { CutoutConfigExtended } from '../HardwareConfigurator/AddFixtureModal'
 import type { MakeSnackbar } from '../Kitchen/KitchenContext'
 
 const map3rdColumnCutoutTo4thColumnSlot: Record<string, string> = {
@@ -39,7 +48,7 @@ const map3rdColumnCutoutTo4thColumnSlot: Record<string, string> = {
 }
 
 interface UpdateInitialDeckSetupProps {
-  values: CutoutConfigExtended[]
+  values: CutoutConfigMap[]
   initialDeckSetup: AllTemporalPropertiesForTimelineFrame
   dispatch: ThunkDispatch<any>
   setShowDeleteEntityModal: Dispatch<
@@ -84,11 +93,13 @@ export const updateInitialDeckState = (
     if (value.cutoutFixtureId === THERMOCYCLER_V2_REAR_FIXTURE) {
       return
     }
+    const fixtureName = getFixtureNameFromAddresableArea(
+      value.addressableAreaId as AddressableAreaName
+    )
+
     const hasLabwareOnSlot = getSlotHasLabware(labwareOnDeck, value.cutoutId)
     const matchingFixture = Object.values(additionalEquipmentOnDeck).find(
-      ae =>
-        ae.name === (value.type as DeckFixture) &&
-        ae.location === value.cutoutId
+      ae => ae.name === fixtureName && ae.location === value.cutoutId
     )
     const fourthColumnSlot =
       matchingFixture != null
@@ -97,7 +108,7 @@ export const updateInitialDeckState = (
 
     const matchingModule = Object.values(moduleOnDeck).find(
       module =>
-        module.model === (value.type as ModuleModel) &&
+        module.model === getModuleModel(value.addressableAreaId) &&
         getCutoutIdForSlotName(module.slot, deckDef) === value.cutoutId
     )
     const matching4thColumnLabware =
@@ -120,7 +131,7 @@ export const updateInitialDeckState = (
     )
 
     //  updating fixtures only
-    if (FIXTURES.includes(value.type as DeckFixture)) {
+    if (fixtureName != null) {
       if (matchingFixture != null) {
         //  if deleting staging area with labware in 4th column slot
         if (
@@ -154,11 +165,11 @@ export const updateInitialDeckState = (
         //  if creating a trashBin or wasteChute and there is a labware on the slot
         if (
           hasLabwareOnSlot &&
-          (value.type === 'trashBin' || value.type === 'wasteChute')
+          (fixtureName === 'trashBin' || fixtureName === 'wasteChute')
         ) {
           makeSnackbar(t('conflict_on_slot_labware_fixture') as string)
         } else {
-          dispatch(createDeckFixture(value.type as DeckFixture, value.cutoutId))
+          dispatch(createDeckFixture(fixtureName, value.cutoutId))
         }
       }
     } else {
@@ -174,16 +185,21 @@ export const updateInitialDeckState = (
           }
         }
       } else {
-        const type = getModuleType(value.type as ModuleModel)
-        const model = value.type as ModuleModel
-        const labwareNotCompatible = getLabwareNotCompatibleWithModule(
-          type,
-          labwareOnDeck,
-          value.cutoutId
+        const model = getModuleModel(
+          value.addressableAreaId as AddressableAreaName
         )
+        const type = model != null ? getModuleType(model) : null
+        const labwareNotCompatible =
+          type != null
+            ? getLabwareNotCompatibleWithModule(
+                type,
+                labwareOnDeck,
+                value.cutoutId
+              )
+            : null
         const slot = value.cutoutId.split('cutout')[1]
         //   creating module
-        if (labwareNotCompatible == null) {
+        if (labwareNotCompatible == null && model != null && type != null) {
           dispatch(
             createModule({
               slot,
@@ -203,3 +219,4 @@ export const updateInitialDeckState = (
     }
   })
 }
+export type TipWellState = 'clean' | 'used' | 'empty'

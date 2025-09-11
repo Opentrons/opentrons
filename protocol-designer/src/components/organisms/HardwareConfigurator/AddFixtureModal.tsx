@@ -16,17 +16,23 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  ABSORBANCE_READER_V1,
+  ABSORBANCE_READER_ADDRESSABLE_AREAS,
   FLEX_ROBOT_TYPE,
+  FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
   getAADisplayName,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
+  getModuleModelFromAddressableArea,
   getModuleType,
+  getSlotFromAddressableAreaName,
+  getWasteChuteOptions,
   MODULE_MODELS,
+  MOVABLE_TRASH_ADDRESSABLE_AREAS,
   replaceCutoutFixtureWithComboFixture,
   replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   SINGLE_CENTER_CUTOUTS,
-  THERMOCYCLER_MODULE_V2,
+  THERMOCYCLER_ADDRESSABLE_AREA,
+  WASTE_CHUTE_ADDRESSABLE_AREAS,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack, uuid } from '@opentrons/step-generation'
@@ -41,16 +47,19 @@ import { getLabwareCompatibleForEditHardware } from '../utils'
 import {
   getAllFixtureOptions,
   getAvailableOptions,
+  getFixtureNameFromAddresableArea,
+  getModuleModel,
   getModuleOptions,
-  getWasteChuteOptions,
 } from './utils'
 
 import type { TFunction } from 'i18next'
 import type { UseFormSetValue } from 'react-hook-form'
 import type { ModalProps } from '@opentrons/components'
 import type {
+  AddressableAreaName,
   AddressableAreaNamesWithFakes,
   CutoutConfig,
+  CutoutConfigMap,
   CutoutFixtureId,
   CutoutId,
   DeckConfiguration,
@@ -58,7 +67,6 @@ import type {
   ModuleModel,
 } from '@opentrons/shared-data'
 import type { FormModules, ModuleOnDeck } from '/protocol-designer/step-forms'
-import type { DeckFixture } from '/protocol-designer/step-forms/actions/additionalItems'
 import type { Fixtures, WizardFormState } from '../types'
 
 const ADDRESSABLE_AREA_D3 = 'D3'
@@ -81,7 +89,7 @@ interface AddFixtureModalProps {
   setValue?: UseFormSetValue<WizardFormState>
   //  used for updating the initialDeckState in redux in overview and
   //  starting deck state
-  updateInitialDeckState?: (value: CutoutConfigExtended[]) => void
+  updateInitialDeckState?: (value: CutoutConfigMap[]) => void
   existingCutoutFixtureId?: CutoutFixtureId
 }
 export type OptionStage =
@@ -90,12 +98,11 @@ export type OptionStage =
   | 'moduleOptions'
   | 'wasteChuteOptions'
 
-export interface CutoutConfigExtended extends CutoutConfig {
-  addressableAreaId: AddressableAreaNamesWithFakes
-  type?: DeckFixture | ModuleModel
-}
-
-const FIXTURES = ['wasteChute', 'trashBin', 'stagingArea']
+const FIXTURE_ADDRESSABLE_AREAS = [
+  ...WASTE_CHUTE_ADDRESSABLE_AREAS,
+  ...MOVABLE_TRASH_ADDRESSABLE_AREAS,
+  ...FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
+]
 
 //  TODO: this is similar to the AddFixtureModal in the app but logic varies
 //  quite a bit. Would be ideal to merge them together but not sure how to do
@@ -129,11 +136,11 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
   )
   // Bind allFixtureOptions with useEffect
   const [allFixtureOptions, setAllFixtureOptions] = useState<
-    CutoutConfigExtended[][]
+    CutoutConfigMap[][]
   >([])
-  const [allModuleOptions, setAllModuleOptions] = useState<
-    CutoutConfigExtended[][]
-  >([])
+  const [allModuleOptions, setAllModuleOptions] = useState<CutoutConfigMap[][]>(
+    []
+  )
   useEffect(() => {
     const options = [
       ...getAllFixtureOptions(
@@ -220,13 +227,13 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     )
   }
 
-  const handleAddFixture = (
-    addedCutoutConfigs: CutoutConfigExtended[]
-  ): void => {
+  const handleAddFixture = (addedCutoutConfigs: CutoutConfigMap[]): void => {
     //  only allow 1 trashBin
     if (
-      addedCutoutConfigs.some(
-        cutoutConfig => cutoutConfig.type === 'trashBin'
+      addedCutoutConfigs.some(cutoutConfig =>
+        MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(
+          cutoutConfig.addressableAreaId as AddressableAreaName
+        )
       ) &&
       Object.values(fixtures).some(fixture => fixture.name === 'trashBin')
     ) {
@@ -234,15 +241,18 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
       //  only allow absorbance reader if gripper is attached
     } else if (
       !hasGripper &&
-      addedCutoutConfigs.some(
-        cutoutConfig => cutoutConfig.type === ABSORBANCE_READER_V1
+      addedCutoutConfigs.some(cutoutConfig =>
+        ABSORBANCE_READER_ADDRESSABLE_AREAS.includes(
+          cutoutConfig.addressableAreaId as AddressableAreaName
+        )
       )
     ) {
       makeSnackbar(t('add_gripper_for_plate') as string)
       //  block thermocycler from being added if there is something in slot A1
     } else if (
       addedCutoutConfigs.some(
-        cutoutConfig => cutoutConfig.type === THERMOCYCLER_MODULE_V2
+        cutoutConfig =>
+          THERMOCYCLER_ADDRESSABLE_AREA === cutoutConfig.addressableAreaId
       ) &&
       (Object.values(modules).some(module => module.cutoutId === 'cutoutA1') ||
         Object.values(fixtures).some(
@@ -267,34 +277,40 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
         )
       })
       const newModule = addedCutoutConfigs.find(cutoutConfig =>
-        MODULE_MODELS.includes(cutoutConfig.type as ModuleModel)
+        MODULE_MODELS.includes(cutoutConfig.cutoutFixtureId as ModuleModel)
       )
-      const newFixture = addedCutoutConfigs.find(
-        cutoutConfig =>
-          cutoutConfig.type != null && FIXTURES.includes(cutoutConfig.type)
+      const newFixture = addedCutoutConfigs.find(cutoutConfig =>
+        FIXTURE_ADDRESSABLE_AREAS.includes(
+          cutoutConfig.addressableAreaId as AddressableAreaName
+        )
       )
 
-      if (newModule != null) {
+      const moduleModel =
+        newModule != null
+          ? getModuleModel(newModule.addressableAreaId as AddressableAreaName)
+          : null
+
+      if (newModule != null && moduleModel != null) {
         const filteredModules = Object.fromEntries(
           Object.entries(modules).filter(
             ([, module]) => module.cutoutId !== newModule.cutoutId
           )
         )
-
         const updatedModules: FormModules = {
           ...filteredModules,
           [uuid()]: {
-            model: newModule.type as ModuleModel,
-            type: getModuleType(newModule.type as ModuleModel),
+            model: moduleModel,
+            type: getModuleType(moduleModel as ModuleModel),
             slot:
-              newModule.type === THERMOCYCLER_MODULE_V2
+              newModule.addressableAreaId === THERMOCYCLER_ADDRESSABLE_AREA
                 ? 'B1'
-                : newModule.cutoutId.split('cutout')[1],
+                : getSlotFromAddressableAreaName(
+                    newModule.addressableAreaId as AddressableAreaName
+                  ),
             cutoutFixtureId: newModule.cutoutFixtureId as FlexModuleCutoutFixtureId,
             cutoutId: newModule.cutoutId,
           },
         }
-
         setValue?.('modules', updatedModules)
       }
       if (newFixture != null) {
@@ -305,12 +321,15 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
         )
 
         let additionalFixture: Fixtures | undefined
+        const name = getFixtureNameFromAddresableArea(
+          newFixture.addressableAreaId as AddressableAreaName
+        )
 
         const updatedFixtures: Fixtures = {
           ...filteredFixtures,
           [uuid()]: {
-            name: newFixture.type as DeckFixture,
-            cutoutFixtureId: newFixture.cutoutFixtureId,
+            name: name ?? 'stagingArea',
+            cutoutFixtureId: newFixture.cutoutFixtureId as CutoutFixtureId,
             cutoutId: newFixture.cutoutId,
           },
           ...additionalFixture,

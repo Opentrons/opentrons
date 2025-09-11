@@ -27,7 +27,6 @@ describe('getLabwareCompatibleForEditHardware', () => {
           cutoutId: 'cutoutB1',
           cutoutFixtureId: 'thermocyclerModuleV2Front',
           addressableAreaId: 'thermocyclerModuleV2',
-          type: 'thermocyclerModuleV2',
         }
       )
     ).toBe(false)
@@ -49,7 +48,6 @@ describe('getLabwareCompatibleForEditHardware', () => {
           cutoutId: 'cutoutA1',
           cutoutFixtureId: 'thermocyclerModuleV2Front',
           addressableAreaId: 'thermocyclerModuleV2',
-          type: 'thermocyclerModuleV2',
         }
       )
     ).toBe(false)
@@ -71,7 +69,6 @@ describe('getLabwareCompatibleForEditHardware', () => {
           cutoutId: 'cutoutA3',
           cutoutFixtureId: 'heaterShakerModuleV1',
           addressableAreaId: 'heaterShakerV1A3',
-          type: 'heaterShakerModuleV1',
         }
       )
     ).toBe(false)
@@ -91,7 +88,6 @@ describe('getLabwareCompatibleForEditHardware', () => {
         'cutoutA3',
         undefined,
         {
-          type: 'trashBin',
           cutoutId: 'cutoutA3',
           cutoutFixtureId: 'trashBinAdapter',
           addressableAreaId: 'movableTrashA3',
@@ -102,7 +98,6 @@ describe('getLabwareCompatibleForEditHardware', () => {
   it('returns true when there is no labware on slot and adding a trash bin', () => {
     expect(
       getLabwareCompatibleForEditHardware({}, 'cutoutA3', undefined, {
-        type: 'trashBin',
         cutoutId: 'cutoutA3',
         cutoutFixtureId: 'trashBinAdapter',
         addressableAreaId: 'movableTrashA3',
