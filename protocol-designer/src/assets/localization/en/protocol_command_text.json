@@ -70,6 +70,7 @@
   "move_to_slot": "Moving to Slot {{slot_name}}",
   "move_to_well": "Moving to X {{xOffset}} Y {{yOffset}} Z {{zOffset}} relative to {{positionRelative}} of well {{wellName}} of {{labware}} in {{displayLocation}}",
   "multiple": "multiple",
+  "ninety_six_channel_cam": "pipette tip attach cam",
   "notes": "notes",
   "off_deck": "off deck",
   "offdeck": "offdeck",
