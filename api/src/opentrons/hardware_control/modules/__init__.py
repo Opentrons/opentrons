@@ -27,7 +27,9 @@ from .types import (
     LiveData,
     ModuleData,
     ModuleDataValidator,
+    module_model_from_string,
 )
+
 from .errors import (
     UpdateError,
     AbsorbanceReaderDisconnectedError,
@@ -66,4 +68,5 @@ __all__ = [
     "FlexStackerStatus",
     "PlatformState",
     "StackerAxisState",
+    "module_model_from_string",
 ]

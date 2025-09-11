@@ -23,6 +23,7 @@ from opentrons.hardware_control.types import (
     HardwareEvent,
     EstopStateNotification,
     HardwareEventHandler,
+    AsynchronousModuleErrorNotification,
 )
 from opentrons.protocols.api_support.deck_type import should_load_fixed_trash
 from opentrons.protocol_runner import (
@@ -71,7 +72,33 @@ class NoRunOrchestrator(RuntimeError):
     """Raised if you try to get the current run orchestrator while there is none."""
 
 
-async def handle_estop_event(
+async def _do_handle_hardware_event(
+    run_orchestrator_store: "RunOrchestratorStore", event: HardwareEvent
+) -> None:
+    if isinstance(event, EstopStateNotification):
+        if event.new_state is not EstopState.PHYSICALLY_ENGAGED:
+            return
+        if run_orchestrator_store.current_run_id is None:
+            return
+        # todo(mm, 2024-04-17): This estop teardown sequencing belongs in the
+        # runner layer.
+        run_orchestrator_store.run_orchestrator.estop()
+        await run_orchestrator_store.run_orchestrator.finish(
+            error=EStopActivatedError()
+        )
+    elif isinstance(event, AsynchronousModuleErrorNotification):
+        if run_orchestrator_store.current_run_id is None:
+            return
+        should_finish = (
+            await run_orchestrator_store.run_orchestrator.asynchronous_module_error(
+                module_model=event.module_model, module_serial=event.module_serial
+            )
+        )
+        if should_finish:
+            await run_orchestrator_store.run_orchestrator.finish(error=event.exception)
+
+
+async def handle_hardware_event(
     run_orchestrator_store: "RunOrchestratorStore", event: HardwareEvent
 ) -> None:
     """Handle an E-stop event from the hardware API.
@@ -80,26 +107,18 @@ async def handle_estop_event(
 
     This is a public function for unit-testing purposes, but it's an implementation
     detail of the store.
+
+    Implementation is in _do_handle_hardware_event, so this can just catch exceptions.
     """
     try:
-        if isinstance(event, EstopStateNotification):
-            if event.new_state is not EstopState.PHYSICALLY_ENGAGED:
-                return
-            if run_orchestrator_store.current_run_id is None:
-                return
-            # todo(mm, 2024-04-17): This estop teardown sequencing belongs in the
-            # runner layer.
-            run_orchestrator_store.run_orchestrator.estop()
-            await run_orchestrator_store.run_orchestrator.finish(
-                error=EStopActivatedError()
-            )
+        await _do_handle_hardware_event(run_orchestrator_store, event)
     except Exception:
         # This is a background task kicked off by a hardware event,
         # so there's no one to propagate this exception to.
         _log.exception("Exception handling E-stop event.")
 
 
-def _get_estop_listener(
+def _get_hardware_listener(
     run_orchestrator_store: "RunOrchestratorStore",
 ) -> HardwareEventHandler:
     """Create a callback for estop events.
@@ -112,7 +131,7 @@ def _get_estop_listener(
         event: HardwareEvent,
     ) -> None:
         asyncio.run_coroutine_threadsafe(
-            handle_estop_event(run_orchestrator_store, event), engine_loop
+            handle_hardware_event(run_orchestrator_store, event), engine_loop
         )
 
     return run_handler_in_engine_thread_from_hardware_thread
@@ -140,7 +159,7 @@ class RunOrchestratorStore:
         self._deck_type = deck_type
         self._run_orchestrator: Optional[RunOrchestrator] = None
         self._default_run_orchestrator: Optional[RunOrchestrator] = None
-        hardware_api.register_callback(_get_estop_listener(self))
+        hardware_api.register_callback(_get_hardware_listener(self))
 
     @property
     def run_orchestrator(self) -> RunOrchestrator:

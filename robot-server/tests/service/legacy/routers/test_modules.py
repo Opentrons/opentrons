@@ -32,6 +32,8 @@ async def magdeck():
         simulating=True,
         execution_manager=ExecutionManager(),
         hw_control_loop=asyncio.get_running_loop(),
+        error_callback=lambda *args: None,
+        disconnected_callback=lambda *args: None,
     )
     MagDeck.current_height = PropertyMock(return_value=321)
 
@@ -56,6 +58,8 @@ async def tempdeck():
         type=ModuleType.TEMPERATURE,
         simulating=True,
         execution_manager=ExecutionManager(),
+        error_callback=lambda *args: None,
+        disconnected_callback=lambda *args: None,
         hw_control_loop=asyncio.get_running_loop(),
     )
     TempDeck.temperature = PropertyMock(return_value=123.0)
@@ -83,6 +87,8 @@ async def thermocycler():
         simulating=True,
         execution_manager=ExecutionManager(),
         hw_control_loop=asyncio.get_running_loop(),
+        error_callback=lambda *args: None,
+        disconnected_callback=lambda *args: None,
     )
 
     Thermocycler.lid_status = PropertyMock(return_value="open")
@@ -119,6 +125,8 @@ async def heater_shaker():
         simulating=True,
         execution_manager=ExecutionManager(),
         hw_control_loop=asyncio.get_running_loop(),
+        error_callback=lambda *args: None,
+        disconnected_callback=lambda *args: None,
     )
 
     HeaterShaker.live_data = PropertyMock(

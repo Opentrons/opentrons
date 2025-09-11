@@ -5,7 +5,6 @@ Try to add new tests to test_command_state.py, where they can be tested together
 treating CommandState as a private implementation detail.
 """
 
-
 from decoy import matchers
 import pytest
 from datetime import datetime
@@ -333,7 +332,7 @@ def test_command_store_handles_pause_action(pause_source: PauseSource) -> None:
         command_error_recovery_types={},
         recovery_target=None,
         latest_protocol_command_hash=None,
-        stopped_by_estop=False,
+        stopped_by_async_error=False,
         error_recovery_policy=matchers.Anything(),
         has_entered_error_recovery=False,
     )
@@ -362,7 +361,7 @@ def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
         recovery_target=None,
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_protocol_command_hash=None,
-        stopped_by_estop=False,
+        stopped_by_async_error=False,
         error_recovery_policy=matchers.Anything(),
         has_entered_error_recovery=False,
     )
@@ -396,7 +395,7 @@ def test_command_store_handles_finish_action() -> None:
         recovery_target=None,
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_protocol_command_hash=None,
-        stopped_by_estop=False,
+        stopped_by_async_error=False,
         error_recovery_policy=matchers.Anything(),
         has_entered_error_recovery=False,
     )
@@ -421,11 +420,11 @@ def test_command_store_handles_finish_action_with_stopped() -> None:
 
 
 @pytest.mark.parametrize(
-    ["from_estop", "expected_run_result"],
+    ["from_asynchronous_error", "expected_run_result"],
     [(True, RunResult.FAILED), (False, RunResult.STOPPED)],
 )
 def test_command_store_handles_stop_action(
-    from_estop: bool, expected_run_result: RunResult
+    from_asynchronous_error: bool, expected_run_result: RunResult
 ) -> None:
     """It should mark the engine as non-gracefully stopped on StopAction."""
     subject = CommandStore(
@@ -435,7 +434,7 @@ def test_command_store_handles_stop_action(
     )
 
     subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
-    subject.handle_action(StopAction(from_estop=from_estop))
+    subject.handle_action(StopAction(from_asynchronous_error=from_asynchronous_error))
 
     assert subject.state == CommandState(
         command_history=CommandHistory(),
@@ -450,7 +449,7 @@ def test_command_store_handles_stop_action(
         recovery_target=None,
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_protocol_command_hash=None,
-        stopped_by_estop=from_estop,
+        stopped_by_async_error=from_asynchronous_error,
         error_recovery_policy=matchers.Anything(),
         has_entered_error_recovery=False,
     )
@@ -487,7 +486,7 @@ def test_command_store_handles_stop_action_when_awaiting_recovery() -> None:
         recovery_target=None,
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_protocol_command_hash=None,
-        stopped_by_estop=False,
+        stopped_by_async_error=False,
         error_recovery_policy=matchers.Anything(),
         has_entered_error_recovery=False,
     )
@@ -520,7 +519,7 @@ def test_command_store_cannot_restart_after_should_stop() -> None:
         recovery_target=None,
         run_started_at=None,
         latest_protocol_command_hash=None,
-        stopped_by_estop=False,
+        stopped_by_async_error=False,
         error_recovery_policy=matchers.Anything(),
         has_entered_error_recovery=False,
     )
@@ -666,7 +665,7 @@ def test_command_store_wraps_unknown_errors() -> None:
         command_error_recovery_types={},
         recovery_target=None,
         latest_protocol_command_hash=None,
-        stopped_by_estop=False,
+        stopped_by_async_error=False,
         error_recovery_policy=matchers.Anything(),
         has_entered_error_recovery=False,
     )
@@ -735,7 +734,7 @@ def test_command_store_preserves_enumerated_errors() -> None:
         recovery_target=None,
         run_started_at=None,
         latest_protocol_command_hash=None,
-        stopped_by_estop=False,
+        stopped_by_async_error=False,
         error_recovery_policy=matchers.Anything(),
         has_entered_error_recovery=False,
     )
@@ -770,7 +769,7 @@ def test_command_store_ignores_stop_after_graceful_finish() -> None:
         recovery_target=None,
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_protocol_command_hash=None,
-        stopped_by_estop=False,
+        stopped_by_async_error=False,
         error_recovery_policy=matchers.Anything(),
         has_entered_error_recovery=False,
     )
@@ -805,7 +804,7 @@ def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
         recovery_target=None,
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_protocol_command_hash=None,
-        stopped_by_estop=False,
+        stopped_by_async_error=False,
         error_recovery_policy=matchers.Anything(),
         has_entered_error_recovery=False,
     )
@@ -840,7 +839,7 @@ def test_handles_hardware_stopped() -> None:
         recovery_target=None,
         run_started_at=None,
         latest_protocol_command_hash=None,
-        stopped_by_estop=False,
+        stopped_by_async_error=False,
         error_recovery_policy=matchers.Anything(),
         has_entered_error_recovery=False,
     )

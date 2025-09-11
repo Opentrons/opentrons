@@ -11,6 +11,7 @@ from typing import (
     Awaitable,
     Union,
     Optional,
+    Protocol,
     cast,
     TYPE_CHECKING,
     TypeGuard,
@@ -54,7 +55,24 @@ class ThermocyclerCycle(TypedDict):
 UploadFunction = Callable[[str, str, Dict[str, Any]], Awaitable[Tuple[bool, str]]]
 
 
-ModuleDisconnectedCallback = Optional[Callable[[str, str | None], None]]
+class ModuleDisconnectedCallback(Protocol):
+    """Protocol for the callback when the module should be disconnected."""
+
+    def __call__(self, port: str, serial: str | None) -> None:
+        ...
+
+
+class ModuleErrorCallback(Protocol):
+    """Protocol for the callback when the module sees a hardware error."""
+
+    def __call__(
+        self,
+        exc: Exception,
+        model: str,
+        port: str,
+        serial: str | None,
+    ) -> None:
+        ...
 
 
 class MagneticModuleData(TypedDict):
