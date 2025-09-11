@@ -1,0 +1,53 @@
+{
+  "brand": {
+    "brand": "Millipore",
+    "brandId": []
+  },
+  "wells": {
+    "A1": {
+      "x": 14.38,
+      "y": 74.24,
+      "z": 2.8,
+      "depth": 41.4,
+      "shape": "rectangular",
+      "xDimension": 8,
+      "yDimension": 8,
+      "totalLiquidVolume": 2000
+    }
+  },
+  "groups": [
+    {
+      "wells": ["A1"],
+      "metadata": {}
+    }
+  ],
+  "version": 1,
+  "metadata": {
+    "tags": [],
+    "displayName": "Millipore Vacuum Manifold Base",
+    "displayCategory": "adapter",
+    "displayVolumeUnits": "µL"
+  },
+  "ordering": [["A1"]],
+  "namespace": "custom_beta",
+  "dimensions": {
+    "xDimension": 143,
+    "yDimension": 101.5,
+    "zDimension": 38
+  },
+  "parameters": {
+    "format": "96Standard",
+    "quirks": [],
+    "loadName": "millipore_vacuum_manifold_base",
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false
+  },
+  "stackLimit": 5,
+  "allowedRoles": [],
+  "schemaVersion": 2,
+  "cornerOffsetFromSlot": {
+    "x": -7.5,
+    "y": -7.75,
+    "z": 0
+  }
+}

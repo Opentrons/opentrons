@@ -1,0 +1,71 @@
+{
+  "brand": {
+    "brand": "Millipore",
+    "brandId": []
+  },
+  "wells": {
+    "A1": {
+      "x": 123.25,
+      "y": 45.75,
+      "z": 50,
+      "depth": 40,
+      "shape": "rectangular",
+      "xDimension": 225,
+      "yDimension": 86,
+      "totalLiquidVolume": 3200000
+    }
+  },
+  "groups": [
+    {
+      "wells": ["A1"],
+      "metadata": {}
+    }
+  ],
+  "version": 1,
+  "metadata": {
+    "tags": [],
+    "displayName": "Millipore Vacuum Manifold Collar (Tall)",
+    "displayCategory": "adapter",
+    "displayVolumeUnits": "µL"
+  },
+  "ordering": [["A1"]],
+  "namespace": "custom_beta",
+  "dimensions": {
+    "xDimension": 153,
+    "yDimension": 111,
+    "zDimension": 78
+  },
+  "parameters": {
+    "format": "96Standard",
+    "quirks": [],
+    "loadName": "millipore_vacuum_manifold_collar_tall",
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false
+  },
+  "stackLimit": 5,
+  "allowedRoles": ["labware"],
+  "schemaVersion": 2,
+  "cornerOffsetFromSlot": {
+    "x": -12.5,
+    "y": -12.5,
+    "z": 0
+  },
+  "stackingOffsetWithLabware": {
+    "invitroven_filter_plate": {
+      "x": 0,
+      "y": 0,
+      "z": 26.5
+    },
+    "millipore_vacuum_manifold_base": {
+      "x": 0,
+      "y": 0,
+      "z": 16
+    },
+    "millipore_vacuum_manifold_holder": {
+      "x": 0,
+      "y": 0,
+      "z": 24
+    }
+  },
+  "gripHeightFromLabwareBottom": 74
+}
