@@ -44,7 +44,7 @@ def test_parse_valid_sandbox_args_with_branch(tmp_path):
 
     # Check that we get the real config back
     assert isinstance(parsed.config, ApplicationConfig)
-    assert parsed.config.s3_bucket == "opentrons.sandbox.protocol-designer"
+    assert parsed.config.s3_bucket == "sandbox.designer.opentrons.com"
     assert parsed.config.url == "http://sandbox.designer.opentrons.com/"
     assert parsed.relative_artifact_dir == str(artifact_dir)
     assert parsed.sandbox_prefix == "feature-branch"
