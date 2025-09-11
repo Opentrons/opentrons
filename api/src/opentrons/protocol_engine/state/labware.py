@@ -46,6 +46,7 @@ from ..types import (
     AddressableAreaLocation,
     NonStackedLocation,
     Dimensions,
+    GripSpecs,
     LabwareOffset,
     LabwareOffsetVector,
     LabwareOffsetLocationSequence,
@@ -1361,3 +1362,68 @@ class LabwareView:
         ):
             return Dimensions(0, 0, 0)
         return Dimensions(max_x - min_x, max_y - min_y, max_z)
+
+    def _gripper_uncertainty_narrower(
+        self, labware_bbox: Dimensions, well_bbox: Dimensions, target_grip_width: float
+    ) -> float:
+        """Most narrower the gripper can be than the target while still likely gripping successfully.
+
+        This number can't just be the 0, because that is not going to be accurate if the labware is
+        skirted - the dimensions are a full bounding box including the skirt, and the labware is
+        narrower than that at the point where it is gripped. The general heuristic is that we can't
+        get to the wells; but some labware don't have wells, so we need alternate values.
+
+        The number will be interpreted relative to the target width, which is (for now) the labware
+        outer bounding box.
+
+        TODO: This should be a number looked up from the definition.
+        """
+        if well_bbox.y == 0:
+            # This labware has no wells; use a fixed minimum
+            return 5
+        if well_bbox.y > labware_bbox.y:
+            # This labware has a very odd definition with wells outside its dimensions.
+            # Return the smaller value.
+            return 0
+        # An ok heuristic for successful grip is if we don't get all the way to the wells.
+        return target_grip_width - well_bbox.y
+
+    def _gripper_uncertainty_wider(
+        self, labware_bbox: Dimensions, well_bbox: Dimensions, target_grip_width: float
+    ) -> float:
+        """Most wider the gripper can be than the target while still likely gripping successfully.
+
+        This can be a lot closer to 0, since the bounding box of the labware will certainly be the
+        widest point (if it's defined without error), but since there might be error in the
+        definition we allow some slop.
+
+        The number will be interpreted relative to the target width, which is (for now) the labware
+        outer bounding box.
+
+        TODO: This should be a number looked up from the definition.
+        """
+        # This will be 0 unless the wells are wider than the labware
+        return max(well_bbox.y - target_grip_width, 0)
+
+    def get_gripper_width_specs(
+        self, labware_definition: LabwareDefinition
+    ) -> GripSpecs:
+        """Get the target and bounds for a successful grip of this labware."""
+        outer_bounds = self.get_dimensions(labware_definition=labware_definition)
+        well_bounds = self.get_well_bbox(labware_definition=labware_definition)
+        narrower = self._gripper_uncertainty_narrower(
+            labware_bbox=outer_bounds,
+            well_bbox=well_bounds,
+            target_grip_width=outer_bounds.y,
+        )
+        wider = self._gripper_uncertainty_wider(
+            labware_bbox=outer_bounds,
+            well_bbox=well_bounds,
+            target_grip_width=outer_bounds.y,
+        )
+        return GripSpecs(
+            # TODO: This should be a number looked up from the definition.
+            targetY=outer_bounds.y,
+            uncertaintyNarrower=narrower,
+            uncertaintyWider=wider,
+        )

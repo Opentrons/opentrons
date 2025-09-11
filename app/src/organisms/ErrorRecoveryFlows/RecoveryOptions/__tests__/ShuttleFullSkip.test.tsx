@@ -1,5 +1,5 @@
 import { screen } from '@testing-library/react'
-import { afterEach, beforeEach, describe, it, vi } from 'vitest'
+import { beforeEach, describe, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -17,21 +17,21 @@ import {
   StackerShuttleLwInfo,
 } from '../../shared'
 import { SelectRecoveryOption } from '../SelectRecoveryOption'
-import { StackerStalledSkip } from '../StackerStalledSkip'
+import { ShuttleFullSkip } from '../ShuttleFullSkip'
 
 import type { ComponentProps } from 'react'
 
 vi.mock('../SelectRecoveryOption')
 vi.mock('../../shared/')
 
-const render = (props: ComponentProps<typeof StackerStalledSkip>) => {
-  return renderWithProviders(<StackerStalledSkip {...props} />, {
+const render = (props: ComponentProps<typeof ShuttleFullSkip>) => {
+  return renderWithProviders(<ShuttleFullSkip {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
-describe('StackerStalledSkip', () => {
-  let props: ComponentProps<typeof StackerStalledSkip>
+describe('ShuttleFullSkip', () => {
+  let props: ComponentProps<typeof ShuttleFullSkip>
   beforeEach(() => {
     props = {
       ...mockRecoveryContentProps,
@@ -63,27 +63,22 @@ describe('StackerStalledSkip', () => {
     vi.mocked(SkipStepInfo).mockReturnValue(<div>MOCK_SKIP_STEP_INFO</div>)
   })
 
-  afterEach(() => {
-    vi.resetAllMocks()
-  })
-
   it(`renders StackerHomeShuttle when step is ${RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS}`, () => {
     props.recoveryMap.step =
-      RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS
+      RECOVERY_MAP.SHUTTLE_FULL_SKIP.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS
     render(props)
     screen.getByText('MOCK_STACKER_HOME_SHUTTLE')
   })
 
   it(`renders StackerReengageLatch when step is ${RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE}`, () => {
     props.recoveryMap.step =
-      RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE
+      RECOVERY_MAP.SHUTTLE_FULL_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE
     render(props)
     screen.getByText('MOCK_STACKER_SHUTTLE_LW_INFO')
   })
 
   it(`renders StackerHopperLwInfo when step is ${RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.CHECK_HOPPER}`, () => {
-    props.recoveryMap.step =
-      RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.CHECK_HOPPER
+    props.recoveryMap.step = RECOVERY_MAP.SHUTTLE_FULL_SKIP.STEPS.CHECK_HOPPER
     render(props)
     screen.getByText('MOCK_STACKER_HOPPER_LW_INFO')
   })

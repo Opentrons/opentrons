@@ -10,21 +10,21 @@ import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { RecoveryContentProps } from '../types'
 
-export function StackerStalledSkip(props: RecoveryContentProps): JSX.Element {
+export function ShuttleFullSkip(props: RecoveryContentProps): JSX.Element {
   const { recoveryMap } = props
   const { step, route } = recoveryMap
-  const { STACKER_STALLED_SKIP } = RECOVERY_MAP
+  const { SHUTTLE_FULL_SKIP } = RECOVERY_MAP
 
   switch (step) {
-    case STACKER_STALLED_SKIP.STEPS.EMPTY_STACKER:
+    case SHUTTLE_FULL_SKIP.STEPS.EMPTY_STACKER:
       return <StackerEmptyHopper {...props} />
-    case STACKER_STALLED_SKIP.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS:
+    case SHUTTLE_FULL_SKIP.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS:
       return <StackerHomeShuttle {...props} />
-    case STACKER_STALLED_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE:
+    case SHUTTLE_FULL_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE:
       return <StackerShuttleLwInfo {...props} />
-    case STACKER_STALLED_SKIP.STEPS.CHECK_HOPPER:
+    case SHUTTLE_FULL_SKIP.STEPS.CHECK_HOPPER:
       return <StackerHopperLwInfo {...props} />
-    case STACKER_STALLED_SKIP.STEPS.SKIP:
+    case SHUTTLE_FULL_SKIP.STEPS.SKIP:
       return <SkipStepInfo {...props} />
     default:
       console.warn(
