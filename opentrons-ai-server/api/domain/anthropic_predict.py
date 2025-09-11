@@ -69,7 +69,7 @@ class AnthropicPredict:
         self.path_api_docs: Path = ROOT_PATH / "api" / "storage" / "api_docs" / "api_docs_struct_v2.25.md"
 
         docker_api_docs_path = ROOT_PATH / "api" / "storage" / "api_docs"
-        local_api_docs_path = REPO_ROOT / settings.api_docs_base_path
+        local_api_docs_path = REPO_ROOT / "api"
 
         if (docker_api_docs_path / "docs").exists():
             self.api_docs_base_path = docker_api_docs_path

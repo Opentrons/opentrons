@@ -42,7 +42,6 @@ class Settings(BaseSettings):
     memory: str = "2048"
     google_sheet_id: str = "harcoded_default_from_settings"
     google_sheet_worksheet: str = "Sheet1"
-    api_docs_base_path: str = "api"
 
     # Secrets
     # These come from environment variables in the local and deployed execution environments
