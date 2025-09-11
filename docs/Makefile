@@ -3,6 +3,10 @@ FLEX_MANUAL_PREFIX ?= flex
 BRANCH ?= edge
 SANDBOX_S3_BUCKET ?= sandbox.docs
 
+.PHONY: setup
+setup:
+	uv sync
+
 .PHONY: clean
 clean:
 	rm -rf site
