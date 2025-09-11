@@ -2,9 +2,7 @@ import {
   FLEX_ROBOT_TYPE,
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
-  getModuleModelFromAddressableArea,
   getModuleType,
-  THERMOCYCLER_MODULE_V2,
   THERMOCYCLER_V2_REAR_FIXTURE,
 } from '@opentrons/shared-data'
 
@@ -28,10 +26,8 @@ import { getHardwareInSlotInUse } from './getHardwareInSlotInUse'
 import type { Dispatch, SetStateAction } from 'react'
 import type {
   AddressableAreaName,
-  AddressableAreaNamesWithFakes,
   CutoutConfigMap,
   DeckConfiguration,
-  ModuleModel,
 } from '@opentrons/shared-data'
 import type {
   AllTemporalPropertiesForTimelineFrame,
@@ -219,4 +215,3 @@ export const updateInitialDeckState = (
     }
   })
 }
-export type TipWellState = 'clean' | 'used' | 'empty'

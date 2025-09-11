@@ -22,7 +22,6 @@ import {
   getAADisplayName,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
-  getModuleModelFromAddressableArea,
   getModuleType,
   getSlotFromAddressableAreaName,
   getWasteChuteOptions,
