@@ -30,6 +30,7 @@ from .module_contexts import (
     AbsorbanceReaderContext,
     FlexStackerContext,
 )
+from .tasks import Task
 from .disposal_locations import TrashBin, WasteChute
 from ._liquid import Liquid, LiquidClass
 from ._types import (
@@ -101,6 +102,8 @@ __all__ = [
     "BLOWOUT_ACTION",
     "RuntimeParameterRequiredError",
     "CSVParameter",
+    # Concurrent task types
+    "Task",
     # For internal Opentrons use only:
     "create_protocol_context",
     "ProtocolEngineCoreRequiredError",
