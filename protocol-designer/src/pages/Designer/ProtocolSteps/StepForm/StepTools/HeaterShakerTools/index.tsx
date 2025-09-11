@@ -12,6 +12,8 @@ import {
 
 import {
   DropdownStepFormField,
+  StepFormStatus,
+  StepFormStatusList,
   ToggleExpandStepFormField,
   ToggleStepFormField,
 } from '/protocol-designer/components/molecules'
@@ -46,6 +48,12 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
         tooltipContent={null}
       />
       <Box borderBottom={`1px solid ${COLORS.grey30}`} />
+
+      <StepFormStatusList>
+        <StepFormStatus label="The label" value="The value" />
+        <StepFormStatus label="Block temperature" value="50 °C" />
+      </StepFormStatusList>
+
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing4}
