@@ -92,7 +92,7 @@ def default_fw_version() -> int:
 
 
 def default_revision() -> types.PCBARevision:
-    return types.PCBARevision("A1")
+    return types.PCBARevision("A1.0")
 
 
 def device_info_for(
