@@ -48,7 +48,8 @@ export function createQuickTransferFile(
   } = generateQuickTransferArgs(quickTransferState, deckConfig)
   const pipetteEntity = Object.values(invariantContext.pipetteEntities)[0]
   const { name, id, spec } = pipetteEntity
-
+  console.log('quickTransferState', quickTransferState)
+  console.log('stepArgs', stepArgs)
   const loadPipetteCommand: LoadPipetteCreateCommand = {
     key: uuid(),
     commandType: 'loadPipette' as const,
@@ -154,7 +155,7 @@ export function createQuickTransferFile(
     robotStateTimeline.timeline,
     timelineFrame => timelineFrame.commands
   )
-
+  console.log('nonLoadCommands', nonLoadCommands)
   const commands: CreateCommand[] = [
     loadPipetteCommand,
     ...loadAdapterCommands,
