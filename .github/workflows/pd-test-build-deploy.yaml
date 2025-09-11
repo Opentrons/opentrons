@@ -1,4 +1,4 @@
-# Run tests, build PD, and deploy it to sandbox
+# Run tests, build PD, and deploy
 
 name: 'PD test, build, and deploy'
 
@@ -14,22 +14,15 @@ on:
       - '.github/actions/js/setup/action.yml'
       - '.github/actions/git/resolve-tag/action.yml'
       - '.github/actions/environment/complex-variables/action.yml'
+      - 'scripts/static-deploy/**'
   push:
-    paths:
-      - 'protocol-designer/**'
-      - 'step-generation/**'
-      - 'shared-data/**'
-      - 'components/**'
-      - 'package.json'
-      - '.github/workflows/pd-test-build-deploy.yaml'
-      - '.github/actions/js/setup/action.yml'
-      - '.github/actions/git/resolve-tag/action.yml'
-      - '.github/actions/environment/complex-variables/action.yml'
     branches:
-      - '**'
+      - 'edge'
+      - 'chore_release*'
     tags:
       - 'protocol-designer*'
-  workflow_dispatch:
+      - 'staging-protocol-designer*'
+  workflow_dispatch: {}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
@@ -40,13 +33,43 @@ defaults:
     shell: bash
 
 env:
-  CI: true
+  CI: 'true'
+  # This is the artifact directory as a relative path
+  # to the working-directory of our tools: scripts/static-deploy
+  # our script deploy_ci_config.py expects this ENV variable is set
+  RELATIVE_ARTIFACT_DIR: '../../dist'
 
 jobs:
+  determine-deploy-config:
+    name: Determine Deployment Configuration
+    runs-on: ubuntu-24.04
+    outputs:
+      application: ${{ steps.deploy-config.outputs.APPLICATION }}
+      environment: ${{ steps.deploy-config.outputs.ENVIRONMENT }}
+      sandbox_prefix: ${{ steps.deploy-config.outputs.SANDBOX_PREFIX }}
+      relative_artifact_dir: ${{ steps.deploy-config.outputs.RELATIVE_ARTIFACT_DIR }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - uses: ./.github/actions/git/resolve-tag
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.10'
+      - name: Setup Deploy Dependencies
+        working-directory: scripts/static-deploy
+        run: make setup
+      - name: Determine Deployment Configuration
+
+        id: deploy-config
+        working-directory: scripts/static-deploy
+        run: make resolve-ci
+
   unit-test:
     name: 'protocol designer unit tests'
     runs-on: 'ubuntu-24.04'
     timeout-minutes: 20
+    if: ${{ !startsWith(github.ref, 'refs/tags/') }}
     steps:
       - name: 'Checkout Repository'
         uses: actions/checkout@v4
@@ -63,6 +86,7 @@ jobs:
     name: 'protocol designer e2e tests'
     runs-on: 'ubuntu-24.04'
     timeout-minutes: 20
+    if: ${{ !startsWith(github.ref, 'refs/tags/') }}
     steps:
       - name: 'Checkout Repository'
         uses: actions/checkout@v4
@@ -73,9 +97,11 @@ jobs:
   build-pd:
     timeout-minutes: 20
     name: 'build protocol designer'
-    needs: ['unit-test', 'e2e-test']
+    needs:
+      - unit-test
+      - e2e-test
     runs-on: 'ubuntu-24.04'
-    if: github.event_name != 'pull_request'
+    if: always() && (needs.unit-test.result == 'success' || needs.unit-test.result == 'skipped') && (needs.e2e-test.result == 'success' || needs.e2e-test.result == 'skipped')
     steps:
       - uses: actions/checkout@v4
         with:
@@ -91,7 +117,8 @@ jobs:
         run: |
           make -C protocol-designer NODE_ENV=development
       - name: 'upload sourcemaps to Sentry'
-        if: github.ref_type == 'tag'
+        # Only on production releases (tagged with protocol-designer*)
+        if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/protocol-designer')
         uses: getsentry/action-release@v3
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
@@ -110,9 +137,11 @@ jobs:
   deploy-pd:
     timeout-minutes: 10
     name: 'deploy protocol designer'
-    needs: ['build-pd']
+    needs:
+      - determine-deploy-config
+      - build-pd
     runs-on: 'ubuntu-24.04'
-    if: github.event_name != 'pull_request'
+    if: always() && needs.build-pd.result == 'success' && needs.determine-deploy-config.result == 'success'
     permissions:
       id-token: write
       contents: read
@@ -122,31 +151,45 @@ jobs:
         with:
           role-to-assume: ${{ secrets.PD_SANDBOX_ROLE }}
           aws-region: us-east-2
-      - name: 'Checkout Repository'
+      - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Unlimited fetch depth. Required for getsentry/action-release.
-
-      - uses: ./.github/actions/git/resolve-tag
-
-      - uses: ./.github/actions/environment/complex-variables
+          fetch-depth: 0
+      - id: resolve-tag
+        uses: ./.github/actions/git/resolve-tag
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.10'
+      - name: Setup Deploy Dependencies
+        working-directory: scripts/static-deploy
+        run: |
+          make setup
 
       - name: 'download PD build'
         uses: 'actions/download-artifact@v4'
         with:
           name: pd-artifact
-          path: ./dist
-      - name: 'deploy protocol designer to sandbox'
-        shell: bash
-        run: |
-          aws s3 sync ./dist "s3://sandbox.designer.opentrons.com/${OT_BRANCH}" --acl=public-read
+          path: ./dist # in the default workspace
+          # RELATIVE_ARTIFACT_DIR is set to ../../dist
+          # because that is the relative path from scripts/static-deploy
+          # to the this location
+      - name: Deploy to S3
+        working-directory: scripts/static-deploy
+        run: make deploy \
+          APPLICATION=${{ needs.determine-deploy-config.outputs.application }} \
+          ENVIRONMENT=${{ needs.determine-deploy-config.outputs.environment }} \
+          SANDBOX_PREFIX=${{ needs.determine-deploy-config.outputs.sandbox_prefix }} \
+          RELATIVE_ARTIFACT_DIR=${{ needs.determine-deploy-config.outputs.relative_artifact_dir }}
       - name: 'notify Sentry of prod deploy'
-        if: github.ref_type == 'tag'
+        # Only on production releases (tagged with protocol-designer*)
+        if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/protocol-designer')
         uses: getsentry/action-release@v3
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
           SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
         with:
-          version: ${{ steps.resolve-tag.outputs.tag }}
+          # version is deprecated, use release instead
+          release: ${{ steps.resolve-tag.outputs.tag }}
           environment: production
