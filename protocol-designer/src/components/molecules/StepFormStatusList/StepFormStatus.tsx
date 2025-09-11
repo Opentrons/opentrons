@@ -8,6 +8,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   StyledText,
+  Tag,
 } from '@opentrons/components'
 
 interface StepFormStatusProps {
@@ -42,21 +43,7 @@ export function StepFormStatus(props: StepFormStatusProps): JSX.Element {
         </StyledText>
       </Box>
       <Box as="dd">
-        <Box
-          as="span"
-          paddingX={SPACING.spacing8}
-          paddingY={SPACING.spacing2}
-          borderRadius={BORDERS.borderRadius4}
-          backgroundColor={COLORS.transparentBlack20}
-        >
-          <StyledText
-            as="span"
-            desktopStyle="bodyDefaultRegular"
-            color={COLORS.black90}
-          >
-            {value}
-          </StyledText>
-        </Box>
+        <Tag type="default" text={value} />
       </Box>
     </Flex>
   )
