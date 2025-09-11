@@ -51,7 +51,7 @@ jobs:
           enable-cache: true
           cache-dependency-glob: './docs/uv.lock'
       - name: Setup Docs Dependencies
-        working-directory: ./docs
+        working-directory: scripts/static-deploy
         run: make setup
       - name: Build Docs
         working-directory: ./docs
