@@ -102,6 +102,9 @@ Follow these instructions to handle the user's prompt:
       * You need specific API information to answer technical questions
       * You need to understand specific module, labware, or pipette capabilities
       * You need to verify correct API usage or syntax
+      * If you are hesitant by any chance, then use it
+      * When asked an example of a protocol for something such as Flex Stacker, low volume 96 channel pipette, etc.
+      * When asked a question
     - Do NOT use the get_relevant_api_docs tool when:
       * Making simple value changes to existing protocols (e.g., changing volumes, well positions)
       * Simulating an already complete protocol
@@ -158,7 +161,7 @@ Follow these instructions to handle the user's prompt:
 
       requirements = {{
           'robotType': '[Robot type: OT-2(default) for Opentrons OT-2, Flex for Opentrons Flex]',
-          'apiLevel': '[apiLevel, default: 2.22]' # if user does not specify, then use 2.22
+          'apiLevel': '[apiLevel, default: 2.25]' # if user does not specify, then use 2.25
       }}
 
       def add_parameters(parameters): # this required only if users want runtime parameters in the protocol

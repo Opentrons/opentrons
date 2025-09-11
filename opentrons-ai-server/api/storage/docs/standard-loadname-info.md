@@ -587,15 +587,19 @@ Total number of labware: 73
 
     <Opentrons Flex Loadnames>
       - flex_1channel_50
-      - volume: 1–50 µL
+        - volume: 1–50 µL
       - flex_1channel_1000
-      - volume: 5–1000 µL
+        - volume: 5–1000 µL
       - flex_8channel_50
-      - volume: 1–50 µL
+        - volume: 1–50 µL
       - flex_8channel_1000
-      - volume: 5–1000 µL
+        - volume: 5–1000 µL
       - flex_96channel_1000
-      - volume: 5–1000 µL
+        - high volume: 5–1000 µL
+      - flex_96channel_200
+        - low volume: 1–200 μL
+  
+  
 
 </Pipettes with volume>
 
