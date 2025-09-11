@@ -89,7 +89,8 @@ export function SetupLabwareMap({
           ? getWellFillFromLabwareId(
               topLabwareInfo.labwareId,
               protocolAnalysis.liquids,
-              labwareByLiquidId
+              labwareByLiquidId,
+              protocolAnalysis.commands
             )
           : undefined
       const moduleType = getModuleType(module.moduleModel)
@@ -161,7 +162,8 @@ export function SetupLabwareMap({
     const wellFill = getWellFillFromLabwareId(
       topLabwareInfo.labwareId,
       protocolAnalysis.liquids,
-      labwareByLiquidId
+      labwareByLiquidId,
+      protocolAnalysis.commands
     )
 
     return {
