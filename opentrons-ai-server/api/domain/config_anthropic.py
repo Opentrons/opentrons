@@ -102,7 +102,7 @@ Follow these instructions to handle the user's prompt:
       * You need specific API information to answer technical questions
       * You need to understand specific module, labware, or pipette capabilities
       * You need to verify correct API usage or syntax
-      * If you are hesitant by any chance, then use it
+      * When in doubt, always consult the API documentation first
       * When asked an example of a protocol for something such as Flex Stacker, low volume 96 channel pipette, etc.
       * When asked a question
     - Do NOT use the get_relevant_api_docs tool when:
