@@ -169,7 +169,7 @@ const getNoLiquidClassValues = (
 
   const aspirateState = {
     aspirateFlowRate: aspirateFlowRateFields.aspirate_flowRate ?? 0,
-    tipPositionAspirate: aspirate.aspiratePosition.offset.z,
+    tipPositionAspirate: 0,
     submergeAspirate: {
       speed: aspirate.submerge.speed,
       positionFromBottom: aspirate.submerge.startPosition.offset.z,
@@ -177,8 +177,8 @@ const getNoLiquidClassValues = (
     },
     preWetTip: aspirate.preWet,
     mixOnAspirate: {
-      mixVolume: aspirate.mix.params?.volume ?? 0,
-      repetitions: aspirate.mix.params?.repetitions ?? 0,
+      mixVolume: 0,
+      repetitions: 0,
     },
     delayAspirate: {
       delayDuration: aspirate.delay.params?.duration ?? 0,
@@ -192,13 +192,12 @@ const getNoLiquidClassValues = (
       ? undefined
       : aspirate.retract.touchTip.params?.zOffset,
     touchTipAspirateSpeed: aspirate.retract.touchTip.params?.speed,
-    airGapAspirate: aspirate.retract.airGapByVolume[0][1] ?? 0,
     conditionAspirate: conditioning ?? 0,
   }
 
   const dispenseState = {
     dispenseFlowRate: dispenseFlowRateFields.dispense_flowRate ?? 0,
-    tipPositionDispense: dispense.dispensePosition.offset.z,
+    tipPositionDispense: 0,
     submergeDispense: {
       speed: dispense.submerge.speed,
       positionFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
@@ -232,9 +231,8 @@ const getNoLiquidClassValues = (
       ? undefined
       : dispense.retract.touchTip.params?.zOffset,
     touchTipDispenseSpeed: dispense.retract.touchTip.params?.speed,
-    airGapDispense: dispense.retract.airGapByVolume[0][1] ?? 0,
     disposalVolumeDispenseSettings: {
-      volume: pipette.liquids.default.minVolume,
+      volume: 0,
       blowOutLocation:
         convertBlowoutLocation(
           dispense?.retract.blowout?.params?.location,
