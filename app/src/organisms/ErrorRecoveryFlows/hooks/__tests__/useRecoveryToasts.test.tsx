@@ -306,6 +306,7 @@ describe('handleRecoveryOptionAction', () => {
     RECOVERY_MAP.STACKER_STALLED_STORE_SKIP.ROUTE,
     RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.ROUTE,
     RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE,
+    RECOVERY_MAP.SHUTTLE_FULL_SKIP.ROUTE,
   ]
 
   // Routes that should return the currentStepReturnVal toasts.
@@ -324,6 +325,7 @@ describe('handleRecoveryOptionAction', () => {
     RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE,
     RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.ROUTE,
     RECOVERY_MAP.STACKER_HOPPER_OR_SHUTTLE_EMPTY.ROUTE,
+    RECOVERY_MAP.SHUTTLE_FULL_RETRY.ROUTE,
   ]
 
   // Routes that should return no toasts.
