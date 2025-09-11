@@ -4,11 +4,11 @@ description: Basic commands for working with liquids.
 
 # Liquid Control
 
-After attaching a tip, your robot is ready to aspirate, dispense, and perform other liquid handling tasks. The API includes methods that help you perform these actions and the following sections show how to use them. The examples used here assume that you've loaded the pipettes and labware from the basic [protocol template](../protocol_template.md).
+After attaching a tip, your robot is ready to aspirate, dispense, and perform other liquid handling tasks. The API includes methods that help you perform these actions and the following sections show how to use them. The examples used here assume that you've loaded the pipettes and labware from the basic [protocol template][protocol-template].
 
 ## Aspirate
 
-To draw liquid up into a pipette tip, call the [`InstrumentContext.aspirate`](https://docs.opentrons.com/v2/api/protocol_api.html#opentrons.protocol_api.InstrumentContext.aspirate) method. Using this method, you can specify the aspiration volume in µL, the well location, and pipette flow rate. Other parameters let you position the pipette within a well. For example, this snippet tells the robot to aspirate 200 µL from well location A1.
+To draw liquid up into a pipette tip, call the [`InstrumentContext.aspirate()`][opentrons.protocol_api.InstrumentContext.aspirate] method. Using this method, you can specify the aspiration volume in µL, the well location, and pipette flow rate. Other parameters let you position the pipette within a well. For example, this snippet tells the robot to aspirate 200 µL from well location A1.
 
 ```python
 pipette.pick_up_tip()
@@ -28,7 +28,7 @@ Now our pipette holds 300 µL.
 
 ### Aspirate by Well or Location
 
-The `aspirate` method includes a `location` parameter that accepts either a `Well` or a `Location`.
+The `aspirate()` method includes a `location` parameter that accepts either a `Well` or a `Location`.
 
 If you specify a well, like `plate["A1"]`, the pipette will aspirate from a default position 1 mm above the bottom center of that well. To change the default clearance, first set the `aspirate` attribute of `well_bottom_clearance`:
 
@@ -38,7 +38,7 @@ pipette.well_bottom_clearance.aspirate = 2  # tip is 2 mm above well bottom
 pipette.aspirate(200, plate["A1"])
 ```
 
-You can also aspirate from a location along the center vertical axis within a well using the `Well.top` and `Well.bottom` methods. These methods move the pipette to a specified distance relative to the top or bottom center of a well:
+You can also aspirate from a location along the center vertical axis within a well using the `Well.top()` and `Well.bottom()` methods. These methods move the pipette to a specified distance relative to the top or bottom center of a well:
 
 ```python
 pipette.pick_up_tip()
@@ -46,7 +46,8 @@ depth = plate["A1"].bottom(z=2) # tip is 2 mm above well bottom
 pipette.aspirate(200, depth)
 ```
 
-Use the `Well.meniscus` method to aspirate relative to the meniscus of liquid in a well with a Flex pipette. First, you'll need to determine the amount of liquid in your well one of two ways:
+Use the `Well.meniscus()` method to aspirate relative to the meniscus of liquid in a well with a Flex pipette. First, you'll need to determine the amount of liquid in your well one of two ways:
+
 - Specify your starting liquid volume with `Labware.load_liquid`.
 - Measure the height of the liquid with `InstrumentContext.measure_liquid_height`.
 
@@ -62,20 +63,21 @@ pipette.aspirate(
 # aspirates at 1 mm below the liquid meniscus
 ```
 
-The liquid meniscus changes when you aspirate liquid from a well. Set `target="end"` to ensure the pipette stays submerged while aspirating. For more information, see [well-meniscus](../robot_position.md#meniscus).
+The liquid meniscus changes when you aspirate liquid from a well. Set `target="end"` to ensure the pipette stays submerged while aspirating. For more information, see [Meniscus][well-meniscus].
 
 `measure_liquid_height()` works best with a new pipette tip each time. To save time and tips throughout your protocol, use `Labware.load_liquid` instead to specify starting liquid volumes.
 
 *New in version 2.23*
 
 See also:
-- [new-default-op-positions](../robot_position.md#default-positions) for information about controlling pipette height for a particular pipette.
-- [position-relative-labware](../robot_position.md#position-relative-to-labware) for information about controlling pipette height from within a well.
-- [move-to](../robot_position.md#move-to) for information about moving a pipette to any reachable deck location.
+
+- [Default Positions][default-positions] for information about controlling pipette height for a particular pipette.
+- [Position Relative to Labware][position-relative-to-labware] for information about controlling pipette height from within a well.
+- [Move To][move-to] for information about moving a pipette to any reachable deck location.
 
 ### Aspiration Flow Rates
 
-Flex and OT-2 pipettes aspirate at [default flow rates](../pipettes/new-plunger-flow-rates.md) measured in µL/s. Specifying the `rate` parameter multiplies the flow rate by that value. As a best practice, don't set the flow rate higher than 3x the default. For example, this code causes the pipette to aspirate at twice its normal rate:
+Flex and OT-2 pipettes aspirate at [flow rates][pipette-flow-rates] measured in µL/s. Specifying the `rate` parameter multiplies the flow rate by that value. As a best practice, don't set the flow rate higher than 3x the default. For example, this code causes the pipette to aspirate at twice its normal rate:
 
 ```python
 pipette.aspirate(200, plate["A1"], rate=2.0)
@@ -95,18 +97,18 @@ The `rate` and `flow_rate` parameters are mutually exclusive. If you specify bot
 
 ## Dispense
 
-To dispense liquid from a pipette tip, call the [`InstrumentContext.dispense`](https://docs.opentrons.com/v2/api/protocol_api.html#opentrons.protocol_api.InstrumentContext.dispense) method. Using this method, you can specify the dispense volume in µL, the well location, and pipette flow rate. Other parameters let you position the pipette within a well. For example, this snippet tells the robot to dispense 200 µL into well location B1.
+To dispense liquid from a pipette tip, call the [`InstrumentContext.dispense()`][opentrons.protocol_api.InstrumentContext.dispense] method. Using this method, you can specify the dispense volume in µL, the well location, and pipette flow rate. Other parameters let you position the pipette within a well. For example, this snippet tells the robot to dispense 200 µL into well location B1.
 
 ```python
 pipette.dispense(200, plate["B1"])
 ```
 
-> [!note]
-> In API version 2.16 and earlier, you could pass a `volume` argument to `dispense()` greater than what was aspirated into the pipette. In this case, the API would ignore `volume` and dispense the pipette's `current_volume`. The robot *would not* move the plunger lower as a result.
->
-> In version 2.17 and later, passing such values raises an error.
->
-> To move the plunger a small extra amount, add a [push out](#push-out-after-dispense). Or to move it a large amount, use [blow out](#blow-out).
+!!! note
+    In API version 2.16 and earlier, you could pass a `volume` argument to `dispense()` greater than what was aspirated into the pipette. In this case, the API would ignore `volume` and dispense the pipette's `current_volume`. The robot *would not* move the plunger lower as a result.
+    
+    In version 2.17 and later, passing such values raises an error.
+    
+    To move the plunger a small extra amount, add a [push out](#push-out-after-dispense). Or to move it a large amount, use [blow out](#blow-out).
 
 If the pipette doesn’t move, you can specify an additional dispense action without including a location. To demonstrate, this code snippet pauses the protocol, automatically resumes it, and dispenses a second time from location B1.
 
@@ -118,7 +120,7 @@ pipette.dispense(100)     # dispense 100 µL at current position
 
 ### Dispense by Well or Location
 
-The `dispense` method includes a `location` parameter that accepts either a `Well` or a `Location`.
+The `dispense()` method includes a `location` parameter that accepts either a `Well` or a `Location`.
 
 If you specify a well, like `plate["B1"]`, the pipette will dispense from a default position 1 mm above the bottom center of that well. To change the default clearance, you would call `well_bottom_clearance`:
 
@@ -127,7 +129,7 @@ pipette.well_bottom_clearance.dispense = 2 # tip is 2 mm above well bottom
 pipette.dispense(200, plate["B1"])
 ```
 
-You can also dispense from a location along the center vertical axis within a well using the `Well.top` and `Well.bottom` methods. These methods move the pipette to a specified distance relative to the top or bottom center of a well:
+You can also dispense from a location along the center vertical axis within a well using the `Well.top()` and `Well.bottom()` methods. These methods move the pipette to a specified distance relative to the top or bottom center of a well:
 
 ```python
 depth = plate["B1"].bottom(z=2) # tip is 2 mm above well bottom
@@ -135,8 +137,9 @@ pipette.dispense(200, depth)
 ```
 
 Use the `Well.meniscus` method to dispense at the meniscus of liquid in your well with a Flex pipette. First, you'll need to determine the amount of liquid in your well one of two ways:
-- Specify your starting liquid volume with `Labware.load_liquid`.
-- Measure the height of liquid with `InstrumentContext.measure_liquid_height`.
+
+- Specify your starting liquid volume with `Labware.load_liquid()`.
+- Measure the height of liquid with `InstrumentContext.measure_liquid_height()`.
 
 This example measures the liquid height in well B1 of a plate and then immediately dispenses below the meniscus:
 
@@ -149,20 +152,21 @@ pipette.dispense(
 # dispenses at 1 mm below the liquid meniscus
 ```
 
-The liquid meniscus changes when you dispense liquid into a well. Set `target="start"` to ensure the pipette begins the dispense at the liquid meniscus. For more information, see [well-meniscus](../robot_position.md#meniscus).
+The liquid meniscus changes when you dispense liquid into a well. Set `target="start"` to ensure the pipette begins the dispense at the liquid meniscus. For more information, see [Meniscus][meniscus].
 
 `measure_liquid_height()` works best with a new pipette tip each time. To save time and tips throughout your protocol, use `Labware.load_liquid` instead to specify starting liquid volumes.
 
 *New in version 2.23*
 
 See also:
-- [new-default-op-positions](../robot_position.md#default-positions) for information about controlling pipette height for a particular pipette.
-- [position-relative-labware](../robot_position.md#position-relative-to-labware) for formation about controlling pipette height from within a well.
-- [move-to](../robot_position.md#move-to) for information about moving a pipette to any reachable deck location.
+
+- [Default Positions][default-positions] for information about controlling pipette height for a particular pipette.
+- [Position Relative to Labware][position-relative-to-labware] for information about controlling pipette height from within a well.
+- [Move To][move-to] for information about moving a pipette to any reachable deck location.
 
 ### Dispense Flow Rates
 
-Flex and OT-2 pipettes dispense at [default flow rates](../pipettes/new-plunger-flow-rates.md) measured in µL/s. Adding a number to the `rate` parameter multiplies the flow rate by that value. As a best practice, don't set the flow rate higher than 3x the default. For example, this code causes the pipette to dispense at twice its normal rate:
+Flex and OT-2 pipettes dispense at default [flow rates][pipette-flow-rates] measured in µL/s. Specifying the `rate` parameter multiplies the flow rate by that value. As a best practice, don't set the flow rate higher than 3x the default. For example, this code causes the pipette to dispense at twice its normal rate:
 
 ```python
 pipette.dispense(200, plate["B1"], rate=2.0)
@@ -188,17 +192,53 @@ Use the optional `push_out` parameter of `dispense()` for applications that requ
 
 Flex pipettes include a push out of air by default for any dispense that completely empties the attached pipette tip. Both default and maximum push out volumes depend on your Flex pipette and tip combination.
 
-| Pipette                      | Tip      | Default push out | Maximum push out |
-|------------------------------|----------|------------------|------------------|
-| 50 µL (1- and 8-channel)     | 50 µL    | Regular: 2 µL    | Regular: 3.9 µL  |
-|                              |          | Low-volume: 7 µL | Low-volume: 11.7 µL |
-| 1000 µL (1-, 8-, 96-channel) | 50 µL    | 7 µL             | 79.5 µL          |
-|                              | 200 µL   | 5 µL             | 79.5 µL          |
-|                              | 1000 µL  | 20 µL            | 79.5 µL          |
+<table>
+    <thead>
+        <tr>
+            <th>Pipette</th>
+            <th>Tip</th>
+            <th>Default push out</th>
+            <th>Maximum push out</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>50 µL<br>(1- and 8-channel)</td>
+            <td>50 µL</td>
+            <td>
+            <ul>
+                <li>Regular: 2 µL</li>
+                <li>Low-volume: 7 µL</li>
+            </ul>
+            </td>
+            <td>
+            <ul>
+                <li>Regular: 3.9 µL</li>
+                <li>Low-volume: 11.7 µL</li>
+            </ul>
+            </td>
+        </tr>    <tr>
+            <td rowspan="3">1000 µL<br>(1-, 8-, 96-channel)</td>
+            <td>50 µL</td>
+            <td>7 µL</td>
+            <td>79.5 µL</td>
+        </tr>
+        <tr>
+            <td>200 µL</td>
+            <td>5 µL</td>
+            <td>79.5 µL</td>
+        </tr>
+        <tr>
+            <td>1000 µL</td>
+            <td>20 µL</td>
+            <td>79.5 µL</td>
+        </tr>
+    </tbody>
+</table>
 
 OT-2 pipettes do not include a push out by default.
 
-You can change the push out volume for any `dispense` command. For this example dispense of all 100 µL of liquid in a 200 µL tip, the Flex 1-Channel 1000 µL pipette plunger will move the equivalent of 7 µL (an additional 2 µL more than the default) beyond the aspirate start position to push out any remaining liquid in the tip.
+You can change the push out volume for any `dispense()` command. For this example dispense of all 100 µL of liquid in a 200 µL tip, the Flex 1-Channel 1000 µL pipette plunger will move the equivalent of 7 µL (an additional 2 µL more than the default) beyond the aspirate start position to push out any remaining liquid in the tip.
 
 ```python
 pipette.pick_up_tip()
@@ -215,7 +255,7 @@ To disable `push_out` during any dispense action, set `push_out=0`. You can use 
 
 ## Blow Out
 
-To blow an extra amount of air through the pipette's tip, call the [`InstrumentContext.blow_out`](https://docs.opentrons.com/v2/api/protocol_api.html#opentrons.protocol_api.InstrumentContext.blow_out) method. You can use a specific well in a well plate or reservoir as the blowout location. If no location is specified, the pipette will blowout from its current well position:
+To blow an extra amount of air through the pipette's tip, call the [`InstrumentContext.blow_out()`][opentrons.protocol_api.InstrumentContext.blow_out] method. You can use a specific well in a well plate or reservoir as the blowout location. If no location is specified, the pipette will blowout from its current well position:
 
 ```python
 pipette.blow_out()
@@ -227,18 +267,19 @@ You can also specify a particular well as the blowout location:
 pipette.blow_out(plate["B1"])
 ```
 
-Many protocols use a trash container for blowing out the pipette. You can specify the pipette's current trash container as the blowout location by using the `trash_container` property:
+Many protocols use a trash container for blowing out the pipette. You can specify the pipette's current trash container as the blowout location by using the [`InstrumentContext.trash_container`][opentrons.protocol_api.InstrumentContext.trash_container] property:
 
 ```python
 pipette.blow_out(pipette.trash_container)
 ```
 
 *New in version 2.0*
+
 *Changed in version 2.16: Added support for `TrashBin` and `WasteChute` locations.*
 
 ## Touch Tip
 
-The [`InstrumentContext.touch_tip`](https://docs.opentrons.com/v2/api/protocol_api.html#opentrons.protocol_api.InstrumentContext.touch_tip) method moves the pipette so the tip touches each wall of a well. A touch tip procedure helps knock off any droplets that might cling to the pipette's tip. This method includes optional arguments that allow you to control where the tip will touch the inner walls of a well and the touch speed. Calling `touch_tip` without arguments causes the pipette to touch the well walls from its current location:
+The [`InstrumentContext.touch_tip()`][opentrons.protocol_api.InstrumentContext.touch_tip] method moves the pipette so the tip touches each wall of a well. A touch tip procedure helps knock off any droplets that might cling to the pipette's tip. This method includes optional arguments that allow you to control where the tip will touch the inner walls of a well and the touch speed. Calling `touch_tip()` without arguments causes the pipette to touch the well walls from its current location:
 
 ```python
 pipette.touch_tip()
@@ -253,6 +294,8 @@ This example demonstrates touching the tip in a specific well:
 ```python
 pipette.touch_tip(plate["B1"])
 ```
+
+*New in version 2.0.*
 
 This example uses an offset to set the touch tip location 2mm below the top of the current well:
 
@@ -272,14 +315,14 @@ And this example uses `mm_from_edge` to set the touch tip location 0 mm, or the 
 pipette.touch_tip(plate["B1"], mm_from_edge=0)
 ```
 
-*Changed in version 2.24: Add the `mm_from_edge` parameter.*
+*Added in version 2.24: The `mm_from_edge` parameter.*
 
 The `touch_tip` feature allows the pipette to touch the edges of a well gently instead of crashing into them. It includes the `radius` and `mm_from_edge` arguments. When `radius=1` or `mm_from_edge=0`, the robot moves the centerline of the pipette’s plunger axis to the edge of a well. This means a pipette tip may sometimes touch the well wall too early, causing it to bend inwards. A smaller radius or larger `mm_from_edge`, like 1 mm, help avoid premature wall collisions and a lower speed produces gentler motion. Different liquid droplets behave differently, so test out these parameters in a single well before performing a full protocol run.
 
 The `radius` and `mm_from_edge` arguments are mutually exclusive. If you specify both in the same command, the API will raise an error.
 
-> [!warning]
-> *Do not* set the `radius` value greater than `1.0` or a negative `mm_from_edge` value. When `radius` is > `1.0` or `mm_from_edge` is < `0.0`, the robot will forcibly move the pipette tip across a well wall or edge. This type of aggressive movement can damage the pipette tip and the pipette.
+!!! warning
+    *Do not* set the `radius` value greater than `1.0` or a negative `mm_from_edge` value. When `radius` is > `1.0` or `mm_from_edge` is < `0.0`, the robot will forcibly move the pipette tip across a well wall or edge. This type of aggressive movement can damage the pipette tip and the pipette.
 
 ### Touch Speed
 
