@@ -67,8 +67,14 @@ class AnthropicPredict:
         self.path_docs: Path = ROOT_PATH / "api" / "storage" / "docs"
         self.path_docs_pd: Path = ROOT_PATH / "api" / "storage" / "docs" / "pd"
         self.path_api_docs: Path = ROOT_PATH / "api" / "storage" / "api_docs" / "api_docs_struct_v2.25.md"
-        # Path to the main Opentrons API docs (not copied, original location)
-        self.api_docs_base_path: Path = REPO_ROOT / settings.api_docs_base_path
+
+        docker_api_docs_path = ROOT_PATH / "api" / "storage" / "api_docs"
+        local_api_docs_path = REPO_ROOT / settings.api_docs_base_path
+
+        if (docker_api_docs_path / "docs").exists():
+            self.api_docs_base_path = docker_api_docs_path
+        else:
+            self.api_docs_base_path = local_api_docs_path
         self.system_prompt_pd = self.get_system_prompt_pd()
 
         self.cached_docs: List[MessageParam] = [
