@@ -4,9 +4,9 @@ description: Basic commands for working with pipette tips.
 
 # Manipulating Pipette Tips
 
-Your robot needs to attach a disposable tip to the pipette before it can aspirate or dispense liquids. The API provides three basic functions that help the robot attach and manage pipette tips during a protocol run. These methods are [`InstrumentContext.pick_up_tip`](https://docs.opentrons.com/v2/api/protocol_api.html#opentrons.protocol_api.InstrumentContext.pick_up_tip), [`InstrumentContext.drop_tip`](https://docs.opentrons.com/v2/api/protocol_api.html#opentrons.protocol_api.InstrumentContext.drop_tip), and [`InstrumentContext.return_tip`](https://docs.opentrons.com/v2/api/protocol_api.html#opentrons.protocol_api.InstrumentContext.return_tip). Respectively, these methods tell the robot to pick up a tip from a tip rack, drop a tip into the trash (or another location), and return a tip to its location in the tip rack.
+Your robot needs to attach a disposable tip to the pipette before it can aspirate or dispense liquids. The API provides three basic functions that help the robot attach and manage pipette tips during a protocol run. These methods are [`InstrumentContext.pick_up_tip`][opentrons.protocol_api.InstrumentContext.pick_up_tip], [`InstrumentContext.drop_tip`][opentrons.protocol_api.InstrumentContext.drop_tip], and [`InstrumentContext.return_tip`][opentrons.protocol_api.InstrumentContext.return_tip]. Respectively, these methods tell the robot to pick up a tip from a tip rack, drop a tip into the trash (or another location), and return a tip to its location in the tip rack.
 
-The following sections demonstrate how to use each method and include sample code. The examples used here assume that you've loaded the pipettes and labware from the basic [protocol template](../protocol_template.md).
+The following sections demonstrate how to use each method and include sample code. The examples used here assume that you've loaded the pipettes and labware from the basic [protocol template][protocol-template].
 
 ## Picking Up a Tip
 
@@ -78,11 +78,11 @@ for i in range(192):
     pipette.drop_tip()
 ```
 
-For a more advanced "real-world" example, review the [off-deck location protocol](../moving_labware.md#off-deck-location) on the [moving-labware](../moving_labware.md) page. This example also uses a `for` loop to iterate through a tip rack, but it includes other commands that pause the protocol and let you replace an on-deck tip rack with another rack stored in an off-deck location.
+For a more advanced "real-world" example, review the [off-deck location protocol][the-off-deck-location] on the [Moving Labware](../moving-labware.md) page. This example also uses a `for` loop to iterate through a tip rack, but it includes other commands that pause the protocol and let you replace an on-deck tip rack with another rack stored in an off-deck location.
 
 ## Dropping a Tip
 
-To drop a tip in the pipette's trash container, call the `drop_tip` method with no arguments:
+To drop a tip in the pipette's trash container, call the [`drop_tip()`][opentrons.protocol_api.InstrumentContext.drop_tip] method with no arguments:
 
 ```python
 pipette.drop_tip()
@@ -112,7 +112,7 @@ pipette.drop_tip(chute)  # drops tip in waste chute
 
 ## Returning a Tip
 
-To return a tip to its original location, call the `return_tip` method with no arguments:
+To return a tip to its original location, call the [`return_tip()`][opentrons.protocol_api.InstrumentContext.return_tip] method with no arguments:
 
 ```python
 pipette.return_tip()
@@ -120,10 +120,10 @@ pipette.return_tip()
 
 *New in version 2.0*
 
-> [!note]
-> You can't return tips with a pipette that's configured to use [partial tip pickup](../pipettes/partial_tip_pickup.md). This restriction ensures that the pipette has clear access to unused tips. For example, a 96-channel pipette in column configuration can't reach column 2 unless column 1 is empty.
->
-> If you call `return_tip()` while using partial tip pickup, the API will raise an error. Use `drop_tip()` to dispose the tips instead.
+!!! note
+    You can't return tips with a pipette that's configured to use [partial tip pickup](../pipettes/partial-tip-pickup.md). This restriction ensures that the pipette has clear access to unused tips. For example, a 96-channel pipette in column configuration can't reach column 2 unless column 1 is empty.
+
+    If you call `return_tip()` while using partial tip pickup, the API will raise an error. Use `drop_tip()` to dispose the tips instead.
 
 ## Working With Used Tips
 

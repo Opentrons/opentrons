@@ -26,11 +26,11 @@ nav:
       - Volume Modes: pipettes/volume-modes.md
   - Liquid Classes: liquid-classes.md
   - Liquid Class Definitions: liquid-class-definitions.md
-  - Atomic Commands:
-      - Overview: atomic-commands/index.md
-      - Pipette Tips: atomic-commands/pipette-tips.md
-      - Liquids: atomic-commands/liquids.md
-      - Utilities: atomic-commands/utilities.md
+  - Building Block Commands:
+      - Overview: building-block-commands/index.md
+      - Pipette Tips: building-block-commands/pipette-tips.md
+      - Liquids: building-block-commands/liquids.md
+      - Utilities: building-block-commands/utilities.md
   - Complex Commands:
       - Overview: complex-commands/index.md
       - Sources & Destinations: complex-commands/sources-destinations.md
