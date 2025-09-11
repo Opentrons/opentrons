@@ -3,7 +3,8 @@ import { describe, expect, it, vi } from 'vitest'
 import { getWellFillFromLabwareId } from '../getWellFillFromLabwareId'
 import { parseLiquidsInLoadOrder } from '../parseProtocolCommands'
 
-import type { LabwareByLiquidId, Liquid } from '@opentrons/shared-data'
+import type { Liquid } from '../../types'
+import type { LabwareByLiquidId } from '../getLabwareInfoByLiquidId'
 
 vi.mock('../parseProtocolCommands')
 
