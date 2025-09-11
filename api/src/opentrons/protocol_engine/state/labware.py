@@ -458,6 +458,25 @@ class LabwareView:
                     " another labware stacked on top."
                 )
 
+    def raise_if_not_tip_rack(self, labware_id: str) -> None:
+        """Raise if a labware is not a tip rack."""
+        if not self.is_tiprack(labware_id):
+            raise errors.LabwareIsNotTipRackError(
+                f"Labware {self.get_display_name(labware_id)} is not a tip rack and cannot have its well states set."
+            )
+
+    def raise_if_wells_are_invalid(
+        self, labware_id: str, well_names: List[str]
+    ) -> None:
+        """Raise if given wells do not exist with the given labware ID."""
+        non_existent_wells = set(well_names) - set(
+            self.get_definition(labware_id).wells
+        )
+        if non_existent_wells:
+            raise errors.WellDoesNotExistError(
+                f"Tip rack {self.get_display_name(labware_id)} does not have wells: {', '.join(non_existent_wells)}"
+            )
+
     def get_by_slot(
         self,
         slot_name: Union[DeckSlotName, StagingSlotName],
