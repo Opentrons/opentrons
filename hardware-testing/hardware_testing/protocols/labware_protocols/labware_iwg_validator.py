@@ -98,7 +98,7 @@ def _setup(
     List[Labware],
     InstrumentContext,
     str,
-    int,  # <-- add n_regions to return
+    int,  
 ]:
     global DIAL_PORT, RUN_ID, FILE_NAME, LABWARE
 

@@ -21,7 +21,7 @@ from dataclasses import dataclass, field
 #  GLOBAL VARIABLES - START
 ###########################################
 
-LABWARE = "eppendorf_96_wellplate_500ul"  # change to desired labware
+LABWARE = "opentrons_15_tuberack_15000ul"  # change to desired labware
 
 RESERVOIR = "nest_1_reservoir_290ml"
 
@@ -624,7 +624,7 @@ def geometry_creator(
         get_dispense_props(state, ts)
 
         pick_up_tips(state.liq_pipette, state.probe_pipette)
-        tip_z_error = _get_tip_z_error(ctx, state.probe_pipette, state.dial)
+        ts.tip_z_error = _get_tip_z_error(ctx, state.probe_pipette, state.dial)
 
         state.liq_pipette.transfer_with_liquid_class(
             liquid_class=state.ethanol,
@@ -639,7 +639,8 @@ def geometry_creator(
         height = _get_height_of_liquid_in_well(
             state.probe_pipette, state.labware[ts.current_well], ctx.is_simulating()
         )
-        ts.corrected_height = height + tip_z_error
+        ts.corrected_height = height + ts.tip_z_error
+        ts.corrected_heights.append(ts.corrected_height)
 
         # Compute hdelta
         ts.compute_hdelta()
