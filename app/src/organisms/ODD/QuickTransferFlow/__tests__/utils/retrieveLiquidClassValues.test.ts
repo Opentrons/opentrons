@@ -4,14 +4,15 @@ import {
   fixture96Plate,
   fixtureP100096V2Specs,
   fixtureTiprack300ul,
-  LabwareDefinition2,
   NONE_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
 
-import { QuickTransferSummaryState } from '../../types'
 import { retrieveLiquidClassValues } from '../../utils'
 
-let STATE: QuickTransferSummaryState = {
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { QuickTransferSummaryState } from '../../types'
+
+const STATE: QuickTransferSummaryState = {
   pipette: fixtureP100096V2Specs,
   mount: 'left',
   tipRack: fixtureTiprack300ul as LabwareDefinition2,
