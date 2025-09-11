@@ -68,7 +68,8 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
             ? getWellFillFromLabwareId(
                 topLabwareInfo.labwareId,
                 protocolAnalysis.liquids,
-                labwareByLiquidId
+                labwareByLiquidId,
+                protocolAnalysis.commands
               )
             : undefined,
       }
@@ -90,7 +91,8 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
           wellFill: getWellFillFromLabwareId(
             topLabwareInfo.labwareId,
             protocolAnalysis.liquids,
-            labwareByLiquidId
+            labwareByLiquidId,
+            protocolAnalysis.commands
           ),
         }
       : null
