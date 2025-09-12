@@ -169,7 +169,7 @@ const getNoLiquidClassValues = (
 
   const aspirateState = {
     aspirateFlowRate: aspirateFlowRateFields.aspirate_flowRate ?? 0,
-    tipPositionAspirate: 0,
+    tipPositionAspirate: aspirate.aspiratePosition.offset.z,
     submergeAspirate: {
       speed: aspirate.submerge.speed,
       positionFromBottom: aspirate.submerge.startPosition.offset.z,
@@ -197,7 +197,7 @@ const getNoLiquidClassValues = (
 
   const dispenseState = {
     dispenseFlowRate: dispenseFlowRateFields.dispense_flowRate ?? 0,
-    tipPositionDispense: 0,
+    tipPositionDispense: dispense.dispensePosition.offset.z,
     submergeDispense: {
       speed: dispense.submerge.speed,
       positionFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
