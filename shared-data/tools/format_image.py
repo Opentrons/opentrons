@@ -15,6 +15,7 @@ import argparse
 import os
 import io
 
+
 def rename_image_path(image_path: str, keyword: str)-> str:
     """Save image to new path."""
     image_path_dir = os.path.dirname(image_path)
@@ -97,9 +98,24 @@ def resize_image(image_path: str, new_width: int = 1024) -> str:
     aspect_ratio = original_height / original_width
     new_height = int(new_width * aspect_ratio)
     # Resize the image
-    resized_img = img.resize((new_width, new_height), Image.LANCZOS) # LANCZOS for high-quality downsampling
     resize_image_path = rename_image_path(image_path, "resize")
-    resized_img.save(resize_image_path, "JPEG", quality=98, optimize=True)
+    resized_img = img.resize((new_width, new_height), Image.LANCZOS) # LANCZOS for high-quality downsampling
+    quality = 98
+    min_quality = 90
+    target_kb = 250
+    buffer = io.BytesIO()
+    while quality >= min_quality:
+        buffer.seek(0)
+        buffer.truncate()
+        size_kb = buffer.tell() // 1024
+        if size_kb <= target_kb:
+            break
+        print(f"🔍 Trying quality={quality} → {size_kb} KB")
+        quality -= 5
+
+    if quality < min_quality:
+        print("⚠️ Warning: Could not reach target size without going below minimum quality.")
+    resized_img.save(resize_image_path, "JPEG", quality=quality, optimize=True)
     print(f"✅ Final image size: {os.path.getsize(image_path) // 1024} KB")
     return resize_image_path
 

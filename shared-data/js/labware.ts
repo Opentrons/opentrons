@@ -192,9 +192,24 @@ for (const [varName, url] of Object.entries(imageKeyToUrl)) {
     labwareImages[varName] = [url]
   }
 }
+
+const adapters = ['aluminumblock', 'tuberack']
+// Sort the image URLs inside each labwareImages entry
 const sortedLabwareImages = Object.fromEntries(
-  Object.entries(labwareImages).sort(([a], [b]) => a.localeCompare(b))
-)
+  Object.entries(labwareImages).map(([key, urls]) => {
+    const sortedUrls = [...urls].sort((a, b) => {
+      const aMatches = adapters.some(substr => a.includes(substr));
+      const bMatches = adapters.some(substr => b.includes(substr));
+
+      if (aMatches && !bMatches) return -1;
+      if (!aMatches && bMatches) return 1;
+
+      return a.localeCompare(b);
+    });
+
+    return [key, sortedUrls];
+  })
+);
 
 export {
   sortedLabwareImages as labwareImages,
