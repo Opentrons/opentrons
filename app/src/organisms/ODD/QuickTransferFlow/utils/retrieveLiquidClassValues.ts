@@ -180,9 +180,6 @@ const getNoLiquidClassValues = (
       mixVolume: 0,
       repetitions: 0,
     },
-    delayAspirate: {
-      delayDuration: aspirate.delay.params?.duration ?? 0,
-    },
     retractAspirate: {
       speed: aspirate.retract.speed ?? 0,
       positionFromBottom: aspirate.retract.endPosition.offset.z ?? 0,
@@ -203,11 +200,6 @@ const getNoLiquidClassValues = (
       positionFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
       delayDuration: dispense.submerge.delay.params?.duration ?? 0,
     },
-    delayDispense: !dispense.delay.enable
-      ? undefined
-      : {
-          delayDuration: dispense.delay.params?.duration ?? 0,
-        },
     pushOutDispense: {
       volume:
         linearInterpolate(

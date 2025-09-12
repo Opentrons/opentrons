@@ -122,11 +122,11 @@ export function useAspirateSettingsConfig({
       option: SETTING_OPTIONS.ASPIRATE_DELAY,
       copy: t('delay'),
       value:
-        state.delayAspirate !== undefined && hasLiquidClass
+        state.delayAspirate != null
           ? t('delay_value', {
               delay: state.delayAspirate.delayDuration,
             })
-          : '',
+          : t('option_disabled'),
       enabled: true,
       onClick: () => {
         setSelectedSetting(SETTING_OPTIONS.ASPIRATE_DELAY)
