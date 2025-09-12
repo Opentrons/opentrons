@@ -18,8 +18,8 @@ This release adds support for new instruments, labware, and hardware,enables lim
 
 - Transfer as little as 1 µL in a protocol with the Opentrons Flex 96-Channel Pipette (1–200 μL). This release also adds liquid class transfer support for the pipette.
 - Use Opentrons Tough Auto-Sealing Lids on compatible labware in the Thermocycler Module.
-- Add Opentrons Universal Lids, tip rack lids, ibidi lids, and Corning lids in your Protocol Designer protocols.
-- Secure lidded labware properly on the Heater-Shaker Module with the new Opentrons Universal Flat Adapter Type B.
+- Add new lids to Protocol Designer protocols, including the Opentrons Tough Universal Lid and Opentrons Tough Auto-Sealing Lid. Tip rack lids are also available for Flex tip racks.
+- Secure lidded labware properly on the Heater-Shaker Module with the new Opentrons Universal Flat Heater-Shaker Adapter Type B.
 - Return an attached pipette tip to the tip rack after aspirating, dispensing, or mixing. Return tip settings in version 8.6.0 are limited to a single return, and you won't be able to pick up these tips again in the same protocol.
 
 ### Improved Features
@@ -33,7 +33,6 @@ This release adds support for new instruments, labware, and hardware,enables lim
 ### Bug Fixes
 
 - Protocol Designer now raises an error when moving labware to a deleted module.
-
 
 ## Opentrons Protocol Designer Changes in 8.5.3
 
