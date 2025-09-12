@@ -34,6 +34,8 @@ import {
 } from './RecoveryOptions'
 import { ShuttleFullRetry } from './RecoveryOptions/ShuttleFullRetry'
 import { ShuttleFullSkip } from './RecoveryOptions/ShuttleFullSkip'
+import { StackerShuttleEmptyStoreRetry } from './RecoveryOptions/StackerShuttleEmptyRetryStore'
+import { StackerShuttleEmptyStoreSkip } from './RecoveryOptions/StackerShuttleEmptyStoreSkip'
 import { StackerStalledStoreRetry } from './RecoveryOptions/StackerStalledStoreRetry'
 import { StackerStalledStoreSkip } from './RecoveryOptions/StackerStalledStoreSkip'
 import {
@@ -49,8 +51,6 @@ import type { UseRecoveryAnalyticsResult } from '/app/redux-resources/analytics'
 import type { ErrorRecoveryFlowsProps } from '.'
 import type { ERUtilsResults, useRetainedFailedCommandBySource } from './hooks'
 import type { RecoveryContentProps, RecoveryRoute, RouteStep } from './types'
-import { StackerShuttleEmptyStoreSkip } from './RecoveryOptions/StackerShuttleEmptyStoreSkip'
-import { StackerShuttleEmptyStoreRetry } from './RecoveryOptions/StackerShuttleEmptyRetryStore'
 
 export interface UseERWizardResult {
   hasLaunchedRecovery: boolean
@@ -346,9 +346,9 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
     case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
       return buildStackerShuttleEmptySkip()
     case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_STORE_RETRY.ROUTE:
-        return buildStackerShuttleEmptyStoreRetry()
+      return buildStackerShuttleEmptyStoreRetry()
     case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_STORE_SKIP.ROUTE:
-        return buildStackerShuttleEmptyStoreSkip()
+      return buildStackerShuttleEmptyStoreSkip()
     case RECOVERY_MAP.ROBOT_DOOR_OPEN_SPECIAL.ROUTE:
       return buildRecoveryDoorOpenSpecial()
     case RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE:
