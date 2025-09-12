@@ -72,6 +72,7 @@ class SimulatingDriver(AbstractThermocyclerDriver):
         self._plate_temperature.target = temp
         self._plate_temperature.current = temp
         self._plate_temperature.hold = 0
+        self._ramp_rate = ramp_rate
 
     @ensure_yield
     async def get_plate_temperature(self) -> PlateTemperature:
