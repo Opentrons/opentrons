@@ -241,7 +241,7 @@
           "default": {
             "speed": 10.0,
             "distance": 13.0,
-            "current": 0.55,
+            "current": 0.15,
             "tipOverlaps": {
               "v0": {
                 "default": 10.5,
