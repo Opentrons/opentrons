@@ -1271,7 +1271,7 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                         fixture_settings.increment
                         or fixture_settings.pipette_channels == 96
                     ):
-                        avg_asp_evap = avg_asp_evap / fixture_settings.pipette_channels
+                        asp_with_evap = asp_with_evap / fixture_settings.pipette_channels
                         disp_with_evap = (
                             disp_with_evap / fixture_settings.pipette_channels
                         )
