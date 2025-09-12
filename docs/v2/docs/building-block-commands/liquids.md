@@ -348,7 +348,7 @@ pipette.touch_tip(speed=80)
 
 ## Mix
 
-The [`InstrumentContext.mix`](https://docs.opentrons.com/v2/api/protocol_api.html#opentrons.protocol_api.InstrumentContext.mix) method aspirates and dispenses repeatedly in a single location. It's designed to mix the contents of a well together using a single command rather than using multiple `aspirate()` and `dispense()` calls. This method includes arguments that let you specify the number of times to mix, the volume (in µL) of liquid, and the well that contains the liquid you want to mix.
+The [`InstrumentContext.mix()`][opentrons.protocol_api.InstrumentContext.mix] method aspirates and dispenses repeatedly in a single location. It's designed to mix the contents of a well together using a single command rather than using multiple `aspirate()` and `dispense()` calls. This method includes arguments that let you specify the number of times to mix, the volume (in µL) of liquid, and the well that contains the liquid you want to mix.
 
 This example draws 100 µL from the current well and mixes it three times:
 
@@ -387,15 +387,16 @@ And this example adds a push out of 10 µL after the final dispense in the mix:
 pipette.mix(repetitions=3, volume=100, final_push_out=10)
 ```
 
-> [!note]
-> In API versions 2.2 and earlier, during a mix, the pipette moves up and out of the target well. In API versions 2.3 and later, the pipette does not move while mixing.
+!!! note
+    In API versions 2.2 and earlier, during a mix, the pipette moves up and out of the target well. In API versions 2.3 and later, the pipette does not move while mixing.
 
 *New in version 2.0*
+
 *Changed in version 2.24: Adds the `aspirate_flow_rate`, `dispense_flow_rate`, `aspirate_delay`, `dispense_delay`, and `final_push_out` parameters.*
 
 ## Air Gap
 
-The [`InstrumentContext.air_gap`](https://docs.opentrons.com/v2/api/protocol_api.html#opentrons.protocol_api.InstrumentContext.air_gap) method tells the pipette to draw in air before or after a liquid. Creating an air gap helps keep liquids from seeping out of a pipette after drawing it from a well. This method includes arguments that give you control over the amount of air to aspirate and the position at the target well to add the air gap. By default, the pipette moves 5 mm above the center of a well before aspirating air. Calling `air_gap` with no arguments uses the entire remaining volume in the pipette.
+The [`InstrumentContext.air_gap()`][opentrons.protocol_api.InstrumentContext.air_gap] method tells the pipette to draw in air before or after a liquid. Creating an air gap helps keep liquids from seeping out of a pipette after drawing it from a well. This method includes arguments that give you control over the amount of air to aspirate and the position at the target well to add the air gap. By default, the pipette moves 5 mm above the center of a well before aspirating air. Calling `air_gap()` with no arguments uses the entire remaining volume in the pipette.
 
 This example aspirates 200 µL of air 5 mm above the current well:
 
@@ -438,11 +439,12 @@ pipette.air_gap(volume=200, flow_rate=50)
 The `rate` and `flow_rate` parameters are mutually exclusive. If you choose to change the `flow_rate`, specifying a `rate` will raise an error.
 
 *New in version 2.0*
+
 *Changed in version 2.24: Add the `in_place` and `flow_rate` parameters.*
 
 ## Detect Liquids
 
-The [`InstrumentContext.detect_liquid_presence`](https://docs.opentrons.com/v2/api/protocol_api.html#opentrons.protocol_api.InstrumentContext.detect_liquid_presence) method tells a Flex pipette to check for liquid in a well. It returns `True` if the pressure sensors in the pipette detect a liquid and `False` if the sensors do not. When `detect_liquid_presence()` finds an empty well it won't raise an error or stop your protocol.
+The [`InstrumentContext.detect_liquid_presence()`][opentrons.protocol_api.InstrumentContext.detect_liquid_presence] method tells a Flex pipette to check for liquid in a well. It returns `True` if the pressure sensors in the pipette detect a liquid and `False` if the sensors do not. When `detect_liquid_presence()` finds an empty well it won't raise an error or stop your protocol.
 
 `detect_liquid_presence()` is a standalone method to record the presence or absence of a liquid. You don't have to aspirate after detecting liquid presence. However, you should always pick up a tip immediately prior to checking for liquid, and either aspirate or drop the tip immediately after. This ensures that the pipette uses a clean, dry tip to check for liquid, and prevents cross-contamination.
 
@@ -460,7 +462,7 @@ else:
 
 ## Require Liquids
 
-The [`InstrumentContext.require_liquid_presence`](https://docs.opentrons.com/v2/api/protocol_api.html#opentrons.protocol_api.InstrumentContext.require_liquid_presence) method tells a Flex pipette to check for and require liquid in a well. When `require_liquid_presence()` finds an empty well, it raises an error and pauses the protocol to let you resolve the problem.
+The [`InstrumentContext.require_liquid_presence()`][opentrons.protocol_api.InstrumentContext.require_liquid_presence] method tells a Flex pipette to check for and require liquid in a well. When `require_liquid_presence()` finds an empty well, it raises an error and pauses the protocol to let you resolve the problem.
 
 `require_liquid_presence()` is a standalone method to react to a missing liquid or empty well. You don't have to aspirate after requiring liquid presence. However, you should always pick up a tip immediately prior to checking for liquid, and either aspirate or drop the tip immediately after. This ensures that the pipette uses a clean, dry tip to check for liquid, and prevents cross-contamination.
 
@@ -470,13 +472,13 @@ pipette.require_liquid_presence(reservoir["A1"])
 pipette.aspirate(100, reservoir["A1"])  # only occurs if liquid found
 ```
 
-You can also require liquid presence for all aspirations performed with a given pipette. See [liquid presence detection](../robot_position.md#liquid-presence-detection).
+You can also require liquid presence for all aspirations performed with a given pipette. See [Liquid Presence Detection][liquid-presence-detection].
 
 *New in version 2.20*
 
 ## Measure Liquids
 
-The [`InstrumentContext.measure_liquid_height`](https://docs.opentrons.com/v2/api/protocol_api.html#opentrons.protocol_api.InstrumentContext.measure_liquid_height) method tells a Flex pipette to measure the height of liquid relative to the bottom of a well. When `measure_liquid_height()` finds an empty well, it raises and error and pauses the protocol to let you resolve the problem.
+The [`InstrumentContext.measure_liquid_height()`][opentrons.protocol_api.InstrumentContext.measure_liquid_height] method tells a Flex pipette to measure the height of liquid relative to the bottom of a well. When `measure_liquid_height()` finds an empty well, it raises and error and pauses the protocol to let you resolve the problem.
 
 `measure_liquid_height()` is a standalone method that records the height of liquid in a well during a protocol. You can use the liquid height to aspirate or dispense from, or move to, the liquid meniscus, either immediately after or later in your protocol.
 
