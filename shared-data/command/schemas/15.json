@@ -4222,7 +4222,7 @@
           "type": "number"
         }
       },
-      "required": ["celsius", "holdSeconds", "rampRate"],
+      "required": ["celsius", "holdSeconds"],
       "title": "ProfileStep",
       "type": "object"
     },
@@ -4753,7 +4753,7 @@
           "type": "number"
         }
       },
-      "required": ["celsius", "holdSeconds", "rampRate"],
+      "required": ["celsius", "holdSeconds"],
       "title": "RunProfileStepParams",
       "type": "object"
     },
