@@ -110,14 +110,14 @@ export interface QuickTransferSummaryState {
     // this has been added
     speed: number
     delayDuration: number
-    positionFromTop: number
+    position: number
     positionReference: PositionReference
   }
   retractAspirate?: {
     // this has been added
     speed: number
     delayDuration: number
-    positionFromTop: number
+    position: number
     positionReference: PositionReference
   }
   delayAspirate?: {
@@ -136,14 +136,14 @@ export interface QuickTransferSummaryState {
     // this has been added
     speed: number
     delayDuration: number
-    positionFromTop: number
+    position: number
     positionReference: PositionReference
   }
   retractDispense?: {
     // this has been added
     speed: number
     delayDuration: number
-    positionFromTop: number
+    position: number
     positionReference: PositionReference
   }
   delayDispense?: {

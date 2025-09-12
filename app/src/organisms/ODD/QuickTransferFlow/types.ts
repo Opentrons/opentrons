@@ -74,13 +74,13 @@ export interface QuickTransferSummaryState {
   submergeAspirate?: {
     speed: number
     delayDuration: number
-    positionFromTop: number
+    position: number
     positionReference: PositionReference
   }
   retractAspirate?: {
     speed: number
     delayDuration: number
-    positionFromTop: number
+    position: number
     positionReference: PositionReference
   }
   delayAspirate?: {
@@ -97,13 +97,13 @@ export interface QuickTransferSummaryState {
   submergeDispense?: {
     speed: number
     delayDuration: number
-    positionFromTop: number
+    position: number
     positionReference: PositionReference
   }
   retractDispense?: {
     speed: number
     delayDuration: number
-    positionFromTop: number
+    position: number
     positionReference: PositionReference
   }
   delayDispense?: {
@@ -221,7 +221,7 @@ interface SetSubmergeAspirate {
   submergeSettings?: {
     speed: number
     delayDuration: number
-    positionFromTop: number
+    position: number
     positionReference: PositionReference
   }
 }
@@ -230,7 +230,7 @@ interface SetRetractAspirate {
   retractSettings?: {
     speed: number
     delayDuration: number
-    positionFromTop: number
+    position: number
     positionReference: PositionReference
   }
 }
@@ -269,7 +269,7 @@ interface SetSubmergeDispense {
   submergeSettings?: {
     speed: number
     delayDuration: number
-    positionFromTop: number
+    position: number
     positionReference: PositionReference
   }
 }
@@ -278,7 +278,7 @@ interface SetRetractDispense {
   retractSettings?: {
     speed: number
     delayDuration: number
-    positionFromTop: number
+    position: number
     positionReference: PositionReference
   }
 }

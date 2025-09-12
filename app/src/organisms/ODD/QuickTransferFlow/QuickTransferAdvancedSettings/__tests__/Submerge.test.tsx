@@ -83,7 +83,7 @@ describe('Submerge', () => {
     fireEvent.click(screen.getByRole('button', { name: '5' }))
     fireEvent.click(screen.getByText('Continue'))
     screen.getByText('Save')
-    screen.getByText('Distance from top of well (mm)')
+    screen.getByText('Distance from bottom of well (mm)')
     screen.getByText('Between 0 and 2 mm')
     fireEvent.click(screen.getByRole('button', { name: '2' }))
     fireEvent.click(screen.getByRole('button', { name: '2' }))
@@ -92,6 +92,12 @@ describe('Submerge', () => {
   })
 
   it('should call dispatch when clicking save button', () => {
+    props.state.submergeAspirate = {
+      speed: 0,
+      delayDuration: 0,
+      position: 0,
+      positionReference: 'well-top',
+    }
     render(props)
     fireEvent.click(screen.getByRole('button', { name: '1' }))
     fireEvent.click(screen.getByRole('button', { name: '1' }))
@@ -108,7 +114,7 @@ describe('Submerge', () => {
       submergeSettings: {
         speed: 11,
         delayDuration: 0.5,
-        positionFromTop: 22,
+        position: 22,
         positionReference: 'well-top',
       },
     })

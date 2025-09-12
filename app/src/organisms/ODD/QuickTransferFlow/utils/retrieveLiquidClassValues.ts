@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import {
   ETHANOL_LIQUID_CLASS_NAME,
   FLEX_ROBOT_TYPE,
@@ -176,7 +177,7 @@ const getNoLiquidClassValues = (
     submergeAspirate: {
       speed: aspirate.submerge.speed,
       positionReference: POSITION_REFERENCE_TOP,
-      positionFromTop: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+      position: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
       delayDuration: aspirate.submerge.delay.params?.duration ?? 0,
     },
     preWetTip: aspirate.preWet,
@@ -187,7 +188,7 @@ const getNoLiquidClassValues = (
     retractAspirate: {
       speed: aspirate.retract.speed ?? 0,
       positionReference: POSITION_REFERENCE_TOP,
-      positionFromTop: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+      position: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
       delayDuration: aspirate.retract.delay.params?.duration ?? 0,
     },
     touchTipAspirate: !aspirate.retract.touchTip.enable
@@ -202,7 +203,7 @@ const getNoLiquidClassValues = (
     tipPositionDispense: DEFAULT_MM_OFFSET_FROM_BOTTOM,
     submergeDispense: {
       speed: dispense.submerge.speed,
-      positionFromTop: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+      position: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
       positionReference: POSITION_REFERENCE_TOP,
       delayDuration: dispense.submerge.delay.params?.duration ?? 0,
     },
@@ -215,7 +216,7 @@ const getNoLiquidClassValues = (
     },
     retractDispense: {
       speed: dispense.retract.speed,
-      positionFromTop: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+      position: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
       positionReference: POSITION_REFERENCE_TOP,
       delayDuration: dispense.retract.delay.params?.duration ?? 0,
     },
@@ -380,12 +381,9 @@ const getLiquidClassValues = (
     tipPositionAspirate: aspirate?.aspiratePosition.offset.z ?? 0,
     submergeAspirate: {
       speed: aspirate?.submerge.speed ?? 0,
-      positionFromTop:
-        aspirate?.submerge.startPosition.offset.z ??
-        SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
-      positionReference:
-        aspirate?.submerge.startPosition.positionReference ??
-        POSITION_REFERENCE_TOP,
+      position: aspirate?.submerge.startPosition.offset.z ?? 0,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      positionReference: aspirate?.submerge.startPosition.positionReference!,
       delayDuration: aspirate?.submerge.delay.params?.duration ?? 0,
     },
     preWetTip: preWet ?? false,
@@ -404,12 +402,9 @@ const getLiquidClassValues = (
           },
     retractAspirate: {
       speed: aspirate?.retract.speed ?? 0,
-      positionReference:
-        aspirate?.retract.endPosition.positionReference ??
-        POSITION_REFERENCE_TOP,
-      positionFromTop:
-        aspirate?.retract.endPosition.offset.z ??
-        SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+      position: aspirate?.retract.endPosition.offset.z ?? 0,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      positionReference: aspirate?.retract.endPosition.positionReference!,
       delayDuration: aspirate?.retract.delay.params?.duration ?? 0,
     },
     touchTipAspirate:
@@ -429,13 +424,9 @@ const getLiquidClassValues = (
     tipPositionDispense: dispense?.dispensePosition.offset.z ?? 0,
     submergeDispense: {
       speed: dispense?.submerge.speed ?? 0,
-      // Convert from well-top reference to well-bottom reference
-      positionFromTop:
-        dispense?.submerge.startPosition.offset.z ??
-        SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
-      positionReference:
-        dispense?.submerge.startPosition.positionReference ??
-        POSITION_REFERENCE_TOP,
+      position: dispense?.submerge.startPosition.offset.z ?? 0,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      positionReference: dispense?.submerge.startPosition.positionReference!,
       delayDuration: dispense?.submerge.delay.params?.duration ?? 0,
     },
     delayDispense:
@@ -460,12 +451,9 @@ const getLiquidClassValues = (
     },
     retractDispense: {
       speed: dispense?.retract.speed ?? 0,
-      positionFromTop:
-        dispense?.retract.endPosition.offset.z ??
-        SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
-      positionReference:
-        dispense?.retract.endPosition.positionReference ??
-        POSITION_REFERENCE_TOP,
+      position: dispense?.retract.endPosition.offset.z ?? 0,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      positionReference: dispense?.retract.endPosition.positionReference!,
       delayDuration: dispense?.retract.delay.params?.duration ?? 0,
     },
     blowOutDispense:

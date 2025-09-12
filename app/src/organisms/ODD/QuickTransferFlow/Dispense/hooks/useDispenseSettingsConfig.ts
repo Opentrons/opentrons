@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
 import {
+  POSITION_REFERENCE_TOP,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
@@ -90,7 +91,12 @@ export function useDispenseSettingsConfig({
           ? t('submerge_value', {
               speed: state.submergeDispense.speed,
               delayDuration: state.submergeDispense.delayDuration,
-              position: state.submergeDispense.positionFromTop,
+              position: state.submergeDispense.position,
+              positionReference:
+                state.submergeDispense.positionReference ===
+                POSITION_REFERENCE_TOP
+                  ? t('top')
+                  : t('bottom'),
             })
           : t('option_disabled'),
       enabled: true,
@@ -156,7 +162,12 @@ export function useDispenseSettingsConfig({
           ? t('retract_value', {
               speed: state.retractDispense.speed,
               delayDuration: state.retractDispense.delayDuration,
-              position: state.retractDispense.positionFromTop,
+              position: state.retractDispense.position,
+              positionReference:
+                state.retractDispense.positionReference ===
+                POSITION_REFERENCE_TOP
+                  ? t('top')
+                  : t('bottom'),
             })
           : t('option_disabled'),
       enabled: true,

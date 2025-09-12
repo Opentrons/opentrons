@@ -89,7 +89,7 @@ describe('Retract', () => {
     fireEvent.click(screen.getByRole('button', { name: '.' }))
     fireEvent.click(screen.getByRole('button', { name: '6' }))
     fireEvent.click(screen.getByText('Continue'))
-    screen.getByText('Distance from top of well (mm)')
+    screen.getByText('Distance from bottom of well (mm)')
     screen.getByText('Between 0 and 2 mm')
     fireEvent.click(screen.getByRole('button', { name: '2' }))
     fireEvent.click(screen.getByRole('button', { name: '2' }))
@@ -98,6 +98,12 @@ describe('Retract', () => {
     screen.getByText('Save')
   })
   it('calls dispatch with correct action and settings when save is clicked', () => {
+    props.state.retractAspirate = {
+      speed: 0,
+      delayDuration: 0,
+      position: 0,
+      positionReference: 'well-bottom',
+    }
     render(props)
     fireEvent.click(screen.getByRole('button', { name: '1' }))
     fireEvent.click(screen.getByRole('button', { name: '1' }))
@@ -114,8 +120,8 @@ describe('Retract', () => {
       retractSettings: {
         speed: 11,
         delayDuration: 0.5,
-        positionFromTop: 22,
-        positionReference: 'well-top',
+        position: 22,
+        positionReference: 'well-bottom',
       },
     })
   })
