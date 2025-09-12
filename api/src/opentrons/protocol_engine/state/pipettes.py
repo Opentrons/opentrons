@@ -212,7 +212,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                         # we identify tip classes - looking things up by volume is not enough.
                         tip_configuration = list(
                             static_config.tip_configuration_lookup_table.values()
-                        )[0]
+                        )[-1]
                     self._state.flow_rates_by_id[pipette_id] = FlowRates(
                         default_blow_out=tip_configuration.default_blowout_flowrate.values_by_api_level,
                         default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
@@ -230,7 +230,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                     # TODO(seth,9/11/2023): bad way to do defaulting, see above.
                     tip_configuration = list(
                         static_config.tip_configuration_lookup_table.values()
-                    )[0]
+                    )[-1]
                     self._state.flow_rates_by_id[pipette_id] = FlowRates(
                         default_blow_out=tip_configuration.default_blowout_flowrate.values_by_api_level,
                         default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
