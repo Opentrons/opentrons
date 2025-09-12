@@ -1,12 +1,13 @@
 import asyncio
 import os
 from pathlib import Path
-
+import logging
 from opentrons.config import ARCHITECTURE, SystemArchitecture
 from opentrons_shared_data.errors.exceptions import CommunicationError
 from opentrons_shared_data.errors.codes import ErrorCodes
 
 
+log = logging.getLogger(__name__)
 STREAM_CONF_FILE = "opentrons-live-stream.conf"
 
 
@@ -60,3 +61,20 @@ def get_stream_configuration_filepath() -> Path:
         return Path(f"/var/lib/opentrons-live-stream/{STREAM_CONF_FILE}")
     else:
         return Path(f"{STREAM_CONF_FILE}")
+
+
+async def restart_live_stream() -> None:
+    """Attempt to restart the Opentrons Live Stream service."""
+    command = ["systemctl", "restart", "opentrons-live-stream"]
+    subprocess = await asyncio.create_subprocess_exec(
+        *command,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    stdout, stderr = await subprocess.communicate()
+    if subprocess.returncode == 0:
+        log.info("Restarted opentrons-live-stream service.")
+    else:
+        log.info(
+            f"Failed to restart opentrons-live-stream, returncode:{ subprocess.returncode}, stdout: {stdout.decode()}, stderr: {stderr.decode()}"
+        )

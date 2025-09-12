@@ -2,7 +2,6 @@ import logging
 import os
 import io
 import tempfile
-import asyncio
 from typing import Annotated
 from pathlib import Path
 from fastapi import APIRouter, HTTPException, Depends
@@ -54,7 +53,7 @@ async def post_camera(
         stream_settings = _get_stream_settings()
         stream_settings.source = "NONE"
         _write_stream_settings(stream_settings)
-        _restart_live_stream(settings=stream_settings)
+        await camera.restart_live_stream()
 
     return CameraEnable(enabled=request_body.data.enabled)
 
@@ -98,19 +97,24 @@ async def post_picture_capture(
         "enableCamera", robot_type
     )
     if camera_enabled:
-        await camera.take_picture(filename)
-        log.info(f"Image taken at {filename}")
-        # Open the file. It will be closed and deleted when the response is
-        # finished.
-        fd = filename.open("rb")
-        return StreamingResponse(
-            fd,
-            media_type=JPG,
-            background=BackgroundTask(func=_cleanup, filename=filename, fd=fd),
-        )
+        try:
+            await camera.take_picture(filename)
+            log.info(f"Image taken at {filename}")
+            # Open the file. It will be closed and deleted when the response is
+            # finished.
+            fd = filename.open("rb")
+            return StreamingResponse(
+                fd,
+                media_type=JPG,
+                background=BackgroundTask(func=_cleanup, filename=filename, fd=fd),
+            )
+        except camera.CameraException as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+            )
     else:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=str("Cannot take photo, camera is disabled."),
         )
 
@@ -159,15 +163,14 @@ async def post_live_stream(
     if camera_enabled:
         if request_body.data.enabled:
             # todo(chb, 2025-09-08): In order to restart the stream service, validate that a protocol run is active first.
-            settings = _get_stream_settings()
-            await _restart_live_stream(settings)
+            await camera.restart_live_stream()
         else:
             # Shut off the live stream service
             stream_settings = _get_stream_settings()
             stream_settings.source = "NONE"
             _write_stream_settings(stream_settings)
 
-            _restart_live_stream(settings=stream_settings)
+            await camera.restart_live_stream()
 
     return LiveStreamData(
         enabled=request_body.data.enabled,
@@ -291,7 +294,7 @@ async def post_live_stream_settings(
     if camera_enabled and live_stream_enabled:
         # todo(chb, 2025-09-08): In order to restart the stream service, validate that a protocol run is active first.
 
-        await _restart_live_stream(updated_settings)
+        await camera.restart_live_stream()
 
     return updated_settings
 
@@ -357,20 +360,3 @@ def _write_stream_settings(settings: LiveStreamSettings) -> None:
             f"BITRATE={settings.bitrate}\n",
         ]
         fd.writelines(file_lines)
-
-
-async def _restart_live_stream(settings: LiveStreamSettings) -> None:
-    # attempt to restart the live stream
-    command = ["systemctl", "restart", "opentrons-live-stream"]
-    subprocess = await asyncio.create_subprocess_exec(
-        *command,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-    stdout, stderr = await subprocess.communicate()
-    if subprocess.returncode == 0:
-        log.info(f"Restarted opentrons-live-stream with settings: {settings}")
-    else:
-        log.info(
-            f"Failed to restart opentrons-live-stream, returncode:{ subprocess.returncode}, stdout: {stdout.decode()}, stderr: {stderr.decode()}"
-        )
