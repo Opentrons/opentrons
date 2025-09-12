@@ -25,11 +25,12 @@ In a `transfer()`, aspiration and dispensing are the only required actions. You 
 9. Blow out
 10. Drop tip
 
-In a `transfer_with_liquid_class()`, your chosen liquid class definition specifies nearly all transfer behavior your Flex pipette will perform, like position information. For more information, see [liquid class definitions](../liquid_classes/liquid-class-definitions.md).
+In a `transfer_with_liquid_class()`, your chosen liquid class definition specifies nearly all transfer behavior your Flex pipette will perform, like position information. For more information, see [Liquid Class Definitions](../liquid-class-definitions.md).
 
 A liquid class definition with every action enabled would proceed in this order:
 
 To **aspirate:**
+
 1. Pick up tip
 2. Submerge into the source well to the aspirate position
 3. Delay for an amount of time
@@ -42,6 +43,7 @@ To **aspirate:**
 10. Add an air gap
 
 To **dispense:**
+
 11. Move to and submerge into the destination well to the dispense position
 12. Delay for an amount of time
 13. Dispense into the destination well
@@ -53,6 +55,11 @@ To **dispense:**
 19. Blow out at the specified location
 20. Touch tip at the blow out location
 21. Drop tip
+
+!!! note
+    If you specify a blowout at a location other than the destination well, the pipette will touch the tip at the destination well and add an air gap before continuing to the blowout location.
+
+    In addition, the pipette will always touch the tip after a blowout.
 
 Each command may repeat some or all of these steps in order to move liquid as requested. [`transfer()`][opentrons.protocol_api.InstrumentContext.transfer] repeats as many times as there are wells in the longer of its `source` or `dest` arguments. Both legacy and liquid class distribute and consolidate methods try to repeat as few times as possible. See [Tip Refilling](#tip-refilling) below for how they behave when they do need to repeat.
 
@@ -108,7 +115,7 @@ Dropping tip into A1 of Opentrons Fixed Trash on 12
 
 Since dispensing and touching the tip are both associated with the destination wells, those steps are performed at each of the two destination wells.
 
-If you use `distribute_with_liquid_class()` to perform the same transfer, the liquid class definition automatically determines transfer behaviors like touch tip and blow out. For more information on automatic changes to transfer steps, see the [liquid class definitions](../liquid_classes/liquid-class-definitions.md).
+If you use `distribute_with_liquid_class()` to perform the same transfer, the liquid class definition automatically determines transfer behaviors like touch tip and blow out. For more information on automatic changes to transfer steps, see the [liquid class definitions](../liquid-class-definitions.md).
 
 ## Tip Refilling
 
@@ -194,8 +201,9 @@ Dropping tip into A1 of Opentrons Fixed Trash on 12
 
 This is such a simple example that you might prefer to use two `transfer()` commands instead. Lists of volumes become more useful when they are longer than a couple elements. For example, you can specify `volume` as a list with 96 items and `dest=plate.wells()` to individually control amounts to dispense (and wells to skip) across an entire plate.
 
-*New in version 2.0*: Skip wells for `transfer()` and `distribute()`.
-*New in version 2.8*: Skip wells for `consolidate()`.
-
 !!! note
     When the optional `new_tip` parameter is set to `"always"`, the pipette will pick up and drop a tip even for skipped wells. If you don't want to waste tips, pre-process your list of sources or destinations and use the result as the argument of your complex command.
+
+*New in version 2.0*: Skip wells for `transfer()` and `distribute()`.
+
+*New in version 2.8*: Skip wells for `consolidate()`.
