@@ -241,7 +241,7 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
       numAspirateWells: state.sourceWells.length,
       numDispenseWells: state.destinationWells.length,
       aspirateAirGapByVolume:
-        (retract?.airGapByVolume as Array<[number, number]>) ?? [],
+        (retract?.airGapByVolume as Array<[number, number]>) ?? null,
       conditioningByVolume:
         (correctionByVolume as Array<[number, number]>) ?? null,
       disposalByVolume: null, // note always null because blowout is available only for single dispense
