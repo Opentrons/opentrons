@@ -1000,9 +1000,6 @@ export const transfer: CommandCreator<TransferArgs> = (
                   ...(considerRetractSafety
                     ? preDispenseAirGapMoveToCommand
                     : []),
-                  curryWithoutPython(prepareToAspirate, {
-                    pipetteId: pipette,
-                  }),
                   curryWithoutPython(airGapInPlace, {
                     pipetteId: pipette,
                     volume: dispenseAirGapVol,

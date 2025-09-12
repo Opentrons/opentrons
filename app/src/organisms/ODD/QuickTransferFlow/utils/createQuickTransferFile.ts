@@ -154,6 +154,7 @@ export function createQuickTransferFile(
     robotStateTimeline.timeline,
     timelineFrame => timelineFrame.commands
   )
+  console.log('nonLoadCommands', nonLoadCommands)
   const commands: CreateCommand[] = [
     loadPipetteCommand,
     ...loadAdapterCommands,

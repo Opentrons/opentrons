@@ -220,13 +220,6 @@ const getNoLiquidClassValues = (
       positionFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
       delayDuration: dispense.retract.delay.params?.duration ?? 0,
     },
-    blowOutDispense: {
-      location: convertBlowoutLocation(
-        dispense.retract.blowout?.params?.location,
-        state
-      ),
-      flowRate: dispense.retract.blowout?.params?.flowRate ?? 0,
-    },
     touchTipDispense: !dispense.retract.touchTip.enable
       ? undefined
       : dispense.retract.touchTip.params?.zOffset,

@@ -584,13 +584,6 @@ export const blowoutInTrashCommands = (args: {
     ...(dispenseAirGap > 0
       ? [
           {
-            commandType: 'prepareToAspirate',
-            key: expect.any(String),
-            params: {
-              pipetteId: 'p300SingleId',
-            },
-          },
-          {
             commandType: 'airGapInPlace',
             key: expect.any(String),
             params: {
@@ -857,13 +850,6 @@ export const dispenseHelperLiquidClass = (params: {
               wellLocation: isRetractSafeForAirGap
                 ? retractLocation
                 : SAFE_MOVE_TO_WELL_LOCATION,
-            },
-          },
-          {
-            commandType: 'prepareToAspirate',
-            key: expect.any(String),
-            params: {
-              pipetteId: 'p300SingleId',
             },
           },
           {

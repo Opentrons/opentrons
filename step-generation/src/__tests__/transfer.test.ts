@@ -6346,13 +6346,6 @@ mock_pipette.transfer_with_liquid_class(
           },
         },
         {
-          commandType: 'prepareToAspirate',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-          },
-        },
-        {
           commandType: 'airGapInPlace',
           key: expect.any(String),
           params: {
@@ -6527,13 +6520,6 @@ mock_pipette.transfer_with_liquid_class(
             wellLocation: {
               origin: 'top',
             },
-          },
-        },
-        {
-          commandType: 'prepareToAspirate',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
           },
         },
         {
