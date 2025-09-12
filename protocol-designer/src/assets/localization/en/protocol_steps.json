@@ -112,9 +112,12 @@
   "of": "of",
   "off_deck": "Off-Deck",
   "pause": {
-    "untilResume": "Pausing until manually told to resume",
-    "untilTemperature": "<text>Pausing until</text><semiBoldText>{{module}}</semiBoldText><text>reaches</text><tag/>",
-    "untilTime": "<text>Pausing for</text><tag/>"
+    "pausingUntilResume": "Pausing until manually told to resume",
+    "pausingUntilTemperature": "<text>Pausing until</text><semiBoldText>{{module}}</semiBoldText><text>reaches</text><tag/>",
+    "pausingForDuration": "<text>Pausing for</text><tag/>",
+    "untilResume": "Until told to resume",
+    "untilTemperature": "Until {{temperature}} °C reached",
+    "forDuration": "For {{duration}}"
   },
   "pipette": "Pipette",
   "pipette_path": "Pipette path",
