@@ -33,7 +33,7 @@ nav:
       - Utilities: building-block-commands/utilities.md
   - Complex Commands:
       - Overview: complex-commands/index.md
-      - Sources & Destinations: complex-commands/sources-destinations.md
+      - Sources and Destinations: complex-commands/sources-destinations.md
       - Order of Operations: complex-commands/order-operations.md
       - Parameters: complex-commands/parameters.md
   - Robot Position: robot-position.md

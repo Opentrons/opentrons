@@ -6,7 +6,7 @@ description: How the Opentrons Python API moves liquids between wells when using
 
 The legacy and liquid class transfer methods form the family of complex liquid handling commands. These methods require `source` and `dest` (destination) arguments to move liquid from one well, or group of wells, to another. In contrast, the [building block commands](../building-block-commands/liquids.md) `aspirate` and `dispense` only operate in a single location.
 
-This example uses `transfer` to perform a transfer between two wells on a plate:
+This example uses [`InstrumentContext.transfer()`][opentrons.protocol_api.InstrumentContext.transfer] to perform a transfer between two wells on a plate:
 
 ```python
 pipette.transfer(
@@ -18,7 +18,7 @@ pipette.transfer(
 
 *New in version 2.0*
 
-You could also use `transfer_with_liquid_class` to perform the transfer:
+You could also use [`InstrumentContext.transfer_with_liquid_class()`][opentrons.protocol_api.InstrumentContext.transfer_with_liquid_class] to perform the transfer:
 
 ```python
 liquid_1 = protocol.define_liquid_class("glycerol_50")
@@ -42,7 +42,7 @@ Each complex liquid handling command requires `source` and `dest` (destination) 
 
 `transfer` is the most versatile complex liquid handling function, because it has the fewest restrictions on what wells it can operate on. You will likely use transfer commands in many of your protocols.
 
-Certain liquid handling cases focus on moving liquid to or from a single well. `distribute` and `distribute_with_liquid_class` limit their sources to a single well, while `consolidate` and `consolidate_with_liquid_class` limit their destinations to a single well. The `distribute()` method and all liquid class complex commands also make changes to liquid-handling behavior to improve accuracy.
+Certain liquid handling cases focus on moving liquid to or from a single well. [`distribute()`][opentrons.protocol_api.InstrumentContext.distribute] and [`distribute_with_liquid_class()`][opentrons.protocol_api.InstrumentContext.distribute_with_liquid_class] limit their sources to a single well, while [`consolidate()`][opentrons.protocol_api.InstrumentContext.consolidate] and [`consolidate_with_liquid_class()`][opentrons.protocol_api.InstrumentContext.consolidate_with_liquid_class] limit their destinations to a single well. The `distribute()` method and all liquid class complex commands also make changes to liquid-handling behavior to improve accuracy.
 
 The following table summarizes the source and destination restrictions for each method:
 
@@ -55,7 +55,7 @@ The following table summarizes the source and destination restrictions for each 
 
 A single well can be passed by itself or as a list with one item: `source=plate["A1"]` and `source=[plate["A1"]]` are equivalent.
 
-The section on [many-to-many transfers](#many-to-many) below covers how `transfer()` works when specifying sources and destinations of different sizes. However, if they don't meet the even divisibility requirement, the API will raise an error. You can work around such situations by making multiple calls to `transfer()` in sequence or by using a [list of volumes](order_operations.md#list-of-volumes) to skip certain wells.
+The section on [many-to-many transfers](#many-to-many) below covers how `transfer()` works when specifying sources and destinations of different sizes. However, if they don't meet the even divisibility requirement, the API will raise an error. You can work around such situations by making multiple calls to `transfer()` in sequence or by using a [list of volumes][list-of-volumes] to skip certain wells.
 
 For a `distribute()` or `consolidate()`, the API will not raise an error if you use a list of wells as the argument that is limited to exactly one well. Instead, the API will ignore everything except the first well in the list. For example, the following command will only aspirate from well A1:
 
@@ -83,9 +83,10 @@ Each complex command uses a different pattern of aspiration and dispensing. In a
 4. Repeat the pattern of aspirating and dispensing, as needed.
 5. Drop the tip in the trash.
 
+<figure markdown>
 ![Transfer](../../img/complex_commands/transfer.png)
-
-This transfer aspirates six times and dispenses six times.
+<figcaption>This transfer aspirates six times and dispenses six times.</figcaption>
+</figure>
 
 `distribute` and `distribute_with_liquid_class` always fill the tip with as few aspirations as possible, and then dispense to the destination wells in order. Their overall pattern is:
 
@@ -95,11 +96,12 @@ This transfer aspirates six times and dispenses six times.
 4. Continue to dispense in destination wells.
 5. Drop the tip in the trash.
 
-See [Tip Refilling](order_operations.md#tip-refilling) below for cases where the total amount to be dispensed is greater than the capacity of the tip.
+See [Tip Refilling][tip-refilling] below for cases where the total amount to be dispensed is greater than the capacity of the tip.
 
+<figure markdown>
 ![Distribute](../../img/complex_commands/robot_distribute.png)
-
-This distribute aspirates one time and dispenses three times.
+<figcaption>This distribute aspirates one time and dispenses three times.</figcaption>
+</figure>
 
 `consolidate` and `consolidate_with_liquid_class` aspirate multiple times in a row, and then dispense as few times as possible in the destination well. Their overall pattern is:
 
@@ -109,13 +111,14 @@ This distribute aspirates one time and dispenses three times.
 4. Dispense in the destination well.
 5. Drop the tip in the trash.
 
-See [Tip Refilling](order_operations.md#tip-refilling) below for cases where the total amount to be aspirated is greater than the capacity of the tip.
+See [Tip Refilling][tip-refilling] below for cases where the total amount to be aspirated is greater than the capacity of the tip.
 
+<figure markdown>
 ![Consolidate](../../img/complex_commands/robot_consolidate.png)
+<figcaption>This consolidate aspirates three times and dispenses one time.</figcaption>
+</figure>
 
-This consolidate aspirates three times and dispenses one time.
-
-In addition, all liquid class commands automatically include changes like flow rate, adding an air gap, or delaying based on the liquid class definition. For more information, see [liquid classes](../liquid_classes/liquid-class-definitions.md).
+In addition, all liquid class commands automatically include changes like flow rate, adding an air gap, or delaying based on the liquid class definition. For more information, see [Liquid Classes](../liquid-classes.md).
 
 !!! note
     By default, all complex commands begin by picking up a tip and conclude by dropping a tip. In general, don't call `pick_up_tip` just before a complex command, or the API will raise an error. You can override this behavior with the [tip handling complex parameter](parameters.md#tip-handling), by setting `new_tip="never"`. For liquid class commands, you can also override whether the pipette drops the last tip used in the command by setting `keep_last_tip` to `True` or `False`.
@@ -136,20 +139,38 @@ pipette.transfer_with_liquid_class(
 )
 ```
 
-| Source | Destination |
-|--------|-------------|
-| A1     | B1          |
-| A2     | B2          |
-| A3     | B3          |
-| A4     | B4          |
-| A5     | B5          |
-| A6     | B6          |
-| A7     | B7          |
-| A8     | B8          |
-| A9     | B9          |
-| A10    | B10         |
-| A11    | B11         |
-| A12    | B12         |
+<table>
+    <tr>
+        <th>Source</th>
+        <td>A1</td>
+        <td>A2</td>
+        <td>A3</td>
+        <td>A4</td>
+        <td>A5</td>
+        <td>A6</td>
+        <td>A7</td>
+        <td>A8</td>
+        <td>A9</td>
+        <td>A10</td>
+        <td>A11</td>
+        <td>A12</td>
+    </tr>
+    <tr>
+        <th>Destination</th>
+        <td>B1</td>
+        <td>B2</td>
+        <td>B3</td>
+        <td>B4</td>
+        <td>B5</td>
+        <td>B6</td>
+        <td>B7</td>
+        <td>B8</td>
+        <td>B9</td>
+        <td>B10</td>
+        <td>B11</td>
+        <td>B12</td>
+    </tr>
+</table>
 
 In a `transfer()` or `transfer_with_liquid_class()`, there's no requirement that the source and destination lists be mutually exclusive. In fact, this command deliberately uses slices of the same list, saved to the variable `row`, with the effect that each aspiration happens in the same location as the previous dispense:
 
@@ -162,19 +183,36 @@ pipette.transfer(
 )
 ```
 
-| Source | Destination |
-|--------|-------------|
-| A1     | A2          |
-| A2     | A3          |
-| A3     | A4          |
-| A4     | A5          |
-| A5     | A6          |
-| A6     | A7          |
-| A7     | A8          |
-| A8     | A9          |
-| A9     | A10         |
-| A10    | A11         |
-| A11    | A12         |
+<table>
+    <tr>
+        <th>Source</th>
+        <td>A1</td>
+        <td>A2</td>
+        <td>A3</td>
+        <td>A4</td>
+        <td>A5</td>
+        <td>A6</td>
+        <td>A7</td>
+        <td>A8</td>
+        <td>A9</td>
+        <td>A10</td>
+        <td>A11</td>
+    </tr>
+    <tr>
+        <th>Destination</th>
+        <td>A2</td>
+        <td>A3</td>
+        <td>A4</td>
+        <td>A5</td>
+        <td>A6</td>
+        <td>A7</td>
+        <td>A8</td>
+        <td>A9</td>
+        <td>A10</td>
+        <td>A11</td>
+        <td>A12</td>
+    </tr>
+</table>
 
 For a `transfer()`, you can specify different numbers of source and destination wells. In this case, `transfer()` will always aspirate and dispense as many times as there are wells in the *longer* list. The shorter list will be "stretched" to cover the length of the longer list. Here is an example of transferring from 3 wells to a full row of 12 wells:
 
@@ -186,20 +224,38 @@ pipette.transfer(
 )
 ```
 
-| Source | Destination |
-|--------|-------------|
-| A1     | B1          |
-| A1     | B2          |
-| A1     | B3          |
-| A1     | B4          |
-| A2     | B5          |
-| A2     | B6          |
-| A2     | B7          |
-| A2     | B8          |
-| A3     | B9          |
-| A3     | B10         |
-| A3     | B11         |
-| A3     | B12         |
+<table>
+    <tr>
+        <th>Source</th>
+        <td>A1</td>
+        <td>A1</td>
+        <td>A1</td>
+        <td>A1</td>
+        <td>A2</td>
+        <td>A2</td>
+        <td>A2</td>
+        <td>A2</td>
+        <td>A3</td>
+        <td>A3</td>
+        <td>A3</td>
+        <td>A3</td>
+    </tr>
+    <tr>
+        <th>Destination</th>
+        <td>B1</td>
+        <td>B2</td>
+        <td>B3</td>
+        <td>B4</td>
+        <td>B5</td>
+        <td>B6</td>
+        <td>B7</td>
+        <td>B8</td>
+        <td>B9</td>
+        <td>B10</td>
+        <td>B11</td>
+        <td>B12</td>
+    </tr>
+</table>
 
 This is why the longer list must be evenly divisible by the shorter list. Changing the destination in this example to a column instead of a row will cause the API to raise an error, because 8 is not evenly divisible by 3:
 
@@ -220,7 +276,7 @@ pipette.transfer(50, plate["A2"], plate.columns()[3][3:6])
 pipette.transfer(50, plate["A3"], plate.columns()[3][6:])
 ```
 
-Finally, be aware of the ordering of source and destination lists when constructing them with [well accessor methods](../building-block-commands/liquids.md#well-accessor-methods). For example, at first glance this code may appear to take liquid from each well in the first row of a plate and move it to each of the other wells in the same column:
+Finally, be aware of the ordering of source and destination lists when constructing them with [well accessor methods][accessor-methods]. For example, at first glance this code may appear to take liquid from each well in the first row of a plate and move it to each of the other wells in the same column:
 
 ```python
 pipette.transfer(
@@ -242,6 +298,7 @@ for i in range(12):
 ```
 
 Here the repeat index `i` picks out:
+
 - The individual well in the first row, for the source.
 - The corresponding column, which is sliced to form the destination.
 
@@ -271,4 +328,4 @@ pipette.distribute_with_liquid_class(
 )
 ```
 
-This will produce *just 1* aspirate step and 12 dispense steps (when using a 1000 µL pipette). The pipette will aspirate enough liquid to fill all the wells, plus a disposal volume. Then it will move to A1 of the plate, dispense, move the short distance to A2, dispense, and so on. This greatly reduces gantry movement and the time to perform this action. And even if you're using a smaller pipette, `distribute()` or `distribute_with_liquid_class()` will fill the pipette, dispense as many times as possible, and only then return to the reservoir to refill (see [Tip Refilling](order_operations.md#tip-refilling) for more information).
+This will produce *just 1* aspirate step and 12 dispense steps (when using a 1000 µL pipette). The pipette will aspirate enough liquid to fill all the wells, plus a disposal volume. Then it will move to A1 of the plate, dispense, move the short distance to A2, dispense, and so on. This greatly reduces gantry movement and the time to perform this action. And even if you're using a smaller pipette, `distribute()` or `distribute_with_liquid_class()` will fill the pipette, dispense as many times as possible, and only then return to the reservoir to refill (see [Tip Refilling][tip-refilling] for more information).
