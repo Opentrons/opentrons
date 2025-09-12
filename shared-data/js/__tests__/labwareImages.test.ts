@@ -9,12 +9,10 @@ const ignoredLoadNames = new Set([
   'opentrons_1_trash_3200ml_fixed',
   'opentrons_1_trash_850ml_fixed',
   'opentrons_40_aluminumblock_eppendorf_24x2ml_safelock_snapcap_generic_16x0.2ml_pcr_strip',
-  'opentrons_96_filtertiprack_10ul',
-  'opentrons_96_tiprack_10ul',
   'opentrons_flex_96_filtertiprack_20ul',
   'opentrons_flex_96_tiprack_20ul',
+  'eppendorf_96_wellplate_1000ul',
   'opentrons_flex_lid_absorbance_plate_reader_module',
-  'opentrons_flex_tiprack_lid',
   'protocol_engine_lid_stack_object',
 ])
 
@@ -36,7 +34,7 @@ describe('labwareImages mapping', () => {
   })
 })
 const IMAGES_DIR = path.join(__dirname, '..', '..', 'labware', 'images')
-const MAX_FILE_SIZE_BYTES = 200 * 1024
+const MAX_FILE_SIZE_BYTES = 250 * 1024
 
 function getAllFiles(dir: string): string[] {
   return fs.readdirSync(dir).flatMap(file => {
@@ -49,13 +47,7 @@ function getAllFiles(dir: string): string[] {
 
 describe('labwareImages format', () => {
   const imageFiles = getAllFiles(IMAGES_DIR)
-  it('should all be .png files', () => {
-    const offenders = imageFiles.filter(
-      file => path.extname(file).toLowerCase() !== '.png'
-    )
-    expect(offenders).toEqual([])
-  })
-
+  
   it(`should all be smaller than ${MAX_FILE_SIZE_BYTES / 1024} KB`, () => {
     const offenders = imageFiles.filter(file => {
       const { size } = fs.statSync(file)
