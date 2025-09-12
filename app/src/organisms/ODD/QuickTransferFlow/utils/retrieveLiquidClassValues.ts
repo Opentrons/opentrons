@@ -380,7 +380,9 @@ const getLiquidClassValues = (
     tipPositionAspirate: aspirate?.aspiratePosition.offset.z ?? 0,
     submergeAspirate: {
       speed: aspirate?.submerge.speed ?? 0,
-      positionFromTop: aspirate?.submerge.startPosition.offset.z,
+      positionFromTop:
+        aspirate?.submerge.startPosition.offset.z ??
+        SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
       positionReference:
         aspirate?.submerge.startPosition.positionReference ??
         POSITION_REFERENCE_TOP,
@@ -405,7 +407,9 @@ const getLiquidClassValues = (
       positionReference:
         aspirate?.retract.endPosition.positionReference ??
         POSITION_REFERENCE_TOP,
-      positionFromTop: aspirate?.retract.endPosition.offset.z,
+      positionFromTop:
+        aspirate?.retract.endPosition.offset.z ??
+        SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
       delayDuration: aspirate?.retract.delay.params?.duration ?? 0,
     },
     touchTipAspirate:
@@ -426,7 +430,9 @@ const getLiquidClassValues = (
     submergeDispense: {
       speed: dispense?.submerge.speed ?? 0,
       // Convert from well-top reference to well-bottom reference
-      positionFromTop: dispense?.submerge.startPosition.offset.z,
+      positionFromTop:
+        dispense?.submerge.startPosition.offset.z ??
+        SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
       positionReference:
         dispense?.submerge.startPosition.positionReference ??
         POSITION_REFERENCE_TOP,
@@ -454,7 +460,9 @@ const getLiquidClassValues = (
     },
     retractDispense: {
       speed: dispense?.retract.speed ?? 0,
-      positionFromTop: dispense?.retract.endPosition.offset.z,
+      positionFromTop:
+        dispense?.retract.endPosition.offset.z ??
+        SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
       positionReference:
         dispense?.retract.endPosition.positionReference ??
         POSITION_REFERENCE_TOP,

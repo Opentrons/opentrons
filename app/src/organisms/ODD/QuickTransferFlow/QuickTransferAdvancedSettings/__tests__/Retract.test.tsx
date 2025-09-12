@@ -89,7 +89,7 @@ describe('Retract', () => {
     fireEvent.click(screen.getByRole('button', { name: '.' }))
     fireEvent.click(screen.getByRole('button', { name: '6' }))
     fireEvent.click(screen.getByText('Continue'))
-    screen.getByText('Distance from bottom of well (mm)')
+    screen.getByText('Distance from top of well (mm)')
     screen.getByText('Between 0 and 2 mm')
     fireEvent.click(screen.getByRole('button', { name: '2' }))
     fireEvent.click(screen.getByRole('button', { name: '2' }))
