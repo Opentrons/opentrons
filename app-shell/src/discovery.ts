@@ -47,16 +47,122 @@ interface DiscoveryStore {
   services?: LegacyService[]
 }
 
-let config: ConfigV1['discovery']
-let store: Store<DiscoveryStore>
-let client: DiscoveryClient
-let isClientInitialized = false
-const dispatchers = new Set<Dispatch>()
+interface DiscoveryState {
+  config: ConfigV1['discovery']
+  store: Store<DiscoveryStore>
+  client: DiscoveryClient
+  dispatchers: Set<Dispatch>
+  primaryDispatcher: Dispatch | null
+}
 
-const makeManualAddresses = (addrs: string | string[]): Address[] => {
-  return ['fd00:0:cafe:fefe::1']
-    .concat(addrs)
-    .map(ip => ({ ip, port: DEFAULT_PORT }))
+let discoveryState: DiscoveryState | null = null
+
+export function initializeDiscovery(): void {
+  if (discoveryState != null) {
+    log.warn('Discovery already initialized')
+    return
+  }
+
+  const state = getDiscoveryState()
+  let initialRobots: DiscoveryClientRobot[] = []
+
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+  if (!state.config.disableCache) {
+    const legacyCachedServices: LegacyService[] | undefined = state.store.get(
+      'services',
+      // @ts-expect-error(mc, 2021-02-16): tweak these type definitions
+      null
+    )
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+    if (legacyCachedServices) {
+      initialRobots = migrateLegacyServices(legacyCachedServices)
+      state.store.delete('services')
+    } else {
+      initialRobots = state.store.get('robots', [])
+    }
+  }
+
+  state.client.start({
+    initialRobots,
+    healthPollInterval: SLOW_POLL_INTERVAL_MS,
+    manualAddresses: makeManualAddresses(state.config.candidates),
+  })
+
+  handleConfigChange('discovery.candidates', (value: string | string[]) => {
+    state.client.start({ manualAddresses: makeManualAddresses(value) })
+  })
+
+  handleConfigChange('discovery.disableCache', (value: boolean) => {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-boolean-literal-compare
+    if (value === true) {
+      state.config.disableCache = value
+      state.store.set('robots', [])
+      clearClientRobotCache()
+    }
+  })
+
+  app.once('will-quit', () => {
+    state.client.stop()
+  })
+
+  log.debug('Discovery initialized')
+}
+
+// Register a dispatcher to mediate discovery client actions.
+// See createPrimaryActionHandler.
+export function registerDiscoveryMainWindow(
+  dispatch: Dispatch
+): (action: Action) => unknown {
+  const state = getDiscoveryState()
+
+  if (state.primaryDispatcher != null) {
+    log.error(
+      'Attempted to register main window discovery when primary dispatcher already exists.'
+    )
+    return createSecondaryActionHandler()
+  }
+
+  state.primaryDispatcher = dispatch
+  state.dispatchers.add(dispatch)
+
+  const robots = state.client.getRobots()
+  dispatch({
+    type: 'discovery:UPDATE_LIST',
+    payload: { robots },
+  })
+
+  return createPrimaryActionHandler(state)
+}
+
+// Register a dispatcher as a "listener". This dispatcher only receives
+// discovery updates. Only the primary dispatcher (the main window) should
+// drive discovery client behavior.
+export function registerDiscoverySecondaryWindow(
+  dispatch: Dispatch
+): (action: Action) => unknown {
+  const state = getDiscoveryState()
+
+  state.dispatchers.add(dispatch)
+
+  const robots = state.client.getRobots()
+  dispatch({
+    type: 'discovery:UPDATE_LIST',
+    payload: { robots },
+  })
+
+  return createSecondaryActionHandler()
+}
+
+export function unregisterDiscovery(dispatch: Dispatch): void {
+  if (discoveryState != null) {
+    if (discoveryState.primaryDispatcher === dispatch) {
+      log.error(
+        'Attempted to unregister the primary dispatch, the main window.'
+      )
+    } else {
+      discoveryState.dispatchers.delete(dispatch)
+    }
+  }
 }
 
 const migrateLegacyServices = (
@@ -86,101 +192,105 @@ const migrateLegacyServices = (
   })
 }
 
-export function registerDiscovery(
-  dispatch: Dispatch
-): (action: Action) => unknown {
-  const handleRobotListChange = throttle(handleRobots, UPDATE_THROTTLE_MS)
+const makeManualAddresses = (addrs: string | string[]): Address[] => {
+  return ['fd00:0:cafe:fefe::1']
+    .concat(addrs)
+    .map(ip => ({ ip, port: DEFAULT_PORT }))
+}
 
-  dispatchers.add(dispatch)
+const getDiscoveryState = (): DiscoveryState => {
+  if (discoveryState != null) {
+    return discoveryState
+  }
 
-  if (!isClientInitialized) {
-    config = getFullConfig().discovery
-    store = new Store({
-      name: 'discovery',
-      defaults: { robots: [] as DiscoveryClientRobot[] },
-    })
+  const config = getFullConfig().discovery
+  const store = new Store({
+    name: 'discovery',
+    defaults: { robots: [] as DiscoveryClientRobot[] },
+  })
 
-    let initialRobots: DiscoveryClientRobot[] = []
+  const dispatchers = new Set<Dispatch>()
 
-    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-    if (!config.disableCache) {
-      const legacyCachedServices: LegacyService[] | undefined = store.get(
-        'services',
-        // @ts-expect-error(mc, 2021-02-16): tweak these type definitions
-        null
-      )
-      // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-      if (legacyCachedServices) {
-        initialRobots = migrateLegacyServices(legacyCachedServices)
-        store.delete('services')
-      } else {
-        initialRobots = store.get('robots', [])
-      }
-    }
+  const handleRobots = (): void => {
+    const robots = discoveryState?.client.getRobots() ?? []
+    handleNotificationConnectionsFor(robots)
+    if (!config.disableCache) store.set('robots', robots)
 
-    client = createDiscoveryClient({
-      onListChange: handleRobotListChange,
-      logger: log,
-    })
-
-    client.start({
-      initialRobots,
-      healthPollInterval: SLOW_POLL_INTERVAL_MS,
-      manualAddresses: makeManualAddresses(config.candidates),
-    })
-
-    handleConfigChange('discovery.candidates', (value: string | string[]) => {
-      client.start({ manualAddresses: makeManualAddresses(value) })
-    })
-
-    handleConfigChange('discovery.disableCache', (value: boolean) => {
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-boolean-literal-compare
-      if (value === true) {
-        config.disableCache = value
-        store.set('robots', [])
-        clearCache()
-      }
-    })
-
-    app.once('will-quit', () => {
-      client.stop()
-    })
-
-    isClientInitialized = true
-  } else {
-    const robots = client.getRobots()
-    dispatch({
-      type: 'discovery:UPDATE_LIST',
-      payload: { robots },
+    dispatchers.forEach(dispatcher => {
+      dispatcher({
+        type: 'discovery:UPDATE_LIST',
+        payload: { robots },
+      })
     })
   }
 
-  return function handleIncomingAction(action: Action) {
-    log.debug('handling action in discovery', { action })
+  const handleRobotListChange = throttle(handleRobots, UPDATE_THROTTLE_MS)
 
-    // Only first dispatcher handles client control actions
-    const isMainDispatcher = dispatchers.values().next().value === dispatch
-    if (!isMainDispatcher) {
-      return
+  const client = createDiscoveryClient({
+    onListChange: handleRobotListChange,
+    logger: log,
+  })
+
+  discoveryState = {
+    config,
+    store,
+    client,
+    dispatchers,
+    primaryDispatcher: null,
+  }
+
+  return discoveryState
+}
+
+// Only one dispatcher, the primary action handler (ie, the main window), should mediate
+// discovery client actions. This prevents duplicated discovery actions that may
+// lead to unexpected behavior.
+function createPrimaryActionHandler(
+  state: DiscoveryState
+): (action: Action) => void {
+  const handleRobots = (): void => {
+    const robots = state.client.getRobots()
+
+    handleNotificationConnectionsFor(robots)
+
+    if (!state.config.disableCache) {
+      state.store.set('robots', robots)
     }
+
+    state.dispatchers.forEach(dispatcher => {
+      dispatcher({
+        type: 'discovery:UPDATE_LIST',
+        payload: { robots },
+      })
+    })
+  }
+
+  const clearCache = (): void => {
+    state.client.start({ initialRobots: [], manualAddresses: [] })
+  }
+
+  return function handleIncomingAction(action: Action) {
+    log.debug('handling action in discovery (primary)', { action })
 
     switch (action.type) {
       case UI_INITIALIZED:
       case DISCOVERY_START: {
         handleRobots()
-        client.start({
+        state.client.start({
           healthPollInterval: FAST_POLL_INTERVAL_MS,
         })
         return
       }
       case DISCOVERY_FINISH: {
-        client.start({
+        state.client.start({
           healthPollInterval: SLOW_POLL_INTERVAL_MS,
         })
         return
       }
       case DISCOVERY_REMOVE: {
-        client.removeRobot((action.payload as { robotName: string }).robotName)
+        state.client.removeRobot(
+          (action.payload as { robotName: string }).robotName
+        )
         return
       }
       case CLEAR_CACHE: {
@@ -190,7 +300,7 @@ export function registerDiscovery(
       case USB_HTTP_REQUESTS_START: {
         const usbHttpAgent = getSerialPortHttpAgent()
 
-        client.start({
+        state.client.start({
           healthPollInterval: FAST_POLL_INTERVAL_MS,
           manualAddresses: [
             {
@@ -203,7 +313,7 @@ export function registerDiscovery(
         break
       }
       case USB_HTTP_REQUESTS_STOP: {
-        client.start({
+        state.client.start({
           healthPollInterval: FAST_POLL_INTERVAL_MS,
           manualAddresses: [
             {
@@ -216,30 +326,20 @@ export function registerDiscovery(
       }
     }
   }
+}
 
-  function handleRobots(): void {
-    const robots = client.getRobots()
-    handleNotificationConnectionsFor(robots)
-    if (!config.disableCache) store.set('robots', robots)
-
-    dispatchers.forEach(dispatcher => {
-      dispatcher({
-        type: 'discovery:UPDATE_LIST',
-        payload: { robots },
-      })
-    })
-  }
-
-  function clearCache(): void {
-    client.start({ initialRobots: [], manualAddresses: [] })
+// Secondary dispatchers don't handle client control actions.
+function createSecondaryActionHandler(): (action: Action) => void {
+  return function handleIncomingAction(action: Action) {
+    log.debug('handling action in discovery (secondary - no-op)', { action })
   }
 }
 
-export function unregisterDiscovery(dispatch: Dispatch): void {
-  dispatchers.delete(dispatch)
+function clearClientRobotCache(): void {
+  const state = getDiscoveryState()
+  state.client.start({ initialRobots: [], manualAddresses: [] })
 }
 
 export function __resetDiscoveryForTesting(): void {
-  isClientInitialized = false
-  dispatchers.clear()
+  discoveryState = null
 }

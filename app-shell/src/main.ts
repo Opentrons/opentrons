@@ -6,7 +6,12 @@ import electronDebug from 'electron-debug'
 import * as electronDevtoolsInstaller from 'electron-devtools-installer'
 
 import { getConfig, getOverrides, getStore, registerConfig } from './config'
-import { registerDiscovery, unregisterDiscovery } from './discovery'
+import {
+  initializeDiscovery,
+  registerDiscoveryMainWindow,
+  registerDiscoverySecondaryWindow,
+  unregisterDiscovery,
+} from './discovery'
 import { registerLabware } from './labware'
 import { createLogger } from './log'
 import { initializeMenu } from './menu'
@@ -90,7 +95,7 @@ function getOrCreateHandlerSet(window: BrowserWindow): HandlerSet | null {
     const handlers: Dispatch[] = isMainWindow(window)
       ? [
           registerConfig(dispatch),
-          registerDiscovery(dispatch),
+          registerDiscoveryMainWindow(dispatch),
           registerProtocolAnalysis(dispatch, window),
           registerUpdate(dispatch),
           registerRobotUpdate(dispatch),
@@ -106,7 +111,7 @@ function getOrCreateHandlerSet(window: BrowserWindow): HandlerSet | null {
       : // Only register necessary subset for secondary windows.
         [
           registerConfig(dispatch),
-          registerDiscovery(dispatch),
+          registerDiscoverySecondaryWindow(dispatch),
           registerUsb(dispatch),
           registerSystemInfo(dispatch),
           registerNotify(dispatch, window),
@@ -143,6 +148,7 @@ function startUp(): void {
     log.error('Uncaught Promise rejection: ', { reason })
   )
 
+  initializeDiscovery()
   mainWindow = createUi()
   rendererLogger = createRendererLogger()
 

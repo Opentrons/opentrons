@@ -13,7 +13,9 @@ import * as DiscoveryClient from '@opentrons/discovery-client'
 import * as Cfg from '../config'
 import {
   __resetDiscoveryForTesting,
-  registerDiscovery,
+  initializeDiscovery,
+  registerDiscoveryMainWindow,
+  registerDiscoverySecondaryWindow,
   unregisterDiscovery,
 } from '../discovery'
 import * as SysInfo from '../system-info'
@@ -28,18 +30,22 @@ vi.mock('../system-info')
 vi.mock('../log', () => {
   return {
     createLogger: () => {
-      return { debug: () => null }
+      return {
+        debug: () => null,
+        warn: () => null,
+        error: () => null,
+        info: () => null,
+      }
     },
   }
 })
 vi.mock('../notifications')
 
-let mockGet = vi.fn(property => {
-  return []
-})
+let mockGet = vi.fn()
 let mockOnDidChange = vi.fn()
 let mockDelete = vi.fn()
 let mockSet = vi.fn()
+
 describe('app-shell/discovery', () => {
   const dispatch = vi.fn()
   const dispatch2 = vi.fn()
@@ -94,8 +100,8 @@ describe('app-shell/discovery', () => {
     vi.resetAllMocks()
   })
 
-  it('registerDiscovery creates a DiscoveryClient', () => {
-    registerDiscovery(dispatch)
+  it('initializeDiscovery creates a DiscoveryClient', () => {
+    initializeDiscovery()
 
     expect(
       vi.mocked(DiscoveryClient.createDiscoveryClient)
@@ -106,17 +112,17 @@ describe('app-shell/discovery', () => {
     )
   })
 
-  it('registerDiscovery creates a DiscoveryClient only once for multiple dispatchers', () => {
-    registerDiscovery(dispatch)
-    registerDiscovery(dispatch2)
+  it('initializeDiscovery can only be called once', () => {
+    initializeDiscovery()
+    initializeDiscovery()
 
     expect(
       vi.mocked(DiscoveryClient.createDiscoveryClient)
     ).toHaveBeenCalledTimes(1)
   })
 
-  it('calls client.start on discovery registration', () => {
-    registerDiscovery(dispatch)
+  it('calls client.start on initialization', () => {
+    initializeDiscovery()
 
     expect(mockClient.start).toHaveBeenCalledTimes(1)
     expect(mockClient.start).toHaveBeenCalledWith({
@@ -127,113 +133,131 @@ describe('app-shell/discovery', () => {
     })
   })
 
-  it('sends current robots to secondary dispatchers immediately', () => {
+  it('sends current robots to all dispatchers on registration', () => {
     const robots = [{ name: 'robot1' }, { name: 'robot2' }]
     mockClient.getRobots.mockReturnValue(robots)
 
-    registerDiscovery(dispatch)
-    registerDiscovery(dispatch2)
+    initializeDiscovery()
+    registerDiscoveryMainWindow(dispatch)
+    registerDiscoverySecondaryWindow(dispatch2)
 
+    expect(dispatch).toHaveBeenCalledWith({
+      type: 'discovery:UPDATE_LIST',
+      payload: { robots },
+    })
     expect(dispatch2).toHaveBeenCalledWith({
       type: 'discovery:UPDATE_LIST',
       payload: { robots },
     })
   })
 
+  it('cannot register multiple main windows', () => {
+    initializeDiscovery()
+    registerDiscoveryMainWindow(dispatch)
+
+    const handleAction = registerDiscoveryMainWindow(dispatch2)
+
+    mockClient.start.mockClear()
+    handleAction(startDiscovery())
+    expect(mockClient.start).not.toHaveBeenCalled()
+  })
+
   it('calls client.stop when electron app emits "will-quit"', () => {
     expect(vi.mocked(app.once)).toHaveBeenCalledTimes(0)
 
-    registerDiscovery(dispatch)
+    initializeDiscovery()
 
     expect(mockClient.stop).toHaveBeenCalledTimes(0)
+
     expect(vi.mocked(app.once)).toHaveBeenCalledTimes(1)
 
     const [event, handler] = vi.mocked(app.once).mock.calls[0]
+
     expect(event).toEqual('will-quit')
 
-    // trigger event handler
     handler()
+
     expect(mockClient.stop).toHaveBeenCalledTimes(1)
   })
 
-  it('sets poll speed on "discovery:START" and "discovery:FINISH"', () => {
-    const handleAction = registerDiscovery(dispatch)
+  it('sets poll speed on "discovery:START" and "discovery:FINISH" via main window', () => {
+    initializeDiscovery()
+    const handleAction = registerDiscoveryMainWindow(dispatch)
 
+    mockClient.start.mockClear()
     handleAction(startDiscovery())
+
     expect(mockClient.start).toHaveBeenLastCalledWith({
       healthPollInterval: 3000,
     })
 
     handleAction(finishDiscovery())
+
     expect(mockClient.start).toHaveBeenLastCalledWith({
       healthPollInterval: 15000,
     })
   })
 
-  it('sets poll speed on "discovery:START" and "discovery:FINISH" only for main dispatcher', () => {
-    const handleAction1 = registerDiscovery(dispatch)
-    const handleAction2 = registerDiscovery(dispatch2)
+  it('secondary windows cannot control discovery client', () => {
+    initializeDiscovery()
+    registerDiscoveryMainWindow(dispatch)
+    const handleAction2 = registerDiscoverySecondaryWindow(dispatch2)
 
-    const initialCallCount = mockClient.start.mock.calls.length
-
-    handleAction1(startDiscovery())
-    expect(mockClient.start).toHaveBeenCalledTimes(initialCallCount + 1)
-
+    mockClient.start.mockClear()
     handleAction2(startDiscovery())
-    expect(mockClient.start).toHaveBeenCalledTimes(initialCallCount + 1)
 
-    handleAction1(finishDiscovery())
-    expect(mockClient.start).toHaveBeenCalledTimes(initialCallCount + 2)
+    expect(mockClient.start).not.toHaveBeenCalled()
 
     handleAction2(finishDiscovery())
-    expect(mockClient.start).toHaveBeenCalledTimes(initialCallCount + 2)
+
+    expect(mockClient.start).not.toHaveBeenCalled()
   })
 
-  it('sets poll speed on "shell:UI_INTIALIZED"', () => {
-    const handleAction = registerDiscovery(dispatch)
+  it('sets poll speed on "shell:UI_INITIALIZED" via main window', () => {
+    initializeDiscovery()
+    const handleAction = registerDiscoveryMainWindow(dispatch)
 
+    mockClient.start.mockClear()
     handleAction({ type: 'shell:UI_INITIALIZED', meta: { shell: true } })
     expect(mockClient.start).toHaveBeenLastCalledWith({
       healthPollInterval: 3000,
     })
   })
 
-  it('sets poll speed on "shell:UI_INTIALIZED" only for main dispatcher', () => {
-    const handleAction1 = registerDiscovery(dispatch)
-    const handleAction2 = registerDiscovery(dispatch2)
-
-    const initialCallCount = mockClient.start.mock.calls.length
-
-    handleAction1({ type: 'shell:UI_INITIALIZED', meta: { shell: true } })
-    expect(mockClient.start).toHaveBeenCalledTimes(initialCallCount + 1)
-
-    handleAction2({ type: 'shell:UI_INITIALIZED', meta: { shell: true } })
-    expect(mockClient.start).toHaveBeenCalledTimes(initialCallCount + 1)
-  })
-
-  it('always sends "discovery:UPDATE_LIST" on "discovery:START"', () => {
+  it('always sends "discovery:UPDATE_LIST" on "discovery:START" from main window', () => {
     const expected = [
       { name: 'opentrons', health: null, serverHealth: null, addresses: [] },
     ]
 
+    initializeDiscovery()
+
     mockClient.getRobots.mockReturnValue(expected)
-    registerDiscovery(dispatch)(startDiscovery())
+
+    const handleAction = registerDiscoveryMainWindow(dispatch)
+    dispatch.mockClear()
+    handleAction(startDiscovery())
+
     expect(dispatch).toHaveBeenCalledWith({
       type: 'discovery:UPDATE_LIST',
       payload: { robots: expected },
     })
   })
 
-  it('sends "discovery:UPDATE_LIST" to all dispatchers on "discovery:START"', () => {
+  it('sends "discovery:UPDATE_LIST" to all dispatchers on robot list change', () => {
     const expected = [
       { name: 'opentrons', health: null, serverHealth: null, addresses: [] },
     ]
 
-    mockClient.getRobots.mockReturnValue(expected)
-    const handleAction1 = registerDiscovery(dispatch)
-    registerDiscovery(dispatch2)
+    initializeDiscovery()
 
-    handleAction1(startDiscovery())
+    mockClient.getRobots.mockReturnValue(expected)
+
+    registerDiscoveryMainWindow(dispatch)
+    registerDiscoverySecondaryWindow(dispatch2)
+
+    dispatch.mockClear()
+    dispatch2.mockClear()
+    emitListChange()
 
     expect(dispatch).toHaveBeenCalledWith({
       type: 'discovery:UPDATE_LIST',
@@ -245,8 +269,10 @@ describe('app-shell/discovery', () => {
     })
   })
 
-  it('calls client.removeRobot on discovery:REMOVE', () => {
-    const handleAction = registerDiscovery(dispatch)
+  it('calls client.removeRobot on discovery:REMOVE from main window', () => {
+    initializeDiscovery()
+    const handleAction = registerDiscoveryMainWindow(dispatch)
+
     handleAction({
       type: 'discovery:REMOVE',
       payload: { robotName: 'robot-name' },
@@ -256,48 +282,30 @@ describe('app-shell/discovery', () => {
     expect(mockClient.removeRobot).toHaveBeenCalledWith('robot-name')
   })
 
-  it('calls client.removeRobot on discovery:REMOVE only for main dispatcher', () => {
-    const handleAction1 = registerDiscovery(dispatch)
-    const handleAction2 = registerDiscovery(dispatch2)
-
-    handleAction1({
-      type: 'discovery:REMOVE',
-      payload: { robotName: 'robot-name' },
-      meta: { shell: true },
-    })
-    expect(mockClient.removeRobot).toHaveBeenCalledWith('robot-name')
-
-    mockClient.removeRobot.mockClear()
-    handleAction2({
-      type: 'discovery:REMOVE',
-      payload: { robotName: 'robot-name' },
-      meta: { shell: true },
-    })
-    expect(mockClient.removeRobot).not.toHaveBeenCalled()
-  })
-
-  it('unregisterDiscovery removes dispatcher from the set', () => {
+  it('unregisterDiscovery removes secondary dispatcher from the set', () => {
     const robots = [{ name: 'robot1' }]
     mockClient.getRobots.mockReturnValue(robots)
-
-    registerDiscovery(dispatch)
-    registerDiscovery(dispatch2)
-
+    initializeDiscovery()
+    registerDiscoveryMainWindow(dispatch)
+    registerDiscoverySecondaryWindow(dispatch2)
     unregisterDiscovery(dispatch2)
 
+    dispatch.mockClear()
+    dispatch2.mockClear()
     emitListChange()
 
     expect(dispatch).toHaveBeenCalledWith({
       type: 'discovery:UPDATE_LIST',
       payload: { robots },
     })
-    // dispatch2 should only have been called once during registration, not from emitListChange
-    expect(dispatch2).toHaveBeenCalledTimes(1)
+    expect(dispatch2).not.toHaveBeenCalled()
   })
 
   describe('robot list caching', () => {
-    it('stores services to when onListUpdate is called', () => {
-      registerDiscovery(dispatch)
+    it('stores robots when onListUpdate is called', () => {
+      initializeDiscovery()
+      registerDiscoveryMainWindow(dispatch)
+
       expect(Store).toHaveBeenCalledWith({
         name: 'discovery',
         defaults: { robots: [] },
@@ -313,8 +321,12 @@ describe('app-shell/discovery', () => {
     })
 
     it('sends updates to all dispatchers when robot list changes', () => {
-      registerDiscovery(dispatch)
-      registerDiscovery(dispatch2)
+      initializeDiscovery()
+      registerDiscoveryMainWindow(dispatch)
+      registerDiscoverySecondaryWindow(dispatch2)
+
+      dispatch.mockClear()
+      dispatch2.mockClear()
 
       mockClient.getRobots.mockReturnValue([{ name: 'foo' }, { name: 'bar' }])
       emitListChange()
@@ -337,7 +349,8 @@ describe('app-shell/discovery', () => {
         return null as any
       })
 
-      registerDiscovery(dispatch)
+      initializeDiscovery()
+
       expect(mockClient.start).toHaveBeenCalledWith(
         expect.objectContaining({
           initialRobots: [mockRobot],
@@ -423,7 +436,8 @@ describe('app-shell/discovery', () => {
         return null as any
       })
 
-      registerDiscovery(dispatch)
+      initializeDiscovery()
+
       expect(mockDelete).toHaveBeenCalledWith('services')
       expect(mockClient.start).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -476,9 +490,10 @@ describe('app-shell/discovery', () => {
       )
     })
 
-    it('can delete cached robots', () => {
-      const handleAction = registerDiscovery(dispatch)
-      mockClient.start.mockReset()
+    it('can delete cached robots via main window', () => {
+      initializeDiscovery()
+      const handleAction = registerDiscoveryMainWindow(dispatch)
+      mockClient.start.mockClear()
 
       handleAction({
         type: 'discovery:CLEAR_CACHE',
@@ -492,23 +507,12 @@ describe('app-shell/discovery', () => {
       )
     })
 
-    it('can delete cached robots only via main dispatcher', () => {
-      const handleAction1 = registerDiscovery(dispatch)
-      const handleAction2 = registerDiscovery(dispatch2)
-      mockClient.start.mockReset()
+    it('secondary windows cannot clear cache', () => {
+      initializeDiscovery()
+      registerDiscoveryMainWindow(dispatch)
+      const handleAction2 = registerDiscoverySecondaryWindow(dispatch2)
+      mockClient.start.mockClear()
 
-      handleAction1({
-        type: 'discovery:CLEAR_CACHE',
-        meta: { shell: true },
-      })
-
-      expect(mockClient.start).toHaveBeenCalledWith(
-        expect.objectContaining({
-          initialRobots: [],
-        })
-      )
-
-      mockClient.start.mockReset()
       handleAction2({
         type: 'discovery:CLEAR_CACHE',
         meta: { shell: true },
@@ -532,7 +536,7 @@ describe('app-shell/discovery', () => {
         return null as any
       })
 
-      registerDiscovery(dispatch)
+      initializeDiscovery()
 
       // should not contain above entry
       expect(mockClient.start).toHaveBeenCalledWith(
@@ -557,7 +561,7 @@ describe('app-shell/discovery', () => {
         return null as any
       })
 
-      registerDiscovery(dispatch)
+      initializeDiscovery()
 
       const disableCacheCall = vi
         .mocked(Cfg.handleConfigChange)
@@ -586,7 +590,7 @@ describe('app-shell/discovery', () => {
         discovery: { cacheDisabled: false, candidates: ['1.2.3.4'] },
       } as unknown) as Cfg.Config)
 
-      registerDiscovery(dispatch)
+      initializeDiscovery()
 
       expect(mockClient.start).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -603,7 +607,7 @@ describe('app-shell/discovery', () => {
         discovery: { cacheDisabled: false, candidates: '1.2.3.4' },
       } as unknown) as Cfg.Config)
 
-      registerDiscovery(dispatch)
+      initializeDiscovery()
 
       expect(mockClient.start).toHaveBeenCalledWith(
         expect.objectContaining({
