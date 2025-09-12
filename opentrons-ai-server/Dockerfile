@@ -8,13 +8,13 @@ WORKDIR /code
 
 ARG CACHEBUST=1
 
-COPY ./requirements.txt /code/requirements.txt
+COPY opentrons-ai-server/requirements.txt /code/requirements.txt
 
 RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
-COPY ./api /code/api
+COPY opentrons-ai-server/api /code/api
 
-COPY ../api/docs/v2 /code/api/storage/api_docs/docs/v2
+COPY api/docs/v2 /code/api/storage/api_docs/docs/v2
 
 EXPOSE 8000 
 
