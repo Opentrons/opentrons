@@ -387,16 +387,6 @@ const getLiquidClassValues = (
 
   const { conditioning, disposal } = byVolumeLookup
 
-  const airGapAspirate = linearInterpolate(
-    byVolumeLookup.airGap.aspirate,
-    aspirate?.retract.airGapByVolume as Array<[number, number]>
-  )
-
-  const airGapDispense = linearInterpolate(
-    byVolumeLookup.airGap.dispense,
-    dispense?.retract.airGapByVolume as Array<[number, number]>
-  )
-
   const aspirateState = {
     aspirateFlowRate: aspirateFlowRateFields.aspirate_flowRate ?? 0,
     tipPositionAspirate: aspirate?.aspiratePosition.offset.z ?? 0,
@@ -432,7 +422,7 @@ const getLiquidClassValues = (
       aspirate?.retract.touchTip.enable === false
         ? undefined
         : aspirate?.retract.touchTip.params?.speed,
-    airGapAspirate: airGapAspirate ?? 0,
+    airGapAspirate: aspirate?.retract.airGapByVolume[0][1] ?? 0,
     conditionAspirate: conditioning ?? 0,
   }
 
@@ -487,7 +477,7 @@ const getLiquidClassValues = (
       dispense?.retract.touchTip.enable === false
         ? undefined
         : dispense?.retract.touchTip.params?.speed,
-    airGapDispense: airGapDispense ?? 0,
+    airGapDispense: dispense?.retract.airGapByVolume[0][1] ?? 0,
     disposalVolumeDispenseSettings: {
       volume: disposal ?? 0,
       blowOutLocation:
