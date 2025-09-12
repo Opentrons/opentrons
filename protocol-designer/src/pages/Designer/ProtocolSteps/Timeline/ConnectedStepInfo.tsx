@@ -1,5 +1,4 @@
 import { useEffect, useMemo } from 'react'
-import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import debounce from 'lodash/debounce'
 
@@ -31,6 +30,7 @@ import {
 } from '/protocol-designer/ui/steps/actions/actions'
 
 import { ConnectedStepContainer } from './ConnectedStepContainer'
+import { useStepText } from './useStepText'
 import {
   getMetaSelectedSteps,
   getMouseClickKeyInfo,
@@ -65,7 +65,6 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
     setOpenedOverflowMenuId,
     sidebarWidth,
   } = props
-  const { i18n, t } = useTranslation('application')
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const stepIds = useSelector(getOrderedStepIds)
   const step = useSelector(stepFormSelectors.getSavedStepForms)[stepId]
@@ -85,6 +84,7 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
     errorStepId != null ? stepIds.slice(stepIds.indexOf(errorStepId) + 1) : []
   const stepAfterError =
     stepId != null ? stepListAfterErrors.includes(stepId) : false
+  const { text, subtext } = useStepText(step)
 
   const hasWarnings =
     hasTimelineWarningsPerStep[stepId] || hasFormLevelWarningsPerStep[stepId]
@@ -247,12 +247,8 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
         onMouseEnter={handleMouseEnter}
         iconName={hasError || hasWarnings ? 'alert-circle' : iconName}
         stepNumber={stepNumber}
-        // add empty check to avoid causing undefined issue when calling titleCase
-        text={
-          step.stepName !== undefined && step.stepName !== ''
-            ? i18n.format(step.stepName, 'titleCase')
-            : t(`stepType.${step.stepType}`)
-        }
+        text={text}
+        subtext={subtext}
         dragHovered={dragHovered}
         sidebarWidth={sidebarWidth}
       />
