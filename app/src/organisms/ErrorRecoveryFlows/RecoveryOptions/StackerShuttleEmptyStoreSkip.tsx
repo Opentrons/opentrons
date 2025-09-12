@@ -1,13 +1,8 @@
 import { RECOVERY_MAP } from '../constants'
 import {
-  HoldingLabware,
-  ReleaseLabware,
   SkipStepInfo,
-  StackerEmptyHopper,
   StackerEnsureShuttleEmpty,
   StackerHopperLwInfo,
-  StackerReengageLatch,
-  StackerShuttleLwInfo,
 } from '../shared'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
