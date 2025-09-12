@@ -226,6 +226,7 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
         temp: float,
         hold_time: Optional[float] = None,
         volume: Optional[float] = None,
+        ramp_rate: Optional[float] = None,
     ) -> None:
         """Send set plate temperature command"""
         temp = min(BLOCK_TARGET_MAX, max(BLOCK_TARGET_MIN, temp))

@@ -67,6 +67,7 @@ class SimulatingDriver(AbstractThermocyclerDriver):
         temp: float,
         hold_time: Optional[float] = None,
         volume: Optional[float] = None,
+        ramp_rate: Optional[float] = None,
     ) -> None:
         self._plate_temperature.target = temp
         self._plate_temperature.current = temp
