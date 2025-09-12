@@ -135,7 +135,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         self._user_aspirate_flow_rate: Optional[float] = None
         self._user_dispense_flow_rate: Optional[float] = None
         self._user_blow_out_flow_rate: Optional[float] = None
-        if self._protocol_core.api_version < _DISPENSE_VOLUME_VALIDATION_ADDED_IN:
+        if self._protocol_core.api_version < _DEFAULT_FLOW_RATE_BUG_FIXED_IN:
             # TODO also look into why we were using MAX_SUPPORTED_VERSION here and if that makes sense to keep
             self._user_aspirate_flow_rate = find_value_for_api_version(
                 MAX_SUPPORTED_VERSION, self._initial_default_flow_rates.default_aspirate
