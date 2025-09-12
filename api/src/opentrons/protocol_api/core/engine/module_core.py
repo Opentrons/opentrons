@@ -363,6 +363,7 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
             cmd.thermocycler.RunProfileStepParams(
                 celsius=step["temperature"],
                 holdSeconds=step["hold_time_seconds"],
+                rampRate=step["ramp_rate"],
             )
             for step in steps
         ]
@@ -391,6 +392,7 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
                     cmd.thermocycler.ProfileStep(
                         celsius=step["temperature"],
                         holdSeconds=step["hold_time_seconds"],
+                        rampRate=step["ramp_rate"],
                     )
                     for step in steps
                 ],
