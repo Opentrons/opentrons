@@ -216,8 +216,7 @@ const updatePatchOnPipetteChange = (
         'dispense_mix_volume',
         'disposalVolume_volume',
         'aspirate_mmFromBottom',
-        'dispense_mmFromBottom',
-        'tipRack'
+        'dispense_mmFromBottom'
       ),
       nozzles,
       aspirate_airGap_volume: airGapVolume,
