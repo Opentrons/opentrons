@@ -121,11 +121,10 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
   const [currentStep, setCurrentStep] = useState<number>(1)
   const [blowOutLocation, setBlowOutLocation] = useState<
     BlowOutLocation | undefined
-  >(state.blowOutDispense?.location as BlowOutLocation | undefined)
+  >(state.blowOutDispense?.location ?? undefined)
   const [speed, setSpeed] = useState<number | null>(
     (state.blowOutDispense?.flowRate as number) ?? null
   )
-
   const enableBlowOutDisplayItems = [
     {
       option: true,
@@ -142,12 +141,10 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
       },
     },
   ]
-
   const blowOutLocationItems = useBlowOutLocationOptions(
     deckConfig,
     state.transferType
   )
-
   const handleClickBackOrExit = (): void => {
     currentStep > 1 ? setCurrentStep(currentStep - 1) : onBack()
   }
