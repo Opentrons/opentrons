@@ -52,3 +52,20 @@ def move_labware(text: str) -> command_types.MoveLabwareCommand:
         "name": command_types.MOVE_LABWARE,
         "payload": {"text": text},
     }
+
+
+def wait_for_tasks() -> command_types.WaitForTasksCommand:
+    return {
+        "name": command_types.WAIT_FOR_TASKS,
+        "payload": {"text": "Waiting for tasks."},
+    }
+
+
+def create_timer(seconds: float) -> command_types.CreateTimerCommand:
+    return {
+        "name": command_types.CREATE_TIMER,
+        "payload": {
+            "text": f"Creating background timer for {seconds} seconds.",
+            "time": seconds,
+        },
+    }
