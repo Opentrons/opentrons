@@ -35,6 +35,7 @@ export function LeftColumnLabwareInfo({
     relevantPickUpTipLwLocs,
     labwareQuantity,
   } = failedLabwareUtils
+  console.log('failedLabwareUtils', failedLabwareUtils)
   const { displayNameNewLoc, displayNameCurrentLoc } = failedLabwareLocations
   const {
     STACKER_STALLED_RETRY,
@@ -43,6 +44,7 @@ export function LeftColumnLabwareInfo({
     STACKER_STALLED_STORE_RETRY,
     STACKER_HOPPER_EMPTY_SKIP,
     STACKER_SHUTTLE_EMPTY_SKIP,
+    STACKER_SHUTTLE_EMPTY_STORE_RETRY,
   } = RECOVERY_MAP
   const { t, i18n } = useTranslation(['error_recovery', 'shared'])
 
@@ -53,6 +55,9 @@ export function LeftColumnLabwareInfo({
       ? { deckLabel: displayNameNewLoc.toUpperCase() }
       : undefined
 
+  console.log('route', route)
+  console.log('step', step)
+  console.log('failedLabwareNames', failedLabwareNames)
   const buildInfoNames = (): {
     labwareName: string
     labwareNickname: string | undefined
@@ -92,6 +97,7 @@ export function LeftColumnLabwareInfo({
         case STACKER_STALLED_STORE_RETRY.STEPS.PLACE_LABWARE_ON_SHUTTLE:
         case STACKER_HOPPER_EMPTY_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE:
         case STACKER_SHUTTLE_EMPTY_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE:
+        case STACKER_SHUTTLE_EMPTY_STORE_RETRY.STEPS.PLACE_LABWARE_ON_SHUTTLE:
           return {
             labwareName: failedLabwareNames.name ?? '',
             labwareNickname: failedLabwareNames.nickName,
@@ -120,7 +126,6 @@ export function LeftColumnLabwareInfo({
     if (!showQuantity || labwareQuantity == null) {
       return null
     }
-
     // Define routes and steps that require quantity adjustment
     const requiresQuantityAdjustment = [
       {

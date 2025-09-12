@@ -174,6 +174,7 @@ export function handleRecoveryOptionAction<T>(
     case RECOVERY_MAP.STACKER_STALLED_STORE_SKIP.ROUTE:
     case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
     case RECOVERY_MAP.SHUTTLE_FULL_SKIP.ROUTE:
+    case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_STORE_SKIP.ROUTE:
       return nextStepReturnVal
     case RECOVERY_MAP.CANCEL_RUN.ROUTE:
     case RECOVERY_MAP.RETRY_SAME_TIPS.ROUTE:
@@ -189,7 +190,8 @@ export function handleRecoveryOptionAction<T>(
     case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
     case RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.ROUTE:
     case RECOVERY_MAP.STACKER_HOPPER_OR_SHUTTLE_EMPTY.ROUTE:
-    case RECOVERY_MAP.SHUTTLE_FULL_RETRY.ROUTE:
+    case RECOVERY_MAP.SHUTTLE_FULL_RETRY.ROUTE: 
+    case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_STORE_RETRY.ROUTE:
       return currentStepReturnVal
     default: {
       console.error('Unhandled recovery toast case. Handle explicitly.')
