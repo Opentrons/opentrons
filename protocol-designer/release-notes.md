@@ -8,6 +8,33 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 ---
 
+## Opentrons Protocol Designer Changes in 8.6.0
+
+**Welcome to Protocol Designer 8.6.0!**
+
+This release adds support for new instruments, labware, and hardware,enables limited return tip support in Protocol Designer, and includes feature improvements and bug fixes.
+
+### New Features
+
+- Transfer as little as 1 µL in a protocol with the Opentrons Flex 96-Channel Pipette (1–200 μL). This release also adds liquid class transfer support for the pipette.
+- Use Opentrons Tough Auto-Sealing Lids on compatible labware in the Thermocycler Module.
+- Add Opentrons universal lids, tip rack lids, ibidi lids, and Corning lids in your Protocol Designer protocols. 
+- Secure lidded labware properly on the Heater-Shaker Module with the new Opentrons Universal Flat Adapter Type B. 
+- Return an attached pipette tip to the tip rack after aspirating, dispensing, or mixing. Return tip settings in version 8.6.0 are limited to a single return, and you won't be able to pick up these tips again in the same protocol. 
+
+### Improved Features
+
+- Choose where protocol steps are added to your timeline. Click to select a step already in your timeline, then click **Add step** to insert a new step after the chosen point in your timeline.
+- Add a time in hours for the Heater-Shaker Module to heat or shake samples. 
+- Exported protocols include step names and details added in Protocol Designer. Each appear as comments above individual steps in the Python protocol file. 
+- Hover over wells in a labware to view final volumes on the ending deck. 
+- Protocol Designer includes a warning when deleting a liquid added to labware in your protocol.  
+
+### Bug Fixes
+
+- Protocol Designer now raises an error when moving labware to a deleted module. 
+- 
+
 ## Opentrons Protocol Designer Changes in 8.5.3
 
 **Welcome to Protocol Designer 8.5.3!**
