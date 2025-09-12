@@ -1,0 +1,105 @@
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 15%, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.container {
+  display: flex;
+  height: 29.5rem;
+  flex-direction: column;
+  gap: var(--spacing-40);
+}
+
+.header {
+  display: flex;
+  height: 6.75rem;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-40);
+}
+
+.status_info {
+  display: flex;
+  flex-direction: column;
+}
+
+.status_text {
+  font-size: var(--font-size-28);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-36);
+}
+
+.title_text {
+  display: -webkit-box;
+  overflow: hidden;
+  height: max-content;
+  -webkit-box-orient: vertical;
+  color: var(--grey-60);
+  font-size: 1.75rem;
+  font-weight: var(--font-weight-semi-bold);
+  -webkit-line-clamp: 2;
+  line-height: 2.25rem;
+  overflow-wrap: anywhere;
+}
+
+.timer_info {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.run_timer {
+  color: var(--black-90);
+  font-size: 2rem;
+  font-weight: var(--font-weight-bold);
+  line-height: 2.625rem;
+}
+
+.controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-24);
+}
+
+.command_container {
+  display: flex;
+  width: 100%;
+  max-width: 100%;
+  max-height: 4.6rem;
+  justify-content: center;
+  padding: var(--spacing-12) var(--spacing-24);
+  border-radius: var(--border-radius-8);
+  margin: auto;
+  background-color: var(--blue-35);
+  font-size: 1.375rem;
+  font-weight: var(--font-weight-regular);
+  line-height: 1.75rem;
+  text-align: center;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.command_container * {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.animated {
+  animation: fadeIn 1.5s ease-in-out;
+  backface-visibility: hidden;
+  perspective: 1000;
+  will-change: opacity, transform;
+}

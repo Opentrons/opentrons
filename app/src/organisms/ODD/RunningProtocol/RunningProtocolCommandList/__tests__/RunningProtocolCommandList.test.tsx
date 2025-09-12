@@ -8,12 +8,10 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
 
-import { RunningProtocolCommandList } from '../RunningProtocolCommandList'
+import { RunningProtocolCommandList } from '..'
 
 import type { ComponentProps } from 'react'
 
-const mockPlayRun = vi.fn()
-const mockPauseRun = vi.fn()
 const mockShowModal = vi.fn()
 
 const render = (props: ComponentProps<typeof RunningProtocolCommandList>) => {
@@ -26,13 +24,10 @@ describe('RunningProtocolCommandList', () => {
   let props: ComponentProps<typeof RunningProtocolCommandList>
   beforeEach(() => {
     props = {
+      onTogglePlayPause: vi.fn(),
+      onStop: mockShowModal,
       runStatus: RUN_STATUS_RUNNING,
       robotSideAnalysis: mockRobotSideAnalysis,
-      playRun: mockPlayRun,
-      pauseRun: mockPauseRun,
-      setShowConfirmCancelRunModal: mockShowModal,
-      trackProtocolRunEvent: vi.fn(), // temporary
-      robotAnalyticsData: {} as any,
       protocolName: 'mockRunningProtocolName',
       currentRunCommandIndex: 0,
       robotType: FLEX_ROBOT_TYPE,

@@ -4,14 +4,7 @@ import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
-import {
-  COLORS,
-  DIRECTION_COLUMN,
-  DIRECTION_ROW,
-  Flex,
-  LegacyStyledText,
-  SPACING,
-} from '@opentrons/components'
+import { COLORS, LegacyStyledText } from '@opentrons/components'
 import {
   useDeleteRunMutation,
   useDismissCurrentRunMutation,
@@ -25,7 +18,8 @@ import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
 import { getLocalRobot } from '/app/redux/discovery'
 import { useNotifyRunQuery } from '/app/resources/runs'
 
-import { CancelingRunModal } from './CancelingRunModal'
+import { CancelingRunModal } from '../CancelingRunModal'
+import styles from './confirmcancelmodal.module.css'
 
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
@@ -114,12 +108,11 @@ export function ConfirmCancelRunModal({
         setShowConfirmCancelRunModal(false)
       }}
     >
-      <Flex flexDirection={DIRECTION_COLUMN} width="100%">
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing12}
-          paddingBottom={SPACING.spacing32}
-          paddingTop={`${isActiveRun ? SPACING.spacing32 : '0'}`}
+      <div className={styles.container}>
+        <div
+          className={`${styles.content} ${
+            isActiveRun ? styles.active_run : styles.inactive_run
+          }`}
         >
           <LegacyStyledText as="p">
             {t('cancel_run_alert_info_flex')}
@@ -127,12 +120,8 @@ export function ConfirmCancelRunModal({
           <LegacyStyledText as="p">
             {t('cancel_run_module_info')}
           </LegacyStyledText>
-        </Flex>
-        <Flex
-          flexDirection={DIRECTION_ROW}
-          gridGap={SPACING.spacing8}
-          width="100%"
-        >
+        </div>
+        <div className={styles.button_row}>
           <SmallButton
             flex="1"
             buttonText={t('shared:go_back')}
@@ -146,8 +135,8 @@ export function ConfirmCancelRunModal({
             buttonText={t('cancel_run')}
             onClick={handleCancelRun}
           />
-        </Flex>
-      </Flex>
+        </div>
+      </div>
     </OddModal>
   )
 }
