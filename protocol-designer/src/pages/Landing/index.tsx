@@ -61,7 +61,6 @@ export function Landing(): JSX.Element {
       hasOptedIn != null
     ) {
       const toastId = bakeToast(
-        // TODO
         t('learn_more', { version: process.env.OT_PD_VERSION }) as string,
         INFO_TOAST,
         {

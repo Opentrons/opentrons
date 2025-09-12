@@ -12,7 +12,6 @@ export type AnalyticsEvent =
     }
   | { superProperties: Record<string, unknown> }
 
-// TODO
 // pulled in from environment at build time
 const MIXPANEL_ID = process.env.OT_AI_CLIENT_MIXPANEL_ID
 

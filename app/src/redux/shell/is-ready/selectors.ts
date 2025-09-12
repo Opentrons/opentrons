@@ -4,7 +4,6 @@ import type { State } from '../../types'
 
 export function getIsShellReady(state: State): boolean {
   const isOnDevice = getIsOnDevice(state)
-  // TODO
   const isDevMode = process.env.NODE_ENV === 'development'
   return isDevMode || !isOnDevice || state.shell.isReady
 }

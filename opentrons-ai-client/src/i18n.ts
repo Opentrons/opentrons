@@ -12,7 +12,6 @@ i18n.use(initReactI18next).init(
     resources,
     lng: 'en',
     fallbackLng: 'en',
-    // TODO
     debug: process.env.NODE_ENV === 'development',
     ns: ['shared'],
     defaultNS: 'shared',
@@ -30,7 +29,6 @@ i18n.use(initReactI18next).init(
     keySeparator: false, // use namespaces and context instead
     saveMissing: true,
     missingKeyHandler: (lng, ns, key) => {
-      // TODO
       process.env.NODE_ENV === 'test'
         ? console.error(`Missing ${lng} Translation: key={${key}} ns={${ns}}`)
         : console.warn(`Missing ${lng} Translation: key={${key}} ns={${ns}}`)

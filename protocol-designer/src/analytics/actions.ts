@@ -25,13 +25,11 @@ const _setOptIn = (payload: SetOptIn['payload']): SetOptIn => {
 export const optIn = (): SetOptIn =>
   _setOptIn({
     hasOptedIn: true,
-    // TODO
     appVersion: process.env.OT_PD_VERSION || OLDEST_MIGRATEABLE_VERSION,
   })
 export const optOut = (): SetOptIn =>
   _setOptIn({
     hasOptedIn: false,
-    // TODO
     appVersion: process.env.OT_PD_VERSION || OLDEST_MIGRATEABLE_VERSION,
   })
 export interface AnalyticsEventAction {

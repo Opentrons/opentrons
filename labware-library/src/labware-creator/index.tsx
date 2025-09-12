@@ -332,7 +332,6 @@ export const LabwareCreator = (props: LabwareCreatorProps): JSX.Element => {
   )
 
   React.useEffect(() => {
-    // TODO
     if (process.env.NODE_ENV === 'production') {
       // NOTE: the contents of this message will be overridden by modern browsers
       window.onbeforeunload = () =>

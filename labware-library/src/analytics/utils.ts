@@ -6,7 +6,6 @@ import type { AnalyticsState } from './types'
 
 const COOKIE_KEY_NAME = 'ot_ll_analytics' // NOTE: cookie is named "LL" but only LC uses it now
 const COOKIE_DOMAIN =
-  // TODO
   process.env.NODE_ENV === 'production' ? 'opentrons.com' : undefined
 
 const persistAnalyticsCookie = (cookies: AnalyticsState): void => {

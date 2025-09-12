@@ -65,14 +65,12 @@ import type { Selector } from '../../types'
 
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
 // console.assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')
-// TODO
 if (isEmpty(process.env.OT_PD_VERSION))
   console.warn('Could not find application version!')
 const applicationVersion: string = process.env.OT_PD_VERSION || ''
 // Internal release date: this should never be read programatically,
 // it just helps us humans quickly identify what build a user was using
 // when we look at saved protocols (without requiring us to trace thru git logs)
-// TODO
 const _internalAppBuildDate = process.env.OT_PD_BUILD_DATE
 // A labware definition is considered "in use" and should be included in
 // the protocol file if it either...

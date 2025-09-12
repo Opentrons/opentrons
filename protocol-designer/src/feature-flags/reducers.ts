@@ -23,7 +23,6 @@ import type { Flags, FlagTypes } from './types'
 //
 // If you add/remove an environment variable here, also update vite.config.mts.
 const initialFlags: Flags = {
-  // TODO: All of these
   PRERELEASE_MODE: process.env.OT_PD_PRERELEASE_MODE === '1' || false,
   OT_PD_DISABLE_MODULE_RESTRICTIONS:
     process.env.OT_PD_DISABLE_MODULE_RESTRICTIONS === '1' || false,

@@ -6,7 +6,6 @@ import mixpanel from 'mixpanel-browser'
 export const getIsProduction = (): boolean =>
   window.location.host === 'labware.opentrons.com'
 
-// TODO
 const MIXPANEL_ID = getIsProduction()
   ? process.env.OT_LL_MIXPANEL_ID
   : process.env.OT_LL_MIXPANEL_DEV_ID

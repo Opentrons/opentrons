@@ -23,7 +23,6 @@ export function AppInfo({
   setShowAnnouncementModal,
 }: AppInfoProps): JSX.Element {
   const { t } = useTranslation('shared')
-  // TODO
   const pdVersion = process.env.OT_PD_VERSION
 
   const handleSoftwareManualClick = (): void => {
