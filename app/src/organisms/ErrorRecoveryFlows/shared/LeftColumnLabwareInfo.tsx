@@ -35,7 +35,6 @@ export function LeftColumnLabwareInfo({
     relevantPickUpTipLwLocs,
     labwareQuantity,
   } = failedLabwareUtils
-  console.log('failedLabwareUtils', failedLabwareUtils)
   const { displayNameNewLoc, displayNameCurrentLoc } = failedLabwareLocations
   const {
     STACKER_STALLED_RETRY,
@@ -55,9 +54,6 @@ export function LeftColumnLabwareInfo({
       ? { deckLabel: displayNameNewLoc.toUpperCase() }
       : undefined
 
-  console.log('route', route)
-  console.log('step', step)
-  console.log('failedLabwareNames', failedLabwareNames)
   const buildInfoNames = (): {
     labwareName: string
     labwareNickname: string | undefined
