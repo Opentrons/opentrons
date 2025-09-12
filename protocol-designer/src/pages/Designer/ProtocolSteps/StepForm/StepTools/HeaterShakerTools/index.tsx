@@ -9,6 +9,8 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
+import { HeaterShakerModuleState as SG_HeaterShakerModuleState } from '@opentrons/step-generation'
 
 import {
   DropdownStepFormField,
@@ -17,6 +19,7 @@ import {
   ToggleExpandStepFormField,
   ToggleStepFormField,
 } from '/protocol-designer/components/molecules'
+import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import { getHeaterShakerLabwareOptions } from '/protocol-designer/ui/modules/selectors'
 import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
 
@@ -27,6 +30,10 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
   const { t } = useTranslation(['application', 'form', 'protocol_steps'])
   const moduleLabwareOptions = useSelector(getHeaterShakerLabwareOptions)
   const dispatch = useDispatch()
+
+  const priorState = usePriorHeaterShakerState(
+    propsForFields.moduleId.value as string
+  )
 
   return (
     <Flex
@@ -47,12 +54,22 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
         width="100%"
         tooltipContent={null}
       />
+
       <Box borderBottom={`1px solid ${COLORS.grey30}`} />
 
-      <StepFormStatusList>
-        <StepFormStatus label="The label" value="The value" />
-        <StepFormStatus label="Block temperature" value="50 °C" />
-      </StepFormStatusList>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing8}
+        paddingX={SPACING.spacing16}
+      >
+        {/* TODO: i18n, and stuff this behind a feature flag. */}
+        <StyledText desktopStyle="bodyDefaultSemiBold" color={COLORS.black90}>
+          Last module state
+        </StyledText>
+        {priorState != null && <PriorState priorState={priorState} />}
+      </Flex>
+
+      <Box borderBottom={`1px solid ${COLORS.grey30}`} />
 
       <Flex
         flexDirection={DIRECTION_COLUMN}
@@ -123,4 +140,52 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
       </Flex>
     </Flex>
   )
+}
+
+function PriorState(props: {
+  priorState: SG_HeaterShakerModuleState
+}): JSX.Element {
+  // TODO: Use i18n for these.
+  const { targetTemp, targetSpeed, latchOpen } = props.priorState
+  const targetTempString = targetTemp != null ? `${targetTemp} °C` : 'Off'
+  const targetSpeedString = targetSpeed != null ? `${targetSpeed} rpm` : 'Off'
+  const latchOpenString = latchOpen ?? false ? 'Open' : 'Closed' // TODO: Is it right to default to false?
+
+  return (
+    <StepFormStatusList>
+      <StepFormStatus label="Heater set to" value={targetTempString} />
+      <StepFormStatus label="Shaker set to" value={targetSpeedString} />
+      <StepFormStatus label="Labware latch" value={latchOpenString} />
+    </StepFormStatusList>
+  )
+}
+
+function usePriorHeaterShakerState(
+  moduleId: string
+): SG_HeaterShakerModuleState | null {
+  // TODO: I think getRobotStateAtActiveItem returns the robot state just before the
+  // current step, which is what we want, but double-check that this is actually always
+  // the case.
+  const state = useSelector(getRobotStateAtActiveItem)
+  const moduleState = state?.modules[moduleId]?.moduleState
+  const fallback: SG_HeaterShakerModuleState = {
+    type: HEATERSHAKER_MODULE_TYPE,
+    latchOpen: false,
+    targetSpeed: null,
+    targetTemp: null,
+  }
+
+  // Shouldn't happen:
+  if (moduleState == null) {
+    console.error("Couldn't find module state.")
+    return fallback
+  } else if (moduleState.type !== HEATERSHAKER_MODULE_TYPE) {
+    console.error(
+      'Expecting Heater-Shaker module type, but got:',
+      moduleState.type
+    )
+    return fallback
+  }
+
+  return moduleState
 }
