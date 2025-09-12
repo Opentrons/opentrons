@@ -144,6 +144,10 @@ export function LeftColumnLabwareInfo({
         route: RECOVERY_MAP.STACKER_STALLED_STORE_RETRY.ROUTE,
         step: RECOVERY_MAP.STACKER_STALLED_STORE_RETRY.STEPS.CHECK_HOPPER,
       },
+      {
+        route: RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_STORE_RETRY.ROUTE,
+        step: RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_STORE_RETRY.STEPS.CHECK_HOPPER,
+      },
     ]
 
     const needsAdjustment = requiresQuantityAdjustment.some(

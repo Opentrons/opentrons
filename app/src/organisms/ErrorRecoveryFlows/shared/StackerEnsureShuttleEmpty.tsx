@@ -17,7 +17,10 @@ export function StackerEnsureShuttleEmpty(
   const { proceedNextStep, goBackPrevStep } = routeUpdateActions
   const { t } = useTranslation('error_recovery')
 
-  const storeSkip = route === RECOVERY_MAP.STACKER_STALLED_STORE_SKIP.ROUTE
+  const storeSkip = [
+    RECOVERY_MAP.STACKER_STALLED_STORE_SKIP.ROUTE,
+    RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_STORE_SKIP.ROUTE,
+  ].includes(route)
   return (
     <RecoverySingleColumnContentWrapper>
       <TwoColumn>
