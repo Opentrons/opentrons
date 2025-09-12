@@ -4215,6 +4215,11 @@
           "description": "Time to hold target temperature in seconds.",
           "title": "Holdseconds",
           "type": "number"
+        },
+        "rampRate": {
+          "description": "How quickly to change temperature in \u00b0C/second.",
+          "title": "Ramprate",
+          "type": "number"
         }
       },
       "required": ["celsius", "holdSeconds"],
@@ -4740,6 +4745,11 @@
         "holdSeconds": {
           "description": "Time to hold target temperature at in seconds.",
           "title": "Holdseconds",
+          "type": "number"
+        },
+        "rampRate": {
+          "description": "How quickly to change temperature in \u00b0C/second.",
+          "title": "Ramprate",
           "type": "number"
         }
       },
