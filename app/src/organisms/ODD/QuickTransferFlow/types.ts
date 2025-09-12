@@ -3,6 +3,7 @@ import type {
   CutoutConfig,
   LabwareDefinition2,
   PipetteV2Specs,
+  PositionReference,
 } from '@opentrons/shared-data'
 import type {
   ACTIONS,
@@ -73,12 +74,14 @@ export interface QuickTransferSummaryState {
   submergeAspirate?: {
     speed: number
     delayDuration: number
-    positionFromBottom: number
+    positionFromTop: number
+    positionReference: PositionReference
   }
   retractAspirate?: {
     speed: number
     delayDuration: number
-    positionFromBottom: number
+    positionFromTop: number
+    positionReference: PositionReference
   }
   delayAspirate?: {
     delayDuration: number
@@ -94,12 +97,14 @@ export interface QuickTransferSummaryState {
   submergeDispense?: {
     speed: number
     delayDuration: number
-    positionFromBottom: number
+    positionFromTop: number
+    positionReference: PositionReference
   }
   retractDispense?: {
     speed: number
     delayDuration: number
-    positionFromBottom: number
+    positionFromTop: number
+    positionReference: PositionReference
   }
   delayDispense?: {
     delayDuration: number
@@ -216,7 +221,8 @@ interface SetSubmergeAspirate {
   submergeSettings?: {
     speed: number
     delayDuration: number
-    positionFromBottom: number
+    positionFromTop: number
+    positionReference: PositionReference
   }
 }
 interface SetRetractAspirate {
@@ -224,7 +230,8 @@ interface SetRetractAspirate {
   retractSettings?: {
     speed: number
     delayDuration: number
-    positionFromBottom: number
+    positionFromTop: number
+    positionReference: PositionReference
   }
 }
 interface SetDispenseTipPosition {
@@ -262,7 +269,8 @@ interface SetSubmergeDispense {
   submergeSettings?: {
     speed: number
     delayDuration: number
-    positionFromBottom: number
+    positionFromTop: number
+    positionReference: PositionReference
   }
 }
 interface SetRetractDispense {
@@ -270,7 +278,8 @@ interface SetRetractDispense {
   retractSettings?: {
     speed: number
     delayDuration: number
-    positionFromBottom: number
+    positionFromTop: number
+    positionReference: PositionReference
   }
 }
 interface SetChangeTip {

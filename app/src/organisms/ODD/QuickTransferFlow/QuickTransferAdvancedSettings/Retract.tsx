@@ -54,7 +54,7 @@ export function Retract({
     retractSettings?.delayDuration ?? null
   )
   const [position, setPosition] = useState<number | null>(
-    retractSettings?.positionFromBottom ?? null
+    retractSettings?.positionFromTop ?? null
   )
 
   const action =
@@ -81,7 +81,8 @@ export function Retract({
             retractSettings: {
               speed,
               delayDuration,
-              positionFromBottom: position,
+              positionFromTop: position,
+              positionReference: 'well-top',
             },
           })
           trackEventWithRobotSerial({
@@ -324,7 +325,7 @@ function RetractSettingComponent({
             type="number"
             value={position}
             error={positionError}
-            title={t('distance_bottom_of_well_mm')}
+            title={t('distance_top_of_well_mm')}
             readOnly
           />
           {positionError == null ? (

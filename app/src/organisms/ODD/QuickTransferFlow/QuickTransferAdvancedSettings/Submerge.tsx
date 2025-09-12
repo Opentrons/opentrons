@@ -12,6 +12,7 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+import { POSITION_REFERENCE_TOP } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
@@ -54,7 +55,7 @@ export function Submerge({
     submergeSettings?.delayDuration ?? null
   )
   const [position, setPosition] = useState<number | null>(
-    submergeSettings?.positionFromBottom ?? null
+    submergeSettings?.positionFromTop ?? null
   )
 
   const action =
@@ -81,7 +82,8 @@ export function Submerge({
             submergeSettings: {
               speed,
               delayDuration,
-              positionFromBottom: position,
+              positionFromTop: position,
+              positionReference: POSITION_REFERENCE_TOP,
             },
           })
           trackEventWithRobotSerial({
@@ -323,7 +325,7 @@ function SubmergeSettingComponent({
             type="number"
             value={position}
             error={positionError}
-            title={t('distance_bottom_of_well_mm')}
+            title={t('distance_top_of_well_mm')}
             readOnly
           />
           {positionError == null ? (

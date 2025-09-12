@@ -108,7 +108,8 @@ describe('Submerge', () => {
       submergeSettings: {
         speed: 11,
         delayDuration: 0.5,
-        positionFromBottom: 22,
+        positionFromTop: 22,
+        positionReference: 'well-top',
       },
     })
   })

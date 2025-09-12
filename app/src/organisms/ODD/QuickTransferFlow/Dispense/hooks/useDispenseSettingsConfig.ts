@@ -91,7 +91,7 @@ export function useDispenseSettingsConfig({
           ? t('submerge_value', {
               speed: state.submergeDispense.speed,
               delayDuration: state.submergeDispense.delayDuration,
-              position: state.submergeDispense.positionFromBottom,
+              position: state.submergeDispense.positionFromTop,
             })
           : t('option_disabled'),
       enabled: true,
@@ -157,7 +157,7 @@ export function useDispenseSettingsConfig({
           ? t('retract_value', {
               speed: state.retractDispense.speed,
               delayDuration: state.retractDispense.delayDuration,
-              position: state.retractDispense.positionFromBottom,
+              position: state.retractDispense.positionFromTop,
             })
           : t('option_disabled'),
       enabled: true,
