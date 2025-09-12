@@ -1,4 +1,82 @@
-# Flex stacker examples
+## Critical Lessons for the Usage of Flex Stacker Module
+
+### 1. **Lid Management is Essential**
+- **Problem**: Tip racks retrieved from stackers have lids that prevent pipette access
+- **Solution**: Always use `protocol.move_lid(tiprack, trash, use_gripper=True)` after retrieving tip racks
+- **Rule**: Stackers require lids for tip racks (`lid='opentrons_flex_tiprack_lid'`), but lids must be removed before use
+
+### 2. **Proper Waste Disposal Hierarchy**
+- **Problem**: Attempted to dispose tip racks in trash bin (not allowed)
+- **Solution**: 
+  - **Tips** → Trash bin (via `pipette.drop_tip()`)
+  - **Lids** → Trash bin (via `protocol.move_lid()`)
+  - **Tip racks & other labware** → Waste chute (via `protocol.move_labware()`)
+- **Rule**: Trash bins only accept tips and lids; everything else goes to waste chute
+
+### 3. **Stacker Slot Restrictions**
+- **Problem**: Trash bin placement conflicts with stacker adjacency rules
+- **Solution**: Stackers in A4/B4 block adjacent slots A3/B3
+- **Rule**: 
+  - Stackers only in slots A4, B4, C4, D4
+  - Adjacent slots (A3, B3, C3, D3) become unusable
+  - Trash bins can only go in columns 1 or 3
+
+### 4. **Deck Layout Planning**
+- **Problem**: Multiple slot conflicts due to stacker physical footprint
+- **Solution**: Plan entire deck layout considering stacker adjacency
+- **Final Working Layout**:
+  ```
+  A4: Stacker 1 (blocks A3)
+  B4: Stacker 2 (blocks B3)  
+  C1: Trash bin (column 1 allowed)
+  C2: Tip rack workspace
+  C3: Tip rack workspace  
+  D1: Reservoir
+  D2: PCR plate workspace
+  D3: Waste chute
+  ```
+
+### 5. **Stacker Configuration Requirements**
+- **Tip racks**: Must specify `lid='opentrons_flex_tiprack_lid'`
+- **Other labware**: No lid parameter needed
+- **Gripper**: Required for all stacker operations (`use_gripper=True`)
+
+### 6. **Protocol Flow for Stackers**
+1. Configure stacker with `set_stored_labware()`
+2. Retrieve labware with `stacker.retrieve()`
+3. Move to workspace with `protocol.move_labware()`
+4. Remove lid if tip rack with `protocol.move_lid()`
+5. Use labware normally
+6. Store back with `protocol.move_labware()` + `stacker.store()`
+
+## General Protocol Development Lessons
+
+### 7. **Simulation-Driven Development**
+- Always simulate protocols to catch errors early
+- Fix one error at a time and re-simulate
+- Don't assume fixes work without testing
+
+### 8. **Error Message Analysis**
+- Read error messages carefully for specific constraints
+- Slot restrictions are often clearly stated in errors
+- API limitations are usually well-documented in error messages
+
+### 9. **Documentation Cross-Reference**
+- Stacker documentation clearly states slot and adjacency rules
+- Waste disposal rules are documented but easy to miss
+- Always check both module-specific and general API docs
+
+## Checklist for Future Stacker Protocols
+
+- [ ] Stackers only in A4, B4, C4, D4
+- [ ] No labware in adjacent slots (A3, B3, C3, D3)
+- [ ] Trash bin in column 1 or 3 only
+- [ ] Waste chute loaded for tip rack disposal
+- [ ] Lid removal after tip rack retrieval
+- [ ] All moves use `use_gripper=True`
+- [ ] Proper waste disposal hierarchy followed
+
+These lessons will prevent the three major error categories I encountered: lid access issues, waste disposal violations, and deck slot conflicts.
 
 ##  Example 1: Only uses 2 stackers but replaces the tip boxes back into the empty stacker
 
