@@ -84,8 +84,13 @@ export default defineConfig(
         'process.env': {
           // NOTE: For security, do not spread in the entirety of process.env.
           ...getFeatureFlagEnvVars(),
-          OT_PD_VERSION,
+          NODE_ENV: process.env.NODE_ENV,
           OT_PD_BUILD_DATE,
+          OT_PD_MIXPANEL_DEV_ID: process.env.OT_PD_MIXPANEL_DEV_ID,
+          OT_PD_MIXPANEL_ID: process.env.OT_PD_MIXPANEL_ID,
+          OT_PD_SENTRY_DEV_DSN: process.env.OT_PD_SENTRY_DEV_DSN,
+          OT_PD_SENTRY_DSN: process.env.OT_PD_SENTRY_DSN,
+          OT_PD_VERSION,
         },
         global: 'globalThis',
       },
