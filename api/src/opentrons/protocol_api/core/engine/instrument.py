@@ -101,6 +101,9 @@ _RESIN_TIP_DEFAULT_FLOW_RATE = 10.0
 _FLEX_PIPETTE_NAMES_FIXED_IN = APIVersion(2, 23)
 """The version after which InstrumentContext.name returns the correct API-specific names of Flex pipettes."""
 
+_DEFAULT_FLOW_RATE_BUG_FIXED_IN = APIVersion(2, 26)
+"""The version after which default flow rates correctly update when pipette tip or volume changes."""
+
 
 class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
     """Instrument API core using a ProtocolEngine.
@@ -122,18 +125,27 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         self._sync_hardware_api = sync_hardware_api
         self._protocol_core = protocol_core
 
-        # TODO(jbl 2022-11-03) flow_rates should not live in the cores, and should be moved to the protocol context
-        #   along with other rate related refactors (for the hardware API)
-        flow_rates = self._engine_client.state.pipettes.get_flow_rates(pipette_id)
-        self._aspirate_flow_rate = find_value_for_api_version(
-            MAX_SUPPORTED_VERSION, flow_rates.default_aspirate
+        # TODO(jbl 2025): The way to fix flow_rates is something like:
+        #   Have something called user_flow_rate that defaults to None (except for older API versions)
+        #   When calling a flow_rate, if a user_flow_rate exists use that, otherwise ping the engine
+        #   For older API versions, cheat by setting the user_flow_rate to the default so that incorrectly stays
+        self._initial_default_flow_rates = (
+            self._engine_client.state.pipettes.get_flow_rates(pipette_id)
         )
-        self._dispense_flow_rate = find_value_for_api_version(
-            MAX_SUPPORTED_VERSION, flow_rates.default_dispense
-        )
-        self._blow_out_flow_rate = find_value_for_api_version(
-            MAX_SUPPORTED_VERSION, flow_rates.default_blow_out
-        )
+        self._user_aspirate_flow_rate: Optional[float] = None
+        self._user_dispense_flow_rate: Optional[float] = None
+        self._user_blow_out_flow_rate: Optional[float] = None
+        if self._protocol_core.api_version < _DISPENSE_VOLUME_VALIDATION_ADDED_IN:
+            # TODO also look into why we were using MAX_SUPPORTED_VERSION here and if that makes sense to keep
+            self._user_aspirate_flow_rate = find_value_for_api_version(
+                MAX_SUPPORTED_VERSION, self._initial_default_flow_rates.default_aspirate
+            )
+            self._user_dispense_flow_rate = find_value_for_api_version(
+                MAX_SUPPORTED_VERSION, self._initial_default_flow_rates.default_dispense
+            )
+            self._user_blow_out_flow_rate = find_value_for_api_version(
+                MAX_SUPPORTED_VERSION, self._initial_default_flow_rates.default_blow_out
+            )
         self._flow_rates = FlowRates(self)
 
         self.set_default_speed(speed=default_movement_speed)
@@ -1031,13 +1043,94 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         return self._flow_rates
 
     def get_aspirate_flow_rate(self, rate: float = 1.0) -> float:
-        return self._aspirate_flow_rate * rate
+        """Returns the user-set aspirate flow rate if that's been modified, otherwise return the default.
+
+        Note that in API versions 2.25 and below `_user_aspirate_flow_rate` will automatically be set to the initial
+        default flow rate when the pipette is loaded (which is the same as the max tip capacity). This is to preserve
+        buggy behavior in which the default was never correctly updated when the pipette picked up or dropped a tip or
+        had its volume configuration changed.
+        """
+        aspirate_flow_rate = (
+            self._user_aspirate_flow_rate
+            or find_value_for_api_version(
+                self._protocol_core.api_version,
+                self._engine_client.state.pipettes.get_flow_rates(
+                    self._pipette_id
+                ).default_aspirate,
+            )
+        )
+
+        return aspirate_flow_rate * rate
 
     def get_dispense_flow_rate(self, rate: float = 1.0) -> float:
-        return self._dispense_flow_rate * rate
+        """Returns the user-set dispense flow rate if that's been modified, otherwise return the default.
+
+        Note that in API versions 2.25 and below `_user_dispense_flow_rate` will automatically be set to the initial
+        default flow rate when the pipette is loaded (which is the same as the max tip capacity). This is to preserve
+        buggy behavior in which the default was never correctly updated when the pipette picked up or dropped a tip or
+        had its volume configuration changed.
+        """
+        dispense_flow_rate = (
+            self._user_dispense_flow_rate
+            or find_value_for_api_version(
+                self._protocol_core.api_version,
+                self._engine_client.state.pipettes.get_flow_rates(
+                    self._pipette_id
+                ).default_dispense,
+            )
+        )
+
+        return dispense_flow_rate * rate
 
     def get_blow_out_flow_rate(self, rate: float = 1.0) -> float:
-        return self._blow_out_flow_rate * rate
+        """Returns the user-set blow-out flow rate if that's been modified, otherwise return the default.
+
+        Note that in API versions 2.25 and below `_user_dispense_flow_rate` will automatically be set to the initial
+        default flow rate when the pipette is loaded (which is the same as the max tip capacity). This is to preserve
+        buggy behavior in which the default was never correctly updated when the pipette picked up or dropped a tip or
+        had its volume configuration changed.
+        """
+        blow_out_flow_rate = (
+            self._user_dispense_flow_rate
+            or find_value_for_api_version(
+                self._protocol_core.api_version,
+                self._engine_client.state.pipettes.get_flow_rates(
+                    self._pipette_id
+                ).default_dispense,
+            )
+        )
+
+        return blow_out_flow_rate * rate
+
+    def reset_aspirate_flow_rate(self) -> None:
+        """Resets the user-set aspirate flow rate to allow the automatic default to be used."""
+        if self._protocol_core.api_version >= _DEFAULT_FLOW_RATE_BUG_FIXED_IN:
+            self._user_aspirate_flow_rate = None
+        else:
+            # Set to the initial default to preserve buggy behavior where the default was not correctly updated
+            self._user_aspirate_flow_rate = find_value_for_api_version(
+                MAX_SUPPORTED_VERSION, self._initial_default_flow_rates.default_aspirate
+            )
+
+    def reset_dispense_flow_rate(self) -> None:
+        """Resets the user-set dispense flow rate to allow the automatic default to be used."""
+        if self._protocol_core.api_version >= _DEFAULT_FLOW_RATE_BUG_FIXED_IN:
+            self._user_dispense_flow_rate = None
+        else:
+            # Set to the initial default to preserve buggy behavior where the default was not correctly updated
+            self._user_dispense_flow_rate = find_value_for_api_version(
+                MAX_SUPPORTED_VERSION, self._initial_default_flow_rates.default_dispense
+            )
+
+    def reset_blow_out_flow_rate(self) -> None:
+        """Resets the user-set dispense flow rate to allow the automatic default to be used."""
+        if self._protocol_core.api_version >= _DEFAULT_FLOW_RATE_BUG_FIXED_IN:
+            self._user_blow_out_flow_rate = None
+        else:
+            # Set to the initial default to preserve buggy behavior where the default was not correctly updated
+            self._user_blow_out_flow_rate = find_value_for_api_version(
+                MAX_SUPPORTED_VERSION, self._initial_default_flow_rates.default_blow_out
+            )
 
     def get_nozzle_configuration(self) -> NozzleConfigurationType:
         return self._engine_client.state.pipettes.get_nozzle_layout_type(
@@ -1084,13 +1177,13 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
     ) -> None:
         if aspirate is not None:
             assert aspirate > 0
-            self._aspirate_flow_rate = aspirate
+            self._user_aspirate_flow_rate = aspirate
         if dispense is not None:
             assert dispense > 0
-            self._dispense_flow_rate = dispense
+            self._user_dispense_flow_rate = dispense
         if blow_out is not None:
             assert blow_out > 0
-            self._blow_out_flow_rate = blow_out
+            self._user_blow_out_flow_rate = blow_out
 
     def set_liquid_presence_detection(self, enable: bool) -> None:
         self._liquid_presence_detection = enable
