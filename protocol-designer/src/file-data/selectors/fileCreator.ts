@@ -404,7 +404,13 @@ export const createFile: Selector<PDPythonFile> = createSelector(
       [
         // Here are the sections of the Python file:
         pythonImports(),
-        pythonMetadata(fileMetadata),
+        pythonMetadata({
+          ...fileMetadata,
+          // It's OK to use the "real" process.env.OT_PD_VERSION here instead of the hard-coded
+          // proxy PD_APPLICATION_VERSION, as done above, because this is just metadata for humans
+          // and doesn't have the migration baggage described above.
+          protocolDesigner: process.env.OT_PD_VERSION,
+        }),
         pythonRequirements(robotType),
         pythonDefRun(
           invariantContext,
