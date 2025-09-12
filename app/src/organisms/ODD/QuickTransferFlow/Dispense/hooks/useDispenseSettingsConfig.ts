@@ -58,7 +58,6 @@ export function useDispenseSettingsConfig({
 
   const touchTipEnabled = getIsTouchTipEnabled(state.destination)
   const hasLiquidClass = state.liquidClassName !== 'none'
-
   const dispenseSettingsItems = [
     {
       option: 'dispense_flow_rate',
@@ -103,11 +102,11 @@ export function useDispenseSettingsConfig({
       option: 'dispense_delay',
       copy: t('delay'),
       value:
-        state.delayDispense !== undefined
+        state.delayDispense != null
           ? t('delay_value', {
               delay: state.delayDispense.delayDuration,
             })
-          : '',
+          : t('option_disabled'),
       enabled: true,
       onClick: () => {
         setSelectedSetting('dispense_delay')
