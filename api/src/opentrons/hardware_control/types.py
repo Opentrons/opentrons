@@ -2,11 +2,25 @@ from asyncio import Queue
 import enum
 import logging
 from dataclasses import dataclass
-from typing import cast, Tuple, Union, List, Callable, Dict, TypeVar, Type
+from typing import (
+    cast,
+    Tuple,
+    Union,
+    List,
+    Callable,
+    Dict,
+    TypeVar,
+    Type,
+    TYPE_CHECKING,
+)
 from typing_extensions import Literal
 from opentrons import types as top_types
 from opentrons_shared_data.pipette.types import PipetteChannelType
+from opentrons_shared_data.errors.exceptions import EnumeratedError
 from opentrons.config import feature_flags
+
+if TYPE_CHECKING:
+    from .modules.types import ModuleModel
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -384,6 +398,7 @@ class HardwareEventType(enum.Enum):
     DOOR_SWITCH_CHANGE = enum.auto()
     ERROR_MESSAGE = enum.auto()
     ESTOP_CHANGE = enum.auto()
+    ASYNCHRONOUS_MODULE_ERROR = enum.auto()
 
 
 @dataclass
@@ -428,10 +443,24 @@ class ErrorMessageNotification:
     event: Literal[HardwareEventType.ERROR_MESSAGE] = HardwareEventType.ERROR_MESSAGE
 
 
+@dataclass(frozen=True)
+class AsynchronousModuleErrorNotification:
+    exception: EnumeratedError
+    module_serial: str | None
+    module_model: "ModuleModel"
+    port: str
+    event: Literal[
+        HardwareEventType.ASYNCHRONOUS_MODULE_ERROR
+    ] = HardwareEventType.ASYNCHRONOUS_MODULE_ERROR
+
+
 # new event types get new dataclasses
 # when we add more event types we add them here
 HardwareEvent = Union[
-    DoorStateNotification, ErrorMessageNotification, EstopStateNotification
+    DoorStateNotification,
+    ErrorMessageNotification,
+    EstopStateNotification,
+    AsynchronousModuleErrorNotification,
 ]
 
 HardwareEventHandler = Callable[[HardwareEvent], None]

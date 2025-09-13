@@ -782,7 +782,7 @@ class OT3Simulator(FlexBackend):
                 next_fw_version=1,
                 fw_update_needed=False,
                 current_fw_sha="simulated",
-                pcba_revision="A1",
+                pcba_revision="A1.0",
                 update_state=None,
             )
             for axis in self._present_axes

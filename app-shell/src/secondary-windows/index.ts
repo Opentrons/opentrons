@@ -8,8 +8,9 @@
  * Each "type" of open window requires an associated action and secondary window details, see detailsByActionType.
  */
 
-import { CAMERA_STREAM_OPEN } from '../constants'
+import { CAMERA_PHOTO_OPEN, CAMERA_STREAM_OPEN } from '../constants'
 import { createLogger } from '../log'
+import { openCameraPhoto } from './camera-photo'
 import { openCameraStream } from './camera-stream'
 
 import type { BrowserWindow } from 'electron'
@@ -48,6 +49,14 @@ function detailsByActionType(action: Action): SecondaryWindowDetails | null {
       return openCameraStream({
         robotIp: action.payload.hostname,
         robotName: action.payload.robotName,
+        log,
+      })
+    case CAMERA_PHOTO_OPEN:
+      return openCameraPhoto({
+        photoUrl: action.payload.photoUrl,
+        robotName: action.payload.robotName,
+        windowTitle: action.payload.windowTitle,
+        dimensions: action.payload.dimensions,
         log,
       })
     default:

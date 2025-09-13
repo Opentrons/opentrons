@@ -162,9 +162,10 @@ export function useGetModulesNeedingSetup(): AttachedModule[] {
       .map(m => m.opentronsModuleSerialNumber)
     return attachedModules.filter(
       m =>
-        !modulesInDeckConfig.includes(m.serialNumber) ||
-        (!MODULES_NOT_REQUIRING_CALIBRATION.includes(m.moduleType) &&
-          m.moduleOffset === undefined)
+        m.compatibleWithRobot &&
+        (!modulesInDeckConfig.includes(m.serialNumber) ||
+          (!MODULES_NOT_REQUIRING_CALIBRATION.includes(m.moduleType) &&
+            m.moduleOffset === undefined))
     )
   }
   return []
@@ -280,7 +281,11 @@ export function useWindowType(): WindowType {
     try {
       // Listen for window type from main process
       const handleWindowType = (_: IpcMainEvent, type: string): void => {
-        if (type === 'main' || type === 'secondary') {
+        if (
+          type === 'desktop-main' ||
+          type === 'odd-main' ||
+          type === 'secondary'
+        ) {
           setWindowType(type)
         } else {
           console.error(`Received unhandled window type from shell ${type}`)
@@ -294,8 +299,8 @@ export function useWindowType(): WindowType {
       }
     } catch (error) {
       console.error('Failed to setup window type listener:', error)
-      // Fallback to main window if electron APIs not available
-      setWindowType('main')
+      // Fallback to desktop main window if electron APIs not available
+      setWindowType('desktop-main')
     }
   }, [])
 

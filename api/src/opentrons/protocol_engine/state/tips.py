@@ -13,7 +13,7 @@ from ._well_math import (
     wells_covered_by_pipette_configuration,
     wells_covered_by_physical_pipette,
 )
-from ..actions import Action, ResetTipsAction, get_state_updates
+from ..actions import Action, get_state_updates
 
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 
@@ -45,14 +45,6 @@ class TipStore(HasState[TipState], HandlesActions):
         """Modify state in reaction to an action."""
         for state_update in get_state_updates(action):
             self._handle_state_update(state_update)
-
-        if isinstance(action, ResetTipsAction):
-            labware_id = action.labware_id
-
-            for well_name in self._state.tips_by_labware_id[labware_id].keys():
-                self._state.tips_by_labware_id[labware_id][
-                    well_name
-                ] = TipRackWellState.CLEAN
 
     def _handle_state_update(self, state_update: update_types.StateUpdate) -> None:
         if state_update.tips_state != update_types.NO_CHANGE:

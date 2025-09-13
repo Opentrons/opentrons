@@ -16,11 +16,17 @@ Protocols
    :members:
    :exclude-members: location_cache, cleanup, clear_commands
 
+.. autoclass:: opentrons.protocol_api.tasks
+   :members:
+
 Instruments
 ===========
 .. autoclass:: opentrons.protocol_api.InstrumentContext
    :members:
    :exclude-members: delay
+
+Robot Motors
+============
 
 .. autoclass:: opentrons.protocol_api.RobotContext
    :members: 

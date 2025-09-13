@@ -33,7 +33,8 @@ describe('ConnectedStepContainer', () => {
 
   beforeEach(() => {
     props = {
-      title: 'Starting deck state',
+      stepNumber: null,
+      text: 'Starting deck state',
       iconName: 'add',
       onClick: vi.fn(),
       selected: false,
@@ -63,27 +64,20 @@ describe('ConnectedStepContainer', () => {
     expect(props.onClick).toHaveBeenCalled()
   })
   it('renders the ending deck state step', () => {
-    props.title = 'Final deck state'
+    props.text = 'Final deck state'
     render(props)
     screen.getByText('Final deck state')
   })
 
-  it('renders the step title, mock overflow menu and mock step overflow menu', () => {
+  it('renders the overflow menu button when active (selected)', () => {
     props = {
       ...props,
-      title: 'Transfer',
       selected: true,
       openedOverflowMenuId: 'mockStepId',
       setOpenedOverflowMenuId: vi.fn(),
     }
     render(props)
-    screen.getByText('Transfer')
 
-    const buttonSansPadding = within(
-      screen.getByTestId('StepContainer_mockStepId')
-    ).getByTestId('StepContainer_buttonSansPadding')
-    expect(buttonSansPadding).toHaveStyle(`background-color: ${COLORS.blue50}`)
-    expect(buttonSansPadding).toHaveStyle(`color: ${COLORS.white}`)
     fireEvent.click(
       within(screen.getByTestId('StepContainer_mockStepId')).getByTestId(
         'StepContainer_OverflowBtn'
@@ -92,24 +86,57 @@ describe('ConnectedStepContainer', () => {
     screen.getByText('mock StepOverflowMenu')
   })
 
-  it('render non-active style when selected is false', () => {
+  it('renders the active (selected) style', () => {
     props = {
       ...props,
-      title: 'Transfer',
+      stepNumber: 123,
+      text: 'Transfer',
+      subtext: 'Subtext',
+      selected: true,
+    }
+    render(props)
+
+    const buttonSansPadding = within(
+      screen.getByTestId('StepContainer_mockStepId')
+    ).getByTestId('StepContainer_buttonSansPadding')
+    const stepNumber = screen.getByText('123.')
+    const text = screen.getByText('Transfer')
+    const subtext = screen.getByText('Subtext')
+
+    expect(buttonSansPadding).toHaveStyle(`background-color: ${COLORS.blue50}`)
+    expect(stepNumber).toHaveStyle(`color: ${COLORS.white}`)
+    expect(text).toHaveStyle(`color: ${COLORS.white}`)
+    expect(subtext).toHaveStyle(`color: ${COLORS.transparentWhite80}`)
+  })
+
+  it('renders the non-active (non-selected) style', () => {
+    props = {
+      ...props,
+      stepNumber: 123,
+      text: 'Transfer',
+      subtext: 'Subtext',
       selected: false,
     }
     render(props)
     const buttonSansPadding = within(
       screen.getByTestId('StepContainer_mockStepId')
     ).getByTestId('StepContainer_buttonSansPadding')
+    const stepNumber = screen.getByText('123.')
+    const text = screen.getByText('Transfer')
+    const subtext = screen.getByText('Subtext')
+
     expect(buttonSansPadding).toHaveStyle(`background-color: ${COLORS.grey20}`)
-    expect(buttonSansPadding).toHaveStyle(`color: ${COLORS.black90}`)
+    expect(stepNumber).toHaveStyle(`color: ${COLORS.black90}`)
+    expect(text).toHaveStyle(`color: ${COLORS.black90}`)
+    expect(subtext).toHaveStyle(`color: ${COLORS.grey60}`)
   })
 
-  it('render error style when hasError is true and selected is true', () => {
+  it('renders the error + selected style', () => {
     props = {
       ...props,
-      title: 'Transfer',
+      stepNumber: 123,
+      text: 'Transfer',
+      subtext: 'Subtext',
       selected: true,
       hasError: true,
       openedOverflowMenuId: 'mockStepId',
@@ -119,14 +146,22 @@ describe('ConnectedStepContainer', () => {
     const buttonSansPadding = within(
       screen.getByTestId('StepContainer_mockStepId')
     ).getByTestId('StepContainer_buttonSansPadding')
+    const stepNumber = screen.getByText('123.')
+    const text = screen.getByText('Transfer')
+    const subtext = screen.getByText('Subtext')
+
     expect(buttonSansPadding).toHaveStyle(`background-color: ${COLORS.red50}`)
-    expect(buttonSansPadding).toHaveStyle(`color: ${COLORS.white}`)
+    expect(stepNumber).toHaveStyle(`color: ${COLORS.white}`)
+    expect(text).toHaveStyle(`color: ${COLORS.white}`)
+    expect(subtext).toHaveStyle(`color: ${COLORS.transparentWhite80}`)
   })
 
-  it('render non-active error style when hasError is true and selected is false', () => {
+  it('renders the error + nonselected style', () => {
     props = {
       ...props,
-      title: 'Transfer',
+      stepNumber: 123,
+      text: 'Transfer',
+      subtext: 'Subtext',
       selected: false,
       hasError: true,
       openedOverflowMenuId: 'mockStepId',
@@ -136,8 +171,14 @@ describe('ConnectedStepContainer', () => {
     const buttonSansPadding = within(
       screen.getByTestId('StepContainer_mockStepId')
     ).getByTestId('StepContainer_buttonSansPadding')
+    const stepNumber = screen.getByText('123.')
+    const text = screen.getByText('Transfer')
+    const subtext = screen.getByText('Subtext')
+
     expect(buttonSansPadding).toHaveStyle(`background-color: ${COLORS.red30}`)
-    expect(buttonSansPadding).toHaveStyle(`color: ${COLORS.red60}`)
+    expect(stepNumber).toHaveStyle(`color: ${COLORS.red60}`)
+    expect(text).toHaveStyle(`color: ${COLORS.red60}`)
+    expect(subtext).toHaveStyle(`color: ${COLORS.red60}`)
   })
 
   it('renders the divider if hover targets that step', () => {

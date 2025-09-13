@@ -1,4 +1,5 @@
 """FLEX Stacker Cycle QC Test."""
+
 from os import environ
 from serial.tools.list_ports import comports  # type: ignore[import]
 
@@ -13,6 +14,7 @@ from hardware_testing.data.csv_report import CSVReport
 
 from .config import TestSection, TestConfig, build_report, TESTS
 from opentrons.hardware_control.modules import FlexStacker
+from opentrons.hardware_control.execution_manager import ExecutionManager
 from opentrons.drivers.rpi_drivers.types import USBPort
 
 STACKER_VID = 0x483
@@ -38,6 +40,9 @@ async def build_stacker_report(
         usb_port=USBPort(port, 0),
         hw_control_loop=asyncio.get_running_loop(),
         simulating=is_simulating,
+        execution_manager=ExecutionManager(),
+        disconnected_callback=lambda *args: None,
+        error_callback=lambda *args: None,
     )
 
     report = build_report(test_name)

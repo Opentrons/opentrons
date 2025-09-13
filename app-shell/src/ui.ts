@@ -48,7 +48,7 @@ export function createUi(): BrowserWindow {
     () => {
       log.debug('Main window ready to show')
       mainWindow.show()
-      mainWindow.webContents.send('window-type', 'main')
+      mainWindow.webContents.send('window-type', 'desktop-main')
     }
   )
 

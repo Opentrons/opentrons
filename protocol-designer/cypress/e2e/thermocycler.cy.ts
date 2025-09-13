@@ -1,5 +1,5 @@
 import { verifyImportProtocolPage } from '../support/Import'
-import { StepBuilder } from '../support/StepBuilder'
+import { StepExecutor } from '../support/StepBuilder'
 import { getTestFile, TestFilePath } from '../support/TestFiles'
 import {
   ThermocyclerEditor,
@@ -22,49 +22,49 @@ describe('Redesigned Thermocycler Set Up Steps - Happy Path', () => {
   })
 
   it('It should verify the working function of thermocycler set up', () => {
-    const steps = new StepBuilder()
-    steps.add(
-      TimelineSteps.SelectItemMenuOption('1. Thermocycler', 'Edit step')
+    const se = new StepExecutor()
+    se.execute(
+      TimelineSteps.SelectItemMenuOption(1, 'Thermocycler', 'Edit step')
     )
-    steps.add(ThermoVerifications.VerifyPartOne())
-    steps.add(ThermocyclerEditor.SelectProfileOrState('state'))
-    steps.add(ThermoVerifications.VerifyThermoState())
-    steps.add(ThermocyclerEditor.BlockTempOnOff('on'))
-    steps.add(ThermoState.BlockTempInput('99'))
-    steps.add(ThermocyclerEditor.BlockTempOnOff('off'))
-    steps.add(ThermocyclerEditor.BlockTempOnOff('on'))
-    steps.add(ThermoState.BlockTempInput('15'))
-    steps.add(ThermocyclerEditor.LidTempOnOff('on'))
-    steps.add(ThermoState.LidTempInput('37'))
-    steps.add(ThermocyclerEditor.LidTempOnOff('off'))
-    steps.add(ThermocyclerEditor.LidTempOnOff('on'))
-    steps.add(ThermoState.LidTempInput('110'))
-    steps.add(ThermocyclerEditor.LidOpenClosed('closed'))
-    steps.add(ThermocyclerEditor.LidOpenClosed('open'))
-    steps.add(ThermocyclerEditor.LidOpenClosed('closed'))
-    steps.add(ThermocyclerEditor.BackButton())
-    steps.add(ThermocyclerEditor.SelectProfileOrState('state'))
-    steps.add(ThermoVerifications.VerifyOptionsPersist('state'))
-    steps.add(ThermocyclerEditor.BackButton())
-    steps.add(ThermocyclerEditor.SelectProfileOrState('profile'))
-    steps.add(ThermoVerifications.VerifyThermoProfile())
-    steps.add(ThermoProfile.WellVolumeInput('99'))
-    steps.add(ThermoProfile.LidTempInput('40'))
-    steps.add(ThermocyclerEditor.BlockTempOnOff('on'))
-    steps.add(ThermoProfile.BlockTempHoldInput('90'))
-    steps.add(ThermocyclerEditor.LidTempOnOff('on'))
-    steps.add(ThermoProfile.LidTempHoldInput('40'))
-    steps.add(ThermocyclerEditor.LidOpenClosed('open'))
-    steps.add(ThermocyclerEditor.BackButton())
-    steps.add(ThermocyclerEditor.SelectProfileOrState('profile'))
-    steps.add(ThermoVerifications.VerifyOptionsPersist('profile'))
-    steps.add(ThermoVerifications.VerifyProfileSteps())
-    steps.add(ThermoProfileSteps.AddCycle())
-    steps.add(ThermoProfileSteps.DeleteCycle(0))
-    steps.add(ThermoProfileSteps.AddCycle())
-    steps.add(ThermoProfileSteps.SetCycleCount(0, '3'))
-    steps.add(ThermoProfileSteps.AddCycleStep(0))
-    steps.add(
+    se.execute(ThermoVerifications.VerifyPartOne())
+    se.execute(ThermocyclerEditor.SelectProfileOrState('state'))
+    se.execute(ThermoVerifications.VerifyThermoState())
+    se.execute(ThermocyclerEditor.BlockTempOnOff('on'))
+    se.execute(ThermoState.BlockTempInput('99'))
+    se.execute(ThermocyclerEditor.BlockTempOnOff('off'))
+    se.execute(ThermocyclerEditor.BlockTempOnOff('on'))
+    se.execute(ThermoState.BlockTempInput('15'))
+    se.execute(ThermocyclerEditor.LidTempOnOff('on'))
+    se.execute(ThermoState.LidTempInput('37'))
+    se.execute(ThermocyclerEditor.LidTempOnOff('off'))
+    se.execute(ThermocyclerEditor.LidTempOnOff('on'))
+    se.execute(ThermoState.LidTempInput('110'))
+    se.execute(ThermocyclerEditor.LidOpenClosed('closed'))
+    se.execute(ThermocyclerEditor.LidOpenClosed('open'))
+    se.execute(ThermocyclerEditor.LidOpenClosed('closed'))
+    se.execute(ThermocyclerEditor.BackButton())
+    se.execute(ThermocyclerEditor.SelectProfileOrState('state'))
+    se.execute(ThermoVerifications.VerifyOptionsPersist('state'))
+    se.execute(ThermocyclerEditor.BackButton())
+    se.execute(ThermocyclerEditor.SelectProfileOrState('profile'))
+    se.execute(ThermoVerifications.VerifyThermoProfile())
+    se.execute(ThermoProfile.WellVolumeInput('99'))
+    se.execute(ThermoProfile.LidTempInput('40'))
+    se.execute(ThermocyclerEditor.BlockTempOnOff('on'))
+    se.execute(ThermoProfile.BlockTempHoldInput('90'))
+    se.execute(ThermocyclerEditor.LidTempOnOff('on'))
+    se.execute(ThermoProfile.LidTempHoldInput('40'))
+    se.execute(ThermocyclerEditor.LidOpenClosed('open'))
+    se.execute(ThermocyclerEditor.BackButton())
+    se.execute(ThermocyclerEditor.SelectProfileOrState('profile'))
+    se.execute(ThermoVerifications.VerifyOptionsPersist('profile'))
+    se.execute(ThermoVerifications.VerifyProfileSteps())
+    se.execute(ThermoProfileSteps.AddCycle())
+    se.execute(ThermoProfileSteps.DeleteCycle(0))
+    se.execute(ThermoProfileSteps.AddCycle())
+    se.execute(ThermoProfileSteps.SetCycleCount(0, '3'))
+    se.execute(ThermoProfileSteps.AddCycleStep(0))
+    se.execute(
       ThermoProfileSteps.FillCycleStep({
         cycle: 0,
         step: 0,
@@ -73,8 +73,8 @@ describe('Redesigned Thermocycler Set Up Steps - Happy Path', () => {
         time: '05:00',
       })
     )
-    steps.add(ThermoProfileSteps.AddCycleStep(0))
-    steps.add(
+    se.execute(ThermoProfileSteps.AddCycleStep(0))
+    se.execute(
       ThermoProfileSteps.FillCycleStep({
         cycle: 0,
         step: 1,
@@ -83,10 +83,10 @@ describe('Redesigned Thermocycler Set Up Steps - Happy Path', () => {
         time: '05:55',
       })
     )
-    steps.add(ThermoProfileSteps.AddCycleStep(0))
-    steps.add(ThermoProfileSteps.DeleteCycleStep(0, 2))
-    steps.add(ThermoProfileSteps.AddCycleStep(0))
-    steps.add(
+    se.execute(ThermoProfileSteps.AddCycleStep(0))
+    se.execute(ThermoProfileSteps.DeleteCycleStep(0, 2))
+    se.execute(ThermoProfileSteps.AddCycleStep(0))
+    se.execute(
       ThermoProfileSteps.FillCycleStep({
         cycle: 0,
         step: 2,
@@ -95,9 +95,9 @@ describe('Redesigned Thermocycler Set Up Steps - Happy Path', () => {
         time: '03:33',
       })
     )
-    steps.add(ThermoProfileSteps.SaveCycle(0))
-    steps.add(ThermoProfileSteps.AddStep())
-    steps.add(
+    se.execute(ThermoProfileSteps.SaveCycle(0))
+    se.execute(ThermoProfileSteps.AddStep())
+    se.execute(
       ThermoProfileSteps.FillThermocyclerStep({
         step: 0,
         stepName: 'Thermocycler Step 1',
@@ -105,9 +105,9 @@ describe('Redesigned Thermocycler Set Up Steps - Happy Path', () => {
         time: '03:01',
       })
     )
-    steps.add(ThermoProfileSteps.DeleteThermocyclerStep(0))
-    steps.add(ThermoProfileSteps.AddStep())
-    steps.add(
+    se.execute(ThermoProfileSteps.DeleteThermocyclerStep(0))
+    se.execute(ThermoProfileSteps.AddStep())
+    se.execute(
       ThermoProfileSteps.FillThermocyclerStep({
         step: 0,
         stepName: 'Thermocycler step 2',
@@ -115,9 +115,9 @@ describe('Redesigned Thermocycler Set Up Steps - Happy Path', () => {
         time: '02:02',
       })
     )
-    steps.add(ThermoProfileSteps.SaveThermocyclerStep(0))
-    steps.add(ThermoProfileSteps.AddStep())
-    steps.add(
+    se.execute(ThermoProfileSteps.SaveThermocyclerStep(0))
+    se.execute(ThermoProfileSteps.AddStep())
+    se.execute(
       ThermoProfileSteps.FillThermocyclerStep({
         step: 1,
         stepName: 'Thermocycler Step 3',
@@ -125,9 +125,8 @@ describe('Redesigned Thermocycler Set Up Steps - Happy Path', () => {
         time: '01:59',
       })
     )
-    steps.add(ThermoProfileSteps.SaveThermocyclerStep(1))
-    steps.add(ThermocyclerEditor.SaveProfileSteps())
-    steps.add(ThermocyclerEditor.SaveButton())
-    steps.execute()
+    se.execute(ThermoProfileSteps.SaveThermocyclerStep(1))
+    se.execute(ThermocyclerEditor.SaveProfileSteps())
+    se.execute(ThermocyclerEditor.SaveButton())
   })
 })
