@@ -5,6 +5,7 @@ from typing import NewType, Optional
 from opentrons.protocol_engine.errors import (
     InvalidTargetTemperatureError,
     InvalidBlockVolumeError,
+    InvalidRampRateError,
     NoTargetTemperatureSetError,
     InvalidHoldTimeError,
 )
@@ -22,6 +23,10 @@ from opentrons.drivers.thermocycler.driver import (
 from opentrons.hardware_control.modules import ModuleData, ModuleDataValidator
 
 ThermocyclerModuleId = NewType("ThermocyclerModuleId", str)
+
+# TODO(Ryan) add a real max heating and cooling rate
+MAX_HEATING_RATE = 100.0
+MAX_COOLING_RATE = 100.0
 
 
 @dataclass(frozen=True)
@@ -142,6 +147,38 @@ class ThermocyclerModuleSubState:
                 f"Module {self.module_id} does not have a target block temperature set."
             )
         return target
+
+    def validate_ramp_rate(
+        self, ramp_rate: Optional[float], target_temp: float
+    ) -> Optional[float]:
+        """Validate a given temperature ramp rate.
+
+        Args:
+            ramp_rate: The requested ramp rate in °C/second.
+            target_temp:  The requested block temperature.
+
+        Raises:
+            InvalidRampRateError: The given ramp_rate is invalid
+
+        Returns:
+            The validated ramp rate in °C/second
+        """
+        if ramp_rate is None:
+            return ramp_rate
+
+        heating = target_temp > self.get_target_block_temperature()
+        if (heating and ramp_rate > MAX_HEATING_RATE) or (
+            not heating and ramp_rate > MAX_COOLING_RATE
+        ):
+            raise InvalidRampRateError(
+                f"Thermocycler ramp rate cannot exceed {MAX_HEATING_RATE}°C/s"
+                f" while heating or {MAX_COOLING_RATE}°C/s when cooling."
+            )
+        if ramp_rate <= 0:
+            raise InvalidRampRateError(
+                f"Thermocycler ramp rate cannot be less than or equal to 0, got {ramp_rate}"
+            )
+        return ramp_rate
 
     @classmethod
     def from_live_data(

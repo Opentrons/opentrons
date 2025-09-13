@@ -496,6 +496,7 @@ export interface HeaterShakerArgs extends CommonArgs {
   commandCreatorFnName: 'heaterShaker'
   targetTemperature: number | null
   latchOpen: boolean
+  timerHours: number | null
   timerMinutes: number | null
   timerSeconds: number | null
   message?: string
@@ -754,12 +755,14 @@ export interface CommandCreatorWarning {
 
 interface StepInfo {
   stepNumber?: number
-  //  TODO: can extend to include stepName and stepDetails
+  name?: string | null
+  description?: string | null
 }
 
-export interface CommandsAndRobotState extends StepInfo {
+export interface CommandsAndRobotState {
   commands: CreateCommand[]
   robotState: RobotState
+  stepInfo?: StepInfo
   warnings?: CommandCreatorWarning[]
   python?: string
 }

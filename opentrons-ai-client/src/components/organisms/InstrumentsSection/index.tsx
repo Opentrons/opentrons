@@ -25,11 +25,13 @@ export const PIPETTES_FIELD_NAME = 'instruments.pipettes'
 export const FLEX_GRIPPER_FIELD_NAME = 'instruments.flexGripper'
 export const LEFT_PIPETTE_FIELD_NAME = 'instruments.leftPipette'
 export const RIGHT_PIPETTE_FIELD_NAME = 'instruments.rightPipette'
+export const NINETY_SIX_CHANNEL_PIPETTE_FIELD_NAME =
+  'instruments.ninetySixChannelPipette'
 export const FLEX_GRIPPER = 'flex_gripper'
 export const NO_FLEX_GRIPPER = 'no_flex_gripper'
 export const OPENTRONS_FLEX = 'opentrons_flex'
 export const OPENTRONS_OT2 = 'opentrons_ot2'
-export const _96_CHANNEL_1000UL_PIPETTE = '96_channel_1000ul_pipette'
+export const NINETY_SIX_CHANNEL_PIPETTE = '96_channel_pipette'
 export const TWO_PIPETTES = 'two_pipettes'
 export const NO_PIPETTES = 'none'
 
@@ -45,11 +47,14 @@ export function InstrumentsSection(): JSX.Element | null {
       FLEX_GRIPPER_FIELD_NAME,
       LEFT_PIPETTE_FIELD_NAME,
       RIGHT_PIPETTE_FIELD_NAME,
+      NINETY_SIX_CHANNEL_PIPETTE_FIELD_NAME,
     ])
   })
 
   const robotType = watch(ROBOT_FIELD_NAME)
   const isOtherPipettesSelected = watch(PIPETTES_FIELD_NAME) === TWO_PIPETTES
+  const is96ChannelSelected =
+    watch(PIPETTES_FIELD_NAME) === NINETY_SIX_CHANNEL_PIPETTE
   const isOpentronsOT2Selected = robotType === OPENTRONS_OT2
 
   const robotRadioButtons = [
@@ -72,9 +77,9 @@ export function InstrumentsSection(): JSX.Element | null {
       buttonValue: TWO_PIPETTES,
     },
     {
-      id: _96_CHANNEL_1000UL_PIPETTE,
-      buttonLabel: t('96_channel_1000ul_pipette_label'),
-      buttonValue: _96_CHANNEL_1000UL_PIPETTE,
+      id: NINETY_SIX_CHANNEL_PIPETTE,
+      buttonLabel: t('96_channel_pipette_label'),
+      buttonValue: NINETY_SIX_CHANNEL_PIPETTE,
     },
   ]
 
@@ -89,6 +94,11 @@ export function InstrumentsSection(): JSX.Element | null {
       buttonLabel: t('flex_gripper_no_label'),
       buttonValue: NO_FLEX_GRIPPER,
     },
+  ]
+
+  const ninetySixChannelOptions = [
+    { name: t('96_channel_200ul'), value: 'Flex 96-Channel 200uL pipette' },
+    { name: t('96_channel_1000ul'), value: 'Flex 96-Channel 1000uL pipette' },
   ]
 
   const pipetteOptions = useMemo(() => {
@@ -171,6 +181,22 @@ export function InstrumentsSection(): JSX.Element | null {
               title={t('right_pipette_label')}
               name={RIGHT_PIPETTE_FIELD_NAME}
               options={pipetteOptions}
+              placeholder={t('choose_pipette_placeholder')}
+              rules={{
+                required: true,
+              }}
+            />
+          </PipettesDropdown>
+        )}
+
+        {is96ChannelSelected && (
+          <PipettesDropdown>
+            <ControlledDropdownMenu
+              width="100%"
+              dropdownType="neutral"
+              title={t('pipette')}
+              name={NINETY_SIX_CHANNEL_PIPETTE_FIELD_NAME}
+              options={ninetySixChannelOptions}
               placeholder={t('choose_pipette_placeholder')}
               rules={{
                 required: true,

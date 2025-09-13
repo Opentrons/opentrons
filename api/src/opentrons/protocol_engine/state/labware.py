@@ -46,6 +46,7 @@ from ..types import (
     AddressableAreaLocation,
     NonStackedLocation,
     Dimensions,
+    GripSpecs,
     LabwareOffset,
     LabwareOffsetVector,
     LabwareOffsetLocationSequence,
@@ -399,7 +400,7 @@ class LabwareView:
             return self._state.labware_by_id[labware_id]
         except KeyError as e:
             raise errors.LabwareNotLoadedError(
-                f"Labware {labware_id} not found."
+                f"Labware with id {labware_id} not found."
             ) from e
 
     def known(self, labware_id: str) -> bool:
@@ -428,7 +429,7 @@ class LabwareView:
             ):
                 return labware.id
         raise errors.exceptions.LabwareNotLoadedOnLabwareError(
-            f"There is not labware loaded onto labware {labware_id}"
+            f"There is not labware loaded onto labware {self.get_display_name(labware_id)}"
         )
 
     def raise_if_labware_has_non_lid_labware_on_top(self, labware_id: str) -> None:
@@ -441,7 +442,8 @@ class LabwareView:
                 and candidate_id != lid_id
             ):
                 raise errors.LabwareIsInStackError(
-                    f"Cannot access labware {labware_id} because it has a non-lid labware stacked on top."
+                    f"Cannot access labware {self.get_display_name(labware_id)} because it has"
+                    " a non-lid labware stacked on top."
                 )
 
     def raise_if_labware_has_labware_on_top(self, labware_id: str) -> None:
@@ -452,8 +454,28 @@ class LabwareView:
                 and labware.location.labwareId == labware_id
             ):
                 raise errors.LabwareIsInStackError(
-                    f"Cannot access labware {labware_id} because it has another labware stacked on top."
+                    f"Cannot access labware {self.get_display_name(labware_id)} because it has"
+                    " another labware stacked on top."
                 )
+
+    def raise_if_not_tip_rack(self, labware_id: str) -> None:
+        """Raise if a labware is not a tip rack."""
+        if not self.is_tiprack(labware_id):
+            raise errors.LabwareIsNotTipRackError(
+                f"Labware {self.get_display_name(labware_id)} is not a tip rack and cannot have its well states set."
+            )
+
+    def raise_if_wells_are_invalid(
+        self, labware_id: str, well_names: List[str]
+    ) -> None:
+        """Raise if given wells do not exist with the given labware ID."""
+        non_existent_wells = set(well_names) - set(
+            self.get_definition(labware_id).wells
+        )
+        if non_existent_wells:
+            raise errors.WellDoesNotExistError(
+                f"Tip rack {self.get_display_name(labware_id)} does not have wells: {', '.join(non_existent_wells)}"
+            )
 
     def get_by_slot(
         self,
@@ -661,6 +683,14 @@ class LabwareView:
             or len(self.get_definition(labware_id).wells) >= 96
         )
 
+    def get_has_96_subwells(self, labware_id: str) -> bool:
+        """True if a labware is a reservoir with a 96-grid of sub-wells."""
+        return self.get_has_quirk(labware_id, "offsetPipetteFor96GridSubwells")
+
+    def get_has_12_subwells(self, labware_id: str) -> bool:
+        """True if a labware is a reservoir with a 12-grid of sub-wells."""
+        return self.get_has_quirk(labware_id, "offsetPipetteFor12GridSubwells")
+
     def get_well_definition(
         self,
         labware_id: str,
@@ -679,7 +709,7 @@ class LabwareView:
             return definition.wells[well_name]
         except KeyError as e:
             raise errors.WellDoesNotExistError(
-                f"{well_name} does not exist in {labware_id}."
+                f"{well_name} does not exist in {self.get_display_name(labware_id)}."
             ) from e
 
     def get_well_geometry(
@@ -689,19 +719,21 @@ class LabwareView:
         labware_def = self.get_definition(labware_id)
         if labware_def.innerLabwareGeometry is None:
             raise errors.IncompleteLabwareDefinitionError(
-                message=f"No innerLabwareGeometry found in labware definition for labware_id: {labware_id}."
+                message=f"No innerLabwareGeometry found in labware definition for {self.get_display_name(labware_id)}."
             )
         well_def = self.get_well_definition(labware_id, well_name)
         geometry_id = well_def.geometryDefinitionId
         if geometry_id is None:
             raise errors.IncompleteWellDefinitionError(
-                message=f"No geometryDefinitionId found in well definition for well: {well_name} in labware_id: {labware_id}"
+                message=f"No geometryDefinitionId found in well definition for well {well_name}"
+                f" for {self.get_display_name(labware_id)}"
             )
         else:
             well_geometry = labware_def.innerLabwareGeometry.get(geometry_id)
             if well_geometry is None:
                 raise errors.IncompleteLabwareDefinitionError(
-                    message=f"No innerLabwareGeometry found in labware definition for well_id: {geometry_id} in labware_id: {labware_id}"
+                    message=f"No innerLabwareGeometry found in labware definition for geometry id {geometry_id}"
+                    f" for {self.get_display_name(labware_id)}"
                 )
             return well_geometry
 
@@ -770,15 +802,15 @@ class LabwareView:
         contains_wells = all(well_name in labware_wells for well_name in iter(wells))
         if labware_definition.parameters.isTiprack:
             raise errors.LabwareIsTipRackError(
-                f"Given labware: {labware_id} is a tiprack. Can not load liquid."
+                f"Given labware {self.get_display_name(labware_id)} is a tip rack. Can not load liquid."
             )
         if LabwareRole.adapter in labware_definition.allowedRoles:
             raise errors.LabwareIsAdapterError(
-                f"Given labware: {labware_id} is an adapter. Can not load liquid."
+                f"Given labware {self.get_display_name(labware_id)} is an adapter. Can not load liquid."
             )
         if not contains_wells:
             raise errors.WellDoesNotExistError(
-                f"Some of the supplied wells do not match the labwareId: {labware_id}."
+                f"Some of the supplied wells do not match the labware {self.get_display_name(labware_id)}."
             )
         return list(wells)
 
@@ -787,7 +819,7 @@ class LabwareView:
         definition = self.get_definition(labware_id)
         if definition.parameters.tipLength is None:
             raise errors.LabwareIsNotTipRackError(
-                f"Labware {labware_id} has no tip length defined."
+                f"Labware {self.get_display_name(labware_id)} has no tip length defined."
             )
 
         return definition.parameters.tipLength - overlap
@@ -1349,3 +1381,68 @@ class LabwareView:
         ):
             return Dimensions(0, 0, 0)
         return Dimensions(max_x - min_x, max_y - min_y, max_z)
+
+    def _gripper_uncertainty_narrower(
+        self, labware_bbox: Dimensions, well_bbox: Dimensions, target_grip_width: float
+    ) -> float:
+        """Most narrower the gripper can be than the target while still likely gripping successfully.
+
+        This number can't just be the 0, because that is not going to be accurate if the labware is
+        skirted - the dimensions are a full bounding box including the skirt, and the labware is
+        narrower than that at the point where it is gripped. The general heuristic is that we can't
+        get to the wells; but some labware don't have wells, so we need alternate values.
+
+        The number will be interpreted relative to the target width, which is (for now) the labware
+        outer bounding box.
+
+        TODO: This should be a number looked up from the definition.
+        """
+        if well_bbox.y == 0:
+            # This labware has no wells; use a fixed minimum
+            return 5
+        if well_bbox.y > labware_bbox.y:
+            # This labware has a very odd definition with wells outside its dimensions.
+            # Return the smaller value.
+            return 0
+        # An ok heuristic for successful grip is if we don't get all the way to the wells.
+        return target_grip_width - well_bbox.y
+
+    def _gripper_uncertainty_wider(
+        self, labware_bbox: Dimensions, well_bbox: Dimensions, target_grip_width: float
+    ) -> float:
+        """Most wider the gripper can be than the target while still likely gripping successfully.
+
+        This can be a lot closer to 0, since the bounding box of the labware will certainly be the
+        widest point (if it's defined without error), but since there might be error in the
+        definition we allow some slop.
+
+        The number will be interpreted relative to the target width, which is (for now) the labware
+        outer bounding box.
+
+        TODO: This should be a number looked up from the definition.
+        """
+        # This will be 0 unless the wells are wider than the labware
+        return max(well_bbox.y - target_grip_width, 0)
+
+    def get_gripper_width_specs(
+        self, labware_definition: LabwareDefinition
+    ) -> GripSpecs:
+        """Get the target and bounds for a successful grip of this labware."""
+        outer_bounds = self.get_dimensions(labware_definition=labware_definition)
+        well_bounds = self.get_well_bbox(labware_definition=labware_definition)
+        narrower = self._gripper_uncertainty_narrower(
+            labware_bbox=outer_bounds,
+            well_bbox=well_bounds,
+            target_grip_width=outer_bounds.y,
+        )
+        wider = self._gripper_uncertainty_wider(
+            labware_bbox=outer_bounds,
+            well_bbox=well_bounds,
+            target_grip_width=outer_bounds.y,
+        )
+        return GripSpecs(
+            # TODO: This should be a number looked up from the definition.
+            targetY=outer_bounds.y,
+            uncertaintyNarrower=narrower,
+            uncertaintyWider=wider,
+        )

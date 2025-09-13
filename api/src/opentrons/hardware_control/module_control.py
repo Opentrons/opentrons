@@ -2,8 +2,10 @@ from __future__ import annotations
 import asyncio
 import logging
 import re
-from typing import TYPE_CHECKING, List, Optional, Union
+from typing import TYPE_CHECKING, List, Optional, Union, Callable
 from glob import glob
+
+from opentrons_shared_data.errors.exceptions import EnumeratedError
 
 from opentrons.config import IS_ROBOT, IS_LINUX
 from opentrons.drivers.rpi_drivers import types, interfaces, usb, usb_simulator
@@ -19,8 +21,16 @@ from opentrons.hardware_control.modules.module_calibration import (
 from opentrons.hardware_control.modules.types import ModuleAtPort, ModuleType
 from opentrons.hardware_control.modules import SimulatingModuleAtPort
 
+
 from opentrons.types import Point
-from .types import AionotifyEvent, BoardRevision, OT3Mount, StatusBarUpdateEvent
+from .types import (
+    AionotifyEvent,
+    BoardRevision,
+    OT3Mount,
+    StatusBarUpdateEvent,
+    HardwareEvent,
+    AsynchronousModuleErrorNotification,
+)
 from . import modules
 
 if TYPE_CHECKING:
@@ -51,10 +61,21 @@ class AttachedModulesControl:
         self,
         api: Union["API", "OT3API"],
         usb: interfaces.USBDriverInterface,
+        event_callback: Callable[[HardwareEvent], None],
     ) -> None:
         self._available_modules: List[modules.AbstractModule] = []
         self._api = api
         self._usb = usb
+        self._event_callback = event_callback
+        if not IS_ROBOT and not api.is_simulator:
+            # Start task that registers emulated modules.
+            self._emulation_listen_task: asyncio.Task[
+                None
+            ] | None = api.loop.create_task(
+                listen_module_connection(self.register_modules)
+            )
+        else:
+            self._emulation_listen_task = None
 
     def subscribe_to_api_event(self, module: modules.AbstractModule) -> None:
         self._api.add_status_bar_listener(module.event_listener)
@@ -64,28 +85,57 @@ class AttachedModulesControl:
         cls,
         api_instance: Union["API", "OT3API"],
         board_revision: BoardRevision,
+        event_callback: Callable[[HardwareEvent], None],
     ) -> AttachedModulesControl:
         usb_instance = (
             usb.USBBus(board_revision)
             if not api_instance.is_simulator and IS_ROBOT
             else usb_simulator.USBBusSimulator()
         )
-        mc_instance = cls(api=api_instance, usb=usb_instance)
+        mc_instance = cls(
+            api=api_instance, usb=usb_instance, event_callback=event_callback
+        )
 
         if not api_instance.is_simulator:
             # Do an initial scan of modules.
             await mc_instance.register_modules(mc_instance.scan())
-            if not IS_ROBOT:
-                # Start task that registers emulated modules.
-                api_instance.loop.create_task(
-                    listen_module_connection(mc_instance.register_modules)
-                )
 
         return mc_instance
 
     @property
     def available_modules(self) -> List[modules.AbstractModule]:
         return self._available_modules
+
+    async def clean_up(self) -> None:
+        """Clean up all registered modules and emulator scanning tasks (if any)."""
+        for module in self._available_modules:
+            await module.cleanup()
+        if self._emulation_listen_task is not None:
+            self._emulation_listen_task.cancel("cleanup")
+            try:
+                await self._emulation_listen_task
+            except asyncio.CancelledError:
+                pass
+            except Exception:
+                log.exception("Exception cleaning up emulation listen task")
+            finally:
+                self._emulation_listen_task = None
+
+    async def register_simulated_module(
+        self,
+        simulated_usb_port: types.USBPort,
+        type: modules.ModuleType,
+        sim_model: str,
+    ) -> modules.AbstractModule:
+        """Register a simulated module."""
+        module = await self.build_module(
+            "", simulated_usb_port, type, sim_model, sim_serial_number=None
+        )
+        self._available_modules.append(module)
+        self._available_modules = sorted(
+            self._available_modules, key=modules.AbstractModule.sort_key
+        )
+        return module
 
     async def build_module(
         self,
@@ -105,6 +155,7 @@ class AttachedModulesControl:
             sim_model=sim_model,
             sim_serial_number=sim_serial_number,
             disconnected_callback=self._disconnected_callback,
+            error_callback=self._async_error_callback,
         )
         last_event = StatusBarUpdateEvent(
             self._api.get_status_bar_state(), self._api.get_status_bar_enabled()
@@ -120,6 +171,29 @@ class AttachedModulesControl:
             self.unregister_modules([mod]),
             self._api.loop,
         )
+
+    def _async_error_callback(
+        self,
+        exc: Exception,
+        model: str,
+        port: str,
+        serial: str | None,
+    ) -> None:
+        """Used by the module to indicate it saw an error from its data poller."""
+        try:
+            self._api.loop.call_soon(
+                self._event_callback,
+                AsynchronousModuleErrorNotification(
+                    exception=EnumeratedError.ensure(exc),
+                    module_serial=serial,
+                    module_model=modules.module_model_from_string(model),
+                    port=port,
+                ),
+            )
+        except Exception:
+            log.exception(
+                f"Async error callback for module {model} {serial} at {port} for exc {exc} failed"
+            )
 
     async def unregister_modules(
         self,

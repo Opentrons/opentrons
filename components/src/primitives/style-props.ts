@@ -76,6 +76,7 @@ const GRID_PROPS = [
 
 const LAYOUT_PROPS = [
   'display',
+  'visibility',
   'size',
   'width',
   'minWidth',

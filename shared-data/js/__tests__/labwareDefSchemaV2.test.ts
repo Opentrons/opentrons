@@ -208,6 +208,28 @@ const expectGroupsFollowConvention = (
   })
 }
 
+const checkQuirkRequirements = (labwareDef: LabwareDefinition2): void => {
+  test('definitions cannot have both offsetPipetteFor96GridSubwells and offsetPipetteFor12GridSubwells', () => {
+    if (labwareDef.parameters.quirks === undefined) {
+      return
+    }
+    if (
+      labwareDef.parameters.quirks.includes('offsetPipetteFor96GridSubwells')
+    ) {
+      expect(
+        labwareDef.parameters.quirks.includes('offsetPipetteFor12GridSubwells')
+      ).toBe(false)
+    }
+    if (
+      labwareDef.parameters.quirks.includes('offsetPipetteFor12GridSubwells')
+    ) {
+      expect(
+        labwareDef.parameters.quirks.includes('offsetPipetteFor96GridSubwells')
+      ).toBe(false)
+    }
+  })
+}
+
 const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
   test('geometries referenced by wells must actually exist', () => {
     for (const geometryId of Object.values(labwareDef.wells).map(
@@ -438,6 +460,7 @@ describe('test schemas of all opentrons definitions', () => {
     })
 
     expectGroupsFollowConvention(labwareDef, labwarePath)
+    checkQuirkRequirements(labwareDef)
   })
 })
 
@@ -509,6 +532,7 @@ describe('test schemas of all v2 labware fixtures', () => {
 
     expectGroupsFollowConvention(labwareDef, filename)
     checkGeometryDefinitions(labwareDef)
+    checkQuirkRequirements(labwareDef)
   })
 })
 

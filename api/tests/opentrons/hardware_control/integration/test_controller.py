@@ -19,8 +19,11 @@ async def subject(
     assert isinstance(conf, RobotConfig)
     hc = await Controller.build(config=conf)
     await hc.connect(port=port)
-    yield hc
-    await hc._smoothie_driver.disconnect()
+    try:
+        yield hc
+    finally:
+        await hc.clean_up()
+        await hc._smoothie_driver.disconnect()
 
 
 async def test_get_fw_version(subject: Controller) -> None:

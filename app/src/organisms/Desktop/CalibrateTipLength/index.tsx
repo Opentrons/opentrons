@@ -9,6 +9,7 @@ import {
   AnimationVideo,
   ModalShell,
   useConditionalConfirm,
+  WizardHeader,
 } from '@opentrons/components'
 import { useHost } from '@opentrons/react-api-client'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
@@ -16,7 +17,6 @@ import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import { getTopPortalEl } from '/app/App/portal'
 import slotOneRemoveBlockAsset from '/app/assets/videos/tip-length-cal/Slot_1_Remove_CalBlock_(330x260)REV1.webm'
 import slotThreeRemoveBlockAsset from '/app/assets/videos/tip-length-cal/Slot_3_Remove_CalBlock_(330x260)REV1.webm'
-import { WizardHeader } from '/app/molecules/WizardHeader'
 import {
   CalibrationError,
   useCalibrationError,

@@ -17,7 +17,7 @@
   "dimensions": {
     "xDimension": 127.76,
     "yDimension": 85.48,
-    "zDimension": 8.8
+    "zDimension": 9.2
   },
   "wells": {},
   "groups": [
@@ -46,12 +46,12 @@
     "default": {
       "x": 0,
       "y": 0,
-      "z": 6.6
+      "z": 7.1
     },
     "opentrons_96_wellplate_200ul_pcr_full_skirt": {
       "x": 0,
       "y": 0,
-      "z": 7.1
+      "z": 6.1
     },
     "protocol_engine_lid_stack_object": {
       "x": 0,
@@ -61,12 +61,12 @@
     "opentrons_tough_universal_lid": {
       "x": 0,
       "y": 0,
-      "z": 0.8
+      "z": 1
     }
   },
   "stackLimit": 5,
   "gripForce": 10,
-  "gripHeightFromLabwareBottom": 5.3,
+  "gripHeightFromLabwareBottom": 4.7,
   "gripperOffsets": {
     "default": {
       "pickUpOffset": {

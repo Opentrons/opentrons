@@ -46,7 +46,7 @@ export const dropTip: CommandCreator<DropTipArgs> = (
   if (isReturnTip && isReturnLocationKnown) {
     const pythonPipette = invariantContext.pipetteEntities[pipette].pythonName
     const pythonLabware = mostRecentlyAccessedTiprackLabware.pythonName
-    const pythonLocation = `${pythonLabware}.wells_by_name()["${mostRecentlyAccessedTipWell}"]`
+    const pythonLocation = `${pythonLabware}["${mostRecentlyAccessedTipWell}"]`
     python = `${pythonPipette}.drop_tip(location=${pythonLocation})`
   }
 

@@ -1,6 +1,7 @@
 """Motion state store and getters."""
 from dataclasses import dataclass
 from typing import List, Optional, Union
+import logging
 
 from opentrons.types import MountType, Point, StagingSlotName
 from opentrons.hardware_control.types import CriticalPoint
@@ -27,6 +28,8 @@ from .addressable_areas import AddressableAreaView
 from .geometry import GeometryView
 from .modules import ModuleView
 from .module_substates import HeaterShakerModuleId
+
+log = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -85,6 +88,42 @@ class MotionView:
                 critical_point = CriticalPoint.XY_CENTER
         return PipetteLocationData(mount=mount, critical_point=critical_point)
 
+    def _get_pipette_offset_for_reservoirs(
+        self, labware_id: str, well_name: str, pipette_id: str
+    ) -> Point:
+        #   8 rows, 12 columns
+        subwells_96 = self._labware.get_has_96_subwells(labware_id)
+        #   1 row, 12 columns
+        subwells_12 = self._labware.get_has_12_subwells(labware_id)
+        if subwells_12 and subwells_96:
+            log.warning(
+                f"{self._labware.get_display_name(labware_id)} has both offsetPipetteFor96GridSubwells and"
+                " offsetPipetteFor12GridSubwells quirks."
+            )
+
+        pipette_rows = self._pipettes.get_nozzle_configuration(pipette_id).rows
+        pipette_cols = self._pipettes.get_nozzle_configuration(pipette_id).columns
+
+        even_labware_rows = subwells_96
+        even_labware_columns = subwells_96 or subwells_12
+        odd_pipette_rows = len(pipette_rows) % 2 == 1
+        odd_pipette_cols = len(pipette_cols) % 2 == 1
+
+        well_x_dim, well_y_dim, well_z_dim = self._labware.get_well_size(
+            labware_id=labware_id, well_name=well_name
+        )
+        x_offset = 0.0
+        y_offset = 0.0
+        if even_labware_rows and odd_pipette_rows:
+            # need to move up half a row
+            # there's 8 rows, so move 1/16 of reservoir length
+            y_offset = well_y_dim / 16
+        if even_labware_columns and odd_pipette_cols:
+            # need to move left half a column
+            # there's 12 columns, so move 1/24 of reservoir width
+            x_offset = -1 * well_x_dim / 24
+        return Point(x=x_offset, y=y_offset)
+
     def get_movement_waypoints_to_well(
         self,
         pipette_id: str,
@@ -98,6 +137,7 @@ class MotionView:
         force_direct: bool = False,
         minimum_z_height: Optional[float] = None,
         operation_volume: Optional[float] = None,
+        offset_pipette_for_reservoir_subwells: bool = False,
     ) -> List[motion_planning.Waypoint]:
         """Calculate waypoints to a destination that's specified as a well."""
         location = current_well or self._pipettes.get_current_location()
@@ -115,6 +155,10 @@ class MotionView:
             operation_volume=operation_volume,
             pipette_id=pipette_id,
         )
+        if offset_pipette_for_reservoir_subwells:
+            destination += self._get_pipette_offset_for_reservoirs(
+                labware_id=labware_id, well_name=well_name, pipette_id=pipette_id
+            )
 
         move_type = _move_types.get_move_type_to_well(
             pipette_id, labware_id, well_name, location, force_direct

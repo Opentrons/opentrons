@@ -29,19 +29,19 @@ async def test_run_extended_profile(
     subject = RunExtendedProfileImpl(state_view=state_view, equipment=equipment)
 
     step_data: List[Union[ProfileStep, ProfileCycle]] = [
-        ProfileStep(celsius=12.3, holdSeconds=45),
+        ProfileStep(celsius=12.3, holdSeconds=45, rampRate=0.0),
         ProfileCycle(
             steps=[
-                ProfileStep(celsius=78.9, holdSeconds=910),
-                ProfileStep(celsius=12, holdSeconds=1),
+                ProfileStep(celsius=78.9, holdSeconds=910, rampRate=2.0),
+                ProfileStep(celsius=12, holdSeconds=1, rampRate=0.0),
             ],
             repetitions=2,
         ),
-        ProfileStep(celsius=45.6, holdSeconds=78),
+        ProfileStep(celsius=45.6, holdSeconds=78, rampRate=2.0),
         ProfileCycle(
             steps=[
-                ProfileStep(celsius=56, holdSeconds=11),
-                ProfileStep(celsius=34, holdSeconds=10),
+                ProfileStep(celsius=56, holdSeconds=11, rampRate=0.0),
+                ProfileStep(celsius=34, holdSeconds=10, rampRate=2.0),
             ],
             repetitions=1,
         ),
@@ -80,6 +80,12 @@ async def test_run_extended_profile(
 
     # Stub volume validation from hs module view
     decoy.when(tc_module_substate.validate_max_block_volume(56.7)).then_return(76.5)
+    decoy.when(tc_module_substate.validate_ramp_rate(0.0, 12.3)).then_return(0.0)
+    decoy.when(tc_module_substate.validate_ramp_rate(2.0, 78.9)).then_return(2.0)
+    decoy.when(tc_module_substate.validate_ramp_rate(0.0, 12.0)).then_return(0.0)
+    decoy.when(tc_module_substate.validate_ramp_rate(2.0, 45.6)).then_return(2.0)
+    decoy.when(tc_module_substate.validate_ramp_rate(0.0, 56.0)).then_return(0.0)
+    decoy.when(tc_module_substate.validate_ramp_rate(2.0, 34.0)).then_return(2.0)
 
     # Get attached hardware modules
     decoy.when(
@@ -91,19 +97,23 @@ async def test_run_extended_profile(
     decoy.verify(
         await tc_hardware.execute_profile(
             profile=[
-                {"temperature": 32.1, "hold_time_seconds": 45},
+                {"temperature": 32.1, "hold_time_seconds": 45, "ramp_rate": 0.0},
                 {
                     "steps": [
-                        {"temperature": 78.9, "hold_time_seconds": 910},
-                        {"temperature": 12, "hold_time_seconds": 1},
+                        {
+                            "temperature": 78.9,
+                            "hold_time_seconds": 910,
+                            "ramp_rate": 2.0,
+                        },
+                        {"temperature": 12, "hold_time_seconds": 1, "ramp_rate": 0.0},
                     ],
                     "repetitions": 2,
                 },
-                {"temperature": 65.4, "hold_time_seconds": 78},
+                {"temperature": 65.4, "hold_time_seconds": 78, "ramp_rate": 2.0},
                 {
                     "steps": [
-                        {"temperature": 56, "hold_time_seconds": 11},
-                        {"temperature": 34, "hold_time_seconds": 10},
+                        {"temperature": 56, "hold_time_seconds": 11, "ramp_rate": 0.0},
+                        {"temperature": 34, "hold_time_seconds": 10, "ramp_rate": 2.0},
                     ],
                     "repetitions": 1,
                 },

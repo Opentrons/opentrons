@@ -6,6 +6,7 @@ import {
   MAGNETIC_BLOCK_ADDRESSABLE_AREAS,
   MAGNETIC_BLOCK_FIXTURES,
   MAGNETIC_BLOCK_V1_FIXTURE,
+  SINGLE_RIGHT_SLOT_FIXTURE,
   SINGLE_SLOT_FIXTURES,
   STAGING_AREA_FIXTURES,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
@@ -110,6 +111,9 @@ export const getFilteredDeckConfigFixtureCompatibility = (
           ) &&
             !compatabilityItem.requiredAddressableAreas.some(raa =>
               MAGNETIC_BLOCK_ADDRESSABLE_AREAS.includes(raa)
+            ) &&
+            !compatabilityItem.requiredAddressableAreas.some(raa =>
+              FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS.includes(raa)
             ))
         ) {
           return acc
@@ -137,6 +141,25 @@ export const getFilteredDeckConfigFixtureCompatibility = (
             }
             acc.push(stagingAreaRequirement)
           }
+          return acc
+        } else if (
+          compatabilityItem.requiredAddressableAreas.some(
+            raa =>
+              FLEX_STACKER_ADDRESSABLE_AREAS.includes(raa) &&
+              compatabilityItem.requiredAddressableAreas.some(raa =>
+                FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS.includes(raa)
+              )
+          )
+        ) {
+          const rightSlotRequirement = {
+            ...compatabilityItem,
+            partialRequiredCutoutFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
+          }
+          if (
+            compatabilityItem.cutoutFixtureId !== FLEX_STACKER_V1_FIXTURE &&
+            compatabilityItem.cutoutFixtureId !== SINGLE_RIGHT_SLOT_FIXTURE
+          )
+            acc.push(rightSlotRequirement)
           return acc
         } else {
           acc.push(compatabilityItem)

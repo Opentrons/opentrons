@@ -51,6 +51,7 @@ export interface CreateProtocolFormData {
     pipettes: string
     leftPipette: string
     rightPipette: string
+    ninetySixChannelPipette: string
     flexGripper: string
   }
   modules: DisplayModule[]

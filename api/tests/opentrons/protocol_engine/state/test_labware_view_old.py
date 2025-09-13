@@ -5,10 +5,12 @@ longer helpful. Try to add new tests to test_labware_state.py, where they can be
 tested together, treating LabwareState as a private implementation detail.
 """
 
-import pytest
 from datetime import datetime
 from typing import Dict, Optional, cast, ContextManager, Any, Union, List
 from contextlib import nullcontext as does_not_raise
+
+import pytest
+from numpy import isclose
 
 from opentrons_shared_data.deck.types import DeckDefinitionV5
 from opentrons_shared_data.pipette.types import LabwareUri
@@ -43,6 +45,7 @@ from opentrons.protocol_engine.types import (
     OFF_DECK_LOCATION,
     OnAddressableAreaOffsetLocationSequenceComponent,
     OnModuleOffsetLocationSequenceComponent,
+    GripSpecs,
 )
 from opentrons.protocol_engine.state._move_types import EdgePathType
 from opentrons.protocol_engine.state.labware import (
@@ -201,7 +204,7 @@ def test_get_id_by_labware() -> None:
 
 
 def test_get_id_by_labware_raises_error() -> None:
-    """Should raise error that labware not found."""
+    """Should raise an error that labware not found."""
     subject = get_labware_view(
         labware_by_id={
             "labware-id": LoadedLabware(
@@ -209,11 +212,12 @@ def test_get_id_by_labware_raises_error() -> None:
                 loadName="test",
                 definitionUri="test-uri",
                 location=OnLabwareLocation(labwareId="other-labware-id"),
-            )
-        }
+                displayName="The Labware",
+            ),
+        },
     )
     with pytest.raises(errors.exceptions.LabwareNotLoadedOnLabwareError):
-        subject.get_id_by_labware(labware_id="no-labware-id")
+        subject.get_id_by_labware(labware_id="labware-id")
 
 
 def test_raise_if_labware_has_non_lid_labware_on_top() -> None:
@@ -225,6 +229,7 @@ def test_raise_if_labware_has_non_lid_labware_on_top() -> None:
                 loadName="test",
                 definitionUri="test-uri",
                 location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+                displayName="lorem",
             ),
             "bottom-labware-2": LoadedLabware(
                 id="bottom-labware-2",
@@ -232,24 +237,28 @@ def test_raise_if_labware_has_non_lid_labware_on_top() -> None:
                 definitionUri="test-uri",
                 location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
                 lid_id="lid-labware-a",
+                displayName="ipsum",
             ),
             "bottom-labware-3": LoadedLabware(
                 id="bottom-labware-3",
                 loadName="test",
                 definitionUri="test-uri",
                 location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+                displayName="dolor",
             ),
             "lid-labware-a": LoadedLabware(
                 id="lid-labware-a",
                 loadName="lid",
                 definitionUri="lid-uri",
                 location=OnLabwareLocation(labwareId="bottom-labware-2"),
+                displayName="sit",
             ),
             "top-labware-b": LoadedLabware(
                 id="top-labware-b",
                 loadName="test",
                 definitionUri="test-uri",
                 location=OnLabwareLocation(labwareId="bottom-labware-3"),
+                displayName="amet",
             ),
         }
     )
@@ -270,6 +279,7 @@ def test_raise_if_labware_has_labware_on_top() -> None:
                 loadName="test",
                 definitionUri="test-uri",
                 location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+                displayName="lorem",
             ),
             "bottom-labware-2": LoadedLabware(
                 id="bottom-labware-2",
@@ -277,24 +287,28 @@ def test_raise_if_labware_has_labware_on_top() -> None:
                 definitionUri="test-uri",
                 location=ModuleLocation(moduleId="module-id"),
                 lid_id="lid-labware-a",
+                displayName="ipsum",
             ),
             "bottom-labware-3": LoadedLabware(
                 id="bottom-labware-3",
                 loadName="test",
                 definitionUri="test-uri",
                 location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+                displayName="dolor",
             ),
             "lid-labware-a": LoadedLabware(
                 id="lid-labware-a",
                 loadName="test-lid",
                 definitionUri="lid-uri",
                 location=OnLabwareLocation(labwareId="bottom-labware-2"),
+                displayName="sit",
             ),
             "top-labware-b": LoadedLabware(
                 id="top-labware-b",
                 loadName="test",
                 definitionUri="test-uri",
                 location=OnLabwareLocation(labwareId="bottom-labware-3"),
+                displayName="amet",
             ),
         }
     )
@@ -616,12 +630,14 @@ def test_validate_liquid_allowed_raises_incompatible_labware() -> None:
                 loadName="test1",
                 definitionUri="some-tiprack-uri",
                 location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+                displayName="Tip Rack",
             ),
             "adapter-id": LoadedLabware(
                 id="adapter-id",
                 loadName="test2",
                 definitionUri="some-adapter-uri",
                 location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
+                displayName="Some adapter",
             ),
         },
         definitions_by_uri={
@@ -1776,3 +1792,55 @@ def test_calculates_well_bounding_box(
     assert subject.get_well_bbox(definition).x == pytest.approx(well_bbox.x)
     assert subject.get_well_bbox(definition).y == pytest.approx(well_bbox.y)
     assert subject.get_well_bbox(definition).z == pytest.approx(well_bbox.z)
+
+
+@pytest.mark.parametrize(
+    "labware_to_check,gripper_specs",
+    [
+        (
+            "opentrons_universal_flat_adapter",
+            GripSpecs(targetY=75, uncertaintyNarrower=5, uncertaintyWider=0),
+        ),
+        # well min: 7.81
+        # well max: 77.67
+        # well bbox: 69.86
+        (
+            "corning_96_wellplate_360ul_flat",
+            GripSpecs(targetY=85.47, uncertaintyNarrower=15.61, uncertaintyWider=0),
+        ),
+        # well min 7.18
+        # well max 78.38
+        # well bbox 71.2
+        (
+            "nest_12_reservoir_15ml",
+            GripSpecs(targetY=85.48, uncertaintyNarrower=14.28, uncertaintyWider=0),
+        ),
+        (
+            "opentrons_tough_universal_lid",
+            GripSpecs(targetY=85.48, uncertaintyNarrower=5, uncertaintyWider=0),
+        ),
+        (
+            "opentrons_flex_tiprack_lid",
+            GripSpecs(targetY=78.75, uncertaintyNarrower=5, uncertaintyWider=0),
+        ),
+        # well min 7.175
+        # well max 78.305
+        # well bbox 71.13
+        (
+            "corning_384_wellplate_112ul_flat",
+            GripSpecs(targetY=85.47, uncertaintyNarrower=14.34, uncertaintyWider=0),
+        ),
+    ],
+)
+def test_calculates_gripper_positions(
+    labware_to_check: str, gripper_specs: GripSpecs
+) -> None:
+    """It should calculate gripper positions."""
+    definition = labware_definition_type_adapter.validate_python(
+        load_definition(labware_to_check, 1)
+    )
+    subject = get_labware_view()
+    specs = subject.get_gripper_width_specs(definition)
+    assert isclose(specs.targetY, gripper_specs.targetY)
+    assert isclose(specs.uncertaintyNarrower, gripper_specs.uncertaintyNarrower)
+    assert isclose(specs.uncertaintyWider, gripper_specs.uncertaintyWider)

@@ -5,7 +5,7 @@ import logging
 from copy import deepcopy
 from enum import Enum
 from typing import TYPE_CHECKING, Optional, Union, Literal
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     PositionReference,
@@ -21,7 +21,6 @@ from opentrons.protocol_api._liquid_properties import (
     MultiDispenseProperties,
     TouchTipProperties,
 )
-from opentrons.protocol_engine.errors import TouchTipDisabledError
 from opentrons.types import Location, Point, Mount
 from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import (
     LocationCheckDescriptors,
@@ -466,7 +465,7 @@ class TransferComponentsExecutor:
         2. If blowout is enabled and “destination”
             - Do blow-out (at the retract position)
             - Leave plunger down
-        3. Touch-tip
+        3. Touch-tip in the destination well.
         4. If not ready-to-aspirate
             - Prepare-to-aspirate (at the retract position)
         5. Air-gap (at the retract position)
@@ -479,7 +478,7 @@ class TransferComponentsExecutor:
         6. If blowout is “source” or “trash”
             - Move to location (top of Well)
             - Do blow-out (top of well)
-            - Do touch-tip (?????) (only if it’s in a non-trash location)
+            - Do touch-tip AGAIN at the source well (if blowout in a non-trash location)
             - Prepare-to-aspirate (top of well)
             - Do air-gap (top of well)
         7. If drop tip, move to drop tip location, drop tip
@@ -563,9 +562,9 @@ class TransferComponentsExecutor:
             blowout_props.enabled
             and blowout_props.location != BlowoutLocation.DESTINATION
         ):
-            # TODO: no-op touch tip if touch tip is enabled and blowout is in trash/ reservoir/ any labware with touch-tip disabled
             assert blowout_props.flow_rate is not None
             self._instrument.set_flow_rate(blow_out=blowout_props.flow_rate)
+            blowout_touch_tip_props = retract_props.touch_tip
             touch_tip_and_air_gap_location: Union[Location, TrashBin, WasteChute]
             if blowout_props.location == BlowoutLocation.SOURCE:
                 if source_location is None or source_well is None:
@@ -584,6 +583,13 @@ class TransferComponentsExecutor:
                     source_well.get_top(0), labware=source_location.labware
                 )
                 touch_tip_and_air_gap_well = source_well
+                # Skip touch tip if blowing out at the SOURCE and it's untouchable:
+                if (
+                    "touchTipDisabled"
+                    in source_location.labware.quirks_from_any_parent()
+                ):
+                    blowout_touch_tip_props = replace(blowout_touch_tip_props)
+                    blowout_touch_tip_props.enabled = False
             else:
                 self._instrument.blow_out(
                     location=trash_location,
@@ -612,7 +618,7 @@ class TransferComponentsExecutor:
             )
             # Do touch tip and air gap again after blowing out into source well or trash
             self._do_touch_tip_and_air_gap_after_dispense(
-                touch_tip_properties=retract_props.touch_tip,
+                touch_tip_properties=blowout_touch_tip_props,
                 location=touch_tip_and_air_gap_location,
                 well=touch_tip_and_air_gap_well,
                 air_gap_volume=air_gap_volume,
@@ -758,6 +764,7 @@ class TransferComponentsExecutor:
         ):
             assert blowout_props.flow_rate is not None
             self._instrument.set_flow_rate(blow_out=blowout_props.flow_rate)
+            blowout_touch_tip_props = retract_props.touch_tip
             touch_tip_and_air_gap_location: Union[Location, TrashBin, WasteChute]
             if blowout_props.location == BlowoutLocation.SOURCE:
                 if source_location is None or source_well is None:
@@ -776,6 +783,13 @@ class TransferComponentsExecutor:
                     source_well.get_top(0), labware=source_location.labware
                 )
                 touch_tip_and_air_gap_well = source_well
+                # Skip touch tip if blowing out at the SOURCE and it's untouchable:
+                if (
+                    "touchTipDisabled"
+                    in source_location.labware.quirks_from_any_parent()
+                ):
+                    blowout_touch_tip_props = replace(blowout_touch_tip_props)
+                    blowout_touch_tip_props.enabled = False
             else:
                 self._instrument.blow_out(
                     location=trash_location,
@@ -807,13 +821,13 @@ class TransferComponentsExecutor:
                 air_gap_volume = 0
             # Do touch tip and air gap again after blowing out into source well or trash
             self._do_touch_tip_and_air_gap_after_dispense(
-                touch_tip_properties=retract_props.touch_tip,
+                touch_tip_properties=blowout_touch_tip_props,
                 location=touch_tip_and_air_gap_location,
                 well=touch_tip_and_air_gap_well,
                 air_gap_volume=air_gap_volume,
             )
 
-    def _do_touch_tip_and_air_gap_after_dispense(  # noqa: C901
+    def _do_touch_tip_and_air_gap_after_dispense(
         self,
         touch_tip_properties: TouchTipProperties,
         location: Union[Location, TrashBin, WasteChute],
@@ -821,6 +835,12 @@ class TransferComponentsExecutor:
         air_gap_volume: float,
     ) -> None:
         """Perform touch tip and air gap as part of post-dispense retract.
+
+        This function can be invoked up to 2 times for each dispense:
+        1) Once for touching tip at the dispense location.
+        2) Then again in the blowout location if it is not the dispense location.
+        For case (2), the caller should disable touch-tip in touch_tip_properties
+        if the blowout location is not touchable (such as reservoirs).
 
         If the retract location is at or above the safe location of
         AIR_GAP_LOC_Z_OFFSET_FROM_WELL_TOP, then add the air gap at the retract location
@@ -842,18 +862,14 @@ class TransferComponentsExecutor:
             #  whether the touch tip params from transfer props should be used for
             #  both dest-well touch tip and non-dest-well touch tip.
             if isinstance(location, Location) and well is not None:
-                try:
-                    self._instrument.touch_tip(
-                        location=location,
-                        well_core=well,
-                        radius=1,
-                        z_offset=touch_tip_properties.z_offset,
-                        speed=touch_tip_properties.speed,
-                        mm_from_edge=touch_tip_properties.mm_from_edge,
-                    )
-                except TouchTipDisabledError:
-                    # TODO: log a warning
-                    pass
+                self._instrument.touch_tip(
+                    location=location,
+                    well_core=well,
+                    radius=1,
+                    z_offset=touch_tip_properties.z_offset,
+                    speed=touch_tip_properties.speed,
+                    mm_from_edge=touch_tip_properties.mm_from_edge,
+                )
 
                 # Move back to the 'retract' position
                 self._instrument.move_to(

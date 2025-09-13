@@ -57,7 +57,7 @@ You'll need to use :py:meth:`~.FlexStackerContext.set_stored_labware` to configu
        count=12
    )
 
-In this example, ``stacker_1`` is configured to hold 6 Flex tip racks, each with a compatible lid. Flex tip racks must have lids to be properly stored in the Stacker. ``stacker_2`` is configured to hold 12 PCR plates without lids. You must configure each Stacker in your protocol before using :py:meth:`.FlexStackerContext.store` or :py:meth:`.FlexStackerContext.retrieve`. 
+In this example, ``stacker_1`` is configured to hold 5 Flex tip racks, each with a compatible lid. Flex tip racks must have lids to be properly stored in the Stacker. ``stacker_2`` is configured to hold 12 PCR plates without lids. You must configure each Stacker in your protocol before using :py:meth:`.FlexStackerContext.store` or :py:meth:`.FlexStackerContext.retrieve`. 
 
 :py:meth:`~.FlexStackerContext.set_stored_labware` assigns a labware stack to the Stacker in this deck slot. You can use the Stacker and shuttle as a normal deck slot earlier in your protocol with :py:meth:`~.FlexStackerContext.load_labware`. You'll need to move this labware elsewhere on the deck before configuring and using the Stacker for storage.  
 
