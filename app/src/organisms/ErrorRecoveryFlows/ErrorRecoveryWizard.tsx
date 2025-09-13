@@ -28,16 +28,16 @@ import {
   StackerSelectErrorFlow,
   StackerShuttleEmptyRetry,
   StackerShuttleEmptySkip,
+  StackerShuttleEmptyStoreRetry,
+  StackerShuttleEmptyStoreSkip,
   StackerShuttleMissing,
   StackerStalledRetry,
   StackerStalledSkip,
+  StackerStalledStoreRetry,
+  StackerStalledStoreSkip,
 } from './RecoveryOptions'
 import { ShuttleFullRetry } from './RecoveryOptions/ShuttleFullRetry'
 import { ShuttleFullSkip } from './RecoveryOptions/ShuttleFullSkip'
-import { StackerShuttleEmptyStoreRetry } from './RecoveryOptions/StackerShuttleEmptyRetryStore'
-import { StackerShuttleEmptyStoreSkip } from './RecoveryOptions/StackerShuttleEmptyStoreSkip'
-import { StackerStalledStoreRetry } from './RecoveryOptions/StackerStalledStoreRetry'
-import { StackerStalledStoreSkip } from './RecoveryOptions/StackerStalledStoreSkip'
 import {
   ErrorDetailsModal,
   RecoveryDoorOpenSpecial,

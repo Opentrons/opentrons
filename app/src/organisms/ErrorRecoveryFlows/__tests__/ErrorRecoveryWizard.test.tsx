@@ -278,12 +278,12 @@ describe('ErrorRecoveryContent', () => {
     vi.mocked(StackerStalledSkip).mockReturnValue(
       <div>MOCK_STACKER_STALLED_SKIP</div>
     )
-    vi
-      .mocked(StackerStalledStoreSkip)
-      .mockReturnValue(<div>MOCK_STACKER_STALLED_STORE_SKIP</div>),
-      vi
-        .mocked(StackerStalledStoreRetry)
-        .mockReturnValue(<div>MOCK_STACKER_STALLED_STORE_RETRY</div>)
+    vi.mocked(StackerStalledStoreSkip).mockReturnValue(
+      <div>MOCK_STACKER_STALLED_STORE_SKIP</div>
+    )
+    vi.mocked(StackerStalledStoreRetry).mockReturnValue(
+      <div>MOCK_STACKER_STALLED_STORE_RETRY</div>
+    )
     vi.mocked(StackerShuttleEmptyStoreSkip).mockReturnValue(
       <div>MOCK_STACKER_SHUTTLE_EMPTY_STORE_SKIP</div>
     )
