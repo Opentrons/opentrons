@@ -52,10 +52,7 @@ export default defineConfig({
     },
   },
   define: {
-    'process.env': {
-      // NOTE: For security, do not spread in the entirety of process.env.
-      NODE_ENV: process.env.NODE_ENV,
-    },
+    _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
     global: 'globalThis',
   },
   resolve: {
