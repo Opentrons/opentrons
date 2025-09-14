@@ -123,7 +123,11 @@ export function Landing(): JSX.Element {
         width="100%"
         gridGap={SPACING.spacing32}
       >
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing16}
+          alignItems={ALIGN_CENTER}
+        >
           <img
             src={welcomeImage}
             height="132px"

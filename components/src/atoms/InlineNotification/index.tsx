@@ -31,7 +31,7 @@ export interface InlineNotificationProps extends StyleProps {
   /** optional handler to show close button/clear alert  */
   onCloseClick?: (() => void) | MouseEventHandler<HTMLButtonElement>
   linkText?: string
-  onLinkClick?: (() => void) | MouseEventHandler<HTMLButtonElement>
+  onLinkClick?: (() => void) | MouseEventHandler<HTMLAnchorElement>
 }
 
 const INLINE_NOTIFICATION_PROPS_BY_TYPE: Record<

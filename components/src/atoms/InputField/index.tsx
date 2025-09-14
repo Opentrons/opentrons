@@ -59,9 +59,7 @@ export interface InputFieldProps {
     | typeof LEGACY_INPUT_TYPE_PASSWORD
     | typeof INPUT_TYPE_NUMBER
   /** mouse click handler */
-  onClick?: (
-    event: MouseEvent<HTMLInputElement> | MouseEvent<HTMLDivElement>
-  ) => unknown
+  onClick?: (event: MouseEvent<HTMLElement>) => unknown
   /** focus handler */
   onFocus?: (event: FocusEvent<HTMLInputElement>) => unknown
   /** blur handler */
@@ -309,7 +307,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
             width="100%"
             flexDirection={DIRECTION_COLUMN}
             css={OUTER_CSS}
-            onClick={!props.disabled ? props.onClick : null}
+            onClick={props.disabled === true ? undefined : props.onClick}
           >
             <Flex
               tabIndex={tabIndex}
