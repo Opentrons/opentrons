@@ -59,7 +59,9 @@ export interface InputFieldProps {
     | typeof LEGACY_INPUT_TYPE_PASSWORD
     | typeof INPUT_TYPE_NUMBER
   /** mouse click handler */
-  onClick?: (event: MouseEvent<HTMLInputElement>) => unknown
+  onClick?: (
+    event: MouseEvent<HTMLInputElement> | MouseEvent<HTMLDivElement>
+  ) => unknown
   /** focus handler */
   onFocus?: (event: FocusEvent<HTMLInputElement>) => unknown
   /** blur handler */

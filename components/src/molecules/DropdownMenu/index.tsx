@@ -27,7 +27,7 @@ import { DeckInfoLabel } from '../DeckInfoLabel'
 import { LiquidIcon } from '../LiquidIcon'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
-import type { FocusEventHandler } from 'react'
+import type { FocusEventHandler, MouseEvent } from 'react'
 
 export interface DropdownOption {
   /** dropdown option name */
@@ -72,9 +72,9 @@ export interface DropdownMenuProps {
   /** optional error */
   error?: string | null
   /** focus handler */
-  onFocus?: FocusEventHandler<HTMLButtonElement>
+  onFocus?: FocusEventHandler<HTMLElement>
   /** blur handler */
-  onBlur?: FocusEventHandler<HTMLButtonElement>
+  onBlur?: FocusEventHandler<HTMLElement>
   /** optional disabled */
   disabled?: boolean
   /** optional placement of the menu */

@@ -1,27 +1,21 @@
-import styled from 'styled-components'
+import { withStyleProps } from '../../hocs/withStyleProps'
+import { Btn } from '../../primitives'
+import styles from './alertprimarybutton.module.css'
 
-import { BORDERS, COLORS } from '../../helix-design-system'
-import { Btn, styleProps } from '../../primitives'
-import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import type { ComponentProps, FC } from 'react'
+import type { StyleProps } from '../../primitives/types'
 
-export const AlertPrimaryButton = styled(Btn)`
-  color: ${COLORS.white};
-  background-color: ${COLORS.red50};
-  border-radius: ${BORDERS.borderRadius8};
-  padding: ${SPACING.spacing8} ${SPACING.spacing16};
-  text-transform: ${TYPOGRAPHY.textTransformNone};
-  box-shadow: 0 0 0;
-  ${TYPOGRAPHY.pSemiBold}
+const AlertPrimaryButtonComponent: FC<
+  ComponentProps<'button'> & StyleProps
+> = ({ className, ...props }) => {
+  const combinedClassName =
+    className != null && className !== ''
+      ? `${styles.alert_primary_button} ${className}`
+      : styles.alert_primary_button
 
-  ${styleProps}
+  return <Btn {...props} className={combinedClassName} />
+}
 
-  &:hover {
-    box-shadow: 0 0 0;
-    background-color: ${COLORS.red55};
-  }
-
-  &:disabled {
-    background-color: ${COLORS.grey30};
-    color: ${COLORS.grey40};
-  }
-`
+export const AlertPrimaryButton: FC<
+  ComponentProps<'button'> & StyleProps
+> = withStyleProps(AlertPrimaryButtonComponent)

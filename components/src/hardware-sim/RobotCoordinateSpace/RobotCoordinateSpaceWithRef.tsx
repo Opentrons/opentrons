@@ -10,7 +10,7 @@ export interface RobotCoordinateSpaceWithRefRenderProps {
 }
 
 interface RobotCoordinateSpaceWithRefProps extends ComponentProps<typeof Svg> {
-  viewBox?: string | null
+  viewBox?: string
   deckDef?: DeckDefinition
   zoomed?: boolean
   children?: (props: RobotCoordinateSpaceWithRefRenderProps) => ReactNode

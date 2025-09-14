@@ -33,7 +33,7 @@ const SvgComponent = forwardRef<
         xmlns={SVG_NAMESPACE}
         width={svgWidth}
         height={svgHeight}
-        className={`${styles.svg} ${className ?? ''}`}
+        className={className ?? ''}
         {...props}
       >
         {children}
