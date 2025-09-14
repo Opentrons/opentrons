@@ -1,30 +1,25 @@
 .new_primary_btn {
   /* Base button variant styles */
-  border-color: inherit;
-  border-radius: 4px;
   display: inline-block;
-  font-size: 0.875rem;
-  font-weight: 600;
+  padding: var(--spacing-8) var(--spacing-16);
+  border: none;
+  border-color: inherit;
+  border-radius: var(--border-radius-4);
+  background-color: #0070f3;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+  color: var(--white);
+  cursor: pointer;
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-semi-bold);
   line-height: 1.4;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
   text-align: center;
   text-transform: uppercase;
-
-  /* Primary button specific styles */
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
-  background-color: #0070f3;
-  color: #ffffff;
-  border: none;
-  cursor: pointer;
 }
 
 .new_primary_btn:hover,
 .new_primary_btn:focus {
   background-color: #0070f3;
-  box-shadow: 0px 3px 6px 0px rgba(0, 0, 0, 0.23);
+  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.23);
 }
 
 .new_primary_btn:active {
@@ -35,7 +30,7 @@
 .new_primary_btn:disabled,
 .new_primary_btn.disabled {
   background-color: #9ca3af;
-  color: #ffffff;
   box-shadow: none;
+  color: var(--white);
   cursor: default;
 }
