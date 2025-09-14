@@ -5,19 +5,14 @@ import { BORDERS, COLORS } from '../../helix-design-system'
 import { Btn } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'
 
-import type { ComponentProps, ForwardedRef, ReactNode } from 'react'
+import type { ComponentProps } from 'react'
 
 interface OverflowBtnProps extends ComponentProps<typeof Btn> {
   fillColor?: string
 }
-export const OverflowBtn: (
-  props: OverflowBtnProps,
-  ref: ForwardedRef<HTMLInputElement>
-) => ReactNode = forwardRef(
-  (
-    props: OverflowBtnProps,
-    ref: ForwardedRef<HTMLInputElement>
-  ): JSX.Element => {
+
+export const OverflowBtn = forwardRef<HTMLButtonElement, OverflowBtnProps>(
+  (props: OverflowBtnProps, ref) => {
     const { fillColor, ...restProps } = props
     return (
       <Btn css={OVERFLOW_MENU_BUTTON_STYLE} {...restProps} ref={ref}>

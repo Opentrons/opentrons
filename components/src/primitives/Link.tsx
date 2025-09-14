@@ -14,13 +14,18 @@ export interface LinkProps extends StyleProps {
  * @component
  */
 
-const LinkComponent = (props: ComponentProps<'a'>): JSX.Element => (
+const LinkComponent = ({
+  external,
+  ...props
+}: ComponentProps<'a'> & LinkProps): JSX.Element => (
   <a
     {...props}
+    {...(external === true && { target: '_blank', rel: 'noopener noreferrer' })}
+    // eslint-disable-next-line react/forbid-dom-props
     style={{ textDecoration: 'none', cursor: 'pointer', ...props.style }}
   />
 )
 
-export const Link: FC<ComponentProps<'a'> & StyleProps> = withStyleProps(
+export const Link: FC<ComponentProps<'a'> & LinkProps> = withStyleProps(
   LinkComponent
-) as FC<ComponentProps<'a'> & StyleProps>
+) as FC<ComponentProps<'a'> & LinkProps>

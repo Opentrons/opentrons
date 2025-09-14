@@ -29,7 +29,12 @@ import { OPEN_STEP_DETAILS_EVENT } from '../../../../analytics/constants'
 import { OVERFLOW_MENU_POSITION_ADJUSTMENT } from '../../../../constants'
 
 import type { ThunkDispatch } from 'redux-thunk'
-import type { Dispatch, MutableRefObject, SetStateAction } from 'react'
+import type {
+  Dispatch,
+  MouseEvent,
+  MutableRefObject,
+  SetStateAction,
+} from 'react'
 import type { AnalyticsEvent } from '/protocol-designer/analytics/mixpanel'
 import type { StepIdType } from '/protocol-designer/form-types'
 import type { BaseState } from '/protocol-designer/types'
@@ -109,7 +114,7 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
         boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
         backgroundColor={COLORS.white}
         flexDirection={DIRECTION_COLUMN}
-        onClick={(e: MouseEvent) => {
+        onClick={(e: MouseEvent<HTMLDivElement>) => {
           e.preventDefault()
           e.stopPropagation()
         }}

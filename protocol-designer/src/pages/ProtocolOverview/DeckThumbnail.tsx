@@ -112,7 +112,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
       backgroundColor={
         robotType === OT2_ROBOT_TYPE ? COLORS.white : COLORS.grey10
       }
-      paddingY={robotType === FLEX_ROBOT_TYPE && SPACING.spacing24}
+      paddingY={robotType === FLEX_ROBOT_TYPE ? SPACING.spacing24 : undefined}
       borderRadius={BORDERS.borderRadius8}
     >
       <RobotCoordinateSpaceWithRef

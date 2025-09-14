@@ -107,7 +107,7 @@ export function OddInfoScreen(props: OddInfoScreenProps): JSX.Element {
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
         gridGap={SPACING.spacing4}
-        widhth="100%"
+        width="100%"
       >
         <StyledText oddStyle={headerStyle}>{header}</StyledText>
         {subText != null ? (

@@ -25,6 +25,6 @@ const BtnComponent: FC<ComponentProps<'button'> & StyleProps> = ({
   return <button {...props} className={combinedClassName} />
 }
 
-export const Btn = withStyleProps(BtnComponent) as FC<
-  ComponentProps<'button'> & StyleProps
->
+export const Btn: FC<ComponentProps<'button'> & StyleProps> = withStyleProps(
+  BtnComponent
+) as FC<ComponentProps<'button'> & StyleProps>

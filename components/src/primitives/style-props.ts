@@ -53,6 +53,7 @@ const BORDER_PROPS = [
 const FLEXBOX_PROPS = [
   'flex',
   'alignItems',
+  'alignContent',
   'justifyContent',
   'flexDirection',
   'flexGrow',

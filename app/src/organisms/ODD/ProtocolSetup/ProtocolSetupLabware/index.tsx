@@ -273,7 +273,9 @@ function LabwareLatch({
     params: { moduleId: matchedHeaterShaker.id },
   }
 
-  const toggleLatch = (e: TouchEvent): void => {
+  const toggleLatch = (
+    e: React.TouchEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>
+  ): void => {
     e.stopPropagation()
     createLiveCommand({
       command: latchCommand,
@@ -367,6 +369,7 @@ function LabwareLatch({
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       lineHeight={TYPOGRAPHY.lineHeight28}
       minWidth="11.0625rem"
+      onTouchStart={toggleLatch}
       onClick={toggleLatch}
       padding={SPACING.spacing12}
     >
