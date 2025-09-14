@@ -111,6 +111,9 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
       onDelete,
       borderRadius,
       padding,
+      id,
+      disabled,
+      error,
       ...inputProps
     } = props
     const hasError = props.error != null
@@ -233,6 +236,9 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
       color: ${COLORS.grey60};
       padding-bottom: ${SPACING.spacing4};
       text-align: ${textAlign};
+      font-size: ${TYPOGRAPHY.fontSizeH3};
+      line-height: ${TYPOGRAPHY.lineHeight20};
+      font-weight: ${TYPOGRAPHY.fontWeightRegular};
       @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
         font-size: ${TYPOGRAPHY.fontSize22};
         font-weight: ${TYPOGRAPHY.fontWeightRegular};
@@ -272,8 +278,8 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
         lineHeight={1}
         fontSize={TYPOGRAPHY.fontSizeP}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
-        color={props.error != null ? COLOR_WARNING_DARK : COLORS.black90}
-        opacity={props.disabled ?? false ? 0.5 : ''}
+        color={error != null ? COLOR_WARNING_DARK : COLORS.black90}
+        opacity={disabled ?? false ? 0.5 : ''}
       >
         <Flex flexDirection={DIRECTION_COLUMN} width="100%">
           {title != null ? (
@@ -282,13 +288,9 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
               gridGap={SPACING.spacing8}
               alignItems={ALIGN_CENTER}
             >
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
-                htmlFor={props.id}
-                css={TITLE_STYLE}
-              >
+              <label htmlFor={id} css={TITLE_STYLE}>
                 {title}
-              </StyledText>
+              </label>
               {tooltipText != null ? (
                 <>
                   <Flex {...targetProps}>
