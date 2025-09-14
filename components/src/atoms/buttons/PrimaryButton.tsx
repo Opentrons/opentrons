@@ -4,7 +4,9 @@ import { BORDERS, COLORS } from '../../helix-design-system'
 import { Btn, styleProps } from '../../primitives'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
-export const PrimaryButton = styled(Btn)`
+import type { StyledComponent } from 'styled-components'
+
+export const PrimaryButton: StyledComponent<any, any> = styled(Btn)`
   color: ${COLORS.white};
   background-color: ${COLORS.blue50};
   border-radius: ${BORDERS.borderRadius8};
@@ -16,7 +18,7 @@ export const PrimaryButton = styled(Btn)`
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   line-height: ${TYPOGRAPHY.lineHeight20};
 
-  ${styleProps}
+  ${styleProps as any}
 
   &:hover,
   &:focus {
