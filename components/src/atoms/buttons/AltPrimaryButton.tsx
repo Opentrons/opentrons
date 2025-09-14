@@ -1,37 +1,22 @@
-import styled from 'styled-components'
+import { withStyleProps } from '../../hocs/withStyleProps'
+import { Btn } from '../../primitives'
+import styles from './altprimarybutton.module.css'
 
-import { BORDERS, COLORS } from '../../helix-design-system'
-import { Btn, styleProps } from '../../primitives'
-import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import type { ComponentProps, FC } from 'react'
+import type { StyleProps } from '../../primitives/types'
 
-export const AltPrimaryButton = styled(Btn)`
-  background-color: ${COLORS.grey30};
-  color: ${COLORS.black90};
-  padding: ${SPACING.spacing8} ${SPACING.spacing16};
-  border-radius: ${BORDERS.borderRadius8};
-  box-shadow: none;
-  font-size: ${TYPOGRAPHY.fontSizeH3};
-  font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-  line-height: ${TYPOGRAPHY.lineHeight20};
+const AltPrimaryButtonComponent: FC<ComponentProps<'button'> & StyleProps> = ({
+  className,
+  ...props
+}) => {
+  const combinedClassName =
+    className != null && className !== ''
+      ? `${styles.alt_primary_button} ${className}`
+      : styles.alt_primary_button
 
-  ${styleProps}
+  return <Btn {...props} className={combinedClassName} />
+}
 
-  &:focus {
-    background-color: ${COLORS.grey35};
-    box-shadow: none;
-  }
-
-  &:active {
-    background-color: ${COLORS.grey40};
-  }
-
-  &:hover {
-    box-shadow: 0 0 0;
-    background-color: ${COLORS.grey35};
-  }
-
-  &:disabled {
-    background-color: ${COLORS.grey30};
-    color: ${COLORS.grey40};
-  }
-`
+export const AltPrimaryButton: FC<
+  ComponentProps<'button'> & StyleProps
+> = withStyleProps(AltPrimaryButtonComponent)
