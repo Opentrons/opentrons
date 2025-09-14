@@ -41,14 +41,20 @@ const TOGGLE_ENABLED_STYLES = css`
 
 interface ToggleButtonProps extends StyleProps {
   toggledOn: boolean
-  label?: string | null
+  label?: string
   disabled?: boolean | null
   id?: string
   onClick?: (e: MouseEvent) => void
 }
 
 export function ToggleButton(props: ToggleButtonProps): JSX.Element {
-  const { label, toggledOn, disabled, size, ...buttonProps } = props
+  const {
+    label = 'ToggleButton',
+    toggledOn,
+    disabled,
+    size,
+    ...buttonProps
+  } = props
   const iconName = toggledOn ? 'ot-toggle-input-on' : 'ot-toggle-input-off'
 
   return (
@@ -58,7 +64,7 @@ export function ToggleButton(props: ToggleButtonProps): JSX.Element {
       aria-label={label}
       aria-checked={toggledOn}
       size={size ?? '2rem'}
-      css={props.toggledOn ? TOGGLE_ENABLED_STYLES : TOGGLE_DISABLED_STYLES}
+      css={toggledOn ? TOGGLE_ENABLED_STYLES : TOGGLE_DISABLED_STYLES}
       {...buttonProps}
     >
       <Flex>
