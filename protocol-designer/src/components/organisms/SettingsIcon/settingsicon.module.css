@@ -1,0 +1,41 @@
+.gear_icon_button {
+  display: flex;
+  width: 2rem;
+  height: 2rem;
+  align-items: center;
+  justify-content: center;
+  border-color: var(--transparent);
+  border-radius: 50%;
+  background-color: var(--transparent);
+  color: var(--grey-60);
+  cursor: pointer;
+}
+
+.gear_icon_button:hover {
+  background-color: var(--grey-30);
+}
+
+.gear_icon_button:active {
+  background-color: var(--grey-35);
+  color: var(--grey-60);
+}
+
+.gear_icon_button:focus-visible {
+  position: relative;
+  background-color: var(--grey-35);
+  outline: none;
+}
+
+/* blue ring for focus-visible */
+.gear_icon_button:focus-visible::after {
+  position: absolute;
+  top: -var(--spacing-8);
+  left: -var(--spacing-8);
+  width: calc(100% + 2 * var(--spacing-8));
+  height: calc(100% + 2 * var(--spacing-8));
+  box-sizing: border-box;
+  border: 3px solid var(--blue-50);
+  border-radius: 50%;
+  content: '';
+  pointer-events: none;
+}
