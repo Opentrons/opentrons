@@ -25,16 +25,19 @@ Pipettes attach to the gantry using captive screws on the front of the pipette. 
 
 The pipettes pick up disposable plastic *tips* by pressing them onto the pipette *nozzles*, and then use the tips to aspirate and dispense liquids. The amount of total force required for pickup increases as more tips get picked up simultaneously. For smaller numbers of tips, the pipette attaches tips by pushing each pipette nozzle down into a tip. To achieve the necessary force to pick up a full rack of tips, the 96-channel pipette also pulls the tips upward onto the nozzles. This pulling action requires placing tip racks into a *tip rack adapter*, rather than directly in a deck slot. To discard tips (or return them to their rack), the pipette *ejector* mechanism pushes the tips off of the nozzles.
 
-## Pipette accuracy and precision
+## Pipette specifications
 
-Opentrons Flex pipettes are designed to handle a wide range of liquid volumes and are compatible with multiple tip sizes. To help ensure accuracy and precision, Opentrons has tested the performance of these instruments with multiple tip and liquid volume combinations. The following tables list the accuracy and precision specifications for Opentrons Flex 1-, 8-, and 96-channel pipettes.
+Opentrons Flex pipettes are designed to handle a wide range of liquid volumes and are compatible with multiple tip sizes. To help ensure performance and quality, Opentrons has tested these instruments with different tips and liquid volume combinations. The following tables list the accuracy and precision specifications for Opentrons Flex 1-, 8-, and 96-channel pipettes.
+
+!!!tip
+    Refer to these tables when choosing tips for your pipette. For best results you should use the smallest tips that meet the needs of your protocol.
 
 ### Flex 1-channel specifications
 
 <table>
   <thead>
     <tr>
-      <th>Instrument</th>
+      <th>Pipette</th>
       <th>Tip Capacity</th>
       <th>Tested Volume</th>
       <th>Accuracy %D</th>
@@ -103,7 +106,7 @@ Opentrons Flex pipettes are designed to handle a wide range of liquid volumes an
   </thead>
   <tbody>
     <tr>
-      <td rowspan="3"><b>Flex 8-Channel 50 µL</b></td>
+      <td rowspan="3"><b>8-Channel<br>(1-50 µL)</b></td>
       <td>50 µL</td>
       <td>1 µL</td>
       <td>10.00%</td>
@@ -122,7 +125,7 @@ Opentrons Flex pipettes are designed to handle a wide range of liquid volumes an
       <td>0.60%</td>
     </tr>
     <tr>
-      <td rowspan="4"><b>Flex 8-Channel 1000 µL</b></td>
+      <td rowspan="4"><b>8-Channel<br>(1-1000 µL)</b></td>
       <td>50 µL</td>
       <td>5 µL</td>
       <td>8.00%</td>
@@ -163,7 +166,7 @@ Opentrons Flex pipettes are designed to handle a wide range of liquid volumes an
   </thead>
   <tbody>
     <tr>
-      <td rowspan="4"><b>Flex 96-Channel 1000 µL</b></td>
+      <td rowspan="4"><b>96-Channel<br>(1-1000 µL)</b></td>
       <td>50 µL</td>
       <td>5 µL</td>
       <td>10.00%</td>
@@ -187,8 +190,33 @@ Opentrons Flex pipettes are designed to handle a wide range of liquid volumes an
       <td>1.50%</td>
       <td>1.50%</td>
     </tr>
+    <td rowspan="4"><b>96-Channel<br>(1-200 µL)</b></td>
+      <td> µL</td>
+      <td> µL</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
 </table>
 
+<!-- hide original, temporary
 <table>
   <thead>
     <tr>
@@ -315,15 +343,10 @@ Opentrons Flex pipettes are designed to handle a wide range of liquid volumes an
     </tr>
   </tbody>
 </table>
-
-Keep this accuracy information in mind when choosing tips for your
-pipette. In general, for best results you should use the smallest tips
-that meet the needs of your protocol.
+-->
 
 !!! note
     Opentrons performs volumetric testing of Flex pipettes to ensure that they meet the accuracy and precision specifications listed above. You *do not* have to calibrate the volume that your pipettes dispense before use. You only have to perform positional calibration. See the next section, as well as the [Pipette Installation section][pipette-installation] of the Installation and Relocation chapter, for details.
-
-    The Opentrons Care and Opentrons Care Plus services include yearly pipette replacement and certificates of calibration. See the [Servicing Flex section](../maintenance/service.md) of the Maintenance and Service chapter for details.
 
 ## Pipette calibration
 
