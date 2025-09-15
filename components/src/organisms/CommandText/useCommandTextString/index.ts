@@ -311,6 +311,12 @@ export function useCommandTextString(
         commandText: utils.getRailLightsCommandText({ ...fullParams, command }),
       }
 
+    case 'setTipState':
+      return {
+        kind: 'generic',
+        commandText: utils.getTipStateCommandText({ ...fullParams, command }),
+      }
+
     case 'robot/moveTo':
     case 'robot/moveAxesTo':
     case 'robot/moveAxesRelative':

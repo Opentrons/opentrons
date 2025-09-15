@@ -55,6 +55,7 @@ class AbstractThermocyclerDriver(ABC):
         temp: float,
         hold_time: Optional[float] = None,
         volume: Optional[float] = None,
+        ramp_rate: Optional[float] = None,
     ) -> None:
         """Send set plate temperature command"""
         ...

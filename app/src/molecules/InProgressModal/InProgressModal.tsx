@@ -27,6 +27,7 @@ const StyledDescription = styled(LegacyStyledText)`
   ${TYPOGRAPHY.h1Default}
   margin-top: ${SPACING.spacing24};
   margin-bottom: ${SPACING.spacing8};
+  text-align: ${TYPOGRAPHY.textAlignCenter};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-weight: ${TYPOGRAPHY.fontWeightBold};
@@ -35,7 +36,6 @@ const StyledDescription = styled(LegacyStyledText)`
     margin-bottom: ${SPACING.spacing4};
     margin-left: 4.5rem;
     margin-right: 4.5rem;
-    text-align: ${TYPOGRAPHY.textAlignCenter};
     line-height: ${TYPOGRAPHY.lineHeight42};
   }
 `

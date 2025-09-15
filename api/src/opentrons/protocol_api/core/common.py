@@ -16,6 +16,7 @@ from .module import (
 from .protocol import AbstractProtocol
 from .well import AbstractWellCore
 from .robot import AbstractRobot
+from .tasks import AbstractTaskCore
 
 
 WellCore = AbstractWellCore
@@ -31,3 +32,4 @@ AbsorbanceReaderCore = AbstractAbsorbanceReaderCore[LabwareCore]
 FlexStackerCore = AbstractFlexStackerCore[LabwareCore]
 RobotCore = AbstractRobot
 ProtocolCore = AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]
+TaskCore = AbstractTaskCore

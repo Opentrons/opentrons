@@ -30,7 +30,7 @@ export function LaunchLivestreamBtn(): JSX.Element {
       aria-disabled={!isLaunchCameraEnabled}
       onClick={handleOpenCameraStream}
     >
-      {t('live_camera_view')}
+      {t('live_camera')}
       <Icon className={styles.launch_icon_style} name="open-in-new" />
     </SecondaryButton>
   )
