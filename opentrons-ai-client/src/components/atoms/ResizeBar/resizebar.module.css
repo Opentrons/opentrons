@@ -24,6 +24,6 @@
 .grip_line {
   width: 0.125rem;
   height: 0.625rem;
-  border-radius: 0.75rem;
+  border-radius: var(--border-radius-12);
   background-color: var(--white);
 }
