@@ -56,8 +56,8 @@ def move_labware(text: str) -> command_types.MoveLabwareCommand:
 
 
 def wait_for_tasks(tasks: list[Task]) -> command_types.WaitForTasksCommand:
-    task_ids = [task.id for task in tasks]
-    msg = f"Waiting for tasks, {task_ids}."
+    task_ids = [task.created_at.strftime("%Y-%m-%d %H:%M:%S") for task in tasks]
+    msg = f"Waiting for tasks that started at: {task_ids}."
     return {
         "name": command_types.WAIT_FOR_TASKS,
         "payload": {"text": msg},

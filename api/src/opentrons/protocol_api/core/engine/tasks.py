@@ -9,9 +9,6 @@ class EngineTaskCore(AbstractTaskCore):
         self._id = task_id
         self._engine_client = engine_client
 
-    def get_id(self) -> str:
-        return self._id
-
     def get_created_at_timestamp(self) -> datetime:
         task = self._engine_client.state.tasks.get(self._id)
         return task.createdAt

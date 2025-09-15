@@ -21,12 +21,6 @@ class Task:
 
     @property
     @requires_version(2, 27)
-    def id(self) -> str:
-        """The unique ID of the task."""
-        return self._core.get_id()
-
-    @property
-    @requires_version(2, 27)
     def created_at(self) -> datetime:
         """The timestamp of when the task was created."""
         return self._core.get_created_at_timestamp()

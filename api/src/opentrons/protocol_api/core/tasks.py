@@ -5,11 +5,6 @@ from typing import TypeVar
 
 class AbstractTaskCore(ABC):
     @abstractmethod
-    def get_id(self) -> str:
-        """Get the ID of the task."""
-        ...
-
-    @abstractmethod
     def get_created_at_timestamp(self) -> datetime:
         """Get the createdAt timestamp of the task."""
         ...
