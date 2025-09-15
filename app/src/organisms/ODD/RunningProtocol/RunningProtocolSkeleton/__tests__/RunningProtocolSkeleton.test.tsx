@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 
-import { RunningProtocolSkeleton } from '../RunningProtocolSkeleton'
+import { RunningProtocolSkeleton } from '..'
 
 import type { ComponentProps } from 'react'
 

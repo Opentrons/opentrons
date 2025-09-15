@@ -1,25 +1,16 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { css } from 'styled-components'
 
 import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
-import {
-  ALIGN_FLEX_START,
-  BORDERS,
-  COLORS,
-  DIRECTION_COLUMN,
-  Flex,
-  LegacyStyledText,
-  OVERFLOW_AUTO,
-  SPACING,
-  TYPOGRAPHY,
-} from '@opentrons/components'
+import { LegacyStyledText } from '@opentrons/components'
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 import { getHighestPriorityError } from '/app/transformations/runs'
+
+import styles from './runfailedmodal.module.css'
 
 import type {
   RunCommandErrors,
@@ -91,7 +82,7 @@ export function RunFailedModal({
   }: ErrorContentProps): JSX.Element => {
     return (
       <>
-        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightBold}>
+        <LegacyStyledText as="p" className={styles.error_info_text}>
           {isSingleError
             ? t('error_info', {
                 errorType: errors[0].errorType,
@@ -105,31 +96,21 @@ export function RunFailedModal({
                 count: errors.length,
               })}
         </LegacyStyledText>
-        <Flex
-          width="100%"
-          flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing8}
-          maxHeight="11rem"
-          backgroundColor={COLORS.grey35}
-          borderRadius={BORDERS.borderRadius8}
-          padding={`${SPACING.spacing16} ${SPACING.spacing20}`}
-        >
-          <Flex flexDirection={DIRECTION_COLUMN} css={SCROLL_BAR_STYLE}>
-            {' '}
+        <div className={styles.error_container}>
+          <div className={styles.error_list}>
             {errors.map((error, index) => (
               <LegacyStyledText
                 as="p"
-                textAlign={TYPOGRAPHY.textAlignLeft}
+                className={styles.error_detail_text}
                 key={index}
               >
-                {' '}
                 {isSingleError
                   ? error.detail
                   : `${error.errorCode}: ${error.detail}`}
               </LegacyStyledText>
             ))}
-          </Flex>
-        </Flex>
+          </div>
+        </div>
       </>
     )
   }
@@ -141,19 +122,8 @@ export function RunFailedModal({
         setShowRunFailedModal(false)
       }}
     >
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing40}
-        width="100%"
-        css={css`
-          word-break: break-all;
-        `}
-      >
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing16}
-          alignItems={ALIGN_FLEX_START}
-        >
+      <div className={styles.container}>
+        <div className={styles.error_content}>
           <ErrorContent
             errors={
               highestPriorityError
@@ -164,14 +134,8 @@ export function RunFailedModal({
             }
             isSingleError={!!highestPriorityError}
           />
-        </Flex>
-        <LegacyStyledText
-          as="p"
-          textAlign={TYPOGRAPHY.textAlignLeft}
-          css={css`
-            word-break: break-word;
-          `}
-        >
+        </div>
+        <LegacyStyledText as="p" className={styles.contact_text}>
           {t('branded:contact_information')}
         </LegacyStyledText>
         <SmallButton
@@ -181,26 +145,7 @@ export function RunFailedModal({
           onClick={handleClose}
           disabled={isCanceling}
         />
-      </Flex>
+      </div>
     </OddModal>
   )
 }
-
-const SCROLL_BAR_STYLE = css`
-  overflow-y: ${OVERFLOW_AUTO};
-
-  &::-webkit-scrollbar {
-    width: 0.75rem;
-    background-color: ${COLORS.grey35};
-  }
-
-  &::-webkit-scrollbar-track {
-    margin-top: ${SPACING.spacing16};
-    margin-bottom: ${SPACING.spacing16};
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: ${COLORS.grey50};
-    border-radius: 11px;
-  }
-`
