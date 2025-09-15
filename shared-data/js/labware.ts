@@ -198,18 +198,18 @@ const adapters = ['aluminumblock', 'tuberack']
 const sortedLabwareImages = Object.fromEntries(
   Object.entries(labwareImages).map(([key, urls]) => {
     const sortedUrls = [...urls].sort((a, b) => {
-      const aMatches = adapters.some(substr => a.includes(substr));
-      const bMatches = adapters.some(substr => b.includes(substr));
+      const aMatches = adapters.some(substr => a.includes(substr))
+      const bMatches = adapters.some(substr => b.includes(substr))
 
-      if (aMatches && !bMatches) return -1;
-      if (!aMatches && bMatches) return 1;
+      if (aMatches && !bMatches) return -1
+      if (!aMatches && bMatches) return 1
 
-      return a.localeCompare(b);
-    });
+      return a.localeCompare(b)
+    })
 
-    return [key, sortedUrls];
+    return [key, sortedUrls]
   })
-);
+)
 
 export {
   sortedLabwareImages as labwareImages,
