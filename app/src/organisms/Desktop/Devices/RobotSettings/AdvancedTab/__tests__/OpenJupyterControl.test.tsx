@@ -18,7 +18,7 @@ const mockIpAddress = '1.1.1.1'
 const mockLink = `http://${mockIpAddress}:48888`
 const trackEvent = vi.fn()
 
-global.window = Object.create(window)
+globalThis.window = Object.create(window)
 Object.defineProperty(window, 'open', { writable: true, configurable: true })
 window.open = vi.fn()
 

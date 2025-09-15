@@ -3,10 +3,16 @@ import { Box } from '@opentrons/components'
 export const TOP_PORTAL_ID = '__otAppTopPortalRoot'
 export const MODAL_PORTAL_ID = '__otAppModalPortalRoot'
 export function getTopPortalEl(): HTMLElement {
-  return global.document.getElementById(TOP_PORTAL_ID) ?? global.document.body
+  return (
+    globalThis.document.getElementById(TOP_PORTAL_ID) ??
+    globalThis.document.body
+  )
 }
 export function getModalPortalEl(): HTMLElement {
-  return global.document.getElementById(MODAL_PORTAL_ID) ?? global.document.body
+  return (
+    globalThis.document.getElementById(MODAL_PORTAL_ID) ??
+    globalThis.document.body
+  )
 }
 
 export function PortalRoot(): JSX.Element {

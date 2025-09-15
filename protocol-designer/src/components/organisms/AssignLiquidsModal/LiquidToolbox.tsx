@@ -147,7 +147,7 @@ export function LiquidToolbox({
 
   const handleClearSelectedWells: () => void = () => {
     if (labwareId != null && selectedWells != null && selectionHasLiquids) {
-      if (global.confirm(t('application:are_you_sure') as string)) {
+      if (globalThis.confirm(t('application:are_you_sure') as string)) {
         dispatch(
           removeWellsContents({
             labwareId,
@@ -164,7 +164,9 @@ export function LiquidToolbox({
   const handleClearAllWells: () => void = () => {
     if (labwareId != null && activeItemHasLiquids) {
       if (
-        global.confirm(t('application:are_you_sure_clear_all_wells') as string)
+        globalThis.confirm(
+          t('application:are_you_sure_clear_all_wells') as string
+        )
       ) {
         dispatch(
           removeWellsContents({

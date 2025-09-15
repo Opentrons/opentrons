@@ -263,7 +263,7 @@ export function LabwareModal({
               </Flex>
             </Flex>
           </Modal>,
-          global.document.body
+          globalThis.document.body
         )}
     </>
   )

@@ -12,7 +12,7 @@ const persistAnalyticsCookie = (cookies: AnalyticsState): void => {
   const maxAge = 10 * 365 * 24 * 60 * 60 // 10 years
   const options = { COOKIE_DOMAIN, maxAge }
 
-  global.document.cookie = cookie.serialize(
+  globalThis.document.cookie = cookie.serialize(
     COOKIE_KEY_NAME,
     JSON.stringify(cookies),
     options
@@ -20,7 +20,7 @@ const persistAnalyticsCookie = (cookies: AnalyticsState): void => {
 }
 
 const getAnalyticsCookie = (): AnalyticsState => {
-  const cookies = cookie.parse(global.document.cookie)
+  const cookies = cookie.parse(globalThis.document.cookie)
   const analyticsCookie =
     cookies[COOKIE_KEY_NAME] != null ? JSON.parse(cookies[COOKIE_KEY_NAME]) : {}
   return analyticsCookie

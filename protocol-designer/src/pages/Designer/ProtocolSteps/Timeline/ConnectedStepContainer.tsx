@@ -124,9 +124,9 @@ export function ConnectedStepContainer(
   }
 
   useEffect(() => {
-    global.addEventListener('click', handleClick)
+    globalThis.addEventListener('click', handleClick)
     return () => {
-      global.removeEventListener('click', handleClick)
+      globalThis.removeEventListener('click', handleClick)
     }
   })
 

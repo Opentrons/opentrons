@@ -71,6 +71,14 @@ module.exports = {
         ],
       },
     ],
+
+    'no-restricted-globals': [
+      'error',
+      {
+        name: 'global',
+        message: "Use 'globalThis' instead.",
+      },
+    ],
   },
 
   globals: {},

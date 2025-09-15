@@ -9,7 +9,7 @@ describe('persist', () => {
   let setItemSpy: MockInstance<(key: string, value: string) => void>
 
   beforeEach(() => {
-    const LocalStorageProto = Object.getPrototypeOf(global.localStorage)
+    const LocalStorageProto = Object.getPrototypeOf(globalThis.localStorage)
     getItemSpy = vi.spyOn(LocalStorageProto, 'getItem') as MockInstance<
       (key: string) => string | null
     >

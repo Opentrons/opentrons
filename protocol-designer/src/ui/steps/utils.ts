@@ -10,7 +10,7 @@ export const MAIN_CONTENT_FORCED_SCROLL_CLASSNAME = 'main_content_forced_scroll'
 // being positioned absolute until we can figure out something better
 export const resetScrollElements = (): void => {
   forEach(
-    global.document.getElementsByClassName(
+    globalThis.document.getElementsByClassName(
       MAIN_CONTENT_FORCED_SCROLL_CLASSNAME
     ),
     elem => {

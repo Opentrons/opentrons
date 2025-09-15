@@ -3,4 +3,4 @@
 // for security reasons
 import { ipcRenderer } from 'electron'
 
-global.APP_SHELL_REMOTE = { ipcRenderer }
+globalThis.APP_SHELL_REMOTE = { ipcRenderer }

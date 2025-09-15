@@ -78,17 +78,17 @@ const render = () => {
 }
 
 describe('CalibrationDataDownload', () => {
-  const realBlob = global.Blob
+  const realBlob = globalThis.Blob
 
   beforeAll(() => {
     // @ts-expect-error(sa, 2021-6-28): not a valid blob interface
-    global.Blob = function (content: any, options: any) {
+    globalThis.Blob = function (content: any, options: any) {
       return { content, options }
     }
   })
 
   afterAll(() => {
-    global.Blob = realBlob
+    globalThis.Blob = realBlob
   })
 
   beforeEach(() => {

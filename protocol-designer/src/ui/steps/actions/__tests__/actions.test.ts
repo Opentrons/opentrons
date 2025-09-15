@@ -135,7 +135,7 @@ describe('steps actions', () => {
         .calledWith(expect.anything())
         .thenReturn(null)
       const consoleWarnSpy = vi
-        .spyOn(global.console, 'warn')
+        .spyOn(globalThis.console, 'warn')
         .mockImplementation(() => null)
       const store: any = mockStore()
       store.dispatch(deselectAllSteps())

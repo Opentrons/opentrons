@@ -82,7 +82,6 @@ export default defineConfig(
       },
       define: {
         'process.env': { ...process.env, OT_PD_VERSION, OT_PD_BUILD_DATE },
-        global: 'globalThis',
       },
       resolve: {
         alias: {

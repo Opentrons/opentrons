@@ -1,2 +1,2 @@
 export const getIsProduction = (): boolean =>
-  global.location.host === 'designer.opentrons.com'
+  globalThis.location.host === 'designer.opentrons.com'

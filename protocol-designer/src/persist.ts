@@ -18,7 +18,7 @@ export interface RehydratePersistedAction {
 }
 export const getLocalStorageItem = (path: string): unknown => {
   try {
-    const persisted = global.localStorage.getItem(_addStoragePrefix(path))
+    const persisted = globalThis.localStorage.getItem(_addStoragePrefix(path))
     return persisted ? JSON.parse(persisted) : undefined
   } catch (e) {
     console.error('Could not rehydrate:', e)
@@ -80,7 +80,7 @@ function transformBeforePersist(
 
 export const setLocalStorageItem = (path: string, value: any): void => {
   try {
-    global.localStorage.setItem(
+    globalThis.localStorage.setItem(
       _addStoragePrefix(path),
       JSON.stringify(transformBeforePersist(path, value))
     )

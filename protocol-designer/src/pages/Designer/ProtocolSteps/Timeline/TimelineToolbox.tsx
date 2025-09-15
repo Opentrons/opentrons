@@ -94,10 +94,10 @@ export function TimelineToolbox({
       handleKeyDown(e)
     }
 
-    global.addEventListener('keydown', onKeyDown, false)
+    globalThis.addEventListener('keydown', onKeyDown, false)
 
     return () => {
-      global.removeEventListener('keydown', onKeyDown, false)
+      globalThis.removeEventListener('keydown', onKeyDown, false)
     }
   }, [])
 

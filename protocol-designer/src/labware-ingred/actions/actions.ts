@@ -149,7 +149,7 @@ export const deleteLiquidGroup: (
   const liquidIsOnDeck = allLiquidGroups.includes(liquidGroupId)
 
   const okToDelete = liquidIsOnDeck
-    ? global.confirm(
+    ? globalThis.confirm(
         'This liquid has been placed on the deck, are you sure you want to delete it?'
       )
     : true

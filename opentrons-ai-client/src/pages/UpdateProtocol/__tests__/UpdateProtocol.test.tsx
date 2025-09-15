@@ -8,8 +8,8 @@ import { UpdateProtocol } from '../index'
 
 import type { NavigateFunction } from 'react-router-dom'
 
-// global.Blob = BlobPolyfill as any
-global.Blob = require('node:buffer').Blob
+// globalThis.Blob = BlobPolyfill as any
+globalThis.Blob = require('node:buffer').Blob
 
 const mockNavigate = vi.fn()
 const mockUseTrackEvent = vi.fn()

@@ -8,7 +8,7 @@ export function hash(source: string): Promise<string> {
   const data = encoder.encode(source)
 
   // https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest
-  return global.crypto.subtle
+  return globalThis.crypto.subtle
     .digest(ALGORITHM, data)
     .then((digest: ArrayBuffer) => arrayBufferToHex(digest))
 }

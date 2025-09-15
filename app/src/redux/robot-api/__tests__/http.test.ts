@@ -23,7 +23,7 @@ describe('robot-api http client', () => {
   let robot: RobotHost
 
   beforeAll(() => {
-    ;(global as any).fetch = fetch
+    ;(globalThis as any).fetch = fetch
     testApp = express()
     testApp.use((express as any).json())
 
@@ -55,7 +55,7 @@ describe('robot-api http client', () => {
 
   afterAll(() => {
     // @ts-expect-error(sa, 2021-6-28): can't delete non optional properties
-    delete global.fetch
+    delete globalThis.fetch
 
     if (testServer) {
       const close = promisify(testServer.close.bind(testServer))

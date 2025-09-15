@@ -104,7 +104,7 @@ function OpentronsAIApp(): JSX.Element | null {
     return null
   }
 
-  global.enablePrereleaseMode = () => {
+  globalThis.enablePrereleaseMode = () => {
     setFeatureFlags({ enablePrereleaseMode: true })
   }
 

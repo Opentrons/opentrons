@@ -11,4 +11,4 @@ const getFilePathFrom = (file: File): Promise<string> => {
   return Promise.resolve(webUtils.getPathForFile(file))
 }
 
-global.APP_SHELL_REMOTE = { ipcRenderer, getFilePathFrom }
+globalThis.APP_SHELL_REMOTE = { ipcRenderer, getFilePathFrom }
