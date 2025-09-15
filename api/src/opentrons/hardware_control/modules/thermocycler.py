@@ -320,11 +320,8 @@ class Thermocycler(mod_abc.AbstractModule):
         total_seconds = seconds + (minutes * 60)
         hold_time = total_seconds if total_seconds > 0 else 0
 
-        if ramp_rate is not None:
-            await self._driver.set_ramp_rate(ramp_rate=ramp_rate)
-
         await self._driver.set_plate_temperature(
-            temp=temperature, hold_time=hold_time, volume=volume
+            temp=temperature, hold_time=hold_time, volume=volume, ramp_rate=ramp_rate
         )
 
         task = self._loop.create_task(self._wait_for_block_target())
@@ -437,10 +434,12 @@ class Thermocycler(mod_abc.AbstractModule):
             celsius: The target block temperature, in degrees celsius.
         """
         await self.wait_for_is_running()
+
         await self._driver.set_plate_temperature(
             temp=celsius,
             hold_time=hold_time_seconds,
             volume=volume,
+            ramp_rate=ramp_rate,
         )
         await self._reader.read_block_temperature()
 
@@ -605,11 +604,12 @@ class Thermocycler(mod_abc.AbstractModule):
         temperature = step.get("temperature")
         hold_time_minutes = step.get("hold_time_minutes", None)
         hold_time_seconds = step.get("hold_time_seconds", None)
+        ramp_rate = step.get("ramp_rate", None)
         await self._set_temperature_no_pause(
             temperature=temperature,  # type: ignore
             hold_time_minutes=hold_time_minutes,
             hold_time_seconds=hold_time_seconds,
-            ramp_rate=None,
+            ramp_rate=ramp_rate,
             volume=volume,
         )
 
