@@ -77,7 +77,7 @@ export interface TextAreaFieldProps {
   /** optional caption. hidden when `error` is given */
   caption?: string | null
   /** mouse click handler */
-  onClick?: (event: MouseEvent<HTMLTextAreaElement>) => unknown
+  onClick?: (event: MouseEvent<HTMLTextAreaElement | HTMLDivElement>) => unknown
   /** focus handler */
   onFocus?: (event: FocusEvent<HTMLTextAreaElement>) => unknown
   /** blur handler */
@@ -133,6 +133,8 @@ export const TextAreaField = forwardRef<
       height,
       leftIcon,
       caption,
+      id,
+      onClick,
       resize = 'none',
       ...textAreaProps
     } = props
@@ -157,13 +159,9 @@ export const TextAreaField = forwardRef<
               gridGap={SPACING.spacing8}
               alignItems={ALIGN_CENTER}
             >
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
-                htmlFor={props.id}
-                css={TITLE_STYLE(textAlign)}
-              >
+              <label htmlFor={id} css={TITLE_STYLE(textAlign)}>
                 {title}
-              </StyledText>
+              </label>
               {tooltipText != null && (
                 <>
                   <Flex {...targetProps}>
@@ -182,7 +180,7 @@ export const TextAreaField = forwardRef<
           <Flex
             width="100%"
             flexDirection={DIRECTION_COLUMN}
-            onClick={!disabled ? props.onClick : undefined}
+            onClick={disabled !== true ? onClick : undefined}
           >
             <Flex
               alignItems={ALIGN_CENTER}
@@ -309,6 +307,9 @@ const TITLE_STYLE = (textAlign: string): FlattenSimpleInterpolation => css`
   color: ${COLORS.grey60};
   padding-bottom: ${SPACING.spacing4};
   text-align: ${textAlign};
+  font-size: ${TYPOGRAPHY.fontSizeH3};
+  line-height: ${TYPOGRAPHY.lineHeight20};
+  font-weight: ${TYPOGRAPHY.fontWeightRegular};
 `
 
 const ERROR_TEXT_STYLE = css`
