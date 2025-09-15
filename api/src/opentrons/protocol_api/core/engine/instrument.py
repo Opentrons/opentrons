@@ -1081,7 +1081,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         had its volume configuration changed.
         """
         blow_out_flow_rate = (
-            self._user_dispense_flow_rate
+            self._user_blow_out_flow_rate
             or find_value_for_api_version(
                 self._protocol_core.api_version,
                 self._engine_client.state.pipettes.get_flow_rates(
