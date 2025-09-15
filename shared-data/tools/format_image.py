@@ -72,22 +72,6 @@ def crop_image(image_path: str) -> str:
     img_cropped.save(cropped_image_path, "JPEG")
     print(f"✅ Image cropped and saved: {cropped_image_path}")
     return cropped_image_path
-
-def remove_background_and_replace_with_white(image_path: str)-> str:
-    """Remove background and replace with white."""
-    print("🖼️ Beginning remove background and replace with white steps.")
-    # Remove background
-    with open(image_path, "rb") as image_file:
-        image_data = image_file.read()
-    no_bkgrnd = remove(image_data)
-    img_transparent = Image.open(io.BytesIO(no_bkgrnd))
-    # Add white background
-    white_bkgrnd = Image.new("RGB", img_transparent.size,(255, 255, 255) )
-    white_bkgrnd.paste(img_transparent, (0,0), img_transparent)
-    bkgrnd_image_path = rename_image_path(image_path, "bkgrnd")
-    white_bkgrnd.save(bkgrnd_image_path, "JPEG")
-    return bkgrnd_image_path
-    
     
 def resize_image(image_path: str, new_width: int = 1024) -> str:
     """Resize JPG image by downscaling until it's under target size (in KB)."""
@@ -150,7 +134,6 @@ def image_sequence(image_path: str) -> str:
     """Run conversion, crop, and resize on image, overwriting original."""
     image_path = convert_to_jpg(image_path)  
     if len(image_path) > 0:
-        #image_path = remove_background_and_replace_with_white(image_path)
         image_path = crop_image(image_path) 
         image_path = resize_image(image_path)    
     return image_path

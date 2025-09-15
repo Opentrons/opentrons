@@ -47,7 +47,7 @@ function getAllFiles(dir: string): string[] {
 
 describe('labwareImages format', () => {
   const imageFiles = getAllFiles(IMAGES_DIR)
-  
+
   it(`should all be smaller than ${MAX_FILE_SIZE_BYTES / 1024} KB`, () => {
     const offenders = imageFiles.filter(file => {
       const { size } = fs.statSync(file)
