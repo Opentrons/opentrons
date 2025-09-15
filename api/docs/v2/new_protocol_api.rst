@@ -16,7 +16,7 @@ Protocols
    :members:
    :exclude-members: location_cache, cleanup, clear_commands
 
-.. autoclass:: opentrons.protocol_api.tasks
+.. autoclass:: opentrons.protocol_api.Task
    :members:
 
 Instruments
