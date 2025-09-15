@@ -66,7 +66,6 @@ from opentrons.protocol_engine.types.automatic_tip_selection import (
 )
 from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons_shared_data.pipette.types import (
     PIPETTE_API_NAMES_MAP,
     LIQUID_PROBE_START_OFFSET_FROM_WELL_TOP,
@@ -1087,7 +1086,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 self._protocol_core.api_version,
                 self._engine_client.state.pipettes.get_flow_rates(
                     self._pipette_id
-                ).default_dispense,
+                ).default_blow_out,
             )
         )
 
@@ -1102,13 +1101,16 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         else:
             # Set to the initial defaults to preserve buggy behavior where the default was not correctly updated
             self._user_aspirate_flow_rate = find_value_for_api_version(
-                self._protocol_core.api_version, self._initial_default_flow_rates.default_aspirate
+                self._protocol_core.api_version,
+                self._initial_default_flow_rates.default_aspirate,
             )
             self._user_dispense_flow_rate = find_value_for_api_version(
-                self._protocol_core.api_version, self._initial_default_flow_rates.default_dispense
+                self._protocol_core.api_version,
+                self._initial_default_flow_rates.default_dispense,
             )
             self._user_blow_out_flow_rate = find_value_for_api_version(
-                self._protocol_core.api_version, self._initial_default_flow_rates.default_blow_out
+                self._protocol_core.api_version,
+                self._initial_default_flow_rates.default_blow_out,
             )
 
     def get_nozzle_configuration(self) -> NozzleConfigurationType:

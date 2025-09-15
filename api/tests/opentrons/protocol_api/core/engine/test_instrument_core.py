@@ -175,6 +175,8 @@ def subject(
         LoadedPipette.model_construct(mount=MountType.LEFT)  # type: ignore[call-arg]
     )
 
+    decoy.when(mock_protocol_core.api_version).then_return(MAX_SUPPORTED_VERSION)
+
     decoy.when(mock_engine_client.state.pipettes.get_flow_rates("abc123")).then_return(
         FlowRates(
             default_aspirate={"1.2": 2.3},
