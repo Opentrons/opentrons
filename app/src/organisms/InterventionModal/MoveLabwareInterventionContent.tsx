@@ -7,7 +7,6 @@ import {
   Flex,
   getLabwareDisplayLocation,
   getLoadedLabware,
-  LabwareRender,
   MoveLabwareOnDeck,
   SPACING,
 } from '@opentrons/components'
@@ -19,11 +18,8 @@ import {
 import { InterventionInfo } from '/app/molecules/InterventionModal/InterventionContent'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
-import {
-  getLabwareNameFromRunData,
-  getRunLabwareRenderInfo,
-  getRunModuleRenderInfo,
-} from './utils'
+import { getRunCurrentLabwareInfo } from '../ErrorRecoveryFlows/hooks/useDeckMapUtils'
+import { getLabwareNameFromRunData, getRunModuleRenderInfo } from './utils'
 
 import type { RunData } from '@opentrons/api-client'
 import type {
@@ -54,11 +50,19 @@ export function MoveLabwareInterventionContent({
   const deckDef = getDeckDefFromRobotType(robotType)
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
-  const labwareRenderInfo = getRunLabwareRenderInfo(
-    run,
-    labwareDefsByUri,
-    deckDef
-  )
+  const runCurrentLabwareInfo = getRunCurrentLabwareInfo({
+    runData: run,
+    runLwDefsByUri: labwareDefsByUri,
+  })
+
+  const labwareOnDeck = runCurrentLabwareInfo
+    .filter(lw => lw.labwareId !== command.params.labwareId)
+    .map(lw => ({
+      labwareLocation: lw.labwareLocation,
+      definition: lw.labwareDef,
+      labwareId: lw.labwareId,
+    }))
+
   const moduleRenderInfo = getRunModuleRenderInfo(
     run,
     deckDef,
@@ -146,23 +150,7 @@ export function MoveLabwareInterventionContent({
               loadedLabware={run.labware}
               deckConfig={deckConfig}
               modulesOnDeck={modulesOnDeck}
-              backgroundItems={
-                <>
-                  {labwareRenderInfo
-                    .filter(l => l.labwareId !== command.params.labwareId)
-                    .map(({ labwareOrigin, labwareDef, labwareId }) => (
-                      <g
-                        key={labwareId}
-                        transform={`translate(${labwareOrigin.x},${labwareOrigin.y})`}
-                      >
-                        <LabwareRender
-                          definition={labwareDef}
-                          positioningMode="passThrough"
-                        />
-                      </g>
-                    ))}
-                </>
-              }
+              labwareOnDeck={labwareOnDeck}
             />
           </Box>
         </Flex>
