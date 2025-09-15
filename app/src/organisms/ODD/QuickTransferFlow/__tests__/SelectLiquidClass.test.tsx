@@ -6,7 +6,7 @@ import {
   getAllLiquidClassDefs,
   GLYCEROL_LIQUID_CLASS_NAME,
   NONE_LIQUID_CLASS_NAME,
-  WATER_LIQUID_CLASS_NAME,
+  WATER_LIQUID_CLASS_NAME_V2,
 } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -71,7 +71,7 @@ const mockLiquidClasses = {
     namespace: '',
     byPipette: mockByPipette,
   },
-  [WATER_LIQUID_CLASS_NAME]: {
+  [WATER_LIQUID_CLASS_NAME_V2]: {
     displayName: 'Aqueous',
     liquidClassName: 'water',
     description: 'Deionized water',
@@ -220,7 +220,7 @@ describe('SelectLiquidClass', () => {
     expect(props.onNext).toHaveBeenCalled()
     expect(props.dispatch).toHaveBeenCalledWith({
       type: 'SET_LIQUID_CLASS',
-      liquidClassName: WATER_LIQUID_CLASS_NAME,
+      liquidClassName: WATER_LIQUID_CLASS_NAME_V2,
     })
   })
 

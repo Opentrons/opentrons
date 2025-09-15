@@ -15,7 +15,7 @@ import {
   MAGNETIC_BLOCK_V1,
   OT2_ROBOT_TYPE,
   WASTE_CHUTE_CUTOUT,
-  WATER_LIQUID_CLASS_NAME,
+  WATER_LIQUID_CLASS_NAME_V2,
 } from '@opentrons/shared-data'
 
 import {
@@ -536,7 +536,7 @@ const mockLiquidEntities: LiquidEntities = {
     displayName: 'water',
     description: 'mock description',
     displayColor: 'mock display color',
-    liquidClass: WATER_LIQUID_CLASS_NAME,
+    liquidClass: WATER_LIQUID_CLASS_NAME_V2,
   },
   [liquid2]: {
     liquidGroupId: liquid2,
@@ -665,7 +665,7 @@ describe('getLoadLiquidClasses', () => {
   it('should load a liquid class for each liquid class types', () => {
     expect(
       getLoadLiquidClasses([
-        WATER_LIQUID_CLASS_NAME,
+        WATER_LIQUID_CLASS_NAME_V2,
         ETHANOL_LIQUID_CLASS_NAME,
         GLYCEROL_LIQUID_CLASS_NAME,
       ])

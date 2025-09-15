@@ -8,7 +8,7 @@ import {
   linearInterpolate,
   NONE_LIQUID_CLASS_NAME,
   SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
-  WATER_LIQUID_CLASS_NAME,
+  WATER_LIQUID_CLASS_NAME_V2,
 } from '@opentrons/shared-data'
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
@@ -75,7 +75,9 @@ const getNoLiquidClassValues = (
 ): QuickTransferSummaryState => {
   const { tipRack, path, volume, pipette } = state
   const tiprackUri = getLabwareDefURI(tipRack)
-  const referenceLiquidClass = getAllLiquidClassDefs()[WATER_LIQUID_CLASS_NAME]
+  const referenceLiquidClass = getAllLiquidClassDefs()[
+    WATER_LIQUID_CLASS_NAME_V2
+  ]
   const liquidClassValuesForPipette = referenceLiquidClass.byPipette.find(
     ({ pipetteModel }) => convertedPipetteName === pipetteModel
   )
@@ -267,7 +269,7 @@ const getLiquidClassValues = (
 
   const allLiquidClassDefs = getAllLiquidClassDefs()
   const liquidClassMap = new Map<string, string>([
-    ['water', WATER_LIQUID_CLASS_NAME],
+    ['water', WATER_LIQUID_CLASS_NAME_V2],
     ['glycerol_50', GLYCEROL_LIQUID_CLASS_NAME],
     ['ethanol_80', ETHANOL_LIQUID_CLASS_NAME],
   ])
