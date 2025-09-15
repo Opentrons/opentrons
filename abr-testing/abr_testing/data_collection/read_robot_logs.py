@@ -892,8 +892,18 @@ def get_logs(storage_directory: str, ip: str) -> str:
         {"log type": "touchscreen.log", "records": 10000},
     ]
     collected_files: List[str] = []
-    # Fetch HTTP logs
-    with open("/data/ODD/discovery.json") as f:
+    discovery_data_path = "/data/ODD/discovery.json"
+    if os.path.exists(discovery_data_path):
+        save_path = discovery_data_path
+    else:
+        save_dir = Path(f"{storage_directory}")
+        command = ["scp", "-r", f"root@{ip}:{discovery_data_path}", storage_directory]
+        try:
+            subprocess.run(command, check=True)  # type: ignore
+            save_path = os.path.join(save_dir, "discovery.json")
+        except subprocess.CalledProcessError as e:
+            print(f"Error during file transfer: {e}")
+    with open(save_path) as f:
         discovery_data = json.load(f)
     robot_name = discovery_data["robots"][0].get("name", "unknown")
     sw_version = discovery_data["robots"][0]["health"].get("api_version", "unknown")
@@ -942,46 +952,23 @@ def get_logs(storage_directory: str, ip: str) -> str:
 def fetch_weston_log(
     ip: str, storage_directory: str, collected_files: list, robot_name: str
 ) -> list[str]:
-    """Get weston log using scp."""
-    try:
-        # Ensure destination directory exists
-        storage_path = Path(storage_directory).resolve()
-        storage_path.mkdir(parents=True, exist_ok=True)
+    """Get weston log using scp or local copy, saved with robot name."""
+    local_log_path = Path("/var/log/weston.log")
+    destination_path = Path(storage_directory) / f"{robot_name}_weston.log"
 
-        # Check if we're already on the robot (i.e., the file exists locally)
-        local_log_path = Path("/var/log/weston.log")
-
-        if local_log_path.exists():
-            # We're on the robot - just copy the file locally
-            destination_path = storage_path / "weston.log"
-            with open(local_log_path, "rb") as src, open(destination_path, "wb") as dst:
-                dst.write(src.read())
+    if local_log_path.exists():
+        try:
+            with open(local_log_path, "rb") as src:
+                with open(destination_path, "wb") as dst:
+                    dst.write(src.read())
             collected_files.append(str(destination_path))
-            return collected_files
-
-        # Otherwise, assume we need to SCP from the robot
-        ssh_key_path = Path.home() / ".ssh" / "robot_key"
-        if not ssh_key_path.exists():
-            return collected_files
-
-        scp_command = [
-            "scp",
-            "-r",
-            "-i",
-            str(ssh_key_path),
-            f"root@{ip}:/var/log/weston.log",
-            str(storage_path),
-        ]
-        subprocess.run(
-            scp_command, check=True, capture_output=True, text=True, timeout=30
-        )
-
-        file_path = storage_path / f"{robot_name}_weston.log"
-        if file_path.exists():
-            collected_files.append(str(file_path))
-            return collected_files
-        else:
-            print(f"'weston.log' not found at {file_path} after SCP.")
-    except Exception as e:
-        print(f"Unexpected error occurred: {e}")
+        except Exception as e:
+            print(f"Error copying local weston.log: {e}")
+    else:
+        remote_path = f"root@{ip}:/var/log/weston.log"
+        try:
+            subprocess.run(["scp", remote_path, str(destination_path)], check=True)
+            collected_files.append(str(destination_path))
+        except subprocess.CalledProcessError as e:
+            print(f"Error during file transfer: {e}")
     return collected_files
