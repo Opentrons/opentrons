@@ -1,5 +1,6 @@
 import path from 'path'
 import react from '@vitejs/plugin-react'
+import { sentryVitePlugin } from '@sentry/vite-plugin'
 import lostCss from 'lost'
 import postCssApply from 'postcss-apply'
 import postColorModFunction from 'postcss-color-mod-function'
@@ -16,6 +17,9 @@ export default defineConfig(
   async (): Promise<UserConfig> => {
     const project = process.env.OPENTRONS_PROJECT ?? 'robot-stack'
     const version = await versionForProject(project)
+    const mode = process.env.NODE_ENV ?? 'development'
+    const buildTarget = process.env.OT_BUILD_TARGET ?? 'desktop'
+
     return {
       // this makes imports relative rather than absolute
       base: '',
@@ -33,6 +37,23 @@ export default defineConfig(
           },
         }),
         cssModuleSideEffect(),
+        // We have two sentry vite plugins, one for each project.
+        sentryVitePlugin({
+          org: 'opentrons-sw',
+          project: buildTarget === 'desktop' ? 'desktop-electron' : 'odd-electron',
+          authToken: process.env.OT_SENTRY_AUTH_TOKEN,
+          telemetry: false,
+          reactComponentAnnotation: {
+            enabled: true,
+            ignoredComponents: [], // (kk:08/15/2025) ToDo add later
+          },
+          sourcemaps: {
+            assets: ['./dist/**'],
+            ignore: ['./node_modules/**'],
+            filesToDeleteAfterUpload:
+              mode === 'production' ? ['./dist/**/*.js.map'] : undefined,
+          },
+        }),
       ],
       optimizeDeps: {
         esbuildOptions: {
@@ -53,6 +74,7 @@ export default defineConfig(
       define: {
         'process.env': {
           NODE_ENV: process.env.NODE_ENV,
+          OT_SENTRY_DSN: process.env.OT_SENTRY_DSN,
           OT_APP_MIXPANEL_ID: process.env.OT_APP_MIXPANEL_ID,
           OPENTRONS_PROJECT: process.env.OPENTRONS_PROJECT,
         },
