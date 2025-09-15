@@ -56,7 +56,7 @@ def move_labware(text: str) -> command_types.MoveLabwareCommand:
 
 
 def wait_for_tasks(tasks: list[Task]) -> command_types.WaitForTasksCommand:
-    task_ids = [task._core.id for task in tasks]
+    task_ids = [task._core.get_id() for task in tasks]
     msg = f"Waiting for tasks, {task_ids}."
     return {
         "name": command_types.WAIT_FOR_TASKS,
