@@ -21,6 +21,7 @@ import {
   registerNotify,
 } from './notifications'
 import { registerAppRestart } from './restart'
+import { initializeSentry } from './sentry'
 import { registerUpdateBrightness } from './system'
 import { registerRobotSystemUpdate } from './system-update'
 import systemd from './systemd'
@@ -49,6 +50,9 @@ log.debug('App config', {
   store: getStore(),
   overrides: getOverrides(),
 })
+
+// Initialize Sentry before the app is ready.
+initializeSentry()
 
 systemd.setRemoteDevToolsEnabled(config.devtools)
 

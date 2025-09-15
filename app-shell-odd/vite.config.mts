@@ -2,6 +2,7 @@ import { versionForProject } from '../scripts/git-version.mjs'
 import pkg from './package.json'
 import path from 'path'
 import { defineConfig } from 'vite'
+import { sentryVitePlugin } from '@sentry/vite-plugin'
 import react from '@vitejs/plugin-react'
 import postCssImport from 'postcss-import'
 import postCssApply from 'postcss-apply'
@@ -14,6 +15,8 @@ export default defineConfig(
   async (): Promise<UserConfig> => {
     const project = process.env.OPENTRONS_PROJECT ?? 'robot-stack'
     const version = await versionForProject(project)
+    const mode = process.env.NODE_ENV ?? 'development'
+
     return {
       publicDir: false,
       build: {
@@ -41,6 +44,18 @@ export default defineConfig(
             configFile: true,
           },
         }),
+        sentryVitePlugin({
+          org: 'opentrons-sw',
+          project: 'odd-electron',
+          authToken: process.env.OT_SENTRY_AUTH_TOKEN,
+          telemetry: false,
+          sourcemaps: {
+            assets: ['./dist/**'],
+            ignore: ['./node_modules/**'],
+            filesToDeleteAfterUpload:
+              mode === 'production' ? ['./dist/**/*.js.map'] : undefined,
+          },
+        }),
       ],
       optimizeDeps: {
         esbuildOptions: {
@@ -61,6 +76,8 @@ export default defineConfig(
       define: {
         'process.env': {
           NODE_ENV: process.env.NODE_ENV,
+          OT_SENTRY_DSN: process.env.OT_SENTRY_DSN,
+          OT_APP_MIXPANEL_ID: process.env.OT_APP_MIXPANEL_ID,
           OPENTRONS_PROJECT: process.env.OPENTRONS_PROJECT,
         },
         global: 'globalThis',
