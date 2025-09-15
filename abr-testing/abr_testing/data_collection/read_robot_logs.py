@@ -13,6 +13,8 @@ from typing import List, Dict, Any, Tuple, Set, Optional
 import time as t
 import json
 import requests
+from pathlib import Path
+import zipfile
 from abr_testing.tools import plate_reader
 
 
@@ -881,60 +883,105 @@ def get_calibration_offsets(
     return saved_file_path, calibration
 
 
-def get_logs(storage_directory: str, ip: str) -> List[str]:
-    """Get Robot logs."""
+def get_logs(storage_directory: str, ip: str) -> str:
+    """Get Robot logs and return a zip file path containing them."""
     log_types: List[Dict[str, Any]] = [
         {"log type": "api.log", "records": 10000},
         {"log type": "server.log", "records": 10000},
         {"log type": "serial.log", "records": 10000},
         {"log type": "touchscreen.log", "records": 10000},
     ]
-    all_paths = []
+    collected_files: List[str] = []
+    # Fetch HTTP logs
+    with open("/data/ODD/discovery.json") as f:
+        discovery_data = json.load(f)
+    robot_name = discovery_data["robots"][0].get("name", "unknown")
+    sw_version = discovery_data["robots"][0]["health"].get("api_version", "unknown")
     for log_type in log_types:
         try:
-            log_type_name = log_type["log type"]
-            print(log_type_name)
-            log_records = int(log_type["records"])
-            print(log_records)
+            log_type_name: str = log_type["log type"]
+            log_records: int = int(log_type["records"])
             response = requests.get(
                 f"http://{ip}:31950/logs/{log_type_name}",
                 headers={"log_identifier": log_type_name},
                 params={"records": log_records},
             )
             response.raise_for_status()
-            log_data = response.text
-            log_name = ip + "_" + log_type_name.split(".")[0] + ".log"
-            file_path = os.path.join(storage_directory, log_name)
-            with open(file_path, mode="w", encoding="utf-8") as file:
-                file.write(log_data)
-        except RuntimeError:
-            print(f"Request exception. Did not save {log_type_name}")
+            log_data: str = response.text
+            log_name: str = f"{robot_name}_{log_type_name.split('.')[0]}.log"
+            file_path: str = os.path.join(storage_directory, log_name)
+            with open(file_path, mode="w", encoding="utf-8") as f:
+                f.write(log_data)
+            collected_files.append(file_path)
+        except Exception as e:
+            print(f"Failed to fetch {log_type['log type']}: {e}")
             continue
-        all_paths.append(file_path)
+
     # Get weston.log using scp
-    # Split the path into parts
-    parts = storage_directory.split(os.sep)
-    # Find the index of 'Users'
-    index = parts.index("Users")
-    user_name = parts[index + 1]
-    # Define the SCP command
-    scp_command = [
-        "scp",
-        "-r",
-        "-i",
-        f"C:\\Users\\{user_name}\\.ssh\\robot_key",
-        f"root@{ip}:/var/log/weston.log",
-        storage_directory,
-    ]
-    # Execute the SCP command
+    collected_files = fetch_weston_log(
+        ip, storage_directory, collected_files, robot_name
+    )
+    timestamp = datetime.now().strftime("%Y-%m-%d")
+    # Create a ZIP archive with all collected files
+    zip_filename: str = os.path.join(
+        storage_directory, f"{robot_name}_{timestamp}_{sw_version}_logs.zip"
+    )
+    with zipfile.ZipFile(zip_filename, "w", zipfile.ZIP_DEFLATED) as zipf:
+        for file_path in collected_files:
+            arcname: str = os.path.basename(file_path)  # ✅ always str
+            zipf.write(file_path, arcname=arcname)
+    for file_path in collected_files:
+        try:
+            os.remove(file_path)
+        except Exception as e:
+            print(f"Failed to delete {file_path}: {e}")
+
+    return zip_filename
+
+
+def fetch_weston_log(
+    ip: str, storage_directory: str, collected_files: list, robot_name: str
+) -> list[str]:
+    """Get weston log using scp."""
     try:
-        subprocess.run(scp_command, check=True, capture_output=True, text=True)
-        file_path = os.path.join(storage_directory, "weston.log")
-        all_paths.append(file_path)
-    except subprocess.CalledProcessError as e:
-        print("Error during SCP command execution")
-        print("Return code:", e.returncode)
-        print("Output:", e.output)
-        print("Error output:", e.stderr)
-        subprocess.run(["scp", "weston.log", "root@10.14.19.40:/var/log/weston.log"])
-    return all_paths
+        # Ensure destination directory exists
+        storage_path = Path(storage_directory).resolve()
+        storage_path.mkdir(parents=True, exist_ok=True)
+
+        # Check if we're already on the robot (i.e., the file exists locally)
+        local_log_path = Path("/var/log/weston.log")
+
+        if local_log_path.exists():
+            # We're on the robot - just copy the file locally
+            destination_path = storage_path / "weston.log"
+            with open(local_log_path, "rb") as src, open(destination_path, "wb") as dst:
+                dst.write(src.read())
+            collected_files.append(str(destination_path))
+            return collected_files
+
+        # Otherwise, assume we need to SCP from the robot
+        ssh_key_path = Path.home() / ".ssh" / "robot_key"
+        if not ssh_key_path.exists():
+            return collected_files
+
+        scp_command = [
+            "scp",
+            "-r",
+            "-i",
+            str(ssh_key_path),
+            f"root@{ip}:/var/log/weston.log",
+            str(storage_path),
+        ]
+        subprocess.run(
+            scp_command, check=True, capture_output=True, text=True, timeout=30
+        )
+
+        file_path = storage_path / f"{robot_name}_weston.log"
+        if file_path.exists():
+            collected_files.append(str(file_path))
+            return collected_files
+        else:
+            print(f"'weston.log' not found at {file_path} after SCP.")
+    except Exception as e:
+        print(f"Unexpected error occurred: {e}")
+    return collected_files
