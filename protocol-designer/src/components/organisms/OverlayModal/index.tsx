@@ -1,4 +1,3 @@
-import { useCallback, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
@@ -16,8 +15,6 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { actions } from '/protocol-designer/tutorial'
-
 import { getMainPagePortalEl } from '../Portal'
 
 import type { ReactNode } from 'react'
@@ -34,7 +31,6 @@ export interface OverlayModalProps {
 export function OverlayModal(props: OverlayModalProps): JSX.Element {
   const { header, subText, children, handleCancel, handleContinue } = props
   const { t, i18n } = useTranslation(['alert', 'shared'])
-  const dispatch = useDispatch()
 
   const onCancelClick = (): void => {
     handleCancel()
@@ -56,8 +52,7 @@ export function OverlayModal(props: OverlayModalProps): JSX.Element {
         <Flex
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
-        >
-        </Flex>
+        ></Flex>
       }
     >
       {children}

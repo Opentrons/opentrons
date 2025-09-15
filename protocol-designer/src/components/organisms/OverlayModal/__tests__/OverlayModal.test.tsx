@@ -5,7 +5,7 @@ import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
 import { removeHint } from '/protocol-designer/tutorial/actions'
 
-import { useOverlayModal, OverlayModal } from '..'
+import { OverlayModal, useOverlayModal } from '..'
 
 import type { ComponentProps } from 'react'
 
@@ -17,7 +17,7 @@ const render = (props: ComponentProps<typeof OverlayModal>) => {
   })[0]
 }
 
-describe('BlockingHintModal', () => {
+describe('OverlayModal', () => {
   let props: ComponentProps<typeof OverlayModal>
 
   beforeEach(() => {
