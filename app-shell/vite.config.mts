@@ -2,12 +2,15 @@ import { versionForProject } from '../scripts/git-version.mjs'
 import pkg from './package.json'
 import path from 'path'
 import { defineConfig } from 'vite'
+import { sentryVitePlugin } from '@sentry/vite-plugin'
 import type { UserConfig } from 'vite'
 
 export default defineConfig(
   async (): Promise<UserConfig> => {
     const project = process.env.OPENTRONS_PROJECT ?? 'robot-stack'
     const version = await versionForProject(project)
+    const mode = process.env.NODE_ENV ?? 'development'
+
     return {
       // this makes imports relative rather than absolute
       base: '',
@@ -30,6 +33,20 @@ export default defineConfig(
           formats: ['cjs'],
         },
       },
+      plugins: [
+        sentryVitePlugin({
+          org: 'opentrons-sw',
+          project: 'desktop-electron',
+          authToken: process.env.OT_SENTRY_AUTH_TOKEN,
+          telemetry: false,
+          sourcemaps: {
+            assets: ['./dist/**'],
+            ignore: ['./node_modules/**'],
+            filesToDeleteAfterUpload:
+              mode === 'production' ? ['./dist/**/*.js.map'] : undefined,
+          },
+        }),
+      ],
       optimizeDeps: {
         esbuildOptions: {
           target: 'CommonJs',
@@ -39,6 +56,8 @@ export default defineConfig(
       define: {
         'process.env': {
           NODE_ENV: process.env.NODE_ENV,
+          OT_SENTRY_DSN: process.env.OT_SENTRY_DSN,
+          OT_APP_MIXPANEL_ID: process.env.OT_APP_MIXPANEL_ID,
           OPENTRONS_PROJECT: process.env.OPENTRONS_PROJECT,
         },
         global: 'globalThis',

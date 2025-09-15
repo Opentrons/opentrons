@@ -23,6 +23,7 @@ import {
   closeSecondaryWindows,
   registerCameraStream,
 } from './secondary-windows'
+import { initializeSentry } from './sentry'
 import { registerSystemInfo } from './system-info'
 import { createUi, registerReloadUi, registerSystemLanguage } from './ui'
 import { registerUpdate } from './update'
@@ -46,6 +47,9 @@ log.debug('App config', {
   store: getStore(),
   overrides: getOverrides(),
 })
+
+// Initialize Sentry before the app is ready.
+initializeSentry()
 
 if (config.devtools) {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -143,6 +147,7 @@ function getOrCreateHandlerSet(window: BrowserWindow): HandlerSet | null {
 
 function startUp(): void {
   log.info('Starting App')
+
   process.on('uncaughtException', error => log.error('Uncaught: ', { error }))
   process.on('unhandledRejection', reason =>
     log.error('Uncaught Promise rejection: ', { reason })
@@ -219,7 +224,7 @@ function installDevtools(): Promise<Logger> {
   if (typeof install === 'function') {
     return install(extensions, {
       loadExtensionOptions: { allowFileAccess: true },
-      forceDownload: forceReinstall,
+      forceReinstall,
     })
       .then(() => log.debug('Devtools extensions installed'))
       .catch((error: unknown) => {

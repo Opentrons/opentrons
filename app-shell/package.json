@@ -37,6 +37,8 @@
     "@opentrons/discovery-client": "link:../discovery-client",
     "@opentrons/shared-data": "link:../shared-data",
     "@opentrons/usb-bridge/node-client": "link:../usb-bridge/node-client",
+    "@sentry/electron": "7.0.0",
+    "@sentry/vite-plugin": "4.3.0",
     "@thi.ng/paths": "1.6.5",
     "@types/dateformat": "^3.0.1",
     "@types/fs-extra": "9.0.13",
