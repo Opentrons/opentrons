@@ -8,8 +8,7 @@ interface KnowledgeLinkProps {
   children: ReactNode
 }
 
-export const RELEASE_NOTES_URL =
-  'https://github.com/Opentrons/opentrons/blob/edge/protocol-designer/release-notes.md'
+export const RELEASE_NOTES_URL = `https://github.com/Opentrons/opentrons/blob/protocol-designer@${_OT_PD_VERSION_}/protocol-designer/release-notes.md`
 
 export const DOC_URL = 'https://docs.opentrons.com/protocol-designer/'
 
