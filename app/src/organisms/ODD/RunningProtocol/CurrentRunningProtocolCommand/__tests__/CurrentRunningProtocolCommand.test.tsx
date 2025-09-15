@@ -10,15 +10,13 @@ import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
 import { useRunningStepCounts } from '/app/resources/protocols/hooks'
 import { useNotifyAllCommandsQuery } from '/app/resources/runs'
 
-import { CurrentRunningProtocolCommand } from '../CurrentRunningProtocolCommand'
+import { CurrentRunningProtocolCommand } from '..'
 
 import type { ComponentProps } from 'react'
 
 vi.mock('/app/resources/runs')
 vi.mock('/app/resources/protocols/hooks')
 
-const mockPlayRun = vi.fn()
-const mockPauseRun = vi.fn()
 const mockShowModal = vi.fn()
 const mockUpdateLastAnimatedCommand = vi.fn()
 
@@ -43,13 +41,10 @@ describe('CurrentRunningProtocolCommand', () => {
   beforeEach(() => {
     props = {
       runStatus: RUN_STATUS_RUNNING,
+      onStop: mockShowModal,
+      onTogglePlayPause: vi.fn(),
       robotSideAnalysis: mockRobotSideAnalysis,
       runTimerInfo: mockRunTimer,
-      playRun: mockPlayRun,
-      pauseRun: mockPauseRun,
-      setShowConfirmCancelRunModal: mockShowModal,
-      trackProtocolRunEvent: vi.fn(), // temporary
-      robotAnalyticsData: {} as any,
       protocolName: 'mockRunningProtocolName',
       currentRunCommandIndex: 0,
       lastAnimatedCommand: null,

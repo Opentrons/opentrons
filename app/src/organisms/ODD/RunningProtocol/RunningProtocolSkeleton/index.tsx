@@ -10,8 +10,8 @@ import {
 
 import { Skeleton } from '/app/atoms/Skeleton'
 
-import { PlayPauseButton } from './PlayPauseButton'
-import { StopButton } from './StopButton'
+import { PlayPauseButton } from '../shared/PlayPauseButton'
+import { StopButton } from '../shared/StopButton'
 
 // eslint-disable-next-line opentrons/no-imports-up-the-tree-of-life
 import type { ScreenOption } from '/app/pages/ODD/RunningProtocol'

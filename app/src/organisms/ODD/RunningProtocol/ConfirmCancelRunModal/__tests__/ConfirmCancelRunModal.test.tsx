@@ -18,8 +18,8 @@ import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 import { useNotifyRunQuery } from '/app/resources/runs'
 
-import { CancelingRunModal } from '../CancelingRunModal'
-import { ConfirmCancelRunModal } from '../ConfirmCancelRunModal'
+import { CancelingRunModal } from '../../CancelingRunModal'
+import { ConfirmCancelRunModal } from '../../ConfirmCancelRunModal'
 
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
@@ -28,7 +28,7 @@ vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/runs')
 vi.mock('/app/redux-resources/analytics')
 vi.mock('/app/redux/analytics')
-vi.mock('../CancelingRunModal')
+vi.mock('../../CancelingRunModal')
 vi.mock('/app/redux/discovery')
 const mockNavigate = vi.fn()
 const mockStopRun = vi.fn()
