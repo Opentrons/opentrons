@@ -53,7 +53,7 @@ export function ModalContentOneColSimpleButtons(
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gap={SPACING.spacing4}
-          overflowY={props.scroll === true ? 'auto' : null}
+          overflowY={props.scroll === true ? 'auto' : undefined}
         >
           {props.buttons.map((buttonProps, idx) => (
             <RadioButton
