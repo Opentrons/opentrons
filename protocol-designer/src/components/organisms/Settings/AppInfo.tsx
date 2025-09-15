@@ -23,7 +23,7 @@ export function AppInfo({
   setShowAnnouncementModal,
 }: AppInfoProps): JSX.Element {
   const { t } = useTranslation('shared')
-  const pdVersion = process.env.OT_PD_VERSION
+  const pdVersion = _OT_PD_VERSION_
 
   const handleSoftwareManualClick = (): void => {
     window.open(DOC_URL, '_blank')

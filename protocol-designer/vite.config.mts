@@ -81,17 +81,14 @@ export default defineConfig(
         },
       },
       define: {
-        'process.env': {
-          // NOTE: For security, do not spread in the entirety of process.env.
-          ...getFeatureFlagEnvVars(),
-          NODE_ENV: process.env.NODE_ENV,
-          OT_PD_BUILD_DATE,
-          OT_PD_MIXPANEL_DEV_ID: process.env.OT_PD_MIXPANEL_DEV_ID,
-          OT_PD_MIXPANEL_ID: process.env.OT_PD_MIXPANEL_ID,
-          OT_PD_SENTRY_DEV_DSN: process.env.OT_PD_SENTRY_DEV_DSN,
-          OT_PD_SENTRY_DSN: process.env.OT_PD_SENTRY_DSN,
-          OT_PD_VERSION,
-        },
+        _FF_ENV_VARS_: getFeatureFlagEnvVars(),
+        _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
+        _OT_PD_BUILD_DATE_: JSON.stringify(OT_PD_BUILD_DATE),
+        _OT_PD_MIXPANEL_DEV_ID_: JSON.stringify(process.env.OT_PD_MIXPANEL_DEV_ID),
+        _OT_PD_MIXPANEL_ID_: JSON.stringify(process.env.OT_PD_MIXPANEL_ID),
+        _OT_PD_SENTRY_DEV_DSN_: JSON.stringify(process.env.OT_PD_SENTRY_DEV_DSN),
+        _OT_PD_SENTRY_DSN_: JSON.stringify(process.env.OT_PD_SENTRY_DSN),
+        _OT_PD_VERSION_: JSON.stringify(OT_PD_VERSION),
         global: 'globalThis',
       },
       resolve: {

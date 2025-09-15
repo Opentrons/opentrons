@@ -19,7 +19,7 @@ vi.mock('./app/src/resources/useNotifyDataReady', async () => {
   }
 })
 
-process.env.OT_PD_VERSION = 'fake_PD_version'
+global._OT_PD_VERSION_ = 'fake_PD_version'
 global._PKG_VERSION_ = 'test environment'
 global._OPENTRONS_PROJECT_ = 'robotics'
 global._PKG_PRODUCT_NAME_ = 'test product'

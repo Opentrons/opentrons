@@ -16,8 +16,8 @@ let isSentryInitialized = false
 // because we are not using Sentry in development. If we decide to use it
 // in the future, we can add a dev DSN here.
 const sentryDsn = getIsProduction()
-  ? process.env.OT_PD_SENTRY_DSN
-  : process.env.OT_PD_SENTRY_DEV_DSN
+  ? _OT_PD_SENTRY_DSN_
+  : _OT_PD_SENTRY_DEV_DSN_
 
 export const initializeSentry = (state: BaseState): void => {
   const optedIn = getHasOptedIn(state)?.hasOptedIn ?? false
@@ -35,7 +35,7 @@ export const initializeSentry = (state: BaseState): void => {
       init({
         dsn: sentryDsn,
         environment: 'production',
-        release: process.env.OT_PD_VERSION,
+        release: _OT_PD_VERSION_,
         integrations: [
           captureConsoleIntegration({ levels: ['assert'] }),
           replayIntegration(),
