@@ -4,6 +4,13 @@ from typing import TypeVar
 
 
 class AbstractTaskCore(ABC):
+    def __init__(self, task_id: str) -> None:
+        self._id = task_id
+
+    @property
+    def id(self) -> str:
+        return self._id
+
     @abstractmethod
     def get_created_at_timestamp(self) -> datetime:
         """Get the createdAt timestamp of the task."""

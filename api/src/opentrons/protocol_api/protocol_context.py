@@ -1287,6 +1287,7 @@ class ProtocolContext(CommandPublisher):
         delay_time = seconds + minutes * 60
         self._core.delay(seconds=delay_time, msg=msg)
 
+    @publish(command=cmds.wait_for_tasks)
     @requires_version(2, 27)
     def wait_for_tasks(self, tasks: list[Task]) -> None:
         """Wait for a list of tasks to complete before executing subsequent commands.
@@ -1298,6 +1299,7 @@ class ProtocolContext(CommandPublisher):
         task_cores = [task._core for task in tasks]
         self._core.wait_for_tasks(task_cores)
 
+    @publish(command=cmds.create_timer)
     @requires_version(2, 27)
     def create_timer(self, seconds: float) -> Task:
         """Create a timer task that runs in the background.
