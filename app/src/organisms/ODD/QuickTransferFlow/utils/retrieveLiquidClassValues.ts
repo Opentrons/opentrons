@@ -382,8 +382,8 @@ const getLiquidClassValues = (
     submergeAspirate: {
       speed: aspirate?.submerge.speed ?? 0,
       position: aspirate?.submerge.startPosition.offset.z ?? 0,
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      positionReference: aspirate?.submerge.startPosition.positionReference!,
+      positionReference:
+        aspirate?.submerge.startPosition.positionReference ?? undefined,
       delayDuration: aspirate?.submerge.delay.params?.duration ?? 0,
     },
     preWetTip: preWet ?? false,
@@ -403,8 +403,8 @@ const getLiquidClassValues = (
     retractAspirate: {
       speed: aspirate?.retract.speed ?? 0,
       position: aspirate?.retract.endPosition.offset.z ?? 0,
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      positionReference: aspirate?.retract.endPosition.positionReference!,
+      positionReference:
+        aspirate?.retract.endPosition.positionReference ?? undefined,
       delayDuration: aspirate?.retract.delay.params?.duration ?? 0,
     },
     touchTipAspirate:
@@ -425,8 +425,8 @@ const getLiquidClassValues = (
     submergeDispense: {
       speed: dispense?.submerge.speed ?? 0,
       position: dispense?.submerge.startPosition.offset.z ?? 0,
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      positionReference: dispense?.submerge.startPosition.positionReference!,
+      positionReference:
+        dispense?.submerge.startPosition.positionReference ?? undefined,
       delayDuration: dispense?.submerge.delay.params?.duration ?? 0,
     },
     delayDispense:
@@ -452,8 +452,8 @@ const getLiquidClassValues = (
     retractDispense: {
       speed: dispense?.retract.speed ?? 0,
       position: dispense?.retract.endPosition.offset.z ?? 0,
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      positionReference: dispense?.retract.endPosition.positionReference!,
+      positionReference:
+        dispense?.retract.endPosition.positionReference ?? undefined,
       delayDuration: dispense?.retract.delay.params?.duration ?? 0,
     },
     blowOutDispense:
