@@ -55,8 +55,7 @@ export function ProtocolAnalysisErrorBanner(
             components={{
               errorLink: (
                 <Btn
-                  as="a"
-                  role="button"
+                  // as="a"
                   aria-label="error_link"
                   textDecoration={TYPOGRAPHY.textDecorationUnderline}
                   onClick={handleToggleDetails}

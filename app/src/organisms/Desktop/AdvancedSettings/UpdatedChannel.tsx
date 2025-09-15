@@ -39,7 +39,6 @@ export function UpdatedChannel(): JSX.Element {
       <LegacyStyledText
         as="p"
         textTransform={TYPOGRAPHY.textTransformCapitalize}
-        id={index}
       >
         {value === 'latest' ? label : value}
       </LegacyStyledText>

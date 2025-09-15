@@ -139,7 +139,7 @@ export function HistoricalProtocolRunDrawer(
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         <LegacyStyledText>{t('protocol_files')}</LegacyStyledText>
         <Flex
-          direction={DIRECTION_COLUMN}
+          flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_FLEX_START}
           alignItems={ALIGN_END}
           gridGap={SPACING.spacing24}
@@ -189,7 +189,7 @@ export function HistoricalProtocolRunDrawer(
           {i18n.format(t('labware_offset_data'), 'capitalize')}
         </LegacyStyledText>
         <Flex
-          direction={DIRECTION_COLUMN}
+          flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_FLEX_START}
           alignItems={ALIGN_END}
           gridGap={SPACING.spacing4}

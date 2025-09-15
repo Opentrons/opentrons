@@ -5,9 +5,9 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
-  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 export type ModalContentMixedType =
@@ -85,21 +85,21 @@ export function ModalContentMixed(props: ModalContentMixedProps): JSX.Element {
         `}
       >
         {props.headline != null ? (
-          <LegacyStyledText
+          <StyledText
             oddStyle="level3HeaderBold"
             desktopStyle="headingSmallBold"
           >
             {props.headline}
-          </LegacyStyledText>
+          </StyledText>
         ) : null}
         {props.subText != null ? (
-          <LegacyStyledText
+          <StyledText
             oddStyle="level4HeaderRegular"
             desktopStyle="bodyDefaultRegular"
             color={COLORS.grey60}
           >
             {props.subText}
-          </LegacyStyledText>
+          </StyledText>
         ) : null}
       </Flex>
     </Flex>

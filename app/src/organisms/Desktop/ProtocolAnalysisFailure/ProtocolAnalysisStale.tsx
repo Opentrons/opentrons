@@ -54,8 +54,7 @@ export function ProtocolAnalysisStale(
             components={{
               analysisLink: (
                 <Btn
-                  as="a"
-                  role="button"
+                  // as="a"
                   textDecoration={TYPOGRAPHY.textDecorationUnderline}
                   onClick={handleClickReanalyze}
                 />

@@ -73,16 +73,14 @@ export function ProtocolAnalysisFailure(
             components={{
               errorLink: (
                 <Btn
-                  as="a"
-                  role="button"
+                  // as="a"
                   textDecoration={TYPOGRAPHY.textDecorationUnderline}
                   onClick={handleClickShowDetails}
                 />
               ),
               analysisLink: (
                 <Btn
-                  as="a"
-                  role="button"
+                  // as="a"
                   textDecoration={TYPOGRAPHY.textDecorationUnderline}
                   onClick={handleClickReanalyze}
                 />

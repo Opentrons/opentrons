@@ -51,6 +51,7 @@ export interface FlexboxProps {
   flex?: string | number
   alignItems?: string
   alignSelf?: string
+  alignContent?: string
   justifyContent?: string
   flexDirection?: string
   flexWrap?: string
