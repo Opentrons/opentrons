@@ -497,13 +497,28 @@ class ProtocolCore(
             )
         # if this is a labware with a lid, we just need to find its lid_id
         else:
-            lid = self._engine_client.state.labware.get_lid_by_labware_id(
-                labware.labware_id
+            # we need to check to see if this labware is hosting a lid stack
+            potential_lid_stack = (
+                self._engine_client.state.labware.get_next_child_labware(
+                    labware.labware_id
+                )
             )
-            if lid is not None:
-                lid_id = lid.id
+            if potential_lid_stack and labware_validation.is_lid_stack(
+                self._engine_client.state.labware.get_load_name(potential_lid_stack)
+            ):
+                lid_id = self._engine_client.state.labware.get_highest_child_labware(
+                    labware.labware_id
+                )
             else:
-                raise ValueError("Cannot move a lid off of a labware with no lid.")
+                lid = self._engine_client.state.labware.get_lid_by_labware_id(
+                    labware.labware_id
+                )
+                if lid is not None:
+                    lid_id = lid.id
+                else:
+                    raise ValueError(
+                        f"Cannot move a lid off of a labware with no lid. {labware.get_display_name()}"
+                    )
 
         _pick_up_offset = (
             LabwareOffsetVector(
@@ -607,6 +622,9 @@ class ProtocolCore(
         )
 
         # Handle leftover empty lid stack if there is one
+        potential_lid_stack = self._engine_client.state.labware.get_next_child_labware(
+            labware.labware_id
+        )
         if (
             labware_validation.is_lid_stack(labware.load_name)
             and self._engine_client.state.labware.get_highest_child_labware(
@@ -618,6 +636,25 @@ class ProtocolCore(
             self._engine_client.execute_command(
                 cmd.MoveLabwareParams(
                     labwareId=labware.labware_id,
+                    newLocation=SYSTEM_LOCATION,
+                    strategy=LabwareMovementStrategy.MANUAL_MOVE_WITHOUT_PAUSE,
+                    pickUpOffset=None,
+                    dropOffset=None,
+                )
+            )
+        elif (
+            potential_lid_stack
+            and labware_validation.is_lid_stack(
+                self._engine_client.state.labware.get_load_name(potential_lid_stack)
+            )
+            and self._engine_client.state.labware.get_highest_child_labware(
+                potential_lid_stack
+            )
+            == potential_lid_stack
+        ):
+            self._engine_client.execute_command(
+                cmd.MoveLabwareParams(
+                    labwareId=potential_lid_stack,
                     newLocation=SYSTEM_LOCATION,
                     strategy=LabwareMovementStrategy.MANUAL_MOVE_WITHOUT_PAUSE,
                     pickUpOffset=None,
