@@ -52,48 +52,59 @@ def run(protocol: ProtocolContext) -> None:
     labware_type = protocol.params.labware_type  # type: ignore[attr-defined]
     heater_shaker_enabled = protocol.params.heater_shaker  # type: ignore[attr-defined]
 
+    if not protocol.is_simulating():
+        from abr_testing.protocols import helpers
+
+        slack_bot = helpers.set_up_slack()
     # Lid loading
-    if labware_type == "ibidi_96_square_well_plate_300ul_lid":
-        protocol.load_lid_stack(labware_type, "C3", 1)
-        labware = protocol.load_labware("ibidi_96_square_well_plate_300ul", "D3")
-        for _ in range(3):
-            protocol.move_lid("C3", labware, use_gripper=True)
-            protocol.move_lid(labware, "C3", use_gripper=True)
-    elif labware_type == "corning_96_wellplate_360ul_lid":
-        protocol.load_lid_stack(labware_type, "C3", 1)
-        labware = protocol.load_labware("corning_96_wellplate_360ul_flat", "D3")
-        for _ in range(3):
-            protocol.move_lid("C3", labware, use_gripper=True)
-            protocol.move_lid(labware, "C3", use_gripper=True)
-    else:
-        labware = protocol.load_labware(labware_type, "D3")
-        # load pipette and tip rack
-        tip_rack = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "D2")
-        pipette = protocol.load_instrument(
-            "flex_8channel_1000", "left", tip_racks=[tip_rack]
-        )
+    try:
+        if labware_type == "ibidi_96_square_well_plate_300ul_lid":
+            protocol.load_lid_stack(labware_type, "C3", 1)
+            labware = protocol.load_labware("ibidi_96_square_well_plate_300ul", "D3")
+            for _ in range(3):
+                protocol.move_lid("C3", labware, use_gripper=True)
+                protocol.move_lid(labware, "C3", use_gripper=True)
+        elif labware_type == "corning_96_wellplate_360ul_lid":
+            protocol.load_lid_stack(labware_type, "C3", 1)
+            labware = protocol.load_labware("corning_96_wellplate_360ul_flat", "D3")
+            for _ in range(3):
+                protocol.move_lid("C3", labware, use_gripper=True)
+                protocol.move_lid(labware, "C3", use_gripper=True)
+        else:
+            labware = protocol.load_labware(labware_type, "D3")
+            # load pipette and tip rack
+            tip_rack = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "D2")
+            pipette = protocol.load_instrument(
+                "flex_8channel_1000", "left", tip_racks=[tip_rack]
+            )
 
-        # pick up tip
-        pipette.pick_up_tip()
+            # pick up tip
+            pipette.pick_up_tip()
 
-        # move tip to positions
-        pipette.move_to(labware["A6"].top(z=1))
-        protocol.pause("Check top height with shim")
-        pipette.move_to(labware["A6"].bottom(z=1))
-        protocol.pause("Check bottom height with shim")
-
-        # Optional heater shaker use
-        if heater_shaker_enabled:
-            hsh: HeaterShakerContext = protocol.load_module(
-                "heaterShakerModuleV1", "D1"
-            )  # type: ignore[assignment]
-            hsh.close_labware_latch()
-            adapter = hsh.load_adapter("opentrons_universal_flat_adapter")
-            hsh.open_labware_latch()
-            protocol.move_labware(labware, adapter, use_gripper=True)
-            hsh.close_labware_latch()
-
+            # move tip to positions
             pipette.move_to(labware["A6"].top(z=1))
             protocol.pause("Check top height with shim")
+            pipette.move_to(labware["A6"].bottom(z=1))
+            protocol.pause("Check bottom height with shim")
 
-        pipette.return_tip()
+            # Optional heater shaker use
+            if heater_shaker_enabled:
+                hsh: HeaterShakerContext = protocol.load_module(
+                    "heaterShakerModuleV1", "D1"
+                )  # type: ignore[assignment]
+                hsh.close_labware_latch()
+                adapter = hsh.load_adapter("opentrons_universal_flat_adapter")
+                hsh.open_labware_latch()
+                protocol.move_labware(labware, adapter, use_gripper=True)
+                hsh.close_labware_latch()
+
+                pipette.move_to(labware["A6"].top(z=1))
+                protocol.pause("Check top height with shim")
+
+            pipette.return_tip()
+    except Exception as e:
+        if not protocol.is_simulating():
+            helpers.send_slack_error_message_with_log(
+                slack_bot, metadata["protocolName"], str(e)
+            )
+        raise (e)

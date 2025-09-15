@@ -611,7 +611,7 @@ def create_robot_log_zip() -> str:
     """Create a zip file of logs saved locally on robot."""
     storage_directory = "/data/testing_data"
     result = subprocess.run(
-        "ip route show default | grep mlan0 | awk '{print $3}'",
+        "ip route get 1.1.1.1 | awk '{print $7}'",
         shell=True,
         capture_output=True,
         text=True,
