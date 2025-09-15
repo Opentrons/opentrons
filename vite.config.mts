@@ -60,6 +60,7 @@ export default defineConfig({
   },
   define: {
     // These defines mimic the ones set in various project-local vite.config.mts files.
+    // NOTE: For security, only include environment variables here if they're explicitly allowlisted.
     _FF_ENV_VARS_: {},
     _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
     _OT_AI_CLIENT_MIXPANEL_ID_: JSON.stringify(process.env.OT_AI_CLIENT_MIXPANEL_ID),

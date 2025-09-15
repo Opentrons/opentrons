@@ -37,6 +37,7 @@ export default defineConfig(
         exclude: ['node_modules'],
       },
       define: {
+        // NOTE: For security, only include environment variables here if they're explicitly allowlisted.
         global: 'globalThis',
         _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
         _OPENTRONS_PROJECT_: JSON.stringify(project),

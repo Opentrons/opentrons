@@ -19,6 +19,7 @@ export default defineConfig({
     },
   },
   define: {
+    // NOTE: For security, only include environment variables here if they're explicitly allowlisted.
     global: 'globalThis',
   },
 })

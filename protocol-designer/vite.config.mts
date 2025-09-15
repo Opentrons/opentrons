@@ -81,6 +81,7 @@ export default defineConfig(
         },
       },
       define: {
+        // NOTE: For security, only include environment variables here if they're explicitly allowlisted.
         _FF_ENV_VARS_: getFeatureFlagEnvVars(),
         _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
         _OT_PD_BUILD_DATE_: JSON.stringify(OT_PD_BUILD_DATE),

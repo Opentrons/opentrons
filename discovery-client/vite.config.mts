@@ -51,6 +51,7 @@ export default defineConfig(
         },
       },
       define: {
+        // NOTE: For security, only include environment variables here if they're explicitly allowlisted.
         _PKG_VERSION_: JSON.stringify(version),
         _PKG_BUGS_URL_: JSON.stringify(pkg.bugs.url),
         _OPENTRONS_PROJECT_: JSON.stringify(project),
