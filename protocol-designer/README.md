@@ -33,13 +33,17 @@ It uses [shared-data](../shared-data) for data about labware and pipettes and fo
 - `protocol-designer/src/steplist` - contains Redux actions, reducers, and selectors that make up the bulk of the logic for the behavior of Step Forms and the protocol Timeline.
 - `protocol-designer/src/ui` - Redux actions, reducers, and selectors that are purely concerned with UI and not with the "domain layer" of the protocol itself
 
-## Environment variable feature flags
+## Environment variables
 
-Any env var that starts with `OT_PD_` will be picked up by the build system and made available to use in the app code, as strings, through `process.env`. These are baked in at compile time.
+### Feature flags
 
-Right now we are using them as feature flags for development, to avoid introducing regressions when we add new features that aren't fully ready to be "live" on `edge`.
+We have an evolving set of feature flags for development, to avoid introducing regressions when we add new features that aren't fully ready to be "live" on `edge`. You can either set them through the UI, or through environment variables that are baked in at build time.
 
-Use them like: `OT_PD_COOL_FLAG=true OT_PD_SWAG_FLAG=100 make dev`.
+The environment variables start with `OT_PD_`. See the code for the current list. Use them like:
+
+```
+OT_PD_COOL_FLAG=1 OT_PD_SWAG_FLAG=1 make dev
+```
 
 ### `OT_PD_VERSION`
 
