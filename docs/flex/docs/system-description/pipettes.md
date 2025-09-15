@@ -12,6 +12,8 @@ Opentrons *pipettes* are configurable devices used to move liquids throughout th
 
 - Opentrons Flex 8-Channel Pipette (5–1000 µL)
 
+- Opentrons Flex 96-Channel Pipette (1–200 µL)
+
 - Opentrons Flex 96-Channel Pipette (5–1000 µL)
 
 Pipettes attach to the gantry using captive screws on the front of the pipette. 1-channel and 8-channel pipettes each occupy one *pipette mount* (left or right); the 96-channel pipette occupies both mounts. For details on installing pipettes, see [Instrument Installation and Calibration](../installation/instruments.md).
@@ -23,10 +25,169 @@ Pipettes attach to the gantry using captive screws on the front of the pipette. 
 
 The pipettes pick up disposable plastic *tips* by pressing them onto the pipette *nozzles*, and then use the tips to aspirate and dispense liquids. The amount of total force required for pickup increases as more tips get picked up simultaneously. For smaller numbers of tips, the pipette attaches tips by pushing each pipette nozzle down into a tip. To achieve the necessary force to pick up a full rack of tips, the 96-channel pipette also pulls the tips upward onto the nozzles. This pulling action requires placing tip racks into a *tip rack adapter*, rather than directly in a deck slot. To discard tips (or return them to their rack), the pipette *ejector* mechanism pushes the tips off of the nozzles.
 
-## Pipette specifications
+## Pipette accuracy and precision
 
-Opentrons Flex pipettes are designed to handle a wide range of volumes.
-Because of their wide overall range, they can use multiple sizes of tips, which affect their liquid-handling characteristics. Opentrons has tested Flex pipettes for accuracy and precision in a number of tip and liquid volume combinations:
+Opentrons Flex pipettes are designed to handle a wide range of liquid volumes and are compatible with multiple tip sizes. To help ensure accuracy and precision, Opentrons has tested the performance of these instruments with multiple tip and liquid volume combinations. The following tables list the accuracy and precision specifications for Opentrons Flex 1-, 8-, and 96-channel pipettes.
+
+### Flex 1-channel specifications
+
+<table>
+  <thead>
+    <tr>
+      <th>Instrument</th>
+      <th>Tip Capacity</th>
+      <th>Tested Volume</th>
+      <th>Accuracy %D</th>
+      <th>Precision %CV</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="3"><b>1-Channel<br>(1-50 µL)</b></td>
+      <td>50 µL</td>
+      <td>1 µL</td>
+      <td>8.00%</td>
+      <td>7.00%</td>
+    </tr>
+    <tr>
+      <td>50 µL</td>
+      <td>10 µL</td>
+      <td>1.50%</td>
+      <td>0.50%</td>
+    </tr>
+    <tr>
+      <td>50 µL</td>
+      <td>50 µL</td>
+      <td>1.25%</td>
+      <td>0.40%</td>
+    </tr>
+    <tr>
+      <td rowspan="4"><b>1-Channel<br>(1-1000 µL)</b></td>
+      <td>50 µL</td>
+      <td>5 µL</td>
+      <td>5.00%</td>
+      <td>2.50%</td>
+    </tr>
+    <tr>
+      <td>50 µL</td>
+      <td>50 µL</td>
+      <td>0.50%</td>
+      <td>0.30%</td>
+    </tr>
+    <tr>
+      <td>200 µL</td>
+      <td>200 µL</td>
+      <td>0.50%</td>
+      <td>0.15%</td>
+    </tr>
+    <tr>
+      <td>1000 µL</td>
+      <td>1000 µL</td>
+      <td>0.50%</td>
+      <td>0.15%</td>
+    </tr>
+  </tbody>
+</table>
+
+### Flex 8-channel specifications
+
+<table>
+  <thead>
+    <tr>
+      <th>Pipette</th>
+      <th>Tip Capacity</th>
+      <th>Tested Volume</th>
+      <th>Accuracy %D</th>
+      <th>Precision %CV</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="3"><b>Flex 8-Channel 50 µL</b></td>
+      <td>50 µL</td>
+      <td>1 µL</td>
+      <td>10.00%</td>
+      <td>8.00%</td>
+    </tr>
+    <tr>
+      <td>50 µL</td>
+      <td>10 µL</td>
+      <td>2.50%</td>
+      <td>1.00%</td>
+    </tr>
+    <tr>
+      <td>50 µL</td>
+      <td>50 µL</td>
+      <td>1.25%</td>
+      <td>0.60%</td>
+    </tr>
+    <tr>
+      <td rowspan="4"><b>Flex 8-Channel 1000 µL</b></td>
+      <td>50 µL</td>
+      <td>5 µL</td>
+      <td>8.00%</td>
+      <td>4.00%</td>
+    </tr>
+    <tr>
+      <td>50 µL</td>
+      <td>50 µL</td>
+      <td>2.50%</td>
+      <td>0.60%</td>
+    </tr>
+    <tr>
+      <td>200 µL</td>
+      <td>200 µL</td>
+      <td>1.00%</td>
+      <td>0.25%</td>
+    </tr>
+    <tr>
+      <td>1000 µL</td>
+      <td>1000 µL</td>
+      <td>0.70%</td>
+      <td>0.15%</td>
+    </tr>
+  </tbody>
+</table>
+
+### Flex 96-channel specifications
+
+<table>
+  <thead>
+    <tr>
+      <th>Pipette</th>
+      <th>Tip Capacity</th>
+      <th>Tested Volume</th>
+      <th>Accuracy %D</th>
+      <th>Precision %CV</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="4"><b>Flex 96-Channel 1000 µL</b></td>
+      <td>50 µL</td>
+      <td>5 µL</td>
+      <td>10.00%</td>
+      <td>5.00%</td>
+    </tr>
+    <tr>
+      <td>50 µL</td>
+      <td>50 µL</td>
+      <td>2.50%</td>
+      <td>1.25%</td>
+    </tr>
+    <tr>
+      <td>200 µL</td>
+      <td>200 µL</td>
+      <td>1.50%</td>
+      <td>1.25%</td>
+    </tr>
+    <tr>
+      <td>1000 µL</td>
+      <td>1000 µL</td>
+      <td>1.50%</td>
+      <td>1.50%</td>
+    </tr>
+</table>
 
 <table>
   <thead>
