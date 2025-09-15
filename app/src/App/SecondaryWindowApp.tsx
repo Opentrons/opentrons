@@ -12,6 +12,8 @@ import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { LocalizationProvider } from '/app/LocalizationProvider'
 // eslint-disable-next-line opentrons/no-imports-across-applications
+import { CameraPhotoViewer } from '/app/pages/Desktop/CameraPhotoViewer'
+// eslint-disable-next-line opentrons/no-imports-across-applications
 import { LivestreamViewer } from '/app/pages/Desktop/LivestreamViewer'
 import { useRobot } from '/app/redux-resources/robots'
 import { OPENTRONS_USB } from '/app/redux/discovery'
@@ -30,6 +32,11 @@ export const SecondaryWindowApp = (): JSX.Element => {
       Component: LivestreamViewer,
       name: 'Camera Stream',
       path: '/devices/:robotName/camera-stream',
+    },
+    {
+      Component: CameraPhotoViewer,
+      name: 'Camera Photo',
+      path: '/devices/:robotName/camera-photo',
     },
   ]
 

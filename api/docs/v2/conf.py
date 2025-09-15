@@ -452,6 +452,6 @@ nitpick_ignore_regex = [
     ("py:class", r".*protocol_api.module_contexts.ModuleContext*"),
     (
         "py:class",
-        r".*AbstractLabware|APIVersion|LabwareLike|LoadedCoreMap|ModuleTypes|NoneType|OffDeckType|ProtocolCore|WellCore",
+        r".*AbstractLabware|APIVersion|LabwareLike|LoadedCoreMap|ModuleTypes|NoneType|OffDeckType|ProtocolCore|TaskCore|WellCore",
     ),  # laundry list of not fully qualified things
 ]

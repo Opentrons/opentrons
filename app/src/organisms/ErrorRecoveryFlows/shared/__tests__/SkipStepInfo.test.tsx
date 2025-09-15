@@ -155,6 +155,7 @@ describe('SkipStepInfo', () => {
     RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.ROUTE,
     RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE,
     RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE,
+    RECOVERY_MAP.STACKER_STALLED_STORE_SKIP.ROUTE,
   ])('calls manualStore when the route is %s', async route => {
     props.currentRecoveryOptionUtils.selectedRecoveryOption = route
     props.failedCommand = {

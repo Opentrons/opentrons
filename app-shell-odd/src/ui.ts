@@ -69,6 +69,7 @@ export function waitForRobotServerAndShowMainWindow(
   mainWindow: BrowserWindow
 ): void {
   mainWindow.show()
+  mainWindow.webContents.send('window-type', 'odd-main')
   _NODE_ENV_ !== 'development' &&
     setTimeout(function () {
       systemd

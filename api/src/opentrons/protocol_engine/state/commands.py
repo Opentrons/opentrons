@@ -238,7 +238,7 @@ class CommandState:
     has_entered_error_recovery: bool
     """Whether the run has entered error recovery."""
 
-    stopped_by_estop: bool
+    stopped_by_async_error: bool
     """If this is set to True, the engine was stopped by an estop event."""
 
     error_recovery_policy: ErrorRecoveryPolicy
@@ -272,7 +272,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             run_completed_at=None,
             run_started_at=None,
             latest_protocol_command_hash=None,
-            stopped_by_estop=False,
+            stopped_by_async_error=False,
             error_recovery_policy=error_recovery_policy,
             has_entered_error_recovery=False,
         )
@@ -472,8 +472,8 @@ class CommandStore(HasState[CommandState], HandlesActions):
             self._state.recovery_target = None
             self._state.queue_status = QueueStatus.PAUSED
 
-            if action.from_estop:
-                self._state.stopped_by_estop = True
+            if action.from_asynchronous_error:
+                self._state.stopped_by_async_error = True
                 self._state.run_result = RunResult.FAILED
             else:
                 self._state.run_result = RunResult.STOPPED
@@ -501,7 +501,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
         else:
             # HACK(sf): There needs to be a better way to set
             # an estop error than this else clause
-            if self._state.stopped_by_estop and action.error_details:
+            if self._state.stopped_by_async_error and action.error_details:
                 self._state.run_error = self._map_run_exception_to_error_occurrence(
                     action.error_details.error_id,
                     action.error_details.created_at,
@@ -952,9 +952,9 @@ class CommandView:
         """Get whether an engine stop has completed."""
         return self._state.run_completed_at is not None
 
-    def get_is_stopped_by_estop(self) -> bool:
+    def get_is_stopped_by_async_error(self) -> bool:
         """Return whether the engine was stopped specifically by an E-stop."""
-        return self._state.stopped_by_estop
+        return self._state.stopped_by_async_error
 
     def has_been_played(self) -> bool:
         """Get whether engine has started."""

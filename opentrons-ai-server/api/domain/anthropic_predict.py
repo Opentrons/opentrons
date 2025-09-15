@@ -66,7 +66,15 @@ class AnthropicPredict:
         self.PROMPT_PD = PROMPT_PD
         self.path_docs: Path = ROOT_PATH / "api" / "storage" / "docs"
         self.path_docs_pd: Path = ROOT_PATH / "api" / "storage" / "docs" / "pd"
-        self.path_api_docs: Path = ROOT_PATH / "api" / "storage" / "api_docs" / "api_docs_struct.md"
+        self.path_api_docs: Path = ROOT_PATH / "api" / "storage" / "api_docs" / "api_docs_struct_v2.25.md"
+
+        docker_api_docs_path = ROOT_PATH / "api" / "storage" / "api_docs"
+        local_api_docs_path = REPO_ROOT / "api"
+
+        if (docker_api_docs_path / "docs").exists():
+            self.api_docs_base_path = docker_api_docs_path
+        else:
+            self.api_docs_base_path = local_api_docs_path
         self.system_prompt_pd = self.get_system_prompt_pd()
 
         self.cached_docs: List[MessageParam] = [
@@ -163,6 +171,7 @@ class AnthropicPredict:
                 # Skip directories
                 if file_path.is_dir():
                     continue
+                print(f"Load doc file: {file_path}")
 
                 content = file_path.read_text(encoding="utf-8")
                 document_xml = [
@@ -197,6 +206,7 @@ class AnthropicPredict:
     def parse_relevant_files_and_get_content(self, api_info_output: str) -> str:
         """
         Parse the output of get_api_info and construct XML content with file contents.
+        Now reads directly from the main API docs location using paths like 'docs/v2/...'
         """
         match = re.search(r"<relevant_files>(.*?)</relevant_files>", api_info_output, re.DOTALL)
         if not match:
@@ -207,7 +217,8 @@ class AnthropicPredict:
         xml_content = "<relevant_file_content>\n"
 
         for filename in filenames:
-            filepath = f"{self.path_api_docs.parent}/{filename}"
+            # Combine base path with filename (e.g., 'api' + 'docs/v2/file.rst' = 'api/docs/v2/file.rst')
+            filepath = self.api_docs_base_path / filename
             try:
                 with open(filepath, "r") as f:
                     content = f.read()
@@ -218,8 +229,10 @@ class AnthropicPredict:
                 xml_content += "\n</content>\n"
                 xml_content += "</file>\n"
             except FileNotFoundError:
+                logger.warning(f"File not found: {filepath}")
                 continue  # Skip files that don't exist
-            except Exception:
+            except Exception as e:
+                logger.warning(f"Error reading file {filepath}: {e}")
                 continue  # Skip files that can't be read
 
         xml_content += "</relevant_file_content>"

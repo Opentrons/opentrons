@@ -62,4 +62,4 @@ export interface OnDeviceRouteParams {
  * Main: Renders DesktopApp/OnDeviceDisplay
  * Secondary: Renders SecondaryWindowApp
  * */
-export type WindowType = 'main' | 'secondary' | null
+export type WindowType = 'desktop-main' | 'odd-main' | 'secondary' | null

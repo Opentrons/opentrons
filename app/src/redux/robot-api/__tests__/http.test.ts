@@ -1,4 +1,6 @@
 import { promisify } from 'util'
+// todo(mm, 2025-09-10): This test file looks like the last remaining use of express.
+// Try to remove the dependency if this test file ever gets rethought.
 import express from 'express'
 import FormData from 'form-data'
 import multer from 'multer'

@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import { DIRECTION_ROW, Flex, POSITION_FIXED } from '@opentrons/components'
 
 import { GlobalStyle } from '/app/atoms/GlobalStyle'
-import { getConfig, getIsOnDevice } from '/app/redux/config'
+import { getConfig } from '/app/redux/config'
 
 import { DesktopApp } from './DesktopApp'
 import { useWindowType } from './hooks'
@@ -19,7 +19,6 @@ const stopEvent = (event: MouseEvent): void => {
 
 export const App = (): JSX.Element | null => {
   const hasConfigLoaded = useSelector(getConfig) != null
-  const isOnDevice = useSelector(getIsOnDevice)
   const windowType = useWindowType()
 
   // render null until both config and window type are loaded
@@ -57,7 +56,7 @@ export const App = (): JSX.Element | null => {
         onDrop={stopEvent}
       >
         <TopPortalRoot />
-        {isOnDevice ? <OnDeviceDisplayApp /> : <DesktopApp />}
+        {windowType === 'odd-main' ? <OnDeviceDisplayApp /> : <DesktopApp />}
       </Flex>
     </>
   )
