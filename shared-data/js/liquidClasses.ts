@@ -16,4 +16,7 @@ export const ETHANOL_LIQUID_CLASS_NAME = 'ethanol80V1'
 const defs = { waterV2, glycerol50V1, ethanol80V1 }
 
 //  returns all liquid class defs but their latest version only
+//  NOTE: we should refactor this util though to get the latest versions of all the definitions types
+//  that exist. right now, its hard-coded in which means we need to manually
+//  update it every time, which is not great.
 export const getAllLiquidClassDefs = (): Record<string, LiquidClass> => defs
