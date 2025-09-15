@@ -135,17 +135,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         self._user_aspirate_flow_rate: Optional[float] = None
         self._user_dispense_flow_rate: Optional[float] = None
         self._user_blow_out_flow_rate: Optional[float] = None
-        if self._protocol_core.api_version < _DEFAULT_FLOW_RATE_BUG_FIXED_IN:
-            # TODO also look into why we were using MAX_SUPPORTED_VERSION here and if that makes sense to keep
-            self._user_aspirate_flow_rate = find_value_for_api_version(
-                MAX_SUPPORTED_VERSION, self._initial_default_flow_rates.default_aspirate
-            )
-            self._user_dispense_flow_rate = find_value_for_api_version(
-                MAX_SUPPORTED_VERSION, self._initial_default_flow_rates.default_dispense
-            )
-            self._user_blow_out_flow_rate = find_value_for_api_version(
-                MAX_SUPPORTED_VERSION, self._initial_default_flow_rates.default_blow_out
-            )
+        # Call this to ensure pre 2.26 buggy flow rate behavior is maintained
+        self._reset_flow_rates()
         self._flow_rates = FlowRates(self)
 
         self.set_default_speed(speed=default_movement_speed)
@@ -1102,34 +1093,22 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
 
         return blow_out_flow_rate * rate
 
-    def reset_aspirate_flow_rate(self) -> None:
-        """Resets the user-set aspirate flow rate to allow the automatic default to be used."""
+    def _reset_flow_rates(self) -> None:
+        """Resets the user-set flow rates to allow the automatic default to be used."""
         if self._protocol_core.api_version >= _DEFAULT_FLOW_RATE_BUG_FIXED_IN:
             self._user_aspirate_flow_rate = None
-        else:
-            # Set to the initial default to preserve buggy behavior where the default was not correctly updated
-            self._user_aspirate_flow_rate = find_value_for_api_version(
-                MAX_SUPPORTED_VERSION, self._initial_default_flow_rates.default_aspirate
-            )
-
-    def reset_dispense_flow_rate(self) -> None:
-        """Resets the user-set dispense flow rate to allow the automatic default to be used."""
-        if self._protocol_core.api_version >= _DEFAULT_FLOW_RATE_BUG_FIXED_IN:
             self._user_dispense_flow_rate = None
-        else:
-            # Set to the initial default to preserve buggy behavior where the default was not correctly updated
-            self._user_dispense_flow_rate = find_value_for_api_version(
-                MAX_SUPPORTED_VERSION, self._initial_default_flow_rates.default_dispense
-            )
-
-    def reset_blow_out_flow_rate(self) -> None:
-        """Resets the user-set dispense flow rate to allow the automatic default to be used."""
-        if self._protocol_core.api_version >= _DEFAULT_FLOW_RATE_BUG_FIXED_IN:
             self._user_blow_out_flow_rate = None
         else:
-            # Set to the initial default to preserve buggy behavior where the default was not correctly updated
+            # Set to the initial defaults to preserve buggy behavior where the default was not correctly updated
+            self._user_aspirate_flow_rate = find_value_for_api_version(
+                self._protocol_core.api_version, self._initial_default_flow_rates.default_aspirate
+            )
+            self._user_dispense_flow_rate = find_value_for_api_version(
+                self._protocol_core.api_version, self._initial_default_flow_rates.default_dispense
+            )
             self._user_blow_out_flow_rate = find_value_for_api_version(
-                MAX_SUPPORTED_VERSION, self._initial_default_flow_rates.default_blow_out
+                self._protocol_core.api_version, self._initial_default_flow_rates.default_blow_out
             )
 
     def get_nozzle_configuration(self) -> NozzleConfigurationType:
@@ -1198,6 +1177,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 ),
             )
         )
+        if self._protocol_core.api_version >= _DEFAULT_FLOW_RATE_BUG_FIXED_IN:
+            self._reset_flow_rates()
 
     def prepare_to_aspirate(self) -> None:
         self._engine_client.execute_command(
