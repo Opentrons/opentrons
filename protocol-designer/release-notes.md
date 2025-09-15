@@ -123,6 +123,8 @@ When editing your protocol starting deck, click and drag to move any individual 
 
 Running a protocol created in Protocol Designer now requires Opentrons App version 8.3.0 or newer.
 
+<div id="latest"></div>
+
 ## Opentrons Protocol Designer Changes in 8.4.2
 
 **Welcome to Protocol Designer 8.4.2!**
