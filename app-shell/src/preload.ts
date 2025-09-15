@@ -11,5 +11,4 @@ const getFilePathFrom = (file: File): Promise<string> => {
   return Promise.resolve(webUtils.getPathForFile(file))
 }
 
-// @ts-expect-error can't get TS to recognize global.d.ts
 global.APP_SHELL_REMOTE = { ipcRenderer, getFilePathFrom }

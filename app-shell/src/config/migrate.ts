@@ -47,8 +47,11 @@ export const DEFAULTS_V0: ConfigV0 = {
 
   // app update config
   update: {
-    // @ts-expect-error can't get TS to recognize global.d.ts
-    channel: [].includes('beta') ? 'beta' : 'latest',
+    channel: 'latest',
+    // todo(mm, 2025-09-15): We used to set this more dynamically depending on _PKG_VERSION_,
+    // but that got dropped during the Vite migration, possibly because of type-checking problems
+    // that have since been resolved. Do we want to restore this?
+    // channel: _PKG_VERSION_.includes('beta') ? 'beta' : 'latest',
   },
 
   buildroot: {

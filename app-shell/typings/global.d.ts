@@ -1,7 +1,5 @@
 /* eslint-disable no-var */
-declare global {
-  var APP_SHELL_REMOTE: { ipcRenderer: IpcRenderer; [key: string]: any }
-}
+declare var APP_SHELL_REMOTE: { ipcRenderer: IpcRenderer; [key: string]: any }
 
 declare const _PKG_VERSION_: string
 declare const _PKG_PRODUCT_NAME_: string

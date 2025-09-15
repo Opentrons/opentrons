@@ -1,11 +1,6 @@
-declare global {
-  namespace NodeJS {
-    export interface Global {
-      APP_SHELL_REMOTE: {
-        ipcRenderer: IpcRenderer
-      }
-    }
-  }
+/* eslint-disable no-var */
+declare var APP_SHELL_REMOTE: {
+  ipcRenderer: IpcRenderer
 }
 
 declare const _PKG_VERSION_: string
