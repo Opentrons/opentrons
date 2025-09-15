@@ -235,7 +235,13 @@ export function CurrentRunningProtocolCommand({
           flexDirection={DIRECTION_COLUMN}
         >
           <RunTimer {...runTimerInfo} style={RUN_TIMER_STYLE} />
-          <LegacyStyledText as="h4SemiBold">{stepCounterCopy}</LegacyStyledText>
+          <LegacyStyledText
+            fontSize={TYPOGRAPHY.fontSize28}
+            lineHeight={TYPOGRAPHY.lineHeight36}
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
+            {stepCounterCopy}
+          </LegacyStyledText>
         </Flex>
       </Flex>
 
