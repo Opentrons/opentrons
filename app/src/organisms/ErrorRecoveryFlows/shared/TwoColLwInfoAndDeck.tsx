@@ -135,7 +135,7 @@ export function TwoColLwInfoAndDeck(
                   : null,
             }
           })
-        const labwareOnDeckFiltered = labwareOnDeck.filter(
+        const labwareOnDeckFiltered = labwareOnDeck?.filter(
           lw => lw.labwareId !== failedLwId
         )
         return isValidDeck ? (
