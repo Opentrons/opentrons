@@ -88,8 +88,7 @@ export function Retract({
               speed,
               delayDuration,
               position,
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              positionReference: positionReference!,
+              positionReference: positionReference ?? undefined,
             },
           })
           trackEventWithRobotSerial({
