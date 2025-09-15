@@ -546,7 +546,7 @@ export function ChooseRobotSlideout(
                   key={runtimeParam.variableName}
                   flexDirection={DIRECTION_COLUMN}
                   alignItems={ALIGN_CENTER}
-                  gridgap={SPACING.spacing8}
+                  gridGap={SPACING.spacing8}
                 >
                   <Flex
                     flexDirection={DIRECTION_COLUMN}

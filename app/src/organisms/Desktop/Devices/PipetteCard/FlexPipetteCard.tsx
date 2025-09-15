@@ -110,7 +110,7 @@ export function FlexPipetteCard({
     handleLaunchPipetteWizardFlows(FLOWS.DETACH)
   }
 
-  const handleCalibrate: MouseEventHandler<HTMLButtonElement> = () => {
+  const handleCalibrate: MouseEventHandler<HTMLAnchorElement> = () => {
     handleLaunchPipetteWizardFlows(FLOWS.CALIBRATE)
   }
 

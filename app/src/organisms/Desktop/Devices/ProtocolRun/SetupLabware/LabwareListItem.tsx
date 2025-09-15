@@ -333,7 +333,7 @@ export function LabwareListItem(
         <Flex
           flexDirection={DIRECTION_ROW}
           gridGap={SPACING.spacing24}
-          align={ALIGN_FLEX_END}
+          alignItems={ALIGN_FLEX_END}
           marginLeft={SPACING.spacing24}
         >
           {secureLabwareInstructions ?? null}

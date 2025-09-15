@@ -351,7 +351,7 @@ export function ProtocolRunSetup({
             css={TYPOGRAPHY.pSemiBold}
             marginRight={SPACING.spacing16}
             id={`RunSetupCard_${LABWARE_SETUP_STEP_KEY}_incompleteText`}
-            whitespace={NO_WRAP}
+            whiteSpace={NO_WRAP}
           >
             {t('check_locations_and_volumes')}
           </StyledText>

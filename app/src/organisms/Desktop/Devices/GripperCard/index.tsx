@@ -60,7 +60,7 @@ export function GripperCard({
     setOpenWizardFlowType(GRIPPER_FLOW_TYPES.DETACH)
   }
 
-  const handleCalibrate: MouseEventHandler<HTMLButtonElement> = () => {
+  const handleCalibrate: MouseEventHandler<HTMLAnchorElement> = () => {
     setOpenWizardFlowType(GRIPPER_FLOW_TYPES.RECALIBRATE)
   }
   const [pollForSubsystemUpdate, setPollForSubsystemUpdate] = useState(false)
