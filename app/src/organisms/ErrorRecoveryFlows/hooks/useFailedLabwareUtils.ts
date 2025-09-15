@@ -116,7 +116,7 @@ export function useFailedLabwareUtils({
       }),
     [failedCommand, runCommands]
   )
-  console.log('recentRelevantFailedLabwareCmd', recentRelevantFailedLabwareCmd)
+
   const relevantPickUpTipCommand = getRelevantPickUpTipCommand(
     failedCommandByRunRecord,
     runCommands

@@ -361,7 +361,7 @@ describe('getRunCurrentLabwareInfo', () => {
 
   it('should return an empty array if runRecord is null', () => {
     const result = getRunCurrentLabwareInfo({
-      runRecord: undefined,
+      runData: undefined,
       runLwDefsByUri: {} as any,
     })
 
@@ -370,7 +370,7 @@ describe('getRunCurrentLabwareInfo', () => {
 
   it('should return an empty array if protocolAnalysis is null', () => {
     const result = getRunCurrentLabwareInfo({
-      runRecord: { data: { labware: [] } } as any,
+      runData: { labware: [] } as any,
       runLwDefsByUri: {},
     })
 
@@ -384,7 +384,7 @@ describe('getRunCurrentLabwareInfo', () => {
     }
 
     const result = getRunCurrentLabwareInfo({
-      runRecord: { data: { labware: [mockPickUpTipLwSlotName] } } as any,
+      runData: { labware: [mockPickUpTipLwSlotName] } as any,
       runLwDefsByUri: {
         [mockPickUpTipLabware.definitionUri]: mockLabwareDef,
       },
