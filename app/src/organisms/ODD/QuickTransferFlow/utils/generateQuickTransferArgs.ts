@@ -487,8 +487,10 @@ export function generateQuickTransferArgs(
       quickTransferState.retractDispense?.delayDuration != null
         ? { seconds: quickTransferState.retractDispense.delayDuration }
         : null,
-    touchTipAfterAspirateMmFromEdge: null,
-    touchTipAfterDispenseMmFromEdge: null,
+    touchTipAfterAspirateMmFromEdge:
+      quickTransferState.touchTipAspirate ?? null,
+    touchTipAfterDispenseMmFromEdge:
+      quickTransferState.touchTipDispense ?? null,
   }
 
   switch (quickTransferState.path) {
