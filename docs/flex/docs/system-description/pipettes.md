@@ -27,10 +27,16 @@ The pipettes pick up disposable plastic *tips* by pressing them onto the pipette
 
 ## Pipette specifications
 
-Opentrons Flex pipettes are designed to handle a wide range of liquid volumes and are compatible with multiple tip sizes. To help ensure performance and quality, Opentrons has tested these instruments with different tips and liquid volume combinations. The following tables list the accuracy and precision specifications for Opentrons Flex 1-, 8-, and 96-channel pipettes.
+Opentrons Flex pipettes are designed to handle a wide range of liquid volumes and are compatible with multiple tip sizes. To help ensure performance and quality, Opentrons has tested these instruments with different tips and liquid volume combinations.
 
 !!!tip
-    Refer to these tables when choosing tips for your pipette. For best results you should use the smallest tips that meet the needs of your protocol.
+    For best results, use the smallest capacity tips that meet the needs of your protocol.
+
+!!!note
+    You *do not* have to calibrate the volume that your pipettes dispense before use. You only have to perform positional calibration. See [Pipette calibration](pipettes.md#pipette-calibration) below, as well as the [Pipette Installation section][pipette-installation] of the Installation and Relocation chapter, for details.
+
+The following tables list the accuracy and precision specifications for Opentrons Flex 1-, 8-, and 96-channel pipettes.
+
 
 ### 1-channel pipette specifications
 
@@ -211,7 +217,7 @@ Flex 96-channel pipettes meet the following accuracy and precision specification
     <tr>
       <td>200 µL</td>
       <td>200 µL</td>
-      <td>1.5%</td>
+      <td>± 1.5%</td>
       <td>1.25%</td>
     </tr>
     <tr>
@@ -221,138 +227,6 @@ Flex 96-channel pipettes meet the following accuracy and precision specification
       <td>1.5%</td>
     </tr>
 </table>
-
-<!-- hide original, temporary
-<table>
-  <thead>
-    <tr>
-      <th>Pipette</th>
-      <th>Tip Capacity</th>
-      <th>Tested Volume</th>
-      <th>Accuracy %D</th>
-      <th>Precision %CV</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td rowspan="3"><b>Flex 1-Channel 50 µL</b></td>
-      <td>50 µL</td>
-      <td>1 µL</td>
-      <td>8.00%</td>
-      <td>7.00%</td>
-    </tr>
-    <tr>
-      <td>50 µL</td>
-      <td>10 µL</td>
-      <td>1.50%</td>
-      <td>0.50%</td>
-    </tr>
-    <tr>
-      <td>50 µL</td>
-      <td>50 µL</td>
-      <td>1.25%</td>
-      <td>0.40%</td>
-    </tr>
-    <tr>
-      <td rowspan="4"><b>Flex 1-Channel 1000 µL</b></td>
-      <td>50 µL</td>
-      <td>5 µL</td>
-      <td>5.00%</td>
-      <td>2.50%</td>
-    </tr>
-    <tr>
-      <td>50 µL</td>
-      <td>50 µL</td>
-      <td>0.50%</td>
-      <td>0.30%</td>
-    </tr>
-    <tr>
-      <td>200 µL</td>
-      <td>200 µL</td>
-      <td>0.50%</td>
-      <td>0.15%</td>
-    </tr>
-    <tr>
-      <td>1000 µL</td>
-      <td>1000 µL</td>
-      <td>0.50%</td>
-      <td>0.15%</td>
-    </tr>
-    <tr>
-      <td rowspan="3"><b>Flex 8-Channel 50 µL</b></td>
-      <td>50 µL</td>
-      <td>1 µL</td>
-      <td>10.00%</td>
-      <td>8.00%</td>
-    </tr>
-    <tr>
-      <td>50 µL</td>
-      <td>10 µL</td>
-      <td>2.50%</td>
-      <td>1.00%</td>
-    </tr>
-    <tr>
-      <td>50 µL</td>
-      <td>50 µL</td>
-      <td>1.25%</td>
-      <td>0.60%</td>
-    </tr>
-    <tr>
-      <td rowspan="4"><b>Flex 8-Channel 1000 µL</b></td>
-      <td>50 µL</td>
-      <td>5 µL</td>
-      <td>8.00%</td>
-      <td>4.00%</td>
-    </tr>
-    <tr>
-      <td>50 µL</td>
-      <td>50 µL</td>
-      <td>2.50%</td>
-      <td>0.60%</td>
-    </tr>
-    <tr>
-      <td>200 µL</td>
-      <td>200 µL</td>
-      <td>1.00%</td>
-      <td>0.25%</td>
-    </tr>
-    <tr>
-      <td>1000 µL</td>
-      <td>1000 µL</td>
-      <td>0.70%</td>
-      <td>0.15%</td>
-    </tr>
-    <tr>
-      <td rowspan="4"><b>Flex 96-Channel 1000 µL</b></td>
-      <td>50 µL</td>
-      <td>5 µL</td>
-      <td>10.00%</td>
-      <td>5.00%</td>
-    </tr>
-    <tr>
-      <td>50 µL</td>
-      <td>50 µL</td>
-      <td>2.50%</td>
-      <td>1.25%</td>
-    </tr>
-    <tr>
-      <td>200 µL</td>
-      <td>200 µL</td>
-      <td>1.50%</td>
-      <td>1.25%</td>
-    </tr>
-    <tr>
-      <td>1000 µL</td>
-      <td>1000 µL</td>
-      <td>1.50%</td>
-      <td>1.50%</td>
-    </tr>
-  </tbody>
-</table>
--->
-
-!!! note
-    Opentrons performs volumetric testing of Flex pipettes to ensure that they meet the accuracy and precision specifications listed above. You *do not* have to calibrate the volume that your pipettes dispense before use. You only have to perform positional calibration. See the next section, as well as the [Pipette Installation section][pipette-installation] of the Installation and Relocation chapter, for details.
 
 ## Pipette calibration
 
