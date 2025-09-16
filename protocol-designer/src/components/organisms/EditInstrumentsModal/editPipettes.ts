@@ -194,6 +194,7 @@ export const editPipettes = (
         substitutionMap,
         startStepId: orderedStepIds[0],
         endStepId: last(orderedStepIds) ?? '',
+        newTiprackURI: Array.from(newTiprackUris)[0],
       })
     )
   }

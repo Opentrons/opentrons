@@ -74,6 +74,13 @@ const _patchDefaultPipette = (args: {
     orderedStepIds,
     initialDeckSetup.pipettes
   )
+  const pipetteTipracks = pipetteEntities[defaultPipetteId].tiprackDefURI
+  const labwareURIsOnDeck = new Set(
+    Object.values(labwareEntities).map(({ labwareDefURI }) => labwareDefURI)
+  )
+  const firstDefaultTiprackURIOnDeck = pipetteTipracks.find(uri =>
+    labwareURIsOnDeck.has(uri)
+  )
   const hasPartialTipSupportedChannel =
     pipetteEntities[defaultPipetteId]?.spec.channels !== 1
   // If there is a `pipette` field in the form,
@@ -88,6 +95,7 @@ const _patchDefaultPipette = (args: {
       {
         pipette: defaultPipetteId,
         nozzles: hasPartialTipSupportedChannel ? ALL : null,
+        tipRack: firstDefaultTiprackURIOnDeck ?? null,
       },
       formData,
       pipetteEntities,

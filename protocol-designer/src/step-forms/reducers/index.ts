@@ -206,7 +206,12 @@ export const unsavedForm = (
 
     case 'SUBSTITUTE_STEP_FORM_PIPETTES': {
       // only substitute unsaved step form if its ID is in the start-end range
-      const { substitutionMap, startStepId, endStepId } = action.payload
+      const {
+        substitutionMap,
+        startStepId,
+        endStepId,
+        newTiprackURI,
+      } = action.payload
       const stepIdsToUpdate = getIdsInRange(
         rootState.orderedStepIds,
         startStepId,
@@ -226,6 +231,7 @@ export const unsavedForm = (
           ...handleFormChange(
             {
               pipette: substitutionMap[unsavedFormState.pipette],
+              tipRack: newTiprackURI,
             },
             unsavedFormState,
             _getPipetteEntitiesRootState(rootState),
@@ -865,7 +871,12 @@ export const savedStepForms = (
     }
 
     case 'SUBSTITUTE_STEP_FORM_PIPETTES': {
-      const { startStepId, endStepId, substitutionMap } = action.payload
+      const {
+        startStepId,
+        endStepId,
+        substitutionMap,
+        newTiprackURI,
+      } = action.payload
       const stepIdsToUpdate = getIdsInRange(
         rootState.orderedStepIds,
         startStepId,
@@ -882,6 +893,7 @@ export const savedStepForms = (
         const updatedFields = handleFormChange(
           {
             pipette: substitutionMap[prevStepForm.pipette],
+            tipRack: newTiprackURI,
           },
           prevStepForm,
           _getPipetteEntitiesRootState(rootState),

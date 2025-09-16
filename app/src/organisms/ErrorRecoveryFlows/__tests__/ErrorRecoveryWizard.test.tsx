@@ -33,9 +33,13 @@ import {
   StackerHopperEmptySkip,
   StackerShuttleEmptyRetry,
   StackerShuttleEmptySkip,
+  StackerShuttleEmptyStoreRetry,
+  StackerShuttleEmptyStoreSkip,
   StackerShuttleMissing,
   StackerStalledRetry,
   StackerStalledSkip,
+  StackerStalledStoreRetry,
+  StackerStalledStoreSkip,
 } from '../RecoveryOptions'
 import {
   ErrorDetailsModal,
@@ -208,6 +212,10 @@ describe('ErrorRecoveryContent', () => {
     STACKER_SHUTTLE_MISSING_RETRY,
     STACKER_SHUTTLE_EMPTY_RETRY,
     STACKER_SHUTTLE_EMPTY_SKIP,
+    STACKER_STALLED_STORE_SKIP,
+    STACKER_STALLED_STORE_RETRY,
+    STACKER_SHUTTLE_EMPTY_STORE_SKIP,
+    STACKER_SHUTTLE_EMPTY_STORE_RETRY,
   } = RECOVERY_MAP
 
   let props: ComponentProps<typeof ErrorRecoveryContent>
@@ -269,6 +277,18 @@ describe('ErrorRecoveryContent', () => {
     )
     vi.mocked(StackerStalledSkip).mockReturnValue(
       <div>MOCK_STACKER_STALLED_SKIP</div>
+    )
+    vi.mocked(StackerStalledStoreSkip).mockReturnValue(
+      <div>MOCK_STACKER_STALLED_STORE_SKIP</div>
+    )
+    vi.mocked(StackerStalledStoreRetry).mockReturnValue(
+      <div>MOCK_STACKER_STALLED_STORE_RETRY</div>
+    )
+    vi.mocked(StackerShuttleEmptyStoreSkip).mockReturnValue(
+      <div>MOCK_STACKER_SHUTTLE_EMPTY_STORE_SKIP</div>
+    )
+    vi.mocked(StackerShuttleEmptyStoreRetry).mockReturnValue(
+      <div>MOCK_STACKER_SHUTTLE_EMPTY_STORE_RETRY</div>
     )
   })
 
@@ -497,6 +517,58 @@ describe('ErrorRecoveryContent', () => {
     renderRecoveryContent(props)
 
     screen.getByText('MOCK_STACKER_STALLED_SKIP')
+  })
+
+  it(`returns appropriate view when the route is ${STACKER_STALLED_STORE_SKIP.ROUTE}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        ...props.recoveryMap,
+        route: STACKER_STALLED_STORE_SKIP.ROUTE,
+      },
+    }
+    renderRecoveryContent(props)
+
+    screen.getByText('MOCK_STACKER_STALLED_STORE_SKIP')
+  })
+
+  it(`returns appropriate view when the route is ${STACKER_STALLED_STORE_RETRY.ROUTE}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        ...props.recoveryMap,
+        route: STACKER_STALLED_STORE_RETRY.ROUTE,
+      },
+    }
+    renderRecoveryContent(props)
+
+    screen.getByText('MOCK_STACKER_STALLED_STORE_RETRY')
+  })
+
+  it(`returns appropriate view when the route is ${STACKER_SHUTTLE_EMPTY_STORE_SKIP.ROUTE}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        ...props.recoveryMap,
+        route: STACKER_SHUTTLE_EMPTY_STORE_SKIP.ROUTE,
+      },
+    }
+    renderRecoveryContent(props)
+
+    screen.getByText('MOCK_STACKER_SHUTTLE_EMPTY_STORE_SKIP')
+  })
+
+  it(`returns appropriate view when the route is ${STACKER_SHUTTLE_EMPTY_STORE_RETRY.ROUTE}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        ...props.recoveryMap,
+        route: STACKER_SHUTTLE_EMPTY_STORE_RETRY.ROUTE,
+      },
+    }
+    renderRecoveryContent(props)
+
+    screen.getByText('MOCK_STACKER_SHUTTLE_EMPTY_STORE_RETRY')
   })
 
   it(`returns appropriate view when the route is ${STACKER_STALLED_RETRY.ROUTE}`, () => {
