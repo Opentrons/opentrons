@@ -1,25 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
-import styled, { css } from 'styled-components'
 
 import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
+  RUN_STATUS_IDLE,
+  RUN_STATUS_RUNNING,
   RUN_STATUS_STOP_REQUESTED,
 } from '@opentrons/api-client'
 import {
-  ALIGN_CENTER,
-  ALIGN_FLEX_END,
-  COLORS,
-  DIRECTION_COLUMN,
-  DIRECTION_ROW,
-  Flex,
   getLabwareDefinitionsFromCommands,
-  JUSTIFY_CENTER,
-  OVERFLOW_HIDDEN,
-  POSITION_ABSOLUTE,
-  POSITION_RELATIVE,
-  SPACING,
   StepMeter,
   useSwipe,
 } from '@opentrons/components'
@@ -50,6 +40,7 @@ import {
   useTrackProtocolRunEvent,
 } from '/app/redux-resources/analytics'
 import { useRobotType } from '/app/redux-resources/robots'
+import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
 import { getLocalRobot } from '/app/redux/discovery'
 import {
   useLastRunCommand,
@@ -59,27 +50,25 @@ import {
   useRunTimestamps,
 } from '/app/resources/runs'
 
+import styles from './runningprotocol.module.css'
+
 import type { OnDeviceRouteParams } from '/app/App/types'
+import type {
+  CurrentRunningProtocolCommandProps,
+  RunningProtocolCommandListProps,
+} from '/app/organisms/ODD/RunningProtocol'
 
 const RUN_STATUS_REFETCH_INTERVAL = 5000
 const LIVE_RUN_COMMANDS_POLL_MS = 3000
-interface BulletProps {
-  isActive: boolean
-}
-const Bullet = styled.div`
-  height: 0.5rem;
-  width: 0.5rem;
-  border-radius: 50%;
-  z-index: 2;
-  background: ${(props: BulletProps) =>
-    props.isActive ? COLORS.grey50 : COLORS.grey40};
-  transform: ${(props: BulletProps) =>
-    props.isActive ? 'scale(2)' : 'scale(1)'};
-`
 
 export type ScreenOption =
   | 'CurrentRunningProtocolCommand'
   | 'RunningProtocolCommandList'
+
+const SCREEN_ORDER: ScreenOption[] = [
+  'CurrentRunningProtocolCommand',
+  'RunningProtocolCommandList',
+]
 
 export function RunningProtocol(): JSX.Element {
   const { runId } = useParams<
@@ -140,21 +129,25 @@ export function RunningProtocol(): JSX.Element {
   })
 
   useEffect(() => {
-    if (
-      currentOption === 'CurrentRunningProtocolCommand' &&
-      swipeType === 'swipe-left'
-    ) {
-      setCurrentOption('RunningProtocolCommandList')
-      setSwipeType('')
+    if (swipeType === '') {
+      return
     }
 
-    if (
-      currentOption === 'RunningProtocolCommandList' &&
-      swipeType === 'swipe-right'
-    ) {
-      setCurrentOption('CurrentRunningProtocolCommand')
-      setSwipeType('')
+    const currentIndex = SCREEN_ORDER.indexOf(currentOption)
+    let newIndex: number
+
+    if (swipeType === 'swipe-left') {
+      newIndex = Math.min(currentIndex + 1, SCREEN_ORDER.length - 1)
+    } else if (swipeType === 'swipe-right') {
+      newIndex = Math.max(currentIndex - 1, 0)
+    } else {
+      return
     }
+
+    if (newIndex !== currentIndex) {
+      setCurrentOption(SCREEN_ORDER[newIndex])
+    }
+    setSwipeType('')
   }, [currentOption, swipeType, setSwipeType])
 
   const isValidRobotSideAnalysis = robotSideAnalysis != null
@@ -165,6 +158,30 @@ export function RunningProtocol(): JSX.Element {
         : [],
     [isValidRobotSideAnalysis]
   )
+
+  const onStop = (): void => {
+    if (runStatus === RUN_STATUS_RUNNING) pauseRun()
+    setShowConfirmCancelRunModal(true)
+  }
+
+  const onTogglePlayPause = (): void => {
+    if (runStatus === RUN_STATUS_RUNNING) {
+      pauseRun()
+      trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.PAUSE })
+    } else {
+      playRun()
+      trackProtocolRunEvent({
+        name:
+          runStatus === RUN_STATUS_IDLE
+            ? ANALYTICS_PROTOCOL_RUN_ACTION.START
+            : ANALYTICS_PROTOCOL_RUN_ACTION.RESUME,
+        properties:
+          runStatus === RUN_STATUS_IDLE && robotAnalyticsData != null
+            ? robotAnalyticsData
+            : {},
+      })
+    }
+  }
 
   return (
     <>
@@ -183,16 +200,7 @@ export function RunningProtocol(): JSX.Element {
         />
       ) : null}
       {runStatus === RUN_STATUS_STOP_REQUESTED ? <CancelingRunModal /> : null}
-      {/* note: this zindex is here to establish a zindex context for the bullets
-          so they're relatively-above this flex but not anything else like error
-          recovery
-        */}
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        position={POSITION_RELATIVE}
-        overflow={OVERFLOW_HIDDEN}
-        zIndex="0"
-      >
+      <div className={styles.container}>
         {robotSideAnalysis != null ? (
           <StepMeter
             totalSteps={totalIndex ?? 0}
@@ -214,86 +222,77 @@ export function RunningProtocol(): JSX.Element {
         {showIntervention ? (
           <InterventionModal {...interventionProps} onResume={playRun} />
         ) : null}
-        <Flex
-          ref={ref}
-          style={style}
-          padding={`1.75rem ${SPACING.spacing40} ${SPACING.spacing40}`}
-          flexDirection={DIRECTION_COLUMN}
-        >
+        <div ref={ref} style={style} className={styles.content}>
           {robotSideAnalysis != null ? (
-            currentOption === 'CurrentRunningProtocolCommand' ? (
-              <CurrentRunningProtocolCommand
-                runId={runId}
-                playRun={playRun}
-                pauseRun={pauseRun}
-                setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}
-                trackProtocolRunEvent={trackProtocolRunEvent}
-                robotType={robotType}
-                robotAnalyticsData={robotAnalyticsData}
-                protocolName={protocolName}
-                runStatus={runStatus}
-                currentRunCommandIndex={currentRunCommandIndex}
-                robotSideAnalysis={robotSideAnalysis}
-                runTimerInfo={{
-                  runStatus,
-                  startedAt,
-                  stoppedAt,
-                  completedAt,
-                }}
-                lastRunCommand={lastRunCommand}
-                lastAnimatedCommand={lastAnimatedCommand.current}
-                updateLastAnimatedCommand={(newCommandKey: string) =>
-                  (lastAnimatedCommand.current = newCommandKey)
-                }
-                allRunDefs={allRunDefs}
-              />
-            ) : (
-              <>
-                <RunningProtocolCommandList
-                  protocolName={protocolName}
-                  runStatus={runStatus}
-                  robotType={robotType}
-                  playRun={playRun}
-                  pauseRun={pauseRun}
-                  setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}
-                  trackProtocolRunEvent={trackProtocolRunEvent}
-                  robotAnalyticsData={robotAnalyticsData}
-                  currentRunCommandIndex={currentRunCommandIndex}
-                  robotSideAnalysis={robotSideAnalysis}
-                  allRunDefs={allRunDefs}
-                />
-                <Flex
-                  css={css`
-                    background: linear-gradient(
-                      rgba(255, 0, 0, 0) 85%,
-                      #ffffff
-                    );
-                  `}
-                  position={POSITION_ABSOLUTE}
-                  height="20.25rem"
-                  width="59rem"
-                  marginTop="9.25rem"
-                  alignSelf={ALIGN_FLEX_END}
-                />
-              </>
-            )
+            <CurrentOptionView
+              currentOption={currentOption}
+              onStop={onStop}
+              onTogglePlayPause={onTogglePlayPause}
+              runId={runId}
+              robotType={robotType}
+              protocolName={protocolName}
+              runStatus={runStatus}
+              currentRunCommandIndex={currentRunCommandIndex}
+              robotSideAnalysis={robotSideAnalysis}
+              runTimerInfo={{
+                runStatus,
+                startedAt,
+                stoppedAt,
+                completedAt,
+              }}
+              lastRunCommand={lastRunCommand}
+              lastAnimatedCommand={lastAnimatedCommand.current}
+              updateLastAnimatedCommand={(newCommandKey: string) =>
+                (lastAnimatedCommand.current = newCommandKey)
+              }
+              allRunDefs={allRunDefs}
+            />
           ) : (
             <RunningProtocolSkeleton currentOption={currentOption} />
           )}
-          <Flex
-            marginTop={SPACING.spacing32}
-            flexDirection={DIRECTION_ROW}
-            gridGap={SPACING.spacing16}
-            justifyContent={JUSTIFY_CENTER}
-            alignItems={ALIGN_CENTER}
-          >
-            <Bullet
-              isActive={currentOption === 'CurrentRunningProtocolCommand'}
+          <div className={styles.navigation_dots}>
+            <div
+              className={`${styles.bullet} ${
+                currentOption === 'CurrentRunningProtocolCommand'
+                  ? styles.bullet_active
+                  : styles.bullet_inactive
+              }`}
             />
-            <Bullet isActive={currentOption === 'RunningProtocolCommandList'} />
-          </Flex>
-        </Flex>
-      </Flex>
+            <div
+              className={`${styles.bullet} ${
+                currentOption === 'RunningProtocolCommandList'
+                  ? styles.bullet_active
+                  : styles.bullet_inactive
+              }`}
+            />
+          </div>
+        </div>
+      </div>
     </>
   )
+}
+
+type CurrentOptionViewProps = CurrentRunningProtocolCommandProps &
+  RunningProtocolCommandListProps & { currentOption: ScreenOption }
+
+function CurrentOptionView({
+  currentOption,
+  ...rest
+}: CurrentOptionViewProps): JSX.Element {
+  switch (currentOption) {
+    case 'CurrentRunningProtocolCommand':
+      return <CurrentRunningProtocolCommand {...rest} />
+
+    case 'RunningProtocolCommandList':
+      return (
+        <>
+          <RunningProtocolCommandList {...rest} />
+          <div className={styles.gradient_overlay} />
+        </>
+      )
+
+    default:
+      console.error(`Unknown screen option: ${currentOption}`)
+      return <CurrentRunningProtocolCommand {...rest} />
+  }
 }

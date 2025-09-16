@@ -8,9 +8,6 @@ import {
 
 import { CURRENT_VERSION } from '/app/redux/shell'
 
-const SENTRY_DSN = process.env.OT_SENTRY_DSN
-const NODE_ENV = process.env.NODE_ENV
-
 let isSentryInitialized = false
 
 // Sentry doesn't expose this type publicly.
@@ -34,14 +31,14 @@ export const initializeSentry = (isAnalyticsEnabled: boolean): void => {
     return
   }
 
-  if (SENTRY_DSN == null) {
+  if (_OT_SENTRY_DSN_ == null) {
     console.log('Sentry DSN not found. Sentry is not initialized.')
     return
   }
 
   const sentryOptions: ElectronRendererOptions = {
-    dsn: SENTRY_DSN,
-    environment: NODE_ENV,
+    dsn: _OT_SENTRY_DSN_,
+    environment: _NODE_ENV_,
     release: CURRENT_VERSION,
     tracesSampleRate: 1.0,
   }

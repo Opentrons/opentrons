@@ -11,9 +11,6 @@ import { createLogger } from './log'
 
 import type { ElectronMainOptions } from '@sentry/electron/main'
 
-const SENTRY_DSN = process.env.OT_SENTRY_DSN
-const NODE_ENV = process.env.NODE_ENV
-
 let isSentryInitialized = false
 
 const log = createLogger('sentry')
@@ -29,14 +26,14 @@ export const initializeSentry = (isAnalyticsEnabled: boolean): void => {
     return
   }
 
-  if (SENTRY_DSN == null) {
+  if (_OT_SENTRY_DSN_ == null) {
     log.debug('Sentry DSN not found. Sentry is not initialized.')
     return
   }
 
   const sentryOptions: ElectronMainOptions = {
-    dsn: SENTRY_DSN,
-    environment: NODE_ENV,
+    dsn: _OT_SENTRY_DSN_,
+    environment: _NODE_ENV_,
     release: app.getVersion(),
     tracesSampleRate: 1.0,
   }

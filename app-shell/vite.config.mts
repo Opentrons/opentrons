@@ -54,16 +54,14 @@ export default defineConfig(
         exclude: ['node_modules'],
       },
       define: {
-        'process.env': {
-          NODE_ENV: process.env.NODE_ENV,
-          OT_SENTRY_DSN: process.env.OT_SENTRY_DSN,
-          OPENTRONS_PROJECT: process.env.OPENTRONS_PROJECT,
-        },
+        // NOTE: For security, only include environment variables here if they're explicitly allowlisted.
         global: 'globalThis',
-        _PKG_VERSION_: JSON.stringify(version),
-        _PKG_PRODUCT_NAME_: JSON.stringify(pkg.productName),
-        _PKG_BUGS_URL_: JSON.stringify(pkg.bugs.url),
+        _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
+        _OT_SENTRY_DSN_: process.env.OT_SENTRY_DSN,
         _OPENTRONS_PROJECT_: JSON.stringify(project),
+        _PKG_BUGS_URL_: JSON.stringify(pkg.bugs.url),
+        _PKG_PRODUCT_NAME_: JSON.stringify(pkg.productName),
+        _PKG_VERSION_: JSON.stringify(version),
       },
       resolve: {
         alias: {

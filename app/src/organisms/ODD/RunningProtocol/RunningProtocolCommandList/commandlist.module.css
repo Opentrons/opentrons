@@ -1,0 +1,56 @@
+.container {
+  display: flex;
+  height: 29.5rem;
+  flex-direction: column;
+  gap: var(--spacing-40);
+}
+
+.command_list_container {
+  position: relative;
+  display: flex;
+  overflow: hidden;
+  height: 20.25rem;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.command_row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-12);
+}
+
+.command_content {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  padding: var(--spacing-12) var(--spacing-24);
+  border-radius: var(--border-radius-8);
+  font-size: 1.375rem;
+  font-weight: var(--font-weight-regular);
+  gap: 0.875rem;
+  line-height: 1.75rem;
+}
+
+.current_command {
+  background-color: var(--blue-35);
+}
+
+.regular_command {
+  background-color: var(--grey-35);
+}
+
+.command_text {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  font-size: var(--font-size-22);
+  font-weight: var(--font-weight-regular);
+  -webkit-line-clamp: 2;
+  line-height: var(--line-height-28);
+}
+
+.command_num {
+  min-width: var(--spacing-16);
+  height: 1.75rem;
+}

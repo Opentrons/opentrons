@@ -1201,6 +1201,9 @@ def test_get_highest_z_in_slot_with_single_module(
             addressable_areas=mock_addressable_area_view,
         )
     ).then_return(12345)
+    decoy.when(mock_module_view.is_column_4_module(module_in_slot.model)).then_return(
+        False
+    )
 
     assert (
         subject.get_highest_z_in_slot(DeckSlotLocation(slotName=DeckSlotName.SLOT_3))
@@ -1358,6 +1361,9 @@ def test_get_highest_z_in_slot_with_labware_stack_on_module(
             "magneticModuleV2Slot3"
         )
     ).then_return(Point(11, 22, 33))
+    decoy.when(mock_module_view.is_column_4_module(module_on_slot.model)).then_return(
+        False
+    )
 
     expected_highest_z = 33 + 1000 + 3 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z
 

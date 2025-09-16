@@ -332,7 +332,7 @@ export const LabwareCreator = (props: LabwareCreatorProps): JSX.Element => {
   )
 
   React.useEffect(() => {
-    if (process.env.NODE_ENV === 'production') {
+    if (_NODE_ENV_ === 'production') {
       // NOTE: the contents of this message will be overridden by modern browsers
       window.onbeforeunload = () =>
         'Are you sure you want to leave? You may have unsaved changes.'

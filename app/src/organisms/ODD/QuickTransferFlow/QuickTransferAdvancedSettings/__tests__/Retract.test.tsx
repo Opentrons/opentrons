@@ -98,6 +98,12 @@ describe('Retract', () => {
     screen.getByText('Save')
   })
   it('calls dispatch with correct action and settings when save is clicked', () => {
+    props.state.retractAspirate = {
+      speed: 0,
+      delayDuration: 0,
+      position: 0,
+      positionReference: 'well-bottom',
+    }
     render(props)
     fireEvent.click(screen.getByRole('button', { name: '1' }))
     fireEvent.click(screen.getByRole('button', { name: '1' }))
@@ -114,7 +120,8 @@ describe('Retract', () => {
       retractSettings: {
         speed: 11,
         delayDuration: 0.5,
-        positionFromBottom: 22,
+        position: 22,
+        positionReference: 'well-bottom',
       },
     })
   })

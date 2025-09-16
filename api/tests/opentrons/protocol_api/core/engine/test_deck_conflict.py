@@ -749,6 +749,19 @@ module = LoadedModule(
             ),
             170,
         ),
+        (
+            (
+                Point(x=150, y=250, z=40),
+                Point(x=250, y=201, z=40),
+                Point(x=150, y=201, z=40),
+                Point(x=250, y=250, z=40),
+            ),
+            pytest.raises(
+                pipette_movement_conflict.PartialTipMovementNotAllowedError,
+                match="result in collision with items on flexStackerModuleV1 mounted in B3.",
+            ),
+            170,
+        ),
     ],
 )
 def test_deck_conflict_raises_for_bad_pipette_move(
@@ -766,6 +779,8 @@ def test_deck_conflict_raises_for_bad_pipette_move(
     - we are checking for conflicts when moving to a labware in C2.
       For each test case, we are moving to a different point in the destination labware,
       with the same pipette and tip
+    - we are checking for conflicts when moving to a point that would collide with a
+      flex stacker in column 4 at position B4 but nothing in the ancestor slot of B3
 
     Note: this test does not stub out the slot overlap checker function
           in order to preserve readability of the test. That means the test does
@@ -842,6 +857,24 @@ def test_deck_conflict_raises_for_bad_pipette_move(
         )
     ).then_return(pipette_bounds)
 
+    stacker = LoadedModule(
+        id="fake-stacker-id",
+        model=ModuleModel.FLEX_STACKER_MODULE_V1,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_B3),
+        serialNumber="serial-number",
+    )
+    decoy.when(mock_state_view.modules.get_by_slot(DeckSlotName.SLOT_B3)).then_return(
+        stacker
+    )
+    decoy.when(mock_state_view.modules.is_column_4_module(stacker.model)).then_return(
+        True
+    )
+    decoy.when(
+        mock_state_view.modules.ensure_and_convert_module_fixture_location(
+            DeckSlotName.SLOT_B3, stacker.model
+        )
+    ).then_return("flexStackerModuleV1B4")
+
     decoy.when(
         adjacent_slots_getters.get_surrounding_slots(5, robot_type="OT-3 Standard")
     ).then_return(
@@ -850,6 +883,7 @@ def test_deck_conflict_raises_for_bad_pipette_move(
                 DeckSlotName.SLOT_D1,
                 DeckSlotName.SLOT_D2,
                 DeckSlotName.SLOT_C1,
+                DeckSlotName.SLOT_B3,
             ],
             staging_slots=[StagingSlotName.SLOT_C4],
         )
@@ -887,6 +921,38 @@ def test_deck_conflict_raises_for_bad_pipette_move(
         mock_state_view.geometry.get_highest_z_in_slot(
             StagingSlotLocation(slotName=StagingSlotName.SLOT_C4)
         )
+    ).then_return(50)
+    decoy.when(
+        mock_state_view.addressable_areas.get_addressable_area_position(
+            addressable_area_name="B3", do_compatibility_check=False
+        )
+    ).then_return(Point(150, 200, 0))
+    decoy.when(
+        mock_state_view.addressable_areas.get_addressable_area_bounding_box(
+            addressable_area_name="B3", do_compatibility_check=False
+        )
+    ).then_return(Dimensions(90, 90, 0))
+
+    # Ensure slot B3 is empty so we can test the stacker
+    decoy.when(
+        mock_state_view.geometry.get_highest_z_in_slot(
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_B3)
+        )
+    ).then_return(0)
+
+    decoy.when(
+        mock_state_view.addressable_areas.get_addressable_area_position(
+            addressable_area_name="flexStackerModuleV1B4", do_compatibility_check=False
+        )
+    ).then_return(Point(200, 200, 0))
+    decoy.when(
+        mock_state_view.addressable_areas.get_addressable_area_bounding_box(
+            addressable_area_name="flexStackerModuleV1B4", do_compatibility_check=False
+        )
+    ).then_return(Dimensions(90, 90, 0))
+
+    decoy.when(
+        mock_state_view.geometry.get_highest_z_of_column_4_module(stacker)
     ).then_return(50)
     for slot_name in [DeckSlotName.SLOT_C1, DeckSlotName.SLOT_D1, DeckSlotName.SLOT_D2]:
         decoy.when(
