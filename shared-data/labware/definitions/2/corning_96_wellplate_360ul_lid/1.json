@@ -14,7 +14,7 @@
   "dimensions": {
     "xDimension": 127,
     "yDimension": 85,
-    "zDimension": 10
+    "zDimension": 9
   },
   "wells": {},
   "groups": [
@@ -51,6 +51,11 @@
       "y": 0,
       "z": 6.5
     },
+    "corning_96_wellplate_360ul_lid": {
+      "x": 0,
+      "y": 0,
+      "z": 1
+    },
     "opentrons_flex_deck_riser": {
       "x": 0,
       "y": 0,
@@ -66,7 +71,8 @@
   "compatibleParentLabware": [
     "protocol_engine_lid_stack_object",
     "opentrons_flex_deck_riser",
-    "corning_96_wellplate_360ul_flat"
+    "corning_96_wellplate_360ul_flat",
+    "corning_96_wellplate_360ul_lid"
   ],
   "gripForce": 10,
   "gripHeightFromLabwareBottom": 7,
