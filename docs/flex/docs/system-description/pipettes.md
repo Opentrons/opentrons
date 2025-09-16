@@ -35,7 +35,7 @@ Opentrons Flex pipettes are designed to handle a wide range of liquid volumes an
 !!!note
     You *do not* have to calibrate the volume that your pipettes dispense before use. You only have to perform positional calibration. See [Pipette calibration](pipettes.md#pipette-calibration) below, as well as the [Pipette Installation section][pipette-installation] of the Installation and Relocation chapter, for details.
 
-The following tables list the accuracy and precision specifications for Opentrons Flex 1-, 8-, and 96-channel pipettes.
+The following tables list the accuracy and precision specifications for Opentrons Flex pipettes.
 
 
 ### 1-channel pipette specifications
