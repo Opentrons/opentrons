@@ -517,7 +517,7 @@ class ProtocolCore(
                     lid_id = lid.id
                 else:
                     raise ValueError(
-                        f"Cannot move a lid off of a labware with no lid. {labware.get_display_name()}"
+                        f"Cannot move a lid off of {labware.get_display_name()} because it has no lid."
                     )
 
         _pick_up_offset = (
