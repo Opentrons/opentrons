@@ -1,11 +1,21 @@
-import { Btn, VIEWPORT } from '@opentrons/components'
+import {
+  _CENTER,
+  ALIGN_CENTER,
+  ALIGNPrimaryButton,
+  Btn,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  PrimaryButton,
+  SecondaryButton,
+  VIEWPORT,
+} from '@opentrons/components'
 
 import { OverlayModal } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof OverlayModal> = {
-  title: 'PD/organisms/OverlayModal',
+  title: 'PROTOCOL_DESIGNER/organisms/OverlayModal',
   component: OverlayModal,
   argTypes: {
     header: {
@@ -36,7 +46,12 @@ export const PrimaryOverlayModal: Story = {
   args: {
     header: 'header',
     subText: 'subText',
-    children: <Btn>Button</Btn>,
+    children: (
+      <Flex alignItems={ALIGN_CENTER}>
+        <SecondaryButton>cancel</SecondaryButton>
+        <PrimaryButton>continue</PrimaryButton>
+      </Flex>
+    ),
     handleCancel: () => {},
     handleContinue: () => {},
   },

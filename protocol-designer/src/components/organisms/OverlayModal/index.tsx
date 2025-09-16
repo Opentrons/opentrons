@@ -6,6 +6,7 @@ import {
   ALIGN_CENTER,
   Check,
   COLORS,
+  DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   Modal,
@@ -44,20 +45,35 @@ export function OverlayModal(props: OverlayModalProps): JSX.Element {
   return createPortal(
     <Modal
       marginLeft="0"
-      type="warning"
+      zIndexOverlay={15}
       width="100%"
       height="100%"
-      zIndexOverlay={15}
-      title={header}
-      onClose={onCancelClick}
-      footer={
-        <Flex
-          alignItems={ALIGN_CENTER}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-        ></Flex>
-      }
+      hasHeader={false}
+      backgroundColor={COLORS.transparentBlack90}
+      showOverlay={true}
     >
-      {children}
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        alignItems={ALIGN_CENTER}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        gridGap={SPACING.spacing16}
+      >
+        <StyledText desktopStyle="headingLargeBold" oddStyle="level4HeaderBold">
+          {header}
+        </StyledText>
+        {subText != null ? (
+          <StyledText
+            desktopStyle="bodyLargeRegular"
+            oddStyle="bodyTextRegular"
+            color={COLORS.grey60}
+          >
+            {subText}
+          </StyledText>
+        ) : null}
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+          {children}
+        </Flex>
+      </Flex>
     </Modal>,
     getMainPagePortalEl()
   )
