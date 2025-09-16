@@ -298,6 +298,10 @@ def parse_github_event_context(  # noqa: C901
             # Default to sandbox for unrecognized tags
             environment = "sandbox"
             sandbox_prefix = ref_name
+    elif event_name == "workflow_dispatch":
+        # Manual workflow dispatch - treat as branch push to sandbox
+        environment = "sandbox"
+        sandbox_prefix = ref_name
     else:
         raise ValueError(f"No deployment configuration found for event: {event_name}, ref: {ref}")
 
