@@ -18,6 +18,7 @@ from opentrons.hardware_control.modules.types import (
     SpeedStatus,
 )
 from .labware import LabwareCoreType, AbstractLabware
+from .tasks import AbstractTaskCore
 from opentrons.protocol_engine.types import ABSMeasureMode
 from opentrons.types import DeckSlotName
 
@@ -59,7 +60,7 @@ class AbstractTemperatureModuleCore(
         """Get the module's unique hardware serial number."""
 
     @abstractmethod
-    def set_target_temperature(self, celsius: float) -> None:
+    def set_target_temperature(self, celsius: float) -> AbstractTaskCore:
         """Set the Temperature Module's target temperature in °C."""
 
     @abstractmethod

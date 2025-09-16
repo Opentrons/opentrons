@@ -10,7 +10,7 @@ from ...errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state.state import StateView
-    from opentrons.protocol_engine.execution import EquipmentHandler
+    from opentrons.protocol_engine.execution import EquipmentHandler, TaskHandler
 
 SetTargetTemperatureCommandType = Literal["temperatureModule/setTargetTemperature"]
 
@@ -20,6 +20,9 @@ class SetTargetTemperatureParams(BaseModel):
 
     moduleId: str = Field(..., description="Unique ID of the Temperature Module.")
     celsius: float = Field(..., description="Target temperature in °C.")
+    taskId: str | None = Field(
+        None, description="Id for the background task that manages the temperature"
+    )
 
 
 class SetTargetTemperatureResult(BaseModel):
@@ -29,6 +32,9 @@ class SetTargetTemperatureResult(BaseModel):
         ...,
         description="The target temperature that was set after validation "
         "and type conversion (if any).",
+    )
+    taskId: str = Field(
+        ..., description="The task id for the setTargetTemperature task"
     )
 
 
@@ -43,10 +49,12 @@ class SetTargetTemperatureImpl(
         self,
         state_view: StateView,
         equipment: EquipmentHandler,
+        task_handler: TaskHandler,
         **unused_dependencies: object,
     ) -> None:
         self._state_view = state_view
         self._equipment = equipment
+        self._task_handler = task_handler
 
     async def execute(
         self, params: SetTargetTemperatureParams
@@ -56,19 +64,33 @@ class SetTargetTemperatureImpl(
         module_substate = self._state_view.modules.get_temperature_module_substate(
             module_id=params.moduleId
         )
-
         # Verify temperature from temperature module view
         validated_temp = module_substate.validate_target_temperature(params.celsius)
-
         # Allow propagation of ModuleNotAttachedError.
         temp_hardware_module = self._equipment.get_module_hardware_api(
             module_substate.module_id
         )
 
-        if temp_hardware_module is not None:
-            await temp_hardware_module.start_set_temperature(celsius=validated_temp)
+        async def start_set_temperature(task_handler: TaskHandler) -> None:
+            if temp_hardware_module is not None:
+                async with task_handler.synchronize_cancel_previous(
+                    module_substate.module_id
+                ):
+                    await temp_hardware_module.start_set_temperature(
+                        celsius=validated_temp
+                    )
+                    await temp_hardware_module.await_temperature(
+                        awaiting_temperature=validated_temp
+                    )
+
+        task = await self._task_handler.create_task(
+            task_function=start_set_temperature, id=params.taskId
+        )
+
         return SuccessData(
-            public=SetTargetTemperatureResult(targetTemperature=validated_temp),
+            public=SetTargetTemperatureResult(
+                targetTemperature=validated_temp, taskId=task.id
+            ),
         )
 
 
