@@ -81,7 +81,8 @@ export const initializeSentry = (): void => {
         // Filter out network/fetch errors.
         if (
           errorMessage.includes('Failed to fetch') ||
-          errorMessage.includes('Failed to load resource')
+          errorMessage.includes('Failed to load resource') ||
+          errorMessage.includes('ERR_INTERNET_DISCONNECTED')
         ) {
           return null
         }
