@@ -440,7 +440,7 @@ export function generateQuickTransferArgs(
         ? quickTransferState.liquidClassName
         : null,
     aspiratePositionReference: POSITION_REFERENCE_BOTTOM,
-    aspirateZOffset: 0,
+    aspirateZOffset: quickTransferState.tipPositionAspirate,
     aspirateSubmergeSpeed: null,
     aspirateSubmergeXOffset: 0,
     aspirateSubmergeYOffset: 0,
@@ -454,7 +454,7 @@ export function generateQuickTransferArgs(
     aspirateRetractPositionReference: POSITION_REFERENCE_BOTTOM,
     aspirateRetractDelay: null,
     dispensePositionReference: POSITION_REFERENCE_BOTTOM,
-    dispenseZOffset: 0,
+    dispenseZOffset: quickTransferState.tipPositionDispense,
     dispenseSubmergeSpeed: null,
     dispenseSubmergeXOffset: 0,
     dispenseSubmergeYOffset: 0,
