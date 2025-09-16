@@ -16,8 +16,6 @@ interface ElectronRendererOptions {
   release?: string
   environment?: string
   tracesSampleRate?: number
-  replaysSessionSampleRate?: number
-  replaysOnErrorSampleRate?: number
 }
 
 export const initializeSentry = (isAnalyticsEnabled: boolean): void => {

@@ -147,7 +147,6 @@ function getOrCreateHandlerSet(window: BrowserWindow): HandlerSet | null {
 
 function startUp(): void {
   log.info('Starting App')
-
   process.on('uncaughtException', error => log.error('Uncaught: ', { error }))
   process.on('unhandledRejection', reason =>
     log.error('Uncaught Promise rejection: ', { reason })
@@ -224,7 +223,7 @@ function installDevtools(): Promise<Logger> {
   if (typeof install === 'function') {
     return install(extensions, {
       loadExtensionOptions: { allowFileAccess: true },
-      forceReinstall,
+      forceDownload: forceReinstall,
     })
       .then(() => log.debug('Devtools extensions installed'))
       .catch((error: unknown) => {

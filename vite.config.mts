@@ -65,7 +65,7 @@ export default defineConfig({
     _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
     _OT_AI_CLIENT_MIXPANEL_ID_: JSON.stringify(process.env.OT_AI_CLIENT_MIXPANEL_ID),
     _OT_APP_MIXPANEL_ID_: JSON.stringify(process.env.OT_APP_MIXPANEL_ID),
-    _OT_SENTRY_DSN_: process.env.OT_SENTRY_DSN,
+    _OT_SENTRY_DSN_: JSON.stringify(process.env.OT_SENTRY_DSN),
     _OT_LL_MIXPANEL_DEV_ID_: JSON.stringify(process.env.OT_LL_MIXPANEL_DEV_ID),
     _OT_LL_MIXPANEL_ID_: JSON.stringify(process.env.OT_LL_MIXPANEL_ID),
     _OT_PD_BUILD_DATE_: JSON.stringify(process.env.OT_PD_BUILD_DATE),

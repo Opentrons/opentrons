@@ -37,7 +37,6 @@ export default defineConfig(
           },
         }),
         cssModuleSideEffect(),
-        // We have two sentry vite plugins, one for each project.
         sentryVitePlugin({
           org: 'opentrons-sw',
           project: buildTarget === 'desktop' ? 'app' : 'odd',
@@ -76,7 +75,7 @@ export default defineConfig(
         global: 'globalThis',
         _PKG_VERSION_: JSON.stringify(version),
         _OPENTRONS_PROJECT_: JSON.stringify(project),
-        _OT_SENTRY_DSN_: process.env.OT_SENTRY_DSN,
+        _OT_SENTRY_DSN_: JSON.stringify(process.env.OT_SENTRY_DSN),
         _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
         _OT_APP_MIXPANEL_ID_: JSON.stringify(process.env.OT_APP_MIXPANEL_ID),
       },
