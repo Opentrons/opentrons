@@ -505,7 +505,7 @@ export function InputPrompt(): JSX.Element {
 }
 
 const getChatEndpoint = (): string => {
-  switch (process.env.NODE_ENV) {
+  switch (_NODE_ENV_) {
     case 'production':
       return PROD_END_POINT
     case 'development':
@@ -516,7 +516,7 @@ const getChatEndpoint = (): string => {
 }
 
 const getCreateEndpoint = (): string => {
-  switch (process.env.NODE_ENV) {
+  switch (_NODE_ENV_) {
     case 'production':
       return PROD_CREATE_PROTOCOL_END_POINT
     case 'development':
@@ -527,7 +527,7 @@ const getCreateEndpoint = (): string => {
 }
 
 const getUpdateEndpoint = (): string => {
-  switch (process.env.NODE_ENV) {
+  switch (_NODE_ENV_) {
     case 'production':
       return PROD_UPDATE_PROTOCOL_END_POINT
     case 'development':

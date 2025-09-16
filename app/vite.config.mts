@@ -51,14 +51,12 @@ export default defineConfig(
         },
       },
       define: {
-        'process.env': {
-          NODE_ENV: process.env.NODE_ENV,
-          OT_APP_MIXPANEL_ID: process.env.OT_APP_MIXPANEL_ID,
-          OPENTRONS_PROJECT: process.env.OPENTRONS_PROJECT,
-        },
+        // NOTE: For security, only include environment variables here if they're explicitly allowlisted.
         global: 'globalThis',
         _PKG_VERSION_: JSON.stringify(version),
         _OPENTRONS_PROJECT_: JSON.stringify(project),
+        _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
+        _OT_APP_MIXPANEL_ID_: JSON.stringify(process.env.OT_APP_MIXPANEL_ID),
       },
       resolve: {
         alias: {

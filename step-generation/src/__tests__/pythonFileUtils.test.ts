@@ -71,6 +71,7 @@ describe('pythonMetadata', () => {
         subcategory: 'PCR Prep',
         tags: ['wombat', 'kangaroo', 'wallaby'],
         source: 'Protocol Designer',
+        protocolDesigner: 'fake_PD_version',
       })
     ).toBe(
       `
