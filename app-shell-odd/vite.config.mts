@@ -59,15 +59,13 @@ export default defineConfig(
         },
       },
       define: {
-        'process.env': {
-          NODE_ENV: process.env.NODE_ENV,
-          OPENTRONS_PROJECT: process.env.OPENTRONS_PROJECT,
-        },
+        // NOTE: For security, only include environment variables here if they're explicitly allowlisted.
         global: 'globalThis',
-        _PKG_VERSION_: JSON.stringify(version),
-        _PKG_PRODUCT_NAME_: JSON.stringify(pkg.productName),
-        _PKG_BUGS_URL_: JSON.stringify(pkg.bugs.url),
+        _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
         _OPENTRONS_PROJECT_: JSON.stringify(project),
+        _PKG_BUGS_URL_: JSON.stringify(pkg.bugs.url),
+        _PKG_PRODUCT_NAME_: JSON.stringify(pkg.productName),
+        _PKG_VERSION_: JSON.stringify(version),
       },
       resolve: {
         alias: {
