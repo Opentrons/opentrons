@@ -503,5 +503,7 @@ def run(protocol: ProtocolContext) -> None:
 
     except Exception as e:
         if not protocol.is_simulating():
-            slack_bot.send_error_message(metadata["protocolName"], str(e))
+            helpers.send_slack_error_message_with_log(
+                slack_bot, metadata["protocolName"], str(e)
+            )
         raise (e)
