@@ -280,7 +280,7 @@ class Thermocycler(mod_abc.AbstractModule):
         if version_string.startswith("v"):
             version_string = version_string[1:]
         try:
-            version_tuple = tuple(int(c) for c in version_string[1:].split("."))
+            version_tuple = tuple(int(c) for c in version_string.split("."))
             return version_tuple >= _TC_RAMP_RATE_ADDED_VERSION
         except (ValueError, IndexError):
             log.error(
