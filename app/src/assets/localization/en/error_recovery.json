@@ -155,6 +155,7 @@
   "stacker_shuttle_full": "Stacker shuttle full",
   "stacker_shuttle_missing_error_occurs_when": "Stacker shuttle missing errors occur when the shuttle is not placed correctly on the track",
   "stacker_stall_or_collision_error": "Stacker stalled",
+  "stacker_shuttle_store_empty": "Shuttle empty",
   "stacker_what_is_wrong": "What is wrong with the Stacker?",
   "stall_or_collision_detected_when": "A stall or collision is detected when the robot's motors are blocked",
   "stall_or_collision_error": "Stall or collision",

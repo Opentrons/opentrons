@@ -2,6 +2,7 @@ import { RECOVERY_MAP } from '../constants'
 import {
   SkipStepInfo,
   StackerEnsureShuttleEmpty,
+  StackerHomeShuttle,
   StackerHopperLwInfo,
 } from '../shared'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
@@ -16,6 +17,8 @@ export function StackerShuttleEmptyStoreSkip(
   const { STACKER_SHUTTLE_EMPTY_STORE_SKIP } = RECOVERY_MAP
 
   switch (step) {
+    case STACKER_SHUTTLE_EMPTY_STORE_SKIP.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS:
+      return <StackerHomeShuttle {...props} />
     case STACKER_SHUTTLE_EMPTY_STORE_SKIP.STEPS.CHECK_HOPPER:
       return <StackerHopperLwInfo {...props} />
     case STACKER_SHUTTLE_EMPTY_STORE_SKIP.STEPS.ENSURE_SHUTTLE_EMPTY:
