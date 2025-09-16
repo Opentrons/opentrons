@@ -519,3 +519,17 @@ async def test_async_error_response_to_poller(
             "dummySerialTC",
         )
     )
+
+
+def test_can_use_ramp_rate(subject: modules.Thermocycler) -> None:
+    """It should handle various malformed versions without failing."""
+    subject._device_info["version"] = "1.0.9"
+    assert subject.can_use_ramp_rate()
+    subject._device_info["version"] = "1.0.7"
+    assert subject.can_use_ramp_rate() is False
+    subject._device_info["version"] = "asdasvasd"
+    assert subject.can_use_ramp_rate() is False
+    subject._device_info["version"] = ""
+    assert subject.can_use_ramp_rate() is False
+    del subject._device_info["version"]
+    assert subject.can_use_ramp_rate() is False
