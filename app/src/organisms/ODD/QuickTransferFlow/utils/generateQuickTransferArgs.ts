@@ -446,17 +446,23 @@ export function generateQuickTransferArgs(
     aspirateSubmergeYOffset: 0,
     aspirateSubmergeZOffset: quickTransferState.submergeAspirate?.position ?? 0,
     aspirateSubmergePositionReference:
-      quickTransferState.submergeAspirate?.positionReference ?? undefined,
+      quickTransferState.submergeAspirate?.positionReference ??
+      POSITION_REFERENCE_BOTTOM,
     aspirateSubmergeDelay:
-      quickTransferState.submergeAspirate?.delayDuration ?? 0,
+      quickTransferState.submergeAspirate?.delayDuration != null
+        ? { seconds: quickTransferState.submergeAspirate.delayDuration }
+        : null,
     aspirateRetractSpeed: quickTransferState.retractAspirate?.speed ?? 0,
     aspirateRetractXOffset: 0,
     aspirateRetractYOffset: 0,
     aspirateRetractZOffset: quickTransferState.retractAspirate?.position ?? 0,
     aspirateRetractPositionReference:
-      quickTransferState.retractAspirate?.positionReference ?? undefined,
+      quickTransferState.retractAspirate?.positionReference ??
+      POSITION_REFERENCE_BOTTOM,
     aspirateRetractDelay:
-      quickTransferState.retractAspirate?.delayDuration ?? 0,
+      quickTransferState.retractAspirate?.delayDuration != null
+        ? { seconds: quickTransferState.retractAspirate.delayDuration }
+        : null,
     dispensePositionReference: POSITION_REFERENCE_BOTTOM,
     dispenseZOffset: quickTransferState.tipPositionDispense,
     dispenseSubmergeSpeed: quickTransferState.submergeDispense?.speed ?? 0,
@@ -464,17 +470,23 @@ export function generateQuickTransferArgs(
     dispenseSubmergeYOffset: 0,
     dispenseSubmergeZOffset: quickTransferState.submergeDispense?.position ?? 0,
     dispenseSubmergePositionReference:
-      quickTransferState.submergeDispense?.positionReference ?? undefined,
+      quickTransferState.submergeDispense?.positionReference ??
+      POSITION_REFERENCE_BOTTOM,
     dispenseSubmergeDelay:
-      quickTransferState.submergeDispense?.delayDuration ?? 0,
+      quickTransferState.submergeDispense?.delayDuration != null
+        ? { seconds: quickTransferState.submergeDispense.delayDuration }
+        : null,
     dispenseRetractSpeed: quickTransferState.retractDispense?.speed ?? 0,
     dispenseRetractXOffset: 0,
     dispenseRetractYOffset: 0,
     dispenseRetractZOffset: quickTransferState.retractDispense?.position ?? 0,
     dispenseRetractPositionReference:
-      quickTransferState.retractDispense?.positionReference ?? undefined,
+      quickTransferState.retractDispense?.positionReference ??
+      POSITION_REFERENCE_BOTTOM,
     dispenseRetractDelay:
-      quickTransferState.retractDispense?.delayDuration ?? null,
+      quickTransferState.retractDispense?.delayDuration != null
+        ? { seconds: quickTransferState.retractDispense.delayDuration }
+        : null,
     touchTipAfterAspirateMmFromEdge: null,
     touchTipAfterDispenseMmFromEdge: null,
   }
