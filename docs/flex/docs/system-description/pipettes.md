@@ -72,7 +72,7 @@ Flex 1-channel pipettes meet the following accuracy and precision specifications
       <td>0.40%</td>
     </tr>
     <tr>
-      <td rowspan="4"><b>1-1000 µL</td>
+      <td rowspan="4"><b>1-1000 µL</b></td>
       <td>50 µL</td>
       <td>5 µL</td>
       <td>± 5.00%</td>
@@ -176,7 +176,8 @@ Flex 96-channel pipettes meet the following accuracy and precision specification
     </tr>
   </thead>
   <tbody>
-    <td rowspan="4"><b>1-200 µL</b></td>
+    <tr>
+      <td rowspan="4"><b>1-200 µL</b></td>
       <td>50 µL</td>
       <td>1 µL</td>
       <td>± 10%</td>
