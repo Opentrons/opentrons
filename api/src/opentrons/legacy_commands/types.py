@@ -102,6 +102,10 @@ ROBOT_MOVE_RELATIVE_TO: Final = "command.ROBOT_MOVE_RELATIVE_TO"
 ROBOT_OPEN_GRIPPER_JAW: Final = "command.ROBOT_OPEN_GRIPPER_JAW"
 ROBOT_CLOSE_GRIPPER_JAW: Final = "command.ROBOT_CLOSE_GRIPPER_JAW"
 
+# Tasks #
+WAIT_FOR_TASKS: Final = "command.WAIT_FOR_TASKS"
+CREATE_TIMER: Final = "command.CREATE_TIMER"
+
 
 class TextOnlyPayload(TypedDict):
     text: str
@@ -714,6 +718,27 @@ class RobotCloseGripperJawCommand(TypedDict):
     payload: GripperCommandPayload
 
 
+# Task Commands and Payloads
+
+
+class WaitForTasksPayload(TextOnlyPayload):
+    pass
+
+
+class CreateTimerPayload(TextOnlyPayload):
+    time: float
+
+
+class WaitForTasksCommand(TypedDict):
+    name: Literal["command.WAIT_FOR_TASKS"]
+    payload: WaitForTasksPayload
+
+
+class CreateTimerCommand(TypedDict):
+    name: Literal["command.CREATE_TIMER"]
+    payload: CreateTimerPayload
+
+
 Command = Union[
     DropTipCommand,
     DropTipInDisposalLocationCommand,
@@ -782,6 +807,9 @@ Command = Union[
     FlexStackerStoreCommand,
     FlexStackerEmptyCommand,
     FlexStackerFillCommand,
+    # Task commands
+    WaitForTasksCommand,
+    CreateTimerCommand,
 ]
 
 
@@ -842,6 +870,9 @@ CommandPayload = Union[
     RobotMoveAxisRelativeCommandPayload,
     RobotMoveAxisToCommandPayload,
     GripperCommandPayload,
+    # Task payloads
+    WaitForTasksPayload,
+    CreateTimerPayload,
 ]
 
 
@@ -1124,6 +1155,14 @@ class RobotCloseGripperJawMessage(CommandMessageFields, RobotCloseGripperJawComm
     pass
 
 
+class WaitForTasksMessage(CommandMessageFields, WaitForTasksCommand):
+    pass
+
+
+class CreateTimerMessage(CommandMessageFields, CreateTimerCommand):
+    pass
+
+
 CommandMessage = Union[
     DropTipMessage,
     DropTipInDisposalLocationMessage,
@@ -1183,4 +1222,7 @@ CommandMessage = Union[
     FlexStackerStoreMessage,
     FlexStackerEmptyMessage,
     FlexStackerFillMessage,
+    # Task Messages
+    WaitForTasksMessage,
+    CreateTimerMessage,
 ]

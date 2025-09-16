@@ -89,6 +89,7 @@ from .module_contexts import (
     FlexStackerContext,
     ModuleContext,
 )
+from .tasks import Task
 from ._parameters import Parameters
 
 
@@ -1285,6 +1286,30 @@ class ProtocolContext(CommandPublisher):
         """
         delay_time = seconds + minutes * 60
         self._core.delay(seconds=delay_time, msg=msg)
+
+    @publish(command=cmds.wait_for_tasks)
+    @requires_version(2, 27)
+    def wait_for_tasks(self, tasks: list[Task]) -> None:
+        """Wait for a list of tasks to complete before executing subsequent commands.
+
+        :param list Task: tasks: A list of Task objects to wait for.
+
+        Task objects can be commands that are allowed to run concurrently.
+        """
+        task_cores = [task._core for task in tasks]
+        self._core.wait_for_tasks(task_cores)
+
+    @publish(command=cmds.create_timer)
+    @requires_version(2, 27)
+    def create_timer(self, seconds: float) -> Task:
+        """Create a timer task that runs in the background.
+
+        :param float seconds: The time to delay in seconds.
+
+        This timer will continue to run until it is complete and will not block subsequent commands.
+        """
+        task_core = self._core.create_timer(seconds=seconds)
+        return Task(core=task_core, api_version=self._api_version)
 
     @requires_version(2, 0)
     def home(self) -> None:

@@ -57,6 +57,7 @@ from opentrons.protocol_api.core.common import (
     MagneticBlockCore,
     FlexStackerCore,
 )
+from opentrons.protocol_api.tasks import Task
 from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
 from opentrons.protocols.api_support.deck_type import (
     NoTrashDefinedError,
@@ -2008,6 +2009,33 @@ def test_home(
     """It should home all axes."""
     subject.home()
     decoy.verify(mock_core.home(), times=1)
+
+
+def test_wait_for_tasks(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    subject: ProtocolContext,
+) -> None:
+    """It should wait for all tasks to complete."""
+    task1 = decoy.mock(cls=Task)
+    task2 = decoy.mock(cls=Task)
+    decoy.when(task1._core).then_return(sentinel.task1_core)
+    decoy.when(task2._core).then_return(sentinel.task2_core)
+    subject.wait_for_tasks([task1, task2])
+    decoy.verify(
+        mock_core.wait_for_tasks([sentinel.task1_core, sentinel.task2_core]), times=1
+    )
+
+
+def test_create_timer(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    subject: ProtocolContext,
+) -> None:
+    """It should create a timer."""
+    decoy.when(mock_core.create_timer(seconds=0.1)).then_return(sentinel.task1_core)
+    result = subject.create_timer(seconds=0.1)
+    assert result._core is sentinel.task1_core
 
 
 def test_define_liquid(

@@ -87,6 +87,7 @@ from opentrons.protocol_api.core.engine.module_core import (
     HeaterShakerModuleCore,
     NonConnectedModuleCore,
 )
+from opentrons.protocol_api.core.engine.tasks import EngineTaskCore
 from opentrons.protocol_api import validation, MAX_SUPPORTED_VERSION
 
 from opentrons.protocols.api_support.types import APIVersion
@@ -1675,6 +1676,42 @@ def test_delay(
             cmd.WaitForDurationParams(seconds=seconds, message=message)
         )
     )
+
+
+def test_wait_for_tasks(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: ProtocolCore,
+) -> None:
+    """It should issue a waitForTasks command."""
+    task1 = decoy.mock(cls=EngineTaskCore)
+    task2 = decoy.mock(cls=EngineTaskCore)
+    tasks = [task1, task2]
+    task_ids = ["task-id-1", "task-id-2"]
+
+    decoy.when(task1._id).then_return(task_ids[0])
+    decoy.when(task2._id).then_return(task_ids[1])
+
+    subject.wait_for_tasks(task_cores=tasks)
+    decoy.verify(
+        mock_engine_client.execute_command(cmd.WaitForTasksParams(task_ids=task_ids))
+    )
+
+
+def test_create_timer(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: ProtocolCore,
+) -> None:
+    """It should issue a createTimer command."""
+    decoy.when(
+        mock_engine_client.execute_command_without_recovery(
+            cmd.CreateTimerParams(time=0.1)
+        )
+    ).then_return(cmd.CreateTimerResult(task_id="taskid", time=0.1))
+    result = subject.create_timer(seconds=0.1)
+    assert result._id == "taskid"
+    assert result._engine_client == mock_engine_client
 
 
 def test_comment(
