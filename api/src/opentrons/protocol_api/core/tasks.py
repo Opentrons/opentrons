@@ -1,5 +1,6 @@
 from abc import abstractmethod, ABC
 from datetime import datetime
+from typing import TypeVar
 
 
 class AbstractTaskCore(ABC):
@@ -25,3 +26,6 @@ class AbstractTaskCore(ABC):
         Returns ``None`` if the task hasn't finished yet.
         """
         ...
+
+
+TaskCoreType = TypeVar("TaskCoreType", bound=AbstractTaskCore)
