@@ -277,6 +277,8 @@ class Thermocycler(mod_abc.AbstractModule):
 
     def can_use_ramp_rate(self) -> bool:
         version_string = self._device_info.get("version", "v")
+        if version_string.startswith("v"):
+            version_string = version_string[1:]
         try:
             version_tuple = tuple(int(c) for c in version_string[1:].split("."))
             return version_tuple >= _TC_RAMP_RATE_ADDED_VERSION
