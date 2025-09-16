@@ -434,7 +434,7 @@ export function generateQuickTransferArgs(
     name: null,
     description: null,
     nozzles,
-    pushOut: null,
+    pushOut: quickTransferState.pushOutDispense?.volume ?? 0,
     liquidClass:
       quickTransferState.liquidClassName !== 'none'
         ? quickTransferState.liquidClassName
