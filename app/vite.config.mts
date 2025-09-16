@@ -40,7 +40,7 @@ export default defineConfig(
         // We have two sentry vite plugins, one for each project.
         sentryVitePlugin({
           org: 'opentrons-sw',
-          project: buildTarget === 'desktop' ? 'desktop-electron' : 'odd-electron',
+          project: buildTarget === 'desktop' ? 'app' : 'odd',
           authToken: process.env.OT_SENTRY_AUTH_TOKEN,
           telemetry: false,
           reactComponentAnnotation: {

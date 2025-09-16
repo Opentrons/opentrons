@@ -36,7 +36,7 @@ export default defineConfig(
       plugins: [
         sentryVitePlugin({
           org: 'opentrons-sw',
-          project: 'desktop-electron',
+          project: 'app',
           authToken: process.env.OT_SENTRY_AUTH_TOKEN,
           telemetry: false,
           sourcemaps: {

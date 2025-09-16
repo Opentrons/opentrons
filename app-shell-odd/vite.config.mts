@@ -46,7 +46,7 @@ export default defineConfig(
         }),
         sentryVitePlugin({
           org: 'opentrons-sw',
-          project: 'odd-electron',
+          project: 'odd',
           authToken: process.env.OT_SENTRY_AUTH_TOKEN,
           telemetry: false,
           sourcemaps: {
