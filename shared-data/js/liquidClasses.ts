@@ -1,11 +1,11 @@
-import ethanol80V1Uncasted from '../liquid-class/definitions/1/ethanol_80/2.json'
-import glycerol50V1Uncasted from '../liquid-class/definitions/1/glycerol_50/2.json'
+import ethanol80V2Uncasted from '../liquid-class/definitions/1/ethanol_80/2.json'
+import glycerol50V2Uncasted from '../liquid-class/definitions/1/glycerol_50/2.json'
 import waterV2Uncasted from '../liquid-class/definitions/1/water/2.json'
 
 import type { LiquidClass } from '.'
 
-const ethanol80V2 = ethanol80V1Uncasted as LiquidClass
-const glycerol50V2 = glycerol50V1Uncasted as LiquidClass
+const ethanol80V2 = ethanol80V2Uncasted as LiquidClass
+const glycerol50V2 = glycerol50V2Uncasted as LiquidClass
 const waterV2 = waterV2Uncasted as LiquidClass
 
 export const WATER_LIQUID_CLASS_NAME_V2 = 'waterV2'
