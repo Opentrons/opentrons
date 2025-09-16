@@ -1,6 +1,7 @@
 import { RECOVERY_MAP } from '../constants'
 import {
   RetryStepInfo,
+  StackerHomeShuttle,
   StackerHopperLwInfo,
   StackerShuttleLwInfo,
 } from '../shared'
@@ -16,6 +17,8 @@ export function StackerShuttleEmptyStoreRetry(
   const { STACKER_SHUTTLE_EMPTY_STORE_RETRY } = RECOVERY_MAP
 
   switch (step) {
+    case STACKER_SHUTTLE_EMPTY_STORE_RETRY.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS:
+      return <StackerHomeShuttle {...props} />
     case STACKER_SHUTTLE_EMPTY_STORE_RETRY.STEPS.CHECK_HOPPER:
       return <StackerHopperLwInfo {...props} />
     case STACKER_SHUTTLE_EMPTY_STORE_RETRY.STEPS.PLACE_LABWARE_ON_SHUTTLE:
