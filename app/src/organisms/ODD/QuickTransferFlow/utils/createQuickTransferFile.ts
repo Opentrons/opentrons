@@ -39,7 +39,8 @@ const uuid: () => string = uuidv1
 export function createQuickTransferFile(
   quickTransferState: QuickTransferSummaryState,
   deckConfig: DeckConfiguration,
-  protocolName?: string
+  protocolName?: string,
+  enableProtocolContentsLog?: boolean
 ): File {
   const {
     stepArgs,
@@ -225,8 +226,11 @@ export function createQuickTransferFile(
     ...commandAnnotionaV1Mixin,
   })
 
-  console.log('protocolContents')
-  console.log(protocolContents)
+  if (enableProtocolContentsLog) {
+    console.log('===protocolContents start===')
+    console.log(protocolContents)
+    console.log('===protocolContents end===')
+  }
 
   return new File(
     [protocolContents],

@@ -18,6 +18,7 @@ export type DevInternalFlag =
   | 'reactScan'
   | 'quickTransferExportPython'
   | 'camera'
+  | 'protocolContentsLog'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
 
