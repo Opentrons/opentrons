@@ -32,12 +32,14 @@ Opentrons Flex pipettes are designed to handle a wide range of liquid volumes an
 !!!tip
     Refer to these tables when choosing tips for your pipette. For best results you should use the smallest tips that meet the needs of your protocol.
 
-### Flex 1-channel specifications
+### 1-channel pipette specifications
+
+Flex 1-channel pipettes meet the following accuracy and precision specifications.
 
 <table>
   <thead>
     <tr>
-      <th>Pipette</th>
+      <th>Pipette Capacity</th>
       <th>Tip Capacity</th>
       <th>Tested Volume</th>
       <th>Accuracy %D</th>
@@ -46,58 +48,60 @@ Opentrons Flex pipettes are designed to handle a wide range of liquid volumes an
   </thead>
   <tbody>
     <tr>
-      <td rowspan="3"><b>1-Channel<br>(1-50 µL)</b></td>
+      <td rowspan="3"><b>1-50 µL</b></td>
       <td>50 µL</td>
       <td>1 µL</td>
-      <td>8.00%</td>
+      <td>± 8.00%</td>
       <td>7.00%</td>
     </tr>
     <tr>
-      <td>50 µL</td>
-      <td>10 µL</td>
-      <td>1.50%</td>
+      <td>50 µL</td>
+      <td>10 µL</td>
+      <td>± 1.50%</td>
       <td>0.50%</td>
     </tr>
     <tr>
-      <td>50 µL</td>
-      <td>50 µL</td>
-      <td>1.25%</td>
+      <td>50 µL</td>
+      <td>50 µL</td>
+      <td>± 1.25%</td>
       <td>0.40%</td>
     </tr>
     <tr>
-      <td rowspan="4"><b>1-Channel<br>(1-1000 µL)</b></td>
-      <td>50 µL</td>
-      <td>5 µL</td>
-      <td>5.00%</td>
+      <td rowspan="4"><b>1-1000 µL</td>
+      <td>50 µL</td>
+      <td>5 µL</td>
+      <td>± 5.00%</td>
       <td>2.50%</td>
     </tr>
     <tr>
-      <td>50 µL</td>
-      <td>50 µL</td>
-      <td>0.50%</td>
+      <td>50 µL</td>
+      <td>50 µL</td>
+      <td>± 0.50%</td>
       <td>0.30%</td>
     </tr>
     <tr>
-      <td>200 µL</td>
-      <td>200 µL</td>
-      <td>0.50%</td>
+      <td>200 µL</td>
+      <td>200 µL</td>
+      <td>± 0.50%</td>
       <td>0.15%</td>
     </tr>
     <tr>
-      <td>1000 µL</td>
-      <td>1000 µL</td>
-      <td>0.50%</td>
+      <td>1000 µL</td>
+      <td>1000 µL</td>
+      <td>± 0.50%</td>
       <td>0.15%</td>
     </tr>
   </tbody>
 </table>
 
-### Flex 8-channel specifications
+### 8-channel pipette specifications
+
+Flex 8-channel pipettes meet the following accuracy and precision specifications.
 
 <table>
   <thead>
     <tr>
-      <th>Pipette</th>
+      <th>Pipette Capacity</th>
       <th>Tip Capacity</th>
       <th>Tested Volume</th>
       <th>Accuracy %D</th>
@@ -106,58 +110,60 @@ Opentrons Flex pipettes are designed to handle a wide range of liquid volumes an
   </thead>
   <tbody>
     <tr>
-      <td rowspan="3"><b>8-Channel<br>(1-50 µL)</b></td>
-      <td>50 µL</td>
-      <td>1 µL</td>
-      <td>10.00%</td>
+      <td rowspan="3"><b>1-50 µL</b></td>
+      <td>50 µL</td>
+      <td>1 µL</td>
+      <td>± 10.00%</td>
       <td>8.00%</td>
     </tr>
     <tr>
-      <td>50 µL</td>
-      <td>10 µL</td>
-      <td>2.50%</td>
+      <td>50 µL</td>
+      <td>10 µL</td>
+      <td>± 2.50%</td>
       <td>1.00%</td>
     </tr>
     <tr>
-      <td>50 µL</td>
-      <td>50 µL</td>
-      <td>1.25%</td>
+      <td>50 µL</td>
+      <td>50 µL</td>
+      <td>± 1.25%</td>
       <td>0.60%</td>
     </tr>
     <tr>
-      <td rowspan="4"><b>8-Channel<br>(1-1000 µL)</b></td>
-      <td>50 µL</td>
-      <td>5 µL</td>
-      <td>8.00%</td>
-      <td>4.00%</td>
+      <td rowspan="4"><b>1-1000 µL</b></td>
+      <td>50 µL</td>
+      <td>5 µL</td>
+      <td>± 8.00%</td>
+      <td>4%</td>
     </tr>
     <tr>
-      <td>50 µL</td>
-      <td>50 µL</td>
-      <td>2.50%</td>
+      <td>50 µL</td>
+      <td>50 µL</td>
+      <td>± 2.50%</td>
       <td>0.60%</td>
     </tr>
     <tr>
-      <td>200 µL</td>
-      <td>200 µL</td>
-      <td>1.00%</td>
+      <td>200 µL</td>
+      <td>200 µL</td>
+      <td>± 1.00%</td>
       <td>0.25%</td>
     </tr>
     <tr>
-      <td>1000 µL</td>
-      <td>1000 µL</td>
+      <td>1000 µL</td>
+      <td>1000 µL</td>
       <td>0.70%</td>
       <td>0.15%</td>
     </tr>
   </tbody>
 </table>
 
-### Flex 96-channel specifications
+### 96-channel pipette specifications
+
+Flex 96-channel pipettes meet the following accuracy and precision specifications.
 
 <table>
   <thead>
     <tr>
-      <th>Pipette</th>
+      <th>Pipette Capacity</th>
       <th>Tip Capacity</th>
       <th>Tested Volume</th>
       <th>Accuracy %D</th>
@@ -165,54 +171,54 @@ Opentrons Flex pipettes are designed to handle a wide range of liquid volumes an
     </tr>
   </thead>
   <tbody>
+    <td rowspan="4"><b>1-200 µL</b></td>
+      <td>50 µL</td>
+      <td>1 µL</td>
+      <td>± 10%</td>
+      <td>6%</td>
+    </tr>
     <tr>
-      <td rowspan="4"><b>96-Channel<br>(1-1000 µL)</b></td>
       <td>50 µL</td>
       <td>5 µL</td>
-      <td>10.00%</td>
-      <td>5.00%</td>
+      <td>± 4%</td>
+      <td>2 %</td>
     </tr>
     <tr>
       <td>50 µL</td>
       <td>50 µL</td>
-      <td>2.50%</td>
+      <td>± 1.5%</td>
+      <td>1%</td>
+    </tr>
+    <tr>
+      <td>200 µL</td>
+      <td>200 µL</td>
+      <td>± 1%</td>
+      <td>1%</td>
+    </tr>
+    <tr>
+      <td rowspan="4"><b>5-1000 µL</b></td>
+      <td>50 µL</td>
+      <td>5 µL</td>
+      <td>± 10%</td>
+      <td>5%</td>
+    </tr>
+    <tr>
+      <td>50 µL</td>
+      <td>50 µL</td>
+      <td>± 2.5%</td>
       <td>1.25%</td>
     </tr>
     <tr>
       <td>200 µL</td>
       <td>200 µL</td>
-      <td>1.50%</td>
+      <td>1.5%</td>
       <td>1.25%</td>
     </tr>
     <tr>
-      <td>1000 µL</td>
-      <td>1000 µL</td>
-      <td>1.50%</td>
-      <td>1.50%</td>
-    </tr>
-    <td rowspan="4"><b>96-Channel<br>(1-200 µL)</b></td>
-      <td> µL</td>
-      <td> µL</td>
-      <td></td>
-      <td></td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
+      <td>1000 µL</td>
+      <td>1000 µL</td>
+      <td>± 1.5%</td>
+      <td>1.5%</td>
     </tr>
 </table>
 
