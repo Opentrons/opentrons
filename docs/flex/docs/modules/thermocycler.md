@@ -46,7 +46,7 @@ The Thermocycler is compatible with two different plate seals to help protect yo
 
 ### Opentrons Tough PCR lids
 
-The Opentrons Tough PCR Auto-sealing lids are single-use lids that prevent cross-contamination and evaporation during Thermocycler incubation periods. They are gripper-compatible and can be stacked directly on the deck or placed in a specialized deck riser.
+The Opentrons Tough PCR Auto-sealing lids are single-use lids that prevent cross-contamination and evaporation during Thermocycler incubation periods. They are gripper-compatible and can be stacked directly on the deck or placed in a specialized [deck riser](https://opentrons.com/products/opentrons-flex-deck-riser).
 
 ![Tough PCR lid image](../images/autoseal-lids.png)
 
