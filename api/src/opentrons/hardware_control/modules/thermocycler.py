@@ -37,7 +37,7 @@ DFU_PID = "df11"
 _TC_PLATE_LIFT_OPEN_DEGREES = 20
 _TC_PLATE_LIFT_RETURN_DEGREES = 23
 
-_TC_RAMP_RATE_ADDED_VERSION = 108  # v1.0.8
+_TC_RAMP_RATE_ADDED_VERSION = (1, 0, 8)  # v1.0.8
 
 
 class ThermocyclerError(Exception):
@@ -276,10 +276,17 @@ class Thermocycler(mod_abc.AbstractModule):
         await self._wait_for_lid_status(ThermocyclerLidStatus.OPEN)
 
     def can_use_ramp_rate(self) -> bool:
-        version_as_num = int(
-            "".join([c for c in self._device_info["version"] if c.isdigit()])
-        )
-        return version_as_num >= _TC_RAMP_RATE_ADDED_VERSION
+        version_string = self._device_info.get("version", "v")
+        if version_string.startswith("v"):
+            version_string = version_string[1:]
+        try:
+            version_tuple = tuple(int(c) for c in version_string.split("."))
+            return version_tuple >= _TC_RAMP_RATE_ADDED_VERSION
+        except (ValueError, IndexError):
+            log.error(
+                f"Invalid version from device: {self._device_info.get('version', '')}"
+            )
+            return False
 
     async def set_temperature(
         self,
