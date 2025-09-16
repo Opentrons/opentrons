@@ -16,13 +16,27 @@ runs:
       with:
         node-version: '22.12.0'
         cache: 'yarn'
+        cache-dependency-path: |
+          yarn.lock
+          **/yarn.lock
+
+    - name: 'Cache Yarn global cache'
+      uses: actions/cache@v4
+      with:
+        path: ~/.yarn/cache
+        key: yarn-cache-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+        restore-keys: |
+          yarn-cache-${{ runner.os }}-
 
     - name: 'Cache Cypress binary'
       id: cache-cypress
       uses: actions/cache@v4
       with:
         path: ~/.cache/Cypress
-        key: cypress-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+        key: cypress-${{ runner.os }}-13.7.1-${{ hashFiles('**/yarn.lock') }}
+        restore-keys: |
+          cypress-${{ runner.os }}-13.7.1-
+          cypress-${{ runner.os }}-
 
     - name: 'Install udev for USB-detection'
       if: runner.os == 'Linux'
@@ -32,4 +46,6 @@ runs:
     - name: 'Setup JS'
       shell: bash
       run: |
+        export CYPRESS_CACHE_FOLDER=~/.cache/Cypress
+        export CYPRESS_INSTALL_BINARY=1
         make setup-js
