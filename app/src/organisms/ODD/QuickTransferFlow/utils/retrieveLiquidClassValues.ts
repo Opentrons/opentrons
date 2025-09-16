@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import {
   ETHANOL_LIQUID_CLASS_NAME,
   FLEX_ROBOT_TYPE,
@@ -7,6 +8,7 @@ import {
   GLYCEROL_LIQUID_CLASS_NAME,
   linearInterpolate,
   NONE_LIQUID_CLASS_NAME,
+  POSITION_REFERENCE_TOP,
   SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
   WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
@@ -22,6 +24,8 @@ import { getMatchingTipLiquidSpecsFromSpec } from './getMatchingTipLiquidSpecsFr
 import { getMaxUiFlowRate } from './getMaxUiFlowRate'
 
 import type { BlowOutLocation, QuickTransferSummaryState } from '../types'
+
+const DEFAULT_MM_OFFSET_FROM_BOTTOM = 1
 
 export const retrieveLiquidClassValues = (
   state: QuickTransferSummaryState,
@@ -169,10 +173,11 @@ const getNoLiquidClassValues = (
 
   const aspirateState = {
     aspirateFlowRate: aspirateFlowRateFields.aspirate_flowRate ?? 0,
-    tipPositionAspirate: aspirate.aspiratePosition.offset.z,
+    tipPositionAspirate: DEFAULT_MM_OFFSET_FROM_BOTTOM,
     submergeAspirate: {
       speed: aspirate.submerge.speed,
-      positionFromBottom: aspirate.submerge.startPosition.offset.z,
+      positionReference: POSITION_REFERENCE_TOP,
+      position: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
       delayDuration: aspirate.submerge.delay.params?.duration ?? 0,
     },
     preWetTip: aspirate.preWet,
@@ -182,7 +187,8 @@ const getNoLiquidClassValues = (
     },
     retractAspirate: {
       speed: aspirate.retract.speed ?? 0,
-      positionFromBottom: aspirate.retract.endPosition.offset.z ?? 0,
+      positionReference: POSITION_REFERENCE_TOP,
+      position: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
       delayDuration: aspirate.retract.delay.params?.duration ?? 0,
     },
     touchTipAspirate: !aspirate.retract.touchTip.enable
@@ -194,10 +200,11 @@ const getNoLiquidClassValues = (
 
   const dispenseState = {
     dispenseFlowRate: dispenseFlowRateFields.dispense_flowRate ?? 0,
-    tipPositionDispense: dispense.dispensePosition.offset.z,
+    tipPositionDispense: DEFAULT_MM_OFFSET_FROM_BOTTOM,
     submergeDispense: {
       speed: dispense.submerge.speed,
-      positionFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+      position: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+      positionReference: POSITION_REFERENCE_TOP,
       delayDuration: dispense.submerge.delay.params?.duration ?? 0,
     },
     pushOutDispense: {
@@ -209,7 +216,8 @@ const getNoLiquidClassValues = (
     },
     retractDispense: {
       speed: dispense.retract.speed,
-      positionFromBottom: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+      position: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+      positionReference: POSITION_REFERENCE_TOP,
       delayDuration: dispense.retract.delay.params?.duration ?? 0,
     },
     touchTipDispense: !dispense.retract.touchTip.enable
@@ -373,7 +381,9 @@ const getLiquidClassValues = (
     tipPositionAspirate: aspirate?.aspiratePosition.offset.z ?? 0,
     submergeAspirate: {
       speed: aspirate?.submerge.speed ?? 0,
-      positionFromBottom: aspirate?.submerge.startPosition.offset.z ?? 0,
+      position: aspirate?.submerge.startPosition.offset.z ?? 0,
+      positionReference:
+        aspirate?.submerge.startPosition.positionReference ?? undefined,
       delayDuration: aspirate?.submerge.delay.params?.duration ?? 0,
     },
     preWetTip: preWet ?? false,
@@ -392,7 +402,9 @@ const getLiquidClassValues = (
           },
     retractAspirate: {
       speed: aspirate?.retract.speed ?? 0,
-      positionFromBottom: aspirate?.retract.endPosition.offset.z ?? 0,
+      position: aspirate?.retract.endPosition.offset.z ?? 0,
+      positionReference:
+        aspirate?.retract.endPosition.positionReference ?? undefined,
       delayDuration: aspirate?.retract.delay.params?.duration ?? 0,
     },
     touchTipAspirate:
@@ -412,7 +424,9 @@ const getLiquidClassValues = (
     tipPositionDispense: dispense?.dispensePosition.offset.z ?? 0,
     submergeDispense: {
       speed: dispense?.submerge.speed ?? 0,
-      positionFromBottom: dispense?.submerge.startPosition.offset.z ?? 0,
+      position: dispense?.submerge.startPosition.offset.z ?? 0,
+      positionReference:
+        dispense?.submerge.startPosition.positionReference ?? undefined,
       delayDuration: dispense?.submerge.delay.params?.duration ?? 0,
     },
     delayDispense:
@@ -437,7 +451,9 @@ const getLiquidClassValues = (
     },
     retractDispense: {
       speed: dispense?.retract.speed ?? 0,
-      positionFromBottom: dispense?.retract.endPosition.offset.z ?? 0,
+      position: dispense?.retract.endPosition.offset.z ?? 0,
+      positionReference:
+        dispense?.retract.endPosition.positionReference ?? undefined,
       delayDuration: dispense?.retract.delay.params?.duration ?? 0,
     },
     blowOutDispense:

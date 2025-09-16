@@ -225,6 +225,9 @@ export function createQuickTransferFile(
     ...commandAnnotionaV1Mixin,
   })
 
+  console.log('protocolContents')
+  console.log(protocolContents)
+
   return new File(
     [protocolContents],
     `${protocolBase.metadata.protocolName}.json`
