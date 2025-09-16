@@ -276,7 +276,9 @@ class Thermocycler(mod_abc.AbstractModule):
         await self._wait_for_lid_status(ThermocyclerLidStatus.OPEN)
 
     def can_use_ramp_rate(self) -> bool:
-        version_as_num = int("".join([c for c in self._device_info["version"] if c.isdigit()]))
+        version_as_num = int(
+            "".join([c for c in self._device_info["version"] if c.isdigit()])
+        )
         return version_as_num >= _TC_RAMP_RATE_ADDED_VERSION
 
     async def set_temperature(
