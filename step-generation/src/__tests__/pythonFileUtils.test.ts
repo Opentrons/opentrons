@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  ETHANOL_LIQUID_CLASS_NAME,
+  ETHANOL_LIQUID_CLASS_NAME_V2,
   fixture96Plate,
   fixtureP300MultiV2Specs,
   fixtureP1000SingleV2Specs,
   fixtureTiprack1000ul,
   fixtureTiprackAdapter,
   FLEX_ROBOT_TYPE,
-  GLYCEROL_LIQUID_CLASS_NAME,
+  GLYCEROL_LIQUID_CLASS_NAME_V2,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_TYPE,
@@ -544,7 +544,7 @@ const mockLiquidEntities: LiquidEntities = {
     description: '',
     displayName: 'sulfur',
     displayColor: 'mock display color 2',
-    liquidClass: ETHANOL_LIQUID_CLASS_NAME,
+    liquidClass: ETHANOL_LIQUID_CLASS_NAME_V2,
   },
 }
 
@@ -666,8 +666,8 @@ describe('getLoadLiquidClasses', () => {
     expect(
       getLoadLiquidClasses([
         WATER_LIQUID_CLASS_NAME_V2,
-        ETHANOL_LIQUID_CLASS_NAME,
-        GLYCEROL_LIQUID_CLASS_NAME,
+        ETHANOL_LIQUID_CLASS_NAME_V2,
+        GLYCEROL_LIQUID_CLASS_NAME_V2,
       ])
     ).toBe(
       `

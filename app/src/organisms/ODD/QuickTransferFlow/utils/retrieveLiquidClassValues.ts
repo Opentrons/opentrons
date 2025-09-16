@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import {
-  ETHANOL_LIQUID_CLASS_NAME,
+  ETHANOL_LIQUID_CLASS_NAME_V2,
   FLEX_ROBOT_TYPE,
   getAllLiquidClassDefs,
   getFlexNameConversion,
   getLabwareDefURI,
-  GLYCEROL_LIQUID_CLASS_NAME,
+  GLYCEROL_LIQUID_CLASS_NAME_V2,
   linearInterpolate,
   NONE_LIQUID_CLASS_NAME,
   POSITION_REFERENCE_TOP,
@@ -278,8 +278,8 @@ const getLiquidClassValues = (
   const allLiquidClassDefs = getAllLiquidClassDefs()
   const liquidClassMap = new Map<string, string>([
     ['water', WATER_LIQUID_CLASS_NAME_V2],
-    ['glycerol_50', GLYCEROL_LIQUID_CLASS_NAME],
-    ['ethanol_80', ETHANOL_LIQUID_CLASS_NAME],
+    ['glycerol_50', GLYCEROL_LIQUID_CLASS_NAME_V2],
+    ['ethanol_80', ETHANOL_LIQUID_CLASS_NAME_V2],
   ])
   const selectedLiquidClass = liquidClassMap.get(
     getLiquidClassName(state.liquidClassName) ?? 'none'
