@@ -37,7 +37,6 @@ Opentrons Flex pipettes are designed to handle a wide range of liquid volumes an
 
 The following tables list the accuracy and precision specifications for Opentrons Flex pipettes.
 
-
 ### 1-channel pipette specifications
 
 Flex 1-channel pipettes meet the following accuracy and precision specifications.
