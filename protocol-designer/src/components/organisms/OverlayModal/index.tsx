@@ -45,6 +45,8 @@ export function OverlayModal(props: OverlayModalProps): JSX.Element {
     <Modal
       marginLeft="0"
       type="warning"
+      width="100%"
+      height="100%"
       zIndexOverlay={15}
       title={header}
       onClose={onCancelClick}
