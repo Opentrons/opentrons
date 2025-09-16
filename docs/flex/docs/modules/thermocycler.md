@@ -31,19 +31,6 @@ The automated lid can be opened or closed as needed during protocol execution.
 
 The Thermocycler can execute *profiles*: automatically cycling through a sequence of block temperatures to perform heat-sensitive reactions.
 
-### Thermocycler lid seals
-
-The Thermocycler works with two different plate seals to help protect your samples. These are the the [Opentrons Tough PCR Auto-sealing Lid](https://opentrons.com/products/opentrons-flex-tough-auto-sealing-lids-20-count) and reuseable [rubber automation seals](https://opentrons.com/products/gen2-thermocycler-seals).
-
-| Lid Type | Description |
-|----|----|
-| Opentrons Tough PCR Auto-sealing Lid | These sterile, single-use PCR plate lids help prevent cross-contamination and evaporation during Thermocycler incubation periods. The lids are gripper-compatible and can be stacked directly on the deck or placed in a special deck riser. |
-| Rubber Automation Seal | These are adhesive-backed ethylene propylene diene monomer (EPDM) seals you manually apply to the Thermocycler lid. Rubber seals can be reused up to 20 times; however, unlike the Opentrons Tough Auto-sealing Lid, they are not sterile. The seals must be cleaned and sanitized before each use. |
-
-!!!warning
-    Do not use the Opentrons Tough Auto-sealing PCR Lid and a rubber automation seal on the Thermocycler at the same time. This combination prevents the module's lid from closing properly, which can cause temperature control problems and mechanical damage. Always remove the rubber seal before running protocols that use the disposable PCR lid.
-    ![PCR lid and rubber seal warning](../images/thermocycler-lid-warning.png)
-
 ### Software control
 
 The Thermocycler is fully programmable in Protocol Designer and the
@@ -52,6 +39,30 @@ Python Protocol API.
 Outside of protocols, the Opentrons App can display the current status
 of the Thermocycler and can directly control the block temperature, lid
 temperature, and lid position.
+
+## Thermocycler lids and seals
+
+The Thermocycler is compatible with two different plate seals to help protect your samples: the single-use  [Opentrons Tough PCR Auto-sealing Lid](https://opentrons.com/products/opentrons-flex-tough-auto-sealing-lids-20-count) and reuseable [rubber automation seals](https://opentrons.com/products/gen2-thermocycler-seals).
+
+### Opentrons Tough PCR lids
+
+The Opentrons Tough PCR Auto-sealing lids are single-use lids that prevent cross-contamination and evaporation during Thermocycler incubation periods. They are gripper-compatible and can be stacked directly on the deck or placed in a specialized deck riser.
+
+![Tough PCR lid image](../images/autoseal-lids.png)
+
+These lids are manufactured in cleanroom facilities that meet ISO 14644-1 Class 8 standards. They also have a "Sterile-R" designation, which means they're irradiated to a sterility assurance level (SAL) of 10-6. Each box contains documentation certifying the lids are free of ATP, pyrogens, DNA, DNase, RNase, and PCR inhibitors.
+
+### Reuseable seals
+
+These are adhesive-backed ethylene propylene diene monomer (EPDM) seals you manually apply to the Thermocycler lid. Each seal can be reused up to 20 times.
+
+![Reuseable seals image](../images/reuseable-seals.png){width="80%"}
+
+Unlike the Opentrons Tough PCR lids, reuseable seals are not sterile. They must be cleaned and sanitized before each use.
+
+!!!warning
+    Do not use the Opentrons Tough Auto-sealing PCR Lid and a rubber automation seal on the Thermocycler at the same time. This combination prevents the module's lid from closing properly, which can cause temperature control problems and mechanical damage. Always remove the rubber seal before running protocols that use the disposable PCR lid.
+    ![PCR lid and rubber seal warning](../images/thermocycler-lid-warning.png)
 
 ## Thermocycler specifications
 
