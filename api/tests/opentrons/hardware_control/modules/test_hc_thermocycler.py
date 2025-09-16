@@ -14,7 +14,10 @@ from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.thermocycler import SimulatingDriver
 from opentrons.hardware_control import modules, ExecutionManager
 from opentrons.hardware_control.poller import Poller
-from opentrons.hardware_control.modules.thermocycler import ThermocyclerReader
+from opentrons.hardware_control.modules.thermocycler import (
+    ThermocyclerReader,
+    ThermocyclerError,
+)
 from opentrons.drivers.asyncio.communication.errors import ErrorResponse
 
 
@@ -318,10 +321,28 @@ async def test_set_temperature_with_ramp_rate(
     set_temperature_subject: modules.Thermocycler, set_plate_temp_spy: mock.AsyncMock
 ) -> None:
     """It should call set_plate_temperature with volume param"""
+    set_temperature_subject._device_info = {
+        "serial": "dummySerialTC",
+        "model": "dummyModelTC",
+        "version": "v1.0.8",
+    }
     await set_temperature_subject.set_temperature(30, volume=35, ramp_rate=5.0)
     set_plate_temp_spy.assert_called_once_with(
         temp=30, hold_time=0, volume=35, ramp_rate=5.0
     )
+
+
+async def test_set_temperature_with_ramp_rate_with_old_firmware(
+    set_temperature_subject: modules.Thermocycler, set_plate_temp_spy: mock.AsyncMock
+) -> None:
+    """It should call set_plate_temperature with volume param"""
+    set_temperature_subject._device_info = {
+        "serial": "dummySerialTC",
+        "model": "dummyModelTC",
+        "version": "v1.0.7",
+    }
+    with pytest.raises(ThermocyclerError):
+        await set_temperature_subject.set_temperature(30, volume=35, ramp_rate=5.0)
 
 
 async def test_set_temperature_mixed_hold(

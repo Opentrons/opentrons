@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, List, Optional, Set, Union, cast, Tuple
+from typing import Dict, List, Optional, Set, Union, cast, Tuple, Sequence
 
 from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
 from opentrons_shared_data.labware.types import LabwareDefinition
@@ -34,6 +34,7 @@ from .legacy_instrument_core import LegacyInstrumentCore
 from .labware_offset_provider import AbstractLabwareOffsetProvider
 from .legacy_labware_core import LegacyLabwareCore
 from .load_info import LoadInfo, InstrumentLoadInfo, LabwareLoadInfo, ModuleLoadInfo
+from .tasks import LegacyTaskCore
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +44,7 @@ class LegacyProtocolCore(
         LegacyInstrumentCore,
         LegacyLabwareCore,
         legacy_module_core.LegacyModuleCore,
+        LegacyTaskCore,
     ]
 ):
     def __init__(
@@ -610,3 +612,11 @@ class LegacyProtocolCore(
     ]:
         """Get labware parent location."""
         assert False, "get_labware_location only supported on engine core"
+
+    def wait_for_tasks(self, task: Sequence[LegacyTaskCore]) -> None:
+        """Wait for list of tasks to complete before executing subsequent commands."""
+        assert False, "wait_for_tasks only supported on engine core"
+
+    def create_timer(self, seconds: float) -> LegacyTaskCore:
+        """Create a timer task that runs in the background."""
+        assert False, "create_timer only supported on engine core"

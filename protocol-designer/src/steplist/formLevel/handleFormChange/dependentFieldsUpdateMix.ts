@@ -124,7 +124,7 @@ const updatePatchOnPipetteChange = (
 
     return {
       ...patch,
-      ...getDefaultFields('aspirate_flowRate', 'dispense_flowRate', 'tipRack'),
+      ...getDefaultFields('aspirate_flowRate', 'dispense_flowRate'),
       nozzles,
     }
   }

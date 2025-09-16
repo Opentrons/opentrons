@@ -13,7 +13,7 @@ import { BaseDeck } from '../BaseDeck'
 import { LabwareRender } from '../Labware'
 import { resolveLabwareLocation } from './resolveLabwareLocation'
 
-import type { PropsWithChildren, ReactNode } from 'react'
+import type { PropsWithChildren } from 'react'
 import type {
   DeckConfiguration,
   DeckDefinition,
@@ -24,7 +24,7 @@ import type {
   RobotType,
   Vector3D,
 } from '@opentrons/shared-data'
-import type { ModuleOnDeck } from '../../hardware-sim/BaseDeck'
+import type { LabwareOnDeck, ModuleOnDeck } from '../../hardware-sim/BaseDeck'
 import type { StyleProps } from '../../primitives'
 
 const SPLASH_Y_BUFFER_MM = 10
@@ -37,9 +37,9 @@ interface MoveLabwareOnDeckProps extends StyleProps {
   loadedModules: LoadedModule[]
   loadedLabware: LoadedLabware[]
   modulesOnDeck?: ModuleOnDeck[]
+  labwareOnDeck?: LabwareOnDeck[]
   labwareDefinitions: LabwareDefinition[]
   deckConfig: DeckConfiguration
-  backgroundItems?: ReactNode
   deckFill?: string
 }
 export function MoveLabwareOnDeck(
@@ -50,12 +50,12 @@ export function MoveLabwareOnDeck(
     movedLabwareDef,
     loadedLabware,
     modulesOnDeck,
+    labwareOnDeck,
     labwareDefinitions,
     initialLabwareLocation,
     finalLabwareLocation,
     loadedModules,
     deckConfig,
-    backgroundItems = null,
     ...styleProps
   } = props
   const deckDef = useMemo(() => getDeckDefFromRobotType(robotType), [robotType])
@@ -163,6 +163,7 @@ export function MoveLabwareOnDeck(
       deckConfig={deckConfig}
       robotType={robotType}
       modulesOnDeck={modulesOnDeck}
+      labwareOnDeck={labwareOnDeck}
       svgProps={{
         style: { opacity: springProps.deckOpacity },
         ...styleProps,
@@ -171,7 +172,6 @@ export function MoveLabwareOnDeck(
       // add fixedTrash not to display trash bin on OT-2 deck
       deckLayerBlocklist={robotType === 'OT-2 Standard' ? ['fixedTrash'] : []}
     >
-      {backgroundItems}
       <AnimatedG style={{ x: springProps.x, y: springProps.y }}>
         <LabwareRender
           definition={movedLabwareDef}

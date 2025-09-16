@@ -268,12 +268,20 @@ class GeometryView:
             try:
                 labware_id = self._labware.get_id_by_module(module_id=module_id)
             except LabwareNotLoadedOnModuleError:
-                return self._modules.get_module_highest_z(
-                    module_id=module_id,
-                    addressable_areas=self._addressable_areas,
-                )
+                # For the time being we will ignore column 4 modules in this check to avoid conflating results
+                if self._modules.is_column_4_module(slot_item.model) is False:
+                    return self._modules.get_module_highest_z(
+                        module_id=module_id,
+                        addressable_areas=self._addressable_areas,
+                    )
             else:
-                return self.get_highest_z_of_labware_stack(labware_id)
+                # For the time being we will ignore column 4 modules in this check to avoid conflating results
+                if self._modules.is_column_4_module(slot_item.model) is False:
+                    return self.get_highest_z_of_labware_stack(labware_id)
+            # todo (cb, 2025-09-15): For now we skip column 4 modules and handle them seperately in
+            # get_highest_z_of_column_4_module, so this will return 0. In the future we may want to consolidate
+            # this to make it more apparently at this point in the query process.
+            return 0
         elif isinstance(slot_item, LoadedLabware):
             # get stacked heights of all labware in the slot
             return self.get_highest_z_of_labware_stack(slot_item.id)
@@ -294,6 +302,26 @@ class GeometryView:
         except LabwareNotLoadedOnLabwareError:
             return self.get_labware_highest_z(labware_id)
         return self.get_highest_z_of_labware_stack(stacked_labware_id)
+
+    def get_highest_z_of_column_4_module(self, module: LoadedModule) -> float:
+        """Get the highest Z-point of the topmost labware in the stack of labware on the given column 4 module.
+
+        If there is no labware on the given module, returns highest z of the module.
+        """
+        if self._modules.is_column_4_module(module.model):
+            try:
+                labware_id = self._labware.get_id_by_module(module_id=module.id)
+            except LabwareNotLoadedOnModuleError:
+                return self._modules.get_module_highest_z(
+                    module_id=module.id,
+                    addressable_areas=self._addressable_areas,
+                )
+            else:
+                return self.get_highest_z_of_labware_stack(labware_id)
+        else:
+            raise ValueError(
+                "Module must be a Column 4 Module to determine maximum z height."
+            )
 
     def get_min_travel_z(
         self,

@@ -134,6 +134,7 @@ function getFeatureFlagEnvVars(): Record<string, string | undefined> {
     'OT_PD_ENABLE_STACKING',
     'OT_PD_ENABLE_CONCURRENT_MODULE_ACTIONS',
     'OT_PD_ENABLE_JSON_EXPORT',
+    'OT_PD_ENABLE_BY_VOLUME_BUILDER',
   ])
   return Object.fromEntries(
     Object.entries(process.env).filter(([key, _value]) => envVarNames.has(key))
