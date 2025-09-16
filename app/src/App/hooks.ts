@@ -2,7 +2,9 @@ import { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { useDispatch } from 'react-redux'
+import { captureException } from '@sentry/electron/renderer'
 import difference from 'lodash/difference'
+import { v4 as uuidv4 } from 'uuid'
 
 import { getProtocol } from '@opentrons/api-client'
 import {
@@ -305,4 +307,15 @@ export function useWindowType(): WindowType {
   }, [])
 
   return windowType
+}
+
+// Report an error to sentry if it falls to an error boundary.
+export function useSentryReport(error: any): void {
+  const errorId = uuidv4()
+
+  useEffect(() => {
+    if (error != null) {
+      captureException(error, { extra: { errorId }, level: 'error' })
+    }
+  }, [error, errorId])
 }
