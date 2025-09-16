@@ -61,7 +61,9 @@ export function SummaryAndSettings(
   const { t } = useTranslation(['quick_transfer', 'shared'])
   const [showSaveOrRunModal, setShowSaveOrRunModal] = useState<boolean>(false)
   const enableExportPython = useFeatureFlag('quickTransferExportPython')
-  const enableProtocolContentsLog = useFeatureFlag('protocolContentsLog')
+  const enableProtocolContentsLog = useFeatureFlag(
+    'quickTransferProtocolContentsLog'
+  )
 
   const displayCategory: string[] = ['overview', 'aspirate', 'dispense']
 
