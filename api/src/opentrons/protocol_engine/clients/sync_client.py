@@ -73,6 +73,12 @@ class SyncClient:
 
     @overload
     def execute_command_without_recovery(
+        self, params: commands.temperature_module.SetTargetTemperatureParams
+    ) -> commands.temperature_module.SetTargetTemperatureResult:
+        pass
+
+    @overload
+    def execute_command_without_recovery(
         self, params: commands.LoadModuleParams
     ) -> commands.LoadModuleResult:
         pass
