@@ -8,6 +8,7 @@ import { mockRecoveryContentProps } from '../../__fixtures__'
 import { RECOVERY_MAP } from '../../constants'
 import {
   RetryStepInfo,
+  StackerHomeShuttle,
   StackerHopperLwInfo,
   StackerShuttleLwInfo,
 } from '../../shared'
@@ -47,6 +48,7 @@ describe('StackerShuttleEmptyStoreRetry', () => {
     vi.mocked(StackerShuttleLwInfo).mockReturnValue(
       <div>MOCK_SHUTTLE_LABWARE_INFO</div>
     )
+    vi.mocked(StackerHomeShuttle).mockReturnValue(<div>MOCK_HOME_SHUTTLE</div>)
   })
 
   afterEach(() => {
@@ -79,5 +81,12 @@ describe('StackerShuttleEmptyStoreRetry', () => {
       RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.STEPS.REPLACE_TIPS
     render(props)
     screen.getByText('MOCK_SELECT_RECOVERY_OPTION')
+  })
+
+  it(`renders StackerHomeShuttle when step is ${RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_STORE_RETRY.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS}`, () => {
+    props.recoveryMap.step =
+      RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_STORE_RETRY.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS
+    render(props)
+    screen.getByText('MOCK_HOME_SHUTTLE')
   })
 })
