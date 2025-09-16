@@ -57,7 +57,6 @@ export default defineConfig(
         'process.env': {
           NODE_ENV: process.env.NODE_ENV,
           OT_SENTRY_DSN: process.env.OT_SENTRY_DSN,
-          OT_APP_MIXPANEL_ID: process.env.OT_APP_MIXPANEL_ID,
           OPENTRONS_PROJECT: process.env.OPENTRONS_PROJECT,
         },
         global: 'globalThis',

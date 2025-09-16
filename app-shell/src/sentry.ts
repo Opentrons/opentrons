@@ -11,7 +11,6 @@ import { createLogger } from './log'
 
 import type { ElectronMainOptions } from '@sentry/electron/main'
 
-const MIXPANEL_ID = process.env.OT_APP_MIXPANEL_ID
 const SENTRY_DSN = process.env.OT_SENTRY_DSN
 const NODE_ENV = process.env.NODE_ENV
 
@@ -19,13 +18,13 @@ let isSentryInitialized = false
 
 const log = createLogger('sentry')
 
-export const initializeSentry = (): void => {
+export const initializeSentry = (isAnalyticsEnabled: boolean): void => {
   if (isSentryInitialized) {
     log.warn('Sentry is already initialized')
     return
   }
 
-  if (MIXPANEL_ID == null) {
+  if (!isAnalyticsEnabled) {
     log.debug('Analytics disabled. Sentry not initialized.')
     return
   }

@@ -52,7 +52,7 @@ log.debug('App config', {
 })
 
 // Initialize Sentry before the app is ready.
-initializeSentry()
+initializeSentry(getStore().analytics.optedIn)
 
 systemd.setRemoteDevToolsEnabled(config.devtools)
 

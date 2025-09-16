@@ -49,7 +49,7 @@ log.debug('App config', {
 })
 
 // Initialize Sentry before the app is ready.
-initializeSentry()
+initializeSentry(getStore().analytics.optedIn)
 
 if (config.devtools) {
   // eslint-disable-next-line @typescript-eslint/no-var-requires

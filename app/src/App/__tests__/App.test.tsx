@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { initializeSentry } from '/app/App/sentry'
 import { i18n } from '/app/i18n'
 import { getConfig } from '/app/redux/config'
 
@@ -12,6 +13,7 @@ import { useWindowType } from '../hooks'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
 import { SecondaryWindowApp } from '../SecondaryWindowApp'
 
+import type { Mock } from 'vitest'
 import type { State } from '/app/redux/types'
 
 vi.mock('/app/redux/config')
@@ -19,10 +21,12 @@ vi.mock('../DesktopApp')
 vi.mock('../hooks')
 vi.mock('../OnDeviceDisplayApp')
 vi.mock('../SecondaryWindowApp')
+vi.mock('/app/App/sentry')
 
 const MOCK_STATE: State = {
   config: {
     isOnDevice: true,
+    analytics: { optedIn: true },
   },
 } as any
 
@@ -33,8 +37,11 @@ const render = () => {
   })
 }
 
+let mockInitSentry: Mock
+
 describe('App', () => {
   beforeEach(() => {
+    mockInitSentry = vi.fn()
     vi.mocked(DesktopApp).mockReturnValue(<div>mock DesktopApp</div>)
     vi.mocked(OnDeviceDisplayApp).mockReturnValue(
       <div>mock OnDeviceDisplayApp</div>
@@ -42,6 +49,7 @@ describe('App', () => {
     vi.mocked(SecondaryWindowApp).mockReturnValue(
       <div>mock SecondaryWindowApp</div>
     )
+    vi.mocked(initializeSentry).mockImplementation(mockInitSentry)
     vi.mocked(useWindowType).mockReturnValue('desktop-main')
     when(vi.mocked(getConfig))
       .calledWith(MOCK_STATE)
@@ -74,5 +82,13 @@ describe('App', () => {
     render()
 
     screen.getByText('mock OnDeviceDisplayApp')
+  })
+
+  it('initializes sentry if config is defined', () => {
+    render()
+
+    expect(mockInitSentry).toHaveBeenCalledWith(
+      MOCK_STATE.config?.analytics.optedIn
+    )
   })
 })

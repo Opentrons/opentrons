@@ -8,7 +8,6 @@ import {
 
 import { CURRENT_VERSION } from '/app/redux/shell'
 
-const MIXPANEL_ID = process.env.OT_APP_MIXPANEL_ID
 const SENTRY_DSN = process.env.OT_SENTRY_DSN
 const NODE_ENV = process.env.NODE_ENV
 
@@ -24,13 +23,13 @@ interface ElectronRendererOptions {
   replaysOnErrorSampleRate?: number
 }
 
-export const initializeSentry = (): void => {
+export const initializeSentry = (isAnalyticsEnabled: boolean): void => {
   if (isSentryInitialized) {
-    console.warn('Sentry is already initialized')
+    console.info('Sentry is already initialized, skipping...')
     return
   }
 
-  if (MIXPANEL_ID == null) {
+  if (!isAnalyticsEnabled) {
     console.log('Analytics disabled. Sentry not initialized.')
     return
   }

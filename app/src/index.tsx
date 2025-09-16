@@ -10,7 +10,6 @@ import { App } from './App'
 import { createLogger } from './logger'
 import { uiInitialized } from './redux/shell'
 import { store } from './redux/store'
-import { initializeSentry } from './sentry'
 
 import '../src/atoms/SoftwareKeyboard/AlphanumericKeyboard'
 import '../src/atoms/SoftwareKeyboard/FullKeyboard/index.css'
@@ -27,8 +26,6 @@ const log = createLogger(new URL('', import.meta.url).pathname)
 
 // kickoff app-shell initializations
 store.dispatch(uiInitialized())
-// initialize renderer sentry
-initializeSentry()
 
 log.info('Rendering app UI')
 

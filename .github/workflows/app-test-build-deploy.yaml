@@ -302,7 +302,6 @@ jobs:
         env:
           OPENTRONS_PROJECT: ${{ steps.project.outputs.project }}
           OT_BUILD_TARGET: ${{ matrix.target }}
-          OT_APP_MIXPANEL_ID: ${{ secrets.OT_APP_MIXPANEL_ID }}
           OT_SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           OT_SENTRY_DSN: ${{ secrets.OT_ODD_SENTRY_DSN }}
         run: |
