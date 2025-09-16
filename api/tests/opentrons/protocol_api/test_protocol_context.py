@@ -1122,6 +1122,112 @@ def test_move_lids_from_stack(
     assert isinstance(result, Labware)
 
 
+@pytest.mark.parametrize("api_version", [APIVersion(2, 23)])
+def test_move_lids_from_stack_via_stack_parent(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    api_version: APIVersion,
+    subject: ProtocolContext,
+) -> None:
+    """It should move a lid onto an empty riser, create a stack, and then move the lid back off by referencing the riser."""
+    decoy.when(mock_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(42, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_C1)
+    mock_riser_core = decoy.mock(cls=LabwareCore)
+    decoy.when(mock_validation.ensure_lowercase_name("RISER_LABWARE")).then_return(
+        "riser_labware"
+    )
+    decoy.when(
+        mock_core.load_labware(
+            load_name="riser_labware",
+            location=DeckSlotName.SLOT_C1,
+            label=None,
+            namespace="some_namespace",
+            version=1337,
+        )
+    ).then_return(mock_riser_core)
+
+    decoy.when(mock_riser_core.get_name()).then_return("RISER_LABWARE")
+    decoy.when(mock_riser_core.get_display_name()).then_return("")
+    decoy.when(mock_riser_core.get_well_columns()).then_return([])
+
+    riser_lw = subject.load_labware(
+        load_name="RISER_LABWARE",
+        location=42,
+        label=None,
+        namespace="some_namespace",
+        version=1337,
+    )
+    assert isinstance(riser_lw, Labware)
+
+    # Load the lid stack on top of the riser
+    mock_lid_core = decoy.mock(cls=LabwareCore)
+    decoy.when(mock_validation.ensure_lowercase_name("UPPERCASE_LID")).then_return(
+        "lowercase_lid"
+    )
+    decoy.when(mock_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_core.load_lid_stack(
+            load_name="lowercase_lid",
+            location=riser_lw._core,
+            quantity=1,
+            namespace="some_namespace",
+            version=1337,
+        )
+    ).then_return(mock_lid_core)
+
+    decoy.when(mock_lid_core.get_name()).then_return("STACK_OBJECT")
+    decoy.when(mock_lid_core.get_display_name()).then_return("")
+    decoy.when(mock_lid_core.get_well_columns()).then_return([])
+
+    result = subject.load_lid_stack(
+        load_name="UPPERCASE_LID",
+        location=riser_lw,
+        quantity=1,
+        namespace="some_namespace",
+        version=1337,
+    )
+
+    assert isinstance(result, Labware)
+    assert result.name == "STACK_OBJECT"
+
+    # Move the lid, by referencing only the riser itself
+    subject.move_lid(riser_lw, "D3")
+
+    # Load another lid stack where the lidstack once was, verifying its engine object is gone
+    mock_lid_core_2 = decoy.mock(cls=LabwareCore)
+    decoy.when(mock_validation.ensure_lowercase_name("UPPERCASE_LID_2")).then_return(
+        "lowercase_lid_2"
+    )
+    decoy.when(mock_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_core.load_lid_stack(
+            load_name="lowercase_lid_2",
+            location=riser_lw._core,
+            quantity=1,
+            namespace="some_namespace",
+            version=1337,
+        )
+    ).then_return(mock_lid_core_2)
+
+    decoy.when(mock_lid_core_2.get_name()).then_return("STACK_OBJECT_2")
+    decoy.when(mock_lid_core_2.get_display_name()).then_return("")
+    decoy.when(mock_lid_core_2.get_well_columns()).then_return([])
+
+    result_2 = subject.load_lid_stack(
+        load_name="UPPERCASE_LID_2",
+        location=riser_lw,
+        quantity=1,
+        namespace="some_namespace",
+        version=1337,
+    )
+
+    assert isinstance(result_2, Labware)
+    assert result_2.name == "STACK_OBJECT_2"
+
+
 @pytest.mark.parametrize("api_version", [APIVersion(2, 22)])
 def test_move_labware_lids_old(
     decoy: Decoy,
