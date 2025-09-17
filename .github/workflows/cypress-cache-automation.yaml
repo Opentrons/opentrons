@@ -1,0 +1,101 @@
+name: 'Cypress Cache Automation'
+
+on:
+  workflow_dispatch:
+    inputs:
+      cypress_version:
+        description: 'Cypress version to cache (leave empty to use package.json version)'
+        required: false
+        type: string
+      deploy:
+        description: 'Actually create the release (default: dry run)'
+        required: false
+        type: boolean
+        default: false
+  schedule:
+    # Run daily at 2 AM UTC to check for new Cypress versions
+    - cron: '0 2 * * *'
+
+jobs:
+  cache-cypress:
+    runs-on: 'ubuntu-24.04'
+    name: 'Cache Cypress Binary'
+    permissions:
+      contents: write
+      actions: read
+    
+    steps:
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: 'Setup Node'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.12.0'
+          cache: 'yarn'
+          cache-dependency-path: |
+            yarn.lock
+            **/yarn.lock
+      
+      - name: 'Install Dependencies'
+        run: yarn install --frozen-lockfile
+      
+      - name: 'Check if Cypress version needs caching'
+        id: check-version
+        run: |
+          # Use provided version or get from package.json
+          if [ -n "${{ github.event.inputs.cypress_version }}" ]; then
+            CYPRESS_VERSION="${{ github.event.inputs.cypress_version }}"
+          else
+            CYPRESS_VERSION=$(grep '"cypress"' package.json | sed 's/.*"cypress": *"\([^"]*\)".*/\1/')
+          fi
+          
+          echo "cypress_version=$CYPRESS_VERSION" >> $GITHUB_OUTPUT
+          
+          # Check if release already exists
+          if curl -s --head "https://github.com/Opentrons/opentrons/releases/download/cypress-${CYPRESS_VERSION}/cypress-${CYPRESS_VERSION}-linux-x64.zip" | head -n 1 | grep -q "200 OK"; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "✅ Cypress ${CYPRESS_VERSION} is already cached"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "❌ Cypress ${CYPRESS_VERSION} needs to be cached"
+          fi
+      
+      - name: 'Cache Cypress Binary'
+        if: steps.check-version.outputs.exists == 'false'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Determine if this is a deploy run
+          DEPLOY_FLAG=""
+          if [ "${{ github.event.inputs.deploy }}" == "true" ] || [ "${{ github.event_name }}" == "schedule" ]; then
+            DEPLOY_FLAG="--deploy"
+            echo "🚀 Running in deploy mode - will create actual release"
+          else
+            echo "🔍 Running in dry-run mode - will show what would be done"
+          fi
+          
+          # Run the automation script
+          node scripts/cypress-cache-automation.js $DEPLOY_FLAG
+      
+      - name: 'Summary'
+        if: always()
+        run: |
+          echo "## Cypress Cache Automation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Cypress Version:** ${{ steps.check-version.outputs.cypress_version }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Already Cached:** ${{ steps.check-version.outputs.exists }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Deploy Mode:** ${{ github.event.inputs.deploy || (github.event_name == 'schedule' && 'true') || 'false' }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ steps.check-version.outputs.exists }}" == "false" ]; then
+            if [ "${{ github.event.inputs.deploy }}" == "true" ] || [ "${{ github.event_name }}" == "schedule" ]; then
+              echo "✅ **Action Taken:** Created GitHub release with cached Cypress binaries" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "🔍 **Action Taken:** Dry run - showed what would be done" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "ℹ️ **Action Taken:** No action needed - version already cached" >> $GITHUB_STEP_SUMMARY
+          fi

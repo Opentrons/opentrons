@@ -48,7 +48,32 @@ runs:
       run: |
         export CYPRESS_CACHE_FOLDER=~/.cache/Cypress
         CYPRESS_VERSION=$(grep '"cypress"' package.json | sed 's/.*"cypress": *"\([^"]*\)".*/\1/')
-        export CYPRESS_INSTALL_BINARY=https://download.cypress.io/desktop/${CYPRESS_VERSION}?platform=linux&arch=x64
+        
+        # Determine platform and architecture
+        if [[ "$RUNNER_OS" == "Linux" ]]; then
+          PLATFORM="linux"
+          ARCH="x64"
+        elif [[ "$RUNNER_OS" == "macOS" ]]; then
+          PLATFORM="darwin"
+          ARCH="x64"
+        elif [[ "$RUNNER_OS" == "Windows" ]]; then
+          PLATFORM="win32"
+          ARCH="x64"
+        fi
+        
+        # Try GitHub release first, fallback to official download
+        GITHUB_RELEASE_URL="https://github.com/Opentrons/opentrons/releases/download/cypress-${CYPRESS_VERSION}/cypress-${CYPRESS_VERSION}-${PLATFORM}-${ARCH}.zip"
+        OFFICIAL_URL="https://download.cypress.io/desktop/${CYPRESS_VERSION}?platform=${PLATFORM}&arch=${ARCH}"
+        
+        # Check if GitHub release exists, use it if available
+        if curl -s --head "$GITHUB_RELEASE_URL" | head -n 1 | grep -q "200 OK"; then
+          export CYPRESS_INSTALL_BINARY="$GITHUB_RELEASE_URL"
+          echo "Using GitHub release: $GITHUB_RELEASE_URL"
+        else
+          export CYPRESS_INSTALL_BINARY="$OFFICIAL_URL"
+          echo "Using official download: $OFFICIAL_URL"
+        fi
+        
         echo "Cypress version from package.json: $CYPRESS_VERSION"
         echo "Cypress install binary URL: $CYPRESS_INSTALL_BINARY"
         make setup-js
