@@ -417,9 +417,10 @@ class LegacyHeaterShakerCore(
     _sync_module_hardware: SynchronousAdapter[hw_modules.HeaterShaker]
     _geometry: HeaterShakerGeometry
 
-    def set_target_temperature(self, celsius: float) -> None:
+    def set_target_temperature(self, celsius: float) -> LegacyTaskCore:
         """Set the labware plate's target temperature in °C."""
         self._sync_module_hardware.start_set_temperature(celsius)
+        return LegacyTaskCore()
 
     def wait_for_target_temperature(self) -> None:
         """Wait for the labware plate's target temperature to be reached."""

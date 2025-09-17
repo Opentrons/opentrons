@@ -516,13 +516,17 @@ class HeaterShakerModuleCore(ModuleCore, AbstractHeaterShakerCore[LabwareCore]):
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.HeaterShaker]
 
-    def set_target_temperature(self, celsius: float) -> None:
+    def set_target_temperature(self, celsius: float) -> EngineTaskCore:
         """Set the labware plate's target temperature in °C."""
-        self._engine_client.execute_command(
+        result = self._engine_client.execute_command_without_recovery(
             cmd.heater_shaker.SetTargetTemperatureParams(
                 moduleId=self.module_id, celsius=celsius
             )
         )
+        temperature_task = EngineTaskCore(
+            engine_client=self._engine_client, task_id=result.taskId
+        )
+        return temperature_task
 
     def wait_for_target_temperature(self) -> None:
         """Wait for the labware plate's target temperature to be reached."""

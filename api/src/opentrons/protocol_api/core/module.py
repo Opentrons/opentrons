@@ -296,7 +296,7 @@ class AbstractHeaterShakerCore(
         """Get the module's unique hardware serial number."""
 
     @abstractmethod
-    def set_target_temperature(self, celsius: float) -> None:
+    def set_target_temperature(self, celsius: float) -> AbstractTaskCore:
         """Set the labware plate's target temperature in °C."""
 
     @abstractmethod

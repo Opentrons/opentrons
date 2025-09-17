@@ -426,7 +426,7 @@ def test_handle_hs_temperature_commands(heater_shaker_v1_def: ModuleDefinition) 
     )
     set_temp_cmd = hs_commands.SetTargetTemperature.model_construct(  # type: ignore[call-arg]
         params=hs_commands.SetTargetTemperatureParams(moduleId="module-id", celsius=42),
-        result=hs_commands.SetTargetTemperatureResult(),
+        result=hs_commands.SetTargetTemperatureResult(taskId="taskId"),
     )
     deactivate_cmd = hs_commands.DeactivateHeater.model_construct(  # type: ignore[call-arg]
         params=hs_commands.DeactivateHeaterParams(moduleId="module-id"),

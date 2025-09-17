@@ -6703,6 +6703,19 @@
           "description": "Unique ID of the Heater-Shaker Module.",
           "title": "Moduleid",
           "type": "string"
+        },
+        "taskId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Id for the background task that manages the temperature",
+          "title": "Taskid"
         }
       },
       "required": ["moduleId", "celsius"],
