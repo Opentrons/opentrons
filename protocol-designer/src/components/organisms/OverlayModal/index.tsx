@@ -8,10 +8,9 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   Modal,
-  PrimaryButton,
-  SecondaryButton,
   SPACING,
   StyledText,
 } from '@opentrons/components'
@@ -55,17 +54,17 @@ export function OverlayModal(props: OverlayModalProps): JSX.Element {
       <Flex
         flexDirection={DIRECTION_COLUMN}
         alignItems={ALIGN_CENTER}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
         gridGap={SPACING.spacing16}
+        marginTop={SPACING.spacing120}
       >
-        <StyledText desktopStyle="headingLargeBold" oddStyle="level4HeaderBold">
+        <StyledText desktopStyle="headingLargeBold" oddStyle="level4HeaderBold" color={COLORS.white}>
           {header}
         </StyledText>
         {subText != null ? (
           <StyledText
             desktopStyle="bodyLargeRegular"
             oddStyle="bodyTextRegular"
-            color={COLORS.grey60}
+            color={COLORS.white}
           >
             {subText}
           </StyledText>

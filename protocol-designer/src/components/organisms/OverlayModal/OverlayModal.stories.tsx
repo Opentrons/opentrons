@@ -1,12 +1,11 @@
 import {
-  _CENTER,
   ALIGN_CENTER,
-  ALIGNPrimaryButton,
-  Btn,
+  COLORS,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
   SecondaryButton,
+  SPACING,
   VIEWPORT,
 } from '@opentrons/components'
 
@@ -47,9 +46,9 @@ export const PrimaryOverlayModal: Story = {
     header: 'header',
     subText: 'subText',
     children: (
-      <Flex alignItems={ALIGN_CENTER}>
+      <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN} gridGap={SPACING.spacing16}>
         <SecondaryButton>cancel</SecondaryButton>
-        <PrimaryButton>continue</PrimaryButton>
+        <PrimaryButton backgroundColor={COLORS.red50}>continue</PrimaryButton>
       </Flex>
     ),
     handleCancel: () => {},
