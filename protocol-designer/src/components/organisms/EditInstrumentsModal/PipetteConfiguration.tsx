@@ -85,6 +85,7 @@ export function PipetteConfiguration({
     setPipetteVolume,
     selectedTips,
     setSelectedTips,
+    temporarilyDeletedPipettes,
   } = pipetteConfig
 
   return (
@@ -104,7 +105,8 @@ export function PipetteConfiguration({
               has96Channel,
               leftPipette,
               rightPipette,
-              mount
+              mount,
+              temporarilyDeletedPipettes
             ) ? (
               <RadioButton
                 key={`${type.label}_${type.value}`}

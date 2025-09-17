@@ -46,7 +46,8 @@ export const getShouldShowPipetteType = (
   has96Channel: boolean,
   leftPipette?: PipetteOnDeck | null,
   rightPipette?: PipetteOnDeck | null,
-  currentEditingMount?: PipetteMount | null
+  currentEditingMount?: PipetteMount | null,
+  temporarilyDeletedPipettes?: string[] | null
 ): boolean => {
   if (type === '96') {
     // if a protocol has 96-Channel, no 96-Channel button
@@ -54,16 +55,27 @@ export const getShouldShowPipetteType = (
       return false
     }
 
+    const effectiveLeftPipette =
+      leftPipette != null &&
+      !temporarilyDeletedPipettes?.includes(leftPipette.id)
+        ? leftPipette
+        : null
+    const effectiveRightPipette =
+      rightPipette != null &&
+      !temporarilyDeletedPipettes?.includes(rightPipette.id)
+        ? rightPipette
+        : null
+
     // If no mount is being edited (adding a new pipette)
     if (currentEditingMount == null) {
       // Only show if both mounts are empty
-      return leftPipette == null && rightPipette == null
+      return effectiveLeftPipette == null && effectiveRightPipette == null
     }
 
     // Only show if the opposite mount of the one being edited is empty
     return currentEditingMount === 'left'
-      ? rightPipette == null
-      : leftPipette == null
+      ? effectiveRightPipette == null
+      : effectiveLeftPipette == null
   }
 
   // Always show 1-Channel and Multi-Channel options
