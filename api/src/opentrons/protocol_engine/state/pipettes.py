@@ -19,7 +19,7 @@ from opentrons_shared_data.pipette import pipette_definition
 from opentrons_shared_data.pipette.ul_per_mm import calculate_ul_per_mm
 from opentrons_shared_data.pipette.types import (
     UlPerMmAction,
-    LiquidClasses as VolumeClasses,
+    LiquidClasses as VolumeModes,
 )
 
 from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
@@ -110,7 +110,7 @@ class StaticPipetteConfig:
     plunger_positions: Dict[str, float]
     shaft_ul_per_mm: float
     available_sensors: pipette_definition.AvailableSensorDefinition
-    volume_mode: VolumeClasses
+    volume_mode: VolumeModes
 
 
 @dataclasses.dataclass
@@ -874,7 +874,7 @@ class PipetteView:
 
     def get_is_low_volume_mode(self, pipette_id: str) -> bool:
         """Determine if the pipette is currently in low volume mode."""
-        return self.get_config(pipette_id).volume_mode == VolumeClasses.lowVolumeDefault
+        return self.get_config(pipette_id).volume_mode == VolumeModes.lowVolumeDefault
 
     def lookup_volume_to_mm_conversion(
         self, pipette_id: str, volume: float, action: str

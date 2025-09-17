@@ -5,7 +5,7 @@ import pytest
 from opentrons_shared_data.pipette.types import (
     PipetteNameType,
     PipetteModel,
-    LiquidClasses as VolumeClasses,
+    LiquidClasses as VolumeModes,
 )
 from opentrons_shared_data.pipette import pipette_definition, types as pip_types
 from opentrons_shared_data.pipette.pipette_definition import (
@@ -85,7 +85,7 @@ def test_get_virtual_pipette_static_config(
         },
         shaft_ul_per_mm=0.785,
         available_sensors=AvailableSensorDefinition(sensors=[]),
-        volume_mode=VolumeClasses.default,
+        volume_mode=VolumeModes.default,
     )
 
 
@@ -127,7 +127,7 @@ def test_configure_virtual_pipette_for_volume(
         },
         shaft_ul_per_mm=0.785,
         available_sensors=available_sensors,
-        volume_mode=VolumeClasses.default,
+        volume_mode=VolumeModes.default,
     )
     subject_instance.configure_virtual_pipette_for_volume(
         "my-pipette", 1, result1.model
@@ -165,7 +165,7 @@ def test_configure_virtual_pipette_for_volume(
         },
         shaft_ul_per_mm=0.785,
         available_sensors=available_sensors,
-        volume_mode=VolumeClasses.lowVolumeDefault,
+        volume_mode=VolumeModes.lowVolumeDefault,
     )
 
 
@@ -204,7 +204,7 @@ def test_load_virtual_pipette_by_model_string(
         },
         shaft_ul_per_mm=9.621,
         available_sensors=AvailableSensorDefinition(sensors=[]),
-        volume_mode=VolumeClasses.default,
+        volume_mode=VolumeModes.default,
     )
 
 
@@ -306,7 +306,7 @@ def pipette_dict(
         "plunger_positions": {"top": 100, "bottom": 20, "blow_out": 10, "drop_tip": 0},
         "shaft_ul_per_mm": 5.0,
         "available_sensors": available_sensors,
-        "volume_mode": VolumeClasses.lowVolumeDefault,
+        "volume_mode": VolumeModes.lowVolumeDefault,
     }
 
 
@@ -357,7 +357,7 @@ def test_get_pipette_static_config(
         plunger_positions={"top": 100, "bottom": 20, "blow_out": 10, "drop_tip": 0},
         shaft_ul_per_mm=5.0,
         available_sensors=available_sensors,
-        volume_mode=VolumeClasses.lowVolumeDefault,
+        volume_mode=VolumeModes.lowVolumeDefault,
     )
 
 

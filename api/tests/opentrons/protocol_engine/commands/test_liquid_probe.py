@@ -23,7 +23,7 @@ from opentrons_shared_data.pipette.pipette_definition import (
 
 from opentrons_shared_data.pipette.types import (
     PipetteNameType,
-    LiquidClasses as VolumeClasses,
+    LiquidClasses as VolumeModes,
 )
 
 from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
@@ -237,7 +237,7 @@ async def test_liquid_probe_implementation(
             },
             shaft_ul_per_mm=5.0,
             available_sensors=available_sensors,
-            volume_mode=VolumeClasses.default,
+            volume_mode=VolumeModes.default,
         )
     )
 
@@ -333,7 +333,7 @@ async def test_liquid_not_found_error(
             },
             shaft_ul_per_mm=5.0,
             available_sensors=available_sensors,
-            volume_mode=VolumeClasses.default,
+            volume_mode=VolumeModes.default,
         )
     )
     decoy.when(
@@ -461,7 +461,7 @@ async def test_liquid_probe_tip_checking(
             },
             shaft_ul_per_mm=5.0,
             available_sensors=available_sensors,
-            volume_mode=VolumeClasses.default,
+            volume_mode=VolumeModes.default,
         )
     )
     with pytest.raises(TipNotAttachedError):
@@ -525,7 +525,7 @@ async def test_liquid_probe_plunger_preparedness_checking(
             },
             shaft_ul_per_mm=5.0,
             available_sensors=available_sensors,
-            volume_mode=VolumeClasses.default,
+            volume_mode=VolumeModes.default,
         )
     )
     decoy.when(state_view.pipettes.get_aspirated_volume(pipette_id)).then_return(None)
@@ -591,7 +591,7 @@ async def test_liquid_probe_volume_checking(
             },
             shaft_ul_per_mm=5.0,
             available_sensors=available_sensors,
-            volume_mode=VolumeClasses.default,
+            volume_mode=VolumeModes.default,
         )
     )
     decoy.when(
@@ -665,7 +665,7 @@ async def test_liquid_probe_location_checking(
             },
             shaft_ul_per_mm=5.0,
             available_sensors=available_sensors,
-            volume_mode=VolumeClasses.default,
+            volume_mode=VolumeModes.default,
         )
     )
     decoy.when(
@@ -736,7 +736,7 @@ async def test_liquid_probe_stall(
             },
             shaft_ul_per_mm=5.0,
             available_sensors=available_sensors,
-            volume_mode=VolumeClasses.default,
+            volume_mode=VolumeModes.default,
         )
     )
     decoy.when(

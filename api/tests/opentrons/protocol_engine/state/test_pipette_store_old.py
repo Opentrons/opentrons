@@ -8,7 +8,7 @@ import pytest
 
 from opentrons_shared_data.pipette.types import (
     PipetteNameType,
-    LiquidClasses as VolumeClasses,
+    LiquidClasses as VolumeModes,
 )
 from opentrons_shared_data.pipette import pipette_definition
 
@@ -226,7 +226,7 @@ def test_handles_load_pipette(
         },
         shaft_ul_per_mm=5.0,
         available_sensors=available_sensors,
-        volume_mode=VolumeClasses.default,
+        volume_mode=VolumeModes.default,
     )
     config_update = update_types.PipetteConfigUpdate(
         pipette_id="pipette-id",
@@ -668,7 +668,7 @@ def test_add_pipette_config(
         },
         shaft_ul_per_mm=5.0,
         available_sensors=available_sensors,
-        volume_mode=VolumeClasses.default,
+        volume_mode=VolumeModes.default,
     )
 
     subject.handle_action(
@@ -715,7 +715,7 @@ def test_add_pipette_config(
         },
         shaft_ul_per_mm=5.0,
         available_sensors=available_sensors,
-        volume_mode=VolumeClasses.default,
+        volume_mode=VolumeModes.default,
     )
     assert subject.state.flow_rates_by_id["pipette-id"].default_aspirate == {"a": 1.0}
     assert subject.state.flow_rates_by_id["pipette-id"].default_dispense == {"b": 2.0}

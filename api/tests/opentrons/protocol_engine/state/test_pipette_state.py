@@ -11,7 +11,7 @@ import pytest
 from opentrons_shared_data.pipette import pipette_definition
 from opentrons_shared_data.pipette.types import (
     PipetteNameType,
-    LiquidClasses as VolumeClasses,
+    LiquidClasses as VolumeModes,
 )
 
 from opentrons.hardware_control.nozzle_manager import NozzleMap
@@ -87,7 +87,7 @@ def test_handle_pipette_config_action(
             available_sensors=pipette_definition.AvailableSensorDefinition(
                 sensors=["pressure", "capacitive", "environment"]
             ),
-            volume_mode=VolumeClasses.default,
+            volume_mode=VolumeModes.default,
         ),
     )
     subject.handle_action(
@@ -203,7 +203,7 @@ def test_active_channels(
             available_sensors=pipette_definition.AvailableSensorDefinition(
                 sensors=["pressure", "capacitive", "environment"]
             ),
-            volume_mode=VolumeClasses.default,
+            volume_mode=VolumeModes.default,
         ),
     )
     subject.handle_action(
