@@ -16,6 +16,7 @@ on:
     branches:
       - 'edge'
       - 'chore_release*'
+      - 'cypress-caching'
     tags:
       - 'staging-labware-library*'
       - 'labware-library*'
