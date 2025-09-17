@@ -8,6 +8,7 @@ import { removeHint } from '/protocol-designer/tutorial/actions'
 import { OverlayModal, useOverlayModal } from '..'
 
 import type { ComponentProps } from 'react'
+import { Btn } from '@opentrons/components'
 
 vi.mock('/protocol-designer/tutorial/actions')
 
@@ -25,17 +26,24 @@ describe('OverlayModal', () => {
       header: 'header',
       subText: 'subText',
       children: <div>mock content</div>,
-      handleCancel: vi.fn(),
-      handleContinue: vi.fn(),
     }
   })
-  it('renders the hint with buttons and checkbox', () => {
+
+  it('renders the OverlayModal with no buttons', () => {
     render(props)
-    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
-    expect(props.handleCancel).toHaveBeenCalled()
-    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
-    expect(props.handleContinue).toHaveBeenCalled()
-    expect(vi.mocked(removeHint)).toHaveBeenCalled()
+    screen.getByText('header')
+    screen.getByText('subText')
     screen.getByText('mock content')
+  })
+
+  it('renders the OverlayModal with buttons', () => {
+    props = {
+      ...props,
+      children: <Btn>mock button</Btn>,
+    }
+    render(props)
+    screen.getByText('header')
+    screen.getByText('subText')
+    screen.getByRole('button', { name: 'mock button' })
   })
 })
