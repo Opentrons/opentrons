@@ -130,8 +130,8 @@ describe('DesktopApp', () => {
     screen.getByText('Mock ProtocolsLanding')
   })
 
-  it('renders a ProtocolsTimeline component from /preview', () => {
-    render(`/protocols/95e67900-bc9f-4fbf-92c6-cc4d7226a51b/preview`)
+  it('renders a ProtocolsTimeline component from /visualization', () => {
+    render(`/protocols/95e67900-bc9f-4fbf-92c6-cc4d7226a51b/visualization`)
     screen.getByText('Mock Preview')
   })
 

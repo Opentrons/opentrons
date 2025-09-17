@@ -82,7 +82,7 @@ export const DesktopApp = (): JSX.Element => {
     {
       Component: ProtocolPreview,
       name: 'Preview',
-      path: '/protocols/:protocolKey/preview',
+      path: '/protocols/:protocolKey/visualization',
     },
     {
       Component: Labware,
