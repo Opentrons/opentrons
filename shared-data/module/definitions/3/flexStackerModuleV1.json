@@ -61,32 +61,6 @@
   "displayName": "Flex Stacker Module GEN1",
   "quirks": [],
   "slotTransforms": {
-    "ot2_short_trash": {
-      "3": {
-        "labwareOffset": [
-          [-1, 0, 0, 0],
-          [0, -1, 0, 0],
-          [0, 0, 1, 0],
-          [0, 0, 0, 1]
-        ]
-      },
-      "6": {
-        "labwareOffset": [
-          [-1, 0, 0, 0],
-          [0, -1, 0, 0],
-          [0, 0, 1, 0],
-          [0, 0, 0, 1]
-        ]
-      },
-      "9": {
-        "labwareOffset": [
-          [-1, 0, 0, 0],
-          [0, -1, 0, 0],
-          [0, 0, 1, 0],
-          [0, 0, 0, 1]
-        ]
-      }
-    },
     "ot3_standard": {
       "D1": {
         "labwareOffset": [
