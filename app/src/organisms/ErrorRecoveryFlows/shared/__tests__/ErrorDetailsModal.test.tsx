@@ -16,6 +16,7 @@ import {
   NoLiquidDetectedBanner,
   OverpressureBanner,
   StackerShuttleMissingErrorBanner,
+  StackerShuttleStoreEmptyErrorBanner,
   StackerStallErrorBanner,
   StallErrorBanner,
   TipNotDetectedBanner,
@@ -285,6 +286,22 @@ describe('renders the InlineNotification', () => {
         heading:
           'Stacker shuttle missing errors occur when the shuttle is not placed correctly on the track',
         message: 'Load the stacker shuttle onto the track to proceed',
+      }),
+      {}
+    )
+  })
+
+  it('renders the InlineNotification for StackerShuttleStoreEmptyErrorBanner', () => {
+    renderWithProviders(<StackerShuttleStoreEmptyErrorBanner />, {
+      i18nInstance: i18n,
+    })
+    expect(vi.mocked(InlineNotification)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'alert',
+        heading:
+          'Shuttle empty errors occur when the robot tries to store labware into a stacker from an empty shuttle',
+        message:
+          'shuttle with the correct labware to complete the stacker store step.',
       }),
       {}
     )
