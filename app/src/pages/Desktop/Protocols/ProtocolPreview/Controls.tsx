@@ -105,7 +105,7 @@ export function Controls(props: ControlsProps): JSX.Element {
               </button>
               <button className={styles.play_button} onClick={handlePlayPause}>
                 <Icon
-                  name={isPlaying ? 'pause' : 'play-icon'}
+                  name={isPlaying ? 'pause' : 'play'}
                   width="1.5625rem"
                   height="1.5rem"
                   color="white"
