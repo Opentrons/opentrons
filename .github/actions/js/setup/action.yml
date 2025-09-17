@@ -47,8 +47,7 @@ runs:
       shell: bash
       run: |
         export CYPRESS_CACHE_FOLDER=~/.cache/Cypress
-        export CYPRESS_INSTALL_BINARY=1
-        export CYPRESS_VERSION=13.7.1
-        echo "Cypress version: $CYPRESS_VERSION"
+        export CYPRESS_INSTALL_BINARY=https://download.cypress.io/desktop/13.7.1?platform=linux&arch=x64
+        echo "Cypress install binary URL: $CYPRESS_INSTALL_BINARY"
         echo "Package.json cypress version: $(grep '"cypress"' package.json)"
         make setup-js
