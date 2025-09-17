@@ -33,9 +33,9 @@ runs:
       uses: actions/cache@v4
       with:
         path: ~/.cache/Cypress
-        key: cypress-${{ runner.os }}-13.7.1-${{ hashFiles('**/yarn.lock') }}
+        key: cypress-${{ runner.os }}-13.8.0-${{ hashFiles('**/yarn.lock') }}
         restore-keys: |
-          cypress-${{ runner.os }}-13.7.1-
+          cypress-${{ runner.os }}-13.8.0-
           cypress-${{ runner.os }}-
 
     - name: 'Install udev for USB-detection'
