@@ -183,7 +183,7 @@ export function useAspirateSettingsConfig({
       option: SETTING_OPTIONS.ASPIRATE_AIR_GAP,
       copy: t('air_gap'),
       value:
-        state.airGapAspirate !== undefined && hasLiquidClass
+        state.airGapAspirate !== undefined
           ? t('air_gap_value', { volume: state.airGapAspirate })
           : t('option_disabled'),
       enabled: true,
