@@ -9,7 +9,10 @@ from typing import Any, Optional, cast, Dict
 import pytest
 from _pytest.fixtures import SubRequest
 
-from opentrons_shared_data.pipette.types import PipetteNameType
+from opentrons_shared_data.pipette.types import (
+    PipetteNameType,
+    LiquidClasses as VolumeClasses,
+)
 from opentrons_shared_data.pipette import pipette_definition
 from opentrons_shared_data.labware.types import LabwareUri
 
@@ -178,6 +181,7 @@ def loaded_static_pipette_data(
         },
         shaft_ul_per_mm=5.0,
         available_sensors=available_sensors,
+        volume_mode=VolumeClasses.default,
     )
 
 
