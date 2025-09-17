@@ -55,7 +55,7 @@ jobs:
           echo "cypress_version=$CYPRESS_VERSION" >> $GITHUB_OUTPUT
           
           # Check if release already exists
-          if curl -s --head "https://github.com/Opentrons/opentrons/releases/download/cypress-${CYPRESS_VERSION}/cypress-${CYPRESS_VERSION}-linux-x64.zip" | head -n 1 | grep -q "200 OK"; then
+          if curl -s --head "https://github.com/Opentrons/cypress-mirror/releases/download/cypress-${CYPRESS_VERSION}/cypress-${CYPRESS_VERSION}-linux-x64.zip" | head -n 1 | grep -q "200 OK"; then
             echo "exists=true" >> $GITHUB_OUTPUT
             echo "✅ Cypress ${CYPRESS_VERSION} is already cached"
           else

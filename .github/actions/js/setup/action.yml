@@ -62,7 +62,7 @@ runs:
         fi
         
         # Try GitHub release first, fallback to official download
-        GITHUB_RELEASE_URL="https://github.com/Opentrons/opentrons/releases/download/cypress-${CYPRESS_VERSION}/cypress-${CYPRESS_VERSION}-${PLATFORM}-${ARCH}.zip"
+        GITHUB_RELEASE_URL="https://github.com/Opentrons/cypress-mirror/releases/download/cypress-${CYPRESS_VERSION}/cypress-${CYPRESS_VERSION}-${PLATFORM}-${ARCH}.zip"
         OFFICIAL_URL="https://download.cypress.io/desktop/${CYPRESS_VERSION}?platform=${PLATFORM}&arch=${ARCH}"
         
         # Check if GitHub release exists, use it if available

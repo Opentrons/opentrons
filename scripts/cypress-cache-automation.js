@@ -20,7 +20,7 @@ const { execSync } = require('child_process')
 
 const REPO_DETAILS = {
   owner: 'Opentrons',
-  repo: 'opentrons',
+  repo: 'cypress-mirror',
 }
 
 const PLATFORMS = [
