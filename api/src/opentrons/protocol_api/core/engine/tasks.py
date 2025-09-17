@@ -5,8 +5,8 @@ from opentrons.protocol_engine.errors.exceptions import NoTaskFoundError
 
 
 class EngineTaskCore(AbstractTaskCore):
-    def __init__(self, id: str, engine_client: ProtocolEngineClient) -> None:
-        self._id = id
+    def __init__(self, task_id: str, engine_client: ProtocolEngineClient) -> None:
+        self._id = task_id
         self._engine_client = engine_client
 
     def get_created_at_timestamp(self) -> datetime:

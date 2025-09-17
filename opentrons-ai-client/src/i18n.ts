@@ -12,7 +12,7 @@ i18n.use(initReactI18next).init(
     resources,
     lng: 'en',
     fallbackLng: 'en',
-    debug: process.env.NODE_ENV === 'development',
+    debug: _NODE_ENV_ === 'development',
     ns: ['shared'],
     defaultNS: 'shared',
     interpolation: {
@@ -29,7 +29,7 @@ i18n.use(initReactI18next).init(
     keySeparator: false, // use namespaces and context instead
     saveMissing: true,
     missingKeyHandler: (lng, ns, key) => {
-      process.env.NODE_ENV === 'test'
+      _NODE_ENV_ === 'test'
         ? console.error(`Missing ${lng} Translation: key={${key}} ns={${ns}}`)
         : console.warn(`Missing ${lng} Translation: key={${key}} ns={${ns}}`)
     },

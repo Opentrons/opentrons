@@ -1450,6 +1450,7 @@ describe('unsavedForm reducer', () => {
         },
         startStepId: '3',
         endStepId: '5',
+        newTiprackURI: 'mockURI',
       },
     }
     const rootState: RootState = {
@@ -1483,6 +1484,7 @@ describe('unsavedForm reducer', () => {
       [
         {
           pipette: 'newPipetteId',
+          tipRack: 'mockURI',
         },
         rootState.unsavedForm,
         'pipetteEntitiesPlaceholder',

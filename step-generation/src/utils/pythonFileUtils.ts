@@ -53,7 +53,7 @@ export function pythonImports(): string {
 }
 
 export function pythonMetadata(
-  fileMetadata: ProtocolFile<{}>['metadata']
+  fileMetadata: ProtocolFile<{}>['metadata'] & { protocolDesigner?: string }
 ): string {
   // FileMetadataFields has timestamps, lists, etc., but Python metadata dict can only contain strings
   function formatTimestamp(timestamp: number | null | undefined): string {
@@ -69,7 +69,7 @@ export function pythonMetadata(
       category: fileMetadata.category,
       subcategory: fileMetadata.subcategory,
       tags: fileMetadata.tags?.length && fileMetadata.tags.join(', '),
-      protocolDesigner: process.env.OT_PD_VERSION,
+      protocolDesigner: fileMetadata.protocolDesigner,
       source: fileMetadata.source,
     }).filter(([key, value]) => value) // drop blank entries
   )

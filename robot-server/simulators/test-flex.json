@@ -10,7 +10,7 @@
       "model": "p50_single_3.4",
       "id": "123_flex"
     },
-    "gripper":{
+    "gripper": {
       "model": "gripper_1.3",
       "id": "1234_flex_gripper"
     }
@@ -27,7 +27,6 @@
               "temperature": 3,
               "hold_time_seconds": 1,
               "hold_time_minutes": 2,
-              "ramp_rate": 4,
               "volume": 5
             }
           },
