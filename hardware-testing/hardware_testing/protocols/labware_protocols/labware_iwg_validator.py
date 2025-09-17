@@ -7,12 +7,16 @@ from opentrons.protocol_api import (
     ParameterContext,
     Well,
 )
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    PositionReference,
+    Coordinate,
+)
 from typing import List, Dict, Optional, Union, Tuple
 from opentrons.types import Point
 from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
 
 # LABWARE TYPE
-LABWARE = "eppendorf_96_wellplate_500ul"  # change to desired labware
+LABWARE = "eppendorf_96_wellplate_150ul"  # change to desired labware
 
 # SLOTS
 SLOT_LIQUID_TIPRACKS = ["C3", "B3", "A2"]
@@ -65,8 +69,17 @@ def add_parameters(parameters: ParameterContext) -> None:
     parameters.add_int(
         variable_name="n_regions",
         display_name="Number of Regions",
-        description="Number of dispense regions to test (splits depth into intervals).",
-        default=5,
+        description="Number of depth intervals to test. ",
+        default=3,
+        minimum=1,
+        maximum=20,
+    )
+
+    parameters.add_int(
+        variable_name="number_of_trials",
+        display_name="trials per region",
+        description="Number of trials per region.",
+        default=3,
         minimum=1,
         maximum=20,
     )
@@ -82,8 +95,6 @@ def add_parameters(parameters: ParameterContext) -> None:
     )
 
 
-# ...existing code...
-
 def _setup(
     ctx: ProtocolContext,
 ) -> Tuple[
@@ -98,11 +109,10 @@ def _setup(
     List[Labware],
     InstrumentContext,
     str,
-    int,  
+    int,
+    List[float],
 ]:
     global DIAL_PORT, RUN_ID, FILE_NAME, LABWARE
-
-    n_regions = int(getattr(ctx.params, "n_regions", 5)) 
 
     labware_type = LABWARE
 
@@ -114,10 +124,12 @@ def _setup(
     ethanol_liq = ctx.define_liquid("Ethanol", display_color="#FFFFC5")
     src["A1"].load_liquid(ethanol_liq, src["A1"].max_volume - 1000)
     ctx.load_trash_bin("A3")
-    dial = ctx.load_labware("nest_1_reservoir_290ml", SLOT_DIAL)
+    dial = ctx.load_labware("dial_indicator", SLOT_DIAL)
     left_mount = ctx.params.left_mount  # type: ignore[attr-defined]
     right_mount = ctx.params.right_mount  # type: ignore[attr-defined]
     liq_tip_size = ctx.params.liq_tip_size  # type: ignore[attr-defined]
+    n_regions = ctx.params.n_regions  # type: ignore[attr-defined]
+    number_of_trials = ctx.params.number_of_trials  # type: ignore[attr-defined]
 
     liq_tip_racks = [
         ctx.load_labware(f"opentrons_flex_96_tiprack_{liq_tip_size}ul", slot)
@@ -160,9 +172,19 @@ def _setup(
     depth = labware["A1"].depth
 
     # Calculate region heights based on n_regions
-    region_heights = [(depth * (i + 1) / n_regions) for i in range(n_regions)]
+    region_heights: List[float]
+    if n_regions == 3:
+        region_heights = [3, depth / 2, depth * 4 / 5]
+    else:
+        region_heights = [(depth * (i + 1) / n_regions) for i in range(n_regions)]
 
-    # Each region will be tested number_of_trials times
+    # Ensure the last interval never reaches a calculated volume above the max volume for that well
+    if region_heights:
+        max_vol = labware["A1"].max_volume
+        max_height = extract_float(labware["A1"].height_from_volume(max_vol))
+        if region_heights[-1] > max_height:
+            region_heights[-1] = max_height
+
     expected_heights = []
     for h in region_heights:
         expected_heights.extend([h] * number_of_trials)
@@ -179,8 +201,10 @@ def _setup(
         liq_tip_racks,
         right_mount,
         liq_tip_size,
-        n_regions,  
+        n_regions,
+        region_heights,
     )
+
 
 def pick_up_tips(
     probe_pipette: InstrumentContext, liq_pipette: InstrumentContext
@@ -238,16 +262,17 @@ def _write_line_to_csv(ctx: ProtocolContext, line: List[str]) -> None:
     append_data_to_file(metadata["protocolName"], RUN_ID, FILE_NAME, line_str)
 
 
+def extract_float(result: Union[float | SimulatedProbeResult]) -> float:
+    """Extract float."""
+    if isinstance(result, SimulatedProbeResult):
+        return result.net_liquid_exchanged_after_probe
+    return float(result)
+
+
 def _get_height_of_liquid_in_well(
     pipette: InstrumentContext, well: Well, simulating: bool
 ) -> float:
     """Get height of liquid in well."""
-
-    def extract_float(result: Union[float | SimulatedProbeResult]) -> float:
-        """Extract float."""
-        if isinstance(result, SimulatedProbeResult):
-            return result.net_liquid_exchanged_after_probe
-        return float(result)
 
     if not simulating:
         return extract_float(pipette.measure_liquid_height(well))
@@ -288,32 +313,38 @@ def aspirate_dispense_measure(
         expected_height = expected_heights[i]
 
         if liq_tip_size == "1000":
-            dispense_offset = expected_height + 10
-            liq_pipette.flow_rate.blow_out = 1000
+            liq_pipette.flow_rate.blow_out = 200
         else:
-            dispense_offset = expected_height + 3
-            liq_pipette.flow_rate.blow_out = 500
+            liq_pipette.flow_rate.blow_out = 50
 
         meniscus_z = -0.5
-
+        dispense_offset = 10  # type: ignore [attr-defined]
         ethanol = ctx.get_liquid_class(name="ethanol_80")
 
-        wb = "well-bottom"
         lm = "liquid-meniscus"
-        dest = "destination"
         for rack in liq_tip_racks:
             ethanol_props = ethanol.get_for(right_mount, rack)
+            # Aspirate settings
             ethanol_props.aspirate.aspirate_position.position_reference = lm  # type: ignore[assignment]
-            ethanol_props.aspirate.aspirate_position.offset.z = meniscus_z
-            ethanol_props.dispense.dispense_position.position_reference = wb  # type: ignore[assignment]
-            ethanol_props.dispense.dispense_position.offset.z = dispense_offset
-            ethanol_props.dispense.push_out_by_volume.set_for_all_volumes(0.0)
-            ethanol_props.dispense.flow_rate_by_volume.set_for_all_volumes(50)
-            ethanol_props.dispense.retract.blowout.location = dest  # type: ignore[assignment]
+            ethanol_props.aspirate.aspirate_position.offset.z = meniscus_z  # type: ignore[assignment]
+            # Dispense settings
+            ethanol_props.dispense.dispense_position.offset.z = dispense_offset  # type: ignore [attr-defined]
+            ethanol_props.dispense.dispense_position.position_reference = (
+                PositionReference.LIQUID_MENISCUS
+            )  # type: ignore [attr-defined]
+            # Flow rates and speeds (example values, can be parameterized)
+            ethanol_props.dispense.flow_rate_by_volume.set_for_all_volumes(50)  # type: ignore [attr-defined]
+            ethanol_props.dispense.submerge.speed = 50  # type: ignore [attr-defined]
+            ethanol_props.dispense.retract.speed = 50  # type: ignore [attr-defined]
+            ethanol_props.dispense.push_out_by_volume.set_for_all_volumes(3.5)  # type: ignore [attr-defined]
             ethanol_props.dispense.retract.blowout.flow_rate = (
                 liq_pipette.flow_rate.blow_out
-            )
-            ethanol_props.dispense.retract.blowout.enabled = True
+            )  # type: ignore [attr-defined]
+            ethanol_props.dispense.retract.blowout.enabled = True  # type: ignore [attr-defined]
+            ethanol_props.dispense.retract.end_position.position_reference = (  # type: ignore [attr-defined]
+                PositionReference.WELL_TOP
+            )  # type: ignore [attr-defined]
+            ethanol_props.dispense.retract.end_position.offset.z = 10  # type: ignore [attr-defined]
 
         liq_pipette.transfer_with_liquid_class(
             liquid_class=ethanol,
@@ -323,6 +354,8 @@ def aspirate_dispense_measure(
             new_tip="never",
             return_tip=False,
         )
+        if expected_heights[i] <= labware["A1"].depth - 5:
+            liq_pipette.touch_tip()
 
         height = _get_height_of_liquid_in_well(
             probe_pipette, labware[well], ctx.is_simulating()
@@ -357,7 +390,8 @@ def run(ctx: ProtocolContext) -> None:
         liq_tip_racks,
         right_mount,
         liq_tip_size,
-        n_regions,  # <-- unpack n_regions
+        n_regions,
+        region_heights,
     ) = _setup(ctx)
 
     wells = [str(w).split(" ")[0] for w in labware.wells()]
@@ -386,9 +420,8 @@ def run(ctx: ProtocolContext) -> None:
         liq_tip_size,
     )
 
-    region_results = []
+    region_results: List[str] = []
     region_len = number_of_trials
-    region_heights = list(dict.fromkeys(expected_heights))  # unique region heights
 
     if not ctx.is_simulating():
         for i in range(n_regions):
@@ -398,18 +431,22 @@ def run(ctx: ProtocolContext) -> None:
             expected_val = region_heights[i]
             errors = [abs(c - expected_val) for c in corrected]
             avg_error = sum(errors) / len(errors) if errors else 0.0
-            region_results.extend(
-                [str(round(c, 3)) for c in corrected]
-                + [str(round(expected_val, 3))]
-                + [str(round(avg_error, 3))]
-            )
+
+            # Add corrected heights
+            region_results.extend(str(round(c, 3)) for c in corrected)
+
+            # Add expected value
+            region_results.append(str(round(expected_val, 3)))
+
+            # Add average error
+            region_results.append(str(round(avg_error, 3)))
 
         from hardware_testing.data import append_data_to_file
 
         line = [labware_type] + region_results
         line_str = ",".join(line) + "\n"
         append_data_to_file(metadata["protocolName"], RUN_ID, FILE_NAME, line_str)
-        ctx.pause(f"Results: {line_str}")
+        ctx.pause(f"Results:\n{line_str}")
 
     drop_tips(probe_pipette, liq_pipette)
 

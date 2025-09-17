@@ -10,6 +10,9 @@ from opentrons.protocol_api import (
     Labware,
     LiquidClass,
 )
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    PositionReference,
+)
 from opentrons.types import Point
 from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
 import numpy as np
@@ -21,7 +24,7 @@ from dataclasses import dataclass, field
 #  GLOBAL VARIABLES - START
 ###########################################
 
-LABWARE = "opentrons_15_tuberack_15000ul"  # change to desired labware
+LABWARE = "eppendorf_96_wellplate_150ul"  # change to desired labware
 
 RESERVOIR = "nest_1_reservoir_290ml"
 
@@ -191,7 +194,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         display_name="Step Height Target",
         description="Specify the desired target step height, i.e 1mm",
         default=1.0,
-        maximum=3.0,
+        maximum=10,
         minimum=0.1,
     )
 
@@ -491,14 +494,13 @@ def generate_frusta(
 def get_dispense_props(state: SetupState, ts: TrialState) -> None:
     if state.liquid_tip == "1000":
         dispense_offset = ts.corrected_height + state.target_height + 10
-        state.liq_pipette.flow_rate.blow_out = 1000
+        state.liq_pipette.flow_rate.blow_out = 200
     else:
         dispense_offset = ts.corrected_height + state.target_height + 3
-        state.liq_pipette.flow_rate.blow_out = 500
+        state.liq_pipette.flow_rate.blow_out = 50
 
     wb = "well-bottom"
     lm = "liquid-meniscus"
-    dest = "destination"
     meniscus_z = -0.5
 
     for rack in state.liquid_racks:
@@ -507,27 +509,32 @@ def get_dispense_props(state: SetupState, ts: TrialState) -> None:
         ethanol_props.aspirate.aspirate_position.offset.z = meniscus_z
         ethanol_props.dispense.dispense_position.position_reference = wb  # type: ignore[assignment]
         ethanol_props.dispense.dispense_position.offset.z = dispense_offset
-        ethanol_props.dispense.push_out_by_volume.set_for_all_volumes(0.0)
+        ethanol_props.dispense.push_out_by_volume.set_for_all_volumes(3.5)
         ethanol_props.dispense.flow_rate_by_volume.set_for_all_volumes(50)
-        ethanol_props.dispense.retract.blowout.location = dest  # type: ignore[assignment]
         ethanol_props.dispense.retract.blowout.flow_rate = (
             state.liq_pipette.flow_rate.blow_out
         )
+        ethanol_props.dispense.retract.end_position.position_reference = (
+            PositionReference.WELL_TOP
+        )
+        ethanol_props.dispense.retract.end_position.offset = 10  # type: ignore[assignment]
         ethanol_props.dispense.retract.blowout.enabled = True
 
 
 def get_alpha_for_height(state: SetupState, ts: TrialState) -> float:
     """Return adaptive proportional factor depending on well size & current height."""
-    if state.max_volume >= 200000:
-        alpha_low, alpha_high = 0.5, 1.5
-    elif state.max_volume >= 2000:
-        alpha_low, alpha_high = 0.2, 0.5
-    elif state.max_volume >= 250:
+    if state.max_volume >= 100000:
+        alpha_low, alpha_high = 0.2, 0.3
+    if state.max_volume >= 5000:
+        alpha_low, alpha_high = 0.2, 0.35
+    elif state.max_volume >= 3000:
+        alpha_low, alpha_high = 0.35, 0.6
+    elif state.max_volume >= 350:
         alpha_low, alpha_high = 0.5, 0.8
-    elif state.max_volume >= 100:
+    elif state.max_volume >= 90:
         alpha_low, alpha_high = 0.8, 1.0
     else:
-        alpha_low, alpha_high = 1.0, 0.8
+        alpha_low, alpha_high = 0.8, 1.0
     return alpha_low if ts.corrected_height < state.threshold else alpha_high
 
 
@@ -594,10 +601,9 @@ def geometry_creator(
     # Stops the protocol once the dispensed volume reaches a certain point
     stop_volume = state.max_volume * 0.85
 
+    # initial protocol steps
     _store_dial_baseline(ctx, state.probe_pipette, state.dial)
     _write_line_to_csv(ctx, CSV_HEADER)
-
-    # initial protocol steps
     write_trial_log(ctx, ts)
     state.liq_pipette.pick_up_tip()
     _get_height_of_liquid_in_well(
@@ -608,21 +614,22 @@ def geometry_creator(
     while ts.dispense_volume < stop_volume:
 
         ts.current_well = state.wells[ts.step % len(state.wells)]
+        drop_tips(state.liq_pipette, state.probe_pipette)
+        get_dispense_props(state, ts)
+
         # check if out of wells
         no_more_wells = ts.step > 0 and ts.step % len(state.wells) == 0
         if no_more_wells:
             if not ctx.is_simulating():
                 ctx.pause("Reload the labware.")
+                _get_height_of_liquid_in_well(
+                    state.liq_pipette, state.src["A1"], ctx.is_simulating()
+                )
             else:
                 break
 
-        drop_tips(state.liq_pipette, state.probe_pipette)
-
-        # Set Dispense Parameters
         ts.dispense_volume += ts.step_volume
         volume_per_channel = ts.dispense_volume / state.liq_pipette.channels
-        get_dispense_props(state, ts)
-
         pick_up_tips(state.liq_pipette, state.probe_pipette)
         ts.tip_z_error = _get_tip_z_error(ctx, state.probe_pipette, state.dial)
 
@@ -635,6 +642,9 @@ def geometry_creator(
             return_tip=False,
         )
 
+        if ts.corrected_height + state.target_height <= state.labware["A1"].depth - 5:
+            state.liq_pipette.touch_tip()
+
         # Measure liquid height
         height = _get_height_of_liquid_in_well(
             state.probe_pipette, state.labware[ts.current_well], ctx.is_simulating()
@@ -642,7 +652,7 @@ def geometry_creator(
         ts.corrected_height = height + ts.tip_z_error
         ts.corrected_heights.append(ts.corrected_height)
 
-        # Compute hdelta
+        # Compute change in height from last liquid probe
         ts.compute_hdelta()
 
         # Check for bad hdelta
