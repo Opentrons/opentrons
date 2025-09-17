@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { Link, useLocation, useParams } from 'react-router-dom'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -42,7 +42,7 @@ function CrumbName({ crumbName, isLastCrumb }: CrumbNameProps): JSX.Element {
       <Box
         paddingRight={SPACING.spacing4}
         textTransform={TYPOGRAPHY.textTransformNone}
-        css={TYPOGRAPHY.labelRegular}
+        css={TEXT_STYLE}
       >
         {crumbName}
       </Box>
@@ -52,6 +52,12 @@ function CrumbName({ crumbName, isLastCrumb }: CrumbNameProps): JSX.Element {
     </Flex>
   )
 }
+
+const TEXT_STYLE = css`
+  font-size: ${TYPOGRAPHY.fontSizeP};
+  font-weight: ${TYPOGRAPHY.fontWeightRegular};
+  line-height: ${TYPOGRAPHY.lineHeight16};
+`
 
 const CrumbLink = styled(Link)`
   &:hover {
@@ -121,7 +127,7 @@ function BreadcrumbsComponent(): JSX.Element | null {
       alignItems={ALIGN_FLEX_START}
       backgroundColor={COLORS.white}
       borderBottom={BORDERS.lineBorder}
-      css={TYPOGRAPHY.labelRegular}
+      css={TEXT_STYLE}
       flexDirection={DIRECTION_ROW}
       padding={`${SPACING.spacing4} 0 ${SPACING.spacing4} ${SPACING.spacing8}`}
     >
