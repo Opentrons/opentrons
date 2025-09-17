@@ -61,19 +61,18 @@ export function getOnlyLatestDefs(): LabwareDefByDefURI {
           unacceptableDefVersions?.[loadName] ?? []
 
         const disallowed = new Set(disallowedVersions)
-        const allowedDefs = group.filter(def => !disallowed.has(def.version))
-
-        // if no allowed defs left, skip this group
-        if (allowedDefs.length === 0) {
-          return acc
-        }
-
-        // find the highest version number among the allowed defs
-        const highestVersionNum = Math.max(
-          ...allowedDefs.map(def => def.version)
-        )
-        const latestDefInGroup = allowedDefs.find(
-          def => def.version === highestVersionNum
+        // find latest allowed def
+        const latestDefInGroup = group.reduce(
+          (latestDef: LabwareDefinition2 | null, def) => {
+            if (disallowed.has(def.version)) {
+              return latestDef
+            }
+            if (latestDef == null || def.version > latestDef.version) {
+              return def
+            }
+            return latestDef
+          },
+          null
         )
 
         if (latestDefInGroup == null) {
