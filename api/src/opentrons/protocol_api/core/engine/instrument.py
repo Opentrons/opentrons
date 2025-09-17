@@ -1465,7 +1465,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         if not keep_last_tip:
             self._drop_tip_for_liquid_class(trash_location, return_tip)
 
-        if self._protocol_core.api_version < _DEFAULT_FLOW_RATE_BUG_FIXED_IN:
+        if self._protocol_core.api_version >= _DEFAULT_FLOW_RATE_BUG_FIXED_IN:
             self._restore_pipette_flow_rates_and_volume_mode(
                 aspirate_flow_rate=original_aspirate_flow_rate,
                 dispense_flow_rate=original_dispense_flow_rate,
@@ -1730,7 +1730,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         if not keep_last_tip:
             self._drop_tip_for_liquid_class(trash_location, return_tip)
 
-        if self._protocol_core.api_version < _DEFAULT_FLOW_RATE_BUG_FIXED_IN:
+        if self._protocol_core.api_version >= _DEFAULT_FLOW_RATE_BUG_FIXED_IN:
             self._restore_pipette_flow_rates_and_volume_mode(
                 aspirate_flow_rate=original_aspirate_flow_rate,
                 dispense_flow_rate=original_dispense_flow_rate,
@@ -1924,7 +1924,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         if not keep_last_tip:
             self._drop_tip_for_liquid_class(trash_location, return_tip)
 
-        if self._protocol_core.api_version < _DEFAULT_FLOW_RATE_BUG_FIXED_IN:
+        if self._protocol_core.api_version >= _DEFAULT_FLOW_RATE_BUG_FIXED_IN:
             self._restore_pipette_flow_rates_and_volume_mode(
                 aspirate_flow_rate=original_aspirate_flow_rate,
                 dispense_flow_rate=original_dispense_flow_rate,
@@ -2047,12 +2047,12 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         blow_out_flow_rate: Optional[float],
         is_low_volume: bool,
     ) -> None:
-        self._user_aspirate_flow_rate = aspirate_flow_rate
-        self._user_dispense_flow_rate = dispense_flow_rate
-        self._user_blow_out_flow_rate = blow_out_flow_rate
         # TODO(jbl 2025-09-17) this works for p50 low volume mode but is not guaranteed to work for future low volume
         #   modes, this should be replaced with something less flaky
         self.configure_for_volume(self.get_max_volume() if not is_low_volume else 1)
+        self._user_aspirate_flow_rate = aspirate_flow_rate
+        self._user_dispense_flow_rate = dispense_flow_rate
+        self._user_blow_out_flow_rate = blow_out_flow_rate
 
     def aspirate_liquid_class(
         self,
