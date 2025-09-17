@@ -30,6 +30,9 @@ from opentrons.protocols.advanced_control.transfers.common import (
     NoLiquidClassPropertyError,
 )
 from opentrons.protocols.advanced_control.transfers import common as tx_commons
+from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import (
+    check_current_volume_before_dispensing,
+)
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine import (
     DeckPoint,
@@ -1702,7 +1705,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             # multi-dispense in those destinations.
             # If the tip has a volume corresponding to a single destination, then
             # do a single-dispense into that destination.
-            for dispense_vol, dispense_dest in vol_dest_combo:
+            for idx, (dispense_vol, dispense_dest) in enumerate(vol_dest_combo):
                 if use_single_dispense:
                     tip_contents = self.dispense_liquid_class(
                         volume=dispense_vol,
@@ -1730,6 +1733,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                         trash_location=trash_location,
                         conditioning_volume=conditioning_vol,
                         disposal_volume=disposal_vol,
+                        is_last_dispense_in_tip=(idx == len(vol_dest_combo) - 1),
                     )
                 is_first_step = False
 
@@ -2143,9 +2147,12 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         """Remove an air gap that was previously added during a transfer."""
         if last_air_gap == 0:
             return
-
+        current_vol = self.get_current_volume()
+        check_current_volume_before_dispensing(
+            current_volume=current_vol, dispense_volume=last_air_gap
+        )
         correction_volume = dispense_props.correction_by_volume.get_for_volume(
-            last_air_gap
+            current_vol - last_air_gap
         )
         # The minimum flow rate should be air_gap_volume per second
         flow_rate = max(
@@ -2280,6 +2287,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         trash_location: Union[Location, TrashBin, WasteChute],
         conditioning_volume: float,
         disposal_volume: float,
+        is_last_dispense_in_tip: bool,
     ) -> List[tx_comps_executor.LiquidAndAirGapPair]:
         """Execute a dispense step that's part of a multi-dispense.
 
@@ -2326,9 +2334,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         components_executor.submerge(
             submerge_properties=dispense_props.submerge, post_submerge_action="dispense"
         )
-        tip_starting_volume = self.get_current_volume()
         is_last_dispense_without_disposal_vol = (
-            disposal_volume == 0 and tip_starting_volume == volume
+            disposal_volume == 0 and is_last_dispense_in_tip
         )
         push_out_vol = (
             # TODO (spp): verify if it's okay to use push_out_by_volume of single dispense
@@ -2348,7 +2355,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             source_well=source[1] if source else None,
             conditioning_volume=conditioning_volume,
             add_final_air_gap=add_final_air_gap,
-            is_last_retract=tip_starting_volume - volume == disposal_volume,
+            is_last_retract=is_last_dispense_in_tip,
         )
         last_contents = components_executor.tip_state.last_liquid_and_air_gap_in_tip
         new_tip_contents = tip_contents[0:-1] + [last_contents]

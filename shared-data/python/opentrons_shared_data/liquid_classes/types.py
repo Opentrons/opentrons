@@ -119,6 +119,7 @@ class MultiDispensePropertiesDict(TypedDict):
     dispense_position: TipPositionDict
     retract: RetractDispenseDict
     conditioning_by_volume: Sequence[Tuple[float, float]]
+    disposal_by_volume: Sequence[Tuple[float, float]]
 
 
 class TransferPropertiesDict(TypedDict):

@@ -8,6 +8,14 @@ By installing and using Opentrons software, you agree to the Opentrons End-User 
 
 ---
 
+## Opentrons App Changes in 8.5.1
+
+Welcome to the v8.5.1 release of the Opentrons App!
+
+There are no changes to the Opentrons App in v8.5.1, but it is required for updating the robot software to improve some features.
+
+---
+
 ## Opentrons App Changes in 8.5.0
 
 Welcome to the v8.5.0 release of the Opentrons App! This release features the ability to run protocols that use liquid classes to improve pipetting accuracy.

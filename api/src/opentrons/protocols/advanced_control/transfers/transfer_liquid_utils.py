@@ -212,3 +212,20 @@ def _group_wells_for_nozzle_configuration(  # noqa: C901
         grouped_wells.reverse()
 
     return grouped_wells
+
+
+def check_current_volume_before_dispensing(
+    current_volume: float,
+    dispense_volume: float,
+) -> None:
+    """Check if the current volume is valid for dispensing the dispense volume."""
+    if current_volume < dispense_volume:
+        # Although this should never happen, we can get into an unexpected state
+        # following error recovery and not have the expected amount of liquid in the tip.
+        # If this happens, we want to raise a useful error so the user can understand
+        # the cause of the problem. If we don't make this check for current volume,
+        # an unhelpful error might get raised when a '..byVolume' property encounters
+        # a negative volume (current_volume - dispense_volume).
+        raise RuntimeError(
+            f"Cannot dispense {dispense_volume}uL when the tip has only {current_volume}uL."
+        )

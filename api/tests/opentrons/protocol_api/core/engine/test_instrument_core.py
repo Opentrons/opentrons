@@ -2176,7 +2176,7 @@ def test_aspirate_liquid_class_for_transfer_without_volume_config(
     assert result == [LiquidAndAirGapPair(air_gap=222, liquid=111)]
 
 
-@pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 23)))
+@pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 24)))
 def test_aspirate_liquid_class_using_volume_config(
     decoy: Decoy,
     mock_engine_client: EngineClient,
@@ -2201,6 +2201,11 @@ def test_aspirate_liquid_class_using_volume_config(
     test_transfer_properties.dispense.delay.enabled = True
 
     last_liquid_and_airgap_in_tip = LiquidAndAirGapPair(liquid=0, air_gap=100)
+    decoy.when(
+        mock_engine_client.state.pipettes.get_aspirated_volume(
+            pipette_id=subject.pipette_id
+        )
+    ).then_return(200)
     decoy.when(mock_protocol_core.api_version).then_return(version)
     decoy.when(source_well.labware_id).then_return("source-labware-id")
     decoy.when(source_well.get_name()).then_return("source-well")
@@ -2417,19 +2422,27 @@ def test_remove_air_gap_during_transfer_with_liquid_class(
     expected_air_gap_flow_rate: float,
     version: APIVersion,
 ) -> None:
-    """It should remove ait gap by calling dispense and delay with liquid class props."""
+    """It should remove air gap by calling dispense and delay with liquid class props."""
     test_transfer_props = decoy.mock(cls=TransferProperties)
     air_gap_correction_by_vol = 0.321
+    current_volume = 3.21
 
     test_transfer_props.dispense.delay.duration = 321
     test_transfer_props.dispense.delay.enabled = True
 
+    decoy.when(
+        mock_engine_client.state.pipettes.get_aspirated_volume(
+            pipette_id=subject.pipette_id
+        )
+    ).then_return(current_volume)
     decoy.when(mock_protocol_core.api_version).then_return(version)
     decoy.when(
         test_transfer_props.dispense.flow_rate_by_volume.get_for_volume(air_gap_volume)
     ).then_return(air_gap_flow_rate_by_vol)
     decoy.when(
-        test_transfer_props.dispense.correction_by_volume.get_for_volume(air_gap_volume)
+        test_transfer_props.dispense.correction_by_volume.get_for_volume(
+            current_volume - air_gap_volume
+        )
     ).then_return(air_gap_correction_by_vol)
     subject.remove_air_gap_during_transfer_with_liquid_class(
         last_air_gap=air_gap_volume,
@@ -2450,6 +2463,32 @@ def test_remove_air_gap_during_transfer_with_liquid_class(
     )
 
 
+@pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 24)))
+def test_remove_air_gap_during_transfer_raises_if_tip_volume_less_than_dispense_vol(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
+    version: APIVersion,
+) -> None:
+    """It should raise an error if tip volume is less than dispense volume."""
+    test_transfer_props = decoy.mock(cls=TransferProperties)
+    decoy.when(mock_protocol_core.api_version).then_return(version)
+    decoy.when(
+        mock_engine_client.state.pipettes.get_aspirated_volume(
+            pipette_id=subject.pipette_id
+        )
+    ).then_return(50)
+    with pytest.raises(
+        RuntimeError, match="Cannot dispense 50.1uL when the tip has only 50uL."
+    ):
+        subject.remove_air_gap_during_transfer_with_liquid_class(
+            last_air_gap=50.1,
+            dispense_props=test_transfer_props.dispense,
+            location=Location(Point(1, 2, 3), labware=None),
+        )
+
+
 @pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 23)))
 def test_remove_air_gap_during_transfer_with_liquid_class_handles_delays(
     decoy: Decoy,
@@ -2458,20 +2497,28 @@ def test_remove_air_gap_during_transfer_with_liquid_class_handles_delays(
     subject: InstrumentCore,
     version: APIVersion,
 ) -> None:
-    """It should remove ait gap by calling dispense and delay with liquid class props."""
+    """It should remove air gap by calling dispense and delay with liquid class props."""
     test_transfer_props = decoy.mock(cls=TransferProperties)
     air_gap_volume = 0.123
     air_gap_flow_rate_by_vol = 123
     air_gap_correction_by_vol = 0.321
+    current_volume = 0.654
 
     test_transfer_props.dispense.delay.enabled = False
 
+    decoy.when(
+        mock_engine_client.state.pipettes.get_aspirated_volume(
+            pipette_id=subject.pipette_id
+        )
+    ).then_return(current_volume)
     decoy.when(mock_protocol_core.api_version).then_return(version)
     decoy.when(
         test_transfer_props.dispense.flow_rate_by_volume.get_for_volume(air_gap_volume)
     ).then_return(air_gap_flow_rate_by_vol)
     decoy.when(
-        test_transfer_props.dispense.correction_by_volume.get_for_volume(air_gap_volume)
+        test_transfer_props.dispense.correction_by_volume.get_for_volume(
+            current_volume - air_gap_volume
+        )
     ).then_return(air_gap_correction_by_vol)
 
     subject.remove_air_gap_during_transfer_with_liquid_class(
@@ -2619,9 +2666,6 @@ def test_dispense_liquid_class_during_multi_dispense(
     decoy.when(
         mock_transfer_components_executor.tip_state.last_liquid_and_air_gap_in_tip
     ).then_return(LiquidAndAirGapPair(liquid=333, air_gap=444))
-    decoy.when(
-        mock_engine_client.state.pipettes.get_aspirated_volume("abc123")
-    ).then_return(12345)
     result = subject.dispense_liquid_class_during_multi_dispense(
         volume=123,
         dest=(dest_location, dest_well),
@@ -2633,6 +2677,7 @@ def test_dispense_liquid_class_during_multi_dispense(
         trash_location=Location(Point(1, 2, 3), labware=None),
         conditioning_volume=conditioning_volume,
         disposal_volume=disposal_volume,
+        is_last_dispense_in_tip=False,  # testing the case when this is not last dispense
     )
     decoy.verify(
         mock_transfer_components_executor.submerge(
@@ -2703,9 +2748,6 @@ def test_last_dispense_liquid_class_during_multi_dispense(
     decoy.when(
         mock_transfer_components_executor.tip_state.last_liquid_and_air_gap_in_tip
     ).then_return(LiquidAndAirGapPair(liquid=333, air_gap=444))
-    decoy.when(
-        mock_engine_client.state.pipettes.get_aspirated_volume("abc123")
-    ).then_return(123)
     result = subject.dispense_liquid_class_during_multi_dispense(
         volume=123,
         dest=(dest_location, dest_well),
@@ -2717,6 +2759,7 @@ def test_last_dispense_liquid_class_during_multi_dispense(
         trash_location=Location(Point(1, 2, 3), labware=None),
         conditioning_volume=conditioning_volume,
         disposal_volume=disposal_volume,
+        is_last_dispense_in_tip=True,
     )
     decoy.verify(
         mock_transfer_components_executor.submerge(

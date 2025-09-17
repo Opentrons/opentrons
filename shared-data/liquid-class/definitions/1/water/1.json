@@ -237,7 +237,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[50.0, 50.0]],
+            "flowRateByVolume": [[1.0, 50.0]],
             "correctionByVolume": [[0.0, 0.0]],
             "conditioningByVolume": [
               [1.0, 5.0],
@@ -485,7 +485,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[50.0, 50.0]],
+            "flowRateByVolume": [[1.0, 50.0]],
             "correctionByVolume": [[0.0, 0.0]],
             "conditioningByVolume": [
               [1.0, 5.0],

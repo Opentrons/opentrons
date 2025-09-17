@@ -340,31 +340,23 @@ export const blowoutLocationHelper = (args: {
     offsetFromTopMm,
     invariantContext,
   } = args
-  if (!blowoutLocation) return []
-  const { labwareEntities, additionalEquipmentEntities } = invariantContext
-  const trashOrLabware = getTrashOrLabware(
-    labwareEntities,
-    additionalEquipmentEntities,
-    destLabwareId
-  )
+  if (!blowoutLocation) {
+    return []
+  }
+  const { additionalEquipmentEntities } = invariantContext
+
   let labware: LabwareEntity | null = null
   let well: string | null = null
   if (blowoutLocation === SOURCE_WELL_BLOWOUT_DESTINATION) {
     labware = invariantContext.labwareEntities[sourceLabwareId]
     well = sourceWell
   } else if (blowoutLocation === DEST_WELL_BLOWOUT_DESTINATION) {
-    labware =
-      trashOrLabware === 'labware'
-        ? invariantContext.labwareEntities[destLabwareId]
-        : null
-    well = trashOrLabware === 'labware' ? destWell : null
-  } else {
-    // if it's not one of the magic strings, it's a labware or waste chute or trash bin id
-    labware = invariantContext.labwareEntities?.[blowoutLocation]
-    well = trashOrLabware === 'labware' ? 'A1' : null
+    labware = invariantContext.labwareEntities[destLabwareId]
+
+    well = destWell
   }
 
-  if (well != null && trashOrLabware === 'labware' && labware != null) {
+  if (well != null && labware != null) {
     return [
       curryCommandCreator(blowOutInWell, {
         pipetteId: pipette,
@@ -379,7 +371,10 @@ export const blowoutLocationHelper = (args: {
         },
       }),
     ]
-  } else if (trashOrLabware === 'wasteChute') {
+  } else if (
+    additionalEquipmentEntities[blowoutLocation] != null &&
+    additionalEquipmentEntities[blowoutLocation].name === 'wasteChute'
+  ) {
     const wasteChute = Object.values(additionalEquipmentEntities).find(
       ae => ae.name === 'wasteChute'
     )
