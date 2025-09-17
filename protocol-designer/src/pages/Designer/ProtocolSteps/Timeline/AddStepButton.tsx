@@ -111,8 +111,8 @@ export function AddStepButton({
   ).some(([labwareId, { stack }]) => {
     const labwareDef = labwareEntities[labwareId]?.def
     const slot = getSlotInLocationStack(stack)
-    const lidOnSlot = Object.values(labwareEntities).some(entity =>
-      getIsLid(entity.def)
+    const lidOnSlot = Object.values(labwareEntities).some(({ def }) =>
+      getIsLid(def)
     )
     return (
       labwareDef != null &&
