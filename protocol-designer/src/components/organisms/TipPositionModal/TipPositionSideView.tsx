@@ -17,6 +17,8 @@ import TOP_LAYER from '/protocol-designer/assets/images/tip_side_top_layer.svg'
 const WELL_HEIGHT_PIXELS = 78
 const WELL_WIDTH_PIXELS = 80
 const PIXEL_DECIMALS = 2
+const SCALE_FACTOR_HEIGHT = 1.12
+const WELL_BOTTOM_OFFSET_PIXELS = 5
 
 interface TipPositionAllVizProps {
   mmFromBottom: number
@@ -30,7 +32,8 @@ export function TipPositionSideView(
 ): JSX.Element {
   const { mmFromBottom, xPosition, wellDepthMm, xWidthMm } = props
   const { t } = useTranslation('application')
-  const fractionOfWellHeight = mmFromBottom / wellDepthMm
+  const fractionOfWellHeight =
+    (mmFromBottom / wellDepthMm) * SCALE_FACTOR_HEIGHT
   const pixelsFromBottom =
     fractionOfWellHeight * WELL_HEIGHT_PIXELS - WELL_HEIGHT_PIXELS
   const roundedPixelsFromBottom = round(pixelsFromBottom, PIXEL_DECIMALS)
@@ -58,7 +61,7 @@ export function TipPositionSideView(
         style={{
           position: POSITION_ABSOLUTE,
           transform: `translate(${roundedXPositionPixels}px)`,
-          bottom: `calc(${bottomPx}px + 10px)`,
+          bottom: `calc(${bottomPx}px + ${WELL_BOTTOM_OFFSET_PIXELS}px)`,
         }}
         alt="mid layer"
       />
