@@ -5,6 +5,7 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  JUSTIFY_CENTER,
   Modal,
   SPACING,
   StyledText,
@@ -32,12 +33,16 @@ export function OverlayModal(props: OverlayModalProps): JSX.Element {
       hasHeader={false}
       backgroundColor={COLORS.transparentBlack90}
       showOverlay={true}
+      position={'center'}
     >
       <Flex
+        width="100%"
+        height="100%"
         flexDirection={DIRECTION_COLUMN}
         alignItems={ALIGN_CENTER}
+        justifyContent={JUSTIFY_CENTER}
         gridGap={SPACING.spacing16}
-        marginTop={SPACING.spacing120}
+        className="overlay-modal-content"
       >
         <StyledText desktopStyle="headingLargeBold" oddStyle="level4HeaderBold" color={COLORS.white}>
           {header}
