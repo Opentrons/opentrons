@@ -26219,7 +26219,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetTemperature": 80.0
+        "targetTemperature": 80.0,
+        "taskId": "f4aebcc6-2e67-4cff-8cfb-578238d99ef5"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -26250,7 +26251,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetTemperature": 10.0
+        "targetTemperature": 10.0,
+        "taskId": "cf2544f8-f7db-49df-9805-a8ccc77d5e34"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"

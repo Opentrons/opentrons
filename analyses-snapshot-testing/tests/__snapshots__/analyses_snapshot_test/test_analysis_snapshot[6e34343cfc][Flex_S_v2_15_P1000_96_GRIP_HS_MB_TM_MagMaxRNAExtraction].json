@@ -25339,7 +25339,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetTemperature": 55.0
+        "targetTemperature": 55.0,
+        "taskId": "be583ae6-d4a8-40d0-91e7-62827993779e"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -26706,7 +26707,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetTemperature": 4.0
+        "targetTemperature": 4.0,
+        "taskId": "9b40115b-2ce7-4d73-8244-e42b88498a20"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -40743,7 +40745,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetTemperature": 55.0
+        "targetTemperature": 55.0,
+        "taskId": "b0e2a69b-2541-48d6-a910-fae4a7aff89a"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -42110,7 +42113,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetTemperature": 4.0
+        "targetTemperature": 4.0,
+        "taskId": "c33ea12c-ad54-44c2-ac48-e374bc4a87d8"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -56147,7 +56151,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetTemperature": 55.0
+        "targetTemperature": 55.0,
+        "taskId": "700d5893-6a6c-4de0-a3d1-982e06d92079"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -57514,7 +57519,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetTemperature": 4.0
+        "targetTemperature": 4.0,
+        "taskId": "eaf25806-ded6-4a7a-8633-dd293eed88d7"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"

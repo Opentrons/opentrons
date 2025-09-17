@@ -11430,7 +11430,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetTemperature": 6.0
+        "targetTemperature": 6.0,
+        "taskId": "3cd8b8dc-5590-4a91-950f-7121c051871f"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"

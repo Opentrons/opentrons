@@ -10419,7 +10419,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetTemperature": 4.0
+        "targetTemperature": 4.0,
+        "taskId": "675cc45c-1582-43c9-9ce7-cced0d93c287"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -26605,7 +26606,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetTemperature": 4.0
+        "targetTemperature": 4.0,
+        "taskId": "a5a642ad-261e-4f09-9014-c224781d7056"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -31010,7 +31012,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetTemperature": 4.0
+        "targetTemperature": 4.0,
+        "taskId": "71d5a578-d36f-486f-bc65-654234157713"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
