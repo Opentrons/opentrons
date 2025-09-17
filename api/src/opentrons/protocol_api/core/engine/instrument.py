@@ -1364,6 +1364,13 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             tiprack_uri=tiprack_uri_for_transfer_props,
         )
 
+        original_aspirate_flow_rate = self._user_aspirate_flow_rate
+        original_dispense_flow_rate = self._user_dispense_flow_rate
+        original_blow_out_flow_rate = self._user_blow_out_flow_rate
+        in_low_volume_mode = self._engine_client.state.pipettes.get_is_low_volume_mode(
+            self._pipette_id
+        )
+
         target_destinations: Sequence[
             Union[Tuple[Location, WellCore], TrashBin, WasteChute]
         ]
@@ -1457,6 +1464,14 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
 
         if not keep_last_tip:
             self._drop_tip_for_liquid_class(trash_location, return_tip)
+
+        if self._protocol_core.api_version < _DEFAULT_FLOW_RATE_BUG_FIXED_IN:
+            self._restore_pipette_flow_rates_and_volume_mode(
+                aspirate_flow_rate=original_aspirate_flow_rate,
+                dispense_flow_rate=original_dispense_flow_rate,
+                blow_out_flow_rate=original_blow_out_flow_rate,
+                is_low_volume=in_low_volume_mode,
+            )
 
     def distribute_with_liquid_class(  # noqa: C901
         self,
@@ -1563,6 +1578,13 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             name=liquid_class.name,
             transfer_properties=transfer_props,
             tiprack_uri=tiprack_uri_for_transfer_props,
+        )
+
+        original_aspirate_flow_rate = self._user_aspirate_flow_rate
+        original_dispense_flow_rate = self._user_dispense_flow_rate
+        original_blow_out_flow_rate = self._user_blow_out_flow_rate
+        in_low_volume_mode = self._engine_client.state.pipettes.get_is_low_volume_mode(
+            self._pipette_id
         )
 
         # This will return a generator that provides pairs of destination well and
@@ -1708,6 +1730,14 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         if not keep_last_tip:
             self._drop_tip_for_liquid_class(trash_location, return_tip)
 
+        if self._protocol_core.api_version < _DEFAULT_FLOW_RATE_BUG_FIXED_IN:
+            self._restore_pipette_flow_rates_and_volume_mode(
+                aspirate_flow_rate=original_aspirate_flow_rate,
+                dispense_flow_rate=original_dispense_flow_rate,
+                blow_out_flow_rate=original_blow_out_flow_rate,
+                is_low_volume=in_low_volume_mode,
+            )
+
     def _tip_can_hold_volume_for_multi_dispensing(
         self,
         transfer_volume: float,
@@ -1803,6 +1833,13 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             tiprack_uri=tiprack_uri_for_transfer_props,
         )
 
+        original_aspirate_flow_rate = self._user_aspirate_flow_rate
+        original_dispense_flow_rate = self._user_dispense_flow_rate
+        original_blow_out_flow_rate = self._user_blow_out_flow_rate
+        in_low_volume_mode = self._engine_client.state.pipettes.get_is_low_volume_mode(
+            self._pipette_id
+        )
+
         working_volume = self.get_working_volume_for_tip_rack(tip_racks[0][1])
 
         source_per_volume_step = (
@@ -1886,6 +1923,14 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
 
         if not keep_last_tip:
             self._drop_tip_for_liquid_class(trash_location, return_tip)
+
+        if self._protocol_core.api_version < _DEFAULT_FLOW_RATE_BUG_FIXED_IN:
+            self._restore_pipette_flow_rates_and_volume_mode(
+                aspirate_flow_rate=original_aspirate_flow_rate,
+                dispense_flow_rate=original_dispense_flow_rate,
+                blow_out_flow_rate=original_blow_out_flow_rate,
+                is_low_volume=in_low_volume_mode,
+            )
 
     def _get_location_and_well_core_from_next_tip_info(
         self,
@@ -1994,6 +2039,20 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 home_after=False,
                 alternate_drop_location=True,
             )
+
+    def _restore_pipette_flow_rates_and_volume_mode(
+        self,
+        aspirate_flow_rate: Optional[float],
+        dispense_flow_rate: Optional[float],
+        blow_out_flow_rate: Optional[float],
+        is_low_volume: bool,
+    ) -> None:
+        self._user_aspirate_flow_rate = aspirate_flow_rate
+        self._user_dispense_flow_rate = dispense_flow_rate
+        self._user_blow_out_flow_rate = blow_out_flow_rate
+        # TODO(jbl 2025-09-17) this works for p50 low volume mode but is not guaranteed to work for future low volume
+        #   modes, this should be replaced with something less flaky
+        self.configure_for_volume(self.get_max_volume() if not is_low_volume else 1)
 
     def aspirate_liquid_class(
         self,
