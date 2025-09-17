@@ -35,8 +35,6 @@ import type { ErrorRecoveryFlowsProps } from '..'
 import type { ERUtilsProps, ERUtilsResults } from './useERUtils'
 import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
 
-const TC_LID_DEFINITION_LOAD_NAME = 'opentrons_tough_pcr_auto_sealing_lid'
-
 interface UseDeckMapUtilsProps {
   runId: ErrorRecoveryFlowsProps['runId']
   protocolAnalysis: ErrorRecoveryFlowsProps['protocolAnalysis']
@@ -372,22 +370,16 @@ export function getRunCurrentLabwareInfo({
     )
 
     // Group labware by slotName
-    const labwareBySlot = allLabware
-      // filter out lids we don't yet have custom SVG for
-      // TODO: (sarah, 9-16-25) change this behavior when we have SVG for lids
-      .filter(
-        labware =>
-          !labware.labwareDef.allowedRoles?.includes('lid') ||
-          labware.labwareDef.parameters.loadName === TC_LID_DEFINITION_LOAD_NAME
-      )
-      .reduce<Record<string, RunCurrentLabwareInfo[]>>((acc, labware) => {
-        const slot = labware.slotName
-        if (!acc[slot]) {
-          acc[slot] = []
-        }
-        acc[slot].push(labware)
-        return acc
-      }, {})
+    const labwareBySlot = allLabware.reduce<
+      Record<string, RunCurrentLabwareInfo[]>
+    >((acc, labware) => {
+      const slot = labware.slotName
+      if (!acc[slot]) {
+        acc[slot] = []
+      }
+      acc[slot].push(labware)
+      return acc
+    }, {})
 
     // For each slot, return either:
     // 1. The first labware where no other labware has its 'labwareId' as a location
