@@ -31,9 +31,7 @@ const meta: Meta<typeof OverlayModal> = {
       control: {
         type: 'object',
       },
-    },
-    handleCancel: { action: 'clicked' },
-    handleContinue: { action: 'clicked' },
+    }
   },
   parameters: VIEWPORT.touchScreenViewport,
 }
@@ -47,11 +45,22 @@ export const PrimaryOverlayModal: Story = {
     subText: 'subText',
     children: (
       <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN} gridGap={SPACING.spacing16}>
-        <SecondaryButton>cancel</SecondaryButton>
-        <PrimaryButton backgroundColor={COLORS.red50}>continue</PrimaryButton>
+        <SecondaryButton onClick={() => {alert('cancel')}}>cancel</SecondaryButton>
+        <PrimaryButton backgroundColor={COLORS.red50} onClick={() => {alert('continue')}}>continue</PrimaryButton>
       </Flex>
-    ),
-    handleCancel: () => {},
-    handleContinue: () => {},
+    )
+  },
+}
+
+export const ClearLiquidOverlayModal: Story = {
+  args: {
+    header: 'Labware have different liquid layouts',
+    subText: 'To edit liquid in these labware at the same time, you will have to clear liquids from them',
+    children: (
+      <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN} gridGap={SPACING.spacing16}>
+        <SecondaryButton onClick={() => {alert('Cancel')}}>Cancel</SecondaryButton>
+        <PrimaryButton backgroundColor={COLORS.red50} onClick={() => {alert('Clear Liquids')}}>Clear Liquids</PrimaryButton>
+      </Flex>
+    )
   },
 }

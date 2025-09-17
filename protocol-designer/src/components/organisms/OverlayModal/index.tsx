@@ -1,15 +1,10 @@
 import { createPortal } from 'react-dom'
-import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
 
 import {
   ALIGN_CENTER,
-  Check,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  JUSTIFY_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
   Modal,
   SPACING,
   StyledText,
@@ -24,23 +19,10 @@ export interface OverlayModalProps {
   header: string
   subText?: string
   children: ReactNode
-  handleCancel: () => void
-  handleContinue: () => void
 }
 
 export function OverlayModal(props: OverlayModalProps): JSX.Element {
-  const { header, subText, children, handleCancel, handleContinue } = props
-  const { t, i18n } = useTranslation(['alert', 'shared'])
-
-  const onCancelClick = (): void => {
-    handleCancel()
-  }
-
-  const onContinueClick = (): void => {
-    // dispatch(actions.removeHint(hintKey, rememberDismissal))
-    handleContinue()
-  }
-
+  const { header, subText, children} = props
   return createPortal(
     <Modal
       marginLeft="0"
