@@ -33,9 +33,9 @@ runs:
       uses: actions/cache@v4
       with:
         path: ~/.cache/Cypress
-        key: cypress-${{ runner.os }}-13.8.0-${{ hashFiles('**/yarn.lock') }}
+        key: cypress-${{ runner.os }}-13.7.1-${{ hashFiles('**/yarn.lock') }}
         restore-keys: |
-          cypress-${{ runner.os }}-13.8.0-
+          cypress-${{ runner.os }}-13.7.1-
           cypress-${{ runner.os }}-
 
     - name: 'Install udev for USB-detection'
@@ -48,4 +48,7 @@ runs:
       run: |
         export CYPRESS_CACHE_FOLDER=~/.cache/Cypress
         export CYPRESS_INSTALL_BINARY=1
+        export CYPRESS_VERSION=13.7.1
+        echo "Cypress version: $CYPRESS_VERSION"
+        echo "Package.json cypress version: $(grep '"cypress"' package.json)"
         make setup-js
