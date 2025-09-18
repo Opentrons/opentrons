@@ -78,6 +78,14 @@ export default defineConfig(
         _OT_SENTRY_DSN_: JSON.stringify(process.env.OT_SENTRY_DSN),
         _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
         _OT_APP_MIXPANEL_ID_: JSON.stringify(process.env.OT_APP_MIXPANEL_ID),
+        // _OT_LL_ variables because app/ imports files directly from labware-library/,
+        // causing them to be processed in the context of this Vite config instead of
+        // labware-library's Vite config.
+        _OT_LL_MIXPANEL_DEV_ID_: JSON.stringify(process.env.OT_LL_MIXPANEL_DEV_ID),
+        _OT_LL_MIXPANEL_ID_: JSON.stringify(process.env.OT_LL_MIXPANEL_ID),
+        // TODO(jh, 09-18-25): App-shell code is getting imported in the app...somehow.
+        // We expose this debug for sentry code to initialize properly. Investigate further.
+        'process.env.NODE_DEBUG': JSON.stringify(process.env.NODE_DEBUG),
       },
       resolve: {
         alias: {

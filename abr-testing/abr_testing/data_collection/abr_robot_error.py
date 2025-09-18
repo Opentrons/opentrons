@@ -594,7 +594,7 @@ if __name__ == "__main__":
     email = args.email[0]
     board_id = args.board_id[0]
     reporter_id = args.reporter_id[0]
-    file_paths = read_robot_logs.get_logs(storage_directory, ip)
+    log_zip_path = read_robot_logs.get_logs(storage_directory, ip)
     ticket = jira_tool.JiraTicket(url, api_token, email)
     users_file_path = ticket.get_jira_users(storage_directory)
     assignee_id = get_user_id(users_file_path, assignee)
@@ -683,7 +683,8 @@ if __name__ == "__main__":
         run_log_file_path,
         protocol_file_path,
         version_file_path,
-    ] + file_paths
+        log_zip_path,
+    ]
     error_folder_path = os.path.join(storage_directory, issue_key)
     os.makedirs(error_folder_path, exist_ok=True)
     for source_file in error_files:
