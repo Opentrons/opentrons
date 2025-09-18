@@ -1,13 +1,4 @@
-import {
-  ALIGN_CENTER,
-  COLORS,
-  Flex,
-  JUSTIFY_SPACE_BETWEEN,
-  PrimaryButton,
-  SecondaryButton,
-  SPACING,
-  VIEWPORT,
-} from '@opentrons/components'
+import { VIEWPORT } from '@opentrons/components'
 
 import { OverlayModal } from '.'
 

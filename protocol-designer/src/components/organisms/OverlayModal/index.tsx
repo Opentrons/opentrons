@@ -14,8 +14,6 @@ import {
   TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 
-import type { ReactNode } from 'react'
-
 export interface OverlayModalProps {
   header: string
   subText?: string
