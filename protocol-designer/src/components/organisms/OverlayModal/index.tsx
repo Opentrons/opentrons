@@ -2,9 +2,13 @@ import {
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
   Flex,
   JUSTIFY_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
   Overlay,
+  PrimaryButton,
+  SecondaryButton,
   SPACING,
   StyledText,
   TEXT_ALIGN_CENTER,
@@ -15,12 +19,21 @@ import type { ReactNode } from 'react'
 export interface OverlayModalProps {
   header: string
   subText?: string
+  primaryButtonText: string
+  secondaryButtonText: string
+  onSecondaryButtonClick: () => void
+  onPrimaryButtonClick: () => void
 }
 
-export function OverlayModal(
-  props: OverlayModalProps & { children: ReactNode }
-): JSX.Element {
-  const { header, subText, children } = props
+export function OverlayModal(props: OverlayModalProps): JSX.Element {
+  const {
+    header,
+    subText,
+    onSecondaryButtonClick,
+    onPrimaryButtonClick,
+    primaryButtonText,
+    secondaryButtonText,
+  } = props
   return (
     <Overlay
       width="100%"
@@ -56,8 +69,28 @@ export function OverlayModal(
             {subText}
           </StyledText>
         ) : null}
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-          {children}
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          alignItems={ALIGN_CENTER}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          gridGap={SPACING.spacing8}
+        >
+          <SecondaryButton
+            backgroundColor={COLORS.white}
+            onClick={() => {
+              onSecondaryButtonClick()
+            }}
+          >
+            {secondaryButtonText ?? 'cancel'}
+          </SecondaryButton>
+          <PrimaryButton
+            backgroundColor={COLORS.red50}
+            onClick={() => {
+              onPrimaryButtonClick()
+            }}
+          >
+            {primaryButtonText ?? 'continue'}
+          </PrimaryButton>
         </Flex>
       </Flex>
     </Overlay>

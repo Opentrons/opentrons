@@ -25,25 +25,25 @@ describe('OverlayModal', () => {
     props = {
       header: 'header',
       subText: 'subText',
-      children: <div>mock content</div>,
+      primaryButtonText: 'primaryButtonText',
+      secondaryButtonText: 'secondaryButtonText',
+      onSecondaryButtonClick: () => {
+        alert('Cancel')
+      },
+      onPrimaryButtonClick: () => {
+        alert('Continue')
+      },
     }
-  })
-
-  it('renders the OverlayModal with no buttons', () => {
-    render(props)
-    screen.getByText('header')
-    screen.getByText('subText')
-    screen.getByText('mock content')
   })
 
   it('renders the OverlayModal with buttons', () => {
     props = {
       ...props,
-      children: <Btn>mock button</Btn>,
     }
     render(props)
     screen.getByText('header')
     screen.getByText('subText')
-    screen.getByRole('button', { name: 'mock button' })
+    screen.getByRole('button', { name: 'secondaryButtonText' })
+    screen.getByRole('button', { name: 'primaryButtonText' })
   })
 })

@@ -27,9 +27,24 @@ const meta: Meta<typeof OverlayModal> = {
         type: 'text',
       },
     },
-    children: {
+    primaryButtonText: {
       control: {
-        type: 'object',
+        type: 'text',
+      },
+    },
+    secondaryButtonText: {
+      control: {
+        type: 'text',
+      },
+    },
+    onSecondaryButtonClick: {
+      control: {
+        type: 'function',
+      },
+    },
+    onPrimaryButtonClick: {
+      control: {
+        type: 'function',
       },
     },
   },
@@ -43,30 +58,12 @@ export const PrimaryOverlayModal: Story = {
   args: {
     header: 'header',
     subText: 'subText',
-    children: (
-      <Flex
-        alignItems={ALIGN_CENTER}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        gridGap={SPACING.spacing16}
-      >
-        <SecondaryButton
-          backgroundColor={COLORS.white}
-          onClick={() => {
-            alert('cancel')
-          }}
-        >
-          cancel
-        </SecondaryButton>
-        <PrimaryButton
-          backgroundColor={COLORS.red50}
-          onClick={() => {
-            alert('continue')
-          }}
-        >
-          continue
-        </PrimaryButton>
-      </Flex>
-    ),
+    onSecondaryButtonClick: () => {
+      alert('Cancel')
+    },
+    onPrimaryButtonClick: () => {
+      alert('Continue')
+    },
   },
 }
 
@@ -75,29 +72,13 @@ export const ClearLiquidOverlayModal: Story = {
     header: 'Labware have different liquid layouts',
     subText:
       'To edit liquid in these labware at the same time, you will have to clear liquids from them',
-    children: (
-      <Flex
-        alignItems={ALIGN_CENTER}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        gridGap={SPACING.spacing16}
-      >
-        <SecondaryButton
-          backgroundColor={COLORS.white}
-          onClick={() => {
-            alert('Cancel')
-          }}
-        >
-          Cancel
-        </SecondaryButton>
-        <PrimaryButton
-          backgroundColor={COLORS.red50}
-          onClick={() => {
-            alert('Clear Liquids')
-          }}
-        >
-          Clear Liquids
-        </PrimaryButton>
-      </Flex>
-    ),
+    primaryButtonText: 'Clear Liquids',
+    secondaryButtonText: 'Cancel',
+    onSecondaryButtonClick: () => {
+      alert('Cancel')
+    },
+    onPrimaryButtonClick: () => {
+      alert('Clear Liquids')
+    },
   },
 }
