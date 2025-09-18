@@ -1019,7 +1019,7 @@ class HeaterShakerContext(ModuleContext):
             not achievable.
         .. versionchanged:: 2.27
             Returns a task object that represents concurrent preheating.
-            Pass the task object to :py:meth:`ProtocolContet.wait_for_tasks` to wait for the preheat to complete.
+            Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for the preheat to complete.
 
         :param celsius: A value under 95, representing the target temperature in °C.
                         Values are automatically truncated to two decimal places,
