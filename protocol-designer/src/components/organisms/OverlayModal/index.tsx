@@ -6,9 +6,10 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
-  Modal,
+  Overlay,
   SPACING,
   StyledText,
+  TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 
 import { getMainPagePortalEl } from '../Portal'
@@ -23,34 +24,37 @@ export interface OverlayModalProps {
 }
 
 export function OverlayModal(props: OverlayModalProps): JSX.Element {
-  const { header, subText, children} = props
-  return createPortal(
-    <Modal
-      marginLeft="0"
-      zIndexOverlay={15}
+  const { header, subText, children } = props
+  return (
+    <Overlay
       width="100%"
       height="100%"
-      hasHeader={false}
       backgroundColor={COLORS.transparentBlack90}
-      showOverlay={true}
-      position={'center'}
+      alignItems={ALIGN_CENTER}
+      justifyContent={JUSTIFY_CENTER}
     >
       <Flex
         width="100%"
         height="100%"
         flexDirection={DIRECTION_COLUMN}
+        maxWidth="445px"
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
         gridGap={SPACING.spacing16}
         className="overlay-modal-content"
+        textAlign={TEXT_ALIGN_CENTER}
       >
-        <StyledText desktopStyle="headingLargeBold" oddStyle="level4HeaderBold" color={COLORS.white}>
+        <StyledText
+          desktopStyle="headingLargeBold"
+          oddStyle="level4HeaderBold"
+          color={COLORS.white}
+        >
           {header}
         </StyledText>
         {subText != null ? (
           <StyledText
             desktopStyle="bodyLargeRegular"
-            oddStyle="bodyTextRegular"
+            oddStyle="smallBodyTextRegular"
             color={COLORS.white}
           >
             {subText}
@@ -60,7 +64,6 @@ export function OverlayModal(props: OverlayModalProps): JSX.Element {
           {children}
         </Flex>
       </Flex>
-    </Modal>,
-    getMainPagePortalEl()
+    </Overlay>
   )
 }
