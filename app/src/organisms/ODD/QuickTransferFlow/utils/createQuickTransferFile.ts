@@ -279,7 +279,6 @@ export function createQuickTransferPythonFile(
       protocolName ?? `Quick Transfer ${quickTransferState.volume}µL`,
     description: `This quick transfer moves liquids from a ${sourceLabwareName} to a ${destinationLabwareName}`,
     source: 'Quick Transfer',
-    //  TODO: increase version for when we export python
     //  see QuickTransferFlow/README.md for versioning details
     version: '2.0.0',
     category: null,
