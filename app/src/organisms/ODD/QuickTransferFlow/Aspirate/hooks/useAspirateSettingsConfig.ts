@@ -20,14 +20,12 @@ interface UseAspirateSettingsConfigProps {
   state: QuickTransferSummaryState
   dispatch: Dispatch<QuickTransferSummaryAction>
   setSelectedSetting: (setting: AspirateSettingOption | null) => void
-  isMultiTransfer: boolean
 }
 
 export function useAspirateSettingsConfig({
   state,
   dispatch,
   setSelectedSetting,
-  isMultiTransfer,
 }: UseAspirateSettingsConfigProps): SettingItem[] {
   const { t } = useTranslation(['quick_transfer', 'shared'])
   const { makeSnackbar } = useToaster()
@@ -120,7 +118,7 @@ export function useAspirateSettingsConfig({
         state.conditionAspirate != null || state.conditionAspirate !== 0
           ? t('volume', { volume: state.conditionAspirate })
           : t('option_disabled'),
-      enabled: isMultiTransfer,
+      enabled: true,
       onClick: () => {
         setSelectedSetting(SETTING_OPTIONS.ASPIRATE_CONDITION)
       },
@@ -193,8 +191,5 @@ export function useAspirateSettingsConfig({
     },
   ]
 
-  return aspirateSettingsItems.filter(
-    item =>
-      item.option !== SETTING_OPTIONS.ASPIRATE_CONDITION || isMultiTransfer
-  )
+  return aspirateSettingsItems
 }
