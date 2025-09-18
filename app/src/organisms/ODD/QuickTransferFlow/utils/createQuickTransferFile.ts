@@ -318,6 +318,7 @@ export function createQuickTransferPythonFile(
       URL.revokeObjectURL(url)
     }
     ;(window as any).downloadpy = downloadProtocolPython
+    console.log('💾 Or copy/paste: downloadpy()')
     console.groupEnd()
   }
 
