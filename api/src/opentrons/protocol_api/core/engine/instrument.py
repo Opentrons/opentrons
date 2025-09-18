@@ -1101,27 +1101,6 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
 
         return blow_out_flow_rate * rate
 
-    def _reset_flow_rates(self) -> None:
-        """Resets the user-set flow rates to allow the automatic default to be used."""
-        if self._protocol_core.api_version >= _DEFAULT_FLOW_RATE_BUG_FIXED_IN:
-            self._user_aspirate_flow_rate = None
-            self._user_dispense_flow_rate = None
-            self._user_blow_out_flow_rate = None
-        else:
-            # Set to the initial defaults to preserve buggy behavior where the default was not correctly updated
-            self._user_aspirate_flow_rate = find_value_for_api_version(
-                self._protocol_core.api_version,
-                self._initial_default_flow_rates.default_aspirate,
-            )
-            self._user_dispense_flow_rate = find_value_for_api_version(
-                self._protocol_core.api_version,
-                self._initial_default_flow_rates.default_dispense,
-            )
-            self._user_blow_out_flow_rate = find_value_for_api_version(
-                self._protocol_core.api_version,
-                self._initial_default_flow_rates.default_blow_out,
-            )
-
     def get_nozzle_configuration(self) -> NozzleConfigurationType:
         return self._engine_client.state.pipettes.get_nozzle_layout_type(
             self._pipette_id
