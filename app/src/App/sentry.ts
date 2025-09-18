@@ -19,6 +19,7 @@ interface ElectronRendererOptions {
 }
 
 export const initializeSentry = (isAnalyticsEnabled: boolean): void => {
+  console.log('=>(sentry.ts:43) _OT_SENTRY_DSN_', _OT_SENTRY_DSN_)
   if (isSentryInitialized) {
     console.info('Sentry is already initialized, skipping...')
     return
