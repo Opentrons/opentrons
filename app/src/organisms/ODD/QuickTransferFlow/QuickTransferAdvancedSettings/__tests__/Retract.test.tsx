@@ -90,11 +90,11 @@ describe('Retract', () => {
     fireEvent.click(screen.getByRole('button', { name: '6' }))
     fireEvent.click(screen.getByText('Continue'))
     screen.getByText('Distance from bottom of well (mm)')
-    screen.getByText('Between 0 and 2 mm')
+    screen.getByText('Between 0 and 3 mm')
     fireEvent.click(screen.getByRole('button', { name: '2' }))
     fireEvent.click(screen.getByRole('button', { name: '2' }))
     fireEvent.click(screen.getByRole('button', { name: '2' }))
-    screen.getByText('Value must be between 1 to 2')
+    screen.getByText('Value must be between 0 to 3')
     screen.getByText('Save')
   })
   it('calls dispatch with correct action and settings when save is clicked', () => {

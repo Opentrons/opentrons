@@ -84,11 +84,11 @@ describe('Submerge', () => {
     fireEvent.click(screen.getByText('Continue'))
     screen.getByText('Save')
     screen.getByText('Distance from bottom of well (mm)')
-    screen.getByText('Between 0 and 2 mm')
+    screen.getByText('Between 0 and 3 mm')
     fireEvent.click(screen.getByRole('button', { name: '2' }))
     fireEvent.click(screen.getByRole('button', { name: '2' }))
     fireEvent.click(screen.getByRole('button', { name: '2' }))
-    screen.getByText('Value must be between 1 to 2')
+    screen.getByText('Value must be between 0 to 3')
   })
 
   it('should call dispatch when clicking save button', () => {

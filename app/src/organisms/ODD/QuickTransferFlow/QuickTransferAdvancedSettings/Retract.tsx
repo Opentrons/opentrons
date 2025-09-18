@@ -188,6 +188,7 @@ function RetractSettingComponent({
   const { t } = useTranslation(['quick_transfer'])
   const keyboardRef = useRef<KeyboardReactInterface | null>(null)
 
+  // TODO: accommodate arbitrary position reference
   const positionText =
     positionReference === POSITION_REFERENCE_TOP
       ? t('distance_top_of_well_mm')
@@ -219,7 +220,16 @@ function RetractSettingComponent({
       )
     )
   }
-  const positionRange = { min: 1, max: Math.floor(wellHeight * 2) }
+  const positionRange =
+    positionReference === POSITION_REFERENCE_TOP
+      ? {
+          min: -wellHeight,
+          max: Math.floor(wellHeight * 2),
+        }
+      : {
+          min: 0,
+          max: wellHeight + 2,
+        }
   const positionError =
     position != null &&
     (position < positionRange.min || position > positionRange.max)
@@ -326,6 +336,10 @@ function RetractSettingComponent({
   }
 
   const positionSetting = (): JSX.Element => {
+    const caption =
+      positionReference === POSITION_REFERENCE_TOP
+        ? t('from_top', { min: -wellHeight })
+        : t('from_bottom', { max: wellHeight + 2 })
     return (
       <>
         <Flex
@@ -344,7 +358,7 @@ function RetractSettingComponent({
           />
           {positionError == null ? (
             <StyledText oddStyle="bodyTextRegular" color={COLORS.grey60}>
-              {t('from_bottom', { max: positionRange.max })}
+              {caption}
             </StyledText>
           ) : null}
         </Flex>
@@ -358,6 +372,7 @@ function RetractSettingComponent({
             keyboardRef={keyboardRef}
             initialValue={String(position ?? '')}
             onChange={handlePositionChange}
+            hasHyphen={positionReference === POSITION_REFERENCE_TOP}
           />
         </Flex>
       </>
