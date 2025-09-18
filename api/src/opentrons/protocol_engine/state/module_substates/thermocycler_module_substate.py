@@ -24,9 +24,9 @@ from opentrons.hardware_control.modules import ModuleData, ModuleDataValidator
 
 ThermocyclerModuleId = NewType("ThermocyclerModuleId", str)
 
-# TODO(Ryan) add a real max heating and cooling rate
-MAX_HEATING_RATE = 100.0
-MAX_COOLING_RATE = 100.0
+# These are our published numbers, and from testing they are good bounds
+MAX_HEATING_RATE = 4.25
+MAX_COOLING_RATE = 2.0
 
 
 @dataclass(frozen=True)
