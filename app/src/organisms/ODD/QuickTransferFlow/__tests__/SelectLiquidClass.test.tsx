@@ -2,11 +2,11 @@ import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
-  ETHANOL_LIQUID_CLASS_NAME,
+  ETHANOL_LIQUID_CLASS_NAME_V2,
   getAllLiquidClassDefs,
-  GLYCEROL_LIQUID_CLASS_NAME,
+  GLYCEROL_LIQUID_CLASS_NAME_V2,
   NONE_LIQUID_CLASS_NAME,
-  WATER_LIQUID_CLASS_NAME,
+  WATER_LIQUID_CLASS_NAME_V2,
 } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -55,7 +55,7 @@ const mockByPipette = [
 ]
 
 const mockLiquidClasses = {
-  [ETHANOL_LIQUID_CLASS_NAME]: {
+  [ETHANOL_LIQUID_CLASS_NAME_V2]: {
     liquidClassName: 'ethanol_80',
     displayName: 'Volatile',
     description: '80% ethanol',
@@ -63,7 +63,7 @@ const mockLiquidClasses = {
     namespace: '',
     byPipette: mockByPipette,
   },
-  [GLYCEROL_LIQUID_CLASS_NAME]: {
+  [GLYCEROL_LIQUID_CLASS_NAME_V2]: {
     liquidClassName: 'glycerol_50',
     displayName: 'Viscous',
     description: '50% glycerol',
@@ -71,7 +71,7 @@ const mockLiquidClasses = {
     namespace: '',
     byPipette: mockByPipette,
   },
-  [WATER_LIQUID_CLASS_NAME]: {
+  [WATER_LIQUID_CLASS_NAME_V2]: {
     displayName: 'Aqueous',
     liquidClassName: 'water',
     description: 'Deionized water',
@@ -220,7 +220,7 @@ describe('SelectLiquidClass', () => {
     expect(props.onNext).toHaveBeenCalled()
     expect(props.dispatch).toHaveBeenCalledWith({
       type: 'SET_LIQUID_CLASS',
-      liquidClassName: WATER_LIQUID_CLASS_NAME,
+      liquidClassName: WATER_LIQUID_CLASS_NAME_V2,
     })
   })
 

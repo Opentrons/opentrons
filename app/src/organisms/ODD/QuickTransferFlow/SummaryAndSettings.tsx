@@ -61,6 +61,9 @@ export function SummaryAndSettings(
   const { t } = useTranslation(['quick_transfer', 'shared'])
   const [showSaveOrRunModal, setShowSaveOrRunModal] = useState<boolean>(false)
   const enableExportPython = useFeatureFlag('quickTransferExportPython')
+  const enableProtocolContentsLog = useFeatureFlag(
+    'quickTransferProtocolContentsLog'
+  )
 
   const displayCategory: string[] = ['overview', 'aspirate', 'dispense']
 
@@ -105,8 +108,7 @@ export function SummaryAndSettings(
     }
   })
 
-  const isMultiTransferAspirate = state?.path === 'multiDispense'
-  const isMultiTransferDispense = state?.path === 'multiAspirate'
+  const isMultiTransferDispense = state?.path === 'multiDispense'
 
   const handleClickCreateTransfer = (): void => {
     setShowSaveOrRunModal(true)
@@ -122,7 +124,12 @@ export function SummaryAndSettings(
   const handleClickSave = (protocolName: string): void => {
     const protocolFile = enableExportPython
       ? createQuickTransferPythonFile(state, deckConfig, protocolName)
-      : createQuickTransferFile(state, deckConfig, protocolName)
+      : createQuickTransferFile(
+          state,
+          deckConfig,
+          protocolName,
+          enableProtocolContentsLog
+        )
 
     createProtocolAsync({
       files: [protocolFile],
@@ -141,7 +148,12 @@ export function SummaryAndSettings(
   const handleClickRun = (): void => {
     const protocolFile = enableExportPython
       ? createQuickTransferPythonFile(state, deckConfig)
-      : createQuickTransferFile(state, deckConfig)
+      : createQuickTransferFile(
+          state,
+          deckConfig,
+          undefined,
+          enableProtocolContentsLog
+        )
 
     createProtocolAsync({
       files: [protocolFile],
@@ -196,7 +208,7 @@ export function SummaryAndSettings(
             <Aspirate
               state={state}
               dispatch={dispatch}
-              isMultiTransfer={isMultiTransferAspirate}
+              isMultiTransfer={isMultiTransferDispense}
             />
           ) : null}
           {selectedCategory === 'dispense' ? (

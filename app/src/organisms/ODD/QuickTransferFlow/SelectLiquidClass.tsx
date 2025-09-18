@@ -9,11 +9,11 @@ import {
   StyledText,
 } from '@opentrons/components'
 import {
-  ETHANOL_LIQUID_CLASS_NAME,
+  ETHANOL_LIQUID_CLASS_NAME_V2,
   getAllLiquidClassDefs,
-  GLYCEROL_LIQUID_CLASS_NAME,
+  GLYCEROL_LIQUID_CLASS_NAME_V2,
   NONE_LIQUID_CLASS_NAME,
-  WATER_LIQUID_CLASS_NAME,
+  WATER_LIQUID_CLASS_NAME_V2,
 } from '@opentrons/shared-data'
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
@@ -62,9 +62,9 @@ export function SelectLiquidClass({
     LiquidClass['liquidClassName'],
     string
   > = {
-    ethanol_80: ETHANOL_LIQUID_CLASS_NAME,
-    glycerol_50: GLYCEROL_LIQUID_CLASS_NAME,
-    water: WATER_LIQUID_CLASS_NAME,
+    ethanol_80: ETHANOL_LIQUID_CLASS_NAME_V2,
+    glycerol_50: GLYCEROL_LIQUID_CLASS_NAME_V2,
+    water: WATER_LIQUID_CLASS_NAME_V2,
     none: NONE_LIQUID_CLASS_NAME,
   }
 
