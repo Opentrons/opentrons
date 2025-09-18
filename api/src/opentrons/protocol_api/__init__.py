@@ -14,7 +14,7 @@ from opentrons.protocols.parameters.exceptions import (
     RuntimeParameterRequired as RuntimeParameterRequiredError,
 )
 from opentrons.protocols.parameters.csv_parameter_interface import CSVParameter
-
+from .tasks import Task
 from .protocol_context import ProtocolContext
 from .deck import Deck
 from .robot_context import RobotContext
@@ -30,7 +30,6 @@ from .module_contexts import (
     AbsorbanceReaderContext,
     FlexStackerContext,
 )
-from .tasks import Task
 from .disposal_locations import TrashBin, WasteChute
 from ._liquid import Liquid, LiquidClass
 from ._types import (

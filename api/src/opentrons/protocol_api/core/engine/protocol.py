@@ -879,7 +879,7 @@ class ProtocolCore(
 
     def wait_for_tasks(self, task_cores: Sequence[EngineTaskCore]) -> None:
         """Wait for specified tasks to complete."""
-        task_ids = [task._id for task in task_cores]
+        task_ids = task_ids = [task._id for task in task_cores if task._id is not None]
         self._engine_client.execute_command(cmd.WaitForTasksParams(task_ids=task_ids))
 
     def create_timer(self, seconds: float) -> EngineTaskCore:

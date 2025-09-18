@@ -74,6 +74,7 @@ export default defineConfig({
     _OT_PD_SENTRY_DEV_DSN_: JSON.stringify(process.env.OT_PD_SENTRY_DEV_DSN),
     _OT_PD_SENTRY_DSN_: JSON.stringify(process.env.OT_PD_SENTRY_DSN),
     _OT_PD_VERSION_: JSON.stringify(process.env.OT_PD_VERSION),
+    'process.env.NODE_DEBUG': JSON.stringify(process.env.NODE_DEBUG),
     global: 'globalThis',
   },
   resolve: {
