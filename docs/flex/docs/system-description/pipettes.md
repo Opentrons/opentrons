@@ -53,47 +53,47 @@ Flex 1-channel pipettes meet the following accuracy and precision specifications
   </thead>
   <tbody>
     <tr>
-      <td rowspan="3"><b>1-50 µL</b></td>
-      <td>50 µL</td>
-      <td>1 µL</td>
-      <td>± 8.00%</td>
+      <td rowspan="3"><b>1–50 µL</b></td>
+      <td>50 µL</td>
+      <td>1 µL</td>
+      <td>±8.00%</td>
       <td>7.00%</td>
     </tr>
     <tr>
       <td>50 µL</td>
       <td>10 µL</td>
-      <td>± 1.50%</td>
+      <td>±1.50%</td>
       <td>0.50%</td>
     </tr>
     <tr>
       <td>50 µL</td>
       <td>50 µL</td>
-      <td>± 1.25%</td>
+      <td>±1.25%</td>
       <td>0.40%</td>
     </tr>
     <tr>
-      <td rowspan="4"><b>5-1000 µL</b></td>
+      <td rowspan="4"><b>5-1000 µL</b></td>
       <td>50 µL</td>
       <td>5 µL</td>
-      <td>± 5.00%</td>
+      <td>±5.00%</td>
       <td>2.50%</td>
     </tr>
     <tr>
       <td>50 µL</td>
       <td>50 µL</td>
-      <td>± 0.50%</td>
+      <td>±0.50%</td>
       <td>0.30%</td>
     </tr>
     <tr>
       <td>200 µL</td>
       <td>200 µL</td>
-      <td>± 0.50%</td>
+      <td>±0.50%</td>
       <td>0.15%</td>
     </tr>
     <tr>
       <td>1000 µL</td>
       <td>1000 µL</td>
-      <td>± 0.50%</td>
+      <td>±0.50%</td>
       <td>0.15%</td>
     </tr>
   </tbody>
@@ -115,41 +115,41 @@ Flex 8-channel pipettes meet the following accuracy and precision specifications
   </thead>
   <tbody>
     <tr>
-      <td rowspan="3"><b>1-50 µL</b></td>
+      <td rowspan="3"><b>1–50 µL</b></td>
       <td>50 µL</td>
       <td>1 µL</td>
-      <td>± 10.00%</td>
+      <td>±10.00%</td>
       <td>8.00%</td>
     </tr>
     <tr>
       <td>50 µL</td>
       <td>10 µL</td>
-      <td>± 2.50%</td>
+      <td>±2.50%</td>
       <td>1.00%</td>
     </tr>
     <tr>
       <td>50 µL</td>
       <td>50 µL</td>
-      <td>± 1.25%</td>
+      <td>±1.25%</td>
       <td>0.60%</td>
     </tr>
     <tr>
-      <td rowspan="4"><b>5-1000 µL</b></td>
+      <td rowspan="4"><b>5–1000 µL</b></td>
       <td>50 µL</td>
       <td>5 µL</td>
-      <td>± 8.00%</td>
+      <td>±8.00%</td>
       <td>4%</td>
     </tr>
     <tr>
       <td>50 µL</td>
       <td>50 µL</td>
-      <td>± 2.50%</td>
+      <td>±2.50%</td>
       <td>0.60%</td>
     </tr>
     <tr>
       <td>200 µL</td>
       <td>200 µL</td>
-      <td>± 1.00%</td>
+      <td>±1.00%</td>
       <td>0.25%</td>
     </tr>
     <tr>
@@ -177,53 +177,53 @@ Flex 96-channel pipettes meet the following accuracy and precision specification
   </thead>
   <tbody>
     <tr>
-      <td rowspan="4"><b>1-200 µL</b></td>
-      <td>50 µL</td>
+      <td rowspan="4"><b>1–200 µL</b></td>
+      <td>50 µL</td>
       <td>1 µL</td>
-      <td>± 10%</td>
+      <td>±10%</td>
       <td>6%</td>
     </tr>
     <tr>
-      <td>50 µL</td>
-      <td>5 µL</td>
-      <td>± 4%</td>
-      <td>2 %</td>
-    </tr>
-    <tr>
-      <td>50 µL</td>
-      <td>50 µL</td>
-      <td>± 1.5%</td>
-      <td>1%</td>
-    </tr>
-    <tr>
-      <td>200 µL</td>
-      <td>200 µL</td>
-      <td>± 1%</td>
-      <td>1%</td>
-    </tr>
-    <tr>
-      <td rowspan="4"><b>5-1000 µL</b></td>
       <td>50 µL</td>
       <td>5 µL</td>
-      <td>± 10%</td>
+      <td>±4%</td>
+      <td>2%</td>
+    </tr>
+    <tr>
+      <td>50 µL</td>
+      <td>50 µL</td>
+      <td>±1.5%</td>
+      <td>1%</td>
+    </tr>
+    <tr>
+      <td>200 µL</td>
+      <td>200 µL</td>
+      <td>±1%</td>
+      <td>1%</td>
+    </tr>
+    <tr>
+      <td rowspan="4"><b>5–1000 µL</b></td>
+      <td>50 µL</td>
+      <td>5 µL</td>
+      <td>±10%</td>
       <td>5%</td>
     </tr>
     <tr>
       <td>50 µL</td>
       <td>50 µL</td>
-      <td>± 2.5%</td>
+      <td>±2.5%</td>
       <td>1.25%</td>
     </tr>
     <tr>
-      <td>200 µL</td>
-      <td>200 µL</td>
-      <td>± 1.5%</td>
+      <td>200 µL</td>
+      <td>200 µL</td>
+      <td>±1.5%</td>
       <td>1.25%</td>
     </tr>
     <tr>
       <td>1000 µL</td>
       <td>1000 µL</td>
-      <td>± 1.5%</td>
+      <td>±1.5%</td>
       <td>1.5%</td>
     </tr>
 </table>
