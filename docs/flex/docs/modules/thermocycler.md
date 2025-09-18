@@ -50,7 +50,7 @@ The Opentrons Tough PCR Auto-sealing lids are single-use lids that prevent cross
 
 ![Tough PCR lid image](../images/autoseal-lids.png)
 
-These lids are manufactured in cleanroom facilities that meet ISO 14644-1 Class 8 standards. They also have a "Sterile-R" designation, which means they're irradiated to a sterility assurance level (SAL) of 10-6. Each box contains documentation certifying the lids are free of ATP, pyrogens, DNA, DNase, RNase, and PCR inhibitors.
+These lids are manufactured in cleanroom facilities that meet ISO 14644-1 Class 8 standards. They also have a "Sterile-R" designation, which means they're irradiated to a sterility assurance level (SAL) of 10<sup>-6</sup>. Each box contains documentation certifying the lids are free of ATP, pyrogens, DNA, DNase, RNase, and PCR inhibitors.
 
 ### Reuseable seals
 
