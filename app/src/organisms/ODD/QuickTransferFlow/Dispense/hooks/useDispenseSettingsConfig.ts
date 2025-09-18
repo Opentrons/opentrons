@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
 import {
+  POSITION_REFERENCE_TOP,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
@@ -58,7 +59,6 @@ export function useDispenseSettingsConfig({
 
   const touchTipEnabled = getIsTouchTipEnabled(state.destination)
   const hasLiquidClass = state.liquidClassName !== 'none'
-
   const dispenseSettingsItems = [
     {
       option: 'dispense_flow_rate',
@@ -91,7 +91,12 @@ export function useDispenseSettingsConfig({
           ? t('submerge_value', {
               speed: state.submergeDispense.speed,
               delayDuration: state.submergeDispense.delayDuration,
-              position: state.submergeDispense.positionFromBottom,
+              position: state.submergeDispense.position,
+              positionReference:
+                state.submergeDispense.positionReference ===
+                POSITION_REFERENCE_TOP
+                  ? t('top')
+                  : t('bottom'),
             })
           : t('option_disabled'),
       enabled: true,
@@ -103,11 +108,11 @@ export function useDispenseSettingsConfig({
       option: 'dispense_delay',
       copy: t('delay'),
       value:
-        state.delayDispense !== undefined
+        state.delayDispense != null
           ? t('delay_value', {
               delay: state.delayDispense.delayDuration,
             })
-          : '',
+          : t('option_disabled'),
       enabled: true,
       onClick: () => {
         setSelectedSetting('dispense_delay')
@@ -157,7 +162,12 @@ export function useDispenseSettingsConfig({
           ? t('retract_value', {
               speed: state.retractDispense.speed,
               delayDuration: state.retractDispense.delayDuration,
-              position: state.retractDispense.positionFromBottom,
+              position: state.retractDispense.position,
+              positionReference:
+                state.retractDispense.positionReference ===
+                POSITION_REFERENCE_TOP
+                  ? t('top')
+                  : t('bottom'),
             })
           : t('option_disabled'),
       enabled: true,

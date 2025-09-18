@@ -82,7 +82,6 @@ if __name__ == "__main__":
             configurations, "abr-robot-alerts", "Robot Status Checker"
         )
     # GET IP ADDRESSES OF INTEREST
-    available_users = slack_bot.get_users_in_channel("C04S59A3FHQ")
     robot_ips = [input("Enter IP of robot (type 'all' to run on all robots): ")]
     if robot_ips[0].lower() == "all":
         ip_file = configurations["DEFAULT"]["ips"]

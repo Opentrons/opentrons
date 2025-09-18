@@ -12,6 +12,7 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+import { POSITION_REFERENCE_TOP } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
@@ -23,6 +24,7 @@ import { ACTIONS } from '../constants'
 
 import type { Dispatch } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
+import type { PositionReference } from '@opentrons/shared-data'
 import type {
   FlowRateKind,
   QuickTransferSummaryAction,
@@ -54,8 +56,12 @@ export function Submerge({
     submergeSettings?.delayDuration ?? null
   )
   const [position, setPosition] = useState<number | null>(
-    submergeSettings?.positionFromBottom ?? null
+    submergeSettings?.position ?? null
   )
+  const positionReference =
+    kind === 'aspirate'
+      ? state.submergeAspirate?.positionReference
+      : state.submergeDispense?.positionReference
 
   const action =
     kind === 'aspirate'
@@ -81,7 +87,8 @@ export function Submerge({
             submergeSettings: {
               speed,
               delayDuration,
-              positionFromBottom: position,
+              position,
+              positionReference: positionReference ?? undefined,
             },
           })
           trackEventWithRobotSerial({
@@ -145,6 +152,7 @@ export function Submerge({
           speed={speed}
           position={position}
           currentStep={currentStep}
+          positionReference={positionReference}
         />
       </Flex>
     </Flex>,
@@ -162,6 +170,7 @@ interface SubmergeSettingComponentProps {
   speed: number | null
   position: number | null
   currentStep: number
+  positionReference?: PositionReference
 }
 
 function SubmergeSettingComponent({
@@ -174,9 +183,15 @@ function SubmergeSettingComponent({
   position,
   setPosition,
   currentStep,
+  positionReference,
 }: SubmergeSettingComponentProps): JSX.Element {
   const { t } = useTranslation(['quick_transfer'])
   const keyboardRef = useRef<KeyboardReactInterface | null>(null)
+
+  const positionText =
+    positionReference === POSITION_REFERENCE_TOP
+      ? t('distance_top_of_well_mm')
+      : t('distance_bottom_of_well_mm')
 
   let wellHeight = 1
   if (
@@ -323,7 +338,7 @@ function SubmergeSettingComponent({
             type="number"
             value={position}
             error={positionError}
-            title={t('distance_bottom_of_well_mm')}
+            title={positionText}
             readOnly
           />
           {positionError == null ? (

@@ -61,7 +61,8 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
           ? getWellFillFromLabwareId(
               topLabwareInfo.labwareId,
               mostRecentAnalysis?.liquids ?? [],
-              labwareByLiquidId
+              labwareByLiquidId,
+              mostRecentAnalysis?.commands ?? []
             )
           : undefined
       return {
@@ -105,7 +106,8 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
     const wellFill = getWellFillFromLabwareId(
       topLabwareInfo.labwareId,
       mostRecentAnalysis?.liquids ?? [],
-      labwareByLiquidId
+      labwareByLiquidId,
+      mostRecentAnalysis?.commands ?? []
     )
 
     return {

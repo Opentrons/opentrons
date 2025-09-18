@@ -43,6 +43,7 @@ export function LeftColumnLabwareInfo({
     STACKER_STALLED_STORE_RETRY,
     STACKER_HOPPER_EMPTY_SKIP,
     STACKER_SHUTTLE_EMPTY_SKIP,
+    STACKER_SHUTTLE_EMPTY_STORE_RETRY,
   } = RECOVERY_MAP
   const { t, i18n } = useTranslation(['error_recovery', 'shared'])
 
@@ -92,6 +93,7 @@ export function LeftColumnLabwareInfo({
         case STACKER_STALLED_STORE_RETRY.STEPS.PLACE_LABWARE_ON_SHUTTLE:
         case STACKER_HOPPER_EMPTY_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE:
         case STACKER_SHUTTLE_EMPTY_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE:
+        case STACKER_SHUTTLE_EMPTY_STORE_RETRY.STEPS.PLACE_LABWARE_ON_SHUTTLE:
           return {
             labwareName: failedLabwareNames.name ?? '',
             labwareNickname: failedLabwareNames.nickName,
@@ -120,7 +122,6 @@ export function LeftColumnLabwareInfo({
     if (!showQuantity || labwareQuantity == null) {
       return null
     }
-
     // Define routes and steps that require quantity adjustment
     const requiresQuantityAdjustment = [
       {
@@ -138,6 +139,10 @@ export function LeftColumnLabwareInfo({
       {
         route: RECOVERY_MAP.STACKER_STALLED_STORE_RETRY.ROUTE,
         step: RECOVERY_MAP.STACKER_STALLED_STORE_RETRY.STEPS.CHECK_HOPPER,
+      },
+      {
+        route: RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_STORE_RETRY.ROUTE,
+        step: RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_STORE_RETRY.STEPS.CHECK_HOPPER,
       },
     ]
 

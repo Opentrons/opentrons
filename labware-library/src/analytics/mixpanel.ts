@@ -7,8 +7,8 @@ export const getIsProduction = (): boolean =>
   window.location.host === 'labware.opentrons.com'
 
 const MIXPANEL_ID = getIsProduction()
-  ? process.env.OT_LL_MIXPANEL_ID
-  : process.env.OT_LL_MIXPANEL_DEV_ID
+  ? _OT_LL_MIXPANEL_ID_
+  : _OT_LL_MIXPANEL_DEV_ID_
 
 const MIXPANEL_OPTS = {
   // opt out by default

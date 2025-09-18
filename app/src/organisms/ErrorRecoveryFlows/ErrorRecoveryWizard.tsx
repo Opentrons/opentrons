@@ -28,14 +28,16 @@ import {
   StackerSelectErrorFlow,
   StackerShuttleEmptyRetry,
   StackerShuttleEmptySkip,
+  StackerShuttleEmptyStoreRetry,
+  StackerShuttleEmptyStoreSkip,
   StackerShuttleMissing,
   StackerStalledRetry,
   StackerStalledSkip,
+  StackerStalledStoreRetry,
+  StackerStalledStoreSkip,
 } from './RecoveryOptions'
 import { ShuttleFullRetry } from './RecoveryOptions/ShuttleFullRetry'
 import { ShuttleFullSkip } from './RecoveryOptions/ShuttleFullSkip'
-import { StackerStalledStoreRetry } from './RecoveryOptions/StackerStalledStoreRetry'
-import { StackerStalledStoreSkip } from './RecoveryOptions/StackerStalledStoreSkip'
 import {
   ErrorDetailsModal,
   RecoveryDoorOpenSpecial,
@@ -253,6 +255,12 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
   const buildStackerHopperEmptySkip = (): JSX.Element => {
     return <StackerHopperEmptySkip {...props} />
   }
+  const buildStackerShuttleEmptyStoreRetry = (): JSX.Element => {
+    return <StackerShuttleEmptyStoreRetry {...props} />
+  }
+  const buildStackerShuttleEmptyStoreSkip = (): JSX.Element => {
+    return <StackerShuttleEmptyStoreSkip {...props} />
+  }
   const buildStackerShuttleEmptyRetry = (): JSX.Element => {
     return <StackerShuttleEmptyRetry {...props} />
   }
@@ -337,6 +345,10 @@ export function ErrorRecoveryContent(props: RecoveryContentProps): JSX.Element {
       return buildStackerShuttleEmptyRetry()
     case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
       return buildStackerShuttleEmptySkip()
+    case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_STORE_RETRY.ROUTE:
+      return buildStackerShuttleEmptyStoreRetry()
+    case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_STORE_SKIP.ROUTE:
+      return buildStackerShuttleEmptyStoreSkip()
     case RECOVERY_MAP.ROBOT_DOOR_OPEN_SPECIAL.ROUTE:
       return buildRecoveryDoorOpenSpecial()
     case RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE:

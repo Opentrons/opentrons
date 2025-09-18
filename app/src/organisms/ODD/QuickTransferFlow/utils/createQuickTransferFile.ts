@@ -39,7 +39,8 @@ const uuid: () => string = uuidv1
 export function createQuickTransferFile(
   quickTransferState: QuickTransferSummaryState,
   deckConfig: DeckConfiguration,
-  protocolName?: string
+  protocolName?: string,
+  enableQuickTransferProtocolContentsLog?: boolean
 ): File {
   const {
     stepArgs,
@@ -154,7 +155,6 @@ export function createQuickTransferFile(
     robotStateTimeline.timeline,
     timelineFrame => timelineFrame.commands
   )
-
   const commands: CreateCommand[] = [
     loadPipetteCommand,
     ...loadAdapterCommands,
@@ -181,7 +181,7 @@ export function createQuickTransferFile(
     // see QuickTransferFlow/README.md for versioning details
     designerApplication: {
       name: 'opentrons/quick-transfer',
-      version: '1.1.0',
+      version: '1.2.0',
       data: quickTransferState,
     },
   }
@@ -225,6 +225,38 @@ export function createQuickTransferFile(
     ...commandv8Mixin,
     ...commandAnnotionaV1Mixin,
   })
+
+  // temporary logging for debugging
+  if (enableQuickTransferProtocolContentsLog) {
+    const protocolObject = {
+      ...protocolBase,
+      ...flexDeckSpec,
+      ...labwareV2Mixin,
+      ...liquidV1Mixin,
+      ...commandv8Mixin,
+      ...commandAnnotionaV1Mixin,
+    }
+
+    console.group('🧪 Quick Transfer Protocol Contents')
+    console.log(JSON.stringify(protocolObject, null, 2))
+    const downloadProtocolObject = (): void => {
+      const jsonString = JSON.stringify(protocolObject, null, 2)
+      const blob = new Blob([jsonString], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `debug-${protocolObject.metadata.protocolName
+        .replace(/[^a-z0-9]/gi, '_')
+        .toLowerCase()}-${Date.now()}.json`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+    }
+    ;(window as any).downloadjson = downloadProtocolObject
+    console.log('💾 Or copy/paste: downloadjson()')
+    console.groupEnd()
+  }
 
   return new File(
     [protocolContents],

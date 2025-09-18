@@ -31,6 +31,8 @@ export interface SubstituteStepFormPipettesAction {
     endStepId: StepIdType
     // old pipette id -> new id
     substitutionMap: Record<string, string>
+    //  1st assosciated tiprack with the pipetteId
+    newTiprackURI: string
   }
 }
 export const substituteStepFormPipettes = (

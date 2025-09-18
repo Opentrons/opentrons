@@ -65,7 +65,7 @@ const EIGHT_FIVE_ZERO_RELEASE_BULLET_POINTS = ['4', '5', '6']
 
 export const useAnnouncements = (): Announcement[] => {
   const { t } = useTranslation('modal')
-  const pdVersion = process.env.OT_PD_VERSION
+  const pdVersion = _OT_PD_VERSION_
 
   return [
     {

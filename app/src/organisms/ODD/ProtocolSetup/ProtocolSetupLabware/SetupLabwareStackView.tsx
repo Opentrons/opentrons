@@ -86,8 +86,9 @@ export function SetupLabwareStackView({
 
   const wellFill = getWellFillFromLabwareId(
     selectedLabware.labwareId,
-    mostRecentAnalysis?.liquids ?? [],
-    labwareByLiquidId
+    mostRecentAnalysis.liquids,
+    labwareByLiquidId,
+    mostRecentAnalysis.commands
   )
   const hasLiquids = Object.keys(wellFill).length > 0
   const labwareDefinition =

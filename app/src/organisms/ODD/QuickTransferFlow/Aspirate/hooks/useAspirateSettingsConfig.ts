@@ -1,5 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
+import { POSITION_REFERENCE_TOP } from '@opentrons/shared-data'
+
 import { useToaster } from '/app/organisms/ToasterOven'
 
 import { ASPIRATE_SETTING_OPTIONS as SETTING_OPTIONS } from '../../constants'
@@ -65,7 +67,12 @@ export function useAspirateSettingsConfig({
           ? t('submerge_value', {
               speed: state.submergeAspirate.speed,
               delayDuration: state.submergeAspirate.delayDuration,
-              position: state.submergeAspirate.positionFromBottom,
+              position: state.submergeAspirate.position,
+              positionReference:
+                state.submergeAspirate.positionReference ===
+                POSITION_REFERENCE_TOP
+                  ? t('top')
+                  : t('bottom'),
             })
           : t('option_disabled'),
       enabled: true,
@@ -122,11 +129,11 @@ export function useAspirateSettingsConfig({
       option: SETTING_OPTIONS.ASPIRATE_DELAY,
       copy: t('delay'),
       value:
-        state.delayAspirate !== undefined && hasLiquidClass
+        state.delayAspirate != null
           ? t('delay_value', {
               delay: state.delayAspirate.delayDuration,
             })
-          : '',
+          : t('option_disabled'),
       enabled: true,
       onClick: () => {
         setSelectedSetting(SETTING_OPTIONS.ASPIRATE_DELAY)
@@ -140,7 +147,12 @@ export function useAspirateSettingsConfig({
           ? t('retract_value', {
               speed: state.retractAspirate.speed,
               delayDuration: state.retractAspirate.delayDuration,
-              position: state.retractAspirate.positionFromBottom,
+              position: state.retractAspirate.position,
+              positionReference:
+                state.retractAspirate.positionReference ===
+                POSITION_REFERENCE_TOP
+                  ? t('top')
+                  : t('bottom'),
             })
           : '',
       enabled: true,
