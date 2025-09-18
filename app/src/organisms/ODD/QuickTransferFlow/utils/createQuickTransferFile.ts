@@ -282,7 +282,7 @@ export function createQuickTransferPythonFile(
     source: 'Quick Transfer',
     //  TODO: increase version for when we export python
     //  see QuickTransferFlow/README.md for versioning details
-    version: '1.1.0',
+    version: '1.2.0',
     category: null,
     subcategory: null,
     tags: [],
@@ -300,7 +300,25 @@ export function createQuickTransferPythonFile(
 
   // temporary logging for debugging
   if (enableQuickTransferProtocolContentsLog) {
+    console.group('🧪 Quick Transfer Protocol Contents')
     console.log(protocolContents)
+    const downloadProtocolPython = (): void => {
+      const blob = new Blob([protocolContents], { type: 'text/x-python' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      const safeName = (protocolName ?? 'protocol name')
+        .replace(/[^a-z0-9]/gi, '_')
+        .toLowerCase()
+
+      link.download = `debug-${safeName}-${Date.now()}.py`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+    }
+    ;(window as any).downloadpy = downloadProtocolPython
+    console.groupEnd()
   }
 
   return new File([protocolContents], `${fileMetadata.protocolName}.py`, {
