@@ -5,15 +5,24 @@ from opentrons.protocol_engine.errors.exceptions import NoTaskFoundError
 
 
 class EngineTaskCore(AbstractTaskCore):
-    def __init__(self, task_id: str, engine_client: ProtocolEngineClient) -> None:
+    def __init__(
+        self, task_id: str | None, engine_client: ProtocolEngineClient
+    ) -> None:
         self._id = task_id
         self._engine_client = engine_client
 
     def get_created_at_timestamp(self) -> datetime:
-        task = self._engine_client.state.tasks.get(self._id)
-        return task.createdAt
+        if self._id is None:
+            raise NoTaskFoundError
+        try:
+            task = self._engine_client.state.tasks.get(self._id)
+            return task.createdAt
+        except NoTaskFoundError:
+            raise NoTaskFoundError
 
     def is_done(self) -> bool:
+        if self._id is None:
+            raise NoTaskFoundError
         try:
             self._engine_client.state.tasks.get_finished(self._id)
             return True
@@ -21,6 +30,8 @@ class EngineTaskCore(AbstractTaskCore):
             return False
 
     def is_started(self) -> bool:
+        if self._id is None:
+            raise NoTaskFoundError
         try:
             self._engine_client.state.tasks.get_current(self._id)
             return True
@@ -28,6 +39,8 @@ class EngineTaskCore(AbstractTaskCore):
             return self.is_done()
 
     def get_finished_at_timestamp(self) -> datetime | None:
+        if self._id is None:
+            raise NoTaskFoundError
         try:
             finished_task = self._engine_client.state.tasks.get_finished(self._id)
             return finished_task.finishedAt

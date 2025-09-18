@@ -6793,6 +6793,11 @@
           "description": "Unique ID of the Temperature Module.",
           "title": "Moduleid",
           "type": "string"
+        },
+        "taskId": {
+          "description": "Id for the background task that manages the temperature",
+          "title": "Taskid",
+          "type": "string"
         }
       },
       "required": ["moduleId", "celsius"],

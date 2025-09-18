@@ -31,6 +31,7 @@ from ..module import (
 )
 
 from .legacy_labware_core import LegacyLabwareCore
+from .tasks import LegacyTaskCore
 from .module_geometry import ModuleGeometry, ThermocyclerGeometry, HeaterShakerGeometry
 from ...labware import Labware
 
@@ -116,9 +117,10 @@ class LegacyTemperatureModuleCore(
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.TempDeck]
 
-    def set_target_temperature(self, celsius: float) -> None:
+    def set_target_temperature(self, celsius: float) -> LegacyTaskCore:
         """Set the Temperature Module's target temperature in °C."""
         self._sync_module_hardware.start_set_temperature(celsius)
+        return LegacyTaskCore()
 
     def wait_for_target_temperature(self, celsius: Optional[float] = None) -> None:
         """Wait until the module's target temperature is reached.

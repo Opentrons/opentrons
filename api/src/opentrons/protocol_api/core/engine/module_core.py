@@ -51,6 +51,7 @@ from ..module import (
 from .exceptions import InvalidMagnetEngageHeightError
 
 from .labware import LabwareCore
+from .tasks import EngineTaskCore
 from . import load_labware_params
 
 if TYPE_CHECKING:
@@ -175,13 +176,17 @@ class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore[LabwareCor
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.TempDeck]
 
-    def set_target_temperature(self, celsius: float) -> None:
+    def set_target_temperature(self, celsius: float) -> EngineTaskCore:
         """Set the Temperature Module's target temperature in °C."""
-        self._engine_client.execute_command(
+        result = self._engine_client.execute_command_without_recovery(
             cmd.temperature_module.SetTargetTemperatureParams(
                 moduleId=self.module_id, celsius=celsius
             )
         )
+        temperature_task = EngineTaskCore(
+            engine_client=self._engine_client, task_id=result.taskId
+        )
+        return temperature_task
 
     def wait_for_target_temperature(self, celsius: Optional[float] = None) -> None:
         """Wait until the module's target temperature is reached.
