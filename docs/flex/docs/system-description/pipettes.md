@@ -155,7 +155,7 @@ Flex 8-channel pipettes meet the following accuracy and precision specifications
     <tr>
       <td>1000 µL</td>
       <td>1000 µL</td>
-      <td>0.70%</td>
+      <td>±0.70%</td>
       <td>0.15%</td>
     </tr>
   </tbody>
