@@ -28,15 +28,19 @@ runs:
         restore-keys: |
           yarn-cache-${{ runner.os }}-
 
-    - name: 'Cache Cypress binary'
-      id: cache-cypress
+    - name: 'Cache package binaries'
+      id: cache-packages
       uses: actions/cache@v4
       with:
-        path: ~/.cache/Cypress
-        key: cypress-${{ runner.os }}-${{ hashFiles('package.json') }}-${{ hashFiles('**/yarn.lock') }}
+        path: |
+          ~/.cache/Cypress
+          ~/.cache/electron
+          ~/.cache/playwright
+          ~/.cache/puppeteer
+        key: packages-${{ runner.os }}-${{ hashFiles('package.json') }}-${{ hashFiles('**/yarn.lock') }}
         restore-keys: |
-          cypress-${{ runner.os }}-${{ hashFiles('package.json') }}-
-          cypress-${{ runner.os }}-
+          packages-${{ runner.os }}-${{ hashFiles('package.json') }}-
+          packages-${{ runner.os }}-
 
     - name: 'Install udev for USB-detection'
       if: runner.os == 'Linux'
@@ -46,8 +50,9 @@ runs:
     - name: 'Setup JS'
       shell: bash
       run: |
+        # Generic package caching setup
         export CYPRESS_CACHE_FOLDER=~/.cache/Cypress
-        CYPRESS_VERSION=$(grep '"cypress"' package.json | sed 's/.*"cypress": *"\([^"]*\)".*/\1/')
+        export ELECTRON_CACHE=~/.cache/electron
         
         # Determine platform and architecture
         if [[ "$RUNNER_OS" == "Linux" ]]; then
@@ -61,19 +66,33 @@ runs:
           ARCH="x64"
         fi
         
-        # Try GitHub release first, fallback to official download
-        GITHUB_RELEASE_URL="https://github.com/Opentrons/cypress-mirror/releases/download/cypress-${CYPRESS_VERSION}/cypress-${CYPRESS_VERSION}-${PLATFORM}-${ARCH}.zip"
-        OFFICIAL_URL="https://download.cypress.io/desktop/${CYPRESS_VERSION}?platform=${PLATFORM}&arch=${ARCH}"
+        # Automatically detect and cache any packages that might need it
+        echo "🔍 Scanning package.json for packages that might need caching..."
         
-        # Check if GitHub release exists, use it if available
-        if curl -s --head "$GITHUB_RELEASE_URL" | head -n 1 | grep -q "200 OK"; then
-          export CYPRESS_INSTALL_BINARY="$GITHUB_RELEASE_URL"
-          echo "Using GitHub release: $GITHUB_RELEASE_URL"
-        else
-          export CYPRESS_INSTALL_BINARY="$OFFICIAL_URL"
-          echo "Using official download: $OFFICIAL_URL"
-        fi
+        # Common packages that often need binary caching
+        PACKAGES_TO_CHECK=("cypress" "electron" "playwright" "puppeteer" "chromium" "firefox" "webkit")
         
-        echo "Cypress version from package.json: $CYPRESS_VERSION"
-        echo "Cypress install binary URL: $CYPRESS_INSTALL_BINARY"
+        for package in "${PACKAGES_TO_CHECK[@]}"; do
+          # Check both dependencies and devDependencies
+          version=$(grep "\"$package\"" package.json | sed 's/.*"'$package'": *"\([^"]*\)".*/\1/' || echo "")
+          
+          if [[ -n "$version" ]]; then
+            echo "📦 Found $package $version - setting up caching..."
+            
+            # Set up environment variable based on package name
+            env_var=$(echo "${package^^}_CACHE" | sed 's/-/_/g')
+            
+            # Try package-mirror first
+            mirror_url="https://github.com/Opentrons/package-mirror/releases/download/${package}-${version}/${package}-${version}-${PLATFORM}-${ARCH}.zip"
+            
+            if curl -s --head "$mirror_url" | head -n 1 | grep -q "200 OK"; then
+              export $env_var="$mirror_url"
+              echo "✅ Using cached $package from package-mirror"
+            else
+              echo "⚠️  $package not cached yet - will use official source"
+            fi
+          fi
+        done
+        
+        echo "🚀 Running make setup-js..."
         make setup-js
