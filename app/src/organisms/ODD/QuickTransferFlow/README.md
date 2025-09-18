@@ -57,7 +57,7 @@ touchTipAspirate = -(sourceWellHeight - prevTouchTipAspirate)
 touchTipDispense = -(destWellHeight - prevTouchTipDispense)
 ```
 
-## [WIP] Version 1.2.0
+## Version 1.2.0
 
 Due to changes in the Quick Transfer setup flow, there will be changes to QuickTransferWizardState and QuickTransferSummaryState. The changes are as follows:
 the comment `this has been added` will be removed before feature freeze.
@@ -172,3 +172,9 @@ export interface QuickTransferSummaryState {
   liquidClassValuesInitialized: boolean // this has been added
 }
 ```
+
+## Version 2.0.0
+
+Introduction of python protocol generation starting in robot stack v8.7.0.
+
+You can still export JSON behind a feature flag.
