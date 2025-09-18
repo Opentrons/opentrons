@@ -268,7 +268,7 @@ class LegacyThermocyclerCore(
         ramp_rate: Optional[float],
         hold_time_seconds: Optional[float] = None,
         block_max_volume: Optional[float] = None,
-    ) -> None:
+    ) -> LegacyTaskCore:
         """Set the target temperature for the well block, in °C."""
         self._sync_module_hardware.set_target_block_temperature(
             celsius=celsius,
@@ -276,14 +276,16 @@ class LegacyThermocyclerCore(
             volume=block_max_volume,
             ramp_rate=ramp_rate,
         )
+        return LegacyTaskCore()
 
     def wait_for_block_temperature(self) -> None:
         """Wait for target block temperature to be reached."""
         self._sync_module_hardware.wait_for_block_target()
 
-    def set_target_lid_temperature(self, celsius: float) -> None:
+    def set_target_lid_temperature(self, celsius: float) -> LegacyTaskCore:
         """Set the target temperature for the heated lid, in °C."""
         self._sync_module_hardware.set_target_lid_temperature(celsius=celsius)
+        return LegacyTaskCore()
 
     def wait_for_lid_temperature(self) -> None:
         """Wait for target lid temperature to be reached."""

@@ -85,6 +85,18 @@ class SyncClient:
 
     @overload
     def execute_command_without_recovery(
+        self, params: commands.thermocycler.SetTargetBlockTemperatureParams
+    ) -> commands.thermocycler.SetTargetBlockTemperatureResult:
+        pass
+
+    @overload
+    def execute_command_without_recovery(
+        self, params: commands.thermocycler.SetTargetLidTemperatureParams
+    ) -> commands.thermocycler.SetTargetLidTemperatureResult:
+        pass
+
+    @overload
+    def execute_command_without_recovery(
         self, params: commands.LoadModuleParams
     ) -> commands.LoadModuleResult:
         pass

@@ -126,6 +126,7 @@ def test_get_labware_latch_status(
     result = subject.labware_latch_status
     assert result == "opening"
 
+
 def test_set_target_temperature(
     decoy: Decoy,
     mock_core: HeaterShakerCore,

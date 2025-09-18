@@ -10,7 +10,7 @@ from ...errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state.state import StateView
-    from opentrons.protocol_engine.execution import EquipmentHandler
+    from opentrons.protocol_engine.execution import EquipmentHandler, TaskHandler
 
 
 SetTargetLidTemperatureCommandType = Literal["thermocycler/setTargetLidTemperature"]
@@ -21,6 +21,9 @@ class SetTargetLidTemperatureParams(BaseModel):
 
     moduleId: str = Field(..., description="Unique ID of the Thermocycler Module.")
     celsius: float = Field(..., description="Target temperature in °C.")
+    taskId: str | None = Field(
+        None, description="Id for the background task that manages the temperature."
+    )
 
 
 class SetTargetLidTemperatureResult(BaseModel):
@@ -29,6 +32,10 @@ class SetTargetLidTemperatureResult(BaseModel):
     targetLidTemperature: float = Field(
         ...,
         description="The target lid temperature that was set after validation.",
+    )
+    taskId: str = Field(
+        ...,
+        description="The taask id for the setTargetBlockTemperature",
     )
 
 
@@ -43,10 +50,12 @@ class SetTargetLidTemperatureImpl(
         self,
         state_view: StateView,
         equipment: EquipmentHandler,
+        task_handler: TaskHandler,
         **unused_dependencies: object,
     ) -> None:
         self._state_view = state_view
         self._equipment = equipment
+        self._task_handler = task_handler
 
     async def execute(
         self,
@@ -63,12 +72,19 @@ class SetTargetLidTemperatureImpl(
             thermocycler_state.module_id
         )
 
-        if thermocycler_hardware is not None:
-            await thermocycler_hardware.set_target_lid_temperature(target_temperature)
+        async def set_target_lid_temperature(task_handler: TaskHandler) -> None:
+            if thermocycler_hardware is not None:
+                await thermocycler_hardware.set_target_lid_temperature(
+                    target_temperature
+                )
+                await thermocycler_hardware.wait_for_lid_target()
 
+        task = await self._task_handler.create_task(
+            task_function=set_target_lid_temperature, id=params.taskId
+        )
         return SuccessData(
             public=SetTargetLidTemperatureResult(
-                targetLidTemperature=target_temperature
+                targetLidTemperature=target_temperature, taskId=task.id
             ),
         )
 

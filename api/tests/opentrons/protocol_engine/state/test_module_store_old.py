@@ -673,7 +673,9 @@ def test_handle_thermocycler_temperature_commands(
         params=tc_commands.SetTargetBlockTemperatureParams(
             moduleId="module-id", celsius=42.4
         ),
-        result=tc_commands.SetTargetBlockTemperatureResult(targetBlockTemperature=42.4),
+        result=tc_commands.SetTargetBlockTemperatureResult(
+            targetBlockTemperature=42.4, taskId="taskId"
+        ),
     )
     deactivate_block_cmd = tc_commands.DeactivateBlock.model_construct(  # type: ignore[call-arg]
         params=tc_commands.DeactivateBlockParams(moduleId="module-id"),
@@ -683,7 +685,9 @@ def test_handle_thermocycler_temperature_commands(
         params=tc_commands.SetTargetLidTemperatureParams(
             moduleId="module-id", celsius=35.3
         ),
-        result=tc_commands.SetTargetLidTemperatureResult(targetLidTemperature=35.3),
+        result=tc_commands.SetTargetLidTemperatureResult(
+            targetLidTemperature=35.3, taskId="taskId"
+        ),
     )
     deactivate_lid_cmd = tc_commands.DeactivateLid.model_construct(  # type: ignore[call-arg]
         params=tc_commands.DeactivateLidParams(moduleId="module-id"),

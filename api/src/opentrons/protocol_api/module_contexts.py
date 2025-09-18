@@ -667,8 +667,15 @@ class ThermocyclerContext(ModuleContext):
         hold_time_minutes: Optional[float] = None,
         ramp_rate: Optional[float] = None,
         block_max_volume: Optional[float] = None,
-    ) -> None:
+    ) -> Task:
         """Set the target temperature for the well block, in °C.
+
+        .. versionchanged::2.27
+            Returns a task object that represents concurrent preheating.
+            Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for
+            the preheat to complete.
+
+        On version 2.26 or below, this function returns ``None``.
 
         :param temperature: A value between 4 and 99, representing the target
                             temperature in °C.
@@ -693,18 +700,28 @@ class ThermocyclerContext(ModuleContext):
         seconds = validation.ensure_hold_time_seconds(
             seconds=hold_time_seconds, minutes=hold_time_minutes
         )
-        self._core.set_target_block_temperature(
+        task = self._core.set_target_block_temperature(
             celsius=temperature,
             hold_time_seconds=seconds,
             block_max_volume=block_max_volume,
             ramp_rate=ramp_rate,
         )
-        self._core.wait_for_block_temperature()
+        if self._api_version >= APIVersion(2, 27):
+            return Task(api_version=self._api_version, core=task)
+        else:
+            return cast(Task, None)
 
     @publish(command=cmds.thermocycler_set_lid_temperature)
     @requires_version(2, 0)
-    def set_lid_temperature(self, temperature: float) -> None:
+    def set_lid_temperature(self, temperature: float) -> Task:
         """Set the target temperature for the heated lid, in °C.
+
+        .. versionchanged::2.27
+            Returns a task object that represents concurrent preheating.
+            Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for
+            the preheat to complete.
+
+        On version 2.26 or below, this function returns ``None``.
 
         :param temperature: A value between 37 and 110, representing the target
                             temperature in °C.
@@ -715,8 +732,11 @@ class ThermocyclerContext(ModuleContext):
             ``temperature`` is reached.
 
         """
-        self._core.set_target_lid_temperature(celsius=temperature)
-        self._core.wait_for_lid_temperature()
+        task = self._core.set_target_lid_temperature(celsius=temperature)
+        if self._api_version >= APIVersion(2, 27):
+            return Task(api_version=self._api_version, core=task)
+        else:
+            return cast(Task, None)
 
     @publish(command=cmds.thermocycler_execute_profile)
     @requires_version(2, 0)
