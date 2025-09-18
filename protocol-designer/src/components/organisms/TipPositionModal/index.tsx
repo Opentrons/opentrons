@@ -27,8 +27,9 @@ import {
   SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
 } from '@opentrons/shared-data'
 
-import { getIsTouchTipField } from '../../../form-types'
-import { LINK_BUTTON_STYLE } from '../../atoms'
+import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
+import { getIsTouchTipField } from '/protocol-designer/form-types'
+
 import { getMainPagePortalEl } from '../Portal'
 import {
   MoveLiquidPrefixToAction,
@@ -43,9 +44,9 @@ import * as utils from './utils'
 
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
 import type { PositionReference } from '@opentrons/shared-data'
-import type { FormData, StepFieldName } from '../../../form-types'
-import type { FieldProps } from '../../../pages/Designer/ProtocolSteps/types'
-import type { MoveLiquidPrefixType } from '../../../resources/types'
+import type { FormData, StepFieldName } from '/protocol-designer/form-types'
+import type { FieldProps } from '/protocol-designer/pages/Designer/ProtocolSteps/types'
+import type { MoveLiquidPrefixType } from '/protocol-designer/resources/types'
 
 type Offset = 'x' | 'y' | 'z'
 interface PositionSpec {
@@ -428,14 +429,14 @@ export function TipPositionModal(
                     : defaultMmFromBottom
                 }
                 wellDepthMm={wellDepthMm}
-                xPosition={parseInt(xValue ?? '0')}
+                xPosition={parseFloat(xValue ?? '0')}
                 xWidthMm={wellXWidthMm}
               />
             ) : (
               <TipPositionTopView
-                xPosition={parseInt(xValue ?? '0')}
+                xPosition={parseFloat(xValue ?? '0')}
                 xWidthMm={wellXWidthMm}
-                yPosition={parseInt(yValue ?? '0')}
+                yPosition={parseFloat(yValue ?? '0')}
                 yWidthMm={wellYWidthMm}
               />
             )}

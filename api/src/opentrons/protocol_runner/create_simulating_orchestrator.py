@@ -16,11 +16,38 @@ from opentrons_shared_data.robot.types import RobotType
 from .python_protocol_wrappers import SimulatingContextCreator
 from .run_orchestrator import RunOrchestrator
 from .protocol_runner import create_protocol_runner, LiveRunner
+from ..protocol_engine.types import (
+    PostRunHardwareState,
+)
+
+
+class SimulatingRunOrchestrator(RunOrchestrator):
+    """A RunOrchestrator that cleans up its simulating hardware controller.
+
+    This should only be created and returned by create_simulating_orchestrator, unless
+    you are sure it's appropriate to clean up the hardware controller.
+    """
+
+    async def finish(
+        self,
+        error: Exception | None = None,
+        drop_tips_after_run: bool = True,
+        set_run_status: bool = True,
+        post_run_hardware_state: PostRunHardwareState = PostRunHardwareState.HOME_AND_STAY_ENGAGED,
+    ) -> None:
+        """Finish the run and clean up the simulating hardware controller."""
+        await super().finish(
+            error=error,
+            drop_tips_after_run=drop_tips_after_run,
+            set_run_status=set_run_status,
+            post_run_hardware_state=post_run_hardware_state,
+        )
+        await self._hardware_api.clean_up()
 
 
 async def create_simulating_orchestrator(
     robot_type: RobotType, protocol_config: ProtocolConfig
-) -> RunOrchestrator:
+) -> SimulatingRunOrchestrator:
     """Create a RunOrchestrator wired to a simulating HardwareControlAPI.
 
     Example:
@@ -96,7 +123,7 @@ async def create_simulating_orchestrator(
         hardware_api=simulating_hardware_api,
     )
 
-    return RunOrchestrator(
+    return SimulatingRunOrchestrator(
         hardware_api=simulating_hardware_api,
         json_or_python_protocol_runner=runner,
         protocol_engine=protocol_engine,

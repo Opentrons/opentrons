@@ -19,7 +19,6 @@ import type {
   LabwareDefinition,
   LabwareDefinition2,
   ModuleDefinition,
-  SlotTransforms,
   Vector3D,
 } from '../types'
 
@@ -364,7 +363,7 @@ export function getDeckSlotOriginToLabwareOrigin(
  * to go slot->module and a second function to go module->labware.
  */
 export function getModuleParentOriginToLabwareOrigin(
-  deckId: string,
+  deckId: string | null,
   slotId: string | null,
   moduleDefinition: ModuleDefinition,
   labwareDefinition: LabwareDefinition
@@ -452,15 +451,14 @@ export function getLabwareOriginToLabwareOrigin(
  *  slot -x,-y corner idea.
  */
 export function getModuleParentOriginToChildSlotOrigin(
-  deckId: string,
+  deckId: string | null,
   slotId: string | null,
   moduleDefinition: ModuleDefinition
 ): Vector3D {
-  const transformsForLocation = getSlotTransformsFromModuleDefinition(
-    moduleDefinition,
-    deckId,
-    slotId
-  )
+  const transformsForLocation =
+    deckId != null && slotId != null
+      ? moduleDefinition.slotTransforms[deckId]?.[slotId] ?? {}
+      : {}
   const labwareOffsetTransform =
     transformsForLocation.labwareOffset ?? IDENTITY_AFFINE_TRANSFORM
   const [[x], [y], [z]] = multiplyMatrices(labwareOffsetTransform, [
@@ -540,17 +538,4 @@ export function getSchema2CornerOffsetFromSlot(
       z: 56,
     }
   }
-}
-
-type ModuleTransformsForDeck = NonNullable<SlotTransforms[string]>
-type ModuleTransformsForSlot = NonNullable<ModuleTransformsForDeck[string]>
-function getSlotTransformsFromModuleDefinition(
-  moduleDefinition: ModuleDefinition,
-  targetDeckId: string,
-  targetSlotId: string | null
-): ModuleTransformsForSlot {
-  const transformsForDeck = moduleDefinition.slotTransforms[targetDeckId] ?? {}
-  const transformsForSlot =
-    targetSlotId == null ? {} : transformsForDeck[targetSlotId] ?? {}
-  return transformsForSlot
 }

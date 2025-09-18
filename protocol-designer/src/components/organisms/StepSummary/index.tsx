@@ -13,7 +13,9 @@ import {
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 
-import { formatTime } from '../../../pages/Designer/utils'
+import { LINE_CLAMP_TEXT_STYLE } from '/protocol-designer/components/atoms'
+import { formatTime } from '/protocol-designer/pages/Designer/utils'
+
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
@@ -22,14 +24,13 @@ import {
 } from '../../../step-forms/selectors'
 import { getRobotStateAtActiveItem } from '../../../top-selectors/labware-locations'
 import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
-import { LINE_CLAMP_TEXT_STYLE } from '../../atoms'
 import { AbsorbanceReaderSummary } from './AbsorbanceReaderSummary'
 import { MixSummary } from './MixSummary'
 import { MoveLiquidSummary } from './MoveLiquidSummary'
 import { StyledTrans } from './StyledTrans'
 import styles from './summary.module.css'
 
-import type { FormData } from '../../../form-types'
+import type { FormData } from '/protocol-designer/form-types'
 
 interface StepSummaryProps {
   currentStep: FormData | null
@@ -176,7 +177,7 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
         case 'untilResume':
           stepSummaryContent = (
             <StyledText desktopStyle="bodyDefaultRegular">
-              {t('protocol_steps:pause.untilResume')}
+              {t('protocol_steps:pause.pausingUntilResume')}
             </StyledText>
           )
           break
@@ -188,7 +189,7 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
               : unknownModule
           stepSummaryContent = (
             <StyledTrans
-              i18nKey="protocol_steps:pause.untilTemperature"
+              i18nKey="protocol_steps:pause.pausingUntilTemperature"
               values={{ module: pauseModuleDisplayName }}
               tagText={`${pauseTemperature}${t('application:units.degrees')}`}
             />
@@ -197,7 +198,7 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
         case 'untilTime':
           stepSummaryContent = (
             <StyledTrans
-              i18nKey={t('protocol_steps:pause.untilTime')}
+              i18nKey={t('protocol_steps:pause.pausingForDuration')}
               tagText={formatTime(pauseTime as string)}
             />
           )

@@ -1,15 +1,12 @@
 import { DeckConfigurator } from '@opentrons/components'
 
-import { useDeckConfigurationEditing } from './useDeckConfigurationEditing'
+import { useDeckConfigurationEditing } from './utils'
 
 import type { UseFormSetValue } from 'react-hook-form'
-import type { DeckConfiguration } from '@opentrons/shared-data'
-import type { FormModules } from '../../../step-forms'
+import type { CutoutConfigMap, DeckConfiguration } from '@opentrons/shared-data'
+import type { FormModules } from '/protocol-designer/step-forms'
 import type { Fixtures, WizardFormState } from '../types'
-import type {
-  CutoutConfigExtended,
-  InitialDeckStateModules,
-} from './AddFixtureModal'
+import type { InitialDeckStateModules } from './AddFixtureModal'
 
 interface HardwareConfiguratorContainerProps {
   modules: FormModules | InitialDeckStateModules
@@ -18,7 +15,7 @@ interface HardwareConfiguratorContainerProps {
   deckConfig: DeckConfiguration
   setValue?: UseFormSetValue<WizardFormState>
   updateInitialDeckState?: (
-    value: CutoutConfigExtended[],
+    value: CutoutConfigMap[],
     newDeckConfig?: DeckConfiguration
   ) => void
 }

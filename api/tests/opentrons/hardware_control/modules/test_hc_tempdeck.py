@@ -1,15 +1,21 @@
 import asyncio
+from typing import AsyncGenerator
 
-from opentrons.hardware_control.modules.tempdeck import TempDeck
+from decoy import Decoy
 import pytest
 
+from opentrons.hardware_control.modules.types import (
+    ModuleDisconnectedCallback,
+    ModuleErrorCallback,
+)
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control import modules, ExecutionManager
-from typing import AsyncGenerator
+from opentrons.hardware_control.modules.tempdeck import TempDeck
 
 
 @pytest.fixture
 def usb_port() -> USBPort:
+    """Token USB port."""
     return USBPort(
         name="",
         port_number=0,
@@ -18,7 +24,12 @@ def usb_port() -> USBPort:
 
 
 @pytest.fixture
-async def subject(usb_port: USBPort) -> AsyncGenerator[modules.AbstractModule, None]:
+async def subject(
+    usb_port: USBPort,
+    mock_execution_manager: ExecutionManager,
+    module_error_callback: ModuleErrorCallback,
+    module_disconnected_callback: ModuleDisconnectedCallback,
+) -> AsyncGenerator[modules.AbstractModule, None]:
     """Test subject"""
     temp = await modules.build(
         port="/dev/ot_module_sim_tempdeck0",
@@ -26,17 +37,23 @@ async def subject(usb_port: USBPort) -> AsyncGenerator[modules.AbstractModule, N
         type=modules.ModuleType["TEMPERATURE"],
         simulating=True,
         hw_control_loop=asyncio.get_running_loop(),
-        execution_manager=ExecutionManager(),
+        execution_manager=mock_execution_manager,
+        error_callback=module_error_callback,
+        disconnected_callback=module_disconnected_callback,
     )
-    yield temp
-    await temp.cleanup()
+    try:
+        yield temp
+    finally:
+        await temp.cleanup()
 
 
 async def test_sim_initialization(subject: modules.AbstractModule) -> None:
+    """It should build a tempdeck."""
     assert isinstance(subject, modules.AbstractModule)
 
 
 async def test_sim_state(subject: modules.AbstractModule) -> None:
+    """It sohuld forward state."""
     assert isinstance(subject, TempDeck)
     assert subject.temperature == 0
     assert subject.target is None
@@ -55,6 +72,7 @@ async def test_sim_state(subject: modules.AbstractModule) -> None:
 
 
 async def test_sim_update(subject: modules.AbstractModule) -> None:
+    """It should update state."""
     assert isinstance(subject, TempDeck)
     await subject.start_set_temperature(10)
     await subject.await_temperature(None)
@@ -68,6 +86,7 @@ async def test_sim_update(subject: modules.AbstractModule) -> None:
 
 
 async def test_revision_model_parsing(subject: modules.AbstractModule) -> None:
+    """It should parse its model."""
     assert isinstance(subject, TempDeck)
     subject._device_info["model"] = "temp_deck_v20"
     assert subject.model() == "temperatureModuleV2"
@@ -77,3 +96,23 @@ async def test_revision_model_parsing(subject: modules.AbstractModule) -> None:
     assert subject.model() == "temperatureModuleV1"
     subject._device_info["model"] = "temp_deck_v1.1"
     assert subject.model() == "temperatureModuleV1"
+
+
+async def test_error_callback(
+    subject: modules.TempDeck,
+    monkeypatch: pytest.MonkeyPatch,
+    decoy: Decoy,
+    module_error_callback: ModuleErrorCallback,
+) -> None:
+    """It should forward temperature check errors."""
+    mock_get_temp = decoy.mock(func=subject._driver.get_temperature)
+    exc = Exception("oh no!")
+    decoy.when(await mock_get_temp()).then_raise(exc)
+    monkeypatch.setattr(subject._driver, "get_temperature", mock_get_temp)
+    with pytest.raises(Exception, match="oh no!"):
+        await subject._poller.wait_next_poll()
+    decoy.verify(
+        module_error_callback(
+            exc, "temperatureModuleV1", "/dev/ot_module_sim_tempdeck0", "dummySerialTD"
+        )
+    )

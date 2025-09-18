@@ -24,7 +24,7 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   HydratedMoveLiquidFormData,
   PathOption,
-} from '../../../../form-types'
+} from '/protocol-designer/form-types'
 
 vi.mock('../../../utils')
 vi.mock('assert')

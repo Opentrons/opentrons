@@ -17,6 +17,7 @@ import { EndUserAgreementFooter } from '../../components/molecules'
 import { AnnouncementModal } from '../../components/organisms'
 import { useAnnouncements } from '../../components/organisms/AnnouncementModal/announcements'
 import { useKitchen } from '../../components/organisms/Kitchen/useKitchen'
+import { ACCEPTED_PROTOCOL_FILE_TYPES } from '../../constants'
 import { getFileMetadata } from '../../file-data/selectors'
 import { actions as loadFileActions } from '../../load-file'
 import { toggleNewProtocolModal } from '../../navigation/actions'
@@ -60,7 +61,7 @@ export function Landing(): JSX.Element {
       hasOptedIn != null
     ) {
       const toastId = bakeToast(
-        t('learn_more', { version: process.env.OT_PD_VERSION }) as string,
+        t('learn_more', { version: _OT_PD_VERSION_ }) as string,
         INFO_TOAST,
         {
           heading: t('updated_protocol_designer'),
@@ -151,6 +152,7 @@ export function Landing(): JSX.Element {
             ref={fileInputRef}
             aria-label={`${t('import')}_from_landing`}
             className={styles.hiddenInput}
+            accept={ACCEPTED_PROTOCOL_FILE_TYPES}
           />
         </label>
       </div>

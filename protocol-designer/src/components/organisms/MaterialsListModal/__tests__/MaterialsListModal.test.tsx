@@ -3,21 +3,22 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
+import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
+import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
+
 import { MaterialsListModal } from '..'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
-import { getRobotType } from '../../../../file-data/selectors'
-import { selectors as labwareIngredSelectors } from '../../../../labware-ingred/selectors'
-import { getInitialDeckSetup } from '../../../../step-forms/selectors'
 
 import type { ComponentProps } from 'react'
 import type { InfoScreen } from '@opentrons/components'
 import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
-import type { LabwareOnDeck, ModuleOnDeck } from '../../../../step-forms'
+import type { LabwareOnDeck, ModuleOnDeck } from '/protocol-designer/step-forms'
 
-vi.mock('../../../../step-forms/selectors')
-vi.mock('../../../../labware-ingred/selectors')
-vi.mock('../../../../file-data/selectors')
+vi.mock('/protocol-designer/step-forms/selectors')
+vi.mock('/protocol-designer/labware-ingred/selectors')
+vi.mock('/protocol-designer/file-data/selectors')
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof InfoScreen>()
   return {

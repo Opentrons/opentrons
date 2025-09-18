@@ -24,15 +24,22 @@ import {
   wellFillFromWellContents,
 } from '@opentrons/step-generation'
 
-import { selectors } from '../../../labware-ingred/selectors'
-import { selectors as stepFormSelectors } from '../../../step-forms'
-import { getInitialDeckSetup } from '../../../step-forms/selectors'
-import * as wellContentsSelectors from '../../../top-selectors/well-contents'
-import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
-import { deselectWells, selectWells } from '../../../well-selection/actions'
-import { getSelectedWells } from '../../../well-selection/selectors'
-import { LINE_CLAMP_TEXT_STYLE, NAV_BAR_HEIGHT_REM } from '../../atoms'
-import { LiquidButton } from '../../molecules'
+import {
+  LINE_CLAMP_TEXT_STYLE,
+  NAV_BAR_HEIGHT_REM,
+} from '/protocol-designer/components/atoms'
+import { LiquidButton } from '/protocol-designer/components/molecules'
+import { selectors } from '/protocol-designer/labware-ingred/selectors'
+import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
+import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
+import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
+import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
+import {
+  deselectWells,
+  selectWells,
+} from '/protocol-designer/well-selection/actions'
+import { getSelectedWells } from '/protocol-designer/well-selection/selectors'
+
 import { SelectableLabware } from '../Labware/SelectableLabware'
 import { LiquidToolbox } from './LiquidToolbox'
 
@@ -116,7 +123,7 @@ export function AssignLiquidsModal(
               />
               <StyledText
                 desktopStyle="headingLargeBold"
-                css={LINE_CLAMP_TEXT_STYLE(3)}
+                css={LINE_CLAMP_TEXT_STYLE(3, true)}
               >
                 {t('add_liquids_to_labware', {
                   labwareName: nickNames[labwareId],

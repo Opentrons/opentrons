@@ -85,7 +85,7 @@ describe('getRunCurrentModulesOnDeck', () => {
         moduleModel: 'MOCK_MODEL',
         moduleLocation: { slotName: 'A1' },
         innerProps: {},
-        nestedLabwareDef: mockLabwareDef,
+        nestedLabwareDefsBottomToTop: [mockLabwareDef],
         highlight: 'A1',
       },
     ])

@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 
-import { BaseDeck, Flex } from '@opentrons/components'
+import { BaseDeck, Flex, LabwareRender } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   getLabwareDefinitionsByURIForProtocol,
@@ -50,6 +50,11 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
         topLabwareInfo != null
           ? definitionsByURI[topLabwareInfo.definitionUri]
           : null
+      // TODO: ja 8.27.25: find a better way to find the matching lid def without
+      // relying on the lidDisplayNames
+      const matchingLidDef = Object.values(definitionsByURI).find(
+        uri => uri.metadata.displayName === topLabwareInfo?.lidDisplayName
+      )
       const isLabwareStacked = topLabwareInfo != null && stackedItems.length > 2
       const wellFill =
         topLabwareInfo != null
@@ -67,7 +72,10 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
           module.moduleModel === THERMOCYCLER_MODULE_V1
             ? { lidMotorState: 'open' }
             : {},
-        nestedLabwareDef: topLabwareDefinition,
+        nestedLabwareDefsBottomToTop: [
+          ...(topLabwareDefinition != null ? [topLabwareDefinition] : []),
+          ...(matchingLidDef != null ? [matchingLidDef] : []),
+        ],
         nestedLabwareWellFill: wellFill,
         onLabwareClick:
           topLabwareInfo != null
@@ -89,6 +97,9 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
       topLabwareInfo != null
         ? definitionsByURI[topLabwareInfo.definitionUri]
         : null
+    const matchingLidDef = Object.values(definitionsByURI).find(
+      uri => uri.metadata.displayName === topLabwareInfo?.lidDisplayName
+    )
     if (topLabwareInfo == null || topLabwareDefinition == null) return null
 
     const isLabwareInStack = stackedItems.length > 1
@@ -108,6 +119,13 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
       wellFill: wellFill,
       highlight: true,
       stacked: isLabwareInStack,
+      labwareChildren:
+        matchingLidDef != null ? (
+          <LabwareRender
+            definition={matchingLidDef}
+            positioningMode="passThrough"
+          />
+        ) : null,
     }
   })
 

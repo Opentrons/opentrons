@@ -6,6 +6,7 @@ import {
   FLEX_STACKER_MODULE_TYPE,
   FLEX_STACKER_MODULE_V1,
   getDeckDefFromRobotType,
+  getWasteChuteOptions,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_V1_FIXTURE,
@@ -20,7 +21,6 @@ import {
   getModuleOptions,
   getModuleUnconfiguredFixtures,
   getThermoUnconfiguredFixtures,
-  getWasteChuteOptions,
 } from '../utils'
 
 import type { AttachedModule } from '@opentrons/api-client'

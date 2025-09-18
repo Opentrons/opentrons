@@ -14,8 +14,8 @@ import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
 
-import { ZTipPositionModal } from '../../../../../components/organisms'
-import { getLabwareEntities } from '../../../../../step-forms/selectors'
+import { ZTipPositionModal } from '/protocol-designer/components/organisms'
+import { getLabwareEntities } from '/protocol-designer/step-forms/selectors'
 
 import type { FieldProps } from '../types'
 

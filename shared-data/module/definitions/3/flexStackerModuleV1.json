@@ -61,6 +61,16 @@
   "displayName": "Flex Stacker Module GEN1",
   "quirks": [],
   "slotTransforms": {},
+  "orientation": {
+    "A3": "right",
+    "A4": "right",
+    "B3": "right",
+    "B4": "right",
+    "C3": "right",
+    "C4": "right",
+    "D3": "right",
+    "D4": "right"
+  },
   "compatibleWith": [],
   "incompatibleWithDecks": ["ot2_standard", "ot2_short_trash"],
   "uniqueModuleData": {

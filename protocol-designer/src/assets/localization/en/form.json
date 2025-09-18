@@ -169,6 +169,9 @@
         },
         "title": "Condition"
       },
+      "dropTip": {
+        "option": { "return": "Tip rack" }
+      },
       "delay": {
         "label": "delay"
       },

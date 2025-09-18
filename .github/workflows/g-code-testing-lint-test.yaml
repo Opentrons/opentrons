@@ -52,7 +52,7 @@ jobs:
           sudo apt-get update && sudo apt-get install libudev-dev
       - uses: 'actions/setup-node@v4'
         with:
-          node-version: '22.11.0'
+          node-version: '22.12.0'
       - name: 'set complex environment variables'
         id: 'set-vars'
         uses: actions/github-script@v6

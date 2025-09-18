@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { css } from 'styled-components'
 
 import {
+  AlignControlToModule,
   BaseDeck,
   Box,
   COLORS,
@@ -13,6 +14,8 @@ import {
 } from '@opentrons/components'
 import {
   FLEX_STACKER_MODULE_TYPE,
+  getDeckDefFromRobotType,
+  getModuleDef,
   getModuleType,
   getSchema2CornerOffsetFromSlot,
   getSchema2Dimensions,
@@ -59,14 +62,14 @@ export const DeckMapContent: (
 function InterventionStyleDeckMapContent(
   props: InterventionStyleDeckMapContentProps
 ): JSX.Element {
+  const deckDef = getDeckDefFromRobotType(props.robotType)
+
   const labwareWithHighlights =
-    props.labwareOnDeck?.map(labwareOnDeck =>
-      props.highlightLabwareEventuallyIn.reduce(
-        (found, locationToMatch) =>
-          found ||
-          getIsLabwareMatch(labwareOnDeck.labwareLocation, locationToMatch),
-        false
+    props.labwareOnDeck?.map(labwareOnDeck => {
+      const found = props.highlightLabwareEventuallyIn.some(locationToMatch =>
+        getIsLabwareMatch(labwareOnDeck.labwareLocation, locationToMatch)
       )
+      return found
         ? {
             ...labwareOnDeck,
             labwareChildren: (
@@ -77,30 +80,46 @@ function InterventionStyleDeckMapContent(
             ),
           }
         : labwareOnDeck
-    ) ?? []
-  // we should not highlight labware that matches the flex stacker slot location
+    }) ?? []
+
   const modulesWithHighlights =
-    props.modulesOnDeck?.map(module =>
-      props.highlightLabwareEventuallyIn.reduce((found, locationToMatch) => {
+    props.modulesOnDeck?.map(module => {
+      const found = props.highlightLabwareEventuallyIn.some(locationToMatch => {
         const moduleType = getModuleType(module.moduleModel)
         return (
-          found ||
-          (moduleType !== FLEX_STACKER_MODULE_TYPE &&
-            getIsLabwareMatch(module.moduleLocation, locationToMatch))
+          moduleType !== FLEX_STACKER_MODULE_TYPE &&
+          getIsLabwareMatch(module.moduleLocation, locationToMatch)
         )
-      }, false)
+      })
+      return found
         ? {
             ...module,
             moduleChildren:
-              module?.nestedLabwareDef != null ? (
-                <LabwareHighlight
-                  highlight={true}
-                  definition={module.nestedLabwareDef}
-                />
+              module?.nestedLabwareDefsBottomToTop.length > 0 ? (
+                <AlignControlToModule
+                  // todo(mm, 2025-07-14): This <AlignControlToModule> ought to be a
+                  // <AlignLabwareToModule>; right now, this will misalign the highlight
+                  // for schema-3 labware definitions. Before we can do that,
+                  // <LabwareHighlight> and probably <BaseDeck>'s labwareChildren prop
+                  // will need to be modified.
+                  deckId={deckDef.otId}
+                  slotId={module.moduleLocation.slotName}
+                  moduleDefinition={getModuleDef(module.moduleModel)}
+                >
+                  <LabwareHighlight
+                    highlight={true}
+                    definition={
+                      module.nestedLabwareDefsBottomToTop[
+                        module.nestedLabwareDefsBottomToTop.length - 1
+                      ]
+                    }
+                  />
+                </AlignControlToModule>
               ) : undefined,
           }
         : module
-    ) ?? []
+    }) ?? []
+
   return (
     <BaseDeck
       deckConfig={props.deckConfig}

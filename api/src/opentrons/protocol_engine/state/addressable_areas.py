@@ -5,6 +5,7 @@ from functools import cached_property
 from typing import Dict, List, Optional, Set
 
 from opentrons_shared_data.robot.types import RobotType, RobotDefinition
+from opentrons_shared_data.module.types import ModuleOrientation
 from opentrons_shared_data.deck.types import (
     DeckDefinitionV5,
     SlotDefV3,
@@ -614,6 +615,7 @@ class AddressableAreaView:
             "displayName": addressable_area.display_name,
             "compatibleModuleTypes": addressable_area.compatible_module_types,
             "features": addressable_area.features,
+            "orientation": ModuleOrientation.NOT_APPLICABLE,
         }
 
     def get_deck_slot_definitions(self) -> Dict[str, SlotDefV3]:

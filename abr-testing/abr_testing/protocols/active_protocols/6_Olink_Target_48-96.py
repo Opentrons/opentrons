@@ -16,7 +16,7 @@ metadata = {
     "author": "Zachary Galluzzo <zachary.galluzzo@opentrons.com>",
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.23"}
+requirements = {"robotType": "Flex", "apiLevel": "2.25"}
 
 open_location: Any = "A4"
 
@@ -188,8 +188,6 @@ def run(protocol: ProtocolContext) -> None:
     ifp_primer_dests = []
     for well in prim_dest_list:
         ifp_primer_dests.append(ifp_plate.wells()[well])
-    input(len(ifp_primer_dests))
-
     samp_dest_list = (
         [96, 97, 112, 113, 128, 129, 144, 145, 160, 161, 176, 177]
         if ninety_six
@@ -505,5 +503,7 @@ def run(protocol: ProtocolContext) -> None:
 
     except Exception as e:
         if not protocol.is_simulating():
-            slack_bot.send_error_message(metadata["protocolName"], str(e))
+            helpers.send_slack_error_message_with_log(
+                slack_bot, metadata["protocolName"], str(e)
+            )
         raise (e)

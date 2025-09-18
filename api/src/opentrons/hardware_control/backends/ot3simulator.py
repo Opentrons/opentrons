@@ -728,7 +728,8 @@ class OT3Simulator(FlexBackend):
     @ensure_yield
     async def clean_up(self) -> None:
         """Clean up."""
-        pass
+        if hasattr(self, "_module_controls") and self._module_controls is not None:
+            await self._module_controls.clean_up()
 
     @staticmethod
     def _get_home_position() -> Dict[Axis, float]:

@@ -123,18 +123,3 @@ def test_add_liquid(
     result = subject.add_liquid(name="water", description="water desc", color="#fff")
 
     assert result == liquid
-
-
-def test_reset_tips(
-    decoy: Decoy, transport: ChildThreadTransport, subject: SyncClient
-) -> None:
-    """It should reset the tip tracking state of a labware."""
-    subject.reset_tips(labware_id="cool-labware")
-
-    decoy.verify(
-        transport.call_method(
-            "reset_tips",
-            labware_id="cool-labware",
-        ),
-        times=1,
-    )

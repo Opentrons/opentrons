@@ -23,8 +23,8 @@ from opentrons.protocol_engine.types import (
     LabwareOffsetVector,
     LabwareLocation,
     NonStackedLocation,
-    LabwareMovementOffsetData,
     Dimensions,
+    GripperMoveType,
     GripSpecs,
 )
 from opentrons.protocol_engine.execution.thermocycler_plate_lifter import (
@@ -167,10 +167,6 @@ async def test_raise_error_if_gripper_pickup_failed(
 
     user_pick_up_offset = Point(x=123, y=234, z=345)
     user_drop_offset = Point(x=111, y=222, z=333)
-    final_offset_data = LabwareMovementOffsetData(
-        pickUpOffset=LabwareOffsetVector(x=-1, y=-2, z=-3),
-        dropOffset=LabwareOffsetVector(x=1, y=2, z=3),
-    )
 
     starting_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
     to_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_2)
@@ -186,30 +182,21 @@ async def test_raise_error_if_gripper_pickup_failed(
         )
     ).then_return(mock_tc_context_manager)
 
-    current_labware = state_store.labware.get_definition(
-        labware_id="my-teleporting-labware"
-    )
-
-    decoy.when(
-        state_store.geometry.get_final_labware_movement_offset_vectors(
-            from_location=starting_location,
-            to_location=to_location,
-            additional_pick_up_offset=user_pick_up_offset,
-            additional_drop_offset=user_drop_offset,
-            current_labware=current_labware,
-        )
-    ).then_return(final_offset_data)
-
     decoy.when(
         state_store.geometry.get_labware_grip_point(
             labware_definition=sentinel.my_teleporting_labware_def,
             location=starting_location,
+            move_type=GripperMoveType.PICK_UP_LABWARE,
+            user_additional_offset=user_pick_up_offset,
         )
     ).then_return(Point(101, 102, 119.5))
 
     decoy.when(
         state_store.geometry.get_labware_grip_point(
-            labware_definition=sentinel.my_teleporting_labware_def, location=to_location
+            labware_definition=sentinel.my_teleporting_labware_def,
+            location=to_location,
+            move_type=GripperMoveType.DROP_LABWARE,
+            user_additional_offset=user_drop_offset,
         )
     ).then_return(Point(201, 202, 219.5))
 
@@ -308,25 +295,6 @@ async def test_move_labware_with_gripper(
 
     user_pick_up_offset = Point(x=123, y=234, z=345)
     user_drop_offset = Point(x=111, y=222, z=333)
-    final_offset_data = LabwareMovementOffsetData(
-        pickUpOffset=LabwareOffsetVector(x=-1, y=-2, z=-3),
-        dropOffset=LabwareOffsetVector(x=1, y=2, z=3),
-    )
-
-    current_labware = state_store.labware.get_definition(
-        labware_id="my-teleporting-labware"
-    )
-    decoy.when(
-        state_store.geometry.get_final_labware_movement_offset_vectors(
-            from_location=from_location,
-            to_location=to_location,
-            additional_pick_up_offset=user_pick_up_offset,
-            additional_drop_offset=user_drop_offset,
-            current_labware=current_labware,
-        )
-    ).then_return(
-        final_offset_data
-    )  # TODO: Is this used for anything? Could this have been a sentinel? Are sentinels appropriate here?
 
     decoy.when(
         state_store.labware.get_dimensions(
@@ -340,17 +308,27 @@ async def test_move_labware_with_gripper(
         )
     ).then_return(Dimensions(x=99, y=80, z=1))
 
+    pickup_grip_point = Point(101, 102, 119.5)
+    drop_grip_point = Point(201, 202, 219.5)
+
     decoy.when(
         state_store.geometry.get_labware_grip_point(
             labware_definition=sentinel.my_teleporting_labware_def,
             location=from_location,
+            move_type=GripperMoveType.PICK_UP_LABWARE,
+            user_additional_offset=user_pick_up_offset,
         )
-    ).then_return(Point(101, 102, 119.5))
+    ).then_return(pickup_grip_point)
+
     decoy.when(
         state_store.geometry.get_labware_grip_point(
-            labware_definition=sentinel.my_teleporting_labware_def, location=to_location
+            labware_definition=sentinel.my_teleporting_labware_def,
+            location=to_location,
+            move_type=GripperMoveType.DROP_LABWARE,
+            user_additional_offset=user_drop_offset,
         )
-    ).then_return(Point(201, 202, 219.5))
+    ).then_return(drop_grip_point)
+
     mock_tc_context_manager = decoy.mock(name="mock_tc_context_manager")
     decoy.when(
         thermocycler_plate_lifter.lift_plate_for_labware_movement(
@@ -365,12 +343,16 @@ async def test_move_labware_with_gripper(
     ).then_return(GripSpecs(targetY=100, uncertaintyNarrower=5, uncertaintyWider=10))
 
     expected_waypoints = [
-        Point(100, 100, 999),  # move to above slot 1
-        Point(100, 100, 116.5),  # move to labware on slot 1
-        Point(100, 100, 999),  # gripper retract at current location
-        Point(202.0, 204.0, 999),  # move to above slot 3
-        Point(202.0, 204.0, 222.5),  # move down to labware drop height on slot 3
-        Point(202.0, 204.0, 999),  # retract in place
+        Point(
+            pickup_grip_point.x, pickup_grip_point.y, 999
+        ),  # move to above pickup location
+        pickup_grip_point,  # move to pickup location
+        Point(
+            pickup_grip_point.x, pickup_grip_point.y, 999
+        ),  # gripper retract at pickup location
+        Point(drop_grip_point.x, drop_grip_point.y, 999),  # move to above drop location
+        drop_grip_point,  # move down to drop location
+        Point(drop_grip_point.x, drop_grip_point.y, 999),  # retract at drop location
     ]
 
     await subject.move_labware_with_gripper(

@@ -21,6 +21,7 @@ from opentrons_shared_data.labware.types import LocatingFeatures
 
 from opentrons.hardware_control.modules import (
     ModuleType as ModuleType,
+    ModuleModel as HardwareModuleModel,
 )
 
 from .location import DeckSlotLocation
@@ -42,6 +43,11 @@ class ModuleModel(str, Enum):
     MAGNETIC_BLOCK_V1 = "magneticBlockV1"
     ABSORBANCE_READER_V1 = "absorbanceReaderV1"
     FLEX_STACKER_MODULE_V1 = "flexStackerModuleV1"
+
+    @classmethod
+    def from_hardware(cls, hardware_model: HardwareModuleModel) -> "ModuleModel":
+        """Convert from the hardware model representation."""
+        return cls(hardware_model.value)
 
     def as_type(self) -> ModuleType:
         """Get the ModuleType of this model."""
@@ -190,6 +196,10 @@ class ModuleDefinition(BaseModel):
     # database, this field needs to stay typed loosely enough to support both sizes.
     # We can fix this once Jira RSS-221 is resolved.
     slotTransforms: Dict[str, Any] = Field(
+        ...,
+    )
+
+    orientation: Dict[str, str] = Field(
         ...,
     )
 

@@ -38,7 +38,6 @@ from opentrons.protocol_engine.types import (
     DeckType,
     ModuleOffsetData,
     HeaterShakerLatchStatus,
-    LabwareMovementOffsetData,
     AddressableArea,
     DeckConfigurationType,
     PotentialCutoutFixture,
@@ -1906,51 +1905,6 @@ def test_is_edge_move_unsafe(
 
 
 @pytest.mark.parametrize(
-    argnames=["module_def", "expected_offset_data"],
-    argvalues=[
-        (
-            lazy_fixture("thermocycler_v2_def"),
-            LabwareMovementOffsetData(
-                pickUpOffset=LabwareOffsetVector(x=0, y=0, z=4.6),
-                dropOffset=LabwareOffsetVector(x=0, y=0, z=5.6),
-            ),
-        ),
-        (
-            lazy_fixture("heater_shaker_v1_def"),
-            LabwareMovementOffsetData(
-                pickUpOffset=LabwareOffsetVector(x=0, y=0, z=0),
-                dropOffset=LabwareOffsetVector(x=0, y=0, z=1.0),
-            ),
-        ),
-        (
-            lazy_fixture("tempdeck_v1_def"),
-            None,
-        ),
-    ],
-)
-def test_get_default_gripper_offsets(
-    module_def: ModuleDefinition,
-    expected_offset_data: Optional[LabwareMovementOffsetData],
-) -> None:
-    """It should return the correct gripper offsets, if present."""
-    subject = make_module_view(
-        slot_by_module_id={
-            "module-1": DeckSlotName.SLOT_1,
-        },
-        requested_model_by_module_id={
-            "module-1": ModuleModel.TEMPERATURE_MODULE_V1,  # Does not matter
-        },
-        hardware_by_module_id={
-            "module-1": HardwareModule(
-                serial_number="serial-1",
-                definition=module_def,
-            ),
-        },
-    )
-    assert subject.get_default_gripper_offsets("module-1") == expected_offset_data
-
-
-@pytest.mark.parametrize(
     argnames=["deck_type", "slot_name", "expected_highest_z", "deck_definition"],
     argvalues=[
         (
@@ -2146,4 +2100,70 @@ def test_stacker_max_pool_count_by_height(
             "module-1", pool_height, pool_overlap.z
         )
         == expected_pool_count
+    )
+
+
+@pytest.mark.parametrize(
+    "module_model,module_serial,has_match",
+    [
+        (ModuleModel.TEMPERATURE_MODULE_V2, "serial-3", True),
+        (
+            ModuleModel.TEMPERATURE_MODULE_V1,
+            "serial-3",
+            True,
+        ),  # serial number is prioritized over model
+        (ModuleModel.TEMPERATURE_MODULE_V2, "serial-2", True),
+        (ModuleModel.TEMPERATURE_MODULE_V2, "serial-7", False),
+        (ModuleModel.TEMPERATURE_MODULE_V2, None, True),
+        (ModuleModel.FLEX_STACKER_MODULE_V1, "serial-1", True),
+        (ModuleModel.FLEX_STACKER_MODULE_V1, "serial-4", True),
+        (ModuleModel.FLEX_STACKER_MODULE_V1, "serial-9", False),
+        (ModuleModel.FLEX_STACKER_MODULE_V1, None, True),
+    ],
+)
+def test_get_has_module_probably_matching_hardware_details(
+    module_model: ModuleModel,
+    module_serial: str | None,
+    has_match: bool,
+    flex_stacker_v1_def: ModuleDefinition,
+    thermocycler_v2_def: ModuleDefinition,
+    tempdeck_v2_def: ModuleDefinition,
+) -> None:
+    """It should appropriately match hardware module details."""
+    subject = make_module_view(
+        slot_by_module_id={
+            "module-1": DeckSlotName.SLOT_D3,
+            "module-2": DeckSlotName.SLOT_A1,
+            "module-3": DeckSlotName.SLOT_D1,
+            "module-4": DeckSlotName.SLOT_C3,
+        },
+        requested_model_by_module_id={
+            "module-1": ModuleModel.FLEX_STACKER_MODULE_V1,
+            "module-2": ModuleModel.THERMOCYCLER_MODULE_V2,
+            "module-3": ModuleModel.TEMPERATURE_MODULE_V2,
+            "module-4": ModuleModel.FLEX_STACKER_MODULE_V1,
+        },
+        hardware_by_module_id={
+            "module-1": HardwareModule(
+                serial_number="serial-1",
+                definition=flex_stacker_v1_def,
+            ),
+            "module-2": HardwareModule(
+                serial_number="serial-2",
+                definition=thermocycler_v2_def,
+            ),
+            "module-3": HardwareModule(
+                serial_number="serial-3",
+                definition=tempdeck_v2_def,
+            ),
+            "module-4": HardwareModule(
+                serial_number="serial-4", definition=flex_stacker_v1_def
+            ),
+        },
+    )
+    assert (
+        subject.get_has_module_probably_matching_hardware_details(
+            module_model, module_serial
+        )
+        is has_match
     )

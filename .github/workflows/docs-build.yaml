@@ -1,31 +1,35 @@
 # This workflow builds API docs when either:
 #
-# * A commit is tagged like "docs@foo".
+# * A commit is tagged like "docs@foo" or "staging-docs@foo".
 #
-# * Someone pushes, to any branch, a commit that touches any of:
-#   * The parts of the api/ project that are used by the docs.
-#   * The docs source themselves;
-#   * The CI/makefile tooling used to build the docs.
+# * Someone pushes to either:
+#   * The `edge` branch, or
+#   * Any branch starting with "chore_release".
+#
+# * A pull request touches any of:
+#   * The api/**
+#   * The tooling used to build the docs.
+#
+# * Or when manually dispatched from the Actions tab.
 
 name: 'API docs build'
 
 on:
   push:
+    branches:
+      - edge
+      - 'chore_release*'
     tags:
       - 'docs@*'
-    branches:
-      # We don't want to do any filtering based on branch name.
-      # But because we specified `tags`, we need to specify `branches` too,
-      # or else GitHub will only run this workflow for tag matches
-      # and not for path matches.
-      - '**'
+      - 'staging-docs@*'
+  pull_request:
     paths:
       - 'api/**'
       - '.github/workflows/docs-build.yaml'
       - '.github/actions/python/**'
-      - '.github/actions/webstack/deploy-to-sandbox/**'
       - '.github/workflows/utils.js'
-  workflow_dispatch:
+      - 'scripts/static-deploy/**'
+  workflow_dispatch: {}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
@@ -34,46 +38,109 @@ concurrency:
 defaults:
   run:
     shell: bash
+env:
+  CI: 'true'
+  # This is the artifact directory as a relative path
+  # to the working-directory of our tools: scripts/static-deploy
+  # our script deploy_ci_config.py expects this ENV variable is set
+  RELATIVE_ARTIFACT_DIR: '../../dist'
 
 jobs:
+  determine-deploy-config:
+    name: Determine Deployment Configuration
+    runs-on: ubuntu-24.04
+    outputs:
+      application: ${{ steps.deploy-config.outputs.APPLICATION }}
+      environment: ${{ steps.deploy-config.outputs.ENVIRONMENT }}
+      sandbox_prefix: ${{ steps.deploy-config.outputs.SANDBOX_PREFIX }}
+      relative_artifact_dir: ${{ steps.deploy-config.outputs.RELATIVE_ARTIFACT_DIR }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - uses: ./.github/actions/git/resolve-tag
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.10'
+      - name: Setup Deploy Dependencies
+        working-directory: scripts/static-deploy
+        run: make setup
+      - name: Determine Deployment Configuration
+        id: deploy-config
+        working-directory: scripts/static-deploy
+        run: make resolve-ci
+
   build:
     name: opentrons documentation build
     runs-on: 'ubuntu-24.04'
+    timeout-minutes: 10
     steps:
       - uses: 'actions/checkout@v4'
         with:
           fetch-depth: 0
-      # https://github.com/actions/checkout/issues/290
-      - name: 'Fix actions/checkout odd handling of tags'
-        if: startsWith(github.ref, 'refs/tags')
-        run: |
-          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
-          git checkout ${{ github.ref }}
+      - uses: ./.github/actions/git/resolve-tag
+      - uses: ./.github/actions/environment/complex-variables
       - uses: 'actions/setup-node@v4'
         with:
-          node-version: '22.11.0'
+          node-version: '22.12.0'
       - uses: 'actions/setup-python@v3'
         with:
           python-version: '3.10'
       - uses: './.github/actions/python/setup'
         with:
           project: 'api'
-      - name: 'set complex environment variables'
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
-            buildComplexEnvVars(core, context)
       - name: 'Build docs'
         run: |
           make -C api docs
-      - name: 'Deploy docs to sandbox'
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.S3_SANDBOX_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SANDBOX_SECRET }}
-          AWS_DEFAULT_REGION: us-east-2
-        uses: './.github/actions/webstack/deploy-to-sandbox'
+      - name: 'upload github artifact'
+        uses: actions/upload-artifact@v4
         with:
-          domain: 'docs.opentrons.com'
-          distPath: './api/docs/dist'
-          destPrefix: ${{ env.OT_BRANCH }}
+          name: 'docs-artifact'
+          path: api/docs/dist/
+
+  deploy:
+    name: Deploy docs to S3
+    needs:
+      - determine-deploy-config
+      - build
+    runs-on: 'ubuntu-24.04'
+    timeout-minutes: 5
+    if: always() && needs.build.result == 'success' && needs.determine-deploy-config.result == 'success'
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/git/resolve-tag
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.10'
+      - name: Setup Deploy Dependencies
+        working-directory: scripts/static-deploy
+        run: |
+          make setup
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: us-east-2
+          audience: sts.amazonaws.com
+          role-to-assume: ${{ secrets.DOCS_SANDBOX_ROLE }}
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: docs-artifact
+          path: ./dist # in the default workspace
+          # RELATIVE_ARTIFACT_DIR is set to ../../dist
+          # because that is the relative path from scripts/static-deploy
+          # to the this location
+      - name: Deploy to S3
+        working-directory: scripts/static-deploy
+        run: make deploy \
+          APPLICATION=${{ needs.determine-deploy-config.outputs.application }} \
+          ENVIRONMENT=${{ needs.determine-deploy-config.outputs.environment }} \
+          SANDBOX_PREFIX=${{ needs.determine-deploy-config.outputs.sandbox_prefix }} \
+          RELATIVE_ARTIFACT_DIR=${{ needs.determine-deploy-config.outputs.relative_artifact_dir }}

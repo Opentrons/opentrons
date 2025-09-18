@@ -1,12 +1,12 @@
 import round from 'lodash/round'
 
-import { CHANNELS_MAPPED_TO_MAX_SPEED } from '../../../../../constants'
-import { getPipetteCapacity } from '../../../../../pipettes/pipetteData'
+import { CHANNELS_MAPPED_TO_MAX_SPEED } from '/protocol-designer/constants'
+import { getPipetteCapacity } from '/protocol-designer/pipettes/pipetteData'
 import {
   volumeInCapacityForMultiAspirate,
   volumeInCapacityForMultiDispense,
-} from '../../../../../steplist/formLevel/handleFormChange/utils'
-import { getWellRatio } from '../../../../../steplist/utils'
+} from '/protocol-designer/steplist/formLevel/handleFormChange/utils'
+import { getWellRatio } from '/protocol-designer/steplist/utils'
 
 import type {
   PipetteChannels,
@@ -17,8 +17,8 @@ import type {
   ChangeTipOptions,
   PipetteEntities,
 } from '@opentrons/step-generation'
-import type { PathOption, StepType } from '../../../../../form-types'
-import type { FlowRateType } from '../../../../../resources/types'
+import type { PathOption, StepType } from '/protocol-designer/form-types'
+import type { FlowRateType } from '/protocol-designer/resources/types'
 
 export interface DisabledChangeTipArgs {
   aspirateWells?: string[]

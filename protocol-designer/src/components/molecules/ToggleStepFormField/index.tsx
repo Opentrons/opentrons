@@ -12,7 +12,7 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
-import { ToggleButton } from '../../atoms'
+import { ToggleButton } from '/protocol-designer/components/atoms'
 
 interface ToggleStepFormFieldProps {
   title: string

@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
-import { DropdownStepFormField } from '../../../../../components/molecules'
+import { DropdownStepFormField } from '/protocol-designer/components/molecules'
+
 import { getDisabledChangeTipOptions } from './utils'
 
 import type { ChangeTipOptions } from '@opentrons/step-generation'
@@ -48,7 +49,6 @@ export function ChangeTipField(
       value={value}
       title={t('tip_handling.title')}
       width="100%"
-      tooltipContent={t('tip_handling.tooltip')}
     />
   )
 }

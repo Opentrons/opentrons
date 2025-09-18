@@ -10,10 +10,11 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { ToggleButton } from '../../atoms'
+import { ToggleButton } from '/protocol-designer/components/atoms'
+
 import { InputStepFormField } from '../InputStepFormField'
 
-import type { FieldProps } from '../../../pages/Designer/ProtocolSteps/StepForm/types'
+import type { FieldProps } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/types'
 
 interface ToggleExpandStepFormFieldProps extends FieldProps {
   title: string
