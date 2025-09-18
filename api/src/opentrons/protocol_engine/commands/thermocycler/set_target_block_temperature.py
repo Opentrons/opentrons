@@ -45,9 +45,10 @@ class SetTargetBlockTemperatureParams(BaseModel):
         " If unspecified, the Thermocycler will change temperature at the fastest possible rate.",
         json_schema_extra=_remove_default,
     )
-    taskId: str | None = Field(
+    taskId: str | SkipJsonSchema[None] = Field(
         None,
         description="Id for the background task that manages the temperature.",
+        json_schema_extra=_remove_default,
     )
 
 
@@ -58,9 +59,10 @@ class SetTargetBlockTemperatureResult(BaseModel):
         ...,
         description="The target block temperature that was set after validation.",
     )
-    taskId: str = Field(
-        ...,
+    taskId: str | SkipJsonSchema[None] = Field(
+        None,
         description="The task id for the setTargetBlockTemperature",
+        json_schema_extra=_remove_default,
     )
 
 

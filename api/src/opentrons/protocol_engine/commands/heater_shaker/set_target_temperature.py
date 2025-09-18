@@ -1,9 +1,10 @@
 """Command models to start heating a Heater-Shaker Module."""
 from __future__ import annotations
-from typing import Optional, TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING, Any
 from typing_extensions import Literal, Type
 
 from pydantic import BaseModel, Field
+from pydantic.json_schema import SkipJsonSchema
 
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ...errors.error_occurrence import ErrorOccurrence
@@ -16,21 +17,29 @@ if TYPE_CHECKING:
 SetTargetTemperatureCommandType = Literal["heaterShaker/setTargetTemperature"]
 
 
+def _remove_default(s: dict[str, Any]) -> None:
+    s.pop("default", None)
+
+
 class SetTargetTemperatureParams(BaseModel):
     """Input parameters to set a Heater-Shaker's target temperature."""
 
     moduleId: str = Field(..., description="Unique ID of the Heater-Shaker Module.")
     celsius: float = Field(..., description="Target temperature in °C.")
-    taskId: str | None = Field(
-        None, description="Id for the background task that manages the temperature"
+    taskId: str | SkipJsonSchema[None] = Field(
+        None,
+        description="Id for the background task that manages the temperature",
+        json_schema_extra=_remove_default,
     )
 
 
 class SetTargetTemperatureResult(BaseModel):
     """Result data from setting a Heater-Shaker's target temperature."""
 
-    taskId: str = Field(
-        ..., description="The task id for the setTargetTemperature task"
+    taskId: str | SkipJsonSchema[None] = Field(
+        None,
+        description="The task id for the setTargetTemperature task",
+        json_schema_extra=_remove_default,
     )
 
 

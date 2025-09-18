@@ -1,9 +1,10 @@
 """Command models to start heating a Thermocycler's lid."""
 from __future__ import annotations
-from typing import Optional, TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING, Any
 from typing_extensions import Literal, Type
 
 from pydantic import BaseModel, Field
+from pydantic.json_schema import SkipJsonSchema
 
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ...errors.error_occurrence import ErrorOccurrence
@@ -16,13 +17,19 @@ if TYPE_CHECKING:
 SetTargetLidTemperatureCommandType = Literal["thermocycler/setTargetLidTemperature"]
 
 
+def _remove_default(s: dict[str, Any]) -> None:
+    s.pop("default", None)
+
+
 class SetTargetLidTemperatureParams(BaseModel):
     """Input parameters to set a Thermocycler's target lid temperature."""
 
     moduleId: str = Field(..., description="Unique ID of the Thermocycler Module.")
     celsius: float = Field(..., description="Target temperature in °C.")
-    taskId: str | None = Field(
-        None, description="Id for the background task that manages the temperature."
+    taskId: str | SkipJsonSchema[None] = Field(
+        None,
+        description="Id for the background task that manages the temperature.",
+        json_schema_extra=_remove_default,
     )
 
 
@@ -33,9 +40,10 @@ class SetTargetLidTemperatureResult(BaseModel):
         ...,
         description="The target lid temperature that was set after validation.",
     )
-    taskId: str = Field(
-        ...,
+    taskId: str | SkipJsonSchema[None] = Field(
+        None,
         description="The taask id for the setTargetBlockTemperature",
+        json_schema_extra=_remove_default,
     )
 
 
