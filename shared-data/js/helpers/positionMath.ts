@@ -127,8 +127,6 @@ export function computeLabwareOrigin(
     return null
   }
 
-  console.log(stack)
-
   const absolutePosition = getVectorSum(
     IDENTITY_VECTOR,
     ...stack.map(e => e.offset)
