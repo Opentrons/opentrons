@@ -108,8 +108,7 @@ export function SummaryAndSettings(
     }
   })
 
-  const isMultiTransferAspirate = state?.path === 'multiDispense'
-  const isMultiTransferDispense = state?.path === 'multiAspirate'
+  const isMultiTransferDispense = state?.path === 'multiDispense'
 
   const handleClickCreateTransfer = (): void => {
     setShowSaveOrRunModal(true)
@@ -209,7 +208,7 @@ export function SummaryAndSettings(
             <Aspirate
               state={state}
               dispatch={dispatch}
-              isMultiTransfer={isMultiTransferAspirate}
+              isMultiTransfer={isMultiTransferDispense}
             />
           ) : null}
           {selectedCategory === 'dispense' ? (
