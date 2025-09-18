@@ -66,7 +66,15 @@ class AnthropicPredict:
         self.PROMPT_PD = PROMPT_PD
         self.path_docs: Path = ROOT_PATH / "api" / "storage" / "docs"
         self.path_docs_pd: Path = ROOT_PATH / "api" / "storage" / "docs" / "pd"
-        self.path_api_docs: Path = ROOT_PATH / "api" / "storage" / "api_docs" / "api_docs_struct.md"
+        self.path_api_docs: Path = ROOT_PATH / "api" / "storage" / "api_docs" / "api_docs_struct_v2.25.md"
+
+        docker_api_docs_path = ROOT_PATH / "api" / "storage" / "api_docs"
+        local_api_docs_path = REPO_ROOT / "api"
+
+        if (docker_api_docs_path / "docs").exists():
+            self.api_docs_base_path = docker_api_docs_path
+        else:
+            self.api_docs_base_path = local_api_docs_path
         self.system_prompt_pd = self.get_system_prompt_pd()
 
         self.cached_docs: List[MessageParam] = [
@@ -94,7 +102,21 @@ class AnthropicPredict:
                     },
                     "required": ["protocol"],
                 },
-            }
+            },
+            {
+                "name": "get_relevant_api_docs",
+                "description": """Retrieves relevant API documentation based on the user's query.
+                Use this tool when you need specific Opentrons API information to help generate
+                protocols or answer technical questions about protocol implementation.""",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "query": {"type": "string", "description": "The user's query or context about what API documentation is needed"},
+                    },
+                    "required": ["query"],
+                },
+                "cache_control": {"type": "ephemeral"},
+            },
         ]
 
     @tracer.wrap()
@@ -149,6 +171,7 @@ class AnthropicPredict:
                 # Skip directories
                 if file_path.is_dir():
                     continue
+                print(f"Load doc file: {file_path}")
 
                 content = file_path.read_text(encoding="utf-8")
                 document_xml = [
@@ -183,6 +206,7 @@ class AnthropicPredict:
     def parse_relevant_files_and_get_content(self, api_info_output: str) -> str:
         """
         Parse the output of get_api_info and construct XML content with file contents.
+        Now reads directly from the main API docs location using paths like 'docs/v2/...'
         """
         match = re.search(r"<relevant_files>(.*?)</relevant_files>", api_info_output, re.DOTALL)
         if not match:
@@ -193,7 +217,8 @@ class AnthropicPredict:
         xml_content = "<relevant_file_content>\n"
 
         for filename in filenames:
-            filepath = f"{self.path_api_docs.parent}/{filename}"
+            # Combine base path with filename (e.g., 'api' + 'docs/v2/file.rst' = 'api/docs/v2/file.rst')
+            filepath = self.api_docs_base_path / filename
             try:
                 with open(filepath, "r") as f:
                     content = f.read()
@@ -204,8 +229,10 @@ class AnthropicPredict:
                 xml_content += "\n</content>\n"
                 xml_content += "</file>\n"
             except FileNotFoundError:
+                logger.warning(f"File not found: {filepath}")
                 continue  # Skip files that don't exist
-            except Exception:
+            except Exception as e:
+                logger.warning(f"Error reading file {filepath}: {e}")
                 continue  # Skip files that can't be read
 
         xml_content += "</relevant_file_content>"
@@ -216,6 +243,15 @@ class AnthropicPredict:
         """
         Get relevant API docs based on the user's prompt
         """
+        logger.info(
+            "get_relevant_api_docs method called",
+            extra={
+                "user_id": user_id,
+                "query_preview": query[:100] if query else "empty",
+                "called_from": "tool" if "tool" in str(tracer.current_span()) else "direct",
+            },
+        )
+
         with open(self.path_api_docs, "r") as f:
             api_docs_structure = f.read()
 
@@ -399,11 +435,7 @@ class AnthropicPredict:
 
     def _create_current_user_message(self, prompt: str, current_msg_files: Optional[List[Dict[str, str]]], user_id: str) -> MessageParam:
         """Create the current user message with file attachments."""
-        relevant_api_docs = self.get_relevant_api_docs(prompt, user_id)
-        prompt_with_docs = f"{prompt}\n\n{relevant_api_docs}"
-
-        # Create current user message with any new file attachments
-        current_user_content: List[ContentBlockParam] = [TextBlockParam(type="text", text=PROMPT.format(USER_PROMPT=prompt_with_docs))]
+        current_user_content: List[ContentBlockParam] = [TextBlockParam(type="text", text=PROMPT.format(USER_PROMPT=prompt))]
 
         # Add NEW file attachments to current message
         if current_msg_files:
@@ -473,7 +505,7 @@ class AnthropicPredict:
         if response.content[-1].type == "tool_use":
             tool_use = response.content[-1]
             messages.append({"role": "assistant", "content": response.content})
-            result = self.handle_tool_use(tool_use.name, tool_use.input)  # type: ignore[arg-type]
+            result = self.handle_tool_use(tool_use.name, tool_use.input, user_id)  # type: ignore[arg-type]
             messages.append(
                 {
                     "role": "user",
@@ -522,11 +554,7 @@ class AnthropicPredict:
             if history:
                 messages += history
 
-            relevant_api_docs = self.get_relevant_api_docs(prompt, user_id)
-            prompt_with_docs = f"{prompt}\n\n{relevant_api_docs}"
-
-            # Create user message with file attachments if present
-            user_content: List[ContentBlockParam] = [TextBlockParam(type="text", text=PROMPT.format(USER_PROMPT=prompt_with_docs))]
+            user_content: List[ContentBlockParam] = [TextBlockParam(type="text", text=PROMPT.format(USER_PROMPT=prompt))]
 
             # Add file attachments with actual content
             if file_references:
@@ -538,8 +566,6 @@ class AnthropicPredict:
                 )
 
             user_message: MessageParam = {"role": "user", "content": user_content}
-
-            # Debug log the message structure for PDF debugging
             if file_references:
                 logger.info(
                     "Message structure debug",
@@ -550,15 +576,13 @@ class AnthropicPredict:
                         "message_structure": user_message,
                     },
                 )
-
             messages.append(user_message)
-
             response = self._process_message(user_id=user_id, messages=messages, message_type=message_type)
 
             if response.content[-1].type == "tool_use":
                 tool_use = response.content[-1]
                 messages.append({"role": "assistant", "content": response.content})
-                result = self.handle_tool_use(tool_use.name, tool_use.input)  # type: ignore[arg-type]
+                result = self.handle_tool_use(tool_use.name, tool_use.input, user_id)  # type: ignore[arg-type]
                 messages.append(
                     {
                         "role": "user",
@@ -865,9 +889,32 @@ class AnthropicPredict:
         return self.process_message(user_id, prompt, history, "update")
 
     @tracer.wrap()
-    def handle_tool_use(self, func_name: str, func_params: Dict[str, Any]) -> str:
+    def handle_tool_use(self, func_name: str, func_params: Dict[str, Any], user_id: str) -> str:
+        logger.info("Tool use invoked", extra={"tool_name": func_name, "user_id": user_id, "params": func_params})
+
         if func_name == "simulate_protocol":
+            logger.info("Simulating protocol", extra={"user_id": user_id})
             results = self.simulate_protocol(**func_params)
+            return results
+        elif func_name == "get_relevant_api_docs":
+            query = func_params.get("query", "")
+            logger.info(
+                "get_relevant_api_docs tool called",
+                extra={
+                    "user_id": user_id,
+                    "query": query[:200] if query else "empty_query",  # Log first 200 chars of query
+                    "query_length": len(query),
+                },
+            )
+            results = self.get_relevant_api_docs(query, user_id)
+            logger.info(
+                "get_relevant_api_docs tool completed",
+                extra={
+                    "user_id": user_id,
+                    "result_length": len(results) if results else 0,
+                    "result_preview": results[:100] + "..." if results and len(results) > 100 else results,
+                },
+            )
             return results
 
         logger.error("Unknown tool", extra={"tool": func_name})

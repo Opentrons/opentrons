@@ -32,6 +32,8 @@ import {
   generatePromptPreviewData,
 } from '/ai-client/resources/utils/createProtocolUtils'
 
+import styles from './createprotocol.module.css'
+
 import type { MouseEvent } from 'react'
 import type { DisplayLabware } from '/ai-client/components/organisms/LabwareLiquidsSection'
 import type {
@@ -51,6 +53,7 @@ export interface CreateProtocolFormData {
     pipettes: string
     leftPipette: string
     rightPipette: string
+    ninetySixChannelPipette: string
     flexGripper: string
   }
   modules: DisplayModule[]
@@ -177,7 +180,7 @@ export function CreateProtocol(): JSX.Element | null {
     return currentSection > 0 ? currentSection / TOTAL_STEPS : 0
   }
 
-  function handleMouseDown(e: MouseEvent<HTMLDivElement, MouseEvent>): void {
+  function handleMouseDown(e: MouseEvent<HTMLDivElement>): void {
     setIsResizing(true)
     setInitialMouseX(e.clientX)
     setInitialLeftWidth(leftWidth)
@@ -238,11 +241,14 @@ export function CreateProtocol(): JSX.Element | null {
         height="100%"
         width="100%"
       >
-        <div style={{ width: `${leftWidth}%`, height: '100%' }}>
+        <div className={styles.left_panel} style={{ width: `${leftWidth}%` }}>
           <ProtocolSectionsContainer />
         </div>
         <ResizeBar handleMouseDown={handleMouseDown} />
-        <div style={{ width: `${100 - leftWidth}%`, height: '100%' }}>
+        <div
+          className={styles.right_panel}
+          style={{ width: `${100 - leftWidth}%` }}
+        >
           <PromptPreview
             handleSubmit={handleSubmit}
             // todo: fix this disabled logic

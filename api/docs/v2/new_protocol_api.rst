@@ -16,11 +16,21 @@ Protocols
    :members:
    :exclude-members: location_cache, cleanup, clear_commands
 
+.. autoclass:: opentrons.protocol_api.Task
+   :members:
+
 Instruments
 ===========
 .. autoclass:: opentrons.protocol_api.InstrumentContext
    :members:
    :exclude-members: delay
+
+Robot Motors
+============
+
+.. autoclass:: opentrons.protocol_api.RobotContext
+   :members: 
+   :exclude-members: 
 
 .. _protocol-api-labware:
 
@@ -131,6 +141,8 @@ Useful Types
 
 .. autodata:: opentrons.protocol_api.OFF_DECK
    :no-value:
+
+.. autoclass:: opentrons.protocol_api.OffDeckType
 
 Executing and Simulating Protocols
 ==================================

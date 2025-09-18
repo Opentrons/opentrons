@@ -14,8 +14,8 @@ import {
 } from '@opentrons/components'
 import { getPipetteSpecsV2 } from '@opentrons/shared-data'
 
-import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
-import { LINK_BUTTON_STYLE } from '../../atoms'
+import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
+import { getLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
 
 import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
 

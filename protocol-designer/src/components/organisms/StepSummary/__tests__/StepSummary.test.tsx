@@ -3,24 +3,25 @@ import { beforeEach, describe, it, vi } from 'vitest'
 
 import { fixture96Plate } from '@opentrons/shared-data'
 
-import { StepSummary } from '..'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
   getLiquidEntities,
   getModuleEntities,
-} from '../../../../step-forms/selectors'
-import { getRobotStateAtActiveItem } from '../../../../top-selectors/labware-locations'
-import { getLabwareNicknamesById } from '../../../../ui/labware/selectors'
+} from '/protocol-designer/step-forms/selectors'
+import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
+import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
+
+import { StepSummary } from '..'
 
 import type { ComponentProps } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-vi.mock('../../../../step-forms/selectors')
-vi.mock('../../../../top-selectors/labware-locations')
-vi.mock('../../../../ui/labware/selectors')
+vi.mock('/protocol-designer/step-forms/selectors')
+vi.mock('/protocol-designer/top-selectors/labware-locations')
+vi.mock('/protocol-designer/ui/labware/selectors')
 const render = (props: ComponentProps<typeof StepSummary>) => {
   return renderWithProviders(<StepSummary {...props} />, {
     i18nInstance: i18n,

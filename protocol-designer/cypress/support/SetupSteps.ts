@@ -87,7 +87,7 @@ export enum SetupLocators {
   button = 'button',
   svg = 'svg',
   exist = 'exist',
-  StepOptionsTestIDThreeDots = 'button.Btn-sc-o3dtr1-0.OverflowBtn___StyledBtn-sc-1mslfxo-0',
+  StepOptionsTestIDThreeDots = '[data-testid="StepContainer_OverflowBtn"]:visible',
   AspirateCheckbox = 'div.Checkbox___StyledFlex3-sc-1mvp7vt-0.gZwGCw.btdgeU',
 }
 
@@ -814,7 +814,7 @@ export const SetupSteps = {
         .find('button[type="button"]')
         .click()
       cy.contains('Choose option').click()
-      cy.contains('Destination Well').click()
+      cy.contains('Destination well').click()
     },
   }),
 
@@ -994,7 +994,7 @@ export const SetupVerifications = {
       cy.get('button[data-testid="D3"]').click()
       cy.get('button[data-testid="Modules"]').click()
       cy.contains(SetupContent.PlateReader)
-      cy.get('[data-testid="ModalHeader_icon_close_Add to slot D3"]').click()
+      cy.get('[data-testid="ModalHeader_icon_close_Add to Slot D3"]').click()
     },
   }),
 

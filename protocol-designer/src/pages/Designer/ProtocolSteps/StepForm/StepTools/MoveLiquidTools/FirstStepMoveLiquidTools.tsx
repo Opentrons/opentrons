@@ -11,13 +11,14 @@ import {
 
 import {
   getEnablePartialTipSupport,
-  getEnableReturnTip,
-} from '../../../../../../feature-flags/selectors'
+  getEnableTipPickupLocation,
+} from '/protocol-designer/feature-flags/selectors'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
   getPipetteEntities,
-} from '../../../../../../step-forms/selectors'
+} from '/protocol-designer/step-forms/selectors'
+
 import {
   ChangeTipField,
   DropTipField,
@@ -32,7 +33,7 @@ import {
   WellSelectionField,
 } from '../../PipetteFields'
 
-import type { FormData } from '../../../../../../form-types'
+import type { FormData } from '/protocol-designer/form-types'
 import type { FieldPropsByName } from '../../types'
 
 interface FirstStepMoveLiquidToolsProps {
@@ -51,7 +52,7 @@ export function FirstStepMoveLiquidTools({
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
-  const enableReturnTip = useSelector(getEnableReturnTip)
+  const enableTipPickupLocation = useSelector(getEnableTipPickupLocation)
 
   const { pipette, tipRack } = propsForFields
   const is96Channel =
@@ -153,23 +154,27 @@ export function FirstStepMoveLiquidTools({
         <StyledText desktopStyle="bodyDefaultSemiBold">
           {t('tip_management')}
         </StyledText>
-        <ChangeTipField
-          {...propsForFields.changeTip}
-          aspirateWells={formData.aspirate_wells}
-          dispenseWells={formData.dispense_wells}
-          path={formData.path}
-          stepType={formData.stepType}
-          isDisposalLocation={isDisposalLocation}
-          tooltipContent={null}
-          padding="0"
-        />
-        <DropTipField
-          {...propsForFields.dropTip_location}
-          tooltipContent={null}
-          padding="0"
-        />
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
+          <ChangeTipField
+            {...propsForFields.changeTip}
+            aspirateWells={formData.aspirate_wells}
+            dispenseWells={formData.dispense_wells}
+            path={formData.path}
+            stepType={formData.stepType}
+            isDisposalLocation={isDisposalLocation}
+            tooltipContent={null}
+            padding="0"
+          />
+          <DropTipField
+            {...propsForFields.dropTip_location}
+            nozzles={formData.nozzles}
+            tiprackDefUri={formData.tipRack}
+            tooltipContent={null}
+            padding="0"
+          />
+        </Flex>
       </Flex>
-      {enableReturnTip ? (
+      {enableTipPickupLocation ? (
         <>
           <Divider marginY="0" />
           <PickUpTipField {...propsForFields.pickUpTip_location} />
@@ -189,7 +194,7 @@ export function FirstStepMoveLiquidTools({
           ) : null}
         </>
       ) : null}
-      {userSelectedDropTipLocation && enableReturnTip ? (
+      {userSelectedDropTipLocation && enableTipPickupLocation ? (
         <>
           <Divider marginY="0" />
           <TipWellSelectionField

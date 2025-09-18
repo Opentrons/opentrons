@@ -1,20 +1,26 @@
 import asyncio
-import pytest
 import mock
 from typing import Any, AsyncGenerator
-import typing
+
+from decoy import Decoy
+import pytest
+
 from opentrons.hardware_control import modules, ExecutionManager
 from opentrons.hardware_control.modules.types import (
     TemperatureStatus,
     SpeedStatus,
     HeaterShakerStatus,
+    ModuleDisconnectedCallback,
+    ModuleErrorCallback,
 )
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.types import HeaterShakerLabwareLatchStatus, Temperature, RPM
+from opentrons.drivers.heater_shaker.simulator import SimulatingDriver
 
 
 @pytest.fixture
 def usb_port() -> USBPort:
+    """A token USB port."""
     return USBPort(
         name="",
         port_number=0,
@@ -25,14 +31,20 @@ def usb_port() -> USBPort:
 @pytest.fixture
 async def simulating_module(
     usb_port: USBPort,
+    mock_execution_manager: ExecutionManager,
+    module_error_callback: ModuleErrorCallback,
+    module_disconnected_callback: ModuleDisconnectedCallback,
 ) -> AsyncGenerator[modules.AbstractModule, None]:
+    """Get a mocked simulating subject."""
     module = await modules.build(
         port=usb_port.device_path,
         usb_port=usb_port,
         type=modules.ModuleType["HEATER_SHAKER"],
         simulating=True,
         hw_control_loop=asyncio.get_running_loop(),
-        execution_manager=ExecutionManager(),
+        execution_manager=mock_execution_manager,
+        error_callback=module_error_callback,
+        disconnected_callback=module_disconnected_callback,
     )
     assert isinstance(module, modules.AbstractModule)
     try:
@@ -42,17 +54,25 @@ async def simulating_module(
 
 
 @pytest.fixture
+def mock_driver(decoy: Decoy) -> SimulatingDriver:
+    """Get a mocked simulating driver."""
+    return decoy.mock(cls=SimulatingDriver)
+
+
+@pytest.fixture
 async def simulating_module_driver_patched(
     simulating_module: modules.HeaterShaker,
+    mock_driver: SimulatingDriver,
 ) -> AsyncGenerator[modules.AbstractModule, None]:
-    driver_mock = mock.MagicMock()
+    """Get a mocked module with a patched driver."""
     with mock.patch.object(
-        simulating_module, "_driver", driver_mock
-    ), mock.patch.object(simulating_module._reader, "_driver", driver_mock):
+        simulating_module, "_driver", mock_driver
+    ), mock.patch.object(simulating_module._reader, "_driver", mock_driver):
         yield simulating_module
 
 
 async def test_sim_state(simulating_module: modules.HeaterShaker) -> None:
+    """It should forward simulated state."""
     assert simulating_module.temperature == 23
     assert simulating_module.speed == 0
     assert simulating_module.target_temperature is None
@@ -68,6 +88,7 @@ async def test_sim_state(simulating_module: modules.HeaterShaker) -> None:
 
 
 async def test_sim_update(simulating_module: modules.HeaterShaker) -> None:
+    """It should update its simulated state."""
     await simulating_module.start_set_temperature(10)
     await simulating_module.await_temperature(10)
     assert simulating_module.temperature == 10
@@ -91,6 +112,7 @@ async def test_sim_update(simulating_module: modules.HeaterShaker) -> None:
 
 
 async def test_await_both(simulating_module: modules.HeaterShaker) -> None:
+    """It should wait for speed and temp."""
     await simulating_module.start_set_temperature(10)
     await simulating_module.set_speed(2000)
     await simulating_module.await_temperature(10)
@@ -99,6 +121,7 @@ async def test_await_both(simulating_module: modules.HeaterShaker) -> None:
 
 
 async def test_labware_latch(simulating_module: modules.HeaterShaker) -> None:
+    """It should handle the latch."""
     await simulating_module.open_labware_latch()
     assert (
         await simulating_module._driver.get_labware_latch_status()
@@ -198,29 +221,39 @@ async def fake_get_latch_status(
     return HeaterShakerLabwareLatchStatus.IDLE_OPEN
 
 
-@typing.no_type_check
 async def test_async_error_response(
     simulating_module_driver_patched: modules.HeaterShaker,
+    module_error_callback: ModuleErrorCallback,
+    mock_driver: SimulatingDriver,
+    decoy: Decoy,
 ) -> None:
     """Test that asynchronous error is detected by poller and module live data and status are updated."""
-    # TODO(mc, 2022-10-13): driver is too deep a level to mock in this test
-    # mock the reader, instead
-    simulating_module_driver_patched._driver.get_temperature.side_effect = Exception()
+    exc = Exception("Oh no, an asynchronous error!")
+    decoy.when(await mock_driver.get_temperature()).then_raise(exc)
     with pytest.raises(Exception):
         await simulating_module_driver_patched._poller.wait_next_poll()
+    decoy.verify(
+        module_error_callback(
+            exc,
+            "heaterShakerModuleV1",
+            "/dev/ot_module_sim_heatershaker0",
+            "dummySerialHS",
+        )
+    )
 
     assert (
-        simulating_module_driver_patched.live_data["data"]["errorDetails"]
-        == "Exception()"
+        simulating_module_driver_patched.live_data["data"]["errorDetails"]  # type: ignore[index,typeddict-item]
+        == "Oh no, an asynchronous error!"
     )
     assert simulating_module_driver_patched.status == HeaterShakerStatus.ERROR
-    simulating_module_driver_patched._driver.get_temperature.side_effect = (
-        fake_get_temperature
+    decoy.reset()
+    decoy.when(await mock_driver.get_temperature()).then_return(
+        Temperature(current=50, target=50)
     )
-    simulating_module_driver_patched._driver.get_rpm.side_effect = fake_get_rpm
-    simulating_module_driver_patched._driver.get_labware_latch_status.side_effect = (
-        fake_get_latch_status
+    decoy.when(await mock_driver.get_rpm()).then_return(RPM(current=500, target=500))
+    decoy.when(await mock_driver.get_labware_latch_status()).then_return(
+        HeaterShakerLabwareLatchStatus.IDLE_OPEN
     )
     await simulating_module_driver_patched._poller.wait_next_poll()
-    assert simulating_module_driver_patched.live_data["data"]["errorDetails"] is None
-    assert simulating_module_driver_patched.status == HeaterShakerStatus.RUNNING
+    assert simulating_module_driver_patched.live_data["data"]["errorDetails"] is None  # type: ignore[index,typeddict-item]
+    assert simulating_module_driver_patched.status == HeaterShakerStatus.RUNNING  # type: ignore[comparison-overlap]

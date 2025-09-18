@@ -8,27 +8,32 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { PAUSE_UNTIL_TEMP } from '../../../../constants'
-import * as fileDataSelectors from '../../../../file-data/selectors'
+import { PAUSE_UNTIL_TEMP } from '/protocol-designer/constants'
+import * as fileDataSelectors from '/protocol-designer/file-data/selectors'
 import {
   getInitialDeckSetup,
   getOrderedStepIds,
   getUnsavedForm,
   getUnsavedFormIsPristineHeaterShakerForm,
   getUnsavedFormIsPristineSetTempForm,
-} from '../../../../step-forms/selectors'
-import { changeFormInput } from '../../../../steplist/actions/actions'
-import { PRESAVED_STEP_ID } from '../../../../steplist/types'
+} from '/protocol-designer/step-forms/selectors'
+import { changeFormInput } from '/protocol-designer/steplist/actions/actions'
+import { PRESAVED_STEP_ID } from '/protocol-designer/steplist/types'
 import {
   actions as tutorialActions,
   selectors as tutorialSelectors,
-} from '../../../../tutorial'
-import { uuid } from '../../../../utils'
+} from '/protocol-designer/tutorial'
+import { uuid } from '/protocol-designer/utils'
+
 import { getMultiSelectLastSelected, getSelectedStepId } from '../../selectors'
 import { addStep, selectDropdownItem } from '../actions'
 
-import type { FormData, StepIdType, StepType } from '../../../../form-types'
-import type { ThunkAction } from '../../../../types'
+import type {
+  FormData,
+  StepIdType,
+  StepType,
+} from '/protocol-designer/form-types'
+import type { ThunkAction } from '/protocol-designer/types'
 import type {
   DuplicateMultipleStepsAction,
   DuplicateStepAction,

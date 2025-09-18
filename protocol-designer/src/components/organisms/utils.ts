@@ -1,18 +1,19 @@
 import {
   getAreSlotsVerticallyAdjacent,
   getModuleType,
-  MAGNETIC_BLOCK_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  WASTE_CHUTE_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
 import { MODULES_WITH_COLLISION_ISSUES } from '@opentrons/step-generation'
 
-import { ALL_MODULE_SLOTS_OT2 } from '../../modules'
-import { DEFAULT_SLOT_MAP_OT2 } from '../../pages/Onboarding/constants'
-import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
+import { ALL_MODULE_SLOTS_OT2 } from '/protocol-designer/modules'
+import { DEFAULT_SLOT_MAP_OT2 } from '/protocol-designer/pages/Onboarding/constants'
+import { getLabwareIsCompatible } from '/protocol-designer/utils/labwareModuleCompatibility'
 
 import type {
   AddressableArea,
   AddressableAreaName,
+  CutoutConfigMap,
   CutoutId,
   DeckDefinition,
   LabwareDefinition2,
@@ -22,9 +23,8 @@ import type {
 import type {
   AllTemporalPropertiesForTimelineFrame,
   ModuleOnDeck,
-} from '../../step-forms'
-import type * as wellContentsSelectors from '../../top-selectors/well-contents'
-import type { CutoutConfigExtended } from './HardwareConfigurator/AddFixtureModal'
+} from '/protocol-designer/step-forms'
+import type * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
 
 export const getSlotsWithCollisions = (
   deckDef: DeckDefinition,
@@ -61,6 +61,7 @@ export const getLabwareNotCompatibleWithModule = (
   const labwareOnSlot = Object.values(labware).find(lw =>
     lw.stack.includes(slot)
   )
+
   const isLabwareOnOtherTCSlot = isThermocycler
     ? Object.values(labware).some(({ stack }) => stack.includes('A1'))
     : false
@@ -90,16 +91,16 @@ export const getLabwareOnSlot = (
 export const getLabwareCompatibleForEditHardware = (
   labware: AllTemporalPropertiesForTimelineFrame['labware'],
   cutoutId: CutoutId,
-  newModule?: CutoutConfigExtended,
-  newFixture?: CutoutConfigExtended
+  newModule?: CutoutConfigMap,
+  newFixture?: CutoutConfigMap
 ): boolean => {
   const labwareDef = getLabwareOnSlot(labware, cutoutId)
   const labwareDefB1 = getLabwareOnSlot(labware, 'cutoutB1')
   const moduleType =
     newModule != null
-      ? newModule.type === 'stagingAreaAndMagneticBlock'
-        ? MAGNETIC_BLOCK_TYPE
-        : getModuleType(newModule.type as ModuleModel)
+      ? newModule.addressableAreaId === 'thermocyclerModuleV2'
+        ? THERMOCYCLER_MODULE_TYPE
+        : getModuleType(newModule.cutoutFixtureId as ModuleModel)
       : null
 
   let labwareCompatible = true
@@ -115,7 +116,10 @@ export const getLabwareCompatibleForEditHardware = (
     labwareCompatible = getLabwareIsCompatible(labwareDef, moduleType)
   } else if (
     newFixture != null &&
-    (newFixture.type === 'wasteChute' || newFixture.type === 'trashBin') &&
+    (newFixture.cutoutFixtureId === 'trashBinAdapter' ||
+      WASTE_CHUTE_ADDRESSABLE_AREAS.includes(
+        newFixture.addressableAreaId as AddressableAreaName
+      )) &&
     labwareDef != null
   ) {
     labwareCompatible = false

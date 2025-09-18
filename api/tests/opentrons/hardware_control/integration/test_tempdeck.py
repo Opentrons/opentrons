@@ -21,8 +21,10 @@ async def tempdeck(
         execution_manager=execution_manager,
         poll_interval_seconds=poll_interval_seconds,
     )
-    yield module
-    await module.cleanup()
+    try:
+        yield module
+    finally:
+        await module.cleanup()
 
 
 def test_device_info(tempdeck: TempDeck) -> None:

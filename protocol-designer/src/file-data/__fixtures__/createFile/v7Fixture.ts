@@ -251,7 +251,7 @@ export const robotStateTimeline: Timeline = {
       ],
       robotState: initialRobotState,
       warnings: [],
-      stepNumber: 1,
+      stepInfo: { stepNumber: 1, description: 'v7 fixture', name: 'transfer' },
     },
   ],
   errors: null,

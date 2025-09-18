@@ -148,6 +148,7 @@ def test_set_target_block_temperature(
         celsius=42.0,
         hold_time_seconds=1.2,
         block_max_volume=3.4,
+        ramp_rate=None,
     )
 
     decoy.verify(
@@ -157,6 +158,7 @@ def test_set_target_block_temperature(
                 celsius=42.0,
                 blockMaxVolumeUl=3.4,
                 holdTimeSeconds=1.2,
+                ramp_rate=None,
             )
         ),
         times=1,
@@ -216,7 +218,7 @@ def test_execute_profile_below_221(
 ) -> None:
     """It should run a thermocycler profile with the engine client."""
     subject_below_221.execute_profile(
-        steps=[{"temperature": 45.6, "hold_time_seconds": 12.3}],
+        steps=[{"temperature": 45.6, "hold_time_seconds": 12.3, "ramp_rate": 0.0}],
         repetitions=2,
         block_max_volume=78.9,
     )
@@ -227,10 +229,10 @@ def test_execute_profile_below_221(
                 moduleId="1234",
                 profile=[
                     cmd.thermocycler.RunProfileStepParams(
-                        celsius=45.6, holdSeconds=12.3
+                        celsius=45.6, holdSeconds=12.3, rampRate=0.0
                     ),
                     cmd.thermocycler.RunProfileStepParams(
-                        celsius=45.6, holdSeconds=12.3
+                        celsius=45.6, holdSeconds=12.3, rampRate=0.0
                     ),
                 ],
                 blockMaxVolumeUl=78.9,
@@ -247,8 +249,8 @@ def test_execute_profile_above_221(
     """It should run a thermocycler profile with the engine client."""
     subject_at_or_above_221.execute_profile(
         steps=[
-            {"temperature": 45.6, "hold_time_seconds": 12.3},
-            {"temperature": 78.9, "hold_time_seconds": 45.6},
+            {"temperature": 45.6, "hold_time_seconds": 12.3, "ramp_rate": 0.0},
+            {"temperature": 78.9, "hold_time_seconds": 45.6, "ramp_rate": 1.0},
         ],
         repetitions=2,
         block_max_volume=25,
@@ -262,10 +264,10 @@ def test_execute_profile_above_221(
                         repetitions=2,
                         steps=[
                             cmd.thermocycler.ProfileStep(
-                                celsius=45.6, holdSeconds=12.3
+                                celsius=45.6, holdSeconds=12.3, rampRate=0.0
                             ),
                             cmd.thermocycler.ProfileStep(
-                                celsius=78.9, holdSeconds=45.6
+                                celsius=78.9, holdSeconds=45.6, rampRate=1.0
                             ),
                         ],
                     )
@@ -431,8 +433,8 @@ def test_cycle_counting(
     """It should keep track of cycle and step counts and indices."""
     subject.execute_profile(
         [
-            {"temperature": 45.6, "hold_time_seconds": 12.3},
-            {"temperature": 78.9, "hold_time_seconds": 45.6},
+            {"temperature": 45.6, "hold_time_seconds": 12.3, "ramp_rate": 0.0},
+            {"temperature": 78.9, "hold_time_seconds": 45.6, "ramp_rate": 0.0},
         ],
         repetitions=3,
     )

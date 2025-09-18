@@ -11,6 +11,7 @@ import {
   ABSORBANCE_READER_TYPE,
   ABSORBANCE_READER_V1,
   FLEX_STACKER_MODULE_TYPE,
+  FLEX_STACKER_MODULE_V1,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_TYPE,
@@ -28,6 +29,15 @@ import {
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
+export const FLEX_MODULE_MODELS_WITH_FF: ModuleModel[] = [
+  ABSORBANCE_READER_V1,
+  FLEX_STACKER_MODULE_V1,
+  HEATERSHAKER_MODULE_V1,
+  MAGNETIC_BLOCK_V1,
+  TEMPERATURE_MODULE_V2,
+  THERMOCYCLER_MODULE_V2,
+]
+
 export const FLEX_MODULE_MODELS: ModuleModel[] = [
   ABSORBANCE_READER_V1,
   HEATERSHAKER_MODULE_V1,
@@ -35,6 +45,7 @@ export const FLEX_MODULE_MODELS: ModuleModel[] = [
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_V2,
 ]
+
 export const OT2_MODULE_MODELS: ModuleModel[] = [
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_MODULE_V1,
@@ -98,6 +109,7 @@ export const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
     'opentrons_96_flat_bottom_adapter',
     'opentrons_96_pcr_adapter',
     'opentrons_universal_flat_adapter',
+    'opentrons_universal_flat_adapter_type_b',
   ],
   [MAGNETIC_BLOCK_TYPE]: [
     'nest_96_wellplate_100ul_pcr_full_skirt',

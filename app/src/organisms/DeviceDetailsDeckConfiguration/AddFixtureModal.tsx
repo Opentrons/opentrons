@@ -17,6 +17,7 @@ import {
 import {
   getAADisplayName,
   getFixtureDisplayName,
+  getWasteChuteOptions,
   replaceCutoutFixtureWithComboFixture,
   replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   SINGLE_CENTER_CUTOUTS,
@@ -32,7 +33,6 @@ import {
   getFixtureOptions,
   getModuleOptions,
   getOptions,
-  getWasteChuteOptions,
 } from '../DeviceDetailsDeckConfiguration/utils'
 import { useSendIdentifyStacker } from '../ModuleWizardFlows/hooks'
 

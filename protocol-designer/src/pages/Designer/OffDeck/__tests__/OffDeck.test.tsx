@@ -6,15 +6,16 @@ import { screen } from '@testing-library/react'
 
 import { fixture96Plate } from '@opentrons/shared-data'
 
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { LiquidButton } from '/protocol-designer/components/molecules'
+import { LabwareOnDeck } from '/protocol-designer/components/organisms'
+import { getCustomLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
+import { selectors } from '/protocol-designer/labware-ingred/selectors'
+import { START_TERMINAL_ITEM_ID } from '/protocol-designer/steplist'
+import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
+import { getSelectedTerminalItemId } from '/protocol-designer/ui/steps'
+
 import { OffDeck } from '..'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { LiquidButton } from '../../../../components/molecules'
-import { LabwareOnDeck } from '../../../../components/organisms'
-import { getCustomLabwareDefsByURI } from '../../../../labware-defs/selectors'
-import { selectors } from '../../../../labware-ingred/selectors'
-import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
-import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
-import { getSelectedTerminalItemId } from '../../../../ui/steps'
 import { DeckSetupToolbox } from '../../DeckSetup/DeckSetupToolbox'
 import { OffDeckDetails } from '../OffDeckDetails'
 
@@ -23,13 +24,13 @@ import type * as Components from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('../OffDeckDetails')
-vi.mock('../../../../ui/steps')
-vi.mock('../../../../labware-ingred/selectors')
-vi.mock('../../../../labware-defs/selectors')
-vi.mock('../../../../components/molecules')
-vi.mock('../../../../top-selectors/labware-locations')
+vi.mock('/protocol-designer/ui/steps')
+vi.mock('/protocol-designer/labware-ingred/selectors')
+vi.mock('/protocol-designer/labware-defs/selectors')
+vi.mock('/protocol-designer/components/molecules')
+vi.mock('/protocol-designer/top-selectors/labware-locations')
 vi.mock('../../DeckSetup/DeckSetupToolbox')
-vi.mock('../../../../components/organisms')
+vi.mock('/protocol-designer/components/organisms')
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof Components>()
   return {

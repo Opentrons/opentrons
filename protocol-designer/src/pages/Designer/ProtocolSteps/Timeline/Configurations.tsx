@@ -8,8 +8,9 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { LINE_CLAMP_TEXT_STYLE } from '../../../../components/atoms'
-import { LiquidButton } from '../../../../components/molecules'
+import { LINE_CLAMP_TEXT_STYLE } from '/protocol-designer/components/atoms'
+import { LiquidButton } from '/protocol-designer/components/molecules'
+
 import { HardwareStep } from './HardwareStep'
 
 import type { Dispatch, SetStateAction } from 'react'

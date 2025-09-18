@@ -26,8 +26,9 @@ from .actions import (
     AddModuleAction,
     FinishErrorDetails,
     DoorChangeAction,
-    ResetTipsAction,
     SetPipetteMovementSpeedAction,
+    StartTaskAction,
+    FinishTaskAction,
 )
 from .get_state_update import get_state_updates
 
@@ -55,8 +56,9 @@ __all__ = [
     "AddAddressableAreaAction",
     "AddModuleAction",
     "DoorChangeAction",
-    "ResetTipsAction",
     "SetPipetteMovementSpeedAction",
+    "StartTaskAction",
+    "FinishTaskAction",
     # action payload values
     "PauseSource",
     "FinishErrorDetails",

@@ -741,6 +741,7 @@ async def test_liquid_probe(
     fake_liquid_settings: LiquidProbeSettings,
     mock_move_group_run: mock.AsyncMock,
     mock_send_stop_threshold: mock.AsyncMock,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     fake_max_p_dist = 70
     head_node = axis_to_node(Axis.by_mount(mount))
@@ -750,6 +751,10 @@ async def test_liquid_probe(
     )
     controller._pipettes_to_monitor_pressure = mock.MagicMock(  # type: ignore[method-assign]
         return_value=[sensor_node_for_mount(mount)]
+    )
+    monkeypatch.setattr(
+        "opentrons_hardware.hardware_control.tool_sensors.finalize_logs",
+        mock.AsyncMock(),
     )
     try:
         await controller.liquid_probe(

@@ -113,6 +113,10 @@ export function UpdateProtocol(): JSX.Element {
       value: 'adapt_python_protocol',
     },
     {
+      name: t('update_option_add_flex_stackers'),
+      value: 'add_flex_stackers',
+    },
+    {
       name: t('update_option_add_runtime_parameters'),
       value: 'add_runtime_parameters',
     },

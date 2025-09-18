@@ -8,6 +8,17 @@ from opentrons.protocol_engine.types import (
     SimulatedProbeResult,
     LiquidTrackingType,
     WellInfoSummary,
+    ModuleModel,
+)
+from opentrons.hardware_control.modules.types import (
+    MagneticModuleModel,
+    TemperatureModuleModel,
+    ThermocyclerModuleModel,
+    HeaterShakerModuleModel,
+    MagneticBlockModel,
+    AbsorbanceReaderModel,
+    FlexStackerModuleModel,
+    ModuleModel as HWModuleModel,
 )
 
 
@@ -101,3 +112,19 @@ def test_simulated_probe_result_operand_math(
         _error = _e
     assert _error is None
     assert r is not None
+
+
+@pytest.mark.parametrize(
+    "hardware_module_model",
+    [m for m in MagneticModuleModel]
+    + [m for m in TemperatureModuleModel]
+    + [m for m in ThermocyclerModuleModel]
+    + [m for m in HeaterShakerModuleModel]
+    + [m for m in MagneticBlockModel]
+    + [m for m in AbsorbanceReaderModel]
+    + [m for m in FlexStackerModuleModel],
+)
+def test_module_model_translation(hardware_module_model: HWModuleModel) -> None:
+    """It should turn every hardware module model into an engine model."""
+    engine_module = ModuleModel.from_hardware(hardware_module_model)
+    assert engine_module.value == hardware_module_model.value

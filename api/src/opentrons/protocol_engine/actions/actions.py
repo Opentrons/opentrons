@@ -3,6 +3,7 @@
 Actions can be passed to the ActionDispatcher, where they will trigger
 reactions in objects that subscribe to the pipeline, like the StateStore.
 """
+
 import dataclasses
 from datetime import datetime
 from enum import Enum
@@ -20,6 +21,7 @@ from ..commands import (
     CommandDefinedErrorData,
 )
 from ..error_recovery_policy import ErrorRecoveryPolicy, ErrorRecoveryType
+from ..errors import ErrorOccurrence
 from ..notes.notes import CommandNote
 from ..state.update_types import StateUpdate
 from ..types import (
@@ -27,6 +29,7 @@ from ..types import (
     ModuleDefinition,
     Liquid,
     DeckConfigurationType,
+    Task,
 )
 
 
@@ -60,7 +63,7 @@ class PauseAction:
 class StopAction:
     """Request engine execution to stop soon."""
 
-    from_estop: bool = False
+    from_asynchronous_error: bool = False
 
 
 @dataclasses.dataclass(frozen=True)
@@ -202,6 +205,22 @@ class FailCommandAction:
 
 
 @dataclasses.dataclass(frozen=True)
+class StartTaskAction:
+    """Store new task in state."""
+
+    task: Task
+
+
+@dataclasses.dataclass(frozen=True)
+class FinishTaskAction:
+    """Mark task as finished in state."""
+
+    task_id: str
+    finished_at: datetime
+    error: ErrorOccurrence | None
+
+
+@dataclasses.dataclass(frozen=True)
 class AddLabwareOffsetAction:
     """Add a labware offset, to apply to subsequent `LoadLabwareCommand`s."""
 
@@ -254,13 +273,6 @@ class AddModuleAction:
 
 
 @dataclasses.dataclass(frozen=True)
-class ResetTipsAction:
-    """Reset the tip tracking state of a given tip rack."""
-
-    labware_id: str
-
-
-@dataclasses.dataclass(frozen=True)
 class SetPipetteMovementSpeedAction:
     """Set the speed of a pipette's X/Y/Z movements. Does not affect plunger speed.
 
@@ -296,7 +308,8 @@ Action = Union[
     SetDeckConfigurationAction,
     AddAddressableAreaAction,
     AddLiquidAction,
-    ResetTipsAction,
     SetPipetteMovementSpeedAction,
     SetErrorRecoveryPolicyAction,
+    StartTaskAction,
+    FinishTaskAction,
 ]

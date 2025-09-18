@@ -7,6 +7,10 @@ import type {
   CalibrationCreateCommand,
   CalibrationRunTimeCommand,
 } from './calibration'
+import type {
+  ConcurrentCreateCommand,
+  ConcurrentRunTimeCommand,
+} from './concurrent'
 import type { GantryCreateCommand, GantryRunTimeCommand } from './gantry'
 import type {
   IncidentalCreateCommand,
@@ -33,6 +37,7 @@ export * from './timing'
 export * from './unsafe'
 export * from './support'
 export * from './robot'
+export * from './concurrent'
 // NOTE: these key/value pairs will only be present on commands at analysis/run time
 // they pertain only to the actual execution status of a command on hardware, as opposed to
 // the command's identity and parameters which can be known prior to runtime
@@ -75,7 +80,7 @@ export type CreateCommand =
   | IncidentalCreateCommand // command with only incidental effects (status bar animations)
   | UnsafeCreateCommand // command providing capabilities that are not safe for scientific uses
   | RobotCreateCommand // command providing underlying robot capabilities outside the normal model
-
+  | ConcurrentCreateCommand // command providing concurrent actions
 // commands will be required to have a key, but will not be created with one
 export type RunTimeCommand =
   | PipettingRunTimeCommand // involves the pipettes plunger motor
@@ -88,7 +93,7 @@ export type RunTimeCommand =
   | IncidentalRunTimeCommand // command with only incidental effects (status bar animations)
   | UnsafeRunTimeCommand // command providing capabilities that are not safe for scientific uses
   | RobotRunTimeCommand // command providing underlying robot capabilities outside the normal model
-
+  | ConcurrentRunTimeCommand // command providing concurrent actions
 export type RunCommandError = RunCommandErrorUndefined | DefinedRunCommandError
 
 export type DefinedRunCommandError =

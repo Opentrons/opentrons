@@ -37,8 +37,9 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
+import { TIPRACK_LID_LOADNAME } from '/protocol-designer/pages/Designer/utils'
+
 import { LINK_BUTTON_STYLE } from '../../../components/atoms'
-import { getEnableStacking } from '../../../feature-flags/selectors'
 import { getRobotType } from '../../../file-data/selectors'
 import { getOnlyLatestDefs } from '../../../labware-defs'
 import { createCustomLabwareDef } from '../../../labware-defs/actions'
@@ -94,7 +95,6 @@ export function SelectLabwareModal(
   const [error, setError] = useState<string | null>(null)
 
   const dispatch = useDispatch<ThunkDispatch<any>>()
-  const enableStacking = useSelector(getEnableStacking)
   const permittedTipracks = useSelector(stepFormSelectors.getPermittedTipracks)
   const pipetteEntities = useSelector(getPipetteEntities)
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
@@ -203,7 +203,7 @@ export function SelectLabwareModal(
         (slot === 'offDeck' && isAdapter) ||
         (PLATE_READER_LOADNAME === parameters.loadName &&
           moduleType !== ABSORBANCE_READER_TYPE) ||
-        (!enableStacking && parameters.loadName === 'opentrons_flex_deck_riser')
+        parameters.loadName === TIPRACK_LID_LOADNAME
       )
     },
     [filterRecommended, filterHeight, getIsLabwareCompatible, moduleType, slot]
@@ -219,9 +219,8 @@ export function SelectLabwareModal(
         const category: string = def.metadata.displayCategory
         //  filter out non-permitted tipracks
         if (
-          (category === 'tipRack' &&
-            !permittedTipracks.includes(getLabwareDefURI(def))) ||
-          (category === 'lid' && !enableStacking)
+          category === 'tipRack' &&
+          !permittedTipracks.includes(getLabwareDefURI(def))
         ) {
           return acc
         }

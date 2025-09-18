@@ -1,6 +1,7 @@
 import type {
   ABSORBANCE_READER_TYPE,
   CreateCommand,
+  FLEX_STACKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   LabwareDefinition2,
   LabwareLocation,
@@ -20,6 +21,9 @@ import type {
 } from '@opentrons/shared-data'
 import type { AtomicProfileStep } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type {
+  CLEAN,
+  DIRTY,
+  EMPTY,
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_DEACTIVATED,
@@ -50,6 +54,8 @@ export interface PipetteTemporalProperties {
   nozzles?: NozzleConfigurationStyle
   //  current tiprack assosciated with pipette
   tiprackId?: string
+  //  last primary tip well accessed (used for return tip)
+  tipWell?: string
 }
 
 export interface MagneticModuleState {
@@ -96,6 +102,11 @@ export interface AbsorbanceReaderState {
   initialization: Initialization | null
 }
 
+export interface FlexStackerState {
+  type: typeof FLEX_STACKER_MODULE_TYPE
+  //  TODO: extend this state
+}
+
 export type ModuleState =
   | MagneticModuleState
   | TemperatureModuleState
@@ -103,6 +114,7 @@ export type ModuleState =
   | HeaterShakerModuleState
   | MagneticBlockState
   | AbsorbanceReaderState
+  | FlexStackerState
 export interface ModuleTemporalProperties {
   slot: DeckSlot
   moduleState: ModuleState
@@ -491,6 +503,7 @@ export interface HeaterShakerArgs extends CommonArgs {
   commandCreatorFnName: 'heaterShaker'
   targetTemperature: number | null
   latchOpen: boolean
+  timerHours: number | null
   timerMinutes: number | null
   timerSeconds: number | null
   message?: string
@@ -634,6 +647,7 @@ export interface InvariantContext {
   config: Config
 }
 
+export type TipState = typeof CLEAN | typeof DIRTY | typeof EMPTY
 export interface TimelineFrame {
   pipettes: {
     [pipetteId: string]: PipetteTemporalProperties
@@ -647,14 +661,14 @@ export interface TimelineFrame {
   tipState: {
     tipracks: {
       [labwareId: string]: {
-        [wellName: string]: boolean // true if tip is in there
+        [wellName: string]: TipState
       }
     }
     pipettes: {
       [pipetteId: string]: {
         hasTip: boolean
         tiprackURI: string | null
-      } // true if pipette has tip(s)
+      }
     }
   }
   liquidState: {
@@ -686,6 +700,7 @@ export type ErrorType =
   | 'ABSORBANCE_READER_NO_GRIPPER'
   | 'ABSORBANCE_READER_NO_INITIALIZATION'
   | 'CANNOT_MOVE_WITH_GRIPPER'
+  | 'CLOSING_THERMOCYCLER_WITH_INVALID_LABWARE_LID'
   | 'DROP_TIP_LOCATION_DOES_NOT_EXIST'
   | 'EQUIPMENT_DOES_NOT_EXIST'
   | 'GRIPPER_REQUIRED'
@@ -698,7 +713,7 @@ export type ErrorType =
   | 'HEATER_SHAKER_NORTH_SOUTH_EAST_WEST_SHAKING'
   | 'INSUFFICIENT_TIPS'
   | 'INVALID_SLOT'
-  | 'LABWARE_DISCARDED_IN_WASTE_CHUTE'
+  | 'LABWARE_DISCARDED_IN_TRASH'
   | 'LABWARE_DOES_NOT_EXIST'
   | 'LABWARE_OFF_DECK'
   | 'LABWARE_ON_ANOTHER_ENTITY'
@@ -708,6 +723,7 @@ export type ErrorType =
   | 'MISSING_TEMPERATURE_STEP'
   | 'MODULE_PIPETTE_COLLISION_DANGER'
   | 'MULTI_DISPENSE_VALUES_NOT_FOUND'
+  | 'NEXT_TIPRACK_HAS_LID'
   | 'NO_TIP_ON_PIPETTE'
   | 'NO_TIP_SELECTED'
   | 'PIPETTE_DOES_NOT_EXIST'
@@ -718,11 +734,14 @@ export type ErrorType =
   | 'REMOVE_96_CHANNEL_TIPRACK_ADAPTER'
   | 'RETRACT_BELOW_ASPIRATE'
   | 'RETRACT_BELOW_DISPENSE'
+  | 'RETURN_TIP_UNAVAILABLE'
+  | 'STACK_TOO_HIGH'
   | 'SUBMERGE_BELOW_ASPIRATE'
   | 'SUBMERGE_BELOW_DISPENSE'
   | 'TALL_LABWARE_EAST_WEST_OF_HEATER_SHAKER'
   | 'THERMOCYCLER_LID_CLOSED'
   | 'TIP_VOLUME_EXCEEDED'
+  | 'TIPRACK_LID_NOT_ALLOWED_ON_DECK'
 
 export interface CommandCreatorError {
   message: string
@@ -743,12 +762,14 @@ export interface CommandCreatorWarning {
 
 interface StepInfo {
   stepNumber?: number
-  //  TODO: can extend to include stepName and stepDetails
+  name?: string | null
+  description?: string | null
 }
 
-export interface CommandsAndRobotState extends StepInfo {
+export interface CommandsAndRobotState {
   commands: CreateCommand[]
   robotState: RobotState
+  stepInfo?: StepInfo
   warnings?: CommandCreatorWarning[]
   python?: string
 }

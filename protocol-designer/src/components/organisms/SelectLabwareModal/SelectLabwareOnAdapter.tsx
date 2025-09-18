@@ -8,7 +8,6 @@ import {
   ListButtonAccordionContainer,
 } from '@opentrons/components'
 
-import { getEnableStacking } from '../../../feature-flags/selectors'
 import { getOnlyLatestDefs } from '../../../labware-defs'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import {
@@ -26,6 +25,7 @@ import { getPipetteEntities } from '../../../step-forms/selectors'
 import { getHas96Channel } from '../../../utils'
 import { ADAPTER_96_CHANNEL } from '../../../utils/labwareModuleCompatibility'
 import { SelectLidOnLabware } from './SelectLidOnLabware'
+import { getIsNestedDefinitionALid } from './utils'
 
 import type { ChangeEvent } from 'react'
 import type { StackingProps } from '@opentrons/components'
@@ -54,7 +54,6 @@ export function SelectLabwareOnAdapter(
     universalLid,
   } = props
   const { t } = useTranslation(['starting_deck_state', 'shared'])
-  const enableStacking = useSelector(getEnableStacking)
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
   const pipetteEntities = useSelector(getPipetteEntities)
   const has96Channel = getHas96Channel(pipetteEntities)
@@ -92,8 +91,7 @@ export function SelectLabwareOnAdapter(
 
   return isAdapter &&
     parentLabwareURI === selectedAdapterDefURI &&
-    getLabwareCompatibleWithAdapter(defs, enableStacking, loadName)?.length >
-      0 ? (
+    getLabwareCompatibleWithAdapter(defs, loadName)?.length > 0 ? (
     <ListButtonAccordionContainer id={`nestedAccordionContainer_${loadName}`}>
       <ListButtonAccordion
         key={`${category}_${loadName}_accordion`}
@@ -106,8 +104,7 @@ export function SelectLabwareOnAdapter(
               const nestedDef = defs[tiprackDefUri]
               return (
                 <CustomizeExpandButton
-                  enableStackingFF={enableStacking}
-                  loadName={loadName}
+                  isNestedDefALid={false}
                   allowInputField={false}
                   key={`${index}_${category}_${loadName}_${tiprackDefUri}`}
                   id={`${index}_${category}_${loadName}_${tiprackDefUri}`}
@@ -132,7 +129,7 @@ export function SelectLabwareOnAdapter(
                 ...defs,
                 ...customLabwareDefs,
               },
-              enableStacking,
+
               loadName
             ).map(nestedDefUri => {
               const nestedDef =
@@ -185,8 +182,7 @@ export function SelectLabwareOnAdapter(
               return (
                 <Fragment key={`${loadName}_${category}`}>
                   <CustomizeExpandButton
-                    enableStackingFF={enableStacking}
-                    loadName={nestedDef.parameters.loadName}
+                    isNestedDefALid={getIsNestedDefinitionALid(nestedDef)}
                     allowInputField={lidLoadNames.includes(
                       nestedDef.parameters.loadName
                     )}

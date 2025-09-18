@@ -5,6 +5,7 @@ import { BaseDeck } from '@opentrons/components'
 import {
   FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC,
   getSimplestDeckConfigForProtocol,
+  OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -27,6 +28,7 @@ const PROTOCOL_ANALYSIS = {
   id: 'fake analysis',
   status: 'completed',
   labware: [],
+  robotType: OT2_ROBOT_TYPE,
 } as any
 
 const mockAttachedProtocolModuleMatches = [

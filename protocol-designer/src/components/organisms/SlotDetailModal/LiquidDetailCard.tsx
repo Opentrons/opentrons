@@ -2,6 +2,7 @@ import sum from 'lodash/sum'
 import { css } from 'styled-components'
 
 import {
+  ALIGN_CENTER,
   BORDERS,
   Box,
   COLORS,
@@ -12,8 +13,8 @@ import {
   Flex,
   FLEX_MAX_CONTENT,
   Icon,
+  JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  SIZE_1,
   SPACING,
   StyledText,
 } from '@opentrons/components'
@@ -23,7 +24,7 @@ import {
 } from '@opentrons/shared-data'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { IngredInputs } from '../../../labware-ingred/types'
+import type { IngredInputs } from '/protocol-designer/labware-ingred/types'
 import type { WellContentsByNumber } from './index'
 
 interface LiquidDetailCardProps {
@@ -66,44 +67,48 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
     <Box
       css={selectedValue === liquidId ? ACTIVE_STYLE : LIQUID_CARD_STYLE}
       borderRadius={BORDERS.borderRadius8}
-      padding={SPACING.spacing16}
+      padding={SPACING.spacing12}
       backgroundColor={COLORS.white}
       onClick={handleSelectedValue}
       width="10.3rem"
       minHeight={FLEX_MAX_CONTENT}
       data-testid="LiquidDetailCard_box"
     >
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-      >
+      <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing16}>
         <Flex
-          css={CARD_OUTLINE_BORDER_STYLE}
-          padding={SPACING.spacing8}
-          height={FLEX_MAX_CONTENT}
-          width={FLEX_MAX_CONTENT}
-          backgroundColor={COLORS.white}
+          flexDirection={DIRECTION_COLUMN}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          gridGap={SPACING.spacing8}
         >
-          <Icon name="circle" color={displayColor} size={SIZE_1} />
+          <Flex
+            css={CARD_OUTLINE_BORDER_STYLE}
+            padding={SPACING.spacing8}
+            height="1.5rem"
+            width="1.5rem"
+            backgroundColor={COLORS.white}
+            alignItems={ALIGN_CENTER}
+            justifyContent={JUSTIFY_CENTER}
+          >
+            <Icon name="circle" color={displayColor} size="0.5rem" />
+          </Flex>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            gap={description != null ? SPACING.spacing4 : 0}
+          >
+            <StyledText desktopStyle="bodyDefaultSemiBold">
+              {displayName}
+            </StyledText>
+            <StyledText desktopStyle="captionRegular" color={COLORS.grey50}>
+              {description != null ? description : null}
+            </StyledText>
+          </Flex>
         </Flex>
-        <StyledText
-          desktopStyle="headingMediumSemiBold"
-          marginTop={SPACING.spacing8}
-        >
-          {displayName}
-        </StyledText>
-        <StyledText desktopStyle="captionRegular" color={COLORS.grey50}>
-          {description != null ? description : null}
-        </StyledText>
-
         <Flex
           backgroundColor={`${COLORS.black90}${COLORS.opacity20HexCode}`}
           borderRadius={BORDERS.borderRadius8}
           height={FLEX_MAX_CONTENT}
           width={FLEX_MAX_CONTENT}
-          paddingY={SPACING.spacing4}
-          paddingX={SPACING.spacing8}
-          marginTop={SPACING.spacing8}
+          padding={`${SPACING.spacing4} ${SPACING.spacing8}`}
         >
           <StyledText desktopStyle="bodyDefaultRegular">
             {totalVolume} {MICRO_LITERS}

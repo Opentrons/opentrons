@@ -44,6 +44,7 @@ from .execution_manager import ExecutionManagerProvider
 from .pause_manager import PauseManager
 from .module_control import AttachedModulesControl
 from .types import (
+    AsynchronousModuleErrorNotification,
     Axis,
     CriticalPoint,
     DoorState,
@@ -51,6 +52,7 @@ from .types import (
     ErrorMessageNotification,
     HardwareEventHandler,
     HardwareAction,
+    HardwareEvent,
     MotionChecks,
     PauseType,
     StatusBarState,
@@ -167,6 +169,18 @@ class API(
             except Exception:
                 mod_log.exception("Errored during door state event callback")
 
+    def _send_module_notification(self, event: HardwareEvent) -> None:
+        if not isinstance(event, AsynchronousModuleErrorNotification):
+            return
+        mod_log.info(
+            f"Forwarding module event {event.event} for {event.module_model} {event.module_serial} at {event.port}"
+        )
+        for cb in self._callbacks:
+            try:
+                cb(event)
+            except Exception:
+                mod_log.exception("Errored during module asynchronous callback")
+
     def _reset_last_mount(self) -> None:
         self._last_moved_mount = None
 
@@ -247,7 +261,9 @@ class API(
             )
             await api_instance.cache_instruments()
             module_controls = await AttachedModulesControl.build(
-                api_instance, board_revision=backend.board_revision
+                api_instance,
+                board_revision=backend.board_revision,
+                event_callback=api_instance._send_module_notification,
             )
             backend.module_controls = module_controls
             checked_loop.create_task(backend.watch(loop=checked_loop))
@@ -306,7 +322,9 @@ class API(
         )
         await api_instance.cache_instruments()
         module_controls = await AttachedModulesControl.build(
-            api_instance, board_revision=backend.board_revision
+            api_instance,
+            board_revision=backend.board_revision,
+            event_callback=api_instance._send_module_notification,
         )
         backend.module_controls = module_controls
         await backend.watch()
@@ -1312,9 +1330,10 @@ class API(
             self.is_simulator
         ), "Cannot build simulating module from non-simulating hardware control API"
 
-        return await self._backend.module_controls.build_module(
-            port="",
-            usb_port=USBPort(name="", port_number=1, port_group=PortGroup.MAIN),
+        return await self._backend.module_controls.register_simulated_module(
+            simulated_usb_port=USBPort(
+                name="", port_number=1, port_group=PortGroup.MAIN
+            ),
             type=modules.ModuleType.from_model(model),
             sim_model=model.value,
         )
