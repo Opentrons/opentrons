@@ -25339,7 +25339,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetTemperature": 55.0
+        "targetTemperature": 55.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -26706,7 +26707,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetTemperature": 4.0
+        "targetTemperature": 4.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -40743,7 +40745,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetTemperature": 55.0
+        "targetTemperature": 55.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -42110,7 +42113,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetTemperature": 4.0
+        "targetTemperature": 4.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -56147,7 +56151,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetTemperature": 55.0
+        "targetTemperature": 55.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -57514,7 +57519,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetTemperature": 4.0
+        "targetTemperature": 4.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
