@@ -50,6 +50,7 @@ export const PrimaryOverlayModal: Story = {
         gridGap={SPACING.spacing16}
       >
         <SecondaryButton
+          backgroundColor={COLORS.white}
           onClick={() => {
             alert('cancel')
           }}
@@ -81,6 +82,7 @@ export const ClearLiquidOverlayModal: Story = {
         gridGap={SPACING.spacing16}
       >
         <SecondaryButton
+          backgroundColor={COLORS.white}
           onClick={() => {
             alert('Cancel')
           }}

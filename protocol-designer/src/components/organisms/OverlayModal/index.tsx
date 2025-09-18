@@ -1,5 +1,3 @@
-import { createPortal } from 'react-dom'
-
 import {
   ALIGN_CENTER,
   COLORS,
@@ -12,18 +10,16 @@ import {
   TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 
-import { getMainPagePortalEl } from '../Portal'
-
 import type { ReactNode } from 'react'
 
-export * from './useOverlayModal'
 export interface OverlayModalProps {
   header: string
   subText?: string
-  children: ReactNode
 }
 
-export function OverlayModal(props: OverlayModalProps): JSX.Element {
+export function OverlayModal(
+  props: OverlayModalProps & { children: ReactNode }
+): JSX.Element {
   const { header, subText, children } = props
   return (
     <Overlay
