@@ -205,7 +205,11 @@ export function SummaryAndSettings(
         {selectedCategory === 'overview' ? <Overview state={state} /> : null}
         <>
           {selectedCategory === 'aspirate' ? (
-            <Aspirate state={state} dispatch={dispatch} />
+            <Aspirate
+              state={state}
+              dispatch={dispatch}
+              isMultiTransfer={isMultiTransferDispense}
+            />
           ) : null}
           {selectedCategory === 'dispense' ? (
             <Dispense
