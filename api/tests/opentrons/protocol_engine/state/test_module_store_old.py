@@ -615,7 +615,9 @@ def test_handle_tempdeck_temperature_commands(
         params=temp_commands.SetTargetTemperatureParams(
             moduleId="module-id", celsius=42.4
         ),
-        result=temp_commands.SetTargetTemperatureResult(targetTemperature=42),
+        result=temp_commands.SetTargetTemperatureResult(
+            targetTemperature=42, taskId="taskId"
+        ),
     )
     deactivate_cmd = temp_commands.DeactivateTemperature.model_construct(  # type: ignore[call-arg]
         params=temp_commands.DeactivateTemperatureParams(moduleId="module-id"),

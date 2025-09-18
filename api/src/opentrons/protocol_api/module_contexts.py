@@ -43,6 +43,7 @@ from .module_validation_and_errors import (
 )
 from .labware import Labware
 from . import validation
+from . import Task
 
 
 _MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN = APIVersion(2, 14)
@@ -447,18 +448,28 @@ class TemperatureModuleContext(ModuleContext):
         No other protocol commands will execute while waiting for the temperature.
 
         :param celsius: A value between 4 and 95, representing the target temperature in °C.
+
         """
         self._core.set_target_temperature(celsius)
         self._core.wait_for_target_temperature()
 
     @publish(command=cmds.tempdeck_set_temp)
     @requires_version(2, 3)
-    def start_set_temperature(self, celsius: float) -> None:
+    def start_set_temperature(self, celsius: float) -> Task:
         """Set the target temperature without waiting for the target to be hit.
 
+        .. versionchanged:: 2.27
+            Returns a task object that represents concurrent preheating.
+            Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for the preheat to complete.
+
+        On version 2.26 or below, this function returns ``None``.
         :param celsius: A value between 4 and 95, representing the target temperature in °C.
         """
-        self._core.set_target_temperature(celsius)
+        task = self._core.set_target_temperature(celsius)
+        if self._api_version >= APIVersion(2, 27):
+            return Task(api_version=self._api_version, core=task)
+        else:
+            return cast(Task, None)
 
     @publish(command=cmds.tempdeck_await_temp)
     @requires_version(2, 3)

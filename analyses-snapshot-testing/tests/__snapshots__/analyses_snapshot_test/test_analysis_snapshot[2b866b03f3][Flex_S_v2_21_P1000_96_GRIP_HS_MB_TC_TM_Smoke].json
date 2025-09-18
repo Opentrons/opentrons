@@ -13785,7 +13785,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetTemperature": 38.0
+        "targetTemperature": 38.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"

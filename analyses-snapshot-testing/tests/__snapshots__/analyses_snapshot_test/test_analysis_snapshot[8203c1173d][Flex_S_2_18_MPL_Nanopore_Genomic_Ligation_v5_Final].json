@@ -11430,7 +11430,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetTemperature": 6.0
+        "targetTemperature": 6.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
