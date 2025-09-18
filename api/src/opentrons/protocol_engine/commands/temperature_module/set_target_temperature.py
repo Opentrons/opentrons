@@ -40,9 +40,10 @@ class SetTargetTemperatureResult(BaseModel):
         description="The target temperature that was set after validation "
         "and type conversion (if any).",
     )
-    taskId: str = Field(
-        ...,
+    taskId: str | SkipJsonSchema[None] = Field(
+        None,
         description="The task id for the setTargetTemperature task",
+        json_schema_extra=_remove_default,
     )
 
 
