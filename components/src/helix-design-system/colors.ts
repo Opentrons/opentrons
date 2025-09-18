@@ -42,7 +42,7 @@ export const purple50 = isTouchscreen ? '#9E39A8' : '#893BA4'
 export const purple40 = isTouchscreen ? '#E2A9EA' : '#CEA4DF'
 export const purple35 = isTouchscreen ? '#ECC2F2' : '#DBBCE7'
 export const purple30 = isTouchscreen ? '#F4DEF7' : '#E6D5EC'
-export const purple20 = isTouchscreen ? '#FFF3FE' : '#F1E8F5'
+export const purple20 = isTouchscreen ? '#FFF3FE' : '#F3E9F6'
 
 /**
  * blue
