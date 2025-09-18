@@ -267,7 +267,8 @@ export function createQuickTransferFile(
 export function createQuickTransferPythonFile(
   quickTransferState: QuickTransferSummaryState,
   deckConfig: DeckConfiguration,
-  protocolName?: string
+  protocolName?: string,
+  enableQuickTransferProtocolContentsLog?: boolean
 ): File {
   const sourceLabwareName = quickTransferState.source.metadata.displayName
   let destinationLabwareName = sourceLabwareName
@@ -297,8 +298,10 @@ export function createQuickTransferPythonFile(
       .filter(section => section)
       .join('\n\n') + '\n'
 
-  // so you can view the string in devTools:
-  console.log(protocolContents)
+  // temporary logging for debugging
+  if (enableQuickTransferProtocolContentsLog) {
+    console.log(protocolContents)
+  }
 
   return new File([protocolContents], `${fileMetadata.protocolName}.py`, {
     type: 'text/x-python',
