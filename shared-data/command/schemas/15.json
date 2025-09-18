@@ -5150,6 +5150,19 @@
           "description": "The rate in C\u00b0/second to change temperature from the current target. If unspecified, the Thermocycler will change temperature at the fastest possible rate.",
           "title": "Ramp Rate",
           "type": "number"
+        },
+        "taskId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Id for the background task that manages the temperature.",
+          "title": "Taskid"
         }
       },
       "required": ["moduleId", "celsius"],
@@ -5195,6 +5208,19 @@
           "description": "Unique ID of the Thermocycler Module.",
           "title": "Moduleid",
           "type": "string"
+        },
+        "taskId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Id for the background task that manages the temperature.",
+          "title": "Taskid"
         }
       },
       "required": ["moduleId", "celsius"],
