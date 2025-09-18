@@ -124,10 +124,6 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         self._sync_hardware_api = sync_hardware_api
         self._protocol_core = protocol_core
 
-        # TODO(jbl 2025): The way to fix flow_rates is something like:
-        #   Have something called user_flow_rate that defaults to None (except for older API versions)
-        #   When calling a flow_rate, if a user_flow_rate exists use that, otherwise ping the engine
-        #   For older API versions, cheat by setting the user_flow_rate to the default so that incorrectly stays
         self._initial_default_flow_rates = (
             self._engine_client.state.pipettes.get_flow_rates(pipette_id)
         )
