@@ -60,9 +60,9 @@ export const PrimaryOverlayModal: Story = {
 
 export const ClearLiquidOverlayModal: Story = {
   args: {
-    header: 'Labware have different liquid layouts',
+    header: 'Selected labware have different liquid layouts',
     subText:
-      'To edit liquid in these labware at the same time, you will have to clear liquids from them',
+      'Clear liquids in labware to edit them together to edit liquid in these labware at the same time, you will have to clear liquids from them',
     primaryButtonText: 'Clear Liquids',
     secondaryButtonText: 'Cancel',
     onSecondaryButtonClick: () => {
