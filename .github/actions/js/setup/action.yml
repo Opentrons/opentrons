@@ -109,7 +109,9 @@ runs:
             # Check if the URL exists using a more robust approach
             if curl -s --head "$mirror_url" >/dev/null 2>&1; then
               # Double-check with a more specific test
-              if curl -s --head "$mirror_url" | head -n 1 | grep -qE "(200 OK|302)"; then
+              response=$(curl -s --head "$mirror_url" | head -n 1)
+              echo "🔍 Response for $package: $response"
+              if echo "$response" | grep -qE "(200 OK|302)"; then
                 export $env_var="$mirror_url"
                 echo "✅ Using cached $package from package-mirror"
               else
