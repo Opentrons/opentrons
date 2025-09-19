@@ -4,7 +4,6 @@ import pytest
 from decoy import Decoy, matchers
 
 from opentrons.legacy_broker import LegacyBroker
-from opentrons.protocol_api.tasks import Task
 from opentrons.drivers.types import ThermocyclerLidStatus
 from opentrons.hardware_control.modules import TemperatureStatus
 from opentrons.protocol_api.tasks import Task
