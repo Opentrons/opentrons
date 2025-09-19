@@ -106,13 +106,15 @@ runs:
               mirror_url="https://github.com/Opentrons/package-mirror/releases/download/${package}-${version}/${package}-${version}-${PLATFORM}-${ARCH}.zip"
             fi
             
-            echo "🔍 Checking: $mirror_url"
-            response=$(curl -s --head "$mirror_url" | head -n 1)
-            echo "📡 Response: $response"
-            
-            if echo "$response" | grep -qE "(200 OK|302)"; then
-              export $env_var="$mirror_url"
-              echo "✅ Using cached $package from package-mirror"
+            # Check if the URL exists using a more robust approach
+            if curl -s --head "$mirror_url" >/dev/null 2>&1; then
+              # Double-check with a more specific test
+              if curl -s --head "$mirror_url" | head -n 1 | grep -qE "(200 OK|302)"; then
+                export $env_var="$mirror_url"
+                echo "✅ Using cached $package from package-mirror"
+              else
+                echo "⚠️  $package not cached yet - will use official source"
+              fi
             else
               echo "⚠️  $package not cached yet - will use official source"
             fi
