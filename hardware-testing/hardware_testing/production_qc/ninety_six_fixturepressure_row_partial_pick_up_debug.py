@@ -30,7 +30,7 @@ from .pressure import (  # type: ignore[import]
     PRESSURE_FIXTURE_INSERT_DEPTH,
     PRESSURE_ASPIRATE_DELTA_SPEC,
 )
-
+from opentrons_hardware.firmware_bindings.constants import SensorType, SensorId
 import logging
 
 from hardware_testing.drivers.pressure_fixture import (
@@ -412,6 +412,7 @@ async def _fixture_check_pressure(
                 
                 fixture,
                 PressureEvent.INSERT,
+                mount
                
             )
             alldatalist_insert.append(_samples)
@@ -430,10 +431,11 @@ async def _fixture_check_pressure(
                 asp_evt = PressureEvent.ASPIRATE_P200
             r, _ = await _read_pressure_and_check_results_8ch_row(
                 api,
-               
+                
                 fixture,
                 asp_evt,
-                
+                mount
+               
             )
             alldatalist_holding.append(r)
            
@@ -444,10 +446,12 @@ async def _fixture_check_pressure(
             await asyncio.sleep(delaytime)
             r, _ = await _read_pressure_and_check_results_8ch_row(
                 api,
+                
                 fixture,
-                PressureEvent.DISPENSE,  
+                PressureEvent.DISPENSE,
+                mount
+               
             )
-           
             alldatalist_dispense.append(r)
             await api.prepare_for_aspirate(OT3Mount.LEFT)
             # retract out of fixture
@@ -457,8 +461,11 @@ async def _fixture_check_pressure(
             await asyncio.sleep(delaytime)
             r, _ = await _read_pressure_and_check_results_8ch_row(
                 api,
+                
                 fixture,
                 PressureEvent.POST,
+                mount
+               
             )
             alldatalist_post.append(r)
             await api.home_z(mount)
@@ -491,6 +498,7 @@ async def _read_pressure_and_check_results_8ch_row(
     api: OT3API,
     fixture: PressureFixtureBase,
     tag: PressureEvent,
+    mount: OT3Mount,
 ) -> Tuple[List[List[float]], List[List[float]]]:
     pressure_event_config: PressureEventConfig = PRESSURE_CFG[tag]
     if not api.is_simulator:
@@ -500,6 +508,9 @@ async def _read_pressure_and_check_results_8ch_row(
     for i in range(pressure_event_config.sample_count):
         #_samples.append(fixture.read_all_pressure_channel_96())
         _samples.append(fixture.read_all_pressure_channel()) #使用8CH气压工装
+        for sensor_id in [SensorId.S0,SensorId.S1]:
+            pressure = await _read_pressure(api,mount,sensor_id)
+            LOG_GING.info(f"{i + 1}/{sensor_id}: {pressure}")
         next_sample_time = time() + pressure_event_config.sample_delay
         _sample_as_strings = [str(round(p, 2)) for p in _samples[-1]]
         csv_data_sample = [tag.value] + _sample_as_strings
@@ -516,7 +527,64 @@ async def _read_pressure_and_check_results_8ch_row(
             await asyncio.sleep(pressure_event_config.sample_delay)
     return _samples,csv_data_sample_list
 
+async def _read_pressure(api,mount,_sensor_id: SensorId) -> float:
+        return await _read_pipette_sensor_repeatedly_and_average(
+            api, mount, SensorType.pressure, 10, _sensor_id
+        )
 
+async def _read_pipette_sensor_repeatedly_and_average(
+    api: OT3API,
+    mount: OT3Mount,
+    sensor_type: SensorType,
+    num_readings: int,
+    sensor_id: SensorId,
+) -> float:
+    # FIXME: this while loop is required b/c the command does not always
+    #        return a value, not sure what's the source of this issue
+    readings: List[float] = []
+    sequential_failures = 0
+    while len(readings) < num_readings:
+        try:
+            if sensor_type == SensorType.capacitive:
+                r = await helpers_ot3.get_capacitance_ot3(api, mount, sensor_id)
+            elif sensor_type == SensorType.pressure:
+                r = await helpers_ot3.get_pressure_ot3(api, mount, sensor_id)
+            elif sensor_type == SensorType.temperature:
+                res = await helpers_ot3.get_temperature_humidity_ot3(
+                    api, mount, sensor_id
+                )
+                r = res[0]
+            elif sensor_type == SensorType.humidity:
+                res = await helpers_ot3.get_temperature_humidity_ot3(
+                    api, mount, sensor_id
+                )
+                r = res[1]
+            else:
+                raise ValueError(f"unexpected sensor type: {sensor_type}")
+
+            # print(f"{sensor_type} {sensor_id} sensor response {r}")
+            LOG_GING.info(f"{sensor_type} {sensor_id} sensor response {r}")
+        except helpers_ot3.SensorResponseBad:
+            sequential_failures += 1
+            if sequential_failures == 3:
+                sensor_type_dic = {
+                    1: "capacitive(电容)",
+                    3: "pressure(气压)",
+                    6: "temperature(温度)",
+                    5: "humidity(湿度)",
+                }
+                printerr = f"07-01 {sensor_type_dic[int(sensor_type)]} 故障: 传感器{sensor_type_dic[int(sensor_type)]} 通道ID {sensor_id} 读取数据失败)"
+                ui.print_fail(printerr)
+                FINAL_TEST_FAIL_INFOR.append(printerr)
+                return -999999999999.0
+
+            r = 0.0
+            continue
+
+        readings.append(r)
+    readings.sort()
+    readings = readings[1:-1]
+    return sum(readings) / len(readings)
 
 async def _read_pressure_and_check_results(
     api: OT3API,
