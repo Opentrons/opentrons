@@ -8,6 +8,28 @@ By installing and using Opentrons software, you agree to the Opentrons End-User 
 
 ---
 
+## Opentrons App Changes in 8.7.0
+
+Welcome to the v8.7.0 release of the Opentrons App! This release adds support for Opentrons Tough Universal Lids, improves error recovery on the Opentrons App on Flex touchscreen, and addresses several bugs.
+
+### New Features
+
+Use Opentrons Tough Universal Lids on compatible well plates and reservoirs.
+
+### Improvements
+
+- Recover from Flex Stacker errors to resume your protocol:
+  - when a Stacker module is empty during a `store()` command.
+  - when a Stacker module stalls during a `store()` or `retrieve()` command.
+
+### Bug Fixes
+
+- Liquid colors now match across deck views on the Opentrons App and Flex touchscreen.
+- Protocol run previews now includes complete Flex 96-channel pipette movements.
+- The API raises an error when the Flex Gripper fails to pick up a lid.
+- Deck views in error recovery inlude labware loaded in a Flex Stacker.
+- Quick transfers no longer crash when adding an air gap or blow out after dispensing.
+
 ## Opentrons App Changes in 8.6.0
 
 Welcome to the v8.6.0 release of the Opentrons App! This release adds support for the Flex Stacker Module, as well as other improvements.

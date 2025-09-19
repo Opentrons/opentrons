@@ -8,6 +8,23 @@ By installing and using Opentrons software, you agree to the Opentrons End-User 
 
 ---
 
+## Opentrons Robot Software Changes in 8.7.0
+
+Welcome to the v8.7.0 release of the Opentrons robot software! This release adds improvements, and bug fixes. 
+
+### New Features
+
+Use Opentrons Tough Universal Lids on compatible well plates and reservoirs. 
+
+### Improvements
+
+- Transfer aqueous, viscous, or volatile liquids with the Opentrons Flex 96-Channel Pipette (1–200 μL) to apply optimized, liquid class transfer behavior to volumes as low as 1 µL. 
+
+### Bug Fixes
+
+- Default pipette flow rates are correctly applied in liquid transfers. 
+- The API no longer raises an error when partial tip pickup occurs in a slot adjacent to a loaded Flex Stacker Module. 
+
 ## Opentrons Robot Software Changes in 8.6.0
 
 Welcome to the v8.6.0 release of the Opentrons robot software! This release adds support for the Flex Stacker Module, along with other new features and improvements.
