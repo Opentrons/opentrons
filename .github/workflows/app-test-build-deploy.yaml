@@ -255,6 +255,7 @@ jobs:
           OT_BUILD_TARGET: ${{ matrix.target }}
           OT_SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           OT_SENTRY_DSN: ${{ matrix.target == 'desktop' && secrets.OT_DESKTOP_SENTRY_DSN || secrets.OT_ODD_SENTRY_DSN }}
+          echo "TEST_ENV: ${{ secrets.OT_ODD_SENTRY_DSN }}"
         run: |
           make -C app dist
 
