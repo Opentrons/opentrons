@@ -1,32 +1,37 @@
-import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { mockThermocycler } from '../../../redux/modules/__fixtures__'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
+import { mockThermocycler } from '/app/redux/modules/__fixtures__'
+
 import { ThermocyclerModuleSlideout } from '../ThermocyclerModuleSlideout'
 
-vi.mock('@opentrons/react-api-client')
+import type { ComponentProps } from 'react'
 
-const render = (
-  props: React.ComponentProps<typeof ThermocyclerModuleSlideout>
-) => {
+vi.mock('@opentrons/react-api-client')
+vi.mock('/app/redux-resources/analytics')
+
+const render = (props: ComponentProps<typeof ThermocyclerModuleSlideout>) => {
   return renderWithProviders(<ThermocyclerModuleSlideout {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
 describe('ThermocyclerModuleSlideout', () => {
-  let props: React.ComponentProps<typeof ThermocyclerModuleSlideout>
+  let props: ComponentProps<typeof ThermocyclerModuleSlideout>
   let mockCreateLiveCommand = vi.fn()
   beforeEach(() => {
     mockCreateLiveCommand = vi.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
     vi.mocked(useCreateLiveCommandMutation).mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
+    } as any)
+    vi.mocked(useModuleCommandAnalytics).mockReturnValue({
+      reportModuleCommand: vi.fn(),
     } as any)
   })
   afterEach(() => {

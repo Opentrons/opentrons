@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { NavLink } from './NavLink'
 import styles from './styles.module.css'
 

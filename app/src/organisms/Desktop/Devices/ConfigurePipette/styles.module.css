@@ -1,0 +1,75 @@
+@import '@opentrons/components/styles';
+
+.warning_title {
+  margin-bottom: 0.5rem;
+  color: var(--c-font-dark); /* from legacy --font-body-2-dark */
+  font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
+  font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
+  text-transform: uppercase;
+}
+
+.warning_text {
+  margin-bottom: 0.75rem;
+  color: var(--c-font-dark); /* from legacy --font-body-1-dark */
+  font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
+  font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
+}
+
+.form_column {
+  display: inline-block;
+  width: 50%;
+  padding: 1rem 1rem 1rem 0;
+  vertical-align: top;
+}
+
+.form_group {
+  margin-bottom: 1.5rem;
+}
+
+.form_row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0.5rem 0;
+}
+
+.form_label,
+.form_input {
+  flex: 1 1 50%;
+}
+
+.form_label {
+  color: var(--c-font-dark); /* from legacy --font-body-1-dark */
+  font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
+  font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
+}
+
+.form_button {
+  min-width: 7rem;
+
+  &:first-child {
+    min-width: 8rem;
+    float: left;
+  }
+}
+
+.reset_message {
+  margin-bottom: 1rem;
+  color: var(--c-font-dark); /* from legacy --font-body-1-dark */
+  font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
+  font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
+  text-align: left;
+}
+
+.config_submit_error {
+  margin-bottom: 0.5rem;
+  color: var(--c-warning-dark);
+  font-size: var(--fs-body-1);
+  font-style: italic;
+}
+
+.group_error {
+  color: var(--c-warning-dark);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+}

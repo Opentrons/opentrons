@@ -1,5 +1,6 @@
 from __future__ import annotations
 import enum
+import re
 from itertools import groupby
 from dataclasses import dataclass
 from typing import List, Optional, Tuple
@@ -27,6 +28,26 @@ FLEX_B2_USB_PORT_GROUP_RIGHT = 3
 FLEX_B2_USB_PORT_GROUP_FRONT = 7
 FLEX_B2_USB_PORTS = {"4": 1, "3": 2, "2": 3, "1": 4}
 
+BUS_PATH = "/sys/bus/usb/devices/usb1/"
+
+# Example usb path might look like:
+# '/sys/bus/usb/devices/usb1/1-1/1-1.3/1-1.3:1.0/tty/ttyACM1/dev'.
+# Example hid device path might look like:
+# '/sys/bus/usb/devices/usb1/1-1/1-1.3/1-1.3:1.0/0003:16D0:1199.0002/hidraw/hidraw0/dev'
+# There is only 1 bus that supports USB on the raspberry pi.
+USB_PORT_INFO = re.compile(
+    r"""
+    (?P<port_path>(\d[\d]*-\d[\d\.]*[/]?)+):
+    (?P<device_path>
+        \d.\d/
+        (tty/tty(\w{4})/dev | [\w:\.]+?/hidraw/hidraw\d/dev)
+    )
+    """,
+    re.VERBOSE,
+)
+
+HUB_PATTERN = re.compile(r"(\d-[\d.]+\d?)[\/:]")
+
 
 @dataclass(frozen=True)
 class USBPort:
@@ -38,7 +59,9 @@ class USBPort:
     device_path: str = ""
 
     @classmethod
-    def build(cls, port_path: str, board_revision: BoardRevision) -> "USBPort":
+    def build(
+        cls, full_path: str, board_revision: BoardRevision
+    ) -> Optional["USBPort"]:
         """
         Build a USBPort dataclass.
 
@@ -52,8 +75,13 @@ class USBPort:
         Returns:
             Tuple of the port number, port group, hub, hub port, device path, and name
         """
-        full_name, device_path = port_path.split(":")
-        port_nodes = cls.get_unique_nodes(full_name)
+        match = USB_PORT_INFO.search(full_path)
+        if not match:
+            return None
+
+        port_path = match.group("port_path")
+        device_path = match.group("device_path")
+        port_nodes = cls.get_unique_nodes(port_path)
         hub, port, hub_port, name = cls.find_hub(port_nodes, board_revision)
         hub, port_group, port, hub_port = cls.map_to_revision(
             board_revision,
@@ -91,43 +119,52 @@ class USBPort:
         :param port_nodes: A list of unique port id(s)
         :returns: Tuple of the hub, port number, hub_port and name
         """
-        if len(port_nodes) > 2:
-            port_info = port_nodes[2].split(".")
-            hub: Optional[int] = int(port_info[1])
-            port = int(port_info[2])
-            hub_port: Optional[int] = int(port_info[3])
-            name = port_nodes[2]
-        elif len(port_nodes) > 1:
-            if board_revision == BoardRevision.OG:
-                port_info = port_nodes[1].split(".")
-                hub = int(port_info[1])
-                port = int(port_info[1])
-                hub_port = int(port_info[2])
-                name = port_nodes[1]
-            else:
-                port_info = port_nodes[1].split(".")
-                hub = int(port_info[1])
-                name = port_nodes[1]
-                if (board_revision == BoardRevision.FLEX_B2) and (
-                    hub == FLEX_B2_USB_PORT_GROUP_FRONT
-                ):
-                    port = 9
-                    hub_port = int(port_info[2])
-                else:
-                    port = int(port_info[2])
-                    hub_port = None
+        if len(port_nodes) == 1 and "." not in port_nodes[0]:
+            # if no hub is attached, such as on a dev kit, the port
+            # nodes available will be 1-1
+            port = int(port_nodes[0].split("-")[1])
+            hub = None
+            hub_port = None
+            name = port_nodes[0]
         else:
-            if board_revision == BoardRevision.FLEX_B2:
-                port_info = port_nodes[0].split(".")
+            port_nodes = [node for node in port_nodes if "." in node]
+            if len(port_nodes) > 2:
+                port_info = port_nodes[2].split(".")
                 hub = int(port_info[1])
-                port = 9
-                hub_port = None
-                name = port_nodes[0]
+                port = int(port_info[2])
+                hub_port = int(port_info[3])
+                name = port_nodes[2]
+            elif len(port_nodes) > 1:
+                if board_revision == BoardRevision.OG:
+                    port_info = port_nodes[1].split(".")
+                    hub = int(port_info[1])
+                    port = int(port_info[1])
+                    hub_port = int(port_info[2])
+                    name = port_nodes[1]
+                else:
+                    port_info = port_nodes[1].split(".")
+                    hub = int(port_info[1])
+                    name = port_nodes[1]
+                    if (board_revision == BoardRevision.FLEX_B2) and (
+                        hub == FLEX_B2_USB_PORT_GROUP_FRONT
+                    ):
+                        port = 9
+                        hub_port = int(port_info[2])
+                    else:
+                        port = int(port_info[2])
+                        hub_port = None
             else:
-                port = int(port_nodes[0].split(".")[1])
-                hub = None
-                hub_port = None
-                name = port_nodes[0]
+                if board_revision == BoardRevision.FLEX_B2:
+                    port_info = port_nodes[0].split(".")
+                    hub = int(port_info[1])
+                    port = 9
+                    hub_port = None
+                    name = port_nodes[0]
+                else:
+                    port = int(port_nodes[0].split(".")[1])
+                    hub = None
+                    hub_port = None
+                    name = port_nodes[0]
         return hub, port, hub_port, name
 
     @staticmethod
@@ -161,11 +198,12 @@ class USBPort:
         :param full_name: Full path of the physical USB Path
         :returns: List of separated USB port paths
         """
-        port_nodes = []
-        for node in full_name.split("/"):
-            if node not in port_nodes:
-                port_nodes.append(node)
-        return port_nodes
+        all_match = HUB_PATTERN.findall(full_name)
+        match_set = []
+        for match in all_match:
+            if match not in match_set:
+                match_set.append(match)
+        return match_set
 
     @staticmethod
     def map_to_revision(

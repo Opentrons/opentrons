@@ -1,17 +1,17 @@
 import omit from 'lodash/omit'
 import range from 'lodash/range'
-import { describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import { createRegularLabware } from '..'
 import fixture_regular_example_1 from '../../../labware/fixtures/2/fixture_regular_example_1.json'
 import fixture_regular_example_2 from '../../../labware/fixtures/2/fixture_regular_example_2.json'
 
+import type { RegularLabwareProps } from '..'
 import type {
   LabwareDefinition2,
-  LabwareWellProperties,
   LabwareOffset,
+  LabwareWellProperties,
 } from '../../types'
-
-import type { RegularLabwareProps } from '..'
 
 // NOTE: loadName needs to be replaced here b/c fixture has a non-default loadName
 const exampleLabware1 = {

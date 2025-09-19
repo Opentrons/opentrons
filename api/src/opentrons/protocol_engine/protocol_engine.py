@@ -1,37 +1,38 @@
 """ProtocolEngine class definition."""
+
 from contextlib import AsyncExitStack
 from logging import getLogger
-from typing import Dict, Optional, Union
-from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
-from opentrons.protocol_engine.error_recovery_policy import (
-    ErrorRecoveryPolicy,
-    ErrorRecoveryType,
-    error_recovery_by_ff,
-)
+from typing import Dict, Optional, Union, AsyncGenerator, Callable
 
-from opentrons.protocols.models import LabwareDefinition
-from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
-from opentrons.hardware_control.types import PauseType as HardwarePauseType
 from opentrons_shared_data.errors import (
     ErrorCodes,
     EnumeratedError,
 )
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from .errors import ProtocolCommandFailedError, ErrorOccurrence
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
+from opentrons.hardware_control.types import PauseType as HardwarePauseType
+
+from .actions.actions import (
+    ResumeFromRecoveryAction,
+    SetErrorRecoveryPolicyAction,
+)
+from .errors import ProtocolCommandFailedError, ErrorOccurrence, CommandNotAllowedError
 from .errors.exceptions import EStopActivatedError
-from . import commands, slot_standardization
-from .resources import ModelUtils, ModuleDataProvider
+from .error_recovery_policy import ErrorRecoveryPolicy
+from . import commands, slot_standardization, labware_offset_standardization
+from .resources import ModelUtils, ModuleDataProvider, FileProvider
 from .types import (
     LabwareOffset,
     LabwareOffsetCreate,
+    LegacyLabwareOffsetCreate,
     LabwareUri,
     ModuleModel,
     Liquid,
     HexColor,
     PostRunHardwareState,
     DeckConfigurationType,
-    AddressableAreaLocation,
 )
 from .execution import (
     QueueWorker,
@@ -39,7 +40,8 @@ from .execution import (
     DoorWatcher,
     HardwareStopper,
 )
-from .state import StateStore, StateView
+from .state.state import StateStore, StateView
+from .state.update_types import StateUpdate
 from .plugins import AbstractPlugin, PluginStarter
 from .actions import (
     ActionDispatcher,
@@ -53,12 +55,11 @@ from .actions import (
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
     AddLiquidAction,
+    SetDeckConfigurationAction,
     AddAddressableAreaAction,
     AddModuleAction,
     HardwareStoppedAction,
-    ResetTipsAction,
     SetPipetteMovementSpeedAction,
-    FailCommandAction,
 )
 
 
@@ -88,51 +89,34 @@ class ProtocolEngine:
         self,
         hardware_api: HardwareControlAPI,
         state_store: StateStore,
-        action_dispatcher: Optional[ActionDispatcher] = None,
-        plugin_starter: Optional[PluginStarter] = None,
+        action_dispatcher: ActionDispatcher,
+        plugin_starter: PluginStarter,
+        model_utils: ModelUtils,
+        hardware_stopper: HardwareStopper,
+        door_watcher: DoorWatcher,
+        module_data_provider: ModuleDataProvider,
+        file_provider: FileProvider,
         queue_worker: Optional[QueueWorker] = None,
-        model_utils: Optional[ModelUtils] = None,
-        hardware_stopper: Optional[HardwareStopper] = None,
-        door_watcher: Optional[DoorWatcher] = None,
-        module_data_provider: Optional[ModuleDataProvider] = None,
-        error_recovery_policy: ErrorRecoveryPolicy = error_recovery_by_ff,
     ) -> None:
         """Initialize a ProtocolEngine instance.
 
         Must be called while an event loop is active.
 
-        This constructor does not inject provider implementations.
+        This constructor is only for `ProtocolEngine` unit tests.
         Prefer the `create_protocol_engine()` factory function.
         """
         self._hardware_api = hardware_api
+        self._file_provider = file_provider
         self._state_store = state_store
-        self._model_utils = model_utils or ModelUtils()
-
-        self._action_dispatcher = action_dispatcher or ActionDispatcher(
-            sink=self._state_store
-        )
-        self._plugin_starter = plugin_starter or PluginStarter(
-            state=self._state_store,
-            action_dispatcher=self._action_dispatcher,
-        )
-        self._queue_worker = queue_worker or create_queue_worker(
-            hardware_api=hardware_api,
-            state_store=self._state_store,
-            action_dispatcher=self._action_dispatcher,
-            error_recovery_policy=error_recovery_policy,
-        )
-        self._hardware_stopper = hardware_stopper or HardwareStopper(
-            hardware_api=hardware_api,
-            state_store=state_store,
-        )
-        self._door_watcher = door_watcher or DoorWatcher(
-            state_store=state_store,
-            hardware_api=hardware_api,
-            action_dispatcher=self._action_dispatcher,
-        )
-        self._module_data_provider = module_data_provider or ModuleDataProvider()
-
-        self._queue_worker.start()
+        self._model_utils = model_utils
+        self._action_dispatcher = action_dispatcher
+        self._plugin_starter = plugin_starter
+        self._hardware_stopper = hardware_stopper
+        self._door_watcher = door_watcher
+        self._module_data_provider = module_data_provider
+        self._queue_worker = queue_worker
+        if self._queue_worker:
+            self._queue_worker.start()
         self._door_watcher.start()
 
     @property
@@ -140,17 +124,37 @@ class ProtocolEngine:
         """Get an interface to retrieve calculated state values."""
         return self._state_store
 
+    @property
+    def _get_queue_worker(self) -> QueueWorker:
+        """Get the queue worker instance."""
+        assert self._queue_worker is not None
+        return self._queue_worker
+
     def add_plugin(self, plugin: AbstractPlugin) -> None:
         """Add a plugin to the engine to customize behavior."""
         self._plugin_starter.start(plugin)
 
-    def play(self, deck_configuration: Optional[DeckConfigurationType] = None) -> None:
+    def set_deck_configuration(
+        self, deck_configuration: Optional[DeckConfigurationType]
+    ) -> None:
+        """Inform the engine of the robot's current deck configuration.
+
+        If `Config.use_simulated_deck_config` is `True`, this is meaningless and unused.
+        You can call this with `None` if you want to be explicit--it will no-op.
+
+        If `Config.use_simulated_deck_config` is `False`, you should call this with the
+        robot's actual, full, non-`None` deck configuration, before you play the run for
+        the first time. Do not call this in the middle of a run.
+        """
+        self._action_dispatcher.dispatch(SetDeckConfigurationAction(deck_configuration))
+
+    def play(self) -> None:
         """Start or resume executing commands in the queue."""
         requested_at = self._model_utils.get_timestamp()
         # TODO(mc, 2021-08-05): if starting, ensure plungers motors are
         # homed if necessary
         action = self._state_store.commands.validate_action_allowed(
-            PlayAction(requested_at=requested_at, deck_configuration=deck_configuration)
+            PlayAction(requested_at=requested_at)
         )
         self._action_dispatcher.dispatch(action)
 
@@ -159,22 +163,52 @@ class ProtocolEngine:
         else:
             self._hardware_api.resume(HardwarePauseType.PAUSE)
 
-    def pause(self) -> None:
-        """Pause executing commands in the queue."""
+    def request_pause(self) -> None:
+        """Make command execution pause soon.
+
+        This will try to pause in the middle of the ongoing command, if there is one.
+        Otherwise, whenever the next command begins, the pause will happen then.
+        """
         action = self._state_store.commands.validate_action_allowed(
             PauseAction(source=PauseSource.CLIENT)
         )
         self._action_dispatcher.dispatch(action)
         self._hardware_api.pause(HardwarePauseType.PAUSE)
 
-    def resume_from_recovery(self) -> None:
-        """Resume normal protocol execution after the engine was `AWAITING_RECOVERY`."""
+    def resume_from_recovery(self, reconcile_false_positive: bool) -> None:
+        """Resume normal protocol execution after the engine was `AWAITING_RECOVERY`.
+
+        If `reconcile_false_positive` is `False`, the engine will continue naively from
+        whatever state the error left it in. (Each defined error individually documents
+        exactly how it affects state.) This is appropriate for client-driven error
+        recovery, where the client wants predictable behavior from the engine.
+
+        If `reconcile_false_positive` is `True`, the engine may apply additional fixups
+        to its state to try to get the rest of the run to just work, assuming the error
+        was a false-positive.
+
+        For example, a `tipPhysicallyMissing` error from a `pickUpTip` would normally
+        leave the engine state without a tip on the pipette. If `reconcile_false_positive=True`,
+        the engine will set the pipette to have that missing tip before continuing, so
+        subsequent path planning, aspirates, dispenses, etc. will work as if nothing
+        went wrong.
+        """
+        if reconcile_false_positive:
+            state_update = (
+                self._state_store.commands.get_state_update_for_false_positive()
+            )
+        else:
+            state_update = StateUpdate()  # Empty/no-op.
+
         action = self._state_store.commands.validate_action_allowed(
-            ResumeFromRecoveryAction()
+            ResumeFromRecoveryAction(state_update)
         )
+
         self._action_dispatcher.dispatch(action)
 
-    def add_command(self, request: commands.CommandCreate) -> commands.Command:
+    def add_command(
+        self, request: commands.CommandCreate, failed_command_id: Optional[str] = None
+    ) -> commands.Command:
         """Add a command to the `ProtocolEngine`'s queue.
 
         Arguments:
@@ -189,16 +223,29 @@ class ProtocolEngine:
                 but the engine was not idle or paused.
             RunStoppedError: the run has been stopped, so no new commands
                 may be added.
+            CommandNotAllowedError: the request specified a failed command id
+                with a non fixit command.
         """
         request = slot_standardization.standardize_command(
             request, self.state_view.config.robot_type
         )
 
+        if failed_command_id and request.intent != commands.CommandIntent.FIXIT:
+            raise CommandNotAllowedError(
+                "failed command id should be supplied with a FIXIT command."
+            )
+
         command_id = self._model_utils.generate_id()
-        request_hash = commands.hash_command_params(
-            create=request,
-            last_hash=self._state_store.commands.get_latest_command_hash(),
-        )
+        if request.intent in (
+            commands.CommandIntent.SETUP,
+            commands.CommandIntent.FIXIT,
+        ):
+            request_hash = None
+        else:
+            request_hash = commands.hash_protocol_command_params(
+                create=request,
+                last_hash=self._state_store.commands.get_latest_protocol_command_hash(),
+            )
 
         action = self.state_view.commands.validate_action_allowed(
             QueueCommandAction(
@@ -206,6 +253,7 @@ class ProtocolEngine:
                 request_hash=request_hash,
                 command_id=command_id,
                 created_at=self._model_utils.get_timestamp(),
+                failed_command_id=failed_command_id,
             )
         )
         self._action_dispatcher.dispatch(action)
@@ -234,7 +282,10 @@ class ProtocolEngine:
                 the command in state.
 
         Returns:
-            The command. If the command completed, it will be succeeded or failed.
+            The command.
+
+            If the command completed, it will be succeeded or failed.
+
             If the engine was stopped before it reached the command,
             the command will be queued.
         """
@@ -242,76 +293,113 @@ class ProtocolEngine:
         await self.wait_for_command(command.id)
         return self._state_store.commands.get(command.id)
 
-    def estop(self, maintenance_run: bool) -> None:
-        """Signal to the engine that an estop event occurred.
+    async def add_and_execute_command_wait_for_recovery(
+        self, request: commands.CommandCreate
+    ) -> commands.Command:
+        """Like `add_and_execute_command()`, except wait for error recovery.
 
-        If there are any queued commands for the engine, they will be marked
-        as failed due to the estop event. If there aren't any queued commands
-        *and* this is a maintenance run (which has commands queued one-by-one),
-        a series of actions will mark the engine as Stopped. In either case the
-        queue worker will be deactivated; the primary difference is that the former
-        case will expect the protocol runner to `finish()` the engine, whereas the
-        maintenance run will be put into a state wherein the engine can be discarded.
+        Unlike `add_and_execute_command()`, if the command fails, this will not
+        immediately return the failed command. Instead, if the error is recoverable,
+        it will wait until error recovery has completed (e.g. when some other task
+        calls `self.resume_from_recovery()`).
+
+        Returns:
+            The command.
+
+            If the command completed, it will be succeeded or failed. If it failed
+            and then its failure was recovered from, it will still be failed.
+
+            If the engine was stopped before it reached the command,
+            the command will be queued.
         """
-        if self._state_store.commands.get_is_stopped():
-            return
-        current_id = (
-            self._state_store.commands.get_running_command_id()
-            or self._state_store.commands.state.queued_command_ids.head(None)
+        queued_command = self.add_command(request)
+        await self.wait_for_command(command_id=queued_command.id)
+        completed_command = self._state_store.commands.get(queued_command.id)
+        await self._state_store.wait_for_not(
+            self.state_view.commands.get_recovery_in_progress_for_command,
+            queued_command.id,
         )
+        return completed_command
 
-        if current_id is not None:
-            fail_action = FailCommandAction(
-                command_id=current_id,
-                error_id=self._model_utils.generate_id(),
-                failed_at=self._model_utils.get_timestamp(),
-                error=EStopActivatedError(message="Estop Activated"),
-                type=ErrorRecoveryType.FAIL_RUN,
+    def _stop_from_asynchronous_error(self) -> None:
+        try:
+            action = self._state_store.commands.validate_action_allowed(
+                StopAction(from_asynchronous_error=True)
             )
-            self._action_dispatcher.dispatch(fail_action)
-
-            # In the case where the running command was a setup command - check if there
-            # are any pending *run* commands and, if so, clear them all
-            current_id = self._state_store.commands.state.queued_command_ids.head(None)
-            if current_id is not None:
-                fail_action = FailCommandAction(
-                    command_id=current_id,
-                    error_id=self._model_utils.generate_id(),
-                    failed_at=self._model_utils.get_timestamp(),
-                    error=EStopActivatedError(message="Estop Activated"),
-                    type=ErrorRecoveryType.FAIL_RUN,
-                )
-                self._action_dispatcher.dispatch(fail_action)
-            self._queue_worker.cancel()
-        elif maintenance_run:
-            stop_action = self._state_store.commands.validate_action_allowed(
-                StopAction(from_estop=True)
+        except Exception:  # todo(mm, 2024-04-16): Catch a more specific type.
+            # This is likely called from some hardware API callback that doesn't care
+            # about ProtocolEngine lifecycle or what methods are valid to call at what
+            # times. So it makes more sense for us to no-op here than to propagate this
+            # as an error.
+            _log.info(
+                "ProtocolEngine cannot handle E-stop event right now. Ignoring it.",
+                exc_info=True,
             )
-            self._action_dispatcher.dispatch(stop_action)
-            hardware_stop_action = HardwareStoppedAction(
-                completed_at=self._model_utils.get_timestamp(),
-                finish_error_details=FinishErrorDetails(
-                    error=EStopActivatedError(message="Estop Activated"),
-                    error_id=self._model_utils.generate_id(),
-                    created_at=self._model_utils.get_timestamp(),
-                ),
-            )
-            self._action_dispatcher.dispatch(hardware_stop_action)
-            self._queue_worker.cancel()
-        else:
-            _log.info("estop pressed before protocol was started, taking no action.")
-
-    async def stop(self) -> None:
-        """Stop execution immediately, halting all motion and cancelling future commands.
-
-        After an engine has been `stop`'ed, it cannot be restarted.
-
-        After a `stop`, you must still call `finish` to give the engine a chance
-        to clean up resources and propagate errors.
-        """
-        action = self._state_store.commands.validate_action_allowed(StopAction())
+            return
         self._action_dispatcher.dispatch(action)
-        self._queue_worker.cancel()
+        # self._queue_worker.cancel() will try to interrupt any ongoing command.
+        # Unfortunately, if it's a hardware command, this interruption will race
+        # against the E-stop exception propagating up from lower layers. But we need to
+        # do this because we want to make sure non-hardware commands, like
+        # `waitForDuration`, are also interrupted.
+        self._get_queue_worker.cancel()
+
+    def estop(self) -> None:
+        """Signal to the engine that an E-stop event occurred.
+
+        If an estop happens while the robot is moving, lower layers physically stop
+        motion and raise the event as an exception, which fails the Protocol Engine
+        command. No action from the `ProtocolEngine` caller is needed to handle that.
+
+        However, if an estop happens in between commands, or in the middle of
+        a command like `comment` or `waitForDuration` that doesn't access the hardware,
+        `ProtocolEngine` needs to be told about it so it can interrupt the command
+        and stop executing any more. This method is how to do that.
+
+        This acts roughly like `request_stop()`. After calling this, you should call
+        `finish()` with an EStopActivatedError.
+        """
+        # Unlike self.request_stop(), we don't need to do
+        # self._hardware_api.cancel_execution_and_running_tasks(). Since this was an
+        # E-stop event, the hardware API already knows.
+        self._stop_from_asynchronous_error()
+
+    async def async_module_error(
+        self, module_model: ModuleModel, serial: str | None
+    ) -> bool:
+        """Signal to the engine that an asynchronous module error occured.
+
+        The return value of this function signals whether the error is relevant to the protocol
+        or not. If the function returns True, the error is relevant. The engine will stop, and
+        the caller should call `finish()` with the error object that signaled the error. If
+        the function returns False, the error is not relevant. The engine will not stop, and the
+        caller should not call `finish()`.
+
+        Asynchronous module errors are signaled when a module enters a hardware error state
+        - for instance, a thermocycler's thermistors fail because of condensation, or a
+        heater-shaker's wires fray and snap, or a module is accidentally disconnected. These
+        errors are not related to a particular command, even a currently-happening module
+        control command for the module in the error state.
+
+        Similar to an estop error, the error can occur at any time relative to the lifecycle
+        of the engine run or of any particular command.
+
+        Unlike an estop, the motion control hardware will not be raising an error and will not
+        stop on its own; the stop action derived from this call will do that.
+        """
+        if not self._state_store.modules.get_has_module_probably_matching_hardware_details(
+            module_model, serial
+        ):
+            return False
+        self._stop_from_asynchronous_error()
+        # like self.request_stop, and unlike self.estop(), we must explicitly request that the
+        # hardware stops execution, since not all asynchronous errors will cause the hardware
+        # to know that it should stop.
+        await self._do_hardware_stop()
+        return True
+
+    async def _do_hardware_stop(self) -> None:
+        """Make the hardware stop now."""
         if self._hardware_api.is_movement_execution_taskified():
             # We 'taskify' hardware controller movement functions when running protocols
             # that are not backed by the engine. Such runs cannot be stopped by cancelling
@@ -321,6 +409,24 @@ class ProtocolEngine:
             # run function execution, just like `_queue_worker.cancel()` does for
             # engine-backed runs.
             await self._hardware_api.cancel_execution_and_running_tasks()
+
+    async def request_stop(self) -> None:
+        """Make command execution stop soon.
+
+        This will try to interrupt the ongoing command, if there is one. Future commands
+        are canceled. However, by the time this method returns, things may not have
+        settled by the time this method returns; the last command may still be
+        running.
+
+        After a stop has been requested, the engine cannot be restarted.
+
+        After a stop request, you must still call `finish` to give the engine a chance
+        to clean up resources and propagate errors.
+        """
+        action = self._state_store.commands.validate_action_allowed(StopAction())
+        self._action_dispatcher.dispatch(action)
+        self._get_queue_worker.cancel()
+        await self._do_hardware_stop()
 
     async def wait_until_complete(self) -> None:
         """Wait until there are no more commands to execute.
@@ -339,14 +445,20 @@ class ProtocolEngine:
         set_run_status: bool = True,
         post_run_hardware_state: PostRunHardwareState = PostRunHardwareState.HOME_AND_STAY_ENGAGED,
     ) -> None:
-        """Gracefully finish using the ProtocolEngine, waiting for it to become idle.
+        """Finish using the `ProtocolEngine`.
 
-        The engine will finish executing its current command (if any),
-        and then shut down. After an engine has been `finished`'ed, it cannot
-        be restarted.
+        This does a few things:
+
+        1. It may do post-run actions like homing and dropping tips. This depends on the
+           arguments passed as well as heuristics based on the history of the engine.
+        2. It waits for the engine to be done controlling the robot's hardware.
+        3. It releases internal resources, like background tasks.
+
+        It's safe to call `finish()` multiple times. After you call `finish()`,
+        the engine can't be restarted.
 
         This method should not raise. If any exceptions happened during execution that were not
-        properly caught by the CommandExecutor, or if any exceptions happen during this
+        properly caught by `ProtocolEngine` internals, or if any exceptions happen during this
         `finish()` call, they should be saved as `.state_view.get_summary().errors`.
 
         Arguments:
@@ -357,15 +469,14 @@ class ProtocolEngine:
             post_run_hardware_state: The state in which to leave the gantry and motors in
                 after the run is over.
         """
-        if self._state_store.commands.state.stopped_by_estop:
+        if self._state_store.commands.get_is_stopped_by_async_error():
             # This handles the case where the E-stop was pressed while we were *not* in the middle
             # of some hardware interaction that would raise it as an exception. For example, imagine
-            # we were paused between two commands, or imagine we were executing a very long run of
-            # comment commands.
+            # we were paused between two commands, or imagine we were executing a waitForDuration.
             drop_tips_after_run = False
             post_run_hardware_state = PostRunHardwareState.DISENGAGE_IN_PLACE
             if error is None:
-                error = EStopActivatedError(message="Estop was activated during a run")
+                error = EStopActivatedError()
 
         if error:
             # If the run had an error, check if that error indicates an E-stop.
@@ -379,9 +490,9 @@ class ProtocolEngine:
             # We don't use self._hardware_api.get_estop_state() because the E-stop may have been
             # released by the time we get here.
             if isinstance(error, EnumeratedError):
-                if self._code_in_error_tree(
+                if code_in_error_tree(
                     root_error=error, code=ErrorCodes.E_STOP_ACTIVATED
-                ) or self._code_in_error_tree(
+                ) or code_in_error_tree(
                     # Request from the hardware team for the v7.0 betas: to help in-house debugging
                     # of pipette overpressure events, leave the pipette where it was like we do
                     # for E-stops.
@@ -427,7 +538,7 @@ class ProtocolEngine:
             self._hardware_stopper.do_halt,
             disengage_before_stopping=disengage_before_stopping,
         )
-        exit_stack.push_async_callback(self._queue_worker.join)  # First step.
+        exit_stack.push_async_callback(self._get_queue_worker.join)  # First step.
         try:
             # If any teardown steps failed, this will raise something.
             await exit_stack.aclose()
@@ -448,15 +559,21 @@ class ProtocolEngine:
             )
         )
 
-    def add_labware_offset(self, request: LabwareOffsetCreate) -> LabwareOffset:
+    def add_labware_offset(
+        self, request: LabwareOffsetCreate | LegacyLabwareOffsetCreate
+    ) -> LabwareOffset:
         """Add a new labware offset and return it.
 
         The added offset will apply to subsequent `LoadLabwareCommand`s.
 
         To retrieve offsets later, see `.state_view.labware`.
         """
-        request = slot_standardization.standardize_labware_offset(
-            request, self.state_view.config.robot_type
+        internal_request = (
+            labware_offset_standardization.standardize_labware_offset_create(
+                request,
+                self.state_view.config.robot_type,
+                self.state_view.addressable_areas.deck_definition,
+            )
         )
 
         labware_offset_id = self._model_utils.generate_id()
@@ -465,7 +582,7 @@ class ProtocolEngine:
             AddLabwareOffsetAction(
                 labware_offset_id=labware_offset_id,
                 created_at=created_at,
-                request=request,
+                request=internal_request,
             )
         )
         return self.state_view.labware.get_labware_offset(
@@ -496,22 +613,18 @@ class ProtocolEngine:
             description=(description or ""),
             displayColor=color,
         )
+        validated_liquid = self._state_store.liquid.validate_liquid_allowed(
+            liquid=liquid
+        )
 
-        self._action_dispatcher.dispatch(AddLiquidAction(liquid=liquid))
-        return liquid
+        self._action_dispatcher.dispatch(AddLiquidAction(liquid=validated_liquid))
+        return validated_liquid
 
     def add_addressable_area(self, addressable_area_name: str) -> None:
         """Add an addressable area to state."""
-        area = AddressableAreaLocation(addressableAreaName=addressable_area_name)
         self._action_dispatcher.dispatch(
-            AddAddressableAreaAction(addressable_area=area)
+            AddAddressableAreaAction(addressable_area_name)
         )
-
-    def reset_tips(self, labware_id: str) -> None:
-        """Reset the tip state of a given labware."""
-        # TODO(mm, 2023-03-10): Safely raise an error if the given labware isn't a
-        # tip rack?
-        self._action_dispatcher.dispatch(ResetTipsAction(labware_id=labware_id))
 
     # TODO(mm, 2022-11-10): This is a method on ProtocolEngine instead of a command
     # as a quick hack to support Python protocols. We should consider making this a
@@ -548,36 +661,57 @@ class ProtocolEngine:
         for a in actions:
             self._action_dispatcher.dispatch(a)
 
-    # TODO(tz, 7-12-23): move this to shared data when we dont relay on ErrorOccurrence
-    @staticmethod
-    def _code_in_error_tree(
-        root_error: Union[EnumeratedError, ErrorOccurrence], code: ErrorCodes
-    ) -> bool:
-        if isinstance(root_error, ErrorOccurrence):
-            # ErrorOccurrence is not the same as the enumerated error exceptions. Check the
-            # code by a string value.
-            if root_error.errorCode == code.value.code:
-                return True
-            return any(
-                ProtocolEngine._code_in_error_tree(wrapped, code)
-                for wrapped in root_error.wrappedErrors
-            )
-
-        # From here we have an exception, can just check the code + recurse to wrapped errors.
-        if root_error.code == code:
-            return True
-
-        if (
-            isinstance(root_error, ProtocolCommandFailedError)
-            and root_error.original_error is not None
-        ):
-            # For this specific EnumeratedError child, we recurse on the original_error field
-            # in favor of the general error.wrapping field.
-            return ProtocolEngine._code_in_error_tree(root_error.original_error, code)
-
-        if len(root_error.wrapping) == 0:
-            return False
-        return any(
-            ProtocolEngine._code_in_error_tree(wrapped_error, code)
-            for wrapped_error in root_error.wrapping
+    def set_and_start_queue_worker(
+        self, command_generator: Callable[[], AsyncGenerator[str, None]]
+    ) -> None:
+        """Set QueueWorker and start it."""
+        assert self._queue_worker is None
+        self._queue_worker = create_queue_worker(
+            hardware_api=self._hardware_api,
+            file_provider=self._file_provider,
+            state_store=self._state_store,
+            action_dispatcher=self._action_dispatcher,
+            command_generator=command_generator,
         )
+        self._queue_worker.start()
+
+    def set_error_recovery_policy(self, policy: ErrorRecoveryPolicy) -> None:
+        """Replace the run's error recovery policy with a new one."""
+        self._action_dispatcher.dispatch(SetErrorRecoveryPolicyAction(policy))
+
+    def clear_command_history(self) -> None:
+        """Clear command history."""
+        self._state_store.clear_command_history()
+
+
+# TODO(tz, 7-12-23): move this to shared data when we dont relay on ErrorOccurrence
+def code_in_error_tree(
+    root_error: Union[EnumeratedError, ErrorOccurrence], code: ErrorCodes
+) -> bool:
+    """Check if the specified error code can be found in the given error tree."""
+    if isinstance(root_error, ErrorOccurrence):
+        # ErrorOccurrence is not the same as the enumerated error exceptions. Check the
+        # code by a string value.
+        if root_error.errorCode == code.value.code:
+            return True
+        return any(
+            code_in_error_tree(wrapped, code) for wrapped in root_error.wrappedErrors
+        )
+
+    # From here we have an exception, can just check the code + recurse to wrapped errors.
+    if root_error.code == code:
+        return True
+
+    if (
+        isinstance(root_error, ProtocolCommandFailedError)
+        and root_error.original_error is not None
+    ):
+        # For this specific EnumeratedError child, we recurse on the original_error field
+        # in favor of the general error.wrapping field.
+        return code_in_error_tree(root_error.original_error, code)
+
+    if len(root_error.wrapping) == 0:
+        return False
+    return any(
+        code_in_error_tree(wrapped_error, code) for wrapped_error in root_error.wrapping
+    )

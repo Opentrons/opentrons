@@ -1,38 +1,43 @@
-import * as React from 'react'
-import { Provider } from 'react-redux'
-import { when } from 'vitest-when'
-import { createStore } from 'redux'
 import { I18nextProvider } from 'react-i18next'
+import { Provider } from 'react-redux'
 import { act, renderHook } from '@testing-library/react'
+import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { heater_shaker_commands_with_results_key } from '@opentrons/shared-data'
 
-import { i18n } from '../../../i18n'
+import { i18n } from '/app/i18n'
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
+import { useIsRobotBusy } from '/app/redux-resources/robots'
 import {
   mockHeaterShaker,
   mockMagneticModuleGen2,
   mockTemperatureModuleGen2,
   mockThermocycler,
   mockThermocyclerGen2,
-} from '../../../redux/modules/__fixtures__'
-import { useIsRobotBusy, useRunStatuses } from '../../Devices/hooks'
-import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useCurrentRunId } from '../../ProtocolUpload/hooks'
+} from '/app/redux/modules/__fixtures__'
 import {
+  useCurrentRunId,
+  useMostRecentCompletedAnalysis,
+  useRunStatuses,
+} from '/app/resources/runs'
+
+import {
+  useIsHeaterShakerInProtocol,
   useLatchControls,
   useModuleOverflowMenu,
-  useIsHeaterShakerInProtocol,
 } from '../hooks'
 
 import type { Store } from 'redux'
-import type { State } from '../../../redux/types'
+import type { FunctionComponent, ReactNode } from 'react'
+import type { State } from '/app/redux/types'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
-vi.mock('../../ProtocolUpload/hooks')
-vi.mock('../../Devices/hooks')
+vi.mock('/app/resources/runs')
+vi.mock('/app/redux-resources/robots')
+vi.mock('/app/redux-resources/analytics')
 
 const mockCloseLatchHeaterShaker = {
   id: 'heatershaker_id',
@@ -160,8 +165,23 @@ const mockTCLidHeating = {
   usbPort: { hub: 1, port: 1, path: '/dev/ot_module_thermocycler0' },
 } as any
 
+const mockFlexStacker = {
+  id: 'flexstacker_id',
+  moduleModel: 'flexStackerModuleV1',
+  moduleType: 'flexStackerModuleType',
+  serialNumber: 'flex123',
+  hardwareRevision: 'flex_stacker_v1.0',
+  firmwareVersion: 'v1.0.0',
+  hasAvailableUpdate: false,
+  data: {
+    platformState: 'extended',
+    hopperDoorState: 'closed',
+  },
+  usbPort: { hub: 1, port: 3, path: '/dev/ot_module_flexstacker0' },
+} as any
+
 describe('useLatchControls', () => {
-  const store: Store<any> = createStore(vi.fn(), {})
+  const store: Store<any> = legacy_createStore(vi.fn(), {})
   let mockCreateLiveCommand = vi.fn()
 
   beforeEach(() => {
@@ -178,6 +198,9 @@ describe('useLatchControls', () => {
       createLiveCommand: mockCreateLiveCommand,
     } as any)
     vi.mocked(useIsRobotBusy).mockReturnValue(false)
+    vi.mocked(useModuleCommandAnalytics).mockReturnValue({
+      reportModuleCommand: vi.fn(),
+    } as any)
   })
 
   afterEach(() => {
@@ -185,7 +208,7 @@ describe('useLatchControls', () => {
   })
 
   it('should return latch is open and handle latch function and command to close latch', () => {
-    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+    const wrapper: FunctionComponent<{ children: ReactNode }> = ({
       children,
     }) => (
       <I18nextProvider i18n={i18n}>
@@ -209,7 +232,7 @@ describe('useLatchControls', () => {
     })
   })
   it('should return if latch is closed and handle latch function opens latch', () => {
-    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+    const wrapper: FunctionComponent<{ children: ReactNode }> = ({
       children,
     }) => (
       <I18nextProvider i18n={i18n}>
@@ -238,7 +261,7 @@ describe('useLatchControls', () => {
 })
 
 describe('useModuleOverflowMenu', () => {
-  const store: Store<any> = createStore(vi.fn(), {})
+  const store: Store<any> = legacy_createStore(vi.fn(), {})
   let mockCreateLiveCommand = vi.fn()
 
   beforeEach(() => {
@@ -254,13 +277,16 @@ describe('useModuleOverflowMenu', () => {
     vi.mocked(useCreateLiveCommandMutation).mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)
+    vi.mocked(useModuleCommandAnalytics).mockReturnValue({
+      reportModuleCommand: vi.fn(),
+    } as any)
   })
 
   afterEach(() => {
     vi.restoreAllMocks()
   })
   it('should return everything for menuItemsByModuleType and create deactive heater command', () => {
-    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+    const wrapper: FunctionComponent<{ children: ReactNode }> = ({
       children,
     }) => (
       <I18nextProvider i18n={i18n}>
@@ -301,7 +327,7 @@ describe('useModuleOverflowMenu', () => {
     const mockAboutClick = vi.fn()
     const mockTestShakeClick = vi.fn()
     const mockHandleWizard = vi.fn()
-    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+    const wrapper: FunctionComponent<{ children: ReactNode }> = ({
       children,
     }) => (
       <I18nextProvider i18n={i18n}>
@@ -333,7 +359,7 @@ describe('useModuleOverflowMenu', () => {
 
   it('should return only 1 menu button when module is a magnetic module and calls handleClick when module is disengaged', () => {
     const mockHandleClick = vi.fn()
-    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+    const wrapper: FunctionComponent<{ children: ReactNode }> = ({
       children,
     }) => (
       <I18nextProvider i18n={i18n}>
@@ -363,7 +389,7 @@ describe('useModuleOverflowMenu', () => {
   })
 
   it('should render magnetic module and create disengage command', () => {
-    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+    const wrapper: FunctionComponent<{ children: ReactNode }> = ({
       children,
     }) => (
       <I18nextProvider i18n={i18n}>
@@ -401,7 +427,7 @@ describe('useModuleOverflowMenu', () => {
 
   it('should render temperature module and call handleClick when module is idle', () => {
     const mockHandleClick = vi.fn()
-    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+    const wrapper: FunctionComponent<{ children: ReactNode }> = ({
       children,
     }) => (
       <I18nextProvider i18n={i18n}>
@@ -430,7 +456,7 @@ describe('useModuleOverflowMenu', () => {
   })
 
   it('should render temp module and create deactivate temp command', () => {
-    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+    const wrapper: FunctionComponent<{ children: ReactNode }> = ({
       children,
     }) => (
       <I18nextProvider i18n={i18n}>
@@ -467,7 +493,7 @@ describe('useModuleOverflowMenu', () => {
 
   it('should render TC module and call handleClick when module is idle', () => {
     const mockHandleClick = vi.fn()
-    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+    const wrapper: FunctionComponent<{ children: ReactNode }> = ({
       children,
     }) => (
       <I18nextProvider i18n={i18n}>
@@ -496,7 +522,7 @@ describe('useModuleOverflowMenu', () => {
   })
 
   it('should render TC module and create open lid command', () => {
-    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+    const wrapper: FunctionComponent<{ children: ReactNode }> = ({
       children,
     }) => (
       <I18nextProvider i18n={i18n}>
@@ -534,7 +560,7 @@ describe('useModuleOverflowMenu', () => {
   })
 
   it('should render TC module and create deactivate lid command', () => {
-    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+    const wrapper: FunctionComponent<{ children: ReactNode }> = ({
       children,
     }) => (
       <I18nextProvider i18n={i18n}>
@@ -572,7 +598,7 @@ describe('useModuleOverflowMenu', () => {
   })
 
   it('should render TC module gen 2 and create a close lid command', () => {
-    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+    const wrapper: FunctionComponent<{ children: ReactNode }> = ({
       children,
     }) => (
       <I18nextProvider i18n={i18n}>
@@ -608,10 +634,50 @@ describe('useModuleOverflowMenu', () => {
       },
     })
   })
+
+  it('should create a live command for flex stacker when home shuttle button is clicked', () => {
+    const wrapper: FunctionComponent<{ children: ReactNode }> = ({
+      children,
+    }) => (
+      <I18nextProvider i18n={i18n}>
+        <Provider store={store}>{children}</Provider>
+      </I18nextProvider>
+    )
+    const { result } = renderHook(
+      () =>
+        useModuleOverflowMenu(
+          mockFlexStacker,
+          vi.fn(),
+          vi.fn(),
+          vi.fn(),
+          vi.fn(),
+          false,
+          false
+        ),
+      {
+        wrapper,
+      }
+    )
+    const { menuOverflowItemsByModuleType } = result.current
+    const flexStackerMenu = menuOverflowItemsByModuleType.flexStackerModuleType
+
+    act(() => flexStackerMenu[0].onClick(false))
+
+    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
+      command: {
+        commandType: 'unsafe/flexStacker/prepareShuttle',
+        params: {
+          moduleId: mockFlexStacker.id,
+        },
+      },
+    })
+
+    expect(flexStackerMenu[0].menuButtons).toHaveLength(2)
+  })
 })
 
 describe('useIsHeaterShakerInProtocol', () => {
-  const store: Store<State> = createStore(vi.fn(), {})
+  const store: Store<State> = legacy_createStore(vi.fn(), {})
 
   beforeEach(() => {
     when(useCurrentRunId).calledWith().thenReturn('1')
@@ -647,7 +713,7 @@ describe('useIsHeaterShakerInProtocol', () => {
   })
 
   it('should return true when a heater shaker is in the protocol', () => {
-    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+    const wrapper: FunctionComponent<{ children: ReactNode }> = ({
       children,
     }) => <Provider store={store}>{children}</Provider>
     const { result } = renderHook(useIsHeaterShakerInProtocol, { wrapper })
@@ -671,7 +737,7 @@ describe('useIsHeaterShakerInProtocol', () => {
           id,
         })),
       } as any)
-    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+    const wrapper: FunctionComponent<{ children: ReactNode }> = ({
       children,
     }) => <Provider store={store}>{children}</Provider>
     const { result } = renderHook(useIsHeaterShakerInProtocol, { wrapper })

@@ -1,19 +1,64 @@
+import omit from 'lodash/omit'
 import uniq from 'lodash/uniq'
+
+import { getPipetteSpecsV2 } from '@opentrons/shared-data'
+
+import {
+  DEFAULT_MM_OFFSET_FROM_BOTTOM,
+  INITIAL_DECK_SETUP_STEP_ID,
+} from '../constants'
+import {
+  createFile,
+  getFileMetadata,
+  getRobotStateTimeline,
+} from '../file-data/selectors'
 import {
   getArgsAndErrorsByStepId,
   getPipetteEntities,
   getSavedStepForms,
 } from '../step-forms/selectors'
-import { getFileMetadata } from '../file-data/selectors'
-import { trackEvent, AnalyticsEvent } from './mixpanel'
+import { trackEvent } from './mixpanel'
 import { getHasOptedIn } from './selectors'
 import { flattenNestedProperties } from './utils/flattenNestedProperties'
-import { Middleware } from 'redux'
-import { BaseState } from '../types'
-import { FormData, StepIdType, StepType } from '../form-types'
-import { StepArgsAndErrors } from '../steplist'
-import { SaveStepFormAction } from '../ui/steps/actions/thunks'
-import { AnalyticsEventAction } from './actions'
+
+import type { Middleware } from 'redux'
+import type {
+  ConsolidateArgs,
+  DistributeArgs,
+  MixArgs,
+  NormalizedPipetteById,
+  TransferArgs,
+} from '@opentrons/step-generation'
+import type { SetFeatureFlagAction } from '../feature-flags/actions'
+import type { FormData, StepIdType, StepType } from '../form-types'
+import type { RenameStepAction } from '../labware-ingred/actions'
+import type { LocationUpdate } from '../load-file/migration/utils/getAdditionalEquipmentLocationUpdate'
+import type { CreatePipettesAction } from '../step-forms/actions'
+import type { StepArgsAndErrors } from '../steplist'
+import type { BaseState } from '../types'
+import type { SaveStepFormAction } from '../ui/steps/actions/thunks'
+import type { AnalyticsEventAction } from './actions'
+import type { AnalyticsEvent } from './mixpanel'
+
+const DEFAULT_VALUE = 'default'
+const PIPETTING_ARGS_FILTER_LIST = [
+  'touchTipAfterAspirateOffsetMmFromBottom',
+  'touchTipAfterDispenseOffsetMmFromBottom',
+  'commandCreatorFnName',
+  'blowoutFlowRateUlSec',
+  'blowoutOffsetFromTopMm',
+  'touchTipMmFromBottom',
+  'aspirateAirGapVolume',
+  'aspirateFlowRateUlSec',
+  'dispenseFlowRateUlSec',
+]
+
+interface TransformedPipetteInfo {
+  [pipetteId: string]: {
+    name: string
+    numberOfTipracks: number
+  }
+}
 
 // Converts Redux actions to analytics events (read: Mixpanel events).
 // Returns null if there is no analytics event associated with the action,
@@ -26,9 +71,11 @@ export const reduxActionToAnalyticsEvent = (
     // create the "saveStep" action, taking advantage of the formToArgs machinery
     // to get nice cleaned-up data instead of the raw form data.
     const a: SaveStepFormAction = action
+
     const argsAndErrors: StepArgsAndErrors = getArgsAndErrorsByStepId(state)[
       a.payload.id
     ]
+
     const { stepArgs } = argsAndErrors
 
     if (stepArgs !== null) {
@@ -39,7 +86,9 @@ export const reduxActionToAnalyticsEvent = (
       // additional fields for analytics, eg descriptive name for pipettes
       // (these fields are prefixed with double underscore only to make sure they
       // never accidentally overlap with actual fields)
-      const additionalProperties = flattenNestedProperties(stepArgs)
+      const additionalProperties = flattenNestedProperties(
+        (stepArgs as unknown) as Record<string, unknown>
+      )
 
       // Mixpanel wants YYYY-MM-DDTHH:MM:SS for Date type
       additionalProperties.__dateCreated =
@@ -48,16 +97,155 @@ export const reduxActionToAnalyticsEvent = (
           : null
 
       additionalProperties.__protocolName = fileMetadata.protocolName
-      // @ts-expect-error not a valid way to type narrow
-      if (stepArgs.pipette) {
+      if ('pipette' in stepArgs && stepArgs.pipette != null) {
         additionalProperties.__pipetteName =
-          // @ts-expect-error not a valid way to type narrow
           pipetteEntities[stepArgs?.pipette].name
       }
 
+      const stepName = stepArgs.commandCreatorFnName
+      const modifiedStepName =
+        stepName === 'delay' || stepName === 'waitForTemperature'
+          ? 'pause'
+          : stepName
+
+      switch (modifiedStepName) {
+        case 'engageMagnet':
+        case 'disengageMagnet': {
+          return {
+            name: `magnetStep`,
+            properties: { type: modifiedStepName },
+          }
+        }
+        case 'setTemperature':
+        case 'deactivateTemperature': {
+          return {
+            name: `temperatureStep`,
+            properties: { type: modifiedStepName },
+          }
+        }
+        case 'thermocyclerProfile':
+        case 'thermocyclerState': {
+          return {
+            name: 'thermocyclerStep',
+            properties: { type: modifiedStepName },
+          }
+        }
+        case 'heaterShaker': {
+          return {
+            name: 'heaterShakerStep',
+            properties: {},
+          }
+        }
+        case 'transfer':
+        case 'consolidate':
+        case 'distribute': {
+          const stepArgModified = omit(
+            stepArgs as TransferArgs | ConsolidateArgs | DistributeArgs,
+            PIPETTING_ARGS_FILTER_LIST
+          )
+          return {
+            name: `${modifiedStepName}Step`,
+            properties: {
+              ...stepArgModified,
+              aspirateAirGap:
+                stepArgModified.aspirateAirGapVolume ?? DEFAULT_VALUE,
+              aspirateFlowRate:
+                stepArgModified.aspirateFlowRateUlSec ?? DEFAULT_VALUE,
+              dispenseFlowRate:
+                stepArgModified.dispenseFlowRateUlSec ?? DEFAULT_VALUE,
+              dispenseAirGap:
+                stepArgModified.dispenseAirGapVolume ?? DEFAULT_VALUE,
+              blowoutFlowRate: stepArgModified.blowoutFlowRateUlSec,
+              aspirateOffsetFromBottomMm:
+                stepArgModified.aspirateOffsetFromBottomMm ===
+                DEFAULT_MM_OFFSET_FROM_BOTTOM
+                  ? DEFAULT_VALUE
+                  : stepArgModified.aspirateOffsetFromBottomMm,
+              dispenseOffsetFromBottomMm:
+                stepArgModified.dispenseOffsetFromBottomMm ===
+                DEFAULT_MM_OFFSET_FROM_BOTTOM
+                  ? DEFAULT_VALUE
+                  : stepArgModified.dispenseOffsetFromBottomMm,
+              aspirateXOffset:
+                stepArgModified.aspirateXOffset === 0
+                  ? DEFAULT_VALUE
+                  : stepArgModified.aspirateXOffset,
+              aspirateYOffset:
+                stepArgModified.aspirateYOffset === 0
+                  ? DEFAULT_VALUE
+                  : stepArgModified.aspirateYOffset,
+              dispenseXOffset:
+                stepArgModified.dispenseXOffset === 0
+                  ? DEFAULT_VALUE
+                  : stepArgModified.dispenseXOffset,
+              dispenseYOffset:
+                stepArgModified.dispenseYOffset === 0
+                  ? DEFAULT_VALUE
+                  : stepArgModified.dispenseYOffset,
+
+              ...additionalProperties,
+            },
+          }
+        }
+        case 'mix': {
+          const stepArgModified = omit(
+            stepArgs as MixArgs,
+            PIPETTING_ARGS_FILTER_LIST
+          )
+          return {
+            name: `mixStep`,
+            properties: {
+              ...stepArgModified,
+              aspirateFlowRate:
+                stepArgModified.aspirateFlowRateUlSec ?? DEFAULT_VALUE,
+              dispenseFlowRate:
+                stepArgModified.dispenseFlowRateUlSec ?? DEFAULT_VALUE,
+              blowoutFlowRate: stepArgModified.blowoutFlowRateUlSec,
+              offsetFromBottomMm:
+                stepArgModified.offsetFromBottomMm ===
+                DEFAULT_MM_OFFSET_FROM_BOTTOM
+                  ? DEFAULT_VALUE
+                  : stepArgModified.offsetFromBottomMm,
+              xOffset:
+                stepArgModified.xOffset === 0
+                  ? DEFAULT_VALUE
+                  : stepArgModified.xOffset,
+              yOffset:
+                stepArgModified.yOffset === 0
+                  ? DEFAULT_VALUE
+                  : stepArgModified.yOffset,
+              ...additionalProperties,
+            },
+          }
+        }
+        default:
+          return {
+            name: `${modifiedStepName}Step`,
+            properties: { ...stepArgs, ...additionalProperties },
+          }
+      }
+    }
+  }
+
+  if (action.type === 'COMPUTE_ROBOT_STATE_TIMELINE_SUCCESS') {
+    const robotTimeline = getRobotStateTimeline(state)
+    const { errors, timeline } = robotTimeline
+    const commandAndRobotState = timeline.filter(t => t.warnings != null)
+    const warnings =
+      commandAndRobotState.length > 0
+        ? commandAndRobotState.flatMap(state => state.warnings ?? [])
+        : []
+    if (errors != null) {
+      const errorTypes = errors.map(error => error.type)
       return {
-        name: 'saveStep',
-        properties: { ...stepArgs, ...additionalProperties },
+        name: 'timelineErrors',
+        properties: { errorTypes },
+      }
+    }
+    if (warnings.length > 0) {
+      return {
+        name: 'timelineWarnings',
+        properties: { warnings },
       }
     }
   }
@@ -66,7 +254,9 @@ export const reduxActionToAnalyticsEvent = (
     const dateCreatedTimestamp = fileMetadata.created
 
     const { editedFields, stepIds } = action.payload
-    const additionalProperties = flattenNestedProperties(editedFields)
+    const additionalProperties = flattenNestedProperties(
+      editedFields as Record<string, unknown>
+    )
     const savedStepForms = getSavedStepForms(state)
     const batchEditedStepForms: FormData[] = stepIds.map(
       (id: StepIdType) => savedStepForms[id]
@@ -114,16 +304,140 @@ export const reduxActionToAnalyticsEvent = (
       properties: {},
     }
   }
-  if (action.type === 'EXPAND_MULTIPLE_STEPS') {
+  if (action.type === 'LOAD_FILE') {
     return {
-      name: 'expandMultipleSteps',
+      name: 'loadFile',
       properties: {},
     }
   }
-  if (action.type === 'COLLAPSE_MULTIPLE_STEPS') {
+  if (action.type === 'GENERATE_NEW_PROTOCOL') {
     return {
-      name: 'collapseMultipleSteps',
+      name: 'createNewProtocol',
       properties: {},
+    }
+  }
+  if (action.type === 'CHANGE_STEP_DETAILS') {
+    const a: RenameStepAction = action
+    if ('stepDetails' in a.payload.update) {
+      return {
+        name: 'editStepMetadata',
+        properties: {
+          stepDetails: a.payload.update.stepDetails,
+          stepName: a.payload.update.stepName,
+        },
+      }
+    }
+  }
+  if (action.type === 'SAVE_PROTOCOL_FILE') {
+    const file = createFile(state)
+    const { metadata, robot, designerApplication } = file.designerApplication
+    const {
+      ingredients,
+      savedStepForms,
+      modules,
+      pipettes,
+      labware,
+    } = designerApplication.data
+
+    const robotType = { robotType: robot.model }
+    const pipetteDisplayNames = Object.values(pipettes).map(
+      pipette => getPipetteSpecsV2(pipette.pipetteName)?.displayName
+    )
+    const moduleModels = Object.values(modules).map(module => module.model)
+    const initialStep: Record<string, LocationUpdate> =
+      savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
+
+    const {
+      trashBinLocationUpdate,
+      wasteChuteLocationUpdate,
+      gripperLocationUpdate,
+      stagingAreaLocationUpdate,
+      labwareLocationUpdate,
+    } = initialStep
+
+    const hasTrashBin = Object.keys(trashBinLocationUpdate).length > 0
+    const hasWasteChute = Object.keys(wasteChuteLocationUpdate).length > 0
+    const hasGripper = Object.keys(gripperLocationUpdate).length > 0
+    const numberOfSteps = {
+      numberOfSteps: Object.keys(savedStepForms).length - 1,
+    }
+    const stagingAreaSlots = Object.values(stagingAreaLocationUpdate).map(
+      location => location
+    )
+
+    const labwareInfo = Object.entries(labwareLocationUpdate).reduce(
+      (acc: Record<string, { location: string }>, [id, location]) => {
+        const displayName = labware[id].displayName
+        acc[displayName] = { location }
+        return acc
+      },
+      {}
+    )
+
+    const liquidClasses = {
+      liquidClasses: Object.values(ingredients).map(ingredient =>
+        'liquidClass' in ingredient && ingredient.liquidClass != null
+          ? ingredient.liquidClass
+          : 'none'
+      ),
+    }
+
+    const fixtureInfo = {
+      trashBin: hasTrashBin,
+      wasteChute: hasWasteChute,
+      stagingAreaSlots: stagingAreaSlots,
+      gripper: hasGripper,
+    }
+
+    const loadCommandInfo = {
+      modules: moduleModels,
+      pipettes: pipetteDisplayNames,
+    }
+
+    return {
+      name: 'saveProtocol',
+      properties: {
+        ...metadata,
+        ...loadCommandInfo,
+        ...robotType,
+        ...liquidClasses,
+        ...numberOfSteps,
+        ...fixtureInfo,
+        ...labwareInfo,
+      },
+    }
+  }
+
+  if (action.type === 'SET_FEATURE_FLAGS') {
+    const a: SetFeatureFlagAction = action
+    if (a.payload.OT_PD_ALLOW_ALL_TIPRACKS === true) {
+      return {
+        name: 'allowAllTipracks',
+        properties: {},
+      }
+    }
+  }
+  if (action.type === 'CREATE_PIPETTES') {
+    const a: CreatePipettesAction = action
+
+    const getTransformPipetteInfo = (
+      payload: NormalizedPipetteById
+    ): TransformedPipetteInfo => {
+      return Object.entries(payload).reduce(
+        (acc: TransformedPipetteInfo, [pipetteId, { name, tiprackDefURI }]) => {
+          acc[pipetteId] = {
+            name,
+            numberOfTipracks: tiprackDefURI.length,
+          }
+          return acc
+        },
+        {}
+      )
+    }
+    const properties = getTransformPipetteInfo(a.payload)
+    return {
+      name: 'numberOfTipracksPerPipette',
+      properties,
     }
   }
   if (action.type === 'ANALYTICS_EVENT') {
@@ -142,9 +456,10 @@ export const trackEventMiddleware: Middleware<BaseState, any> = ({
   // NOTE: this is the Redux state AFTER the action has been fully dispatched
   const state = getState()
 
-  const optedIn = getHasOptedIn(state) || false
-  const event = reduxActionToAnalyticsEvent(state, action)
-  if (event) {
+  const optedIn = getHasOptedIn(state as BaseState)?.hasOptedIn ?? false
+  const event = reduxActionToAnalyticsEvent(state as BaseState, action)
+
+  if (event != null) {
     // actually report to analytics (trackEvent is responsible for using optedIn)
     trackEvent(event, optedIn)
   }

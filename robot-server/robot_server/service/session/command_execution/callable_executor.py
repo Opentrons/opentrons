@@ -13,7 +13,7 @@ CommandHandler = typing.Callable[
 class CallableExecutor(CommandExecutor):
     """A command executor that passes off execution to a callable"""
 
-    def __init__(self, command_handler: CommandHandler):
+    def __init__(self, command_handler: CommandHandler) -> None:
         """
         Constructor
 
@@ -26,7 +26,7 @@ class CallableExecutor(CommandExecutor):
         with duration() as time_it:
             name_arg = command.request.command
             data = command.request.data
-            data_arg = data.dict() if data else {}
+            data_arg = data.model_dump() if data else {}
 
             await self._callable(name_arg, data_arg)
 

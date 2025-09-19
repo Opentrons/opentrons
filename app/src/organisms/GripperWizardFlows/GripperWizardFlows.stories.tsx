@@ -1,18 +1,20 @@
-import * as React from 'react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
-import { createStore } from 'redux'
-import { mockConnectableRobot } from '../../redux/discovery/__fixtures__'
-import * as DiscoveryClientFixtures from '../../../../discovery-client/src/fixtures'
+import { legacy_createStore } from 'redux'
+
+import { configReducer } from '/app/redux/config/reducer'
+import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import {
   HEALTH_STATUS_OK,
   ROBOT_MODEL_OT3,
-} from '../../redux/discovery/constants'
-import { configReducer } from '../../redux/config/reducer'
+} from '/app/redux/discovery/constants'
+
+import * as DiscoveryClientFixtures from '../../../../discovery-client/src/fixtures'
 import { GripperWizardFlows } from './'
 
-import type { Store } from 'redux'
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react'
+import type { Store, StoreEnhancer } from 'redux'
+import type * as React from 'react'
 
 export default {
   title: 'App/organisms/GripperWizardFlows',
@@ -45,7 +47,10 @@ const dummyConfig = {
   },
 } as any
 
-const store: Store<any> = createStore(configReducer, dummyConfig)
+const store: Store<any> = legacy_createStore(
+  configReducer,
+  dummyConfig as StoreEnhancer
+)
 const queryClient = new QueryClient()
 
 const Template: Story<

@@ -1,0 +1,88 @@
+test_name: Test the /errorRecovery/settings endpoints
+
+marks:
+  - usefixtures:
+      - ot3_server_base_url
+
+stages:
+  - name: Get default settings
+    request:
+      method: GET
+      url: '{ot3_server_base_url}/errorRecovery/settings'
+    response:
+      status_code: 200
+      json: &initial_get_settings_response
+        data:
+          enabled: true
+
+  - name: Change settings
+    request:
+      method: PATCH
+      url: '{ot3_server_base_url}/errorRecovery/settings'
+      json:
+        data:
+          enabled: false
+    response:
+      status_code: 200
+      json: &patch_settings_response
+        data:
+          enabled: false
+
+  - name: Get the settings again and make sure they're still changed
+    request:
+      method: GET
+      url: '{ot3_server_base_url}/errorRecovery/settings'
+    response:
+      status_code: 200
+      json: *patch_settings_response
+
+  - name: Restore defaults
+    request:
+      method: DELETE
+      url: '{ot3_server_base_url}/errorRecovery/settings'
+    response:
+      status_code: 200
+      json: *initial_get_settings_response
+
+  - name: Get the settings again and make sure they're still the defaults
+    request:
+      method: GET
+      url: '{ot3_server_base_url}/errorRecovery/settings'
+    response:
+      status_code: 200
+      json: *initial_get_settings_response
+
+---
+test_name: Test no-op PATCH requests
+
+marks:
+  - usefixtures:
+      - ot3_server_base_url
+  - parametrize:
+      key: enabled
+      vals:
+        - true
+        - false
+
+stages:
+  - name: Set initial settings
+    request:
+      method: PATCH
+      url: '{ot3_server_base_url}/errorRecovery/settings'
+      json:
+        data:
+          enabled: '{enabled}'
+    response:
+      save:
+        json:
+          initial_response: data
+
+  - name: Send a no-op PATCH and make sure it doesn't change anything
+    request:
+      method: PATCH
+      url: '{ot3_server_base_url}/errorRecovery/settings'
+      json:
+        data: {}
+    response:
+      json:
+        data: !force_original_structure '{initial_response}'

@@ -1,19 +1,21 @@
-import React from 'react'
 import { css } from 'styled-components'
+
 import {
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
-  JUSTIFY_CENTER,
   Flex,
+  JUSTIFY_CENTER,
+  LegacyStyledText,
   SPACING,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
+
+import type { ReactNode } from 'react'
 import type { StyleProps } from '@opentrons/components'
 
 interface ControlContainerProps extends StyleProps {
   title: string
-  children: React.ReactNode
+  children: ReactNode
 }
 
 const CONTROL_CHILDREN_STYLES = css`
@@ -33,9 +35,9 @@ export const ControlContainer = (props: ControlContainerProps): JSX.Element => {
   const { title, children } = props
   return (
     <Flex width="100%" flexDirection={DIRECTION_COLUMN}>
-      <StyledText as="h6" marginY={SPACING.spacing8}>
+      <LegacyStyledText as="h6" marginY={SPACING.spacing8}>
         {title}
-      </StyledText>
+      </LegacyStyledText>
       <Flex css={CONTROL_CHILDREN_STYLES}>{children}</Flex>
     </Flex>
   )

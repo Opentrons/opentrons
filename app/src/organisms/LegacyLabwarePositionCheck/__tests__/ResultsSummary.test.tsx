@@ -1,0 +1,96 @@
+import { fireEvent, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
+
+import {
+  mockCompletedAnalysis,
+  mockExistingOffsets,
+  mockWorkingOffsets,
+} from '../__fixtures__'
+import { SECTIONS } from '../constants'
+import { ResultsSummary } from '../ResultsSummary'
+
+import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
+
+vi.mock('/app/redux/config')
+
+const render = (props: ComponentProps<typeof ResultsSummary>) => {
+  return renderWithProviders(<ResultsSummary {...props} />, {
+    i18nInstance: i18n,
+  })[0]
+}
+
+describe('ResultsSummary', () => {
+  let props: ComponentProps<typeof ResultsSummary>
+  let mockOnCloseClick: Mock
+
+  beforeEach(() => {
+    mockOnCloseClick = vi.fn()
+
+    props = {
+      section: SECTIONS.RESULTS_SUMMARY,
+      protocolData: mockCompletedAnalysis,
+      workingOffsets: mockWorkingOffsets,
+      existingOffsets: mockExistingOffsets,
+      isDeletingMaintenanceRun: false,
+      allAppliedOffsets: [
+        {
+          location: { slotName: '1' },
+          vector: { x: 1.0, y: 1.0, z: 1.0 },
+          definitionUri: 'mock-uri',
+        },
+        {
+          location: { slotName: '3' },
+          vector: { x: 3.0, y: 3.0, z: 3.0 },
+          definitionUri: 'mock-uri-2',
+        },
+      ],
+      onCloseClick: mockOnCloseClick,
+    }
+  })
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+  it('renders correct copy', () => {
+    render(props)
+    screen.getByText('New labware offset data')
+    screen.getByRole('button', { name: 'Complete' })
+    screen.getByRole('link', { name: 'Need help?' })
+    screen.getByRole('columnheader', { name: 'location' })
+    screen.getByRole('columnheader', { name: 'labware' })
+    screen.getByRole('columnheader', { name: 'labware offset data' })
+  })
+  it('calls on close function when button is clicked', () => {
+    render(props)
+    fireEvent.click(screen.getByRole('button', { name: 'Complete' }))
+    expect(mockOnCloseClick).toHaveBeenCalled()
+  })
+  it('does disables the CTA to apply offsets when the maintenance run is being deleted', () => {
+    props.isDeletingMaintenanceRun = true
+    render(props)
+    const button = screen.getByRole('button', { name: 'Complete' })
+    expect(button).toBeDisabled()
+    fireEvent.click(button)
+    expect(mockOnCloseClick).not.toHaveBeenCalled()
+  })
+  it('renders a row per offset to apply', () => {
+    render(props)
+
+    screen.getByRole('cell', { name: 'Slot 1' })
+    screen.getByRole('cell', { name: 'Slot 3' })
+    screen.getByRole('cell', { name: 'X 1.0 Y 1.0 Z 1.0' })
+    screen.getByRole('cell', { name: 'X 3.0 Y 3.0 Z 3.0' })
+  })
+
+  it('renders tabbed offset data with snippets when config option is selected', () => {
+    vi.mocked(getIsLabwareOffsetCodeSnippetsOn).mockReturnValue(true)
+    render(props)
+    expect(screen.getByText('Table View')).toBeTruthy()
+    expect(screen.getByText('Jupyter Notebook')).toBeTruthy()
+    expect(screen.getByText('Command Line Interface (SSH)')).toBeTruthy()
+  })
+})

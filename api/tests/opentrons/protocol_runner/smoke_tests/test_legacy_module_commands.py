@@ -9,7 +9,9 @@ from pathlib import Path
 from opentrons.protocol_engine import ModuleModel, commands
 
 from opentrons.protocol_reader import ProtocolReader
-from opentrons.protocol_runner import create_simulating_runner
+from opentrons.protocol_runner.create_simulating_orchestrator import (
+    create_simulating_orchestrator,
+)
 
 
 @pytest.fixture()
@@ -60,12 +62,12 @@ async def test_runner_with_modules_in_legacy_python(
         directory=None,
     )
 
-    subject = await create_simulating_runner(
-        robot_type="OT-2 Standard",
-        protocol_config=protocol_source.config,
+    subject = await create_simulating_orchestrator(
+        robot_type="OT-2 Standard", protocol_config=protocol_source.config
     )
     result = await subject.run(deck_configuration=[], protocol_source=protocol_source)
-    commands_result = result.commands
+    commands_result = [c for c in result.commands]
+    await subject.finish()
 
     assert len(commands_result) == 6
 
@@ -74,7 +76,7 @@ async def test_runner_with_modules_in_legacy_python(
     thermocycler_result_captor = matchers.Captor()
     heater_shaker_result_captor = matchers.Captor()
 
-    assert commands_result[0] == commands.Home.construct(
+    assert commands_result[0] == commands.Home.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -82,9 +84,10 @@ async def test_runner_with_modules_in_legacy_python(
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
         params=commands.HomeParams(axes=None),
+        notes=[],
         result=commands.HomeResult(),
     )
-    assert commands_result[1] == commands.LoadLabware.construct(
+    assert commands_result[1] == commands.LoadLabware.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -92,10 +95,11 @@ async def test_runner_with_modules_in_legacy_python(
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
         params=matchers.Anything(),
+        notes=[],
         result=matchers.Anything(),
     )
 
-    assert commands_result[2] == commands.LoadModule.construct(
+    assert commands_result[2] == commands.LoadModule.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -103,10 +107,11 @@ async def test_runner_with_modules_in_legacy_python(
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
         params=matchers.Anything(),
+        notes=[],
         result=temp_module_result_captor,
     )
 
-    assert commands_result[3] == commands.LoadModule.construct(
+    assert commands_result[3] == commands.LoadModule.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -114,10 +119,11 @@ async def test_runner_with_modules_in_legacy_python(
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
         params=matchers.Anything(),
+        notes=[],
         result=mag_module_result_captor,
     )
 
-    assert commands_result[4] == commands.LoadModule.construct(
+    assert commands_result[4] == commands.LoadModule.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -125,10 +131,11 @@ async def test_runner_with_modules_in_legacy_python(
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
         params=matchers.Anything(),
+        notes=[],
         result=thermocycler_result_captor,
     )
 
-    assert commands_result[5] == commands.LoadModule.construct(
+    assert commands_result[5] == commands.LoadModule.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -136,15 +143,13 @@ async def test_runner_with_modules_in_legacy_python(
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
         params=matchers.Anything(),
+        notes=[],
         result=heater_shaker_result_captor,
     )
 
-    assert temp_module_result_captor.value["model"] == ModuleModel.TEMPERATURE_MODULE_V1
-    assert mag_module_result_captor.value["model"] == ModuleModel.MAGNETIC_MODULE_V1
+    assert temp_module_result_captor.value.model == ModuleModel.TEMPERATURE_MODULE_V1
+    assert mag_module_result_captor.value.model == ModuleModel.MAGNETIC_MODULE_V1
+    assert thermocycler_result_captor.value.model == ModuleModel.THERMOCYCLER_MODULE_V1
     assert (
-        thermocycler_result_captor.value["model"] == ModuleModel.THERMOCYCLER_MODULE_V1
-    )
-    assert (
-        heater_shaker_result_captor.value["model"]
-        == ModuleModel.HEATER_SHAKER_MODULE_V1
+        heater_shaker_result_captor.value.model == ModuleModel.HEATER_SHAKER_MODULE_V1
     )

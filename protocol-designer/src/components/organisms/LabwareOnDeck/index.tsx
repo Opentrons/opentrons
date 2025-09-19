@@ -1,0 +1,55 @@
+import { useSelector } from 'react-redux'
+
+import { LabwareRender } from '@opentrons/components'
+import * as wellContentsSelectors from '@opentrons/step-generation'
+
+import { selectors } from '../../../labware-ingred/selectors'
+import * as highlightSelectors from '../../../top-selectors/substep-highlight'
+import * as tipContentsSelectors from '../../../top-selectors/tip-contents'
+import { getAllWellContentsForActiveItem } from '../../../top-selectors/well-contents'
+
+import type { LabwareOnDeck as LabwareOnDeckType } from '/protocol-designer/step-forms'
+
+interface LabwareOnDeckProps {
+  labwareOnDeck: LabwareOnDeckType
+  x: number
+  y: number
+}
+
+export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
+  const { labwareOnDeck, x, y } = props
+  const missingAndUsedTipsByLabwareId = useSelector(
+    tipContentsSelectors.getMissingAndUsedTipsByLabwareId
+  )
+  const allWellContentsForActiveItem = useSelector(
+    getAllWellContentsForActiveItem
+  )
+  const allHighlightedWells = useSelector(
+    highlightSelectors.wellHighlightsByLabwareId
+  )
+  const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
+  const wellContents = allWellContentsForActiveItem
+    ? allWellContentsForActiveItem[labwareOnDeck.id]
+    : null
+  const highlightedWells = allHighlightedWells[labwareOnDeck.id]
+  const labwareTipInfo =
+    missingAndUsedTipsByLabwareId != null
+      ? missingAndUsedTipsByLabwareId[labwareOnDeck.id]
+      : null
+  const { missingTips } = labwareTipInfo ?? {}
+
+  return (
+    <g transform={`translate(${x}, ${y})`}>
+      <LabwareRender
+        definition={labwareOnDeck.def}
+        positioningMode="offsetInSlot"
+        wellFill={wellContentsSelectors.wellFillFromWellContents(
+          wellContents,
+          liquidDisplayColors
+        )}
+        highlightedWells={highlightedWells}
+        missingTips={missingTips}
+      />
+    </g>
+  )
+}

@@ -1,12 +1,16 @@
 # noqa: D100
 
+from __future__ import annotations
+
 import enum
-from typing import Protocol
+from typing import Optional, Protocol, TYPE_CHECKING
 
-from opentrons_shared_data.errors import EnumeratedError, ErrorCodes
-
-from opentrons.config import feature_flags as ff
-from opentrons.protocol_engine.commands import Command
+if TYPE_CHECKING:
+    from opentrons.protocol_engine.commands import (
+        Command,
+        CommandDefinedErrorData,
+    )
+    from opentrons.protocol_engine.state.config import Config
 
 
 class ErrorRecoveryType(enum.Enum):
@@ -22,12 +26,20 @@ class ErrorRecoveryType(enum.Enum):
     """
 
     WAIT_FOR_RECOVERY = enum.auto()
-    """Stop and wait for the error to be recovered from manually."""
+    """Enter interactive error recovery mode."""
 
-    # TODO(mm, 2023-03-18): Add something like this for
-    # https://opentrons.atlassian.net/browse/EXEC-302.
-    # CONTINUE = enum.auto()
-    # """Continue with the run, as if the command never failed."""
+    CONTINUE_WITH_ERROR = enum.auto()
+    """Continue without interruption, carrying on from whatever error state the failed
+    command left the engine in.
+
+    This is like `ProtocolEngine.resume_from_recovery(reconcile_false_positive=False)`.
+    """
+
+    ASSUME_FALSE_POSITIVE_AND_CONTINUE = enum.auto()
+    """Continue without interruption, acting as if the underlying error was a false positive.
+
+    This is like `ProtocolEngine.resume_from_recovery(reconcile_false_positive=True)`.
+    """
 
 
 class ErrorRecoveryPolicy(Protocol):
@@ -36,41 +48,34 @@ class ErrorRecoveryPolicy(Protocol):
     This describes a function that Protocol Engine calls after each command failure,
     with the details of that failure. The implementation should inspect those details
     and return an appropriate `ErrorRecoveryType`.
+
+    Args:
+        config: The config of the calling `ProtocolEngine`.
+        failed_command: The command that failed, in its final `status=="failed"` state.
+        defined_error_data: If the command failed with a defined error, details about
+            that error. If the command failed with an undefined error, `None`.
+            By design, this callable isn't given details about undefined errors,
+            since it would be fragile to rely on them.
     """
 
     @staticmethod
     def __call__(  # noqa: D102
-        failed_command: Command, exception: Exception
+        config: Config,
+        failed_command: Command,
+        defined_error_data: Optional[CommandDefinedErrorData],
     ) -> ErrorRecoveryType:
         ...
 
 
-def error_recovery_by_ff(
-    failed_command: Command, exception: Exception
+def never_recover(
+    config: Config,
+    failed_command: Command,
+    defined_error_data: Optional[CommandDefinedErrorData],
 ) -> ErrorRecoveryType:
-    """Use API feature flags to decide how to handle an error.
+    """An error recovery policy where error recovery is never attempted.
 
-    This is just for development. This should be replaced by a proper config
-    system exposed through robot-server's HTTP API.
+    This makes sense for things like the `opentrons_simulate` and `opentrons_execute`
+    CLIs. Those don't expose any way to bring the run out of recovery mode after it's
+    been entered, so we need to avoid entering recovery mode in the first place.
     """
-    # todo(mm, 2024-03-18): Do we need to do anything explicit here to disable
-    # error recovery on the OT-2?
-    if ff.enable_error_recovery_experiments() and _is_recoverable(
-        failed_command, exception
-    ):
-        return ErrorRecoveryType.WAIT_FOR_RECOVERY
-    else:
-        return ErrorRecoveryType.FAIL_RUN
-
-
-def _is_recoverable(failed_command: Command, exception: Exception) -> bool:
-    if (
-        failed_command.commandType == "pickUpTip"
-        and isinstance(exception, EnumeratedError)
-        # Hack(?): It seems like this should be ErrorCodes.TIP_PICKUP_FAILED, but that's
-        # not what gets raised in practice.
-        and exception.code == ErrorCodes.UNEXPECTED_TIP_REMOVAL
-    ):
-        return True
-    else:
-        return False
+    return ErrorRecoveryType.FAIL_RUN

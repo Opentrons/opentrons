@@ -10,10 +10,11 @@ import httpx
 from httpx import Response
 
 
-_STARTUP_WAIT = 20
+_STARTUP_WAIT = 40
 _SHUTDOWN_WAIT = 20
 
 _RUN_POLL_INTERVAL = 0.1
+_ANALYSIS_POLL_INTERVAL = 0.1
 
 
 class RobotClient:
@@ -220,6 +221,14 @@ class RobotClient:
         response.raise_for_status()
         return response
 
+    async def get_preserialized_commands(self, run_id: str) -> Response:
+        """GET /runs/:run_id/commandsAsPreSerializedList."""
+        response = await self.httpx_client.get(
+            url=f"{self.base_url}/runs/{run_id}/commandsAsPreSerializedList",
+        )
+        response.raise_for_status()
+        return response
+
     async def post_labware_offset(
         self,
         run_id: str,
@@ -312,6 +321,80 @@ class RobotClient:
         response.raise_for_status()
         return response
 
+    async def get_deck_configuration(self) -> Response:
+        """PUT /deck_configuration."""
+        response = await self.httpx_client.get(
+            url=f"{self.base_url}/deck_configuration",
+        )
+        response.raise_for_status()
+        return response
+
+    async def put_deck_configuration(
+        self,
+        req_body: Dict[str, object],
+    ) -> Response:
+        """PUT /deck_configuration."""
+        response = await self.httpx_client.put(
+            url=f"{self.base_url}/deck_configuration",
+            json=req_body,
+        )
+        response.raise_for_status()
+        return response
+
+    async def post_data_files(self, req_body: Dict[str, object]) -> Response:
+        """POST /dataFiles"""
+        response = await self.httpx_client.post(
+            url=f"{self.base_url}/dataFiles",
+            data=req_body,
+        )
+        response.raise_for_status()
+        return response
+
+    async def get_data_files(self) -> Response:
+        """GET /dataFiles."""
+        response = await self.httpx_client.get(url=f"{self.base_url}/dataFiles")
+        response.raise_for_status()
+        return response
+
+    async def delete_data_file(self, file_id: str) -> Response:
+        """DELETE /dataFiles/{file_id}."""
+        response = await self.httpx_client.delete(
+            f"{self.base_url}/dataFiles/{file_id}"
+        )
+        response.raise_for_status()
+        return response
+
+    async def get_data_files_download(self, data_file_id: str) -> Response:
+        """GET /dataFiles/{data_file_id}/download"""
+        response = await self.httpx_client.get(
+            url=f"{self.base_url}/dataFiles/{data_file_id}/download",
+        )
+        response.raise_for_status()
+        return response
+
+    async def delete_all_client_data(self) -> Response:
+        response = await self.httpx_client.delete(url=f"{self.base_url}/clientData")
+        response.raise_for_status()
+        return response
+
+    async def delete_error_recovery_settings(self) -> Response:
+        response = await self.httpx_client.delete(
+            url=f"{self.base_url}/errorRecovery/settings"
+        )
+        response.raise_for_status()
+        return response
+
+    async def get_labware_offsets(self) -> Response:
+        # Filter query parameters omitted for simplicity. This currently returns all offsets.
+        response = await self.httpx_client.get(url=f"{self.base_url}/labwareOffsets")
+        response.raise_for_status()
+        return response
+
+    async def delete_all_labware_offsets(self) -> Response:
+        response = await self.httpx_client.delete(url=f"{self.base_url}/labwareOffsets")
+        response.raise_for_status()
+        return response
+
 
 async def poll_until_run_completes(
     robot_client: RobotClient, run_id: str, poll_interval: float = _RUN_POLL_INTERVAL
@@ -334,3 +417,24 @@ async def poll_until_run_completes(
         else:
             # The run is still ongoing. Wait a beat, then poll again.
             await asyncio.sleep(poll_interval)
+
+
+async def poll_until_all_analyses_complete(
+    robot_client: RobotClient, poll_interval: float = _ANALYSIS_POLL_INTERVAL
+) -> None:
+    """Wait until all pending analyses have completed.
+
+    You probably want to wrap this in an `anyio.fail_after()` timeout in case something causes
+    an analysis to hang forever.
+    """
+
+    async def _all_analyses_are_complete() -> bool:
+        protocols = (await robot_client.get_protocols()).json()
+        for protocol in protocols["data"]:
+            for analysis_summary in protocol["analysisSummaries"]:
+                if analysis_summary["status"] != "completed":
+                    return False
+        return True
+
+    while not await _all_analyses_are_complete():
+        await asyncio.sleep(poll_interval)

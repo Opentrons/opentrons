@@ -3,7 +3,7 @@ import logging
 
 from typing import Optional, List, Dict, Any, Union
 
-from pydantic import BaseModel, Field, create_model, validator
+from pydantic import field_validator, BaseModel, Field, create_model
 
 from opentrons_shared_data.pipette import model_constants
 from opentrons.config.reset import ResetOptionId
@@ -17,7 +17,7 @@ class AdvancedSetting(BaseModel):
         ...,
         description="The ID by which the property used to be known; not"
         " useful now and may contain spaces or hyphens",
-        deprecated=True,
+        json_schema_extra={"deprecated": True},
     )
     title: str = Field(
         ...,
@@ -76,7 +76,7 @@ class LogLevels(str, Enum):
 
     """Valid log levels"""
 
-    def __new__(cls, value, level):
+    def __new__(cls, value: str, level: int) -> "LogLevels":
         # https://docs.python.org/3/library/enum.html#when-to-use-new-vs-init
         obj = str.__new__(cls, value)
         obj._value_ = value
@@ -89,7 +89,7 @@ class LogLevels(str, Enum):
     error = ("error", logging.ERROR)
 
     @property
-    def level_id(self):
+    def level_id(self) -> int:
         """The log level id as defined in logging lib"""
         return self._level_id
 
@@ -99,9 +99,19 @@ class LogLevel(BaseModel):
         None, description="The value to set (conforming to Python log levels)"
     )
 
-    @validator("log_level", pre=True)
-    def lower_case_log_keys(cls, value):
-        return value if value is None else LogLevels(value.lower(), None)
+    @field_validator("log_level", mode="before")
+    @classmethod
+    def lower_case_log_keys(cls, value: object) -> object:
+        if value is None:
+            return value
+        else:
+            # This `type: ignore[call-arg]` is because mypy thinks there needs to be
+            # a second arg here for the int level, but there does not.
+            return LogLevels(  # type: ignore[call-arg]
+                # todo(mm, 2025-03-18): We probably do actually need to check that
+                # the value is a str before calling .lower() on it.
+                value.lower(),  # type: ignore[attr-defined]
+            )
 
 
 class FactoryResetOption(BaseModel):
@@ -136,7 +146,7 @@ class PipetteSettingsField(BaseModel):
     units: Optional[str] = Field(
         None, description="The physical units this value is in (e.g. mm, uL)"
     )
-    type: Optional[PipetteSettingsFieldType]
+    type: Optional[PipetteSettingsFieldType] = None
     min: float = Field(..., description="The minimum acceptable value of the property")
     max: float = Field(..., description="The maximum acceptable value of the property")
     default: float = Field(..., description="The default value of the property")
@@ -184,11 +194,9 @@ PipetteSettingsFields.__doc__ = "The fields of the pipette settings"
 
 
 class PipetteSettings(BaseModel):
-    info: PipetteSettingsInfo
-    setting_fields: PipetteSettingsFields  # type: ignore
 
-    class Config:
-        fields = {"setting_fields": "fields"}
+    info: PipetteSettingsInfo
+    setting_fields: PipetteSettingsFields = Field(..., alias="fields")  # type: ignore
 
 
 MultiPipetteSettings = Dict[str, PipetteSettings]
@@ -208,22 +216,26 @@ class PipetteSettingsUpdate(BaseModel):
         None, alias="fields"
     )
 
-    @validator("setting_fields")
-    def validate_fields(cls, v):
+    @field_validator("setting_fields")
+    @classmethod
+    def validate_fields(
+        cls, v: Optional[Dict[str, Optional[PipetteUpdateField]]]
+    ) -> Optional[Dict[str, Optional[PipetteUpdateField]]]:
         """A validator to ensure that values for mutable configs are
         floats and booleans for quirks."""
-        for key, value in v.items():
-            if value is None:
-                pass
-            elif key in model_constants.MUTABLE_CONFIGS_V1:
-                if value.value is not None:
-                    # Must be a float for overriding a config field
-                    value.value = float(value.value)
-            elif key in model_constants.VALID_QUIRKS:
-                if not isinstance(value.value, bool):
-                    raise ValueError(
-                        f"{key} quirk value must " f"be a boolean. Got {value.value}"
-                    )
-            else:
-                raise ValueError(f"{key} is not a valid field or quirk name")
+        if v is not None:
+            for key, value in v.items():
+                if value is None:
+                    pass
+                elif key in model_constants.MUTABLE_CONFIGS_V1:
+                    if value.value is not None:
+                        # Must be a float for overriding a config field
+                        value.value = float(value.value)
+                elif key in model_constants.VALID_QUIRKS:
+                    if not isinstance(value.value, bool):
+                        raise ValueError(
+                            f"{key} quirk value must be a boolean. Got {value.value}"
+                        )
+                else:
+                    raise ValueError(f"{key} is not a valid field or quirk name")
         return v

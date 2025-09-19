@@ -1,0 +1,15 @@
+{
+  "extends": "../tsconfig-base.json",
+  "references": [],
+  "compilerOptions": {
+    "composite": true,
+    "emitDeclarationOnly": false,
+    "rootDir": ".",
+    "outDir": "lib",
+    "paths": {
+      "/ai-client/*": ["./src/*"]
+    }
+  },
+  "include": ["src/**/*.json", "fixtures/**/*.json", "vite.config.mts"],
+  "exclude": ["**/*.ts", "**/*.tsx"]
+}

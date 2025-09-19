@@ -1,4 +1,6 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { makeEvent } from '../make-event'
 import * as selectors from '../selectors'
@@ -49,6 +51,7 @@ describe('analytics events map', () => {
         name: 'pipetteOffsetCalibrationStarted',
         properties: {
           ...action.payload,
+          robotType: OT2_ROBOT_TYPE,
         },
       })
     })
@@ -65,6 +68,7 @@ describe('analytics events map', () => {
         name: 'tipLengthCalibrationStarted',
         properties: {
           ...action.payload,
+          robotType: OT2_ROBOT_TYPE,
         },
       })
     })
@@ -77,6 +81,7 @@ describe('analytics events map', () => {
           robotName: 'my-robot',
           sessionId: 'seshid',
           command: { command: 'calibration.exitSession' },
+          robotType: OT2_ROBOT_TYPE,
         },
       } as any
       vi.mocked(selectors.getAnalyticsSessionExitDetails).mockReturnValue({
@@ -86,7 +91,7 @@ describe('analytics events map', () => {
 
       return expect(makeEvent(action, state)).resolves.toEqual({
         name: 'my-session-typeExit',
-        properties: { step: 'session-step' },
+        properties: { step: 'session-step', robotType: OT2_ROBOT_TYPE },
       })
     })
 
@@ -117,7 +122,25 @@ describe('analytics events map', () => {
         properties: {
           pipetteModel: 'my-pipette-model',
           tipRackDisplayName: 'some display name',
+          robotType: OT2_ROBOT_TYPE,
         },
+      })
+    })
+
+    it('analytics:RESOURCE_MONITOR_REPORT -> resourceMonitorReport event', () => {
+      const state = {} as any
+      const action = {
+        type: 'analytics:RESOURCE_MONITOR_REPORT',
+        payload: {
+          systemAvailMemMb: '500',
+          systemUptimeHrs: '111',
+          processesDetails: [],
+        },
+      } as any
+
+      return expect(makeEvent(action, state)).resolves.toEqual({
+        name: 'resourceMonitorReport',
+        properties: { ...action.payload },
       })
     })
   })

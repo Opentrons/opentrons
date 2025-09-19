@@ -8,7 +8,7 @@
   "types": "lib/main.d.ts",
   "scripts": {
     "start": "make dev",
-    "rebuild": "electron-rebuild"
+    "rebuild": "electron-rebuild --force-abi=3.71.0"
   },
   "repository": {
     "type": "git",
@@ -24,9 +24,7 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons",
   "workspaces": {
-    "nohoist": [
-      "**"
-    ]
+    "nohoist": ["**"]
   },
   "devDependencies": {
     "@opentrons/app": "link:../app"
@@ -44,7 +42,7 @@
     "dateformat": "3.0.3",
     "electron-devtools-installer": "3.2.0",
     "electron-store": "5.1.1",
-    "electron-updater": "4.1.2",
+    "electron-updater": "6.3.9",
     "execa": "4.0.0",
     "form-data": "2.5.0",
     "fs-extra": "10.0.0",
@@ -55,10 +53,10 @@
     "node-fetch": "2.6.7",
     "node-stream-zip": "1.8.2",
     "pump": "3.0.0",
-    "semver": "5.5.0",
+    "semver": "5.7.2",
     "tempy": "1.0.1",
     "uuid": "3.2.1",
-    "winston": "3.1.0",
+    "winston": "3.15.0",
     "yargs-parser": "13.1.2"
   }
 }

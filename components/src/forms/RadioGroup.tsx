@@ -1,19 +1,21 @@
-import * as React from 'react'
 import cx from 'classnames'
+
 import { Icon } from '../icons'
 import styles from './forms.module.css'
+
+import type { ChangeEventHandler, FocusEventHandler, ReactNode } from 'react'
 
 export interface RadioOption {
   name: string
   value: string
-  children?: React.ReactNode
+  children?: ReactNode
 }
 
 export interface RadioGroupProps {
   /** blur handler */
-  onBlur?: React.FocusEventHandler<HTMLInputElement>
+  onBlur?: FocusEventHandler<HTMLInputElement>
   /** change handler */
-  onChange: React.ChangeEventHandler
+  onChange: ChangeEventHandler
   /** value that is checked */
   value?: string
   /** Array of {name, value} data with optional children */
@@ -50,7 +52,7 @@ export function RadioGroup(props: RadioGroupProps): JSX.Element {
         const useStyleUpdates =
           props.useBlueChecked && radio.value === props.value
         return (
-          <label key={radio.value} className={itemClassName}>
+          <label key={radio.value} id={radio.value} className={itemClassName}>
             <div
               className={cx(styles.checkbox_icon, {
                 [styles.checked]: useStyleUpdates,

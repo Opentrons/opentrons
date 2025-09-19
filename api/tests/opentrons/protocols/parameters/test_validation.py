@@ -1,15 +1,25 @@
 import pytest
-from typing import Optional, List
+from typing import Optional, List, Union
 
 from opentrons.protocols.parameters.types import (
-    AllowedTypes,
+    PrimitiveAllowedTypes,
     ParameterChoice,
-    ParameterNameError,
+)
+from opentrons.protocols.parameters.exceptions import (
     ParameterValueError,
     ParameterDefinitionError,
+    ParameterNameError,
 )
 
 from opentrons.protocols.parameters import validation as subject
+
+
+def test_validate_variable_name_unique() -> None:
+    """It should no-op if the name is unique or if it's not a string, and raise if it is not."""
+    subject.validate_variable_name_unique("one of a kind", {"fee", "foo", "fum"})
+    subject.validate_variable_name_unique({}, {"fee", "foo", "fum"})  # type: ignore[arg-type]
+    with pytest.raises(ParameterNameError):
+        subject.validate_variable_name_unique("copy", {"paste", "copy", "cut"})
 
 
 def test_ensure_display_name() -> None:
@@ -96,10 +106,12 @@ def test_ensure_variable_name_raises_keyword(variable_name: str) -> None:
 def test_validate_options() -> None:
     """It should not raise when given valid constraints"""
     subject.validate_options(123, 1, 100, None, int)
+    subject.validate_options(123, 100, 100, None, int)
     subject.validate_options(
         123, None, None, [{"display_name": "abc", "value": 456}], int
     )
     subject.validate_options(12.3, 1.1, 100.9, None, float)
+    subject.validate_options(12.3, 1.1, 1.1, None, float)
     subject.validate_options(
         12.3, None, None, [{"display_name": "abc", "value": 45.6}], float
     )
@@ -130,6 +142,120 @@ def test_validate_options_raises_name_error() -> None:
 
 
 @pytest.mark.parametrize(
+    ["value", "param_type", "result"],
+    [
+        (1.0, int, 1),
+        (1.1, int, 1.1),
+        (2, float, 2.0),
+        (2.0, float, 2.0),
+        (2.2, float, 2.2),
+        ("3.0", str, "3.0"),
+        (0.0, bool, False),
+        (1, bool, True),
+        (3.0, bool, 3.0),
+        (True, bool, True),
+    ],
+)
+def test_ensure_value_type(
+    value: Union[float, bool, str], param_type: type, result: PrimitiveAllowedTypes
+) -> None:
+    """It should ensure that if applicable, the value is coerced into the expected type"""
+    assert result == subject.ensure_value_type(value, param_type)
+
+
+@pytest.mark.parametrize(
+    ["value", "result"],
+    [
+        (1, 1.0),
+        (2.0, 2.0),
+        (3.3, 3.3),
+    ],
+)
+def test_ensure_float_value(value: Union[float, int], result: float) -> None:
+    """It should ensure that if applicable, the value is coerced into a float."""
+    assert result == subject.ensure_float_value(value)
+
+
+@pytest.mark.parametrize(
+    ["value", "result"],
+    [
+        (1, 1.0),
+        (2.0, 2.0),
+        (3.3, 3.3),
+        (None, None),
+    ],
+)
+def test_ensure_optional_float_value(value: Union[float, int], result: float) -> None:
+    """It should ensure that if applicable, the value is coerced into a float."""
+    assert result == subject.ensure_optional_float_value(value)
+
+
+@pytest.mark.parametrize(
+    ["choices", "result"],
+    [
+        ([], []),
+        (None, None),
+        (
+            [{"display_name": "foo", "value": 1}],
+            [{"display_name": "foo", "value": 1.0}],
+        ),
+        (
+            [{"display_name": "foo", "value": 2.0}],
+            [{"display_name": "foo", "value": 2.0}],
+        ),
+        (
+            [{"display_name": "foo", "value": 3.3}],
+            [{"display_name": "foo", "value": 3.3}],
+        ),
+        (
+            [{"display_name": "foo", "value": "4"}],
+            [{"display_name": "foo", "value": "4"}],
+        ),
+        (
+            [{"display_name": "foo", "value": True}],
+            [{"display_name": "foo", "value": True}],
+        ),
+    ],
+)
+def test_ensure_float_choices(
+    choices: Optional[List[ParameterChoice]], result: Optional[List[ParameterChoice]]
+) -> None:
+    """It should ensure that if applicable, the value in a choice is coerced into a float."""
+    assert result == subject.ensure_float_choices(choices)
+
+
+@pytest.mark.parametrize(
+    ["param_type", "result"],
+    [(int, "int"), (float, "float"), (str, "str")],
+)
+def test_convert_type_string_for_enum(param_type: type, result: str) -> None:
+    """It should convert the type into a string for the EnumParameter model."""
+    assert result == subject.convert_type_string_for_enum(param_type)
+
+
+def test_convert_type_string_for_enum_raises() -> None:
+    """It should raise if given a bool to convert to an enum type string."""
+    with pytest.raises(ParameterValueError):
+        subject.convert_type_string_for_enum(bool)
+
+
+@pytest.mark.parametrize(["param_type", "result"], [(int, "int"), (float, "float")])
+def test_convert_type_string_for_num_param(param_type: type, result: str) -> None:
+    """It should convert the type into a string for the NumberParameter model."""
+    assert result == subject.convert_type_string_for_num_param(param_type)
+
+
+@pytest.mark.parametrize(
+    "param_type",
+    [str, bool],
+)
+def test_convert_type_string_for_num_param_raises(param_type: type) -> None:
+    """It should raise if given a bool or str to convert to a number type string."""
+    with pytest.raises(ParameterValueError):
+        subject.convert_type_string_for_num_param(param_type)
+
+
+@pytest.mark.parametrize(
     ["default", "minimum", "maximum", "choices", "parameter_type", "error_text"],
     [
         (123, None, None, None, int, "provide either"),
@@ -157,20 +283,21 @@ def test_validate_options_raises_name_error() -> None:
             None,
             [{"display_name": "abc", "value": "123"}],
             int,
-            "must match type",
+            "must be of type",
         ),
         (123, 1, None, None, int, "maximum must also"),
         (123, None, 100, None, int, "minimum must also"),
         (123, 100, 1, None, int, "Maximum must be greater"),
-        (123, 1.1, 100, None, int, "Minimum and maximum must match type"),
-        (123, 1, 100.5, None, int, "Minimum and maximum must match type"),
-        (123, "1", "100", None, int, "Only parameters of type float or int"),
+        (123, 1.1, 100, None, int, "Minimum is type"),
+        (123, 1, 100.5, None, int, "Maximum is type"),
+        (123.0, "1.0", 100.0, None, float, "Minimum is type"),
+        ("blah", 1, 100, None, str, "Only parameters of type float or int"),
     ],
 )
 def test_validate_options_raise_definition_error(
-    default: AllowedTypes,
-    minimum: Optional[AllowedTypes],
-    maximum: Optional[AllowedTypes],
+    default: PrimitiveAllowedTypes,
+    minimum: Optional[PrimitiveAllowedTypes],
+    maximum: Optional[PrimitiveAllowedTypes],
     choices: Optional[List[ParameterChoice]],
     parameter_type: type,
     error_text: str,

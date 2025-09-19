@@ -74,9 +74,6 @@ class FlexCalibratable(Protocol):
     async def restore_system_constrants(self) -> AsyncIterator[None]:
         yield
 
-    async def set_system_constraints_for_calibration(self) -> None:
-        ...
-
     async def reset_instrument_offset(
         self, mount: Union[top_types.Mount, OT3Mount], to_default: bool = True
     ) -> None:

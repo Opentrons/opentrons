@@ -1,11 +1,17 @@
-from typing import Any, AsyncGenerator, Dict, NamedTuple, cast
+import json
+from copy import deepcopy
 from datetime import datetime
+from typing import Any, AsyncGenerator, Dict, NamedTuple, cast
 
 import anyio
 import pytest
 
+from tests.conftest import zulu_iso8601_to_datetime
 from tests.integration.dev_server import DevServer
 from tests.integration.robot_client import RobotClient
+
+
+pytestmark = pytest.mark.slow
 
 
 class ClientServerFixture(NamedTuple):
@@ -73,7 +79,46 @@ async def _assert_run_persisted(
     assert get_persisted_run_response.json()["data"] == expected_run_data
 
 
-async def test_runs_persist(client_and_server: ClientServerFixture) -> None:
+async def test_untimely_restart_marks_runs_bad(
+    client_and_server: ClientServerFixture,
+) -> None:
+    """Test that a run persists even if the server was restarted before the run was
+    gracefully closed out."""
+    client, server = client_and_server
+
+    # create a run
+    create_run_response = await client.post_run(req_body={"data": {}})
+    run_id = create_run_response.json()["data"]["id"]
+
+    run = (await client.get_run(run_id)).json()["data"]
+    assert run["status"] == "idle"
+    assert run["current"] is True
+    # Some loss of state is expected.
+    expected_run = deepcopy(run)
+    expected_run["status"] = "stopped"
+    expected_run["current"] = False
+    expected_run["ok"] = False
+    expected_run["dataError"] = {
+        "id": "RunDataError",
+        "title": "Run Data Error",
+        "detail": "There was no engine state data for this run.",
+        "meta": {
+            "code": "4008",
+            "detail": {},
+            "message": "There was no engine state data for this run.",
+            "type": "InvalidStoredData",
+            "wrapping": [],
+        },
+        "errorCode": "4008",
+    }
+
+    # reboot the server
+    await client_and_server.restart()
+
+    await _assert_run_persisted(robot_client=client, expected_run_data=expected_run)
+
+
+async def test_runs_persist_via_patch(client_and_server: ClientServerFixture) -> None:
     """Test that runs are persisted through dev server restart."""
     client, server = client_and_server
 
@@ -100,10 +145,7 @@ async def test_runs_persist_via_actions_router(
     """Test that runs commands and state
     are persisted when calling play action through dev server restart."""
     client, server = client_and_server
-    # await client.post_protocol([Path("./tests/integration/protocols/simple.py")])
-    #
-    # protocols = (await client.get_protocols()).json()["data"]
-    # protocol_id = protocols[0]["id"]
+
     # create a run
     create_run_response = await client.post_run(req_body={"data": {}})
     run_id = create_run_response.json()["data"]["id"]
@@ -213,6 +255,9 @@ async def test_run_commands_persist(client_and_server: ClientServerFixture) -> N
     get_persisted_command_response = await client.get_run_command(
         run_id=run_id, command_id=command_id
     )
+    get_preserialized_commands_response = await client.get_preserialized_commands(
+        run_id=run_id
+    )
 
     # ensure the persisted commands still match the original ones
     assert get_all_persisted_commands_response.json()["data"] == [
@@ -221,6 +266,11 @@ async def test_run_commands_persist(client_and_server: ClientServerFixture) -> N
         {k: v for k, v in expected_command.items() if k != "result"}
     ]
     assert get_persisted_command_response.json()["data"] == expected_command
+
+    json_converted_command = json.loads(
+        get_preserialized_commands_response.json()["data"][0]
+    )
+    assert json_converted_command == expected_command
 
 
 async def test_runs_completed_started_at_persist_via_actions_router(
@@ -252,13 +302,13 @@ async def test_runs_completed_started_at_persist_via_actions_router(
     get_run_response = await client.get_run(run_id=run_id)
     run_data = get_run_response.json()["data"]
 
-    assert datetime.fromisoformat(run_data["startedAt"]).timestamp() == pytest.approx(
+    assert zulu_iso8601_to_datetime(run_data["startedAt"]).timestamp() == pytest.approx(
         expected_started_at.timestamp(), abs=2
     )
 
-    assert datetime.fromisoformat(run_data["completedAt"]).timestamp() == pytest.approx(
-        expected_completed_at.timestamp(), abs=2
-    )
+    assert zulu_iso8601_to_datetime(
+        run_data["completedAt"]
+    ).timestamp() == pytest.approx(expected_completed_at.timestamp(), abs=2)
 
     # make sure the times are in order
     assert run_data["startedAt"] < run_data["completedAt"]
@@ -286,6 +336,6 @@ async def test_runs_completed_filled_started_at_none_persist(
     run_data = get_run_response.json()["data"]
 
     assert "startedAt" not in run_data
-    assert datetime.fromisoformat(run_data["completedAt"]).timestamp() == pytest.approx(
-        expected_completed_at.timestamp(), abs=2
-    )
+    assert zulu_iso8601_to_datetime(
+        run_data["completedAt"]
+    ).timestamp() == pytest.approx(expected_completed_at.timestamp(), abs=2)

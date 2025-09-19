@@ -1,12 +1,37 @@
 import assert from 'assert'
 import produce from 'immer'
+
 import { stripNoOpCommands } from '../utils/stripNoOpCommands'
+import {
+  forAbsorbanceReaderCloseLid,
+  forAbsorbanceReaderInitialize,
+  forAbsorbanceReaderOpenLid,
+} from './absorbanceReaderUpdates'
 import { forAspirate } from './forAspirate'
-import { forDispense } from './forDispense'
 import { forBlowout } from './forBlowout'
+import { forConfigureNozzleLayout } from './forConfigureNozzleLayout'
+import { forDispense } from './forDispense'
 import { forDropTip } from './forDropTip'
+import { forLoadLiquid } from './forLoadLiquid'
+import { forMoveLabware } from './forMoveLabware'
+import { forMoveToAddressableArea } from './forMoveToAddressableArea'
+import { forMoveToWell } from './forMoveToWell'
 import { forPickUpTip } from './forPickUpTip'
-import { forEngageMagnet, forDisengageMagnet } from './magnetUpdates'
+import {
+  forHeaterShakerCloseLatch,
+  forHeaterShakerDeactivateHeater,
+  forHeaterShakerOpenLatch,
+  forHeaterShakerSetTargetShakeSpeed,
+  forHeaterShakerSetTargetTemperature,
+  forHeaterShakerStopShake,
+} from './heaterShakerUpdates'
+import { forBlowOutInPlace, forDropTipInPlace } from './inPlaceCommandUpdates'
+import { forDisengageMagnet, forEngageMagnet } from './magnetUpdates'
+import {
+  forAwaitTemperature,
+  forDeactivateTemperature,
+  forSetTemperature,
+} from './temperatureUpdates'
 import {
   forThermocyclerAwaitBlockTemperature,
   forThermocyclerAwaitLidTemperature,
@@ -19,33 +44,13 @@ import {
   forThermocyclerSetTargetBlockTemperature,
   forThermocyclerSetTargetLidTemperature,
 } from './thermocyclerUpdates'
-import {
-  forAwaitTemperature,
-  forSetTemperature,
-  forDeactivateTemperature,
-} from './temperatureUpdates'
-import {
-  forHeaterShakerCloseLatch,
-  forHeaterShakerDeactivateHeater,
-  forHeaterShakerOpenLatch,
-  forHeaterShakerSetTargetShakeSpeed,
-  forHeaterShakerSetTargetTemperature,
-  forHeaterShakerStopShake,
-} from './heaterShakerUpdates'
-import { forMoveLabware } from './forMoveLabware'
-import {
-  forAspirateInPlace,
-  forBlowOutInPlace,
-  forDispenseInPlace,
-  forDropTipInPlace,
-} from './inPlaceCommandUpdates'
+
 import type { CreateCommand } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   RobotState,
   RobotStateAndWarnings,
 } from '../types'
-import { forConfigureNozzleLayout } from './forConfigureNozzleLayout'
 
 // WARNING this will mutate the prevRobotState
 function _getNextRobotStateAndWarningsSingleCommand(
@@ -56,6 +61,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
   assert(command, 'undefined command passed to getNextRobotStateAndWarning')
   switch (command.commandType) {
     case 'aspirate':
+    case 'aspirateInPlace':
       if (command.meta?.isAirGap === true) {
         break
       } else {
@@ -64,6 +70,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
       break
 
     case 'dispense':
+    case 'dispenseInPlace':
       if (command.meta?.isAirGap === true) {
         break
       } else {
@@ -99,12 +106,45 @@ function _getNextRobotStateAndWarningsSingleCommand(
       forMoveLabware(command.params, invariantContext, robotStateAndWarnings)
       break
 
-    case 'aspirateInPlace':
-      forAspirateInPlace(
+    // the following commands currently don't effect tracked robot state
+    case 'touchTip': // pipetting
+    case 'configureForVolume':
+    case 'loadPipette': // setup VVV
+    case 'loadLabware':
+    case 'loadModule':
+    case 'home': // gantry VVV
+    case 'moveRelative':
+    case 'moveToSlot':
+    case 'moveToCoordinates':
+    case 'savePosition':
+    case 'waitForResume': // timing VVV
+    case 'waitForDuration':
+    case 'pause': // deprecated, use waitForResume instead
+    case 'delay': // deprecated, use waitForDuration instead
+    case 'custom': // fall-back
+    case 'comment':
+    case 'airGapInPlace':
+    case 'prepareToAspirate':
+    case 'liquidProbe':
+    case 'loadLiquidClass':
+    case 'getNextTip':
+      break
+
+    case 'moveToAddressableArea':
+    case 'moveToAddressableAreaForDropTip':
+      forMoveToAddressableArea(
         command.params,
         invariantContext,
         robotStateAndWarnings
       )
+      break
+
+    case 'moveToWell':
+      forMoveToWell(command.params, invariantContext, robotStateAndWarnings)
+      break
+
+    case 'loadLiquid':
+      forLoadLiquid(command.params, invariantContext, robotStateAndWarnings)
       break
 
     case 'dropTipInPlace':
@@ -115,31 +155,12 @@ function _getNextRobotStateAndWarningsSingleCommand(
       forBlowOutInPlace(command.params, invariantContext, robotStateAndWarnings)
       break
 
-    case 'dispenseInPlace':
-      forDispenseInPlace(
-        command.params,
-        invariantContext,
-        robotStateAndWarnings
-      )
-      break
-
     case 'configureNozzleLayout':
       forConfigureNozzleLayout(
         command.params,
         invariantContext,
         robotStateAndWarnings
       )
-      break
-
-    case 'touchTip':
-    case 'waitForDuration':
-    case 'waitForResume':
-    case 'moveToWell':
-    case 'delay':
-    case 'configureForVolume':
-    case 'moveToAddressableArea':
-    case 'moveToAddressableAreaForDropTip':
-      // these commands don't have any effects on the state
       break
 
     case 'temperatureModule/setTargetTemperature':
@@ -286,6 +307,29 @@ function _getNextRobotStateAndWarningsSingleCommand(
     //  no state updates required
     case 'heaterShaker/waitForTemperature':
       break
+    case 'absorbanceReader/openLid':
+      forAbsorbanceReaderOpenLid(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+    case 'absorbanceReader/closeLid':
+      forAbsorbanceReaderCloseLid(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+    case 'absorbanceReader/initialize':
+      forAbsorbanceReaderInitialize(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+    case 'absorbanceReader/read':
+      break
     default:
       assert(
         false,
@@ -313,11 +357,12 @@ export function getNextRobotStateAndWarnings(
   invariantContext: InvariantContext,
   initialRobotState: RobotState
 ): RobotStateAndWarnings {
+  const strippedCommands = stripNoOpCommands(commands)
+
   const prevState = {
     warnings: [],
     robotState: initialRobotState,
   }
-  const strippedCommands = stripNoOpCommands(commands)
   return produce(prevState, draft => {
     strippedCommands.forEach(command => {
       _getNextRobotStateAndWarningsSingleCommand(

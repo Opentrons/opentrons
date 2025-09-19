@@ -1,7 +1,7 @@
-import zipWith from 'lodash/zipWith'
-import uniq from 'lodash/uniq'
 import compact from 'lodash/compact'
 import flatten from 'lodash/flatten'
+import uniq from 'lodash/uniq'
+import zipWith from 'lodash/zipWith'
 
 export type WellOrderOption = 'l2r' | 'r2l' | 't2b' | 'b2t'
 

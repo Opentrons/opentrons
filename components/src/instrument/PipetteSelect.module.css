@@ -1,14 +1,14 @@
 .pipette_volume_class {
-  cursor: default;
   min-width: 3.5rem;
+  cursor: default;
 }
 
 .pipette_channels {
-  cursor: default;
   min-width: 7rem;
+  cursor: default;
 }
 
 .pipette_category {
-  cursor: default;
   min-width: 2.5rem;
+  cursor: default;
 }

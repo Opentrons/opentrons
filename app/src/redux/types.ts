@@ -1,40 +1,41 @@
 /* eslint-disable no-use-before-define */
 // application types
-import type { Store as ReduxStore, Dispatch as ReduxDispatch } from 'redux'
-import type { RouterState, RouterAction } from 'connected-react-router'
+import type { RouterAction } from 'connected-react-router'
+import type { Dispatch as ReduxDispatch, Store as ReduxStore } from 'redux'
 import type { Observable } from 'rxjs'
-
-import type { RobotApiState, RobotApiAction } from './robot-api/types'
-import type { RobotAdminState, RobotAdminAction } from './robot-admin/types'
-import type {
-  RobotControlsState,
-  RobotControlsAction,
-} from './robot-controls/types'
-import type { RobotUpdateState, RobotUpdateAction } from './robot-update/types'
-import type { PipettesState, PipettesAction } from './pipettes/types'
-import type { ModulesAction } from './modules/types'
-import type { ShellState, ShellAction } from './shell/types'
-import type { ConfigState, ConfigAction } from './config/types'
-import type { DiscoveryState, DiscoveryAction } from './discovery/types'
-import type { NetworkingState, NetworkingAction } from './networking/types'
-import type {
-  ProtocolStorageState,
-  ProtocolStorageAction,
-} from './protocol-storage/types'
-import type { ProtocolAnalysisAction } from './protocol-analysis'
-import type {
-  CustomLabwareState,
-  CustomLabwareAction,
-} from './custom-labware/types'
-import type {
-  RobotSettingsState,
-  RobotSettingsAction,
-} from './robot-settings/types'
-import type { CalibrationState, CalibrationAction } from './calibration/types'
-import type { SystemInfoState, SystemInfoAction } from './system-info/types'
-import type { AlertsState, AlertsAction } from './alerts/types'
-import type { SessionState, SessionsAction } from './sessions/types'
+import type { AlertsAction, AlertsState } from './alerts/types'
 import type { AnalyticsTriggerAction } from './analytics/types'
+import type { CalibrationAction, CalibrationState } from './calibration/types'
+import type { ConfigAction, ConfigState } from './config/types'
+import type {
+  AddCustomLabwareFromCreatorAction,
+  CustomLabwareAction,
+  CustomLabwareState,
+} from './custom-labware/types'
+import type { DiscoveryAction, DiscoveryState } from './discovery/types'
+import type { ModulesAction } from './modules/types'
+import type { NetworkingAction, NetworkingState } from './networking/types'
+import type { PipettesAction, PipettesState } from './pipettes/types'
+import type { ProtocolAnalysisAction } from './protocol-analysis'
+import type { ProtocolRunAction, ProtocolRunState } from './protocol-runs/types'
+import type {
+  ProtocolStorageAction,
+  ProtocolStorageState,
+} from './protocol-storage/types'
+import type { RobotAdminAction, RobotAdminState } from './robot-admin/types'
+import type { RobotApiAction, RobotApiState } from './robot-api/types'
+import type {
+  RobotControlsAction,
+  RobotControlsState,
+} from './robot-controls/types'
+import type {
+  RobotSettingsAction,
+  RobotSettingsState,
+} from './robot-settings/types'
+import type { RobotUpdateAction, RobotUpdateState } from './robot-update/types'
+import type { SessionsAction, SessionState } from './sessions/types'
+import type { ShellAction, ShellState } from './shell/types'
+import type { SystemInfoAction, SystemInfoState } from './system-info/types'
 
 export interface State {
   readonly robotApi: RobotApiState
@@ -53,7 +54,7 @@ export interface State {
   readonly sessions: SessionState
   readonly calibration: CalibrationState
   readonly protocolStorage: ProtocolStorageState
-  readonly router: RouterState
+  readonly protocolRuns: ProtocolRunState
 }
 
 export type Action =
@@ -77,6 +78,8 @@ export type Action =
   | SessionsAction
   | CalibrationAction
   | AnalyticsTriggerAction
+  | AddCustomLabwareFromCreatorAction
+  | ProtocolRunAction
 
 export type GetState = () => State
 
@@ -114,3 +117,5 @@ export type Epic = (
 ) => Observable<Action>
 
 export type Error = Partial<{ name: string; message: string }>
+
+export * from './shell/types'

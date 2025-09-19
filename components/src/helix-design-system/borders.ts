@@ -26,6 +26,7 @@ export const lineBorder = `1px ${styleSolid} ${COLORS.grey30}`
  * Shadows
  */
 export const smallDropShadow = '0px 3px 6px rgba(0, 0, 0, 0.23)'
+export const tinyDropShadow = '0px 1px 3px 0px rgba(0, 0, 0, .33)'
 // touch screen
 export const shadowBig = '0px 3px 6px rgba(0,0,0,0.23)'
 export const shadowSmall = '0px 0px 40px rgba(0,0,0,0.4)'

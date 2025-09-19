@@ -3,13 +3,14 @@ from decoy import Decoy
 
 from opentrons.hardware_control.modules import TempDeck
 
-from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.state.module_substates import (
     TemperatureModuleSubState,
     TemperatureModuleId,
 )
 from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands import temperature_module
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.temperature_module.wait_for_temperature import (
     WaitForTemperatureImpl,
 )
@@ -46,7 +47,9 @@ async def test_wait_for_temperature(
     decoy.verify(
         await tempdeck_hardware.await_temperature(awaiting_temperature=123), times=1
     )
-    assert result == temperature_module.WaitForTemperatureResult()
+    assert result == SuccessData(
+        public=temperature_module.WaitForTemperatureResult(),
+    )
 
 
 async def test_wait_for_temperature_requested_celsius(
@@ -86,4 +89,6 @@ async def test_wait_for_temperature_requested_celsius(
     decoy.verify(
         await tempdeck_hardware.await_temperature(awaiting_temperature=12), times=1
     )
-    assert result == temperature_module.WaitForTemperatureResult()
+    assert result == SuccessData(
+        public=temperature_module.WaitForTemperatureResult(),
+    )

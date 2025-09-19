@@ -110,11 +110,11 @@ DOOR_CONDITIONS.sync_engaged = False
 
 # Start UI Prompts
 PROMPT_UNPLUGGED = "ENSURE AUX TESTER IS NOT PLUGGED IN"
-PROMPT_AUX_1 = "PLUG IN AUX PORT 1 RIGHT"
-PROMPT_PLUGGED = "PLUG IN AUX PORT 2 LEFT"
+PROMPT_AUX_1 = "PLUG IN AUX PORT 1"
+PROMPT_PLUGGED = "PLUG IN AUX PORT 2"
 PROMPT_ESTOP_1 = "PRESS ESTOP 1"
 PROMPT_ESTOP_2 = "RELEASE ESTOP 1, PRESS ESTOP 2"
-PROMPT_AUX_2 = "UNPLUG AUX PORT 1 RIGHT"
+PROMPT_AUX_2 = "UNPLUG AUX PORT 1"
 PROMPT_DOOR = "UNPLUG AUX PORT 2 LEFT AND CLOSE DOOR"
 
 
@@ -385,9 +385,9 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         await _test_wifi(report, section)
     else:
         report(section, "wifi", ["", "", "0.0.0.0", CSVResult.PASS])
-        assert nmcli.iface_info
-        assert nmcli.configure
-        assert nmcli.wifi_disconnect
+        assert nmcli.iface_info is not None
+        assert nmcli.configure is not None
+        assert nmcli.wifi_disconnect is not None
 
     # USB-B-REAR
     ui.print_header("USB-B-REAR")

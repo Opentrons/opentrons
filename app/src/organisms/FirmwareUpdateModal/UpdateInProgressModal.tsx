@@ -1,19 +1,21 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
-  Icon,
   Flex,
+  Icon,
+  LegacyStyledText,
+  RESPONSIVENESS,
   SPACING,
   TYPOGRAPHY,
-  RESPONSIVENESS,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
-import { Modal } from '../../molecules/Modal'
+
+import { OddModal } from '/app/molecules/OddModal'
+
 import type { Subsystem } from '@opentrons/api-client'
 
 interface UpdateInProgressModalProps {
@@ -36,7 +38,7 @@ export function UpdateInProgressModal(
   const { t } = useTranslation('firmware_update')
 
   return (
-    <Modal>
+    <OddModal>
       <Flex
         height="17.25rem"
         width="100%"
@@ -48,13 +50,13 @@ export function UpdateInProgressModal(
         alignItems={ALIGN_CENTER}
         gridGap={SPACING.spacing40}
       >
-        <StyledText
+        <LegacyStyledText
           as="h4"
           marginBottom={SPACING.spacing4}
           fontWeight={TYPOGRAPHY.fontWeightBold}
         >
           {t('updating_firmware', { subsystem: t(subsystem) })}
-        </StyledText>
+        </LegacyStyledText>
         <Icon
           name="ot-spinner"
           aria-label="spinner"
@@ -63,6 +65,6 @@ export function UpdateInProgressModal(
           spin
         />
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

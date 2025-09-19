@@ -1,0 +1,6 @@
+*.py[cod]
+*.egg
+build
+htmlcov
+
+src/test_data_generation/_version.py

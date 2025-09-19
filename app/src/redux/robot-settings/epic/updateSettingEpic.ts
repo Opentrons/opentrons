@@ -2,18 +2,15 @@ import { ofType } from 'redux-observable'
 
 import { POST } from '../../robot-api'
 import { mapToRobotApiRequest } from '../../robot-api/operators'
-
 import * as Actions from '../actions'
 import * as Constants from '../constants'
-
-import type { Action, Epic } from '../../types'
 
 import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
-
-import type { UpdateSettingAction } from '../types'
+import type { Action, Epic } from '../../types'
+import type { RobotSettings, UpdateSettingAction } from '../types'
 
 const mapActionToRequest: ActionToRequestMapper<UpdateSettingAction> = action => ({
   method: POST,
@@ -31,11 +28,11 @@ const mapResponseToAction: ResponseToActionMapper<UpdateSettingAction> = (
   return response.ok
     ? Actions.updateSettingSuccess(
         host.name,
-        body.settings,
-        body.links?.restart || null,
+        body.settings as RobotSettings,
+        (body.links?.restart as string | null) ?? null,
         meta
       )
-    : Actions.updateSettingFailure(host.name, body, meta)
+    : Actions.updateSettingFailure(host.name, body as { message: string }, meta)
 }
 
 export const updateSettingEpic: Epic = (action$, state$) => {

@@ -7,6 +7,7 @@ from opentrons.hardware_control.ot3api import OT3API
 
 from hardware_testing.opentrons_api import types
 from hardware_testing.opentrons_api import helpers_ot3
+from opentrons_hardware.hardware_control.motion_planning import move_utils
 
 
 async def _exercise_pipette(api: OT3API, mount: types.OT3Mount) -> None:
@@ -66,6 +67,7 @@ async def _main(
 ) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating)
     await api.home()
+    move_utils.MINIMUM_DISPLACEMENT = 0.009
     while True:
         await helpers_ot3.jog_mount_ot3(api, mount, speed=speed)
         if mount == types.OT3Mount.GRIPPER:

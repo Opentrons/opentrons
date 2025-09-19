@@ -1,4 +1,9 @@
-from opentrons.hardware_control.types import StatusBarState
+from opentrons.hardware_control.types import (
+    StatusBarState,
+    StatusBarUpdateEvent,
+    StatusBarUpdateListener,
+    StatusBarUpdateUnsubscriber,
+)
 from opentrons_hardware.hardware_control import status_bar
 from opentrons_hardware.firmware_bindings.binary_constants import (
     LightAnimationType,
@@ -22,6 +27,24 @@ class StatusBarStateController:
         self._status_bar_state = StatusBarState.IDLE
         self._controller = controller
         self._enabled = True
+        self._listeners: List[StatusBarUpdateListener] = []
+
+    def add_listener(
+        self, listener: StatusBarUpdateListener
+    ) -> StatusBarUpdateUnsubscriber:
+        """Add a listener to the status bar state."""
+        if listener not in self._listeners:
+            self._listeners.append(listener)
+
+        def _remove_listener() -> None:
+            self._listeners.remove(listener)
+
+        return _remove_listener
+
+    def emit_event(self) -> None:
+        """Emit an event to all listeners."""
+        for listener in self._listeners:
+            listener(StatusBarUpdateEvent(self._status_bar_state, self._enabled))
 
     async def _status_bar_idle(self) -> None:
         self._status_bar_state = StatusBarState.IDLE
@@ -47,6 +70,11 @@ class StatusBarStateController:
         self._status_bar_state = StatusBarState.SOFTWARE_ERROR
         if self._enabled:
             await self._controller.static_color(status_bar.YELLOW)
+
+    async def _status_bar_error_recovery(self) -> None:
+        self._status_bar_state = StatusBarState.ERROR_RECOVERY
+        if self._enabled:
+            await self._controller.pulse_color(status_bar.YELLOW)
 
     async def _status_bar_confirm(self) -> None:
         # Confirm should revert to IDLE
@@ -163,6 +191,7 @@ class StatusBarStateController:
             StatusBarState.PAUSED: self._status_bar_paused,
             StatusBarState.HARDWARE_ERROR: self._status_bar_hardware_error,
             StatusBarState.SOFTWARE_ERROR: self._status_bar_software_error,
+            StatusBarState.ERROR_RECOVERY: self._status_bar_error_recovery,
             StatusBarState.CONFIRMATION: self._status_bar_confirm,
             StatusBarState.RUN_COMPLETED: self._status_bar_run_complete,
             StatusBarState.UPDATING: self._status_bar_updating,
@@ -171,6 +200,7 @@ class StatusBarStateController:
             StatusBarState.OFF: self._status_bar_off,
         }
         await callbacks[state]()
+        self.emit_event()
 
     def get_current_state(self) -> StatusBarState:
         """Get the current state."""

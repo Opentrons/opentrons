@@ -1,0 +1,6 @@
+*.py[cod]
+*.egg
+build
+htmlcov
+
+robot_server/_version.py

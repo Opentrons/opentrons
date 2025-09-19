@@ -1,6 +1,6 @@
 import path from 'path'
 import glob from 'glob'
-import { describe, expect, it, beforeAll } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
 
 const definitionsGlobPath = path.join(
   __dirname,
@@ -13,6 +13,8 @@ const EXPECTED_VALID_QUIRKS = [
   'fixedTrash',
   'gripperIncompatible',
   'tiprackAdapterFor96Channel',
+  'stackingMaxFive',
+  'stackingOnly',
 ]
 
 describe('check quirks for all labware defs', () => {

@@ -4,10 +4,12 @@ from typing import Optional, TYPE_CHECKING
 from typing_extensions import Literal, Type
 from pydantic import BaseModel, Field
 
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ...errors.error_occurrence import ErrorOccurrence
+from ...state import update_types
 
 if TYPE_CHECKING:
-    from opentrons.protocol_engine.state import StateView
+    from opentrons.protocol_engine.state.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
 
 OpenLabwareLatchCommandType = Literal["heaterShaker/openLabwareLatch"]
@@ -32,7 +34,7 @@ class OpenLabwareLatchResult(BaseModel):
 
 
 class OpenLabwareLatchImpl(
-    AbstractCommandImpl[OpenLabwareLatchParams, OpenLabwareLatchResult]
+    AbstractCommandImpl[OpenLabwareLatchParams, SuccessData[OpenLabwareLatchResult]]
 ):
     """Execution implementation of a Heater-Shaker's open latch labware command."""
 
@@ -47,8 +49,12 @@ class OpenLabwareLatchImpl(
         self._equipment = equipment
         self._movement = movement
 
-    async def execute(self, params: OpenLabwareLatchParams) -> OpenLabwareLatchResult:
+    async def execute(
+        self, params: OpenLabwareLatchParams
+    ) -> SuccessData[OpenLabwareLatchResult]:
         """Open a Heater-Shaker's labware latch."""
+        state_update = update_types.StateUpdate()
+
         # Allow propagation of ModuleNotLoadedError and WrongModuleTypeError.
         hs_module_substate = self._state_view.modules.get_heater_shaker_module_substate(
             module_id=params.moduleId
@@ -67,6 +73,7 @@ class OpenLabwareLatchImpl(
             await self._movement.home(
                 axes=self._state_view.motion.get_robot_mount_axes()
             )
+            state_update.clear_all_pipette_locations()
 
         # Allow propagation of ModuleNotAttachedError.
         hs_hardware_module = self._equipment.get_module_hardware_api(
@@ -76,15 +83,20 @@ class OpenLabwareLatchImpl(
         if hs_hardware_module is not None:
             await hs_hardware_module.open_labware_latch()
 
-        return OpenLabwareLatchResult(pipetteRetracted=pipette_should_retract)
+        return SuccessData(
+            public=OpenLabwareLatchResult(pipetteRetracted=pipette_should_retract),
+            state_update=state_update,
+        )
 
 
-class OpenLabwareLatch(BaseCommand[OpenLabwareLatchParams, OpenLabwareLatchResult]):
+class OpenLabwareLatch(
+    BaseCommand[OpenLabwareLatchParams, OpenLabwareLatchResult, ErrorOccurrence]
+):
     """A command to open a Heater-Shaker's labware latch."""
 
     commandType: OpenLabwareLatchCommandType = "heaterShaker/openLabwareLatch"
     params: OpenLabwareLatchParams
-    result: Optional[OpenLabwareLatchResult]
+    result: Optional[OpenLabwareLatchResult] = None
 
     _ImplementationCls: Type[OpenLabwareLatchImpl] = OpenLabwareLatchImpl
 

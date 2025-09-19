@@ -3,6 +3,7 @@
 */
 
 @import '../../node_modules/react-simple-keyboard/build/css/index.css';
-@import './atoms/SoftwareKeyboard/CustomKeyboard/index.css';
-@import './atoms/SoftwareKeyboard/NormalKeyboard/index.css';
-@import './atoms/SoftwareKeyboard/Numpad/index.css';
+@import './atoms/SoftwareKeyboard/AlphanumericKeyboard/index.css';
+@import './atoms/SoftwareKeyboard/FullKeyboard/index.css';
+@import './atoms/SoftwareKeyboard/NumericalKeyboard/index.css';
+@import './atoms/SoftwareKeyboard/IndividualKey/index.css';

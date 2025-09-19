@@ -1,12 +1,15 @@
 import { fixtureTiprack300ul } from '@opentrons/shared-data'
-import type {
-  PipetteOffsetCalibrationSessionDetails,
-  CalibrationLabware,
-} from '../types'
+
+import { calibrationSlotFromSlotName } from '../utils'
+
 import type { PipetteOffsetCalibrationSessionParams } from '../pipette-offset-calibration/types'
+import type {
+  CalibrationLabware,
+  PipetteOffsetCalibrationSessionDetails,
+} from '../types'
 
 export const mockPipetteOffsetTipRack: CalibrationLabware = {
-  slot: '8',
+  slot: calibrationSlotFromSlotName('8'),
   loadName: 'opentrons_96_tiprack_300ul',
   namespace: 'opentrons',
   version: 1,

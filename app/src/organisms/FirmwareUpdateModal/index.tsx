@@ -1,23 +1,25 @@
-import * as React from 'react'
+import { useEffect, useState } from 'react'
 import { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
+  COLORS,
   DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  SPACING,
   Flex,
   Icon,
-  RESPONSIVENESS,
   JUSTIFY_CENTER,
-  COLORS,
+  LegacyStyledText,
+  RESPONSIVENESS,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   useInstrumentsQuery,
   useSubsystemUpdateQuery,
   useUpdateSubsystemMutation,
 } from '@opentrons/react-api-client'
-import { StyledText } from '../../atoms/text'
-import { BadGripper, BadPipette, Subsystem } from '@opentrons/api-client'
+
+import type { BadGripper, BadPipette, Subsystem } from '@opentrons/api-client'
 
 interface FirmwareUpdateModalProps {
   description: string
@@ -73,8 +75,8 @@ export const FirmwareUpdateModal = (
     description,
     isOnDevice,
   } = props
-  const [updateId, setUpdateId] = React.useState<string | null>(null)
-  const [firmwareText, setFirmwareText] = React.useState<string | null>(null)
+  const [updateId, setUpdateId] = useState<string | null>(null)
+  const [firmwareText, setFirmwareText] = useState<string | null>(null)
   const {
     data: attachedInstruments,
     refetch: refetchInstruments,
@@ -92,7 +94,7 @@ export const FirmwareUpdateModal = (
       (i): i is BadGripper | BadPipette => !i.ok && i.subsystem === subsystem
     ) ?? false
 
-  React.useEffect(() => {
+  useEffect(() => {
     setTimeout(() => {
       if (!updateNeeded) {
         setFirmwareText(proceedDescription)
@@ -107,7 +109,7 @@ export const FirmwareUpdateModal = (
   const { data: updateData } = useSubsystemUpdateQuery(updateId)
   const status = updateData?.data.updateStatus
 
-  React.useEffect(() => {
+  useEffect(() => {
     if ((status != null || updateNeeded) && firmwareText !== description) {
       setFirmwareText(description)
     }
@@ -150,9 +152,9 @@ export const FirmwareUpdateModal = (
           color={COLORS.green60}
         />
       )}
-      <StyledText css={DESCRIPTION_STYLE}>
+      <LegacyStyledText css={DESCRIPTION_STYLE}>
         {firmwareText ?? 'Checking for updates...'}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }

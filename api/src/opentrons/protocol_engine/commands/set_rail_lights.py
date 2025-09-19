@@ -4,7 +4,8 @@ from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from ..execution import RailLightsHandler
@@ -28,25 +29,31 @@ class SetRailLightsResult(BaseModel):
 
 
 class SetRailLightsImplementation(
-    AbstractCommandImpl[SetRailLightsParams, SetRailLightsResult]
+    AbstractCommandImpl[SetRailLightsParams, SuccessData[SetRailLightsResult]]
 ):
     """setRailLights command implementation."""
 
     def __init__(self, rail_lights: RailLightsHandler, **kwargs: object) -> None:
         self._rail_lights = rail_lights
 
-    async def execute(self, params: SetRailLightsParams) -> SetRailLightsResult:
+    async def execute(
+        self, params: SetRailLightsParams
+    ) -> SuccessData[SetRailLightsResult]:
         """Dispatch a set lights command setting the state of the rail lights."""
         await self._rail_lights.set_rail_lights(params.on)
-        return SetRailLightsResult()
+        return SuccessData(
+            public=SetRailLightsResult(),
+        )
 
 
-class SetRailLights(BaseCommand[SetRailLightsParams, SetRailLightsResult]):
+class SetRailLights(
+    BaseCommand[SetRailLightsParams, SetRailLightsResult, ErrorOccurrence]
+):
     """setRailLights command model."""
 
     commandType: SetRailLightsCommandType = "setRailLights"
     params: SetRailLightsParams
-    result: Optional[SetRailLightsResult]
+    result: Optional[SetRailLightsResult] = None
 
     _ImplementationCls: Type[SetRailLightsImplementation] = SetRailLightsImplementation
 

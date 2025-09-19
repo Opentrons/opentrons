@@ -1,4 +1,4 @@
-import { LabwareFields, ProcessedLabwareFields } from '../fields'
+import type { LabwareFields, ProcessedLabwareFields } from '../fields'
 
 // NOTE: if tubeRackInsertLoadName is blank,
 // assume Opentrons tube rack (aka non-custom tube rack)

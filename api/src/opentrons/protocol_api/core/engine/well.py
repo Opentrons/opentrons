@@ -1,12 +1,19 @@
 """ProtocolEngine-based Well core implementations."""
-from typing import Optional
+from typing import Optional, Union
 
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
+from opentrons.types import Point, Mount, MountType
+
 from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
+from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from opentrons.protocols.api_support.util import APIVersionError
-from opentrons.types import Point
+from opentrons.protocols.api_support.util import UnsupportedAPIError
+from opentrons.protocol_engine.types.liquid_level_detection import (
+    SimulatedProbeResult,
+    LiquidTrackingType,
+)
+from opentrons.protocol_engine.errors import PipetteNotAttachedError
 
 from . import point_calculations
 from . import stringify
@@ -43,17 +50,27 @@ class WellCore(AbstractWellCore):
     @property
     def diameter(self) -> Optional[float]:
         """Get the well's diameter, if circular."""
-        return self._definition.diameter
+        return (
+            self._definition.diameter if self._definition.shape == "circular" else None
+        )
 
     @property
     def length(self) -> Optional[float]:
         """Get the well's length, if rectangular."""
-        return self._definition.xDimension
+        return (
+            self._definition.xDimension
+            if self._definition.shape == "rectangular"
+            else None
+        )
 
     @property
     def width(self) -> Optional[float]:
         """Get the well's width, if rectangular."""
-        return self._definition.yDimension
+        return (
+            self._definition.yDimension
+            if self._definition.shape == "rectangular"
+            else None
+        )
 
     @property
     def depth(self) -> float:
@@ -68,8 +85,8 @@ class WellCore(AbstractWellCore):
 
     def set_has_tip(self, value: bool) -> None:
         """Set the well as containing or not containing a tip."""
-        raise APIVersionError(
-            "Manually setting the tip state of a well in a tip rack has been deprecated."
+        raise UnsupportedAPIError(
+            api_element="Manually setting the tip state of a well in a tip rack",
         )
 
     def get_display_name(self) -> str:
@@ -124,16 +141,29 @@ class WellCore(AbstractWellCore):
             well_location=WellLocation(origin=WellOrigin.CENTER),
         )
 
+    def get_meniscus(self) -> Union[Point, SimulatedProbeResult]:
+        """Get the coordinate of the well's meniscus."""
+        current_liquid_height = self.current_liquid_height()
+        if isinstance(current_liquid_height, float):
+            return self.get_bottom(z_offset=current_liquid_height)
+        else:
+            return current_liquid_height
+
     def load_liquid(
         self,
         liquid: Liquid,
         volume: float,
     ) -> None:
-        """Load liquid into a well."""
-        self._engine_client.load_liquid(
-            labware_id=self._labware_id,
-            liquid_id=liquid._id,
-            volume_by_well={self._name: volume},
+        """Load liquid into a well.
+
+        If the well is known to be empty, use ``load_empty()`` instead of calling this with a 0.0 volume.
+        """
+        self._engine_client.execute_command(
+            cmd.LoadLiquidParams(
+                labwareId=self._labware_id,
+                liquidId=liquid._id,
+                volumeByWell={self._name: volume},
+            )
         )
 
     def from_center_cartesian(self, x: float, y: float, z: float) -> Point:
@@ -148,4 +178,64 @@ class WellCore(AbstractWellCore):
             x_ratio=x,
             y_ratio=y,
             z_ratio=z,
+        )
+
+    def estimate_liquid_height_after_pipetting(
+        self,
+        mount: Mount | str,
+        operation_volume: float,
+    ) -> LiquidTrackingType:
+        """Return an estimate of liquid height after pipetting without raising an error."""
+        labware_id = self.labware_id
+        well_name = self._name
+        if isinstance(mount, Mount):
+            mount_type = MountType.from_hw_mount(mount)
+        else:
+            mount_type = MountType(mount)
+        pipette_from_mount = self._engine_client.state.pipettes.get_by_mount(mount_type)
+        if pipette_from_mount is None:
+            raise PipetteNotAttachedError(f"No pipette present on mount {mount}")
+        pipette_id = pipette_from_mount.id
+        starting_liquid_height = self.current_liquid_height()
+        projected_final_height = (
+            self._engine_client.state.geometry.get_well_height_after_liquid_handling(
+                labware_id=labware_id,
+                well_name=well_name,
+                pipette_id=pipette_id,
+                initial_height=starting_liquid_height,
+                volume=operation_volume,
+            )
+        )
+        return projected_final_height
+
+    def current_liquid_height(self) -> LiquidTrackingType:
+        """Return the current liquid height within a well."""
+        labware_id = self.labware_id
+        well_name = self._name
+        return self._engine_client.state.geometry.get_meniscus_height(
+            labware_id=labware_id, well_name=well_name
+        )
+
+    def get_liquid_volume(self) -> LiquidTrackingType:
+        """Return the current volume in a well."""
+        labware_id = self.labware_id
+        well_name = self._name
+        return self._engine_client.state.geometry.get_current_well_volume(
+            labware_id=labware_id, well_name=well_name
+        )
+
+    def height_from_volume(self, volume: LiquidTrackingType) -> LiquidTrackingType:
+        """Return the height in a well corresponding to a given volume."""
+        labware_id = self.labware_id
+        well_name = self._name
+        return self._engine_client.state.geometry.get_well_height_at_volume(
+            labware_id=labware_id, well_name=well_name, volume=volume
+        )
+
+    def volume_from_height(self, height: LiquidTrackingType) -> LiquidTrackingType:
+        """Return the volume contained in a well at any height."""
+        labware_id = self.labware_id
+        well_name = self._name
+        return self._engine_client.state.geometry.get_well_volume_at_height(
+            labware_id=labware_id, well_name=well_name, height=height
         )

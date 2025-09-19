@@ -6,6 +6,7 @@ from tests.integration.dev_server import DevServer
 from tests.integration.robot_client import RobotClient
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize(
     ("num_to_configure_as_maximum", "num_to_upload", "num_to_expect"),
     [
@@ -34,11 +35,13 @@ async def test_runs_auto_delete(
             fetched_run_ids = await _get_run_ids(robot_client=robot_client)
             # Last n elements of created_run_ids.
             run_ids_to_expect = created_run_ids[-num_to_expect:]
-
             assert set(fetched_run_ids) == set(run_ids_to_expect)
 
 
-async def _create_runs(robot_client: RobotClient, num_runs: int) -> List[str]:
+async def _create_runs(
+    robot_client: RobotClient,
+    num_runs: int,
+) -> List[str]:
     """Upload several runs and return their IDs."""
     created_run_ids: List[str] = []
     for _ in range(num_runs):

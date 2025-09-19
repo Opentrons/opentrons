@@ -1,25 +1,30 @@
-import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
-import { i18n } from '../../../i18n'
-import { renderWithProviders } from '../../../__testing-utils__'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+
 import { TakeoverModal } from '../TakeoverModal'
 
-const render = (props: React.ComponentProps<typeof TakeoverModal>) => {
+import type { ComponentProps } from 'react'
+
+const render = (props: ComponentProps<typeof TakeoverModal>) => {
   return renderWithProviders(<TakeoverModal {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
 describe('TakeoverModal', () => {
-  let props: React.ComponentProps<typeof TakeoverModal>
+  let props: ComponentProps<typeof TakeoverModal>
   beforeEach(() => {
     props = {
       showConfirmTerminateModal: false,
       setShowConfirmTerminateModal: vi.fn(),
       confirmTerminate: vi.fn(),
       terminateInProgress: false,
+      title: 'Robot is busy',
     }
   })
 

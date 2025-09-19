@@ -1,6 +1,5 @@
-import * as React from 'react'
-import { fireEvent, waitFor, screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect, afterEach } from 'vitest'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   LEFT,
@@ -9,29 +8,32 @@ import {
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
-import { InProgressModal } from '../../../molecules/InProgressModal/InProgressModal'
-// import { NeedHelpLink } from '../../CalibrationPanels'
-import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { InProgressModal } from '/app/molecules/InProgressModal/InProgressModal'
+import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
+// import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
+import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
+
 import { BeforeBeginning } from '../BeforeBeginning'
 import { FLOWS } from '../constants'
 import { getIsGantryEmpty } from '../utils'
 
+import type { ComponentProps } from 'react'
+
 //  TODO(jr, 11/3/22): uncomment out the get help link when we have
 //  the correct URL to link it to
-vi.mock('../../../molecules/InProgressModal/InProgressModal')
+vi.mock('/app/molecules/InProgressModal/InProgressModal')
 vi.mock('../utils')
 
-const render = (props: React.ComponentProps<typeof BeforeBeginning>) => {
+const render = (props: ComponentProps<typeof BeforeBeginning>) => {
   return renderWithProviders(<BeforeBeginning {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
 describe('BeforeBeginning', () => {
-  let props: React.ComponentProps<typeof BeforeBeginning>
+  let props: ComponentProps<typeof BeforeBeginning>
   beforeEach(() => {
     props = {
       selectedPipette: SINGLE_MOUNT_PIPETTES,
@@ -190,7 +192,7 @@ describe('BeforeBeginning', () => {
       screen.getByText(
         'The calibration probe is included with the robot and should be stored on the front pillar of the robot.'
       )
-      screen.getByAltText('Flex 1-Channel 1000 μL')
+      screen.getByAltText('Flex 1-Channel 1000 µL')
       screen.getByText('You will need:')
       screen.getByAltText('Calibration Probe')
       screen.getByAltText('2.5 mm Hex Screwdriver')
@@ -232,16 +234,18 @@ describe('BeforeBeginning', () => {
         attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
         flowType: FLOWS.DETACH,
       }
-      const { getByText, getByAltText, getByRole } = render(props)
-      getByText('Before you begin')
-      getByText(
+      render(props)
+      screen.getByText('Before you begin')
+      screen.getByText(
         'To get started, remove labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right.'
       )
-      getByAltText('2.5 mm Hex Screwdriver')
-      getByText(
+      screen.getByAltText('2.5 mm Hex Screwdriver')
+      screen.getByText(
         'Provided with the robot. Using another size can strip the instruments’s screws.'
       )
-      const proceedBtn = getByRole('button', { name: 'Move gantry to front' })
+      const proceedBtn = screen.getByRole('button', {
+        name: 'Move gantry to front',
+      })
       fireEvent.click(proceedBtn)
       expect(props.chainRunCommands).toHaveBeenCalledWith(
         [
@@ -446,7 +450,7 @@ describe('BeforeBeginning', () => {
       )
       screen.getByAltText('2.5 mm Hex Screwdriver')
       screen.getByAltText('Calibration Probe')
-      screen.getByAltText('Flex 96-Channel 1000 μL')
+      screen.getByAltText('Flex 96-Channel 1000 µL')
       screen.getByAltText('96-Channel Mounting Plate')
       screen.getByText(
         'Provided with the robot. Using another size can strip the instruments’s screws.'

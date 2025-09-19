@@ -1,15 +1,15 @@
-import Yargs from 'yargs'
 import noop from 'lodash/noop'
+import Yargs from 'yargs'
+
 import { createDiscoveryClient, DEFAULT_PORT } from '.'
 
 import type { MiddlewareFunction } from 'yargs'
-
 import type {
   DiscoveryClient,
   DiscoveryClientRobot,
   DiscoveryClientRobotAddress,
-  LogLevel,
   Logger,
+  LogLevel,
 } from './types'
 
 const LOG_LVLS: LogLevel[] = [
@@ -99,7 +99,9 @@ const browse = (argv: Argv): void => {
   const log = createLogger(argv)
 
   createClient(argv, robots => {
-    robots.forEach(robot => log.info('%o\n\n', robot))
+    robots.forEach(robot => {
+      log.info('%o\n\n', robot)
+    })
   })
 
   log.warn('Browsing for services')

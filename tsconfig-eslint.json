@@ -1,6 +1,11 @@
 {
   "extends": "./tsconfig-base.json",
   "compilerOptions": {
+    "paths": {
+      "/app/*": ["./app/src/*"],
+      "/ai-client/*": ["./opentrons-ai-client/src/*"],
+      "/protocol-designer/*": ["./protocol-designer/src/*"]
+    },
     "emitDeclarationOnly": false,
     "noEmit": true
   },
@@ -19,6 +24,7 @@
     "labware-designer/typings",
     "labware-library/src",
     "labware-library/typings",
+    "opentrons-ai-client/src",
     "shared-data/deck",
     "shared-data/js",
     "shared-data/protocol",
@@ -35,8 +41,18 @@
     "usb-bridge/node-client/src",
     "**/*.js",
     "**/*.ts",
+    "**/*.mts",
     "*.js",
     ".*.js",
     "**/*.json"
+  ],
+  "exclude": [
+    "analyses-snapshot-testing/**",
+    "**/node_modules/**",
+    "**/coverage/**",
+    "**/dist/**/*",
+    "**/lib/**/*",
+    "**/build/**",
+    "**/venv/**"
   ]
 }

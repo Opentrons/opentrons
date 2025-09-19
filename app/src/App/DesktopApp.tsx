@@ -1,6 +1,7 @@
-import * as React from 'react'
-import { Redirect, Route, Switch, useRouteMatch } from 'react-router-dom'
+import { Fragment, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
+import { Navigate, Route, Routes, useMatch } from 'react-router-dom'
+import NiceModal from '@ebay/nice-modal-react'
 
 import {
   Box,
@@ -9,80 +10,104 @@ import {
   POSITION_RELATIVE,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
-import NiceModal from '@ebay/nice-modal-react'
 
-import { Alerts } from '../organisms/Alerts'
-import { Breadcrumbs } from '../organisms/Breadcrumbs'
-import { ToasterOven } from '../organisms/ToasterOven'
-import { CalibrationDashboard } from '../pages/Devices/CalibrationDashboard'
-import { DeviceDetails } from '../pages/Devices/DeviceDetails'
-import { DevicesLanding } from '../pages/Devices/DevicesLanding'
-import { ProtocolRunDetails } from '../pages/Devices/ProtocolRunDetails'
-import { RobotSettings } from '../pages/Devices/RobotSettings'
-import { ProtocolsLanding } from '../pages/Protocols/ProtocolsLanding'
-import { ProtocolDetails } from '../pages/Protocols/ProtocolDetails'
-import { AppSettings } from '../pages/AppSettings'
-import { Labware } from '../pages/Labware'
+import { LocalizationProvider } from '/app/LocalizationProvider'
+import { Alerts } from '/app/organisms/Desktop/Alerts'
+import { Breadcrumbs } from '/app/organisms/Desktop/Breadcrumbs'
+import { SystemLanguagePreferenceModal } from '/app/organisms/Desktop/SystemLanguagePreferenceModal'
+import {
+  EmergencyStopContext,
+  EstopTakeover,
+} from '/app/organisms/EmergencyStop'
+import { IncompatibleModuleTakeover } from '/app/organisms/IncompatibleModule'
+import { ToasterOven } from '/app/organisms/ToasterOven'
+import { AppSettings } from '/app/pages/Desktop/AppSettings'
+import { CalibrationDashboard } from '/app/pages/Desktop/Devices/CalibrationDashboard'
+import { DeviceDetails } from '/app/pages/Desktop/Devices/DeviceDetails'
+import { DevicesLanding } from '/app/pages/Desktop/Devices/DevicesLanding'
+import { ProtocolRunDetails } from '/app/pages/Desktop/Devices/ProtocolRunDetails'
+import { RobotSettings } from '/app/pages/Desktop/Devices/RobotSettings'
+import { Labware } from '/app/pages/Desktop/Labware'
+import { ProtocolDetails } from '/app/pages/Desktop/Protocols/ProtocolDetails'
+import { ProtocolPreview } from '/app/pages/Desktop/Protocols/ProtocolPreview'
+import { ProtocolsLanding } from '/app/pages/Desktop/Protocols/ProtocolsLanding'
+import { useIsFlex, useRobot } from '/app/redux-resources/robots'
+import { OPENTRONS_USB } from '/app/redux/discovery'
+import { appShellRequestor } from '/app/redux/shell/remote'
+
+import { useFeatureFlag } from '../redux/config'
+import { DesktopAppFallback } from './DesktopAppFallback'
 import { useSoftwareUpdatePoll } from './hooks'
 import { Navbar } from './Navbar'
-import { EstopTakeover, EmergencyStopContext } from '../organisms/EmergencyStop'
-import { OPENTRONS_USB } from '../redux/discovery'
-import { appShellRequestor } from '../redux/shell/remote'
-import { useRobot, useIsFlex } from '../organisms/Devices/hooks'
 import { PortalRoot as ModalPortalRoot } from './portal'
-import { DesktopAppFallback } from './DesktopAppFallback'
+import { ReactQueryDevtools } from './tools'
 
-import type { RouteProps, DesktopRouteParams } from './types'
+import type { RouteProps } from './types'
 
 export const DesktopApp = (): JSX.Element => {
   useSoftwareUpdatePoll()
   const [
     isEmergencyStopModalDismissed,
     setIsEmergencyStopModalDismissed,
-  ] = React.useState<boolean>(false)
+  ] = useState<boolean>(false)
+
+  // note for react-scan
+  const enableReactScan = useFeatureFlag('reactScan')
+  // Dynamically import `react-scan` to avoid build errors
+  if (typeof window !== 'undefined' && enableReactScan) {
+    import('react-scan')
+      .then(({ scan }) => {
+        scan({
+          enabled: enableReactScan,
+          log: true,
+        })
+      })
+      .catch(error => {
+        console.error('Failed to load react-scan:', error)
+      })
+  }
 
   const desktopRoutes: RouteProps[] = [
     {
       Component: ProtocolsLanding,
-      exact: true,
-      name: 'Protocols',
+      name: 'protocols',
       navLinkTo: '/protocols',
       path: '/protocols',
     },
     {
       Component: ProtocolDetails,
-      exact: true,
       name: 'Protocol Details',
       path: '/protocols/:protocolKey',
     },
     {
+      Component: ProtocolPreview,
+      name: 'Preview',
+      path: '/protocols/:protocolKey/preview',
+    },
+    {
       Component: Labware,
-      name: 'Labware',
+      name: 'labware',
       navLinkTo: '/labware',
       path: '/labware',
     },
     {
       Component: DevicesLanding,
-      exact: true,
-      name: 'Devices',
+      name: 'devices',
       navLinkTo: '/devices',
       path: '/devices',
     },
     {
       Component: DeviceDetails,
-      exact: true,
       name: 'Device',
       path: '/devices/:robotName',
     },
     {
       Component: RobotSettings,
-      exact: true,
       name: 'Robot Settings',
       path: '/devices/:robotName/robot-settings/:robotSettingsTab?',
     },
     {
       Component: CalibrationDashboard,
-      exact: true,
       name: 'Calibration Dashboard',
       path: '/devices/:robotName/robot-settings/calibration/dashboard',
     },
@@ -93,67 +118,74 @@ export const DesktopApp = (): JSX.Element => {
     },
     {
       Component: AppSettings,
-      exact: true,
       name: 'App Settings',
       path: '/app-settings/:appSettingsTab?',
     },
   ]
 
   return (
-    <NiceModal.Provider>
-      <ErrorBoundary FallbackComponent={DesktopAppFallback}>
-        <Navbar routes={desktopRoutes} />
-        <ToasterOven>
-          <EmergencyStopContext.Provider
-            value={{
-              isEmergencyStopModalDismissed,
-              setIsEmergencyStopModalDismissed,
-            }}
-          >
-            <Box width="100%">
-              <Alerts>
-                <Switch>
-                  {desktopRoutes.map(
-                    ({ Component, exact, path }: RouteProps) => {
+    <LocalizationProvider>
+      <NiceModal.Provider>
+        <ErrorBoundary FallbackComponent={DesktopAppFallback}>
+          <ReactQueryDevtools />
+          <SystemLanguagePreferenceModal />
+          <Navbar routes={desktopRoutes} />
+          <ToasterOven>
+            <EmergencyStopContext.Provider
+              value={{
+                isEmergencyStopModalDismissed,
+                setIsEmergencyStopModalDismissed,
+              }}
+            >
+              <Box width="100%">
+                <Alerts>
+                  <Routes>
+                    {desktopRoutes.map(({ Component, path }: RouteProps) => {
                       return (
-                        <Route key={path} exact={exact} path={path}>
-                          <Breadcrumbs />
-                          <Box
-                            position={POSITION_RELATIVE}
-                            width="100%"
-                            height="100%"
-                            backgroundColor={COLORS.grey10}
-                            overflow={OVERFLOW_AUTO}
-                          >
-                            <ModalPortalRoot />
-                            <Component />
-                          </Box>
-                        </Route>
+                        <Route
+                          key={path}
+                          element={
+                            <Fragment key={Component.name}>
+                              <Breadcrumbs />
+                              <Box
+                                position={POSITION_RELATIVE}
+                                width="100%"
+                                height="100%"
+                              >
+                                <Box
+                                  width="100%"
+                                  height="100%"
+                                  backgroundColor={COLORS.grey10}
+                                  overflow={OVERFLOW_AUTO}
+                                >
+                                  <ModalPortalRoot />
+                                  <Component />
+                                </Box>
+                              </Box>
+                            </Fragment>
+                          }
+                          path={path}
+                        />
                       )
-                    }
-                  )}
-                  <Redirect exact from="/" to="/protocols" />
-                </Switch>
-                <RobotControlTakeover />
-              </Alerts>
-            </Box>
-          </EmergencyStopContext.Provider>
-        </ToasterOven>
-      </ErrorBoundary>
-    </NiceModal.Provider>
+                    })}
+                    <Route path="*" element={<Navigate to="/protocols" />} />
+                  </Routes>
+                  <RobotControlTakeover />
+                </Alerts>
+              </Box>
+            </EmergencyStopContext.Provider>
+          </ToasterOven>
+        </ErrorBoundary>
+      </NiceModal.Provider>
+    </LocalizationProvider>
   )
 }
 
 function RobotControlTakeover(): JSX.Element | null {
-  const deviceRouteMatch = useRouteMatch({ path: '/devices/:robotName' })
-  const params = deviceRouteMatch?.params as DesktopRouteParams
-  const robotName = params?.robotName
+  const deviceRouteMatch = useMatch('/devices/:robotName/*')
+  const params = deviceRouteMatch?.params
+  const robotName = params?.robotName ?? null
   const robot = useRobot(robotName)
-  const isFlex = useIsFlex(robotName)
-
-  // E-stop is not supported on OT2
-  if (!isFlex) return null
-
   if (deviceRouteMatch == null || robot == null || robotName == null)
     return null
 
@@ -163,7 +195,29 @@ function RobotControlTakeover(): JSX.Element | null {
       hostname={robot.ip ?? null}
       requestor={robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined}
     >
-      <EstopTakeover robotName={robotName} />
+      <FlexOnlyRobotControlTakeover robotName={robotName} />
+      <AllRobotsRobotControlTakeover robotName={robotName} />
     </ApiHostProvider>
   )
+}
+
+interface TakeoverProps {
+  robotName: string
+}
+
+function AllRobotsRobotControlTakeover({
+  robotName,
+}: TakeoverProps): JSX.Element | null {
+  return <IncompatibleModuleTakeover isOnDevice={false} robotName={robotName} />
+}
+
+function FlexOnlyRobotControlTakeover({
+  robotName,
+}: TakeoverProps): JSX.Element | null {
+  // E-stop is not supported on OT2
+  const isFlex = useIsFlex(robotName)
+  if (!isFlex) {
+    return null
+  }
+  return <EstopTakeover robotName={robotName} />
 }

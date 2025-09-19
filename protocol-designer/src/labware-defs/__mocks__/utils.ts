@@ -1,9 +1,11 @@
 // replace webpack-specific require.context with Node-based glob in tests
 
-import { vi } from 'vitest'
 import path from 'path'
 import glob from 'glob'
+import { vi } from 'vitest'
+
 import { getLabwareDefURI } from '@opentrons/shared-data'
+
 import type { LabwareDefinition1 } from '@opentrons/shared-data'
 import type { LabwareDefByDefURI } from '../types'
 

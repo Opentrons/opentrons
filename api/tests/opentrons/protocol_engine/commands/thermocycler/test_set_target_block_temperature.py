@@ -3,13 +3,14 @@ from decoy import Decoy
 
 from opentrons.hardware_control.modules import Thermocycler
 
-from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.state.module_substates import (
     ThermocyclerModuleSubState,
     ThermocyclerModuleId,
 )
 from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands import thermocycler as tc_commands
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.thermocycler.set_target_block_temperature import (
     SetTargetBlockTemperatureImpl,
 )
@@ -62,8 +63,11 @@ async def test_set_target_block_temperature(
 
     decoy.verify(
         await tc_hardware.set_target_block_temperature(
-            celsius=45.6, volume=77.6, hold_time_seconds=654321
+            celsius=45.6,
+            volume=77.6,
+            hold_time_seconds=654321,
+            ramp_rate=None,
         ),
         times=1,
     )
-    assert result == expected_result
+    assert result == SuccessData(public=expected_result)

@@ -12,7 +12,7 @@ from opentrons.calibration_storage.helpers import uri_from_definition
 from .types import BundleContents
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.labware.dev_types import LabwareDefinition
+    from opentrons_shared_data.labware.types import LabwareDefinition
 
 MAIN_PROTOCOL_FILENAME = "protocol.ot2.py"
 LABWARE_DIR = "labware"

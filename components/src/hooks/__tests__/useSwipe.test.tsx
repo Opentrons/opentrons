@@ -1,6 +1,7 @@
-import { describe, it, expect } from 'vitest'
 import { act, renderHook } from '@testing-library/react'
-import { useSwipe } from '..'
+import { describe, expect, it } from 'vitest'
+
+import { useSwipe } from '../useSwipe'
 
 describe('useSwipe hook', () => {
   it('useSwipe returns UseSwipeResult object', () => {

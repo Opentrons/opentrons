@@ -1,24 +1,31 @@
-import * as React from 'react'
-import { UseMutateFunction } from 'react-query'
+import { useEffect } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import { COLORS } from '@opentrons/components'
+
+import { COLORS, LegacyStyledText } from '@opentrons/components'
 import { EXTENSION } from '@opentrons/shared-data'
-import { StyledText } from '../../atoms/text'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import { WizardRequiredEquipmentList } from '../../molecules/WizardRequiredEquipmentList'
+
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
-  GRIPPER_FLOW_TYPES,
-  SCREWDRIVER_LOADNAME,
-  GRIPPER_LOADNAME,
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '/app/molecules/SimpleWizardBody'
+import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
+
+import {
   CAL_PIN_LOADNAME,
+  CALIBRATION_PIN_DISPLAY_NAME,
+  GRIPPER_FLOW_TYPES,
+  GRIPPER_LOADNAME,
+  HEX_SCREWDRIVER_DISPLAY_NAME,
+  SCREWDRIVER_LOADNAME,
 } from './constants'
+
+import type { AxiosError } from 'axios'
+import type { UseMutateFunction } from 'react-query'
 import type {
   CreateMaintenanceRunData,
   MaintenanceRun,
 } from '@opentrons/api-client'
-import type { AxiosError } from 'axios'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { GripperWizardFlowType, GripperWizardStepProps } from './types'
 
@@ -73,8 +80,8 @@ export const BeforeBeginning = (
     setErrorMessage,
     createdMaintenanceRunId,
   } = props
-  const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
-  React.useEffect(() => {
+  const { t } = useTranslation(['gripper_wizard_flows', 'shared', 'branded'])
+  useEffect(() => {
     if (createdMaintenanceRunId == null) {
       createMaintenanceRun({})
     }
@@ -96,19 +103,19 @@ export const BeforeBeginning = (
         proceed()
       })
       .catch(error => {
-        setErrorMessage(error.message)
+        setErrorMessage(error.message as string)
       })
   }
 
   const equipmentInfoByLoadName: {
     [loadName: string]: { displayName: string; subtitle?: string }
   } = {
-    calibration_pin: { displayName: t('calibration_pin') },
+    calibration_pin: { displayName: CALIBRATION_PIN_DISPLAY_NAME },
     hex_screwdriver: {
-      displayName: t('hex_screwdriver'),
+      displayName: HEX_SCREWDRIVER_DISPLAY_NAME,
       subtitle: t('provided_with_robot_use_right_size'),
     },
-    [GRIPPER_LOADNAME]: { displayName: t('gripper') },
+    [GRIPPER_LOADNAME]: { displayName: t('branded:gripper') },
   }
 
   const { bodyI18nKey, equipmentLoadNames } = INFO_BY_FLOW_TYPE[flowType]
@@ -119,7 +126,7 @@ export const BeforeBeginning = (
 
   if (isRobotMoving)
     return (
-      <InProgressModal
+      <SimpleWizardInProgressBody
         description={t('shared:stand_back_robot_is_in_motion')}
       />
     )
@@ -142,7 +149,7 @@ export const BeforeBeginning = (
         <Trans
           t={t}
           i18nKey={bodyI18nKey}
-          components={{ block: <StyledText as="p" /> }}
+          components={{ block: <LegacyStyledText as="p" /> }}
         />
       }
       proceedButtonText={t('move_gantry_to_front')}

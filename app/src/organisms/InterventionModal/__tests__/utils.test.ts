@@ -1,12 +1,9 @@
 import deepClone from 'lodash/cloneDeep'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import {
-  getSlotHasMatingSurfaceUnitVector,
-  ot2DeckDefV4,
-} from '@opentrons/shared-data'
+import { describe, expect, it, vi } from 'vitest'
+
+import { ot2DeckDefV5 } from '@opentrons/shared-data'
 
 import {
-  mockLabwareDefinition,
   mockLabwareDefinitionsByUri,
   mockLabwareOnSlot,
   mockModule,
@@ -14,12 +11,12 @@ import {
   mockThermocyclerModule,
 } from '../__fixtures__'
 import {
-  getRunLabwareRenderInfo,
-  getRunModuleRenderInfo,
   getLabwareNameFromRunData,
   getModuleDisplayLocationFromRunData,
   getModuleModelFromRunData,
+  getRunModuleRenderInfo,
 } from '../utils'
+
 import type * as SharedData from '@opentrons/shared-data'
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
@@ -121,83 +118,7 @@ describe('getModuleModelFromRunData', () => {
   })
 })
 
-describe('getRunLabwareRenderInfo', () => {
-  beforeEach(() => {
-    vi.mocked(getSlotHasMatingSurfaceUnitVector).mockReturnValue(true)
-  })
-
-  it('returns an empty array if there is no loaded labware for the run', () => {
-    const res = getRunLabwareRenderInfo({ labware: [] } as any, {}, {} as any)
-
-    expect(res).toBeInstanceOf(Array)
-    expect(res).toHaveLength(0)
-  })
-
-  it('returns run labware render info', () => {
-    const res = getRunLabwareRenderInfo(
-      mockRunData,
-      mockLabwareDefinitionsByUri,
-      ot2DeckDefV4 as any
-    )
-    const labwareInfo = res[0]
-    expect(labwareInfo).toBeTruthy()
-    expect(labwareInfo.x).toEqual(0) // taken from deckDef fixture
-    expect(labwareInfo.y).toEqual(0)
-    expect(labwareInfo.labwareDef.metadata.displayName).toEqual(
-      'NEST 96 Well Plate 100 µL PCR Full Skirt'
-    )
-    expect(labwareInfo.labwareId).toEqual('mockLabwareID2')
-  })
-
-  it('does not add labware to results array if the labware is on deck and the slot does not have a mating surface vector', () => {
-    vi.mocked(getSlotHasMatingSurfaceUnitVector).mockReturnValue(false)
-    const res = getRunLabwareRenderInfo(
-      mockRunData,
-      mockLabwareDefinitionsByUri,
-      ot2DeckDefV4 as any
-    )
-    expect(res).toHaveLength(1) // the offdeck labware still gets added because the mating surface doesn't exist for offdeck labware
-  })
-
-  it('does add offdeck labware to the results array', () => {
-    const res = getRunLabwareRenderInfo(
-      mockRunData,
-      mockLabwareDefinitionsByUri,
-      ot2DeckDefV4 as any
-    )
-    expect(res).toHaveLength(2)
-    const labwareInfo = res.find(
-      labware => labware.labwareId === 'mockLabwareID3'
-    )
-    expect(labwareInfo).toBeTruthy()
-    expect(labwareInfo?.x).toEqual(0)
-    expect(labwareInfo?.y).toEqual(
-      ot2DeckDefV4.cornerOffsetFromOrigin[1] -
-        mockLabwareDefinition.dimensions.yDimension
-    )
-  })
-
-  it('defaults labware x, y coordinates to 0,0 if slot position not found in deck definition', () => {
-    const mockBadSlotLabware = {
-      id: 'mockBadLabwareID',
-      loadName: 'nest_96_wellplate_100ul_pcr_full_skirt',
-      definitionUri: 'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1',
-      location: {
-        slotName: '0',
-      },
-    }
-    const res = getRunLabwareRenderInfo(
-      { labware: [mockBadSlotLabware] } as any,
-      mockLabwareDefinitionsByUri,
-      ot2DeckDefV4 as any
-    )
-
-    expect(res[0].x).toEqual(0)
-    expect(res[0].y).toEqual(0)
-  })
-})
-
-describe('getCurrentRunModuleRenderInfo', () => {
+describe('getRunModuleRenderInfo', () => {
   it('returns an empty array if there is no loaded module for the run', () => {
     const res = getRunModuleRenderInfo({ modules: [] } as any, {} as any, {})
     expect(res).toBeInstanceOf(Array)
@@ -207,7 +128,7 @@ describe('getCurrentRunModuleRenderInfo', () => {
   it('returns run module render info with nested labware', () => {
     const res = getRunModuleRenderInfo(
       mockRunData,
-      ot2DeckDefV4 as any,
+      ot2DeckDefV5 as any,
       mockLabwareDefinitionsByUri
     )
     const moduleInfo = res[0]
@@ -216,6 +137,8 @@ describe('getCurrentRunModuleRenderInfo', () => {
     expect(moduleInfo.y).toEqual(0)
     expect(moduleInfo.moduleDef.moduleType).toEqual('heaterShakerModuleType')
     expect(moduleInfo.moduleId).toEqual('mockModuleID')
+    expect(moduleInfo.targetDeckId).toEqual(ot2DeckDefV5.otId)
+    expect(moduleInfo.targetSlotId).toEqual('3') // taken from mockRunData
     expect(moduleInfo.nestedLabwareDef).not.toEqual(null)
     expect(moduleInfo.nestedLabwareId).toEqual('mockLabwareID')
   })
@@ -228,7 +151,7 @@ describe('getCurrentRunModuleRenderInfo', () => {
 
     const res = getRunModuleRenderInfo(
       mockRunDataNoNesting,
-      ot2DeckDefV4 as any,
+      ot2DeckDefV5 as any,
       mockLabwareDefinitionsByUri
     )
 
@@ -245,7 +168,7 @@ describe('getCurrentRunModuleRenderInfo', () => {
 
     const res = getRunModuleRenderInfo(
       mockRunDataWithTC,
-      ot2DeckDefV4 as any,
+      ot2DeckDefV5 as any,
       mockLabwareDefinitionsByUri
     )
 
@@ -270,7 +193,7 @@ describe('getCurrentRunModuleRenderInfo', () => {
 
     const res = getRunModuleRenderInfo(
       mockRunDataWithBadModuleSlot,
-      ot2DeckDefV4 as any,
+      ot2DeckDefV5 as any,
       mockLabwareDefinitionsByUri
     )
 

@@ -1,0 +1,19 @@
+{
+  "extends": "../tsconfig-base.json",
+  "references": [
+    {
+      "path": "./tsconfig-data.json"
+    },
+    {
+      "path": "../components"
+    }
+  ],
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "lib",
+    "paths": {
+      "/ai-client/*": ["./src/*"]
+    }
+  },
+  "include": ["typings", "src"]
+}

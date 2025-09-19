@@ -65,12 +65,14 @@ deps:
 .PHONY: package-deps
 package-deps: clean lib deps
 
+# Note: keep the push dep separate from the dist target so it doesn't accidentally
+# do a js dist when we want to only build electron
 .PHONY: dist-ot3
-dist-ot3: package-deps
+dist-ot3: clean lib
 	NO_USB_DETECTION=true OT_APP_DEPLOY_BUCKET=opentrons-app OT_APP_DEPLOY_FOLDER=builds OPENTRONS_PROJECT=$(OPENTRONS_PROJECT) $(builder) --linux --arm64
 
 .PHONY: push-ot3
-push-ot3: dist-ot3
+push-ot3: deps dist-ot3
 	tar -zcvf opentrons-robot-app.tar.gz -C ./dist/linux-arm64-unpacked/ ./
 	scp $(if $(ssh_key),-i $(ssh_key)) $(ssh_opts) -r ./opentrons-robot-app.tar.gz root@$(host):
 	ssh $(if $(ssh_key),-i $(ssh_key)) $(ssh_opts) root@$(host) "mount -o remount,rw / && systemctl stop opentrons-robot-app && rm -rf /opt/opentrons-app && mkdir -p /opt/opentrons-app"

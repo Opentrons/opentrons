@@ -1,27 +1,36 @@
-import * as React from 'react'
 import { format } from 'date-fns'
-import type { CommandData } from '@opentrons/api-client'
+
+import { shouldCommandSucceedGivenRecoveryPolicy } from '/app/local-resources/commands/utils/shouldCommandSucceedGivenRecoveryPolicy'
+
+import type { Dispatch, SetStateAction } from 'react'
+import type { UseMutateAsyncFunction } from 'react-query'
+import type { CommandData, ErrorRecoveryPolicy } from '@opentrons/api-client'
+import type { CreateLiveCommandMutateParams } from '@opentrons/react-api-client/src/runs/useCreateLiveCommandMutation'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { CreateMaintenanceCommand, CreateRunCommand } from './hooks'
-import type { UseMutateAsyncFunction } from 'react-query'
-import { CreateLiveCommandMutateParams } from '@opentrons/react-api-client/src/runs/useCreateLiveCommandMutation'
-import { ModulePrepCommandsType } from '../../organisms/Devices/getModulePrepCommands'
 
 export const chainRunCommandsRecursive = (
   commands: CreateCommand[],
   createRunCommand: CreateRunCommand,
   continuePastCommandFailure: boolean = true,
-  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
+  setIsLoading: Dispatch<SetStateAction<boolean>>,
+  recoveryPolicy?: ErrorRecoveryPolicy
 ): Promise<CommandData[]> => {
-  if (commands.length < 1)
+  if (commands.length < 1) {
     return Promise.reject(new Error('no commands to execute'))
+  }
   setIsLoading(true)
+
   return createRunCommand({
     command: commands[0],
     waitUntilComplete: true,
   })
     .then(response => {
-      if (!continuePastCommandFailure && response.data.status === 'failed') {
+      if (
+        !continuePastCommandFailure &&
+        response.data.status === 'failed' &&
+        !shouldCommandSucceedGivenRecoveryPolicy(response.data, recoveryPolicy)
+      ) {
         setIsLoading(false)
         return Promise.reject(
           new Error(response.data.error?.detail ?? 'command failed')
@@ -48,18 +57,20 @@ export const chainRunCommandsRecursive = (
 }
 
 export const chainLiveCommandsRecursive = (
-  commands: ModulePrepCommandsType[],
+  commands: CreateCommand[],
   createLiveCommand: UseMutateAsyncFunction<
     CommandData,
     unknown,
     CreateLiveCommandMutateParams
   >,
   continuePastCommandFailure: boolean = true,
-  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
+  setIsLoading: Dispatch<SetStateAction<boolean>>
 ): Promise<CommandData[]> => {
-  if (commands.length < 1)
+  if (commands.length < 1) {
     return Promise.reject(new Error('no commands to execute'))
+  }
   setIsLoading(true)
+
   return createLiveCommand({
     command: commands[0],
     waitUntilComplete: true,
@@ -96,11 +107,13 @@ export const chainMaintenanceCommandsRecursive = (
   commands: CreateCommand[],
   createMaintenanceCommand: CreateMaintenanceCommand,
   continuePastCommandFailure: boolean = true,
-  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
+  setIsLoading: Dispatch<SetStateAction<boolean>>
 ): Promise<CommandData[]> => {
-  if (commands.length < 1)
+  if (commands.length < 1) {
     return Promise.reject(new Error('no commands to execute'))
+  }
   setIsLoading(true)
+
   return createMaintenanceCommand({
     maintenanceRunId: maintenanceRunId,
     command: commands[0],
@@ -144,4 +157,19 @@ export const formatTimeWithUtcLabel = (time: string | null): string => {
   return typeof time === 'string' && dateIsValid(time)
     ? `${format(new Date(time), 'M/d/yy HH:mm')} ${UTC_LABEL}`
     : `${time} ${UTC_LABEL}`
+}
+
+// Visit the command, setting the command intent to "fixit" if a failedCommandId is supplied.
+export const setCommandIntent = (
+  command: CreateCommand,
+  failedCommandId?: string
+): CreateCommand => {
+  const isCommandWithFixitIntent = failedCommandId != null
+  if (isCommandWithFixitIntent) {
+    return {
+      ...command,
+      intent: 'fixit',
+    }
+  }
+  return command
 }

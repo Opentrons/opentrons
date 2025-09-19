@@ -1,31 +1,31 @@
-import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import styled, { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
+
 import {
-  DIRECTION_COLUMN,
-  Flex,
-  SPACING,
-  JUSTIFY_SPACE_BETWEEN,
-  DIRECTION_ROW,
-  TYPOGRAPHY,
-  COLORS,
-  Btn,
-  JUSTIFY_FLEX_END,
-  JUSTIFY_START,
-  JUSTIFY_CENTER,
-  PrimaryButton,
-  RESPONSIVENESS,
-  DISPLAY_INLINE_BLOCK,
   ALIGN_CENTER,
   ALIGN_FLEX_END,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  DISPLAY_INLINE_BLOCK,
+  Flex,
+  JUSTIFY_CENTER,
+  JUSTIFY_FLEX_END,
+  JUSTIFY_SPACE_BETWEEN,
+  JUSTIFY_START,
+  PrimaryButton,
+  RESPONSIVENESS,
+  SPACING,
+  Tooltip,
+  TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
-import { getIsOnDevice } from '../../redux/config'
-import { StyledText } from '../../atoms/text'
-import { Tooltip } from '../../atoms/Tooltip'
-import { NeedHelpLink } from '../../organisms/CalibrationPanels'
-import { SmallButton } from '../../atoms/buttons'
+
+import { SmallButton, TextOnlyButton } from '/app/atoms/buttons'
+import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
+import { getIsOnDevice } from '/app/redux/config'
+
+import type { ReactNode } from 'react'
 
 const ALIGN_BUTTONS = css`
   align-items: ${ALIGN_FLEX_END};
@@ -40,29 +40,7 @@ const CAPITALIZE_FIRST_LETTER_STYLE = css`
     text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   }
 `
-const GO_BACK_BUTTON_STYLE = css`
-  ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.grey50};
 
-  &:hover {
-    opacity: 70%;
-  }
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-    font-size: ${TYPOGRAPHY.fontSize22};
-    &:hover {
-      opacity: 100%;
-    }
-    &:active {
-      opacity: 70%;
-    }
-  }
-`
-const GO_BACK_BUTTON_DISABLED_STYLE = css`
-  ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.grey60};
-`
 const Title = styled.h1`
   ${TYPOGRAPHY.h1Default};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
@@ -82,13 +60,13 @@ const TILE_CONTAINER_STYLE = css`
   }
 `
 export interface GenericWizardTileProps {
-  rightHandBody: React.ReactNode
-  bodyText: React.ReactNode
-  header: string | React.ReactNode
+  rightHandBody: ReactNode
+  bodyText: ReactNode
+  header: string | ReactNode
   getHelp?: string
   back?: () => void
   proceed?: () => void
-  proceedButtonText?: React.ReactNode
+  proceedButtonText?: ReactNode
   proceedIsDisabled?: boolean
   proceedButton?: JSX.Element
   backIsDisabled?: boolean
@@ -148,17 +126,12 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
       </Flex>
       <Flex justifyContent={buttonPositioning} css={ALIGN_BUTTONS}>
         {back != null ? (
-          <Btn onClick={back} disabled={backIsDisabled} aria-label="back">
-            <StyledText
-              css={
-                backIsDisabled ?? false
-                  ? GO_BACK_BUTTON_DISABLED_STYLE
-                  : GO_BACK_BUTTON_STYLE
-              }
-            >
-              {t('go_back')}
-            </StyledText>
-          </Btn>
+          <TextOnlyButton
+            disabled={backIsDisabled}
+            onClick={back}
+            aria-label="back"
+            buttonText={t('go_back')}
+          />
         ) : null}
         {getHelp != null ? <NeedHelpLink href={getHelp} /> : null}
         {proceed != null && proceedButton == null ? (

@@ -11,7 +11,7 @@ from opentrons_shared_data.protocol.constants import (
 
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.protocol.dev_types import (
+    from opentrons_shared_data.protocol.types import (
         JsonProtocolV3,
         JsonProtocol,
         PipetteAccessParams,

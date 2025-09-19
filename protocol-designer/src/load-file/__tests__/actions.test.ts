@@ -1,4 +1,5 @@
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+
 import { createFile } from '../../file-data/selectors/fileCreator'
 import { getFileMetadata } from '../../file-data/selectors/fileFields'
 import { saveProtocolFile } from '../actions'
@@ -29,7 +30,7 @@ describe('saveProtocolFile thunk', () => {
       }
     })
     vi.mocked(saveFileUtil).mockImplementation((fileData, fileName) => {
-      expect(fileName).toEqual('fooFileName.json')
+      expect(fileName).toEqual('fooFileName.py')
       expect(fileData).toBe(mockFileData)
     })
     const dispatch: () => any = vi.fn().mockImplementation(action => {

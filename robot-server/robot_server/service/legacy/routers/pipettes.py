@@ -27,18 +27,20 @@ router = APIRouter()
     response_model=pipettes.PipettesByMount,
 )
 async def get_pipettes(
-    refresh: typing.Optional[bool] = Query(
-        False,
-        description="If `false`, query a cached value. If `true`, actively scan for"
-        " attached pipettes."
-        "\n\n"
-        "**Warning:** Actively scanning disables the pipette motors and should only be done"
-        " when no protocol is running and you know it won't cause a problem."
-        "\n\n"
-        "**Warning:** Actively scanning is only valid on OT-2s. On Flex robots, it's"
-        " unnecessary, and the behavior is currently undefined.",
-    ),
-    hardware: HardwareControlAPI = Depends(get_hardware),
+    hardware: typing.Annotated[HardwareControlAPI, Depends(get_hardware)],
+    refresh: typing.Annotated[
+        typing.Optional[bool],
+        Query(
+            description="If `false`, query a cached value. If `true`, actively scan for"
+            " attached pipettes."
+            "\n\n"
+            "**Warning:** Actively scanning disables the pipette motors and should only be done"
+            " when no protocol is running and you know it won't cause a problem."
+            "\n\n"
+            "**Warning:** Actively scanning is only valid on OT-2s. On Flex robots, it's"
+            " unnecessary, and the behavior is currently undefined.",
+        ),
+    ] = False,
 ) -> pipettes.PipettesByMount:
     """
     Query robot for model strings on 'left' and 'right' mounts, and return a
@@ -57,7 +59,9 @@ async def get_pipettes(
 
     attached = hardware.attached_instruments
 
-    def make_pipette(mount: Mount, pipette_dict: PipetteDict, is_ot2: bool):
+    def make_pipette(
+        mount: Mount, pipette_dict: PipetteDict, is_ot2: bool
+    ) -> pipettes.AttachedPipette:
         if is_ot2:
             mount_axis = ot2_axis_to_string(Axis.by_mount(mount))
             plunger_axis = ot2_axis_to_string(Axis.of_plunger(mount))

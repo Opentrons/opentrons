@@ -1,0 +1,505 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "opentronsLiquidClassSchemaV1",
+  "title": "Liquid Class Schema",
+  "description": "Schema for defining a single liquid class's properties for liquid handling functions.",
+  "type": "object",
+  "definitions": {
+    "positiveNumber": {
+      "type": "number",
+      "minimum": 0
+    },
+    "safeString": {
+      "description": "A string safe to use for namespace. Lowercase-only.",
+      "type": "string",
+      "pattern": "^[a-z0-9._]+$"
+    },
+    "delay": {
+      "type": "object",
+      "properties": {
+        "enable": {
+          "type": "boolean",
+          "description": "Whether delay is enabled."
+        },
+        "params": {
+          "type": "object",
+          "properties": {
+            "duration": {
+              "#ref": "#/definitions/positiveNumber",
+              "description": "Duration of delay, in seconds."
+            }
+          },
+          "required": ["duration"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["enable"],
+      "additionalProperties": false
+    },
+    "positionReference": {
+      "type": "string",
+      "description": "Reference point for positioning.",
+      "enum": ["well-bottom", "well-top", "well-center", "liquid-meniscus"]
+    },
+    "coordinate": {
+      "type": "object",
+      "description": "3-dimensional coordinate.",
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "z": {
+          "type": "number"
+        }
+      },
+      "required": ["x", "y", "z"],
+      "additionalProperties": false
+    },
+    "tipPosition": {
+      "type": "object",
+      "description": "Positional reference and relative offset for where a tip should go.",
+      "properties": {
+        "positionReference": {
+          "$ref": "#/definitions/positionReference"
+        },
+        "offset": {
+          "$ref": "#/definitions/coordinate"
+        }
+      },
+      "required": ["positionReference", "offset"],
+      "additionalProperties": false
+    },
+    "touchTip": {
+      "type": "object",
+      "description": "Shared properties for the touch-tip function.",
+      "properties": {
+        "enable": {
+          "type": "boolean",
+          "description": "Whether touch-tip is enabled."
+        },
+        "params": {
+          "type": "object",
+          "properties": {
+            "zOffset": {
+              "type": "number",
+              "description": "Offset from the top of the well for touch-tip, in millimeters."
+            },
+            "mmFromEdge": {
+              "type": "number",
+              "description": "Offset away from the the well edge, in millimeters."
+            },
+            "speed": {
+              "$ref": "#/definitions/positiveNumber",
+              "description": "Touch-tip speed, in millimeters per second."
+            }
+          },
+          "required": ["zOffset", "mmFromEdge", "speed"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["enable"],
+      "additionalProperties": false
+    },
+    "airGapByVolume": {
+      "type": "array",
+      "description": "Settings for air gap keyed by current volume in the tip.",
+      "items": {
+        "type": "array",
+        "items": { "$ref": "#/definitions/positiveNumber" },
+        "minItems": 2,
+        "maxItems": 2
+      },
+      "minItems": 1
+    },
+    "flowRateByVolume": {
+      "type": "array",
+      "description": "Settings for flow rate keyed by target aspiration/dispense volume.",
+      "items": {
+        "type": "array",
+        "items": { "$ref": "#/definitions/positiveNumber" },
+        "minItems": 2,
+        "maxItems": 2
+      },
+      "minItems": 1
+    },
+    "pushOutByVolume": {
+      "type": "array",
+      "description": "Settings for pushout keyed by target dispense volume.",
+      "items": {
+        "type": "array",
+        "items": { "$ref": "#/definitions/positiveNumber" },
+        "minItems": 2,
+        "maxItems": 2
+      },
+      "minItems": 1
+    },
+    "disposalByVolume": {
+      "type": "array",
+      "description": "Settings for disposal volume, keyed by the total volume aspirated for a multi-dispense.",
+      "items": {
+        "type": "array",
+        "items": { "$ref": "#/definitions/positiveNumber" },
+        "minItems": 2,
+        "maxItems": 2
+      },
+      "minItems": 1
+    },
+    "conditioningByVolume": {
+      "type": "array",
+      "description": "Settings for conditioning volume keyed by the total volume aspirated for a multi-dispense.",
+      "items": {
+        "type": "array",
+        "items": { "$ref": "#/definitions/positiveNumber" },
+        "minItems": 2,
+        "maxItems": 2
+      },
+      "minItems": 1
+    },
+    "correctionByVolume": {
+      "type": "array",
+      "description": "Settings for volume correction, keyed by the total volume in tip after the aspirate/dispense action. The correction value provides additional information about how much the pipette plunger should move to accurately pipette the specified volume when using this liquid class.",
+      "items": {
+        "type": "array",
+        "items": { "type": "number" },
+        "minItems": 2,
+        "maxItems": 2
+      },
+      "minItems": 1
+    },
+    "mix": {
+      "type": "object",
+      "description": "Mixing properties.",
+      "properties": {
+        "enable": {
+          "type": "boolean",
+          "description": "Whether mix is enabled."
+        },
+        "params": {
+          "type": "object",
+          "properties": {
+            "repetitions": {
+              "type": "integer",
+              "description": "Number of mixing repetitions.",
+              "minimum": 0
+            },
+            "volume": {
+              "$ref": "#/definitions/positiveNumber",
+              "description": "Volume used for mixing, in microliters."
+            }
+          },
+          "required": ["repetitions", "volume"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["enable"],
+      "additionalProperties": false
+    },
+    "blowout": {
+      "type": "object",
+      "description": "Blowout properties.",
+      "properties": {
+        "enable": {
+          "type": "boolean",
+          "description": "Whether blow-out is enabled."
+        },
+        "params": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "enum": ["source", "destination", "trash"],
+              "description": "Location for blow out."
+            },
+            "flowRate": {
+              "$ref": "#/definitions/positiveNumber",
+              "description": "Flow rate for blow out, in microliters per second."
+            }
+          },
+          "required": ["location", "flowRate"]
+        }
+      },
+      "required": ["enable"],
+      "additionalProperties": false
+    },
+    "submerge": {
+      "type": "object",
+      "description": "Shared properties for the submerge function before aspiration or dispense.",
+      "properties": {
+        "startPosition": {
+          "$ref": "#/definitions/tipPosition"
+        },
+        "speed": {
+          "$ref": "#/definitions/positiveNumber",
+          "description": "Speed of submerging, in millimeters per second."
+        },
+        "delay": {
+          "$ref": "#/definitions/delay"
+        }
+      },
+      "required": ["startPosition", "speed", "delay"],
+      "additionalProperties": false
+    },
+    "retractAspirate": {
+      "type": "object",
+      "description": "Shared properties for the retract function after an aspiration.",
+      "properties": {
+        "endPosition": {
+          "$ref": "#/definitions/tipPosition"
+        },
+        "speed": {
+          "$ref": "#/definitions/positiveNumber",
+          "description": "Speed of retraction, in millimeters per second."
+        },
+        "airGapByVolume": {
+          "$ref": "#/definitions/airGapByVolume"
+        },
+        "touchTip": {
+          "$ref": "#/definitions/touchTip"
+        },
+        "delay": {
+          "$ref": "#/definitions/delay"
+        }
+      },
+      "required": ["endPosition", "speed", "airGapByVolume", "delay"],
+      "additionalProperties": false
+    },
+    "retractDispense": {
+      "type": "object",
+      "description": "Shared properties for the retract function after a dispense.",
+      "properties": {
+        "endPosition": {
+          "$ref": "#/definitions/tipPosition"
+        },
+        "speed": {
+          "$ref": "#/definitions/positiveNumber",
+          "description": "Speed of retraction, in millimeters per second."
+        },
+        "airGapByVolume": {
+          "$ref": "#/definitions/airGapByVolume"
+        },
+        "blowout": {
+          "$ref": "#/definitions/blowout"
+        },
+        "touchTip": {
+          "$ref": "#/definitions/touchTip"
+        },
+        "delay": {
+          "$ref": "#/definitions/delay"
+        }
+      },
+      "required": [
+        "endPosition",
+        "speed",
+        "airGapByVolume",
+        "blowout",
+        "touchTip",
+        "delay"
+      ],
+      "additionalProperties": false
+    },
+    "aspirateParams": {
+      "type": "object",
+      "description": "Parameters specific to the aspirate function.",
+      "properties": {
+        "submerge": {
+          "$ref": "#/definitions/submerge"
+        },
+        "retract": {
+          "$ref": "#/definitions/retractAspirate"
+        },
+        "aspiratePosition": {
+          "$ref": "#/definitions/tipPosition"
+        },
+        "flowRateByVolume": {
+          "$ref": "#/definitions/flowRateByVolume"
+        },
+        "correctionByVolume": {
+          "$ref": "#/definitions/correctionByVolume"
+        },
+        "preWet": {
+          "type": "boolean",
+          "description": "Whether to perform a pre-wet action."
+        },
+        "mix": {
+          "$ref": "#/definitions/mix"
+        },
+        "delay": {
+          "$ref": "#/definitions/delay"
+        }
+      },
+      "required": [
+        "submerge",
+        "retract",
+        "aspiratePosition",
+        "flowRateByVolume",
+        "correctionByVolume",
+        "preWet",
+        "mix",
+        "delay"
+      ],
+      "additionalProperties": false
+    },
+    "singleDispenseParams": {
+      "type": "object",
+      "description": "Parameters specific to the single-dispense function.",
+      "properties": {
+        "submerge": {
+          "$ref": "#/definitions/submerge"
+        },
+        "retract": {
+          "$ref": "#/definitions/retractDispense"
+        },
+        "dispensePosition": {
+          "$ref": "#/definitions/tipPosition"
+        },
+        "flowRateByVolume": {
+          "$ref": "#/definitions/flowRateByVolume"
+        },
+        "correctionByVolume": {
+          "$ref": "#/definitions/correctionByVolume"
+        },
+        "mix": {
+          "$ref": "#/definitions/mix"
+        },
+        "pushOutByVolume": {
+          "$ref": "#/definitions/pushOutByVolume"
+        },
+        "delay": {
+          "$ref": "#/definitions/delay"
+        }
+      },
+      "required": [
+        "submerge",
+        "retract",
+        "dispensePosition",
+        "flowRateByVolume",
+        "correctionByVolume",
+        "mix",
+        "pushOutByVolume",
+        "delay"
+      ],
+      "additionalProperties": false
+    },
+    "multiDispenseParams": {
+      "type": "object",
+      "description": "Parameters specific to the multi-dispense function.",
+      "properties": {
+        "submerge": {
+          "$ref": "#/definitions/submerge"
+        },
+        "retract": {
+          "$ref": "#/definitions/retractDispense"
+        },
+        "dispensePosition": {
+          "$ref": "#/definitions/tipPosition"
+        },
+        "flowRateByVolume": {
+          "$ref": "#/definitions/flowRateByVolume"
+        },
+        "correctionByVolume": {
+          "$ref": "#/definitions/correctionByVolume"
+        },
+        "conditioningByVolume": {
+          "$ref": "#/definitions/conditioningByVolume"
+        },
+        "disposalByVolume": {
+          "$ref": "#/definitions/disposalByVolume"
+        },
+        "delay": {
+          "$ref": "#/definitions/delay"
+        }
+      },
+      "required": [
+        "submerge",
+        "retract",
+        "dispensePosition",
+        "flowRateByVolume",
+        "correctionByVolume",
+        "conditioningByVolume",
+        "disposalByVolume",
+        "delay"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "liquidClassName": {
+      "$ref": "#/definitions/safeString",
+      "description": "The name of the liquid class specified when loading into protocol (e.g., water, ethanol, serum). Should be the same as file name."
+    },
+    "displayName": {
+      "type": "string",
+      "description": "User-readable name of the liquid class."
+    },
+    "description": {
+      "type": "string",
+      "description": "User-readable description of the liquid class"
+    },
+    "schemaVersion": {
+      "description": "Which schema version a liquid class is using",
+      "type": "number",
+      "enum": [1]
+    },
+    "version": {
+      "description": "Version of the liquid class definition itself (eg water v1/v2/v3). An incrementing integer",
+      "type": "integer",
+      "minimum": 1
+    },
+    "namespace": {
+      "$ref": "#/definitions/safeString"
+    },
+    "byPipette": {
+      "type": "array",
+      "description": "Liquid class settings by each pipette compatible with this liquid class.",
+      "items": {
+        "type": "object",
+        "description": "The settings for a specific kind of pipette when interacting with this liquid class",
+        "properties": {
+          "pipetteModel": {
+            "type": "string",
+            "description": "The pipette model this applies to"
+          },
+          "byTipType": {
+            "type": "array",
+            "description": "Settings for each kind of tip this pipette can use",
+            "items": {
+              "type": "object",
+              "properties": {
+                "tiprack": {
+                  "type": "string",
+                  "description": "The tiprack name whose tip will be used when handling this specific liquid class with this pipette"
+                },
+                "aspirate": {
+                  "$ref": "#/definitions/aspirateParams"
+                },
+                "singleDispense": {
+                  "$ref": "#/definitions/singleDispenseParams"
+                },
+                "multiDispense": {
+                  "$ref": "#/definitions/multiDispenseParams"
+                }
+              },
+              "required": ["tiprack", "aspirate", "singleDispense"],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": ["pipetteModel", "byTipType"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "liquidClassName",
+    "displayName",
+    "description",
+    "schemaVersion",
+    "version",
+    "namespace",
+    "byPipette"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,52 @@
+# This workflow runs lint on pull requests that touch anything in the opentrons-ai-server directory
+
+name: 'Opentrons ai-server lint'
+
+on:
+  pull_request:
+    paths:
+      - 'opentrons-ai-server/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  lint:
+    name: 'ai-server lint'
+    timeout-minutes: 5
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: Checkout opentrons repo
+        uses: 'actions/checkout@v4'
+
+      - name: Setup Python
+        uses: 'actions/setup-python@v5'
+        with:
+          python-version: '3.12'
+          cache: 'pipenv'
+          cache-dependency-path: opentrons-ai-server/Pipfile.lock
+      - name: Setup
+        id: install
+        working-directory: ./opentrons-ai-server
+        run: make setup
+      - name: black-check
+        if: always() && steps.install.outcome == 'success' || steps.install.outcome == 'skipped'
+        working-directory: ./opentrons-ai-server
+        run: make black-check
+      - name: ruff
+        if: always() && steps.install.outcome == 'success' || steps.install.outcome == 'skipped'
+        working-directory: ./opentrons-ai-server
+        run: make ruff-check
+      - name: mypy
+        if: always() && steps.install.outcome == 'success' || steps.install.outcome == 'skipped'
+        working-directory: ./opentrons-ai-server
+        run: make mypy
+      - name: unit tests
+        if: always() && steps.install.outcome == 'success' || steps.install.outcome == 'skipped'
+        working-directory: ./opentrons-ai-server
+        run: make unit-test

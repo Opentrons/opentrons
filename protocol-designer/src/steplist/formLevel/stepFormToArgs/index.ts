@@ -1,53 +1,110 @@
 import mapValues from 'lodash/mapValues'
-import { CommandCreatorArgs } from '@opentrons/step-generation'
+
 import { castField } from '../../../steplist/fieldLevel'
-import { mixFormToArgs } from './mixFormToArgs'
-import { pauseFormToArgs } from './pauseFormToArgs'
+import { absorbanceReaderFormToArgs } from './absorbanceReaderFormToArgs'
+import { commentFormToArgs } from './commentFormToArgs'
+import { heaterShakerFormToArgs } from './heaterShakerFormToArgs'
 import { magnetFormToArgs } from './magnetFormToArgs'
+import { mixFormToArgs } from './mixFormToArgs'
+import { moveLabwareFormToArgs } from './moveLabwareFormToArgs'
+import { moveLiquidFormToArgs } from './moveLiquidFormToArgs'
+import { pauseFormToArgs } from './pauseFormToArgs'
 import { temperatureFormToArgs } from './temperatureFormToArgs'
 import { thermocyclerFormToArgs } from './thermocyclerFormToArgs'
-import { heaterShakerFormToArgs } from './heaterShakerFormToArgs'
-import { moveLiquidFormToArgs } from './moveLiquidFormToArgs'
-import { moveLabwareFormToArgs } from './moveLabwareFormToArgs'
-import type { FormData } from '../../../form-types'
+
+import type {
+  CommandCreatorArgs,
+  InvariantContext,
+} from '@opentrons/step-generation'
+import type {
+  HydratedAbsorbanceReaderFormData,
+  HydratedCommentFormData,
+  HydratedFormData,
+  HydratedHeaterShakerFormData,
+  HydratedMagnetFormData,
+  HydratedMixFormData,
+  HydratedMoveLabwareFormData,
+  HydratedMoveLiquidFormData,
+  HydratedPauseFormData,
+  HydratedTemperatureFormData,
+  HydratedThermocyclerFormData,
+} from '../../../form-types'
+
 // NOTE: this acts as an adapter for the PD defined data shape of the step forms
 // to create arguments that the step generation service is expecting
 // in order to generate command creators
 type StepArgs = CommandCreatorArgs | null
-// cast all fields that have 'castValue' in stepFieldHelperMap
-export const _castForm = (hydratedForm: FormData): any =>
+export const _castForm = (hydratedForm: HydratedFormData): any =>
   mapValues(hydratedForm, (value, name) => castField(name, value))
-// TODO: Ian 2019-01-29 use hydrated form type
-export const stepFormToArgs = (hydratedForm: FormData): StepArgs => {
+
+export const stepFormToArgs = (
+  hydratedForm: HydratedFormData,
+  contextualState: InvariantContext
+): StepArgs => {
   const castForm = _castForm(hydratedForm)
+  let stepArgs: StepArgs = null
   switch (castForm.stepType) {
-    case 'moveLiquid':
-      return moveLiquidFormToArgs({ ...castForm, fields: castForm })
+    case 'moveLiquid': {
+      stepArgs = moveLiquidFormToArgs(
+        castForm as HydratedMoveLiquidFormData,
+        contextualState
+      )
+      break
+    }
+    case 'pause': {
+      stepArgs = pauseFormToArgs(castForm as HydratedPauseFormData)
+      break
+    }
+    case 'mix': {
+      stepArgs = mixFormToArgs(castForm as HydratedMixFormData)
+      break
+    }
+    case 'magnet': {
+      stepArgs = magnetFormToArgs(castForm as HydratedMagnetFormData)
+      break
+    }
+    case 'temperature': {
+      stepArgs = temperatureFormToArgs(castForm as HydratedTemperatureFormData)
+      break
+    }
+    case 'thermocycler': {
+      stepArgs = thermocyclerFormToArgs(
+        castForm as HydratedThermocyclerFormData
+      )
+      break
+    }
+    case 'heaterShaker': {
+      stepArgs = heaterShakerFormToArgs(
+        castForm as HydratedHeaterShakerFormData
+      )
+      break
+    }
+    case 'moveLabware': {
+      stepArgs = moveLabwareFormToArgs(castForm as HydratedMoveLabwareFormData)
 
-    // TODO: Ian 2019-01-29 nest all fields under `fields` (in #2917 ?)
-    case 'pause':
-      return pauseFormToArgs(castForm)
+      break
+    }
+    case 'comment': {
+      stepArgs = commentFormToArgs(castForm as HydratedCommentFormData)
 
-    case 'mix':
-      return mixFormToArgs(castForm)
+      break
+    }
+    case 'absorbanceReader': {
+      stepArgs = absorbanceReaderFormToArgs(
+        castForm as HydratedAbsorbanceReaderFormData
+      )
+      break
+    }
+  }
 
-    case 'magnet':
-      return magnetFormToArgs(castForm)
-
-    case 'temperature':
-      return temperatureFormToArgs(castForm)
-
-    case 'thermocycler':
-      return thermocyclerFormToArgs(castForm)
-
-    case 'heaterShaker':
-      return heaterShakerFormToArgs(castForm)
-
-    case 'moveLabware':
-      return moveLabwareFormToArgs({ ...castForm, fields: castForm })
-
-    default:
-      console.warn(`stepFormToArgs not implemented for ${castForm.stepType}`)
-      return null
+  if (stepArgs == null) {
+    console.warn(`stepFormToArgs not implemented for ${castForm.stepType}`)
+    return null
+  }
+  return {
+    ...stepArgs,
+    stepNumber: castForm.stepNumber,
+    name: castForm.stepName,
+    description: castForm.stepDetails,
   }
 }

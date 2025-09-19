@@ -1,7 +1,7 @@
 from typing import Any, Dict, Optional, List
 from typing_extensions import Literal
 from functools import partial
-from pydantic import BaseModel, Field
+from pydantic import ConfigDict, BaseModel, Field
 
 from ..helper_classes import RequiredLabware, AttachedPipette
 
@@ -14,8 +14,8 @@ OffsetVectorField = partial(
     Field,
     ...,
     description="An offset vector in deck coordinates (x, y, z)",
-    min_items=3,
-    max_items=3,
+    min_length=3,
+    max_length=3,
 )
 
 
@@ -75,9 +75,9 @@ class TipComparisonMap(BaseModel):
 
 
 class ComparisonStatePerCalibration(BaseModel):
-    tipLength: Optional[TipComparisonMap]
-    pipetteOffset: Optional[PipetteOffsetComparisonMap]
-    deck: Optional[DeckComparisonMap]
+    tipLength: Optional[TipComparisonMap] = None
+    pipetteOffset: Optional[PipetteOffsetComparisonMap] = None
+    deck: Optional[DeckComparisonMap] = None
 
 
 class ComparisonStatePerPipette(BaseModel):
@@ -104,6 +104,9 @@ class SessionCreateParams(BaseModel):
         description="Whether to use a calibration block in the"
         "calibration health check flow.",
     )
+    # todo(mm, 2025-02-13): This should restrict input to labware schema 2 to protect
+    # robot_server.robot.calibration legacy internals.
+    # https://opentrons.atlassian.net/browse/EXEC-1230
     tipRacks: List[Dict[str, Any]] = Field(
         [],
         description="A list of labware definitions to use in"
@@ -123,10 +126,9 @@ class CalibrationCheckSessionStatus(BaseModel):
     supportedCommands: List[str] = Field(
         ..., description="A list of supported commands for this user flow"
     )
-
-    class Config:
-        arbitrary_types_allowed = True
-        schema_extra = {
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+        json_schema_extra={
             "examples": [
                 {
                     "instruments": [
@@ -154,4 +156,5 @@ class CalibrationCheckSessionStatus(BaseModel):
                     },
                 }
             ]
-        }
+        },
+    )

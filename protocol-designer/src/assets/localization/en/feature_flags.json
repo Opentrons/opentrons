@@ -1,0 +1,62 @@
+{
+  "PRERELEASE_MODE": {
+    "title": "Use prerelease mode",
+    "description": "Show in-progress features for testing & internal use"
+  },
+  "OT_PD_DISABLE_MODULE_RESTRICTIONS": {
+    "title": "Disable module placement restrictions",
+    "description": "Turn off all restrictions on module placement and related pipette crash guidance."
+  },
+  "OT_PD_ALLOW_ALL_TIPRACKS": {
+    "title": "Allow all tip rack options",
+    "description": "Enable selection of all tip racks for each pipette."
+  },
+  "OT_PD_ENABLE_COMMENT": {
+    "title": "Enable comment step",
+    "description": "You can add comments anywhere between timeline steps."
+  },
+  "OT_PD_ENABLE_TIP_PICKUP_LOCATION": {
+    "title": "Enable tip pickup location",
+    "description": "You can choose which tip to pick up."
+  },
+  "OT_PD_ENABLE_RETURN_TIP": {
+    "title": "Enable return tip",
+    "description": "You can choose where to drop tip."
+  },
+  "OT_PD_ENABLE_HOT_KEYS_DISPLAY": {
+    "title": "Timeline editing guidance",
+    "description": "Show information about working with steps next to the protocol timeline"
+  },
+  "OT_PD_ENABLE_REACT_SCAN": {
+    "title": "Enable React Scan",
+    "description": "Enable React Scan support for components rendering check"
+  },
+  "OT_PD_ENABLE_TIMELINE_SCRUBBER": {
+    "title": "Enable timeline scrubber",
+    "description": "See the protocol timeline visualization in overview"
+  },
+  "OT_PD_ENABLE_MULTIPLE_TEMPS_OT2": {
+    "title": "Allow two temperature modules on OT-2",
+    "description": "This experimental setting may cause collisions, and Opentrons will not be responsible for any damage resulting from its use."
+  },
+  "OT_PD_ENABLE_PARTIAL_TIP_SUPPORT": {
+    "title": "Enable partial tip support",
+    "description": "Partial tip configurations that are not released yet"
+  },
+  "OT_PD_ENABLE_STACKING": {
+    "title": "Enable more labware capabilities",
+    "description": "Ability to stack labwares and add the Flex Stacker"
+  },
+  "OT_PD_ENABLE_CONCURRENT_MODULE_ACTIONS": {
+    "title": "Enable concurrent module actions",
+    "description": "Features and design changes for running steps while waiting for modules to do stuff."
+  },
+  "OT_PD_ENABLE_JSON_EXPORT": {
+    "title": "Enable exporting JSON",
+    "description": "Enables the ability to export JSON for internal usages only"
+  },
+  "OT_PD_ENABLE_BY_VOLUME_BUILDER": {
+    "title": "Enable by-volume builder",
+    "description": "Enables the ability to build by-volume curves"
+  }
+}

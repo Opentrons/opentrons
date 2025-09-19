@@ -1,24 +1,29 @@
+import mapValues from 'lodash/mapValues'
 import { createSelector } from 'reselect'
+
 import {
+  ABSORBANCE_READER_TYPE,
   getLabwareDisplayName,
+  HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
-  HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import mapValues from 'lodash/mapValues'
+
 import { getInitialDeckSetup } from '../../step-forms/selectors'
+import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
 import { getLabwareNicknamesById } from '../labware/selectors'
 import {
-  getModuleLabwareOptions,
   getLabwareOnModule,
-  getModuleOnDeckByType,
-  getModuleHasLabware,
   getMagnetLabwareEngageHeight as getMagnetLabwareEngageHeightUtil,
+  getModuleLabwareOptions,
+  getModuleOnDeckByType,
+  getModulesOnDeckByType,
 } from './utils'
-import { Options } from '@opentrons/components'
-import { Selector } from '../../types'
-import { LabwareNamesByModuleId } from '../../steplist/types'
+
+import type { DropdownOption } from '@opentrons/components'
+import type { LabwareNamesByModuleId } from '../../steplist/types'
+import type { Selector } from '../../types'
+
 export const getLabwareNamesByModuleId: Selector<LabwareNamesByModuleId> = createSelector(
   getInitialDeckSetup,
   getLabwareNicknamesById,
@@ -35,7 +40,9 @@ export const getLabwareNamesByModuleId: Selector<LabwareNamesByModuleId> = creat
 )
 
 /** Returns dropdown option for labware placed on magnetic module */
-export const getMagneticLabwareOptions: Selector<Options> = createSelector(
+export const getMagneticLabwareOptions: Selector<
+  DropdownOption[]
+> = createSelector(
   getInitialDeckSetup,
   getLabwareNicknamesById,
   (initialDeckSetup, nicknamesById) => {
@@ -48,7 +55,9 @@ export const getMagneticLabwareOptions: Selector<Options> = createSelector(
 )
 
 /** Returns dropdown option for labware placed on temperature module */
-export const getTemperatureLabwareOptions: Selector<Options> = createSelector(
+export const getTemperatureLabwareOptions: Selector<
+  DropdownOption[]
+> = createSelector(
   getInitialDeckSetup,
   getLabwareNicknamesById,
   (initialDeckSetup, nicknamesById) => {
@@ -62,7 +71,9 @@ export const getTemperatureLabwareOptions: Selector<Options> = createSelector(
 )
 
 /** Returns dropdown option for labware placed on heater shaker module */
-export const getHeaterShakerLabwareOptions: Selector<Options> = createSelector(
+export const getHeaterShakerLabwareOptions: Selector<
+  DropdownOption[]
+> = createSelector(
   getInitialDeckSetup,
   getLabwareNicknamesById,
   (initialDeckSetup, nicknamesById) => {
@@ -75,6 +86,22 @@ export const getHeaterShakerLabwareOptions: Selector<Options> = createSelector(
   }
 )
 
+/** Returns dropdown option for labware placed on absorbance reader module */
+export const getAbsorbanceReaderLabwareOptions: Selector<
+  DropdownOption[]
+> = createSelector(
+  getDeckSetupForActiveItem,
+  getLabwareNicknamesById,
+  (deckSetup, nicknamesById) => {
+    const absorbanceReaderModuleOptions = getModuleLabwareOptions(
+      deckSetup,
+      nicknamesById,
+      ABSORBANCE_READER_TYPE
+    )
+    return absorbanceReaderModuleOptions
+  }
+)
+
 /** Get single magnetic module (assumes no multiples) */
 export const getSingleMagneticModuleId: Selector<
   string | null
@@ -84,47 +111,15 @@ export const getSingleMagneticModuleId: Selector<
     getModuleOnDeckByType(initialDeckSetup, MAGNETIC_MODULE_TYPE)?.id || null
 )
 
-/** Get single temperature module (assumes no multiples) */
-export const getSingleTemperatureModuleId: Selector<
-  string | null
+/** Get all temperature modules */
+export const getTemperatureModuleIds: Selector<
+  string[] | null
 > = createSelector(
   getInitialDeckSetup,
   initialDeckSetup =>
-    getModuleOnDeckByType(initialDeckSetup, TEMPERATURE_MODULE_TYPE)?.id || null
-)
-
-/** Get single temperature module (assumes no multiples) */
-export const getSingleThermocyclerModuleId: Selector<
-  string | null
-> = createSelector(
-  getInitialDeckSetup,
-  initialDeckSetup =>
-    getModuleOnDeckByType(initialDeckSetup, THERMOCYCLER_MODULE_TYPE)?.id ||
-    null
-)
-
-/** Returns boolean if magnetic module has labware */
-export const getMagnetModuleHasLabware: Selector<boolean> = createSelector(
-  getInitialDeckSetup,
-  initialDeckSetup => {
-    return getModuleHasLabware(initialDeckSetup, MAGNETIC_MODULE_TYPE)
-  }
-)
-
-/** Returns boolean if temperature module has labware */
-export const getTemperatureModuleHasLabware: Selector<boolean> = createSelector(
-  getInitialDeckSetup,
-  initialDeckSetup => {
-    return getModuleHasLabware(initialDeckSetup, TEMPERATURE_MODULE_TYPE)
-  }
-)
-
-/** Returns boolean if thermocycler module has labware */
-export const getThermocyclerModuleHasLabware: Selector<boolean> = createSelector(
-  getInitialDeckSetup,
-  initialDeckSetup => {
-    return getModuleHasLabware(initialDeckSetup, THERMOCYCLER_MODULE_TYPE)
-  }
+    getModulesOnDeckByType(initialDeckSetup, TEMPERATURE_MODULE_TYPE)?.map(
+      module => module.id
+    ) || null
 )
 export const getMagnetLabwareEngageHeight: Selector<
   number | null
@@ -133,27 +128,4 @@ export const getMagnetLabwareEngageHeight: Selector<
   getSingleMagneticModuleId,
   (initialDeckSetup, magnetModuleId) =>
     getMagnetLabwareEngageHeightUtil(initialDeckSetup, magnetModuleId)
-)
-
-/** Returns boolean if Temperature Module is present on deck  */
-export const getTempModuleIsOnDeck: Selector<boolean> = createSelector(
-  getInitialDeckSetup,
-  initialDeckSetup => {
-    const tempOnDeck = getModuleOnDeckByType(
-      initialDeckSetup,
-      TEMPERATURE_MODULE_TYPE
-    )
-    return Boolean(tempOnDeck)
-  }
-)
-
-export const getHeaterShakerModuleIsOnDeck: Selector<boolean> = createSelector(
-  getInitialDeckSetup,
-  initialDeckSetup => {
-    const heaterShakerOnDeck = getModuleOnDeckByType(
-      initialDeckSetup,
-      HEATERSHAKER_MODULE_TYPE
-    )
-    return Boolean(heaterShakerOnDeck)
-  }
 )

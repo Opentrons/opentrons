@@ -1,4 +1,5 @@
 import mapValues from 'lodash/mapValues'
+
 export const PD_VERSION = '5.0.0'
 export const migrateSavedStepForms = (
   savedStepForms: Record<string, any>
@@ -36,7 +37,10 @@ export const migrateFile = (fileData: any): any => {
       data: {
         ...fileData.designerApplication.data,
         savedStepForms: migrateSavedStepForms(
-          fileData.designerApplication.data.savedStepForms
+          fileData.designerApplication.data.savedStepForms as Record<
+            string,
+            any
+          >
         ),
       },
     },

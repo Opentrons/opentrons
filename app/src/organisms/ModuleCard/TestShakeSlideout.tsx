@@ -1,50 +1,53 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+
 import {
-  Flex,
-  TYPOGRAPHY,
-  SPACING,
+  ALIGN_CENTER,
+  ALIGN_FLEX_START,
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
-  Icon,
   DIRECTION_ROW,
-  SIZE_AUTO,
-  ALIGN_FLEX_START,
+  Flex,
+  Icon,
+  InputField,
+  LegacyStyledText,
   Link,
-  useHoverTooltip,
-  ALIGN_CENTER,
-  useConditionalConfirm,
   PrimaryButton,
-  BORDERS,
+  SIZE_AUTO,
+  SPACING,
+  Tooltip,
+  TYPOGRAPHY,
+  useConditionalConfirm,
+  useHoverTooltip,
 } from '@opentrons/components'
-import { getIsHeaterShakerAttached } from '../../redux/config'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
-  CreateCommand,
   getModuleDisplayName,
   HS_RPM_MAX,
   HS_RPM_MIN,
   RPM,
 } from '@opentrons/shared-data'
-import { getTopPortalEl } from '../../App/portal'
-import { Slideout } from '../../atoms/Slideout'
-import { TertiaryButton } from '../../atoms/buttons'
-import { Divider } from '../../atoms/structure'
-import { InputField } from '../../atoms/InputField'
-import { Tooltip } from '../../atoms/Tooltip'
-import { StyledText } from '../../atoms/text'
+
+import { getTopPortalEl } from '/app/App/portal'
+import { TertiaryButton } from '/app/atoms/buttons'
+import { Slideout } from '/app/atoms/Slideout'
+import { Divider } from '/app/atoms/structure'
+import { getIsHeaterShakerAttached } from '/app/redux/config'
+
 import { ConfirmAttachmentModal } from './ConfirmAttachmentModal'
 import { useLatchControls } from './hooks'
 import { ModuleSetupModal } from './ModuleSetupModal'
 
-import type { HeaterShakerModule, LatchStatus } from '../../redux/modules/types'
 import type {
+  CreateCommand,
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerDeactivateShakerCreateCommand,
   HeaterShakerSetAndWaitForShakeSpeedCreateCommand,
 } from '@opentrons/shared-data'
+import type { HeaterShakerModule, LatchStatus } from '/app/redux/modules/types'
 
 interface TestShakeSlideoutProps {
   module: HeaterShakerModule
@@ -64,11 +67,10 @@ export const TestShakeSlideout = (
   })
   const { toggleLatch, isLatchClosed } = useLatchControls(module)
   const configHasHeaterShakerAttached = useSelector(getIsHeaterShakerAttached)
-  const [shakeValue, setShakeValue] = React.useState<number | null>(null)
-  const [
-    showModuleSetupModal,
-    setShowModuleSetupModal,
-  ] = React.useState<boolean>(false)
+  const [shakeValue, setShakeValue] = useState<number | null>(null)
+  const [showModuleSetupModal, setShowModuleSetupModal] = useState<boolean>(
+    false
+  )
   const isShaking = module.data.speedStatus !== 'idle'
 
   const setShakeCommand: HeaterShakerSetAndWaitForShakeSpeedCreateCommand = {
@@ -186,15 +188,15 @@ export const TestShakeSlideout = (
           />
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} fontSize={TYPOGRAPHY.fontSizeP}>
-          <StyledText fontWeight={TYPOGRAPHY.fontWeightRegular}>
+          <LegacyStyledText fontWeight={TYPOGRAPHY.fontWeightRegular}>
             {t('heater_shaker:test_shake_slideout_banner_info')}
-          </StyledText>
+          </LegacyStyledText>
         </Flex>
       </Flex>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
-        padding={`${SPACING.spacing16} ${SPACING.spacing20} ${SPACING.spacing20} ${SPACING.spacing16}`}
+        paddingBottom={SPACING.spacing24}
         width="100%"
       >
         <Flex
@@ -203,21 +205,21 @@ export const TestShakeSlideout = (
           alignItems={ALIGN_CENTER}
         >
           <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing8}>
-            <StyledText
+            <LegacyStyledText
               textTransform={TYPOGRAPHY.textTransformCapitalize}
               fontSize={TYPOGRAPHY.fontSizeLabel}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             >
               {t('labware_latch')}
-            </StyledText>
-            <StyledText
+            </LegacyStyledText>
+            <LegacyStyledText
               textTransform={TYPOGRAPHY.textTransformCapitalize}
               fontSize={TYPOGRAPHY.fontSizeLabel}
               marginTop={SPACING.spacing8}
               data-testid="TestShake_Slideout_latch_status"
             >
               {getLatchStatus(module.data.labwareLatchStatus)}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
           <TertiaryButton
             marginTop={SPACING.spacing4}
@@ -238,13 +240,13 @@ export const TestShakeSlideout = (
           ) : null}
         </Flex>
         <Divider color={COLORS.grey30} />
-        <StyledText
+        <LegacyStyledText
           fontSize={TYPOGRAPHY.fontSizeLabel}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginTop={SPACING.spacing16}
         >
           {t('shake_speed')}
-        </StyledText>
+        </LegacyStyledText>
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_FLEX_START}>
           <Flex
             flexDirection={DIRECTION_COLUMN}
@@ -256,7 +258,9 @@ export const TestShakeSlideout = (
               autoFocus
               units={RPM}
               value={shakeValue != null ? Math.round(shakeValue) : null}
-              onChange={e => setShakeValue(e.target.valueAsNumber)}
+              onChange={e => {
+                setShakeValue(e.target.valueAsNumber)
+              }}
               type="number"
               caption={t('min_max_rpm', {
                 min: HS_RPM_MIN,
@@ -265,10 +269,10 @@ export const TestShakeSlideout = (
               error={errorMessage}
               disabled={isShaking}
             />
-            <StyledText
+            <LegacyStyledText
               color={COLORS.grey50}
               fontSize={TYPOGRAPHY.fontSizeCaption}
-            ></StyledText>
+            ></LegacyStyledText>
           </Flex>
           <TertiaryButton
             textTransform={TYPOGRAPHY.textTransformCapitalize}
@@ -293,8 +297,11 @@ export const TestShakeSlideout = (
       </Flex>
       {showModuleSetupModal && (
         <ModuleSetupModal
-          close={() => setShowModuleSetupModal(false)}
+          close={() => {
+            setShowModuleSetupModal(false)
+          }}
           moduleDisplayName={getModuleDisplayName(module.moduleModel)}
+          moduleModel={module.moduleModel}
         />
       )}
       <Link
@@ -302,7 +309,9 @@ export const TestShakeSlideout = (
         marginTop={SPACING.spacing4}
         css={TYPOGRAPHY.linkPSemiBold}
         id="HeaterShaker_Attachment_Instructions"
-        onClick={() => setShowModuleSetupModal(true)}
+        onClick={() => {
+          setShowModuleSetupModal(true)
+        }}
       >
         {t('show_attachment_instructions')}
       </Link>

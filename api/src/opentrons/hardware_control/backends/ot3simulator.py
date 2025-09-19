@@ -45,9 +45,10 @@ from opentrons.hardware_control.types import (
     EstopPhysicalStatus,
     HardwareEventHandler,
     HardwareEventUnsubscriber,
+    PipetteSensorResponseQueue,
 )
 
-from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
+from opentrons_shared_data.pipette.types import PipetteName, PipetteModel
 from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
     load_data as load_pipette_data,
@@ -62,7 +63,10 @@ from opentrons.hardware_control.dev_types import (
 )
 from opentrons.util.async_helpers import ensure_yield
 from .types import HWStopCondition
-from .flex_protocol import FlexBackend
+from .flex_protocol import (
+    FlexBackend,
+)
+
 
 log = logging.getLogger(__name__)
 
@@ -103,7 +107,7 @@ class OT3Simulator(FlexBackend):
     async def build(
         cls,
         attached_instruments: Dict[OT3Mount, Dict[str, Optional[str]]],
-        attached_modules: Dict[str, List[str]],
+        attached_modules: Dict[str, List[modules.SimulatingModule]],
         config: OT3Config,
         loop: asyncio.AbstractEventLoop,
         strict_attached_instruments: bool = True,
@@ -129,7 +133,7 @@ class OT3Simulator(FlexBackend):
     def __init__(
         self,
         attached_instruments: Dict[OT3Mount, Dict[str, Optional[str]]],
-        attached_modules: Dict[str, List[str]],
+        attached_modules: Dict[str, List[modules.SimulatingModule]],
         config: OT3Config,
         loop: asyncio.AbstractEventLoop,
         strict_attached_instruments: bool = True,
@@ -226,14 +230,12 @@ class OT3Simulator(FlexBackend):
     def update_constraints_for_gantry_load(self, gantry_load: GantryLoad) -> None:
         self._sim_gantry_load = gantry_load
 
-    def update_constraints_for_calibration_with_gantry_load(
-        self,
-        gantry_load: GantryLoad,
-    ) -> None:
-        self._sim_gantry_load = gantry_load
-
     def update_constraints_for_plunger_acceleration(
-        self, mount: OT3Mount, acceleration: float, gantry_load: GantryLoad
+        self,
+        mount: OT3Mount,
+        acceleration: float,
+        gantry_load: GantryLoad,
+        high_speed_pipette: bool = False,
     ) -> None:
         self._sim_gantry_load = gantry_load
 
@@ -340,18 +342,19 @@ class OT3Simulator(FlexBackend):
     async def liquid_probe(
         self,
         mount: OT3Mount,
-        max_z_distance: float,
+        max_p_distance: float,
         mount_speed: float,
         plunger_speed: float,
         threshold_pascals: float,
-        log_pressure: bool = True,
-        auto_zero_sensor: bool = True,
-        num_baseline_reads: int = 10,
+        plunger_impulse_time: float,
+        num_baseline_reads: int,
+        z_offset_for_plunger_prep: float,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
+        force_both_sensors: bool = False,
+        response_queue: Optional[PipetteSensorResponseQueue] = None,
     ) -> float:
         z_axis = Axis.by_mount(mount)
         pos = self._position
-        pos[z_axis] += max_z_distance
         self._position.update(pos)
         self._encoder_position.update(pos)
         return self._position[z_axis]
@@ -435,10 +438,12 @@ class OT3Simulator(FlexBackend):
         return self._sim_jaw_state
 
     async def tip_action(
-        self, origin: Dict[Axis, float], targets: List[Tuple[Dict[Axis, float], float]]
+        self, origin: float, targets: List[Tuple[float, float]]
     ) -> None:
         self._gear_motor_position.update(
-            coalesce_move_segments(origin, [target[0] for target in targets])
+            coalesce_move_segments(
+                {Axis.Q: origin}, [{Axis.Q: target[0]} for target in targets]
+            )
         )
         await asyncio.sleep(0)
 
@@ -501,21 +506,30 @@ class OT3Simulator(FlexBackend):
                         converted_name.pipette_type,
                         converted_name.pipette_channels,
                         converted_name.pipette_version,
+                        converted_name.oem_type,
                     ),
                     "id": None,
                 }
-        if found_model and expected_instr or found_model:
+        if found_model and init_instr["id"] is not None:
             # Instrument detected matches instrument expected (note:
             # "instrument detected" means passed as an argument to the
             # constructor of this class)
 
             # OR Instrument detected and no expected instrument specified
-            converted_name = pipette_load_name.convert_pipette_model(found_model)
+
+            found_model_version = ""
+            if found_model.find("flex") > -1:
+                found_model = found_model.replace("_flex", "")  # type: ignore
+                found_model_version = f"{init_instr['id'][4]}.{init_instr['id'][5]}"
+            converted_name = pipette_load_name.convert_pipette_model(
+                found_model, found_model_version
+            )
             return {
                 "config": load_pipette_data.load_definition(
                     converted_name.pipette_type,
                     converted_name.pipette_channels,
                     converted_name.pipette_version,
+                    converted_name.oem_type,
                 ),
                 "id": init_instr["id"],
             }
@@ -527,6 +541,7 @@ class OT3Simulator(FlexBackend):
                     converted_name.pipette_type,
                     converted_name.pipette_channels,
                     converted_name.pipette_version,
+                    converted_name.oem_type,
                 ),
                 "id": None,
             }
@@ -596,13 +611,14 @@ class OT3Simulator(FlexBackend):
     @ensure_yield
     async def watch(self, loop: asyncio.AbstractEventLoop) -> None:
         new_mods_at_ports = []
-        for mod, serials in self._stubbed_attached_modules.items():
-            for serial in serials:
+        for mod_name, list_of_modules in self._stubbed_attached_modules.items():
+            for module_details in list_of_modules:
                 new_mods_at_ports.append(
                     modules.SimulatingModuleAtPort(
-                        port=f"/dev/ot_module_sim_{mod}{str(serial)}",
-                        name=mod,
-                        serial_number=serial,
+                        port=f"/dev/ot_module_sim_{mod_name}{str(module_details.serial_number)}",
+                        name=mod_name,
+                        serial_number=module_details.serial_number,
+                        model=module_details.model,
                     )
                 )
         await self.module_controls.register_modules(new_mods_at_ports=new_mods_at_ports)
@@ -712,7 +728,8 @@ class OT3Simulator(FlexBackend):
     @ensure_yield
     async def clean_up(self) -> None:
         """Clean up."""
-        pass
+        if hasattr(self, "_module_controls") and self._module_controls is not None:
+            await self._module_controls.clean_up()
 
     @staticmethod
     def _get_home_position() -> Dict[Axis, float]:
@@ -739,7 +756,7 @@ class OT3Simulator(FlexBackend):
         distance_mm: float,
         speed_mm_per_s: float,
         sensor_threshold_pf: float,
-        probe: InstrumentProbeType,
+        probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
     ) -> bool:
         self._position[moving] += distance_mm
         return True
@@ -765,13 +782,17 @@ class OT3Simulator(FlexBackend):
                 next_fw_version=1,
                 fw_update_needed=False,
                 current_fw_sha="simulated",
-                pcba_revision="A1",
+                pcba_revision="A1.0",
                 update_state=None,
             )
             for axis in self._present_axes
         }
 
-    async def get_tip_status(self, mount: OT3Mount) -> TipStateType:
+    async def get_tip_status(
+        self,
+        mount: OT3Mount,
+        follow_singular_sensor: Optional[InstrumentProbeType] = None,
+    ) -> TipStateType:
         return TipStateType(self._sim_tip_state[mount])
 
     def current_tip_state(self, mount: OT3Mount) -> Optional[bool]:
@@ -789,6 +810,9 @@ class OT3Simulator(FlexBackend):
 
     async def set_status_bar_enabled(self, enabled: bool) -> None:
         await asyncio.sleep(0)
+
+    def get_status_bar_enabled(self) -> bool:
+        return True
 
     def get_status_bar_state(self) -> StatusBarState:
         return self._sim_status_bar_state
@@ -841,3 +865,37 @@ class OT3Simulator(FlexBackend):
 
     async def get_hepa_uv_state(self) -> Optional[HepaUVState]:
         return None
+
+    def _update_tip_state(self, mount: OT3Mount, status: bool) -> None:
+        """This is something we only use in the simulator.
+        It is required so that PE simulations using ot3api don't break."""
+        self._sim_tip_state[mount] = status
+
+    async def increase_evo_disp_count(self, mount: OT3Mount) -> None:
+        pass
+
+    async def read_env_temp_sensor(
+        self, mount: OT3Mount, primary: bool
+    ) -> Optional[float]:
+        """Read and return the current sensor information."""
+
+        return 0.0
+
+    async def read_env_hum_sensor(
+        self, mount: OT3Mount, primary: bool
+    ) -> Optional[float]:
+        """Read and return the current sensor information."""
+
+        return 0.0
+
+    async def read_pressure_sensor(
+        self, mount: OT3Mount, primary: bool
+    ) -> Optional[float]:
+        """Read and return the current sensor information."""
+        return 0.0
+
+    async def read_capacitive_sensor(
+        self, mount: OT3Mount, primary: bool
+    ) -> Optional[float]:
+        """Read and return the current sensor information."""
+        return 0.0

@@ -1,42 +1,28 @@
-import * as React from 'react'
-
 import { useRunQuery } from '@opentrons/react-api-client'
 
-import { useNotifyService } from '../useNotifyService'
+import { useNotifyDataReady } from '../useNotifyDataReady'
 
 import type { UseQueryResult } from 'react-query'
-import type { Run } from '@opentrons/api-client'
-import type {
-  QueryOptionsWithPolling,
-  HTTPRefetchFrequency,
-} from '../useNotifyService'
-import type { NotifyTopic } from '../../redux/shell/types'
+import type { HostConfig, Run } from '@opentrons/api-client'
+import type { NotifyTopic } from '/app/redux/shell/types'
+import type { QueryOptionsWithPolling } from '../useNotifyDataReady'
 
 export function useNotifyRunQuery<TError = Error>(
   runId: string | null,
-  options: QueryOptionsWithPolling<Run, TError> = {}
+  options: QueryOptionsWithPolling<Run, TError> = {},
+  hostOverride?: HostConfig | null
 ): UseQueryResult<Run, TError> {
-  const [
-    refetchUsingHTTP,
-    setRefetchUsingHTTP,
-  ] = React.useState<HTTPRefetchFrequency>(null)
-
-  const isEnabled = options.enabled !== false && runId != null
-
-  useNotifyService({
+  const { shouldRefetch, queryOptionsNotify } = useNotifyDataReady({
     topic: `robot-server/runs/${runId}` as NotifyTopic,
-    setRefetchUsingHTTP,
-    options: { ...options, enabled: options.enabled != null && runId != null },
+    options,
+    hostOverride,
   })
 
-  const httpResponse = useRunQuery(runId, {
-    ...options,
-    enabled: isEnabled && refetchUsingHTTP != null,
-    onSettled:
-      refetchUsingHTTP === 'once'
-        ? () => setRefetchUsingHTTP(null)
-        : () => null,
-  })
+  const httpQueryResult = useRunQuery(runId, queryOptionsNotify, hostOverride)
 
-  return httpResponse
+  if (shouldRefetch && runId != null) {
+    void httpQueryResult.refetch()
+  }
+
+  return httpQueryResult
 }

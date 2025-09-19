@@ -1,10 +1,15 @@
-import gripperV1 from '../gripper/definitions/1/gripperV1.json'
 import gripperV1_1 from '../gripper/definitions/1/gripperV1.1.json'
 import gripperV1_2 from '../gripper/definitions/1/gripperV1.2.json'
+import gripperV1_3 from '../gripper/definitions/1/gripperV1.3.json'
+import gripperV1 from '../gripper/definitions/1/gripperV1.json'
+import {
+  GRIPPER_V1,
+  GRIPPER_V1_1,
+  GRIPPER_V1_2,
+  GRIPPER_V1_3,
+} from './constants'
 
-import { GRIPPER_V1, GRIPPER_V1_1, GRIPPER_V1_2 } from './constants'
-
-import type { GripperModel, GripperDefinition } from './types'
+import type { GripperDefinition, GripperModel } from './types'
 
 export const getGripperDef = (
   gripperModel: GripperModel
@@ -16,11 +21,13 @@ export const getGripperDef = (
       return gripperV1_1 as GripperDefinition
     case GRIPPER_V1_2:
       return gripperV1_2 as GripperDefinition
+    case GRIPPER_V1_3:
+      return gripperV1_3 as GripperDefinition
     default:
       console.warn(
-        `Could not find a gripper with model ${gripperModel}, falling back to most recent definition: ${GRIPPER_V1_1}`
+        `Could not find a gripper with model ${gripperModel}, falling back to most recent definition: ${GRIPPER_V1_2}`
       )
-      return gripperV1_1 as GripperDefinition
+      return gripperV1_2 as GripperDefinition
   }
 }
 

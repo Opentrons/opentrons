@@ -1,10 +1,12 @@
 """QueueWorker and dependency factory."""
+from typing import AsyncGenerator, Callable
+
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 from opentrons.protocol_engine.execution.rail_lights import RailLightsHandler
 
-from ..state import StateStore
+from ..state.state import StateStore
 from ..actions import ActionDispatcher
+from ..resources import FileProvider
 from .equipment import EquipmentHandler
 from .movement import MovementHandler
 from .gantry_mover import create_gantry_mover
@@ -15,21 +17,25 @@ from .run_control import RunControlHandler
 from .command_executor import CommandExecutor
 from .queue_worker import QueueWorker
 from .status_bar import StatusBarHandler
+from .task_handler import TaskHandler
 
 
 def create_queue_worker(
     hardware_api: HardwareControlAPI,
+    file_provider: FileProvider,
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
-    error_recovery_policy: ErrorRecoveryPolicy,
+    command_generator: Callable[[], AsyncGenerator[str, None]],
 ) -> QueueWorker:
     """Create a ready-to-use QueueWorker instance.
 
     Arguments:
         hardware_api: Hardware control API to pass down to dependencies.
+        file_provider: Provides access to robot server file writing procedures for protocol output.
         state_store: StateStore to pass down to dependencies.
         action_dispatcher: ActionDispatcher to pass down to dependencies.
         error_recovery_policy: ErrorRecoveryPolicy to pass down to dependencies.
+        command_generator: Command generator to get the next command to execute.
     """
     gantry_mover = create_gantry_mover(
         hardware_api=hardware_api,
@@ -39,7 +45,6 @@ def create_queue_worker(
     equipment_handler = EquipmentHandler(
         hardware_api=hardware_api,
         state_store=state_store,
-        action_dispatcher=action_dispatcher,
     )
 
     movement_handler = MovementHandler(
@@ -72,11 +77,14 @@ def create_queue_worker(
     rail_lights_handler = RailLightsHandler(
         hardware_api=hardware_api,
     )
-
+    task_handler = TaskHandler(
+        state_store=state_store, action_dispatcher=action_dispatcher
+    )
     status_bar_handler = StatusBarHandler(hardware_api=hardware_api)
 
     command_executor = CommandExecutor(
         hardware_api=hardware_api,
+        file_provider=file_provider,
         state_store=state_store,
         action_dispatcher=action_dispatcher,
         equipment=equipment_handler,
@@ -88,10 +96,11 @@ def create_queue_worker(
         run_control=run_control_handler,
         rail_lights=rail_lights_handler,
         status_bar=status_bar_handler,
-        error_recovery_policy=error_recovery_policy,
+        task_handler=task_handler,
     )
 
     return QueueWorker(
         state_store=state_store,
         command_executor=command_executor,
+        command_generator=command_generator,
     )

@@ -11,6 +11,7 @@ from opentrons.drivers.asyncio.communication import (
     SerialConnection,
     AsyncResponseSerialConnection,
     AsyncSerial,
+    UnhandledGcode,
 )
 from opentrons.drivers.thermocycler.abstract import AbstractThermocyclerDriver
 from opentrons.drivers.types import Temperature, PlateTemperature, ThermocyclerLidStatus
@@ -33,6 +34,7 @@ class GCODE(str, Enum):
     DEACTIVATE_LID = "M108"
     DEACTIVATE_BLOCK = "M14"
     DEVICE_INFO = "M115"
+    GET_RESET_REASON = "M114"
     ENTER_PROGRAMMING = "dfu"
 
 
@@ -94,7 +96,7 @@ class ThermocyclerDriverFactory:
             name=port,
             ack=TC_GEN2_SERIAL_ACK,
             retry_wait_time_seconds=0.1,
-            error_keyword="error",
+            error_keyword="err",
             alarm_keyword="alarm",
         )
 
@@ -224,6 +226,7 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
         temp: float,
         hold_time: Optional[float] = None,
         volume: Optional[float] = None,
+        ramp_rate: Optional[float] = None,
     ) -> None:
         """Send set plate temperature command"""
         temp = min(BLOCK_TARGET_MAX, max(BLOCK_TARGET_MIN, temp))
@@ -292,12 +295,13 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
 
     async def get_device_info(self) -> Dict[str, str]:
         """Send get device info command"""
-        c = CommandBuilder(terminator=TC_COMMAND_TERMINATOR).add_gcode(
+        device_info = CommandBuilder(terminator=TC_COMMAND_TERMINATOR).add_gcode(
             gcode=GCODE.DEVICE_INFO
         )
         response = await self._connection.send_command(
-            command=c, retries=DEFAULT_COMMAND_RETRIES
+            command=device_info, retries=DEFAULT_COMMAND_RETRIES
         )
+
         return utils.parse_device_information(device_info_string=response)
 
     async def enter_programming_mode(self) -> None:
@@ -340,10 +344,38 @@ class ThermocyclerDriverV2(ThermocyclerDriver):
         """
         super().__init__(connection)
 
-    async def set_ramp_rate(self, ramp_rate: float) -> None:
-        """Send a set ramp rate command"""
-        # This command is fully unsupported on TC Gen2
-        return None
+    async def set_plate_temperature(
+        self,
+        temp: float,
+        hold_time: Optional[float] = None,
+        volume: Optional[float] = None,
+        ramp_rate: Optional[float] = None,
+    ) -> None:
+        """Send set plate temperature command"""
+        temp = min(BLOCK_TARGET_MAX, max(BLOCK_TARGET_MIN, temp))
+
+        c = (
+            CommandBuilder(terminator=TC_COMMAND_TERMINATOR)
+            .add_gcode(gcode=GCODE.SET_PLATE_TEMP)
+            .add_float(
+                prefix="S", value=temp, precision=utils.TC_GCODE_ROUNDING_PRECISION
+            )
+        )
+        if hold_time is not None:
+            c = c.add_float(
+                prefix="H", value=hold_time, precision=utils.TC_GCODE_ROUNDING_PRECISION
+            )
+        if volume is not None:
+            c = c.add_float(
+                prefix="V", value=volume, precision=utils.TC_GCODE_ROUNDING_PRECISION
+            )
+
+        if ramp_rate is not None:
+            c = c.add_float(
+                prefix="R", value=ramp_rate, precision=utils.TC_GCODE_ROUNDING_PRECISION
+            )
+
+        await self._connection.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES)
 
     async def get_device_info(self) -> Dict[str, str]:
         """Send get device info command"""
@@ -353,6 +385,17 @@ class ThermocyclerDriverV2(ThermocyclerDriver):
         response = await self._connection.send_command(
             command=c, retries=DEFAULT_COMMAND_RETRIES
         )
+
+        reset_reason = CommandBuilder(terminator=TC_COMMAND_TERMINATOR).add_gcode(
+            gcode=GCODE.GET_RESET_REASON
+        )
+        try:
+            await self._connection.send_command(
+                command=reset_reason, retries=DEFAULT_COMMAND_RETRIES
+            )
+        except UnhandledGcode:
+            pass
+
         return utils.parse_hs_device_information(device_info_string=response)
 
     async def enter_programming_mode(self) -> None:

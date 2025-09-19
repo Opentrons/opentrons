@@ -1,11 +1,10 @@
-import { describe, it, expect } from 'vitest'
-
-import { makeEvent } from '../make-event'
+import { describe, expect, it } from 'vitest'
 
 import * as Alerts from '../../alerts'
+import { makeEvent } from '../make-event'
 
-import type { State } from '../../types'
 import type { AlertId } from '../../alerts/types'
+import type { State } from '../../types'
 
 const MOCK_STATE: State = { mockState: true } as any
 const MOCK_ALERT_ID: AlertId = 'fizzbuzz' as any

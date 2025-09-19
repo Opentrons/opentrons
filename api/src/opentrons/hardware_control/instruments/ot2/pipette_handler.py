@@ -13,7 +13,6 @@ from typing import (
     Sequence,
     Iterator,
     TypeVar,
-    overload,
 )
 import numpy
 
@@ -21,7 +20,7 @@ from opentrons_shared_data.errors.exceptions import (
     UnexpectedTipRemovalError,
     UnexpectedTipAttachError,
 )
-from opentrons_shared_data.pipette.dev_types import UlPerMmAction
+from opentrons_shared_data.pipette.types import UlPerMmAction
 from opentrons_shared_data.pipette.types import Quirks
 from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 
@@ -212,6 +211,7 @@ class PipetteHandlerProvider(Generic[MountType]):
                 "blow_out_flow_rate",
                 "working_volume",
                 "tip_overlap",
+                "versioned_tip_overlap",
                 "available_volume",
                 "return_tip_height",
                 "default_aspirate_flow_rates",
@@ -219,6 +219,7 @@ class PipetteHandlerProvider(Generic[MountType]):
                 "default_dispense_flow_rates",
                 "back_compat_names",
                 "supported_tips",
+                "lld_settings",
             ]
 
             instr_dict = instr.as_dict()
@@ -229,7 +230,7 @@ class PipetteHandlerProvider(Generic[MountType]):
             result["current_nozzle_map"] = instr.nozzle_manager.current_configuration
             result["min_volume"] = instr.liquid_class.min_volume
             result["max_volume"] = instr.liquid_class.max_volume
-            result["channels"] = instr.channels
+            result["channels"] = instr._max_channels.value
             result["has_tip"] = instr.has_tip
             result["tip_length"] = instr.current_tip_length
             result["aspirate_speed"] = self.plunger_speed(
@@ -258,6 +259,14 @@ class PipetteHandlerProvider(Generic[MountType]):
             result[
                 "pipette_bounding_box_offsets"
             ] = instr.config.pipette_bounding_box_offsets
+            result["lld_settings"] = instr.config.lld_settings
+            result["plunger_positions"] = {
+                "top": instr.plunger_positions.top,
+                "bottom": instr.plunger_positions.bottom,
+                "blow_out": instr.plunger_positions.blow_out,
+                "drop_tip": instr.plunger_positions.drop_tip,
+            }
+            result["shaft_ul_per_mm"] = instr.config.shaft_ul_per_mm
         return cast(PipetteDict, result)
 
     @property
@@ -412,7 +421,7 @@ class PipetteHandlerProvider(Generic[MountType]):
         if instr:
             instr.reset_nozzle_configuration()
 
-    async def add_tip(self, mount: MountType, tip_length: float) -> None:
+    def add_tip(self, mount: MountType, tip_length: float) -> None:
         instr = self._attached_instruments[mount]
         attached = self.attached_instruments
         instr_dict = attached[mount]
@@ -427,7 +436,15 @@ class PipetteHandlerProvider(Generic[MountType]):
                 f"attach tip called while tip already attached to {instr}"
             )
 
-    async def remove_tip(self, mount: MountType) -> None:
+    def cache_tip(self, mount: MountType, tip_length: float) -> None:
+        instrument = self.get_pipette(mount)
+        if instrument.has_tip:
+            # instrument.add_tip() would raise an AssertionError if we tried to overwrite an existing tip.
+            instrument.remove_tip()
+        instrument.add_tip(tip_length=tip_length)
+        instrument.set_current_volume(0)
+
+    def remove_tip(self, mount: MountType) -> None:
         instr = self._attached_instruments[mount]
         attached = self.attached_instruments
         instr_dict = attached[mount]
@@ -492,25 +509,12 @@ class PipetteHandlerProvider(Generic[MountType]):
         ul_per_s = mm_per_s * instr.ul_per_mm(instr.liquid_class.max_volume, action)
         return round(ul_per_s, 6)
 
-    @overload
     def plan_check_aspirate(
-        self, mount: top_types.Mount, volume: Optional[float], rate: float
-    ) -> Optional[LiquidActionSpec]:
-        ...
-
-    @overload
-    def plan_check_aspirate(
-        self, mount: OT3Mount, volume: Optional[float], rate: float
-    ) -> Optional[LiquidActionSpec]:
-        ...
-
-    # note on this type ignore: see motion_utilities
-    def plan_check_aspirate(  # type: ignore[no-untyped-def]
         self,
-        mount,
-        volume,
-        rate,
-    ):
+        mount: MountType,
+        volume: Optional[float],
+        rate: float,
+    ) -> Optional[LiquidActionSpec]:
         """Check preconditions for aspirate, parse args, and calculate positions.
 
         While the mechanics of issuing an aspirate move itself are left to child
@@ -569,28 +573,12 @@ class PipetteHandlerProvider(Generic[MountType]):
                 current=instrument.plunger_motor_current.run,
             )
 
-    @overload
     def plan_check_dispense(
         self,
-        mount: top_types.Mount,
+        mount: MountType,
         volume: Optional[float],
         rate: float,
         push_out: Optional[float],
-    ) -> Optional[LiquidActionSpec]:
-        ...
-
-    @overload
-    def plan_check_dispense(
-        self,
-        mount: OT3Mount,
-        volume: Optional[float],
-        rate: float,
-        push_out: Optional[float],
-    ) -> Optional[LiquidActionSpec]:
-        ...
-
-    def plan_check_dispense(  # type: ignore[no-untyped-def]
-        self, mount, volume, rate, push_out
     ) -> Optional[LiquidActionSpec]:
         """Check preconditions for dispense, parse args, and calculate positions.
 
@@ -684,15 +672,7 @@ class PipetteHandlerProvider(Generic[MountType]):
                 current=instrument.plunger_motor_current.run,
             )
 
-    @overload
-    def plan_check_blow_out(self, mount: top_types.Mount) -> LiquidActionSpec:
-        ...
-
-    @overload
-    def plan_check_blow_out(self, mount: OT3Mount) -> LiquidActionSpec:
-        ...
-
-    def plan_check_blow_out(self, mount):  # type: ignore[no-untyped-def]
+    def plan_check_blow_out(self, mount: MountType) -> LiquidActionSpec:
         """Check preconditions and calculate values for blowout."""
         instrument = self.get_pipette(mount)
         speed = self.plunger_speed(
@@ -740,39 +720,19 @@ class PipetteHandlerProvider(Generic[MountType]):
         else:
             return []
 
-    @overload
     def plan_check_pick_up_tip(
         self,
-        mount: top_types.Mount,
-        tip_length: float,
+        mount: MountType,
         presses: Optional[int],
         increment: Optional[float],
+        tip_length: float = 0,
     ) -> Tuple[PickUpTipSpec, Callable[[], None]]:
-        ...
-
-    @overload
-    def plan_check_pick_up_tip(
-        self,
-        mount: OT3Mount,
-        tip_length: float,
-        presses: Optional[int],
-        increment: Optional[float],
-    ) -> Tuple[PickUpTipSpec, Callable[[], None]]:
-        ...
-
-    def plan_check_pick_up_tip(  # type: ignore[no-untyped-def]
-        self,
-        mount,
-        tip_length,
-        presses,
-        increment,
-    ):
         # Prechecks: ready for pickup tip and press/increment are valid
         instrument = self.get_pipette(mount)
         if instrument.has_tip:
             raise UnexpectedTipAttachError("pick_up_tip", instrument.name, mount.name)
         self._ihp_log.debug(f"Picking up tip on {mount.name}")
-        tip_count = instrument.nozzle_manager.current_configuration.tip_count
+
         if presses is None or presses < 0:
             checked_presses = instrument.pick_up_configurations.press_fit.presses
         else:
@@ -783,11 +743,12 @@ class PipetteHandlerProvider(Generic[MountType]):
         else:
             check_incr = increment
 
-        pick_up_speed = instrument.pick_up_configurations.press_fit.speed_by_tip_count[
-            tip_count
-        ]
-        pick_up_distance = (
-            instrument.pick_up_configurations.press_fit.distance_by_tip_count[tip_count]
+        pick_up_speed = instrument.get_pick_up_speed_by_configuration(
+            instrument.pick_up_configurations.press_fit
+        )
+
+        pick_up_distance = instrument.get_pick_up_distance_by_configuration(
+            instrument.pick_up_configurations.press_fit
         )
 
         def build_presses() -> Iterator[Tuple[float, float]]:
@@ -817,9 +778,9 @@ class PipetteHandlerProvider(Generic[MountType]):
                             current={
                                 Axis.by_mount(
                                     mount
-                                ): instrument.pick_up_configurations.press_fit.current_by_tip_count[
-                                    tip_count
-                                ]
+                                ): instrument.get_pick_up_current_by_configuration(
+                                    instrument.pick_up_configurations.press_fit
+                                )
                             },
                             speed=pick_up_speed,
                             relative_down=top_types.Point(0, 0, press_dist),
@@ -846,9 +807,9 @@ class PipetteHandlerProvider(Generic[MountType]):
                             current={
                                 Axis.by_mount(
                                     mount
-                                ): instrument.pick_up_configurations.press_fit.current_by_tip_count[
-                                    instrument.nozzle_manager.current_configuration.tip_count
-                                ]
+                                ): instrument.get_pick_up_current_by_configuration(
+                                    instrument.pick_up_configurations.press_fit
+                                )
                             },
                             speed=pick_up_speed,
                             relative_down=top_types.Point(0, 0, press_dist),
@@ -913,23 +874,13 @@ class PipetteHandlerProvider(Generic[MountType]):
 
         return build
 
-    @overload
+    # todo(mm, 2024-10-17): The returned _remove_tips() callable is not used by anything
+    # anymore. Delete it.
     def plan_check_drop_tip(
-        self, mount: top_types.Mount, home_after: bool
-    ) -> Tuple[DropTipSpec, Callable[[], None]]:
-        ...
-
-    @overload
-    def plan_check_drop_tip(
-        self, mount: OT3Mount, home_after: bool
-    ) -> Tuple[DropTipSpec, Callable[[], None]]:
-        ...
-
-    def plan_check_drop_tip(  # type: ignore[no-untyped-def]
         self,
-        mount,
-        home_after,
-    ):
+        mount: MountType,
+        home_after: bool,
+    ) -> Tuple[DropTipSpec, Callable[[], None]]:
         instrument = self.get_pipette(mount)
 
         if not instrument.drop_configurations.plunger_eject:

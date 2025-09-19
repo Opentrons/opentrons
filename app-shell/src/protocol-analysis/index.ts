@@ -1,17 +1,17 @@
-import { createLogger } from '../log'
 import { getConfig, handleConfigChange } from '../config'
 import { updateConfigValue } from '../config/actions'
-import { getValidLabwareFilePaths } from '../labware'
-import {
-  showOpenDirectoryDialog,
-  openDirectoryInFileExplorer,
-} from '../dialogs'
 import {
   CHANGE_PYTHON_PATH_OVERRIDE,
   OPEN_PYTHON_DIRECTORY,
 } from '../constants'
-import { selectPythonPath, getPythonPath } from './getPythonPath'
+import {
+  openDirectoryInFileExplorer,
+  showOpenDirectoryDialog,
+} from '../dialogs'
+import { getValidLabwareFilePaths } from '../labware'
+import { createLogger } from '../log'
 import { executeAnalyzeCli } from './executeAnalyzeCli'
+import { getPythonPath, selectPythonPath } from './getPythonPath'
 import { writeFailedAnalysis } from './writeFailedAnalysis'
 
 import type { BrowserWindow } from 'electron'
@@ -30,7 +30,7 @@ export function registerProtocolAnalysis(
   selectPythonPath(pathToPythonOverride)
 
   handleConfigChange(CONFIG_PYTHON_PATH_TO_PYTHON_OVERRIDE, newValue => {
-    selectPythonPath(newValue)
+    selectPythonPath(newValue as string | null)
   })
 
   return function handleIncomingAction(action: Action): void {

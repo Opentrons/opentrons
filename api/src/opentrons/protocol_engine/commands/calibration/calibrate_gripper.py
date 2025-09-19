@@ -1,10 +1,11 @@
 """Models and implementation for the calibrateGripper command."""
 
 from enum import Enum
-from typing import Optional, Type
+from typing import Optional, Type, Any
 from typing_extensions import Literal
 
 from pydantic import BaseModel, Field
+from pydantic.json_schema import SkipJsonSchema
 
 from opentrons.types import Point
 from opentrons.hardware_control import HardwareControlAPI
@@ -13,16 +14,17 @@ from opentrons.hardware_control.types import OT3Mount, GripperProbe as HWAPIGrip
 from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
 )
-from opentrons.protocol_engine.commands.command import (
-    AbstractCommandImpl,
-    BaseCommand,
-    BaseCommandCreate,
-)
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ...errors.error_occurrence import ErrorOccurrence
 from opentrons.protocol_engine.types import Vec3f
 from opentrons.protocol_engine.resources import ensure_ot3_hardware
 
 
 CalibrateGripperCommandType = Literal["calibration/calibrateGripper"]
+
+
+def _remove_default(s: dict[str, Any]) -> None:
+    s.pop("default", None)
 
 
 class CalibrateGripperParamsJaw(Enum):  # noqa: D101
@@ -42,7 +44,7 @@ class CalibrateGripperParams(BaseModel):
         ),
     )
 
-    otherJawOffset: Optional[Vec3f] = Field(
+    otherJawOffset: Vec3f | SkipJsonSchema[None] = Field(
         None,
         description=(
             "If an offset for the other probe is already found, then specifying it here"
@@ -51,6 +53,7 @@ class CalibrateGripperParams(BaseModel):
             " If this param is not specified then the command will only find and return"
             " the offset for the specified probe."
         ),
+        json_schema_extra=_remove_default,
     )
 
 
@@ -65,16 +68,17 @@ class CalibrateGripperResult(BaseModel):
         ),
     )
 
-    savedCalibration: Optional[GripperCalibrationOffset] = Field(
+    savedCalibration: GripperCalibrationOffset | SkipJsonSchema[None] = Field(
         None,
         description=(
             "Gripper calibration result data, when `otherJawOffset` is provided."
         ),
+        json_schema_extra=_remove_default,
     )
 
 
 class CalibrateGripperImplementation(
-    AbstractCommandImpl[CalibrateGripperParams, CalibrateGripperResult]
+    AbstractCommandImpl[CalibrateGripperParams, SuccessData[CalibrateGripperResult]]
 ):
     """The implementation of a `calibrateGripper` command."""
 
@@ -86,7 +90,9 @@ class CalibrateGripperImplementation(
     ) -> None:
         self._hardware_api = hardware_api
 
-    async def execute(self, params: CalibrateGripperParams) -> CalibrateGripperResult:
+    async def execute(
+        self, params: CalibrateGripperParams
+    ) -> SuccessData[CalibrateGripperResult]:
         """Execute a `calibrateGripper` command.
 
         1. Move from the current location to the calibration area on the deck.
@@ -118,11 +124,13 @@ class CalibrateGripperImplementation(
             )
             calibration_data = result
 
-        return CalibrateGripperResult.construct(
-            jawOffset=Vec3f.construct(
-                x=probe_offset.x, y=probe_offset.y, z=probe_offset.z
+        return SuccessData(
+            public=CalibrateGripperResult.model_construct(
+                jawOffset=Vec3f.model_construct(
+                    x=probe_offset.x, y=probe_offset.y, z=probe_offset.z
+                ),
+                savedCalibration=calibration_data,
             ),
-            savedCalibration=calibration_data,
         )
 
     @staticmethod
@@ -135,12 +143,14 @@ class CalibrateGripperImplementation(
             return HWAPIGripperProbe.REAR
 
 
-class CalibrateGripper(BaseCommand[CalibrateGripperParams, CalibrateGripperResult]):
+class CalibrateGripper(
+    BaseCommand[CalibrateGripperParams, CalibrateGripperResult, ErrorOccurrence]
+):
     """A `calibrateGripper` command."""
 
     commandType: CalibrateGripperCommandType = "calibration/calibrateGripper"
     params: CalibrateGripperParams
-    result: Optional[CalibrateGripperResult]
+    result: Optional[CalibrateGripperResult] = None
 
     _ImplementationCls: Type[
         CalibrateGripperImplementation

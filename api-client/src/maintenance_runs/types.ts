@@ -5,10 +5,11 @@ import type {
   LoadedPipette,
 } from '@opentrons/shared-data'
 import type {
-  RunCommandSummary,
   LabwareOffsetCreateData,
-  RunStatus,
+  LegacyLabwareOffsetCreateData,
   RunAction,
+  RunCommandSummary,
+  RunStatus,
 } from '../runs'
 
 export interface MaintenanceRunData {
@@ -42,7 +43,7 @@ export interface MaintenanceRunError {
 }
 
 export interface CreateMaintenanceRunData {
-  labwareOffsets?: LabwareOffsetCreateData[]
+  labwareOffsets?: LegacyLabwareOffsetCreateData[] | LabwareOffsetCreateData[]
 }
 
 export interface LabwareDefinitionSummary {

@@ -1,6 +1,5 @@
-import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   LEFT,
@@ -8,24 +7,27 @@ import {
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
-import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
-import { FLOWS } from '../constants'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
+import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
+
 import { CheckPipetteButton } from '../CheckPipetteButton'
+import { FLOWS } from '../constants'
 import { MountPipette } from '../MountPipette'
+
+import type { ComponentProps } from 'react'
 
 vi.mock('../CheckPipetteButton')
 
-const render = (props: React.ComponentProps<typeof MountPipette>) => {
+const render = (props: ComponentProps<typeof MountPipette>) => {
   return renderWithProviders(<MountPipette {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
 describe('MountPipette', () => {
-  let props: React.ComponentProps<typeof MountPipette>
+  let props: ComponentProps<typeof MountPipette>
   beforeEach(() => {
     props = {
       selectedPipette: SINGLE_MOUNT_PIPETTES,

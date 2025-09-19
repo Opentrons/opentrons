@@ -1,9 +1,9 @@
 import type {
   Link,
-  Submenu,
   ProtocolLinks,
-  SupportLinks,
   SalesLinks,
+  Submenu,
+  SupportLinks,
 } from './types'
 
 export const aboutLinkProps: Submenu = {
@@ -150,7 +150,7 @@ export const protocolLinkProps: ProtocolLinks = {
   },
   library: {
     name: 'Protocol Library',
-    url: 'https://protocols.opentrons.com',
+    url: 'https://library.opentrons.com',
     description: 'Explore our open source database of protocols',
     gtm: { action: 'click', category: 'l-header', label: 'protocol-library' },
   },

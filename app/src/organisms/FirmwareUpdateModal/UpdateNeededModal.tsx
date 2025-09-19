@@ -1,23 +1,31 @@
-import * as React from 'react'
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { useTranslation, Trans } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import capitalize from 'lodash/capitalize'
-import { COLORS, DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
+
+import {
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  LegacyStyledText,
+  SPACING,
+} from '@opentrons/components'
 import {
   useInstrumentsQuery,
   useSubsystemUpdateQuery,
   useUpdateSubsystemMutation,
 } from '@opentrons/react-api-client'
 import { LEFT, RIGHT } from '@opentrons/shared-data'
-import { getTopPortalEl } from '../../App/portal'
-import { SmallButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
-import { Modal } from '../../molecules/Modal'
+
+import { getTopPortalEl } from '/app/App/portal'
+import { SmallButton } from '/app/atoms/buttons'
+import { OddModal } from '/app/molecules/OddModal'
+
 import { UpdateInProgressModal } from './UpdateInProgressModal'
 import { UpdateResultsModal } from './UpdateResultsModal'
-import type { Subsystem } from '@opentrons/api-client'
 
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { Subsystem } from '@opentrons/api-client'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface UpdateNeededModalProps {
   onClose: () => void
@@ -29,9 +37,9 @@ interface UpdateNeededModalProps {
 export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
   const { onClose, shouldExit, subsystem, setInitiatedSubsystemUpdate } = props
   const { t } = useTranslation('firmware_update')
-  const [updateId, setUpdateId] = React.useState<string | null>(null)
+  const [updateId, setUpdateId] = useState<string | null>(null)
   // when we move to the next subsystem to update, set updateId back to null
-  React.useEffect(() => {
+  useEffect(() => {
     setUpdateId(null)
   }, [subsystem])
 
@@ -53,7 +61,7 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
   const status = updateData?.data.updateStatus
   const ongoingUpdateId = updateData?.data.id
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (status === 'done') {
       setInitiatedSubsystemUpdate(null)
     }
@@ -65,16 +73,16 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
   if (subsystem === 'pipette_left') mount = LEFT
   else if (subsystem === 'pipette_right') mount = RIGHT
 
-  const updateNeededHeader: ModalHeaderBaseProps = {
+  const updateNeededHeader: OddModalHeaderBaseProps = {
     title: t('update_needed'),
     iconName: 'ot-alert',
     iconColor: COLORS.yellow50,
   }
 
   let modalContent = (
-    <Modal header={updateNeededHeader}>
+    <OddModal header={updateNeededHeader}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-        <StyledText as="p" marginBottom={SPACING.spacing60}>
+        <LegacyStyledText as="p" marginBottom={SPACING.spacing60}>
           <Trans
             t={t}
             i18nKey="firmware_out_of_date"
@@ -86,7 +94,7 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
               bold: <strong />,
             }}
           />
-        </StyledText>
+        </LegacyStyledText>
         <SmallButton
           onClick={() => {
             setInitiatedSubsystemUpdate(subsystem)
@@ -96,7 +104,7 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
           width="100%"
         />
       </Flex>
-    </Modal>
+    </OddModal>
   )
   if (
     (status === 'updating' || status === 'queued') &&
@@ -109,7 +117,9 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
         instrument={instrument}
         isSuccess={updateError === undefined}
         onClose={() => {
-          refetchInstruments().catch(error => console.error(error))
+          refetchInstruments().catch(error => {
+            console.error(error)
+          })
           onClose()
         }}
         shouldExit={shouldExit}

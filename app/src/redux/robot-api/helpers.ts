@@ -1,4 +1,4 @@
-import * as Types from './types'
+import type * as Types from './types'
 
 // TODO(mc, 2020-06-17): this is unit tested by component tests
 // write some direct tests and maybe fold into getRequestState selector

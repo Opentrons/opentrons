@@ -2,7 +2,6 @@
 
 export * from './useConditionalConfirm'
 export * from './useDrag'
-export * from './useIdle'
 export * from './useInterval'
 export * from './useLongPress'
 export * from './useMountEffect'
@@ -12,3 +11,4 @@ export * from './useSelectDeckLocation'
 export * from './useSwipe'
 export * from './useTimeout'
 export * from './useToggle'
+export * from './useMenuHandleClickOutside'

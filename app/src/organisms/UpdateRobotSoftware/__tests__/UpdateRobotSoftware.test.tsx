@@ -1,26 +1,27 @@
-import * as React from 'react'
 import { screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
-import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import * as RobotUpdate from '../../../redux/robot-update'
-import * as UpdateRobotSoftware from '../'
+import '@testing-library/jest-dom/vitest'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import {
   CompleteUpdateSoftware,
   UpdateSoftware,
-} from '../../../organisms/UpdateRobotSoftware'
+} from '/app/organisms/UpdateRobotSoftware'
+import * as RobotUpdate from '/app/redux/robot-update'
 
-import type { State } from '../../../redux/types'
+import * as UpdateRobotSoftware from '../'
 
-vi.mock('../../../redux/discovery')
-vi.mock('../../../redux/robot-update')
-vi.mock('../../../organisms/UpdateRobotSoftware/CheckUpdates')
-vi.mock('../../../organisms/UpdateRobotSoftware/CompleteUpdateSoftware')
-vi.mock('../../../organisms/UpdateRobotSoftware/ErrorUpdateSoftware')
-vi.mock('../../../organisms/UpdateRobotSoftware/NoUpdateFound')
-vi.mock('../../../organisms/UpdateRobotSoftware/UpdateSoftware')
+import type { State } from '/app/redux/types'
+
+vi.mock('/app/redux/discovery')
+vi.mock('/app/redux/robot-update')
+vi.mock('/app/organisms/UpdateRobotSoftware/CheckUpdates')
+vi.mock('/app/organisms/UpdateRobotSoftware/CompleteUpdateSoftware')
+vi.mock('/app/organisms/UpdateRobotSoftware/ErrorUpdateSoftware')
+vi.mock('/app/organisms/UpdateRobotSoftware/NoUpdateFound')
+vi.mock('/app/organisms/UpdateRobotSoftware/UpdateSoftware')
 
 const getRobotUpdateSession = RobotUpdate.getRobotUpdateSession
 
@@ -113,7 +114,7 @@ describe('UpdateRobotSoftware', () => {
     render()
     expect(mockBeforeCommitting).toBeCalled()
     expect(UpdateSoftware).toBeCalledWith(
-      { updateType: 'installing', processProgress: 0 },
+      { updateType: 'installing' },
       expect.anything()
     )
     screen.getByText('mock UpdateSoftware')

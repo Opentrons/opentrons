@@ -2,21 +2,19 @@ import { ofType } from 'redux-observable'
 import { of } from 'rxjs'
 import { map, switchMap } from 'rxjs/operators'
 
-import { GET, POST, fetchRobotApi } from '../../robot-api'
-import { withRobotHost } from '../../robot-api/operators'
 import { getAttachedPipettes } from '../../pipettes'
-
+import { fetchRobotApi, GET, POST } from '../../robot-api'
+import { withRobotHost } from '../../robot-api/operators'
 import * as Actions from '../actions'
 import * as Constants from '../constants'
 
 import type { Observable } from 'rxjs'
-import type { State, Action, Epic } from '../../types'
 import type {
   RobotApiRequestOptions,
   RobotApiResponse,
   RobotHost,
 } from '../../robot-api/types'
-
+import type { Action, Epic, State } from '../../types'
 import type { MoveAction, PositionsResponse } from '../types'
 
 const mapActionToRequest = (
@@ -38,7 +36,7 @@ const mapActionToRequest = (
           mount,
           target: Constants.PIPETTE,
           point: apiPosition.point,
-          model: attachedPipettes[mount]?.model || null,
+          model: attachedPipettes[mount]?.model ?? null,
         }
 
   return { method: POST, path: Constants.MOVE_PATH, body }
@@ -53,7 +51,7 @@ const mapResponseToAction = (
 
   return response.ok
     ? Actions.moveSuccess(host.name, meta)
-    : Actions.moveFailure(host.name, body, meta)
+    : Actions.moveFailure(host.name, body as { message: string }, meta)
 }
 
 const fetchPositionsRequest = { method: GET, path: Constants.POSITIONS_PATH }
@@ -82,7 +80,11 @@ export const moveEpic: Epic = (action$, state$) => {
             return positionsResponse.ok
               ? fetchRobotApi(
                   host,
-                  mapActionToRequest(action, state, positionsResponse.body)
+                  mapActionToRequest(
+                    action,
+                    state,
+                    positionsResponse.body as PositionsResponse
+                  )
                 )
               : of(positionsResponse)
           }),

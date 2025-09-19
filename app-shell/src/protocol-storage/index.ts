@@ -1,8 +1,14 @@
-import fse from 'fs-extra'
 import path from 'path'
 import { shell } from 'electron'
-import first from 'lodash/first'
+import fse from 'fs-extra'
 
+import {
+  analyzeProtocol,
+  analyzeProtocolFailure,
+  analyzeProtocolSuccess,
+  updateProtocolList,
+  updateProtocolListFailure,
+} from '../config/actions'
 import {
   ADD_PROTOCOL,
   ANALYZE_PROTOCOL,
@@ -15,18 +21,11 @@ import {
   UI_INITIALIZED,
   VIEW_PROTOCOL_SOURCE_FOLDER,
 } from '../constants'
-import {
-  analyzeProtocol,
-  analyzeProtocolFailure,
-  analyzeProtocolSuccess,
-  updateProtocolList,
-  updateProtocolListFailure,
-} from '../config/actions'
-import * as FileSystem from './file-system'
 import { createFailedAnalysis } from '../protocol-analysis/writeFailedAnalysis'
+import * as FileSystem from './file-system'
 
-import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { ProtocolListActionSource as ListSource } from '@opentrons/app/src/redux/protocol-storage/types'
+import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { Action, Dispatch } from '../types'
 
 const ensureDir: (dir: string) => Promise<void> = fse.ensureDir
@@ -46,18 +45,6 @@ export const getParsedAnalysisFromPath = (
         : 'protocol analysis file cannot be parsed'
     return createFailedAnalysis(errorMessage)
   }
-}
-
-export const getProtocolSrcFilePaths = (
-  protocolKey: string
-): Promise<string[]> => {
-  const protocolDir = `${FileSystem.PROTOCOLS_DIRECTORY_PATH}/${protocolKey}`
-  return ensureDir(protocolDir)
-    .then(() => FileSystem.parseProtocolDirs([protocolDir]))
-    .then(storedProtocols => {
-      const storedProtocol = first(storedProtocols)
-      return storedProtocol?.srcFilePaths ?? []
-    })
 }
 
 // Revert a v7.0.0 pre-parity stop-gap solution.

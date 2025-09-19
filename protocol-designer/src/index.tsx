@@ -1,13 +1,16 @@
-import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { Provider } from 'react-redux'
 import { I18nextProvider } from 'react-i18next'
+import { Provider } from 'react-redux'
 
-import { configureStore } from './configureStore'
-import { App } from './components/App'
-import { initialize } from './initialize'
 import { initializeMixpanel } from './analytics/mixpanel'
-import { i18n } from './localization'
+import { App } from './App'
+import { i18n } from './assets/localization'
+import { GlobalStyle } from './components/atoms'
+import { configureStore } from './configureStore'
+import { initialize } from './initialize'
+import { initializeSentry } from './resources/sentry'
+
+import '@opentrons/components/styles/global'
 
 // initialize Redux
 const store = configureStore()
@@ -16,17 +19,26 @@ initialize(store)
 // initialize analytics
 initializeMixpanel(store.getState())
 
+// initialize Sentry
+initializeSentry(store.getState())
+
 const container = document.getElementById('root')
 if (container == null) throw new Error('Failed to find the root element')
 const root = ReactDOM.createRoot(container)
 
-const render = (Component: any): void => {
-  root.render(
-    <Provider store={store}>
+const RootComponent = (): JSX.Element => {
+  return (
+    <>
+      <GlobalStyle />
       <I18nextProvider i18n={i18n}>
-        <Component />
+        <App />
       </I18nextProvider>
-    </Provider>
+    </>
   )
 }
-render(App)
+
+root.render(
+  <Provider store={store}>
+    <RootComponent />
+  </Provider>
+)

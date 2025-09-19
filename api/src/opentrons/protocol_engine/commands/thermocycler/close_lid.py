@@ -5,11 +5,13 @@ from typing_extensions import Literal, Type
 
 from pydantic import BaseModel, Field
 
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ...errors.error_occurrence import ErrorOccurrence
+from ...state import update_types
 from opentrons.protocol_engine.types import MotorAxis
 
 if TYPE_CHECKING:
-    from opentrons.protocol_engine.state import StateView
+    from opentrons.protocol_engine.state.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
 
 
@@ -26,7 +28,7 @@ class CloseLidResult(BaseModel):
     """Result data from closing a Thermocycler's lid."""
 
 
-class CloseLidImpl(AbstractCommandImpl[CloseLidParams, CloseLidResult]):
+class CloseLidImpl(AbstractCommandImpl[CloseLidParams, SuccessData[CloseLidResult]]):
     """Execution implementation of a Thermocycler's close lid command."""
 
     def __init__(
@@ -40,8 +42,10 @@ class CloseLidImpl(AbstractCommandImpl[CloseLidParams, CloseLidResult]):
         self._equipment = equipment
         self._movement = movement
 
-    async def execute(self, params: CloseLidParams) -> CloseLidResult:
+    async def execute(self, params: CloseLidParams) -> SuccessData[CloseLidResult]:
         """Close a Thermocycler's lid."""
+        state_update = update_types.StateUpdate()
+
         thermocycler_state = self._state_view.modules.get_thermocycler_module_substate(
             params.moduleId
         )
@@ -56,19 +60,20 @@ class CloseLidImpl(AbstractCommandImpl[CloseLidParams, CloseLidResult]):
             MotorAxis.Y,
         ] + self._state_view.motion.get_robot_mount_axes()
         await self._movement.home(axes=axes_to_home)
+        state_update.clear_all_pipette_locations()
 
         if thermocycler_hardware is not None:
             await thermocycler_hardware.close()
 
-        return CloseLidResult()
+        return SuccessData(public=CloseLidResult(), state_update=state_update)
 
 
-class CloseLid(BaseCommand[CloseLidParams, CloseLidResult]):
+class CloseLid(BaseCommand[CloseLidParams, CloseLidResult, ErrorOccurrence]):
     """A command to close a Thermocycler's lid."""
 
     commandType: CloseLidCommandType = "thermocycler/closeLid"
     params: CloseLidParams
-    result: Optional[CloseLidResult]
+    result: Optional[CloseLidResult] = None
 
     _ImplementationCls: Type[CloseLidImpl] = CloseLidImpl
 

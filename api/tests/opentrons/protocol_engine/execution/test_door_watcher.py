@@ -16,7 +16,7 @@ from opentrons.hardware_control.types import (
 )
 
 from opentrons.protocol_engine.actions import ActionDispatcher, DoorChangeAction
-from opentrons.protocol_engine.state import StateStore
+from opentrons.protocol_engine.state.state import StateStore
 from opentrons.protocol_engine.execution.door_watcher import (
     DoorWatcher,
 )
@@ -92,6 +92,35 @@ async def test_event_forwarding(
     decoy.reset()
     input_event = DoorStateNotification(new_state=DoorState.CLOSED)
     await to_thread.run_sync(captured_handler, input_event)
+    decoy.verify(
+        hardware_control_api.pause(PauseType.PAUSE),
+        times=0,
+    )
+
+    decoy.reset()
+
+    decoy.when(state_store.commands.get_is_running()).then_return(True)
+
+    input_event_module = DoorStateNotification(
+        new_state=DoorState.OPEN, module_serial="magical_module"
+    )
+    expected_action_to_forward_module = DoorChangeAction(
+        DoorState.OPEN, module_serial="magical_module"
+    )
+
+    await to_thread.run_sync(captured_handler, input_event_module)
+
+    decoy.verify(
+        hardware_control_api.pause(PauseType.PAUSE),
+        action_dispatcher.dispatch(expected_action_to_forward_module),
+        times=1,
+    )
+
+    decoy.reset()
+    input_event_module = DoorStateNotification(
+        new_state=DoorState.CLOSED, module_serial="magical_module"
+    )
+    await to_thread.run_sync(captured_handler, input_event_module)
     decoy.verify(
         hardware_control_api.pause(PauseType.PAUSE),
         times=0,

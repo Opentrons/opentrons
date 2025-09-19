@@ -1,6 +1,8 @@
 // mock electron-updater
 'use strict'
+
 import { vi } from 'vitest'
+
 const EventEmitter = require('events')
 const autoUpdater = new EventEmitter()
 

@@ -1,8 +1,11 @@
 import { useQuery } from 'react-query'
-import { WifiListResponse, getWifiList } from '@opentrons/api-client'
+
+import { getWifiList } from '@opentrons/api-client'
+
 import { useHost } from '../api'
-import type { UseQueryResult, UseQueryOptions } from 'react-query'
-import type { HostConfig } from '@opentrons/api-client'
+
+import type { UseQueryOptions, UseQueryResult } from 'react-query'
+import type { HostConfig, WifiListResponse } from '@opentrons/api-client'
 
 export function useWifiQuery(
   options: UseQueryOptions<

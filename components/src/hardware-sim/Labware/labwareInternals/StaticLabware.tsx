@@ -1,30 +1,39 @@
 // Render labware definition to SVG. XY is in robot coordinates.
-import * as React from 'react'
-import styled from 'styled-components'
+import { Fragment, memo } from 'react'
 import flatMap from 'lodash/flatMap'
+import styled from 'styled-components'
 
+import { COLORS } from '../../../helix-design-system'
 import { LabwareOutline } from './LabwareOutline'
+import { STYLE_BY_WELL_CONTENTS } from './StyledWells'
 import { Well } from './Well'
 
-import type { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
-import type { WellMouseEvent } from './types'
-import { STYLE_BY_WELL_CONTENTS } from './StyledWells'
-import { COLORS } from '../../../helix-design-system'
+import type { CSSProperties } from 'styled-components'
+import type { MemoExoticComponent } from 'react'
+import type { LabwareDefinition, LabwareWell } from '@opentrons/shared-data'
+import type { WellMouseEvent, WellStroke } from './types'
 
 export interface StaticLabwareProps {
   /** Labware definition to render */
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
   /** Add thicker blurred blue border to labware, defaults to false */
   highlight?: boolean
+  /** adds a drop shadow to the highlight border */
+  highlightShadow?: boolean
   /** Optional callback to be executed when entire labware element is clicked */
   onLabwareClick?: () => void
   /** Optional callback to be executed when mouse enters a well element */
   onMouseEnterWell?: (e: WellMouseEvent) => unknown
   /** Optional callback to be executed when mouse leaves a well element */
   onMouseLeaveWell?: (e: WellMouseEvent) => unknown
+  fill?: CSSProperties['fill']
+  showRadius?: boolean
+  wellStroke?: WellStroke
+  /** optional show of labware border, defaulted to true */
+  showBorder?: boolean
 }
 
-const TipDecoration = React.memo(function TipDecoration(props: {
+const TipDecoration = memo(function TipDecoration(props: {
   well: LabwareWell
 }) {
   const { well } = props
@@ -49,36 +58,56 @@ const LabwareDetailGroup = styled.g`
 `
 
 export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
-  const { isTiprack } = props.definition.parameters
+  const {
+    definition,
+    highlight,
+    highlightShadow,
+    onLabwareClick,
+    onMouseEnterWell,
+    onMouseLeaveWell,
+    fill,
+    showRadius = true,
+    wellStroke = {},
+    showBorder = true,
+  } = props
+
+  const { isTiprack } = definition.parameters
   return (
-    <g onClick={props.onLabwareClick}>
-      <LabwareDetailGroup>
-        <LabwareOutline
-          definition={props.definition}
-          highlight={props.highlight}
-        />
-      </LabwareDetailGroup>
+    <g onClick={onLabwareClick}>
+      {!showBorder ? null : (
+        <LabwareDetailGroup>
+          <LabwareOutline
+            definition={definition}
+            highlight={highlight}
+            highlightShadow={highlightShadow}
+            fill={fill}
+            showRadius={showRadius}
+          />
+        </LabwareDetailGroup>
+      )}
       <g>
         {flatMap(
-          props.definition.ordering,
+          definition.ordering,
           (row: string[], i: number, c: string[][]) => {
             return row.map(wellName => {
               return (
-                <React.Fragment key={wellName}>
+                <Fragment key={wellName}>
                   <Well
                     wellName={wellName}
-                    well={props.definition.wells[wellName]}
-                    onMouseEnterWell={props.onMouseEnterWell}
-                    onMouseLeaveWell={props.onMouseLeaveWell}
+                    well={definition.wells[wellName]}
+                    onMouseEnterWell={onMouseEnterWell}
+                    onMouseLeaveWell={onMouseLeaveWell}
                     {...(isTiprack
                       ? STYLE_BY_WELL_CONTENTS.tipPresent
                       : STYLE_BY_WELL_CONTENTS.defaultWell)}
+                    fill={fill}
+                    stroke={wellStroke[wellName] ?? undefined}
                   />
 
                   {isTiprack ? (
-                    <TipDecoration well={props.definition.wells[wellName]} />
+                    <TipDecoration well={definition.wells[wellName]} />
                   ) : null}
-                </React.Fragment>
+                </Fragment>
               )
             })
           }
@@ -88,6 +117,6 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
   )
 }
 
-export const StaticLabware: React.MemoExoticComponent<
+export const StaticLabware: MemoExoticComponent<
   typeof StaticLabwareComponent
-> = React.memo(StaticLabwareComponent)
+> = memo(StaticLabwareComponent)

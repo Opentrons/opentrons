@@ -1,33 +1,31 @@
-import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-
-import { useTrackEvent, ANALYTICS_ODD_APP_ERROR } from '../redux/analytics'
-import { getLocalRobot, getRobotSerialNumber } from '../redux/discovery'
-
-import type { FallbackProps } from 'react-error-boundary'
+import { useDispatch, useSelector } from 'react-redux'
 
 import {
   ALIGN_CENTER,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
+  LegacyStyledText,
   SPACING,
-  COLORS,
 } from '@opentrons/components'
 
-import { StyledText } from '../atoms/text'
-import { MediumButton } from '../atoms/buttons'
-import { Modal } from '../molecules/Modal'
-import { appRestart, sendLog } from '../redux/shell'
+import { MediumButton } from '/app/atoms/buttons'
+import { OddModal } from '/app/molecules/OddModal'
+import { ANALYTICS_ODD_APP_ERROR, useTrackEvent } from '/app/redux/analytics'
+import { getLocalRobot, getRobotSerialNumber } from '/app/redux/discovery'
+import { appRestart, sendLog } from '/app/redux/shell'
 
-import type { Dispatch } from '../redux/types'
-import type { ModalHeaderBaseProps } from '../molecules/Modal/types'
+import type { FallbackProps } from 'react-error-boundary'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { Dispatch } from '/app/redux/types'
 
 export function OnDeviceDisplayAppFallback({
   error,
 }: FallbackProps): JSX.Element {
-  const { t } = useTranslation('app_settings')
+  const { t } = useTranslation(['app_settings', 'branded'])
   const trackEvent = useTrackEvent()
   const dispatch = useDispatch<Dispatch>()
   const localRobot = useSelector(getLocalRobot)
@@ -38,28 +36,30 @@ export function OnDeviceDisplayAppFallback({
       name: ANALYTICS_ODD_APP_ERROR,
       properties: { errorMessage: error.message, robotSerialNumber },
     })
-    dispatch(appRestart(error.message))
+    dispatch(appRestart(error.message as string))
   }
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('error_boundary_title'),
     iconName: 'ot-alert',
     iconColor: COLORS.red50,
   }
 
   // immediately report to robot logs that something fatal happened
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(sendLog(`ODD app encountered a fatal error: ${error.message}`))
   }, [])
 
   return (
-    <Modal header={modalHeader}>
+    <OddModal header={modalHeader}>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing32}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
       >
-        <StyledText as="p">{t('error_boundary_description')}</StyledText>
+        <LegacyStyledText as="p">
+          {t('branded:error_boundary_description')}
+        </LegacyStyledText>
         <MediumButton
           width="100%"
           buttonType="alert"
@@ -67,6 +67,6 @@ export function OnDeviceDisplayAppFallback({
           onClick={handleRestartClick}
         />
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

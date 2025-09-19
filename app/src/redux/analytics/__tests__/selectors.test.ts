@@ -1,10 +1,10 @@
-import { vi, describe, it, expect } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
-import * as Selectors from '../selectors'
 import * as SessionsSelectors from '../../sessions/selectors'
+import * as Selectors from '../selectors'
 
-import type { State } from '../../types'
 import type { DeckCalibrationSessionDetails } from '../../sessions/deck-calibration/types'
+import type { State } from '../../types'
 
 vi.mock('../../sessions/selectors')
 
@@ -40,20 +40,6 @@ describe('analytics selectors', () => {
         },
       } as any
       expect(Selectors.getAnalyticsOptedIn(mockState)).toBe(true)
-    })
-
-    it('should return true for getAnalyticsOptInSeen if no config', () => {
-      const mockState = { config: null } as any
-      expect(Selectors.getAnalyticsOptInSeen(mockState)).toBe(true)
-    })
-
-    it('should return config.analytics.seenOptIn with getAnalyticsOptInSeen', () => {
-      const mockState = {
-        config: {
-          analytics: { appId: 'foobar', optedIn: false, seenOptIn: false },
-        },
-      } as any
-      expect(Selectors.getAnalyticsOptInSeen(mockState)).toBe(false)
     })
   })
 

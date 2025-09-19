@@ -1,15 +1,14 @@
 import { useMutation, useQueryClient } from 'react-query'
+
 import { createCommand } from '@opentrons/api-client'
+
 import { useHost } from '../api'
-import type {
-  UseMutationResult,
-  UseMutationOptions,
-  UseMutateAsyncFunction,
-} from 'react-query'
+
+import type { UseMutateAsyncFunction, UseMutationResult } from 'react-query'
 import type {
   CommandData,
-  HostConfig,
   CreateCommandParams,
+  HostConfig,
 } from '@opentrons/api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
 
@@ -32,29 +31,23 @@ export type UseCreateCommandMutationResult = UseMutationResult<
   >
 }
 
-export type UseCreateCommandMutationOptions = UseMutationOptions<
-  CommandData,
-  unknown,
-  CreateCommandMutateParams
->
-
 export function useCreateCommandMutation(): UseCreateCommandMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
 
   const mutation = useMutation<CommandData, unknown, CreateCommandMutateParams>(
-    ({ runId, command, waitUntilComplete, timeout }) =>
-      createCommand(host as HostConfig, runId, command, {
-        waitUntilComplete,
-        timeout,
+    params => {
+      const { runId, command, ...rest } = params
+
+      return createCommand(host as HostConfig, runId, command, {
+        ...rest,
       }).then(response => {
-        queryClient
-          .invalidateQueries([host, 'runs'])
-          .catch((e: Error) =>
-            console.error(`error invalidating runs query: ${e.message}`)
-          )
+        queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
+          console.error(`error invalidating runs query: ${e.message}`)
+        })
         return response.data
       })
+    }
   )
 
   return {

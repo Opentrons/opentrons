@@ -1,47 +1,39 @@
-import * as React from 'react'
-
 import { useAllRunsQuery } from '@opentrons/react-api-client'
 
-import { useNotifyService } from '../useNotifyService'
+import { useNotifyDataReady } from '../useNotifyDataReady'
 
-import type { UseQueryResult } from 'react-query'
 import type { AxiosError } from 'axios'
-import type { HostConfig, GetRunsParams, Runs } from '@opentrons/api-client'
+import type { UseQueryResult } from 'react-query'
+import type { GetRunsParams, HostConfig, Runs } from '@opentrons/api-client'
 import type { UseAllRunsQueryOptions } from '@opentrons/react-api-client/src/runs/useAllRunsQuery'
-import type {
-  QueryOptionsWithPolling,
-  HTTPRefetchFrequency,
-} from '../useNotifyService'
+import type { QueryOptionsWithPolling } from '../useNotifyDataReady'
 
+export type UseNotifyAllRunsQueryOptions = QueryOptionsWithPolling<
+  UseAllRunsQueryOptions,
+  AxiosError
+>
+
+// TODO(jh, 08-21-24): Abstract harder.
 export function useNotifyAllRunsQuery(
   params: GetRunsParams = {},
-  options: QueryOptionsWithPolling<UseAllRunsQueryOptions, AxiosError> = {},
+  options: UseNotifyAllRunsQueryOptions = {},
   hostOverride?: HostConfig | null
 ): UseQueryResult<Runs, AxiosError> {
-  const [
-    refetchUsingHTTP,
-    setRefetchUsingHTTP,
-  ] = React.useState<HTTPRefetchFrequency>(null)
-
-  useNotifyService<UseAllRunsQueryOptions, AxiosError>({
+  const { shouldRefetch, queryOptionsNotify } = useNotifyDataReady({
     topic: 'robot-server/runs',
-    setRefetchUsingHTTP,
     options,
     hostOverride,
   })
 
-  const httpResponse = useAllRunsQuery(
+  const httpQueryResult = useAllRunsQuery(
     params,
-    {
-      ...(options as UseAllRunsQueryOptions),
-      enabled: options?.enabled !== false && refetchUsingHTTP != null,
-      onSettled:
-        refetchUsingHTTP === 'once'
-          ? () => setRefetchUsingHTTP(null)
-          : () => null,
-    },
+    queryOptionsNotify as UseAllRunsQueryOptions,
     hostOverride
   )
 
-  return httpResponse
+  if (shouldRefetch) {
+    void httpQueryResult.refetch()
+  }
+
+  return httpQueryResult
 }

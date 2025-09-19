@@ -1,7 +1,11 @@
 // access main process remote modules via attachments to `global`
-import type { AxiosRequestConfig } from 'axios'
-import type { ResponsePromise } from '@opentrons/api-client'
-import type { Remote, NotifyTopic, NotifyResponseData } from './types'
+import type { AxiosRequestConfig, AxiosResponse } from 'axios'
+import type {
+  IPCSafeFormData,
+  NotifyResponseData,
+  NotifyTopic,
+  Remote,
+} from './types'
 
 const emptyRemote: Remote = {} as any
 
@@ -20,18 +24,44 @@ export const remote: Remote = new Proxy(emptyRemote, {
   },
 })
 
-export function appShellRequestor<Data>(
+// FormData and File objects can't be sent through invoke().
+// This converts them into simpler objects that can be.
+// app-shell will convert them back.
+async function proxyFormData(formData: FormData): Promise<IPCSafeFormData> {
+  const result: IPCSafeFormData = []
+  for (const [name, value] of formData.entries()) {
+    if (value instanceof File) {
+      result.push({
+        type: 'file',
+        name,
+        // todo(mm, 2024-04-24): Send just the (full) filename instead of the file
+        // contents, to avoid the IPC message ballooning into several MB.
+        value: await value.arrayBuffer(),
+        filename: value.name,
+      })
+    } else {
+      result.push({ type: 'string', name, value })
+    }
+  }
+
+  return result
+}
+
+export async function appShellRequestor<Data>(
   config: AxiosRequestConfig
-): ResponsePromise<Data> {
+): Promise<AxiosResponse<Data>> {
   const { data } = config
-  // special case: protocol files and form data cannot be sent through invoke. proxy by protocolKey and handle in app-shell
   const formDataProxy =
     data instanceof FormData
-      ? { formDataProxy: { protocolKey: data.get('key') } }
+      ? { proxiedFormData: await proxyFormData(data) }
       : data
   const configProxy = { ...config, data: formDataProxy }
 
-  return remote.ipcRenderer.invoke('usb:request', configProxy)
+  const result = await remote.ipcRenderer.invoke('usb:request', configProxy)
+  if (result?.error != null) {
+    throw result.error
+  }
+  return result
 }
 
 interface CallbackStore {
@@ -43,41 +73,48 @@ const callbackStore: CallbackStore = {}
 
 interface AppShellListener {
   hostname: string
-  topic: NotifyTopic
+  notifyTopic: NotifyTopic
   callback: (data: NotifyResponseData) => void
   isDismounting?: boolean
 }
 export function appShellListener({
   hostname,
-  topic,
+  notifyTopic,
   callback,
   isDismounting = false,
 }: AppShellListener): CallbackStore {
-  if (isDismounting) {
-    const callbacks = callbackStore[hostname]?.[topic]
-    if (callbacks != null) {
-      callbackStore[hostname][topic] = callbacks.filter(cb => cb !== callback)
-      if (!callbackStore[hostname][topic].length) {
-        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-        delete callbackStore[hostname][topic]
-        if (!Object.keys(callbackStore[hostname]).length) {
+  // The shell emits general messages to ALL_TOPICS, typically errors, and all listeners must handle those messages.
+  const topics: NotifyTopic[] = [notifyTopic, 'ALL_TOPICS'] as const
+
+  topics.forEach(topic => {
+    if (isDismounting) {
+      const callbacks = callbackStore[hostname]?.[topic]
+      if (callbacks != null) {
+        callbackStore[hostname][topic] = callbacks.filter(cb => cb !== callback)
+        if (!callbackStore[hostname][topic].length) {
           // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-          delete callbackStore[hostname]
+          delete callbackStore[hostname][topic]
+          if (!Object.keys(callbackStore[hostname]).length) {
+            // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+            delete callbackStore[hostname]
+          }
         }
       }
+    } else {
+      callbackStore[hostname] = callbackStore[hostname] ?? {}
+      callbackStore[hostname][topic] ??= []
+      callbackStore[hostname][topic].push(callback)
     }
-  } else {
-    callbackStore[hostname] = callbackStore[hostname] ?? {}
-    callbackStore[hostname][topic] ??= []
-    callbackStore[hostname][topic].push(callback)
-  }
+  })
+
   return callbackStore
 }
-
 // Instantiate the notify listener at runtime.
 remote.ipcRenderer.on(
   'notify',
   (_, shellHostname, shellTopic, shellMessage) => {
-    callbackStore[shellHostname]?.[shellTopic]?.forEach(cb => cb(shellMessage))
+    callbackStore[shellHostname]?.[shellTopic]?.forEach(cb => {
+      cb(shellMessage)
+    })
   }
 )

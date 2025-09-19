@@ -1,26 +1,31 @@
-import * as React from 'react'
-import { css } from 'styled-components'
-import attachProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
-import attachProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
-import attachProbe96 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
 import { Trans, useTranslation } from 'react-i18next'
-import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
-import { WASTE_CHUTE_CUTOUT, CreateCommand, LEFT } from '@opentrons/shared-data'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
+import { css } from 'styled-components'
+
 import {
+  AnimationVideo,
+  Banner,
   Flex,
+  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { LEFT, WASTE_CHUTE_FIXTURES } from '@opentrons/shared-data'
 
-import { Banner } from '../../atoms/Banner'
-import { StyledText } from '../../atoms/text'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
+import attachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
+import attachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
+import attachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 
-import type { ModuleCalibrationWizardStepProps } from './types'
-interface AttachProbeProps extends ModuleCalibrationWizardStepProps {
+import { getFixtureIdByCutoutId } from './getFixtureIdByCutoutId'
+
+import type { CreateCommand, DeckConfiguration } from '@opentrons/shared-data'
+import type { ModuleSetupWizardRequiresPipetteStepProps } from './types'
+
+interface AttachProbeProps extends ModuleSetupWizardRequiresPipetteStepProps {
   adapterId: string | null
+  deckConfig: DeckConfiguration
 }
 
 const BODY_STYLE = css`
@@ -31,7 +36,7 @@ const BODY_STYLE = css`
   }
 `
 
-export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
+export function AttachProbe(props: AttachProbeProps): JSX.Element {
   const {
     proceed,
     goBack,
@@ -42,13 +47,13 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     attachedModule,
     attachedPipette,
     isOnDevice,
-    slotName,
+    deckConfig,
   } = props
   const { t, i18n } = useTranslation([
     'module_wizard_flows',
     'pipette_wizard_flows',
   ])
-
+  const fixtureIdByCutoutId = getFixtureIdByCutoutId(attachedModule, deckConfig)
   const attachedPipetteChannels = attachedPipette.data.channels
   let pipetteAttachProbeVideoSource, probeLocation
   switch (attachedPipetteChannels) {
@@ -65,54 +70,10 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       probeLocation = t('pipette_wizard_flows:ninety_six_probe_location')
       break
   }
-  const wasteChuteConflict =
-    slotName === 'C3' && attachedPipette.data.channels === 96
-  const deckConfig = useDeckConfigurationQuery().data
-  const isWasteChuteOnDeck =
-    deckConfig?.find(fixture => fixture.cutoutId === WASTE_CHUTE_CUTOUT) ??
-    false
-
-  const pipetteAttachProbeVid = (
-    <Flex height="13.25rem" paddingTop={SPACING.spacing4}>
-      <video
-        css={css`
-          max-width: 100%;
-          max-height: 100%;
-        `}
-        autoPlay={true}
-        loop={true}
-        controls={false}
-      >
-        <source src={pipetteAttachProbeVideoSource} />
-      </video>
-    </Flex>
-  )
-
-  const bodyText = (
-    <>
-      <StyledText css={BODY_STYLE}>
-        <Trans
-          t={t}
-          i18nKey={'pipette_wizard_flows:install_probe'}
-          values={{ location: probeLocation }}
-          components={{
-            bold: <strong />,
-          }}
-        />
-      </StyledText>
-
-      {wasteChuteConflict && (
-        <Banner
-          type={isWasteChuteOnDeck ? 'error' : 'warning'}
-          size={isOnDevice ? '1.5rem' : '1rem'}
-          marginTop={isOnDevice ? SPACING.spacing24 : SPACING.spacing16}
-        >
-          {isWasteChuteOnDeck
-            ? t('pipette_wizard_flows:waste_chute_error')
-            : t('pipette_wizard_flows:waste_chute_warning')}
-        </Banner>
-      )}
-    </>
+  const wasteChuteConflictWith96Channel =
+    'cutoutC3' in fixtureIdByCutoutId && attachedPipette.data.channels === 96
+  const isWasteChuteOnDeck = deckConfig.some(cc =>
+    WASTE_CHUTE_FIXTURES.includes(cc.cutoutFixtureId)
   )
 
   const handleBeginCalibration = (): void => {
@@ -154,7 +115,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
 
   if (isRobotMoving)
     return (
-      <InProgressModal
+      <SimpleWizardInProgressBody
         // TODO ND: 9/6/23 use spinner until animations are made
         alternativeSpinner={null}
         description={t('stand_back')}
@@ -165,8 +126,44 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     return (
       <GenericWizardTile
         header={i18n.format(t('attach_probe'), 'capitalize')}
-        rightHandBody={pipetteAttachProbeVid}
-        bodyText={bodyText}
+        rightHandBody={
+          <Flex height="13.25rem" paddingTop={SPACING.spacing4}>
+            <AnimationVideo
+              css={css`
+                max-width: 100%;
+                max-height: 100%;
+              `}
+            >
+              <source src={pipetteAttachProbeVideoSource} />
+            </AnimationVideo>
+          </Flex>
+        }
+        bodyText={
+          <>
+            <LegacyStyledText css={BODY_STYLE}>
+              <Trans
+                t={t}
+                i18nKey="pipette_wizard_flows:install_probe"
+                values={{ location: probeLocation }}
+                components={{
+                  bold: <strong />,
+                }}
+              />
+            </LegacyStyledText>
+
+            {wasteChuteConflictWith96Channel && (
+              <Banner
+                type={isWasteChuteOnDeck ? 'error' : 'warning'}
+                size={isOnDevice ? '1.5rem' : '1rem'}
+                marginTop={isOnDevice ? SPACING.spacing24 : SPACING.spacing16}
+              >
+                {isWasteChuteOnDeck
+                  ? t('pipette_wizard_flows:waste_chute_error')
+                  : t('pipette_wizard_flows:waste_chute_warning')}
+              </Banner>
+            )}
+          </>
+        }
         proceedButtonText={t('begin_calibration')}
         proceed={handleBeginCalibration}
         back={goBack}

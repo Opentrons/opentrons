@@ -71,6 +71,7 @@ class GripperHandler:
         """
         gripper = self.get_gripper()
         gripper.reset_offset(to_default)
+        gripper.reset_jaw_width_calibration(to_default)
 
     def save_instrument_offset(self, delta: Point) -> GripperCalibrationOffset:
         """

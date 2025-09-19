@@ -15,7 +15,7 @@ from opentrons_shared_data.pipette import (
     pipette_definition as pip_def,
 )
 from opentrons.types import Mount
-from opentrons_shared_data.robot.dev_types import RobotTypeEnum
+from opentrons_shared_data.robot.types import RobotTypeEnum
 
 
 from robot_server.app import app
@@ -146,6 +146,7 @@ def test_receive_attached_pipette_settings(
                 pip_types.PipetteModelType.p20,
                 pip_types.PipetteChannelType.EIGHT_CHANNEL,
                 pip_types.PipetteVersionType(3, 5),
+                pip_types.PipetteOEMType.OT,
             ),
             pipette_serial_number="P12345",
             pipette_override_path="nope",
@@ -598,7 +599,7 @@ def test_reset_invalid_option(
     assert resp.status_code == 422
     body = resp.json()
     assert "message" in body
-    assert "not a valid enumeration member" in body["message"]
+    assert "Input should be" in body["message"]
 
 
 @pytest.fixture()

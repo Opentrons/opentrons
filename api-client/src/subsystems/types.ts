@@ -6,6 +6,7 @@ export type Subsystem =
   | 'pipette_right'
   | 'gripper'
   | 'rear_panel'
+  | 'hepa_uv'
 
 type UpdateStatus = 'queued' | 'updating' | 'done'
 export interface SubsystemUpdateProgressData {

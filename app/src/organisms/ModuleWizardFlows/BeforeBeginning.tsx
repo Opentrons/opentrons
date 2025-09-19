@@ -1,25 +1,18 @@
-import * as React from 'react'
-import { UseMutateFunction } from 'react-query'
 import { Trans, useTranslation } from 'react-i18next'
 
+import { LegacyStyledText } from '@opentrons/components'
 import {
+  getModuleDisplayName,
   HEATERSHAKER_MODULE_MODELS,
   TEMPERATURE_MODULE_MODELS,
   THERMOCYCLER_MODULE_MODELS,
-  getModuleDisplayName,
 } from '@opentrons/shared-data'
 
-import { StyledText } from '../../atoms/text'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { WizardRequiredEquipmentList } from '../../molecules/WizardRequiredEquipmentList'
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
 
-import type {
-  CreateMaintenanceRunData,
-  MaintenanceRun,
-  AttachedModule,
-} from '@opentrons/api-client'
-import type { AxiosError } from 'axios'
-import type { ModuleCalibrationWizardStepProps } from './types'
+import type { AttachedModule } from '@opentrons/api-client'
+import type { ModuleSetupWizardMaybePipetteStepProps } from './types'
 
 interface EqipmentItem {
   loadName: string
@@ -27,38 +20,16 @@ interface EqipmentItem {
   subtitle?: string
 }
 
-interface BeforeBeginningProps extends ModuleCalibrationWizardStepProps {
-  createMaintenanceRun: UseMutateFunction<
-    MaintenanceRun,
-    AxiosError<any>,
-    CreateMaintenanceRunData,
-    unknown
-  >
-  isCreateLoading: boolean
-  createdMaintenanceRunId: string | null
-}
+interface BeforeBeginningProps extends ModuleSetupWizardMaybePipetteStepProps {}
 
-export const BeforeBeginning = (
-  props: BeforeBeginningProps
-): JSX.Element | null => {
-  const {
-    proceed,
-    createMaintenanceRun,
-    isCreateLoading,
-    attachedModule,
-    maintenanceRunId,
-    createdMaintenanceRunId,
-  } = props
+export function BeforeBeginning(props: BeforeBeginningProps): JSX.Element {
+  const { proceed, attachedModule, setErrorMessage } = props
   const { t } = useTranslation(['module_wizard_flows', 'shared'])
-  React.useEffect(() => {
-    if (createdMaintenanceRunId == null) {
-      createMaintenanceRun({})
-    }
-  }, [])
+
   const moduleDisplayName = getModuleDisplayName(attachedModule.moduleModel)
 
-  let adapterLoadname: string
-  let adapterDisplaynameKey: string
+  let adapterLoadname: string = ''
+  let adapterDisplaynameKey: string = ''
   const equipmentList = useAddEquipmentToSpecificModules([], attachedModule)
   if (
     THERMOCYCLER_MODULE_MODELS.some(
@@ -82,11 +53,9 @@ export const BeforeBeginning = (
     adapterLoadname = 'calibration_adapter_temperature'
     adapterDisplaynameKey = 'calibration_adapter_temperature'
   } else {
-    adapterLoadname = ''
-    console.error(
+    setErrorMessage(
       `Invalid module type for calibration: ${attachedModule.moduleModel}`
     )
-    return null
   }
   equipmentList.push(
     ...[
@@ -104,13 +73,12 @@ export const BeforeBeginning = (
       bodyText={
         <Trans
           t={t}
-          i18nKey={'get_started'}
+          i18nKey="branded:module_calibration_get_started"
           values={{ module: moduleDisplayName }}
-          components={{ block: <StyledText as="p" /> }}
+          components={{ block: <LegacyStyledText as="p" /> }}
         />
       }
       proceedButtonText={t('start_setup')}
-      proceedIsDisabled={isCreateLoading || maintenanceRunId == null}
       proceed={proceed}
     />
   )

@@ -1,71 +1,41 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   MAGNETIC_MODULE_TYPE,
+  MAGNETIC_MODULE_V2,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  MAGNETIC_MODULE_V1,
-  MAGNETIC_MODULE_V2,
 } from '@opentrons/shared-data'
 
+import { INITIAL_DECK_SETUP_STEP_ID, PAUSE_UNTIL_TEMP } from '../../constants'
+import { moveDeckItem } from '../../labware-ingred/actions'
+import { handleFormChange } from '../../steplist/formLevel/handleFormChange'
+import { PRESAVED_STEP_ID } from '../../steplist/types'
+import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
 import {
-  orderedStepIds,
+  batchEditFormChanges,
   labwareInvariantProperties,
   moduleInvariantProperties,
+  orderedStepIds,
   presavedStepForm,
   savedStepForms,
   unsavedForm,
-  batchEditFormChanges,
 } from '../reducers'
 import {
-  _getPipetteEntitiesRootState,
-  _getLabwareEntitiesRootState,
   _getInitialDeckSetupRootState,
+  _getLabwareEntitiesRootState,
+  _getPipetteEntitiesRootState,
 } from '../selectors'
-import { handleFormChange } from '../../steplist/formLevel/handleFormChange'
-import { moveDeckItem } from '../../labware-ingred/actions'
-import {
-  INITIAL_DECK_SETUP_STEP_ID,
-  SPAN7_8_10_11_SLOT,
-  PAUSE_UNTIL_TEMP,
-} from '../../constants'
-import { PRESAVED_STEP_ID } from '../../steplist/types'
 import { createPresavedStepForm } from '../utils/createPresavedStepForm'
-import { createInitialProfileCycle } from '../utils/createInitialProfileItems'
-import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
-import { uuid } from '../../utils'
-import { PROFILE_CYCLE, PROFILE_STEP } from '../../form-types'
 
 import type { ModuleEntity } from '@opentrons/step-generation'
-import type { DeckSlot } from '../../types'
+import type { FormData, StepType } from '../../form-types'
 import type { DeleteContainerAction } from '../../labware-ingred/actions/actions'
 import type {
-  AddProfileCycleAction,
-  AddProfileStepAction,
   ChangeFormInputAction,
   DeleteMultipleStepsAction,
-  DeleteProfileCycleAction,
-  DeleteProfileStepAction,
-  EditProfileCycleAction,
-  EditProfileStepAction,
 } from '../../steplist/actions'
-import type { FormData, StepType } from '../../form-types'
-import type {
-  SavedStepFormsActions,
-  UnsavedFormActions,
-  RootState,
-  PresavedStepFormState,
-  PresavedStepFormAction,
-} from '../reducers'
-import type {
-  DeletePipettesAction,
-  SubstituteStepFormPipettesAction,
-} from '../actions/pipettes'
-import type {
-  CreateModuleAction,
-  DeleteModuleAction,
-  EditModuleAction,
-} from '../actions/modules'
+import type { DeckSlot } from '../../types'
 import type {
   AddStepAction,
   DuplicateMultipleStepsAction,
@@ -76,9 +46,21 @@ import type {
 } from '../../ui/steps'
 import type {
   ChangeBatchEditFieldAction,
-  SaveStepFormsMultiAction,
   ResetBatchEditFieldChangesAction,
+  SaveStepFormsMultiAction,
 } from '../actions'
+import type { CreateModuleAction, DeleteModuleAction } from '../actions/modules'
+import type {
+  DeletePipettesAction,
+  SubstituteStepFormPipettesAction,
+} from '../actions/pipettes'
+import type {
+  PresavedStepFormAction,
+  PresavedStepFormState,
+  RootState,
+  SavedStepFormsActions,
+  UnsavedFormActions,
+} from '../reducers'
 
 vi.mock('../../labware-defs/utils')
 vi.mock('../selectors')
@@ -283,12 +265,18 @@ describe('labwareInvariantProperties reducer', () => {
     const prevState = {
       labwareIdA1: {
         labwareDefURI: 'foo/a/1',
+        pythonName: 'mockPythonName',
+        displayCategory: 'wellPlate',
       },
       labwareIdA2: {
         labwareDefURI: 'foo/a/1',
+        pythonName: 'mockPythonName',
+        displayCategory: 'wellPlate',
       },
       labwareIdB: {
         labwareDefURI: 'foo/b/1',
+        pythonName: 'mockPythonName',
+        displayCategory: 'wellPlate',
       },
     }
     const result = labwareInvariantProperties(prevState, {
@@ -301,6 +289,9 @@ describe('labwareInvariantProperties reducer', () => {
           },
           version: 2,
           namespace: 'foo',
+          metadata: {
+            displayCategory: 'wellPlate',
+          },
         },
         isOverwriteMismatched: false,
       },
@@ -309,13 +300,17 @@ describe('labwareInvariantProperties reducer', () => {
       // changed
       labwareIdA1: {
         labwareDefURI: 'foo/a/2',
+        displayCategory: 'wellPlate',
       },
       labwareIdA2: {
         labwareDefURI: 'foo/a/2',
+        displayCategory: 'wellPlate',
       },
       // unchanged
       labwareIdB: {
         labwareDefURI: 'foo/b/1',
+        displayCategory: 'wellPlate',
+        pythonName: 'mockPythonName',
       },
     })
   })
@@ -354,19 +349,6 @@ describe('moduleInvariantProperties reducer', () => {
         type: newModuleData.type,
         model: newModuleData.model,
       },
-    })
-  })
-  it('edit module (change its model)', () => {
-    const newModel = 'someDifferentModel'
-    const result = moduleInvariantProperties(prevState, {
-      type: 'EDIT_MODULE',
-      payload: {
-        id: existingModuleId,
-        model: newModel,
-      },
-    })
-    expect(result).toEqual({
-      [existingModuleId]: { ...prevState.existingModuleId, model: newModel },
     })
   })
   it('delete module', () => {
@@ -421,6 +403,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
             duplicateLabwareId: newLabwareId,
             duplicateLabwareNickname: 'new labware nickname',
             slot: newSlot,
+            displayCategory: 'wellPlate',
           },
         },
       },
@@ -432,6 +415,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
             slot: newSlot,
             labwareDefURI: 'fixtures/foo/1',
             id: newLabwareId,
+            displayCategory: 'adapter',
           },
         },
       },
@@ -1006,19 +990,6 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         expectedModuleId: string
       }> = [
         {
-          testName: 'create TC -> override TC step module id',
-          action: {
-            type: 'CREATE_MODULE',
-            payload: {
-              id: 'NewTCId',
-              slot: SPAN7_8_10_11_SLOT,
-              type: THERMOCYCLER_MODULE_TYPE,
-              model: 'thermocyclerModuleV1',
-            },
-          },
-          expectedModuleId: 'NewTCId',
-        },
-        {
           testName: 'create temp mod -> DO NOT override TC step module id',
           action: {
             type: 'CREATE_MODULE',
@@ -1095,22 +1066,6 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         },
         expectedLabwareLocations: {
           [labwareOnModuleId]: '3',
-        },
-        expectedModuleLocations: {},
-      },
-      {
-        testName:
-          'delete occupied module in span7_8_10_11 slot -> labware goes into slot 7',
-        makeStateArgs: {
-          labwareLocationUpdate: {
-            [labwareOnModuleId]: moduleId,
-          },
-          moduleLocationUpdate: {
-            [moduleId]: SPAN7_8_10_11_SLOT,
-          },
-        },
-        expectedLabwareLocations: {
-          [labwareOnModuleId]: '7',
         },
         expectedModuleLocations: {},
       },
@@ -1376,95 +1331,6 @@ describe('savedStepForms reducer: initial deck setup step', () => {
       ).toEqual(expectedState)
     })
   })
-  describe('EDIT_MODULE', () => {
-    it('should set engageHeight to null for all Magnet > Engage steps when a magnet module has its model changed, unless height matches default', () => {
-      vi.mocked(_getInitialDeckSetupRootState).mockReturnValue({
-        labware: {
-          magPlateId: {
-            id: 'magPlateId',
-            slot: 'magModuleId',
-            def: {
-              // @ts-expect-error(sa, 2021-6-14): add missing parameters to fixture
-              parameters: {
-                magneticModuleEngageHeight: 12,
-              },
-            },
-          },
-        },
-        pipettes: {},
-        modules: {
-          // @ts-expect-error(sa, 2021-6-14): add missing parameters to fixture
-          magModuleId: {
-            id: 'magModuleId',
-            type: MAGNETIC_MODULE_TYPE,
-            model: MAGNETIC_MODULE_V1,
-            slot: '1',
-          },
-        },
-      })
-      const action: EditModuleAction = {
-        type: 'EDIT_MODULE',
-        payload: {
-          id: 'magModuleId',
-          model: 'magneticModuleV2',
-        },
-      }
-      const prevRootState: RootState = {
-        savedStepForms: {
-          // @ts-expect-error(sa, 2021-6-14): add id to fixture
-          magnetEngageStepId: {
-            stepType: 'magnet',
-            magnetAction: 'engage',
-            moduleId: 'magModuleId',
-            engageHeight: '24', // = 12 * 2 b/c we're going V1 -> V2
-          },
-          // @ts-expect-error(sa, 2021-6-14): add id to fixture
-          magnetDisengageStepId: {
-            stepType: 'magnet',
-            magnetAction: 'disengage',
-            engageHeight: null,
-            moduleId: 'magModuleId',
-          },
-          // @ts-expect-error(sa, 2021-6-14): add id to fixture
-          nonDefaultMagnetEngageStepId: {
-            stepType: 'magnet',
-            magnetAction: 'engage',
-            moduleId: 'magModuleId',
-            engageHeight: '8',
-          },
-          // @ts-expect-error(sa, 2021-6-14): add id to fixture
-          unrelatedMagnetEngageStepId: {
-            stepType: 'magnet',
-            magnetAction: 'engage',
-            moduleId: 'otherMagModuleId',
-            // not 'magModuleId'
-            engageHeight: '8',
-          },
-        },
-      }
-      const result = savedStepForms(prevRootState, action)
-      expect(result).toEqual({
-        magnetEngageStepId: {
-          stepType: 'magnet',
-          magnetAction: 'engage',
-          engageHeight: '12',
-          // V2 units default
-          moduleId: 'magModuleId',
-        },
-        magnetDisengageStepId:
-          prevRootState.savedStepForms.magnetDisengageStepId,
-        nonDefaultMagnetEngageStepId: {
-          stepType: 'magnet',
-          magnetAction: 'engage',
-          moduleId: 'magModuleId',
-          engageHeight: null,
-        },
-        // module id not matching, unchanged
-        unrelatedMagnetEngageStepId:
-          prevRootState.savedStepForms.unrelatedMagnetEngageStepId,
-      })
-    })
-  })
   describe('saving multiple steps', () => {
     it('should apply the form patch to all of the step ids', () => {
       const prevState: RootState = {
@@ -1584,6 +1450,7 @@ describe('unsavedForm reducer', () => {
         },
         startStepId: '3',
         endStepId: '5',
+        newTiprackURI: 'mockURI',
       },
     }
     const rootState: RootState = {
@@ -1617,6 +1484,7 @@ describe('unsavedForm reducer', () => {
       [
         {
           pipette: 'newPipetteId',
+          tipRack: 'mockURI',
         },
         rootState.unsavedForm,
         'pipetteEntitiesPlaceholder',
@@ -1635,7 +1503,6 @@ describe('unsavedForm reducer', () => {
     'DELETE_MODULE',
     'DELETE_STEP',
     'DELETE_MULTIPLE_STEPS',
-    'EDIT_MODULE',
     'SAVE_STEP_FORM',
     'SELECT_TERMINAL_ITEM',
     'SELECT_MULTIPLE_STEPS',
@@ -1690,360 +1557,6 @@ describe('unsavedForm reducer', () => {
         },
       ],
     ])
-  })
-  it('should add a profile cycle item upon ADD_PROFILE_CYCLE action', () => {
-    const action: AddProfileCycleAction = {
-      type: 'ADD_PROFILE_CYCLE',
-      payload: null,
-    }
-    const id = 'newCycleId'
-    const profileStepId = 'newProfileStepId'
-    // NOTE: because we're using uuid() to create multiple different ids,
-    // this test is sensitive to the order that uuid is called in and
-    // assumes it's first for cycle id, then next for profile step id
-    vi.mocked(uuid).mockReturnValueOnce(id)
-    vi.mocked(uuid).mockReturnValueOnce(profileStepId)
-    const state: RootState = {
-      // @ts-expect-error(sa, 2021-6-14): add id to fixture
-      unsavedForm: {
-        stepType: 'thermocycler',
-        orderedProfileItems: [],
-        profileItemsById: {},
-      },
-    }
-    const result = unsavedForm(state, action)
-    expect(result).toEqual({
-      stepType: 'thermocycler',
-      orderedProfileItems: [id],
-      profileItemsById: {
-        [id]: createInitialProfileCycle(id, profileStepId),
-      },
-    })
-  })
-  it('should add a profile step item to the specified cycle upon ADD_PROFILE_STEP action with cycleId payload', () => {
-    const cycleId = 'someCycleId'
-    const stepId = 'newStepId'
-    const action: AddProfileStepAction = {
-      type: 'ADD_PROFILE_STEP',
-      payload: {
-        cycleId,
-      },
-    }
-    vi.mocked(uuid).mockReturnValue(stepId)
-    const state: RootState = {
-      // @ts-expect-error(sa, 2021-6-14): add id to fixture
-      unsavedForm: {
-        stepType: 'thermocycler',
-        orderedProfileItems: [cycleId],
-        profileItemsById: {
-          [cycleId]: {
-            type: PROFILE_CYCLE,
-            id: cycleId,
-            repetitions: '1',
-            steps: [],
-          },
-        },
-      },
-    }
-    const result = unsavedForm(state, action)
-    expect(result).toEqual({
-      stepType: 'thermocycler',
-      orderedProfileItems: [cycleId],
-      profileItemsById: {
-        [cycleId]: {
-          // @ts-expect-error(sa, 2021-6-14): possibly null
-          ...state.unsavedForm.profileItemsById[cycleId],
-          steps: [
-            {
-              id: stepId,
-              type: PROFILE_STEP,
-              title: '',
-              temperature: '',
-              durationMinutes: '',
-              durationSeconds: '',
-            },
-          ],
-        },
-      },
-    })
-  })
-  it('should remove a profile step item on DELETE_PROFILE_STEP', () => {
-    const id = 'stepItemId'
-    const action: DeleteProfileStepAction = {
-      type: 'DELETE_PROFILE_STEP',
-      payload: {
-        id,
-      },
-    }
-    const state: RootState = {
-      // @ts-expect-error(sa, 2021-6-14): add missing id to fixture
-      unsavedForm: {
-        stepType: 'thermocycler',
-        orderedProfileItems: [id],
-        profileItemsById: {
-          [id]: {
-            type: PROFILE_STEP,
-            id,
-            title: '',
-            temperature: '',
-            durationMinutes: '',
-            durationSeconds: '',
-          },
-        },
-      },
-    }
-    const result = unsavedForm(state, action)
-    expect(result).toEqual({
-      stepType: 'thermocycler',
-      orderedProfileItems: [],
-      profileItemsById: {},
-    })
-  })
-  it('should remove a step item inside a cycle on DELETE_PROFILE_STEP', () => {
-    const stepId = 'stepItemId'
-    const cycleId = 'cycleId'
-    const action: DeleteProfileStepAction = {
-      type: 'DELETE_PROFILE_STEP',
-      payload: {
-        id: stepId,
-      },
-    }
-    const state: RootState = {
-      // @ts-expect-error(sa, 2021-6-14): add id to fixture
-      unsavedForm: {
-        stepType: 'thermocycler',
-        orderedProfileItems: [cycleId],
-        profileItemsById: {
-          [cycleId]: {
-            type: PROFILE_CYCLE,
-            id: cycleId,
-            steps: [
-              {
-                type: PROFILE_STEP,
-                id: stepId,
-                title: '',
-                temperature: '',
-                durationMinutes: '',
-                durationSeconds: '',
-              },
-            ],
-            repetitions: '1',
-          },
-        },
-      },
-    }
-    const result = unsavedForm(state, action)
-    expect(result).toEqual({
-      stepType: 'thermocycler',
-      orderedProfileItems: [cycleId],
-      profileItemsById: {
-        [cycleId]: {
-          type: PROFILE_CYCLE,
-          id: cycleId,
-          steps: [],
-          repetitions: '1',
-        },
-      },
-    })
-  })
-  it('should do nothing on DELETE_PROFILE_STEP when the id is a cycle', () => {
-    const id = 'cycleItemId'
-    const action: DeleteProfileStepAction = {
-      type: 'DELETE_PROFILE_STEP',
-      payload: {
-        id,
-      },
-    }
-    const state: RootState = {
-      // @ts-expect-error(sa, 2021-6-14): add id to fixture
-      unsavedForm: {
-        stepType: 'thermocycler',
-        orderedProfileItems: [id],
-        profileItemsById: {
-          [id]: {
-            type: PROFILE_CYCLE,
-            id,
-            steps: [],
-            repetitions: '1',
-          },
-        },
-      },
-    }
-    const result = unsavedForm(state, action)
-    expect(result).toEqual(state.unsavedForm)
-  })
-  it('should delete cycle on DELETE_PROFILE_CYCLE', () => {
-    const id = 'cycleItemId'
-    const action: DeleteProfileCycleAction = {
-      type: 'DELETE_PROFILE_CYCLE',
-      payload: {
-        id,
-      },
-    }
-    const state: RootState = {
-      // @ts-expect-error(sa, 2021-6-14): add id to fixture
-      unsavedForm: {
-        stepType: 'thermocycler',
-        orderedProfileItems: [id],
-        profileItemsById: {
-          [id]: {
-            type: PROFILE_CYCLE,
-            id,
-            steps: [],
-            repetitions: '1',
-          },
-        },
-      },
-    }
-    const result = unsavedForm(state, action)
-    expect(result).toEqual({
-      stepType: 'thermocycler',
-      orderedProfileItems: [],
-      profileItemsById: {},
-    })
-  })
-  it('should edit a profile step on the top level with EDIT_PROFILE_STEP', () => {
-    const stepId = 'profileStepId'
-    const action: EditProfileStepAction = {
-      type: 'EDIT_PROFILE_STEP',
-      payload: {
-        id: stepId,
-        fields: {
-          title: 'x',
-        },
-      },
-    }
-    const state: RootState = {
-      // @ts-expect-error(sa, 2021-6-14): add id to fixture
-      unsavedForm: {
-        stepType: 'thermocycler',
-        orderedProfileItems: [stepId],
-        profileItemsById: {
-          [stepId]: {
-            type: PROFILE_STEP,
-            id: stepId,
-            title: '',
-            temperature: '',
-            durationMinutes: '',
-            durationSeconds: '',
-          },
-        },
-      },
-    }
-    const result = unsavedForm(state, action)
-    expect(result).toEqual({
-      stepType: 'thermocycler',
-      orderedProfileItems: [stepId],
-      profileItemsById: {
-        [stepId]: {
-          type: PROFILE_STEP,
-          id: stepId,
-          title: 'x',
-          temperature: '',
-          durationMinutes: '',
-          durationSeconds: '',
-        },
-      },
-    })
-  })
-  it('should edit a profile step that is inside a cycle with EDIT_PROFILE_STEP', () => {
-    const cycleId = 'cycleId'
-    const stepId = 'profileStepId'
-    const action: EditProfileStepAction = {
-      type: 'EDIT_PROFILE_STEP',
-      payload: {
-        id: stepId,
-        fields: {
-          title: 'x',
-        },
-      },
-    }
-    const state: RootState = {
-      // @ts-expect-error(sa, 2021-6-14): add id to fixture
-      unsavedForm: {
-        stepType: 'thermocycler',
-        orderedProfileItems: [cycleId],
-        profileItemsById: {
-          [cycleId]: {
-            type: PROFILE_CYCLE,
-            id: cycleId,
-            steps: [
-              {
-                type: PROFILE_STEP,
-                id: stepId,
-                title: '',
-                temperature: '',
-                durationMinutes: '',
-                durationSeconds: '',
-              },
-            ],
-            repetitions: '1',
-          },
-        },
-      },
-    }
-    const result = unsavedForm(state, action)
-    expect(result).toEqual({
-      stepType: 'thermocycler',
-      orderedProfileItems: [cycleId],
-      profileItemsById: {
-        [cycleId]: {
-          type: PROFILE_CYCLE,
-          id: cycleId,
-          steps: [
-            {
-              type: PROFILE_STEP,
-              id: stepId,
-              title: 'x',
-              temperature: '',
-              durationMinutes: '',
-              durationSeconds: '',
-            },
-          ],
-          repetitions: '1',
-        },
-      },
-    })
-  })
-  it('should edit a profile cycle on EDIT_PROFILE_CYCLE', () => {
-    const cycleId = 'cycleId'
-    const action: EditProfileCycleAction = {
-      type: 'EDIT_PROFILE_CYCLE',
-      payload: {
-        id: cycleId,
-        fields: {
-          repetitions: '5',
-        },
-      },
-    }
-    const state: RootState = {
-      // @ts-expect-error(sa, 2021-6-14): add id to fixture
-      unsavedForm: {
-        stepType: 'thermocycler',
-        orderedProfileItems: [cycleId],
-        profileItemsById: {
-          [cycleId]: {
-            type: PROFILE_CYCLE,
-            id: cycleId,
-            steps: [],
-            repetitions: '1',
-          },
-        },
-      },
-    }
-    const result = unsavedForm(state, action)
-    expect(result).toEqual({
-      stepType: 'thermocycler',
-      orderedProfileItems: [cycleId],
-      profileItemsById: {
-        [cycleId]: {
-          type: PROFILE_CYCLE,
-          id: cycleId,
-          steps: [],
-          repetitions: '5',
-        },
-      },
-    })
   })
 })
 describe('presavedStepForm reducer', () => {

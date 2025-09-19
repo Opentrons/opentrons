@@ -1,20 +1,19 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  SPACING,
-  COLORS,
-  Icon,
-  DIRECTION_COLUMN,
   ALIGN_CENTER,
-  JUSTIFY_CENTER,
   BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  Icon,
+  JUSTIFY_CENTER,
+  LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
-import { MediumButton } from '../../atoms/buttons'
+import { MediumButton } from '/app/atoms/buttons'
 
 export interface NoUpdateFoundProps {
   onContinue: () => void
@@ -45,9 +44,9 @@ export function NoUpdateFound(props: NoUpdateFoundProps): JSX.Element {
           color={COLORS.green50}
           data-testid="NoUpdateFound_check_circle_icon"
         />
-        <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+        <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {t('software_is_up_to_date')}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
       <MediumButton
         buttonText={i18n.format(t('shared:continue'), 'capitalize')}

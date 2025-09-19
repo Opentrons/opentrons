@@ -1,23 +1,35 @@
-import { beforeEach, describe, it, expect } from 'vitest'
 import flatMap from 'lodash/flatMap'
-import { FIXED_TRASH_ID } from '@opentrons/shared-data'
+import { beforeEach, describe, expect, it } from 'vitest'
+
+import {
+  FIXED_TRASH_ID,
+  fixtureTiprack300ul,
+  getLabwareDefURI,
+} from '@opentrons/shared-data'
+
 import { mix } from '../commandCreators/compound/mix'
 import {
-  getRobotStateWithTipStandard,
-  makeContext,
-  getSuccessResult,
-  getErrorResult,
-  replaceTipCommands,
-  getFlowRateAndOffsetParamsMix,
-  DEFAULT_PIPETTE,
-  SOURCE_LABWARE,
-  DEST_LABWARE,
-  makeAspirateHelper,
-  makeDispenseHelper,
   blowoutHelper,
-  makeTouchTipHelper,
+  DEFAULT_PIPETTE,
   delayCommand,
+  DEST_LABWARE,
+  getErrorResult,
+  getFlowRateAndOffsetParamsMix,
+  getRobotStateWithTipStandard,
+  getSuccessResult,
+  makeAspirateInPlaceHelper,
+  makeContext,
+  makeDispenseInPlaceHelper,
+  makeTouchTipHelper,
+  prepareAndConfigureCommands,
+  replaceTipCommands,
+  SOURCE_LABWARE,
 } from '../fixtures'
+
+import type {
+  AspDispAirgapParams,
+  LabwareDefinition2,
+} from '@opentrons/shared-data'
 import type {
   ChangeTipOptions,
   InvariantContext,
@@ -25,8 +37,8 @@ import type {
   RobotState,
 } from '../types'
 
-const aspirateHelper = makeAspirateHelper()
-const dispenseHelper = makeDispenseHelper({ labwareId: SOURCE_LABWARE })
+const aspirateInPlaceHelper = makeAspirateInPlaceHelper()
+const dispenseInPlaceHelper = makeDispenseInPlaceHelper()
 const touchTipHelper = makeTouchTipHelper()
 // TODO: Ian 2019-06-14 more elegant way to test the blowout offset calculation
 const BLOWOUT_OFFSET_ANY: any = expect.any(Number)
@@ -35,22 +47,31 @@ let invariantContext: InvariantContext
 let robotStateWithTip: RobotState
 let mixinArgs: Partial<MixArgs>
 
+const mockWellLocation: Partial<AspDispAirgapParams> = {
+  wellLocation: {
+    origin: 'bottom',
+    offset: { x: 0, y: 0, z: 3.2 },
+  },
+}
+
 beforeEach(() => {
   mixinArgs = {
     ...getFlowRateAndOffsetParamsMix(),
     commandCreatorFnName: 'mix',
     name: 'mix test',
     description: 'test blah blah',
-
+    tipRack: getLabwareDefURI(fixtureTiprack300ul as LabwareDefinition2),
     pipette: DEFAULT_PIPETTE,
     labware: SOURCE_LABWARE,
 
     blowoutLocation: null,
     touchTip: false,
-
+    offsetFromBottomMm: 3.2,
     aspirateDelaySeconds: null,
     dispenseDelaySeconds: null,
     dropTipLocation: FIXED_TRASH_ID,
+    xOffset: 0,
+    yOffset: 0,
   }
 
   invariantContext = makeContext()
@@ -68,7 +89,7 @@ describe('mix: change tip', () => {
       wells: ['A1', 'B1', 'C1'],
       changeTip,
     } as MixArgs)
-  it('changeTip="always"', () => {
+  it('changeTip="always" with no advanced settings', () => {
     const args = makeArgs('always')
     const result = mix(args, invariantContext, robotStateWithTip)
     const res = getSuccessResult(result)
@@ -76,12 +97,68 @@ describe('mix: change tip', () => {
     expect(res.commands).toEqual(
       flatMap(args.wells, (well: string, idx: number) => [
         ...replaceTipCommands(idx),
-        aspirateHelper(well, volume),
-        dispenseHelper(well, volume),
+        ...aspirateInPlaceHelper(
+          {
+            pipetteId: 'p300SingleId',
+            volume,
+            flowRate: 2.1,
+          },
+          {
+            pipetteId: 'p300SingleId',
+            labwareId: SOURCE_LABWARE,
+            wellName: well,
+            wellLocation: mockWellLocation.wellLocation,
+          },
+          true
+        ),
+        ...dispenseInPlaceHelper({
+          pipetteId: 'p300SingleId',
+          volume,
+          flowRate: 2.2,
+          pushOut: 0,
+        }),
 
-        aspirateHelper(well, volume),
-        dispenseHelper(well, volume),
+        ...aspirateInPlaceHelper({
+          pipetteId: 'p300SingleId',
+          volume,
+          flowRate: 2.1,
+        }),
+        ...dispenseInPlaceHelper({
+          pipetteId: 'p300SingleId',
+          volume,
+          flowRate: 2.2,
+        }),
       ])
+    )
+    expect(res.python).toBe(
+      `
+mock_pipette.drop_tip()
+mock_pipette.pick_up_tip(location=mock_tip_rack_1)
+mock_pipette.mix(
+    repetitions=2,
+    volume=5,
+    location=mock_source_plate["A1"].bottom(z=3.2),
+    aspirate_flow_rate=2.1,
+    dispense_flow_rate=2.2,
+)
+mock_pipette.drop_tip()
+mock_pipette.pick_up_tip(location=mock_tip_rack_1)
+mock_pipette.mix(
+    repetitions=2,
+    volume=5,
+    location=mock_source_plate["B1"].bottom(z=3.2),
+    aspirate_flow_rate=2.1,
+    dispense_flow_rate=2.2,
+)
+mock_pipette.drop_tip()
+mock_pipette.pick_up_tip(location=mock_tip_rack_1)
+mock_pipette.mix(
+    repetitions=2,
+    volume=5,
+    location=mock_source_plate["C1"].bottom(z=3.2),
+    aspirate_flow_rate=2.1,
+    dispense_flow_rate=2.2,
+)`.trimStart()
     )
   })
 
@@ -93,10 +170,37 @@ describe('mix: change tip', () => {
     expect(res.commands).toEqual([
       ...replaceTipCommands(0),
       ...flatMap(args.wells, well => [
-        aspirateHelper(well, volume),
-        dispenseHelper(well, volume),
-        aspirateHelper(well, volume),
-        dispenseHelper(well, volume),
+        ...aspirateInPlaceHelper(
+          {
+            pipetteId: 'p300SingleId',
+            volume,
+            flowRate: 2.1,
+          },
+          {
+            pipetteId: 'p300SingleId',
+            labwareId: SOURCE_LABWARE,
+            wellName: well,
+            wellLocation: mockWellLocation.wellLocation,
+          },
+          true
+        ),
+        ...dispenseInPlaceHelper({
+          pipetteId: 'p300SingleId',
+          volume,
+          flowRate: 2.2,
+          pushOut: 0,
+        }),
+
+        ...aspirateInPlaceHelper({
+          pipetteId: 'p300SingleId',
+          volume,
+          flowRate: 2.1,
+        }),
+        ...dispenseInPlaceHelper({
+          pipetteId: 'p300SingleId',
+          volume,
+          flowRate: 2.2,
+        }),
       ]),
     ])
   })
@@ -107,11 +211,37 @@ describe('mix: change tip', () => {
     const res = getSuccessResult(result)
 
     expect(res.commands).toEqual(
-      flatMap(args.wells, well => [
-        aspirateHelper(well, volume),
-        dispenseHelper(well, volume),
-        aspirateHelper(well, volume),
-        dispenseHelper(well, volume),
+      flatMap(args.wells, (well, idx) => [
+        ...aspirateInPlaceHelper(
+          {
+            pipetteId: 'p300SingleId',
+            volume,
+            flowRate: 2.1,
+          },
+          {
+            pipetteId: 'p300SingleId',
+            labwareId: SOURCE_LABWARE,
+            wellName: well,
+            wellLocation: mockWellLocation.wellLocation,
+          },
+          true
+        ),
+        ...dispenseInPlaceHelper({
+          pipetteId: 'p300SingleId',
+          volume,
+          flowRate: 2.2,
+          pushOut: 0,
+        }),
+        ...aspirateInPlaceHelper({
+          pipetteId: 'p300SingleId',
+          volume,
+          flowRate: 2.1,
+        }),
+        ...dispenseInPlaceHelper({
+          pipetteId: 'p300SingleId',
+          volume,
+          flowRate: 2.2,
+        }),
       ])
     )
   })
@@ -135,10 +265,44 @@ describe('mix: advanced options', () => {
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
       ...replaceTipCommands(0),
-      aspirateHelper('A1', volume),
-      dispenseHelper('A1', volume),
-      aspirateHelper('A1', volume),
-      dispenseHelper('A1', volume),
+      ...aspirateInPlaceHelper(
+        {
+          pipetteId: 'p300SingleId',
+          volume,
+          flowRate: 2.1,
+        },
+        {
+          pipetteId: 'p300SingleId',
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
+          wellLocation: {
+            origin: 'bottom',
+            offset: {
+              x: 0,
+              y: 0,
+              z: 3.2,
+            },
+          },
+        },
+        true
+      ),
+      ...dispenseInPlaceHelper({
+        pipetteId: 'p300SingleId',
+        volume,
+        flowRate: 2.2,
+        pushOut: 0,
+      }),
+
+      ...aspirateInPlaceHelper({
+        pipetteId: 'p300SingleId',
+        volume,
+        flowRate: 2.1,
+      }),
+      ...dispenseInPlaceHelper({
+        pipetteId: 'p300SingleId',
+        volume,
+        flowRate: 2.2,
+      }),
     ])
   })
 
@@ -158,11 +322,37 @@ describe('mix: advanced options', () => {
     expect(res.commands).toEqual(
       flatMap(args.wells, (well: string, idx: number) => [
         ...replaceTipCommands(idx),
-        aspirateHelper(well, volume),
-        dispenseHelper(well, volume),
+        ...aspirateInPlaceHelper(
+          {
+            pipetteId: 'p300SingleId',
+            volume,
+            flowRate: 2.1,
+          },
+          {
+            pipetteId: 'p300SingleId',
+            labwareId: SOURCE_LABWARE,
+            wellName: well,
+            wellLocation: mockWellLocation.wellLocation,
+          },
+          true
+        ),
+        ...dispenseInPlaceHelper({
+          pipetteId: 'p300SingleId',
+          volume,
+          flowRate: 2.2,
+          pushOut: 0,
+        }),
 
-        aspirateHelper(well, volume),
-        dispenseHelper(well, volume),
+        ...aspirateInPlaceHelper({
+          pipetteId: 'p300SingleId',
+          volume,
+          flowRate: 2.1,
+        }),
+        ...dispenseInPlaceHelper({
+          pipetteId: 'p300SingleId',
+          volume,
+          flowRate: 2.2,
+        }),
         touchTipHelper(well),
       ])
     )
@@ -174,7 +364,7 @@ describe('mix: advanced options', () => {
       volume,
       times,
       changeTip: 'always',
-      blowoutLocation: blowoutLabwareId,
+      blowoutLocation: 'source_well',
       wells: ['A1', 'B1', 'C1'],
     } as MixArgs
 
@@ -184,14 +374,44 @@ describe('mix: advanced options', () => {
     expect(res.commands).toEqual(
       flatMap(args.wells, (well, idx) => [
         ...replaceTipCommands(idx),
-        aspirateHelper(well, volume),
-        dispenseHelper(well, volume),
+        ...(idx > 0 ? prepareAndConfigureCommands() : []),
+        ...aspirateInPlaceHelper(
+          {
+            pipetteId: 'p300SingleId',
+            volume,
+            flowRate: 2.1,
+          },
+          {
+            pipetteId: 'p300SingleId',
+            labwareId: SOURCE_LABWARE,
+            wellName: well,
+            wellLocation: mockWellLocation.wellLocation,
+          },
 
-        aspirateHelper(well, volume),
-        dispenseHelper(well, volume),
+          true
+        ),
+        ...dispenseInPlaceHelper({
+          pipetteId: 'p300SingleId',
+          volume,
+          flowRate: 2.2,
+          pushOut: 0,
+        }),
+
+        ...aspirateInPlaceHelper({
+          pipetteId: 'p300SingleId',
+          volume,
+          flowRate: 2.1,
+        }),
+        ...dispenseInPlaceHelper({
+          pipetteId: 'p300SingleId',
+          volume,
+          flowRate: 2.2,
+        }),
         blowoutHelper(blowoutLabwareId, {
+          labwareId: 'sourcePlateId',
+          wellName: well,
           wellLocation: {
-            origin: 'bottom',
+            origin: 'top',
             offset: {
               z: BLOWOUT_OFFSET_ANY,
             },
@@ -207,9 +427,9 @@ describe('mix: advanced options', () => {
       volume,
       times,
       changeTip: 'always',
-      blowoutLocation: blowoutLabwareId,
+      blowoutLocation: 'dest_well',
       touchTip: true,
-      wells: ['A1', 'B1', 'C1'],
+      wells: ['A1'],
     } as MixArgs
 
     const result = mix(args, invariantContext, robotStateWithTip)
@@ -218,14 +438,44 @@ describe('mix: advanced options', () => {
     expect(res.commands).toEqual(
       flatMap(args.wells, (well, idx) => [
         ...replaceTipCommands(idx),
-        aspirateHelper(well, volume),
-        dispenseHelper(well, volume),
+        ...(idx > 0 ? prepareAndConfigureCommands() : []),
+        ...aspirateInPlaceHelper(
+          {
+            pipetteId: 'p300SingleId',
+            volume,
+            flowRate: 2.1,
+          },
+          {
+            pipetteId: 'p300SingleId',
+            labwareId: SOURCE_LABWARE,
+            wellName: well,
+            wellLocation: mockWellLocation.wellLocation,
+          },
 
-        aspirateHelper(well, volume),
-        dispenseHelper(well, volume),
+          true
+        ),
+        ...dispenseInPlaceHelper({
+          pipetteId: 'p300SingleId',
+          volume,
+          flowRate: 2.2,
+          pushOut: 0,
+        }),
+
+        ...aspirateInPlaceHelper({
+          pipetteId: 'p300SingleId',
+          volume,
+          flowRate: 2.1,
+        }),
+        ...dispenseInPlaceHelper({
+          pipetteId: 'p300SingleId',
+          volume,
+          flowRate: 2.2,
+        }),
         blowoutHelper(blowoutLabwareId, {
+          labwareId: 'sourcePlateId',
+          wellName: 'A1',
           wellLocation: {
-            origin: 'bottom',
+            origin: 'top',
             offset: {
               z: BLOWOUT_OFFSET_ANY,
             },
@@ -251,12 +501,40 @@ describe('mix: advanced options', () => {
     expect(res.commands).toEqual(
       flatMap(args.wells, (well, idx) => [
         ...replaceTipCommands(idx),
-        aspirateHelper(well, volume),
+        ...aspirateInPlaceHelper(
+          {
+            pipetteId: 'p300SingleId',
+            volume,
+            flowRate: 2.1,
+          },
+          {
+            pipetteId: 'p300SingleId',
+            labwareId: SOURCE_LABWARE,
+            wellName: well,
+            wellLocation: mockWellLocation.wellLocation,
+          },
+
+          true
+        ),
         delayCommand(12),
-        dispenseHelper(well, volume),
-        aspirateHelper(well, volume),
+        ...dispenseInPlaceHelper({
+          pipetteId: 'p300SingleId',
+          volume,
+          flowRate: 2.2,
+          pushOut: 0,
+        }),
+
+        ...aspirateInPlaceHelper({
+          pipetteId: 'p300SingleId',
+          volume,
+          flowRate: 2.1,
+        }),
         delayCommand(12),
-        dispenseHelper(well, volume),
+        ...dispenseInPlaceHelper({
+          pipetteId: 'p300SingleId',
+          volume,
+          flowRate: 2.2,
+        }),
       ])
     )
   })
@@ -276,28 +554,64 @@ describe('mix: advanced options', () => {
     expect(res.commands).toEqual(
       flatMap(args.wells, (well, idx) => [
         ...replaceTipCommands(idx),
-        aspirateHelper(well, volume),
-        dispenseHelper(well, volume),
+        ...aspirateInPlaceHelper(
+          {
+            pipetteId: 'p300SingleId',
+            volume,
+            flowRate: 2.1,
+          },
+          {
+            pipetteId: 'p300SingleId',
+            labwareId: SOURCE_LABWARE,
+            wellName: well,
+            wellLocation: mockWellLocation.wellLocation,
+          },
+
+          true
+        ),
+        ...dispenseInPlaceHelper({
+          pipetteId: 'p300SingleId',
+          volume,
+          flowRate: 2.2,
+          pushOut: 0,
+        }),
         delayCommand(12),
-        aspirateHelper(well, volume),
-        dispenseHelper(well, volume),
+
+        ...aspirateInPlaceHelper({
+          pipetteId: 'p300SingleId',
+          volume,
+          flowRate: 2.1,
+        }),
+        ...dispenseInPlaceHelper({
+          pipetteId: 'p300SingleId',
+          volume,
+          flowRate: 2.2,
+        }),
         delayCommand(12),
       ])
     )
   })
   describe('all advanced settings enabled', () => {
-    it('should create commands in the expected order with expected params', () => {
+    it('should create commands in the expected order with expected params with all args', () => {
       const args: MixArgs = {
         ...mixinArgs,
         touchTip: true,
         aspirateDelaySeconds: 10,
         dispenseDelaySeconds: 12,
-        blowoutLocation: blowoutLabwareId,
+        blowoutLocation: 'source_well',
         volume,
         times,
         changeTip: 'always',
         wells: ['A1', 'B1', 'C1'],
+        yOffset: 1,
+        finalPushOut: 2,
       } as MixArgs
+      const mockWellLocationCustomXY: Partial<AspDispAirgapParams> = {
+        wellLocation: {
+          origin: 'bottom',
+          offset: { x: 0, y: 1, z: 3.2 },
+        },
+      }
 
       const result = mix(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
@@ -305,17 +619,49 @@ describe('mix: advanced options', () => {
       expect(res.commands).toEqual(
         flatMap(args.wells, (well, idx) => [
           ...replaceTipCommands(idx),
-          aspirateHelper(well, volume),
+          ...(idx > 0 ? prepareAndConfigureCommands() : []),
+          ...aspirateInPlaceHelper(
+            {
+              pipetteId: 'p300SingleId',
+              volume,
+              flowRate: 2.1,
+            },
+            {
+              pipetteId: 'p300SingleId',
+              labwareId: SOURCE_LABWARE,
+              wellName: well,
+              wellLocation: mockWellLocationCustomXY.wellLocation,
+            },
+
+            true
+          ),
           delayCommand(10),
-          dispenseHelper(well, volume),
+          ...dispenseInPlaceHelper({
+            pipetteId: 'p300SingleId',
+            volume,
+            flowRate: 2.2,
+            pushOut: 0,
+          }),
           delayCommand(12),
-          aspirateHelper(well, volume),
+
+          ...aspirateInPlaceHelper({
+            pipetteId: 'p300SingleId',
+            volume,
+            flowRate: 2.1,
+          }),
           delayCommand(10),
-          dispenseHelper(well, volume),
+          ...dispenseInPlaceHelper({
+            pipetteId: 'p300SingleId',
+            volume,
+            flowRate: 2.2,
+            pushOut: 2,
+          }),
           delayCommand(12),
           blowoutHelper(blowoutLabwareId, {
+            labwareId: 'sourcePlateId',
+            wellName: well,
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
                 z: BLOWOUT_OFFSET_ANY,
               },
@@ -324,7 +670,117 @@ describe('mix: advanced options', () => {
           touchTipHelper(well),
         ])
       )
+      expect(res.python).toBe(
+        `
+mock_pipette.drop_tip()
+mock_pipette.pick_up_tip(location=mock_tip_rack_1)
+mock_pipette.mix(
+    repetitions=2,
+    volume=8,
+    location=mock_source_plate["A1"].bottom(z=3.2).move(types.Point(y=1)),
+    aspirate_flow_rate=2.1,
+    dispense_flow_rate=2.2,
+    aspirate_delay=10,
+    dispense_delay=12,
+    final_push_out=2,
+)
+mock_pipette.flow_rate.blow_out = 2.3
+mock_pipette.blow_out(mock_source_plate["A1"].top(z=3.3))
+mock_pipette.touch_tip(mock_source_plate["A1"], v_offset=-3.4)
+mock_pipette.drop_tip()
+mock_pipette.pick_up_tip(location=mock_tip_rack_1)
+mock_pipette.prepare_to_aspirate()
+mock_pipette.mix(
+    repetitions=2,
+    volume=8,
+    location=mock_source_plate["B1"].bottom(z=3.2).move(types.Point(y=1)),
+    aspirate_flow_rate=2.1,
+    dispense_flow_rate=2.2,
+    aspirate_delay=10,
+    dispense_delay=12,
+    final_push_out=2,
+)
+mock_pipette.flow_rate.blow_out = 2.3
+mock_pipette.blow_out(mock_source_plate["B1"].top(z=3.3))
+mock_pipette.touch_tip(mock_source_plate["B1"], v_offset=-3.4)
+mock_pipette.drop_tip()
+mock_pipette.pick_up_tip(location=mock_tip_rack_1)
+mock_pipette.prepare_to_aspirate()
+mock_pipette.mix(
+    repetitions=2,
+    volume=8,
+    location=mock_source_plate["C1"].bottom(z=3.2).move(types.Point(y=1)),
+    aspirate_flow_rate=2.1,
+    dispense_flow_rate=2.2,
+    aspirate_delay=10,
+    dispense_delay=12,
+    final_push_out=2,
+)
+mock_pipette.flow_rate.blow_out = 2.3
+mock_pipette.blow_out(mock_source_plate["C1"].top(z=3.3))
+mock_pipette.touch_tip(mock_source_plate["C1"], v_offset=-3.4)
+`.trim()
+      )
     })
+  })
+  it('should create python commands with mix() with touchTip and blowOut and no delay or x/y offset set', () => {
+    const args: MixArgs = {
+      ...mixinArgs,
+      touchTip: true,
+      blowoutLocation: 'dest_well',
+      volume,
+      times,
+      changeTip: 'always',
+      wells: ['A1', 'B1', 'C1'],
+      xOffset: 1,
+      yOffset: 1,
+    } as MixArgs
+
+    const result = mix(args, invariantContext, robotStateWithTip)
+    const res = getSuccessResult(result)
+
+    expect(res.python).toBe(
+      `
+mock_pipette.drop_tip()
+mock_pipette.pick_up_tip(location=mock_tip_rack_1)
+mock_pipette.mix(
+    repetitions=2,
+    volume=8,
+    location=mock_source_plate["A1"].bottom(z=3.2).move(types.Point(x=1, y=1)),
+    aspirate_flow_rate=2.1,
+    dispense_flow_rate=2.2,
+)
+mock_pipette.flow_rate.blow_out = 2.3
+mock_pipette.blow_out(mock_source_plate["A1"].top(z=3.3))
+mock_pipette.touch_tip(mock_source_plate["A1"], v_offset=-3.4)
+mock_pipette.drop_tip()
+mock_pipette.pick_up_tip(location=mock_tip_rack_1)
+mock_pipette.prepare_to_aspirate()
+mock_pipette.mix(
+    repetitions=2,
+    volume=8,
+    location=mock_source_plate["B1"].bottom(z=3.2).move(types.Point(x=1, y=1)),
+    aspirate_flow_rate=2.1,
+    dispense_flow_rate=2.2,
+)
+mock_pipette.flow_rate.blow_out = 2.3
+mock_pipette.blow_out(mock_source_plate["B1"].top(z=3.3))
+mock_pipette.touch_tip(mock_source_plate["B1"], v_offset=-3.4)
+mock_pipette.drop_tip()
+mock_pipette.pick_up_tip(location=mock_tip_rack_1)
+mock_pipette.prepare_to_aspirate()
+mock_pipette.mix(
+    repetitions=2,
+    volume=8,
+    location=mock_source_plate["C1"].bottom(z=3.2).move(types.Point(x=1, y=1)),
+    aspirate_flow_rate=2.1,
+    dispense_flow_rate=2.2,
+)
+mock_pipette.flow_rate.blow_out = 2.3
+mock_pipette.blow_out(mock_source_plate["C1"].top(z=3.3))
+mock_pipette.touch_tip(mock_source_plate["C1"], v_offset=-3.4)
+`.trim()
+    )
   })
 })
 
@@ -368,4 +824,86 @@ describe('mix: errors', () => {
   // TODO Ian 2018-05-08
   it.todo('"times" arg non-integer')
   it.todo('"times" arg negative')
+})
+
+describe('mix: return tip', () => {
+  let args: MixArgs
+  beforeEach(() => {
+    args = {
+      ...mixinArgs,
+      volume: 8,
+      times: 2,
+      dropTipLocation: 'fixture/fixture_tiprack_300_ul/1',
+      wells: ['A1', 'B1', 'C1'],
+      changeTip: 'always',
+    } as MixArgs
+  })
+  it('should return tip if changeTip is always', () => {
+    args.dropTipLocation = 'fixture/fixture_tiprack_300_ul/1'
+    args.wells = ['A1', 'B1', 'C1']
+    args.changeTip = 'always'
+    const result = mix(args, invariantContext, robotStateWithTip)
+    expect(getSuccessResult(result).python).toBe(
+      `mock_pipette.drop_tip()
+mock_pipette.pick_up_tip(location=mock_tip_rack_1)
+mock_pipette.mix(
+    repetitions=2,
+    volume=8,
+    location=mock_source_plate["A1"].bottom(z=3.2),
+    aspirate_flow_rate=2.1,
+    dispense_flow_rate=2.2,
+)
+mock_pipette.drop_tip(location=mock_tip_rack_1["A1"])
+mock_pipette.pick_up_tip(location=mock_tip_rack_1)
+mock_pipette.mix(
+    repetitions=2,
+    volume=8,
+    location=mock_source_plate["B1"].bottom(z=3.2),
+    aspirate_flow_rate=2.1,
+    dispense_flow_rate=2.2,
+)
+mock_pipette.drop_tip(location=mock_tip_rack_1["B1"])
+mock_pipette.pick_up_tip(location=mock_tip_rack_1)
+mock_pipette.mix(
+    repetitions=2,
+    volume=8,
+    location=mock_source_plate["C1"].bottom(z=3.2),
+    aspirate_flow_rate=2.1,
+    dispense_flow_rate=2.2,
+)
+mock_pipette.drop_tip(location=mock_tip_rack_1["C1"])`
+    )
+  })
+  it('should return tip if changeTip is once', () => {
+    args.dropTipLocation = 'fixture/fixture_tiprack_300_ul/1'
+    args.wells = ['A1', 'B1', 'C1']
+    args.changeTip = 'once'
+    const result = mix(args, invariantContext, robotStateWithTip)
+    expect(getSuccessResult(result).python).toBe(
+      `mock_pipette.drop_tip()
+mock_pipette.pick_up_tip(location=mock_tip_rack_1)
+mock_pipette.mix(
+    repetitions=2,
+    volume=8,
+    location=mock_source_plate["A1"].bottom(z=3.2),
+    aspirate_flow_rate=2.1,
+    dispense_flow_rate=2.2,
+)
+mock_pipette.mix(
+    repetitions=2,
+    volume=8,
+    location=mock_source_plate["B1"].bottom(z=3.2),
+    aspirate_flow_rate=2.1,
+    dispense_flow_rate=2.2,
+)
+mock_pipette.mix(
+    repetitions=2,
+    volume=8,
+    location=mock_source_plate["C1"].bottom(z=3.2),
+    aspirate_flow_rate=2.1,
+    dispense_flow_rate=2.2,
+)
+mock_pipette.drop_tip(location=mock_tip_rack_1["A1"])`
+    )
+  })
 })

@@ -1,15 +1,17 @@
 import type {
-  UiInitializedAction,
-  UsbRequestsAction,
   AppRestartAction,
+  CameraPhotoOpenAction,
+  CameraStreamOpenAction,
+  NotifySubscribeAction,
+  NotifyTopic,
   ReloadUiAction,
-  SendLogAction,
-  UpdateBrightnessAction,
   RobotMassStorageDeviceAdded,
   RobotMassStorageDeviceEnumerated,
   RobotMassStorageDeviceRemoved,
-  NotifySubscribeAction,
-  NotifyTopic,
+  SendLogAction,
+  UiInitializedAction,
+  UpdateBrightnessAction,
+  UsbRequestsAction,
 } from './types'
 
 export const UI_INITIALIZED: 'shell:UI_INITIALIZED' = 'shell:UI_INITIALIZED'
@@ -30,6 +32,9 @@ export const ROBOT_MASS_STORAGE_DEVICE_ENUMERATED: 'shell:ROBOT_MASS_STORAGE_DEV
   'shell:ROBOT_MASS_STORAGE_DEVICE_ENUMERATED'
 export const NOTIFY_SUBSCRIBE: 'shell:NOTIFY_SUBSCRIBE' =
   'shell:NOTIFY_SUBSCRIBE'
+export const SEND_FILE_PATHS: 'shell:SEND_FILE_PATHS' = 'shell:SEND_FILE_PATHS'
+export const CAMERA_STREAM_OPEN = 'shell:CAMERA_STREAM_OPEN' as const
+export const CAMERA_PHOTO_OPEN = 'shell:CAMERA_PHOTO_OPEN' as const
 
 export const uiInitialized = (): UiInitializedAction => ({
   type: UI_INITIALIZED,
@@ -119,5 +124,22 @@ export const notifySubscribeAction = (
     hostname,
     topic,
   },
+  meta: { shell: true },
+})
+
+export const cameraStreamOpenAction = (
+  hostname: string,
+  robotName: string
+): CameraStreamOpenAction => ({
+  type: CAMERA_STREAM_OPEN,
+  payload: { hostname, robotName },
+  meta: { shell: true },
+})
+
+export const cameraPhotoOpenAction = (
+  payload: CameraPhotoOpenAction['payload']
+): CameraPhotoOpenAction => ({
+  type: CAMERA_PHOTO_OPEN,
+  payload,
   meta: { shell: true },
 })

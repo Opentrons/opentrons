@@ -5,12 +5,11 @@ from typing_extensions import Literal
 from typing import Optional, TypeVar, Union, Generic, Dict, List
 from datetime import datetime
 from pydantic import BaseModel, Field
-from pydantic.generics import GenericModel
 
 
 from opentrons.calibration_storage.types import SourceType
 from opentrons.protocol_engine.types import Vec3f
-from opentrons_shared_data.pipette.dev_types import (
+from opentrons_shared_data.pipette.types import (
     PipetteName,
     PipetteModel,
     ChannelCount,
@@ -41,7 +40,7 @@ class InconsistentCalibrationFailure(BaseModel):
     limit: float
 
 
-class _GenericInstrument(GenericModel, Generic[InstrumentModelT, InstrumentDataT]):
+class _GenericInstrument(BaseModel, Generic[InstrumentModelT, InstrumentDataT]):
     """Base instrument response."""
 
     mount: str = Field(..., description="The mount this instrument is attached to.")
@@ -51,14 +50,15 @@ class _GenericInstrument(GenericModel, Generic[InstrumentModelT, InstrumentDataT
     instrumentModel: InstrumentModelT = Field(..., description="Instrument model.")
     serialNumber: str = Field(..., description="Instrument hardware serial number.")
     subsystem: Optional[SubSystem] = Field(
-        None,
+        default=None,
         description="The subsystem corresponding to this instrument.",
     )
     ok: Literal[True] = Field(
         ..., description="Whether this instrument is OK and ready to go"
     )
     firmwareVersion: Optional[str] = Field(
-        None, description="The firmware version of this instrument (if applicable)"
+        default=None,
+        description="The firmware version of this instrument (if applicable)",
     )
     data: InstrumentDataT
 
@@ -76,10 +76,8 @@ class GripperData(BaseModel):
     """Data from attached gripper."""
 
     jawState: str = Field(..., description="Gripper Jaw state.")
-    # TODO (spp, 2023-01-03): update calibration field as decided after
-    #  spike https://opentrons.atlassian.net/browse/RSS-167
     calibratedOffset: Optional[InstrumentCalibrationData] = Field(
-        None, description="Calibrated gripper offset."
+        default=None, description="Calibrated gripper offset."
     )
 
 
@@ -90,11 +88,8 @@ class PipetteData(BaseModel):
     min_volume: float = Field(..., description="Minimum pipette volume.")
     max_volume: float = Field(..., description="Maximum pipette volume.")
     calibratedOffset: Optional[InstrumentCalibrationData] = Field(
-        None, description="Calibrated pipette offset."
+        default=None, description="Calibrated pipette offset."
     )
-
-    # TODO (spp, 2022-12-20): update/ add fields according to client needs.
-    #  add calibration data as decided by https://opentrons.atlassian.net/browse/RSS-167
 
 
 class PipetteState(BaseModel):
@@ -114,7 +109,7 @@ class Pipette(_GenericInstrument[PipetteModel, PipetteData]):
     instrumentName: PipetteName
     instrumentModel: PipetteModel
     data: PipetteData
-    state: Optional[PipetteState]
+    state: Optional[PipetteState] = None
 
 
 class Gripper(_GenericInstrument[GripperModelStr, GripperData]):

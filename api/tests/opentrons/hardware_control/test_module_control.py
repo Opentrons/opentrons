@@ -1,11 +1,12 @@
 """Tests for opentrons.hardware_control.module_control."""
+
 import pytest
 from decoy import Decoy, matchers
 from typing import Awaitable, Callable, cast, Union, List
 
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.rpi_drivers.interfaces import USBDriverInterface
-from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control import API as HardwareAPI, types
 from opentrons.hardware_control.modules import AbstractModule
 from opentrons.hardware_control.modules.types import (
     ModuleAtPort,
@@ -45,12 +46,20 @@ def build_module(decoy: Decoy) -> Callable[..., Awaitable[AbstractModule]]:
 
 
 @pytest.fixture()
+def event_callback(decoy: Decoy) -> Callable[[types.HardwareEvent], None]:
+    return decoy.mock(name="event_callback")  # type: ignore[no-any-return]
+
+
+@pytest.fixture()
 def subject(
     hardware_api: HardwareAPI,
     usb_bus: USBDriverInterface,
     build_module: Callable[..., Awaitable[AbstractModule]],
+    event_callback: Callable[[types.HardwareEvent], None],
 ) -> AttachedModulesControl:
-    modules_control = AttachedModulesControl(api=hardware_api, usb=usb_bus)
+    modules_control = AttachedModulesControl(
+        api=hardware_api, usb=usb_bus, event_callback=event_callback
+    )
 
     # TODO(mc, 2022-03-01): partial patching the class under test creates
     # a contaminated test subject that reduces the value of these tests
@@ -66,7 +75,10 @@ def subject(
         (
             [
                 SimulatingModuleAtPort(
-                    port="/dev/foo", name="bar", serial_number="test-123"
+                    port="/dev/foo",
+                    name="bar",
+                    serial_number="test-123",
+                    model="mymodel",
                 )
             ]
         ),
@@ -101,6 +113,7 @@ async def test_register_modules(
             usb_port=USBPort(name="baz", port_number=0),
             type=ModuleType.TEMPERATURE,
             sim_serial_number=None,
+            sim_model=None,
         )
     ).then_return(module)
 
@@ -134,27 +147,34 @@ async def test_register_modules_sort(
     module_4 = decoy.mock(cls=AbstractModule)
     decoy.when(module_4.usb_port).then_return(USBPort(name="x", port_number=2))
 
+    module_5 = decoy.mock(cls=AbstractModule)
+    decoy.when(module_5.usb_port).then_return(USBPort(name="z", port_number=1))
+
     new_mods_at_ports = [ModuleAtPort(port="/dev/foo", name="bar")]
     actual_ports = [
         ModuleAtPort(port="/dev/a", name="magdeck", usb_port=module_1.usb_port),
         ModuleAtPort(port="/dev/b", name="tempdeck", usb_port=module_2.usb_port),
         ModuleAtPort(port="/dev/c", name="thermocycler", usb_port=module_3.usb_port),
         ModuleAtPort(port="/dev/d", name="heatershaker", usb_port=module_4.usb_port),
+        ModuleAtPort(
+            port="/dev/d", name="absorbancereader", usb_port=module_5.usb_port
+        ),
     ]
 
     decoy.when(usb_bus.match_virtual_ports(new_mods_at_ports)).then_return(actual_ports)
 
-    for mod in [module_1, module_2, module_3, module_4]:
+    for mod in [module_1, module_2, module_3, module_4, module_5]:
         decoy.when(
             await build_module(
                 usb_port=mod.usb_port,
                 port=matchers.Anything(),
                 type=matchers.Anything(),
                 sim_serial_number=None,
+                sim_model=None,
             )
         ).then_return(mod)
 
     await subject.register_modules(new_mods_at_ports=new_mods_at_ports)
     result = subject.available_modules
 
-    assert result == [module_4, module_3, module_2, module_1]
+    assert result == [module_5, module_4, module_3, module_2, module_1]

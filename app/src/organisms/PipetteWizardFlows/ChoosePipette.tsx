@@ -1,49 +1,55 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
-import { useSelector } from 'react-redux'
-import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import startCase from 'lodash/startCase'
+import { css } from 'styled-components'
+
 import {
+  ALIGN_CENTER,
+  ALIGN_FLEX_END,
   BORDERS,
   COLORS,
+  CURSOR_POINTER,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
   Flex,
+  JUSTIFY_CENTER,
+  JUSTIFY_FLEX_END,
+  JUSTIFY_FLEX_START,
+  JUSTIFY_SPACE_AROUND,
+  JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
+  ModalShell,
+  POSITION_ABSOLUTE,
+  PrimaryButton,
+  RESPONSIVENESS,
   SPACING,
   TYPOGRAPHY,
-  DIRECTION_COLUMN,
-  JUSTIFY_CENTER,
-  POSITION_ABSOLUTE,
-  JUSTIFY_FLEX_END,
-  JUSTIFY_SPACE_BETWEEN,
-  RESPONSIVENESS,
-  DIRECTION_ROW,
-  JUSTIFY_FLEX_START,
-  PrimaryButton,
-  ALIGN_FLEX_END,
-  ALIGN_CENTER,
-  JUSTIFY_SPACE_AROUND,
+  WizardHeader,
 } from '@opentrons/components'
 import {
   EIGHT_CHANNEL,
+  LEFT,
   NINETY_SIX_CHANNEL,
   RIGHT,
-  LEFT,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import { i18n } from '../../i18n'
-import { getIsOnDevice } from '../../redux/config'
-import { StyledText } from '../../atoms/text'
-import { getTopPortalEl } from '../../App/portal'
-import { SmallButton } from '../../atoms/buttons'
-import { LegacyModalShell } from '../../molecules/LegacyModal'
-import { WizardHeader } from '../../molecules/WizardHeader'
-import singleChannelAndEightChannel from '../../assets/images/change-pip/1_and_8_channel.png'
-import ninetySixChannel from '../../assets/images/change-pip/ninety-six-channel.png'
-import { useAttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
-import { ExitModal } from './ExitModal'
+
+import { getTopPortalEl } from '/app/App/portal'
+import singleChannelAndEightChannel from '/app/assets/images/change-pip/1_and_8_channel.png'
+import ninetySixChannel from '/app/assets/images/change-pip/ninety-six-channel.png'
+import { SmallButton } from '/app/atoms/buttons'
+import { i18n } from '/app/i18n'
+import { ModalContentOneColSimpleButtons } from '/app/molecules/InterventionModal'
+import { getIsOnDevice } from '/app/redux/config'
+import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
+
 import { FLOWS } from './constants'
+import { ExitModal } from './ExitModal'
 import { getIsGantryEmpty } from './utils'
 
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { StyleProps } from '@opentrons/components'
 import type { PipetteMount } from '@opentrons/shared-data'
 import type { SelectablePipettes } from './types'
@@ -54,7 +60,7 @@ const UNSELECTED_OPTIONS_STYLE = css`
   border-radius: ${BORDERS.borderRadius8};
   height: 14.5625rem;
   width: 14.5625rem;
-  cursor: pointer;
+  cursor: ${CURSOR_POINTER};
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
@@ -80,6 +86,7 @@ const UNSELECTED_OPTIONS_STYLE = css`
     }
   }
 `
+
 const SELECTED_OPTIONS_STYLE = css`
   ${UNSELECTED_OPTIONS_STYLE}
   border: 1px solid ${COLORS.blue50};
@@ -105,7 +112,7 @@ const SELECTED_OPTIONS_STYLE = css`
 interface ChoosePipetteProps {
   proceed: () => void
   selectedPipette: SelectablePipettes
-  setSelectedPipette: React.Dispatch<React.SetStateAction<SelectablePipettes>>
+  setSelectedPipette: Dispatch<SetStateAction<SelectablePipettes>>
   exit: () => void
   mount: PipetteMount
 }
@@ -114,10 +121,9 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
   const attachedPipettesByMount = useAttachedPipettesFromInstrumentsQuery()
-  const [
-    showExitConfirmation,
-    setShowExitConfirmation,
-  ] = React.useState<boolean>(false)
+  const [showExitConfirmation, setShowExitConfirmation] = useState<boolean>(
+    false
+  )
 
   const bothMounts = getIsGantryEmpty(attachedPipettesByMount)
     ? t('ninety_six_channel', {
@@ -135,66 +141,61 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
   })
   const wizardHeader = (
     <WizardHeader
-      title={startCase(t('attach_pipette', { mount: mount }))}
+      title={startCase(t('attach_pipette', { mount }) as string)}
       currentStep={0}
       totalSteps={3}
-      onExit={showExitConfirmation ? exit : () => setShowExitConfirmation(true)}
+      onExit={
+        showExitConfirmation
+          ? exit
+          : () => {
+              setShowExitConfirmation(true)
+            }
+      }
     />
   )
   return createPortal(
     isOnDevice ? (
-      <LegacyModalShell height="100%" header={wizardHeader}>
+      <ModalShell height="100%" header={wizardHeader}>
         <Flex
           flexDirection={DIRECTION_COLUMN}
           width="100%"
+          height="472px"
           position={POSITION_ABSOLUTE}
           backgroundColor={COLORS.white}
         >
           {showExitConfirmation ? (
             <ExitModal
-              goBack={() => setShowExitConfirmation(false)}
+              goBack={() => {
+                setShowExitConfirmation(false)
+              }}
               proceed={exit}
               flowType={FLOWS.ATTACH}
               isOnDevice={isOnDevice}
             />
           ) : (
             <Flex
+              margin={SPACING.spacing32}
               flexDirection={DIRECTION_COLUMN}
-              padding={SPACING.spacing32}
+              height="100%"
               justifyContent={JUSTIFY_SPACE_BETWEEN}
-              height="29.5rem"
             >
-              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-                <StyledText
-                  as="h4"
-                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  marginBottom={SPACING.spacing4}
-                >
-                  {t('choose_pipette')}
-                </StyledText>
-                <PipetteMountOption
-                  isSelected={selectedPipette === SINGLE_MOUNT_PIPETTES}
-                  onClick={() => setSelectedPipette(SINGLE_MOUNT_PIPETTES)}
-                >
-                  <StyledText
-                    as="h4"
-                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  >
-                    {singleMount}
-                  </StyledText>
-                </PipetteMountOption>
-                <PipetteMountOption
-                  isSelected={selectedPipette === NINETY_SIX_CHANNEL}
-                  onClick={() => setSelectedPipette(NINETY_SIX_CHANNEL)}
-                >
-                  <StyledText
-                    as="h4"
-                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  >
-                    {bothMounts}
-                  </StyledText>
-                </PipetteMountOption>
-              </Flex>
+              <ModalContentOneColSimpleButtons
+                headline={t('choose_pipette')}
+                buttons={[
+                  {
+                    label: singleMount,
+                    value: SINGLE_MOUNT_PIPETTES,
+                  },
+                  {
+                    label: bothMounts,
+                    value: NINETY_SIX_CHANNEL,
+                  },
+                ]}
+                onSelect={event => {
+                  setSelectedPipette(event.target.value as SelectablePipettes)
+                }}
+                initialSelected={selectedPipette}
+              />
               <Flex justifyContent={JUSTIFY_FLEX_END}>
                 <SmallButton
                   onClick={proceed}
@@ -205,12 +206,14 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
             </Flex>
           )}
         </Flex>
-      </LegacyModalShell>
+      </ModalShell>
     ) : (
-      <LegacyModalShell width="47rem" height="30rem" header={wizardHeader}>
+      <ModalShell width="47rem" height="min-content" header={wizardHeader}>
         {showExitConfirmation ? (
           <ExitModal
-            goBack={() => setShowExitConfirmation(false)}
+            goBack={() => {
+              setShowExitConfirmation(false)
+            }}
             proceed={exit}
             flowType={FLOWS.ATTACH}
             isOnDevice={isOnDevice}
@@ -218,50 +221,54 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
         ) : (
           <Flex
             flexDirection={DIRECTION_COLUMN}
-            padding={SPACING.spacing40}
+            padding={SPACING.spacing32}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <StyledText as="h1">{t('choose_pipette')}</StyledText>
+              <LegacyStyledText as="h1">{t('choose_pipette')}</LegacyStyledText>
               <Flex
                 margin={SPACING.spacing40}
                 justifyContent={JUSTIFY_SPACE_AROUND}
               >
                 <PipetteMountOption
                   isSelected={selectedPipette === SINGLE_MOUNT_PIPETTES}
-                  onClick={() => setSelectedPipette(SINGLE_MOUNT_PIPETTES)}
+                  onClick={() => {
+                    setSelectedPipette(SINGLE_MOUNT_PIPETTES)
+                  }}
                 >
                   <img
                     src={singleChannelAndEightChannel}
-                    width="138.78px"
-                    height="160px"
+                    width="168px"
+                    height="150.99px"
                     alt={singleMount}
                   />
-                  <StyledText
+                  <LegacyStyledText
                     as="h3"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     textAlign={TYPOGRAPHY.textAlignCenter}
                   >
                     {singleMount}
-                  </StyledText>
+                  </LegacyStyledText>
                 </PipetteMountOption>
                 <PipetteMountOption
                   isSelected={selectedPipette === NINETY_SIX_CHANNEL}
-                  onClick={() => setSelectedPipette(NINETY_SIX_CHANNEL)}
+                  onClick={() => {
+                    setSelectedPipette(NINETY_SIX_CHANNEL)
+                  }}
                 >
                   <img
                     src={ninetySixChannel}
-                    width="138.78px"
-                    height="160px"
+                    width="168px"
+                    height="151.2px"
                     alt={bothMounts}
                   />
-                  <StyledText
+                  <LegacyStyledText
                     as="h3"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     textAlign={TYPOGRAPHY.textAlignCenter}
                   >
                     {bothMounts}
-                  </StyledText>
+                  </LegacyStyledText>
                 </PipetteMountOption>
               </Flex>
             </Flex>
@@ -270,7 +277,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
             </PrimaryButton>
           </Flex>
         )}
-      </LegacyModalShell>
+      </ModalShell>
     ),
     getTopPortalEl()
   )
@@ -279,7 +286,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
 interface PipetteMountOptionProps extends StyleProps {
   isSelected: boolean
   onClick: () => void
-  children: React.ReactNode
+  children: ReactNode
 }
 function PipetteMountOption(props: PipetteMountOptionProps): JSX.Element {
   const { isSelected, onClick, children, ...styleProps } = props

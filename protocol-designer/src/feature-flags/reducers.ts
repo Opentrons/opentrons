@@ -1,11 +1,16 @@
-import omit from 'lodash/omit'
 import mapValues from 'lodash/mapValues'
-import { Reducer, combineReducers } from 'redux'
+import omit from 'lodash/omit'
+import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
-import { Flags, FlagTypes, userFacingFlags, DEPRECATED_FLAGS } from './types'
-import { RehydratePersistedAction } from '../persist'
-import { SetFeatureFlagAction } from './actions'
-import { Action } from '../types'
+
+import { DEPRECATED_FLAGS, userFacingFlags } from './types'
+
+import type { Reducer } from 'redux'
+import type { RehydratePersistedAction } from '../persist'
+import type { Action } from '../types'
+import type { SetFeatureFlagAction } from './actions'
+import type { Flags, FlagTypes } from './types'
+
 // NOTE: these values will always be overridden by persisted values,
 // whenever the browser has seen the feature flag before and persisted it.
 // Only "never before seen" flags will take on the default values from `initialFlags`.
@@ -15,13 +20,34 @@ import { Action } from '../types'
 // initial values. Eg `OT_PD_PRERELEASE_MODE=1 make -C protocol-designer dev`
 // will initialize PRERELEASE_MODE to true (but as per the note above, that
 // initial value is only relevant if there is no persisted value already)
+//
+// If you add/remove an environment variable here, also update vite.config.mts.
 const initialFlags: Flags = {
-  PRERELEASE_MODE: process.env.OT_PD_PRERELEASE_MODE === '1' || false,
+  PRERELEASE_MODE: _FF_ENV_VARS_.OT_PD_PRERELEASE_MODE === '1' || false,
   OT_PD_DISABLE_MODULE_RESTRICTIONS:
-    process.env.OT_PD_DISABLE_MODULE_RESTRICTIONS === '1' || false,
+    _FF_ENV_VARS_.OT_PD_DISABLE_MODULE_RESTRICTIONS === '1' || false,
   OT_PD_ALLOW_ALL_TIPRACKS:
-    process.env.OT_PD_ALLOW_ALL_TIPRACKS === '1' || false,
-  OT_PD_ENABLE_MULTI_TIP: process.env.OT_PD_ENABLE_MULTI_TIP === '1' || false,
+    _FF_ENV_VARS_.OT_PD_ALLOW_ALL_TIPRACKS === '1' || false,
+  OT_PD_ENABLE_COMMENT: _FF_ENV_VARS_.OT_PD_ENABLE_COMMENT === '1' || false,
+  OT_PD_ENABLE_TIP_PICKUP_LOCATION:
+    _FF_ENV_VARS_.OT_PD_ENABLE_TIP_PICKUP_LOCATION === '1' || false,
+  OT_PD_ENABLE_HOT_KEYS_DISPLAY:
+    _FF_ENV_VARS_.OT_PD_ENABLE_HOT_KEYS_DISPLAY === '1' || true,
+  OT_PD_ENABLE_REACT_SCAN:
+    _FF_ENV_VARS_.OT_PD_ENABLE_REACT_SCAN === '1' || false,
+  OT_PD_ENABLE_MULTIPLE_TEMPS_OT2:
+    _FF_ENV_VARS_.OT_PD_ENABLE_MULTIPLE_TEMPS_OT_ === '1' || false,
+  OT_PD_ENABLE_TIMELINE_SCRUBBER:
+    _FF_ENV_VARS_.OT_PD_ENABLE_TIMELINE_SCRUBBER === '1' || false,
+  OT_PD_ENABLE_PARTIAL_TIP_SUPPORT:
+    _FF_ENV_VARS_.OT_PD_ENABLE_PARTIAL_TIP_SUPPORT === '1' || false,
+  OT_PD_ENABLE_STACKING: _FF_ENV_VARS_.OT_PD_ENABLE_STACKING === '1' || false,
+  OT_PD_ENABLE_CONCURRENT_MODULE_ACTIONS:
+    _FF_ENV_VARS_.OT_PD_ENABLE_CONCURRENT_MODULE_ACTIONS === '1' || false,
+  OT_PD_ENABLE_JSON_EXPORT:
+    _FF_ENV_VARS_.OT_PD_ENABLE_JSON_EXPORT === '1' || false,
+  OT_PD_ENABLE_BY_VOLUME_BUILDER:
+    _FF_ENV_VARS_.OT_PD_ENABLE_BY_VOLUME_BUILDER === '1' || false,
 }
 // @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
 // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081

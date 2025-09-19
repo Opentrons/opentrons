@@ -1,33 +1,27 @@
-import { combineReducers, Reducer } from 'redux'
-import { handleActions } from 'redux-actions'
 import pickBy from 'lodash/pickBy'
 import uniq from 'lodash/uniq'
-import { Action } from '../types'
-import { AddHintAction, RemoveHintAction } from './actions'
-import { NavigateToPageAction } from '../navigation/actions'
+import { combineReducers } from 'redux'
+import { handleActions } from 'redux-actions'
+
+import type { Reducer } from 'redux'
 import type { RehydratePersistedAction } from '../persist'
+import type { Action } from '../types'
+import type { AddHintAction, RemoveHintAction } from './actions'
 import type { HintKey } from './index'
+
 type HintReducerState = HintKey[]
-// @ts-expect-error(sa, 2021-6-21): cannot use string literals as action type
-// TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
-const hints = handleActions(
+
+const hints = handleActions<HintReducerState, AddHintAction>(
   {
+    //  @ts-expect-error
     ADD_HINT: (
       state: HintReducerState,
       action: AddHintAction
     ): HintReducerState => uniq([...state, action.payload.hintKey]),
-    // going to the steplist page triggers 'deck_setup_explanation' hint
-    NAVIGATE_TO_PAGE: (
-      state: HintReducerState,
-      action: NavigateToPageAction
-    ): HintReducerState =>
-      action.payload === 'steplist'
-        ? uniq([...state, 'deck_setup_explanation'])
-        : state,
   },
   []
-)
-type DismissedHintReducerState = Record<
+) as Reducer<HintReducerState, Action>
+export type DismissedHintReducerState = Record<
   HintKey,
   {
     rememberDismissal: boolean

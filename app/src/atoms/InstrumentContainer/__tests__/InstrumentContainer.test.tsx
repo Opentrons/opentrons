@@ -1,15 +1,18 @@
-import * as React from 'react'
-import { describe, it } from 'vitest'
 import { screen } from '@testing-library/react'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { describe, it } from 'vitest'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+
 import { InstrumentContainer } from '..'
 
-const render = (props: React.ComponentProps<typeof InstrumentContainer>) => {
+import type { ComponentProps } from 'react'
+
+const render = (props: ComponentProps<typeof InstrumentContainer>) => {
   return renderWithProviders(<InstrumentContainer {...props} />)[0]
 }
 
 describe('InstrumentContainer', () => {
-  let props: React.ComponentProps<typeof InstrumentContainer>
+  let props: ComponentProps<typeof InstrumentContainer>
 
   it('renders an instrument display name', () => {
     props = {

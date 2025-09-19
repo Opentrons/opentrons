@@ -1,0 +1,29 @@
+{
+  "$otSharedSchema": "gripper/schemas/1",
+  "model": "gripperV1.3",
+  "schemaVersion": 1,
+  "displayName": "Flex Gripper",
+  "gripForceProfile": {
+    "polynomial": [
+      [0, 3.759869],
+      [1, 0.81005],
+      [2, 0.04597701]
+    ],
+    "defaultGripForce": 15.0,
+    "defaultIdleForce": 10.0,
+    "defaultHomeForce": 12.0,
+    "min": 2.0,
+    "max": 30.0
+  },
+  "geometry": {
+    "baseOffsetFromMount": [19.5, -74.325, -94.825],
+    "jawCenterOffsetFromBase": [0.0, 0.0, -86.475],
+    "pinOneOffsetFromBase": [6.0, -54.0, -98.475],
+    "pinTwoOffsetFromBase": [6.0, 54.0, -98.475],
+    "jawWidth": {
+      "min": 60.0,
+      "max": 92.0
+    },
+    "maxAllowedGripError": 3.0
+  }
+}

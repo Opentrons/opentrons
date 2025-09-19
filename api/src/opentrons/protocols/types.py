@@ -1,13 +1,13 @@
 from typing import Any, Dict, NamedTuple, Optional, Union, TYPE_CHECKING
 from dataclasses import dataclass
 
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 from .api_support.definitions import MIN_SUPPORTED_VERSION
 from .api_support.types import APIVersion
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.labware.dev_types import LabwareDefinition
-    from opentrons_shared_data.protocol.dev_types import (
+    from opentrons_shared_data.labware.types import LabwareDefinition
+    from opentrons_shared_data.protocol.types import (
         JsonProtocol as JsonProtocolDef,
         Metadata as JsonProtocolMetadata,
     )

@@ -1,23 +1,27 @@
-import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import '@testing-library/jest-dom/vitest'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
 
-import { i18n } from '../../../i18n'
-import { getIsOnDevice } from '../../../redux/config'
+import '@testing-library/jest-dom/vitest'
+
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { getIsOnDevice } from '/app/redux/config'
+
 import { EstopMissingModal } from '../EstopMissingModal'
 
-vi.mock('../../../redux/config')
+import type { ComponentProps } from 'react'
 
-const render = (props: React.ComponentProps<typeof EstopMissingModal>) => {
+vi.mock('/app/redux/config')
+
+const render = (props: ComponentProps<typeof EstopMissingModal>) => {
   return renderWithProviders(<EstopMissingModal {...props} />, {
     i18nInstance: i18n,
   })
 }
 
 describe('EstopMissingModal - Touchscreen', () => {
-  let props: React.ComponentProps<typeof EstopMissingModal>
+  let props: ComponentProps<typeof EstopMissingModal>
 
   beforeEach(() => {
     props = {
@@ -40,7 +44,7 @@ describe('EstopMissingModal - Touchscreen', () => {
 })
 
 describe('EstopMissingModal - Desktop', () => {
-  let props: React.ComponentProps<typeof EstopMissingModal>
+  let props: ComponentProps<typeof EstopMissingModal>
 
   beforeEach(() => {
     props = {

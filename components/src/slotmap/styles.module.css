@@ -1,8 +1,8 @@
 @import '../index.module.css';
 
 .slot_rect {
-  stroke: var(--c-med-gray);
   fill: none;
+  stroke: var(--c-med-gray);
 }
 
 .slot_occupied {

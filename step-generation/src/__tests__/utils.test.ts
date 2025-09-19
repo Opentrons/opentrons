@@ -1,24 +1,34 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { beforeEach, describe, it, expect, vi } from 'vitest'
+
 import {
-  getLabwareDefURI,
-  TEMPERATURE_MODULE_TYPE,
-  TEMPERATURE_MODULE_V1,
-  THERMOCYCLER_MODULE_TYPE,
-  LabwareDefinition2,
-  getIsLabwareAboveHeight,
-  MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
-  HEATERSHAKER_MODULE_TYPE,
-  PipetteNameSpecs,
-  fixtureTrash as _fixtureTrash,
   fixture96Plate as _fixture96Plate,
   fixtureTiprack10ul as _fixtureTiprack10ul,
   fixtureTiprack300ul as _fixtureTiprack300ul,
-  fixtureP10Single,
-  fixtureP300Multi,
-  pipetteNameSpecFixtures,
+  fixtureTrash as _fixtureTrash,
+  fixtureP10SingleV2Specs,
+  fixtureP300MultiV2Specs,
+  getIsLabwareAboveHeight,
+  getLabwareDefURI,
+  HEATERSHAKER_MODULE_TYPE,
+  MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
+  OT2_ROBOT_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+  TEMPERATURE_MODULE_V1,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import * as SharedData from '@opentrons/shared-data'
+
 import { FIXED_TRASH_ID, TEMPERATURE_DEACTIVATED } from '../constants'
+import { DEFAULT_CONFIG } from '../fixtures'
+import {
+  getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerEastWestWithLatchOpen,
+  getIsTallLabwareEastWestOfHeaterShaker,
+  pipetteAdjacentHeaterShakerWhileShaking,
+  thermocyclerPipetteCollision,
+} from '../utils'
+import { getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette } from '../utils/heaterShakerCollision'
 import {
   AIR,
   DEST_WELL_BLOWOUT_DESTINATION,
@@ -30,15 +40,9 @@ import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   splitLiquid,
 } from '../utils/misc'
-import { Diff, thermocyclerStateDiff } from '../utils/thermocyclerStateDiff'
-import { DEFAULT_CONFIG } from '../fixtures'
-import {
-  getIsHeaterShakerEastWestWithLatchOpen,
-  getIsHeaterShakerEastWestMultiChannelPipette,
-  getIsTallLabwareEastWestOfHeaterShaker,
-  pipetteAdjacentHeaterShakerWhileShaking,
-  thermocyclerPipetteCollision,
-} from '../utils'
+import { thermocyclerStateDiff } from '../utils/thermocyclerStateDiff'
+
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { RobotState } from '../'
 import type {
   LabwareEntities,
@@ -46,8 +50,7 @@ import type {
   ThermocyclerModuleState,
   ThermocyclerStateStepArgs,
 } from '../types'
-import { getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette } from '../utils/heaterShakerCollision'
-import * as SharedData from '@opentrons/shared-data'
+import type { Diff } from '../utils/thermocyclerStateDiff'
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actualSharedData = await importOriginal<typeof SharedData>()
@@ -275,16 +278,18 @@ describe('makeInitialRobotState', () => {
             p10SingleId: {
               id: 'p10SingleId',
               name: 'p10_single',
-              spec: fixtureP10Single,
-              tiprackDefURI: getLabwareDefURI(fixtureTiprack10ul),
-              tiprackLabwareDef: fixtureTiprack10ul,
+              spec: fixtureP10SingleV2Specs,
+              tiprackDefURI: [getLabwareDefURI(fixtureTiprack10ul)],
+              tiprackLabwareDef: [fixtureTiprack10ul],
+              pythonName: 'mockPythonName',
             },
             p300MultiId: {
               id: 'p300MultiId',
               name: 'p300_multi',
-              spec: fixtureP300Multi,
-              tiprackDefURI: getLabwareDefURI(fixtureTiprack300ul),
-              tiprackLabwareDef: fixtureTiprack300ul,
+              spec: fixtureP300MultiV2Specs,
+              tiprackDefURI: [getLabwareDefURI(fixtureTiprack300ul)],
+              tiprackLabwareDef: [fixtureTiprack300ul],
+              pythonName: 'mockPythonName',
             },
           },
           moduleEntities: {
@@ -292,6 +297,7 @@ describe('makeInitialRobotState', () => {
               id: 'someTempModuleId',
               model: TEMPERATURE_MODULE_V1,
               type: TEMPERATURE_MODULE_TYPE,
+              pythonName: 'mockPythonName',
             },
           },
           labwareEntities: {
@@ -299,30 +305,38 @@ describe('makeInitialRobotState', () => {
               id: 'somePlateId',
               labwareDefURI: getLabwareDefURI(fixture96Plate),
               def: fixture96Plate,
+              pythonName: 'mockPythonName',
             },
             tiprack10Id: {
               id: 'tiprack10Id',
               labwareDefURI: getLabwareDefURI(fixtureTiprack10ul),
               def: fixtureTiprack10ul,
+              pythonName: 'mockPythonName',
             },
             tiprack300Id: {
               id: 'tiprack300Id',
               labwareDefURI: getLabwareDefURI(fixtureTiprack300ul),
               def: fixtureTiprack300ul,
+              pythonName: 'mockPythonName',
             },
             fixedTrash: {
               id: FIXED_TRASH_ID,
               labwareDefURI: getLabwareDefURI(fixtureTrash),
               def: fixtureTrash,
+              pythonName: 'mockPythonName',
             },
           },
-          additionalEquipmentEntities: {},
+          wasteChuteEntities: {},
+          trashBinEntities: {},
+          stagingAreaEntities: {},
+          gripperEntities: {},
+          liquidEntities: {},
         },
         labwareLocations: {
-          somePlateId: { slot: '1' },
-          tiprack10Id: { slot: '2' },
-          tiprack300Id: { slot: '4' },
-          fixedTrash: { slot: '12' },
+          somePlateId: { stack: ['somePlateId', '1'] },
+          tiprack10Id: { stack: ['tiprack10Id', '2'] },
+          tiprack300Id: { stack: ['tiprack300Id', '4'] },
+          fixedTrash: { stack: ['fixedTrash', '12'] },
         },
         moduleLocations: {
           someTempModuleId: {
@@ -368,7 +382,7 @@ describe('thermocyclerStateDiff', () => {
         lidOpen: null,
       },
       args: {
-        module: thermocyclerId,
+        moduleId: thermocyclerId,
         commandCreatorFnName: 'thermocyclerState',
         blockTargetTemp: null,
         lidTargetTemp: null,
@@ -389,7 +403,7 @@ describe('thermocyclerStateDiff', () => {
         lidOpen: null,
       },
       args: {
-        module: thermocyclerId,
+        moduleId: thermocyclerId,
         commandCreatorFnName: 'thermocyclerState',
         blockTargetTemp: null,
         lidTargetTemp: null,
@@ -410,7 +424,7 @@ describe('thermocyclerStateDiff', () => {
         lidOpen: null,
       },
       args: {
-        module: thermocyclerId,
+        moduleId: thermocyclerId,
         commandCreatorFnName: 'thermocyclerState',
         blockTargetTemp: null,
         lidTargetTemp: null,
@@ -431,7 +445,7 @@ describe('thermocyclerStateDiff', () => {
         lidOpen: null,
       },
       args: {
-        module: thermocyclerId,
+        moduleId: thermocyclerId,
         commandCreatorFnName: 'thermocyclerState',
         blockTargetTemp: null,
         lidTargetTemp: null,
@@ -453,7 +467,7 @@ describe('thermocyclerStateDiff', () => {
         lidOpen: false,
       },
       args: {
-        module: thermocyclerId,
+        moduleId: thermocyclerId,
         commandCreatorFnName: 'thermocyclerState',
         blockTargetTemp: null,
         lidTargetTemp: 20,
@@ -474,7 +488,7 @@ describe('thermocyclerStateDiff', () => {
         lidOpen: false,
       },
       args: {
-        module: thermocyclerId,
+        moduleId: thermocyclerId,
         commandCreatorFnName: 'thermocyclerState',
         blockTargetTemp: null,
         lidTargetTemp: 30,
@@ -495,7 +509,7 @@ describe('thermocyclerStateDiff', () => {
         lidOpen: false,
       },
       args: {
-        module: thermocyclerId,
+        moduleId: thermocyclerId,
         commandCreatorFnName: 'thermocyclerState',
         blockTargetTemp: null,
         lidTargetTemp: 20,
@@ -516,7 +530,7 @@ describe('thermocyclerStateDiff', () => {
         lidOpen: false,
       },
       args: {
-        module: thermocyclerId,
+        moduleId: thermocyclerId,
         commandCreatorFnName: 'thermocyclerState',
         blockTargetTemp: null,
         lidTargetTemp: null,
@@ -537,7 +551,7 @@ describe('thermocyclerStateDiff', () => {
         lidOpen: false,
       },
       args: {
-        module: thermocyclerId,
+        moduleId: thermocyclerId,
         commandCreatorFnName: 'thermocyclerState',
         blockTargetTemp: 20,
         lidTargetTemp: null,
@@ -558,7 +572,7 @@ describe('thermocyclerStateDiff', () => {
         lidOpen: false,
       },
       args: {
-        module: thermocyclerId,
+        moduleId: thermocyclerId,
         commandCreatorFnName: 'thermocyclerState',
         blockTargetTemp: 20,
         lidTargetTemp: null,
@@ -578,7 +592,7 @@ describe('thermocyclerStateDiff', () => {
         lidOpen: false,
       },
       args: {
-        module: thermocyclerId,
+        moduleId: thermocyclerId,
         commandCreatorFnName: 'thermocyclerState',
         blockTargetTemp: 40,
         lidTargetTemp: null,
@@ -598,7 +612,7 @@ describe('thermocyclerStateDiff', () => {
         lidOpen: false,
       },
       args: {
-        module: thermocyclerId,
+        moduleId: thermocyclerId,
         commandCreatorFnName: 'thermocyclerState',
         blockTargetTemp: null,
         lidTargetTemp: null,
@@ -643,7 +657,7 @@ describe('thermocyclerPipetteColision', () => {
         },
       },
       labware: {
-        [labwareOnTCId]: { slot: thermocyclerId }, // when labware is on a module, the slot is the module's id
+        [labwareOnTCId]: { stack: [labwareOnTCId, thermocyclerId, '7'] }, // when labware is on a module, the slot is the module's id
       },
       labwareId: labwareOnTCId,
       expected: true,
@@ -663,7 +677,7 @@ describe('thermocyclerPipetteColision', () => {
         },
       },
       labware: {
-        [labwareOnTCId]: { slot: thermocyclerId }, // when labware is on a module, the slot is the module's id
+        [labwareOnTCId]: { stack: [labwareOnTCId, thermocyclerId, '7'] }, // when labware is on a module, the slot is the module's id
       },
       labwareId: labwareOnTCId,
       expected: true,
@@ -683,7 +697,7 @@ describe('thermocyclerPipetteColision', () => {
         },
       },
       labware: {
-        [labwareOnTCId]: { slot: thermocyclerId }, // when labware is on a module, the slot is the module's id
+        [labwareOnTCId]: { stack: [labwareOnTCId, thermocyclerId, '7'] }, // when labware is on a module, the slot is the module's id
       },
       labwareId: labwareOnTCId,
       expected: false,
@@ -703,7 +717,7 @@ describe('thermocyclerPipetteColision', () => {
         },
       },
       labware: {
-        [labwareOnTCId]: { slot: thermocyclerId },
+        [labwareOnTCId]: { stack: [labwareOnTCId, thermocyclerId, '7'] },
       },
       labwareId: 'someOtherLabwareNotOnTC',
       expected: false,
@@ -795,13 +809,14 @@ describe('getIsTallLabwareEastWestOfHeaterShaker', () => {
   let labwareState: RobotState['labware']
   beforeEach(() => {
     labwareState = {
-      labwareId: { slot: '2' },
+      labwareId: { stack: ['labwareId', '2'] },
     }
     labwareEntities = {
       labwareId: {
         id: 'labwareId',
         labwareDefURI: 'some_uri',
         def: fakeLabwareDef,
+        pythonName: 'mockPythonName',
       },
     }
   })
@@ -826,7 +841,7 @@ describe('getIsTallLabwareEastWestOfHeaterShaker', () => {
     ).toBe(false)
   })
   it('should return false when there is NO labware next to a heater shaker', () => {
-    labwareState.labwareId.slot = '9'
+    labwareState.labwareId.stack = ['labwareId', '9']
     when(getIsLabwareAboveHeight)
       .calledWith(
         expect.any(Object),
@@ -878,7 +893,7 @@ describe('getIsHeaterShakerEastWestWithLatchOpen', () => {
 describe('getIsHeaterShakerEastWestMultiChannelPipette', () => {
   let slot: string
   let modules: RobotState['modules']
-  let pipetteSpecs: PipetteNameSpecs
+  let pipetteSpecs: SharedData.PipetteV2Specs
   beforeEach(() => {
     slot = '2'
     modules = {
@@ -892,7 +907,7 @@ describe('getIsHeaterShakerEastWestMultiChannelPipette', () => {
         },
       },
     }
-    pipetteSpecs = pipetteNameSpecFixtures.p10_multi as PipetteNameSpecs
+    pipetteSpecs = SharedData.fixtureP10MultiV2Specs
   })
   it('should return true when there is a heater shaker east west and the pipette is a multi channel', () => {
     expect(
@@ -900,13 +915,13 @@ describe('getIsHeaterShakerEastWestMultiChannelPipette', () => {
     ).toBe(true)
   })
   it('should return false when there the pipette is not a multi channel', () => {
-    pipetteSpecs = pipetteNameSpecFixtures.p1000_single as PipetteNameSpecs
+    pipetteSpecs = SharedData.fixtureP1000SingleV2Specs
     expect(
       getIsHeaterShakerEastWestMultiChannelPipette(modules, slot, pipetteSpecs)
     ).toBe(false)
   })
   it('should return false when the HS is not next to the slot', () => {
-    pipetteSpecs = pipetteNameSpecFixtures.p1000_single as PipetteNameSpecs
+    pipetteSpecs = SharedData.fixtureP1000SingleV2Specs
     slot = '11'
     expect(
       getIsHeaterShakerEastWestMultiChannelPipette(modules, slot, pipetteSpecs)
@@ -916,7 +931,7 @@ describe('getIsHeaterShakerEastWestMultiChannelPipette', () => {
 describe('getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette', () => {
   let slot: string
   let modules: RobotState['modules']
-  let pipetteSpecs: PipetteNameSpecs
+  let pipetteSpecs: SharedData.PipetteV2Specs
   let labwareEntity: LabwareEntity
   beforeEach(() => {
     slot = '4'
@@ -931,11 +946,12 @@ describe('getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette', () =>
         },
       },
     }
-    pipetteSpecs = pipetteNameSpecFixtures.p10_multi as PipetteNameSpecs
+    pipetteSpecs = SharedData.fixtureP10MultiV2Specs
     labwareEntity = {
       id: 'fixture96PlateId',
       labwareDefURI: getLabwareDefURI(fixture96Plate),
       def: fixture96Plate,
+      pythonName: 'mockPythonName',
     }
   })
 
@@ -954,6 +970,7 @@ describe('getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette', () =>
       id: 'fixtureTiprack10ulId',
       labwareDefURI: getLabwareDefURI(fixtureTiprack10ul),
       def: fixtureTiprack10ul,
+      pythonName: 'mockPythonName',
     }
     expect(
       getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette(
@@ -997,36 +1014,50 @@ describe('pipetteAdjacentHeaterShakerWhileShaking', () => {
 
   it('should return false when there are no modules', () => {
     modules = {}
-    expect(pipetteAdjacentHeaterShakerWhileShaking(modules, slot)).toBe(false)
+    expect(
+      pipetteAdjacentHeaterShakerWhileShaking(modules, slot, OT2_ROBOT_TYPE)
+    ).toBe(false)
   })
   it('should return false when there is no heater shaker ajacent to labware', () => {
     slot = '9'
-    expect(pipetteAdjacentHeaterShakerWhileShaking(modules, slot)).toBe(false)
+    expect(
+      pipetteAdjacentHeaterShakerWhileShaking(modules, slot, OT2_ROBOT_TYPE)
+    ).toBe(false)
   })
   it('should return false when the heater shaker is not shaking', () => {
-    expect(pipetteAdjacentHeaterShakerWhileShaking(modules, slot)).toBe(false)
+    expect(
+      pipetteAdjacentHeaterShakerWhileShaking(modules, slot, OT2_ROBOT_TYPE)
+    ).toBe(false)
   })
   it('should return true when there is a heater shaker north of labware shaking', () => {
     modules.heaterShakerId.slot = '5'
     ;(modules.heaterShakerId.moduleState as any).targetSpeed = 300
-    expect(pipetteAdjacentHeaterShakerWhileShaking(modules, slot)).toBe(true)
+    expect(
+      pipetteAdjacentHeaterShakerWhileShaking(modules, slot, OT2_ROBOT_TYPE)
+    ).toBe(true)
   })
   it('should return true when there is a heater shaker south of labware shaking', () => {
     slot = '9'
     modules.heaterShakerId.slot = '6'
     ;(modules.heaterShakerId.moduleState as any).targetSpeed = 300
-    expect(pipetteAdjacentHeaterShakerWhileShaking(modules, slot)).toBe(true)
+    expect(
+      pipetteAdjacentHeaterShakerWhileShaking(modules, slot, OT2_ROBOT_TYPE)
+    ).toBe(true)
   })
   it('should return true when there is a heater shaker east of labware shaking', () => {
     slot = '5'
     modules.heaterShakerId.slot = '6'
     ;(modules.heaterShakerId.moduleState as any).targetSpeed = 300
-    expect(pipetteAdjacentHeaterShakerWhileShaking(modules, slot)).toBe(true)
+    expect(
+      pipetteAdjacentHeaterShakerWhileShaking(modules, slot, OT2_ROBOT_TYPE)
+    ).toBe(true)
   })
   it('should return true when there is a heater shaker west of labware shaking', () => {
     slot = '5'
     modules.heaterShakerId.slot = '4'
     ;(modules.heaterShakerId.moduleState as any).targetSpeed = 300
-    expect(pipetteAdjacentHeaterShakerWhileShaking(modules, slot)).toBe(true)
+    expect(
+      pipetteAdjacentHeaterShakerWhileShaking(modules, slot, OT2_ROBOT_TYPE)
+    ).toBe(true)
   })
 })

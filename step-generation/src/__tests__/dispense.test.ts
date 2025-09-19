@@ -1,37 +1,40 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { beforeEach, describe, it, expect, vi, afterEach } from 'vitest'
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
+
+import { getPipetteSpecsV2, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { dispense } from '../commandCreators/atomic/dispense'
 import {
-  thermocyclerPipetteCollision,
-  pipetteIntoHeaterShakerLatchOpen,
-  pipetteIntoHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestWithLatchOpen,
-  pipetteAdjacentHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestMultiChannelPipette,
-  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
-} from '../utils'
-import {
+  DEFAULT_PIPETTE,
+  getErrorResult,
   getInitialRobotStateStandard,
   getInitialRobotStateWithOffDeckLabwareStandard,
   getRobotStateWithTipStandard,
-  makeContext,
-  getErrorResult,
   getSuccessResult,
-  DEFAULT_PIPETTE,
+  makeContext,
   SOURCE_LABWARE,
 } from '../fixtures'
-import { dispense } from '../commandCreators/atomic/dispense'
-import { InvariantContext, RobotState } from '../types'
-import type {
-  AspDispAirgapParams as V3AspDispAirgapParams,
-  DispenseParams,
-} from '@opentrons/shared-data/protocol/types/schemaV3'
+import {
+  absorbanceReaderCollision,
+  getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerEastWestWithLatchOpen,
+  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
+  getSlotInLocationStack,
+  pipetteAdjacentHeaterShakerWhileShaking,
+  pipetteIntoHeaterShakerLatchOpen,
+  pipetteIntoHeaterShakerWhileShaking,
+  thermocyclerPipetteCollision,
+} from '../utils'
 
+import type { DispenseAtomicCommandParams } from '../commandCreators/atomic/dispense'
+import type { InvariantContext, RobotState } from '../types'
+
+vi.mock('../utils/absorbanceReaderCollision')
 vi.mock('../utils/thermocyclerPipetteCollision')
 vi.mock('../utils/heaterShakerCollision')
 
 const FLEX_PIPETTE = 'p1000_single_flex'
-const FlexPipetteNameSpecs = getPipetteNameSpecs(FLEX_PIPETTE)
+const FlexPipetteNameSpecs = getPipetteSpecsV2(FLEX_PIPETTE)
 
 describe('dispense', () => {
   let initialRobotState: RobotState
@@ -46,15 +49,19 @@ describe('dispense', () => {
     vi.resetAllMocks()
   })
   describe('tip tracking & commands:', () => {
-    let params: V3AspDispAirgapParams
+    let params: DispenseAtomicCommandParams
     beforeEach(() => {
       params = {
-        pipette: DEFAULT_PIPETTE,
+        pipetteId: DEFAULT_PIPETTE,
         volume: 50,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-        offsetFromBottomMm: 5,
+        labwareId: SOURCE_LABWARE,
+        wellName: 'A1',
+        wellLocation: {
+          origin: 'bottom',
+          offset: { z: 5, x: 0, y: 0 },
+        },
         flowRate: 6,
+        tipRack: 'tiprack1Id',
       }
     })
     it('dispense normally (with tip)', () => {
@@ -71,6 +78,8 @@ describe('dispense', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 5,
               },
             },
@@ -78,6 +87,14 @@ describe('dispense', () => {
           },
         },
       ])
+      expect(getSuccessResult(result).python).toBe(
+        `
+mock_pipette.dispense(
+    volume=50,
+    location=mock_source_plate["A1"].bottom(z=5),
+    flow_rate=6,
+)`.trimStart()
+      )
     })
     it('dispensing without tip should throw error', () => {
       const result = dispense(params, invariantContext, initialRobotState)
@@ -94,12 +111,16 @@ describe('dispense', () => {
       const result = dispense(
         {
           flowRate: 10,
-          offsetFromBottomMm: 5,
-          pipette: DEFAULT_PIPETTE,
+          wellLocation: {
+            origin: 'bottom',
+            offset: { z: 5, x: 0, y: 0 },
+          },
+          pipetteId: DEFAULT_PIPETTE,
           volume: 50,
-          labware: SOURCE_LABWARE,
-          well: 'A1',
-        } as DispenseParams,
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
+          tipRack: 'tiprack1Id',
+        },
         invariantContext,
         initialRobotState
       )
@@ -110,7 +131,7 @@ describe('dispense', () => {
     })
     it('dispense to nonexistent labware should throw error', () => {
       const result = dispense(
-        { ...params, labware: 'someBadLabwareId' },
+        { ...params, labwareId: 'someBadLabwareId' },
         invariantContext,
         robotStateWithTip
       )
@@ -124,7 +145,7 @@ describe('dispense', () => {
       robotStateWithTip = {
         ...robotStateWithTip,
         labware: {
-          [SOURCE_LABWARE]: { slot: 'A4' },
+          [SOURCE_LABWARE]: { stack: [SOURCE_LABWARE, 'A4'] },
         },
       }
       const result = dispense(params, invariantContext, robotStateWithTip)
@@ -151,6 +172,26 @@ describe('dispense', () => {
       expect(res.errors).toHaveLength(1)
       expect(res.errors[0]).toMatchObject({
         type: 'THERMOCYCLER_LID_CLOSED',
+      })
+    })
+    it('should return an error when dispensing into absorbance reader with pipette collision', () => {
+      vi.mocked(absorbanceReaderCollision).mockImplementationOnce(
+        (
+          modules: RobotState['modules'],
+          labware: RobotState['labware'],
+          labwareId: string
+        ) => {
+          expect(modules).toBe(robotStateWithTip.modules)
+          expect(labware).toBe(robotStateWithTip.labware)
+          expect(labwareId).toBe(SOURCE_LABWARE)
+          return true
+        }
+      )
+      const result = dispense(params, invariantContext, robotStateWithTip)
+      const res = getErrorResult(result)
+      expect(res.errors).toHaveLength(1)
+      expect(res.errors[0]).toMatchObject({
+        type: 'ABSORBANCE_READER_LID_CLOSED',
       })
     })
     it('should return an error when dispensing into heater shaker with latch open', () => {
@@ -249,7 +290,9 @@ describe('dispense', () => {
       when(getIsHeaterShakerEastWestWithLatchOpen)
         .calledWith(
           robotStateWithTip.modules,
-          robotStateWithTip.labware[SOURCE_LABWARE].slot
+          getSlotInLocationStack(
+            robotStateWithTip.labware[SOURCE_LABWARE].stack
+          )
         )
         .thenReturn(true)
 
@@ -263,7 +306,9 @@ describe('dispense', () => {
       when(getIsHeaterShakerEastWestMultiChannelPipette)
         .calledWith(
           robotStateWithTip.modules,
-          robotStateWithTip.labware[SOURCE_LABWARE].slot,
+          getSlotInLocationStack(
+            robotStateWithTip.labware[SOURCE_LABWARE].stack
+          ),
           expect.anything()
         )
         .thenReturn(true)
@@ -278,7 +323,10 @@ describe('dispense', () => {
       when(pipetteAdjacentHeaterShakerWhileShaking)
         .calledWith(
           robotStateWithTip.modules,
-          robotStateWithTip.labware[SOURCE_LABWARE].slot
+          getSlotInLocationStack(
+            robotStateWithTip.labware[SOURCE_LABWARE].stack
+          ),
+          OT2_ROBOT_TYPE
         )
         .thenReturn(true)
 
@@ -292,7 +340,9 @@ describe('dispense', () => {
       when(getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette)
         .calledWith(
           robotStateWithTip.modules,
-          robotStateWithTip.labware[SOURCE_LABWARE].slot,
+          getSlotInLocationStack(
+            robotStateWithTip.labware[SOURCE_LABWARE].stack
+          ),
           expect.anything(),
           expect.anything()
         )

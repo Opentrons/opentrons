@@ -1,14 +1,15 @@
 """Tests for the InstrumentContext public interface."""
+
 import inspect
 from typing import cast
 
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
+from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
 
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import APIVersionError
+from opentrons.protocols.api_support.util import APIVersionError, UnsupportedAPIError
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, Labware, Well
 from opentrons.protocol_api.core import well_grid
 from opentrons.protocol_api.core.common import (
@@ -21,8 +22,11 @@ from opentrons.protocol_api.core.common import (
 from opentrons.protocol_api.core.labware import LabwareLoadParams
 from opentrons.protocol_api.core.core_map import LoadedCoreMap
 from opentrons.protocol_api import TemperatureModuleContext
+from opentrons.protocol_api._liquid import Liquid
 
 from opentrons.types import Point
+
+from . import versions_at_or_below, versions_at_or_above, versions_between
 
 
 @pytest.fixture(autouse=True)
@@ -317,7 +321,7 @@ def test_child(
     assert subject.child == mock_labware
 
 
-@pytest.mark.parametrize("api_version", [APIVersion(2, 13)])
+@pytest.mark.parametrize("api_version", versions_at_or_below(APIVersion(2, 13)))
 def test_set_offset_succeeds_on_low_api_version(
     decoy: Decoy,
     subject: Labware,
@@ -328,8 +332,13 @@ def test_set_offset_succeeds_on_low_api_version(
     decoy.verify(mock_labware_core.set_calibration(Point(1, 2, 3)))
 
 
-@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
-def test_set_offset_raises_on_high_api_version(
+@pytest.mark.parametrize(
+    "api_version",
+    versions_between(
+        low_inclusive_bound=APIVersion(2, 14), high_inclusive_bound=APIVersion(2, 17)
+    ),
+)
+def test_set_offset_raises_on_intermediate_api_version(
     decoy: Decoy,
     subject: Labware,
     mock_labware_core: LabwareCore,
@@ -339,12 +348,336 @@ def test_set_offset_raises_on_high_api_version(
         subject.set_offset(1, 2, 3)
 
 
-@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
+@pytest.mark.parametrize("api_version", versions_at_or_above(APIVersion(2, 18)))
+def test_set_offset_succeeds_on_high_api_version(
+    decoy: Decoy, subject: Labware, mock_labware_core: LabwareCore
+) -> None:
+    """It should not raise an API version error on the most recent versions."""
+    subject.set_offset(1, 2, 3)
+    decoy.verify(mock_labware_core.set_calibration(Point(1, 2, 3)))
+
+
+@pytest.mark.parametrize("api_version", versions_at_or_above(APIVersion(2, 14)))
 def test_separate_calibration_raises_on_high_api_version(
     decoy: Decoy,
     subject: Labware,
     mock_labware_core: LabwareCore,
 ) -> None:
     """It should raise an error, on high API versions."""
-    with pytest.raises(APIVersionError):
+    with pytest.raises(UnsupportedAPIError):
         subject.separate_calibration
+
+
+@pytest.mark.parametrize("api_version", versions_at_or_above(APIVersion(2, 22)))
+def test_load_liquid_handles_valid_inputs(
+    decoy: Decoy,
+    mock_labware_core: LabwareCore,
+    api_version: APIVersion,
+    mock_protocol_core: ProtocolCore,
+    mock_map_core: LoadedCoreMap,
+) -> None:
+    """It should load volumes for list of wells."""
+    mock_well_core_1 = decoy.mock(cls=WellCore)
+    mock_well_core_2 = decoy.mock(cls=WellCore)
+    grid = well_grid.WellGrid(
+        columns_by_name={"1": ["A1", "B1"]},
+        rows_by_name={"A": ["A1"], "B": ["B1"]},
+    )
+    decoy.when(mock_well_core_1.get_name()).then_return("A1")
+    decoy.when(mock_well_core_2.get_name()).then_return("B1")
+
+    decoy.when(mock_labware_core.get_well_columns()).then_return([["A1", "B1"]])
+    decoy.when(mock_labware_core.get_well_core("A1")).then_return(mock_well_core_1)
+    decoy.when(mock_labware_core.get_well_core("B1")).then_return(mock_well_core_2)
+    decoy.when(well_grid.create([["A1", "B1"]])).then_return(grid)
+
+    subject = Labware(
+        core=mock_labware_core,
+        api_version=api_version,
+        protocol_core=mock_protocol_core,
+        core_map=mock_map_core,
+    )
+    mock_liquid = decoy.mock(cls=Liquid)
+
+    subject.load_liquid(["A1", subject["B1"]], 10, mock_liquid)
+    decoy.verify(
+        mock_labware_core.load_liquid(
+            {
+                "A1": 10,
+                "B1": 10,
+            },
+            mock_liquid,
+        )
+    )
+
+
+@pytest.mark.parametrize("api_version", versions_at_or_above(APIVersion(2, 22)))
+def test_load_liquid_rejects_invalid_inputs(
+    decoy: Decoy,
+    mock_labware_core: LabwareCore,
+    api_version: APIVersion,
+    mock_protocol_core: ProtocolCore,
+    mock_map_core: LoadedCoreMap,
+) -> None:
+    """It should require valid load inputs."""
+    mock_well_core_1 = decoy.mock(cls=WellCore)
+    mock_well_core_2 = decoy.mock(cls=WellCore)
+
+    grid = well_grid.WellGrid(
+        columns_by_name={"1": ["A1", "B1"]},
+        rows_by_name={"A": ["A1"], "B": ["B1"]},
+    )
+    decoy.when(mock_well_core_1.get_name()).then_return("A1")
+    decoy.when(mock_well_core_2.get_name()).then_return("B1")
+    decoy.when(mock_labware_core.get_well_columns()).then_return([["A1", "B1"]])
+    decoy.when(mock_labware_core.get_well_core("A1")).then_return(mock_well_core_1)
+    decoy.when(mock_labware_core.get_well_core("B1")).then_return(mock_well_core_2)
+    decoy.when(well_grid.create([["A1", "B1"]])).then_return(grid)
+    subject = Labware(
+        core=mock_labware_core,
+        api_version=api_version,
+        protocol_core=mock_protocol_core,
+        core_map=mock_map_core,
+    )
+
+    core_2 = decoy.mock(cls=LabwareCore)
+    mock_well_core_3 = decoy.mock(cls=WellCore)
+    grid_2 = well_grid.WellGrid(
+        columns_by_name={"1": ["A1"]}, rows_by_name={"A": ["A1"]}
+    )
+    decoy.when(mock_well_core_3.get_name()).then_return("A1")
+    decoy.when(core_2.get_well_columns()).then_return([["A1", "B1"]])
+    decoy.when(core_2.get_well_core("A1")).then_return(mock_well_core_1)
+    decoy.when(core_2.get_well_core("B1")).then_return(mock_well_core_2)
+
+    decoy.when(well_grid.create([["A1"]])).then_return(grid_2)
+    other_labware = Labware(
+        core=core_2,
+        api_version=api_version,
+        protocol_core=mock_protocol_core,
+        core_map=mock_map_core,
+    )
+    mock_liquid = decoy.mock(cls=Liquid)
+    with pytest.raises(KeyError):
+        subject.load_liquid(["A1", "C1"], 10, mock_liquid)
+
+    with pytest.raises(KeyError):
+        subject.load_liquid([subject["A1"], other_labware["A1"]], 10, mock_liquid)
+
+    with pytest.raises(TypeError):
+        subject.load_liquid([2], 10, mock_liquid)  # type: ignore[list-item]
+
+    with pytest.raises(TypeError):
+        subject.load_liquid(["A1"], "A1", mock_liquid)  # type: ignore[arg-type]
+    mock_liquid = decoy.mock(cls=Liquid)
+
+    subject.load_liquid(["A1", subject["B1"]], 10, mock_liquid)
+    decoy.verify(
+        mock_labware_core.load_liquid(
+            {
+                "A1": 10,
+                "B1": 10,
+            },
+            mock_liquid,
+        )
+    )
+
+
+@pytest.mark.parametrize("api_version", versions_at_or_above(APIVersion(2, 22)))
+def test_load_liquid_by_well_handles_valid_inputs(
+    decoy: Decoy,
+    mock_labware_core: LabwareCore,
+    api_version: APIVersion,
+    mock_protocol_core: ProtocolCore,
+    mock_map_core: LoadedCoreMap,
+) -> None:
+    """It should load liquids of different volumes in different wells."""
+    mock_well_core_1 = decoy.mock(cls=WellCore)
+    mock_well_core_2 = decoy.mock(cls=WellCore)
+    grid = well_grid.WellGrid(
+        columns_by_name={"1": ["A1", "B1"]},
+        rows_by_name={"A": ["A1"], "B": ["B1"]},
+    )
+    decoy.when(mock_well_core_1.get_name()).then_return("A1")
+    decoy.when(mock_well_core_2.get_name()).then_return("B1")
+
+    decoy.when(mock_labware_core.get_well_columns()).then_return([["A1", "B1"]])
+    decoy.when(mock_labware_core.get_well_core("A1")).then_return(mock_well_core_1)
+    decoy.when(mock_labware_core.get_well_core("B1")).then_return(mock_well_core_2)
+    decoy.when(well_grid.create([["A1", "B1"]])).then_return(grid)
+    decoy.when(mock_well_core_2.get_display_name()).then_return("well 2")
+    subject = Labware(
+        core=mock_labware_core,
+        api_version=api_version,
+        protocol_core=mock_protocol_core,
+        core_map=mock_map_core,
+    )
+    mock_liquid = decoy.mock(cls=Liquid)
+
+    subject.load_liquid_by_well({"A1": 10, subject["B1"]: 11}, mock_liquid)
+    decoy.verify(
+        mock_labware_core.load_liquid(
+            {
+                "A1": 10,
+                "B1": 11,
+            },
+            mock_liquid,
+        )
+    )
+
+
+@pytest.mark.parametrize("api_version", versions_at_or_above(APIVersion(2, 22)))
+def test_load_liquid_by_well_rejects_invalid_inputs(
+    decoy: Decoy,
+    mock_labware_core: LabwareCore,
+    api_version: APIVersion,
+    mock_protocol_core: ProtocolCore,
+    mock_map_core: LoadedCoreMap,
+) -> None:
+    """It should require valid well specs."""
+    mock_well_core_1 = decoy.mock(cls=WellCore)
+    mock_well_core_2 = decoy.mock(cls=WellCore)
+
+    grid = well_grid.WellGrid(
+        columns_by_name={"1": ["A1", "B1"]},
+        rows_by_name={"A": ["A1"], "B": ["B1"]},
+    )
+    decoy.when(mock_well_core_1.get_name()).then_return("A1")
+    decoy.when(mock_well_core_2.get_name()).then_return("B1")
+    decoy.when(mock_well_core_1.get_display_name()).then_return("well 1")
+    decoy.when(mock_well_core_2.get_display_name()).then_return("well 2")
+    decoy.when(mock_well_core_1.get_top(z_offset=0.0)).then_return(Point(4, 5, 6))
+    decoy.when(mock_well_core_1.get_top(z_offset=0.0)).then_return(Point(7, 8, 9))
+    decoy.when(mock_labware_core.get_well_columns()).then_return([["A1", "B1"]])
+    decoy.when(mock_labware_core.get_well_core("A1")).then_return(mock_well_core_1)
+    decoy.when(mock_labware_core.get_well_core("B1")).then_return(mock_well_core_2)
+    decoy.when(well_grid.create([["A1", "B1"]])).then_return(grid)
+    subject = Labware(
+        core=mock_labware_core,
+        api_version=api_version,
+        protocol_core=mock_protocol_core,
+        core_map=mock_map_core,
+    )
+    core_2 = decoy.mock(cls=LabwareCore)
+    mock_well_core_3 = decoy.mock(cls=WellCore)
+    decoy.when(mock_well_core_3.get_display_name()).then_return("well 3")
+    grid_2 = well_grid.WellGrid(
+        columns_by_name={"1": ["A1"]}, rows_by_name={"A": ["A1"]}
+    )
+    decoy.when(mock_well_core_3.get_name()).then_return("A1")
+    decoy.when(core_2.get_well_columns()).then_return([["A1"]])
+    decoy.when(core_2.get_well_core("A1")).then_return(mock_well_core_3)
+    decoy.when(mock_well_core_3.get_top(z_offset=0.0)).then_return(Point(1, 2, 3))
+
+    decoy.when(well_grid.create([["A1"]])).then_return(grid_2)
+    other_labware = Labware(
+        core=core_2,
+        api_version=api_version,
+        protocol_core=mock_protocol_core,
+        core_map=mock_map_core,
+    )
+
+    mock_liquid = decoy.mock(cls=Liquid)
+    with pytest.raises(KeyError):
+        subject.load_liquid_by_well({"A1": 10, "C1": 11}, mock_liquid)
+
+    with pytest.raises(KeyError):
+        subject.load_liquid_by_well(
+            {subject["A1"]: 10, other_labware["A1"]: 11}, mock_liquid
+        )
+
+    with pytest.raises(TypeError):
+        subject.load_liquid_by_well({2: 10}, mock_liquid)  # type: ignore[dict-item]
+
+    with pytest.raises(TypeError):
+        subject.load_liquid_by_well({"A1": "A3"}, mock_liquid)  # type: ignore[dict-item]
+
+
+@pytest.mark.parametrize("api_version", versions_at_or_above(APIVersion(2, 22)))
+def test_load_empty_handles_valid_inputs(
+    decoy: Decoy,
+    mock_labware_core: LabwareCore,
+    api_version: APIVersion,
+    mock_protocol_core: ProtocolCore,
+    mock_map_core: LoadedCoreMap,
+) -> None:
+    """It should load lists of wells as empty."""
+    mock_well_core_1 = decoy.mock(cls=WellCore)
+    mock_well_core_2 = decoy.mock(cls=WellCore)
+    grid = well_grid.WellGrid(
+        columns_by_name={"1": ["A1", "B1"]},
+        rows_by_name={"A": ["A1"], "B": ["B1"]},
+    )
+    decoy.when(mock_well_core_1.get_name()).then_return("A1")
+    decoy.when(mock_well_core_2.get_name()).then_return("B1")
+
+    decoy.when(mock_labware_core.get_well_columns()).then_return([["A1", "B1"]])
+    decoy.when(mock_labware_core.get_well_core("A1")).then_return(mock_well_core_1)
+    decoy.when(mock_labware_core.get_well_core("B1")).then_return(mock_well_core_2)
+    decoy.when(well_grid.create([["A1", "B1"]])).then_return(grid)
+
+    subject = Labware(
+        core=mock_labware_core,
+        api_version=api_version,
+        protocol_core=mock_protocol_core,
+        core_map=mock_map_core,
+    )
+
+    subject.load_empty(["A1", subject["B1"]])
+    decoy.verify(mock_labware_core.load_empty(["A1", "B1"]))
+
+
+@pytest.mark.parametrize("api_version", versions_at_or_above(APIVersion(2, 22)))
+def test_load_empty_rejects_invalid_inputs(
+    decoy: Decoy,
+    mock_labware_core: LabwareCore,
+    api_version: APIVersion,
+    mock_protocol_core: ProtocolCore,
+    mock_map_core: LoadedCoreMap,
+) -> None:
+    """It should require valid well specs."""
+    mock_well_core_1 = decoy.mock(cls=WellCore)
+    mock_well_core_2 = decoy.mock(cls=WellCore)
+
+    grid = well_grid.WellGrid(
+        columns_by_name={"1": ["A1", "B1"]},
+        rows_by_name={"A": ["A1"], "B": ["B1"]},
+    )
+    decoy.when(mock_well_core_1.get_name()).then_return("A1")
+    decoy.when(mock_well_core_2.get_name()).then_return("B1")
+    decoy.when(mock_labware_core.get_well_columns()).then_return([["A1", "B1"]])
+    decoy.when(mock_labware_core.get_well_core("A1")).then_return(mock_well_core_1)
+    decoy.when(mock_labware_core.get_well_core("B1")).then_return(mock_well_core_2)
+    decoy.when(well_grid.create([["A1", "B1"]])).then_return(grid)
+    subject = Labware(
+        core=mock_labware_core,
+        api_version=api_version,
+        protocol_core=mock_protocol_core,
+        core_map=mock_map_core,
+    )
+
+    core_2 = decoy.mock(cls=LabwareCore)
+    mock_well_core_3 = decoy.mock(cls=WellCore)
+    grid_2 = well_grid.WellGrid(
+        columns_by_name={"1": ["A1"]}, rows_by_name={"A": ["A1"]}
+    )
+    decoy.when(mock_well_core_3.get_name()).then_return("A1")
+    decoy.when(core_2.get_well_columns()).then_return([["A1", "B1"]])
+    decoy.when(core_2.get_well_core("A1")).then_return(mock_well_core_1)
+    decoy.when(core_2.get_well_core("B1")).then_return(mock_well_core_2)
+
+    decoy.when(well_grid.create([["A1"]])).then_return(grid_2)
+    other_labware = Labware(
+        core=core_2,
+        api_version=api_version,
+        protocol_core=mock_protocol_core,
+        core_map=mock_map_core,
+    )
+    with pytest.raises(KeyError):
+        subject.load_empty(["A1", "C1"])
+
+    with pytest.raises(KeyError):
+        subject.load_empty([subject["A1"], other_labware["A1"]])
+
+    with pytest.raises(TypeError):
+        subject.load_empty([2])  # type: ignore[list-item]

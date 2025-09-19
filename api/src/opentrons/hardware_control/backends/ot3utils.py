@@ -2,7 +2,9 @@
 from typing import Dict, Iterable, List, Set, Tuple, TypeVar, cast, Sequence, Optional
 from typing_extensions import Literal
 from logging import getLogger
-from opentrons.config.defaults_ot3 import DEFAULT_CALIBRATION_AXIS_MAX_SPEED
+from opentrons.config.defaults_ot3 import (
+    DEFAULT_EMULSIFYING_PIPETTE_AXIS_MAX_SPEED,
+)
 from opentrons.config.types import OT3MotionSettings, OT3CurrentSettings, GantryLoad
 from opentrons.hardware_control.types import (
     Axis,
@@ -213,7 +215,7 @@ def get_current_settings(
                 hold_current=conf_by_pip["hold_current"][axis_kind],
                 run_current=conf_by_pip["run_current"][axis_kind],
             )
-    if gantry_load == GantryLoad.HIGH_THROUGHPUT:
+    if gantry_load in [GantryLoad.HIGH_THROUGHPUT_1000, GantryLoad.HIGH_THROUGHPUT_200]:
         # In high-throughput configuration, the right mount doesn't do anything: the
         # lead screw nut is disconnected from the carriage, and it just hangs out
         # up at the top of the axis. We should therefore not give it a lot of current.
@@ -240,7 +242,7 @@ def get_system_constraints(
         OT3AxisKind.Z,
         OT3AxisKind.Z_G,
     ]
-    if gantry_load == GantryLoad.HIGH_THROUGHPUT:
+    if gantry_load in [GantryLoad.HIGH_THROUGHPUT_1000, GantryLoad.HIGH_THROUGHPUT_200]:
         axis_kind_list.append(OT3AxisKind.Q)
     for axis_kind in axis_kind_list:
         for axis in Axis.of_kind(axis_kind):
@@ -253,40 +255,27 @@ def get_system_constraints(
     return constraints
 
 
-def get_system_constraints_for_calibration(
-    config: OT3MotionSettings,
-    gantry_load: GantryLoad,
-) -> "SystemConstraints[Axis]":
-    conf_by_pip = config.by_gantry_load(gantry_load)
-    constraints = {}
-    for axis_kind in [
-        OT3AxisKind.P,
-        OT3AxisKind.X,
-        OT3AxisKind.Y,
-        OT3AxisKind.Z,
-        OT3AxisKind.Z_G,
-    ]:
-        for axis in Axis.of_kind(axis_kind):
-            constraints[axis] = AxisConstraints.build(
-                conf_by_pip["acceleration"][axis_kind],
-                conf_by_pip["max_speed_discontinuity"][axis_kind],
-                conf_by_pip["direction_change_speed_discontinuity"][axis_kind],
-                DEFAULT_CALIBRATION_AXIS_MAX_SPEED,
-            )
-    return constraints
-
-
 def get_system_constraints_for_plunger_acceleration(
     config: OT3MotionSettings,
     gantry_load: GantryLoad,
     mount: OT3Mount,
     acceleration: float,
+    high_speed_pipette: bool = False,
 ) -> "SystemConstraints[Axis]":
     old_constraints = config.by_gantry_load(gantry_load)
     new_constraints = {}
     axis_kinds = set([k for _, v in old_constraints.items() for k in v.keys()])
+
+    def _get_axis_max_speed(ax: Axis) -> float:
+        if ax == Axis.of_main_tool_actuator(mount) and high_speed_pipette:
+            _max_speed = float(DEFAULT_EMULSIFYING_PIPETTE_AXIS_MAX_SPEED)
+        else:
+            _max_speed = old_constraints["default_max_speed"][axis_kind]
+        return _max_speed
+
     for axis_kind in axis_kinds:
         for axis in Axis.of_kind(axis_kind):
+            _default_max_speed = _get_axis_max_speed(axis)
             if axis == Axis.of_main_tool_actuator(mount):
                 _accel = acceleration
             else:
@@ -295,7 +284,32 @@ def get_system_constraints_for_plunger_acceleration(
                 _accel,
                 old_constraints["max_speed_discontinuity"][axis_kind],
                 old_constraints["direction_change_speed_discontinuity"][axis_kind],
-                old_constraints["default_max_speed"][axis_kind],
+                _default_max_speed,
+            )
+    return new_constraints
+
+
+def get_system_constraints_for_emulsifying_pipette(
+    config: OT3MotionSettings,
+    gantry_load: GantryLoad,
+    mount: OT3Mount,
+) -> "SystemConstraints[Axis]":
+    old_constraints = config.by_gantry_load(gantry_load)
+    new_constraints = {}
+    axis_kinds = set([k for _, v in old_constraints.items() for k in v.keys()])
+    for axis_kind in axis_kinds:
+        for axis in Axis.of_kind(axis_kind):
+            if axis == Axis.of_main_tool_actuator(mount):
+                _max_speed = float(DEFAULT_EMULSIFYING_PIPETTE_AXIS_MAX_SPEED)
+            else:
+                _max_speed = old_constraints["default_max_speed"][axis_kind]
+            new_constraints[axis] = AxisConstraints.build(
+                max_acceleration=old_constraints["acceleration"][axis_kind],
+                max_speed_discont=old_constraints["max_speed_discontinuity"][axis_kind],
+                max_direction_change_speed_discont=old_constraints[
+                    "direction_change_speed_discontinuity"
+                ][axis_kind],
+                max_speed=_max_speed,
             )
     return new_constraints
 
@@ -498,14 +512,18 @@ def create_gripper_jaw_hold_group(encoder_position_um: int) -> MoveGroup:
     return move_group
 
 
-def moving_axes_in_move_group(group: MoveGroup) -> Set[NodeId]:
-    """Utility function to get only the moving nodes in a move group."""
-    ret: Set[NodeId] = set()
-    for step in group:
-        for node, node_step in step.items():
-            if node_step.is_moving_step():
-                ret.add(node)
-    return ret
+def moving_pipettes_in_move_group(
+    all_nodes: Set[NodeId], moving_nodes: Set[NodeId]
+) -> List[NodeId]:
+    """Utility function to get which pipette nodes are moving either in z or their plunger."""
+    pipettes_moving: List[NodeId] = [
+        k for k in moving_nodes if k in [NodeId.pipette_left, NodeId.pipette_right]
+    ]
+    if NodeId.head_l in moving_nodes and NodeId.pipette_left in all_nodes:
+        pipettes_moving.append(NodeId.pipette_left)
+    if NodeId.head_r in moving_nodes and NodeId.pipette_right in all_nodes:
+        pipettes_moving.append(NodeId.pipette_right)
+    return pipettes_moving
 
 
 AxisMapPayload = TypeVar("AxisMapPayload")
@@ -544,6 +562,7 @@ def sensor_node_for_pipette(mount: OT3Mount) -> PipetteProbeTarget:
 _instr_sensor_id_lookup: Dict[InstrumentProbeType, SensorId] = {
     InstrumentProbeType.PRIMARY: SensorId.S0,
     InstrumentProbeType.SECONDARY: SensorId.S1,
+    InstrumentProbeType.BOTH: SensorId.BOTH,
 }
 
 
@@ -637,6 +656,7 @@ _gripper_jaw_state_lookup: Dict[FirmwareGripperjawState, GripperJawState] = {
     FirmwareGripperjawState.force_controlling_home: GripperJawState.HOMED_READY,
     FirmwareGripperjawState.force_controlling: GripperJawState.GRIPPING,
     FirmwareGripperjawState.position_controlling: GripperJawState.HOLDING,
+    FirmwareGripperjawState.stopped: GripperJawState.STOPPED,
 }
 
 

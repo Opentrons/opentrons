@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import { COLORS } from '../../../helix-design-system'
 
 interface ThermocyclerGEN2Props {

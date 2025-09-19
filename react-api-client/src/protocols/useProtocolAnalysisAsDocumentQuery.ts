@@ -1,9 +1,12 @@
-import { UseQueryResult, useQuery } from 'react-query'
+import { useQuery } from 'react-query'
+
 import { getProtocolAnalysisAsDocument } from '@opentrons/api-client'
+
 import { useHost } from '../api'
+
+import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type { HostConfig } from '@opentrons/api-client'
-import type { UseQueryOptions } from 'react-query'
-import { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 export function useProtocolAnalysisAsDocumentQuery(
   protocolId: string | null,

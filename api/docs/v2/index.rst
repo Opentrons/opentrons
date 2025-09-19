@@ -14,9 +14,12 @@ Welcome
     new_modules
     deck_slots
     new_pipette
+    liquid_classes
+    liquid_class_definitions
     new_atomic_commands
     new_complex_commands
     robot_position
+    runtime_parameters
     new_advanced_running
     new_examples
     adapting_ot2_flex
@@ -171,17 +174,17 @@ More Resources
 Opentrons App
 +++++++++++++
 
-The `Opentrons App <https://opentrons.com/ot-app/>`__ is the easiest way to run your Python protocols. The app `supports <https://support.opentrons.com/en/articles/2687536-get-started-supported-operating-systems-for-the-opentrons-app>`_ the latest versions of macOS, Windows, and Ubuntu.
+The `Opentrons App <https://opentrons.com/ot-app/>`__ is the easiest way to run your Python protocols. The app runs on the latest versions of macOS, Windows, and Ubuntu.
 
 Support
 +++++++
 
-Questions about setting up your robot, using Opentrons software, or troubleshooting? Check out our `support articles <https://support.opentrons.com/s/>`_ or `get in touch directly <https://support.opentrons.com/s/article/Getting-help-from-Opentrons-Support>`_ with Opentrons Support.
+Questions about setting up your robot, using Opentrons software, or troubleshooting? Check out our `support articles <https://support.opentrons.com/s/>`_ or `contact Opentrons Support directly <mailto:support@opentrons.com>`_.
 
 Custom Protocol Service
 +++++++++++++++++++++++
 
-Don't have the time or resources to write your own protocols? The `Opentrons Custom Protocols <https://shop.opentrons.com/opentrons-remote-custom-protocol-development/>`_ service can get you set up in as little as a week. 
+Don't have the time or resources to write your own protocols? Our `custom protocol development service <https://opentrons.com/instrument-services/>`_ can get you set up in two weeks.
 
 Contributing
 ++++++++++++

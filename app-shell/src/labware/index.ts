@@ -1,10 +1,18 @@
-import fse from 'fs-extra'
 import { app, shell } from 'electron'
+import fse from 'fs-extra'
+
 import { getFullConfig, handleConfigChange } from '../config'
-import { showOpenDirectoryDialog, showOpenFileDialog } from '../dialogs'
+import {
+  addCustomLabwareFailure,
+  addNewLabwareName,
+  customLabwareList,
+  customLabwareListFailure,
+  updateConfigValue,
+} from '../config/actions'
 import {
   ADD_CUSTOM_LABWARE,
   ADD_CUSTOM_LABWARE_FILE,
+  ADD_CUSTOM_LABWARE_FILE_FROM_CREATOR,
   ADD_LABWARE,
   CHANGE_CUSTOM_LABWARE_DIRECTORY,
   CHANGE_DIRECTORY,
@@ -19,46 +27,60 @@ import {
   UI_INITIALIZED,
   VALID_LABWARE_FILE,
 } from '../constants'
+import { showOpenDirectoryDialog, showOpenFileDialog } from '../dialogs'
+import { sameIdentity } from './compare'
 import * as Definitions from './definitions'
 import { validateLabwareFiles, validateNewLabwareFile } from './validation'
-import { sameIdentity } from './compare'
-
-import type {
-  UncheckedLabwareFile,
-  DuplicateLabwareFile,
-  CheckedLabwareFile,
-  CustomLabwareListActionSource as ListSource,
-} from '@opentrons/app/src/redux/custom-labware/types'
 
 import type { BrowserWindow } from 'electron'
+import type {
+  CheckedLabwareFile,
+  DuplicateLabwareFile,
+  CustomLabwareListActionSource as ListSource,
+  UncheckedLabwareFile,
+} from '@opentrons/app/src/redux/custom-labware/types'
 import type { Action, Dispatch } from '../types'
-import {
-  addCustomLabwareFailure,
-  addNewLabwareName,
-  customLabwareList,
-  customLabwareListFailure,
-  updateConfigValue,
-} from '../config/actions'
 
 const ensureDir: (dir: string) => Promise<void> = fse.ensureDir
 
-const fetchCustomLabware = (): Promise<UncheckedLabwareFile[]> => {
+const fetchCustomLabware = (
+  inMemoryFile?: string
+): Promise<UncheckedLabwareFile[]> => {
   const { labware: config } = getFullConfig()
 
   return ensureDir(config.directory)
     .then(() => Definitions.readLabwareDirectory(config.directory))
-    .then(Definitions.parseLabwareFiles)
+    .then(filePaths => {
+      const tasks = []
+
+      if (inMemoryFile) {
+        tasks.push(Definitions.parseLabwareFiles(inMemoryFile))
+      }
+      tasks.push(Definitions.parseLabwareFiles(filePaths))
+
+      return Promise.all(tasks)
+    })
+    .then(parsedFilesArrays => {
+      const parsedFiles = parsedFilesArrays.reduce(
+        (acc, curr) => acc.concat(curr),
+        []
+      )
+      return parsedFiles
+    })
 }
 
-const fetchValidatedCustomLabware = (): Promise<CheckedLabwareFile[]> => {
-  return fetchCustomLabware().then(validateLabwareFiles)
+const fetchValidatedCustomLabware = (
+  inMemoryFile?: string
+): Promise<CheckedLabwareFile[]> => {
+  return fetchCustomLabware(inMemoryFile).then(validateLabwareFiles)
 }
 
 const fetchAndValidateCustomLabware = (
   dispatch: Dispatch,
-  source: ListSource
+  source: ListSource,
+  inMemoryFile?: string
 ): Promise<void> => {
-  return fetchValidatedCustomLabware()
+  return fetchValidatedCustomLabware(inMemoryFile)
     .then(payload => {
       dispatch(customLabwareList(payload, source))
     })
@@ -101,11 +123,38 @@ const copyLabware = (
     const dir = getFullConfig().labware.directory
 
     if (next.type !== VALID_LABWARE_FILE) {
-      return dispatch(addCustomLabwareFailure(next))
+      dispatch(addCustomLabwareFailure(next))
+      return
     }
     return Definitions.addLabwareFile(next.filename, dir)
       .then(() => fetchAndValidateCustomLabware(dispatch, ADD_LABWARE))
-      .then(() => dispatch(addNewLabwareName(newFile.filename)))
+      .then(() => {
+        dispatch(addNewLabwareName(newFile.filename))
+      })
+  })
+}
+
+const copyLabwareFromCreator = (
+  dispatch: Dispatch,
+  file: string
+): Promise<void> => {
+  return Promise.all([
+    fetchCustomLabware(),
+    Definitions.parseLabwareFiles(file),
+  ]).then(([existingFiles, [newFile]]) => {
+    const existing = validateLabwareFiles(existingFiles)
+    const next = validateNewLabwareFile(existing, newFile)
+    const dir = getFullConfig().labware.directory
+
+    if (next.type !== VALID_LABWARE_FILE) {
+      dispatch(addCustomLabwareFailure(next))
+      return
+    }
+    return Definitions.addLabwareFileFromCreator(file, dir, next.filename)
+      .then(() => fetchAndValidateCustomLabware(dispatch, ADD_LABWARE, file))
+      .then(() => {
+        dispatch(addNewLabwareName(newFile.filename))
+      })
   })
 }
 
@@ -187,6 +236,14 @@ export function registerLabware(
           dispatch(addCustomLabwareFailure(null, error.message))
         })
 
+        break
+      }
+
+      case ADD_CUSTOM_LABWARE_FILE_FROM_CREATOR: {
+        const file = action.payload.file
+        copyLabwareFromCreator(dispatch, file).catch((error: Error) => {
+          dispatch(addCustomLabwareFailure(null, error.message))
+        })
         break
       }
 

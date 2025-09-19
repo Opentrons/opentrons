@@ -1,11 +1,11 @@
 // TODO(mc, 2018-08-08): figure out type exports from app
+import type { Logger } from '@opentrons/app/src/logger'
+import type { Config } from '@opentrons/app/src/redux/config/types'
 import type {
   Action,
   Error as PlainError,
 } from '@opentrons/app/src/redux/types'
-import type { Logger } from '@opentrons/app/src/logger'
 
-import type { Config } from '@opentrons/app/src/redux/config/types'
 export type { Action, PlainError }
 
 export type Dispatch = (action: Action) => void
@@ -112,11 +112,13 @@ export type CLEAR_CACHE_TYPE = 'discovery:CLEAR_CACHE'
 export interface ConfigInitializedAction {
   type: CONFIG_INITIALIZED_TYPE
   payload: { config: Config }
+  meta: { shell: true }
 }
 
 export interface ConfigValueUpdatedAction {
   type: CONFIG_VALUE_UPDATED_TYPE
   payload: { path: string; value: any }
+  meta: { shell: true }
 }
 
 export interface StartDiscoveryAction {
@@ -133,5 +135,11 @@ export interface FinishDiscoveryAction {
 export interface RobotSystemAction {
   type: 'shell:SEND_READY_STATUS'
   payload: { shellReady: boolean }
+  meta: { shell: true }
+}
+
+export interface SendFilePathsAction {
+  type: 'shell:SEND_FILE_PATHS'
+  payload: { filePaths: string[] }
   meta: { shell: true }
 }

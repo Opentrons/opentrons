@@ -1,26 +1,29 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { beforeEach, describe, it, expect, afterEach, vi } from 'vitest'
+
 import {
-  getLabwareDefURI,
-  getPipetteNameSpecs,
   fixtureTiprack1000ul as _fixtureTiprack1000ul,
+  getLabwareDefURI,
+  getPipetteSpecsV2,
 } from '@opentrons/shared-data'
+
 import { heaterShakerOpenLatch } from '../commandCreators/atomic/heaterShakerOpenLatch'
-import { getIsTallLabwareEastWestOfHeaterShaker } from '../utils'
 import {
+  DEFAULT_PIPETTE,
   getErrorResult,
   getInitialRobotStateStandard,
   makeContext,
-  DEFAULT_PIPETTE,
 } from '../fixtures'
-import type { InvariantContext, RobotState } from '../types'
+import { getIsTallLabwareEastWestOfHeaterShaker } from '../utils'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { InvariantContext, RobotState } from '../types'
 
 vi.mock('../utils/heaterShakerCollision')
 
 const fixtureTiprack1000ul = _fixtureTiprack1000ul as LabwareDefinition2
 const FLEX_PIPETTE = 'p1000_single_flex'
-const FlexPipetteNameSpecs = getPipetteNameSpecs(FLEX_PIPETTE)
+const FlexPipetteNameSpecs = getPipetteSpecsV2(FLEX_PIPETTE)
 
 describe('heaterShakerOpenLatch', () => {
   const HEATER_SHAKER_ID = 'heaterShakerId'
@@ -38,7 +41,14 @@ describe('heaterShakerOpenLatch', () => {
           // this tiprack is tall enough to trigger the latch open warning
           labwareDefURI: getLabwareDefURI(fixtureTiprack1000ul),
           def: fixtureTiprack1000ul,
+          pythonName: 'mockPythonName',
         },
+      },
+      moduleEntities: {
+        ...context.moduleEntities,
+        [HEATER_SHAKER_ID]: {
+          pythonName: 'mock_heater_shaker_1',
+        } as any,
       },
     }
     const state = getInitialRobotStateStandard(invariantContext)
@@ -99,6 +109,7 @@ describe('heaterShakerOpenLatch', () => {
           params: { moduleId: 'heaterShakerId' },
         },
       ],
+      python: 'mock_heater_shaker_1.open_labware_latch()',
     })
   })
   it('should return an open latch command when there is no labware that is too tall east/west of the heater shaker', () => {
@@ -124,6 +135,7 @@ describe('heaterShakerOpenLatch', () => {
           params: { moduleId: 'heaterShakerId' },
         },
       ],
+      python: 'mock_heater_shaker_1.open_labware_latch()',
     })
   })
 })

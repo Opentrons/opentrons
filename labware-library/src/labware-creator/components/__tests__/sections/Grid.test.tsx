@@ -1,20 +1,18 @@
-import React from 'react'
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { FormikConfig } from 'formik'
-import isEqual from 'lodash/isEqual'
-import { when } from 'vitest-when'
 import { render, screen } from '@testing-library/react'
-import {
-  getDefaultFormState,
-  LabwareFields,
-  yesNoOptions,
-} from '../../../fields'
-import { isEveryFieldHidden, getLabwareName } from '../../../utils'
-import { Grid } from '../../sections/Grid'
+import isEqual from 'lodash/isEqual'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+
+import { getDefaultFormState, yesNoOptions } from '../../../fields'
+import { getLabwareName, isEveryFieldHidden } from '../../../utils'
 import { FormAlerts } from '../../alerts/FormAlerts'
-import { TextField } from '../../TextField'
 import { RadioField } from '../../RadioField'
+import { Grid } from '../../sections/Grid'
+import { TextField } from '../../TextField'
 import { wrapInFormik } from '../../utils/wrapInFormik'
+
+import type { FormikConfig } from 'formik'
+import type { LabwareFields } from '../../../fields'
 
 vi.mock('../../../utils')
 vi.mock('../../TextField')

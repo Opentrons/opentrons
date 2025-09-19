@@ -39,13 +39,13 @@ env:
 jobs:
   checks:
     name: 'js checks'
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     timeout-minutes: 20
     steps:
-      - uses: 'actions/checkout@v3'
-      - uses: 'actions/setup-node@v3'
+      - uses: 'actions/checkout@v4'
+      - uses: 'actions/setup-node@v4'
         with:
-          node-version: '18.19.0'
+          node-version: '22.12.0'
       - name: 'set complex environment variables'
         id: 'set-vars'
         uses: actions/github-script@v6
@@ -54,9 +54,12 @@ jobs:
             const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
       - name: 'install libudev for usb-detection'
-        run: sudo apt-get update && sudo apt-get install libudev-dev
+        run: |
+          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+          sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ${{ github.workspace }}/.yarn-cache
@@ -72,12 +75,12 @@ jobs:
           make setup-js
         # Use the if to run all the lint checks even of some fail
         shell: bash
-      - name: 'lint js'
-        if: always() && steps.setup-js.outcome == 'success'
-        run: make lint-js
       - name: 'typechecks'
         if: always() && steps.setup-js.outcome == 'success'
         run: make check-js
+      - name: 'lint js'
+        if: always() && steps.setup-js.outcome == 'success'
+        run: make lint-js
       - name: 'circular deps'
         if: always() && steps.setup-js.outcome == 'success'
         run: make circular-dependencies-js

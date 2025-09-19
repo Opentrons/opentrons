@@ -1,7 +1,14 @@
 import typing
 from enum import Enum
 
-from pydantic import BaseModel, Field, SecretStr, validator, root_validator
+from pydantic import (
+    field_validator,
+    model_validator,
+    ConfigDict,
+    BaseModel,
+    Field,
+    SecretStr,
+)
 from opentrons.system import wifi
 
 
@@ -53,9 +60,8 @@ class NetworkingStatus(BaseModel):
         description="Per-interface networking status. Properties are "
         "named for network interfaces",
     )
-
-    class Config:
-        schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "status": "full",
                 "interfaces": {
@@ -76,6 +82,7 @@ class NetworkingStatus(BaseModel):
                 },
             }
         }
+    )
 
 
 class NetworkingSecurityType(str, Enum):
@@ -111,9 +118,8 @@ class WifiNetworks(BaseModel):
     """The list of networks"""
 
     list: typing.List[WifiNetworkFull]
-
-    class Config:
-        schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "list": [
                     {
@@ -126,6 +132,7 @@ class WifiNetworks(BaseModel):
                 ]
             }
         }
+    )
 
 
 class WifiConfiguration(BaseModel):
@@ -141,7 +148,7 @@ class WifiConfiguration(BaseModel):
         "`false` (default if key is not "
         "present) otherwise.",
     )
-    securityType: typing.Optional[NetworkingSecurityType]
+    securityType: typing.Optional[NetworkingSecurityType] = None
 
     psk: typing.Optional[SecretStr] = Field(
         None,
@@ -160,11 +167,14 @@ class WifiConfiguration(BaseModel):
         'and it may also have `"anonymousIdentity"` and '
         '`"caCert"` properties, both of which are identified'
         " as present but not required.",
-        required=["eapType"],
+        json_schema_extra={"required": ["eapType"]},
     )
 
-    @validator("eapConfig")
-    def eap_config_validate(cls, v):
+    @field_validator("eapConfig")
+    @classmethod
+    def eap_config_validate(
+        cls, v: typing.Optional[typing.Dict[str, str]]
+    ) -> typing.Optional[typing.Dict[str, str]]:
         """Custom validator for the eapConfig field"""
         if v is not None:
             if not v.get("eapType"):
@@ -176,8 +186,13 @@ class WifiConfiguration(BaseModel):
 
         return v
 
-    @root_validator(pre=True)
-    def validate_configuration(cls, values):
+    @model_validator(mode="before")
+    @classmethod
+    def validate_configuration(
+        cls,
+        # todo(mm, 2025-03-18): I think values can actually be other types, like str or bool.
+        values: typing.Dict[str, object],
+    ) -> typing.Dict[str, object]:
         """Validate the configuration"""
         security_type = values.get("securityType")
         psk = values.get("psk")
@@ -199,8 +214,8 @@ class WifiConfiguration(BaseModel):
             raise ValueError("If securityType is wpa-eap, eapConfig must be specified")
         return values
 
-    class Config:
-        schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "examples": [
                 {"ssid": "linksys"},
                 {
@@ -225,6 +240,7 @@ class WifiConfiguration(BaseModel):
                 },
             ]
         }
+    )
 
 
 class WifiConfigurationResponse(BaseModel):
@@ -257,7 +273,7 @@ class WifiKeyFile(BaseModel):
 class AddWifiKeyFileResponse(WifiKeyFile):
     """Response to add wifi key file"""
 
-    message: typing.Optional[str]
+    message: typing.Optional[str] = None
 
 
 class WifiKeyFiles(BaseModel):
@@ -266,9 +282,8 @@ class WifiKeyFiles(BaseModel):
     wifi_keys: typing.List[WifiKeyFile] = Field(
         [], alias="keys", description="A list of keys in the system"
     )
-
-    class Config:
-        schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "keys": [
                     {
@@ -279,6 +294,7 @@ class WifiKeyFiles(BaseModel):
                 ]
             }
         }
+    )
 
 
 class EapConfigOptionType(str, Enum):
@@ -327,9 +343,8 @@ class EapOptions(BaseModel):
     """An object describing all supported EAP variants and their parameters"""
 
     options: typing.List[EapVariant]
-
-    class Config:
-        schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "options": [
                     {
@@ -365,3 +380,4 @@ class EapOptions(BaseModel):
                 ]
             }
         }
+    )

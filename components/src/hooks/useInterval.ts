@@ -1,5 +1,7 @@
 import { useEffect, useRef } from 'react'
 
+import type { MutableRefObject } from 'react'
+
 /**
  * React hook to call a function on an interval; copied from:
  * https://overreacted.io/making-setinterval-declarative-with-react-hooks/
@@ -15,9 +17,7 @@ export function useInterval(
   delay: number | null,
   immediate: boolean = false
 ): void {
-  const savedCallback: React.MutableRefObject<
-    (() => unknown) | undefined
-  > = useRef()
+  const savedCallback: MutableRefObject<(() => unknown) | undefined> = useRef()
 
   // remember the latest callback
   useEffect(() => {
@@ -30,7 +30,9 @@ export function useInterval(
     if (delay !== null && delay > 0) {
       if (immediate) tick()
       const id = setInterval(tick, delay)
-      return () => clearInterval(id)
+      return () => {
+        clearInterval(id)
+      }
     }
   }, [delay, immediate])
 }

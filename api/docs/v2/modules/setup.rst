@@ -66,7 +66,7 @@ Available Modules
 The first parameter of :py:meth:`.ProtocolContext.load_module` is the module's  *API load name*. The load name tells your robot which module you're going to use in a protocol. The table below lists the API load names for the currently available modules.
 
 .. table::
-   :widths: 4 5 2
+   :widths: 4 4 2
    
    +--------------------+-------------------------------+---------------------------+
    | Module             | API Load Name                 | Introduced in API Version |
@@ -94,6 +94,12 @@ The first parameter of :py:meth:`.ProtocolContext.load_module` is the module's  
    +--------------------+-------------------------------+---------------------------+
    | Magnetic Block     | ``magneticBlockV1``           | 2.15                      |
    | GEN1               |                               |                           |
+   +--------------------+-------------------------------+---------------------------+
+   | Absorbance Plate   | ``absorbanceReaderV1``        | 2.21                      |
+   | Reader Module      |                               |                           |
+   +--------------------+-------------------------------+---------------------------+
+   | Flex Stacker       | ``flexStackerModuleV1``       | 2.25                      |
+   | Module             |                               |                           |
    +--------------------+-------------------------------+---------------------------+
 
 Some modules were added to our Python API later than others, and others span multiple hardware generations. When writing a protocol that requires a module, make sure your ``requirements`` or ``metadata`` code block specifies an :ref:`API version <v2-versioning>` high enough to support all the module generations you want to use.
@@ -124,7 +130,7 @@ Any :ref:`custom labware <v2-custom-labware>` added to your Opentrons App is als
 Module and Labware Compatibility
 --------------------------------
 
-It's your responsibility to ensure the labware and module combinations you load together work together. The Protocol API won't raise a warning or error if you load an unusual combination, like placing a tube rack on a Thermocycler. See `What labware can I use with my modules? <https://support.opentrons.com/s/article/What-labware-can-I-use-with-my-modules>`_ for more information about labware/module combinations.
+It's your responsibility to ensure the labware and module combinations you load together work together. The API generally won't raise a warning or error if you load an unusual combination, like placing a tube rack on a Thermocycler. The API will raise an error if you try to load a labware on an unsupported adapter. When working with custom labware and module adapters, be sure to add stacking offsets for the adapter to your custom labware definition.
 
 
 Additional Labware Parameters

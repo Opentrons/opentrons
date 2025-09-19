@@ -1,24 +1,47 @@
+import snakeCase from 'lodash/snakeCase'
 import uuidv1 from 'uuid/v4'
+
 import {
-  WellSetHelpers,
-  makeWellSetHelpers,
-  AddressableAreaName,
-  getDeckDefFromRobotType,
   FLEX_ROBOT_TYPE,
-  CutoutId,
-  STAGING_AREA_RIGHT_SLOT_FIXTURE,
-  isAddressableAreaStandardSlot,
-  CutoutFixtureId,
-  RobotType,
+  getAllLabwareDefs,
+  getDeckDefFromRobotType,
+  getTiprackVolume,
   INTERACTIVE_WELL_DATA_ATTRIBUTE,
+  isAddressableAreaStandardSlot,
+  LOW_VOLUME_PIPETTES,
+  makeWellSetHelpers,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
-import { BoundingRect, GenericRect } from '../collision-types'
+import {
+  getSlotInLocationStack,
+  PROTOCOL_CONTEXT_NAME,
+} from '@opentrons/step-generation'
+
+import type { WellGroup } from '@opentrons/components'
+import type {
+  AddressableAreaName,
+  CutoutId,
+  DeckSlotId,
+  LabwareDefinition2,
+  LabwareDisplayCategory,
+  ModuleType,
+  PipetteV2Specs,
+  SupportedTip,
+  WellSetHelpers,
+} from '@opentrons/shared-data'
 import type {
   AdditionalEquipmentEntity,
   LabwareEntities,
   PipetteEntities,
+  PipetteEntity,
 } from '@opentrons/step-generation'
-import type { WellGroup } from '@opentrons/components'
+import type { BoundingRect, GenericRect } from '../collision-types'
+import type {
+  AllTemporalPropertiesForTimelineFrame,
+  InitialDeckSetup,
+  LabwareOnDeck,
+  ModuleEntities,
+} from '../step-forms'
 
 export const uuid: () => string = uuidv1
 // Collision detection for SelectionRect / SelectableLabware
@@ -124,10 +147,11 @@ export const getIsAdapter = (
   labwareEntities: LabwareEntities
 ): boolean => {
   if (labwareEntities[labwareId] == null) return false
-  return (
-    labwareEntities[labwareId].def.allowedRoles?.includes('adapter') ?? false
-  )
+  return getIsAdapterFromDef(labwareEntities[labwareId].def)
 }
+
+export const getIsAdapterFromDef = (labwareDef: LabwareDefinition2): boolean =>
+  labwareDef.allowedRoles?.includes('adapter') ?? false
 
 export const getStagingAreaSlots = (
   stagingAreas?: AdditionalEquipmentEntity[]
@@ -142,55 +166,365 @@ export const getHas96Channel = (pipettes: PipetteEntities): boolean => {
 }
 
 export const getStagingAreaAddressableAreas = (
-  cutoutIds: CutoutId[]
+  cutoutIds: CutoutId[],
+  filterStandardSlots: boolean = true
 ): AddressableAreaName[] => {
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const cutoutFixtures = deckDef.cutoutFixtures
 
-  return cutoutIds
-    .flatMap(cutoutId => {
-      const addressableAreasOnCutout = cutoutFixtures.find(
-        cutoutFixture => cutoutFixture.id === STAGING_AREA_RIGHT_SLOT_FIXTURE
-      )?.providesAddressableAreas[cutoutId]
-      return addressableAreasOnCutout ?? []
-    })
-    .filter(aa => !isAddressableAreaStandardSlot(aa, deckDef))
+  const addressableAreasRaw = cutoutIds.flatMap(cutoutId => {
+    const addressableAreasOnCutout = cutoutFixtures.find(
+      cutoutFixture => cutoutFixture.id === STAGING_AREA_RIGHT_SLOT_FIXTURE
+    )?.providesAddressableAreas[cutoutId]
+    return addressableAreasOnCutout ?? []
+  })
+  if (filterStandardSlots) {
+    return addressableAreasRaw.filter(
+      aa => !isAddressableAreaStandardSlot(aa, deckDef)
+    )
+  }
+  return addressableAreasRaw
 }
 
-export const getCutoutIdByAddressableArea = (
-  addressableAreaName: AddressableAreaName,
-  cutoutFixtureId: CutoutFixtureId,
-  robotType: RobotType
-): CutoutId => {
-  const deckDef = getDeckDefFromRobotType(robotType)
-  const cutoutFixtures = deckDef.cutoutFixtures
-  const providesAddressableAreasForAddressableArea = cutoutFixtures.find(
-    cutoutFixture => cutoutFixture.id.includes(cutoutFixtureId)
-  )?.providesAddressableAreas
+export function getMatchingTipLiquidSpecsFromSpec(
+  pipetteSpecs: PipetteV2Specs,
+  volume: number,
+  tiprackUri: string
+): SupportedTip {
+  const matchingLabwareDef = getAllLabwareDefs()[tiprackUri]
 
-  const findCutoutIdByAddressableArea = (
-    addressableAreaName: AddressableAreaName
-  ): CutoutId | null => {
-    if (providesAddressableAreasForAddressableArea != null) {
-      for (const cutoutId in providesAddressableAreasForAddressableArea) {
-        if (
-          providesAddressableAreasForAddressableArea[
-            cutoutId as keyof typeof providesAddressableAreasForAddressableArea
-          ].includes(addressableAreaName)
-        ) {
-          return cutoutId as CutoutId
-        }
+  console.assert(
+    matchingLabwareDef,
+    `expected to find a matching labware def with tiprack ${tiprackUri} but could not`
+  )
+
+  const tipLength = matchingLabwareDef?.parameters.tipLength ?? 0
+
+  if (tipLength === 0) {
+    console.error(
+      `expected to find a tiplength with tiprack ${
+        matchingLabwareDef?.metadata.displayName ?? 'unknown displayName'
+      } but could not`
+    )
+  }
+
+  const isLowVolumePipette = Object.keys(pipetteSpecs.liquids).some(
+    key => key === 'lowVolumeDefault'
+  )
+
+  const isUsingLowVolume = volume < 5
+  const liquidType =
+    isLowVolumePipette && isUsingLowVolume ? 'lowVolumeDefault' : 'default'
+  const liquidSupportedTips = Object.values(
+    pipetteSpecs.liquids[liquidType].supportedTips
+  )
+
+  //  find the supported tip liquid specs that either exactly match
+  //  tipLength or are closest, this accounts for custom tipracks
+  const matchingTipLiquidSpecs = liquidSupportedTips.sort((tipA, tipB) => {
+    const differenceA = Math.abs(tipA.defaultTipLength - tipLength)
+    const differenceB = Math.abs(tipB.defaultTipLength - tipLength)
+    return differenceA - differenceB
+  })[0]
+  console.assert(
+    matchingTipLiquidSpecs,
+    `expected to find the tip liquid specs but could not with pipette tiprack displayname ${
+      matchingLabwareDef?.metadata.displayName ?? 'unknown displayname'
+    }`
+  )
+
+  return matchingTipLiquidSpecs
+}
+
+export function getMatchingTipLiquidSpecs(
+  pipetteEntity: PipetteEntity,
+  volume: number,
+  tiprack: string
+): SupportedTip {
+  const matchingLabwareDef = Object.values(
+    pipetteEntity.tiprackLabwareDef
+  ).find(def => tiprack.includes(def.parameters.loadName))
+
+  console.assert(
+    matchingLabwareDef,
+    `expected to find a matching labware def with tiprack ${tiprack} but could not`
+  )
+
+  const tipLength = matchingLabwareDef?.parameters.tipLength ?? 0
+
+  if (tipLength === 0) {
+    console.error(
+      `expected to find a tiplength with tiprack ${
+        matchingLabwareDef?.metadata.displayName ?? 'unknown displayName'
+      } but could not`
+    )
+  }
+
+  const isLowVolumePipette = LOW_VOLUME_PIPETTES.includes(pipetteEntity.name)
+  const isUsingLowVolume = volume < 5
+  const liquidType =
+    isLowVolumePipette && isUsingLowVolume ? 'lowVolumeDefault' : 'default'
+  const liquidSupportedTips = Object.values(
+    pipetteEntity.spec.liquids[liquidType].supportedTips
+  )
+
+  //  find the supported tip liquid specs that either exactly match
+  //  tipLength or are closest, this accounts for custom tipracks
+  const matchingTipLiquidSpecs = liquidSupportedTips.sort((tipA, tipB) => {
+    const differenceA = Math.abs(tipA.defaultTipLength - tipLength)
+    const differenceB = Math.abs(tipB.defaultTipLength - tipLength)
+    return differenceA - differenceB
+  })[0]
+  console.assert(
+    matchingTipLiquidSpecs,
+    `expected to find the tip liquid specs but could not with pipette tiprack displayname ${
+      matchingLabwareDef?.metadata.displayName ?? 'unknown displayname'
+    }`
+  )
+
+  return matchingTipLiquidSpecs
+}
+
+/**
+ * Removes specific phrases from the input string.
+ *
+ * This function removes the following phrases from the input string:
+ * - 'Opentrons Flex 96'
+ * - 'Opentrons OT-2 96'
+ * - '(Retired)'
+ * - '96' (only if it is not the first two characters)
+ *
+ * @param {string} input - The input string from which phrases will be removed.
+ * @returns {string} - The modified string with specified phrases removed.
+ */
+export const removeOpentronsPhrases = (input: string): string => {
+  const phrasesToRemove = [
+    'Opentrons Flex 96',
+    'Opentrons OT-2 96',
+    '\\(Retired\\)',
+    '96',
+    'Eppendorf',
+  ]
+
+  const updatedText = phrasesToRemove
+    .reduce((text, phrase) => {
+      return text.replace(new RegExp(phrase, 'gi'), '')
+    }, input)
+    .trim()
+    .replace(/\s+/g, ' ')
+
+  return updatedText.trim()
+}
+
+const getModuleShortnameForPython = (type: ModuleType): string => {
+  const shortName = type.split('Type')[0]
+  return snakeCase(shortName)
+}
+
+export const getModulePythonName = (
+  type: ModuleType,
+  typeCount: number
+): string => {
+  return `${getModuleShortnameForPython(type)}_${typeCount}`
+}
+
+export const getLabwarePythonName = (
+  labwareDisplayCategory: LabwareDisplayCategory,
+  typeCount: number
+): string => {
+  return `${snakeCase(labwareDisplayCategory)}_${typeCount}`
+}
+
+export const getAdditionalEquipmentPythonName = (
+  fixtureName: 'wasteChute' | 'trashBin',
+  typeCount: number,
+  location?: string
+): string => {
+  switch (fixtureName) {
+    case 'wasteChute': {
+      return snakeCase(fixtureName)
+    }
+    case 'trashBin': {
+      if (location === 'cutout12') {
+        return `${PROTOCOL_CONTEXT_NAME}.fixed_trash`
+      } else {
+        return `${snakeCase(fixtureName)}_${typeCount}`
       }
     }
+  }
+}
+
+export const getDefaultBlowoutFlowRate = (
+  transferVolume: number,
+  pipetteSpecs: PipetteV2Specs,
+  tiprackDef: LabwareDefinition2
+): number | null => {
+  const { liquids } = pipetteSpecs
+  const isInLowVolumeMode =
+    transferVolume < liquids.default.minVolume && 'lowVolumeDefault' in liquids
+  const liquidsObject = isInLowVolumeMode
+    ? liquids.lowVolumeDefault
+    : liquids.default
+  return liquidsObject.supportedTips[
+    `t${tiprackDef.wells.A1.totalLiquidVolume}`
+  ].defaultBlowOutFlowRate.default
+}
+
+export const getDefaultPushOutVolume = (
+  transferVolume: number,
+  pipetteSpecs: PipetteV2Specs,
+  tiprackDefinition: LabwareDefinition2
+): number => {
+  const { liquids } = pipetteSpecs
+  if (tiprackDefinition == null) {
+    return 0
+  }
+  console.assert(
+    tiprackDefinition.metadata.displayCategory === 'tipRack',
+    'Specified labware entity must be tiprack'
+  )
+  const tipVolume = Object.values(tiprackDefinition.wells)[0].totalLiquidVolume
+  const lookupKey =
+    transferVolume < liquids.default.minVolume && 'lowVolumeDefault' in liquids
+      ? 'lowVolumeDefault'
+      : 'default'
+  const tipVolumeKey = `t${tipVolume}`
+  return (
+    liquids[lookupKey].supportedTips[tipVolumeKey]?.defaultPushOutVolume ?? 0
+  )
+}
+
+export const getMaxConditioningVolume = (args: {
+  transferVolume: number
+  disposalVolume: number
+  tiprackDefUri: string
+  labwareEntities: LabwareEntities
+  pipetteSpecs: PipetteV2Specs
+}): number => {
+  const {
+    transferVolume,
+    disposalVolume,
+    labwareEntities,
+    tiprackDefUri,
+    pipetteSpecs,
+  } = args
+  const { liquids } = pipetteSpecs
+  const minVolumeForMultiDispense = transferVolume * 2
+  const isInLowVolumeMode =
+    minVolumeForMultiDispense < liquids.default.minVolume &&
+    'lowVolumeDefault' in liquids
+  const tiprack = Object.values(labwareEntities).find(
+    ({ labwareDefURI }) => labwareDefURI === tiprackDefUri
+  )
+  const tipMaxVolume = tiprack != null ? getTiprackVolume(tiprack.def) : null
+
+  const maxWorkingVolume = Math.min(
+    isInLowVolumeMode
+      ? liquids.lowVolumeDefault.maxVolume
+      : liquids.default.maxVolume,
+    ...(tipMaxVolume != null ? [tipMaxVolume] : [])
+  )
+  return Math.max(
+    0,
+    maxWorkingVolume - disposalVolume - minVolumeForMultiDispense
+  )
+}
+
+// for stacking
+export function getLocationStackTopToBottom(
+  labwareId: string,
+  labwareLocationUpdate: Record<string, string>,
+  moduleLocationUpdate: Record<string, string>
+): string[] {
+  const stack = []
+  let current = labwareId
+
+  //  while parent still exists
+  while (true) {
+    stack.push(current)
+    const parent =
+      labwareLocationUpdate[current] || moduleLocationUpdate[current]
+    if (!parent) break
+    current = parent
+  }
+
+  return stack
+}
+
+export const getLabwaresOnModuleFromStack = (
+  moduleId: string,
+  labware: LabwareOnDeck[]
+): { topMostId: string | null; rightBelowTopId: string | null } => {
+  // all stacks involving this module
+  const allStacks = labware.filter(lw => lw.stack.includes(moduleId))
+  const largestStack = allStacks.sort(
+    (a, b) => b.stack.length - a.stack.length
+  )[0]
+  const topMostId = largestStack?.stack[0]
+  const isTopMostIdALid = labware.find(
+    lw => lw.id === topMostId && lw.def.allowedRoles?.includes('lid')
+  )
+  return {
+    topMostId: largestStack?.stack[0],
+    rightBelowTopId: isTopMostIdALid ? largestStack?.stack[1] : null,
+  }
+}
+
+export const getFullStackFromLabwaresOnDeck = (
+  labwareOnDeck: LabwareOnDeck[],
+  slot: DeckSlotId
+): string[] => {
+  return labwareOnDeck
+    .filter(lw => lw.stack.includes(slot))
+    .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack
+}
+
+export const getModuleIdFromStack = (
+  stack: string[],
+  modulesById: InitialDeckSetup['modules'] | ModuleEntities
+): string | null => {
+  return stack.find(id => modulesById[id] != null) ?? null
+}
+
+export const getLabwareIdAfterModuleIdInStack = (
+  moduleId: string,
+  labware: {
+    [labwareId: string]: LabwareOnDeck
+  }
+): string | null => {
+  const matchingLabware = Object.values(labware).find(lw =>
+    lw.stack.includes(moduleId)
+  )
+  if (!matchingLabware) {
     return null
   }
 
-  const cutoutId = findCutoutIdByAddressableArea(addressableAreaName)
+  const index = matchingLabware.stack.indexOf(moduleId)
+  const indexAfter = index + 1
 
-  if (cutoutId == null) {
-    throw Error(
-      `expected to find cutoutId from addressableAreaName ${addressableAreaName} but could not`
-    )
-  }
-  return cutoutId
+  return matchingLabware.stack[indexAfter] ?? null
+}
+
+export const getHasTrash = (
+  additionalEquipment: AllTemporalPropertiesForTimelineFrame['additionalEquipmentOnDeck']
+): boolean => {
+  return Object.values(additionalEquipment).some(
+    ae => ae.name === 'trashBin' || ae.name === 'wasteChute'
+  )
+}
+
+export const getAllLabwareIdsOfCertainURIOnStack = (
+  deckSetupLabware: AllTemporalPropertiesForTimelineFrame['labware'],
+  labwareOnDeck: LabwareOnDeck
+): string[] => {
+  return Object.values(deckSetupLabware).reduce<string[]>(
+    (acc, { labwareDefURI, stack, id }) => {
+      return labwareDefURI === labwareOnDeck.labwareDefURI &&
+        getSlotInLocationStack(stack) ===
+          getSlotInLocationStack(labwareOnDeck.stack)
+        ? [...acc, id]
+        : acc
+    },
+    []
+  )
 }

@@ -1,8 +1,10 @@
 import styled from 'styled-components'
 
-import { styleProps, isntStyleProp } from './style-props'
+import { CURSOR_POINTER } from '../styles'
+import { isntStyleProp, styleProps } from './style-props'
 
-import type { StyleProps, PrimitiveComponent } from './types'
+import type { ComponentProps } from 'react'
+import type { PrimitiveComponent, StyleProps } from './types'
 
 export interface LinkProps extends StyleProps {
   /** render link with target="_blank" */
@@ -19,13 +21,13 @@ export const Link: PrimitiveComponent<'a', LinkProps> = styled.a
     shouldForwardProp: p => isntStyleProp(p) && p !== 'external',
   })
   .attrs(
-    (props: LinkProps): React.ComponentProps<PrimitiveComponent<'a'>> => {
+    (props: LinkProps): ComponentProps<PrimitiveComponent<'a'>> => {
       return props.external === true
         ? { target: '_blank', rel: 'noopener noreferrer' }
         : { tabIndex: '0' }
     }
   )`
   text-decoration: none;
-  cursor: pointer;
+  cursor: ${CURSOR_POINTER};
   ${styleProps}
 `

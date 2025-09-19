@@ -1,35 +1,37 @@
-import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  RUN_STATUS_FINISHING,
   RUN_STATUS_IDLE,
   RUN_STATUS_RUNNING,
-  RUN_STATUS_FINISHING,
 } from '@opentrons/api-client'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
 import {
   mockMagneticModule,
   mockMagneticModuleGen2,
   mockTemperatureModule,
   mockTemperatureModuleGen2,
   mockThermocycler,
-} from '../../../redux/modules/__fixtures__'
-import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
+} from '/app/redux/modules/__fixtures__'
+
 import { AboutModuleSlideout } from '../AboutModuleSlideout'
 
-vi.mock('../../RunTimeControl/hooks')
+import type { ComponentProps } from 'react'
 
-const render = (props: React.ComponentProps<typeof AboutModuleSlideout>) => {
+vi.mock('/app/organisms/RunTimeControl')
+
+const render = (props: ComponentProps<typeof AboutModuleSlideout>) => {
   return renderWithProviders(<AboutModuleSlideout {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
 describe('AboutModuleSlideout', () => {
-  let props: React.ComponentProps<typeof AboutModuleSlideout>
+  let props: ComponentProps<typeof AboutModuleSlideout>
   beforeEach(() => {
     props = {
       module: mockMagneticModule,

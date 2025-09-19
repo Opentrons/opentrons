@@ -1,78 +1,93 @@
-import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { Switch, Route, Redirect } from 'react-router-dom'
-import { css } from 'styled-components'
+import { useEffect, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
+import { useDispatch, useSelector } from 'react-redux'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import NiceModal from '@ebay/nice-modal-react'
+import { css } from 'styled-components'
 
 import {
   Box,
-  POSITION_RELATIVE,
   COLORS,
   OVERFLOW_AUTO,
-  useIdle,
-  useScrolling,
+  POSITION_RELATIVE,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
-import NiceModal from '@ebay/nice-modal-react'
 
-import { SleepScreen } from '../atoms/SleepScreen'
-import { ToasterOven } from '../organisms/ToasterOven'
-import { MaintenanceRunTakeover } from '../organisms/TakeoverModal'
-import { FirmwareUpdateTakeover } from '../organisms/FirmwareUpdateModal/FirmwareUpdateTakeover'
-import { EstopTakeover } from '../organisms/EmergencyStop'
-import { ConnectViaEthernet } from '../pages/ConnectViaEthernet'
-import { ConnectViaUSB } from '../pages/ConnectViaUSB'
-import { ConnectViaWifi } from '../pages/ConnectViaWifi'
-import { EmergencyStop } from '../pages/EmergencyStop'
-import { NameRobot } from '../pages/NameRobot'
-import { NetworkSetupMenu } from '../pages/NetworkSetupMenu'
-import { ProtocolSetup } from '../pages/ProtocolSetup'
-import { RobotDashboard } from '../pages/RobotDashboard'
-import { RobotSettingsDashboard } from '../pages/RobotSettingsDashboard'
-import { ProtocolDashboard } from '../pages/ProtocolDashboard'
-import { ProtocolDetails } from '../pages/ProtocolDetails'
-import { RunningProtocol } from '../pages/RunningProtocol'
-import { RunSummary } from '../pages/RunSummary'
-import { UpdateRobot } from '../pages/UpdateRobot/UpdateRobot'
-import { UpdateRobotDuringOnboarding } from '../pages/UpdateRobot/UpdateRobotDuringOnboarding'
-import { InstrumentsDashboard } from '../pages/InstrumentsDashboard'
-import { InstrumentDetail } from '../pages/InstrumentDetail'
-import { Welcome } from '../pages/Welcome'
-import { InitialLoadingScreen } from '../pages/InitialLoadingScreen'
-import { DeckConfigurationEditor } from '../pages/DeckConfiguration'
-import { PortalRoot as ModalPortalRoot } from './portal'
-import { getOnDeviceDisplaySettings, updateConfigValue } from '../redux/config'
-import { updateBrightness } from '../redux/shell'
-import { SLEEP_NEVER_MS } from './constants'
+import { ReactQueryDevtools } from '/app/App/tools'
+import { SleepScreen } from '/app/atoms/SleepScreen'
+import { SLEEP_NEVER_MS, useScreenIdle } from '/app/local-resources/dom-utils'
+import { EstopTakeover } from '/app/organisms/EmergencyStop'
+import { FirmwareUpdateTakeover } from '/app/organisms/FirmwareUpdateModal/FirmwareUpdateTakeover'
+import { IncompatibleModuleTakeover } from '/app/organisms/IncompatibleModule'
+import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
+import { QuickTransferFlow } from '/app/organisms/ODD/QuickTransferFlow'
+import { MaintenanceRunTakeover } from '/app/organisms/TakeoverModal'
+import { ToasterOven } from '/app/organisms/ToasterOven'
+import { ChooseLanguage } from '/app/pages/ODD/ChooseLanguage'
+import { ConnectViaEthernet } from '/app/pages/ODD/ConnectViaEthernet'
+import { ConnectViaUSB } from '/app/pages/ODD/ConnectViaUSB'
+import { ConnectViaWifi } from '/app/pages/ODD/ConnectViaWifi'
+import { DeckConfigurationEditor } from '/app/pages/ODD/DeckConfiguration'
+import { EmergencyStop } from '/app/pages/ODD/EmergencyStop'
+import { InitialLoadingScreen } from '/app/pages/ODD/InitialLoadingScreen'
+import { InstrumentDetail } from '/app/pages/ODD/InstrumentDetail'
+import { InstrumentsDashboard } from '/app/pages/ODD/InstrumentsDashboard'
+import { NameRobot } from '/app/pages/ODD/NameRobot'
+import { NetworkSetupMenu } from '/app/pages/ODD/NetworkSetupMenu'
+import { ProtocolDashboard } from '/app/pages/ODD/ProtocolDashboard'
+import { ProtocolDetails } from '/app/pages/ODD/ProtocolDetails'
+import { ProtocolSetup } from '/app/pages/ODD/ProtocolSetup'
+import { QuickTransferDashboard } from '/app/pages/ODD/QuickTransferDashboard'
+import { QuickTransferDetails } from '/app/pages/ODD/QuickTransferDetails'
+import { RobotDashboard } from '/app/pages/ODD/RobotDashboard'
+import { RobotSettingsDashboard } from '/app/pages/ODD/RobotSettingsDashboard'
+import { RunningProtocol } from '/app/pages/ODD/RunningProtocol'
+import { RunSummary } from '/app/pages/ODD/RunSummary'
+import { UpdateRobot } from '/app/pages/ODD/UpdateRobot/UpdateRobot'
+import { UpdateRobotDuringOnboarding } from '/app/pages/ODD/UpdateRobot/UpdateRobotDuringOnboarding'
+import { Welcome } from '/app/pages/ODD/Welcome'
 import {
-  useCurrentRunRoute,
+  getOnDeviceDisplaySettings,
+  updateConfigValue,
+} from '/app/redux/config'
+import { getLocalRobot } from '/app/redux/discovery'
+import { updateBrightness } from '/app/redux/shell'
+
+import { LocalizationProvider } from '../LocalizationProvider'
+import { hackWindowNavigatorOnLine } from './hacks'
+import {
+  useModuleAttachedToast,
   useProtocolReceiptToast,
+  useScrollRef,
   useSoftwareUpdatePoll,
 } from './hooks'
-
+import { SharedScrollRefProvider } from './ODDProviders/ScrollRefProvider'
+import { ODDTopLevelRedirects } from './ODDTopLevelRedirects'
 import { OnDeviceDisplayAppFallback } from './OnDeviceDisplayAppFallback'
+import { PortalRoot as ModalPortalRoot } from './portal'
 
-import { hackWindowNavigatorOnLine } from './hacks'
-
-import type { Dispatch } from '../redux/types'
+import type { Dispatch } from '/app/redux/types'
 
 // forces electron to think we're online which means axios won't elide
 // network calls to localhost. see ./hacks.ts for more.
 hackWindowNavigatorOnLine()
 
 export const ON_DEVICE_DISPLAY_PATHS = [
+  '/choose-language',
   '/dashboard',
   '/deck-configuration',
   '/emergency-stop',
   '/instruments',
   '/instruments/:mount',
-  '/loading',
   '/network-setup',
   '/network-setup/ethernet',
   '/network-setup/usb',
   '/network-setup/wifi',
   '/protocols',
   '/protocols/:protocolId',
+  '/quick-transfer',
+  '/quick-transfer/new',
+  '/quick-transfer/:quickTransferId',
   '/robot-settings',
   '/robot-settings/rename-robot',
   '/robot-settings/update-robot',
@@ -87,6 +102,8 @@ function getPathComponent(
   path: typeof ON_DEVICE_DISPLAY_PATHS[number]
 ): JSX.Element {
   switch (path) {
+    case '/choose-language':
+      return <ChooseLanguage />
     case '/dashboard':
       return <RobotDashboard />
     case '/deck-configuration':
@@ -97,8 +114,6 @@ function getPathComponent(
       return <InstrumentsDashboard />
     case '/instruments/:mount':
       return <InstrumentDetail />
-    case '/loading':
-      return <InitialLoadingScreen />
     case '/network-setup':
       return <NetworkSetupMenu />
     case '/network-setup/ethernet':
@@ -111,6 +126,12 @@ function getPathComponent(
       return <ProtocolDashboard />
     case '/protocols/:protocolId':
       return <ProtocolDetails />
+    case '/quick-transfer':
+      return <QuickTransferDashboard />
+    case '/quick-transfer/new':
+      return <QuickTransferFlow />
+    case '/quick-transfer/:quickTransferId':
+      return <QuickTransferDetails />
     case '/robot-settings':
       return <RobotSettingsDashboard />
     case '/robot-settings/rename-robot':
@@ -143,6 +164,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
   const { brightness: userSetBrightness, sleepMs } = useSelector(
     getOnDeviceDisplaySettings
   )
+  const localRobot = useSelector(getLocalRobot)
 
   const sleepTime = sleepMs ?? SLEEP_NEVER_MS
   const options = {
@@ -150,12 +172,100 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
     initialState: false,
   }
   const dispatch = useDispatch<Dispatch>()
-  const isIdle = useIdle(sleepTime, options)
-  const [currentNode, setCurrentNode] = React.useState<null | HTMLElement>(null)
-  const scrollRef = React.useCallback((node: HTMLElement | null) => {
-    setCurrentNode(node)
-  }, [])
-  const isScrolling = useScrolling(currentNode)
+  const isIdle = useScreenIdle(sleepTime, options)
+  const [showModuleSetupModal, setShowModuleSetupModal] = useState(false)
+
+  useEffect(() => {
+    if (isIdle) {
+      dispatch(updateBrightness(TURN_OFF_BACKLIGHT))
+    } else {
+      dispatch(
+        updateConfigValue(
+          'onDeviceDisplaySettings.brightness',
+          userSetBrightness
+        )
+      )
+    }
+  }, [dispatch, isIdle, userSetBrightness])
+
+  // TODO (sb:6/12/23) Create a notification manager to set up preference and order of takeover modals
+  return (
+    <ApiHostProvider hostname="127.0.0.1">
+      <ReactQueryDevtools />
+      <InitialLoadingScreen>
+        <LocalizationProvider>
+          <ErrorBoundary FallbackComponent={OnDeviceDisplayAppFallback}>
+            <Box width="100%" css="user-select: none;">
+              {isIdle ? (
+                <SleepScreen />
+              ) : (
+                <>
+                  <IncompatibleModuleTakeover isOnDevice={true} />
+                  <MaintenanceRunTakeover>
+                    <EstopTakeover />
+                    <FirmwareUpdateTakeover />
+                    {showModuleSetupModal && localRobot?.name != null ? (
+                      <ModuleWizardFlows
+                        showSetupLauncher={true}
+                        closeFlow={() => {
+                          setShowModuleSetupModal(false)
+                        }}
+                        robotName={localRobot.name}
+                      />
+                    ) : null}
+                    <NiceModal.Provider>
+                      <ToasterOven>
+                        <ProtocolReceiptToasts />
+                        {!showModuleSetupModal ? (
+                          <ModuleAttachedToasts
+                            openFlow={(open: boolean) => {
+                              setShowModuleSetupModal(open)
+                            }}
+                          />
+                        ) : null}
+                        <SharedScrollRefProvider>
+                          <OnDeviceDisplayAppRoutes />
+                        </SharedScrollRefProvider>
+                      </ToasterOven>
+                    </NiceModal.Provider>
+                  </MaintenanceRunTakeover>
+                </>
+              )}
+            </Box>
+            <ODDTopLevelRedirects />
+          </ErrorBoundary>
+        </LocalizationProvider>
+      </InitialLoadingScreen>
+    </ApiHostProvider>
+  )
+}
+
+const getTargetPath = (unfinishedUnboxingFlowRoute: string | null): string => {
+  if (unfinishedUnboxingFlowRoute != null) {
+    return unfinishedUnboxingFlowRoute
+  }
+
+  return '/dashboard'
+}
+
+// split to a separate function because scrollRef rerenders on every route change
+// this avoids rerendering parent providers as well
+export function OnDeviceDisplayAppRoutes(): JSX.Element {
+  const { isScrolling, refCallback, element } = useScrollRef()
+  const location = useLocation()
+  useEffect(() => {
+    element?.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'auto',
+    })
+  }, [location.pathname])
+
+  const { unfinishedUnboxingFlowRoute } = useSelector(
+    getOnDeviceDisplaySettings
+  )
+
+  const targetPath = getTargetPath(unfinishedUnboxingFlowRoute)
 
   const TOUCH_SCREEN_STYLE = css`
     position: ${POSITION_RELATIVE};
@@ -176,63 +286,37 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
     }
   `
 
-  React.useEffect(() => {
-    if (isIdle) {
-      dispatch(updateBrightness(TURN_OFF_BACKLIGHT))
-    } else {
-      dispatch(
-        updateConfigValue(
-          'onDeviceDisplaySettings.brightness',
-          userSetBrightness
-        )
-      )
-    }
-  }, [dispatch, isIdle, userSetBrightness])
-
-  // TODO (sb:6/12/23) Create a notification manager to set up preference and order of takeover modals
   return (
-    <ApiHostProvider hostname="127.0.0.1">
-      <ErrorBoundary FallbackComponent={OnDeviceDisplayAppFallback}>
-        <Box width="100%" css="user-select: none;">
-          {isIdle ? (
-            <SleepScreen />
-          ) : (
-            <>
-              <EstopTakeover />
-              <MaintenanceRunTakeover>
-                <FirmwareUpdateTakeover />
-                <NiceModal.Provider>
-                  <ToasterOven>
-                    <ProtocolReceiptToasts />
-                    <Switch>
-                      {ON_DEVICE_DISPLAY_PATHS.map(path => (
-                        <Route key={path} exact path={path}>
-                          <Box css={TOUCH_SCREEN_STYLE} ref={scrollRef}>
-                            <ModalPortalRoot />
-                            {getPathComponent(path)}
-                          </Box>
-                        </Route>
-                      ))}
-                      <Redirect exact from="/" to={'/loading'} />
-                    </Switch>
-                  </ToasterOven>
-                </NiceModal.Provider>
-              </MaintenanceRunTakeover>
-            </>
-          )}
-        </Box>
-      </ErrorBoundary>
-      <TopLevelRedirects />
-    </ApiHostProvider>
+    <Routes>
+      {ON_DEVICE_DISPLAY_PATHS.map(path => (
+        <Route
+          key={path}
+          path={path}
+          element={
+            <Box css={TOUCH_SCREEN_STYLE} ref={refCallback}>
+              <ModalPortalRoot />
+              {getPathComponent(path)}
+            </Box>
+          }
+        />
+      ))}
+      {targetPath != null && (
+        <Route path="*" element={<Navigate to={targetPath} replace />} />
+      )}
+    </Routes>
   )
-}
-
-function TopLevelRedirects(): JSX.Element | null {
-  const currentRunRoute = useCurrentRunRoute()
-  return currentRunRoute != null ? <Redirect to={currentRunRoute} /> : null
 }
 
 function ProtocolReceiptToasts(): null {
   useProtocolReceiptToast()
+  return null
+}
+
+function ModuleAttachedToasts({
+  openFlow,
+}: {
+  openFlow: (open: boolean) => void
+}): null {
+  useModuleAttachedToast(openFlow)
   return null
 }

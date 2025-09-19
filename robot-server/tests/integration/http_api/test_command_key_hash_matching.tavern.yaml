@@ -1,0 +1,119 @@
+test_name: Test that command keys in analysis and protocol run match for a deterministic protocol running using protocol engine
+
+marks:
+  - usefixtures:
+      - ot2_server_base_url
+
+stages:
+  - name: Upload a protocol
+    request:
+      url: '{ot2_server_base_url}/protocols'
+      method: POST
+      files:
+        files: 'tests/integration/protocols/basic_transfer_with_run_time_parameters.py'
+    response:
+      save:
+        json:
+          protocol_id: data.id
+          analysis_id: data.analysisSummaries[0].id
+      strict:
+        - json:off
+      status_code: 201
+
+  - name: Save command keys from protocol analysis
+    max_retries: 5
+    delay_after: 1
+    request:
+      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses/{analysis_id}'
+    response:
+      save:
+        json:
+          analysis_data: data
+          home_cmd_key: data.commands[0].key
+          plate_load_key: data.commands[1].key
+          pipette_load_key: data.commands[3].key
+          pick_up_tip_key: data.commands[4].key
+          drop_tip_key: data.commands[7].key
+      strict:
+        - json:off
+      json:
+        data:
+          id: '{analysis_id}'
+          commands:
+            - commandType: loadPipette
+
+  - name: Create run from protocol
+    request:
+      url: '{ot2_server_base_url}/runs'
+      method: POST
+      json:
+        data:
+          protocolId: '{protocol_id}'
+    response:
+      status_code: 201
+      save:
+        json:
+          original_run_data: data
+          run_id: data.id
+
+  - name: Play the run
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}/actions'
+      method: POST
+      json:
+        data:
+          actionType: play
+    response:
+      status_code: 201
+
+  - name: Wait for the protocol to complete
+    max_retries: 5
+    delay_after: 1
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}'
+      method: GET
+    response:
+      status_code: 200
+      strict:
+        - json:off
+      json:
+        data:
+          status: succeeded
+
+  - name: Verify commands have keys identical to their counterparts in analysis
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}/commands'
+      method: GET
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        links:
+          current:
+            href: !anystr
+            meta:
+              runId: !anystr
+              commandId: !anystr
+              index: 7
+              key: !anystr
+              createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+        meta:
+          cursor: 0
+          totalLength: 8
+        data:
+          - id: !anystr
+            key: '{home_cmd_key}'
+            commandType: home
+          - id: !anystr
+            key: '{plate_load_key}'
+            commandType: loadLabware
+          - id: !anystr
+            key: '{pipette_load_key}'
+            commandType: loadPipette
+          - id: !anystr
+            key: '{pick_up_tip_key}'
+            commandType: pickUpTip
+          - id: !anystr
+            key: '{drop_tip_key}'
+            commandType: dropTip

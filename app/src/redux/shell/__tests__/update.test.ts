@@ -1,9 +1,10 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import * as ShellUpdate from '../update'
 import { shellUpdateReducer } from '../reducer'
-import type { ShellUpdateState, ShellUpdateAction } from '../types'
+import * as ShellUpdate from '../update'
+
 import type { State } from '../../types'
+import type { ShellUpdateAction, ShellUpdateState } from '../types'
 
 describe('shell/update', () => {
   describe('action creators', () => {

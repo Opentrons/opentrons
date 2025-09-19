@@ -1,5 +1,5 @@
+import { combineEpics, ofType } from 'redux-observable'
 import { of } from 'rxjs'
-import { ofType, combineEpics } from 'redux-observable'
 import { switchMap } from 'rxjs/operators'
 
 import { startDiscovery } from '../../discovery'
@@ -12,8 +12,9 @@ import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
+import type { RobotApiErrorResponse } from '../../robot-api/types'
 import type { Action, Epic } from '../../types'
-import {
+import type {
   PostWifiConfigureAction,
   PostWifiConfigureSuccessAction,
 } from '../types'
@@ -32,8 +33,12 @@ const mapResponseToAction: ResponseToActionMapper<PostWifiConfigureAction> = (
   const meta = { ...originalAction.meta, response: responseMeta }
 
   return response.ok
-    ? Actions.postWifiConfigureSuccess(host.name, body.ssid, meta)
-    : Actions.postWifiConfigureFailure(host.name, body, meta)
+    ? Actions.postWifiConfigureSuccess(host.name, body.ssid as string, meta)
+    : Actions.postWifiConfigureFailure(
+        host.name,
+        body as RobotApiErrorResponse,
+        meta
+      )
 }
 
 const postWifiConfigureEpic: Epic = (action$, state$) => {

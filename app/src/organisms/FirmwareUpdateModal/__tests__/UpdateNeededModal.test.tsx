@@ -1,17 +1,21 @@
-import * as React from 'react'
-import { describe, it, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
+
 import {
   useInstrumentsQuery,
   useSubsystemUpdateQuery,
   useUpdateSubsystemMutation,
 } from '@opentrons/react-api-client'
-import { i18n } from '../../../i18n'
-import { UpdateNeededModal } from '../UpdateNeededModal'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+
 import { UpdateInProgressModal } from '../UpdateInProgressModal'
+import { UpdateNeededModal } from '../UpdateNeededModal'
 import { UpdateResultsModal } from '../UpdateResultsModal'
 
+import type { ComponentProps } from 'react'
 import type {
   BadPipette,
   SubsystemUpdateProgressData,
@@ -21,14 +25,14 @@ vi.mock('@opentrons/react-api-client')
 vi.mock('../UpdateInProgressModal')
 vi.mock('../UpdateResultsModal')
 
-const render = (props: React.ComponentProps<typeof UpdateNeededModal>) => {
+const render = (props: ComponentProps<typeof UpdateNeededModal>) => {
   return renderWithProviders(<UpdateNeededModal {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
 describe('UpdateNeededModal', () => {
-  let props: React.ComponentProps<typeof UpdateNeededModal>
+  let props: ComponentProps<typeof UpdateNeededModal>
   const refetch = vi.fn(() => Promise.resolve())
   const updateSubsystem = vi.fn(() =>
     Promise.resolve({

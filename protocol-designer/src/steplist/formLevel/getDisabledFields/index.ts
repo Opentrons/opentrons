@@ -1,20 +1,32 @@
 import { defaultMemoize } from 'reselect'
-import { getDisabledFieldsMoveLiquidForm } from './getDisabledFieldsMoveLiquidForm'
-import { getDisabledFieldsMixForm } from './getDisabledFieldsMixForm'
-import { getDisabledFieldsHeaterShaker } from './getDisabledFieldsHeaterShaker'
-import type { HydratedFormdata } from '../../../form-types'
 
-function _getDisabledFields(hydratedForm: HydratedFormdata): Set<string> {
+import { getDisabledFieldsHeaterShaker } from './getDisabledFieldsHeaterShaker'
+import { getDisabledFieldsMixForm } from './getDisabledFieldsMixForm'
+import { getDisabledFieldsMoveLiquidForm } from './getDisabledFieldsMoveLiquidForm'
+
+import type {
+  HydratedFormData,
+  HydratedHeaterShakerFormData,
+  HydratedMixFormData,
+  HydratedMoveLiquidFormData,
+} from '../../../form-types'
+
+function _getDisabledFields(hydratedForm: HydratedFormData): Set<string> {
   switch (hydratedForm.stepType) {
     case 'moveLiquid':
-      return getDisabledFieldsMoveLiquidForm(hydratedForm)
+      return getDisabledFieldsMoveLiquidForm(
+        hydratedForm as HydratedMoveLiquidFormData
+      )
 
     case 'mix':
-      return getDisabledFieldsMixForm(hydratedForm)
+      return getDisabledFieldsMixForm(hydratedForm as HydratedMixFormData)
 
     case 'heaterShaker':
-      return getDisabledFieldsHeaterShaker(hydratedForm)
+      return getDisabledFieldsHeaterShaker(
+        hydratedForm as HydratedHeaterShakerFormData
+      )
 
+    case 'comment':
     case 'pause':
     case 'magnet':
     case 'thermocycler':
@@ -34,5 +46,5 @@ function _getDisabledFields(hydratedForm: HydratedFormdata): Set<string> {
 // shallow-memoized because every disable-able field in the form calls this function once
 // WARNING: do not mutate the same rawForm obj or this memoization will break
 export const getDisabledFields: (
-  hydratedForm: HydratedFormdata
+  hydratedForm: HydratedFormData
 ) => Set<string> = defaultMemoize(_getDisabledFields)

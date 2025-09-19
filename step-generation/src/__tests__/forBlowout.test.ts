@@ -1,13 +1,15 @@
-import { beforeEach, describe, it, expect } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
+import { makeImmutableStateUpdater } from '../__utils__'
 import {
-  makeContext,
-  getInitialRobotStateStandard,
   DEFAULT_PIPETTE,
+  getInitialRobotStateStandard,
+  makeContext,
   SOURCE_LABWARE,
 } from '../fixtures'
 import { forBlowout as _forBlowout } from '../getNextRobotStateAndWarnings/forBlowout'
-import { makeImmutableStateUpdater } from '../__utils__'
-import type { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+
+import type { BlowoutParams } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../types'
 
 const forBlowout = makeImmutableStateUpdater(_forBlowout)
@@ -53,7 +55,8 @@ describe('Blowout command', () => {
             },
           },
         },
-        additionalEquipment: {} as any,
+        wasteChute: {} as any,
+        trashBins: {} as any,
       },
     }
 

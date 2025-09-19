@@ -1,23 +1,29 @@
-import { createSelector } from 'reselect'
 import last from 'lodash/last'
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
 import uniqBy from 'lodash/uniqBy'
+import { createSelector } from 'reselect'
+
+import { getIsLid, getIsPipettableLabware } from '@opentrons/shared-data'
 import * as StepGeneration from '@opentrons/step-generation'
-import { getAllWellsForLabware } from '../../constants'
-import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import {
-  selectors as stepFormSelectors,
-  LabwareOnDeck,
+  getNearestParentInStack,
+  TOUCHED_PIPETTABLE_LABWARE,
+} from '@opentrons/step-generation'
+
+import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
+import { selectors as stepFormSelectors } from '../../step-forms'
+
+import type { StepIdType } from '../../form-types'
+import type {
   LabwareTemporalProperties,
   ModuleOnDeck,
   ModuleTemporalProperties,
   PipetteOnDeck,
   PipetteTemporalProperties,
 } from '../../step-forms'
-import { Substeps } from '../../steplist/types'
-import { BaseState, Selector } from '../../types'
-import { StepIdType } from '../../form-types'
+import type { Substeps } from '../../steplist/types'
+import type { BaseState, Selector } from '../../types'
 
 // NOTE this just adds missing well keys to the labware-ingred 'deck setup' liquid state
 export const getLabwareLiquidState: Selector<StepGeneration.LabwareLiquidState> = createSelector(
@@ -31,7 +37,9 @@ export const getLabwareLiquidState: Selector<StepGeneration.LabwareLiquidState> 
         labwareId
       ): StepGeneration.LabwareLiquidState => {
         const labwareDef = labwareEntities[labwareId].def
-        const allWells = labwareDef ? getAllWellsForLabware(labwareDef) : []
+        const allWells = labwareDef
+          ? StepGeneration.getAllWellsForLabware(labwareDef)
+          : []
         const liquidStateForLabwareAllWells = allWells.reduce(
           (innerAcc: StepGeneration.SingleLabwareLiquidState, well) => ({
             ...innerAcc,
@@ -63,9 +71,24 @@ export const getInitialRobotState: (
     )
     const labware: Record<string, LabwareTemporalProperties> = mapValues(
       initialDeckSetup.labware,
-      (l: LabwareOnDeck): LabwareTemporalProperties => ({
-        slot: l.slot,
-      })
+      ({ id, stack }): LabwareTemporalProperties => {
+        const labwareEntity = invariantContext.labwareEntities[id]
+        const isLid = getIsLid(labwareEntity.def)
+        const nearestParent = getNearestParentInStack(stack)
+        const isParentPipettableLabware =
+          nearestParent != null &&
+          nearestParent in invariantContext.labwareEntities &&
+          getIsPipettableLabware(
+            invariantContext.labwareEntities[nearestParent].def
+          )
+        return {
+          stack,
+          // set sterility to TOUCHED_PIPETTABLE_LABWARE if the labware is a lid and the parent is pipettable labware
+          ...(isLid && isParentPipettableLabware
+            ? { sterility: TOUCHED_PIPETTABLE_LABWARE }
+            : {}),
+        }
+      }
     )
     const modules: Record<string, ModuleTemporalProperties> = mapValues(
       initialDeckSetup.modules,

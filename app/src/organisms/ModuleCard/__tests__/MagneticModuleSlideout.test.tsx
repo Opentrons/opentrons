@@ -1,26 +1,29 @@
-import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { COLORS } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
-import { MagneticModuleSlideout } from '../MagneticModuleSlideout'
 
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import {
   mockMagneticModule,
   mockMagneticModuleGen2,
-} from '../../../redux/modules/__fixtures__'
+} from '/app/redux/modules/__fixtures__'
+
+import { MagneticModuleSlideout } from '../MagneticModuleSlideout'
+
+import type { ComponentProps } from 'react'
 
 vi.mock('@opentrons/react-api-client')
 
-const render = (props: React.ComponentProps<typeof MagneticModuleSlideout>) => {
+const render = (props: ComponentProps<typeof MagneticModuleSlideout>) => {
   return renderWithProviders(<MagneticModuleSlideout {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 describe('MagneticModuleSlideout', () => {
-  let props: React.ComponentProps<typeof MagneticModuleSlideout>
+  let props: ComponentProps<typeof MagneticModuleSlideout>
   let mockCreateLiveCommand = vi.fn()
   beforeEach(() => {
     mockCreateLiveCommand = vi.fn()
@@ -96,5 +99,13 @@ describe('MagneticModuleSlideout', () => {
       },
     })
     expect(button).not.toBeEnabled()
+  })
+
+  it('renders the correct background color in magnetic module data', () => {
+    render(props)
+    const magneticModuleInfo = screen.getByTestId(
+      'MagneticModuleSlideout_body_data_def456'
+    )
+    expect(magneticModuleInfo).toHaveStyle(`background-color: ${COLORS.grey20}`)
   })
 })

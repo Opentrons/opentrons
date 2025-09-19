@@ -1,12 +1,13 @@
-import * as React from 'react'
+import clsx from 'clsx'
 
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-import { LocationIcon } from '../../molecules'
-import { Flex } from '../../primitives'
-import { ALIGN_CENTER, DIRECTION_COLUMN, JUSTIFY_CENTER } from '../../styles'
+
+import { DeckInfoLabel } from '../../molecules'
+import styles from './deck.module.css'
 import { RobotCoordsForeignObject } from './RobotCoordsForeignObject'
 
 import type { RobotType } from '@opentrons/shared-data'
+
 interface SlotLabelsProps {
   robotType: RobotType
   color?: string
@@ -25,6 +26,29 @@ export const SlotLabels = ({
   const widthSmallRem = 10.5
   const widthLargeRem = 15.25
 
+  const rowDynamicWidth = show4thColumn
+    ? `${widthSmallRem * 2 + widthLargeRem * 2}rem`
+    : `${widthSmallRem + widthLargeRem * 2}rem`
+
+  const itemDynamicWidth = show4thColumn
+    ? `${widthSmallRem}rem`
+    : `${widthLargeRem}rem`
+
+  const rowStyle: Record<string, string> = {
+    '--dynamic-width': rowDynamicWidth,
+  }
+  const simpleItemWidthStyle: Record<string, string> = {
+    '--dynamic-width': `${widthLargeRem}rem`,
+  }
+  const smallItemWidthStyle: Record<string, string> = {
+    '--dynamic-width': `${widthSmallRem}rem`,
+  }
+  const nextTo4thWidthStyle: Record<string, string> = {
+    '--dynamic-width': itemDynamicWidth,
+  }
+  const fourthWidthStyle: Record<string, string> = {
+    '--dynamic-width': `${widthSmallRem}rem`,
+  }
   return robotType === FLEX_ROBOT_TYPE ? (
     <>
       <RobotCoordsForeignObject
@@ -33,46 +57,20 @@ export const SlotLabels = ({
         x="-147"
         y="-10"
       >
-        <Flex
-          alignItems={ALIGN_CENTER}
-          flexDirection={DIRECTION_COLUMN}
-          flex="1"
-          height="100%"
-          width="2.5rem"
-        >
-          <Flex alignItems={ALIGN_CENTER} flex="1">
-            <LocationIcon
-              color={color}
-              slotName="A"
-              height="max-content"
-              width="100%"
-            />
-          </Flex>
-          <Flex alignItems={ALIGN_CENTER} flex="1">
-            <LocationIcon
-              color={color}
-              slotName="B"
-              height="max-content"
-              width="100%"
-            />
-          </Flex>
-          <Flex alignItems={ALIGN_CENTER} flex="1">
-            <LocationIcon
-              color={color}
-              slotName="C"
-              height="max-content"
-              width="100%"
-            />
-          </Flex>
-          <Flex alignItems={ALIGN_CENTER} flex="1">
-            <LocationIcon
-              color={color}
-              slotName="D"
-              height="max-content"
-              width="100%"
-            />
-          </Flex>
-        </Flex>
+        <div className={styles.deck_labels_column}>
+          <div className={styles.deck_label_column_container}>
+            <DeckInfoLabel deckLabel="A" height="max-content" width="100%" />
+          </div>
+          <div className={styles.deck_label_column_container}>
+            <DeckInfoLabel deckLabel="B" height="max-content" width="100%" />
+          </div>
+          <div className={styles.deck_label_column_container}>
+            <DeckInfoLabel deckLabel="C" height="max-content" width="100%" />
+          </div>
+          <div className={styles.deck_label_column_container}>
+            <DeckInfoLabel deckLabel="D" height="max-content" width="100%" />
+          </div>
+        </div>
       </RobotCoordsForeignObject>
       <RobotCoordsForeignObject
         height="2.5rem"
@@ -84,49 +82,34 @@ export const SlotLabels = ({
         x="-100"
         y="-55"
       >
-        <Flex
-          alignItems={ALIGN_CENTER}
-          flex="1"
-          width={`${
-            show4thColumn
-              ? widthSmallRem * 2 + widthLargeRem * 2
-              : widthSmallRem + widthLargeRem * 2
-          }rem`}
-          height="2.5rem"
-        >
-          <Flex
-            alignItems={ALIGN_CENTER}
-            justifyContent={JUSTIFY_CENTER}
-            width={`${widthLargeRem}rem`}
+        <div className={clsx(styles.deck_labels_row)} style={rowStyle}>
+          <div
+            className={styles.deck_label_row_container}
+            style={simpleItemWidthStyle}
           >
-            <LocationIcon color={color} slotName="1" height="100%" />
-          </Flex>
-          <Flex
-            alignItems={ALIGN_CENTER}
-            justifyContent={JUSTIFY_CENTER}
-            width={`${widthSmallRem}rem`}
+            <DeckInfoLabel deckLabel="1" height="100%" />
+          </div>
+          <div
+            className={styles.deck_label_row_container}
+            style={smallItemWidthStyle}
           >
-            <LocationIcon color={color} slotName="2" height="100%" />
-          </Flex>
-          <Flex
-            alignItems={ALIGN_CENTER}
-            justifyContent={JUSTIFY_CENTER}
-            width={
-              show4thColumn ? `${widthSmallRem}rem` : `${widthLargeRem}rem`
-            }
+            <DeckInfoLabel deckLabel="2" height="100%" />
+          </div>
+          <div
+            className={styles.deck_label_row_container}
+            style={nextTo4thWidthStyle}
           >
-            <LocationIcon color={color} slotName="3" height="100%" />
-          </Flex>
+            <DeckInfoLabel deckLabel="3" height="100%" />
+          </div>
           {show4thColumn ? (
-            <Flex
-              alignItems={ALIGN_CENTER}
-              justifyContent={JUSTIFY_CENTER}
-              width={`${widthSmallRem}rem`}
+            <div
+              className={styles.deck_label_row_container}
+              style={fourthWidthStyle}
             >
-              <LocationIcon color={color} slotName="4" height="100%" />
-            </Flex>
+              <DeckInfoLabel deckLabel="4" height="100%" />
+            </div>
           ) : null}
-        </Flex>
+        </div>
       </RobotCoordsForeignObject>
     </>
   ) : null

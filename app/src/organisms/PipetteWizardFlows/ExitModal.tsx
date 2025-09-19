@@ -1,18 +1,23 @@
-import * as React from 'react'
-import capitalize from 'lodash/capitalize'
 import { useTranslation } from 'react-i18next'
+import capitalize from 'lodash/capitalize'
+
 import {
+  AlertPrimaryButton,
   COLORS,
+  JUSTIFY_FLEX_END,
+  SecondaryButton,
   SPACING,
   TYPOGRAPHY,
-  SecondaryButton,
-  AlertPrimaryButton,
-  JUSTIFY_FLEX_END,
 } from '@opentrons/components'
-import { SmallButton } from '../../atoms/buttons'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+
+import { SmallButton } from '/app/atoms/buttons'
+import {
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '/app/molecules/SimpleWizardBody'
+
 import { FLOWS } from './constants'
+
 import type { PipetteWizardFlow } from './types'
 
 interface ExitModalProps {
@@ -38,7 +43,8 @@ export function ExitModal(props: ExitModalProps): JSX.Element {
       break
     }
   }
-  if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
+  if (Boolean(isRobotMoving))
+    return <SimpleWizardInProgressBody description={t('stand_back')} />
 
   return (
     <SimpleWizardBody
@@ -53,7 +59,7 @@ export function ExitModal(props: ExitModalProps): JSX.Element {
           <SmallButton
             marginRight={SPACING.spacing8}
             onClick={proceed}
-            buttonText={capitalize(t('shared:exit'))}
+            buttonText={capitalize(t('shared:exit') as string)}
             buttonType="alert"
           />
 

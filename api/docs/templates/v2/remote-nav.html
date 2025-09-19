@@ -1,0 +1,966 @@
+<!doctype html>
+<html lang="en">
+<head>
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700;800&display=swap" rel="preload" as="style" onload="this.onload=null; this.rel='stylesheet';">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
+
+    
+<!-- Search Engine Optimization by Rank Math PRO - https://rankmath.com/ -->
+<title>Remote Nav - Opentrons</title>
+<meta name="robots" content="follow, noindex, noarchive"/>
+<meta property="og:locale" content="en_US" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Remote Nav - Opentrons" />
+<meta property="og:url" content="https://opentrons.com/remote-nav" />
+<meta property="og:site_name" content="Opentrons.com" />
+<meta property="og:updated_time" content="2023-07-28T19:49:55+00:00" />
+<meta property="og:image" content="https://opentrons.com/wp-content/uploads/2023/03/Social-Share-1024x538.png" />
+<meta property="og:image:secure_url" content="https://opentrons.com/wp-content/uploads/2023/03/Social-Share-1024x538.png" />
+<meta property="og:image:width" content="1024" />
+<meta property="og:image:height" content="538" />
+<meta property="og:image:alt" content="Remote Nav" />
+<meta property="og:image:type" content="image/png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Remote Nav - Opentrons" />
+<meta name="twitter:image" content="https://opentrons.com/wp-content/uploads/2023/03/Social-Share-1024x538.png" />
+<!-- /Rank Math WordPress SEO plugin -->
+
+<link rel="alternate" type="application/rss+xml" title="Opentrons &raquo; Feed" href="https://opentrons.com/feed" />
+<link rel="alternate" type="application/rss+xml" title="Opentrons &raquo; Comments Feed" href="https://opentrons.com/comments/feed" />
+<script type="text/javascript">
+/* <![CDATA[ */
+window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/15.0.3\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/15.0.3\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/opentrons.com\/wp-includes\/js\/wp-emoji-release.min.js?ver=6.5.5"}};
+/*! This file is auto-generated */
+!function(i,n){var o,s,e;function c(e){try{var t={supportTests:e,timestamp:(new Date).valueOf()};sessionStorage.setItem(o,JSON.stringify(t))}catch(e){}}function p(e,t,n){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);var t=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data),r=(e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(n,0,0),new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data));return t.every(function(e,t){return e===r[t]})}function u(e,t,n){switch(t){case"flag":return n(e,"\ud83c\udff3\ufe0f\u200d\u26a7\ufe0f","\ud83c\udff3\ufe0f\u200b\u26a7\ufe0f")?!1:!n(e,"\ud83c\uddfa\ud83c\uddf3","\ud83c\uddfa\u200b\ud83c\uddf3")&&!n(e,"\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7f","\ud83c\udff4\u200b\udb40\udc67\u200b\udb40\udc62\u200b\udb40\udc65\u200b\udb40\udc6e\u200b\udb40\udc67\u200b\udb40\udc7f");case"emoji":return!n(e,"\ud83d\udc26\u200d\u2b1b","\ud83d\udc26\u200b\u2b1b")}return!1}function f(e,t,n){var r="undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope?new OffscreenCanvas(300,150):i.createElement("canvas"),a=r.getContext("2d",{willReadFrequently:!0}),o=(a.textBaseline="top",a.font="600 32px Arial",{});return e.forEach(function(e){o[e]=t(a,e,n)}),o}function t(e){var t=i.createElement("script");t.src=e,t.defer=!0,i.head.appendChild(t)}"undefined"!=typeof Promise&&(o="wpEmojiSettingsSupports",s=["flag","emoji"],n.supports={everything:!0,everythingExceptFlag:!0},e=new Promise(function(e){i.addEventListener("DOMContentLoaded",e,{once:!0})}),new Promise(function(t){var n=function(){try{var e=JSON.parse(sessionStorage.getItem(o));if("object"==typeof e&&"number"==typeof e.timestamp&&(new Date).valueOf()<e.timestamp+604800&&"object"==typeof e.supportTests)return e.supportTests}catch(e){}return null}();if(!n){if("undefined"!=typeof Worker&&"undefined"!=typeof OffscreenCanvas&&"undefined"!=typeof URL&&URL.createObjectURL&&"undefined"!=typeof Blob)try{var e="postMessage("+f.toString()+"("+[JSON.stringify(s),u.toString(),p.toString()].join(",")+"));",r=new Blob([e],{type:"text/javascript"}),a=new Worker(URL.createObjectURL(r),{name:"wpTestEmojiSupports"});return void(a.onmessage=function(e){c(n=e.data),a.terminate(),t(n)})}catch(e){}c(n=f(s,u,p))}t(n)}).then(function(e){for(var t in e)n.supports[t]=e[t],n.supports.everything=n.supports.everything&&n.supports[t],"flag"!==t&&(n.supports.everythingExceptFlag=n.supports.everythingExceptFlag&&n.supports[t]);n.supports.everythingExceptFlag=n.supports.everythingExceptFlag&&!n.supports.flag,n.DOMReady=!1,n.readyCallback=function(){n.DOMReady=!0}}).then(function(){return e}).then(function(){var e;n.supports.everything||(n.readyCallback(),(e=n.source||{}).concatemoji?t(e.concatemoji):e.wpemoji&&e.twemoji&&(t(e.twemoji),t(e.wpemoji)))}))}((window,document),window._wpemojiSettings);
+/* ]]> */
+</script>
+<style id='wp-emoji-styles-inline-css' type='text/css'>
+
+	img.wp-smiley, img.emoji {
+		display: inline !important;
+		border: none !important;
+		box-shadow: none !important;
+		height: 1em !important;
+		width: 1em !important;
+		margin: 0 0.07em !important;
+		vertical-align: -0.1em !important;
+		background: none !important;
+		padding: 0 !important;
+	}
+</style>
+<style id='rank-math-toc-block-style-inline-css' type='text/css'>
+.wp-block-rank-math-toc-block nav ol{counter-reset:item}.wp-block-rank-math-toc-block nav ol li{display:block}.wp-block-rank-math-toc-block nav ol li:before{content:counters(item, ".") ". ";counter-increment:item}
+
+</style>
+<style id='classic-theme-styles-inline-css' type='text/css'>
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+</style>
+<style id='global-styles-inline-css' type='text/css'>
+body{--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #FFFFFF;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--color--brand-blue: #006CFA;--wp--preset--color--brand-blue-dark: #17212d;--wp--preset--color--brand-blue-medium: #ACCFFF;--wp--preset--color--brand-blue-light: #F1F8FF;--wp--preset--color--brand-yellow: #F2B53C;--wp--preset--color--brand-gray: #707075;--wp--preset--color--brand-gray-medium: #E3E3E3;--wp--preset--color--brand-gray-light: #F8F8F8;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgba(252,185,0,1) 0%,rgba(255,105,0,1) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgba(255,105,0,1) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 13px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 36px;--wp--preset--font-size--x-large: 42px;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgba(255, 255, 255, 1), 6px 6px rgba(0, 0, 0, 1);--wp--preset--shadow--crisp: 6px 6px 0px rgba(0, 0, 0, 1);}:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}
+.wp-block-navigation a:where(:not(.wp-element-button)){color: inherit;}
+:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}
+:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}
+.wp-block-pullquote{font-size: 1.5em;line-height: 1.6;}
+</style>
+<link rel='stylesheet' id='auth0-widget-css' href='https://opentrons.com/wp-content/plugins/auth0/assets/css/main.css?ver=4.6.2' type='text/css' media='all' />
+<link rel='stylesheet' id='bigcommerce-styles-css' href='https://opentrons.com/wp-content/plugins/bigcommerce/assets/css/master.min.css?ver=5.1.2-4.39.09.12.2024' type='text/css' media='all' />
+<link rel='stylesheet' id='timberland-app-css' href='https://opentrons.com/wp-content/themes/timberland/theme/assets/build/css/app.css?id=e3cd5368a82afb21e5316b601787a0e5' type='text/css' media='all' />
+<link rel='stylesheet' id='youtube-popup-style-css' href='https://opentrons.com/wp-content/themes/timberland/theme/assets/styles/YouTubePopUp.css?ver=6.7.1' type='text/css' media='all' />
+<link rel='stylesheet' id='algolia-autocomplete-css' href='https://opentrons.com/wp-content/plugins/wp-search-with-algolia/css/algolia-autocomplete.css?ver=2.8.2' type='text/css' media='all' />
+<script type="text/javascript" src="https://opentrons.com/wp-includes/js/jquery/jquery.min.js?ver=3.7.1" id="jquery-core-js"></script>
+<script type="text/javascript" src="https://opentrons.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1" id="jquery-migrate-js"></script>
+<link rel="https://api.w.org/" href="https://opentrons.com/wp-json/" /><link rel="alternate" type="application/json" href="https://opentrons.com/wp-json/wp/v2/pages/1927" /><link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://opentrons.com/xmlrpc.php?rsd" />
+<link rel='shortlink' href='https://opentrons.com/?p=1927' />
+<link rel="alternate" type="application/json+oembed" href="https://opentrons.com/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fopentrons.com%2Fremote-nav" />
+<link rel="alternate" type="text/xml+oembed" href="https://opentrons.com/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fopentrons.com%2Fremote-nav&#038;format=xml" />
+		<!-- Segment Analytics Code -->
+		<script type="text/javascript" data-js="bc-segment-tracker">
+			!function(){var analytics=window.analytics||[];if(!analytics.initialize)if(analytics.invoked)window.console&&console.error&&console.error("Segment snippet included twice.");else{analytics.invoked=!0;analytics.methods=["trackSubmit","trackClick","trackLink","trackForm","pageview","identify","reset","group","track","ready","alias","debug","page","once","off","on"];analytics.factory=function(t){return function(){var e=Array.prototype.slice.call(arguments);e.unshift(t);analytics.push(e);return analytics}};for(var t=0;t<analytics.methods.length;t++){var e=analytics.methods[t];analytics[e]=analytics.factory(e)}analytics.loadPlatform=function(t,e,a,o){window[o||"analytics"]=analytics;window._analytics_js_global_name=o;analytics.platformSettings=e;analytics.platformPlan=a;var n=("https:"===document.location.protocol?"https://":"http://")+"cdn.segment.com/analytics.js/v1";t&&(n+="/"+t);var r=document.createElement("script");r.type="text/javascript";r.async=!0;r.src=n+"/platform/analytics.min.js";var i=document.getElementsByTagName("script")[0];i.parentNode.insertBefore(r,i)};analytics.SNIPPET_VERSION="4.0.0_platform";
+				analytics.loadPlatform(null, {},{},"analytics");
+				analytics.page()
+			}}();
+		</script>
+		<!-- End Segment Analytics Code -->
+		
+<style type='text/css'>
+.bc-btn,
+button.bc-btn,
+a.bc-btn,
+.entry-content .bc-btn,
+.entry-content button.bc-btn,
+.entry-content a.bc-btn,
+.bc-mini-cart .bc-btn,
+.bc-mini-cart button.bc-btn,
+.bc-mini-cart a.bc-btn,
+.bigcommerce-cart__item-count,
+.bc-account-login__form input[type="submit"] {
+	color: #fff;
+	background-color: #5273f4;
+}
+
+.bc-btn--inverse,
+button.bc-btn--inverse,
+a.bc-btn--inverse,
+.entry-content .bc-btn--inverse,
+.entry-content button.bc-btn--inverse,
+.entry-content a.bc-btn--inverse {
+	color: #5273f4;
+	background-color: #fff;
+	border-color: #5273f4;
+}
+
+.bc-btn--inverse:hover,
+.bc-btn--inverse:focus,
+button.bc-btn--inverse:hover,
+button.bc-btn--inverse:focus,
+a.bc-btn--inverse:hover,
+a.bc-btn--inverse:focus {
+	color: #fff;
+	background-color: #5273f4;
+	border-color: #5273f4;
+}
+
+.bc-video-play-icon {
+	background-color: #5273f4;
+}
+
+.bc-video-play-icon:before {
+	color: #fff;
+}
+
+.bc-link {
+	color: #5273f4;
+}
+
+.bc-cart-item__remove-button {
+	color: #5273f4;
+}
+
+.bc-product__out_of_stock,
+.bc-product__low_inventory {
+	color: #34313f;
+}
+
+.bc-product-flag--grey {
+	color: #34313f;
+	background-color: #e0e3e9;
+}
+
+.bc-product-flag--sale {
+	color: #fff;
+	background-color: #65c68c;
+}
+
+.bc-cart-item-total-price.bc-cart-item--on-sale,
+.bc-product__price--sale {
+	color: #65c68c;
+}
+
+.bc-account-address__edit,
+.bc-account-address__delete,
+button.bc-account-address__edit,
+button.bc-account-address__delete,
+a.bc-account-address__edit,
+a.bc-account-address__delete {
+	color: #5273f4;
+}
+
+</style>
+		<script>
+			document.documentElement.className = document.documentElement.className.replace( 'no-js', 'js' );
+		</script>
+				<style>
+			.no-js img.lazyload { display: none; }
+			figure.wp-block-image img.lazyloading { min-width: 150px; }
+							.lazyload, .lazyloading { opacity: 0; }
+				.lazyloaded {
+					opacity: 1;
+					transition: opacity 100ms;
+					transition-delay: 0ms;
+				}
+					</style>
+		<link rel="icon" href="https://opentrons.com/wp-content/uploads/2024/06/cropped-FAVICON-1-32x32.png" sizes="32x32" />
+<link rel="icon" href="https://opentrons.com/wp-content/uploads/2024/06/cropped-FAVICON-1-192x192.png" sizes="192x192" />
+<link rel="apple-touch-icon" href="https://opentrons.com/wp-content/uploads/2024/06/cropped-FAVICON-1-180x180.png" />
+<meta name="msapplication-TileImage" content="https://opentrons.com/wp-content/uploads/2024/06/cropped-FAVICON-1-270x270.png" />
+		<style type="text/css" id="wp-custom-css">
+			.flex.space-x-4.mt-6 {
+	display: none !important;
+}
+
+ h1, h2, h3, h4, h5 { font-family: Public Sans !important; }		</style>
+		
+
+    <style>
+
+        .button-sm {
+    font-family:  "Akko Pro","Open Sans",sans-serif !important;
+    font-size: .75rem  !important;
+    font-weight: 400  !important;
+    letter-spacing: 1px  !important;
+    line-height: 1rem  !important;
+    text-transform: uppercase  !important;
+}
+    </style>
+
+</head>
+
+<body class="page-template-default page page-id-1927 bc-gallery-size-bc-medium" data-template="remote-nav-base.twig">
+    <style>
+	@media (min-width: 1060px) {
+		.opt-main-nav.sticky{
+			top:-32px ;
+			position:sticky ;
+			z-index: 99 ;
+		}
+	}
+	@media (max-width: 1060px) { 
+		.opt-main-nav.sticky{
+			top:0px ;
+			position:sticky ;
+			z-index: 99 ;
+		}
+
+		div#mobile-cart-dot {
+	    position: absolute;
+	    top: 12px;
+	    left: 30px;
+	    z-index: 1;
+	    pointer-events: none;
+		}
+
+		.mobile-account-links{
+			display: flex;
+			gap: 10px;
+
+		}
+
+		.mobile-account-links span{
+			font-family: AkkoPro-Regular, ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+			font-weight: 500;
+			font-size: 14px;
+			line-height: 135%;
+			text-align: center;
+			letter-spacing: 0.08em;
+			text-transform: uppercase;
+			color: #006CFA;
+		}
+
+		.mobile-account-links a {
+    display: flex;
+    gap: 10px;
+}
+	}
+
+/* Oct 18 */
+/* Fix main navigation issue with buttons going into 2 lines */
+@media screen and (max-width: 1060px){
+  .page header.opt-main-nav > div { display: block !important; }
+  .page header.opt-main-nav > div.hidden { display: none !important; }
+}
+
+@media screen and (min-width: 1061px){
+  .page header.opt-main-nav > div { display: none !important; }
+  .page header.opt-main-nav > div.hidden { display: block !important; }
+} 
+
+</style>
+
+
+
+<!-- Global header -->
+<header class="opt-main-nav sticky bg-white" id="opt-main-navigation">
+	<div class="hidden md:block">
+		<div class="max-w-7xl mx-auto py-2 px-4 flex justify-end">
+			<nav class="flex space-x-6" aria-labelledby="secondary-navigation" id="opt-utility-nav">
+									<a href="https://designer.opentrons.com/" target="_blank" class="text-xs text-brand-gray hover:text-brand-blue">Protocol Designer</a>
+									<a href="https://library.opentrons.com/" target="_blank" class="text-xs text-brand-gray hover:text-brand-blue">Protocol Library</a>
+									<a href="https://docs.opentrons.com/" target="_blank" class="text-xs text-brand-gray hover:text-brand-blue">Python API</a>
+									<a href="https://labware.opentrons.com/" target="_blank" class="text-xs text-brand-gray hover:text-brand-blue">Labware Library</a>
+									<a href="https://github.com/Opentrons" target="_blank" class="text-xs text-brand-gray hover:text-brand-blue">GitHub</a>
+									<a href="https://opentrons.com/ot-app/" target="_self" class="text-xs text-brand-gray hover:text-brand-blue">OT App</a>
+								<a href="https://support.opentrons.com/" target="_blank" class="text-xs text-brand-blue hover:text-brand-blue-dark font-semibold">Customer Support</a>
+			</nav>
+		</div>
+
+		<div class="bg-brand-blue-dark" x-data="{ searchOpen: false }">
+			<div class="max-w-7xl mx-auto flex justify-between px-4 py-3"  >
+				<div class="flex items-center space-x-16">
+					<a href="https://opentrons.com/">
+						<img class="h-8 no-lazy min-w-[130px]" src="https://opentrons.com/wp-content/uploads/2024/06/LOGO2024.svg" id="opt-logo" alt="Opentrons" />
+					</a>
+					<nav class="flex items-center space-x-4 lg:space-x-10" aria-labelledby="primary-navigation" x-show="!searchOpen" x-data="{ menuOpen: false }">
+																											<div class="-mt-[2px]">
+															<button type="button" @click="menuOpen = !menuOpen;"  :class="{ 'text-brand-yellow': menuOpen, 'text-white': !menuOpen }" class="hover:text-brand-yellow text-sm">
+									Products
+								</button>
+																									<div x-show="menuOpen" @click.away="menuOpen = false" class="absolute inset-x-0 transform mt-[21px] bg-white z-50 border-b border-brand-[#d0d3d5]" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-1" x-cloak>
+										<div class="max-w-7xl mx-auto px-2 pb-4">
+											<svg class="ml-[294px] -mt-[1px]" width="18" height="8" viewBox="0 0 18 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+												<path d="M9 8L0 0H18L9 8Z" fill="#16212D"/>
+											</svg>
+											<div class="flex justify-evenly gap-10 mt-2 py-2">
+																																																			<div x-data="{ submenuOpen: false }" @click.away="submenuOpen = false">
+														<a @click="submenuOpen = !submenuOpen" href="javascript:;" class="flex flex-col items-center group">
+															<img width="68" height="68" src="https://opentrons.com/wp-content/uploads/2023/05/Robots-1.png" alt=""  class="h-16 w-16 no-lazy" alt="" style="object-fit: contain;" />
+															<span class="mt-1 font-semibold text-xs text-center py-1 px-3 rounded" :class="{ 'text-white bg-brand-blue': submenuOpen, 'text-brand-blue-dark': !submenuOpen }">Robots</span>
+														</a>
+															<div x-show="submenuOpen" class="absolute inset-x-0 transform mt-2 bg-brand-gray-light z-50" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-1" x-cloak>
+															<div class="max-w-7xl mx-auto">
+																<svg class="text-white fill-current -mt-[1px] ml-[487px]" width="18" height="8" viewBox="0 0 18 8" xmlns="http://www.w3.org/2000/svg">
+																	<path d="M9 8L0 0H18L9 8Z" />
+																</svg>
+																<div class="grid  grid-cols-9  gap-10 pt-3 pb-7">
+																																																					<a href="https://opentrons.com/robots/flex/" target="_self" class="flex flex-col items-center group">
+																			<img width="68" height="68" src="https://opentrons.com/wp-content/uploads/2023/05/Flex-1.png" alt=""  class="h-16 w-16 no-lazy" alt="" style="object-fit: contain;" />
+																			<span class="mt-1 text-brand-blue-dark font-semibold text-xs group-hover:text-brand-blue text-center">Opentrons Flex</span>
+																		</a>
+																																																					<a href="https://opentrons.com/robots/ot-2/" target="_self" class="flex flex-col items-center group">
+																			<img width="68" height="68" src="https://opentrons.com/wp-content/uploads/2023/05/OT2-1.png" alt=""  class="h-16 w-16 no-lazy" alt="" style="object-fit: contain;" />
+																			<span class="mt-1 text-brand-blue-dark font-semibold text-xs group-hover:text-brand-blue text-center">OT-2</span>
+																		</a>
+																																																					<a href="https://opentrons.com/robots/" target="_self" class="flex flex-col items-center group">
+																			<img width="68" height="68" src="https://opentrons.com/wp-content/uploads/2023/05/CKMpare.png" alt=""  class="h-16 w-16 no-lazy" alt="" style="object-fit: contain;" />
+																			<span class="mt-1 text-brand-blue-dark font-semibold text-xs group-hover:text-brand-blue text-center">Compare</span>
+																		</a>
+																																	</div>
+															</div>
+														</div>
+													</div>
+																																																				<a href="https://opentrons.com/products/categories/workstations" target="_self" class="flex flex-col items-center group">
+															<img width="68" height="68" src="https://opentrons.com/wp-content/uploads/2023/05/WSnew.png" class="h-16 w-16 no-lazy" alt="" style="object-fit: contain;" />
+															<span class="mt-1 text-brand-blue-dark font-semibold text-xs text-center">Workstations</span>
+														</a>
+																																																																	<a href="https://opentrons.com/products/categories/pipettes" target="_self" class="flex flex-col items-center group">
+															<img width="68" height="68" src="https://opentrons.com/wp-content/uploads/2023/05/Pipettes-2.png" class="h-16 w-16 no-lazy" alt="" style="object-fit: contain;" />
+															<span class="mt-1 text-brand-blue-dark font-semibold text-xs text-center">Pipettes</span>
+														</a>
+																																																																	<a href="https://opentrons.com/products/categories/modules" target="_self" class="flex flex-col items-center group">
+															<img width="68" height="68" src="https://opentrons.com/wp-content/uploads/2023/05/Modules.png" class="h-16 w-16 no-lazy" alt="" style="object-fit: contain;" />
+															<span class="mt-1 text-brand-blue-dark font-semibold text-xs text-center">Modules</span>
+														</a>
+																																																																	<a href="https://opentrons.com/products/categories/tips-&-labware" target="_self" class="flex flex-col items-center group">
+															<img width="68" height="68" src="https://opentrons.com/wp-content/uploads/2023/05/tiprack-1.png" class="h-16 w-16 no-lazy" alt="" style="object-fit: contain;" />
+															<span class="mt-1 text-brand-blue-dark font-semibold text-xs text-center">Tips & Labware</span>
+														</a>
+																																																																	<a href="https://opentrons.com/products/categories/automation-marketplace/" target="_self" class="flex flex-col items-center group">
+															<img width="68" height="68" src="https://opentrons.com/wp-content/uploads/2024/03/Marketplace-2.png" class="h-16 w-16 no-lazy" alt="" style="object-fit: contain;" />
+															<span class="mt-1 text-brand-blue-dark font-semibold text-xs text-center">Automation Marketplace</span>
+														</a>
+																																																																	<a href="https://opentrons.com/instrument-services/" target="_self" class="flex flex-col items-center group">
+															<img width="68" height="68" src="https://opentrons.com/wp-content/uploads/2023/05/Serovce.png" class="h-16 w-16 no-lazy" alt="" style="object-fit: contain;" />
+															<span class="mt-1 text-brand-blue-dark font-semibold text-xs text-center">Services</span>
+														</a>
+																																																	</div>
+										</div>
+									</div>
+																							</div>
+																				<div class="relative -mt-[2px]" x-data="{ menuOpen: false }">
+																						<button type="button" @click="menuOpen = !menuOpen;"  @click.away="menuOpen = false"  :class="{ 'text-brand-yellow': menuOpen, 'text-white': !menuOpen }" class="hover:text-brand-yellow text-sm">
+									Applications
+								</button>
+																																	<div x-show="menuOpen" class="absolute left-1/4 transform -translate-x-1/4 mt-[21px] w-screen max-w-[230px] bg-white z-50 border-r border-l border-brand-[#d0d3d5]" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-1" x-cloak>
+										<svg class="ml-[64px] -mt-[1px]" width="18" height="8" viewBox="0 0 18 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+											<path d="M9 8L0 0H18L9 8Z" fill="#16212D"/>
+										</svg>
+										<div class="flex flex-col mt-2">
+																							<a href="https://opentrons.com/applications/ngs/" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2023/02/NGS.svg" />
+													<span>NGS</span>
+												</a>
+																							<a href="https://opentrons.com/applications/nucleic-acid-extraction/" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Nucleic-Acid-Extraction.svg" />
+													<span>Nucleic Acid Extraction</span>
+												</a>
+																							<a href="https://opentrons.com/applications/pcr/" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2023/02/PCR-1.svg" />
+													<span>PCR</span>
+												</a>
+																							<a href="https://opentrons.com/applications/protein-purification/" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Protein-Purification-1.svg" />
+													<span>Protein Purification</span>
+												</a>
+																							<a href="https://opentrons.com/applications/elisa/" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/ELISA-1.svg" />
+													<span>ELISA</span>
+												</a>
+																							<a href="https://opentrons.com/applications/proteomics/" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Proteomics.svg" />
+													<span>Proteomics</span>
+												</a>
+																																		<a href="https://opentrons.com/applications/" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue items-center space-x-3 text-center">
+													View All
+												</a>
+																					</div>
+									</div>
+															</div>
+																				<div class="relative -mt-[2px]" x-data="{ menuOpen: false }">
+																						<button type="button" @click="menuOpen = !menuOpen;"  @click.away="menuOpen = false"  :class="{ 'text-brand-yellow': menuOpen, 'text-white': !menuOpen }" class="hover:text-brand-yellow text-sm">
+									Partnerships
+								</button>
+																																	<div x-show="menuOpen" class="absolute left-1/4 transform -translate-x-1/4 mt-[21px] w-screen max-w-[230px] bg-white z-50 border-r border-l border-brand-[#d0d3d5]" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-1" x-cloak>
+										<svg class="ml-[64px] -mt-[1px]" width="18" height="8" viewBox="0 0 18 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+											<path d="M9 8L0 0H18L9 8Z" fill="#16212D"/>
+										</svg>
+										<div class="flex flex-col mt-2">
+																							<a href="https://opentrons.com/our-partners" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/07/OUR-PARTNERS.svg" />
+													<span>Our Partners</span>
+												</a>
+																							<a href="https://opentrons.com/partnerships" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2023/10/OEM.svg" />
+													<span>OEM Partnerships</span>
+												</a>
+																							<a href="https://opentrons.com/education/" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/01/Academic.svg" />
+													<span>Education</span>
+												</a>
+																							<a href="https://opentrons.com/automation-marketplace/" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/07/marketplace.svg" />
+													<span>Automation Marketplace</span>
+												</a>
+																																</div>
+									</div>
+															</div>
+																				<div class="relative -mt-[2px]" x-data="{ menuOpen: false }">
+																						<button type="button" @click="menuOpen = !menuOpen;"  @click.away="menuOpen = false"  :class="{ 'text-brand-yellow': menuOpen, 'text-white': !menuOpen }" class="hover:text-brand-yellow text-sm">
+									About
+								</button>
+																																	<div x-show="menuOpen" class="absolute left-1/4 transform -translate-x-1/4 mt-[21px] w-screen max-w-[230px] bg-white z-50 border-r border-l border-brand-[#d0d3d5]" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-1" x-cloak>
+										<svg class="ml-[64px] -mt-[1px]" width="18" height="8" viewBox="0 0 18 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+											<path d="M9 8L0 0H18L9 8Z" fill="#16212D"/>
+										</svg>
+										<div class="flex flex-col mt-2">
+																							<a href="https://opentrons.com/about/about-us" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Opentrons-App.svg" />
+													<span>About Us</span>
+												</a>
+																							<a href="https://opentrons.com/about/events/" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Calendar-2.svg" />
+													<span>Events & Webinars</span>
+												</a>
+																							<a href="https://opentrons.com/about/news" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/News.svg" />
+													<span>News</span>
+												</a>
+																							<a href="https://opentrons.com/about/jobs/" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Careers.svg" />
+													<span>Careers</span>
+												</a>
+																							<a href="https://opentrons.com/globalcontacts/" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Global.svg" />
+													<span>Global Contacts</span>
+												</a>
+																							<a href="https://opentrons.com/contact/" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/04/Chat.svg" />
+													<span>Contact Us</span>
+												</a>
+																																</div>
+									</div>
+															</div>
+																				<div class="relative -mt-[2px]" x-data="{ menuOpen: false }">
+																						<button type="button" @click="menuOpen = !menuOpen;"  @click.away="menuOpen = false"  :class="{ 'text-brand-yellow': menuOpen, 'text-white': !menuOpen }" class="hover:text-brand-yellow text-sm">
+									Resources
+								</button>
+																																	<div x-show="menuOpen" class="absolute left-1/4 transform -translate-x-1/4 mt-[21px] w-screen max-w-[230px] bg-white z-50 border-r border-l border-brand-[#d0d3d5]" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-1" x-cloak>
+										<svg class="ml-[64px] -mt-[1px]" width="18" height="8" viewBox="0 0 18 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+											<path d="M9 8L0 0H18L9 8Z" fill="#16212D"/>
+										</svg>
+										<div class="flex flex-col mt-2">
+																							<a href="https://opentrons.com/resources/knowledge-hub/" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/04/Knowledge-Hub.svg" />
+													<span>Knowledge Hub</span>
+												</a>
+																							<a href="https://opentrons.com/resources/customer-stories/" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/04/Customer-Stories.svg" />
+													<span>Customer Stories</span>
+												</a>
+																							<a href="https://opentrons.com/ai/" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Robot-Head.svg" />
+													<span>OpentronsAI</span>
+												</a>
+																							<a href="https://opentrons.com/resources/citations/" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Citation.svg" />
+													<span>Citations</span>
+												</a>
+																							<a href="https://opentrons.com/intro-to-protocol-library/" target="_self" class="px-8 py-4 border-b border-brand-[#d0d3d5] text-xs font-semibold hover:text-brand-blue flex items-center space-x-3">
+													<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Protocol-Library.svg" />
+													<span>Protocol Library</span>
+												</a>
+																																</div>
+									</div>
+															</div>
+						
+						
+				
+					</nav>
+
+				</div>
+				
+				<div class="flex space-x-4">
+<div x-show="searchOpen" class="bg-brand-blue-dark flex space-x-2 " style="width:700px;" >
+								<div class="border-b border-white flex items-center space-x-2 pb-2 w-full">
+									<svg class="text-white w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+									</svg>
+									<form action="https://opentrons.com/" method="get" class="flex flex-grow">
+										<input class="w-full bg-transparent text-white" name="s" type="text" placeholder="Search">
+										<button type="submit" class="bg-brand-blue hover:bg-brand-blue-medium text-white p-1 font-medium text-sm uppercase sr-only">Search</button>
+									</form>
+								</div>
+								<div class="text-white hover:text-brand-yellow flex items-center h-full">
+								<a @click.prevent="searchOpen = false" class="text-xs text-brand-gray-light mt-1 opacity-50 flex items-center" href="javascript:;">Cancel</a>
+							</div>
+							</div>
+					<div class="flex gap-4">
+						
+						
+						<div class="flex" >
+							<div class="text-white hover:text-brand-yellow flex items-center h-full">
+								<button type="button" @click.prevent="searchOpen = !searchOpen" href="javascript:;" class="text-white hover:text-brand-yellow flex items-center" x-show="!searchOpen" >
+								<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+									<path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+								</svg>
+							</button>
+						</div>
+							
+						</div>
+
+						<!-- account icon start -->
+						<a type="button"  href="https://opentrons.com/account/?v=5084002" class="text-white hover:text-brand-yellow flex items-center" x-show="!searchOpen" >
+								<svg width="18" height="19" viewBox="0 0 18 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M16.2666 16.9508H16.3131L16.3071 16.9067C15.9722 14.4087 13.7202 12.4688 10.9996 12.4688H7.00067C4.28007 12.4688 2.0229 14.4086 1.69304 16.9068L1.72852 16.9111V16.9508H1.73363H1.76969H16.2666ZM0.0410156 18.4608V17.5518C0.0410156 13.916 3.1621 10.9589 7.00067 10.9589H10.9996C14.8381 10.9589 17.9592 13.916 17.9592 17.5518V18.4608H0.0410156ZM9.00011 8.98912C6.54221 8.98912 4.54102 7.0956 4.54102 4.7641C4.54102 2.4326 6.54221 0.539062 9.00011 0.539062C11.458 0.539062 13.4592 2.4326 13.4592 4.7641C13.4592 7.0956 11.458 8.98912 9.00011 8.98912ZM9.00011 2.04904C7.42832 2.04904 6.1467 3.26472 6.1467 4.7641C6.1467 6.26348 7.42832 7.47917 9.00011 7.47917C10.5719 7.47917 11.8535 6.26348 11.8535 4.7641C11.8535 3.26472 10.5719 2.04904 9.00011 2.04904Z" fill="white"/>
+</svg>
+
+
+				</a>
+<!-- account icon end -->
+
+<!-- cart icon -->
+				<a x-show="!searchOpen"  id="cart-icon"  href="https://opentrons.com/cart" class="text-white hover:text-brand-yellow flex items-center">&nbsp;</a>
+				<!-- cart icon end -->
+</div>
+
+
+<a href="https://insights.opentrons.com/schedule-demo" class="button-sm bg-white text-brand-blue py-3 px-4 rounded hover:bg-white/60 demo_button">
+						Schedule a Demo
+					</a>
+<a href="https://opentrons.com/contact/" class="button-sm bg-brand-blue text-white py-3 px-4 rounded hover:bg-brand-blue/60 nav_contact_button">
+						Contact Sales
+					</a>
+					
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Mobile header -->
+	<div class="md:hidden" x-data="{ menuOpen: false }">
+		<div class="flex items-center justify-between py-2 px-5 bg-brand-blue-dark relative">
+				<div id="mobile-cart-dot" x-show="!menuOpen">
+					<svg id="mobile-nav-dot" width="22" height="19" viewBox="0 0 22 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<circle cx="17.5" cy="4.5" r="4.5" fill="#DE1B1B"/>
+					</svg>
+				</div>
+			<button @click="menuOpen = !menuOpen" class="text-white h-[20px] p-0">
+				<div class="w-7 flex items-center justify-center relative">
+					<span :class="{ 'translate-y-0 rotate-45': menuOpen, '-translate-y-2': !menuOpen }" class="transform transition w-full h-px bg-current absolute -translate-y-2"></span>
+					<span :class="{ 'opacity-0 translate-x-3': menuOpen, 'opacity-100': !menuOpen }" class="transform transition w-full h-px bg-current absolute opacity-100"></span>
+					<span :class="{ 'translate-y-0 -rotate-45': menuOpen, 'translate-y-2': !menuOpen }" class="transform transition w-full h-px bg-current absolute translate-y-2"></span>
+				</div>
+			</button>
+			<a href="https://opentrons.com/">
+				<img class="h-9 no-lazy" src="https://opentrons.com/wp-content/themes/timberland/theme/assets/images/logo.png" alt="Opentrons logo" />
+			</a>
+			<!-- Search -->
+			<div x-data="{ searchOpen: false }">
+				<button type="button" @click.prevent="searchOpen = !searchOpen" href="javascript:;" class="text-white flex items-center">
+					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+					</svg>
+				</button>
+				<div x-show="searchOpen" class="absolute inset-0 bg-brand-blue-dark flex space-x-2 py-3 px-5" x-transition x-cloak>
+					<div class="border-b border-white flex items-center space-x-2 pb-2 w-full">
+						<svg class="text-white w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+						</svg>
+						<form action="https://opentrons.com/" method="get" class="flex flex-grow">
+							<input class="w-full bg-transparent text-white" name="s" type="text" placeholder="Search">
+							<button type="submit" class="bg-brand-blue hover:bg-brand-blue-medium text-white p-1 font-medium text-sm uppercase sr-only">Search</button>
+						</form>
+					</div>
+					<a @click.prevent="searchOpen = false" class="text-xs text-brand-gray-light mt-1 opacity-50" href="javascript:;">Cancel</a>
+				</div>
+			</div>
+		</div>
+		<div x-show="menuOpen" class="z-50 absolute inset-x-0 origin-top-left transform transition" x-transition:enter="duration-200 ease-out" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="duration-100 ease-in" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" @click.away="menuOpen = false" x-cloak>
+							<div class="bg-brand-blue-dark border-b border-brand-blue-medium">
+					<div x-data="{ open: false }">
+						<button type="button" @click.prevent="open = !open" class="flex items-center py-4 px-5 text-white w-full text-left" aria-expanded="false" :aria-expanded="open.toString()">
+							<span class="flex-grow text-2xl">Products</span>
+							<svg class="transition duration-300 text-white fill-current" :class="{ '-rotate-180': open }" width="17" height="8" viewBox="0 0 17 8" xmlns="http://www.w3.org/2000/svg">
+								<path d="M17 0L8.5 2.8434e-05L0 0L8.5 8L17 0Z" />
+							</svg>
+						</button>
+						<div x-show="open" class="bg-brand-gray-light" x-collapse x-cloak>
+							<!-- list -->
+														<!-- Products -->
+															<div class="flex space-x-10 py-6 overflow-x-scroll overflow-hidden">
+																			
+																							<div x-data="{ submenuOpen: false }" @click.away="submenuOpen = false">
+														<a @click="submenuOpen = !submenuOpen" href="javascript:;" class="flex flex-col items-center group">
+															<img class="h-12 w-auto no-lazy" src="https://opentrons.com/wp-content/uploads/2023/05/Robots-1.png" alt="" />
+															<span class="mt-1 font-semibold text-xs text-center py-1 px-3 rounded" :class="{ 'text-white bg-brand-blue': submenuOpen, 'text-brand-blue-dark': !submenuOpen }">Robots</span>
+														</a>
+															<div x-show="submenuOpen" class="absolute inset-x-0 transform mt-2 bg-brand-gray-light z-50" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-1" x-cloak>
+															<div class="max-w-7xl mx-auto">
+																<svg class="text-white fill-current -mt-[1px]" width="18" height="8" viewBox="0 0 18 8" xmlns="http://www.w3.org/2000/svg">
+																	<path d="M9 8L0 0H18L9 8Z" />
+																</svg>
+																<div class="flex space-x-8 py-6 overflow-x-scroll overflow-hidden">
+																																			<a href="https://opentrons.com/robots/flex/" target="_self" class="flex flex-col items-center group shrink-0 grow-0 pl-3 pr-3" style="max-width:140px;">
+																			<img class="h-12 w-auto no-lazy" src="https://opentrons.com/wp-content/uploads/2023/05/Flex-1.png" alt="" />
+																			<span class="mt-1 text-brand-blue-dark font-semibold text-xs group-hover:text-brand-blue text-center">Opentrons Flex</span>
+																		</a>
+																																			<a href="https://opentrons.com/robots/ot-2/" target="_self" class="flex flex-col items-center group shrink-0 grow-0 pl-3 pr-3" style="max-width:140px;">
+																			<img class="h-12 w-auto no-lazy" src="https://opentrons.com/wp-content/uploads/2023/05/OT2-1.png" alt="" />
+																			<span class="mt-1 text-brand-blue-dark font-semibold text-xs group-hover:text-brand-blue text-center">OT-2</span>
+																		</a>
+																																			<a href="https://opentrons.com/robots/" target="_self" class="flex flex-col items-center group shrink-0 grow-0 pl-3 pr-3" style="max-width:140px;">
+																			<img class="h-12 w-auto no-lazy" src="https://opentrons.com/wp-content/uploads/2023/05/CKMpare.png" alt="" />
+																			<span class="mt-1 text-brand-blue-dark font-semibold text-xs group-hover:text-brand-blue text-center">Compare</span>
+																		</a>
+																																	</div>
+															</div>
+														</div>
+													</div>
+													
+																														<a href="https://opentrons.com/products/categories/workstations" target="_self"  class="flex flex-col items-center group shrink-0 grow-0 pl-3 pr-3">
+												<img class="w-12 h-12 no-lazy" src="https://opentrons.com/wp-content/uploads/2023/05/WSnew.png" alt="" />
+												<span class="mt-1 text-brand-blue-dark font-semibold text-xs text-center py-1">Workstations</span>
+											</a>
+										
+										
+																														<a href="https://opentrons.com/products/categories/pipettes" target="_self"  class="flex flex-col items-center group shrink-0 grow-0 pl-3 pr-3">
+												<img class="w-12 h-12 no-lazy" src="https://opentrons.com/wp-content/uploads/2023/05/Pipettes-2.png" alt="" />
+												<span class="mt-1 text-brand-blue-dark font-semibold text-xs text-center py-1">Pipettes</span>
+											</a>
+										
+										
+																														<a href="https://opentrons.com/products/categories/modules" target="_self"  class="flex flex-col items-center group shrink-0 grow-0 pl-3 pr-3">
+												<img class="w-12 h-12 no-lazy" src="https://opentrons.com/wp-content/uploads/2023/05/Modules.png" alt="" />
+												<span class="mt-1 text-brand-blue-dark font-semibold text-xs text-center py-1">Modules</span>
+											</a>
+										
+										
+																														<a href="https://opentrons.com/products/categories/tips-&-labware" target="_self"  class="flex flex-col items-center group shrink-0 grow-0 pl-3 pr-3">
+												<img class="w-12 h-12 no-lazy" src="https://opentrons.com/wp-content/uploads/2023/05/tiprack-1.png" alt="" />
+												<span class="mt-1 text-brand-blue-dark font-semibold text-xs text-center py-1">Tips & Labware</span>
+											</a>
+										
+										
+																														<a href="https://opentrons.com/products/categories/automation-marketplace/" target="_self"  class="flex flex-col items-center group shrink-0 grow-0 pl-3 pr-3">
+												<img class="w-12 h-12 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/03/Marketplace-2.png" alt="" />
+												<span class="mt-1 text-brand-blue-dark font-semibold text-xs text-center py-1">Automation Marketplace</span>
+											</a>
+										
+										
+																														<a href="https://opentrons.com/instrument-services/" target="_self"  class="flex flex-col items-center group shrink-0 grow-0 pl-3 pr-3">
+												<img class="w-12 h-12 no-lazy" src="https://opentrons.com/wp-content/uploads/2023/05/Serovce.png" alt="" />
+												<span class="mt-1 text-brand-blue-dark font-semibold text-xs text-center py-1">Services</span>
+											</a>
+										
+										
+																	</div>
+														<!-- list with icon -->
+													</div>
+					</div>
+				</div>
+							<div class="bg-brand-blue-dark border-b border-brand-blue-medium">
+					<div x-data="{ open: false }">
+						<button type="button" @click.prevent="open = !open" class="flex items-center py-4 px-5 text-white w-full text-left" aria-expanded="false" :aria-expanded="open.toString()">
+							<span class="flex-grow text-2xl">Applications</span>
+							<svg class="transition duration-300 text-white fill-current" :class="{ '-rotate-180': open }" width="17" height="8" viewBox="0 0 17 8" xmlns="http://www.w3.org/2000/svg">
+								<path d="M17 0L8.5 2.8434e-05L0 0L8.5 8L17 0Z" />
+							</svg>
+						</button>
+						<div x-show="open" class="bg-brand-gray-light" x-collapse x-cloak>
+							<!-- list -->
+														<!-- Products -->
+														<!-- list with icon -->
+																								<a href="https://opentrons.com/applications/ngs/" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2023/02/NGS.svg" />
+									<span>NGS</span>
+								</a>
+																	<a href="https://opentrons.com/applications/nucleic-acid-extraction/" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Nucleic-Acid-Extraction.svg" />
+									<span>Nucleic Acid Extraction</span>
+								</a>
+																	<a href="https://opentrons.com/applications/pcr/" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2023/02/PCR-1.svg" />
+									<span>PCR</span>
+								</a>
+																	<a href="https://opentrons.com/applications/protein-purification/" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Protein-Purification-1.svg" />
+									<span>Protein Purification</span>
+								</a>
+																	<a href="https://opentrons.com/applications/elisa/" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/ELISA-1.svg" />
+									<span>ELISA</span>
+								</a>
+																	<a href="https://opentrons.com/applications/proteomics/" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Proteomics.svg" />
+									<span>Proteomics</span>
+								</a>
+																								<a href="https://opentrons.com/applications/" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									View All
+								</a>
+																				</div>
+					</div>
+				</div>
+							<div class="bg-brand-blue-dark border-b border-brand-blue-medium">
+					<div x-data="{ open: false }">
+						<button type="button" @click.prevent="open = !open" class="flex items-center py-4 px-5 text-white w-full text-left" aria-expanded="false" :aria-expanded="open.toString()">
+							<span class="flex-grow text-2xl">Partnerships</span>
+							<svg class="transition duration-300 text-white fill-current" :class="{ '-rotate-180': open }" width="17" height="8" viewBox="0 0 17 8" xmlns="http://www.w3.org/2000/svg">
+								<path d="M17 0L8.5 2.8434e-05L0 0L8.5 8L17 0Z" />
+							</svg>
+						</button>
+						<div x-show="open" class="bg-brand-gray-light" x-collapse x-cloak>
+							<!-- list -->
+														<!-- Products -->
+														<!-- list with icon -->
+																								<a href="https://opentrons.com/our-partners" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/07/OUR-PARTNERS.svg" />
+									<span>Our Partners</span>
+								</a>
+																	<a href="https://opentrons.com/partnerships" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2023/10/OEM.svg" />
+									<span>OEM Partnerships</span>
+								</a>
+																	<a href="https://opentrons.com/education/" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/01/Academic.svg" />
+									<span>Education</span>
+								</a>
+																	<a href="https://opentrons.com/automation-marketplace/" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/07/marketplace.svg" />
+									<span>Automation Marketplace</span>
+								</a>
+																													</div>
+					</div>
+				</div>
+							<div class="bg-brand-blue-dark border-b border-brand-blue-medium">
+					<div x-data="{ open: false }">
+						<button type="button" @click.prevent="open = !open" class="flex items-center py-4 px-5 text-white w-full text-left" aria-expanded="false" :aria-expanded="open.toString()">
+							<span class="flex-grow text-2xl">About</span>
+							<svg class="transition duration-300 text-white fill-current" :class="{ '-rotate-180': open }" width="17" height="8" viewBox="0 0 17 8" xmlns="http://www.w3.org/2000/svg">
+								<path d="M17 0L8.5 2.8434e-05L0 0L8.5 8L17 0Z" />
+							</svg>
+						</button>
+						<div x-show="open" class="bg-brand-gray-light" x-collapse x-cloak>
+							<!-- list -->
+														<!-- Products -->
+														<!-- list with icon -->
+																								<a href="https://opentrons.com/about/about-us" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Opentrons-App.svg" />
+									<span>About Us</span>
+								</a>
+																	<a href="https://opentrons.com/about/events/" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Calendar-2.svg" />
+									<span>Events & Webinars</span>
+								</a>
+																	<a href="https://opentrons.com/about/news" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/News.svg" />
+									<span>News</span>
+								</a>
+																	<a href="https://opentrons.com/about/jobs/" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Careers.svg" />
+									<span>Careers</span>
+								</a>
+																	<a href="https://opentrons.com/globalcontacts/" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Global.svg" />
+									<span>Global Contacts</span>
+								</a>
+																	<a href="https://opentrons.com/contact/" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/04/Chat.svg" />
+									<span>Contact Us</span>
+								</a>
+																													</div>
+					</div>
+				</div>
+							<div class="bg-brand-blue-dark border-b border-brand-blue-medium">
+					<div x-data="{ open: false }">
+						<button type="button" @click.prevent="open = !open" class="flex items-center py-4 px-5 text-white w-full text-left" aria-expanded="false" :aria-expanded="open.toString()">
+							<span class="flex-grow text-2xl">Resources</span>
+							<svg class="transition duration-300 text-white fill-current" :class="{ '-rotate-180': open }" width="17" height="8" viewBox="0 0 17 8" xmlns="http://www.w3.org/2000/svg">
+								<path d="M17 0L8.5 2.8434e-05L0 0L8.5 8L17 0Z" />
+							</svg>
+						</button>
+						<div x-show="open" class="bg-brand-gray-light" x-collapse x-cloak>
+							<!-- list -->
+														<!-- Products -->
+														<!-- list with icon -->
+																								<a href="https://opentrons.com/resources/knowledge-hub/" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/04/Knowledge-Hub.svg" />
+									<span>Knowledge Hub</span>
+								</a>
+																	<a href="https://opentrons.com/resources/customer-stories/" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/04/Customer-Stories.svg" />
+									<span>Customer Stories</span>
+								</a>
+																	<a href="https://opentrons.com/ai/" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Robot-Head.svg" />
+									<span>OpentronsAI</span>
+								</a>
+																	<a href="https://opentrons.com/resources/citations/" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Citation.svg" />
+									<span>Citations</span>
+								</a>
+																	<a href="https://opentrons.com/intro-to-protocol-library/" target="_self" class="py-4 px-5 text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium flex items-center space-x-4">
+									<img class="w-7 h-7 no-lazy" src="https://opentrons.com/wp-content/uploads/2024/06/Protocol-Library.svg" />
+									<span>Protocol Library</span>
+								</a>
+																													</div>
+					</div>
+				</div>
+						<!-- new utiltiy nav items -->
+			<div class="bg-brand-blue-dark border-b border-brand-blue-medium">
+					<div x-data="{ open: false }">
+						<button type="button" @click.prevent="open = !open" class="flex items-center py-4 px-5 text-white w-full text-left" aria-expanded="false" :aria-expanded="open.toString()">
+							<span class="flex-grow text-2xl">Tools</span>
+							<svg class="transition duration-300 text-white fill-current" :class="{ '-rotate-180': open }" width="17" height="8" viewBox="0 0 17 8" xmlns="http://www.w3.org/2000/svg">
+								<path d="M17 0L8.5 2.8434e-05L0 0L8.5 8L17 0Z" />
+							</svg>
+						</button>
+						<div x-show="open" class="bg-brand-gray-light" x-collapse x-cloak>
+							<!-- list -->
+							
+																	<a href="https://designer.opentrons.com/" target="_blank" class="py-4 px-10 block text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium">Protocol Designer</a>
+																	<a href="https://library.opentrons.com/" target="_blank" class="py-4 px-10 block text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium">Protocol Library</a>
+																	<a href="https://docs.opentrons.com/" target="_blank" class="py-4 px-10 block text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium">Python API</a>
+																	<a href="https://labware.opentrons.com/" target="_blank" class="py-4 px-10 block text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium">Labware Library</a>
+																	<a href="https://github.com/Opentrons" target="_blank" class="py-4 px-10 block text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium">GitHub</a>
+																	<a href="https://opentrons.com/ot-app/" target="_self" class="py-4 px-10 block text-lg font-semibold text-brand-blue-dark border-b border-brand-gray-medium">OT App</a>
+														</div>
+					</div>
+				</div>
+			
+			<div class="bg-white px-4 py-4">
+				<div class="flex space-x-4 justify-center border-b border-brand-gray-medium pt-3 pb-8">
+					<a href="https://insights.opentrons.com/schedule-demo" class="border border-brand-blue text-brand-blue text-xs leading-none font-medium py-3 px-4 uppercase rounded font-serif demo_button" target="_blank">Schedule a Demo</a>
+					<a href="https://opentrons.com/contact/" class="bg-brand-blue text-white text-xs leading-none font-medium py-3 px-4 uppercase rounded font-serif nav_contact_button">Contact Sales</a>
+				</div>
+
+				<div class="flex flex-row justify-evenly px-4 py-4">
+					
+					<!-- account icon start -->
+						<a type="button" class="mobile-account-links" href="https://opentrons.com/account/" class="text-blue-1100 hover:text-brand-yellow flex items-center">
+								<svg width="18" height="19" viewBox="0 0 18 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M16.2666 16.9508H16.3131L16.3071 16.9067C15.9722 14.4087 13.7202 12.4688 10.9996 12.4688H7.00067C4.28007 12.4688 2.0229 14.4086 1.69304 16.9068L1.72852 16.9111V16.9508H1.73363H1.76969H16.2666ZM0.0410156 18.4608V17.5518C0.0410156 13.916 3.1621 10.9589 7.00067 10.9589H10.9996C14.8381 10.9589 17.9592 13.916 17.9592 17.5518V18.4608H0.0410156ZM9.00011 8.98912C6.54221 8.98912 4.54102 7.0956 4.54102 4.7641C4.54102 2.4326 6.54221 0.539062 9.00011 0.539062C11.458 0.539062 13.4592 2.4326 13.4592 4.7641C13.4592 7.0956 11.458 8.98912 9.00011 8.98912ZM9.00011 2.04904C7.42832 2.04904 6.1467 3.26472 6.1467 4.7641C6.1467 6.26348 7.42832 7.47917 9.00011 7.47917C10.5719 7.47917 11.8535 6.26348 11.8535 4.7641C11.8535 3.26472 10.5719 2.04904 9.00011 2.04904Z" fill="#006cfa"/>
+								</svg>
+
+								<span>ACCOUNT</span>
+								</a>
+								<!-- account icon end -->
+
+								<div  class="mobile-account-links" >
+								<!-- cart icon -->
+								<div id="mobile-cart-dot-expanded" x-show="!menuOpen">
+									<svg width="22" height="19" viewBox="0 0 22 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+										<circle cx="17.5" cy="4.5" r="4.5" fill="#DE1B1B"/>
+									</svg>
+								</div>
+								<a href="https://opentrons.com/cart"><span id="cart-icon-mobile" class="text-blue-1100 hover:text-brand-yellow flex items-center">&nbsp;</span>
+								<!-- cart icon end -->
+								<span>CART</span>
+							</a>
+							</div>		
+				</div>
+
+		
+			</div>
+		</div>
+	</div>
+</header>
+
+
+<script>
+
+let cart_icon = `<svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M7.60976 16.7439C7.60976 17.0012 7.07818 17.2689 6.93525 17.4829C6.79231 17.6968 6.58915 17.8635 6.35146 17.962C6.11377 18.0604 5.85222 18.0862 5.59988 18.036C5.34755 17.9858 5.11577 17.8619 4.93385 17.68C4.75192 17.4981 4.62803 17.2663 4.57784 17.0139C4.52765 16.7616 4.55341 16.5001 4.65186 16.2624C4.75032 16.0247 4.91705 15.8215 5.13097 15.6786C5.34488 15.5356 5.59638 15.4593 5.85366 15.4593C6.19866 15.4594 6.52952 15.5964 6.77347 15.8404C7.01742 16.0843 7.60975 16.3989 7.60976 16.7439ZM15.6098 15.4593C15.3525 15.4593 15.101 15.5356 14.8871 15.6786C14.6731 15.8215 14.5064 16.0247 14.408 16.2624C14.3095 16.5001 14.2837 16.7616 14.3339 17.0139C14.3841 17.2663 14.508 17.4981 14.6899 17.68C14.8719 17.8619 15.1036 17.9858 15.356 18.036C15.6083 18.0862 15.8699 18.0604 16.1076 17.962C16.3452 17.8635 16.5484 17.6968 16.6913 17.4829C16.8343 17.2689 16.9106 17.0174 16.9106 16.7602C16.9106 16.4152 16.7735 16.0843 16.5296 15.8404C16.2856 15.5964 15.9548 15.4594 15.6098 15.4593ZM18.712 5.28543L17.2937 13.0903C17.2394 13.3901 17.0815 13.6613 16.8476 13.8565C16.6136 14.0518 16.3186 14.1587 16.0139 14.1585H5.45676C5.15222 14.1586 4.8573 14.0518 4.62344 13.8567C4.38958 13.6617 4.2316 13.3907 4.17707 13.0911L2.62282 4.5677C2.61455 4.53606 2.60866 4.50384 2.6052 4.47131L2.11827 1.80081H0.650407C0.477908 1.80081 0.312475 1.73229 0.1905 1.61031C0.0685248 1.48834 0 1.32291 0 1.15041C0 0.977908 0.0685248 0.812475 0.1905 0.6905C0.312475 0.568525 0.477908 0.5 0.650407 0.5H2.11819C2.42274 0.499907 2.71767 0.60671 2.95154 0.801787C3.18542 0.996865 3.34341 1.26784 3.39796 1.56747L3.79637 3.75203H17.4321C17.6226 3.75203 17.8108 3.79388 17.9834 3.87462C18.156 3.95537 18.3087 4.07303 18.4308 4.21931C18.5529 4.36558 18.6413 4.53688 18.6899 4.7211C18.7385 4.90533 18.746 5.09798 18.712 5.28543ZM17.4321 5.05285H4.03352L5.45676 12.8577H16.0139L17.4321 5.05285Z" fill="#FFFFFF"/>
+<path d="M7.60976 16.7439C7.60976 17.7138 6.82353 18.5 5.85366 18.5C4.88379 18.5 4.09756 17.7138 4.09756 16.7439C4.09756 15.774 4.88379 14.9878 5.85366 14.9878C6.82353 14.9878 7.60976 15.774 7.60976 16.7439Z" fill="#FFFFFF"/>
+<path d="M17.3659 16.7439C17.3659 17.7138 16.5796 18.5 15.6098 18.5C14.6399 18.5 13.8537 17.7138 13.8537 16.7439C13.8537 15.774 14.6399 14.9878 15.6098 14.9878C16.5796 14.9878 17.3659 15.774 17.3659 16.7439Z" fill="#FFFFFF"/>
+</svg>
+`;
+
+let active_cart_icon = `<svg width="22" height="19" viewBox="0 0 22 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M7.60976 16.7439C7.60976 17.0012 7.07818 17.2689 6.93525 17.4829C6.79231 17.6968 6.58915 17.8635 6.35146 17.962C6.11377 18.0604 5.85222 18.0862 5.59988 18.036C5.34755 17.9858 5.11577 17.8619 4.93385 17.68C4.75192 17.4981 4.62803 17.2663 4.57784 17.0139C4.52765 16.7616 4.55341 16.5001 4.65186 16.2624C4.75032 16.0247 4.91705 15.8215 5.13097 15.6786C5.34488 15.5356 5.59638 15.4593 5.85366 15.4593C6.19866 15.4594 6.52952 15.5964 6.77347 15.8404C7.01742 16.0843 7.60975 16.3989 7.60976 16.7439ZM15.6098 15.4593C15.3525 15.4593 15.101 15.5356 14.8871 15.6786C14.6731 15.8215 14.5064 16.0247 14.408 16.2624C14.3095 16.5001 14.2837 16.7616 14.3339 17.0139C14.3841 17.2663 14.508 17.4981 14.6899 17.68C14.8719 17.8619 15.1036 17.9858 15.356 18.036C15.6083 18.0862 15.8699 18.0604 16.1076 17.962C16.3452 17.8635 16.5484 17.6968 16.6913 17.4829C16.8343 17.2689 16.9106 17.0174 16.9106 16.7602C16.9106 16.4152 16.7735 16.0843 16.5296 15.8404C16.2856 15.5964 15.9548 15.4594 15.6098 15.4593ZM18.712 5.28543L17.2937 13.0903C17.2394 13.3901 17.0815 13.6613 16.8476 13.8565C16.6136 14.0518 16.3186 14.1587 16.0139 14.1585H5.45676C5.15222 14.1586 4.8573 14.0518 4.62344 13.8567C4.38958 13.6617 4.2316 13.3907 4.17707 13.0911L2.62282 4.5677C2.61455 4.53606 2.60866 4.50384 2.6052 4.47131L2.11827 1.80081H0.650407C0.477908 1.80081 0.312475 1.73229 0.1905 1.61031C0.0685248 1.48834 0 1.32291 0 1.15041C0 0.977908 0.0685248 0.812475 0.1905 0.6905C0.312475 0.568525 0.477908 0.5 0.650407 0.5H2.11819C2.42274 0.499907 2.71767 0.60671 2.95154 0.801787C3.18542 0.996865 3.34341 1.26784 3.39796 1.56747L3.79637 3.75203H17.4321C17.6226 3.75203 17.8108 3.79388 17.9834 3.87462C18.156 3.95537 18.3087 4.07303 18.4308 4.21931C18.5529 4.36558 18.6413 4.53688 18.6899 4.7211C18.7385 4.90533 18.746 5.09798 18.712 5.28543ZM17.4321 5.05285H4.03352L5.45676 12.8577H16.0139L17.4321 5.05285Z" fill="#FFFFFF"/>
+<path d="M7.60976 16.7439C7.60976 17.7138 6.82353 18.5 5.85366 18.5C4.88379 18.5 4.09756 17.7138 4.09756 16.7439C4.09756 15.774 4.88379 14.9878 5.85366 14.9878C6.82353 14.9878 7.60976 15.774 7.60976 16.7439Z" fill="#FFFFFF"/>
+<path d="M17.3659 16.7439C17.3659 17.7138 16.5796 18.5 15.6098 18.5C14.6399 18.5 13.8537 17.7138 13.8537 16.7439C13.8537 15.774 14.6399 14.9878 15.6098 14.9878C16.5796 14.9878 17.3659 15.774 17.3659 16.7439Z" fill="#FFFFFF"/>
+<circle cx="17.5" cy="4.5" r="4.5" fill="#DE1B1B"/>
+</svg>
+`;
+
+
+let mobile_cart_icon = `<svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M7.60976 16.7439C7.60976 17.0012 7.07818 17.2689 6.93525 17.4829C6.79231 17.6968 6.58915 17.8635 6.35146 17.962C6.11377 18.0604 5.85222 18.0862 5.59988 18.036C5.34755 17.9858 5.11577 17.8619 4.93385 17.68C4.75192 17.4981 4.62803 17.2663 4.57784 17.0139C4.52765 16.7616 4.55341 16.5001 4.65186 16.2624C4.75032 16.0247 4.91705 15.8215 5.13097 15.6786C5.34488 15.5356 5.59638 15.4593 5.85366 15.4593C6.19866 15.4594 6.52952 15.5964 6.77347 15.8404C7.01742 16.0843 7.60975 16.3989 7.60976 16.7439ZM15.6098 15.4593C15.3525 15.4593 15.101 15.5356 14.8871 15.6786C14.6731 15.8215 14.5064 16.0247 14.408 16.2624C14.3095 16.5001 14.2837 16.7616 14.3339 17.0139C14.3841 17.2663 14.508 17.4981 14.6899 17.68C14.8719 17.8619 15.1036 17.9858 15.356 18.036C15.6083 18.0862 15.8699 18.0604 16.1076 17.962C16.3452 17.8635 16.5484 17.6968 16.6913 17.4829C16.8343 17.2689 16.9106 17.0174 16.9106 16.7602C16.9106 16.4152 16.7735 16.0843 16.5296 15.8404C16.2856 15.5964 15.9548 15.4594 15.6098 15.4593ZM18.712 5.28543L17.2937 13.0903C17.2394 13.3901 17.0815 13.6613 16.8476 13.8565C16.6136 14.0518 16.3186 14.1587 16.0139 14.1585H5.45676C5.15222 14.1586 4.8573 14.0518 4.62344 13.8567C4.38958 13.6617 4.2316 13.3907 4.17707 13.0911L2.62282 4.5677C2.61455 4.53606 2.60866 4.50384 2.6052 4.47131L2.11827 1.80081H0.650407C0.477908 1.80081 0.312475 1.73229 0.1905 1.61031C0.0685248 1.48834 0 1.32291 0 1.15041C0 0.977908 0.0685248 0.812475 0.1905 0.6905C0.312475 0.568525 0.477908 0.5 0.650407 0.5H2.11819C2.42274 0.499907 2.71767 0.60671 2.95154 0.801787C3.18542 0.996865 3.34341 1.26784 3.39796 1.56747L3.79637 3.75203H17.4321C17.6226 3.75203 17.8108 3.79388 17.9834 3.87462C18.156 3.95537 18.3087 4.07303 18.4308 4.21931C18.5529 4.36558 18.6413 4.53688 18.6899 4.7211C18.7385 4.90533 18.746 5.09798 18.712 5.28543ZM17.4321 5.05285H4.03352L5.45676 12.8577H16.0139L17.4321 5.05285Z" fill="#006cfa"/>
+<path d="M7.60976 16.7439C7.60976 17.7138 6.82353 18.5 5.85366 18.5C4.88379 18.5 4.09756 17.7138 4.09756 16.7439C4.09756 15.774 4.88379 14.9878 5.85366 14.9878C6.82353 14.9878 7.60976 15.774 7.60976 16.7439Z" fill="#006cfa"/>
+<path d="M17.3659 16.7439C17.3659 17.7138 16.5796 18.5 15.6098 18.5C14.6399 18.5 13.8537 17.7138 13.8537 16.7439C13.8537 15.774 14.6399 14.9878 15.6098 14.9878C16.5796 14.9878 17.3659 15.774 17.3659 16.7439Z" fill="#006cfa"/>
+</svg>
+`;
+
+let mobile_active_cart_icon = `<svg width="22" height="19" viewBox="0 0 22 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M7.60976 16.7439C7.60976 17.0012 7.07818 17.2689 6.93525 17.4829C6.79231 17.6968 6.58915 17.8635 6.35146 17.962C6.11377 18.0604 5.85222 18.0862 5.59988 18.036C5.34755 17.9858 5.11577 17.8619 4.93385 17.68C4.75192 17.4981 4.62803 17.2663 4.57784 17.0139C4.52765 16.7616 4.55341 16.5001 4.65186 16.2624C4.75032 16.0247 4.91705 15.8215 5.13097 15.6786C5.34488 15.5356 5.59638 15.4593 5.85366 15.4593C6.19866 15.4594 6.52952 15.5964 6.77347 15.8404C7.01742 16.0843 7.60975 16.3989 7.60976 16.7439ZM15.6098 15.4593C15.3525 15.4593 15.101 15.5356 14.8871 15.6786C14.6731 15.8215 14.5064 16.0247 14.408 16.2624C14.3095 16.5001 14.2837 16.7616 14.3339 17.0139C14.3841 17.2663 14.508 17.4981 14.6899 17.68C14.8719 17.8619 15.1036 17.9858 15.356 18.036C15.6083 18.0862 15.8699 18.0604 16.1076 17.962C16.3452 17.8635 16.5484 17.6968 16.6913 17.4829C16.8343 17.2689 16.9106 17.0174 16.9106 16.7602C16.9106 16.4152 16.7735 16.0843 16.5296 15.8404C16.2856 15.5964 15.9548 15.4594 15.6098 15.4593ZM18.712 5.28543L17.2937 13.0903C17.2394 13.3901 17.0815 13.6613 16.8476 13.8565C16.6136 14.0518 16.3186 14.1587 16.0139 14.1585H5.45676C5.15222 14.1586 4.8573 14.0518 4.62344 13.8567C4.38958 13.6617 4.2316 13.3907 4.17707 13.0911L2.62282 4.5677C2.61455 4.53606 2.60866 4.50384 2.6052 4.47131L2.11827 1.80081H0.650407C0.477908 1.80081 0.312475 1.73229 0.1905 1.61031C0.0685248 1.48834 0 1.32291 0 1.15041C0 0.977908 0.0685248 0.812475 0.1905 0.6905C0.312475 0.568525 0.477908 0.5 0.650407 0.5H2.11819C2.42274 0.499907 2.71767 0.60671 2.95154 0.801787C3.18542 0.996865 3.34341 1.26784 3.39796 1.56747L3.79637 3.75203H17.4321C17.6226 3.75203 17.8108 3.79388 17.9834 3.87462C18.156 3.95537 18.3087 4.07303 18.4308 4.21931C18.5529 4.36558 18.6413 4.53688 18.6899 4.7211C18.7385 4.90533 18.746 5.09798 18.712 5.28543ZM17.4321 5.05285H4.03352L5.45676 12.8577H16.0139L17.4321 5.05285Z" fill="#006cfa"/>
+<path d="M7.60976 16.7439C7.60976 17.7138 6.82353 18.5 5.85366 18.5C4.88379 18.5 4.09756 17.7138 4.09756 16.7439C4.09756 15.774 4.88379 14.9878 5.85366 14.9878C6.82353 14.9878 7.60976 15.774 7.60976 16.7439Z" fill="#006cfa"/>
+<path d="M17.3659 16.7439C17.3659 17.7138 16.5796 18.5 15.6098 18.5C14.6399 18.5 13.8537 17.7138 13.8537 16.7439C13.8537 15.774 14.6399 14.9878 15.6098 14.9878C16.5796 14.9878 17.3659 15.774 17.3659 16.7439Z" fill="#006cfa"/>
+<circle cx="17.5" cy="4.5" r="4.5" fill="#DE1B1B"/>
+</svg>
+`;
+	
+let cart_icon_link = document.getElementById('cart-icon');
+let cart_icon_link_mobile = document.getElementById('cart-icon-mobile');
+let cart_icon_link_mobile_expanded = document.getElementById('cart-icon-mobile-expanded');
+let cart_icon_mobile_nav = document.getElementById('mobile-cart-dot');
+let mobile_nav_dot = document.getElementById('mobile-nav-dot');
+
+function getCookie(cname) {
+  let name = cname + "=";
+  let ca = document.cookie.split(';');
+  for(let i = 0; i < ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+
+function checkCookie() {
+  let cart = getCookie("wp-bigcommerce_cart_id");
+  console.log("Cart value:", cart);
+
+  if (cart !== "") {
+    console.log("Setting active cart icon");
+    cart_icon_link.innerHTML = active_cart_icon;
+    cart_icon_link_mobile.innerHTML = mobile_active_cart_icon;
+    mobile_nav_dot.style.display = "block";
+  } else {
+    console.log("Setting default cart icon");
+    cart_icon_link.innerHTML = cart_icon;
+    cart_icon_link_mobile.innerHTML = mobile_cart_icon;
+    mobile_nav_dot.style.display = "none";
+  }
+}
+
+console.log("cart_icon_link:", cart_icon_link);
+checkCookie();
+
+</script>
+</body>
+</html> 

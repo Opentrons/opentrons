@@ -1,29 +1,33 @@
-import * as React from 'react'
-import { describe, it, beforeEach, expect, vi } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
+
 import { useEstopQuery } from '@opentrons/react-api-client'
 
-import { i18n } from '../../../i18n'
-import { EstopMissingModal } from '../EstopMissingModal'
-import { EstopPressedModal } from '../EstopPressedModal'
-import { useIsUnboxingFlowOngoing } from '../../RobotSettingsDashboard/NetworkSettings/hooks'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
+import { getLocalRobot } from '/app/redux/discovery'
+import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
+
 import {
   ENGAGED,
   LOGICALLY_ENGAGED,
   NOT_PRESENT,
   PHYSICALLY_ENGAGED,
 } from '../constants'
-import { getLocalRobot } from '../../../redux/discovery'
-import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
+import { EstopMissingModal } from '../EstopMissingModal'
+import { EstopPressedModal } from '../EstopPressedModal'
 import { EstopTakeover } from '../EstopTakeover'
+
+import type { ComponentProps } from 'react'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../EstopMissingModal')
 vi.mock('../EstopPressedModal')
-vi.mock('../../RobotSettingsDashboard/NetworkSettings/hooks')
-vi.mock('../../../redux/discovery')
+vi.mock('/app/redux-resources/config')
+vi.mock('/app/redux/discovery')
 
 const mockPressed = {
   data: {
@@ -33,14 +37,14 @@ const mockPressed = {
   },
 }
 
-const render = (props: React.ComponentProps<typeof EstopTakeover>) => {
+const render = (props: ComponentProps<typeof EstopTakeover>) => {
   return renderWithProviders(<EstopTakeover {...props} />, {
     i18nInstance: i18n,
   })
 }
 
 describe('EstopTakeover', () => {
-  let props: React.ComponentProps<typeof EstopTakeover>
+  let props: ComponentProps<typeof EstopTakeover>
 
   beforeEach(() => {
     props = {

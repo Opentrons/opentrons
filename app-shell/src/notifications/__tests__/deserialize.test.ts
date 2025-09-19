@@ -4,7 +4,7 @@ import { deserializeExpectedMessages } from '../deserialize'
 
 import type { NotifyResponseData } from '@opentrons/app/src/redux/shell/types'
 
-const MOCK_VALID_RESPONSE: NotifyResponseData = { refetchUsingHTTP: true }
+const MOCK_VALID_RESPONSE: NotifyResponseData = { refetch: true }
 const MOCK_VALID_STRING_RESPONSE = JSON.stringify(MOCK_VALID_RESPONSE)
 const MOCK_INVALID_OBJECT = JSON.stringify({ test: 'MOCK_RESPONSE' })
 const MOCK_INVALID_STRING = 'MOCK_STRING'

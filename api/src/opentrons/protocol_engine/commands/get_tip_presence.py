@@ -6,7 +6,8 @@ from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
 from .pipetting_common import PipetteIdMixin
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 from ..types import TipPresenceStatus
 
@@ -37,7 +38,7 @@ class GetTipPresenceResult(BaseModel):
 
 
 class GetTipPresenceImplementation(
-    AbstractCommandImpl[GetTipPresenceParams, GetTipPresenceResult]
+    AbstractCommandImpl[GetTipPresenceParams, SuccessData[GetTipPresenceResult]]
 ):
     """GetTipPresence command implementation."""
 
@@ -48,7 +49,9 @@ class GetTipPresenceImplementation(
     ) -> None:
         self._tip_handler = tip_handler
 
-    async def execute(self, params: GetTipPresenceParams) -> GetTipPresenceResult:
+    async def execute(
+        self, params: GetTipPresenceParams
+    ) -> SuccessData[GetTipPresenceResult]:
         """Verify if tip presence is as expected for the requested pipette."""
         pipette_id = params.pipetteId
 
@@ -56,15 +59,19 @@ class GetTipPresenceImplementation(
             pipette_id=pipette_id,
         )
 
-        return GetTipPresenceResult(status=result)
+        return SuccessData(
+            public=GetTipPresenceResult(status=result),
+        )
 
 
-class GetTipPresence(BaseCommand[GetTipPresenceParams, GetTipPresenceResult]):
+class GetTipPresence(
+    BaseCommand[GetTipPresenceParams, GetTipPresenceResult, ErrorOccurrence]
+):
     """GetTipPresence command model."""
 
     commandType: GetTipPresenceCommandType = "getTipPresence"
     params: GetTipPresenceParams
-    result: Optional[GetTipPresenceResult]
+    result: Optional[GetTipPresenceResult] = None
 
     _ImplementationCls: Type[
         GetTipPresenceImplementation

@@ -1,9 +1,15 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 // application menu
 import { Menu, shell } from 'electron'
-import type { MenuItemConstructorOptions } from 'electron'
 
 import { LOG_DIR } from './log'
+
+import type { MenuItemConstructorOptions } from 'electron'
+
+const PRODUCT_NAME: string = _PKG_PRODUCT_NAME_
+const BUGS_URL: string = _PKG_BUGS_URL_
+
+const EULA_URL = 'https://opentrons.com/eula' as const
 
 // file or application menu
 const firstMenu: MenuItemConstructorOptions = {
@@ -27,8 +33,7 @@ const helpMenu: MenuItemConstructorOptions = {
       },
     },
     {
-      // @ts-expect-error can't get TS to recognize global.d.ts
-      label: `View ${global._PKG_PRODUCT_NAME_} App Logs`,
+      label: `View ${PRODUCT_NAME} App Logs`,
       click: () => {
         shell.openPath(LOG_DIR)
       },
@@ -37,8 +42,17 @@ const helpMenu: MenuItemConstructorOptions = {
       label: 'Report an Issue',
       click: () => {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        // @ts-expect-error can't get TS to recognize global.d.ts
-        shell.openExternal(global._PKG_BUGS_URL_)
+        shell.openExternal(BUGS_URL)
+      },
+    },
+    {
+      label: 'View Privacy Policy',
+      click: () => {
+        shell.openExternal(EULA_URL).catch((e: Error) => {
+          console.error(
+            `could not open end user license agreement: ${e.message}`
+          )
+        })
       },
     },
   ],

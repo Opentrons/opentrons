@@ -8,7 +8,7 @@
   "types": "lib/main.d.ts",
   "scripts": {
     "start": "make dev",
-    "rebuild": "electron-rebuild"
+    "rebuild": "electron-rebuild --force-abi=3.71.0"
   },
   "repository": {
     "type": "git",
@@ -43,16 +43,17 @@
     "@types/lodash": "^4.14.191",
     "@types/pump": "^1.1.0",
     "@types/uuid": "^3.4.7",
+    "agent-base": "6.0.2",
     "ajv": "6.12.3",
     "axios": "^0.21.1",
     "dateformat": "3.0.3",
     "electron-context-menu": "3.6.1",
-    "electron-debug": "3.0.1",
+    "electron-debug": "3.2.0",
     "electron-is-dev": "1.2.0",
     "electron-localshortcut": "3.2.1",
     "electron-devtools-installer": "3.2.0",
     "electron-store": "5.1.1",
-    "electron-updater": "4.1.2",
+    "electron-updater": "6.3.9",
     "execa": "4.0.0",
     "form-data": "2.5.0",
     "fs-extra": "10.0.0",
@@ -63,12 +64,12 @@
     "node-fetch": "2.6.7",
     "node-stream-zip": "1.8.2",
     "pump": "3.0.0",
-    "semver": "5.5.0",
+    "semver": "5.7.2",
     "serialport": "10.5.0",
     "tempy": "1.0.1",
     "usb": "^2.11.0",
     "uuid": "3.2.1",
-    "winston": "3.1.0",
+    "winston": "3.15.0",
     "yargs-parser": "13.1.2"
   }
 }

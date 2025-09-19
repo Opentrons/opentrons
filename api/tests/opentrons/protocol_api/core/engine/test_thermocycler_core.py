@@ -1,5 +1,8 @@
 """Tests for the engine based Protocol API module core implementations."""
+
+from typing import cast
 import pytest
+from _pytest.fixtures import SubRequest
 from decoy import Decoy
 
 from opentrons.drivers.types import ThermocyclerLidStatus
@@ -9,9 +12,13 @@ from opentrons.hardware_control.modules import (
     TemperatureStatus,
     ModuleType,
 )
+from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_api.core.engine.module_core import ThermocyclerModuleCore
+from opentrons.protocol_api.core.engine.protocol import ProtocolCore
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocols.api_support.types import APIVersion
+from ... import versions_below, versions_at_or_above
 
 SyncThermocyclerHardware = SynchronousAdapter[Thermocycler]
 
@@ -29,16 +36,58 @@ def mock_sync_module_hardware(decoy: Decoy) -> SyncThermocyclerHardware:
 
 
 @pytest.fixture
+def mock_protocol_core(decoy: Decoy) -> ProtocolCore:
+    """Get a mock protocol core."""
+    return decoy.mock(cls=ProtocolCore)
+
+
+@pytest.fixture
 def subject(
     mock_engine_client: EngineClient,
     mock_sync_module_hardware: SyncThermocyclerHardware,
+    mock_protocol_core: ProtocolCore,
 ) -> ThermocyclerModuleCore:
-    """Get a HeaterShakerModuleCore test subject."""
+    """Get a ThermocyclerModuleCore test subject."""
     return ThermocyclerModuleCore(
         module_id="1234",
         engine_client=mock_engine_client,
         api_version=MAX_SUPPORTED_VERSION,
         sync_module_hardware=mock_sync_module_hardware,
+        protocol_core=mock_protocol_core,
+    )
+
+
+@pytest.fixture(params=versions_below(APIVersion(2, 21), flex_only=False))
+def subject_below_221(
+    request: SubRequest,
+    mock_engine_client: EngineClient,
+    mock_sync_module_hardware: SyncThermocyclerHardware,
+    mock_protocol_core: ProtocolCore,
+) -> ThermocyclerModuleCore:
+    """Get a ThermocyclerCore below API version 2.21."""
+    return ThermocyclerModuleCore(
+        module_id="1234",
+        engine_client=mock_engine_client,
+        api_version=cast(APIVersion, request.param),
+        sync_module_hardware=mock_sync_module_hardware,
+        protocol_core=mock_protocol_core,
+    )
+
+
+@pytest.fixture(params=versions_at_or_above(APIVersion(2, 21)))
+def subject_at_or_above_221(
+    request: SubRequest,
+    mock_engine_client: EngineClient,
+    mock_sync_module_hardware: SyncThermocyclerHardware,
+    mock_protocol_core: ProtocolCore,
+) -> ThermocyclerModuleCore:
+    """Get a ThermocyclerCore below API version 2.21."""
+    return ThermocyclerModuleCore(
+        module_id="1234",
+        engine_client=mock_engine_client,
+        api_version=cast(APIVersion, request.param),
+        sync_module_hardware=mock_sync_module_hardware,
+        protocol_core=mock_protocol_core,
     )
 
 
@@ -46,6 +95,7 @@ def test_create(
     decoy: Decoy,
     mock_engine_client: EngineClient,
     mock_sync_module_hardware: SyncThermocyclerHardware,
+    mock_protocol_core: ProtocolCore,
 ) -> None:
     """It should be able to create a thermocycler module core."""
     result = ThermocyclerModuleCore(
@@ -53,6 +103,7 @@ def test_create(
         engine_client=mock_engine_client,
         api_version=MAX_SUPPORTED_VERSION,
         sync_module_hardware=mock_sync_module_hardware,
+        protocol_core=mock_protocol_core,
     )
 
     assert result.module_id == "1234"
@@ -65,7 +116,12 @@ def test_open_lid(
     """It should open the lid with the engine client."""
     result = subject.open_lid()
 
-    decoy.verify(mock_engine_client.thermocycler_open_lid(module_id="1234"), times=1)
+    decoy.verify(
+        mock_engine_client.execute_command(
+            cmd.thermocycler.OpenLidParams(moduleId="1234")
+        ),
+        times=1,
+    )
     assert result == ThermocyclerLidStatus.OPEN
 
 
@@ -75,7 +131,12 @@ def test_close_lid(
     """It should close the lid with the engine client."""
     result = subject.close_lid()
 
-    decoy.verify(mock_engine_client.thermocycler_close_lid(module_id="1234"), times=1)
+    decoy.verify(
+        mock_engine_client.execute_command(
+            cmd.thermocycler.CloseLidParams(moduleId="1234")
+        ),
+        times=1,
+    )
     assert result == ThermocyclerLidStatus.CLOSED
 
 
@@ -87,14 +148,18 @@ def test_set_target_block_temperature(
         celsius=42.0,
         hold_time_seconds=1.2,
         block_max_volume=3.4,
+        ramp_rate=None,
     )
 
     decoy.verify(
-        mock_engine_client.thermocycler_set_target_block_temperature(
-            module_id="1234",
-            celsius=42.0,
-            block_max_volume=3.4,
-            hold_time_seconds=1.2,
+        mock_engine_client.execute_command(
+            cmd.thermocycler.SetTargetBlockTemperatureParams(
+                moduleId="1234",
+                celsius=42.0,
+                blockMaxVolumeUl=3.4,
+                holdTimeSeconds=1.2,
+                ramp_rate=None,
+            )
         ),
         times=1,
     )
@@ -107,7 +172,9 @@ def test_wait_for_block_temperature(
     subject.wait_for_block_temperature()
 
     decoy.verify(
-        mock_engine_client.thermocycler_wait_for_block_temperature(module_id="1234"),
+        mock_engine_client.execute_command(
+            cmd.thermocycler.WaitForBlockTemperatureParams(moduleId="1234")
+        ),
         times=1,
     )
 
@@ -121,8 +188,10 @@ def test_set_target_lid_temperature(
     subject.set_target_lid_temperature(celsius=42.0)
 
     decoy.verify(
-        mock_engine_client.thermocycler_set_target_lid_temperature(
-            module_id="1234", celsius=42.0
+        mock_engine_client.execute_command(
+            cmd.thermocycler.SetTargetLidTemperatureParams(
+                moduleId="1234", celsius=42.0
+            )
         ),
         times=1,
     )
@@ -135,29 +204,76 @@ def test_wait_for_lid_temperature(
     subject.wait_for_lid_temperature()
 
     decoy.verify(
-        mock_engine_client.thermocycler_wait_for_lid_temperature(module_id="1234"),
+        mock_engine_client.execute_command(
+            cmd.thermocycler.WaitForLidTemperatureParams(moduleId="1234")
+        ),
         times=1,
     )
 
 
-def test_execute_profile(
-    decoy: Decoy, mock_engine_client: EngineClient, subject: ThermocyclerModuleCore
+def test_execute_profile_below_221(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject_below_221: ThermocyclerModuleCore,
 ) -> None:
     """It should run a thermocycler profile with the engine client."""
-    subject.execute_profile(
-        steps=[{"temperature": 45.6, "hold_time_seconds": 12.3}],
+    subject_below_221.execute_profile(
+        steps=[{"temperature": 45.6, "hold_time_seconds": 12.3, "ramp_rate": 0.0}],
         repetitions=2,
         block_max_volume=78.9,
     )
 
     decoy.verify(
-        mock_engine_client.thermocycler_run_profile(
-            module_id="1234",
-            steps=[
-                {"temperature": 45.6, "hold_time_seconds": 12.3},
-                {"temperature": 45.6, "hold_time_seconds": 12.3},
-            ],
-            block_max_volume=78.9,
+        mock_engine_client.execute_command(
+            cmd.thermocycler.RunProfileParams(
+                moduleId="1234",
+                profile=[
+                    cmd.thermocycler.RunProfileStepParams(
+                        celsius=45.6, holdSeconds=12.3, rampRate=0.0
+                    ),
+                    cmd.thermocycler.RunProfileStepParams(
+                        celsius=45.6, holdSeconds=12.3, rampRate=0.0
+                    ),
+                ],
+                blockMaxVolumeUl=78.9,
+            )
+        )
+    )
+
+
+def test_execute_profile_above_221(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject_at_or_above_221: ThermocyclerModuleCore,
+) -> None:
+    """It should run a thermocycler profile with the engine client."""
+    subject_at_or_above_221.execute_profile(
+        steps=[
+            {"temperature": 45.6, "hold_time_seconds": 12.3, "ramp_rate": 0.0},
+            {"temperature": 78.9, "hold_time_seconds": 45.6, "ramp_rate": 1.0},
+        ],
+        repetitions=2,
+        block_max_volume=25,
+    )
+    decoy.verify(
+        mock_engine_client.execute_command(
+            cmd.thermocycler.RunExtendedProfileParams(
+                moduleId="1234",
+                profileElements=[
+                    cmd.thermocycler.ProfileCycle(
+                        repetitions=2,
+                        steps=[
+                            cmd.thermocycler.ProfileStep(
+                                celsius=45.6, holdSeconds=12.3, rampRate=0.0
+                            ),
+                            cmd.thermocycler.ProfileStep(
+                                celsius=78.9, holdSeconds=45.6, rampRate=1.0
+                            ),
+                        ],
+                    )
+                ],
+                blockMaxVolumeUl=25,
+            )
         )
     )
 
@@ -169,7 +285,10 @@ def test_deactivate_lid(
     subject.deactivate_lid()
 
     decoy.verify(
-        mock_engine_client.thermocycler_deactivate_lid(module_id="1234"), times=1
+        mock_engine_client.execute_command(
+            cmd.thermocycler.DeactivateLidParams(moduleId="1234")
+        ),
+        times=1,
     )
 
 
@@ -180,7 +299,10 @@ def test_deactivate_block(
     subject.deactivate_block()
 
     decoy.verify(
-        mock_engine_client.thermocycler_deactivate_block(module_id="1234"), times=1
+        mock_engine_client.execute_command(
+            cmd.thermocycler.DeactivateBlockParams(moduleId="1234")
+        ),
+        times=1,
     )
 
 
@@ -191,8 +313,12 @@ def test_deactivate(
     subject.deactivate()
 
     decoy.verify(
-        mock_engine_client.thermocycler_deactivate_block(module_id="1234"),
-        mock_engine_client.thermocycler_deactivate_lid(module_id="1234"),
+        mock_engine_client.execute_command(
+            cmd.thermocycler.DeactivateBlockParams(moduleId="1234")
+        ),
+        mock_engine_client.execute_command(
+            cmd.thermocycler.DeactivateLidParams(moduleId="1234")
+        ),
     )
 
 
@@ -307,8 +433,8 @@ def test_cycle_counting(
     """It should keep track of cycle and step counts and indices."""
     subject.execute_profile(
         [
-            {"temperature": 45.6, "hold_time_seconds": 12.3},
-            {"temperature": 78.9, "hold_time_seconds": 45.6},
+            {"temperature": 45.6, "hold_time_seconds": 12.3, "ramp_rate": 0.0},
+            {"temperature": 78.9, "hold_time_seconds": 45.6, "ramp_rate": 0.0},
         ],
         repetitions=3,
     )

@@ -6,7 +6,7 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.types import PipetteNotAttachedError as HwPipetteNotAttachedError
 
 from ..resources.ot3_validation import ensure_ot3_hardware
-from ..state import StateStore
+from ..state.state import StateStore
 from ..types import MotorAxis, PostRunHardwareState
 from ..errors import HardwareNotSupportedError
 
@@ -65,7 +65,7 @@ class HardwareStopper:
             axes=[MotorAxis.X, MotorAxis.Y, MotorAxis.LEFT_Z, MotorAxis.RIGHT_Z]
         )
 
-    async def _drop_tip(self) -> None:
+    async def _try_to_drop_tips(self) -> None:
         """Drop currently attached tip, if any, into trash after a run cancel."""
         attached_tips = self._state_store.pipettes.get_all_attached_tips()
 
@@ -78,7 +78,7 @@ class HardwareStopper:
                 try:
                     if self._state_store.labware.get_fixed_trash_id() == FIXED_TRASH_ID:
                         # OT-2 and Flex 2.15 protocols will default to the Fixed Trash Labware
-                        await self._tip_handler.add_tip(pipette_id=pipette_id, tip=tip)
+                        self._tip_handler.cache_tip(pipette_id=pipette_id, tip=tip)
                         await self._movement_handler.move_to_well(
                             pipette_id=pipette_id,
                             labware_id=FIXED_TRASH_ID,
@@ -90,7 +90,7 @@ class HardwareStopper:
                         )
                     elif self._state_store.config.robot_type == "OT-2 Standard":
                         # API 2.16 and above OT2 protocols use addressable areas
-                        await self._tip_handler.add_tip(pipette_id=pipette_id, tip=tip)
+                        self._tip_handler.cache_tip(pipette_id=pipette_id, tip=tip)
                         await self._movement_handler.move_to_addressable_area(
                             pipette_id=pipette_id,
                             addressable_area_name="fixedTrash",
@@ -128,15 +128,20 @@ class HardwareStopper:
         post_run_hardware_state: PostRunHardwareState,
         drop_tips_after_run: bool = False,
     ) -> None:
-        """Stop and reset the HardwareAPI, homing and dropping tips independently if specified."""
+        """Stop and reset the HardwareAPI, homing and dropping tips independently if specified. If modules are attached that require recovery handle them."""
         home_after_stop = post_run_hardware_state in (
             PostRunHardwareState.HOME_AND_STAY_ENGAGED,
             PostRunHardwareState.HOME_THEN_DISENGAGE,
         )
-        if drop_tips_after_run:
-            await self._drop_tip()
-            await self._hardware_api.stop(home_after=home_after_stop)
-        else:
+        try:
+            if drop_tips_after_run:
+                await self._try_to_drop_tips()
+
             await self._hardware_api.stop(home_after=False)
+
             if home_after_stop:
                 await self._home_everything_except_plungers()
+        finally:
+            # Ensure module state recovery is handled
+            for module in self._hardware_api.attached_modules:
+                module.cleanup_persistent()

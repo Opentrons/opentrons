@@ -1,36 +1,48 @@
-import { uuid } from '../../utils'
-import { noTipOnPipette, pipetteDoesNotExist } from '../../errorCreators'
-import type { CommandCreator, CommandCreatorError } from '../../types'
-import type { CreateCommand } from '@opentrons/shared-data'
-import type { TouchTipParams } from '@opentrons/shared-data/protocol/types/schemaV3'
+import { WELL_ORIGIN_TOP } from '@opentrons/shared-data'
 
-export const touchTip: CommandCreator<TouchTipParams> = (
+import { noTipOnPipette, pipetteDoesNotExist } from '../../errorCreators'
+import { formatPyStr, uuid } from '../../utils'
+
+import type { CreateCommand, TouchTipParams } from '@opentrons/shared-data'
+import type { CommandCreator, CommandCreatorError } from '../../types'
+
+interface TouchTipAtomicParams extends Omit<TouchTipParams, 'wellLocation'> {
+  zOffsetFromTop: number
+}
+
+export const touchTip: CommandCreator<TouchTipAtomicParams> = (
   args,
   invariantContext,
   prevRobotState
 ) => {
   /** touchTip with given args. Requires tip. */
   const actionName = 'touchTip'
-  const { pipette, labware, well, offsetFromBottomMm } = args
-  const pipetteData = prevRobotState.pipettes[pipette]
+  const {
+    pipetteId,
+    labwareId,
+    wellName,
+    zOffsetFromTop,
+    speed,
+    mmFromEdge,
+  } = args
+  const pipetteData = prevRobotState.pipettes[pipetteId]
   const errors: CommandCreatorError[] = []
 
   if (!pipetteData) {
     errors.push(
       pipetteDoesNotExist({
-        actionName,
-        pipette,
+        pipette: pipetteId,
       })
     )
   }
 
-  if (!prevRobotState.tipState.pipettes[pipette]) {
+  if (!prevRobotState.tipState.pipettes[pipetteId]?.hasTip) {
     errors.push(
       noTipOnPipette({
         actionName,
-        pipette,
-        labware,
-        well,
+        pipette: pipetteId,
+        labware: labwareId,
+        well: wellName,
       })
     )
   }
@@ -41,24 +53,41 @@ export const touchTip: CommandCreator<TouchTipParams> = (
     }
   }
 
+  const pipettePythonName =
+    invariantContext.pipetteEntities[pipetteId].pythonName
+  const labwarePythonName =
+    invariantContext.labwareEntities[labwareId].pythonName
+
+  const pythonArgs = [
+    `${labwarePythonName}[${formatPyStr(wellName)}]`,
+    `v_offset=${zOffsetFromTop}`,
+    ...(speed != null ? [`speed=${speed}`] : []),
+    ...(mmFromEdge != null ? [`mm_from_edge=${mmFromEdge}`] : []),
+  ]
+
+  const python = `${pipettePythonName}.touch_tip(${pythonArgs.join(', ')})`
+
   const commands: CreateCommand[] = [
     {
       commandType: 'touchTip',
       key: uuid(),
       params: {
-        pipetteId: pipette,
-        labwareId: labware,
-        wellName: well,
+        pipetteId,
+        labwareId,
+        wellName,
         wellLocation: {
-          origin: 'bottom',
+          origin: WELL_ORIGIN_TOP,
           offset: {
-            z: offsetFromBottomMm,
+            z: zOffsetFromTop,
           },
         },
+        speed,
+        mmFromEdge,
       },
     },
   ]
   return {
     commands,
+    python,
   }
 }

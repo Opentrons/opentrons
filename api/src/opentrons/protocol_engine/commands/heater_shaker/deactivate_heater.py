@@ -5,10 +5,11 @@ from typing_extensions import Literal, Type
 
 from pydantic import BaseModel, Field
 
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ...errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
-    from opentrons.protocol_engine.state import StateView
+    from opentrons.protocol_engine.state.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler
 
 
@@ -26,7 +27,7 @@ class DeactivateHeaterResult(BaseModel):
 
 
 class DeactivateHeaterImpl(
-    AbstractCommandImpl[DeactivateHeaterParams, DeactivateHeaterResult]
+    AbstractCommandImpl[DeactivateHeaterParams, SuccessData[DeactivateHeaterResult]]
 ):
     """Execution implementation of a Heater-Shaker's deactivate heater command."""
 
@@ -39,7 +40,9 @@ class DeactivateHeaterImpl(
         self._state_view = state_view
         self._equipment = equipment
 
-    async def execute(self, params: DeactivateHeaterParams) -> DeactivateHeaterResult:
+    async def execute(
+        self, params: DeactivateHeaterParams
+    ) -> SuccessData[DeactivateHeaterResult]:
         """Unset a Heater-Shaker's target temperature."""
         hs_module_substate = self._state_view.modules.get_heater_shaker_module_substate(
             module_id=params.moduleId
@@ -53,15 +56,19 @@ class DeactivateHeaterImpl(
         if hs_hardware_module is not None:
             await hs_hardware_module.deactivate_heater()
 
-        return DeactivateHeaterResult()
+        return SuccessData(
+            public=DeactivateHeaterResult(),
+        )
 
 
-class DeactivateHeater(BaseCommand[DeactivateHeaterParams, DeactivateHeaterResult]):
+class DeactivateHeater(
+    BaseCommand[DeactivateHeaterParams, DeactivateHeaterResult, ErrorOccurrence]
+):
     """A command to unset a Heater-Shaker's target temperature."""
 
     commandType: DeactivateHeaterCommandType = "heaterShaker/deactivateHeater"
     params: DeactivateHeaterParams
-    result: Optional[DeactivateHeaterResult]
+    result: Optional[DeactivateHeaterResult] = None
 
     _ImplementationCls: Type[DeactivateHeaterImpl] = DeactivateHeaterImpl
 

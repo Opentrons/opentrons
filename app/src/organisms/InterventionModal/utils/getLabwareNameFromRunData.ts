@@ -1,12 +1,11 @@
 import {
-  RunTimeCommand,
-  getLabwareDefURI,
-  getLabwareDisplayName,
-} from '@opentrons/shared-data'
-import { getLoadedLabware } from '../../CommandText/utils/accessors'
-import { getLabwareDefinitionsFromCommands } from '../../LabwarePositionCheck/utils/labware'
+  getLabwareDefinitionsFromCommands,
+  getLoadedLabware,
+} from '@opentrons/components'
+import { getLabwareDefURI, getLabwareDisplayName } from '@opentrons/shared-data'
 
 import type { RunData } from '@opentrons/api-client'
+import type { RunTimeCommand } from '@opentrons/shared-data'
 
 const FIXED_TRASH_DEF_URIS = [
   'opentrons/opentrons_1_trash_850ml_fixed/1',
@@ -18,7 +17,7 @@ export function getLabwareNameFromRunData(
   labwareId: string,
   commands: RunTimeCommand[]
 ): string {
-  const loadedLabware = getLoadedLabware(protocolData, labwareId)
+  const loadedLabware = getLoadedLabware(protocolData.labware, labwareId)
   if (loadedLabware == null) {
     return ''
   } else if (FIXED_TRASH_DEF_URIS.includes(loadedLabware.definitionUri)) {

@@ -1,6 +1,7 @@
 // sets up the main window ui
-import { app, BrowserWindow } from 'electron'
 import path from 'path'
+import { app, BrowserWindow } from 'electron'
+
 import { sendReadyStatus } from './actions'
 import { getConfig } from './config'
 import { createLogger } from './log'
@@ -68,7 +69,8 @@ export function waitForRobotServerAndShowMainWindow(
   mainWindow: BrowserWindow
 ): void {
   mainWindow.show()
-  process.env.NODE_ENV !== 'development' &&
+  mainWindow.webContents.send('window-type', 'odd-main')
+  _NODE_ENV_ !== 'development' &&
     setTimeout(function () {
       systemd
         .getisRobotServerReady()

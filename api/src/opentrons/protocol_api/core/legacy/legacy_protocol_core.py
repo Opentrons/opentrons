@@ -1,12 +1,18 @@
 import logging
-from typing import Dict, List, Optional, Set, Union, cast, Tuple
+from typing import Dict, List, Optional, Set, Union, cast, Tuple, Sequence
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, SlotDefV3
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
+from opentrons_shared_data.labware.types import LabwareDefinition
+from opentrons_shared_data.pipette.types import PipetteNameType
+from opentrons_shared_data.robot.types import RobotType
 
-from opentrons.types import DeckSlotName, StagingSlotName, Location, Mount, Point
+from opentrons.types import (
+    DeckSlotName,
+    StagingSlotName,
+    Location,
+    Mount,
+    Point,
+)
 from opentrons.util.broker import Broker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules import AbstractModule, ModuleModel, ModuleType
@@ -17,7 +23,7 @@ from opentrons.protocols import labware as labware_definition
 
 from ...labware import Labware
 from ...disposal_locations import TrashBin, WasteChute
-from ..._liquid import Liquid
+from ..._liquid import Liquid, LiquidClass
 from ..._types import OffDeckType
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
@@ -28,6 +34,7 @@ from .legacy_instrument_core import LegacyInstrumentCore
 from .labware_offset_provider import AbstractLabwareOffsetProvider
 from .legacy_labware_core import LegacyLabwareCore
 from .load_info import LoadInfo, InstrumentLoadInfo, LabwareLoadInfo, ModuleLoadInfo
+from .tasks import LegacyTaskCore
 
 logger = logging.getLogger(__name__)
 
@@ -37,6 +44,7 @@ class LegacyProtocolCore(
         LegacyInstrumentCore,
         LegacyLabwareCore,
         legacy_module_core.LegacyModuleCore,
+        LegacyTaskCore,
     ]
 ):
     def __init__(
@@ -88,6 +96,7 @@ class LegacyProtocolCore(
         self._module_cores: List[legacy_module_core.LegacyModuleCore] = []
         self._labware_cores: List[LegacyLabwareCore] = [self.fixed_trash]
         self._disposal_locations: List[Union[Labware, TrashBin, WasteChute]] = []
+        self._liquid_presence_detection = False
 
     @property
     def api_version(self) -> APIVersion:
@@ -138,7 +147,7 @@ class LegacyProtocolCore(
     ) -> None:
         if isinstance(disposal_location, (TrashBin, WasteChute)):
             raise APIVersionError(
-                "Trash Bin and Waste Chute Disposal locations are not supported in this API Version."
+                api_element="Trash Bin and Waste Chute Disposal locations"
             )
         self._disposal_locations.append(disposal_location)
 
@@ -173,14 +182,17 @@ class LegacyProtocolCore(
         """Load a labware using its identifying parameters."""
         if isinstance(location, OffDeckType):
             raise APIVersionError(
-                "Loading a labware off deck is only supported with apiLevel 2.15 and newer."
+                api_element="Loading a labware off deck", until_version="2.15"
             )
         elif isinstance(location, LegacyLabwareCore):
             raise APIVersionError(
-                "Loading a labware onto another labware or adapter is only supported with api version 2.15 and above"
+                api_element="Loading a labware onto another labware or adapter",
+                until_version="2.15",
             )
         elif isinstance(location, StagingSlotName):
-            raise APIVersionError("Using a staging deck slot requires apiLevel 2.16.")
+            raise APIVersionError(
+                api_element="Using a staging deck slot", until_version="2.16"
+            )
 
         deck_slot = (
             location if isinstance(location, DeckSlotName) else location.get_deck_slot()
@@ -199,6 +211,10 @@ class LegacyProtocolCore(
             bundled_defs=self._bundled_labware,
             extra_defs=self._extra_labware,
         )
+        # For type checking. This should always pass because
+        # opentrons.protocol_api.core.legacy should only load labware with schema 2.
+        assert labware_def["schemaVersion"] == 2
+
         labware_core = LegacyLabwareCore(
             definition=labware_def,
             parent=parent,
@@ -261,9 +277,22 @@ class LegacyProtocolCore(
         version: Optional[int],
     ) -> LegacyLabwareCore:
         """Load an adapter using its identifying parameters"""
-        raise APIVersionError("Loading adapter is not supported in this API version.")
+        raise APIVersionError(api_element="Loading adapter")
 
-    # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
+    def load_lid(
+        self,
+        load_name: str,
+        location: LegacyLabwareCore,
+        namespace: Optional[str],
+        version: Optional[int],
+    ) -> LegacyLabwareCore:
+        """Load an individual lid labware using its identifying parameters. Must be loaded on a labware."""
+        raise APIVersionError(api_element="Loading lid")
+
+    def load_robot(self) -> None:  # type: ignore
+        """Load an adapter using its identifying parameters"""
+        raise APIVersionError(api_element="Loading robot")
+
     def move_labware(
         self,
         labware_core: LegacyLabwareCore,
@@ -274,6 +303,7 @@ class LegacyProtocolCore(
             legacy_module_core.LegacyModuleCore,
             OffDeckType,
             WasteChute,
+            TrashBin,
         ],
         use_gripper: bool,
         pause_for_manual_move: bool,
@@ -281,7 +311,26 @@ class LegacyProtocolCore(
         drop_offset: Optional[Tuple[float, float, float]],
     ) -> None:
         """Move labware to new location."""
-        raise APIVersionError("Labware movement is not supported in this API version")
+        raise APIVersionError(api_element="Labware movement")
+
+    def move_lid(
+        self,
+        source_location: Union[DeckSlotName, StagingSlotName, LegacyLabwareCore],
+        new_location: Union[
+            DeckSlotName,
+            StagingSlotName,
+            LegacyLabwareCore,
+            OffDeckType,
+            WasteChute,
+            TrashBin,
+        ],
+        use_gripper: bool,
+        pause_for_manual_move: bool,
+        pick_up_offset: Optional[Tuple[float, float, float]],
+        drop_offset: Optional[Tuple[float, float, float]],
+    ) -> LegacyLabwareCore | None:
+        """Move lid to new location."""
+        raise APIVersionError(api_element="Lid movement")
 
     def load_module(
         self,
@@ -346,7 +395,10 @@ class LegacyProtocolCore(
         return module_core
 
     def load_instrument(
-        self, instrument_name: PipetteNameType, mount: Mount
+        self,
+        instrument_name: PipetteNameType,
+        mount: Mount,
+        liquid_presence_detection: bool = False,
     ) -> LegacyInstrumentCore:
         """Load an instrument."""
         attached = {
@@ -379,19 +431,15 @@ class LegacyProtocolCore(
         return new_instr
 
     def load_trash_bin(self, slot_name: DeckSlotName, area_name: str) -> TrashBin:
-        raise APIVersionError(
-            "Loading deck configured trash bin is not supported in this API version."
-        )
+        raise APIVersionError(api_element="Loading deck configured trash bin")
 
     def load_ot2_fixed_trash_bin(self) -> None:
         raise APIVersionError(
-            "Loading deck configured OT-2 fixed trash bin is not supported in this API version."
+            api_element="Loading deck configured OT-2 fixed trash bin"
         )
 
     def load_waste_chute(self) -> WasteChute:
-        raise APIVersionError(
-            "Loading waste chute is not supported in this API version."
-        )
+        raise APIVersionError(api_element="Loading waste chute")
 
     def get_loaded_instruments(
         self,
@@ -471,6 +519,30 @@ class LegacyProtocolCore(
         self._last_location = location
         self._last_mount = mount
 
+    def load_lid_stack(
+        self,
+        load_name: str,
+        location: Union[DeckSlotName, StagingSlotName, LegacyLabwareCore],
+        quantity: int,
+        namespace: Optional[str],
+        version: Optional[int],
+    ) -> LegacyLabwareCore:
+        """Load a Stack of Lids to a given location, creating a Lid Stack."""
+        raise APIVersionError(api_element="Lid stack")
+
+    def load_labware_to_flex_stacker_hopper(
+        self,
+        module_core: legacy_module_core.LegacyModuleCore,
+        load_name: str,
+        quantity: int,
+        label: Optional[str],
+        namespace: Optional[str],
+        version: Optional[int],
+        lid: Optional[str],
+    ) -> None:
+        """Load labware to a Flex stacker hopper."""
+        raise APIVersionError(api_element="Flex stacker")
+
     def get_module_cores(self) -> List[legacy_module_core.LegacyModuleCore]:
         """Get loaded module cores."""
         return self._module_cores
@@ -491,7 +563,7 @@ class LegacyProtocolCore(
     ) -> Optional[LegacyLabwareCore]:
         assert False, "get_labware_on_labware only supported on engine core"
 
-    def get_deck_definition(self) -> DeckDefinitionV4:
+    def get_deck_definition(self) -> DeckDefinitionV5:
         """Get the geometry definition of the robot's deck."""
         assert False, "get_deck_definition only supported on engine core"
 
@@ -529,6 +601,10 @@ class LegacyProtocolCore(
         """Define a liquid to load into a well."""
         assert False, "define_liquid only supported on engine core"
 
+    def get_liquid_class(self, name: str, version: Optional[int]) -> LiquidClass:
+        """Get an instance of a built-in liquid class."""
+        assert False, "define_liquid_class is only supported on engine core"
+
     def get_labware_location(
         self, labware_core: LegacyLabwareCore
     ) -> Union[
@@ -536,3 +612,11 @@ class LegacyProtocolCore(
     ]:
         """Get labware parent location."""
         assert False, "get_labware_location only supported on engine core"
+
+    def wait_for_tasks(self, task: Sequence[LegacyTaskCore]) -> None:
+        """Wait for list of tasks to complete before executing subsequent commands."""
+        assert False, "wait_for_tasks only supported on engine core"
+
+    def create_timer(self, seconds: float) -> LegacyTaskCore:
+        """Create a timer task that runs in the background."""
+        assert False, "create_timer only supported on engine core"

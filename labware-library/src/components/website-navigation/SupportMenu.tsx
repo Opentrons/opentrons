@@ -1,6 +1,5 @@
-import * as React from 'react'
-import { NavLink, NavButton } from './NavLink'
-import { supportLinkProps, salesLinkProps } from './nav-data'
+import { salesLinkProps, supportLinkProps } from './nav-data'
+import { NavButton, NavLink } from './NavLink'
 import styles from './styles.module.css'
 
 interface Props {

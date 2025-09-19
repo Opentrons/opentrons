@@ -1,18 +1,21 @@
-import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it } from 'vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { ErrorInfo } from '../ErrorInfo'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import {
   mockHeaterShaker,
   mockTemperatureModule,
   mockThermocycler,
-} from '../../../redux/modules/__fixtures__'
+} from '/app/redux/modules/__fixtures__'
+
+import { ErrorInfo } from '../ErrorInfo'
+
+import type { ComponentProps } from 'react'
 import type {
   HeaterShakerModule,
   ThermocyclerModule,
-} from '../../../redux/modules/types'
+} from '/app/redux/modules/types'
 
 const mockErrorThermocycler = {
   id: 'thermocycler_id',
@@ -71,14 +74,14 @@ const mockErrorHeaterShaker = {
   },
 } as HeaterShakerModule
 
-const render = (props: React.ComponentProps<typeof ErrorInfo>) => {
+const render = (props: ComponentProps<typeof ErrorInfo>) => {
   return renderWithProviders(<ErrorInfo {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
 describe('ErrorInfo', () => {
-  let props: React.ComponentProps<typeof ErrorInfo>
+  let props: ComponentProps<typeof ErrorInfo>
   beforeEach(() => {
     props = {
       attachedModule: mockTemperatureModule,

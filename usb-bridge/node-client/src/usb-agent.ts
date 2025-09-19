@@ -1,12 +1,11 @@
 import * as http from 'http'
-import agent from 'agent-base'
 import { Duplex } from 'stream'
-
+import agent from 'agent-base'
 import { SerialPort } from 'serialport'
 
+import type { PortInfo } from '@serialport/bindings-cpp'
 import type { AgentOptions } from 'http'
 import type { Socket } from 'net'
-import type { PortInfo } from '@serialport/bindings-cpp'
 import type { Logger, LogLevel } from './types'
 
 const MAX_SOCKET_CREATE_RETRIES = 10
@@ -48,7 +47,9 @@ export function buildUSBAgent(opts: { serialPort: string }): http.Agent {
   usbAgent.maxFreeSockets = 1
   usbAgent.maxSockets = 1
   usbAgent.maxTotalSockets = 1
-  usbAgent.destroy = () => port.close()
+  usbAgent.destroy = () => {
+    port.close()
+  }
   return usbAgent
 }
 
@@ -228,10 +229,9 @@ class SerialPortHttpAgent extends http.Agent {
             `Failed to open port: ${message} , retrying ${this.remainingRetries} more times`
           )
           this.remainingRetries--
-          setTimeout(
-            () => this.port.open(openRetryer),
-            SOCKET_OPEN_RETRY_TIME_MS
-          )
+          setTimeout(() => {
+            this.port.open(openRetryer)
+          }, SOCKET_OPEN_RETRY_TIME_MS)
         } else if (!this.destroyed) {
           const message = err?.message ?? err
           this.log(

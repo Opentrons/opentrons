@@ -1,11 +1,12 @@
 import type { CreateCommand } from '../../../command/types'
+import type { CommandAnnotation } from '../../../commandAnnotation/types'
 import type {
-  LoadedPipette,
+  Liquid,
   LoadedLabware,
   LoadedModule,
-  Liquid,
+  LoadedPipette,
+  RunTimeParameter,
 } from '../../../js'
-import type { CommandAnnotation } from '../../../commandAnnotation/types'
 import type { LabwareDefinition2, RobotType } from '../../../js/types'
 import type { RunTimeCommand } from '../schemaV8'
 
@@ -18,6 +19,36 @@ export interface CommandsStructure {
 
 export interface CommandV8Mixin {
   commandSchemaId: 'opentronsCommandSchemaV8'
+  commands: CreateCommand[]
+}
+
+export interface CommandV9Mixin {
+  commandSchemaId: 'opentronsCommandSchemaV9'
+  commands: CreateCommand[]
+}
+
+export interface CommandV10Mixin {
+  commandSchemaId: 'opentronsCommandSchemaV10'
+  commands: CreateCommand[]
+}
+
+export interface CommandV11Mixin {
+  commandSchemaId: 'opentronsCommandSchemaV11'
+  commands: CreateCommand[]
+}
+
+export interface CommandV12Mixin {
+  commandSchemaId: 'opentronsCommandSchemaV12'
+  commands: CreateCommand[]
+}
+
+export interface CommandV13Mixin {
+  commandSchemaId: 'opentronsCommandSchemaV13'
+  commands: CreateCommand[]
+}
+
+export interface CommandV14Mixin {
+  commandSchemaId: 'opentronsCommandSchemaV14'
   commands: CreateCommand[]
 }
 
@@ -94,6 +125,7 @@ export interface ProtocolBase<DesignerApplicationData> {
     category?: string | null | undefined
     subcategory?: string | null | undefined
     tags?: string[]
+    source?: string | null
   }
   designerApplication?: {
     name?: string
@@ -109,7 +141,15 @@ export type ProtocolFile<
   (OT2RobotMixin | OT3RobotMixin) &
   LabwareV2Mixin &
   LiquidV1Mixin &
-  CommandV8Mixin &
+  (
+    | CommandV8Mixin
+    | CommandV9Mixin
+    | CommandV10Mixin
+    | CommandV11Mixin
+    | CommandV12Mixin
+    | CommandV13Mixin
+    | CommandV14Mixin
+  ) &
   CommandAnnotationV1Mixin
 
 export type ProtocolStructure = ProtocolBase<{}> &
@@ -136,7 +176,10 @@ export interface ProtocolAnalysisOutput {
   modules: LoadedModule[]
   liquids: Liquid[]
   errors: AnalysisError[]
+  runTimeParameters: RunTimeParameter[]
   robotType?: RobotType
+  commandAnnotations?: CommandAnnotation[]
+  result: 'ok' | 'not-ok' | 'error' | 'parameter-value-required'
 }
 
 interface AnalysisSourceFile {

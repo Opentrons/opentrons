@@ -1,8 +1,12 @@
 import path from 'path'
 import { app } from 'electron'
-import type { UpdateManifestUrls } from './types'
-import type { RobotUpdateTarget } from '@opentrons/app/src/redux/robot-update/types'
+
 import { CURRENT_VERSION } from '../update'
+
+import type { RobotUpdateTarget } from '@opentrons/app/src/redux/robot-update/types'
+import type { UpdateManifestUrls } from './types'
+
+const OPENTRONS_PROJECT: string = _OPENTRONS_PROJECT_
 
 const UPDATE_MANIFEST_URLS_RELEASE = {
   ot2: 'https://builds.opentrons.com/ot2-br/releases.json',
@@ -15,8 +19,7 @@ const UPDATE_MANIFEST_URLS_INTERNAL_RELEASE = {
 }
 
 export const getUpdateManifestUrls = (): UpdateManifestUrls =>
-  // @ts-expect-error can't get TS to recognize global.d.ts
-  global._OPENTRONS_PROJECT_.includes('robot-stack')
+  OPENTRONS_PROJECT.includes('robot-stack')
     ? UPDATE_MANIFEST_URLS_RELEASE
     : UPDATE_MANIFEST_URLS_INTERNAL_RELEASE
 

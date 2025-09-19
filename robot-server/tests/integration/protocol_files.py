@@ -8,7 +8,7 @@ from typing_extensions import Literal
 def get_protocol(
     protocol_name: str, protocol_extension: Literal[".py", ".json"]
 ) -> str:
-    """A NamedTemporaryFile valid json protocol."""
+    """A NamedTemporaryFile valid python/ json protocol."""
     contents = ""
     with open(Path(f"./tests/integration/protocols/simple{protocol_extension}")) as f:
         contents = f.read()
@@ -19,7 +19,7 @@ def get_protocol(
 
 
 def get_json_protocol(protocol_name: str) -> IO[bytes]:
-    """A NamedTemporaryFile valid python protocol."""
+    """A NamedTemporaryFile valid JSON protocol."""
     return create_temp_file(".json", get_protocol(protocol_name, ".json"))
 
 

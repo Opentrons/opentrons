@@ -8,7 +8,6 @@ React components for Opentrons' applications. Visit the [Opentrons Components Li
 
 ```javascript
 import { PrimaryButton } from '@opentrons/components'
-
 export default function CowButton(props) {
   return <PrimaryButton onClick={() => console.log('🐄')} />
 }
@@ -18,12 +17,12 @@ export default function CowButton(props) {
 
 Usage requirements for dependent projects:
 
-- Node v18 and yarn
+- Node v22.12.0+ and yarn
 - The following `dependencies` (peer dependencies of `@opentrons/components`)
-  - `react`: `17.0.1`,
-  - `react-router-dom`: `^4.2.2`,
+  - `react`: `18.2.0`,
+  - `react-router-dom`: `6.24.1`,
   - `classnames`: `^2.2.5`,
-  - `lodash`: `^4.17.4`
+  - `lodash`: `4.17.21`
 
 ## contributing
 

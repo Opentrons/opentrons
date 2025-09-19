@@ -1,10 +1,9 @@
 import {
-  RUN_ACTION_TYPE_PLAY,
   RUN_ACTION_TYPE_PAUSE,
-  Run,
-  Runs,
-  RunData,
+  RUN_ACTION_TYPE_PLAY,
 } from '@opentrons/api-client'
+
+import type { Run, RunData, Runs } from '@opentrons/api-client'
 
 export const PROTOCOL_ID = '1'
 export const RUN_ID_1 = '1'
@@ -29,9 +28,12 @@ export const mockPausedRun: RunData = {
     },
   ],
   errors: [],
+  hasEverEnteredErrorRecovery: false,
   pipettes: [],
   labware: [],
   modules: [],
+  liquids: [],
+  runTimeParameters: [],
 }
 
 export const mockRunningRun: RunData = {
@@ -58,9 +60,12 @@ export const mockRunningRun: RunData = {
     },
   ],
   errors: [],
+  hasEverEnteredErrorRecovery: false,
   pipettes: [],
   labware: [],
   modules: [],
+  liquids: [],
+  runTimeParameters: [],
 }
 
 export const mockRunResponse: Run = {

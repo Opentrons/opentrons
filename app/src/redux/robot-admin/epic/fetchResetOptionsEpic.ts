@@ -2,19 +2,19 @@ import { ofType } from 'redux-observable'
 
 import { GET } from '../../robot-api/constants'
 import { mapToRobotApiRequest } from '../../robot-api/operators'
-import * as Constants from '../constants'
 import * as Actions from '../actions'
+import * as Constants from '../constants'
 
-import type { Action, Epic } from '../../types'
 import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
+import type { Action, Epic } from '../../types'
 import type { FetchResetConfigOptionsAction, ResetConfigOption } from '../types'
 
 const mapActionToRequest: ActionToRequestMapper<FetchResetConfigOptionsAction> = action => ({
   method: GET,
-  path: Constants.RESET_CONFIG_OPTIONS_PATH,
+  path: Constants.SETTINGS_RESET_OPTIONS_PATH,
 })
 
 const mapResponseToAction: ResponseToActionMapper<FetchResetConfigOptionsAction> = (
@@ -27,7 +27,11 @@ const mapResponseToAction: ResponseToActionMapper<FetchResetConfigOptionsAction>
 
   return response.ok
     ? Actions.fetchResetConfigOptionsSuccess(host.name, options, meta)
-    : Actions.fetchResetConfigOptionsFailure(host.name, body, meta)
+    : Actions.fetchResetConfigOptionsFailure(
+        host.name,
+        body as Record<string, unknown>,
+        meta
+      )
 }
 
 export const fetchResetOptionsEpic: Epic = (action$, state$) => {

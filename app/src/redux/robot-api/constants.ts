@@ -12,3 +12,5 @@ export const FAILURE: 'failure' = 'failure'
 
 export const DISMISS_REQUEST: 'robotApi:DISMISS_REQUEST' =
   'robotApi:DISMISS_REQUEST'
+export const DISMISS_ALL_REQUESTS: 'robotApi:DISMISS_ALL_REQUESTS' =
+  'robotApi:DISMISS_ALL_REQUESTS'

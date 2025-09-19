@@ -1,15 +1,18 @@
 import { useMutation, useQueryClient } from 'react-query'
+
 import { createLiveCommand } from '@opentrons/api-client'
+
 import { useHost } from '../api'
+
 import type {
-  UseMutationResult,
-  UseMutationOptions,
   UseMutateAsyncFunction,
+  UseMutationOptions,
+  UseMutationResult,
 } from 'react-query'
 import type {
   CommandData,
-  HostConfig,
   CreateCommandParams,
+  HostConfig,
 } from '@opentrons/api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
 
@@ -50,11 +53,9 @@ export function useCreateLiveCommandMutation(): UseCreateLiveCommandMutationResu
       waitUntilComplete,
       timeout,
     }).then(response => {
-      queryClient
-        .invalidateQueries([host, 'commands'])
-        .catch((e: Error) =>
-          console.error(`error invalidating commands query: ${e.message}`)
-        )
+      queryClient.invalidateQueries([host, 'commands']).catch((e: Error) => {
+        console.error(`error invalidating commands query: ${e.message}`)
+      })
       return response.data
     })
   )

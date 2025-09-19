@@ -27,6 +27,10 @@ StatelessCommandCreate = Annotated[
         commands.heater_shaker.DeactivateShakerCreate,
         commands.heater_shaker.OpenLabwareLatchCreate,
         commands.heater_shaker.CloseLabwareLatchCreate,
+        commands.unsafe.UnsafeFlexStackerPrepareShuttleCreate,
+        commands.unsafe.UnsafeFlexStackerCloseLatchCreate,
+        commands.unsafe.UnsafeFlexStackerOpenLatchCreate,
+        commands.IdentifyModuleCreate,
     ],
     Field(discriminator="commandType"),
 ]
@@ -52,6 +56,10 @@ StatelessCommand = Annotated[
         commands.heater_shaker.DeactivateShaker,
         commands.heater_shaker.OpenLabwareLatch,
         commands.heater_shaker.CloseLabwareLatch,
+        commands.unsafe.UnsafeFlexStackerPrepareShuttleCreate,
+        commands.unsafe.UnsafeFlexStackerCloseLatchCreate,
+        commands.unsafe.UnsafeFlexStackerOpenLatchCreate,
+        commands.IdentifyModule,
     ],
     Field(discriminator="commandType"),
 ]

@@ -1,0 +1,70 @@
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+
+import {
+  Box,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  SPACING,
+  StyledText,
+} from '@opentrons/components'
+
+import {
+  DropdownStepFormField,
+  ToggleExpandStepFormField,
+} from '/protocol-designer/components/molecules'
+import { getTemperatureLabwareOptions } from '/protocol-designer/ui/modules/selectors'
+import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
+
+import type { StepFormProps } from '../../types'
+
+export function TemperatureTools(props: StepFormProps): JSX.Element {
+  const { propsForFields, formData } = props
+  const { t } = useTranslation(['application', 'form', 'protocol_steps'])
+  const moduleLabwareOptions = useSelector(getTemperatureLabwareOptions)
+  const dispatch = useDispatch()
+
+  return (
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing12}
+      paddingY={SPACING.spacing16}
+    >
+      <DropdownStepFormField
+        {...propsForFields.moduleId}
+        tooltipContent={null}
+        width="100%"
+        options={moduleLabwareOptions}
+        title={t('protocol_steps:module')}
+        onEnter={(id: string) => {
+          dispatch(hoverSelection({ id, text: t('select') }))
+        }}
+        onExit={() => {
+          dispatch(hoverSelection({ id: null, text: null }))
+        }}
+      />
+      <Box borderBottom={`1px solid ${COLORS.grey30}`} />
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing4}
+        padding={`0 ${SPACING.spacing16}`}
+      >
+        <StyledText desktopStyle="bodyDefaultSemiBold">
+          {t('form:step_edit_form.temperature.state')}
+        </StyledText>
+        <ToggleExpandStepFormField
+          {...propsForFields.targetTemperature}
+          toggleValue={propsForFields.setTemperature.value}
+          toggleUpdateValue={propsForFields.setTemperature.updateValue}
+          title={t('form:step_edit_form.heat_or_cool')}
+          fieldTitle={t('form:step_edit_form.field.temperature.setTemperature')}
+          units={t('units.degrees')}
+          isSelected={formData.setTemperature === 'true'}
+          onLabel={t('form:step_edit_form.field.temperature.toggleOn')}
+          offLabel={t('form:step_edit_form.field.temperature.toggleOff')}
+        />
+      </Flex>
+    </Flex>
+  )
+}

@@ -1,0 +1,118 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import '@testing-library/jest-dom/vitest'
+
+import { fireEvent, screen } from '@testing-library/react'
+
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { analyticsEvent } from '/protocol-designer/analytics/actions'
+import { i18n } from '/protocol-designer/assets/localization'
+import {
+  getCurrentFormHasUnsavedChanges,
+  getCurrentFormIsPresaved,
+  getSavedStepForms,
+  getUnsavedForm,
+} from '/protocol-designer/step-forms/selectors'
+import {
+  getMultiSelectItemIds,
+  actions as stepsActions,
+} from '/protocol-designer/ui/steps'
+import {
+  hoverOnStep,
+  toggleViewSubstep,
+} from '/protocol-designer/ui/steps/actions/actions'
+
+import { StepOverflowMenu } from '../StepOverflowMenu'
+
+import type { ComponentProps } from 'react'
+import type * as OpentronsComponents from '@opentrons/components'
+
+const mockConfirm = vi.fn()
+const mockCancel = vi.fn()
+const mockId = 'mockId'
+const mockId96 = '96MockId'
+
+vi.mock('/protocol-designer/ui/steps')
+vi.mock('/protocol-designer/step-forms/selectors')
+vi.mock('/protocol-designer/ui/steps/actions/actions')
+vi.mock('/protocol-designer/ui/steps/actions/thunks')
+vi.mock('/protocol-designer/steplist/actions')
+vi.mock('/protocol-designer/feature-flags/selectors')
+vi.mock('/protocol-designer/analytics/actions')
+vi.mock('@opentrons/components', async importOriginal => {
+  const actual = await importOriginal<typeof OpentronsComponents>()
+  return {
+    ...actual,
+    useConditionalConfirm: vi.fn(() => ({
+      confirm: mockConfirm,
+      showConfirmation: true,
+      cancel: mockCancel,
+    })),
+  }
+})
+const render = (props: ComponentProps<typeof StepOverflowMenu>) => {
+  return renderWithProviders(<StepOverflowMenu {...props} />, {
+    i18nInstance: i18n,
+  })[0]
+}
+
+const moveLiquidStepId = 'mockId'
+describe('StepOverflowMenu', () => {
+  let props: ComponentProps<typeof StepOverflowMenu>
+
+  beforeEach(() => {
+    props = {
+      stepId: moveLiquidStepId,
+      top: 0,
+      menuRootRef: { current: null },
+      setOpenedOverflowMenuId: vi.fn(),
+      multiSelectItemIds: [],
+      handleEdit: vi.fn(),
+      confirmDelete: mockConfirm,
+      confirmMultiDelete: vi.fn(),
+      sidebarWidth: 235,
+    }
+    vi.mocked(getMultiSelectItemIds).mockReturnValue(null)
+    vi.mocked(getCurrentFormIsPresaved).mockReturnValue(false)
+    vi.mocked(getCurrentFormHasUnsavedChanges).mockReturnValue(false)
+    vi.mocked(getUnsavedForm).mockReturnValue(null)
+    vi.mocked(getSavedStepForms).mockReturnValue({
+      [moveLiquidStepId]: {
+        stepType: 'moveLiquid',
+        id: moveLiquidStepId,
+        pipette: mockId,
+      },
+    })
+  })
+
+  it('renders each button and clicking them calls the action', () => {
+    render(props)
+    fireEvent.click(screen.getByText('Delete step'))
+    expect(mockConfirm).toHaveBeenCalled()
+    fireEvent.click(screen.getByText('Duplicate step'))
+    expect(vi.mocked(stepsActions.duplicateStep)).toHaveBeenCalled()
+    fireEvent.click(screen.getByText('Edit step'))
+    fireEvent.click(screen.getByText('View details'))
+    expect(vi.mocked(hoverOnStep)).toHaveBeenCalled()
+    expect(vi.mocked(toggleViewSubstep)).toHaveBeenCalled()
+    expect(vi.mocked(analyticsEvent)).toHaveBeenCalled()
+  })
+
+  it('renders the multi select overflow menu', () => {
+    render({ ...props, multiSelectItemIds: ['abc', '123'] })
+    screen.getByText('Duplicate steps')
+    screen.getByText('Delete steps')
+  })
+
+  it('should render view details button if pipette is 96-channel', () => {
+    vi.mocked(getSavedStepForms).mockReturnValue({
+      [moveLiquidStepId]: {
+        stepType: 'moveLiquid',
+        id: moveLiquidStepId,
+        pipette: mockId96,
+      },
+    })
+    render(props)
+    expect(screen.getByText('View details')).toBeInTheDocument()
+  })
+})

@@ -1,14 +1,16 @@
-import { beforeEach, describe, it, expect, vi, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
 } from '@opentrons/shared-data'
+
 import { heaterShaker } from '../commandCreators'
-import { getModuleState } from '../robotStateSelectors'
 import { getInitialRobotStateStandard, makeContext } from '../fixtures'
 import { getErrorResult, getSuccessResult } from '../fixtures/commandFixtures'
+import { getModuleState } from '../robotStateSelectors'
 
-import type { InvariantContext, RobotState, HeaterShakerArgs } from '../types'
+import type { HeaterShakerArgs, InvariantContext, RobotState } from '../types'
 
 vi.mock('../robotStateSelectors')
 
@@ -18,15 +20,20 @@ describe('heaterShaker compound command creator', () => {
   const HEATER_SHAKER_SLOT = '1'
   let robotState: RobotState
   let invariantContext: InvariantContext
+  const name = 'some name'
+  const description = 'description'
   beforeEach(() => {
     heaterShakerArgs = {
-      module: HEATER_SHAKER_ID,
+      moduleId: HEATER_SHAKER_ID,
       rpm: null,
       commandCreatorFnName: 'heaterShaker',
       targetTemperature: null,
       latchOpen: false,
+      timerHours: null,
       timerMinutes: null,
       timerSeconds: null,
+      name,
+      description,
     }
     invariantContext = {
       ...makeContext(),
@@ -35,6 +42,7 @@ describe('heaterShaker compound command creator', () => {
           id: HEATER_SHAKER_ID,
           type: HEATERSHAKER_MODULE_TYPE,
           model: HEATERSHAKER_MODULE_V1,
+          pythonName: 'mock_heater_shaker_1',
         },
       },
     }
@@ -59,7 +67,7 @@ describe('heaterShaker compound command creator', () => {
   it('should return an error when there is no module id', () => {
     heaterShakerArgs = {
       ...heaterShakerArgs,
-      module: null,
+      moduleId: null,
     }
     const result = heaterShaker(heaterShakerArgs, invariantContext, robotState)
 
@@ -102,6 +110,14 @@ describe('heaterShaker compound command creator', () => {
         },
       },
       {
+        commandType: 'heaterShaker/waitForTemperature',
+        key: expect.any(String),
+        params: {
+          celsius: 80,
+          moduleId: 'heaterShakerId',
+        },
+      },
+      {
         commandType: 'waitForDuration',
         key: expect.any(String),
         params: {
@@ -123,6 +139,16 @@ describe('heaterShaker compound command creator', () => {
         },
       },
     ])
+    expect(getSuccessResult(result).python).toBe(
+      `
+mock_heater_shaker_1.close_labware_latch()
+mock_heater_shaker_1.set_target_temperature(80)
+mock_heater_shaker_1.set_and_wait_for_shake_speed(444)
+mock_heater_shaker_1.wait_for_temperature()
+protocol.delay(seconds=30)
+mock_heater_shaker_1.deactivate_shaker()
+mock_heater_shaker_1.deactivate_heater()`.trim()
+    )
   })
   it('should NOT delay and deactivate the heater shaker when a user specificies a timer that is 0 seconds', () => {
     heaterShakerArgs = {
@@ -159,16 +185,22 @@ describe('heaterShaker compound command creator', () => {
         },
       },
     ])
+    expect(getSuccessResult(result).python).toBe(
+      'mock_heater_shaker_1.close_labware_latch()\nmock_heater_shaker_1.set_target_temperature(80)\nmock_heater_shaker_1.set_and_wait_for_shake_speed(444)'
+    )
   })
   it('should delay and emit open latch last if open latch is specified', () => {
     heaterShakerArgs = {
-      module: HEATER_SHAKER_ID,
+      moduleId: HEATER_SHAKER_ID,
       rpm: null,
       commandCreatorFnName: 'heaterShaker',
       targetTemperature: null,
       latchOpen: true,
+      timerHours: null,
       timerMinutes: null,
       timerSeconds: null,
+      name,
+      description,
     }
 
     heaterShakerArgs = {
@@ -195,6 +227,14 @@ describe('heaterShaker compound command creator', () => {
         params: {
           moduleId: 'heaterShakerId',
           rpm: 444,
+        },
+      },
+      {
+        commandType: 'heaterShaker/waitForTemperature',
+        key: expect.any(String),
+        params: {
+          celsius: 80,
+          moduleId: 'heaterShakerId',
         },
       },
       {
@@ -226,6 +266,16 @@ describe('heaterShaker compound command creator', () => {
         },
       },
     ])
+    expect(getSuccessResult(result).python).toBe(
+      `
+mock_heater_shaker_1.set_target_temperature(80)
+mock_heater_shaker_1.set_and_wait_for_shake_speed(444)
+mock_heater_shaker_1.wait_for_temperature()
+protocol.delay(seconds=20)
+mock_heater_shaker_1.deactivate_shaker()
+mock_heater_shaker_1.deactivate_heater()
+mock_heater_shaker_1.open_labware_latch()`.trim()
+    )
   })
   it('should not call deactivateShaker when it is not shaking but call activate temperature when setting target temp', () => {
     heaterShakerArgs = {
@@ -269,6 +319,9 @@ describe('heaterShaker compound command creator', () => {
         },
       },
     ])
+    expect(getSuccessResult(result).python).toBe(
+      'mock_heater_shaker_1.close_labware_latch()\nmock_heater_shaker_1.set_target_temperature(80)'
+    )
   })
   it('should call to open latch last', () => {
     heaterShakerArgs = {
@@ -306,5 +359,8 @@ describe('heaterShaker compound command creator', () => {
         },
       },
     ])
+    expect(getSuccessResult(result).python).toBe(
+      'mock_heater_shaker_1.deactivate_heater()\nmock_heater_shaker_1.open_labware_latch()'
+    )
   })
 })

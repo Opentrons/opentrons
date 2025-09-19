@@ -16,7 +16,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from opentrons_shared_data import module
-from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
+from opentrons_shared_data.module.types import ModuleDefinitionV3
 from opentrons_shared_data.module import OLD_TC_GEN2_LABWARE_OFFSET
 
 from opentrons.types import Location, Point, LocationLabware
@@ -273,8 +273,13 @@ class ThermocyclerGeometry(ModuleGeometry):
             LegacyLabwareCore,
         )
 
-        # Block first three columns from being accessed
         definition = labware._core.get_definition()
+
+        # For type checking. This should always pass because
+        # opentrons.protocol_api.core.legacy should only load labware with schema 2.
+        assert definition["schemaVersion"] == 2
+
+        # Block first three columns from being accessed
         definition["ordering"] = definition["ordering"][2::]
         return Labware(
             core=LegacyLabwareCore(definition, super().location),

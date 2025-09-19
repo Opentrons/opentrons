@@ -1,4 +1,3 @@
-import * as React from 'react'
 import {
   ALIGN_FLEX_START,
   BORDERS,
@@ -6,13 +5,12 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  LegacyStyledText,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import type { Story, Meta } from '@storybook/react'
-
-import { StyledText } from '../../atoms/text'
+import type { Meta, Story } from '@storybook/react'
 
 export default {
   title: 'Design Tokens/BorderRadius',
@@ -47,9 +45,9 @@ const Template: Story<BorderRadiusStorybookProps> = args => {
           width="100%"
           height="6rem"
         >
-          <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+          <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightRegular}>
             {`${br[0]}" ${br[1]}`}
-          </StyledText>
+          </LegacyStyledText>
           <Box
             width="10rem"
             height="4rem"

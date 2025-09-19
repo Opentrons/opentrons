@@ -1,13 +1,16 @@
-import * as React from 'react'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { instrumentsResponseFixture } from '@opentrons/api-client'
-import { i18n } from '../../../i18n'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { MountGripper } from '../MountGripper'
+import { instrumentsResponseFixture } from '@opentrons/api-client'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+
 import { GRIPPER_FLOW_TYPES } from '../constants'
+import { MountGripper } from '../MountGripper'
+
+import type { ComponentProps } from 'react'
 
 vi.mock('@opentrons/react-api-client')
 
@@ -19,9 +22,7 @@ describe('MountGripper', () => {
   let mockChainRunCommands: any
   let mockSetErrorMessage: any
 
-  const render = (
-    props: Partial<React.ComponentProps<typeof MountGripper>> = {}
-  ) => {
+  const render = (props: Partial<ComponentProps<typeof MountGripper>> = {}) => {
     return renderWithProviders(
       <MountGripper
         maintenanceRunId={mockRunId}

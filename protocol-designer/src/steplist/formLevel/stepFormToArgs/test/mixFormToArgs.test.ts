@@ -1,16 +1,22 @@
-import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
-import { getLabwareDefURI } from '@opentrons/shared-data'
-import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+import {
+  fixtureP10SingleV2Specs,
+  getLabwareDefURI,
+} from '@opentrons/shared-data'
 import { fixture_96_plate } from '@opentrons/shared-data/labware/fixtures/2'
-import { mixFormToArgs } from '../mixFormToArgs'
-import { DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP } from '../../../../constants'
+
+import { DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP } from '/protocol-designer/constants'
+
 import { getOrderedWells } from '../../../utils'
-import type { HydratedMixFormDataLegacy } from '../../../../form-types'
+import { mixFormToArgs } from '../mixFormToArgs'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { HydratedMixFormData } from '/protocol-designer/form-types'
 
 vi.mock('../../../utils')
 
-let hydratedForm: HydratedMixFormDataLegacy
+let hydratedForm: HydratedMixFormData
 const labwareDef = fixture_96_plate as LabwareDefinition2
 const labwareType = getLabwareDefURI(labwareDef)
 
@@ -20,8 +26,8 @@ beforeEach(() => {
   hydratedForm = {
     id: 'stepId',
     stepType: 'mix',
-    stepName: 'mix',
-    stepDetails: '',
+    stepName: 'Cool Mix Step',
+    stepDetails: 'Here we mix 2 wells',
     changeTip: 'always',
     labware: {
       id: 'labwareId',
@@ -34,11 +40,22 @@ beforeEach(() => {
     blowout_checkbox: false,
     blowout_location: null,
     mix_mmFromBottom: 0.5,
-    // @ts-expect-error(sa, 2021-6-15): not a valid PipetteEntity
+    tipRack: 'mockTiprack',
     pipette: {
       id: 'pipetteId',
-      spec: fixtureP10Single,
-    },
+      spec: fixtureP10SingleV2Specs,
+      tiprackLabwareDef: [
+        {
+          parameters: {
+            tipLength: 10,
+            loadName: 'mockTiprack',
+          },
+          metadata: {
+            displayName: 'mock display name',
+          },
+        },
+      ] as any,
+    } as any,
     // @ts-expect-error(sa, 2021-6-15): volume should be a number
     volume: '12',
     wells: ['A1', 'A2'],
@@ -46,7 +63,7 @@ beforeEach(() => {
     times: '2',
     dispense_flowRate: 4,
     mix_touchTip_checkbox: false,
-    mix_touchTip_mmFromBottom: null,
+    mix_touchTip_mmFromTop: null,
     aspirate_delay_checkbox: false,
     aspirate_delay_seconds: null,
     dispense_delay_checkbox: false,
@@ -59,6 +76,36 @@ afterEach(() => {
 })
 
 describe('mix step form -> command creator args', () => {
+  it('mixFormToArgs propagates form fields to MixStepArgs', () => {
+    const args = mixFormToArgs(hydratedForm)
+    expect(args).toMatchObject({
+      commandCreatorFnName: 'mix',
+      name: 'Cool Mix Step', // make sure name and description are present
+      description: 'Here we mix 2 wells',
+      labware: 'labwareId',
+      wells: ['A1', 'A2'],
+      volume: '12',
+      times: '2',
+      touchTip: false,
+      touchTipMmFromTop: -1,
+      changeTip: 'always',
+      blowoutLocation: null,
+      pipette: 'pipetteId',
+      aspirateFlowRateUlSec: 5, // make sure flow rates are numbers instead of strings
+      dispenseFlowRateUlSec: 4,
+      blowoutFlowRateUlSec: 1000,
+      offsetFromBottomMm: 0.5,
+      blowoutOffsetFromTopMm: 0,
+      aspirateDelaySeconds: null,
+      tipRack: 'mockTiprack',
+      dispenseDelaySeconds: null,
+      dropTipLocation: undefined,
+      nozzles: undefined,
+      xOffset: 0,
+      yOffset: 0,
+    })
+  })
+
   it('mixFormToArgs calls getOrderedWells correctly', () => {
     mixFormToArgs(hydratedForm)
 
@@ -88,14 +135,14 @@ describe('mix step form -> command creator args', () => {
     // TOUCH TIP
     {
       checkboxField: 'mix_touchTip_checkbox',
-      formFields: { mix_touchTip_mmFromBottom: 10.5 },
+      formFields: { mix_touchTip_mmFromTop: -10.5 },
       expectedArgsUnchecked: {
         touchTip: false,
-        touchTipMmFromBottom: 10.5,
+        touchTipMmFromTop: -10.5,
       },
       expectedArgsChecked: {
         touchTip: true,
-        touchTipMmFromBottom: 10.5,
+        touchTipMmFromTop: -10.5,
       },
     },
     // Aspirate delay

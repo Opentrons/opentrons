@@ -1,16 +1,25 @@
-import assert from 'assert'
 // TODO: Ian 2019-04-18 move orderWells somewhere more general -- shared-data util?
 import min from 'lodash/min'
+
 import {
-  getTiprackVolume,
-  THERMOCYCLER_MODULE_TYPE,
-  orderWells,
-  NozzleConfigurationStyle,
-  COLUMN,
+  ABSORBANCE_READER_TYPE,
   ALL,
+  COLUMN,
+  getIsLid,
+  getLabwareDefIsStandard,
+  getLabwareDefURI,
+  getTiprackVolume,
+  orderWells,
+  SINGLE,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { COLUMN_4_SLOTS } from './constants'
+
+import { CLEAN, COLUMN_4_SLOTS } from './constants'
+import { getSlotInLocationStack } from './utils'
+
+import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
 import type {
+  AbsorbanceReaderState,
   InvariantContext,
   ModuleTemporalProperties,
   RobotState,
@@ -22,21 +31,23 @@ export function sortLabwareBySlot(
 ): string[] {
   const sortedLabware = Object.keys(labwareState).sort(
     (idA: string, idB: string) => {
-      const slotA = parseInt(labwareState[idA].slot)
-      const slotB = parseInt(labwareState[idB].slot)
+      const slotAStr = getSlotInLocationStack(labwareState[idA].stack)
+      const slotBStr = getSlotInLocationStack(labwareState[idB].stack)
+      const slotANum = parseInt(slotAStr)
+      const slotBNum = parseInt(slotBStr)
       if (
-        COLUMN_4_SLOTS.includes(labwareState[idA].slot) &&
-        COLUMN_4_SLOTS.includes(labwareState[idB].slot)
+        COLUMN_4_SLOTS.includes(slotAStr) &&
+        COLUMN_4_SLOTS.includes(slotBStr)
       ) {
         return idA.localeCompare(idB)
       }
-      if (COLUMN_4_SLOTS.includes(labwareState[idA].slot)) {
+      if (COLUMN_4_SLOTS.includes(slotAStr)) {
         return 1
       }
-      if (COLUMN_4_SLOTS.includes(labwareState[idB].slot)) {
+      if (COLUMN_4_SLOTS.includes(slotBStr)) {
         return -1
       }
-      return slotA - slotB
+      return slotANum - slotBNum
     }
   )
 
@@ -57,26 +68,30 @@ export function _getNextTip(args: {
   const tiprackWellsState = robotState.tipState.tipracks[tiprackId]
   const tiprackDef = invariantContext.labwareEntities[tiprackId]?.def
 
-  const hasTip = (wellName: string): boolean => tiprackWellsState[wellName]
+  const hasCleanTip = (wellName: string): boolean =>
+    tiprackWellsState[wellName] === CLEAN
 
   const orderedWells = orderWells(tiprackDef.ordering, 't2b', 'l2r')
-  if (pipetteChannels === 1) {
-    const well = orderedWells.find(hasTip)
+  if (pipetteChannels === 1 || nozzles === SINGLE) {
+    const well = orderedWells.find(hasCleanTip)
     return well || null
   }
 
   if (pipetteChannels === 8 || (pipetteChannels === 96 && nozzles === COLUMN)) {
     // return first well in the column (for 96-well format, the 'A' row)
     const tiprackColumns = tiprackDef.ordering
-    const fullColumn = tiprackColumns.find(col => col.every(hasTip))
+    const fullColumn = tiprackColumns.find(col => col.every(hasCleanTip))
     return fullColumn != null ? fullColumn[0] : null
   }
   if (pipetteChannels === 96 && nozzles === ALL) {
-    const allWellsHaveTip = orderedWells.every(hasTip)
+    const allWellsHaveTip = orderedWells.every(hasCleanTip)
     return allWellsHaveTip ? orderedWells[0] : null
   }
 
-  assert(false, `Pipette ${pipetteId} has no channels/spec, cannot _getNextTip`)
+  console.assert(
+    false,
+    `Pipette ${pipetteId} has no channels/spec, cannot _getNextTip`
+  )
   return null
 }
 interface NextTiprackInfo {
@@ -84,10 +99,16 @@ interface NextTiprackInfo {
     tiprackId: string
     well: string
   } | null
-  tipracks: { totalTipracks: number; filteredTipracks: number }
+  tipracks: {
+    totalTipracks: number
+    excludedBy96Channel: number
+    excludedByLid: number
+    filteredSortedTiprackIds: string[]
+  }
 }
 export function getNextTiprack(
   pipetteId: string,
+  tipRackUri: string,
   invariantContext: InvariantContext,
   robotState: RobotState,
   nozzles?: NozzleConfigurationStyle
@@ -108,35 +129,55 @@ export function getNextTiprack(
   // filter out unmounted or non-compatible tiprack models
   const sortedTipracksIds = sortLabwareBySlot(robotState.labware).filter(
     labwareId => {
-      assert(
+      console.assert(
         invariantContext.labwareEntities[labwareId]?.labwareDefURI,
         `cannot getNextTiprack, no labware entity for "${labwareId}"`
       )
-      const isOnDeck = robotState.labware[labwareId].slot != null
-      return (
-        isOnDeck &&
-        pipetteEntity.tiprackDefURI ===
-          invariantContext.labwareEntities[labwareId]?.labwareDefURI
-      )
+      const isOnDeck =
+        getSlotInLocationStack(robotState.labware[labwareId].stack) !==
+        'offDeck'
+      const labwareIdDefUri =
+        invariantContext.labwareEntities[labwareId].labwareDefURI
+      return isOnDeck && labwareIdDefUri === tipRackUri
     }
   )
+  let filteredSortedTiprackIds = sortedTipracksIds
   const is96Channel = pipetteEntity.spec.channels === 96
-  const filteredSortedTipRackIdsFor96Channel = sortedTipracksIds.filter(
-    tiprackId => {
-      const tipRackLocation = robotState.labware[tiprackId].slot
+
+  const excludedBy96Channel: string[] = []
+  const excludedByLid: string[] = []
+
+  if (is96Channel) {
+    filteredSortedTiprackIds = filteredSortedTiprackIds.filter(tiprackId => {
+      const tipRackLocation = robotState.labware[tiprackId].stack[1]
       const adapterEntity = invariantContext.labwareEntities[tipRackLocation]
       const has96TiprackAdapterId =
         adapterEntity?.def.parameters.loadName ===
           'opentrons_flex_96_tiprack_adapter' &&
-        adapterEntity?.def.namespace === 'opentrons'
+        getLabwareDefIsStandard(adapterEntity?.def)
 
-      return nozzles === ALL ? has96TiprackAdapterId : !has96TiprackAdapterId
+      const keepTiprackAdapter =
+        nozzles === ALL ? has96TiprackAdapterId : !has96TiprackAdapterId
+      if (!keepTiprackAdapter) {
+        excludedBy96Channel.push(tiprackId)
+      }
+      return keepTiprackAdapter
+    })
+  }
+
+  filteredSortedTiprackIds = filteredSortedTiprackIds.filter(tiprackId => {
+    const locationHasLid = Object.entries(robotState.labware).find(
+      ([id, temporalProperties]) =>
+        temporalProperties.stack.includes(tiprackId) &&
+        getIsLid(invariantContext.labwareEntities[id].def)
+    )
+    if (locationHasLid != null) {
+      excludedByLid.push(tiprackId)
     }
-  )
-  const firstAvailableTiprack = (is96Channel
-    ? filteredSortedTipRackIdsFor96Channel
-    : sortedTipracksIds
-  ).find(tiprackId =>
+    return locationHasLid == null
+  })
+
+  const firstAvailableTiprack = filteredSortedTiprackIds.find(tiprackId =>
     _getNextTip({
       pipetteId,
       tiprackId,
@@ -164,7 +205,9 @@ export function getNextTiprack(
       },
       tipracks: {
         totalTipracks: sortedTipracksIds.length,
-        filteredTipracks: filteredSortedTipRackIdsFor96Channel.length,
+        excludedBy96Channel: excludedBy96Channel.length,
+        excludedByLid: excludedByLid.length,
+        filteredSortedTiprackIds,
       },
     }
   }
@@ -175,23 +218,33 @@ export function getNextTiprack(
     nextTiprack: null,
     tipracks: {
       totalTipracks: sortedTipracksIds.length,
-      filteredTipracks: filteredSortedTipRackIdsFor96Channel.length,
+      excludedBy96Channel: excludedBy96Channel.length,
+      excludedByLid: excludedByLid.length,
+      filteredSortedTiprackIds,
     },
   }
 }
 export function getPipetteWithTipMaxVol(
   pipetteId: string,
-  invariantContext: InvariantContext
+  invariantContext: InvariantContext,
+  tipRackDefUri: string
 ): number {
   // NOTE: this fn assumes each pipette is assigned to exactly one tiprack type,
   // across the entire timeline
   const pipetteEntity = invariantContext.pipetteEntities[pipetteId]
-  const pipetteMaxVol = pipetteEntity.spec.maxVolume
+  const pipetteMaxVol = pipetteEntity.spec.liquids.default.maxVolume
   const tiprackDef = pipetteEntity.tiprackLabwareDef
-  const tiprackTipVol = getTiprackVolume(tiprackDef)
+  let chosenTipRack = null
+  for (const def of tiprackDef) {
+    if (getLabwareDefURI(def) === tipRackDefUri) {
+      chosenTipRack = def
+      break
+    }
+  }
+  const tiprackTipVol = getTiprackVolume(chosenTipRack ?? tiprackDef[0])
 
   if (!pipetteMaxVol || !tiprackTipVol) {
-    assert(
+    console.assert(
       false,
       `getPipetteEffectiveMaxVol expected tiprackMaxVol and pipette maxVolume to be > 0, got',
       ${pipetteMaxVol}, ${tiprackTipVol}`
@@ -219,6 +272,17 @@ export const thermocyclerStateGetter = (
 ): ThermocyclerModuleState | null => {
   const hardwareModule = robotState.modules[moduleId]?.moduleState
   return hardwareModule && hardwareModule.type === THERMOCYCLER_MODULE_TYPE
+    ? hardwareModule
+    : null
+}
+
+// TODO: refactor this and above utility into one
+export const absorbanceReaderStateGetter = (
+  robotState: RobotState,
+  moduleId: string
+): AbsorbanceReaderState | null => {
+  const hardwareModule = robotState.modules[moduleId]?.moduleState
+  return hardwareModule && hardwareModule.type === ABSORBANCE_READER_TYPE
     ? hardwareModule
     : null
 }

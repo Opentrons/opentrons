@@ -1,13 +1,19 @@
 import * as React from 'react'
-import { Flex, PrimaryButton } from '@opentrons/components'
-import { touchScreenViewport } from '../../DesignTokens/constants'
-import { StyledText } from '../../atoms/text'
+
+import {
+  Flex,
+  LegacyStyledText,
+  PrimaryButton,
+  VIEWPORT,
+} from '@opentrons/components'
+
 import { BackgroundOverlay } from './index'
-import type { Story, Meta } from '@storybook/react'
+
+import type { Meta, Story } from '@storybook/react'
 
 export default {
   title: 'ODD/Molecules/BackgroundOverlay',
-  parameters: touchScreenViewport,
+  parameters: VIEWPORT.touchScreenViewport,
 } as Meta
 
 const Template: Story<
@@ -18,11 +24,21 @@ const Template: Story<
     <Flex>
       {openOverlay ? (
         <Flex height="80%" width="80%">
-          <BackgroundOverlay onClick={() => setOpenOverlay(false)} />
+          <BackgroundOverlay
+            onClick={() => {
+              setOpenOverlay(false)
+            }}
+          />
         </Flex>
       ) : (
-        <PrimaryButton onClick={() => setOpenOverlay(true)}>
-          <StyledText as="h4">Click to open the Background Overlay</StyledText>
+        <PrimaryButton
+          onClick={() => {
+            setOpenOverlay(true)
+          }}
+        >
+          <LegacyStyledText as="h4">
+            Click to open the Background Overlay
+          </LegacyStyledText>
         </PrimaryButton>
       )}
     </Flex>

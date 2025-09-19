@@ -1,9 +1,10 @@
 import assert from 'assert'
+import { createHmac } from 'crypto'
 import execa from 'execa'
 import { usb } from 'usb'
-import { isWindows } from '../os'
+
 import { createLogger } from '../log'
-import { createHmac } from 'crypto'
+import { isWindows } from '../os'
 
 import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
 
@@ -133,10 +134,15 @@ function upstreamDeviceFromUsbDeviceWinAPI(
       const parsePoshJsonOutputToWmiObjectArray = (
         dump: string
       ): WmiObject[] => {
-        if (dump[0] === '[') {
-          return JSON.parse(dump) as WmiObject[]
-        } else {
-          return [JSON.parse(dump) as WmiObject]
+        try {
+          if (dump[0] === '[') {
+            return JSON.parse(dump) as WmiObject[]
+          } else {
+            return [JSON.parse(dump) as WmiObject]
+          }
+        } catch (e: any) {
+          log.error(`Failed to parse posh json output: ${dump}`)
+          throw e
         }
       }
       if (dump.stderr !== '') {
@@ -260,9 +266,9 @@ export function createUsbDeviceMonitor(
   }
   if (typeof onDeviceAdd === 'function') {
     usb.on('attach', device => {
-      upstreamDeviceFromUsbDevice(device).then(devices =>
+      upstreamDeviceFromUsbDevice(device).then(devices => {
         devices.forEach(onDeviceAdd)
-      )
+      })
     })
   }
 
@@ -318,7 +324,7 @@ export function getWindowsDriverVersion(
 ): Promise<string | null> {
   console.log('getWindowsDriverVersion', device)
   assert(
-    isWindows() || process.env.NODE_ENV === 'test',
+    isWindows() || _NODE_ENV_ === 'test',
     `getWindowsDriverVersion cannot be called on ${process.platform}`
   )
 

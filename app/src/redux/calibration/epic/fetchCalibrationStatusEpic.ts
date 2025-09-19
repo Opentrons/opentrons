@@ -9,8 +9,9 @@ import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
+import type { RobotApiErrorResponse } from '../../robot-api/types'
 import type { Action, Epic } from '../../types'
-import type { FetchCalibrationStatusAction } from '../types'
+import type { CalibrationStatus, FetchCalibrationStatusAction } from '../types'
 
 const mapActionToRequest: ActionToRequestMapper<FetchCalibrationStatusAction> = action => ({
   method: GET,
@@ -25,8 +26,16 @@ const mapResponseToAction: ResponseToActionMapper<FetchCalibrationStatusAction> 
   const meta = { ...originalAction.meta, response: responseMeta }
 
   return response.ok
-    ? Actions.fetchCalibrationStatusSuccess(host.name, body, meta)
-    : Actions.fetchCalibrationStatusFailure(host.name, body, meta)
+    ? Actions.fetchCalibrationStatusSuccess(
+        host.name,
+        body as CalibrationStatus,
+        meta
+      )
+    : Actions.fetchCalibrationStatusFailure(
+        host.name,
+        body as RobotApiErrorResponse,
+        meta
+      )
 }
 
 export const fetchCalibrationStatusEpic: Epic = (action$, state$) => {

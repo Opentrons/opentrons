@@ -1,33 +1,40 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { beforeEach, describe, it, expect, afterEach, vi } from 'vitest'
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
+
+import { getPipetteSpecsV2, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { expectTimelineError } from '../__utils__/testMatchers'
 import { moveToWell } from '../commandCreators/atomic/moveToWell'
 import {
-  thermocyclerPipetteCollision,
-  pipetteIntoHeaterShakerLatchOpen,
-  pipetteIntoHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestWithLatchOpen,
-  pipetteAdjacentHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestMultiChannelPipette,
-  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
-} from '../utils'
-import {
-  getRobotStateWithTipStandard,
-  getInitialRobotStateWithOffDeckLabwareStandard,
-  makeContext,
-  getSuccessResult,
-  getErrorResult,
   DEFAULT_PIPETTE,
+  getErrorResult,
+  getInitialRobotStateWithOffDeckLabwareStandard,
+  getRobotStateWithTipStandard,
+  getSuccessResult,
+  makeContext,
   SOURCE_LABWARE,
 } from '../fixtures'
+import {
+  absorbanceReaderCollision,
+  getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerEastWestWithLatchOpen,
+  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
+  getSlotInLocationStack,
+  pipetteAdjacentHeaterShakerWhileShaking,
+  pipetteIntoHeaterShakerLatchOpen,
+  pipetteIntoHeaterShakerWhileShaking,
+  thermocyclerPipetteCollision,
+} from '../utils'
+
+import type { WellOrigin } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../types'
 
+vi.mock('../utils/absorbanceReaderCollision')
 vi.mock('../utils/thermocyclerPipetteCollision')
 vi.mock('../utils/heaterShakerCollision')
 
 const FLEX_PIPETTE = 'p1000_single_flex'
-const FlexPipetteNameSpecs = getPipetteNameSpecs(FLEX_PIPETTE)
+const FlexPipetteNameSpecs = getPipetteSpecsV2(FLEX_PIPETTE)
 
 describe('moveToWell', () => {
   let robotStateWithTip: RobotState
@@ -41,9 +48,13 @@ describe('moveToWell', () => {
   })
   it('should return a moveToWell command given only the required params', () => {
     const params = {
-      pipette: DEFAULT_PIPETTE,
-      labware: SOURCE_LABWARE,
-      well: 'A1',
+      pipetteId: DEFAULT_PIPETTE,
+      labwareId: SOURCE_LABWARE,
+      wellName: 'A1',
+      wellLocation: {
+        origin: 'bottom' as WellOrigin,
+        offset: { z: 1 },
+      },
     }
     const result = moveToWell(params, invariantContext, robotStateWithTip)
     expect(getSuccessResult(result).commands).toEqual([
@@ -54,19 +65,31 @@ describe('moveToWell', () => {
           pipetteId: DEFAULT_PIPETTE,
           labwareId: SOURCE_LABWARE,
           wellName: 'A1',
+          wellLocation: {
+            origin: 'bottom' as any,
+            offset: {
+              z: 1,
+            },
+          },
         },
       },
     ])
+    expect(getSuccessResult(result).python).toBe(
+      'mock_pipette.move_to(mock_source_plate["A1"].bottom(z=1))'
+    )
   })
   it('should apply the optional params to the command', () => {
     const params = {
-      pipette: DEFAULT_PIPETTE,
-      labware: SOURCE_LABWARE,
-      well: 'A1',
-      offset: {
-        x: 1,
-        y: 2,
-        z: 3,
+      pipetteId: DEFAULT_PIPETTE,
+      labwareId: SOURCE_LABWARE,
+      wellName: 'A1',
+      wellLocation: {
+        origin: 'bottom' as any,
+        offset: {
+          x: 1,
+          y: 2,
+          z: 3,
+        },
       },
       minimumZHeight: 5,
       forceDirect: true,
@@ -93,13 +116,16 @@ describe('moveToWell', () => {
         },
       },
     ])
+    expect(getSuccessResult(result).python).toBe(
+      'mock_pipette.move_to(mock_source_plate["A1"].bottom(z=3).move(types.Point(x=1, y=2)), force_direct=True, minimum_z_height=5)'
+    )
   })
   it('should return an error if pipette does not exist', () => {
     const result = moveToWell(
       {
-        pipette: 'badPipette',
-        labware: SOURCE_LABWARE,
-        well: 'A1',
+        pipetteId: 'badPipette',
+        labwareId: SOURCE_LABWARE,
+        wellName: 'A1',
       },
       invariantContext,
       robotStateWithTip
@@ -109,9 +135,9 @@ describe('moveToWell', () => {
   it('should return error if labware does not exist', () => {
     const result = moveToWell(
       {
-        pipette: DEFAULT_PIPETTE,
-        labware: 'problematicLabwareId',
-        well: 'A1',
+        pipetteId: DEFAULT_PIPETTE,
+        labwareId: 'problematicLabwareId',
+        wellName: 'A1',
       },
       invariantContext,
       robotStateWithTip
@@ -127,9 +153,9 @@ describe('moveToWell', () => {
     )
     const result = moveToWell(
       {
-        pipette: DEFAULT_PIPETTE,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
+        pipetteId: DEFAULT_PIPETTE,
+        labwareId: SOURCE_LABWARE,
+        wellName: 'A1',
       },
       invariantContext,
       initialRobotState
@@ -143,14 +169,14 @@ describe('moveToWell', () => {
     robotStateWithTip = {
       ...robotStateWithTip,
       labware: {
-        [SOURCE_LABWARE]: { slot: 'A4' },
+        [SOURCE_LABWARE]: { stack: [SOURCE_LABWARE, 'A4'] },
       },
     }
     const result = moveToWell(
       {
-        pipette: DEFAULT_PIPETTE,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
+        pipetteId: DEFAULT_PIPETTE,
+        labwareId: SOURCE_LABWARE,
+        wellName: 'A1',
       },
       invariantContext,
       robotStateWithTip
@@ -175,9 +201,9 @@ describe('moveToWell', () => {
     )
     const result = moveToWell(
       {
-        pipette: DEFAULT_PIPETTE,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
+        pipetteId: DEFAULT_PIPETTE,
+        labwareId: SOURCE_LABWARE,
+        wellName: 'A1',
       },
       invariantContext,
       robotStateWithTip
@@ -185,6 +211,33 @@ describe('moveToWell', () => {
     expect(getErrorResult(result).errors).toHaveLength(1)
     expect(getErrorResult(result).errors[0]).toMatchObject({
       type: 'THERMOCYCLER_LID_CLOSED',
+    })
+  })
+  it('should return an error when moving to well in a absorbance reader with pipette collision', () => {
+    vi.mocked(absorbanceReaderCollision).mockImplementationOnce(
+      (
+        modules: RobotState['modules'],
+        labware: RobotState['labware'],
+        labwareId: string
+      ) => {
+        expect(modules).toBe(robotStateWithTip.modules)
+        expect(labware).toBe(robotStateWithTip.labware)
+        expect(labwareId).toBe(SOURCE_LABWARE)
+        return true
+      }
+    )
+    const result = moveToWell(
+      {
+        pipetteId: DEFAULT_PIPETTE,
+        labwareId: SOURCE_LABWARE,
+        wellName: 'A1',
+      },
+      invariantContext,
+      robotStateWithTip
+    )
+    expect(getErrorResult(result).errors).toHaveLength(1)
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'ABSORBANCE_READER_LID_CLOSED',
     })
   })
 
@@ -203,9 +256,9 @@ describe('moveToWell', () => {
     )
     const result = moveToWell(
       {
-        pipette: DEFAULT_PIPETTE,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
+        pipetteId: DEFAULT_PIPETTE,
+        labwareId: SOURCE_LABWARE,
+        wellName: 'A1',
       },
       invariantContext,
       robotStateWithTip
@@ -237,9 +290,9 @@ describe('moveToWell', () => {
     )
     const result = moveToWell(
       {
-        pipette: DEFAULT_PIPETTE,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
+        pipetteId: DEFAULT_PIPETTE,
+        labwareId: SOURCE_LABWARE,
+        wellName: 'A1',
       },
       invariantContext,
       robotStateWithTip
@@ -278,9 +331,9 @@ describe('moveToWell', () => {
 
     const result = moveToWell(
       {
-        pipette: DEFAULT_PIPETTE,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
+        pipetteId: DEFAULT_PIPETTE,
+        labwareId: SOURCE_LABWARE,
+        wellName: 'A1',
       },
       invariantContext,
       robotStateWithTip
@@ -319,9 +372,9 @@ describe('moveToWell', () => {
 
     const result = moveToWell(
       {
-        pipette: DEFAULT_PIPETTE,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
+        pipetteId: DEFAULT_PIPETTE,
+        labwareId: SOURCE_LABWARE,
+        wellName: 'A1',
       },
       invariantContext,
       robotStateWithTip
@@ -366,9 +419,9 @@ describe('moveToWell', () => {
 
     const result = moveToWell(
       {
-        pipette: DEFAULT_PIPETTE,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
+        pipetteId: DEFAULT_PIPETTE,
+        labwareId: SOURCE_LABWARE,
+        wellName: 'A1',
       },
       invariantContext,
       robotStateWithTip
@@ -408,9 +461,9 @@ describe('moveToWell', () => {
 
     const result = moveToWell(
       {
-        pipette: DEFAULT_PIPETTE,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
+        pipetteId: DEFAULT_PIPETTE,
+        labwareId: SOURCE_LABWARE,
+        wellName: 'A1',
       },
       invariantContext,
       robotStateWithTip
@@ -427,15 +480,15 @@ describe('moveToWell', () => {
     when(getIsHeaterShakerEastWestWithLatchOpen)
       .calledWith(
         robotStateWithTip.modules,
-        robotStateWithTip.labware[SOURCE_LABWARE].slot
+        getSlotInLocationStack(robotStateWithTip.labware[SOURCE_LABWARE].stack)
       )
       .thenReturn(true)
 
     const result = moveToWell(
       {
-        pipette: DEFAULT_PIPETTE,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
+        pipetteId: DEFAULT_PIPETTE,
+        labwareId: SOURCE_LABWARE,
+        wellName: 'A1',
       },
       invariantContext,
       robotStateWithTip
@@ -449,16 +502,16 @@ describe('moveToWell', () => {
     when(getIsHeaterShakerEastWestMultiChannelPipette)
       .calledWith(
         robotStateWithTip.modules,
-        robotStateWithTip.labware[SOURCE_LABWARE].slot,
+        getSlotInLocationStack(robotStateWithTip.labware[SOURCE_LABWARE].stack),
         expect.anything()
       )
       .thenReturn(true)
 
     const result = moveToWell(
       {
-        pipette: DEFAULT_PIPETTE,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
+        pipetteId: DEFAULT_PIPETTE,
+        labwareId: SOURCE_LABWARE,
+        wellName: 'A1',
       },
       invariantContext,
       robotStateWithTip
@@ -472,15 +525,16 @@ describe('moveToWell', () => {
     when(pipetteAdjacentHeaterShakerWhileShaking)
       .calledWith(
         robotStateWithTip.modules,
-        robotStateWithTip.labware[SOURCE_LABWARE].slot
+        getSlotInLocationStack(robotStateWithTip.labware[SOURCE_LABWARE].stack),
+        OT2_ROBOT_TYPE
       )
       .thenReturn(true)
 
     const result = moveToWell(
       {
-        pipette: DEFAULT_PIPETTE,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
+        pipetteId: DEFAULT_PIPETTE,
+        labwareId: SOURCE_LABWARE,
+        wellName: 'A1',
       },
       invariantContext,
       robotStateWithTip
@@ -494,7 +548,7 @@ describe('moveToWell', () => {
     when(getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette)
       .calledWith(
         robotStateWithTip.modules,
-        robotStateWithTip.labware[SOURCE_LABWARE].slot,
+        getSlotInLocationStack(robotStateWithTip.labware[SOURCE_LABWARE].stack),
         expect.anything(),
         expect.anything()
       )
@@ -502,9 +556,9 @@ describe('moveToWell', () => {
 
     const result = moveToWell(
       {
-        pipette: DEFAULT_PIPETTE,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
+        pipetteId: DEFAULT_PIPETTE,
+        labwareId: SOURCE_LABWARE,
+        wellName: 'A1',
       },
       invariantContext,
       robotStateWithTip

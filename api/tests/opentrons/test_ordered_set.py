@@ -126,14 +126,13 @@ def test_clear() -> None:
 def test_head() -> None:
     """It should return the head of the set."""
     subject = OrderedSet([1, 2])
-
     assert subject.head() == 1
+
     subject.remove(1)
-
     assert subject.head() == 2
-    subject.remove(2)
 
-    with pytest.raises(IndexError):
+    subject.remove(2)
+    with pytest.raises(IndexError, match="Set is empty"):
         subject.head()
 
     assert subject.head(default_value=42) == 42

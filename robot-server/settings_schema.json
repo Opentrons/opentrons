@@ -59,6 +59,26 @@
         "ot_robot_server_maximum_unused_protocols"
       ],
       "type": "integer"
+    },
+    "maximum_quick_transfer_protocols": {
+      "title": "Maximum Quick Transfer Protocols",
+      "description": "The maximum number of \"quick transfer protocols\" to allow before auto-deleting old ones.",
+      "default": 20,
+      "exclusiveMinimum": 0,
+      "env_names": [
+        "ot_robot_server_maximum_quick_transfer_protocols"
+      ],
+      "type": "integer"
+    },
+    "maximum_data_files": {
+      "title": "Maximum Data Files",
+      "description": "The maximum number of data files to allow before auto-deleting old ones.",
+      "default": 50,
+      "exclusiveMinimum": 0,
+      "env_names": [
+        "ot_robot_server_maximum_data_files"
+      ],
+      "type": "integer"
     }
   },
   "additionalProperties": false

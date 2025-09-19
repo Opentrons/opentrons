@@ -1,9 +1,11 @@
 // app-shell self-update tests
 import * as ElectronUpdater from 'electron-updater'
-import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { UPDATE_VALUE } from '@opentrons/app/src/redux/config'
-import { registerUpdate } from '../update'
+
 import * as Cfg from '../config'
+import { registerUpdate } from '../update'
 
 import type { Dispatch } from '../types'
 
@@ -38,7 +40,7 @@ describe('update', () => {
 
     vi.mocked(ElectronUpdater.autoUpdater).emit('update-available', {
       version: '1.0.0',
-    })
+    } as any)
 
     expect(dispatch).toHaveBeenCalledWith({
       type: 'shell:CHECK_UPDATE_RESULT',
@@ -50,7 +52,7 @@ describe('update', () => {
     handleAction({ type: 'shell:CHECK_UPDATE', meta: { shell: true } })
     vi.mocked(ElectronUpdater.autoUpdater).emit('update-not-available', {
       version: '1.0.0',
-    })
+    } as any)
 
     expect(dispatch).toHaveBeenCalledWith({
       type: 'shell:CHECK_UPDATE_RESULT',
@@ -82,7 +84,7 @@ describe('update', () => {
       vi.mocked(ElectronUpdater.autoUpdater).downloadUpdate
     ).toHaveBeenCalledTimes(1)
 
-    const progress = {
+    const progress: any = {
       percent: 20,
     }
 
@@ -97,7 +99,7 @@ describe('update', () => {
 
     vi.mocked(ElectronUpdater.autoUpdater).emit('update-downloaded', {
       version: '1.0.0',
-    })
+    } as any)
 
     expect(dispatch).toHaveBeenCalledWith({
       type: 'shell:DOWNLOAD_UPDATE_RESULT',

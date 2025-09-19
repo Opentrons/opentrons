@@ -1,4 +1,4 @@
-import { PENDING, SUCCESS, FAILURE } from './constants'
+import type { FAILURE, PENDING, SUCCESS } from './constants'
 
 export type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 
@@ -56,7 +56,11 @@ export interface DismissRequestAction {
   payload: { requestId: string }
 }
 
-export type RobotApiAction = DismissRequestAction
+export interface DismissAllRequestsAction {
+  type: 'robotApi:DISMISS_ALL_REQUESTS'
+}
+
+export type RobotApiAction = DismissRequestAction | DismissAllRequestsAction
 
 // parameterized response type
 // DataT parameter must be a subtype of RobotApiV2ResponseData

@@ -1,4 +1,6 @@
-import { HeaterShakerArgs } from '@opentrons/step-generation'
+import { getTimeFromForm } from '../../utils/getTimeFromForm'
+
+import type { HeaterShakerArgs } from '@opentrons/step-generation'
 import type { HydratedHeaterShakerFormData } from '../../../form-types'
 
 export const heaterShakerFormToArgs = (
@@ -11,6 +13,8 @@ export const heaterShakerFormToArgs = (
     targetSpeed,
     setShake,
     latchOpen,
+    stepDetails,
+    stepName,
   } = formData
   console.assert(
     setHeaterShakerTemperature
@@ -22,6 +26,10 @@ export const heaterShakerFormToArgs = (
     setShake ? !Number.isNaN(targetSpeed) : true,
     'heaterShakerFormToArgs expected targeShake to be a number when setShake is true'
   )
+  const { hours, minutes, seconds } = getTimeFromForm(
+    formData.heaterShakerTimer
+  )
+  const isNullTime = hours === 0 && minutes === 0 && seconds === 0
 
   const targetTemperature =
     setHeaterShakerTemperature && targetHeaterShakerTemperature != null
@@ -32,17 +40,14 @@ export const heaterShakerFormToArgs = (
 
   return {
     commandCreatorFnName: 'heaterShaker',
-    module: moduleId,
+    name: stepName,
+    description: stepDetails,
+    moduleId,
     targetTemperature: targetTemperature,
     rpm: targetShake,
     latchOpen: latchOpen,
-    timerMinutes:
-      formData.heaterShakerTimerMinutes != null
-        ? parseInt(formData.heaterShakerTimerMinutes)
-        : null,
-    timerSeconds:
-      formData.heaterShakerTimerSeconds != null
-        ? parseInt(formData.heaterShakerTimerSeconds)
-        : null,
+    timerHours: isNullTime ? null : hours,
+    timerMinutes: isNullTime ? null : minutes,
+    timerSeconds: isNullTime ? null : seconds,
   }
 }

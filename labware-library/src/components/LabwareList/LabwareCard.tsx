@@ -1,26 +1,26 @@
 // labware display card
-import * as React from 'react'
 import uniq from 'lodash/uniq'
+
 import { Icon } from '@opentrons/components'
-import { getPublicPath } from '../../public-path'
-import { isNewLabware } from '../../definitions'
-import { Link } from '../ui'
-import {
-  getWellLabel,
-  Gallery,
-  LoadName,
-  Tags,
-  WellCount,
-  AllWellProperties,
-  NewLabwareAlert,
-} from '../labware-ui'
+import { getLabwareDisplayName } from '@opentrons/shared-data'
+
 import {
   CATEGORY_LABELS_BY_CATEGORY,
   MANUFACTURER_VALUES,
 } from '../../localization'
+import {
+  AllWellProperties,
+  Gallery,
+  getWellLabel,
+  LoadName,
+  Tags,
+  WellCount,
+} from '../labware-ui'
+import { Link } from '../ui'
+import styles from './styles.module.css'
+
 import type { LabwareDefinition } from '../../types'
 
-import styles from './styles.module.css'
 export interface LabwareCardProps {
   definition: LabwareDefinition
 }
@@ -48,7 +48,6 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
         </div>
       </div>
       <Tags definition={definition} />
-      {isNewLabware(definition) && <NewLabwareAlert />}
       <LoadName loadName={definition.parameters.loadName} />
     </li>
   )
@@ -73,11 +72,11 @@ function TopBar(props: LabwareCardProps): JSX.Element {
 }
 
 function Title(props: LabwareCardProps): JSX.Element {
-  const { loadName } = props.definition.parameters
-  const { displayName } = props.definition.metadata
+  const { definition } = props
+  const displayName = getLabwareDisplayName(definition)
 
   return (
-    <Link to={`${getPublicPath()}${loadName}`}>
+    <Link to={'/'} search={`loadName=${definition.parameters.loadName}`}>
       <h2 className={styles.title}>
         <span className={styles.title_text}>{displayName}</span>
         <Icon className={styles.title_icon} name="chevron-right" />

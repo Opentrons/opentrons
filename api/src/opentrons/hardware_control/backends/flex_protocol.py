@@ -12,7 +12,7 @@ from typing import (
     Set,
     TypeVar,
 )
-from opentrons_shared_data.pipette.dev_types import (
+from opentrons_shared_data.pipette.types import (
     PipetteName,
 )
 from opentrons.config.types import GantryLoad
@@ -36,10 +36,14 @@ from opentrons.hardware_control.types import (
     HepaFanState,
     HepaUVState,
     StatusBarState,
+    StatusBarUpdateListener,
+    StatusBarUpdateUnsubscriber,
+    PipetteSensorResponseQueue,
 )
 from opentrons.hardware_control.module_control import AttachedModulesControl
 from ..dev_types import OT3AttachedInstruments
 from .types import HWStopCondition
+
 
 Cls = TypeVar("Cls")
 
@@ -54,17 +58,27 @@ class FlexBackend(Protocol):
     def restore_system_constraints(self) -> AsyncIterator[None]:
         ...
 
-    def update_constraints_for_gantry_load(self, gantry_load: GantryLoad) -> None:
+    @asynccontextmanager
+    def grab_pressure(self, channels: int, mount: OT3Mount) -> AsyncIterator[None]:
         ...
 
-    def update_constraints_for_calibration_with_gantry_load(
-        self,
-        gantry_load: GantryLoad,
+    def set_pressure_sensor_available(
+        self, pipette_axis: Axis, available: bool
     ) -> None:
         ...
 
+    def get_pressure_sensor_available(self, pipette_axis: Axis) -> bool:
+        ...
+
+    def update_constraints_for_gantry_load(self, gantry_load: GantryLoad) -> None:
+        ...
+
     def update_constraints_for_plunger_acceleration(
-        self, mount: OT3Mount, acceleration: float, gantry_load: GantryLoad
+        self,
+        mount: OT3Mount,
+        acceleration: float,
+        gantry_load: GantryLoad,
+        high_speed_pipette: bool = False,
     ) -> None:
         ...
 
@@ -142,14 +156,16 @@ class FlexBackend(Protocol):
     async def liquid_probe(
         self,
         mount: OT3Mount,
-        max_z_distance: float,
+        max_p_distance: float,
         mount_speed: float,
         plunger_speed: float,
         threshold_pascals: float,
-        log_pressure: bool = True,
-        auto_zero_sensor: bool = True,
-        num_baseline_reads: int = 10,
+        plunger_impulse_time: float,
+        num_baseline_reads: int,
+        z_offset_for_plunger_prep: float,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
+        force_both_sensors: bool = False,
+        response_queue: Optional[PipetteSensorResponseQueue] = None,
     ) -> float:
         ...
 
@@ -212,7 +228,7 @@ class FlexBackend(Protocol):
         ...
 
     async def tip_action(
-        self, origin: Dict[Axis, float], targets: List[Tuple[Dict[Axis, float], float]]
+        self, origin: float, targets: List[Tuple[float, float]]
     ) -> None:
         ...
 
@@ -364,7 +380,7 @@ class FlexBackend(Protocol):
         distance_mm: float,
         speed_mm_per_s: float,
         sensor_threshold_pf: float,
-        probe: InstrumentProbeType,
+        probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
     ) -> bool:
         ...
 
@@ -382,7 +398,9 @@ class FlexBackend(Protocol):
     def subsystems(self) -> Dict[SubSystem, SubSystemState]:
         ...
 
-    async def get_tip_status(self, mount: OT3Mount) -> TipStateType:
+    async def get_tip_status(
+        self, mount: OT3Mount, ht_operation_sensor: Optional[InstrumentProbeType] = None
+    ) -> TipStateType:
         ...
 
     def current_tip_state(self, mount: OT3Mount) -> Optional[bool]:
@@ -400,7 +418,15 @@ class FlexBackend(Protocol):
     async def set_status_bar_enabled(self, enabled: bool) -> None:
         ...
 
+    def get_status_bar_enabled(self) -> bool:
+        ...
+
     def get_status_bar_state(self) -> StatusBarState:
+        ...
+
+    def add_status_bar_listener(
+        self, listener: StatusBarUpdateListener
+    ) -> StatusBarUpdateUnsubscriber:
         ...
 
     @property
@@ -440,4 +466,32 @@ class FlexBackend(Protocol):
         ...
 
     async def get_hepa_uv_state(self) -> Optional[HepaUVState]:
+        ...
+
+    async def increase_evo_disp_count(self, mount: OT3Mount) -> None:
+        """Tell a pipette to increase it's evo-tip-dispense-count in eeprom."""
+        ...
+
+    async def read_env_temp_sensor(
+        self, mount: OT3Mount, primary: bool
+    ) -> Optional[float]:
+        """Read and return the current sensor information."""
+        ...
+
+    async def read_env_hum_sensor(
+        self, mount: OT3Mount, primary: bool
+    ) -> Optional[float]:
+        """Read and return the current sensor information."""
+        ...
+
+    async def read_pressure_sensor(
+        self, mount: OT3Mount, primary: bool
+    ) -> Optional[float]:
+        """Read and return the current sensor information."""
+        ...
+
+    async def read_capacitive_sensor(
+        self, mount: OT3Mount, primary: bool
+    ) -> Optional[float]:
+        """Read and return the current sensor information."""
         ...

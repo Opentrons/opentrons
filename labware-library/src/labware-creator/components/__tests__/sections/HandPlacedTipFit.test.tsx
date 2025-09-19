@@ -1,19 +1,20 @@
-import React from 'react'
-import { FormikConfig } from 'formik'
-import isEqual from 'lodash/isEqual'
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import isEqual from 'lodash/isEqual'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
   getDefaultFormState,
   getInitialStatus,
-  LabwareFields,
   snugLooseOptions,
 } from '../../../fields'
-import { HandPlacedTipFit } from '../../sections/HandPlacedTipFit'
 import { FormAlerts } from '../../alerts/FormAlerts'
 import { TipFitAlerts } from '../../alerts/TipFitAlerts'
 import { Dropdown } from '../../Dropdown'
+import { HandPlacedTipFit } from '../../sections/HandPlacedTipFit'
 import { wrapInFormik } from '../../utils/wrapInFormik'
+
+import type { FormikConfig } from 'formik'
+import type { LabwareFields } from '../../../fields'
 
 vi.mock('../../Dropdown')
 vi.mock('../../alerts/FormAlerts')

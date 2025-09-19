@@ -5,10 +5,11 @@ from typing_extensions import Literal, Type
 
 from pydantic import BaseModel, Field
 
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ...errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
-    from opentrons.protocol_engine.state import StateView
+    from opentrons.protocol_engine.state.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler
 
 
@@ -26,7 +27,7 @@ class CloseLabwareLatchResult(BaseModel):
 
 
 class CloseLabwareLatchImpl(
-    AbstractCommandImpl[CloseLabwareLatchParams, CloseLabwareLatchResult]
+    AbstractCommandImpl[CloseLabwareLatchParams, SuccessData[CloseLabwareLatchResult]]
 ):
     """Execution implementation of a Heater-Shaker's close labware latch command."""
 
@@ -39,7 +40,9 @@ class CloseLabwareLatchImpl(
         self._state_view = state_view
         self._equipment = equipment
 
-    async def execute(self, params: CloseLabwareLatchParams) -> CloseLabwareLatchResult:
+    async def execute(
+        self, params: CloseLabwareLatchParams
+    ) -> SuccessData[CloseLabwareLatchResult]:
         """Close a Heater-Shaker's labware latch."""
         # Allow propagation of ModuleNotLoadedError and WrongModuleTypeError.
         hs_module_substate = self._state_view.modules.get_heater_shaker_module_substate(
@@ -54,15 +57,19 @@ class CloseLabwareLatchImpl(
         if hs_hardware_module is not None:
             await hs_hardware_module.close_labware_latch()
 
-        return CloseLabwareLatchResult()
+        return SuccessData(
+            public=CloseLabwareLatchResult(),
+        )
 
 
-class CloseLabwareLatch(BaseCommand[CloseLabwareLatchParams, CloseLabwareLatchResult]):
+class CloseLabwareLatch(
+    BaseCommand[CloseLabwareLatchParams, CloseLabwareLatchResult, ErrorOccurrence]
+):
     """A command to close a Heater-Shaker's latch."""
 
     commandType: CloseLabwareLatchCommandType = "heaterShaker/closeLabwareLatch"
     params: CloseLabwareLatchParams
-    result: Optional[CloseLabwareLatchResult]
+    result: Optional[CloseLabwareLatchResult] = None
 
     _ImplementationCls: Type[CloseLabwareLatchImpl] = CloseLabwareLatchImpl
 

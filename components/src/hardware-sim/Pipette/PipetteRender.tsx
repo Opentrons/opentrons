@@ -1,26 +1,22 @@
-import * as React from 'react'
-import {
-  getPipetteNameSpecs,
-  LabwareDefinition2,
-  PipetteName,
-} from '@opentrons/shared-data'
-import { C_MED_DARK_GRAY, C_MED_GRAY } from '../../styles'
-import { BORDERS } from '../../helix-design-system'
+import { getPipetteNameSpecs } from '@opentrons/shared-data'
+
 import { RobotCoordsForeignDiv } from '../Deck/RobotCoordsForeignDiv'
 import {
-  MULTI_CHANNEL_PIPETTE_WIDTH,
-  SINGLE_CHANNEL_PIPETTE_WIDTH,
-  SINGLE_CHANNEL_PIPETTE_HEIGHT,
-  MULTI_CHANNEL_PIPETTE_HEIGHT,
   MULTI_CHANNEL_CENTER_Y_NOZZLE,
+  MULTI_CHANNEL_PIPETTE_HEIGHT,
+  MULTI_CHANNEL_PIPETTE_WIDTH,
   MULTI_CHANNEL_Y_OFFSET,
   NINETY_SIX_CHANNEL_PIPETTE_WIDTH,
+  SINGLE_CHANNEL_PIPETTE_HEIGHT,
+  SINGLE_CHANNEL_PIPETTE_WIDTH,
 } from './constants'
-import { EmanatingNozzle } from './EmanatingNozzle'
 import { EightEmanatingNozzles } from './EightEmanatingNozzles'
+import { EmanatingNozzle } from './EmanatingNozzle'
+
+import type { LabwareDefinition, PipetteName } from '@opentrons/shared-data'
 
 interface PipetteRenderProps {
-  labwareDef: LabwareDefinition2
+  labwareDef: LabwareDefinition
   pipetteName: PipetteName
   usingMetalProbe?: boolean
 }
@@ -53,6 +49,9 @@ export const PipetteRender = (props: PipetteRenderProps): JSX.Element => {
     if (Object.keys(labwareDef.wells).length === 1) {
       probeOffsetX = 99 / 2
     }
+    if (Object.keys(labwareDef.wells).length === 384) {
+      probeOffsetY = 65.75
+    }
   }
 
   return (
@@ -67,15 +66,9 @@ export const PipetteRender = (props: PipetteRenderProps): JSX.Element => {
       y={y}
       outerProps={{ style: { overflow: 'visible' } }}
       innerDivProps={{
-        style: {
-          width: '100%',
-          height: '100%',
-          overflow: 'visible',
-          boxSizing: 'border-box',
-          borderRadius: BORDERS.borderRadius4,
-          boxShadow: `inset 0 0 0 1px ${C_MED_DARK_GRAY}`,
-          backgroundColor: `${C_MED_GRAY}80`,
-        },
+        width: '100%',
+        height: '100%',
+        overflow: 'visible',
       }}
     >
       <svg overflow="visible">

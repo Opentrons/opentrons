@@ -4,6 +4,7 @@ This file is used as a source for code generation, which does not run in a venv
 by default. Please do not unconditionally import things outside the python standard
 library.
 """
+
 from enum import Enum, unique
 from typing import Union, Dict, List
 
@@ -45,7 +46,7 @@ class NodeId(int, Enum):
         """Mapping between bootloader_node and nodes.
 
         Note: The ordering of the Node list matters as the first element
-        represents the core appliaction node for that given node. For example
+        represents the core application node for that given node. For example
 
         NodeId.head_bootloader : [NodeId.head, NodeId.head_l, NodeId.head_r]
 
@@ -173,6 +174,7 @@ class MessageId(int, Enum):
     execute_move_group_request = 0x18
     clear_all_move_groups_request = 0x19
     home_request = 0x20
+    add_sensor_move_request = 0x23
     move_completed = 0x13
 
     motor_position_request = 0x12
@@ -190,6 +192,8 @@ class MessageId(int, Enum):
     write_motor_current_request = 0x33
     read_motor_current_request = 0x34
     read_motor_current_response = 0x35
+    read_motor_driver_error_status_request = 0x36
+    read_motor_driver_error_status_response = 0x37
 
     set_brushed_motor_vref_request = 0x40
     set_brushed_motor_pwm_request = 0x41
@@ -237,6 +241,11 @@ class MessageId(int, Enum):
     gear_write_motor_driver_request = 0x506
     gear_read_motor_driver_request = 0x507
 
+    max_sensor_value_request = 0x70
+    max_sensor_value_response = 0x71
+
+    increase_evo_disp_count_request = 0x80
+    batch_read_sensor_response = 0x81
     read_sensor_request = 0x82
     write_sensor_request = 0x83
     baseline_sensor_request = 0x84
@@ -250,6 +259,7 @@ class MessageId(int, Enum):
     peripheral_status_request = 0x8C
     peripheral_status_response = 0x8D
     baseline_sensor_response = 0x8E
+    send_accumulated_sensor_data = 0x8F
 
     set_hepa_fan_state_request = 0x90
     get_hepa_fan_state_request = 0x91
@@ -263,6 +273,7 @@ class MessageId(int, Enum):
 class ErrorSeverity(int, Enum):
     """Error Severity levels."""
 
+    none = 0x0
     warning = 0x1
     recoverable = 0x2
     unrecoverable = 0x3
@@ -288,6 +299,17 @@ class ErrorCode(int, Enum):
     over_pressure = 0x0D
     door_open = 0x0E
     reed_open = 0x0F
+    motor_driver_error_detected = 0x10
+    safety_relay_inactive = 0x11
+
+
+@unique
+class MotorDriverErrorCode(int, Enum):
+    """Motor driver error codes."""
+
+    over_temperature = 0x2000000
+    short_circuit = 0x18000000
+    open_circuit = 0x60000000
 
 
 @unique
@@ -311,6 +333,7 @@ class SensorType(int, Enum):
     pressure_temperature = 0x04
     humidity = 0x05
     temperature = 0x06
+    UNUSED = 0x07
 
 
 @unique
@@ -323,6 +346,8 @@ class SensorId(int, Enum):
 
     S0 = 0x0
     S1 = 0x1
+    UNUSED = 0x2
+    BOTH = 0x3
 
 
 @unique
@@ -335,6 +360,8 @@ class PipetteName(int, Enum):
     p50_multi = 0x03
     p1000_96 = 0x04
     p50_96 = 0x05
+    p200_96 = 0x06
+    p1000_multi_em = 0x07
     unknown = 0xFFFF
 
 
@@ -355,6 +382,8 @@ class SensorOutputBinding(int, Enum):
     sync = 0x01
     report = 0x02
     max_threshold_sync = 0x04
+    auto_baseline_report = 0x08
+    multi_sensor_sync = 0x10
 
 
 @unique
@@ -405,6 +434,7 @@ class MoveStopCondition(int, Enum):
     stall = 0x10
     ignore_stalls = 0x20
     limit_switch_backoff = 0x40
+    sensor_report = 0x80
 
 
 @unique
@@ -416,6 +446,8 @@ class MotorUsageValueType(int, Enum):
     right_gear_motor_distance = 0x2
     force_application_time = 0x3
     total_error_count = 0x4
+    overpressure_error_count = 0x5
+    resin_tip_dispense_count = 0x6
 
 
 class MoveAckId(int, Enum):
@@ -435,3 +467,4 @@ class GripperJawState(int, Enum):
     force_controlling_home = 0x1
     force_controlling = 0x2
     position_controlling = 0x3
+    stopped = 0x4

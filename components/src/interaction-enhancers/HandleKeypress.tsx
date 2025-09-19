@@ -1,4 +1,7 @@
-import * as React from 'react'
+import { Component } from 'react'
+
+import type { ReactNode } from 'react'
+
 export interface KeypressHandler {
   key: string
   shiftKey?: boolean | null | undefined
@@ -11,7 +14,7 @@ export interface HandleKeypressProps {
   /** optionally call event.preventDefault if keypress is handled */
   preventDefault?: boolean | null | undefined
   /** wrapped children */
-  children?: React.ReactNode
+  children?: ReactNode
 }
 
 const matchHandler = (e: KeyboardEvent) => (h: KeypressHandler) =>
@@ -23,9 +26,24 @@ const matchHandler = (e: KeyboardEvent) => (h: KeypressHandler) =>
  * `keyup` event. `event.preventDefault` will be called if a key is handled
  * and `props.preventDefault` is true.
  */
-export class HandleKeypress extends React.Component<HandleKeypressProps> {
+export class HandleKeypress extends Component<HandleKeypressProps> {
   handlePressIfKey = (event: KeyboardEvent): void => {
-    this.props.handlers.filter(matchHandler(event)).forEach(h => h.onPress())
+    const pressHandlers = this.props.handlers.filter(matchHandler(event))
+
+    // Check if any element is currently focused
+    const focusedElement = document.activeElement as HTMLElement
+
+    if (pressHandlers.length > 0) {
+      if (
+        focusedElement &&
+        event.key === 'Enter' &&
+        focusedElement.matches(':focus-visible')
+      ) {
+        focusedElement.click()
+      } else if (!focusedElement || !focusedElement.matches(':focus-visible')) {
+        pressHandlers.forEach(h => h.onPress())
+      }
+    }
   }
 
   preventDefaultIfKey = (event: KeyboardEvent): void => {

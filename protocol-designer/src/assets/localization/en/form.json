@@ -1,0 +1,430 @@
+{
+  "batch_edit_form": {
+    "settings_for": "settings for {{prefix}}"
+  },
+  "field_update_confirmation_modal": {
+    "fields": {
+      "path": "pipette path",
+      "pipette": "pipette",
+      "tipRack": "tips",
+      "volume": "volume"
+    },
+    "footer": {
+      "update_settings": "Update settings",
+      "use_current_settings": "Use current settings"
+    },
+    "liquid_class": {
+      "title": "Apply {{liquidClass}} liquid class settings",
+      "body": "Continuing will update this {{stepType}} step’s pipetting settings to the values of the {{liquidClass}} liquid class."
+    },
+    "no_liquid_class": {
+      "title": "Don’t use liquid class settings",
+      "body": "Continuing will undo any changes and clear all pipetting settings associated with the previously selected liquid class."
+    },
+    "other_fields": {
+      "title": "Update {{liquidClass}} liquid class settings?",
+      "body": "We noticed you changed the {{fieldNames}} in this {{stepType}} step. Do you want to use the current pipetting settings or update to the values of the {{liquidClass}} liquid class?"
+    },
+    "steps": {
+      "mix": "mix",
+      "moveLiquid": "transfer"
+    },
+    "string_helpers": {
+      "and_comma_spaces": ", and ",
+      "and_spaces": " and ",
+      "comma_space": ", "
+    }
+  },
+  "generic": {
+    "default_protocol_name": "Untitled",
+    "error": {
+      "more_than_zero": "Must be more than 0",
+      "required": "{{name}} is required"
+    },
+    "labware_type": "Type",
+    "nickname": "Nickname"
+  },
+  "liquid_edit": {
+    "description": "Description",
+    "details": "Details",
+    "displayColor": "Color",
+    "name": "Liquid name",
+    "serialize": "Serialize",
+    "serialize_explanation": "Each placement of the liquid will get its own number. (\"Sample 1\", \"Sample 2\", \"Sample 3\")",
+    "serialize_title": "Serialization"
+  },
+  "liquid_placement": {
+    "liquid": "Liquid",
+    "volume": "Volume",
+    "errors": {
+      "liquid_required": "Define a liquid",
+      "volume_exceeded": "Warning: exceeded max volume per well: {{volume}}µL",
+      "volume_required": "Define a volume"
+    }
+  },
+  "pipette_mount_label": {
+    "left": "(L)",
+    "right": "(R)"
+  },
+  "step_edit_form": {
+    "absorbanceReader": {
+      "add_wavelength": {
+        "disabled": "Maximum allowed wavelengths reached",
+        "label": "Add a wavelength"
+      },
+      "color_parentheses": "({{color}})",
+      "current_initialization_settings": {
+        "title": "Current initialization settings",
+        "tooltip": "Module must be empty to change initialization settings"
+      },
+      "custom_wavelength": {
+        "caption": "Value between 350 - 1000 nm",
+        "label": "Custom wavelength"
+      },
+      "delete": "Delete",
+      "errors": {
+        "custom_wavelength_required": "Custom wavelength required",
+        "wavelength_out_of_range": "Value falls outside of accepted range"
+      },
+      "export_settings": {
+        "description": "Absorbance Plate Reader data is saved as a .csv file and can be found on the robot's detail page in the Desktop App.",
+        "title": "Export settings"
+      },
+      "initialization_setting": {
+        "multi": {
+          "description": "Up to 6 wavelengths can be programmed.",
+          "title": "Multi initialization setting"
+        },
+        "single": {
+          "title": "Single initialization setting"
+        }
+      },
+      "module_controls": "Module controls",
+      "no_settings_defined": "No settings defined",
+      "reference_wavelength": {
+        "title": "Reference wavelength",
+        "tooltip": "A reference wavelength is a baseline wavelength used for comparing measurements of other wavelengths."
+      },
+      "reference_wavelength_parentheses": "(Reference wavelength)",
+      "reference_wavelength_color_parentheses": "({{color}}, reference wavelength)",
+      "wavelength": "Wavelength"
+    },
+    "field": {
+      "absorbanceReader": {
+        "absorbanceReaderFormType": {
+          "absorbanceReaderInitialize": {
+            "change": "Change initialization settings",
+            "define": "Define initialization settings"
+          },
+          "absorbanceReaderLid": "Change lid position",
+          "absorbanceReaderRead": "Read labware"
+        },
+        "fileName": "Exported file name",
+        "lidOpen": {
+          "closed": "Closed",
+          "label": "Lid position",
+          "open": "Open"
+        },
+        "mode": {
+          "label": "Select mode type",
+          "multi": "Multi",
+          "single": "Single"
+        },
+        "moduleId": {
+          "module": "Module"
+        },
+        "referenceWavelengthActive": "Add reference wavelength?"
+      },
+      "airGap": {
+        "label": "Air gap volume",
+        "title": "Air gap"
+      },
+      "blowout": {
+        "label": "blowout"
+      },
+      "change_tip": {
+        "label": "change tip",
+        "option": {
+          "always": "Always",
+          "never": "Never",
+          "once": "Once",
+          "perSource": "Per source",
+          "perDest": "Per destination"
+        },
+        "option_tooltip": {
+          "always": "Always aspirate with a fresh tip.",
+          "never": "Use same tip as the previous step.",
+          "once": "Get one new tip to use for the whole step.",
+          "perDest": "Get a new tip when dispensing into a new destination well. Keep tip for repeat dispenses into the same destination well.",
+          "perSource": "Get a new tip when aspirating from a new source well. Keep tip for repeat aspirations from the same source well."
+        }
+      },
+      "comment": {
+        "label": "comment"
+      },
+      "conditioning": {
+        "conditioning_volume": {
+          "caption": "Valid range between {{min}}-{{max}}µL",
+          "label": "Conditioning volume"
+        },
+        "title": "Condition"
+      },
+      "dropTip": {
+        "option": { "return": "Tip rack" }
+      },
+      "delay": {
+        "label": "delay"
+      },
+      "engageHeight": {
+        "caption": "Recommended: 4mm",
+        "label": "Engage height"
+      },
+      "flow_rate": {
+        "default_text": "The default {{displayName}} flow rate is optimal for handling aqueous liquids",
+        "error_decimals": "A max of {{decimals}} decimal places is allowed",
+        "error_out_of_bounds": "Enter a value within the specified range",
+        "label": "Flow Rate",
+        "range": "between {{min}} and {{max}}"
+      },
+      "heaterShaker": {
+        "duration": "Duration",
+        "latch": {
+          "setLatch": "Labware latch",
+          "toggleOff": "Closed",
+          "toggleOn": "Open"
+        },
+        "shaker": {
+          "setShake": "Shaker",
+          "toggleOff": "Off",
+          "toggleOn": "On"
+        },
+        "temperature": {
+          "setTemperature": "Heater",
+          "toggleOff": "Off",
+          "toggleOn": "On"
+        },
+        "timer": {
+          "heaterShakerSetTimer": "Timer"
+        }
+      },
+      "location": {
+        "dropTip": "Tip drop location",
+        "label": "location",
+        "pickUp": "pick up tip"
+      },
+      "magnetAction": {
+        "label": "Magnets",
+        "options": {
+          "disengage": "Disengage",
+          "engage": "Engage"
+        }
+      },
+      "mix": {
+        "label": "mix"
+      },
+      "moduleActionLabware": {
+        "label": "module"
+      },
+      "moduleLabwarePrefix": {
+        "heaterShakerModuleType": "Heater-Shaker",
+        "magneticBlockType": "Magnetic Block",
+        "magneticModuleType": "Magnetic Module",
+        "temperatureModuleType": "Temperature Module",
+        "thermocyclerModuleType": "Thermocycler"
+      },
+      "newLocation": {
+        "label": "new location"
+      },
+      "nozzles": {
+        "label": "nozzles",
+        "option": {
+          "ALL": "All",
+          "COLUMN": "Column"
+        },
+        "option_tooltip": {
+          "partial": "To use partial tip pickup, a tiprack without an adapter must be placed on the deck."
+        }
+      },
+      "path": {
+        "subtitle": {
+          "incompatible_with_per_dest": "Incompatible with \"Per Destination Well\" Change Tip setting",
+          "incompatible_with_per_source": "Incompatible with \"Per Source Well\" Change Tip setting",
+          "only_1_to_many": "Only compatible with 1-to-Many well ratios",
+          "only_many_to_1": "Only compatible with Many-to-1 well ratios",
+          "volume_too_high": "Transfer Volume too high"
+        },
+        "title": {
+          "multiAspirate": "Multi-Aspirate",
+          "multiDispense": "Multi-Dispense",
+          "single": "Single Transfers"
+        }
+      },
+      "pauseAction": {
+        "duration": "Delay duration",
+        "options": {
+          "untilResume": "Pause until told to resume",
+          "untilTemperature": "Pause until temperature reached",
+          "untilTime": "Delay for an amount of time"
+        }
+      },
+      "pauseMessage": {
+        "label": "message to display"
+      },
+      "pauseTemperature": {
+        "label": "Temp"
+      },
+      "pipette": {
+        "label": "pipette"
+      },
+      "preWetTip": {
+        "label": "pre-wet tip"
+      },
+      "pushOut": {
+        "pushOut_volume": {
+          "caption": "Valid range between {{min}}-{{max}}µL",
+          "label": "Push out volume"
+        },
+        "title": "Push out"
+      },
+      "setTemperature": {
+        "options": {
+          "false": "Deactivate module",
+          "true": "Change to temperature"
+        }
+      },
+      "step_name": {
+        "label": "Step Name"
+      },
+      "step_notes": {
+        "label": "Step Notes"
+      },
+      "temperature": {
+        "setTemperature": "Temperature",
+        "toggleOff": "Off",
+        "toggleOn": "On"
+      },
+      "thermocyclerAction": {
+        "options": {
+          "profile": "Program a Thermocycler profile",
+          "state": "Change Thermocycler state"
+        }
+      },
+      "thermocyclerProfile": {
+        "add_cycle": "Add cycle",
+        "add_cycle_button": "+ Cycle",
+        "add_cycle_step": "Add a cycle step",
+        "add_step": "Add step",
+        "add_step_button": "+ Step",
+        "cycle": "cycle",
+        "cycle_step": "cycle step",
+        "cycles": "Cycles {{repetitions}}x",
+        "delete": "delete",
+        "edit": "Edit Thermocycler profile steps",
+        "lid_closed": "Closed",
+        "lid_position": "lid position",
+        "lid_temp": "lid temp",
+        "name": "name",
+        "no_profile": "No profile defined",
+        "no_steps": "No steps defined",
+        "number_of_cycles": "number of cycles",
+        "step": "step",
+        "step_profile_defined": "{{steps}} step profile defined",
+        "steps": "Profile steps",
+        "time": "time",
+        "volume": "volume",
+        "well_volume": "Well volume"
+      },
+      "thermocyclerState": {
+        "block": {
+          "engage": "Block",
+          "label": "Thermocycler block",
+          "temperature": "Block temperature",
+          "toggleOff": "Off",
+          "toggleOn": "On",
+          "valid_range": "Valid range between 4 and 96°C"
+        },
+        "ending_hold": "Ending hold",
+        "lid": {
+          "engage": "Lid",
+          "label": "Lid",
+          "temperature": "Lid temperature",
+          "toggleOff": "Off",
+          "toggleOn": "On",
+          "valid_range": "Valid range between 37 and 110°C"
+        },
+        "lidPosition": {
+          "label": "Lid position",
+          "toggleOff": "Closed",
+          "toggleOn": "Open"
+        },
+        "state": "Thermocycler state"
+      },
+      "tip_position": {
+        "label": "tip position"
+      },
+      "touchTip": {
+        "label": "touch tip"
+      },
+      "touchTip_speed": {
+        "label": "Touch tip speed"
+      },
+      "touchTip_mmFromEdge": {
+        "caption": "Valid range between {{min}} - {{max}}mm",
+        "label": "Distance from edge"
+      },
+      "useGripper": {
+        "label": "use gripper",
+        "toggleOff": "Move labware manually (protocol will pause and prompt)",
+        "toggleOn": "Use gripper to move labware"
+      },
+      "volume": {
+        "label": "volume per well"
+      },
+      "well_order": {
+        "label": "Well order",
+        "option": {
+          "b2t": "Bottom to top",
+          "l2r": "Left to right",
+          "r2l": "Right to left",
+          "t2b": "Top to bottom"
+        },
+        "unknown": "unknown"
+      }
+    },
+    "labwareLabel": {
+      "aspirate": "source",
+      "dispense": "destination",
+      "errors": {
+        "labwareSlotIncompatible": "The {{labwareName}} in {{slot}} is incompatible"
+      },
+      "mixLabware": "labware",
+      "movedLabware": "labware"
+    },
+    "heat_or_cool": "Heat or cool",
+    "mixRepetitions": "repetitions",
+    "mixVolumeLabel": "mix volume",
+    "multiDispenseOptionsLabel": "multi-dispense options",
+    "section": {
+      "dropTip": "drop tip",
+      "pickUpAndDrop": "pick up & drop tip",
+      "sterility": "sterility",
+      "sterility&motion": "sterility & motion"
+    },
+    "temperature": {
+      "state": "Temperature Module state"
+    },
+    "tipRack": "tip rack",
+    "wellSelectionLabel": {
+      "choose_wells": "Choose wells",
+      "columns": "columns",
+      "columns_aspirate_wells": "Source columns",
+      "columns_dispense_wells": "Destination columns",
+      "columns_mix_wells": "Select columns",
+      "columns_wells": "Mix wells",
+      "wells": "wells",
+      "wells_aspirate_wells": "Select source wells",
+      "wells_dispense_wells": "Select destination wells",
+      "wells_wells": "Select wells"
+    }
+  }
+}

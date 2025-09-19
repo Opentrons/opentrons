@@ -1,11 +1,14 @@
-import * as React from 'react'
-import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { act, renderHook, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { createProtocol } from '@opentrons/api-client'
-import { useHost } from '../../api'
+
 import { useCreateProtocolMutation } from '..'
-import type { HostConfig, Response, Protocol } from '@opentrons/api-client'
+import { useHost } from '../../api'
+
+import type * as React from 'react'
+import type { HostConfig, Protocol, Response } from '@opentrons/api-client'
 
 vi.mock('@opentrons/api-client')
 vi.mock('../../api/useHost')
@@ -31,6 +34,7 @@ const PROTOCOL_RESPONSE = {
     createdAt: 'now',
     robotType: 'OT-3 Standard',
     protocolType: 'json',
+    protocolKind: 'standard',
     metadata: {},
     analysisSummaries: [],
     files: [],
@@ -95,6 +99,7 @@ describe('useCreateProtocolMutation hook', () => {
       result.current.createProtocol({
         files: createProtocolData,
         protocolKey: 'fakeProtocolKey',
+        runTimeParameterValues: { fakeParamName: 5.0 },
       })
     )
 

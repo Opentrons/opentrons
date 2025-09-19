@@ -16,10 +16,14 @@ Position Relative to Labware
 
 When the robot positions itself relative to a piece of labware, where it moves is determined by the labware definition, the actions you want it to perform, and the labware offsets for a specific deck slot. This section describes how these positional components are calculated and how to change them.
 
-Top, Bottom, and Center
------------------------
+Well Positions
+---------------------------------
 
-Every well on every piece of labware has three addressable positions: top, bottom, and center. The position is determined by the labware definition and what the labware is loaded on top of. You can use these positions as-is or calculate other positions relative to them.
+Every well on every piece of labware has four addressable positions: top, bottom, center, and meniscus. 
+
+The top, bottom, and center positions are determined by the labware definition and what the labware is loaded on top of. The meniscus position is determined by the height of the liquid inside a well. You can use these positions as-is or calculate other positions relative to them.
+
+.. _well-top:
 
 Top
 ^^^^
@@ -77,13 +81,39 @@ Let's look at the :py:meth:`.Well.center` method. It returns a position centered
 
 .. versionadded:: 2.0
 
+.. _well-meniscus:
+
+Meniscus
+^^^^^^^^
+
+Let's look at the :py:meth:`.Well.meniscus` method. It returns a position at the surface of liquid, or meniscus, inside a well. Similar to the ``.Well.top`` and ``.Well.bottom`` methods, you can adjust the height of this position with the optional argument ``z``, which is measured in mm. Positive ``z`` values move the position up, and negative ones move it down. 
+
+.. code-block:: python
+
+    plate["A1"].meniscus(
+        z=-1, target= "end"
+        ) 
+    # 1 mm below the meniscus of liquid inside the well
+
+
+The liquid meniscus in a well changes during aspirating or dispensing, so you'll also need to specify a ``target`` position relative to the meniscus. Each position target is useful in different scenarios: 
+
+- Set ``target="start"`` to target the existing liquid meniscus in the destination well before a dispense. 
+- Set ``target="end"`` to ensure the pipette stays submerged while aspirating, or to avoid touching liquid in the destination well while dispensing. 
+
+.. note::
+    To use the :py:meth:`~.Well.meniscus` method, you'll first need to specify the starting liquid volume with :py:meth:`~.Labware.load_liquid` or probe for liquid with :py:meth:`~.InstrumentContext.measure_liquid_height`.
+
+    Detecting liquid in a well requires pipette sensors, so you can only measure liquid height with a Flex pipette. 
+
+.. versionadded:: 2.23
 
 .. _new-default-op-positions:
 
 Default Positions
 -----------------
 
-By default, your robot will aspirate and dispense 1 mm above the bottom of wells. This default clearance may not be suitable for some labware geometries, liquids, or protocols. You can change this value by using the :py:meth:`.Well.bottom` method with the ``z`` argument, though it can be cumbersome to do so repeatedly.
+By default, your robot will aspirate and dispense 1 mm above the bottom of wells. This default clearance may not be suitable for some labware geometries, liquids, or protocols. You can change this value based on your labware with the :py:meth:`.Well.bottom` method and the ``z`` argument, though it can be cumbersome to do so repeatedly.
 
 If you need to change the aspiration or dispensing height for multiple operations, specify the distance in mm from the well bottom with the :py:obj:`.InstrumentContext.well_bottom_clearance` object. It has two attributes: ``well_bottom_clearance.aspirate`` and ``well_bottom_clearance.dispense``. These change the aspiration height and dispense height, respectively.
 
@@ -108,6 +138,7 @@ Modifying these attributes will affect all subsequent aspirate and dispense acti
     pipette.dispense(50, plate["A1"])
 
 .. versionadded:: 2.0
+  
 
 Using Labware Position Check
 ============================
@@ -115,6 +146,31 @@ Using Labware Position Check
 All positions relative to labware are adjusted automatically based on labware offset data. Calculate labware offsets by running Labware Position Check during protocol setup, either in the Opentrons App or on the Flex touchscreen. Version 6.0.0 and later of the robot software can apply previously calculated offsets on the same robot for the same labware type and deck slot, even across different protocols.
 
 You should only adjust labware offsets in your Python code if you plan to run your protocol in Jupyter Notebook or from the command line. See :ref:`using_lpc` in the Advanced Control article for information.
+
+.. _position-relative-trash:
+
+Position Relative to Trash Containers
+=====================================
+
+Movement to :py:class:`.TrashBin` or :py:class:`.WasteChute` objects is based on the horizontal *center* of the pipette. This is different than movement to labware, which is based on the primary channel (the back channel on 8-channel pipettes, and the back-left channel on 96-channel pipettes in default configuration). Using the center of the pipette ensures that all attached tips are over the trash container for blowing out, dropping tips, or other disposal operations.
+
+.. note::
+    In API version 2.15 and earlier, trash containers are :py:class:`.Labware` objects that have a single well. See :py:obj:`.fixed_trash` and :ref:`position-relative-labware` above.
+
+You can adjust the position of the pipette center with the :py:meth:`.TrashBin.top` and :py:meth:`.WasteChute.top` methods. These methods allow adjustments along the x-, y-, and z-axes. In contrast, ``Well.top()``, :ref:`covered above <well-top>`, only allows z-axis adjustment. With no adjustments, the "top" position is centered on the x- and y-axes and is just below the opening of the trash container.
+
+.. code-block:: python
+
+    trash = protocol.load_trash_bin("A3")
+
+    trash  # pipette center just below trash top center
+    trash.top()  # same position
+    trash.top(z=10)  # 10 mm higher
+    trash.top(y=10)  # 10 mm towards back, default height
+
+.. versionadded:: 2.18
+
+Another difference between the trash container ``top()`` methods and ``Well.top()`` is that they return an object of the same type, not a :py:class:`.Location`. This helps prevent performing undesired actions in trash containers. For example, you can :py:meth:`.aspirate` at a location or from a well, but not from a trash container. On the other hand, you can :py:meth:`.blow_out` at a location, well, trash bin, or waste chute.
 
 .. _protocol-api-deck-coords:
 
@@ -142,7 +198,7 @@ Move To
 
 The :py:meth:`.InstrumentContext.move_to` method moves a pipette to any reachable location on the deck. If the pipette has picked up a tip, it will move the end of the tip to that position; if it hasn't, it will move the pipette nozzle to that position.
 
-The :py:meth:`~.InstrumentContext.move_to` method requires the :py:class:`.Location` argument. The location can be automatically generated by methods like ``Well.top()`` and ``Well.bottom()`` or one you've created yourself, but you can't move a pipette to a well directly:
+The :py:meth:`~.InstrumentContext.move_to` method requires the :py:class:`.Location` argument. The location can be automatically generated by methods like ``Well.top()``, ``Well.bottom()``, and ``Well.mensicus()``, or one you've created yourself. However, you can't move a pipette to a well directly:
 
 .. code-block:: python
 

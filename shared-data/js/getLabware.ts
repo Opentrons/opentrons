@@ -7,8 +7,8 @@ import {
 } from './constants'
 
 import type {
+  LabwareDefinition,
   LabwareDefinition1,
-  LabwareDefinition2,
   WellDefinition,
 } from './types'
 
@@ -43,22 +43,40 @@ export const LABWAREV2_DO_NOT_LIST = [
   'opentrons_ot3_96_tiprack_200ul',
   'opentrons_ot3_96_tiprack_1000ul',
   'opentrons_ot3_96_tiprack_50ul',
+  'opentrons_flex_lid_absorbance_plate_reader_module',
+  'protocol_engine_lid_stack_object',
+  // temporarily blocking 20 uL Flex tip racks until they launch
+  'opentrons_flex_96_tiprack_20ul',
+  'opentrons_flex_96_filtertiprack_20ul',
 ]
 // NOTE(sa, 2020-7-14): in PD we do not want to list calibration blocks
-// but we still might want the rest of the labware in LABWAREV2_DO_NOT_LIST
-// because of legacy protocols that might use them
+// or the adapter/labware combos since we migrated to splitting them up
 export const PD_DO_NOT_LIST = [
   'opentrons_calibrationblock_short_side_left',
   'opentrons_calibrationblock_short_side_right',
   'opentrons_96_aluminumblock_biorad_wellplate_200ul',
   'opentrons_96_aluminumblock_nest_wellplate_100ul',
+  'opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat',
+  'opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt',
+  'opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat',
+  'opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep',
+  'opentrons_96_pcr_adapter_armadillo_wellplate_200ul',
+  'protocol_engine_lid_stack_object',
+  // evotip is not supported in PD
+  'ev_resin_tips_flex_96_tiprack_adapter',
+  'ev_resin_tips_flex_96_labware',
+  'ev_resin_tips_flex_tall_adapter',
+  'ev_resin_tips_flex_short_adapter',
+  // temporarily blocking 20 uL Flex tip racks until they launch
+  'opentrons_flex_96_tiprack_20ul',
+  'opentrons_flex_96_filtertiprack_20ul',
 ]
 
 export function getIsLabwareV1Tiprack(def: LabwareDefinition1): boolean {
   return Boolean(def?.metadata?.isTiprack)
 }
 
-export function getIsTiprack(labwareDef: LabwareDefinition2): boolean {
+export function getIsTiprack(labwareDef: LabwareDefinition): boolean {
   return labwareDef.parameters.isTiprack
 }
 
@@ -83,7 +101,7 @@ const _SHORT_MM_LABWARE_DEF_LOADNAMES = [
 const ENGAGE_HEIGHT_OFFSET = -4
 
 export function getLabwareDefaultEngageHeight(
-  labwareDef: LabwareDefinition2
+  labwareDef: LabwareDefinition
 ): number | null {
   const rawEngageHeight: number | null | undefined =
     labwareDef.parameters.magneticModuleEngageHeight
@@ -142,4 +160,22 @@ export function getWellPropsForSVGLabwareV1(
     x: wellDef.x + xCorrection,
     y: _getSvgYValueForWell(def, wellDef) + yCorrection,
   }))
+}
+
+// determines if the labware is a lid
+export const getIsLid = (labwareDef: LabwareDefinition): boolean =>
+  labwareDef.allowedRoles?.includes('lid') ?? false
+
+// determines if the labware can be a target for pipetting
+export const getIsPipettableLabware = (
+  labwareDef: LabwareDefinition
+): boolean => {
+  // assume the labware can be a pipetting target if labware definition's `allowedRoles` is undefined
+  if (labwareDef.allowedRoles == null) {
+    return true
+  }
+  return (
+    labwareDef.allowedRoles.includes('labware') &&
+    !labwareDef.allowedRoles.includes('lid')
+  )
 }

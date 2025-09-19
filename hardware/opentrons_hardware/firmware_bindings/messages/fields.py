@@ -206,6 +206,14 @@ class FirmwareUpdateDataField(utils.BinaryFieldBase[bytes]):
     FORMAT = f"{NUM_BYTES}s"
 
 
+class BatchSensorDataField(utils.BinaryFieldBase[bytes]):
+    """The data field for many sensor data results."""
+
+    # 14 4-byte data points
+    NUM_BYTES = 56
+    FORMAT = f"{NUM_BYTES}s"
+
+
 class ErrorSeverityField(utils.UInt16Field):
     """A field for error severity."""
 

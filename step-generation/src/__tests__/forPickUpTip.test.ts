@@ -1,14 +1,17 @@
-import { beforeEach, describe, it, expect, vi } from 'vitest'
 import merge from 'lodash/merge'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { makeImmutableStateUpdater } from '../__utils__'
+import { EMPTY } from '../constants'
 import {
-  getInitialRobotStateStandard,
-  makeContext,
-  getTipColumn,
   DEFAULT_PIPETTE,
+  getInitialRobotStateStandard,
+  getTipColumn,
+  makeContext,
 } from '../fixtures'
-import { forPickUpTip as _forPickUpTip } from '../getNextRobotStateAndWarnings/forPickUpTip'
 import { dispenseUpdateLiquidState } from '../getNextRobotStateAndWarnings/dispenseUpdateLiquidState'
+import { forPickUpTip as _forPickUpTip } from '../getNextRobotStateAndWarnings/forPickUpTip'
+
 import type { InvariantContext, RobotState } from '../types'
 
 const forPickUpTip = makeImmutableStateUpdater(_forPickUpTip)
@@ -35,14 +38,24 @@ describe('tip tracking', () => {
     expect(result.warnings).toEqual([])
     expect(result.robotState).toEqual(
       merge({}, initialRobotState, {
+        pipettes: {
+          ...initialRobotState.pipettes,
+          [p300SingleId]: {
+            ...initialRobotState.pipettes[p300SingleId],
+            tipWell: 'A1',
+          },
+        },
         tipState: {
           tipracks: {
             [tiprack1Id]: {
-              A1: false,
+              A1: EMPTY,
             },
           },
           pipettes: {
-            [p300SingleId]: true,
+            [p300SingleId]: {
+              hasTip: true,
+              tiprackURI: tiprack1Id,
+            },
           },
         },
       })
@@ -58,12 +71,22 @@ describe('tip tracking', () => {
     expect(result.warnings).toEqual([])
     expect(result.robotState).toEqual(
       merge({}, initialRobotState, {
+        pipettes: {
+          ...initialRobotState.pipettes,
+          [p300MultiId]: {
+            ...initialRobotState.pipettes[p300MultiId],
+            tipWell: 'A1',
+          },
+        },
         tipState: {
           tipracks: {
-            [tiprack1Id]: getTipColumn(1, false),
+            [tiprack1Id]: getTipColumn(1, EMPTY),
           },
           pipettes: {
-            [p300MultiId]: true,
+            [p300MultiId]: {
+              hasTip: true,
+              tiprackURI: tiprack1Id,
+            },
           },
         },
       })

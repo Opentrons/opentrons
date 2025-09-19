@@ -1,13 +1,20 @@
-import * as React from 'react'
 import { css } from 'styled-components'
-import { SPACING, Flex, COLORS, BORDERS } from '@opentrons/components'
 
+import {
+  BORDERS,
+  COLORS,
+  CURSOR_POINTER,
+  Flex,
+  SPACING,
+} from '@opentrons/components'
+
+import type { ReactNode } from 'react'
 import type { StyleProps } from '@opentrons/components'
 
 interface MiniCardProps extends StyleProps {
   onClick: () => void
   isSelected: boolean
-  children: React.ReactNode
+  children: ReactNode
   isError?: boolean
   isWarning?: boolean
 }
@@ -17,7 +24,7 @@ const unselectedOptionStyles = css`
   border-radius: ${BORDERS.borderRadius8};
   padding: ${SPACING.spacing8};
   width: 100%;
-  cursor: pointer;
+  cursor: ${CURSOR_POINTER};
 
   &:hover {
     background-color: ${COLORS.grey10};

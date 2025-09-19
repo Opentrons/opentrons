@@ -6,8 +6,8 @@
   },
   "metadata": {
     "displayName": "Opentrons Aluminum Flat Bottom Plate",
-    "displayCategory": "adapter",
-    "displayVolumeUnits": "\u00b5L",
+    "displayCategory": "aluminumBlock",
+    "displayVolumeUnits": "µL",
     "tags": []
   },
   "dimensions": {

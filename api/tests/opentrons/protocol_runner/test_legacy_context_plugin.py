@@ -1,11 +1,15 @@
 """Tests for the PythonAndLegacyRunner's LegacyContextPlugin."""
+import asyncio
 import pytest
 from anyio import to_thread
 from decoy import Decoy, matchers
 from datetime import datetime
 from typing import Callable
 
-from opentrons.commands.types import CommandMessage as LegacyCommand, PauseMessage
+from opentrons.legacy_commands.types import (
+    CommandMessage as LegacyCommand,
+    PauseMessage,
+)
 from opentrons.protocol_engine import (
     StateView,
     actions as pe_actions,
@@ -14,17 +18,15 @@ from opentrons.protocol_engine import (
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.util.broker import ReadOnlyBroker
 
+from opentrons.protocol_api.core.legacy.load_info import LoadInfo, LabwareLoadInfo
+
 from opentrons.protocol_runner.legacy_command_mapper import LegacyCommandMapper
 from opentrons.protocol_runner.legacy_context_plugin import LegacyContextPlugin
-from opentrons.protocol_runner.legacy_wrappers import (
-    LegacyLoadInfo,
-    LegacyLabwareLoadInfo,
-)
 
 from opentrons.types import DeckSlotName
 
-from opentrons_shared_data.labware.dev_types import (
-    LabwareDefinition as LabwareDefinitionDict,
+from opentrons_shared_data.labware.types import (
+    LabwareDefinition2 as LabwareDefinition2Dict,
 )
 
 
@@ -35,9 +37,9 @@ def mock_legacy_broker(decoy: Decoy) -> LegacyBroker:
 
 
 @pytest.fixture
-def mock_equipment_broker(decoy: Decoy) -> ReadOnlyBroker[LegacyLoadInfo]:
+def mock_equipment_broker(decoy: Decoy) -> ReadOnlyBroker[LoadInfo]:
     """Get a mocked out `equipment_broker: Broker` dependency."""
-    return decoy.mock(cls=ReadOnlyBroker[LegacyLoadInfo])
+    return decoy.mock(cls=ReadOnlyBroker[LoadInfo])
 
 
 @pytest.fixture
@@ -59,15 +61,16 @@ def mock_action_dispatcher(decoy: Decoy) -> pe_actions.ActionDispatcher:
 
 
 @pytest.fixture
-def subject(
+async def subject(
     mock_legacy_broker: LegacyBroker,
-    mock_equipment_broker: ReadOnlyBroker[LegacyLoadInfo],
+    mock_equipment_broker: ReadOnlyBroker[LoadInfo],
     mock_legacy_command_mapper: LegacyCommandMapper,
     mock_state_view: StateView,
     mock_action_dispatcher: pe_actions.ActionDispatcher,
 ) -> LegacyContextPlugin:
     """Get a configured LegacyContextPlugin with its dependencies mocked out."""
     plugin = LegacyContextPlugin(
+        engine_loop=asyncio.get_running_loop(),
         broker=mock_legacy_broker,
         equipment_broker=mock_equipment_broker,
         legacy_command_mapper=mock_legacy_command_mapper,
@@ -89,7 +92,7 @@ class _ContextManager:
 async def test_broker_subscribe_unsubscribe(
     decoy: Decoy,
     mock_legacy_broker: LegacyBroker,
-    mock_equipment_broker: ReadOnlyBroker[LegacyLoadInfo],
+    mock_equipment_broker: ReadOnlyBroker[LoadInfo],
     subject: LegacyContextPlugin,
 ) -> None:
     """It should subscribe to the brokers on setup and unsubscribe on teardown."""
@@ -122,7 +125,7 @@ async def test_broker_subscribe_unsubscribe(
 async def test_command_broker_messages(
     decoy: Decoy,
     mock_legacy_broker: LegacyBroker,
-    mock_equipment_broker: ReadOnlyBroker[LegacyLoadInfo],
+    mock_equipment_broker: ReadOnlyBroker[LoadInfo],
     mock_legacy_command_mapper: LegacyCommandMapper,
     mock_action_dispatcher: pe_actions.ActionDispatcher,
     subject: LegacyContextPlugin,
@@ -160,27 +163,25 @@ async def test_command_broker_messages(
 
     decoy.when(
         mock_legacy_command_mapper.map_command(command=legacy_command)
-    ).then_return([pe_actions.UpdateCommandAction(engine_command, private_result=None)])
+    ).then_return([pe_actions.SucceedCommandAction(engine_command)])
 
     await to_thread.run_sync(handler, legacy_command)
 
     await subject.teardown()
 
     decoy.verify(
-        mock_action_dispatcher.dispatch(
-            pe_actions.UpdateCommandAction(engine_command, private_result=None)
-        )
+        mock_action_dispatcher.dispatch(pe_actions.SucceedCommandAction(engine_command))
     )
 
 
 async def test_equipment_broker_messages(
     decoy: Decoy,
     mock_legacy_broker: LegacyBroker,
-    mock_equipment_broker: ReadOnlyBroker[LegacyLoadInfo],
+    mock_equipment_broker: ReadOnlyBroker[LoadInfo],
     mock_legacy_command_mapper: LegacyCommandMapper,
     mock_action_dispatcher: pe_actions.ActionDispatcher,
     subject: LegacyContextPlugin,
-    minimal_labware_def: LabwareDefinitionDict,
+    minimal_labware_def: LabwareDefinition2Dict,
 ) -> None:
     """It should dispatch commands from equipment broker messages."""
     # Capture the function that the plugin sets up as its labware load callback.
@@ -194,9 +195,9 @@ async def test_equipment_broker_messages(
 
     subject.setup()
 
-    handler: Callable[[LegacyLabwareLoadInfo], None] = labware_handler_captor.value
+    handler: Callable[[LabwareLoadInfo], None] = labware_handler_captor.value
 
-    load_info = LegacyLabwareLoadInfo(
+    load_info = LabwareLoadInfo(
         labware_definition=minimal_labware_def,
         labware_namespace="some_namespace",
         labware_load_name="some_load_name",
@@ -217,7 +218,7 @@ async def test_equipment_broker_messages(
 
     decoy.when(
         mock_legacy_command_mapper.map_equipment_load(load_info=load_info)
-    ).then_return((engine_command, None))
+    ).then_return([pe_actions.SucceedCommandAction(command=engine_command)])
 
     await to_thread.run_sync(handler, load_info)
 
@@ -225,6 +226,6 @@ async def test_equipment_broker_messages(
 
     decoy.verify(
         mock_action_dispatcher.dispatch(
-            pe_actions.UpdateCommandAction(command=engine_command, private_result=None)
+            pe_actions.SucceedCommandAction(command=engine_command)
         ),
     )

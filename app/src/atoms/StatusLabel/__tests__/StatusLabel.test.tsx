@@ -1,17 +1,23 @@
-import * as React from 'react'
-import { describe, it, expect } from 'vitest'
-import '@testing-library/jest-dom/vitest'
-import { screen } from '@testing-library/react'
-import { C_SKY_BLUE, COLORS } from '@opentrons/components'
-import { StatusLabel } from '..'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { describe, expect, it } from 'vitest'
 
-const render = (props: React.ComponentProps<typeof StatusLabel>) => {
+import '@testing-library/jest-dom/vitest'
+
+import { screen } from '@testing-library/react'
+
+import { C_SKY_BLUE, COLORS } from '@opentrons/components'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+
+import { StatusLabel } from '..'
+
+import type { ComponentProps } from 'react'
+
+const render = (props: ComponentProps<typeof StatusLabel>) => {
   return renderWithProviders(<StatusLabel {...props} />)[0]
 }
 
 describe('StatusLabel', () => {
-  let props: React.ComponentProps<typeof StatusLabel>
+  let props: ComponentProps<typeof StatusLabel>
 
   it('renders an engaged status label with a blue background and text', () => {
     props = {

@@ -1,13 +1,14 @@
-import {
-  SetTemperatureArgs,
+import type {
   DeactivateTemperatureArgs,
+  SetTemperatureArgs,
 } from '@opentrons/step-generation'
-import { HydratedTemperatureFormData } from '../../../form-types'
+import type { HydratedTemperatureFormData } from '../../../form-types'
+
 type TemperatureArgs = SetTemperatureArgs | DeactivateTemperatureArgs
 export const temperatureFormToArgs = (
   hydratedFormData: HydratedTemperatureFormData
 ): TemperatureArgs => {
-  const { moduleId } = hydratedFormData
+  const { moduleId, stepName, stepDetails } = hydratedFormData
   // cast values
   const setTemperature = hydratedFormData.setTemperature === 'true'
   // @ts-expect-error(sa, 2021-6-14): null check targetTemperature
@@ -20,13 +21,17 @@ export const temperatureFormToArgs = (
   if (setTemperature && !Number.isNaN(targetTemperature)) {
     return {
       commandCreatorFnName: 'setTemperature',
-      module: moduleId,
-      targetTemperature,
+      moduleId: moduleId ?? '',
+      celsius: targetTemperature,
+      name: stepName,
+      description: stepDetails,
     }
   } else {
     return {
       commandCreatorFnName: 'deactivateTemperature',
-      module: moduleId,
+      moduleId: moduleId ?? '',
+      name: stepName,
+      description: stepDetails,
     }
   }
 }

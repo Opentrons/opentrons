@@ -1,33 +1,36 @@
-import { COLUMN, NozzleConfigurationStyle } from '@opentrons/shared-data'
-import { uuid } from '../../utils'
+import { formatPyStr, indentPyLines, uuid } from '../../utils'
+
+import type { ConfigureNozzleLayoutParams } from '@opentrons/shared-data'
 import type { CommandCreator } from '../../types'
 
-interface configureNozzleLayoutArgs {
-  pipetteId: string
-  nozzles: NozzleConfigurationStyle
-}
-
-export const configureNozzleLayout: CommandCreator<configureNozzleLayoutArgs> = (
+export const configureNozzleLayout: CommandCreator<ConfigureNozzleLayoutParams> = (
   args,
   invariantContext,
   prevRobotState
 ) => {
-  const { pipetteId, nozzles } = args
-
+  const { pipetteId, configurationParams } = args
+  const { style, primaryNozzle } = configurationParams
   const commands = [
     {
       commandType: 'configureNozzleLayout' as const,
       key: uuid(),
       params: {
         pipetteId,
-        configurationParams: {
-          primaryNozzle: nozzles === COLUMN ? 'A12' : undefined,
-          style: nozzles,
-        },
+        configurationParams,
       },
     },
   ]
+  const pythonName = invariantContext.pipetteEntities[pipetteId].pythonName
+
+  const pythonArgs = [
+    `protocol_api.${style}`,
+    ...(primaryNozzle != null ? [`start=${formatPyStr(primaryNozzle)}`] : []),
+  ]
+
   return {
     commands,
+    python: `${pythonName}.configure_nozzle_layout(\n${indentPyLines(
+      pythonArgs.join(',\n')
+    )},\n)`,
   }
 }

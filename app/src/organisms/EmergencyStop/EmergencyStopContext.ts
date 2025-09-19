@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { createContext } from 'react'
 
 export interface EmergencyStopContextType {
   isEmergencyStopModalDismissed: boolean
@@ -7,9 +7,7 @@ export interface EmergencyStopContextType {
   ) => void
 }
 
-export const EmergencyStopContext = React.createContext<EmergencyStopContextType>(
-  {
-    isEmergencyStopModalDismissed: false,
-    setIsEmergencyStopModalDismissed: () => {},
-  }
-)
+export const EmergencyStopContext = createContext<EmergencyStopContextType>({
+  isEmergencyStopModalDismissed: false,
+  setIsEmergencyStopModalDismissed: () => {},
+})

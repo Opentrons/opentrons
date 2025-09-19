@@ -1,80 +1,85 @@
 import asyncio
+from typing import AsyncGenerator
 
 import pytest
 
 from opentrons.hardware_control import modules, ExecutionManager
+from opentrons.hardware_control.modules.types import (
+    ModuleDisconnectedCallback,
+    ModuleErrorCallback,
+)
 from opentrons.drivers.rpi_drivers.types import USBPort
+
+from opentrons.hardware_control.modules.magdeck import MagDeck
 
 
 @pytest.fixture
-def usb_port():
+def usb_port() -> USBPort:
+    """Token USB port."""
     return USBPort(
         name="",
-        hub=None,
         port_number=0,
         device_path="/dev/ot_module_sim_magdeck0",
     )
 
 
-async def test_sim_initialization(usb_port):
+@pytest.fixture
+async def subject(
+    usb_port: USBPort,
+    mock_execution_manager: ExecutionManager,
+    module_error_callback: ModuleErrorCallback,
+    module_disconnected_callback: ModuleDisconnectedCallback,
+) -> AsyncGenerator[modules.AbstractModule, None]:
+    """Test subject."""
     mag = await modules.build(
         port="/dev/ot_module_sim_magdeck0",
         usb_port=usb_port,
-        type=modules.ModuleType.MAGNETIC,
+        type=modules.ModuleType["MAGNETIC"],
         simulating=True,
         hw_control_loop=asyncio.get_running_loop(),
-        execution_manager=ExecutionManager(),
+        execution_manager=mock_execution_manager,
+        error_callback=module_error_callback,
+        disconnected_callback=module_disconnected_callback,
     )
-    assert isinstance(mag, modules.AbstractModule)
+    try:
+        yield mag
+    finally:
+        await mag.cleanup()
 
 
-async def test_sim_data(usb_port):
-    mag = await modules.build(
-        port="/dev/ot_module_sim_magdeck0",
-        usb_port=usb_port,
-        type=modules.ModuleType.MAGNETIC,
-        simulating=True,
-        hw_control_loop=asyncio.get_running_loop(),
-        execution_manager=ExecutionManager(),
-    )
-    assert mag.status == "disengaged"
-    assert mag.device_info["serial"] == "dummySerialMD"
+async def test_sim_initialization(subject: modules.MagDeck) -> None:
+    """It should initialize to an AbstractModule."""
+    assert isinstance(subject, modules.AbstractModule)
+
+
+async def test_sim_data(subject: modules.MagDeck) -> None:
+    """It should forward simulated data."""
+    assert subject.status == "disengaged"
+    assert subject.device_info["serial"] == "dummySerialMD"
     # return v1 when sim_model is not passed
-    assert mag.device_info["model"] == "mag_deck_v1.1"
-    assert mag.device_info["version"] == "dummyVersionMD"
-    assert mag.live_data["status"] == mag.status
-    assert "data" in mag.live_data
+    assert subject.device_info["model"] == "mag_deck_v1.1"
+    assert subject.device_info["version"] == "dummyVersionMD"
+    assert subject.live_data["status"] == subject.status
+    assert "data" in subject.live_data
 
 
-async def test_sim_state_update(usb_port):
-    mag = await modules.build(
-        port="/dev/ot_module_sim_magdeck0",
-        usb_port=usb_port,
-        type=modules.ModuleType.MAGNETIC,
-        simulating=True,
-        hw_control_loop=asyncio.get_running_loop(),
-        execution_manager=ExecutionManager(),
-    )
-    await mag.calibrate()
-    assert mag.status == "disengaged"
-    await mag.engage(2)
-    assert mag.status == "engaged"
-    await mag.deactivate()
-    assert mag.status == "disengaged"
+async def test_sim_state_update(subject: modules.MagDeck) -> None:
+    """It should update simulated state."""
+    assert isinstance(subject, MagDeck)
+    await subject.calibrate()
+    assert subject.status == "disengaged"
+    await subject.engage(2)
+    assert subject.status == "engaged"
+    await subject.deactivate()
+    assert subject.status == "disengaged"
 
 
-async def test_revision_model_parsing(usb_port):
-    mag = await modules.build(
-        port="",
-        type=modules.ModuleType.MAGNETIC,
-        simulating=True,
-        usb_port=usb_port,
-        hw_control_loop=asyncio.get_running_loop(),
-        execution_manager=ExecutionManager(),
-    )
-    mag._device_info["model"] = "mag_deck_v1.1"
-    assert mag.model() == "magneticModuleV1"
-    mag._device_info["model"] = "mag_deck_v20"
-    assert mag.model() == "magneticModuleV2"
-    del mag._device_info["model"]
-    assert mag.model() == "magneticModuleV1"
+async def test_revision_model_parsing(subject: modules.MagDeck) -> None:
+    """It should parse its own revision."""
+    assert isinstance(subject, MagDeck)
+    subject._device_info["model"] = "mag_deck_v1.1"
+    assert subject.model() == "magneticModuleV1"
+    subject._device_info["model"] = "mag_deck_v20"
+    assert subject.model() == "magneticModuleV2"
+    del subject._device_info["model"]
+    assert subject.model() == "magneticModuleV1"

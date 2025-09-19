@@ -10,7 +10,7 @@ from typing_extensions import TypedDict, Literal
 from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
 )
-from opentrons_shared_data.pipette.dev_types import (
+from opentrons_shared_data.pipette.types import (
     PipetteModel,
     PipetteName,
     ChannelCount,
@@ -20,6 +20,7 @@ from opentrons_shared_data.pipette.pipette_definition import (
     PipetteConfigurations,
     SupportedTipsDefinition,
     PipetteBoundingBoxOffsetDefinition,
+    AvailableSensorDefinition,
 )
 from opentrons_shared_data.gripper import (
     GripperModel,
@@ -84,6 +85,7 @@ class PipetteDict(InstrumentDict):
     tip_length: float
     working_volume: float
     tip_overlap: Dict[str, float]
+    versioned_tip_overlap: Dict[str, Dict[str, float]]
     available_volume: float
     return_tip_height: float
     default_aspirate_flow_rates: Dict[str, float]
@@ -98,6 +100,10 @@ class PipetteDict(InstrumentDict):
     supported_tips: Dict[PipetteTipType, SupportedTipsDefinition]
     pipette_bounding_box_offsets: PipetteBoundingBoxOffsetDefinition
     current_nozzle_map: NozzleMap
+    lld_settings: Optional[Dict[str, Dict[str, float]]]
+    plunger_positions: Dict[str, float]
+    shaft_ul_per_mm: float
+    available_sensors: AvailableSensorDefinition
 
 
 class PipetteStateDict(TypedDict):

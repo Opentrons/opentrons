@@ -1,16 +1,16 @@
-import * as React from 'react'
 import { css } from 'styled-components'
+
 import {
   COLORS,
   Flex,
-  ModuleIcon as SharedModuleIcon,
   POSITION_RELATIVE,
+  ModuleIcon as SharedModuleIcon,
   SPACING,
+  Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-import { Tooltip } from '../../atoms/Tooltip'
 
-import type { AttachedModule } from '../../redux/modules/types'
+import type { AttachedModule } from '/app/redux/modules/types'
 
 const MODULE_ICON_STYLE = css`
   &:hover {
@@ -32,7 +32,7 @@ export function ModuleIcon(props: ModuleIconProps): JSX.Element {
         <SharedModuleIcon
           moduleType={module.moduleType}
           size={SPACING.spacing16}
-          marginX={SPACING.spacing2}
+          marginX={SPACING.spacing4}
           color={COLORS.grey60}
           css={MODULE_ICON_STYLE}
         />

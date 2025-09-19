@@ -13,9 +13,17 @@ module.exports = {
     'prettier',
     'plugin:json/recommended',
     'plugin:storybook/recommended',
+    'plugin:react/jsx-runtime',
   ],
 
-  plugins: ['react', 'react-hooks', 'json', 'testing-library'],
+  plugins: [
+    'react',
+    'react-hooks',
+    'json',
+    'testing-library',
+    'opentrons',
+    '@eslint-react',
+  ],
 
   rules: {
     camelcase: 'off',
@@ -28,6 +36,7 @@ module.exports = {
     'import/no-default-export': 'error',
     '@typescript-eslint/promise-function-async': 'off',
     '@typescript-eslint/default-param-last': 'off',
+    '@typescript-eslint/consistent-indexed-object-style': 'off',
 
     // TODO(mc, 2021-01-29): fix these and remove warning overrides
     'lines-between-class-members': 'warn',
@@ -38,6 +47,30 @@ module.exports = {
     'no-case-declarations': 'warn',
     'prefer-regex-literals': 'warn',
     'react/prop-types': 'warn',
+    'react/jsx-curly-brace-presence': 'warn',
+
+    // Enforce notification hooks
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: '@opentrons/react-api-client',
+            importNames: [
+              'useAllRunsQuery',
+              'useRunQuery',
+              'useAllCommandsQuery',
+              'useCurrentMaintenanceRun',
+              'useDeckConfigurationQuery',
+              'useAllCommandsAsPreSerializedList',
+              'useSearchLabwareOffsets',
+            ],
+            message:
+              'HTTP hook deprecated. Use the equivalent notification wrapper (useNotifyXYZ).',
+          },
+        ],
+      },
+    ],
   },
 
   globals: {},
@@ -79,10 +112,6 @@ module.exports = {
         '@typescript-eslint/no-floating-promises': 'warn',
         '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
         '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'warn',
-        '@typescript-eslint/no-unsafe-argument': 'warn',
-        '@typescript-eslint/consistent-type-imports': 'warn',
-        '@typescript-eslint/consistent-indexed-object-style': 'warn',
-        '@typescript-eslint/no-confusing-void-expression': 'warn',
         '@typescript-eslint/ban-types': 'warn',
         '@typescript-eslint/non-nullable-type-assertion-style': 'warn',
         '@typescript-eslint/await-thenable': 'warn',
@@ -99,6 +128,17 @@ module.exports = {
     },
     {
       files: [
+        './app/src/**/*.@(ts|tsx)',
+        './opentrons-ai-client/src/**/*.@(ts|tsx)',
+        './protocol-designer/src/**/*.@(ts|tsx)',
+      ],
+      rules: {
+        'import/no-absolute-path': 'off',
+        '@eslint-react/no-nested-component-definitions': 'error',
+      },
+    },
+    {
+      files: [
         '**/test/**.js',
         '**/__tests__/**.@(js|ts|tsx)',
         '**/__mocks__/**.@(js|ts|tsx)',
@@ -106,11 +146,13 @@ module.exports = {
         '**/__fixtures__/**.@(js|ts|tsx)',
         '**/fixtures/**.@(js|ts|tsx)',
         'scripts/*.@(js|ts|tsx)',
+        '**/**test.@(js|ts|tsx)',
       ],
       rules: {
         '@typescript-eslint/consistent-type-assertions': 'off',
         '@typescript-eslint/no-var-requires': 'off',
         '@typescript-eslint/explicit-function-return-type': 'off',
+        '@typescript-eslint/no-unsafe-argument': 'off',
         '@typescript-eslint/no-confusing-void-expression': 'warn',
         'node/handle-callback-err': 'off',
       },
@@ -118,10 +160,6 @@ module.exports = {
     {
       files: ['**/__tests__/**test.tsx'],
       extends: ['plugin:testing-library/react'],
-      rules: {
-        'testing-library/no-manual-cleanup': 'off',
-        'testing-library/prefer-screen-queries': 'warn',
-      },
     },
     {
       files: ['**/*.stories.tsx'],
@@ -135,6 +173,72 @@ module.exports = {
       extends: ['plugin:cypress/recommended'],
       rules: {
         'cypress/unsafe-to-chain-command': 'warn',
+      },
+    },
+    // Allow HTTP hooks in notification wrappers and tests
+    {
+      files: ['app/src/resources/**', '**/__tests__/**test**'],
+      rules: {
+        'no-restricted-imports': 'off',
+      },
+    },
+    // Apply tree-of-life import requirements to app as errors
+    {
+      files: ['./app/src/**/*.@(ts|tsx)'],
+      rules: {
+        'opentrons/no-imports-up-the-tree-of-life': 'error',
+      },
+    },
+    {
+      files: ['./protocol-designer/src/**/*.@(ts|tsx)'],
+      rules: {
+        'opentrons/no-imports-up-the-tree-of-life': 'warn',
+        'opentrons/no-margins-in-css': 'warn',
+        'opentrons/no-margins-inline': 'warn',
+        '@eslint-react/no-nested-component-definitions': 'error',
+      },
+    },
+    // apply application structure import requirements to app
+    {
+      files: ['./app/src/**/*.@(ts|tsx)'],
+      rules: {
+        'opentrons/no-imports-across-applications': 'error',
+        'opentrons/no-margins-in-css': 'warn',
+        'opentrons/no-margins-inline': 'warn',
+      },
+    },
+    {
+      files: ['./opentrons-ai-client/src/**/*.@(ts|tsx)'],
+      rules: {
+        'opentrons/no-imports-up-the-tree-of-life': 'warn',
+        'opentrons/no-margins-in-css': 'warn',
+        'opentrons/no-margins-inline': 'warn',
+      },
+    },
+    {
+      files: ['./components/src/**/*.@(ts|tsx)'],
+      rules: {
+        'opentrons/no-margins-in-css': 'warn',
+        'opentrons/no-margins-inline': 'warn',
+      },
+    },
+    {
+      files: ['**/*.tsx'],
+      excludedFiles: ['**/*.stories.tsx'],
+      rules: {
+        // TODO: Switch this rule to 'error' once the CSS modules migration is complete.
+        'react/forbid-dom-props': [
+          'warn',
+          {
+            forbid: [
+              {
+                propName: 'style',
+                message:
+                  'Inline styles are not allowed. Use CSS modules instead.',
+              },
+            ],
+          },
+        ],
       },
     },
   ],

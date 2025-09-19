@@ -39,6 +39,8 @@ You can use these standalone adapter definitions to load Opentrons verified or c
      - ``opentrons_aluminum_flat_bottom_plate``
    * - Opentrons 96 Well Aluminum Block
      - ``opentrons_96_well_aluminum_block``
+   * - Opentrons 96 Deep Well Temperature Module Adapter
+     - ``opentrons_96_deep_well_temp_mod_adapter``
      
 For example, these commands load a PCR plate on top of the 96-well block::
 
@@ -96,11 +98,11 @@ The Temperature Module supports these 96-well block and labware combinations for
 
    * - 96-well block contents
      - API Load Name
-   * - Bio-Rad well plate 200 μL
+   * - Bio-Rad well plate 200 µL
      - ``opentrons_96_aluminumblock_biorad_wellplate_200uL``
-   * - Generic PCR strip 200 μL
+   * - Generic PCR strip 200 µL
      - ``opentrons_96_aluminumblock_generic_pcr_strip_200uL``
-   * - NEST well plate 100 μL
+   * - NEST well plate 100 µL
      - ``opentrons_96_aluminumblock_nest_wellplate_100uL``
 
 This command loads the same physical adapter and labware as the example in the Standalone Adapters section above, but it is also compatible with earlier API versions::

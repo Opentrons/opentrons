@@ -1,64 +1,54 @@
-import * as React from 'react'
 import { screen } from '@testing-library/react'
-import { describe, it, beforeEach, expect } from 'vitest'
+import { beforeEach, describe, it } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { COLORS } from '@opentrons/components'
-import { i18n } from '../../../i18n'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+
 import { UpdateSoftware } from '../UpdateSoftware'
 
-const render = (props: React.ComponentProps<typeof UpdateSoftware>) => {
+import type { ComponentProps } from 'react'
+
+const render = (props: ComponentProps<typeof UpdateSoftware>) => {
   return renderWithProviders(<UpdateSoftware {...props} />, {
     i18nInstance: i18n,
   })
 }
 
 describe('UpdateSoftware', () => {
-  let props: React.ComponentProps<typeof UpdateSoftware>
+  let props: ComponentProps<typeof UpdateSoftware>
   beforeEach(() => {
     props = {
       updateType: 'downloading',
-      processProgress: 50,
     }
   })
-  it('should render text and progressbar - downloading software', () => {
+  it('should render text - downloading software', () => {
     render(props)
     screen.getByText('Downloading software...')
-    const bar = screen.getByTestId('ProgressBar_Bar')
-    expect(bar).toHaveStyle(`background: ${String(COLORS.blue50)}`)
-    expect(bar).toHaveStyle('width: 50%')
   })
-  it('should render text and progressbar - sending software', () => {
+  it('should render text - sending software', () => {
     props = {
       ...props,
-      processProgress: 20,
       updateType: 'sendingFile',
     }
     render(props)
     screen.getByText('Sending software...')
-    const bar = screen.getByTestId('ProgressBar_Bar')
-    expect(bar).toHaveStyle('width: 20%')
   })
-  it('should render text and progressbar - validating software', () => {
+  it('should render text - validating software', () => {
     props = {
       ...props,
-      processProgress: 80,
       updateType: 'validating',
     }
     render(props)
     screen.getByText('Validating software...')
-    const bar = screen.getByTestId('ProgressBar_Bar')
-    expect(bar).toHaveStyle('width: 80%')
   })
-  it('should render text and progressbar - installing software', () => {
+  it('should render text - installing software', () => {
     props = {
       ...props,
-      processProgress: 5,
       updateType: 'installing',
     }
     render(props)
     screen.getByText('Installing software...')
-    const bar = screen.getByTestId('ProgressBar_Bar')
-    expect(bar).toHaveStyle('width: 5%')
   })
 })

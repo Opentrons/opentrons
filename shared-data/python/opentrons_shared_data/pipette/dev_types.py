@@ -1,5 +1,5 @@
 """
-opentrons_shared_data.pipette.dev_types: types for pipette config that
+opentrons_shared_data.pipette.types: types for pipette config that
 require typing_extensions.
 
 This module should only be imported if typing.TYPE_CHECKING is True.
@@ -11,7 +11,7 @@ from typing_extensions import Literal, TypedDict
 
 # TODO(mc, 2022-06-16): remove type alias when able
 # and when certain removal will not break any pickling
-from ..labware.dev_types import LabwareUri as LabwareUri
+from ..labware.types import LabwareUri as LabwareUri
 
 
 PipetteName = Literal[
@@ -31,7 +31,9 @@ PipetteName = Literal[
     "p1000_single_gen2",
     "p1000_single_flex",
     "p1000_multi_flex",
+    "p1000_multi_em",
     "p1000_96",
+    "p200_96",
 ]
 
 
@@ -56,7 +58,9 @@ class PipetteNameType(str, Enum):
     P1000_SINGLE_GEN2 = "p1000_single_gen2"
     P1000_SINGLE_FLEX = "p1000_single_flex"
     P1000_MULTI_FLEX = "p1000_multi_flex"
+    P1000_MULTI_EM = "p1000_multi_em"
     P1000_96 = "p1000_96"
+    P200_96 = "p200_96"
 
 
 # Generic NewType for models because we get new ones frequently and theres

@@ -1,12 +1,11 @@
-import * as React from 'react'
+import type { FC } from 'react'
 
 export interface RouteProps {
   /**
    * the component rendered by a route match
    * drop developed components into slots held by placeholder div components
    */
-  Component: React.FC
-  exact?: boolean
+  Component: FC
   /**
    * a route/page name to render in the nav bar
    */
@@ -23,7 +22,6 @@ export type RobotSettingsTab =
   | 'networking'
   | 'advanced'
   | 'feature-flags'
-  | 'privacy'
 
 export type AppSettingsTab =
   | 'general'
@@ -36,6 +34,7 @@ export type ProtocolRunDetailsTab =
   | 'module-controls'
   | 'run-preview'
   | 'runtime-parameters'
+  | 'camera'
 
 /**
  * desktop app route params type definition
@@ -56,4 +55,11 @@ export interface DesktopRouteParams {
 export interface OnDeviceRouteParams {
   protocolId: string
   runId: string
+  quickTransferId: string
 }
+
+/* The type of electron-created window.
+ * Main: Renders DesktopApp/OnDeviceDisplay
+ * Secondary: Renders SecondaryWindowApp
+ * */
+export type WindowType = 'desktop-main' | 'odd-main' | 'secondary' | null

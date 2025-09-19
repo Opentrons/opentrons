@@ -4,14 +4,14 @@ from __future__ import annotations
 opentrons_shared_data.pipette: functions and types for pipette config
 """
 import copy
-from typing import TYPE_CHECKING, Dict
+from typing import TYPE_CHECKING, Dict, Optional
 import json
 from functools import lru_cache
 
 from .. import load_shared_data
 
 if TYPE_CHECKING:
-    from .dev_types import (
+    from .types import (
         PipetteNameSpecs,
         PipetteModelSpecs,
         PipetteName,
@@ -38,7 +38,7 @@ def model_config() -> PipetteModelSpecs:
     return copy.deepcopy(_model_config())
 
 
-@lru_cache(maxsize=None)
+@lru_cache(maxsize=1)
 def _model_config() -> PipetteModelSpecs:
     return json.loads(
         load_shared_data("pipette/definitions/1/pipetteModelSpecs.json") or "{}"
@@ -50,7 +50,7 @@ def name_config() -> PipetteNameSpecs:
     return _name_config()
 
 
-@lru_cache(maxsize=None)
+@lru_cache(maxsize=1)
 def _name_config() -> PipetteNameSpecs:
     return json.loads(
         load_shared_data("pipette/definitions/1/pipetteNameSpecs.json") or "{}"
@@ -63,7 +63,7 @@ def name_for_model(pipette_model: PipetteModel) -> PipetteName:
 
 
 def fuse_specs(
-    pipette_model: PipetteModel, pipette_name: PipetteName = None
+    pipette_model: PipetteModel, pipette_name: Optional[PipetteName] = None
 ) -> PipetteFusedSpec:
     """Combine the model and name spec for a given model.
 
@@ -73,9 +73,9 @@ def fuse_specs(
     return copy.deepcopy(_fuse_specs_cached(pipette_model, pipette_name))
 
 
-@lru_cache(maxsize=None)
+@lru_cache(maxsize=10)
 def _fuse_specs_cached(
-    pipette_model: PipetteModel, pipette_name: PipetteName = None
+    pipette_model: PipetteModel, pipette_name: Optional[PipetteName] = None
 ) -> PipetteFusedSpec:
     """
     Do the work of fusing the specs inside an lru cache. This can't be the

@@ -1,17 +1,18 @@
-import {
-  createRegularLabware,
-  LabwareWellGroup,
-  //   createIrregularLabware,
-} from '@opentrons/shared-data'
+import { createRegularLabware, getModuleDef } from '@opentrons/shared-data'
+
 import { DISPLAY_VOLUME_UNITS } from './fields'
+import { getIsCustomTubeRack } from './utils'
 
 import type {
+  //   createIrregularLabware,
   LabwareDefinition2,
   LabwareDisplayCategory,
+  LabwareOffset,
+  LabwareWellGroup,
   LabwareWellProperties,
+  ModuleModel,
 } from '@opentrons/shared-data'
 import type { ProcessedLabwareFields } from './fields'
-import { getIsCustomTubeRack } from './utils'
 
 // TODO Ian 2019-07-29: move this constant to shared-data?
 // This is the distance from channel 1 to channel 8 of any 8-channel, not tied to name/model
@@ -32,14 +33,14 @@ export const _getGroupMetadataDisplayCategory = (args: {
 }
 
 export function fieldsToLabware(
-  fields: ProcessedLabwareFields
+  fields: ProcessedLabwareFields,
+  adapterDefinitions?: LabwareDefinition2[]
 ): LabwareDefinition2 {
   // NOTE Ian 2019-07-27: only the 15-50-esque tube rack has multiple grids,
   // and it is not supported in labware creator. So all are regular.
   const isRegularLabware = true
-  const { displayName } = fields
+  const { displayName, compatibleAdapters, compatibleModules } = fields
   const displayCategory = fields.labwareType
-
   if (isRegularLabware) {
     const totalLiquidVolume = fields.wellVolume
     const commonWellProperties = {
@@ -104,6 +105,37 @@ export function fieldsToLabware(
 
     const isTiprack = fields.labwareType === 'tipRack'
 
+    const stackingOffsetWithLabware: Record<string, LabwareOffset> = {}
+    Object.entries(compatibleAdapters).forEach(([loadName, z]) => {
+      const zValue = parseFloat(String(z))
+      const adapterHeight =
+        adapterDefinitions != null
+          ? Object.values(adapterDefinitions).find(
+              definition => definition.parameters.loadName === loadName
+            )?.dimensions.zDimension ?? 0
+          : 0
+
+      stackingOffsetWithLabware[loadName] = {
+        x: 0,
+        y: 0,
+        z: fields.labwareZDimension + adapterHeight - zValue,
+      }
+    })
+
+    const stackingOffsetWithModule: Record<string, LabwareOffset> = {}
+    Object.entries(compatibleModules).forEach(([moduleModel, z]) => {
+      const moduleDefinition = getModuleDef(moduleModel as ModuleModel)
+      return (stackingOffsetWithModule[moduleModel] = {
+        x: 0,
+        y: 0,
+        //  ensure that z is a number!
+        z:
+          fields.labwareZDimension -
+          parseFloat(String(z)) +
+          moduleDefinition.labwareOffset.z,
+      })
+    })
+
     const def = createRegularLabware({
       strict: false,
       metadata: {
@@ -161,11 +193,26 @@ export function fieldsToLabware(
             : { displayCategory: groupMetadataDisplayCategory }),
         },
       },
+      stackingOffsetWithLabware:
+        Object.keys(stackingOffsetWithLabware).length > 0
+          ? stackingOffsetWithLabware
+          : undefined,
+      stackingOffsetWithModule:
+        Object.keys(stackingOffsetWithModule).length > 0
+          ? stackingOffsetWithModule
+          : undefined,
     })
 
     // overwrite loadName from createRegularLabware with ours
     def.parameters.loadName = fields.loadName
-
+    // Calculate stack offset for labware on itself
+    if (fields.stackedLabwareZDimension) {
+      stackingOffsetWithLabware[def.parameters.loadName] = {
+        x: 0,
+        y: 0,
+        z: fields.stackedLabwareZDimension - 2 * fields.labwareZDimension,
+      }
+    }
     return def
   } else {
     throw new Error('use of createIrregularLabware not yet implemented')

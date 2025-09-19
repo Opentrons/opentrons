@@ -8,22 +8,13 @@ REDOC := npx @redocly/cli
 
 # Path of source package
 SRC_PATH = robot_server
-
-# Project to get the version for
-ot_project := $(OPENTRONS_PROJECT)
-project_rs_default = $(if $(ot_project),$(ot_project),robot-stack)
-project_ir_default = $(if $(ot_project),$(ot_project),ot3)
-
+SCRIPTS_PATH = scripts
+TESTS_PATH = tests
 
 # Find the version of the wheel from git using a helper script. We
 # use python here so we can use the same version normalization that will be
 # used to create the wheel.
 wheel_file = dist/$(call python_get_wheelname,robot-server,$(project_rs_default),robot_server,$(BUILD_NUMBER))
-
-# Find the version of the sdist from git using a helper script. We
-# use python here so we can use the same version normalization that will be
-# used to create the sdist.
-sdist_file = dist/$(call python_get_sdistname,robot-server,$(project_rs_default),robot_server)
 
 # Find the branch, sha, version that will be used to update the VERSION.json file
 version_file = $(call python_get_git_version,robot-server,$(project_rs_default),robot_server)
@@ -52,9 +43,9 @@ ot_sources := $(ot_py_sources)
 
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
-clean_cmd = $(SHX) rm -rf build .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc' 'robot_server/**/.mypy_cache'
+clean_cmd = $(SHX) rm -rf build .coverage coverage.xml '*.egg-info'
+clean_cache_cmd = $(SHX) rm -rf '**/__pycache__' '**/*.pyc' '**/.mypy_cache'
 clean_wheel_cmd = $(clean_cmd) dist/*.whl
-clean_sdist_cmd = $(clean_cmd) dist/*.tar.gz
 clean_all_cmd = $(clean_cmd) dist
 # Uvicorn command to run the robot server in dev mode.
 #
@@ -73,10 +64,10 @@ clean_all_cmd = $(clean_cmd) dist
 #     probably POSIX-only.
 dev_port ?= "31950"
 dev_host ?= "localhost"
-run_dev ?= uvicorn "robot_server.app:app" --host $(dev_host) --port $(dev_port) --ws wsproto --lifespan on --reload
+run_dev ?= uvicorn "robot_server.app:app" --host $(dev_host) --port $(dev_port) --ws wsproto --lifespan on --reload --reload-dir robot_server
 
 .PHONY: all
-all: clean sdist wheel
+all: clean wheel
 
 .PHONY: setup
 setup:
@@ -92,24 +83,19 @@ setup-ot2:
 .PHONY: clean
 clean:
 	$(clean_all_cmd)
+	$(clean_cache_cmd)
 
 .PHONY: teardown
 teardown:
-	$(pipenv) --rm
+	-$(pipenv) --rm
 
 .PHONY: wheel
-wheel: export OPENTRONS_PROJECT=$(project_rs_default)
-wheel: setup.py $(ot_sources)
+wheel: export OPENTRONS_PROJECT=$(PROJECT)
+wheel: export HATCH_VCS_TUNABLE_TAG_PATTERN=$(call git_tag_regex_for_project,$(PROJECT))
+wheel: export HATCH_VCS_TUNABLE_RAW_OPTIONS=$(call hatch_raw_options_for_project,$(PROJECT))
+wheel: $(ot_sources)
 	$(clean_wheel_cmd)
-	$(python) setup.py $(wheel_opts) bdist_wheel
-	$(SHX) rm -rf build
-	$(SHX) ls dist
-
-.PHONY: sdist
-sdist: export OPENTRONS_PROJECT=$(project_rs_default)
-sdist: setup.py $(ot_sources)
-	$(clean_sdist_cmd)
-	$(python) setup.py sdist
+	$(python) -m build --wheel .
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
@@ -121,11 +107,15 @@ test:
 test-cov:
 	$(pytest) $(tests) $(test_opts) $(cov_opts)
 
+.PHONT: test-fast
+test-fast:
+	$(pytest) $(tests) $(test_opts) -m 'not slow'
+
 .PHONY: lint
 lint:
-	$(python) -m mypy $(SRC_PATH) $(tests)
+	$(python) -m mypy $(SRC_PATH) $(SCRIPTS_PATH) $(TESTS_PATH)
 	$(python) -m black $(black_opts) --check .
-	$(python) -m flake8 $(SRC_PATH) $(tests) setup.py
+	$(python) -m flake8 $(SRC_PATH) $(SCRIPTS_PATH) $(TESTS_PATH)
 
 .PHONY: format
 format:
@@ -165,13 +155,14 @@ local-shell:
 
 .PHONY: push
 push: wheel
-	$(call push-python-package,$(host),$(ssh_key),$(ssh_opts),$(wheel_file))
+	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/usr/lib/python3.10/site-packages/)
 	$(call push-systemd-unit,$(host),$(ssh_key),$(ssh_opts),./opentrons-robot-server.service)
 	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),opentrons-robot-server)
 
 .PHONY: push-ot3
-push-ot3: sdist
-	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),$(sdist_file),"/opt/opentrons-robot-server","robot_server",,,$(version_file))
+push-ot3: wheel
+	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/opt/opentrons-robot-server/)
+	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),opentrons-robot-server)
 
 .PHONY: install-key
 install-key:

@@ -1,12 +1,14 @@
-import * as React from 'react'
 import { Field } from 'formik'
+
 import { RadioGroup } from '@opentrons/components'
+
 import { reportFieldEdit } from '../analyticsUtils'
-import { getIsHidden } from '../formSelectors'
 import { getLabel } from '../fields'
-import type { LabwareFields } from '../fields'
-import type { RadioGroupProps } from '@opentrons/components'
+import { getIsHidden } from '../formSelectors'
 import fieldStyles from './fieldStyles.module.css'
+
+import type { RadioGroupProps } from '@opentrons/components'
+import type { LabwareFields } from '../fields'
 
 interface Props {
   name: keyof LabwareFields
@@ -18,10 +20,10 @@ export const RadioField = (props: Props): JSX.Element => (
   <Field name={props.name}>
     {/* @ts-expect-error(IL, 2021-03-24): formik types need cleanup w LabwareFields */}
     {({ form, field }) =>
-      getIsHidden(props.name, form.values) ? null : (
+      getIsHidden(props.name, form.values as LabwareFields) ? null : (
         <div className={fieldStyles.field_wrapper}>
           <div className={fieldStyles.field_label}>
-            {getLabel(props.name, form.values)}
+            {getLabel(props.name, form.values as LabwareFields)}
           </div>
           <RadioGroup
             name={field.name}

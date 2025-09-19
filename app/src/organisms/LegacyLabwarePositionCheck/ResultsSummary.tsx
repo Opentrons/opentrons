@@ -1,0 +1,420 @@
+import { Fragment } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import isEqual from 'lodash/isEqual'
+import styled from 'styled-components'
+
+import {
+  ALIGN_CENTER,
+  ALIGN_FLEX_END,
+  BORDERS,
+  COLORS,
+  DeckInfoLabel,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  getLabwareDefinitionsFromCommands,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
+  MODULE_ICON_NAME_BY_TYPE,
+  OVERFLOW_AUTO,
+  PrimaryButton,
+  RESPONSIVENESS,
+  SPACING,
+  TYPOGRAPHY,
+} from '@opentrons/components'
+import {
+  getLabwareDefURI,
+  getLabwareDisplayName,
+  getModuleType,
+  IDENTITY_VECTOR,
+  OT2_ROBOT_TYPE,
+} from '@opentrons/shared-data'
+
+import { SmallButton } from '/app/atoms/buttons'
+import { LabwareOffsetSnippet } from '/app/molecules/LabwareOffsetSnippet'
+import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
+import { LegacyLabwareOffsetTabs } from '/app/organisms/LegacyLabwareOffsetTabs'
+import {
+  getIsLabwareOffsetCodeSnippetsOn,
+  getIsOnDevice,
+} from '/app/redux/config'
+
+import { getDisplayLocation } from './utils/getDisplayLocation'
+
+import type { TFunction } from 'i18next'
+import type {
+  LabwareOffset,
+  LegacyLabwareOffsetCreateData,
+} from '@opentrons/api-client'
+import type {
+  CompletedProtocolAnalysis,
+  LabwareDefinition,
+} from '@opentrons/shared-data'
+import type { ResultsSummaryStep, WorkingOffset } from './types'
+
+const LPC_HELP_LINK_URL =
+  'https://support.opentrons.com/s/article/creating-labware-offsets'
+
+interface ResultsSummaryProps extends ResultsSummaryStep {
+  protocolData: CompletedProtocolAnalysis
+  workingOffsets: WorkingOffset[]
+  existingOffsets: LabwareOffset[]
+  allAppliedOffsets: LegacyLabwareOffsetCreateData[]
+  onCloseClick: () => void
+  isDeletingMaintenanceRun?: boolean
+}
+export const ResultsSummary = (
+  props: ResultsSummaryProps
+): JSX.Element | null => {
+  const { i18n, t } = useTranslation('labware_position_check')
+  const {
+    protocolData,
+    allAppliedOffsets,
+    onCloseClick,
+    isDeletingMaintenanceRun,
+  } = props
+  const labwareDefinitions = getLabwareDefinitionsFromCommands(
+    protocolData.commands
+  )
+  const isSubmittingAndClosing = isDeletingMaintenanceRun
+  const isLabwareOffsetCodeSnippetsOn = useSelector(
+    getIsLabwareOffsetCodeSnippetsOn
+  )
+  const isOnDevice = useSelector(getIsOnDevice)
+
+  const TableComponent = isOnDevice ? (
+    <TerseOffsetTable
+      offsets={allAppliedOffsets}
+      labwareDefinitions={labwareDefinitions}
+    />
+  ) : (
+    <OffsetTable
+      offsets={allAppliedOffsets}
+      labwareDefinitions={labwareDefinitions}
+    />
+  )
+  const JupyterSnippet = (
+    <LabwareOffsetSnippet
+      mode="jupyter"
+      labwareOffsets={allAppliedOffsets}
+      commands={protocolData?.commands ?? []}
+      labware={protocolData?.labware ?? []}
+      modules={protocolData?.modules ?? []}
+      robotType={OT2_ROBOT_TYPE}
+    />
+  )
+  const CommandLineSnippet = (
+    <LabwareOffsetSnippet
+      mode="cli"
+      labwareOffsets={allAppliedOffsets}
+      commands={protocolData?.commands ?? []}
+      labware={protocolData?.labware ?? []}
+      modules={protocolData?.modules ?? []}
+      robotType={OT2_ROBOT_TYPE}
+    />
+  )
+
+  return (
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      padding={SPACING.spacing32}
+      minHeight="29.5rem"
+    >
+      <ScrollContainer flexDirection={DIRECTION_COLUMN} maxHeight="20rem">
+        <Header>{t('new_labware_offset_data')}</Header>
+        {isLabwareOffsetCodeSnippetsOn ? (
+          <LegacyLabwareOffsetTabs
+            TableComponent={TableComponent}
+            JupyterComponent={JupyterSnippet}
+            CommandLineComponent={CommandLineSnippet}
+            marginTop={SPACING.spacing16}
+          />
+        ) : (
+          TableComponent
+        )}
+      </ScrollContainer>
+      {isOnDevice ? (
+        <SmallButton
+          alignSelf={ALIGN_FLEX_END}
+          buttonText={i18n.format(t('complete'), 'capitalize')}
+          iconName={isSubmittingAndClosing ? 'ot-spinner' : null}
+          iconPlacement={isSubmittingAndClosing ? 'startIcon' : null}
+          onClick={onCloseClick}
+        />
+      ) : (
+        <Flex
+          width="100%"
+          marginTop={SPACING.spacing32}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          alignItems={ALIGN_CENTER}
+        >
+          <NeedHelpLink href={LPC_HELP_LINK_URL} />
+          <PrimaryButton
+            onClick={onCloseClick}
+            disabled={isSubmittingAndClosing}
+          >
+            <Flex alignItems={ALIGN_CENTER}>
+              {isSubmittingAndClosing ? (
+                <Icon
+                  size="1rem"
+                  spin
+                  name="ot-spinner"
+                  marginRight={SPACING.spacing8}
+                />
+              ) : null}
+              <LegacyStyledText>
+                {i18n.format(t('complete'), 'capitalize')}
+              </LegacyStyledText>
+            </Flex>
+          </PrimaryButton>
+        </Flex>
+      )}
+    </Flex>
+  )
+}
+
+const Table = styled('table')`
+  ${TYPOGRAPHY.labelRegular}
+  table-layout: auto;
+  width: 100%;
+  border-spacing: 0 ${SPACING.spacing4};
+  margin: ${SPACING.spacing16} 0;
+  text-align: left;
+`
+const TableHeader = styled('th')`
+  text-transform: ${TYPOGRAPHY.textTransformUppercase};
+  color: ${COLORS.black90};
+  font-weight: ${TYPOGRAPHY.fontWeightRegular};
+  font-size: ${TYPOGRAPHY.fontSizeCaption};
+  padding: ${SPACING.spacing4};
+`
+const TableRow = styled('tr')`
+  background-color: ${COLORS.grey20};
+`
+
+const TableDatum = styled('td')`
+  padding: ${SPACING.spacing4};
+  white-space: break-spaces;
+  text-overflow: wrap;
+`
+
+const Header = styled.h1`
+  ${TYPOGRAPHY.h1Default}
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    ${TYPOGRAPHY.level4HeaderSemiBold}
+  }
+`
+
+const LeftRoundedTableDatum = styled(TableDatum)`
+  border-radius: ${BORDERS.borderRadius4} 0 0 ${BORDERS.borderRadius4};
+`
+
+const RightRoundedTableDatum = styled(TableDatum)`
+  border-radius: 0 ${BORDERS.borderRadius4} ${BORDERS.borderRadius4} 0;
+`
+
+const ScrollContainer = styled(Flex)`
+  overflow-y: ${OVERFLOW_AUTO};
+  &::-webkit-scrollbar {
+    width: 0.75rem;
+    background-color: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: ${COLORS.grey50};
+    border-radius: 11px;
+  }
+`
+
+interface OffsetTableProps {
+  offsets: LegacyLabwareOffsetCreateData[]
+  labwareDefinitions: LabwareDefinition[]
+}
+
+const OffsetTable = (props: OffsetTableProps): JSX.Element => {
+  const { offsets, labwareDefinitions } = props
+  const { t, i18n } = useTranslation('labware_position_check')
+  return (
+    <Table>
+      <thead>
+        <tr>
+          <TableHeader>{t('location')}</TableHeader>
+          <TableHeader>{t('labware')}</TableHeader>
+          <TableHeader>{t('legacy_labware_offset_data')}</TableHeader>
+        </tr>
+      </thead>
+
+      <tbody>
+        {offsets.map(({ location, definitionUri, vector }, index) => {
+          const labwareDef = labwareDefinitions.find(
+            def => getLabwareDefURI(def) === definitionUri
+          )
+          const labwareDisplayName =
+            labwareDef != null ? getLabwareDisplayName(labwareDef) : ''
+
+          return (
+            <TableRow key={index}>
+              <LeftRoundedTableDatum>
+                <LegacyStyledText
+                  as="p"
+                  textTransform={TYPOGRAPHY.textTransformCapitalize}
+                >
+                  {getDisplayLocation(
+                    location,
+                    labwareDefinitions,
+                    t as TFunction,
+                    i18n
+                  )}
+                </LegacyStyledText>
+              </LeftRoundedTableDatum>
+              <TableDatum>
+                <LegacyStyledText as="p">{labwareDisplayName}</LegacyStyledText>
+              </TableDatum>
+              <RightRoundedTableDatum>
+                {isEqual(vector, IDENTITY_VECTOR) ? (
+                  <LegacyStyledText>{t('no_labware_offsets')}</LegacyStyledText>
+                ) : (
+                  <Flex>
+                    {[vector.x, vector.y, vector.z].map((axis, index) => (
+                      <Fragment key={index}>
+                        <LegacyStyledText
+                          as="p"
+                          marginLeft={index > 0 ? SPACING.spacing8 : 0}
+                          marginRight={SPACING.spacing4}
+                          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                        >
+                          {['X', 'Y', 'Z'][index]}
+                        </LegacyStyledText>
+                        <LegacyStyledText as="p">
+                          {axis.toFixed(1)}
+                        </LegacyStyledText>
+                      </Fragment>
+                    ))}
+                  </Flex>
+                )}
+              </RightRoundedTableDatum>
+            </TableRow>
+          )
+        })}
+      </tbody>
+    </Table>
+  )
+}
+
+// Very similar to the OffsetTable, but abbreviates certain things to be optimized
+// for smaller screens
+export const TerseOffsetTable = (props: OffsetTableProps): JSX.Element => {
+  const { offsets, labwareDefinitions } = props
+  const { i18n, t } = useTranslation('labware_position_check')
+  return (
+    <TerseTable>
+      <thead>
+        <tr>
+          <TerseHeader>
+            {i18n.format(t('slot_location'), 'capitalize')}
+          </TerseHeader>
+          <TerseHeader>{i18n.format(t('labware'), 'capitalize')}</TerseHeader>
+          <TerseHeader>{i18n.format(t('offsets'), 'capitalize')}</TerseHeader>
+        </tr>
+      </thead>
+
+      <tbody>
+        {offsets.map(({ location, definitionUri, vector }, index) => {
+          const labwareDef = labwareDefinitions.find(
+            def => getLabwareDefURI(def) === definitionUri
+          )
+          const labwareDisplayName =
+            labwareDef != null ? getLabwareDisplayName(labwareDef) : ''
+          return (
+            <TerseTableRow key={index}>
+              <TerseTableDatum>
+                <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing4}>
+                  <DeckInfoLabel deckLabel={location.slotName} />
+                  {location.moduleModel != null ? (
+                    <DeckInfoLabel
+                      iconName={
+                        MODULE_ICON_NAME_BY_TYPE[
+                          getModuleType(location.moduleModel)
+                        ]
+                      }
+                    />
+                  ) : null}
+                </Flex>
+              </TerseTableDatum>
+              <TerseTableDatum>
+                <LegacyStyledText
+                  fontSize={TYPOGRAPHY.fontSize20}
+                  lineHeight={TYPOGRAPHY.lineHeight24}
+                >
+                  {labwareDisplayName}
+                </LegacyStyledText>
+              </TerseTableDatum>
+              <TerseTableDatum>
+                {isEqual(vector, IDENTITY_VECTOR) ? (
+                  <LegacyStyledText>{t('no_labware_offsets')}</LegacyStyledText>
+                ) : (
+                  <Flex>
+                    {[vector.x, vector.y, vector.z].map((axis, index) => (
+                      <Fragment key={index}>
+                        <LegacyStyledText
+                          fontSize={TYPOGRAPHY.fontSize20}
+                          lineHeight={TYPOGRAPHY.lineHeight24}
+                          marginLeft={index > 0 ? SPACING.spacing8 : 0}
+                          marginRight={SPACING.spacing4}
+                          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                        >
+                          {['X', 'Y', 'Z'][index]}
+                        </LegacyStyledText>
+                        <LegacyStyledText
+                          fontSize={TYPOGRAPHY.fontSize20}
+                          lineHeight={TYPOGRAPHY.lineHeight24}
+                        >
+                          {axis.toFixed(1)}
+                        </LegacyStyledText>
+                      </Fragment>
+                    ))}
+                  </Flex>
+                )}
+              </TerseTableDatum>
+            </TerseTableRow>
+          )
+        })}
+      </tbody>
+    </TerseTable>
+  )
+}
+
+const TerseTable = styled('table')`
+  table-layout: auto;
+  width: 100%;
+  border-spacing: 0 ${SPACING.spacing4};
+  margin: ${SPACING.spacing16} 0;
+  text-align: left;
+  tr td:first-child {
+    border-top-left-radius: ${BORDERS.borderRadius8};
+    border-bottom-left-radius: ${BORDERS.borderRadius8};
+    padding-left: ${SPACING.spacing12};
+  }
+  tr td:last-child {
+    border-top-right-radius: ${BORDERS.borderRadius8};
+    border-bottom-right-radius: ${BORDERS.borderRadius8};
+    padding-right: ${SPACING.spacing12};
+  }
+`
+const TerseHeader = styled('th')`
+  font-size: ${TYPOGRAPHY.fontSize20};
+  line-height: ${TYPOGRAPHY.lineHeight24};
+  font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+`
+const TerseTableRow = styled('tr')`
+  background-color: ${COLORS.grey35};
+`
+
+const TerseTableDatum = styled('td')`
+  padding: ${SPACING.spacing12} 0;
+  white-space: break-spaces;
+  text-overflow: wrap;
+`

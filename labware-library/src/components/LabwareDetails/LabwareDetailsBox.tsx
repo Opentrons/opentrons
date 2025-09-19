@@ -1,20 +1,20 @@
 // full-width labware details
-import * as React from 'react'
+import { Fragment } from 'react'
+
 import { getUniqueWellProperties } from '@opentrons/shared-data'
+
 import {
   getWellLabel,
+  ManufacturerStats,
   WellCount,
   WellProperties,
-  ManufacturerStats,
 } from '../labware-ui'
-
 import { DetailsBox } from '../ui'
-import { InsertDetails } from './InsertDetails'
 import { Dimensions } from './Dimensions'
+import { InsertDetails } from './InsertDetails'
+import styles from './styles.module.css'
 import { WellDimensions } from './WellDimensions'
 import { WellSpacing } from './WellSpacing'
-
-import styles from './styles.module.css'
 
 import type { LabwareDefinition } from '../../types'
 
@@ -62,7 +62,7 @@ export function LabwareDetailsBox(props: LabwareDetailsBoxProps): JSX.Element {
               : ''
 
             return (
-              <React.Fragment key={i}>
+              <Fragment key={i}>
                 {!groupMetadata.displayCategory && irregular && (
                   <>
                     <WellCount
@@ -95,7 +95,7 @@ export function LabwareDetailsBox(props: LabwareDetailsBoxProps): JSX.Element {
                   labelSuffix={groupDisplaySuffix}
                   className={styles.details_table}
                 />
-              </React.Fragment>
+              </Fragment>
             )
           })}
         </div>

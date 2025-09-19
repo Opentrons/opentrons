@@ -5,17 +5,24 @@ name: 'Components test, build, and deploy'
 on:
   pull_request:
     paths:
-      - 'Makefile'
-      - 'components/**'
-      - 'app/**/*.stories.@(js|jsx|ts|tsx)'
+      - Makefile
       - 'package.json'
       - '.github/workflows/components-test-build-deploy.yaml'
+      - '**.stories.*'
+      - 'components/**'
+      - 'app/src/atoms/**'
+      - 'app/src/molecules/**'
+      - 'protocol-designer/src/components/**'
   push:
     paths:
-      - 'components/**'
-      - 'app/**/*.stories.@(js|jsx|ts|tsx)'
+      - Makefile
       - 'package.json'
       - '.github/workflows/components-test-build-deploy.yaml'
+      - '**.stories.*'
+      - 'components/**'
+      - 'app/src/atoms/**'
+      - 'app/src/molecules/**'
+      - 'protocol-designer/src/components/**'
     branches:
       - '**'
     tags:
@@ -37,16 +44,19 @@ jobs:
   js-unit-test:
     name: 'components unit tests'
     timeout-minutes: 30
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     steps:
-      - uses: 'actions/checkout@v3'
-      - uses: 'actions/setup-node@v3'
+      - uses: 'actions/checkout@v4'
+      - uses: 'actions/setup-node@v4'
         with:
-          node-version: '18.19.0'
+          node-version: '22.12.0'
       - name: 'install udev for usb-detection'
-        run: sudo apt-get update && sudo apt-get install libudev-dev
+        run: |
+          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+          sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ${{ github.workspace }}/.yarn-cache
@@ -68,18 +78,21 @@ jobs:
 
   build-components-storybook:
     name: 'build components artifact'
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     if: github.event_name != 'pull_request'
     needs: ['js-unit-test']
     steps:
-      - uses: 'actions/checkout@v3'
-      - uses: 'actions/setup-node@v3'
+      - uses: 'actions/checkout@v4'
+      - uses: 'actions/setup-node@v4'
         with:
-          node-version: '18.19.0'
+          node-version: '22.12.0'
       - name: 'install udev for usb-detection'
-        run: sudo apt-get update && sudo apt-get install libudev-dev
+        run: |
+          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+          sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ${{ github.workspace }}/.yarn-cache
@@ -95,7 +108,7 @@ jobs:
       - name: 'build components'
         run: make -C components
       - name: 'upload github artifact'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: 'components-artifact'
           path: storybook-static
@@ -108,35 +121,38 @@ jobs:
     steps:
       - id: determine-build-type
         run: |
-          echo "Determining build type for event ${{github.event_type}} and ref ${{github.ref}}"
-          if [ "${{ format('{0}', github.ref == 'refs/heads/edge') }}" = "true" ] ; then
-            echo "storybook s3 builds for edge"
+          echo "Determining build type for event ${{github.event_name}} and ref ${{github.ref}}"
+          if [ "${{ format('{0}', github.event_name == 'pull_request') }}" = "true" ] ; then
+            echo "No builds for pull requests"
+            echo 'type=none' >> $GITHUB_OUTPUT
+          elif [ "${{ format('{0}', startsWith(github.ref, 'refs/heads/')) }}" = "true" ] ; then
+            echo "storybook s3 builds for branch ${{ github.ref_name }}"
             echo 'type=storybook' >> $GITHUB_OUTPUT
           elif [ "${{ format('{0}', startsWith(github.ref, 'refs/tags/components')) }}" = "true" ] ; then
             echo "publish builds for components tags"
             echo 'type=publish' >> $GITHUB_OUTPUT
           else
-            echo "No build for ref ${{github.ref}} and event ${{github.event_type}}"
+            echo "No build for ref ${{github.ref}} and event ${{github.event_name}}"
             echo 'type=none' >> $GITHUB_OUTPUT
           fi
 
   deploy-components:
     name: 'deploy components storybook artifact to S3'
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     needs:
       ['js-unit-test', 'build-components-storybook', 'determine-build-type']
     if: needs.determine-build-type.outputs.type != 'none'
     steps:
-      - uses: 'actions/checkout@v3'
+      - uses: 'actions/checkout@v4'
       # https://github.com/actions/checkout/issues/290
       - name: 'Fix actions/checkout odd handling of tags'
         if: startsWith(github.ref, 'refs/tags')
         run: |
           git fetch -f origin ${{ github.ref }}:${{ github.ref }}
           git checkout ${{ github.ref }}
-      - uses: 'actions/setup-node@v3'
+      - uses: 'actions/setup-node@v4'
         with:
-          node-version: '18.19.0'
+          node-version: '22.12.0'
       - name: 'set complex environment variables'
         id: 'set-vars'
         uses: actions/github-script@v6
@@ -145,7 +161,7 @@ jobs:
             const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
       - name: 'download components build'
-        uses: 'actions/download-artifact@v3'
+        uses: 'actions/download-artifact@v4'
         with:
           name: components-artifact
           path: ./dist
@@ -156,6 +172,10 @@ jobs:
           AWS_DEFAULT_REGION: us-east-2
         run: |
           aws s3 sync ./dist s3://opentrons-components/${{ env.OT_BRANCH}} --acl public-read
+      - name: 'Set generated URL'
+        run: |
+          echo 'Created component storybook for [${{ env.OT_BRANCH }}](https://s3-us-west-2.amazonaws.com/opentrons-components/${{ env.OT_BRANCH }}/index.html?path=/)' >> $GITHUB_STEP_SUMMARY
+          echo 'Created component storybook for https://s3-us-west-2.amazonaws.com/opentrons-components/${{ env.OT_BRANCH }}/index.html?path=/'
 
   publish-components:
     name: 'publish components package to npm'
@@ -163,26 +183,29 @@ jobs:
     needs: ['js-unit-test', 'determine-build-type']
     if: needs.determine-build-type.outputs.type == 'publish'
     steps:
-      - uses: 'actions/checkout@v3'
+      - uses: 'actions/checkout@v4'
       # https://github.com/actions/checkout/issues/290
       - name: 'Fix actions/checkout odd handling of tags'
         if: startsWith(github.ref, 'refs/tags')
         run: |
           git fetch -f origin ${{ github.ref }}:${{ github.ref }}
           git checkout ${{ github.ref }}
-      - uses: 'actions/setup-node@v3'
+      - uses: 'actions/setup-node@v4'
         with:
-          node-version: '18.19.0'
+          node-version: '22.12.0'
           registry-url: 'https://registry.npmjs.org'
+      - name: 'install udev for usb-detection'
+        run: |
+          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+          sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'setup-js'
         run: |
           npm config set cache ./.npm-cache
           yarn config set cache-folder ./.yarn-cache
-      - name: 'build typescript'
-        run: make build-ts
-      - name: 'build library'
-        run: |
-          make -C components lib
+          make setup-js
+      - name: 'build typescript types'
+        run: make -C components build-ts
       # replace package.json stub version number with version from tag
       - name: 'set version number'
         run: |
@@ -190,12 +213,16 @@ jobs:
           VERSION_STRING=$(echo ${{ github.ref }} | sed 's/refs\/tags\/components@//')
           json -I -f ./components/package.json -e "this.version=\"$VERSION_STRING\""
           json -I -f ./components/package.json -e "this.dependencies['@opentrons/shared-data']=\"$VERSION_STRING\""
-      - uses: 'actions/setup-node@v3'
+          json -I -f ./components/package.json -e "delete this.dependencies['@opentrons/step-generation']"
+      - uses: 'actions/setup-node@v4'
         with:
-          node-version: '18.19.0'
+          node-version: '22.12.0'
           registry-url: 'https://registry.npmjs.org'
       - name: 'publish to npm registry'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          cd ./components && echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ./.npmrc && npm publish --access public
+          cd ./components
+          echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ./.npmrc
+          ls -R # Debug: View contents of ./components
+          npm publish --access public

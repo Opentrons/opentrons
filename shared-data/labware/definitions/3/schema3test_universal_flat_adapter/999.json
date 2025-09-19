@@ -1,0 +1,177 @@
+{
+  "ordering": [],
+  "brand": {
+    "brand": "Opentrons",
+    "brandId": []
+  },
+  "metadata": {
+    "displayName": "Opentrons Universal Flat Heater-Shaker Adapter",
+    "displayCategory": "adapter",
+    "displayVolumeUnits": "µL",
+    "tags": []
+  },
+  "$otSharedSchema": "#/labware/schemas/3",
+  "extents": {
+    "total": {
+      "backLeftBottom": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "frontRightTop": {
+        "x": 127.2,
+        "y": -74.8,
+        "z": 12
+      }
+    }
+  },
+  "features": {
+    "heaterShakerUniversalFlatAdapter": {
+      "flatSupportThermalCouplingZ": 4.7,
+      "deckLeft": {
+        "wallX": 7.52,
+        "screwCenter": {
+          "x": 71.7,
+          "y": -37.4,
+          "z": 0
+        }
+      },
+      "deckRight": {
+        "wallX": -7.52,
+        "screwCenter": {
+          "x": 55.5,
+          "y": -37.4,
+          "z": 0
+        }
+      }
+    }
+  },
+  "wells": {},
+  "groups": [
+    {
+      "metadata": {},
+      "wells": []
+    }
+  ],
+  "parameters": {
+    "format": "96Standard",
+    "quirks": [],
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "loadName": "schema3test_universal_flat_adapter"
+  },
+  "namespace": "opentrons",
+  "version": 999,
+  "schemaVersion": 3,
+  "allowedRoles": ["adapter"],
+  "gripperOffsets": {
+    "default": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "dropOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      }
+    },
+    "A1": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "dropOffset": {
+        "x": 2.0,
+        "y": 0,
+        "z": 0
+      }
+    },
+    "B1": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "dropOffset": {
+        "x": 2.0,
+        "y": 0,
+        "z": 0
+      }
+    },
+    "C1": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "dropOffset": {
+        "x": 2.0,
+        "y": 0,
+        "z": 0
+      }
+    },
+    "D1": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "dropOffset": {
+        "x": 2.0,
+        "y": 0,
+        "z": 0
+      }
+    },
+    "A3": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "dropOffset": {
+        "x": -2.0,
+        "y": 0,
+        "z": 0
+      }
+    },
+    "B3": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "dropOffset": {
+        "x": -2.0,
+        "y": 0,
+        "z": 0
+      }
+    },
+    "C3": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "dropOffset": {
+        "x": -2.0,
+        "y": 0,
+        "z": 0
+      }
+    },
+    "D3": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "dropOffset": {
+        "x": -2.0,
+        "y": 0,
+        "z": 0
+      }
+    }
+  }
+}

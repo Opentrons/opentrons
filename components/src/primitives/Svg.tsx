@@ -1,8 +1,9 @@
 import styled from 'styled-components'
 
-import { styleProps, isntStyleProp } from './style-props'
+import { isntStyleProp, styleProps } from './style-props'
 
-import type { StyleProps, PrimitiveComponent } from './types'
+import type { ComponentProps } from 'react'
+import type { PrimitiveComponent, StyleProps } from './types'
 
 export interface SvgProps extends StyleProps {
   /** attach a width attribute to the <svg> element */
@@ -21,7 +22,6 @@ export interface SvgProps extends StyleProps {
   _cssHeight?: string | number
 }
 
-const SVG_VERSION = '1.1'
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg'
 
 const SVG_PROPS = ['svgWidth', 'svgHeight', '_cssWidth', '_cssHeight']
@@ -44,8 +44,7 @@ export const Svg: PrimitiveComponent<'svg', SvgProps> = styled.svg
     },
   })
   .attrs(
-    (props: SvgProps): React.ComponentProps<PrimitiveComponent<'svg'>> => ({
-      version: SVG_VERSION,
+    (props: SvgProps): ComponentProps<PrimitiveComponent<'svg'>> => ({
       xmlns: SVG_NAMESPACE,
       // map the explicit svgWidth/Height props to width/height attrs
       width: props.svgWidth,

@@ -2,22 +2,31 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { uuid } from '../../utils'
-import { TEMPERATURE_AT_TARGET, TEMPERATURE_DEACTIVATED } from '../../constants'
+
+import {
+  TEMPERATURE_APPROACHING_TARGET,
+  TEMPERATURE_AT_TARGET,
+  TEMPERATURE_DEACTIVATED,
+} from '../../constants'
 import * as errorCreators from '../../errorCreators'
-import type { CommandCreator, WaitForTemperatureArgs } from '../../types'
 import { getModuleState } from '../../robotStateSelectors'
+import { uuid } from '../../utils'
+import * as warningCreators from '../../warningCreators'
+
+import type { TemperatureParams } from '@opentrons/shared-data'
+import type { CommandCreator, CommandCreatorWarning } from '../../types'
 
 /** Set temperature target for specified module. */
-export const waitForTemperature: CommandCreator<WaitForTemperatureArgs> = (
+export const waitForTemperature: CommandCreator<TemperatureParams> = (
   args,
   invariantContext,
   prevRobotState
 ) => {
-  const { module, temperature } = args
-  const moduleState = module ? getModuleState(prevRobotState, module) : null
+  const { moduleId, celsius } = args
+  const moduleState = moduleId ? getModuleState(prevRobotState, moduleId) : null
+  const warnings: CommandCreatorWarning[] = []
 
-  if (module === null || !moduleState) {
+  if (moduleId === null || !moduleState) {
     return {
       errors: [errorCreators.missingModuleError()],
     }
@@ -41,18 +50,28 @@ export const waitForTemperature: CommandCreator<WaitForTemperatureArgs> = (
   const unreachableTemp =
     'status' in moduleState &&
     moduleState.status === TEMPERATURE_AT_TARGET &&
-    moduleState.targetTemperature !== temperature
+    moduleState.targetTemperature !== celsius
+  const potentiallyUnreachableTemp =
+    'status' in moduleState &&
+    moduleState.status === TEMPERATURE_APPROACHING_TARGET &&
+    moduleState.targetTemperature !== celsius
 
   if (
     unreachableTemp ||
-    ('status' in moduleState && moduleState.status === TEMPERATURE_DEACTIVATED)
+    ('status' in moduleState &&
+      moduleState.status === TEMPERATURE_DEACTIVATED) ||
+    ('targetTemp' in moduleState && moduleState.targetTemp == null)
   ) {
     return {
       errors: [errorCreators.missingTemperatureStep()],
     }
   }
 
-  const moduleType = invariantContext.moduleEntities[module]?.type
+  if (potentiallyUnreachableTemp) {
+    warnings.push(warningCreators.potentiallyUnreachableTemp())
+  }
+  const module = invariantContext.moduleEntities[moduleId]
+  const moduleType = module?.type
 
   switch (moduleType) {
     case TEMPERATURE_MODULE_TYPE:
@@ -62,11 +81,13 @@ export const waitForTemperature: CommandCreator<WaitForTemperatureArgs> = (
             commandType: 'temperatureModule/waitForTemperature',
             key: uuid(),
             params: {
-              moduleId: module,
-              celsius: temperature,
+              moduleId,
+              celsius,
             },
           },
         ],
+        warnings: warnings.length > 0 ? warnings : undefined,
+        python: `${module?.pythonName}.await_temperature(${celsius})`,
       }
 
     case HEATERSHAKER_MODULE_TYPE:
@@ -76,16 +97,18 @@ export const waitForTemperature: CommandCreator<WaitForTemperatureArgs> = (
             commandType: 'heaterShaker/waitForTemperature',
             key: uuid(),
             params: {
-              moduleId: module,
-              celsius: temperature,
+              moduleId,
+              celsius,
             },
           },
         ],
+        warnings: warnings.length > 0 ? warnings : undefined,
+        python: `${module?.pythonName}.wait_for_temperature()`,
       }
 
     default:
       console.error(
-        `awaitTemperature expected module ${module} to be ${TEMPERATURE_MODULE_TYPE} or ${HEATERSHAKER_MODULE_TYPE}, got ${moduleType}`
+        `awaitTemperature expected module ${moduleId} to be ${TEMPERATURE_MODULE_TYPE} or ${HEATERSHAKER_MODULE_TYPE}, got ${moduleType}`
       )
       return {
         errors: [errorCreators.missingModuleError()],

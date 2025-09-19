@@ -12,17 +12,13 @@ SHX := npx shx
 # add yarn CLI dev deps to PATH (for cross platform POSIX commands via shx)
 PATH := $(shell cd .. && yarn bin):$(PATH)
 
-ot_project := $(OPENTRONS_PROJECT)
-project_ir_default = $(if $(ot_project),$(ot_project),ot3)
-project_rs_default = $(if $(ot_project),$(ot_project),robot-stack)
-
 # These variables can be overriden when make is invoked to customize the
 # behavior of pytest. For instance,
 # make test tests=tests/ot3usb/abcd.py would run only the
 # specified test
 tests ?= tests
 test_opts ?=
-sdist_file = $(call python_get_sdistname,usb-bridge,$(project_rs_default),ot3usb)
+wheel_file = $(call python_get_wheelname,usb-bridge,$(project_rs_default),ot3usb)
 
 # Find the branch, sha, version that will be used to update the VERSION.json file
 version_file = $(call python_get_git_version,usb-bridge,$(project_rs_default),ot3usb)
@@ -50,7 +46,7 @@ clean:
 
 .PHONY: teardown
 teardown:
-	$(pipenv) --rm
+	-$(pipenv) --rm
 
 .PHONY: test
 test:
@@ -66,14 +62,16 @@ lint:
 format:
 	$(python) -m black ot3usb tests
 
-.PHONY: sdist
-sdist: export OPENTRONS_PROJECT=$(project_rs_default)
-sdist: clean
-	$(python) setup.py sdist
+.PHONY: wheel
+wheel: export OPENTRONS_PROJECT=$(project_rs_default)
+wheel: export HATCH_VCS_TUNABLE_TAG_PATTERN=$(call git_tag_regex_for_project,$(PROJECT))
+wheel: export HATCH_VCS_TUNABLE_RAW_OPTIONS=$(call hatch_raw_options_for_project,$(PROJECT))
+wheel: clean
+	$(python) -m build --wheel .
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
 .PHONY: push-ot3
-push-ot3: sdist
-	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),dist/$(sdist_file),/opt/ot3usb,ot3usb,,,$(version_file))
+push-ot3: wheel
+	$(call push-python,$(host),$(ssh_key),$(ssh_opts),dist/$(wheel_file),/opt/ot3usb/)
 	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),opentrons-usb-bridge)

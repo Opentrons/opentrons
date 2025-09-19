@@ -188,7 +188,7 @@ def _get_legacy_ot_types() -> List[_LegacyTypeInfo]:
         _LegacyTypeInfo(original_name="MovementAxis", current_type=MovementAxis)
     )
 
-    from opentrons_shared_data.pipette.dev_types import PipetteNameType
+    from opentrons_shared_data.pipette.types import PipetteNameType
     _legacy_ot_types.append(
         _LegacyTypeInfo(original_name="PipetteName", current_type=PipetteNameType)
     )

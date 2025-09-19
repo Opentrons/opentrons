@@ -9,6 +9,19 @@
       "default": "/var/lib/opentrons-system-server/",
       "env_names": ["ot_system_server_persistence_directory"],
       "type": "string"
+    },
+    "oem_mode_enabled": {
+      "title": "OEM Mode Enabled",
+      "description": "A flag used to change the default splash screen on system startup. If this flag is disabled (default), the Opentrons loading video will be shown. If this flag is enabled but `oem_mode_splash_custom` is not set, then the default OEM Mode splash screen will be shown. If this flag is enabled and `oem_mode_splash_custom` is set to a PNG filepath, the custom splash screen will be shown.",
+      "default": false,
+      "env_names": ["ot_system_server_oem_mode_enabled"],
+      "type": "bool"
+    },
+    "oem_mode_splash_custom": {
+      "description": "The filepath of the PNG image used as the custom splash screen. Read the description of the `oem_mode_enabled` flag to know how the splash screen changes when the flag is enabled/disabled.",
+      "default": null,
+      "env_names": ["ot_system_server_oem_mode_splash_custom"],
+      "type": "string"
     }
   },
   "additionalProperties": false

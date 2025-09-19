@@ -1,20 +1,19 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  DIRECTION_COLUMN,
-  SPACING,
-  COLORS,
   ALIGN_CENTER,
-  JUSTIFY_CENTER,
-  Box,
   BORDERS,
+  Box,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  JUSTIFY_CENTER,
+  LegacyStyledText,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
-import { ProgressBar } from '../../atoms/ProgressBar'
+import { ProgressBar } from '/app/atoms/ProgressBar'
 
 interface CompleteUpdateSoftwareProps {
   robotName: string
@@ -35,16 +34,16 @@ export function CompleteUpdateSoftware({
         justifyContent={JUSTIFY_CENTER}
         borderRadius={BORDERS.borderRadius12}
       >
-        <StyledText
+        <LegacyStyledText
           as="h2"
           fontWeight={TYPOGRAPHY.fontWeightBold}
           color={COLORS.black90}
         >
           {t('update_complete')}
-        </StyledText>
-        <StyledText as="h3" marginTop={SPACING.spacing16}>
+        </LegacyStyledText>
+        <LegacyStyledText as="h3" marginTop={SPACING.spacing16}>
           {t('restarting_robot')}
-        </StyledText>
+        </LegacyStyledText>
         <Box width="47.5rem">
           <ProgressBar percentComplete={100} />
         </Box>

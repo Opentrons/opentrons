@@ -1,50 +1,90 @@
+import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import values from 'lodash/values'
-import find from 'lodash/find'
-import mapValues from 'lodash/mapValues'
+
 import {
-  getPipetteNameSpecs,
+  FLEX_ROBOT_TYPE,
   GEN_ONE_MULTI_PIPETTES,
+  getCutoutDisplayName,
+  getPipetteSpecsV2,
+  OT2_CUTOUT_BY_SLOT_ID,
+  OT2_ROBOT_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  THERMOCYCLER_MODULE_V2,
+  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { SPAN7_8_10_11_SLOT, TC_SPAN_SLOTS } from '../../constants'
+import {
+  getCutoutIdByAddressableArea,
+  getSlotInLocationStack,
+} from '@opentrons/step-generation'
+
 import { hydrateField } from '../../steplist/fieldLevel'
-import { LabwareDefByDefURI } from '../../labware-defs'
-import type { DeckSlotId, ModuleType } from '@opentrons/shared-data'
+
 import type {
-  AdditionalEquipmentOnDeck,
-  InitialDeckSetup,
-  ModuleOnDeck,
-  FormPipettesByMount,
-  FormPipette,
-  LabwareOnDeck as LabwareOnDeckType,
-} from '../types'
-import type { DeckSlot } from '../../types'
+  AddressableAreaName,
+  CreateCommand,
+  CutoutId,
+  DeckSlotId,
+  LoadLabwareCreateCommand,
+  LoadModuleCreateCommand,
+  ModuleType,
+  MoveLabwareCreateCommand,
+  RobotType,
+} from '@opentrons/shared-data'
 import type {
+  InvariantContext,
   NormalizedPipette,
   NormalizedPipetteById,
-  PipetteEntity,
   PipetteEntities,
-  InvariantContext,
-  ModuleEntity,
+  PipetteEntity,
 } from '@opentrons/step-generation'
-import type { FormData } from '../../form-types'
+import type { FormData, HydratedFormData } from '../../form-types'
+import type { LabwareDefByDefURI } from '../../labware-defs'
+import type { DeckSlot } from '../../types'
+import type {
+  FormPipette,
+  FormPipettesByMount,
+  InitialDeckSetup,
+  LabwareOnDeck as LabwareOnDeckType,
+  ModuleOnDeck,
+} from '../types'
+
 export { createPresavedStepForm } from './createPresavedStepForm'
 
-const slotToCutoutOt2Map: { [key: string]: string } = {
-  '1': 'cutout1',
-  '2': 'cutout2',
-  '3': 'cutout3',
-  '4': 'cutout4',
-  '5': 'cutout5',
-  '6': 'cutout6',
-  '7': 'cutout7',
-  '8': 'cutout8',
-  '9': 'cutout9',
-  '10': 'cutout10',
-  '11': 'cutout11',
-  '12': 'cutout12',
-}
+const MOVABLE_TRASH_CUTOUTS = [
+  {
+    value: 'cutoutA3',
+    slot: 'A3',
+  },
+  {
+    value: 'cutoutA1',
+    slot: 'A1',
+  },
+  {
+    value: 'cutoutB1',
+    slot: 'B1',
+  },
+  {
+    value: 'cutoutB3',
+    slot: 'B3',
+  },
+  {
+    value: 'cutoutC1',
+    slot: 'C1',
+  },
+  {
+    value: 'cutoutC3',
+    slot: 'C3',
+  },
+  {
+    value: 'cutoutD1',
+    slot: 'D1',
+  },
+  {
+    value: 'cutoutD3',
+    slot: 'D3',
+  },
+]
 
 export function getIdsInRange<T extends string | number>(
   orderedIds: T[],
@@ -83,114 +123,89 @@ export function getDeckItemIdInSlot(
 }
 export function denormalizePipetteEntities(
   pipetteInvariantProperties: NormalizedPipetteById,
-  labwareDefs: LabwareDefByDefURI
+  labwareDefs: LabwareDefByDefURI,
+  pipetteLocationUpdate: Record<string, string>
 ): PipetteEntities {
   return reduce(
     pipetteInvariantProperties,
     (acc: PipetteEntities, pipette: NormalizedPipette): PipetteEntities => {
       const pipetteId = pipette.id
-      const spec = getPipetteNameSpecs(pipette.name)
-
+      const spec = getPipetteSpecsV2(pipette.name)
       if (!spec) {
         throw new Error(
           `no pipette spec for pipette id "${pipetteId}", name "${pipette.name}"`
         )
       }
+      const is96Channel = spec.channels === 96
       const pipetteEntity: PipetteEntity = {
         ...pipette,
         spec,
-        tiprackLabwareDef: labwareDefs[pipette.tiprackDefURI],
+        tiprackLabwareDef: pipette.tiprackDefURI.map(def => {
+          if (!labwareDefs[def]) {
+            throw new Error(`pipette.tiprackDefURI "${def}" not in labwareDefs`)
+          }
+          return labwareDefs[def]
+        }),
+        pythonName: is96Channel
+          ? 'pipette'
+          : `pipette_${pipetteLocationUpdate[pipetteId]}`,
       }
       return { ...acc, [pipetteId]: pipetteEntity }
     },
     {}
   )
 }
-export const getSlotIdsBlockedBySpanning = (
-  initialDeckSetup: InitialDeckSetup
+
+export const getSlotIdsBlockedBySpanningForThermocycler = (
+  initialDeckSetup: InitialDeckSetup,
+  robotType: RobotType
 ): DeckSlot[] => {
   const loadedThermocycler = values(initialDeckSetup.modules).find(
     ({ type }: ModuleOnDeck) => type === THERMOCYCLER_MODULE_TYPE
   )
-  if (loadedThermocycler != null) {
-    return loadedThermocycler.slot === SPAN7_8_10_11_SLOT
-      ? ['7', '8', '10', '11']
-      : ['A1', 'B1']
+  if (loadedThermocycler != null && robotType === FLEX_ROBOT_TYPE) {
+    return ['A1', 'B1']
+  } else if (loadedThermocycler != null && robotType === OT2_ROBOT_TYPE) {
+    return ['7', '8', '10', '11']
   }
 
   return []
 }
-//  TODO(jr, 3/13/24): refactor this util it is messy and confusing
+
 export const getSlotIsEmpty = (
   initialDeckSetup: InitialDeckSetup,
   slot: string,
-  /* we don't always want to count the slot as full if there is a staging area present
-     since labware/wasteChute can still go on top of staging areas  **/
-  includeStagingAreas?: boolean
+  discountTrash: boolean
 ): boolean => {
-  //   special-casing the TC's slot A1 for the Flex
+  //  filter out trash slots only when selecting slot but not when
+  //  dragging/dropping
   if (
-    slot === 'cutoutA1' &&
-    Object.values(initialDeckSetup.modules).find(
-      module => module.type === THERMOCYCLER_MODULE_TYPE
-    )
+    Object.values(initialDeckSetup.additionalEquipmentOnDeck).some(
+      ae =>
+        (ae.name === 'trashBin' || ae.name === 'wasteChute') &&
+        getCutoutDisplayName(ae.location as CutoutId) === slot
+    ) &&
+    discountTrash
   ) {
-    return false
-  } else if (
-    slot === SPAN7_8_10_11_SLOT &&
-    TC_SPAN_SLOTS.some(slot => !getSlotIsEmpty(initialDeckSetup, slot))
-  ) {
-    // special "spanning slot" is not empty if there's anything in the slots that it spans,
-    // even when there's no spanning labware/module (eg thermocycler) on the deck
-    return false
-  } else if (getSlotIdsBlockedBySpanning(initialDeckSetup).includes(slot)) {
-    // if a slot is being blocked by a spanning labware/module (eg thermocycler), it's not empty
-    return false
-    //  don't allow duplicating into the trash slot.
-  } else if (slot === '12') {
     return false
   }
-
-  const filteredAdditionalEquipmentOnDeck = values(
-    initialDeckSetup.additionalEquipmentOnDeck
-  ).filter((additionalEquipment: AdditionalEquipmentOnDeck) => {
-    const cutoutForSlotOt2 = slotToCutoutOt2Map[slot]
-    const includeStaging = includeStagingAreas
-      ? true
-      : additionalEquipment.name !== 'stagingArea'
-    if (cutoutForSlotOt2 != null) {
-      //  for Ot-2
-      return additionalEquipment.location === cutoutForSlotOt2 && includeStaging
-    } else {
-      //  for Flex
-      return additionalEquipment.location?.includes(slot) && includeStaging
+  const mappedCutout = OT2_CUTOUT_BY_SLOT_ID[slot]
+  const modulesInSlot = values(initialDeckSetup.modules).filter(
+    (moduleOnDeck: ModuleOnDeck) => {
+      return mappedCutout != null
+        ? moduleOnDeck.slot === slot
+        : slot.includes(moduleOnDeck.slot)
     }
-  })
-  return (
-    [
-      ...values(initialDeckSetup.modules).filter(
-        (moduleOnDeck: ModuleOnDeck) => {
-          const cutoutForSlotOt2 = slotToCutoutOt2Map[slot]
-          return cutoutForSlotOt2 != null
-            ? moduleOnDeck.slot === slot
-            : slot.includes(moduleOnDeck.slot)
-        }
-      ),
-      ...values(initialDeckSetup.labware).filter(
-        (labware: LabwareOnDeckType) => labware.slot === slot
-      ),
-      ...filteredAdditionalEquipmentOnDeck,
-    ].length === 0
   )
-}
-export const getLabwareOnSlot = (
-  initialDeckSetup: InitialDeckSetup,
-  slot: string
-): LabwareOnDeckType | null => {
-  return (
-    find(initialDeckSetup.labware, labware => labware.slot === slot) ?? null
+
+  const labwareInSlot = values(initialDeckSetup.labware).filter(
+    (labware: LabwareOnDeckType) =>
+      getSlotInLocationStack(labware.stack) === slot
   )
+
+  return modulesInSlot.length === 0 && labwareInSlot.length === 0
 }
+
 export const getIsCrashablePipetteSelected = (
   pipettesByMount: FormPipettesByMount
 ): boolean => {
@@ -217,34 +232,104 @@ export const getIsModuleOnDeck = (
   return moduleIds.some(moduleId => modules[moduleId]?.type === moduleType)
 }
 
-const getModuleEntity = (state: InvariantContext, id: string): ModuleEntity => {
-  return state.moduleEntities[id]
-}
-
-// TODO: Ian 2019-01-25 type with hydrated form type, see #3161
 export function getHydratedForm(
   rawForm: FormData,
   invariantContext: InvariantContext
-): FormData {
+): HydratedFormData {
   const hydratedForm = mapValues(rawForm, (value, name) =>
-    hydrateField(invariantContext, name, value)
+    hydrateField(invariantContext, name, value as string)
   )
-  // TODO(IL, 2020-03-23): separate hydrated/denormalized fields from the other fields.
-  // It's confusing that pipette is an ID string before this,
-  // but a PipetteEntity object after this.
-  // For `moduleId` field, it would be surprising to be a ModuleEntity!
-  // Consider nesting all additional fields under 'meta' key,
-  // following what we're doing with 'module'.
-  // See #3161
-  hydratedForm.meta = {}
-
-  if (rawForm?.moduleId != null) {
-    // @ts-expect-error(sa, 2021-6-14): type this properly in #3161
-    hydratedForm.meta.module = getModuleEntity(
-      invariantContext,
-      rawForm.moduleId
-    )
-  }
-  // @ts-expect-error(sa, 2021-6-14):type this properly in #3161
+  //  @ts-expect-error because hydrateField doesn't hydrate every formField type
+  //  need to udpate to hdyrate every field, will do this in a followup
   return hydratedForm
+}
+
+export const getUnoccupiedSlotForTrash = (
+  commands: CreateCommand[],
+  hasWasteChuteCommands: boolean,
+  stagingAreaSlotNames: AddressableAreaName[]
+): string => {
+  const wasteChuteSlot = hasWasteChuteCommands ? [WASTE_CHUTE_CUTOUT] : []
+  const stagingAreaCutoutIds = stagingAreaSlotNames.map(slotName =>
+    getCutoutIdByAddressableArea(
+      slotName,
+      'stagingAreaRightSlot',
+      FLEX_ROBOT_TYPE
+    )
+  )
+  const allLoadLabwareSlotNames = Object.values(commands)
+    .filter(
+      (command): command is LoadLabwareCreateCommand =>
+        command.commandType === 'loadLabware'
+    )
+    .reduce((acc: string[], command) => {
+      const location = command.params.location
+      if (
+        location !== 'offDeck' &&
+        location !== 'systemLocation' &&
+        location !== null &&
+        'slotName' in location
+      ) {
+        return [...acc, location.slotName]
+      }
+      return acc
+    }, [])
+
+  const allLoadModuleSlotNames = Object.values(commands)
+    .filter(
+      (command): command is LoadModuleCreateCommand =>
+        command.commandType === 'loadModule'
+    )
+    .flatMap(command => {
+      //  special-casing Thermocycler
+      if (command.params.model === THERMOCYCLER_MODULE_V2) {
+        return ['A1', command.params.location.slotName]
+      } else {
+        return command.params.location.slotName
+      }
+    })
+
+  const allMoveLabwareLocations = Object.values(commands)
+    .filter(
+      (command): command is MoveLabwareCreateCommand =>
+        command.commandType === 'moveLabware'
+    )
+    .reduce((acc: string[], command) => {
+      const newLocation = command.params.newLocation
+      if (
+        newLocation !== 'offDeck' &&
+        newLocation !== 'systemLocation' &&
+        newLocation !== null &&
+        'slotName' in newLocation
+      ) {
+        return [...acc, newLocation.slotName]
+      }
+      return acc
+    }, [])
+
+  const unoccupiedSlot = MOVABLE_TRASH_CUTOUTS.find(
+    cutout =>
+      !allLoadLabwareSlotNames.includes(cutout.slot) &&
+      !allLoadModuleSlotNames.includes(cutout.slot) &&
+      !allMoveLabwareLocations.includes(cutout.slot) &&
+      !wasteChuteSlot.includes(cutout.value as typeof WASTE_CHUTE_CUTOUT) &&
+      !stagingAreaCutoutIds.includes(cutout.value as CutoutId)
+  )
+  //  if all slots are occupied except for D3 on a staging area, then auto-generate the waste chute
+  if (
+    unoccupiedSlot == null &&
+    !allLoadLabwareSlotNames.includes('D3') &&
+    stagingAreaCutoutIds.includes(WASTE_CHUTE_CUTOUT)
+  ) {
+    return WASTE_CHUTE_CUTOUT
+  }
+
+  if (unoccupiedSlot == null) {
+    console.error(
+      'Expected to find an unoccupied slot for auto-generating a trash bin but could not'
+    )
+    return ''
+  }
+
+  return unoccupiedSlot.slot
 }

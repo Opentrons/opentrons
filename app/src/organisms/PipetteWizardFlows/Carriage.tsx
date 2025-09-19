@@ -1,13 +1,19 @@
-import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import capitalize from 'lodash/capitalize'
-import { COLORS, SPACING, PrimaryButton } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
-import { SmallButton } from '../../atoms/buttons'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { getPipetteAnimations96 } from './utils'
+
+import {
+  COLORS,
+  LegacyStyledText,
+  PrimaryButton,
+  SPACING,
+} from '@opentrons/components'
+
+import { SmallButton } from '/app/atoms/buttons'
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
+
 import { BODY_STYLE, FLOWS, SECTIONS } from './constants'
+import { getPipetteAnimations96 } from './utils'
 
 import type { PipetteWizardStepProps } from './types'
 
@@ -32,6 +38,12 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
             axes: ['rightZ'],
           },
         },
+        {
+          commandType: 'unsafe/updatePositionEstimators' as const,
+          params: {
+            axes: ['x', 'y'],
+          },
+        },
       ],
       false
     )
@@ -39,7 +51,7 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
         proceed()
       })
       .catch(error => {
-        setShowErrorMessage(error.message)
+        setShowErrorMessage(error.message as string)
       })
   }
 
@@ -58,7 +70,7 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
       )}
       rightHandBody={getPipetteAnimations96({
         section: SECTIONS.CARRIAGE,
-        flowType: flowType,
+        flowType,
       })}
       bodyText={
         <Trans
@@ -68,21 +80,24 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
           }
           components={{
             block: (
-              <StyledText css={BODY_STYLE} marginBottom={SPACING.spacing16} />
+              <LegacyStyledText
+                css={BODY_STYLE}
+                marginBottom={SPACING.spacing16}
+              />
             ),
           }}
         />
       }
       back={flowType === FLOWS.ATTACH ? undefined : goBack}
       proceedButton={
-        isOnDevice ? (
+        Boolean(isOnDevice) ? (
           <SmallButton
             onClick={
               flowType === FLOWS.ATTACH
                 ? proceed
                 : handleReattachCarriageProceed
             }
-            buttonText={capitalize(t('shared:continue'))}
+            buttonText={capitalize(t('shared:continue') as string)}
           />
         ) : (
           <PrimaryButton
@@ -92,7 +107,7 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
                 : handleReattachCarriageProceed
             }
           >
-            {capitalize(t('shared:continue'))}
+            {capitalize(t('shared:continue') as string)}
           </PrimaryButton>
         )
       }

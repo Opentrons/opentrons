@@ -8,6 +8,7 @@ import time as t
 from typing import List
 import os
 import argparse
+import pytz
 
 
 class _ABRAsairSensor:
@@ -25,7 +26,7 @@ class _ABRAsairSensor:
         test_name = "ABR-Environment-Monitoring"
         run_id = data.create_run_id()
         file_name = data.create_file_name(test_name, run_id, robot)
-        sensor = asair_sensor.BuildAsairSensor(False, True)
+        sensor = asair_sensor.BuildAsairSensor(False, False, "USB0")
         print(sensor)
         env_data = sensor.get_reading()
         header = [
@@ -49,12 +50,14 @@ class _ABRAsairSensor:
                 "There are no google sheets credentials. Make sure credentials in jupyter notebook."
             )
         results_list = []  # type: List
-        start_time = datetime.datetime.now()
+        timezone = pytz.timezone("America/New_York")
+        start_time = datetime.datetime.now(timezone)
+        # start_time = datetime.datetime.now(tz=tzinfo.utcoffset(timezone))
         while True:
             env_data = sensor.get_reading()
-            timestamp = datetime.datetime.now()
+            timestamp = datetime.datetime.now(timezone)
             # Time adjustment for ABR robot timezone
-            new_timestamp = timestamp - datetime.timedelta(hours=5)
+            new_timestamp = timestamp
             date = new_timestamp.date()
             time = new_timestamp.time()
             temp = env_data.temperature
@@ -72,12 +75,12 @@ class _ABRAsairSensor:
 
             results_list.append(row)
             # Check if duration elapsed
-            elapsed_time = datetime.datetime.now() - start_time
+            elapsed_time = datetime.datetime.now(timezone) - start_time
             if elapsed_time.total_seconds() >= duration * 60:
                 break
             # write to google sheet
             try:
-                if google_sheet.creditals.access_token_expired:
+                if google_sheet.credentials.access_token_expired:
                     google_sheet.gc.login()
                 google_sheet.write_header(header)
                 google_sheet.update_row_index()

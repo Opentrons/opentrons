@@ -1,7 +1,7 @@
-from dataclasses import asdict
+import aiohttp
 import logging
-from typing import cast, Any, Dict, List, Optional, Union
-
+from dataclasses import asdict
+from typing import cast, Annotated, Any, Dict, List, Optional, Union
 from starlette import status
 from fastapi import APIRouter, Depends
 
@@ -32,7 +32,6 @@ from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.errors.error_responses import LegacyErrorResponse
 from robot_server.hardware import (
     get_hardware,
-    get_robot_type,
     get_robot_type_enum,
     get_ot2_hardware,
 )
@@ -57,11 +56,22 @@ from robot_server.persistence.fastapi_dependencies import (
     get_persistence_resetter,
 )
 from robot_server.persistence.persistence_directory import PersistenceResetter
-from opentrons_shared_data.robot.dev_types import RobotTypeEnum
+from opentrons_shared_data.robot.types import RobotTypeEnum
 
 log = logging.getLogger(__name__)
 
 router = APIRouter()
+
+
+# TODO: (ba, 2024-04-11): We should have a proper IPC mechanism to talk between
+# the servers instead of one off endpoint calls like these.
+async def _set_oem_mode_request(enable: bool) -> int:
+    """PUT request to set the OEM Mode for the system server."""
+    async with aiohttp.ClientSession() as session:
+        async with session.put(
+            "http://127.0.0.1:31950/system/oem_mode/enable", json={"enable": enable}
+        ) as resp:
+            return resp.status
 
 
 @router.post(
@@ -77,11 +87,25 @@ router = APIRouter()
 )
 async def post_settings(
     update: AdvancedSettingRequest,
-    hardware: HardwareControlAPI = Depends(get_hardware),
-    robot_type: str = Depends(get_robot_type),
+    hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
+    robot_type: Annotated[RobotTypeEnum, Depends(get_robot_type_enum)],
 ) -> AdvancedSettingsResponse:
     """Update advanced setting (feature flag)"""
     try:
+        # send request to system server if this is the enableOEMMode setting
+        if update.id == "enableOEMMode" and robot_type == RobotTypeEnum.FLEX:
+            resp = await _set_oem_mode_request(
+                # Unlike opentrons.advanced_settings, system-server cannot store
+                # `None`/`null` to restore to default. Storing `False` instead is close
+                # enough.
+                update.value
+                if update.value is not None
+                else False
+            )
+            if resp != 200:
+                # TODO: raise correct error here
+                raise Exception(f"Something went wrong setting OEM Mode. err: {resp}")
+
         await advanced_settings.set_adv_setting(update.id, update.value)
         hardware.hardware_feature_flags = HardwareFeatureFlags.build_from_ff()
         await hardware.set_status_bar_enabled(ff.status_bar_enabled())
@@ -104,21 +128,15 @@ async def post_settings(
     response_model_exclude_unset=True,
 )
 async def get_settings(
-    robot_type: str = Depends(get_robot_type),
+    robot_type: Annotated[RobotTypeEnum, Depends(get_robot_type_enum)],
 ) -> AdvancedSettingsResponse:
     """Get advanced setting (feature flags)"""
     return _create_settings_response(robot_type)
 
 
-def _create_settings_response(robot_type: str) -> AdvancedSettingsResponse:
+def _create_settings_response(robot_type: RobotTypeEnum) -> AdvancedSettingsResponse:
     """Create the feature flag settings response object"""
-    # TODO lc(8-10-2023) We should convert the robot type function to return
-    # the enum value directly.
-    if robot_type == "OT-2 Standard":
-        robot_type_enum = RobotTypeEnum.OT2
-    else:
-        robot_type_enum = RobotTypeEnum.FLEX
-    data = advanced_settings.get_all_adv_settings(robot_type_enum)
+    data = advanced_settings.get_all_adv_settings(robot_type)
 
     if advanced_settings.is_restart_required():
         links = Links(restart="/server/restart")
@@ -152,7 +170,7 @@ def _create_settings_response(robot_type: str) -> AdvancedSettingsResponse:
     },
 )
 async def post_log_level_local(
-    log_level: LogLevel, hardware: HardwareControlAPI = Depends(get_hardware)
+    log_level: LogLevel, hardware: Annotated[HardwareControlAPI, Depends(get_hardware)]
 ) -> V1BasicResponse:
     """Update local log level"""
     level = log_level.log_level
@@ -198,7 +216,7 @@ async def post_log_level_upstream(log_level: LogLevel) -> V1BasicResponse:
     response_model=FactoryResetOptions,
 )
 async def get_settings_reset_options(
-    robot_type: RobotTypeEnum = Depends(get_robot_type_enum),
+    robot_type: Annotated[RobotTypeEnum, Depends(get_robot_type_enum)],
 ) -> FactoryResetOptions:
     reset_options = reset_util.reset_options(robot_type).items()
     return FactoryResetOptions(
@@ -227,11 +245,13 @@ async def get_settings_reset_options(
 )
 async def post_settings_reset_options(
     factory_reset_commands: Dict[reset_util.ResetOptionId, bool],
-    persistence_resetter: PersistenceResetter = Depends(get_persistence_resetter),
-    deck_configuration_store: Optional[DeckConfigurationStore] = Depends(
-        get_deck_configuration_store_failsafe
-    ),
-    robot_type: RobotTypeEnum = Depends(get_robot_type_enum),
+    persistence_resetter: Annotated[
+        PersistenceResetter, Depends(get_persistence_resetter)
+    ],
+    deck_configuration_store: Annotated[
+        Optional[DeckConfigurationStore], Depends(get_deck_configuration_store_failsafe)
+    ],
+    robot_type: Annotated[RobotTypeEnum, Depends(get_robot_type_enum)],
 ) -> V1BasicResponse:
     reset_options = reset_util.reset_options(robot_type)
     not_allowed_options = [
@@ -291,7 +311,7 @@ async def post_settings_reset_options(
     response_model=RobotConfigs,
 )
 async def get_robot_settings(
-    hardware: HardwareControlAPI = Depends(get_hardware),
+    hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
 ) -> RobotConfigs:
     return asdict(hardware.config)
 
@@ -304,7 +324,7 @@ async def get_robot_settings(
     response_model_exclude_unset=True,
 )
 async def get_pipette_settings(
-    hardware: API = Depends(get_ot2_hardware),
+    hardware: Annotated[API, Depends(get_ot2_hardware)],
 ) -> MultiPipetteSettings:
     res = {}
     attached_pipettes = hardware.attached_pipettes
@@ -335,7 +355,7 @@ async def get_pipette_settings(
     },
 )
 async def get_pipette_setting(
-    pipette_id: str, hardware: API = Depends(get_ot2_hardware)
+    pipette_id: str, hardware: Annotated[API, Depends(get_ot2_hardware)]
 ) -> PipetteSettings:
     attached_pipettes = hardware.attached_pipettes
     known_ids = mutable_configurations.known_pipettes(
@@ -365,7 +385,7 @@ async def get_pipette_setting(
 async def patch_pipette_setting(
     pipette_id: str,
     settings_update: PipetteSettingsUpdate,
-    hardware: None = Depends(get_ot2_hardware),
+    hardware: Annotated[None, Depends(get_ot2_hardware)],
 ) -> PipetteSettings:
     # Convert fields to dict of field name to value
     fields = settings_update.setting_fields or {}
@@ -404,7 +424,7 @@ def _pipette_settings_from_mutable_configs(
 
     # TODO(mc, 2020-09-17): s/fields/setting_fields (?)
     # need model and name?
-    return PipetteSettings(  # type: ignore[call-arg]
+    return PipetteSettings(
         info=PipetteSettingsInfo(
             name=cast(str, mutable_configs.get("name", "")),
             model=cast(str, mutable_configs.get("model", "")),

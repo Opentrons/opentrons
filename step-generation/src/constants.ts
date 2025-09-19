@@ -1,8 +1,28 @@
 import {
+  ABSORBANCE_READER_TYPE,
+  HEATERSHAKER_MODULE_TYPE,
+  MAGNETIC_BLOCK_TYPE,
+  MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
+  TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import type { ModuleModel } from '@opentrons/shared-data'
+
+import type {
+  AddressableOffsetVector,
+  ModuleModel,
+  ModuleType,
+} from '@opentrons/shared-data'
+import type {
+  AbsorbanceReaderState,
+  HeaterShakerModuleState,
+  MagneticBlockState,
+  MagneticModuleState,
+  ModuleState,
+  TemperatureModuleState,
+  ThermocyclerModuleState,
+} from './types'
 
 // Temperature statuses
 export const TEMPERATURE_DEACTIVATED: 'TEMPERATURE_DEACTIVATED' =
@@ -18,4 +38,55 @@ export const MODULES_WITH_COLLISION_ISSUES: ModuleModel[] = [
 ]
 export const FIXED_TRASH_ID: 'fixedTrash' = 'fixedTrash'
 
+export const MAGNETIC_MODULE_INITIAL_STATE: MagneticModuleState = {
+  type: MAGNETIC_MODULE_TYPE,
+  engaged: false,
+}
+export const TEMPERATURE_MODULE_INITIAL_STATE: TemperatureModuleState = {
+  type: TEMPERATURE_MODULE_TYPE,
+  status: TEMPERATURE_DEACTIVATED,
+  targetTemperature: null,
+}
+export const THERMOCYCLER_MODULE_INITIAL_STATE: ThermocyclerModuleState = {
+  type: THERMOCYCLER_MODULE_TYPE,
+  blockTargetTemp: null,
+  lidTargetTemp: null,
+  lidOpen: null,
+}
+export const HEATERSHAKER_MODULE_INITIAL_STATE: HeaterShakerModuleState = {
+  type: HEATERSHAKER_MODULE_TYPE,
+  targetTemp: null,
+  targetSpeed: null,
+  latchOpen: null,
+}
+
+const ABSORBANCE_READER_INITIAL_STATE: AbsorbanceReaderState = {
+  type: 'absorbanceReaderType',
+  lidOpen: null,
+  initialization: null,
+}
+const MAGNETIC_BLOCK_INITIAL_STATE: MagneticBlockState = {
+  type: 'magneticBlockType',
+}
+
+// @ts-expect-error Flex stacker not yet supported in step-generation
+export const MODULE_INITIAL_STATE_BY_TYPE: {
+  [moduleType in ModuleType]: ModuleState
+} = {
+  [MAGNETIC_MODULE_TYPE]: MAGNETIC_MODULE_INITIAL_STATE,
+  [TEMPERATURE_MODULE_TYPE]: TEMPERATURE_MODULE_INITIAL_STATE,
+  [THERMOCYCLER_MODULE_TYPE]: THERMOCYCLER_MODULE_INITIAL_STATE,
+  [HEATERSHAKER_MODULE_TYPE]: HEATERSHAKER_MODULE_INITIAL_STATE,
+  [ABSORBANCE_READER_TYPE]: ABSORBANCE_READER_INITIAL_STATE,
+  [MAGNETIC_BLOCK_TYPE]: MAGNETIC_BLOCK_INITIAL_STATE,
+}
+export const OT_2_TRASH_DEF_URI = 'opentrons/opentrons_1_trash_1100ml_fixed/1'
+export const FLEX_TRASH_DEF_URI = 'opentrons/opentrons_1_trash_3200ml_fixed/1'
 export const COLUMN_4_SLOTS = ['A4', 'B4', 'C4', 'D4']
+export const ZERO_OFFSET: AddressableOffsetVector = { x: 0, y: 0, z: 0 }
+
+export const GRIPPER_LOCATION: 'mounted' = 'mounted'
+
+export const CLEAN: 'CLEAN' = 'CLEAN'
+export const DIRTY: 'DIRTY' = 'DIRTY'
+export const EMPTY: 'EMPTY' = 'EMPTY'

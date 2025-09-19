@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import * as Selectors from '../selectors'
 
@@ -217,7 +217,27 @@ describe('shell selectors', () => {
       expect(Selectors.getPinnedProtocolIds(state)).toEqual([])
     })
   })
+  describe('pinnedQuickTransferIds', () => {
+    it('should return id list if pinnedQuickTransferIds is selected', () => {
+      const state: State = {
+        config: {
+          protocols: {
+            pinnedQuickTransferIds: ['2b790468-5d72-45ba-b5da-2fd2e6d93a0e'],
+          },
+        },
+      } as any
+      expect(Selectors.getPinnedQuickTransferIds(state)).toEqual([
+        '2b790468-5d72-45ba-b5da-2fd2e6d93a0e',
+      ])
+    })
 
+    it('should return empty array if saved value in config is empty array', () => {
+      const state: State = {
+        config: { protocols: { pinnedQuickTransferIds: [] } },
+      } as any
+      expect(Selectors.getPinnedQuickTransferIds(state)).toEqual([])
+    })
+  })
   describe('getOnDeviceDisplaySettings', () => {
     it('should return the initial settings OnDeviceDisplaySettings, when starting the unbox flow', () => {
       const state: State = {
@@ -226,7 +246,7 @@ describe('shell selectors', () => {
             sleepMs: 25200000,
             brightness: 4,
             textSize: 1,
-            unfinishedUnboxingFlowRoute: '/welcome',
+            unfinishedUnboxingFlowRoute: '/choose-language',
           },
         },
       } as any
@@ -234,32 +254,24 @@ describe('shell selectors', () => {
         sleepMs: 25200000,
         brightness: 4,
         textSize: 1,
-        unfinishedUnboxingFlowRoute: '/welcome',
+        unfinishedUnboxingFlowRoute: '/choose-language',
       })
     })
   })
 
-  describe('applyHistoricOffsets', () => {
-    it('should return false if applyHistoricOffsets is selected', () => {
+  describe('getUserId', () => {
+    it('should return userId if it exists in config', () => {
       const state: State = {
         config: {
-          protocols: {
-            applyHistoricOffsets: false,
-          },
+          userInfo: { userId: 'test-user-id' },
         },
       } as any
-      expect(Selectors.getApplyHistoricOffsets(state)).toEqual(false)
+      expect(Selectors.getUserId(state)).toEqual('test-user-id')
     })
 
-    it('should return true if applyHistoricOffsets is selected', () => {
-      const state: State = {
-        config: {
-          protocols: {
-            applyHistoricOffsets: true,
-          },
-        },
-      } as any
-      expect(Selectors.getApplyHistoricOffsets(state)).toEqual(true)
+    it('should return an empty string if config is null', () => {
+      const state: State = { config: null } as any
+      expect(Selectors.getUserId(state)).toEqual('')
     })
   })
 })

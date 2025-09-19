@@ -1,26 +1,31 @@
-import { Mount } from '@opentrons/components'
-import {
-  ModuleType,
-  ModuleModel,
-  MAGNETIC_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
+import type { Mount } from '@opentrons/components'
+import type {
+  ABSORBANCE_READER_TYPE,
+  CutoutId,
+  FLEX_STACKER_MODULE_TYPE,
+  FlexModuleCutoutFixtureId,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
+  MAGNETIC_MODULE_TYPE,
+  ModuleModel,
+  ModuleType,
   NozzleConfigurationStyle,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { DeckSlot } from '../types'
-
-import {
-  TemperatureStatus,
+import type {
+  AdditionalEquipmentEntity,
+  LabwareEntity,
   ModuleEntity,
   PipetteEntity,
-  LabwareEntity,
-  AdditionalEquipmentEntity,
+  TemperatureStatus,
+  TOUCHED_PIPETTABLE_LABWARE,
 } from '@opentrons/step-generation'
+import type { DeckSlot } from '../types'
+
 export interface FormPipette {
-  pipetteName: string | null | undefined
-  tiprackDefURI: string | null | undefined
+  pipetteName?: string | null
+  tiprackDefURI?: string[] | null
 }
 export interface FormPipettesByMount {
   left: FormPipette
@@ -28,11 +33,13 @@ export interface FormPipettesByMount {
 }
 // =========== MODULES ========
 export interface FormModule {
-  onDeck: boolean
-  model: ModuleModel | null
+  model: ModuleModel
+  type: ModuleType
   slot: DeckSlot
+  cutoutFixtureId: FlexModuleCutoutFixtureId | null
+  cutoutId: CutoutId | null
 }
-export type FormModulesByType = Record<ModuleType, FormModule>
+export type FormModules = Record<number, FormModule>
 export type ModuleEntities = Record<string, ModuleEntity>
 // NOTE: semi-redundant 'type' key in FooModuleState types is required for Flow to disambiguate 'moduleState'
 export interface MagneticModuleState {
@@ -61,6 +68,23 @@ export interface HeaterShakerModuleState {
 export interface MagneticBlockState {
   type: typeof MAGNETIC_BLOCK_TYPE
 }
+
+export interface FlexStackerModuleState {
+  type: typeof FLEX_STACKER_MODULE_TYPE
+  // TODO: extend this state
+}
+export type InitializationMode = 'single' | 'multi'
+export interface Initialization {
+  mode: InitializationMode
+  wavelengths: number[]
+  referenceWavelength?: number
+}
+
+export interface AbsorbanceReaderState {
+  type: typeof ABSORBANCE_READER_TYPE
+  lidOpen: boolean | null
+  initialization: Initialization | null
+}
 export interface ModuleTemporalProperties {
   slot: DeckSlot
   moduleState:
@@ -69,23 +93,30 @@ export interface ModuleTemporalProperties {
     | ThermocyclerModuleState
     | HeaterShakerModuleState
     | MagneticBlockState
+    | AbsorbanceReaderState
+    | FlexStackerModuleState
 }
 export type ModuleOnDeck = ModuleEntity & ModuleTemporalProperties
 export type ModulesForEditModulesCard = Partial<
-  Record<ModuleType, ModuleOnDeck | null | undefined>
+  Record<ModuleType, ModuleOnDeck[] | null | undefined>
 >
 // =========== LABWARE ========
 export type NormalizedLabwareById = Record<
   string,
   {
     labwareDefURI: string
+    pythonName: string
+    displayCategory: string
   }
 >
 export type NormalizedLabware = NormalizedLabwareById[keyof NormalizedLabwareById]
 // =========== TEMPORAL ONLY =====
 // Temporal properties (eg location) that are time-variant
 export interface LabwareTemporalProperties {
-  slot: DeckSlot
+  stack: string[] // a stack of ids from top to bottom
+  // we currently use this property only to track if a lid has been placed on a "pipettable" labware that could presumably contain liquid
+  // we can expand this type in the future to track other types of sterility for various labware types
+  sterility?: typeof TOUCHED_PIPETTABLE_LABWARE
 }
 export interface PipetteTemporalProperties {
   mount: Mount

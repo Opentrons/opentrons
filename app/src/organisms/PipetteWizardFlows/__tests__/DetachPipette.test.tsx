@@ -1,6 +1,5 @@
-import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, beforeEach, vi, expect } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   LEFT,
@@ -8,28 +7,31 @@ import {
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { InProgressModal } from '/app/molecules/InProgressModal/InProgressModal'
 import {
   mock96ChannelAttachedPipetteInformation,
   mockAttachedPipetteInformation,
-} from '../../../redux/pipettes/__fixtures__'
-import { InProgressModal } from '../../../molecules/InProgressModal/InProgressModal'
-import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
+} from '/app/redux/pipettes/__fixtures__'
+import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
+
 import { FLOWS } from '../constants'
 import { DetachPipette } from '../DetachPipette'
 
-vi.mock('../CheckPipetteButton')
-vi.mock('../../../molecules/InProgressModal/InProgressModal')
+import type { ComponentProps } from 'react'
 
-const render = (props: React.ComponentProps<typeof DetachPipette>) => {
+vi.mock('../CheckPipetteButton')
+vi.mock('/app/molecules/InProgressModal/InProgressModal')
+
+const render = (props: ComponentProps<typeof DetachPipette>) => {
   return renderWithProviders(<DetachPipette {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
 describe('DetachPipette', () => {
-  let props: React.ComponentProps<typeof DetachPipette>
+  let props: ComponentProps<typeof DetachPipette>
   beforeEach(() => {
     props = {
       selectedPipette: SINGLE_MOUNT_PIPETTES,
@@ -50,16 +52,16 @@ describe('DetachPipette', () => {
     vi.mocked(InProgressModal).mockReturnValue(<div>mock in progress</div>)
   })
   it('returns the correct information, buttons work as expected for single mount pipettes', () => {
-    const { getByText, getByTestId, getByLabelText } = render(props)
-    getByText('Loosen screws and detach Flex 1-Channel 1000 μL')
-    getByText(
+    render(props)
+    screen.getByText('Loosen screws and detach Flex 1-Channel 1000 µL')
+    screen.getByText(
       'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette.'
     )
-    getByTestId(
+    screen.getByTestId(
       '/app/src/assets/videos/pipette-wizard-flows/Pipette_Detach_1_L.webm'
     )
-    getByText('Continue')
-    const backBtn = getByLabelText('back')
+    screen.getByText('Continue')
+    const backBtn = screen.getByLabelText('back')
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()
   })
@@ -82,7 +84,7 @@ describe('DetachPipette', () => {
       },
     }
     render(props)
-    screen.getByText('Loosen screws and detach Flex 96-Channel 1000 μL')
+    screen.getByText('Loosen screws and detach Flex 96-Channel 1000 µL')
     screen.getByText(
       'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette.'
     )
@@ -112,7 +114,7 @@ describe('DetachPipette', () => {
       selectedPipette: NINETY_SIX_CHANNEL,
     }
     render(props)
-    screen.getByText('Loosen screws and detach Flex 1-Channel 1000 μL')
+    screen.getByText('Loosen screws and detach Flex 1-Channel 1000 µL')
     screen.getByText(
       'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette.'
     )

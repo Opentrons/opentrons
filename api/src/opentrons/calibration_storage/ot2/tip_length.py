@@ -7,7 +7,7 @@ from dataclasses import asdict
 from opentrons import config
 
 from .. import file_operators as io, helpers, types as local_types
-from opentrons_shared_data.pipette.dev_types import LabwareUri
+from opentrons_shared_data.pipette.types import LabwareUri
 
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.util.helpers import utc_now
@@ -16,7 +16,7 @@ from opentrons.util.helpers import utc_now
 from .models import v1
 
 if typing.TYPE_CHECKING:
-    from opentrons_shared_data.labware.dev_types import LabwareDefinition
+    from opentrons_shared_data.labware.types import LabwareDefinition2
 
 
 log = logging.getLogger(__name__)
@@ -24,13 +24,14 @@ log = logging.getLogger(__name__)
 
 
 def _convert_tip_length_model_to_dict(
-    to_dict: typing.Dict[LabwareUri, v1.TipLengthModel]
+    to_dict: typing.Dict[LabwareUri, v1.TipLengthModel],
 ) -> typing.Dict[LabwareUri, typing.Any]:
+    # TODO[pydantic]: supported in Pydantic V2
     # This is a workaround since pydantic doesn't have a nice way to
     # add encoders when converting to a dict.
     dict_of_tip_lengths = {}
     for key, item in to_dict.items():
-        dict_of_tip_lengths[key] = json.loads(item.json())
+        dict_of_tip_lengths[key] = json.loads(item.model_dump_json())
     return dict_of_tip_lengths
 
 
@@ -77,7 +78,7 @@ def tip_lengths_for_pipette(
 
 
 def load_tip_length_calibration(
-    pip_id: str, definition: "LabwareDefinition"
+    pip_id: str, definition: "LabwareDefinition2"
 ) -> v1.TipLengthModel:
     """
     Function used to grab the current tip length associated
@@ -126,7 +127,7 @@ def get_all_tip_length_calibrations() -> typing.List[v1.TipLengthCalibration]:
     return all_tip_lengths_available
 
 
-def get_custom_tiprack_definition_for_tlc(labware_uri: str) -> "LabwareDefinition":
+def get_custom_tiprack_definition_for_tlc(labware_uri: str) -> "LabwareDefinition2":
     """
     Return the custom tiprack definition saved in the custom tiprack directory
     during tip length calibration
@@ -136,7 +137,7 @@ def get_custom_tiprack_definition_for_tlc(labware_uri: str) -> "LabwareDefinitio
     try:
         with open(custom_tiprack_path, "rb") as f:
             return typing.cast(
-                "LabwareDefinition",
+                "LabwareDefinition2",
                 json.loads(f.read().decode("utf-8")),
             )
     except FileNotFoundError:
@@ -175,12 +176,14 @@ def delete_tip_length_calibration(
             io.save_to_file(tip_length_dir, pipette_id, dict_of_tip_lengths)
         else:
             io.delete_file(tip_length_dir / f"{pipette_id}.json")
-    elif tiprack_hash and any(tiprack_hash in v.dict() for v in tip_lengths.values()):
+    elif tiprack_hash and any(
+        tiprack_hash in v.model_dump() for v in tip_lengths.values()
+    ):
         # NOTE this is for backwards compatibilty only
         # TODO delete this check once the tip_length DELETE router
         # no longer depends on a tiprack hash
         for k, v in tip_lengths.items():
-            if tiprack_hash in v.dict():
+            if tiprack_hash in v.model_dump():
                 tip_lengths.pop(k)
         if tip_lengths:
             dict_of_tip_lengths = _convert_tip_length_model_to_dict(tip_lengths)
@@ -210,7 +213,7 @@ def clear_tip_length_calibration() -> None:
 
 
 def create_tip_length_data(
-    definition: "LabwareDefinition",
+    definition: "LabwareDefinition2",
     length: float,
     cal_status: typing.Optional[
         typing.Union[local_types.CalibrationStatus, v1.CalibrationStatus]
@@ -248,7 +251,7 @@ def create_tip_length_data(
 
 def _save_custom_tiprack_definition(
     labware_uri: str,
-    definition: "LabwareDefinition",
+    definition: "LabwareDefinition2",
 ) -> None:
     namespace, load_name, version = labware_uri.split("/")
     custom_tr_dir_path = config.get_custom_tiprack_def_path()

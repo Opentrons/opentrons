@@ -1,16 +1,16 @@
-import {
-  LoadedPipette,
+import type {
+  Liquid,
   LoadedLabware,
   LoadedModule,
-  Liquid,
+  LoadedPipette,
   PipetteName,
 } from '../../../js'
-import type { CreateCommand, RunTimeCommand } from './command'
 import type {
   LabwareDefinition2,
   ModuleModel,
   RobotType,
 } from '../../../js/types'
+import type { CreateCommand, RunTimeCommand } from './command'
 
 export * from './command'
 

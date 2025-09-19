@@ -7,6 +7,7 @@ from hashlib import md5
 from .file_reader_writer import BufferedFile
 
 
+# TODO (spp: 2024-06-17): move file hasher to utils
 class FileHasher:
     """Hashing utility class that hashes a combination of protocol and labware files."""
 

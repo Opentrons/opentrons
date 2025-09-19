@@ -1,14 +1,14 @@
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { TestScheduler } from 'rxjs/testing'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import * as Cfg from '../../config'
+import { analyticsEpic } from '../epic'
+import { makeEvent } from '../make-event'
 import {
   initializeMixpanel,
-  trackEvent,
   setMixpanelTracking,
+  trackEvent,
 } from '../mixpanel'
-import { makeEvent } from '../make-event'
-import { analyticsEpic } from '../epic'
 
 import type { Action, State } from '../../types'
 

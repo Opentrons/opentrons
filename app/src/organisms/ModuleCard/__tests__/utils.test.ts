@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest'
+import { act, renderHook } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   mockHeaterShaker,
@@ -8,8 +9,12 @@ import {
   mockTemperatureModuleGen2,
   mockThermocycler,
   mockThermocyclerGen2,
-} from '../../../redux/modules/__fixtures__'
-import { getModuleCardImage } from '../utils'
+} from '/app/redux/modules/__fixtures__'
+import { useDispatchApiRequest } from '/app/redux/robot-api'
+
+import { getModuleCardImage, useModuleApiRequests } from '../utils'
+
+vi.mock('/app/redux/robot-api')
 
 const mockThermocyclerGen2ClosedLid = {
   id: 'thermocycler_id2',
@@ -26,6 +31,27 @@ const mockThermocyclerGen1ClosedLid = {
   moduleType: 'thermocyclerModuleType',
   data: {
     lidStatus: 'closed',
+  },
+} as any
+
+const mockFlexStacker = {
+  id: 'flex_stacker_id',
+  serialNumber: 'fs123',
+  hardwareRevision: 'flex_stacker_v1.0',
+  moduleModel: 'flexStackerModuleV1',
+  moduleType: 'flexStackerModuleType',
+  firmwareVersion: 'v2.0.0',
+  hasAvailableUpdate: false,
+  usbPort: {
+    path: '/dev/ot_module_flex_stacker',
+    hub: false,
+    port: 1,
+    portGroup: 'unknown',
+  },
+  data: {
+    platformState: 'extended',
+    hopperDoorState: 'closed',
+    status: 'idle',
   },
 } as any
 
@@ -81,5 +107,35 @@ describe('getModuleCardImage', () => {
     expect(result).toEqual(
       '/app/src/assets/images/thermocycler_gen_2_closed.png'
     )
+  })
+  it('should render the correct image string when there is a flex stacker is attached', () => {
+    const result = getModuleCardImage(mockFlexStacker)
+    expect(result).toEqual('/app/src/assets/images/flex_stacker_no_labware.png')
+  })
+})
+
+const updateModuleAction = { meta: { requestId: '12345' } }
+const MOCK_ROBOT_NAME = 'MOCK_ROBOT'
+const MOCK_SERIAL_NUMBER = '1234'
+const mockDispatchApiRequest = () => updateModuleAction
+
+describe('useModuleApiRequests', () => {
+  beforeEach(() => {
+    vi.mocked(useDispatchApiRequest).mockReturnValue([
+      mockDispatchApiRequest,
+    ] as any)
+  })
+
+  it('should dispatch an API request and update requestIdsBySerial on handleModuleApiRequests', () => {
+    const { result } = renderHook(() => useModuleApiRequests())
+
+    act(() => {
+      result.current[1](MOCK_ROBOT_NAME, MOCK_SERIAL_NUMBER)
+    })
+
+    expect(result.current[0](MOCK_SERIAL_NUMBER)).toEqual(
+      updateModuleAction.meta.requestId
+    )
+    expect(result.current[0]('NON_EXISTENT_SERIAL')).toBeNull()
   })
 })

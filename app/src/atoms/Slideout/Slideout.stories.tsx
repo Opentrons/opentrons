@@ -1,48 +1,53 @@
-import * as React from 'react'
-import { TYPOGRAPHY, PrimaryBtn, COLORS, SPACING } from '@opentrons/components'
-import { Slideout } from './index'
-import { StyledText } from '../text'
+import { Fragment } from 'react'
+import { action } from '@storybook/addon-actions'
 
-import type { Story, Meta } from '@storybook/react'
+import {
+  COLORS,
+  PrimaryButton,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 
-export default {
+import { Slideout as SlideoutComponent } from './index'
+
+import type { Meta, StoryObj } from '@storybook/react'
+
+const meta: Meta<typeof SlideoutComponent> = {
   title: 'App/Atoms/Slideout',
-  component: Slideout,
-  argTypes: { onClick: { action: 'clicked' } },
-} as Meta
+  component: SlideoutComponent,
+  args: {
+    onCloseClick: action('clicked'),
+  },
+}
 
-const Template: Story<React.ComponentProps<typeof Slideout>> = args => (
-  <Slideout {...args} />
-)
+export default meta
+
+type Story = StoryObj<typeof SlideoutComponent>
 
 const Children = (
-  <React.Fragment>
+  <Fragment>
     <StyledText
-      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-      fontSize={TYPOGRAPHY.fontSizeP}
+      desktopStyle="bodyDefaultSemiBold"
       paddingTop={SPACING.spacing4}
     >
       {'this is where the slideout body goes'}
     </StyledText>
 
-    <PrimaryBtn
+    <PrimaryButton
       backgroundColor={COLORS.blue50}
       marginTop="28rem"
       textTransform={TYPOGRAPHY.textTransformNone}
     >
-      <StyledText
-        fontWeight={TYPOGRAPHY.fontWeightRegular}
-        fontSize={TYPOGRAPHY.fontSizeP}
-      >
-        {'btn text'}
-      </StyledText>
-    </PrimaryBtn>
-  </React.Fragment>
+      <StyledText desktopStyle="bodyDefaultRegular">{'btn text'}</StyledText>
+    </PrimaryButton>
+  </Fragment>
 )
 
-export const Primary = Template.bind({})
-Primary.args = {
-  title: 'This is the slideout title with the max width',
-  children: Children,
-  isExpanded: 'true',
+export const Slideout: Story = {
+  args: {
+    title: 'This is the slideout title with the max width',
+    children: Children,
+    isExpanded: true,
+  },
 }

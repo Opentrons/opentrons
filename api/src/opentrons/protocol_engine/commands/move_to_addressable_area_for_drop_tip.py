@@ -1,24 +1,41 @@
 """Move to addressable area for drop tip command request, result, and implementation models."""
 from __future__ import annotations
-from pydantic import Field
-from typing import TYPE_CHECKING, Optional, Type
+from typing import TYPE_CHECKING, Optional, Type, Any
 from typing_extensions import Literal
 
+from pydantic import Field
+from pydantic.json_schema import SkipJsonSchema
+
 from ..errors import LocationNotAccessibleByPipetteError
-from ..types import DeckPoint, AddressableOffsetVector
+from ..types import AddressableOffsetVector
 from ..resources import fixture_validation
 from .pipetting_common import (
     PipetteIdMixin,
+)
+from .movement_common import (
     MovementMixin,
     DestinationPositionResult,
+    move_to_addressable_area,
+    StallOrCollisionError,
 )
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from .command import (
+    AbstractCommandImpl,
+    BaseCommand,
+    BaseCommandCreate,
+    SuccessData,
+    DefinedErrorData,
+)
 
 if TYPE_CHECKING:
     from ..execution import MovementHandler
-    from ..state import StateView
+    from ..state.state import StateView
+    from ..resources.model_utils import ModelUtils
 
 MoveToAddressableAreaForDropTipCommandType = Literal["moveToAddressableAreaForDropTip"]
+
+
+def _remove_default(s: dict[str, Any]) -> None:
+    s.pop("default", None)
 
 
 class MoveToAddressableAreaForDropTipParams(PipetteIdMixin, MovementMixin):
@@ -54,7 +71,7 @@ class MoveToAddressableAreaForDropTipParams(PipetteIdMixin, MovementMixin):
         AddressableOffsetVector(x=0, y=0, z=0),
         description="Relative offset of addressable area to move pipette's critical point.",
     )
-    alternateDropLocation: Optional[bool] = Field(
+    alternateDropLocation: bool | SkipJsonSchema[None] = Field(
         False,
         description=(
             "Whether to alternate location where tip is dropped within the addressable area."
@@ -63,8 +80,9 @@ class MoveToAddressableAreaForDropTipParams(PipetteIdMixin, MovementMixin):
             " labware well."
             " If False, the tip will be dropped at the top center of the area."
         ),
+        json_schema_extra=_remove_default,
     )
-    ignoreTipConfiguration: Optional[bool] = Field(
+    ignoreTipConfiguration: bool | SkipJsonSchema[None] = Field(
         True,
         description=(
             "Whether to utilize the critical point of the tip configuraiton when moving to an addressable area."
@@ -72,6 +90,7 @@ class MoveToAddressableAreaForDropTipParams(PipetteIdMixin, MovementMixin):
             " as the critical point for movement."
             " If False, this command will use the critical point provided by the current tip configuration."
         ),
+        json_schema_extra=_remove_default,
     )
 
 
@@ -81,22 +100,31 @@ class MoveToAddressableAreaForDropTipResult(DestinationPositionResult):
     pass
 
 
+_ExecuteReturn = (
+    SuccessData[MoveToAddressableAreaForDropTipResult]
+    | DefinedErrorData[StallOrCollisionError]
+)
+
+
 class MoveToAddressableAreaForDropTipImplementation(
-    AbstractCommandImpl[
-        MoveToAddressableAreaForDropTipParams, MoveToAddressableAreaForDropTipResult
-    ]
+    AbstractCommandImpl[MoveToAddressableAreaForDropTipParams, _ExecuteReturn]
 ):
     """Move to addressable area for drop tip command implementation."""
 
     def __init__(
-        self, movement: MovementHandler, state_view: StateView, **kwargs: object
+        self,
+        movement: MovementHandler,
+        state_view: StateView,
+        model_utils: ModelUtils,
+        **kwargs: object,
     ) -> None:
         self._movement = movement
         self._state_view = state_view
+        self._model_utils = model_utils
 
     async def execute(
         self, params: MoveToAddressableAreaForDropTipParams
-    ) -> MoveToAddressableAreaForDropTipResult:
+    ) -> _ExecuteReturn:
         """Move the requested pipette to the requested addressable area in preperation of a drop tip."""
         self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
             params.addressableAreaName
@@ -115,7 +143,9 @@ class MoveToAddressableAreaForDropTipImplementation(
         else:
             offset = params.offset
 
-        x, y, z = await self._movement.move_to_addressable_area(
+        result = await move_to_addressable_area(
+            movement=self._movement,
+            model_utils=self._model_utils,
             pipette_id=params.pipetteId,
             addressable_area_name=params.addressableAreaName,
             offset=offset,
@@ -124,13 +154,22 @@ class MoveToAddressableAreaForDropTipImplementation(
             speed=params.speed,
             ignore_tip_configuration=params.ignoreTipConfiguration,
         )
-
-        return MoveToAddressableAreaForDropTipResult(position=DeckPoint(x=x, y=y, z=z))
+        if isinstance(result, DefinedErrorData):
+            return result
+        else:
+            return SuccessData(
+                public=MoveToAddressableAreaForDropTipResult(
+                    position=result.public.position,
+                ),
+                state_update=result.state_update,
+            )
 
 
 class MoveToAddressableAreaForDropTip(
     BaseCommand[
-        MoveToAddressableAreaForDropTipParams, MoveToAddressableAreaForDropTipResult
+        MoveToAddressableAreaForDropTipParams,
+        MoveToAddressableAreaForDropTipResult,
+        StallOrCollisionError,
     ]
 ):
     """Move to addressable area for drop tip command model."""
@@ -139,7 +178,7 @@ class MoveToAddressableAreaForDropTip(
         "moveToAddressableAreaForDropTip"
     )
     params: MoveToAddressableAreaForDropTipParams
-    result: Optional[MoveToAddressableAreaForDropTipResult]
+    result: Optional[MoveToAddressableAreaForDropTipResult] = None
 
     _ImplementationCls: Type[
         MoveToAddressableAreaForDropTipImplementation

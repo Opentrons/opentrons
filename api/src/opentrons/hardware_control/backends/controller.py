@@ -27,7 +27,7 @@ from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
     mutable_configurations,
 )
-from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons_shared_data.pipette.types import PipetteName
 
 from opentrons.drivers.smoothie_drivers import SmoothieDriver
 from opentrons.drivers.rpi_drivers import build_gpio_chardev
@@ -40,7 +40,7 @@ from ..types import AionotifyEvent, BoardRevision, Axis, DoorState
 from ..util import ot2_axis_to_string
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.pipette.dev_types import PipetteModel
+    from opentrons_shared_data.pipette.types import PipetteModel
     from ..dev_types import (
         AttachedPipette,
         AttachedInstruments,
@@ -57,7 +57,7 @@ class Controller:
     """
 
     @classmethod
-    async def build(cls, config: RobotConfig) -> Controller:
+    async def build(cls, config: Optional[RobotConfig]) -> Controller:
         """Build a Controller instance.
 
         Use this factory method rather than the initializer to handle proper
@@ -65,12 +65,13 @@ class Controller:
 
         :param config: A loaded robot config.
         """
+
         gpio = build_gpio_chardev("gpiochip0")
         gpio.config_by_board_rev()
         await gpio.setup()
         return cls(config, gpio)
 
-    def __init__(self, config: RobotConfig, gpio: GPIODriverLike):
+    def __init__(self, config: Optional[RobotConfig], gpio: GPIODriverLike):
         """Build a Controller instance.
 
         Always prefer using :py:meth:`.build` to create an instance of this class. For
@@ -359,13 +360,19 @@ class Controller:
         """Run a probe and return the new position dict"""
         return await self._smoothie_driver.probe_axis(axis, distance)
 
-    async def clean_up(self) -> None:
+    async def clean_up(self) -> None:  # noqa: C901
         try:
             loop = asyncio.get_event_loop()
         except RuntimeError:
             return
+        if hasattr(self, "_module_controls") and self._module_controls is not None:
+            await self._module_controls.clean_up()
         if hasattr(self, "_event_watcher"):
-            if loop.is_running() and self._event_watcher:
+            if (
+                loop.is_running()
+                and self._event_watcher
+                and not self._event_watcher.closed
+            ):
                 self._event_watcher.close()
         if hasattr(self, "gpio_chardev"):
             try:

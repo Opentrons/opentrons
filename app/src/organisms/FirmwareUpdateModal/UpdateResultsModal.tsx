@@ -1,6 +1,5 @@
-import * as React from 'react'
-import { useTranslation, Trans } from 'react-i18next'
-import { getPipetteModelSpecs } from '@opentrons/shared-data'
+import { Trans, useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -8,15 +7,17 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
+  LegacyStyledText,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { SmallButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
-import { Modal } from '../../molecules/Modal'
 
-import type { InstrumentData } from '@opentrons/api-client'
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import { SmallButton } from '/app/atoms/buttons'
+import { usePipetteModelSpecs } from '/app/local-resources/instruments'
+import { OddModal } from '/app/molecules/OddModal'
+
+import type { InstrumentData, PipetteData } from '@opentrons/api-client'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface UpdateResultsModalProps {
   isSuccess: boolean
@@ -29,29 +30,33 @@ export function UpdateResultsModal(
   props: UpdateResultsModalProps
 ): JSX.Element {
   const { isSuccess, shouldExit, onClose, instrument } = props
-  const { i18n, t } = useTranslation(['firmware_update', 'shared'])
+  const { i18n, t } = useTranslation(['firmware_update', 'shared', 'branded'])
 
-  const updateFailedHeader: ModalHeaderBaseProps = {
+  const updateFailedHeader: OddModalHeaderBaseProps = {
     title: t('update_failed'),
     iconName: 'ot-alert',
     iconColor: COLORS.red50,
   }
+
+  const pipetteDisplayName = usePipetteModelSpecs(
+    (instrument as PipetteData)?.instrumentModel
+  )?.displayName
+
   let instrumentName = 'instrument'
   if (instrument?.ok) {
     instrumentName =
       instrument?.instrumentType === 'pipette'
-        ? getPipetteModelSpecs(instrument.instrumentModel)?.displayName ??
-          'pipette'
+        ? pipetteDisplayName ?? 'pipette'
         : 'Flex Gripper'
   }
   return (
     <>
       {!isSuccess ? (
-        <Modal header={updateFailedHeader}>
+        <OddModal header={updateFailedHeader}>
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <StyledText as="p" marginBottom={SPACING.spacing32}>
-              {t('download_logs')}
-            </StyledText>
+            <LegacyStyledText as="p" marginBottom={SPACING.spacing32}>
+              {t('branded:firmware_update_download_logs')}
+            </LegacyStyledText>
             <SmallButton
               onClick={onClose}
               buttonText={
@@ -62,9 +67,9 @@ export function UpdateResultsModal(
               width="100%"
             />
           </Flex>
-        </Modal>
+        </OddModal>
       ) : (
-        <Modal>
+        <OddModal>
           <Flex
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing32}
@@ -88,14 +93,14 @@ export function UpdateResultsModal(
                 size="2.5rem"
                 marginBottom={SPACING.spacing16}
               />
-              <StyledText
+              <LegacyStyledText
                 as="h4"
                 marginBottom={SPACING.spacing4}
                 fontWeight={TYPOGRAPHY.fontWeightBold}
               >
                 {t('successful_update')}
-              </StyledText>
-              <StyledText as="p" textAlign={TYPOGRAPHY.textAlignCenter}>
+              </LegacyStyledText>
+              <LegacyStyledText as="p" textAlign={TYPOGRAPHY.textAlignCenter}>
                 <Trans
                   t={t}
                   i18nKey="ready_to_use"
@@ -106,7 +111,7 @@ export function UpdateResultsModal(
                     bold: <strong />,
                   }}
                 />
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
             <SmallButton
               onClick={onClose}
@@ -118,7 +123,7 @@ export function UpdateResultsModal(
               width="100%"
             />
           </Flex>
-        </Modal>
+        </OddModal>
       )}
     </>
   )

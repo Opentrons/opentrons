@@ -1,20 +1,20 @@
 // mock HTTP responses for pipettes endpoints
 import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
-import type {
-  AttachedPipette,
-  PipetteSettings,
-  PipetteSettingsFieldsMap,
-} from '../types'
+
+import { mockTipRackDefinition } from '../../custom-labware/__fixtures__'
+
+import type { PipetteData } from '@opentrons/api-client'
 import type {
   RobotApiResponse,
   RobotApiResponseMeta,
 } from '../../robot-api/types'
-import { mockTipRackDefinition } from '../../custom-labware/__fixtures__'
 import type {
+  AttachedPipette,
   PipetteInfo,
   PipetteInformation,
-} from '../../../organisms/Devices/hooks'
-import { PipetteData } from '@opentrons/api-client'
+  PipetteSettings,
+  PipetteSettingsFieldsMap,
+} from '../types'
 
 export const mockRobot = { name: 'robot', ip: '127.0.0.1', port: 31950 }
 
@@ -53,14 +53,14 @@ export const mockAttachedFlexPipette: Omit<AttachedPipette, 'modelSpecs'> = {
 }
 
 export const mockFlexP1000PipetteSpecs: any = {
-  displayName: 'Flex 1-Channel 1000 μL',
+  displayName: 'Flex 1-Channel 1000 µL',
   name: 'p1000_single_flex',
   backCompatNames: ['p1000_single'],
   channels: 1,
 }
 
 export const mockFlexP1000Pipette8ChannelSpecs: any = {
-  displayName: 'Flex 8-Channel 1000 μL',
+  displayName: 'Flex 8-Channel 1000 µL',
   name: 'p1000_multi_flex',
   channels: 8,
   backCompatNames: ['p1000_multi'],
@@ -357,7 +357,7 @@ export const mockPipetteData1Channel: PipetteData = {
 }
 export const mockAttachedPipetteInformation: PipetteInformation = {
   ...mockPipetteData1Channel,
-  displayName: 'Flex 1-Channel 1000 μL',
+  displayName: 'Flex 1-Channel 1000 µL',
 }
 
 export const mockPipetteData8Channel: PipetteData = {
@@ -385,7 +385,7 @@ export const mockPipetteData8Channel: PipetteData = {
 }
 export const mock8ChannelAttachedPipetteInformation: PipetteInformation = {
   ...mockPipetteData8Channel,
-  displayName: 'Flex 8-Channel 1000 μL',
+  displayName: 'Flex 8-Channel 1000 µL',
 }
 
 export const mockPipetteData96Channel: PipetteData = {
@@ -412,5 +412,5 @@ export const mockPipetteData96Channel: PipetteData = {
 }
 export const mock96ChannelAttachedPipetteInformation: PipetteInformation = {
   ...mockPipetteData96Channel,
-  displayName: 'Flex 96-Channel 1000 μL',
+  displayName: 'Flex 96-Channel 1000 µL',
 }

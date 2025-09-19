@@ -119,14 +119,15 @@ async def test_get_lid_temp(
 
 
 @pytest.mark.parametrize(
-    argnames=["temp", "hold_time", "volume", "expected_body"],
+    argnames=["temp", "hold_time", "volume", "ramp_rate", "expected_body"],
     argvalues=[
-        [50, 2, 32, "S50 H2 V32"],
-        [50, None, None, "S50"],
-        [50, 2, None, "S50 H2"],
-        [50, None, 32, "S50 V32"],
-        [-5, 2, 32, "S0 H2 V32"],
-        [102, 2, 32, "S99 H2 V32"],
+        [50, 2, 32, None, "S50 H2 V32"],
+        [50, None, None, None, "S50"],
+        [50, 2, None, None, "S50 H2"],
+        [50, None, 32, None, "S50 V32"],
+        [-5, 2, 32, None, "S0 H2 V32"],
+        [102, 2, 32, None, "S99 H2 V32"],
+        [102, 2, 32, 1.0, "S99 H2 V32 R1.0"],
     ],
 )
 async def test_set_plate_temp(
@@ -135,10 +136,13 @@ async def test_set_plate_temp(
     temp: float,
     hold_time: Optional[float],
     volume: Optional[float],
+    ramp_rate: Optional[float],
     expected_body: str,
 ) -> None:
     """It should send a set plate temperature command."""
-    await subject.set_plate_temperature(temp=temp, hold_time=hold_time, volume=volume)
+    await subject.set_plate_temperature(
+        temp=temp, hold_time=hold_time, volume=volume, ramp_rate=ramp_rate
+    )
 
     expected = (
         CommandBuilder(terminator=driver.TC_COMMAND_TERMINATOR)
@@ -168,12 +172,18 @@ async def test_get_plate_temp(
 
 
 async def test_set_ramp_rate(
-    subject: driver.ThermocyclerDriverV2, connection: AsyncMock
+    subject: driver.ThermocyclerDriver, connection: AsyncMock
 ) -> None:
-    """It should not send a set ramp rate command."""
+    """It should send a set ramp rate command."""
     await subject.set_ramp_rate(ramp_rate=22)
 
-    assert not connection.send_command.called
+    expected = (
+        CommandBuilder(terminator=driver.TC_COMMAND_TERMINATOR)
+        .add_gcode(gcode="M566")
+        .add_float(prefix="S", value=22, precision=TC_GCODE_ROUNDING_PRECISION)
+    )
+
+    connection.send_command.assert_called_once_with(command=expected, retries=3)
 
 
 async def test_deactivate_all(
@@ -225,11 +235,15 @@ async def test_device_info(
 
     device_info = await subject.get_device_info()
 
-    expected = CommandBuilder(terminator=driver.TC_COMMAND_TERMINATOR).add_gcode(
+    get_device_info = CommandBuilder(terminator=driver.TC_COMMAND_TERMINATOR).add_gcode(
         gcode="M115"
     )
+    reset_reason = CommandBuilder(terminator=driver.TC_COMMAND_TERMINATOR).add_gcode(
+        gcode="M114"
+    )
 
-    connection.send_command.assert_called_once_with(command=expected, retries=3)
+    connection.send_command.assert_any_call(command=get_device_info, retries=3)
+    connection.send_command.assert_called_with(command=reset_reason, retries=3)
 
     assert device_info == {
         "serial": "EMPTYSN",

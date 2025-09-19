@@ -1,24 +1,25 @@
-import * as React from 'react'
-import { css } from 'styled-components'
-import { SPACING } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
+import styled from 'styled-components'
+
+import { LegacyStyledText, SPACING } from '@opentrons/components'
+
+import type { ReactNode } from 'react'
+
+const ListItem = styled.li`
+  margin-left: ${SPACING.spacing24};
+`
 
 interface UnorderedListProps {
-  items: React.ReactNode[]
+  items: ReactNode[]
 }
+
 export function UnorderedList(props: UnorderedListProps): JSX.Element {
   const { items } = props
   return (
     <ul>
       {items.map((item, index) => (
-        <li
-          key={index}
-          css={css`
-            margin-left: ${SPACING.spacing24};
-          `}
-        >
-          <StyledText as="p">{item}</StyledText>
-        </li>
+        <ListItem key={index}>
+          <LegacyStyledText as="p">{item}</LegacyStyledText>
+        </ListItem>
       ))}
     </ul>
   )

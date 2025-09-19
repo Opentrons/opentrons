@@ -8,8 +8,8 @@ from typing_extensions import Protocol, Final
 
 from opentrons_shared_data.deck import load as load_deck
 
-from opentrons_shared_data.deck.dev_types import SlotDefV3
-from opentrons_shared_data.labware.dev_types import LabwareUri
+from opentrons_shared_data.deck.types import SlotDefV3
+from opentrons_shared_data.labware.types import LabwareUri
 
 from opentrons.hardware_control.modules.types import ModuleType
 from opentrons.motion_planning import deck_conflict
@@ -279,6 +279,11 @@ class Deck(UserDict):  # type: ignore[type-arg]
             slot_def = self.get_slot_definition(str(location))
             compatible_modules = slot_def["compatibleModuleTypes"]
             if module_type.value in compatible_modules:
+                return location
+            elif (
+                self._definition["robot"]["model"] == "OT-3 Standard"
+                and ModuleType.to_module_fixture_id(module_type) == slot_def["id"]
+            ):
                 return location
             else:
                 raise ValueError(

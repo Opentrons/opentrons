@@ -1,6 +1,6 @@
-import * as React from 'react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { EightEmanatingNozzles } from '../EightEmanatingNozzles'
 import { EmanatingNozzle } from '../EmanatingNozzle'
 

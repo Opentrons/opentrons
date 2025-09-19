@@ -9,65 +9,63 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Union
 
-from pydantic import BaseModel, Extra, Field
+from pydantic import ConfigDict, BaseModel, Field
 from typing_extensions import Literal
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons_shared_data.protocol import dev_types
+from opentrons_shared_data.protocol import types
 
-CommandAspirate: dev_types.AspirateCommandId = "aspirate"
-CommandDispense: dev_types.DispenseCommandId = "dispense"
-CommandAirGap: dev_types.AirGapCommandId = "airGap"
-CommandBlowout: dev_types.BlowoutCommandId = "blowout"
-CommandTouchTip: dev_types.TouchTipCommandId = "touchTip"
-CommandPickUpTip: dev_types.PickUpTipCommandId = "pickUpTip"
-CommandDropTip: dev_types.DropTipCommandId = "dropTip"
-CommandMoveToSlot: dev_types.MoveToSlotCommandId = "moveToSlot"
-CommandMoveToWell: dev_types.MoveToWellCommandId = "moveToWell"
-CommandDelay: dev_types.DelayCommandId = "delay"
-CommandMagneticModuleEngage: dev_types.MagneticModuleEngageCommandId = (
+CommandAspirate: types.AspirateCommandId = "aspirate"
+CommandDispense: types.DispenseCommandId = "dispense"
+CommandAirGap: types.AirGapCommandId = "airGap"
+CommandBlowout: types.BlowoutCommandId = "blowout"
+CommandTouchTip: types.TouchTipCommandId = "touchTip"
+CommandPickUpTip: types.PickUpTipCommandId = "pickUpTip"
+CommandDropTip: types.DropTipCommandId = "dropTip"
+CommandMoveToSlot: types.MoveToSlotCommandId = "moveToSlot"
+CommandMoveToWell: types.MoveToWellCommandId = "moveToWell"
+CommandDelay: types.DelayCommandId = "delay"
+CommandMagneticModuleEngage: types.MagneticModuleEngageCommandId = (
     "magneticModule/engageMagnet"
 )
-CommandMagneticModuleDisengage: dev_types.MagneticModuleDisengageCommandId = (
+CommandMagneticModuleDisengage: types.MagneticModuleDisengageCommandId = (
     "magneticModule/disengageMagnet"
 )
-CommandTemperatureModuleSetTarget: dev_types.TemperatureModuleSetTargetCommandId = (
+CommandTemperatureModuleSetTarget: types.TemperatureModuleSetTargetCommandId = (
     "temperatureModule/setTargetTemperature"
 )
-CommandTemperatureModuleAwait: dev_types.TemperatureModuleAwaitCommandId = (
+CommandTemperatureModuleAwait: types.TemperatureModuleAwaitCommandId = (
     "temperatureModule/awaitTemperature"
 )
-CommandTemperatureModuleDeactivate: dev_types.TemperatureModuleDeactivateCommandId = (
+CommandTemperatureModuleDeactivate: types.TemperatureModuleDeactivateCommandId = (
     "temperatureModule/deactivate"
 )
-CommandThermocyclerSetTargetBlock: dev_types.ThermocyclerSetTargetBlockCommandId = (
+CommandThermocyclerSetTargetBlock: types.ThermocyclerSetTargetBlockCommandId = (
     "thermocycler/setTargetBlockTemperature"
 )
-CommandThermocyclerSetTargetLid: dev_types.ThermocyclerSetTargetLidCommandId = (
+CommandThermocyclerSetTargetLid: types.ThermocyclerSetTargetLidCommandId = (
     "thermocycler/setTargetLidTemperature"
 )
-CommandThermocyclerAwaitLidTemperature: dev_types.ThermocyclerAwaitLidTemperatureCommandId = (
+CommandThermocyclerAwaitLidTemperature: types.ThermocyclerAwaitLidTemperatureCommandId = (
     "thermocycler/awaitLidTemperature"
 )
-CommandThermocyclerAwaitBlockTemperature: dev_types.ThermocyclerAwaitBlockTemperatureCommandId = (
+CommandThermocyclerAwaitBlockTemperature: types.ThermocyclerAwaitBlockTemperatureCommandId = (
     "thermocycler/awaitBlockTemperature"
 )
-CommandThermocyclerDeactivateBlock: dev_types.ThermocyclerDeactivateBlockCommandId = (
+CommandThermocyclerDeactivateBlock: types.ThermocyclerDeactivateBlockCommandId = (
     "thermocycler/deactivateBlock"
 )
-CommandThermocyclerDeactivateLid: dev_types.ThermocyclerDeactivateLidCommandId = (
+CommandThermocyclerDeactivateLid: types.ThermocyclerDeactivateLidCommandId = (
     "thermocycler/deactivateLid"
 )
-CommandThermocyclerOpenLid: dev_types.ThermocyclerOpenLidCommandId = (
-    "thermocycler/openLid"
-)
-CommandThermocyclerCloseLid: dev_types.ThermocyclerCloseLidCommandId = (
+CommandThermocyclerOpenLid: types.ThermocyclerOpenLidCommandId = "thermocycler/openLid"
+CommandThermocyclerCloseLid: types.ThermocyclerCloseLidCommandId = (
     "thermocycler/closeLid"
 )
-CommandThermocyclerRunProfile: dev_types.ThermocyclerRunProfileCommandId = (
+CommandThermocyclerRunProfile: types.ThermocyclerRunProfileCommandId = (
     "thermocycler/runProfile"
 )
-CommandThermocyclerAwaitProfile: dev_types.ThermocyclerAwaitProfileCommandId = (
+CommandThermocyclerAwaitProfile: types.ThermocyclerAwaitProfileCommandId = (
     "thermocycler/awaitProfileComplete"
 )
 
@@ -77,8 +75,7 @@ class Metadata(BaseModel):
     Optional metadata about the protocol
     """
 
-    class Config:
-        extra = Extra.allow
+    model_config = ConfigDict(extra="allow")
 
     protocolName: Optional[str] = Field(
         None, description="A short, human-readable name for the protocol"
@@ -576,8 +573,7 @@ class Pipettes(BaseModel):
     Fields describing an individual pipette
     """
 
-    class Config:
-        extra = Extra.allow
+    model_config = ConfigDict(extra="allow")
 
     mount: Literal["left", "right"] = Field(
         ..., description="Where the pipette is mounted"
@@ -594,8 +590,7 @@ class Labware(BaseModel):
     Fields describing a single labware on the deck
     """
 
-    class Config:
-        extra = Extra.allow
+    model_config = ConfigDict(extra="allow")
 
     slot: str = Field(
         ...,
@@ -618,8 +613,7 @@ class Modules(BaseModel):
     Fields describing a single module on the deck
     """
 
-    class Config:
-        extra = Extra.allow
+    model_config = ConfigDict(extra="allow")
 
     slot: str = Field(
         ...,

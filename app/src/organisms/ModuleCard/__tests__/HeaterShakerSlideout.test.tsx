@@ -1,24 +1,28 @@
-import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { mockHeaterShaker } from '../../../redux/modules/__fixtures__'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
+import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
+
 import { HeaterShakerSlideout } from '../HeaterShakerSlideout'
 
-vi.mock('@opentrons/react-api-client')
+import type { ComponentProps } from 'react'
 
-const render = (props: React.ComponentProps<typeof HeaterShakerSlideout>) => {
+vi.mock('@opentrons/react-api-client')
+vi.mock('/app/redux-resources/analytics')
+
+const render = (props: ComponentProps<typeof HeaterShakerSlideout>) => {
   return renderWithProviders(<HeaterShakerSlideout {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
 describe('HeaterShakerSlideout', () => {
-  let props: React.ComponentProps<typeof HeaterShakerSlideout>
+  let props: ComponentProps<typeof HeaterShakerSlideout>
   let mockCreateLiveCommand = vi.fn()
 
   beforeEach(() => {
@@ -26,6 +30,9 @@ describe('HeaterShakerSlideout', () => {
     mockCreateLiveCommand.mockResolvedValue(null)
     vi.mocked(useCreateLiveCommandMutation).mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
+    } as any)
+    vi.mocked(useModuleCommandAnalytics).mockReturnValue({
+      reportModuleCommand: vi.fn(),
     } as any)
   })
 

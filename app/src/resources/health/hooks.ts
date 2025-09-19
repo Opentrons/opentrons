@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useRef } from 'react'
 
 import { useHealthQuery } from '@opentrons/react-api-client'
 
@@ -15,7 +15,7 @@ export type RobotInitializationStatus =
   | null
 
 export function useRobotInitializationStatus(): RobotInitializationStatus {
-  const responseStatusCode = React.useRef<number | null>(null)
+  const responseStatusCode = useRef<number | null>(null)
 
   useHealthQuery({
     refetchInterval: ROBOT_HEALTH_POLL_MS,

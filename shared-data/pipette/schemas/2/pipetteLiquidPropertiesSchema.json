@@ -41,8 +41,7 @@
     "maxVolume",
     "minVolume",
     "defaultTipracks",
-    "supportedTips",
-    "defaultTipOverlapDictionary"
+    "supportedTips"
   ],
   "additionalProperties": false,
   "properties": {
@@ -68,13 +67,16 @@
             ],
             "properties": {
               "defaultAspirateFlowRate": {
-                "$ref": "#/definitions/flowRate"
+                "$ref": "#/definitions/flowRate",
+                "$comment": "for lowVolumeDefault only, the flowRate matches the uiMaxFlowRate. This does not change physical behavior and was made for UI purposes"
               },
               "defaultDispenseFlowRate": {
-                "$ref": "#/definitions/flowRate"
+                "$ref": "#/definitions/flowRate",
+                "$comment": "for lowVolumeDefault only, the flowRate matches the uiMaxFlowRate. This does not change physical behavior and was made for UI purposes"
               },
               "defaultBlowOutFlowRate": {
-                "$ref": "#/definitions/flowRate"
+                "$ref": "#/definitions/flowRate",
+                "$comment": "for lowVolumeDefault only, the flowRate matches the uiMaxFlowRate. This does not change physical behavior and was made for UI purposes"
               },
               "defaultFlowAcceleration": {
                 "$ref": "#/definitions/positiveNumber"
@@ -92,21 +94,16 @@
               "dispense": {
                 "type": "array",
                 "items": { "$ref": "#/definitions/liquidHandlingSpecs" }
+              },
+              "uiMaxFlowRate": {
+                "$ref": "#/definitions/positiveNumber",
+                "$comment": "To be used in frontend applications only since it is the limit-to-lowest-max",
+                "description": "An optional number to represent each pipette's supported tip max flow rate for aspirate and dispense. The limit is the lowest max flow rate given all the tip's volumes minus 2% for safety."
               }
             }
           }
         }
       }
-    },
-    "defaultTipOverlapDictionary": {
-      "type": "object",
-      "description": "Map of tip overlap values with defaults",
-      "required": ["default"],
-      "$comment": "Other keys in here should be labware URIs",
-      "properties": {
-        "default": { "type": "number" }
-      },
-      "additionalProperties": { "type": "number" }
     },
     "maxVolume": { "$ref": "#/definitions/positiveNumber" },
     "minVolume": { "$ref": "#/definitions/positiveNumber" },

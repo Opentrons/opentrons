@@ -1,6 +1,17 @@
 import pytest
-from opentrons.types import DeckSlotName, Point, Location
+from opentrons.types import DeckSlotName, Point, Location, MeniscusTrackingTarget
 from opentrons.protocol_api.labware import Labware
+
+
+def test_point_from_xyz_attrs() -> None:
+    class Original:
+        def __init__(self) -> None:
+            self.x = 1
+            self.y = 2
+            self.z = 3
+
+    point = Point.from_xyz_attrs(Original())
+    assert point == Point(1, 2, 3)
 
 
 def test_point_mul() -> None:
@@ -29,7 +40,7 @@ def test_location_repr_labware(min_lw: Labware) -> None:
     loc = Location(point=Point(x=1.1, y=2.1, z=3.5), labware=min_lw)
     assert (
         f"{loc}"
-        == "Location(point=Point(x=1.1, y=2.1, z=3.5), labware=minimal labware on deck)"
+        == "Location(point=Point(x=1.1, y=2.1, z=3.5), labware=minimal labware on deck, meniscus_tracking=None)"
     )
 
 
@@ -38,14 +49,17 @@ def test_location_repr_well(min_lw: Labware) -> None:
     loc = Location(point=Point(x=1, y=2, z=3), labware=min_lw.wells()[0])
     assert (
         f"{loc}"
-        == "Location(point=Point(x=1, y=2, z=3), labware=A1 of minimal labware on deck)"
+        == "Location(point=Point(x=1, y=2, z=3), labware=A1 of minimal labware on deck, meniscus_tracking=None)"
     )
 
 
 def test_location_repr_slot() -> None:
     """It should represent labware as a slot"""
     loc = Location(point=Point(x=-1, y=2, z=3), labware="1")
-    assert f"{loc}" == "Location(point=Point(x=-1, y=2, z=3), labware=1)"
+    assert (
+        f"{loc}"
+        == "Location(point=Point(x=-1, y=2, z=3), labware=1, meniscus_tracking=None)"
+    )
 
 
 @pytest.mark.parametrize(
@@ -88,3 +102,18 @@ def test_deck_slot_name_equivalencies(
 )
 def test_deck_slot_name_as_int(input: DeckSlotName, expected_int: int) -> None:
     assert input.as_int() == expected_int
+
+
+def test_location_move_preseves_meniscus() -> None:
+    """Location.move() should preserve meniscus relativeness."""
+    loc = Location(
+        point=Point(x=1, y=2, z=3),
+        labware=None,
+        _meniscus_tracking=MeniscusTrackingTarget.START,
+    )
+    moved = loc.move(Point(x=1, y=2, z=3))
+    assert moved == Location(
+        point=Point(x=2, y=4, z=6),
+        labware=None,
+        _meniscus_tracking=MeniscusTrackingTarget.START,
+    )

@@ -6,6 +6,7 @@ from opentrons.drivers.asyncio.communication import AlarmResponse
 from mock import AsyncMock, patch
 import pytest
 from opentrons.drivers.smoothie_drivers.connection import SmoothieConnection
+from opentrons.drivers.rpi_drivers.dev_types import GPIODriverLike
 from opentrons.drivers.smoothie_drivers.constants import (
     HOMED_POSITION,
     Y_BOUND_OVERRIDE,
@@ -14,6 +15,7 @@ from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 
 from opentrons.drivers.smoothie_drivers import driver_3_0, constants
 from opentrons.drivers.smoothie_drivers.errors import SmoothieError, SmoothieAlarm
+from opentrons.drivers.command_builder import CommandBuilder
 
 
 @pytest.fixture
@@ -29,7 +31,9 @@ def sim_gpio() -> SimulatingGPIOCharDev:
 
 
 @pytest.fixture
-def smoothie(mock_connection: AsyncMock, sim_gpio) -> driver_3_0.SmoothieDriver:
+def smoothie(
+    mock_connection: AsyncMock, sim_gpio: GPIODriverLike
+) -> driver_3_0.SmoothieDriver:
     """The smoothie driver under test."""
     from opentrons.config import robot_configs
 
@@ -41,7 +45,9 @@ def smoothie(mock_connection: AsyncMock, sim_gpio) -> driver_3_0.SmoothieDriver:
     return d
 
 
-def position(x, y, z, a, b, c):
+def position(
+    x: float, y: float, z: float, a: float, b: float, c: float
+) -> Dict[str, float]:
     return {axis: value for axis, value in zip("XYZABC", [x, y, z, a, b, c])}
 
 
@@ -76,7 +82,7 @@ async def test_update_position_retry(
     assert smoothie.position == expected
 
 
-def test_active_dwelling_current_push_pop(smoothie):
+def test_active_dwelling_current_push_pop(smoothie: driver_3_0.SmoothieDriver) -> None:
     assert smoothie._active_current_settings != smoothie._dwelling_current_settings
 
     old_active_currents = deepcopy(smoothie._active_current_settings)
@@ -90,7 +96,7 @@ def test_active_dwelling_current_push_pop(smoothie):
     assert smoothie._dwelling_current_settings == old_dwelling_currents
 
 
-async def test_functional(smoothie: driver_3_0.SmoothieDriver):
+async def test_functional(smoothie: driver_3_0.SmoothieDriver) -> None:
     smoothie.simulating = True
     assert smoothie.position == position(0, 0, 0, 0, 0, 0)
 
@@ -116,7 +122,7 @@ async def test_functional(smoothie: driver_3_0.SmoothieDriver):
 
 async def test_read_pipette_v13(
     smoothie: driver_3_0.SmoothieDriver, mock_connection: AsyncMock
-):
+) -> None:
     mock_connection.send_command.return_value = "L:" + utils.string_to_hex(
         "p300_single_v13"
     )
@@ -126,7 +132,7 @@ async def test_read_pipette_v13(
 
 async def test_switch_state(
     smoothie: driver_3_0.SmoothieDriver, mock_connection: AsyncMock
-):
+) -> None:
     smoothie_switch_res = (
         "X_max:0 Y_max:0 Z_max:0 A_max:0 B_max:0 C_max:0"
         " _pins "
@@ -172,7 +178,7 @@ async def test_switch_state(
 
 async def test_clear_limit_switch(
     smoothie: driver_3_0.SmoothieDriver, mock_connection: AsyncMock
-):
+) -> None:
     """
     This functions as a contract test around recovery from a limit-switch hit.
     Note that this *does not* itself guarantee correct physical behavior--this
@@ -182,7 +188,7 @@ async def test_clear_limit_switch(
     """
     cmd_list = []
 
-    async def write_mock(command, retries, timeout):
+    async def write_mock(command: CommandBuilder, retries: int, timeout: float) -> str:
         cmd_list.append(command.build())
         if constants.GCODE.MOVE in command:
             raise AlarmResponse(port="", response="ALARM: Hard limit +C")
@@ -223,10 +229,10 @@ async def test_clear_limit_switch(
 
 async def test_unstick_axes(
     smoothie: driver_3_0.SmoothieDriver, mock_connection: AsyncMock
-):
+) -> None:
     cmd_list = []
 
-    def write_mock(command, retries, timeout):
+    def write_mock(command: CommandBuilder, retries: int, timeout: float) -> str:
         cmd_list.append(command.build())
         if constants.GCODE.LIMIT_SWITCH_STATUS in command:
             return "X_max:0 Y_max:0 Z_max:0 A_max:0 B_max:0 C_max:0 Probe: 0 \r\n"

@@ -1,73 +1,185 @@
 import last from 'lodash/last'
+
 import {
-  getUnsavedForm,
-  getUnsavedFormIsPristineSetTempForm,
-  getUnsavedFormIsPristineHeaterShakerForm,
+  ABSORBANCE_READER_TYPE,
+  HEATERSHAKER_MODULE_TYPE,
+  MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
+
+import { PAUSE_UNTIL_TEMP } from '/protocol-designer/constants'
+import * as fileDataSelectors from '/protocol-designer/file-data/selectors'
+import {
+  getInitialDeckSetup,
   getOrderedStepIds,
-} from '../../../../step-forms/selectors'
-import { changeFormInput } from '../../../../steplist/actions/actions'
-import { PRESAVED_STEP_ID } from '../../../../steplist/types'
-import { PAUSE_UNTIL_TEMP } from '../../../../constants'
-import { uuid } from '../../../../utils'
-import { selectors as labwareIngredsSelectors } from '../../../../labware-ingred/selectors'
-import { getMultiSelectLastSelected, getSelectedStepId } from '../../selectors'
-import { addStep } from '../actions'
+  getUnsavedForm,
+  getUnsavedFormIsPristineHeaterShakerForm,
+  getUnsavedFormIsPristineSetTempForm,
+} from '/protocol-designer/step-forms/selectors'
+import { changeFormInput } from '/protocol-designer/steplist/actions/actions'
+import { PRESAVED_STEP_ID } from '/protocol-designer/steplist/types'
 import {
   actions as tutorialActions,
   selectors as tutorialSelectors,
-} from '../../../../tutorial'
-import * as uiModuleSelectors from '../../../../ui/modules/selectors'
-import * as fileDataSelectors from '../../../../file-data/selectors'
-import { StepType, StepIdType, FormData } from '../../../../form-types'
-import { ThunkAction } from '../../../../types'
-import {
-  DuplicateStepAction,
+} from '/protocol-designer/tutorial'
+import { uuid } from '/protocol-designer/utils'
+
+import { getMultiSelectLastSelected, getSelectedStepId } from '../../selectors'
+import { addStep, selectDropdownItem } from '../actions'
+
+import type {
+  FormData,
+  StepIdType,
+  StepType,
+} from '/protocol-designer/form-types'
+import type { ThunkAction } from '/protocol-designer/types'
+import type {
   DuplicateMultipleStepsAction,
+  DuplicateStepAction,
   SelectMultipleStepsAction,
 } from '../types'
-export const addAndSelectStepWithHints: (arg: {
+
+export const addAndSelectStep: (arg: {
   stepType: StepType
 }) => ThunkAction<any> = payload => (dispatch, getState) => {
   const robotStateTimeline = fileDataSelectors.getRobotStateTimeline(getState())
+  const initialDeckSetup = getInitialDeckSetup(getState())
+  const { modules, labware } = initialDeckSetup
   dispatch(
     addStep({
       stepType: payload.stepType,
       robotStateTimeline,
     })
   )
-  const state = getState()
-  const deckHasLiquid = labwareIngredsSelectors.getDeckHasLiquid(state)
-  const magnetModuleHasLabware = uiModuleSelectors.getMagnetModuleHasLabware(
-    state
-  )
-  const temperatureModuleHasLabware = uiModuleSelectors.getTemperatureModuleHasLabware(
-    state
-  )
-  const thermocyclerModuleHasLabware = uiModuleSelectors.getThermocyclerModuleHasLabware(
-    state
-  )
-  const temperatureModuleOnDeck = uiModuleSelectors.getSingleTemperatureModuleId(
-    state
-  )
-  const thermocyclerModuleOnDeck = uiModuleSelectors.getSingleThermocyclerModuleId(
-    state
-  )
-  // TODO: Ian 2019-01-17 move out to centralized step info file - see #2926
-  const stepNeedsLiquid = ['mix', 'moveLiquid'].includes(payload.stepType)
-  const stepMagnetNeedsLabware = ['magnet'].includes(payload.stepType)
-  const stepTemperatureNeedsLabware = ['temperature'].includes(payload.stepType)
-  const stepModuleMissingLabware =
-    (stepMagnetNeedsLabware && !magnetModuleHasLabware) ||
-    (stepTemperatureNeedsLabware &&
-      ((temperatureModuleOnDeck && !temperatureModuleHasLabware) ||
-        (thermocyclerModuleOnDeck && !thermocyclerModuleHasLabware)))
-
-  if (stepNeedsLiquid && !deckHasLiquid) {
-    dispatch(tutorialActions.addHint('add_liquids_and_labware'))
-  }
-
-  if (stepModuleMissingLabware) {
-    dispatch(tutorialActions.addHint('module_without_labware'))
+  if (payload.stepType === 'thermocycler') {
+    const tcId = Object.entries(modules).find(
+      ([key, module]) => module.type === THERMOCYCLER_MODULE_TYPE
+    )?.[0]
+    if (tcId != null) {
+      dispatch(
+        selectDropdownItem({
+          selection: {
+            id: tcId,
+            text: 'Selected',
+            field: '1',
+          },
+          mode: 'add',
+        })
+      )
+    }
+  } else if (payload.stepType === 'magnet') {
+    const magId = Object.entries(modules).find(
+      ([key, module]) => module.type === MAGNETIC_MODULE_TYPE
+    )?.[0]
+    if (magId != null) {
+      dispatch(
+        selectDropdownItem({
+          selection: {
+            id: magId,
+            text: 'Selected',
+            field: '1',
+          },
+          mode: 'add',
+        })
+      )
+    }
+  } else if (payload.stepType === 'temperature') {
+    const temperatureModules = Object.entries(modules).filter(
+      ([key, module]) => module.type === TEMPERATURE_MODULE_TYPE
+    )
+    //  only set selected temperature module if only 1 type is on deck
+    const tempId =
+      temperatureModules.length === 1 ? temperatureModules[0][0] : null
+    if (tempId != null) {
+      dispatch(
+        selectDropdownItem({
+          selection: {
+            id: tempId,
+            text: 'Selected',
+            field: '1',
+          },
+          mode: 'add',
+        })
+      )
+    }
+  } else if (payload.stepType === 'heaterShaker') {
+    const hsModules = Object.entries(modules).filter(
+      ([key, module]) => module.type === HEATERSHAKER_MODULE_TYPE
+    )
+    //  only set selected h-s module if only 1 type is on deck
+    const hsId = hsModules.length === 1 ? hsModules[0][0] : null
+    if (hsId != null) {
+      dispatch(
+        selectDropdownItem({
+          selection: {
+            id: hsId,
+            text: 'Selected',
+            field: '1',
+          },
+          mode: 'add',
+        })
+      )
+    }
+  } else if (payload.stepType === 'absorbanceReader') {
+    const abosrbanceReaderModules = Object.entries(modules).filter(
+      ([, module]) => module.type === ABSORBANCE_READER_TYPE
+    )
+    const absorbanceReaderId =
+      abosrbanceReaderModules.length === 1
+        ? abosrbanceReaderModules[0][0]
+        : null
+    if (abosrbanceReaderModules != null) {
+      dispatch(
+        selectDropdownItem({
+          selection: {
+            id: absorbanceReaderId,
+            text: 'Selected',
+            field: '1',
+          },
+          mode: 'add',
+        })
+      )
+    }
+  } else if (payload.stepType === 'mix' || payload.stepType === 'moveLiquid') {
+    const labwares = Object.entries(labware).filter(
+      ([key, lw]) =>
+        !lw.def.parameters.isTiprack &&
+        !lw.def.allowedRoles?.includes('adapter') &&
+        !lw.def.allowedRoles?.includes('lid')
+    )
+    //  only set selected labware if only 1 available labware is on deck
+    const labwareId = labwares.length === 1 ? labwares[0][0] : null
+    if (labwareId != null) {
+      dispatch(
+        selectDropdownItem({
+          selection: {
+            id: labwareId,
+            text: payload.stepType === 'moveLiquid' ? 'Source' : 'Selected',
+            field: '1',
+          },
+          mode: 'add',
+        })
+      )
+    }
+  } else if (payload.stepType === 'moveLabware') {
+    const labwares = Object.entries(labware).filter(
+      ([key, lw]) => !lw.def.allowedRoles?.includes('adapter')
+    )
+    //  only set selected labware if only 1 available labware/tiprack/lid is on deck
+    const labwareId = labwares.length === 1 ? labwares[0][0] : null
+    if (labwareId != null) {
+      dispatch(
+        selectDropdownItem({
+          selection: {
+            id: labwareId,
+            text: 'Selected',
+            field: '1',
+          },
+          mode: 'add',
+        })
+      )
+    }
   }
 }
 export interface ReorderSelectedStepAction {
@@ -175,10 +287,6 @@ export const saveStepForm: () => ThunkAction<any> = () => (
 
   if (tutorialSelectors.shouldShowCoolingHint(initialState)) {
     dispatch(tutorialActions.addHint('thermocycler_lid_passive_cooling'))
-  }
-
-  if (tutorialSelectors.shouldShowBatchEditHint(initialState)) {
-    dispatch(tutorialActions.addHint('protocol_can_enter_batch_edit'))
   }
 
   if (tutorialSelectors.shouldShowWasteChuteHint(initialState)) {

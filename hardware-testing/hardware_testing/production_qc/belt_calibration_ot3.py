@@ -124,11 +124,11 @@ async def _calibrate_belts(
 
 
 async def run_belt_calibration(
-    api: OT3API, mount: types.OT3Mount, test: bool
+    api: OT3API, mount: types.OT3Mount, calibrate: bool, test: bool
 ) -> Tuple[
     Optional[_TestBeltCalibrationData],
-    AttitudeMatrix,
-    Dict[str, Any],
+    Optional[AttitudeMatrix],
+    Optional[Dict[str, Any]],
     Optional[_TestBeltCalibrationData],
 ]:
     """Run belt calibration."""
@@ -149,14 +149,16 @@ async def run_belt_calibration(
     if not api.is_simulator:
         ui.get_user_ready("ATTACH a probe to pipette")
 
-    without_data = None
-    with_data = None
-
+    without_data: Optional[_TestBeltCalibrationData] = None
+    with_data: Optional[_TestBeltCalibrationData] = None
+    attitude: Optional[AttitudeMatrix] = None
+    details: Optional[Dict[str, Any]] = None
     try:
         # calibrate belts
-        ui.print_header("CALIBRATE BELTS")
-        await api.reset_instrument_offset(mount)
-        attitude, details = await _calibrate_belts(api, mount)
+        if calibrate:
+            ui.print_header("CALIBRATE BELTS")
+            await api.reset_instrument_offset(mount)
+            attitude, details = await _calibrate_belts(api, mount)
 
         # test after
         if test:
@@ -236,7 +238,7 @@ def _create_csv_report() -> CSVReport:
     )
 
 
-async def run(is_simulating: bool, skip_test: bool) -> None:
+async def run(is_simulating: bool, skip_calibration: bool, skip_test: bool) -> None:
     """Run."""
     ui.print_header("BELT CALIBRATION")
 
@@ -252,9 +254,13 @@ async def run(is_simulating: bool, skip_test: bool) -> None:
     helpers_ot3.set_csv_report_meta_data_ot3(api, report)
 
     # RUN TEST
+    before: Optional[_TestBeltCalibrationData] = None
+    after: Optional[_TestBeltCalibrationData] = None
+    attitude: Optional[AttitudeMatrix] = None
+    details: Optional[Dict[str, Any]] = None
     try:
         before, attitude, details, after = await run_belt_calibration(
-            api, types.OT3Mount.LEFT, test=not skip_test
+            api, types.OT3Mount.LEFT, calibrate=not skip_calibration, test=not skip_test
         )
     except (
         EarlyCapacitiveSenseTrigger,
@@ -263,7 +269,6 @@ async def run(is_simulating: bool, skip_test: bool) -> None:
         MisalignedGantryError,
     ) as e:
         ui.print_error(str(e))
-        return
 
     if api.is_simulator:
         nom_front_left = helpers_ot3.get_slot_calibration_square_position_ot3(
@@ -283,32 +288,34 @@ async def run(is_simulating: bool, skip_test: bool) -> None:
         details = sim_cal_data.build_details()
 
     # STORE ATTITUDE
-    report("ATTITUDE", "attitude-x", attitude[0])
-    report("ATTITUDE", "attitude-y", attitude[1])
-    report("ATTITUDE", "attitude-z", attitude[2])
+    if attitude:
+        report("ATTITUDE", "attitude-x", attitude[0])
+        report("ATTITUDE", "attitude-y", attitude[1])
+        report("ATTITUDE", "attitude-z", attitude[2])
 
     # STORE DETAILS
-    report(
-        "BELT-CALIBRATION-POSITIONS",
-        "slot-front-left",
-        list(details["slots"]["front_left"]),
-    )
-    report(
-        "BELT-CALIBRATION-POSITIONS",
-        "slot-front-right",
-        list(details["slots"]["front_right"]),
-    )
-    report(
-        "BELT-CALIBRATION-POSITIONS",
-        "slot-rear-left",
-        list(details["slots"]["rear_left"]),
-    )
-    for align_shift in AlignmentShift:
+    if details:
         report(
-            "BELT-CALIBRATION-SHIFTS",
-            align_shift.value,
-            [details[align_shift.value]["shift"]],
+            "BELT-CALIBRATION-POSITIONS",
+            "slot-front-left",
+            list(details["slots"]["front_left"]),
         )
+        report(
+            "BELT-CALIBRATION-POSITIONS",
+            "slot-front-right",
+            list(details["slots"]["front_right"]),
+        )
+        report(
+            "BELT-CALIBRATION-POSITIONS",
+            "slot-rear-left",
+            list(details["slots"]["rear_left"]),
+        )
+        for align_shift in AlignmentShift:
+            report(
+                "BELT-CALIBRATION-SHIFTS",
+                align_shift.value,
+                [details[align_shift.value]["shift"]],
+            )
 
     if before and after:
         # STORE PIPETTE-OFFSET CALIBRATIONS
@@ -344,6 +351,7 @@ async def run(is_simulating: bool, skip_test: bool) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
+    parser.add_argument("--skip-calibration", action="store_true")
     parser.add_argument("--skip-test", action="store_true")
     args = parser.parse_args()
-    asyncio.run(run(args.simulate, args.skip_test))
+    asyncio.run(run(args.simulate, args.skip_calibration, args.skip_test))

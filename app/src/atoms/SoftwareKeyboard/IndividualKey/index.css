@@ -1,0 +1,13 @@
+/* stylelint-disable */
+
+.simple-keyboard .hg-button {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 24px;
+  text-align: center;
+}
+
+.simple-keyboard .hg-button:active {
+  background-color: #dedede; /* grey30 */
+  color: #16212d;
+}

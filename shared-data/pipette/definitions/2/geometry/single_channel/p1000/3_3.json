@@ -10,5 +10,19 @@
   "orderedColumns": [{ "key": "1", "orderedNozzles": ["A1"] }],
   "nozzleMap": {
     "A1": [-8.0, -22.0, -259.15]
+  },
+  "lldSettings": {
+    "t50": {
+      "minHeight": 1.0,
+      "minVolume": 0
+    },
+    "t200": {
+      "minHeight": 1.0,
+      "minVolume": 0
+    },
+    "t1000": {
+      "minHeight": 1.5,
+      "minVolume": 0
+    }
   }
 }

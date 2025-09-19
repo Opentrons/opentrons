@@ -1,9 +1,9 @@
 """Manager for the :py:class:`.hardware_control.API` thread."""
+import functools
 import threading
 import logging
 import asyncio
 import inspect
-import functools
 import weakref
 from typing import (
     Any,
@@ -195,7 +195,10 @@ class ThreadManager(Generic[WrappedObj]):
 
     If you want to wait for the managed object's creation separately
     (with managed_thread_ready_blocking or managed_thread_ready_async)
-    then pass threadmanager_nonblocking=True as a kwarg
+     use the nonblocking_builder static method to add an attribute to the builder
+    function, i.e.
+
+    thread_manager = ThreadManager(ThreadManager.nonblocking_builder(builder), ...)
 
     Example
     -------
@@ -206,15 +209,52 @@ class ThreadManager(Generic[WrappedObj]):
     >>> api_single_thread.sync.home() # call as blocking sync
     """
 
+    Builder = ParamSpec("Builder")
+    Built = TypeVar("Built")
+
+    @staticmethod
+    def nonblocking_builder(
+        builder: Callable[Builder, Awaitable[Built]]
+    ) -> Callable[Builder, Awaitable[Built]]:
+        """Wrap an instance of a builder function to make initializes that use it nonblocking.
+
+        For instance, you can build a ThreadManager like this:
+
+        thread_manager = ThreadManager(ThreadManager.nonblocking_builder(API.build_hardware_controller), ...)
+
+        to make the initialize call return immediately so you can later wait on it via
+        managed_thread_ready_blocking or managed_thread_ready_async
+        """
+
+        @functools.wraps(builder)
+        async def wrapper(
+            *args: ThreadManager.Builder.args, **kwargs: ThreadManager.Builder.kwargs
+        ) -> ThreadManager.Built:
+            return await builder(*args, **kwargs)
+
+        setattr(wrapper, "nonblocking", True)
+        return wrapper
+
     def __init__(
         self,
-        builder: Callable[..., Awaitable[WrappedObj]],
-        *args: Any,
-        **kwargs: Any,
+        builder: Callable[Builder, Awaitable[WrappedObj]],
+        *args: Builder.args,
+        **kwargs: Builder.kwargs,
     ) -> None:
         """Build the ThreadManager.
 
-        :param builder: The API function to use
+        builder: The api function to use to build the instance.
+
+        The args and kwargs will be forwarded to the builder function.
+
+        Note: by default, this function will block until the managed thread is ready and the hardware controller
+        has been built. To make this function return immediately you can wrap its builder argument in
+        ThreadManager.nonblocking_builder(), like this:
+
+        thread_manager = ThreadManager(ThreadManager.nonblocking_builder(API.build_hardware_controller), ...)
+
+        Afterwards, you'll need to call ThreadManager.managed_thread_ready_blocking or its async variant before
+        you can actually use thei nstance.
         """
 
         self._loop: Optional[asyncio.AbstractEventLoop] = None
@@ -234,7 +274,7 @@ class ThreadManager(Generic[WrappedObj]):
             asyncio.get_child_watcher()
         except NotImplementedError:
             pass
-        blocking = not kwargs.pop("threadmanager_nonblocking", False)
+        blocking = not getattr(builder, "nonblocking", False)
         target = object.__getattribute__(self, "_build_and_start_loop")
         thread = threading.Thread(
             target=target,

@@ -13,13 +13,17 @@ they are part of the public input / output of the engine, and need validation
 and/or schema generation.
 """
 
+from . import absorbance_reader
+from . import flex_stacker
 from . import heater_shaker
 from . import magnetic_module
 from . import temperature_module
 from . import thermocycler
 from . import calibration
+from . import unsafe
+from . import robot
 
-from .hash_command_params import hash_command_params
+from .hash_command_params import hash_protocol_command_params
 from .generate_command_schema import generate_command_schema
 
 from .command import (
@@ -32,12 +36,21 @@ from .command import (
 
 from .command_unions import (
     Command,
+    CommandAdapter,
     CommandParams,
     CommandCreate,
+    CommandCreateAdapter,
     CommandResult,
     CommandType,
-    CommandPrivateResult,
-    CommandT,
+    CommandDefinedErrorData,
+)
+
+from .air_gap_in_place import (
+    AirGapInPlace,
+    AirGapInPlaceParams,
+    AirGapInPlaceCreate,
+    AirGapInPlaceResult,
+    AirGapInPlaceCommandType,
 )
 
 from .aspirate import (
@@ -46,6 +59,14 @@ from .aspirate import (
     AspirateCreate,
     AspirateResult,
     AspirateCommandType,
+)
+
+from .aspirate_while_tracking import (
+    AspirateWhileTracking,
+    AspirateWhileTrackingParams,
+    AspirateWhileTrackingCreate,
+    AspirateWhileTrackingResult,
+    AspirateWhileTrackingCommandType,
 )
 
 from .aspirate_in_place import (
@@ -78,6 +99,14 @@ from .dispense import (
     DispenseCreate,
     DispenseResult,
     DispenseCommandType,
+)
+
+from .dispense_while_tracking import (
+    DispenseWhileTracking,
+    DispenseWhileTrackingParams,
+    DispenseWhileTrackingCreate,
+    DispenseWhileTrackingResult,
+    DispenseWhileTrackingCommandType,
 )
 
 from .dispense_in_place import (
@@ -120,6 +149,14 @@ from .load_labware import (
     LoadLabwareCommandType,
 )
 
+from .reload_labware import (
+    ReloadLabware,
+    ReloadLabwareParams,
+    ReloadLabwareCreate,
+    ReloadLabwareResult,
+    ReloadLabwareCommandType,
+)
+
 from .load_liquid import (
     LoadLiquid,
     LoadLiquidParams,
@@ -127,6 +164,15 @@ from .load_liquid import (
     LoadLiquidCreate,
     LoadLiquidCommandType,
     LoadLiquidImplementation,
+)
+
+from .load_liquid_class import (
+    LoadLiquidClass,
+    LoadLiquidClassParams,
+    LoadLiquidClassCreate,
+    LoadLiquidClassResult,
+    LoadLiquidClassCommandType,
+    LoadLiquidClassImplementation,
 )
 
 from .load_module import (
@@ -143,7 +189,22 @@ from .load_pipette import (
     LoadPipetteCreate,
     LoadPipetteResult,
     LoadPipetteCommandType,
-    LoadPipettePrivateResult,
+)
+
+from .load_lid_stack import (
+    LoadLidStack,
+    LoadLidStackParams,
+    LoadLidStackCreate,
+    LoadLidStackResult,
+    LoadLidStackCommandType,
+)
+
+from .load_lid import (
+    LoadLid,
+    LoadLidParams,
+    LoadLidCreate,
+    LoadLidResult,
+    LoadLidCommandType,
 )
 
 from .move_labware import (
@@ -208,6 +269,22 @@ from .wait_for_duration import (
     WaitForDurationCreate,
     WaitForDurationResult,
     WaitForDurationCommandType,
+)
+
+from .create_timer import (
+    CreateTimer,
+    CreateTimerCreate,
+    CreateTimerParams,
+    CreateTimerResult,
+    CreateTimerCommandType,
+)
+
+from .wait_for_tasks import (
+    WaitForTasks,
+    WaitForTasksCreate,
+    WaitForTasksParams,
+    WaitForTasksResult,
+    WaitForTasksCommandType,
 )
 
 from .pick_up_tip import (
@@ -296,7 +373,6 @@ from .configure_nozzle_layout import (
     ConfigureNozzleLayoutCreate,
     ConfigureNozzleLayoutParams,
     ConfigureNozzleLayoutResult,
-    ConfigureNozzleLayoutPrivateResult,
     ConfigureNozzleLayoutCommandType,
 )
 
@@ -316,32 +392,104 @@ from .verify_tip_presence import (
     VerifyTipPresenceCommandType,
 )
 
+from .get_next_tip import (
+    GetNextTip,
+    GetNextTipCreate,
+    GetNextTipParams,
+    GetNextTipResult,
+    GetNextTipCommandType,
+)
+
+from .set_tip_state import (
+    SetTipState,
+    SetTipStateCreate,
+    SetTipStateParams,
+    SetTipStateResult,
+    SetTipStateCommandType,
+)
+
+from .liquid_probe import (
+    LiquidProbe,
+    LiquidProbeParams,
+    LiquidProbeCreate,
+    LiquidProbeResult,
+    LiquidProbeCommandType,
+    TryLiquidProbe,
+    TryLiquidProbeParams,
+    TryLiquidProbeCreate,
+    TryLiquidProbeResult,
+    TryLiquidProbeCommandType,
+)
+
+from .seal_pipette_to_tip import (
+    SealPipetteToTip,
+    SealPipetteToTipParams,
+    SealPipetteToTipCreate,
+    SealPipetteToTipResult,
+    SealPipetteToTipCommandType,
+)
+from .unseal_pipette_from_tip import (
+    UnsealPipetteFromTip,
+    UnsealPipetteFromTipParams,
+    UnsealPipetteFromTipCreate,
+    UnsealPipetteFromTipResult,
+    UnsealPipetteFromTipCommandType,
+)
+from .pressure_dispense import (
+    PressureDispense,
+    PressureDispenseParams,
+    PressureDispenseCreate,
+    PressureDispenseResult,
+    PressureDispenseCommandType,
+)
+
+from .identify_module import (
+    IdentifyModule,
+    IdentifyModuleParams,
+    IdentifyModuleCreate,
+    IdentifyModuleResult,
+    IdentifyModuleCommandType,
+)
+
 __all__ = [
     # command type unions
     "Command",
+    "CommandAdapter",
     "CommandParams",
     "CommandCreate",
+    "CommandCreateAdapter",
     "CommandResult",
     "CommandType",
     "CommandPrivateResult",
-    "CommandT",
+    "CommandDefinedErrorData",
     # base interfaces
     "AbstractCommandImpl",
-    "AbstractCommandWithPrivateResultImpl",
     "BaseCommand",
     "BaseCommandCreate",
     "CommandStatus",
     "CommandIntent",
     # command parameter hashing
-    "hash_command_params",
+    "hash_protocol_command_params",
     # command schema generation
     "generate_command_schema",
+    # air gap command models
+    "AirGapInPlace",
+    "AirGapInPlaceCreate",
+    "AirGapInPlaceParams",
+    "AirGapInPlaceResult",
+    "AirGapInPlaceCommandType",
     # aspirate command models
     "Aspirate",
     "AspirateCreate",
     "AspirateParams",
     "AspirateResult",
     "AspirateCommandType",
+    # aspirate while tracking command models
+    "AspirateWhileTracking",
+    "AspirateWhileTrackingCreate",
+    "AspirateWhileTrackingParams",
+    "AspirateWhileTrackingResult",
+    "AspirateWhileTrackingCommandType",
     # aspirate in place command models
     "AspirateInPlace",
     "AspirateInPlaceCreate",
@@ -366,6 +514,12 @@ __all__ = [
     "DispenseParams",
     "DispenseResult",
     "DispenseCommandType",
+    # dispense while tracking command models
+    "DispenseWhileTracking",
+    "DispenseWhileTrackingCreate",
+    "DispenseWhileTrackingParams",
+    "DispenseWhileTrackingResult",
+    "DispenseWhileTrackingCommandType",
     # dispense in place command models
     "DispenseInPlace",
     "DispenseInPlaceCreate",
@@ -402,12 +556,24 @@ __all__ = [
     "LoadLabwareParams",
     "LoadLabwareResult",
     "LoadLabwareCommandType",
+    # reload labware command models
+    "ReloadLabware",
+    "ReloadLabwareCreate",
+    "ReloadLabwareParams",
+    "ReloadLabwareResult",
+    "ReloadLabwareCommandType",
     # load module command models
     "LoadModule",
     "LoadModuleCreate",
     "LoadModuleParams",
     "LoadModuleResult",
     "LoadModuleCommandType",
+    # identify module command models
+    "IdentifyModule",
+    "IdentifyModuleParams",
+    "IdentifyModuleCreate",
+    "IdentifyModuleResult",
+    "IdentifyModuleCommandType",
     # load pipette command models
     "LoadPipette",
     "LoadPipetteCreate",
@@ -415,6 +581,20 @@ __all__ = [
     "LoadPipetteResult",
     "LoadPipetteCommandType",
     "LoadPipettePrivateResult",
+    # load lid stack command models
+    "LoadLidStack",
+    "LoadLidStackCreate",
+    "LoadLidStackParams",
+    "LoadLidStackResult",
+    "LoadLidStackCommandType",
+    "LoadLidStackPrivateResult",
+    # load lid command models
+    "LoadLid",
+    "LoadLidCreate",
+    "LoadLidParams",
+    "LoadLidResult",
+    "LoadLidCommandType",
+    "LoadLidPrivateResult",
     # move labware command models
     "MoveLabware",
     "MoveLabwareCreate",
@@ -463,6 +643,12 @@ __all__ = [
     "WaitForDurationCreate",
     "WaitForDurationResult",
     "WaitForDurationCommandType",
+    # Timer command models
+    "CreateTimer",
+    "CreateTimerCreate",
+    "CreateTimerParams",
+    "CreateTimerResult",
+    "CreateTimerCommandType",
     # pick up tip command models
     "PickUpTip",
     "PickUpTipCreate",
@@ -513,13 +699,26 @@ __all__ = [
     "LoadLiquidParams",
     "LoadLiquidResult",
     "LoadLiquidCommandType",
+    # load liquid class command models
+    "LoadLiquidClass",
+    "LoadLiquidClassParams",
+    "LoadLiquidClassCreate",
+    "LoadLiquidClassResult",
+    "LoadLiquidClassImplementation",
+    "LoadLiquidClassCommandType",
+    # hardware control command models
     # hardware module command bundles
+    "absorbance_reader",
+    "flex_stacker",
     "heater_shaker",
     "magnetic_module",
     "temperature_module",
     "thermocycler",
     # calibration command bundle
     "calibration",
+    # unsafe command bundle
+    "unsafe",
+    "robot",
     # configure pipette volume command bundle
     "ConfigureForVolume",
     "ConfigureForVolumeCreate",
@@ -538,7 +737,6 @@ __all__ = [
     "ConfigureNozzleLayoutParams",
     "ConfigureNozzleLayoutResult",
     "ConfigureNozzleLayoutCommandType",
-    "ConfigureNozzleLayoutPrivateResult",
     # get pipette tip presence bundle
     "GetTipPresence",
     "GetTipPresenceCreate",
@@ -551,4 +749,51 @@ __all__ = [
     "VerifyTipPresenceParams",
     "VerifyTipPresenceResult",
     "VerifyTipPresenceCommandType",
+    # get next tip command bundle
+    "GetNextTip",
+    "GetNextTipCreate",
+    "GetNextTipParams",
+    "GetNextTipResult",
+    "GetNextTipCommandType",
+    # set tip state command bundle
+    "SetTipState",
+    "SetTipStateCreate",
+    "SetTipStateParams",
+    "SetTipStateResult",
+    "SetTipStateCommandType",
+    # liquid probe command bundle
+    "LiquidProbe",
+    "LiquidProbeParams",
+    "LiquidProbeCreate",
+    "LiquidProbeResult",
+    "LiquidProbeCommandType",
+    "TryLiquidProbe",
+    "TryLiquidProbeParams",
+    "TryLiquidProbeCreate",
+    "TryLiquidProbeResult",
+    "TryLiquidProbeCommandType",
+    # seal command bundle
+    "SealPipetteToTip",
+    "SealPipetteToTipParams",
+    "SealPipetteToTipCreate",
+    "SealPipetteToTipResult",
+    "SealPipetteToTipCommandType",
+    # unseal command bundle
+    "UnsealPipetteFromTip",
+    "UnsealPipetteFromTipParams",
+    "UnsealPipetteFromTipCreate",
+    "UnsealPipetteFromTipResult",
+    "UnsealPipetteFromTipCommandType",
+    # pressure dispense command bundle
+    "PressureDispense",
+    "PressureDispenseParams",
+    "PressureDispenseCreate",
+    "PressureDispenseResult",
+    "PressureDispenseCommandType",
+    # wait for tasks command bundle
+    "WaitForTasks",
+    "WaitForTasksCreate",
+    "WaitForTasksParams",
+    "WaitForTasksResult",
+    "WaitForTasksCommandType",
 ]

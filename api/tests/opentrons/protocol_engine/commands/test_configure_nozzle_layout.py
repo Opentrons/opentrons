@@ -1,4 +1,8 @@
 """Test configure nozzle layout commands."""
+from opentrons.protocol_engine.state.update_types import (
+    PipetteNozzleMapUpdate,
+    StateUpdate,
+)
 import pytest
 from decoy import Decoy
 from typing import Union, Dict
@@ -11,11 +15,10 @@ from opentrons.protocol_engine.execution import (
 from opentrons.types import Point
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 
-
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.configure_nozzle_layout import (
     ConfigureNozzleLayoutParams,
     ConfigureNozzleLayoutResult,
-    ConfigureNozzleLayoutPrivateResult,
     ConfigureNozzleLayoutImplementation,
 )
 
@@ -25,6 +28,7 @@ from opentrons.protocol_engine.types import (
     QuadrantNozzleLayoutConfiguration,
     SingleNozzleLayoutConfiguration,
 )
+from opentrons_shared_data.pipette.pipette_definition import ValidNozzleMaps
 from ..pipette_fixtures import (
     NINETY_SIX_MAP,
     NINETY_SIX_COLS,
@@ -44,6 +48,7 @@ from ..pipette_fixtures import (
                 starting_nozzle="A1",
                 back_left_nozzle="A1",
                 front_right_nozzle="A1",
+                valid_nozzle_maps=ValidNozzleMaps(maps={"A1": ["A1"]}),
             ),
             {"primary_nozzle": "A1"},
         ],
@@ -56,12 +61,15 @@ from ..pipette_fixtures import (
                 starting_nozzle="A1",
                 back_left_nozzle="A1",
                 front_right_nozzle="H1",
+                valid_nozzle_maps=ValidNozzleMaps(
+                    maps={"Column1": NINETY_SIX_COLS["1"]}
+                ),
             ),
             {"primary_nozzle": "A1", "front_right_nozzle": "H1"},
         ],
         [
             QuadrantNozzleLayoutConfiguration(
-                primaryNozzle="A1", frontRightNozzle="E1"
+                primaryNozzle="A1", frontRightNozzle="E1", backLeftNozzle="A1"
             ),
             NozzleMap.build(
                 physical_nozzles=NINETY_SIX_MAP,
@@ -70,6 +78,9 @@ from ..pipette_fixtures import (
                 starting_nozzle="A1",
                 back_left_nozzle="A1",
                 front_right_nozzle="E1",
+                valid_nozzle_maps=ValidNozzleMaps(
+                    maps={"A1_E1": ["A1", "B1", "C1", "D1", "E1"]}
+                ),
             ),
             {"primary_nozzle": "A1", "front_right_nozzle": "E1"},
         ],
@@ -107,6 +118,11 @@ async def test_configure_nozzle_layout_implementation(
         if isinstance(request_model, QuadrantNozzleLayoutConfiguration)
         else None
     )
+    back_left_nozzle = (
+        request_model.backLeftNozzle
+        if isinstance(request_model, QuadrantNozzleLayoutConfiguration)
+        else None
+    )
 
     decoy.when(
         await tip_handler.available_for_nozzle_layout(
@@ -114,6 +130,7 @@ async def test_configure_nozzle_layout_implementation(
             style=request_model.style,
             primary_nozzle=primary_nozzle,
             front_right_nozzle=front_right_nozzle,
+            back_left_nozzle=back_left_nozzle,
         )
     ).then_return(nozzle_params)
 
@@ -124,10 +141,14 @@ async def test_configure_nozzle_layout_implementation(
         )
     ).then_return(expected_nozzlemap)
 
-    result, private_result = await subject.execute(requested_nozzle_layout)
+    result = await subject.execute(requested_nozzle_layout)
 
-    assert result == ConfigureNozzleLayoutResult()
-    assert private_result == ConfigureNozzleLayoutPrivateResult(
-        pipette_id="pipette-id",
-        nozzle_map=expected_nozzlemap,
+    assert result == SuccessData(
+        public=ConfigureNozzleLayoutResult(),
+        state_update=StateUpdate(
+            pipette_nozzle_map=PipetteNozzleMapUpdate(
+                pipette_id="pipette-id",
+                nozzle_map=expected_nozzlemap,
+            )
+        ),
     )

@@ -1,14 +1,17 @@
-import { vi, describe, it, expect } from 'vitest'
-import { labwareDefToFields } from '../labwareDefToFields'
-import { fieldsToLabware } from '../fieldsToLabware'
-import { labwareFormSchema } from '../labwareFormSchema'
+import { describe, expect, it, vi } from 'vitest'
+
 import { DEFAULT_CUSTOM_NAMESPACE } from '@opentrons/shared-data'
 import {
-  fixture_96_plate,
   fixture_12_trough,
-  fixture_tiprack_300_ul,
   fixture_24_tuberack,
+  fixture_96_plate,
+  fixture_tiprack_300_ul,
 } from '@opentrons/shared-data/labware/fixtures/2'
+
+import { fieldsToLabware } from '../fieldsToLabware'
+import { labwareDefToFields } from '../labwareDefToFields'
+import { labwareFormSchema } from '../labwareFormSchema'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { ProcessedLabwareFields } from '../fields'
 
@@ -40,7 +43,9 @@ describe('load and immediately save integrity test', () => {
   ]
   testCases.forEach(({ inputDef, extraFields }) => {
     it(inputDef.parameters.loadName, () => {
-      const initialRawFieldValues = labwareDefToFields(inputDef)
+      const initialRawFieldValues = labwareDefToFields(inputDef, [
+        fixture_12_trough,
+      ] as LabwareDefinition2[])
       // both name fields should be set to null upon import
       expect(initialRawFieldValues?.displayName).toBe(null)
       expect(initialRawFieldValues?.loadName).toBe(null)

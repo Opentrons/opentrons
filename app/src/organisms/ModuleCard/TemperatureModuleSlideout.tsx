@@ -1,25 +1,29 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+
 import {
-  Flex,
-  TYPOGRAPHY,
-  SPACING,
   COLORS,
   DIRECTION_COLUMN,
+  Flex,
+  InputField,
+  LegacyStyledText,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   CELSIUS,
   getModuleDisplayName,
   TEMP_MAX,
   TEMP_MIN,
 } from '@opentrons/shared-data'
-import { Slideout } from '../../atoms/Slideout'
-import { SubmitPrimaryButton } from '../../atoms/buttons'
-import { InputField } from '../../atoms/InputField'
-import { StyledText } from '../../atoms/text'
+
+import { SubmitPrimaryButton } from '/app/atoms/buttons'
+import { Slideout } from '/app/atoms/Slideout'
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics/'
+
 import type { TemperatureModuleSetTargetTemperatureCreateCommand } from '@opentrons/shared-data'
-import type { TemperatureModule } from '../../redux/modules/types'
+import type { TemperatureModule } from '/app/redux/modules/types'
 
 interface TemperatureModuleSlideoutProps {
   module: TemperatureModule
@@ -34,9 +38,8 @@ export const TemperatureModuleSlideout = (
   const { t } = useTranslation('device_details')
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const name = getModuleDisplayName(module.moduleModel)
-  const [temperatureValue, setTemperatureValue] = React.useState<number | null>(
-    null
-  )
+  const [temperatureValue, setTemperatureValue] = useState<number | null>(null)
+  const { reportModuleCommand } = useModuleCommandAnalytics()
   const handleSubmitTemperature = (): void => {
     if (temperatureValue != null) {
       const saveTempCommand: TemperatureModuleSetTargetTemperatureCreateCommand = {
@@ -48,11 +51,34 @@ export const TemperatureModuleSlideout = (
       }
       createLiveCommand({
         command: saveTempCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${saveTempCommand.commandType}: ${e.message}`
-        )
       })
+        .then(() => {
+          reportModuleCommand({
+            kind: 'liveCommand',
+            moduleType: module.moduleType,
+            analyticCommand: saveTempCommand.commandType,
+            result: { status: 'succeeded', data: undefined },
+            serialNumber: module.serialNumber,
+            temperature: temperatureValue,
+            errorDetails: '',
+            firmwareVersion: module.firmwareVersion,
+          })
+        })
+        .catch((e: Error) => {
+          reportModuleCommand({
+            kind: 'liveCommand',
+            moduleType: module.moduleType,
+            analyticCommand: saveTempCommand.commandType,
+            result: { status: 'failed', data: undefined },
+            errorDetails: e.message,
+            serialNumber: module.serialNumber,
+            temperature: temperatureValue,
+            firmwareVersion: module.firmwareVersion,
+          })
+          console.error(
+            `error setting module status with command type ${saveTempCommand.commandType}: ${e.message}`
+          )
+        })
     }
     setTemperatureValue(null)
     onCloseClick()
@@ -77,7 +103,7 @@ export const TemperatureModuleSlideout = (
         />
       }
     >
-      <StyledText
+      <LegacyStyledText
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
         paddingTop={SPACING.spacing4}
@@ -86,20 +112,20 @@ export const TemperatureModuleSlideout = (
         {t('tempdeck_slideout_body', {
           model: name,
         })}
-      </StyledText>
+      </LegacyStyledText>
       <Flex
         marginTop={SPACING.spacing16}
         flexDirection={DIRECTION_COLUMN}
         data-testid={`TemperatureSlideout_input_field_${module.serialNumber}`}
       >
-        <StyledText
+        <LegacyStyledText
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
           color={COLORS.black90}
           paddingBottom={SPACING.spacing8}
         >
           {t('set_temperature')}
-        </StyledText>
+        </LegacyStyledText>
         <form id="TemperatureModuleSlideout_submitValue">
           <InputField
             id={`${String(module.moduleModel)}`}
@@ -109,7 +135,9 @@ export const TemperatureModuleSlideout = (
               temperatureValue != null ? Math.round(temperatureValue) : null
             }
             autoFocus
-            onChange={e => setTemperatureValue(e.target.valueAsNumber)}
+            onChange={e => {
+              setTemperatureValue(e.target.valueAsNumber)
+            }}
             type="number"
             caption={t('module_status_range', {
               min: TEMP_MIN,

@@ -1,13 +1,17 @@
 """Test equipment command execution side effects."""
-import pytest
+
+from unittest.mock import sentinel
 import inspect
 from datetime import datetime
 from decoy import Decoy, matchers
-from typing import Any, Optional, cast
+from typing import Any, Optional, cast, Dict
 
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+import pytest
+from _pytest.fixtures import SubRequest
+
+from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.pipette import pipette_definition
-from opentrons_shared_data.labware.dev_types import LabwareUri
+from opentrons_shared_data.labware.types import LabwareUri
 
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.types import Mount as HwMount, MountType, DeckSlotName, Point
@@ -19,10 +23,8 @@ from opentrons.hardware_control.modules import (
     AbstractModule,
 )
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.protocols.models import LabwareDefinition
 
 from opentrons.protocol_engine import errors
-from opentrons.protocol_engine.actions import ActionDispatcher
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     DeckType,
@@ -32,14 +34,19 @@ from opentrons.protocol_engine.types import (
     LoadedPipette,
     LabwareOffset,
     LabwareOffsetVector,
-    LabwareOffsetLocation,
+    LegacyLabwareOffsetLocation,
+    OnAddressableAreaOffsetLocationSequenceComponent,
+    OnModuleOffsetLocationSequenceComponent,
+    OnLabwareOffsetLocationSequenceComponent,
     ModuleModel,
     ModuleDefinition,
     OFF_DECK_LOCATION,
     FlowRates,
+    AddressableAreaLocation,
 )
 
-from opentrons.protocol_engine.state import Config, StateStore
+from opentrons.protocol_engine.state.config import Config
+from opentrons.protocol_engine.state.state import StateStore
 from opentrons.protocol_engine.state.modules import HardwareModule
 from opentrons.protocol_engine.resources import (
     ModelUtils,
@@ -52,11 +59,12 @@ from opentrons.protocol_engine.resources.pipette_data_provider import (
 )
 from opentrons.protocol_engine.execution.equipment import (
     EquipmentHandler,
-    LoadedLabwareData,
     LoadedPipetteData,
     LoadedModuleData,
+    LoadedLabwareData,
 )
 from ..pipette_fixtures import get_default_nozzle_map
+from opentrons.protocol_engine.resources import deck_configuration_provider
 
 
 def _make_config(use_virtual_modules: bool) -> Config:
@@ -65,6 +73,14 @@ def _make_config(use_virtual_modules: bool) -> Config:
         # Robot and deck type are arbitrary.
         robot_type="OT-2 Standard",
         deck_type=DeckType.OT2_STANDARD,
+    )
+
+
+@pytest.fixture
+def available_sensors() -> pipette_definition.AvailableSensorDefinition:
+    """Provide a list of sensors."""
+    return pipette_definition.AvailableSensorDefinition(
+        sensors=["pressure", "capacitive", "environment"]
     )
 
 
@@ -82,12 +98,6 @@ def patch_mock_pipette_data_provider(
 def state_store(decoy: Decoy) -> StateStore:
     """Get a mocked out StateStore instance."""
     return decoy.mock(cls=StateStore)
-
-
-@pytest.fixture
-def action_dispatcher(decoy: Decoy) -> ActionDispatcher:
-    """Get a mocked out ActionDispatcher instance."""
-    return decoy.mock(cls=ActionDispatcher)
 
 
 @pytest.fixture
@@ -128,9 +138,17 @@ async def temp_module_v2(decoy: Decoy) -> TempDeck:
     return temp_mod
 
 
+@pytest.fixture(params=["v0", "v1", "v3"])
+def tip_overlap_versions(request: SubRequest) -> str:
+    """Get a series of tip overlap versions."""
+    return cast(str, request.param)
+
+
 @pytest.fixture
 def loaded_static_pipette_data(
     supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
+    target_tip_overlap_data: Dict[str, float],
+    available_sensors: pipette_definition.AvailableSensorDefinition,
 ) -> LoadedStaticPipetteData:
     """Get a pipette config data value object."""
     return LoadedStaticPipetteData(
@@ -145,13 +163,28 @@ def loaded_static_pipette_data(
             default_dispense={"c": 7.89},
         ),
         tip_configuration_lookup_table={4.56: supported_tip_fixture},
-        nominal_tip_overlap={"default": 9.87},
+        nominal_tip_overlap=target_tip_overlap_data,
         home_position=10.11,
         nozzle_offset_z=12.13,
         nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE),
         back_left_corner_offset=Point(x=1, y=2, z=3),
         front_right_corner_offset=Point(x=4, y=5, z=6),
+        pipette_lld_settings={},
+        plunger_positions={
+            "top": 0.0,
+            "bottom": 5.0,
+            "blow_out": 19.0,
+            "drop_tip": 20.0,
+        },
+        shaft_ul_per_mm=5.0,
+        available_sensors=available_sensors,
     )
+
+
+@pytest.fixture
+def target_tip_overlap_data(tip_overlap_versions: str) -> Dict[str, float]:
+    """Get the corresponding overlap data for the version."""
+    return {"default": 2.13 * int(tip_overlap_versions[1:])}
 
 
 @pytest.fixture
@@ -166,7 +199,6 @@ def virtual_pipette_data_provider(
 def subject(
     hardware_api: HardwareControlAPI,
     state_store: StateStore,
-    action_dispatcher: ActionDispatcher,
     labware_data_provider: LabwareDataProvider,
     module_data_provider: ModuleDataProvider,
     model_utils: ModelUtils,
@@ -176,7 +208,6 @@ def subject(
     return EquipmentHandler(
         hardware_api=hardware_api,
         state_store=state_store,
-        action_dispatcher=action_dispatcher,
         labware_data_provider=labware_data_provider,
         module_data_provider=module_data_provider,
         model_utils=model_utils,
@@ -189,7 +220,6 @@ async def test_load_labware(
     model_utils: ModelUtils,
     state_store: StateStore,
     labware_data_provider: LabwareDataProvider,
-    minimal_labware_def: LabwareDefinition,
     subject: EquipmentHandler,
 ) -> None:
     """It should load labware definition and offset data and generate an ID."""
@@ -205,19 +235,35 @@ async def test_load_labware(
             namespace="opentrons-test",
             version=1,
         )
-    ).then_return(minimal_labware_def)
+    ).then_return(sentinel.labware_def)
+    decoy.when(
+        state_store.geometry.get_projected_offset_location(
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_3), None
+        )
+    ).then_return(
+        [OnAddressableAreaOffsetLocationSequenceComponent(addressableAreaName="3")]
+    )
 
     decoy.when(
         state_store.labware.find_applicable_labware_offset(
             definition_uri="opentrons-test/load-name/1",
-            location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_3),
+            location=[
+                OnAddressableAreaOffsetLocationSequenceComponent(
+                    addressableAreaName="3"
+                )
+            ],
         )
     ).then_return(
         LabwareOffset(
             id="labware-offset-id",
             createdAt=datetime(year=2021, month=1, day=2),
             definitionUri="opentrons-test/load-name/1",
-            location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_3),
+            location=LegacyLabwareOffsetLocation(slotName=DeckSlotName.SLOT_3),
+            locationSequence=[
+                OnAddressableAreaOffsetLocationSequenceComponent(
+                    addressableAreaName="3"
+                )
+            ],
             vector=LabwareOffsetVector(x=1, y=2, z=3),
         )
     )
@@ -232,7 +278,7 @@ async def test_load_labware(
 
     assert result == LoadedLabwareData(
         labware_id="unique-id",
-        definition=minimal_labware_def,
+        definition=sentinel.labware_def,
         offsetId="labware-offset-id",
     )
 
@@ -241,7 +287,6 @@ async def test_load_labware_off_deck(
     decoy: Decoy,
     model_utils: ModelUtils,
     state_store: StateStore,
-    minimal_labware_def: LabwareDefinition,
     subject: EquipmentHandler,
 ) -> None:
     """It should load labware definition and offset data and generate an ID."""
@@ -251,7 +296,7 @@ async def test_load_labware_off_deck(
         state_store.labware.get_definition_by_uri(
             cast("LabwareUri", "opentrons-test/load-name/1")
         )
-    ).then_return(minimal_labware_def)
+    ).then_return(sentinel.labware_def)
 
     result = await subject.load_labware(
         location=OFF_DECK_LOCATION,
@@ -263,7 +308,7 @@ async def test_load_labware_off_deck(
 
     assert result == LoadedLabwareData(
         labware_id="unique-id",
-        definition=minimal_labware_def,
+        definition=sentinel.labware_def,
         offsetId=None,
     )
 
@@ -272,7 +317,6 @@ async def test_load_labware_uses_provided_id(
     decoy: Decoy,
     state_store: StateStore,
     labware_data_provider: LabwareDataProvider,
-    minimal_labware_def: LabwareDefinition,
     subject: EquipmentHandler,
 ) -> None:
     """It should use the provided ID rather than generating an ID for the labware."""
@@ -286,12 +330,22 @@ async def test_load_labware_uses_provided_id(
             namespace="opentrons-test",
             version=1,
         )
-    ).then_return(minimal_labware_def)
-
+    ).then_return(sentinel.labware_def)
+    decoy.when(
+        state_store.geometry.get_projected_offset_location(
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_3), None
+        )
+    ).then_return(
+        [OnAddressableAreaOffsetLocationSequenceComponent(addressableAreaName="3")]
+    )
     decoy.when(
         state_store.labware.find_applicable_labware_offset(
             definition_uri="opentrons-test/load-name/1",
-            location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_3),
+            location=[
+                OnAddressableAreaOffsetLocationSequenceComponent(
+                    addressableAreaName="3"
+                )
+            ],
         )
     ).then_return(None)
 
@@ -304,7 +358,7 @@ async def test_load_labware_uses_provided_id(
     )
 
     assert result == LoadedLabwareData(
-        labware_id="my-labware-id", definition=minimal_labware_def, offsetId=None
+        labware_id="my-labware-id", definition=sentinel.labware_def, offsetId=None
     )
 
 
@@ -313,7 +367,6 @@ async def test_load_labware_uses_loaded_labware_def(
     model_utils: ModelUtils,
     state_store: StateStore,
     labware_data_provider: LabwareDataProvider,
-    minimal_labware_def: LabwareDefinition,
     subject: EquipmentHandler,
 ) -> None:
     """Loading labware should use the labware definition already in state."""
@@ -326,13 +379,25 @@ async def test_load_labware_uses_loaded_labware_def(
     decoy.when(model_utils.generate_id()).then_return("unique-id")
 
     decoy.when(state_store.labware.get_definition_by_uri(expected_uri)).then_return(
-        minimal_labware_def
+        sentinel.labware_def
+    )
+
+    decoy.when(
+        state_store.geometry.get_projected_offset_location(
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_3), None
+        )
+    ).then_return(
+        [OnAddressableAreaOffsetLocationSequenceComponent(addressableAreaName="3")]
     )
 
     decoy.when(
         state_store.labware.find_applicable_labware_offset(
             definition_uri="opentrons-test/load-name/1",
-            location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_3),
+            location=[
+                OnAddressableAreaOffsetLocationSequenceComponent(
+                    addressableAreaName="3"
+                )
+            ],
         )
     ).then_return(None)
 
@@ -346,7 +411,7 @@ async def test_load_labware_uses_loaded_labware_def(
 
     assert result == LoadedLabwareData(
         labware_id="unique-id",
-        definition=minimal_labware_def,
+        definition=sentinel.labware_def,
         offsetId=None,
     )
 
@@ -364,7 +429,6 @@ async def test_load_labware_on_module(
     decoy: Decoy,
     model_utils: ModelUtils,
     state_store: StateStore,
-    minimal_labware_def: LabwareDefinition,
     subject: EquipmentHandler,
 ) -> None:
     """It should load labware definition and offset data and generate an ID."""
@@ -372,7 +436,7 @@ async def test_load_labware_on_module(
 
     decoy.when(
         state_store.labware.get_definition_by_uri(matchers.IsA(str))
-    ).then_return(minimal_labware_def)
+    ).then_return(sentinel.labware_def)
 
     decoy.when(state_store.modules.get_requested_model("module-id")).then_return(
         ModuleModel.THERMOCYCLER_MODULE_V1
@@ -382,22 +446,47 @@ async def test_load_labware_on_module(
     )
 
     decoy.when(
+        state_store.geometry.get_projected_offset_location(
+            ModuleLocation(moduleId="module-id"), None
+        )
+    ).then_return(
+        [
+            OnModuleOffsetLocationSequenceComponent(
+                moduleModel=ModuleModel.THERMOCYCLER_MODULE_V1
+            ),
+            OnAddressableAreaOffsetLocationSequenceComponent(addressableAreaName="1"),
+        ]
+    )
+
+    decoy.when(
         state_store.labware.find_applicable_labware_offset(
             definition_uri="opentrons-test/load-name/1",
-            location=LabwareOffsetLocation(
-                slotName=DeckSlotName.SLOT_3,
-                moduleModel=ModuleModel.THERMOCYCLER_MODULE_V1,
-            ),
+            location=[
+                OnModuleOffsetLocationSequenceComponent(
+                    moduleModel=ModuleModel.THERMOCYCLER_MODULE_V1
+                ),
+                OnAddressableAreaOffsetLocationSequenceComponent(
+                    addressableAreaName="1"
+                ),
+            ],
         )
     ).then_return(
         LabwareOffset(
             id="labware-offset-id",
             createdAt=datetime(year=2021, month=1, day=2),
             definitionUri="opentrons-test/load-name/1",
-            location=LabwareOffsetLocation(
+            location=LegacyLabwareOffsetLocation(
                 slotName=DeckSlotName.SLOT_3,
                 moduleModel=ModuleModel.THERMOCYCLER_MODULE_V1,
             ),
+            locationSequence=[
+                OnModuleOffsetLocationSequenceComponent(
+                    moduleModel=ModuleModel.THERMOCYCLER_MODULE_V1
+                ),
+                OnAddressableAreaOffsetLocationSequenceComponent(
+                    addressableAreaName="1"
+                ),
+            ],
             vector=LabwareOffsetVector(x=1, y=2, z=3),
         )
     )
@@ -412,7 +501,7 @@ async def test_load_labware_on_module(
 
     assert result == LoadedLabwareData(
         labware_id="unique-id",
-        definition=minimal_labware_def,
+        definition=sentinel.labware_def,
         offsetId="labware-offset-id",
     )
 
@@ -424,22 +513,37 @@ def test_find_offset_id_of_labware_on_deck_slot(
 ) -> None:
     """It should find the offset by resolving the provided location."""
     decoy.when(
+        state_store.geometry.get_projected_offset_location(
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_3), None
+        )
+    ).then_return(
+        [
+            OnAddressableAreaOffsetLocationSequenceComponent(addressableAreaName="3"),
+        ]
+    )
+    decoy.when(
         state_store.labware.find_applicable_labware_offset(
             definition_uri="opentrons-test/load-name/1",
-            location=LabwareOffsetLocation(
-                slotName=DeckSlotName.SLOT_3,
-                moduleModel=None,
-            ),
+            location=[
+                OnAddressableAreaOffsetLocationSequenceComponent(
+                    addressableAreaName="3"
+                )
+            ],
         )
     ).then_return(
         LabwareOffset(
             id="labware-offset-id",
             createdAt=datetime(year=2021, month=1, day=2),
             definitionUri="opentrons-test/load-name/1",
-            location=LabwareOffsetLocation(
+            location=LegacyLabwareOffsetLocation(
                 slotName=DeckSlotName.SLOT_3,
                 moduleModel=None,
             ),
+            locationSequence=[
+                OnAddressableAreaOffsetLocationSequenceComponent(
+                    addressableAreaName="3"
+                )
+            ],
             vector=LabwareOffsetVector(x=1, y=2, z=3),
         )
     )
@@ -466,22 +570,47 @@ def test_find_offset_id_of_labware_on_module(
     )
 
     decoy.when(
+        state_store.geometry.get_projected_offset_location(
+            ModuleLocation(moduleId="input-module-id"), None
+        )
+    ).then_return(
+        [
+            OnModuleOffsetLocationSequenceComponent(
+                moduleModel=ModuleModel.THERMOCYCLER_MODULE_V1
+            ),
+            OnAddressableAreaOffsetLocationSequenceComponent(addressableAreaName="3"),
+        ]
+    )
+
+    decoy.when(
         state_store.labware.find_applicable_labware_offset(
             definition_uri="opentrons-test/load-name/1",
-            location=LabwareOffsetLocation(
-                slotName=DeckSlotName.SLOT_3,
-                moduleModel=ModuleModel.THERMOCYCLER_MODULE_V1,
-            ),
+            location=[
+                OnModuleOffsetLocationSequenceComponent(
+                    moduleModel=ModuleModel.THERMOCYCLER_MODULE_V1
+                ),
+                OnAddressableAreaOffsetLocationSequenceComponent(
+                    addressableAreaName="3"
+                ),
+            ],
         )
     ).then_return(
         LabwareOffset(
             id="labware-offset-id",
             createdAt=datetime(year=2021, month=1, day=2),
             definitionUri="opentrons-test/load-name/1",
-            location=LabwareOffsetLocation(
+            location=LegacyLabwareOffsetLocation(
                 slotName=DeckSlotName.SLOT_3,
                 moduleModel=ModuleModel.THERMOCYCLER_MODULE_V1,
             ),
+            locationSequence=[
+                OnModuleOffsetLocationSequenceComponent(
+                    moduleModel=ModuleModel.THERMOCYCLER_MODULE_V1
+                ),
+                OnAddressableAreaOffsetLocationSequenceComponent(
+                    addressableAreaName="3"
+                ),
+            ],
             vector=LabwareOffsetVector(x=1, y=2, z=3),
         )
     )
@@ -516,25 +645,49 @@ def test_find_offset_id_of_labware_on_labware(
     decoy.when(state_store.labware.get_parent_location("labware-id")).then_return(
         parent_location
     )
-
+    decoy.when(
+        state_store.geometry.get_projected_offset_location(
+            OnLabwareLocation(labwareId="labware-id"), None
+        )
+    ).then_return(
+        [
+            OnLabwareOffsetLocationSequenceComponent(
+                labwareUri="opentrons-test/load-name-2/1"
+            ),
+            OnAddressableAreaOffsetLocationSequenceComponent(addressableAreaName="1"),
+        ]
+        if parent_location is not OFF_DECK_LOCATION
+        else None
+    )
     decoy.when(
         state_store.labware.find_applicable_labware_offset(
             definition_uri="opentrons-test/load-name-1/1",
-            location=LabwareOffsetLocation(
-                slotName=DeckSlotName.SLOT_1,
-                moduleModel=None,
-                definitionUri="opentrons-test/load-name-2/1",
-            ),
+            location=[
+                OnLabwareOffsetLocationSequenceComponent(
+                    labwareUri="opentrons-test/load-name-2/1"
+                ),
+                OnAddressableAreaOffsetLocationSequenceComponent(
+                    addressableAreaName="1"
+                ),
+            ],
         )
     ).then_return(
         LabwareOffset(
             id="labware-offset-id",
             createdAt=datetime(year=2021, month=1, day=2),
             definitionUri="opentrons-test/load-name/1",
-            location=LabwareOffsetLocation(
+            location=LegacyLabwareOffsetLocation(
                 slotName=DeckSlotName.SLOT_1,
                 definitionUri="opentrons-test/load-name-2/1",
             ),
+            locationSequence=[
+                OnLabwareOffsetLocationSequenceComponent(
+                    labwareUri="opentrons-test/load-name-2/1"
+                ),
+                OnAddressableAreaOffsetLocationSequenceComponent(
+                    addressableAreaName="1"
+                ),
+            ],
             vector=LabwareOffsetVector(x=1, y=2, z=3),
         )
     )
@@ -570,24 +723,160 @@ def test_find_offset_id_of_labware_on_labware_on_modules(
     )
 
     decoy.when(
+        state_store.geometry.get_projected_offset_location(
+            OnLabwareLocation(labwareId="labware-id"), None
+        )
+    ).then_return(
+        [
+            OnLabwareOffsetLocationSequenceComponent(
+                labwareUri="opentrons-test/load-name-2/1"
+            ),
+            OnModuleOffsetLocationSequenceComponent(
+                moduleModel=ModuleModel.HEATER_SHAKER_MODULE_V1
+            ),
+            OnAddressableAreaOffsetLocationSequenceComponent(addressableAreaName="1"),
+        ]
+    )
+
+    decoy.when(
         state_store.labware.find_applicable_labware_offset(
             definition_uri="opentrons-test/load-name-1/1",
-            location=LabwareOffsetLocation(
-                slotName=DeckSlotName.SLOT_1,
-                moduleModel=ModuleModel.HEATER_SHAKER_MODULE_V1,
-                definitionUri="opentrons-test/load-name-2/1",
-            ),
+            location=[
+                OnLabwareOffsetLocationSequenceComponent(
+                    labwareUri="opentrons-test/load-name-2/1"
+                ),
+                OnModuleOffsetLocationSequenceComponent(
+                    moduleModel=ModuleModel.HEATER_SHAKER_MODULE_V1
+                ),
+                OnAddressableAreaOffsetLocationSequenceComponent(
+                    addressableAreaName="1"
+                ),
+            ],
         )
     ).then_return(
         LabwareOffset(
             id="labware-offset-id",
             createdAt=datetime(year=2021, month=1, day=2),
             definitionUri="opentrons-test/load-name/1",
-            location=LabwareOffsetLocation(
+            location=LegacyLabwareOffsetLocation(
                 slotName=DeckSlotName.SLOT_1,
                 moduleModel=ModuleModel.HEATER_SHAKER_MODULE_V1,
                 definitionUri="opentrons-test/load-name-2/1",
             ),
+            locationSequence=[
+                OnLabwareOffsetLocationSequenceComponent(
+                    labwareUri="opentrons-test/load-name-2/1"
+                ),
+                OnModuleOffsetLocationSequenceComponent(
+                    moduleModel=ModuleModel.HEATER_SHAKER_MODULE_V1
+                ),
+                OnAddressableAreaOffsetLocationSequenceComponent(
+                    addressableAreaName="1"
+                ),
+            ],
+            vector=LabwareOffsetVector(x=1, y=2, z=3),
+        )
+    )
+
+    result = subject.find_applicable_labware_offset_id(
+        labware_definition_uri="opentrons-test/load-name-1/1",
+        labware_location=OnLabwareLocation(labwareId="labware-id"),
+    )
+
+    assert result == "labware-offset-id"
+
+
+def test_find_offset_id_of_labware_on_labware_on_labware_modules(
+    decoy: Decoy,
+    state_store: StateStore,
+    subject: EquipmentHandler,
+) -> None:
+    """It should find an offset for a labware on a labware on a module."""
+    decoy.when(state_store.labware.get_definition_uri("labware-id")).then_return(
+        LabwareUri("opentrons-test/load-name-2/1")
+    )
+
+    decoy.when(state_store.labware.get_parent_location("labware-id")).then_return(
+        ModuleLocation(moduleId="labware-id-2"),
+    )
+
+    decoy.when(state_store.labware.get_definition_uri("labware-id-2")).then_return(
+        LabwareUri("opentrons-test/load-name-3/1")
+    )
+
+    decoy.when(state_store.labware.get_parent_location("labware-id-2")).then_return(
+        ModuleLocation(moduleId="module-id"),
+    )
+
+    decoy.when(state_store.modules.get_requested_model("module-id")).then_return(
+        ModuleModel.HEATER_SHAKER_MODULE_V1
+    )
+
+    decoy.when(state_store.modules.get_location("module-id")).then_return(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+    )
+
+    decoy.when(
+        state_store.geometry.get_projected_offset_location(
+            OnLabwareLocation(labwareId="labware-id"), None
+        )
+    ).then_return(
+        [
+            OnLabwareOffsetLocationSequenceComponent(
+                labwareUri="opentrons-test/load-name-2/1"
+            ),
+            OnLabwareOffsetLocationSequenceComponent(
+                labwareUri="opentrons-test/load-name-3/1"
+            ),
+            OnModuleOffsetLocationSequenceComponent(
+                moduleModel=ModuleModel.HEATER_SHAKER_MODULE_V1
+            ),
+            OnAddressableAreaOffsetLocationSequenceComponent(addressableAreaName="1"),
+        ]
+    )
+
+    decoy.when(
+        state_store.labware.find_applicable_labware_offset(
+            definition_uri="opentrons-test/load-name-1/1",
+            location=[
+                OnLabwareOffsetLocationSequenceComponent(
+                    labwareUri="opentrons-test/load-name-2/1"
+                ),
+                OnLabwareOffsetLocationSequenceComponent(
+                    labwareUri="opentrons-test/load-name-3/1"
+                ),
+                OnModuleOffsetLocationSequenceComponent(
+                    moduleModel=ModuleModel.HEATER_SHAKER_MODULE_V1
+                ),
+                OnAddressableAreaOffsetLocationSequenceComponent(
+                    addressableAreaName="1"
+                ),
+            ],
+        )
+    ).then_return(
+        LabwareOffset(
+            id="labware-offset-id",
+            createdAt=datetime(year=2021, month=1, day=2),
+            definitionUri="opentrons-test/load-name/1",
+            location=LegacyLabwareOffsetLocation(
+                slotName=DeckSlotName.SLOT_1,
+                moduleModel=ModuleModel.HEATER_SHAKER_MODULE_V1,
+                definitionUri="opentrons-test/load-name-2/1",
+            ),
+            locationSequence=[
+                OnLabwareOffsetLocationSequenceComponent(
+                    labwareUri="opentrons-test/load-name-2/1"
+                ),
+                OnLabwareOffsetLocationSequenceComponent(
+                    labwareUri="opentrons-test/load-name-3/1"
+                ),
+                OnModuleOffsetLocationSequenceComponent(
+                    moduleModel=ModuleModel.HEATER_SHAKER_MODULE_V1
+                ),
+                OnAddressableAreaOffsetLocationSequenceComponent(
+                    addressableAreaName="1"
+                ),
+            ],
             vector=LabwareOffsetVector(x=1, y=2, z=3),
         )
     )
@@ -614,8 +903,8 @@ async def test_load_pipette(
     model_utils: ModelUtils,
     hardware_api: HardwareControlAPI,
     state_store: StateStore,
-    action_dispatcher: ActionDispatcher,
     loaded_static_pipette_data: LoadedStaticPipetteData,
+    tip_overlap_versions: str,
     subject: EquipmentHandler,
 ) -> None:
     """It should load pipette data, check attachment, and generate an ID."""
@@ -624,14 +913,21 @@ async def test_load_pipette(
     decoy.when(state_store.config.use_virtual_pipettes).then_return(False)
     decoy.when(model_utils.generate_id()).then_return("unique-id")
     decoy.when(state_store.pipettes.get_by_mount(MountType.RIGHT)).then_return(
-        LoadedPipette.construct(pipetteName=PipetteNameType.P300_MULTI)  # type: ignore[call-arg]
+        LoadedPipette.model_construct(pipetteName=PipetteNameType.P300_MULTI)  # type: ignore[call-arg]
     )
     decoy.when(hardware_api.get_attached_instrument(mount=HwMount.LEFT)).then_return(
         pipette_dict
     )
 
     decoy.when(
-        pipette_data_provider.get_pipette_static_config(pipette_dict)
+        pipette_data_provider.validate_and_default_tip_overlap_version(
+            tip_overlap_versions
+        )
+    ).then_return(tip_overlap_versions)
+    decoy.when(
+        pipette_data_provider.get_pipette_static_config(
+            pipette_dict=pipette_dict, tip_overlap_version=tip_overlap_versions
+        ),
     ).then_return(loaded_static_pipette_data)
 
     decoy.when(hardware_api.get_instrument_max_height(mount=HwMount.LEFT)).then_return(
@@ -642,6 +938,7 @@ async def test_load_pipette(
         pipette_name=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
         pipette_id=None,
+        tip_overlap_version=tip_overlap_versions,
     )
 
     assert result == LoadedPipetteData(
@@ -665,8 +962,8 @@ async def test_load_pipette_96_channels(
     model_utils: ModelUtils,
     hardware_api: HardwareControlAPI,
     state_store: StateStore,
-    action_dispatcher: ActionDispatcher,
     loaded_static_pipette_data: LoadedStaticPipetteData,
+    tip_overlap_versions: str,
     subject: EquipmentHandler,
 ) -> None:
     """It should load pipette data, check attachment, and generate an ID."""
@@ -678,7 +975,14 @@ async def test_load_pipette_96_channels(
         pipette_dict
     )
     decoy.when(
-        pipette_data_provider.get_pipette_static_config(pipette_dict)
+        pipette_data_provider.validate_and_default_tip_overlap_version(
+            tip_overlap_versions
+        )
+    ).then_return(tip_overlap_versions)
+    decoy.when(
+        pipette_data_provider.get_pipette_static_config(
+            pipette_dict=pipette_dict, tip_overlap_version=tip_overlap_versions
+        )
     ).then_return(loaded_static_pipette_data)
 
     decoy.when(hardware_api.get_instrument_max_height(mount=HwMount.LEFT)).then_return(
@@ -689,6 +993,7 @@ async def test_load_pipette_96_channels(
         pipette_name=PipetteNameType.P1000_96,
         mount=MountType.LEFT,
         pipette_id=None,
+        tip_overlap_version=tip_overlap_versions,
     )
 
     assert result == LoadedPipetteData(
@@ -702,8 +1007,8 @@ async def test_load_pipette_uses_provided_id(
     decoy: Decoy,
     hardware_api: HardwareControlAPI,
     state_store: StateStore,
-    action_dispatcher: ActionDispatcher,
     loaded_static_pipette_data: LoadedStaticPipetteData,
+    tip_overlap_versions: str,
     subject: EquipmentHandler,
 ) -> None:
     """It should use the provided ID rather than generating an ID for the pipette."""
@@ -714,13 +1019,21 @@ async def test_load_pipette_uses_provided_id(
         pipette_dict
     )
     decoy.when(
-        pipette_data_provider.get_pipette_static_config(pipette_dict)
+        pipette_data_provider.validate_and_default_tip_overlap_version(
+            tip_overlap_versions
+        )
+    ).then_return(tip_overlap_versions)
+    decoy.when(
+        pipette_data_provider.get_pipette_static_config(
+            pipette_dict=pipette_dict, tip_overlap_version=tip_overlap_versions
+        )
     ).then_return(loaded_static_pipette_data)
 
     result = await subject.load_pipette(
         pipette_name=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
         pipette_id="my-pipette-id",
+        tip_overlap_version=tip_overlap_versions,
     )
 
     assert result == LoadedPipetteData(
@@ -734,9 +1047,9 @@ async def test_load_pipette_use_virtual(
     decoy: Decoy,
     model_utils: ModelUtils,
     state_store: StateStore,
-    action_dispatcher: ActionDispatcher,
     loaded_static_pipette_data: LoadedStaticPipetteData,
     subject: EquipmentHandler,
+    tip_overlap_versions: str,
     virtual_pipette_data_provider: pipette_data_provider.VirtualPipetteDataProvider,
 ) -> None:
     """It should use the provided ID rather than generating an ID for the pipette."""
@@ -746,15 +1059,22 @@ async def test_load_pipette_use_virtual(
     decoy.when(model_utils.generate_id(prefix="fake-serial-number-")).then_return(
         "fake-serial"
     )
-
+    decoy.when(
+        pipette_data_provider.validate_and_default_tip_overlap_version(
+            tip_overlap_versions
+        )
+    ).then_return(tip_overlap_versions)
     decoy.when(
         virtual_pipette_data_provider.get_virtual_pipette_static_config(
-            PipetteNameType.P300_SINGLE.value, "unique-id"
+            PipetteNameType.P300_SINGLE.value, "unique-id", tip_overlap_versions
         )
     ).then_return(loaded_static_pipette_data)
 
     result = await subject.load_pipette(
-        pipette_name=PipetteNameType.P300_SINGLE, mount=MountType.LEFT, pipette_id=None
+        pipette_name=PipetteNameType.P300_SINGLE,
+        mount=MountType.LEFT,
+        pipette_id=None,
+        tip_overlap_version=tip_overlap_versions,
     )
 
     assert result == LoadedPipetteData(
@@ -794,6 +1114,7 @@ async def test_load_pipette_raises_if_pipette_not_attached(
             pipette_name=PipetteNameType.P300_SINGLE,
             mount=MountType.LEFT,
             pipette_id=None,
+            tip_overlap_version="v9999",
         )
 
 
@@ -830,19 +1151,33 @@ async def test_load_module(
     decoy.when(state_store.config).then_return(_make_config(use_virtual_modules=False))
 
     decoy.when(
+        state_store.geometry._addressable_areas.get_addressable_area_base_slot(
+            DeckSlotName.SLOT_1.value
+        )
+    ).then_return(DeckSlotName.SLOT_1)
+    decoy.when(
+        state_store.geometry._addressable_areas.get_cutout_id_by_deck_slot_name(
+            slot_name=DeckSlotName.SLOT_1
+        )
+    ).then_return("cutout1")
+
+    decoy.when(
         state_store.modules.select_hardware_module_to_load(
             model=ModuleModel.TEMPERATURE_MODULE_V1,
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            location=deck_configuration_provider.get_cutout_id_by_deck_slot_name(
+                slot_name=DeckSlotName.SLOT_1
+            ),
             attached_modules=[
                 HardwareModule(serial_number="serial-1", definition=tempdeck_v1_def),
                 HardwareModule(serial_number="serial-2", definition=tempdeck_v2_def),
             ],
+            expected_serial_number=None,
         )
     ).then_return(HardwareModule(serial_number="serial-1", definition=tempdeck_v1_def))
 
     result = await subject.load_module(
         model=ModuleModel.TEMPERATURE_MODULE_V1,
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        location=AddressableAreaLocation(addressableAreaName=DeckSlotName.SLOT_1.value),
         module_id="input-module-id",
     )
 
@@ -880,7 +1215,7 @@ async def test_load_module_using_virtual(
 
     result = await subject.load_module(
         model=ModuleModel.TEMPERATURE_MODULE_V1,
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        location=AddressableAreaLocation(addressableAreaName=DeckSlotName.SLOT_1.value),
         module_id="input-module-id",
     )
 
@@ -909,7 +1244,7 @@ async def test_load_magnetic_block(
 
     result = await subject.load_magnetic_block(
         model=ModuleModel.MAGNETIC_BLOCK_V1,
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        location=AddressableAreaLocation(addressableAreaName=DeckSlotName.SLOT_1.value),
         module_id="input-module-id",
     )
 

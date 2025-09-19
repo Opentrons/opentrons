@@ -1,14 +1,16 @@
-import * as React from 'react'
-import { touchScreenViewport } from '../../DesignTokens/constants'
+import { VIEWPORT } from '@opentrons/components'
+
 import { ODDBackButton } from '.'
-import type { Story, Meta } from '@storybook/react'
+
+import type { Meta, Story } from '@storybook/react'
+import type * as React from 'react'
 
 export default {
   title: 'ODD/Molecules/ODDBackButton',
   argTypes: {
     onClick: { action: 'clicked' },
   },
-  parameters: touchScreenViewport,
+  parameters: VIEWPORT.touchScreenViewport,
 } as Meta
 
 const ODDBackButtonTemplate: Story<

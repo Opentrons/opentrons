@@ -18,9 +18,10 @@ from .helpers import (
     _calculate_average,
     _jog_to_find_liquid_height,
     _sense_liquid_height,
-    _apply_labware_offsets,
     _pick_up_tip,
     _drop_tip,
+    get_latest_offset_for_labware,
+    _get_offsets_from_ctx,
 )
 from .trial import (
     build_gravimetric_trials,
@@ -41,6 +42,7 @@ from .measurement import (
     record_measurement_data,
     calculate_change_in_volume,
     create_measurement_tag,
+    SupportedLiquid,
 )
 from .measurement.environment import get_min_reading, get_max_reading
 from .measurement.record import (
@@ -53,6 +55,8 @@ from .tips import MULTI_CHANNEL_TEST_ORDER
 import glob
 
 from opentrons.hardware_control.types import StatusBarState
+from hardware_testing.gravimetric.workarounds import get_sync_hw_api
+from opentrons.protocol_api.labware import SET_OFFSET_RESTORED_API_VERSION
 
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 
@@ -89,7 +93,7 @@ def _generate_callbacks_for_trial(
     if blank_measurement:
         volume = None
 
-    hw_api = ctx._core.get_hardware()
+    hw_api = get_sync_hw_api(ctx)
     hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
     pip_ax = Axis.of_main_tool_actuator(hw_mount)
     estimate_bottom: float = -1
@@ -179,7 +183,11 @@ def _load_labware(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> Labwar
     labware_on_scale = ctx.load_labware(
         cfg.labware_on_scale, location=cfg.slot_scale, namespace=namespace
     )
-    _apply_labware_offsets(cfg, [labware_on_scale])
+    if ctx.api_version >= SET_OFFSET_RESTORED_API_VERSION:
+        offset = get_latest_offset_for_labware(
+            _get_offsets_from_ctx(ctx), labware_on_scale
+        )
+        labware_on_scale.set_offset(offset.x, offset.y, offset.z)
     return labware_on_scale
 
 
@@ -283,9 +291,13 @@ def _run_trial(
         m_tag = _tag(m_type)
         if trial.recorder.is_simulator and not trial.blank:
             if m_type == MeasurementType.ASPIRATE:
-                trial.recorder.add_simulation_mass(trial.volume * -0.001)
+                trial.recorder.add_simulation_mass(
+                    trial.channel_count * trial.volume * -0.001
+                )
             elif m_type == MeasurementType.DISPENSE:
-                trial.recorder.add_simulation_mass(trial.volume * 0.001)
+                trial.recorder.add_simulation_mass(
+                    trial.channel_count * trial.volume * 0.001
+                )
         m_data = record_measurement_data(
             trial.ctx,
             m_tag,
@@ -327,14 +339,14 @@ def _run_trial(
     else:
         # center channel over well
         trial.pipette.move_to(trial.well.top(50).move(trial.channel_offset))
-    mnt = OT3Mount.RIGHT if trial.pipette.mount == "right" else OT3Mount.LEFT
-    trial.ctx._core.get_hardware().retract(mnt)  # retract to top of gantry
+    trial.pipette._retract()  # retract to top of gantry
     m_data_init = _record_measurement_and_store(MeasurementType.INIT)
     ui.print_info(f"\tinitial grams: {m_data_init.grams_average} g")
     # update the vials volumes, using the last-known weight
     if _PREV_TRIAL_GRAMS is not None:
+        liq = SupportedLiquid.from_string(trial.cfg.liquid)
         _evaporation_loss_ul = abs(
-            calculate_change_in_volume(_PREV_TRIAL_GRAMS, m_data_init)
+            calculate_change_in_volume(_PREV_TRIAL_GRAMS, m_data_init, liq)
         )
         ui.print_info(f"{_evaporation_loss_ul} ul evaporated since last trial")
         trial.liquid_tracker.update_affected_wells(
@@ -357,7 +369,7 @@ def _run_trial(
         mode=trial.mode,
         clear_accuracy_function=trial.cfg.increment,
     )
-    trial.ctx._core.get_hardware().retract(mnt)  # retract to top of gantry
+    trial.pipette._retract()  # retract to top of gantry
 
     _take_photos(trial, "aspirate")
     m_data_aspirate = _record_measurement_and_store(MeasurementType.ASPIRATE)
@@ -379,13 +391,14 @@ def _run_trial(
         mode=trial.mode,
         clear_accuracy_function=trial.cfg.increment,
     )
-    trial.ctx._core.get_hardware().retract(mnt)  # retract to top of gantry
+    trial.pipette._retract()  # retract to top of gantry
     _take_photos(trial, "dispense")
     m_data_dispense = _record_measurement_and_store(MeasurementType.DISPENSE)
     ui.print_info(f"\tgrams after dispense: {m_data_dispense.grams_average} g")
     # calculate volumes
-    volume_aspirate = calculate_change_in_volume(m_data_init, m_data_aspirate)
-    volume_dispense = calculate_change_in_volume(m_data_aspirate, m_data_dispense)
+    liq = SupportedLiquid.from_string(trial.cfg.liquid)
+    volume_aspirate = calculate_change_in_volume(m_data_init, m_data_aspirate, liq)
+    volume_dispense = calculate_change_in_volume(m_data_aspirate, m_data_dispense, liq)
     return volume_aspirate, m_data_aspirate, volume_dispense, m_data_dispense
 
 
@@ -500,8 +513,7 @@ def _calculate_evaporation(
         resources.env_sensor,
     )
     ui.print_info(f"running {config.NUM_BLANK_TRIALS}x blank measurements")
-    mnt = OT3Mount.RIGHT if resources.pipette.mount == "right" else OT3Mount.LEFT
-    resources.ctx._core.get_hardware().retract(mnt)
+    resources.pipette._retract()
     for i in range(config.SCALE_SECONDS_TO_TRUE_STABILIZE):
         ui.print_info(
             f"wait for scale to stabilize "
@@ -545,7 +557,7 @@ def _get_liquid_height(
         if not resources.ctx.is_simulating() and not cfg.same_tip:
             ui.alert_user_ready(
                 f"Please replace the {cfg.tip_volume}ul tips in slot 2",
-                resources.ctx._core.get_hardware(),
+                get_sync_hw_api(resources.ctx),
             )
         _tip_counter[0] = 0
     if cfg.jog:
@@ -587,7 +599,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
     assert resources.recorder is not None
     recorder = resources.recorder
     if resources.ctx.is_simulating():
-        start_sim_mass = {50: 15, 200: 200, 1000: 200}
+        start_sim_mass = {20: 5, 50: 15, 200: 200, 1000: 200}
         resources.recorder.set_simulation_mass(start_sim_mass[cfg.tip_volume])
     os.makedirs(
         f"{resources.test_report.parent}/{resources.test_report._run_id}", exist_ok=True
@@ -595,7 +607,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
     recorder._recording = GravimetricRecording()
     report.store_config_gm(resources.test_report, cfg)
     calibration_tip_in_use = True
-    hw_api = resources.ctx._core.get_hardware()
+    hw_api = get_sync_hw_api(resources.ctx)
     if resources.ctx.is_simulating():
         _PREV_TRIAL_GRAMS = None
         _MEASUREMENTS = list()
@@ -605,8 +617,6 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
         setup_channel_offset = _get_channel_offset(cfg, channel=0)
         first_tip_location = first_tip.top().move(setup_channel_offset)
         _pick_up_tip(resources.ctx, resources.pipette, cfg, location=first_tip_location)
-        mnt = OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT
-        resources.ctx._core.get_hardware().retract(mnt)
         ui.print_info("moving to scale")
         well = labware_on_scale["A1"]
         _liquid_height = _get_liquid_height(resources, cfg, well)
@@ -641,7 +651,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
             _drop_tip(
                 resources.pipette,
                 return_tip=False,
-                minimum_z_height=_minimum_z_height(cfg),
+                offset=_get_channel_offset(cfg, 0),
             )  # always trash calibration tips
         calibration_tip_in_use = False
         trial_count = 0
@@ -662,7 +672,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
             actual_asp_list_all = []
             actual_disp_list_all = []
             ui.print_title(f"{volume} uL")
-
+            resources.pipette.configure_for_volume(volume)
             trial_asp_dict: Dict[int, List[float]] = {
                 trial: [] for trial in range(cfg.trials)
             }
@@ -694,12 +704,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                             cfg,
                             location=next_tip_location,
                         )
-                        mnt = (
-                            OT3Mount.LEFT
-                            if cfg.pipette_mount == "left"
-                            else OT3Mount.RIGHT
-                        )
-                        resources.ctx._core.get_hardware().retract(mnt)
+                        resources.pipette._retract()  # retract to top of gantry
                     (
                         actual_aspirate,
                         aspirate_data,
@@ -742,14 +747,11 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                     )
                     ui.print_info("dropping tip")
                     if not cfg.same_tip:
-                        mnt = (
-                            OT3Mount.LEFT
-                            if cfg.pipette_mount == "left"
-                            else OT3Mount.RIGHT
-                        )
-                        resources.ctx._core.get_hardware().retract(mnt)
+                        resources.pipette._retract()  # retract to top of gantry
                         _drop_tip(
-                            resources.pipette, cfg.return_tip, _minimum_z_height(cfg)
+                            resources.pipette,
+                            cfg.return_tip,
+                            _get_channel_offset(cfg, run_trial.channel),
                         )
 
                 ui.print_header(f"{volume} uL channel {channel + 1} CALCULATIONS")
@@ -809,7 +811,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                 acceptable_d = trials[volume][channel][0].acceptable_d
                 print(f"acceptable cv {acceptable_cv} acceptable_d {acceptable_d}")
                 print(f"dispense cv {dispense_cv} aspirate_cv {aspirate_cv}")
-                print(f"dispense d {dispense_cv} aspirate_d {aspirate_d}")
+                print(f"dispense d {dispense_d} aspirate_d {aspirate_d}")
                 if (
                     not cfg.ignore_fail
                     and acceptable_cv is not None
@@ -820,8 +822,8 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                     if (
                         dispense_cv > acceptable_cv
                         or aspirate_cv > acceptable_cv
-                        or aspirate_d > acceptable_d
-                        or dispense_d > acceptable_d
+                        or abs(aspirate_d) > acceptable_d
+                        or abs(dispense_d) > acceptable_d
                     ):
                         raise RuntimeError(
                             f"Trial with volume {volume} on channel {channel} did not pass spec"

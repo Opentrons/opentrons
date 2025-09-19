@@ -1,22 +1,31 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+
+import {
+  Banner,
+  Flex,
+  JUSTIFY_CENTER,
+  LegacyStyledText,
+  SIZE_1,
+  SPACING,
+} from '@opentrons/components'
 import {
   SINGLE_MOUNT_PIPETTES,
   WEIGHT_OF_96_CHANNEL,
 } from '@opentrons/shared-data'
-import { Flex, JUSTIFY_CENTER, SPACING, SIZE_1 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
-import { Banner } from '../../atoms/Banner'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { Skeleton } from '../../atoms/Skeleton'
+
+import { Skeleton } from '/app/atoms/Skeleton'
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+
 import { CheckPipetteButton } from './CheckPipetteButton'
 import { BODY_STYLE, SECTIONS } from './constants'
 import { getPipetteAnimations, getPipetteAnimations96 } from './utils'
+
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { PipetteWizardStepProps } from './types'
 
 interface MountPipetteProps extends PipetteWizardStepProps {
   isFetching: boolean
-  setFetching: React.Dispatch<React.SetStateAction<boolean>>
+  setFetching: Dispatch<SetStateAction<boolean>>
 }
 const BACKGROUND_SIZE = '47rem'
 
@@ -42,7 +51,7 @@ export const MountPipette = (props: MountPipetteProps): JSX.Element => {
       backgroundSize={BACKGROUND_SIZE}
     />
   )
-  let bodyText: React.ReactNode = <div></div>
+  let bodyText: ReactNode = <div></div>
   if (isFetching) {
     bodyText = (
       <>
@@ -55,11 +64,11 @@ export const MountPipette = (props: MountPipetteProps): JSX.Element => {
   } else {
     bodyText = (
       <>
-        <StyledText css={BODY_STYLE}>
+        <LegacyStyledText css={BODY_STYLE}>
           {isSingleMountPipette
             ? t('align_the_connector')
             : t('hold_pipette_carefully')}
-        </StyledText>
+        </LegacyStyledText>
         {!isSingleMountPipette ? (
           <Banner
             type="warning"

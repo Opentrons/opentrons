@@ -205,6 +205,19 @@ class AddLinearMoveRequest(BaseMessage):  # noqa: D101
 
 
 @dataclass
+class AddSensorLinearMoveRequest(BaseMessage):
+    """Sensor Linear Move Request."""
+
+    payload: payloads.AddSensorLinearMoveBasePayload
+    payload_type: Type[
+        payloads.AddSensorLinearMoveBasePayload
+    ] = payloads.AddSensorLinearMoveBasePayload
+    message_id: Literal[
+        MessageId.add_sensor_move_request
+    ] = MessageId.add_sensor_move_request
+
+
+@dataclass
 class GetMoveGroupRequest(BaseMessage):  # noqa: D101
     payload: payloads.MoveGroupRequestPayload
     payload_type: Type[
@@ -343,6 +356,26 @@ class ReadMotorDriverResponse(BaseMessage):  # noqa: D101
     message_id: Literal[
         MessageId.read_motor_driver_register_response
     ] = MessageId.read_motor_driver_register_response
+
+
+@dataclass
+class ReadMotorDriverErrorStatusRequest(BaseMessage):  # noqa: D101
+    payload: payloads.EmptyPayload
+    payload_type: Type[payloads.EmptyPayload] = payloads.EmptyPayload
+    message_id: Literal[
+        MessageId.read_motor_driver_error_status_request
+    ] = MessageId.read_motor_driver_error_status_request
+
+
+@dataclass
+class ReadMotorDriverErrorStatusResponse(BaseMessage):  # noqa: D101
+    payload: payloads.ReadMotorDriverErrorStatusResponsePayload
+    payload_type: Type[
+        payloads.ReadMotorDriverErrorStatusResponsePayload
+    ] = payloads.ReadMotorDriverErrorStatusResponsePayload
+    message_id: Literal[
+        MessageId.read_motor_driver_error_status_response
+    ] = MessageId.read_motor_driver_error_status_response
 
 
 @dataclass
@@ -490,6 +523,28 @@ class ReadLimitSwitchResponse(BaseMessage):  # noqa: D101
 
 
 @dataclass
+class MaxSensorValueRequest(BaseMessage):  # noqa: D101
+    payload: payloads.ReadFromSensorRequestPayload
+    payload_type: Type[
+        payloads.ReadFromSensorRequestPayload
+    ] = payloads.ReadFromSensorRequestPayload
+    message_id: Literal[
+        MessageId.max_sensor_value_request
+    ] = MessageId.max_sensor_value_request
+
+
+@dataclass
+class MaxSensorValueResponse(BaseMessage):  # noqa: D101
+    payload: payloads.ReadFromSensorRequestPayload
+    payload_type: Type[
+        payloads.ReadFromSensorRequestPayload
+    ] = payloads.ReadFromSensorRequestPayload
+    message_id: Literal[
+        MessageId.max_sensor_value_response
+    ] = MessageId.max_sensor_value_response
+
+
+@dataclass
 class ReadFromSensorRequest(BaseMessage):  # noqa: D101
     payload: payloads.ReadFromSensorRequestPayload
     payload_type: Type[
@@ -536,6 +591,17 @@ class ReadFromSensorResponse(BaseMessage):  # noqa: D101
         payloads.ReadFromSensorResponsePayload
     ] = payloads.ReadFromSensorResponsePayload
     message_id: Literal[MessageId.read_sensor_response] = MessageId.read_sensor_response
+
+
+@dataclass
+class BatchReadFromSensorResponse(BaseMessage):  # noqa: D101
+    payload: payloads.BatchReadFromSensorResponsePayload
+    payload_type: Type[
+        payloads.BatchReadFromSensorResponsePayload
+    ] = payloads.BatchReadFromSensorResponsePayload
+    message_id: Literal[
+        MessageId.batch_read_sensor_response
+    ] = MessageId.batch_read_sensor_response
 
 
 @dataclass
@@ -988,3 +1054,25 @@ class GetHepaUVStateResponse(BaseMessage):
     message_id: Literal[
         MessageId.get_hepa_uv_state_response
     ] = MessageId.get_hepa_uv_state_response
+
+
+@dataclass
+class SendAccumulatedSensorDataRequest(BaseMessage):
+    """Send all the saved sensor data."""
+
+    payload: payloads.SendAccumulatedSensorDataPayload
+    payload_type: Type[
+        payloads.SendAccumulatedSensorDataPayload
+    ] = payloads.SendAccumulatedSensorDataPayload
+    message_id: Literal[
+        MessageId.send_accumulated_sensor_data
+    ] = MessageId.send_accumulated_sensor_data
+
+
+@dataclass
+class IncreaseEvoTipDispenseCountRequestRequest(EmptyPayloadMessage):
+    """Send all the saved sensor data."""
+
+    message_id: Literal[
+        MessageId.increase_evo_disp_count_request
+    ] = MessageId.increase_evo_disp_count_request

@@ -1,30 +1,35 @@
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
+
 import {
-  Flex,
-  Btn,
-  TYPOGRAPHY,
-  JUSTIFY_SPACE_BETWEEN,
-  SPACING,
-  COLORS,
-  RESPONSIVENESS,
-  PrimaryButton,
-  ALIGN_FLEX_END,
   ALIGN_CENTER,
+  ALIGN_FLEX_END,
+  AnimationVideo,
+  Btn,
+  COLORS,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
+  PrimaryButton,
+  RESPONSIVENESS,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { css } from 'styled-components'
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { getIsOnDevice } from '../../redux/config'
-import { StyledText } from '../../atoms/text'
-import { SmallButton } from '../../atoms/buttons'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import mountGripper from '../../assets/videos/gripper-wizards/MOUNT_GRIPPER.webm'
 
-import type { GripperWizardStepProps } from './types'
+import mountGripper from '/app/assets/videos/gripper-wizards/MOUNT_GRIPPER.webm'
+import { SmallButton } from '/app/atoms/buttons'
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+import {
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '/app/molecules/SimpleWizardBody'
+import { getIsOnDevice } from '/app/redux/config'
+
 import type { BadGripper, GripperData } from '@opentrons/api-client'
+import type { GripperWizardStepProps } from './types'
 
 const GO_BACK_BUTTON_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
@@ -58,10 +63,10 @@ export const MountGripper = (
   props: GripperWizardStepProps
 ): JSX.Element | null => {
   const { proceed, isRobotMoving } = props
-  const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
+  const { t } = useTranslation(['gripper_wizard_flows', 'shared', 'branded'])
   const isOnDevice = useSelector(getIsOnDevice)
-  const [showUnableToDetect, setShowUnableToDetect] = React.useState(false)
-  const [isPending, setIsPending] = React.useState(false)
+  const [showUnableToDetect, setShowUnableToDetect] = useState(false)
+  const [isPending, setIsPending] = useState(false)
   const { data: instrumentsQueryData, refetch } = useInstrumentsQuery({
     refetchInterval: QUICK_GRIPPER_POLL_MS,
   })
@@ -83,7 +88,7 @@ export const MountGripper = (
 
   if (isRobotMoving)
     return (
-      <InProgressModal
+      <SimpleWizardInProgressBody
         description={t('shared:stand_back_robot_is_in_motion')}
       />
     )
@@ -99,10 +104,14 @@ export const MountGripper = (
         css={ALIGN_BUTTONS}
         gridGap={SPACING.spacing8}
       >
-        <Btn onClick={() => setShowUnableToDetect(false)}>
-          <StyledText css={GO_BACK_BUTTON_STYLE}>
+        <Btn
+          onClick={() => {
+            setShowUnableToDetect(false)
+          }}
+        >
+          <LegacyStyledText css={GO_BACK_BUTTON_STYLE}>
             {t('shared:go_back')}
-          </StyledText>
+          </LegacyStyledText>
         </Btn>
         {isOnDevice ? (
           <SmallButton
@@ -119,23 +128,22 @@ export const MountGripper = (
     </SimpleWizardBody>
   ) : (
     <GenericWizardTile
-      header={t('connect_and_screw_in_gripper')}
+      header={t('branded:connect_and_screw_in_gripper')}
       rightHandBody={
-        <video
+        <AnimationVideo
           css={css`
             max-width: 100%;
             max-height: 20rem;
           `}
-          autoPlay={true}
-          loop={true}
-          controls={false}
           aria-label="connect and screw in gripper"
         >
           <source src={mountGripper} />
-        </video>
+        </AnimationVideo>
       }
       bodyText={
-        <StyledText as="p">{t('attached_gripper_and_screw_in')}</StyledText>
+        <LegacyStyledText as="p">
+          {t('attached_gripper_and_screw_in')}
+        </LegacyStyledText>
       }
       proceedButtonText={t('continue')}
       proceedIsDisabled={isPending}

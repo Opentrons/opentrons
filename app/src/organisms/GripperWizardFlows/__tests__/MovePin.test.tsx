@@ -1,11 +1,11 @@
-import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect, afterEach } from 'vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { instrumentsResponseFixture } from '@opentrons/api-client'
-import { i18n } from '../../../i18n'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { MovePin } from '../MovePin'
+import { instrumentsResponseFixture } from '@opentrons/api-client'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+
 import {
   GRIPPER_FLOW_TYPES,
   MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
@@ -13,6 +13,9 @@ import {
   REMOVE_PIN_FROM_REAR_JAW,
   SECTIONS,
 } from '../constants'
+import { MovePin } from '../MovePin'
+
+import type { ComponentProps } from 'react'
 import type { CommandData } from '@opentrons/api-client'
 
 describe('MovePin', () => {
@@ -25,9 +28,7 @@ describe('MovePin', () => {
   const mockSetFrontJawOffset = vi.fn()
   const mockRunId = 'fakeRunId'
 
-  const render = (
-    props: Partial<React.ComponentProps<typeof MovePin>> = {}
-  ) => {
+  const render = (props: Partial<ComponentProps<typeof MovePin>> = {}) => {
     return renderWithProviders(
       <MovePin
         maintenanceRunId={mockRunId}

@@ -1,18 +1,22 @@
-import * as React from 'react'
-import { describe, it, expect, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { beforeEach, describe, expect, it } from 'vitest'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+
 import '@testing-library/jest-dom/vitest'
-import { COLORS, SPACING, TYPOGRAPHY, BORDERS } from '@opentrons/components'
+
+import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
 
 import { TertiaryButton } from '..'
 
-const render = (props: React.ComponentProps<typeof TertiaryButton>) => {
+import type { ComponentProps } from 'react'
+
+const render = (props: ComponentProps<typeof TertiaryButton>) => {
   return renderWithProviders(<TertiaryButton {...props} />)[0]
 }
 
 describe('TertiaryButton', () => {
-  let props: React.ComponentProps<typeof TertiaryButton>
+  let props: ComponentProps<typeof TertiaryButton>
 
   beforeEach(() => {
     props = {
@@ -22,7 +26,7 @@ describe('TertiaryButton', () => {
   it('renders tertiary button with text', () => {
     render(props)
     const button = screen.getByText('tertiary button')
-    expect(button).toHaveStyle(`background-color: ${COLORS.blue60}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.blue50}`)
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16}`
     )
@@ -52,7 +56,7 @@ describe('TertiaryButton', () => {
     props.backgroundColor = COLORS.red50
     render(props)
     const button = screen.getByText('tertiary button')
-    expect(button).toHaveStyle(`background-color: ${COLORS.blue60}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.red50}`)
     expect(button).toHaveStyle(`color: ${COLORS.white}`)
   })
 })

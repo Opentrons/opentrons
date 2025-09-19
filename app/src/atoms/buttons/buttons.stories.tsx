@@ -1,20 +1,24 @@
 import * as React from 'react'
+
 import {
-  Flex,
-  DIRECTION_ROW,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  LegacyStyledText,
+  PrimaryButton,
   SPACING,
   useLongPress,
-  PrimaryButton,
 } from '@opentrons/components'
+
 import {
-  TertiaryButton,
   QuaternaryButton,
   SubmitPrimaryButton,
+  TertiaryButton,
+  TextOnlyButton,
   ToggleButton,
 } from './index'
-import { StyledText } from '../text'
-import type { Story, Meta } from '@storybook/react'
+
+import type { Meta, Story } from '@storybook/react'
 
 export default {
   title: 'App/Atoms/Buttons',
@@ -120,9 +124,9 @@ const LongPressButtonTemplate: Story<
         {children}
       </PrimaryButton>
       {
-        <StyledText
+        <LegacyStyledText
           marginTop={SPACING.spacing16}
-        >{`You tapped ${tapCount} times`}</StyledText>
+        >{`You tapped ${tapCount} times`}</LegacyStyledText>
       }
     </Flex>
   )
@@ -132,3 +136,19 @@ export const LongPress = LongPressButtonTemplate.bind({})
 LongPress.args = {
   children: 'long press - 2sec / tap',
 }
+
+const TextOnlyButtonTemplate: Story<
+  React.ComponentProps<typeof TextOnlyButton>
+> = () => {
+  const [count, setCount] = React.useState<number>(0)
+  return (
+    <TextOnlyButton
+      onClick={() => {
+        setCount(prev => prev + 1)
+      }}
+      buttonText={`You clicked me ${count} times`}
+    />
+  )
+}
+
+export const TextOnly = TextOnlyButtonTemplate.bind({})

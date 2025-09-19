@@ -1,34 +1,37 @@
-import * as React from 'react'
 import { act, fireEvent, screen, waitFor } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { COLORS } from '@opentrons/components'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import {
   LEFT,
   NINETY_SIX_CHANNEL,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import { COLORS } from '@opentrons/components'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
-import { i18n } from '../../../i18n'
-import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
-import { Results } from '../Results'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
+import { useIsOEMMode } from '/app/resources/robot-settings/hooks'
+import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
+
 import { FLOWS } from '../constants'
+import { Results } from '../Results'
 
 import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
 vi.mock('@opentrons/react-api-client')
+vi.mock('/app/resources/robot-settings/hooks')
 
-const render = (props: React.ComponentProps<typeof Results>) => {
+const render = (props: ComponentProps<typeof Results>) => {
   return renderWithProviders(<Results {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
 describe('Results', () => {
-  let props: React.ComponentProps<typeof Results>
+  let props: ComponentProps<typeof Results>
   let pipettePromise: Promise<void>
   let mockRefetchInstruments: Mock
   beforeEach(() => {
@@ -57,6 +60,7 @@ describe('Results', () => {
     vi.mocked(useInstrumentsQuery).mockReturnValue({
       refetch: mockRefetchInstruments,
     } as any)
+    vi.mocked(useIsOEMMode).mockReturnValue(false)
   })
   it('renders the correct information when pipette cal is a success for calibrate flow', () => {
     props = {
@@ -66,7 +70,7 @@ describe('Results', () => {
       hasCalData: true,
     }
     render(props)
-    screen.getByText('Flex 1-Channel 1000 μL successfully recalibrated')
+    screen.getByText('Flex 1-Channel 1000 µL successfully recalibrated')
     const image = screen.getByRole('img', { name: 'Success Icon' })
     expect(image.getAttribute('src')).toEqual(
       '/app/src/assets/images/icon_success.png'
@@ -84,7 +88,7 @@ describe('Results', () => {
       flowType: FLOWS.ATTACH,
     }
     render(props)
-    screen.getByText('Flex 1-Channel 1000 μL successfully attached')
+    screen.getByText('Flex 1-Channel 1000 µL successfully attached')
     const image = screen.getByRole('img', { name: 'Success Icon' })
     expect(image.getAttribute('src')).toEqual(
       '/app/src/assets/images/icon_success.png'
@@ -184,7 +188,7 @@ describe('Results', () => {
       flowType: FLOWS.DETACH,
     }
     render(props)
-    screen.getByText('Flex 1-Channel 1000 μL still attached')
+    screen.getByText('Flex 1-Channel 1000 µL still attached')
     expect(screen.getByLabelText('ot-alert')).toHaveStyle(
       `color: ${String(COLORS.red50)}`
     )
@@ -219,7 +223,7 @@ describe('Results', () => {
       selectedPipette: NINETY_SIX_CHANNEL,
     }
     render(props)
-    screen.getByText('Flex 1-Channel 1000 μL still attached')
+    screen.getByText('Flex 1-Channel 1000 µL still attached')
     expect(screen.getByLabelText('ot-alert')).toHaveStyle(
       `color: ${String(COLORS.red50)}`
     )
@@ -251,7 +255,7 @@ describe('Results', () => {
       flowType: FLOWS.CALIBRATE,
     }
     render(props)
-    screen.getByText('Flex 1-Channel 1000 μL successfully calibrated')
+    screen.getByText('Flex 1-Channel 1000 µL successfully calibrated')
     const image = screen.getByRole('img', { name: 'Success Icon' })
     expect(image.getAttribute('src')).toEqual(
       '/app/src/assets/images/icon_success.png'
@@ -268,7 +272,7 @@ describe('Results', () => {
       totalStepCount: 9,
     }
     render(props)
-    screen.getByText('Flex 1-Channel 1000 μL successfully calibrated')
+    screen.getByText('Flex 1-Channel 1000 µL successfully calibrated')
     const image = screen.getByRole('img', { name: 'Success Icon' })
     expect(image.getAttribute('src')).toEqual(
       '/app/src/assets/images/icon_success.png'
@@ -285,7 +289,7 @@ describe('Results', () => {
       totalStepCount: 5,
     }
     render(props)
-    screen.getByText('Flex 1-Channel 1000 μL successfully calibrated')
+    screen.getByText('Flex 1-Channel 1000 µL successfully calibrated')
     const image = screen.getByRole('img', { name: 'Success Icon' })
     expect(image.getAttribute('src')).toEqual(
       '/app/src/assets/images/icon_success.png'
@@ -301,7 +305,7 @@ describe('Results', () => {
       hasCalData: true,
     }
     render(props)
-    screen.getByText('Flex 1-Channel 1000 μL successfully recalibrated')
+    screen.getByText('Flex 1-Channel 1000 µL successfully recalibrated')
     const image = screen.getByRole('img', { name: 'Success Icon' })
     expect(image.getAttribute('src')).toEqual(
       '/app/src/assets/images/icon_success.png'
@@ -337,7 +341,7 @@ describe('Results', () => {
       },
     }
     render(props)
-    screen.getByText('Flex 1-Channel 1000 μL successfully attached')
+    screen.getByText('Flex 1-Channel 1000 µL successfully attached')
     const image = screen.getByRole('img', { name: 'Success Icon' })
     expect(image.getAttribute('src')).toEqual(
       '/app/src/assets/images/icon_success.png'
@@ -356,7 +360,7 @@ describe('Results', () => {
     }
     render(props)
     screen.getByText('Wrong instrument installed')
-    screen.getByText('Install Flex 8-Channel 50 μL instead')
+    screen.getByText('Install Flex 8-Channel 50 µL instead')
     fireEvent.click(screen.getByRole('button', { name: 'Detach and retry' }))
     await act(() => pipettePromise)
     expect(mockRefetchInstruments).toHaveBeenCalled()

@@ -3,7 +3,7 @@ from textwrap import dedent
 from typing import Any, Callable, Optional, Union, Literal
 
 import pytest
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 from opentrons.protocols.parse import (
     PythonParseMode,

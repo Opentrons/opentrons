@@ -1,20 +1,23 @@
-import * as React from 'react'
 import { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   BORDERS,
   Btn,
   COLORS,
+  CURSOR_DEFAULT,
   DIRECTION_ROW,
+  DISPLAY_FLEX,
   Icon,
+  JUSTIFY_CENTER,
+  LegacyStyledText,
   SPACING,
   TYPOGRAPHY,
-  DISPLAY_FLEX,
-  JUSTIFY_CENTER,
 } from '@opentrons/components'
-import { StyledText } from '../text'
+
 import { ODD_FOCUS_VISIBLE } from './constants'
 
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { IconName, StyleProps } from '@opentrons/components'
 import type { ButtonCategory } from './SmallButton'
 
@@ -27,12 +30,12 @@ type MediumButtonTypes =
   | 'tertiaryLowLight'
 
 interface MediumButtonProps extends StyleProps {
-  buttonText: React.ReactNode
+  buttonText: ReactNode
   buttonType?: MediumButtonTypes
   disabled?: boolean
   iconName?: IconName
   buttonCategory?: ButtonCategory
-  onClick: React.MouseEventHandler
+  onClick: MouseEventHandler
 }
 
 export function MediumButton(props: MediumButtonProps): JSX.Element {
@@ -111,7 +114,7 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
       : BORDERS.borderRadius16};
     box-shadow: none;
     color: ${MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor};
-    cursor: default;
+    cursor: ${CURSOR_DEFAULT};
 
     &:focus {
       background-color: ${MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType]
@@ -168,13 +171,13 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
           size={SPACING.spacing40}
         />
       )}
-      <StyledText
+      <LegacyStyledText
         fontSize={TYPOGRAPHY.fontSize28}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         lineHeight={TYPOGRAPHY.lineHeight36}
       >
         {buttonText}
-      </StyledText>
+      </LegacyStyledText>
     </Btn>
   )
 }

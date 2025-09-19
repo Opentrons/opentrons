@@ -1,33 +1,32 @@
-import * as React from 'react'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { describe, it, beforeEach, vi, expect } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import { LEFT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 
-import {
-  nestedTextMatcher,
-  renderWithProviders,
-} from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { nestedTextMatcher, renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import {
   mock8ChannelAttachedPipetteInformation,
   mock96ChannelAttachedPipetteInformation,
   mockAttachedPipetteInformation,
-} from '../../../redux/pipettes/__fixtures__'
-import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
-import { FLOWS } from '../constants'
-import { AttachProbe } from '../AttachProbe'
+} from '/app/redux/pipettes/__fixtures__'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
 
-const render = (props: React.ComponentProps<typeof AttachProbe>) => {
+import { AttachProbe } from '../AttachProbe'
+import { FLOWS } from '../constants'
+
+import type { ComponentProps } from 'react'
+
+const render = (props: ComponentProps<typeof AttachProbe>) => {
   return renderWithProviders(<AttachProbe {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
-vi.mock('@opentrons/react-api-client')
+vi.mock('/app/resources/deck_configuration')
 
 describe('AttachProbe', () => {
-  let props: React.ComponentProps<typeof AttachProbe>
+  let props: ComponentProps<typeof AttachProbe>
   beforeEach(() => {
     props = {
       mount: LEFT,
@@ -47,7 +46,7 @@ describe('AttachProbe', () => {
       selectedPipette: SINGLE_MOUNT_PIPETTES,
       isOnDevice: false,
     }
-    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [
         {
           cutoutId: 'cutoutD3',
@@ -71,7 +70,11 @@ describe('AttachProbe', () => {
         [
           {
             commandType: 'verifyTipPresence',
-            params: { pipetteId: 'abc', expectedState: 'present' },
+            params: {
+              pipetteId: 'abc',
+              expectedState: 'present',
+              followSingularSensor: 'primary',
+            },
           },
         ],
         false
@@ -131,7 +134,7 @@ describe('AttachProbe', () => {
       isRobotMoving: true,
     }
     render(props)
-    screen.getByText('Stand back, Flex 1-Channel 1000 μL is calibrating')
+    screen.getByText('Stand back, Flex 1-Channel 1000 µL is calibrating')
     screen.getByText(
       'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position.'
     )
@@ -150,7 +153,7 @@ describe('AttachProbe', () => {
       isRobotMoving: true,
     }
     render(props)
-    screen.getByText('Stand back, Flex 96-Channel 1000 μL is calibrating')
+    screen.getByText('Stand back, Flex 96-Channel 1000 µL is calibrating')
     screen.getByText(
       'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position.'
     )
@@ -191,21 +194,25 @@ describe('AttachProbe', () => {
       ...props,
       isOnDevice: true,
     }
-    const { getByText, getByTestId, getByRole, getByLabelText } = render(props)
-    getByText('Attach calibration probe')
-    getByText(
+    render(props)
+    screen.getByText('Attach calibration probe')
+    screen.getByText(
       'Take the calibration probe from its storage location. Ensure its collar is unlocked. Push the pipette ejector up and press the probe firmly onto the pipette nozzle. Twist the collar to lock the probe. Test that the probe is secure by gently pulling it back and forth.'
     )
-    getByTestId(
+    screen.getByTestId(
       '/app/src/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
     )
-    fireEvent.click(getByRole('button', { name: 'Begin calibration' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Begin calibration' }))
     await waitFor(() => {
       expect(props.chainRunCommands).toHaveBeenCalledWith(
         [
           {
             commandType: 'verifyTipPresence',
-            params: { pipetteId: 'abc', expectedState: 'present' },
+            params: {
+              pipetteId: 'abc',
+              expectedState: 'present',
+              followSingularSensor: 'primary',
+            },
           },
         ],
         false
@@ -237,7 +244,7 @@ describe('AttachProbe', () => {
     await waitFor(() => {
       expect(props.proceed).toHaveBeenCalled()
     })
-    fireEvent.click(getByLabelText('back'))
+    fireEvent.click(screen.getByLabelText('back'))
     expect(props.goBack).toHaveBeenCalled()
   })
 

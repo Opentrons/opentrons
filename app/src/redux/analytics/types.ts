@@ -1,14 +1,14 @@
-import {
+import type { PipetteMount as Mount, RobotType } from '@opentrons/shared-data'
+import type { DeckCalibrationStatus } from '../calibration/types'
+import type { Config } from '../config/types'
+import type { CalibrationCheckComparisonsPerCalibration } from '../sessions/types'
+import type {
   ANALYTICS_PIPETTE_OFFSET_STARTED,
+  ANALYTICS_RESOURCE_MONITOR_REPORT,
   ANALYTICS_TIP_LENGTH_STARTED,
 } from './constants'
 
-import type { PipetteMount as Mount } from '@opentrons/shared-data'
-import type { CalibrationCheckComparisonsPerCalibration } from '../sessions/types'
-import type { DeckCalibrationStatus } from '../calibration/types'
-import type { ConfigV0 } from '../config/types'
-
-export type AnalyticsConfig = ConfigV0['analytics']
+export type AnalyticsConfig = Config['analytics']
 
 export interface ProtocolAnalyticsData {
   protocolType: string
@@ -41,6 +41,8 @@ export interface BuildrootAnalyticsData {
   currentSystem: string
   updateVersion: string
   error: string | null
+  robotSerialNumber: string | null
+  robotType: RobotType | undefined
 }
 
 export interface PipetteOffsetCalibrationAnalyticsData {
@@ -118,9 +120,19 @@ export interface TipLengthStartedAnalyticsAction {
   }
 }
 
+export interface ResourceMonitorAnalyticsAction {
+  type: typeof ANALYTICS_RESOURCE_MONITOR_REPORT
+  payload: {
+    systemAvailMemMb: string
+    systemUptimeHrs: string
+    processesDetails: Array<Record<string, any>>
+  }
+}
+
 export type AnalyticsTriggerAction =
   | PipetteOffsetStartedAnalyticsAction
   | TipLengthStartedAnalyticsAction
+  | ResourceMonitorAnalyticsAction
 
 export interface SessionInstrumentAnalyticsData {
   sessionType: string

@@ -1,16 +1,21 @@
-import * as React from 'react'
 import { act, screen, waitFor } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
+
 import {
   useInstrumentsQuery,
   useSubsystemUpdateQuery,
   useUpdateSubsystemMutation,
 } from '@opentrons/react-api-client'
-import { i18n } from '../../../i18n'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+
 import { FirmwareUpdateModal } from '..'
-import {
+
+import type { ComponentProps } from 'react'
+import type {
   BadPipette,
   PipetteData,
   SubsystemUpdateProgressData,
@@ -18,14 +23,14 @@ import {
 
 vi.mock('@opentrons/react-api-client')
 
-const render = (props: React.ComponentProps<typeof FirmwareUpdateModal>) => {
+const render = (props: ComponentProps<typeof FirmwareUpdateModal>) => {
   return renderWithProviders(<FirmwareUpdateModal {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
 describe('FirmwareUpdateModal', () => {
-  let props: React.ComponentProps<typeof FirmwareUpdateModal>
+  let props: ComponentProps<typeof FirmwareUpdateModal>
   const refetch = vi.fn(() => Promise.resolve())
   const updateSubsystem = vi.fn(() => Promise.resolve())
   beforeEach(() => {
@@ -86,9 +91,9 @@ describe('FirmwareUpdateModal', () => {
         } as any,
       } as SubsystemUpdateProgressData,
     } as any)
-    const { getByText, getByLabelText } = render(props)
-    getByLabelText('spinner')
-    getByText('Checking for updates...')
+    render(props)
+    screen.getByLabelText('spinner')
+    screen.getByText('Checking for updates...')
   })
   it('calls proceed if no update is needed', async () => {
     vi.mocked(useInstrumentsQuery).mockReturnValue({

@@ -1,19 +1,30 @@
 import uniqBy from 'lodash/uniqBy'
-import { THERMOCYCLER_PROFILE } from '../../constants'
-import { PROFILE_STEP, ProfileStepItem } from '../../form-types'
 
-// TODO: real HydratedFormData type
-type HydratedFormData = any
+import { THERMOCYCLER_PROFILE } from '../../constants'
+import { PROFILE_STEP } from '../../form-types'
+
+import type { ReactNode } from 'react'
+import type {
+  HydratedThermocyclerFormData,
+  ProfileStepItem,
+} from '../../form-types'
+import type { FormErrorLocationType } from './errors'
+
 export interface ProfileFormError {
   title: string
-  body?: React.ReactNode
   dependentProfileFields: string[]
+  //  location the error appears in the form
+  location: FormErrorLocationType
+  body?: ReactNode
+  page?: number
+  showOnReopen?: boolean
 }
 type ProfileFormErrorKey = 'INVALID_PROFILE_DURATION'
 const PROFILE_FORM_ERRORS: Record<ProfileFormErrorKey, ProfileFormError> = {
   INVALID_PROFILE_DURATION: {
     title: 'Invalid profile duration',
     dependentProfileFields: ['durationMinutes', 'durationSeconds'],
+    location: 'field',
   },
 }
 // TC Profile multi-field error fns
@@ -28,7 +39,7 @@ export const profileStepValidDuration = (
 // =====
 const PROFILE_STEP_ERROR_GETTERS = [profileStepValidDuration]
 export const getProfileFormErrors = (
-  hydratedForm: HydratedFormData
+  hydratedForm: HydratedThermocyclerFormData
 ): ProfileFormError[] => {
   if (
     hydratedForm.stepType !== 'thermocycler' ||
@@ -54,7 +65,7 @@ export const getProfileFormErrors = (
     const item = profileItemsById[itemId]
 
     if (item.type === PROFILE_STEP) {
-      addStepErrors(item)
+      addStepErrors(item as ProfileStepItem)
     } else {
       // Cycles themselves don't currently have any form-level errors,
       // so we just validate each cycle's steps

@@ -1,0 +1,2379 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>API Reference &#8212; OT-2 Python API Version 1 Documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <link rel="stylesheet" href="_static/new-nav.css" type="text/css" />
+    <link rel="stylesheet" href="_static/nav.css" type="text/css" />
+    <link rel="stylesheet" href="_static/override_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/banners.css" type="text/css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="shortcut icon" href="_static/OTfavicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Examples" href="examples.html" />  
+<link
+  rel="stylesheet"
+  href="_static/custom.css"
+  type="text/css"
+/>
+ 
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=0.9, maximum-scale=0.9"
+/>
+<script src="_static/Akko-Pro-All.js"></script>
+<!-- INTERCOM -->
+<script>
+  window.intercomSettings = {
+    app_id: 'ukpodv2l',
+  }
+</script>
+
+  </head><body>
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WCDX9CX"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<header id="nav">
+  <nav class="docs-navbar">
+    <div class="container">
+      <div class="container-div"></div>
+      <ul>
+        <li>
+          <a
+            href="https://docs.opentrons.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-gtm-category="g-toolbar"
+            data-gtm-label="opentrons-api"
+            data-gtm-action="click"
+            >Python API</a
+          >
+        </li>
+        <li>
+          <a
+            href="https://labware.opentrons.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-gtm-category="g-toolbar"
+            data-gtm-label="labware-library"
+            data-gtm-action="click"
+            >Labware Library</a
+          >
+        </li>
+        <li>
+          <a
+            href="https://protocols.opentrons.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-gtm-category="g-toolbar"
+            data-gtm-label="protocol-library"
+            data-gtm-action="click"
+            >Protocol Library</a
+          >
+        </li>
+        <li>
+          <a
+            href="https://designer.opentrons.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-gtm-category="g-toolbar"
+            data-gtm-label="protocol-designer"
+            data-gtm-action="click"
+            >Protocol Designer</a
+          >
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <nav class="navbar">
+    <div class="container">
+      <div class="navbar-container">
+        <div class="navbar-logo" onclick="close()">
+          <a
+            href="https://opentrons.com"
+            class="brand"
+            title="Home"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-gtm-category="d-header"
+            data-gtm-label="logo"
+            data-gtm-action="click"
+          >
+            <img
+              class="img-logo"
+              src="https://s3.amazonaws.com/opentrons-images/website/ot_logo_full.png"
+              alt="Opentrons Home"
+            />
+          </a>
+        </div>
+        <div class="schedule-menu mobile-schedule-menu">
+          <div class="schedule-div">
+            <a
+              class="btn schedule-demo"
+              href="https://opentrons.com/contact"
+              target="_blank"
+              rel="noopener noreferrer"
+              data-gtm-category="d-header"
+              data-gtm-label="contact-sales"
+              data-gtm-action="click"
+              >Contact sales</a
+            >
+          </div>
+          <div class="mobile-hamburger">
+            <div id="nav-collapse" onclick="toggleOpen()">
+              <div class="bar1"></div>
+              <div class="bar2"></div>
+              <div class="bar3"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="navbar-menu">
+        <ul class="main-menu">
+          <li class="main-menu-li about" onclick="toggleMenu(`about`)">
+            <span class="menu-span" id="menu-about">About</span>
+            <ul id="about" class="navbar-ul visible">
+              <li onclick="closeMenu()">
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://opentrons.com/about"
+                  data-gtm-category="d-header"
+                  data-gtm-label="about"
+                  data-gtm-action="click"
+                  >Mission</a
+                >
+              </li>
+              <li onclick="closeMenu()">
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://opentrons.com/team"
+                  data-gtm-category="d-header"
+                  data-gtm-label="team"
+                  data-gtm-action="click"
+                  >Our Team</a
+                >
+              </li>
+              <li onclick="closeMenu()">
+                <a
+                  href="https://blog.opentrons.com/"
+                  data-gtm-category="d-header"
+                  data-gtm-label="blog"
+                  data-gtm-action="click"
+                  >Blog</a
+                >
+              </li>
+            </ul>
+          </li>
+          <li class="main-menu-li" onclick="toggleMenu(`products`)">
+            <span class="menu-span" id="menu-products">Products</span>
+            <ul class="navbar-ul visible" id="products">
+              <li onclick="closeMenu()">
+                <a
+                  href="https://opentrons.com/ot-2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-gtm-category="d-header"
+                  data-gtm-label="ot-2"
+                  data-gtm-action="click"
+                  >OT-2 Robot</a
+                >
+              </li>
+              <li onclick="closeMenu()">
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://opentrons.com/modules"
+                  data-gtm-category="d-header"
+                  data-gtm-label="modules"
+                  data-gtm-action="click"
+                  >OT-2 Add-ons</a
+                >
+              </li>
+              <li onclick="closeMenu()">
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://opentrons.com/pipettes"
+                  data-gtm-category="d-header"
+                  data-gtm-label="ot-2-pipettes"
+                  data-gtm-action="click"
+                  >OT-2 Pipettes</a
+                >
+              </li>
+              <li onclick="closeMenu()">
+                <a
+                  href="https://shop.opentrons.com/collections/opentrons-tips"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-gtm-category="d-header"
+                  data-gtm-label="tips"
+                  data-gtm-action="click"
+                  >Pipette Tips</a
+                >
+              </li>
+              <li onclick="closeMenu()">
+                <a
+                  href="https://shop.opentrons.com/collections/racks-and-adapters"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-gtm-category="d-header"
+                  data-gtm-label="tube-racks"
+                  data-gtm-action="click"
+                  >Racks &amp; Adapters</a
+                >
+              </li>
+              <li onclick="closeMenu()">
+                <a
+                  href="https://shop.opentrons.com/collections/mag-bead-kits"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-gtm-category="d-header"
+                  data-gtm-label="reagents"
+                  data-gtm-action="click"
+                  >Reagents</a
+                >
+              </li>
+              <a
+                onclick="closeMenu()"
+                class="blue blue-products"
+                href="https://shop.opentrons.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-gtm-category="d-header"
+                data-gtm-label="all-products"
+                data-gtm-action="click"
+                >Shop all products ›</a
+              >
+            </ul>
+          </li>
+          <li class="main-menu-li" onclick="toggleMenu(`applications`)">
+            <span class="menu-span" id="menu-applications">Applications</span>
+            <ul class="navbar-ul visible" id="applications">
+              <li onclick="closeMenu()">
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://opentrons.com/pcr-sample-prep"
+                  data-gtm-category="d-header"
+                  data-gtm-label="prep"
+                  data-gtm-action="click"
+                  >PCR Sample Prep</a
+                >
+              </li>
+              <li onclick="closeMenu()">
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://protocols.opentrons.com/categories/Molecular%20Biology/Nucleic%20Acid%20Purification"
+                  data-gtm-category="d-header"
+                  data-gtm-label="nap"
+                  data-gtm-action="click"
+                  >Nucelic Acid Purification</a
+                >
+              </li>
+              <li onclick="closeMenu()">
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://protocols.opentrons.com/categories/Sample%20Prep/PCR"
+                  data-gtm-category="d-header"
+                  data-gtm-label="qpcr"
+                  data-gtm-action="click"
+                  >qPCR/RT-PCR</a
+                >
+              </li>
+              <li onclick="closeMenu()">
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://protocols.opentrons.com/protocol/TSH_ELISA_2018-1-25"
+                  data-gtm-category="d-header"
+                  data-gtm-label="elisa"
+                  data-gtm-action="click"
+                  >ELISA</a
+                >
+              </li>
+              <li onclick="closeMenu()">
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://protocols.opentrons.com/categories/NGS%20Library%20Prep"
+                  data-gtm-category="d-header"
+                  data-gtm-label="ngs-prep"
+                  data-gtm-action="click"
+                  >NGS Library Prep</a
+                >
+              </li>
+              <li onclick="closeMenu()">
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://protocols.opentrons.com/categories/Basic%20Pipetting"
+                  data-gtm-category="d-header"
+                  data-gtm-label="basic"
+                  data-gtm-action="click"
+                  >Basic Pipetting</a
+                >
+              </li>
+            </ul>
+          </li>
+          <li class="main-menu-li" onclick="toggleMenu(`protocols`)">
+            <span class="menu-span" id="menu-protocols">Protocols</span>
+            <ul class="navbar-ul protocol-nav visible" id="protocols">
+              <div class="navbar-ul-div">
+                <div class="protocol-items">
+                  <li onclick="closeMenu()">
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://opentrons.com/protocols"
+                      data-gtm-category="d-header"
+                      data-gtm-label="protocol-tools"
+                      data-gtm-action="click"
+                      >Protocol Options</a
+                    >
+                    <span
+                      >Gain an overview of our protocol creation options</span
+                    >
+                  </li>
+                  <li onclick="closeMenu()">
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://opentrons.com/protocols/designer"
+                      data-gtm-category="d-header"
+                      data-gtm-label="protocol-designer"
+                      data-gtm-action="click"
+                      >Protocol Designer</a
+                    >
+                    <span>
+                      Use our graphical user interface to design protocols
+                    </span>
+                  </li>
+                  <li class="protocol-bottom" onclick="closeMenu()">
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://protocols.opentrons.com"
+                      data-gtm-category="d-header"
+                      data-gtm-label="protocol-library"
+                      data-gtm-action="click"
+                      >Protocol Library</a
+                    >
+                    <span>Explore our open source database of protocols</span>
+                  </li>
+                </div>
+                <div class="protocol-items">
+                  <li class="protocol-items-li" onclick="closeMenu()">
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://docs.opentrons.com/"
+                      data-gtm-category="d-header"
+                      data-gtm-label="opentrons-api"
+                      data-gtm-action="click"
+                      >Python API</a
+                    >
+                    <span class="protocol-items-span">
+                      Maximum customization for anyone with python and basic
+                      wetlab skills
+                    </span>
+                  </li>
+                  <li class="protocol-items-li" onclick="closeMenu()">
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://github.com/Opentrons"
+                      data-gtm-category="d-header"
+                      data-gtm-label="github-protocols"
+                      data-gtm-action="click"
+                      >Github</a
+                    >
+                    <span class="protocol-items-span"
+                      >Contribute to open source protocol repository</span
+                    >
+                  </li>
+                </div>
+              </div>
+              <div onclick="closeMenu()">
+                <a
+                  class="blue"
+                  href="https://opentrons.com/request-protocol"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-gtm-category="d-header"
+                  data-gtm-label="request-protocol-protocols"
+                  data-gtm-action="click"
+                  >Request a free custom protocol ›</a
+                >
+              </div>
+            </ul>
+          </li>
+          <li class="main-menu-li" onclick="toggleMenu('sns')">
+            <span class="menu-span" id="menu-sns">Support &amp; Sales</span>
+            <ul class="navbar-ul protocol-nav sns visible" id="sns">
+              <!-- <span>SUPPORT</span> -->
+              <div class="navbar-ul-li">
+                <div class="protocol-items">
+                  <li onclick="closeMenu()">
+                    <span class="support-sales">SUPPORT</span>
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://support.opentrons.com/guide-for-getting-started-with-the-ot-2"
+                      data-gtm-category="d-header"
+                      data-gtm-label="start-guide"
+                      data-gtm-action="click"
+                      >OT-2 Start Guide</a
+                    >
+                    <span>You received your robot, here's what's next</span>
+                  </li>
+                  <li onclick="closeMenu()">
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://support.opentrons.com/"
+                      data-gtm-category="d-header"
+                      data-gtm-label="product-help"
+                      data-gtm-action="click"
+                      >Product Help</a
+                    >
+                    <span>Answer common technical questions</span>
+                  </li>
+                  <li onclick="closeMenu()" class="github">
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://github.com/Opentrons"
+                      data-gtm-category="d-header"
+                      data-gtm-label="github-support"
+                      data-gtm-action="click"
+                      >Github</a
+                    >
+                    <span>Contribute to open source protocol repository</span>
+                  </li>
+                </div>
+              </div>
+              <div class="navbar-ul-li">
+                <div class="protocol-items">
+                  <li onclick="closeMenu()">
+                    <span class="support-sales"></span>
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://support.opentrons.com/s/article/What-labware-can-I-use-with-the-OT-2"
+                      data-gtm-category="d-header"
+                      data-gtm-label="labware-library"
+                      data-gtm-action="click"
+                      >Labware Library</a
+                    >
+                    <span
+                      >Understand what labware is compatible with the OT-2</span
+                    >
+                  </li>
+                  <li onclick="closeMenu()">
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://opentrons.com/ot-app"
+                      data-gtm-category="d-header"
+                      data-gtm-label="ot-app"
+                      data-gtm-action="click"
+                      >Install the app</a
+                    >
+                  </li>
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="blue-text"
+                    href="https://opentrons.com/contact-support"
+                    data-gtm-category="d-header"
+                    data-gtm-label="contact-support"
+                    data-gtm-action="click"
+                    >Contact support ›</a
+                  >
+                </div>
+                <!-- <div class="number">718-999-9999</div> -->
+              </div>
+              <div class="navbar-ul-li order-online">
+                <div class="protocol-items">
+                  <li onclick="close()">
+                    <span class="support-sales">SALES</span>
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://shop.opentrons.com"
+                      data-gtm-category="d-header"
+                      data-gtm-label="shop"
+                      data-gtm-action="click"
+                      >Order online</a
+                    >
+                  </li>
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="blue-text"
+                    href="https://opentrons.com/contact"
+                    data-gtm-category="d-header"
+                    data-gtm-label="contact-sales"
+                    data-gtm-action="click"
+                    >Contact sales ›</a
+                  >
+                </div>
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-gtm-category="d-header"
+                  data-gtm-label="cta-demo-button"
+                  data-gtm-action="click"
+                  class="btn schedule-demo"
+                  href="https://opentrons.com/demo"
+                  >Schedule a demo ›</a
+                >
+                <!-- <div class="number">718-999-9999</div> -->
+              </div>
+            </ul>
+          </li>
+        </ul>
+        <div class="schedule-menu desktop-schedule-menu">
+          <div class="schedule-div">
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn schedule-demo"
+              href="https://opentrons.com/contact"
+              data-gtm-category="d-header"
+              data-gtm-label="contact-sales-primary"
+              data-gtm-action="click"
+              >Contact Sales</a
+            >
+          </div>
+        </div>
+      </div>
+      <div class="div-sub-menu">
+        <div class="mobile-menu mobilemenufixed dnone">
+          <ul>
+            <li onclick="showMenu('about')">About</li>
+            <li onclick="showMenu('products')">Products</li>
+            <li onclick="showMenu('applications')">Applications</li>
+            <li onclick="showMenu('protocols')">Protocols</li>
+            <li onclick="showMenu('sns')">Support &amp; Sales</li>
+          </ul>
+          <div class="menu-button" onclick="close()">
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn"
+              href="https://opentrons.com/contact"
+              data-gtm-category="d-header"
+              data-gtm-label="contact-sales-primary"
+              data-gtm-action="click"
+              >Contact Sales</a
+            >
+          </div>
+        </div>
+        <div class="sub-menu about sub-menu-about">
+          <div class="sub-menu-div" onclick="closeMenu()">
+            <img
+              src="https://s3.amazonaws.com/opentrons-images/website/arrow-icon.svg"
+              alt
+            />
+            <span>About</span>
+          </div>
+          <ul>
+            <li onclick="close()">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://opentrons.com/about"
+                data-gtm-category="d-header"
+                data-gtm-label="about"
+                data-gtm-action="click"
+                >Mission ›</a
+              >
+            </li>
+            <li onclick="close()">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://opentrons.com/team"
+                data-gtm-category="d-header"
+                data-gtm-label="team"
+                data-gtm-action="click"
+                >Our Team ›</a
+              >
+            </li>
+            <li onclick="close()">
+              <a
+                href="https://blog.opentrons.com/"
+                data-gtm-category="d-header"
+                data-gtm-label="blog"
+                data-gtm-action="click"
+                >Blog ›</a
+              >
+            </li>
+          </ul>
+        </div>
+        <div class="sub-menu products sub-menu-products">
+          <div class="sub-menu-div" onclick="closeMenu()">
+            <img
+              src="https://s3.amazonaws.com/opentrons-images/website/arrow-icon.svg"
+              alt
+            />
+            <span>Products</span>
+          </div>
+          <ul>
+            <li onclick="close()">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://opentrons.com/ot-2"
+                data-gtm-category="d-header"
+                data-gtm-label="ot-2"
+                data-gtm-action="click"
+                >OT-2 Robot ›</a
+              >
+            </li>
+            <li onclick="close()">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://opentrons.com/modules"
+                data-gtm-category="d-header"
+                data-gtm-label="modules"
+                data-gtm-action="click"
+                >OT-2 Add-ons ›</a
+              >
+            </li>
+            <li onclick="close()">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://opentrons.com/pipettes"
+                data-gtm-category="d-header"
+                data-gtm-label="ot-2-pipettes"
+                data-gtm-action="click"
+                >OT-2 Pipettes ›</a
+              >
+            </li>
+            <li onclick="close()">
+              <a
+                href="https://shop.opentrons.com/collections/opentrons-tips"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-gtm-category="d-header"
+                data-gtm-label="tips"
+                data-gtm-action="click"
+                >Pipette Tips ›</a
+              >
+            </li>
+            <li onclick="close()">
+              <a
+                href="https://shop.opentrons.com/collections/racks-and-adapters"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-gtm-category="d-header"
+                data-gtm-label="tube-racks"
+                data-gtm-action="click"
+                >Racks &amp; Adapters ›</a
+              >
+            </li>
+            <li onclick="close()">
+              <a
+                href="https://shop.opentrons.com/collections/mag-bead-kits"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-gtm-category="d-header"
+                data-gtm-label="reagents"
+                data-gtm-action="click"
+                >Reagents ›</a
+              >
+            </li>
+            <li class="blue" onclick="close()">
+              <a
+                onclick="close()"
+                class="blue"
+                href="https://shop.opentrons.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-gtm-category="d-header"
+                data-gtm-label="all-products"
+                data-gtm-action="click"
+                >Shop all products ›</a
+              >
+            </li>
+          </ul>
+        </div>
+        <div class="sub-menu applications sub-menu-applications">
+          <div class="sub-menu-div" onclick="closeMenu()">
+            <img
+              src="https://s3.amazonaws.com/opentrons-images/website/arrow-icon.svg"
+              alt
+            />
+            <span>Applications</span>
+          </div>
+          <ul>
+            <li onclick="close()">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://opentrons.com/pcr-sample-prep"
+                data-gtm-category="d-header"
+                data-gtm-label="prep"
+                data-gtm-action="click"
+                >PCR Sample Prep ›</a
+              >
+            </li>
+            <li onclick="close()">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://protocols.opentrons.com/categories/Molecular%20Biology/Nucleic%20Acid%20Purification"
+                data-gtm-category="d-header"
+                data-gtm-label="nap"
+                data-gtm-action="click"
+                >Nucelic Acid Purification ›</a
+              >
+            </li>
+            <li onclick="close()">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://protocols.opentrons.com/categories/Sample%20Prep/PCR"
+                data-gtm-category="d-header"
+                data-gtm-label="qpcr"
+                data-gtm-action="click"
+                >qPCR/RT-PCR ›</a
+              >
+            </li>
+            <li onclick="close()">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://protocols.opentrons.com/protocol/TSH_ELISA_2018-1-25"
+                data-gtm-category="d-header"
+                data-gtm-label="elisa"
+                data-gtm-action="click"
+                >ELISA ›</a
+              >
+            </li>
+            <li onclick="close()">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://protocols.opentrons.com/categories/NGS%20Library%20Prep"
+                data-gtm-category="d-header"
+                data-gtm-label="ngs-prep"
+                data-gtm-action="click"
+                >NGS Library Prep ›</a
+              >
+            </li>
+            <li onclick="close()">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://protocols.opentrons.com/categories/Basic%20Pipetting"
+                data-gtm-category="d-header"
+                data-gtm-label="basic"
+                data-gtm-action="click"
+                >Basic Pipetting ›</a
+              >
+            </li>
+          </ul>
+        </div>
+        <div class="sub-menu protocols sub-menu-protocols">
+          <div class="sub-menu-div" onclick="closeMenu()">
+            <img
+              src="https://s3.amazonaws.com/opentrons-images/website/arrow-icon.svg"
+              alt
+            />
+            <span>Protocols</span>
+          </div>
+          <ul>
+            <li onclick="close()">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://opentrons.com/protocols"
+                data-gtm-category="d-header"
+                data-gtm-label="protocol-tools"
+                data-gtm-action="click"
+                >Protocol Options ›</a
+              >
+              <span>Gain an overview of our protocol creation options</span>
+            </li>
+            <li onclick="close()">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://opentrons.com/protocols/designer"
+                data-gtm-category="d-header"
+                data-gtm-label="protocol-designer"
+                data-gtm-action="click"
+                >Protocol Designer ›</a
+              >
+              <span>Use our graphical user interface to design protocols</span>
+            </li>
+            <li onclick="close()">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://protocols.opentrons.com"
+                data-gtm-category="d-header"
+                data-gtm-label="protocol-library"
+                data-gtm-action="click"
+                >Protocol Library ›</a
+              >
+              <span>Explore our open source database of protocols</span>
+            </li>
+            <li onclick="close()">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://docs.opentrons.com/"
+                data-gtm-category="d-header"
+                data-gtm-label="opentrons-api"
+                data-gtm-action="click"
+                >Python API ›</a
+              >
+              <span>
+                Maximum customization for anyone with python and basic weblab
+                skills
+              </span>
+            </li>
+            <li onclick="close()">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://github.com/Opentrons"
+                data-gtm-category="d-header"
+                data-gtm-label="github-protocols"
+                data-gtm-action="click"
+                >Github ›</a
+              >
+              <span>Contribute to open source protocol repository</span>
+            </li>
+            <li onclick="close()">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                class="blue"
+                href="https://opentrons.com/request-protocol"
+                data-gtm-category="d-header"
+                data-gtm-label="request-protocol-protocols"
+                data-gtm-action="click"
+                >Request a free custom protocol ›</a
+              >
+            </li>
+          </ul>
+        </div>
+        <div class="sub-menu sns sub-menu-sns">
+          <div class="sub-menu-div" onclick="closeMenu()">
+            <img
+              src="https://s3.amazonaws.com/opentrons-images/website/arrow-icon.svg"
+              alt
+            />
+            <span>Support &amp; Sales</span>
+          </div>
+          <ul class="sns-ul">
+            <section class="sns-sales">
+              <!-- <span class="sales">SALES</span> -->
+              <li onclick="close()">
+                <section class="sns-support-section">
+                  <span class="sales-tron">SALES</span>
+                  <div class="support-items">
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://shop.opentrons.com"
+                      data-gtm-category="d-header"
+                      data-gtm-label="shop"
+                      data-gtm-action="click"
+                      class="order-line-mobile"
+                      >Order online ›</a
+                    >
+                  </div>
+                </section>
+              </li>
+              <li onclick="close()">
+                <section class="sns-support-section">
+                  <span class="sales-tron mobile-contact"></span>
+                  <div>
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="sales-link mobile-contact-sales"
+                      href="https://opentrons.com/contact"
+                      data-gtm-category="d-header"
+                      data-gtm-label="contact-sales"
+                      data-gtm-action="click"
+                      >Contact sales ›</a
+                    >
+                  </div>
+                </section>
+              </li>
+              <li>
+                <section class="sns-support-section">
+                  <span class="sales-tron"></span>
+                  <div>
+                    <!-- <a
+                      class="sales-link schedule-demo-mobile"
+                      data-gtm-category="d-header"
+                      data-gtm-label="schedule-demo"
+                      data-gtm-action="click"
+                      onclick="openModal('demo')"
+                    >Schedule a demo ›</a> -->
+                  </div>
+                </section>
+              </li>
+            </section>
+            <section class="sns-support">
+              <!-- <span class="support">SUPPORT</span> -->
+              <li onclick="close()">
+                <section class="sns-support-section ot-2">
+                  <span class="sales-tron">SUPPORT</span>
+                  <div class="ot-2-start-guide support-items">
+                    <a
+                      href="https://support.opentrons.com/guide-for-getting-started-with-the-ot-2"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      data-gtm-category="d-header"
+                      data-gtm-label="start-guide"
+                      data-gtm-action="click"
+                      class="ot-2-guide"
+                      >OT-2 Start Guide ›</a
+                    >
+                    <span class="ot-2-guide"
+                      >You received your robot, here's what's next</span
+                    >
+                  </div>
+                </section>
+              </li>
+              <li class="sns-support-li" onclick="close()">
+                <section class="sns-support-section ot-2">
+                  <span class="sales-tron"></span>
+                  <div class="support-items">
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://support.opentrons.com/"
+                      data-gtm-category="d-header"
+                      data-gtm-label="product-help"
+                      data-gtm-action="click"
+                      >Product Help ›</a
+                    >
+                    <span>Answer common technical questions</span>
+                  </div>
+                </section>
+              </li>
+              <li class="sns-support-li" onclick="close()">
+                <section class="sns-support-section ot-2">
+                  <span class="sales-tron"></span>
+                  <div class="support-items">
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://github.com/Opentrons"
+                      data-gtm-category="d-header"
+                      data-gtm-label="github-support"
+                      data-gtm-action="click"
+                      >Github ›</a
+                    >
+                    <span>Contribute to open source protocol repository</span>
+                  </div>
+                </section>
+              </li>
+              <li class="sns-support-li" onclick="close()">
+                <section class="sns-support-section ot-2">
+                  <span class="sales-tron"></span>
+                  <div class="support-items">
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://support.opentrons.com/s/article/What-labware-can-I-use-with-the-OT-2"
+                      data-gtm-category="d-header"
+                      data-gtm-label="labware-library"
+                      data-gtm-action="click"
+                      >Labware Library ›</a
+                    >
+                    <span
+                      >Understand what labware is compatible with the OT-2</span
+                    >
+                  </div>
+                </section>
+              </li>
+              <li class="sns-support-li" onclick="close()">
+                <section class="sns-support-section ot-2">
+                  <span class="sales-tron"></span>
+                  <div class="support-items">
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://opentrons.com/ot-app"
+                      data-gtm-category="d-header"
+                      data-gtm-label="ot-app"
+                      data-gtm-action="click"
+                      >Install the app ›</a
+                    >
+                  </div>
+                </section>
+              </li>
+              <li class="sns-support-li" onclick="close()">
+                <section class="sns-support-section ot-2">
+                  <span class="sales-tron"></span>
+                  <div>
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="blue-text sales-link"
+                      href="https://opentrons.com/contact-support"
+                      data-gtm-category="d-header"
+                      data-gtm-label="contact-support"
+                      data-gtm-action="click"
+                      >Contact support ›</a
+                    >
+                  </div>
+                </section>
+              </li>
+            </section>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="document">
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/logo.png" alt="Logo"/>
+            </a></p>
+<h1 class="logo"><a href="index.html">OT-2 API V1</a></h1>
+
+
+
+<p class="blurb">Python Protocol API</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=opentrons&repo=opentrons&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<!-- Navbar override for specific styling for the v1 sidebar-->
+<h3>Table Of Contents</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="writing.html">Using Python In Protocols</a></li>
+<li class="toctree-l1"><a class="reference internal" href="labware.html">Labware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipettes.html">Creating a Pipette</a></li>
+<li class="toctree-l1"><a class="reference internal" href="atomic_commands.html">Atomic Liquid Handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="complex_commands.html">Complex Liquid Handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hardware_control.html">Advanced Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Hardware Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#robot">Robot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-instruments">Pipette</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#placeable">Placeable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-opentrons.simulate">Simulation</a></li>
+</ul>
+</li>
+</ul>
+
+<hr />
+<ul>
+    <li class="toctree-l1"><a href="../v2/index.html">OT-2 Python API v2</a></li>
+    <li class="toctree-l1"><a href="../ot1/index.html">OT-1 Python API</a></li>
+</ul>
+<!-- 'extra_nav_links' in the config dict if any, though there probably shoudln't be -->
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="examples.html" title="previous chapter">Examples</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+  <div class="documentwrapper">
+    <div class="bodywrapper">
+      <div class="body" role="main">
+        
+        <div class="banner_wrapper banner_v1">
+          <p>
+            You are currently viewing the documentation for version 1 of the
+              Opentrons OT-2 Python Protocol API. This version of the API is
+              <b>no longer supported</b> on Opentrons App and Robot Software 4.0.0
+              and later. To view version 2 of the API,
+              <a href="../v2/index.html">click here</a>.
+          </p>
+        </div> 
+  <section id="module-opentrons">
+<span id="api-reference"></span><span id="api"></span><h1>API Reference<a class="headerlink" href="#module-opentrons" title="Permalink to this heading">¶</a></h1>
+<p>If you are reading this, you are probably looking for an in-depth explanation of API classes and methods to fully master your protocol development skills.</p>
+<section id="robot">
+<h2>Robot<a class="headerlink" href="#robot" title="Permalink to this heading">¶</a></h2>
+<p>All protocols are set up, simulated and executed using a Robot class.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="robot.Robot">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">robot.</span></span><span class="sig-name descname"><span class="pre">Robot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">broker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#robot.Robot" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class is the main interface to the robot.</p>
+<p>It should never be instantiated directly; instead, the global instance may
+be accessed at <code class="xref py py-attr docutils literal notranslate"><span class="pre">opentrons.robot</span></code>.</p>
+<dl class="simple">
+<dt>Through this class you can can:</dt><dd><ul class="simple">
+<li><p>define your <code class="xref py py-class docutils literal notranslate"><span class="pre">opentrons.Deck</span></code></p></li>
+<li><p><a class="reference internal" href="#robot.Robot.connect" title="robot.Robot.connect"><code class="xref py py-meth docutils literal notranslate"><span class="pre">connect()</span></code></a> to Opentrons physical robot</p></li>
+<li><p><a class="reference internal" href="#robot.Robot.home" title="robot.Robot.home"><code class="xref py py-meth docutils literal notranslate"><span class="pre">home()</span></code></a> axis, move head (<a class="reference internal" href="#robot.Robot.move_to" title="robot.Robot.move_to"><code class="xref py py-meth docutils literal notranslate"><span class="pre">move_to()</span></code></a>)</p></li>
+<li><p><a class="reference internal" href="#robot.Robot.pause" title="robot.Robot.pause"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pause()</span></code></a> and <a class="reference internal" href="#robot.Robot.resume" title="robot.Robot.resume"><code class="xref py py-func docutils literal notranslate"><span class="pre">resume()</span></code></a> the protocol run</p></li>
+<li><p>set the <a class="reference internal" href="#robot.Robot.head_speed" title="robot.Robot.head_speed"><code class="xref py py-meth docutils literal notranslate"><span class="pre">head_speed()</span></code></a> of the robot</p></li>
+</ul>
+</dd>
+</dl>
+<p>Each Opentrons protocol is a Python script. When evaluated the script
+creates an execution plan which is stored as a list of commands in
+Robot’s command queue.</p>
+<dl class="simple">
+<dt>Here are the typical steps of writing the protocol:</dt><dd><ul class="simple">
+<li><p>Using a Python script and the Opentrons API load your
+containers and define instruments
+(see <code class="xref py py-class docutils literal notranslate"><span class="pre">Pipette</span></code>).</p></li>
+<li><p>Call <a class="reference internal" href="#robot.Robot.reset" title="robot.Robot.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reset()</span></code></a> to reset the robot’s state and clear commands.</p></li>
+<li><p>Write your instructions which will get converted
+into an execution plan.</p></li>
+<li><p>Review the list of commands generated by a protocol
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">commands()</span></code>.</p></li>
+<li><p><a class="reference internal" href="#robot.Robot.connect" title="robot.Robot.connect"><code class="xref py py-meth docutils literal notranslate"><span class="pre">connect()</span></code></a> to the robot and call <code class="xref py py-func docutils literal notranslate"><span class="pre">run()</span></code> it on a real robot.</p></li>
+</ul>
+</dd>
+</dl>
+<p>See <code class="xref py py-class docutils literal notranslate"><span class="pre">Pipette</span></code> for the list of supported instructions.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="robot.Robot.add_instrument">
+<span class="sig-name descname"><span class="pre">add_instrument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mount</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instrument</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#robot.Robot.add_instrument" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds instrument to a robot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mount</strong> (<em>str</em>) – Specifies which axis the instruments is attached to.
+Valid options are “left” or “right”.</p></li>
+<li><p><strong>instrument</strong> (<em>Instrument</em>) – An instance of a <code class="xref py py-class docutils literal notranslate"><span class="pre">Pipette</span></code> to attached to the axis.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>A canonical way to add to add a Pipette to a robot is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">instruments</span>
+<span class="n">m300</span> <span class="o">=</span> <span class="n">instruments</span><span class="o">.</span><span class="n">P300_Multi</span><span class="p">(</span><span class="n">mount</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This will create a pipette and call <a class="reference internal" href="#robot.Robot.add_instrument" title="robot.Robot.add_instrument"><code class="xref py py-func docutils literal notranslate"><span class="pre">add_instrument()</span></code></a>
+to attach the instrument.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="robot.Robot.connect">
+<span class="sig-name descname"><span class="pre">connect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#robot.Robot.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connects the robot to a serial port.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>port</strong> (<em>str</em>) – OS-specific port name or <code class="docutils literal notranslate"><span class="pre">'Virtual</span> <span class="pre">Smoothie'</span></code></p></li>
+<li><p><strong>options</strong> (<em>dict</em>) – if <code class="xref py py-attr docutils literal notranslate"><span class="pre">port</span></code> is set to <code class="docutils literal notranslate"><span class="pre">'Virtual</span> <span class="pre">Smoothie'</span></code>, provide
+the list of options to be passed to <code class="xref py py-func docutils literal notranslate"><span class="pre">get_virtual_device()</span></code></p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> for success, <code class="docutils literal notranslate"><span class="pre">False</span></code> for failure.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>If you wish to connect to the robot without using the OT App, you will
+need to use this function.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">robot</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">robot</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span> 
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="robot.Robot.disconnect">
+<span class="sig-name descname"><span class="pre">disconnect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#robot.Robot.disconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disconnects from the robot.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="robot.Robot.get_warnings">
+<span class="sig-name descname"><span class="pre">get_warnings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#robot.Robot.get_warnings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get current runtime warnings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>Runtime warnings accumulated since the last <code class="xref py py-func docutils literal notranslate"><span class="pre">run()</span></code></p></li>
+<li><p>or <code class="xref py py-func docutils literal notranslate"><span class="pre">simulate()</span></code>.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="robot.Robot.head_speed">
+<span class="sig-name descname"><span class="pre">head_speed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">combined_speed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#robot.Robot.head_speed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the speeds (mm/sec) of the robot</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>combined_speed</strong> (<em>number specifying a combined-axes speed</em>) – </p></li>
+<li><p><strong>&lt;axis&gt;</strong> (<em>key/value pair</em><em>, </em><em>specifying the maximum speed of that axis</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">robot</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">robot</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">robot</span><span class="o">.</span><span class="n">head_speed</span><span class="p">(</span><span class="n">combined_speed</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span> 
+<span class="go">#  sets the head speed to 400 mm/sec or the axis max per axis</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">robot</span><span class="o">.</span><span class="n">head_speed</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span> 
+<span class="go"># sets max speeds of X and Y</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="robot.Robot.home">
+<span class="sig-name descname"><span class="pre">home</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">\*args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">\*\*kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#robot.Robot.home" title="Permalink to this definition">¶</a></dt>
+<dd><p>Home robot’s head and plunger motors.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="robot.Robot.move_to">
+<span class="sig-name descname"><span class="pre">move_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instrument</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy='arc'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">\*\*kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#robot.Robot.move_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move an instrument to a coordinate, container or a coordinate within
+a container.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>location</strong> (<em>one of the following:</em>) – 1. <code class="xref py py-class docutils literal notranslate"><span class="pre">Placeable</span></code> (i.e. Container, Deck, Slot, Well) — will
+move to the origin of a container.
+2. <code class="xref py py-class docutils literal notranslate"><span class="pre">Vector</span></code> move to the given coordinate in Deck coordinate
+system.
+3. (<code class="xref py py-class docutils literal notranslate"><span class="pre">Placeable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Vector</span></code>) move to a given coordinate
+within object’s coordinate system.</p></li>
+<li><p><strong>instrument</strong> – Instrument to move relative to. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, move relative to the
+center of a gantry.</p></li>
+<li><p><strong>strategy</strong> (<em>{'arc'</em><em>, </em><em>'direct'}</em>) – <p><code class="docutils literal notranslate"><span class="pre">arc</span></code> : move to the point using arc trajectory
+avoiding obstacles.</p>
+<p><code class="docutils literal notranslate"><span class="pre">direct</span></code> : move to the point in a straight line.</p>
+</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="robot.Robot.pause">
+<span class="sig-name descname"><span class="pre">pause</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#robot.Robot.pause" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pauses execution of the protocol. Use <a class="reference internal" href="#robot.Robot.resume" title="robot.Robot.resume"><code class="xref py py-meth docutils literal notranslate"><span class="pre">resume()</span></code></a> to resume</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="robot.Robot.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#robot.Robot.reset" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Resets the state of the robot and clears:</dt><dd><ul class="simple">
+<li><p>Deck</p></li>
+<li><p>Instruments</p></li>
+<li><p>Command queue</p></li>
+<li><p>Runtime warnings</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">robot</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">robot</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span> 
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="robot.Robot.resume">
+<span class="sig-name descname"><span class="pre">resume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#robot.Robot.resume" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resume execution of the protocol after <a class="reference internal" href="#robot.Robot.pause" title="robot.Robot.pause"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pause()</span></code></a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="robot.Robot.stop">
+<span class="sig-name descname"><span class="pre">stop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#robot.Robot.stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops execution of the protocol. (alias for <cite>halt</cite>)</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-instruments">
+<span id="pipette"></span><h2>Pipette<a class="headerlink" href="#module-instruments" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pipette.Pipette">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pipette.</span></span><span class="sig-name descname"><span class="pre">Pipette</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">robot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mount</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mount_obj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ul_per_mm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_volume</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_volume</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trash_container</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tip_racks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aspirate_speed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dispense_speed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blow_out_speed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aspirate_flow_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dispense_flow_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plunger_current</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop_tip_current</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_tip_height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop_tip_speed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plunger_positions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'blow_out':</span> <span class="pre">0,</span> <span class="pre">'bottom':</span> <span class="pre">2,</span> <span class="pre">'drop_tip':</span> <span class="pre">-</span> <span class="pre">3.5,</span> <span class="pre">'top':</span> <span class="pre">18.5}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pick_up_current</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pick_up_distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pick_up_increment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pick_up_presses</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pick_up_speed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quirks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fallback_tip_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">51.7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blow_out_flow_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requested_as</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pipette_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pipette.Pipette" title="Permalink to this definition">¶</a></dt>
+<dd><p>DIRECT USE OF THIS CLASS IS DEPRECATED – this class should not be used
+directly. Its parameters, defaults, methods, and behaviors are subject to
+change without a major version release. Use the model-specific constructors
+available through <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">opentrons</span> <span class="pre">import</span> <span class="pre">instruments</span></code>.</p>
+<p>All model-specific instrument constructors are inheritors of this class.
+With any of those instances you can can:</p>
+<ul class="simple">
+<li><p>Handle liquids with <a class="reference internal" href="#pipette.Pipette.aspirate" title="pipette.Pipette.aspirate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">aspirate()</span></code></a>, <a class="reference internal" href="#pipette.Pipette.dispense" title="pipette.Pipette.dispense"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dispense()</span></code></a>,
+<a class="reference internal" href="#pipette.Pipette.mix" title="pipette.Pipette.mix"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mix()</span></code></a>, and <a class="reference internal" href="#pipette.Pipette.blow_out" title="pipette.Pipette.blow_out"><code class="xref py py-meth docutils literal notranslate"><span class="pre">blow_out()</span></code></a></p></li>
+<li><p>Handle tips with <a class="reference internal" href="#pipette.Pipette.pick_up_tip" title="pipette.Pipette.pick_up_tip"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pick_up_tip()</span></code></a>, <a class="reference internal" href="#pipette.Pipette.drop_tip" title="pipette.Pipette.drop_tip"><code class="xref py py-meth docutils literal notranslate"><span class="pre">drop_tip()</span></code></a>,
+and <a class="reference internal" href="#pipette.Pipette.return_tip" title="pipette.Pipette.return_tip"><code class="xref py py-meth docutils literal notranslate"><span class="pre">return_tip()</span></code></a></p></li>
+<li><p>Calibrate this pipette’s plunger positions</p></li>
+<li><p>Calibrate the position of each <code class="xref any docutils literal notranslate"><span class="pre">Container</span></code> on deck</p></li>
+</ul>
+<p>Here are the typical steps of using the Pipette:</p>
+<ul class="simple">
+<li><p>Instantiate a pipette with a maximum volume (uL)
+and a mount (<cite>left</cite> or <cite>right</cite>)</p></li>
+<li><p>Design your protocol through the pipette’s liquid-handling commands</p></li>
+</ul>
+<p>Methods in this class include assertions where needed to ensure that any
+action that requires a tip must be preceeded by <cite>pick_up_tip</cite>. For example:
+<cite>mix</cite>, <cite>transfer</cite>, <cite>aspirate</cite>, <cite>blow_out</cite>, and <cite>drop_tip</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mount</strong> (<em>str</em>) – The mount of the pipette’s actuator on the Opentrons robot
+(‘left’ or ‘right’)</p></li>
+<li><p><strong>trash_container</strong> (<em>Container</em>) – Sets the default location <a class="reference internal" href="#pipette.Pipette.drop_tip" title="pipette.Pipette.drop_tip"><code class="xref py py-meth docutils literal notranslate"><span class="pre">drop_tip()</span></code></a> will put tips
+(Default: <cite>fixed-trash</cite>)</p></li>
+<li><p><strong>tip_racks</strong> (<em>list</em>) – A list of Containers for this Pipette to track tips when calling
+<a class="reference internal" href="#pipette.Pipette.pick_up_tip" title="pipette.Pipette.pick_up_tip"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pick_up_tip()</span></code></a> (Default: [])</p></li>
+<li><p><strong>aspirate_flow_rate</strong> (<em>int</em>) – The speed (in ul/sec) the plunger will move while aspirating
+(Default: See Model Type)</p></li>
+<li><p><strong>dispense_flow_rate</strong> (<em>int</em>) – The speed (in ul/sec) the plunger will move while dispensing
+(Default: See Model Type)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new instance of <a class="reference internal" href="#pipette.Pipette" title="pipette.Pipette"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipette</span></code></a>.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">instruments</span><span class="p">,</span> <span class="n">labware</span><span class="p">,</span> <span class="n">robot</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">robot</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tip_rack_300ul</span> <span class="o">=</span> <span class="n">labware</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="s1">&#39;GEB-tiprack-300ul&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">)</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span> <span class="o">=</span> <span class="n">instruments</span><span class="o">.</span><span class="n">P300_Single</span><span class="p">(</span><span class="n">mount</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">tip_racks</span><span class="o">=</span><span class="p">[</span><span class="n">tip_rack_300ul</span><span class="p">])</span> 
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="pipette.Pipette.aspirate">
+<span class="sig-name descname"><span class="pre">aspirate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pipette.Pipette.aspirate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Aspirate a volume of liquid (in microliters/uL) using this pipette
+from the specified location</p>
+<p class="rubric">Notes</p>
+<p>If only a volume is passed, the pipette will aspirate
+from it’s current position. If only a location is passed,
+<cite>aspirate</cite> will default to it’s <cite>max_volume</cite>.</p>
+<p>The location may be a Well, or a specific position in relation to a
+Well, such as <cite>Well.top()</cite>. If a Well is specified without calling a
+a position method (such as .top or .bottom), this method will default
+to the bottom of the well.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>volume</strong> (<em>int</em><em> or </em><em>float</em>) – The number of microliters to aspirate (Default: self.max_volume)</p></li>
+<li><p><strong>location</strong> (<a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a> or tuple(<a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a>, <code class="xref any docutils literal notranslate"><span class="pre">Vector</span></code>)) – The <a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a> (<code class="xref any docutils literal notranslate"><span class="pre">Well</span></code>) to perform the aspirate.
+Can also be a tuple with first item <a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a>,
+second item relative <code class="xref any docutils literal notranslate"><span class="pre">Vector</span></code></p></li>
+<li><p><strong>rate</strong> (<em>float</em>) – Set plunger speed for this aspirate, where
+speed = rate * aspirate_speed (see <code class="xref py py-meth docutils literal notranslate"><span class="pre">set_speed()</span></code>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>This instance of <a class="reference internal" href="#pipette.Pipette" title="pipette.Pipette"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipette</span></code></a>.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">instruments</span><span class="p">,</span> <span class="n">labware</span><span class="p">,</span> <span class="n">robot</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">robot</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plate</span> <span class="o">=</span> <span class="n">labware</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;96-flat&#39;</span><span class="p">,</span> <span class="s1">&#39;2&#39;</span><span class="p">)</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span> <span class="o">=</span> <span class="n">instruments</span><span class="o">.</span><span class="n">P300_Single</span><span class="p">(</span><span class="n">mount</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">)</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span><span class="o">.</span><span class="n">pick_up_tip</span><span class="p">()</span> 
+<span class="go"># aspirate 50uL from a Well</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span><span class="o">.</span><span class="n">aspirate</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">plate</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> 
+<span class="go"># aspirate 50uL from the center of a well</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span><span class="o">.</span><span class="n">aspirate</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">plate</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">bottom</span><span class="p">())</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># aspirate 20uL in place, twice as fast</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span><span class="o">.</span><span class="n">aspirate</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># aspirate the pipette&#39;s remaining volume (80uL) from a Well</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span><span class="o">.</span><span class="n">aspirate</span><span class="p">(</span><span class="n">plate</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> 
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pipette.Pipette.blow_out">
+<span class="sig-name descname"><span class="pre">blow_out</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pipette.Pipette.blow_out" title="Permalink to this definition">¶</a></dt>
+<dd><p>Force any remaining liquid to dispense, by moving
+this pipette’s plunger to the calibrated <cite>blow_out</cite> position</p>
+<p class="rubric">Notes</p>
+<p>If no <cite>location</cite> is passed, the pipette will blow_out
+from it’s current position.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>location</strong> (<a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a> or tuple(<a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a>, <code class="xref any docutils literal notranslate"><span class="pre">Vector</span></code>)) – The <a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a> (<code class="xref any docutils literal notranslate"><span class="pre">Well</span></code>) to perform the blow_out.
+Can also be a tuple with first item <a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a>,
+second item relative <code class="xref any docutils literal notranslate"><span class="pre">Vector</span></code></p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>This instance of <a class="reference internal" href="#pipette.Pipette" title="pipette.Pipette"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipette</span></code></a>.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">instruments</span><span class="p">,</span> <span class="n">robot</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">robot</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span> <span class="o">=</span> <span class="n">instruments</span><span class="o">.</span><span class="n">P300_Single</span><span class="p">(</span><span class="n">mount</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span><span class="o">.</span><span class="n">aspirate</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span><span class="o">.</span><span class="n">dispense</span><span class="p">()</span><span class="o">.</span><span class="n">blow_out</span><span class="p">()</span> 
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pipette.Pipette.consolidate">
+<span class="sig-name descname"><span class="pre">consolidate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">\*args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">\*\*kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pipette.Pipette.consolidate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Consolidate will move a volume of liquid from a list of sources
+to a single target location. See <code class="xref any docutils literal notranslate"><span class="pre">Transfer</span></code> for details
+and a full list of optional arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>This instance of <a class="reference internal" href="#pipette.Pipette" title="pipette.Pipette"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipette</span></code></a>.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">instruments</span><span class="p">,</span> <span class="n">labware</span><span class="p">,</span> <span class="n">robot</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">robot</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plate</span> <span class="o">=</span> <span class="n">labware</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;96-flat&#39;</span><span class="p">,</span> <span class="s1">&#39;A3&#39;</span><span class="p">)</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span> <span class="o">=</span> <span class="n">instruments</span><span class="o">.</span><span class="n">P300_Single</span><span class="p">(</span><span class="n">mount</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span><span class="o">.</span><span class="n">consolidate</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">plate</span><span class="o">.</span><span class="n">cols</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">plate</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> 
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pipette.Pipette.delay">
+<span class="sig-name descname"><span class="pre">delay</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seconds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minutes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pipette.Pipette.delay" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>seconds</strong> (<em>float</em>) – The number of seconds to freeze in place.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pipette.Pipette.dispense">
+<span class="sig-name descname"><span class="pre">dispense</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pipette.Pipette.dispense" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dispense a volume of liquid (in microliters/uL) using this pipette</p>
+<p class="rubric">Notes</p>
+<p>If only a volume is passed, the pipette will dispense
+from it’s current position. If only a location is passed,
+<cite>dispense</cite> will default to it’s <cite>current_volume</cite></p>
+<p>The location may be a Well, or a specific position in relation to a
+Well, such as <cite>Well.top()</cite>. If a Well is specified without calling a
+a position method (such as .top or .bottom), this method will default
+to the bottom of the well.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>volume</strong> (<em>int</em><em> or </em><em>float</em>) – The number of microliters to dispense
+(Default: self.current_volume)</p></li>
+<li><p><strong>location</strong> (<a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a> or tuple(<a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a>, <code class="xref any docutils literal notranslate"><span class="pre">Vector</span></code>)) – The <a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a> (<code class="xref any docutils literal notranslate"><span class="pre">Well</span></code>) to perform the dispense.
+Can also be a tuple with first item <a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a>,
+second item relative <code class="xref any docutils literal notranslate"><span class="pre">Vector</span></code></p></li>
+<li><p><strong>rate</strong> (<em>float</em>) – Set plunger speed for this dispense, where
+speed = rate * dispense_speed (see <code class="xref py py-meth docutils literal notranslate"><span class="pre">set_speed()</span></code>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>This instance of <a class="reference internal" href="#pipette.Pipette" title="pipette.Pipette"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipette</span></code></a>.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">instruments</span><span class="p">,</span> <span class="n">labware</span><span class="p">,</span> <span class="n">robot</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">robot</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plate</span> <span class="o">=</span> <span class="n">labware</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;96-flat&#39;</span><span class="p">,</span> <span class="s1">&#39;3&#39;</span><span class="p">)</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span> <span class="o">=</span> <span class="n">instruments</span><span class="o">.</span><span class="n">P300_Single</span><span class="p">(</span><span class="n">mount</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span> 
+<span class="go"># fill the pipette with liquid (200uL)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span><span class="o">.</span><span class="n">aspirate</span><span class="p">(</span><span class="n">plate</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> 
+<span class="go"># dispense 50uL to a Well</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span><span class="o">.</span><span class="n">dispense</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">plate</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> 
+<span class="go"># dispense 50uL to the center of a well</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">relative_vector</span> <span class="o">=</span> <span class="n">plate</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">center</span><span class="p">()</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span><span class="o">.</span><span class="n">dispense</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="p">(</span><span class="n">plate</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">relative_vector</span><span class="p">))</span> 
+<span class="go"># dispense 20uL in place, at half the speed</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span><span class="o">.</span><span class="n">dispense</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span> 
+<span class="go"># dispense the pipette&#39;s remaining volume (80uL) to a Well</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span><span class="o">.</span><span class="n">dispense</span><span class="p">(</span><span class="n">plate</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> 
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pipette.Pipette.distribute">
+<span class="sig-name descname"><span class="pre">distribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">\*args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">\*\*kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pipette.Pipette.distribute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Distribute will move a volume of liquid from a single of source
+to a list of target locations. See <code class="xref any docutils literal notranslate"><span class="pre">Transfer</span></code> for details
+and a full list of optional arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>This instance of <a class="reference internal" href="#pipette.Pipette" title="pipette.Pipette"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipette</span></code></a>.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">instruments</span><span class="p">,</span> <span class="n">labware</span><span class="p">,</span> <span class="n">robot</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">robot</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plate</span> <span class="o">=</span> <span class="n">labware</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;96-flat&#39;</span><span class="p">,</span> <span class="s1">&#39;3&#39;</span><span class="p">)</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span> <span class="o">=</span> <span class="n">instruments</span><span class="o">.</span><span class="n">P300_Single</span><span class="p">(</span><span class="n">mount</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span><span class="o">.</span><span class="n">distribute</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">plate</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">plate</span><span class="o">.</span><span class="n">cols</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> 
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pipette.Pipette.drop_tip">
+<span class="sig-name descname"><span class="pre">drop_tip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">home_after</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pipette.Pipette.drop_tip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Drop the pipette’s current tip</p>
+<p class="rubric">Notes</p>
+<p>If no location is passed, the pipette defaults to its <cite>trash_container</cite>
+(see <a class="reference internal" href="#pipette.Pipette" title="pipette.Pipette"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Pipette</span></code></a>)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>location</strong> (<a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a> or tuple(<a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a>, <code class="xref any docutils literal notranslate"><span class="pre">Vector</span></code>)) – The <a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a> (<code class="xref any docutils literal notranslate"><span class="pre">Well</span></code>) to perform the drop_tip.
+Can also be a tuple with first item <a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a>,
+second item relative <code class="xref any docutils literal notranslate"><span class="pre">Vector</span></code></p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>This instance of <a class="reference internal" href="#pipette.Pipette" title="pipette.Pipette"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipette</span></code></a>.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">instruments</span><span class="p">,</span> <span class="n">labware</span><span class="p">,</span> <span class="n">robot</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">robot</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tiprack</span> <span class="o">=</span> <span class="n">labware</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;opentrons_96_tiprack_300ul&#39;</span><span class="p">,</span> <span class="s1">&#39;C2&#39;</span><span class="p">)</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">trash</span> <span class="o">=</span> <span class="n">labware</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;point&#39;</span><span class="p">,</span> <span class="s1">&#39;A3&#39;</span><span class="p">)</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span> <span class="o">=</span> <span class="n">instruments</span><span class="o">.</span><span class="n">P300_Single</span><span class="p">(</span><span class="n">mount</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span><span class="o">.</span><span class="n">pick_up_tip</span><span class="p">(</span><span class="n">tiprack</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> 
+<span class="go"># drops the tip in the fixed trash</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span><span class="o">.</span><span class="n">drop_tip</span><span class="p">()</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span><span class="o">.</span><span class="n">pick_up_tip</span><span class="p">(</span><span class="n">tiprack</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> 
+<span class="go"># drops the tip back at its tip rack</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span><span class="o">.</span><span class="n">drop_tip</span><span class="p">(</span><span class="n">tiprack</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> 
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pipette.Pipette.home">
+<span class="sig-name descname"><span class="pre">home</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pipette.Pipette.home" title="Permalink to this definition">¶</a></dt>
+<dd><p>Home the pipette’s plunger axis during a protocol run</p>
+<p class="rubric">Notes</p>
+<p><cite>Pipette.home()</cite> homes the <cite>Robot</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>This instance of <a class="reference internal" href="#pipette.Pipette" title="pipette.Pipette"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipette</span></code></a>.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">instruments</span><span class="p">,</span> <span class="n">robot</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">robot</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span> <span class="o">=</span> <span class="n">instruments</span><span class="o">.</span><span class="n">P300_Single</span><span class="p">(</span><span class="n">mount</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">)</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span><span class="o">.</span><span class="n">home</span><span class="p">()</span> 
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pipette.Pipette.mix">
+<span class="sig-name descname"><span class="pre">mix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repetitions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pipette.Pipette.mix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mix a volume of liquid (in microliters/uL) using this pipette</p>
+<p class="rubric">Notes</p>
+<p>If no <cite>location</cite> is passed, the pipette will mix
+from it’s current position. If no <cite>volume</cite> is passed,
+<cite>mix</cite> will default to it’s <cite>max_volume</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>repetitions</strong> (<em>int</em>) – How many times the pipette should mix (Default: 1)</p></li>
+<li><p><strong>volume</strong> (<em>int</em><em> or </em><em>float</em>) – The number of microliters to mix (Default: self.max_volume)</p></li>
+<li><p><strong>location</strong> (<a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a> or tuple(<a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a>, <code class="xref any docutils literal notranslate"><span class="pre">Vector</span></code>)) – The <a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a> (<code class="xref any docutils literal notranslate"><span class="pre">Well</span></code>) to perform the mix.
+Can also be a tuple with first item <a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a>,
+second item relative <code class="xref any docutils literal notranslate"><span class="pre">Vector</span></code></p></li>
+<li><p><strong>rate</strong> (<em>float</em>) – Set plunger speed for this mix, where
+speed = rate * (aspirate_speed or dispense_speed)
+(see <code class="xref py py-meth docutils literal notranslate"><span class="pre">set_speed()</span></code>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>This instance of <a class="reference internal" href="#pipette.Pipette" title="pipette.Pipette"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipette</span></code></a>.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">instruments</span><span class="p">,</span> <span class="n">labware</span><span class="p">,</span> <span class="n">robot</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">robot</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plate</span> <span class="o">=</span> <span class="n">labware</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;96-flat&#39;</span><span class="p">,</span> <span class="s1">&#39;4&#39;</span><span class="p">)</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span> <span class="o">=</span> <span class="n">instruments</span><span class="o">.</span><span class="n">P300_Single</span><span class="p">(</span><span class="n">mount</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span> 
+<span class="go"># mix 50uL in a Well, three times</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span><span class="o">.</span><span class="n">mix</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="n">plate</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> 
+<span class="go"># mix 3x with the pipette&#39;s max volume, from current position</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span><span class="o">.</span><span class="n">mix</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> 
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pipette.Pipette.move_to">
+<span class="sig-name descname"><span class="pre">move_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pipette.Pipette.move_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move this <a class="reference internal" href="#pipette.Pipette" title="pipette.Pipette"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Pipette</span></code></a> to a <a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a> on the <code class="xref any docutils literal notranslate"><span class="pre">Deck</span></code></p>
+<p class="rubric">Notes</p>
+<p>Until obstacle-avoidance algorithms are in place,
+<a class="reference internal" href="#robot.Robot" title="robot.Robot"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Robot</span></code></a> and <a class="reference internal" href="#pipette.Pipette" title="pipette.Pipette"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Pipette</span></code></a> <a class="reference internal" href="#pipette.Pipette.move_to" title="pipette.Pipette.move_to"><code class="xref py py-meth docutils literal notranslate"><span class="pre">move_to()</span></code></a> use either an
+“arc” or “direct”</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>location</strong> (<a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a> or tuple(<a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a>, <code class="xref any docutils literal notranslate"><span class="pre">Vector</span></code>)) – The destination to arrive at</p></li>
+<li><p><strong>strategy</strong> (<em>&quot;arc&quot;</em><em> or </em><em>&quot;direct&quot;</em>) – “arc” strategies (default) will pick the head up on Z axis, then
+over to the XY destination, then finally down to the Z destination.
+“direct” strategies will simply move in a straight line from
+the current position</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>This instance of <a class="reference internal" href="#pipette.Pipette" title="pipette.Pipette"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipette</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pipette.Pipette.pick_up_tip">
+<span class="sig-name descname"><span class="pre">pick_up_tip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">presses</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">increment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pipette.Pipette.pick_up_tip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pick up a tip for the Pipette to run liquid-handling commands with</p>
+<p class="rubric">Notes</p>
+<p>A tip can be manually set by passing a <cite>location</cite>. If no location
+is passed, the Pipette will pick up the next available tip in
+it’s <cite>tip_racks</cite> list (see <a class="reference internal" href="#pipette.Pipette" title="pipette.Pipette"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Pipette</span></code></a>)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>location</strong> (<a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a> or tuple(<a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a>, <code class="xref any docutils literal notranslate"><span class="pre">Vector</span></code>)) – The <a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a> (<code class="xref any docutils literal notranslate"><span class="pre">Well</span></code>) to perform the pick_up_tip.
+Can also be a tuple with first item <a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a>,
+second item relative <code class="xref any docutils literal notranslate"><span class="pre">Vector</span></code></p></li>
+<li><p><strong>presses</strong> (<em>:any:int</em>) – The number of times to lower and then raise the pipette when
+picking up a tip, to ensure a good seal (0 [zero] will result in
+the pipette hovering over the tip but not picking it up–generally
+not desireable, but could be used for dry-run). Default: 3 presses</p></li>
+<li><p><strong>increment</strong> (<em>:int</em>) – The additional distance to travel on each successive press (e.g.:
+if presses=3 and increment=1, then the first press will travel down
+into the tip by 3.5mm, the second by 4.5mm, and the third by 5.5mm.
+Default: 1mm</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>This instance of <a class="reference internal" href="#pipette.Pipette" title="pipette.Pipette"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipette</span></code></a>.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">instruments</span><span class="p">,</span> <span class="n">labware</span><span class="p">,</span> <span class="n">robot</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">robot</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tiprack</span> <span class="o">=</span> <span class="n">labware</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;GEB-tiprack-300&#39;</span><span class="p">,</span> <span class="s1">&#39;2&#39;</span><span class="p">)</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span> <span class="o">=</span> <span class="n">instruments</span><span class="o">.</span><span class="n">P300_Single</span><span class="p">(</span><span class="n">mount</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">tip_racks</span><span class="o">=</span><span class="p">[</span><span class="n">tiprack</span><span class="p">])</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span><span class="o">.</span><span class="n">pick_up_tip</span><span class="p">(</span><span class="n">tiprack</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span><span class="o">.</span><span class="n">return_tip</span><span class="p">()</span> 
+<span class="go"># `pick_up_tip` will automatically go to tiprack[1]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span><span class="o">.</span><span class="n">pick_up_tip</span><span class="p">()</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span><span class="o">.</span><span class="n">return_tip</span><span class="p">()</span> 
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pipette.Pipette.return_tip">
+<span class="sig-name descname"><span class="pre">return_tip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">home_after</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pipette.Pipette.return_tip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Drop the pipette’s current tip to it’s originating tip rack</p>
+<p class="rubric">Notes</p>
+<p>This method requires one or more tip-rack <code class="xref any docutils literal notranslate"><span class="pre">Container</span></code>
+to be in this Pipette’s <cite>tip_racks</cite> list (see <a class="reference internal" href="#pipette.Pipette" title="pipette.Pipette"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Pipette</span></code></a>)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>This instance of <a class="reference internal" href="#pipette.Pipette" title="pipette.Pipette"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipette</span></code></a>.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">instruments</span><span class="p">,</span> <span class="n">labware</span><span class="p">,</span> <span class="n">robot</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">robot</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tiprack</span> <span class="o">=</span> <span class="n">labware</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;GEB-tiprack-300&#39;</span><span class="p">,</span> <span class="s1">&#39;2&#39;</span><span class="p">)</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span> <span class="o">=</span> <span class="n">instruments</span><span class="o">.</span><span class="n">P300_Single</span><span class="p">(</span><span class="n">mount</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">tip_racks</span><span class="o">=</span><span class="p">[</span><span class="n">tiprack</span><span class="p">,</span> <span class="n">tiprack2</span><span class="p">])</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span><span class="o">.</span><span class="n">pick_up_tip</span><span class="p">()</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span><span class="o">.</span><span class="n">aspirate</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">plate</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span><span class="o">.</span><span class="n">dispense</span><span class="p">(</span><span class="n">plate</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span><span class="o">.</span><span class="n">return_tip</span><span class="p">()</span> 
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pipette.Pipette.set_flow_rate">
+<span class="sig-name descname"><span class="pre">set_flow_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aspirate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dispense</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blow_out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pipette.Pipette.set_flow_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the speed (uL/second) the <a class="reference internal" href="#pipette.Pipette" title="pipette.Pipette"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Pipette</span></code></a> plunger will move
+during <a class="reference internal" href="#pipette.Pipette.aspirate" title="pipette.Pipette.aspirate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">aspirate()</span></code></a> and <a class="reference internal" href="#pipette.Pipette.dispense" title="pipette.Pipette.dispense"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dispense()</span></code></a>. The speed is set using
+nominal max volumes for any given pipette model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>aspirate</strong> (<em>int</em>) – The speed in microliters-per-second, at which the plunger will
+move while performing an aspirate</p></li>
+<li><p><strong>dispense</strong> (<em>int</em>) – The speed in microliters-per-second, at which the plunger will
+move while performing an dispense</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pipette.Pipette.touch_tip">
+<span class="sig-name descname"><span class="pre">touch_tip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">speed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pipette.Pipette.touch_tip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Touch the <a class="reference internal" href="#pipette.Pipette" title="pipette.Pipette"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Pipette</span></code></a> tip to the sides of a well,
+with the intent of removing left-over droplets</p>
+<p class="rubric">Notes</p>
+<p>If no <cite>location</cite> is passed, the pipette will touch_tip
+from it’s current position.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>location</strong> (<a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a>) – The <a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a> (<code class="xref any docutils literal notranslate"><span class="pre">Well</span></code>) to perform the touch_tip.</p></li>
+<li><p><strong>radius</strong> (<em>float</em>) – Radius is a floating point describing the percentage of a well’s
+radius. When radius=1.0, <a class="reference internal" href="#pipette.Pipette.touch_tip" title="pipette.Pipette.touch_tip"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">touch_tip()</span></code></a> will move to 100% of
+the wells radius. When radius=0.5, <a class="reference internal" href="#pipette.Pipette.touch_tip" title="pipette.Pipette.touch_tip"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">touch_tip()</span></code></a> will move to
+50% of the wells radius.
+Default: 1.0 (100%)</p></li>
+<li><p><strong>speed</strong> (<em>float</em>) – The speed for touch tip motion, in mm/s.
+Default: 60.0 mm/s, Max: 80.0 mm/s, Min: 20.0 mm/s</p></li>
+<li><p><strong>v_offset</strong> (<em>float</em>) – The offset in mm from the top of the well to touch tip.
+Default: -1.0 mm</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>This instance of <a class="reference internal" href="#pipette.Pipette" title="pipette.Pipette"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipette</span></code></a>.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">instruments</span><span class="p">,</span> <span class="n">labware</span><span class="p">,</span> <span class="n">robot</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">robot</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plate</span> <span class="o">=</span> <span class="n">labware</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;96-flat&#39;</span><span class="p">,</span> <span class="s1">&#39;8&#39;</span><span class="p">)</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span> <span class="o">=</span> <span class="n">instruments</span><span class="o">.</span><span class="n">P300_Single</span><span class="p">(</span><span class="n">mount</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span><span class="o">.</span><span class="n">aspirate</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">plate</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span><span class="o">.</span><span class="n">dispense</span><span class="p">(</span><span class="n">plate</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">touch_tip</span><span class="p">()</span> 
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pipette.Pipette.transfer">
+<span class="sig-name descname"><span class="pre">transfer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">\*\*kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pipette.Pipette.transfer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transfer will move a volume of liquid from a source location(s)
+to a dest location(s). It is a higher-level command, incorporating
+other <a class="reference internal" href="#pipette.Pipette" title="pipette.Pipette"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Pipette</span></code></a> commands, like <a class="reference internal" href="#pipette.Pipette.aspirate" title="pipette.Pipette.aspirate"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">aspirate</span></code></a> and
+<a class="reference internal" href="#pipette.Pipette.dispense" title="pipette.Pipette.dispense"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">dispense</span></code></a>, designed to make protocol writing easier at the
+cost of specificity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>volumes</strong> (<em>number</em><em>, </em><em>list</em><em>, or </em><em>tuple</em>) – The amount of volume to remove from each <cite>sources</cite> <a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a>
+and add to each <cite>targets</cite> <a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a>. If <cite>volumes</cite> is a list,
+each volume will be used for the sources/targets at the
+matching index. If <cite>volumes</cite> is a tuple with two elements,
+like <cite>(20, 100)</cite>, then a list of volumes will be generated with
+a linear gradient between the two volumes in the tuple.</p></li>
+<li><p><strong>source</strong> (<a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><em>Placeable</em></a><em> or </em><em>list</em>) – Single <a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a> or list of <a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a>s, from where
+liquid will be <a class="reference internal" href="#pipette.Pipette.aspirate" title="pipette.Pipette.aspirate"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">aspirate</span></code></a>d from.</p></li>
+<li><p><strong>dest</strong> (<a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><em>Placeable</em></a><em> or </em><em>list</em>) – Single <a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a> or list of <a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a>s, where
+liquid will be <a class="reference internal" href="#pipette.Pipette.dispense" title="pipette.Pipette.dispense"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">dispense</span></code></a>ed to.</p></li>
+<li><p><strong>new_tip</strong> (<em>str</em>) – The number of clean tips this transfer command will use. If
+‘never’, no tips will be picked up nor dropped. If ‘once’, a
+single tip will be used for all cmds. If ‘always’, a new tip
+will be used for each transfer. Default is ‘once’.</p></li>
+<li><p><strong>trash</strong> (<em>boolean</em>) – If <cite>True</cite> (default behavior) and trash container has been attached
+to this <cite>Pipette</cite>, then the tip will be sent to the trash
+container.
+If <cite>False</cite>, then tips will be returned to their associated tiprack.</p></li>
+<li><p><strong>touch_tip</strong> (<em>boolean</em>) – If <cite>True</cite>, a <a class="reference internal" href="#pipette.Pipette.touch_tip" title="pipette.Pipette.touch_tip"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">touch_tip</span></code></a> will occur following each
+<a class="reference internal" href="#pipette.Pipette.aspirate" title="pipette.Pipette.aspirate"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">aspirate</span></code></a> and <a class="reference internal" href="#pipette.Pipette.dispense" title="pipette.Pipette.dispense"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">dispense</span></code></a>. If set to <cite>False</cite> (default),
+no <a class="reference internal" href="#pipette.Pipette.touch_tip" title="pipette.Pipette.touch_tip"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">touch_tip</span></code></a> will occur.</p></li>
+<li><p><strong>blow_out</strong> (<em>boolean</em>) – If <cite>True</cite>, a <a class="reference internal" href="#pipette.Pipette.blow_out" title="pipette.Pipette.blow_out"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">blow_out</span></code></a> will occur following each
+<a class="reference internal" href="#pipette.Pipette.dispense" title="pipette.Pipette.dispense"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">dispense</span></code></a>, but only if the pipette has no liquid left in it.
+If set to <cite>False</cite> (default), no <a class="reference internal" href="#pipette.Pipette.blow_out" title="pipette.Pipette.blow_out"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">blow_out</span></code></a> will occur.</p></li>
+<li><p><strong>mix_before</strong> (<em>tuple</em>) – Specify the number of repetitions volume to mix, and a <a class="reference internal" href="#pipette.Pipette.mix" title="pipette.Pipette.mix"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">mix</span></code></a>
+will proceed each <a class="reference internal" href="#pipette.Pipette.aspirate" title="pipette.Pipette.aspirate"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">aspirate</span></code></a> during the transfer and dispense.
+The tuple’s values is interpreted as (repetitions, volume).</p></li>
+<li><p><strong>mix_after</strong> (<em>tuple</em>) – Specify the number of repetitions volume to mix, and a <a class="reference internal" href="#pipette.Pipette.mix" title="pipette.Pipette.mix"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">mix</span></code></a>
+will following each <a class="reference internal" href="#pipette.Pipette.dispense" title="pipette.Pipette.dispense"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">dispense</span></code></a> during the transfer or
+consolidate. The tuple’s values is interpreted as
+(repetitions, volume).</p></li>
+<li><p><strong>carryover</strong> (<em>boolean</em>) – If <cite>True</cite> (default), any <cite>volumes</cite> that exceed the maximum volume
+of this <cite>Pipette</cite> will be split into multiple smaller volumes.</p></li>
+<li><p><strong>repeat</strong> (<em>boolean</em>) – (Only applicable to <a class="reference internal" href="#pipette.Pipette.distribute" title="pipette.Pipette.distribute"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">distribute</span></code></a> and <a class="reference internal" href="#pipette.Pipette.consolidate" title="pipette.Pipette.consolidate"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">consolidate</span></code></a>)If
+<cite>True</cite> (default), sequential <a class="reference internal" href="#pipette.Pipette.aspirate" title="pipette.Pipette.aspirate"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">aspirate</span></code></a> volumes will be
+combined into one tip for the purpose of saving time. If <cite>False</cite>,
+all volumes will be transferred seperately.</p></li>
+<li><p><strong>gradient</strong> (<em>lambda</em>) – Function for calculated the curve used for gradient volumes.
+When <cite>volumes</cite> is a tuple of length 2, it’s values are used
+to create a list of gradient volumes. The default curve for
+this gradient is linear (lambda x: x), however a method can
+be passed with the <cite>gradient</cite> keyword argument to create a
+custom curve.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>This instance of <a class="reference internal" href="#pipette.Pipette" title="pipette.Pipette"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipette</span></code></a>.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">instruments</span><span class="p">,</span> <span class="n">labware</span><span class="p">,</span> <span class="n">robot</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">robot</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plate</span> <span class="o">=</span> <span class="n">labware</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;96-flat&#39;</span><span class="p">,</span> <span class="s1">&#39;5&#39;</span><span class="p">)</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span> <span class="o">=</span> <span class="n">instruments</span><span class="o">.</span><span class="n">P300_Single</span><span class="p">(</span><span class="n">mount</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">)</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p300</span><span class="o">.</span><span class="n">transfer</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">plate</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">plate</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> 
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="placeable">
+<h2>Placeable<a class="headerlink" href="#placeable" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="placeable.Placeable">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">placeable.</span></span><span class="sig-name descname"><span class="pre">Placeable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#placeable.Placeable" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class represents every item on the deck.</p>
+<p>It maintains the hierarchy and provides means to:
+* traverse
+* retrieve items by name
+* calculate coordinates in different reference systems</p>
+<p>It should never be directly created; it is created by the system during
+labware load and when accessing wells.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="placeable.Placeable.bottom">
+<span class="sig-name descname"><span class="pre">bottom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">degrees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#placeable.Placeable.bottom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns (<a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Vector</span></code>) tuple where
+the vector points to the bottom of the placeable. This can be passed
+into any <a class="reference internal" href="#robot.Robot" title="robot.Robot"><code class="xref py py-class docutils literal notranslate"><span class="pre">Robot</span></code></a> or <a class="reference internal" href="#pipette.Pipette" title="pipette.Pipette"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipette</span></code></a> method
+<code class="docutils literal notranslate"><span class="pre">location</span></code> argument.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">reference</span></code> (a <a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a>) is provided, the return
+value will be in that placeable’s coordinate system.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">radius</span></code> and <code class="docutils literal notranslate"><span class="pre">degrees</span></code> arguments are interpreted as
+in <a class="reference internal" href="#placeable.Placeable.from_center" title="placeable.Placeable.from_center"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_center()</span></code></a> (except that <code class="docutils literal notranslate"><span class="pre">degrees</span></code> is in degrees, not
+radians). They can be used to specify a further distance from the
+bottom center of the well; for instance, calling
+<code class="docutils literal notranslate"><span class="pre">bottom(radius=0.5,</span> <span class="pre">degrees=180)</span></code> will move half the radius in the
+180 degree direction from the center of the well.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">z</span></code> argument is a distance in mm to move in z from the bottom,
+and can be used to hover above the bottom. For instance, calling
+<code class="docutils literal notranslate"><span class="pre">bottom(z=1)</span></code> will move 1mm above the bottom.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>z</strong> – Absolute distance in mm to move  in <code class="docutils literal notranslate"><span class="pre">z</span></code> from the bottom.
+Note that unlike the other arguments, this is a distance, not
+a ratio.</p></li>
+<li><p><strong>degrees</strong> – Direction in which to move <code class="docutils literal notranslate"><span class="pre">radius</span></code> from the bottom
+center.</p></li>
+<li><p><strong>radius</strong> – Ratio of the placeable’s radius to move in the direction
+specified by <code class="docutils literal notranslate"><span class="pre">degrees</span></code> from the bottom center.</p></li>
+<li><p><strong>reference</strong> – An optional placeable for the vector to be relative
+to.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple of the placeable and the offset. This can be passed
+into any <a class="reference internal" href="#robot.Robot" title="robot.Robot"><code class="xref py py-class docutils literal notranslate"><span class="pre">Robot</span></code></a> or <a class="reference internal" href="#pipette.Pipette" title="pipette.Pipette"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipette</span></code></a> method
+<code class="docutils literal notranslate"><span class="pre">location</span></code> argument.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="placeable.Placeable.center">
+<span class="sig-name descname"><span class="pre">center</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#placeable.Placeable.center" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns (<a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Vector</span></code>) tuple where
+the vector points to the center of the placeable, in <code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">z</span></code>. This can be passed into any <a class="reference internal" href="#robot.Robot" title="robot.Robot"><code class="xref py py-class docutils literal notranslate"><span class="pre">Robot</span></code></a> or
+<a class="reference internal" href="#pipette.Pipette" title="pipette.Pipette"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipette</span></code></a> method <code class="docutils literal notranslate"><span class="pre">location</span></code> argument.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">reference</span></code> (a <a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a>) is provided, the return
+value will be in that placeable’s coordinate system.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>reference</strong> – An optional placeable for the vector to be relative
+to.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple of the placeable and the offset. This can be passed
+into any <a class="reference internal" href="#robot.Robot" title="robot.Robot"><code class="xref py py-class docutils literal notranslate"><span class="pre">Robot</span></code></a> or <a class="reference internal" href="#pipette.Pipette" title="pipette.Pipette"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipette</span></code></a> method
+<code class="docutils literal notranslate"><span class="pre">location</span></code> argument.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="placeable.Placeable.from_center">
+<span class="sig-name descname"><span class="pre">from_center</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#placeable.Placeable.from_center" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accepts a set of ratios for Cartesian or ratios/angle for Polar
+and returns <code class="xref py py-class docutils literal notranslate"><span class="pre">Vector</span></code> using <code class="docutils literal notranslate"><span class="pre">reference</span></code> as origin.</p>
+<p>Though both polar and cartesian arguments are accepted, only one
+set should be used at the same time, and the set selected should be
+entirely used. In addition, all variables in the set should be used.</p>
+<p>For instance, if you want to use cartesian coordinates, you must
+specify all of <code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code>, and <code class="docutils literal notranslate"><span class="pre">z</span></code> as numbers; if you want to
+use polar coordinates, you must specify all of <code class="docutils literal notranslate"><span class="pre">theta</span></code>, <code class="docutils literal notranslate"><span class="pre">r</span></code> and
+<code class="docutils literal notranslate"><span class="pre">h</span></code> as numbers.</p>
+<p>While <code class="docutils literal notranslate"><span class="pre">theta</span></code> is an absolute angle in radians, the other values are
+actually ratios which are multiplied by the relevant dimensions of the
+placeable on which <code class="docutils literal notranslate"><span class="pre">from_center</span></code> is called. For instance, calling
+<code class="docutils literal notranslate"><span class="pre">from_center(x=0.5,</span> <span class="pre">y=0.5,</span> <span class="pre">z=0.5)</span></code> does not mean “500 micromenters
+from the center in each dimension”, but “half the x size, half the y
+size, and half the z size from the center”. Similarly,
+<code class="docutils literal notranslate"><span class="pre">from_center(r=0.5,</span> <span class="pre">theta=3.14,</span> <span class="pre">h=0.5)</span></code> means “half the radius
+dimension at 180 degrees, and half the height upwards”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – Ratio of the x dimension of the placeable to move from the
+center.</p></li>
+<li><p><strong>y</strong> – Ratio of the y dimension of the placeable to move from the
+center.</p></li>
+<li><p><strong>z</strong> – Ratio of the z dimension of the placeable to move from the
+center.</p></li>
+<li><p><strong>r</strong> – Ratio of the radius to move from the center.</p></li>
+<li><p><strong>theta</strong> – Angle in radians at which to move the percentage of the
+radius specified by <code class="docutils literal notranslate"><span class="pre">r</span></code> from the center.</p></li>
+<li><p><strong>h</strong> – Percentage of the height to move up in z from the center.</p></li>
+<li><p><strong>reference</strong> – If specified, an origin to add to the offset vector
+specified by the other arguments.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A vector from either the origin or the specified reference.
+This can be passed into any <a class="reference internal" href="#robot.Robot" title="robot.Robot"><code class="xref py py-class docutils literal notranslate"><span class="pre">Robot</span></code></a> or
+<a class="reference internal" href="#pipette.Pipette" title="pipette.Pipette"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipette</span></code></a> method <code class="docutils literal notranslate"><span class="pre">location</span></code> argument.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="placeable.Placeable.top">
+<span class="sig-name descname"><span class="pre">top</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">degrees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#placeable.Placeable.top" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns (<a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Vector</span></code>) tuple where
+the vector points to the top of the placeable. This can be passed
+into any <a class="reference internal" href="#robot.Robot" title="robot.Robot"><code class="xref py py-class docutils literal notranslate"><span class="pre">Robot</span></code></a> or <a class="reference internal" href="#pipette.Pipette" title="pipette.Pipette"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipette</span></code></a> method
+<code class="docutils literal notranslate"><span class="pre">location</span></code> argument.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">reference</span></code> (a <a class="reference internal" href="#placeable.Placeable" title="placeable.Placeable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Placeable</span></code></a>) is provided, the return
+value will be in that placeable’s coordinate system.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">radius</span></code> and <code class="docutils literal notranslate"><span class="pre">degrees</span></code> arguments are interpreted as
+in <a class="reference internal" href="#placeable.Placeable.from_center" title="placeable.Placeable.from_center"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_center()</span></code></a> (except that <code class="docutils literal notranslate"><span class="pre">degrees</span></code> is in degrees, not
+radians). They can be used to specify a further distance from the top
+center of the well; for instance, calling
+<code class="docutils literal notranslate"><span class="pre">top(radius=0.5,</span> <span class="pre">degrees=180)</span></code> will move half the radius in the 180
+degree direction from the center of the well.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">z</span></code> argument is a distance in mm to move in z from the top, and
+can be used to hover above or below the top. For instance, calling
+<code class="docutils literal notranslate"><span class="pre">top(z=-1)</span></code> will move 1mm below the top.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>z</strong> – Absolute distance in mm to move  in <code class="docutils literal notranslate"><span class="pre">z</span></code> from the top. Note
+that unlike the other arguments, this is a distance, not a
+ratio.</p></li>
+<li><p><strong>degrees</strong> – Direction in which to move <code class="docutils literal notranslate"><span class="pre">radius</span></code> from the top
+center.</p></li>
+<li><p><strong>radius</strong> – Ratio of the placeable’s radius to move in the direction
+specified by <code class="docutils literal notranslate"><span class="pre">degrees</span></code> from the top center.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple of the placeable and the offset. This can be passed
+into any <a class="reference internal" href="#robot.Robot" title="robot.Robot"><code class="xref py py-class docutils literal notranslate"><span class="pre">Robot</span></code></a> or <a class="reference internal" href="#pipette.Pipette" title="pipette.Pipette"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipette</span></code></a> method
+<code class="docutils literal notranslate"><span class="pre">location</span></code> argument.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-opentrons.simulate">
+<span id="simulation"></span><span id="simulating-ref"></span><h2>Simulation<a class="headerlink" href="#module-opentrons.simulate" title="Permalink to this heading">¶</a></h2>
+<p>opentrons.simulate: functions and entrypoints for simulating protocols</p>
+<p>This module has functions that provide a console entrypoint for simulating
+a protocol from the command line.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="opentrons.simulate.allow_bundle">
+<span class="sig-prename descclassname"><span class="pre">opentrons.simulate.</span></span><span class="sig-name descname"><span class="pre">allow_bundle</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#opentrons.simulate.allow_bundle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if bundling is allowed with a special not-exposed-to-the-app flag.</p>
+<p>Returns <code class="docutils literal notranslate"><span class="pre">True</span></code> if the environment variable
+<code class="docutils literal notranslate"><span class="pre">OT_API_FF_allowBundleCreation</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;1&quot;</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="opentrons.simulate.format_runlog">
+<span class="sig-prename descclassname"><span class="pre">opentrons.simulate.</span></span><span class="sig-name descname"><span class="pre">format_runlog</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">runlog</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#opentrons.simulate.format_runlog" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format a run log (return value of <a class="reference internal" href="#opentrons.simulate.simulate" title="opentrons.simulate.simulate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate</span></code></a>) into a
+human-readable string</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>runlog</strong> – The output of a call to <a class="reference internal" href="#opentrons.simulate.simulate" title="opentrons.simulate.simulate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="opentrons.simulate.get_arguments">
+<span class="sig-prename descclassname"><span class="pre">opentrons.simulate.</span></span><span class="sig-name descname"><span class="pre">get_arguments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">argparse.ArgumentParser</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">argparse.ArgumentParser</span></span></span><a class="headerlink" href="#opentrons.simulate.get_arguments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the argument parser for this module</p>
+<p>Useful if you want to use this module as a component of another CLI program
+and want to add its arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>parser</strong> – A parser to add arguments to. If not specified, one will be created.</p>
+</dd>
+<dt class="field-even">Returns argparse.ArgumentParser<span class="colon">:</span></dt>
+<dd class="field-even"><p>The parser with arguments added.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="opentrons.simulate.simulate">
+<span class="sig-prename descclassname"><span class="pre">opentrons.simulate.</span></span><span class="sig-name descname"><span class="pre">simulate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">protocol_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">BinaryIO</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">TextIO</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_labware_paths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_data_paths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">propagate_logs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hardware_simulator_file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration_estimator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">opentrons.protocols.duration.estimator.DurationEstimator</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'warning'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">opentrons.protocols.types.BundleContents</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#opentrons.simulate.simulate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simulate the protocol itself.</p>
+<p>This is a one-stop function to simulate a protocol, whether Python or JSON,
+no matter the API version, from external (i.e. not bound up in other
+internal server infrastructure) sources.</p>
+<p>To simulate an opentrons protocol from other places, pass in a file-like
+object as <code class="docutils literal notranslate"><span class="pre">protocol_file</span></code>; this function either returns (if the simulation
+has no problems) or raises an exception.</p>
+<p>To call from the command line, use either the autogenerated entrypoint
+<code class="docutils literal notranslate"><span class="pre">opentrons_simulate</span></code> (<code class="docutils literal notranslate"><span class="pre">opentrons_simulate.exe</span></code>, on windows) or
+<code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">opentrons.simulate</span></code>.</p>
+<p>The return value is the run log, a list of dicts that represent the
+commands executed by the robot; and either the contents of the protocol
+that would be required to bundle, or <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+<p>Each dict element in the run log has the following keys:</p>
+<blockquote>
+<div><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">level</span></code>: The depth at which this command is nested. If this an
+aspirate inside a mix inside a transfer, for instance, it would be 3.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">payload</span></code>: The command. The human-readable run log text is available at
+<code class="docutils literal notranslate"><span class="pre">payload[&quot;text&quot;]</span></code>. The other keys of <code class="docutils literal notranslate"><span class="pre">payload</span></code> are command-dependent;
+see <code class="docutils literal notranslate"><span class="pre">opentrons.legacy_commands</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In older software versions, <code class="docutils literal notranslate"><span class="pre">payload[&quot;text&quot;]</span></code> was a
+<a class="reference external" href="https://docs.python.org/3/library/string.html#formatstrings">format string</a>.
+To get human-readable text, you had to do <code class="docutils literal notranslate"><span class="pre">payload[&quot;text&quot;].format(**payload)</span></code>.
+Don’t do that anymore. If <code class="docutils literal notranslate"><span class="pre">payload[&quot;text&quot;]</span></code> happens to contain any
+<code class="docutils literal notranslate"><span class="pre">{</span></code> or <code class="docutils literal notranslate"><span class="pre">}</span></code> characters, it can confuse <code class="docutils literal notranslate"><span class="pre">.format()</span></code> and cause it to raise a
+<code class="docutils literal notranslate"><span class="pre">KeyError</span></code>.</p>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">logs</span></code>: Any log messages that occurred during execution of this
+command, as a standard Python <code class="xref py py-obj docutils literal notranslate"><span class="pre">LogRecord</span></code>.</p></li>
+</ul>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>protocol_file</strong> – The protocol file to simulate.</p></li>
+<li><p><strong>file_name</strong> – The name of the file</p></li>
+<li><p><strong>custom_labware_paths</strong> – A list of directories to search for custom labware.
+Loads valid labware from these paths and makes them available
+to the protocol context. If this is <code class="docutils literal notranslate"><span class="pre">None</span></code> (the default), and
+this function is called on a robot, it will look in the <code class="docutils literal notranslate"><span class="pre">labware</span></code>
+subdirectory of the Jupyter data directory.</p></li>
+<li><p><strong>custom_data_paths</strong> – A list of directories or files to load custom
+data files from. Ignored if the apiv2 feature
+flag if not set. Entries may be either files or
+directories. Specified files and the
+non-recursive contents of specified directories
+are presented by the protocol context in
+<code class="docutils literal notranslate"><span class="pre">protocol_api.ProtocolContext.bundled_data</span></code>.</p></li>
+<li><p><strong>hardware_simulator_file_path</strong> – A path to a JSON file defining the simulated
+hardware. This is mainly for internal use by Opentrons, and is not necessary
+to simulate protocols.</p></li>
+<li><p><strong>duration_estimator</strong> – For internal use only.
+Optional duration estimator object.</p></li>
+<li><p><strong>propagate_logs</strong> – Whether this function should allow logs from the
+Opentrons stack to propagate up to the root handler.
+This can be useful if you’re integrating this
+function in a larger application, but most logs that
+occur during protocol simulation are best associated
+with the actions in the protocol that cause them.
+Default: <code class="docutils literal notranslate"><span class="pre">False</span></code></p></li>
+<li><p><strong>log_level</strong> – The level of logs to capture in the run log:
+<code class="docutils literal notranslate"><span class="pre">&quot;debug&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;info&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;warning&quot;</span></code>, or <code class="docutils literal notranslate"><span class="pre">&quot;error&quot;</span></code>.
+Defaults to <code class="docutils literal notranslate"><span class="pre">&quot;warning&quot;</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple of a run log for user output, and possibly the required
+data to write to a bundle to bundle this protocol. The bundle is
+only emitted if bundling is allowed
+and this is an unbundled Protocol API
+v2 python protocol. In other cases it is None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+      </div>
+    </div>
+  </div>
+  <div class="clearer"></div>
+</div>
+<footer>
+  <div class="wrapper">
+    <section class="social-signup">
+      <div class="social-links">
+        <a
+          href="https://www.facebook.com/opentronslabworks/"
+          target="_blank"
+          ga-on="click"
+          ga-event-category="Social"
+          ga-event-action="Open Facebook"
+          ><img
+            src="https://s3.amazonaws.com/opentrons-images/website/logo_facebook.png"
+            alt="facebook logo"
+        /></a>
+        <a
+          href="https://twitter.com/Opentrons"
+          target="_blank"
+          ga-on="click"
+          ga-event-category="Social"
+          ga-event-action="Open Twitter"
+          ><img
+            src="https://s3.amazonaws.com/opentrons-images/website/logo_twitter.png"
+            alt="twitter logo"
+        /></a>
+        <a
+          href="https://www.instagram.com/opentrons_/"
+          target="_blank"
+          ga-on="click"
+          ga-event-category="Social"
+          ga-event-action="Open Instagram"
+          ><img
+            src="https://s3.amazonaws.com/opentrons-images/website/logo_instagram.png"
+            alt="instagram logo"
+        /></a>
+        <a
+          href="https://www.youtube.com/channel/UCvMRmXIxnHs3AutkVhuqaQg"
+          target="_blank"
+          ga-on="click"
+          ga-event-category="Social"
+          ga-event-action="Open Youtube"
+          ><img
+            src="https://s3.amazonaws.com/opentrons-images/website/logo_youtube.png"
+            alt="youtube logo"
+        /></a>
+      </div>
+      <h3>Sign Up For Our Newsletter</h3>
+      <div>
+        <script charset="utf-8" type="text/javascript" src="https://js.hsforms.net/forms/v2.js"></script>
+          <script>
+            hbspt.forms.create({
+          	region: "na1",
+          	portalId: "5383285",
+          	formId: "210adc2c-072f-4c9c-a812-6367469358d5",
+          	version: "V2_PRERELEASE"
+            });
+          </script>
+      </div>
+      <p class="copyrite">
+        &#169;&nbsp;OPENTRONS
+        <script type="text/javascript">
+          document.write(new Date().getFullYear())
+        </script>
+      </p>
+    </section>
+    <section class="footer-menu">
+      <ul>
+        <li>Products</li>
+        <li><a href="https://opentrons.com/robots">OT-One</a></li>
+        <li><a href="https://opentrons.com/ot-2">OT-2</a></li>
+        <li><a href="https://opentrons.com/pipettes">OT-2 Pipettes</a></li>
+        <li><a href="https://opentrons.com/modules">Modules</a></li>
+        <li><a href="https://opentrons.com/ot-app">OT App</a></li>
+        <li>
+          <a href="https://protocols.opentrons.com/" target="_blank"
+            >Protocol Library</a
+          >
+        </li>
+      </ul>
+      <ul>
+        <li>Company</li>
+        <li><a href="https://opentrons.com/about">About</a></li>
+        <li><a href="https://opentrons.com/team">Team</a></li>
+        <li><a href="https://blog.opentrons.com/">Blog</a></li>
+        <li><a href="https://opentrons.com/contact">Contact Us</a></li>
+        <li>
+          <a href="https://opentrons.com/jobs" target="_blank" class="hiring"
+            >WE'RE HIRING</a
+          >
+        </li>
+      </ul>
+      <ul>
+        <li>Resources</li>
+        <li>
+          <a href="https://support.opentrons.com" target="_blank">Support</a>
+        </li>
+        <li>
+          <a href="http://docs.opentrons.com/" target="_blank">Opentrons API</a>
+        </li>
+        <li>
+          <a
+            href="https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md"
+            target="_blank"
+            >Open Source</a
+          >
+        </li>
+      </ul>
+      <ul>
+        <li><a href="https://shop.opentrons.com/" class="buy">Buy</a></li>
+      </ul>
+    </section>
+  </div>
+</footer>
+<script>
+  ;(function(w, d, s, l, i) {
+    w[l] = w[l] || []
+    w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' })
+    var f = d.getElementsByTagName(s)[0],
+      j = d.createElement(s),
+      dl = l != 'dataLayer' ? '&l=' + l : ''
+    j.async = true
+    j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl
+    f.parentNode.insertBefore(j, f)
+  })(window, document, 'script', 'dataLayer', 'GTM-WCDX9CX')
+</script>
+<script>
+  function toggleMenu(menu) {
+    var element = document.querySelector(`#${menu}`)
+    var elementList = document.querySelectorAll('.navbar-ul')
+    elementList.forEach(e => {
+      if (e !== element) {
+        e.previousElementSibling.classList.add('notActive')
+        e.classList.add('visible')
+      }
+    })
+    if (!element.classList.contains('visible')) {
+      element.classList.add('visible')
+      elementList.forEach(e => {
+        e.previousElementSibling.classList.remove('notActive')
+      })
+    } else {
+      element.classList.remove('visible')
+      element.previousElementSibling.classList.remove('notActive')
+    }
+  }
+  function close() {
+    var elementList = document.querySelectorAll('.navbar-ul')
+    var subMenu = document.querySelectorAll('.sub-menu')
+    elementList.forEach(e => {
+      e.classList.add('visible')
+      e.previousElementSibling.classList.remove('notActive')
+    })
+    subMenu.forEach(e => {
+      e.classList.remove('showmenu')
+      console.dir(e)
+    })
+  }
+  function toggleOpen() {
+    var mobile = document.querySelector('.mobile-hamburger')
+    var mobileMenu = document.querySelector('.mobile-menu')
+    var subMenu = document.querySelectorAll('.sub-menu')
+    if (mobileMenu.classList.contains('dnone')) {
+      mobileMenu.classList.remove('dnone')
+    } else {
+      mobileMenu.classList.add('dnone')
+    }
+    subMenu.forEach(e => {
+      if (e.classList.contains('showmenu')) {
+        e.classList.remove('showmenu')
+      }
+    })
+    mobile.classList.toggle('open')
+    document.body.classList.toggle('mobile-scrolling')
+  }
+  function showMenu(menu) {
+    var element = document.querySelector(`.sub-menu-${menu}`)
+    if (element.classList.contains('showmenu')) {
+      element.classList.remove('showmenu')
+    } else {
+      element.classList.add('showmenu')
+    }
+  }
+  function closeMenu() {
+    var element = document.querySelectorAll('.sub-menu')
+    element.forEach(e => {
+      if (e.classList.contains('showmenu')) {
+        e.classList.remove('showmenu')
+      }
+    })
+  }
+  var navbar = document.querySelector('.navbar-menu')
+  document.addEventListener('click', function(event) {
+    var isClickInside = navbar.contains(event.target)
+    if (!isClickInside && window.innerWidth >= 1024) {
+      close()
+    }
+  })
+</script>
+
+ 
+  </body>
+</html>

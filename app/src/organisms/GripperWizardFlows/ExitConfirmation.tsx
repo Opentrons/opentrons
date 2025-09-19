@@ -1,19 +1,24 @@
-import * as React from 'react'
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+
 import {
-  Flex,
-  COLORS,
-  SPACING,
   AlertPrimaryButton,
-  SecondaryButton,
+  COLORS,
+  Flex,
   JUSTIFY_FLEX_END,
+  SecondaryButton,
+  SPACING,
 } from '@opentrons/components'
-import { getIsOnDevice } from '../../redux/config'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import { SmallButton } from '../../atoms/buttons'
+
+import { SmallButton } from '/app/atoms/buttons'
+import {
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '/app/molecules/SimpleWizardBody'
+import { getIsOnDevice } from '/app/redux/config'
+
 import { GRIPPER_FLOW_TYPES } from './constants'
+
 import type { GripperWizardFlowType } from './types'
 
 interface ExitConfirmationProps {
@@ -37,7 +42,7 @@ export function ExitConfirmation(props: ExitConfirmationProps): JSX.Element {
 
   if (isRobotMoving)
     return (
-      <InProgressModal
+      <SimpleWizardInProgressBody
         description={t('shared:stand_back_robot_is_in_motion')}
       />
     )

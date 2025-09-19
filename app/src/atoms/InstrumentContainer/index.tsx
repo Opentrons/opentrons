@@ -1,8 +1,10 @@
-import * as React from 'react'
-
-import { Flex, BORDERS, COLORS, SPACING } from '@opentrons/components'
-
-import { StyledText } from '../text'
+import {
+  BORDERS,
+  COLORS,
+  Flex,
+  LegacyStyledText,
+  SPACING,
+} from '@opentrons/components'
 
 interface InstrumentContainerProps {
   displayName: string
@@ -22,9 +24,9 @@ export const InstrumentContainer = (
       paddingY={SPACING.spacing2}
       width="max-content"
     >
-      <StyledText as="p" id={id}>
+      <LegacyStyledText as="p" id={id}>
         {displayName}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }

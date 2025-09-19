@@ -1,9 +1,20 @@
 import last from 'lodash/last'
+
 import {
+  ABSORBANCE_READER_TYPE,
+  ALL,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+
+import {
+  ABSORBANCE_READER_INITIALIZE,
+  ABSORBANCE_READER_LID,
+  ABSORBANCE_READER_READ,
+} from '../../constants'
+import { maskField } from '../../steplist/fieldLevel'
 import {
   createBlankForm,
   getNextDefaultEngageHeight,
@@ -14,21 +25,23 @@ import {
   handleFormChange,
 } from '../../steplist/formLevel'
 import {
-  getModuleOnDeckByType,
   getMagnetLabwareEngageHeight,
+  getModuleOnDeckByType,
 } from '../../ui/modules/utils'
-import { maskField } from '../../steplist/fieldLevel'
-import {
-  PipetteEntities,
+
+import type {
+  AbsorbanceReaderState,
+  AdditionalEquipmentEntities,
   LabwareEntities,
+  PipetteEntities,
   RobotState,
   Timeline,
-  AdditionalEquipmentEntities,
 } from '@opentrons/step-generation'
-import { FormData, StepType, StepIdType } from '../../form-types'
-import { InitialDeckSetup } from '../types'
-import { FormPatch } from '../../steplist/actions/types'
-import { SavedStepFormState, OrderedStepIdsState } from '../reducers'
+import type { FormData, StepIdType, StepType } from '../../form-types'
+import type { FormPatch } from '../../steplist/actions/types'
+import type { OrderedStepIdsState, SavedStepFormState } from '../reducers'
+import type { InitialDeckSetup } from '../types'
+
 export interface CreatePresavedStepFormArgs {
   stepId: StepIdType
   stepType: StepType
@@ -61,6 +74,15 @@ const _patchDefaultPipette = (args: {
     orderedStepIds,
     initialDeckSetup.pipettes
   )
+  const pipetteTipracks = pipetteEntities[defaultPipetteId].tiprackDefURI
+  const labwareURIsOnDeck = new Set(
+    Object.values(labwareEntities).map(({ labwareDefURI }) => labwareDefURI)
+  )
+  const firstDefaultTiprackURIOnDeck = pipetteTipracks.find(uri =>
+    labwareURIsOnDeck.has(uri)
+  )
+  const hasPartialTipSupportedChannel =
+    pipetteEntities[defaultPipetteId]?.spec.channels !== 1
   // If there is a `pipette` field in the form,
   // then set `pipette` field of new steps to the next default pipette id.
   //
@@ -72,6 +94,8 @@ const _patchDefaultPipette = (args: {
     const updatedFields = handleFormChange(
       {
         pipette: defaultPipetteId,
+        nozzles: hasPartialTipSupportedChannel ? ALL : null,
+        tipRack: firstDefaultTiprackURIOnDeck ?? null,
       },
       formData,
       pipetteEntities,
@@ -113,6 +137,64 @@ const _patchDefaultDropTipLocation = (args: {
       labwareEntities
     )
     return updatedFields
+  }
+
+  return null
+}
+
+const _patchDefaultLabwareLocations = (args: {
+  labwareEntities: LabwareEntities
+  pipetteEntities: PipetteEntities
+  stepType: StepType
+}): FormUpdater => formData => {
+  const { labwareEntities, pipetteEntities, stepType } = args
+
+  const formHasMoveLabware =
+    formData && 'labware' in formData && stepType === 'moveLabware'
+
+  const filteredLabware = Object.values(labwareEntities).filter(
+    lw =>
+      // Filter out the tiprack, adapter, and lid entities
+      !lw.def?.parameters.isTiprack &&
+      !lw.def?.allowedRoles?.includes('adapter') &&
+      !lw.def?.allowedRoles?.includes('lid')
+  )
+
+  const filteredMoveLabware = Object.values(labwareEntities).filter(
+    lw =>
+      // Filter out adapter entities
+      !lw.def?.allowedRoles?.includes('adapter')
+  )
+
+  const formHasAspirateLabware = formData && 'aspirate_labware' in formData
+  const formHasMixLabware =
+    formData && 'labware' in formData && stepType === 'mix'
+
+  if (filteredLabware.length === 1 && formHasAspirateLabware) {
+    return handleFormChange(
+      { aspirate_labware: filteredLabware[0].id ?? null },
+      formData,
+      pipetteEntities,
+      labwareEntities
+    )
+  }
+
+  if (filteredLabware.length === 1 && formHasMixLabware) {
+    return handleFormChange(
+      { labware: filteredLabware[0].id ?? null },
+      formData,
+      pipetteEntities,
+      labwareEntities
+    )
+  }
+
+  if (filteredMoveLabware.length === 1 && formHasMoveLabware) {
+    return handleFormChange(
+      { labware: filteredMoveLabware[0].id },
+      formData,
+      pipetteEntities,
+      labwareEntities
+    )
   }
 
   return null
@@ -168,13 +250,17 @@ const _patchTemperatureModuleId = (args: {
   stepType: StepType
 }): FormUpdater => () => {
   const { initialDeckSetup, orderedStepIds, savedStepForms, stepType } = args
+  const numOfModules =
+    Object.values(initialDeckSetup.modules).filter(
+      module => module.type === TEMPERATURE_MODULE_TYPE
+    )?.length ?? 1
   const hasTemperatureModuleId =
     stepType === 'pause' || stepType === 'temperature'
 
   // Auto-populate moduleId field of 'pause' and 'temperature' steps.
   //
   // Bypass dependent field changes, do not use handleFormChange
-  if (hasTemperatureModuleId) {
+  if (hasTemperatureModuleId && numOfModules === 1) {
     const moduleId = getNextDefaultTemperatureModuleId(
       savedStepForms,
       orderedStepIds,
@@ -195,6 +281,10 @@ const _patchHeaterShakerModuleId = (args: {
   stepType: StepType
 }): FormUpdater => () => {
   const { initialDeckSetup, stepType } = args
+  const numOfModules =
+    Object.values(initialDeckSetup.modules).filter(
+      module => module.type === HEATERSHAKER_MODULE_TYPE
+    )?.length ?? 1
   const hasHeaterShakerModuleId =
     stepType === 'pause' || stepType === 'heaterShaker'
 
@@ -202,7 +292,7 @@ const _patchHeaterShakerModuleId = (args: {
   // Note, if both a temperature module and a heater shaker module are present, the pause form
   // will default to use the heater shaker
   // Bypass dependent field changes, do not use handleFormChange
-  if (hasHeaterShakerModuleId) {
+  if (hasHeaterShakerModuleId && numOfModules === 1) {
     const moduleId =
       getModuleOnDeckByType(initialDeckSetup, HEATERSHAKER_MODULE_TYPE)?.id ??
       null
@@ -210,6 +300,58 @@ const _patchHeaterShakerModuleId = (args: {
       return {
         moduleId,
       }
+    }
+  }
+
+  return null
+}
+
+const _patchAbsorbanceReaderModuleId = (args: {
+  initialDeckSetup: InitialDeckSetup
+  orderedStepIds: OrderedStepIdsState
+  savedStepForms: SavedStepFormState
+  stepType: StepType
+  robotStateTimeline: Timeline
+}): FormUpdater => () => {
+  const { initialDeckSetup, stepType, robotStateTimeline } = args
+  const numOfModules =
+    Object.values(initialDeckSetup.modules).filter(
+      module => module.type === ABSORBANCE_READER_TYPE
+    )?.length ?? 1
+  const hasAbsorbanceReaderModuleId = stepType === 'absorbanceReader'
+
+  const robotState: RobotState | null =
+    last(robotStateTimeline.timeline)?.robotState ?? null
+
+  const modules = robotState?.modules ?? {}
+  const labware = robotState?.labware ?? {}
+
+  // pre-select form type if module is set
+  if (hasAbsorbanceReaderModuleId && numOfModules === 1) {
+    const moduleId =
+      getModuleOnDeckByType(initialDeckSetup, ABSORBANCE_READER_TYPE)?.id ??
+      null
+
+    if (moduleId == null) {
+      return null
+    }
+
+    const isLabwareOnAbsorbanceReader = Object.values(labware).some(lw =>
+      lw.stack.includes(moduleId)
+    )
+    const absorbanceReaderState = modules[moduleId]
+      ?.moduleState as AbsorbanceReaderState | null
+    const initialization = absorbanceReaderState?.initialization ?? null
+    const enableReadOrInitialization =
+      !isLabwareOnAbsorbanceReader || initialization != null
+    const compoundCommandType = isLabwareOnAbsorbanceReader
+      ? ABSORBANCE_READER_READ
+      : ABSORBANCE_READER_INITIALIZE
+    return {
+      moduleId,
+      absorbanceReaderFormType: enableReadOrInitialization
+        ? compoundCommandType
+        : ABSORBANCE_READER_LID,
     }
   }
 
@@ -251,6 +393,21 @@ const _patchThermocyclerFields = (args: {
   }
 }
 
+const _patchMoveLabwareFields = (args: {
+  additionalEquipmentEntities: AdditionalEquipmentEntities
+  stepType: StepType
+}): FormUpdater => () => {
+  const { additionalEquipmentEntities, stepType } = args
+  const isMoveLabware = stepType === 'moveLabware'
+  const hasGripper = Object.values(additionalEquipmentEntities).some(
+    ({ name }) => name === 'gripper'
+  )
+  if (isMoveLabware && hasGripper) {
+    return { useGripper: true }
+  }
+  return null
+}
+
 export const createPresavedStepForm = ({
   initialDeckSetup,
   labwareEntities,
@@ -271,6 +428,12 @@ export const createPresavedStepForm = ({
     labwareEntities,
     pipetteEntities,
     additionalEquipmentEntities,
+  })
+
+  const updateDefaultLabwareLocations = _patchDefaultLabwareLocations({
+    labwareEntities,
+    pipetteEntities,
+    stepType,
   })
 
   const updateDefaultPipette = _patchDefaultPipette({
@@ -302,10 +465,23 @@ export const createPresavedStepForm = ({
     stepType,
   })
 
+  const updateAbsorbanceReaderModuleId = _patchAbsorbanceReaderModuleId({
+    initialDeckSetup,
+    orderedStepIds,
+    savedStepForms,
+    stepType,
+    robotStateTimeline,
+  })
+
   const updateThermocyclerFields = _patchThermocyclerFields({
     initialDeckSetup,
     stepType,
     robotStateTimeline,
+  })
+
+  const updateMoveLabwareFields = _patchMoveLabwareFields({
+    additionalEquipmentEntities,
+    stepType,
   })
 
   // finally, compose and apply all the updaters in order,
@@ -317,6 +493,9 @@ export const createPresavedStepForm = ({
     updateThermocyclerFields,
     updateHeaterShakerModuleId,
     updateMagneticModuleId,
+    updateAbsorbanceReaderModuleId,
+    updateDefaultLabwareLocations,
+    updateMoveLabwareFields,
   ].reduce<FormData>(
     (acc, updater: FormUpdater) => {
       const updates = updater(acc)

@@ -1,6 +1,7 @@
 import asyncio
 from concurrent.futures import Future
 import contextlib
+from copy import deepcopy
 from functools import partial, lru_cache, wraps
 from dataclasses import replace
 import logging
@@ -26,13 +27,12 @@ from opentrons.hardware_control.modules.module_calibration import (
 )
 
 
-from opentrons_shared_data.pipette.dev_types import (
-    PipetteName,
-)
+from opentrons_shared_data.pipette.types import PipetteName, PipetteModelType
 from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
+    pipette_definition,
 )
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 from opentrons import types as top_types
 from opentrons.config import robot_configs
@@ -44,7 +44,6 @@ from opentrons.config.types import (
     LiquidProbeSettings,
 )
 from opentrons.drivers.rpi_drivers.types import USBPort, PortGroup
-from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 from opentrons_shared_data.errors.exceptions import (
     EnumeratedError,
     PythonException,
@@ -52,6 +51,7 @@ from opentrons_shared_data.errors.exceptions import (
     GripperNotPresentError,
     InvalidActuator,
     FirmwareUpdateFailedError,
+    PipetteLiquidNotFoundError,
 )
 
 from .util import use_or_initialize_loop, check_motion_bounds
@@ -74,6 +74,7 @@ from .types import (
     DoorStateNotification,
     ErrorMessageNotification,
     HardwareEvent,
+    AsynchronousModuleErrorNotification,
     HardwareEventHandler,
     HardwareAction,
     HepaFanState,
@@ -89,6 +90,8 @@ from .types import (
     GripperProbe,
     UpdateStatus,
     StatusBarState,
+    StatusBarUpdateListener,
+    StatusBarUpdateUnsubscriber,
     SubSystemState,
     TipStateType,
     EstopOverallStatus,
@@ -96,6 +99,8 @@ from .types import (
     EstopState,
     HardwareFeatureFlags,
     FailedTipStateCheck,
+    PipetteSensorResponseQueue,
+    TipScrapeType,
 )
 from .errors import (
     UpdateOngoingError,
@@ -123,6 +128,7 @@ from .motion_utilities import (
     target_position_from_absolute,
     target_position_from_relative,
     target_position_from_plunger,
+    target_positions_from_plunger_tracking,
     offset_for_mount,
     deck_from_machine,
     machine_from_deck,
@@ -141,7 +147,6 @@ from .backends.types import HWStopCondition
 from .backends.flex_protocol import FlexBackend
 from .backends.ot3simulator import OT3Simulator
 from .backends.errors import SubsystemUpdating
-
 
 mod_log = logging.getLogger(__name__)
 
@@ -162,11 +167,15 @@ def _adjust_high_throughput_z_current(func: Wrapped) -> Wrapped:
     A decorator that temproarily and conditionally changes the active current (based on the axis input)
     before a function is executed and the cleans up afterwards
     """
+
     # only home and retract should be wrappeed by this decorator
     @wraps(func)
     async def wrapper(self: Any, axis: Axis, *args: Any, **kwargs: Any) -> Any:
         async with contextlib.AsyncExitStack() as stack:
-            if axis == Axis.Z_R and self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
+            if axis == Axis.Z_R and self.gantry_load in [
+                GantryLoad.HIGH_THROUGHPUT_1000,
+                GantryLoad.HIGH_THROUGHPUT_200,
+            ]:
                 await stack.enter_async_context(self._backend.restore_z_r_run_current())
             return await func(self, axis, *args, **kwargs)
 
@@ -239,6 +248,7 @@ class OT3API(
         # home() call succeeds or fails.
         self._motion_lock = asyncio.Lock()
         self._door_state = DoorState.CLOSED
+        self._module_door_serial: str | None = None
         self._pause_manager = PauseManager()
         self._pipette_handler = OT3PipetteHandler({m: None for m in OT3Mount})
         self._gripper_handler = GripperHandler(gripper=None)
@@ -258,7 +268,8 @@ class OT3API(
         realmount = OT3Mount.from_mount(mount)
         if realmount == OT3Mount.GRIPPER or (
             realmount == OT3Mount.LEFT
-            and self._gantry_load == GantryLoad.HIGH_THROUGHPUT
+            and self._gantry_load
+            in [GantryLoad.HIGH_THROUGHPUT_1000, GantryLoad.HIGH_THROUGHPUT_200]
         ):
             ax = Axis.by_mount(realmount)
             if ax in self.engaged_axes.keys():
@@ -275,6 +286,14 @@ class OT3API(
         self._door_state = door_state
 
     @property
+    def module_door_serial(self) -> str | None:
+        return self._module_door_serial
+
+    @module_door_serial.setter
+    def module_door_serial(self, module_serial: str | None = None) -> None:
+        self._module_door_serial = module_serial
+
+    @property
     def gantry_load(self) -> GantryLoad:
         return self._gantry_load
 
@@ -287,16 +306,14 @@ class OT3API(
     async def get_serial_number(self) -> Optional[str]:
         return await self._backend.get_serial_number()
 
-    async def set_system_constraints_for_calibration(self) -> None:
-        self._backend.update_constraints_for_calibration_with_gantry_load(
-            self._gantry_load
-        )
-
     async def set_system_constraints_for_plunger_acceleration(
         self, mount: OT3Mount, acceleration: float
     ) -> None:
+        high_speed_pipette = self._pipette_handler.get_pipette(
+            mount
+        ).is_high_speed_pipette()
         self._backend.update_constraints_for_plunger_acceleration(
-            mount, acceleration, self._gantry_load
+            mount, acceleration, self._gantry_load, high_speed_pipette
         )
 
     @contextlib.asynccontextmanager
@@ -304,11 +321,22 @@ class OT3API(
         async with self._backend.restore_system_constraints():
             yield
 
-    def _update_door_state(self, door_state: DoorState) -> None:
-        mod_log.info(f"Updating the window switch status: {door_state}")
+    @contextlib.asynccontextmanager
+    async def grab_pressure(self, mount: OT3Mount) -> AsyncIterator[None]:
+        instrument = self._pipette_handler.get_pipette(mount)
+        async with self._backend.grab_pressure(instrument.channels, mount):
+            yield
+
+    def _update_door_state(
+        self, door_state: DoorState, module_serial: str | None = None
+    ) -> None:
+        mod_log.info(f"Updating the window or module switch status: {door_state}")
         self.door_state = door_state
+        self.module_door_serial = module_serial
         for cb in self._callbacks:
-            hw_event = DoorStateNotification(new_state=door_state)
+            hw_event = DoorStateNotification(
+                new_state=door_state, module_serial=module_serial
+            )
             try:
                 cb(hw_event)
             except Exception:
@@ -340,10 +368,27 @@ class OT3API(
 
         return futures
 
+    def _send_module_notification(self, event: HardwareEvent) -> None:
+        if not isinstance(
+            event,
+            AsynchronousModuleErrorNotification,
+        ):
+            return
+        mod_log.info(
+            f"Forwarding module event {event.event} for {event.module_model} {event.module_serial} at {event.port}"
+        )
+        for cb in self._callbacks:
+            try:
+                cb(event)
+            except Exception:
+                mod_log.exception("Errored during module asynchronous callback")
+
     def _reset_last_mount(self) -> None:
         self._last_moved_mount = None
 
-    def _deck_from_machine(self, machine_pos: Dict[Axis, float]) -> Dict[Axis, float]:
+    def get_deck_from_machine(
+        self, machine_pos: Dict[Axis, float]
+    ) -> Dict[Axis, float]:
         return deck_from_machine(
             machine_pos=machine_pos,
             attitude=self._robot_calibration.deck_calibration.attitude,
@@ -393,7 +438,9 @@ class OT3API(
 
         await api_instance.set_status_bar_enabled(status_bar_enabled)
         module_controls = await AttachedModulesControl.build(
-            api_instance, board_revision=backend.board_revision
+            api_instance,
+            board_revision=backend.board_revision,
+            event_callback=api_instance._send_module_notification,
         )
         backend.module_controls = module_controls
         await backend.build_estop_detector()
@@ -413,7 +460,7 @@ class OT3API(
             Dict[OT3Mount, Dict[str, Optional[str]]],
             Dict[top_types.Mount, Dict[str, Optional[str]]],
         ] = None,
-        attached_modules: Optional[Dict[str, List[str]]] = None,
+        attached_modules: Optional[Dict[str, List[modules.SimulatingModule]]] = None,
         config: Union[RobotConfig, OT3Config, None] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         strict_attached_instruments: bool = True,
@@ -436,9 +483,11 @@ class OT3API(
             checked_config = config
 
         backend = await OT3Simulator.build(
-            {OT3Mount.from_mount(k): v for k, v in attached_instruments.items()}
-            if attached_instruments
-            else {},
+            (
+                {OT3Mount.from_mount(k): v for k, v in attached_instruments.items()}
+                if attached_instruments
+                else {}
+            ),
             checked_modules,
             checked_config,
             checked_loop,
@@ -453,7 +502,9 @@ class OT3API(
         )
         await api_instance.cache_instruments()
         module_controls = await AttachedModulesControl.build(
-            api_instance, board_revision=backend.board_revision
+            api_instance,
+            board_revision=backend.board_revision,
+            event_callback=api_instance._send_module_notification,
         )
         backend.module_controls = module_controls
         await backend.watch(api_instance.loop)
@@ -557,13 +608,22 @@ class OT3API(
         await self.set_lights(button=True)
 
     async def set_status_bar_state(self, state: StatusBarState) -> None:
+        self._log.info(f"Setting status bar state to {state}")
         await self._backend.set_status_bar_state(state)
 
     async def set_status_bar_enabled(self, enabled: bool) -> None:
         await self._backend.set_status_bar_enabled(enabled)
 
+    def get_status_bar_enabled(self) -> bool:
+        return self._backend.get_status_bar_enabled()
+
     def get_status_bar_state(self) -> StatusBarState:
         return self._backend.get_status_bar_state()
+
+    def add_status_bar_listener(
+        self, listener: StatusBarUpdateListener
+    ) -> StatusBarUpdateUnsubscriber:
+        return self._backend.add_status_bar_listener(listener)
 
     @ExecutionManagerProvider.wait_for_running
     async def delay(self, duration_s: float) -> None:
@@ -587,9 +647,10 @@ class OT3API(
             self.is_simulator
         ), "Cannot build simulating module from non-simulating hardware control API"
 
-        return await self._backend.module_controls.build_module(
-            port="",
-            usb_port=USBPort(name="", port_number=1, port_group=PortGroup.LEFT),
+        return await self._backend.module_controls.register_simulated_module(
+            simulated_usb_port=USBPort(
+                name="", port_number=1, port_group=PortGroup.LEFT
+            ),
             type=modules.ModuleType.from_model(model),
             sim_model=model.value,
         )
@@ -599,8 +660,11 @@ class OT3API(
         left = self._pipette_handler.has_pipette(OT3Mount.LEFT)
         if left:
             pip = self._pipette_handler.get_pipette(OT3Mount.LEFT)
-            if pip.config.channels > 8:
-                return GantryLoad.HIGH_THROUGHPUT
+            if pip.config.channels == 96:
+                if pip.config.pipette_type == PipetteModelType.p1000:
+                    return GantryLoad.HIGH_THROUGHPUT_1000
+                else:
+                    return GantryLoad.HIGH_THROUGHPUT_200
         return GantryLoad.LOW_THROUGHPUT
 
     async def cache_pipette(
@@ -623,9 +687,30 @@ class OT3API(
             self._feature_flags.use_old_aspiration_functions,
         )
         self._pipette_handler.hardware_instruments[mount] = p
+
+        if config is not None:
+            self._set_pressure_sensor_available(mount, instrument_config=config)
+
         # TODO (lc 12-5-2022) Properly support backwards compatibility
         # when applicable
         return skipped
+
+    def get_pressure_sensor_available(self, mount: OT3Mount) -> bool:
+        pip_axis = Axis.of_main_tool_actuator(mount)
+        return self._backend.get_pressure_sensor_available(pip_axis)
+
+    def _set_pressure_sensor_available(
+        self,
+        mount: OT3Mount,
+        instrument_config: pipette_definition.PipetteConfigurations,
+    ) -> None:
+        pressure_sensor_available = (
+            "pressure" in instrument_config.available_sensors.sensors
+        )
+        pip_axis = Axis.of_main_tool_actuator(mount)
+        self._backend.set_pressure_sensor_available(
+            pipette_axis=pip_axis, available=pressure_sensor_available
+        )
 
     async def cache_gripper(self, instrument_data: AttachedGripper) -> bool:
         """Set up gripper based on scanned information."""
@@ -760,17 +845,19 @@ class OT3API(
 
     @ExecutionManagerProvider.wait_for_running
     async def _update_position_estimation(
-        self, axes: Optional[List[Axis]] = None
+        self, axes: Optional[Sequence[Axis]] = None
     ) -> None:
         """
         Function to update motor estimation for a set of axes
         """
+        await self._backend.update_motor_status()
 
-        if axes:
-            checked_axes = [ax for ax in axes if ax in Axis]
-        else:
-            checked_axes = [ax for ax in Axis]
-        await self._backend.update_motor_estimation(checked_axes)
+        if axes is None:
+            axes = [ax for ax in Axis]
+
+        axes = [ax for ax in axes if self._backend.axis_is_present(ax)]
+
+        await self._backend.update_motor_estimation(axes)
 
     # Global actions API
     def pause(self, pause_type: PauseType) -> None:
@@ -871,14 +958,17 @@ class OT3API(
             axes = list(Axis.ot3_mount_axes())
         await self.home(axes)
 
-    async def _do_home_and_maybe_calibrate_gripper_jaw(self) -> None:
+    async def _do_home_and_maybe_calibrate_gripper_jaw(
+        self,
+        recalibrate_jaw_width: bool = False,
+    ) -> None:
         gripper = self._gripper_handler.get_gripper()
         self._log.info("Homing gripper jaw.")
         dc = self._gripper_handler.get_duty_cycle_by_grip_force(
             gripper.default_home_force
         )
         await self._ungrip(duty_cycle=dc)
-        if not gripper.has_jaw_width_calibration:
+        if recalibrate_jaw_width or not gripper.has_jaw_width_calibration:
             self._log.info("Calibrating gripper jaw.")
             await self._grip(
                 duty_cycle=dc, expected_displacement=gripper.max_jaw_displacement()
@@ -887,10 +977,13 @@ class OT3API(
             gripper.update_jaw_open_position_from_closed_position(jaw_at_closed)
             await self._ungrip(duty_cycle=dc)
 
-    async def home_gripper_jaw(self) -> None:
+    async def home_gripper_jaw(
+        self,
+        recalibrate_jaw_width: bool = False,
+    ) -> None:
         """Home the jaw of the gripper."""
         try:
-            await self._do_home_and_maybe_calibrate_gripper_jaw()
+            await self._do_home_and_maybe_calibrate_gripper_jaw(recalibrate_jaw_width)
         except GripperNotPresentError:
             pass
 
@@ -911,7 +1004,7 @@ class OT3API(
 
     async def home_gear_motors(self) -> None:
         homing_velocity = self._config.motion_settings.max_speed_discontinuity[
-            GantryLoad.HIGH_THROUGHPUT
+            self._gantry_load
         ][OT3AxisKind.Q]
 
         max_distance = self._backend.axis_bounds[Axis.Q][1]
@@ -931,11 +1024,10 @@ class OT3API(
             current_pos_float > self._config.safe_home_distance
             and current_pos_float < max_distance
         ):
-
             # move toward home until a safe distance
             await self._backend.tip_action(
-                origin={Axis.Q: current_pos_float},
-                targets=[({Axis.Q: self._config.safe_home_distance}, 400)],
+                origin=current_pos_float,
+                targets=[(self._config.safe_home_distance, 400)],
             )
 
             # update current position
@@ -1012,14 +1104,14 @@ class OT3API(
 
     async def _cache_current_position(self) -> Dict[Axis, float]:
         """Cache current position from backend and return in absolute deck coords."""
-        self._current_position = self._deck_from_machine(
+        self._current_position = self.get_deck_from_machine(
             await self._backend.update_position()
         )
         return self._current_position
 
     async def _cache_encoder_position(self) -> Dict[Axis, float]:
         """Cache encoder position from backend and return in absolute deck coords."""
-        self._encoder_position = self._deck_from_machine(
+        self._encoder_position = self.get_deck_from_machine(
             await self._backend.update_encoder_position()
         )
         if self.has_gripper():
@@ -1115,7 +1207,10 @@ class OT3API(
             z_ax: carriage_position[z_ax] + offset[2] + cp.z,
             plunger_ax: carriage_position[plunger_ax],
         }
-        if self._gantry_load == GantryLoad.HIGH_THROUGHPUT:
+        if self._gantry_load in [
+            GantryLoad.HIGH_THROUGHPUT_1000,
+            GantryLoad.HIGH_THROUGHPUT_200,
+        ]:
             effector_pos[Axis.Q] = self._backend.gear_motor_position or 0.0
 
         return effector_pos
@@ -1140,6 +1235,12 @@ class OT3API(
             z=cur_pos[Axis.by_mount(realmount)],
         )
 
+    async def update_axis_position_estimations(self, axes: Sequence[Axis]) -> None:
+        """Update specified axes position estimators from their encoders."""
+        await self._update_position_estimation(axes)
+        await self._cache_current_position()
+        await self._cache_encoder_position()
+
     async def move_to(
         self,
         mount: Union[top_types.Mount, OT3Mount],
@@ -1147,7 +1248,7 @@ class OT3API(
         speed: Optional[float] = None,
         critical_point: Optional[CriticalPoint] = None,
         max_speeds: Union[None, Dict[Axis, float], OT3AxisMap[float]] = None,
-        _expect_stalls: bool = False,
+        expect_stalls: bool = False,
     ) -> None:
         """Move the critical point of the specified mount to a location
         relative to the deck, at the specified speed."""
@@ -1155,7 +1256,8 @@ class OT3API(
         axes_moving = [Axis.X, Axis.Y, Axis.by_mount(mount)]
 
         if (
-            self.gantry_load == GantryLoad.HIGH_THROUGHPUT
+            self.gantry_load
+            in [GantryLoad.HIGH_THROUGHPUT_1000, GantryLoad.HIGH_THROUGHPUT_200]
             and realmount == OT3Mount.RIGHT
         ):
             raise RuntimeError(
@@ -1191,7 +1293,7 @@ class OT3API(
             target_position,
             speed=speed,
             max_speeds=checked_max,
-            expect_stalls=_expect_stalls,
+            expect_stalls=expect_stalls,
         )
 
     async def move_axes(  # noqa: C901
@@ -1199,6 +1301,7 @@ class OT3API(
         position: Mapping[Axis, float],
         speed: Optional[float] = None,
         max_speeds: Optional[Dict[Axis, float]] = None,
+        expect_stalls: bool = False,
     ) -> None:
         """Moves the effectors of the specified axis to the specified position.
         The effector of the x,y axis is the center of the carriage.
@@ -1213,7 +1316,9 @@ class OT3API(
                     message=f"{axis} is not present", detail={"axis": str(axis)}
                 )
 
+        self._log.info(f"Attempting to move {position} with speed {speed}.")
         if not self._backend.check_encoder_status(list(position.keys())):
+            self._log.info("Calling home in move_axes")
             await self.home()
         self._assert_motor_ok(list(position.keys()))
 
@@ -1252,7 +1357,11 @@ class OT3API(
             if axis not in absolute_positions:
                 absolute_positions[axis] = position_value
 
-        await self._move(target_position=absolute_positions, speed=speed)
+        await self._move(
+            target_position=absolute_positions,
+            speed=speed,
+            expect_stalls=expect_stalls,
+        )
 
     async def move_rel(
         self,
@@ -1262,7 +1371,7 @@ class OT3API(
         max_speeds: Union[None, Dict[Axis, float], OT3AxisMap[float]] = None,
         check_bounds: MotionChecks = MotionChecks.NONE,
         fail_on_not_homed: bool = False,
-        _expect_stalls: bool = False,
+        expect_stalls: bool = False,
     ) -> None:
         """Move the critical point of the specified mount by a specified
         displacement in a specified direction, at the specified speed."""
@@ -1273,7 +1382,8 @@ class OT3API(
         axes_moving = [Axis.X, Axis.Y, Axis.by_mount(mount)]
 
         if (
-            self.gantry_load == GantryLoad.HIGH_THROUGHPUT
+            self.gantry_load
+            in [GantryLoad.HIGH_THROUGHPUT_1000, GantryLoad.HIGH_THROUGHPUT_200]
             and realmount == OT3Mount.RIGHT
         ):
             raise RuntimeError(
@@ -1304,7 +1414,7 @@ class OT3API(
             speed=speed,
             max_speeds=checked_max,
             check_bounds=check_bounds,
-            expect_stalls=_expect_stalls,
+            expect_stalls=expect_stalls,
         )
 
     async def _cache_and_maybe_retract_mount(self, mount: OT3Mount) -> None:
@@ -1332,7 +1442,8 @@ class OT3API(
         # if 96-channel pipette is attached and not being moved, it should retract
         if (
             mount != OT3Mount.LEFT
-            and self._gantry_load == GantryLoad.HIGH_THROUGHPUT
+            and self._gantry_load
+            in [GantryLoad.HIGH_THROUGHPUT_1000, GantryLoad.HIGH_THROUGHPUT_200]
             and not self.is_idle_mount(OT3Mount.LEFT)
         ):
             await self.retract(OT3Mount.LEFT, 10)
@@ -1390,8 +1501,8 @@ class OT3API(
             grip_width_uncertainty_narrower,
             gripper.jaw_width,
             gripper.max_allowed_grip_error,
-            gripper.max_jaw_width,
             gripper.min_jaw_width,
+            gripper.max_jaw_width,
         )
 
     def gripper_jaw_can_home(self) -> bool:
@@ -1424,6 +1535,13 @@ class OT3API(
         check_motion_bounds(to_check, target_position, bounds, check_bounds)
         self._log.info(f"Move: deck {target_position} becomes machine {machine_pos}")
         origin = await self._backend.update_position()
+
+        if self._gantry_load in [
+            GantryLoad.HIGH_THROUGHPUT_1000,
+            GantryLoad.HIGH_THROUGHPUT_200,
+        ]:
+            origin[Axis.Q] = self._backend.gear_motor_position or 0.0
+
         async with contextlib.AsyncExitStack() as stack:
             if acquire_lock:
                 await stack.enter_async_context(self._motion_lock)
@@ -1489,7 +1607,10 @@ class OT3API(
         enabled = await self._backend.is_motor_engaged(axis)
 
         if not enabled:
-            if axis == Axis.Z_L and self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
+            if axis == Axis.Z_L and self.gantry_load in [
+                GantryLoad.HIGH_THROUGHPUT_1000,
+                GantryLoad.HIGH_THROUGHPUT_200,
+            ]:
                 # we're here if the left mount has been idle and the brake is engaged
                 # we want to temporarily increase its hold current to prevent the z
                 # stage from dropping when switching off the ebrake
@@ -1532,6 +1653,12 @@ class OT3API(
         if Axis.to_kind(axis) == OT3AxisKind.P:
             await self._set_plunger_current_and_home(axis, motor_ok, encoder_ok)
             return
+
+        # TODO: (ba, 2024-04-19): We need to explictly engage the axis and enable
+        # the motor when we are attempting to move. This should be already
+        # happening but something on the firmware is either not enabling the motor or
+        # disabling the motor.
+        await self.engage_axes([axis])
 
         # we can move to safe home distance!
         if encoder_ok and motor_ok:
@@ -1592,7 +1719,10 @@ class OT3API(
             checked_axes = axes
         else:
             checked_axes = [ax for ax in Axis if ax != Axis.Q]
-        if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
+        if self.gantry_load in [
+            GantryLoad.HIGH_THROUGHPUT_1000,
+            GantryLoad.HIGH_THROUGHPUT_200,
+        ]:
             checked_axes.append(Axis.Q)
         if skip:
             checked_axes = [ax for ax in checked_axes if ax not in skip]
@@ -1619,7 +1749,12 @@ class OT3API(
         await self._backend.disengage_axes(which)
 
     async def engage_axes(self, which: List[Axis]) -> None:
-        await self._backend.engage_axes(which)
+        await self._backend.engage_axes(
+            [axis for axis in which if self._backend.axis_is_present(axis)]
+        )
+
+    def axis_is_present(self, axis: Axis) -> bool:
+        return self._backend.axis_is_present(axis)
 
     async def get_limit_switches(self) -> Dict[Axis, bool]:
         res = await self._backend.get_limit_switches()
@@ -1649,16 +1784,24 @@ class OT3API(
         motor_ok = self._backend.check_motor_status([axis])
         encoder_ok = self._backend.check_encoder_status([axis])
 
-        if motor_ok and encoder_ok:
-            # we can move to the home position without checking the limit switch
-            origin = await self._backend.update_position()
-            target_pos = {axis: self._backend.home_position()[axis]}
-            await self._backend.move(origin, target_pos, 400, HWStopCondition.none)
-        else:
-            # home the axis
-            await self._home_axis(axis)
-        await self._cache_current_position()
-        await self._cache_encoder_position()
+        async with self._motion_lock:
+            if motor_ok and encoder_ok:
+                # TODO: (ba, 2024-04-19): We need to explictly engage the axis and enable
+                # the motor when we are attempting to move. This should be already
+                # happening but something on the firmware is either not enabling the motor or
+                # disabling the motor.
+                await self.engage_axes([axis])
+
+                # we can move to the home position without checking the limit switch
+                origin = await self._backend.update_position()
+                target_pos = {axis: self._backend.home_position()[axis]}
+                await self._backend.move(origin, target_pos, 400, HWStopCondition.none)
+            else:
+                # home the axis
+                await self._home_axis(axis)
+
+            await self._cache_current_position()
+            await self._cache_encoder_position()
 
     # Gantry/frame (i.e. not pipette) config API
     @property
@@ -1782,6 +1925,57 @@ class OT3API(
         self._gripper_handler.check_ready_for_jaw_move("hold_jaw_width")
         await self._hold_jaw_width(jaw_width_mm)
 
+    async def tip_pickup_moves(
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        presses: Optional[int] = None,
+        increment: Optional[float] = None,
+    ) -> None:
+        """This is a slightly more barebones variation of pick_up_tip. This is only the motor routine
+        directly involved in tip pickup, and leaves any state updates and plunger moves to the caller.
+        """
+        realmount = OT3Mount.from_mount(mount)
+        instrument = self._pipette_handler.get_pipette(realmount)
+
+        if (
+            self.gantry_load
+            in [GantryLoad.HIGH_THROUGHPUT_1000, GantryLoad.HIGH_THROUGHPUT_200]
+            and instrument.nozzle_manager.current_configuration.configuration
+            == top_types.NozzleConfigurationType.FULL
+        ):
+            spec = self._pipette_handler.plan_ht_pick_up_tip(
+                instrument.nozzle_manager.current_configuration.tip_count
+            )
+            if spec.z_distance_to_tiprack:
+                await self.move_rel(
+                    realmount, top_types.Point(z=spec.z_distance_to_tiprack)
+                )
+            await self._tip_motor_action(realmount, spec.tip_action_moves)
+        else:
+            spec = self._pipette_handler.plan_lt_pick_up_tip(
+                realmount,
+                instrument.nozzle_manager.current_configuration.tip_count,
+                presses,
+                increment,
+            )
+            await self._force_pick_up_tip(realmount, spec)
+
+        # neighboring tips tend to get stuck in the space between
+        # the volume chamber and the drop-tip sleeve on p1000.
+        # This extra shake ensures those tips are removed
+        for rel_point, speed in spec.shake_off_moves:
+            await self.move_rel(realmount, rel_point, speed=speed)
+
+        if isinstance(self._backend, OT3Simulator):
+            self._backend._update_tip_state(realmount, True)
+
+        # fixme: really only need this during labware position check so user
+        # can verify if a tip is properly attached
+        if spec.ending_z_retract_distance:
+            await self.move_rel(
+                realmount, top_types.Point(z=spec.ending_z_retract_distance)
+            )
+
     async def _move_to_plunger_bottom(
         self,
         mount: OT3Mount,
@@ -1807,12 +2001,10 @@ class OT3API(
 
         With wet tips, the primary concern is leftover droplets inside the tip.
         These droplets ideally only move down and out of the tip, not up into the tip.
-        Therefore, it is preferable to use the "blow-out" speed when moving the
-        plunger down, and the slower "aspirate" speed when moving the plunger up.
+        Therefore, it is preferable to use the slower "aspirate" speed when
+        moving the plunger up after a blow-out.
 
-        Assume all tips are wet, because we do not differentiate between wet/dry tips.
-
-        When no tip is attached, moving at the max speed is preferable, to save time.
+        All other situations, moving at the max speed is preferable, to save time.
         """
         checked_mount = OT3Mount.from_mount(mount)
         instrument = self._pipette_handler.get_pipette(checked_mount)
@@ -1825,21 +2017,22 @@ class OT3API(
             self._current_position,
         )
         pip_ax = Axis.of_main_tool_actuator(checked_mount)
-        # speed depends on if there is a tip, and which direction to move
-        if instrument.has_tip_length:
+        # save time while moving down by using max speed
+        max_speeds = self.config.motion_settings.default_max_speed
+        speed_down = max_speeds[self.gantry_load][OT3AxisKind.P]
+        # upward moves can be max speed, or aspirate speed
+        # use the (slower) aspirate if there is a tip and we're following a blow-out
+        plunger_is_below_bottom_pos = (
+            self._current_position[pip_ax] > instrument.plunger_positions.bottom
+        )
+        if instrument.has_tip_length and plunger_is_below_bottom_pos:
             # using slower aspirate flow-rate, to avoid pulling droplets up
             speed_up = self._pipette_handler.plunger_speed(
                 instrument, instrument.aspirate_flow_rate, "aspirate"
             )
-            # use blow-out flow-rate, so we can push droplets out
-            speed_down = self._pipette_handler.plunger_speed(
-                instrument, instrument.blow_out_flow_rate, "dispense"
-            )
         else:
-            # save time by using max speed
-            max_speeds = self.config.motion_settings.default_max_speed
+            # either no tip, or plunger just homed, so tip is dry
             speed_up = max_speeds[self.gantry_load][OT3AxisKind.P]
-            speed_down = speed_up
         # IMPORTANT: Here is our backlash compensation.
         #            The plunger is pre-loaded in the "aspirate" direction
         backlash_pos = target_pos.copy()
@@ -1867,6 +2060,37 @@ class OT3API(
                 speed=(speed_up * rate),
                 acquire_lock=acquire_lock,
             )
+
+    async def _move_to_plunger_top_for_liquid_probe(
+        self,
+        mount: OT3Mount,
+        rate: float,
+        acquire_lock: bool = True,
+    ) -> None:
+        """
+        Move an instrument's plunger to the top, to prepare for a following
+        liquid probe action.
+
+        The plunger backlash distance (mm) is used to ensure the plunger is pre-loaded
+        in the downward direction. This means that the final position will not be
+        the plunger's configured "top" position, but "top" plus the "backlashDistance".
+        """
+        max_speeds = self.config.motion_settings.default_max_speed
+        speed = max_speeds[self.gantry_load][OT3AxisKind.P]
+        instrument = self._pipette_handler.get_pipette(mount)
+        top_plunger_pos = target_position_from_plunger(
+            OT3Mount.from_mount(mount),
+            instrument.plunger_positions.top,
+            self._current_position,
+        )
+        target_pos = top_plunger_pos.copy()
+        target_pos[Axis.of_main_tool_actuator(mount)] += instrument.backlash_distance
+        await self._move(top_plunger_pos, speed=speed * rate, acquire_lock=acquire_lock)
+        # NOTE: This should ALWAYS be moving DOWN.
+        #       There should never be a time that this function is called and
+        #       the plunger doesn't physically move DOWN.
+        #       This is to make sure we are always engaged at the beginning of liquid-probe.
+        await self._move(target_pos, speed=speed * rate, acquire_lock=acquire_lock)
 
     async def configure_for_volume(
         self, mount: Union[top_types.Mount, OT3Mount], volume: float
@@ -1899,12 +2123,16 @@ class OT3API(
         mount: Union[top_types.Mount, OT3Mount],
         volume: Optional[float] = None,
         rate: float = 1.0,
+        correction_volume: float = 0.0,
     ) -> None:
         """
         Aspirate a volume of liquid (in microliters/uL) using this pipette."""
         realmount = OT3Mount.from_mount(mount)
         aspirate_spec = self._pipette_handler.plan_check_aspirate(
-            realmount, volume, rate
+            mount=realmount,
+            volume=volume,
+            rate=rate,
+            correction_volume=correction_volume,
         )
         if not aspirate_spec:
             return
@@ -1941,12 +2169,19 @@ class OT3API(
         volume: Optional[float] = None,
         rate: float = 1.0,
         push_out: Optional[float] = None,
+        correction_volume: float = 0.0,
+        is_full_dispense: bool = False,
     ) -> None:
         """
         Dispense a volume of liquid in microliters(uL) using this pipette."""
         realmount = OT3Mount.from_mount(mount)
         dispense_spec = self._pipette_handler.plan_check_dispense(
-            realmount, volume, rate, push_out
+            mount=realmount,
+            volume=volume,
+            rate=rate,
+            push_out=push_out,
+            is_full_dispense=is_full_dispense,
+            correction_volume=correction_volume,
         )
         if not dispense_spec:
             return
@@ -2047,8 +2282,8 @@ class OT3API(
         # only move tip motors if they are not already below the sensor
         if tip_motor_pos_float < tip_presence_check_target:
             await self._backend.tip_action(
-                origin={Axis.Q: tip_motor_pos_float},
-                targets=[({Axis.Q: tip_presence_check_target}, 400)],
+                origin=tip_motor_pos_float,
+                targets=[(tip_presence_check_target, 400)],
             )
         try:
             yield
@@ -2058,6 +2293,7 @@ class OT3API(
     async def get_tip_presence_status(
         self,
         mount: Union[top_types.Mount, OT3Mount],
+        follow_singular_sensor: Optional[InstrumentProbeType] = None,
     ) -> TipStateType:
         """
         Check tip presence status. If a high throughput pipette is present,
@@ -2066,35 +2302,43 @@ class OT3API(
         async with self._motion_lock:
             real_mount = OT3Mount.from_mount(mount)
             async with contextlib.AsyncExitStack() as stack:
-                if (
-                    real_mount == OT3Mount.LEFT
-                    and self._gantry_load == GantryLoad.HIGH_THROUGHPUT
-                ):
+                if real_mount == OT3Mount.LEFT and self._gantry_load in [
+                    GantryLoad.HIGH_THROUGHPUT_1000,
+                    GantryLoad.HIGH_THROUGHPUT_200,
+                ]:
                     await stack.enter_async_context(self._high_throughput_check_tip())
-                result = await self._backend.get_tip_status(real_mount)
+                result = await self._backend.get_tip_status(
+                    real_mount, follow_singular_sensor
+                )
             return result
 
     async def verify_tip_presence(
-        self, mount: Union[top_types.Mount, OT3Mount], expected: TipStateType
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        expected: TipStateType,
+        follow_singular_sensor: Optional[InstrumentProbeType] = None,
     ) -> None:
         real_mount = OT3Mount.from_mount(mount)
-        status = await self.get_tip_presence_status(real_mount)
+        status = await self.get_tip_presence_status(real_mount, follow_singular_sensor)
         if status != expected:
-            raise FailedTipStateCheck(expected, status.value)
+            raise FailedTipStateCheck(expected, status)
 
     async def _force_pick_up_tip(
         self, mount: OT3Mount, pipette_spec: TipActionSpec
     ) -> None:
         for press in pipette_spec.tip_action_moves:
             async with self._backend.motor_current(run_currents=press.currents):
-                target_down = target_position_from_relative(
+                target = target_position_from_relative(
                     mount, top_types.Point(z=press.distance), self._current_position
                 )
-                await self._move(target_down, speed=press.speed, expect_stalls=True)
-            if press.distance < 0:
-                # we expect a stall has happened during a downward movement into the tiprack, so
-                # we want to update the motor estimation
-                await self._update_position_estimation([Axis.by_mount(mount)])
+                if press.distance < 0:
+                    # we expect a stall has happened during a downward movement into the tiprack, so
+                    # we want to update the motor estimation
+                    await self._move(target, speed=press.speed, expect_stalls=True)
+                    await self._update_position_estimation([Axis.by_mount(mount)])
+                else:
+                    # we should not ignore stalls that happen during the retract part of the routine
+                    await self._move(target, speed=press.speed, expect_stalls=False)
 
     async def _tip_motor_action(
         self, mount: OT3Mount, pipette_spec: List[TipActionMoveSpec]
@@ -2110,11 +2354,11 @@ class OT3API(
             gear_origin_float = self._backend.gear_motor_position or 0.0
 
             move_targets = [
-                ({Axis.Q: move_segment.distance}, move_segment.speed or 400)
+                (move_segment.distance, move_segment.speed or 400)
                 for move_segment in pipette_spec
             ]
             await self._backend.tip_action(
-                origin={Axis.Q: gear_origin_float}, targets=move_targets
+                origin=gear_origin_float, targets=move_targets
             )
             await self.home_gear_motors()
 
@@ -2135,40 +2379,8 @@ class OT3API(
             instrument.set_current_volume(0)
 
         await self._move_to_plunger_bottom(realmount, rate=1.0)
-        if (
-            self.gantry_load == GantryLoad.HIGH_THROUGHPUT
-            and instrument.nozzle_manager.current_configuration.configuration
-            == NozzleConfigurationType.FULL
-        ):
-            spec = self._pipette_handler.plan_ht_pick_up_tip(
-                instrument.nozzle_manager.current_configuration.tip_count
-            )
-            if spec.z_distance_to_tiprack:
-                await self.move_rel(
-                    realmount, top_types.Point(z=spec.z_distance_to_tiprack)
-                )
-            await self._tip_motor_action(realmount, spec.tip_action_moves)
-        else:
-            spec = self._pipette_handler.plan_lt_pick_up_tip(
-                realmount,
-                instrument.nozzle_manager.current_configuration.tip_count,
-                presses,
-                increment,
-            )
-            await self._force_pick_up_tip(realmount, spec)
 
-        # neighboring tips tend to get stuck in the space between
-        # the volume chamber and the drop-tip sleeve on p1000.
-        # This extra shake ensures those tips are removed
-        for rel_point, speed in spec.shake_off_moves:
-            await self.move_rel(realmount, rel_point, speed=speed)
-
-        # fixme: really only need this during labware position check so user
-        # can verify if a tip is properly attached
-        if spec.ending_z_retract_distance:
-            await self.move_rel(
-                realmount, top_types.Point(z=spec.ending_z_retract_distance)
-            )
+        await self.tip_pickup_moves(mount, presses, increment)
 
         add_tip_to_instr()
 
@@ -2195,36 +2407,47 @@ class OT3API(
         )
         instrument.working_volume = tip_volume
 
-    async def drop_tip(
-        self, mount: Union[top_types.Mount, OT3Mount], home_after: bool = False
+    async def tip_drop_moves(
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        home_after: bool = False,
+        ignore_plunger: bool = False,
+        scrape_type: TipScrapeType = TipScrapeType.NONE,
     ) -> None:
-        """Drop tip at the current location."""
         realmount = OT3Mount.from_mount(mount)
-        instrument = self._pipette_handler.get_pipette(realmount)
+        if ignore_plunger is False:
+            await self._move_to_plunger_bottom(
+                realmount, rate=1.0, check_current_vol=False
+            )
 
-        def _remove_tips() -> None:
-            instrument.set_current_volume(0)
-            instrument.current_tiprack_diameter = 0.0
-            instrument.remove_tip()
-
-        await self._move_to_plunger_bottom(realmount, rate=1.0, check_current_vol=False)
-
-        if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
+        if self.gantry_load in [
+            GantryLoad.HIGH_THROUGHPUT_1000,
+            GantryLoad.HIGH_THROUGHPUT_200,
+        ]:
             spec = self._pipette_handler.plan_ht_drop_tip()
             await self._tip_motor_action(realmount, spec.tip_action_moves)
         else:
-            spec = self._pipette_handler.plan_lt_drop_tip(realmount)
+            spec = self._pipette_handler.plan_lt_drop_tip(realmount, scrape_type)
             for move in spec.tip_action_moves:
                 async with self._backend.motor_current(move.currents):
-                    target_pos = target_position_from_plunger(
-                        realmount, move.distance, self._current_position
-                    )
-                    await self._move(
-                        target_pos,
-                        speed=move.speed,
-                        home_flagged_axes=False,
-                    )
-
+                    if not move.scrape_axis:
+                        target_pos = target_position_from_plunger(
+                            realmount, move.distance, self._current_position
+                        )
+                        await self._move(
+                            target_pos,
+                            speed=move.speed,
+                            home_flagged_axes=False,
+                        )
+                    else:
+                        target_pos = OrderedDict(self._current_position)
+                        target_pos[move.scrape_axis] += move.distance
+                        self._log.info(f"Moving to target Pos: {target_pos}")
+                        await self._move(
+                            target_pos,
+                            speed=move.speed,
+                            home_flagged_axes=False,
+                        )
         for shake in spec.shake_off_moves:
             await self.move_rel(mount, shake[0], speed=shake[1])
 
@@ -2232,7 +2455,26 @@ class OT3API(
         if home_after:
             await self._home([Axis.by_mount(mount)])
 
-        _remove_tips()
+        # call this in case we're simulating:
+        if isinstance(self._backend, OT3Simulator):
+            self._backend._update_tip_state(realmount, False)
+
+    async def drop_tip(
+        self, mount: Union[top_types.Mount, OT3Mount], home_after: bool = False
+    ) -> None:
+        """Drop tip at the current location."""
+        await self.tip_drop_moves(mount=mount, home_after=home_after)
+
+        # todo(mm, 2024-10-17): Ideally, callers would be able to replicate the behavior
+        # of this method via self.drop_tip_moves() plus other public methods. This
+        # currently prevents that: there is no public equivalent for
+        # instrument.set_current_volume().
+        realmount = OT3Mount.from_mount(mount)
+        instrument = self._pipette_handler.get_pipette(realmount)
+        instrument.set_current_volume(0)
+
+        self.set_current_tiprack_diameter(mount, 0.0)
+        self.remove_tip(mount)
 
     async def clean_up(self) -> None:
         """Get the API ready to stop cleanly."""
@@ -2459,7 +2701,7 @@ class OT3API(
         mount: Union[top_types.Mount, OT3Mount],
         critical_point: Optional[CriticalPoint] = None,
     ) -> float:
-        carriage_pos = self._deck_from_machine(self._backend.home_position())
+        carriage_pos = self.get_deck_from_machine(self._backend.home_position())
         pos_at_home = self._effector_pos_from_carriage_pos(
             OT3Mount.from_mount(mount), carriage_pos, critical_point
         )
@@ -2501,13 +2743,18 @@ class OT3API(
                 starting_nozzle,
             )
 
-    async def add_tip(
+    def add_tip(
         self, mount: Union[top_types.Mount, OT3Mount], tip_length: float
     ) -> None:
-        await self._pipette_handler.add_tip(OT3Mount.from_mount(mount), tip_length)
+        self._pipette_handler.add_tip(OT3Mount.from_mount(mount), tip_length)
 
-    async def remove_tip(self, mount: Union[top_types.Mount, OT3Mount]) -> None:
-        await self._pipette_handler.remove_tip(OT3Mount.from_mount(mount))
+    def cache_tip(
+        self, mount: Union[top_types.Mount, OT3Mount], tip_length: float
+    ) -> None:
+        self._pipette_handler.cache_tip(OT3Mount.from_mount(mount), tip_length)
+
+    def remove_tip(self, mount: Union[top_types.Mount, OT3Mount]) -> None:
+        self._pipette_handler.remove_tip(OT3Mount.from_mount(mount))
 
     def add_gripper_probe(self, probe: GripperProbe) -> None:
         self._gripper_handler.add_probe(probe)
@@ -2515,22 +2762,75 @@ class OT3API(
     def remove_gripper_probe(self) -> None:
         self._gripper_handler.remove_probe()
 
-    async def liquid_probe(
+    @staticmethod
+    def liquid_probe_non_responsive_z_distance(
+        z_speed: float, samples_for_baselining: int, sample_time_sec: float
+    ) -> float:
+        """Calculate the Z distance travelled where the LLD pass will be unresponsive."""
+        # NOTE: (sigler) Here lye some magic numbers.
+        #       The Z axis probing motion uses the first 20 samples to calculate
+        #       a baseline for all following samples, making the very beginning of
+        #       that Z motion unable to detect liquid. The sensor is configured for
+        #       4ms sample readings, and so we then assume it takes ~80ms to complete.
+        #       If the Z is moving at 5mm/sec, then ~80ms equates to ~0.4mm
+        baseline_duration_sec = samples_for_baselining * sample_time_sec
+        non_responsive_z_mm = baseline_duration_sec * z_speed
+        return non_responsive_z_mm
+
+    async def _liquid_probe_pass(
         self,
         mount: OT3Mount,
+        probe_settings: LiquidProbeSettings,
+        probe: InstrumentProbeType,
+        p_travel: float,
+        z_offset_for_plunger_prep: float,
+        force_both_sensors: bool = False,
+        response_queue: Optional[PipetteSensorResponseQueue] = None,
+    ) -> float:
+        plunger_direction = -1 if probe_settings.aspirate_while_sensing else 1
+        end_z = await self._backend.liquid_probe(
+            mount,
+            p_travel,
+            probe_settings.mount_speed,
+            (probe_settings.plunger_speed * plunger_direction),
+            probe_settings.sensor_threshold_pascals,
+            probe_settings.plunger_impulse_time,
+            probe_settings.samples_for_baselining,
+            z_offset_for_plunger_prep,
+            probe=probe,
+            force_both_sensors=force_both_sensors,
+            response_queue=response_queue,
+        )
+        machine_pos = await self._backend.update_position()
+        machine_pos[Axis.by_mount(mount)] = end_z
+        deck_end_z = self.get_deck_from_machine(machine_pos)[Axis.by_mount(mount)]
+        offset = offset_for_mount(
+            mount,
+            top_types.Point(*self._config.left_mount_offset),
+            top_types.Point(*self._config.right_mount_offset),
+            top_types.Point(*self._config.gripper_mount_offset),
+        )
+        cp = self.critical_point_for(mount, None)
+        return deck_end_z + offset.z + cp.z
+
+    async def liquid_probe(  # noqa: C901
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        max_z_dist: float,
         probe_settings: Optional[LiquidProbeSettings] = None,
         probe: Optional[InstrumentProbeType] = None,
+        force_both_sensors: bool = False,
+        response_queue: Optional[PipetteSensorResponseQueue] = None,
     ) -> float:
         """Search for and return liquid level height.
 
-        This function begins by moving the mount the distance specified by starting_mount_height in the
-        LiquidProbeSettings. After this, the mount and plunger motors will move simultaneously while
+        This function begins by moving the mount 2 mm upward to protect against a case where the tip starts right at a
+        liquid meniscus.
+        After this, the mount and plunger motors will move simultaneously while
         reading from the pressure sensor.
 
         If the move is completed without the specified threshold being triggered, a
-        LiquidNotFound error will be thrown.
-        If the threshold is triggered before the minimum z distance has been traveled,
-        a EarlyLiquidSenseTrigger error will be thrown.
+        PipetteLiquidNotFoundError error will be thrown.
 
         Otherwise, the function will stop moving once the threshold is triggered,
         and return the position of the
@@ -2543,43 +2843,129 @@ class OT3API(
         self._pipette_handler.ready_for_tip_action(
             instrument, HardwareAction.LIQUID_PROBE, checked_mount
         )
+        # default to using all available sensors
+        if probe:
+            checked_probe = probe
+        else:
+            checked_probe = (
+                InstrumentProbeType.BOTH
+                if instrument.channels > 1
+                else InstrumentProbeType.PRIMARY
+            )
 
         if not probe_settings:
-            probe_settings = self.config.liquid_sense
+            probe_settings = deepcopy(self.config.liquid_sense)
 
-        pos = await self.gantry_position(mount, refresh=True)
-        probe_start_pos = pos._replace(z=probe_settings.starting_mount_height)
-        await self.move_to(mount, probe_start_pos)
-
-        if probe_settings.aspirate_while_sensing:
-            await self._move_to_plunger_bottom(mount, rate=1.0)
-        else:
-            # TODO: shorten this distance by only moving just far enough
-            #       to account for the specified "max-z-distance"
-            target_pos = target_position_from_plunger(
-                checked_mount, instrument.plunger_positions.top, self._current_position
+        # We need to significantly slow down the 96 channel liquid probe
+        if self.gantry_load in [
+            GantryLoad.HIGH_THROUGHPUT_1000,
+            GantryLoad.HIGH_THROUGHPUT_200,
+        ]:
+            max_plunger_speed = self.config.motion_settings.max_speed_discontinuity[
+                self.gantry_load
+            ][OT3AxisKind.P]
+            probe_settings.plunger_speed = min(
+                max_plunger_speed, probe_settings.plunger_speed
             )
-            # FIXME: this should really be the slower "aspirate" speed,
-            #        but this is still in testing phase so let's bias towards speed
-            max_speeds = self.config.motion_settings.default_max_speed
-            speed = max_speeds[self.gantry_load][OT3AxisKind.P]
-            await self._move(target_pos, speed=speed, acquire_lock=True)
 
-        plunger_direction = -1 if probe_settings.aspirate_while_sensing else 1
-        await self._backend.liquid_probe(
-            mount,
-            probe_settings.max_z_distance,
-            probe_settings.mount_speed,
-            (probe_settings.plunger_speed * plunger_direction),
-            probe_settings.sensor_threshold_pascals,
-            probe_settings.log_pressure,
-            probe_settings.auto_zero_sensor,
-            probe_settings.num_baseline_reads,
-            probe=probe if probe else InstrumentProbeType.PRIMARY,
+        starting_position = await self.gantry_position(checked_mount, refresh=True)
+
+        sensor_baseline_plunger_move_mm = (
+            probe_settings.plunger_impulse_time * probe_settings.plunger_speed
         )
-        end_pos = await self.gantry_position(mount, refresh=True)
-        await self.move_to(mount, probe_start_pos)
-        return end_pos.z
+        total_plunger_axis_mm = (
+            instrument.plunger_positions.bottom - instrument.plunger_positions.top
+        )
+        max_allowed_plunger_distance_mm = total_plunger_axis_mm - (
+            instrument.backlash_distance + sensor_baseline_plunger_move_mm
+        )
+        # height where probe action will begin
+        sensor_baseline_z_move_mm = OT3API.liquid_probe_non_responsive_z_distance(
+            probe_settings.mount_speed,
+            probe_settings.samples_for_baselining,
+            probe_settings.sample_time_sec,
+        )
+        z_offset_per_pass = (
+            sensor_baseline_z_move_mm + probe_settings.z_overlap_between_passes_mm
+        )
+
+        # height that is considered safe to reset the plunger without disturbing liquid
+        # this usually needs to at least 1-2mm from liquid, to avoid splashes from air
+        z_offset_for_plunger_prep = max(
+            probe_settings.plunger_reset_offset, z_offset_per_pass
+        )
+
+        async def prep_plunger_for_probe_move(
+            position: top_types.Point, aspirate_while_sensing: bool
+        ) -> None:
+            # safe distance so we don't accidentally aspirate liquid if we're already close to liquid
+            mount_pos_for_plunger_prep = top_types.Point(
+                position.x,
+                position.y,
+                position.z + z_offset_for_plunger_prep,
+            )
+            # Prep the plunger
+            await self.move_to(checked_mount, mount_pos_for_plunger_prep)
+            if aspirate_while_sensing:
+                await self._move_to_plunger_bottom(checked_mount, rate=1)
+            else:
+                await self._move_to_plunger_top_for_liquid_probe(checked_mount, rate=1)
+
+        error: Optional[PipetteLiquidNotFoundError] = None
+        current_position = await self.gantry_position(checked_mount, refresh=True)
+        #  starting_position.z + z_distance of pass - pos.z should be < max_z_dist
+        # due to rounding errors this can get caught in an infinite loop when the distance is almost equal
+        # so we check to see if they're within 0.01 which is 1/5th the minimum movement distance from move_utils.py
+        while (starting_position.z - current_position.z) < (max_z_dist - 0.01):
+            await prep_plunger_for_probe_move(
+                position=current_position,
+                aspirate_while_sensing=probe_settings.aspirate_while_sensing,
+            )
+
+            # overlap amount we want to use between passes
+            pass_start_pos = top_types.Point(
+                current_position.x,
+                current_position.y,
+                current_position.z + z_offset_per_pass,
+            )
+
+            total_remaining_z_dist = pass_start_pos.z - (
+                starting_position.z - max_z_dist
+            )
+            finish_probe_move_duration = (
+                total_remaining_z_dist / probe_settings.mount_speed
+            )
+            finish_probe_plunger_distance_mm = (
+                finish_probe_move_duration * probe_settings.plunger_speed
+            )
+            plunger_travel_mm = min(
+                finish_probe_plunger_distance_mm, max_allowed_plunger_distance_mm
+            )
+            try:
+                # move to where we want to start a pass and run a pass
+                await self.move_to(checked_mount, pass_start_pos)
+                height = await self._liquid_probe_pass(
+                    checked_mount,
+                    probe_settings,
+                    checked_probe,
+                    plunger_travel_mm + sensor_baseline_plunger_move_mm,
+                    z_offset_for_plunger_prep,
+                    force_both_sensors,
+                    response_queue,
+                )
+                # if we made it here without an error we found the liquid
+                error = None
+                break
+            except PipetteLiquidNotFoundError as lnfe:
+                error = lnfe
+            current_position = await self.gantry_position(checked_mount, refresh=True)
+        await self.move_to(checked_mount, starting_position + top_types.Point(z=2))
+        await self.prepare_for_aspirate(checked_mount)
+        await self.move_to(checked_mount, starting_position)
+        if error is not None:
+            # if we never found liquid raise an error
+            raise error
+        return height
 
     async def capacitive_probe(
         self,
@@ -2633,7 +3019,7 @@ class OT3API(
             machine_pass_distance,
             pass_settings.speed_mm_per_s,
             pass_settings.sensor_threshold_pf,
-            probe=probe,
+            probe,
         )
         end_pos = await self.gantry_position(mount, refresh=True)
         if retract_after:
@@ -2687,6 +3073,103 @@ class OT3API(
 
     AMKey = TypeVar("AMKey")
 
+    async def aspirate_while_tracking(
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        z_distance: float,
+        volume: float,
+        flow_rate: float = 1.0,
+    ) -> None:
+        """
+        Aspirate a volume of liquid (in microliters/uL) while moving the z axis synchronously.
+
+        :param mount: A robot mount that the instrument is on.
+        :param z_distance: The distance the z axis will move during apsiration.
+        :param volume: The volume of liquid to be aspirated.
+        :param flow_rate: The flow rate to aspirate with.
+        """
+        realmount = OT3Mount.from_mount(mount)
+        aspirate_spec = self._pipette_handler.plan_check_aspirate(
+            realmount, volume, flow_rate
+        )
+        if not aspirate_spec:
+            return
+        target_pos = target_positions_from_plunger_tracking(
+            realmount,
+            aspirate_spec.plunger_distance,
+            z_distance,
+            self._current_position,
+        )
+        try:
+            await self._backend.set_active_current(
+                {aspirate_spec.axis: aspirate_spec.current}
+            )
+            async with self.restore_system_constrants():
+                await self.set_system_constraints_for_plunger_acceleration(
+                    realmount, aspirate_spec.acceleration
+                )
+                await self._move(
+                    target_pos,
+                    speed=aspirate_spec.speed,
+                    home_flagged_axes=False,
+                )
+        except Exception:
+            self._log.exception("Aspirate failed")
+            aspirate_spec.instr.set_current_volume(0)
+            raise
+        else:
+            aspirate_spec.instr.add_current_volume(aspirate_spec.volume)
+
+    async def dispense_while_tracking(
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        z_distance: float,
+        volume: float,
+        push_out: Optional[float],
+        flow_rate: float = 1.0,
+        is_full_dispense: bool = False,
+    ) -> None:
+        """
+        Dispense a volume of liquid (in microliters/uL) while moving the z axis synchronously.
+
+        :param mount: A robot mount that the instrument is on.
+        :param z_distance: The distance the z axis will move during dispensing.
+        :param volume: The volume of liquid to be dispensed.
+        :param flow_rate: The flow rate to dispense with.
+        """
+        realmount = OT3Mount.from_mount(mount)
+        dispense_spec = self._pipette_handler.plan_check_dispense(
+            realmount, volume, flow_rate, push_out, is_full_dispense
+        )
+        if not dispense_spec:
+            return
+        target_pos = target_positions_from_plunger_tracking(
+            realmount,
+            dispense_spec.plunger_distance,
+            z_distance,
+            self._current_position,
+        )
+
+        try:
+            await self._backend.set_active_current(
+                {dispense_spec.axis: dispense_spec.current}
+            )
+            async with self.restore_system_constrants():
+                await self.set_system_constraints_for_plunger_acceleration(
+                    realmount, dispense_spec.acceleration
+                )
+                await self._move(
+                    target_pos,
+                    speed=dispense_spec.speed,
+                    home_flagged_axes=False,
+                )
+        except Exception:
+            self._log.exception("dispense failed")
+            dispense_spec.instr.set_current_volume(0)
+            raise
+        else:
+            dispense_spec.instr.remove_current_volume(dispense_spec.volume)
+
     @property
     def attached_subsystems(self) -> Dict[SubSystem, SubSystemState]:
         """Get a view of the state of the currently-attached subsystems."""
@@ -2723,3 +3206,43 @@ class OT3API(
 
     async def get_hepa_uv_state(self) -> Optional[HepaUVState]:
         return await self._backend.get_hepa_uv_state()
+
+    async def increase_evo_disp_count(
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+    ) -> None:
+        """Tell a pipette to increase its evo-tip-dispense-count in eeprom."""
+        realmount = OT3Mount.from_mount(mount)
+        await self._backend.increase_evo_disp_count(realmount)
+
+    async def read_stem_temperature(
+        self, mount: Union[top_types.Mount, OT3Mount], primary: bool = True
+    ) -> float:
+        """Read and return the current stem temperature."""
+        realmount = OT3Mount.from_mount(mount)
+        s_data = await self._backend.read_env_temp_sensor(realmount, primary)
+        return s_data if s_data else 0.0
+
+    async def read_stem_humidity(
+        self, mount: Union[top_types.Mount, OT3Mount], primary: bool = True
+    ) -> float:
+        """Read and return the current primary stem humidity."""
+        realmount = OT3Mount.from_mount(mount)
+        s_data = await self._backend.read_env_hum_sensor(realmount, primary)
+        return s_data if s_data else 0.0
+
+    async def read_stem_pressure(
+        self, mount: Union[top_types.Mount, OT3Mount], primary: bool = True
+    ) -> float:
+        """Read and return the current primary stem pressure."""
+        realmount = OT3Mount.from_mount(mount)
+        s_data = await self._backend.read_pressure_sensor(realmount, primary)
+        return s_data if s_data else 0.0
+
+    async def read_stem_capacitance(
+        self, mount: Union[top_types.Mount, OT3Mount], primary: bool = True
+    ) -> float:
+        """Read and return the current primary stem capacitance."""
+        realmount = OT3Mount.from_mount(mount)
+        s_data = await self._backend.read_capacitive_sensor(realmount, primary)
+        return s_data if s_data else 0.0

@@ -1,27 +1,26 @@
-import { POST, DELETE, GET } from '../../robot-api'
+import { DELETE, GET, POST } from '../../robot-api'
 import {
   makeResponseFixtures,
   mockV2ErrorResponse,
 } from '../../robot-api/__fixtures__'
+import * as Constants from '../constants'
 import {
   mockRobotCalibrationCheckSessionDetails,
   mockRobotCalibrationCheckSessionParams,
 } from './calibration-check'
-import {
-  mockTipLengthCalibrationSessionDetails,
-  mockTipLengthCalibrationSessionParams,
-} from './tip-length-calibration'
 import { mockDeckCalibrationSessionDetails } from './deck-calibration'
 import {
   mockPipetteOffsetCalibrationSessionDetails,
   mockPipetteOffsetCalibrationSessionParams,
 } from './pipette-offset-calibration'
+import {
+  mockTipLengthCalibrationSessionDetails,
+  mockTipLengthCalibrationSessionParams,
+} from './tip-length-calibration'
 
 import type { ResponseFixtures } from '../../robot-api/__fixtures__'
 import type { RobotApiV2ErrorResponseBody } from '../../robot-api/types'
-
-import * as Types from '../types'
-import * as Constants from '../constants'
+import type * as Types from '../types'
 
 export * from './calibration-check'
 export * from './tip-length-calibration'

@@ -1,37 +1,113 @@
 import {
-  FormError,
+  absorbanceReaderModuleIdRequired,
+  aspirateAirGapVolumeRequired,
+  aspirateDelayDurationRequired,
+  aspirateLabwareRequired,
+  aspirateMixTimesRequired,
+  aspirateMixVolumeRequired,
+  aspirateRetractSpeedRequired,
+  aspirateSubmergeSpeedRequired,
+  aspirateTouchTipMmFromEdgeOutOfRange,
+  aspirateTouchTipMmFromEdgeRequired,
+  aspirateTouchTipSpeedRequired,
+  aspirateWellsRequired,
+  blockTargetTempHoldRange,
+  blockTargetTempRange,
+  blockTemperatureHoldRequired,
+  blockTemperatureRequired,
+  blowoutFlowRateRequired,
+  blowoutLocationRequired,
   composeErrors,
+  conditioningVolumeOutOfRange,
+  conditioningVolumeRequired,
+  dispenseAirGapVolumeRequired,
+  dispenseDelayDurationRequired,
+  dispenseLabwareRequired,
+  dispenseMixTimesRequired,
+  dispenseMixVolumeRequired,
+  dispenseRetractSpeedRequired,
+  dispenseSubmergeSpeedRequired,
+  dispenseTouchTipMmFromEdgeOutOfRange,
+  dispenseTouchTipMmFromEdgeRequired,
+  dispenseTouchTipSpeedRequired,
+  dispenseWellsRequired,
+  disposalVolumeRequired,
+  engageHeightRangeExceeded,
+  engageHeightRequired,
+  fileNameRequired,
   incompatibleAspirateLabware,
   incompatibleDispenseLabware,
   incompatibleLabware,
-  pauseForTimeOrUntilTold,
-  wellRatioMoveLiquid,
-  magnetActionRequired,
-  engageHeightRequired,
-  engageHeightRangeExceeded,
-  moduleIdRequired,
-  targetTemperatureRequired,
-  blockTemperatureRequired,
-  lidTemperatureRequired,
-  profileVolumeRequired,
-  profileTargetLidTempRequired,
-  blockTemperatureHoldRequired,
+  labwareToMoveRequired,
+  lidTargetTempHoldRange,
+  lidTargetTempRange,
   lidTemperatureHoldRequired,
+  lidTemperatureRequired,
+  magnetActionRequired,
+  magneticModuleIdRequired,
+  messageRequired,
+  mixLabwareRequired,
+  mixWellsRequired,
+  moduleIdRequired,
+  newLabwareLocationRequired,
+  pauseActionRequired,
+  pauseForTimeOrUntilTold,
+  pauseModuleRequired,
+  pauseTemperatureRequired,
+  pipetteRequired,
+  profileTargetLidTempRange,
+  profileTargetLidTempRequired,
+  profileVolumeRange,
+  profileVolumeRequired,
+  pushOutVolumeOutOfRange,
+  pushOutVolumeRequired,
+  referenceWavelengthOutOfRange,
+  referenceWavelengthRequired,
+  shakeSpeedRequired,
+  shakeTimeRequired,
+  targetHeaterShakerTemperatureRange,
+  targetSpeedRange,
+  targetTemperatureRange,
+  targetTemperatureRequired,
+  temperatureRequired,
+  timesRequired,
+  transferVolumeMin,
+  volumeRequired,
   volumeTooHigh,
+  wavelengthOutOfRange,
+  wavelengthRequired,
+  wellRatioMoveLiquid,
 } from './errors'
-
 import {
-  FormWarning,
-  FormWarningType,
   composeWarnings,
-  belowPipetteMinimumVolume,
+  incompatibleLiquidClass,
   maxDispenseWellVolume,
-  minDisposalVolume,
-  minAspirateAirGapVolume,
-  minDispenseAirGapVolume,
+  mixTipPositionInTube,
+  tipPositionInTube,
+  wellVolumeMax,
 } from './warnings'
 
-import { HydratedFormdata, StepType } from '../../form-types'
+import type {
+  LabwareEntities,
+  ModuleEntities,
+} from '@opentrons/step-generation'
+import type {
+  HydratedAbsorbanceReaderFormData,
+  HydratedCommentFormData,
+  HydratedFormData,
+  HydratedHeaterShakerFormData,
+  HydratedMagnetFormData,
+  HydratedMixFormData,
+  HydratedMoveLabwareFormData,
+  HydratedMoveLiquidFormData,
+  HydratedPauseFormData,
+  HydratedTemperatureFormData,
+  HydratedThermocyclerFormData,
+  StepType,
+} from '../../form-types'
+import type { FormError } from './errors'
+import type { FormWarning, FormWarningType } from './warnings'
+
 export { handleFormChange } from './handleFormChange'
 export { createBlankForm } from './createBlankForm'
 export { getDefaultsForStepType } from './getDefaultsForStepType'
@@ -45,30 +121,128 @@ export { getNextDefaultMagnetAction } from './getNextDefaultMagnetAction'
 export { getNextDefaultEngageHeight } from './getNextDefaultEngageHeight'
 export { stepFormToArgs } from './stepFormToArgs'
 export type { FormError, FormWarning, FormWarningType }
-interface FormHelpers {
-  getErrors?: (arg: HydratedFormdata) => FormError[]
-  getWarnings?: (arg: unknown) => FormWarning[]
+
+interface StepFormDataMap {
+  absorbanceReader: HydratedAbsorbanceReaderFormData
+  heaterShaker: HydratedHeaterShakerFormData
+  mix: HydratedMixFormData
+  pause: HydratedPauseFormData
+  moveLabware: HydratedMoveLabwareFormData
+  moveLiquid: HydratedMoveLiquidFormData
+  magnet: HydratedMagnetFormData
+  temperature: HydratedTemperatureFormData
+  thermocycler: HydratedThermocyclerFormData
+  comment: HydratedCommentFormData
 }
-const stepFormHelperMap: Partial<Record<StepType, FormHelpers>> = {
+interface FormHelpers<K extends keyof StepFormDataMap> {
+  getErrors: (
+    arg: StepFormDataMap[K],
+    moduleEntities: ModuleEntities,
+    labwareEntities: LabwareEntities
+  ) => FormError[]
+  getWarnings?: (arg: StepFormDataMap[K]) => FormWarning[] // Changed to match step type
+}
+const stepFormHelperMap: {
+  [K in keyof StepFormDataMap]: FormHelpers<K>
+} = {
+  absorbanceReader: {
+    getErrors: composeErrors(
+      wavelengthRequired,
+      referenceWavelengthRequired,
+      fileNameRequired,
+      wavelengthOutOfRange,
+      referenceWavelengthOutOfRange,
+      absorbanceReaderModuleIdRequired
+    ),
+  },
+  heaterShaker: {
+    getErrors: composeErrors(
+      shakeSpeedRequired,
+      shakeTimeRequired,
+      temperatureRequired,
+      targetSpeedRange,
+      targetHeaterShakerTemperatureRange,
+      moduleIdRequired
+    ),
+  },
   mix: {
-    getErrors: composeErrors(incompatibleLabware, volumeTooHigh),
-    getWarnings: composeWarnings(belowPipetteMinimumVolume),
+    getErrors: composeErrors(
+      incompatibleLabware,
+      volumeTooHigh,
+      mixWellsRequired,
+      mixLabwareRequired,
+      volumeRequired,
+      timesRequired,
+      aspirateDelayDurationRequired,
+      dispenseDelayDurationRequired,
+      blowoutLocationRequired,
+      pushOutVolumeOutOfRange,
+      pushOutVolumeRequired,
+      blowoutFlowRateRequired,
+      transferVolumeMin,
+      pipetteRequired
+    ),
+    getWarnings: composeWarnings(
+      mixTipPositionInTube,
+      incompatibleLiquidClass,
+      wellVolumeMax
+    ),
   },
   pause: {
-    getErrors: composeErrors(pauseForTimeOrUntilTold),
+    getErrors: composeErrors(
+      pauseActionRequired,
+      pauseTemperatureRequired,
+      pauseModuleRequired,
+      pauseForTimeOrUntilTold
+    ),
+  },
+  moveLabware: {
+    getErrors: composeErrors(labwareToMoveRequired, newLabwareLocationRequired),
   },
   moveLiquid: {
     getErrors: composeErrors(
       incompatibleAspirateLabware,
       incompatibleDispenseLabware,
-      wellRatioMoveLiquid
+      wellRatioMoveLiquid,
+      volumeRequired,
+      aspirateLabwareRequired,
+      dispenseLabwareRequired,
+      aspirateMixTimesRequired,
+      aspirateMixVolumeRequired,
+      aspirateDelayDurationRequired,
+      aspirateAirGapVolumeRequired,
+      dispenseMixTimesRequired,
+      dispenseMixVolumeRequired,
+      dispenseDelayDurationRequired,
+      dispenseAirGapVolumeRequired,
+      blowoutLocationRequired,
+      aspirateWellsRequired,
+      dispenseWellsRequired,
+      // TODO (nd: 04/17/2025): re-wire up the following errors once speed getters are implemented in migration
+      aspirateTouchTipSpeedRequired,
+      dispenseTouchTipSpeedRequired,
+      pushOutVolumeRequired,
+      pushOutVolumeOutOfRange,
+      aspirateTouchTipMmFromEdgeOutOfRange,
+      dispenseTouchTipMmFromEdgeOutOfRange,
+      aspirateTouchTipMmFromEdgeRequired,
+      dispenseTouchTipMmFromEdgeRequired,
+      conditioningVolumeRequired,
+      conditioningVolumeOutOfRange,
+      blowoutFlowRateRequired,
+      transferVolumeMin,
+      pipetteRequired,
+      aspirateSubmergeSpeedRequired,
+      aspirateRetractSpeedRequired,
+      dispenseSubmergeSpeedRequired,
+      dispenseRetractSpeedRequired,
+      disposalVolumeRequired
     ),
     getWarnings: composeWarnings(
-      belowPipetteMinimumVolume,
       maxDispenseWellVolume,
-      minDisposalVolume,
-      minAspirateAirGapVolume,
-      minDispenseAirGapVolume
+      tipPositionInTube,
+      incompatibleLiquidClass,
+      wellVolumeMax
     ),
   },
   magnet: {
@@ -76,11 +250,16 @@ const stepFormHelperMap: Partial<Record<StepType, FormHelpers>> = {
       magnetActionRequired,
       engageHeightRequired,
       moduleIdRequired,
-      engageHeightRangeExceeded
+      engageHeightRangeExceeded,
+      magneticModuleIdRequired
     ),
   },
   temperature: {
-    getErrors: composeErrors(targetTemperatureRequired, moduleIdRequired),
+    getErrors: composeErrors(
+      targetTemperatureRequired,
+      moduleIdRequired,
+      targetTemperatureRange
+    ),
   },
   thermocycler: {
     getErrors: composeErrors(
@@ -89,27 +268,129 @@ const stepFormHelperMap: Partial<Record<StepType, FormHelpers>> = {
       profileVolumeRequired,
       profileTargetLidTempRequired,
       blockTemperatureHoldRequired,
-      lidTemperatureHoldRequired
+      lidTemperatureHoldRequired,
+      lidTargetTempHoldRange,
+      blockTargetTempHoldRange,
+      profileVolumeRange,
+      profileTargetLidTempRange,
+      lidTargetTempRange,
+      blockTargetTempRange
     ),
   },
+  comment: {
+    getErrors: composeErrors(messageRequired),
+  },
 }
+
 export const getFormErrors = (
   stepType: StepType,
-  formData: HydratedFormdata
+  formData: HydratedFormData,
+  moduleEntities: ModuleEntities,
+  labwareEntities: LabwareEntities
 ): FormError[] => {
-  const formErrorGetter =
-    // @ts-expect-error(sa, 2021-6-20): not a valid type narrow
-    stepFormHelperMap[stepType] && stepFormHelperMap[stepType].getErrors
-  const errors = formErrorGetter != null ? formErrorGetter(formData) : []
-  return errors
+  //  manualIntervention is the initial starting deck state step
+  if (stepType === 'manualIntervention') {
+    return []
+  }
+
+  //  TODO: try to find a cleaner way to write this via mapping
+  //  while also making TS happy
+  switch (stepType) {
+    case 'absorbanceReader':
+      return stepFormHelperMap[stepType].getErrors(
+        formData as HydratedAbsorbanceReaderFormData,
+        moduleEntities,
+        labwareEntities
+      )
+    case 'heaterShaker':
+      return stepFormHelperMap[stepType].getErrors(
+        formData as HydratedHeaterShakerFormData,
+        moduleEntities,
+        labwareEntities
+      )
+
+    case 'magnet':
+      return stepFormHelperMap[stepType].getErrors(
+        formData as HydratedMagnetFormData,
+        moduleEntities,
+        labwareEntities
+      )
+
+    case 'mix':
+      return stepFormHelperMap[stepType].getErrors(
+        formData as HydratedMixFormData,
+        moduleEntities,
+        labwareEntities
+      )
+
+    case 'moveLabware':
+      return stepFormHelperMap[stepType].getErrors(
+        formData as HydratedMoveLabwareFormData,
+        moduleEntities,
+        labwareEntities
+      )
+
+    case 'moveLiquid':
+      return stepFormHelperMap[stepType].getErrors(
+        formData as HydratedMoveLiquidFormData,
+        moduleEntities,
+        labwareEntities
+      )
+
+    case 'pause':
+      return stepFormHelperMap[stepType].getErrors(
+        formData as HydratedPauseFormData,
+        moduleEntities,
+        labwareEntities
+      )
+
+    case 'temperature':
+      return stepFormHelperMap[stepType].getErrors(
+        formData as HydratedTemperatureFormData,
+        moduleEntities,
+        labwareEntities
+      )
+
+    case 'thermocycler':
+      return stepFormHelperMap[stepType].getErrors(
+        formData as HydratedThermocyclerFormData,
+        moduleEntities,
+        labwareEntities
+      )
+
+    case 'comment':
+      return stepFormHelperMap[stepType].getErrors(
+        formData as HydratedCommentFormData,
+        moduleEntities,
+        labwareEntities
+      )
+  }
 }
+
 export const getFormWarnings = (
   stepType: StepType,
-  formData: unknown
+  formData: HydratedFormData
 ): FormWarning[] => {
-  const formWarningGetter =
-    // @ts-expect-error(sa, 2021-6-20): not a valid type narrow
-    stepFormHelperMap[stepType] && stepFormHelperMap[stepType].getWarnings
-  const warnings = formWarningGetter != null ? formWarningGetter(formData) : []
-  return warnings
+  //  manualIntervention is the initial starting deck state step
+  if (stepType === 'manualIntervention') {
+    return []
+  }
+
+  //  TODO: try to find a cleaner way to write this via mapping
+  //  while also making TS happy
+  switch (stepType) {
+    case 'mix':
+      return stepFormHelperMap.mix.getWarnings != null
+        ? stepFormHelperMap.mix.getWarnings(formData as HydratedMixFormData)
+        : []
+    case 'moveLiquid':
+      return stepFormHelperMap.moveLiquid.getWarnings != null
+        ? stepFormHelperMap.moveLiquid.getWarnings(
+            formData as HydratedMoveLiquidFormData
+          )
+        : []
+    default:
+      //  NOTE: if a new form has warnings, we need to wire it up!
+      return []
+  }
 }

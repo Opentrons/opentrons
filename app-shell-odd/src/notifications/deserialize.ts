@@ -1,5 +1,6 @@
 import isEqual from 'lodash/isEqual'
 
+import { FAILURE_STATUSES } from '../constants'
 import { connectionStore } from './store'
 
 import type {
@@ -9,10 +10,9 @@ import type {
   NotifyTopic,
   NotifyUnsubscribeData,
 } from '@opentrons/app/src/redux/shell/types'
-import { FAILURE_STATUSES } from '../constants'
 
 const VALID_NOTIFY_RESPONSES: [NotifyRefetchData, NotifyUnsubscribeData] = [
-  { refetchUsingHTTP: true },
+  { refetch: true },
   { unsubscribe: true },
 ]
 
@@ -29,6 +29,10 @@ export function sendDeserialized(
       message
     )
   } catch {} // Prevents shell erroring during app shutdown event.
+}
+
+export function sendDeserializedRefetch(topic: NotifyTopic): void {
+  sendDeserialized(topic, { refetch: true })
 }
 
 export function sendDeserializedGenericError(topic: NotifyTopic): void {
@@ -56,7 +60,7 @@ export function deserializeExpectedMessages(
     if (!isValidNotifyResponse) {
       reject(error)
     } else {
-      resolve(JSON.parse(message))
+      resolve(JSON.parse(message) as NotifyBrokerResponses)
     }
   })
 }

@@ -6,13 +6,13 @@ import json
 import textwrap
 import mock
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Generator, List, TextIO, cast
+from typing import TYPE_CHECKING, Any, Callable, Generator, List, TextIO, cast, Iterator
 
 import pytest
 from _pytest.fixtures import SubRequest
 
 from opentrons_shared_data import get_shared_data_root, load_shared_data
-from opentrons_shared_data.pipette.dev_types import PipetteModel
+from opentrons_shared_data.pipette.types import PipetteModel
 from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
     load_data as load_pipette_data,
@@ -21,6 +21,7 @@ from opentrons_shared_data.pipette import (
 from opentrons import execute, types
 from opentrons.hardware_control import Controller, api
 from opentrons.protocol_api.core.engine import ENGINE_CORE_API_VERSION
+from opentrons.protocol_engine.types import DeckConfigurationType
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.util import entrypoint_util
 
@@ -29,6 +30,16 @@ if TYPE_CHECKING:
 
 
 HERE = Path(__file__).parent
+
+
+@pytest.fixture(autouse=True)
+def clean_up_hw() -> Iterator[None]:
+    """Make sure hardware objects are cleaned up."""
+    yield
+    execute._LIVE_PROTOCOL_ENGINE_CONTEXTS.close()
+    if execute._THREAD_MANAGED_HW is not None:
+        execute._THREAD_MANAGED_HW.clean_up()
+        execute._THREAD_MANAGED_HW = None
 
 
 @pytest.fixture(params=[APIVersion(2, 0), ENGINE_CORE_API_VERSION])
@@ -58,6 +69,33 @@ def mock_get_attached_instr(  # noqa: D103
         types.Mount.LEFT: {"model": None, "id": None},
     }
     return gai_mock
+
+
+@pytest.fixture(autouse=True)
+def mock_deck_configuration(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Override the "host device deck config" to be an OT-2's normal deck config."""
+
+    def mock_get_deck_configuration() -> DeckConfigurationType:
+        return [
+            ("cutout1", "singleStandardSlot", None),
+            ("cutout2", "singleStandardSlot", None),
+            ("cutout3", "singleStandardSlot", None),
+            ("cutout4", "singleStandardSlot", None),
+            ("cutout5", "singleStandardSlot", None),
+            ("cutout6", "singleStandardSlot", None),
+            ("cutout7", "singleStandardSlot", None),
+            ("cutout8", "singleStandardSlot", None),
+            ("cutout9", "singleStandardSlot", None),
+            ("cutout10", "singleStandardSlot", None),
+            ("cutout11", "singleStandardSlot", None),
+            ("cutout12", "fixedTrashSlot", None),
+        ]
+
+    monkeypatch.setattr(
+        entrypoint_util, "get_deck_configuration", mock_get_deck_configuration
+    )
 
 
 @pytest.mark.parametrize(
@@ -103,6 +141,7 @@ def test_execute_function_apiv2(
             converted_model_v15.pipette_type,
             converted_model_v15.pipette_channels,
             converted_model_v15.pipette_version,
+            converted_model_v15.oem_type,
         ),
         "id": "testid",
     }
@@ -111,6 +150,7 @@ def test_execute_function_apiv2(
             converted_model_v1.pipette_type,
             converted_model_v1.pipette_channels,
             converted_model_v1.pipette_version,
+            converted_model_v1.oem_type,
         ),
         "id": "testid2",
     }
@@ -149,6 +189,7 @@ def test_execute_function_json_v3(
             converted_model_v15.pipette_type,
             converted_model_v15.pipette_channels,
             converted_model_v15.pipette_version,
+            converted_model_v15.oem_type,
         ),
         "id": "testid",
     }
@@ -187,6 +228,7 @@ def test_execute_function_json_v4(
             converted_model_v15.pipette_type,
             converted_model_v15.pipette_channels,
             converted_model_v15.pipette_version,
+            converted_model_v15.oem_type,
         ),
         "id": "testid",
     }
@@ -225,6 +267,7 @@ def test_execute_function_json_v5(
             converted_model_v15.pipette_type,
             converted_model_v15.pipette_channels,
             converted_model_v15.pipette_version,
+            converted_model_v15.oem_type,
         ),
         "id": "testid",
     }
@@ -264,6 +307,7 @@ def test_execute_function_bundle_apiv2(
             converted_model_v15.pipette_type,
             converted_model_v15.pipette_channels,
             converted_model_v15.pipette_version,
+            converted_model_v15.oem_type,
         ),
         "id": "testid",
     }

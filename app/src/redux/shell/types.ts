@@ -1,4 +1,6 @@
+import type { ReleaseNoteInfo } from 'builder-util-runtime'
 import type { IpcMainEvent } from 'electron'
+import type { UpdateFileInfo } from 'electron-updater'
 import type { Error } from '../types'
 import type { RobotSystemAction } from './is-ready/types'
 
@@ -9,6 +11,8 @@ export interface Remote {
     on: (channel: string, listener: IpcListener) => void
     off: (channel: string, listener: IpcListener) => void
   }
+  /* The renderer process isn't allowed the file path for security reasons. */
+  getFilePathFrom: (file: File) => Promise<string>
 }
 
 export type IpcListener = (
@@ -20,7 +24,7 @@ export type IpcListener = (
 ) => void
 
 export interface NotifyRefetchData {
-  refetchUsingHTTP: boolean
+  refetch: boolean
 }
 
 export interface NotifyUnsubscribeData {
@@ -31,16 +35,11 @@ export type NotifyBrokerResponses = NotifyRefetchData | NotifyUnsubscribeData
 export type NotifyNetworkError = 'ECONNFAILED' | 'ECONNREFUSED'
 export type NotifyResponseData = NotifyBrokerResponses | NotifyNetworkError
 
-interface File {
-  sha512: string
-  url: string
-  [key: string]: unknown
-}
 export interface UpdateInfo {
   version: string
-  files: File[]
+  files: UpdateFileInfo[]
   releaseDate?: string
-  releaseNotes?: string
+  releaseNotes?: string | null | ReleaseNoteInfo[]
 }
 
 export interface ShellUpdateState {
@@ -67,6 +66,8 @@ export type ShellUpdateAction =
 export interface ShellState {
   update: ShellUpdateState
   isReady: boolean
+  filePaths: string[]
+  systemLanguage: string[] | null
 }
 
 export interface UiInitializedAction {
@@ -90,6 +91,14 @@ export interface ReloadUiAction {
   type: 'shell:RELOAD_UI'
   payload: {
     message: string
+  }
+  meta: { shell: true }
+}
+
+export interface SystemLanguageAction {
+  type: 'shell:SYSTEM_LANGUAGE'
+  payload: {
+    systemLanguage: string[]
   }
   meta: { shell: true }
 }
@@ -137,10 +146,14 @@ export interface RobotMassStorageDeviceRemoved {
 
 export type NotifyTopic =
   | 'ALL_TOPICS'
+  | `robot-server/clientData/${string}`
+  | 'robot-server/deck_configuration'
+  | 'robot-server/labwareOffsets'
   | 'robot-server/maintenance_runs/current_run'
-  | 'robot-server/runs/current_command'
+  | 'robot-server/runs/commands_links'
   | 'robot-server/runs'
   | `robot-server/runs/${string}`
+  | `robot-server/runs/pre_serialized_commands/${string}`
 
 export interface NotifySubscribeAction {
   type: 'shell:NOTIFY_SUBSCRIBE'
@@ -149,6 +162,33 @@ export interface NotifySubscribeAction {
     topic: NotifyTopic
   }
   meta: { shell: true }
+}
+
+export interface SendFilePathsAction {
+  type: 'shell:SEND_FILE_PATHS'
+  payload: {
+    filePaths: string[]
+  }
+  meta: { shell: true }
+}
+
+export interface CameraStreamOpenAction {
+  type: 'shell:CAMERA_STREAM_OPEN'
+  payload: { hostname: string; robotName: string }
+  meta: { shell: true }
+}
+
+export interface CameraPhotoOpenAction {
+  type: 'shell:CAMERA_PHOTO_OPEN'
+  payload: {
+    robotName: string
+    windowTitle: string
+    photoUrl: string
+    dimensions: { width: number; height: number }
+  }
+  meta: {
+    shell: true
+  }
 }
 
 export type ShellAction =
@@ -164,3 +204,22 @@ export type ShellAction =
   | RobotMassStorageDeviceEnumerated
   | RobotMassStorageDeviceRemoved
   | NotifySubscribeAction
+  | SendFilePathsAction
+  | SystemLanguageAction
+  | CameraStreamOpenAction
+  | CameraPhotoOpenAction
+
+export type IPCSafeFormDataEntry =
+  | {
+      type: 'string'
+      name: string
+      value: string
+    }
+  | {
+      type: 'file'
+      name: string
+      value: ArrayBuffer
+      filename: string
+    }
+
+export type IPCSafeFormData = IPCSafeFormDataEntry[]

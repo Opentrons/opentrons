@@ -1,16 +1,17 @@
 // custom labware selectors
-import { createSelector } from 'reselect'
 import sortBy from 'lodash/sortBy'
+import { createSelector } from 'reselect'
 
-import { getConfig } from '../config'
 import { getIsTiprack } from '@opentrons/shared-data'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { getConfig } from '../config'
+
+import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { State } from '../types'
 import type {
   CheckedLabwareFile,
-  ValidLabwareFile,
   FailedLabwareFile,
+  ValidLabwareFile,
 } from './types'
 
 export const INVALID_LABWARE_FILE: 'INVALID_LABWARE_FILE' =
@@ -87,13 +88,13 @@ export const getListLabwareErrorMessage = (state: State): null | string =>
 
 export const getCustomLabwareDefinitions: (
   state: State
-) => LabwareDefinition2[] = createSelector(getValidCustomLabware, labware =>
+) => LabwareDefinition[] = createSelector(getValidCustomLabware, labware =>
   labware.map(lw => lw.definition)
 )
 
 export const getCustomTipRackDefinitions: (
   state: State
-) => LabwareDefinition2[] = createSelector(
+) => LabwareDefinition[] = createSelector(
   getCustomLabwareDefinitions,
   labware => labware.filter(lw => getIsTiprack(lw))
 )

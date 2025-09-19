@@ -1,7 +1,18 @@
 import { createAction } from 'redux-actions'
+
+import { getLiquidEntities } from '../../step-forms/selectors'
 import { selectors } from '../selectors'
-import { DeckSlot, ThunkAction } from '../../types'
-import { IngredInputs } from '../types'
+
+import type {
+  CutoutId,
+  LabwareDisplayCategory,
+  ModuleModel,
+} from '@opentrons/shared-data'
+import type { LiquidEntities, LiquidEntity } from '@opentrons/step-generation'
+import type { StepFieldName } from '../../form-types'
+import type { DeckSlot, ThunkAction } from '../../types'
+import type { Fixture, IngredInputs } from '../types'
+
 // ===== Labware selector actions =====
 export interface OpenAddLabwareModalAction {
   type: 'OPEN_ADD_LABWARE_MODAL'
@@ -54,17 +65,17 @@ export const drillUpFromLabware: () => DrillUpFromLabwareAction = createAction(
 )
 // ==== Create/delete/modify labware =====
 export interface CreateContainerArgs {
-  labwareDefURI: string
-  // NOTE: adapterUnderLabwareDefURI is only for rendering an adapter under the labware/tiprack
-  adapterUnderLabwareDefURI?: string
+  labwareDefURIStack: string[]
   // NOTE: if slot is omitted, next available slot will be used.
   slot?: DeckSlot
 }
 export interface CreateContainerAction {
   type: 'CREATE_CONTAINER'
-  payload: CreateContainerArgs & {
+  payload: {
+    labwareDefURI: string
     slot: DeckSlot
     id: string
+    displayCategory: LabwareDisplayCategory
   }
 }
 export interface DeleteContainerAction {
@@ -73,10 +84,6 @@ export interface DeleteContainerAction {
     labwareId: string
   }
 }
-// @ts-expect-error(sa, 2021-6-20): creatActions doesn't return exact actions
-export const deleteContainer: (payload: {
-  labwareId: string
-}) => DeleteContainerAction = createAction('DELETE_CONTAINER')
 // ===========
 export interface SwapSlotContentsAction {
   type: 'MOVE_DECK_ITEM'
@@ -104,8 +111,10 @@ export interface DuplicateLabwareAction {
     duplicateLabwareId: string
     duplicateLabwareNickname: string
     slot: DeckSlot
+    displayCategory: LabwareDisplayCategory
   }
 }
+
 export interface RemoveWellsContentsAction {
   type: 'REMOVE_WELLS_CONTENTS'
   payload: {
@@ -120,33 +129,56 @@ export const removeWellsContents: (
   type: 'REMOVE_WELLS_CONTENTS',
   payload,
 })
+
+export interface EditMultipleLiquidGroupsAction {
+  type: 'EDIT_MULTIPLE_LIQUID_GROUPS_PYTHON_NAME'
+  payload: LiquidEntities // Updated liquid group pythonName
+}
+
 export interface DeleteLiquidGroupAction {
   type: 'DELETE_LIQUID_GROUP'
   payload: string // liquid group id
 }
 export const deleteLiquidGroup: (
   liquidGroupId: string
-) => ThunkAction<DeleteLiquidGroupAction> = liquidGroupId => (
-  dispatch,
-  getState
-) => {
-  const allLiquidGroupsOnDeck = selectors.getLiquidGroupsOnDeck(getState())
-  const liquidIsOnDeck = allLiquidGroupsOnDeck.includes(liquidGroupId)
-  // TODO: Ian 2018-10-22 we will eventually want to replace
-  // this window.confirm with a modal
+) => ThunkAction<
+  DeleteLiquidGroupAction | EditMultipleLiquidGroupsAction
+> = liquidGroupId => (dispatch, getState) => {
+  const allLiquidGroups = selectors.getLiquidGroupsOnDeck(getState())
+  const liquidEntities = getLiquidEntities(getState())
+  const liquidIsOnDeck = allLiquidGroups.includes(liquidGroupId)
+
   const okToDelete = liquidIsOnDeck
     ? global.confirm(
         'This liquid has been placed on the deck, are you sure you want to delete it?'
       )
     : true
-
-  if (okToDelete) {
-    return dispatch({
-      type: 'DELETE_LIQUID_GROUP',
-      payload: liquidGroupId,
-    })
+  if (!okToDelete) {
+    console.error(`problem with deleting liquid id ${liquidGroupId}`)
+    return
   }
+
+  // filter out the deleted group and create an updated liquid entities object
+  const { [liquidGroupId]: _, ...remainingLiquidEntities } = liquidEntities
+
+  const updatedLiquidGroupPythonName = Object.keys(remainingLiquidEntities)
+    .sort() //  sort to ensure correct order
+    .reduce<Record<string, LiquidEntity>>((acc, oldId, index) => {
+      acc[oldId] = {
+        ...remainingLiquidEntities[oldId],
+        pythonName: `liquid_${index + 1}`,
+      }
+      return acc
+    }, {})
+
+  //  delete user selected group, then update pythonName for rest of liquids
+  dispatch({ type: 'DELETE_LIQUID_GROUP', payload: liquidGroupId })
+  dispatch({
+    type: 'EDIT_MULTIPLE_LIQUID_GROUPS_PYTHON_NAME',
+    payload: updatedLiquidGroupPythonName,
+  })
 }
+
 // NOTE: assumes you want to set a uniform volume of the same liquid in one labware
 export interface SetWellContentsPayload {
   liquidGroupId: string
@@ -195,22 +227,162 @@ export interface EditLiquidGroupAction {
   type: 'EDIT_LIQUID_GROUP'
   payload: IngredInputs & {
     liquidGroupId: string
+    pythonName: string
   }
 }
 // NOTE: with no ID, a new one is assigned
 export const editLiquidGroup: (
-  args: IngredInputs & {
-    liquidGroupId: string | null | undefined
-  }
+  args: IngredInputs
 ) => ThunkAction<EditLiquidGroupAction> = args => (dispatch, getState) => {
-  const { liquidGroupId, ...payloadArgs } = args // NOTE: separate liquidGroupId for flow to understand unpacking :/
-
+  const { liquidGroupId: liquidGroupIdFromArg, ...payloadArgs } = args
+  const liquidGroupId =
+    liquidGroupIdFromArg || selectors.getNextLiquidGroupId(getState())
   dispatch({
     type: 'EDIT_LIQUID_GROUP',
     payload: {
       ...payloadArgs,
-      liquidGroupId:
-        args.liquidGroupId || selectors.getNextLiquidGroupId(getState()),
+      liquidGroupId,
+      pythonName: `liquid_${parseInt(liquidGroupId) + 1}`,
     },
   })
 }
+
+//  NOTE: the following actions are for selecting labware/hardware for the zoomed in slot
+export interface SelectTopLabwareAction {
+  type: 'SELECT_TOP_LABWARE'
+  payload: {
+    labwareDefURI: string | null
+  }
+}
+export const selectTopLabware: (
+  payload: SelectTopLabwareAction['payload']
+) => SelectTopLabwareAction = payload => ({
+  type: 'SELECT_TOP_LABWARE',
+  payload,
+})
+
+export interface SelectTopLabwareAmountAction {
+  type: 'SELECT_TOP_LABWARE_AMOUNT'
+  payload: {
+    amount: number
+  }
+}
+export const selectTopLabwareAmount: (
+  payload: SelectTopLabwareAmountAction['payload']
+) => SelectTopLabwareAmountAction = payload => ({
+  type: 'SELECT_TOP_LABWARE_AMOUNT',
+  payload,
+})
+
+export interface SelectAdapterAction {
+  type: 'SELECT_ADAPTER'
+  payload: {
+    adapterDefURI: string | null
+  }
+}
+export const selectAdapter: (
+  payload: SelectAdapterAction['payload']
+) => SelectAdapterAction = payload => ({
+  type: 'SELECT_ADAPTER',
+  payload,
+})
+
+export interface SelectLidAction {
+  type: 'SELECT_LID'
+  payload: {
+    labwareDefURI: string | null
+  }
+}
+export const selectLid: (
+  payload: SelectLidAction['payload']
+) => SelectLidAction = payload => ({
+  type: 'SELECT_LID',
+  payload,
+})
+
+export interface SelectModuleAction {
+  type: 'SELECT_MODULE'
+  payload: {
+    moduleModel: ModuleModel | null
+  }
+}
+export const selectModule: (
+  payload: SelectModuleAction['payload']
+) => SelectModuleAction = payload => ({
+  type: 'SELECT_MODULE',
+  payload,
+})
+
+export interface SelectFixtureAction {
+  type: 'SELECT_FIXTURE'
+  payload: {
+    fixture: Fixture | null
+  }
+}
+export const selectFixture: (
+  payload: SelectFixtureAction['payload']
+) => SelectFixtureAction = payload => ({
+  type: 'SELECT_FIXTURE',
+  payload,
+})
+
+export interface EditSlotInfoAction {
+  type: 'EDIT_SLOT_INFO'
+  payload: {
+    labwareDefURI?: string | null
+    adapterDefURI?: string | null
+    moduleModel?: ModuleModel | null
+    fixture?: Fixture | null
+    amount?: number
+    lidDefURI?: string | null
+  }
+}
+
+export const editSlotInfo: (
+  payload: EditSlotInfoAction['payload']
+) => EditSlotInfoAction = payload => ({
+  type: 'EDIT_SLOT_INFO',
+  payload,
+})
+
+export interface ZoomedIntoSlotAction {
+  type: 'ZOOMED_INTO_SLOT'
+  payload: {
+    slot: DeckSlot | null
+    cutout: CutoutId | null
+  }
+}
+export const selectZoomedIntoSlot: (
+  payload: ZoomedIntoSlotAction['payload']
+) => ZoomedIntoSlotAction = payload => ({
+  type: 'ZOOMED_INTO_SLOT',
+  payload,
+})
+
+export interface GenerateNewProtocolAction {
+  type: 'GENERATE_NEW_PROTOCOL'
+  payload: {
+    isNewProtocol: boolean
+  }
+}
+export const generateNewProtocol: (
+  payload: GenerateNewProtocolAction['payload']
+) => GenerateNewProtocolAction = payload => ({
+  type: 'GENERATE_NEW_PROTOCOL',
+  payload,
+})
+
+export interface RenameStepAction {
+  type: 'CHANGE_STEP_DETAILS'
+  payload: {
+    stepId?: string
+    update: Partial<Record<StepFieldName, unknown | null>>
+  }
+}
+
+export const renameStep: (
+  payload: RenameStepAction['payload']
+) => RenameStepAction = payload => ({
+  type: 'CHANGE_STEP_DETAILS',
+  payload,
+})

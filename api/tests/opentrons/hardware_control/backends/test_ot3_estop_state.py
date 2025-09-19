@@ -16,13 +16,11 @@ from opentrons.hardware_control.types import (
 )
 
 
-@pytest.mark.ot3_only
 @pytest.fixture
 def initial_state() -> "EstopSummary":
     return EstopSummary(left_detected=True, right_detected=True, engaged=False)
 
 
-@pytest.mark.ot3_only
 @pytest.fixture
 def mock_estop_detector(decoy: Decoy, initial_state: "EstopSummary") -> "EstopDetector":
     """Create a mocked estop detector."""
@@ -31,7 +29,6 @@ def mock_estop_detector(decoy: Decoy, initial_state: "EstopSummary") -> "EstopDe
     return mock
 
 
-@pytest.mark.ot3_only
 @pytest.fixture
 def subject(mock_estop_detector: "EstopDetector") -> "EstopStateMachine":
     return EstopStateMachine(detector=mock_estop_detector)

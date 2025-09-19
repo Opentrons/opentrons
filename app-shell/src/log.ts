@@ -1,9 +1,9 @@
 // create logger function
-import { app } from 'electron'
-import { inspect } from 'util'
-import fse from 'fs-extra'
 import path from 'path'
+import { inspect } from 'util'
 import dateFormat from 'dateformat'
+import { app } from 'electron'
+import fse from 'fs-extra'
 import winston from 'winston'
 
 import { getConfig } from './config'
@@ -91,7 +91,7 @@ function createTransports(): Transport[] {
       format: winston.format.combine(
         winston.format.printf(info => {
           const { level, message, timestamp, label } = info
-          const time = timeFromStamp(timestamp)
+          const time = timeFromStamp(timestamp as string)
           // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           const print = `${time} [${label}] ${level}: ${message}`
           const meta = inspect(info.meta, { depth: 6 })

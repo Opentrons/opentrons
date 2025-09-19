@@ -1,27 +1,25 @@
-import { createStore, applyMiddleware, compose } from 'redux'
-import thunk from 'redux-thunk'
-
-import { routerMiddleware } from 'connected-react-router'
+import { applyMiddleware, compose, legacy_createStore } from 'redux'
 import { createEpicMiddleware } from 'redux-observable'
+import { thunk } from 'redux-thunk'
 
-import { rootReducer, history } from './reducer'
 import { rootEpic } from './epic'
+import { rootReducer } from './reducer'
 
+import type { StoreEnhancer } from 'redux'
 import type { Action, State } from './types'
 
 const epicMiddleware = createEpicMiddleware<Action, Action, State, any>()
 
-const middleware = applyMiddleware(
-  thunk,
-  epicMiddleware,
-  routerMiddleware(history)
-)
+const middleware = applyMiddleware(thunk, epicMiddleware)
 
 const composeEnhancers =
-  ((window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ &&
-    (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({ maxAge: 200 })) ||
+  (window as any)?.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__?.({ maxAge: 200 }) ??
   compose
-export const store = createStore(rootReducer, composeEnhancers(middleware))
+
+export const store = legacy_createStore(
+  rootReducer,
+  composeEnhancers(middleware) as StoreEnhancer
+)
 
 epicMiddleware.run(rootEpic)
 

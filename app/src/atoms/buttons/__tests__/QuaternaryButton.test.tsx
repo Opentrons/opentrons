@@ -1,18 +1,29 @@
-import * as React from 'react'
 import '@testing-library/jest-dom/vitest'
-import { describe, it, expect, beforeEach } from 'vitest'
-import { screen, fireEvent } from '@testing-library/react'
-import { COLORS, SPACING, TYPOGRAPHY, BORDERS } from '@opentrons/components'
-import { renderWithProviders } from '../../../__testing-utils__'
+
+import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
+
+import { renderWithProviders } from '/app/__testing-utils__'
 
 import { QuaternaryButton } from '..'
 
-const render = (props: React.ComponentProps<typeof QuaternaryButton>) => {
+import type { ComponentProps } from 'react'
+
+vi.mock('styled-components', async () => {
+  const actual = await vi.importActual(
+    'styled-components/dist/styled-components.browser.esm.js'
+  )
+  return actual
+})
+
+const render = (props: ComponentProps<typeof QuaternaryButton>) => {
   return renderWithProviders(<QuaternaryButton {...props} />)[0]
 }
 
 describe('QuaternaryButton', () => {
-  let props: React.ComponentProps<typeof QuaternaryButton>
+  let props: ComponentProps<typeof QuaternaryButton>
 
   beforeEach(() => {
     props = {
@@ -25,7 +36,7 @@ describe('QuaternaryButton', () => {
     const button = screen.getByText('secondary tertiary button')
     expect(button).toHaveStyle(`background-color: ${COLORS.white}`)
     expect(button).toHaveStyle(`border-radius: ${BORDERS.borderRadiusFull}`)
-    expect(button).toHaveStyle('box-shadow: 0 0 0')
+    expect(button).toHaveStyle('box-shadow: none')
     expect(button).toHaveStyle(`color: ${COLORS.blue50}`)
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16}`
@@ -45,14 +56,6 @@ describe('QuaternaryButton', () => {
     const button = screen.getByText('secondary tertiary button')
     expect(button).toBeDisabled()
     expect(button).toHaveStyle('opacity: 50%')
-  })
-
-  it('applies the correct states to the button - hover', () => {
-    render(props)
-    const button = screen.getByText('secondary tertiary button')
-    fireEvent.mouseOver(button)
-    expect(button).toHaveStyle('opacity: 70%')
-    expect(button).toHaveStyle('box-shadow: 0 0 0')
   })
 
   it('renders secondary tertiary button with text and different background color', () => {

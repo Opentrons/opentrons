@@ -1,19 +1,23 @@
-import * as React from 'react'
 import { screen } from '@testing-library/react'
-import { describe, it, beforeEach } from 'vitest'
+import { beforeEach, describe, it } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+
 import { ErrorUpdateSoftware } from '../ErrorUpdateSoftware'
 
-const render = (props: React.ComponentProps<typeof ErrorUpdateSoftware>) => {
+import type { ComponentProps } from 'react'
+
+const render = (props: ComponentProps<typeof ErrorUpdateSoftware>) => {
   return renderWithProviders(<ErrorUpdateSoftware {...props} />, {
     i18nInstance: i18n,
   })
 }
 
 describe('ErrorUpdateSoftware', () => {
-  let props: React.ComponentProps<typeof ErrorUpdateSoftware>
+  let props: ComponentProps<typeof ErrorUpdateSoftware>
 
   beforeEach(() => {
     props = {

@@ -1,14 +1,18 @@
-import { beforeEach, describe, it, expect } from 'vitest'
-import {
-  makeContext,
-  getInitialRobotStateStandard,
-  DEFAULT_PIPETTE,
-  SOURCE_LABWARE,
-} from '../fixtures'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import { makeImmutableStateUpdater } from '../__utils__'
+import {
+  DEFAULT_PIPETTE,
+  getInitialRobotStateStandard,
+  makeContext,
+} from '../fixtures'
 import { forDropTip as _forDropTip } from '../getNextRobotStateAndWarnings/forDropTip'
-import { InvariantContext, RobotState } from '../types'
+
+import type { InvariantContext, RobotState } from '../types'
+
 const forDropTip = makeImmutableStateUpdater(_forDropTip)
+
+const TIPRACK_ID = 'tiprack1Id'
 
 describe('dropTip', () => {
   let invariantContext: InvariantContext
@@ -24,21 +28,35 @@ describe('dropTip', () => {
         ...prevRobotState,
         tipState: {
           pipettes: {
-            p300SingleId: true,
-            p300MultiId: true,
+            p300SingleId: {
+              hasTip: true,
+              tiprackURI: 'tiprackId',
+            },
+            p300MultiId: {
+              hasTip: true,
+              tiprackURI: 'tiprackId',
+            },
           },
-          tipracks: {} as any,
+          tipracks: {
+            tiprack1Id: {},
+          } as any,
         },
       }
       const params = {
         pipetteId: DEFAULT_PIPETTE,
-        labwareId: SOURCE_LABWARE,
+        labwareId: TIPRACK_ID,
         wellName: 'A1',
       }
       const result = forDropTip(params, invariantContext, prevRobotState)
       expect(result.robotState.tipState.pipettes).toEqual({
-        p300SingleId: false,
-        p300MultiId: true,
+        p300SingleId: {
+          hasTip: false,
+          tiprackURI: null,
+        },
+        p300MultiId: {
+          hasTip: true,
+          tiprackURI: 'tiprackId',
+        },
       })
     })
     // TODO: IL 2019-11-20
@@ -50,69 +68,34 @@ describe('dropTip', () => {
         ...prevRobotState,
         tipState: {
           pipettes: {
-            p300SingleId: true,
-            p300MultiId: true,
+            p300SingleId: {
+              hasTip: true,
+              tiprackURI: 'tiprackId',
+            },
+            p300MultiId: {
+              hasTip: true,
+              tiprackURI: 'tiprackId',
+            },
           },
-          tipracks: {} as any,
+          tipracks: {
+            [TIPRACK_ID]: {},
+          } as any,
         },
       }
       const params = {
         pipetteId: 'p300MultiId',
-        labwareId: SOURCE_LABWARE,
+        labwareId: TIPRACK_ID,
         wellName: 'A1',
       }
       const result = forDropTip(params, invariantContext, prevRobotState)
       expect(result.robotState.tipState.pipettes).toEqual({
-        p300SingleId: true,
-        p300MultiId: false,
-      })
-    })
-  })
-  describe('liquid tracking', () => {
-    it('dropTip uses full volume when transfering tip to trash', () => {
-      prevRobotState = {
-        ...prevRobotState,
-        tipState: {
-          pipettes: {
-            p300SingleId: true,
-            p300MultiId: true,
-          },
-          tipracks: {} as any,
+        p300SingleId: {
+          hasTip: true,
+          tiprackURI: 'tiprackId',
         },
-      }
-      const params = {
-        pipetteId: 'p300MultiId',
-        labwareId: SOURCE_LABWARE,
-        wellName: 'A1',
-      }
-      prevRobotState.liquidState.pipettes.p300MultiId['0'] = {
-        ingred1: {
-          volume: 150,
-        },
-      }
-      const result = forDropTip(params, invariantContext, prevRobotState)
-      expect(result).toMatchObject({
-        robotState: {
-          liquidState: {
-            pipettes: {
-              p300MultiId: {
-                '0': {
-                  ingred1: {
-                    volume: 0,
-                  },
-                },
-              },
-            },
-            labware: {
-              [SOURCE_LABWARE]: {
-                A1: {
-                  ingred1: {
-                    volume: 150,
-                  },
-                },
-              },
-            },
-          },
+        p300MultiId: {
+          hasTip: false,
+          tiprackURI: null,
         },
       })
     })

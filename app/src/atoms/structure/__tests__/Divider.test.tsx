@@ -1,17 +1,23 @@
-import * as React from 'react'
-import { describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
+
 import { screen } from '@testing-library/react'
-import { SPACING, COLORS } from '@opentrons/components'
-import { renderWithProviders } from '../../../__testing-utils__'
+
+import { COLORS, SPACING } from '@opentrons/components'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+
 import { Divider } from '../index'
 
-const render = (props: React.ComponentProps<typeof Divider>) => {
+import type { ComponentProps } from 'react'
+
+const render = (props: ComponentProps<typeof Divider>) => {
   return renderWithProviders(<Divider {...props} />)[0]
 }
 
 describe('Divider', () => {
-  let props: React.ComponentProps<typeof Divider>
+  let props: ComponentProps<typeof Divider>
 
   beforeEach(() => {
     props = {

@@ -27,8 +27,8 @@ from opentrons_shared_data.errors.exceptions import (
 from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
 )
-from opentrons_shared_data.pipette.dev_types import PipetteName
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.pipette.types import PipetteName
+from opentrons_shared_data.robot.types import RobotType
 from opentrons import types as top_types
 from opentrons.config import robot_configs
 from opentrons.config.types import RobotConfig, OT3Config
@@ -44,6 +44,7 @@ from .execution_manager import ExecutionManagerProvider
 from .pause_manager import PauseManager
 from .module_control import AttachedModulesControl
 from .types import (
+    AsynchronousModuleErrorNotification,
     Axis,
     CriticalPoint,
     DoorState,
@@ -51,6 +52,7 @@ from .types import (
     ErrorMessageNotification,
     HardwareEventHandler,
     HardwareAction,
+    HardwareEvent,
     MotionChecks,
     PauseType,
     StatusBarState,
@@ -58,6 +60,7 @@ from .types import (
     SubSystem,
     SubSystemState,
     HardwareFeatureFlags,
+    TipScrapeType,
 )
 from . import modules
 from .robot_calibration import (
@@ -77,6 +80,8 @@ from .motion_utilities import (
 
 
 mod_log = logging.getLogger(__name__)
+
+AttachedModuleSpec = Dict[str, List[Union[str, Tuple[str, str]]]]
 
 
 class API(
@@ -164,8 +169,30 @@ class API(
             except Exception:
                 mod_log.exception("Errored during door state event callback")
 
+    def _send_module_notification(self, event: HardwareEvent) -> None:
+        if not isinstance(event, AsynchronousModuleErrorNotification):
+            return
+        mod_log.info(
+            f"Forwarding module event {event.event} for {event.module_model} {event.module_serial} at {event.port}"
+        )
+        for cb in self._callbacks:
+            try:
+                cb(event)
+            except Exception:
+                mod_log.exception("Errored during module asynchronous callback")
+
     def _reset_last_mount(self) -> None:
         self._last_moved_mount = None
+
+    def get_deck_from_machine(
+        self, machine_pos: Dict[Axis, float]
+    ) -> Dict[Axis, float]:
+        return deck_from_machine(
+            machine_pos=machine_pos,
+            attitude=self._robot_calibration.deck_calibration.attitude,
+            offset=top_types.Point(0, 0, 0),
+            robot_type=cast(RobotType, "OT-2 Standard"),
+        )
 
     @classmethod
     async def build_hardware_controller(  # noqa: C901
@@ -234,7 +261,9 @@ class API(
             )
             await api_instance.cache_instruments()
             module_controls = await AttachedModulesControl.build(
-                api_instance, board_revision=backend.board_revision
+                api_instance,
+                board_revision=backend.board_revision,
+                event_callback=api_instance._send_module_notification,
             )
             backend.module_controls = module_controls
             checked_loop.create_task(backend.watch(loop=checked_loop))
@@ -255,7 +284,7 @@ class API(
         attached_instruments: Optional[
             Dict[top_types.Mount, Dict[str, Optional[str]]]
         ] = None,
-        attached_modules: Optional[Dict[str, List[str]]] = None,
+        attached_modules: Optional[Dict[str, List[modules.SimulatingModule]]] = None,
         config: Optional[Union[RobotConfig, OT3Config]] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         strict_attached_instruments: bool = True,
@@ -293,7 +322,9 @@ class API(
         )
         await api_instance.cache_instruments()
         module_controls = await AttachedModulesControl.build(
-            api_instance, board_revision=backend.board_revision
+            api_instance,
+            board_revision=backend.board_revision,
+            event_callback=api_instance._send_module_notification,
         )
         backend.module_controls = module_controls
         await backend.watch()
@@ -385,6 +416,10 @@ class API(
     async def set_status_bar_enabled(self, enabled: bool) -> None:
         """The status bar does not exist on OT-2!"""
         return None
+
+    def get_status_bar_enabled(self) -> bool:
+        """There is no status bar on OT-2, return False at all times."""
+        return False
 
     def get_status_bar_state(self) -> StatusBarState:
         """There is no status bar on OT-2, return IDLE at all times."""
@@ -655,11 +690,8 @@ class API(
         async with self._motion_lock:
             if smoothie_gantry:
                 smoothie_pos.update(await self._backend.home(smoothie_gantry))
-                self._current_position = deck_from_machine(
-                    machine_pos=self._axis_map_from_string_map(smoothie_pos),
-                    attitude=self._robot_calibration.deck_calibration.attitude,
-                    offset=top_types.Point(0, 0, 0),
-                    robot_type=cast(RobotType, "OT-2 Standard"),
+                self._current_position = self.get_deck_from_machine(
+                    self._axis_map_from_string_map(smoothie_pos)
                 )
             for plunger in plungers:
                 await self._do_plunger_home(axis=plunger, acquire_lock=False)
@@ -701,11 +733,8 @@ class API(
         async with self._motion_lock:
             if refresh:
                 smoothie_pos = await self._backend.update_position()
-                self._current_position = deck_from_machine(
-                    machine_pos=self._axis_map_from_string_map(smoothie_pos),
-                    attitude=self._robot_calibration.deck_calibration.attitude,
-                    offset=top_types.Point(0, 0, 0),
-                    robot_type=cast(RobotType, "OT-2 Standard"),
+                self._current_position = self.get_deck_from_machine(
+                    self._axis_map_from_string_map(smoothie_pos)
                 )
             if mount == top_types.Mount.RIGHT:
                 offset = top_types.Point(0, 0, 0)
@@ -772,6 +801,7 @@ class API(
         position: Mapping[Axis, float],
         speed: Optional[float] = None,
         max_speeds: Optional[Dict[Axis, float]] = None,
+        expect_stalls: bool = False,
     ) -> None:
         """Moves the effectors of the specified axis to the specified position.
         The effector of the x,y axis is the center of the carriage.
@@ -915,6 +945,16 @@ class API(
     async def disengage_axes(self, which: List[Axis]) -> None:
         await self._backend.disengage_axes([ot2_axis_to_string(ax) for ax in which])
 
+    def axis_is_present(self, axis: Axis) -> bool:
+        is_ot2 = axis in Axis.ot2_axes()
+        if not is_ot2:
+            return False
+        if axis in Axis.pipette_axes():
+            mount = Axis.to_ot2_mount(axis)
+            if self.attached_pipettes.get(mount) is None:
+                return False
+        return True
+
     @ExecutionManagerProvider.wait_for_running
     async def _fast_home(self, axes: Sequence[str], margin: float) -> Dict[str, float]:
         converted_axes = "".join(axes)
@@ -936,11 +976,8 @@ class API(
 
         async with self._motion_lock:
             smoothie_pos = await self._fast_home(smoothie_ax, margin)
-            self._current_position = deck_from_machine(
-                machine_pos=self._axis_map_from_string_map(smoothie_pos),
-                attitude=self._robot_calibration.deck_calibration.attitude,
-                offset=top_types.Point(0, 0, 0),
-                robot_type=cast(RobotType, "OT-2 Standard"),
+            self._current_position = self.get_deck_from_machine(
+                self._axis_map_from_string_map(smoothie_pos)
             )
 
     # Gantry/frame (i.e. not pipette) config API
@@ -1026,6 +1063,7 @@ class API(
         mount: top_types.Mount,
         volume: Optional[float] = None,
         rate: float = 1.0,
+        correction_volume: float = 0.0,
     ) -> None:
         """
         Aspirate a volume of liquid (in microliters/uL) using this pipette.
@@ -1060,6 +1098,8 @@ class API(
         volume: Optional[float] = None,
         rate: float = 1.0,
         push_out: Optional[float] = None,
+        correction_volume: float = 0.0,
+        is_full_dispense: bool = False,
     ) -> None:
         """
         Dispense a volume of liquid in microliters(uL) using this pipette.
@@ -1150,20 +1190,14 @@ class API(
                 mount, back_left_nozzle, front_right_nozzle, starting_nozzle
             )
 
-    async def pick_up_tip(
+    async def tip_pickup_moves(
         self,
         mount: top_types.Mount,
-        tip_length: float,
         presses: Optional[int] = None,
         increment: Optional[float] = None,
-        prep_after: bool = True,
     ) -> None:
-        """
-        Pick up tip from current location.
-        """
-
-        spec, _add_tip_to_instrs = self.plan_check_pick_up_tip(
-            mount, tip_length, presses, increment
+        spec, _ = self.plan_check_pick_up_tip(
+            mount=mount, presses=presses, increment=increment
         )
         self._backend.set_active_current(spec.plunger_currents)
         target_absolute = target_position_from_plunger(
@@ -1185,7 +1219,6 @@ class API(
                 mount, press.relative_up, self._current_position
             )
             await self._move(target_up)
-        _add_tip_to_instrs()
         # neighboring tips tend to get stuck in the space between
         # the volume chamber and the drop-tip sleeve on p1000.
         # This extra shake ensures those tips are removed
@@ -1193,13 +1226,62 @@ class API(
             await self.move_rel(mount, rel_point, speed=speed)
 
         await self.retract(mount, spec.retract_target)
+
+    async def pick_up_tip(
+        self,
+        mount: top_types.Mount,
+        tip_length: float,
+        presses: Optional[int] = None,
+        increment: Optional[float] = None,
+        prep_after: bool = True,
+    ) -> None:
+        """
+        Pick up tip from current location.
+        """
+
+        spec, _add_tip_to_instrs = self.plan_check_pick_up_tip(
+            mount=mount, presses=presses, increment=increment, tip_length=tip_length
+        )
+        self._backend.set_active_current(spec.plunger_currents)
+        target_absolute = target_position_from_plunger(
+            mount, spec.plunger_prep_pos, self._current_position
+        )
+        await self._move(
+            target_absolute,
+            home_flagged_axes=False,
+        )
+
+        for press in spec.presses:
+            with self._backend.save_current():
+                self._backend.set_active_current(press.current)
+                target_down = target_position_from_relative(
+                    mount, press.relative_down, self._current_position
+                )
+                await self._move(target_down, speed=press.speed)
+            target_up = target_position_from_relative(
+                mount, press.relative_up, self._current_position
+            )
+            await self._move(target_up)
+        # neighboring tips tend to get stuck in the space between
+        # the volume chamber and the drop-tip sleeve on p1000.
+        # This extra shake ensures those tips are removed
+        for rel_point, speed in spec.shake_off_list:
+            await self.move_rel(mount, rel_point, speed=speed)
+
+        await self.retract(mount, spec.retract_target)
+        _add_tip_to_instrs()
+
         if prep_after:
             await self.prepare_for_aspirate(mount)
 
-    async def drop_tip(self, mount: top_types.Mount, home_after: bool = True) -> None:
-        """Drop tip at the current location."""
-
-        spec, _remove = self.plan_check_drop_tip(mount, home_after)
+    async def tip_drop_moves(
+        self,
+        mount: top_types.Mount,
+        home_after: bool = True,
+        ignore_plunger: bool = False,
+        scrape_type: TipScrapeType = TipScrapeType.NONE,
+    ) -> None:
+        spec, _ = self.plan_check_drop_tip(mount, home_after)
 
         for move in spec.drop_moves:
             self._backend.set_active_current(move.current)
@@ -1216,18 +1298,28 @@ class API(
                     axes=[ot2_axis_to_string(ax) for ax in move.home_axes],
                     margin=move.home_after_safety_margin,
                 )
-                self._current_position = deck_from_machine(
-                    machine_pos=self._axis_map_from_string_map(smoothie_pos),
-                    attitude=self._robot_calibration.deck_calibration.attitude,
-                    offset=top_types.Point(0, 0, 0),
-                    robot_type=cast(RobotType, "OT-2 Standard"),
+                self._current_position = self.get_deck_from_machine(
+                    self._axis_map_from_string_map(smoothie_pos)
                 )
 
         for shake in spec.shake_moves:
             await self.move_rel(mount, shake[0], speed=shake[1])
 
         self._backend.set_active_current(spec.ending_current)
-        _remove()
+
+    async def drop_tip(self, mount: top_types.Mount, home_after: bool = True) -> None:
+        """Drop tip at the current location."""
+        await self.tip_drop_moves(mount, home_after)
+
+        # todo(mm, 2024-10-17): Ideally, callers would be able to replicate the behavior
+        # of this method via self.drop_tip_moves() plus other public methods. This
+        # currently prevents that: there is no public equivalent for
+        # instrument.set_current_volume().
+        instrument = self.get_pipette(mount)
+        instrument.set_current_volume(0)
+
+        self.set_current_tiprack_diameter(mount, 0.0)
+        self.remove_tip(mount)
 
     async def create_simulating_module(
         self,
@@ -1238,9 +1330,10 @@ class API(
             self.is_simulator
         ), "Cannot build simulating module from non-simulating hardware control API"
 
-        return await self._backend.module_controls.build_module(
-            port="",
-            usb_port=USBPort(name="", port_number=1, port_group=PortGroup.MAIN),
+        return await self._backend.module_controls.register_simulated_module(
+            simulated_usb_port=USBPort(
+                name="", port_number=1, port_group=PortGroup.MAIN
+            ),
             type=modules.ModuleType.from_model(model),
             sim_model=model.value,
         )

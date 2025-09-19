@@ -5,17 +5,21 @@ name = "pypi"
 
 [packages]
 opentrons = {editable = true, path = "./../api", extras=['flex-hardware']}
-opentrons-shared-data = {editable = true, path = "./../shared-data/python"}
+opentrons-shared-data = {editable = true, path = "./../shared-data"}
 opentrons-hardware = {editable = true, path = "./../hardware", extras=['FLEX']}
 hardware-testing = { editable = true, path = "." }
+abr-testing = { editable = true, path = "./../abr-testing" }
 pyserial = "==3.5"
+types-pytz = "*"
+paramiko = "*"
+types-paramiko = "*"
 
 [dev-packages]
 atomicwrites = "==1.4.1"
 colorama = "==0.4.4"
 pytest = "==7.1.1"
 pytest-cov = "==2.10.1"
-mypy = "==0.981"
+mypy = "==1.11.0"
 black = "==22.3.0"
 flake8 = "~=3.9.0"
 flake8-annotations = "~=2.6.2"
@@ -23,6 +27,9 @@ flake8-docstrings = "~=1.6.0"
 flake8-noqa = "~=1.2.1"
 requests = "==2.27.1"
 types-requests = "==2.25.6"
+pyusb = "==1.2.1"
+build = "~=1.2.0"
+matplotlib = "==3.10.0"
 
 [requires]
 python_version = "3.10"

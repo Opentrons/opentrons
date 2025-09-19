@@ -14,7 +14,6 @@ Style props will pass their value directly into CSS, but for safety, try to use 
 
 ```js static
 import { Box, C_DARK_GRAY, C_WHITE } from '@opentrons/components'
-
 const GrayBox = () => <Box color={C_WHITE} backgroundColor={C_DARK_GRAY} />
 ```
 
@@ -31,12 +30,11 @@ const GrayBox = () => <Box color={C_WHITE} backgroundColor={C_DARK_GRAY} />
 
 ```js static
 import {
-  Text,
   FONT_SIZE_HEADER,
   FONT_WEIGHT_SEMIBOLD,
   LINE_HEIGHT_TITLE,
+  Text,
 } from '@opentrons/components'
-
 const Heading = () => (
   <Text
     fontSize={FONT_SIZE_HEADER}
@@ -66,8 +64,7 @@ const Heading = () => (
 | `paddingLeft`   | `padding-left`                     |
 
 ```js static
-import { Box, SPACING_AUTO, SPACING_3 } from '@opentrons/components'
-
+import { Box, SPACING_3, SPACING_AUTO } from '@opentrons/components'
 const Heading = () => <Box marginX={SPACING_AUTO} paddingY={SPACING_3} />
 ```
 
@@ -88,11 +85,10 @@ Note: If you specify both of a shorthand prop and the explicit prop (e.g. `margi
 
 ```js static
 import {
-  Box,
-  BORDER_SOLID_LIGHT,
   BORDER_RADIUS_DEFAULT,
+  BORDER_SOLID_LIGHT,
+  Box,
 } from '@opentrons/components'
-
 const Heading = () => (
   <Box border={BORDER_SOLID_LIGHT} borderRadius={BORDER_RADIUS_DEFAULT} />
 )
@@ -110,11 +106,10 @@ const Heading = () => (
 
 ```js static
 import {
-  Flex,
   ALIGN_ITEMS_CENTER,
+  Flex,
   JUSTIFY_CONTENT_CENTER,
 } from '@opentrons/components'
-
 const Heading = () => (
   <Flex
     alignItems={ALIGN_ITEMS_CENTER}
@@ -140,8 +135,7 @@ const Heading = () => (
 | `overflowY` | `overflow-y`         |
 
 ```js static
-import { Box, SIZE_4, OVERFLOW_HIDDEN } from '@opentrons/components'
-
+import { Box, OVERFLOW_HIDDEN, SIZE_4 } from '@opentrons/components'
 const Heading = () => <Box size={SIZE_4} overflow={OVERFLOW_HIDDEN} />
 ```
 
@@ -158,7 +152,6 @@ const Heading = () => <Box size={SIZE_4} overflow={OVERFLOW_HIDDEN} />
 
 ```js static
 import { Box, POSITION_ABSOLUTE } from '@opentrons/components'
-
 const Fill = () => (
   <Box position={POSITION_ABSOLUTE} top={0} right={0} bottom={0} left={0} />
 )
@@ -175,10 +168,8 @@ If you find yourself in a place where...
 
 ```js static
 import styled from 'styled-components'
-import { styleProps, isntStyleProp, C_DARK_GRAY } from '@opentrons/components'
-
+import { C_DARK_GRAY, isntStyleProp, styleProps } from '@opentrons/components'
 import type { PrimitiveComponent } from '@opentrons/components'
-
 export const Gray: PrimitiveComponent<'div'> = styled.div.withConfig({
   shouldForwardProp: isntStyleProp,
 })`

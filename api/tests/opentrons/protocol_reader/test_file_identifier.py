@@ -7,7 +7,7 @@ from decoy import Decoy
 import pytest
 
 from opentrons_shared_data import load_shared_data
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 from opentrons.protocols import parse
 from opentrons.protocols.api_support.types import APIVersion

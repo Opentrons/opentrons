@@ -23,7 +23,7 @@ from ..pipette_definition import (
     PlungerEjectDropTipConfiguration,
 )
 
-from ..dev_types import PipetteModelSpec
+from ..types import PipetteModelSpec
 
 
 PIPETTE_DEFINITION_ROOT = Path("pipette") / "definitions" / "2"
@@ -65,11 +65,7 @@ def _build_pickup_tip_data(
     )
     return PickUpTipConfigurations(
         pressFit=PressFitPickUpTipConfiguration(
-            speedByTipCount={},
-            presses=presses,
-            increment=increment,
-            distanceByTipCount={},
-            currentByTipCount={},
+            presses=presses, increment=increment, configurationsByNozzleMap={}
         )
     )
 
@@ -142,7 +138,7 @@ def _build_partial_tip_configurations(channels: int) -> PartialTipDefinition:
 def build_geometry_model_v2(
     input_dictionary: Dict[str, Any]
 ) -> PipetteGeometryDefinition:
-    return PipetteGeometryDefinition.parse_obj(input_dictionary)
+    return PipetteGeometryDefinition.model_validate(input_dictionary)
 
 
 def build_liquid_model_v2(
@@ -151,11 +147,11 @@ def build_liquid_model_v2(
 ) -> PipetteLiquidPropertiesDefinition:
     if input_dictionary:
         if input_dictionary.get("partialTipConfigurations"):
-            return PipetteLiquidPropertiesDefinition.parse_obj(
+            return PipetteLiquidPropertiesDefinition.model_validate(
                 {**input_dictionary, "supportedTips": supported_tip_configurations}
             )
         else:
-            return PipetteLiquidPropertiesDefinition.parse_obj(
+            return PipetteLiquidPropertiesDefinition.model_validate(
                 {
                     **input_dictionary,
                     "supportedTips": supported_tip_configurations,
@@ -167,7 +163,7 @@ def build_liquid_model_v2(
         "please input the load names of default tipracks separated by commas\n"
     )
     list_default_tipracks = default_tipracks.split(",")
-    return PipetteLiquidPropertiesDefinition.parse_obj(
+    return PipetteLiquidPropertiesDefinition.model_validate(
         {
             "supportedTips": supported_tip_configurations,
             "maxVolume": max_volume,
@@ -185,7 +181,7 @@ def build_physical_model_v2(
             sensors=input_dictionary.pop("availableSensors", [])
         )
         back_compat_names = input_dictionary.pop("backCompatNames", [])
-        return PipettePhysicalPropertiesDefinition.parse_obj(
+        return PipettePhysicalPropertiesDefinition.model_validate(
             {
                 **input_dictionary,
                 "availableSensors": available_sensors,
@@ -217,7 +213,7 @@ def build_physical_model_v2(
         back_compat_names = [i.strip() for i in back_compat_names_str.split(",")]
     else:
         back_compat_names = []
-    return PipettePhysicalPropertiesDefinition.parse_obj(
+    return PipettePhysicalPropertiesDefinition.model_validate(
         {
             "displayName": display_name,
             "model": pipette_type,
@@ -239,7 +235,7 @@ def build_physical_model_v2(
 
 
 def build_supported_tips(input_dictionary: Dict[str, Any]) -> SupportedTipsDefinition:
-    return SupportedTipsDefinition.parse_obj(input_dictionary)
+    return SupportedTipsDefinition.model_validate(input_dictionary)
 
 
 def save_to_file(
@@ -336,7 +332,7 @@ def build_new_pipette_model_v2(
         top_level_pipette_model["liquid"],
         pipette_functions_dict,
     )
-    liquid_model_dict = liquid_model.dict(by_alias=True)
+    liquid_model_dict = liquid_model.model_dump(by_alias=True)
     liquid_model_dict["supportedTips"] = {
         k.name: v for k, v in liquid_model_dict["supportedTips"].items()
     }

@@ -1,24 +1,29 @@
-import { useSelector } from 'react-redux'
-import * as React from 'react'
-import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
+
 import {
   COLORS,
+  Flex,
+  JUSTIFY_FLEX_END,
   PrimaryButton,
   TEXT_TRANSFORM_CAPITALIZE,
-  JUSTIFY_FLEX_END,
-  Flex,
 } from '@opentrons/components'
-import { getIsOnDevice } from '../../redux/config'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import { SmallButton } from '../../atoms/buttons'
+
+import { SmallButton } from '/app/atoms/buttons'
+import {
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '/app/molecules/SimpleWizardBody'
+import { getIsOnDevice } from '/app/redux/config'
+
 import {
   SUCCESSFULLY_ATTACHED,
   SUCCESSFULLY_ATTACHED_AND_CALIBRATED,
   SUCCESSFULLY_CALIBRATED,
   SUCCESSFULLY_DETACHED,
 } from './constants'
+
 import type { GripperWizardStepProps, SuccessStep } from './types'
 
 const HEADER_STYLE = css`
@@ -36,7 +41,11 @@ export const Success = (
     SuccessStep
 ): JSX.Element => {
   const { proceed, successfulAction, isRobotMoving } = props
-  const { t, i18n } = useTranslation(['gripper_wizard_flows', 'shared'])
+  const { t, i18n } = useTranslation([
+    'gripper_wizard_flows',
+    'shared',
+    'branded',
+  ])
   const isOnDevice = useSelector(getIsOnDevice)
 
   const infoByAction: {
@@ -46,11 +55,11 @@ export const Success = (
     }
   } = {
     [SUCCESSFULLY_ATTACHED_AND_CALIBRATED]: {
-      header: t('gripper_successfully_attached_and_calibrated'),
+      header: t('branded:gripper_successfully_attached_and_calibrated'),
       buttonText: i18n.format(t('shared:exit'), 'capitalize'),
     },
     [SUCCESSFULLY_CALIBRATED]: {
-      header: t('gripper_successfully_calibrated'),
+      header: t('branded:gripper_successfully_calibrated'),
       buttonText: i18n.format(t('shared:exit'), 'capitalize'),
     },
     [SUCCESSFULLY_ATTACHED]: {
@@ -58,7 +67,7 @@ export const Success = (
       buttonText: t('calibrate_gripper'),
     },
     [SUCCESSFULLY_DETACHED]: {
-      header: t('gripper_successfully_detached'),
+      header: t('branded:gripper_successfully_detached'),
       buttonText: i18n.format(t('shared:exit'), 'capitalize'),
     },
   }
@@ -66,7 +75,7 @@ export const Success = (
 
   if (isRobotMoving)
     return (
-      <InProgressModal
+      <SimpleWizardInProgressBody
         description={t('shared:stand_back_robot_is_in_motion')}
       />
     )

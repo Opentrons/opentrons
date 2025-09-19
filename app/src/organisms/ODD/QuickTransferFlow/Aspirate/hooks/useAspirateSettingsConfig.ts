@@ -1,0 +1,200 @@
+import { useTranslation } from 'react-i18next'
+
+import { POSITION_REFERENCE_TOP } from '@opentrons/shared-data'
+
+import { useToaster } from '/app/organisms/ToasterOven'
+
+import { ASPIRATE_SETTING_OPTIONS as SETTING_OPTIONS } from '../../constants'
+import { getIsTouchTipEnabled } from '../../utils/getIsTouchTipEnabled'
+
+import type { Dispatch } from 'react'
+import type {
+  AspirateSettingOption,
+  QuickTransferSummaryAction,
+  QuickTransferSummaryState,
+  SettingItem,
+} from '../../types'
+
+const DIGIT = 1
+interface UseAspirateSettingsConfigProps {
+  state: QuickTransferSummaryState
+  dispatch: Dispatch<QuickTransferSummaryAction>
+  setSelectedSetting: (setting: AspirateSettingOption | null) => void
+  isMultiTransfer: boolean
+}
+
+export function useAspirateSettingsConfig({
+  state,
+  dispatch,
+  setSelectedSetting,
+  isMultiTransfer,
+}: UseAspirateSettingsConfigProps): SettingItem[] {
+  const { t } = useTranslation(['quick_transfer', 'shared'])
+  const { makeSnackbar } = useToaster()
+
+  const touchTipEnabled = getIsTouchTipEnabled(state.source)
+  const hasLiquidClass = state.liquidClassName !== 'none'
+
+  const aspirateSettingsItems: SettingItem[] = [
+    {
+      option: SETTING_OPTIONS.ASPIRATE_FLOW_RATE,
+      copy: t('aspirate_flow_rate'),
+      value: t('flow_rate_value', {
+        flow_rate: state.aspirateFlowRate.toFixed(DIGIT),
+      }),
+      enabled: true,
+      onClick: () => {
+        setSelectedSetting(SETTING_OPTIONS.ASPIRATE_FLOW_RATE)
+      },
+    },
+    {
+      option: SETTING_OPTIONS.ASPIRATE_TIP_POSITION,
+      copy: t('tip_position'),
+      value:
+        state.tipPositionAspirate !== null
+          ? t('tip_position_value', { position: state.tipPositionAspirate })
+          : t('option_disabled'),
+      enabled: true,
+      onClick: () => {
+        setSelectedSetting(SETTING_OPTIONS.ASPIRATE_TIP_POSITION)
+      },
+    },
+    {
+      option: SETTING_OPTIONS.ASPIRATE_SUBMERGE,
+      copy: t('submerge'),
+      value:
+        state.submergeAspirate !== undefined
+          ? t('submerge_value', {
+              speed: state.submergeAspirate.speed,
+              delayDuration: state.submergeAspirate.delayDuration,
+              position: state.submergeAspirate.position,
+              positionReference:
+                state.submergeAspirate.positionReference ===
+                POSITION_REFERENCE_TOP
+                  ? t('top')
+                  : t('bottom'),
+            })
+          : t('option_disabled'),
+      enabled: true,
+      onClick: () => {
+        setSelectedSetting(SETTING_OPTIONS.ASPIRATE_SUBMERGE)
+      },
+    },
+    {
+      option: SETTING_OPTIONS.PRE_WET_TIP,
+      copy: t('pre_wet_tip'),
+      value: state.preWetTip ? t('option_enabled') : t('option_disabled'),
+      enabled: true,
+      onClick: () => {
+        setSelectedSetting(SETTING_OPTIONS.PRE_WET_TIP)
+      },
+    },
+    {
+      option: SETTING_OPTIONS.ASPIRATE_MIX,
+      copy: t('mix'),
+      value:
+        state.mixOnAspirate !== undefined && hasLiquidClass
+          ? t('mix_value', {
+              volume: state.mixOnAspirate?.mixVolume,
+              reps: state.mixOnAspirate?.repetitions,
+            })
+          : t('option_disabled'),
+      enabled:
+        state.transferType === 'transfer' ||
+        state.transferType === 'distribute',
+      onClick: () => {
+        if (
+          state.transferType === 'transfer' ||
+          state.transferType === 'distribute'
+        ) {
+          setSelectedSetting(SETTING_OPTIONS.ASPIRATE_MIX)
+        } else {
+          makeSnackbar(t('aspirate_setting_disabled') as string)
+        }
+      },
+    },
+    {
+      option: SETTING_OPTIONS.ASPIRATE_CONDITION,
+      copy: t('condition'),
+      value:
+        state.conditionAspirate != null || state.conditionAspirate !== 0
+          ? t('volume', { volume: state.conditionAspirate })
+          : t('option_disabled'),
+      enabled: isMultiTransfer,
+      onClick: () => {
+        setSelectedSetting(SETTING_OPTIONS.ASPIRATE_CONDITION)
+      },
+    },
+    {
+      option: SETTING_OPTIONS.ASPIRATE_DELAY,
+      copy: t('delay'),
+      value:
+        state.delayAspirate != null
+          ? t('delay_value', {
+              delay: state.delayAspirate.delayDuration,
+            })
+          : t('option_disabled'),
+      enabled: true,
+      onClick: () => {
+        setSelectedSetting(SETTING_OPTIONS.ASPIRATE_DELAY)
+      },
+    },
+    {
+      option: SETTING_OPTIONS.ASPIRATE_RETRACT,
+      copy: t('retract'),
+      value:
+        state.retractAspirate !== undefined
+          ? t('retract_value', {
+              speed: state.retractAspirate.speed,
+              delayDuration: state.retractAspirate.delayDuration,
+              position: state.retractAspirate.position,
+              positionReference:
+                state.retractAspirate.positionReference ===
+                POSITION_REFERENCE_TOP
+                  ? t('top')
+                  : t('bottom'),
+            })
+          : '',
+      enabled: true,
+      onClick: () => {
+        setSelectedSetting(SETTING_OPTIONS.ASPIRATE_RETRACT)
+      },
+    },
+    {
+      option: SETTING_OPTIONS.ASPIRATE_TOUCH_TIP,
+      copy: t('touch_tip'),
+      value:
+        state.touchTipAspirate !== undefined && touchTipEnabled
+          ? t('touch_tip_value', {
+              speed: state.touchTipAspirateSpeed,
+              position: state.touchTipAspirate,
+            })
+          : t('option_disabled'),
+      enabled: touchTipEnabled,
+      onClick: () => {
+        if (touchTipEnabled) {
+          setSelectedSetting(SETTING_OPTIONS.ASPIRATE_TOUCH_TIP)
+        } else {
+          makeSnackbar(t('aspirate_setting_disabled') as string)
+        }
+      },
+    },
+    {
+      option: SETTING_OPTIONS.ASPIRATE_AIR_GAP,
+      copy: t('air_gap'),
+      value:
+        state.airGapAspirate !== undefined && hasLiquidClass
+          ? t('air_gap_value', { volume: state.airGapAspirate })
+          : t('option_disabled'),
+      enabled: true,
+      onClick: () => {
+        setSelectedSetting(SETTING_OPTIONS.ASPIRATE_AIR_GAP)
+      },
+    },
+  ]
+
+  return aspirateSettingsItems.filter(
+    item =>
+      item.option !== SETTING_OPTIONS.ASPIRATE_CONDITION || isMultiTransfer
+  )
+}

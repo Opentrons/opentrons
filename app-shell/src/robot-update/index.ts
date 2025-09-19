@@ -1,31 +1,31 @@
 // robot update files
 import path from 'path'
-import { readFile, ensureDir } from 'fs-extra'
-import { createLogger } from '../log'
-import { UI_INITIALIZED } from '../constants'
+import { ensureDir, readFile } from 'fs-extra'
 
-import { downloadManifest, getReleaseSet } from './release-manifest'
-import {
-  getUpdateManifestUrls,
-  cacheDirForMachine,
-  cacheDirForMachineFiles,
-} from './constants'
+import { UI_INITIALIZED } from '../constants'
+import { createLogger } from '../log'
 import { CURRENT_VERSION } from '../update'
 import {
+  cacheDirForMachine,
+  cacheDirForMachineFiles,
+  getUpdateManifestUrls,
+} from './constants'
+import {
+  cleanupReleaseFiles,
   getReleaseFiles,
   readUpdateFileInfo,
-  cleanupReleaseFiles,
 } from './release-files'
+import { downloadManifest, getReleaseSet } from './release-manifest'
 import { startPremigration, uploadSystemFile } from './update'
 
-import type { DownloadProgress } from '../http'
-import type { Action, Dispatch } from '../types'
-import type { ReleaseSetUrls, ReleaseSetFilepaths } from './types'
 import type {
-  RobotUpdateInfo,
   RobotUpdateAction,
+  RobotUpdateInfo,
   RobotUpdateTarget,
 } from '@opentrons/app/src/redux/robot-update/types'
+import type { DownloadProgress } from '../http'
+import type { Action, Dispatch } from '../types'
+import type { ReleaseSetFilepaths, ReleaseSetUrls } from './types'
 
 const log = createLogger('robot-update/index')
 
@@ -97,19 +97,20 @@ export function registerRobotUpdate(dispatch: Dispatch): Dispatch {
         const { host, path, systemFile } = action.payload
 
         if (systemFile == null) {
-          return dispatch({
+          dispatch({
             type: 'robotUpdate:UNEXPECTED_ERROR',
             payload: { message: 'Robot update file missing' },
           })
+          return
         }
 
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        uploadSystemFile(host, path, systemFile, progress =>
+        uploadSystemFile(host, path, systemFile, progress => {
           dispatch({
             type: 'robotUpdate:FILE_UPLOAD_PROGRESS',
             payload: progress,
           })
-        )
+        })
           .then(() => ({
             type: 'robotUpdate:FILE_UPLOAD_DONE' as const,
             payload: host.name,
@@ -243,17 +244,17 @@ export function checkForRobotUpdate(
         )
       )
       .then(filepaths => cacheUpdateSet(filepaths, target))
-      .then(updateInfo =>
+      .then(updateInfo => {
         dispatch({ type: 'robotUpdate:UPDATE_INFO', payload: updateInfo })
-      )
-      .catch((error: Error) =>
+      })
+      .catch((error: Error) => {
         dispatch({
           type: 'robotUpdate:DOWNLOAD_ERROR',
           payload: { error: error.message, target: target },
         })
-      )
+      })
       .then(() =>
-        cleanupReleaseFiles(cacheDirForMachineFiles(target), CURRENT_VERSION)
+        cleanupReleaseFiles(cacheDirForMachine(target), CURRENT_VERSION)
       )
   }
 

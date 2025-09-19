@@ -1,13 +1,16 @@
 """Test deck data provider."""
 import pytest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
+from pytest_lazy_fixtures import lf as lazy_fixture
 from decoy import Decoy
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
-from opentrons.protocols.models import LabwareDefinition
+from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons.types import DeckSlotName
 
-from opentrons.protocol_engine.types import DeckSlotLocation, DeckType
+from opentrons.protocol_engine.types import (
+    DeckSlotLocation,
+    DeckType,
+)
 from opentrons.protocol_engine.resources import (
     LabwareDataProvider,
     DeckDataProvider,
@@ -31,7 +34,7 @@ def mock_labware_data_provider(decoy: Decoy) -> LabwareDataProvider:
 )
 async def test_get_deck_definition(
     deck_type: DeckType,
-    expected_definition: DeckDefinitionV4,
+    expected_definition: DeckDefinitionV5,
     mock_labware_data_provider: LabwareDataProvider,
 ) -> None:
     """It should be able to load the correct deck definition."""
@@ -44,7 +47,7 @@ async def test_get_deck_definition(
 
 async def test_get_deck_labware_fixtures_ot2_standard(
     decoy: Decoy,
-    ot2_standard_deck_def: DeckDefinitionV4,
+    ot2_standard_deck_def: DeckDefinitionV5,
     ot2_fixed_trash_def: LabwareDefinition,
     mock_labware_data_provider: LabwareDataProvider,
 ) -> None:
@@ -61,7 +64,7 @@ async def test_get_deck_labware_fixtures_ot2_standard(
         )
     ).then_return(ot2_fixed_trash_def)
 
-    result = await subject.get_deck_fixed_labware(ot2_standard_deck_def)
+    result = await subject.get_deck_fixed_labware(True, ot2_standard_deck_def, None)
 
     assert result == [
         DeckFixedLabware(
@@ -74,7 +77,7 @@ async def test_get_deck_labware_fixtures_ot2_standard(
 
 async def test_get_deck_labware_fixtures_ot2_short_trash(
     decoy: Decoy,
-    ot2_short_trash_deck_def: DeckDefinitionV4,
+    ot2_short_trash_deck_def: DeckDefinitionV5,
     ot2_short_fixed_trash_def: LabwareDefinition,
     mock_labware_data_provider: LabwareDataProvider,
 ) -> None:
@@ -91,7 +94,7 @@ async def test_get_deck_labware_fixtures_ot2_short_trash(
         )
     ).then_return(ot2_short_fixed_trash_def)
 
-    result = await subject.get_deck_fixed_labware(ot2_short_trash_deck_def)
+    result = await subject.get_deck_fixed_labware(True, ot2_short_trash_deck_def, None)
 
     assert result == [
         DeckFixedLabware(
@@ -104,7 +107,7 @@ async def test_get_deck_labware_fixtures_ot2_short_trash(
 
 async def test_get_deck_labware_fixtures_ot3_standard(
     decoy: Decoy,
-    ot3_standard_deck_def: DeckDefinitionV4,
+    ot3_standard_deck_def: DeckDefinitionV5,
     ot3_fixed_trash_def: LabwareDefinition,
     mock_labware_data_provider: LabwareDataProvider,
 ) -> None:
@@ -121,7 +124,7 @@ async def test_get_deck_labware_fixtures_ot3_standard(
         )
     ).then_return(ot3_fixed_trash_def)
 
-    result = await subject.get_deck_fixed_labware(ot3_standard_deck_def)
+    result = await subject.get_deck_fixed_labware(True, ot3_standard_deck_def, None)
 
     assert result == [
         DeckFixedLabware(

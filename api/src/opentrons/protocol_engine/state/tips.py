@@ -1,49 +1,32 @@
 """Tip state tracking."""
-from dataclasses import dataclass
-from enum import Enum
-from typing import Dict, Optional, List, Union
 
-from .abstract_store import HasState, HandlesActions
-from ..actions import (
-    Action,
-    UpdateCommandAction,
-    ResetTipsAction,
+from dataclasses import dataclass
+from typing import Dict, Iterable, Optional, List, Set
+
+from opentrons.types import NozzleMapInterface, NozzleConfigurationType
+from opentrons.protocol_engine.state import update_types
+from opentrons.protocol_engine.types import TipRackWellState
+
+from ._abstract_store import HasState, HandlesActions
+from ._well_math import (
+    wells_covered_dense,
+    wells_covered_by_pipette_configuration,
+    wells_covered_by_physical_pipette,
 )
-from ..commands import (
-    Command,
-    LoadLabwareResult,
-    PickUpTipResult,
-    DropTipResult,
-    DropTipInPlaceResult,
-)
-from ..commands.configuring_common import (
-    PipetteConfigUpdateResultMixin,
-    PipetteNozzleLayoutResultMixin,
-)
+from ..actions import Action, get_state_updates
 
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 
 
-class TipRackWellState(Enum):
-    """The state of a single tip in a tip rack's well."""
-
-    CLEAN = "clean"
-    USED = "used"
-
-
-TipRackStateByWellName = Dict[str, TipRackWellState]
+_TipRackStateByWellName = Dict[str, TipRackWellState]
 
 
 @dataclass
 class TipState:
     """State of all tips."""
 
-    tips_by_labware_id: Dict[str, TipRackStateByWellName]
-    column_by_labware_id: Dict[str, List[List[str]]]
-    channels_by_pipette_id: Dict[str, int]
-    length_by_pipette_id: Dict[str, float]
-    active_channels_by_pipette_id: Dict[str, int]
-    nozzle_map_by_pipette_id: Dict[str, NozzleMap]
+    tips_by_labware_id: Dict[str, _TipRackStateByWellName]
+    columns_by_labware_id: Dict[str, List[List[str]]]
 
 
 class TipStore(HasState[TipState], HandlesActions):
@@ -55,118 +38,58 @@ class TipStore(HasState[TipState], HandlesActions):
         """Initialize a liquid store and its state."""
         self._state = TipState(
             tips_by_labware_id={},
-            column_by_labware_id={},
-            channels_by_pipette_id={},
-            length_by_pipette_id={},
-            active_channels_by_pipette_id={},
-            nozzle_map_by_pipette_id={},
+            columns_by_labware_id={},
         )
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
-        if isinstance(action, UpdateCommandAction):
-            if isinstance(action.private_result, PipetteConfigUpdateResultMixin):
-                pipette_id = action.private_result.pipette_id
-                config = action.private_result.config
-                self._state.channels_by_pipette_id[pipette_id] = config.channels
-                self._state.active_channels_by_pipette_id[pipette_id] = config.channels
-                self._state.nozzle_map_by_pipette_id[pipette_id] = config.nozzle_map
-            self._handle_command(action.command)
+        for state_update in get_state_updates(action):
+            self._handle_state_update(state_update)
 
-            if isinstance(action.private_result, PipetteNozzleLayoutResultMixin):
-                pipette_id = action.private_result.pipette_id
-                nozzle_map = action.private_result.nozzle_map
-                if nozzle_map:
-                    self._state.active_channels_by_pipette_id[
-                        pipette_id
-                    ] = nozzle_map.tip_count
-                    self._state.nozzle_map_by_pipette_id[pipette_id] = nozzle_map
-                else:
-                    self._state.active_channels_by_pipette_id[
-                        pipette_id
-                    ] = self._state.channels_by_pipette_id[pipette_id]
-
-        elif isinstance(action, ResetTipsAction):
-            labware_id = action.labware_id
-
-            for well_name in self._state.tips_by_labware_id[labware_id].keys():
-                self._state.tips_by_labware_id[labware_id][
-                    well_name
-                ] = TipRackWellState.CLEAN
-
-    def _handle_command(self, command: Command) -> None:
-        if (
-            isinstance(command.result, LoadLabwareResult)
-            and command.result.definition.parameters.isTiprack
-        ):
-            labware_id = command.result.labwareId
-            definition = command.result.definition
-            self._state.tips_by_labware_id[labware_id] = {
-                well_name: TipRackWellState.CLEAN
-                for column in definition.ordering
-                for well_name in column
-            }
-            self._state.column_by_labware_id[labware_id] = [
-                column for column in definition.ordering
-            ]
-
-        elif isinstance(command.result, PickUpTipResult):
-            labware_id = command.params.labwareId
-            well_name = command.params.wellName
-            pipette_id = command.params.pipetteId
-            length = command.result.tipLength
-            self._set_used_tips(
-                pipette_id=pipette_id, well_name=well_name, labware_id=labware_id
+    def _handle_state_update(self, state_update: update_types.StateUpdate) -> None:
+        if state_update.tips_state != update_types.NO_CHANGE:
+            self._set_tip_state(
+                labware_id=state_update.tips_state.labware_id,
+                well_names=state_update.tips_state.well_names,
+                tip_state=state_update.tips_state.tip_state,
             )
-            self._state.length_by_pipette_id[pipette_id] = length
 
-        elif isinstance(command.result, (DropTipResult, DropTipInPlaceResult)):
-            pipette_id = command.params.pipetteId
-            self._state.length_by_pipette_id.pop(pipette_id, None)
+        if state_update.loaded_labware != update_types.NO_CHANGE:
+            labware_id = state_update.loaded_labware.labware_id
+            definition = state_update.loaded_labware.definition
+            if definition.parameters.isTiprack:
+                self._state.tips_by_labware_id[labware_id] = {
+                    well_name: TipRackWellState.CLEAN
+                    for column in definition.ordering
+                    for well_name in column
+                }
+                self._state.columns_by_labware_id[labware_id] = [
+                    column for column in definition.ordering
+                ]
+        if state_update.batch_loaded_labware != update_types.NO_CHANGE:
+            for labware_id in state_update.batch_loaded_labware.new_locations_by_id:
+                definition = state_update.batch_loaded_labware.definitions_by_id[
+                    labware_id
+                ]
+                if definition.parameters.isTiprack:
+                    self._state.tips_by_labware_id[labware_id] = {
+                        well_name: TipRackWellState.CLEAN
+                        for column in definition.ordering
+                        for well_name in column
+                    }
+                    self._state.columns_by_labware_id[labware_id] = [
+                        column for column in definition.ordering
+                    ]
 
-    def _set_used_tips(  # noqa: C901
-        self, pipette_id: str, well_name: str, labware_id: str
+    def _set_tip_state(
+        self, labware_id: str, well_names: Iterable[str], tip_state: TipRackWellState
     ) -> None:
-        columns = self._state.column_by_labware_id.get(labware_id, [])
-        wells = self._state.tips_by_labware_id.get(labware_id, {})
-        nozzle_map = self._state.nozzle_map_by_pipette_id[pipette_id]
-
-        # TODO (cb, 02-28-2024): Transition from using partial nozzle map to full instrument map for the set used logic
-        num_nozzle_cols = len(nozzle_map.columns)
-        num_nozzle_rows = len(nozzle_map.rows)
-
-        critical_column = 0
-        critical_row = 0
-        for column in columns:
-            if well_name in column:
-                critical_row = column.index(well_name)
-                critical_column = columns.index(column)
-
-        for i in range(num_nozzle_cols):
-            for j in range(num_nozzle_rows):
-                if nozzle_map.starting_nozzle == "A1":
-                    if (critical_column + i < len(columns)) and (
-                        critical_row + j < len(columns[critical_column])
-                    ):
-                        well = columns[critical_column + i][critical_row + j]
-                        wells[well] = TipRackWellState.USED
-                elif nozzle_map.starting_nozzle == "A12":
-                    if (critical_column - i >= 0) and (
-                        critical_row + j < len(columns[critical_column])
-                    ):
-                        well = columns[critical_column - i][critical_row + j]
-                        wells[well] = TipRackWellState.USED
-                elif nozzle_map.starting_nozzle == "H1":
-                    if (critical_column + i < len(columns)) and (critical_row - j >= 0):
-                        well = columns[critical_column + i][critical_row - j]
-                        wells[well] = TipRackWellState.USED
-                elif nozzle_map.starting_nozzle == "H12":
-                    if (critical_column - i >= 0) and (critical_row - j >= 0):
-                        well = columns[critical_column - i][critical_row - j]
-                        wells[well] = TipRackWellState.USED
+        well_states = self._state.tips_by_labware_id.get(labware_id, {})
+        for well_name in well_names:
+            well_states[well_name] = tip_state
 
 
-class TipView(HasState[TipState]):
+class TipView:
     """Read-only tip state view."""
 
     _state: TipState
@@ -184,218 +107,17 @@ class TipView(HasState[TipState]):
         labware_id: str,
         num_tips: int,
         starting_tip_name: Optional[str],
-        nozzle_map: Optional[NozzleMap],
+        nozzle_map: Optional[NozzleMapInterface],
     ) -> Optional[str]:
-        """Get the next available clean tip. Does not support use of a starting tip if the pipette used is in a partial configuration."""
-        wells = self._state.tips_by_labware_id.get(labware_id, {})
-        columns = self._state.column_by_labware_id.get(labware_id, [])
+        """Gets the next available clean tip.
 
-        def _identify_tip_cluster(
-            active_columns: int,
-            active_rows: int,
-            critical_column: int,
-            critical_row: int,
-            entry_well: str,
-        ) -> Optional[List[str]]:
-            tip_cluster = []
-            for i in range(active_columns):
-                if entry_well == "A1" or entry_well == "H1":
-                    if critical_column - i >= 0:
-                        column = columns[critical_column - i]
-                    else:
-                        return None
-                elif entry_well == "A12" or entry_well == "H12":
-                    if critical_column + i < len(columns):
-                        column = columns[critical_column + i]
-                    else:
-                        return None
-                else:
-                    raise ValueError(
-                        f"Invalid entry well {entry_well} for tip cluster identification."
-                    )
-                for j in range(active_rows):
-                    if entry_well == "A1" or entry_well == "A12":
-                        if critical_row - j >= 0:
-                            well = column[critical_row - j]
-                        else:
-                            return None
-                    elif entry_well == "H1" or entry_well == "H12":
-                        if critical_row + j < len(column):
-                            well = column[critical_row + j]
-                        else:
-                            return None
-                    tip_cluster.append(well)
-
-            if any(well not in [*wells] for well in tip_cluster):
-                return None
-
-            return tip_cluster
-
-        def _validate_tip_cluster(
-            active_columns: int, active_rows: int, tip_cluster: List[str]
-        ) -> Union[str, int, None]:
-            if not any(wells[well] == TipRackWellState.USED for well in tip_cluster):
-                return tip_cluster[0]
-            elif all(wells[well] == TipRackWellState.USED for well in tip_cluster):
-                return None
-            else:
-                # The tip cluster list is ordered: Each row from a column in order by columns
-                tip_cluster_final_column = []
-                for i in range(active_rows):
-                    tip_cluster_final_column.append(
-                        tip_cluster[((active_columns * active_rows) - 1) - i]
-                    )
-                tip_cluster_final_row = []
-                for i in range(active_columns):
-                    tip_cluster_final_row.append(
-                        tip_cluster[(active_rows - 1) + (i * active_rows)]
-                    )
-                if all(
-                    wells[well] == TipRackWellState.USED
-                    for well in tip_cluster_final_column
-                ):
-                    return None
-                elif all(
-                    wells[well] == TipRackWellState.USED
-                    for well in tip_cluster_final_row
-                ):
-                    return None
-                else:
-                    # Tiprack has no valid tip selection, cannot progress
-                    return -1
-
-        # Search through the tiprack beginning at A1
-        def _cluster_search_A1(active_columns: int, active_rows: int) -> Optional[str]:
-            critical_column = active_columns - 1
-            critical_row = active_rows - 1
-
-            while critical_column <= len(columns):
-                tip_cluster = _identify_tip_cluster(
-                    active_columns, active_rows, critical_column, critical_row, "A1"
-                )
-                if tip_cluster is not None:
-                    result = _validate_tip_cluster(
-                        active_columns, active_rows, tip_cluster
-                    )
-                    if isinstance(result, str):
-                        return result
-                    elif isinstance(result, int) and result == -1:
-                        return None
-                if critical_row + active_rows < len(columns[0]):
-                    critical_row = critical_row + active_rows
-                else:
-                    critical_column = critical_column + 1
-                    critical_row = active_rows - 1
-            return None
-
-        # Search through the tiprack beginning at A12
-        def _cluster_search_A12(active_columns: int, active_rows: int) -> Optional[str]:
-            critical_column = len(columns) - active_columns
-            critical_row = active_rows - 1
-
-            while critical_column >= 0:
-                tip_cluster = _identify_tip_cluster(
-                    active_columns, active_rows, critical_column, critical_row, "A12"
-                )
-                if tip_cluster is not None:
-                    result = _validate_tip_cluster(
-                        active_columns, active_rows, tip_cluster
-                    )
-                    if isinstance(result, str):
-                        return result
-                    elif isinstance(result, int) and result == -1:
-                        return None
-                if critical_row + active_rows < len(columns[0]):
-                    critical_row = critical_row + active_rows
-                else:
-                    critical_column = critical_column - 1
-                    critical_row = active_rows - 1
-            return None
-
-        # Search through the tiprack beginning at H1
-        def _cluster_search_H1(active_columns: int, active_rows: int) -> Optional[str]:
-            critical_column = active_columns - 1
-            critical_row = len(columns[critical_column]) - active_rows
-
-            while critical_column <= len(columns):  # change to max size of labware
-                tip_cluster = _identify_tip_cluster(
-                    active_columns, active_rows, critical_column, critical_row, "H1"
-                )
-                if tip_cluster is not None:
-                    result = _validate_tip_cluster(
-                        active_columns, active_rows, tip_cluster
-                    )
-                    if isinstance(result, str):
-                        return result
-                    elif isinstance(result, int) and result == -1:
-                        return None
-                if critical_row - active_rows >= 0:
-                    critical_row = critical_row - active_rows
-                else:
-                    critical_column = critical_column + 1
-                    critical_row = len(columns[critical_column]) - active_rows
-            return None
-
-        # Search through the tiprack beginning at H12
-        def _cluster_search_H12(active_columns: int, active_rows: int) -> Optional[str]:
-            critical_column = len(columns) - active_columns
-            critical_row = len(columns[critical_column]) - active_rows
-
-            while critical_column >= 0:
-                tip_cluster = _identify_tip_cluster(
-                    active_columns, active_rows, critical_column, critical_row, "H12"
-                )
-                if tip_cluster is not None:
-                    result = _validate_tip_cluster(
-                        active_columns, active_rows, tip_cluster
-                    )
-                    if isinstance(result, str):
-                        return result
-                    elif isinstance(result, int) and result == -1:
-                        return None
-                if critical_row - active_rows >= 0:
-                    critical_row = critical_row - active_rows
-                else:
-                    critical_column = critical_column - 1
-                    critical_row = len(columns[critical_column]) - active_rows
-            return None
-
-        if starting_tip_name is None and nozzle_map is not None and columns:
-            num_channels = len(nozzle_map.full_instrument_map_store)
-            num_nozzle_cols = len(nozzle_map.columns)
-            num_nozzle_rows = len(nozzle_map.rows)
-            # Each pipette's cluster search is determined by the point of entry for a given pipette/configuration:
-            # - Single channel pipettes always search a tiprack top to bottom, left to right
-            # - Eight channel pipettes will begin at the top if the primary nozzle is H1 and at the bottom if
-            #   it is A1. The eight channel will always progress across the columns left to right.
-            # - 96 Channel pipettes will begin in the corner opposite their primary/starting nozzle (if starting nozzle = A1, enter tiprack at H12)
-            #   The 96 channel will then progress towards the opposite corner, either going up or down, left or right depending on configuration.
-
-            if num_channels == 1:
-                return _cluster_search_A1(num_nozzle_cols, num_nozzle_rows)
-            elif num_channels == 8:
-                if nozzle_map.starting_nozzle == "A1":
-                    return _cluster_search_H1(num_nozzle_cols, num_nozzle_rows)
-                elif nozzle_map.starting_nozzle == "H1":
-                    return _cluster_search_A1(num_nozzle_cols, num_nozzle_rows)
-            elif num_channels == 96:
-                if nozzle_map.starting_nozzle == "A1":
-                    return _cluster_search_H12(num_nozzle_cols, num_nozzle_rows)
-                elif nozzle_map.starting_nozzle == "A12":
-                    return _cluster_search_H1(num_nozzle_cols, num_nozzle_rows)
-                elif nozzle_map.starting_nozzle == "H1":
-                    return _cluster_search_A12(num_nozzle_cols, num_nozzle_rows)
-                elif nozzle_map.starting_nozzle == "H12":
-                    return _cluster_search_A1(num_nozzle_cols, num_nozzle_rows)
-                else:
-                    raise ValueError(
-                        f"Nozzle {nozzle_map.starting_nozzle} is an invalid starting tip for automatic tip pickup."
-                    )
-            else:
-                raise RuntimeError(
-                    "Invalid number of channels for automatic tip tracking."
-                )
+        Does not support use of a starting tip if the pipette used is in a partial configuration.
+        """
+        if starting_tip_name is None and nozzle_map is not None:
+            return self._get_next_tip_with_nozzle_map(labware_id, nozzle_map)
         else:
+            wells = self._state.tips_by_labware_id.get(labware_id, {})
+            columns = self._state.columns_by_labware_id.get(labware_id, [])
             if columns and num_tips == len(columns[0]):  # Get next tips for 8-channel
                 column_head = [column[0] for column in columns]
                 starting_column_index = 0
@@ -409,15 +131,15 @@ class TipView(HasState[TipState]):
                                 starting_column_index = idx
 
                 for column in columns[starting_column_index:]:
-                    if not any(wells[well] == TipRackWellState.USED for well in column):
+                    if all(wells[well] == TipRackWellState.CLEAN for well in column):
                         return column[0]
 
             elif num_tips == len(wells.keys()):  # Get next tips for 96 channel
                 if starting_tip_name and starting_tip_name != columns[0][0]:
                     return None
 
-                if not any(
-                    tip_state == TipRackWellState.USED for tip_state in wells.values()
+                if all(
+                    tip_state == TipRackWellState.CLEAN for tip_state in wells.values()
                 ):
                     return next(iter(wells))
 
@@ -430,17 +152,69 @@ class TipView(HasState[TipState]):
                         return well_name
         return None
 
-    def get_pipette_channels(self, pipette_id: str) -> int:
-        """Return the given pipette's number of channels."""
-        return self._state.channels_by_pipette_id[pipette_id]
+    def _get_next_tip_with_nozzle_map(
+        self,
+        labware_id: str,
+        nozzle_map: NozzleMapInterface,
+    ) -> Optional[str]:
+        """Get the next available clean tip for given nozzle configuration if one can be found."""
+        tip_well_states = self._state.tips_by_labware_id.get(labware_id, {})
+        wells_by_columns = self._state.columns_by_labware_id.get(labware_id, [])
 
-    def get_pipette_active_channels(self, pipette_id: str) -> int:
-        """Get the number of channels being used in the given pipette's configuration."""
-        return self._state.active_channels_by_pipette_id[pipette_id]
+        def _validate_wells(well_list: Set[str], target_well: str) -> bool:
+            # If we are not picking up the correct number of tips it's not valid
+            if len(well_list) != nozzle_map.tip_count:
+                return False
+            # If not all the tips we'll be picking up are clean it's not valid
+            target_well_states = [tip_well_states[well_name] for well_name in well_list]
+            if not all(state == TipRackWellState.CLEAN for state in target_well_states):
+                return False
+            # Since we know a full configuration will always produce zero non-active overlapping wells
+            # we can skip the following checks if it is a full configuration.
+            if nozzle_map.configuration != NozzleConfigurationType.FULL:
+                # If we have a partial configuration we need to ensure that any wells in the way are NOT present
+                wells_covered_physically = set(
+                    wells_covered_by_physical_pipette(
+                        nozzle_map=nozzle_map,  # type: ignore[arg-type]
+                        target_well=target_well,
+                        labware_wells_by_column=wells_by_columns,
+                    )
+                )
+                wells_in_way_well_state = [
+                    tip_well_states[well_name]
+                    for well_name in wells_covered_physically.difference(well_list)
+                ]
+                # TODO(jbl 2025-08-25) this should be changed to ensure all these extra wells are EMPTY when further
+                #   tip return work occurs
+                if any(
+                    well_state == TipRackWellState.CLEAN
+                    for well_state in wells_in_way_well_state
+                ):
+                    return False
 
-    def get_pipette_nozzle_map(self, pipette_id: str) -> NozzleMap:
-        """Get the current nozzle map the given pipette's configuration."""
-        return self._state.nozzle_map_by_pipette_id[pipette_id]
+            return True
+
+        # Get an ordered list of wells to most efficiently search, depending on pipette configuration
+        target_well_list = _resolve_well_order(wells_by_columns, nozzle_map)
+
+        for well in target_well_list:
+            # If the target well/tip isn't clean, skip to the next one. This will be checked
+            # again in _validate_wells, but we can short circuit the following checks if this is False
+            if tip_well_states[well] != TipRackWellState.CLEAN:
+                continue
+            # Get list of all wells (i.e. tips) that would be covered by the active nozzles
+            targeted_wells = set(
+                wells_covered_by_pipette_configuration(
+                    nozzle_map=nozzle_map,  # type: ignore[arg-type]
+                    target_well=well,
+                    labware_wells_by_column=wells_by_columns,
+                )
+            )
+            # If we are picking up the correct number of tips, return that target well
+            if _validate_wells(targeted_wells, target_well=well):
+                return well
+
+        return None
 
     def has_clean_tip(self, labware_id: str, well_name: str) -> bool:
         """Get whether a well in a labware has a clean tip.
@@ -458,20 +232,108 @@ class TipView(HasState[TipState]):
 
         return well_state == TipRackWellState.CLEAN
 
-    def get_tip_length(self, pipette_id: str) -> float:
-        """Return the given pipette's tip length."""
-        return self._state.length_by_pipette_id.get(pipette_id, 0)
+    def compute_tips_to_mark_as_used_or_empty(
+        self, labware_id: str, well_name: str, nozzle_map: NozzleMap
+    ) -> list[str]:
+        """Compute which tips a hypothetical tip pickup/drop should mark as "used" or "empty".
+
+        Params:
+            labware_id: The labware ID of the tip rack.
+            well_name: The single target well of the tip pickup.
+            nozzle_map: The nozzle configuration that the pipette will use for the pickup.
+
+        Returns:
+            The well names of all the tips that the operation will use.
+        """
+        columns = self._state.columns_by_labware_id.get(labware_id, [])
+        return list(
+            wells_covered_dense(
+                nozzle_map.columns,
+                nozzle_map.rows,
+                nozzle_map.starting_nozzle,
+                well_name,
+                columns,
+            )
+        )
 
 
 def _drop_wells_before_starting_tip(
-    wells: TipRackStateByWellName, starting_tip_name: str
-) -> TipRackStateByWellName:
+    wells: _TipRackStateByWellName, starting_tip_name: str
+) -> _TipRackStateByWellName:
     """Drop any wells that come before the starting tip and return the remaining ones after."""
     seen_starting_well = False
-    remaining_wells = {}
+    remaining_wells: dict[str, TipRackWellState] = {}
     for well_name, tip_state in wells.items():
         if well_name == starting_tip_name:
             seen_starting_well = True
         if seen_starting_well:
             remaining_wells[well_name] = tip_state
     return remaining_wells
+
+
+def _resolve_well_order(  # noqa: C901
+    well_list: List[List[str]], nozzle_map: NozzleMapInterface
+) -> List[str]:
+    """Given a list of ordered columns and pipette information, returns a flat list of wells ordered for tip pick up.
+
+    Wells can be ordered in four different ways:
+        - Top to bottom, left to right (A1, B1, ... A2, B2, ... G12, H12)
+        - Top to bottom, right to left (A12, B12, ... A11, B11, ... G1, H1)
+        - Bottom to top, left to right (H1, G1, ... H2, G2, ... B12, A12)
+        - Bottom to top, right to left (A12, B12, ... A11, B11, ... G1, H1)
+
+    - Full configurations (which will always cover a single channel) will go top to bottom, left to right.
+    - A partial 8-channel pipette configuration will always search left to right, starting at either top to bottom for
+        starting nozzle H1 or bottom to top for starting nozzle A1
+    - A partial 96-channel pipette configuration will always begin in the opposite corner of the starting nozzle
+    """
+    if nozzle_map.configuration == NozzleConfigurationType.FULL:
+        return _get_top_to_bottom_left_to_right(well_list)
+    elif nozzle_map.physical_nozzle_count == 8:
+        if nozzle_map.starting_nozzle == "A1":
+            return _get_bottom_to_top_left_to_right(well_list)
+        elif nozzle_map.starting_nozzle == "H1":
+            return _get_top_to_bottom_left_to_right(well_list)
+        else:
+            raise ValueError(
+                f"Nozzle {nozzle_map.starting_nozzle} is an invalid starting tip for"
+                " 8-channel pipette automatic tip pickup."
+            )
+    elif nozzle_map.physical_nozzle_count == 96:
+        if nozzle_map.starting_nozzle == "A1":
+            return _get_bottom_to_top_right_to_left(well_list)
+        elif nozzle_map.starting_nozzle == "A12":
+            return _get_bottom_to_top_left_to_right(well_list)
+        elif nozzle_map.starting_nozzle == "H1":
+            return _get_top_to_bottom_right_to_left(well_list)
+        elif nozzle_map.starting_nozzle == "H12":
+            return _get_top_to_bottom_left_to_right(well_list)
+        else:
+            raise ValueError(
+                f"Nozzle {nozzle_map.starting_nozzle} is an invalid starting tip for 96-channel automatic tip pickup."
+            )
+    else:
+        raise ValueError(
+            f"Automatic tip pickup does not support {nozzle_map.physical_nozzle_count}-channel pipettes"
+        )
+
+
+def _get_top_to_bottom_left_to_right(well_list: List[List[str]]) -> List[str]:
+    return [well for column in well_list for well in column]
+
+
+def _get_bottom_to_top_left_to_right(well_list: List[List[str]]) -> List[str]:
+    reverse_column_ordering = [list(reversed(column)) for column in well_list]
+    return [well for column in reverse_column_ordering for well in column]
+
+
+def _get_top_to_bottom_right_to_left(well_list: List[List[str]]) -> List[str]:
+    reverse_row_ordering = list(reversed(well_list))
+    return [well for column in reverse_row_ordering for well in column]
+
+
+def _get_bottom_to_top_right_to_left(well_list: List[List[str]]) -> List[str]:
+    reverse_row_column_ordering = [
+        list(reversed(column)) for column in reversed(well_list)
+    ]
+    return [well for column in reverse_row_column_ordering for well in column]

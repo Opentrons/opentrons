@@ -1,11 +1,11 @@
 // TODO(mc, 2018-08-08): figure out type exports from app
+import type { Logger } from '@opentrons/app/src/logger'
 import type {
   Action,
   Error as PlainError,
 } from '@opentrons/app/src/redux/types'
-
 import type { Config } from './config'
-import type { Logger } from '@opentrons/app/src/logger'
+
 export type { Action, PlainError }
 
 export type Dispatch = (action: Action) => void
@@ -38,6 +38,7 @@ export type CHANGE_CUSTOM_LABWARE_DIRECTORY_TYPE = 'labware:CHANGE_CUSTOM_LABWAR
 export type ADD_CUSTOM_LABWARE_TYPE = 'labware:ADD_CUSTOM_LABWARE'
 export type ADD_CUSTOM_LABWARE_FILE_TYPE = 'labware:ADD_CUSTOM_LABWARE_FILE'
 export type ADD_CUSTOM_LABWARE_FAILURE_TYPE = 'labware:ADD_CUSTOM_LABWARE_FAILURE'
+export type ADD_CUSTOM_LABWARE_FILE_FROM_CREATOR_TYPE = 'labware:ADD_CUSTOM_LABWARE_FILE_BLOB'
 export type CLEAR_ADD_CUSTOM_LABWARE_FAILURE_TYPE = 'labware:CLEAR_ADD_CUSTOM_LABWARE_FAILURE'
 export type ADD_NEW_LABWARE_NAME_TYPE = 'labware:ADD_NEW_LABWARE_NAME'
 export type CLEAR_NEW_LABWARE_NAME_TYPE = 'labware:CLEAR_NEW_LABWARE_NAME'
@@ -79,6 +80,7 @@ export type USB_HTTP_REQUESTS_STOP_TYPE = 'shell:USB_HTTP_REQUESTS_STOP'
 export type APP_RESTART_TYPE = 'shell:APP_RESTART'
 export type RELOAD_UI_TYPE = 'shell:RELOAD_UI'
 export type SEND_LOG_TYPE = 'shell:SEND_LOG'
+export type CAMERA_STREAM_OPEN_TYPE = 'shell:CAMERA_STREAM_OPEN'
 
 // copy
 // TODO(mc, 2020-05-11): i18n
@@ -95,9 +97,11 @@ export type CLEAR_CACHE_TYPE = 'discovery:CLEAR_CACHE'
 export interface ConfigInitializedAction {
   type: CONFIG_INITIALIZED_TYPE
   payload: { config: Config }
+  meta: { shell: true }
 }
 
 export interface ConfigValueUpdatedAction {
   type: CONFIG_VALUE_UPDATED_TYPE
   payload: { path: string; value: any }
+  meta: { shell: true }
 }

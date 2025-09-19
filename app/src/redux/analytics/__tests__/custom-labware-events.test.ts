@@ -1,12 +1,11 @@
-import { describe, it, expect } from 'vitest'
-
-import { makeEvent } from '../make-event'
+import { describe, expect, it } from 'vitest'
 
 import * as CustomLabware from '../../custom-labware'
 import * as LabwareFixtures from '../../custom-labware/__fixtures__'
 import { ANALYTICS_ADD_CUSTOM_LABWARE } from '../constants'
+import { makeEvent } from '../make-event'
 
-import type { State, Action } from '../../types'
+import type { Action, State } from '../../types'
 import type { AnalyticsEvent } from '../types'
 
 interface EventSpec {

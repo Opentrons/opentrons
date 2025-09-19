@@ -1,7 +1,7 @@
 import { PATCH, request } from '../request'
 
 import type { ResponsePromise } from '../request'
-import type { HostConfig, EmptyResponse } from '../types'
+import type { EmptyResponse, HostConfig } from '../types'
 
 export function dismissCurrentRun(
   config: HostConfig,

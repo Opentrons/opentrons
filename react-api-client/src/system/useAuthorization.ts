@@ -1,13 +1,13 @@
-import * as React from 'react'
-import {
-  createAuthorization,
-  createRegistration,
-  HostConfig,
-} from '@opentrons/api-client'
+import { useEffect, useRef } from 'react'
+
+import { createAuthorization, createRegistration } from '@opentrons/api-client'
+
 import { useHost } from '../api'
+
 import type {
   AuthorizationToken,
   CreateRegistrationParams,
+  HostConfig,
   RegistrationToken,
 } from '@opentrons/api-client'
 
@@ -21,11 +21,14 @@ export function useAuthorization(
 ): UseAuthorizationResult {
   const host = useHost()
   // TODO(bh, 2023-05-31): refactor individual calls to react-query and separate mutations, consider moving this hook to app
-  const registrationToken = React.useRef<RegistrationToken | null>(null)
-  const authorizationToken = React.useRef<AuthorizationToken | null>(null)
+  const registrationToken = useRef<RegistrationToken | null>(null)
+  const authorizationToken = useRef<AuthorizationToken | null>(null)
 
-  React.useEffect(() => {
-    createRegistration(host as HostConfig, createRegistrationParams)
+  useEffect(() => {
+    if (host == null) {
+      return
+    }
+    createRegistration(host, createRegistrationParams)
       .then(response => {
         registrationToken.current = response.data
         return createAuthorization(host as HostConfig, response.data)
@@ -33,8 +36,7 @@ export function useAuthorization(
       .then(response => {
         authorizationToken.current = response.data
       })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [host])
 
   return {
     authorizationToken: authorizationToken.current,

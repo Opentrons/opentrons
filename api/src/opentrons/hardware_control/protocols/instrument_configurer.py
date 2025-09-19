@@ -1,7 +1,7 @@
 from typing import Dict, Optional
 from typing_extensions import Protocol
 
-from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons_shared_data.pipette.types import PipetteName
 from opentrons.types import Mount
 from .types import MountArgType
 
@@ -142,15 +142,27 @@ class InstrumentConfigurer(Protocol[MountArgType]):
         """
         ...
 
-    async def add_tip(self, mount: MountArgType, tip_length: float) -> None:
+    # todo(mm, 2024-10-17): Consider deleting this in favor of cache_tip()
+    # if we can do so without breaking anything.
+    def add_tip(self, mount: MountArgType, tip_length: float) -> None:
         """Inform the hardware that a tip is now attached to a pipette.
+
+        If a tip is already attached, this no-ops.
 
         This changes the critical point of the pipette to make sure that
         the end of the tip is what moves around, and allows liquid handling.
         """
         ...
 
-    async def remove_tip(self, mount: MountArgType) -> None:
+    def cache_tip(self, mount: MountArgType, tip_length: float) -> None:
+        """Inform the hardware that a tip is now attached to a pipette.
+
+        This is like `add_tip()`, except that if a tip is already attached,
+        this replaces it instead of no-opping.
+        """
+        ...
+
+    def remove_tip(self, mount: MountArgType) -> None:
         """Inform the hardware that a tip is no longer attached to a pipette.
 
         This changes the critical point of the system to the end of the

@@ -1239,7 +1239,7 @@
   "commands": [
     {
       "commandType": "loadPipette",
-      "id": "0abc123",
+      "key": "0abc123",
       "params": {
         "pipetteId": "pipetteId",
         "mount": "left"
@@ -1247,7 +1247,7 @@
     },
     {
       "commandType": "loadModule",
-      "id": "1abc123",
+      "key": "1abc123",
       "params": {
         "moduleId": "magneticModuleId",
         "location": { "slotName": "3" }
@@ -1255,7 +1255,7 @@
     },
     {
       "commandType": "loadModule",
-      "id": "2abc123",
+      "key": "2abc123",
       "params": {
         "moduleId": "temperatureModuleId",
         "location": { "slotName": "1" }
@@ -1263,7 +1263,7 @@
     },
     {
       "commandType": "loadLabware",
-      "id": "3abc123",
+      "key": "3abc123",
       "params": {
         "labwareId": "sourcePlateId",
         "location": {
@@ -1273,7 +1273,7 @@
     },
     {
       "commandType": "loadLabware",
-      "id": "4abc123",
+      "key": "4abc123",
       "params": {
         "labwareId": "destPlateId",
         "location": {
@@ -1283,7 +1283,7 @@
     },
     {
       "commandType": "loadLabware",
-      "id": "5abc123",
+      "key": "5abc123",
       "params": {
         "labwareId": "tipRackId",
         "location": { "slotName": "8" }
@@ -1291,7 +1291,7 @@
     },
     {
       "commandType": "loadLiquid",
-      "id": "7abc123",
+      "key": "7abc123",
       "params": {
         "liquidId": "waterId",
         "labwareId": "sourcePlateId",
@@ -1303,12 +1303,12 @@
     },
     {
       "commandType": "home",
-      "id": "00abc123",
+      "key": "00abc123",
       "params": {}
     },
     {
       "commandType": "pickUpTip",
-      "id": "8abc123",
+      "key": "8abc123",
       "params": {
         "pipetteId": "pipetteId",
         "labwareId": "tipRackId",
@@ -1317,7 +1317,7 @@
     },
     {
       "commandType": "aspirate",
-      "id": "9abc123",
+      "key": "9abc123",
       "params": {
         "pipetteId": "pipetteId",
         "labwareId": "sourcePlateId",
@@ -1332,14 +1332,14 @@
     },
     {
       "commandType": "delay",
-      "id": "10abc123",
+      "key": "10abc123",
       "params": {
         "seconds": 42
       }
     },
     {
       "commandType": "dispense",
-      "id": "11abc123",
+      "key": "11abc123",
       "params": {
         "pipetteId": "pipetteId",
         "labwareId": "destPlateId",
@@ -1354,7 +1354,7 @@
     },
     {
       "commandType": "touchTip",
-      "id": "12abc123",
+      "key": "12abc123",
       "params": {
         "pipetteId": "pipetteId",
         "labwareId": "destPlateId",
@@ -1369,7 +1369,7 @@
     },
     {
       "commandType": "blowout",
-      "id": "13abc123",
+      "key": "13abc123",
       "params": {
         "pipetteId": "pipetteId",
         "labwareId": "destPlateId",
@@ -1383,7 +1383,7 @@
     },
     {
       "commandType": "moveToWell",
-      "id": "15abc123",
+      "key": "15abc123",
       "params": {
         "pipetteId": "pipetteId",
         "labwareId": "destPlateId",
@@ -1392,7 +1392,7 @@
     },
     {
       "commandType": "moveToWell",
-      "id": "16abc123",
+      "key": "16abc123",
       "params": {
         "pipetteId": "pipetteId",
         "labwareId": "destPlateId",
@@ -1408,7 +1408,7 @@
     },
     {
       "commandType": "dropTip",
-      "id": "17abc123",
+      "key": "17abc123",
       "params": {
         "pipetteId": "pipetteId",
         "labwareId": "fixedTrash",
@@ -1417,7 +1417,7 @@
     },
     {
       "commandType": "waitForResume",
-      "id": "18abc123",
+      "key": "18abc123",
       "params": {
         "message": "pause command"
       }
@@ -1425,7 +1425,7 @@
 
     {
       "commandType": "moveToCoordinates",
-      "id": "16abc123",
+      "key": "16abc123",
       "params": {
         "pipetteId": "pipetteId",
         "coordinates": { "x": 0, "y": 0, "z": 0 },
@@ -1436,7 +1436,7 @@
     },
     {
       "commandType": "moveRelative",
-      "id": "18abc123",
+      "key": "18abc123",
       "params": {
         "pipetteId": "pipetteId",
         "axis": "x",
@@ -1445,7 +1445,7 @@
     },
     {
       "commandType": "moveRelative",
-      "id": "19abc123",
+      "key": "19abc123",
       "params": {
         "pipetteId": "pipetteId",
         "axis": "y",
@@ -1454,14 +1454,14 @@
     },
     {
       "commandType": "savePosition",
-      "id": "21abc123",
+      "key": "21abc123",
       "params": {
         "pipetteId": "pipetteId"
       }
     },
     {
       "commandType": "moveRelative",
-      "id": "20abc123",
+      "key": "20abc123",
       "params": {
         "pipetteId": "pipetteId",
         "axis": "z",
@@ -1470,7 +1470,7 @@
     },
     {
       "commandType": "savePosition",
-      "id": "21abc123",
+      "key": "21abc123",
       "params": {
         "pipetteId": "pipetteId",
         "positionId": "positionId"

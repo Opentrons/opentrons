@@ -1,5 +1,7 @@
-import { getModuleState } from '../robotStateSelectors'
 import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
+
+import { getModuleState } from '../robotStateSelectors'
+
 import type {
   EngageMagnetParams,
   ModuleOnlyParams,

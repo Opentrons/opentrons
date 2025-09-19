@@ -10,5 +10,6 @@
   "orderedColumns": [{ "key": "1", "orderedNozzles": ["A1"] }],
   "nozzleMap": {
     "A1": [0.0, 0.0, 25.0]
-  }
+  },
+  "lldSettings": {}
 }

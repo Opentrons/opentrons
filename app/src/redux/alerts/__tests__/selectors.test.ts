@@ -1,10 +1,10 @@
-import { vi, describe, it, expect } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import * as Cfg from '../../config'
 import * as Selectors from '../selectors'
 
-import type { State } from '../../types'
 import type { Config } from '../../config/types'
+import type { State } from '../../types'
 import type { AlertId } from '../types'
 
 vi.mock('../../config/selectors')

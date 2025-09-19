@@ -1,30 +1,33 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
+
 import {
-  HandleKeypress,
-  TYPOGRAPHY,
-  COLORS,
-  SPACING,
-  Icon,
-  DIRECTION_COLUMN,
-  Flex,
-  DIRECTION_ROW,
-  TEXT_TRANSFORM_CAPITALIZE,
-  Box,
-  PrimaryButton,
-  BORDERS,
   ALIGN_FLEX_START,
+  BORDERS,
+  Box,
+  COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  DISPLAY_GRID,
+  Flex,
+  HandleKeypress,
+  Icon,
+  LegacyStyledText,
+  PrimaryButton,
+  SPACING,
+  TEXT_TRANSFORM_CAPITALIZE,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { ControlContainer } from './ControlContainer'
-
-import type { StepSize } from './types'
 import { TouchControlButton } from './TouchControlButton'
 
+import type { MouseEvent } from 'react'
+import type { StepSize } from './types'
+
 const JUMP_SIZE_SUBTITLE = '- / +'
-const JUMP_SIZE_ICON_STYLE = css`
+
+const StyledIcon = styled(Icon)`
   flex-shrink: 0;
 `
 
@@ -35,7 +38,7 @@ const stepSizeTranslationKeyByStep: { [stepSize: number]: string } = {
 }
 
 const BUTTON_WRAPPER_STYLE = css`
-  display: grid;
+  display: ${DISPLAY_GRID};
   grid-auto-flow: column;
   grid-gap: ${SPACING.spacing8};
   margin-top: ${SPACING.spacing16};
@@ -76,6 +79,7 @@ const DEFAULT_BUTTON_STYLE = css`
     color: ${COLORS.grey40};
   }
 `
+
 const ACTIVE_BUTTON_STYLE = css`
   ${DEFAULT_BUTTON_STYLE}
   color: ${COLORS.blue50};
@@ -87,11 +91,13 @@ const ACTIVE_BUTTON_STYLE = css`
     outline: 0;
   }
 `
+
 interface StepSizeControlProps {
   stepSizes: StepSize[]
   currentStepSize: StepSize
   setCurrentStepSize: (stepSize: StepSize) => void
 }
+
 export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
   const { stepSizes, currentStepSize, setCurrentStepSize } = props
   const { t } = useTranslation(['robot_calibration'])
@@ -106,9 +112,7 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
     if (i > 0) setCurrentStepSize(stepSizes[i - 1])
   }
 
-  const handleStepSelect = (
-    event: React.MouseEvent<HTMLButtonElement>
-  ): void => {
+  const handleStepSelect = (event: MouseEvent<HTMLButtonElement>): void => {
     setCurrentStepSize(Number(event.currentTarget.value) as StepSize)
     event.currentTarget.blur()
   }
@@ -126,18 +130,18 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
       >
         <Flex flexDirection={DIRECTION_COLUMN} flex="1">
           <Flex flexDirection={DIRECTION_ROW}>
-            <Icon name="jump-size" width="1.2rem" css={JUMP_SIZE_ICON_STYLE} />
-            <StyledText
+            <StyledIcon name="jump-size" width="1.2rem" />
+            <LegacyStyledText
               textTransform={TEXT_TRANSFORM_CAPITALIZE}
               css={TYPOGRAPHY.pSemiBold}
               marginLeft={SPACING.spacing8}
             >
               {t('jump_size')}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
-          <StyledText color={COLORS.grey60} css={TYPOGRAPHY.labelRegular}>
+          <LegacyStyledText color={COLORS.grey60} css={TYPOGRAPHY.labelRegular}>
             {JUMP_SIZE_SUBTITLE}
-          </StyledText>
+          </LegacyStyledText>
           <Box css={BUTTON_WRAPPER_STYLE}>
             {stepSizes.map((stepSize: StepSize, index) => {
               return (
@@ -152,10 +156,10 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
                   onClick={handleStepSelect}
                 >
                   {t(stepSizeTranslationKeyByStep[stepSize])}
-                  <StyledText
+                  <LegacyStyledText
                     color={COLORS.grey60}
                     css={TYPOGRAPHY.labelRegular}
-                  >{`${stepSize} mm`}</StyledText>
+                  >{`${stepSize} mm`}</LegacyStyledText>
                 </PrimaryButton>
               )
             })}
@@ -195,19 +199,19 @@ export function TouchStepSizeControl(props: StepSizeControlProps): JSX.Element {
               flexDirection={DIRECTION_COLUMN}
               alignItems={ALIGN_FLEX_START}
             >
-              <StyledText
+              <LegacyStyledText
                 as="p"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 color={selected ? COLORS.white : COLORS.black90}
               >
                 {t(stepSizeTranslationKeyByStep[stepSize])}
-              </StyledText>
-              <StyledText
+              </LegacyStyledText>
+              <LegacyStyledText
                 as="p"
                 color={selected ? COLORS.white : COLORS.grey60}
               >
                 {`${stepSize} mm`}
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
           </TouchControlButton>
         )

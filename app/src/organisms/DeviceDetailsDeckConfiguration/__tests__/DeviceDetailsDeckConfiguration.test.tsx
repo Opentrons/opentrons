@@ -1,24 +1,31 @@
-import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import { describe, it, beforeEach, vi, afterEach } from 'vitest'
 
 import { DeckConfigurator } from '@opentrons/components'
 import {
-  useDeckConfigurationQuery,
+  useModulesQuery,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
+import { TRASH_BIN_ADAPTER_FIXTURE } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { useIsRobotViewable, useRunStatuses } from '../../Devices/hooks'
-import { DeckFixtureSetupInstructionsModal } from '../DeckFixtureSetupInstructionsModal'
-import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { useIsRobotViewable } from '/app/redux-resources/robots'
+import { useDeckConfigurationEditingTools } from '/app/resources/deck_configuration/hooks/useDeckConfigurationEditingTools'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration/useNotifyDeckConfigurationQuery'
+import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
+import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
+import { useRunStatuses } from '/app/resources/runs'
+
 import { DeviceDetailsDeckConfiguration } from '../'
-import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs'
+import { DeckFixtureSetupInstructionsModal } from '../DeckFixtureSetupInstructionsModal'
 
+import type { ComponentProps } from 'react'
+import type { UseQueryResult } from 'react-query'
 import type { MaintenanceRun } from '@opentrons/api-client'
 import type * as OpentronsComponents from '@opentrons/components'
+import type { DeckConfiguration } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof OpentronsComponents>()
@@ -29,10 +36,21 @@ vi.mock('@opentrons/components', async importOriginal => {
 })
 vi.mock('@opentrons/react-api-client')
 vi.mock('../DeckFixtureSetupInstructionsModal')
-vi.mock('../../Devices/hooks')
-vi.mock('../../../resources/maintenance_runs')
-vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
+vi.mock('/app/resources/runs')
+vi.mock('/app/redux-resources/robots')
+vi.mock('/app/resources/maintenance_runs')
+vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
+vi.mock(
+  '/app/resources/deck_configuration/hooks/useDeckConfigurationEditingTools'
+)
+vi.mock('/app/resources/deck_configuration/useNotifyDeckConfigurationQuery')
 
+const mockDeckConfig = [
+  {
+    cutoutId: 'cutoutC3',
+    cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
+  },
+]
 const ROBOT_NAME = 'otie'
 const mockUpdateDeckConfiguration = vi.fn()
 const RUN_STATUSES = {
@@ -46,7 +64,7 @@ const mockCurrnetMaintenanceRun = {
 } as MaintenanceRun
 
 const render = (
-  props: React.ComponentProps<typeof DeviceDetailsDeckConfiguration>
+  props: ComponentProps<typeof DeviceDetailsDeckConfiguration>
 ) => {
   return renderWithProviders(<DeviceDetailsDeckConfiguration {...props} />, {
     i18nInstance: i18n,
@@ -54,13 +72,13 @@ const render = (
 }
 
 describe('DeviceDetailsDeckConfiguration', () => {
-  let props: React.ComponentProps<typeof DeviceDetailsDeckConfiguration>
+  let props: ComponentProps<typeof DeviceDetailsDeckConfiguration>
 
   beforeEach(() => {
     props = {
       robotName: ROBOT_NAME,
     }
-    vi.mocked(useDeckConfigurationQuery).mockReturnValue({ data: [] } as any)
+    vi.mocked(useModulesQuery).mockReturnValue({ data: { data: [] } } as any)
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
     } as any)
@@ -78,6 +96,14 @@ describe('DeviceDetailsDeckConfiguration', () => {
       .calledWith(ROBOT_NAME)
       .thenReturn(false)
     when(vi.mocked(useIsRobotViewable)).calledWith(ROBOT_NAME).thenReturn(true)
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
+      data: mockDeckConfig,
+    } as UseQueryResult<DeckConfiguration>)
+    vi.mocked(useDeckConfigurationEditingTools).mockReturnValue({
+      addFixtureToCutout: vi.fn(),
+      removeFixtureFromCutout: vi.fn(),
+      addFixtureModal: null,
+    })
   })
 
   afterEach(() => {
@@ -86,10 +112,10 @@ describe('DeviceDetailsDeckConfiguration', () => {
 
   it('should render text and button', () => {
     render(props)
-    screen.getByText('otie deck configuration')
+    screen.getByText('otie Deck configuration')
     screen.getByRole('button', { name: 'Setup Instructions' })
     screen.getByText('Location')
-    screen.getByText('Fixture')
+    screen.getByText('Deck hardware')
     screen.getByText('mock DeckConfigurator')
   })
 
@@ -127,7 +153,9 @@ describe('DeviceDetailsDeckConfiguration', () => {
   })
 
   it('should render no deck fixtures, if deck configs are not set', () => {
-    vi.mocked(useDeckConfigurationQuery).mockReturnValue([] as any)
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
+      data: [],
+    } as any)
     render(props)
     screen.getByText('No deck fixtures')
   })

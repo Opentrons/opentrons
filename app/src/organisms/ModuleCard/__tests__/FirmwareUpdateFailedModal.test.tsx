@@ -1,21 +1,22 @@
-import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { mockTemperatureModule } from '../../../redux/modules/__fixtures__'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { mockTemperatureModule } from '/app/redux/modules/__fixtures__'
+
 import { FirmwareUpdateFailedModal } from '../FirmwareUpdateFailedModal'
 
-const render = (
-  props: React.ComponentProps<typeof FirmwareUpdateFailedModal>
-) => {
+import type { ComponentProps } from 'react'
+
+const render = (props: ComponentProps<typeof FirmwareUpdateFailedModal>) => {
   return renderWithProviders(<FirmwareUpdateFailedModal {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
 describe('FirmwareUpdateFailedModal', () => {
-  let props: React.ComponentProps<typeof FirmwareUpdateFailedModal>
+  let props: ComponentProps<typeof FirmwareUpdateFailedModal>
   beforeEach(() => {
     props = {
       onCloseClick: vi.fn(),

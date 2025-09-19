@@ -2,16 +2,20 @@ import { ofType } from 'redux-observable'
 
 import { GET } from '../../robot-api/constants'
 import { mapToRobotApiRequest } from '../../robot-api/operators'
-
 import * as Actions from '../actions'
 import * as Constants from '../constants'
 
-import type { Action, Epic } from '../../types'
-
 import type { ResponseToActionMapper } from '../../robot-api/operators'
-import type { RobotApiRequestOptions } from '../../robot-api/types'
-
-import type { FetchSessionAction, CreateSessionCommandAction } from '../types'
+import type {
+  RobotApiRequestOptions,
+  RobotApiV2ErrorResponseBody,
+} from '../../robot-api/types'
+import type { Action, Epic } from '../../types'
+import type {
+  CreateSessionCommandAction,
+  FetchSessionAction,
+  SessionResponse,
+} from '../types'
 
 export const mapActionToRequest = (
   action: FetchSessionAction | CreateSessionCommandAction
@@ -28,11 +32,11 @@ const mapResponseToAction: ResponseToActionMapper<FetchSessionAction> = (
   const meta = { ...originalAction.meta, response: responseMeta }
 
   return response.ok
-    ? Actions.fetchSessionSuccess(host.name, body, meta)
+    ? Actions.fetchSessionSuccess(host.name, body as SessionResponse, meta)
     : Actions.fetchSessionFailure(
         host.name,
         originalAction.payload.sessionId,
-        body,
+        body as RobotApiV2ErrorResponseBody,
         meta
       )
 }

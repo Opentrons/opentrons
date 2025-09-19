@@ -1,4 +1,5 @@
 """Tests for the InstrumentContext public interface."""
+
 import pytest
 from decoy import Decoy
 
@@ -98,6 +99,15 @@ def test_well_center(decoy: Decoy, mock_well_core: WellCore, subject: Well) -> N
 
     assert isinstance(result, Location)
     assert result.point == Point(1, 2, 3)
+    assert result.labware.as_well() is subject
+
+
+def test_well_meniscus(decoy: Decoy, mock_well_core: WellCore, subject: Well) -> None:
+    """It should get a Location representing the meniscus of the well."""
+    result = subject.meniscus(z=4.2, target="end")
+
+    assert isinstance(result, Location)
+    assert result.point == Point(0, 0, 4.2)
     assert result.labware.as_well() is subject
 
 

@@ -1,0 +1,66 @@
+@import '../../index.module.css';
+
+.release_notes {
+  width: 100%;
+  max-height: 100%;
+  padding: 0 0.5rem;
+
+  & > h1 {
+    margin-bottom: 1rem;
+    color: var(--c-font-dark); /* from legacy --font-header-dark */
+    font-size: var(--fs-header); /* from legacy --font-header-dark */
+    font-weight: var(--fw-semibold); /* from legacy --font-header-dark */
+  }
+
+  & > h2 {
+    margin-top: 1rem;
+    margin-bottom: 0.75rem;
+    color: var(--c-font-dark); /* from legacy --font-header-dark */
+    font-size: var(--fs-header); /* from legacy --font-header-dark */
+    font-weight: var(--fw-regular);
+  }
+
+  & > h3 {
+    margin-top: 0.75rem;
+    margin-bottom: 0.5rem;
+    color: var(--c-font-dark); /* from legacy --font-body-2-dark */
+    font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
+    font-weight: var(--fw-semibold);
+  }
+
+  & ul,
+  & ol {
+    margin-bottom: 0.25rem;
+    margin-left: 1.25rem;
+    color: var(--c-font-dark); /* from legacy --font-body-2-dark */
+    font-size: var(--fs-body-2);
+  }
+
+  & li {
+    margin: 0.25rem 0;
+    color: var(--c-font-dark); /* from legacy --font-body-2-dark */
+    font-size: var(--fs-body-2);
+  }
+
+  & code {
+    color: var(--c-font-dark);
+    font-family: monospace;
+  }
+
+  & pre {
+    padding: 0.5rem 0.75rem;
+    margin: 0.5rem 0;
+    background-color: var(--c-font-dark);
+
+    & code {
+      color: var(--c-font-light);
+    }
+  }
+
+  & p {
+    margin-bottom: 1rem;
+    color: var(--c-font-dark); /* from legacy --font-body-2-dark */
+    font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
+    font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
+  }
+}

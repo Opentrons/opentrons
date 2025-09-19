@@ -1,41 +1,3 @@
-import type {
-  AddCustomLabwareAction,
-  AddCustomLabwareFailureAction,
-  AddCustomLabwareFileAction,
-  AddNewLabwareNameAction,
-  ChangeCustomLabwareDirectoryAction,
-  CheckedLabwareFile,
-  ClearAddCustomLabwareFailureAction,
-  ClearNewLabwareNameAction,
-  CustomLabwareListAction,
-  CustomLabwareListActionSource,
-  CustomLabwareListFailureAction,
-  DeleteCustomLabwareFileAction,
-  DuplicateLabwareFile,
-  FailedLabwareFile,
-  OpenCustomLabwareDirectoryAction,
-} from '@opentrons/app/src/redux/custom-labware/types'
-import type {
-  ResetConfigValueAction,
-  UpdateConfigValueAction,
-} from '@opentrons/app/src/redux/config'
-import type {
-  AddProtocolAction,
-  AddProtocolFailureAction,
-  AnalyzeProtocolAction,
-  AnalyzeProtocolFailureAction,
-  AnalyzeProtocolSuccessAction,
-  ClearAddProtocolFailureAction,
-  FetchProtocolsAction,
-  OpenProtocolDirectoryAction,
-  ProtocolListActionSource,
-  RemoveProtocolAction,
-  StoredProtocolData,
-  StoredProtocolDir,
-  UpdateProtocolListAction,
-  UpdateProtocolListFailureAction,
-  ViewProtocolSourceFolder,
-} from '@opentrons/app/src/redux/protocol-storage'
 import {
   ADD_CUSTOM_LABWARE,
   ADD_CUSTOM_LABWARE_FAILURE,
@@ -55,17 +17,26 @@ import {
   CUSTOM_LABWARE_LIST,
   CUSTOM_LABWARE_LIST_FAILURE,
   DELETE_CUSTOM_LABWARE_FILE,
+  DISCOVERY_FINISH,
+  DISCOVERY_START,
   FETCH_PROTOCOLS,
   LABWARE_DIRECTORY_CONFIG_PATH,
   NETWORK_INTERFACES_CHANGED,
+  NOTIFY_SUBSCRIBE,
   OPEN_CUSTOM_LABWARE_DIRECTORY,
   OPEN_PROTOCOL_DIRECTORY,
   POLL,
   RELOAD_UI,
   REMOVE_PROTOCOL,
   RESET_VALUE,
+  ROBOT_MASS_STORAGE_DEVICE_ADDED,
+  ROBOT_MASS_STORAGE_DEVICE_ENUMERATED,
+  ROBOT_MASS_STORAGE_DEVICE_REMOVED,
+  SEND_FILE_PATHS,
   SEND_LOG,
+  SEND_READY_STATUS,
   SYSTEM_INFO_INITIALIZED,
+  UPDATE_BRIGHTNESS,
   UPDATE_PROTOCOL_LIST,
   UPDATE_PROTOCOL_LIST_FAILURE,
   UPDATE_VALUE,
@@ -75,31 +46,46 @@ import {
   USB_HTTP_REQUESTS_STOP,
   VALUE_UPDATED,
   VIEW_PROTOCOL_SOURCE_FOLDER,
-  NOTIFY_SUBSCRIBE,
-  ROBOT_MASS_STORAGE_DEVICE_ADDED,
-  ROBOT_MASS_STORAGE_DEVICE_ENUMERATED,
-  ROBOT_MASS_STORAGE_DEVICE_REMOVED,
-  UPDATE_BRIGHTNESS,
-  DISCOVERY_START,
-  DISCOVERY_FINISH,
-  SEND_READY_STATUS,
 } from './constants'
+
 import type {
-  InitializedAction,
-  NetworkInterface,
-  NetworkInterfacesChangedAction,
-  UsbDevice,
-  UsbDeviceAddedAction,
-  UsbDeviceRemovedAction,
-} from '@opentrons/app/src/redux/system-info/types'
+  ResetConfigValueAction,
+  UpdateConfigValueAction,
+} from '@opentrons/app/src/redux/config'
 import type {
-  ConfigInitializedAction,
-  ConfigValueUpdatedAction,
-  Config,
-  StartDiscoveryAction,
-  FinishDiscoveryAction,
-  RobotSystemAction,
-} from './types'
+  AddCustomLabwareAction,
+  AddCustomLabwareFailureAction,
+  AddCustomLabwareFileAction,
+  AddNewLabwareNameAction,
+  ChangeCustomLabwareDirectoryAction,
+  CheckedLabwareFile,
+  ClearAddCustomLabwareFailureAction,
+  ClearNewLabwareNameAction,
+  CustomLabwareListAction,
+  CustomLabwareListActionSource,
+  CustomLabwareListFailureAction,
+  DeleteCustomLabwareFileAction,
+  DuplicateLabwareFile,
+  FailedLabwareFile,
+  OpenCustomLabwareDirectoryAction,
+} from '@opentrons/app/src/redux/custom-labware/types'
+import type {
+  AddProtocolAction,
+  AddProtocolFailureAction,
+  AnalyzeProtocolAction,
+  AnalyzeProtocolFailureAction,
+  AnalyzeProtocolSuccessAction,
+  ClearAddProtocolFailureAction,
+  FetchProtocolsAction,
+  OpenProtocolDirectoryAction,
+  ProtocolListActionSource,
+  RemoveProtocolAction,
+  StoredProtocolData,
+  StoredProtocolDir,
+  UpdateProtocolListAction,
+  UpdateProtocolListFailureAction,
+  ViewProtocolSourceFolder,
+} from '@opentrons/app/src/redux/protocol-storage'
 import type {
   AppRestartAction,
   NotifySubscribeAction,
@@ -112,11 +98,29 @@ import type {
   UpdateBrightnessAction,
   UsbRequestsAction,
 } from '@opentrons/app/src/redux/shell/types'
+import type {
+  InitializedAction,
+  NetworkInterface,
+  NetworkInterfacesChangedAction,
+  UsbDevice,
+  UsbDeviceAddedAction,
+  UsbDeviceRemovedAction,
+} from '@opentrons/app/src/redux/system-info/types'
+import type {
+  Config,
+  ConfigInitializedAction,
+  ConfigValueUpdatedAction,
+  FinishDiscoveryAction,
+  RobotSystemAction,
+  SendFilePathsAction,
+  StartDiscoveryAction,
+} from './types'
 
 // config file has been initialized
 export const configInitialized = (config: Config): ConfigInitializedAction => ({
   type: CONFIG_INITIALIZED,
   payload: { config },
+  meta: { shell: true },
 })
 
 // config value has been updated
@@ -126,6 +130,7 @@ export const configValueUpdated = (
 ): ConfigValueUpdatedAction => ({
   type: VALUE_UPDATED,
   payload: { path, value },
+  meta: { shell: true },
 })
 
 export const customLabwareList = (
@@ -353,7 +358,7 @@ export const usbRequestsStop = (): UsbRequestsAction => ({
 export const appRestart = (message: string): AppRestartAction => ({
   type: APP_RESTART,
   payload: {
-    message: message,
+    message,
   },
   meta: { shell: true },
 })
@@ -361,7 +366,7 @@ export const appRestart = (message: string): AppRestartAction => ({
 export const reloadUi = (message: string): ReloadUiAction => ({
   type: RELOAD_UI,
   payload: {
-    message: message,
+    message,
   },
   meta: { shell: true },
 })
@@ -369,7 +374,7 @@ export const reloadUi = (message: string): ReloadUiAction => ({
 export const sendLog = (message: string): SendLogAction => ({
   type: SEND_LOG,
   payload: {
-    message: message,
+    message,
   },
   meta: { shell: true },
 })
@@ -377,7 +382,7 @@ export const sendLog = (message: string): SendLogAction => ({
 export const updateBrightness = (message: string): UpdateBrightnessAction => ({
   type: UPDATE_BRIGHTNESS,
   payload: {
-    message: message,
+    message,
   },
   meta: { shell: true },
 })
@@ -443,5 +448,11 @@ export function finishDiscovery(): FinishDiscoveryAction {
 export const sendReadyStatus = (status: boolean): RobotSystemAction => ({
   type: SEND_READY_STATUS,
   payload: { shellReady: status },
+  meta: { shell: true },
+})
+
+export const sendFilePaths = (filePaths: string[]): SendFilePathsAction => ({
+  type: SEND_FILE_PATHS,
+  payload: { filePaths },
   meta: { shell: true },
 })

@@ -2,6 +2,7 @@
   "$otSharedSchema": "#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json",
   "supportedTips": {
     "t20": {
+      "uiMaxFlowRate": 25,
       "defaultAspirateFlowRate": {
         "default": 3.78,
         "valuesByApiLevel": { "2.0": 3.78, "2.6": 7.56 }
@@ -146,6 +147,7 @@
       "defaultPushOutVolume": 0
     },
     "t10": {
+      "uiMaxFlowRate": 25,
       "defaultAspirateFlowRate": {
         "default": 3.78,
         "valuesByApiLevel": { "2.0": 3.78, "2.6": 7.56 }
@@ -289,15 +291,6 @@
       },
       "defaultPushOutVolume": 0
     }
-  },
-  "defaultTipOverlapDictionary": {
-    "default": 8.25,
-    "opentrons/opentrons_96_tiprack_10ul/1": 8.25,
-    "opentrons/opentrons_96_filtertiprack_10ul/1": 8.25,
-    "opentrons/eppendorf_96_tiprack_10ul_eptips/1": 8.4,
-    "opentrons/geb_96_tiprack_10ul/1": 8.3,
-    "opentrons/opentrons_96_tiprack_20ul/1": 8.25,
-    "opentrons/opentrons_96_filtertiprack_20ul/1": 8.25
   },
   "maxVolume": 20,
   "minVolume": 1.0,

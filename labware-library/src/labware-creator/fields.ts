@@ -1,9 +1,11 @@
 import capitalize from 'lodash/capitalize'
+
+import { displayAsTube, getLabwareName } from './utils'
+
 import type {
   LabwareDefinition2,
   WellBottomShape,
 } from '@opentrons/shared-data'
-import { displayAsTube, getLabwareName } from './utils'
 
 export const MAX_X_DIMENSION = 129
 export const MIN_X_DIMENSION = 127
@@ -17,6 +19,7 @@ export const SUGGESTED_XY_RANGE = 1
 
 export const MAX_Z_DIMENSION = 195
 export const MAX_SUGGESTED_Z = 124
+export const MAX_SUGGESTED_GRIPPER_Z = 129
 
 export const DISPLAY_VOLUME_UNITS = 'µL'
 
@@ -30,11 +33,6 @@ export const LOOSE_TIP_FIT_ERROR = 'LOOSE_TIP_FIT_ERROR'
 
 export const LABWARE_TOO_SMALL_ERROR = 'LABWARE_TOO_SMALL_ERROR'
 export const LABWARE_TOO_LARGE_ERROR = 'LABWARE_TOO_LARGE_ERROR'
-
-export const LINK_CUSTOM_LABWARE_FORM = 'https://lqilf9ng.paperform.co/'
-
-export const LINK_REQUEST_ADAPTER_FORM =
-  'https://docs.google.com/forms/d/e/1FAIpQLScvsHlXQrtIhIQYO0zr6mYwmzOCGpYPqepeDIorFIyj2jT-UQ/viewform'
 
 export type ImportErrorKey =
   | 'INVALID_FILE_TYPE'
@@ -113,6 +111,7 @@ export interface LabwareFields {
   footprintXDimension: string | null | undefined
   footprintYDimension: string | null | undefined
   labwareZDimension: string | null | undefined
+  stackedLabwareZDimension: number | null | undefined
 
   gridRows: string | null | undefined
   gridColumns: string | null | undefined
@@ -144,6 +143,11 @@ export interface LabwareFields {
 
   loadName: string | null | undefined
   displayName: string | null | undefined
+
+  // used with adapters
+  compatibleAdapters: Record<string, number>
+  // used with modules
+  compatibleModules: Record<string, number>
 }
 
 // NOTE: these fields & types should be kept in sync with Yup schema `labwareFormSchema`.
@@ -161,6 +165,7 @@ export interface ProcessedLabwareFields {
   footprintXDimension: number
   footprintYDimension: number
   labwareZDimension: number
+  stackedLabwareZDimension: number
 
   gridRows: number
   gridColumns: number
@@ -193,6 +198,11 @@ export interface ProcessedLabwareFields {
   // if loadName or displayName are left blank, Yup schema generates them
   loadName: string
   displayName: string
+
+  // used with adapters
+  compatibleAdapters: Record<string, number>
+  // used with modules
+  compatibleModules: Record<string, number>
 }
 
 export const tubeRackInsertOptions: Options = [
@@ -379,7 +389,7 @@ export const getDefaultFormState = (): LabwareFields => ({
   footprintXDimension: null,
   footprintYDimension: null,
   labwareZDimension: null,
-
+  stackedLabwareZDimension: null,
   gridRows: null,
   gridColumns: null,
   gridSpacingX: null,
@@ -410,6 +420,8 @@ export const getDefaultFormState = (): LabwareFields => ({
 
   loadName: null,
   displayName: null,
+  compatibleAdapters: {},
+  compatibleModules: {},
 })
 
 export const LABELS: Record<keyof LabwareFields, string> = {
@@ -443,6 +455,9 @@ export const LABELS: Record<keyof LabwareFields, string> = {
   groupBrandId: 'Manufacturer/Catalog #',
   displayName: 'Display Name',
   loadName: 'API Load Name',
+  compatibleAdapters: 'Is this labware compatible with an adapter?',
+  compatibleModules: 'Is this labware compatible with a module?',
+  stackedLabwareZDimension: 'Stacked Labware Height',
 }
 
 export const getLabel = (

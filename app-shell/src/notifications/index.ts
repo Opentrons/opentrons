@@ -1,17 +1,17 @@
-import { connectionStore } from './store'
 import {
-  establishConnections,
   cleanUpUnreachableRobots,
-  getHealthyRobotDataForNotifyConnections,
   closeConnectionsForcefullyFor,
-  RobotData,
+  establishConnections,
+  getHealthyRobotDataForNotifyConnections,
 } from './connect'
-import { subscribe } from './subscribe'
 import { notifyLog } from './notifyLog'
+import { connectionStore } from './store'
+import { subscribe } from './subscribe'
 
-import type { DiscoveryClientRobot } from '@opentrons/discovery-client'
 import type { BrowserWindow } from 'electron'
+import type { DiscoveryClientRobot } from '@opentrons/discovery-client'
 import type { Action, Dispatch } from '../types'
+import type { RobotData } from './connect'
 
 // Manages MQTT broker connections through a connection store. Broker connections are added  based on health status
 // reported by discovery-client and broker connectivity status reported by MQTT. Because a robot may have several IPs,

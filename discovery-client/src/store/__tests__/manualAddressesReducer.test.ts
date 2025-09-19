@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
+
 import * as Actions from '../actions'
-import { reducer, manualAddressesReducer } from '../reducer'
+import { manualAddressesReducer, reducer } from '../reducer'
+
 import type { Action } from '../types'
 
 describe('manual addresses reducer', () => {

@@ -1,14 +1,14 @@
-import {
-  INITIALIZED,
-  VALUE_UPDATED,
-  UPDATE_VALUE,
-  RESET_VALUE,
-  TOGGLE_VALUE,
+import type {
   ADD_UNIQUE_VALUE,
+  INITIALIZED,
+  RESET_VALUE,
   SUBTRACT_VALUE,
+  TOGGLE_VALUE,
+  UPDATE_VALUE,
+  VALUE_UPDATED,
 } from './constants'
-
 import type { Config } from './schema-types'
+
 export * from './schema-types'
 
 export type ConfigState = Config | null
@@ -16,11 +16,13 @@ export type ConfigState = Config | null
 export interface ConfigInitializedAction {
   type: typeof INITIALIZED
   payload: { config: Config }
+  meta: { shell: true }
 }
 
 export interface ConfigValueUpdatedAction {
   type: typeof VALUE_UPDATED
   payload: { path: string; value: any }
+  meta: { shell: true }
 }
 
 export interface UpdateConfigValueAction {

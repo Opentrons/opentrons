@@ -1,18 +1,17 @@
 // labware definition helpers
 // TODO(mc, 2019-03-18): move to shared-data?
-import * as React from 'react'
-import { Route } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import groupBy from 'lodash/groupBy'
 import uniq from 'lodash/uniq'
-import {
-  LABWAREV2_DO_NOT_LIST,
-  getAllDefinitions as _getAllDefinitions,
-} from '@opentrons/shared-data'
-import { getPublicPath } from './public-path'
 
-import type { RouteComponentProps } from 'react-router-dom'
+import {
+  getAllDefinitions as _getAllDefinitions,
+  LABWAREV2_DO_NOT_LIST,
+} from '@opentrons/shared-data'
+
+import type * as React from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { LabwareList, LabwareDefinition } from './types'
+import type { LabwareDefinition, LabwareList } from './types'
 
 const getOnlyLatestDefs = (labwareList: LabwareList): LabwareList => {
   // group by namespace + loadName
@@ -76,7 +75,7 @@ export function getDefinition(
   return def || null
 }
 
-export interface DefinitionRouteRenderProps extends RouteComponentProps {
+export interface DefinitionRouteRenderProps {
   definition: LabwareDefinition | null
 }
 
@@ -84,31 +83,13 @@ export interface DefinitionRouteProps {
   render: (props: DefinitionRouteRenderProps) => React.ReactNode
 }
 
-export function DefinitionRoute(props: DefinitionRouteProps): JSX.Element {
-  return (
-    <Route
-      path={`${getPublicPath()}:loadName?`}
-      render={routeProps => {
-        const { loadName } = routeProps.match.params
-        const definition = getDefinition(loadName)
+export const DefinitionRoute: React.FC<DefinitionRouteProps> = ({ render }) => {
+  const location = useLocation()
+  const searchParams = new URLSearchParams(location.search)
+  const loadName = searchParams.get('loadName')
+  const definition = getDefinition(loadName)
 
-        // TODO(mc, 2019-04-10): handle 404 if loadName exists but definition
-        // isn't found
+  // TODO: handle 404 if loadName exists but definition isn't found
 
-        return props.render({ ...routeProps, definition })
-      }}
-    />
-  )
-}
-
-export const NEW_LABWARE_DEFS = [
-  'thermoscientificnunc_96_wellplate_1300ul',
-  'thermoscientificnunc_96_wellplate_2000ul',
-  'appliedbiosystemsmicroamp_384_wellplate_40ul',
-  'biorad_384_wellplate_50ul',
-]
-
-export function isNewLabware(definition: LabwareDefinition): boolean {
-  const { loadName } = definition.parameters
-  return NEW_LABWARE_DEFS.includes(loadName)
+  return <>{render({ definition })}</>
 }

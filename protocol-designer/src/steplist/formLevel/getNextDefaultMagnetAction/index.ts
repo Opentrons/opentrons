@@ -1,5 +1,7 @@
 import last from 'lodash/last'
-import { StepIdType, FormData, MagnetAction } from '../../../form-types'
+
+import type { FormData, MagnetAction, StepIdType } from '../../../form-types'
+
 export function getNextDefaultMagnetAction(
   savedForms: Record<StepIdType, FormData>,
   orderedStepIds: StepIdType[]

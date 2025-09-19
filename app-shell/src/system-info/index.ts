@@ -1,27 +1,28 @@
 // system info module
 import { app } from 'electron'
-import { UI_INITIALIZED } from '../constants'
-import { createLogger } from '../log'
-import { isWindows } from '../os'
-import { createUsbDeviceMonitor, getWindowsDriverVersion } from './usb-devices'
-import {
-  createNetworkInterfaceMonitor,
-  getActiveInterfaces,
-} from './network-interfaces'
 
-import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
-import type { Action, Dispatch } from '../types'
-import type { UsbDeviceMonitor } from './usb-devices'
-import type {
-  NetworkInterface,
-  NetworkInterfaceMonitor,
-} from './network-interfaces'
 import {
   initialized,
   networkInterfacesChanged,
   usbDeviceAdded,
   usbDeviceRemoved,
 } from '../config/actions'
+import { UI_INITIALIZED } from '../constants'
+import { createLogger } from '../log'
+import { isWindows } from '../os'
+import {
+  createNetworkInterfaceMonitor,
+  getActiveInterfaces,
+} from './network-interfaces'
+import { createUsbDeviceMonitor, getWindowsDriverVersion } from './usb-devices'
+
+import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
+import type { Action, Dispatch } from '../types'
+import type {
+  NetworkInterface,
+  NetworkInterfaceMonitor,
+} from './network-interfaces'
+import type { UsbDeviceMonitor } from './usb-devices'
 
 export { createNetworkInterfaceMonitor }
 export type { NetworkInterface, NetworkInterfaceMonitor }
@@ -54,7 +55,9 @@ export function registerSystemInfo(
 
   const handleDeviceAdd = (device: UsbDevice): void => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    addDriverVersion(device).then(d => dispatch(usbDeviceAdded(d)))
+    addDriverVersion(device).then(d => {
+      dispatch(usbDeviceAdded(d))
+    })
   }
 
   const handleDeviceRemove = (d: UsbDevice): void => {

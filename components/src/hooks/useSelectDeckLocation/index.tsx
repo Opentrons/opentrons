@@ -1,20 +1,18 @@
-import * as React from 'react'
-import isEqual from 'lodash/isEqual'
+import { Fragment, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import isEqual from 'lodash/isEqual'
+
 import {
-  CutoutConfig,
   FLEX_CUTOUT_BY_SLOT_ID,
-  FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
   FLEX_ROBOT_TYPE,
+  FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
   getDeckDefFromRobotType,
-  getPositionFromSlotId,
   getFixtureDisplayName,
+  getPositionFromSlotId,
   isAddressableAreaStandardSlot,
   OT2_ROBOT_TYPE,
-  AddressableArea,
-  CoordinateTuple,
-  CutoutFixtureId,
 } from '@opentrons/shared-data'
+
 import {
   DeckFromLayers,
   LegacyDeckSlotLocation,
@@ -25,13 +23,18 @@ import {
   SingleSlotFixture,
   SlotLabels,
 } from '../../hardware-sim'
+import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import { Text } from '../../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
-import { COLORS } from '../../helix-design-system'
 
+import type { TFunction } from 'i18next'
 import type {
+  AddressableArea,
+  CoordinateTuple,
+  CutoutConfig,
+  CutoutFixtureId,
   DeckDefinition,
   ModuleLocation,
   RobotType,
@@ -59,10 +62,7 @@ export function useDeckLocationSelect(
   theme?: DeckLocationSelectThemes
 ): { DeckLocationSelect: JSX.Element; selectedLocation: ModuleLocation } {
   const deckDef = getDeckDefFromRobotType(robotType)
-  const [
-    selectedLocation,
-    setSelectedLocation,
-  ] = React.useState<ModuleLocation>({
+  const [selectedLocation, setSelectedLocation] = useState<ModuleLocation>({
     slotName: deckDef.locations.addressableAreas[0].id,
   })
   return {
@@ -98,9 +98,9 @@ export function DeckLocationSelect({
 }: DeckLocationSelectProps): JSX.Element {
   const robotType = deckDef.robot.model
 
-  const { t } = useTranslation('module_wizard_flows')
+  const { t } = useTranslation(['module_wizard_flows', 'deck_configuration'])
 
-  const [hoveredData, setHoveredData] = React.useState<{
+  const [hoveredData, setHoveredData] = useState<{
     slot: AddressableArea
     slotPosition: CoordinateTuple | null
     isDisabled: boolean
@@ -115,10 +115,10 @@ export function DeckLocationSelect({
   ): void => {
     if (isDisabled) {
       setHoveredData({
-        slot: slot,
-        slotPosition: slotPosition,
-        isDisabled: isDisabled,
-        disabledReason: disabledReason,
+        slot,
+        slotPosition,
+        isDisabled,
+        disabledReason,
       })
     } else {
       setHoveredData(null)
@@ -193,32 +193,31 @@ export function DeckLocationSelect({
           const cutoutId = FLEX_CUTOUT_BY_SLOT_ID[slot.id]
 
           return (
-            <React.Fragment key={slot.id}>
+            <Fragment key={slot.id}>
               {robotType === FLEX_ROBOT_TYPE ? (
                 <>
                   <SingleSlotFixture
                     cutoutId={cutoutId}
                     fixtureBaseColor={fill}
                     slotClipColor={COLORS.white}
-                    onClick={() =>
-                      !isDisabled &&
-                      setSelectedLocation != null &&
-                      setSelectedLocation(slotLocation)
-                    }
+                    onClick={() => {
+                      if (!isDisabled && setSelectedLocation != null)
+                        setSelectedLocation(slotLocation)
+                    }}
                     cursor={
                       setSelectedLocation == null || isDisabled || isSelected
                         ? 'default'
                         : 'pointer'
                     }
                     deckDefinition={deckDef}
-                    onMouseEnter={() =>
+                    onMouseEnter={() => {
                       handleMouseEnter(
                         slot,
                         slotPosition,
                         isDisabled,
                         disabledReason
                       )
-                    }
+                    }}
                     onMouseLeave={handleMouseLeave}
                   />
                 </>
@@ -228,11 +227,10 @@ export function DeckLocationSelect({
                   slotBaseColor={fill}
                   slotName={slot.id}
                   slotClipColor={COLORS.white}
-                  onClick={() =>
-                    !isDisabled &&
-                    setSelectedLocation != null &&
-                    setSelectedLocation(slotLocation)
-                  }
+                  onClick={() => {
+                    if (!isDisabled && setSelectedLocation != null)
+                      setSelectedLocation(slotLocation)
+                  }}
                   cursor={
                     setSelectedLocation == null || isDisabled || isSelected
                       ? 'default'
@@ -268,7 +266,7 @@ export function DeckLocationSelect({
                   </Text>
                 </RobotCoordsForeignDiv>
               ) : null}
-            </React.Fragment>
+            </Fragment>
           )
         })}
       {robotType === OT2_ROBOT_TYPE ? (
@@ -316,6 +314,7 @@ export function DeckLocationSelect({
               {hoveredData.disabledReason != null
                 ? t('location_occupied', {
                     fixture: getFixtureDisplayName(
+                      t as TFunction,
                       hoveredData.disabledReason
                     ).toLowerCase(),
                   })
@@ -333,4 +332,5 @@ const INNER_DIV_PROPS = {
   justifyContent: JUSTIFY_CENTER,
   height: '100%',
   gridGap: SPACING.spacing4,
+  transform: 'scaleY(-1)',
 }

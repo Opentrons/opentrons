@@ -1,10 +1,10 @@
 {
-  "download_logs": "Download the robot logs from the Opentrons App and send them to support@opentrons.com for assistance.",
   "firmware_out_of_date": "The firmware for <bold>{{mount}} {{instrument}}</bold> is out of date. You need to update it before running protocols that use this instrument.",
   "gantry_x": "Gantry X",
   "gantry_y": "Gantry Y",
   "gripper": "Gripper",
   "head": "Head",
+  "hepa_uv": "HEPA/UV Module",
   "pipette_left": "pipette",
   "pipette_right": "pipette",
   "ready_to_use": "Your <bold>{{instrument}}</bold> is ready to use!",

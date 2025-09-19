@@ -5,10 +5,11 @@ from typing_extensions import Literal, Type
 
 from pydantic import BaseModel, Field
 
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ...errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
-    from opentrons.protocol_engine.state import StateView
+    from opentrons.protocol_engine.state.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler
 
 
@@ -27,7 +28,9 @@ class SetTargetTemperatureResult(BaseModel):
 
 
 class SetTargetTemperatureImpl(
-    AbstractCommandImpl[SetTargetTemperatureParams, SetTargetTemperatureResult]
+    AbstractCommandImpl[
+        SetTargetTemperatureParams, SuccessData[SetTargetTemperatureResult]
+    ]
 ):
     """Execution implementation of a Heater-Shaker's set temperature command."""
 
@@ -43,7 +46,7 @@ class SetTargetTemperatureImpl(
     async def execute(
         self,
         params: SetTargetTemperatureParams,
-    ) -> SetTargetTemperatureResult:
+    ) -> SuccessData[SetTargetTemperatureResult]:
         """Set a Heater-Shaker's target temperature."""
         # Allow propagation of ModuleNotLoadedError and WrongModuleTypeError.
         hs_module_substate = self._state_view.modules.get_heater_shaker_module_substate(
@@ -61,17 +64,19 @@ class SetTargetTemperatureImpl(
         if hs_hardware_module is not None:
             await hs_hardware_module.start_set_temperature(validated_temp)
 
-        return SetTargetTemperatureResult()
+        return SuccessData(
+            public=SetTargetTemperatureResult(),
+        )
 
 
 class SetTargetTemperature(
-    BaseCommand[SetTargetTemperatureParams, SetTargetTemperatureResult]
+    BaseCommand[SetTargetTemperatureParams, SetTargetTemperatureResult, ErrorOccurrence]
 ):
     """A command to set a Heater-Shaker's target temperature."""
 
     commandType: SetTargetTemperatureCommandType = "heaterShaker/setTargetTemperature"
     params: SetTargetTemperatureParams
-    result: Optional[SetTargetTemperatureResult]
+    result: Optional[SetTargetTemperatureResult] = None
 
     _ImplementationCls: Type[SetTargetTemperatureImpl] = SetTargetTemperatureImpl
 

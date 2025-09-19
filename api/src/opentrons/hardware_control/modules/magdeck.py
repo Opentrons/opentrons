@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from typing import Mapping, Optional
+from typing import Dict, Optional
 from opentrons.drivers.mag_deck import (
     SimulatingDriver,
     MagDeckDriver,
@@ -48,8 +48,10 @@ class MagDeck(mod_abc.AbstractModule):
         cls,
         port: str,
         usb_port: USBPort,
-        execution_manager: ExecutionManager,
         hw_control_loop: asyncio.AbstractEventLoop,
+        execution_manager: ExecutionManager,
+        disconnected_callback: types.ModuleDisconnectedCallback,
+        error_callback: types.ModuleErrorCallback,
         poll_interval_seconds: Optional[float] = None,
         simulating: bool = False,
         sim_model: Optional[str] = None,
@@ -71,6 +73,8 @@ class MagDeck(mod_abc.AbstractModule):
             hw_control_loop=hw_control_loop,
             device_info=await driver.get_device_info(),
             driver=driver,
+            disconnected_callback=disconnected_callback,
+            error_callback=error_callback,
         )
         return mod
 
@@ -78,10 +82,12 @@ class MagDeck(mod_abc.AbstractModule):
         self,
         port: str,
         usb_port: USBPort,
-        execution_manager: ExecutionManager,
         hw_control_loop: asyncio.AbstractEventLoop,
         driver: AbstractMagDeckDriver,
-        device_info: Mapping[str, str],
+        device_info: Dict[str, str],
+        execution_manager: ExecutionManager,
+        disconnected_callback: types.ModuleDisconnectedCallback,
+        error_callback: types.ModuleErrorCallback,
     ) -> None:
         """Constructor"""
         super().__init__(
@@ -89,6 +95,8 @@ class MagDeck(mod_abc.AbstractModule):
             usb_port=usb_port,
             hw_control_loop=hw_control_loop,
             execution_manager=execution_manager,
+            disconnected_callback=disconnected_callback,
+            error_callback=error_callback,
         )
         self._device_info = device_info
         self._driver = driver
@@ -162,7 +170,7 @@ class MagDeck(mod_abc.AbstractModule):
         return self._current_height
 
     @property
-    def device_info(self) -> Mapping[str, str]:
+    def device_info(self) -> Dict[str, str]:
         """
 
         Returns: a dict
@@ -170,6 +178,11 @@ class MagDeck(mod_abc.AbstractModule):
 
         """
         return self._device_info
+
+    @property
+    def serial_number(self) -> Optional[str]:
+        """The usb serial number of this device"""
+        return self._device_info.get("serial")
 
     @property
     def status(self) -> types.MagneticStatus:
@@ -187,9 +200,13 @@ class MagDeck(mod_abc.AbstractModule):
 
     @property
     def live_data(self) -> types.LiveData:
+        data: types.MagneticModuleData = {
+            "engaged": self.engaged,
+            "height": self.current_height,
+        }
         return {
             "status": self.status,
-            "data": {"engaged": self.engaged, "height": self.current_height},
+            "data": data,
         }
 
     @property

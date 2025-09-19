@@ -1,33 +1,35 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { TEMPERATURE_MODULE_TYPE } from '@opentrons/shared-data'
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
+
+import { getMockMixStep, getMockMoveLiquidStep } from '../__fixtures__'
 import {
   END_TERMINAL_ITEM_ID,
   PRESAVED_STEP_ID,
   START_TERMINAL_ITEM_ID,
 } from '../../../steplist/types'
+import * as utils from '../../modules/utils'
 import {
-  SINGLE_STEP_SELECTION_TYPE,
   MULTI_STEP_SELECTION_TYPE,
+  SINGLE_STEP_SELECTION_TYPE,
   TERMINAL_ITEM_SELECTION_TYPE,
 } from '../reducers'
 import {
-  getHoveredStepLabware,
-  getSelectedStepTitleInfo,
-  getActiveItem,
-  getMultiSelectLastSelected,
   _getSavedMultiSelectFieldValues,
-  getMultiSelectFieldValues,
-  getMultiSelectDisabledFields,
-  getCountPerStepType,
+  getActiveItem,
   getBatchEditSelectedStepTypes,
+  getCountPerStepType,
+  getHoveredStepLabware,
+  getMultiSelectDisabledFields,
+  getMultiSelectFieldValues,
+  getMultiSelectLastSelected,
+  getSelectedStepTitleInfo,
 } from '../selectors'
-import { getMockMoveLiquidStep, getMockMixStep } from '../__fixtures__'
 
-import * as utils from '../../modules/utils'
-
+import type { MoveLabwareArgs } from '@opentrons/step-generation'
 import type { FormData } from '../../../form-types'
+import type { AllTemporalPropertiesForTimelineFrame } from '../../../step-forms'
 import type { StepArgsAndErrorsById } from '../../../steplist/types'
-import { AllTemporalPropertiesForTimelineFrame } from '../../../step-forms'
 
 vi.mock('../../modules/utils')
 
@@ -46,7 +48,6 @@ function createArgsForStepId(
 const hoveredStepId = 'hoveredStepId'
 const labware = 'well plate'
 const mixCommand = 'mix'
-const moveLabwareCommand = 'moveLabware'
 describe('getHoveredStepLabware', () => {
   let initialDeckState: AllTemporalPropertiesForTimelineFrame
   beforeEach(() => {
@@ -135,9 +136,13 @@ describe('getHoveredStepLabware', () => {
   })
 
   it('correct labware is returned when command is moveLabware', () => {
-    const stepArgs = {
-      commandCreatorFnName: moveLabwareCommand,
-      labware,
+    const stepArgs: MoveLabwareArgs = {
+      labwareId: labware,
+      strategy: 'usingGripper',
+      newLocation: { slotName: 'A1' },
+      commandCreatorFnName: 'moveLabware',
+      name: 'some name',
+      description: 'some description',
     }
     const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
     const result = getHoveredStepLabware.resultFunc(
@@ -146,7 +151,7 @@ describe('getHoveredStepLabware', () => {
       initialDeckState
     )
 
-    expect(result).toEqual([labware])
+    expect(result).toEqual([stepArgs.labwareId])
   })
 
   describe('modules', () => {
@@ -182,7 +187,7 @@ describe('getHoveredStepLabware', () => {
       } as any)
       const stepArgs = {
         commandCreatorFnName: setTempCommand,
-        module: type,
+        moduleId: type,
       }
       const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
       const result = getHoveredStepLabware.resultFunc(
@@ -414,9 +419,33 @@ describe('_getSavedMultiSelectFieldValues', () => {
         )
       ).toEqual({
         // aspirate settings
+        tipRack: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        blowout_flowRate: {
+          isIndeterminate: false,
+          value: undefined,
+        },
         aspirate_labware: {
           value: 'aspirate_labware_id',
           isIndeterminate: false,
+        },
+        aspirate_x_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_y_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_x_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_y_position: {
+          isIndeterminate: false,
+          value: undefined,
         },
         aspirate_wells: {
           isIndeterminate: true,
@@ -445,6 +474,22 @@ describe('_getSavedMultiSelectFieldValues', () => {
           value: false,
           isIndeterminate: false,
         },
+        pushOut_checkbox: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        pushOut_volume: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        conditioning_checkbox: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        conditioning_volume: {
+          isIndeterminate: false,
+          value: undefined,
+        },
         aspirate_mix_checkbox: {
           value: true,
           isIndeterminate: false,
@@ -465,10 +510,6 @@ describe('_getSavedMultiSelectFieldValues', () => {
           value: '2',
           isIndeterminate: false,
         },
-        aspirate_delay_mmFromBottom: {
-          value: '1',
-          isIndeterminate: false,
-        },
         aspirate_airGap_checkbox: {
           value: true,
           isIndeterminate: false,
@@ -481,9 +522,45 @@ describe('_getSavedMultiSelectFieldValues', () => {
           value: true,
           isIndeterminate: false,
         },
-        aspirate_touchTip_mmFromBottom: {
-          value: 1,
+        aspirate_touchTip_mmFromEdge: {
+          value: undefined,
           isIndeterminate: false,
+        },
+        aspirate_touchTip_mmFromTop: {
+          value: -1,
+          isIndeterminate: false,
+        },
+        aspirate_touchTip_speed: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_retract_delay_seconds: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_retract_mmFromBottom: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_retract_speed: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_retract_x_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_retract_y_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_submerge_delay_seconds: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_submerge_speed: {
+          isIndeterminate: false,
+          value: undefined,
         },
         // dispense settings
         dispense_labware: {
@@ -526,10 +603,6 @@ describe('_getSavedMultiSelectFieldValues', () => {
           value: '1',
           isIndeterminate: false,
         },
-        dispense_delay_mmFromBottom: {
-          value: '0.5',
-          isIndeterminate: false,
-        },
         dispense_airGap_checkbox: {
           value: true,
           isIndeterminate: false,
@@ -542,9 +615,45 @@ describe('_getSavedMultiSelectFieldValues', () => {
           value: true,
           isIndeterminate: false,
         },
-        dispense_touchTip_mmFromBottom: {
-          value: 1,
+        dispense_touchTip_mmFromEdge: {
+          value: undefined,
           isIndeterminate: false,
+        },
+        dispense_touchTip_mmFromTop: {
+          value: -1,
+          isIndeterminate: false,
+        },
+        dispense_touchTip_speed: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_retract_delay_seconds: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_retract_mmFromBottom: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_retract_speed: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_retract_x_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_retract_y_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_submerge_delay_seconds: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_submerge_speed: {
+          isIndeterminate: false,
+          value: undefined,
         },
         blowout_checkbox: {
           value: true,
@@ -589,6 +698,74 @@ describe('_getSavedMultiSelectFieldValues', () => {
           value: 'fixedTrash',
           isIndeterminate: false,
         },
+        dropTip_wellNames: {
+          value: undefined,
+          isIndeterminate: false,
+        },
+        pickUpTip_location: {
+          value: undefined,
+          isIndeterminate: false,
+        },
+        pickUpTip_wellNames: {
+          value: undefined,
+          isIndeterminate: false,
+        },
+        liquidClassesSupported: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        liquidClass: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_position_reference: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_submerge_position_reference: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_retract_position_reference: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_submerge_mmFromBottom: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_submerge_x_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_submerge_y_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_position_reference: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_submerge_position_reference: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_submerge_x_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_submerge_y_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_submerge_mmFromBottom: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_retract_position_reference: {
+          isIndeterminate: false,
+          value: undefined,
+        },
       })
     })
   })
@@ -598,6 +775,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
       mockSavedStepFormsIndeterminate = {
         ...getMockMoveLiquidStep(),
         // just doing this so the ids are not the exact same
+        tipRack: 'mockTiprack',
         another_move_liquid_step_id: {
           ...getMockMoveLiquidStep().move_liquid_step_id,
           aspirate_labware: 'other_asp_labware',
@@ -614,20 +792,21 @@ describe('_getSavedMultiSelectFieldValues', () => {
           aspirate_airGap_checkbox: false,
           // same thing here with air gap volume
           aspirate_touchTip_checkbox: false,
-          // same thing with aspirate_touchTip_mmFromBottom
+          // same thing with aspirate_touchTip_mmFromTop
           dispense_labware: 'other_disp_labware',
           dispense_flowRate: 2,
           dispense_mmFromBottom: '2',
           dispense_wellOrder_first: 'b2t',
           dispense_wellOrder_second: 'r2l',
           dispense_mix_checkbox: false,
+          blowout_flowRate: null,
           // same thing here with mix times or mix volumes
           dispense_delay_checkbox: false,
           // same thing here for delay seconds and mm from bottom
           dispense_airGap_checkbox: false,
           // same thing here with air gap volume
           dispense_touchTip_checkbox: false,
-          // same thing with dispense_touchTip_mmFromBottom
+          // same thing with dispense_touchTip_mmFromTop
           blowout_checkbox: false,
           // same thing here with blowout location
           nozzles: null,
@@ -646,6 +825,13 @@ describe('_getSavedMultiSelectFieldValues', () => {
         aspirate_labware: {
           isIndeterminate: true,
         },
+        tipRack: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        blowout_flowRate: {
+          isIndeterminate: true,
+        },
         aspirate_flowRate: {
           isIndeterminate: true,
         },
@@ -661,8 +847,40 @@ describe('_getSavedMultiSelectFieldValues', () => {
         path: {
           isIndeterminate: true,
         },
+        aspirate_x_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_y_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_x_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_y_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
         preWetTip: {
           isIndeterminate: true,
+        },
+        pushOut_checkbox: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        pushOut_volume: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        conditioning_checkbox: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        conditioning_volume: {
+          isIndeterminate: false,
+          value: undefined,
         },
         aspirate_mix_checkbox: {
           isIndeterminate: true,
@@ -682,10 +900,6 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
           value: '2',
         },
-        aspirate_delay_mmFromBottom: {
-          isIndeterminate: false,
-          value: '1',
-        },
         aspirate_airGap_checkbox: {
           isIndeterminate: true,
         },
@@ -696,9 +910,45 @@ describe('_getSavedMultiSelectFieldValues', () => {
         aspirate_touchTip_checkbox: {
           isIndeterminate: true,
         },
-        aspirate_touchTip_mmFromBottom: {
+        aspirate_touchTip_mmFromTop: {
           isIndeterminate: false,
-          value: 1,
+          value: -1,
+        },
+        aspirate_touchTip_mmFromEdge: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_touchTip_speed: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_submerge_delay_seconds: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_submerge_speed: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_retract_delay_seconds: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_retract_mmFromBottom: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_retract_speed: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_retract_x_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_retract_y_position: {
+          isIndeterminate: false,
+          value: undefined,
         },
         // dispense settings
         dispense_labware: {
@@ -734,10 +984,6 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
           value: '1',
         },
-        dispense_delay_mmFromBottom: {
-          isIndeterminate: false,
-          value: '0.5',
-        },
         dispense_airGap_checkbox: {
           isIndeterminate: true,
         },
@@ -748,9 +994,45 @@ describe('_getSavedMultiSelectFieldValues', () => {
         dispense_touchTip_checkbox: {
           isIndeterminate: true,
         },
-        dispense_touchTip_mmFromBottom: {
+        dispense_touchTip_mmFromEdge: {
           isIndeterminate: false,
-          value: 1,
+          value: undefined,
+        },
+        dispense_touchTip_mmFromTop: {
+          isIndeterminate: false,
+          value: -1,
+        },
+        dispense_touchTip_speed: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_retract_delay_seconds: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_retract_mmFromBottom: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_retract_speed: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_retract_x_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_retract_y_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_submerge_delay_seconds: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_submerge_speed: {
+          isIndeterminate: false,
+          value: undefined,
         },
         blowout_checkbox: {
           isIndeterminate: true,
@@ -796,6 +1078,71 @@ describe('_getSavedMultiSelectFieldValues', () => {
           value: 'fixedTrash',
           isIndeterminate: false,
         },
+        dropTip_wellNames: {
+          value: undefined,
+          isIndeterminate: false,
+        },
+        pickUpTip_location: {
+          value: undefined,
+          isIndeterminate: false,
+        },
+        pickUpTip_wellNames: {
+          value: undefined,
+          isIndeterminate: false,
+        },
+        liquidClassesSupported: { isIndeterminate: false },
+        liquidClass: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_position_reference: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_submerge_position_reference: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_retract_position_reference: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_submerge_mmFromBottom: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_submerge_x_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_submerge_y_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_position_reference: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_submerge_position_reference: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_submerge_x_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_submerge_y_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_submerge_mmFromBottom: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_retract_position_reference: {
+          isIndeterminate: false,
+          value: undefined,
+        },
       })
     })
   })
@@ -822,6 +1169,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
         )
       ).toEqual({
         volume: { value: '100', isIndeterminate: false },
+        tipRack: { isIndeterminate: false },
+        blowout_flowRate: {
+          isIndeterminate: false,
+        },
         times: { value: null, isIndeterminate: false },
         changeTip: { value: 'always', isIndeterminate: false },
         labware: { value: 'some_labware_id', isIndeterminate: false },
@@ -839,11 +1190,49 @@ describe('_getSavedMultiSelectFieldValues', () => {
         dispense_delay_checkbox: { value: false, isIndeterminate: false },
         dispense_delay_seconds: { value: '1', isIndeterminate: false },
         mix_touchTip_checkbox: { value: false, isIndeterminate: false },
-        mix_touchTip_mmFromBottom: { value: null, isIndeterminate: false },
+        mix_touchTip_mmFromTop: { value: null, isIndeterminate: false },
         nozzles: { value: undefined, isIndeterminate: false },
+        mix_x_position: {
+          isIndeterminate: false,
+        },
+        mix_y_position: {
+          isIndeterminate: false,
+        },
+        blowout_z_offset: {
+          isIndeterminate: false,
+        },
         dropTip_location: {
           value: 'fixedTrash',
           isIndeterminate: false,
+        },
+        dropTip_wellNames: {
+          value: undefined,
+          isIndeterminate: false,
+        },
+        pickUpTip_location: {
+          value: undefined,
+          isIndeterminate: false,
+        },
+        pickUpTip_wellNames: {
+          value: undefined,
+          isIndeterminate: false,
+        },
+        liquidClassesSupported: { isIndeterminate: false },
+        liquidClass: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        pushOut_checkbox: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        pushOut_volume: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        mix_position_reference: {
+          isIndeterminate: false,
+          value: undefined,
         },
       })
     })
@@ -866,7 +1255,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
           blowout_checkbox: true,
           blowout_location: 'some_blowout_location',
           mix_mmFromBottom: 2,
-          pipette: 'other_pipette_id',
+          pipette: 'some_pipette_id',
           wells: ['A2'],
           aspirate_flowRate: '11.1',
           dispense_flowRate: '11.2',
@@ -875,7 +1264,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
           dispense_delay_checkbox: true,
           dispense_delay_seconds: '3',
           mix_touchTip_checkbox: true,
-          mix_touchTip_mmFromBottom: '14',
+          mix_touchTip_mmFromTop: '-14',
           nozzles: null,
         },
       }
@@ -890,6 +1279,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
           mockMixMultiSelectItemIds
         )
       ).toEqual({
+        tipRack: { isIndeterminate: false },
+        blowout_flowRate: {
+          isIndeterminate: false,
+        },
         volume: { isIndeterminate: true },
         times: { isIndeterminate: true },
         changeTip: { isIndeterminate: true },
@@ -899,7 +1292,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
         blowout_checkbox: { isIndeterminate: true },
         blowout_location: { isIndeterminate: true },
         mix_mmFromBottom: { isIndeterminate: true },
-        pipette: { isIndeterminate: true },
+        pipette: { isIndeterminate: false, value: 'some_pipette_id' },
         wells: { isIndeterminate: true },
         aspirate_flowRate: { isIndeterminate: true },
         dispense_flowRate: { isIndeterminate: true },
@@ -908,11 +1301,46 @@ describe('_getSavedMultiSelectFieldValues', () => {
         dispense_delay_checkbox: { isIndeterminate: true },
         dispense_delay_seconds: { isIndeterminate: true },
         mix_touchTip_checkbox: { isIndeterminate: true },
-        mix_touchTip_mmFromBottom: { isIndeterminate: true },
+        mix_touchTip_mmFromTop: { isIndeterminate: true },
         nozzles: { isIndeterminate: true },
+        mix_x_position: {
+          isIndeterminate: false,
+        },
+        mix_y_position: {
+          isIndeterminate: false,
+        },
+        blowout_z_offset: {
+          isIndeterminate: false,
+        },
         dropTip_location: {
           value: 'fixedTrash',
           isIndeterminate: false,
+        },
+        dropTip_wellNames: {
+          isIndeterminate: false,
+        },
+        pickUpTip_location: {
+          isIndeterminate: false,
+        },
+        pickUpTip_wellNames: {
+          isIndeterminate: false,
+        },
+        liquidClassesSupported: { isIndeterminate: false },
+        liquidClass: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        pushOut_checkbox: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        pushOut_volume: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        mix_position_reference: {
+          isIndeterminate: false,
+          value: undefined,
         },
       })
     })
@@ -1033,7 +1461,7 @@ describe('getMultiSelectDisabledFields', () => {
           aspirate_delay_seconds: aspirateLabwareDifferentText,
           aspirate_delay_mmFromBottom: aspirateLabwareDifferentText,
           aspirate_touchTip_checkbox: aspirateLabwareDifferentText,
-          aspirate_touchTip_mmFromBottom: aspirateLabwareDifferentText,
+          aspirate_touchTip_mmFromTop: aspirateLabwareDifferentText,
         })
       })
     })
@@ -1063,7 +1491,7 @@ describe('getMultiSelectDisabledFields', () => {
           dispense_delay_seconds: dispenseLabwareDifferentText,
           dispense_delay_mmFromBottom: dispenseLabwareDifferentText,
           dispense_touchTip_checkbox: dispenseLabwareDifferentText,
-          dispense_touchTip_mmFromBottom: dispenseLabwareDifferentText,
+          dispense_touchTip_mmFromTop: dispenseLabwareDifferentText,
         })
       })
     })
@@ -1251,7 +1679,7 @@ describe('getMultiSelectDisabledFields', () => {
           dispense_delay_checkbox: labwareDifferentText,
           dispense_delay_seconds: labwareDifferentText,
           mix_touchTip_checkbox: labwareDifferentText,
-          mix_touchTip_mmFromBottom: labwareDifferentText,
+          mix_touchTip_mmFromTop: labwareDifferentText,
         })
       })
     })

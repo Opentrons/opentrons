@@ -1,17 +1,20 @@
-import * as React from 'react'
 import { screen } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import '@testing-library/jest-dom/vitest'
-import { i18n } from '../../../i18n'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { useMaintenanceRunTakeover } from '../useMaintenanceRunTakeover'
-import { MaintenanceRunTakeover } from '../MaintenanceRunTakeover'
-import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import '@testing-library/jest-dom/vitest'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
+
+import { MaintenanceRunTakeover } from '../MaintenanceRunTakeover'
+import { useMaintenanceRunTakeover } from '../useMaintenanceRunTakeover'
+
+import type { ComponentProps } from 'react'
 import type { MaintenanceRunStatus } from '../MaintenanceRunStatusProvider'
 
 vi.mock('../useMaintenanceRunTakeover')
-vi.mock('../../../resources/maintenance_runs')
+vi.mock('/app/resources/maintenance_runs')
 
 const MOCK_MAINTENANCE_RUN: MaintenanceRunStatus = {
   getRunIds: () => ({
@@ -21,14 +24,14 @@ const MOCK_MAINTENANCE_RUN: MaintenanceRunStatus = {
   setOddRunIds: () => null,
 }
 
-const render = (props: React.ComponentProps<typeof MaintenanceRunTakeover>) => {
+const render = (props: ComponentProps<typeof MaintenanceRunTakeover>) => {
   return renderWithProviders(<MaintenanceRunTakeover {...props} />, {
     i18nInstance: i18n,
   })
 }
 
 describe('MaintenanceRunTakeover', () => {
-  let props: React.ComponentProps<typeof MaintenanceRunTakeover>
+  let props: ComponentProps<typeof MaintenanceRunTakeover>
   const testComponent = <div>{'Test Component'}</div>
 
   beforeEach(() => {

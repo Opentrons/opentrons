@@ -1,19 +1,17 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  COLORS,
-  SPACING,
-  DIRECTION_COLUMN,
   ALIGN_CENTER,
-  JUSTIFY_CENTER,
-  Icon,
-  TYPOGRAPHY,
   BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  Icon,
+  JUSTIFY_CENTER,
+  LegacyStyledText,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
 
 export function CheckUpdates(): JSX.Element {
   const { t } = useTranslation('device_settings')
@@ -29,9 +27,9 @@ export function CheckUpdates(): JSX.Element {
       borderRadius={BORDERS.borderRadius12}
     >
       <Icon name="ot-spinner" size="5rem" spin color={COLORS.grey60} />
-      <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+      <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
         {t('checking_for_updates')}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }

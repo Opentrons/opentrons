@@ -1,18 +1,18 @@
 import { ofType } from 'redux-observable'
 import { mapTo } from 'rxjs/operators'
 
+import { startDiscovery } from '../../discovery'
 import { POST } from '../../robot-api/constants'
 import { mapToRobotApiRequest } from '../../robot-api/operators'
 import { getRobotRestartPath } from '../../robot-settings'
-import { startDiscovery } from '../../discovery'
-import * as Constants from '../constants'
 import * as Actions from '../actions'
+import * as Constants from '../constants'
 
-import type { Epic, Action } from '../../types'
 import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
+import type { Action, Epic } from '../../types'
 import type { RestartRobotAction } from '../types'
 
 const RESTART_DISCOVERY_TIMEOUT_MS = 60000
@@ -22,7 +22,7 @@ const mapActionToRequest: ActionToRequestMapper<RestartRobotAction> = (
   state
 ) => {
   const path =
-    getRobotRestartPath(state, action.payload.robotName) ||
+    getRobotRestartPath(state, action.payload.robotName) ??
     Constants.RESTART_PATH
 
   return { method: POST, path }
@@ -38,7 +38,11 @@ const mapResponseToAction: ResponseToActionMapper<RestartRobotAction> = (
 
   return response.ok
     ? Actions.restartRobotSuccess(host.name, meta)
-    : Actions.restartRobotFailure(host.name, body, meta)
+    : Actions.restartRobotFailure(
+        host.name,
+        body as Record<string, unknown>,
+        meta
+      )
 }
 
 export const restartEpic: Epic = (action$, state$) => {

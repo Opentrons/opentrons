@@ -6,7 +6,7 @@ from opentrons.hardware_control.ot3api import OT3API
 
 from opentrons.hardware_control.instruments.ot3.pipette import Pipette
 
-from opentrons_shared_data.pipette.dev_types import UlPerMm
+from opentrons_shared_data.pipette.types import UlPerMm
 
 from .types import OT3Mount
 
@@ -287,4 +287,4 @@ def overwrite_attached_pipette_ul_per_mm(
     pipette: Optional[Pipette] = api._pipette_handler._attached_instruments[mount]
     if pipette is None:
         raise RuntimeError(f"No pipette is attached to mount: {mount}")
-    pipette._config = replace(pipette._config, ul_per_mm=ul_per_mm)
+    pipette._config = replace(pipette._config, ul_per_mm=ul_per_mm)  # type: ignore[type-var]

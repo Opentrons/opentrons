@@ -17,7 +17,7 @@ from opentrons.protocol_engine import ModuleDefinition
 def tempdeck_v1_def() -> ModuleDefinition:
     """Get the definition of a V1 tempdeck."""
     definition = load_shared_data("module/definitions/3/temperatureModuleV1.json")
-    return ModuleDefinition.parse_raw(definition)
+    return ModuleDefinition.model_validate_json(definition)
 
 
 @pytest.fixture()
@@ -110,6 +110,58 @@ def python_protocol_file(tmp_path: Path) -> Path:
                 pipette.pick_up_tip(
                     location=tip_rack.wells_by_name()["A1"],
                 )
+            """
+        )
+    )
+
+    return path
+
+
+@pytest.fixture()
+def python_protocol_file_with_run_time_params(tmp_path: Path) -> Path:
+    """Get minimal Python protocol input "file" with run time parameters."""
+    path = tmp_path / "protocol-name.py"
+    path.write_text(
+        textwrap.dedent(
+            """
+            # my protocol
+            metadata = {
+                "apiLevel": "2.18",
+            }
+            def add_parameters(params):
+                params.add_float(
+                    display_name="Aspirate volume",
+                    variable_name="aspirate_volume",
+                    default=25.5,
+                    minimum=10,
+                    maximum=50,
+                )
+                params.add_str(
+                    display_name="Mount",
+                    variable_name="mount",
+                    choices=[
+                        {"display_name": "Left Mount", "value": "left"},
+                        {"display_name": "Right Mount", "value": "right"},
+                    ],
+                    default="left",
+                )
+            def run(ctx):
+                pipette = ctx.load_instrument(
+                    instrument_name="p300_single",
+                    mount=ctx.params.mount,
+                )
+                tip_rack = ctx.load_labware(
+                    load_name="opentrons_96_tiprack_300ul",
+                    location="1",
+                )
+                reservoir = ctx.load_labware(
+                    load_name="nest_1_reservoir_195ml",
+                    location=2,
+                )
+                pipette.pick_up_tip(
+                    location=tip_rack.wells_by_name()["A1"],
+                )
+                pipette.aspirate(ctx.params.aspirate_volume, reservoir.wells()[0])
             """
         )
     )

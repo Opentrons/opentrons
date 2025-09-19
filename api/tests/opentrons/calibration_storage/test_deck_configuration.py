@@ -10,8 +10,12 @@ def test_deck_configuration_serdes() -> None:
     """Test that deck configuration serialization/deserialization survives a round trip."""
 
     dummy_cutout_fixture_placements = [
-        CutoutFixturePlacement(cutout_fixture_id="a", cutout_id="b"),
-        CutoutFixturePlacement(cutout_fixture_id="c", cutout_id="d"),
+        CutoutFixturePlacement(
+            cutout_fixture_id="a", cutout_id="b", opentrons_module_serial_number="1"
+        ),
+        CutoutFixturePlacement(
+            cutout_fixture_id="c", cutout_id="d", opentrons_module_serial_number="2"
+        ),
     ]
     dummy_datetime = datetime(year=1961, month=5, day=6, tzinfo=timezone.utc)
 

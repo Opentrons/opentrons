@@ -1,11 +1,22 @@
-import * as React from 'react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
-import { fireEvent, screen } from '@testing-library/react'
+
 import { BrowserRouter } from 'react-router-dom'
-import { i18n } from '../../../i18n'
+import { fireEvent, screen } from '@testing-library/react'
+
+import {
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  LegacyStyledText,
+  SPACING,
+} from '@opentrons/components'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+
 import { UploadInput } from '..'
-import { renderWithProviders } from '../../../__testing-utils__'
 
 describe('UploadInput', () => {
   let onUpload: any
@@ -24,6 +35,32 @@ describe('UploadInput', () => {
     )
 
     expect(screen.getByRole('button', { name: 'Upload' })).toBeTruthy()
+  })
+
+  it('renders text when passing them as props', () => {
+    const mockUploadText = (
+      <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
+        <LegacyStyledText>{'CSV file'}</LegacyStyledText>
+        <Icon name="information" size="0.75rem" data-testid="mockIcon" />
+      </Flex>
+    )
+
+    renderWithProviders(
+      <BrowserRouter>
+        <UploadInput
+          onUpload={onUpload}
+          uploadButtonText="Choose file"
+          uploadText={mockUploadText}
+        />
+      </BrowserRouter>,
+      {
+        i18nInstance: i18n,
+      }
+    )
+
+    screen.getByText('CSV file')
+    screen.getByTestId('mockIcon')
+    screen.getByText('Choose file')
   })
 
   it('opens file select on button click', () => {

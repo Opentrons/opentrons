@@ -3,13 +3,14 @@ from decoy import Decoy
 
 from opentrons.hardware_control.modules import Thermocycler
 
-from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.state.module_substates import (
     ThermocyclerModuleSubState,
     ThermocyclerModuleId,
 )
 from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands import thermocycler as tc_commands
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.thermocycler.run_profile import (
     RunProfileImpl,
 )
@@ -24,8 +25,8 @@ async def test_run_profile(
     subject = RunProfileImpl(state_view=state_view, equipment=equipment)
 
     step_data = [
-        tc_commands.RunProfileStepParams(celsius=12.3, holdSeconds=45),
-        tc_commands.RunProfileStepParams(celsius=45.6, holdSeconds=78),
+        tc_commands.RunProfileStepParams(celsius=12.3, holdSeconds=45, rampRate=0.0),
+        tc_commands.RunProfileStepParams(celsius=45.6, holdSeconds=78, rampRate=0.0),
     ]
     data = tc_commands.RunProfileParams(
         moduleId="input-thermocycler-id",
@@ -56,6 +57,9 @@ async def test_run_profile(
     # Stub volume validation from hs module view
     decoy.when(tc_module_substate.validate_max_block_volume(56.7)).then_return(76.5)
 
+    decoy.when(tc_module_substate.validate_ramp_rate(0.0, 12.3)).then_return(0.0)
+    decoy.when(tc_module_substate.validate_ramp_rate(0.0, 45.6)).then_return(0.0)
+
     # Get attached hardware modules
     decoy.when(
         equipment.get_module_hardware_api(ThermocyclerModuleId("thermocycler-id"))
@@ -66,12 +70,12 @@ async def test_run_profile(
     decoy.verify(
         await tc_hardware.cycle_temperatures(
             steps=[
-                {"temperature": 32.1, "hold_time_seconds": 45},
-                {"temperature": 65.4, "hold_time_seconds": 78},
+                {"temperature": 32.1, "hold_time_seconds": 45, "ramp_rate": 0.0},
+                {"temperature": 65.4, "hold_time_seconds": 78, "ramp_rate": 0.0},
             ],
             repetitions=1,
             volume=76.5,
         ),
         times=1,
     )
-    assert result == expected_result
+    assert result == SuccessData(public=expected_result)

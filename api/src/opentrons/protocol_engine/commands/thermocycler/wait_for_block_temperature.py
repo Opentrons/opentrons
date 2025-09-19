@@ -5,10 +5,11 @@ from typing_extensions import Literal, Type
 
 from pydantic import BaseModel, Field
 
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ...errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
-    from opentrons.protocol_engine.state import StateView
+    from opentrons.protocol_engine.state.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler
 
 
@@ -27,8 +28,7 @@ class WaitForBlockTemperatureResult(BaseModel):
 
 class WaitForBlockTemperatureImpl(
     AbstractCommandImpl[
-        WaitForBlockTemperatureParams,
-        WaitForBlockTemperatureResult,
+        WaitForBlockTemperatureParams, SuccessData[WaitForBlockTemperatureResult]
     ]
 ):
     """Execution implementation of Thermocycler's wait for block temperature command."""
@@ -45,7 +45,7 @@ class WaitForBlockTemperatureImpl(
     async def execute(
         self,
         params: WaitForBlockTemperatureParams,
-    ) -> WaitForBlockTemperatureResult:
+    ) -> SuccessData[WaitForBlockTemperatureResult]:
         """Wait for a Thermocycler's target block temperature."""
         thermocycler_state = self._state_view.modules.get_thermocycler_module_substate(
             params.moduleId
@@ -61,11 +61,15 @@ class WaitForBlockTemperatureImpl(
         if thermocycler_hardware is not None:
             await thermocycler_hardware.wait_for_block_target()
 
-        return WaitForBlockTemperatureResult()
+        return SuccessData(
+            public=WaitForBlockTemperatureResult(),
+        )
 
 
 class WaitForBlockTemperature(
-    BaseCommand[WaitForBlockTemperatureParams, WaitForBlockTemperatureResult]
+    BaseCommand[
+        WaitForBlockTemperatureParams, WaitForBlockTemperatureResult, ErrorOccurrence
+    ]
 ):
     """A command to wait for a Thermocycler's target block temperature."""
 
@@ -73,7 +77,7 @@ class WaitForBlockTemperature(
         "thermocycler/waitForBlockTemperature"
     )
     params: WaitForBlockTemperatureParams
-    result: Optional[WaitForBlockTemperatureResult]
+    result: Optional[WaitForBlockTemperatureResult] = None
 
     _ImplementationCls: Type[WaitForBlockTemperatureImpl] = WaitForBlockTemperatureImpl
 

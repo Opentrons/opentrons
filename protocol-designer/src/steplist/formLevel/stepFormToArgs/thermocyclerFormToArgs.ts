@@ -1,14 +1,16 @@
-import { THERMOCYCLER_STATE, THERMOCYCLER_PROFILE } from '../../../constants'
-import {
+import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../../../constants'
+import { PROFILE_STEP } from '../../../form-types'
+
+import type {
   ThermocyclerProfileStepArgs,
   ThermocyclerStateStepArgs,
 } from '@opentrons/step-generation'
-import { PROFILE_STEP } from '../../../form-types'
 import type {
-  FormData,
+  HydratedThermocyclerFormData,
   ProfileItem,
   ProfileStepItem,
 } from '../../../form-types'
+
 type FlatProfileSteps = ThermocyclerProfileStepArgs['profileSteps']
 
 const _flattenProfileSteps = (args: {
@@ -47,14 +49,14 @@ const _flattenProfileSteps = (args: {
 }
 
 export const thermocyclerFormToArgs = (
-  formData: FormData
+  formData: HydratedThermocyclerFormData
 ): ThermocyclerProfileStepArgs | ThermocyclerStateStepArgs | null => {
-  const { thermocyclerFormType } = formData
+  const { thermocyclerFormType, stepDetails } = formData
 
   switch (thermocyclerFormType) {
     case THERMOCYCLER_STATE: {
       return {
-        module: formData.moduleId,
+        moduleId: formData.moduleId,
         commandCreatorFnName: THERMOCYCLER_STATE,
         blockTargetTemp:
           formData.blockIsActive && formData.blockTargetTemp !== null
@@ -75,7 +77,7 @@ export const thermocyclerFormToArgs = (
       })
 
       return {
-        module: formData.moduleId,
+        moduleId: formData.moduleId,
         commandCreatorFnName: THERMOCYCLER_PROFILE,
         blockTargetTempHold:
           formData.blockIsActiveHold && formData.blockTargetTempHold !== null
@@ -94,6 +96,7 @@ export const thermocyclerFormToArgs = (
         profileSteps,
         profileTargetLidTemp: Number(formData.profileTargetLidTemp),
         profileVolume: Number(formData.profileVolume),
+        description: stepDetails,
       }
     }
   }

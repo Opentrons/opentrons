@@ -1,13 +1,17 @@
-import * as React from 'react'
-import { COLORS, SPACING } from '@opentrons/components'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { COLORS, SPACING } from '@opentrons/components'
+
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+
 import { ModuleIcon } from '../'
 
-import type { AttachedModule } from '../../../redux/modules/types'
+import type { ComponentProps } from 'react'
 import type * as OpentronsComponents from '@opentrons/components'
+import type { AttachedModule } from '/app/redux/modules/types'
 
 vi.mock('@opentrons/components', async importOriginal => {
   const actualComponents = await importOriginal<typeof OpentronsComponents>()
@@ -17,7 +21,7 @@ vi.mock('@opentrons/components', async importOriginal => {
   }
 })
 
-const render = (props: React.ComponentProps<typeof ModuleIcon>) => {
+const render = (props: ComponentProps<typeof ModuleIcon>) => {
   return renderWithProviders(<ModuleIcon {...props} />)[0]
 }
 
@@ -46,7 +50,7 @@ const mockHeaterShakerModule = {
 } as AttachedModule
 
 describe('ModuleIcon', () => {
-  let props: React.ComponentProps<typeof ModuleIcon>
+  let props: ComponentProps<typeof ModuleIcon>
 
   beforeEach(() => {
     props = {
@@ -58,11 +62,11 @@ describe('ModuleIcon', () => {
   it('renders SharedIcon with correct style', () => {
     render(props)
     const module = screen.getByTestId('ModuleIcon_ot-temperature-v2')
-    expect(module).toHaveStyle(`color: ${COLORS.black90}`)
+    expect(module).toHaveStyle(`color: ${COLORS.grey60}`)
     expect(module).toHaveStyle(`height: ${SPACING.spacing16}`)
     expect(module).toHaveStyle(`width: ${SPACING.spacing16}`)
-    expect(module).toHaveStyle(`margin-left: ${SPACING.spacing2}`)
-    expect(module).toHaveStyle(`margin-right: ${SPACING.spacing2}`)
+    expect(module).toHaveStyle(`margin-left: ${SPACING.spacing4}`)
+    expect(module).toHaveStyle(`margin-right: ${SPACING.spacing4}`)
   })
 
   it('renders magnetic module icon', () => {

@@ -1,0 +1,40 @@
+# This workflow runs lint on pull requests that touch anything in the analyses-snapshot-testing directory
+
+name: 'analyses-snapshot-testing lint'
+
+on:
+  pull_request:
+    paths:
+      - 'analyses-snapshot-testing/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  lint:
+    name: 'analyses-snapshot-testing lint'
+    timeout-minutes: 5
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: Checkout opentrons repo
+        uses: 'actions/checkout@v4'
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.10"
+          enable-cache: true
+          cache-dependency-glob: "./analyses-snapshot-testing/uv.lock"
+      - name: Setup the project
+        working-directory: ./analyses-snapshot-testing
+        run: make setup
+      - name: ruff-check
+        working-directory: ./analyses-snapshot-testing
+        run: make ruff-check
+      - name: unit tests
+        working-directory: ./analyses-snapshot-testing
+        run: make unit-test

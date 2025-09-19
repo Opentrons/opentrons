@@ -22,12 +22,6 @@ const parseArgs = require('./lib/parseArgs')
 const conventionalChangelog = require('conventional-changelog')
 const semver = require('semver')
 const { Octokit } = require('@octokit/rest')
-const {
-  detailsFromTag,
-  tagFromDetails,
-  prefixForProject,
-  monorepoGit,
-} = require('../git-version')
 
 const USAGE =
   '\nUsage:\n node ./scripts/deploy/create-release <token> <tag> [--deploy] [--allow-old]'
@@ -81,9 +75,35 @@ function versionPrevious(currentVersion, previousVersions) {
   return releasesOfGEQKind.length === 0 ? null : releasesOfGEQKind[0]
 }
 
+async function gitVersion() {
+  let imported
+  if (imported === undefined) {
+    imported = await import('../git-version.mjs')
+  }
+  return imported
+}
+
+async function monorepoGit() {
+  return await (await gitVersion()).monorepoGit()
+}
+
+async function detailsFromTag(tag) {
+  return await (await gitVersion()).detailsFromTag(tag)
+}
+
+async function tagFromDetails(project, version) {
+  return await (await gitVersion()).tagFromDetails(project, version)
+}
+
+async function prefixForProject(project) {
+  return (await gitVersion()).prefixForProject(project)
+}
+
 async function versionDetailsFromGit(tag, allowOld) {
   if (!allowOld) {
-    const last100 = await monorepoGit().log({ from: 'HEAD~100', to: 'HEAD' })
+    const git = await monorepoGit()
+    const last100 = await git.log({ from: 'HEAD~100', to: 'HEAD' })
+
     if (!last100.all.some(commit => commit.refs.includes('tag: ' + tag))) {
       throw new Error(
         `Cannot find tag ${tag} in last 100 commits. You must run this script from a ref with ` +
@@ -93,20 +113,19 @@ async function versionDetailsFromGit(tag, allowOld) {
     }
   }
 
-  const [project, currentVersion] = detailsFromTag(tag)
-
-  const allTags = (await monorepoGit().tags([prefixForProject(project) + '*']))
-    .all
+  const [project, currentVersion] = await detailsFromTag(tag)
+  const prefix = await prefixForProject(project)
+  const allTags = (await (await monorepoGit()).tags([prefix + '*'])).all
   if (!allTags.includes(tag)) {
     throw new Error(
       `Tag ${tag} does not exist - create it before running this script`
     )
   }
-  const sortedVersions = allTags
-    .map(tag => detailsFromTag(tag)[1])
+  const allVersions = await Promise.all(allTags.map(tag => detailsFromTag(tag)))
+  const sortedVersions = allVersions
+    .map(details => details[1])
     .sort(semver.compare)
     .reverse()
-
   const previousVersion = versionPrevious(currentVersion, sortedVersions)
   return [project, currentVersion, previousVersion]
 }
@@ -123,14 +142,15 @@ async function buildChangelog(project, currentVersion, previousVersion) {
       `## ${currentVersion}` + `\nFirst release for ${titleForProject(project)}`
     )
   }
-  const previousTag = tagFromDetails(project, previousVersion)
-
+  const previousTag = await tagFromDetails(project, previousVersion)
+  const currentTag = await tagFromDetails(project, currentVersion)
+  const prefix = await prefixForProject(project)
   const changelogStream = conventionalChangelog(
-    { preset: 'angular', tagPrefix: prefixForProject(project) },
+    { preset: 'angular', tagPrefix: prefix },
     {
       version: currentVersion,
-      currentTag: tagFromDetails(project, currentVersion),
-      previousTag: previousTag,
+      currentTag,
+      previousTag,
       host: 'https://github.com',
       owner: REPO_DETAILS.owner,
       repository: REPO_DETAILS.repo,
@@ -203,6 +223,7 @@ async function main() {
     currentVersion,
     previousVersion,
   ] = await versionDetailsFromGit(tag, allowOld)
+  const prefix = await prefixForProject(project)
   const changelog = await buildChangelog(
     project,
     currentVersion,
@@ -211,8 +232,8 @@ async function main() {
   const truncatedChangelog = truncateAndAnnotate(
     changelog,
     10000,
-    prefixForProject(project) + previousVersion,
-    prefixForProject(project) + currentVersion
+    prefix + previousVersion,
+    prefix + currentVersion
   )
   return await createRelease(
     token,

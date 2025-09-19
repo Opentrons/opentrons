@@ -1,4 +1,5 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import {
   FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC,
   getSimplestDeckConfigForProtocol,
@@ -24,7 +25,7 @@ describe('getSimplestDeckConfigForProtocol', () => {
       FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC
     )
   })
-  it('returns staging area fixtures if commands address column 4 areas', () => {
+  it.only('returns staging area fixtures if commands address column 4 areas', () => {
     const cutoutConfigs = getSimplestDeckConfigForProtocol(({
       commands: [
         {

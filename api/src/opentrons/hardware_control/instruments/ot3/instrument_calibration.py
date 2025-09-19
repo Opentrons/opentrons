@@ -21,7 +21,7 @@ from opentrons.calibration_storage import (
 )
 from opentrons.hardware_control.types import OT3Mount
 
-PIPETTE_OFFSET_CONSISTENCY_LIMIT: Final = 1.5
+PIPETTE_OFFSET_CONSISTENCY_LIMIT: Final = 4.0
 
 # These type aliases aid typechecking in tests that work the same on this and
 # the hardware_control.instruments.ot2 variant
@@ -70,6 +70,16 @@ class GripperCalibrationOffset:
     offset: Point
     source: SourceType
     status: CalibrationStatus
+    last_modified: typing.Optional[datetime] = None
+
+
+@dataclass
+class GripperJawWidthData:
+    """Store gripper jaw width information on the robot fs."""
+
+    source: SourceType
+    status: CalibrationStatus
+    encoder_position_at_jaw_closed: typing.Optional[float] = None
     last_modified: typing.Optional[datetime] = None
 
 
@@ -140,6 +150,39 @@ def load_gripper_calibration_offset(
                 ),
             )
     return grip_cal_obj
+
+
+def load_gripper_jaw_width(
+    gripper_id: typing.Optional[str],
+) -> GripperJawWidthData:
+    grip_jaw_width_obj = GripperJawWidthData(
+        encoder_position_at_jaw_closed=None,
+        source=SourceType.default,
+        status=CalibrationStatus(),
+    )
+    if gripper_id and ff.enable_ot3_hardware_controller():
+        gripper_jaw_width_data = gripper_offset.get_gripper_jaw_width_data(gripper_id)
+        if gripper_jaw_width_data:
+            return GripperJawWidthData(
+                encoder_position_at_jaw_closed=gripper_jaw_width_data.encoderPositionAtJawClosed,
+                source=gripper_jaw_width_data.source,
+                status=cal_top_types.CalibrationStatus(
+                    markedAt=gripper_jaw_width_data.status.markedAt,
+                    markedBad=gripper_jaw_width_data.status.markedBad,
+                    source=gripper_jaw_width_data.status.source,
+                ),
+            )
+    return grip_jaw_width_obj
+
+
+def save_gripper_jaw_width_data(
+    gripper_id: typing.Optional[str], encoder_position_at_closed: float
+) -> None:
+    if gripper_id and ff.enable_ot3_hardware_controller():
+        gripper_offset.save_gripper_jaw_width_data(
+            encoder_position_at_jaw_closed=encoder_position_at_closed,
+            gripper_id=gripper_id,
+        )
 
 
 def save_gripper_calibration_offset(

@@ -42,6 +42,8 @@ MessageDefinition = Union[
     defs.WriteMotorDriverRegister,
     defs.ReadMotorDriverRequest,
     defs.ReadMotorDriverResponse,
+    defs.ReadMotorDriverErrorStatusRequest,
+    defs.ReadMotorDriverErrorStatusResponse,
     defs.WriteMotorCurrentRequest,
     defs.SetBrushedMotorVrefRequest,
     defs.SetBrushedMotorPwmRequest,
@@ -64,12 +66,15 @@ MessageDefinition = Union[
     defs.FirmwareUpdateStartApp,
     defs.ReadLimitSwitchRequest,
     defs.ReadLimitSwitchResponse,
+    defs.MaxSensorValueRequest,
+    defs.MaxSensorValueResponse,
     defs.ReadFromSensorRequest,
     defs.WriteToSensorRequest,
     defs.BaselineSensorRequest,
     defs.BaselineSensorResponse,
     defs.SetSensorThresholdRequest,
     defs.ReadFromSensorResponse,
+    defs.BatchReadFromSensorResponse,
     defs.SensorThresholdResponse,
     defs.SensorDiagnosticRequest,
     defs.SensorDiagnosticResponse,
@@ -107,10 +112,13 @@ MessageDefinition = Union[
     defs.SetHepaUVStateRequest,
     defs.GetHepaUVStateRequest,
     defs.GetHepaUVStateResponse,
+    defs.SendAccumulatedSensorDataRequest,
+    defs.AddSensorLinearMoveRequest,
+    defs.IncreaseEvoTipDispenseCountRequestRequest,
 ]
 
 
-@lru_cache(maxsize=None)
+@lru_cache(maxsize=100)
 def get_definition(message_id: MessageId) -> Optional[Type[MessageDefinition]]:
     """Get the message type for a message id.
 

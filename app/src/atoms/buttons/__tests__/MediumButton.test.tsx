@@ -1,18 +1,22 @@
-import * as React from 'react'
 import '@testing-library/jest-dom/vitest'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+
 import { fireEvent, screen } from '@testing-library/react'
-import { COLORS, BORDERS } from '@opentrons/components'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { BORDERS, COLORS } from '@opentrons/components'
+
+import { renderWithProviders } from '/app/__testing-utils__'
 
 import { MediumButton } from '../MediumButton'
 
-const render = (props: React.ComponentProps<typeof MediumButton>) => {
+import type { ComponentProps } from 'react'
+
+const render = (props: ComponentProps<typeof MediumButton>) => {
   return renderWithProviders(<MediumButton {...props} />)[0]
 }
 
 describe('MediumButton', () => {
-  let props: React.ComponentProps<typeof MediumButton>
+  let props: ComponentProps<typeof MediumButton>
   beforeEach(() => {
     props = {
       onClick: vi.fn(),
@@ -24,7 +28,6 @@ describe('MediumButton', () => {
     render(props)
     fireEvent.click(screen.getByText('Medium button'))
     expect(props.onClick).toHaveBeenCalled()
-    expect(screen.getByRole('button')).toHaveStyle('background-color: #045dd0')
   })
   it('renders the alert button', () => {
     props = {
@@ -32,7 +35,9 @@ describe('MediumButton', () => {
       buttonType: 'alert',
     }
     render(props)
-    expect(screen.getByRole('button')).toHaveStyle('background-color: #b91f20')
+    expect(screen.getByRole('button')).toHaveStyle(
+      `background-color: ${COLORS.red50}`
+    )
   })
   it('renders the secondary button', () => {
     props = {
@@ -40,7 +45,9 @@ describe('MediumButton', () => {
       buttonType: 'secondary',
     }
     render(props)
-    expect(screen.getByRole('button')).toHaveStyle('background-color: #94afd4')
+    expect(screen.getByRole('button')).toHaveStyle(
+      `background-color: ${COLORS.blue35}`
+    )
   })
   it('renders the secondary alert button', () => {
     props = {
@@ -48,7 +55,9 @@ describe('MediumButton', () => {
       buttonType: 'alertSecondary',
     }
     render(props)
-    expect(screen.getByRole('button')).toHaveStyle('background-color: #ccabac')
+    expect(screen.getByRole('button')).toHaveStyle(
+      `background-color: ${COLORS.red35}`
+    )
   })
   it('renders the tertiary high button', () => {
     props = {
@@ -57,7 +66,7 @@ describe('MediumButton', () => {
     }
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(
-      `background-color: ${COLORS.grey35}`
+      `background-color: ${COLORS.white}`
     )
   })
   it('renders the tertiary low light button', () => {
@@ -67,7 +76,7 @@ describe('MediumButton', () => {
     }
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(
-      `background-color: ${COLORS.grey35}`
+      `background-color: ${COLORS.white}`
     )
   })
   it('renders the button as disabled', () => {

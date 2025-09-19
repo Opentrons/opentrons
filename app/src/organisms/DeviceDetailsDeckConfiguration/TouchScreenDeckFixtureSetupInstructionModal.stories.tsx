@@ -1,7 +1,9 @@
-import * as React from 'react'
-import { touchScreenViewport } from '../../DesignTokens/constants'
+import { VIEWPORT } from '@opentrons/components'
+
 import { DeckFixtureSetupInstructionsModal } from './DeckFixtureSetupInstructionsModal'
-import type { Story, Meta } from '@storybook/react'
+
+import type { Meta, Story } from '@storybook/react'
+import type * as React from 'react'
 
 export default {
   title: 'ODD/Organisms/DeckFixtureSetupInstructionsModal',
@@ -12,7 +14,7 @@ export default {
     },
     onOutsideClick: { action: 'clicked' },
   },
-  parameters: touchScreenViewport,
+  parameters: VIEWPORT.touchScreenViewport,
 } as Meta
 
 const Template: Story<

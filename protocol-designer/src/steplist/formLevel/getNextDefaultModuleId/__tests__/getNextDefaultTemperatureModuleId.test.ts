@@ -1,16 +1,19 @@
-import { it, describe, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import {
   MAGNETIC_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
+  TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,
+  THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
+
 import { getNextDefaultTemperatureModuleId } from '../getNextDefaultTemperatureModuleId'
-import type { FormData, StepIdType } from '../../../../form-types'
-import type { ModuleOnDeck } from '../../../../step-forms'
+
+import type { FormData, StepIdType } from '/protocol-designer/form-types'
+import type { ModuleOnDeck } from '/protocol-designer/step-forms'
 
 const getThermocycler = () => ({
   id: 'tcId',
@@ -23,6 +26,7 @@ const getThermocycler = () => ({
     lidTargetTemp: null,
     lidOpen: null,
   },
+  pythonName: 'mockPythonName',
 })
 
 const getMag = () => ({
@@ -34,6 +38,7 @@ const getMag = () => ({
     type: MAGNETIC_MODULE_TYPE,
     engaged: false,
   },
+  pythonName: 'mockPythonName',
 })
 
 const getTemp = () => ({
@@ -46,6 +51,7 @@ const getTemp = () => ({
     status: TEMPERATURE_DEACTIVATED,
     targetTemperature: null,
   },
+  pythonName: 'mockPythonName',
 })
 
 describe('getNextDefaultTemperatureModuleId', () => {

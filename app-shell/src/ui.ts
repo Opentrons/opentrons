@@ -1,12 +1,12 @@
 // sets up the main window ui
-import { app, shell, BrowserWindow } from 'electron'
 import path from 'path'
+import { app, BrowserWindow, shell } from 'electron'
 
 import { getConfig } from './config'
-import { RELOAD_UI } from './constants'
+import { RELOAD_UI, UI_INITIALIZED } from './constants'
 import { createLogger } from './log'
 
-import type { Action } from './types'
+import type { Action, Dispatch } from './types'
 
 const config = getConfig('ui')
 const log = createLogger('ui')
@@ -48,6 +48,7 @@ export function createUi(): BrowserWindow {
     () => {
       log.debug('Main window ready to show')
       mainWindow.show()
+      mainWindow.webContents.send('window-type', 'desktop-main')
     }
   )
 
@@ -73,8 +74,27 @@ export function registerReloadUi(
       case RELOAD_UI:
         log.info(`reloading UI: ${action.payload.message}`)
         browserWindow.webContents.reload()
+        break
+    }
+  }
+}
+
+export function registerSystemLanguage(
+  dispatch: Dispatch
+): (action: Action) => unknown {
+  return function handleAction(action: Action) {
+    switch (action.type) {
+      case UI_INITIALIZED: {
+        const systemLanguage = app.getPreferredSystemLanguages()
+
+        dispatch({
+          type: 'shell:SYSTEM_LANGUAGE',
+          payload: { systemLanguage },
+          meta: { shell: true },
+        })
 
         break
+      }
     }
   }
 }

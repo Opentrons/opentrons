@@ -1,4 +1,5 @@
 import { dialog, shell } from 'electron'
+
 import type {
   BrowserWindow,
   OpenDialogOptions,
@@ -24,7 +25,7 @@ const BASE_FILE_OPTS = {
 export function showOpenDirectoryDialog(
   browserWindow: BrowserWindow,
   options: Partial<BaseDialogOptions> = {}
-): Promise<String[]> {
+): Promise<string[]> {
   let openDialogOpts: OpenDialogOptions = BASE_DIRECTORY_OPTS
 
   // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
@@ -35,7 +36,7 @@ export function showOpenDirectoryDialog(
   return dialog
     .showOpenDialog(browserWindow, openDialogOpts)
     .then((result: OpenDialogReturnValue) => {
-      return result.canceled ? [] : (result.filePaths as string[])
+      return result.canceled ? [] : result.filePaths
     })
 }
 
@@ -58,7 +59,7 @@ export function showOpenFileDialog(
   return dialog
     .showOpenDialog(browserWindow, openDialogOpts)
     .then((result: OpenDialogReturnValue) => {
-      return result.canceled ? [] : (result.filePaths as string[])
+      return result.canceled ? [] : result.filePaths
     })
 }
 

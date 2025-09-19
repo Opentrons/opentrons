@@ -1,19 +1,18 @@
-import * as React from 'react'
-
 import {
+  ALIGN_CENTER,
   Btn,
+  COLORS,
   Flex,
   Icon,
-  ALIGN_CENTER,
-  COLORS,
+  LegacyStyledText,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
+import type { HTMLProps } from 'react'
 
 export function ODDBackButton(
-  props: React.HTMLProps<HTMLButtonElement>
+  props: HTMLProps<HTMLButtonElement>
 ): JSX.Element {
   const { onClick, label } = props
 
@@ -27,9 +26,9 @@ export function ODDBackButton(
           width="3rem"
         />
       </Btn>
-      <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+      <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
         {label}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }

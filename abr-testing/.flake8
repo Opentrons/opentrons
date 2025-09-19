@@ -1,5 +1,7 @@
 [flake8]
 
+extend-exclude = venv .venv
+
 # set line-length for future black support
 # https://github.com/psf/black/blob/master/docs/compatible_configs.md
 max-line-length = 100
@@ -21,4 +23,5 @@ docstring-convention = google
 
 noqa-require-code = true
 
-# per-file-ignores =
+per-file-ignores =
+    abr_testing/protocols/*: C901

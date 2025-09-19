@@ -1,19 +1,18 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
+  LegacyStyledText,
   SPACING,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
-import { SmallButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
+import { SmallButton } from '/app/atoms/buttons'
+import { OddModal } from '/app/molecules/OddModal'
 
-import { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface DeckConfigurationDiscardChangesModalProps {
   setShowConfirmationModal: (showConfirmationModal: boolean) => void
@@ -23,20 +22,22 @@ export function DeckConfigurationDiscardChangesModal({
   setShowConfirmationModal,
 }: DeckConfigurationDiscardChangesModalProps): JSX.Element {
   const { t } = useTranslation('device_details')
-  const history = useHistory()
-  const modalHeader: ModalHeaderBaseProps = {
+  const navigate = useNavigate()
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('changes_will_be_lost'),
   }
 
   const handleDiscard = (): void => {
     setShowConfirmationModal(false)
-    history.goBack()
+    navigate(-1)
   }
 
   return (
-    <Modal header={modalHeader}>
+    <OddModal header={modalHeader}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-        <StyledText as="p">{t('changes_will_be_lost_description')}</StyledText>
+        <LegacyStyledText as="p">
+          {t('changes_will_be_lost_description')}
+        </LegacyStyledText>
         <Flex
           width="100%"
           flexDirection={DIRECTION_ROW}
@@ -51,10 +52,12 @@ export function DeckConfigurationDiscardChangesModal({
           <SmallButton
             width="100%"
             buttonText={t('continue_editing')}
-            onClick={() => setShowConfirmationModal(false)}
+            onClick={() => {
+              setShowConfirmationModal(false)
+            }}
           />
         </Flex>
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

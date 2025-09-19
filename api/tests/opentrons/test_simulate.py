@@ -296,6 +296,45 @@ def test_get_protocol_api_usable_without_homing(api_version: APIVersion) -> None
     pipette.pick_up_tip(tip_rack["A1"])  # Should not raise.
 
 
+def test_liquid_probe_get_protocol_api() -> None:
+    """Covers `simulate.get_protocol_api()`-specific issues with liquid probes.
+
+    See https://opentrons.atlassian.net/browse/EXEC-646.
+    """
+    protocol = simulate.get_protocol_api(version="2.20", robot_type="Flex")
+    pipette = protocol.load_instrument("flex_1channel_1000", mount="left")
+    tip_rack = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", "A1")
+    well_plate = protocol.load_labware(
+        "opentrons_96_wellplate_200ul_pcr_full_skirt", "A2"
+    )
+    pipette.pick_up_tip(tip_rack["A1"])
+    pipette.require_liquid_presence(well_plate["A1"])  # Should not raise MustHomeError.
+
+
+def test_liquid_probe_simulate_file() -> None:
+    """Covers `opentrons_simulate`-specific issues with liquid probes.
+
+    See https://opentrons.atlassian.net/browse/EXEC-646.
+    """
+    protocol_contents = textwrap.dedent(
+        """\
+        requirements = {"robotType": "Flex", "apiLevel": "2.20"}
+        def run(protocol):
+            pipette = protocol.load_instrument("flex_1channel_1000", mount="left")
+            tip_rack = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", "A1")
+            well_plate = protocol.load_labware(
+                "opentrons_96_wellplate_200ul_pcr_full_skirt", "A2"
+            )
+            pipette.pick_up_tip(tip_rack["A1"])
+            pipette.require_liquid_presence(well_plate["A1"])
+        """
+    )
+    protocol_contents_stream = io.StringIO(protocol_contents)
+    simulate.simulate(
+        protocol_file=protocol_contents_stream
+    )  # Should not raise MustHomeError.
+
+
 class TestGetProtocolAPILabware:
     """Tests for making sure get_protocol_api() handles extra labware correctly."""
 

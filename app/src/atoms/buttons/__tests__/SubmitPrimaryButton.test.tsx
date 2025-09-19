@@ -1,20 +1,25 @@
-import * as React from 'react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
+
 import { fireEvent, screen } from '@testing-library/react'
-import { COLORS, SPACING, TYPOGRAPHY, BORDERS } from '@opentrons/components'
-import { renderWithProviders } from '../../../__testing-utils__'
+
+import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
+
+import { renderWithProviders } from '/app/__testing-utils__'
 
 import { SubmitPrimaryButton } from '..'
 
+import type { ComponentProps } from 'react'
+
 const mockOnClick = vi.fn()
 
-const render = (props: React.ComponentProps<typeof SubmitPrimaryButton>) => {
+const render = (props: ComponentProps<typeof SubmitPrimaryButton>) => {
   return renderWithProviders(<SubmitPrimaryButton {...props} />)[0]
 }
 
 describe('SubmitPrimaryButton', () => {
-  let props: React.ComponentProps<typeof SubmitPrimaryButton>
+  let props: ComponentProps<typeof SubmitPrimaryButton>
 
   beforeEach(() => {
     props = {
@@ -28,7 +33,7 @@ describe('SubmitPrimaryButton', () => {
   it('renders submit primary button with text - active', () => {
     render(props)
     const button = screen.getByText('submit primary button')
-    expect(button).toHaveStyle(`background-color: ${COLORS.blue60}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.blue50}`)
     expect(button).toHaveStyle(`border-radius: ${BORDERS.borderRadius8}`)
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing8} ${SPACING.spacing16}`

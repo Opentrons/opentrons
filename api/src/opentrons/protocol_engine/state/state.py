@@ -2,17 +2,19 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from functools import partial
-from typing import Any, Callable, Dict, List, Optional, Sequence, TypeVar
+from typing import Callable, Dict, List, Optional, Sequence, TypeVar
+from typing_extensions import ParamSpec
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
+from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.robot.types import RobotDefinition
 
-from opentrons.protocol_engine.types import ModuleOffsetData
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
+from opentrons.protocol_engine.types import LiquidClassRecordWithId, ModuleOffsetData
+from opentrons.util.change_notifier import ChangeNotifier
 
 from ..resources import DeckFixedLabware
 from ..actions import Action, ActionHandler
-from .abstract_store import HasState, HandlesActions
-from .change_notifier import ChangeNotifier
+from ._abstract_store import HasState, HandlesActions
 from .commands import CommandState, CommandStore, CommandView
 from .addressable_areas import (
     AddressableAreaState,
@@ -23,14 +25,20 @@ from .labware import LabwareState, LabwareStore, LabwareView
 from .pipettes import PipetteState, PipetteStore, PipetteView
 from .modules import ModuleState, ModuleStore, ModuleView
 from .liquids import LiquidState, LiquidView, LiquidStore
+from .liquid_classes import LiquidClassState, LiquidClassStore, LiquidClassView
 from .tips import TipState, TipView, TipStore
+from .wells import WellState, WellView, WellStore
 from .geometry import GeometryView
 from .motion import MotionView
+from .files import FileView, FileState, FileStore
 from .config import Config
 from .state_summary import StateSummary
 from ..types import DeckConfigurationType
+from .tasks import TaskState, TaskView, TaskStore
 
-ReturnT = TypeVar("ReturnT")
+
+_ParamsT = ParamSpec("_ParamsT")
+_ReturnT = TypeVar("_ReturnT")
 
 
 @dataclass(frozen=True)
@@ -43,7 +51,11 @@ class State:
     pipettes: PipetteState
     modules: ModuleState
     liquids: LiquidState
+    liquid_classes: LiquidClassState
     tips: TipState
+    wells: WellState
+    files: FileState
+    tasks: TaskState
 
 
 class StateView(HasState[State]):
@@ -56,10 +68,14 @@ class StateView(HasState[State]):
     _pipettes: PipetteView
     _modules: ModuleView
     _liquid: LiquidView
+    _liquid_classes: LiquidClassView
     _tips: TipView
+    _wells: WellView
     _geometry: GeometryView
     _motion: MotionView
+    _files: FileView
     _config: Config
+    _tasks: TaskView
 
     @property
     def commands(self) -> CommandView:
@@ -92,9 +108,19 @@ class StateView(HasState[State]):
         return self._liquid
 
     @property
+    def liquid_classes(self) -> LiquidClassView:
+        """Get state view selectors for liquid class state."""
+        return self._liquid_classes
+
+    @property
     def tips(self) -> TipView:
         """Get state view selectors for tip state."""
         return self._tips
+
+    @property
+    def wells(self) -> WellView:
+        """Get state view selectors for well state."""
+        return self._wells
 
     @property
     def geometry(self) -> GeometryView:
@@ -107,15 +133,25 @@ class StateView(HasState[State]):
         return self._motion
 
     @property
+    def files(self) -> FileView:
+        """Get state view selectors for engine create file state."""
+        return self._files
+
+    @property
     def config(self) -> Config:
         """Get ProtocolEngine configuration."""
         return self._config
+
+    @property
+    def tasks(self) -> TaskView:
+        """Get state view selectors for task state."""
+        return self._tasks
 
     def get_summary(self) -> StateSummary:
         """Get protocol run data."""
         error = self._commands.get_error()
         # TODO maybe add summary here for AA
-        return StateSummary.construct(
+        return StateSummary.model_construct(
             status=self._commands.get_status(),
             errors=[] if error is None else [error],
             pipettes=self._pipettes.get_all(),
@@ -125,6 +161,16 @@ class StateView(HasState[State]):
             completedAt=self._state.commands.run_completed_at,
             startedAt=self._state.commands.run_started_at,
             liquids=self._liquid.get_all(),
+            wells=self._wells.get_all(),
+            hasEverEnteredErrorRecovery=self._commands.get_has_entered_recovery_mode(),
+            files=self._state.files.file_ids,
+            liquidClasses=[
+                LiquidClassRecordWithId(
+                    liquidClassId=liquid_class_id, **dict(liquid_class_record)
+                )
+                for liquid_class_id, liquid_class_record in self._liquid_classes.get_all().items()
+            ],
+            tasks=self._tasks.get_summary(),
         )
 
 
@@ -140,12 +186,15 @@ class StateStore(StateView, ActionHandler):
         self,
         *,
         config: Config,
-        deck_definition: DeckDefinitionV4,
+        deck_definition: DeckDefinitionV5,
         deck_fixed_labware: Sequence[DeckFixedLabware],
+        robot_definition: RobotDefinition,
         is_door_open: bool,
+        error_recovery_policy: ErrorRecoveryPolicy,
         change_notifier: Optional[ChangeNotifier] = None,
         module_calibration_offsets: Optional[Dict[str, ModuleOffsetData]] = None,
         deck_configuration: Optional[DeckConfigurationType] = None,
+        notify_publishers: Optional[Callable[[], None]] = None,
     ) -> None:
         """Initialize a StateStore and its substores.
 
@@ -156,11 +205,18 @@ class StateStore(StateView, ActionHandler):
             deck_fixed_labware: Labware definitions from the deck
                 definition to preload into labware state.
             is_door_open: Whether the robot's door is currently open.
+            error_recovery_policy: The run's initial error recovery policy.
             change_notifier: Internal state change notifier.
             module_calibration_offsets: Module offsets to preload.
             deck_configuration: The initial deck configuration the addressable area store will be instantiated with.
+            robot_definition: Static information about the robot type being used.
+            notify_publishers: Notifies robot server publishers of internal state change.
         """
-        self._command_store = CommandStore(config=config, is_door_open=is_door_open)
+        self._command_store = CommandStore(
+            config=config,
+            is_door_open=is_door_open,
+            error_recovery_policy=error_recovery_policy,
+        )
         self._pipette_store = PipetteStore()
         if deck_configuration is None:
             deck_configuration = []
@@ -168,6 +224,7 @@ class StateStore(StateView, ActionHandler):
             deck_configuration=deck_configuration,
             config=config,
             deck_definition=deck_definition,
+            robot_definition=robot_definition,
         )
         self._labware_store = LabwareStore(
             deck_fixed_labware=deck_fixed_labware,
@@ -175,10 +232,15 @@ class StateStore(StateView, ActionHandler):
         )
         self._module_store = ModuleStore(
             config=config,
+            deck_fixed_labware=deck_fixed_labware,
             module_calibration_offsets=module_calibration_offsets,
         )
         self._liquid_store = LiquidStore()
+        self._liquid_class_store = LiquidClassStore()
         self._tip_store = TipStore()
+        self._well_store = WellStore()
+        self._file_store = FileStore()
+        self._task_store = TaskStore()
 
         self._substores: List[HandlesActions] = [
             self._command_store,
@@ -187,10 +249,15 @@ class StateStore(StateView, ActionHandler):
             self._labware_store,
             self._module_store,
             self._liquid_store,
+            self._liquid_class_store,
             self._tip_store,
+            self._well_store,
+            self._file_store,
+            self._task_store,
         ]
         self._config = config
         self._change_notifier = change_notifier or ChangeNotifier()
+        self._notify_robot_server = notify_publishers
         self._initialize_state()
 
     def handle_action(self, action: Action) -> None:
@@ -207,10 +274,10 @@ class StateStore(StateView, ActionHandler):
 
     async def wait_for(
         self,
-        condition: Callable[..., Optional[ReturnT]],
-        *args: Any,
-        **kwargs: Any,
-    ) -> ReturnT:
+        condition: Callable[_ParamsT, _ReturnT],
+        *args: _ParamsT.args,
+        **kwargs: _ParamsT.kwargs,
+    ) -> _ReturnT:
         """Wait for a condition to become true, checking whenever state changes.
 
         If the condition is already true, return immediately.
@@ -255,14 +322,47 @@ class StateStore(StateView, ActionHandler):
         Raises:
             The exception raised by the `condition` function, if any.
         """
-        predicate = partial(condition, *args, **kwargs)
-        is_done = predicate()
 
-        while not is_done:
+        def predicate() -> _ReturnT:
+            return condition(*args, **kwargs)
+
+        return await self._wait_for(condition=predicate, truthiness_to_wait_for=True)
+
+    def clear_command_history(self) -> None:
+        """Clear CommandHistory state."""
+        self._command_store.clear_history()
+
+    async def wait_for_not(
+        self,
+        condition: Callable[_ParamsT, _ReturnT],
+        *args: _ParamsT.args,
+        **kwargs: _ParamsT.kwargs,
+    ) -> _ReturnT:
+        """Like `wait_for()`, except wait for the condition to become false.
+
+        See the documentation in `wait_for()`, especially the warning about condition
+        design.
+
+        The advantage of having this separate method over just passing a wrapper lambda
+        as the condition to `wait_for()` yourself is that wrapper lambdas are hard to
+        test in the mock-heavy Decoy + Protocol Engine style.
+        """
+
+        def predicate() -> _ReturnT:
+            return condition(*args, **kwargs)
+
+        return await self._wait_for(condition=predicate, truthiness_to_wait_for=False)
+
+    async def _wait_for(
+        self, condition: Callable[[], _ReturnT], truthiness_to_wait_for: bool
+    ) -> _ReturnT:
+        current_value = condition()
+
+        while bool(current_value) != truthiness_to_wait_for:
             await self._change_notifier.wait()
-            is_done = predicate()
+            current_value = condition()
 
-        return is_done
+        return current_value
 
     def _get_next_state(self) -> State:
         """Get a new instance of the state value object."""
@@ -273,7 +373,11 @@ class StateStore(StateView, ActionHandler):
             pipettes=self._pipette_store.state,
             modules=self._module_store.state,
             liquids=self._liquid_store.state,
+            liquid_classes=self._liquid_class_store.state,
             tips=self._tip_store.state,
+            wells=self._well_store.state,
+            files=self._file_store.state,
+            tasks=self._task_store.state,
         )
 
     def _initialize_state(self) -> None:
@@ -286,14 +390,19 @@ class StateStore(StateView, ActionHandler):
         self._addressable_areas = AddressableAreaView(state.addressable_areas)
         self._labware = LabwareView(state.labware)
         self._pipettes = PipetteView(state.pipettes)
-        self._modules = ModuleView(state.modules)
+        self._modules = ModuleView(state=state.modules)
         self._liquid = LiquidView(state.liquids)
+        self._liquid_classes = LiquidClassView(state.liquid_classes)
         self._tips = TipView(state.tips)
+        self._wells = WellView(state.wells)
+        self._files = FileView(state.files)
+        self._tasks = TaskView(state.tasks)
 
         # Derived states
         self._geometry = GeometryView(
             config=self._config,
             labware_view=self._labware,
+            well_view=self._wells,
             module_view=self._modules,
             pipette_view=self._pipettes,
             addressable_area_view=self._addressable_areas,
@@ -317,5 +426,10 @@ class StateStore(StateView, ActionHandler):
         self._pipettes._state = next_state.pipettes
         self._modules._state = next_state.modules
         self._liquid._state = next_state.liquids
+        self._liquid_classes._state = next_state.liquid_classes
         self._tips._state = next_state.tips
+        self._wells._state = next_state.wells
+        self._tasks._state = next_state.tasks
         self._change_notifier.notify()
+        if self._notify_robot_server is not None:
+            self._notify_robot_server()

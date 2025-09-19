@@ -1,0 +1,73 @@
+import path from 'path'
+import react from '@vitejs/plugin-react'
+import lostCss from 'lost'
+import postCssApply from 'postcss-apply'
+import postColorModFunction from 'postcss-color-mod-function'
+import postCssImport from 'postcss-import'
+import postCssPresetEnv from 'postcss-preset-env'
+import { defineConfig } from 'vite'
+
+import { cssModuleSideEffect } from './cssModuleSideEffect'
+
+export default defineConfig({
+  build: {
+    // Relative to the root
+    ssr: 'src/index.ts',
+    outDir: 'lib',
+    // Do not delete the outdir, typescript types might live there and we don't want to delete them
+    emptyOutDir: false,
+    commonjsOptions: {
+      transformMixedEsModules: true,
+      esmExternals: true,
+    },
+    rollupOptions: {
+      // Only @opentrons/shared-data is external; step-generation will be bundled!
+      external: ['@opentrons/shared-data'],
+    },
+  },
+  plugins: [
+    react({
+      include: '**/*.tsx',
+      babel: {
+        // Use babel.config.js files
+        configFile: true,
+      },
+    }),
+    cssModuleSideEffect(),
+  ],
+  optimizeDeps: {
+    esbuildOptions: {
+      target: 'es2020',
+    },
+  },
+  css: {
+    postcss: {
+      plugins: [
+        postCssImport({ root: 'src/' }),
+        postCssApply(),
+        postColorModFunction(),
+        postCssPresetEnv({ stage: 0 }),
+        lostCss(),
+      ],
+    },
+  },
+  define: {
+    // NOTE: For security, only include environment variables here if they're explicitly allowlisted.
+    _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
+    global: 'globalThis',
+  },
+  resolve: {
+    alias: {
+      '@opentrons/shared-data': path.resolve('../shared-data/js/index.ts'),
+      '@opentrons/components/styles': path.resolve(
+        '../components/src/index.module.css'
+      ),
+      '@opentrons/components/styles/global': path.resolve(
+        '../components/src/styles/global.css'
+      ),
+      '@opentrons/step-generation': path.resolve(
+        '../step-generation/src/index.ts'
+      ),
+    },
+  },
+})

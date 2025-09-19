@@ -1,13 +1,13 @@
-import * as React from 'react'
 import { useFormikContext } from 'formik'
-import { isEveryFieldHidden, getLabwareName } from '../../utils'
+
 import { makeMaskToDecimal } from '../../fieldMasks'
-import { LabwareFields } from '../../fields'
+import styles from '../../styles.module.css'
+import { getLabwareName, isEveryFieldHidden } from '../../utils'
 import { FormAlerts } from '../alerts/FormAlerts'
 import { TextField } from '../TextField'
 import { SectionBody } from './SectionBody'
 
-import styles from '../../styles.module.css'
+import type { LabwareFields } from '../../fields'
 
 const maskTo2Decimal = makeMaskToDecimal(2)
 
@@ -24,7 +24,7 @@ const Content = (props: ContentProps): JSX.Element => {
       </div>
 
       <div className={styles.form_fields_column}>
-        <TextField name="wellVolume" inputMasks={[maskTo2Decimal]} units="μL" />
+        <TextField name="wellVolume" inputMasks={[maskTo2Decimal]} units="µL" />
       </div>
     </div>
   )

@@ -374,9 +374,9 @@ async def _init_deck_and_pipette_coordinates(
     if mount != OT3Mount.GRIPPER:
         # do this early on, so that all coordinates are using the probe's length
         if short_probe:
-            await api.add_tip(mount, helpers_ot3.CALIBRATION_PROBE_EVT.length - 10)
+            api.add_tip(mount, helpers_ot3.CALIBRATION_PROBE_EVT.length - 10)
         else:
-            await api.add_tip(mount, helpers_ot3.CALIBRATION_PROBE_EVT.length)
+            api.add_tip(mount, helpers_ot3.CALIBRATION_PROBE_EVT.length)
     return calibration_square_pos
 
 

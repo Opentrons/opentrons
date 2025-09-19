@@ -1,4 +1,4 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import * as Cfg from '..'
 import { configReducer } from '../reducer'
@@ -28,6 +28,7 @@ describe('config', () => {
       expect(Cfg.configInitialized(state.config as any)).toEqual({
         type: 'config:INITIALIZED',
         payload: { config: state.config },
+        meta: { shell: true },
       })
     })
 
@@ -35,6 +36,7 @@ describe('config', () => {
       expect(Cfg.configValueUpdated('foo.bar', false)).toEqual({
         type: 'config:VALUE_UPDATED',
         payload: { path: 'foo.bar', value: false },
+        meta: { shell: true },
       })
     })
 

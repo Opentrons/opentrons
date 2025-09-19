@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import {
   SINGLE_CENTER_SLOT_FIXTURE,
   SINGLE_LEFT_SLOT_FIXTURE,
@@ -10,7 +8,8 @@ import {
 
 import { DeckConfigurator } from '.'
 
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react'
+import type * as React from 'react'
 import type { CutoutConfig } from '@opentrons/shared-data'
 
 export default {
@@ -71,17 +70,40 @@ const deckConfig: CutoutConfig[] = [
   },
 ]
 
+const staticFixtures = [
+  { location: 'cutoutB2', label: 'Tip rack' },
+  { location: 'cutoutC2', label: 'Labware' },
+  { location: 'cutoutD2', label: 'Labware' },
+]
+
 export const Default = Template.bind({})
 Default.args = {
   deckConfig,
-  handleClickAdd: cutoutId => console.log(`add at ${cutoutId}`),
-  handleClickRemove: cutoutId => console.log(`remove at ${cutoutId}`),
+  handleClickAdd: cutoutId => {
+    console.log(`add at ${cutoutId}`)
+  },
+  handleClickRemove: cutoutId => {
+    console.log(`remove at ${cutoutId}`)
+  },
 }
 
 export const ReadOnly = Template.bind({})
 ReadOnly.args = {
   deckConfig,
-  handleClickAdd: cutoutId => console.log(`add at ${cutoutId}`),
-  handleClickRemove: cutoutId => console.log(`remove at ${cutoutId}`),
+  handleClickAdd: cutoutId => {
+    console.log(`add at ${cutoutId}`)
+  },
+  handleClickRemove: cutoutId => {
+    console.log(`remove at ${cutoutId}`)
+  },
   readOnly: true,
+}
+
+export const ReadOnlyWithStaticFixtures = Template.bind({})
+ReadOnlyWithStaticFixtures.args = {
+  deckConfig,
+  handleClickAdd: () => {},
+  handleClickRemove: () => {},
+  readOnly: true,
+  additionalStaticFixtures: staticFixtures,
 }

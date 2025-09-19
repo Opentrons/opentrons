@@ -1,5 +1,5 @@
-import { connectionStore } from './store'
 import { notifyLog } from './notifyLog'
+import { connectionStore } from './store'
 
 import type { NotifyTopic } from '@opentrons/app/src/redux/shell/types'
 
@@ -11,7 +11,8 @@ export function unsubscribe(topic: NotifyTopic): Promise<void> {
         .then(() => {
           const { client } = connectionStore
           if (client == null) {
-            return reject(new Error('Expected hostData, received null.'))
+            reject(new Error('Expected hostData, received null.'))
+            return
           }
 
           client.unsubscribe(topic, {}, (error, result) => {

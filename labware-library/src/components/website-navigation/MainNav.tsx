@@ -1,7 +1,6 @@
-import * as React from 'react'
 import { Logo } from './Logo'
-import { NavList } from './NavList'
 import { MobileNav } from './MobileNav'
+import { NavList } from './NavList'
 import styles from './styles.module.css'
 
 export function MainNav(): JSX.Element {

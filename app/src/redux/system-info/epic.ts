@@ -1,4 +1,4 @@
-import { map, mapTo, pairwise, filter } from 'rxjs/operators'
+import { filter, map, mapTo, pairwise } from 'rxjs/operators'
 
 import * as Alerts from '../alerts'
 import { OUTDATED } from './constants'

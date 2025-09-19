@@ -1,15 +1,18 @@
 import { useMutation, useQueryClient } from 'react-query'
+
 import { createMaintenanceCommand } from '@opentrons/api-client'
+
 import { useHost } from '../api'
+
 import type {
-  UseMutationResult,
-  UseMutationOptions,
   UseMutateAsyncFunction,
+  UseMutationOptions,
+  UseMutationResult,
 } from 'react-query'
 import type {
   CommandData,
-  HostConfig,
   CreateCommandParams,
+  HostConfig,
 } from '@opentrons/api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
 
@@ -50,16 +53,21 @@ export function useCreateMaintenanceCommandMutation(): UseCreateMaintenanceComma
     createMaintenanceCommand(host as HostConfig, maintenanceRunId, command, {
       waitUntilComplete,
       timeout,
-    }).then(response => {
-      queryClient
-        .invalidateQueries([host, 'maintenance_runs'])
-        .catch((e: Error) =>
-          console.error(
-            `error invalidating maintenance runs query: ${e.message}`
-          )
-        )
-      return response.data
     })
+      .then(response => {
+        queryClient
+          .invalidateQueries([host, 'maintenance_runs'])
+          .catch((e: Error) => {
+            console.error(
+              `error invalidating maintenance runs query: ${e.message}`
+            )
+          })
+        return response.data
+      })
+      .catch((e: any) => {
+        queryClient.invalidateQueries([host, 'robot/control/estopStatus'])
+        throw e
+      })
   )
 
   return {

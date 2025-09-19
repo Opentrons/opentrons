@@ -1,7 +1,6 @@
 // top subdomain nav bar component
-import * as React from 'react'
 import { Link } from 'react-router-dom'
-import { getPublicPath } from '../../public-path'
+
 import styles from './styles.module.css'
 
 interface LinkItem {
@@ -26,7 +25,7 @@ export const SUBDOMAIN_NAV_LINKS: Links = [
   },
   {
     name: 'Labware Library',
-    url: getPublicPath(),
+    url: '/',
     linkout: false,
     gtm: {
       action: 'click',
@@ -36,7 +35,7 @@ export const SUBDOMAIN_NAV_LINKS: Links = [
   },
   {
     name: 'Protocol Library',
-    url: 'https://protocols.opentrons.com/',
+    url: 'https://library.opentrons.com/',
     linkout: true,
     gtm: {
       action: 'click',

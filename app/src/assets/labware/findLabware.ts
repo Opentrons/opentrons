@@ -1,7 +1,8 @@
 import head from 'lodash/head'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 import { getLatestLabwareDef } from './getLabware'
+
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 // TODO(mc, 2021-05-19): this function does not filter by namespace
 // nor version. Instead, it short-circuits as soon as it finds a loadName match
@@ -10,8 +11,8 @@ function filterLabwareDefinitions(
   namespace: string | null,
   loadName: string | null,
   version: string | null,
-  customLabware: LabwareDefinition2[]
-): LabwareDefinition2 | null {
+  customLabware: LabwareDefinition[]
+): LabwareDefinition | null {
   return (
     head(
       customLabware.filter(
@@ -28,8 +29,8 @@ export function findLabwareDefWithCustom(
   namespace: string | null,
   loadName: string | null,
   version: string | null,
-  customLabware: LabwareDefinition2[]
-): LabwareDefinition2 | null {
+  customLabware: LabwareDefinition[]
+): LabwareDefinition | null {
   return namespace === 'opentrons'
     ? getLatestLabwareDef(loadName)
     : filterLabwareDefinitions(namespace, loadName, version, customLabware)

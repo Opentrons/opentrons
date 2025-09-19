@@ -1,9 +1,10 @@
 // app updater
 import updater from 'electron-updater'
 
-import { createLogger } from './log'
 import { getConfig } from './config'
 import { UI_INITIALIZED, UPDATE_VALUE } from './constants'
+import { createLogger } from './log'
+
 import type { UpdateInfo } from '@opentrons/app/src/redux/shell/types'
 import type { Action, Dispatch, PlainError } from './types'
 
@@ -11,6 +12,7 @@ const autoUpdater = updater.autoUpdater
 
 autoUpdater.logger = createLogger('update')
 autoUpdater.autoDownload = false
+autoUpdater.forceDevUpdateConfig = true
 
 export const CURRENT_VERSION: string = autoUpdater.currentVersion.version
 
@@ -20,14 +22,19 @@ export function registerUpdate(
   return function handleAction(action: Action) {
     switch (action.type) {
       case UI_INITIALIZED:
-      case 'shell:CHECK_UPDATE':
-        return checkUpdate(dispatch)
+      case 'shell:CHECK_UPDATE': {
+        checkUpdate(dispatch)
+        return
+      }
 
-      case 'shell:DOWNLOAD_UPDATE':
-        return downloadUpdate(dispatch)
+      case 'shell:DOWNLOAD_UPDATE': {
+        downloadUpdate(dispatch)
+        return
+      }
 
-      case 'shell:APPLY_UPDATE':
-        return autoUpdater.quitAndInstall()
+      case 'shell:APPLY_UPDATE': {
+        autoUpdater.quitAndInstall()
+      }
     }
   }
 }
@@ -72,18 +79,14 @@ interface ProgressInfo {
   percent: number
   bytesPerSecond: number
 }
-interface DownloadingPayload {
-  progress: ProgressInfo
-  bytesPerSecond: number
-  percent: number
-  total: number
-  transferred: number
-}
 
 function downloadUpdate(dispatch: Dispatch): void {
-  const onDownloading = (payload: DownloadingPayload): void =>
+  const onDownloading = (payload: ProgressInfo): void => {
     dispatch({ type: 'shell:DOWNLOAD_PERCENTAGE', payload })
-  const onDownloaded = (): void => done({})
+  }
+  const onDownloaded = (): void => {
+    done({})
+  }
   const onError = (error: Error): void => {
     done({ error: PlainObjectError(error) })
   }

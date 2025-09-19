@@ -12,7 +12,7 @@ from typing import (
 )
 from typing_extensions import Final
 import numpy
-from opentrons_shared_data.pipette.dev_types import UlPerMmAction
+from opentrons_shared_data.pipette.types import UlPerMmAction
 
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
@@ -32,6 +32,7 @@ from opentrons.hardware_control.types import (
     HardwareAction,
     Axis,
     OT3Mount,
+    TipScrapeType,
 )
 from opentrons.hardware_control.constants import (
     SHAKE_OFF_TIPS_SPEED,
@@ -78,6 +79,8 @@ class TipActionMoveSpec:
     speed: Optional[
         float
     ]  # allow speed for a movement to default to its axes' speed settings
+    scrape_axis: Optional[Axis] = None
+    # add a scrape motion in the middle of a tip drop
 
 
 @dataclass(frozen=True)
@@ -228,6 +231,7 @@ class OT3PipetteHandler:
                 "blow_out_flow_rate",
                 "working_volume",
                 "tip_overlap",
+                "versioned_tip_overlap",
                 "available_volume",
                 "return_tip_height",
                 "default_aspirate_flow_rates",
@@ -235,6 +239,8 @@ class OT3PipetteHandler:
                 "default_dispense_flow_rates",
                 "back_compat_names",
                 "supported_tips",
+                "lld_settings",
+                "available_sensors",
             ]
 
             instr_dict = instr.as_dict()
@@ -246,7 +252,7 @@ class OT3PipetteHandler:
             result["current_nozzle_map"] = instr.nozzle_manager.current_configuration
             result["min_volume"] = instr.liquid_class.min_volume
             result["max_volume"] = instr.liquid_class.max_volume
-            result["channels"] = instr._max_channels
+            result["channels"] = instr._max_channels.value
             result["has_tip"] = instr.has_tip
             result["tip_length"] = instr.current_tip_length
             result["aspirate_speed"] = self.plunger_speed(
@@ -279,6 +285,15 @@ class OT3PipetteHandler:
             result[
                 "pipette_bounding_box_offsets"
             ] = instr.config.pipette_bounding_box_offsets
+            result["lld_settings"] = instr.config.lld_settings
+            result["plunger_positions"] = {
+                "top": instr.plunger_positions.top,
+                "bottom": instr.plunger_positions.bottom,
+                "blow_out": instr.plunger_positions.blow_out,
+                "drop_tip": instr.plunger_positions.drop_tip,
+            }
+            result["shaft_ul_per_mm"] = instr.config.shaft_ul_per_mm
+            result["available_sensors"] = instr.config.available_sensors
         return cast(PipetteDict, result)
 
     @property
@@ -422,7 +437,7 @@ class OT3PipetteHandler:
         if instr:
             instr.reset_nozzle_configuration()
 
-    async def add_tip(self, mount: OT3Mount, tip_length: float) -> None:
+    def add_tip(self, mount: OT3Mount, tip_length: float) -> None:
         instr = self._attached_instruments[mount]
         attached = self.attached_instruments
         instr_dict = attached[mount]
@@ -437,7 +452,15 @@ class OT3PipetteHandler:
                 "attach tip called while tip already attached to {instr}"
             )
 
-    async def remove_tip(self, mount: OT3Mount) -> None:
+    def cache_tip(self, mount: OT3Mount, tip_length: float) -> None:
+        instrument = self.get_pipette(mount)
+        if instrument.has_tip:
+            # instrument.add_tip() would raise an AssertionError if we tried to overwrite an existing tip.
+            instrument.remove_tip()
+        instrument.add_tip(tip_length=tip_length)
+        instrument.set_current_volume(0)
+
+    def remove_tip(self, mount: OT3Mount) -> None:
         instr = self._attached_instruments[mount]
         attached = self.attached_instruments
         instr_dict = attached[mount]
@@ -482,10 +505,19 @@ class OT3PipetteHandler:
         self._ihp_log.debug(f"{action} on {target.name}")
 
     def plunger_position(
-        self, instr: Pipette, ul: float, action: "UlPerMmAction"
+        self,
+        instr: Pipette,
+        ul: float,
+        action: "UlPerMmAction",
+        correction_volume: float = 0.0,
     ) -> float:
-        mm = ul / instr.ul_per_mm(ul, action)
-        position = instr.plunger_positions.bottom - mm
+        if ul == 0:
+            position = instr.plunger_positions.bottom
+        else:
+            multiplier = 1.0 + (correction_volume / ul)
+            mm_dist_from_bottom = ul / instr.ul_per_mm(ul, action)
+            mm_dist_from_bottom_corrected = mm_dist_from_bottom * multiplier
+            position = instr.plunger_positions.bottom - mm_dist_from_bottom_corrected
         return round(position, 6)
 
     def plunger_speed(
@@ -511,6 +543,7 @@ class OT3PipetteHandler:
         mount: OT3Mount,
         volume: Optional[float],
         rate: float,
+        correction_volume: float = 0.0,
     ) -> Optional[LiquidActionSpec]:
         """Check preconditions for aspirate, parse args, and calculate positions.
 
@@ -546,7 +579,10 @@ class OT3PipetteHandler:
         ), "Cannot aspirate more than pipette max volume"
 
         dist = self.plunger_position(
-            instrument, instrument.current_volume + asp_vol, "aspirate"
+            instr=instrument,
+            ul=instrument.current_volume + asp_vol,
+            action="aspirate",
+            correction_volume=correction_volume,
         )
         speed = self.plunger_speed(
             instrument, instrument.aspirate_flow_rate * rate, "aspirate"
@@ -571,6 +607,8 @@ class OT3PipetteHandler:
         volume: Optional[float],
         rate: float,
         push_out: Optional[float],
+        is_full_dispense: bool,
+        correction_volume: float = 0.0,
     ) -> Optional[LiquidActionSpec]:
         """Check preconditions for dispense, parse args, and calculate positions.
 
@@ -607,12 +645,27 @@ class OT3PipetteHandler:
         # of the OT-2 version of this class. Protocol Engine does its own clamping,
         # so we don't expect this to trigger in practice.
         disp_vol = min(instrument.current_volume, disp_vol)
-        is_full_dispense = numpy.isclose(instrument.current_volume - disp_vol, 0)
+
+        # TODO (Ryan): Remove this check in the future.
+        # we moved this logic up to protocol_engine but replacing with this check to make sure
+        # we don't accidentally call this incorrectly from somewhere else.
+        if not is_full_dispense and numpy.isclose(
+            instrument.current_volume - disp_vol, 0
+        ):
+            raise CommandPreconditionViolated(
+                message="Command created a full-dispense without the full dispense argument",
+                detail={
+                    "command": "dispense",
+                    "current-volume": str(instrument.current_volume),
+                    "dispense-volume": str(disp_vol),
+                },
+            )
 
         if disp_vol == 0:
             return None
 
         if is_full_dispense:
+            disp_vol = instrument.current_volume
             if push_out is None:
                 push_out_ul = instrument.push_out_volume
             else:
@@ -639,7 +692,10 @@ class OT3PipetteHandler:
             )
 
         dist = self.plunger_position(
-            instrument, instrument.current_volume - disp_vol, "dispense"
+            instr=instrument,
+            ul=instrument.current_volume - disp_vol,
+            action="dispense",
+            correction_volume=correction_volume,
         )
         speed = self.plunger_speed(
             instrument, instrument.dispense_flow_rate * rate, "dispense"
@@ -747,7 +803,7 @@ class OT3PipetteHandler:
             raise UnexpectedTipAttachError("pick_up_tip", instrument.name, mount.name)
         self._ihp_log.debug(f"Picking up tip on {mount.name}")
 
-        pick_up_config = instrument.get_pick_up_configuration_for_tip_count(tip_count)
+        pick_up_config = instrument.get_pick_up_configuration()
         if not isinstance(pick_up_config, CamActionPickUpTipConfiguration):
             raise CommandPreconditionViolated(
                 f"Low-throughput pick up tip got wrong config for {instrument.name} on {mount.name}"
@@ -755,11 +811,17 @@ class OT3PipetteHandler:
 
         tip_motor_moves = self._build_tip_motor_moves(
             prep_move_dist=pick_up_config.prep_move_distance,
-            clamp_move_dist=pick_up_config.distance,
+            clamp_move_dist=instrument.get_pick_up_distance_by_configuration(
+                pick_up_config
+            ),
             prep_move_speed=pick_up_config.prep_move_speed,
-            clamp_move_speed=pick_up_config.speed,
+            clamp_move_speed=instrument.get_pick_up_speed_by_configuration(
+                pick_up_config
+            ),
             plunger_current=instrument.plunger_motor_current.run,
-            tip_motor_current=pick_up_config.current_by_tip_count[tip_count],
+            tip_motor_current=instrument.get_pick_up_current_by_configuration(
+                pick_up_config
+            ),
         )
 
         return TipActionSpec(
@@ -782,7 +844,7 @@ class OT3PipetteHandler:
             raise UnexpectedTipAttachError("pick_up_tip", instrument.name, mount.name)
         self._ihp_log.debug(f"Picking up tip on {mount.name}")
 
-        pick_up_config = instrument.get_pick_up_configuration_for_tip_count(tip_count)
+        pick_up_config = instrument.get_pick_up_configuration()
         if not isinstance(pick_up_config, PressFitPickUpTipConfiguration):
             raise CommandPreconditionViolated(
                 f"Low-throughput pick up tip got wrong config for {instrument.name} on {mount.name}"
@@ -797,7 +859,7 @@ class OT3PipetteHandler:
         else:
             check_incr = increment
 
-        pick_up_speed = pick_up_config.speed_by_tip_count[tip_count]
+        pick_up_speed = instrument.get_pick_up_speed_by_configuration(pick_up_config)
 
         def build_presses() -> List[TipActionMoveSpec]:
             # Press the nozzle into the tip <presses> number of times,
@@ -806,7 +868,8 @@ class OT3PipetteHandler:
             for i in range(checked_presses):
                 # move nozzle down into the tip
                 press_dist = (
-                    -1.0 * pick_up_config.distance_by_tip_count[tip_count]
+                    -1.0
+                    * instrument.get_pick_up_distance_by_configuration(pick_up_config)
                     + -1.0 * check_incr * i
                 )
                 press_moves.append(
@@ -814,9 +877,11 @@ class OT3PipetteHandler:
                         distance=press_dist,
                         speed=pick_up_speed,
                         currents={
-                            Axis.by_mount(mount): pick_up_config.current_by_tip_count[
-                                tip_count
-                            ]
+                            Axis.by_mount(
+                                mount
+                            ): instrument.get_pick_up_current_by_configuration(
+                                pick_up_config
+                            )
                         },
                     )
                 )
@@ -860,6 +925,7 @@ class OT3PipetteHandler:
     def plan_lt_drop_tip(
         self,
         mount: OT3Mount,
+        scrape_tips: TipScrapeType = TipScrapeType.NONE,
     ) -> TipActionSpec:
         instrument = self.get_pipette(mount)
         config = instrument.drop_configurations.plunger_eject
@@ -867,6 +933,20 @@ class OT3PipetteHandler:
             raise CommandPreconditionViolated(
                 f"No plunger-eject drop tip configurations for {instrument.name} on {mount.name}"
             )
+        scrape_move: Optional[TipActionMoveSpec] = None
+        match scrape_tips:
+            case TipScrapeType.LEFT_ONE_COL:
+                scrape_move = TipActionMoveSpec(
+                    distance=-11, currents=None, speed=None, scrape_axis=Axis.X
+                )
+            case TipScrapeType.RIGHT_ONE_COL:
+                scrape_move = TipActionMoveSpec(
+                    distance=11, currents=None, speed=None, scrape_axis=Axis.X
+                )
+            case TipScrapeType.NONE:
+                scrape_move = None
+            case _:
+                scrape_move = None
         drop_seq = [
             TipActionMoveSpec(
                 distance=instrument.plunger_positions.drop_tip,
@@ -885,6 +965,9 @@ class OT3PipetteHandler:
                 },
             ),
         ]
+        if scrape_move:
+            # Add the scrape move before the plunger moves back up
+            drop_seq.insert(1, scrape_move)
 
         return TipActionSpec(
             tip_action_moves=drop_seq,

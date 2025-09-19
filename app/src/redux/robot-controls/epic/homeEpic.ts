@@ -2,17 +2,14 @@ import { ofType } from 'redux-observable'
 
 import { POST } from '../../robot-api/constants'
 import { mapToRobotApiRequest } from '../../robot-api/operators'
-
 import * as Actions from '../actions'
 import * as Constants from '../constants'
-
-import type { Action, Epic } from '../../types'
 
 import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
-
+import type { Action, Epic } from '../../types'
 import type { HomeAction } from '../types'
 
 const mapActionToRequest: ActionToRequestMapper<HomeAction> = action => ({
@@ -33,7 +30,7 @@ const mapResponseToAction: ResponseToActionMapper<HomeAction> = (
 
   return response.ok
     ? Actions.homeSuccess(host.name, meta)
-    : Actions.homeFailure(host.name, body, meta)
+    : Actions.homeFailure(host.name, body as { message: string }, meta)
 }
 
 export const homeEpic: Epic = (action$, state$) => {

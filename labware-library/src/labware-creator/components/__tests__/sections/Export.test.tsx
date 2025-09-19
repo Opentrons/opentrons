@@ -1,17 +1,16 @@
-import React from 'react'
-import { FormikConfig } from 'formik'
-import { vi, describe, it, beforeEach, afterEach } from 'vitest'
-import { when } from 'vitest-when'
 import { render, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+
 import '@testing-library/jest-dom/vitest'
-import {
-  getDefaultFormState,
-  getInitialStatus,
-  LabwareFields,
-} from '../../../fields'
+
+import { getDefaultFormState, getInitialStatus } from '../../../fields'
 import { isEveryFieldHidden } from '../../../utils'
 import { Export } from '../../sections/Export'
 import { wrapInFormik } from '../../utils/wrapInFormik'
+
+import type { FormikConfig } from 'formik'
+import type { LabwareFields } from '../../../fields'
 
 vi.mock('../../../utils')
 
@@ -38,7 +37,16 @@ describe('Export', () => {
   })
 
   it('should render button when section is visible', () => {
-    render(wrapInFormik(<Export onExportClick={onExportClick} />, formikConfig))
+    render(
+      wrapInFormik(
+        <Export
+          onExportClick={onExportClick}
+          isOnRunApp={false}
+          disabled={false}
+        />,
+        formikConfig
+      )
+    )
 
     screen.getByRole('button', { name: /export/i })
   })

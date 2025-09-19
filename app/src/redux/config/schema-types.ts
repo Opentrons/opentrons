@@ -1,5 +1,6 @@
+import type { Language } from '/app/i18n'
+import type { ProtocolSort } from '/app/redux/protocol-storage'
 import type { LogLevel } from '../../logger'
-import type { ProtocolSort } from '../../organisms/ProtocolsLanding/hooks'
 
 export type UrlProtocol = 'file:' | 'http:'
 
@@ -8,9 +9,16 @@ export type UpdateChannel = 'latest' | 'beta' | 'alpha'
 export type DiscoveryCandidates = string[]
 
 export type DevInternalFlag =
+  | 'forceHttpPolling'
   | 'protocolStats'
-  | 'enableRunTimeParameters'
   | 'enableRunNotes'
+  | 'protocolTimeline'
+  | 'enableLabwareCreator'
+  | 'reactQueryDevtools'
+  | 'reactScan'
+  | 'quickTransferExportPython'
+  | 'camera'
+  | 'quickTransferProtocolContentsLog'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
 
@@ -19,6 +27,12 @@ export type ProtocolsOnDeviceSortKey =
   | 'reverse'
   | 'recentRun'
   | 'oldRun'
+  | 'recentCreated'
+  | 'oldCreated'
+
+export type QuickTransfersOnDeviceSortKey =
+  | 'alphabetical'
+  | 'reverse'
   | 'recentCreated'
   | 'oldCreated'
 
@@ -242,4 +256,39 @@ export type ConfigV21 = Omit<ConfigV20, 'version'> & {
   version: 21
 }
 
-export type Config = ConfigV21
+export type ConfigV22 = Omit<ConfigV21, 'version' | 'analytics'> & {
+  version: 22
+  analytics: {
+    appId: string
+    optedIn: boolean
+  }
+}
+export type ConfigV23 = Omit<ConfigV22, 'version'> & {
+  version: 23
+  protocols: ConfigV22['protocols'] & {
+    pinnedQuickTransferIds: string[]
+    quickTransfersOnDeviceSortKey: QuickTransfersOnDeviceSortKey | null
+    hasDismissedQuickTransferIntro: boolean
+  }
+}
+
+export type ConfigV24 = Omit<ConfigV23, 'version' | 'support'> & {
+  version: 24
+  userInfo: {
+    userId: string
+  }
+}
+
+export type ConfigV25 = Omit<ConfigV24, 'version'> & {
+  version: 25
+  language: {
+    appLanguage: Language | null
+    systemLanguage: string | null
+  }
+}
+
+export type ConfigV26 = Omit<ConfigV25, 'version'> & {
+  version: 26
+}
+
+export type Config = ConfigV26

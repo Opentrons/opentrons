@@ -11,7 +11,6 @@ class ConfigType(Enum):
     """Substitute for Literal which isn't available until 3.8.0."""
 
     gravimetric = 1
-    photometric = 2
 
 
 @dataclass
@@ -24,7 +23,6 @@ class VolumetricConfig:
     pipette_mount: str
     tip_volume: int
     trials: int
-    labware_offsets: List[dict]
     slots_tiprack: List[int]
     increment: bool
     return_tip: bool
@@ -49,24 +47,10 @@ class GravimetricConfig(VolumetricConfig):
     scale_delay: int
     isolate_channels: List[int]
     isolate_volumes: List[float]
-
-
-@dataclass
-class PhotometricConfig(VolumetricConfig):
-    """Execute photometric Setup Config."""
-
-    photoplate: str
-    photoplate_slot: int
-    reservoir: str
-    reservoir_slot: int
-    touch_tip: bool
-    refill: bool
-    photoplate_column_offset: List[int]
-    dye_well_column_offset: List[int]
+    liquid: str
 
 
 GRAV_CONFIG_EXCLUDE_FROM_REPORT = ["labware_offsets", "slots_tiprack"]
-PHOTO_CONFIG_EXCLUDE_FROM_REPORT = ["labware_offsets", "slots_tiprack"]
 
 NUM_BLANK_TRIALS: Final = 10
 NUM_MIXES_BEFORE_ASPIRATE = 5
@@ -88,92 +72,99 @@ LABWARE_BOTTOM_CLEARANCE = 1.5
 LIQUID_PROBE_SETTINGS: Dict[int, Dict[int, Dict[int, Dict[str, int]]]] = {
     50: {
         1: {
+            20: {
+                "mount_speed": 5,
+                "plunger_speed": 15,
+                "sensor_threshold_pascals": 15,
+            },
             50: {
-                "max_z_distance": 20,
-                "min_z_distance": 5,
-                "mount_speed": 11,
-                "plunger_speed": 21,
-                "sensor_threshold_pascals": 150,
+                "mount_speed": 5,
+                "plunger_speed": 15,
+                "sensor_threshold_pascals": 15,
             },
         },
         8: {
             50: {
-                "max_z_distance": 20,
-                "min_z_distance": 5,
-                "mount_speed": 11,
-                "plunger_speed": 21,
-                "sensor_threshold_pascals": 150,
+                "mount_speed": 5,
+                "plunger_speed": 15,
+                "sensor_threshold_pascals": 15,
             },
         },
+    },
+    200: {
+        96: {
+            20: {
+                "mount_speed": 5,
+                "plunger_speed": 5,
+                "sensor_threshold_pascals": 15,
+            },
+            50: {
+                "mount_speed": 5,
+                "plunger_speed": 5,
+                "sensor_threshold_pascals": 15,
+            },
+            200: {
+                "mount_speed": 5,
+                "plunger_speed": 5,
+                "sensor_threshold_pascals": 15,
+            },
+        }
     },
     1000: {
         1: {
             50: {
-                "max_z_distance": 20,
-                "min_z_distance": 5,
                 "mount_speed": 5,
-                "plunger_speed": 10,
-                "sensor_threshold_pascals": 200,
+                "plunger_speed": 15,
+                "sensor_threshold_pascals": 15,
             },
             200: {
-                "max_z_distance": 20,
-                "min_z_distance": 5,
                 "mount_speed": 5,
-                "plunger_speed": 10,
-                "sensor_threshold_pascals": 200,
+                "plunger_speed": 15,
+                "sensor_threshold_pascals": 15,
             },
             1000: {
-                "max_z_distance": 20,
-                "min_z_distance": 5,
                 "mount_speed": 5,
-                "plunger_speed": 11,
-                "sensor_threshold_pascals": 150,
+                "plunger_speed": 15,
+                "sensor_threshold_pascals": 15,
             },
         },
         8: {
             50: {
-                "max_z_distance": 20,
-                "min_z_distance": 5,
                 "mount_speed": 5,
-                "plunger_speed": 10,
-                "sensor_threshold_pascals": 200,
+                "plunger_speed": 15,
+                "sensor_threshold_pascals": 15,
             },
             200: {
-                "max_z_distance": 20,
-                "min_z_distance": 5,
                 "mount_speed": 5,
-                "plunger_speed": 10,
-                "sensor_threshold_pascals": 200,
+                "plunger_speed": 15,
+                "sensor_threshold_pascals": 15,
             },
             1000: {
-                "max_z_distance": 20,
-                "min_z_distance": 5,
                 "mount_speed": 5,
-                "plunger_speed": 11,
-                "sensor_threshold_pascals": 150,
+                "plunger_speed": 15,
+                "sensor_threshold_pascals": 15,
             },
         },
         96: {
-            50: {
-                "max_z_distance": 20,
-                "min_z_distance": 5,
+            20: {
                 "mount_speed": 5,
-                "plunger_speed": 10,
-                "sensor_threshold_pascals": 200,
+                "plunger_speed": 5,
+                "sensor_threshold_pascals": 15,
+            },
+            50: {
+                "mount_speed": 5,
+                "plunger_speed": 5,
+                "sensor_threshold_pascals": 15,
             },
             200: {
-                "max_z_distance": 20,
-                "min_z_distance": 5,
                 "mount_speed": 5,
-                "plunger_speed": 10,
-                "sensor_threshold_pascals": 200,
+                "plunger_speed": 5,
+                "sensor_threshold_pascals": 15,
             },
             1000: {
-                "max_z_distance": 20,
-                "min_z_distance": 5,
                 "mount_speed": 5,
-                "plunger_speed": 11,
-                "sensor_threshold_pascals": 150,
+                "plunger_speed": 5,
+                "sensor_threshold_pascals": 15,
             },
         },
     },
@@ -187,24 +178,22 @@ def _get_liquid_probe_settings(
         cfg.pipette_channels
     ][cfg.tip_volume]
     return LiquidProbeSettings(
-        starting_mount_height=well.top().point.z,
-        max_z_distance=min(well.depth, lqid_cfg["max_z_distance"]),
-        min_z_distance=lqid_cfg["min_z_distance"],
         mount_speed=lqid_cfg["mount_speed"],
         plunger_speed=lqid_cfg["plunger_speed"],
+        plunger_impulse_time=0.2,
         sensor_threshold_pascals=lqid_cfg["sensor_threshold_pascals"],
-        expected_liquid_height=110,
-        log_pressure=True,
         aspirate_while_sensing=False,
-        auto_zero_sensor=True,
-        num_baseline_reads=10,
-        data_file="/var/pressure_sensor_data.csv",
+        z_overlap_between_passes_mm=0.1,
+        plunger_reset_offset=2.0,
+        samples_for_baselining=20,
+        sample_time_sec=0.004,
     )
 
 
 QC_VOLUMES_G: Dict[int, Dict[int, List[Tuple[int, List[float]]]]] = {
     1: {
         50: [  # P50
+            (20, [1.0, 20.0]),
             (50, [1.0, 50.0]),  # T50
         ],
         1000: [  # P1000
@@ -224,7 +213,13 @@ QC_VOLUMES_G: Dict[int, Dict[int, List[Tuple[int, List[float]]]]] = {
         ],
     },
     96: {
+        200: [
+            (20, [0.5, 1.0]),  # T20
+            (50, [1.0, 50.0]),  # T50
+            (200, [200.0]),  # T200
+        ],
         1000: [  # P1000
+            (20, [5.0]),
             (50, [5.0]),  # T50
             (200, [200.0]),  # T200
             (1000, [1000.0]),  # T1000
@@ -263,46 +258,11 @@ QC_VOLUMES_EXTRA_G: Dict[int, Dict[int, List[Tuple[int, List[float]]]]] = {
     },
 }
 
-QC_VOLUMES_P: Dict[int, Dict[int, List[Tuple[int, List[float]]]]] = {
-    1: {
-        50: [  # P50
-            (50, [1.0]),
-        ],
-        1000: [  # P1000
-            (50, [5.0]),  # T50
-            (200, [200.0]),  # T200
-            (1000, []),  # T1000
-        ],
-    },
-    8: {
-        50: [  # P50
-            (50, [1.0]),
-        ],
-        1000: [  # P1000
-            (50, [5.0]),  # T50
-            (200, [200.0]),  # T200
-            (1000, []),  # T1000
-        ],
-    },
-    96: {
-        1000: [  # P1000
-            (50, [5.0]),  # T50
-            (200, [200.0]),  # T200
-            (1000, []),  # T1000
-        ],
-    },
-}
-
 QC_DEFAULT_TRIALS: Dict[ConfigType, Dict[int, int]] = {
     ConfigType.gravimetric: {
         1: 10,
         8: 10,
         96: 9,
-    },
-    ConfigType.photometric: {
-        1: 8,
-        8: 12,
-        96: 5,
     },
 }
 
@@ -314,6 +274,11 @@ QC_TEST_MIN_REQUIREMENTS: Dict[
     # channels: [Pipette: [tip: [Volume: (%d, Cv)]]]
     1: {
         50: {  # P50
+            20: {
+                1.0: (5.0, 4.0),
+                10.0: (1.0, 0.5),
+                20.0: (1, 0.4),
+            },
             50: {
                 1.0: (5.0, 4.0),
                 10.0: (1.0, 0.5),
@@ -365,7 +330,34 @@ QC_TEST_MIN_REQUIREMENTS: Dict[
         },
     },
     96: {
+        200: {
+            20: {  # T20
+                0.5: (2.5, 2.0),
+                1.0: (2.5, 2.0),
+                2.0: (2.5, 2.0),
+                3.0: (2.5, 2.0),
+                5.0: (2.5, 2.0),
+                10.0: (3.1, 1.7),
+            },
+            50: {  # T50
+                1.0: (2.5, 2.0),
+                50.0: (1.5, 0.75),
+            },
+            200: {  # T200
+                5.0: (2.5, 4.0),
+                50.0: (1.5, 2.0),
+                200.0: (1.4, 0.9),
+            },
+        },
         1000: {  # P1000
+            20: {  # T20
+                1.0: (2.5, 2.0),
+                2.0: (2.5, 2.0),
+                3.0: (2.5, 2.0),
+                5.0: (2.5, 2.0),
+                10.0: (3.1, 1.7),
+                20.0: (3.1, 1.7),
+            },
             50: {  # T50
                 1.0: (2.5, 2.0),
                 2.0: (2.5, 2.0),
@@ -390,15 +382,12 @@ QC_TEST_MIN_REQUIREMENTS: Dict[
 
 
 def get_tip_volumes_for_qc(
-    pipette_volume: int, pipette_channels: int, extra: bool, photometric: bool
+    pipette_volume: int, pipette_channels: int, extra: bool
 ) -> List[int]:
     """Build the default testing volumes for qc."""
     config: Dict[int, Dict[int, List[Tuple[int, List[float]]]]] = {}
     tip_volumes: List[int] = []
-    if photometric:
-        config = QC_VOLUMES_P
-    else:
-        config = QC_VOLUMES_G
+    config = QC_VOLUMES_G
     for t, vls in config[pipette_channels][pipette_volume]:
         if len(vls) > 0 and t not in tip_volumes:
             tip_volumes.append(t)

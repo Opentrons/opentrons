@@ -1,30 +1,35 @@
-import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
+
 import {
+  ALIGN_CENTER,
+  ALIGN_FLEX_END,
+  AnimationVideo,
+  Btn,
   COLORS,
   Flex,
-  Btn,
   JUSTIFY_SPACE_BETWEEN,
-  ALIGN_FLEX_END,
-  ALIGN_CENTER,
+  LegacyStyledText,
+  PrimaryButton,
+  RESPONSIVENESS,
   SPACING,
   TYPOGRAPHY,
-  RESPONSIVENESS,
-  PrimaryButton,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { css } from 'styled-components'
-import { getIsOnDevice } from '../../redux/config'
-import { StyledText } from '../../atoms/text'
-import { SmallButton } from '../../atoms/buttons'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import unmountGripper from '../../assets/videos/gripper-wizards/UNMOUNT_GRIPPER.webm'
 
-import type { GripperWizardStepProps } from './types'
+import unmountGripper from '/app/assets/videos/gripper-wizards/UNMOUNT_GRIPPER.webm'
+import { SmallButton } from '/app/atoms/buttons'
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+import {
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '/app/molecules/SimpleWizardBody'
+import { getIsOnDevice } from '/app/redux/config'
+
 import type { GripperData } from '@opentrons/api-client'
+import type { GripperWizardStepProps } from './types'
 
 const GO_BACK_BUTTON_TEXT_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
@@ -51,9 +56,9 @@ export const UnmountGripper = (
   props: GripperWizardStepProps
 ): JSX.Element | null => {
   const { proceed, isRobotMoving, goBack, chainRunCommands } = props
-  const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
+  const { t } = useTranslation(['gripper_wizard_flows', 'shared', 'branded'])
   const isOnDevice = useSelector(getIsOnDevice)
-  const [isPending, setIsPending] = React.useState<boolean>(false)
+  const [isPending, setIsPending] = useState<boolean>(false)
   const { data: instrumentsQueryData, refetch } = useInstrumentsQuery({
     refetchInterval: QUICK_GRIPPER_POLL_MS,
   })
@@ -61,10 +66,9 @@ export const UnmountGripper = (
     (i): i is GripperData => i.instrumentType === 'gripper' && i.ok
   )
 
-  const [
-    showGripperStillDetected,
-    setShowGripperStillDetected,
-  ] = React.useState(false)
+  const [showGripperStillDetected, setShowGripperStillDetected] = useState(
+    false
+  )
   const handleContinue = (): void => {
     setIsPending(true)
     refetch()
@@ -93,14 +97,14 @@ export const UnmountGripper = (
 
   if (isRobotMoving)
     return (
-      <InProgressModal
+      <SimpleWizardInProgressBody
         description={t('shared:stand_back_robot_is_in_motion')}
       />
     )
   return showGripperStillDetected ? (
     <SimpleWizardBody
       iconColor={COLORS.red50}
-      header={t('gripper_still_attached')}
+      header={t('branded:gripper_still_attached')}
       isSuccess={false}
     >
       <Flex
@@ -111,11 +115,13 @@ export const UnmountGripper = (
       >
         <Btn
           paddingLeft={isOnDevice ? 0 : SPACING.spacing32}
-          onClick={() => setShowGripperStillDetected(false)}
+          onClick={() => {
+            setShowGripperStillDetected(false)
+          }}
         >
-          <StyledText css={GO_BACK_BUTTON_TEXT_STYLE}>
+          <LegacyStyledText css={GO_BACK_BUTTON_TEXT_STYLE}>
             {t('shared:go_back')}
-          </StyledText>
+          </LegacyStyledText>
         </Btn>
         {isOnDevice ? (
           <SmallButton
@@ -132,23 +138,22 @@ export const UnmountGripper = (
     </SimpleWizardBody>
   ) : (
     <GenericWizardTile
-      header={t('loosen_screws_and_detach')}
+      header={t('branded:loosen_screws_and_detach')}
       rightHandBody={
-        <video
+        <AnimationVideo
           css={css`
             max-width: 100%;
             max-height: 20rem;
           `}
-          autoPlay={true}
-          loop={true}
-          controls={false}
           aria-label="unscrew and disconnect gripper"
         >
           <source src={unmountGripper} />
-        </video>
+        </AnimationVideo>
       }
       bodyText={
-        <StyledText as="p">{t('hold_gripper_and_loosen_screws')}</StyledText>
+        <LegacyStyledText as="p">
+          {t('hold_gripper_and_loosen_screws')}
+        </LegacyStyledText>
       }
       proceedButtonText={t('continue')}
       proceed={handleContinue}

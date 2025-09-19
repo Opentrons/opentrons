@@ -8,6 +8,7 @@ from .equipment import (
     LoadedPipetteData,
     LoadedModuleData,
     LoadedConfigureForVolumeData,
+    ReloadedLabwareData,
 )
 from .movement import MovementHandler
 from .gantry_mover import GantryMover
@@ -20,6 +21,8 @@ from .run_control import RunControlHandler
 from .hardware_stopper import HardwareStopper
 from .door_watcher import DoorWatcher
 from .status_bar import StatusBarHandler
+from .task_handler import TaskHandler
+from ..resources.file_provider import FileProvider
 
 # .thermocycler_movement_flagger omitted from package's public interface.
 
@@ -29,6 +32,7 @@ __all__ = [
     "create_queue_worker",
     "EquipmentHandler",
     "LoadedLabwareData",
+    "ReloadedLabwareData",
     "LoadedPipetteData",
     "LoadedModuleData",
     "LoadedConfigureForVolumeData",
@@ -43,4 +47,6 @@ __all__ = [
     "DoorWatcher",
     "RailLightsHandler",
     "StatusBarHandler",
+    "TaskHandler",
+    "FileProvider",
 ]

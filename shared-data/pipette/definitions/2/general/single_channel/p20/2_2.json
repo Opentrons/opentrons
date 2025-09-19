@@ -3,18 +3,34 @@
   "displayName": "P20 Single-Channel GEN2",
   "model": "p20",
   "displayCategory": "GEN2",
+  "validNozzleMaps": {
+    "maps": {
+      "SingleA1": ["A1"]
+    }
+  },
   "pickUpTipConfigurations": {
     "pressFit": {
-      "speedByTipCount": {
-        "1": 10.0
-      },
       "presses": 1,
       "increment": 0.0,
-      "distanceByTipCount": {
-        "1": 14.0
-      },
-      "currentByTipCount": {
-        "1": 0.1
+      "configurationsByNozzleMap": {
+        "SingleA1": {
+          "default": {
+            "speed": 10.0,
+            "distance": 14.0,
+            "current": 0.1,
+            "tipOverlaps": {
+              "v0": {
+                "default": 8.25,
+                "opentrons/opentrons_96_tiprack_10ul/1": 8.25,
+                "opentrons/opentrons_96_filtertiprack_10ul/1": 8.25,
+                "opentrons/eppendorf_96_tiprack_10ul_eptips/1": 8.4,
+                "opentrons/geb_96_tiprack_10ul/1": 8.3,
+                "opentrons/opentrons_96_tiprack_20ul/1": 8.25,
+                "opentrons/opentrons_96_filtertiprack_20ul/1": 8.25
+              }
+            }
+          }
+        }
       }
     }
   },

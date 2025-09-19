@@ -1,15 +1,15 @@
 /** Ensure that protocol schema v7 definition itself functions as intended,
  *  and that all v7 protocol fixtures will validate */
-import Ajv from 'ajv'
 import path from 'path'
+import Ajv from 'ajv'
 import glob from 'glob'
 import omit from 'lodash/omit'
 import { describe, expect, it } from 'vitest'
 
-import protocolSchema from '../../protocol/schemas/7.json'
-import labwareV2Schema from '../../labware/schemas/2.json'
 import commandV7Schema from '../../command/schemas/7.json'
+import labwareV2Schema from '../../labware/schemas/2.json'
 import simpleV7Fixture from '../../protocol/fixtures/7/simpleV7.json'
+import protocolSchema from '../../protocol/schemas/7.json'
 
 const fixturesGlobPath = path.join(
   __dirname,

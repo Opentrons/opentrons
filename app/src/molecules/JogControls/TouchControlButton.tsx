@@ -1,12 +1,13 @@
 import styled from 'styled-components'
-import { COLORS, SPACING, BORDERS } from '@opentrons/components'
 
-import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
+import { BORDERS, COLORS, CURSOR_DEFAULT, SPACING } from '@opentrons/components'
+
+import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
 
 export const TouchControlButton = styled.button<{ selected: boolean }>`
   background-color: ${({ selected }) =>
     selected ? COLORS.blue50 : COLORS.blue35};
-  cursor: default;
+  cursor: ${CURSOR_DEFAULT};
   border-radius: ${BORDERS.borderRadius16};
   box-shadow: none;
   padding: ${SPACING.spacing8} ${SPACING.spacing20};

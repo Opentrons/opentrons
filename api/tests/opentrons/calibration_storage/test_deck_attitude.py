@@ -22,7 +22,7 @@ from opentrons.calibration_storage.ot2.models.v1 import (
 )
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.deck.dev_types import RobotModel
+    from opentrons_shared_data.deck.types import RobotModel
 
 
 @pytest.fixture(autouse=True)
@@ -57,7 +57,7 @@ def test_save_ot2_deck_attitude(ot_config_tempdir: Any) -> None:
         "pip1",
         "mytiprack",
     )
-    assert get_robot_deck_attitude() != {}
+    assert get_robot_deck_attitude() is not None
 
 
 def test_save_ot3_deck_attitude(ot_config_tempdir: Any) -> None:

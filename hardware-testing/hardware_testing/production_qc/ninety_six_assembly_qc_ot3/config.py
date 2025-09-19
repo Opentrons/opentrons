@@ -1,7 +1,7 @@
 """Config."""
 from dataclasses import dataclass
 import enum
-from typing import Dict, Callable
+from typing import Dict, Callable, Literal
 
 from hardware_testing.data.csv_report import CSVReport, CSVSection
 
@@ -13,6 +13,7 @@ from . import (
     test_environmental_sensor,
     test_tip_sensor,
     test_droplets,
+    test_encoder,
 )
 
 
@@ -26,6 +27,7 @@ class TestSection(enum.Enum):
     ENVIRONMENT_SENSOR = "ENVIRONMENT-SENSOR"
     TIP_SENSOR = "TIP-SENSOR"
     DROPLETS = "DROPLETS"
+    ENCODER = "ENCODER"
 
 
 @dataclass
@@ -34,6 +36,7 @@ class TestConfig:
 
     simulate: bool
     tests: Dict[TestSection, Callable]
+    pipette: Literal[200, 1000]
 
 
 TESTS = [
@@ -65,6 +68,10 @@ TESTS = [
         TestSection.DROPLETS,
         test_droplets.run,
     ),
+    (
+        TestSection.ENCODER,
+        test_encoder.run,
+    ),
 ]
 
 
@@ -94,6 +101,9 @@ def build_report(test_name: str) -> CSVReport:
             ),
             CSVSection(
                 title=TestSection.DROPLETS.value, lines=test_droplets.build_csv_lines()
+            ),
+            CSVSection(
+                title=TestSection.ENCODER.value, lines=test_encoder.build_csv_lines()
             ),
         ],
     )

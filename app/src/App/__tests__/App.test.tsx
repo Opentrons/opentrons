@@ -1,21 +1,24 @@
-import * as React from 'react'
-import { vi, describe, beforeEach, afterEach, expect, it } from 'vitest'
-import { when } from 'vitest-when'
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
-import { i18n } from '../../i18n'
-import { getIsOnDevice, getConfig } from '../../redux/config'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { getConfig } from '/app/redux/config'
 
-import { DesktopApp } from '../DesktopApp'
-import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
 import { App } from '../'
+import { DesktopApp } from '../DesktopApp'
+import { useWindowType } from '../hooks'
+import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
+import { SecondaryWindowApp } from '../SecondaryWindowApp'
 
-import type { State } from '../../redux/types'
-import { renderWithProviders } from '../../__testing-utils__'
+import type { State } from '/app/redux/types'
 
-vi.mock('../../redux/config')
+vi.mock('/app/redux/config')
 vi.mock('../DesktopApp')
+vi.mock('../hooks')
 vi.mock('../OnDeviceDisplayApp')
+vi.mock('../SecondaryWindowApp')
 
 const MOCK_STATE: State = {
   config: {
@@ -36,13 +39,13 @@ describe('App', () => {
     vi.mocked(OnDeviceDisplayApp).mockReturnValue(
       <div>mock OnDeviceDisplayApp</div>
     )
+    vi.mocked(SecondaryWindowApp).mockReturnValue(
+      <div>mock SecondaryWindowApp</div>
+    )
+    vi.mocked(useWindowType).mockReturnValue('desktop-main')
     when(vi.mocked(getConfig))
       .calledWith(MOCK_STATE)
       .thenReturn(MOCK_STATE.config)
-    when(vi.mocked(getIsOnDevice)).calledWith(MOCK_STATE).thenReturn(false)
-  })
-  afterEach(() => {
-    vi.resetAllMocks()
   })
 
   it('renders null before config initializes', () => {
@@ -51,15 +54,25 @@ describe('App', () => {
     expect(container).toBeEmptyDOMElement()
   })
 
-  it('renders a DesktopApp component when not on device', () => {
-    when(vi.mocked(getIsOnDevice)).calledWith(MOCK_STATE).thenReturn(false)
+  it('renders a SecondaryWindowApp component when window type is secondary', () => {
+    vi.mocked(useWindowType).mockReturnValue('secondary')
+
     render()
+
+    screen.getByText('mock SecondaryWindowApp')
+  })
+
+  it('renders a DesktopApp component when not on device and window type is main', () => {
+    render()
+
     screen.getByText('mock DesktopApp')
   })
 
-  it('renders an OnDeviceDisplayApp component when on device', () => {
-    when(vi.mocked(getIsOnDevice)).calledWith(MOCK_STATE).thenReturn(true)
+  it('renders an OnDeviceDisplayApp component when on device and window type is main', () => {
+    vi.mocked(useWindowType).mockReturnValue('odd-main')
+
     render()
+
     screen.getByText('mock OnDeviceDisplayApp')
   })
 })

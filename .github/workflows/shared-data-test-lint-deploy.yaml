@@ -44,23 +44,23 @@ jobs:
   python-lint:
     name: 'shared-data package python lint'
     timeout-minutes: 10
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     steps:
-      - uses: 'actions/checkout@v3'
+      - uses: 'actions/checkout@v4'
         with:
           fetch-depth: 0
-      - uses: 'actions/setup-node@v3'
+      - uses: 'actions/setup-node@v4'
         with:
-          node-version: '18.19.0'
+          node-version: '22.12.0'
       - uses: 'actions/setup-python@v3'
         with:
           python-version: '3.10'
 
       - uses: './.github/actions/python/setup'
         with:
-          project: 'shared-data/python'
+          project: 'shared-data'
       - name: Lint
-        run: make -C shared-data/python lint
+        run: make -C shared-data lint-py
 
   python-test:
     name: 'shared-data package python ${{ matrix.python }} tests on ${{ matrix.os }}'
@@ -68,28 +68,31 @@ jobs:
     needs: [python-lint]
     strategy:
       matrix:
-        os: ['windows-2022', 'ubuntu-22.04', 'macos-latest']
+        os: ['windows-2022', 'ubuntu-24.04', 'macos-latest']
         # TODO(mc, 2022-02-24): expand this matrix to 3.8 and 3.9,
         # preferably in a nightly cronjob on edge or something
         python: ['3.10']
 
     runs-on: '${{ matrix.os }}'
     steps:
-      - uses: 'actions/checkout@v3'
+      - uses: 'actions/checkout@v4'
         with:
           fetch-depth: 0
       - name: 'install udev for usb-detection'
         if: startsWith(matrix.os, 'ubuntu')
-        run: sudo apt-get update && sudo apt-get install libudev-dev
+        run: |
+          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+          sudo apt-get update && sudo apt-get install libudev-dev
       - uses: 'actions/setup-node@v1'
         with:
-          node-version: '18.19.0'
+          node-version: '22.12.0'
       - uses: 'actions/setup-python@v4'
         with:
           python-version: ${{ matrix.python }}
       - uses: './.github/actions/python/setup'
         with:
-          project: 'shared-data/python'
+          project: 'shared-data'
           python-version: ${{ matrix.python }}
       - name: 'set complex environment variables'
         uses: actions/github-script@v6
@@ -98,28 +101,31 @@ jobs:
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
       - name: Test
-        run: make -C shared-data/python test
+        run: make -C shared-data test-py
       - name: Ensure assets build
-        run: make -C shared-data/python sdist wheel
+        run: make -C shared-data dist-py
       - name: 'Upload coverage report'
         uses: codecov/codecov-action@v3
         with:
-          files: ./shared-data/python/coverage.xml
+          files: ./shared-data/coverage.xml
           flags: shared-data
 
   js-test:
     name: 'shared-data JS tests'
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     timeout-minutes: 30
     steps:
-      - uses: 'actions/checkout@v3'
-      - uses: 'actions/setup-node@v3'
+      - uses: 'actions/checkout@v4'
+      - uses: 'actions/setup-node@v4'
         with:
-          node-version: '18.19.0'
+          node-version: '22.12.0'
       - name: 'install udev'
-        run: sudo apt-get update && sudo apt-get install libudev-dev
+        run: |
+          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+          sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ${{ github.workspace }}/.yarn-cache
@@ -143,10 +149,10 @@ jobs:
   python-deploy:
     name: 'shared-data package deploy'
     needs: [python-test]
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     if: github.event_name == 'push'
     steps:
-      - uses: 'actions/checkout@v3'
+      - uses: 'actions/checkout@v4'
         with:
           fetch-depth: 0
       # https://github.com/actions/checkout/issues/290
@@ -155,17 +161,20 @@ jobs:
         run: |
           git fetch -f origin ${{ github.ref }}:${{ github.ref }}
           git checkout ${{ github.ref }}
-      - uses: 'actions/setup-node@v3'
+      - uses: 'actions/setup-node@v4'
         with:
-          node-version: '18.19.0'
+          node-version: '22.12.0'
       - name: 'install udev for usb-detection'
-        run: sudo apt-get update && sudo apt-get install libudev-dev
+        run: |
+          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+          sudo apt-get update && sudo apt-get install libudev-dev
       - uses: 'actions/setup-python@v4'
         with:
           python-version: '3.10'
       - uses: './.github/actions/python/setup'
         with:
-          project: 'shared-data/python'
+          project: 'shared-data'
       - name: 'set complex environment variables'
         uses: actions/github-script@v6
         with:
@@ -177,14 +186,14 @@ jobs:
         name: 'upload to test pypi'
         uses: './.github/actions/python/pypi-deploy'
         with:
-          project: 'shared-data/python'
+          project: 'shared-data'
           repository_url: 'https://test.pypi.org/legacy/'
           password: '${{ secrets.TEST_PYPI_DEPLOY_TOKEN_OPENTRONS_SHARED_DATA }}'
       - if: startsWith(env.OT_TAG, 'v')
         name: 'upload to pypi'
         uses: './.github/actions/python/pypi-deploy'
         with:
-          project: 'shared-data/python'
+          project: 'shared-data'
           repository_url: 'https://upload.pypi.org/legacy/'
           password: '${{ secrets.PYPI_DEPLOY_TOKEN_OPENTRONS_SHARED_DATA }}'
 
@@ -214,19 +223,24 @@ jobs:
     needs: ['js-test', 'publish-switch']
     if: needs.publish-switch.outputs.should_publish == 'true'
     steps:
-      - uses: 'actions/checkout@v3'
+      - uses: 'actions/checkout@v4'
       # https://github.com/actions/checkout/issues/290
       - name: 'Fix actions/checkout odd handling of tags'
         if: startsWith(github.ref, 'refs/tags')
         run: |
           git fetch -f origin ${{ github.ref }}:${{ github.ref }}
           git checkout ${{ github.ref }}
-      - uses: 'actions/setup-node@v3'
+      - uses: 'actions/setup-node@v4'
         with:
-          node-version: '18.19.0'
+          node-version: '22.12.0'
           registry-url: 'https://registry.npmjs.org'
+      - name: 'install udev for usb-detection'
+        run: |
+          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+          sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ${{ github.workspace }}/.yarn-cache
@@ -237,7 +251,8 @@ jobs:
       - name: 'js deps'
         run: |
           npm config set cache ./.npm-cache
-          yarn config set cache-folder ./.yarn-cache 
+          yarn config set cache-folder ./.yarn-cache
+          make setup-js
       - name: 'build typescript'
         run: make build-ts
       - name: 'build library'
@@ -250,9 +265,9 @@ jobs:
           VERSION_STRING=$(echo ${{ github.ref }} | sed -E 's/refs\/tags\/(components|shared-data)@//')
           json -I -f ./shared-data/package.json -e "this.version=\"$VERSION_STRING\""
           cd ./shared-data
-      - uses: 'actions/setup-node@v3'
+      - uses: 'actions/setup-node@v4'
         with:
-          node-version: '18.19.0'
+          node-version: '22.12.0'
           registry-url: 'https://registry.npmjs.org'
       - name: 'publish to npm registry'
         env:

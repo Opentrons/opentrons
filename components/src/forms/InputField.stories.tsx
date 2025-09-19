@@ -1,9 +1,10 @@
 import * as React from 'react'
+
 import { Box, SIZE_6 } from '@opentrons/components'
 
-import { InputField as InputFieldComponent } from './InputField'
+import { LegacyInputField as InputFieldComponent } from './LegacyInputField'
 
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react'
 
 export default {
   title: 'Library/Molecules/Forms/Input Field',
@@ -24,7 +25,9 @@ const Template: Story<React.ComponentProps<typeof InputFieldComponent>> = ({
         error={error}
         secondaryCaption={secondaryCaption}
         value={controlledValue}
-        onChange={e => setControlledValue(e.target.value)}
+        onChange={e => {
+          setControlledValue(e.target.value)
+        }}
       />
     </Box>
   )
@@ -33,7 +36,7 @@ export const InputField = Template.bind({})
 InputField.args = {
   label: 'Input field',
   placeholder: 'Placeholder Text',
-  units: 'μL',
+  units: 'µL',
   caption: 'caption here',
   isIndeterminate: false,
 }

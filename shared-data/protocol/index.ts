@@ -1,3 +1,12 @@
+import protocolSchemaV1 from './schemas/1.json'
+import protocolSchemaV2 from './schemas/2.json'
+import protocolSchemaV3 from './schemas/3.json'
+import protocolSchemaV4 from './schemas/4.json'
+import protocolSchemaV5 from './schemas/5.json'
+import protocolSchemaV6 from './schemas/6.json'
+import protocolSchemaV7 from './schemas/7.json'
+import protocolSchemaV8 from './schemas/8.json'
+
 import type { ProtocolFile as ProtocolFileV1 } from './types/schemaV1'
 import type { ProtocolFile as ProtocolFileV3 } from './types/schemaV3'
 import type { ProtocolFile as ProtocolFileV4 } from './types/schemaV4'
@@ -8,14 +17,6 @@ import type {
   ProtocolFile as ProtocolFileV8,
   ProtocolStructure as ProtocolStructureV8,
 } from './types/schemaV8'
-import protocolSchemaV1 from './schemas/1.json'
-import protocolSchemaV2 from './schemas/2.json'
-import protocolSchemaV3 from './schemas/3.json'
-import protocolSchemaV4 from './schemas/4.json'
-import protocolSchemaV5 from './schemas/5.json'
-import protocolSchemaV6 from './schemas/6.json'
-import protocolSchemaV7 from './schemas/7.json'
-import protocolSchemaV8 from './schemas/8.json'
 
 export type {
   ProtocolFileV1,

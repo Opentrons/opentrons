@@ -9,21 +9,16 @@ COPY LICENSE LICENSE
 
 COPY shared-data shared-data
 
-COPY server-utils/setup.py server-utils/setup.py
-COPY server-utils/server_utils server-utils/server_utils
+COPY server-utils server-utils
 
-COPY api/MANIFEST.in api/MANIFEST.in
-COPY api/setup.py api/setup.py
-COPY api/pypi-readme.rst api/pypi-readme.rst
-COPY api/src/opentrons api/src/opentrons
+COPY api api
 
-COPY robot-server/setup.py robot-server/setup.py
-COPY robot-server/robot_server robot-server/robot_server
+COPY robot-server robot-server
 
-RUN cd shared-data/python && python3 setup.py bdist_wheel -d /dist/
-RUN cd server-utils && python3 setup.py bdist_wheel -d /dist/
-RUN cd api && python3 setup.py bdist_wheel -d /dist/
-RUN cd robot-server && python3 setup.py bdist_wheel -d /dist/
+RUN cd shared-data && python3 -m build --outdir=/dist/ --wheel .
+RUN cd server-utils && python3 -m build --outdir=/dist/ --wheel .
+RUN cd api && python3 -m build --outdir=/dist/ --wheel .
+RUN cd robot-server && python3 -m build --outdir=/dist/ --wheel .
 
 FROM base
 COPY --from=builder /dist /dist

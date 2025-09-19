@@ -1,8 +1,6 @@
-import type { CSSProperties } from 'react'
-
-import type { Instance, Options, Modifier } from '@popperjs/core/lib/types'
-
-import type { UseHoverOptions, HoverHandlers } from '../interaction-enhancers'
+import type { Instance, Modifier, Options } from '@popperjs/core/lib/types'
+import type { CSSProperties, RefCallback } from 'react'
+import type { HoverHandlers, UseHoverOptions } from '../interaction-enhancers'
 
 export type Placement = Options['placement']
 
@@ -41,16 +39,16 @@ export interface UseTooltipOptions {
 }
 
 export interface UseTooltipResultTargetProps {
-  ref: React.RefCallback<Element | null>
+  ref: RefCallback<Element | null>
   'aria-describedby': string
 }
 
 export interface UseTooltipResultTooltipProps {
   id: string
-  ref: React.RefCallback<HTMLElement | null>
+  ref: RefCallback<HTMLElement | null>
   placement: Placement | null
   style: CSSProperties
-  arrowRef: React.RefCallback<HTMLElement | null>
+  arrowRef: RefCallback<HTMLElement | null>
   arrowStyle: CSSProperties
 }
 

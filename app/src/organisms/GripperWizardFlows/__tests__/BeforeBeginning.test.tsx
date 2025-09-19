@@ -1,22 +1,25 @@
-import * as React from 'react'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { InProgressModal } from '../../../molecules/InProgressModal/InProgressModal'
-import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { InProgressModal } from '/app/molecules/InProgressModal/InProgressModal'
+import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
+
 import { BeforeBeginning } from '../BeforeBeginning'
 import { GRIPPER_FLOW_TYPES } from '../constants'
 
-vi.mock('../../../molecules/InProgressModal/InProgressModal')
+import type { ComponentProps } from 'react'
 
-const render = (props: React.ComponentProps<typeof BeforeBeginning>) => {
+vi.mock('/app/molecules/InProgressModal/InProgressModal')
+
+const render = (props: ComponentProps<typeof BeforeBeginning>) => {
   return renderWithProviders(<BeforeBeginning {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 describe('BeforeBeginning', () => {
-  let props: React.ComponentProps<typeof BeforeBeginning>
+  let props: ComponentProps<typeof BeforeBeginning>
   beforeEach(() => {
     props = {
       goBack: vi.fn(),

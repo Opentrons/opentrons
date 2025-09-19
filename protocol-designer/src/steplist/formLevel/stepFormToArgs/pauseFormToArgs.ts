@@ -1,40 +1,43 @@
 import {
-  PAUSE_UNTIL_TIME,
-  PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_RESUME,
+  PAUSE_UNTIL_TEMP,
+  PAUSE_UNTIL_TIME,
 } from '../../../constants'
-import { FormData } from '../../../form-types'
+import { getTimeFromForm } from '../../utils/getTimeFromForm'
+
 import type {
-  WaitForTemperatureArgs,
   PauseArgs,
+  WaitForTemperatureArgs,
 } from '@opentrons/step-generation'
+import type { HydratedPauseFormData } from '../../../form-types'
+
 export const pauseFormToArgs = (
-  formData: FormData
+  formData: HydratedPauseFormData
 ): PauseArgs | WaitForTemperatureArgs | null => {
-  const hours = parseFloat(formData.pauseHour) || 0
-  const minutes = parseFloat(formData.pauseMinute) || 0
-  const seconds = parseFloat(formData.pauseSecond) || 0
-  const totalSeconds = hours * 3600 + minutes * 60 + seconds
-  const temperature = parseFloat(formData.pauseTemperature)
-  const message = formData.pauseMessage || ''
+  const { hours, minutes, seconds } = getTimeFromForm(
+    'pauseTime' in formData ? formData.pauseTime ?? null : null
+  )
+  const totalSeconds = (hours ?? 0) * 3600 + minutes * 60 + seconds
+  const temperature = parseFloat(formData.pauseTemperature as string)
+  const message = formData.pauseMessage ?? ''
 
   switch (formData.pauseAction) {
     case PAUSE_UNTIL_TEMP:
       return {
         commandCreatorFnName: 'waitForTemperature',
-        temperature,
-        module: formData.moduleId,
+        name: formData.stepName,
+        description: formData.stepDetails ?? '',
+        celsius: temperature,
+        moduleId: formData.moduleId ?? '',
         message,
       }
 
     case PAUSE_UNTIL_TIME:
       return {
         commandCreatorFnName: 'delay',
-        name: `Pause ${formData.id}`,
-        // TODO real name for steps
-        description: formData.description || '',
-        // TODO get from form
-        wait: totalSeconds,
+        name: formData.stepName,
+        description: formData.stepDetails ?? '',
+        seconds: totalSeconds,
         message,
         meta: {
           hours,
@@ -46,11 +49,8 @@ export const pauseFormToArgs = (
     case PAUSE_UNTIL_RESUME:
       return {
         commandCreatorFnName: 'delay',
-        name: `Pause ${formData.id}`,
-        // TODO real name for steps
-        description: formData.description || '',
-        // TODO get from form
-        wait: true,
+        name: formData.stepName,
+        description: formData.stepDetails ?? '',
         message,
         meta: {
           hours,

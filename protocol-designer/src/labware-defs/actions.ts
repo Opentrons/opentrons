@@ -1,19 +1,23 @@
 import Ajv from 'ajv'
 import isEqual from 'lodash/isEqual'
-import flatten from 'lodash/flatten'
-import values from 'lodash/values'
 import uniqBy from 'lodash/uniqBy'
+import values from 'lodash/values'
+
 import {
-  getLabwareDefURI,
   getIsTiprack,
-  OPENTRONS_LABWARE_NAMESPACE,
+  getLabwareDefURI,
   labwareSchemaV2,
+  OPENTRONS_LABWARE_NAMESPACE,
+  validateCustomLabwareHelper,
 } from '@opentrons/shared-data'
+
 import { getAllWellSetsForLabware } from '../utils'
 import * as labwareDefSelectors from './selectors'
+
+import type { SyntheticEvent } from 'react'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { ThunkAction } from '../types'
 import type { LabwareUploadMessage } from './types'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 export interface LabwareUploadMessageAction {
   type: 'LABWARE_UPLOAD_MESSAGE'
@@ -89,7 +93,7 @@ const getIsOverwriteMismatched = (
 const _createCustomLabwareDef: (
   onlyTiprack: boolean
 ) => (
-  event: React.SyntheticEvent<HTMLInputElement>
+  event: SyntheticEvent<HTMLInputElement>
 ) => ThunkAction<any> = onlyTiprack => event => (dispatch, getState) => {
   const customLabwareDefs = values(
     labwareDefSelectors.getCustomLabwareDefsByURI(getState())
@@ -131,15 +135,17 @@ const _createCustomLabwareDef: (
 
     const valid: boolean | PromiseLike<any> =
       parsedLabwareDef === null ? false : validate(parsedLabwareDef)
-    const hasWellA1 = flatten(parsedLabwareDef?.ordering || []).includes('A1')
+    const hasWellMatching = validateCustomLabwareHelper(parsedLabwareDef)
     const loadName = parsedLabwareDef?.parameters?.loadName || ''
     const displayName = parsedLabwareDef?.metadata?.displayName || ''
 
-    if (!hasWellA1) {
-      console.warn('uploaded labware conforms to schema, but has no well A1!')
+    if (!hasWellMatching) {
+      console.warn(
+        'uploaded labware conforms to schema, but wells do not match!'
+      )
     }
 
-    if (!valid || !hasWellA1) {
+    if (!valid || !hasWellMatching) {
       return dispatch(
         labwareUploadMessage({
           messageType: 'INVALID_JSON_FILE',
@@ -242,11 +248,11 @@ const _createCustomLabwareDef: (
 }
 
 export const createCustomLabwareDef: (
-  event: React.SyntheticEvent<HTMLInputElement>
+  event: SyntheticEvent<HTMLInputElement>
 ) => ThunkAction<any> = _createCustomLabwareDef(false)
 
 export const createCustomTiprackDef: (
-  event: React.SyntheticEvent<HTMLInputElement>
+  event: SyntheticEvent<HTMLInputElement>
 ) => ThunkAction<any> = _createCustomLabwareDef(true)
 
 interface DismissLabwareUploadMessage {

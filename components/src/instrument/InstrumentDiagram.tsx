@@ -1,22 +1,22 @@
-import * as React from 'react'
-import { FlattenSimpleInterpolation } from 'styled-components'
 import { Flex } from '../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../styles'
-import singleSrc from './single_channel_GEN1_800px.png'
-import multiSrc from './multi-channel_GEN1_800px.png'
-import singleGEN2Src from './single-channel_GEN2_800px.png'
-import multiGEN2Src from './multi-channel_GEN2_800px.png'
-import singleFlexSrc from './single-channel-flex.png'
-import eightChannelFlexSrc from './eight-channel-flex.png'
-import ninetySixSrc from './ninety-six-channel-gen1.png'
 
-import type { PipetteNameSpecs } from '@opentrons/shared-data'
-import type { Mount } from '../robot-types'
+import type { FlattenSimpleInterpolation } from 'styled-components'
+import type { PipetteV2Specs } from '@opentrons/shared-data'
 import type { StyleProps } from '..'
+import type { Mount } from '../robot-types'
+
+import eightChannelFlexSrc from './eight-channel-flex.png'
+import multiSrc from './multi-channel_GEN1_800px.png'
+import multiGEN2Src from './multi-channel_GEN2_800px.png'
+import ninetySixSrc from './ninety-six-channel-gen1.png'
+import singleSrc from './single_channel_GEN1_800px.png'
+import singleGEN2Src from './single-channel_GEN2_800px.png'
+import singleFlexSrc from './single-channel-flex.png'
 
 export interface InstrumentDiagramProps extends StyleProps {
   mount: Mount
-  pipetteSpecs?: Pick<PipetteNameSpecs, 'displayCategory' | 'channels'> | null
+  pipetteSpecs?: Pick<PipetteV2Specs, 'displayCategory' | 'channels'> | null
   className?: string
   imageStyle?: FlattenSimpleInterpolation
 }
@@ -43,8 +43,6 @@ export function InstrumentDiagram(props: InstrumentDiagramProps): JSX.Element {
   return (
     <Flex
       className={className}
-      transform={mount === 'right' ? 'scaleX(-1)' : ''}
-      filter={mount === 'right' ? 'FlipH' : ''}
       {...styleProps}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}

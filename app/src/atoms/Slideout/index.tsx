@@ -1,5 +1,7 @@
-import * as React from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   Box,
@@ -10,6 +12,7 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   OVERFLOW_WRAP_ANYWHERE,
   Overlay,
   POSITION_FIXED,
@@ -18,20 +21,20 @@ import {
 } from '@opentrons/components'
 
 import { Divider } from '../structure'
-import { StyledText } from '../text'
-import { useTranslation } from 'react-i18next'
+
+import type { ReactElement, ReactNode } from 'react'
 
 export interface MultiSlideoutSpecs {
   currentStep: number
   maxSteps: number
 }
 export interface SlideoutProps {
-  title: string | React.ReactElement
-  children: React.ReactNode
+  title: string | ReactElement
+  children: ReactNode
   onCloseClick: () => void
   //  isExpanded is for collapse and expand animation
   isExpanded?: boolean
-  footer?: React.ReactNode
+  footer?: ReactNode
   multiSlideoutSpecs?: MultiSlideoutSpecs
 }
 
@@ -123,9 +126,9 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
     multiSlideoutSpecs,
   } = props
   const { t } = useTranslation('shared')
-  const slideOutRef = React.useRef<HTMLDivElement>(null)
-  const [isReachedBottom, setIsReachedBottom] = React.useState<boolean>(false)
-  const hasBeenExpanded = React.useRef<boolean>(isExpanded ?? false)
+  const slideOutRef = useRef<HTMLDivElement>(null)
+  const [isReachedBottom, setIsReachedBottom] = useState<boolean>(false)
+  const hasBeenExpanded = useRef<boolean>(isExpanded ?? false)
   const handleScroll = (): void => {
     if (slideOutRef.current == null) return
     const { scrollTop, scrollHeight, clientHeight } = slideOutRef.current
@@ -136,7 +139,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
     }
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     handleScroll()
   }, [slideOutRef])
 
@@ -180,7 +183,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
           {multiSlideoutSpecs === undefined ? null : (
-            <StyledText
+            <LegacyStyledText
               as="p"
               color={COLORS.grey60}
               alignItems={ALIGN_CENTER}
@@ -190,7 +193,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
                 current: multiSlideoutSpecs.currentStep,
                 max: multiSlideoutSpecs.maxSteps,
               })}
-            </StyledText>
+            </LegacyStyledText>
           )}
           {typeof title === 'string' ? (
             <Flex
@@ -200,14 +203,14 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
               paddingX={SPACING.spacing16}
               marginBottom={SPACING.spacing16}
             >
-              <StyledText
+              <LegacyStyledText
                 as="h2"
                 overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 data-testid={`Slideout_title_${title}`}
               >
                 {title}
-              </StyledText>
+              </LegacyStyledText>
               <Flex alignItems={ALIGN_CENTER}>
                 <Btn
                   size="1.5rem"

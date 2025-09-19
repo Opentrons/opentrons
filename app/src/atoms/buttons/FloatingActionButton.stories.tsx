@@ -1,9 +1,9 @@
-import * as React from 'react'
-import { ICON_DATA_BY_NAME } from '@opentrons/components'
-import { touchScreenViewport } from '../../DesignTokens/constants'
+import { ICON_DATA_BY_NAME, VIEWPORT } from '@opentrons/components'
+
 import { FloatingActionButton } from './'
 
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react'
+import type * as React from 'react'
 
 export default {
   title: 'ODD/Atoms/Buttons/FloatingActionButton',
@@ -17,7 +17,7 @@ export default {
     },
     onClick: { action: 'clicked' },
   },
-  parameters: touchScreenViewport,
+  parameters: VIEWPORT.touchScreenViewport,
 } as Meta
 
 const FloatingActionButtonTemplate: Story<

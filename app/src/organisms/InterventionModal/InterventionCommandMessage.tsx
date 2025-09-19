@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
@@ -6,13 +5,13 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
   TEXT_TRANSFORM_UPPERCASE,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 
 const INTERVENTION_COMMAND_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
@@ -51,16 +50,16 @@ export function InterventionCommandMessage({
 
   return (
     <Flex css={INTERVENTION_COMMAND_STYLE}>
-      <StyledText css={INTERVENTION_COMMAND_NOTES_STYLE}>
+      <LegacyStyledText css={INTERVENTION_COMMAND_NOTES_STYLE}>
         {t('notes')}
-      </StyledText>
-      <StyledText css={INTERVENTION_COMMAND_MESSAGE_STYLE}>
+      </LegacyStyledText>
+      <LegacyStyledText css={INTERVENTION_COMMAND_MESSAGE_STYLE}>
         {commandMessage != null && commandMessage !== ''
           ? commandMessage.length > 220
             ? `${commandMessage.substring(0, 217)}...`
             : commandMessage
           : t('wait_for_resume')}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 }

@@ -1,10 +1,11 @@
 """Tests for base /runs routes."""
+
 import pytest
 from datetime import datetime
 from decoy import Decoy
 
 from opentrons.types import DeckSlotName
-from opentrons.protocol_engine import LabwareOffsetCreate, types as pe_types
+from opentrons.protocol_engine import types as pe_types
 
 from robot_server.errors.error_responses import ApiError
 from robot_server.service.json_api import (
@@ -19,7 +20,9 @@ from robot_server.maintenance_runs.maintenance_run_models import (
     MaintenanceRunCreate,
     MaintenanceRunNotFoundError,
 )
-from robot_server.maintenance_runs.maintenance_engine_store import EngineConflictError
+from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
+    RunConflictError,
+)
 from robot_server.maintenance_runs.maintenance_run_data_manager import (
     MaintenanceRunDataManager,
 )
@@ -36,12 +39,17 @@ from robot_server.maintenance_runs.router.base_router import (
 from robot_server.deck_configuration.store import DeckConfigurationStore
 
 
+def mock_notify_publishers() -> None:
+    """A mock notify_publishers."""
+    return None
+
+
 @pytest.fixture
-def labware_offset_create() -> LabwareOffsetCreate:
+def labware_offset_create() -> pe_types.LegacyLabwareOffsetCreate:
     """Get a labware offset create request value object."""
-    return pe_types.LabwareOffsetCreate(
+    return pe_types.LegacyLabwareOffsetCreate(
         definitionUri="namespace_1/load_name_1/123",
-        location=pe_types.LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
+        location=pe_types.LegacyLabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
         vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
     )
 
@@ -68,6 +76,8 @@ async def test_create_run(
         labwareOffsets=[],
         status=pe_types.EngineStatus.IDLE,
         liquids=[],
+        liquidClasses=[],
+        hasEverEnteredErrorRecovery=False,
     )
 
     decoy.when(
@@ -79,6 +89,7 @@ async def test_create_run(
             created_at=run_created_at,
             labware_offsets=[labware_offset_create],
             deck_configuration=[],
+            notify_publishers=mock_notify_publishers,
         )
     ).then_return(expected_response)
 
@@ -91,6 +102,8 @@ async def test_create_run(
         created_at=run_created_at,
         is_ok_to_create_maintenance_run=True,
         deck_configuration_store=mock_deck_configuration_store,
+        notify_publishers=mock_notify_publishers,
+        check_estop=True,
     )
 
     assert result.content.data == expected_response
@@ -115,6 +128,8 @@ async def test_create_maintenance_run_with_protocol_run_conflict(
             run_data_manager=mock_maintenance_run_data_manager,
             is_ok_to_create_maintenance_run=False,
             deck_configuration_store=mock_deck_configuration_store,
+            check_estop=True,
+            notify_publishers=mock_notify_publishers,
         )
     assert exc_info.value.status_code == 409
     assert exc_info.value.content["errors"][0]["id"] == "ProtocolRunIsActive"
@@ -137,6 +152,8 @@ async def test_get_run_data_from_url(
         labware=[],
         labwareOffsets=[],
         liquids=[],
+        liquidClasses=[],
+        hasEverEnteredErrorRecovery=False,
     )
 
     decoy.when(mock_maintenance_run_data_manager.get("run-id")).then_return(
@@ -186,6 +203,8 @@ async def test_get_run() -> None:
         labware=[],
         labwareOffsets=[],
         liquids=[],
+        liquidClasses=[],
+        hasEverEnteredErrorRecovery=False,
     )
 
     result = await get_run(run_data=run_data)
@@ -211,6 +230,8 @@ async def test_get_current_run(
         labware=[],
         labwareOffsets=[],
         liquids=[],
+        liquidClasses=[],
+        hasEverEnteredErrorRecovery=False,
     )
     decoy.when(mock_maintenance_run_data_manager.current_run_id).then_return(
         "current-run-id"
@@ -281,7 +302,7 @@ async def test_delete_active_run(
 ) -> None:
     """It should 409 if the run is not finished."""
     decoy.when(await mock_maintenance_run_data_manager.delete("run-id")).then_raise(
-        EngineConflictError("oh no")
+        RunConflictError("oh no")
     )
 
     with pytest.raises(ApiError) as exc_info:

@@ -1,19 +1,21 @@
 import cx from 'classnames'
-import * as React from 'react'
+import { Field } from 'formik'
+
 import {
   Box,
+  LegacyTooltip,
   SelectField,
-  SelectOption,
-  StyleProps,
-  Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-import { Field } from 'formik'
+
 import { reportFieldEdit } from '../analyticsUtils'
-import { getLabel, LabwareFields } from '../fields'
-import type { RichOption, RichOptions } from '../fields'
-import fieldStyles from './fieldStyles.module.css'
+import { getLabel } from '../fields'
 import styles from './Dropdown.module.css'
+import fieldStyles from './fieldStyles.module.css'
+
+import type * as React from 'react'
+import type { SelectOption, StyleProps } from '@opentrons/components'
+import type { LabwareFields, RichOption, RichOptions } from '../fields'
 
 export interface DropdownProps extends StyleProps {
   name: keyof LabwareFields
@@ -55,7 +57,9 @@ export const Dropdown = (props: DropdownProps): JSX.Element => {
 
   return (
     <>
-      {tooltip != null && <Tooltip {...tooltipProps}>{tooltip}</Tooltip>}
+      {tooltip != null && (
+        <LegacyTooltip {...tooltipProps}>{tooltip}</LegacyTooltip>
+      )}
 
       <div {...targetProps} className={fieldStyles.field_wrapper}>
         <label
@@ -67,7 +71,10 @@ export const Dropdown = (props: DropdownProps): JSX.Element => {
             {/* @ts-expect-error(IL, 2021-03-24): formik types need cleanup w LabwareFields */}
             {({ field, form }) => (
               <Box {...styleProps}>
-                {getLabel(field.name, form.values)}
+                {getLabel(
+                  field.name as keyof LabwareFields,
+                  form.values as LabwareFields
+                )}
                 <SelectField
                   disabled={disabled}
                   name={field.name}

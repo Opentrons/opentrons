@@ -1,39 +1,53 @@
-import * as React from 'react'
+import { useEffect } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import { UseMutateFunction } from 'react-query'
-import { COLORS, DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
+
+import {
+  Banner,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  LegacyStyledText,
+  SPACING,
+} from '@opentrons/components'
 import {
   NINETY_SIX_CHANNEL,
   RIGHT,
   SINGLE_MOUNT_PIPETTES,
-  WEIGHT_OF_96_CHANNEL,
-  LoadedPipette,
-  getPipetteNameSpecs,
   WASTE_CHUTE_CUTOUT,
+  WEIGHT_OF_96_CHANNEL,
 } from '@opentrons/shared-data'
-import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
-import { StyledText } from '../../atoms/text'
-import { Banner } from '../../atoms/Banner'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import { WizardRequiredEquipmentList } from '../../molecules/WizardRequiredEquipmentList'
+
+import { usePipetteNameSpecs } from '/app/local-resources/instruments'
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '/app/molecules/SimpleWizardBody'
+import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+
+import {
+  BODY_STYLE,
   CALIBRATION_PROBE,
   FLOWS,
-  PIPETTE,
   HEX_SCREWDRIVER,
-  NINETY_SIX_CHANNEL_PIPETTE,
   NINETY_SIX_CHANNEL_MOUNTING_PLATE,
-  BODY_STYLE,
+  NINETY_SIX_CHANNEL_PIPETTE,
+  PIPETTE,
 } from './constants'
 import { getIsGantryEmpty } from './utils'
+
 import type { AxiosError } from 'axios'
-import type { CreateCommand } from '@opentrons/shared-data'
+import type { UseMutateFunction } from 'react-query'
 import type {
   CreateMaintenanceRunData,
   MaintenanceRun,
 } from '@opentrons/api-client'
+import type {
+  CreateCommand,
+  LoadedPipette,
+  PipetteName,
+} from '@opentrons/shared-data'
 import type { PipetteWizardStepProps } from './types'
 
 interface BeforeBeginningProps extends PipetteWizardStepProps {
@@ -68,7 +82,7 @@ export const BeforeBeginning = (
     createdMaintenanceRunId,
   } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
-  React.useEffect(() => {
+  useEffect(() => {
     if (createdMaintenanceRunId == null) {
       createMaintenanceRun({})
     }
@@ -79,10 +93,14 @@ export const BeforeBeginning = (
     isGantryEmpty &&
     selectedPipette === NINETY_SIX_CHANNEL &&
     flowType === FLOWS.ATTACH
-  const deckConfig = useDeckConfigurationQuery().data
+  const deckConfig = useNotifyDeckConfigurationQuery().data
   const isWasteChuteOnDeck =
     deckConfig?.find(fixture => fixture.cutoutId === WASTE_CHUTE_CUTOUT) ??
     false
+
+  const pipetteDisplayName = usePipetteNameSpecs(
+    requiredPipette?.pipetteName as PipetteName
+  )?.displayName
 
   if (
     pipetteId == null &&
@@ -92,6 +110,10 @@ export const BeforeBeginning = (
 
   let equipmentList = [CALIBRATION_PROBE]
   const proceedButtonText = t('move_gantry_to_front')
+  const hexScrewdriverWithSubtitle = {
+    ...HEX_SCREWDRIVER,
+    subtitle: t('provided_with_robot'),
+  }
   let bodyTranslationKey: string = ''
 
   switch (flowType) {
@@ -103,15 +125,13 @@ export const BeforeBeginning = (
       bodyTranslationKey = 'remove_labware'
       let displayName: string | undefined
       if (requiredPipette != null) {
-        displayName =
-          getPipetteNameSpecs(requiredPipette.pipetteName)?.displayName ??
-          requiredPipette.pipetteName
+        displayName = pipetteDisplayName ?? requiredPipette.pipetteName
       }
       if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
         equipmentList = [
           { ...PIPETTE, displayName: displayName ?? PIPETTE.displayName },
           CALIBRATION_PROBE,
-          HEX_SCREWDRIVER,
+          hexScrewdriverWithSubtitle,
         ]
       } else {
         equipmentList = [
@@ -120,7 +140,7 @@ export const BeforeBeginning = (
             displayName: displayName ?? NINETY_SIX_CHANNEL_PIPETTE.displayName,
           },
           CALIBRATION_PROBE,
-          HEX_SCREWDRIVER,
+          hexScrewdriverWithSubtitle,
           NINETY_SIX_CHANNEL_MOUNTING_PLATE,
         ]
       }
@@ -128,28 +148,29 @@ export const BeforeBeginning = (
     }
     case FLOWS.DETACH: {
       if (requiredPipette != null) {
-        const displayName =
-          getPipetteNameSpecs(requiredPipette.pipetteName)?.displayName ??
-          requiredPipette.pipetteName
+        const displayName = pipetteDisplayName ?? requiredPipette.pipetteName
         bodyTranslationKey = 'remove_labware'
 
-        if (requiredPipette.pipetteName === 'p1000_96') {
+        if (
+          requiredPipette.pipetteName === 'p1000_96' ||
+          requiredPipette.pipetteName === 'p200_96'
+        ) {
           equipmentList = [
-            { ...NINETY_SIX_CHANNEL_PIPETTE, displayName: displayName },
+            { ...NINETY_SIX_CHANNEL_PIPETTE, displayName },
             CALIBRATION_PROBE,
-            HEX_SCREWDRIVER,
+            hexScrewdriverWithSubtitle,
             NINETY_SIX_CHANNEL_MOUNTING_PLATE,
           ]
         } else {
           equipmentList = [
-            { ...PIPETTE, displayName: displayName },
+            { ...PIPETTE, displayName },
             CALIBRATION_PROBE,
-            HEX_SCREWDRIVER,
+            hexScrewdriverWithSubtitle,
           ]
         }
       } else {
         bodyTranslationKey = 'get_started_detach'
-        equipmentList = [HEX_SCREWDRIVER]
+        equipmentList = [hexScrewdriverWithSubtitle]
       }
       break
     }
@@ -165,14 +186,14 @@ export const BeforeBeginning = (
         params: {
           pipetteName: attachedPipettes[mount]?.instrumentName ?? '',
           pipetteId: pipetteId ?? '',
-          mount: mount,
+          mount,
         },
       },
       { commandType: 'home' as const, params: {} },
       {
         commandType: 'calibration/moveToMaintenancePosition' as const,
         params: {
-          mount: mount,
+          mount,
         },
       },
     ]
@@ -182,7 +203,7 @@ export const BeforeBeginning = (
         proceed()
       })
       .catch(error => {
-        setShowErrorMessage(error.message)
+        setShowErrorMessage(error.message as string)
       })
   }
 
@@ -191,7 +212,7 @@ export const BeforeBeginning = (
     {
       commandType: 'calibration/moveToMaintenancePosition' as const,
       params: {
-        mount: mount,
+        mount,
       },
     },
   ]
@@ -218,11 +239,12 @@ export const BeforeBeginning = (
         proceed()
       })
       .catch(error => {
-        setShowErrorMessage(error.message)
+        setShowErrorMessage(error.message as string)
       })
   }
 
-  if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
+  if (isRobotMoving)
+    return <SimpleWizardInProgressBody description={t('stand_back')} />
 
   return errorMessage != null ? (
     <SimpleWizardBody
@@ -242,33 +264,37 @@ export const BeforeBeginning = (
               t={t}
               i18nKey={bodyTranslationKey}
               components={{
-                block: <StyledText css={BODY_STYLE} />,
+                block: <LegacyStyledText css={BODY_STYLE} />,
               }}
             />
             {selectedPipette === NINETY_SIX_CHANNEL &&
               flowType === FLOWS.ATTACH &&
-              !isOnDevice && (
-                <StyledText css={BODY_STYLE}>
+              !Boolean(isOnDevice) && (
+                <LegacyStyledText css={BODY_STYLE}>
                   {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
-                </StyledText>
+                </LegacyStyledText>
               )}
           </Flex>
           {selectedPipette === NINETY_SIX_CHANNEL &&
             (flowType === FLOWS.CALIBRATE || flowType === FLOWS.ATTACH ? (
               <Banner
-                type={isWasteChuteOnDeck ? 'error' : 'warning'}
-                size={isOnDevice ? '1.5rem' : '1rem'}
-                marginTop={isOnDevice ? SPACING.spacing24 : SPACING.spacing16}
+                type={Boolean(isWasteChuteOnDeck) ? 'error' : 'warning'}
+                size={Boolean(isOnDevice) ? '1.5rem' : '1rem'}
+                marginTop={
+                  Boolean(isOnDevice) ? SPACING.spacing24 : SPACING.spacing16
+                }
               >
-                {isWasteChuteOnDeck
+                {Boolean(isWasteChuteOnDeck)
                   ? t('waste_chute_error')
                   : t('waste_chute_warning')}
               </Banner>
             ) : (
               <Banner
                 type="warning"
-                size={isOnDevice ? '1.5rem' : '1rem'}
-                marginTop={isOnDevice ? SPACING.spacing24 : SPACING.spacing16}
+                size={Boolean(isOnDevice) ? '1.5rem' : '1rem'}
+                marginTop={
+                  Boolean(isOnDevice) ? SPACING.spacing24 : SPACING.spacing16
+                }
               >
                 {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
               </Banner>

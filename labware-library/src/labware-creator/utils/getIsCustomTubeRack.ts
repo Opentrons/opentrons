@@ -1,4 +1,4 @@
-import { LabwareFields, ProcessedLabwareFields } from '../fields'
+import type { LabwareFields, ProcessedLabwareFields } from '../fields'
 
 export const getIsCustomTubeRack = (
   values: LabwareFields | ProcessedLabwareFields

@@ -9,37 +9,37 @@
 }
 
 .labware_guide {
-  border-bottom: var(--bd-light);
   padding-bottom: var(--spacing-7);
+  border-bottom: var(--bd-light);
 }
 
 .labware_guide_container {
+  padding: var(--spacing-5);
   border: var(--bd-light);
   border-radius: 3px;
-  padding: var(--spacing-5);
 }
 
 .labware_guide_title {
-  font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
-  color: var(--c-font-dark); /* from legacy --font-body-2-dark */
   display: flex;
   align-items: center;
   margin-bottom: var(--spacing-5);
+  color: var(--c-font-dark); /* from legacy --font-body-2-dark */
+  font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
   font-weight: var(--fw-semibold);
 }
 
 .labware_guide_icon {
-  flex: none;
   width: var(--size-1);
+  flex: none;
   margin-right: var(--spacing-5);
 }
 
 .labware_guide_link {
   display: block;
-  line-height: var(--lh-copy);
-  font-size: var(--fs-body-1);
   margin-top: var(--spacing-2);
   color: var(--c-blue);
+  font-size: var(--fs-body-1);
+  line-height: var(--lh-copy);
 }
 
 .filter_manufacturer {
@@ -48,17 +48,17 @@
 }
 
 .filter_label {
-  text-transform: uppercase;
   padding: 0 0 var(--spacing-3) 0;
+  color: var(--c-dark-gray);
   font-size: var(--fs-caption);
   font-weight: var(--fw-semibold);
-  color: var(--c-dark-gray);
+  text-transform: uppercase;
 }
 
 .filter_manufacturer_select {
+  color: var(--c-font-dark); /* from legacy --font-body-1-dark */
   font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
   font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
-  color: var(--c-font-dark); /* from legacy --font-body-1-dark */
   line-height: var(--lh-title);
 
   /* react-select adds background: white on its <input> for some reason */
@@ -79,14 +79,14 @@
 }
 
 .filter_category_link {
-  font-size: var(--fs-default); /* from legacy --font-default-dark */
   color: var(--c-font-dark); /* from legacy --font-default-dark */
+  cursor: pointer;
+  font-size: var(--fs-default); /* from legacy --font-default-dark */
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-title);
 
   /* pulled from legacy --transition-color */
   transition: color 0.15s ease-in-out;
-  cursor: pointer;
-  line-height: var(--lh-title);
-  font-weight: var(--fw-semibold);
 
   &:hover {
     color: var(--c-blue);
@@ -100,10 +100,10 @@
 .filter_reset_link {
   display: inline-flex;
   align-items: center;
-  border-radius: var(--bd-radius-default);
-  margin-top: var(--spacing-3);
   padding: var(--spacing-1);
   padding-right: var(--spacing-2);
+  border-radius: var(--bd-radius-default);
+  margin-top: var(--spacing-3);
   color: var(--c-blue);
   font-size: var(--fs-caption);
   font-weight: var(--fw-semibold);

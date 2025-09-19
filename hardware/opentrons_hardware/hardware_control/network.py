@@ -1,4 +1,5 @@
 """Utilities for managing the CANbus network on the OT3."""
+
 import asyncio
 from dataclasses import dataclass
 from itertools import chain
@@ -10,6 +11,8 @@ from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     FirmwareTarget,
     USBTarget,
+    MessageId,
+    MotorUsageValueType,
 )
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
@@ -17,6 +20,8 @@ from opentrons_hardware.drivers.can_bus.can_messenger import (
 from opentrons_hardware.drivers.binary_usb import BinaryMessenger
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     DeviceInfoRequest as CanDeviceInfoRequest,
+    GetMotorUsageResponse,
+    GetMotorUsageRequest,
 )
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     DeviceInfoResponse as CanDeviceInfoResponse,
@@ -502,3 +507,33 @@ def _parse_can_device_info_response(
         except (ValueError, UnicodeDecodeError) as e:
             log.error(f"Could not parse DeviceInfoResponse {e}")
     return None
+
+
+def _listener(message: MessageDefinition, arb_id: ArbitrationId) -> None:
+    if isinstance(message, GetMotorUsageResponse):
+        usage_elements = message.payload.usage_elements
+        node = NodeId(arb_id.parts.originating_node_id)
+        logline = f"Usage from {node.name}: "
+        for m in usage_elements:
+            data_name = MotorUsageValueType(m.key).name
+            data_value = m.usage_value
+            logline += f"\n    {data_name}: {data_value}"
+        log.info(logline)
+
+
+async def log_motor_usage_data(can_messenger: CanMessenger) -> None:
+    """Broadcasts a message to get motor usage request and installs a listener to log responses.
+
+    This is really only intended to make sure that usage data gets logged; it will return before
+    responses get sent and shouldn't be relied upon beyond logging.
+    """
+    log.info(f"Getting usage data using listener {_listener}")
+
+    def _filter(arb_id: ArbitrationId) -> bool:
+        return MessageId(arb_id.parts.message_id) == MessageId.get_motor_usage_response
+
+    # Note: this adds but does not remove a listener. this is safe asl ong as add_listener
+    # is implemented with a dictionary keyed on function object identity, because this
+    # function should be stable. It will not be okay if we ever change that.
+    can_messenger.add_listener(_listener, _filter)
+    await can_messenger.send(node_id=NodeId.broadcast, message=GetMotorUsageRequest())

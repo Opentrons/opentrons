@@ -2,6 +2,7 @@ import { combineReducers } from 'redux'
 
 import { robotSystemReducer } from './is-ready/reducer'
 
+import type { Reducer } from 'redux'
 import type { Action } from '../types'
 import type { ShellState, ShellUpdateState } from './types'
 
@@ -51,8 +52,47 @@ export function shellUpdateReducer(
 
   return state
 }
-// TODO: (sa 2021-15-18: remove any typed state in combineReducers)
-export const shellReducer = combineReducers<ShellState, Action>({
+
+export function massStorageReducer(
+  state = [] as string[],
+  action: Action
+): string[] {
+  switch (action.type) {
+    case 'shell:SEND_FILE_PATHS':
+      return action.payload.filePaths
+  }
+  return state
+}
+
+export function systemLanguageReducer(
+  state: string[] | null = null,
+  action: Action
+): string[] | null {
+  switch (action.type) {
+    case 'shell:SYSTEM_LANGUAGE':
+      return action.payload.systemLanguage
+  }
+  return state
+}
+
+interface ShellReducerMap {
+  update: Reducer<ShellUpdateState, Action>
+  isReady: Reducer<boolean, Action>
+  filePaths: Reducer<string[], Action>
+  systemLanguage: Reducer<string[] | null, Action>
+}
+
+const reducers: ShellReducerMap = {
   update: shellUpdateReducer,
-  isReady: robotSystemReducer,
-})
+  isReady: robotSystemReducer as Reducer<boolean, Action>,
+  filePaths: massStorageReducer,
+  systemLanguage: systemLanguageReducer,
+}
+
+export const shellReducer: Reducer<ShellState, Action> = (
+  state: ShellState | undefined,
+  action: Action
+): ShellState => {
+  const combinedReducer = combineReducers(reducers)
+  return combinedReducer(state, action)
+}

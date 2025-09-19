@@ -4,28 +4,31 @@ import range from 'lodash/range'
 import round from 'lodash/round'
 
 import labwareSchema from '../../labware/schemas/2.json'
-
 import {
-  toWellName,
+  ensureVolumeUnits,
+  getAsciiVolumeUnits,
+  getDisplayVolume,
   sortWells,
   splitWellsOnColumn,
-  getDisplayVolume,
-  getAsciiVolumeUnits,
-  ensureVolumeUnits,
+  toWellName,
 } from '../helpers/index'
 
 import type {
-  LabwareDefinition2 as Definition,
-  LabwareMetadata as Metadata,
-  LabwareDimensions as Dimensions,
   LabwareBrand as Brand,
-  LabwareParameters as Params,
-  LabwareWell as Well,
+  // todo(mm, 2025-05-13): We probably want these functions to be able to emit
+  // LabwareDefinition3, too. https://opentrons.atlassian.net/browse/EXEC-1491
+  LabwareDefinition2 as Definition,
+  LabwareDimensions as Dimensions,
   LabwareWellProperties as InputWell,
-  LabwareWellMap as WellMap,
-  LabwareWellGroup as WellGroup,
+  LabwareOffset,
+  LabwareMetadata as Metadata,
+  ModuleModel,
   LabwareOffset as Offset,
+  LabwareParameters as Params,
   LabwareVolumeUnits as VolumeUnits,
+  LabwareWell as Well,
+  LabwareWellGroup as WellGroup,
+  LabwareWellMap as WellMap,
 } from '../types'
 
 // NOTE: leaving this 'beta' to reduce conflicts with future labware cloud namespaces
@@ -56,12 +59,16 @@ type InputWellGroup = Omit<WellGroup, 'wells'>
 export interface BaseLabwareProps {
   metadata: Metadata
   parameters: InputParams
+  // todo(mm, 2025-05-13): dimensions is currently coupled to LabwareDefinition2.
+  // Replace it with something that works with LabwareDefinition3.
   dimensions: Dimensions
   brand?: Brand
   version?: number
   namespace?: string
   loadNamePostfix?: string[]
   strict?: boolean | null // If true, throws error on failed validation
+  stackingOffsetWithLabware?: Record<string, LabwareOffset>
+  stackingOffsetWithModule?: Record<ModuleModel, LabwareOffset>
 }
 
 export interface RegularLabwareProps extends BaseLabwareProps {
@@ -354,7 +361,16 @@ export function createDefaultDisplayName(args: RegularNameProps): string {
 // For further info on these parameters look at labware examples in __tests__
 // or the labware definition schema in labware/schemas/
 export function createRegularLabware(args: RegularLabwareProps): Definition {
-  const { offset, dimensions, grid, spacing, well, loadNamePostfix } = args
+  const {
+    offset,
+    dimensions,
+    grid,
+    spacing,
+    well,
+    loadNamePostfix,
+    stackingOffsetWithLabware,
+    stackingOffsetWithModule,
+  } = args
   const strict = args.strict
   const version = args.version || 1
   const namespace = args.namespace || DEFAULT_CUSTOM_NAMESPACE
@@ -393,6 +409,8 @@ export function createRegularLabware(args: RegularLabwareProps): Definition {
         y: 0,
         z: 0,
       },
+      stackingOffsetWithLabware,
+      stackingOffsetWithModule,
     },
     strict
   )

@@ -1,11 +1,11 @@
-import { connectionStore } from './store'
 import {
+  closeConnectionForcefully,
   connectAsync,
   establishListeners,
-  closeConnectionForcefully,
 } from './connect'
-import { subscribe } from './subscribe'
 import { notifyLog } from './notifyLog'
+import { connectionStore } from './store'
+import { subscribe } from './subscribe'
 
 import type { BrowserWindow } from 'electron'
 import type { Action, Dispatch } from '../types'
@@ -39,7 +39,9 @@ export function establishBrokerConnection(): Promise<void> {
       notifyLog.debug(`Successfully connected to ${robotName} on ${ip}`)
       void connectionStore
         .setConnected(client)
-        .then(() => establishListeners())
+        .then(() => {
+          establishListeners()
+        })
         .catch((error: Error) => notifyLog.debug(error.message))
     })
     .catch((error: Error) => {

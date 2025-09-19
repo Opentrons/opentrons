@@ -1,13 +1,13 @@
-import * as React from 'react'
-import { Provider } from 'react-redux'
-import { createStore } from 'redux'
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { Provider } from 'react-redux'
+import { legacy_createStore } from 'redux'
 
-import { configReducer } from '../../redux/config/reducer'
 import { EstopPressedModal } from '.'
+import { configReducer } from '../../redux/config/reducer'
 
-import type { Store } from 'redux'
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react'
+import type { Store, StoreEnhancer } from 'redux'
+import type * as React from 'react'
 
 export default {
   title: 'App/Organisms/EstopPressedModal',
@@ -20,7 +20,10 @@ const dummyConfig = {
   },
 } as any
 
-const store: Store<any> = createStore(configReducer, dummyConfig)
+const store: Store<any> = legacy_createStore(
+  configReducer,
+  dummyConfig as StoreEnhancer
+)
 const queryClient = new QueryClient()
 
 const Template: Story<

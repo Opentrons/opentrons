@@ -12,7 +12,7 @@ import asyncio
 import contextlib
 import logging
 from os import environ
-from time import time
+from time import monotonic
 from typing import Any, Dict, Optional, Union, List, Tuple, cast, AsyncIterator
 
 from math import isclose
@@ -803,6 +803,8 @@ class SmoothieDriver:
         This methods writes a sequence of newline characters, which will
         guarantee Smoothieware responds with 'ok\r\nok\r\n' within 3 seconds
         """
+        if self._connection:
+            await self._connection.flush_input()
         await self._send_command(_command_builder(), timeout=SMOOTHIE_BOOT_TIMEOUT)
 
     async def _reset_from_error(self) -> None:
@@ -1899,12 +1901,12 @@ class SmoothieDriver:
         # if loop:
         #    kwargs["loop"] = loop
         log.info(update_cmd)
-        before = time()
+        before = monotonic()
         proc = await asyncio.create_subprocess_shell(update_cmd, **kwargs)
-        created = time()
+        created = monotonic()
         log.info(f"created lpc21isp subproc in {created-before}")
         out_b, err_b = await proc.communicate()
-        done = time()
+        done = monotonic()
         log.info(f"ran lpc21isp subproc in {done-created}")
         if proc.returncode != 0:
             log.error(

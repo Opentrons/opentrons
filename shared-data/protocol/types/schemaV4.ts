@@ -1,12 +1,12 @@
 import type { DeckSlotId, ModuleModel } from '../../js/types'
 import type {
-  ProtocolFile as V3ProtocolFile,
   AspDispAirgapParams,
   BlowoutParams,
-  TouchTipParams,
-  PipetteAccessParams,
-  MoveToSlotParams,
   DelayParams,
+  MoveToSlotParams,
+  PipetteAccessParams,
+  TouchTipParams,
+  ProtocolFile as V3ProtocolFile,
 } from './schemaV3'
 
 export type { BlowoutParams, FilePipette, FileLabware } from './schemaV3'

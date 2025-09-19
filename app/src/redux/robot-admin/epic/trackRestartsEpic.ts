@@ -1,15 +1,15 @@
-import { ofType, combineEpics } from 'redux-observable'
+import { combineEpics, ofType } from 'redux-observable'
 import { of } from 'rxjs'
-import { map, filter, withLatestFrom, switchMap } from 'rxjs/operators'
+import { filter, map, switchMap, withLatestFrom } from 'rxjs/operators'
 
-import { getRobotByName, getDiscoveredRobots } from '../../discovery'
-import { getNextRestartStatus } from '../selectors'
+import { getDiscoveredRobots, getRobotByName } from '../../discovery'
 import { restartStatusChanged } from '../actions'
 import * as Constants from '../constants'
+import { getNextRestartStatus } from '../selectors'
 
+import type { ReachableRobot, Robot } from '../../discovery/types'
 import type { Action, Epic } from '../../types'
 import type { RestartRobotSuccessAction } from '../types'
-import type { Robot, ReachableRobot } from '../../discovery/types'
 
 // mark robot as restart-pending if HTTP restart request succeeds
 const trackRestartBeginEpic: Epic = (action$, state$) => {

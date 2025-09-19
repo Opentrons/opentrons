@@ -1,18 +1,49 @@
 """Parameter definition and associated validators."""
-
-from typing import Generic, Optional, List, Set, Union, get_args
+from abc import abstractmethod, ABC
+from typing import Generic, Optional, List, Set, Union
 
 from opentrons.protocols.parameters.types import (
     ParamType,
     ParameterChoice,
-    AllowedTypes,
-    ParameterDefinitionError,
+    PrimitiveAllowedTypes,
+)
+from opentrons.protocols.parameters.exceptions import (
     ParameterValueError,
+    ParameterDefinitionError,
 )
 from opentrons.protocols.parameters import validation
+from opentrons.protocol_engine.types import (
+    RunTimeParameter,
+    NumberParameter,
+    BooleanParameter,
+    EnumParameter,
+    EnumChoice,
+)
+from opentrons.util.get_union_elements import get_union_elements
 
 
-class ParameterDefinition(Generic[ParamType]):
+class AbstractParameterDefinition(ABC, Generic[ParamType]):
+    @property
+    @abstractmethod
+    def variable_name(self) -> str:
+        ...
+
+    @property
+    @abstractmethod
+    def value(self) -> ParamType:
+        ...
+
+    @value.setter
+    @abstractmethod
+    def value(self, new_value: ParamType) -> None:
+        ...
+
+    @abstractmethod
+    def as_protocol_engine_type(self) -> RunTimeParameter:
+        ...
+
+
+class ParameterDefinition(AbstractParameterDefinition[PrimitiveAllowedTypes]):
     """The definition for a user defined parameter."""
 
     def __init__(
@@ -20,9 +51,9 @@ class ParameterDefinition(Generic[ParamType]):
         display_name: str,
         variable_name: str,
         parameter_type: type,
-        default: ParamType,
-        minimum: Optional[ParamType] = None,
-        maximum: Optional[ParamType] = None,
+        default: PrimitiveAllowedTypes,
+        minimum: Optional[PrimitiveAllowedTypes] = None,
+        maximum: Optional[PrimitiveAllowedTypes] = None,
         choices: Optional[List[ParameterChoice]] = None,
         description: Optional[str] = None,
         unit: Optional[str] = None,
@@ -51,14 +82,14 @@ class ParameterDefinition(Generic[ParamType]):
         self._description = validation.ensure_description(description)
         self._unit = validation.ensure_unit_string_length(unit)
 
-        if parameter_type not in get_args(AllowedTypes):
+        if parameter_type not in get_union_elements(PrimitiveAllowedTypes):
             raise ParameterDefinitionError(
                 "Parameters can only be of type int, float, str, or bool."
             )
         self._type = parameter_type
 
         self._choices: Optional[List[ParameterChoice]] = choices
-        self._allowed_values: Optional[Set[AllowedTypes]] = None
+        self._allowed_values: Optional[Set[PrimitiveAllowedTypes]] = None
 
         self._minimum: Optional[Union[int, float]] = None
         self._maximum: Optional[Union[int, float]] = None
@@ -73,20 +104,20 @@ class ParameterDefinition(Generic[ParamType]):
             self._minimum = minimum
             self._maximum = maximum
 
-        self._default: ParamType = default
-        self.value: ParamType = default
+        self._default: PrimitiveAllowedTypes = default
+        self.value: PrimitiveAllowedTypes = default
 
     @property
-    def value(self) -> ParamType:
+    def value(self) -> PrimitiveAllowedTypes:
         """The current value of the parameter."""
         return self._value
 
     @value.setter
-    def value(self, new_value: ParamType) -> None:
+    def value(self, new_value: PrimitiveAllowedTypes) -> None:
         validation.validate_type(new_value, self._type)
         if self._allowed_values is not None and new_value not in self._allowed_values:
             raise ParameterValueError(
-                f"Parameter must be set to one of the allowed values of {self._allowed_values}."
+                f"Parameter must be set to one of the allowed values of {sorted(self._allowed_values)}."
             )
         elif (
             isinstance(self._minimum, (int, float))
@@ -104,6 +135,58 @@ class ParameterDefinition(Generic[ParamType]):
         """The in-protocol variable name of the parameter."""
         return self._variable_name
 
+    @property
+    def parameter_type(self) -> type:
+        """The python type of the parameter."""
+        return self._type
+
+    def as_protocol_engine_type(self) -> RunTimeParameter:
+        """Returns parameter as a Protocol Engine type to send to client."""
+        parameter: RunTimeParameter
+        if self._type is bool:
+            parameter = BooleanParameter(
+                displayName=self._display_name,
+                variableName=self._variable_name,
+                description=self._description,
+                value=bool(self._value),
+                default=bool(self._default),
+            )
+        elif self._choices is not None:
+            choices = [
+                EnumChoice(
+                    displayName=str(choice["display_name"]),
+                    value=choice["value"],
+                )
+                for choice in self._choices
+            ]
+            parameter = EnumParameter(
+                type=validation.convert_type_string_for_enum(self._type),
+                displayName=self._display_name,
+                variableName=self._variable_name,
+                description=self._description,
+                choices=choices,
+                value=self._value,
+                default=self._default,
+            )
+        elif self._minimum is not None and self._maximum is not None:
+            parameter = NumberParameter(
+                type=validation.convert_type_string_for_num_param(self._type),
+                displayName=self._display_name,
+                variableName=self._variable_name,
+                description=self._description,
+                suffix=self._unit,
+                min=float(self._minimum),
+                max=float(self._maximum),
+                value=float(self._value),
+                default=float(self._default),
+            )
+        else:
+            raise ParameterDefinitionError(
+                f"Cannot resolve parameter {self._display_name} to protocol engine type."
+            )
+
+        return parameter
+
 
 def create_int_parameter(
     display_name: str,
@@ -114,7 +197,7 @@ def create_int_parameter(
     choices: Optional[List[ParameterChoice]] = None,
     description: Optional[str] = None,
     unit: Optional[str] = None,
-) -> ParameterDefinition[int]:
+) -> ParameterDefinition:
     """Creates an integer parameter."""
     return ParameterDefinition(
         parameter_type=int,
@@ -138,7 +221,7 @@ def create_float_parameter(
     choices: Optional[List[ParameterChoice]] = None,
     description: Optional[str] = None,
     unit: Optional[str] = None,
-) -> ParameterDefinition[float]:
+) -> ParameterDefinition:
     """Creates a float parameter."""
     return ParameterDefinition(
         parameter_type=float,
@@ -159,7 +242,7 @@ def create_bool_parameter(
     default: bool,
     choices: List[ParameterChoice],
     description: Optional[str] = None,
-) -> ParameterDefinition[bool]:
+) -> ParameterDefinition:
     """Creates a boolean parameter."""
     return ParameterDefinition(
         parameter_type=bool,
@@ -177,7 +260,7 @@ def create_str_parameter(
     default: str,
     choices: Optional[List[ParameterChoice]] = None,
     description: Optional[str] = None,
-) -> ParameterDefinition[str]:
+) -> ParameterDefinition:
     """Creates a string parameter."""
     return ParameterDefinition(
         parameter_type=str,

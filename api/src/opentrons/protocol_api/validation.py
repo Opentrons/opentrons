@@ -11,17 +11,28 @@ from typing import (
     NamedTuple,
     TYPE_CHECKING,
 )
-
+from math import isinf, isnan
 from typing_extensions import TypeGuard
 
-from opentrons_shared_data.labware.labware_definition import LabwareRole
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.labware.labware_definition import (
+    LabwareDefinition,
+    LabwareRole,
+)
+from opentrons_shared_data.pipette.types import PipetteNameType, PIPETTE_API_NAMES_MAP
+from opentrons_shared_data.robot.types import RobotType
 
-from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.types import APIVersion, ThermocyclerStep
 from opentrons.protocols.api_support.util import APIVersionError
-from opentrons.protocols.models import LabwareDefinition
-from opentrons.types import Mount, DeckSlotName, StagingSlotName, Location
+from opentrons.protocols.advanced_control.transfers.common import TransferTipPolicyV2
+from opentrons.types import (
+    Mount,
+    DeckSlotName,
+    StagingSlotName,
+    Location,
+    AxisType,
+    AxisMapType,
+    StringAxisMap,
+)
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     MagneticModuleModel,
@@ -29,7 +40,8 @@ from opentrons.hardware_control.modules.types import (
     ThermocyclerModuleModel,
     HeaterShakerModuleModel,
     MagneticBlockModel,
-    ThermocyclerStep,
+    AbsorbanceReaderModel,
+    FlexStackerModuleModel,
 )
 
 from .disposal_locations import TrashBin, WasteChute
@@ -44,27 +56,15 @@ _COORDINATE_DECK_LABEL_VERSION_GATE = APIVersion(2, 15)
 # The first APIVersion where Python protocols can specify staging deck slots (e.g. "D4")
 _STAGING_DECK_SLOT_VERSION_GATE = APIVersion(2, 16)
 
-# Mapping of public Python Protocol API pipette load names
-# to names used by the internal Opentrons system
-_PIPETTE_NAMES_MAP = {
-    "p10_single": PipetteNameType.P10_SINGLE,
-    "p10_multi": PipetteNameType.P10_MULTI,
-    "p20_single_gen2": PipetteNameType.P20_SINGLE_GEN2,
-    "p20_multi_gen2": PipetteNameType.P20_MULTI_GEN2,
-    "p50_single": PipetteNameType.P50_SINGLE,
-    "p50_multi": PipetteNameType.P50_MULTI,
-    "p300_single": PipetteNameType.P300_SINGLE,
-    "p300_multi": PipetteNameType.P300_MULTI,
-    "p300_single_gen2": PipetteNameType.P300_SINGLE_GEN2,
-    "p300_multi_gen2": PipetteNameType.P300_MULTI_GEN2,
-    "p1000_single": PipetteNameType.P1000_SINGLE,
-    "p1000_single_gen2": PipetteNameType.P1000_SINGLE_GEN2,
-    "flex_1channel_50": PipetteNameType.P50_SINGLE_FLEX,
-    "flex_8channel_50": PipetteNameType.P50_MULTI_FLEX,
-    "flex_1channel_1000": PipetteNameType.P1000_SINGLE_FLEX,
-    "flex_8channel_1000": PipetteNameType.P1000_MULTI_FLEX,
-    "flex_96channel_1000": PipetteNameType.P1000_96,
-}
+# The first APIVersion where Python protocols can load lids as stacks and treat them as attributes of a parent labware.
+LID_STACK_VERSION_GATE = APIVersion(2, 23)
+
+# The first APIVersion where Python protocols can use the Flex Stacker module.
+FLEX_STACKER_VERSION_GATE = APIVersion(2, 23)
+
+# The first APIVersion where various "multi labware load" methods allow you to specify
+# the namespace and version of adapters and lids separately from the main labware.
+NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE = APIVersion(2, 26)
 
 
 class InvalidPipetteMountError(ValueError):
@@ -73,6 +73,14 @@ class InvalidPipetteMountError(ValueError):
 
 class PipetteMountTypeError(TypeError):
     """An error raised when an invalid mount type is used for loading pipettes."""
+
+
+class InstrumentMountTypeError(TypeError):
+    """An error raised when an invalid mount type is used for any available instruments."""
+
+
+class IncorrectAxisError(TypeError):
+    """An error raised when an invalid axis key is provided in an axis map."""
 
 
 class LabwareDefinitionIsNotAdapterError(ValueError):
@@ -87,11 +95,15 @@ class InvalidTrashBinLocationError(ValueError):
     """An error raised when attempting to load trash bins in invalid slots."""
 
 
+class InvalidFixtureLocationError(ValueError):
+    """An error raised when attempting to load a fixture in an invalid cutout."""
+
+
 def ensure_mount_for_pipette(
     mount: Union[str, Mount, None], pipette: PipetteNameType
 ) -> Mount:
     """Ensure that an input value represents a valid mount, and is valid for the given pipette."""
-    if pipette == PipetteNameType.P1000_96:
+    if pipette in [PipetteNameType.P1000_96, PipetteNameType.P200_96]:
         # Always validate the raw mount input, even if the pipette is a 96-channel and we're not going
         # to use the mount value.
         if mount is not None:
@@ -142,16 +154,108 @@ def _ensure_mount(mount: Union[str, Mount]) -> Mount:
     )
 
 
+def ensure_instrument_mount(mount: Union[str, Mount]) -> Mount:
+    """Ensure that an input value represents a valid Mount for all instruments."""
+    if isinstance(mount, Mount):
+        return mount
+
+    if isinstance(mount, str):
+        if mount == "gripper":
+            # TODO (lc 08-02-2024) We should decide on the user facing name for
+            # the gripper mount axis.
+            mount = "extension"
+        try:
+            return Mount[mount.upper()]
+        except KeyError as e:
+            raise InstrumentMountTypeError(
+                "If mount is specified as a string, it must be 'left', 'right', 'gripper', or 'extension';"
+                f" instead, {mount} was given."
+            ) from e
+
+
 def ensure_pipette_name(pipette_name: str) -> PipetteNameType:
     """Ensure that an input value represents a valid pipette name."""
     pipette_name = ensure_lowercase_name(pipette_name)
 
     try:
-        return _PIPETTE_NAMES_MAP[pipette_name]
+        return PIPETTE_API_NAMES_MAP[pipette_name]
     except KeyError:
         raise ValueError(
             f"Cannot resolve {pipette_name} to pipette, must be given valid pipette name."
         ) from None
+
+
+def _check_ot2_axis_type(
+    robot_type: RobotType, axis_map_keys: Union[List[str], List[AxisType]]
+) -> None:
+    if robot_type == "OT-2 Standard" and isinstance(axis_map_keys[0], AxisType):
+        if any(k not in AxisType.ot2_axes() for k in axis_map_keys):
+            raise IncorrectAxisError(
+                f"An OT-2 Robot only accepts the following axes {AxisType.ot2_axes()}"
+            )
+    if robot_type == "OT-2 Standard" and isinstance(axis_map_keys[0], str):
+        if any(k.upper() not in [axis.value for axis in AxisType.ot2_axes()] for k in axis_map_keys):  # type: ignore [union-attr]
+            raise IncorrectAxisError(
+                f"An OT-2 Robot only accepts the following axes {AxisType.ot2_axes()}"
+            )
+
+
+def _check_96_channel_axis_type(
+    is_96_channel: bool, axis_map_keys: Union[List[str], List[AxisType]]
+) -> None:
+    if is_96_channel and any(
+        key_variation in axis_map_keys for key_variation in ["Z_R", "z_r", AxisType.Z_R]
+    ):
+        raise IncorrectAxisError(
+            "A 96 channel is attached. You cannot move the `Z_R` mount."
+        )
+    if not is_96_channel and any(
+        key_variation in axis_map_keys for key_variation in ["Q", "q", AxisType.Q]
+    ):
+        raise IncorrectAxisError(
+            "A 96 channel is not attached. The clamp `Q` motor does not exist."
+        )
+
+
+def ensure_axis_map_type(
+    axis_map: Union[AxisMapType, StringAxisMap],
+    robot_type: RobotType,
+    is_96_channel: bool = False,
+) -> AxisMapType:
+    """Ensure that the axis map provided is in the correct shape and contains the correct keys."""
+    axis_map_keys: Union[List[str], List[AxisType]] = list(axis_map.keys())  # type: ignore
+    key_type = set(type(k) for k in axis_map_keys)
+
+    if len(key_type) > 1:
+        raise IncorrectAxisError(
+            "Please provide an `axis_map` with only string or only AxisType keys."
+        )
+    _check_ot2_axis_type(robot_type, axis_map_keys)
+    _check_96_channel_axis_type(is_96_channel, axis_map_keys)
+
+    if all(isinstance(k, AxisType) for k in axis_map_keys):
+        return_map: AxisMapType = axis_map  # type: ignore
+        return return_map
+    try:
+        return {AxisType[k.upper()]: v for k, v in axis_map.items()}  # type: ignore [union-attr]
+    except KeyError as e:
+        raise IncorrectAxisError(f"{e} is not a supported `AxisMapType`")
+
+
+def ensure_only_gantry_axis_map_type(
+    axis_map: AxisMapType, robot_type: RobotType
+) -> None:
+    """Ensure that the axis map provided is in the correct shape and matches the gantry axes for the robot."""
+    if robot_type == "OT-2 Standard":
+        if any(k not in AxisType.ot2_gantry_axes() for k in axis_map.keys()):
+            raise IncorrectAxisError(
+                f"A critical point only accepts OT-2 gantry axes which are {AxisType.ot2_gantry_axes()}"
+            )
+    else:
+        if any(k not in AxisType.flex_gantry_axes() for k in axis_map.keys()):
+            raise IncorrectAxisError(
+                f"A critical point only accepts Flex gantry axes which are {AxisType.flex_gantry_axes()}"
+            )
 
 
 # TODO(jbl 11-17-2023) this function's original purpose was ensure a valid deck slot for a given robot type
@@ -184,7 +288,9 @@ def ensure_and_convert_deck_slot(
     if str(deck_slot).upper() in {"A4", "B4", "C4", "D4"}:
         if api_version < APIVersion(2, 16):
             raise APIVersionError(
-                f"Using a staging deck slot requires apiLevel {_STAGING_DECK_SLOT_VERSION_GATE}."
+                api_element="Using a staging deck slot",
+                until_version=f"{_STAGING_DECK_SLOT_VERSION_GATE}",
+                current_version=f"{api_version}",
             )
         # Don't need a try/except since we're already pre-validating this
         parsed_staging_slot = StagingSlotName.from_primitive(str(deck_slot))
@@ -198,9 +304,10 @@ def ensure_and_convert_deck_slot(
         if not is_ot2_style and api_version < _COORDINATE_DECK_LABEL_VERSION_GATE:
             alternative = parsed_slot.to_ot2_equivalent().id
             raise APIVersionError(
-                f'Specifying a deck slot like "{deck_slot}" requires apiLevel'
-                f" {_COORDINATE_DECK_LABEL_VERSION_GATE}."
-                f' Increase your protocol\'s apiLevel, or use slot "{alternative}" instead.'
+                api_element=f"Specifying a deck slot like '{deck_slot}'",
+                until_version=f"{_COORDINATE_DECK_LABEL_VERSION_GATE}",
+                current_version=f"{api_version}",
+                extra_message=f"Increase your protocol's apiLevel, or use slot '{alternative}' instead.",
             )
 
         return parsed_slot.to_equivalent_for_robot_type(robot_type)
@@ -246,6 +353,27 @@ def ensure_definition_is_labware(definition: LabwareDefinition) -> None:
         )
 
 
+def ensure_definition_is_lid(definition: LabwareDefinition) -> None:
+    """Ensure that one of the definition's allowed roles is `lid` or that that field is empty."""
+    if LabwareRole.lid not in definition.allowedRoles:
+        raise LabwareDefinitionIsNotLabwareError(
+            f"Labware {definition.parameters.loadName} is not a lid."
+        )
+
+
+def ensure_definition_is_not_lid_after_api_version(
+    api_version: APIVersion, definition: LabwareDefinition
+) -> None:
+    """Ensure that one of the definition's allowed roles is not `lid` or that the API Version is below the release where lid loading was seperated."""
+    if (
+        LabwareRole.lid in definition.allowedRoles
+        and api_version >= LID_STACK_VERSION_GATE
+    ):
+        raise APIVersionError(
+            f"Labware Lids cannot be loaded like standard labware in Protocols written with an API version greater than {LID_STACK_VERSION_GATE}."
+        )
+
+
 _MODULE_ALIASES: Dict[str, ModuleModel] = {
     "magdeck": MagneticModuleModel.MAGNETIC_V1,
     "magnetic module": MagneticModuleModel.MAGNETIC_V1,
@@ -268,6 +396,8 @@ _MODULE_MODELS: Dict[str, ModuleModel] = {
     "thermocyclerModuleV2": ThermocyclerModuleModel.THERMOCYCLER_V2,
     "heaterShakerModuleV1": HeaterShakerModuleModel.HEATER_SHAKER_V1,
     "magneticBlockV1": MagneticBlockModel.MAGNETIC_BLOCK_V1,
+    "absorbanceReaderV1": AbsorbanceReaderModel.ABSORBANCE_READER_V1,
+    "flexStackerModuleV1": FlexStackerModuleModel.FLEX_STACKER_V1,
 }
 
 
@@ -359,6 +489,7 @@ def ensure_thermocycler_profile_steps(
         temperature = step.get("temperature")
         hold_mins = step.get("hold_time_minutes")
         hold_secs = step.get("hold_time_seconds")
+        ramp_rate = step.get("ramp_rate")
         if temperature is None:
             raise ValueError("temperature must be defined for each step in cycle")
         if hold_mins is None and hold_secs is None:
@@ -366,10 +497,14 @@ def ensure_thermocycler_profile_steps(
                 "either hold_time_minutes or hold_time_seconds must be"
                 "defined for each step in cycle"
             )
+        if ramp_rate is not None and ramp_rate <= 0:
+            raise ValueError("Ramp rate must be greater than 0.")
         validated_seconds = ensure_hold_time_seconds(hold_secs, hold_mins)
         validated_steps.append(
             ThermocyclerStep(
-                temperature=temperature, hold_time_seconds=validated_seconds
+                temperature=temperature,
+                hold_time_seconds=validated_seconds,
+                ramp_rate=ramp_rate,
             )
         )
     return validated_steps
@@ -419,6 +554,11 @@ class PointTarget(NamedTuple):
     in_place: bool
 
 
+class DisposalTarget(NamedTuple):
+    location: Union[TrashBin, WasteChute]
+    in_place: bool
+
+
 class NoLocationError(ValueError):
     """Error representing that no location was supplied."""
 
@@ -427,10 +567,13 @@ class LocationTypeError(TypeError):
     """Error representing that the location supplied is of different expected type."""
 
 
+ValidTarget = Union[WellTarget, PointTarget, DisposalTarget]
+
+
 def validate_location(
-    location: Union[Location, Well, TrashBin, WasteChute, None],
-    last_location: Optional[Location],
-) -> Union[WellTarget, PointTarget, TrashBin, WasteChute]:
+    location: Optional[Union[Location, Well, TrashBin, WasteChute]],
+    last_location: Optional[Union[Location, TrashBin, WasteChute]],
+) -> ValidTarget:
     """Validate a given location for a liquid handling command.
 
     Args:
@@ -440,9 +583,11 @@ def validate_location(
     Returns:
         A `WellTarget` if the input location represents a well.
         A `PointTarget` if the input location is an x, y, z coordinate.
+        A `TrashBin` if the input location is a trash bin
+        A `WasteChute` if the input location is a waste chute
 
     Raises:
-        NoLocationError: The is no input location and no cached loaction.
+        NoLocationError: There is no input location and no cached location.
         LocationTypeError: The location supplied is of unexpected type.
     """
     from .labware import Well
@@ -457,10 +602,10 @@ def validate_location(
             f"location should be a Well, Location, TrashBin or WasteChute, but it is {location}"
         )
 
-    if isinstance(target_location, (TrashBin, WasteChute)):
-        return target_location
-
     in_place = target_location == last_location
+
+    if isinstance(target_location, (TrashBin, WasteChute)):
+        return DisposalTarget(location=target_location, in_place=in_place)
 
     if isinstance(target_location, Well):
         return WellTarget(well=target_location, location=None, in_place=in_place)
@@ -472,3 +617,154 @@ def validate_location(
         if well is not None
         else PointTarget(location=target_location, in_place=in_place)
     )
+
+
+def ensure_boolean(value: bool) -> bool:
+    """Ensure value is a boolean."""
+    if not isinstance(value, bool):
+        raise ValueError("Value must be a boolean.")
+    return value
+
+
+def ensure_float(value: Union[int, float]) -> float:
+    """Ensure value is a float (or an integer) and return it as a float."""
+    if not isinstance(value, (int, float)):
+        raise ValueError("Value must be a floating point number.")
+    return float(value)
+
+
+def ensure_positive_float(value: Union[int, float]) -> float:
+    """Ensure value is a positive and real float value."""
+    float_value = ensure_float(value)
+    if isnan(float_value) or isinf(float_value):
+        raise ValueError("Value must be a defined, non-infinite number.")
+    if float_value < 0:
+        raise ValueError("Value must be a positive float.")
+    return float_value
+
+
+def ensure_greater_than_zero_float(value: Union[int, float]) -> float:
+    """Ensure value is a positive and real float value."""
+    float_value = ensure_float(value)
+    if isnan(float_value) or isinf(float_value):
+        raise ValueError("Value must be a defined, non-infinite number.")
+    if float_value <= 0:
+        raise ValueError("Value must be a positive float greater than 0.")
+    return float_value
+
+
+def ensure_positive_int(value: int) -> int:
+    """Ensure value is a positive integer."""
+    if not isinstance(value, int):
+        raise ValueError("Value must be an integer.")
+    if value < 0:
+        raise ValueError("Value must be a positive integer.")
+    return value
+
+
+def validate_coordinates(value: Sequence[float]) -> Tuple[float, float, float]:
+    """Ensure value is a valid sequence of 3 floats and return a tuple of 3 floats."""
+    if len(value) != 3:
+        raise ValueError("Coordinates must be a sequence of exactly three numbers")
+    if not all(isinstance(v, (float, int)) for v in value):
+        raise ValueError("All values in coordinates must be floats.")
+    return float(value[0]), float(value[1]), float(value[2])
+
+
+def ensure_new_tip_policy(value: str) -> TransferTipPolicyV2:
+    """Ensure that new_tip value is a valid TransferTipPolicy value."""
+    try:
+        return TransferTipPolicyV2(value.lower())
+    except ValueError:
+        raise ValueError(
+            f"'{value}' is invalid value for 'new_tip'."
+            f" Acceptable value is either 'never', 'once', 'always', 'per source' or 'per destination'."
+        )
+
+
+def _verify_each_list_element_is_valid_location(locations: Sequence[Well]) -> None:
+    from .labware import Well
+
+    for loc in locations:
+        if not isinstance(loc, Well):
+            raise ValueError(
+                f"'{loc}' is not a valid location for transfer."
+                f" Location should be a well instance."
+            )
+
+
+def ensure_valid_flat_wells_list_for_transfer_v2(
+    target: Union[Well, Sequence[Well], Sequence[Sequence[Well]]],
+) -> List[Well]:
+    """Ensure that the given target(s) for a liquid transfer are valid and in a flat list."""
+    from .labware import Well
+
+    if isinstance(target, Well):
+        return [target]
+
+    if isinstance(target, (list, tuple)):
+        if len(target) == 0:
+            raise ValueError("No target well(s) specified for transfer.")
+        if isinstance(target[0], (list, tuple)):
+            for sub_sequence in target:
+                _verify_each_list_element_is_valid_location(sub_sequence)
+            return [loc for sub_sequence in target for loc in sub_sequence]
+        else:
+            _verify_each_list_element_is_valid_location(target)
+            return list(target)
+    else:
+        raise ValueError(
+            f"'{target}' is not a valid location for transfer."
+            f" Location should be a well instance, or a 1-dimensional or"
+            f" 2-dimensional sequence of well instances."
+        )
+
+
+def ensure_valid_trash_location_for_transfer_v2(
+    trash_location: Union[Location, Well, TrashBin, WasteChute]
+) -> Union[Location, TrashBin, WasteChute]:
+    """Ensure that the trash location is valid for v2 transfer."""
+    from .labware import Well
+
+    if isinstance(trash_location, TrashBin) or isinstance(trash_location, WasteChute):
+        return trash_location
+    elif isinstance(trash_location, Well):
+        return trash_location.top()
+    elif isinstance(trash_location, Location):
+        _, maybe_well = trash_location.labware.get_parent_labware_and_well()
+
+        if maybe_well is None:
+            raise TypeError(
+                "If a location is specified as a `types.Location`"
+                " (for instance, as the result of a call to `Well.top()`),"
+                " it must be a location relative to a well,"
+                " since that is where a tip is dropped."
+                " However, the given location doesn't refer to any well."
+            )
+        return trash_location
+    else:
+        raise TypeError(
+            f"If specified, location should be an instance of"
+            f" `types.Location` (e.g. the return value from `Well.top()`)"
+            f" or `Well` (e.g. `reservoir.wells()[0]`) or an instance of `TrashBin` or `WasteChute`."
+            f" However, it is '{trash_location}'."
+        )
+
+
+def convert_flex_stacker_load_slot(slot_name: StagingSlotName) -> DeckSlotName:
+    """
+    Ensure a Flex Stacker load location to a deck slot location.
+
+    Args:
+        slot_name: The input staging slot location.
+
+    Returns:
+        A `DeckSlotName` on the deck.
+    """
+    _map = {
+        StagingSlotName.SLOT_A4: DeckSlotName.SLOT_A3,
+        StagingSlotName.SLOT_B4: DeckSlotName.SLOT_B3,
+        StagingSlotName.SLOT_C4: DeckSlotName.SLOT_C3,
+        StagingSlotName.SLOT_D4: DeckSlotName.SLOT_D3,
+    }
+    return _map[slot_name]

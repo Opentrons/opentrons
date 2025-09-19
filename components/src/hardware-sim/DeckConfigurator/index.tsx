@@ -1,35 +1,61 @@
-import * as React from 'react'
+import { useMemo } from 'react'
 
 import {
-  getDeckDefFromRobotType,
+  filterAAByAreaType,
   FLEX_ROBOT_TYPE,
-  SINGLE_SLOT_FIXTURES,
-  STAGING_AREA_RIGHT_SLOT_FIXTURE,
-  TRASH_BIN_ADAPTER_FIXTURE,
-  WASTE_CHUTE_ONLY_FIXTURES,
-  WASTE_CHUTE_STAGING_AREA_FIXTURES,
+  getDeckDefFromRobotType,
+  isModuleAllowedOnAA,
+  replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
+  STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
+  THERMOCYCLER_MODULE_CUTOUTS,
 } from '@opentrons/shared-data'
 
 import { COLORS } from '../../helix-design-system'
-import { SingleSlotFixture } from '../BaseDeck/SingleSlotFixture'
 import { SlotLabels } from '../Deck'
 import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
-import { EmptyConfigFixture } from './EmptyConfigFixture'
-import { StagingAreaConfigFixture } from './StagingAreaConfigFixture'
-import { TrashBinConfigFixture } from './TrashBinConfigFixture'
-import { WasteChuteConfigFixture } from './WasteChuteConfigFixture'
+import { AbsorbanceReaderItem } from './AbsorbanceReaderItem'
+import { EmptyConfigItem } from './EmptyConfigItem'
+import { FlexStackerItem } from './FlexStackerItem'
+import { HeaterShakerItem } from './HeaterShakerItem'
+import { MagneticBlockItem } from './MagneticBlockItem'
+import { StagingAreaConfigItem } from './StagingAreaConfigItem'
+import { StaticItem } from './StaticItem'
+import { TemperatureModuleItem } from './TemperatureModuleItem'
+import { ThermocyclerItem } from './ThermocyclerItem'
+import { TrashBinConfigItem } from './TrashBinConfigItem'
+import { WasteChuteConfigFixture } from './WasteChuteConfigItem'
 
-import type { CutoutId, DeckConfiguration } from '@opentrons/shared-data'
+import type { ReactNode } from 'react'
+import type {
+  AddressableAreaNamesWithFakes,
+  CutoutFixtureIdsWithFakes,
+  CutoutId,
+  DeckConfiguration,
+  ModuleModel,
+} from '@opentrons/shared-data'
+
+export * from './constants'
 
 interface DeckConfiguratorProps {
   deckConfig: DeckConfiguration
-  handleClickAdd: (cutoutId: CutoutId) => void
-  handleClickRemove: (cutoutId: CutoutId) => void
+  handleClickAdd: (
+    cutoutId: CutoutId,
+    addressableAreaId: AddressableAreaNamesWithFakes
+  ) => void
+  handleClickRemove: (
+    cutoutId: CutoutId,
+    cutoutFixtureId: CutoutFixtureIdsWithFakes,
+    addressableAreaId: AddressableAreaNamesWithFakes
+  ) => void
   lightFill?: string
   darkFill?: string
-  readOnly?: boolean
+  editableCutoutIds?: CutoutId[]
   showExpansion?: boolean
-  children?: React.ReactNode
+  children?: ReactNode
+  additionalStaticFixtures?: Array<{ location: CutoutId; label: string }>
+  height?: string
+  selectedCutoutId?: CutoutId
+  moduleModel?: ModuleModel
 }
 
 export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
@@ -37,119 +63,296 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     deckConfig,
     handleClickAdd,
     handleClickRemove,
-    lightFill = COLORS.grey35,
-    darkFill = COLORS.black90,
-    readOnly = false,
-    showExpansion = true,
+    additionalStaticFixtures,
     children,
+    selectedCutoutId,
+    darkFill = COLORS.black90,
+    editableCutoutIds = deckConfig.map(({ cutoutId }) => cutoutId),
+    height = '455px',
+    moduleModel,
   } = props
+
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
-  // restrict configuration to certain locations
-  const configurableFixtureLocations: CutoutId[] = [
-    'cutoutA1',
-    'cutoutB1',
-    'cutoutC1',
-    'cutoutD1',
-    'cutoutA3',
-    'cutoutB3',
-    'cutoutC3',
-    'cutoutD3',
-  ]
-  const configurableDeckConfig = deckConfig.filter(({ cutoutId }) =>
-    configurableFixtureLocations.includes(cutoutId)
+  const deckConfigWithAA = useMemo(
+    () => replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(deckConfig),
+    [deckConfig]
   )
 
-  const stagingAreaFixtures = configurableDeckConfig.filter(
-    ({ cutoutFixtureId }) => cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE
+  const stagingAreaItems = filterAAByAreaType(
+    deckConfigWithAA,
+    deckDef,
+    'stagingSlot'
   )
-  const wasteChuteFixtures = configurableDeckConfig.filter(
-    ({ cutoutFixtureId }) =>
-      cutoutFixtureId != null &&
-      WASTE_CHUTE_ONLY_FIXTURES.includes(cutoutFixtureId)
+
+  const wasteChuteItems = filterAAByAreaType(
+    deckConfigWithAA,
+    deckDef,
+    'wasteChute'
   )
-  const wasteChuteStagingAreaFixtures = configurableDeckConfig.filter(
-    ({ cutoutFixtureId }) =>
-      cutoutFixtureId != null &&
-      WASTE_CHUTE_STAGING_AREA_FIXTURES.includes(cutoutFixtureId)
+  const fakeStagingItems = filterAAByAreaType(
+    deckConfigWithAA,
+    deckDef,
+    'fakeStagingSlot'
   )
-  const emptyFixtures = readOnly
-    ? []
-    : configurableDeckConfig.filter(
-        ({ cutoutFixtureId }) =>
-          cutoutFixtureId != null &&
-          SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
-      )
-  const trashBinFixtures = configurableDeckConfig.filter(
-    ({ cutoutFixtureId }) => cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
+
+  const emptySlotLikeItems = filterAAByAreaType(
+    deckConfigWithAA,
+    deckDef,
+    'slot'
+  ).concat(fakeStagingItems)
+
+  const trashBinItems = filterAAByAreaType(
+    deckConfigWithAA,
+    deckDef,
+    'movableTrash'
+  )
+  const thermocyclerItems = filterAAByAreaType(
+    deckConfigWithAA,
+    deckDef,
+    'thermocycler'
+  )
+  const heaterShakerItems = filterAAByAreaType(
+    deckConfigWithAA,
+    deckDef,
+    'heaterShaker'
+  )
+  const temperatureModuleItems = filterAAByAreaType(
+    deckConfigWithAA,
+    deckDef,
+    'temperatureModule'
+  )
+  const magneticBlockItems = filterAAByAreaType(
+    deckConfigWithAA,
+    deckDef,
+    'magneticBlock'
+  )
+  const absorbanceReaderItems = filterAAByAreaType(
+    deckConfigWithAA,
+    deckDef,
+    'absorbanceReader'
+  )
+
+  const flexStackerItems = filterAAByAreaType(
+    deckConfigWithAA,
+    deckDef,
+    'flexStacker'
   )
 
   return (
     <RobotCoordinateSpace
-      height="455px"
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      height={height}
       viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
     >
-      {deckDef.locations.cutouts.map(cutout => (
-        // give the outside of the base fixture svgs a stroke for extra spacing
-        <g key={cutout.id} stroke={COLORS.white} strokeWidth="4">
-          <SingleSlotFixture
-            cutoutId={cutout.id}
-            deckDefinition={deckDef}
-            slotClipColor={COLORS.transparent}
-            fixtureBaseColor={lightFill}
-            showExpansion={showExpansion}
-          />
-        </g>
-      ))}
-      {stagingAreaFixtures.map(({ cutoutId }) => (
-        <StagingAreaConfigFixture
-          key={cutoutId}
-          deckDefinition={deckDef}
-          handleClickRemove={readOnly ? undefined : handleClickRemove}
-          fixtureLocation={cutoutId}
-        />
-      ))}
-      {emptyFixtures.map(({ cutoutId }) => (
-        <EmptyConfigFixture
-          key={cutoutId}
+      {stagingAreaItems.map(
+        ({ cutoutId, cutoutFixtureId, addressableAreaId }) => {
+          const shouldAllowRemove =
+            moduleModel != null
+              ? isModuleAllowedOnAA(cutoutId, addressableAreaId, moduleModel)
+              : editableCutoutIds.includes(cutoutId)
+          return (
+            <StagingAreaConfigItem
+              data-testid={cutoutId}
+              key={addressableAreaId}
+              deckDefinition={deckDef}
+              handleClickRemove={
+                shouldAllowRemove ? handleClickRemove : undefined
+              }
+              fixtureLocation={cutoutId}
+              cutoutFixtureId={cutoutFixtureId}
+              addressableAreaId={addressableAreaId}
+              selected={cutoutId === selectedCutoutId}
+            />
+          )
+        }
+      )}
+      {emptySlotLikeItems.map(({ cutoutId, addressableAreaId }) => (
+        <EmptyConfigItem
+          data-testid={addressableAreaId}
+          editableCutoutIds={editableCutoutIds ?? []}
+          key={addressableAreaId}
+          addressableAreaId={addressableAreaId}
           deckDefinition={deckDef}
           handleClickAdd={handleClickAdd}
           fixtureLocation={cutoutId}
+          moduleModel={moduleModel}
         />
       ))}
-      {wasteChuteFixtures.map(({ cutoutId }) => (
-        <WasteChuteConfigFixture
-          key={cutoutId}
+      {wasteChuteItems.map(
+        ({ cutoutId, cutoutFixtureId, addressableAreaId }) => {
+          const shouldAllowRemove =
+            moduleModel != null
+              ? isModuleAllowedOnAA(cutoutId, addressableAreaId, moduleModel)
+              : editableCutoutIds.includes(cutoutId)
+          return (
+            <WasteChuteConfigFixture
+              data-testid={cutoutId}
+              key={addressableAreaId}
+              deckDefinition={deckDef}
+              handleClickRemove={
+                shouldAllowRemove ? handleClickRemove : undefined
+              }
+              fixtureLocation={cutoutId}
+              cutoutFixtureId={cutoutFixtureId}
+              selected={cutoutId === selectedCutoutId}
+            />
+          )
+        }
+      )}
+      {trashBinItems.map(({ cutoutId, cutoutFixtureId, addressableAreaId }) => (
+        <TrashBinConfigItem
+          data-testid={cutoutId}
+          key={addressableAreaId}
           deckDefinition={deckDef}
-          handleClickRemove={readOnly ? undefined : handleClickRemove}
+          handleClickRemove={
+            editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined
+          }
           fixtureLocation={cutoutId}
+          cutoutFixtureId={cutoutFixtureId}
+          addressableAreaId={addressableAreaId}
+          selected={cutoutId === selectedCutoutId}
         />
       ))}
-      {wasteChuteStagingAreaFixtures.map(({ cutoutId }) => (
-        <WasteChuteConfigFixture
-          key={cutoutId}
+      {temperatureModuleItems.map(
+        ({ cutoutId, cutoutFixtureId, addressableAreaId }) => (
+          <TemperatureModuleItem
+            data-testid={cutoutId}
+            key={addressableAreaId}
+            deckDefinition={deckDef}
+            handleClickRemove={
+              editableCutoutIds.includes(cutoutId)
+                ? handleClickRemove
+                : undefined
+            }
+            fixtureLocation={cutoutId}
+            cutoutFixtureId={cutoutFixtureId}
+            addressableAreaId={addressableAreaId}
+            selected={cutoutId === selectedCutoutId}
+          />
+        )
+      )}
+      {heaterShakerItems.map(
+        ({ cutoutId, cutoutFixtureId, addressableAreaId }) => (
+          <HeaterShakerItem
+            data-testid={cutoutId}
+            key={addressableAreaId}
+            deckDefinition={deckDef}
+            handleClickRemove={
+              editableCutoutIds.includes(cutoutId)
+                ? handleClickRemove
+                : undefined
+            }
+            fixtureLocation={cutoutId}
+            cutoutFixtureId={cutoutFixtureId}
+            addressableAreaId={addressableAreaId}
+            selected={cutoutId === selectedCutoutId}
+          />
+        )
+      )}
+      {magneticBlockItems.map(
+        ({ cutoutId, cutoutFixtureId, addressableAreaId }) => {
+          const shouldAllowRemove =
+            moduleModel != null
+              ? isModuleAllowedOnAA(cutoutId, addressableAreaId, moduleModel)
+              : editableCutoutIds.includes(cutoutId)
+          return (
+            <MagneticBlockItem
+              data-testid={cutoutId}
+              key={addressableAreaId}
+              deckDefinition={deckDef}
+              handleClickRemove={
+                shouldAllowRemove ? handleClickRemove : undefined
+              }
+              fixtureLocation={cutoutId}
+              cutoutFixtureId={cutoutFixtureId}
+              addressableAreaId={addressableAreaId}
+              selected={cutoutId === selectedCutoutId}
+              hasStagingArea={
+                cutoutFixtureId ===
+                STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE
+              }
+            />
+          )
+        }
+      )}
+      {thermocyclerItems.map(
+        ({ cutoutId, cutoutFixtureId, addressableAreaId }) => {
+          return (
+            <ThermocyclerItem
+              data-testid={cutoutId}
+              key={addressableAreaId}
+              deckDefinition={deckDef}
+              handleClickRemove={
+                editableCutoutIds.includes(cutoutId)
+                  ? handleClickRemove
+                  : undefined
+              }
+              fixtureLocation={cutoutId}
+              cutoutFixtureId={cutoutFixtureId}
+              addressableAreaId={addressableAreaId}
+              selected={
+                selectedCutoutId != null &&
+                THERMOCYCLER_MODULE_CUTOUTS.includes(selectedCutoutId) &&
+                THERMOCYCLER_MODULE_CUTOUTS.includes(cutoutId)
+              }
+            />
+          )
+        }
+      )}
+      {absorbanceReaderItems.map(
+        ({ cutoutId, cutoutFixtureId, addressableAreaId }) => (
+          <AbsorbanceReaderItem
+            data-testid={cutoutId}
+            key={addressableAreaId}
+            deckDefinition={deckDef}
+            handleClickRemove={
+              editableCutoutIds.includes(cutoutId)
+                ? handleClickRemove
+                : undefined
+            }
+            fixtureLocation={cutoutId}
+            cutoutFixtureId={cutoutFixtureId}
+            addressableAreaId={addressableAreaId}
+            selected={cutoutId === selectedCutoutId}
+          />
+        )
+      )}
+      {flexStackerItems.map(
+        ({ cutoutId, cutoutFixtureId, addressableAreaId }) => (
+          <FlexStackerItem
+            data-testid={cutoutId}
+            key={addressableAreaId}
+            deckDefinition={deckDef}
+            handleClickRemove={
+              editableCutoutIds.includes(cutoutId)
+                ? handleClickRemove
+                : undefined
+            }
+            fixtureLocation={cutoutId}
+            cutoutFixtureId={cutoutFixtureId}
+            hasWasteChute={[
+              'wasteChuteRightAdapterCovered',
+              'wasteChuteRightAdapterNoCover',
+            ].includes(cutoutFixtureId)}
+            selected={cutoutId === selectedCutoutId}
+            addressableAreaId={addressableAreaId}
+          />
+        )
+      )}
+      {additionalStaticFixtures?.map(staticFixture => (
+        <StaticItem
+          data-testid={staticFixture.location}
+          key={staticFixture.location}
           deckDefinition={deckDef}
-          handleClickRemove={readOnly ? undefined : handleClickRemove}
-          fixtureLocation={cutoutId}
-          hasStagingAreas
+          label={staticFixture.label}
+          fixtureLocation={staticFixture.location}
         />
       ))}
-      {trashBinFixtures.map(({ cutoutId }) => (
-        <TrashBinConfigFixture
-          key={cutoutId}
-          deckDefinition={deckDef}
-          handleClickRemove={readOnly ? undefined : handleClickRemove}
-          fixtureLocation={cutoutId}
-        />
-      ))}
+      */
       <SlotLabels
         robotType={FLEX_ROBOT_TYPE}
         color={darkFill}
-        show4thColumn={
-          stagingAreaFixtures.length > 0 ||
-          wasteChuteStagingAreaFixtures.length > 0
-        }
+        show4thColumn={true}
       />
       {children}
     </RobotCoordinateSpace>

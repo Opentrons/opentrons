@@ -1,17 +1,20 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { css } from 'styled-components'
 
 import {
+  Btn,
+  COLORS,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   Flex,
-  Btn,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  StyleProps,
-  COLORS,
+  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
+
+import type { ReactNode } from 'react'
+import type { StyleProps } from '@opentrons/components'
 
 const ACCORDION_STYLE = css`
   border-radius: 50%;
@@ -25,7 +28,7 @@ const ACCORDION_STYLE = css`
 
 interface CollapsibleSectionProps extends StyleProps {
   title: string
-  children: React.ReactNode
+  children: ReactNode
   isExpandedInitially?: boolean
 }
 
@@ -33,21 +36,28 @@ export function CollapsibleSection(
   props: CollapsibleSectionProps
 ): JSX.Element {
   const { title, children, isExpandedInitially = true, ...styleProps } = props
-  const [isExpanded, setIsExpanded] = React.useState(isExpandedInitially)
+  const [isExpanded, setIsExpanded] = useState(isExpandedInitially)
   return (
     <Flex flexDirection={DIRECTION_COLUMN} {...styleProps}>
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        onClick={() => setIsExpanded(!isExpanded)}
+        onClick={() => {
+          setIsExpanded(!isExpanded)
+        }}
         css={{
-          cursor: 'pointer',
+          cursor: CURSOR_POINTER,
         }}
       >
-        <StyledText as="p" textTransform={TYPOGRAPHY.textTransformCapitalize}>
+        <LegacyStyledText
+          as="p"
+          textTransform={TYPOGRAPHY.textTransformCapitalize}
+        >
           {title}
-        </StyledText>
+        </LegacyStyledText>
         <Btn
-          onClick={() => setIsExpanded(!isExpanded)}
+          onClick={() => {
+            setIsExpanded(!isExpanded)
+          }}
           data-testid={
             isExpanded
               ? `CollapsibleSection_collapse_${title}`

@@ -10,7 +10,7 @@ on:
 
 jobs:
   create-release:
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     name: 'Create changelogs and release'
     steps:
       # this could be improved by replacing this checkout with something like
@@ -19,14 +19,14 @@ jobs:
       # git fetch origin ${{ github.ref_name }}:${{ github.ref_name }}
       # git checkout ${{ github.ref_name }}
       # This would pull history for only the tag in question.
-      - uses: 'actions/checkout@v3'
+      - uses: 'actions/checkout@v4'
         with:
           fetch-depth: 0
-      - uses: 'actions/setup-node@v3'
+      - uses: 'actions/setup-node@v4'
         with:
-          node-version: '18.19.0'
+          node-version: '22.12.0'
       - name: 'cache yarn cache'
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ${{ github.workspace }}/.npm-cache/_prebuild

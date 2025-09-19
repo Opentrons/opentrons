@@ -1,24 +1,28 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
+
 import {
+  ALIGN_CENTER,
+  CheckboxField,
+  DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
   JUSTIFY_FLEX_END,
-  TEXT_ALIGN_CENTER,
-  SPACING,
-  TYPOGRAPHY,
-  DIRECTION_COLUMN,
+  LegacyStyledText,
   Link,
+  Modal,
   PrimaryButton,
-  CheckboxField,
-  ALIGN_CENTER,
+  SPACING,
+  TEXT_ALIGN_CENTER,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { LegacyModal } from '../../molecules/LegacyModal'
-import { StyledText } from '../../atoms/text'
-import { Dispatch } from '../../redux/types'
-import { UpdateConfigValueAction } from '../../redux/config/types'
-import { updateConfigValue } from '../../redux/config'
+
+import { updateConfigValue } from '/app/redux/config'
+
+import type { ChangeEvent } from 'react'
+import type { UpdateConfigValueAction } from '/app/redux/config/types'
+import type { Dispatch } from '/app/redux/types'
 
 export function setHeaterShakerAttached(
   heaterShakerAttached: boolean
@@ -28,7 +32,7 @@ export function setHeaterShakerAttached(
     heaterShakerAttached
   )
 }
-interface ConfirmAttachmentModalProps {
+export interface ConfirmAttachmentModalProps {
   onCloseClick: () => void
   isProceedToRunModal: boolean
   onConfirmClick: () => void
@@ -38,7 +42,7 @@ export const ConfirmAttachmentModal = (
 ): JSX.Element | null => {
   const { isProceedToRunModal, onCloseClick, onConfirmClick } = props
   const { t } = useTranslation(['heater_shaker', 'shared'])
-  const [isDismissed, setIsDismissed] = React.useState<boolean>(false)
+  const [isDismissed, setIsDismissed] = useState<boolean>(false)
   const dispatch = useDispatch<Dispatch>()
 
   const confirmAttached = (): void => {
@@ -50,7 +54,7 @@ export const ConfirmAttachmentModal = (
   }
 
   return (
-    <LegacyModal
+    <Modal
       title={t('confirm_heater_shaker_modal_attachment')}
       onClose={onCloseClick}
     >
@@ -61,14 +65,16 @@ export const ConfirmAttachmentModal = (
         flexDirection={DIRECTION_COLUMN}
         fontSize={TYPOGRAPHY.fontSizeP}
       >
-        <StyledText paddingBottom={SPACING.spacing4}>
+        <LegacyStyledText paddingBottom={SPACING.spacing4}>
           {t(
             isProceedToRunModal
               ? 'module_anchors_extended'
               : 'module_should_have_anchors'
           )}
-        </StyledText>
-        <StyledText>{t('thermal_adapter_attached_to_module')}</StyledText>
+        </LegacyStyledText>
+        <LegacyStyledText>
+          {t('thermal_adapter_attached_to_module')}
+        </LegacyStyledText>
       </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}
@@ -79,18 +85,18 @@ export const ConfirmAttachmentModal = (
         }`}
       >
         <CheckboxField
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          onChange={(e: ChangeEvent<HTMLInputElement>) => {
             setIsDismissed(e.currentTarget.checked)
-          }
+          }}
           value={isDismissed}
         />
-        <StyledText
+        <LegacyStyledText
           paddingTop="1px"
           paddingLeft={SPACING.spacing8}
           fontSize={TYPOGRAPHY.fontSizeP}
         >
           {t('dont_show_me_again', { ns: 'shared' })}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}
@@ -127,6 +133,6 @@ export const ConfirmAttachmentModal = (
           </PrimaryButton>
         </Flex>
       </Flex>
-    </LegacyModal>
+    </Modal>
   )
 }

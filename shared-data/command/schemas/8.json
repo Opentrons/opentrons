@@ -19,6 +19,7 @@
       "home": "#/definitions/HomeCreate",
       "retractAxis": "#/definitions/RetractAxisCreate",
       "loadLabware": "#/definitions/LoadLabwareCreate",
+      "reloadLabware": "#/definitions/ReloadLabwareCreate",
       "loadLiquid": "#/definitions/LoadLiquidCreate",
       "loadModule": "#/definitions/LoadModuleCreate",
       "loadPipette": "#/definitions/LoadPipetteCreate",
@@ -39,6 +40,8 @@
       "setStatusBar": "#/definitions/SetStatusBarCreate",
       "verifyTipPresence": "#/definitions/VerifyTipPresenceCreate",
       "getTipPresence": "#/definitions/GetTipPresenceCreate",
+      "liquidProbe": "#/definitions/LiquidProbeCreate",
+      "tryLiquidProbe": "#/definitions/TryLiquidProbeCreate",
       "heaterShaker/waitForTemperature": "#/definitions/opentrons__protocol_engine__commands__heater_shaker__wait_for_temperature__WaitForTemperatureCreate",
       "heaterShaker/setTargetTemperature": "#/definitions/opentrons__protocol_engine__commands__heater_shaker__set_target_temperature__SetTargetTemperatureCreate",
       "heaterShaker/deactivateHeater": "#/definitions/DeactivateHeaterCreate",
@@ -57,9 +60,13 @@
       "thermocycler/waitForLidTemperature": "#/definitions/WaitForLidTemperatureCreate",
       "thermocycler/deactivateBlock": "#/definitions/DeactivateBlockCreate",
       "thermocycler/deactivateLid": "#/definitions/DeactivateLidCreate",
-      "thermocycler/openLid": "#/definitions/OpenLidCreate",
-      "thermocycler/closeLid": "#/definitions/CloseLidCreate",
+      "thermocycler/openLid": "#/definitions/opentrons__protocol_engine__commands__thermocycler__open_lid__OpenLidCreate",
+      "thermocycler/closeLid": "#/definitions/opentrons__protocol_engine__commands__thermocycler__close_lid__CloseLidCreate",
       "thermocycler/runProfile": "#/definitions/RunProfileCreate",
+      "absorbanceReader/closeLid": "#/definitions/opentrons__protocol_engine__commands__absorbance_reader__close_lid__CloseLidCreate",
+      "absorbanceReader/openLid": "#/definitions/opentrons__protocol_engine__commands__absorbance_reader__open_lid__OpenLidCreate",
+      "absorbanceReader/initialize": "#/definitions/InitializeCreate",
+      "absorbanceReader/read": "#/definitions/ReadAbsorbanceCreate",
       "calibration/calibrateGripper": "#/definitions/CalibrateGripperCreate",
       "calibration/calibratePipette": "#/definitions/CalibratePipetteCreate",
       "calibration/calibrateModule": "#/definitions/CalibrateModuleCreate",
@@ -111,6 +118,9 @@
     },
     {
       "$ref": "#/definitions/LoadLabwareCreate"
+    },
+    {
+      "$ref": "#/definitions/ReloadLabwareCreate"
     },
     {
       "$ref": "#/definitions/LoadLiquidCreate"
@@ -170,6 +180,12 @@
       "$ref": "#/definitions/GetTipPresenceCreate"
     },
     {
+      "$ref": "#/definitions/LiquidProbeCreate"
+    },
+    {
+      "$ref": "#/definitions/TryLiquidProbeCreate"
+    },
+    {
       "$ref": "#/definitions/opentrons__protocol_engine__commands__heater_shaker__wait_for_temperature__WaitForTemperatureCreate"
     },
     {
@@ -224,13 +240,25 @@
       "$ref": "#/definitions/DeactivateLidCreate"
     },
     {
-      "$ref": "#/definitions/OpenLidCreate"
+      "$ref": "#/definitions/opentrons__protocol_engine__commands__thermocycler__open_lid__OpenLidCreate"
     },
     {
-      "$ref": "#/definitions/CloseLidCreate"
+      "$ref": "#/definitions/opentrons__protocol_engine__commands__thermocycler__close_lid__CloseLidCreate"
     },
     {
       "$ref": "#/definitions/RunProfileCreate"
+    },
+    {
+      "$ref": "#/definitions/opentrons__protocol_engine__commands__absorbance_reader__close_lid__CloseLidCreate"
+    },
+    {
+      "$ref": "#/definitions/opentrons__protocol_engine__commands__absorbance_reader__open_lid__OpenLidCreate"
+    },
+    {
+      "$ref": "#/definitions/InitializeCreate"
+    },
+    {
+      "$ref": "#/definitions/ReadAbsorbanceCreate"
     },
     {
       "$ref": "#/definitions/CalibrateGripperCreate"
@@ -339,7 +367,7 @@
     "CommandIntent": {
       "title": "CommandIntent",
       "description": "Run intent for a given command.\n\nProps:\n    PROTOCOL: the command is part of the protocol run itself.\n    SETUP: the command is part of the setup phase of a run.",
-      "enum": ["protocol", "setup"],
+      "enum": ["protocol", "setup", "fixit"],
       "type": "string"
     },
     "AspirateCreate": {
@@ -485,6 +513,11 @@
           "description": "Amount of liquid in uL. Must be at least 0 and no greater than a pipette-specific maximum volume.",
           "minimum": 0,
           "type": "number"
+        },
+        "tipOverlapNotAfterVersion": {
+          "title": "Tipoverlapnotafterversion",
+          "description": "A version of tip overlap data to not exceed. The highest-versioned tip overlap data that does not exceed this version will be used. Versions are expressed as vN where N is an integer, counting up from v0. If None, the current highest version will be used.",
+          "type": "string"
         }
       },
       "required": ["pipetteId", "volume"]
@@ -614,9 +647,15 @@
           "description": "The front right nozzle in your configuration.",
           "pattern": "[A-Z]\\d{1,2}",
           "type": "string"
+        },
+        "backLeftNozzle": {
+          "title": "Backleftnozzle",
+          "description": "The back left nozzle in your configuration.",
+          "pattern": "[A-Z]\\d{1,2}",
+          "type": "string"
         }
       },
-      "required": ["primaryNozzle", "frontRightNozzle"]
+      "required": ["primaryNozzle", "frontRightNozzle", "backLeftNozzle"]
     },
     "ConfigureNozzleLayoutParams": {
       "title": "ConfigureNozzleLayoutParams",
@@ -1407,6 +1446,49 @@
       },
       "required": ["params"]
     },
+    "ReloadLabwareParams": {
+      "title": "ReloadLabwareParams",
+      "description": "Payload required to load a labware into a slot.",
+      "type": "object",
+      "properties": {
+        "labwareId": {
+          "title": "Labwareid",
+          "description": "The already-loaded labware instance to update.",
+          "type": "string"
+        }
+      },
+      "required": ["labwareId"]
+    },
+    "ReloadLabwareCreate": {
+      "title": "ReloadLabwareCreate",
+      "description": "Reload labware command creation request.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "reloadLabware",
+          "enum": ["reloadLabware"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/ReloadLabwareParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
     "LoadLiquidParams": {
       "title": "LoadLiquidParams",
       "description": "Payload required to load a liquid into a well.",
@@ -1474,7 +1556,8 @@
         "thermocyclerModuleV1",
         "thermocyclerModuleV2",
         "heaterShakerModuleV1",
-        "magneticBlockV1"
+        "magneticBlockV1",
+        "absorbanceReaderV1"
       ],
       "type": "string"
     },
@@ -1587,6 +1670,16 @@
           "title": "Pipetteid",
           "description": "An optional ID to assign to this pipette. If None, an ID will be generated.",
           "type": "string"
+        },
+        "tipOverlapNotAfterVersion": {
+          "title": "Tipoverlapnotafterversion",
+          "description": "A version of tip overlap data to not exceed. The highest-versioned tip overlap data that does not exceed this version will be used. Versions are expressed as vN where N is an integer, counting up from v0. If None, the current highest version will be used.",
+          "type": "string"
+        },
+        "liquidPresenceDetection": {
+          "title": "Liquidpresencedetection",
+          "description": "Enable liquid presence detection for this pipette. Defaults to False.",
+          "type": "boolean"
         }
       },
       "required": ["pipetteName", "mount"]
@@ -2582,6 +2675,12 @@
       "enum": ["present", "absent", "unknown"],
       "type": "string"
     },
+    "InstrumentSensorId": {
+      "title": "InstrumentSensorId",
+      "description": "Primary and secondary sensor ids.",
+      "enum": ["primary", "secondary", "both"],
+      "type": "string"
+    },
     "VerifyTipPresenceParams": {
       "title": "VerifyTipPresenceParams",
       "description": "Payload required for a VerifyTipPresence command.",
@@ -2597,6 +2696,14 @@
           "allOf": [
             {
               "$ref": "#/definitions/TipPresenceStatus"
+            }
+          ]
+        },
+        "followSingularSensor": {
+          "description": "The sensor id to follow if the other can be ignored.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/InstrumentSensorId"
             }
           ]
         }
@@ -2659,6 +2766,130 @@
         },
         "params": {
           "$ref": "#/definitions/GetTipPresenceParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "LiquidProbeParams": {
+      "title": "LiquidProbeParams",
+      "description": "Parameters required for a `liquidProbe` command.",
+      "type": "object",
+      "properties": {
+        "labwareId": {
+          "title": "Labwareid",
+          "description": "Identifier of labware to use.",
+          "type": "string"
+        },
+        "wellName": {
+          "title": "Wellname",
+          "description": "Name of well to use in labware.",
+          "type": "string"
+        },
+        "wellLocation": {
+          "title": "Welllocation",
+          "description": "Relative well location at which to perform the operation",
+          "allOf": [
+            {
+              "$ref": "#/definitions/WellLocation"
+            }
+          ]
+        },
+        "pipetteId": {
+          "title": "Pipetteid",
+          "description": "Identifier of pipette to use for liquid handling.",
+          "type": "string"
+        }
+      },
+      "required": ["labwareId", "wellName", "pipetteId"]
+    },
+    "LiquidProbeCreate": {
+      "title": "LiquidProbeCreate",
+      "description": "The request model for a `liquidProbe` command.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "liquidProbe",
+          "enum": ["liquidProbe"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/LiquidProbeParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "TryLiquidProbeParams": {
+      "title": "TryLiquidProbeParams",
+      "description": "Parameters required for a `tryLiquidProbe` command.",
+      "type": "object",
+      "properties": {
+        "labwareId": {
+          "title": "Labwareid",
+          "description": "Identifier of labware to use.",
+          "type": "string"
+        },
+        "wellName": {
+          "title": "Wellname",
+          "description": "Name of well to use in labware.",
+          "type": "string"
+        },
+        "wellLocation": {
+          "title": "Welllocation",
+          "description": "Relative well location at which to perform the operation",
+          "allOf": [
+            {
+              "$ref": "#/definitions/WellLocation"
+            }
+          ]
+        },
+        "pipetteId": {
+          "title": "Pipetteid",
+          "description": "Identifier of pipette to use for liquid handling.",
+          "type": "string"
+        }
+      },
+      "required": ["labwareId", "wellName", "pipetteId"]
+    },
+    "TryLiquidProbeCreate": {
+      "title": "TryLiquidProbeCreate",
+      "description": "The request model for a `tryLiquidProbe` command.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "tryLiquidProbe",
+          "enum": ["tryLiquidProbe"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/TryLiquidProbeParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
@@ -3500,7 +3731,7 @@
       },
       "required": ["params"]
     },
-    "OpenLidParams": {
+    "opentrons__protocol_engine__commands__thermocycler__open_lid__OpenLidParams": {
       "title": "OpenLidParams",
       "description": "Input parameters to open a Thermocycler's lid.",
       "type": "object",
@@ -3513,7 +3744,7 @@
       },
       "required": ["moduleId"]
     },
-    "OpenLidCreate": {
+    "opentrons__protocol_engine__commands__thermocycler__open_lid__OpenLidCreate": {
       "title": "OpenLidCreate",
       "description": "A request to open a Thermocycler's lid.",
       "type": "object",
@@ -3525,7 +3756,7 @@
           "type": "string"
         },
         "params": {
-          "$ref": "#/definitions/OpenLidParams"
+          "$ref": "#/definitions/opentrons__protocol_engine__commands__thermocycler__open_lid__OpenLidParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
@@ -3543,7 +3774,7 @@
       },
       "required": ["params"]
     },
-    "CloseLidParams": {
+    "opentrons__protocol_engine__commands__thermocycler__close_lid__CloseLidParams": {
       "title": "CloseLidParams",
       "description": "Input parameters to close a Thermocycler's lid.",
       "type": "object",
@@ -3556,7 +3787,7 @@
       },
       "required": ["moduleId"]
     },
-    "CloseLidCreate": {
+    "opentrons__protocol_engine__commands__thermocycler__close_lid__CloseLidCreate": {
       "title": "CloseLidCreate",
       "description": "A request to close a Thermocycler's lid.",
       "type": "object",
@@ -3568,7 +3799,7 @@
           "type": "string"
         },
         "params": {
-          "$ref": "#/definitions/CloseLidParams"
+          "$ref": "#/definitions/opentrons__protocol_engine__commands__thermocycler__close_lid__CloseLidParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
@@ -3643,6 +3874,188 @@
         },
         "params": {
           "$ref": "#/definitions/RunProfileParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "opentrons__protocol_engine__commands__absorbance_reader__close_lid__CloseLidParams": {
+      "title": "CloseLidParams",
+      "description": "Input parameters to close the lid on an absorbance reading.",
+      "type": "object",
+      "properties": {
+        "moduleId": {
+          "title": "Moduleid",
+          "description": "Unique ID of the absorbance reader.",
+          "type": "string"
+        }
+      },
+      "required": ["moduleId"]
+    },
+    "opentrons__protocol_engine__commands__absorbance_reader__close_lid__CloseLidCreate": {
+      "title": "CloseLidCreate",
+      "description": "A request to execute an Absorbance Reader close lid command.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "absorbanceReader/closeLid",
+          "enum": ["absorbanceReader/closeLid"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/opentrons__protocol_engine__commands__absorbance_reader__close_lid__CloseLidParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "opentrons__protocol_engine__commands__absorbance_reader__open_lid__OpenLidParams": {
+      "title": "OpenLidParams",
+      "description": "Input parameters to open the lid on an absorbance reading.",
+      "type": "object",
+      "properties": {
+        "moduleId": {
+          "title": "Moduleid",
+          "description": "Unique ID of the absorbance reader.",
+          "type": "string"
+        }
+      },
+      "required": ["moduleId"]
+    },
+    "opentrons__protocol_engine__commands__absorbance_reader__open_lid__OpenLidCreate": {
+      "title": "OpenLidCreate",
+      "description": "A request to execute an Absorbance Reader open lid command.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "absorbanceReader/openLid",
+          "enum": ["absorbanceReader/openLid"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/opentrons__protocol_engine__commands__absorbance_reader__open_lid__OpenLidParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "InitializeParams": {
+      "title": "InitializeParams",
+      "description": "Input parameters to initialize an absorbance reading.",
+      "type": "object",
+      "properties": {
+        "moduleId": {
+          "title": "Moduleid",
+          "description": "Unique ID of the absorbance reader.",
+          "type": "string"
+        },
+        "sampleWavelength": {
+          "title": "Samplewavelength",
+          "description": "Sample wavelength in nm.",
+          "type": "integer"
+        }
+      },
+      "required": ["moduleId", "sampleWavelength"]
+    },
+    "InitializeCreate": {
+      "title": "InitializeCreate",
+      "description": "A request to execute an Absorbance Reader measurement.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "absorbanceReader/initialize",
+          "enum": ["absorbanceReader/initialize"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/InitializeParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "ReadAbsorbanceParams": {
+      "title": "ReadAbsorbanceParams",
+      "description": "Input parameters for a single absorbance reading.",
+      "type": "object",
+      "properties": {
+        "moduleId": {
+          "title": "Moduleid",
+          "description": "Unique ID of the Absorbance Reader.",
+          "type": "string"
+        },
+        "sampleWavelength": {
+          "title": "Samplewavelength",
+          "description": "Sample wavelength in nm.",
+          "type": "integer"
+        }
+      },
+      "required": ["moduleId", "sampleWavelength"]
+    },
+    "ReadAbsorbanceCreate": {
+      "title": "ReadAbsorbanceCreate",
+      "description": "A request to execute an Absorbance Reader measurement.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "absorbanceReader/read",
+          "enum": ["absorbanceReader/read"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/ReadAbsorbanceParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",

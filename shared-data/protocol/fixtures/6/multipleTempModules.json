@@ -4561,7 +4561,7 @@
   },
   "commands": [
     {
-      "id": "0",
+      "key": "0",
       "commandType": "loadPipette",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -4569,7 +4569,7 @@
       }
     },
     {
-      "id": "1",
+      "key": "1",
       "commandType": "loadPipette",
       "params": {
         "pipetteId": "4da579b0-a9bf-11eb-bce6-9f1d5b9c1a1b",
@@ -4577,7 +4577,7 @@
       }
     },
     {
-      "id": "2",
+      "key": "2",
       "commandType": "loadModule",
       "params": {
         "moduleId": "3e012450-3412-11eb-ad93-ed232a2337cf:magneticModuleType",
@@ -4590,7 +4590,7 @@
       }
     },
     {
-      "id": "3",
+      "key": "3",
       "commandType": "loadModule",
       "params": {
         "moduleId": "3e0283e0-3412-11eb-ad93-ed232a2337cf:temperatureModuleType1",
@@ -4603,7 +4603,7 @@
       }
     },
     {
-      "id": "4",
+      "key": "4",
       "commandType": "loadModule",
       "params": {
         "moduleId": "3e039550-3412-11eb-ad93-ed232a2337cf:temperatureModuleType2",
@@ -4616,7 +4616,7 @@
       }
     },
     {
-      "id": "5",
+      "key": "5",
       "commandType": "loadLabware",
       "params": {
         "labwareId": "fixedTrash",
@@ -4683,7 +4683,7 @@
       }
     },
     {
-      "id": "6",
+      "key": "6",
       "commandType": "loadLabware",
       "params": {
         "labwareId": "3e047fb0-3412-11eb-ad93-ed232a2337cf:opentrons/opentrons_96_tiprack_1000ul/1",
@@ -5715,7 +5715,7 @@
       }
     },
     {
-      "id": "7",
+      "key": "7",
       "commandType": "loadLabware",
       "params": {
         "labwareId": "5ae317e0-3412-11eb-ad93-ed232a2337cf:opentrons/nest_1_reservoir_195ml/1",
@@ -5784,7 +5784,7 @@
       }
     },
     {
-      "id": "8",
+      "key": "8",
       "commandType": "loadLabware",
       "params": {
         "labwareId": "aac5d680-3412-11eb-ad93-ed232a2337cf:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",
@@ -6815,7 +6815,7 @@
       }
     },
     {
-      "id": "9",
+      "key": "9",
       "commandType": "loadLabware",
       "params": {
         "labwareId": "60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1",
@@ -7121,7 +7121,7 @@
       }
     },
     {
-      "id": "10",
+      "key": "10",
       "commandType": "loadLabware",
       "params": {
         "labwareId": "ada13110-3412-11eb-ad93-ed232a2337cf:opentrons/opentrons_96_aluminumblock_generic_pcr_strip_200ul/1",
@@ -8160,7 +8160,7 @@
       }
     },
     {
-      "id": "11",
+      "key": "11",
       "commandType": "loadLabware",
       "params": {
         "labwareId": "b0103540-3412-11eb-ad93-ed232a2337cf:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",
@@ -9191,7 +9191,7 @@
       }
     },
     {
-      "id": "12",
+      "key": "12",
       "commandType": "loadLabware",
       "params": {
         "labwareId": "faa13a50-a9bf-11eb-bce6-9f1d5b9c1a1b:opentrons/opentrons_96_tiprack_20ul/1",
@@ -10223,7 +10223,7 @@
       }
     },
     {
-      "id": "13",
+      "key": "13",
       "commandType": "loadLabware",
       "params": {
         "labwareId": "53d3b350-a9c0-11eb-bce6-9f1d5b9c1a1b",
@@ -10529,7 +10529,7 @@
       }
     },
     {
-      "id": "14",
+      "key": "14",
       "commandType": "pickUpTip",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10538,7 +10538,7 @@
       }
     },
     {
-      "id": "15",
+      "key": "15",
       "commandType": "aspirate",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10553,7 +10553,7 @@
       }
     },
     {
-      "id": "16",
+      "key": "16",
       "commandType": "dispense",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10568,7 +10568,7 @@
       }
     },
     {
-      "id": "17",
+      "key": "17",
       "commandType": "dropTip",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10577,7 +10577,7 @@
       }
     },
     {
-      "id": "18",
+      "key": "18",
       "commandType": "pickUpTip",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10586,7 +10586,7 @@
       }
     },
     {
-      "id": "19",
+      "key": "19",
       "commandType": "aspirate",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10601,7 +10601,7 @@
       }
     },
     {
-      "id": "20",
+      "key": "20",
       "commandType": "dispense",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10616,7 +10616,7 @@
       }
     },
     {
-      "id": "21",
+      "key": "21",
       "commandType": "dropTip",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10625,7 +10625,7 @@
       }
     },
     {
-      "id": "22",
+      "key": "22",
       "commandType": "pickUpTip",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10634,7 +10634,7 @@
       }
     },
     {
-      "id": "23",
+      "key": "23",
       "commandType": "aspirate",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10649,7 +10649,7 @@
       }
     },
     {
-      "id": "24",
+      "key": "24",
       "commandType": "dispense",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10664,7 +10664,7 @@
       }
     },
     {
-      "id": "25",
+      "key": "25",
       "commandType": "dropTip",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10673,7 +10673,7 @@
       }
     },
     {
-      "id": "26",
+      "key": "26",
       "commandType": "pickUpTip",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10682,7 +10682,7 @@
       }
     },
     {
-      "id": "27",
+      "key": "27",
       "commandType": "aspirate",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10697,7 +10697,7 @@
       }
     },
     {
-      "id": "28",
+      "key": "28",
       "commandType": "dispense",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10712,7 +10712,7 @@
       }
     },
     {
-      "id": "29",
+      "key": "29",
       "commandType": "dropTip",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10721,7 +10721,7 @@
       }
     },
     {
-      "id": "30",
+      "key": "30",
       "commandType": "pickUpTip",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10730,7 +10730,7 @@
       }
     },
     {
-      "id": "31",
+      "key": "31",
       "commandType": "aspirate",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10745,7 +10745,7 @@
       }
     },
     {
-      "id": "32",
+      "key": "32",
       "commandType": "dispense",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10760,7 +10760,7 @@
       }
     },
     {
-      "id": "33",
+      "key": "33",
       "commandType": "dropTip",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10769,7 +10769,7 @@
       }
     },
     {
-      "id": "34",
+      "key": "34",
       "commandType": "pickUpTip",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10778,7 +10778,7 @@
       }
     },
     {
-      "id": "35",
+      "key": "35",
       "commandType": "aspirate",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10793,7 +10793,7 @@
       }
     },
     {
-      "id": "36",
+      "key": "36",
       "commandType": "dispense",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10808,7 +10808,7 @@
       }
     },
     {
-      "id": "37",
+      "key": "37",
       "commandType": "dropTip",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10817,7 +10817,7 @@
       }
     },
     {
-      "id": "38",
+      "key": "38",
       "commandType": "pickUpTip",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10826,7 +10826,7 @@
       }
     },
     {
-      "id": "39",
+      "key": "39",
       "commandType": "aspirate",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10841,7 +10841,7 @@
       }
     },
     {
-      "id": "40",
+      "key": "40",
       "commandType": "dispense",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10856,7 +10856,7 @@
       }
     },
     {
-      "id": "41",
+      "key": "41",
       "commandType": "dropTip",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10865,7 +10865,7 @@
       }
     },
     {
-      "id": "42",
+      "key": "42",
       "commandType": "pickUpTip",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10874,7 +10874,7 @@
       }
     },
     {
-      "id": "43",
+      "key": "43",
       "commandType": "aspirate",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10889,7 +10889,7 @@
       }
     },
     {
-      "id": "44",
+      "key": "44",
       "commandType": "dispense",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10904,7 +10904,7 @@
       }
     },
     {
-      "id": "45",
+      "key": "45",
       "commandType": "dropTip",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10913,7 +10913,7 @@
       }
     },
     {
-      "id": "46",
+      "key": "46",
       "commandType": "pickUpTip",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10922,7 +10922,7 @@
       }
     },
     {
-      "id": "47",
+      "key": "47",
       "commandType": "aspirate",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10937,7 +10937,7 @@
       }
     },
     {
-      "id": "48",
+      "key": "48",
       "commandType": "dispense",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10952,7 +10952,7 @@
       }
     },
     {
-      "id": "49",
+      "key": "49",
       "commandType": "dropTip",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10961,7 +10961,7 @@
       }
     },
     {
-      "id": "50",
+      "key": "50",
       "commandType": "pickUpTip",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10970,7 +10970,7 @@
       }
     },
     {
-      "id": "51",
+      "key": "51",
       "commandType": "aspirate",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -10985,7 +10985,7 @@
       }
     },
     {
-      "id": "52",
+      "key": "52",
       "commandType": "dispense",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -11000,7 +11000,7 @@
       }
     },
     {
-      "id": "53",
+      "key": "53",
       "commandType": "dropTip",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -11009,7 +11009,7 @@
       }
     },
     {
-      "id": "54",
+      "key": "54",
       "commandType": "pickUpTip",
       "params": {
         "pipetteId": "4da579b0-a9bf-11eb-bce6-9f1d5b9c1a1b",
@@ -11018,7 +11018,7 @@
       }
     },
     {
-      "id": "55",
+      "key": "55",
       "commandType": "aspirate",
       "params": {
         "pipetteId": "4da579b0-a9bf-11eb-bce6-9f1d5b9c1a1b",
@@ -11033,7 +11033,7 @@
       }
     },
     {
-      "id": "56",
+      "key": "56",
       "commandType": "dispense",
       "params": {
         "pipetteId": "4da579b0-a9bf-11eb-bce6-9f1d5b9c1a1b",
@@ -11048,7 +11048,7 @@
       }
     },
     {
-      "id": "57",
+      "key": "57",
       "commandType": "dropTip",
       "params": {
         "pipetteId": "4da579b0-a9bf-11eb-bce6-9f1d5b9c1a1b",

@@ -4,10 +4,11 @@ import logging
 from functools import lru_cache
 from pathlib import Path
 
-from pydantic import BaseSettings, Field
+from pydantic import Field
 from dotenv import load_dotenv
 
 from opentrons.config import infer_config_base_dir
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 log = logging.getLogger(__name__)
 
@@ -28,9 +29,7 @@ class Environment(BaseSettings):
     """Environment related settings"""
 
     dot_env_path: Path = infer_config_base_dir() / "robot.env"
-
-    class Config:
-        env_prefix = "OT_ROBOT_SERVER_"
+    model_config = SettingsConfigDict(env_prefix="OT_ROBOT_SERVER_")
 
 
 # If you update this, also update the generated settings_schema.json.
@@ -94,5 +93,21 @@ class RobotServerSettings(BaseSettings):
         ),
     )
 
-    class Config:
-        env_prefix = "OT_ROBOT_SERVER_"
+    model_config = SettingsConfigDict(env_prefix="OT_ROBOT_SERVER_")
+
+    maximum_quick_transfer_protocols: int = Field(
+        default=20,
+        gt=0,
+        description=(
+            'The maximum number of "quick transfer protocols" to allow before auto-deleting'
+            " old ones."
+        ),
+    )
+
+    maximum_data_files: int = Field(
+        default=50,
+        gt=0,
+        description=(
+            "The maximum number of uploaded data files to allow before auto-deleting old ones."
+        ),
+    )

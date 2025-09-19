@@ -6,8 +6,10 @@ class LogIdentifier(str, Enum):
 
     api = "api.log"
     serial = "serial.log"
+    can = "can_bus.log"
     server = "server.log"
     api_server = "combined_api_server.log"
+    update_server = "update_server.log"
     touchscreen = "touchscreen.log"
 
 

@@ -1,23 +1,20 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import { getLabwareSlot } from '../utils'
 
 describe('getLabwareSlot', () => {
   it('should return the slot the labware is in when it is NOT on top of a module', () => {
     const labware = {
-      someLabwareId: { slot: '1' },
+      someLabwareId: { stack: ['someLabwareId', '1'] },
     }
-    const modules = {}
 
-    expect(getLabwareSlot('someLabwareId', labware, modules)).toBe('1')
+    expect(getLabwareSlot('someLabwareId', labware)).toBe('1')
   })
   it('should return the slot the labware is in when it is on top of a module', () => {
     const labware = {
-      someLabwareId: { slot: 'someModuleId' },
-    }
-    const modules = {
-      someModuleId: { slot: '2', moduleState: {} as any },
+      someLabwareId: { stack: ['someLabwareId', 'someModuleId', '2'] },
     }
 
-    expect(getLabwareSlot('someLabwareId', labware, modules)).toBe('2')
+    expect(getLabwareSlot('someLabwareId', labware)).toBe('2')
   })
 })

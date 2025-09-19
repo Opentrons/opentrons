@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 from typing import Callable
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
+from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
 from opentrons.util.entrypoint_util import (
     FoundLabware,
     labware_from_paths,
@@ -34,6 +34,8 @@ def test_labware_from_paths(
         lwtemp.write("asdjkashdkajvka")
     with open(path_2 / "notevenjson", "w") as lwtemp:
         lwtemp.write("bgbbabcba")
+    with open(path_2 / "not_an_object.json", "w") as lwtemp:
+        lwtemp.write('["hello", "world"]')
 
     res = labware_from_paths(
         [

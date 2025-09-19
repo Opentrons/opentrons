@@ -1,35 +1,30 @@
-import { Reducer, combineReducers } from 'redux'
-
-import { handleActions } from 'redux-actions'
 import omit from 'lodash/omit'
-import { getPDMetadata } from '../../file-types'
-import {
-  SubstepIdentifier,
-  TerminalItemId,
-  START_TERMINAL_ITEM_ID,
-  PRESAVED_STEP_ID,
-} from '../../steplist/types'
+import { combineReducers } from 'redux'
+import { handleActions } from 'redux-actions'
 
-import { Action } from '../../types'
-import { LoadFileAction } from '../../load-file'
-import { StepIdType } from '../../form-types'
-import { SaveStepFormAction } from '../steps/actions/thunks'
-import {
-  DeleteStepAction,
+import { getPDMetadata } from '../../file-types'
+import { PRESAVED_STEP_ID, START_TERMINAL_ITEM_ID } from '../../steplist/types'
+
+import type { Reducer } from 'redux'
+import type { StepIdType } from '../../form-types'
+import type { LoadFileAction } from '../../load-file'
+import type {
   DeleteMultipleStepsAction,
+  DeleteStepAction,
 } from '../../steplist/actions'
-import {
+import type { SubstepIdentifier, TerminalItemId } from '../../steplist/types'
+import type { SaveStepFormAction } from '../steps/actions/thunks'
+import type {
   AddStepAction,
   HoverOnStepAction,
   HoverOnSubstepAction,
   HoverOnTerminalItemAction,
-  SelectStepAction,
+  Selection,
   SelectMultipleStepsAction,
+  SelectStepAction,
   SelectTerminalItemAction,
-  ToggleStepCollapsedAction,
-  ExpandMultipleStepsAction,
-  CollapseMultipleStepsAction,
 } from './actions/types'
+
 export type CollapsedStepsState = Record<StepIdType, boolean>
 // @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
 // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
@@ -54,18 +49,6 @@ const collapsedSteps: Reducer<CollapsedStepsState, any> = handleActions(
       state: CollapsedStepsState,
       action: DeleteMultipleStepsAction
     ) => omit(state, action.payload),
-    TOGGLE_STEP_COLLAPSED: (
-      state: CollapsedStepsState,
-      { payload }: ToggleStepCollapsedAction
-    ) => ({ ...state, [payload]: !state[payload] }),
-    EXPAND_MULTIPLE_STEPS: (
-      state: CollapsedStepsState,
-      { payload }: ExpandMultipleStepsAction
-    ) => payload.reduce((acc, stepId) => ({ ...acc, [stepId]: false }), state),
-    COLLAPSE_MULTIPLE_STEPS: (
-      state: CollapsedStepsState,
-      { payload }: CollapseMultipleStepsAction
-    ) => payload.reduce((acc, stepId) => ({ ...acc, [stepId]: true }), state),
     LOAD_FILE: (
       state: CollapsedStepsState,
       action: LoadFileAction // default all steps to collapsed
@@ -195,12 +178,71 @@ const wellSelectionLabwareKey: Reducer<string | null, any> = handleActions(
   },
   null
 )
+
+const selectedSubstep: Reducer<StepIdType | null, any> = handleActions(
+  {
+    TOGGLE_VIEW_SUBSTEP: (
+      state,
+      action: {
+        payload: StepIdType
+      }
+    ) => action.payload,
+  },
+  null
+)
+const hoveredDropdownItem: Reducer<Selection, any> = handleActions(
+  {
+    HOVER_DROPDOWN_ITEM: (
+      state,
+      action: {
+        payload: Selection
+      }
+    ) => action.payload,
+  },
+  { id: null, text: null }
+)
+const selectedDropdownItem: Reducer<Selection[], any> = handleActions(
+  {
+    SELECT_DROPDOWN_ITEM: (
+      state: Selection[],
+      action: {
+        payload: {
+          selection: Selection | null
+          mode: 'add' | 'clear'
+        }
+      }
+    ) => {
+      const { selection, mode } = action.payload
+
+      switch (mode) {
+        case 'clear':
+          return []
+        case 'add': {
+          if (!selection) {
+            return state
+          }
+          const updatedState = state.filter(
+            sel => sel.field !== selection.field
+          )
+
+          return [...updatedState, selection]
+        }
+        default:
+          return state
+      }
+    },
+  },
+  []
+)
 export interface StepsState {
   collapsedSteps: CollapsedStepsState
   selectedItem: SelectedItemState
   hoveredItem: HoveredItemState
   hoveredSubstep: SubstepIdentifier
   wellSelectionLabwareKey: string | null
+  selectedSubstep: StepIdType | null
+  hoveredDropdownItem: Selection
+  selectedDropdownItem: Selection[]
 }
 export const _allReducers = {
   collapsedSteps,
@@ -208,7 +250,8 @@ export const _allReducers = {
   hoveredItem,
   hoveredSubstep,
   wellSelectionLabwareKey,
+  selectedSubstep,
+  hoveredDropdownItem,
+  selectedDropdownItem,
 }
-export const rootReducer: Reducer<StepsState, Action> = combineReducers(
-  _allReducers
-)
+export const rootReducer = combineReducers(_allReducers)

@@ -1,79 +1,71 @@
-import { it, describe, expect } from 'vitest'
-import { getMoveLiquidDelayData, getMixDelayData } from '../getDelayData'
+import { describe, expect, it } from 'vitest'
+
+import { getMixDelayData, getMoveLiquidDelayData } from '../getDelayData'
 
 describe('getMoveLiquidDelayData', () => {
   it('should return null if checkbox field is false', () => {
     const fields: any = {
       aspirate_delay_checkbox: false,
       aspirate_delay_seconds: 3,
-      aspirate_delay_mmFromBottom: 2,
     }
     expect(
-      getMoveLiquidDelayData(
-        fields,
-        'aspirate_delay_checkbox',
-        'aspirate_delay_seconds',
-        'aspirate_delay_mmFromBottom'
-      )
+      getMoveLiquidDelayData({
+        hydratedFormData: fields,
+        secondsField: 'aspirate_delay_seconds',
+        checkboxField: 'aspirate_delay_checkbox',
+      })
     ).toBe(null)
   })
 
-  it('should return null if either seconds field is <= 0 or null, or if offset field is negative', () => {
-    const cases = [
-      [0, 5],
-      [null, 5],
-      [-1, 2],
-      [2, -1],
-    ]
+  it('should return null if either seconds field is <= 0 or null', () => {
+    const cases = [[0], [null], [-1]]
 
     cases.forEach(testCase => {
-      const [secondsValue, offsetValue] = testCase
+      const [secondsValue] = testCase
       const fields: any = {
         aspirate_delay_checkbox: true,
         aspirate_delay_seconds: secondsValue,
-        aspirate_delay_mmFromBottom: offsetValue,
       }
       expect(
-        getMoveLiquidDelayData(
-          fields,
-          'aspirate_delay_checkbox',
-          'aspirate_delay_seconds',
-          'aspirate_delay_mmFromBottom'
-        )
+        getMoveLiquidDelayData({
+          hydratedFormData: fields,
+          secondsField: 'aspirate_delay_seconds',
+          checkboxField: 'aspirate_delay_checkbox',
+        })
       ).toBe(null)
     })
   })
 
-  it('should return seconds & mmFromBottom if checkbox is checked', () => {
+  it('should return seconds if checkbox is checked', () => {
     const fields: any = {
       aspirate_delay_checkbox: true,
       aspirate_delay_seconds: 30,
-      aspirate_delay_mmFromBottom: 2,
+      aspirate_x_position: 10,
+      aspirate_y_position: 10,
     }
     expect(
-      getMoveLiquidDelayData(
-        fields,
-        'aspirate_delay_checkbox',
-        'aspirate_delay_seconds',
-        'aspirate_delay_mmFromBottom'
-      )
-    ).toEqual({ seconds: 30, mmFromBottom: 2 })
+      getMoveLiquidDelayData({
+        hydratedFormData: fields,
+        secondsField: 'aspirate_delay_seconds',
+        checkboxField: 'aspirate_delay_checkbox',
+      })
+    ).toEqual({ seconds: 30 })
   })
 
   it('should allow mmFromBottom to be zero', () => {
     const fields: any = {
       aspirate_delay_checkbox: true,
       aspirate_delay_seconds: 30,
-      aspirate_delay_mmFromBottom: 0,
+      aspirate_x_position: 10,
+      aspirate_y_position: 10,
     }
     expect(
-      getMoveLiquidDelayData(
-        fields,
-        'aspirate_delay_checkbox',
-        'aspirate_delay_seconds',
-        'aspirate_delay_mmFromBottom'
-      )
-    ).toEqual({ seconds: 30, mmFromBottom: 0 })
+      getMoveLiquidDelayData({
+        hydratedFormData: fields,
+        secondsField: 'aspirate_delay_seconds',
+        checkboxField: 'aspirate_delay_checkbox',
+      })
+    ).toEqual({ seconds: 30 })
   })
 })
 

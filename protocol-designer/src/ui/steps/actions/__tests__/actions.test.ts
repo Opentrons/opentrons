@@ -1,37 +1,40 @@
 import last from 'lodash/last'
-import configureMockStore from 'redux-mock-store'
-import thunk from 'redux-thunk'
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
+import { legacy_configureStore } from 'redux-mock-store'
+import { thunk } from 'redux-thunk'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
-import * as utils from '../../../../utils'
-import * as stepFormSelectors from '../../../../step-forms/selectors'
-import { getRobotStateTimeline } from '../../../../file-data/selectors'
+
+import { getRobotStateTimeline } from '/protocol-designer/file-data/selectors'
+import * as stepFormSelectors from '/protocol-designer/step-forms/selectors'
+import * as utils from '/protocol-designer/utils'
+
 import { getMultiSelectLastSelected } from '../../selectors'
-import { selectStep, selectAllSteps, deselectAllSteps } from '../actions'
+import { deselectAllSteps, selectAllSteps } from '../actions'
 import {
-  duplicateStep,
   duplicateMultipleSteps,
+  duplicateStep,
   saveHeaterShakerFormWithAddedPauseUntilTemp,
   saveSetTempFormWithAddedPauseUntilTemp,
 } from '../thunks'
-import type { Timeline, RobotState } from '@opentrons/step-generation/src/types'
 
-vi.mock('../../../../step-forms/selectors')
+import type { RobotState, Timeline } from '@opentrons/step-generation/src/types'
+
+vi.mock('/protocol-designer/step-forms/selectors')
 vi.mock('../../selectors')
-vi.mock('../../../../file-data/selectors')
+vi.mock('/protocol-designer/file-data/selectors')
 
-const mockStore = configureMockStore([thunk])
+const mockStore = legacy_configureStore([thunk] as any)
 
 const initialRobotState: RobotState = {
   labware: {
     fixedTrash: {
-      slot: '12',
+      stack: ['fixedTrash', '12'],
     },
     tiprackId: {
-      slot: '1',
+      stack: ['tiprackId', '1'],
     },
     plateId: {
-      slot: '7',
+      stack: ['plateId', '7'],
     },
   },
   modules: {},
@@ -43,7 +46,8 @@ const initialRobotState: RobotState = {
   liquidState: {
     pipettes: {},
     labware: {},
-    additionalEquipment: {},
+    trashBins: {},
+    wasteChute: {},
   },
   tipState: {
     pipettes: {},
@@ -52,38 +56,6 @@ const initialRobotState: RobotState = {
 }
 
 describe('steps actions', () => {
-  describe('selectStep', () => {
-    const stepId = 'stepId'
-    beforeEach(() => {
-      when(vi.mocked(stepFormSelectors.getSavedStepForms))
-        .calledWith(expect.anything())
-        .thenReturn({
-          stepId: {
-            foo: 'getSavedStepFormsResult',
-          } as any,
-        })
-    })
-    afterEach(() => {
-      vi.resetAllMocks()
-    })
-    // TODO(IL, 2020-04-17): also test scroll to top behavior
-    it('should select the step and populate the form', () => {
-      const store: any = mockStore()
-      store.dispatch(selectStep(stepId))
-      expect(store.getActions()).toEqual([
-        {
-          type: 'SELECT_STEP',
-          payload: stepId,
-        },
-        {
-          type: 'POPULATE_FORM',
-          payload: {
-            foo: 'getSavedStepFormsResult',
-          },
-        },
-      ])
-    })
-  })
   describe('selectAllSteps', () => {
     let ids: string[]
     beforeEach(() => {
@@ -350,20 +322,21 @@ describe('steps actions', () => {
                   ],
                   robotState: {
                     labware: {
-                      plateId: {
-                        slot: '7',
+                      fixedTrash: {
+                        stack: ['fixedTrash', '12'],
                       },
                       tiprackId: {
-                        slot: '1',
+                        stack: ['tiprackId', '1'],
                       },
-                      fixedTrash: {
-                        slot: '12',
+                      plateId: {
+                        stack: ['plateId', '7'],
                       },
                     },
                     liquidState: {
                       labware: {},
                       pipettes: {},
-                      additionalEquipment: {},
+                      trashBins: {},
+                      wasteChute: {},
                     },
                     modules: {},
                     pipettes: {
@@ -497,19 +470,21 @@ describe('steps actions', () => {
                   robotState: {
                     labware: {
                       plateId: {
-                        slot: '7',
+                        stack: ['plateId', '7'],
                       },
                       tiprackId: {
-                        slot: '1',
+                        stack: ['tiprackId', '1'],
                       },
+
                       fixedTrash: {
-                        slot: '12',
+                        stack: ['fixedTrash', '12'],
                       },
                     },
                     liquidState: {
                       labware: {},
                       pipettes: {},
-                      additionalEquipment: {},
+                      trashBins: {},
+                      wasteChute: {},
                     },
                     modules: {},
                     pipettes: {

@@ -21,6 +21,11 @@ import type {
   ConfigV19,
   ConfigV20,
   ConfigV21,
+  ConfigV22,
+  ConfigV23,
+  ConfigV24,
+  ConfigV25,
+  ConfigV26,
 } from '@opentrons/app/src/redux/config/types'
 
 export const MOCK_CONFIG_V0: ConfigV0 = {
@@ -267,4 +272,49 @@ export const MOCK_CONFIG_V20: ConfigV20 = {
 export const MOCK_CONFIG_V21: ConfigV21 = {
   ...MOCK_CONFIG_V20,
   version: 21,
+}
+
+export const MOCK_CONFIG_V22: ConfigV22 = {
+  ...MOCK_CONFIG_V21,
+  version: 22,
+  analytics: {
+    appId: MOCK_CONFIG_V21.analytics.appId,
+    optedIn: true,
+  },
+}
+
+export const MOCK_CONFIG_V23: ConfigV23 = {
+  ...MOCK_CONFIG_V22,
+  version: 23,
+  protocols: {
+    ...MOCK_CONFIG_V22.protocols,
+    pinnedQuickTransferIds: [],
+    quickTransfersOnDeviceSortKey: null,
+    hasDismissedQuickTransferIntro: false,
+  },
+}
+
+export const MOCK_CONFIG_V24: ConfigV24 = {
+  ...(() => {
+    const { support, ...rest } = MOCK_CONFIG_V23
+    return rest
+  })(),
+  version: 24,
+  userInfo: {
+    userId: 'MOCK_UUIDv4',
+  },
+}
+
+export const MOCK_CONFIG_V25: ConfigV25 = {
+  ...MOCK_CONFIG_V24,
+  version: 25,
+  language: {
+    appLanguage: null,
+    systemLanguage: null,
+  },
+}
+
+export const MOCK_CONFIG_V26: ConfigV26 = {
+  ...MOCK_CONFIG_V25,
+  version: 26,
 }

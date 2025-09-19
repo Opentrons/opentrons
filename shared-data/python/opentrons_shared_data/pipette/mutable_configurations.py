@@ -31,7 +31,7 @@ from .file_operation_helpers import (
     MutableConfigurationEncoder,
     MutableConfigurationDecoder,
 )
-from .dev_types import PipetteModel, PipetteName
+from .types import PipetteModel, PipetteName
 
 
 log = logging.getLogger(__name__)
@@ -41,7 +41,7 @@ SERIAL_STUB_REGEX = re.compile(r"P[0-9]{1,3}[KSMHV]{1,2}V[0-9]{2}")
 LIQUID_CLASS = LiquidClasses.default
 
 
-def _edit_non_quirk(
+def _edit_non_quirk(  # noqa: C901
     mutable_config_key: str, new_mutable_value: MutableConfig, base_dict: Dict[str, Any]
 ) -> None:
     def _do_edit_non_quirk(
@@ -52,18 +52,20 @@ def _edit_non_quirk(
             thiskey = LiquidClasses[thiskey]
         if len(keypath) > 1:
             restkeys = keypath[1:]
-            if thiskey == "##EACHTIP##":
+            if thiskey == "##EACHNOZZLEMAP##":
+                for key in existing.keys():
+                    _do_edit_non_quirk(new_value, existing[key], restkeys)
+            elif thiskey == "##EACHTIPTYPE##":
+                for key in existing.keys():
+                    _do_edit_non_quirk(new_value, existing[key], restkeys)
+            elif thiskey == "##EACHTIP##":
                 for key in existing.keys():
                     _do_edit_non_quirk(new_value, existing[key], restkeys)
             else:
                 _do_edit_non_quirk(new_value, existing[thiskey], restkeys)
         else:
             # This was the last key
-            if thiskey == "##EACHTIP##":
-                for key in existing.keys():
-                    existing[key] = new_value.value
-            else:
-                existing[thiskey] = new_value.value
+            existing[thiskey] = new_value.value
 
     new_names = _MAP_KEY_TO_V2[mutable_config_key]
     _do_edit_non_quirk(new_mutable_value, base_dict, new_names)
@@ -78,7 +80,7 @@ def _migrate_to_v2_configurations(
     Given an input of v1 mutable configs, look up the equivalent keyed
     value of that configuration."""
     quirks_list = []
-    dict_of_base_model = base_configurations.dict(by_alias=True)
+    dict_of_base_model = base_configurations.model_dump(by_alias=True)
     for c, v in v1_mutable_configs.items():
         if isinstance(v, str):
             # ignore the saved model
@@ -110,7 +112,7 @@ def _migrate_to_v2_configurations(
         k.name: v
         for k, v in dict_of_base_model["plungerPositionsConfigurations"].items()
     }
-    return PipetteConfigurations.parse_obj(dict_of_base_model)
+    return PipetteConfigurations.model_validate(dict_of_base_model)
 
 
 def _load_available_overrides(
@@ -155,10 +157,12 @@ def _list_all_mutable_configs(
     return default_configurations
 
 
-def _get_default_value_for(config: Dict[str, Any], keypath: List[str]) -> Any:
+def _get_default_value_for(  # noqa: C901
+    config: Dict[str, Any], keypath: List[str]
+) -> Any:
     def _do_get_default_value_for(
-        remaining_config: Dict[Any, Any], keypath: List[str]
-    ) -> Any:
+        remaining_config: Dict[Any, Any], keypath: List[Any]
+    ) -> None:
         first: Any = keypath[0]
         if first in [lc.name for lc in LiquidClasses]:
             first = LiquidClasses[first]
@@ -168,6 +172,13 @@ def _get_default_value_for(config: Dict[str, Any], keypath: List[str]) -> Any:
                 tip_list = list(remaining_config.keys())
                 tip_list.sort(key=lambda o: o.value if isinstance(o, Enum) else o)
                 return _do_get_default_value_for(remaining_config[tip_list[-1]], rest)
+            elif first == "##EACHNOZZLEMAP##":
+                map_list = list(remaining_config.keys())
+                return _do_get_default_value_for(remaining_config[map_list[-1]], rest)
+            elif first == "##EACHTIPTYPE##":
+                for key in remaining_config.keys():
+                    if key == "default":
+                        return _do_get_default_value_for(remaining_config[key], rest)
             else:
                 return _do_get_default_value_for(remaining_config[first], rest)
         else:
@@ -175,12 +186,7 @@ def _get_default_value_for(config: Dict[str, Any], keypath: List[str]) -> Any:
                 tip_list = list(remaining_config.keys())
                 tip_list.sort(key=lambda o: o.value if isinstance(o, Enum) else o)
                 return remaining_config[tip_list[-1]]
-            elif first == "currentByTipCount":
-                # return the value for the most tips at a time
-                cbt = remaining_config[first]
-                return cbt[next(reversed(sorted(cbt.keys())))]
-            else:
-                return remaining_config[first]
+            return remaining_config[first]
 
     return _do_get_default_value_for(config, keypath)
 
@@ -232,8 +238,9 @@ def _load_full_mutable_configs(
         pipette_model.pipette_type,
         pipette_model.pipette_channels,
         pipette_model.pipette_version,
+        pipette_model.oem_type,
     )
-    base_configs_dict = base_configs.dict(by_alias=True)
+    base_configs_dict = base_configs.model_dump(by_alias=True)
     full_mutable_configs = _list_all_mutable_configs(overrides, base_configs_dict)
 
     if not full_mutable_configs.get("name"):
@@ -328,6 +335,7 @@ def load_with_mutable_configurations(
         pipette_model.pipette_type,
         pipette_model.pipette_channels,
         pipette_model.pipette_version,
+        pipette_model.oem_type,
     )
     # Load overrides if we have a pipette id
     if pipette_serial_number:
@@ -425,8 +433,9 @@ def save_overrides(
         pipette_model.pipette_type,
         pipette_model.pipette_channels,
         pipette_model.pipette_version,
+        pipette_model.oem_type,
     )
-    base_configs_dict = base_configs.dict(by_alias=True)
+    base_configs_dict = base_configs.model_dump(by_alias=True)
     try:
         existing_overrides = _load_available_overrides(
             pipette_serial_number, pipette_override_path
