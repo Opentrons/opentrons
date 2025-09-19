@@ -10,4 +10,15 @@ The OT-2 helps automate routine liquid-handling processes in your lab. It is a m
 
 ## Structure of this manual
 
-TBD PLACEHOLDER
+Summary of top-level topics, similar to Flex. Bullet list with summary of broad topics and links to relevant chapters.
+
+#### OT-2 features
+- Learn about bullet: features, regulatory, modules
+- Starting bullet: hardware installation, app installation, system description
+- Run protocol: Opentrons app, modules, labware
+- Maintenance
+- Support: How to get it, warranty, contact us
+
+#### Notes and warnings
+
+- Callouts
