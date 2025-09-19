@@ -9,11 +9,10 @@ import {
   getMmFromBottom,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
   isFlexPipette,
+  LIQUID_CLASS_NAMES_LATEST_VERSION,
   LOW_VOLUME_PIPETTES,
-  NONE_LIQUID_CLASS_NAME,
   POSITION_REFERENCE_MAPPED_TO_WELL_ORIGIN,
   SAFE_MOVE_TO_WELL_LOCATION,
-  WATER_LIQUID_CLASS_NAME_V2,
   WELL_ORIGIN_TOP,
 } from '@opentrons/shared-data'
 
@@ -363,8 +362,9 @@ export const transfer: CommandCreator<TransferArgs> = (
   const liquidClassValuesForTip =
     getAllLiquidClassDefs()
       [
-        liquidClass === NONE_LIQUID_CLASS_NAME || liquidClass == null
-          ? WATER_LIQUID_CLASS_NAME_V2
+        liquidClass === LIQUID_CLASS_NAMES_LATEST_VERSION.none ||
+        liquidClass == null
+          ? LIQUID_CLASS_NAMES_LATEST_VERSION.water
           : liquidClass
       ].byPipette?.find(
         ({ pipetteModel }) =>

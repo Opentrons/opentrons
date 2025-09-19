@@ -1,20 +1,16 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import {
-  ETHANOL_LIQUID_CLASS_NAME_V2,
   FLEX_ROBOT_TYPE,
   getAllLiquidClassDefs,
   getFlexNameConversion,
   getLabwareDefURI,
-  GLYCEROL_LIQUID_CLASS_NAME_V2,
   linearInterpolate,
-  NONE_LIQUID_CLASS_NAME,
+  LIQUID_CLASS_NAMES_LATEST_VERSION,
   POSITION_REFERENCE_TOP,
   SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
-  WATER_LIQUID_CLASS_NAME_V2,
 } from '@opentrons/shared-data'
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
-  getLiquidClassName,
   getTransferPlanAndReferenceVolumes,
   SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
@@ -23,6 +19,7 @@ import { getFlowRateFields } from './getFlowRaiteFields'
 import { getMatchingTipLiquidSpecsFromSpec } from './getMatchingTipLiquidSpecsFromSpec'
 import { getMaxUiFlowRate } from './getMaxUiFlowRate'
 
+import type { LiquidName } from '@opentrons/shared-data'
 import type { BlowOutLocation, QuickTransferSummaryState } from '../types'
 
 const DEFAULT_MM_OFFSET_FROM_BOTTOM = 1
@@ -34,7 +31,7 @@ export const retrieveLiquidClassValues = (
   const { pipette } = state
   const convertedPipetteName = getFlexNameConversion(pipette)
 
-  if (state.liquidClassName === NONE_LIQUID_CLASS_NAME) {
+  if (state.liquidClassName === LIQUID_CLASS_NAMES_LATEST_VERSION.none) {
     return getNoLiquidClassValues(
       state,
       convertedPipetteName,
@@ -80,7 +77,7 @@ const getNoLiquidClassValues = (
   const { tipRack, path, volume, pipette } = state
   const tiprackUri = getLabwareDefURI(tipRack)
   const referenceLiquidClass = getAllLiquidClassDefs()[
-    WATER_LIQUID_CLASS_NAME_V2
+    LIQUID_CLASS_NAMES_LATEST_VERSION.water
   ]
   const liquidClassValuesForPipette = referenceLiquidClass.byPipette.find(
     ({ pipetteModel }) => convertedPipetteName === pipetteModel
@@ -276,16 +273,12 @@ const getLiquidClassValues = (
   } = state
 
   const allLiquidClassDefs = getAllLiquidClassDefs()
-  const liquidClassMap = new Map<string, string>([
-    ['water', WATER_LIQUID_CLASS_NAME_V2],
-    ['glycerol_50', GLYCEROL_LIQUID_CLASS_NAME_V2],
-    ['ethanol_80', ETHANOL_LIQUID_CLASS_NAME_V2],
-  ])
-  const selectedLiquidClass = liquidClassMap.get(
-    getLiquidClassName(state.liquidClassName) ?? 'none'
-  )
-  const liquidClassDef =
-    allLiquidClassDefs[selectedLiquidClass ?? NONE_LIQUID_CLASS_NAME]
+
+  const selectedLiquidClass =
+    LIQUID_CLASS_NAMES_LATEST_VERSION[state.liquidClassName as LiquidName] ??
+    'none'
+
+  const liquidClassDef = allLiquidClassDefs[selectedLiquidClass]
 
   const tiprackUri = getLabwareDefURI(tipRack)
   const tipTypeSettings = liquidClassDef?.byPipette

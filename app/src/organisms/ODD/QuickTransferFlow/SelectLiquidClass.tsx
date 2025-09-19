@@ -9,11 +9,8 @@ import {
   StyledText,
 } from '@opentrons/components'
 import {
-  ETHANOL_LIQUID_CLASS_NAME_V2,
   getAllLiquidClassDefs,
-  GLYCEROL_LIQUID_CLASS_NAME_V2,
-  NONE_LIQUID_CLASS_NAME,
-  WATER_LIQUID_CLASS_NAME_V2,
+  LIQUID_CLASS_NAMES_LATEST_VERSION,
 } from '@opentrons/shared-data'
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
@@ -22,7 +19,7 @@ import { useToaster } from '/app/organisms/ToasterOven'
 import { checkLiquidClassCompatibility } from './utils'
 
 import type { ComponentProps, Dispatch } from 'react'
-import type { LiquidClass } from '@opentrons/shared-data'
+import type { LiquidClass, LiquidName } from '@opentrons/shared-data'
 import type { SmallButton } from '/app/atoms/buttons'
 import type {
   QuickTransferWizardAction,
@@ -58,23 +55,15 @@ export function SelectLiquidClass({
     schemaVersion: 1,
   }
 
-  const mapLiquidClassToInternalName: Record<
-    LiquidClass['liquidClassName'],
-    string
-  > = {
-    ethanol_80: ETHANOL_LIQUID_CLASS_NAME_V2,
-    glycerol_50: GLYCEROL_LIQUID_CLASS_NAME_V2,
-    water: WATER_LIQUID_CLASS_NAME_V2,
-    none: NONE_LIQUID_CLASS_NAME,
-  }
-
   const liquidClassOptions = [noLiquidClass, ...Object.values(liquidClasses)]
   const handleClickNext = (): void => {
     if (selectedLiquidClass != null) {
       dispatch({
         type: 'SET_LIQUID_CLASS',
         liquidClassName:
-          mapLiquidClassToInternalName[selectedLiquidClass.liquidClassName],
+          LIQUID_CLASS_NAMES_LATEST_VERSION[
+            selectedLiquidClass.liquidClassName as LiquidName
+          ],
       })
     }
     onNext()

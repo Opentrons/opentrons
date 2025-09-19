@@ -18,8 +18,7 @@ import {
   getFlexNameConversion,
   getMaxPushOutVolume,
   getMinXYDimension,
-  NONE_LIQUID_CLASS_NAME,
-  WATER_LIQUID_CLASS_NAME_V2,
+  LIQUID_CLASS_NAMES_LATEST_VERSION,
 } from '@opentrons/shared-data'
 import {
   getPipetteWithTipMaxVol,
@@ -104,9 +103,9 @@ export const SecondStepsMoveLiquidTools = ({
   // TODO: replace this with the actual individual byVolume values, separated by aspirate/dispense etc.
   const stubbedByTipValues = getAllLiquidClassDefs()
     [
-      formData.liquidClass !== NONE_LIQUID_CLASS_NAME
+      formData.liquidClass !== LIQUID_CLASS_NAMES_LATEST_VERSION.none
         ? formData.liquidClass
-        : WATER_LIQUID_CLASS_NAME_V2
+        : LIQUID_CLASS_NAMES_LATEST_VERSION.water
     ].byPipette.find(
       ({ pipetteModel }) => pipetteModel === getFlexNameConversion(pipetteSpecs)
     )
