@@ -41,10 +41,16 @@ export interface GetTCRunExtendedProfileCommandTextResult {
   commandText: string
   profileElementTexts: Array<TCProfileStepText | TCProfileCycleText>
 }
+export interface GetTCStartRunExtendedProfileCommandTextResult {
+  kind: 'thermocycler/startRunExtendedProfile'
+  commandText: string
+  profileElementTexts: Array<TCProfileStepText | TCProfileCycleText>
+}
 export type GetCommandTextResult =
   | GetGenericCommandTextResult
   | GetTCRunProfileCommandTextResult
   | GetTCRunExtendedProfileCommandTextResult
+  | GetTCStartRunExtendedProfileCommandTextResult
 
 // TODO(jh, 07-18-24): Move the testing that covers this from CommandText to a new file, and verify that all commands are
 // properly tested.
@@ -165,6 +171,12 @@ export function useCommandTextString(
 
     case 'thermocycler/runExtendedProfile':
       return utils.getTCRunExtendedProfileCommandText({
+        ...fullParams,
+        command,
+      })
+
+    case 'thermocycler/startRunExtendedProfile':
+      return utils.getTCStartRunExtendedProfileCommandText({
         ...fullParams,
         command,
       })

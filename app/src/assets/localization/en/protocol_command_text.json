@@ -112,6 +112,7 @@
   "tc_run_profile_steps": "Temperature: {{celsius}}°C, hold time: {{duration}}",
   "tc_starting_extended_profile": "Running thermocycler profile with {{elementCount}} total steps and cycles:",
   "tc_starting_extended_profile_cycle": "{{repetitions}} repetitions of the following steps:",
+  "tc_starting_extended_profile_in_background": "Running thermocycler profile in the background with {{elementCount}} total steps and cycles:",
   "tc_starting_profile": "Running thermocycler profile with {{stepCount}} steps:",
   "touch_tip": "Touching tip",
   "trash_bin": "Trash Bin",
