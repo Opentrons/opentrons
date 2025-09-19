@@ -42,7 +42,7 @@ class SetTargetLidTemperatureResult(BaseModel):
     )
     taskId: str | SkipJsonSchema[None] = Field(
         None,
-        description="The taask id for the setTargetBlockTemperature",
+        description="The task id for the setTargetBlockTemperature",
         json_schema_extra=_remove_default,
     )
 
