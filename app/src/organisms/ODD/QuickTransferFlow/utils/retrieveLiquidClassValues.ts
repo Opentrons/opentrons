@@ -140,7 +140,7 @@ const getNoLiquidClassValues = (
 
   if (path === 'multiDispense') {
     // For distribute: minimum 2x volume + disposal volume + air gap (if not disabled)
-    minRequiredVolume = volume * 2 // Protocol-designer and step-generation requirement
+    minRequiredVolume = volume * 2
     const isDisposalVolumeEnabled = actualDisposalVolume > 0
     const isConditioningVolumeEnabled = actualConditioningVolume > 0
     const airGapVolume =
@@ -149,43 +149,27 @@ const getNoLiquidClassValues = (
         : aspirateAirGapVolume
     extraVolumes = actualDisposalVolume + airGapVolume
   } else if (path === 'multiAspirate') {
-    // For consolidate: minimum 2x volume + air gap between aspirations
-    minRequiredVolume = volume * 2 // Same requirement for multiAspirate
+    minRequiredVolume = volume * 2
     extraVolumes = aspirateAirGapVolume
   }
 
   const maxWellsPerTip =
     path === 'single' ? 1 : Math.floor((tipCapacity - extraVolumes) / volume)
 
-  // Ensure we don't exceed minimum volume requirement
+  // Ensure we don't exceed minimum volume requirement to align with protocol-designer
   const maxWellsWithMinVolume =
     path === 'single'
       ? 1
-      : Math.floor((tipCapacity - extraVolumes) / minRequiredVolume) * 2 // *2 because minRequiredVolume is 2x volume
+      : Math.floor((tipCapacity - extraVolumes) / minRequiredVolume) * 2
 
   const finalMaxWells = Math.min(maxWellsPerTip, maxWellsWithMinVolume)
 
-  console.log('Volume calculation debug (no liquid class):', {
-    tipCapacity,
-    volume,
-    minRequiredVolume,
-    actualConditioningVolume,
-    actualDisposalVolume,
-    aspirateAirGapVolume,
-    extraVolumes,
-    maxWellsPerTip,
-    maxWellsWithMinVolume,
-    finalMaxWells,
-    path,
-  })
-
-  // Limit destination wells to finalMaxWells for multiDispense path
+  // update wells value
   const adjustedDestinationWells =
     path === 'multiDispense' && finalMaxWells > 0
       ? state.destinationWells.slice(0, finalMaxWells)
       : state.destinationWells
 
-  // Limit source wells to finalMaxWells for multiAspirate path
   const adjustedSourceWells =
     path === 'multiAspirate' && finalMaxWells > 0
       ? state.sourceWells.slice(0, finalMaxWells)
@@ -205,7 +189,7 @@ const getNoLiquidClassValues = (
   const matchingTipLiquidSpecs = getMatchingTipLiquidSpecsFromSpec(
     pipette,
     volume,
-    tiprackUri as string
+    tiprackUri
   )
 
   const aspirateMaxUiFlowRate = getMaxUiFlowRate({
@@ -419,7 +403,6 @@ const getLiquidClassValues = (
   let minRequiredVolume = volume
 
   if (path === 'multiDispense') {
-    // For distribute: minimum 2x volume + disposal volume + air gap (if not disabled)
     minRequiredVolume = volume * 2
     const isDisposalVolumeEnabled = actualDisposalVolume > 0
     const isConditioningVolumeEnabled = actualConditioningVolume > 0
@@ -429,8 +412,7 @@ const getLiquidClassValues = (
         : aspirateAirGapVolume
     extraVolumes = actualDisposalVolume + airGapVolume
   } else if (path === 'multiAspirate') {
-    // For consolidate: minimum 2x volume + air gap between aspirations
-    minRequiredVolume = volume * 2 // Same requirement for multiAspirate
+    minRequiredVolume = volume * 2
     extraVolumes = aspirateAirGapVolume
   }
 
@@ -443,20 +425,6 @@ const getLiquidClassValues = (
       : Math.floor((tipCapacity - extraVolumes) / minRequiredVolume) * 2
 
   const finalMaxWells = Math.min(maxWellsPerTip, maxWellsWithMinVolume)
-
-  console.log('Volume calculation debug:', {
-    tipCapacity,
-    volume,
-    minRequiredVolume,
-    actualConditioningVolume,
-    actualDisposalVolume,
-    aspirateAirGapVolume,
-    extraVolumes,
-    maxWellsPerTip,
-    maxWellsWithMinVolume,
-    finalMaxWells,
-    path,
-  })
 
   const adjustedDestinationWells =
     path === 'multiDispense' && finalMaxWells > 0
