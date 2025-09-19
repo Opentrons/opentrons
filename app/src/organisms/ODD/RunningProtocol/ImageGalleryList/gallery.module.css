@@ -58,12 +58,12 @@
 
 .list_item_step {
   display: flex;
+  width: 27rem;
   flex-direction: column;
 }
 
 .list_item_step_text {
   overflow: hidden;
-  width: 432px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }

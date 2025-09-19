@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
+import clsx from 'clsx'
 
 import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
@@ -260,26 +261,29 @@ export function RunningProtocol(): JSX.Element {
           )}
           <div className={styles.navigation_dots}>
             <div
-              className={`${styles.bullet} ${
+              className={clsx(
+                styles.bullet,
                 currentOption === 'CurrentRunningProtocolCommand'
                   ? styles.bullet_active
                   : styles.bullet_inactive
-              }`}
+              )}
             />
             <div
-              className={`${styles.bullet} ${
+              className={clsx(
+                styles.bullet,
                 currentOption === 'RunningProtocolCommandList'
                   ? styles.bullet_active
                   : styles.bullet_inactive
-              }`}
+              )}
             />
             {isCameraEnabled ? (
               <div
-                className={`${styles.bullet} ${
+                className={clsx(
+                  styles.bullet,
                   currentOption === 'ImageGallery'
                     ? styles.bullet_active
                     : styles.bullet_inactive
-                }`}
+                )}
               />
             ) : null}
           </div>
