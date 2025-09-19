@@ -27,7 +27,7 @@ Use Opentrons Tough Universal Lids on compatible well plates and reservoirs.
 - Liquid colors now match across deck views on the Opentrons App and Flex touchscreen.
 - Protocol run previews now includes complete Flex 96-channel pipette movements.
 - The API raises an error when the Flex Gripper fails to pick up a lid.
-- Deck views in error recovery inlude labware loaded in a Flex Stacker.
+- Deck views in error recovery now include labware loaded in a Flex Stacker.
 - Quick transfers no longer crash when adding an air gap or blow out after dispensing.
 
 ## Opentrons App Changes in 8.6.0
