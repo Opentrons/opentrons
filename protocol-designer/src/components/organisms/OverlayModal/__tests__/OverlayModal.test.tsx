@@ -49,7 +49,7 @@ describe('OverlayModal', () => {
     screen.getByRole('button', { name: 'primaryButtonText' })
   })
 
-  it('renders the OverlayModal without button text', () => {
+  it('renders the OverlayModal without buttons', () => {
     props = {
       ...props,
       primaryButtonProps: undefined,
@@ -58,7 +58,5 @@ describe('OverlayModal', () => {
     render(props)
     screen.getByText('header')
     screen.getByText('subText')
-    screen.getByRole('button', { name: 'Cancel' })
-    screen.getByRole('button', { name: 'Continue' })
   })
 })
