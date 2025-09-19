@@ -66,32 +66,17 @@ runs:
           ARCH="x64"
         fi
         
-        # Automatically detect and cache ALL packages from ALL package.json files
-        echo "🔍 Scanning all package.json files for packages that might need caching..."
+        # Automatically detect and cache packages that need binary caching
+        echo "🔍 Scanning for packages that need binary caching..."
         
         # Find all package.json files in the project
         PACKAGE_FILES=$(find . -name "package.json" -not -path "./node_modules/*" -not -path "./.git/*")
         
-        # Extract all unique package names from all package.json files
-        ALL_PACKAGES=()
-        for package_file in $PACKAGE_FILES; do
-          if [[ -f "$package_file" ]]; then
-            echo "📄 Scanning $package_file..."
-            # Extract package names from dependencies and devDependencies
-            packages=$(grep -E '^\s*"[^"]+":\s*"[^"]*"' "$package_file" | sed 's/.*"\([^"]*\)":.*/\1/' | grep -v '^@' | head -20)
-            for pkg in $packages; do
-              # Add to array if not already present
-              if [[ ! " ${ALL_PACKAGES[@]} " =~ " ${pkg} " ]]; then
-                ALL_PACKAGES+=("$pkg")
-              fi
-            done
-          fi
-        done
+        # Packages that commonly need binary caching (expandable list)
+        BINARY_PACKAGES=("cypress" "electron" "playwright" "puppeteer" "chromium" "firefox" "webkit" "npm")
         
-        echo "📦 Found ${#ALL_PACKAGES[@]} unique packages to check for caching..."
-        
-        # Check each package for cached versions
-        for package in "${ALL_PACKAGES[@]}"; do
+        # Check each binary package across all package.json files
+        for package in "${BINARY_PACKAGES[@]}"; do
           version=""
           source_file=""
           
