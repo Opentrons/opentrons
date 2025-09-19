@@ -75,9 +75,7 @@ export function OverlayModal(props: OverlayModalProps): JSX.Element {
         >
           <SecondaryButton
             backgroundColor={COLORS.white}
-            onClick={() => {
-              onSecondaryButtonClick()
-            }}
+            onClick={onSecondaryButtonClick}
           >
             {secondaryButtonText ?? 'cancel'}
           </SecondaryButton>
