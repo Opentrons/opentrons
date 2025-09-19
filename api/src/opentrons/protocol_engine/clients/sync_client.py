@@ -79,6 +79,12 @@ class SyncClient:
 
     @overload
     def execute_command_without_recovery(
+        self, params: commands.thermocycler.StartRunExtendedProfileParams
+    ) -> commands.thermocycler.StartRunExtendedProfileResult:
+        pass
+
+    @overload
+    def execute_command_without_recovery(
         self, params: commands.LoadModuleParams
     ) -> commands.LoadModuleResult:
         pass

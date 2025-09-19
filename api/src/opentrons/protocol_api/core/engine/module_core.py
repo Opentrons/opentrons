@@ -425,6 +425,42 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
         else:
             return self._execute_profile_pre_221(steps, repetitions, block_max_volume)
 
+    def start_execute_profile(
+        self,
+        steps: List[ThermocyclerStep],
+        repetitions: int,
+        block_max_volume: Optional[float] = None,
+    ) -> EngineTaskCore:
+        """Start the execution of a hermocycler profile and return a task."""
+        self._repetitions = repetitions
+        self._step_count = len(steps)
+        engine_steps: List[
+            Union[cmd.thermocycler.ProfileStep, cmd.thermocycler.ProfileCycle]
+        ] = [
+            cmd.thermocycler.ProfileCycle(
+                repetitions=repetitions,
+                steps=[
+                    cmd.thermocycler.ProfileStep(
+                        celsius=step["temperature"],
+                        holdSeconds=step["hold_time_seconds"],
+                        rampRate=step["ramp_rate"],
+                    )
+                    for step in steps
+                ],
+            )
+        ]
+        result = self._engine_client.execute_command_without_recovery(
+            cmd.thermocycler.StartRunExtendedProfileParams(
+                moduleId=self.module_id,
+                profileElements=engine_steps,
+                blockMaxVolumeUl=block_max_volume,
+            )
+        )
+        start_execute_profile_result = EngineTaskCore(
+            engine_client=self._engine_client, task_id=result.taskId
+        )
+        return start_execute_profile_result
+
     def deactivate_lid(self) -> None:
         """Turn off the heated lid."""
         self._engine_client.execute_command(
