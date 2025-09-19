@@ -165,7 +165,7 @@ class AbstractThermocyclerCore(
         ramp_rate: Optional[float],
         hold_time_seconds: Optional[float] = None,
         block_max_volume: Optional[float] = None,
-    ) -> None:
+    ) -> AbstractTaskCore:
         """Set the target temperature for the well block, in °C.
 
         Note:
@@ -185,7 +185,7 @@ class AbstractThermocyclerCore(
         """Wait for target block temperature to be reached."""
 
     @abstractmethod
-    def set_target_lid_temperature(self, celsius: float) -> None:
+    def set_target_lid_temperature(self, celsius: float) -> AbstractTaskCore:
         """Set the target temperature for the heated lid, in °C."""
 
     @abstractmethod
@@ -296,7 +296,7 @@ class AbstractHeaterShakerCore(
         """Get the module's unique hardware serial number."""
 
     @abstractmethod
-    def set_target_temperature(self, celsius: float) -> None:
+    def set_target_temperature(self, celsius: float) -> AbstractTaskCore:
         """Set the labware plate's target temperature in °C."""
 
     @abstractmethod

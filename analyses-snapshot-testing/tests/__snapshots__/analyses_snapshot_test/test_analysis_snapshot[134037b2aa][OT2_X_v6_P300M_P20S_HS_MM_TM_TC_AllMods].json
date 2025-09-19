@@ -7303,7 +7303,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 55.0
+        "targetBlockTemperature": 55.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -7334,7 +7335,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetLidTemperature": 50.0
+        "targetLidTemperature": 50.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -7378,7 +7380,9 @@
         "celsius": 55.0,
         "moduleId": "UUID"
       },
-      "result": {},
+      "result": {
+        "taskId": "UUID"
+      },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
