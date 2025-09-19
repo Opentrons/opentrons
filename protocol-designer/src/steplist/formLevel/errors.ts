@@ -762,8 +762,10 @@ export const volumeTooHigh = (
   fields: HydratedMixFormData
 ): FormError | null => {
   const { pipette, tipRack } = fields
-  if (!pipette) {
+  if (!pipette || !tipRack) {
     // pipette is null if user deletes pipette
+    // I haven't been able to reproduce when tipRack alone becomes null, but it
+    // probably happens if the user deletes or changes the tip racks somehow.
     return null
   }
   const volume = Number(fields.volume)
