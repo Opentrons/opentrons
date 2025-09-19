@@ -21,6 +21,7 @@ runs:
           **/yarn.lock
 
     - name: 'Cache Yarn global cache'
+      id: cache-yarn
       uses: actions/cache@v4
       with:
         path: ~/.yarn/cache
@@ -42,16 +43,20 @@ runs:
           packages-${{ runner.os }}-${{ hashFiles('package.json') }}-
           packages-${{ runner.os }}-
 
-    - name: 'Cache node_modules'
-      id: cache-node-modules
-      uses: actions/cache@v4
-      with:
-        path: |
-          node_modules
-          **/node_modules
-        key: node-modules-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
-        restore-keys: |
-          node-modules-${{ runner.os }}-
+    - name: 'Show cache status'
+      shell: bash
+      run: |
+        if [[ "${{ steps.cache-yarn.outputs.cache-hit }}" == "true" ]]; then
+          echo "✅ Yarn cache hit - using cached dependencies"
+        else
+          echo "⚠️  Yarn cache miss - will download dependencies"
+        fi
+        
+        if [[ "${{ steps.cache-packages.outputs.cache-hit }}" == "true" ]]; then
+          echo "✅ Package binaries cache hit - using cached binaries"
+        else
+          echo "⚠️  Package binaries cache miss - will download binaries"
+        fi
 
     - name: 'Install udev for USB-detection'
       if: runner.os == 'Linux'
@@ -134,13 +139,4 @@ runs:
         yarn config set prefer-offline true
         yarn config set network-concurrency 1
         
-        # Check if node_modules cache was restored
-        if [[ -d "node_modules" ]]; then
-          echo "✅ node_modules cache restored - skipping yarn install"
-          # Still need to run the app-shell setup steps
-          make -C app-shell setup
-          make -C app-shell-odd setup
-        else
-          echo "⚠️  No node_modules cache - running full setup"
-          make setup-js
-        fi
+        make setup-js
