@@ -16,23 +16,24 @@ import {
   TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 
+export interface overlayButtonProps {
+  onClick: () => void,
+  text: string
+}
+
 export interface OverlayModalProps {
   header: string
-  onSecondaryButtonClick: () => void
-  onPrimaryButtonClick: () => void
   subText?: string
-  primaryButtonText?: string
-  secondaryButtonText?: string
+  primaryButtonProps?: overlayButtonProps
+  secondaryButtonProps?: overlayButtonProps
 }
 
 export function OverlayModal(props: OverlayModalProps): JSX.Element {
   const {
     header,
     subText,
-    onSecondaryButtonClick,
-    onPrimaryButtonClick,
-    primaryButtonText,
-    secondaryButtonText,
+    primaryButtonProps,
+    secondaryButtonProps,
   } = props
   const { t } = useTranslation('shared')
   return (
@@ -75,18 +76,22 @@ export function OverlayModal(props: OverlayModalProps): JSX.Element {
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           gridGap={SPACING.spacing8}
         >
+          {secondaryButtonProps && 
           <SecondaryButton
             backgroundColor={COLORS.white}
-            onClick={onSecondaryButtonClick}
+            onClick={secondaryButtonProps?.onClick}
           >
-            {secondaryButtonText ?? t('cancel')}
+            {secondaryButtonProps?.text}
           </SecondaryButton>
+          }
+          {primaryButtonProps && (
           <PrimaryButton
             backgroundColor={COLORS.red50}
-            onClick={onPrimaryButtonClick}
+            onClick={primaryButtonProps?.onClick}
           >
-            {primaryButtonText ?? t('continue')}
-          </PrimaryButton>
+              {primaryButtonProps?.text}
+            </PrimaryButton>
+          )}
         </Flex>
       </Flex>
     </Overlay>

@@ -23,13 +23,17 @@ describe('OverlayModal', () => {
     props = {
       header: 'header',
       subText: 'subText',
-      primaryButtonText: 'primaryButtonText',
-      secondaryButtonText: 'secondaryButtonText',
-      onSecondaryButtonClick: () => {
-        alert('Cancel')
+      primaryButtonProps: {
+        onClick: () => {
+          alert('Continue')
+        },
+        text: 'primaryButtonText',
       },
-      onPrimaryButtonClick: () => {
-        alert('Continue')
+      secondaryButtonProps: {
+        onClick: () => {
+          alert('Cancel')
+        },
+        text: 'secondaryButtonText',
       },
     }
   })
@@ -48,8 +52,8 @@ describe('OverlayModal', () => {
   it('renders the OverlayModal without button text', () => {
     props = {
       ...props,
-      primaryButtonText: undefined,
-      secondaryButtonText: undefined,
+      primaryButtonProps: undefined,
+      secondaryButtonProps: undefined,
     }
     render(props)
     screen.getByText('header')

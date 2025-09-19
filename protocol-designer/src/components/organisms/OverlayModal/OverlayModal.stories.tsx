@@ -18,24 +18,14 @@ const meta: Meta<typeof OverlayModal> = {
         type: 'text',
       },
     },
-    primaryButtonText: {
+    primaryButtonProps: {
       control: {
         type: 'text',
       },
     },
-    secondaryButtonText: {
+    secondaryButtonProps: {
       control: {
-        type: 'text',
-      },
-    },
-    onSecondaryButtonClick: {
-      control: {
-        type: 'function',
-      },
-    },
-    onPrimaryButtonClick: {
-      control: {
-        type: 'function',
+        type: 'object',
       },
     },
   },
@@ -49,11 +39,17 @@ export const PrimaryOverlayModal: Story = {
   args: {
     header: 'header',
     subText: 'subText',
-    onSecondaryButtonClick: () => {
-      alert('Cancel')
+    secondaryButtonProps: {
+      onClick: () => {
+        alert('Cancel')
+      },
+      text: 'Cancel',
     },
-    onPrimaryButtonClick: () => {
-      alert('Continue')
+    primaryButtonProps: {
+      onClick: () => {
+        alert('Continue')
+      },
+      text: 'Continue',
     },
   },
 }
@@ -63,13 +59,17 @@ export const ClearLiquidOverlayModal: Story = {
     header: 'Selected labware have different liquid layouts',
     subText:
       'Clear liquids in labware to edit them together to edit liquid in these labware at the same time, you will have to clear liquids from them',
-    primaryButtonText: 'Clear Liquids',
-    secondaryButtonText: 'Cancel',
-    onSecondaryButtonClick: () => {
-      alert('Cancel')
+    primaryButtonProps: {
+      onClick: () => {
+        alert('Clear Liquids')
+      },
+      text: 'Clear Liquids',
     },
-    onPrimaryButtonClick: () => {
-      alert('Clear Liquids')
+    secondaryButtonProps: {
+      onClick: () => {
+        alert('Cancel')
+      },
+      text: 'Cancel',
     },
   },
 }
