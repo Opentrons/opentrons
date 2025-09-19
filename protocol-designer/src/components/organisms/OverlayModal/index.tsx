@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   COLORS,
@@ -16,11 +18,11 @@ import {
 
 export interface OverlayModalProps {
   header: string
-  primaryButtonText: string
-  secondaryButtonText: string
   onSecondaryButtonClick: () => void
   onPrimaryButtonClick: () => void
-    subText?: string
+  subText?: string
+  primaryButtonText?: string
+  secondaryButtonText?: string
 }
 
 export function OverlayModal(props: OverlayModalProps): JSX.Element {
@@ -32,6 +34,7 @@ export function OverlayModal(props: OverlayModalProps): JSX.Element {
     primaryButtonText,
     secondaryButtonText,
   } = props
+  const { t } = useTranslation('shared')
   return (
     <Overlay
       width="100%"
@@ -48,7 +51,6 @@ export function OverlayModal(props: OverlayModalProps): JSX.Element {
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
         gridGap={SPACING.spacing16}
-        className="overlay-modal-content"
         textAlign={TEXT_ALIGN_CENTER}
       >
         <StyledText
@@ -77,13 +79,13 @@ export function OverlayModal(props: OverlayModalProps): JSX.Element {
             backgroundColor={COLORS.white}
             onClick={onSecondaryButtonClick}
           >
-            {secondaryButtonText ?? 'cancel'}
+            {secondaryButtonText ?? t('cancel')}
           </SecondaryButton>
           <PrimaryButton
             backgroundColor={COLORS.red50}
-            onClick={onPrimaryButtonClick()}
+            onClick={onPrimaryButtonClick}
           >
-            {primaryButtonText ?? 'continue'}
+            {primaryButtonText ?? t('continue')}
           </PrimaryButton>
         </Flex>
       </Flex>
