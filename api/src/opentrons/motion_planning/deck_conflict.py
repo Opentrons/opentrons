@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Container
 from dataclasses import dataclass
 from typing import List, Mapping, NamedTuple, Optional, Set, Union
 from typing_extensions import Final
@@ -15,6 +16,7 @@ from opentrons.motion_planning.adjacent_slots_getters import (
     get_adjacent_staging_slot,
 )
 
+from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.types import DeckSlotName, StagingSlotName
 
 _FIXED_TRASH_SLOT: Final[Set[DeckSlotName]] = {
@@ -37,14 +39,14 @@ HS_MAX_X_ADJACENT_ITEM_HEIGHT = 53.0
 # For background, see: https://github.com/Opentrons/opentrons/issues/10316
 #
 # TODO(mc, 2022-06-16): move this constant to the module definition
-HS_ALLOWED_ADJACENT_TALL_LABWARE = [
-    LabwareUri("opentrons/opentrons_96_filtertiprack_10ul/1"),
-    LabwareUri("opentrons/opentrons_96_filtertiprack_200ul/1"),
-    LabwareUri("opentrons/opentrons_96_filtertiprack_20ul/1"),
-    LabwareUri("opentrons/opentrons_96_tiprack_10ul/1"),
-    LabwareUri("opentrons/opentrons_96_tiprack_20ul/1"),
-    LabwareUri("opentrons/opentrons_96_tiprack_300ul/1"),
-]
+HS_ALLOWED_ADJACENT_TALL_LABWARE = {
+    "opentrons_96_filtertiprack_10ul",
+    "opentrons_96_filtertiprack_200ul",
+    "opentrons_96_filtertiprack_20ul",
+    "opentrons_96_tiprack_10ul",
+    "opentrons_96_tiprack_20ul",
+    "opentrons_96_tiprack_300ul",
+}
 
 
 @dataclass
@@ -156,11 +158,15 @@ class _MaxHeight(NamedTuple):
     source_item: DeckItem
     source_location: DeckSlotName
     max_height: float
-    allowed_labware: List[LabwareUri]
+    allowed_labware_load_names: Container[str]
 
     def is_allowed(self, item: DeckItem) -> bool:
         if isinstance(item, Labware):
-            if item.uri in self.allowed_labware:
+            namespace, load_name, _version = item.uri.split("/")
+            if (
+                namespace == OPENTRONS_NAMESPACE
+                and load_name in self.allowed_labware_load_names
+            ):
                 return True
             else:
                 return item.highest_z < self.max_height
@@ -315,7 +321,7 @@ def _create_ot2_restrictions(  # noqa: C901
                     source_item=item,
                     source_location=location,
                     max_height=HS_MAX_X_ADJACENT_ITEM_HEIGHT,
-                    allowed_labware=HS_ALLOWED_ADJACENT_TALL_LABWARE,
+                    allowed_labware_load_names=HS_ALLOWED_ADJACENT_TALL_LABWARE,
                 )
             )
 
@@ -434,7 +440,6 @@ def _create_flex_restrictions(  # noqa: C901
 def _create_restrictions(
     item: DeckItem, location: Union[DeckSlotName, StagingSlotName], robot_type: str
 ) -> List[_DeckRestriction]:
-
     if robot_type == "OT-2 Standard":
         return _create_ot2_restrictions(item, location)
     else:

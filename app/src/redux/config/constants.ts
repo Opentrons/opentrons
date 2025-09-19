@@ -10,6 +10,7 @@ export const DEV_INTERNAL_FLAGS: DevInternalFlag[] = [
   'reactScan',
   'quickTransferExportPython',
   'camera',
+  'quickTransferProtocolContentsLog',
 ]
 
 // action type constants

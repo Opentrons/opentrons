@@ -3,8 +3,8 @@ from datetime import datetime
 
 
 class LegacyTaskCore(AbstractTaskCore):
-    def __init__(self, created_at: datetime) -> None:
-        raise NotImplementedError("Legacy protocols do not implement tasks.")
+    def __init__(self) -> None:
+        pass
 
     def get_created_at_timestamp(self) -> datetime:
         raise NotImplementedError("Legacy protocols do not implement tasks.")

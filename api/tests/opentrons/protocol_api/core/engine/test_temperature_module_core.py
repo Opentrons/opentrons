@@ -9,6 +9,7 @@ from opentrons.hardware_control.modules.types import TemperatureStatus, ModuleTy
 
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
+from opentrons.protocol_api.core.engine.tasks import EngineTaskCore
 
 from opentrons.protocol_api.core.engine.module_core import TemperatureModuleCore
 from opentrons.protocol_api.core.engine.protocol import ProtocolCore
@@ -76,17 +77,23 @@ def test_set_target_temperature(
     subject: TemperatureModuleCore,
     mock_engine_client: EngineClient,
 ) -> None:
-    """Should verify EngineClient call to set_target_temperature."""
-    subject.set_target_temperature(38.9)
-
-    decoy.verify(
-        mock_engine_client.execute_command(
+    """Should verify EngineClient call to set_target_temperature and return an EngineTaskCore."""
+    task_mock = decoy.mock(cls=EngineTaskCore)
+    decoy.when(
+        mock_engine_client.execute_command_without_recovery(
             cmd.temperature_module.SetTargetTemperatureParams(
                 moduleId="1234", celsius=38.9
             )
         ),
-        times=1,
+    ).then_return(
+        cmd.temperature_module.SetTargetTemperatureResult(
+            targetTemperature=38.9, taskId="taskId"
+        )
     )
+    task_mock._id = "taskId"
+    result = subject.set_target_temperature(38.9)
+    assert isinstance(result, EngineTaskCore)
+    assert result._id == "taskId"
 
 
 def test_wait_for_target_temperature(

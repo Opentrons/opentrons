@@ -110,12 +110,16 @@ export function AddStepButton({
     labwareAtLastState
   ).some(([labwareId, { stack }]) => {
     const labwareDef = labwareEntities[labwareId]?.def
+    const slot = getSlotInLocationStack(stack)
+    const isLidOnSlot = Object.values(labwareEntities).some(({ def }) =>
+      getIsLid(def)
+    )
     return (
       labwareDef != null &&
-      getSlotInLocationStack(stack) !== OFFDECK &&
+      slot !== OFFDECK &&
       !getIsTiprack(labwareDef) &&
       !getIsAdapterFromDef(labwareDef) &&
-      !getIsLid(labwareDef)
+      !isLidOnSlot
     )
   })
   const getSupportedSteps = (): Array<

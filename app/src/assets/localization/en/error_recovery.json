@@ -180,5 +180,7 @@
   "use_dry_unused_tips": "Use dry, unused tips for best results",
   "view_error_details": "View error details",
   "view_recovery_options": "View recovery options",
-  "you_can_still_drop_tips": "You can still drop the attached tips before proceeding to tip selection."
+  "you_can_still_drop_tips": "You can still drop the attached tips before proceeding to tip selection.",
+  "stacker_shuttle_store_empty_error_occurs_when": "Shuttle empty errors occur when the robot tries to store labware into a stacker from an empty shuttle",
+  "load_labware_shuttle_to_proceed": "shuttle with the correct labware to complete the stacker store step."
 }

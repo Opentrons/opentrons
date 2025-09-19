@@ -271,13 +271,13 @@ def test_labware_when_heater_shaker(
         highest_z_including_labware=123, name_for_errors="some_heater_shaker"
     )
     cool_labware = deck_conflict.Labware(
-        uri=LabwareUri("cool_labware_uri"),
+        uri=LabwareUri("test/cool_labware/1"),
         highest_z=1,
         is_fixed_trash=False,
         name_for_errors="cool_labware",
     )
     lame_labware = deck_conflict.Labware(
-        uri=LabwareUri("lame_labware_uri"),
+        uri=LabwareUri("test/lame_labware/1"),
         highest_z=999,
         is_fixed_trash=False,
         name_for_errors="lame_labware",
@@ -406,9 +406,10 @@ def test_no_modules_when_heater_shaker(
 
 
 @pytest.mark.parametrize(
-    "allowed_tip_rack_uri",
+    "allowed_tip_rack_load_name",
     deck_conflict.HS_ALLOWED_ADJACENT_TALL_LABWARE,
 )
+@pytest.mark.parametrize("allowed_tip_rack_version", [1, 2])
 @pytest.mark.parametrize(
     ("heater_shaker_location", "tip_rack_location"),
     [
@@ -429,7 +430,8 @@ def test_no_modules_when_heater_shaker(
     ],
 )
 def test_tip_rack_when_heater_shaker(
-    allowed_tip_rack_uri: LabwareUri,
+    allowed_tip_rack_load_name: str,
+    allowed_tip_rack_version: int,
     heater_shaker_location: DeckSlotName,
     tip_rack_location: DeckSlotName,
 ) -> None:
@@ -441,8 +443,11 @@ def test_tip_rack_when_heater_shaker(
 
     too_high = deck_conflict.HS_MAX_X_ADJACENT_ITEM_HEIGHT + 0.1
 
+    cool_tip_rack_uri = LabwareUri(
+        f"opentrons/{allowed_tip_rack_load_name}/{allowed_tip_rack_version}"
+    )
     cool_tip_rack = deck_conflict.Labware(
-        uri=allowed_tip_rack_uri,
+        uri=cool_tip_rack_uri,
         highest_z=too_high,
         is_fixed_trash=False,
         name_for_errors="cool_tip_rack",

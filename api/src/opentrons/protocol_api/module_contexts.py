@@ -43,6 +43,7 @@ from .module_validation_and_errors import (
 )
 from .labware import Labware
 from . import validation
+from . import Task
 
 
 _MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN = APIVersion(2, 14)
@@ -447,18 +448,28 @@ class TemperatureModuleContext(ModuleContext):
         No other protocol commands will execute while waiting for the temperature.
 
         :param celsius: A value between 4 and 95, representing the target temperature in °C.
+
         """
         self._core.set_target_temperature(celsius)
         self._core.wait_for_target_temperature()
 
     @publish(command=cmds.tempdeck_set_temp)
     @requires_version(2, 3)
-    def start_set_temperature(self, celsius: float) -> None:
+    def start_set_temperature(self, celsius: float) -> Task:
         """Set the target temperature without waiting for the target to be hit.
 
+        .. versionchanged:: 2.27
+            Returns a task object that represents concurrent preheating.
+            Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for the preheat to complete.
+
+        On version 2.26 or below, this function returns ``None``.
         :param celsius: A value between 4 and 95, representing the target temperature in °C.
         """
-        self._core.set_target_temperature(celsius)
+        task = self._core.set_target_temperature(celsius)
+        if self._api_version >= APIVersion(2, 27):
+            return Task(api_version=self._api_version, core=task)
+        else:
+            return cast(Task, None)
 
     @publish(command=cmds.tempdeck_await_temp)
     @requires_version(2, 3)
@@ -656,8 +667,15 @@ class ThermocyclerContext(ModuleContext):
         hold_time_minutes: Optional[float] = None,
         ramp_rate: Optional[float] = None,
         block_max_volume: Optional[float] = None,
-    ) -> None:
+    ) -> Task:
         """Set the target temperature for the well block, in °C.
+
+        .. versionchanged::2.27
+            Returns a task object that represents concurrent preheating.
+            Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for
+            the preheat to complete.
+
+        On version 2.26 or below, this function returns ``None``.
 
         :param temperature: A value between 4 and 99, representing the target
                             temperature in °C.
@@ -682,18 +700,28 @@ class ThermocyclerContext(ModuleContext):
         seconds = validation.ensure_hold_time_seconds(
             seconds=hold_time_seconds, minutes=hold_time_minutes
         )
-        self._core.set_target_block_temperature(
+        task = self._core.set_target_block_temperature(
             celsius=temperature,
             hold_time_seconds=seconds,
             block_max_volume=block_max_volume,
             ramp_rate=ramp_rate,
         )
-        self._core.wait_for_block_temperature()
+        if self._api_version >= APIVersion(2, 27):
+            return Task(api_version=self._api_version, core=task)
+        else:
+            return cast(Task, None)
 
     @publish(command=cmds.thermocycler_set_lid_temperature)
     @requires_version(2, 0)
-    def set_lid_temperature(self, temperature: float) -> None:
+    def set_lid_temperature(self, temperature: float) -> Task:
         """Set the target temperature for the heated lid, in °C.
+
+        .. versionchanged::2.27
+            Returns a task object that represents concurrent preheating.
+            Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for
+            the preheat to complete.
+
+        On version 2.26 or below, this function returns ``None``.
 
         :param temperature: A value between 37 and 110, representing the target
                             temperature in °C.
@@ -704,8 +732,11 @@ class ThermocyclerContext(ModuleContext):
             ``temperature`` is reached.
 
         """
-        self._core.set_target_lid_temperature(celsius=temperature)
-        self._core.wait_for_lid_temperature()
+        task = self._core.set_target_lid_temperature(celsius=temperature)
+        if self._api_version >= APIVersion(2, 27):
+            return Task(api_version=self._api_version, core=task)
+        else:
+            return cast(Task, None)
 
     @publish(command=cmds.thermocycler_execute_profile)
     @requires_version(2, 0)
@@ -974,18 +1005,21 @@ class HeaterShakerContext(ModuleContext):
 
     @requires_version(2, 13)
     @publish(command=cmds.heater_shaker_set_target_temperature)
-    def set_target_temperature(self, celsius: float) -> None:
+    def set_target_temperature(self, celsius: float) -> Task:
         """Set target temperature and return immediately.
 
         Sets the Heater-Shaker's target temperature and returns immediately without
         waiting for the target to be reached. Does not delay the protocol until
         target temperature has reached.
         Use :py:meth:`~.HeaterShakerContext.wait_for_temperature` to delay
-        protocol execution.
+        protocol execution for api levels below 2.27.
 
         .. versionchanged:: 2.25
             Removed the minimum temperature limit of 37 °C. Note that temperatures under ambient are
             not achievable.
+        .. versionchanged:: 2.27
+            Returns a task object that represents concurrent preheating.
+            Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for the preheat to complete.
 
         :param celsius: A value under 95, representing the target temperature in °C.
                         Values are automatically truncated to two decimal places,
@@ -994,7 +1028,11 @@ class HeaterShakerContext(ModuleContext):
         validated_temp = validate_heater_shaker_temperature(
             celsius=celsius, api_version=self.api_version
         )
-        self._core.set_target_temperature(celsius=validated_temp)
+        task = self._core.set_target_temperature(celsius=validated_temp)
+        if self._api_version >= APIVersion(2, 27):
+            return Task(api_version=self._api_version, core=task)
+        else:
+            return cast(Task, None)
 
     @requires_version(2, 13)
     @publish(command=cmds.heater_shaker_wait_for_temperature)
