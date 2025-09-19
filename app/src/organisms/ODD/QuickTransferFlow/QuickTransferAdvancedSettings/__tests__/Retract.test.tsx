@@ -80,7 +80,12 @@ describe('Retract', () => {
   })
 
   it('renders test, buttons, input field, and keyboard for retract after aspirating - position', () => {
-    render(props)
+    render({
+      ...props,
+      state: {
+        retractAspirate: { positionReference: 'well-bottom', position: 0 },
+      } as any,
+    })
     fireEvent.click(screen.getByRole('button', { name: '1' }))
     fireEvent.click(screen.getByRole('button', { name: '1' }))
     fireEvent.click(screen.getByText('Continue'))

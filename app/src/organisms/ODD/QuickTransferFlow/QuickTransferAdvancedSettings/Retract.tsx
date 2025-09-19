@@ -55,8 +55,8 @@ export function Retract({
   const [delayDuration, setDelayDuration] = useState<number | null>(
     retractSettings?.delayDuration ?? null
   )
-  const [position, setPosition] = useState<number | null>(
-    retractSettings?.position ?? null
+  const [position, setPosition] = useState<string | null>(
+    String(retractSettings?.position) ?? null
   )
   const positionReference =
     kind === 'aspirate'
@@ -87,7 +87,7 @@ export function Retract({
             retractSettings: {
               speed,
               delayDuration,
-              position,
+              position: Number(position),
               positionReference: positionReference ?? undefined,
             },
           })
@@ -115,7 +115,7 @@ export function Retract({
   if (delayDuration == null && currentStep === 2) {
     buttonIsDisabled = true
   }
-  if (position == null && currentStep === 3) {
+  if ((position == null || isNaN(Number(position))) && currentStep === 3) {
     buttonIsDisabled = true
   }
 
@@ -164,11 +164,11 @@ interface RetractSettingComponentProps {
   kind: FlowRateKind
   state: QuickTransferSummaryState
   setSpeed: (speed: number | null) => void
-  setPosition: (position: number | null) => void
+  setPosition: (position: string | null) => void
   delayDuration: number | null
   setDelayDuration: (delayDuration: number | null) => void
   speed: number | null
-  position: number | null
+  position: string | null
   currentStep: number
   positionReference?: PositionReference
 }
@@ -232,7 +232,8 @@ function RetractSettingComponent({
         }
   const positionError =
     position != null &&
-    (position < positionRange.min || position > positionRange.max)
+    (Number(position) < positionRange.min ||
+      Number(position) > positionRange.max)
       ? t(`value_out_of_range`, {
           min: positionRange.min,
           max: positionRange.max,
@@ -261,8 +262,7 @@ function RetractSettingComponent({
     if (userInput === '') {
       setPosition(null)
     } else {
-      const parsedValue = Number(userInput)
-      setPosition(!isNaN(parsedValue) ? parsedValue : null)
+      setPosition(userInput)
     }
   }
 
@@ -350,7 +350,7 @@ function RetractSettingComponent({
           marginTop={SPACING.spacing68}
         >
           <InputField
-            type="number"
+            type="text"
             value={position}
             error={positionError}
             title={positionText}

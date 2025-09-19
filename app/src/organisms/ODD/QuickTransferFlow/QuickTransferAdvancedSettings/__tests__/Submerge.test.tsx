@@ -67,7 +67,12 @@ describe('Submerge', () => {
   })
 
   it('renders text, buttons, input field, and keyboard for submerge before aspirating - position', () => {
-    render(props)
+    render({
+      ...props,
+      state: {
+        submergeAspirate: { positionReference: 'well-bottom', position: 0 },
+      } as any,
+    })
     fireEvent.click(screen.getByRole('button', { name: '1' }))
     fireEvent.click(screen.getByRole('button', { name: '1' }))
     fireEvent.click(screen.getByText('Continue'))
