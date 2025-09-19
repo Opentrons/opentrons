@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { Link, useLocation, useParams } from 'react-router-dom'
-import styled, { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -25,6 +24,8 @@ import { appShellRequestor } from '/app/redux/shell/remote'
 import { useRunCreatedAtTimestamp } from '/app/resources/runs'
 import { getProtocolDisplayName } from '/app/transformations/protocols'
 
+import styles from './breadcrumbs.module.css'
+
 import type { DesktopRouteParams } from '/app/App/types'
 import type { State } from '/app/redux/types'
 
@@ -38,11 +39,12 @@ function CrumbName({ crumbName, isLastCrumb }: CrumbNameProps): JSX.Element {
     <Flex
       alignItems={ALIGN_CENTER}
       color={isLastCrumb ? COLORS.grey50 : COLORS.blue50}
+      className={isLastCrumb ? styles.crumb_inactive : styles.crumb_active}
     >
       <Box
         paddingRight={SPACING.spacing4}
         textTransform={TYPOGRAPHY.textTransformNone}
-        css={TEXT_STYLE}
+        className={styles.text_style}
       >
         {crumbName}
       </Box>
@@ -52,24 +54,6 @@ function CrumbName({ crumbName, isLastCrumb }: CrumbNameProps): JSX.Element {
     </Flex>
   )
 }
-
-const TEXT_STYLE = css`
-  font-size: ${TYPOGRAPHY.fontSizeP};
-  font-weight: ${TYPOGRAPHY.fontWeightRegular};
-  line-height: ${TYPOGRAPHY.lineHeight16};
-`
-
-const CrumbLink = styled(Link)`
-  &:hover {
-    opacity: 0.8;
-  }
-`
-
-const CrumbLinkInactive = styled(Flex)`
-  &:hover {
-    opacity: 1;
-  }
-`
 
 function BreadcrumbsComponent(): JSX.Element | null {
   const { t } = useTranslation('top_navigation')
@@ -127,24 +111,26 @@ function BreadcrumbsComponent(): JSX.Element | null {
       alignItems={ALIGN_FLEX_START}
       backgroundColor={COLORS.white}
       borderBottom={BORDERS.lineBorder}
-      css={TEXT_STYLE}
       flexDirection={DIRECTION_ROW}
       padding={`${SPACING.spacing4} 0 ${SPACING.spacing4} ${SPACING.spacing8}`}
+      className={styles.text_style}
     >
       {pathCrumbs.map((crumb, i) => {
         const isLastCrumb = i === pathCrumbs.length - 1
 
         return (
           <Flex key={crumb.linkPath} paddingRight={SPACING.spacing4}>
-            <CrumbLink
-              as={!isLastCrumb ? CrumbLink : CrumbLinkInactive}
+            <Link
+              className={
+                isLastCrumb ? styles.crumb_link_inactive : styles.crumb_link
+              }
               to={crumb.linkPath}
             >
               <CrumbName
                 crumbName={crumb.crumbName}
                 isLastCrumb={isLastCrumb}
               />
-            </CrumbLink>
+            </Link>
           </Flex>
         )
       })}
