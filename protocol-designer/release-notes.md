@@ -8,6 +8,18 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 ---
 
+## Opentrons Protocol Designer Changes in 8.5.4
+
+**Welcome to Protocol Designer 8.5.4!**
+
+This hotfix release addresses several bugs.
+
+### Bug Fixes
+
+- Set a custom aspirate tip position for any dispense location.
+- Default pipette tip settings are transferred after deleting a pipette from your protcol and adding another.
+- Protocol Designer no longer crashes when encountering missing tip rack errors in imported protocols.
+
 ## Opentrons Protocol Designer Changes in 8.5.3
 
 **Welcome to Protocol Designer 8.5.3!**
