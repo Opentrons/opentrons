@@ -1,3 +1,4 @@
+import { stat } from 'fs'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -32,7 +33,7 @@ export function useDispenseSettingsConfig({
 }: UseDispenseSettingsConfigProps): SettingItem[] {
   const { t, i18n } = useTranslation(['quick_transfer', 'shared'])
   const { makeSnackbar } = useToaster()
-
+  console.log('state', state.blowOutDispense)
   const getBlowoutValueCopy = (): string | undefined => {
     if (state.blowOutDispense == null) {
       return t('option_disabled')
@@ -179,23 +180,19 @@ export function useDispenseSettingsConfig({
       option: 'dispense_blow_out',
       copy: t('blow_out'),
       value:
-        state.transferType === 'distribute' && hasLiquidClass
+        state.transferType === 'distribute'
           ? t('disabled')
           : i18n.format(getBlowoutValueCopy(), 'capitalize'),
       enabled: state.transferType !== 'distribute',
       onClick: () => {
-        if (state.transferType === 'distribute') {
-          makeSnackbar(t('dispense_setting_disabled') as string)
-        } else {
-          setSelectedSetting('dispense_blow_out')
-        }
+        setSelectedSetting('dispense_blow_out')
       },
     },
     {
       option: 'dispense_disposal_volume',
       copy: t('disposal_volume'),
       value:
-        state.disposalVolumeDispenseSettings != null
+        state.disposalVolumeDispenseSettings != null && isMultiTransfer
           ? t('disposal_volume_label', {
               volume: state.disposalVolumeDispenseSettings.volume,
               location:
@@ -208,11 +205,7 @@ export function useDispenseSettingsConfig({
           : t('option_disabled'),
       enabled: isMultiTransfer,
       onClick: () => {
-        if (isMultiTransfer) {
-          setSelectedSetting('dispense_disposal_volume')
-        } else {
-          makeSnackbar(t('dispense_setting_disabled') as string)
-        }
+        setSelectedSetting('dispense_disposal_volume')
       },
     },
     {
