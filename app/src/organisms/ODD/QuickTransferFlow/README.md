@@ -177,15 +177,15 @@ export interface QuickTransferSummaryState {
 
 Introduction of Python protocol generation starting in robot stack v8.7.0.
 
-The shape of the python file is as follows:
+The shape of the Python file is as follows:
 
 ```ts
-  imports
-  metadata
-  requirements
-  commands
+imports
+metadata
+requirements
+commands
 ```
 
-Note that the `designerApplicationData` is not included in the generating python, therefore, cloning/editing the generated protocol is currently not possible (which is never has been).
+Note that the `designerApplicationData` is not included in the generated Python, therefore, cloning/editing the generated protocol is currently not possible (which is never has been).
 
 You can still generate JSON behind a feature flag.
