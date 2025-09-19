@@ -106,6 +106,7 @@ async def run_hepa_fan(
     cycle: int = 1
     sleep_time: int = 0
     success: bool = False
+    log.info(f"Hepa Task: cycle {cycle}")
     while not event.is_set():
         try:
             if not run_forever and cycle > cycles:
@@ -115,7 +116,6 @@ async def run_hepa_fan(
             # on time
             if not fan_on or fan_on_time:
                 fan_on = True
-                log.info(f"Hepa Task: cycle {cycle}")
                 msg = "forever" if run_forever else f"for {fan_on_time} seconds"
                 log.info(f"Hepa Task: Turning on fan {msg}")
                 success = await api.set_hepa_fan_state(
@@ -140,6 +140,7 @@ async def run_hepa_fan(
             if not run_forever:
                 # record result
                 cycle += 1
+                log.info(f"Hepa Task: cycle {cycle}")
             else:
                 sleep_time += 1
 
@@ -188,6 +189,7 @@ async def run_hepa_uv(
     uv_light_on: bool = False
     cycle: int = 1
     success: bool = False
+    log.info(f"UV Task: cycle number={cycle}")
     while not event.is_set():
         try:
             if cycle > cycles:
@@ -197,7 +199,6 @@ async def run_hepa_uv(
             # on time
             if not uv_light_on or light_on_time:
                 uv_light_on = True
-                log.info(f"UV Task: cycle number={cycle}")
                 log.info(
                     f"UV Task: Turning on the UV Light for {light_on_time} seconds"
                 )
@@ -223,6 +224,7 @@ async def run_hepa_uv(
             # Sleep and increment the cycle
             await asyncio.sleep(light_off_time or 1)
             cycle += 1
+            log.info(f"UV Task: cycle number={cycle}")
         except asyncio.CancelledError:
             break
 
