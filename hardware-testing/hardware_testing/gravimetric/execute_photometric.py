@@ -1,6 +1,6 @@
 """Gravimetric."""
 from typing import Tuple, List, Dict
-from math import ceil
+from math import ceil,floor
 
 from opentrons.protocol_api import ProtocolContext, Well, Labware
 
@@ -124,9 +124,15 @@ def _load_labware(
 
 
 def _dispense_volumes(volume: float) -> Tuple[float, float, int]:
-    num_dispenses = ceil(volume / 250)
-    volume_to_dispense = volume / num_dispenses
-    target_volume = min(max(volume_to_dispense, 200), 250)
+    if volume <= 200:
+        num_dispenses = ceil(volume / 250)
+        volume_to_dispense = volume / num_dispenses
+        target_volume = min(max(volume_to_dispense, 200), 250)
+    else:
+        num_dispenses = floor(volume / 333.33)
+        volume_to_dispense = volume / num_dispenses
+        target_volume = min(max(volume_to_dispense, 200), 333.33)
+
     return target_volume, volume_to_dispense, num_dispenses
 
 
