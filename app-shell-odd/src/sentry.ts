@@ -16,6 +16,8 @@ let isSentryInitialized = false
 const log = createLogger('sentry')
 
 export const initializeSentry = (isAnalyticsEnabled: boolean): void => {
+  console.log('=>(sentry.ts:40) _OT_SENTRY_DSN_', _OT_SENTRY_DSN_)
+
   if (isSentryInitialized) {
     log.warn('Sentry is already initialized')
     return
