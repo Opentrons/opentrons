@@ -1244,7 +1244,10 @@ export const pipetteInvariantProperties: Reducer<
           acc: NormalizedPipetteById,
           [id, pipetteLoadInfo]: [string, PipetteLoadInfo]
         ) => {
-          const tiprackDefURI = metadata.pipetteTiprackAssignments[id]
+          const tiprackDefURI = metadata.pipetteTiprackAssignments[id] ?? []
+          // If the pipette doesn't exist in the metadata.pipetteTiprackAssignments,
+          // then the protocol file is malformed, but there's nothing we can do about
+          // that, so just assign an empty tiprackDefURI to the pipette in that case.
 
           return {
             ...acc,
