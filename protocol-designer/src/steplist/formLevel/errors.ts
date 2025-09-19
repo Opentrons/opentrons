@@ -762,7 +762,7 @@ export const volumeTooHigh = (
   fields: HydratedMixFormData
 ): FormError | null => {
   const { pipette, tipRack } = fields
-  if (!pipette) {
+  if (!pipette || !tipRack) {
     // pipette is null if user deletes pipette
     return null
   }
