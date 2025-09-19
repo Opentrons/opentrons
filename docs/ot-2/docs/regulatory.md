@@ -2,13 +2,24 @@
 title: "Opentrons OT-2: Safety and Regulatory Information"
 ---
 
-some text here
+## Intro section
 
-## Section
+## Warnings and caution section
 
-more text
+Include regulatory symbols with text.
 
-## Section2
+- Safety
+- Electrical
+- Biological
+- Toxic
+- Flammable
 
-even more text
+## Compliance standards
+
+Regulatory IDs and descriptions:
+
+- Electromagnetic
+- FCC
+- CISPR
+- Everything causes cancer in California warning
 
