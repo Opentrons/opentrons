@@ -150,6 +150,9 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     trashBinEntities,
     wasteChuteEntities,
   } = invariantContext
+  const isTouchTipDisabledOnSouce = labwareEntities[
+    sourceLabware
+  ]?.def.parameters.quirks?.includes('touchTipDisabled')
 
   const actionName = 'consolidate'
   const errors: CommandCreatorError[] = []
@@ -543,7 +546,9 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       const getTouchTipAfterDispenseRetractCommands = (
         considerUltimateSubtransfer: boolean
       ): CurriedCommandCreator[] =>
-        destWell != null && touchTipAfterDispense
+        // touch tip at source well with source touch tip parameters
+        // only if source is touchTip-able
+        destWell != null && touchTipAfterDispense && !isTouchTipDisabledOnSouce
           ? [
               curryWithoutPython(touchTip, {
                 pipetteId: pipette,

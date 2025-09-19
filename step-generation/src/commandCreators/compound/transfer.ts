@@ -170,7 +170,7 @@ export const transfer: CommandCreator<TransferArgs> = (
     args.destLabware
   )
 
-  const isTouchTipDisabled = labwareEntities[
+  const isTouchTipDisabledOnSouce = labwareEntities[
     sourceLabware
   ]?.def.parameters.quirks?.includes('touchTipDisabled')
 
@@ -1085,7 +1085,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                 blowoutInPlaceCommand,
                 // touch tip at source well with source touch tip parameters
                 // only if source is touchTip-able
-                ...(touchTipAfterDispense && !isTouchTipDisabled
+                ...(touchTipAfterDispense && !isTouchTipDisabledOnSouce
                   ? [
                       curryWithoutPython(touchTip, {
                         pipetteId: pipette,

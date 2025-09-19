@@ -158,7 +158,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
   const actionName = 'distribute'
   const errors: CommandCreatorError[] = []
   const isMultiChannelPipette = pipetteEntities[pipette]?.spec.channels !== 1
-  const isTouchTipDisabled = labwareEntities[
+  const isTouchTipDisabledOnSouce = labwareEntities[
     sourceLabware
   ]?.def.parameters.quirks?.includes('touchTipDisabled')
   const aspirateAirGapVolume = args.aspirateAirGapVolume ?? 0
@@ -1107,7 +1107,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
               ...blowoutInPlaceCommand,
               // touch tip at source well with source touch tip parameters
               // only if source is touchTip-able
-              ...(touchTipAfterDispense && !isTouchTipDisabled
+              ...(touchTipAfterDispense && !isTouchTipDisabledOnSouce
                 ? [
                     curryWithoutPython(touchTip, {
                       pipetteId: pipette,
