@@ -83,9 +83,7 @@ export function OverlayModal(props: OverlayModalProps): JSX.Element {
           </SecondaryButton>
           <PrimaryButton
             backgroundColor={COLORS.red50}
-            onClick={() => {
-              onPrimaryButtonClick()
-            }}
+            onClick={onPrimaryButtonClick()}
           >
             {primaryButtonText ?? 'continue'}
           </PrimaryButton>
