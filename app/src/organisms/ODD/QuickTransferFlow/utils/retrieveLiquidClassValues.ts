@@ -19,6 +19,7 @@ import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
 
+import { calculateAdjustWells } from './calculateAdjustWells'
 import { getFlowRateFields } from './getFlowRaiteFields'
 import { getMatchingTipLiquidSpecsFromSpec } from './getMatchingTipLiquidSpecsFromSpec'
 import { getMaxUiFlowRate } from './getMaxUiFlowRate'
@@ -125,56 +126,26 @@ const getNoLiquidClassValues = (
     disposalByVolume,
   })
 
-  const tipCapacity = tipRack?.wells?.A1?.totalLiquidVolume
   const actualConditioningVolume =
     linearInterpolate(
       volume,
       conditioningByVolume as Array<[number, number]>
     ) ?? 0
-  const actualDisposalVolume = linearInterpolate(volume, disposalByVolume) ?? 0
   const aspirateAirGapVolume = aspirate?.retract.airGapByVolume[0][1] ?? 0
 
-  // Calculate extra volumes based on path (same logic as getLiquidClassValues)
-  let extraVolumes = 0
-  let minRequiredVolume = volume
-
-  if (path === 'multiDispense') {
-    // For distribute: minimum 2x volume + disposal volume + air gap (if not disabled)
-    minRequiredVolume = volume * 2
-    const isDisposalVolumeEnabled = actualDisposalVolume > 0
-    const isConditioningVolumeEnabled = actualConditioningVolume > 0
-    const airGapVolume =
-      isDisposalVolumeEnabled || isConditioningVolumeEnabled
-        ? 0
-        : aspirateAirGapVolume
-    extraVolumes = actualDisposalVolume + airGapVolume
-  } else if (path === 'multiAspirate') {
-    minRequiredVolume = volume * 2
-    extraVolumes = aspirateAirGapVolume
-  }
-
-  const maxWellsPerTip =
-    path === 'single' ? 1 : Math.floor((tipCapacity - extraVolumes) / volume)
-
-  // Ensure we don't exceed minimum volume requirement to align with protocol-designer
-  const maxWellsWithMinVolume =
-    path === 'single'
-      ? 1
-      : Math.floor((tipCapacity - extraVolumes) / minRequiredVolume) * 2
-
-  const finalMaxWells = Math.min(maxWellsPerTip, maxWellsWithMinVolume)
-
-  // update wells value
-  const adjustedDestinationWells =
-    path === 'multiDispense' && finalMaxWells > 0
-      ? state.destinationWells.slice(0, finalMaxWells)
-      : state.destinationWells
-
-  const adjustedSourceWells =
-    path === 'multiAspirate' && finalMaxWells > 0
-      ? state.sourceWells.slice(0, finalMaxWells)
-      : state.sourceWells
-
+  // Calculate extra volumes based on path
+  const {
+    adjustedSourceWells,
+    adjustedDestinationWells,
+  } = calculateAdjustWells({
+    state,
+    tipRack,
+    volume,
+    path,
+    conditioningByVolume,
+    disposalByVolume,
+    aspirateAirGapVolume,
+  })
   const { correction } = byVolumeLookup
 
   const aspirateCorrectionVolume = linearInterpolate(
@@ -390,51 +361,20 @@ const getLiquidClassValues = (
     disposalByVolume,
   })
 
-  const tipCapacity = tipRack?.wells?.A1?.totalLiquidVolume
-  const actualConditioningVolume =
-    linearInterpolate(
-      volume,
-      conditioningByVolume as Array<[number, number]>
-    ) ?? 0
-  const actualDisposalVolume = linearInterpolate(volume, disposalByVolume) ?? 0
   const aspirateAirGapVolume = aspirate?.retract.airGapByVolume[0][1] ?? 0
 
-  let extraVolumes = 0
-  let minRequiredVolume = volume
-
-  if (path === 'multiDispense') {
-    minRequiredVolume = volume * 2
-    const isDisposalVolumeEnabled = actualDisposalVolume > 0
-    const isConditioningVolumeEnabled = actualConditioningVolume > 0
-    const airGapVolume =
-      isDisposalVolumeEnabled || isConditioningVolumeEnabled
-        ? 0
-        : aspirateAirGapVolume
-    extraVolumes = actualDisposalVolume + airGapVolume
-  } else if (path === 'multiAspirate') {
-    minRequiredVolume = volume * 2
-    extraVolumes = aspirateAirGapVolume
-  }
-
-  const maxWellsPerTip =
-    path === 'single' ? 1 : Math.floor((tipCapacity - extraVolumes) / volume)
-
-  const maxWellsWithMinVolume =
-    path === 'single'
-      ? 1
-      : Math.floor((tipCapacity - extraVolumes) / minRequiredVolume) * 2
-
-  const finalMaxWells = Math.min(maxWellsPerTip, maxWellsWithMinVolume)
-
-  const adjustedDestinationWells =
-    path === 'multiDispense' && finalMaxWells > 0
-      ? destinationWells.slice(0, finalMaxWells)
-      : destinationWells
-
-  const adjustedSourceWells =
-    path === 'multiAspirate' && finalMaxWells > 0
-      ? state.sourceWells.slice(0, finalMaxWells)
-      : state.sourceWells
+  const {
+    adjustedSourceWells,
+    adjustedDestinationWells,
+  } = calculateAdjustWells({
+    state,
+    tipRack,
+    volume,
+    path,
+    conditioningByVolume,
+    disposalByVolume,
+    aspirateAirGapVolume,
+  })
 
   const matchingTipLiquidSpecs = getMatchingTipLiquidSpecsFromSpec(
     pipetteSpecs,
