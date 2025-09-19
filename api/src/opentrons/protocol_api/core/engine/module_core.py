@@ -325,9 +325,9 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
         ramp_rate: Optional[float],
         hold_time_seconds: Optional[float] = None,
         block_max_volume: Optional[float] = None,
-    ) -> None:
+    ) -> EngineTaskCore:
         """Set the target temperature for the well block, in °C."""
-        self._engine_client.execute_command(
+        result = self._engine_client.execute_command_without_recovery(
             cmd.thermocycler.SetTargetBlockTemperatureParams(
                 moduleId=self.module_id,
                 celsius=celsius,
@@ -336,6 +336,10 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
                 ramp_rate=ramp_rate,
             )
         )
+        block_temperature_task = EngineTaskCore(
+            engine_client=self._engine_client, task_id=result.taskId
+        )
+        return block_temperature_task
 
     def wait_for_block_temperature(self) -> None:
         """Wait for target block temperature to be reached."""
@@ -343,13 +347,17 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
             cmd.thermocycler.WaitForBlockTemperatureParams(moduleId=self.module_id)
         )
 
-    def set_target_lid_temperature(self, celsius: float) -> None:
+    def set_target_lid_temperature(self, celsius: float) -> EngineTaskCore:
         """Set the target temperature for the heated lid, in °C."""
-        self._engine_client.execute_command(
+        result = self._engine_client.execute_command_without_recovery(
             cmd.thermocycler.SetTargetLidTemperatureParams(
                 moduleId=self.module_id, celsius=celsius
             )
         )
+        lid_temperature_task = EngineTaskCore(
+            engine_client=self._engine_client, task_id=result.taskId
+        )
+        return lid_temperature_task
 
     def wait_for_lid_temperature(self) -> None:
         """Wait for target lid temperature to be reached."""
@@ -552,13 +560,17 @@ class HeaterShakerModuleCore(ModuleCore, AbstractHeaterShakerCore[LabwareCore]):
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.HeaterShaker]
 
-    def set_target_temperature(self, celsius: float) -> None:
+    def set_target_temperature(self, celsius: float) -> EngineTaskCore:
         """Set the labware plate's target temperature in °C."""
-        self._engine_client.execute_command(
+        result = self._engine_client.execute_command_without_recovery(
             cmd.heater_shaker.SetTargetTemperatureParams(
                 moduleId=self.module_id, celsius=celsius
             )
         )
+        temperature_task = EngineTaskCore(
+            engine_client=self._engine_client, task_id=result.taskId
+        )
+        return temperature_task
 
     def wait_for_target_temperature(self) -> None:
         """Wait for the labware plate's target temperature to be reached."""

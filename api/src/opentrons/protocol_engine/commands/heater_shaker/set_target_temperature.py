@@ -1,19 +1,24 @@
 """Command models to start heating a Heater-Shaker Module."""
 from __future__ import annotations
-from typing import Optional, TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING, Any
 from typing_extensions import Literal, Type
 
 from pydantic import BaseModel, Field
+from pydantic.json_schema import SkipJsonSchema
 
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ...errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state.state import StateView
-    from opentrons.protocol_engine.execution import EquipmentHandler
+    from opentrons.protocol_engine.execution import EquipmentHandler, TaskHandler
 
 
 SetTargetTemperatureCommandType = Literal["heaterShaker/setTargetTemperature"]
+
+
+def _remove_default(s: dict[str, Any]) -> None:
+    s.pop("default", None)
 
 
 class SetTargetTemperatureParams(BaseModel):
@@ -21,10 +26,21 @@ class SetTargetTemperatureParams(BaseModel):
 
     moduleId: str = Field(..., description="Unique ID of the Heater-Shaker Module.")
     celsius: float = Field(..., description="Target temperature in °C.")
+    taskId: str | SkipJsonSchema[None] = Field(
+        None,
+        description="Id for the background task that manages the temperature",
+        json_schema_extra=_remove_default,
+    )
 
 
 class SetTargetTemperatureResult(BaseModel):
     """Result data from setting a Heater-Shaker's target temperature."""
+
+    taskId: str | SkipJsonSchema[None] = Field(
+        None,
+        description="The task id for the setTargetTemperature task",
+        json_schema_extra=_remove_default,
+    )
 
 
 class SetTargetTemperatureImpl(
@@ -38,10 +54,12 @@ class SetTargetTemperatureImpl(
         self,
         state_view: StateView,
         equipment: EquipmentHandler,
+        task_handler: TaskHandler,
         **unused_dependencies: object,
     ) -> None:
         self._state_view = state_view
         self._equipment = equipment
+        self._task_handler = task_handler
 
     async def execute(
         self,
@@ -61,11 +79,19 @@ class SetTargetTemperatureImpl(
             hs_module_substate.module_id
         )
 
-        if hs_hardware_module is not None:
-            await hs_hardware_module.start_set_temperature(validated_temp)
+        async def start_set_temperature(task_handler: TaskHandler) -> None:
+            if hs_hardware_module is not None:
+                async with task_handler.synchronize_cancel_previous(
+                    hs_module_substate.module_id
+                ):
+                    await hs_hardware_module.start_set_temperature(validated_temp)
+                    await hs_hardware_module.await_temperature(validated_temp)
 
+        task = await self._task_handler.create_task(
+            task_function=start_set_temperature, id=params.taskId
+        )
         return SuccessData(
-            public=SetTargetTemperatureResult(),
+            public=SetTargetTemperatureResult(taskId=task.id),
         )
 
 
