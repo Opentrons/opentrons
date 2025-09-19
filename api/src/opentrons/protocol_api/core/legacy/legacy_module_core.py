@@ -449,6 +449,10 @@ class LegacyHeaterShakerCore(
                 "Cannot start shaking unless labware latch is closed."
             )
 
+    def set_shake_speed(self, rpm: int) -> LegacyTaskCore:
+        """Set heatershaker speed."""
+        assert False, "set_shake_speed only supported on engine core."
+
     def open_labware_latch(self) -> None:
         """Open the labware latch."""
         if self.get_speed_status() != SpeedStatus.IDLE:

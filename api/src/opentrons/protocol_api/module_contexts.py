@@ -1060,6 +1060,21 @@ class HeaterShakerContext(ModuleContext):
         validated_speed = validate_heater_shaker_speed(rpm=rpm)
         self._core.set_and_wait_for_shake_speed(rpm=validated_speed)
 
+    @requires_version(2, 27)
+    @publish(command=cmds.heater_shaker_set_shake_speed)
+    def set_shake_speed(self, rpm: int) -> Task:
+        """Set a shake speed in rpm to run in the background.
+
+        .. note::
+
+            Before shaking, this command will retract the pipettes upward if they are parked adjacent to the Heater-Shaker.
+
+        :param rpm: A value between 200 and 3000, representing the target shake speed in revolutions per minute.
+        """
+        validated_speed = validate_heater_shaker_speed(rpm=rpm)
+        task = self._core.set_shake_speed(rpm=validated_speed)
+        return Task(api_version=self._api_version, core=task)
+
     @requires_version(2, 13)
     @publish(command=cmds.heater_shaker_open_labware_latch)
     def open_labware_latch(self) -> None:
