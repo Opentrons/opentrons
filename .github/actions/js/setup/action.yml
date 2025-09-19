@@ -99,16 +99,12 @@ runs:
             env_var=$(echo "${package^^}_CACHE" | sed 's/-/_/g')
             
             # Try package-mirror first
-            mirror_url="https://github.com/Opentrons/package-mirror/releases/download/${package}-${version}/${package}-${version}-${PLATFORM}-${ARCH}.zip"
-            
-            echo "🔍 Checking: $mirror_url"
-            echo "🔧 Platform: $PLATFORM, Arch: $ARCH"
-            echo "🔧 Package: $package, Version: $version"
-            
-            # Test the curl command step by step
-            echo "🔧 Testing curl command..."
-            curl_result=$(curl -s --head "$mirror_url" 2>&1)
-            echo "🔧 Curl result: $curl_result"
+            # Handle different naming conventions (electron uses 'v' prefix)
+            if [[ "$package" == "electron" ]]; then
+              mirror_url="https://github.com/Opentrons/package-mirror/releases/download/${package}-${version}/${package}-v${version}-${PLATFORM}-${ARCH}.zip"
+            else
+              mirror_url="https://github.com/Opentrons/package-mirror/releases/download/${package}-${version}/${package}-${version}-${PLATFORM}-${ARCH}.zip"
+            fi
             
             if curl -s --head "$mirror_url" | head -n 1 | grep -qE "(200 OK|302)"; then
               export $env_var="$mirror_url"
