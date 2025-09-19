@@ -12,7 +12,7 @@ interface WithVersion<LiquidClass> {
 }
 
 const liquidClassModules: Record<string, LiquidClass> = import.meta.glob(
-  '../liquid-class/definitions/1/*/*/*.json',
+  '../liquid-class/definitions/1/*/*.json',
   {
     eager: true,
   }
@@ -31,15 +31,14 @@ const parsePath = (
   return { name: name as LiquidName, version: Number(versionStr), path }
 }
 
-// dictionary of latest versions only
-const latestLiquidClasssDefinitions: Record<
-  string,
-  WithVersion<LiquidClass>
-> = {}
-
-const liquidClassNameConsts: Record<string, string> = { none: 'none' }
-
+// TODO: make none liquid class definition file
 export const getAllLiquidClassDefs = (): Record<string, LiquidClass> => {
+  // dictionary of latest versions only
+  const latestLiquidClasssDefinitions: Record<
+    string,
+    WithVersion<LiquidClass>
+  > = {}
+
   Object.entries(liquidClassModules).forEach(([path, def]) => {
     const info = parsePath(path)
     if (!info) return
@@ -47,11 +46,10 @@ export const getAllLiquidClassDefs = (): Record<string, LiquidClass> => {
 
     const existing = latestLiquidClasssDefinitions[name]
     if (!existing || version > existing.version) {
-      latestLiquidClasssDefinitions[name] = { def, version }
-      liquidClassNameConsts[name] = `${name}V${version}`
+      const nameWithVersion = `${name}V${version}`
+      latestLiquidClasssDefinitions[nameWithVersion] = { def, version }
     }
   })
-
   return Object.fromEntries(
     Object.entries(latestLiquidClasssDefinitions).map(([name, { def }]) => [
       name,
@@ -60,8 +58,9 @@ export const getAllLiquidClassDefs = (): Record<string, LiquidClass> => {
   )
 }
 
-// auto-generated name constant values
-export const LIQUID_CLASS_NAMES_LATEST_VERSION = liquidClassNameConsts as Record<
-  LiquidName,
-  string
->
+export const LIQUID_CLASS_NAMES_LATEST_VERSION: Record<LiquidName, string> = {
+  water: 'waterV2',
+  ethanol_80: 'ethanol80V2',
+  glycerol_50: 'glycerol50V2',
+  none: 'none',
+}
