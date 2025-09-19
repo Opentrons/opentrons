@@ -301,7 +301,7 @@ describe('renders the InlineNotification', () => {
         heading:
           'Shuttle empty errors occur when the robot tries to store labware into a stacker from an empty shuttle',
         message:
-          'shuttle with the correct labware to complete the stacker store step.',
+          'Load the shuttle with the correct labware to complete the stacker store step',
       }),
       {}
     )
