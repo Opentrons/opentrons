@@ -60,7 +60,7 @@ export function SummaryAndSettings(
   const host = useHost()
   const { t } = useTranslation(['quick_transfer', 'shared'])
   const [showSaveOrRunModal, setShowSaveOrRunModal] = useState<boolean>(false)
-  const enableExportPython = useFeatureFlag('quickTransferExportPython')
+  const enableExportJSON = useFeatureFlag('quickTransferExportJSON')
   const enableProtocolContentsLog = useFeatureFlag(
     'quickTransferProtocolContentsLog'
   )
@@ -108,8 +108,7 @@ export function SummaryAndSettings(
     }
   })
 
-  const isMultiTransferAspirate = state?.path === 'multiDispense'
-  const isMultiTransferDispense = state?.path === 'multiAspirate'
+  const isMultiTransferDispense = state?.path === 'multiDispense'
 
   const handleClickCreateTransfer = (): void => {
     setShowSaveOrRunModal(true)
@@ -123,9 +122,14 @@ export function SummaryAndSettings(
   }
 
   const handleClickSave = (protocolName: string): void => {
-    const protocolFile = enableExportPython
-      ? createQuickTransferPythonFile(state, deckConfig, protocolName)
-      : createQuickTransferFile(
+    const protocolFile = enableExportJSON
+      ? createQuickTransferFile(
+          state,
+          deckConfig,
+          protocolName,
+          enableProtocolContentsLog
+        )
+      : createQuickTransferPythonFile(
           state,
           deckConfig,
           protocolName,
@@ -147,9 +151,14 @@ export function SummaryAndSettings(
   }
 
   const handleClickRun = (): void => {
-    const protocolFile = enableExportPython
-      ? createQuickTransferPythonFile(state, deckConfig)
-      : createQuickTransferFile(
+    const protocolFile = enableExportJSON
+      ? createQuickTransferFile(
+          state,
+          deckConfig,
+          undefined,
+          enableProtocolContentsLog
+        )
+      : createQuickTransferPythonFile(
           state,
           deckConfig,
           undefined,
@@ -209,7 +218,7 @@ export function SummaryAndSettings(
             <Aspirate
               state={state}
               dispatch={dispatch}
-              isMultiTransfer={isMultiTransferAspirate}
+              isMultiTransfer={isMultiTransferDispense}
             />
           ) : null}
           {selectedCategory === 'dispense' ? (

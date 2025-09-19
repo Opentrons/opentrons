@@ -111,7 +111,7 @@ export function Overview(props: OverviewProps): JSX.Element | null {
         <ListItem type="default" key={displayItem.option} onClick={onClick}>
           <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
             <StyledText
-              oddStyle="level4HeaderRegular"
+              oddStyle="level4HeaderSemiBold"
               width="20rem"
               whiteSpace={NO_WRAP}
             >

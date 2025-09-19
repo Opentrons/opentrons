@@ -131,7 +131,7 @@ describe('TipPosition', () => {
     expect(vi.mocked(InputField)).toHaveBeenCalledWith(
       {
         title: 'Distance from bottom of well (mm)',
-        error: 'Value must be between 1 to 100',
+        error: 'Value must be between 1 to 52',
         readOnly: true,
         type: 'text',
         value: 0,
@@ -154,7 +154,7 @@ describe('TipPosition', () => {
     expect(vi.mocked(InputField)).toHaveBeenCalledWith(
       {
         title: 'Distance from bottom of well (mm)',
-        error: 'Value must be between 1 to 400',
+        error: 'Value must be between 1 to 202',
         readOnly: true,
         type: 'text',
         value: 0,
