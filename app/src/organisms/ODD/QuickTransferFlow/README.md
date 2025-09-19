@@ -175,6 +175,6 @@ export interface QuickTransferSummaryState {
 
 ## Version 2.0.0
 
-Introduction of python protocol generation starting in robot stack v8.7.0.
+Introduction of Python protocol generation starting in robot stack v8.7.0.
 
-You can still export JSON behind a feature flag.
+You can still generate JSON behind a feature flag.
