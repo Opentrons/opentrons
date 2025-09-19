@@ -110,19 +110,88 @@ const getNoLiquidClassValues = (
   >
   const numAspirateWells = state.sourceWells.length
   const numDispenseWells = state.destinationWells.length
-  const byVolumeLookup = getTransferPlanAndReferenceVolumes({
+
+  const {
+    referenceVolumes: byVolumeLookup,
+  } = getTransferPlanAndReferenceVolumes({
     pipetteSpecs: pipette,
     tiprackDefinition: tipRack,
-    numAspirateWells: numAspirateWells,
-    volume: volume,
-    path: path,
-    numDispenseWells: numDispenseWells,
-    aspirateAirGapByVolume: aspirateAirGapByVolume,
-    conditioningByVolume: conditioningByVolume,
-    disposalByVolume: disposalByVolume,
-  }).referenceVolumes
+    numAspirateWells,
+    volume,
+    path,
+    numDispenseWells,
+    aspirateAirGapByVolume,
+    conditioningByVolume,
+    disposalByVolume,
+  })
 
-  const { conditioning, correction } = byVolumeLookup
+  const tipCapacity = tipRack?.wells?.A1?.totalLiquidVolume
+  const actualConditioningVolume =
+    linearInterpolate(
+      volume,
+      conditioningByVolume as Array<[number, number]>
+    ) ?? 0
+  const actualDisposalVolume = linearInterpolate(volume, disposalByVolume) ?? 0
+  const aspirateAirGapVolume = aspirate?.retract.airGapByVolume[0][1] ?? 0
+
+  // Calculate extra volumes based on path (same logic as getLiquidClassValues)
+  let extraVolumes = 0
+  let minRequiredVolume = volume
+
+  if (path === 'multiDispense') {
+    // For distribute: minimum 2x volume + disposal volume + air gap (if not disabled)
+    minRequiredVolume = volume * 2 // Protocol-designer and step-generation requirement
+    const isDisposalVolumeEnabled = actualDisposalVolume > 0
+    const isConditioningVolumeEnabled = actualConditioningVolume > 0
+    const airGapVolume =
+      isDisposalVolumeEnabled || isConditioningVolumeEnabled
+        ? 0
+        : aspirateAirGapVolume
+    extraVolumes = actualDisposalVolume + airGapVolume
+  } else if (path === 'multiAspirate') {
+    // For consolidate: minimum 2x volume + air gap between aspirations
+    minRequiredVolume = volume * 2 // Same requirement for multiAspirate
+    extraVolumes = aspirateAirGapVolume
+  }
+
+  const maxWellsPerTip =
+    path === 'single' ? 1 : Math.floor((tipCapacity - extraVolumes) / volume)
+
+  // Ensure we don't exceed minimum volume requirement
+  const maxWellsWithMinVolume =
+    path === 'single'
+      ? 1
+      : Math.floor((tipCapacity - extraVolumes) / minRequiredVolume) * 2 // *2 because minRequiredVolume is 2x volume
+
+  const finalMaxWells = Math.min(maxWellsPerTip, maxWellsWithMinVolume)
+
+  console.log('Volume calculation debug (no liquid class):', {
+    tipCapacity,
+    volume,
+    minRequiredVolume,
+    actualConditioningVolume,
+    actualDisposalVolume,
+    aspirateAirGapVolume,
+    extraVolumes,
+    maxWellsPerTip,
+    maxWellsWithMinVolume,
+    finalMaxWells,
+    path,
+  })
+
+  // Limit destination wells to finalMaxWells for multiDispense path
+  const adjustedDestinationWells =
+    path === 'multiDispense' && finalMaxWells > 0
+      ? state.destinationWells.slice(0, finalMaxWells)
+      : state.destinationWells
+
+  // Limit source wells to finalMaxWells for multiAspirate path
+  const adjustedSourceWells =
+    path === 'multiAspirate' && finalMaxWells > 0
+      ? state.sourceWells.slice(0, finalMaxWells)
+      : state.sourceWells
+
+  const { correction } = byVolumeLookup
 
   const aspirateCorrectionVolume = linearInterpolate(
     correction.aspirate,
@@ -197,7 +266,7 @@ const getNoLiquidClassValues = (
       ? undefined
       : aspirate.retract.touchTip.params?.zOffset,
     touchTipAspirateSpeed: aspirate.retract.touchTip.params?.speed,
-    conditionAspirate: conditioning ?? 0,
+    conditionAspirate: actualConditioningVolume ?? 0,
   }
 
   const dispenseState = {
@@ -240,6 +309,8 @@ const getNoLiquidClassValues = (
   if (liquidHandlingAction === 'all') {
     return {
       ...state,
+      sourceWells: adjustedSourceWells,
+      destinationWells: adjustedDestinationWells,
       ...aspirateState,
       ...dispenseState,
     }
@@ -247,11 +318,15 @@ const getNoLiquidClassValues = (
   if (liquidHandlingAction === 'aspirate') {
     return {
       ...state,
+      sourceWells: adjustedSourceWells,
+      destinationWells: adjustedDestinationWells,
       ...aspirateState,
     }
   } else {
     return {
       ...state,
+      sourceWells: adjustedSourceWells,
+      destinationWells: adjustedDestinationWells,
       ...dispenseState,
     }
   }
@@ -305,9 +380,11 @@ const getLiquidClassValues = (
     conditioningByVolume: rawConditioningByVolume = [],
     disposalByVolume: rawDisposalByVolume = [],
   } = multiDispense ?? {}
+
   const conditioningByVolume = rawConditioningByVolume as Array<
     [number, number]
   >
+
   const disposalByVolume = rawDisposalByVolume as Array<[number, number]>
   const aspirateAirGapByVolume = aspirate?.retract.airGapByVolume as Array<
     [number, number]
@@ -315,17 +392,82 @@ const getLiquidClassValues = (
   const numAspirateWells = state.sourceWells.length
   const numDispenseWells = destinationWells.length
 
-  const byVolumeLookup = getTransferPlanAndReferenceVolumes({
+  const {
+    referenceVolumes: byVolumeLookup,
+  } = getTransferPlanAndReferenceVolumes({
     pipetteSpecs,
     tiprackDefinition: tipRack,
-    numAspirateWells: numAspirateWells,
-    volume: volume,
-    path: path,
-    numDispenseWells: numDispenseWells,
-    aspirateAirGapByVolume: aspirateAirGapByVolume,
-    conditioningByVolume: conditioningByVolume,
-    disposalByVolume: disposalByVolume,
-  }).referenceVolumes
+    numAspirateWells,
+    volume,
+    path,
+    numDispenseWells,
+    aspirateAirGapByVolume,
+    conditioningByVolume,
+    disposalByVolume,
+  })
+
+  const tipCapacity = tipRack?.wells?.A1?.totalLiquidVolume
+  const actualConditioningVolume =
+    linearInterpolate(
+      volume,
+      conditioningByVolume as Array<[number, number]>
+    ) ?? 0
+  const actualDisposalVolume = linearInterpolate(volume, disposalByVolume) ?? 0
+  const aspirateAirGapVolume = aspirate?.retract.airGapByVolume[0][1] ?? 0
+
+  let extraVolumes = 0
+  let minRequiredVolume = volume
+
+  if (path === 'multiDispense') {
+    // For distribute: minimum 2x volume + disposal volume + air gap (if not disabled)
+    minRequiredVolume = volume * 2
+    const isDisposalVolumeEnabled = actualDisposalVolume > 0
+    const isConditioningVolumeEnabled = actualConditioningVolume > 0
+    const airGapVolume =
+      isDisposalVolumeEnabled || isConditioningVolumeEnabled
+        ? 0
+        : aspirateAirGapVolume
+    extraVolumes = actualDisposalVolume + airGapVolume
+  } else if (path === 'multiAspirate') {
+    // For consolidate: minimum 2x volume + air gap between aspirations
+    minRequiredVolume = volume * 2 // Same requirement for multiAspirate
+    extraVolumes = aspirateAirGapVolume
+  }
+
+  const maxWellsPerTip =
+    path === 'single' ? 1 : Math.floor((tipCapacity - extraVolumes) / volume)
+
+  const maxWellsWithMinVolume =
+    path === 'single'
+      ? 1
+      : Math.floor((tipCapacity - extraVolumes) / minRequiredVolume) * 2
+
+  const finalMaxWells = Math.min(maxWellsPerTip, maxWellsWithMinVolume)
+
+  console.log('Volume calculation debug:', {
+    tipCapacity,
+    volume,
+    minRequiredVolume,
+    actualConditioningVolume,
+    actualDisposalVolume,
+    aspirateAirGapVolume,
+    extraVolumes,
+    maxWellsPerTip,
+    maxWellsWithMinVolume,
+    finalMaxWells,
+    path,
+  })
+
+  const adjustedDestinationWells =
+    path === 'multiDispense' && finalMaxWells > 0
+      ? destinationWells.slice(0, finalMaxWells)
+      : destinationWells
+
+  const adjustedSourceWells =
+    path === 'multiAspirate' && finalMaxWells > 0
+      ? state.sourceWells.slice(0, finalMaxWells)
+      : state.sourceWells
+
   const matchingTipLiquidSpecs = getMatchingTipLiquidSpecsFromSpec(
     pipetteSpecs,
     volume,
@@ -376,7 +518,14 @@ const getLiquidClassValues = (
     dispenseMaxUiFlowRate
   )
 
-  const { conditioning, disposal } = byVolumeLookup
+  const conditioningVolume =
+    linearInterpolate(
+      volume,
+      conditioningByVolume as Array<[number, number]>
+    ) ?? 0
+
+  const disposalVolume =
+    linearInterpolate(volume, disposalByVolume as Array<[number, number]>) ?? 0
 
   const aspirateState = {
     aspirateFlowRate: aspirateFlowRateFields.aspirate_flowRate ?? 0,
@@ -418,7 +567,7 @@ const getLiquidClassValues = (
         ? undefined
         : aspirate?.retract.touchTip.params?.speed,
     airGapAspirate: aspirate?.retract.airGapByVolume[0][1] ?? 0,
-    conditionAspirate: conditioning ?? 0,
+    conditionAspirate: conditioningVolume ?? 0,
   }
 
   const dispenseState = {
@@ -478,20 +627,22 @@ const getLiquidClassValues = (
         : dispense?.retract.touchTip.params?.speed,
     airGapDispense: dispense?.retract.airGapByVolume[0][1] ?? 0,
     disposalVolumeDispenseSettings: {
-      volume: disposal ?? 0,
+      volume: disposalVolume,
       blowOutLocation:
         convertBlowoutLocation(
           dispense?.retract.blowout?.params?.location,
           state
         ) ?? state.dropTipLocation,
 
-      flowRate: dispense?.retract.blowout?.params?.flowRate ?? 0,
+      flowRate: dispenseFlowRateFields.dispense_flowRate ?? 0,
     },
   }
 
   if (liquidHandlingAction === 'all') {
     return {
       ...state,
+      sourceWells: adjustedSourceWells,
+      destinationWells: adjustedDestinationWells,
       ...aspirateState,
       ...dispenseState,
     }
@@ -499,11 +650,15 @@ const getLiquidClassValues = (
   if (liquidHandlingAction === 'aspirate') {
     return {
       ...state,
+      sourceWells: adjustedSourceWells,
+      destinationWells: adjustedDestinationWells,
       ...aspirateState,
     }
   } else {
     return {
       ...state,
+      sourceWells: adjustedSourceWells,
+      destinationWells: adjustedDestinationWells,
       ...dispenseState,
     }
   }
