@@ -30,6 +30,7 @@ import {
 import { OpenDoorAlertModal } from '/app/organisms/ODD/OpenDoorAlertModal'
 import {
   CurrentRunningProtocolCommand,
+  ImageGalleryList,
   RunningProtocolCommandList,
   RunningProtocolSkeleton,
 } from '/app/organisms/ODD/RunningProtocol'
@@ -41,6 +42,7 @@ import {
 } from '/app/redux-resources/analytics'
 import { useRobotType } from '/app/redux-resources/robots'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
+import { useFeatureFlag } from '/app/redux/config'
 import { getLocalRobot } from '/app/redux/discovery'
 import {
   useLastRunCommand,
@@ -64,10 +66,12 @@ const LIVE_RUN_COMMANDS_POLL_MS = 3000
 export type ScreenOption =
   | 'CurrentRunningProtocolCommand'
   | 'RunningProtocolCommandList'
+  | 'ImageGallery'
 
 const SCREEN_ORDER: ScreenOption[] = [
   'CurrentRunningProtocolCommand',
   'RunningProtocolCommandList',
+  'ImageGallery',
 ]
 
 export function RunningProtocol(): JSX.Element {
@@ -111,6 +115,7 @@ export function RunningProtocol(): JSX.Element {
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
   const robotType = useRobotType(robotName)
+  const isCameraEnabled = useFeatureFlag('camera')
   const { isERActive, failedCommand, runLwDefsByUri } = useErrorRecoveryFlows(
     runId,
     runStatus
@@ -134,10 +139,13 @@ export function RunningProtocol(): JSX.Element {
     }
 
     const currentIndex = SCREEN_ORDER.indexOf(currentOption)
+    const maxIndex = isCameraEnabled
+      ? SCREEN_ORDER.length - 1
+      : SCREEN_ORDER.length - 2
     let newIndex: number
 
     if (swipeType === 'swipe-left') {
-      newIndex = Math.min(currentIndex + 1, SCREEN_ORDER.length - 1)
+      newIndex = Math.min(currentIndex + 1, maxIndex)
     } else if (swipeType === 'swipe-right') {
       newIndex = Math.max(currentIndex - 1, 0)
     } else {
@@ -265,6 +273,15 @@ export function RunningProtocol(): JSX.Element {
                   : styles.bullet_inactive
               }`}
             />
+            {isCameraEnabled ? (
+              <div
+                className={`${styles.bullet} ${
+                  currentOption === 'ImageGallery'
+                    ? styles.bullet_active
+                    : styles.bullet_inactive
+                }`}
+              />
+            ) : null}
           </div>
         </div>
       </div>
@@ -287,6 +304,14 @@ function CurrentOptionView({
       return (
         <>
           <RunningProtocolCommandList {...rest} />
+          <div className={styles.gradient_overlay} />
+        </>
+      )
+
+    case 'ImageGallery':
+      return (
+        <>
+          <ImageGalleryList {...rest} />
           <div className={styles.gradient_overlay} />
         </>
       )

@@ -1,0 +1,76 @@
+.container {
+  display: flex;
+  height: 29.5rem;
+  flex-direction: column;
+  gap: var(--spacing-40);
+}
+
+.gallery_list_container {
+  position: relative;
+  display: flex;
+  height: 20.25rem;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.gallery_list_container::-webkit-scrollbar {
+  display: none; /* This will work in Electron */
+}
+
+.gallery_table_headers_container {
+  display: flex;
+  padding-left: var(--spacing-24);
+  color: var(--black-90);
+  gap: var(--spacing-24);
+}
+
+.header_timestamp {
+  display: flex;
+  flex: 0 0 15.625rem;
+  color: var(--grey-60);
+}
+
+.header_step_details {
+  display: flex;
+  flex: 1;
+  color: var(--grey-60);
+}
+
+.list_item_content_container {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-24);
+}
+
+.list_item_container {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-24);
+}
+
+.list_item_timestamp {
+  width: 15.625rem;
+}
+
+.list_item_step {
+  display: flex;
+  flex-direction: column;
+}
+
+.list_item_step_text {
+  overflow: hidden;
+  width: 432px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.modal_content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--border-radius-4);
+}
