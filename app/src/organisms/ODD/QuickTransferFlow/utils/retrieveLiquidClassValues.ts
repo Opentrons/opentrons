@@ -127,10 +127,7 @@ const getNoLiquidClassValues = (
   })
 
   const actualConditioningVolume =
-    linearInterpolate(
-      volume,
-      conditioningByVolume as Array<[number, number]>
-    ) ?? 0
+    linearInterpolate(volume, conditioningByVolume) ?? 0
   const aspirateAirGapVolume = aspirate?.retract.airGapByVolume[0][1] ?? 0
 
   // Calculate extra volumes based on path
@@ -427,13 +424,9 @@ const getLiquidClassValues = (
   )
 
   const conditioningVolume =
-    linearInterpolate(
-      volume,
-      conditioningByVolume as Array<[number, number]>
-    ) ?? 0
+    linearInterpolate(volume, conditioningByVolume) ?? 0
 
-  const disposalVolume =
-    linearInterpolate(volume, disposalByVolume as Array<[number, number]>) ?? 0
+  const disposalVolume = linearInterpolate(volume, disposalByVolume) ?? 0
 
   const aspirateState = {
     aspirateFlowRate: aspirateFlowRateFields.aspirate_flowRate ?? 0,
