@@ -16,11 +16,11 @@ import {
 
 export interface OverlayModalProps {
   header: string
-  subText?: string
   primaryButtonText: string
   secondaryButtonText: string
   onSecondaryButtonClick: () => void
   onPrimaryButtonClick: () => void
+    subText?: string
 }
 
 export function OverlayModal(props: OverlayModalProps): JSX.Element {
