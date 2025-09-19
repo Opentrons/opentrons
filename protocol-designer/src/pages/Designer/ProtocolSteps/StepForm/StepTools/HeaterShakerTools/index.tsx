@@ -184,9 +184,8 @@ function PriorState(props: {
 function usePriorHeaterShakerState(
   moduleId: string
 ): SG_HeaterShakerModuleState | null {
-  // TODO: I think getRobotStateAtActiveItem returns the robot state just before the
-  // current step, which is what we want, but double-check that this is actually always
-  // the case.
+  // fixme(mm, 2025-09-19): getRobotStateAtActiveItem returns the state for the hovered step,
+  // which isn't quite what we want. We want the state just before the step that owns this form.
   const state = useSelector(getRobotStateAtActiveItem)
   const moduleState = state?.modules[moduleId]?.moduleState
   const fallback: SG_HeaterShakerModuleState = {
@@ -196,17 +195,17 @@ function usePriorHeaterShakerState(
     targetTemp: null,
   }
 
-  // Shouldn't happen:
   if (moduleState == null) {
-    console.error("Couldn't find module state.")
+    // This can happen if the user deletes the module but retains this step.
     return fallback
   } else if (moduleState.type !== HEATERSHAKER_MODULE_TYPE) {
+    // Shouldn't ever happen.
     console.error(
       'Expecting Heater-Shaker module type, but got:',
       moduleState.type
     )
     return fallback
+  } else {
+    return moduleState
   }
-
-  return moduleState
 }
