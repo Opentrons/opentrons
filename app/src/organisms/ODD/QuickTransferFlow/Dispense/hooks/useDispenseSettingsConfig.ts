@@ -32,7 +32,6 @@ export function useDispenseSettingsConfig({
 }: UseDispenseSettingsConfigProps): SettingItem[] {
   const { t, i18n } = useTranslation(['quick_transfer', 'shared'])
   const { makeSnackbar } = useToaster()
-  console.log('state', state.blowOutDispense)
   const getBlowoutValueCopy = (): string | undefined => {
     if (state.blowOutDispense == null) {
       return t('option_disabled')
@@ -184,7 +183,11 @@ export function useDispenseSettingsConfig({
           : i18n.format(getBlowoutValueCopy(), 'capitalize'),
       enabled: state.transferType !== 'distribute',
       onClick: () => {
-        setSelectedSetting('dispense_blow_out')
+        if (state.transferType === 'distribute') {
+          makeSnackbar(t('dispense_setting_disabled') as string)
+        } else {
+          setSelectedSetting('dispense_blow_out')
+        }
       },
     },
     {
@@ -204,7 +207,11 @@ export function useDispenseSettingsConfig({
           : t('option_disabled'),
       enabled: isMultiTransfer,
       onClick: () => {
-        setSelectedSetting('dispense_disposal_volume')
+        if (isMultiTransfer) {
+          setSelectedSetting('dispense_disposal_volume')
+        } else {
+          makeSnackbar(t('dispense_setting_disabled') as string)
+        }
       },
     },
     {
