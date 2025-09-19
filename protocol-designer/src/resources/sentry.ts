@@ -41,6 +41,7 @@ export const initializeSentry = (state: BaseState): void => {
           replayIntegration(),
           browserTracingIntegration(),
         ],
+        attachStacktrace: true, // include stack traces in captureConsoleIntegration
         tracesSampleRate: 1.0,
         tracePropagationTargets: [
           'localhost',

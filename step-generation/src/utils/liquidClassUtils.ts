@@ -131,9 +131,13 @@ export const getCustomLiquidClassProperties = (
             duration: args.aspirateDelay?.seconds ?? undefined,
           },
           mix: {
-            enabled: aspirateMixArgs != null,
-            repetitions: aspirateMixArgs?.times ?? undefined,
-            volume: aspirateMixArgs?.volume ?? undefined,
+            enabled: !!aspirateMixArgs?.volume,
+            ...(aspirateMixArgs?.times
+              ? { repetitions: aspirateMixArgs.times }
+              : {}),
+            ...(aspirateMixArgs?.volume
+              ? { volume: aspirateMixArgs.volume }
+              : {}),
           },
           submerge: {
             delay: {
