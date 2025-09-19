@@ -314,7 +314,7 @@ export const SecondStepsMoveLiquidTools = ({
             />
           </>
         )}
-        {isDestinationTrash ? null : (
+        {isDestinationTrash && tab === 'dispense' ? null : (
           <>
             <Divider marginY="0" />
             <PositionField
