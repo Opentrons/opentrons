@@ -1,5 +1,3 @@
-import { useTranslation } from 'react-i18next'
-
 import {
   ALIGN_CENTER,
   COLORS,
@@ -17,7 +15,7 @@ import {
 } from '@opentrons/components'
 
 export interface overlayButtonProps {
-  onClick: () => void,
+  onClick: () => void
   text: string
 }
 
@@ -29,13 +27,7 @@ export interface OverlayModalProps {
 }
 
 export function OverlayModal(props: OverlayModalProps): JSX.Element {
-  const {
-    header,
-    subText,
-    primaryButtonProps,
-    secondaryButtonProps,
-  } = props
-  const { t } = useTranslation('shared')
+  const { header, subText, primaryButtonProps, secondaryButtonProps } = props
   return (
     <Overlay
       width="100%"
@@ -76,19 +68,19 @@ export function OverlayModal(props: OverlayModalProps): JSX.Element {
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           gridGap={SPACING.spacing8}
         >
-          {secondaryButtonProps && 
-          <SecondaryButton
-            backgroundColor={COLORS.white}
-            onClick={secondaryButtonProps?.onClick}
-          >
-            {secondaryButtonProps?.text}
-          </SecondaryButton>
-          }
+          {secondaryButtonProps && (
+            <SecondaryButton
+              backgroundColor={COLORS.white}
+              onClick={secondaryButtonProps?.onClick}
+            >
+              {secondaryButtonProps?.text}
+            </SecondaryButton>
+          )}
           {primaryButtonProps && (
-          <PrimaryButton
-            backgroundColor={COLORS.red50}
-            onClick={primaryButtonProps?.onClick}
-          >
+            <PrimaryButton
+              backgroundColor={COLORS.red50}
+              onClick={primaryButtonProps?.onClick}
+            >
               {primaryButtonProps?.text}
             </PrimaryButton>
           )}

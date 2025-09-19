@@ -73,3 +73,11 @@ export const ClearLiquidOverlayModal: Story = {
     },
   },
 }
+
+export const NoButtonsOverlayModal: Story = {
+  args: {
+    header: 'Selected labware have different liquid layouts',
+    subText:
+      'Clear liquids in labware to edit them together to edit liquid in these labware at the same time, you will have to clear liquids from them',
+  },
+}
