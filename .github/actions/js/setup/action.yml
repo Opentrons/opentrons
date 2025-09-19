@@ -42,6 +42,17 @@ runs:
           packages-${{ runner.os }}-${{ hashFiles('package.json') }}-
           packages-${{ runner.os }}-
 
+    - name: 'Cache node_modules'
+      id: cache-node-modules
+      uses: actions/cache@v4
+      with:
+        path: |
+          node_modules
+          **/node_modules
+        key: node-modules-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+        restore-keys: |
+          node-modules-${{ runner.os }}-
+
     - name: 'Install udev for USB-detection'
       if: runner.os == 'Linux'
       shell: bash
@@ -117,4 +128,19 @@ runs:
         done
         
         echo "🚀 Running make setup-js..."
-        make setup-js
+        
+        # Configure yarn for faster installs
+        yarn config set network-timeout 60000
+        yarn config set prefer-offline true
+        yarn config set network-concurrency 1
+        
+        # Check if node_modules cache was restored
+        if [[ -d "node_modules" ]]; then
+          echo "✅ node_modules cache restored - skipping yarn install"
+          # Still need to run the app-shell setup steps
+          make -C app-shell setup
+          make -C app-shell-odd setup
+        else
+          echo "⚠️  No node_modules cache - running full setup"
+          make setup-js
+        fi
