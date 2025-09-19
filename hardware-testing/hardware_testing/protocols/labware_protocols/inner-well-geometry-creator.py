@@ -9,6 +9,7 @@ from opentrons.protocol_api import (
     Well,
     Labware,
     LiquidClass,
+    SINGLE,
 )
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     PositionReference,
@@ -24,7 +25,7 @@ from dataclasses import dataclass, field
 #  GLOBAL VARIABLES - START
 ###########################################
 
-LABWARE = "eppendorf_96_wellplate_150ul"  # change to desired labware
+LABWARE = "example_labware" # change to desired labware
 
 RESERVOIR = "nest_1_reservoir_290ml"
 
@@ -35,22 +36,12 @@ PROBING_MOUNT = "left"
 PROBING_TIP_SIZE = 50
 PROBING_PIPETTE_SIZE = 50
 
-SLOT_LIQUID_TIPRACK1 = "C3"
-SLOT_LIQUID_TIPRACK2 = "B3"
-SLOT_PROBING_TIPRACK = "D3"
+SLOT_LIQUID_TIPRACKS = ["D3", "B3"]
+SLOT_PROBING_TIPRACK = "D2"
 
-SLOT_LABWARE = "D2"
-SLOT_RESERVOIR = "C2"
+SLOT_LABWARE = "D1"
+SLOT_RESERVOIR = "C1"
 SLOT_DIAL = "B2"
-
-
-###########################################
-#  GLOBAL VARIABLES - END
-###########################################
-
-metadata = {"protocolName": "inner-well-geometry-creator", "author": "ABR"}
-
-requirements = {"robotType": "Flex", "apiLevel": "2.24"}
 
 DIAL_PORT = None
 DIAL_PORT_NAME = "/dev/ttyUSB0"
@@ -69,6 +60,12 @@ CSV_HEADER = [
     "status",
 ]
 
+###########################################
+#  GLOBAL VARIABLES - END
+###########################################
+
+metadata = {"protocolName": "inner-well-geometry-creator", "author": "ABR"}
+requirements = {"robotType": "Flex", "apiLevel": "2.24"}
 
 @dataclass(frozen=True)
 class SetupState:
@@ -138,10 +135,12 @@ class TrialState:
         )
 
     def rollback_last_data_point(self) -> None:
+        """Cancels the step that failed to prepare for a retry."""
         self.dispense_volume -= self.step_volume  # rollback dispense volume
         self.corrected_heights.pop()  # rollback corrected heights
 
     def compute_hdelta(self) -> None:
+        """Calculates the change in liquid level."""
         self.hdelta = (
             self.corrected_heights[-1] - self.corrected_heights[-2]
             if len(self.corrected_heights) > 1
@@ -210,6 +209,7 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 
 def _setup(ctx: ProtocolContext) -> SetupState:
+    """Sets up the static data for the protocol"""
     global DIAL_PORT, RUN_ID, FILE_NAME, LABWARE
 
     first_dispense = ctx.params.first_dispense  # type: ignore[attr-defined]
@@ -220,22 +220,23 @@ def _setup(ctx: ProtocolContext) -> SetupState:
     right_mount = ctx.params.right_mount  # type: ignore[attr-defined]
 
     # tipracks
-    liquid_rack1 = ctx.load_labware(
-        f"opentrons_flex_96_tiprack_{liq_tip_size}uL", SLOT_LIQUID_TIPRACK1
-    )
-    liquid_rack2 = ctx.load_labware(
-        f"opentrons_flex_96_tiprack_{liq_tip_size}uL", SLOT_LIQUID_TIPRACK2
-    )
+    liquid_racks = [
+        ctx.load_labware(f"opentrons_flex_96_tiprack_{liq_tip_size}ul", slot)
+        for slot in SLOT_LIQUID_TIPRACKS
+    ]
     probing_rack = ctx.load_labware(
         f"opentrons_flex_96_tiprack_{PROBING_TIP_SIZE}uL", SLOT_PROBING_TIPRACK
     )
-    liquid_racks = [liquid_rack1, liquid_rack2]
 
     # load pipettes
     probe_pipette = ctx.load_instrument(
         left_mount, PROBING_MOUNT, tip_racks=[probing_rack]
     )
     liq_pipette = ctx.load_instrument(right_mount, LIQUID_MOUNT, tip_racks=liquid_racks)
+    if liq_pipette.channels == 8:
+        liq_pipette.configure_nozzle_layout(
+            style=SINGLE, start="H1", tip_racks=liquid_racks
+        )
 
     # load labware + dial
     labware = ctx.load_labware(labware_type, SLOT_LABWARE)
@@ -308,7 +309,6 @@ def _setup(ctx: ProtocolContext) -> SetupState:
 
 
 # Helper Functions
-
 
 def _read_dial_indicator(
     ctx: ProtocolContext,
@@ -405,7 +405,7 @@ def _get_height_of_liquid_in_well(
 def generate_frusta(
     ctx: ProtocolContext, data: List, labware: Labware
 ) -> LabwareDefinition2 | LabwareDefinition3:
-    """Generate Frusta."""
+    """Read the geometry creator results and generate frustum dimensions for the IWG."""
     inner_well_json = labware._core.get_definition()
     depth = inner_well_json["wells"]["A1"]["depth"]
     well_shape = inner_well_json["wells"]["A1"].get("shape")
@@ -492,6 +492,7 @@ def generate_frusta(
 
 
 def get_dispense_props(state: SetupState, ts: TrialState) -> None:
+    """Assigns the liquid class properties for ethanol dispense"""
     if state.liquid_tip == "1000":
         dispense_offset = ts.corrected_height + state.target_height + 10
         state.liq_pipette.flow_rate.blow_out = 200
@@ -517,8 +518,10 @@ def get_dispense_props(state: SetupState, ts: TrialState) -> None:
         ethanol_props.dispense.retract.end_position.position_reference = (
             PositionReference.WELL_TOP
         )
-        ethanol_props.dispense.retract.end_position.offset = 10  # type: ignore[assignment]
-        ethanol_props.dispense.retract.blowout.enabled = True
+        ethanol_props.dispense.retract.end_position.offset.z = 10
+        ethanol_props.dispense.retract.blowout.enabled = (
+            False  # disabled because it was causing bubbles
+        )
 
 
 def get_alpha_for_height(state: SetupState, ts: TrialState) -> float:
@@ -566,12 +569,14 @@ def adaptive_volume_step(ts: TrialState, state: SetupState) -> float:
 
 
 def write_trial_log(ctx, ts: TrialState) -> None:
+    """Writes the current step's results to the CSV."""
     ts.add_result()
     trial_data = ts.results[-1]
     _write_line_to_csv(ctx, [str(v) for v in vars(trial_data).values()])
 
 
 def check_hdelta(ctx, state: SetupState, ts: TrialState) -> str:
+    """Checks if the liquid level was successful in reaching the set target height."""
     if ctx.is_simulating():
         status = "sim"
     else:
@@ -598,9 +603,6 @@ def geometry_creator(
 ) -> List[TrialResult]:
     """Run liquid dispense + measure loop and return trial results."""
 
-    # Stops the protocol once the dispensed volume reaches a certain point
-    stop_volume = state.max_volume * 0.85
-
     # initial protocol steps
     _store_dial_baseline(ctx, state.probe_pipette, state.dial)
     _write_line_to_csv(ctx, CSV_HEADER)
@@ -610,26 +612,29 @@ def geometry_creator(
         state.liq_pipette, state.src["A1"], ctx.is_simulating()
     )
     ts.step_volume = state.first_dispense
+    final_step = False
 
-    while ts.dispense_volume < stop_volume:
+    while ts.dispense_volume < state.max_volume:
 
         ts.current_well = state.wells[ts.step % len(state.wells)]
         drop_tips(state.liq_pipette, state.probe_pipette)
-        get_dispense_props(state, ts)
 
-        # check if out of wells
+        # check if out of available wells
         no_more_wells = ts.step > 0 and ts.step % len(state.wells) == 0
         if no_more_wells:
             if not ctx.is_simulating():
-                ctx.pause("Reload the labware.")
+                ctx.pause("Dump the labware and replace it.")
                 _get_height_of_liquid_in_well(
                     state.liq_pipette, state.src["A1"], ctx.is_simulating()
                 )
             else:
                 break
 
+        # prepare for dispense
         ts.dispense_volume += ts.step_volume
-        volume_per_channel = ts.dispense_volume / state.liq_pipette.channels
+        volume_per_channel = ts.dispense_volume / state.liq_pipette.active_channels
+        get_dispense_props(state, ts)
+
         pick_up_tips(state.liq_pipette, state.probe_pipette)
         ts.tip_z_error = _get_tip_z_error(ctx, state.probe_pipette, state.dial)
 
@@ -642,7 +647,8 @@ def geometry_creator(
             return_tip=False,
         )
 
-        if ts.corrected_height + state.target_height <= state.labware["A1"].depth - 5:
+        # Check if there's clearance for touch tip
+        if ts.corrected_height + state.target_height <= state.labware["A1"].depth - 4:
             state.liq_pipette.touch_tip()
 
         # Measure liquid height
@@ -655,12 +661,15 @@ def geometry_creator(
         # Compute change in height from last liquid probe
         ts.compute_hdelta()
 
-        # Check for bad hdelta
+        # Check if liquid level is successfully raised by the target height
         ts.status = check_hdelta(ctx, state, ts)
 
         if ts.status == "fail":
             if ts.step == 0:
                 break
+            elif final_step:
+                ts.status = "pass"
+                write_trial_log(ctx, ts)
             else:
                 write_trial_log(ctx, ts)
                 ts.rollback_last_data_point()
@@ -669,9 +678,11 @@ def geometry_creator(
 
         # recalculate step volume for next step
         ts.step_volume = adaptive_volume_step(ts, state)
+
         # prevent overflow of well
         if ts.step_volume + ts.dispense_volume > state.max_volume:
-            break
+            ts.step_volume = state.max_volume - ts.dispense_volume
+            final_step = True
 
         ts.step += 1
 
@@ -686,7 +697,7 @@ def run(ctx: ProtocolContext) -> None:
     trial_results = geometry_creator(ctx, state, ts)
     drop_tips(state.liq_pipette, state.probe_pipette)
 
-    # Save results
+    # Save results and generate IWG .json
     passed_trials = [trial for trial in trial_results if trial.status == "pass"]
     frusta_data = np.array(
         [(trial.dispense_volume, trial.height) for trial in passed_trials]

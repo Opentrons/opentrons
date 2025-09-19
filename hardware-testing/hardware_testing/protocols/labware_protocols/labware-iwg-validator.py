@@ -6,6 +6,7 @@ from opentrons.protocol_api import (
     InstrumentContext,
     ParameterContext,
     Well,
+    SINGLE,
 )
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     PositionReference,
@@ -16,13 +17,13 @@ from opentrons.types import Point
 from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
 
 # LABWARE TYPE
-LABWARE = "eppendorf_96_wellplate_150ul"  # change to desired labware
+LABWARE = "example_labware"  # change to desired labware
 
 # SLOTS
-SLOT_LIQUID_TIPRACKS = ["C3", "B3", "A2"]
-SLOT_PROBING_TIPRACK = "D3"
-SLOT_LABWARE = "D2"
-SLOT_RESERVOIR = "C2"
+SLOT_LIQUID_TIPRACKS = ["D3", "B3"]
+SLOT_PROBING_TIPRACK = "D2"
+SLOT_LABWARE = "D1"
+SLOT_RESERVOIR = "C1"
 SLOT_DIAL = "B2"
 CSV_SEPARATOR = ""
 RUN_ID = ""
@@ -131,20 +132,20 @@ def _setup(
     n_regions = ctx.params.n_regions  # type: ignore[attr-defined]
     number_of_trials = ctx.params.number_of_trials  # type: ignore[attr-defined]
 
-    liq_tip_racks = [
+    liquid_racks= [
         ctx.load_labware(f"opentrons_flex_96_tiprack_{liq_tip_size}ul", slot)
         for slot in SLOT_LIQUID_TIPRACKS
     ]
     probe_tip_rack = ctx.load_labware(
         "opentrons_flex_96_tiprack_50ul", SLOT_PROBING_TIPRACK
     )
-    if labware["A1"].max_volume > 500:
-        liq_racks = liq_tip_racks
-    else:
-        liq_racks = liq_tip_racks[:1]
 
     probe_pipette = ctx.load_instrument(left_mount, "left", tip_racks=[probe_tip_rack])
-    liq_pipette = ctx.load_instrument(right_mount, "right", tip_racks=liq_racks)
+    liq_pipette = ctx.load_instrument(right_mount, "right", tip_racks=liquid_racks)
+    if liq_pipette.channels == 8:
+        liq_pipette.configure_nozzle_layout(
+            style=SINGLE, start="H1", tip_racks=liquid_racks
+        )
 
     # Connect dial indicator and create data sheet
 
@@ -174,16 +175,20 @@ def _setup(
     # Calculate region heights based on n_regions
     region_heights: List[float]
     if n_regions == 3:
-        region_heights = [3, depth / 2, depth * 4 / 5]
+        region_heights = [3, depth / 2, depth * 9 / 10]
     else:
         region_heights = [(depth * (i + 1) / n_regions) for i in range(n_regions)]
 
-    # Ensure the last interval never reaches a calculated volume above the max volume for that well
     if region_heights:
         max_vol = labware["A1"].max_volume
         max_height = extract_float(labware["A1"].height_from_volume(max_vol))
-        if region_heights[-1] > max_height:
-            region_heights[-1] = max_height
+        for i, h in enumerate(region_heights):
+            if h > max_height:
+                region_heights[
+                    i
+                ] = max_height  # must be lower than height at max volume
+            if h < 1.5:
+                region_heights[i] = 1.5  # must be 1.5mm or higher
 
     expected_heights = []
     for h in region_heights:
@@ -198,7 +203,7 @@ def _setup(
         dial,
         number_of_trials,
         labware_type,
-        liq_tip_racks,
+        liquid_racks,
         right_mount,
         liq_tip_size,
         n_regions,
@@ -289,7 +294,7 @@ def aspirate_dispense_measure(
     probe_pipette: InstrumentContext,
     liq_pipette: InstrumentContext,
     expected_heights: List[float],
-    liq_tip_racks: List[Labware],
+    liquid_racks: List[Labware],
     right_mount: InstrumentContext,
     liq_tip_size: str,
 ) -> List[float]:
@@ -303,13 +308,16 @@ def aspirate_dispense_measure(
         pick_up_tips(probe_pipette, liq_pipette)
 
         if i != 0 and i % num_of_individual_wells == 0:
-            ctx.pause("Dump the labware and resume.")
-            _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
+            if not ctx.is_simulating():
+                ctx.pause("Dump the labware and resume.")
+                _get_height_of_liquid_in_well(
+                    liq_pipette, src["A1"], ctx.is_simulating()
+                )
+            else:
+                break
 
         tip_z_error = _get_tip_z_error(ctx, probe_pipette, dial)
-
-        dispense_vol = float(expected_vol / liq_pipette.channels)
-
+        dispense_vol = float(expected_vol / liq_pipette.active_channels)
         expected_height = expected_heights[i]
 
         if liq_tip_size == "1000":
@@ -322,7 +330,7 @@ def aspirate_dispense_measure(
         ethanol = ctx.get_liquid_class(name="ethanol_80")
 
         lm = "liquid-meniscus"
-        for rack in liq_tip_racks:
+        for rack in liquid_racks:
             ethanol_props = ethanol.get_for(right_mount, rack)
             # Aspirate settings
             ethanol_props.aspirate.aspirate_position.position_reference = lm  # type: ignore[assignment]
@@ -340,7 +348,7 @@ def aspirate_dispense_measure(
             ethanol_props.dispense.retract.blowout.flow_rate = (
                 liq_pipette.flow_rate.blow_out
             )  # type: ignore [attr-defined]
-            ethanol_props.dispense.retract.blowout.enabled = True  # type: ignore [attr-defined]
+            ethanol_props.dispense.retract.blowout.enabled = False  # type: ignore [attr-defined]
             ethanol_props.dispense.retract.end_position.position_reference = (  # type: ignore [attr-defined]
                 PositionReference.WELL_TOP
             )  # type: ignore [attr-defined]
@@ -354,7 +362,9 @@ def aspirate_dispense_measure(
             new_tip="never",
             return_tip=False,
         )
-        if expected_heights[i] <= labware["A1"].depth - 5:
+        if (
+            expected_heights[i] <= labware["A1"].depth - 4
+        ):  # checks if theres clearance for touch tip
             liq_pipette.touch_tip()
 
         height = _get_height_of_liquid_in_well(
@@ -387,7 +397,7 @@ def run(ctx: ProtocolContext) -> None:
         dial,
         number_of_trials,
         labware_type,
-        liq_tip_racks,
+        liquid_racks,
         right_mount,
         liq_tip_size,
         n_regions,
@@ -415,7 +425,7 @@ def run(ctx: ProtocolContext) -> None:
         probe_pipette,
         liq_pipette,
         expected_heights,
-        liq_tip_racks,
+        liquid_racks,
         right_mount,
         liq_tip_size,
     )
