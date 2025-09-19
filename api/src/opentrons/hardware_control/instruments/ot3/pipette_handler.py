@@ -294,6 +294,7 @@ class OT3PipetteHandler:
             }
             result["shaft_ul_per_mm"] = instr.config.shaft_ul_per_mm
             result["available_sensors"] = instr.config.available_sensors
+            result["volume_mode"] = instr.liquid_class_name
         return cast(PipetteDict, result)
 
     @property

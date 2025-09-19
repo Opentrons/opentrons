@@ -6,7 +6,7 @@
   "__dev_internal__lpcRedesign": "LPC Redesign",
   "__dev_internal__protocolStats": "Protocol Stats",
   "__dev_internal__protocolTimeline": "Protocol Timeline",
-  "__dev_internal__quickTransferExportPython": "Enable Python Export for Quick Transfer",
+  "__dev_internal__quickTransferExportJSON": "Enable JSON Export for Quick Transfer",
   "__dev_internal__reactQueryDevtools": "Enable React Query Devtools",
   "__dev_internal__reactScan": "Enable React Scan",
   "__dev_internal__quickTransferProtocolContentsLog": "Enable QT Protocol Contents Logging",

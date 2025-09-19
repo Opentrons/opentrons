@@ -215,11 +215,17 @@ export const SecondStepsMoveLiquidTools = ({
       formData.tipRack,
     ]
   )
+  const labwareId = formData[`${tab}_labware`]
+  // The getMinXYDimension() call below is crashing quite often, but I'm not sure why
+  if (!labwareEntities[labwareId]?.def) {
+    throw new Error(
+      `missing ${tab}_labware def for ${labwareId}, ` +
+        `in labwareEntities: ${!!labwareEntities[labwareId]}`
+    )
+  }
   const minXYDimension = isDestinationTrash
     ? null
-    : getMinXYDimension(labwareEntities[formData[`${tab}_labware`]]?.def, [
-        'A1',
-      ])
+    : getMinXYDimension(labwareEntities[labwareId]?.def, ['A1'])
   const minRadiusForTouchTip =
     minXYDimension != null ? round(minXYDimension / 2, 1) : null
 
@@ -387,7 +393,7 @@ export const SecondStepsMoveLiquidTools = ({
             />
           </>
         )}
-        {isDestinationTrash ? null : (
+        {isDestinationTrash && tab === 'dispense' ? null : (
           <>
             <Divider marginY="0" />
             <PositionField

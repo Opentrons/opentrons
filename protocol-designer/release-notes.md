@@ -34,6 +34,18 @@ This release adds support for new instruments, labware, and hardware,enables lim
 
 - Protocol Designer now raises an error when moving labware to a deleted module.
 
+## Opentrons Protocol Designer Changes in 8.5.4
+
+**Welcome to Protocol Designer 8.5.4!**
+
+This hotfix release addresses several bugs.
+
+### Bug Fixes
+
+- Set a custom aspirate tip position for any dispense location.
+- Protocol Designer correctly reassigns default tip settings when changing pipettes in your protocol.
+- Protocol Designer no longer crashes when encountering missing tip rack errors in imported protocols.
+
 ## Opentrons Protocol Designer Changes in 8.5.3
 
 **Welcome to Protocol Designer 8.5.3!**
