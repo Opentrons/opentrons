@@ -20,7 +20,7 @@ const meta: Meta<typeof OverlayModal> = {
     },
     primaryButtonProps: {
       control: {
-        type: 'text',
+        type: 'object',
       },
     },
     secondaryButtonProps: {
