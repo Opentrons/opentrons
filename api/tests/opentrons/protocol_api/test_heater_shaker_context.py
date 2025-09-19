@@ -7,6 +7,7 @@ from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
 from opentrons.hardware_control.modules import TemperatureStatus, SpeedStatus
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, HeaterShakerContext
+from opentrons.protocol_api.tasks import Task
 from opentrons.protocol_api.core.common import ProtocolCore, HeaterShakerCore
 from opentrons.protocol_api.core.core_map import LoadedCoreMap
 
@@ -131,9 +132,13 @@ def test_set_target_temperature(
     mock_core: HeaterShakerCore,
     mock_broker: LegacyBroker,
     subject: HeaterShakerContext,
+    api_version: APIVersion,
 ) -> None:
     """It should set the temperature via the core."""
-    subject.set_target_temperature(42.0)
+    subject._api_version = api_version
+    mock_task = decoy.mock(cls=Task)
+    decoy.when(mock_core.set_target_temperature(42.0)).then_return(mock_task._core)
+    result = subject.set_target_temperature(42.0)
 
     decoy.verify(
         mock_broker.publish(
@@ -145,12 +150,20 @@ def test_set_target_temperature(
                 }
             ),
         ),
-        mock_core.set_target_temperature(celsius=42.0),
         mock_broker.publish(
             "command",
             matchers.DictMatching({"$": "after"}),
         ),
     )
+    decoy.verify(
+        mock_core.wait_for_target_temperature(), ignore_extra_args=True, times=0
+    )
+    if api_version >= APIVersion(2, 27):
+        assert isinstance(result, Task)
+        assert result._core is mock_task._core
+        assert result._api_version == api_version
+    else:
+        assert result is None
 
 
 def test_wait_for_temperature(
