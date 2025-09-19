@@ -25,7 +25,7 @@ from dataclasses import dataclass, field
 #  GLOBAL VARIABLES - START
 ###########################################
 
-LABWARE = "example_labware" # change to desired labware
+LABWARE = "example_labware"  # change to desired labware
 
 RESERVOIR = "nest_1_reservoir_290ml"
 
@@ -66,6 +66,7 @@ CSV_HEADER = [
 
 metadata = {"protocolName": "inner-well-geometry-creator", "author": "ABR"}
 requirements = {"robotType": "Flex", "apiLevel": "2.24"}
+
 
 @dataclass(frozen=True)
 class SetupState:
@@ -309,6 +310,7 @@ def _setup(ctx: ProtocolContext) -> SetupState:
 
 
 # Helper Functions
+
 
 def _read_dial_indicator(
     ctx: ProtocolContext,

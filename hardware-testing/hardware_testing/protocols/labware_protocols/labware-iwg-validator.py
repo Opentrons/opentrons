@@ -132,7 +132,7 @@ def _setup(
     n_regions = ctx.params.n_regions  # type: ignore[attr-defined]
     number_of_trials = ctx.params.number_of_trials  # type: ignore[attr-defined]
 
-    liquid_racks= [
+    liquid_racks = [
         ctx.load_labware(f"opentrons_flex_96_tiprack_{liq_tip_size}ul", slot)
         for slot in SLOT_LIQUID_TIPRACKS
     ]
