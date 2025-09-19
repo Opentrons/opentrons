@@ -62,9 +62,9 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
         gridGap={SPACING.spacing8}
         paddingX={SPACING.spacing16}
       >
-        {/* TODO: i18n, and stuff this behind a feature flag. */}
+        {/* TODO: stuff this behind a feature flag. */}
         <StyledText desktopStyle="bodyDefaultSemiBold" color={COLORS.black90}>
-          Last module state
+          {t('protocol_steps:prior_state')}
         </StyledText>
         {priorState != null && <PriorState priorState={priorState} />}
       </Flex>
@@ -145,17 +145,38 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
 function PriorState(props: {
   priorState: SG_HeaterShakerModuleState
 }): JSX.Element {
-  // TODO: Use i18n for these.
   const { targetTemp, targetSpeed, latchOpen } = props.priorState
-  const targetTempString = targetTemp != null ? `${targetTemp} °C` : 'Off'
-  const targetSpeedString = targetSpeed != null ? `${targetSpeed} rpm` : 'Off'
-  const latchOpenString = latchOpen ?? false ? 'Open' : 'Closed' // TODO: Is it right to default to false?
-
+  const { t } = useTranslation()
   return (
     <StepFormStatusList>
-      <StepFormStatus label="Heater set to" value={targetTempString} />
-      <StepFormStatus label="Shaker set to" value={targetSpeedString} />
-      <StepFormStatus label="Labware latch" value={latchOpenString} />
+      <StepFormStatus
+        label={t('protocol_steps:heater_shaker.prior_state.heater_label')}
+        value={
+          targetTemp != null
+            ? t('protocol_steps:heater_shaker.prior_state.heater_value', {
+                value: targetTemp,
+              })
+            : t('protocol_steps:heater_shaker.prior_state.heater_value_off')
+        }
+      />
+      <StepFormStatus
+        label={t('protocol_steps:heater_shaker.prior_state.shaker_label')}
+        value={
+          targetSpeed != null
+            ? t('protocol_steps:heater_shaker.prior_state.shaker_value', {
+                value: targetSpeed,
+              })
+            : t('protocol_steps:heater_shaker.prior_state.shaker_value_off')
+        }
+      />
+      <StepFormStatus
+        label={t('protocol_steps:heater_shaker.prior_state.latch_label')}
+        value={
+          latchOpen ?? false
+            ? t('protocol_steps:heater_shaker.prior_state.latch_value_open')
+            : t('protocol_steps:heater_shaker.prior_state.latch_value_closed')
+        }
+      />
     </StepFormStatusList>
   )
 }

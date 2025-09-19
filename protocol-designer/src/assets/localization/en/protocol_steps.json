@@ -79,6 +79,17 @@
     "latch": {
       "closed": "closed",
       "open": "open"
+    },
+    "prior_state": {
+      "heater_label": "Heater set to",
+      "heater_value": "{{value}} °C",
+      "heater_value_off": "Off",
+      "latch_label": "Labware latch",
+      "latch_value_closed": "Closed",
+      "latch_value_open": "Open",
+      "shaker_label": "Shaker set to",
+      "shaker_value": "{{value}} rpm",
+      "shaker_value_off": "Off"
     }
   },
   "heater_shaker_state": "Heater-Shaker state",
@@ -124,6 +135,7 @@
   "pipette_path": "Pipette path",
   "place_hardware": "Place the modules and fixtures that you are using for this protocol onto the deck.",
   "place_modules": "Place the modules that you are using for this protocol onto the deck.",
+  "prior_state": "Last state",
   "protocol_steps": "Protocol steps",
   "protocol_timeline": "Protocol timeline",
   "reference_positions": {
