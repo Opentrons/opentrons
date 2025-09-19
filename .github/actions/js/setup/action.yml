@@ -101,7 +101,7 @@ runs:
             # Try package-mirror first
             mirror_url="https://github.com/Opentrons/package-mirror/releases/download/${package}-${version}/${package}-${version}-${PLATFORM}-${ARCH}.zip"
             
-            if curl -s --head "$mirror_url" | head -n 1 | grep -q "200 OK"; then
+            if curl -s --head "$mirror_url" | head -n 1 | grep -qE "(200 OK|302)"; then
               export $env_var="$mirror_url"
               echo "✅ Using cached $package from package-mirror"
             else
