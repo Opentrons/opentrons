@@ -224,7 +224,7 @@ function RetractSettingComponent({
     positionReference === POSITION_REFERENCE_TOP
       ? {
           min: -wellHeight,
-          max: Math.floor(wellHeight * 2),
+          max: 2,
         }
       : {
           min: 0,
