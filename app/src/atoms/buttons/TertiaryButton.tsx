@@ -21,7 +21,7 @@ export const TertiaryButton = styled(NewPrimaryBtn)`
   white-space: nowrap;
   ${TYPOGRAPHY.labelSemiBold}
 
-  ${styleProps}
+  ${styleProps as any}
 
   &:hover {
     background-color: ${COLORS.blue55};

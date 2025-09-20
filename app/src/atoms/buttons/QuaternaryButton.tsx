@@ -21,7 +21,7 @@ export const QuaternaryButton = styled(NewSecondaryBtn)`
   white-space: nowrap;
   ${TYPOGRAPHY.labelSemiBold}
 
-  ${styleProps}
+  ${styleProps as any}
 
   &:hover {
     opacity: 70%;
