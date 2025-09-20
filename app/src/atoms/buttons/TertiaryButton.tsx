@@ -9,7 +9,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-export const TertiaryButton = styled(NewPrimaryBtn)`
+export const TertiaryButton: typeof NewPrimaryBtn = styled(NewPrimaryBtn)`
   background-color: ${COLORS.blue50};
   border-radius: ${BORDERS.borderRadiusFull};
   box-shadow: none;
