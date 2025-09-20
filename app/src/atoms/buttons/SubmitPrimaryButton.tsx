@@ -10,8 +10,8 @@ const BaseSubmitInput: FC<ComponentProps<'input'> & StyleProps> = ({
 }) => {
   const combinedClassName =
     className != null && className !== ''
-      ? `${styles.submitButton} ${className}`
-      : styles.submitButton
+      ? `${styles.submit_primary_button} ${className}`
+      : styles.submit_primary_button
 
   return <input {...props} type="submit" className={combinedClassName} />
 }
