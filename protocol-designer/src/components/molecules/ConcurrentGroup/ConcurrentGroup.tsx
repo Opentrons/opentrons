@@ -36,9 +36,7 @@ export function ConcurrentGroup(
       gridGap={SPACING.spacing4}
     >
       <OrnamentalLine active={active} />
-      <Box as="ul" flex="1">
-        {children}
-      </Box>
+      <Box /* as="ul" */ flex="1">{children}</Box>
     </Flex>
   )
 }
