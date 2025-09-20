@@ -12,7 +12,6 @@ import {
   LegacyStyledText,
   NO_WRAP,
   SPACING,
-  TEXT_ALIGN_RIGHT,
   truncateString,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -166,8 +165,8 @@ export function ProtocolSetupStep({
           }
         >
           <LegacyStyledText
-            as={fontSize}
-            textAlign={TEXT_ALIGN_RIGHT}
+            as={fontSize as keyof JSX.IntrinsicElements}
+            textAlign={TYPOGRAPHY.textAlignRight}
             color={interactionDisabled ? COLORS.grey50 : COLORS.black90}
             maxWidth="20rem"
             css={clipDetail ? CLIPPED_TEXT_STYLE : undefined}

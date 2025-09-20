@@ -33,6 +33,7 @@ import type {
   PipetteData,
 } from '@opentrons/api-client'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
+import type { MenuOverlayItemProps } from '/app/molecules/InstrumentCard/MenuOverlay'
 import type {
   PipetteWizardFlow,
   SelectablePipettes,
@@ -179,6 +180,7 @@ export function FlexPipetteCard({
             },
           },
         ]
+
   return (
     <>
       {(attachedPipette == null || attachedPipette.ok) &&
@@ -212,7 +214,7 @@ export function FlexPipetteCard({
                   side: mount === LEFT ? t('left') : t('right'),
                 })
           }
-          menuOverlayItems={menuOverlayItems}
+          menuOverlayItems={menuOverlayItems as MenuOverlayItemProps[]}
           isEstopNotDisengaged={isEstopNotDisengaged}
         />
       ) : null}

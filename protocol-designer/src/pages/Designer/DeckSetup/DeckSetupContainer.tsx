@@ -246,7 +246,6 @@ export function DeckSetupContainer(
                   ? 'scale(1.3, -1.3)'
                   : 'scale(1, -1)'
               }
-              outline="auto"
               zoomed={zoomIn.slot != null}
               borderRadius={BORDERS.borderRadius12}
             >
