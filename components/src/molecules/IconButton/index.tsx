@@ -22,15 +22,18 @@ const COLOR_VARIANTS: Record<
   {
     default: string
     active: string
+    hover: string
   }
 > = {
   primary: {
     default: COLORS.blue50,
-    active: COLORS.blue55,
+    active: COLORS.blue60,
+    hover: COLORS.blue55,
   },
   alert: {
     default: COLORS.red50,
-    active: COLORS.red55,
+    active: COLORS.red60,
+    hover: COLORS.red55,
   },
 }
 
@@ -83,6 +86,7 @@ export function IconButton({
   const buttonStyle = {
     '--variant-default': colors.default, // color for background and outline
     '--variant-active': colors.active, // color for background when clicked
+    '--variant-hover': colors.hover, // color for background when hovered
   } as const
 
   return (

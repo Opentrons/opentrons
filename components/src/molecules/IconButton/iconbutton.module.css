@@ -8,12 +8,12 @@
   border-radius: 50%;
 }
 
-/* .icon_button:active {
+.icon_button:active {
   background-color: var(--active-color);
-} */
+}
 
 .icon_button:hover {
-  background-color: var(--variant-active);
+  background-color: var(--variant-hover);
 }
 
 .icon_button:focus-visible::after {
