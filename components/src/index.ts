@@ -2,6 +2,7 @@
 
 export * from './hooks'
 export * from './utils'
+export * from './hocs'
 
 // Components
 export * from './alerts'

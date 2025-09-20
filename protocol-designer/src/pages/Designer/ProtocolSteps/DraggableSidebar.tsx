@@ -31,7 +31,9 @@ export function DraggableSidebar({
 }: DraggableSidebarProps): JSX.Element {
   const sidebarRef = useRef<HTMLDivElement>(null)
   const [isResizing, setIsResizing] = useState(false)
-  const [sidebarWidth, setSidebarWidth] = useState(INITIAL_SIDEBAR_WIDTH)
+  const [sidebarWidth, setSidebarWidth] = useState<number>(
+    INITIAL_SIDEBAR_WIDTH
+  )
 
   const startResizing = useCallback(() => {
     setIsResizing(true)
@@ -73,7 +75,7 @@ export function DraggableSidebar({
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       height="100%"
     >
-      <SidebarContainer ref={sidebarRef} resizedWidth={sidebarWidth}>
+      <SidebarContainer ref={sidebarRef} /* resizedWidth={sidebarWidth} */>
         <SidebarContent>
           <TimelineToolbox
             sidebarWidth={sidebarWidth}
