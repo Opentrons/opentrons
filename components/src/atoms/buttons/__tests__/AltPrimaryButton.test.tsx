@@ -26,23 +26,19 @@ describe('AltPrimaryButton', () => {
   it('renders alt primary button with text', () => {
     render(props)
     const button = screen.getByText('alt primary button')
-    expect(button).toHaveStyle('background-color: var(--grey-30)')
-    expect(button).toHaveStyle('font-weight: var(--font-weight-semi-bold)')
-    expect(button).toHaveStyle('border-radius: var(--border-radius-8)')
+    expect(button).toHaveStyle(`background-color: ${COLORS.grey30}`)
     expect(button).toHaveStyle(
-      `text-transform: ${TYPOGRAPHY.textTransformNone}`
+      `padding: ${SPACING.spacing8} ${SPACING.spacing16}`
     )
-    expect(button).toHaveStyle('box-shadow: none')
-    expect(button).toHaveStyle('color: var(--black-90)')
-    expect(button).toHaveStyle(`font-size: var(--font-size-h3)`)
-    expect(button).toHaveStyle(`font-weight: var(--font-weight-semi-bold)`)
-    expect(button).toHaveStyle(`line-height: var(--line-height-20)`)
-    expect(button).toHaveStyle(`border-radius: var(--border-radius-8)`)
+    expect(button).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSizeH3}`)
+    expect(button).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`)
+    expect(button).toHaveStyle(`line-height: ${TYPOGRAPHY.lineHeight20}`)
+    expect(button).toHaveStyle(`border-radius: ${BORDERS.borderRadius8}`)
     expect(button).toHaveStyle(
       `text-transform: ${TYPOGRAPHY.textTransformNone}`
     )
     expect(button).toHaveStyle(`box-shadow: none`)
-    expect(button).toHaveStyle(`color: var(--black-90)`)
+    expect(button).toHaveStyle(`color: ${COLORS.black90}`)
   })
 
   it('renders alt primary button with text and disabled', () => {
@@ -50,8 +46,8 @@ describe('AltPrimaryButton', () => {
     render(props)
     const button = screen.getByText('alt primary button')
     expect(button).toBeDisabled()
-    expect(button).toHaveStyle('background-color: var(--grey-30)')
-    expect(button).toHaveStyle('color: var(--grey-40)')
+    expect(button).toHaveStyle(`background-color: ${COLORS.grey30}`)
+    expect(button).toHaveStyle(`color: ${COLORS.grey40}`)
   })
 
   // (kk: 09/23/2024) hover test needs jsdom update so this will be activated later
