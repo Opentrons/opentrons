@@ -33,6 +33,7 @@ export const OverflowBtn = forwardRef<HTMLButtonElement, OverflowBtnProps>(
 )
 
 const OVERFLOW_MENU_BUTTON_STYLE = css`
+  background-color: ${COLORS.transparent};
   border-radius: ${BORDERS.borderRadius4};
   max-height: ${SPACING.spacing32};
 

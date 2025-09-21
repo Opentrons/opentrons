@@ -15,6 +15,7 @@ export default mergeConfig(
       allowOnly: true,
       exclude: [...configDefaults.exclude, '**/node_modules/**', '**/dist/**'],
       setupFiles: ['./setup-vitest.mts'],
+      css: true,
       coverage: {
         exclude: [
           '**/node_modules/**',
@@ -30,6 +31,9 @@ export default mergeConfig(
     },
     resolve: {
       alias: {
+        '@opentrons/components/styles/global': path.resolve(
+          './components/src/styles/global.css'
+        ),
         '@opentrons/components/styles': path.resolve(
           './components/src/index.module.css'
         ),
