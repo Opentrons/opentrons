@@ -1,5 +1,3 @@
-import { Box } from './Box'
-// import { NewPrimaryBtn, NewSecondaryBtn, TertiaryBtn } from './Btn'
 import { NewPrimaryBtn } from './Buttons/NewPrimaryBtn'
 import { NewSecondaryBtn } from './Buttons/NewSecondaryBtn'
 
@@ -28,19 +26,3 @@ AppSecondary.args = {
   children: 'Confirm and Proceed',
   title: 'app secondary button title',
 }
-
-// const TertiaryTemplate: Story<
-//   React.ComponentProps<typeof TertiaryBtn>
-// > = args => <TertiaryBtn {...args} />
-// export const Tertiary = TertiaryTemplate.bind({})
-// Tertiary.decorators = [
-//   Story => (
-//     <Box backgroundColor="black" size="20rem" padding="2rem" id="hello">
-//       <Story />
-//     </Box>
-//   ),
-// ]
-// Tertiary.args = {
-//   children: 'Perform Side-Effect',
-//   title: 'tertiary button title',
-// }
