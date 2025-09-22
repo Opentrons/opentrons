@@ -24,14 +24,17 @@ import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labw
 import { getHeaterShakerLabwareOptions } from '/protocol-designer/ui/modules/selectors'
 import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
 
+import { usePriorModuleState } from '../../hooks/usePriorModuleState'
+
 import type { StepFormProps } from '../../types'
 
 export function HeaterShakerTools(props: StepFormProps): JSX.Element {
   const { propsForFields, formData } = props
   const { t } = useTranslation(['application', 'form', 'protocol_steps'])
   const moduleLabwareOptions = useSelector(getHeaterShakerLabwareOptions)
-  const priorState = usePriorHeaterShakerState(
-    propsForFields.moduleId.value as string
+  const priorState = usePriorModuleState(
+    propsForFields.moduleId.value as any,
+    HEATERSHAKER_MODULE_TYPE
   )
   const enableConcurrentModuleActions = useSelector(
     getEnableConcurrentModuleActions
@@ -188,34 +191,4 @@ function PriorState(props: {
       />
     </StepFormStatusList>
   )
-}
-
-function usePriorHeaterShakerState(
-  moduleId: string | null
-): SG_HeaterShakerModuleState | null {
-  // fixme(mm, 2025-09-19): getRobotStateAtActiveItem returns the state for the hovered step,
-  // which isn't quite what we want. We want the state just before the step that owns this form.
-  const state = useSelector(getRobotStateAtActiveItem)
-
-  if (moduleId == null) {
-    return null
-  }
-
-  const moduleState = state?.modules[moduleId]?.moduleState
-
-  if (moduleState == null) {
-    // This can happen if the user deletes the module but retains this step.
-    return null
-  }
-
-  if (moduleState.type !== HEATERSHAKER_MODULE_TYPE) {
-    // Shouldn't ever happen.
-    console.error(
-      'Expecting Heater-Shaker module type, but got:',
-      moduleState.type
-    )
-    return null
-  }
-
-  return moduleState
 }

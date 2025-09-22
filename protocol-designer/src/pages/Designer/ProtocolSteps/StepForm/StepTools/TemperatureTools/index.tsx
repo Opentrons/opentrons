@@ -9,13 +9,24 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+import { TEMPERATURE_MODULE_TYPE } from '@opentrons/shared-data'
+import {
+  TemperatureModuleState as SG_TemperatureModuleState,
+  TEMPERATURE_DEACTIVATED,
+} from '@opentrons/step-generation'
 
 import {
   DropdownStepFormField,
+  StepFormStatus,
+  StepFormStatusList,
   ToggleExpandStepFormField,
 } from '/protocol-designer/components/molecules'
+import { getEnableConcurrentModuleActions } from '/protocol-designer/feature-flags/selectors'
+import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import { getTemperatureLabwareOptions } from '/protocol-designer/ui/modules/selectors'
 import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
+
+import { usePriorModuleState } from '../../hooks/usePriorModuleState'
 
 import type { StepFormProps } from '../../types'
 
@@ -23,6 +34,13 @@ export function TemperatureTools(props: StepFormProps): JSX.Element {
   const { propsForFields, formData } = props
   const { t } = useTranslation(['application', 'form', 'protocol_steps'])
   const moduleLabwareOptions = useSelector(getTemperatureLabwareOptions)
+  const enableConcurrentModuleActions = useSelector(
+    getEnableConcurrentModuleActions
+  )
+  const priorState = usePriorModuleState(
+    propsForFields.moduleId.value as any,
+    TEMPERATURE_MODULE_TYPE
+  )
   const dispatch = useDispatch()
 
   return (
@@ -45,6 +63,24 @@ export function TemperatureTools(props: StepFormProps): JSX.Element {
         }}
       />
       <Box borderBottom={`1px solid ${COLORS.grey30}`} />
+      {enableConcurrentModuleActions && priorState != null && (
+        <>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing8}
+            paddingX={SPACING.spacing16}
+          >
+            <StyledText
+              desktopStyle="bodyDefaultSemiBold"
+              color={COLORS.black90}
+            >
+              {t('protocol_steps:prior_state')}
+            </StyledText>
+            <PriorState priorState={priorState} />
+          </Flex>
+          <Box borderBottom={`1px solid ${COLORS.grey30}`} />
+        </>
+      )}
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing4}
@@ -66,5 +102,31 @@ export function TemperatureTools(props: StepFormProps): JSX.Element {
         />
       </Flex>
     </Flex>
+  )
+}
+
+function PriorState(props: {
+  priorState: SG_TemperatureModuleState
+}): JSX.Element {
+  const { t } = useTranslation()
+  const { targetTemperature } = props.priorState
+  return (
+    <StepFormStatusList>
+      <StepFormStatus
+        label={t(
+          'protocol_steps:temperature_module.prior_state.temperature_label'
+        )}
+        value={
+          targetTemperature != null
+            ? t(
+                'protocol_steps:temperature_module.prior_state.temperature_value',
+                { value: targetTemperature }
+              )
+            : t(
+                'protocol_steps:temperature_module.prior_state.temperature_value_off'
+              )
+        }
+      />
+    </StepFormStatusList>
   )
 }

@@ -176,7 +176,12 @@
   "temperature": "Temperature",
   "temperature_module": {
     "active": "<semiBoldText>{{module}}</semiBoldText><text>set to</text><tag/>",
-    "deactivated": "<semiBoldText>{{module}}</semiBoldText><text>deactivated</text>"
+    "deactivated": "<semiBoldText>{{module}}</semiBoldText><text>deactivated</text>",
+    "prior_state": {
+      "temperature_label": "Temperature set to",
+      "temperature_value": "{{value}} °C",
+      "temperature_value_off": "Off"
+    }
   },
   "thermocycler_module": {
     "lid_position": {
