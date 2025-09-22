@@ -20,6 +20,7 @@ declare const _NODE_ENV_: string | undefined
 declare const _OT_PD_BUILD_DATE_: string | undefined
 declare const _OT_PD_MIXPANEL_DEV_ID_: string | undefined
 declare const _OT_PD_MIXPANEL_ID_: string | undefined
+declare const _OT_PD_REQUIRED_APP_VERSION_: string | undefined
 declare const _OT_PD_SENTRY_DEV_DSN_: string | undefined
 declare const _OT_PD_SENTRY_DSN_: string | undefined
 declare const _OT_PD_VERSION_: string | undefined

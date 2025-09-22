@@ -19,8 +19,6 @@ import {
   LINK_BUTTON_STYLE,
 } from '../../components/atoms'
 
-const REQUIRED_APP_VERSION = '8.7.0'
-
 type MetadataInfo = Array<{
   author?: string
   description?: string | null
@@ -106,7 +104,7 @@ export function ProtocolMetadata({
             content={
               <StyledText desktopStyle="bodyDefaultRegular">
                 {t('app_version', {
-                  version: REQUIRED_APP_VERSION,
+                  version: _OT_PD_REQUIRED_APP_VERSION_,
                 })}
               </StyledText>
             }
