@@ -1,26 +1,34 @@
-import type { TemperatureModuleState as SG_TemperatureModuleState } from '@opentrons/step-generation';
-import { useTranslation } from 'react-i18next';
-import { StepFormStatusList, StepFormStatus } from '/protocol-designer/components/molecules';
+import { useTranslation } from 'react-i18next'
+
+import {
+  StepFormStatus,
+  StepFormStatusList,
+} from '/protocol-designer/components/molecules'
+
+import type { TemperatureModuleState as SG_TemperatureModuleState } from '@opentrons/step-generation'
 
 export function PriorTemperatureState(props: {
-  priorState: SG_TemperatureModuleState;
+  priorState: SG_TemperatureModuleState
 }): JSX.Element {
-  const { t } = useTranslation();
-  const { targetTemperature } = props.priorState;
+  const { t } = useTranslation()
+  const { targetTemperature } = props.priorState
   return (
     <StepFormStatusList>
       <StepFormStatus
         label={t(
           'protocol_steps:temperature_module.prior_state.temperature_label'
         )}
-        value={targetTemperature != null
-          ? t(
-            'protocol_steps:temperature_module.prior_state.temperature_value',
-            { value: targetTemperature }
-          )
-          : t(
-            'protocol_steps:temperature_module.prior_state.temperature_value_off'
-          )} />
+        value={
+          targetTemperature != null
+            ? t(
+                'protocol_steps:temperature_module.prior_state.temperature_value',
+                { value: targetTemperature }
+              )
+            : t(
+                'protocol_steps:temperature_module.prior_state.temperature_value_off'
+              )
+        }
+      />
     </StepFormStatusList>
-  );
+  )
 }

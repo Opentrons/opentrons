@@ -21,9 +21,9 @@ import { getHeaterShakerLabwareOptions } from '/protocol-designer/ui/modules/sel
 import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
 
 import { usePriorModuleState } from '../../hooks/usePriorModuleState'
+import { PriorHeaterShakerState } from './PriorHeaterShakerState'
 
 import type { StepFormProps } from '../../types'
-import { PriorHeaterShakerState } from './PriorHeaterShakerState'
 
 export function HeaterShakerTools(props: StepFormProps): JSX.Element {
   const { propsForFields, formData } = props
@@ -150,5 +150,3 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
     </Flex>
   )
 }
-
-

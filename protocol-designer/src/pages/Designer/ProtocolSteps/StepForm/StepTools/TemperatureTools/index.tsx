@@ -20,9 +20,9 @@ import { getTemperatureLabwareOptions } from '/protocol-designer/ui/modules/sele
 import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
 
 import { usePriorModuleState } from '../../hooks/usePriorModuleState'
+import { PriorTemperatureState } from './PriorTemperatureState'
 
 import type { StepFormProps } from '../../types'
-import { PriorTemperatureState } from './PriorTemperatureState'
 
 export function TemperatureTools(props: StepFormProps): JSX.Element {
   const { propsForFields, formData } = props
