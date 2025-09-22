@@ -70,7 +70,7 @@ requirements = {"robotType": "Flex", "apiLevel": "2.24"}
 
 @dataclass(frozen=True)
 class SetupState:
-    """Configure static runtime parameters"""
+    """Configure static data for the protocol."""
 
     liq_pipette: InstrumentContext
     probe_pipette: InstrumentContext
@@ -109,7 +109,7 @@ class TrialResult:
 
 @dataclass
 class TrialState:
-    """Information that changes per-trial"""
+    """Data that changes per-trial."""
 
     current_well: str = "none"
     status: str = "pass"
@@ -123,6 +123,7 @@ class TrialState:
     step: int = 0
 
     def add_result(self) -> None:
+        """Adds the current step's results to the results list."""
         self.results.append(
             TrialResult(
                 well=self.current_well,
@@ -210,7 +211,7 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 
 def _setup(ctx: ProtocolContext) -> SetupState:
-    """Sets up the static data for the protocol"""
+    """Sets up the static data for the protocol."""
     global DIAL_PORT, RUN_ID, FILE_NAME, LABWARE
 
     first_dispense = ctx.params.first_dispense  # type: ignore[attr-defined]
@@ -251,14 +252,14 @@ def _setup(ctx: ProtocolContext) -> SetupState:
     threshold = 4.5
     delta_tolerance = 0.2
 
-    # volume deadband for the controller
+    # if within these bounds, then feedback loop doesnt make any changes
     max_volume = labware["A1"].max_volume
     lower_bound = target_height - delta_tolerance
     upper_bound = target_height + delta_tolerance
 
-    # volume clamps for the controller
-    min_step = max(max_volume * 0.01, 1)  # clamped to 1uL
-    max_step = max_volume * 0.25
+    # volume clamps for the feedback loop
+    min_step = max(max_volume * 0.01, 1)  # the lowest possible step
+    max_step = max_volume * 0.25  # the highest possible step
 
     # liquid
     ethanol_liq = ctx.define_liquid("Ethanol", display_color="#FFFFC5")
@@ -371,7 +372,9 @@ def _get_tip_z_error(
     return (new_val - baseline) * -1.0
 
 
-def pick_up_tips(liq_pipette, probe_pipette) -> None:
+def pick_up_tips(
+    liq_pipette: InstrumentContext, probe_pipette: InstrumentContext
+) -> None:
     """Pick up tips."""
     if not probe_pipette.has_tip:
         probe_pipette.pick_up_tip()
@@ -379,7 +382,7 @@ def pick_up_tips(liq_pipette, probe_pipette) -> None:
         liq_pipette.pick_up_tip()
 
 
-def drop_tips(liq_pipette, probe_pipette) -> None:
+def drop_tips(liq_pipette: InstrumentContext, probe_pipette: InstrumentContext) -> None:
     """Drop tips."""
     if probe_pipette.has_tip:
         probe_pipette.drop_tip()
@@ -494,7 +497,7 @@ def generate_frusta(
 
 
 def get_dispense_props(state: SetupState, ts: TrialState) -> None:
-    """Assigns the liquid class properties for ethanol dispense"""
+    """Assigns the liquid class properties for ethanol dispense."""
     if state.liquid_tip == "1000":
         dispense_offset = ts.corrected_height + state.target_height + 10
         state.liq_pipette.flow_rate.blow_out = 200
@@ -570,14 +573,14 @@ def adaptive_volume_step(ts: TrialState, state: SetupState) -> float:
     return new_volume
 
 
-def write_trial_log(ctx, ts: TrialState) -> None:
+def write_trial_log(ctx: ProtocolContext, ts: TrialState) -> None:
     """Writes the current step's results to the CSV."""
     ts.add_result()
     trial_data = ts.results[-1]
     _write_line_to_csv(ctx, [str(v) for v in vars(trial_data).values()])
 
 
-def check_hdelta(ctx, state: SetupState, ts: TrialState) -> str:
+def check_hdelta(ctx: ProtocolContext, state: SetupState, ts: TrialState) -> str:
     """Checks if the liquid level was successful in reaching the set target height."""
     if ctx.is_simulating():
         status = "sim"
@@ -604,10 +607,9 @@ def geometry_creator(
     ctx: ProtocolContext, state: SetupState, ts: TrialState
 ) -> List[TrialResult]:
     """Run liquid dispense + measure loop and return trial results."""
-
     # initial protocol steps
     _store_dial_baseline(ctx, state.probe_pipette, state.dial)
-    _write_line_to_csv(ctx, CSV_HEADER)
+    _write_line_to_csv(ctx, CSV_HEADER)  # log 0th step as a baseline
     write_trial_log(ctx, ts)
     state.liq_pipette.pick_up_tip()
     _get_height_of_liquid_in_well(

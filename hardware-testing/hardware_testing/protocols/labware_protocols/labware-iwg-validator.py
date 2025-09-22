@@ -10,14 +10,13 @@ from opentrons.protocol_api import (
 )
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     PositionReference,
-    Coordinate,
 )
 from typing import List, Dict, Optional, Union, Tuple
 from opentrons.types import Point
 from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
 
 # LABWARE TYPE
-LABWARE = "example_labware"  # change to desired labware
+LABWARE = "eppendorf_96_wellplate_500ul"  # change to desired labware
 
 # SLOTS
 SLOT_LIQUID_TIPRACKS = ["D3", "B3"]
@@ -278,7 +277,6 @@ def _get_height_of_liquid_in_well(
     pipette: InstrumentContext, well: Well, simulating: bool
 ) -> float:
     """Get height of liquid in well."""
-
     if not simulating:
         return extract_float(pipette.measure_liquid_height(well))
     else:
@@ -444,10 +442,8 @@ def run(ctx: ProtocolContext) -> None:
 
             # Add corrected heights
             region_results.extend(str(round(c, 3)) for c in corrected)
-
             # Add expected value
             region_results.append(str(round(expected_val, 3)))
-
             # Add average error
             region_results.append(str(round(avg_error, 3)))
 
