@@ -55,7 +55,7 @@ If condensation affects your Thermocycler, use the module's heating capabilities
 - 1 hour at 95 °C
 - 2 hours at 75 °C
 
-Contact [Opentrons Support](https://opentrons.com/opentrons-support) if condensation causes a module failure, as indicated by a blinking orange status light.
+Contact [Opentrons Support](https://opentrons.com/opentrons-support) if condensation causes a module failure, as indicated by a pulsing orange [status light](product-specs.md#led-status-light).
 
 ### Software Requirements
 
