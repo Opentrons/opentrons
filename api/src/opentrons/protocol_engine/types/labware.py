@@ -2,15 +2,11 @@
 
 from __future__ import annotations
 
-from typing import Optional, Union
+from typing import Optional
 from dataclasses import dataclass
 from datetime import datetime
 
 from pydantic import BaseModel, Field
-
-from opentrons_shared_data.labware.labware_definition import (
-    LabwareDefinition,
-)
 
 from .location import LabwareLocation
 from .labware_offset_location import (
@@ -19,8 +15,15 @@ from .labware_offset_location import (
 )
 from .labware_offset_vector import LabwareOffsetVector
 from .util import Vec3f
-from .module import ModuleDefinition
-from .deck_configuration import DeckLocationDefinition
+
+
+@dataclass(frozen=True)
+class GripSpecs:
+    """Data for how a labware should be gripped."""
+
+    uncertaintyWider: float
+    uncertaintyNarrower: float
+    targetY: float
 
 
 class OverlapOffset(Vec3f):
@@ -117,7 +120,9 @@ class LoadedLabware(BaseModel):
     )
 
 
-LabwareParentDefinition = Union[
-    DeckLocationDefinition, ModuleDefinition, LabwareDefinition
-]
-"""Information pertaining to a labware's parent (deck slot, module, or another labware) location."""
+@dataclass(frozen=True)
+class LabwareWellId:
+    """Designates a well in a labware."""
+
+    labware_id: str
+    well_name: str

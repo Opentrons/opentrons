@@ -3,7 +3,7 @@ from typing import Callable, cast
 
 import pytest
 from _pytest.fixtures import SubRequest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
+from pytest_lazy_fixtures import lf as lazy_fixture
 
 from opentrons.protocol_api.core.common import InstrumentCore, LabwareCore
 from opentrons.types import Location, Point

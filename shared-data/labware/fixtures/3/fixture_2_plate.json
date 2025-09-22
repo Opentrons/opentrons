@@ -8,8 +8,6 @@
     "displayVolumeUnits": "mL",
     "displayCategory": "reservoir"
   },
-  "locatingFeaturesAsParent": {},
-  "locatingFeaturesAsChild": {},
   "extents": {
     "total": {
       "backLeftBottom": {
@@ -22,8 +20,11 @@
         "y": -85.8,
         "z": 44.45
       }
-    },
-    "footprint": {
+    }
+  },
+  "features": {
+    "slotFootprintAsChild": {
+      "z": 0,
       "backLeft": {
         "x": 0,
         "y": 0

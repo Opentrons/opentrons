@@ -16,11 +16,21 @@ Protocols
    :members:
    :exclude-members: location_cache, cleanup, clear_commands
 
+.. autoclass:: opentrons.protocol_api.Task
+   :members:
+
 Instruments
 ===========
 .. autoclass:: opentrons.protocol_api.InstrumentContext
    :members:
    :exclude-members: delay
+
+Robot Motors
+============
+
+.. autoclass:: opentrons.protocol_api.RobotContext
+   :members: 
+   :exclude-members: 
 
 .. _protocol-api-labware:
 
@@ -49,7 +59,7 @@ Wells and Liquids
 .. autoclass:: opentrons.protocol_api.Liquid
 
 .. autoclass:: opentrons.protocol_api.LiquidClass
-   :members:
+   :members: get_for
 
 .. _protocol-api-modules:
 
@@ -64,6 +74,14 @@ Absorbance Plate Reader
    :exclude-members: broker, geometry, load_labware_object, load_adapter, load_adapter_from_definition
    :inherited-members:
 
+
+Flex Stacker
+------------
+
+.. autoclass:: opentrons.protocol_api.FlexStackerContext
+   :members:
+   :exclude-members: calibrate, broker, geometry, load_labware_object
+   :inherited-members:
 
 Heater-Shaker
 -------------
@@ -123,6 +141,8 @@ Useful Types
 
 .. autodata:: opentrons.protocol_api.OFF_DECK
    :no-value:
+
+.. autoclass:: opentrons.protocol_api.OffDeckType
 
 Executing and Simulating Protocols
 ==================================

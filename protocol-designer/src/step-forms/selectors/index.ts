@@ -6,8 +6,8 @@ import { createSelector } from 'reselect'
 
 import {
   ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   getLabwareDefURI,
-  getLabwareDisplayName,
   getPipetteSpecsV2,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
@@ -31,13 +31,7 @@ import { getLocationStackTopToBottom } from '../../utils'
 import { denormalizePipetteEntities, getHydratedForm } from '../utils'
 
 import type { Selector } from 'reselect'
-import type { ComponentProps } from 'react'
-import type {
-  DropdownOption,
-  InstrumentGroup,
-  InstrumentInfoProps,
-  Mount,
-} from '@opentrons/components'
+import type { DropdownOption, Mount } from '@opentrons/components'
 import type { LabwareDefinition2, PipetteName } from '@opentrons/shared-data'
 import type {
   AdditionalEquipmentEntities,
@@ -78,6 +72,7 @@ import type {
 } from '../reducers'
 import type {
   AbsorbanceReaderState,
+  FlexStackerModuleState,
   FormPipettesByMount,
   HeaterShakerModuleState,
   InitialDeckSetup,
@@ -86,6 +81,7 @@ import type {
   MagneticModuleState,
   ModuleOnDeck,
   ModulesForEditModulesCard,
+  ModuleTemporalProperties,
   NormalizedLabware,
   NormalizedLabwareById,
   PipetteOnDeck,
@@ -249,6 +245,22 @@ const ABSORBANCE_READER_INITIAL_STATE: AbsorbanceReaderState = {
   lidOpen: null,
   initialization: null,
 }
+const FLEX_STACKER_INITIAL_STATE: FlexStackerModuleState = {
+  type: FLEX_STACKER_MODULE_TYPE,
+}
+
+const MODULE_INITIAL_STATES_MAP: Record<
+  string,
+  ModuleTemporalProperties['moduleState']
+> = {
+  [MAGNETIC_MODULE_TYPE]: MAGNETIC_MODULE_INITIAL_STATE,
+  [TEMPERATURE_MODULE_TYPE]: TEMPERATURE_MODULE_INITIAL_STATE,
+  [THERMOCYCLER_MODULE_TYPE]: THERMOCYCLER_MODULE_INITIAL_STATE,
+  [HEATERSHAKER_MODULE_TYPE]: HEATERSHAKER_MODULE_INITIAL_STATE,
+  [MAGNETIC_BLOCK_TYPE]: MAGNETIC_BLOCK_INITIAL_STATE,
+  [ABSORBANCE_READER_TYPE]: ABSORBANCE_READER_INITIAL_STATE,
+  [FLEX_STACKER_MODULE_TYPE]: FLEX_STACKER_INITIAL_STATE,
+}
 
 const _getInitialDeckSetup = (
   initialSetupStep: FormData,
@@ -296,65 +308,22 @@ const _getInitialDeckSetup = (
     ),
     modules: mapValues<Record<DeckSlot, string>, ModuleOnDeck>(
       moduleLocations as Record<DeckSlot, string>,
-      // @ts-expect-error Flex stacker not yet supported in PD
       (slot: DeckSlot, moduleId: string): ModuleOnDeck => {
         const moduleEntity = moduleEntities[moduleId]
+        const { id, model, type, pythonName } = moduleEntity
+        const moduleState = MODULE_INITIAL_STATES_MAP[type]
 
-        switch (moduleEntity.type) {
-          case MAGNETIC_MODULE_TYPE:
-            return {
-              id: moduleEntity.id,
-              model: moduleEntity.model,
-              type: MAGNETIC_MODULE_TYPE,
-              slot,
-              moduleState: MAGNETIC_MODULE_INITIAL_STATE,
-              pythonName: moduleEntity.pythonName,
-            }
-          case TEMPERATURE_MODULE_TYPE:
-            return {
-              id: moduleEntity.id,
-              model: moduleEntity.model,
-              type: TEMPERATURE_MODULE_TYPE,
-              slot,
-              moduleState: TEMPERATURE_MODULE_INITIAL_STATE,
-              pythonName: moduleEntity.pythonName,
-            }
-          case THERMOCYCLER_MODULE_TYPE:
-            return {
-              id: moduleEntity.id,
-              model: moduleEntity.model,
-              type: THERMOCYCLER_MODULE_TYPE,
-              slot,
-              moduleState: THERMOCYCLER_MODULE_INITIAL_STATE,
-              pythonName: moduleEntity.pythonName,
-            }
-          case HEATERSHAKER_MODULE_TYPE:
-            return {
-              id: moduleEntity.id,
-              model: moduleEntity.model,
-              type: HEATERSHAKER_MODULE_TYPE,
-              slot,
-              moduleState: HEATERSHAKER_MODULE_INITIAL_STATE,
-              pythonName: moduleEntity.pythonName,
-            }
-          case MAGNETIC_BLOCK_TYPE:
-            return {
-              id: moduleEntity.id,
-              model: moduleEntity.model,
-              type: MAGNETIC_BLOCK_TYPE,
-              slot,
-              moduleState: MAGNETIC_BLOCK_INITIAL_STATE,
-              pythonName: moduleEntity.pythonName,
-            }
-          case ABSORBANCE_READER_TYPE:
-            return {
-              id: moduleEntity.id,
-              model: moduleEntity.model,
-              type: ABSORBANCE_READER_TYPE,
-              slot,
-              moduleState: ABSORBANCE_READER_INITIAL_STATE,
-              pythonName: moduleEntity.pythonName,
-            }
+        if (moduleState == null) {
+          console.error(`Unknown module type: ${type}`)
+        }
+
+        return {
+          id,
+          model,
+          type,
+          slot,
+          moduleState,
+          pythonName,
         }
       }
     ),
@@ -444,35 +413,6 @@ export const getEquippedPipetteOptions: Selector<
     []
   )
 })
-// Formats pipette data specifically for file page InstrumentGroup component
-type PipettesForInstrumentGroup = ComponentProps<typeof InstrumentGroup>
-export const getPipettesForInstrumentGroup: Selector<
-  BaseState,
-  PipettesForInstrumentGroup
-> = createSelector(getInitialDeckSetup, initialDeckSetup =>
-  reduce(
-    initialDeckSetup.pipettes,
-    (
-      acc: PipettesForInstrumentGroup,
-      pipetteOnDeck: PipetteOnDeck,
-      pipetteId
-    ) => {
-      const pipetteSpec = pipetteOnDeck.spec
-      const tiprackDefs = pipetteOnDeck.tiprackLabwareDef
-      const pipetteForInstrumentGroup: InstrumentInfoProps = {
-        mount: pipetteOnDeck.mount,
-        pipetteSpecs: pipetteSpec,
-        description: _getPipetteDisplayName(pipetteOnDeck.name),
-        tiprackModels: tiprackDefs?.map((def: LabwareDefinition2) =>
-          getLabwareDisplayName(def)
-        ),
-      }
-      acc[pipetteOnDeck.mount] = pipetteForInstrumentGroup
-      return acc
-    },
-    {}
-  )
-)
 export const getPipettesForEditPipetteForm: Selector<
   BaseState,
   FormPipettesByMount

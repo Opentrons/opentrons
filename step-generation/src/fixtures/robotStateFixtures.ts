@@ -18,7 +18,12 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { FIXED_TRASH_ID, TEMPERATURE_DEACTIVATED } from '../constants'
+import {
+  CLEAN,
+  EMPTY,
+  FIXED_TRASH_ID,
+  TEMPERATURE_DEACTIVATED,
+} from '../constants'
 import { makeInitialRobotState } from '../utils'
 import {
   DEFAULT_PIPETTE,
@@ -43,7 +48,7 @@ import type {
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_AT_TARGET,
 } from '../constants'
-import type { TrashBinEntities } from '../types'
+import type { TipState, TrashBinEntities } from '../types'
 
 const fixture96Plate = _fixture96Plate as LabwareDefinition2
 const fixture12Trough = _fixture12Trough as LabwareDefinition2
@@ -56,12 +61,15 @@ export const DEFAULT_CONFIG: Config = {
   OT_PD_DISABLE_MODULE_RESTRICTIONS: false,
 }
 // Eg {A1: true, B1: true, ...}
-type WellTipState = Record<string, boolean>
+type WellTipState = Record<string, TipState>
 export function getTiprackTipstate(
   filled: boolean | null | undefined
 ): WellTipState {
   return tiprackWellNamesFlat.reduce<WellTipState>(
-    (acc, wellName: string) => ({ ...acc, [wellName]: Boolean(filled) }),
+    (acc, wellName: string) => ({
+      ...acc,
+      [wellName]: filled ? CLEAN : EMPTY,
+    }),
     {}
   )
 }
@@ -236,9 +244,11 @@ export const makeStateArgsStandard = (): StandardMakeStateArgs => ({
   pipetteLocations: {
     [DEFAULT_PIPETTE]: {
       mount: 'left',
+      tiprackId: 'tiprack1Id',
     },
     [MULTI_PIPETTE]: {
       mount: 'right',
+      tiprackId: 'tiprack1Id',
     },
   },
   labwareLocations: {
@@ -360,7 +370,7 @@ export const getRobotStatePickedUpTipStandard = (
     hasTip: true,
     tiprackURI: 'tiprackId',
   }
-  robotStatePickedUpOneTip.tipState.tipracks.tiprack1Id.A1 = false
+  robotStatePickedUpOneTip.tipState.tipracks.tiprack1Id.A1 = EMPTY
   return robotStatePickedUpOneTip
 }
 export const getRobotInitialStateNoTipsRemain = (

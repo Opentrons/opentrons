@@ -13,21 +13,22 @@ import {
 import {
   actions as dismissActions,
   selectors as dismissSelectors,
-} from '../../../dismiss'
+} from '/protocol-designer/dismiss'
 import {
   getVisibleFormErrors,
   getVisibleFormWarnings,
   getVisibleProfileFormLevelErrors,
-} from '../../../pages/Designer/ProtocolSteps/StepForm/utils'
-import { selectors as stepFormSelectors } from '../../../step-forms'
-import * as timelineWarningSelectors from '../../../top-selectors/timelineWarnings'
-import { getSelectedStepId } from '../../../ui/steps'
+} from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/utils'
+import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
+import * as timelineWarningSelectors from '/protocol-designer/top-selectors/timelineWarnings'
+import { getSelectedStepId } from '/protocol-designer/ui/steps'
+
 import { WarningContents } from './WarningContents'
 
 import type { ReactNode } from 'react'
 import type { ProfileItem } from '@opentrons/step-generation'
-import type { StepFieldName } from '../../../form-types'
-import type { ProfileFormError } from '../../../steplist/formLevel/profileErrors'
+import type { StepFieldName } from '/protocol-designer/form-types'
+import type { ProfileFormError } from '/protocol-designer/steplist/formLevel/profileErrors'
 import type { MakeAlert } from './types'
 
 interface FormAlertsProps {

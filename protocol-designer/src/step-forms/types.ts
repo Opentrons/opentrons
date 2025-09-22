@@ -2,6 +2,7 @@ import type { Mount } from '@opentrons/components'
 import type {
   ABSORBANCE_READER_TYPE,
   CutoutId,
+  FLEX_STACKER_MODULE_TYPE,
   FlexModuleCutoutFixtureId,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
@@ -18,6 +19,7 @@ import type {
   ModuleEntity,
   PipetteEntity,
   TemperatureStatus,
+  TOUCHED_PIPETTABLE_LABWARE,
 } from '@opentrons/step-generation'
 import type { DeckSlot } from '../types'
 
@@ -67,6 +69,10 @@ export interface MagneticBlockState {
   type: typeof MAGNETIC_BLOCK_TYPE
 }
 
+export interface FlexStackerModuleState {
+  type: typeof FLEX_STACKER_MODULE_TYPE
+  // TODO: extend this state
+}
 export type InitializationMode = 'single' | 'multi'
 export interface Initialization {
   mode: InitializationMode
@@ -88,6 +94,7 @@ export interface ModuleTemporalProperties {
     | HeaterShakerModuleState
     | MagneticBlockState
     | AbsorbanceReaderState
+    | FlexStackerModuleState
 }
 export type ModuleOnDeck = ModuleEntity & ModuleTemporalProperties
 export type ModulesForEditModulesCard = Partial<
@@ -107,6 +114,9 @@ export type NormalizedLabware = NormalizedLabwareById[keyof NormalizedLabwareByI
 // Temporal properties (eg location) that are time-variant
 export interface LabwareTemporalProperties {
   stack: string[] // a stack of ids from top to bottom
+  // we currently use this property only to track if a lid has been placed on a "pipettable" labware that could presumably contain liquid
+  // we can expand this type in the future to track other types of sterility for various labware types
+  sterility?: typeof TOUCHED_PIPETTABLE_LABWARE
 }
 export interface PipetteTemporalProperties {
   mount: Mount

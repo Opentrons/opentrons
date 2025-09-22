@@ -8,7 +8,7 @@ from typing import ContextManager, Optional, Any
 from unittest.mock import sentinel
 
 from decoy import Decoy, matchers
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
+from pytest_lazy_fixtures import lf as lazy_fixture
 
 from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
 from opentrons.protocol_engine.errors.error_occurrence import (
@@ -50,7 +50,13 @@ from opentrons.protocol_api import (
     labware,
     LiquidClass,
 )
-from opentrons.protocol_api.core.common import InstrumentCore, ProtocolCore
+from opentrons.protocol_api.core.common import (
+    InstrumentCore,
+    ProtocolCore,
+    WellCore,
+    LabwareCore,
+)
+from opentrons.protocol_api.core.core_map import LoadedCoreMap
 from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
     LegacyInstrumentCore,
 )
@@ -133,6 +139,12 @@ def mock_protocol_core(decoy: Decoy) -> ProtocolCore:
 
 
 @pytest.fixture
+def mock_core_map(decoy: Decoy) -> LoadedCoreMap:
+    """Get a mock LoadedCoreMap."""
+    return decoy.mock(cls=LoadedCoreMap)
+
+
+@pytest.fixture
 def mock_broker(decoy: Decoy) -> LegacyBroker:
     """Get a mock command message broker."""
     return decoy.mock(cls=LegacyBroker)
@@ -154,6 +166,7 @@ def api_version() -> APIVersion:
 def subject(
     mock_instrument_core: InstrumentCore,
     mock_protocol_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
     mock_broker: LegacyBroker,
     mock_trash: Labware,
     api_version: APIVersion,
@@ -167,6 +180,7 @@ def subject(
         tip_racks=[],
         trash=mock_trash,
         requested_as="requested-pipette-name",
+        core_map=mock_core_map,
     )
 
 
@@ -1002,28 +1016,32 @@ def test_return_tip(
     decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
 ) -> None:
     """It should pick up a tip and return it."""
+    mock_tiprack_core = decoy.mock(cls=LabwareCore)
+    mock_tiprack = decoy.mock(cls=Labware)
+    mock_well_core = decoy.mock(cls=WellCore)
+    subject._core_map = {mock_tiprack_core: mock_tiprack}  # type: ignore[assignment]
     mock_well = decoy.mock(cls=Well)
     top_location = Location(point=Point(1, 2, 3), labware=mock_well)
-    decoy.when(mock_well.top()).then_return(top_location)
 
-    subject.pick_up_tip(mock_well)
+    decoy.when(mock_well_core.get_display_name()).then_return("bar")
+    decoy.when(mock_well_core.get_name()).then_return("foo")
+    decoy.when(mock_well.top()).then_return(top_location)
+    decoy.when(mock_instrument_core.has_tip()).then_return(True)
+    decoy.when(mock_instrument_core.get_tip_origin()).then_return(
+        (mock_tiprack_core, mock_well_core)
+    )
+
     subject.return_tip()
 
     decoy.verify(
-        mock_instrument_core.pick_up_tip(
-            location=top_location,
-            well_core=mock_well._core,
-            presses=None,
-            increment=None,
-            prep_after=True,
-        ),
         mock_instrument_core.drop_tip(
             location=None,
-            well_core=mock_well._core,
+            well_core=mock_well_core,
             home_after=None,
             alternate_drop_location=False,
-        ),
+        )
     )
+    decoy.when(mock_instrument_core.get_tip_origin()).then_return(None)
 
     with pytest.raises(TypeError, match="Last tip location"):
         subject.return_tip()
@@ -2464,7 +2482,6 @@ def test_transfer_liquid_delegates_to_engine_core(
     mock_starting_tip_well = decoy.mock(cls=Well)
     tip_racks = [decoy.mock(cls=Labware)]
     trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
-    next_tiprack = decoy.mock(cls=Labware)
     subject.starting_tip = mock_starting_tip_well
     subject._tip_racks = tip_racks
 
@@ -2472,7 +2489,6 @@ def test_transfer_liquid_delegates_to_engine_core(
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(MOCK_MAP)
     decoy.when(mock_instrument_core.get_active_channels()).then_return(2)
     decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
-    decoy.when(next_tiprack.uri).then_return("tiprack-uri")
     decoy.when(mock_instrument_core.get_pipette_name()).then_return("pipette-name")
     subject.transfer_with_liquid_class(
         liquid_class=test_liq_class,
@@ -2494,6 +2510,7 @@ def test_transfer_liquid_delegates_to_engine_core(
             starting_tip=mock_starting_tip_well._core,
             trash_location=trash_location,
             return_tip=True,
+            keep_last_tip=False,
         )
     )
 
@@ -2513,7 +2530,6 @@ def test_transfer_liquid_multi_channel_delegates_to_engine_core(
     decoy.when(mock_well.well_name).then_return("mock well")
     tip_racks = [decoy.mock(cls=Labware)]
     trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
-    next_tiprack = decoy.mock(cls=Labware)
     subject.starting_tip = None
     subject._tip_racks = tip_racks
 
@@ -2523,13 +2539,17 @@ def test_transfer_liquid_multi_channel_delegates_to_engine_core(
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(
         mock_tx_liquid_utils.group_wells_for_multi_channel_transfer(
-            [mock_well, mock_well], mock_nozzle_map
+            [mock_well, mock_well], mock_nozzle_map, "source"
+        )
+    ).then_return([mock_well])
+    decoy.when(
+        mock_tx_liquid_utils.group_wells_for_multi_channel_transfer(
+            [mock_well, mock_well], mock_nozzle_map, "destination"
         )
     ).then_return([mock_well])
 
     decoy.when(mock_instrument_core.get_active_channels()).then_return(2)
     decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
-    decoy.when(next_tiprack.uri).then_return("tiprack-uri")
     decoy.when(mock_instrument_core.get_pipette_name()).then_return("pipette-name")
     subject.transfer_with_liquid_class(
         liquid_class=test_liq_class,
@@ -2551,6 +2571,7 @@ def test_transfer_liquid_multi_channel_delegates_to_engine_core(
             starting_tip=None,
             trash_location=trash_location,
             return_tip=True,
+            keep_last_tip=False,
         )
     )
 
@@ -2571,7 +2592,6 @@ def test_transfer_liquid_delegates_to_engine_core_with_trash_destination(
     mock_trash = decoy.mock(cls=TrashBin)
     tip_racks = [decoy.mock(cls=Labware)]
     trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
-    next_tiprack = decoy.mock(cls=Labware)
     subject.starting_tip = mock_starting_tip_well
     subject._tip_racks = tip_racks
 
@@ -2579,7 +2599,6 @@ def test_transfer_liquid_delegates_to_engine_core_with_trash_destination(
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(MOCK_MAP)
     decoy.when(mock_instrument_core.get_active_channels()).then_return(2)
     decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
-    decoy.when(next_tiprack.uri).then_return("tiprack-uri")
     decoy.when(mock_instrument_core.get_pipette_name()).then_return("pipette-name")
     subject.transfer_with_liquid_class(
         liquid_class=test_liq_class,
@@ -2601,6 +2620,59 @@ def test_transfer_liquid_delegates_to_engine_core_with_trash_destination(
             starting_tip=mock_starting_tip_well._core,
             trash_location=trash_location,
             return_tip=True,
+            keep_last_tip=False,
+        )
+    )
+
+
+@pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
+def test_transfer_liquid_uses_provided_tip_racks(
+    decoy: Decoy,
+    mock_protocol_core: ProtocolCore,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    robot_type: RobotType,
+    minimal_liquid_class_def2: LiquidClassSchemaV1,
+) -> None:
+    """It should use the provided tip racks instead of the assigned ones."""
+    test_liq_class = LiquidClass.create(minimal_liquid_class_def2)
+    mock_well = decoy.mock(cls=Well)
+    mock_starting_tip_well = decoy.mock(cls=Well)
+    tip_racks = [decoy.mock(cls=Labware)]
+    trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
+    assigned_tip_rack = decoy.mock(cls=Labware)
+    subject.starting_tip = mock_starting_tip_well
+    subject._tip_racks = tip_racks
+
+    decoy.when(mock_protocol_core.robot_type).then_return(robot_type)
+    decoy.when(mock_instrument_core.get_nozzle_map()).then_return(MOCK_MAP)
+    decoy.when(mock_instrument_core.get_active_channels()).then_return(2)
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
+    decoy.when(mock_instrument_core.get_pipette_name()).then_return("pipette-name")
+    subject.transfer_with_liquid_class(
+        liquid_class=test_liq_class,
+        volume=10,
+        source=[mock_well],
+        dest=[mock_well],
+        new_tip="once",
+        trash_location=trash_location,
+        return_tip=True,
+        tip_racks=[assigned_tip_rack],
+    )
+    decoy.verify(
+        mock_instrument_core.transfer_with_liquid_class(
+            liquid_class=test_liq_class,
+            volume=10,
+            source=[(Location(Point(), labware=mock_well), mock_well._core)],
+            dest=[(Location(Point(), labware=mock_well), mock_well._core)],
+            new_tip=TransferTipPolicyV2.ONCE,
+            tip_racks=[
+                (Location(Point(), labware=assigned_tip_rack), assigned_tip_rack._core)
+            ],
+            starting_tip=mock_starting_tip_well._core,
+            trash_location=trash_location,
+            return_tip=True,
+            keep_last_tip=False,
         )
     )
 
@@ -2751,7 +2823,7 @@ def test_distribute_liquid_raises_if_tip_has_liquid(
 
 
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
-@pytest.mark.parametrize("new_tip", ["always", "per source", "per destination"])
+@pytest.mark.parametrize("new_tip", ["per source", "per destination"])
 def test_distribute_liquid_raises_for_incompatible_tip_policies(
     decoy: Decoy,
     mock_protocol_core: ProtocolCore,
@@ -2761,7 +2833,7 @@ def test_distribute_liquid_raises_for_incompatible_tip_policies(
     robot_type: RobotType,
     minimal_liquid_class_def2: LiquidClassSchemaV1,
 ) -> None:
-    """It should raise errors if the tip policy is "per source"."""
+    """It should raise errors if the tip policy is "per source" or "per destination"."""
     test_liq_class = LiquidClass.create(minimal_liquid_class_def2)
     mock_well = decoy.mock(cls=Well)
     trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
@@ -2795,7 +2867,6 @@ def test_distribute_liquid_delegates_to_engine_core(
     mock_starting_tip_well = decoy.mock(cls=Well)
     tip_racks = [decoy.mock(cls=Labware)]
     trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
-    next_tiprack = decoy.mock(cls=Labware)
     subject.starting_tip = mock_starting_tip_well
     subject._tip_racks = tip_racks
 
@@ -2803,7 +2874,6 @@ def test_distribute_liquid_delegates_to_engine_core(
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(MOCK_MAP)
     decoy.when(mock_instrument_core.get_active_channels()).then_return(2)
     decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
-    decoy.when(next_tiprack.uri).then_return("tiprack-uri")
     decoy.when(mock_instrument_core.get_pipette_name()).then_return("pipette-name")
     subject.distribute_with_liquid_class(
         liquid_class=test_liq_class,
@@ -2825,6 +2895,7 @@ def test_distribute_liquid_delegates_to_engine_core(
             starting_tip=mock_starting_tip_well._core,
             trash_location=trash_location,
             return_tip=True,
+            keep_last_tip=False,
         )
     )
 
@@ -2844,7 +2915,6 @@ def test_distribute_liquid_multi_channel_delegates_to_engine_core(
     decoy.when(mock_well.well_name).then_return("mock well")
     tip_racks = [decoy.mock(cls=Labware)]
     trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
-    next_tiprack = decoy.mock(cls=Labware)
     subject.starting_tip = None
     subject._tip_racks = tip_racks
 
@@ -2854,18 +2924,17 @@ def test_distribute_liquid_multi_channel_delegates_to_engine_core(
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(
         mock_tx_liquid_utils.group_wells_for_multi_channel_transfer(
-            [mock_well, mock_well, mock_well], mock_nozzle_map
+            [mock_well, mock_well, mock_well], mock_nozzle_map, "source"
         )
     ).then_return([mock_well])
     decoy.when(
         mock_tx_liquid_utils.group_wells_for_multi_channel_transfer(
-            [mock_well, mock_well], mock_nozzle_map
+            [mock_well, mock_well], mock_nozzle_map, "destination"
         )
     ).then_return([mock_well, mock_well])
 
     decoy.when(mock_instrument_core.get_active_channels()).then_return(2)
     decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
-    decoy.when(next_tiprack.uri).then_return("tiprack-uri")
     decoy.when(mock_instrument_core.get_pipette_name()).then_return("pipette-name")
     subject.distribute_with_liquid_class(
         liquid_class=test_liq_class,
@@ -2890,6 +2959,75 @@ def test_distribute_liquid_multi_channel_delegates_to_engine_core(
             starting_tip=None,
             trash_location=trash_location,
             return_tip=True,
+            keep_last_tip=False,
+        )
+    )
+
+
+@pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
+def test_distribute_liquid_uses_provided_tip_racks(
+    decoy: Decoy,
+    mock_protocol_core: ProtocolCore,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    robot_type: RobotType,
+    minimal_liquid_class_def2: LiquidClassSchemaV1,
+) -> None:
+    """It should use the provided tip racks instead of the assigned ones."""
+    test_liq_class = LiquidClass.create(minimal_liquid_class_def2)
+    mock_well = decoy.mock(cls=Well)
+    decoy.when(mock_well.well_name).then_return("mock well")
+    tip_racks = [decoy.mock(cls=Labware)]
+    trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
+    assigned_tip_rack = decoy.mock(cls=Labware)
+    subject.starting_tip = None
+    subject._tip_racks = tip_racks
+
+    decoy.when(mock_protocol_core.robot_type).then_return(robot_type)
+    mock_nozzle_map = decoy.mock(cls=NozzleMapInterface)
+    decoy.when(mock_nozzle_map.tip_count).then_return(2)
+    decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
+    decoy.when(
+        mock_tx_liquid_utils.group_wells_for_multi_channel_transfer(
+            [mock_well, mock_well, mock_well], mock_nozzle_map, "source"
+        )
+    ).then_return([mock_well])
+    decoy.when(
+        mock_tx_liquid_utils.group_wells_for_multi_channel_transfer(
+            [mock_well, mock_well], mock_nozzle_map, "destination"
+        )
+    ).then_return([mock_well, mock_well])
+
+    decoy.when(mock_instrument_core.get_active_channels()).then_return(2)
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
+    decoy.when(mock_instrument_core.get_pipette_name()).then_return("pipette-name")
+    subject.distribute_with_liquid_class(
+        liquid_class=test_liq_class,
+        volume=10,
+        source=[mock_well, mock_well, mock_well],
+        dest=[[mock_well, mock_well]],
+        new_tip="once",
+        trash_location=trash_location,
+        return_tip=True,
+        tip_racks=[assigned_tip_rack],
+    )
+    decoy.verify(
+        mock_instrument_core.distribute_with_liquid_class(
+            liquid_class=test_liq_class,
+            volume=10,
+            source=(Location(Point(), labware=mock_well), mock_well._core),
+            dest=[
+                (Location(Point(), labware=mock_well), mock_well._core),
+                (Location(Point(), labware=mock_well), mock_well._core),
+            ],
+            new_tip=TransferTipPolicyV2.ONCE,
+            tip_racks=[
+                (Location(Point(), labware=assigned_tip_rack), assigned_tip_rack._core)
+            ],
+            starting_tip=None,
+            trash_location=trash_location,
+            return_tip=True,
+            keep_last_tip=False,
         )
     )
 
@@ -3033,7 +3171,7 @@ def test_consolidate_liquid_raises_if_tip_has_liquid(
 
 
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
-@pytest.mark.parametrize("new_tip", ["always", "per source", "per destination"])
+@pytest.mark.parametrize("new_tip", ["per source", "per destination"])
 def test_consolidate_liquid_raises_for_incompatible_tip_policies(
     decoy: Decoy,
     mock_protocol_core: ProtocolCore,
@@ -3043,7 +3181,7 @@ def test_consolidate_liquid_raises_for_incompatible_tip_policies(
     robot_type: RobotType,
     minimal_liquid_class_def2: LiquidClassSchemaV1,
 ) -> None:
-    """It should raise errors if the tip policy is "per source" or "always"."""
+    """It should raise errors if the tip policy is "per source" or "per destination"."""
     test_liq_class = LiquidClass.create(minimal_liquid_class_def2)
     mock_well = decoy.mock(cls=Well)
     trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
@@ -3077,7 +3215,6 @@ def test_consolidate_liquid_delegates_to_engine_core(
     mock_starting_tip_well = decoy.mock(cls=Well)
     tip_racks = [decoy.mock(cls=Labware)]
     trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
-    next_tiprack = decoy.mock(cls=Labware)
     subject.starting_tip = mock_starting_tip_well
     subject._tip_racks = tip_racks
 
@@ -3085,7 +3222,6 @@ def test_consolidate_liquid_delegates_to_engine_core(
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(MOCK_MAP)
     decoy.when(mock_instrument_core.get_active_channels()).then_return(2)
     decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
-    decoy.when(next_tiprack.uri).then_return("tiprack-uri")
     decoy.when(mock_instrument_core.get_pipette_name()).then_return("pipette-name")
 
     subject.consolidate_with_liquid_class(
@@ -3108,6 +3244,7 @@ def test_consolidate_liquid_delegates_to_engine_core(
             starting_tip=mock_starting_tip_well._core,
             trash_location=trash_location,
             return_tip=True,
+            keep_last_tip=False,
         )
     )
 
@@ -3127,7 +3264,6 @@ def test_consolidate_liquid_multi_channel_delegates_to_engine_core(
     decoy.when(mock_well.well_name).then_return("mock well")
     tip_racks = [decoy.mock(cls=Labware)]
     trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
-    next_tiprack = decoy.mock(cls=Labware)
     subject.starting_tip = None
     subject._tip_racks = tip_racks
 
@@ -3137,18 +3273,17 @@ def test_consolidate_liquid_multi_channel_delegates_to_engine_core(
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(
         mock_tx_liquid_utils.group_wells_for_multi_channel_transfer(
-            [mock_well, mock_well, mock_well], mock_nozzle_map
-        )
-    ).then_return([mock_well])
-    decoy.when(
-        mock_tx_liquid_utils.group_wells_for_multi_channel_transfer(
-            [mock_well, mock_well], mock_nozzle_map
+            [mock_well, mock_well], mock_nozzle_map, "source"
         )
     ).then_return([mock_well, mock_well])
+    decoy.when(
+        mock_tx_liquid_utils.group_wells_for_multi_channel_transfer(
+            [mock_well, mock_well, mock_well], mock_nozzle_map, "destination"
+        )
+    ).then_return([mock_well])
 
     decoy.when(mock_instrument_core.get_active_channels()).then_return(2)
     decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
-    decoy.when(next_tiprack.uri).then_return("tiprack-uri")
     decoy.when(mock_instrument_core.get_pipette_name()).then_return("pipette-name")
 
     subject.consolidate_with_liquid_class(
@@ -3174,6 +3309,7 @@ def test_consolidate_liquid_multi_channel_delegates_to_engine_core(
             starting_tip=None,
             trash_location=trash_location,
             return_tip=True,
+            keep_last_tip=False,
         )
     )
 
@@ -3194,7 +3330,6 @@ def test_consolidate_liquid_delegates_to_engine_core_with_trash_destination(
     mock_waste_chute = decoy.mock(cls=WasteChute)
     tip_racks = [decoy.mock(cls=Labware)]
     trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
-    next_tiprack = decoy.mock(cls=Labware)
     subject.starting_tip = mock_starting_tip_well
     subject._tip_racks = tip_racks
 
@@ -3202,7 +3337,6 @@ def test_consolidate_liquid_delegates_to_engine_core_with_trash_destination(
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(MOCK_MAP)
     decoy.when(mock_instrument_core.get_active_channels()).then_return(2)
     decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
-    decoy.when(next_tiprack.uri).then_return("tiprack-uri")
     decoy.when(mock_instrument_core.get_pipette_name()).then_return("pipette-name")
 
     subject.consolidate_with_liquid_class(
@@ -3225,5 +3359,59 @@ def test_consolidate_liquid_delegates_to_engine_core_with_trash_destination(
             starting_tip=mock_starting_tip_well._core,
             trash_location=trash_location,
             return_tip=True,
+            keep_last_tip=False,
+        )
+    )
+
+
+@pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
+def test_consolidate_liquid_uses_provided_tip_racks(
+    decoy: Decoy,
+    mock_protocol_core: ProtocolCore,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    robot_type: RobotType,
+    minimal_liquid_class_def2: LiquidClassSchemaV1,
+) -> None:
+    """It should use the provided tip racks instead of the assigned ones."""
+    test_liq_class = LiquidClass.create(minimal_liquid_class_def2)
+    mock_well = decoy.mock(cls=Well)
+    mock_starting_tip_well = decoy.mock(cls=Well)
+    tip_racks = [decoy.mock(cls=Labware)]
+    trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
+    assigned_tip_rack = decoy.mock(cls=Labware)
+    subject.starting_tip = mock_starting_tip_well
+    subject._tip_racks = tip_racks
+
+    decoy.when(mock_protocol_core.robot_type).then_return(robot_type)
+    decoy.when(mock_instrument_core.get_nozzle_map()).then_return(MOCK_MAP)
+    decoy.when(mock_instrument_core.get_active_channels()).then_return(2)
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
+    decoy.when(mock_instrument_core.get_pipette_name()).then_return("pipette-name")
+
+    subject.consolidate_with_liquid_class(
+        liquid_class=test_liq_class,
+        volume=10,
+        source=[mock_well],
+        dest=mock_well,
+        new_tip="once",
+        trash_location=trash_location,
+        return_tip=True,
+        tip_racks=[assigned_tip_rack],
+    )
+    decoy.verify(
+        mock_instrument_core.consolidate_with_liquid_class(
+            liquid_class=test_liq_class,
+            volume=10,
+            source=[(Location(Point(), labware=mock_well), mock_well._core)],
+            dest=(Location(Point(), labware=mock_well), mock_well._core),
+            new_tip=TransferTipPolicyV2.ONCE,
+            tip_racks=[
+                (Location(Point(), labware=assigned_tip_rack), assigned_tip_rack._core)
+            ],
+            starting_tip=mock_starting_tip_well._core,
+            trash_location=trash_location,
+            return_tip=True,
+            keep_last_tip=False,
         )
     )

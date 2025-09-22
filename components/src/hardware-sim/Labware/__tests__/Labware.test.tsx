@@ -11,6 +11,7 @@ import {
   LabwareWellLabelsComponent as LabwareWellLabels,
 } from '../labwareInternals'
 
+import type { ComponentProps } from 'react'
 import type { LabwareDefinition } from '@opentrons/shared-data'
 
 vi.mock('../labwareInternals')
@@ -23,7 +24,10 @@ describe('Labware', () => {
   })
 
   it('should render a labware outline', () => {
-    const props = { definition: troughFixture12 }
+    const props: ComponentProps<typeof Labware> = {
+      definition: troughFixture12,
+      positioningMode: 'passThrough',
+    }
     render(
       <svg>
         <Labware {...props} />
@@ -32,8 +36,9 @@ describe('Labware', () => {
     screen.getByText('mock labware outline')
   })
   it('should render well labels', () => {
-    const props = {
+    const props: ComponentProps<typeof Labware> = {
       definition: troughFixture12,
+      positioningMode: 'passThrough',
       showLabels: true,
     }
     vi.mocked(LabwareWellLabels).mockReturnValue(<div>mock well labels</div>)

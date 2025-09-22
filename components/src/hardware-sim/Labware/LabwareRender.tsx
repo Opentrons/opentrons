@@ -3,7 +3,7 @@ import {
   getSchema2Dimensions,
 } from '@opentrons/shared-data'
 
-import { LabwareAdapter, labwareAdapterLoadNames } from './LabwareAdapter'
+import { customSVGLoadNames, LabwareAdapter } from './LabwareAdapter'
 import {
   FilledWells,
   StaticLabware,
@@ -12,8 +12,7 @@ import {
   WellLabels,
 } from './labwareInternals'
 
-import type { CSSProperties } from 'styled-components'
-import type { RefObject } from 'react'
+import type { CSSProperties, RefObject } from 'react'
 import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { LabwareAdapterLoadName } from './LabwareAdapter'
 import type {
@@ -38,7 +37,9 @@ export interface LabwareRenderProps {
    * How the rendered labware should be positioned. Use `passThrough` for new code.
    *
    * `passThrough` -
-   *   The origin of the labware will be at the SVG origin.
+   *   The origin of the labware will be at the SVG origin. Beware that what
+   *   "the origin of the labware" corresponds to, physically, is not consistent across
+   *   labware. e.g. do not assume that it's always the labware's front-left corner.
    *
    *   To render a labware on its own, use the `getLabwareViewBox()` util from
    *   shared-data to compute the SVG's viewBox around that origin.
@@ -63,10 +64,9 @@ export interface LabwareRenderProps {
    *   how labware are positioned. It's also clunky when rendering a labware on its
    *   own.
    */
-  // todo(mm, 2025-06-09): Make this prop required after the dust settles on
-  // v8.5.0/PD-v8.5.0 mergebacks, to force new callers to consider passThrough mode.
+  // todo(mm, 2025-06-09):
   // Remove uses of offsetInSlot mode as we're able, and delete it when none are left.
-  positioningMode?: 'passThrough' | 'offsetInSlot'
+  positioningMode: 'passThrough' | 'offsetInSlot'
   /**
    * Special handling for opentrons_universal_flat_adapter. Unlike other labware,
    * it rotates to match the underlying module, and that rotation actually matters
@@ -112,15 +112,18 @@ export interface LabwareRenderProps {
 }
 
 export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
-  const { gRef, definition, positioningMode = 'offsetInSlot' } = props
+  const { gRef, definition, positioningMode } = props
 
   const cornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(definition)
   const labwareLoadName = definition.parameters.loadName
-  const isAdapter = labwareAdapterLoadNames.includes(labwareLoadName)
+  const isNeedingCustomSVG = customSVGLoadNames.includes(labwareLoadName)
+  const isLid = definition.allowedRoles?.includes('lid')
 
-  if (isAdapter) {
+  if (isNeedingCustomSVG || isLid) {
     const { shouldRotateAdapterOrientation } = props
     const { xDimension, yDimension } = getSchema2Dimensions(definition)
+    const lidDimensions =
+      'dimensions' in definition ? definition.dimensions : null
 
     return (
       <g
@@ -146,6 +149,8 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
             definition={definition}
             highlight={props.highlight}
             highlightShadow={props.highlightShadow}
+            isLid={isLid}
+            lidDimensions={lidDimensions}
           />
         </g>
       </g>

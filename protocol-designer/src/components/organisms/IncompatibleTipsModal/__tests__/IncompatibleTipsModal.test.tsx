@@ -1,14 +1,15 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { setFeatureFlags } from '/protocol-designer/feature-flags/actions'
+
 import { IncompatibleTipsModal } from '..'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
-import { setFeatureFlags } from '../../../../feature-flags/actions'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('../../../../feature-flags/actions')
+vi.mock('/protocol-designer/feature-flags/actions')
 
 const render = (props: ComponentProps<typeof IncompatibleTipsModal>) => {
   return renderWithProviders(<IncompatibleTipsModal {...props} />, {
@@ -28,7 +29,7 @@ describe('IncompatibleTipsModal', () => {
     render(props)
     screen.getByText('Incompatible tips')
     screen.getByText(
-      'Using a pipette with an incompatible tip rack may result reduce pipette accuracy and collisions. We strongly recommend that you do not pair a pipette with an incompatible tip rack.'
+      'Incompatible tip racks cause reduced pipette accuracy and collisions. Use compatible tip racks only.'
     )
     fireEvent.click(screen.getByText('Show more tip types'))
     expect(vi.mocked(setFeatureFlags)).toHaveBeenCalled()

@@ -21,7 +21,10 @@ from opentrons_shared_data.pipette.pipette_definition import (
     SupportedTipsDefinition,
 )
 
-from opentrons_shared_data.pipette.types import PipetteNameType
+from opentrons_shared_data.pipette.types import (
+    PipetteNameType,
+    LiquidClasses as VolumeModes,
+)
 
 from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
 from opentrons.protocol_engine.state.state import StateView
@@ -33,6 +36,7 @@ from opentrons.protocol_engine.state.pipettes import (
 from opentrons.protocol_engine.state import update_types
 from opentrons.types import MountType, Point
 from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset, DeckPoint
+from opentrons.protocol_engine.types import LabwareWellId
 from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
 
 from opentrons.protocol_engine.commands.liquid_probe import (
@@ -178,6 +182,7 @@ async def test_liquid_probe_implementation(
             minimum_z_height=None,
             speed=None,
             operation_volume=None,
+            offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_return(Point(x=1, y=2, z=3))
 
@@ -233,6 +238,7 @@ async def test_liquid_probe_implementation(
             },
             shaft_ul_per_mm=5.0,
             available_sensors=available_sensors,
+            volume_mode=VolumeModes.default,
         )
     )
 
@@ -247,7 +253,7 @@ async def test_liquid_probe_implementation(
         state_update=update_types.StateUpdate(
             pipette_location=update_types.PipetteLocationUpdate(
                 pipette_id="abc",
-                new_location=update_types.Well(labware_id="123", well_name="A3"),
+                new_location=LabwareWellId(labware_id="123", well_name="A3"),
                 new_deck_point=DeckPoint(x=1, y=2, z=3),
             ),
             liquid_probed=update_types.LiquidProbedUpdate(
@@ -328,6 +334,7 @@ async def test_liquid_not_found_error(
             },
             shaft_ul_per_mm=5.0,
             available_sensors=available_sensors,
+            volume_mode=VolumeModes.default,
         )
     )
     decoy.when(
@@ -341,6 +348,7 @@ async def test_liquid_not_found_error(
             minimum_z_height=None,
             speed=None,
             operation_volume=None,
+            offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_return(position)
     decoy.when(
@@ -362,7 +370,7 @@ async def test_liquid_not_found_error(
     expected_state_update = update_types.StateUpdate(
         pipette_location=update_types.PipetteLocationUpdate(
             pipette_id=pipette_id,
-            new_location=update_types.Well(labware_id=labware_id, well_name=well_name),
+            new_location=LabwareWellId(labware_id=labware_id, well_name=well_name),
             new_deck_point=DeckPoint(x=position.x, y=position.y, z=position.z),
         ),
         liquid_probed=update_types.LiquidProbedUpdate(
@@ -455,6 +463,7 @@ async def test_liquid_probe_tip_checking(
             },
             shaft_ul_per_mm=5.0,
             available_sensors=available_sensors,
+            volume_mode=VolumeModes.default,
         )
     )
     with pytest.raises(TipNotAttachedError):
@@ -518,6 +527,7 @@ async def test_liquid_probe_plunger_preparedness_checking(
             },
             shaft_ul_per_mm=5.0,
             available_sensors=available_sensors,
+            volume_mode=VolumeModes.default,
         )
     )
     decoy.when(state_view.pipettes.get_aspirated_volume(pipette_id)).then_return(None)
@@ -583,6 +593,7 @@ async def test_liquid_probe_volume_checking(
             },
             shaft_ul_per_mm=5.0,
             available_sensors=available_sensors,
+            volume_mode=VolumeModes.default,
         )
     )
     decoy.when(
@@ -656,6 +667,7 @@ async def test_liquid_probe_location_checking(
             },
             shaft_ul_per_mm=5.0,
             available_sensors=available_sensors,
+            volume_mode=VolumeModes.default,
         )
     )
     decoy.when(
@@ -726,6 +738,7 @@ async def test_liquid_probe_stall(
             },
             shaft_ul_per_mm=5.0,
             available_sensors=available_sensors,
+            volume_mode=VolumeModes.default,
         )
     )
     decoy.when(
@@ -743,6 +756,7 @@ async def test_liquid_probe_stall(
             minimum_z_height=None,
             speed=None,
             operation_volume=None,
+            offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_raise(StallOrCollisionDetectedError())
 

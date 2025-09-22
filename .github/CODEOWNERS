@@ -1,19 +1,16 @@
-# catchall: someone in software should be notified for any change in this repo
-* @Opentrons/software
+# Add teams here to be notified automatically when a PR changes certain file paths,
+# but be mindful of the rate of false positives -- we want to avoid notification spam.
 
-# language expertise verticals - if a PR changes things in multiple projects let's
-# notify those language communities
-*.js @Opentrons/js
-*.py @Opentrons/py
-*.d.ts @Opentrons/js
-/webpack-config @Opentrons/js
+/components @Opentrons/components-devs
 
-# subprojects by language - some subprojects are shared by teams but united by a
-# language community (including makefiles and config) so mark them appropriately
-/app @Opentrons/js
-/api-client @Opentrons/js
-/react-api-client @Opentrons/js
-/app-shell @Opentrons/js
-/components @Opentrons/js @Opentrons/components-devs
-/api @Opentrons/py
+# Changes to nonspecific files in shared-data are probably probably changes to the
+# actual data (e.g. deck definitions) and thus affect everyone, so notify everyone.
+# This needs to come first so it can be overridden by more specific rules.
+/shared-data @Opentrons/js @Opentrons/py
+# If a file is definitely JS or Python, notify just that language's community.
+# If this happens to all the files in the PR, it will override the "notify everyone" rule above.
 /shared-data/js @Opentrons/js
+/shared-data/**/*.ts @Opentrons/js
+/shared-data/python @Opentrons/py
+/shared-data/python_tests @Opentrons/py
+/shared-data/**/*.py @Opentrons/py

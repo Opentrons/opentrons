@@ -17,10 +17,6 @@ export const linearInterpolate = (
   left: number | null = null,
   right: number | null = null
 ): number | null => {
-  console.assert(
-    interpolationPoints.length > 0,
-    'At least one point required for interpolation'
-  )
   if (interpolationPoints.length === 0) {
     return null
   }

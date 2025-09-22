@@ -10,6 +10,7 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.errors.exceptions import (
     FlexStackerStallError,
     FlexStackerShuttleMissingError,
+    FlexStackerShuttleLabwareError,
 )
 
 from ..command import (
@@ -22,6 +23,7 @@ from ..command import (
 from ..flex_stacker.common import (
     FlexStackerStallOrCollisionError,
     FlexStackerShuttleError,
+    FlexStackerLabwareStoreError,
     labware_locations_for_group,
     labware_location_base_sequence,
     primary_location_sequence,
@@ -41,6 +43,7 @@ from ...types import (
     InStackerHopperLocation,
     StackerStoredLabwareGroup,
     ModuleLocation,
+    StackerLabwareMovementStrategy,
 )
 
 if TYPE_CHECKING:
@@ -58,6 +61,13 @@ class StoreParams(BaseModel):
     moduleId: str = Field(
         ...,
         description="Unique ID of the flex stacker.",
+    )
+    strategy: StackerLabwareMovementStrategy = Field(
+        ...,
+        description=(
+            "If manual, indicates that labware has been moved to the hopper "
+            "manually by the user, as required in error recovery."
+        ),
     )
 
 
@@ -107,7 +117,8 @@ class StoreResult(BaseModel):
 _ExecuteReturn = Union[
     SuccessData[StoreResult],
     DefinedErrorData[FlexStackerStallOrCollisionError]
-    | DefinedErrorData[FlexStackerShuttleError],
+    | DefinedErrorData[FlexStackerShuttleError]
+    | DefinedErrorData[FlexStackerLabwareStoreError],
 ]
 
 
@@ -172,7 +183,7 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
                 )
             return labware_ids[0], None, lid_id
 
-    async def execute(self, params: StoreParams) -> _ExecuteReturn:
+    async def execute(self, params: StoreParams) -> _ExecuteReturn:  # noqa: C901
         """Execute the labware storage command."""
         stacker_state = self._state_view.modules.get_flex_stacker_substate(
             params.moduleId
@@ -201,42 +212,62 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
         stacker_hw = self._equipment.get_module_hardware_api(stacker_state.module_id)
 
         state_update = update_types.StateUpdate()
-        try:
-            if stacker_hw is not None:
-                stacker_hw.set_stacker_identify(True)
+        if stacker_hw is not None:
+            stacker_hw.set_stacker_identify(True)
+
+        if (
+            params.strategy is StackerLabwareMovementStrategy.AUTOMATIC
+            and stacker_hw is not None
+        ):
+            try:
                 await stacker_hw.store_labware(
                     labware_height=stacker_state.get_pool_height_minus_overlap()
                 )
-        except FlexStackerStallError as e:
-            return DefinedErrorData(
-                public=FlexStackerStallOrCollisionError(
-                    id=self._model_utils.generate_id(),
-                    createdAt=self._model_utils.get_timestamp(),
-                    wrappedErrors=[
-                        ErrorOccurrence.from_failed(
-                            id=self._model_utils.generate_id(),
-                            createdAt=self._model_utils.get_timestamp(),
-                            error=e,
-                        )
-                    ],
-                    errorInfo={"labwareId": primary_id},
-                ),
-            )
-        except FlexStackerShuttleMissingError as e:
-            return DefinedErrorData(
-                public=FlexStackerShuttleError(
-                    id=self._model_utils.generate_id(),
-                    createdAt=self._model_utils.get_timestamp(),
-                    wrappedErrors=[
-                        ErrorOccurrence.from_failed(
-                            id=self._model_utils.generate_id(),
-                            createdAt=self._model_utils.get_timestamp(),
-                            error=e,
-                        )
-                    ],
-                    errorInfo={"labwareId": primary_id},
-                ),
-            )
+            except FlexStackerStallError as e:
+                return DefinedErrorData(
+                    public=FlexStackerStallOrCollisionError(
+                        id=self._model_utils.generate_id(),
+                        createdAt=self._model_utils.get_timestamp(),
+                        wrappedErrors=[
+                            ErrorOccurrence.from_failed(
+                                id=self._model_utils.generate_id(),
+                                createdAt=self._model_utils.get_timestamp(),
+                                error=e,
+                            )
+                        ],
+                        errorInfo={"labwareId": primary_id},
+                    ),
+                )
+            except FlexStackerShuttleMissingError as e:
+                return DefinedErrorData(
+                    public=FlexStackerShuttleError(
+                        id=self._model_utils.generate_id(),
+                        createdAt=self._model_utils.get_timestamp(),
+                        wrappedErrors=[
+                            ErrorOccurrence.from_failed(
+                                id=self._model_utils.generate_id(),
+                                createdAt=self._model_utils.get_timestamp(),
+                                error=e,
+                            )
+                        ],
+                        errorInfo={"labwareId": primary_id},
+                    ),
+                )
+            except FlexStackerShuttleLabwareError as e:
+                return DefinedErrorData(
+                    public=FlexStackerLabwareStoreError(
+                        id=self._model_utils.generate_id(),
+                        createdAt=self._model_utils.get_timestamp(),
+                        wrappedErrors=[
+                            ErrorOccurrence.from_failed(
+                                id=self._model_utils.generate_id(),
+                                createdAt=self._model_utils.get_timestamp(),
+                                error=e,
+                            )
+                        ],
+                        errorInfo={"labwareId": primary_id},
+                    ),
+                )
 
         id_list = [
             id for id in (primary_id, maybe_adapter_id, maybe_lid_id) if id is not None

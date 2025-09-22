@@ -175,7 +175,7 @@ def run(protocol: protocol_api.ProtocolContext):
     assert CFG.volume > 0
     assert len(CFG.plate_rows) == len(CFG.trough_cols)
 
-    start_timestamp = time.time()
+    start_timestamp = time.monotonic()
     print(f'Time: {datetime.now().strftime("%m/%d/%Y, %H:%M:%S")}')
 
     items = load_labware_and_pipettes(
@@ -212,7 +212,7 @@ def run(protocol: protocol_api.ProtocolContext):
     fill_plate_with_baseline(
         protocol, items.multi, items.trough, items.plate)
     print(f'Time: {datetime.now().strftime("%m/%d/%Y, %H:%M:%S")}')
-    print(f'Duration: {round((time.time() - start_timestamp) / 60, 1)} minutes')
+    print(f'Duration: {round((time.monotonic() - start_timestamp) / 60, 1)} minutes')
     print('\ndone')
 
 

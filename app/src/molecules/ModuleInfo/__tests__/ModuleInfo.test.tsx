@@ -56,18 +56,18 @@ describe('ModuleInfo', () => {
   it('should show module connected and USB number', () => {
     props = {
       ...props,
-      physicalPort: { port: 1, hub: false, portGroup: 'unknown', path: '' },
+      physicalPort: 'USB-1',
       isAttached: true,
     }
     render(props)
     screen.getByText('Connected')
-    screen.getByText('USB Port 1')
+    screen.getByText('USB-1')
   })
 
   it('should not show module connected when run has started', () => {
     props = {
       ...props,
-      physicalPort: { port: 1, hub: false, portGroup: 'unknown', path: '' },
+      physicalPort: 'USB-1',
       isAttached: true,
       runId: MOCK_RUN_ID,
     }

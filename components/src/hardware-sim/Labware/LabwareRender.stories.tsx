@@ -51,24 +51,34 @@ const Template: Story<React.ComponentProps<typeof LabwareRender>> = ({
   definition,
   ...args
 }) => {
-  const displayName: unknown = definition
-  const allLabwareMap = { ...labwareDefMap, ...tipRackDefMap }
-  const resolvedDef: typeof definition = allLabwareMap[displayName as string]
-  return <LabwareRender definition={resolvedDef} {...args} />
+  // Ensure we have a valid definition
+  const resolvedDef = definition || fixture96Plate
+  return (
+    <LabwareRender
+      definition={resolvedDef}
+      positioningMode="passThrough"
+      {...args}
+    />
+  )
 }
+
 export const Basic = Template.bind({})
 Basic.argTypes = {
   definition: {
     control: {
       type: 'select',
-      options: Object.keys(labwareDefMap).map(
-        d => labwareDefMap[d].metadata.displayName
-      ),
+      options: Object.keys(labwareDefMap),
     },
-    defaultValue: fixture96Plate.metadata.displayName,
+  },
+  positioningMode: {
+    control: {
+      type: 'select',
+      options: ['passThrough', 'offsetInSlot'],
+    },
   },
 }
 Basic.args = {
+  definition: fixture96Plate,
   wellLabelOption: 'SHOW_LABEL_INSIDE',
   highlightedWells: { A1: null, A2: null },
   wellFill: { A1: 'maroon', A2: 'lavender' },
@@ -80,14 +90,19 @@ TipRack.argTypes = {
   definition: {
     control: {
       type: 'select',
-      options: Object.keys(tipRackDefMap).map(
-        d => tipRackDefMap[d].metadata.displayName
-      ),
+      options: Object.keys(tipRackDefMap),
     },
-    defaultValue: fixtureTiprack10.metadata.displayName,
+  },
+  positioningMode: {
+    control: {
+      type: 'select',
+      options: ['passThrough', 'offsetInSlot'],
+    },
   },
 }
 TipRack.args = {
+  definition: fixtureTiprack10,
+  positioningMode: 'passThrough',
   wellLabelOption: 'SHOW_LABEL_INSIDE',
   highlightedWells: { A1: null, A2: null },
   missingTips: { C3: null, D4: null },

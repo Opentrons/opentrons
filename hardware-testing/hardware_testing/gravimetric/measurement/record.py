@@ -1,4 +1,5 @@
 """Record weight measurements."""
+
 from contextlib import contextmanager
 from dataclasses import dataclass
 from statistics import stdev

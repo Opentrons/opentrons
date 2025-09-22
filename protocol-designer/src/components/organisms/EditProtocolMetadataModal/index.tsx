@@ -16,11 +16,15 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { actions, selectors as fileSelectors } from '../../../file-data'
-import { TextAreaField } from '../../molecules'
+import { TextAreaField } from '/protocol-designer/components/molecules'
+import {
+  actions,
+  selectors as fileSelectors,
+} from '/protocol-designer/file-data'
+
 import { getMainPagePortalEl } from '../Portal'
 
-import type { FileMetadataFields } from '../../../file-data'
+import type { FileMetadataFields } from '/protocol-designer/file-data'
 
 interface EditProtocolMetadataModalProps {
   onClose: () => void
@@ -54,7 +58,6 @@ export function EditProtocolMetadataModal(
       marginLeft="0"
       title={t('shared:edit_protocol_metadata')}
       type="info"
-      closeOnOutsideClick
       onClose={onClose}
       childrenPadding={SPACING.spacing24}
       footer={

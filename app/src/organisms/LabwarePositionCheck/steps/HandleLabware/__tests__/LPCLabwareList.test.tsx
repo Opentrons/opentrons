@@ -150,7 +150,7 @@ describe('LPCLabwareList', () => {
     expect(header).toHaveTextContent('Labware Position Check')
 
     const primaryButton = screen.getByTestId('primary-button')
-    expect(primaryButton).toHaveAttribute('data-button-text', 'Exit')
+    expect(primaryButton).toHaveAttribute('data-button-text', 'Save & exit')
     expect(primaryButton).toHaveAttribute('data-click-handler', 'true')
   })
 

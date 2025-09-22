@@ -1,6 +1,6 @@
 """Test Droplets."""
 from asyncio import sleep
-from time import time
+from time import monotonic
 from typing import List, Union, Tuple, Optional, Dict, Literal
 
 from opentrons.hardware_control.ot3api import OT3API
@@ -110,7 +110,7 @@ async def aspirate_and_wait(
     await api.aspirate(OT3Mount.LEFT, volume)
     await api.move_to(OT3Mount.LEFT, reservoir + Point(z=HOVER_HEIGHT_MM))
 
-    start_time = time()
+    start_time = monotonic()
     for i in range(seconds):
         print(f"waiting {i + 1}/{seconds}")
         if i == 0 or i == seconds - 1:
@@ -123,7 +123,7 @@ async def aspirate_and_wait(
         result = ui.get_user_answer("look good")
     else:
         result = True
-    duration_seconds = time() - start_time
+    duration_seconds = monotonic() - start_time
     print(f"waited for {duration_seconds} seconds")
 
     await api.move_to(
@@ -205,20 +205,22 @@ async def run(
     for trial in range(2):
         ui.print_header("JOG to 96-Tip RACK")
         if trial == 0:
-            tip_rack = str(pipette) + "ul"
+            tip_rack: int = pipette
             test_volume: int = pipette
         else:
-            tip_rack = "50ul"
+            tip_rack = 50
             test_volume = 1 if pipette == 200 else 5
         if not api.is_simulator:
-            ui.get_user_ready(f"ADD 96 tip-rack-{tip_rack} to slot #{TIP_RACK_96_SLOT}")
+            ui.get_user_ready(
+                f"ADD 96 tip-rack-{tip_rack}ul to slot #{TIP_RACK_96_SLOT}"
+            )
         await helpers_ot3.move_to_arched_ot3(
             api, OT3Mount.LEFT, tip_rack_96_a1_nominal + Point(z=30)
         )
         await helpers_ot3.jog_mount_ot3(api, OT3Mount.LEFT)
         print("picking up tips")
         await api.pick_up_tip(
-            OT3Mount.LEFT, helpers_ot3.get_default_tip_length(pipette)
+            OT3Mount.LEFT, helpers_ot3.get_default_tip_length(tip_rack)
         )
         await api.home_z(OT3Mount.LEFT)
         if reservoir_a1_actual is None:

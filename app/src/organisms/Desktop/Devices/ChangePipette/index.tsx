@@ -9,11 +9,11 @@ import {
   ModalShell,
   SPACING,
   TYPOGRAPHY,
+  WizardHeader,
 } from '@opentrons/components'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
 
 import { InProgressModal } from '/app/molecules/InProgressModal/InProgressModal'
-import { WizardHeader } from '/app/molecules/WizardHeader'
 import { getCalibrationForPipette } from '/app/redux/calibration'
 import {
   getRequestById,

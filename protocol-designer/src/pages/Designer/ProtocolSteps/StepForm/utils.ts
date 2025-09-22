@@ -9,12 +9,12 @@ import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
 
-import { i18n } from '../../../../assets/localization'
-import { PROFILE_CYCLE } from '../../../../form-types'
+import { i18n } from '/protocol-designer/assets/localization'
+import { PROFILE_CYCLE } from '/protocol-designer/form-types'
 import {
   getDefaultsForStepType,
   getDisabledFields,
-} from '../../../../steplist/formLevel'
+} from '/protocol-designer/steplist/formLevel'
 
 import type { DropdownOption } from '@opentrons/components'
 import type { PipetteEntity } from '@opentrons/step-generation'
@@ -25,12 +25,12 @@ import type {
   ProfileItem,
   StepFieldName,
   StepType,
-} from '../../../../form-types'
-import type { FormError } from '../../../../steplist/formLevel'
-import type { ProfileFormError } from '../../../../steplist/formLevel/profileErrors'
-import type { FormWarning } from '../../../../steplist/formLevel/warnings'
-import type { StepFormErrors } from '../../../../steplist/types'
-import type { NozzleType } from '../../../../types'
+} from '/protocol-designer/form-types'
+import type { FormError } from '/protocol-designer/steplist/formLevel'
+import type { ProfileFormError } from '/protocol-designer/steplist/formLevel/profileErrors'
+import type { FormWarning } from '/protocol-designer/steplist/formLevel/warnings'
+import type { StepFormErrors } from '/protocol-designer/steplist/types'
+import type { NozzleType } from '/protocol-designer/types'
 import type { FieldProps, FieldPropsByName, FocusHandlers } from './types'
 
 export function getBlowoutLocationOptionsForForm(args: {
@@ -193,17 +193,17 @@ export const getVisibleProfileFormLevelErrors = (args: {
   })
 }
 export const getFieldDefaultTooltip = (name: string, t: any): string =>
-  name != null ? t(`step_fields.defaults.${name}`) : ''
+  name != null ? t(`tooltip:step_fields.defaults.${name}`) : ''
 export const getFieldIndeterminateTooltip = (name: string, t: any): string =>
-  name != null ? t(`step_fields.indeterminate.${name}`) : ''
+  name != null ? t(`tooltip:step_fields.indeterminate.${name}`) : ''
 export const getSingleSelectDisabledTooltip = (
   name: string,
   stepType: string,
   t: any
 ): string =>
   name != null
-    ? t(`step_fields.${stepType}.disabled.${name}`)
-    : t(`step_fields.${stepType}.disabled.$generic`)
+    ? t(`tooltip:step_fields.${stepType}.disabled.${name}`)
+    : t(`tooltip:step_fields.${stepType}.disabled.$generic`)
 
 export const getFieldCaptions = (
   name: string,
@@ -304,7 +304,9 @@ export const makeSingleEditFieldProps = (
   handleChangeFormInput: (name: string, value: unknown) => void,
   hydratedForm: HydratedFormData,
   t: any,
-  visibleFormErrors: StepFormErrors
+  visibleFormErrors: StepFormErrors,
+  showFormErrors: boolean,
+  currentFormIsPresaved: boolean
 ): FieldPropsByName => {
   const { blur, focus } = focusHandlers
   const fieldNames: string[] = Object.keys(
@@ -323,7 +325,12 @@ export const makeSingleEditFieldProps = (
     //  NOTE: some fields can have multiple errors, but we
     //  will always just show the first one until they're all
     //  resolved
-    const error = mappedErrorsToField[name]?.[0]?.title
+    const error = mappedErrorsToField[name]?.[0]
+    const errorTitle =
+      error != null &&
+      (showFormErrors || (!currentFormIsPresaved && error.showOnReopen))
+        ? error.title
+        : null
     const updateValue = (value: unknown): void => {
       handleChangeFormInput(name, value)
     }
@@ -346,7 +353,7 @@ export const makeSingleEditFieldProps = (
 
     const fieldProps: FieldProps = {
       disabled,
-      errorToShow: error,
+      errorToShow: errorTitle,
       name,
       updateValue,
       value,

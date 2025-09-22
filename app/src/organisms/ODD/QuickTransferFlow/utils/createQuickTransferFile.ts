@@ -1,41 +1,37 @@
+import flatMap from 'lodash/flatMap'
 import uuidv1 from 'uuid/v4'
 
 import {
   FLEX_ROBOT_TYPE,
   FLEX_STANDARD_DECKID,
-  getDeckDefFromRobotType,
-  TRASH_BIN_ADAPTER_FIXTURE,
-  WASTE_CHUTE_FIXTURES,
+  getAllLiquidClassDefs,
+  getFlexNameConversion,
 } from '@opentrons/shared-data'
 import {
-  consolidate,
-  distribute,
+  getLiquidClassName,
   getSlotInLocationStack,
-  getWasteChuteAddressableAreaNamePip,
   pythonImports,
   pythonMetadata,
   pythonRequirements,
-  transfer,
 } from '@opentrons/step-generation'
 
-import { generateQuickTransferArgs } from './'
+import { generateQuickTransferArgs } from './generateQuickTransferArgs'
+import { generateQuickTransferRobotStateTimeline } from './generateQuickTransferRobotStateTimeline'
 import { pythonDef } from './pythonDef'
 
 import type {
-  AddressableAreaName,
   CommandAnnotationV1Mixin,
-  CommandV8Mixin,
+  CommandV14Mixin,
   CreateCommand,
-  CutoutId,
   DeckConfiguration,
   LabwareDefinition2,
   LabwareV2Mixin,
   LiquidV1Mixin,
   LoadLabwareCreateCommand,
+  LoadLiquidClassCreateCommand,
   LoadPipetteCreateCommand,
   OT3RobotMixin,
 } from '@opentrons/shared-data'
-import type { CommandCreatorResult } from '@opentrons/step-generation'
 import type { QuickTransferSummaryState } from '../types'
 
 const uuid: () => string = uuidv1
@@ -43,7 +39,8 @@ const uuid: () => string = uuidv1
 export function createQuickTransferFile(
   quickTransferState: QuickTransferSummaryState,
   deckConfig: DeckConfiguration,
-  protocolName?: string
+  protocolName?: string,
+  enableQuickTransferProtocolContentsLog?: boolean
 ): File {
   const {
     stepArgs,
@@ -51,14 +48,15 @@ export function createQuickTransferFile(
     initialRobotState,
   } = generateQuickTransferArgs(quickTransferState, deckConfig)
   const pipetteEntity = Object.values(invariantContext.pipetteEntities)[0]
+  const { name, id, spec } = pipetteEntity
 
   const loadPipetteCommand: LoadPipetteCreateCommand = {
     key: uuid(),
     commandType: 'loadPipette' as const,
     params: {
-      pipetteName: pipetteEntity.name,
+      pipetteName: name,
       mount: quickTransferState.mount,
-      pipetteId: pipetteEntity.id,
+      pipetteId: id,
     },
   }
   const labwareEntities = Object.values(invariantContext.labwareEntities)
@@ -113,88 +111,56 @@ export function createQuickTransferFile(
     })
     return acc
   }, [])
+  const {
+    loadName: currentTiprackLoadName,
+  } = quickTransferState.tipRack.parameters
 
-  let nonLoadCommandCreator: CommandCreatorResult | null = null
-  if (stepArgs?.commandCreatorFnName === 'transfer') {
-    nonLoadCommandCreator = transfer(
-      stepArgs,
-      invariantContext,
-      initialRobotState
-    )
-  } else if (stepArgs?.commandCreatorFnName === 'consolidate') {
-    nonLoadCommandCreator = consolidate(
-      stepArgs,
-      invariantContext,
-      initialRobotState
-    )
-  } else if (stepArgs?.commandCreatorFnName === 'distribute') {
-    nonLoadCommandCreator = distribute(
-      stepArgs,
-      invariantContext,
-      initialRobotState
-    )
-  }
+  const liquidClass =
+    stepArgs?.liquidClass != null && stepArgs.liquidClass !== 'none'
+      ? stepArgs.liquidClass
+      : null
+  const byTipTypeSettings =
+    liquidClass != null
+      ? getAllLiquidClassDefs()
+          [liquidClass]?.byPipette.find(
+            pipetteObject =>
+              pipetteObject.pipetteModel === getFlexNameConversion(spec)
+          )
+          ?.byTipType.find(tipObject => {
+            const tiprackLoadName = tipObject.tiprack.split('/')[1]
+            return tiprackLoadName === currentTiprackLoadName
+          })
+      : null
+  const loadLiquidCommand: LoadLiquidClassCreateCommand | null =
+    liquidClass != null && byTipTypeSettings != null
+      ? {
+          key: uuid(),
+          commandType: 'loadLiquidClass' as const,
+          params: {
+            liquidClassRecord: {
+              ...byTipTypeSettings,
+              liquidClassName: getLiquidClassName(liquidClass),
+              pipetteModel: spec.model,
+            },
+          },
+        }
+      : null
 
-  const nonLoadCommands =
-    nonLoadCommandCreator != null && 'commands' in nonLoadCommandCreator
-      ? nonLoadCommandCreator.commands
-      : []
-
-  let finalDropTipCommands: CreateCommand[] = []
-  let addressableAreaName: AddressableAreaName | null = null
-  if (
-    quickTransferState.dropTipLocation.cutoutFixtureId ===
-    TRASH_BIN_ADAPTER_FIXTURE
-  ) {
-    const trashLocation = quickTransferState.dropTipLocation.cutoutId
-    const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
-    const cutouts: Record<CutoutId, AddressableAreaName[]> | null =
-      deckDef.cutoutFixtures.find(
-        cutoutFixture => cutoutFixture.id === 'trashBinAdapter'
-      )?.providesAddressableAreas ?? null
-    addressableAreaName =
-      trashLocation != null && cutouts != null
-        ? cutouts[trashLocation]?.[0] ?? null
-        : null
-  } else if (
-    WASTE_CHUTE_FIXTURES.includes(
-      quickTransferState.dropTipLocation.cutoutFixtureId
-    )
-  ) {
-    addressableAreaName = getWasteChuteAddressableAreaNamePip(
-      pipetteEntity.spec.channels
-    )
-  }
-  if (addressableAreaName == null) {
-    console.error(
-      `expected to find addressableAreaName with trashBin or wasteChute location but could not`
-    )
-  } else {
-    finalDropTipCommands = [
-      {
-        key: uuid(),
-        commandType: 'moveToAddressableAreaForDropTip',
-        params: {
-          pipetteId: pipetteEntity.id,
-          addressableAreaName,
-        },
-      },
-      {
-        key: uuid(),
-        commandType: 'dropTipInPlace',
-        params: {
-          pipetteId: pipetteEntity.id,
-        },
-      },
-    ]
-  }
-
+  const robotStateTimeline = generateQuickTransferRobotStateTimeline({
+    stepArgs,
+    initialRobotState,
+    invariantContext,
+  })
+  const nonLoadCommands: CreateCommand[] = flatMap(
+    robotStateTimeline.timeline,
+    timelineFrame => timelineFrame.commands
+  )
   const commands: CreateCommand[] = [
     loadPipetteCommand,
     ...loadAdapterCommands,
     ...loadLabwareCommands,
+    ...(loadLiquidCommand != null ? [loadLiquidCommand] : []),
     ...nonLoadCommands,
-    ...finalDropTipCommands,
   ]
   const sourceLabwareName = quickTransferState.source.metadata.displayName
   let destinationLabwareName = sourceLabwareName
@@ -215,7 +181,7 @@ export function createQuickTransferFile(
     // see QuickTransferFlow/README.md for versioning details
     designerApplication: {
       name: 'opentrons/quick-transfer',
-      version: '1.1.0',
+      version: '1.2.0',
       data: quickTransferState,
     },
   }
@@ -242,8 +208,8 @@ export function createQuickTransferFile(
     liquids: {},
   }
 
-  const commandv8Mixin: CommandV8Mixin = {
-    commandSchemaId: 'opentronsCommandSchemaV8',
+  const commandv8Mixin: CommandV14Mixin = {
+    commandSchemaId: 'opentronsCommandSchemaV14',
     commands,
   }
 
@@ -260,6 +226,38 @@ export function createQuickTransferFile(
     ...commandAnnotionaV1Mixin,
   })
 
+  // temporary logging for debugging
+  if (enableQuickTransferProtocolContentsLog) {
+    const protocolObject = {
+      ...protocolBase,
+      ...flexDeckSpec,
+      ...labwareV2Mixin,
+      ...liquidV1Mixin,
+      ...commandv8Mixin,
+      ...commandAnnotionaV1Mixin,
+    }
+
+    console.group('🧪 Quick Transfer Protocol Contents')
+    console.log(JSON.stringify(protocolObject, null, 2))
+    const downloadProtocolObject = (): void => {
+      const jsonString = JSON.stringify(protocolObject, null, 2)
+      const blob = new Blob([jsonString], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `debug-${protocolObject.metadata.protocolName
+        .replace(/[^a-z0-9]/gi, '_')
+        .toLowerCase()}-${Date.now()}.json`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+    }
+    ;(window as any).downloadjson = downloadProtocolObject
+    console.log('💾 Or copy/paste: downloadjson()')
+    console.groupEnd()
+  }
+
   return new File(
     [protocolContents],
     `${protocolBase.metadata.protocolName}.json`
@@ -269,7 +267,8 @@ export function createQuickTransferFile(
 export function createQuickTransferPythonFile(
   quickTransferState: QuickTransferSummaryState,
   deckConfig: DeckConfiguration,
-  protocolName?: string
+  protocolName?: string,
+  enableQuickTransferProtocolContentsLog?: boolean
 ): File {
   const sourceLabwareName = quickTransferState.source.metadata.displayName
   let destinationLabwareName = sourceLabwareName
@@ -281,9 +280,8 @@ export function createQuickTransferPythonFile(
       protocolName ?? `Quick Transfer ${quickTransferState.volume}µL`,
     description: `This quick transfer moves liquids from a ${sourceLabwareName} to a ${destinationLabwareName}`,
     source: 'Quick Transfer',
-    //  TODO: increase version for when we export python
     //  see QuickTransferFlow/README.md for versioning details
-    version: '1.1.0',
+    version: '2.0.0',
     category: null,
     subcategory: null,
     tags: [],
@@ -299,8 +297,29 @@ export function createQuickTransferPythonFile(
       .filter(section => section)
       .join('\n\n') + '\n'
 
-  // so you can view the string in devTools:
-  console.log(protocolContents)
+  // temporary logging for debugging
+  if (enableQuickTransferProtocolContentsLog) {
+    console.group('🧪 Quick Transfer Protocol Contents')
+    console.log(protocolContents)
+    const downloadProtocolPython = (): void => {
+      const blob = new Blob([protocolContents], { type: 'text/x-python' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      const safeName = (protocolName ?? 'protocol name')
+        .replace(/[^a-z0-9]/gi, '_')
+        .toLowerCase()
+
+      link.download = `debug-${safeName}-${Date.now()}.py`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+    }
+    ;(window as any).downloadpy = downloadProtocolPython
+    console.log('💾 Or copy/paste: downloadpy()')
+    console.groupEnd()
+  }
 
   return new File([protocolContents], `${fileMetadata.protocolName}.py`, {
     type: 'text/x-python',

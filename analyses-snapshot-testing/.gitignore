@@ -1,5 +1,10 @@
 .env
 results
+analysis_results/**/*
 analysis_results/*.json
+!analysis_results/.keepme
+temp_sample_protocols/**/*
+temp_single_protocol/**/*
 files/protocols/generated_protocols/*
 !files/protocols/generated_protocols/.keepme
+chunks/*.json

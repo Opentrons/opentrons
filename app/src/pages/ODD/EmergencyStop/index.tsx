@@ -11,13 +11,13 @@ import {
   JUSTIFY_CENTER,
   LegacyStyledText,
   SPACING,
+  StepMeter,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useEstopQuery } from '@opentrons/react-api-client'
 
 import estopImg from '/app/assets/images/on-device-display/install_e_stop.png'
 import { MediumButton } from '/app/atoms/buttons'
-import { StepMeter } from '/app/atoms/StepMeter'
 
 const ESTOP_STATUS_REFETCH_INTERVAL_MS = 10000
 

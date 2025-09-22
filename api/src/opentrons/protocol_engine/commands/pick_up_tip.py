@@ -10,7 +10,7 @@ from typing_extensions import Literal
 from ..errors import ErrorOccurrence, PickUpTipTipNotAttachedError
 from ..resources import ModelUtils
 from ..state import update_types
-from ..types import PickUpTipWellLocation
+from ..types import PickUpTipWellLocation, LabwareWellId, TipRackWellState
 from .pipetting_common import (
     PipetteIdMixin,
 )
@@ -51,21 +51,21 @@ class PickUpTipResult(DestinationPositionResult):
 
     # Tip volume has a default ONLY for parsing data from earlier versions, which did not include this in the result
     tipVolume: float = Field(
-        0,
+        0.0,
         description="Maximum volume of liquid that the picked up tip can hold, in µL.",
-        ge=0,
+        ge=0.0,
     )
 
     tipLength: float = Field(
-        0,
+        0.0,
         description="The length of the tip in mm.",
-        ge=0,
+        ge=0.0,
     )
 
     tipDiameter: float = Field(
-        0,
+        0.0,
         description="The diameter of the tip in mm.",
-        ge=0,
+        ge=0.0,
     )
 
 
@@ -121,10 +121,14 @@ class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, _ExecuteRetur
         labware_id = params.labwareId
         well_name = params.wellName
 
-        tips_to_mark_as_used = self._state_view.tips.compute_tips_to_mark_as_used(
-            labware_id=labware_id,
-            well_name=well_name,
-            nozzle_map=self._state_view.pipettes.get_nozzle_configuration(pipette_id),
+        tips_to_mark_as_empty = (
+            self._state_view.tips.compute_tips_to_mark_as_used_or_empty(
+                labware_id=labware_id,
+                well_name=well_name,
+                nozzle_map=self._state_view.pipettes.get_nozzle_configuration(
+                    pipette_id
+                ),
+            )
         )
 
         well_location = self._state_view.geometry.convert_pick_up_tip_well_location(
@@ -155,18 +159,25 @@ class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, _ExecuteRetur
                 .update_pipette_tip_state(
                     pipette_id=pipette_id,
                     tip_geometry=e.tip_geometry,
+                    tip_source=LabwareWellId(
+                        labware_id=labware_id, well_name=well_name
+                    ),
                 )
                 .set_fluid_empty(pipette_id=pipette_id, clean_tip=True)
-                .mark_tips_as_used(
-                    labware_id=labware_id, well_names=tips_to_mark_as_used
+                .update_tip_rack_well_state(
+                    tip_state=TipRackWellState.EMPTY,
+                    labware_id=labware_id,
+                    well_names=tips_to_mark_as_empty,
                 )
             )
             state_update = (
                 update_types.StateUpdate.reduce(
                     update_types.StateUpdate(), move_result.state_update
                 )
-                .mark_tips_as_used(
-                    labware_id=labware_id, well_names=tips_to_mark_as_used
+                .update_tip_rack_well_state(
+                    tip_state=TipRackWellState.EMPTY,
+                    labware_id=labware_id,
+                    well_names=tips_to_mark_as_empty,
                 )
                 .set_fluid_unknown(pipette_id=pipette_id)
             )
@@ -190,9 +201,14 @@ class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, _ExecuteRetur
                 move_result.state_update.update_pipette_tip_state(
                     pipette_id=pipette_id,
                     tip_geometry=tip_geometry,
+                    tip_source=LabwareWellId(
+                        labware_id=labware_id, well_name=well_name
+                    ),
                 )
-                .mark_tips_as_used(
-                    labware_id=labware_id, well_names=tips_to_mark_as_used
+                .update_tip_rack_well_state(
+                    tip_state=TipRackWellState.EMPTY,
+                    labware_id=labware_id,
+                    well_names=tips_to_mark_as_empty,
                 )
                 .set_fluid_empty(pipette_id=pipette_id, clean_tip=True)
                 .set_pipette_ready_to_aspirate(

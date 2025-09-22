@@ -58,7 +58,7 @@ describe('SelectPipettePath', () => {
     props.state.destinationWells = ['A1', 'A2']
     render(props)
     screen.getByText('Single transfers')
-    screen.getByText('Multi-dispense')
+    screen.getByText('Distribute')
   })
 
   it('should render single transfer when transfer is n:1', () => {
@@ -66,7 +66,7 @@ describe('SelectPipettePath', () => {
     props.state.destinationWells = ['A1']
     render(props)
     screen.getByText('Single transfers')
-    screen.getByText('Multi-aspirate')
+    screen.getByText('Consolidate')
   })
 
   it('should call mock function when tapping exit button', () => {

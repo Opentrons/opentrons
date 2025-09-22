@@ -11,7 +11,8 @@ import {
   FLEX_HIGH_THROUGHPUT_PLUNGER_MAX_SPEED,
   FLEX_LOW_THROUGHPUT_PLUNGER_MAX_SPEED,
   OT2_PLUNGER_MAX_SPEED,
-} from '../../../../../constants'
+} from '/protocol-designer/constants'
+
 import { getMaxUiFlowRate } from '../PipetteFields/utils'
 import {
   capitalizeFirstLetter,
@@ -20,7 +21,7 @@ import {
 } from '../utils'
 
 import type { PipetteChannels } from '@opentrons/shared-data'
-import type { FormErrorLocationType } from '../../../../../steplist/formLevel/errors'
+import type { FormErrorLocationType } from '/protocol-designer/steplist/formLevel/errors'
 
 const BASE_VISIBLE_FORM_ERROR = {
   title: 'form level error title',
@@ -30,11 +31,11 @@ const BASE_VISIBLE_FORM_ERROR = {
 
 describe('getBlowoutLocationOptionsForForm', () => {
   const destOption = {
-    name: 'Destination Well',
+    name: 'Destination well',
     value: DEST_WELL_BLOWOUT_DESTINATION,
   }
   const sourceOption = {
-    name: 'Source Well',
+    name: 'Source well',
     value: SOURCE_WELL_BLOWOUT_DESTINATION,
   }
 
@@ -149,6 +150,7 @@ describe('getMaxUiFlowRate', () => {
       tipLiquidSpecs: mockTipLiquidSpecs,
       flowRateType: 'aspirate',
       correctionVolume: 0,
+      shaftULperMM: 0.785,
     } as any
     const expectedAccuracy = 0.05 * 50 + 1
     const expectedTravelMm = 50 / expectedAccuracy
@@ -183,11 +185,10 @@ describe('getMaxUiFlowRate', () => {
       tipLiquidSpecs: mockTipLiquidSpecs,
       flowRateType: 'blowout',
       correctionVolume: 0,
+      shaftULperMM: 0.785,
     } as any
-    const expectedAccuracy = 0.06 * 80 + 1.2
-    const expectedTravelMm = 80 / expectedAccuracy
     const expectedMaxFlowRate = round(
-      80 / (expectedTravelMm / FLEX_LOW_THROUGHPUT_PLUNGER_MAX_SPEED)
+      0.785 * FLEX_LOW_THROUGHPUT_PLUNGER_MAX_SPEED
     )
     expect(getMaxUiFlowRate(args)).toEqual(expectedMaxFlowRate)
   })
@@ -200,6 +201,7 @@ describe('getMaxUiFlowRate', () => {
       tipLiquidSpecs: mockTipLiquidSpecs,
       flowRateType: 'aspirate',
       correctionVolume: 0,
+      shaftULperMM: 0.785,
     } as any
     const expectedAccuracy = 0.1 * 5 + 0.5
     const expectedTravelMm = 5 / expectedAccuracy
@@ -217,6 +219,7 @@ describe('getMaxUiFlowRate', () => {
       tipLiquidSpecs: mockTipLiquidSpecs,
       flowRateType: 'dispense',
       correctionVolume: 10,
+      shaftULperMM: 0.785,
     } as any
     const expectedAccuracy = 0.06 * 50 + 1.2
     const expectedTravelMm = 50 / expectedAccuracy
@@ -236,6 +239,7 @@ describe('getMaxUiFlowRate', () => {
       tipLiquidSpecs: mockTipLiquidSpecs,
       flowRateType: 'aspirate',
       correctionVolume: 0,
+      shaftULperMM: 0.785,
     } as any
     const expectedAccuracy = 0.05 * 150 + 1 // Using the last entry [100, 0.05, 1]
     const expectedTravelMm = 150 / expectedAccuracy

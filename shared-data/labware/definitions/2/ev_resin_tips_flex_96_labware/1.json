@@ -14,7 +14,7 @@
     ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"]
   ],
   "brand": {
-    "brand": "opentrons",
+    "brand": "Opentrons",
     "brandId": ["999-00254"],
     "links": [
       "https://opentrons.com/products/opentrons-flex-adapter-set-for-3rd-party-evotips/"

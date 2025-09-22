@@ -48,15 +48,35 @@ describe('PushOut', () => {
     screen.getByText('Helps ensure all liquid leaves the tip')
     screen.getByText('Enabled')
     screen.getByText('Disabled')
+    fireEvent.click(screen.getByText('Disabled'))
+    screen.getByText('Save')
+  })
+
+  it('renders text, button, and keyboard for push out volume', () => {
+    render(props)
+    fireEvent.click(screen.getByText('Enabled'))
+    fireEvent.click(screen.getByText('Continue'))
+    screen.getByText('Push out volume (µL)')
+    screen.getByText('Save')
+    screen.getByRole('button', { name: '1' })
+    screen.getByRole('button', { name: '5' })
+    screen.getByRole('button', { name: '9' })
+    screen.getByRole('button', { name: 'del' })
+    screen.getByRole('button', { name: '.' })
   })
 
   it('should call dispatch when clicking save button', () => {
     render(props)
     fireEvent.click(screen.getByText('Enabled'))
+    fireEvent.click(screen.getByText('Continue'))
+    fireEvent.click(screen.getByRole('button', { name: '1' }))
+    fireEvent.click(screen.getByRole('button', { name: '0' }))
     fireEvent.click(screen.getByText('Save'))
     expect(props.dispatch).toHaveBeenCalledWith({
       type: 'SET_PUSH_OUT',
-      pushOut: !props.state.preWetTip,
+      pushOutSettings: {
+        volume: 10,
+      },
     })
     expect(mockTrackEventWithRobotSerial).toHaveBeenCalledWith({
       name: 'quickTransferSettingSaved',

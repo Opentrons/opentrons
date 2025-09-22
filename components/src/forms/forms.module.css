@@ -3,20 +3,20 @@
 .accessibly_hidden {
   position: absolute;
   overflow: hidden;
-  clip: rect(0 0 0 0);
-  height: 1px;
   width: 1px;
-  margin: -1px;
+  height: 1px;
   padding: 0;
   border: 0;
+  margin: -1px;
+  clip: rect(0 0 0 0);
 }
 
 .form_field {
-  font-size: var(--fs-body-1); /* from legacy --font-form-default */
-  font-weight: var(--fw-regular); /* from legacy --font-form-default */
-  color: var(--c-font-dark); /* from legacy --font-form-default */
   display: flex;
   align-items: center;
+  color: var(--c-font-dark); /* from legacy --font-form-default */
+  font-size: var(--fs-body-1); /* from legacy --font-form-default */
+  font-weight: var(--fw-regular); /* from legacy --font-form-default */
   line-height: 1;
 }
 
@@ -30,10 +30,10 @@
 }
 
 .form_group_label {
-  font-size: var(--fs-body-1); /* from legacy --font-form-default */
-  color: var(--c-font-dark); /* from legacy --font-form-default */
-  font-weight: var(--fw-semibold);
   margin-bottom: 0.15rem;
+  color: var(--c-font-dark); /* from legacy --font-form-default */
+  font-size: var(--fs-body-1); /* from legacy --font-form-default */
+  font-weight: var(--fw-semibold);
   text-transform: capitalize;
 
   &::after {
@@ -42,21 +42,22 @@
 }
 
 .form_group_label_pipette_settings_slideout {
-  font-weight: var(--fw-semibold);
   margin-bottom: 0.5rem;
-  text-transform: capitalize;
-  font-size: 13px;
   color: #16212d;
+  font-size: 13px;
+  font-weight: var(--fw-semibold);
+  text-transform: capitalize;
 }
 
 .checkbox_icon {
+  display: flex;
+
   /* Icon for radiobutton and for checkbox */
   width: 1.25rem;
   min-width: 1.25rem;
-  color: var(--c-font-dark);
-  display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  color: var(--c-font-dark);
 
   &:not(.checkbox_disabled):hover {
     cursor: pointer;
@@ -96,20 +97,20 @@
 .input_field {
   display: flex;
   flex: 1 1;
-  background-color: var(--c-light-gray);
-  border-radius: var(--bd-radius-form-field);
   padding: 0.25rem 0.25rem 0.25rem 0.5rem;
+  border-radius: var(--bd-radius-form-field);
+  background-color: var(--c-light-gray);
 
   & input {
-    font-size: var(--fs-body-1); /* from legacy --font-form-default */
-    font-weight: var(--fw-regular); /* from legacy --font-form-default */
-    color: var(--c-font-dark); /* from legacy --font-form-default */
-    background-color: inherit;
-    border-radius: inherit;
-    border: none;
-    flex: 1 1 auto;
     width: 100%;
     height: 1rem;
+    flex: 1 1 auto;
+    border: none;
+    border-radius: inherit;
+    background-color: inherit;
+    color: var(--c-font-dark); /* from legacy --font-form-default */
+    font-size: var(--fs-body-1); /* from legacy --font-form-default */
+    font-weight: var(--fw-regular); /* from legacy --font-form-default */
 
     /* TODO: Ian 2018-09-14 Firefox has 1px padding on input element,
     * but I can't figure out how to fix it in Firefox without breaking it in Chrome.
@@ -133,20 +134,20 @@
   }
 
   & .suffix {
-    font-size: var(--fs-body-1); /* from legacy --font-form-default */
-    color: var(--c-font-dark); /* from legacy --font-form-default */
-    font-weight: var(--fw-semibold);
     display: inline-block;
     flex: 1 0;
-    text-align: right;
     align-self: center;
+    color: var(--c-font-dark); /* from legacy --font-form-default */
+    font-size: var(--fs-body-1); /* from legacy --font-form-default */
+    font-weight: var(--fw-semibold);
+    text-align: right;
   }
 }
 
 .input_caption {
+  color: var(--c-med-gray); /* from legacy --font-form-caption */
   font-size: var(--fs-caption); /* from legacy --font-form-caption */
   font-weight: var(--fw-semibold); /* from legacy --font-form-caption */
-  color: var(--c-med-gray); /* from legacy --font-form-caption */
   line-height: 1.2;
 
   & .right {
@@ -184,18 +185,18 @@
   position: relative;
 
   & select {
+    overflow: hidden;
+    width: 100%;
+    height: 1.5rem;
+    padding: 0.25rem 0.5rem;
+    border: 0;
+    border-radius: var(--bd-radius-form-field);
+    appearance: none;
+    color: var(--c-font-dark); /* from legacy --font-form-default */
+    font-family: inherit;
     font-size: var(--fs-body-1); /* from legacy --font-form-default */
     font-weight: var(--fw-regular); /* from legacy --font-form-default */
-    color: var(--c-font-dark); /* from legacy --font-form-default */
-    border: 0;
-    padding: 0.25rem 0.5rem;
     outline: none;
-    height: 1.5rem;
-    border-radius: var(--bd-radius-form-field);
-    font-family: inherit;
-    width: 100%;
-    appearance: none;
-    overflow: hidden;
 
     &:focus {
       background-color: var(--c-white);

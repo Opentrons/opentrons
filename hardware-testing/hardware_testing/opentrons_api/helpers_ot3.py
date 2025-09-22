@@ -1,5 +1,8 @@
 """Opentrons helper methods."""
 import asyncio
+import atexit
+import logging
+
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
@@ -17,7 +20,6 @@ from typing import (
     cast,
     Sequence,
 )
-import atexit
 from opentrons_hardware.drivers.can_bus import DriverSettings, build, CanMessenger
 from opentrons_hardware.drivers.can_bus import settings as can_bus_settings
 from opentrons_hardware.firmware_bindings.constants import SensorId
@@ -50,6 +52,23 @@ from .types import (
     Point,
     CriticalPoint,
 )
+
+
+# Supress logging.exception messages as they can be confusing when running scripts.
+class StripExceptionMessageHandler(logging.StreamHandler):
+    """Custom StreamHandler to strip logging.exception messages."""
+
+    def emit(self, record: logging.LogRecord) -> None:
+        """Emit a record, but supress logging.exception logs."""
+        if record.exc_info:
+            # Remove the msg, traceback if it's an exception
+            record.msg = ""
+            record.exc_info = None
+        super().emit(record)
+
+
+logger = logging.getLogger()
+logger.addHandler(StripExceptionMessageHandler())
 
 # TODO: use values from shared data, so we don't need to update here again
 TIP_LENGTH_OVERLAP = 10.5

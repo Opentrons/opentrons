@@ -19,15 +19,15 @@ import {
   TEXT_DECORATION_UNDERLINE,
 } from '@opentrons/components'
 
-import { getEnableLiquidClasses } from '../../../feature-flags/selectors'
-import { removeWellsContents } from '../../../labware-ingred/actions'
-import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
-import { getLabwareEntities } from '../../../step-forms/selectors'
-import * as wellContentsSelectors from '../../../top-selectors/well-contents'
-import { LINE_CLAMP_TEXT_STYLE } from '../../atoms'
+import { LINE_CLAMP_TEXT_STYLE } from '/protocol-designer/components/atoms'
+import { removeWellsContents } from '/protocol-designer/labware-ingred/actions'
+import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
+import { getLabwareEntities } from '/protocol-designer/step-forms/selectors'
+import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
+
 import { WellContents } from './WellContents'
 
-import type { SelectedContainerId } from '../../../labware-ingred/reducers'
+import type { SelectedContainerId } from '/protocol-designer/labware-ingred/reducers'
 import type { LiquidInfo } from './LiquidToolbox'
 
 interface LiquidCardProps {
@@ -50,7 +50,6 @@ export function LiquidCard({ info }: LiquidCardProps): JSX.Element {
   const allWellContentsForActiveItem = useSelector(
     wellContentsSelectors.getAllWellContentsForActiveItem
   )
-  const enableLiquidClasses = useSelector(getEnableLiquidClasses)
   const wellContents =
     allWellContentsForActiveItem != null && labwareId != null
       ? allWellContentsForActiveItem[labwareId]
@@ -125,7 +124,7 @@ export function LiquidCard({ info }: LiquidCardProps): JSX.Element {
             >
               {name}
             </StyledText>
-            {liquidClassDisplayName != null && enableLiquidClasses ? (
+            {liquidClassDisplayName != null ? (
               <Tag
                 text={liquidClassDisplayName}
                 type="default"

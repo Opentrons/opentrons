@@ -1,25 +1,25 @@
 @import '@opentrons/components/styles';
 
 .warning_title {
+  margin-bottom: 0.5rem;
+  color: var(--c-font-dark); /* from legacy --font-body-2-dark */
   font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
   font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
-  color: var(--c-font-dark); /* from legacy --font-body-2-dark */
-  margin-bottom: 0.5rem;
   text-transform: uppercase;
 }
 
 .warning_text {
+  margin-bottom: 0.75rem;
+  color: var(--c-font-dark); /* from legacy --font-body-1-dark */
   font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
   font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
-  color: var(--c-font-dark); /* from legacy --font-body-1-dark */
-  margin-bottom: 0.75rem;
 }
 
 .form_column {
-  width: 50%;
   display: inline-block;
-  vertical-align: top;
+  width: 50%;
   padding: 1rem 1rem 1rem 0;
+  vertical-align: top;
 }
 
 .form_group {
@@ -28,8 +28,8 @@
 
 .form_row {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   margin: 0.5rem 0;
 }
 
@@ -39,37 +39,37 @@
 }
 
 .form_label {
+  color: var(--c-font-dark); /* from legacy --font-body-1-dark */
   font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
   font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
-  color: var(--c-font-dark); /* from legacy --font-body-1-dark */
 }
 
 .form_button {
   min-width: 7rem;
 
   &:first-child {
-    float: left;
     min-width: 8rem;
+    float: left;
   }
 }
 
 .reset_message {
+  margin-bottom: 1rem;
+  color: var(--c-font-dark); /* from legacy --font-body-1-dark */
   font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
   font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
-  color: var(--c-font-dark); /* from legacy --font-body-1-dark */
   text-align: left;
-  margin-bottom: 1rem;
 }
 
 .config_submit_error {
-  font-size: var(--fs-body-1);
-  color: var(--c-warning-dark);
-  font-style: italic;
   margin-bottom: 0.5rem;
+  color: var(--c-warning-dark);
+  font-size: var(--fs-body-1);
+  font-style: italic;
 }
 
 .group_error {
+  color: var(--c-warning-dark);
   font-size: var(--fs-caption);
   font-weight: var(--fw-semibold);
-  color: var(--c-warning-dark);
 }

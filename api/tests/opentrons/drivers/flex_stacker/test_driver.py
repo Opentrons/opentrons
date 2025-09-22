@@ -750,3 +750,29 @@ async def test_set_tof_configuration(
     )
     connection.send_command.assert_any_call(set_config)
     connection.reset_mock()
+
+
+async def test_get_estop_engaged(
+    subject: FlexStackerDriver, connection: AsyncMock
+) -> None:
+    """It should send a get estop command return boolean."""
+    connection.send_command.return_value = "M112 E:1"
+    response = await subject.get_estop_engaged()
+    assert response
+
+    estop = types.GCODE.GET_ESTOP_ENGAGED.build_command()
+    connection.send_command.assert_any_call(estop)
+    connection.reset_mock()
+
+
+async def test_get_install_detected(
+    subject: FlexStackerDriver, connection: AsyncMock
+) -> None:
+    """It should send a get install detected command and return boolean."""
+    connection.send_command.return_value = "M123 I:1"
+    response = await subject.get_installation_detected()
+    assert response
+
+    install_detect = types.GCODE.GET_INSTALL_DETECTED.build_command()
+    connection.send_command.assert_any_call(install_detect)
+    connection.reset_mock()

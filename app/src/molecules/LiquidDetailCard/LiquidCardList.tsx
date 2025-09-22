@@ -9,8 +9,11 @@ import { getIsOnDevice } from '/app/redux/config'
 import { LiquidDetailCard } from './LiquidDetailCard'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { LabwareDefinition, ParsedLiquid } from '@opentrons/shared-data'
-import type { LabwareByLiquidId } from '/app/transformations/commands'
+import type {
+  LabwareByLiquidId,
+  LabwareDefinition,
+  ParsedLiquid,
+} from '@opentrons/shared-data'
 
 interface LiquidCardListProps {
   selectedLabwareDefinition: LabwareDefinition

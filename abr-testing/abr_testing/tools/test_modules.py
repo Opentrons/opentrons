@@ -16,8 +16,8 @@ import traceback
 async def tc_test_1(module: str, path_to_file: str) -> None:
     """Thermocycler Test 1 Open and Close Lid."""
     duration = int(input("How long to run this test for? (in seconds): "))
-    start = time.time()
-    while time.time() - start < duration:
+    start = time.monotonic()
+    while time.monotonic() - start < duration:
         try:
             await (tc_open_lid(module, path_to_file))
         except asyncio.TimeoutError:
@@ -34,8 +34,8 @@ async def hs_test_1(module: str, path_to_file: str) -> None:
     """Heater Shaker Test 1. (Home and Shake)."""
     duration = int(input("How long to run this test for? (in seconds): "))
     rpm = input("Target RPM (200-3000): ")
-    start = time.time()
-    while time.time() - start < duration:
+    start = time.monotonic()
+    while time.monotonic() - start < duration:
         try:
             await (hs_test_home(module, path_to_file))
         except asyncio.TimeoutError:

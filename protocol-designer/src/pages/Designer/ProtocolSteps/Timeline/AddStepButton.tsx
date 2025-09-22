@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import { last } from 'lodash'
+import last from 'lodash/last'
 import { css } from 'styled-components'
 
 import {
@@ -27,6 +27,7 @@ import {
 } from '@opentrons/components'
 import {
   ABSORBANCE_READER_TYPE,
+  getIsLid,
   getIsTiprack,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
@@ -39,39 +40,42 @@ import {
   CLOSE_UNSAVED_STEP_FORM,
   ConfirmDeleteModal,
   getMainPagePortalEl,
-} from '../../../../components/organisms'
-import { useKitchen } from '../../../../components/organisms/Kitchen/useKitchen'
-import { OFFDECK } from '../../../../constants'
-import { getEnableComment } from '../../../../feature-flags/selectors'
+} from '/protocol-designer/components/organisms'
+import { OFFDECK } from '/protocol-designer/constants'
+import { getEnableComment } from '/protocol-designer/feature-flags/selectors'
 import {
   getInitialRobotState,
   getRobotStateTimeline,
-} from '../../../../file-data/selectors'
+} from '/protocol-designer/file-data/selectors'
 import {
   getIsModuleOnDeck,
   selectors as stepFormSelectors,
-} from '../../../../step-forms'
-import { getLabwareEntities } from '../../../../step-forms/selectors'
+} from '/protocol-designer/step-forms'
+import { getLabwareEntities } from '/protocol-designer/step-forms/selectors'
 import {
   getIsMultiSelectMode,
   actions as stepsActions,
-} from '../../../../ui/steps'
-import { getHasTrash, getIsAdapterFromDef } from '../../../../utils'
+} from '/protocol-designer/ui/steps'
+import { getIsAdapterFromDef } from '/protocol-designer/utils'
+
 import { AddStepOverflowButton } from './AddStepOverflowButton'
 
 import type { ThunkDispatch } from 'redux-thunk'
 import type { MouseEvent } from 'react'
-import type { StepType } from '../../../../form-types'
-import type { BaseState } from '../../../../types'
+import type { StepType } from '/protocol-designer/form-types'
+import type { BaseState } from '/protocol-designer/types'
 
 interface AddStepButtonProps {
   hasText: boolean
+  sidebarWidth: number
 }
 
-export function AddStepButton({ hasText }: AddStepButtonProps): JSX.Element {
-  const { t } = useTranslation(['tooltip', 'button', 'starting_deck_state'])
+export function AddStepButton({
+  hasText,
+  sidebarWidth,
+}: AddStepButtonProps): JSX.Element {
+  const { t } = useTranslation(['tooltip', 'button'])
   const enableComment = useSelector(getEnableComment)
-  const { makeSnackbar } = useKitchen()
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_TOP,
@@ -84,10 +88,7 @@ export function AddStepButton({ hasText }: AddStepButtonProps): JSX.Element {
     stepFormSelectors.getCurrentFormHasUnsavedChanges
   )
   const isStepCreationDisabled = useSelector(getIsMultiSelectMode)
-  const { modules, additionalEquipmentOnDeck } = useSelector(
-    stepFormSelectors.getInitialDeckSetup
-  )
-  const hasTrash = getHasTrash(additionalEquipmentOnDeck)
+  const { modules } = useSelector(stepFormSelectors.getInitialDeckSetup)
   const [showStepOverflowMenu, setShowStepOverflowMenu] = useState<boolean>(
     false
   )
@@ -109,11 +110,16 @@ export function AddStepButton({ hasText }: AddStepButtonProps): JSX.Element {
     labwareAtLastState
   ).some(([labwareId, { stack }]) => {
     const labwareDef = labwareEntities[labwareId]?.def
+    const slot = getSlotInLocationStack(stack)
+    const isLidOnSlot = Object.values(labwareEntities).some(({ def }) =>
+      getIsLid(def)
+    )
     return (
       labwareDef != null &&
-      getSlotInLocationStack(stack) !== OFFDECK &&
+      slot !== OFFDECK &&
       !getIsTiprack(labwareDef) &&
-      !getIsAdapterFromDef(labwareDef)
+      !getIsAdapterFromDef(labwareDef) &&
+      !isLidOnSlot
     )
   })
   const getSupportedSteps = (): Array<
@@ -169,11 +175,7 @@ export function AddStepButton({ hasText }: AddStepButtonProps): JSX.Element {
     ))
 
   const handleAddClick = (): void => {
-    if (hasTrash) {
-      setShowStepOverflowMenu(true)
-    } else {
-      makeSnackbar(t('starting_deck_state:trash_required') as string)
-    }
+    setShowStepOverflowMenu(true)
   }
 
   return (

@@ -13,6 +13,7 @@
   "pipettes_not_calibrated": "Please calibrate all pipettes specified in loaded protocol to proceed",
   "please_connect_to_a_robot": "Please connect to a robot to proceed",
   "please_load_a_protocol": "Please load a protocol to proceed",
+  "preview": "Preview",
   "protocol_details": "Protocol Details",
   "protocol_runs": "Protocol Runs",
   "protocol_timeline": "Protocol Timeline",

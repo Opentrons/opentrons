@@ -1,6 +1,9 @@
 import { useMemo } from 'react'
 
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import {
+  useInstrumentsQuery,
+  useRunCurrentState,
+} from '@opentrons/react-api-client'
 
 import { useRecoveryAnalytics } from '/app/redux-resources/analytics'
 import { getRunningStepCountsFrom } from '/app/resources/protocols'
@@ -90,6 +93,7 @@ export function useERUtils({
 }: ERUtilsProps): ERUtilsResults {
   const { data: attachedInstruments } = useInstrumentsQuery()
   const { data: runRecord } = useNotifyRunQuery(runId)
+  const { data: runCurrentState } = useRunCurrentState(runId)
   // TODO(jh, 06-04-24): Refactor the utilities that derive info
   // from runCommands once the server yields that info directly on an existing/new endpoint. We'll still need this with a
   // pageLength of 1 though for stepCount things.
@@ -162,6 +166,7 @@ export function useERUtils({
     failedPipetteInfo,
     runRecord,
     runCommands,
+    runCurrentState,
   })
 
   const recoveryCommands = useRecoveryCommands({

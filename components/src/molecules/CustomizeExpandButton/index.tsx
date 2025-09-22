@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import styled, { css } from 'styled-components'
 
 import { CheckboxField } from '../../atoms/CheckboxField'
@@ -8,7 +9,12 @@ import { Flex } from '../../primitives'
 import { CURSOR_POINTER, DIRECTION_COLUMN } from '../../styles'
 import { SPACING } from '../../ui-style-constants'
 
-import type { ChangeEvent, ChangeEventHandler, MouseEvent } from 'react'
+import type {
+  ChangeEvent,
+  ChangeEventHandler,
+  MemoExoticComponent,
+  MouseEvent,
+} from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { StyleProps } from '../../primitives'
 
@@ -25,9 +31,8 @@ export interface StackingProps {
 }
 
 interface CustomizeExpandButtonProps extends StyleProps {
-  enableStackingFF: boolean
   allowInputField: boolean
-  loadName: string
+  isNestedDefALid: boolean
   buttonText: string
   buttonValue: string | number
   onChange: ChangeEventHandler<HTMLInputElement>
@@ -38,7 +43,7 @@ interface CustomizeExpandButtonProps extends StyleProps {
 }
 
 //  used for helix and as a child button to ListButtonAccordion
-export function CustomizeExpandButton(
+export function CustomizeExpandButtonComponent(
   props: CustomizeExpandButtonProps
 ): JSX.Element {
   const {
@@ -50,13 +55,11 @@ export function CustomizeExpandButton(
     id = buttonText,
     stackingProps,
     allowInputField,
-    loadName,
-    enableStackingFF,
+    isNestedDefALid,
   } = props
   const isLid =
     stackingProps != null &&
     stackingProps.definition.allowedRoles?.includes('lid')
-  const tcLidDef = loadName === 'opentrons_tough_pcr_auto_sealing_lid'
 
   return (
     <Flex
@@ -87,14 +90,14 @@ export function CustomizeExpandButton(
           <StyledText desktopStyle="bodyDefaultRegular">
             {buttonText}
           </StyledText>
-          {stackingProps != null && enableStackingFF && isSelected ? (
+          {stackingProps != null && isSelected ? (
             <Flex
               flexDirection={DIRECTION_COLUMN}
               backgroundColor={COLORS.blue10}
               padding={`${SPACING.spacing16} ${SPACING.spacing20}`}
               borderRadius={BORDERS.borderRadius4}
             >
-              {isLid && !tcLidDef ? (
+              {isLid && !isNestedDefALid ? (
                 <CheckboxField
                   onChange={e => {
                     e.stopPropagation()
@@ -134,6 +137,10 @@ export function CustomizeExpandButton(
     </Flex>
   )
 }
+
+export const CustomizeExpandButton: MemoExoticComponent<
+  typeof CustomizeExpandButtonComponent
+> = memo(CustomizeExpandButtonComponent)
 
 const SettingButton = styled.input`
   display: none;

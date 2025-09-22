@@ -1,10 +1,11 @@
 """Tests for the RunOrchestrator."""
+
 from pathlib import Path
 
 import pytest
 from datetime import datetime
 
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
+from pytest_lazy_fixtures import lf as lazy_fixture
 from decoy import Decoy
 from typing import Union, Generator
 
@@ -13,9 +14,15 @@ from opentrons.protocol_engine.errors import RunStoppedError
 from opentrons.protocol_engine.state.state import StateStore
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_engine import ProtocolEngine
-from opentrons.protocol_engine.types import PostRunHardwareState
+from opentrons.protocol_engine.types import (
+    PostRunHardwareState,
+    ModuleModel as EngineModuleModel,
+)
 from opentrons.protocol_engine import commands as pe_commands
 from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control.modules.types import (
+    TemperatureModuleModel as HardwareTemperatureModuleModel,
+)
 from opentrons.protocol_reader import (
     JsonProtocolConfig,
     PythonProtocolConfig,
@@ -534,3 +541,24 @@ def test_create_error_recovery_policy(
     policy = decoy.mock(cls=ErrorRecoveryPolicy)
     live_protocol_subject.set_error_recovery_policy(policy)
     decoy.verify(mock_protocol_engine.set_error_recovery_policy(policy))
+
+
+async def test_transform_module_model_in_ame(
+    decoy: Decoy,
+    python_protocol_subject: RunOrchestrator,
+    mock_protocol_engine: ProtocolEngine,
+) -> None:
+    """It should make the module model the PE kind in its asynch module error call."""
+    decoy.when(
+        await mock_protocol_engine.async_module_error(
+            module_model=EngineModuleModel.TEMPERATURE_MODULE_V2,
+            serial="whatever",
+        )
+    ).then_return(True)
+    assert (
+        await python_protocol_subject.asynchronous_module_error(
+            module_model=HardwareTemperatureModuleModel.TEMPERATURE_V2,
+            module_serial="whatever",
+        )
+        is True
+    )

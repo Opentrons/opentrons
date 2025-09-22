@@ -16,6 +16,7 @@ export interface WellOffset {
   y?: number
   z?: number
 }
+// TODO(jh, 06-27-25): Origin and offset should be required. Mark them as so and fix all the type errors.
 export interface WellLocation {
   origin?: WellOrigin
   offset?: WellOffset

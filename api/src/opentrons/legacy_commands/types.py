@@ -89,12 +89,22 @@ THERMOCYCLER_SET_LID_TEMP: Final = "command.THERMOCYCLER_SET_LID_TEMP"
 THERMOCYCLER_DEACTIVATE_LID: Final = "command.THERMOCYCLER_DEACTIVATE_LID"
 THERMOCYCLER_DEACTIVATE_BLOCK: Final = "command.THERMOCYCLER_DEACTIVATE_BLOCK"
 
+FLEX_STACKER_SET_STORED_LABWARE: Final = "command.FLEX_STACKER_SET_STORED_LABWARE"
+FLEX_STACKER_RETRIEVE: Final = "command.FLEX_STACKER_RETRIEVE"
+FLEX_STACKER_STORE: Final = "command.FLEX_STACKER_STORE"
+FLEX_STACKER_EMPTY: Final = "command.FLEX_STACKER_EMPTY"
+FLEX_STACKER_FILL: Final = "command.FLEX_STACKER_FILL"
+
 # Robot #
 ROBOT_MOVE_TO: Final = "command.ROBOT_MOVE_TO"
 ROBOT_MOVE_AXES_TO: Final = "command.ROBOT_MOVE_AXES_TO"
 ROBOT_MOVE_RELATIVE_TO: Final = "command.ROBOT_MOVE_RELATIVE_TO"
 ROBOT_OPEN_GRIPPER_JAW: Final = "command.ROBOT_OPEN_GRIPPER_JAW"
 ROBOT_CLOSE_GRIPPER_JAW: Final = "command.ROBOT_CLOSE_GRIPPER_JAW"
+
+# Tasks #
+WAIT_FOR_TASKS: Final = "command.WAIT_FOR_TASKS"
+CREATE_TIMER: Final = "command.CREATE_TIMER"
 
 
 class TextOnlyPayload(TypedDict):
@@ -152,6 +162,9 @@ class ResumeCommandPayload(TextOnlyPayload):
 class ResumeCommand(TypedDict):
     name: Literal["command.RESUME"]
     payload: ResumeCommandPayload
+
+
+# Module commands
 
 
 class HeaterShakerSetTargetTemperaturePayload(TextOnlyPayload):
@@ -369,6 +382,34 @@ class ThermocyclerCloseCommandPayload(TextOnlyPayload):
 class ThermocyclerCloseCommand(TypedDict):
     name: Literal["command.THERMOCYCLER_CLOSE"]
     payload: ThermocyclerCloseCommandPayload
+
+
+class FlexStackerSetStoredLabwareCommand(TypedDict):
+    name: Literal["command.FLEX_STACKER_SET_STORED_LABWARE"]
+    payload: TextOnlyPayload
+
+
+class FlexStackerRetrieveCommand(TypedDict):
+    name: Literal["command.FLEX_STACKER_RETRIEVE"]
+    payload: TextOnlyPayload
+
+
+class FlexStackerStoreCommand(TypedDict):
+    name: Literal["command.FLEX_STACKER_STORE"]
+    payload: TextOnlyPayload
+
+
+class FlexStackerEmptyCommand(TypedDict):
+    name: Literal["command.FLEX_STACKER_EMPTY"]
+    payload: TextOnlyPayload
+
+
+class FlexStackerFillCommand(TypedDict):
+    name: Literal["command.FLEX_STACKER_FILL"]
+    payload: TextOnlyPayload
+
+
+# Module command end
 
 
 class HomeCommandPayload(TextOnlyPayload):
@@ -677,6 +718,27 @@ class RobotCloseGripperJawCommand(TypedDict):
     payload: GripperCommandPayload
 
 
+# Task Commands and Payloads
+
+
+class WaitForTasksPayload(TextOnlyPayload):
+    pass
+
+
+class CreateTimerPayload(TextOnlyPayload):
+    time: float
+
+
+class WaitForTasksCommand(TypedDict):
+    name: Literal["command.WAIT_FOR_TASKS"]
+    payload: WaitForTasksPayload
+
+
+class CreateTimerCommand(TypedDict):
+    name: Literal["command.CREATE_TIMER"]
+    payload: CreateTimerPayload
+
+
 Command = Union[
     DropTipCommand,
     DropTipInDisposalLocationCommand,
@@ -739,6 +801,15 @@ Command = Union[
     RobotMoveAxisRelativeCommand,
     RobotOpenGripperJawCommand,
     RobotCloseGripperJawCommand,
+    # Flex Stacker commands
+    FlexStackerSetStoredLabwareCommand,
+    FlexStackerRetrieveCommand,
+    FlexStackerStoreCommand,
+    FlexStackerEmptyCommand,
+    FlexStackerFillCommand,
+    # Task commands
+    WaitForTasksCommand,
+    CreateTimerCommand,
 ]
 
 
@@ -799,6 +870,9 @@ CommandPayload = Union[
     RobotMoveAxisRelativeCommandPayload,
     RobotMoveAxisToCommandPayload,
     GripperCommandPayload,
+    # Task payloads
+    WaitForTasksPayload,
+    CreateTimerPayload,
 ]
 
 
@@ -1019,6 +1093,28 @@ class MagdeckEngageMessage(CommandMessageFields, MagdeckEngageCommand):
     pass
 
 
+class FlexStackerSetStoredLabwareMessage(
+    CommandMessageFields, FlexStackerSetStoredLabwareCommand
+):
+    pass
+
+
+class FlexStackerRetrieveMessage(CommandMessageFields, FlexStackerRetrieveCommand):
+    pass
+
+
+class FlexStackerStoreMessage(CommandMessageFields, FlexStackerStoreCommand):
+    pass
+
+
+class FlexStackerEmptyMessage(CommandMessageFields, FlexStackerEmptyCommand):
+    pass
+
+
+class FlexStackerFillMessage(CommandMessageFields, FlexStackerFillCommand):
+    pass
+
+
 class ResumeMessage(CommandMessageFields, ResumeCommand):
     pass
 
@@ -1056,6 +1152,14 @@ class RobotOpenGripperJawMessage(CommandMessageFields, RobotOpenGripperJawComman
 
 
 class RobotCloseGripperJawMessage(CommandMessageFields, RobotCloseGripperJawCommand):
+    pass
+
+
+class WaitForTasksMessage(CommandMessageFields, WaitForTasksCommand):
+    pass
+
+
+class CreateTimerMessage(CommandMessageFields, CreateTimerCommand):
     pass
 
 
@@ -1112,4 +1216,13 @@ CommandMessage = Union[
     RobotMoveAxisRelativeMessage,
     RobotOpenGripperJawMessage,
     RobotCloseGripperJawMessage,
+    # Flex Stacker Messages
+    FlexStackerSetStoredLabwareMessage,
+    FlexStackerRetrieveMessage,
+    FlexStackerStoreMessage,
+    FlexStackerEmptyMessage,
+    FlexStackerFillMessage,
+    # Task Messages
+    WaitForTasksMessage,
+    CreateTimerMessage,
 ]

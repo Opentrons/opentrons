@@ -33,6 +33,12 @@ export function useErrorName(errorKind: ErrorKind): string {
       return t('shuttle_missing')
     case ERROR_KINDS.STACKER_SHUTTLE_EMPTY:
       return t('labware_not_retrieved')
+    case ERROR_KINDS.STACKER_SHUTTLE_OCCUPIED:
+      return t('stacker_shuttle_full')
+    case ERROR_KINDS.STACKER_HOPPER_OR_SHUTTLE_EMPTY:
+      return t('stacker_error')
+    case ERROR_KINDS.STACKER_SHUTTLE_STORE_EMPTY:
+      return t('stacker_shuttle_store_empty')
     default:
       return t('error')
   }

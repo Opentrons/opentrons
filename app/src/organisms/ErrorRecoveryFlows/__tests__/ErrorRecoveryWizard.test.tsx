@@ -29,6 +29,17 @@ import {
   SelectRecoveryOption,
   SkipStepNewTips,
   SkipStepSameTips,
+  StackerHopperEmptyRetry,
+  StackerHopperEmptySkip,
+  StackerShuttleEmptyRetry,
+  StackerShuttleEmptySkip,
+  StackerShuttleEmptyStoreRetry,
+  StackerShuttleEmptyStoreSkip,
+  StackerShuttleMissing,
+  StackerStalledRetry,
+  StackerStalledSkip,
+  StackerStalledStoreRetry,
+  StackerStalledStoreSkip,
 } from '../RecoveryOptions'
 import {
   ErrorDetailsModal,
@@ -201,6 +212,10 @@ describe('ErrorRecoveryContent', () => {
     STACKER_SHUTTLE_MISSING_RETRY,
     STACKER_SHUTTLE_EMPTY_RETRY,
     STACKER_SHUTTLE_EMPTY_SKIP,
+    STACKER_STALLED_STORE_SKIP,
+    STACKER_STALLED_STORE_RETRY,
+    STACKER_SHUTTLE_EMPTY_STORE_SKIP,
+    STACKER_SHUTTLE_EMPTY_STORE_RETRY,
   } = RECOVERY_MAP
 
   let props: ComponentProps<typeof ErrorRecoveryContent>
@@ -242,6 +257,39 @@ describe('ErrorRecoveryContent', () => {
       <div>MOCK_DOOR_OPEN_SPECIAL</div>
     )
     vi.mocked(HomeAndRetry).mockReturnValue(<div>MOCK_HOME_AND_RETRY</div>)
+    vi.mocked(StackerHopperEmptyRetry).mockReturnValue(
+      <div>MOCK_STACKER_HOPPER_EMPTY_RETRY</div>
+    )
+    vi.mocked(StackerHopperEmptySkip).mockReturnValue(
+      <div>MOCK_STACKER_HOPPER_EMPTY_SKIP</div>
+    )
+    vi.mocked(StackerShuttleEmptyRetry).mockReturnValue(
+      <div>MOCK_STACKER_SHUTTLE_EMPTY_RETRY</div>
+    )
+    vi.mocked(StackerShuttleEmptySkip).mockReturnValue(
+      <div>MOCK_STACKER_SHUTTLE_EMPTY_SKIP</div>
+    )
+    vi.mocked(StackerShuttleMissing).mockReturnValue(
+      <div>MOCK_STACKER_SHUTTLE_MISSING</div>
+    )
+    vi.mocked(StackerStalledRetry).mockReturnValue(
+      <div>MOCK_STACKER_STALLED_RETRY</div>
+    )
+    vi.mocked(StackerStalledSkip).mockReturnValue(
+      <div>MOCK_STACKER_STALLED_SKIP</div>
+    )
+    vi.mocked(StackerStalledStoreSkip).mockReturnValue(
+      <div>MOCK_STACKER_STALLED_STORE_SKIP</div>
+    )
+    vi.mocked(StackerStalledStoreRetry).mockReturnValue(
+      <div>MOCK_STACKER_STALLED_STORE_RETRY</div>
+    )
+    vi.mocked(StackerShuttleEmptyStoreSkip).mockReturnValue(
+      <div>MOCK_STACKER_SHUTTLE_EMPTY_STORE_SKIP</div>
+    )
+    vi.mocked(StackerShuttleEmptyStoreRetry).mockReturnValue(
+      <div>MOCK_STACKER_SHUTTLE_EMPTY_STORE_RETRY</div>
+    )
   })
 
   it(`returns SelectRecoveryOption when the route is ${OPTION_SELECTION.ROUTE}`, () => {
@@ -403,7 +451,7 @@ describe('ErrorRecoveryContent', () => {
     }
     renderRecoveryContent(props)
 
-    screen.getByText('MOCK_REPLACE_LW_AND_RETRY')
+    screen.getByText('MOCK_STACKER_HOPPER_EMPTY_RETRY')
   })
 
   it(`returns appropriate view when the route is ${STACKER_HOPPER_EMPTY_SKIP.ROUTE}`, () => {
@@ -416,20 +464,33 @@ describe('ErrorRecoveryContent', () => {
     }
     renderRecoveryContent(props)
 
-    screen.getByText('MOCK_REPLACE_LW_AND_RETRY')
+    screen.getByText('MOCK_STACKER_HOPPER_EMPTY_SKIP')
   })
 
-  it(`returns appropriate view when the route is ${STACKER_HOPPER_EMPTY_SKIP.ROUTE}`, () => {
+  it(`returns appropriate view when the route is ${STACKER_SHUTTLE_EMPTY_RETRY.ROUTE}`, () => {
     props = {
       ...props,
       recoveryMap: {
         ...props.recoveryMap,
-        route: STACKER_HOPPER_EMPTY_SKIP.ROUTE,
+        route: STACKER_SHUTTLE_EMPTY_RETRY.ROUTE,
       },
     }
     renderRecoveryContent(props)
 
-    screen.getByText('MOCK_REPLACE_LW_AND_RETRY')
+    screen.getByText('MOCK_STACKER_SHUTTLE_EMPTY_RETRY')
+  })
+
+  it(`returns appropriate view when the route is ${STACKER_SHUTTLE_EMPTY_SKIP.ROUTE}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        ...props.recoveryMap,
+        route: STACKER_SHUTTLE_EMPTY_SKIP.ROUTE,
+      },
+    }
+    renderRecoveryContent(props)
+
+    screen.getByText('MOCK_STACKER_SHUTTLE_EMPTY_SKIP')
   })
 
   it(`returns appropriate view when the route is ${STACKER_SHUTTLE_MISSING_RETRY.ROUTE}`, () => {
@@ -442,7 +503,7 @@ describe('ErrorRecoveryContent', () => {
     }
     renderRecoveryContent(props)
 
-    screen.getByText('MOCK_REPLACE_LW_AND_RETRY')
+    screen.getByText('MOCK_STACKER_SHUTTLE_MISSING')
   })
 
   it(`returns appropriate view when the route is ${STACKER_STALLED_SKIP.ROUTE}`, () => {
@@ -455,7 +516,59 @@ describe('ErrorRecoveryContent', () => {
     }
     renderRecoveryContent(props)
 
-    screen.getByText('MOCK_REPLACE_LW_AND_RETRY')
+    screen.getByText('MOCK_STACKER_STALLED_SKIP')
+  })
+
+  it(`returns appropriate view when the route is ${STACKER_STALLED_STORE_SKIP.ROUTE}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        ...props.recoveryMap,
+        route: STACKER_STALLED_STORE_SKIP.ROUTE,
+      },
+    }
+    renderRecoveryContent(props)
+
+    screen.getByText('MOCK_STACKER_STALLED_STORE_SKIP')
+  })
+
+  it(`returns appropriate view when the route is ${STACKER_STALLED_STORE_RETRY.ROUTE}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        ...props.recoveryMap,
+        route: STACKER_STALLED_STORE_RETRY.ROUTE,
+      },
+    }
+    renderRecoveryContent(props)
+
+    screen.getByText('MOCK_STACKER_STALLED_STORE_RETRY')
+  })
+
+  it(`returns appropriate view when the route is ${STACKER_SHUTTLE_EMPTY_STORE_SKIP.ROUTE}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        ...props.recoveryMap,
+        route: STACKER_SHUTTLE_EMPTY_STORE_SKIP.ROUTE,
+      },
+    }
+    renderRecoveryContent(props)
+
+    screen.getByText('MOCK_STACKER_SHUTTLE_EMPTY_STORE_SKIP')
+  })
+
+  it(`returns appropriate view when the route is ${STACKER_SHUTTLE_EMPTY_STORE_RETRY.ROUTE}`, () => {
+    props = {
+      ...props,
+      recoveryMap: {
+        ...props.recoveryMap,
+        route: STACKER_SHUTTLE_EMPTY_STORE_RETRY.ROUTE,
+      },
+    }
+    renderRecoveryContent(props)
+
+    screen.getByText('MOCK_STACKER_SHUTTLE_EMPTY_STORE_RETRY')
   })
 
   it(`returns appropriate view when the route is ${STACKER_STALLED_RETRY.ROUTE}`, () => {
@@ -468,7 +581,7 @@ describe('ErrorRecoveryContent', () => {
     }
     renderRecoveryContent(props)
 
-    screen.getByText('MOCK_REPLACE_LW_AND_RETRY')
+    screen.getByText('MOCK_STACKER_STALLED_RETRY')
   })
 
   it(`returns appropriate view when the route is ${MANUAL_REPLACE_AND_RETRY.ROUTE}`, () => {
@@ -483,25 +596,6 @@ describe('ErrorRecoveryContent', () => {
 
     screen.getByText('MOCK_REPLACE_LW_AND_RETRY')
   })
-
-  it.each([
-    STACKER_SHUTTLE_EMPTY_RETRY.ROUTE,
-    STACKER_SHUTTLE_EMPTY_SKIP.ROUTE,
-  ])(
-    'returns appropriate view when the route is $recoveryOption',
-    recoveryOption => {
-      props = {
-        ...props,
-        recoveryMap: {
-          ...props.recoveryMap,
-          route: recoveryOption,
-        },
-      }
-      renderRecoveryContent(props)
-
-      screen.getByText('MOCK_REPLACE_LW_AND_RETRY')
-    }
-  )
 
   it(`returns RecoveryError when the route is ${ERROR_WHILE_RECOVERING.ROUTE}`, () => {
     props = {

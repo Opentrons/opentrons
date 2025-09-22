@@ -2274,7 +2274,7 @@
       "displayColor": "#b925ff"
     }
   },
-  "commandSchemaId": "opentronsCommandSchemaV10",
+  "commandSchemaId": "opentronsCommandSchemaV14",
   "commands": [
     {
       "key": "ffe32279-1362-4a67-bb58-44c67d98458d",

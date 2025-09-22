@@ -35,6 +35,9 @@ export function LPCRobotInMotion(props: RobotMotionLoaderProps): JSX.Element {
       {...props}
       header={t('labware_position_check_title')}
       contentStyle={isOnDevice ? CHILDREN_CONTAINER_STYLE : undefined}
+      oddHeaderBtnCopy="NO_COPY"
+      desktopHeaderBtnCopy="NO_COPY"
+      desktopFooterBtnCopy="NO_COPY"
     >
       <Flex css={CONTAINER_STYLE}>
         <Icon name="ot-spinner" css={SPINNER_STYLE} spin />

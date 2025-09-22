@@ -179,7 +179,6 @@ stages:
                   moduleId: magneticBlockId
                 result:
                   moduleId: magneticBlockId
-                  definition: !anydict
                   model: magneticBlockV1
                 notes: []
                 startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
@@ -196,7 +195,6 @@ stages:
                   moduleId: temperatureModuleId
                 result:
                   moduleId: temperatureModuleId
-                  definition: !anydict
                   model: temperatureModuleV2
                   serialNumber: !anystr
                 notes: []

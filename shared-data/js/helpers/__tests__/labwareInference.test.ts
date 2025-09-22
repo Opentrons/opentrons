@@ -101,7 +101,6 @@ describe('getUniqueWellProperties', () => {
             z: 50,
           },
         },
-        footprint: {} as any,
       },
       wells: {
         A1: {

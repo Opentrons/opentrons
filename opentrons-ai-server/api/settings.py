@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     service_name: str = "local-ai-api"
     openai_model_name: str = "gpt-4-1106-preview"
     anthropic_model_name: str = "claude-sonnet-4-20250514"
-    model_helper: str = "claude-3-5-haiku-20241022"
+    model_helper: str = "claude-sonnet-4-20250514"
     model: str = "claude"
     auth0_domain: str = "opentrons-dev.us.auth0.com"
     auth0_api_audience: str = "sandbox-ai-api"

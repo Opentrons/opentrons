@@ -1,7 +1,6 @@
 import {
   commandCreatorsTimeline,
   curryCommandCreator,
-  curryWithoutPython,
   dropTip,
   dropTipInTrash,
   dropTipInWasteChute,
@@ -42,12 +41,14 @@ export const generateRobotStateTimeline = (
       args: StepGeneration.CommandCreatorArgs,
       stepIndex
     ): StepGeneration.CurriedCommandCreator[] => {
-      const curriedCommandCreator = commandCreatorFromStepArgs(args)
-
-      if (curriedCommandCreator === null) {
-        // unsupported command creator in args.commandCreatorFnName
+      const { stepNumber, name, description } = args
+      const baseCreator = commandCreatorFromStepArgs(args)
+      // unsupported command creator in args.commandCreatorFnName
+      if (baseCreator === null) {
         return acc
       }
+
+      let finalCreator: StepGeneration.CurriedCommandCreator = baseCreator
 
       // Drop tips eagerly, per pipette
       //
@@ -57,13 +58,6 @@ export const generateRobotStateTimeline = (
       const pipetteId = getPipetteIdFromCCArgs(args)
       const dropTipLocation =
         'dropTipLocation' in args ? args.dropTipLocation : null
-
-      // TODO: update to only mix requiring curryCommandCreator
-      const commandCreator =
-        args.commandCreatorFnName !== 'transfer' &&
-        args.commandCreatorFnName !== 'consolidate'
-          ? curryCommandCreator
-          : curryWithoutPython
 
       //  assume that whenever we have a pipetteId we also have a dropTipLocation
       if (pipetteId != null && dropTipLocation != null) {
@@ -82,14 +76,14 @@ export const generateRobotStateTimeline = (
         const isTrashBin =
           invariantContext.trashBinEntities[dropTipLocation] != null
         let dropTipCommands = [
-          commandCreator(dropTip, {
+          curryCommandCreator(dropTip, {
             pipette: pipetteId,
             dropTipLocation,
           }),
         ]
         if (isWasteChute) {
           dropTipCommands = [
-            commandCreator(dropTipInWasteChute, {
+            curryCommandCreator(dropTipInWasteChute, {
               pipetteId,
               wasteChuteId:
                 invariantContext.wasteChuteEntities[dropTipLocation].id,
@@ -101,7 +95,7 @@ export const generateRobotStateTimeline = (
           const trashLocation =
             invariantContext.trashBinEntities[dropTipLocation].location
           dropTipCommands = [
-            commandCreator(dropTipInTrash, {
+            curryCommandCreator(dropTipInTrash, {
               pipetteId,
               trashLocation: trashLocation as CutoutId,
             }),
@@ -109,19 +103,29 @@ export const generateRobotStateTimeline = (
         }
 
         if (!willReuseTip) {
-          return [
-            ...acc,
-            (_invariantContext, _prevRobotState) =>
-              reduceCommandCreators(
-                [curriedCommandCreator, ...dropTipCommands],
-                _invariantContext,
-                _prevRobotState
-              ),
-          ]
+          finalCreator = (_invariantContext, _prevRobotState) =>
+            reduceCommandCreators(
+              [baseCreator, ...dropTipCommands],
+              _invariantContext,
+              _prevRobotState
+            )
         }
       }
 
-      return [...acc, curriedCommandCreator]
+      const wrappedWithStepInfo: StepGeneration.CurriedCommandCreator = (
+        _invariantContext,
+        _prevRobotState
+      ) => {
+        const result = finalCreator(_invariantContext, _prevRobotState)
+        return {
+          ...result,
+          stepNumber,
+          name,
+          description,
+        }
+      }
+
+      return [...acc, wrappedWithStepInfo]
     },
     []
   )

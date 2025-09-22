@@ -92,7 +92,7 @@ describe('getPipettingCommandText', () => {
 
     render(command)
     screen.getByText(
-      /Aspirating 100 µL from well A1 of Test Labware in Slot 1 at 150 µL\/sec/
+      /Aspirating 100.00 µL from well A1 of Test Labware in Slot 1 at 150.00 µL\/sec/
     )
   })
 
@@ -110,7 +110,7 @@ describe('getPipettingCommandText', () => {
 
     render(command)
     screen.getByText(
-      /Dispensing 100 µL into well A1 of Test Labware in Slot 1 at 150 µL\/sec/
+      /Dispensing 100.00 µL into well A1 of Test Labware in Slot 1 at 150.00 µL\/sec/
     )
   })
 
@@ -129,7 +129,7 @@ describe('getPipettingCommandText', () => {
 
     render(command)
     screen.getByText(
-      /Dispensing 100 µL into well A1 of Test Labware in Slot 1 at 150 µL\/sec and pushing out 10 µL/
+      /Dispensing 100.00 µL into well A1 of Test Labware in Slot 1 at 150.00 µL\/sec and pushing out 10.00 µL/
     )
   })
 

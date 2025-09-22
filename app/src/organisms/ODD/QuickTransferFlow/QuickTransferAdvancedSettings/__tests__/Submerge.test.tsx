@@ -52,24 +52,64 @@ describe('Submerge', () => {
     screen.getByRole('button', { name: 'del' })
   })
 
-  it('renders text, buttons, input field, and keyboard for submerge before aspirating - position', () => {
+  it('renders text, buttons, input field, and keyboard for submerge before aspirating - delay duration', () => {
     render(props)
     fireEvent.click(screen.getByRole('button', { name: '1' }))
     fireEvent.click(screen.getByRole('button', { name: '1' }))
     fireEvent.click(screen.getByText('Continue'))
+    screen.getByText('Continue')
+    screen.getByText('Delay duration (seconds)')
+    screen.getByRole('button', { name: '1' })
+    screen.getByRole('button', { name: '5' })
+    screen.getByRole('button', { name: '9' })
+    screen.getByRole('button', { name: 'del' })
+    screen.getByRole('button', { name: '.' })
+  })
+
+  it('renders text, buttons, input field, and keyboard for submerge before aspirating - position', () => {
+    render({
+      ...props,
+      state: {
+        submergeAspirate: { positionReference: 'well-bottom', position: 0 },
+      } as any,
+    })
+    fireEvent.click(screen.getByRole('button', { name: '1' }))
+    fireEvent.click(screen.getByRole('button', { name: '1' }))
+    fireEvent.click(screen.getByText('Continue'))
+    screen.getByText('Continue')
+    screen.getByText('Delay duration (seconds)')
+    screen.getByRole('button', { name: '1' })
+    screen.getByRole('button', { name: '5' })
+    screen.getByRole('button', { name: '9' })
+    screen.getByRole('button', { name: 'del' })
+    screen.getByRole('button', { name: '.' })
+    fireEvent.click(screen.getByRole('button', { name: '0' }))
+    fireEvent.click(screen.getByRole('button', { name: '.' }))
+    fireEvent.click(screen.getByRole('button', { name: '5' }))
+    fireEvent.click(screen.getByText('Continue'))
     screen.getByText('Save')
     screen.getByText('Distance from bottom of well (mm)')
-    screen.getByText('Between 0 and 2 mm')
+    screen.getByText('Between 0 and 3 mm')
     fireEvent.click(screen.getByRole('button', { name: '2' }))
     fireEvent.click(screen.getByRole('button', { name: '2' }))
     fireEvent.click(screen.getByRole('button', { name: '2' }))
-    screen.getByText('Value must be between 1 to 2')
+    screen.getByText('Value must be between 0 to 3')
   })
 
   it('should call dispatch when clicking save button', () => {
+    props.state.submergeAspirate = {
+      speed: 0,
+      delayDuration: 0,
+      position: 0,
+      positionReference: 'well-top',
+    }
     render(props)
     fireEvent.click(screen.getByRole('button', { name: '1' }))
     fireEvent.click(screen.getByRole('button', { name: '1' }))
+    fireEvent.click(screen.getByText('Continue'))
+    fireEvent.click(screen.getByRole('button', { name: '0' }))
+    fireEvent.click(screen.getByRole('button', { name: '.' }))
+    fireEvent.click(screen.getByRole('button', { name: '5' }))
     fireEvent.click(screen.getByText('Continue'))
     fireEvent.click(screen.getByRole('button', { name: '2' }))
     fireEvent.click(screen.getByRole('button', { name: '2' }))
@@ -78,7 +118,9 @@ describe('Submerge', () => {
       type: 'SET_SUBMERGE_ASPIRATE',
       submergeSettings: {
         speed: 11,
-        positionFromBottom: 22,
+        delayDuration: 0.5,
+        position: 22,
+        positionReference: 'well-top',
       },
     })
   })

@@ -23,7 +23,7 @@ import type {
   LabwareEntities,
   PipetteEntities,
 } from '@opentrons/step-generation'
-import type { FormData } from '../../../../form-types'
+import type { FormData } from '/protocol-designer/form-types'
 
 const fixtureTiprack10ul = fixture_tiprack_10_ul as LabwareDefinition2
 const fixtureTiprack300ul = fixture_tiprack_300_ul as LabwareDefinition2
@@ -187,14 +187,9 @@ describe('path should update...', () => {
                 volume: '1',
               }
             )
-            const pathPatch =
-              path === expectedPath ? {} : { path: expectedPath }
 
-            const volumeChangeExpected = { volume, ...pathPatch }
-            const airGapChangeExpected = {
-              aspirate_airGap_volume,
-              ...pathPatch,
-            }
+            const volumeChangeExpected = { volume }
+            const airGapChangeExpected = { aspirate_airGap_volume }
             expect(airGapChange).toMatchObject(airGapChangeExpected)
             expect(volumeChange).toMatchObject(volumeChangeExpected)
           })

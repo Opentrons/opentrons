@@ -5,7 +5,7 @@ import values from 'lodash/values'
 import { Module } from '@opentrons/components'
 import {
   getAddressableAreaFromSlotId,
-  getModuleDef2,
+  getModuleDef,
   getPositionFromSlotId,
   inferModuleOrientationFromSlot,
   inferModuleOrientationFromXCoordinate,
@@ -26,10 +26,9 @@ import {
 } from '../../../step-forms'
 import { START_TERMINAL_ITEM_ID } from '../../../steplist'
 import {
+  getLabwaresOnModuleFromStack,
   getStagingAreaAddressableAreas,
-  getTopmostLabwareOnModuleFromStack,
 } from '../../../utils'
-import { getShowTCLid } from '../../ProtocolOverview/utils'
 import { HighlightLabware } from '../HighlightLabware'
 import { getSlotInformation } from '../utils'
 import { HighlightItems } from './HighlightItems'
@@ -200,7 +199,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           console.warn(`no slot ${slotId} for module ${moduleOnDeck.id}`)
           return null
         }
-        const moduleDef = getModuleDef2(moduleOnDeck.model)
+        const moduleDef = getModuleDef(moduleOnDeck.model)
 
         const getModuleInnerProps = (
           moduleState: ModuleTemporalProperties['moduleState']
@@ -233,7 +232,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           }
         }
 
-        const labwareLoadedOnModuleId = getTopmostLabwareOnModuleFromStack(
+        const { topMostId, rightBelowTopId } = getLabwaresOnModuleFromStack(
           moduleOnDeck.id,
           allLabware
         )
@@ -260,7 +259,12 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                     : 'open',
               }
             : tempInnerProps
-        const labwareOnModule = activeDeckSetup.labware[labwareLoadedOnModuleId]
+        const labwareOnModule =
+          topMostId != null ? activeDeckSetup.labware[topMostId] : null
+        const labwareRightBelowTopMostLabware =
+          rightBelowTopId != null
+            ? activeDeckSetup.labware[rightBelowTopId]
+            : null
         const isAdapter = labwareOnModule?.def.allowedRoles?.includes('adapter')
 
         return moduleOnDeck.slot !== selectedSlot.slot ? (
@@ -276,10 +280,18 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
               innerProps={innerProps}
               targetSlotId={slotId}
               targetDeckId={deckDef.otId}
+              childrenPositioningMode="offsetToSlot"
             >
               {labwareOnModule != null &&
               !isLabwareOccludedByThermocyclerLid ? (
                 <>
+                  {labwareRightBelowTopMostLabware != null ? (
+                    <LabwareOnDeck
+                      x={0}
+                      y={0}
+                      labwareOnDeck={labwareRightBelowTopMostLabware}
+                    />
+                  ) : null}
                   <LabwareOnDeck x={0} y={0} labwareOnDeck={labwareOnModule} />
                   <HighlightLabware
                     labwareOnDeck={labwareOnModule}
@@ -430,7 +442,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           getSlotInLocationStack(labware.stack) === 'offDeck' ||
           allModules.some(m => labware.stack.includes(m.id)) ||
           labware.id === adjacentLabware?.id ||
-          getShowTCLid(labware)
+          labware.stack.includes('fixedTrash')
         ) {
           return null
         }

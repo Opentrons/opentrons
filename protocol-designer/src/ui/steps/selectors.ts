@@ -241,6 +241,10 @@ export type MultiselectFieldValues = Record<
     isIndeterminate: boolean
   }
 >
+
+const getUniqueValues = (key: string, forms: FormData[]): string[] =>
+  Array.from(new Set(forms.map(form => form[key])))
+
 export const _getSavedMultiSelectFieldValues: Selector<MultiselectFieldValues | null> = createSelector(
   stepFormSelectors.getSavedStepForms,
   getMultiSelectItemIds,
@@ -259,6 +263,20 @@ export const _getSavedMultiSelectFieldValues: Selector<MultiselectFieldValues | 
       return null
     }
 
+    const uniqueTipRackFieldValues = getUniqueValues('tipRack', forms)
+    const uniquePipetteFieldValues = getUniqueValues('pipette', forms)
+
+    //  since a lot liquid class advanced settings rely on
+    //  knowing the pipette and tiprack, we can't support
+    //  batch edit if the steps have multiple tiprack types
+    //  or multiple pipette types
+    if (
+      uniqueTipRackFieldValues.length > 1 ||
+      uniquePipetteFieldValues.length > 1
+    ) {
+      return null
+    }
+
     const allFieldNames = Object.keys(getDefaultsForStepType(stepType))
     return allFieldNames.reduce(
       (acc: MultiselectFieldValues, fieldName: StepFieldName) => {
@@ -266,7 +284,6 @@ export const _getSavedMultiSelectFieldValues: Selector<MultiselectFieldValues | 
         const isFieldValueIndeterminant = forms.some(
           form => form[fieldName] !== firstFieldValue
         )
-
         if (isFieldValueIndeterminant) {
           acc[fieldName] = {
             isIndeterminate: true,

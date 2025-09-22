@@ -14,20 +14,20 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import batchEdit from '/protocol-designer/assets/images/announcements/batch_edit.gif'
+import liquidEnhancements from '/protocol-designer/assets/images/announcements/liquid-enhancements.gif'
+import multiSelect from '/protocol-designer/assets/images/announcements/multi_select.gif'
+import deckConfiguration from '/protocol-designer/assets/images/deck_configuration.png'
+import heaterShaker from '/protocol-designer/assets/images/modules/heatershaker.png'
+import magTempCombined from '/protocol-designer/assets/images/modules/magdeck_tempdeck_combined.png'
+import thermocyclerGen2 from '/protocol-designer/assets/images/modules/thermocycler_gen2.png'
+import thermocycler from '/protocol-designer/assets/images/modules/thermocycler.png'
+import absorbancePlateReaderImage from '/protocol-designer/assets/images/opentrons_absorbance_plate_reader.png'
+import opentronsFlex from '/protocol-designer/assets/images/OpentronsFlex.png'
+
 import { DOC_URL, RELEASE_NOTES_URL } from '../KnowledgeLink'
 
 import type { ReactNode } from 'react'
-
-import batchEdit from '../../../assets/images/announcements/batch_edit.gif'
-import liquidEnhancements from '../../../assets/images/announcements/liquid-enhancements.gif'
-import multiSelect from '../../../assets/images/announcements/multi_select.gif'
-import deckConfiguration from '../../../assets/images/deck_configuration.png'
-import heaterShaker from '../../../assets/images/modules/heatershaker.png'
-import magTempCombined from '../../../assets/images/modules/magdeck_tempdeck_combined.png'
-import thermocyclerGen2 from '../../../assets/images/modules/thermocycler_gen2.png'
-import thermocycler from '../../../assets/images/modules/thermocycler.png'
-import absorbancePlateReaderImage from '../../../assets/images/opentrons_absorbance_plate_reader.png'
-import opentronsFlex from '../../../assets/images/OpentronsFlex.png'
 
 export interface Announcement {
   announcementKey: string
@@ -61,23 +61,11 @@ const APP = 'Opentrons App'
 const OPENTRONS_PD = 'Opentrons Protocol Designer'
 const OPENTRONS_ABSORBANCE_READER_URL =
   'https://opentrons.com/products/opentrons-flex-absorbance-plate-reader-module-gen1'
-const EIGHT_FIVE_ZERO_RELEASE_BULLET_POINTS = [
-  '4',
-  '5',
-  '6',
-  '7',
-  '8',
-  '9',
-  '10',
-  '11',
-  '12',
-  '13',
-  '14',
-]
+const EIGHT_FIVE_ZERO_RELEASE_BULLET_POINTS = ['4', '5', '6']
 
 export const useAnnouncements = (): Announcement[] => {
   const { t } = useTranslation('modal')
-  const pdVersion = process.env.OT_PD_VERSION
+  const pdVersion = _OT_PD_VERSION_
 
   return [
     {
@@ -596,6 +584,7 @@ export const useAnnouncements = (): Announcement[] => {
           <StyledText desktopStyle="bodyDefaultRegular">
             {t('announcements.liquidClassAndPythonExport.body2')}
           </StyledText>
+
           <Flex flexDirection={DIRECTION_COLUMN}>
             <StyledText desktopStyle="bodyDefaultRegular">
               {t('announcements.liquidClassAndPythonExport.body3')}
@@ -614,7 +603,7 @@ export const useAnnouncements = (): Announcement[] => {
           </Flex>
           <Flex gridGap={SPACING.spacing4} flexDirection={DIRECTION_COLUMN}>
             <StyledText desktopStyle="bodyDefaultRegular">
-              {t('announcements.liquidClassAndPythonExport.body15')}
+              {t('announcements.liquidClassAndPythonExport.body7')}
             </StyledText>
             <StyledText desktopStyle="bodyDefaultRegular">
               <Trans
@@ -629,7 +618,7 @@ export const useAnnouncements = (): Announcement[] => {
                     />
                   ),
                 }}
-                i18nKey="announcements.liquidClassAndPythonExport.body16"
+                i18nKey="announcements.liquidClassAndPythonExport.body8"
               />
             </StyledText>
           </Flex>

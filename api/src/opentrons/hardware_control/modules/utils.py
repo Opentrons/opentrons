@@ -6,7 +6,12 @@ from opentrons.drivers.rpi_drivers.types import USBPort
 
 from ..execution_manager import ExecutionManager
 
-from .types import ModuleDisconnectedCallback, ModuleType, SpeedStatus
+from .types import (
+    ModuleDisconnectedCallback,
+    ModuleType,
+    SpeedStatus,
+    ModuleErrorCallback,
+)
 from .mod_abc import AbstractModule
 from .tempdeck import TempDeck
 from .magdeck import MagDeck
@@ -47,9 +52,10 @@ async def build(
     usb_port: USBPort,
     hw_control_loop: asyncio.AbstractEventLoop,
     execution_manager: ExecutionManager,
+    disconnected_callback: ModuleDisconnectedCallback,
+    error_callback: ModuleErrorCallback,
     sim_model: Optional[str] = None,
     sim_serial_number: Optional[str] = None,
-    disconnected_callback: ModuleDisconnectedCallback = None,
 ) -> AbstractModule:
     return await _MODULE_CLS_BY_TYPE[type].build(
         port=port,
@@ -57,9 +63,10 @@ async def build(
         simulating=simulating,
         hw_control_loop=hw_control_loop,
         execution_manager=execution_manager,
+        disconnected_callback=disconnected_callback,
+        error_callback=error_callback,
         sim_model=sim_model,
         sim_serial_number=sim_serial_number,
-        disconnected_callback=disconnected_callback,
     )
 
 

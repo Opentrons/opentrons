@@ -3,7 +3,10 @@ import enum
 import math
 from typing import Iterable, Generator, Tuple, TypeVar, Literal, List, Union
 
-from opentrons.protocol_api._liquid_properties import LiquidHandlingPropertyByVolume
+from opentrons.protocol_api._liquid_properties import (
+    LiquidHandlingPropertyByVolume,
+    TransferProperties,
+)
 
 
 class NoLiquidClassPropertyError(ValueError):
@@ -100,6 +103,37 @@ def _split_volume_equally(volume: float, max_volume: float) -> List[float]:
     else:
         iterations = math.ceil(volume / max_volume)
         return [volume / iterations for _ in range(iterations)]
+
+
+def get_sources_and_destinations_for_liquid_classes(
+    volumes: List[float],
+    max_volume: float,
+    targets: Iterable[Target],
+    transfer_properties: TransferProperties,
+    is_multi_dispense: bool = False,
+) -> Generator[Tuple[float, "Target"], None, None]:
+    """Return a list of targets (wells or tuples of wells) and volumes for a liquid class transfer."""
+    aspirate_air_gap_by_volume = transfer_properties.aspirate.retract.air_gap_by_volume
+    if is_multi_dispense:
+        assert transfer_properties.multi_dispense is not None
+        disposal_vol_by_volume = transfer_properties.multi_dispense.disposal_by_volume
+        conditioning_vol_by_volume = (
+            transfer_properties.multi_dispense.conditioning_by_volume
+        )
+        return expand_for_volume_constraints_for_liquid_classes(
+            volumes=volumes,
+            targets=targets,
+            max_volume=max_volume,
+            air_gap=aspirate_air_gap_by_volume,
+            disposal_vol=disposal_vol_by_volume,
+            conditioning_vol=conditioning_vol_by_volume,
+        )
+    return expand_for_volume_constraints_for_liquid_classes(
+        volumes=volumes,
+        targets=targets,
+        max_volume=max_volume,
+        air_gap=aspirate_air_gap_by_volume,
+    )
 
 
 def expand_for_volume_constraints_for_liquid_classes(

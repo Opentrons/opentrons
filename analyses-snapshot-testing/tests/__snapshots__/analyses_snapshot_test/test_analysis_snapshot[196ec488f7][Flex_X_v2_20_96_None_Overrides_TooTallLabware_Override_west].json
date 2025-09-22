@@ -1484,12 +1484,7 @@
       ]
     }
   ],
-  "files": [
-    {
-      "name": "Flex_X_v2_20_96_None_Overrides_TooTallLabware_Override_west.py",
-      "role": "main"
-    }
-  ],
+  "files": [],
   "labware": [
     {
       "definitionUri": "opentrons/opentrons_96_tiprack_1000ul/1",

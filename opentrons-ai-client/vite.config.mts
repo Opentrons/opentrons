@@ -1,11 +1,13 @@
 import path from 'path'
-import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import postCssImport from 'postcss-import'
+import lostCss from 'lost'
 import postCssApply from 'postcss-apply'
 import postColorModFunction from 'postcss-color-mod-function'
+import postCssImport from 'postcss-import'
 import postCssPresetEnv from 'postcss-preset-env'
-import lostCss from 'lost'
+import { defineConfig } from 'vite'
+
+import { cssModuleSideEffect } from './cssModuleSideEffect'
 
 export default defineConfig({
   // this makes imports relative rather than absolute
@@ -22,6 +24,7 @@ export default defineConfig({
         configFile: true,
       },
     }),
+    cssModuleSideEffect(),
   ],
   optimizeDeps: {
     esbuildOptions: {
@@ -40,15 +43,18 @@ export default defineConfig({
     },
   },
   define: {
-    'process.env': process.env,
+    // NOTE: For security, only include environment variables here if they're explicitly allowlisted.
+    _OT_AI_CLIENT_MIXPANEL_ID_: JSON.stringify(process.env.OT_AI_CLIENT_MIXPANEL_ID),
+    _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
     global: 'globalThis',
   },
   resolve: {
     alias: {
-      '@opentrons/components/styles': path.resolve(
-        '../components/src/index.module.css'
+      '@opentrons/components/styles/global': path.resolve(
+        '../components/src/styles/global.css'
       ),
       '@opentrons/components': path.resolve('../components/src/index.ts'),
+      '/ai-client/': path.resolve('./src/') + '/',
     },
   },
 })

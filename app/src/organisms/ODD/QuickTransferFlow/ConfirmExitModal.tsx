@@ -4,9 +4,8 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
-  TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
@@ -33,9 +32,9 @@ export const ConfirmExitModal = (props: ConfirmExitModalProps): JSX.Element => {
         gridGap={SPACING.spacing32}
         width="100%"
       >
-        <LegacyStyledText css={TYPOGRAPHY.bodyTextRegular}>
+        <StyledText oddStyle="bodyTextRegular">
           {t('lose_all_progress')}
-        </LegacyStyledText>
+        </StyledText>
         <Flex gridGap={SPACING.spacing8}>
           <SmallButton
             width="50%"

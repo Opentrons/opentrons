@@ -19,6 +19,8 @@ from .flex_stacker.common import (
     FlexStackerShuttleError,
     FlexStackerHopperError,
     FlexStackerLabwareRetrieveError,
+    FlexStackerShuttleOccupiedError,
+    FlexStackerLabwareStoreError,
 )
 
 from . import absorbance_reader
@@ -265,6 +267,22 @@ from .wait_for_duration import (
     WaitForDurationCommandType,
 )
 
+from .create_timer import (
+    CreateTimer,
+    CreateTimerCreate,
+    CreateTimerParams,
+    CreateTimerResult,
+    CreateTimerCommandType,
+)
+
+from .wait_for_tasks import (
+    WaitForTasks,
+    WaitForTasksCreate,
+    WaitForTasksParams,
+    WaitForTasksResult,
+    WaitForTasksCommandType,
+)
+
 from .pick_up_tip import (
     PickUpTip,
     PickUpTipParams,
@@ -370,6 +388,14 @@ from .get_next_tip import (
     GetNextTipCommandType,
 )
 
+from .set_tip_state import (
+    SetTipState,
+    SetTipStateCreate,
+    SetTipStateParams,
+    SetTipStateResult,
+    SetTipStateCommandType,
+)
+
 from .liquid_probe import (
     LiquidProbe,
     LiquidProbeParams,
@@ -452,6 +478,8 @@ Command = Annotated[
         PrepareToAspirate,
         WaitForResume,
         WaitForDuration,
+        WaitForTasks,
+        CreateTimer,
         PickUpTip,
         SavePosition,
         SetRailLights,
@@ -460,6 +488,7 @@ Command = Annotated[
         VerifyTipPresence,
         GetTipPresence,
         GetNextTip,
+        SetTipState,
         LiquidProbe,
         TryLiquidProbe,
         SealPipetteToTip,
@@ -555,6 +584,8 @@ CommandParams = Union[
     PrepareToAspirateParams,
     WaitForResumeParams,
     WaitForDurationParams,
+    WaitForTasksParams,
+    CreateTimerParams,
     PickUpTipParams,
     SavePositionParams,
     SetRailLightsParams,
@@ -563,6 +594,7 @@ CommandParams = Union[
     VerifyTipPresenceParams,
     GetTipPresenceParams,
     GetNextTipParams,
+    SetTipStateParams,
     LiquidProbeParams,
     TryLiquidProbeParams,
     SealPipetteToTipParams,
@@ -656,6 +688,8 @@ CommandType = Union[
     PrepareToAspirateCommandType,
     WaitForResumeCommandType,
     WaitForDurationCommandType,
+    WaitForTasksCommandType,
+    CreateTimerCommandType,
     PickUpTipCommandType,
     SavePositionCommandType,
     SetRailLightsCommandType,
@@ -664,6 +698,7 @@ CommandType = Union[
     VerifyTipPresenceCommandType,
     GetTipPresenceCommandType,
     GetNextTipCommandType,
+    SetTipStateCommandType,
     LiquidProbeCommandType,
     TryLiquidProbeCommandType,
     SealPipetteToTipCommandType,
@@ -758,6 +793,8 @@ CommandCreate = Annotated[
         PrepareToAspirateCreate,
         WaitForResumeCreate,
         WaitForDurationCreate,
+        WaitForTasksCreate,
+        CreateTimerCreate,
         PickUpTipCreate,
         SavePositionCreate,
         SetRailLightsCreate,
@@ -766,6 +803,7 @@ CommandCreate = Annotated[
         VerifyTipPresenceCreate,
         GetTipPresenceCreate,
         GetNextTipCreate,
+        SetTipStateCreate,
         LiquidProbeCreate,
         TryLiquidProbeCreate,
         SealPipetteToTipCreate,
@@ -868,6 +906,8 @@ CommandResult = Union[
     PrepareToAspirateResult,
     WaitForResumeResult,
     WaitForDurationResult,
+    WaitForTasksResult,
+    CreateTimerResult,
     PickUpTipResult,
     SavePositionResult,
     SetRailLightsResult,
@@ -876,6 +916,7 @@ CommandResult = Union[
     VerifyTipPresenceResult,
     GetTipPresenceResult,
     GetNextTipResult,
+    SetTipStateResult,
     LiquidProbeResult,
     TryLiquidProbeResult,
     SealPipetteToTipResult,
@@ -946,6 +987,8 @@ CommandDefinedErrorData = Union[
     DefinedErrorData[FlexStackerShuttleError],
     DefinedErrorData[FlexStackerHopperError],
     DefinedErrorData[FlexStackerLabwareRetrieveError],
+    DefinedErrorData[FlexStackerShuttleOccupiedError],
+    DefinedErrorData[FlexStackerLabwareStoreError],
 ]
 
 

@@ -11,16 +11,17 @@ import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
   COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH,
   COLUMN_1_X_ADJUSTMENT,
-  COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH,
   COLUMN_DEFAULT_X_ADJUSTMENT,
   CONFIG_STYLE_EDITABLE,
   CONFIG_STYLE_READ_ONLY,
   CONFIG_STYLE_SELECTED,
   FIXTURE_HEIGHT,
+  LARGE_SINGLE_ITEM_SLOT_WIDTH,
   Y_ADJUSTMENT,
 } from './constants'
 
 import type {
+  AddressableAreaNamesWithFakes,
   CutoutFixtureIdsWithFakes,
   CutoutId,
   DeckDefinition,
@@ -32,9 +33,11 @@ interface TemperatureModuleFixtureProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
   cutoutFixtureId: CutoutFixtureIdsWithFakes
+  addressableAreaId: AddressableAreaNamesWithFakes
   handleClickRemove?: (
     fixtureLocation: CutoutId,
-    cutoutFixtureId: CutoutFixtureIdsWithFakes
+    cutoutFixtureId: CutoutFixtureIdsWithFakes,
+    addressableAreaId: AddressableAreaNamesWithFakes
   ) => void
   selected?: boolean
 }
@@ -49,6 +52,7 @@ export function TemperatureModuleItem(
     handleClickRemove,
     fixtureLocation,
     cutoutFixtureId,
+    addressableAreaId,
     selected = false,
   } = props
 
@@ -73,12 +77,17 @@ export function TemperatureModuleItem(
 
   const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
 
+  const handleRemoveClick = (): void => {
+    if (handleClickRemove != null) {
+      handleClickRemove(fixtureLocation, cutoutFixtureId, addressableAreaId)
+    }
+  }
   return (
     <RobotCoordsForeignObject
       width={
         isColumnOne
           ? COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH
-          : COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH
+          : LARGE_SINGLE_ITEM_SLOT_WIDTH
       }
       height={FIXTURE_HEIGHT}
       x={x}
@@ -89,13 +98,9 @@ export function TemperatureModuleItem(
       <Btn
         css={handleClickRemove != null ? editableStyle : CONFIG_STYLE_READ_ONLY}
         cursor={handleClickRemove != null ? 'pointer' : 'default'}
-        onClick={
-          handleClickRemove != null
-            ? () => {
-                handleClickRemove(fixtureLocation, cutoutFixtureId)
-              }
-            : () => {}
-        }
+        onClick={handleRemoveClick}
+        height="100%"
+        data-testid={addressableAreaId}
       >
         <StyledText
           oddStyle="smallBodyTextSemiBold"

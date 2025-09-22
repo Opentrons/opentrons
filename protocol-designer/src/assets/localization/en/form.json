@@ -169,6 +169,9 @@
         },
         "title": "Condition"
       },
+      "dropTip": {
+        "option": { "return": "Tip rack" }
+      },
       "delay": {
         "label": "delay"
       },
@@ -187,7 +190,7 @@
         "duration": "Duration",
         "latch": {
           "setLatch": "Labware latch",
-          "toggleOff": "Close",
+          "toggleOff": "Closed",
           "toggleOn": "Open"
         },
         "shaker": {
@@ -406,6 +409,9 @@
       "pickUpAndDrop": "pick up & drop tip",
       "sterility": "sterility",
       "sterility&motion": "sterility & motion"
+    },
+    "temperature": {
+      "state": "Temperature Module state"
     },
     "tipRack": "tip rack",
     "wellSelectionLabel": {

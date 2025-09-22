@@ -100,7 +100,9 @@ export function DesktopOffsetSuccess(
     <LPCContentContainer
       {...props}
       header={t('labware_position_check_title')}
-      buttonText={t('continue')}
+      oddHeaderBtnCopy={t('continue')}
+      desktopFooterBtnCopy={t('continue')}
+      desktopHeaderBtnCopy={t('exit')}
       onClickButton={props.handleAddConfirmedWorkingVector}
     >
       <Flex css={CONTENT_CONTAINER}>

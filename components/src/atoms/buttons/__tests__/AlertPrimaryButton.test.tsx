@@ -28,7 +28,7 @@ describe('AlertPrimaryButton', () => {
     const button = screen.getByText('alert primary button')
     expect(button).toHaveStyle(`background-color: ${COLORS.red50}`)
     expect(button).toHaveStyle(
-      `padding: ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16}`
+      `padding: ${SPACING.spacing8} ${SPACING.spacing16}`
     )
     expect(button).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSizeP}`)
     expect(button).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`)

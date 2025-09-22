@@ -438,6 +438,34 @@
           }
         }
       }
+    },
+    "HeightVolumePair": {
+      "type": "object",
+      "required": ["height", "volume"],
+      "properties": {
+        "height": {
+          "description": "The height within a well at a user-defined volume.",
+          "type": "number"
+        },
+        "volume": {
+          "description": "A user-defined volume at a known height within a well.",
+          "type": "number"
+        }
+      }
+    },
+    "UserDefinedVolumes": {
+      "type": "object",
+      "required": ["heightToVolumeMap"],
+      "properties": {
+        "heightToVolumeMap": {
+          "description": "A list mapping heights to volumes [height, volume]. Must be ordered from top (highest z) to bottom (lowest z).",
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "$ref": "#/definitions/HeightVolumePair"
+          }
+        }
+      }
     }
   },
   "type": "object",
@@ -656,7 +684,7 @@
     },
     "stackingOffsetWithLabware": {
       "type": "object",
-      "description": "Supported labware that can be stacked upon, with overlap height between both labware.",
+      "description": "Supported labware that this one can be stacked atop, with overlaps between both labware. x and y should always equal 0 to preserve intended behavior. z=0 means the bottom of this labware is at the top of the labware below it. +z moves this labware down.",
       "additionalProperties": {
         "$ref": "#/definitions/vector"
       }
@@ -713,7 +741,14 @@
       "type": ["object", "null"],
       "description": "A dictionary holding all unique inner well geometries in a labware.",
       "additionalProperties": {
-        "$ref": "#/definitions/InnerWellGeometry"
+        "oneOf": [
+          {
+            "$ref": "#/definitions/InnerWellGeometry"
+          },
+          {
+            "$ref": "#/definitions/UserDefinedVolumes"
+          }
+        ]
       }
     }
   }

@@ -64,6 +64,7 @@ const FLEXBOX_PROPS = [
 
 const GRID_PROPS = [
   'columnGap',
+  'rowGap',
   'gridGap',
   'gridTemplateAreas',
   'gridTemplateRows',
@@ -75,6 +76,7 @@ const GRID_PROPS = [
 
 const LAYOUT_PROPS = [
   'display',
+  'visibility',
   'size',
   'width',
   'minWidth',

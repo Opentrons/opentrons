@@ -187,7 +187,7 @@ describe('waitForTemperature', () => {
           slot: 'A1',
           moduleState: {
             type: HEATERSHAKER_MODULE_TYPE,
-            targetTemp: null,
+            targetTemp: 40,
             latchOpen: false,
             targetSpeed: null,
           },

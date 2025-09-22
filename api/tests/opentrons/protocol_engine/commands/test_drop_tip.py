@@ -4,8 +4,13 @@ from datetime import datetime
 
 import pytest
 from decoy import Decoy, matchers
+from unittest.mock import sentinel
 
 from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
+from opentrons_shared_data.labware.labware_definition import (
+    LabwareDefinition2,
+    Parameters2,
+)
 
 from opentrons.protocol_engine import (
     DropTipWellLocation,
@@ -28,6 +33,7 @@ from opentrons.protocol_engine.errors.exceptions import TipAttachedError
 from opentrons.protocol_engine.resources.model_utils import ModelUtils
 from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.state import StateView
+from opentrons.protocol_engine.types import LabwareWellId, TipRackWellState
 from opentrons.protocol_engine.execution import MovementHandler, TipHandler
 
 
@@ -122,6 +128,20 @@ async def test_drop_tip_implementation(
         )
     ).then_return(WellLocation(offset=WellOffset(x=4, y=5, z=6)))
 
+    decoy.when(mock_state_view.labware.get_definition("123")).then_return(
+        LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+            parameters=Parameters2.model_construct(isTiprack=True),  # type: ignore[call-arg]
+        )
+    )
+    decoy.when(mock_state_view.pipettes.get_nozzle_configuration("abc")).then_return(
+        sentinel.nozzle_configuration
+    )
+    decoy.when(
+        mock_state_view.tips.compute_tips_to_mark_as_used_or_empty(
+            "123", "A3", sentinel.nozzle_configuration
+        )
+    ).then_return(sentinel.tips_to_mark_as_used)
+
     decoy.when(
         await mock_movement_handler.move_to_well(
             pipette_id="abc",
@@ -133,6 +153,7 @@ async def test_drop_tip_implementation(
             minimum_z_height=None,
             speed=None,
             operation_volume=None,
+            offset_pipette_for_reservoir_subwells=False,
         )
     ).then_return(Point(x=111, y=222, z=333))
 
@@ -143,17 +164,24 @@ async def test_drop_tip_implementation(
         state_update=update_types.StateUpdate(
             pipette_location=update_types.PipetteLocationUpdate(
                 pipette_id="abc",
-                new_location=update_types.Well(
+                new_location=LabwareWellId(
                     labware_id="123",
                     well_name="A3",
                 ),
                 new_deck_point=DeckPoint(x=111, y=222, z=333),
             ),
             pipette_tip_state=update_types.PipetteTipStateUpdate(
-                pipette_id="abc", tip_geometry=None
+                pipette_id="abc",
+                tip_geometry=None,
+                tip_source=None,
             ),
             pipette_aspirated_fluid=update_types.PipetteUnknownFluidUpdate(
                 pipette_id="abc"
+            ),
+            tips_state=update_types.TipsStateUpdate(
+                tip_state=TipRackWellState.USED,
+                labware_id="123",
+                well_names=sentinel.tips_to_mark_as_used,
             ),
         ),
     )
@@ -210,6 +238,12 @@ async def test_drop_tip_with_alternating_locations(
         )
     ).then_return(WellLocation(offset=WellOffset(x=4, y=5, z=6)))
 
+    decoy.when(mock_state_view.labware.get_definition("123")).then_return(
+        LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+            parameters=Parameters2.model_construct(isTiprack=False),  # type: ignore[call-arg]
+        )
+    )
+
     decoy.when(
         await mock_movement_handler.move_to_well(
             pipette_id="abc",
@@ -221,6 +255,7 @@ async def test_drop_tip_with_alternating_locations(
             minimum_z_height=None,
             speed=None,
             operation_volume=None,
+            offset_pipette_for_reservoir_subwells=False,
         )
     ).then_return(Point(x=111, y=222, z=333))
 
@@ -230,17 +265,24 @@ async def test_drop_tip_with_alternating_locations(
         state_update=update_types.StateUpdate(
             pipette_location=update_types.PipetteLocationUpdate(
                 pipette_id="abc",
-                new_location=update_types.Well(
+                new_location=LabwareWellId(
                     labware_id="123",
                     well_name="A3",
                 ),
                 new_deck_point=DeckPoint(x=111, y=222, z=333),
             ),
             pipette_tip_state=update_types.PipetteTipStateUpdate(
-                pipette_id="abc", tip_geometry=None
+                pipette_id="abc",
+                tip_geometry=None,
+                tip_source=None,
             ),
             pipette_aspirated_fluid=update_types.PipetteUnknownFluidUpdate(
                 pipette_id="abc"
+            ),
+            tips_state=update_types.TipsStateUpdate(
+                tip_state=TipRackWellState.USED,
+                labware_id="123",
+                well_names=[],
             ),
         ),
     )
@@ -282,6 +324,20 @@ async def test_tip_attached_error(
         )
     ).then_return(WellLocation(offset=WellOffset(x=4, y=5, z=6)))
 
+    decoy.when(mock_state_view.labware.get_definition("123")).then_return(
+        LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+            parameters=Parameters2.model_construct(isTiprack=True),  # type: ignore[call-arg]
+        )
+    )
+    decoy.when(mock_state_view.pipettes.get_nozzle_configuration("abc")).then_return(
+        sentinel.nozzle_configuration
+    )
+    decoy.when(
+        mock_state_view.tips.compute_tips_to_mark_as_used_or_empty(
+            "123", "A3", sentinel.nozzle_configuration
+        )
+    ).then_return(sentinel.tips_to_mark_as_used)
+
     decoy.when(
         await mock_movement_handler.move_to_well(
             pipette_id="abc",
@@ -293,6 +349,7 @@ async def test_tip_attached_error(
             minimum_z_height=None,
             speed=None,
             operation_volume=None,
+            offset_pipette_for_reservoir_subwells=False,
         )
     ).then_return(Point(x=111, y=222, z=333))
     decoy.when(
@@ -318,7 +375,7 @@ async def test_tip_attached_error(
         state_update=update_types.StateUpdate(
             pipette_location=update_types.PipetteLocationUpdate(
                 pipette_id="abc",
-                new_location=update_types.Well(
+                new_location=LabwareWellId(
                     labware_id="123",
                     well_name="A3",
                 ),
@@ -332,14 +389,20 @@ async def test_tip_attached_error(
             pipette_tip_state=update_types.PipetteTipStateUpdate(
                 pipette_id="abc",
                 tip_geometry=None,
+                tip_source=None,
             ),
             pipette_location=update_types.PipetteLocationUpdate(
                 pipette_id="abc",
-                new_location=update_types.Well(
+                new_location=LabwareWellId(
                     labware_id="123",
                     well_name="A3",
                 ),
                 new_deck_point=DeckPoint(x=111, y=222, z=333),
+            ),
+            tips_state=update_types.TipsStateUpdate(
+                tip_state=TipRackWellState.USED,
+                labware_id="123",
+                well_names=sentinel.tips_to_mark_as_used,
             ),
         ),
     )
@@ -380,6 +443,12 @@ async def test_stall_error(
         )
     ).then_return(WellLocation(offset=WellOffset(x=4, y=5, z=6)))
 
+    decoy.when(mock_state_view.labware.get_definition("123")).then_return(
+        LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+            parameters=Parameters2.model_construct(isTiprack=False),  # type: ignore[call-arg]
+        )
+    )
+
     decoy.when(
         await mock_movement_handler.move_to_well(
             pipette_id="abc",
@@ -391,6 +460,7 @@ async def test_stall_error(
             minimum_z_height=None,
             speed=None,
             operation_volume=None,
+            offset_pipette_for_reservoir_subwells=False,
         )
     ).then_raise(StallOrCollisionDetectedError())
 

@@ -1,4 +1,5 @@
 """Opentrons analyze CLI."""
+
 import click
 
 from anyio import run
@@ -24,7 +25,9 @@ from typing import (
 import logging
 import sys
 import json
+import gc
 
+from opentrons.protocol_engine import ProtocolEngine
 from opentrons.protocol_engine.types import (
     RunTimeParameter,
     CSVRuntimeParamPaths,
@@ -95,6 +98,18 @@ class _Output:
     type=click.File(mode="wb"),
 )
 @click.option(
+    "--leaks",
+    help="Fail (via exit code) if the analysis engine has not been garbage collected after analysis is complete.",
+    is_flag=True,
+    default=False,
+)
+@click.option(
+    "--leaks-debug",
+    help="Drop into a PDB shell if a leak is detected",
+    is_flag=True,
+    default=False,
+)
+@click.option(
     "--check",
     help="Fail (via exit code) if the protocol had an error. If not specified, always succeed.",
     is_flag=True,
@@ -133,6 +148,8 @@ def analyze(
     log_output: str,
     log_level: str,
     check: bool,
+    leaks: bool,
+    leaks_debug: bool,
 ) -> int:
     """Analyze a protocol.
 
@@ -147,7 +164,18 @@ def analyze(
 
     try:
         with _capture_logs(log_output, log_level):
-            sys.exit(run(_analyze, files, rtp_values, rtp_files, outputs, check))
+            sys.exit(
+                run(
+                    _analyze,
+                    files,
+                    rtp_values,
+                    rtp_files,
+                    outputs,
+                    check,
+                    leaks or leaks_debug,
+                    leaks_debug,
+                )
+            )
     except click.ClickException:
         raise
     except Exception as e:
@@ -344,12 +372,14 @@ async def _do_analyze(
     return await orchestrator.run(deck_configuration=[])
 
 
-async def _analyze(
+async def _analyze(  # noqa: C901
     files_and_dirs: Sequence[Path],
     rtp_values: str,
     rtp_files: str,
     outputs: Sequence[_Output],
     check: bool,
+    fail_on_leak: bool,
+    debug_on_leak: bool,
 ) -> int:
     input_files = _get_input_files(files_and_dirs)
     parsed_rtp_values = _get_runtime_parameter_values(rtp_values)
@@ -365,6 +395,32 @@ async def _analyze(
 
     analysis = await _do_analyze(protocol_source, parsed_rtp_values, rtp_paths)
     return_code = _get_return_code(analysis)
+
+    # This ugly code checks to see if an engine remains past garbage collection
+    # after analysis is complete.
+    # It should be here and open coded to make it a little easier to present
+    # the debug option.
+    if fail_on_leak or debug_on_leak:
+        gc.collect()
+        leaked_engine = next(
+            (obj for obj in gc.get_objects() if isinstance(obj, ProtocolEngine)), None
+        )
+        if leaked_engine:
+            if fail_on_leak:
+                print(
+                    "A ProtocolEngine instance exists even after garbage collection; "
+                    "some thing (likely in the protocol) has caused it to be leaked, "
+                    "likely by reference to the engine or something that refers to the "
+                    "engine after the run function ends.",
+                    file=sys.stderr,
+                )
+                return_code = -2
+            if debug_on_leak:
+                print(
+                    "You are now in an interactive PDB (https://docs.python.org/3.10/library/pdb.html) "
+                    "session; the leaked engine is bound to the variable leaked_engine."
+                )
+                breakpoint()
 
     if not outputs:
         return return_code

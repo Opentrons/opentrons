@@ -21,6 +21,7 @@ from opentrons.hardware_control.poller import Poller, Reader
 from opentrons.hardware_control.modules import mod_abc
 from opentrons.hardware_control.modules.types import (
     ModuleDisconnectedCallback,
+    ModuleErrorCallback,
     ModuleType,
     AbsorbanceReaderStatus,
     LiveData,
@@ -103,13 +104,14 @@ class AbsorbanceReader(mod_abc.AbstractModule):
         cls,
         port: str,
         usb_port: USBPort,
-        execution_manager: ExecutionManager,
         hw_control_loop: asyncio.AbstractEventLoop,
+        execution_manager: ExecutionManager,
+        disconnected_callback: ModuleDisconnectedCallback,
+        error_callback: ModuleErrorCallback,
         poll_interval_seconds: Optional[float] = None,
         simulating: bool = False,
         sim_model: Optional[str] = None,
         sim_serial_number: Optional[str] = None,
-        disconnected_callback: ModuleDisconnectedCallback = None,
     ) -> "AbsorbanceReader":
         """
         Build and connect to an AbsorbanceReader
@@ -117,8 +119,8 @@ class AbsorbanceReader(mod_abc.AbstractModule):
         Args:
             port: The port to connect to
             usb_port: USB Port
-            execution_manager: Execution manager.
             hw_control_loop: The event loop running in the hardware control thread.
+            execution_manager: Execution manager.
             poll_interval_seconds: Poll interval override.
             simulating: whether to build a simulating driver
             sim_model: The model name used by simulator
@@ -152,6 +154,7 @@ class AbsorbanceReader(mod_abc.AbstractModule):
             hw_control_loop=hw_control_loop,
             execution_manager=execution_manager,
             disconnected_callback=disconnected_callback,
+            error_callback=error_callback,
         )
 
         try:
@@ -169,9 +172,10 @@ class AbsorbanceReader(mod_abc.AbstractModule):
         reader: AbsorbanceReaderReader,
         poller: Poller,
         device_info: Mapping[str, str],
-        execution_manager: ExecutionManager,
         hw_control_loop: asyncio.AbstractEventLoop,
-        disconnected_callback: ModuleDisconnectedCallback = None,
+        execution_manager: ExecutionManager,
+        disconnected_callback: ModuleDisconnectedCallback,
+        error_callback: ModuleErrorCallback,
     ) -> None:
         """
         Constructor
@@ -179,12 +183,12 @@ class AbsorbanceReader(mod_abc.AbstractModule):
         Args:
             port: The port the absorbance is connected to.
             usb_port: The USB port.
-            execution_manager: The hardware execution manager.
             driver: The Absorbance driver.
             reader: An interface to read data from the Absorbance Reader.
             poller: A poll controller for reads.
             device_info: The Absorbance device info.
             hw_control_loop: The event loop running in the hardware control thread.
+            execution_manager: The hardware execution manager.
         """
         self._driver = driver
         super().__init__(
@@ -193,6 +197,7 @@ class AbsorbanceReader(mod_abc.AbstractModule):
             hw_control_loop=hw_control_loop,
             execution_manager=execution_manager,
             disconnected_callback=disconnected_callback,
+            error_callback=error_callback,
         )
         self._device_info = device_info
         self._reader = reader
@@ -276,10 +281,6 @@ class AbsorbanceReader(mod_abc.AbstractModule):
     async def deactivate(self, must_be_running: bool = True) -> None:
         """Deactivate the module."""
         pass
-
-    async def wait_for_is_running(self) -> None:
-        if not self.is_simulated:
-            await self._execution_manager.wait_for_is_running()
 
     async def prep_for_update(self) -> str:
         """Prepare for an update.
@@ -375,3 +376,5 @@ class AbsorbanceReader(mod_abc.AbstractModule):
         self._error = str(error)
         if isinstance(error, AbsorbanceReaderDisconnectedError):
             self.disconnected_callback()
+        else:
+            self.error_callback(error)

@@ -62,6 +62,10 @@ LID_STACK_VERSION_GATE = APIVersion(2, 23)
 # The first APIVersion where Python protocols can use the Flex Stacker module.
 FLEX_STACKER_VERSION_GATE = APIVersion(2, 23)
 
+# The first APIVersion where various "multi labware load" methods allow you to specify
+# the namespace and version of adapters and lids separately from the main labware.
+NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE = APIVersion(2, 26)
+
 
 class InvalidPipetteMountError(ValueError):
     """An error raised when attempting to load pipettes on an invalid mount."""
@@ -485,6 +489,7 @@ def ensure_thermocycler_profile_steps(
         temperature = step.get("temperature")
         hold_mins = step.get("hold_time_minutes")
         hold_secs = step.get("hold_time_seconds")
+        ramp_rate = step.get("ramp_rate")
         if temperature is None:
             raise ValueError("temperature must be defined for each step in cycle")
         if hold_mins is None and hold_secs is None:
@@ -492,10 +497,14 @@ def ensure_thermocycler_profile_steps(
                 "either hold_time_minutes or hold_time_seconds must be"
                 "defined for each step in cycle"
             )
+        if ramp_rate is not None and ramp_rate <= 0:
+            raise ValueError("Ramp rate must be greater than 0.")
         validated_seconds = ensure_hold_time_seconds(hold_secs, hold_mins)
         validated_steps.append(
             ThermocyclerStep(
-                temperature=temperature, hold_time_seconds=validated_seconds
+                temperature=temperature,
+                hold_time_seconds=validated_seconds,
+                ramp_rate=ramp_rate,
             )
         )
     return validated_steps

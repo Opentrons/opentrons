@@ -7,7 +7,10 @@ import {
   RadioButton,
   SPACING,
 } from '@opentrons/components'
-import { getAllDefinitions } from '@opentrons/shared-data'
+import {
+  getAllDefinitions,
+  LABWAREV2_DO_NOT_LIST,
+} from '@opentrons/shared-data'
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
@@ -31,7 +34,7 @@ export function SelectTipRack(props: SelectTipRackProps): JSX.Element {
   const { onNext, onBack, exitButtonProps, state, dispatch } = props
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
 
-  const allLabwareDefinition2sByUri = getAllDefinitions()
+  const allLabwareDefinition2sByUri = getAllDefinitions(LABWAREV2_DO_NOT_LIST)
   const selectedPipetteDefaultTipracks =
     state.pipette?.liquids.default.defaultTipracks ?? []
 
@@ -63,8 +66,8 @@ export function SelectTipRack(props: SelectTipRackProps): JSX.Element {
       <Flex
         marginTop={SPACING.spacing120}
         flexDirection={DIRECTION_COLUMN}
-        padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
-        gridGap={SPACING.spacing4}
+        padding={`${SPACING.spacing32} ${SPACING.spacing60} ${SPACING.spacing40}`}
+        gridGap={SPACING.spacing8}
         width="100%"
       >
         {selectedPipetteDefaultTipracks.map(tipRack => {

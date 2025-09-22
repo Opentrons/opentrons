@@ -58,7 +58,7 @@ export function getWellRange(
   if (channelCount === 96) {
     return 'A1 - H12'
   } else if (channelCount === 8) {
-    const column = wellName.substr(1)
+    const column = wellName.substring(1)
     return `A${column} - H${column}`
   }
   return wellName

@@ -12,6 +12,7 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+import { POSITION_REFERENCE_TOP } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
@@ -23,6 +24,7 @@ import { ACTIONS } from '../constants'
 
 import type { Dispatch } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
+import type { PositionReference } from '@opentrons/shared-data'
 import type {
   FlowRateKind,
   QuickTransferSummaryAction,
@@ -50,9 +52,16 @@ export function Submerge({
   const [speed, setSpeed] = useState<number | null>(
     submergeSettings?.speed ?? null
   )
-  const [position, setPosition] = useState<number | null>(
-    submergeSettings?.positionFromBottom ?? null
+  const [delayDuration, setDelayDuration] = useState<number | null>(
+    submergeSettings?.delayDuration ?? null
   )
+  const [position, setPosition] = useState<string | null>(
+    String(submergeSettings?.position) ?? null
+  )
+  const positionReference =
+    kind === 'aspirate'
+      ? state.submergeAspirate?.positionReference
+      : state.submergeDispense?.positionReference
 
   const action =
     kind === 'aspirate'
@@ -64,37 +73,49 @@ export function Submerge({
   }
 
   const handleClickSaveOrContinue = (): void => {
-    if (currentStep === 1) {
-      setCurrentStep(2)
-    }
-    if (currentStep === 2) {
-      if (speed != null && position != null) {
-        dispatch({
-          type: action,
-          submergeSettings: {
-            speed,
-            positionFromBottom: position,
-          },
-        })
-        trackEventWithRobotSerial({
-          name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
-          properties: {
-            setting: `Submerge_${kind}`,
-          },
-        })
-        onBack()
-      }
+    switch (currentStep) {
+      case 1:
+        setCurrentStep(2)
+        break
+      case 2:
+        setCurrentStep(3)
+        break
+      case 3:
+        if (speed != null && position != null && delayDuration != null) {
+          dispatch({
+            type: action,
+            submergeSettings: {
+              speed,
+              delayDuration,
+              position: Number(position),
+              positionReference: positionReference ?? undefined,
+            },
+          })
+          trackEventWithRobotSerial({
+            name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+            properties: {
+              setting: `Submerge_${kind}`,
+            },
+          })
+          onBack()
+        }
+        break
     }
   }
 
   const setSaveOrContinueButtonText =
-    currentStep === 1 ? t('shared:continue') : t('shared:save')
+    currentStep === 1 || currentStep === 2
+      ? t('shared:continue')
+      : t('shared:save')
 
   let buttonIsDisabled = false
   if (speed == null && currentStep === 1) {
     buttonIsDisabled = true
   }
-  if (position == null && currentStep === 2) {
+  if (delayDuration == null && currentStep === 2) {
+    buttonIsDisabled = true
+  }
+  if ((position == null || isNaN(Number(position))) && currentStep === 3) {
     buttonIsDisabled = true
   }
 
@@ -126,9 +147,12 @@ export function Submerge({
           state={state}
           setSpeed={setSpeed}
           setPosition={setPosition}
+          delayDuration={delayDuration}
+          setDelayDuration={setDelayDuration}
           speed={speed}
           position={position}
           currentStep={currentStep}
+          positionReference={positionReference}
         />
       </Flex>
     </Flex>,
@@ -139,11 +163,14 @@ export function Submerge({
 interface SubmergeSettingComponentProps {
   kind: FlowRateKind
   state: QuickTransferSummaryState
-  setSpeed: (speed: number) => void
-  setPosition: (position: number) => void
+  setSpeed: (speed: number | null) => void
+  setPosition: (position: string | null) => void
+  delayDuration: number | null
+  setDelayDuration: (delayDuration: number | null) => void
   speed: number | null
-  position: number | null
+  position: string | null
   currentStep: number
+  positionReference?: PositionReference
 }
 
 function SubmergeSettingComponent({
@@ -151,12 +178,21 @@ function SubmergeSettingComponent({
   state,
   speed,
   setSpeed,
+  delayDuration,
+  setDelayDuration,
   position,
   setPosition,
   currentStep,
+  positionReference,
 }: SubmergeSettingComponentProps): JSX.Element {
   const { t } = useTranslation(['quick_transfer'])
   const keyboardRef = useRef<KeyboardReactInterface | null>(null)
+
+  // TODO: accommodate arbitrary position reference
+  const positionText =
+    positionReference === POSITION_REFERENCE_TOP
+      ? t('distance_top_of_well_mm')
+      : t('distance_bottom_of_well_mm')
 
   let wellHeight = 1
   if (
@@ -184,15 +220,53 @@ function SubmergeSettingComponent({
       )
     )
   }
-  const positionRange = { min: 1, max: Math.floor(wellHeight * 2) }
+  const positionRange =
+    positionReference === POSITION_REFERENCE_TOP
+      ? {
+          min: -wellHeight,
+          max: 2,
+        }
+      : {
+          min: 0,
+          max: wellHeight + 2,
+        }
+
+  console.log(positionRange)
   const positionError =
     position != null &&
-    (position < positionRange.min || position > positionRange.max)
+    (Number(position) < positionRange.min ||
+      Number(position) > positionRange.max)
       ? t(`value_out_of_range`, {
           min: positionRange.min,
           max: positionRange.max,
         })
       : null
+
+  const handleSpeedChange = (userInput: string): void => {
+    if (userInput === '') {
+      setSpeed(null)
+    } else {
+      const parsedValue = Number(userInput)
+      setSpeed(!isNaN(parsedValue) ? parsedValue : null)
+    }
+  }
+
+  const handleDelayDurationChange = (userInput: string): void => {
+    if (userInput === '') {
+      setDelayDuration(null)
+    } else {
+      const parsedValue = Number(userInput)
+      setDelayDuration(!isNaN(parsedValue) ? parsedValue : null)
+    }
+  }
+
+  const handlePositionChange = (userInput: string): void => {
+    if (userInput === '') {
+      setPosition(null)
+    } else {
+      setPosition(userInput)
+    }
+  }
 
   const speedSetting = (): JSX.Element => {
     return (
@@ -205,7 +279,7 @@ function SubmergeSettingComponent({
           marginTop={SPACING.spacing68}
         >
           <StyledText oddStyle="level4HeaderRegular">
-            {t('submerge_aspirating_description')}
+            {t(`submerge_${kind}_description`)}
           </StyledText>
           <InputField type="number" value={speed} title={t('speed')} readOnly />
         </Flex>
@@ -218,10 +292,44 @@ function SubmergeSettingComponent({
           <NumericalKeyboard
             key={`${kind}_speed_keyboard`}
             keyboardRef={keyboardRef}
+            isDecimal
             initialValue={String(speed ?? '')}
-            onChange={e => {
-              setSpeed(Number(e))
-            }}
+            onChange={handleSpeedChange}
+          />
+        </Flex>
+      </>
+    )
+  }
+
+  const delayDurationSetting = (): JSX.Element => {
+    return (
+      <>
+        <Flex
+          width="30.5rem"
+          height="100%"
+          gridGap={SPACING.spacing24}
+          flexDirection={DIRECTION_COLUMN}
+          marginTop={SPACING.spacing68}
+        >
+          <InputField
+            type="number"
+            value={delayDuration}
+            title={t('delay_duration_s')}
+            readOnly
+          />
+        </Flex>
+        <Flex
+          paddingX={SPACING.spacing24}
+          height="21.25rem"
+          marginTop="7.75rem"
+          borderRadius="0"
+        >
+          <NumericalKeyboard
+            key={`${kind}_delay_duration_keyboard`}
+            keyboardRef={keyboardRef}
+            isDecimal
+            initialValue={String(delayDuration ?? '')}
+            onChange={handleDelayDurationChange}
           />
         </Flex>
       </>
@@ -229,6 +337,10 @@ function SubmergeSettingComponent({
   }
 
   const positionSetting = (): JSX.Element => {
+    const caption =
+      positionReference === POSITION_REFERENCE_TOP
+        ? t('from_top', { min: -wellHeight })
+        : t('from_bottom', { max: wellHeight + 2 })
     return (
       <>
         <Flex
@@ -239,15 +351,15 @@ function SubmergeSettingComponent({
           marginTop={SPACING.spacing68}
         >
           <InputField
-            type="number"
+            type="text"
             value={position}
             error={positionError}
-            title={t('distance_bottom_of_well_mm')}
+            title={positionText}
             readOnly
           />
           {positionError == null ? (
             <StyledText oddStyle="bodyTextRegular" color={COLORS.grey60}>
-              {t('from_bottom', { max: positionRange.max })}
+              {caption}
             </StyledText>
           ) : null}
         </Flex>
@@ -261,9 +373,8 @@ function SubmergeSettingComponent({
             key={`${kind}_position_keyboard`}
             keyboardRef={keyboardRef}
             initialValue={String(position ?? '')}
-            onChange={e => {
-              setPosition(Number(e))
-            }}
+            onChange={handlePositionChange}
+            hasHyphen={positionReference === POSITION_REFERENCE_TOP}
           />
         </Flex>
       </>
@@ -274,6 +385,8 @@ function SubmergeSettingComponent({
     case 1:
       return speedSetting()
     case 2:
+      return delayDurationSetting()
+    case 3:
       return positionSetting()
     default:
       console.error('step not found')

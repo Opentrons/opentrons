@@ -6,36 +6,108 @@ import {
 } from './misc'
 import { formatPyDict } from './pythonFormat'
 
-import type { PipetteName } from '@opentrons/shared-data'
-import type { ConsolidateArgs, InnerMixArgs, TransferArgs } from '../types'
+import type { ByTipTypeSetting } from '@opentrons/shared-data'
+import type {
+  ConsolidateArgs,
+  DistributeArgs,
+  InnerMixArgs,
+  LabwareEntities,
+  TransferArgs,
+} from '../types'
 
 type BlowoutLocation = 'source' | 'destination' | 'trash'
 
 interface CustomLiquidClassPropertiesProps {
-  args: TransferArgs | ConsolidateArgs
-  pipetteName: PipetteName
+  args: TransferArgs | ConsolidateArgs | DistributeArgs
+  pipetteName: string
   tiprackUri: string
-  aspirateCorrectionVolume: number
-  dispenseCorrectionVolume: number
+  liquidClassValuesForTip: ByTipTypeSetting | null
 }
 
 export const getCustomLiquidClassProperties = (
   props: CustomLiquidClassPropertiesProps
 ): string => {
-  const {
-    args,
-    pipetteName,
-    tiprackUri,
-    aspirateCorrectionVolume,
-    dispenseCorrectionVolume,
-  } = props
-
+  const { args, pipetteName, tiprackUri, liquidClassValuesForTip } = props
   let aspirateMixArgs: InnerMixArgs | null = null
   if ('mixBeforeAspirate' in args) {
     aspirateMixArgs = args.mixBeforeAspirate as InnerMixArgs | null
   } else if ('mixFirstAspirate' in args) {
     aspirateMixArgs = args.mixFirstAspirate as InnerMixArgs | null
   }
+
+  const sharedDispenseArgs = {
+    dispense_position: {
+      offset: {
+        x: args.dispenseXOffset,
+        y: args.dispenseYOffset,
+        z: args.dispenseZOffset,
+      },
+      position_reference: args.dispensePositionReference,
+    },
+    flow_rate_by_volume: [[0, args.dispenseFlowRateUlSec ?? 0]],
+    delay: {
+      enabled: !!args.dispenseDelay?.seconds,
+      ...(args.dispenseDelay?.seconds
+        ? { duration: args.dispenseDelay?.seconds }
+        : {}),
+    },
+    submerge: {
+      delay: {
+        enabled: !!args.dispenseSubmergeDelay?.seconds,
+        ...(args.dispenseSubmergeDelay?.seconds
+          ? { duration: args.dispenseSubmergeDelay?.seconds }
+          : {}),
+      },
+      speed: args.dispenseSubmergeSpeed ?? undefined,
+      start_position: {
+        offset: {
+          x: args.dispenseSubmergeXOffset,
+          y: args.dispenseSubmergeYOffset,
+          z: args.dispenseSubmergeZOffset,
+        },
+        position_reference: args.dispenseSubmergePositionReference,
+      },
+    },
+    retract: {
+      air_gap_by_volume: [[0, args.dispenseAirGapVolume ?? 0]],
+      delay: {
+        enabled: !!args.dispenseRetractDelay?.seconds,
+        ...(args.dispenseRetractDelay?.seconds
+          ? { duration: args.dispenseRetractDelay?.seconds }
+          : {}),
+      },
+      end_position: {
+        offset: {
+          x: args.dispenseRetractXOffset,
+          y: args.dispenseRetractYOffset,
+          z: args.dispenseRetractZOffset,
+        },
+        position_reference: args.dispenseRetractPositionReference,
+      },
+      speed: args.dispenseRetractSpeed ?? undefined,
+      touch_tip: {
+        enabled: args.touchTipAfterDispense,
+        z_offset: args.touchTipAfterDispense
+          ? args.touchTipAfterDispenseOffsetMmFromTop
+          : undefined,
+        mm_from_edge:
+          args.touchTipAfterDispense &&
+          args.touchTipAfterDispenseMmFromEdge != null
+            ? args.touchTipAfterDispenseMmFromEdge
+            : undefined,
+        speed: args.touchTipAfterDispense
+          ? args.touchTipAfterDispenseSpeed
+          : undefined,
+      },
+      blowout: {
+        enabled: args.blowoutLocation != null,
+        location: getBlowoutPythonLocation(args.blowoutLocation),
+        flow_rate:
+          args.blowoutLocation != null ? args.blowoutFlowRateUlSec : undefined,
+      },
+    },
+  }
+
   //    properties object is based off of liquid class schema
   //    shared-data/liquid-class/schemas/1.json
   const customLiquidClassProperties = {
@@ -53,20 +125,29 @@ export const getCustomLiquidClassProperties = (
           flow_rate_by_volume: [[0, args.aspirateFlowRateUlSec]],
 
           pre_wet: args.preWetTip,
-          correction_by_volume: [[0, aspirateCorrectionVolume ?? 0]],
+          correction_by_volume: liquidClassValuesForTip?.aspirate
+            .correctionByVolume ?? [[0, 0]], // nullish coalescing for type checks. Should never hit
           delay: {
-            enabled: args.aspirateDelay != null,
-            duration: args.aspirateDelay?.seconds ?? undefined,
+            enabled: !!args.aspirateDelay?.seconds,
+            ...(args.aspirateDelay?.seconds
+              ? { duration: args.aspirateDelay?.seconds }
+              : {}),
           },
           mix: {
-            enabled: aspirateMixArgs != null,
-            repetitions: aspirateMixArgs?.times ?? undefined,
-            volume: aspirateMixArgs?.volume ?? undefined,
+            enabled: !!aspirateMixArgs?.volume,
+            ...(aspirateMixArgs?.times
+              ? { repetitions: aspirateMixArgs.times }
+              : {}),
+            ...(aspirateMixArgs?.volume
+              ? { volume: aspirateMixArgs.volume }
+              : {}),
           },
           submerge: {
             delay: {
-              enabled: args.aspirateSubmergeDelay != null,
-              duration: args.aspirateSubmergeDelay?.seconds ?? undefined,
+              enabled: !!args.aspirateSubmergeDelay?.seconds,
+              ...(args.aspirateSubmergeDelay?.seconds
+                ? { duration: args.aspirateSubmergeDelay?.seconds }
+                : {}),
             },
             speed: args.aspirateSubmergeSpeed ?? undefined,
             start_position: {
@@ -81,8 +162,10 @@ export const getCustomLiquidClassProperties = (
           retract: {
             air_gap_by_volume: [[0, args.aspirateAirGapVolume ?? 0]],
             delay: {
-              enabled: args.aspirateRetractDelay != null,
-              duration: args.aspirateRetractDelay?.seconds ?? undefined,
+              enabled: !!args.aspirateRetractDelay?.seconds,
+              ...(args.aspirateRetractDelay?.seconds
+                ? { duration: args.aspirateRetractDelay?.seconds }
+                : {}),
             },
             end_position: {
               offset: {
@@ -110,81 +193,47 @@ export const getCustomLiquidClassProperties = (
           },
         },
         dispense: {
-          dispense_position: {
-            offset: {
-              x: args.dispenseXOffset,
-              y: args.dispenseYOffset,
-              z: args.dispenseZOffset,
-            },
-            position_reference: args.dispensePositionReference,
-          },
+          ...sharedDispenseArgs,
+          correction_by_volume: liquidClassValuesForTip?.singleDispense
+            .correctionByVolume ?? [[0, 0]], // nullish coalescing for type checks. Should never hit
           push_out_by_volume: [[0, args.pushOut ?? 0]],
-          flow_rate_by_volume: [[0, args.dispenseFlowRateUlSec ?? 0]],
-          correction_by_volume: [[0, dispenseCorrectionVolume ?? 0]],
-
-          delay: {
-            enabled: args.dispenseDelay != null,
-            duration: args.dispenseDelay?.seconds ?? undefined,
-          },
           mix: {
-            enabled: args.mixInDestination != null,
-            repetitions: args.mixInDestination?.times ?? undefined,
-            volume: args.mixInDestination?.volume ?? undefined,
-          },
-          submerge: {
-            delay: {
-              enabled: args.dispenseSubmergeDelay != null,
-              duration: args.dispenseSubmergeDelay?.seconds ?? undefined,
-            },
-            speed: args.dispenseSubmergeSpeed ?? undefined,
-            start_position: {
-              offset: {
-                x: args.dispenseSubmergeXOffset,
-                y: args.dispenseSubmergeYOffset,
-                z: args.dispenseSubmergeZOffset,
-              },
-              position_reference: args.dispenseSubmergePositionReference,
-            },
-          },
-          retract: {
-            air_gap_by_volume: [[0, args.dispenseAirGapVolume ?? 0]],
-            delay: {
-              enabled: args.dispenseRetractDelay != null,
-              duration: args.dispenseRetractDelay?.seconds ?? undefined,
-            },
-            end_position: {
-              offset: {
-                x: args.dispenseRetractXOffset,
-                y: args.dispenseRetractYOffset,
-                z: args.dispenseRetractZOffset,
-              },
-              position_reference: args.dispenseRetractPositionReference,
-            },
-            speed: args.dispenseRetractSpeed ?? undefined,
-            touch_tip: {
-              enabled: args.touchTipAfterDispense,
-              z_offset: args.touchTipAfterDispense
-                ? args.touchTipAfterDispenseOffsetMmFromTop
+            enabled:
+              'mixInDestination' in args
+                ? args.mixInDestination != null
+                : false,
+            repetitions:
+              'mixInDestination' in args
+                ? args.mixInDestination?.times ?? undefined
                 : undefined,
-              mm_from_edge:
-                args.touchTipAfterDispense &&
-                args.touchTipAfterDispenseMmFromEdge != null
-                  ? args.touchTipAfterDispenseMmFromEdge
-                  : undefined,
-              speed: args.touchTipAfterDispense
-                ? args.touchTipAfterDispenseSpeed
+            volume:
+              'mixInDestination' in args
+                ? args.mixInDestination?.volume ?? undefined
                 : undefined,
-            },
-            blowout: {
-              enabled: args.blowoutLocation != null,
-              location: getBlowoutPythonLocation(args.blowoutLocation),
-              flow_rate:
-                args.blowoutLocation != null
-                  ? args.blowoutFlowRateUlSec
-                  : undefined,
-            },
           },
         },
+        ...(args.commandCreatorFnName === 'distribute'
+          ? {
+              multi_dispense: {
+                ...sharedDispenseArgs,
+                //  distribute specific args
+                correction_by_volume: liquidClassValuesForTip?.multiDispense
+                  ?.correctionByVolume ?? [[0, 0]], // nullish coalescing for type checks. Should never hit
+                ...('conditioningVolume' in args
+                  ? {
+                      conditioning_by_volume: [
+                        [0, args.conditioningVolume ?? 0],
+                      ],
+                    }
+                  : {}),
+                ...('disposalVolume' in args
+                  ? {
+                      disposal_by_volume: [[0, args.disposalVolume ?? 0]],
+                    }
+                  : {}),
+              },
+            }
+          : {}),
       },
     },
   }
@@ -196,10 +245,13 @@ export const getCustomLiquidClassProperties = (
   return formatPyDict(stringifiedCustomLiquidClassProperties)
 }
 
-export const getPythonLiquidClassName = (liquidClass: string): string => {
+export const getLiquidClassName = (
+  liquidClass: string, // a liquid class name like "water", "none" is not allowed
+  showBase?: boolean
+): string => {
   const allLiquidClassDefs = getAllLiquidClassDefs()
   const liquidClassDef = allLiquidClassDefs[liquidClass]
-  return `${liquidClassDef.liquidClassName}_v${liquidClassDef.schemaVersion}`
+  return `${liquidClassDef.liquidClassName}${showBase ? `_base_class` : ''}`
 }
 
 const getBlowoutPythonLocation = (
@@ -214,4 +266,15 @@ const getBlowoutPythonLocation = (
   } else {
     return 'trash'
   }
+}
+
+export const getPythonAssignTipRacksString = (args: {
+  labwareEntities: LabwareEntities
+  tiprackIds: string[]
+}): string => {
+  const { labwareEntities, tiprackIds } = args
+  const tiprackPythonNames = tiprackIds.map(
+    id => labwareEntities[id].pythonName
+  )
+  return `tip_racks=[${tiprackPythonNames.join(', ')}]`
 }

@@ -67,6 +67,36 @@ class SyncClient:
 
     @overload
     def execute_command_without_recovery(
+        self, params: commands.CreateTimerParams
+    ) -> commands.CreateTimerResult:
+        pass
+
+    @overload
+    def execute_command_without_recovery(
+        self, params: commands.temperature_module.SetTargetTemperatureParams
+    ) -> commands.temperature_module.SetTargetTemperatureResult:
+        pass
+
+    @overload
+    def execute_command_without_recovery(
+        self, params: commands.heater_shaker.SetTargetTemperatureParams
+    ) -> commands.heater_shaker.SetTargetTemperatureResult:
+        pass
+
+    @overload
+    def execute_command_without_recovery(
+        self, params: commands.thermocycler.SetTargetBlockTemperatureParams
+    ) -> commands.thermocycler.SetTargetBlockTemperatureResult:
+        pass
+
+    @overload
+    def execute_command_without_recovery(
+        self, params: commands.thermocycler.SetTargetLidTemperatureParams
+    ) -> commands.thermocycler.SetTargetLidTemperatureResult:
+        pass
+
+    @overload
+    def execute_command_without_recovery(
         self, params: commands.LoadModuleParams
     ) -> commands.LoadModuleResult:
         pass
@@ -148,13 +178,6 @@ class SyncClient:
     ) -> Liquid:
         """Add a liquid to the engine."""
         return self._transport.call_method("add_liquid", name=name, color=color, description=description)  # type: ignore[no-any-return]
-
-    def reset_tips(self, labware_id: str) -> None:
-        """Reset a labware's tip tracking state.."""
-        self._transport.call_method(
-            "reset_tips",
-            labware_id=labware_id,
-        )
 
     def add_labware_offset(self, request: LabwareOffsetCreate) -> None:
         """Add a labware offset."""

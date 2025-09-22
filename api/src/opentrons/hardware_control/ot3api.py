@@ -74,6 +74,7 @@ from .types import (
     DoorStateNotification,
     ErrorMessageNotification,
     HardwareEvent,
+    AsynchronousModuleErrorNotification,
     HardwareEventHandler,
     HardwareAction,
     HepaFanState,
@@ -367,6 +368,21 @@ class OT3API(
 
         return futures
 
+    def _send_module_notification(self, event: HardwareEvent) -> None:
+        if not isinstance(
+            event,
+            AsynchronousModuleErrorNotification,
+        ):
+            return
+        mod_log.info(
+            f"Forwarding module event {event.event} for {event.module_model} {event.module_serial} at {event.port}"
+        )
+        for cb in self._callbacks:
+            try:
+                cb(event)
+            except Exception:
+                mod_log.exception("Errored during module asynchronous callback")
+
     def _reset_last_mount(self) -> None:
         self._last_moved_mount = None
 
@@ -422,7 +438,9 @@ class OT3API(
 
         await api_instance.set_status_bar_enabled(status_bar_enabled)
         module_controls = await AttachedModulesControl.build(
-            api_instance, board_revision=backend.board_revision
+            api_instance,
+            board_revision=backend.board_revision,
+            event_callback=api_instance._send_module_notification,
         )
         backend.module_controls = module_controls
         await backend.build_estop_detector()
@@ -484,7 +502,9 @@ class OT3API(
         )
         await api_instance.cache_instruments()
         module_controls = await AttachedModulesControl.build(
-            api_instance, board_revision=backend.board_revision
+            api_instance,
+            board_revision=backend.board_revision,
+            event_callback=api_instance._send_module_notification,
         )
         backend.module_controls = module_controls
         await backend.watch(api_instance.loop)
@@ -627,9 +647,10 @@ class OT3API(
             self.is_simulator
         ), "Cannot build simulating module from non-simulating hardware control API"
 
-        return await self._backend.module_controls.build_module(
-            port="",
-            usb_port=USBPort(name="", port_number=1, port_group=PortGroup.LEFT),
+        return await self._backend.module_controls.register_simulated_module(
+            simulated_usb_port=USBPort(
+                name="", port_number=1, port_group=PortGroup.LEFT
+            ),
             type=modules.ModuleType.from_model(model),
             sim_model=model.value,
         )
@@ -937,14 +958,17 @@ class OT3API(
             axes = list(Axis.ot3_mount_axes())
         await self.home(axes)
 
-    async def _do_home_and_maybe_calibrate_gripper_jaw(self) -> None:
+    async def _do_home_and_maybe_calibrate_gripper_jaw(
+        self,
+        recalibrate_jaw_width: bool = False,
+    ) -> None:
         gripper = self._gripper_handler.get_gripper()
         self._log.info("Homing gripper jaw.")
         dc = self._gripper_handler.get_duty_cycle_by_grip_force(
             gripper.default_home_force
         )
         await self._ungrip(duty_cycle=dc)
-        if not gripper.has_jaw_width_calibration:
+        if recalibrate_jaw_width or not gripper.has_jaw_width_calibration:
             self._log.info("Calibrating gripper jaw.")
             await self._grip(
                 duty_cycle=dc, expected_displacement=gripper.max_jaw_displacement()
@@ -953,10 +977,13 @@ class OT3API(
             gripper.update_jaw_open_position_from_closed_position(jaw_at_closed)
             await self._ungrip(duty_cycle=dc)
 
-    async def home_gripper_jaw(self) -> None:
+    async def home_gripper_jaw(
+        self,
+        recalibrate_jaw_width: bool = False,
+    ) -> None:
         """Home the jaw of the gripper."""
         try:
-            await self._do_home_and_maybe_calibrate_gripper_jaw()
+            await self._do_home_and_maybe_calibrate_gripper_jaw(recalibrate_jaw_width)
         except GripperNotPresentError:
             pass
 
@@ -1474,8 +1501,8 @@ class OT3API(
             grip_width_uncertainty_narrower,
             gripper.jaw_width,
             gripper.max_allowed_grip_error,
-            gripper.max_jaw_width,
             gripper.min_jaw_width,
+            gripper.max_jaw_width,
         )
 
     def gripper_jaw_can_home(self) -> bool:
@@ -2829,7 +2856,7 @@ class OT3API(
         if not probe_settings:
             probe_settings = deepcopy(self.config.liquid_sense)
 
-        # We need to significatly slow down the 96 channel liquid probe
+        # We need to significantly slow down the 96 channel liquid probe
         if self.gantry_load in [
             GantryLoad.HIGH_THROUGHPUT_1000,
             GantryLoad.HIGH_THROUGHPUT_200,

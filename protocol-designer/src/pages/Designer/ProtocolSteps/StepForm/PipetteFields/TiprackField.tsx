@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
@@ -11,9 +10,9 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { DropdownStepFormField } from '../../../../../components/molecules'
-import { getPipetteEntities } from '../../../../../step-forms/selectors'
-import { getTiprackOptions } from '../../../../../ui/labware/selectors'
+import { DropdownStepFormField } from '/protocol-designer/components/molecules'
+import { getPipetteEntities } from '/protocol-designer/step-forms/selectors'
+import { getTiprackOptions } from '/protocol-designer/ui/labware/selectors'
 
 import type { FieldProps } from '../types'
 
@@ -21,12 +20,7 @@ interface TiprackFieldProps extends FieldProps {
   pipetteId?: unknown
 }
 export function TiprackField(props: TiprackFieldProps): JSX.Element {
-  const {
-    value,
-    updateValue,
-    pipetteId,
-    padding = `0 ${SPACING.spacing16}`,
-  } = props
+  const { value, pipetteId, padding = `0 ${SPACING.spacing16}` } = props
   const { t } = useTranslation('protocol_steps')
   const pipetteEntities = useSelector(getPipetteEntities)
   const options = useSelector(getTiprackOptions)
@@ -36,13 +30,6 @@ export function TiprackField(props: TiprackFieldProps): JSX.Element {
     defaultTiprackUris.includes(option.value)
   )
 
-  useEffect(() => {
-    //  if default value is not included in the pipette's tiprack uris then
-    //  change it so it is
-    if (!defaultTiprackUris.includes(value as string)) {
-      updateValue(defaultTiprackUris[0])
-    }
-  }, [defaultTiprackUris, value, updateValue])
   const hasMissingTiprack = defaultTiprackUris.length > tiprackOptions.length
   return (
     <>

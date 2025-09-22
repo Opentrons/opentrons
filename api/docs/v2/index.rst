@@ -14,6 +14,8 @@ Welcome
     new_modules
     deck_slots
     new_pipette
+    liquid_classes
+    liquid_class_definitions
     new_atomic_commands
     new_complex_commands
     robot_position

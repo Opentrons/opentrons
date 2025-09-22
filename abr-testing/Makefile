@@ -72,7 +72,7 @@ test:
 
 .PHONY: push-no-restart-ot3
 push-no-restart-ot3: wheel Pipfile.lock
-	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/opt/opentrons-robot-server/)
+	$(call push-python,$(host),$(ssh_key),$(ssh_opts),dist/$(wheel_file),/opt/opentrons-robot-server/)
 
 .PHONY: push-ot3
 push-ot3: push-no-restart-ot3

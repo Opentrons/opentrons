@@ -5,6 +5,8 @@ import {
   aspirateLabwareRequired,
   aspirateMixTimesRequired,
   aspirateMixVolumeRequired,
+  aspirateRetractSpeedRequired,
+  aspirateSubmergeSpeedRequired,
   aspirateTouchTipMmFromEdgeOutOfRange,
   aspirateTouchTipMmFromEdgeRequired,
   aspirateTouchTipSpeedRequired,
@@ -23,10 +25,13 @@ import {
   dispenseLabwareRequired,
   dispenseMixTimesRequired,
   dispenseMixVolumeRequired,
+  dispenseRetractSpeedRequired,
+  dispenseSubmergeSpeedRequired,
   dispenseTouchTipMmFromEdgeOutOfRange,
   dispenseTouchTipMmFromEdgeRequired,
   dispenseTouchTipSpeedRequired,
   dispenseWellsRequired,
+  disposalVolumeRequired,
   engageHeightRangeExceeded,
   engageHeightRequired,
   fileNameRequired,
@@ -66,7 +71,6 @@ import {
   targetTemperatureRequired,
   temperatureRequired,
   timesRequired,
-  transferVolumeMax,
   transferVolumeMin,
   volumeRequired,
   volumeTooHigh,
@@ -75,13 +79,12 @@ import {
   wellRatioMoveLiquid,
 } from './errors'
 import {
-  belowPipetteMinimumVolume,
   composeWarnings,
   incompatibleLiquidClass,
   maxDispenseWellVolume,
-  minDisposalVolume,
   mixTipPositionInTube,
   tipPositionInTube,
+  wellVolumeMax,
 } from './warnings'
 
 import type {
@@ -176,14 +179,13 @@ const stepFormHelperMap: {
       pushOutVolumeOutOfRange,
       pushOutVolumeRequired,
       blowoutFlowRateRequired,
-      transferVolumeMax,
       transferVolumeMin,
       pipetteRequired
     ),
     getWarnings: composeWarnings(
-      belowPipetteMinimumVolume,
       mixTipPositionInTube,
-      incompatibleLiquidClass
+      incompatibleLiquidClass,
+      wellVolumeMax
     ),
   },
   pause: {
@@ -228,16 +230,19 @@ const stepFormHelperMap: {
       conditioningVolumeRequired,
       conditioningVolumeOutOfRange,
       blowoutFlowRateRequired,
-      transferVolumeMax,
       transferVolumeMin,
-      pipetteRequired
+      pipetteRequired,
+      aspirateSubmergeSpeedRequired,
+      aspirateRetractSpeedRequired,
+      dispenseSubmergeSpeedRequired,
+      dispenseRetractSpeedRequired,
+      disposalVolumeRequired
     ),
     getWarnings: composeWarnings(
-      belowPipetteMinimumVolume,
       maxDispenseWellVolume,
-      minDisposalVolume,
       tipPositionInTube,
-      incompatibleLiquidClass
+      incompatibleLiquidClass,
+      wellVolumeMax
     ),
   },
   magnet: {

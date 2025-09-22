@@ -81,7 +81,7 @@ async def set_up_task_runner(app_state: AppState) -> AsyncGenerator[None, None]:
     """
     task_runner = TaskRunner()
     try:
-        _task_runner_accessor.set_on(app_state, TaskRunner())
+        _task_runner_accessor.set_on(app_state, task_runner)
         yield
     finally:
         await task_runner.cancel_all_and_clean_up()

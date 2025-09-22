@@ -65,6 +65,7 @@ export const getMoveLabwareFormErrors = (
           title: errorString,
           dependentProfileFields: ['newLocation'],
           location: 'field',
+          showOnReopen: true,
         },
       ] as ProfileFormError[])
     : []

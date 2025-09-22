@@ -8,7 +8,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { COLORS } from '../../helix-design-system'
-import { LabwareAdapter, labwareAdapterLoadNames } from './LabwareAdapter'
+import { customSVGLoadNames, LabwareAdapter } from './LabwareAdapter'
 import {
   LabwareOutline,
   LabwareWellLabels,
@@ -30,7 +30,7 @@ export interface LabwareProps {
   /** Labware definition to render */
   definition: LabwareDefinition
   /* See docs on LabwareRender. */
-  positioningMode?: 'passThrough' | 'offsetInSlot'
+  positioningMode: 'passThrough' | 'offsetInSlot'
   /** See docs on LabwareRender. */
   shouldRotateAdapterOrientation?: boolean
   /** boolean to show well labels */
@@ -89,7 +89,7 @@ const LabwareDetailGroup = styled.g`
 export const Labware = (props: LabwareProps): JSX.Element => {
   const {
     definition,
-    positioningMode = 'offsetInSlot',
+    positioningMode,
     gRef,
     hideOutline = false,
     highlight,
@@ -106,11 +106,13 @@ export const Labware = (props: LabwareProps): JSX.Element => {
 
   const cornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(definition)
   const labwareLoadName = definition.parameters.loadName
-  const isAdapter = labwareAdapterLoadNames.includes(labwareLoadName)
-
-  if (isAdapter) {
+  const isNeedingCustomSVG = customSVGLoadNames.includes(labwareLoadName)
+  const isLid = definition.allowedRoles?.includes('lid')
+  if (isNeedingCustomSVG || isLid) {
     const { shouldRotateAdapterOrientation = false } = props
     const { xDimension, yDimension } = getSchema2Dimensions(definition)
+    const lidDimensions =
+      'dimensions' in definition ? definition.dimensions : null
 
     return (
       <g
@@ -130,6 +132,8 @@ export const Labware = (props: LabwareProps): JSX.Element => {
         >
           <LabwareAdapter
             labwareLoadName={labwareLoadName as LabwareAdapterLoadName}
+            isLid={isLid}
+            lidDimensions={lidDimensions}
           />
         </g>
       </g>

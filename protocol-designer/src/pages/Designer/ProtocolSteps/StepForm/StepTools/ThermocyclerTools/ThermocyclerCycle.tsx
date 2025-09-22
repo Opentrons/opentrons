@@ -21,17 +21,18 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { LINK_BUTTON_STYLE } from '../../../../../../components/atoms'
+import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
 import {
   maskToFloat,
   maskToInteger,
   maskToTime,
-} from '../../../../../../steplist/fieldLevel/processing'
+} from '/protocol-designer/steplist/fieldLevel/processing'
 import {
   enterValueWithinRange,
   isTimeFormatMinutesSeconds,
-} from '../../../../../../steplist/fieldLevel/thermocyclerFieldErrors'
-import { uuid } from '../../../../../../utils'
+} from '/protocol-designer/steplist/fieldLevel/thermocyclerFieldErrors'
+import { uuid } from '/protocol-designer/utils'
+
 import { getStepIndex, getTimeFromString } from './utils'
 
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react'

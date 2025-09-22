@@ -1,26 +1,40 @@
 import { useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { round } from 'lodash'
+import round from 'lodash/round'
 
 import {
+  ALIGN_CENTER,
   DIRECTION_COLUMN,
   Divider,
   Flex,
+  PrimaryButton,
   SPACING,
   StyledText,
   Tabs,
 } from '@opentrons/components'
-import { getMinXYDimension } from '@opentrons/shared-data'
-import { getTrashOrLabware } from '@opentrons/step-generation'
+import {
+  getAllLiquidClassDefs,
+  getFlexNameConversion,
+  getMaxPushOutVolume,
+  getMinXYDimension,
+  NONE_LIQUID_CLASS_NAME,
+  WATER_LIQUID_CLASS_NAME_V2,
+} from '@opentrons/shared-data'
+import {
+  getPipetteWithTipMaxVol,
+  getTrashOrLabware,
+} from '@opentrons/step-generation'
 
 import {
   CheckboxExpandStepFormField,
   InputStepFormField,
   ToggleStepFormField,
-} from '../../../../../../components/molecules'
-import { ResetSettingsModal } from '../../../../../../components/organisms/ResetSettingsModal'
-import { getEnableLiquidClasses } from '../../../../../../feature-flags/selectors'
+} from '/protocol-designer/components/molecules'
+import { ResetSettingsModal } from '/protocol-designer/components/organisms/ResetSettingsModal'
+import { getEnableByVolumeBuilder } from '/protocol-designer/feature-flags/selectors'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
+
 import {
   getAdditionalEquipmentEntities,
   getInvariantContext,
@@ -28,10 +42,7 @@ import {
   getPipetteEntities,
 } from '../../../../../../step-forms/selectors'
 import { updateFieldsForLiquidClass } from '../../../../../../steplist/formLevel/handleFormChange/utils'
-import {
-  getMaxConditioningVolume,
-  getMaxPushOutVolume,
-} from '../../../../../../utils'
+import { getMaxConditioningVolume } from '../../../../../../utils'
 import {
   BlowoutLocationField,
   DisposalField,
@@ -43,11 +54,14 @@ import {
   getBlowoutLocationOptionsForForm,
   getLabwareFieldForPositioningField,
 } from '../../utils'
+import { ByVolumeBuilderModal } from '../ByVolumeBuilderModal/ByVolumeBuilderModal'
+import { FLOW_RATE } from '../ByVolumeBuilderModal/types'
 import { MultiInputField } from './MultiInputField'
 import { ResetSettingsField } from './ResetSettingsField'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { FormData, StepFieldName } from '../../../../../../form-types'
+import type { LiquidHandlingPropertyByVolume } from '@opentrons/shared-data'
+import type { FormData, StepFieldName } from '/protocol-designer/form-types'
 import type { FieldPropsByName, LiquidHandlingTab } from '../../types'
 import type { StepInputFieldProps } from './MultiInputField'
 
@@ -79,10 +93,41 @@ export const SecondStepsMoveLiquidTools = ({
   const { trashBinEntities, wasteChuteEntities } = useSelector(
     getInvariantContext
   )
-  const enableLiquidClasses = useSelector(getEnableLiquidClasses)
+  const enableByVolumeBuilder = useSelector(getEnableByVolumeBuilder)
+  const { spec: pipetteSpecs } = pipetteEntities[String(formData.pipette)]
+  const invariantContext = useSelector(getInvariantContext)
+  const pipetteWithTipMaxVol = getPipetteWithTipMaxVol(
+    formData.pipette as string,
+    invariantContext,
+    formData.tipRack as string
+  )
+  // TODO: replace this with the actual individual byVolume values, separated by aspirate/dispense etc.
+  const stubbedByTipValues = getAllLiquidClassDefs()
+    [
+      formData.liquidClass !== NONE_LIQUID_CLASS_NAME
+        ? formData.liquidClass
+        : WATER_LIQUID_CLASS_NAME_V2
+    ].byPipette.find(
+      ({ pipetteModel }) => pipetteModel === getFlexNameConversion(pipetteSpecs)
+    )
+    ?.byTipType.find(({ tiprack }) => tiprack === formData.tipRack)?.aspirate
+    .flowRateByVolume
+  const highestY = Math.max(
+    ...(stubbedByTipValues?.map(point => point[1]) ?? [])
+  )
+  const maxY = Math.max(pipetteWithTipMaxVol, highestY)
+
+  const robotType = useSelector(getRobotType)
   const pipetteSpec = useSelector(getPipetteEntities)[formData.pipette]?.spec
   const [showResetModal, setShowResetModal] = useState<boolean>(false)
+  const [showChart, setShowChart] = useState<boolean>(false)
 
+  // TODO: replace this state/setter with propsForFields value/updateValue
+  // should remove the need for byTipValues (handled in form change utils)
+  const [flowRates, setFlowRates] = useState<LiquidHandlingPropertyByVolume>(
+    stubbedByTipValues ?? []
+  )
+  // need presaved and deep equality check logic here
   const addFieldNamePrefix = addPrefix(tab)
   const isWasteChuteSelected =
     propsForFields.dispense_labware?.value != null
@@ -170,11 +215,17 @@ export const SecondStepsMoveLiquidTools = ({
       formData.tipRack,
     ]
   )
+  const labwareId = formData[`${tab}_labware`]
+  // The getMinXYDimension() call below is crashing quite often, but I'm not sure why
+  if (!labwareEntities[labwareId]?.def) {
+    throw new Error(
+      `missing ${tab}_labware def for ${labwareId}, ` +
+        `in labwareEntities: ${!!labwareEntities[labwareId]}`
+    )
+  }
   const minXYDimension = isDestinationTrash
     ? null
-    : getMinXYDimension(labwareEntities[formData[`${tab}_labware`]]?.def, [
-        'A1',
-      ])
+    : getMinXYDimension(labwareEntities[labwareId]?.def, ['A1'])
   const minRadiusForTouchTip =
     minXYDimension != null ? round(minXYDimension / 2, 1) : null
 
@@ -261,6 +312,7 @@ export const SecondStepsMoveLiquidTools = ({
               labwareEntities,
               additionalEquipmentEntities,
               liquidHandlingAction: tab,
+              robotType,
             })
           }}
           onClose={() => {
@@ -283,19 +335,47 @@ export const SecondStepsMoveLiquidTools = ({
           <Tabs tabs={[aspirateTab, dispenseTab]} />
         </Flex>
         <Divider marginY="0" />
-        <FlowRateField
-          key={`${addFieldNamePrefix('flowRate')}_flowRateField`}
-          {...propsForFields[addFieldNamePrefix('flowRate')]}
-          pipetteId={formData.pipette}
-          flowRateType={tab}
-          volume={propsForFields.volume?.value ?? 0}
-          tiprack={propsForFields.tipRack.value}
-          showTooltip={false}
-          formData={formData}
-        />
+        {enableByVolumeBuilder && stubbedByTipValues != null ? (
+          <Flex
+            paddingX={SPACING.spacing16}
+            gridGap={SPACING.spacing4}
+            alignItems={ALIGN_CENTER}
+          >
+            <PrimaryButton
+              onClick={() => {
+                setShowChart(true)
+              }}
+            >
+              {t('protocol_steps:flow_rate_builder')}
+            </PrimaryButton>
+            {showChart ? (
+              <ByVolumeBuilderModal
+                byVolume={flowRates}
+                onClose={() => {
+                  setShowChart(false)
+                }}
+                type={FLOW_RATE}
+                setByVolume={setFlowRates}
+                defaultFlowRates={stubbedByTipValues ?? []}
+                maxX={pipetteWithTipMaxVol}
+                maxY={maxY}
+              />
+            ) : null}
+          </Flex>
+        ) : (
+          <FlowRateField
+            key={`${addFieldNamePrefix('flowRate')}_flowRateField`}
+            {...propsForFields[addFieldNamePrefix('flowRate')]}
+            pipetteId={formData.pipette}
+            flowRateType={tab}
+            volume={propsForFields.volume?.value ?? 0}
+            tiprack={propsForFields.tipRack.value}
+            showTooltip={false}
+            formData={formData}
+          />
+        )}
         {hideWellOrderField ? null : (
           <>
-            <Divider marginY="0" />
             <WellsOrderField
               prefix={tab}
               updateFirstWellOrder={
@@ -313,10 +393,11 @@ export const SecondStepsMoveLiquidTools = ({
             />
           </>
         )}
-        {isDestinationTrash ? null : (
+        {isDestinationTrash && tab === 'dispense' ? null : (
           <>
             <Divider marginY="0" />
             <PositionField
+              formData={formData}
               prefix={tab}
               propsForFields={propsForFields}
               zField={`${tab}_mmFromBottom`}
@@ -333,10 +414,11 @@ export const SecondStepsMoveLiquidTools = ({
             />
           </>
         )}
-        {enableLiquidClasses && !isDestinationTrash ? (
+        {!isDestinationTrash ? (
           <>
             <Divider marginY="0" />
             <MultiInputField
+              formData={formData}
               name={t('submerge')}
               prefix={`${tab}_submerge`}
               tooltipContent={t(`tooltip:step_fields.defaults.${tab}_submerge`)}
@@ -354,6 +436,7 @@ export const SecondStepsMoveLiquidTools = ({
             />
             <Divider marginY="0" />
             <MultiInputField
+              formData={formData}
               name={t('retract')}
               prefix={`${tab}_retract`}
               tooltipContent={t(`tooltip:step_fields.defaults.${tab}_retract`)}
@@ -404,6 +487,7 @@ export const SecondStepsMoveLiquidTools = ({
                 >
                   {formData.conditioning_checkbox === true ? (
                     <InputStepFormField
+                      {...propsForFields.conditioning_volume}
                       title={t(
                         'form:step_edit_form.field.conditioning.conditioning_volume.label'
                       )}
@@ -412,7 +496,6 @@ export const SecondStepsMoveLiquidTools = ({
                         { min: 0, max: maxConditioningVolume }
                       )}
                       padding="0"
-                      {...propsForFields.conditioning_volume}
                       showTooltip={false}
                     />
                   ) : null}
@@ -531,6 +614,7 @@ export const SecondStepsMoveLiquidTools = ({
                   units={t('application:units.millimeter')}
                 />
                 <PositionField
+                  formData={formData}
                   prefix={tab}
                   propsForFields={propsForFields}
                   zField={`${tab}_touchTip_mmFromTop`}
@@ -566,14 +650,12 @@ export const SecondStepsMoveLiquidTools = ({
             ) : null}
           </CheckboxExpandStepFormField>
         </Flex>
-        {enableLiquidClasses ? (
-          <ResetSettingsField
-            tab={tab}
-            onClick={() => {
-              setShowResetModal(true)
-            }}
-          />
-        ) : null}
+        <ResetSettingsField
+          tab={tab}
+          onClick={() => {
+            setShowResetModal(true)
+          }}
+        />
       </Flex>
     </>
   )

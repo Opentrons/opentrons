@@ -33,7 +33,7 @@ import type {
 
 // TODO(bc, 2021-09-18): generate typescript types directly from JSON schema
 // having to maintain TS types side by side with the schema is a liability
-export const getModuleDef2 = (moduleModel: ModuleModel): ModuleDefinition => {
+export const getModuleDef = (moduleModel: ModuleModel): ModuleDefinition => {
   switch (moduleModel) {
     case MAGNETIC_MODULE_V1:
       return magneticModuleV1 as ModuleDefinition
@@ -89,18 +89,18 @@ export function normalizeModuleModel(
 }
 
 export function getModuleType(moduleModel: ModuleModel): ModuleType {
-  return getModuleDef2(moduleModel).moduleType
+  return getModuleDef(moduleModel).moduleType
 }
 
 // use module model (not type!) to get model-specific displayName for UI
 export function getModuleDisplayName(moduleModel: ModuleModel): string {
-  return getModuleDef2(moduleModel).displayName
+  return getModuleDef(moduleModel).displayName
 }
 
 export function checkModuleCompatibility(
   modelA: ModuleModel,
   modelB: ModuleModel
 ): boolean {
-  const bDef = getModuleDef2(modelB)
+  const bDef = getModuleDef(modelB)
   return modelA === modelB || bDef.compatibleWith.includes(modelA)
 }

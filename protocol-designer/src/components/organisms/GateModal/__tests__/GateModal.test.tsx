@@ -1,14 +1,15 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { GateModal } from '..'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { optIn } from '../../../../analytics/actions'
-import { getHasOptedIn } from '../../../../analytics/selectors'
-import { i18n } from '../../../../assets/localization'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { optIn } from '/protocol-designer/analytics/actions'
+import { getHasOptedIn } from '/protocol-designer/analytics/selectors'
+import { i18n } from '/protocol-designer/assets/localization'
 
-vi.mock('../../../../analytics/selectors')
-vi.mock('../../../../analytics/actions')
+import { GateModal } from '..'
+
+vi.mock('/protocol-designer/analytics/selectors')
+vi.mock('/protocol-designer/analytics/actions')
 
 const render = () => {
   return renderWithProviders(<GateModal />, {

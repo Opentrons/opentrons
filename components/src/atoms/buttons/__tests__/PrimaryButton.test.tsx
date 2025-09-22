@@ -28,7 +28,7 @@ describe('PrimaryButton', () => {
     const button = screen.getByText('primary button')
     expect(button).toHaveStyle(`background-color: ${COLORS.blue50}`)
     expect(button).toHaveStyle(
-      `padding: ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16}`
+      `padding: ${SPACING.spacing8} ${SPACING.spacing16}`
     )
     expect(button).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSizeH3}`)
     expect(button).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`)

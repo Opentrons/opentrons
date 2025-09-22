@@ -5,7 +5,10 @@
     "composite": true,
     "emitDeclarationOnly": false,
     "rootDir": ".",
-    "outDir": "lib"
+    "outDir": "lib",
+    "paths": {
+      "/ai-client/*": ["./src/*"]
+    }
   },
   "include": ["src/**/*.json", "fixtures/**/*.json", "vite.config.mts"],
   "exclude": ["**/*.ts", "**/*.tsx"]

@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import { Module } from '@opentrons/components'
 import {
   getAllLabwareDefs,
-  getModuleDef2,
+  getModuleDef,
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
@@ -37,6 +37,7 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
     selectedAdapterDefURI,
     selectedFixture,
     selectedModuleModel,
+    selectedLidLabware,
   } = selectedSlotInfo
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
   const defs = getAllLabwareDefs()
@@ -47,6 +48,16 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
       const matchingSlot = getSlotInLocationStack(stack)
       return (
         labwareDefURI === selectedTopLabware.labwareDefURI &&
+        matchingSlot === selectedSlot.slot
+      )
+    }
+  )
+
+  const matchingSelectedLidOnDeck = Object.values(labware).find(
+    ({ stack, labwareDefURI }) => {
+      const matchingSlot = getSlotInLocationStack(stack)
+      return (
+        labwareDefURI === selectedLidLabware &&
         matchingSlot === selectedSlot.slot
       )
     }
@@ -88,6 +99,10 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
     }
     labwareInfos.push(selectedAdapterLabel)
   }
+  const lengthOfStack =
+    (selectedLidLabware ? 1 : 0) +
+    (selectedAdapterDefURI ? 1 : 0) +
+    (selectedTopLabware?.labwareDefURI ? 1 : 0)
 
   return (
     <>
@@ -103,20 +118,28 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
       slotPosition != null &&
       orientation != null ? (
         <>
+          {/*
+          todo(mm, 2025-07-10): This <Module> and <ModuleLabel> positioning is not
+          quite right, most obviously for the Thermocycler on a Flex. We aren't
+          passing a targetSlotId and targetDeckId down to <Module>, which means
+          it isn't applying slot-specific adjustments.
+          */}
           <Module
             key={`${selectedModuleModel}_${selectedSlot.slot}_selected`}
             x={slotPosition[0]}
             y={slotPosition[1]}
-            def={getModuleDef2(selectedModuleModel)}
+            def={getModuleDef(selectedModuleModel)}
             orientation={orientation}
+            targetDeckId={null}
+            targetSlotId={null}
+            childrenPositioningMode="offsetToSlot"
           >
-            <>
-              <SelectedModuleLabwareRender
-                topLabwareOnDeck={matchingSelectedTopLabwareOnDeck}
-                adapterDef={selectedAdapterDef}
-                moduleModel={selectedModuleModel}
-              />
-            </>
+            <SelectedModuleLabwareRender
+              topLabwareOnDeck={matchingSelectedTopLabwareOnDeck}
+              adapterDef={selectedAdapterDef}
+              moduleModel={selectedModuleModel}
+              lidOnDeck={matchingSelectedLidOnDeck}
+            />
           </Module>
           {selectedModuleModel != null ? (
             <ModuleLabel
@@ -127,13 +150,15 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
               isSelected={true}
               labwareInfos={labwareInfos}
               slot={selectedSlot.slot}
+              showModuleIcon={
+                selectedTopLabware.amount > 1 || lengthOfStack > 1
+              }
             />
           ) : null}
         </>
       ) : null}
       <SelectedLabwareRender
-        showModuleIcon={selectedTopLabware.amount > 1}
-        labwareOnDeck={matchingSelectedTopLabwareOnDeck}
+        showModuleIcon={selectedTopLabware.amount > 1 || lengthOfStack > 1}
         labwareDef={selectedTopLabwareDef ?? selectedAdapterDef}
         slotPosition={slotPosition}
         moduleModel={selectedModuleModel ?? null}

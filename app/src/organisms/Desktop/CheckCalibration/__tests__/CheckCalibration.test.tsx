@@ -1,8 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
-
-import { getDeckDefinitions } from '@opentrons/shared-data'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -16,13 +13,6 @@ import type { RobotCalibrationCheckStep } from '/app/redux/sessions/types'
 
 vi.mock('/app/redux/calibration/selectors')
 vi.mock('/app/redux/config')
-vi.mock('@opentrons/shared-data', async importOriginal => {
-  const actual = await importOriginal<typeof getDeckDefinitions>()
-  return {
-    ...actual,
-    getDeckDefinitions: vi.fn(),
-  }
-})
 
 interface CheckCalibrationSpec {
   heading: string
@@ -87,10 +77,6 @@ describe('CheckCalibration', () => {
       currentStep: 'resultsSummary',
     },
   ]
-
-  beforeEach(() => {
-    when(vi.mocked(getDeckDefinitions)).calledWith().thenReturn({})
-  })
 
   afterEach(() => {
     vi.clearAllMocks()

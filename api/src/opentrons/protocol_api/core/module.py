@@ -18,6 +18,7 @@ from opentrons.hardware_control.modules.types import (
     SpeedStatus,
 )
 from .labware import LabwareCoreType, AbstractLabware
+from .tasks import AbstractTaskCore
 from opentrons.protocol_engine.types import ABSMeasureMode
 from opentrons.types import DeckSlotName
 
@@ -59,7 +60,7 @@ class AbstractTemperatureModuleCore(
         """Get the module's unique hardware serial number."""
 
     @abstractmethod
-    def set_target_temperature(self, celsius: float) -> None:
+    def set_target_temperature(self, celsius: float) -> AbstractTaskCore:
         """Set the Temperature Module's target temperature in °C."""
 
     @abstractmethod
@@ -161,9 +162,10 @@ class AbstractThermocyclerCore(
     def set_target_block_temperature(
         self,
         celsius: float,
+        ramp_rate: Optional[float],
         hold_time_seconds: Optional[float] = None,
         block_max_volume: Optional[float] = None,
-    ) -> None:
+    ) -> AbstractTaskCore:
         """Set the target temperature for the well block, in °C.
 
         Note:
@@ -183,7 +185,7 @@ class AbstractThermocyclerCore(
         """Wait for target block temperature to be reached."""
 
     @abstractmethod
-    def set_target_lid_temperature(self, celsius: float) -> None:
+    def set_target_lid_temperature(self, celsius: float) -> AbstractTaskCore:
         """Set the target temperature for the heated lid, in °C."""
 
     @abstractmethod
@@ -294,7 +296,7 @@ class AbstractHeaterShakerCore(
         """Get the module's unique hardware serial number."""
 
     @abstractmethod
-    def set_target_temperature(self, celsius: float) -> None:
+    def set_target_temperature(self, celsius: float) -> AbstractTaskCore:
         """Set the labware plate's target temperature in °C."""
 
     @abstractmethod

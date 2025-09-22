@@ -45,7 +45,6 @@ from opentrons.protocol_engine import (
     ModuleLocation,
     OnLabwareLocation,
     AddressableAreaLocation,
-    ModuleDefinition,
     LabwareMovementStrategy,
     LoadedLabware,
     LoadedModule,
@@ -76,6 +75,7 @@ from opentrons.protocol_api.core.engine import (
     LabwareCore,
     ModuleCore,
     load_labware_params,
+    _default_liquid_class_versions,
 )
 from opentrons.protocol_api._command_annotations import CommandAnnotationAggregator
 from opentrons.protocol_api._liquid import Liquid, LiquidClass
@@ -88,6 +88,7 @@ from opentrons.protocol_api.core.engine.module_core import (
     HeaterShakerModuleCore,
     NonConnectedModuleCore,
 )
+from opentrons.protocol_api.core.engine.tasks import EngineTaskCore
 from opentrons.protocol_api import validation, MAX_SUPPORTED_VERSION
 
 from opentrons.protocols.api_support.types import APIVersion
@@ -118,6 +119,17 @@ def patch_mock_load_labware_params(
     """Mock out load_labware_params.py functions."""
     for name, func in inspect.getmembers(load_labware_params, inspect.isfunction):
         monkeypatch.setattr(load_labware_params, name, decoy.mock(func=func))
+
+
+@pytest.fixture(autouse=True)
+def patch_default_liquid_class_versions(
+    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Mock out _default_liquid_class_versions.py functions."""
+    for name, func in inspect.getmembers(
+        _default_liquid_class_versions, inspect.isfunction
+    ):
+        monkeypatch.setattr(_default_liquid_class_versions, name, decoy.mock(func=func))
 
 
 @pytest.fixture(autouse=True)
@@ -1431,8 +1443,6 @@ def test_load_module(
     robot_type: RobotType,
 ) -> None:
     """It should issue a load module engine command."""
-    definition = ModuleDefinition.model_construct()  # type: ignore[call-arg]
-
     mock_hw_mod_1 = decoy.mock(cls=AbstractModule)
     mock_hw_mod_2 = decoy.mock(cls=AbstractModule)
 
@@ -1454,7 +1464,6 @@ def test_load_module(
     ).then_return(
         commands.LoadModuleResult(
             moduleId="abc123",
-            definition=definition,
             model=engine_model,
             serialNumber="xyz789",
         )
@@ -1503,8 +1512,6 @@ def test_load_mag_block(
     subject: ProtocolCore,
 ) -> None:
     """It should issue a load module engine command."""
-    definition = ModuleDefinition.model_construct()  # type: ignore[call-arg]
-
     decoy.when(mock_engine_client.state.config.robot_type).then_return("OT-3 Standard")
 
     decoy.when(
@@ -1517,7 +1524,6 @@ def test_load_mag_block(
     ).then_return(
         commands.LoadModuleResult(
             moduleId="abc123",
-            definition=definition,
             model=EngineModuleModel.MAGNETIC_BLOCK_V1,
             serialNumber=None,
         )
@@ -1583,8 +1589,6 @@ def test_load_module_thermocycler_with_no_location(
     expected_slot: DeckSlotName,
 ) -> None:
     """It should issue a load module engine command with location at 7."""
-    definition = ModuleDefinition.model_construct()  # type: ignore[call-arg]
-
     mock_hw_mod = decoy.mock(cls=AbstractModule)
     decoy.when(mock_hw_mod.device_info).then_return({"serial": "xyz789"})
     decoy.when(mock_sync_hardware_api.attached_modules).then_return([mock_hw_mod])
@@ -1600,7 +1604,6 @@ def test_load_module_thermocycler_with_no_location(
     ).then_return(
         commands.LoadModuleResult(
             moduleId="abc123",
-            definition=definition,
             model=engine_model,
             serialNumber="xyz789",
         )
@@ -1675,6 +1678,42 @@ def test_delay(
             cmd.WaitForDurationParams(seconds=seconds, message=message)
         )
     )
+
+
+def test_wait_for_tasks(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: ProtocolCore,
+) -> None:
+    """It should issue a waitForTasks command."""
+    task1 = decoy.mock(cls=EngineTaskCore)
+    task2 = decoy.mock(cls=EngineTaskCore)
+    tasks = [task1, task2]
+    task_ids = ["task-id-1", "task-id-2"]
+
+    decoy.when(task1._id).then_return(task_ids[0])
+    decoy.when(task2._id).then_return(task_ids[1])
+
+    subject.wait_for_tasks(task_cores=tasks)
+    decoy.verify(
+        mock_engine_client.execute_command(cmd.WaitForTasksParams(task_ids=task_ids))
+    )
+
+
+def test_create_timer(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: ProtocolCore,
+) -> None:
+    """It should issue a createTimer command."""
+    decoy.when(
+        mock_engine_client.execute_command_without_recovery(
+            cmd.CreateTimerParams(time=0.1)
+        )
+    ).then_return(cmd.CreateTimerResult(task_id="taskid", time=0.1))
+    result = subject.create_timer(seconds=0.1)
+    assert result._id == "taskid"
+    assert result._engine_client == mock_engine_client
 
 
 def test_comment(
@@ -1896,6 +1935,42 @@ def test_define_liquid_class(
         minimal_liquid_class_def2
     )
     assert subject.get_liquid_class("water", 123) == expected_liquid_class
+
+
+def test_define_liquid_class_without_version_provided(
+    decoy: Decoy,
+    subject: ProtocolCore,
+    minimal_liquid_class_def1: LiquidClassSchemaV1,
+    minimal_liquid_class_def2: LiquidClassSchemaV1,
+) -> None:
+    """It should create a LiquidClass with the most recent version and cache the definition."""
+    expected_liquid_class = LiquidClass(
+        _name="water1", _display_name="water 1", _by_pipette_setting={}
+    )
+    decoy.when(
+        _default_liquid_class_versions.get_liquid_class_version(
+            subject.api_version, "water"
+        )
+    ).then_return(987)
+    decoy.when(liquid_classes.load_definition("water", version=987)).then_return(
+        minimal_liquid_class_def1
+    )
+
+    assert subject.get_liquid_class("water", version=None) == expected_liquid_class
+
+    # Test that specified version number works too
+    decoy.when(liquid_classes.load_definition("water", version=654)).then_return(
+        minimal_liquid_class_def2
+    )
+    different_liquid_class = subject.get_liquid_class("water", 654)
+    assert different_liquid_class.name == "water2"
+    assert different_liquid_class.display_name == "water 2"
+
+    # Test that definition caching works
+    decoy.when(liquid_classes.load_definition("water", version=987)).then_return(
+        minimal_liquid_class_def2
+    )
+    assert subject.get_liquid_class("water", version=None) == expected_liquid_class
 
 
 def test_get_labware_location_deck_slot(

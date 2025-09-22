@@ -9,6 +9,7 @@ import {
   COLORS,
   ModalShell,
   useConditionalConfirm,
+  WizardHeader,
 } from '@opentrons/components'
 import {
   ApiHostProvider,
@@ -19,7 +20,6 @@ import { LEFT, NINETY_SIX_CHANNEL, RIGHT } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
-import { WizardHeader } from '/app/molecules/WizardHeader'
 import { getIsOnDevice } from '/app/redux/config'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import {
@@ -121,12 +121,33 @@ export const PipetteWizardFlows = (
     monitorMaintenanceRunForDeletion,
     setMonitorMaintenanceRunForDeletion,
   ] = useState<boolean>(false)
+  const isDetachPipettesAndAttach96ChFlow =
+    flowType === FLOWS.ATTACH &&
+    !isGantryEmpty &&
+    selectedPipette === NINETY_SIX_CHANNEL
 
   const goBack = (): void => {
-    setCurrentStepIndex(
-      currentStepIndex !== totalStepCount ? 0 : currentStepIndex
-    )
+    if (currentStepIndex !== totalStepCount) {
+      // The detach pipettes + attach 96ch flow is a compound flow that effectively
+      // has two "checkpoints". As a user passes a checkpoint, pressing "go back"
+      // should return to the most recent checkpoint.
+      if (isDetachPipettesAndAttach96ChFlow) {
+        if (currentStepIndex <= 2) {
+          setCurrentStepIndex(0)
+        } else {
+          const stepIdx =
+            pipetteWizardSteps?.findIndex(
+              step => step.section === SECTIONS.CARRIAGE
+            ) ?? 3 // Safe fallback that at least allows users to proceed.
+
+          setCurrentStepIndex(stepIdx)
+        }
+      } else {
+        setCurrentStepIndex(0)
+      }
+    }
   }
+
   const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
     refetchInterval: RUN_REFETCH_INTERVAL,
     enabled: createdMaintenanceRunId != null,
@@ -189,9 +210,12 @@ export const PipetteWizardFlows = (
       onComplete()
     }
     if (maintenanceRunData != null) {
-      deleteMaintenanceRun(maintenanceRunData?.data.id)
+      deleteMaintenanceRun(maintenanceRunData?.data.id, {
+        onSettled: closeFlow,
+      })
+    } else {
+      closeFlow()
     }
-    closeFlow()
   }
 
   const {

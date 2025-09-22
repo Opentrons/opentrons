@@ -65,12 +65,10 @@ const Labels = (props: {
             key={wellName}
             x={isLetterColumn ? firstWellXPosition : well.x}
             y={isLetterColumn ? well.y : firstWellYPosition}
-            style={{
-              fontSize: '0.2rem', // LEGACY --fs-micro
-              fontWeight: TYPOGRAPHY.fontWeightSemiBold,
-              textAnchor: 'middle',
-              dominantBaseline: isLetterColumn ? 'middle' : 'auto',
-            }}
+            fontSize="0.2rem" // LEGACY --fs-micro
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            textAnchor="middle"
+            dominantBaseline={isLetterColumn ? 'middle' : 'auto'}
             fill={
               highlightedWellLabels?.wells.includes(wellName) ?? false
                 ? highlightColor

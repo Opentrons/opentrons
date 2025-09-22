@@ -92,7 +92,7 @@ def default_fw_version() -> int:
 
 
 def default_revision() -> types.PCBARevision:
-    return types.PCBARevision("A1")
+    return types.PCBARevision("A1.0")
 
 
 def device_info_for(
@@ -984,8 +984,9 @@ async def test_update_process_fails_if_subsytem_does_not_appear_afterward(
     await tool_detection_controller.add_resolution(tool_struct, network_info_value)
 
     await subject.start()
+    subject._check_device_update_timeout = 0.5
     iteration = 0
-    with pytest.raises(RuntimeError):
+    with pytest.raises(RuntimeError, match="Device failed"):
         async for status in subject.update_firmware({SubSystem.gantry_x}):
             iteration += 1
             if iteration == 3:
@@ -1032,8 +1033,9 @@ async def test_update_process_fails_if_subsytem_is_not_ok_afterward(
     await tool_detection_controller.add_resolution(tool_struct, network_info_value)
 
     await subject.start()
+    subject._check_device_update_timeout = 0.5
     iteration = 0
-    with pytest.raises(RuntimeError):
+    with pytest.raises(RuntimeError, match="Device failed"):
         async for status in subject.update_firmware({SubSystem.gantry_x}):
             iteration += 1
             if iteration == 3:

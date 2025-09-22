@@ -311,6 +311,12 @@ export function useCommandTextString(
         commandText: utils.getRailLightsCommandText({ ...fullParams, command }),
       }
 
+    case 'setTipState':
+      return {
+        kind: 'generic',
+        commandText: utils.getTipStateCommandText({ ...fullParams, command }),
+      }
+
     case 'robot/moveTo':
     case 'robot/moveAxesTo':
     case 'robot/moveAxesRelative':
@@ -320,6 +326,13 @@ export function useCommandTextString(
         kind: 'generic',
         commandText: utils.getRobotCommandText({ ...fullParams, command }),
       }
+    case 'waitForTasks':
+    case 'createTimer': {
+      return {
+        kind: 'generic',
+        commandText: utils.getConcurrentCommandText({ ...fullParams, command }),
+      }
+    }
 
     case undefined:
     case null:

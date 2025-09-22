@@ -12,20 +12,21 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../assets/localization'
-import { OFFDECK } from '../../../../../constants'
-import { getEnableComment } from '../../../../../feature-flags/selectors'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { OFFDECK } from '/protocol-designer/constants'
+import { getEnableComment } from '/protocol-designer/feature-flags/selectors'
 import {
   getInitialRobotState,
   getRobotStateTimeline,
-} from '../../../../../file-data/selectors'
+} from '/protocol-designer/file-data/selectors'
 import {
   getCurrentFormIsPresaved,
   getInitialDeckSetup,
   getLabwareEntities,
-} from '../../../../../step-forms/selectors'
-import { getIsMultiSelectMode } from '../../../../../ui/steps'
+} from '/protocol-designer/step-forms/selectors'
+import { getIsMultiSelectMode } from '/protocol-designer/ui/steps'
+
 import { AddStepButton } from '../AddStepButton'
 
 import type { ComponentProps } from 'react'
@@ -35,10 +36,10 @@ import type {
 } from '@opentrons/shared-data'
 import type { LabwareEntity, RobotState } from '@opentrons/step-generation'
 
-vi.mock('../../../../../feature-flags/selectors')
-vi.mock('../../../../../file-data/selectors')
-vi.mock('../../../../../step-forms/selectors')
-vi.mock('../../../../../ui/steps')
+vi.mock('/protocol-designer/feature-flags/selectors')
+vi.mock('/protocol-designer/file-data/selectors')
+vi.mock('/protocol-designer/step-forms/selectors')
+vi.mock('/protocol-designer/ui/steps')
 
 const render = (props: ComponentProps<typeof AddStepButton>) => {
   return renderWithProviders(<AddStepButton {...props} />, {
@@ -46,6 +47,7 @@ const render = (props: ComponentProps<typeof AddStepButton>) => {
   })[0]
 }
 
+const MOCK_LID_ID = 'mockLidId'
 const MOCK_TIPRACK_ID = 'mockTiprackId'
 const MOCK_TUBERACK_ID = 'mockTuberackId'
 const MOCK_TIPRACK_ENTITY = {
@@ -54,6 +56,12 @@ const MOCK_TIPRACK_ENTITY = {
     parameters: {
       isTiprack: true,
     } as LabwareParameters,
+  } as LabwareDefinition2,
+} as LabwareEntity
+const MOCK_LID_ENTITY = {
+  id: MOCK_LID_ID,
+  def: {
+    allowedRoles: ['lid'],
   } as LabwareDefinition2,
 } as LabwareEntity
 const MOCK_TIPRACK_LABWARE = {
@@ -106,6 +114,7 @@ describe('AddStepButton', () => {
   beforeEach(() => {
     props = {
       hasText: true,
+      sidebarWidth: 10,
     }
     vi.mocked(getEnableComment).mockReturnValue(true)
     vi.mocked(getCurrentFormIsPresaved).mockReturnValue(false)
@@ -182,6 +191,22 @@ describe('AddStepButton', () => {
   it('should not render liquid handling steps if no compatible labware is present in entities', () => {
     vi.mocked(getLabwareEntities).mockReturnValue({
       [MOCK_TIPRACK_ID]: MOCK_TIPRACK_ENTITY,
+    })
+    render(props)
+    fireEvent.click(screen.getByText('Add Step'))
+    screen.getByText('Comment')
+    expect(screen.queryByText('Transfer')).not.toBeInTheDocument()
+    expect(screen.queryByText('Mix')).not.toBeInTheDocument()
+    screen.getByText('Pause')
+    screen.getByText('Thermocycler')
+    screen.getByText('Heater-Shaker')
+    screen.getByText('Temperature')
+    screen.getByText('Magnet')
+  })
+
+  it('should not render liquid handling steps if only labware has a lid on top in entities', () => {
+    vi.mocked(getLabwareEntities).mockReturnValue({
+      [MOCK_LID_ID]: MOCK_LID_ENTITY,
     })
     render(props)
     fireEvent.click(screen.getByText('Add Step'))

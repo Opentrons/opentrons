@@ -11,7 +11,7 @@ from ...errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state.state import StateView
-    from opentrons.protocol_engine.execution import EquipmentHandler
+    from opentrons.protocol_engine.execution import EquipmentHandler, TaskHandler
 
 
 SetTargetBlockTemperatureCommandType = Literal["thermocycler/setTargetBlockTemperature"]
@@ -39,6 +39,17 @@ class SetTargetBlockTemperatureParams(BaseModel):
         " the given hold time has elapsed.",
         json_schema_extra=_remove_default,
     )
+    ramp_rate: float | SkipJsonSchema[None] = Field(
+        None,
+        description="The rate in C°/second to change temperature from the current target."
+        " If unspecified, the Thermocycler will change temperature at the fastest possible rate.",
+        json_schema_extra=_remove_default,
+    )
+    taskId: str | SkipJsonSchema[None] = Field(
+        None,
+        description="Id for the background task that manages the temperature.",
+        json_schema_extra=_remove_default,
+    )
 
 
 class SetTargetBlockTemperatureResult(BaseModel):
@@ -47,6 +58,11 @@ class SetTargetBlockTemperatureResult(BaseModel):
     targetBlockTemperature: float = Field(
         ...,
         description="The target block temperature that was set after validation.",
+    )
+    taskId: str | SkipJsonSchema[None] = Field(
+        None,
+        description="The task id for the setTargetBlockTemperature",
+        json_schema_extra=_remove_default,
     )
 
 
@@ -62,10 +78,12 @@ class SetTargetBlockTemperatureImpl(
         self,
         state_view: StateView,
         equipment: EquipmentHandler,
+        task_handler: TaskHandler,
         **unused_dependencies: object,
     ) -> None:
         self._state_view = state_view
         self._equipment = equipment
+        self._task_handler = task_handler
 
     async def execute(
         self,
@@ -90,19 +108,35 @@ class SetTargetBlockTemperatureImpl(
             hold_time = thermocycler_state.validate_hold_time(params.holdTimeSeconds)
         else:
             hold_time = None
+        target_ramp_rate: Optional[float]
+        if params.ramp_rate is not None:
+            target_ramp_rate = thermocycler_state.validate_ramp_rate(
+                params.ramp_rate, target_temperature
+            )
+        else:
+            target_ramp_rate = None
 
         thermocycler_hardware = self._equipment.get_module_hardware_api(
             thermocycler_state.module_id
         )
 
-        if thermocycler_hardware is not None:
-            await thermocycler_hardware.set_target_block_temperature(
-                target_temperature, volume=target_volume, hold_time_seconds=hold_time
-            )
+        async def set_target_block_temperature(task_handler: TaskHandler) -> None:
+            if thermocycler_hardware is not None:
+                await thermocycler_hardware.set_target_block_temperature(
+                    target_temperature,
+                    volume=target_volume,
+                    hold_time_seconds=hold_time,
+                    ramp_rate=target_ramp_rate,
+                )
+                await thermocycler_hardware.wait_for_block_target()
+
+        task = await self._task_handler.create_task(
+            task_function=set_target_block_temperature, id=params.taskId
+        )
 
         return SuccessData(
             public=SetTargetBlockTemperatureResult(
-                targetBlockTemperature=target_temperature
+                targetBlockTemperature=target_temperature, taskId=task.id
             ),
         )
 

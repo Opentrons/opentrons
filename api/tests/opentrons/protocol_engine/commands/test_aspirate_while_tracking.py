@@ -161,6 +161,7 @@ async def test_aspirate_while_tracking_implementation(
             minimum_z_height=None,
             speed=None,
             operation_volume=-123,
+            offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_return(Point(x=4, y=5, z=6))
 
@@ -237,9 +238,7 @@ async def test_handle_aspirate_while_tracking_request_not_ready_to_aspirate(
     )
     with pytest.raises(
         PipetteNotReadyToAspirateError,
-        match="Pipette cannot aspirate while tracking because of a previous blow out."
-        " The first aspirate following a blow-out must be from a specific well"
-        " so the plunger can be reset in a known safe position.",
+        match="Pipette cannot aspirate while tracking because a previous",
     ):
         await subject.execute(params=data)
 
@@ -301,6 +300,7 @@ async def test_aspirate_raises_volume_error(
             minimum_z_height=None,
             speed=None,
             operation_volume=-50,
+            offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_return(Point(x=4, y=5, z=6))
 
@@ -405,6 +405,7 @@ async def test_overpressure_error(
             minimum_z_height=None,
             speed=None,
             operation_volume=-50,
+            offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_return(Point(x=4, y=5, z=6))
 

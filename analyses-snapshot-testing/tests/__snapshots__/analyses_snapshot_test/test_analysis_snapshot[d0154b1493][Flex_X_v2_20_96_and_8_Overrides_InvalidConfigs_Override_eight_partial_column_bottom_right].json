@@ -295,6 +295,11 @@
               "x": 0,
               "y": 0,
               "z": 121
+            },
+            "opentrons_flex_tiprack_lid": {
+              "x": 0,
+              "y": 0,
+              "z": 0.25
             }
           },
           "stackingOffsetWithModule": {},
@@ -1223,7 +1228,7 @@
             "errorInfo": {
               "args": "('G12',)",
               "class": "KeyError",
-              "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/hardware_control/nozzle_manager.py\", line N, in build\n    back_left_row_index, back_left_column_index = _row_col_indices_for_nozzle(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/hardware_control/nozzle_manager.py\", line N, in _row_col_indices_for_nozzle\n    return _row_or_col_index_for_nozzle(rows, nozzle), _row_or_col_index_for_nozzle(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/hardware_control/nozzle_manager.py\", line N, in _row_or_col_index_for_nozzle\n    raise KeyError(nozzle)\n"
+              "traceback": "  File \"<PATH>\", line N, in build\n    back_left_row_index, back_left_column_index = _row_col_indices_for_nozzle(\n\n  File \"<PATH>\", line N, in _row_col_indices_for_nozzle\n    return _row_or_col_index_for_nozzle(rows, nozzle), _row_or_col_index_for_nozzle(\n\n  File \"<PATH>\", line N, in _row_or_col_index_for_nozzle\n    raise KeyError(nozzle)\n"
             },
             "errorType": "PythonException",
             "id": "UUID",
@@ -1298,7 +1303,7 @@
                   "errorInfo": {
                     "args": "('G12',)",
                     "class": "KeyError",
-                    "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/hardware_control/nozzle_manager.py\", line N, in build\n    back_left_row_index, back_left_column_index = _row_col_indices_for_nozzle(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/hardware_control/nozzle_manager.py\", line N, in _row_col_indices_for_nozzle\n    return _row_or_col_index_for_nozzle(rows, nozzle), _row_or_col_index_for_nozzle(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/hardware_control/nozzle_manager.py\", line N, in _row_or_col_index_for_nozzle\n    raise KeyError(nozzle)\n"
+                    "traceback": "  File \"<PATH>\", line N, in build\n    back_left_row_index, back_left_column_index = _row_col_indices_for_nozzle(\n\n  File \"<PATH>\", line N, in _row_col_indices_for_nozzle\n    return _row_or_col_index_for_nozzle(rows, nozzle), _row_or_col_index_for_nozzle(\n\n  File \"<PATH>\", line N, in _row_or_col_index_for_nozzle\n    raise KeyError(nozzle)\n"
                   },
                   "errorType": "PythonException",
                   "id": "UUID",
@@ -1312,12 +1317,7 @@
       ]
     }
   ],
-  "files": [
-    {
-      "name": "Flex_X_v2_20_96_and_8_Overrides_InvalidConfigs_Override_eight_partial_column_bottom_right.py",
-      "role": "main"
-    }
-  ],
+  "files": [],
   "labware": [
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_1000ul/1",

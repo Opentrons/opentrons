@@ -1,7 +1,7 @@
 {
+  "close": "Close",
   "enablePDProtocolGeneration": "Enable Real PD Protocol Generation",
   "enablePrereleaseMode": "Enable Prerelease Mode",
-  "feature_flags_title": "Feature Flags",
-  "close": "Close",
-  "feature_flags_body": "Internal Feature Flags"
+  "feature_flags_body": "Internal Feature Flags",
+  "feature_flags_title": "Feature Flags"
 }

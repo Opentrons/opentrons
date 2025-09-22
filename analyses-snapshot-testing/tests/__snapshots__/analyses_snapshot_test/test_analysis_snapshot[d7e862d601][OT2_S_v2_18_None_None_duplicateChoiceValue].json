@@ -37,12 +37,7 @@
   },
   "createdAt": "TIMESTAMP",
   "errors": [],
-  "files": [
-    {
-      "name": "OT2_S_v2_18_None_None_duplicateChoiceValue.py",
-      "role": "main"
-    }
-  ],
+  "files": [],
   "labware": [],
   "liquidClasses": [],
   "liquids": [],

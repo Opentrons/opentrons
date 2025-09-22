@@ -1,4 +1,4 @@
-import { useReducer, useState } from 'react'
+import { useEffect, useReducer, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { useNavigate } from 'react-router-dom'
@@ -31,11 +31,13 @@ import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configurati
 import { Aspirate } from './Aspirate'
 import { Dispense } from './Dispense'
 import { Overview } from './Overview'
-import { QuickTransferAdvancedSettings } from './QuickTransferAdvancedSettings'
 import { quickTransferSummaryReducer } from './reducers'
 import { SaveOrRunModal } from './SaveOrRunModal'
-import { TipManagement } from './TipManagement'
-import { createQuickTransferFile, getInitialSummaryState } from './utils'
+import {
+  createQuickTransferFile,
+  getInitialSummaryState,
+  retrieveLiquidClassValues,
+} from './utils'
 import { createQuickTransferPythonFile } from './utils/createQuickTransferFile'
 
 import type { ComponentProps } from 'react'
@@ -58,14 +60,12 @@ export function SummaryAndSettings(
   const host = useHost()
   const { t } = useTranslation(['quick_transfer', 'shared'])
   const [showSaveOrRunModal, setShowSaveOrRunModal] = useState<boolean>(false)
-  const enableExportPython = useFeatureFlag('quickTransferExportPython')
-  const enableLiquidClassesForQT = useFeatureFlag(
-    'liquidClassesForQuickTransfer'
+  const enableExportJSON = useFeatureFlag('quickTransferExportJSON')
+  const enableProtocolContentsLog = useFeatureFlag(
+    'quickTransferProtocolContentsLog'
   )
 
-  const displayCategory: string[] = enableLiquidClassesForQT
-    ? ['overview', 'aspirate', 'dispense']
-    : ['overview', 'advanced_settings', 'tip_management']
+  const displayCategory: string[] = ['overview', 'aspirate', 'dispense']
 
   const [selectedCategory, setSelectedCategory] = useState<string>('overview')
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
@@ -95,6 +95,21 @@ export function SummaryAndSettings(
     host
   )
 
+  useEffect(() => {
+    if (!state.liquidClassValuesInitialized) {
+      const liquidClassValues = retrieveLiquidClassValues(state, 'all')
+      dispatch({
+        type: 'SET_LIQUID_CLASS_VALUES',
+        liquidClassValues: {
+          ...liquidClassValues,
+          liquidClassValuesInitialized: true,
+        },
+      })
+    }
+  })
+
+  const isMultiTransferDispense = state?.path === 'multiDispense'
+
   const handleClickCreateTransfer = (): void => {
     setShowSaveOrRunModal(true)
     const duration = new Date().getTime() - analyticsStartTime.getTime()
@@ -107,9 +122,19 @@ export function SummaryAndSettings(
   }
 
   const handleClickSave = (protocolName: string): void => {
-    const protocolFile = enableExportPython
-      ? createQuickTransferPythonFile(state, deckConfig, protocolName)
-      : createQuickTransferFile(state, deckConfig, protocolName)
+    const protocolFile = enableExportJSON
+      ? createQuickTransferFile(
+          state,
+          deckConfig,
+          protocolName,
+          enableProtocolContentsLog
+        )
+      : createQuickTransferPythonFile(
+          state,
+          deckConfig,
+          protocolName,
+          enableProtocolContentsLog
+        )
 
     createProtocolAsync({
       files: [protocolFile],
@@ -126,9 +151,19 @@ export function SummaryAndSettings(
   }
 
   const handleClickRun = (): void => {
-    const protocolFile = enableExportPython
-      ? createQuickTransferPythonFile(state, deckConfig)
-      : createQuickTransferFile(state, deckConfig)
+    const protocolFile = enableExportJSON
+      ? createQuickTransferFile(
+          state,
+          deckConfig,
+          undefined,
+          enableProtocolContentsLog
+        )
+      : createQuickTransferPythonFile(
+          state,
+          deckConfig,
+          undefined,
+          enableProtocolContentsLog
+        )
 
     createProtocolAsync({
       files: [protocolFile],
@@ -156,7 +191,7 @@ export function SummaryAndSettings(
       />
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        padding={`${SPACING.spacing16} ${SPACING.spacing40} ${SPACING.spacing40} ${SPACING.spacing40}`} // TODO Ian 2023-05-02: remove this padding
+        padding={`${SPACING.spacing16} ${SPACING.spacing40} ${SPACING.spacing40} ${SPACING.spacing40}`}
         width="100%"
       >
         <Flex
@@ -178,28 +213,22 @@ export function SummaryAndSettings(
           />
         </Flex>
         {selectedCategory === 'overview' ? <Overview state={state} /> : null}
-        {enableLiquidClassesForQT ? (
-          <>
-            {selectedCategory === 'aspirate' ? (
-              <Aspirate state={state} dispatch={dispatch} />
-            ) : null}
-            {selectedCategory === 'dispense' ? (
-              <Dispense state={state} dispatch={dispatch} />
-            ) : null}
-          </>
-        ) : (
-          <>
-            {selectedCategory === 'advanced_settings' ? (
-              <QuickTransferAdvancedSettings
-                state={state}
-                dispatch={dispatch}
-              />
-            ) : null}
-            {selectedCategory === 'tip_management' ? (
-              <TipManagement state={state} dispatch={dispatch} />
-            ) : null}
-          </>
-        )}
+        <>
+          {selectedCategory === 'aspirate' ? (
+            <Aspirate
+              state={state}
+              dispatch={dispatch}
+              isMultiTransfer={isMultiTransferDispense}
+            />
+          ) : null}
+          {selectedCategory === 'dispense' ? (
+            <Dispense
+              state={state}
+              dispatch={dispatch}
+              isMultiTransfer={isMultiTransferDispense}
+            />
+          ) : null}
+        </>
       </Flex>
     </Flex>
   )

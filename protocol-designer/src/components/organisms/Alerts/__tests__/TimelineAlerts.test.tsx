@@ -4,14 +4,15 @@ import '@testing-library/jest-dom/vitest'
 
 import { fireEvent, screen } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
-import { getRobotStateTimeline } from '../../../../file-data/selectors'
-import { selectTerminalItem } from '../../../../ui/steps/actions/actions'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { getRobotStateTimeline } from '/protocol-designer/file-data/selectors'
+import { selectTerminalItem } from '/protocol-designer/ui/steps/actions/actions'
+
 import { TimelineAlerts } from '../TimelineAlerts'
 
-vi.mock('../../../../file-data/selectors')
-vi.mock('../../../../ui/steps/actions/actions')
+vi.mock('/protocol-designer/file-data/selectors')
+vi.mock('/protocol-designer/ui/steps/actions/actions')
 
 const render = () => {
   return renderWithProviders(<TimelineAlerts />, {

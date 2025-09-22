@@ -35,8 +35,12 @@ from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.module_substates.absorbance_reader_substate import (
     AbsorbanceReaderMeasureMode,
 )
-from opentrons.types import DeckSlotName, MountType, StagingSlotName
-from .update_types import AbsorbanceReaderStateUpdate, FlexStackerStateUpdate
+from opentrons.types import DeckSlotName, MountType, Point, StagingSlotName
+from .update_types import (
+    AbsorbanceReaderStateUpdate,
+    FlexStackerStateUpdate,
+    LoadModuleUpdate,
+)
 from ..errors import ModuleNotConnectedError, AreaNotInDeckConfigurationError
 from ..resources import deck_configuration_provider
 
@@ -49,11 +53,9 @@ from ..types import (
     ModuleDefinition,
     DeckSlotLocation,
     ModuleDimensions,
-    LabwareOffsetVector,
     HeaterShakerLatchStatus,
     HeaterShakerMovementRestrictors,
     DeckType,
-    LabwareMovementOffsetData,
     AddressableAreaLocation,
     StackerStoredLabwareGroup,
 )
@@ -63,7 +65,6 @@ from .addressable_areas import AddressableAreaView
 from .. import errors
 from ..commands import (
     Command,
-    LoadModuleResult,
     heater_shaker,
     temperature_module,
     thermocycler,
@@ -137,6 +138,8 @@ _OT2_THERMOCYCLER_ADDITIONAL_SLOTS = [
     DeckSlotName.SLOT_11,
 ]
 _OT3_THERMOCYCLER_ADDITIONAL_SLOTS = [DeckSlotName.SLOT_A1]
+
+_COLUMN_4_MODULES = [ModuleModel.FLEX_STACKER_MODULE_V1]
 
 
 @dataclass(frozen=True)
@@ -237,8 +240,8 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         elif isinstance(action, AddModuleAction):
             self._add_module_substate(
                 module_id=action.module_id,
-                serial_number=action.serial_number,
                 definition=action.definition,
+                serial_number=action.serial_number,
                 slot_name=None,
                 requested_model=None,
                 module_live_data=action.module_live_data,
@@ -250,17 +253,6 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
     def _handle_command(self, command: Command) -> None:
         # todo(mm, 2024-11-04): Delete this function. Port these isinstance()
         # checks to the update_types.StateUpdate mechanism.
-
-        if isinstance(command.result, LoadModuleResult):
-            slot_name = command.params.location.slotName
-            self._add_module_substate(
-                module_id=command.result.moduleId,
-                serial_number=command.result.serialNumber,
-                definition=command.result.definition,
-                slot_name=slot_name,
-                requested_model=command.params.model,
-                module_live_data=None,
-            )
 
         if isinstance(command.result, CalibrateModuleResult):
             self._update_module_calibration(
@@ -305,6 +297,9 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             self._handle_thermocycler_module_commands(command)
 
     def _handle_state_update(self, state_update: update_types.StateUpdate) -> None:
+        if state_update.loaded_module != update_types.NO_CHANGE:
+            self._handle_load_module(state_update.loaded_module)
+
         if state_update.absorbance_reader_state_update != update_types.NO_CHANGE:
             self._handle_absorbance_reader_commands(
                 state_update.absorbance_reader_state_update
@@ -579,6 +574,16 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 target_block_temperature=block_temperature,
                 target_lid_temperature=lid_temperature,
             )
+
+    def _handle_load_module(self, load_module_state_update: LoadModuleUpdate) -> None:
+        self._add_module_substate(
+            module_id=load_module_state_update.module_id,
+            definition=load_module_state_update.definition,
+            serial_number=load_module_state_update.serial_number,
+            slot_name=load_module_state_update.slot_name,
+            requested_model=load_module_state_update.requested_model,
+            module_live_data=None,
+        )
 
     def _handle_absorbance_reader_commands(
         self, absorbance_reader_state_update: AbsorbanceReaderStateUpdate
@@ -927,7 +932,7 @@ class ModuleView:
         # addressable area info, can we do that computation in GeometryView instead of
         # here?
         addressable_areas: AddressableAreaView,
-    ) -> LabwareOffsetVector:
+    ) -> Point:
         """Get the nominal offset from a module's location to its child labware's location.
 
         Includes the slot-specific transform. Does not include the child's
@@ -941,17 +946,13 @@ class ModuleView:
                     module_addressable_area
                 )
             )
-            return base + LabwareOffsetVector(
-                x=module_addressable_area_position.x,
-                y=module_addressable_area_position.y,
-                z=module_addressable_area_position.z,
-            )
+            return base + module_addressable_area_position
         else:
             return base
 
     def get_nominal_offset_to_child_from_addressable_area(
         self, module_id: str
-    ) -> LabwareOffsetVector:
+    ) -> Point:
         """Get the position offset for a child of this module from the nearest AA.
 
         On the Flex, this is always (0, 0, 0); on the OT-2, since modules load on top
@@ -960,11 +961,7 @@ class ModuleView:
         slotTransform if appropriate.
         """
         if self.get_deck_supports_module_fixtures():
-            return LabwareOffsetVector(
-                x=0,
-                y=0,
-                z=0,
-            )
+            return Point(0, 0, 0)
         else:
             definition = self.get_definition(module_id)
             slot = self.get_location(module_id).slotName.id
@@ -995,7 +992,7 @@ class ModuleView:
             # Apply the slot transform, if any
             xform: NDArray[npdouble] = array(xforms_ser_offset)
             xformed = dot(xform, pre_transform)
-            return LabwareOffsetVector(
+            return Point(
                 x=xformed[0],
                 y=xformed[1],
                 z=xformed[2],
@@ -1263,7 +1260,22 @@ class ModuleView:
             if existing_def.model == model or model in existing_def.compatibleWith:
                 return existing_mod_in_slot
 
-            else:
+            # FIXME(sfoster): This is a bad hack. This code should check that these can coexist
+            # through some data-driven means. Or this code should, in fact, not exist at all,
+            # since it's probably for setup commands that we don't use anymore, and doesn't
+            # check serial numbers and therefore would fail if there was mroe than one of
+            # a given module loaded across the deck and the one in this location was not the
+            # one that was being requested.
+            elif not (
+                (
+                    ModuleModel.is_flex_stacker(existing_def.model)
+                    and ModuleModel.is_magnetic_block(model)
+                )
+                or (
+                    ModuleModel.is_magnetic_block(existing_def.model)
+                    and ModuleModel.is_flex_stacker(model)
+                )
+            ):
                 _err = f" present in {location}"
                 raise errors.ModuleAlreadyPresentError(
                     f"A {existing_def.model.value} is already" + _err
@@ -1308,17 +1320,20 @@ class ModuleView:
     ) -> None:
         """Raise if the given location has a module in it."""
         for module in self.get_all():
+            if module.model in _COLUMN_4_MODULES and module.location == location:
+                raise errors.LocationIsOccupiedError(
+                    f"Module {module.model} is already present at {location.slotName.value[:1]}4."
+                )
             if module.location == location:
                 raise errors.LocationIsOccupiedError(
                     f"Module {module.model} is already present at {location}."
                 )
 
-    def get_default_gripper_offsets(
-        self, module_id: str
-    ) -> Optional[LabwareMovementOffsetData]:
-        """Get the deck's default gripper offsets."""
-        offsets = self.get_definition(module_id).gripperOffsets
-        return offsets.get("default") if offsets else None
+    def is_column_4_module(self, model: ModuleModel) -> bool:
+        """Determine whether or not a module is a Column 4 Module."""
+        if model in _COLUMN_4_MODULES:
+            return True
+        return False
 
     def get_overflowed_module_in_slot(
         self, slot_name: DeckSlotName
@@ -1496,3 +1511,24 @@ class ModuleView:
                 f"Provided overlap offset {overlap_offset} does not match "
                 f"configured {configured}."
             )
+
+    def get_has_module_probably_matching_hardware_details(
+        self, module_model: ModuleModel, module_serial: str | None
+    ) -> bool:
+        """Get the ID of a model that possibly matches the provided details.
+
+        If the provided serial is not None, return True if there is a module with the same serial or
+        False if there is not.
+        If the provided serial is None, return True if there is a module with the same model or False if
+        there is not.
+
+        This is intended to provide a good probability that a module matching the provided details
+        is or is not present in the state store. It is used to drive whether the engine cancels a protocol
+        in response to an asynchronous module error or not.
+        """
+        for module_id, module in self._state.hardware_by_module_id.items():
+            if module_serial is not None and module_serial == module.serial_number:
+                return True
+            if module_serial is None and module.definition.model == module_model:
+                return True
+        return False

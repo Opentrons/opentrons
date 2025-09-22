@@ -28,7 +28,7 @@ describe('AltPrimaryButton', () => {
     const button = screen.getByText('alt primary button')
     expect(button).toHaveStyle(`background-color: ${COLORS.grey30}`)
     expect(button).toHaveStyle(
-      `padding: ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16}`
+      `padding: ${SPACING.spacing8} ${SPACING.spacing16}`
     )
     expect(button).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSizeH3}`)
     expect(button).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`)

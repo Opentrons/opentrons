@@ -86,6 +86,7 @@ class Location(BaseModel):
 class ProfileStep(BaseModel):
     celsius: float
     holdSeconds: float
+    rampRate: float
 
 
 class WellLocation(BaseModel):

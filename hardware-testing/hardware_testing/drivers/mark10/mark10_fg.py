@@ -1,7 +1,7 @@
 """Mark10 Force Gauge Driver."""
 from serial import Serial  # type: ignore[import]
 from abc import ABC, abstractmethod
-from time import time
+from time import monotonic
 from typing import Tuple
 
 
@@ -96,8 +96,8 @@ class Mark10(Mark10Base):
     def read_force(self, timeout: float = 1.0) -> float:
         """Get Force in Newtons."""
         self._force_guage.write("?\r\n".encode("utf-8"))
-        start_time = time()
-        while time() < start_time + timeout:
+        start_time = monotonic()
+        while monotonic() < start_time + timeout:
             # return "12.3 N"
             line = self._force_guage.readline().decode("utf-8").strip()
             try:

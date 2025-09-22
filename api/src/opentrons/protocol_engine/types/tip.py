@@ -1,6 +1,7 @@
 """Protocol Engine types to deal with tips."""
 
 from dataclasses import dataclass
+from enum import Enum
 
 
 @dataclass(frozen=True)
@@ -16,3 +17,11 @@ class TipGeometry:
     length: float
     diameter: float
     volume: float
+
+
+class TipRackWellState(Enum):
+    """The state of a single tip in a tip rack's well."""
+
+    CLEAN = "clean"
+    USED = "used"
+    EMPTY = "empty"

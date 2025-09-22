@@ -332,7 +332,7 @@ describe('ProtocolRunSetup', () => {
       expect(screen.getAllByText('Instruments attached').length).toEqual(1)
     })
 
-    it('renders calibration needed if robot is Flex and modules are not calibrated', () => {
+    it('renders action needed if modules need to be calibrated, homed, etc.', () => {
       when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
       when(vi.mocked(useModuleCalibrationStatus))
         .calledWith(ROBOT_NAME, RUN_ID)
@@ -340,7 +340,7 @@ describe('ProtocolRunSetup', () => {
 
       render()
       screen.getByText('Deck Hardware')
-      screen.getByText('Calibration needed')
+      screen.getByText('Action needed')
     })
 
     it('does not render calibration element if robot is OT-2', () => {
@@ -376,7 +376,6 @@ describe('ProtocolRunSetup', () => {
           compatibleCutoutFixtureIds: [
             STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
           ],
-          missingLabwareDisplayName: null,
         },
       ])
       vi.mocked(getRequiredDeckConfig).mockReturnValue([

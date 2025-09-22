@@ -81,8 +81,8 @@ export function SelectTipDropLocation({
       <Flex
         marginTop={SPACING.spacing120}
         flexDirection={DIRECTION_COLUMN}
-        padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
-        gridGap={SPACING.spacing4}
+        padding={`${SPACING.spacing32} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
+        gridGap={SPACING.spacing8}
         width="100%"
       >
         {tipDropLocationOptions.map(option => (

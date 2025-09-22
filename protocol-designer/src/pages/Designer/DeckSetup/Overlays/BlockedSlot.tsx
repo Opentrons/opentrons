@@ -16,7 +16,8 @@ import {
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 
-import { getAdditionalEquipmentEntities } from '../../../../step-forms/selectors'
+import { getAdditionalEquipmentEntities } from '/protocol-designer/step-forms/selectors'
+
 import { SlotOverlay } from './SlotOverlay'
 
 import type { CoordinateTuple, DeckSlotId } from '@opentrons/shared-data'

@@ -7,12 +7,18 @@ import pytest
 from decoy import Decoy, matchers
 
 from opentrons_shared_data.robot.types import RobotType
+from opentrons_shared_data.errors.exceptions import ModuleCommunicationError
 
 from opentrons.protocol_engine.error_recovery_policy import never_recover
 from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
 from opentrons.types import DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI, API
-from opentrons.hardware_control.types import EstopStateNotification, EstopState
+from opentrons.hardware_control.types import (
+    EstopStateNotification,
+    EstopState,
+    AsynchronousModuleErrorNotification,
+)
+from opentrons.hardware_control.modules.types import TemperatureModuleModel
 from opentrons.protocol_engine import (
     StateSummary,
     types as pe_types,
@@ -25,7 +31,7 @@ from robot_server.runs.run_orchestrator_store import (
     RunOrchestratorStore,
     RunConflictError,
     NoRunOrchestrator,
-    handle_estop_event,
+    handle_hardware_event,
 )
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.protocols.protocol_models import ProtocolKind
@@ -215,7 +221,12 @@ async def test_clear_engine(subject: RunOrchestratorStore) -> None:
         notify_publishers=mock_notify_publishers,
     )
     assert subject._run_orchestrator is not None
+    engine = subject._run_orchestrator._protocol_engine
+    engine.state_view.state.commands.command_history._queued_command_ids.add("1231")
     result = await subject.clear()
+    assert (
+        len(engine.state_view.state.commands.command_history._queued_command_ids) == 0
+    )
 
     assert subject.current_run_id is None
     assert isinstance(result, RunResult)
@@ -360,7 +371,7 @@ async def test_estop_callback(
     )
 
     decoy.when(run_orchestrator_store.current_run_id).then_return(None)
-    await handle_estop_event(run_orchestrator_store, disengage_event)
+    await handle_hardware_event(run_orchestrator_store, disengage_event)
     assert run_orchestrator_store.run_orchestrator is not None
     decoy.verify(
         run_orchestrator_store.run_orchestrator.estop(),
@@ -374,7 +385,7 @@ async def test_estop_callback(
     )
 
     decoy.when(run_orchestrator_store.current_run_id).then_return("fake-run-id")
-    await handle_estop_event(run_orchestrator_store, engage_event)
+    await handle_hardware_event(run_orchestrator_store, engage_event)
     assert run_orchestrator_store._run_orchestrator is not None
     decoy.verify(
         run_orchestrator_store.run_orchestrator.estop(),
@@ -382,4 +393,86 @@ async def test_estop_callback(
             error=matchers.IsA(EStopActivatedError)
         ),
         times=1,
+    )
+
+
+async def test_async_module_callback_noops_with_no_engine(decoy: Decoy) -> None:
+    """It should noop without a run."""
+    run_orchestrator_store = decoy.mock(cls=RunOrchestratorStore)
+
+    exc = ModuleCommunicationError()
+    error_event = AsynchronousModuleErrorNotification(
+        exception=exc,
+        module_serial="some-serial",
+        module_model=TemperatureModuleModel.TEMPERATURE_V2,
+        port="some-port",
+    )
+
+    decoy.when(run_orchestrator_store.current_run_id).then_return(None)
+    await handle_hardware_event(run_orchestrator_store, error_event)
+    assert run_orchestrator_store.run_orchestrator is not None
+    decoy.verify(
+        await run_orchestrator_store.run_orchestrator.asynchronous_module_error(
+            module_model=matchers.Anything(), module_serial=matchers.Anything()
+        ),
+        times=0,
+    )
+    decoy.verify(
+        await run_orchestrator_store.finish(error=None),
+        ignore_extra_args=True,
+        times=0,
+    )
+
+
+async def test_async_module_callback_noops_if_engine_says_no(decoy: Decoy) -> None:
+    """It shouldn't finish if the engine doesn't want it to."""
+    run_orchestrator_store = decoy.mock(cls=RunOrchestratorStore)
+
+    exc = ModuleCommunicationError()
+    error_event = AsynchronousModuleErrorNotification(
+        exception=exc,
+        module_serial="some-serial",
+        module_model=TemperatureModuleModel.TEMPERATURE_V2,
+        port="some-port",
+    )
+
+    decoy.when(run_orchestrator_store.current_run_id).then_return("fake-run-id")
+    decoy.when(
+        await run_orchestrator_store.run_orchestrator.asynchronous_module_error(
+            module_model=TemperatureModuleModel.TEMPERATURE_V2,
+            module_serial="some-serial",
+        )
+    ).then_return(False)
+    await handle_hardware_event(run_orchestrator_store, error_event)
+    assert run_orchestrator_store._run_orchestrator is not None
+    decoy.verify(
+        await run_orchestrator_store.run_orchestrator.finish(error=None),
+        ignore_extra_args=True,
+        times=0,
+    )
+
+
+async def test_async_module_callback_finishes_if_engine_says_so(decoy: Decoy) -> None:
+    """It should finish with the error if the engine says it should."""
+    run_orchestrator_store = decoy.mock(cls=RunOrchestratorStore)
+
+    exc = ModuleCommunicationError()
+    error_event = AsynchronousModuleErrorNotification(
+        exception=exc,
+        module_serial="some-serial",
+        module_model=TemperatureModuleModel.TEMPERATURE_V2,
+        port="some-port",
+    )
+    decoy.when(run_orchestrator_store.current_run_id).then_return("fake-run-id")
+
+    decoy.when(
+        await run_orchestrator_store.run_orchestrator.asynchronous_module_error(
+            module_model=TemperatureModuleModel.TEMPERATURE_V2,
+            module_serial="some-serial",
+        )
+    ).then_return(True)
+    await handle_hardware_event(run_orchestrator_store, error_event)
+    assert run_orchestrator_store._run_orchestrator is not None
+    decoy.verify(
+        await run_orchestrator_store.run_orchestrator.finish(error=exc),
     )

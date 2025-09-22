@@ -8,14 +8,14 @@
   --link-btn: {
     display: block;
     width: 100%;
-    margin: 1.5rem 0 0.5rem;
     padding: 1rem;
     border-radius: 3px;
+    margin: 1.5rem 0 0.5rem;
+    cursor: pointer;
+    font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
     font-size: var(--fs-body-2);
     text-align: center;
-    font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
     text-transform: uppercase;
-    cursor: pointer;
   }
 }
 
@@ -27,22 +27,22 @@
 }
 
 .top_bar {
+  padding: var(--spacing-2);
+  background-color: var(--c-lightest-gray);
+  color: var(--c-font-dark); /* from legacy --font-body-2-dark */
   font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
   font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
-  color: var(--c-font-dark); /* from legacy --font-body-2-dark */
-  padding: var(--spacing-2);
   line-height: var(--lh-copy);
   text-align: right;
-  background-color: var(--c-lightest-gray);
 }
 
 .title {
   display: flex;
   align-items: center;
-  margin-bottom: var(--spacing-3);
   padding: var(--spacing-3) var(--spacing-5);
-  color: var(--c-blue);
+  margin-bottom: var(--spacing-3);
   background-color: var(--c-white);
+  color: var(--c-blue);
 
   &:hover {
     background-color: var(--c-light-gray);
@@ -51,27 +51,27 @@
 
 .title_text {
   display: block;
-  line-height: var(--lh-title);
-  font-size: var(--fs-default);
-  font-weight: var(--fw-semibold);
-  max-height: calc(2 * (var(--lh-title) * var(--fs-default)));
-  overflow: hidden;
-  word-wrap: break-word;
-  text-overflow: ellipsis;
-  min-width: 0;
 
   /*
    * non-standard, but works on all webkit browsers, Edge, and Firefox >= 68
    * it turns out CSS ellipses for multiline blocks are hard
    */
   display: -webkit-box; /* stylelint-disable-line declaration-block-no-duplicate-properties, value-no-vendor-prefix */
-  -webkit-line-clamp: 2; /* stylelint-disable-line value-no-vendor-prefix */
+  overflow: hidden;
+  min-width: 0;
+  max-height: calc(2 * (var(--lh-title) * var(--fs-default)));
   -webkit-box-orient: vertical; /* stylelint-disable-line property-no-vendor-prefix */
+  font-size: var(--fs-default);
+  font-weight: var(--fw-semibold);
+  -webkit-line-clamp: 2; /* stylelint-disable-line value-no-vendor-prefix */
+  line-height: var(--lh-title);
+  text-overflow: ellipsis;
+  word-wrap: break-word;
 }
 
 .title_icon {
-  flex: none;
   height: 1.5rem;
+  flex: none;
 }
 
 .card_contents {
@@ -88,30 +88,30 @@
   display: flex;
 
   /* from legacy --flex-between */
-  justify-content: space-between;
+  align-items: center;
 
   /* from legacy --flex-between */
-  align-items: center;
+  justify-content: space-between;
 
   /* from legacy --flex-between */
 }
 
 .well_group_properties {
-  margin-top: var(--spacing-5);
   padding: var(--spacing-5);
   border: var(--bd-light);
+  margin-top: var(--spacing-5);
 }
 
 .custom_labware_card {
   display: block;
   width: 100%;
-  margin: 0 auto var(--spacing-7) auto;
   padding: var(--spacing-5);
+  margin: 0 auto var(--spacing-7) auto;
 }
 
 .custom_labware_text {
-  font-size: var(--fs-header);
   color: var(--c-blue);
+  font-size: var(--fs-header);
   font-weight: var(--fw-semibold);
 }
 
@@ -119,16 +119,16 @@
   /* from legacy --linkb-tn */
   display: block;
   width: 100%;
-  margin: 1.5rem 0 0.5rem;
   padding: 1rem;
   border-radius: 3px;
-  font-size: var(--fs-body-2);
-  text-align: center;
-  font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
-  text-transform: uppercase;
-  cursor: pointer;
+  margin: 1.5rem 0 0.5rem;
   background-color: var(--c-blue);
   color: white;
+  cursor: pointer;
+  font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
+  font-size: var(--fs-body-2);
+  text-align: center;
+  text-transform: uppercase;
 
   &:visited {
     color: white;
@@ -144,16 +144,16 @@
   /* from legacy --linkb-tn */
   display: block;
   width: 100%;
-  margin: 1.5rem 0 0.5rem;
   padding: 1rem;
+  border: 1px solid var(--c-blue);
   border-radius: 3px;
+  margin: 1.5rem 0 0.5rem;
+  color: var(--c-blue);
+  cursor: pointer;
+  font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
   font-size: var(--fs-body-2);
   text-align: center;
-  font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
   text-transform: uppercase;
-  cursor: pointer;
-  border: 1px solid var(--c-blue);
-  color: var(--c-blue);
 
   &:visited {
     color: var(--c-blue);
@@ -188,10 +188,10 @@
   .card,
   .custom_labware_card {
     display: inline-block;
-    vertical-align: top;
     width: calc(50% - 0.5 * var(--spacing-7));
     margin-right: var(--spacing-7);
     margin-bottom: var(--spacing-7);
+    vertical-align: top;
 
     &:nth-child(even) {
       margin-right: 0;

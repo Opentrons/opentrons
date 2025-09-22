@@ -13,17 +13,6 @@ import {
 import { DeckSetup } from '../DeckSetup'
 
 import type { ComponentProps } from 'react'
-import type { getDeckDefinitions } from '@opentrons/shared-data'
-
-vi.mock('/app/assets/labware/getLabware')
-vi.mock('@opentrons/shared-data', async importOriginal => {
-  const actual = await importOriginal<typeof getDeckDefinitions>()
-  return {
-    ...actual,
-    getDeckDefinitions: () => vi.fn(),
-  }
-})
-vi.mock('@opentrons/components/src/hardware-sim/Deck/RobotWorkSpace')
 
 describe('DeckSetup', () => {
   const mockSendCommands = vi.fn()

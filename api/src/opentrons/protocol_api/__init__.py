@@ -1,9 +1,10 @@
-""" protocol_api: The user-facing API for OT2 protocols.
+"""protocol_api: The user-facing API for Opentrons OT-2 and Opentrons Flex protocols.
 
-This package defines classes and functions for access through a protocol to
-control the OT2.
+This package defines classes and functions for Python protocols to
+control an OT-2 or Flex robot.
 
 """
+
 from opentrons.protocols.api_support.definitions import (
     MAX_SUPPORTED_VERSION,
     MIN_SUPPORTED_VERSION,
@@ -13,7 +14,7 @@ from opentrons.protocols.parameters.exceptions import (
     RuntimeParameterRequired as RuntimeParameterRequiredError,
 )
 from opentrons.protocols.parameters.csv_parameter_interface import CSVParameter
-
+from .tasks import Task
 from .protocol_context import ProtocolContext
 from .deck import Deck
 from .robot_context import RobotContext
@@ -32,6 +33,7 @@ from .module_contexts import (
 from .disposal_locations import TrashBin, WasteChute
 from ._liquid import Liquid, LiquidClass
 from ._types import (
+    OffDeckType,
     OFF_DECK,
     PLUNGER_BLOWOUT,
     PLUNGER_TOP,
@@ -87,6 +89,7 @@ __all__ = [
     "ROW",
     "ALL",
     # Deck location types
+    "OffDeckType",
     "OFF_DECK",
     # Pipette plunger types
     "PLUNGER_BLOWOUT",
@@ -98,6 +101,8 @@ __all__ = [
     "BLOWOUT_ACTION",
     "RuntimeParameterRequiredError",
     "CSVParameter",
+    # Concurrent task types
+    "Task",
     # For internal Opentrons use only:
     "create_protocol_context",
     "ProtocolEngineCoreRequiredError",

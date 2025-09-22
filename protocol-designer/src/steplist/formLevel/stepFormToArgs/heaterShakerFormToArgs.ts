@@ -26,9 +26,10 @@ export const heaterShakerFormToArgs = (
     setShake ? !Number.isNaN(targetSpeed) : true,
     'heaterShakerFormToArgs expected targeShake to be a number when setShake is true'
   )
-  const { minutes, seconds } = getTimeFromForm(formData.heaterShakerTimer)
-
-  const isNullTime = minutes === 0 && seconds === 0
+  const { hours, minutes, seconds } = getTimeFromForm(
+    formData.heaterShakerTimer
+  )
+  const isNullTime = hours === 0 && minutes === 0 && seconds === 0
 
   const targetTemperature =
     setHeaterShakerTemperature && targetHeaterShakerTemperature != null
@@ -45,6 +46,7 @@ export const heaterShakerFormToArgs = (
     targetTemperature: targetTemperature,
     rpm: targetShake,
     latchOpen: latchOpen,
+    timerHours: isNullTime ? null : hours,
     timerMinutes: isNullTime ? null : minutes,
     timerSeconds: isNullTime ? null : seconds,
   }

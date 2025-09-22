@@ -4,7 +4,8 @@ import { getLabwareLocation } from '@opentrons/components'
 import {
   fixture96Plate,
   getLoadedLabwareDefinitionsByUri,
-  getModuleDef2,
+  getModuleDef,
+  getModuleType,
   getPositionFromSlotId,
   TEMPERATURE_MODULE_V2,
 } from '@opentrons/shared-data'
@@ -22,7 +23,7 @@ import {
   updateLabwareInModules,
 } from '../useDeckMapUtils'
 
-import type { LabwareDefinition } from '@opentrons/shared-data'
+import type { LabwareDefinition, ModuleModel } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actual = await importOriginal<typeof getLoadedLabwareDefinitionsByUri>()
@@ -30,7 +31,8 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
     ...actual,
     getLoadedLabwareDefinitionsByUri: vi.fn(),
     getPositionFromSlotId: vi.fn(),
-    getModuleDef2: vi.fn(),
+    getModuleDef: vi.fn(),
+    getModuleType: vi.fn(),
   }
 })
 vi.mock('@opentrons/components')
@@ -59,7 +61,7 @@ describe('getRunCurrentModulesOnDeck', () => {
   ]
 
   beforeEach(() => {
-    vi.mocked(getModuleDef2).mockReturnValue({ model: 'MOCK_MODEL' } as any)
+    vi.mocked(getModuleDef).mockReturnValue({ model: 'MOCK_MODEL' } as any)
     vi.mocked(getLabwareLocation).mockReturnValue({ slotName: 'A1' })
   })
 
@@ -83,7 +85,7 @@ describe('getRunCurrentModulesOnDeck', () => {
         moduleModel: 'MOCK_MODEL',
         moduleLocation: { slotName: 'A1' },
         innerProps: {},
-        nestedLabwareDef: mockLabwareDef,
+        nestedLabwareDefsBottomToTop: [mockLabwareDef],
         highlight: 'A1',
       },
     ])
@@ -274,7 +276,8 @@ describe('getRunCurrentModulesInfo', () => {
       'opentrons/opentrons_96_pcr_adapter/1': 'MOCK_LW_DEF',
     } as any)
     vi.mocked(getPositionFromSlotId).mockReturnValue('position' as any)
-    vi.mocked(getModuleDef2).mockReturnValue('MOCK_MODULE_DEF' as any)
+    vi.mocked(getModuleDef).mockReturnValue('MOCK_MODULE_DEF' as any)
+    vi.mocked(getModuleType).mockReturnValue('MOCK_MODULE_TYPE' as any)
   })
 
   it('should return an empty array if runRecord is null', () => {
@@ -358,7 +361,7 @@ describe('getRunCurrentLabwareInfo', () => {
 
   it('should return an empty array if runRecord is null', () => {
     const result = getRunCurrentLabwareInfo({
-      runRecord: undefined,
+      runData: undefined,
       runLwDefsByUri: {} as any,
     })
 
@@ -367,7 +370,7 @@ describe('getRunCurrentLabwareInfo', () => {
 
   it('should return an empty array if protocolAnalysis is null', () => {
     const result = getRunCurrentLabwareInfo({
-      runRecord: { data: { labware: [] } } as any,
+      runData: { labware: [] } as any,
       runLwDefsByUri: {},
     })
 
@@ -381,7 +384,7 @@ describe('getRunCurrentLabwareInfo', () => {
     }
 
     const result = getRunCurrentLabwareInfo({
-      runRecord: { data: { labware: [mockPickUpTipLwSlotName] } } as any,
+      runData: { labware: [mockPickUpTipLwSlotName] } as any,
       runLwDefsByUri: {
         [mockPickUpTipLabware.definitionUri]: mockLabwareDef,
       },
@@ -391,6 +394,7 @@ describe('getRunCurrentLabwareInfo', () => {
       {
         labwareDef: mockLabwareDef,
         slotName: 'A1',
+        labwareId: 'MOCK_PickUpTipLabware_ID',
         labwareLocation: { slotName: 'A1' },
       },
     ])
@@ -408,7 +412,11 @@ describe('getSlotNameAndLwLocFrom', () => {
     expect(result).toEqual([null, null])
   })
 
-  it('should return [null, null] if location has a moduleId and excludeModules is true', () => {
+  it('should return [null, null] if location has a moduleId and moduleModel and excludeModules is true', () => {
+    vi.mocked(getLabwareLocation).mockReturnValue({
+      slotName: 'A1',
+      moduleModel: 'MOCK_MODULE_MODEL' as ModuleModel,
+    })
     const result = getSlotNameAndLwLocFrom(
       { moduleId: 'MOCK_MODULE_ID' },
       {} as any,

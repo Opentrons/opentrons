@@ -39,6 +39,7 @@ from opentrons.protocol_engine.types import (
     AspiratedFluid,
     FluidKind,
     WellLocation,
+    LabwareWellId,
 )
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.notes import CommandNoteAdder
@@ -119,6 +120,7 @@ async def test_aspirate_implementation_no_prep(
             minimum_z_height=None,
             speed=None,
             operation_volume=-50,
+            offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_return(Point(x=1, y=2, z=3))
 
@@ -139,9 +141,7 @@ async def test_aspirate_implementation_no_prep(
         state_update=update_types.StateUpdate(
             pipette_location=update_types.PipetteLocationUpdate(
                 pipette_id=pipette_id,
-                new_location=update_types.Well(
-                    labware_id=labware_id, well_name=well_name
-                ),
+                new_location=LabwareWellId(labware_id=labware_id, well_name=well_name),
                 new_deck_point=DeckPoint(x=1, y=2, z=3),
             ),
             liquid_operated=update_types.LiquidOperatedUpdate(
@@ -213,6 +213,7 @@ async def test_aspirate_implementation_with_prep(
             minimum_z_height=None,
             speed=None,
             operation_volume=None,
+            offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_return(Point())
 
@@ -231,6 +232,7 @@ async def test_aspirate_implementation_with_prep(
             minimum_z_height=None,
             speed=None,
             operation_volume=-volume,
+            offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_return(Point(x=1, y=2, z=3))
 
@@ -251,9 +253,7 @@ async def test_aspirate_implementation_with_prep(
         state_update=update_types.StateUpdate(
             pipette_location=update_types.PipetteLocationUpdate(
                 pipette_id=pipette_id,
-                new_location=update_types.Well(
-                    labware_id=labware_id, well_name=well_name
-                ),
+                new_location=LabwareWellId(labware_id=labware_id, well_name=well_name),
                 new_deck_point=DeckPoint(x=1, y=2, z=3),
             ),
             liquid_operated=update_types.LiquidOperatedUpdate(
@@ -326,6 +326,7 @@ async def test_aspirate_raises_volume_error(
             minimum_z_height=None,
             speed=None,
             operation_volume=-50,
+            offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_return(Point(1, 2, 3))
 
@@ -404,6 +405,7 @@ async def test_overpressure_error(
             minimum_z_height=None,
             speed=None,
             operation_volume=-50,
+            offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_return(position)
 
@@ -432,9 +434,7 @@ async def test_overpressure_error(
         state_update=update_types.StateUpdate(
             pipette_location=update_types.PipetteLocationUpdate(
                 pipette_id=pipette_id,
-                new_location=update_types.Well(
-                    labware_id=labware_id, well_name=well_name
-                ),
+                new_location=LabwareWellId(labware_id=labware_id, well_name=well_name),
                 new_deck_point=DeckPoint(x=position.x, y=position.y, z=position.z),
             ),
             liquid_operated=update_types.LiquidOperatedUpdate(
@@ -506,6 +506,7 @@ async def test_aspirate_implementation_meniscus(
             minimum_z_height=None,
             speed=None,
             operation_volume=-50,
+            offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_return(Point(x=1, y=2, z=3))
 
@@ -526,9 +527,7 @@ async def test_aspirate_implementation_meniscus(
         state_update=update_types.StateUpdate(
             pipette_location=update_types.PipetteLocationUpdate(
                 pipette_id=pipette_id,
-                new_location=update_types.Well(
-                    labware_id=labware_id, well_name=well_name
-                ),
+                new_location=LabwareWellId(labware_id=labware_id, well_name=well_name),
                 new_deck_point=DeckPoint(x=1, y=2, z=3),
             ),
             liquid_operated=update_types.LiquidOperatedUpdate(
@@ -587,6 +586,7 @@ async def test_stall_during_final_movement(
             minimum_z_height=None,
             speed=None,
             operation_volume=-50,
+            offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_raise(StallOrCollisionDetectedError())
 
@@ -649,6 +649,7 @@ async def test_stall_during_preparation(
             minimum_z_height=None,
             speed=None,
             operation_volume=None,
+            offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_raise(StallOrCollisionDetectedError())
     decoy.when(model_utils.generate_id()).then_return(error_id)
@@ -722,6 +723,7 @@ async def test_overpressure_during_preparation(
             minimum_z_height=None,
             speed=None,
             operation_volume=None,
+            offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_return(prep_location)
 
@@ -744,9 +746,7 @@ async def test_overpressure_during_preparation(
         state_update=update_types.StateUpdate(
             pipette_location=update_types.PipetteLocationUpdate(
                 pipette_id=pipette_id,
-                new_location=update_types.Well(
-                    labware_id=labware_id, well_name=well_name
-                ),
+                new_location=LabwareWellId(labware_id=labware_id, well_name=well_name),
                 new_deck_point=DeckPoint(
                     x=prep_location.x, y=prep_location.y, z=prep_location.z
                 ),

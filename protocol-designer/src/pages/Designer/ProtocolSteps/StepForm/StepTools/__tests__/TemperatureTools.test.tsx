@@ -1,18 +1,19 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 
-import { renderWithProviders } from '../../../../../../__testing-utils__'
-import { i18n } from '../../../../../../assets/localization'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
 import {
   getTemperatureLabwareOptions,
   getTemperatureModuleIds,
-} from '../../../../../../ui/modules/selectors'
+} from '/protocol-designer/ui/modules/selectors'
+
 import { TemperatureTools } from '../TemperatureTools'
 
 import type { ComponentProps } from 'react'
-import type * as ModulesSelectors from '../../../../../../ui/modules/selectors'
+import type * as ModulesSelectors from '/protocol-designer/ui/modules/selectors'
 
-vi.mock('../../../../../../ui/modules/selectors', async importOriginal => {
+vi.mock('/protocol-designer/ui/modules/selectors', async importOriginal => {
   const actualFields = await importOriginal<typeof ModulesSelectors>()
   return {
     ...actualFields,

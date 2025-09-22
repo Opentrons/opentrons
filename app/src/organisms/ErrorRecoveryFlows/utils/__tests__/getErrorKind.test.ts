@@ -70,7 +70,7 @@ describe('getErrorKind', () => {
     {
       commandType: 'flexStacker/retrieve',
       errorType: DEFINED_ERROR_TYPES.STACKER_SHUTTLE_EMPTY,
-      expectedError: ERROR_KINDS.STACKER_SHUTTLE_EMPTY,
+      expectedError: ERROR_KINDS.STACKER_HOPPER_OR_SHUTTLE_EMPTY,
     },
     {
       commandType: 'flexStacker/retrieve',
@@ -86,6 +86,16 @@ describe('getErrorKind', () => {
       commandType: 'flexStacker/retrieve',
       errorType: DEFINED_ERROR_TYPES.STACKER_STALL,
       expectedError: ERROR_KINDS.STACKER_STALLED,
+    },
+    {
+      commandType: 'flexStacker/store',
+      errorType: DEFINED_ERROR_TYPES.STACKER_SHUTTLE_STORE_EMPTY,
+      expectedError: ERROR_KINDS.STACKER_SHUTTLE_STORE_EMPTY,
+    },
+    {
+      commandType: 'flexStacker/store',
+      errorType: DEFINED_ERROR_TYPES.STACKER_SHUTTLE_OCCUPIED,
+      expectedError: ERROR_KINDS.STACKER_SHUTTLE_OCCUPIED,
     },
     {
       commandType: 'aspirate',

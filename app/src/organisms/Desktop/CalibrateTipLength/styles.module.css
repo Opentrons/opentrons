@@ -5,6 +5,6 @@
 }
 
 .block_image {
-  max-height: 20rem;
   max-width: 16rem;
+  max-height: 20rem;
 }

@@ -66,13 +66,10 @@ const Labels = (props: {
                 : getSchema2Dimensions(props.definition).yDimension -
                   NUMBER_COLUMN_Y_FROM_TOP
             }
-            style={{
-              color: COLORS.grey50, // LEGACY --c-font-dark
-              fontSize: '0.2rem', // LEGACY --fs-micro
-              textAnchor: 'middle',
-              dominantBaseline:
-                props.isLetterColumn === true ? 'middle' : 'auto',
-            }}
+            color={COLORS.grey50} // LEGACY --c-font-dark
+            fontSize="0.2rem" // LEGACY --fs-micro
+            textAnchor="middle"
+            dominantBaseline={props.isLetterColumn === true ? 'middle' : 'auto'}
             fill={
               highlightedWellLabels?.wells.includes(wellName) ?? false
                 ? highlightColor

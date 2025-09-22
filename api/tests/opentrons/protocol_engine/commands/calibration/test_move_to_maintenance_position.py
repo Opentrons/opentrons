@@ -22,7 +22,6 @@ if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
 
 
-@pytest.mark.ot3_only
 @pytest.fixture
 def subject(
     ot3_hardware_api: OT3API, state_view: StateView

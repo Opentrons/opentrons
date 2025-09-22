@@ -287,6 +287,13 @@ CONFIG_ELEMENTS = (
         "The dir where gripper calibration is stored",
     ),
     ConfigElement(
+        "gripper_jaw_width_dir",
+        "Gripper Jaw Width Directory",
+        Path("robot") / "gripper_jaw_width_data",
+        ConfigElementType.DIR,
+        "The dir where gripper jaw width data is stored",
+    ),
+    ConfigElement(
         "module_calibration_dir",
         "Module Calibration Directory",
         Path("robot") / "modules",

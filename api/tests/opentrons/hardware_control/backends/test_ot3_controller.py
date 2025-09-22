@@ -258,7 +258,7 @@ def _subsystems_entry(info: DeviceInfoCache) -> Tuple[SubSystem, SubSystemState]
         current_fw_version=info.version,
         next_fw_version=2,
         current_fw_sha=info.shortsha,
-        pcba_revision="A1",
+        pcba_revision="A1.0",
         update_state=None,
         fw_update_needed=False,
     )
@@ -741,6 +741,7 @@ async def test_liquid_probe(
     fake_liquid_settings: LiquidProbeSettings,
     mock_move_group_run: mock.AsyncMock,
     mock_send_stop_threshold: mock.AsyncMock,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     fake_max_p_dist = 70
     head_node = axis_to_node(Axis.by_mount(mount))
@@ -750,6 +751,10 @@ async def test_liquid_probe(
     )
     controller._pipettes_to_monitor_pressure = mock.MagicMock(  # type: ignore[method-assign]
         return_value=[sensor_node_for_mount(mount)]
+    )
+    monkeypatch.setattr(
+        "opentrons_hardware.hardware_control.tool_sensors.finalize_logs",
+        mock.AsyncMock(),
     )
     try:
         await controller.liquid_probe(
@@ -1316,8 +1321,8 @@ def test_grip_error_detection(
             narrower,
             actual_grip_width,
             allowed_error,
-            hard_max,
             hard_min,
+            hard_max,
         )
 
 

@@ -30,7 +30,7 @@ def verify_and_normalize_transfer_args(
     source: Union[Well, Sequence[Well], Sequence[Sequence[Well]]],
     dest: Union[Well, Sequence[Well], Sequence[Sequence[Well]], TrashBin, WasteChute],
     tip_policy: TransferTipPolicyV2Type,
-    last_tip_picked_up_from: Optional[Well],
+    last_tip_well: Optional[Well],
     tip_racks: List[Labware],
     nozzle_map: NozzleMapInterface,
     group_wells_for_multi_channel: bool,
@@ -45,10 +45,10 @@ def verify_and_normalize_transfer_args(
         flat_dests_list = []
     if group_wells_for_multi_channel and nozzle_map.tip_count > 1:
         flat_sources_list = tx_liquid_utils.group_wells_for_multi_channel_transfer(
-            flat_sources_list, nozzle_map
+            flat_sources_list, nozzle_map, "source"
         )
         flat_dests_list = tx_liquid_utils.group_wells_for_multi_channel_transfer(
-            flat_dests_list, nozzle_map
+            flat_dests_list, nozzle_map, "destination"
         )
     for well in flat_sources_list + flat_dests_list:
         instrument.validate_takes_liquid(
@@ -59,14 +59,14 @@ def verify_and_normalize_transfer_args(
 
     valid_new_tip = validation.ensure_new_tip_policy(tip_policy)
     if valid_new_tip == TransferTipPolicyV2.NEVER:
-        if last_tip_picked_up_from is None:
+        if last_tip_well is None:
             raise RuntimeError(
                 "Pipette has no tip attached to perform transfer."
                 " Either do a pick_up_tip beforehand or specify a new_tip parameter"
                 " of 'once' or 'always'."
             )
         else:
-            valid_tip_racks = [last_tip_picked_up_from.parent]
+            valid_tip_racks = [last_tip_well.parent]
     else:
         valid_tip_racks = tip_racks
     if current_volume != 0:
@@ -93,3 +93,16 @@ def verify_and_normalize_transfer_args(
         tip_racks=valid_tip_racks,
         trash_location=valid_trash_location,
     )
+
+
+def resolve_keep_last_tip(
+    keep_last_tip: Optional[bool], tip_strategy: TransferTipPolicyV2
+) -> bool:
+    """Resolve the liquid class transfer argument `keep_last_tip`
+
+    If set to a boolean value, maintains that setting. Otherwise, default to
+    `True` if tip policy is `NEVER`, otherwise default to `False`
+    """
+    if keep_last_tip is not None:
+        return keep_last_tip
+    return tip_strategy == TransferTipPolicyV2.NEVER

@@ -1,0 +1,27 @@
+.container {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: var(--spacing-32);
+  gap: var(--spacing-12);
+}
+
+.active_run {
+  padding-top: var(--spacing-32);
+}
+
+.inactive_run {
+  padding-top: 0;
+}
+
+.button_row {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  gap: var(--spacing-8);
+}

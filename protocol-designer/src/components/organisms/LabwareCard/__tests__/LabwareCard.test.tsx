@@ -2,8 +2,10 @@ import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { fixture96Plate } from '@opentrons/shared-data'
+import { getLiquidIdsOnLabware } from '@opentrons/step-generation'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+
 import { i18n } from '../../../../assets/localization'
 import { getEnableStacking } from '../../../../feature-flags/selectors'
 import { openIngredientSelector } from '../../../../labware-ingred/actions'
@@ -12,7 +14,6 @@ import * as wellContentsSelectors from '../../../../top-selectors/well-contents'
 import { getLabwareNicknamesById } from '../../../../ui/labware/selectors'
 import { EditLabwareQuantityModal } from '../../EditLabwareQuantityModal'
 import { LabwareCardOverflowMenu } from '../../LabwareCardOverflowMenu'
-import { getLiquidIdsOnLabware } from '../../utils'
 import { LabwareCard } from '../index'
 
 import type { ComponentProps } from 'react'
@@ -25,7 +26,7 @@ vi.mock('../../../../labware-ingred/actions')
 vi.mock('../../LabwareCardOverflowMenu')
 vi.mock('../../../../ui/labware/selectors')
 vi.mock('../../../../top-selectors/well-contents')
-vi.mock('../../utils')
+vi.mock('@opentrons/step-generation')
 vi.mock('../../../../feature-flags/selectors')
 vi.mock('../../../../top-selectors/labware-locations')
 vi.mock('../../EditLabwareQuantityModal')
@@ -55,7 +56,7 @@ describe('LabwareCard', () => {
         labwareDefURI: 'mockuri',
         def: fixture96Plate as LabwareDefinition2,
       },
-      lidDisplayName: 'mock lid',
+      lidId: 'lidId',
       quantity: 1,
     }
     vi.mocked(EditLabwareQuantityModal).mockReturnValue(
@@ -81,6 +82,16 @@ describe('LabwareCard', () => {
           id: 'labwareId',
           labwareDefURI: 'mockuri',
           def: fixture96Plate as LabwareDefinition2,
+          pythonName: 'mockPythonName',
+          stack: ['labwareId', 'A1'],
+        },
+        lidId: {
+          id: 'lidId',
+          labwareDefURI: 'mockuri',
+          def: ({
+            ...fixture96Plate,
+            metadata: { displayName: 'mock lid' },
+          } as any) as LabwareDefinition2,
           pythonName: 'mockPythonName',
           stack: ['labwareId', 'A1'],
         },

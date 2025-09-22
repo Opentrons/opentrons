@@ -24,6 +24,7 @@ from opentrons.protocol_engine.types import (
     ABSMeasureMode,
     StackerFillEmptyStrategy,
     StackerStoredLabwareGroup,
+    StackerLabwareMovementStrategy,
 )
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
@@ -50,6 +51,7 @@ from ..module import (
 from .exceptions import InvalidMagnetEngageHeightError
 
 from .labware import LabwareCore
+from .tasks import EngineTaskCore
 from . import load_labware_params
 
 if TYPE_CHECKING:
@@ -174,13 +176,17 @@ class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore[LabwareCor
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.TempDeck]
 
-    def set_target_temperature(self, celsius: float) -> None:
+    def set_target_temperature(self, celsius: float) -> EngineTaskCore:
         """Set the Temperature Module's target temperature in °C."""
-        self._engine_client.execute_command(
+        result = self._engine_client.execute_command_without_recovery(
             cmd.temperature_module.SetTargetTemperatureParams(
                 moduleId=self.module_id, celsius=celsius
             )
         )
+        temperature_task = EngineTaskCore(
+            engine_client=self._engine_client, task_id=result.taskId
+        )
+        return temperature_task
 
     def wait_for_target_temperature(self, celsius: Optional[float] = None) -> None:
         """Wait until the module's target temperature is reached.
@@ -316,18 +322,24 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
     def set_target_block_temperature(
         self,
         celsius: float,
+        ramp_rate: Optional[float],
         hold_time_seconds: Optional[float] = None,
         block_max_volume: Optional[float] = None,
-    ) -> None:
+    ) -> EngineTaskCore:
         """Set the target temperature for the well block, in °C."""
-        self._engine_client.execute_command(
+        result = self._engine_client.execute_command_without_recovery(
             cmd.thermocycler.SetTargetBlockTemperatureParams(
                 moduleId=self.module_id,
                 celsius=celsius,
                 blockMaxVolumeUl=block_max_volume,
                 holdTimeSeconds=hold_time_seconds,
+                ramp_rate=ramp_rate,
             )
         )
+        block_temperature_task = EngineTaskCore(
+            engine_client=self._engine_client, task_id=result.taskId
+        )
+        return block_temperature_task
 
     def wait_for_block_temperature(self) -> None:
         """Wait for target block temperature to be reached."""
@@ -335,13 +347,17 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
             cmd.thermocycler.WaitForBlockTemperatureParams(moduleId=self.module_id)
         )
 
-    def set_target_lid_temperature(self, celsius: float) -> None:
+    def set_target_lid_temperature(self, celsius: float) -> EngineTaskCore:
         """Set the target temperature for the heated lid, in °C."""
-        self._engine_client.execute_command(
+        result = self._engine_client.execute_command_without_recovery(
             cmd.thermocycler.SetTargetLidTemperatureParams(
                 moduleId=self.module_id, celsius=celsius
             )
         )
+        lid_temperature_task = EngineTaskCore(
+            engine_client=self._engine_client, task_id=result.taskId
+        )
+        return lid_temperature_task
 
     def wait_for_lid_temperature(self) -> None:
         """Wait for target lid temperature to be reached."""
@@ -360,6 +376,7 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
             cmd.thermocycler.RunProfileStepParams(
                 celsius=step["temperature"],
                 holdSeconds=step["hold_time_seconds"],
+                rampRate=step["ramp_rate"],
             )
             for step in steps
         ]
@@ -388,6 +405,7 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
                     cmd.thermocycler.ProfileStep(
                         celsius=step["temperature"],
                         holdSeconds=step["hold_time_seconds"],
+                        rampRate=step["ramp_rate"],
                     )
                     for step in steps
                 ],
@@ -506,13 +524,17 @@ class HeaterShakerModuleCore(ModuleCore, AbstractHeaterShakerCore[LabwareCore]):
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.HeaterShaker]
 
-    def set_target_temperature(self, celsius: float) -> None:
+    def set_target_temperature(self, celsius: float) -> EngineTaskCore:
         """Set the labware plate's target temperature in °C."""
-        self._engine_client.execute_command(
+        result = self._engine_client.execute_command_without_recovery(
             cmd.heater_shaker.SetTargetTemperatureParams(
                 moduleId=self.module_id, celsius=celsius
             )
         )
+        temperature_task = EngineTaskCore(
+            engine_client=self._engine_client, task_id=result.taskId
+        )
+        return temperature_task
 
     def wait_for_target_temperature(self) -> None:
         """Wait for the labware plate's target temperature to be reached."""
@@ -747,6 +769,7 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore[LabwareCore]):
         self._engine_client.execute_command(
             cmd.flex_stacker.StoreParams(
                 moduleId=self.module_id,
+                strategy=StackerLabwareMovementStrategy.AUTOMATIC,
             )
         )
 

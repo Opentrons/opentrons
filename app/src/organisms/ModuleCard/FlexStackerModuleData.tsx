@@ -28,7 +28,7 @@ export function FlexStackerModuleData(
       case 'retracted':
         return t('flex_stacker_retracted')
       default:
-        return t('shared:unknown')
+        return t('shared:missing')
     }
   }
 

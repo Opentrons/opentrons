@@ -17,6 +17,7 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.state import StateView
+from opentrons.protocol_engine.types import LabwareWellId
 from opentrons.protocol_engine.commands import (
     BlowOutResult,
     BlowOutImplementation,
@@ -80,6 +81,7 @@ async def test_blow_out_implementation(
             minimum_z_height=None,
             speed=None,
             operation_volume=None,
+            offset_pipette_for_reservoir_subwells=False,
         )
     ).then_return(Point(x=1, y=2, z=3))
 
@@ -90,7 +92,7 @@ async def test_blow_out_implementation(
         state_update=update_types.StateUpdate(
             pipette_location=update_types.PipetteLocationUpdate(
                 pipette_id="pipette-id",
-                new_location=update_types.Well(
+                new_location=LabwareWellId(
                     labware_id="labware-id",
                     well_name="C6",
                 ),
@@ -155,6 +157,7 @@ async def test_overpressure_error(
             minimum_z_height=None,
             speed=None,
             operation_volume=None,
+            offset_pipette_for_reservoir_subwells=False,
         )
     ).then_return(Point(x=1, y=2, z=3))
 
@@ -170,7 +173,7 @@ async def test_overpressure_error(
         state_update=update_types.StateUpdate(
             pipette_location=update_types.PipetteLocationUpdate(
                 pipette_id="pipette-id",
-                new_location=update_types.Well(
+                new_location=LabwareWellId(
                     labware_id="labware-id",
                     well_name="C6",
                 ),
@@ -183,7 +186,7 @@ async def test_overpressure_error(
         state_update_if_false_positive=update_types.StateUpdate(
             pipette_location=update_types.PipetteLocationUpdate(
                 pipette_id="pipette-id",
-                new_location=update_types.Well(
+                new_location=LabwareWellId(
                     labware_id="labware-id",
                     well_name="C6",
                 ),
@@ -230,6 +233,7 @@ async def test_stall_error(
             minimum_z_height=None,
             speed=None,
             operation_volume=None,
+            offset_pipette_for_reservoir_subwells=False,
         )
     ).then_raise(StallOrCollisionDetectedError())
 

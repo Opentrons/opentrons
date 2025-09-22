@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { getNextDefaultEngageHeight } from '../'
 
-import type { StepType } from '../../../../form-types'
+import type { StepType } from '/protocol-designer/form-types'
 
 describe('getNextDefaultEngageHeight', () => {
   describe('no previous forms', () => {

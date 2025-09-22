@@ -57,10 +57,12 @@ touchTipAspirate = -(sourceWellHeight - prevTouchTipAspirate)
 touchTipDispense = -(destWellHeight - prevTouchTipDispense)
 ```
 
-## [WIP] Version 1.2.0
+## Version 1.2.0
 
 Due to changes in the Quick Transfer setup flow, there will be changes to QuickTransferWizardState and QuickTransferSummaryState. The changes are as follows:
 the comment `this has been added` will be removed before feature freeze.
+
+Now using command schema 14
 
 ```ts
 export interface QuickTransferWizardState {
@@ -73,10 +75,10 @@ export interface QuickTransferWizardState {
   destinationWells?: string[]
   transferType?: TransferType
   volume?: number
-  path?: PathOption // this has been added
-  changeTip?: ChangeTipOptions // this has been added
-  dropTipLocation?: CutoutConfig // this has been added
-  liquidClass?: LiquidClass // this has been added
+  path?: PathOption // from version 1.2.0
+  changeTip?: ChangeTipOptions // from version 1.2.0
+  dropTipLocation?: CutoutConfig // from version 1.2.0
+  liquidClassName?: string // from version 1.2.0
 }
 ```
 
@@ -96,23 +98,31 @@ export interface QuickTransferSummaryState {
   path: PathOption
   tipPositionAspirate: number
   preWetTip: boolean
+  pushOutDispense?: {
+    // from version 1.2.0
+    volume: number
+  }
   mixOnAspirate?: {
     mixVolume: number
     repetitions: number
   }
   submergeAspirate?: {
-    // this has been added
+    // from version 1.2.0
     speed: number
-    positionFromBottom: number
+    delayDuration: number
+    position: number
+    positionReference: PositionReference
   }
   retractAspirate?: {
-    // this has been added
+    // from version 1.2.0
     speed: number
-    positionFromBottom: number
+    delayDuration: number
+    position: number
+    positionReference: PositionReference
   }
   delayAspirate?: {
+    // updated in version 1.2.0
     delayDuration: number
-    positionFromBottom: number
   }
   touchTipAspirate?: number
   touchTipAspirateSpeed?: number
@@ -123,27 +133,59 @@ export interface QuickTransferSummaryState {
     repetitions: number
   }
   submergeDispense?: {
-    // this has been added
+    // from version 1.2.0
     speed: number
-    positionFromBottom: number
+    delayDuration: number
+    position: number
+    positionReference: PositionReference
   }
   retractDispense?: {
-    // this has been added
+    // from version 1.2.0
     speed: number
-    positionFromBottom: number
+    delayDuration: number
+    position: number
+    positionReference: PositionReference
   }
   delayDispense?: {
+    // updated in version 1.2.0
     delayDuration: number
-    positionFromBottom: number
   }
   touchTipDispense?: number
   touchTipDispenseSpeed?: number
   disposalVolume?: number
-  blowOut?: BlowOutLocation
+  blowOutDispense?: {
+    // updated in version 1.2.0
+    location?: BlowOutLocation
+    flowRate?: number
+  }
   airGapDispense?: number
   changeTip: ChangeTipOptions
   dropTipLocation: CutoutConfig
-  liquidClass: LiquidClass // this has been added
-  pushOut: boolean // this has been added
+  liquidClassName: string // from version 1.2.0
+  conditionAspirate?: number // from version 1.2.0
+  disposalVolumeDispenseSettings?: {
+    // from version 1.2.0
+    volume: number
+    blowOutLocation: BlowOutLocation
+    flowRate: number
+  }
+  liquidClassValuesInitialized: boolean // from version 1.2.0
 }
 ```
+
+## Version 2.0.0
+
+Introduction of Python protocol generation starting in robot stack v8.7.0.
+
+The shape of the Python file is as follows:
+
+```ts
+imports
+metadata
+requirements
+commands
+```
+
+Note that the `designerApplicationData` is not included in the generated Python, therefore, cloning/editing the generated protocol is currently not possible (which is never has been).
+
+You can still generate JSON behind a feature flag.

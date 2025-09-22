@@ -1,14 +1,15 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { actions as featureFlagActions } from '/protocol-designer/feature-flags'
+
 import { FeatureFlag } from '..'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
-import { actions as featureFlagActions } from '../../../../feature-flags'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('../../../../feature-flags')
+vi.mock('/protocol-designer/feature-flags')
 
 const render = (props: ComponentProps<typeof FeatureFlag>) => {
   return renderWithProviders(<FeatureFlag {...props} />, {
@@ -24,9 +25,8 @@ describe('FeatureFlag', () => {
         PRERELEASE_MODE: true,
         OT_PD_ALLOW_ALL_TIPRACKS: true,
         OT_PD_ENABLE_COMMENT: true,
-        OT_PD_ENABLE_RETURN_TIP: true,
+        OT_PD_ENABLE_TIP_PICKUP_LOCATION: true,
         OT_PD_ENABLE_REACT_SCAN: true,
-        OT_PD_ENABLE_LIQUID_CLASSES: true,
         OT_PD_ENABLE_TIMELINE_SCRUBBER: true,
       },
     }
@@ -41,17 +41,13 @@ describe('FeatureFlag', () => {
     screen.getByText('Enable selection of all tip racks for each pipette.')
     screen.getByText('Enable comment step')
     screen.getByText('You can add comments anywhere between timeline steps.')
-    screen.getByText('Enable return tip')
-    screen.getByText(
-      'You can choose which tip to pick up and where to drop tip.'
-    )
+    screen.getByText('Enable tip pickup location')
+    screen.getByText('You can choose which tip to pick up.')
     screen.getByText('Enable React Scan')
     screen.getByText('Enable React Scan support for components rendering check')
-    screen.getByText('Enable liquid classes')
-    screen.getByText('Enable liquid classes support')
     screen.getByText('Enable timeline scrubber')
     screen.getByText('See the protocol timeline visualization in overview')
-    expect(screen.getAllByRole('switch').length).toBe(7)
+    expect(screen.getAllByRole('switch').length).toBe(6)
   })
   it('should call function when clicking toggle switches', () => {
     render(props)
@@ -74,7 +70,7 @@ describe('FeatureFlag', () => {
 
     fireEvent.click(toggleButtons[3])
     expect(vi.mocked(featureFlagActions.setFeatureFlags)).toHaveBeenCalledWith({
-      OT_PD_ENABLE_RETURN_TIP: false,
+      OT_PD_ENABLE_TIP_PICKUP_LOCATION: false,
     })
 
     fireEvent.click(toggleButtons[4])
@@ -83,11 +79,6 @@ describe('FeatureFlag', () => {
     })
 
     fireEvent.click(toggleButtons[5])
-    expect(vi.mocked(featureFlagActions.setFeatureFlags)).toHaveBeenCalledWith({
-      OT_PD_ENABLE_LIQUID_CLASSES: false,
-    })
-
-    fireEvent.click(toggleButtons[6])
     expect(vi.mocked(featureFlagActions.setFeatureFlags)).toHaveBeenCalledWith({
       OT_PD_ENABLE_TIMELINE_SCRUBBER: false,
     })

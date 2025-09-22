@@ -1,4 +1,4 @@
-import { getAllDefinitions, getSchema2Dimensions } from '@opentrons/shared-data'
+import { getAllDefinitions, getLabwareViewBox } from '@opentrons/shared-data'
 
 import { RobotWorkSpace } from '../Deck'
 import { CalibrationBlockRender } from './CalibrationBlockRender'
@@ -21,9 +21,10 @@ const meta: Meta<typeof CalibrationBlockRender> = {
   decorators: [
     (Story, context) => {
       const { labwareDef } = context.args
-      // todo(mm, 2025-06-05): Update viewBox to account for labware schema 3.
-      const { xDimension, yDimension } = getSchema2Dimensions(labwareDef)
-      const viewBox = `0 0 ${xDimension} ${yDimension}`
+      const { minX, minY, xDimension, yDimension } = getLabwareViewBox(
+        labwareDef
+      )
+      const viewBox = `${minX} ${minY} ${xDimension} ${yDimension}`
 
       return (
         <RobotWorkSpace viewBox={viewBox}>{() => <Story />}</RobotWorkSpace>

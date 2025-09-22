@@ -1,35 +1,7 @@
 import { COLORS } from '@opentrons/components'
 
 import type { WellGroup } from '@opentrons/components'
-import type { Liquid } from '@opentrons/shared-data'
-import type { LabwareByLiquidId } from '/app/transformations/commands'
-
-export function getWellFillFromLabwareId(
-  labwareId: string,
-  liquidsInLoadOrder: Liquid[],
-  labwareByLiquidId: LabwareByLiquidId
-): { [well: string]: string } {
-  let labwareWellFill: { [well: string]: string } = {}
-  const liquidIds = Object.keys(labwareByLiquidId)
-  const labwareInfo = Object.values(labwareByLiquidId)
-
-  labwareInfo.forEach((labwareArray, index) => {
-    labwareArray.forEach(labware => {
-      if (labware.labwareId === labwareId) {
-        const liquidId = liquidIds[index]
-        const liquid = liquidsInLoadOrder.find(liquid => liquid.id === liquidId)
-        const wellFill: {
-          [well: string]: string
-        } = {}
-        Object.keys(labware.volumeByWell).forEach(key => {
-          wellFill[key] = liquid?.displayColor ?? COLORS.transparent
-        })
-        labwareWellFill = { ...labwareWellFill, ...wellFill }
-      }
-    })
-  })
-  return labwareWellFill
-}
+import type { LabwareByLiquidId, Liquid } from '@opentrons/shared-data'
 
 export function getDisabledWellFillFromLabwareId(
   labwareId: string,

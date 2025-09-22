@@ -4,7 +4,11 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import isEqual from 'lodash/isEqual'
 
-import { ModalShell, useConditionalConfirm } from '@opentrons/components'
+import {
+  ModalShell,
+  useConditionalConfirm,
+  WizardHeader,
+} from '@opentrons/components'
 import {
   useAddLabwareOffsetToRunMutation,
   useCreateMaintenanceCommandMutation,
@@ -18,7 +22,6 @@ import {
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { WizardHeader } from '/app/molecules/WizardHeader'
 import { getIsOnDevice } from '/app/redux/config'
 import {
   useChainMaintenanceCommands,

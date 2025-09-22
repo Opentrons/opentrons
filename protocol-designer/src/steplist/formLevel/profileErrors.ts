@@ -17,6 +17,7 @@ export interface ProfileFormError {
   location: FormErrorLocationType
   body?: ReactNode
   page?: number
+  showOnReopen?: boolean
 }
 type ProfileFormErrorKey = 'INVALID_PROFILE_DURATION'
 const PROFILE_FORM_ERRORS: Record<ProfileFormErrorKey, ProfileFormError> = {

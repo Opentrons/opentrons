@@ -13,11 +13,26 @@ import {
 } from '/app/redux/analytics'
 
 import type {
+  LabwareOffsetCreateData,
   LegacyLabwareOffsetLocation,
   StoredLabwareOffset,
 } from '@opentrons/api-client'
-import type { RobotType, Vector3D } from '@opentrons/shared-data'
+import type { LabwareOffsetLocationSequenceComponent } from '@opentrons/api-client/lib'
+import type {
+  AddressableAreaName,
+  LocationSequenceComponent,
+  ModuleModel,
+  RobotType,
+  Vector3D,
+} from '@opentrons/shared-data'
 import type { ResolvedOffsetSource } from '/app/redux/protocol-runs'
+
+// A formatted location sequence digestible for LPC Mixpanel analysis
+interface LPCLocationSequenceAnalytic {
+  kind: LocationSequenceComponent['kind'] | 'anyLocation'
+  info?: string | ModuleModel | AddressableAreaName
+  child?: LPCLocationSequenceAnalytic
+}
 
 interface ReportSaveOffsetToRunRecordParams {
   uri: string
@@ -35,7 +50,7 @@ export interface UseLPCAnalyticsResult {
   /* Report when a user launches LPC, generating a wizard session id. */
   reportLaunchLpcWizard: () => void
   /* Report when a user clicks the 'apply offsets' button. Effectively a Flex only event. */
-  reportApplyOffsets: () => void
+  reportApplyOffsets: (data: LabwareOffsetCreateData[]) => void
   /* Report all the modified offsets when a user saves to the database. Flex only. */
   reportSaveOffset: (
     params: [StoredLabwareOffset[], StoredLabwareOffset[]]
@@ -72,16 +87,21 @@ export function useLPCAnalytics({
   }
 
   // Offsets are applied outside the LPC wizard and therefore not tied to a wizard session.
-  const reportApplyOffsets = (): void => {
+  const reportApplyOffsets = (data: LabwareOffsetCreateData[]): void => {
     if (robotType === OT2_ROBOT_TYPE) {
       console.error('OT2 robot type should not report apply offsets.')
     } else {
-      doTrackEvent({
-        name: ANALYTICS_LPC_APPLY_OFFSETS,
-        properties: {
-          robotType,
-          runSession: runId,
-        },
+      data.forEach(offset => {
+        doTrackEvent({
+          name: ANALYTICS_LPC_APPLY_OFFSETS,
+          properties: {
+            robotType,
+            runSession: runId,
+            offsetKind: getOffsetKindFrom(offset.locationSequence),
+            slot: getSlotNameFrom(offset.locationSequence),
+            uri: offset.definitionUri,
+          },
+        })
       })
     }
   }
@@ -95,23 +115,36 @@ export function useLPCAnalytics({
       )
     } else {
       const sendSaveOffsetEvent = (offset: StoredLabwareOffset): void => {
-        const offsetKind =
-          offset.locationSequence === ANY_LOCATION
-            ? 'default'
-            : 'appliedLocation'
+        // Transform the locationSequence into a data structure digestible by Mixpanel.
+        const locationDetails = ((): LPCLocationSequenceAnalytic | null => {
+          if (offset.locationSequence === 'anyLocation') {
+            return { kind: offset.locationSequence }
+          } else {
+            return offset.locationSequence.reduceRight((acc, lsComponent) => {
+              const currentLevel: any = {
+                kind: lsComponent.kind,
+                info: null,
+                child: null,
+              }
 
-        const slot = offset.locationSequence[offset.locationSequence.length - 1]
+              switch (lsComponent.kind) {
+                case 'onLabware':
+                  currentLevel.info = lsComponent.labwareUri
+                  break
+                case 'onModule':
+                  currentLevel.info = lsComponent.moduleModel
+                  break
+                case 'onAddressableArea':
+                  currentLevel.info = lsComponent.addressableAreaName
+                  break
+              }
 
-        const slotName = ((): string | null => {
-          if (typeof slot === 'string') {
-            return null
-          } else if (slot.kind === 'onAddressableArea') {
-            return slot.addressableAreaName
-          }
-          // The last location sequence component in a LabwareOffsetLocationSequence is
-          // always the addressable area, but we handle unexpected input to be safe.
-          else {
-            return null
+              if (acc != null) {
+                currentLevel.child = acc
+              }
+
+              return currentLevel
+            }, null)
           }
         })()
 
@@ -122,10 +155,10 @@ export function useLPCAnalytics({
             runSession: runId,
             wizardSession: lpcWizardSessionId,
             uri: offset.definitionUri,
-            locationDetails: offset.locationSequence,
-            slot: slotName,
+            locationDetails,
+            slot: getSlotNameFrom(offset.locationSequence),
             vector: offset.vector,
-            offsetKind,
+            offsetKind: getOffsetKindFrom(offset.locationSequence),
           },
         })
       }
@@ -181,4 +214,31 @@ export function useLPCAnalytics({
     reportSaveOffsetToRunRecord,
     reportOffsetSourceResolution,
   }
+}
+
+function getSlotNameFrom(
+  locationSequence:
+    | LabwareOffsetLocationSequenceComponent[]
+    | typeof ANY_LOCATION
+): string | null {
+  const slot = locationSequence[locationSequence.length - 1]
+
+  if (typeof slot === 'string') {
+    return null
+  } else if (slot.kind === 'onAddressableArea') {
+    return slot.addressableAreaName
+  }
+  // The last location sequence component in a LabwareOffsetLocationSequence is
+  // always the addressable area, but we handle unexpected input to be safe.
+  else {
+    return null
+  }
+}
+
+function getOffsetKindFrom(
+  locationSequence:
+    | LabwareOffsetLocationSequenceComponent[]
+    | typeof ANY_LOCATION
+): 'default' | 'appliedLocation' {
+  return locationSequence === ANY_LOCATION ? 'default' : 'appliedLocation'
 }

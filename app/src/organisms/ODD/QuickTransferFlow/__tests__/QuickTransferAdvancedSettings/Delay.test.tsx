@@ -133,7 +133,7 @@ describe('Delay', () => {
     expect(vi.mocked(InputField)).toHaveBeenCalledWith(
       {
         title: 'Delay duration (seconds)',
-        error: 'Value must be between 1 to 9999999999',
+        error: 'Value must be between 0.1 to 9999999999',
         readOnly: true,
         type: 'number',
         value: 0,
@@ -142,62 +142,6 @@ describe('Delay', () => {
     )
     const nextBtn = screen.getByTestId('ChildNavigation_Primary_Button')
     expect(nextBtn).toBeDisabled()
-  })
-
-  it('has correct range for delay height for aspirate', () => {
-    render(props)
-    const enabledBtn = screen.getByText('Enabled')
-    fireEvent.click(enabledBtn)
-    const continueBtn = screen.getByText('Continue')
-    fireEvent.click(continueBtn)
-    const oneButton = screen.getByText('1')
-    fireEvent.click(oneButton)
-    const nextBtn = screen.getByTestId('ChildNavigation_Primary_Button')
-    fireEvent.click(nextBtn)
-    const zeroButton = screen.getByText('0')
-    fireEvent.click(zeroButton)
-    expect(vi.mocked(InputField)).toHaveBeenCalledWith(
-      {
-        title: 'Delay position from bottom of well (mm)',
-        error: 'Value must be between 1 to 100',
-        readOnly: true,
-        type: 'number',
-        value: 0,
-      },
-      {}
-    )
-    const saveBtn = screen.getByTestId('ChildNavigation_Primary_Button')
-    expect(saveBtn).toBeDisabled()
-  })
-
-  it('has correct range for delay height for dispense', () => {
-    props = {
-      ...props,
-      kind: 'dispense',
-    }
-    render(props)
-    const enabledBtn = screen.getByText('Enabled')
-    fireEvent.click(enabledBtn)
-    const continueBtn = screen.getByText('Continue')
-    fireEvent.click(continueBtn)
-    const oneButton = screen.getByText('1')
-    fireEvent.click(oneButton)
-    const nextBtn = screen.getByTestId('ChildNavigation_Primary_Button')
-    fireEvent.click(nextBtn)
-    const zeroButton = screen.getByText('0')
-    fireEvent.click(zeroButton)
-    expect(vi.mocked(InputField)).toHaveBeenCalledWith(
-      {
-        title: 'Delay position from bottom of well (mm)',
-        error: 'Value must be between 1 to 400',
-        readOnly: true,
-        type: 'number',
-        value: 0,
-      },
-      {}
-    )
-    const saveBtn = screen.getByTestId('ChildNavigation_Primary_Button')
-    expect(saveBtn).toBeDisabled()
   })
 
   it('calls dispatch when an in range value is entered and saved', () => {
@@ -225,7 +169,6 @@ describe('Delay', () => {
         ...props.state,
         delayAspirate: {
           delayDuration: 15,
-          positionFromBottom: 55,
         },
       },
     }
@@ -242,17 +185,6 @@ describe('Delay', () => {
       },
       {}
     )
-    fireEvent.click(continueBtn)
-    expect(vi.mocked(InputField)).toHaveBeenCalledWith(
-      {
-        title: 'Delay position from bottom of well (mm)',
-        error: null,
-        readOnly: true,
-        type: 'number',
-        value: 55,
-      },
-      {}
-    )
   })
 
   it('persists previously set value saved in state for dispense', () => {
@@ -263,7 +195,6 @@ describe('Delay', () => {
         ...props.state,
         delayDispense: {
           delayDuration: 20,
-          positionFromBottom: 84,
         },
       },
     }
@@ -277,17 +208,6 @@ describe('Delay', () => {
         readOnly: true,
         type: 'number',
         value: 20,
-      },
-      {}
-    )
-    fireEvent.click(continueBtn)
-    expect(vi.mocked(InputField)).toHaveBeenCalledWith(
-      {
-        title: 'Delay position from bottom of well (mm)',
-        error: null,
-        readOnly: true,
-        type: 'number',
-        value: 84,
       },
       {}
     )

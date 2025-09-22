@@ -1,4 +1,4 @@
-import { getSchema2Dimensions } from '@opentrons/shared-data'
+import { getLabwareViewBox } from '@opentrons/shared-data'
 
 import {
   C_MED_DARK_GRAY,
@@ -35,40 +35,43 @@ export function CalibrationBlockRender(
   props: CalibrationBlockRenderProps
 ): JSX.Element | null {
   const { labwareDef } = props
-  const dimensions = getSchema2Dimensions(labwareDef)
+  const { minX, minY, xDimension, yDimension } = getLabwareViewBox(labwareDef)
+  const textLeftX = minX + TEXT_MARGIN
+  const textRightX = minX + xDimension - TEXT_MARGIN
+  const textY = minY + yDimension / 2
 
   switch (labwareDef.parameters.loadName) {
     case 'opentrons_calibrationblock_short_side_right': {
       return (
         <>
           <rect
-            width={dimensions.xDimension}
-            height={dimensions.yDimension}
+            width={xDimension}
+            height={yDimension}
             rx="10"
             ry="10"
-            x={0}
-            y={0}
+            x={minX}
+            y={minY}
             fill={C_MED_DARK_GRAY}
           />
           <rect
-            width={dimensions.xDimension / 2}
-            height={dimensions.yDimension}
+            width={xDimension / 2}
+            height={yDimension}
             rx="10"
             ry="10"
-            x={0}
-            y={0}
+            x={minX}
+            y={minY}
             fill={C_MED_GRAY}
           />
           <g
             transform={`rotate(
               270,
-              ${TEXT_MARGIN},
-              ${dimensions.yDimension / 2}
+              ${textLeftX},
+              ${textY}
             )`}
           >
             <RobotCoordsText
-              x={TEXT_MARGIN}
-              y={dimensions.yDimension / 2}
+              x={textLeftX}
+              y={textY}
               textAnchor="middle"
               fill={C_MED_LIGHT_GRAY}
               fontSize={TYPOGRAPHY.fontSizeCaption}
@@ -80,13 +83,13 @@ export function CalibrationBlockRender(
           <g
             transform={`rotate(
               90,
-              ${dimensions.xDimension - TEXT_MARGIN},
-              ${dimensions.yDimension / 2}
+              ${textRightX},
+              ${textY}
             )`}
           >
             <RobotCoordsText
-              x={dimensions.xDimension - TEXT_MARGIN}
-              y={dimensions.yDimension / 2}
+              x={textRightX}
+              y={textY}
               textAnchor="middle"
               fill={C_MED_LIGHT_GRAY}
               fontSize={TYPOGRAPHY.fontSizeCaption}
@@ -102,33 +105,33 @@ export function CalibrationBlockRender(
       return (
         <>
           <rect
-            width={dimensions.xDimension}
-            height={dimensions.yDimension}
+            width={xDimension}
+            height={yDimension}
             rx="10"
             ry="10"
-            x={0}
-            y={0}
+            x={minX}
+            y={minY}
             fill={C_MED_DARK_GRAY}
           />
           <rect
-            width={dimensions.xDimension / 2}
-            height={dimensions.yDimension}
+            width={xDimension / 2}
+            height={yDimension}
             rx="10"
             ry="10"
-            x={dimensions.xDimension / 2}
-            y={0}
+            x={minX + xDimension / 2}
+            y={minY}
             fill={C_MED_GRAY}
           />
           <g
             transform={`rotate(
               270,
-              ${TEXT_MARGIN},
-              ${dimensions.yDimension / 2}
+              ${textLeftX},
+              ${textY}
             )`}
           >
             <RobotCoordsText
-              x={TEXT_MARGIN}
-              y={dimensions.yDimension / 2}
+              x={textLeftX}
+              y={textY}
               textAnchor="middle"
               fill={C_MED_LIGHT_GRAY}
               fontSize={TYPOGRAPHY.fontSizeCaption}
@@ -140,13 +143,13 @@ export function CalibrationBlockRender(
           <g
             transform={`rotate(
               90,
-              ${dimensions.xDimension - TEXT_MARGIN},
-              ${dimensions.yDimension / 2}
+              ${textRightX},
+              ${textY}
             )`}
           >
             <RobotCoordsText
-              x={dimensions.xDimension - TEXT_MARGIN}
-              y={dimensions.yDimension / 2}
+              x={textRightX}
+              y={textY}
               textAnchor="middle"
               fill={C_MED_LIGHT_GRAY}
               fontSize={TYPOGRAPHY.fontSizeCaption}

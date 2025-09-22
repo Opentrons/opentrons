@@ -7,11 +7,12 @@ import sys
 from datetime import datetime, timedelta
 from typing import Any
 from hardware_testing.scripts import ABRAsairScript  # type: ignore
-from abr_testing.automation import google_sheets_tool
+from abr_testing.automation import google_sheets_tool, gopro
 from abr_testing.data_collection import (
     get_run_logs,
     abr_google_drive,
     abr_calibration_logs,
+    abr_hepauv,
 )
 from abr_testing.tools import sync_abr_sheet
 
@@ -50,7 +51,7 @@ def clean_sheet(sheet_name: str, credentials: str) -> Any:
         return
     print(f"Rows to be removed: {rem_rows}")
     try:
-        sheet.batch_delete_rows(rem_rows)
+        sheet.batch_delete_rows(rem_rows, "0")
         print("deleted rows")
     except Exception:
         print("could not delete rows")
@@ -66,11 +67,22 @@ def run_sync_abr_sheet(
     sync_abr_sheet.run(storage_directory, abr_data_sheet, room_conditions_sheet)
 
 
-def run_temp_sensor(ambient_conditions_sheet: str, credentials: str) -> None:
+def run_hepa_uv(
+    turning_hepa_fan: str,
+    google_sheet_name: str,
+    storage_directory: str,
+) -> None:
+    """Record HEPA UVs."""
+    abr_hepauv.run(turning_hepa_fan, google_sheet_name, storage_directory)
+
+
+def run_temp_sensor(
+    ambient_conditions_sheet: str, credentials: str, storage_directory: str
+) -> None:
     """Run temperature sensors on all robots."""
     # Remove entries > 60 days
     clean_sheet(ambient_conditions_sheet, credentials)
-    processes = ABRAsairScript.run()
+    processes = ABRAsairScript.run(storage_directory)
     for process in processes:
         process.start()
         time.sleep(20)
@@ -127,26 +139,36 @@ def main(configurations: configparser.ConfigParser) -> None:
             credentials = default["Credentials"]
         except KeyError as e:
             print("Cannot read config file\n" + str(e))
-
+    # Record HEPA/UV Tracking
+    storage_directory = configurations["RUN-LOG"]["Storage"]
+    sheet_name = configurations["RUN-LOG"]["Sheet_Name"]
+    hepa_on = input("Are you turning HEPA Fans on or off? ")
+    run_hepa_uv(hepa_on.lower(), sheet_name, storage_directory)
+    if hepa_on == "off":
+        continue_str = input(
+            "Type 'continue' to continue with the rest of the set up script."
+        )
+        if continue_str == "continue":
+            print("Script will continue.")
+        else:
+            sys.exit()
     # Run Temperature Sensors
     ambient_conditions_sheet = configurations["TEMP-SENSOR"]["Sheet_Url"]
     ambient_conditions_sheet_name = configurations["TEMP-SENSOR"]["Sheet_Name"]
-    print("Starting temp sensors...")
-    run_temp_sensor(ambient_conditions_sheet_name, credentials)
-    print("Temp Sensors Started")
+    print("Starting 🌡️ temp sensors 🌡️...")
+    run_temp_sensor(ambient_conditions_sheet_name, credentials, storage_directory)
     # Get Run Logs and Record
-    storage_directory = configurations["RUN-LOG"]["Storage"]
     email = configurations["RUN-LOG"]["Email"]
     drive_folder = configurations["RUN-LOG"]["Drive_Folder"]
     sheet_name = configurations["RUN-LOG"]["Sheet_Name"]
     sheet_url = configurations["RUN-LOG"]["Sheet_Url"]
     print(sheet_name)
     if storage_directory and drive_folder and sheet_name and email:
-        print("Retrieving robot run logs...")
+        print("🤖 Retrieving robot run logs...")
         get_abr_logs(storage_directory, drive_folder, email)
-        print("Recording robot run logs...")
+        print("📄 Recording robot run logs...")
         record_abr_logs(storage_directory, drive_folder, sheet_name, email)
-        print("Run logs updated")
+        print("✅ Run logs updated")
     else:
         print("Storage, Email, or Drive Folder is missing, please fix configs")
         sys.exit(1)
@@ -167,6 +189,9 @@ def main(configurations: configparser.ConfigParser) -> None:
             "Storage, Email, Drive Folder, or Sheet name is missing, please fix configs"
         )
         sys.exit(1)
+    # Set up go pros
+    storage_directory = configurations["RUN-LOG"]["Storage"]
+    gopro.run(storage_directory)
 
 
 if __name__ == "__main__":
