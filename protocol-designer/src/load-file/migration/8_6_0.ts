@@ -49,11 +49,11 @@ export const migrateFile = (
           [id]: {
             ...form,
             aspirate_mmFromBottom:
-              aspirate_mmFromBottom != null && aspirate_mmFromBottom !== 0
+              aspirate_mmFromBottom != null
                 ? aspirate_mmFromBottom
                 : DEFAULT_MM_OFFSET_FROM_BOTTOM,
             dispense_mmFromBottom:
-              dispense_mmFromBottom != null && dispense_mmFromBottom !== 0
+              dispense_mmFromBottom != null
                 ? dispense_mmFromBottom
                 : DEFAULT_MM_OFFSET_FROM_BOTTOM,
           },

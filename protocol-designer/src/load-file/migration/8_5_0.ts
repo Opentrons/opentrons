@@ -18,6 +18,7 @@ import { getTransferPlanAndReferenceVolumes } from '@opentrons/step-generation'
 
 import {
   CHANNELS_MAPPED_TO_MAX_SPEED,
+  DEFAULT_MM_OFFSET_FROM_BOTTOM,
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_EDGE,
   PROTOCOL_DESIGNER_SOURCE,
 } from '../../constants'
@@ -238,6 +239,8 @@ export const migrateFile = (
         aspirate_delay_mmFromBottom,
         dispense_delay_mmFromBottom,
         blowout_z_offset,
+        aspirate_mmFromBottom,
+        dispense_mmFromBottom,
         ...rest
       } = form
       const aspirateLabwareUri = labware[aspirate_labware].labwareDefURI
@@ -330,6 +333,14 @@ export const migrateFile = (
         [id]: {
           ...rest,
           id,
+          aspirate_mmFromBottom:
+            aspirate_mmFromBottom !== 0
+              ? aspirate_mmFromBottom
+              : DEFAULT_MM_OFFSET_FROM_BOTTOM,
+          dispense_mmFromBottom:
+            dispense_mmFromBottom !== 0
+              ? dispense_mmFromBottom
+              : DEFAULT_MM_OFFSET_FROM_BOTTOM,
           aspirate_labware,
           dispense_labware,
           aspirate_touchTip_checkbox: isAspirateLabwareTouchtipDisabled
