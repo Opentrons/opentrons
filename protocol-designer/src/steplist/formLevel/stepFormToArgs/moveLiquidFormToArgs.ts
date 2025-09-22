@@ -354,14 +354,12 @@ export const moveLiquidFormToArgs = (
     aspirateXOffset: aspirate_x_position ?? 0,
     aspirateYOffset: aspirate_y_position ?? 0,
     aspirateZOffset:
-      hydratedFormData.aspirate_mmFromBottom ??
-      DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
+      hydratedFormData.aspirate_mmFromBottom ?? DEFAULT_MM_OFFSET_FROM_BOTTOM,
     aspiratePositionReference: hydratedFormData.aspirate_position_reference,
     dispenseXOffset: dispense_x_position ?? 0,
     dispenseYOffset: dispense_y_position ?? 0,
     dispenseZOffset:
-      hydratedFormData.dispense_mmFromBottom ??
-      DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
+      hydratedFormData.dispense_mmFromBottom ?? DEFAULT_MM_OFFSET_FROM_BOTTOM,
     dispensePositionReference: hydratedFormData.dispense_position_reference,
     aspirateSubmergeSpeed: hydratedFormData.aspirate_submerge_speed ?? null,
     aspirateSubmergeXOffset: hydratedFormData.aspirate_submerge_x_position ?? 0,
