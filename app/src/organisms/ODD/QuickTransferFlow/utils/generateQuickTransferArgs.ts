@@ -399,7 +399,7 @@ export function generateQuickTransferArgs(
     aspirateOffsetFromBottomMm: quickTransferState.tipPositionAspirate,
     dispenseOffsetFromBottomMm: quickTransferState.tipPositionDispense,
     blowoutLocation,
-    blowoutFlowRateUlSec: quickTransferState.blowOutDispense?.flowRate ?? null,
+    blowoutFlowRateUlSec: quickTransferState.blowOutDispense?.flowRate ?? 0,
     blowoutOffsetFromTopMm: DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
     changeTip: quickTransferState.changeTip,
     preWetTip: quickTransferState.preWetTip,
