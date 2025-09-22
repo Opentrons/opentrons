@@ -50,7 +50,7 @@ Holding the Thermocycler below ambient temperature for extended periods can caus
 !!!warning
     Do not set the plate temperature below the ambient temperature for over two hours: condensation could affect performance or damage the module.
 
-If condensation affects your Thermocycler, create a protocol in the Opentrons App that uses the module's heating capabilities to evaporate excess internal or external moisture. To help remove condensation, we recommend operating the Thermocycler for either:
+If condensation affects your Thermocycler, use the module's heating capabilities to evaporate excess internal or external moisture. Either create and run a protocol or use the module controls in the Opentrons App. To help remove condensation, we recommend operating the Thermocycler for either:
 
 - 1 hour at 95 °C
 - 2 hours at 75 °C
