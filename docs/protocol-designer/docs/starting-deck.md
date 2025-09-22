@@ -8,7 +8,7 @@ The protocol starting deck view shows how your Flex or OT-2 deck will look at th
 
 ## Deck hardware
 
-To start, Protocol Designer automatically places modules and fixtures used in your protocol on the robot deck. Click **Deck hardware** in the upper left to add, move, or delete modules or fixtures. Protocol Designer only shows compatible options for each slot. 
+To start, the deck includes your chosen modules and fixtures. Click **Deck hardware** in the upper left to add, move, or delete modules or fixtures. Protocol Designer only shows compatible options for each slot. 
 
 <figure class="screenshot" markdown>
   ![Configure hardware](images/configure_hardware.png)
@@ -22,6 +22,8 @@ Next, click **Liquids** in the upper left. First, define a liquid to use in your
 ## Labware
 
 Click to return to the protocol starting deck, the first step in your protocol timeline. Here, you can edit labware on or off the robot deck. Hover over each deck slot to view slot details. Then, click individual slots to add, remove, or change labware. 
+
+To start, Protocol Designer places your chosen tip racks on the deck. Click and choose **Edit labware** to replace or delete the tip rack. Click any open deck slot to add additional tip racks. You can include lids on additional Flex tip racks. 
 
 Use the toggle switch at the upper right of the protocol starting deck to add, view, and edit off-deck labware.
 
