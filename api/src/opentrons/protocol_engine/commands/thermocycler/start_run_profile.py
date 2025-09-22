@@ -149,11 +149,9 @@ class StartRunExtendedProfileImpl(
 
         async def start_run_profile(task_handler: TaskHandler) -> None:
             if thermocycler_hardware is not None:
-                async with task_handler.synchronize_cancel_previous(
+                async with task_handler.synchronize_cancel_latest(
                     thermocycler_state.module_id
                 ):
-                    # TODO(jbl 2022-06-27) hardcoded constant 1 for `repetitions` should be
-                    #  moved from HardwareControlAPI to the Python ProtocolContext
                     await thermocycler_hardware.execute_profile(
                         profile=profile, volume=target_volume
                     )

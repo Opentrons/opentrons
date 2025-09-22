@@ -779,7 +779,7 @@ class ThermocyclerContext(ModuleContext):
         repetitions: int,
         block_max_volume: Optional[float] = None,
     ) -> Task:
-        """Execute a Thermocycler profile and does not wait for it to finished.
+        """Execute a Thermocycler profile and returns a :py:class:`Task` representing its execution.
         Profile is defined as a cycle of ``steps``, for a given number of ``repetitions``.
 
         Returns a task object that represents concurrent preheating.
