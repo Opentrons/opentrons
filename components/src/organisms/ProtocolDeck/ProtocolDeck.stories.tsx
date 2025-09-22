@@ -6,7 +6,13 @@ import type { Meta, StoryObj } from '@storybook/react'
 const meta: Meta<typeof ProtocolDeckComponent> = {
   title: 'Helix/Organisms/ProtocolDeck',
   component: ProtocolDeckComponent,
-  decorators: [Story => <Story />],
+  decorators: [
+    Story => (
+      <div style={{ width: '50rem', height: '50rem' }}>
+        <Story />
+      </div>
+    ),
+  ],
   parameters: {
     layout: 'centered',
     docs: {
@@ -23,7 +29,7 @@ type Story = StoryObj<typeof ProtocolDeckComponent>
 
 export const Default: Story = {
   args: {
-    protocolAnalysis: StackerAnalysis,
+    protocolAnalysis: StackerAnalysis as any,
   },
   parameters: {
     docs: {
@@ -37,19 +43,47 @@ export const Default: Story = {
 
 export const WithCustomStyling: Story = {
   args: {
-    protocolAnalysis: StackerAnalysis,
+    protocolAnalysis: StackerAnalysis as any,
     baseDeckProps: {
       showSlotLabels: true,
-      svgProps: {
-        style: { width: '100%', height: 'auto', border: '1px solid #ccc' },
-      },
     },
   },
   parameters: {
     docs: {
       description: {
         story:
-          'ProtocolDeck with custom SVG styling applied through baseDeckProps.',
+          'ProtocolDeck with slot labels shown for easier identification of deck positions.',
+      },
+    },
+  },
+}
+
+export const NullAnalysis: Story = {
+  args: {
+    protocolAnalysis: null,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'ProtocolDeck with null analysis - should render nothing gracefully.',
+      },
+    },
+  },
+}
+
+export const ErrorAnalysis: Story = {
+  args: {
+    protocolAnalysis: {
+      ...StackerAnalysis,
+      errors: [{ id: 'test-error', detail: 'Test error message' }],
+    } as any,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'ProtocolDeck with analysis containing errors - should render nothing when errors are present.',
       },
     },
   },
