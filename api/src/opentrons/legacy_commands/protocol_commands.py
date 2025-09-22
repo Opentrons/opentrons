@@ -1,6 +1,7 @@
 from datetime import timedelta
 from typing import Optional
 from . import types as command_types
+from opentrons.protocol_api.tasks import Task
 
 
 def comment(msg: str) -> command_types.CommentCommand:
@@ -51,4 +52,23 @@ def move_labware(text: str) -> command_types.MoveLabwareCommand:
     return {
         "name": command_types.MOVE_LABWARE,
         "payload": {"text": text},
+    }
+
+
+def wait_for_tasks(tasks: list[Task]) -> command_types.WaitForTasksCommand:
+    task_ids = [task.created_at.strftime("%Y-%m-%d %H:%M:%S") for task in tasks]
+    msg = f"Waiting for tasks that started at: {task_ids}."
+    return {
+        "name": command_types.WAIT_FOR_TASKS,
+        "payload": {"text": msg},
+    }
+
+
+def create_timer(seconds: float) -> command_types.CreateTimerCommand:
+    return {
+        "name": command_types.CREATE_TIMER,
+        "payload": {
+            "text": f"Creating background timer for {seconds} seconds.",
+            "time": seconds,
+        },
     }

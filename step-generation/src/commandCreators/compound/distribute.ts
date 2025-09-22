@@ -14,7 +14,7 @@ import {
   NONE_LIQUID_CLASS_NAME,
   POSITION_REFERENCE_MAPPED_TO_WELL_ORIGIN,
   SAFE_MOVE_TO_WELL_LOCATION,
-  WATER_LIQUID_CLASS_NAME,
+  WATER_LIQUID_CLASS_NAME_V2,
   WELL_ORIGIN_TOP,
 } from '@opentrons/shared-data'
 
@@ -163,7 +163,9 @@ export const distribute: CommandCreator<DistributeArgs> = (
   const actionName = 'distribute'
   const errors: CommandCreatorError[] = []
   const isMultiChannelPipette = pipetteEntities[pipette]?.spec.channels !== 1
-
+  const isTouchTipDisabled = labwareEntities[
+    sourceLabware
+  ]?.def.parameters.quirks?.includes('touchTipDisabled')
   const aspirateAirGapVolume = args.aspirateAirGapVolume ?? 0
   const dispenseAirGapVolume = args.dispenseAirGapVolume ?? 0
   const disposalVolume =
@@ -260,7 +262,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
     getAllLiquidClassDefs()
       [
         liquidClass === NONE_LIQUID_CLASS_NAME || liquidClass == null
-          ? WATER_LIQUID_CLASS_NAME
+          ? WATER_LIQUID_CLASS_NAME_V2
           : liquidClass
       ].byPipette?.find(
         ({ pipetteModel }) =>
@@ -1144,8 +1146,9 @@ export const distribute: CommandCreator<DistributeArgs> = (
                 },
               }),
               ...blowoutInPlaceCommand,
-              // touch tip at source well with dispense touch tip parameters
-              ...(touchTipAfterDispense
+              // touch tip at source well with source touch tip parameters
+              // only if source is touchTip-able
+              ...(touchTipAfterDispense && !isTouchTipDisabled
                 ? [
                     curryWithoutPython(touchTip, {
                       pipetteId: pipette,

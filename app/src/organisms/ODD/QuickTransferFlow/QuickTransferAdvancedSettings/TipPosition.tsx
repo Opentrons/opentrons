@@ -63,8 +63,9 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
     )
   }
 
-  // the maxiumum allowed position is 2x the height of the well
-  const tipPositionRange = { min: 1, max: Math.floor(wellHeight * 2) } // TODO: set this based on range
+  // the maxiumum allowed position is 2mm above the height of the well
+  // this currently assumes bottom position reference
+  const tipPositionRange = { min: 1, max: Math.floor(wellHeight + 2) } // TODO: set this based on range
 
   const textEntryCopy: string = t('distance_bottom_of_well_mm')
   const tipPositionAction =

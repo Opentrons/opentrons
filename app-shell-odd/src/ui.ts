@@ -70,7 +70,7 @@ export function waitForRobotServerAndShowMainWindow(
 ): void {
   mainWindow.show()
   mainWindow.webContents.send('window-type', 'odd-main')
-  process.env.NODE_ENV !== 'development' &&
+  _NODE_ENV_ !== 'development' &&
     setTimeout(function () {
       systemd
         .getisRobotServerReady()

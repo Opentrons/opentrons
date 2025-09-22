@@ -279,7 +279,9 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
         prevRobotState.labware[slotName].stack
       )
       const isParentLid = getIsLid(labwareEntities[slotName].def)
-      location = isParentLid ? slot : labwareEntities[slotName].pythonName
+      location = isParentLid
+        ? formatPyStr(slot)
+        : labwareEntities[slotName].pythonName
       const newLocationStack = prevRobotState.labware[slotName].stack
       parentSlotForSlotCompatibility =
         newLocationStack[newLocationStack.length - 1]

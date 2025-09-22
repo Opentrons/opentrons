@@ -66,6 +66,8 @@ describe('TwoColLwInfoAndDeck', () => {
         movedLabwareDef: {},
         moduleRenderInfo: [],
         labwareRenderInfo: [],
+        modulesOnDeck: [],
+        labwareOnDeck: [],
       },
       currentRecoveryOptionUtils: {
         selectedRecoveryOption: RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE,

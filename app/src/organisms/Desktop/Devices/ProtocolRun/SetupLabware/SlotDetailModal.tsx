@@ -82,8 +82,9 @@ export const SlotDetailModal = (
   const [selectedLabware, setSelectedLabware] = useState(labwareInStack[0])
   const wellFill = getWellFillFromLabwareId(
     selectedLabware.labwareId,
-    protocolData?.liquids ?? [],
-    labwareByLiquidId
+    protocolData.liquids,
+    labwareByLiquidId,
+    protocolData.commands
   )
 
   const labwareDefinition = definitionsByURI[selectedLabware.definitionUri]

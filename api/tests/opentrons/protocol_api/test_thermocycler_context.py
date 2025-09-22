@@ -4,6 +4,7 @@ import pytest
 from decoy import Decoy, matchers
 
 from opentrons.legacy_broker import LegacyBroker
+from opentrons.protocol_api.tasks import Task
 from opentrons.drivers.types import ThermocyclerLidStatus
 from opentrons.hardware_control.modules import TemperatureStatus
 from opentrons.protocols.api_support.types import APIVersion
@@ -264,18 +265,28 @@ def test_set_block_temperature(
     mock_core: ThermocyclerCore,
     mock_broker: LegacyBroker,
     subject: ThermocyclerContext,
+    api_version: APIVersion,
 ) -> None:
     """It should set the block temperature via the core."""
+    subject._api_version = api_version
+    mock_task = decoy.mock(cls=Task)
     decoy.when(
         mock_validation.ensure_hold_time_seconds(seconds=1.2, minutes=3.4)
     ).then_return(5.6)
-
-    subject.set_block_temperature(
+    decoy.when(
+        mock_core.set_target_block_temperature(
+            celsius=42.0,
+            hold_time_seconds=5.6,
+            block_max_volume=7.8,
+            ramp_rate=5.6,
+        )
+    ).then_return(mock_task._core)
+    result = subject.set_block_temperature(
         temperature=42.0,
         hold_time_seconds=1.2,
         hold_time_minutes=3.4,
-        ramp_rate=5.6,
         block_max_volume=7.8,
+        ramp_rate=5.6,
     )
 
     decoy.verify(
@@ -291,13 +302,6 @@ def test_set_block_temperature(
                 }
             ),
         ),
-        mock_core.set_target_block_temperature(
-            celsius=42.0,
-            hold_time_seconds=5.6,
-            block_max_volume=7.8,
-            ramp_rate=5.6,
-        ),
-        mock_core.wait_for_block_temperature(),
         mock_broker.publish(
             "command",
             matchers.DictMatching(
@@ -310,6 +314,12 @@ def test_set_block_temperature(
             ),
         ),
     )
+    if api_version >= APIVersion(2, 27):
+        assert isinstance(result, Task)
+        assert result._core is mock_task._core
+        assert result._api_version == api_version
+    else:
+        assert result is None
 
 
 def test_set_lid_temperature(
@@ -317,10 +327,13 @@ def test_set_lid_temperature(
     mock_core: ThermocyclerCore,
     mock_broker: LegacyBroker,
     subject: ThermocyclerContext,
+    api_version: APIVersion,
 ) -> None:
     """It should close the lid via the core."""
-    subject.set_lid_temperature(temperature=42.0)
-
+    subject._api_version = api_version
+    mock_task = decoy.mock(cls=Task)
+    decoy.when(mock_core.set_target_lid_temperature(42.0)).then_return(mock_task._core)
+    result = subject.set_lid_temperature(42.0)
     decoy.verify(
         mock_broker.publish(
             "command",
@@ -331,13 +344,17 @@ def test_set_lid_temperature(
                 }
             ),
         ),
-        mock_core.set_target_lid_temperature(celsius=42.0),
-        mock_core.wait_for_lid_temperature(),
         mock_broker.publish(
             "command",
             matchers.DictMatching({"$": "after"}),
         ),
     )
+    if api_version >= APIVersion(2, 27):
+        assert isinstance(result, Task)
+        assert result._core is mock_task._core
+        assert result._api_version == api_version
+    else:
+        assert result is None
 
 
 def test_execute_profile(
