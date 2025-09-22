@@ -13,6 +13,7 @@ Include regulatory symbols with text.
 - Biological
 - Toxic
 - Flammable
+- Pinch point
 
 ## Compliance standards
 
@@ -21,5 +22,6 @@ Regulatory IDs and descriptions:
 - Electromagnetic
 - FCC
 - CISPR
+- WEEE
 - Everything causes cancer in California warning
 

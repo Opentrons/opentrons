@@ -2,14 +2,15 @@
 title: "Opentrons OT-2: Installation and Relocation"
 ---
 
-## Section
+## Installation
 
-text
+### Requirements
 
-## Section
+### Unboxing
 
-text
+### First run
+- power
 
-## Section
+## Software installation and update
 
-text
+- App

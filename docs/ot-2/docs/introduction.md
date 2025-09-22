@@ -20,4 +20,4 @@ Summary of top-level topics, similar to Flex. Bullet list with summary of broad 
 
 ## Notes and warnings
 
-- Callouts
+- Callouts used throughout
