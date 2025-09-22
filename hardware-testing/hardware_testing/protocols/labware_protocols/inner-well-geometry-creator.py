@@ -1,6 +1,6 @@
 """Inner Labware Geometry Creator Protocol.
 
-This protocol updates a custom labware definition with its inner labware geometry 
+This protocol updates a custom labware definition with its inner labware geometry
 through a sequence of aspirating, dispensing, and measuring liquid height.
 """
 
@@ -67,7 +67,7 @@ CSV_HEADER = [
 #  GLOBAL VARIABLES - END
 ###########################################
 
-metadata = {"protocolName": "inner-well-geometry-creator", "author": "ABR"}
+metadata = {"protocolName": "inner-well-geometry-creator", "author": "hovan.ngo@opentrons.com"}
 requirements = {"robotType": "Flex", "apiLevel": "2.24"}
 
 
