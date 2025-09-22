@@ -1,0 +1,64 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-16);
+  border-radius: var(--spacing-8);
+  gap: var(--spacing-24);
+}
+
+.status_container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-16);
+  border: 1px solid var(--grey-30);
+  border-radius: var(--spacing-4);
+}
+
+.status_content_container {
+  display: flex;
+  width: 70%;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.status_camera_status {
+  display: flex;
+  gap: var(--spacing-8);
+}
+
+.status_toggle_container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.settings_container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-16);
+}
+
+.usage_item_container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: var(--spacing-16);
+}
+
+.usage_item_text_container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.camera_controls_container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.camera_controls_text_container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
