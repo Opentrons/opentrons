@@ -30,7 +30,10 @@ from opentrons.types import (
     StagingSlotName,
     MeniscusTrackingTarget,
 )
-from opentrons_shared_data.pipette.types import PipetteNameType
+from opentrons_shared_data.pipette.types import (
+    PipetteNameType,
+    LiquidClasses as VolumeModes,
+)
 from opentrons_shared_data.labware.labware_definition import (
     CuboidalFrustum,
     InnerWellGeometry,
@@ -3353,6 +3356,7 @@ def test_get_next_drop_tip_location(
             },
             shaft_ul_per_mm=5.0,
             available_sensors=available_sensors,
+            volume_mode=VolumeModes.default,
         )
     )
     decoy.when(mock_pipette_view.get_mount("pip-123")).then_return(pipette_mount)
