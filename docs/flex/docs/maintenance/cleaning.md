@@ -202,6 +202,6 @@ To set up the Thermocycler with a clean seal:
 
 ![Location of the automation seal on the inside lid of the Thermocycler](../images/thermocycler-seal.svg "Thermocycler seal"){width="50%"}
 
-## Autoclave safe labware
+## Autoclaving labware
 
 Opentrons doesn't recommend re-using autoclaved labware with a Flex. The heat and pressure may cause items to warp or shrink, even if they're considered "autoclave safe." While autoclaved labware may be acceptable for quick, proof-of-concept testing, it's always better to use fresh labware for production runs, which helps ensure the best results. You can find Flex-compatible labware in the [Opentrons Labware Library](https://labware.opentrons.com/) and on the [Tips & Labware section](https://opentrons.com/products/categories/tips-&-labware) of our website.
