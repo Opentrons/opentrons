@@ -14,7 +14,10 @@ from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.thermocycler import SimulatingDriver
 from opentrons.hardware_control import modules, ExecutionManager
 from opentrons.hardware_control.poller import Poller
-from opentrons.hardware_control.modules.thermocycler import ThermocyclerReader
+from opentrons.hardware_control.modules.thermocycler import (
+    ThermocyclerReader,
+    ThermocyclerError,
+)
 from opentrons.drivers.asyncio.communication.errors import ErrorResponse
 
 
@@ -309,7 +312,37 @@ async def test_set_temperature_with_volume(
 ) -> None:
     """It should call set_plate_temperature with volume param"""
     await set_temperature_subject.set_temperature(30, volume=35)
-    set_plate_temp_spy.assert_called_once_with(temp=30, hold_time=0, volume=35)
+    set_plate_temp_spy.assert_called_once_with(
+        temp=30, hold_time=0, volume=35, ramp_rate=None
+    )
+
+
+async def test_set_temperature_with_ramp_rate(
+    set_temperature_subject: modules.Thermocycler, set_plate_temp_spy: mock.AsyncMock
+) -> None:
+    """It should call set_plate_temperature with volume param"""
+    set_temperature_subject._device_info = {
+        "serial": "dummySerialTC",
+        "model": "dummyModelTC",
+        "version": "v1.0.8",
+    }
+    await set_temperature_subject.set_temperature(30, volume=35, ramp_rate=5.0)
+    set_plate_temp_spy.assert_called_once_with(
+        temp=30, hold_time=0, volume=35, ramp_rate=5.0
+    )
+
+
+async def test_set_temperature_with_ramp_rate_with_old_firmware(
+    set_temperature_subject: modules.Thermocycler, set_plate_temp_spy: mock.AsyncMock
+) -> None:
+    """It should call set_plate_temperature with volume param"""
+    set_temperature_subject._device_info = {
+        "serial": "dummySerialTC",
+        "model": "dummyModelTC",
+        "version": "v1.0.7",
+    }
+    with pytest.raises(ThermocyclerError):
+        await set_temperature_subject.set_temperature(30, volume=35, ramp_rate=5.0)
 
 
 async def test_set_temperature_mixed_hold(
@@ -320,7 +353,9 @@ async def test_set_temperature_mixed_hold(
     await set_temperature_subject.set_temperature(
         30, hold_time_seconds=20, hold_time_minutes=1
     )
-    set_plate_temp_spy.assert_called_once_with(temp=30, hold_time=80, volume=None)
+    set_plate_temp_spy.assert_called_once_with(
+        temp=30, hold_time=80, volume=None, ramp_rate=None
+    )
 
 
 async def test_set_temperature_just_seconds_hold(
@@ -329,7 +364,9 @@ async def test_set_temperature_just_seconds_hold(
     """ "It should call set_plate_temperature with total second count computed from
     just seconds."""
     await set_temperature_subject.set_temperature(20, hold_time_seconds=30)
-    set_plate_temp_spy.assert_called_once_with(temp=20, hold_time=30, volume=None)
+    set_plate_temp_spy.assert_called_once_with(
+        temp=20, hold_time=30, volume=None, ramp_rate=None
+    )
 
 
 async def test_set_temperature_just_minutes_hold(
@@ -338,7 +375,9 @@ async def test_set_temperature_just_minutes_hold(
     """ "It should call set_plate_temperature with total second count computed from
     just minutes."""
     await set_temperature_subject.set_temperature(40, hold_time_minutes=5.5)
-    set_plate_temp_spy.assert_called_once_with(temp=40, hold_time=330, volume=None)
+    set_plate_temp_spy.assert_called_once_with(
+        temp=40, hold_time=330, volume=None, ramp_rate=None
+    )
 
 
 async def test_cycle_temperature(
@@ -362,10 +401,10 @@ async def test_cycle_temperature(
     assert (
         set_plate_temp_spy.call_args_list
         == [
-            mock.call(temp=42, hold_time=30, volume=123),
-            mock.call(temp=50, hold_time=60, volume=123),
-            mock.call(temp=60, hold_time=150, volume=123),
-            mock.call(temp=70, hold_time=0, volume=123),
+            mock.call(temp=42, hold_time=30, volume=123, ramp_rate=None),
+            mock.call(temp=50, hold_time=60, volume=123, ramp_rate=None),
+            mock.call(temp=60, hold_time=150, volume=123, ramp_rate=None),
+            mock.call(temp=70, hold_time=0, volume=123, ramp_rate=None),
         ]
         * 5
     )
@@ -397,38 +436,38 @@ async def test_execute_profile(
         volume=123,
     )
     assert set_plate_temp_spy.call_args_list == [
-        mock.call(temp=42, hold_time=30, volume=123),
-        mock.call(temp=20, hold_time=60, volume=123),
-        mock.call(temp=30, hold_time=1, volume=123),
-        mock.call(temp=20, hold_time=60, volume=123),
-        mock.call(temp=30, hold_time=1, volume=123),
-        mock.call(temp=20, hold_time=60, volume=123),
-        mock.call(temp=30, hold_time=1, volume=123),
-        mock.call(temp=20, hold_time=60, volume=123),
-        mock.call(temp=30, hold_time=1, volume=123),
-        mock.call(temp=20, hold_time=60, volume=123),
-        mock.call(temp=30, hold_time=1, volume=123),
-        mock.call(temp=90, hold_time=2, volume=123),
-        mock.call(temp=10, hold_time=120, volume=123),
-        mock.call(temp=20, hold_time=5, volume=123),
-        mock.call(temp=10, hold_time=120, volume=123),
-        mock.call(temp=20, hold_time=5, volume=123),
-        mock.call(temp=10, hold_time=120, volume=123),
-        mock.call(temp=20, hold_time=5, volume=123),
-        mock.call(temp=10, hold_time=120, volume=123),
-        mock.call(temp=20, hold_time=5, volume=123),
-        mock.call(temp=10, hold_time=120, volume=123),
-        mock.call(temp=20, hold_time=5, volume=123),
-        mock.call(temp=10, hold_time=120, volume=123),
-        mock.call(temp=20, hold_time=5, volume=123),
-        mock.call(temp=10, hold_time=120, volume=123),
-        mock.call(temp=20, hold_time=5, volume=123),
-        mock.call(temp=10, hold_time=120, volume=123),
-        mock.call(temp=20, hold_time=5, volume=123),
-        mock.call(temp=10, hold_time=120, volume=123),
-        mock.call(temp=20, hold_time=5, volume=123),
-        mock.call(temp=10, hold_time=120, volume=123),
-        mock.call(temp=20, hold_time=5, volume=123),
+        mock.call(temp=42, hold_time=30, volume=123, ramp_rate=None),
+        mock.call(temp=20, hold_time=60, volume=123, ramp_rate=None),
+        mock.call(temp=30, hold_time=1, volume=123, ramp_rate=None),
+        mock.call(temp=20, hold_time=60, volume=123, ramp_rate=None),
+        mock.call(temp=30, hold_time=1, volume=123, ramp_rate=None),
+        mock.call(temp=20, hold_time=60, volume=123, ramp_rate=None),
+        mock.call(temp=30, hold_time=1, volume=123, ramp_rate=None),
+        mock.call(temp=20, hold_time=60, volume=123, ramp_rate=None),
+        mock.call(temp=30, hold_time=1, volume=123, ramp_rate=None),
+        mock.call(temp=20, hold_time=60, volume=123, ramp_rate=None),
+        mock.call(temp=30, hold_time=1, volume=123, ramp_rate=None),
+        mock.call(temp=90, hold_time=2, volume=123, ramp_rate=None),
+        mock.call(temp=10, hold_time=120, volume=123, ramp_rate=None),
+        mock.call(temp=20, hold_time=5, volume=123, ramp_rate=None),
+        mock.call(temp=10, hold_time=120, volume=123, ramp_rate=None),
+        mock.call(temp=20, hold_time=5, volume=123, ramp_rate=None),
+        mock.call(temp=10, hold_time=120, volume=123, ramp_rate=None),
+        mock.call(temp=20, hold_time=5, volume=123, ramp_rate=None),
+        mock.call(temp=10, hold_time=120, volume=123, ramp_rate=None),
+        mock.call(temp=20, hold_time=5, volume=123, ramp_rate=None),
+        mock.call(temp=10, hold_time=120, volume=123, ramp_rate=None),
+        mock.call(temp=20, hold_time=5, volume=123, ramp_rate=None),
+        mock.call(temp=10, hold_time=120, volume=123, ramp_rate=None),
+        mock.call(temp=20, hold_time=5, volume=123, ramp_rate=None),
+        mock.call(temp=10, hold_time=120, volume=123, ramp_rate=None),
+        mock.call(temp=20, hold_time=5, volume=123, ramp_rate=None),
+        mock.call(temp=10, hold_time=120, volume=123, ramp_rate=None),
+        mock.call(temp=20, hold_time=5, volume=123, ramp_rate=None),
+        mock.call(temp=10, hold_time=120, volume=123, ramp_rate=None),
+        mock.call(temp=20, hold_time=5, volume=123, ramp_rate=None),
+        mock.call(temp=10, hold_time=120, volume=123, ramp_rate=None),
+        mock.call(temp=20, hold_time=5, volume=123, ramp_rate=None),
     ]
 
 
@@ -480,3 +519,17 @@ async def test_async_error_response_to_poller(
             "dummySerialTC",
         )
     )
+
+
+def test_can_use_ramp_rate(subject: modules.Thermocycler) -> None:
+    """It should handle various malformed versions without failing."""
+    subject._device_info["version"] = "v1.0.9"
+    assert subject.can_use_ramp_rate()
+    subject._device_info["version"] = "v1.0.7"
+    assert subject.can_use_ramp_rate() is False
+    subject._device_info["version"] = "asdasvasd"
+    assert subject.can_use_ramp_rate() is False
+    subject._device_info["version"] = ""
+    assert subject.can_use_ramp_rate() is False
+    del subject._device_info["version"]
+    assert subject.can_use_ramp_rate() is False

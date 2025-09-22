@@ -51,7 +51,7 @@ export function PlayButton({
     >
       <Icon
         color={isEnabled ? COLORS.white : COLORS.grey50}
-        name="play-icon"
+        name="play"
         size="2.5rem"
       />
     </Btn>

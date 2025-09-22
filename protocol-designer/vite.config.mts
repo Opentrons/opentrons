@@ -81,7 +81,15 @@ export default defineConfig(
         },
       },
       define: {
-        'process.env': { ...process.env, OT_PD_VERSION, OT_PD_BUILD_DATE },
+        // NOTE: For security, only include environment variables here if they're explicitly allowlisted.
+        _FF_ENV_VARS_: getFeatureFlagEnvVars(),
+        _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
+        _OT_PD_BUILD_DATE_: JSON.stringify(OT_PD_BUILD_DATE),
+        _OT_PD_MIXPANEL_DEV_ID_: JSON.stringify(process.env.OT_PD_MIXPANEL_DEV_ID),
+        _OT_PD_MIXPANEL_ID_: JSON.stringify(process.env.OT_PD_MIXPANEL_ID),
+        _OT_PD_SENTRY_DEV_DSN_: JSON.stringify(process.env.OT_PD_SENTRY_DEV_DSN),
+        _OT_PD_SENTRY_DSN_: JSON.stringify(process.env.OT_PD_SENTRY_DSN),
+        _OT_PD_VERSION_: JSON.stringify(OT_PD_VERSION),
         global: 'globalThis',
       },
       resolve: {
@@ -106,3 +114,29 @@ export default defineConfig(
     }
   }
 )
+
+function getFeatureFlagEnvVars(): Record<string, string | undefined> {
+  // If we change the prefix to something like "OT_PD_FF_...", we could automatically
+  // scrape process.env instead of having this explicit list. We don't want to scrape
+  // process.env as long as the prefix is just "OT_PD_..." because it might accidentally
+  // include something like "OT_PD_SUPER_SECRET_DEPLOY_KEY".
+  const envVarNames = new Set([
+    'OT_PD_PRERELEASE_MODE',
+    'OT_PD_DISABLE_MODULE_RESTRICTIONS',
+    'OT_PD_ALLOW_ALL_TIPRACKS',
+    'OT_PD_ENABLE_COMMENT',
+    'OT_PD_ENABLE_TIP_PICKUP_LOCATION',
+    'OT_PD_ENABLE_HOT_KEYS_DISPLAY',
+    'OT_PD_ENABLE_REACT_SCAN',
+    'OT_PD_ENABLE_MULTIPLE_TEMPS_OT',
+    'OT_PD_ENABLE_TIMELINE_SCRUBBER',
+    'OT_PD_ENABLE_PARTIAL_TIP_SUPPORT',
+    'OT_PD_ENABLE_STACKING',
+    'OT_PD_ENABLE_CONCURRENT_MODULE_ACTIONS',
+    'OT_PD_ENABLE_JSON_EXPORT',
+    'OT_PD_ENABLE_BY_VOLUME_BUILDER',
+  ])
+  return Object.fromEntries(
+    Object.entries(process.env).filter(([key, _value]) => envVarNames.has(key))
+  )
+}

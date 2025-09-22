@@ -48,6 +48,7 @@ export function PresavedStep({
       stepNumber={stepNumber}
       iconName={stepIconsByType[stepType]}
       text={t(`stepType.${stepType}`)}
+      subtext={null}
       sidebarWidth={sidebarWidth}
     />
   )

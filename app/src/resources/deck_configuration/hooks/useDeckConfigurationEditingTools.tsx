@@ -4,8 +4,8 @@ import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
+  getNewConfigForDeckConfig,
   getReplacementFixtureForFixtureRemoval,
-  isFixtureInUsbModules,
 } from '@opentrons/shared-data'
 
 // TODO: return the arguments or something - don't instantiate ui in helper code like this
@@ -78,46 +78,15 @@ export function useDeckConfigurationEditingTools(
       cutoutId,
       addressableAreaId
     )
+    const newDeckConfig = getNewConfigForDeckConfig(
+      cutoutId,
+      cutoutFixtureId,
+      replacementFixtureId,
+      deckConfig,
+      deckDef,
+      true
+    )
 
-    const fixtureGroup =
-      deckDef.cutoutFixtures.find(cf => cf.id === cutoutFixtureId)
-        ?.fixtureGroup ?? {}
-
-    let newDeckConfig = deckConfig
-    if (cutoutId in fixtureGroup) {
-      const groupMap =
-        fixtureGroup[cutoutId]?.find(group =>
-          Object.entries(group).every(([cId, cfId]) =>
-            deckConfig.find(
-              config =>
-                config.cutoutId === cId && config.cutoutFixtureId === cfId
-            )
-          )
-        ) ?? {}
-      newDeckConfig = deckConfig.map(cutoutConfig =>
-        cutoutConfig.cutoutId in groupMap
-          ? {
-              ...cutoutConfig,
-              cutoutFixtureId: replacementFixtureId,
-              opentronsModuleSerialNumber: undefined,
-            }
-          : cutoutConfig
-      )
-    } else {
-      newDeckConfig = deckConfig.map(cutoutConfig => {
-        return cutoutConfig.cutoutId === cutoutId
-          ? {
-              ...cutoutConfig,
-              cutoutFixtureId: replacementFixtureId,
-              opentronsModuleSerialNumber: isFixtureInUsbModules(
-                replacementFixtureId
-              )
-                ? cutoutConfig.opentronsModuleSerialNumber
-                : undefined,
-            }
-          : cutoutConfig
-      })
-    }
     updateDeckConfiguration(newDeckConfig)
   }
 

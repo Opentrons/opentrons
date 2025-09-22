@@ -4215,6 +4215,11 @@
           "description": "Time to hold target temperature in seconds.",
           "title": "Holdseconds",
           "type": "number"
+        },
+        "rampRate": {
+          "description": "How quickly to change temperature in \u00b0C/second.",
+          "title": "Ramprate",
+          "type": "number"
         }
       },
       "required": ["celsius", "holdSeconds"],
@@ -4741,6 +4746,11 @@
           "description": "Time to hold target temperature at in seconds.",
           "title": "Holdseconds",
           "type": "number"
+        },
+        "rampRate": {
+          "description": "How quickly to change temperature in \u00b0C/second.",
+          "title": "Ramprate",
+          "type": "number"
         }
       },
       "required": ["celsius", "holdSeconds"],
@@ -5140,6 +5150,11 @@
           "description": "The rate in C\u00b0/second to change temperature from the current target. If unspecified, the Thermocycler will change temperature at the fastest possible rate.",
           "title": "Ramp Rate",
           "type": "number"
+        },
+        "taskId": {
+          "description": "Id for the background task that manages the temperature.",
+          "title": "Taskid",
+          "type": "string"
         }
       },
       "required": ["moduleId", "celsius"],
@@ -5184,6 +5199,11 @@
         "moduleId": {
           "description": "Unique ID of the Thermocycler Module.",
           "title": "Moduleid",
+          "type": "string"
+        },
+        "taskId": {
+          "description": "Id for the background task that manages the temperature.",
+          "title": "Taskid",
           "type": "string"
         }
       },
@@ -6693,6 +6713,11 @@
           "description": "Unique ID of the Heater-Shaker Module.",
           "title": "Moduleid",
           "type": "string"
+        },
+        "taskId": {
+          "description": "Id for the background task that manages the temperature",
+          "title": "Taskid",
+          "type": "string"
         }
       },
       "required": ["moduleId", "celsius"],
@@ -6782,6 +6807,11 @@
         "moduleId": {
           "description": "Unique ID of the Temperature Module.",
           "title": "Moduleid",
+          "type": "string"
+        },
+        "taskId": {
+          "description": "Id for the background task that manages the temperature",
+          "title": "Taskid",
           "type": "string"
         }
       },
