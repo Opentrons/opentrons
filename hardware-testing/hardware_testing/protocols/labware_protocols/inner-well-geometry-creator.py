@@ -1,9 +1,7 @@
-"""Inner Labware Geometry Creator Protocol.
-
+"""Inner Labware Geometry Creator Protocol. 
 This protocol updates a custom labware definition with its inner labware geometry 
 through a sequence of aspirating, dispensing, and measuring liquid height.
 """
-
 from typing import List, Optional, Union
 from opentrons.protocol_api import (
     ProtocolContext,
