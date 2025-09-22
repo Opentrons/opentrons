@@ -1,4 +1,8 @@
-"""inner-well-geometry-creator Protocol."""
+"""Inner Labware Geometry Creator Protocol.
+
+This protocol updates a custom labware definition with its inner labware geometry 
+through a sequence of aspirating, dispensing, and measuring liquid height.
+"""
 
 
 from typing import List, Optional, Union
@@ -155,13 +159,10 @@ def add_parameters(parameters: ParameterContext) -> None:
     parameters.add_str(
         variable_name="left_mount",
         display_name="Left Mount",
-        description="Pipette Type on Left Mount.",
+        description="Probing Pipette Type on Left Mount.",
         choices=[
-            {"display_name": "8ch 50ul", "value": "flex_8channel_50"},
-            {"display_name": "8ch 1000ul", "value": "flex_8channel_1000"},
             {"display_name": "1ch 50ul", "value": "flex_1channel_50"},
             {"display_name": "1ch 1000ul", "value": "flex_1channel_1000"},
-            {"display_name": "96ch 1000ul", "value": "flex_96channel_1000"},
             {"display_name": "None", "value": "none"},
         ],
         default="flex_1channel_50",
@@ -170,7 +171,7 @@ def add_parameters(parameters: ParameterContext) -> None:
     parameters.add_str(
         variable_name="right_mount",
         display_name="Right Mount",
-        description="Pipette Type on Right Mount.",
+        description="Liquid Pipette Type on Right Mount.",
         choices=[
             {"display_name": "8ch 50ul", "value": "flex_8channel_50"},
             {"display_name": "8ch 1000ul", "value": "flex_8channel_1000"},

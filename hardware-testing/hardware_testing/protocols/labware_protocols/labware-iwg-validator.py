@@ -1,4 +1,7 @@
-"""Volume Validator Protocol."""
+"""Inner Well Geometry Validator Protocol.
+
+This protocol should be used to validate inner well geometry definitions of labware.
+"""
 
 from opentrons.protocol_api import (
     ProtocolContext,
@@ -16,7 +19,7 @@ from opentrons.types import Point
 from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
 
 # LABWARE TYPE
-LABWARE = "eppendorf_96_wellplate_500ul"  # change to desired labware
+LABWARE = "example_labware"  # change to desired labware
 
 # SLOTS
 SLOT_LIQUID_TIPRACKS = ["D3", "B3"]
@@ -40,13 +43,10 @@ def add_parameters(parameters: ParameterContext) -> None:
     parameters.add_str(
         variable_name="left_mount",
         display_name="Left Mount",
-        description="Pipette Type on Left Mount.",
+        description="Probing Pipette Type on Left Mount.",
         choices=[
-            {"display_name": "8ch 50ul", "value": "flex_8channel_50"},
-            {"display_name": "8ch 1000ul", "value": "flex_8channel_1000"},
             {"display_name": "1ch 50ul", "value": "flex_1channel_50"},
             {"display_name": "1ch 1000ul", "value": "flex_1channel_1000"},
-            {"display_name": "96ch 1000ul", "value": "flex_96channel_1000"},
             {"display_name": "None", "value": "none"},
         ],
         default="flex_1channel_50",
@@ -55,10 +55,8 @@ def add_parameters(parameters: ParameterContext) -> None:
     parameters.add_str(
         variable_name="right_mount",
         display_name="Right Mount",
-        description="Pipette Type on Right Mount.",
+        description="Liquid Pipette Type on Right Mount.",
         choices=[
-            {"display_name": "8ch 50ul", "value": "flex_8channel_50"},
-            {"display_name": "8ch 1000ul", "value": "flex_8channel_1000"},
             {"display_name": "1ch 50ul", "value": "flex_1channel_50"},
             {"display_name": "1ch 1000ul", "value": "flex_1channel_1000"},
             {"display_name": "None", "value": "none"},
@@ -384,6 +382,27 @@ def aspirate_dispense_measure(
     return all_corrected_heights
 
 
+def _read_dial_indicator(
+    ctx: ProtocolContext,
+    pipette: InstrumentContext,
+    dial: Labware,
+    front_channel: bool = False,
+) -> float:
+    target = dial["A1"].top()
+    if front_channel:
+        target = target.move(Point(y=9 * 7))
+        if pipette.channels == 96:
+            target = target.move(Point(x=9 * -11))
+    pipette.move_to(target.move(Point(z=5)))
+    pipette.move_to(target)
+    ctx.delay(seconds=2)
+    if ctx.is_simulating():
+        return 0.0
+    dial_port = DIAL_PORT.read()  # type: ignore[union-attr]
+    pipette.move_to(target.move(Point(z=5)))
+    return dial_port
+
+
 def run(ctx: ProtocolContext) -> None:
     """Protocol."""
     (
@@ -455,24 +474,3 @@ def run(ctx: ProtocolContext) -> None:
         ctx.pause(f"Results:\n{line_str}")
 
     drop_tips(probe_pipette, liq_pipette)
-
-
-def _read_dial_indicator(
-    ctx: ProtocolContext,
-    pipette: InstrumentContext,
-    dial: Labware,
-    front_channel: bool = False,
-) -> float:
-    target = dial["A1"].top()
-    if front_channel:
-        target = target.move(Point(y=9 * 7))
-        if pipette.channels == 96:
-            target = target.move(Point(x=9 * -11))
-    pipette.move_to(target.move(Point(z=5)))
-    pipette.move_to(target)
-    ctx.delay(seconds=2)
-    if ctx.is_simulating():
-        return 0.0
-    dial_port = DIAL_PORT.read()  # type: ignore[union-attr]
-    pipette.move_to(target.move(Point(z=5)))
-    return dial_port
