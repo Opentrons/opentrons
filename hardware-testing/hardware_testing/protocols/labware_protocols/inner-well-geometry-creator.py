@@ -67,7 +67,10 @@ CSV_HEADER = [
 #  GLOBAL VARIABLES - END
 ###########################################
 
-metadata = {"protocolName": "inner-well-geometry-creator", "author": "hovan.ngo@opentrons.com"}
+metadata = {
+    "protocolName": "inner-well-geometry-creator",
+    "author": "hovan.ngo@opentrons.com",
+}
 requirements = {"robotType": "Flex", "apiLevel": "2.24"}
 
 
