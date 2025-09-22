@@ -60,7 +60,7 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
 
       <Box borderBottom={`1px solid ${COLORS.grey30}`} />
 
-      {enableConcurrentModuleActions && (
+      {enableConcurrentModuleActions && priorState !== null && (
         <>
           <Flex
             flexDirection={DIRECTION_COLUMN}
@@ -73,7 +73,7 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
             >
               {t('protocol_steps:prior_state')}
             </StyledText>
-            {priorState != null && <PriorState priorState={priorState} />}
+            <PriorState priorState={priorState} />
           </Flex>
 
           <Box borderBottom={`1px solid ${COLORS.grey30}`} />
@@ -191,30 +191,31 @@ function PriorState(props: {
 }
 
 function usePriorHeaterShakerState(
-  moduleId: string
+  moduleId: string | null
 ): SG_HeaterShakerModuleState | null {
   // fixme(mm, 2025-09-19): getRobotStateAtActiveItem returns the state for the hovered step,
   // which isn't quite what we want. We want the state just before the step that owns this form.
   const state = useSelector(getRobotStateAtActiveItem)
-  const moduleState = state?.modules[moduleId]?.moduleState
-  const fallback: SG_HeaterShakerModuleState = {
-    type: HEATERSHAKER_MODULE_TYPE,
-    latchOpen: false,
-    targetSpeed: null,
-    targetTemp: null,
+
+  if (moduleId == null) {
+    return null
   }
+
+  const moduleState = state?.modules[moduleId]?.moduleState
 
   if (moduleState == null) {
     // This can happen if the user deletes the module but retains this step.
-    return fallback
-  } else if (moduleState.type !== HEATERSHAKER_MODULE_TYPE) {
+    return null
+  }
+
+  if (moduleState.type !== HEATERSHAKER_MODULE_TYPE) {
     // Shouldn't ever happen.
     console.error(
       'Expecting Heater-Shaker module type, but got:',
       moduleState.type
     )
-    return fallback
-  } else {
-    return moduleState
+    return null
   }
+
+  return moduleState
 }
