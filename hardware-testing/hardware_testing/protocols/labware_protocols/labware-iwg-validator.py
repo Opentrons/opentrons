@@ -57,6 +57,8 @@ def add_parameters(parameters: ParameterContext) -> None:
         display_name="Right Mount",
         description="Liquid Pipette Type on Right Mount.",
         choices=[
+            {"display_name": "8ch 50ul", "value": "flex_8channel_50"},
+            {"display_name": "8ch 1000ul", "value": "flex_8channel_1000"},
             {"display_name": "1ch 50ul", "value": "flex_1channel_50"},
             {"display_name": "1ch 1000ul", "value": "flex_1channel_1000"},
             {"display_name": "None", "value": "none"},
