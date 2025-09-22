@@ -5,10 +5,10 @@ import {
   StepFormStatusList,
 } from '/protocol-designer/components/molecules'
 
-import type { HeaterShakerModuleState as SG_HeaterShakerModuleState } from '@opentrons/step-generation'
+import type { HeaterShakerModuleState } from '@opentrons/step-generation'
 
 export function PriorHeaterShakerState(props: {
-  priorState: SG_HeaterShakerModuleState
+  priorState: HeaterShakerModuleState
 }): JSX.Element {
   const { targetTemp, targetSpeed, latchOpen } = props.priorState
   const { t } = useTranslation()

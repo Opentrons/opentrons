@@ -5,10 +5,10 @@ import {
   StepFormStatusList,
 } from '/protocol-designer/components/molecules'
 
-import type { ThermocyclerModuleState as SG_ThermocyclerModuleState } from '@opentrons/step-generation'
+import type { ThermocyclerModuleState } from '@opentrons/step-generation'
 
 export function PriorThermocyclerState(props: {
-  priorState: SG_ThermocyclerModuleState
+  priorState: ThermocyclerModuleState
 }): JSX.Element {
   const { blockTargetTemp, lidTargetTemp, lidOpen } = props.priorState
   const { t } = useTranslation()
