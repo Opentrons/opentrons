@@ -2,17 +2,19 @@
 title: "Opentrons OT-2: Instruments and Modules"
 ---
 
+## Intro
+
 ## Instruments
 
-Pipette stuff here, as H3s.
+- Pipettes
+- Attaching
+- Calibration
 
 ## Modules
 
-Module stuff here, as H3s
+- HEPA
+- Magnetic
+- Temperature
+- TC
 
-Could also be a parent landing page for 2 sub-sections/child pages:
-
-- Instruments
-- Modules
-
-depending on how long this gets. will work to keep short.
+## Chemical compatibility

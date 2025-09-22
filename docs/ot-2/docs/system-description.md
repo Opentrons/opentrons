@@ -2,14 +2,19 @@
 title: "Opentrons OT-2: System Description"
 ---
 
-## Section
+## Liquid handler specifications
 
 text
 
-## Section
+## Robot components
 
-text
+- Labeled parts of the OT-2
+- Gantry and deck
+- Back panel
+- Door switch
+- LED status lights
 
-## Section
+## Serial number
 
-text
+## UV compatibility
+
