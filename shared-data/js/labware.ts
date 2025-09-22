@@ -10,6 +10,7 @@ import fixtureTiprack300ul from '../labware/fixtures/2/fixture_tiprack_300_ul.js
 import fixtureTrash from '../labware/fixtures/2/fixture_trash.json'
 import labwareSchemaV2 from '../labware/schemas/2.json'
 import labwareSchemaV3 from '../labware/schemas/3.json'
+import { exactMatchOnlyLoadNames } from './constants'
 
 import type {
   LabwareDef2ByDefURI,
@@ -111,7 +112,7 @@ function getAllImages(): Record<string, string> {
   })
   const imageKeyToUrl: Record<string, string> = {}
   for (const imgPath in imageModules) {
-    const filename = imgPath.split('/').pop() ?? ''
+    const filename = imgPath.split(/[/\\]/).pop() || ""
     const base = filename.replace(/\.(png|jpe?g)$/i, '')
     const varName = base.replace(/\./g, '_').replace(/-/g, '_')
     imageKeyToUrl[varName] = imageModules[imgPath] as string
@@ -128,19 +129,11 @@ const loadNames = Array.from(
   )
 )
 
-function matchLoadNamestoURL(loadName: string, varName: string): boolean {
-  const exactMatchOnlyLoadNames = new Set([
-    'milliplex_microtiter_plate',
-    'milliplex_microtiter_plate_lid',
-    'ibidi_96_square_well_plate_300ul',
-    'ibidi_96_square_well_plate_300ul_lid',
-    'opentrons_96_deep_well_adapter',
-    'opentrons_96_filtertiprack_1000ul',
-    'opentrons_96_tiprack_1000ul',
-    'opentrons_universal_flat_adapter',
-    'opentrons_universal_flat_adapter_type_b',
-  ])
-
+function matchLoadNamestoURL(
+  loadName: string,
+  varName: string,
+  exactMatchOnlyLoadNames: Set<string>
+): boolean {
   const normalizedLoadName = loadName.replace(/\./g, '_').replace(/-/g, '_')
   const loadParts = normalizedLoadName.split('_')
   const normalizedVarName = varName.replace(/\./g, '_').replace(/-/g, '_')
@@ -169,50 +162,67 @@ function matchLoadNamestoURL(loadName: string, varName: string): boolean {
     normalizedLoadName.includes(normalizedVarName)
   )
 }
-// Match images to load names
-const labwareImages: Record<string, string[]> = {}
-const matchedImageVars = new Set<string>()
-const imageKeyToUrl = getAllImages()
-for (const loadName of loadNames) {
-  const matchingUrls = Object.entries(imageKeyToUrl)
-    .filter(([varName]) => matchLoadNamestoURL(loadName, varName))
-    .map(([varName, url]) => {
-      matchedImageVars.add(varName)
-      return url
-    })
-
-  if (matchingUrls.length > 0) {
-    labwareImages[loadName] = matchingUrls
-  }
-}
-
-// Clean up labwareImages
-for (const [varName, url] of Object.entries(imageKeyToUrl)) {
-  if (!matchedImageVars.has(varName)) {
-    labwareImages[varName] = [url]
-  }
-}
 
 const adapters = ['aluminumblock', 'tuberack']
-// Sort the image URLs inside each labwareImages entry
-const sortedLabwareImages = Object.fromEntries(
-  Object.entries(labwareImages).map(([key, urls]) => {
-    const sortedUrls = [...urls].sort((a, b) => {
-      const aMatches = adapters.some(substr => a.includes(substr))
-      const bMatches = adapters.some(substr => b.includes(substr))
 
-      if (aMatches && !bMatches) return -1
-      if (!aMatches && bMatches) return 1
+// Match images to load names
+function buildSortedLabwareImages(
+  loadNames: string[]
+): Record<string, string[]> {
+  const matchedImageVars = new Set<string>()
+  const imageKeyToUrl = getAllImages()
+  const labwareImages: Record<string, string[]> = {}
 
-      return a.localeCompare(b)
+  for (const loadName of loadNames) {
+    const matchingUrls = Object.entries(imageKeyToUrl)
+      .filter(([varName]) =>
+        matchLoadNamestoURL(loadName, varName, exactMatchOnlyLoadNames)
+      )
+      .map(([varName, url]) => {
+        matchedImageVars.add(varName)
+        return url
+      })
+    if (matchingUrls.length > 0) {
+      labwareImages[loadName] = matchingUrls
+    }
+  }
+  // Add unmatched images to the object
+  for (const [varName, url] of Object.entries(imageKeyToUrl)) {
+    if (!matchedImageVars.has(varName)) {
+      labwareImages[varName] = [url]
+    }
+  }
+
+  // Sort the image URLs within each entry
+  const sortedLabwareImages = Object.fromEntries(
+    Object.entries(labwareImages).map(([key, urls]) => {
+      const sortedUrls = [...urls].sort((a, b) => {
+        const aMatches = adapters.some(substr => a.includes(substr))
+        const bMatches = adapters.some(substr => b.includes(substr))
+
+        if (aMatches && !bMatches) return -1
+        if (!aMatches && bMatches) return 1
+
+        return a.localeCompare(b)
+      })
+
+      return [key, sortedUrls]
     })
+  )
 
-    return [key, sortedUrls]
-  })
-)
+  return sortedLabwareImages
+}
+
+let labwareImages: Record<string, string[]> = {}
+
+function initializeLabwareImages(): void {
+  labwareImages = buildSortedLabwareImages(loadNames)
+}
+
+initializeLabwareImages()
 
 export {
-  sortedLabwareImages as labwareImages,
+  labwareImages,
   labwareSchemaV2,
   labwareSchemaV3,
   fixture96Plate,
