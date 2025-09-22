@@ -1,0 +1,25 @@
+{
+  "name": "components-testing",
+  "version": "1.0.0",
+  "description": "Minimal React app with Vite for testing components and shared-data packages",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@opentrons/components": "file:../components/opentrons-components-v0.0.0-dev.tgz",
+    "@opentrons/shared-data": "file:../shared-data/opentrons-shared-data-v0.0.0-dev.tgz",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "18.2.51",
+    "@types/react-dom": "18.2.0",
+    "@vitejs/plugin-react": "^4.3.3",
+    "typescript": "5.3.3",
+    "vite": "5.4.11"
+  },
+  "packageManager": "pnpm@9.0.0"
+}

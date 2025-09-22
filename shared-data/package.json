@@ -11,7 +11,19 @@
   "source": "js/index.ts",
   "types": "lib/js/index.d.ts",
   "main": "lib/index.mjs",
-  "module": "js/index.ts",
+  "module": "lib/index.mjs",
+  "exports": {
+    ".": {
+      "types": "./lib/js/index.d.ts",
+      "import": "./lib/index.mjs",
+      "require": "./lib/index.mjs"
+    }
+  },
+  "files": [
+    "lib/",
+    "README.md",
+    "LICENSE"
+  ],
   "dependencies": {
     "ajv": "^6.12.3",
     "lodash": "4.17.21"
