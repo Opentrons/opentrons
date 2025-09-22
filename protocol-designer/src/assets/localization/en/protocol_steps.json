@@ -135,7 +135,7 @@
   "pipette_path": "Pipette path",
   "place_hardware": "Place the modules and fixtures that you are using for this protocol onto the deck.",
   "place_modules": "Place the modules that you are using for this protocol onto the deck.",
-  "prior_state": "Last state",
+  "prior_state": "Last module state",
   "protocol_steps": "Protocol steps",
   "protocol_timeline": "Protocol timeline",
   "reference_positions": {
