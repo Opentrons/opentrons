@@ -44,7 +44,7 @@ The OT-2 complies with all applicable requirements of the following safety and e
 | KN 61000-6-3:2012 | — |
 | EN 61000-3-2:2014 | Electromagnetic compatibility (EMC) – Part 3-2: Limits – Limits for harmonic current emissions (equipment input current ≤ 16 A per phase) |
 | IEC 61000-3-3:2013 Ed.3+A1 | See EN 61000-3-3:2013 above |
-| IEC 61000-6-1 AEI | <font color="red">CANNOT VERIFY w/ *AEI</font> |
+| IEC 61000-6-1 *AEI | <font color="red">CANNOT VERIFY w/ *AEI</font> |
 | EN 61000-3-3:2008 | See EN 61000-3-3:2013 above |
 | FCC Part 15 | Subpart B, Sections 15.107 and 15.109 as a Class A digital device |
 | IC ICES-003:2016Ed.6 | Information Technology Equipment (Including Digital Apparatus) Limits and Methods of Measurement |
