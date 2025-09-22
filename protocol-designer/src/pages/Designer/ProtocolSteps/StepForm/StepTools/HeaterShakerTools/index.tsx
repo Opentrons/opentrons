@@ -13,8 +13,6 @@ import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 
 import {
   DropdownStepFormField,
-  StepFormStatus,
-  StepFormStatusList,
   ToggleExpandStepFormField,
   ToggleStepFormField,
 } from '/protocol-designer/components/molecules'
@@ -24,8 +22,8 @@ import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
 
 import { usePriorModuleState } from '../../hooks/usePriorModuleState'
 
-import type { HeaterShakerModuleState as SG_HeaterShakerModuleState } from '@opentrons/step-generation'
 import type { StepFormProps } from '../../types'
+import { PriorHeaterShakerState } from './PriorHeaterShakerState'
 
 export function HeaterShakerTools(props: StepFormProps): JSX.Element {
   const { propsForFields, formData } = props
@@ -75,7 +73,7 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
             >
               {t('protocol_steps:prior_state')}
             </StyledText>
-            <PriorState priorState={priorState} />
+            <PriorHeaterShakerState priorState={priorState} />
           </Flex>
 
           <Box borderBottom={`1px solid ${COLORS.grey30}`} />
@@ -153,41 +151,4 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
   )
 }
 
-function PriorState(props: {
-  priorState: SG_HeaterShakerModuleState
-}): JSX.Element {
-  const { targetTemp, targetSpeed, latchOpen } = props.priorState
-  const { t } = useTranslation()
-  return (
-    <StepFormStatusList>
-      <StepFormStatus
-        label={t('protocol_steps:heater_shaker.prior_state.heater_label')}
-        value={
-          targetTemp != null
-            ? t('protocol_steps:heater_shaker.prior_state.heater_value', {
-                value: targetTemp,
-              })
-            : t('protocol_steps:heater_shaker.prior_state.heater_value_off')
-        }
-      />
-      <StepFormStatus
-        label={t('protocol_steps:heater_shaker.prior_state.shaker_label')}
-        value={
-          targetSpeed != null
-            ? t('protocol_steps:heater_shaker.prior_state.shaker_value', {
-                value: targetSpeed,
-              })
-            : t('protocol_steps:heater_shaker.prior_state.shaker_value_off')
-        }
-      />
-      <StepFormStatus
-        label={t('protocol_steps:heater_shaker.prior_state.latch_label')}
-        value={
-          latchOpen ?? false
-            ? t('protocol_steps:heater_shaker.prior_state.latch_value_open')
-            : t('protocol_steps:heater_shaker.prior_state.latch_value_closed')
-        }
-      />
-    </StepFormStatusList>
-  )
-}
+

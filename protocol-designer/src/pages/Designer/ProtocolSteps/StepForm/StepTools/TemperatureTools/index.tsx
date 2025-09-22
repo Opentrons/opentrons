@@ -13,8 +13,6 @@ import { TEMPERATURE_MODULE_TYPE } from '@opentrons/shared-data'
 
 import {
   DropdownStepFormField,
-  StepFormStatus,
-  StepFormStatusList,
   ToggleExpandStepFormField,
 } from '/protocol-designer/components/molecules'
 import { getEnableConcurrentModuleActions } from '/protocol-designer/feature-flags/selectors'
@@ -23,8 +21,8 @@ import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
 
 import { usePriorModuleState } from '../../hooks/usePriorModuleState'
 
-import type { TemperatureModuleState as SG_TemperatureModuleState } from '@opentrons/step-generation'
 import type { StepFormProps } from '../../types'
+import { PriorTemperatureState } from './PriorTemperatureState'
 
 export function TemperatureTools(props: StepFormProps): JSX.Element {
   const { propsForFields, formData } = props
@@ -72,7 +70,7 @@ export function TemperatureTools(props: StepFormProps): JSX.Element {
             >
               {t('protocol_steps:prior_state')}
             </StyledText>
-            <PriorState priorState={priorState} />
+            <PriorTemperatureState priorState={priorState} />
           </Flex>
           <Box borderBottom={`1px solid ${COLORS.grey30}`} />
         </>
@@ -98,31 +96,5 @@ export function TemperatureTools(props: StepFormProps): JSX.Element {
         />
       </Flex>
     </Flex>
-  )
-}
-
-function PriorState(props: {
-  priorState: SG_TemperatureModuleState
-}): JSX.Element {
-  const { t } = useTranslation()
-  const { targetTemperature } = props.priorState
-  return (
-    <StepFormStatusList>
-      <StepFormStatus
-        label={t(
-          'protocol_steps:temperature_module.prior_state.temperature_label'
-        )}
-        value={
-          targetTemperature != null
-            ? t(
-                'protocol_steps:temperature_module.prior_state.temperature_value',
-                { value: targetTemperature }
-              )
-            : t(
-                'protocol_steps:temperature_module.prior_state.temperature_value_off'
-              )
-        }
-      />
-    </StepFormStatusList>
   )
 }
