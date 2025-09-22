@@ -30,14 +30,13 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
   const { propsForFields, formData } = props
   const { t } = useTranslation(['application', 'form', 'protocol_steps'])
   const moduleLabwareOptions = useSelector(getHeaterShakerLabwareOptions)
-  const dispatch = useDispatch()
-
   const priorState = usePriorHeaterShakerState(
     propsForFields.moduleId.value as string
   )
   const enableConcurrentModuleActions = useSelector(
     getEnableConcurrentModuleActions
   )
+  const dispatch = useDispatch()
 
   return (
     <Flex
