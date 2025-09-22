@@ -10,10 +10,6 @@ import {
   StyledText,
 } from '@opentrons/components'
 import { TEMPERATURE_MODULE_TYPE } from '@opentrons/shared-data'
-import {
-  TemperatureModuleState as SG_TemperatureModuleState,
-  TEMPERATURE_DEACTIVATED,
-} from '@opentrons/step-generation'
 
 import {
   DropdownStepFormField,
@@ -22,12 +18,12 @@ import {
   ToggleExpandStepFormField,
 } from '/protocol-designer/components/molecules'
 import { getEnableConcurrentModuleActions } from '/protocol-designer/feature-flags/selectors'
-import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import { getTemperatureLabwareOptions } from '/protocol-designer/ui/modules/selectors'
 import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
 
 import { usePriorModuleState } from '../../hooks/usePriorModuleState'
 
+import type { TemperatureModuleState as SG_TemperatureModuleState } from '@opentrons/step-generation'
 import type { StepFormProps } from '../../types'
 
 export function TemperatureTools(props: StepFormProps): JSX.Element {
@@ -38,7 +34,7 @@ export function TemperatureTools(props: StepFormProps): JSX.Element {
     getEnableConcurrentModuleActions
   )
   const priorState = usePriorModuleState(
-    propsForFields.moduleId.value as any,
+    propsForFields.moduleId.value as string | null,
     TEMPERATURE_MODULE_TYPE
   )
   const dispatch = useDispatch()

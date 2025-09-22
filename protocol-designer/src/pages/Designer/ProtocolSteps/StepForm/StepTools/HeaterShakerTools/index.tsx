@@ -10,7 +10,6 @@ import {
   StyledText,
 } from '@opentrons/components'
 import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
-import { HeaterShakerModuleState as SG_HeaterShakerModuleState } from '@opentrons/step-generation'
 
 import {
   DropdownStepFormField,
@@ -20,12 +19,12 @@ import {
   ToggleStepFormField,
 } from '/protocol-designer/components/molecules'
 import { getEnableConcurrentModuleActions } from '/protocol-designer/feature-flags/selectors'
-import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import { getHeaterShakerLabwareOptions } from '/protocol-designer/ui/modules/selectors'
 import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
 
 import { usePriorModuleState } from '../../hooks/usePriorModuleState'
 
+import type { HeaterShakerModuleState as SG_HeaterShakerModuleState } from '@opentrons/step-generation'
 import type { StepFormProps } from '../../types'
 
 export function HeaterShakerTools(props: StepFormProps): JSX.Element {
@@ -33,7 +32,7 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
   const { t } = useTranslation(['application', 'form', 'protocol_steps'])
   const moduleLabwareOptions = useSelector(getHeaterShakerLabwareOptions)
   const priorState = usePriorModuleState(
-    propsForFields.moduleId.value as any,
+    propsForFields.moduleId.value as string | null,
     HEATERSHAKER_MODULE_TYPE
   )
   const enableConcurrentModuleActions = useSelector(
