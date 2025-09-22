@@ -4,7 +4,6 @@ This protocol updates a custom labware definition with its inner labware geometr
 through a sequence of aspirating, dispensing, and measuring liquid height.
 """
 
-
 from typing import List, Optional, Union
 from opentrons.protocol_api import (
     ProtocolContext,
