@@ -43,7 +43,6 @@ export const getAllLiquidClassDefs = (): Record<string, LiquidClass> => {
     const info = parsePath(path)
     if (!info) return
     const { name, version } = info
-
     const existing = latestLiquidClasssDefinitions[name]
     if (!existing || version > existing.version) {
       const nameWithVersion = `${name}V${version}`
@@ -60,7 +59,7 @@ export const getAllLiquidClassDefs = (): Record<string, LiquidClass> => {
 
 export const LIQUID_CLASS_NAMES_LATEST_VERSION: Record<LiquidName, string> = {
   water: 'waterV2',
-  ethanol_80: 'ethanol80V2',
-  glycerol_50: 'glycerol50V2',
+  ethanol_80: 'ethanol_80V2',
+  glycerol_50: 'glycerol_50V2',
   none: 'none',
 }
