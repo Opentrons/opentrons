@@ -34,7 +34,7 @@ DIAL_PORT = None
 DIAL_PORT_NAME = "/dev/ttyUSB0"
 DIAL_POS_WITHOUT_TIP: List[Optional[float]] = [None, None]
 
-metadata = {"protocolName": "volume-validator"}
+metadata = {"protocolName": "volume-validator", "author": "hovan.ngo@opentrons.com"}
 requirements = {"robotType": "Flex", "apiLevel": "2.24"}
 
 
