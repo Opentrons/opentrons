@@ -517,6 +517,7 @@ def test_dispense_and_wait_skips_delay(
 def test_dispense_and_wait_raises_if_tip_volume_less_than_dispense_vol(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
+    mock_engine_client: EngineClient,
     sample_transfer_props: TransferProperties,
 ) -> None:
     """Should raise a useful error if trying to dispense more than liquid present in tip."""
@@ -524,6 +525,7 @@ def test_dispense_and_wait_raises_if_tip_volume_less_than_dispense_vol(
 
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
+        engine_client=mock_engine_client,
         transfer_properties=sample_transfer_props,
         target_location=Location(Point(1, 2, 3), labware=None),
         target_well=decoy.mock(cls=WellCore),
@@ -878,6 +880,7 @@ def test_retract_after_aspiration(
 def test_retract_after_aspiration_when_retract_loc_below_safe_airgap_point(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
+    mock_engine_client: EngineClient,
     sample_transfer_props: TransferProperties,
 ) -> None:
     """It should execute post-aspiration retract steps and air gap above retract location."""
@@ -901,6 +904,7 @@ def test_retract_after_aspiration_when_retract_loc_below_safe_airgap_point(
 
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
+        engine_client=mock_engine_client,
         transfer_properties=sample_transfer_props,
         target_location=Location(Point(1, 1, 1), labware=None),
         target_well=source_well,
@@ -1923,6 +1927,7 @@ def test_retract_after_dispense_in_trash_with_blowout_in_disposal_location(
 def test_retract_after_dispense_touch_tip(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
+    mock_engine_client: EngineClient,
     sample_transfer_props: TransferProperties,
     dest_type: Literal["well", "trash"],
     blowout_location: BlowoutLocation,
@@ -1951,6 +1956,7 @@ def test_retract_after_dispense_touch_tip(
 
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
+        engine_client=mock_engine_client,
         transfer_properties=sample_transfer_props,
         target_location=target_location,
         target_well=target_well,
@@ -2062,6 +2068,7 @@ def test_retract_after_dispense_raises_for_invalid_retract_point(
 def test_retract_after_dispense_with_blowout_in_src_moves_to_safe_loc_for_air_gap(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
+    mock_engine_client: EngineClient,
     sample_transfer_props: TransferProperties,
 ) -> None:
     """It should retract after a dispense and move to safe location for air gap at dest well and source well."""
@@ -2086,6 +2093,7 @@ def test_retract_after_dispense_with_blowout_in_src_moves_to_safe_loc_for_air_ga
 
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
+        engine_client=mock_engine_client,
         transfer_properties=sample_transfer_props,
         target_location=Location(Point(1, 1, 1), labware=None),
         target_well=dest_well,
