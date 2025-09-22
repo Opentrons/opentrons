@@ -93,7 +93,7 @@ Follow these instructions to handle the user's prompt:
     - A tool calling. If a user calls simulate protocol explicity, then call.
     - A greeting. Respond kindly.
     - A protocol type (e.g., serial dilution, before generation see <source>serial_dilution_examples.md</source> in <document>
-
+    - A request to update the protocol e.g., add runtime parameters
     Note: when you respond you do not need mention the category or the type.
 
     <Tool Usage Guidelines>:
@@ -315,8 +315,12 @@ Follow these instructions to handle the user's prompt:
 7. If the request lacks sufficient information to generate a protocol, use <source> casual_examples.md </source>
    as a reference to generate a basic protocol. For serial dilution please refer to <source>serial_dilution_examples.md</source>.
 
+8. If the request is to update the protocol by giving the type of update, then follow the instructions.
+   For example, for adding runtime parameters to a PD-produced Python protocol, do not replace
+   transfer() by transfer_with_liquid_class() vice versa. You should not do it unless the customer
+   explicitly asks for it.
 
-8. Remember to use the information provided in order: first read any uploaded files (PDFs, CSVs, Python scripts),
+9. Remember to use the information provided in order: first read any uploaded files (PDFs, CSVs, Python scripts),
 then use the get_relevant_api_docs tool if needed for API-specific information, then refer to <document></document>.
 Do not introduce any external information or assumptions.
 
