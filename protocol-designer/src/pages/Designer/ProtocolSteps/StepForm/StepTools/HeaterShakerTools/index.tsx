@@ -19,6 +19,7 @@ import {
   ToggleExpandStepFormField,
   ToggleStepFormField,
 } from '/protocol-designer/components/molecules'
+import { getEnableConcurrentModuleActions } from '/protocol-designer/feature-flags/selectors'
 import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import { getHeaterShakerLabwareOptions } from '/protocol-designer/ui/modules/selectors'
 import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
@@ -33,6 +34,9 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
 
   const priorState = usePriorHeaterShakerState(
     propsForFields.moduleId.value as string
+  )
+  const enableConcurrentModuleActions = useSelector(
+    getEnableConcurrentModuleActions
   )
 
   return (
@@ -57,19 +61,25 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
 
       <Box borderBottom={`1px solid ${COLORS.grey30}`} />
 
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing8}
-        paddingX={SPACING.spacing16}
-      >
-        {/* TODO: stuff this behind a feature flag. */}
-        <StyledText desktopStyle="bodyDefaultSemiBold" color={COLORS.black90}>
-          {t('protocol_steps:prior_state')}
-        </StyledText>
-        {priorState != null && <PriorState priorState={priorState} />}
-      </Flex>
+      {enableConcurrentModuleActions && (
+        <>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing8}
+            paddingX={SPACING.spacing16}
+          >
+            <StyledText
+              desktopStyle="bodyDefaultSemiBold"
+              color={COLORS.black90}
+            >
+              {t('protocol_steps:prior_state')}
+            </StyledText>
+            {priorState != null && <PriorState priorState={priorState} />}
+          </Flex>
 
-      <Box borderBottom={`1px solid ${COLORS.grey30}`} />
+          <Box borderBottom={`1px solid ${COLORS.grey30}`} />
+        </>
+      )}
 
       <Flex
         flexDirection={DIRECTION_COLUMN}
