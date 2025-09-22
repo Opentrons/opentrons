@@ -188,6 +188,17 @@
       "closed": "closed",
       "open": "open"
     },
+    "prior_state": {
+      "block_label": "Block set to",
+      "block_value": "{{value}} °C",
+      "block_value_off": "Off",
+      "lid_label": "Lid set to",
+      "lid_value": "{{value}} °C",
+      "lid_value_off": "Off",
+      "lid_position_label": "Lid position",
+      "lid_position_value_open": "Open",
+      "lid_position_value_closed": "Closed"
+    },
     "repeat": "Repeat {{repetitions}} times",
     "substep_settings": "<text>Set block temperature to</text><tagTemperature/><text>for</text><tagDuration/>",
     "thermocycler_profile": {
