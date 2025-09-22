@@ -1,6 +1,8 @@
-"""Inner Well Geometry Validator Protocol. 
+"""Inner Well Geometry Validator Protocol.
+
 This protocol should be used to validate inner well geometry definitions of labware.
 """
+
 from opentrons.protocol_api import (
     ProtocolContext,
     Labware,
