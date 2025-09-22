@@ -316,9 +316,9 @@ Follow these instructions to handle the user's prompt:
    as a reference to generate a basic protocol. For serial dilution please refer to <source>serial_dilution_examples.md</source>.
 
 8. If the request is to update the protocol by giving the type of update, then follow the instructions.
-   For example, for adding runtime parameters to a PD-produced Python protocol, do not replace 
-   transfer() by transfer_with_liquid_class() vice versa. You should not do it unless the customer 
-   explicitly asks for it. 
+   For example, for adding runtime parameters to a PD-produced Python protocol, do not replace
+   transfer() by transfer_with_liquid_class() vice versa. You should not do it unless the customer
+   explicitly asks for it.
 
 9. Remember to use the information provided in order: first read any uploaded files (PDFs, CSVs, Python scripts),
 then use the get_relevant_api_docs tool if needed for API-specific information, then refer to <document></document>.
