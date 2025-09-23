@@ -352,9 +352,6 @@ export function generateQuickTransferArgs(
     dropTipWasteChuteLocationEntity?.id ??
     ''
 
-  const tipType = getTipTypeFromTipRackDefinition(quickTransferState.tipRack)
-  const flowRatesForSupportedTip =
-    quickTransferState.pipette.liquids.default.supportedTips[tipType]
   const pipetteEntity = Object.values(invariantContext.pipetteEntities)[0]
 
   const sourceLabwareId = Object.keys(robotState.labware).find(
