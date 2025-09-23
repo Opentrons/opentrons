@@ -1,16 +1,16 @@
 {
   "schemaVersion": 2,
   "version": 1,
-  "namespace": "custom_beta",
+  "namespace": "opentrons",
   "metadata": {
     "displayName": "Thermoscientific ABgene 96 Well Plate 1.2mL",
     "displayCategory": "wellPlate",
-    "displayVolumeUnits": "µL",
+    "displayVolumeUnits": "mL",
     "tags": []
   },
   "brand": { "brand": "thermoscientific", "brandId": [] },
   "parameters": {
-    "format": "irregular",
+    "format": "96Standard",
     "quirks": [],
     "isTiprack": false,
     "loadName": "thermoscientific_abgene_96_wellplate_1.2ml",

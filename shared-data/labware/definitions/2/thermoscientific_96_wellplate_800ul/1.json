@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "version": 1,
-  "namespace": "custom_beta",
+  "namespace": "opentrons",
   "metadata": {
     "displayName": "Thermo Fisher Scientific 96 Well Plate 800 µL",
     "displayCategory": "wellPlate",
@@ -10,7 +10,7 @@
   },
   "brand": { "brand": "Thermo Fisher Scientific", "brandId": [] },
   "parameters": {
-    "format": "irregular",
+    "format": "96Standard",
     "quirks": [],
     "isTiprack": false,
     "loadName": "thermoscientific_96_wellplate_800ul",

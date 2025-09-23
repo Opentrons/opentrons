@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "version": 1,
-  "namespace": "custom_beta",
+  "namespace": "opentrons",
   "metadata": {
     "displayName": "Eppendorf Protein LoBind Deepwell Plate 96/500 µL",
     "displayCategory": "wellPlate",

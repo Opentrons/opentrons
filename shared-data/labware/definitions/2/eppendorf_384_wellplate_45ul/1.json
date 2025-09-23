@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "version": 1,
-  "namespace": "custom_beta",
+  "namespace": "opentrons",
   "metadata": {
     "displayName": "Eppendorf 384 Well Plate 45 µL",
     "displayCategory": "wellPlate",

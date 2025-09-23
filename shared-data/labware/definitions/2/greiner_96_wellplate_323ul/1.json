@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "version": 1,
-  "namespace": "custom_beta",
+  "namespace": "opentrons",
   "metadata": {
     "displayName": "Greiner 96 Well Plate 323 \u00b5L",
     "displayCategory": "wellPlate",
@@ -13,7 +13,7 @@
     "brandId": []
   },
   "parameters": {
-    "format": "irregular",
+    "format": "96Standard",
     "quirks": [],
     "isTiprack": false,
     "loadName": "greiner_96_wellplate_323ul",

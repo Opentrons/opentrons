@@ -1,19 +1,19 @@
 {
   "schemaVersion": 2,
   "version": 1,
-  "namespace": "custom_beta",
+  "namespace": "opentrons",
   "metadata": {
-    "displayName": "Costar 96 Well Plate 2200 µL",
+    "displayName": "Costar 96 Well Plate 2.2 mL",
     "displayCategory": "wellPlate",
-    "displayVolumeUnits": "µL",
+    "displayVolumeUnits": "mL",
     "tags": []
   },
   "brand": { "brand": "Costar", "brandId": [] },
   "parameters": {
-    "format": "irregular",
+    "format": "96Standard",
     "quirks": [],
     "isTiprack": false,
-    "loadName": "costar_96_wellplate_2200ul",
+    "loadName": "costar_96_wellplate_2.2ml",
     "isMagneticModuleCompatible": false
   },
   "cornerOffsetFromSlot": { "x": 0, "y": 0, "z": 0 },

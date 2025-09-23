@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "version": 1,
-  "namespace": "custom_beta",
+  "namespace": "opentrons",
   "metadata": {
     "displayName": "Nunc 384 Well Plate 100 µL",
     "displayCategory": "wellPlate",
@@ -10,7 +10,7 @@
   },
   "brand": { "brand": "nunc", "brandId": [] },
   "parameters": {
-    "format": "irregular",
+    "format": "384Standard",
     "quirks": [],
     "isTiprack": false,
     "loadName": "nunc_384_wellplate_100ul",

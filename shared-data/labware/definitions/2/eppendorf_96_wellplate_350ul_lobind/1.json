@@ -1,16 +1,16 @@
 {
   "schemaVersion": 2,
   "version": 1,
-  "namespace": "custom_beta",
+  "namespace": "opentrons",
   "metadata": {
-    "displayName": "Eppendorf DNA LoBind Microplate 96/V-PP",
+    "displayName": "Eppendorf DNA LoBind Microplate 96/350 µL",
     "displayCategory": "wellPlate",
     "displayVolumeUnits": "µL",
     "tags": []
   },
   "brand": { "brand": "Eppendorf", "brandId": [] },
   "parameters": {
-    "format": "irregular",
+    "format": "96Standard",
     "quirks": [],
     "isTiprack": false,
     "loadName": "eppendorf_96_wellplate_350ul_lobind",

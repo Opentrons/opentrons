@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "version": 1,
-  "namespace": "custom_beta",
+  "namespace": "opentrons",
   "metadata": {
     "displayName": "Eppendorf 96 Well Plate 150 µL",
     "displayCategory": "wellPlate",
@@ -10,7 +10,7 @@
   },
   "brand": { "brand": "eppendorf", "brandId": [] },
   "parameters": {
-    "format": "irregular",
+    "format": "96Standard",
     "quirks": [],
     "isTiprack": false,
     "loadName": "eppendorf_96_wellplate_150ul",

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "version": 1,
-  "namespace": "custom_beta",
+  "namespace": "opentrons",
   "metadata": {
     "displayName": "Corning Falcon 384 Well Microtest Plate 130 µL",
     "displayCategory": "wellPlate",
@@ -10,7 +10,7 @@
   },
   "brand": { "brand": "Corning", "brandId": [] },
   "parameters": {
-    "format": "irregular",
+    "format": "384Standard",
     "quirks": [],
     "isTiprack": false,
     "loadName": "corning_falcon_384_wellplate_130ul_flat",

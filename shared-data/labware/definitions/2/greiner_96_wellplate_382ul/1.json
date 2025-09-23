@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "version": 1,
-  "namespace": "custom_beta",
+  "namespace": "opentrons",
   "metadata": {
     "displayName": "Greiner 96 Well Plate 382 µL",
     "displayCategory": "wellPlate",
@@ -10,7 +10,7 @@
   },
   "brand": { "brand": "greiner", "brandId": [] },
   "parameters": {
-    "format": "irregular",
+    "format": "96Standard",
     "quirks": [],
     "isTiprack": false,
     "loadName": "greiner_96_wellplate_382ul",

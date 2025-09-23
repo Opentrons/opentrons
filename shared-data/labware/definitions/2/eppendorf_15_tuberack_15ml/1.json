@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "version": 1,
-  "namespace": "custom_beta",
+  "namespace": "opentrons",
   "metadata": {
     "displayName": "Opentrons 15 Tube Rack with Eppendorf 15 mL",
     "displayCategory": "tubeRack",

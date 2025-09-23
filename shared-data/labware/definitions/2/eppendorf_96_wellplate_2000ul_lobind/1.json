@@ -1,11 +1,11 @@
 {
   "schemaVersion": 2,
   "version": 1,
-  "namespace": "custom_beta",
+  "namespace": "opentrons",
   "metadata": {
-    "displayName": "Eppendorf Protein LoBind Deepwell Plate 96/2000 µL",
+    "displayName": "Eppendorf Protein LoBind Deepwell Plate 96/2 mL",
     "displayCategory": "wellPlate",
-    "displayVolumeUnits": "µL",
+    "displayVolumeUnits": "mL",
     "tags": []
   },
   "brand": { "brand": "Eppendorf", "brandId": [] },

@@ -1,9 +1,9 @@
 {
   "schemaVersion": 2,
   "version": 1,
-  "namespace": "custom_beta",
+  "namespace": "opentrons",
   "metadata": {
-    "displayName": "Eppendorf 96 Well Plate 2000 µL",
+    "displayName": "Eppendorf 96 Well Plate 2 mL",
     "displayCategory": "wellPlate",
     "displayVolumeUnits": "µL",
     "tags": []
