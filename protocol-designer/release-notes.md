@@ -24,7 +24,6 @@ This release adds support for new instruments, labware, and hardware,enables lim
 
 ### Improved Features
 
-- Choose where protocol steps are added to your timeline. Click to select a step already in your timeline, then click **Add step** to insert a new step after the chosen point in your timeline.
 - Add a time in hours for the Heater-Shaker Module to heat or shake samples.
 - Exported protocols include step names and details added in Protocol Designer. Each appear as comments above individual steps in the Python protocol file.
 - Hover over wells in a labware to view final volumes on the ending deck.
