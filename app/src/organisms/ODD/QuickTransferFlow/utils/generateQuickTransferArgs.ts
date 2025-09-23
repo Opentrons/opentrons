@@ -4,7 +4,6 @@ import uuidv1 from 'uuid/v4'
 import {
   getAllDefinitions,
   getLabwareDefURI,
-  getTipTypeFromTipRackDefinition,
   orderWells,
   POSITION_REFERENCE_BOTTOM,
   TRASH_BIN_ADAPTER_FIXTURE,
