@@ -1,8 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  ETHANOL_LIQUID_CLASS_NAME,
   getAllLiquidClassDefs,
-  LIQUID_CLASS_NAMES_LATEST_VERSION,
+  GLYCEROL_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
 
 import { getLoadLiquidClassCommands } from '../getLoadLiquidClassCommands'
@@ -31,14 +32,14 @@ const MOCK_PIPETTE_ENTITIES = ({
 const MOCK_SAVED_STEP_FORMS = ({
   step0: {
     pipette: 'mockPipette1',
-    liquidClass: LIQUID_CLASS_NAMES_LATEST_VERSION.ethanol_80,
+    liquidClass: ETHANOL_LIQUID_CLASS_NAME,
     tipRack: 'mockTipRack1',
     stepType: 'moveLiquid',
     id: 'step0',
   },
   step1: {
     pipette: 'mockPipette1',
-    liquidClass: LIQUID_CLASS_NAMES_LATEST_VERSION.glycerol_50,
+    liquidClass: GLYCEROL_LIQUID_CLASS_NAME,
     tipRack: 'mockTipRack3',
     stepType: 'mix',
     id: 'step1',
@@ -46,7 +47,7 @@ const MOCK_SAVED_STEP_FORMS = ({
 } as unknown) as SavedStepFormState
 
 const mockLiquidClasses = {
-  [LIQUID_CLASS_NAMES_LATEST_VERSION.ethanol_80]: {
+  [ETHANOL_LIQUID_CLASS_NAME]: {
     liquidClassName: 'ethanol_80',
     byPipette: [
       {
@@ -62,7 +63,7 @@ const mockLiquidClasses = {
       },
     ],
   },
-  [LIQUID_CLASS_NAMES_LATEST_VERSION.glycerol_50]: {
+  [GLYCEROL_LIQUID_CLASS_NAME]: {
     liquidClassName: 'glycerol_50',
     byPipette: [
       {
@@ -125,7 +126,7 @@ describe('getLoadLiquidClassCommands', () => {
         stepType: 'moveLiquid',
         id: 'step2',
         pipette: 'mockPipette1',
-        liquidClass: LIQUID_CLASS_NAMES_LATEST_VERSION.glycerol_50,
+        liquidClass: GLYCEROL_LIQUID_CLASS_NAME,
         tipRack: 'mockTipRack3',
       },
     })

@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 
-import { LIQUID_CLASS_NAMES_LATEST_VERSION } from '@opentrons/shared-data'
+import { WATER_LIQUID_CLASS_NAME } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
@@ -39,7 +39,7 @@ describe('LiquidClassesStepMoveLiquidTools', () => {
       orderedLiquidClassOptions: [
         {
           name: 'mockname',
-          value: LIQUID_CLASS_NAMES_LATEST_VERSION.water,
+          value: WATER_LIQUID_CLASS_NAME,
           subButtonLabel: '',
         },
       ],

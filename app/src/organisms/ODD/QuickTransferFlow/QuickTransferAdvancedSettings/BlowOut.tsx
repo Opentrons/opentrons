@@ -21,8 +21,8 @@ import {
   getFlexNameConversion,
   getTipTypeFromTipRackDefinition,
   linearInterpolate,
-  LIQUID_CLASS_NAMES_LATEST_VERSION,
   LOW_VOLUME_PIPETTES,
+  NONE_LIQUID_CLASS_NAME,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
@@ -215,9 +215,7 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
 
   const selectedLiquidClass = state.liquidClassName
   const liquidClassDef =
-    allLiquidClassDefs[
-      selectedLiquidClass ?? LIQUID_CLASS_NAMES_LATEST_VERSION.none
-    ]
+    allLiquidClassDefs[selectedLiquidClass ?? NONE_LIQUID_CLASS_NAME]
   const convertedPipetteName =
     state.pipette != null ? getFlexNameConversion(state.pipette) : null
 

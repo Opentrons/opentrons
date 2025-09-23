@@ -5,9 +5,10 @@ import {
   getFlexNameConversion,
   getLabwareDefURI,
   linearInterpolate,
-  LIQUID_CLASS_NAMES_LATEST_VERSION,
+  NONE_LIQUID_CLASS_NAME,
   POSITION_REFERENCE_TOP,
   SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+  WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
@@ -31,7 +32,7 @@ export const retrieveLiquidClassValues = (
   const { pipette } = state
   const convertedPipetteName = getFlexNameConversion(pipette)
 
-  if (state.liquidClassName === LIQUID_CLASS_NAMES_LATEST_VERSION.none) {
+  if (state.liquidClassName === NONE_LIQUID_CLASS_NAME) {
     return getNoLiquidClassValues(
       state,
       convertedPipetteName,
@@ -76,9 +77,7 @@ const getNoLiquidClassValues = (
 ): QuickTransferSummaryState => {
   const { tipRack, path, volume, pipette } = state
   const tiprackUri = getLabwareDefURI(tipRack)
-  const referenceLiquidClass = getAllLiquidClassDefs()[
-    LIQUID_CLASS_NAMES_LATEST_VERSION.water
-  ]
+  const referenceLiquidClass = getAllLiquidClassDefs()[WATER_LIQUID_CLASS_NAME]
   const liquidClassValuesForPipette = referenceLiquidClass.byPipette.find(
     ({ pipetteModel }) => convertedPipetteName === pipetteModel
   )
@@ -274,9 +273,7 @@ const getLiquidClassValues = (
 
   const allLiquidClassDefs = getAllLiquidClassDefs()
 
-  const selectedLiquidClass =
-    LIQUID_CLASS_NAMES_LATEST_VERSION[state.liquidClassName as LiquidName] ??
-    'none'
+  const selectedLiquidClass = state.liquidClassName ?? 'none'
 
   const liquidClassDef = allLiquidClassDefs[selectedLiquidClass]
 

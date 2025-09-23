@@ -8,7 +8,7 @@ import { createSelector } from 'reselect'
 import {
   FLEX_ROBOT_TYPE,
   FLEX_STANDARD_DECKID,
-  LIQUID_CLASS_NAMES_LATEST_VERSION,
+  NONE_LIQUID_CLASS_NAME,
   OT2_STANDARD_DECKID,
   OT2_STANDARD_MODEL,
 } from '@opentrons/shared-data'
@@ -361,7 +361,7 @@ export const createFile: Selector<PDPythonFile> = createSelector(
         if (
           'liquidClass' in stepForm &&
           stepForm.liquidClass != null &&
-          stepForm.liquidClass !== LIQUID_CLASS_NAMES_LATEST_VERSION.none
+          stepForm.liquidClass !== NONE_LIQUID_CLASS_NAME
         ) {
           acc.add(stepForm.liquidClass as string)
         }

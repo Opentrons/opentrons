@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 
-import { LIQUID_CLASS_NAMES_LATEST_VERSION } from '@opentrons/shared-data'
+import { WATER_LIQUID_CLASS_NAME } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -44,7 +44,7 @@ describe('Overview', () => {
         } as any,
         transferType: 'transfer',
         volume: 25,
-        liquidClassName: LIQUID_CLASS_NAMES_LATEST_VERSION.water,
+        liquidClassName: WATER_LIQUID_CLASS_NAME,
       } as any,
     }
   })

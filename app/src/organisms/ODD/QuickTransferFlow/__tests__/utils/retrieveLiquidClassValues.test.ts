@@ -4,7 +4,7 @@ import {
   fixture96Plate,
   fixtureP100096V2Specs,
   fixtureTiprack300ul,
-  LIQUID_CLASS_NAMES_LATEST_VERSION,
+  NONE_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
 
 import { retrieveLiquidClassValues } from '../../utils'
@@ -30,7 +30,7 @@ const STATE: QuickTransferSummaryState = {
   tipPositionDispense: 5,
   changeTip: 'once',
   dropTipLocation: { cutoutFixtureId: 'trashBinAdapter', cutoutId: 'cutoutA3' },
-  liquidClassName: LIQUID_CLASS_NAMES_LATEST_VERSION.none,
+  liquidClassName: NONE_LIQUID_CLASS_NAME,
   liquidClassValuesInitialized: false,
 }
 

@@ -8,10 +8,7 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import {
-  getAllLiquidClassDefs,
-  LIQUID_CLASS_NAMES_LATEST_VERSION,
-} from '@opentrons/shared-data'
+import { getAllLiquidClassDefs } from '@opentrons/shared-data'
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useToaster } from '/app/organisms/ToasterOven'
@@ -60,10 +57,7 @@ export function SelectLiquidClass({
     if (selectedLiquidClass != null) {
       dispatch({
         type: 'SET_LIQUID_CLASS',
-        liquidClassName:
-          LIQUID_CLASS_NAMES_LATEST_VERSION[
-            selectedLiquidClass.liquidClassName as LiquidName
-          ],
+        liquidClassName: selectedLiquidClass.liquidClassName as LiquidName,
       })
     }
     onNext()

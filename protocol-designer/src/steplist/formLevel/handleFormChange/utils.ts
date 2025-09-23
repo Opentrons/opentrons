@@ -7,10 +7,11 @@ import {
   getAllLiquidClassDefs,
   getFlexNameConversion,
   linearInterpolate,
-  LIQUID_CLASS_NAMES_LATEST_VERSION,
+  NONE_LIQUID_CLASS_NAME,
   OT2_ROBOT_TYPE,
   POSITION_REFERENCE_TOP,
   SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+  WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
@@ -545,9 +546,7 @@ const getNoLiquidClassValuesMoveLiquid = (args: {
     Object.values(labwareEntities).find(
       ({ labwareDefURI }) => labwareDefURI === tiprack
     ) ?? null
-  const referenceLiquidClass = getAllLiquidClassDefs()[
-    LIQUID_CLASS_NAMES_LATEST_VERSION.water
-  ]
+  const referenceLiquidClass = getAllLiquidClassDefs()[WATER_LIQUID_CLASS_NAME]
   const liquidClassValuesForPipette = referenceLiquidClass.byPipette.find(
     ({ pipetteModel }) => convertedPipetteName === pipetteModel
   )
@@ -854,9 +853,7 @@ const getNoLiquidClassValuesMix = (args: {
   }
   const { spec: pipetteSpecs } = pipetteEntity
   const volume = Number(rawVolume)
-  const referenceLiquidClass = getAllLiquidClassDefs()[
-    LIQUID_CLASS_NAMES_LATEST_VERSION.water
-  ]
+  const referenceLiquidClass = getAllLiquidClassDefs()[WATER_LIQUID_CLASS_NAME]
   const liquidClassValuesForPipette = referenceLiquidClass.byPipette.find(
     ({ pipetteModel }) => convertedPipetteName === pipetteModel
   )
@@ -1435,10 +1432,7 @@ export const getLiquidClassesValues = (args: {
     return {}
   }
   const convertedPipetteName = getFlexNameConversion(pipetteEntity.spec)
-  if (
-    liquidClass === LIQUID_CLASS_NAMES_LATEST_VERSION.none ||
-    robotType === OT2_ROBOT_TYPE
-  ) {
+  if (liquidClass === NONE_LIQUID_CLASS_NAME || robotType === OT2_ROBOT_TYPE) {
     // OT-2 liquid class selection should always be "none"
     return stepType === 'moveLiquid'
       ? getNoLiquidClassValuesMoveLiquid({
