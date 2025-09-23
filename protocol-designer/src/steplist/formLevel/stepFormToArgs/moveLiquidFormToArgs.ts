@@ -2,7 +2,7 @@ import {
   getAllLiquidClassDefs,
   getFlexNameConversion,
   NONE_LIQUID_CLASS_NAME,
-  WATER_LIQUID_CLASS_NAME_V2,
+  WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
@@ -89,7 +89,7 @@ const getCheckedPath = (
   const liquidClassValuesForTip = allLiquidClassDefs[
     hydratedFormData.liquidClass === NONE_LIQUID_CLASS_NAME ||
     hydratedFormData.liquidClass == null
-      ? WATER_LIQUID_CLASS_NAME_V2
+      ? WATER_LIQUID_CLASS_NAME
       : hydratedFormData.liquidClass ?? null
   ]?.byPipette
     .find(
