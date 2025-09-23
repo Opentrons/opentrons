@@ -90,9 +90,8 @@ jobs:
     steps:
       - name: 'Checkout Repository'
         uses: actions/checkout@v4
-      - name: 'Check out release tags and chore_release branches'
-        # need this because PD examines the app release branch for labware
-        run: git fetch origin '+refs/heads/chore_release-*:refs/remotes/origin/chore_release-*' '+refs/tags/v*:refs/tags/v*'
+        with:
+          fetch-depth: 0 # PD needs to see labware in other release branches
       - uses: ./.github/actions/js/setup
       - name: 'run test-e2e'
         run: make -C protocol-designer test-e2e
