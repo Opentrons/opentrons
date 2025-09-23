@@ -20,7 +20,6 @@ import { getFlowRateFields } from './getFlowRaiteFields'
 import { getMatchingTipLiquidSpecsFromSpec } from './getMatchingTipLiquidSpecsFromSpec'
 import { getMaxUiFlowRate } from './getMaxUiFlowRate'
 
-import type { LiquidName } from '@opentrons/shared-data'
 import type { BlowOutLocation, QuickTransferSummaryState } from '../types'
 
 const DEFAULT_MM_OFFSET_FROM_BOTTOM = 1
