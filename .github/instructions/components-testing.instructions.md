@@ -27,7 +27,6 @@ The testing environment simulates a real-world scenario where these packages wou
 
 ```shell
 components-testing/
-├── INSTRUCTIONS.md          # This file
 ├── Makefile                # Build and setup automation
 ├── package.json            # Dependencies and scripts
 ├── vite.config.mts         # Vite configuration
