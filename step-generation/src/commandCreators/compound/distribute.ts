@@ -534,8 +534,9 @@ export const distribute: CommandCreator<DistributeArgs> = (
     destWellChunks,
     (destWellChunk: string[], chunkIndex: number): CurriedCommandCreator[] => {
       const numDestsPerAsp = destWellChunk.length // can differ on final chunk
-      const totalSampleAspirateVolume =
-        volume * numDestsPerAsp + disposalVolume + conditioningVolume
+      const totalSampleAspirateVolume = volume * numDestsPerAsp
+      const totalGrossAspirateVolume =
+        totalSampleAspirateVolume + disposalVolume + conditioningVolume
       const isFirstChunk = chunkIndex === 0
       const isLastChunk = chunkIndex === destWellChunks.length - 1
       const changeTipNow =
@@ -548,7 +549,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
         ? [
             curryWithoutPython(configureForVolume, {
               pipetteId: pipette,
-              volume: totalSampleAspirateVolume,
+              volume: totalGrossAspirateVolume,
             }),
           ]
         : []
@@ -766,8 +767,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
           liquidClass,
           pipetteSpecs,
           tiprackDefUri: tipRack,
-          targetVolume:
-            totalSampleAspirateVolume + disposalVolume + conditioningVolume,
+          targetVolume: totalGrossAspirateVolume,
           liquidHandlingAction: 'aspirate',
           byVolumeProperty: 'correctionByVolume',
           defaultValue: 0,
@@ -798,10 +798,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
       const aspirateCommands = [
         curryWithoutPython(aspirateInPlace, {
           pipetteId: pipette,
-          volume:
-            totalSampleAspirateVolume +
-            (disposalVolume ?? 0) +
-            (conditioningVolume ?? 0),
+          volume: totalGrossAspirateVolume,
           flowRate: aspirateFlowRateUlSec,
           correctionVolume: aspirateCorrectionVolumeForTotalAspiration,
         }),
