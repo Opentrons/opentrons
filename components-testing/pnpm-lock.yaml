@@ -344,14 +344,14 @@ packages:
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
   '@opentrons/components@file:../components/opentrons-components-v0.0.0-dev.tgz':
-    resolution: {integrity: sha512-YC20kK8xcOWqs/toFtrhrPEBRM0rHNvHcpXv2jDMhJ/LQoW7eDsaFrj9MUYHonBUt5kVFQG9J6SROz8O+xCVaQ==, tarball: file:../components/opentrons-components-v0.0.0-dev.tgz}
+    resolution: {integrity: sha512-rMfx9DtxO70ndghHA91H4OzP7kSR2eRkmxCDvqZOH1G9bKlqeWJvXE3ST1hxZ6/gE5JdEUgKVDujUjsyA6wMIQ==, tarball: file:../components/opentrons-components-v0.0.0-dev.tgz}
     version: 0.0.0-dev
     peerDependencies:
       react: 18.2.0
       react-dom: 18.2.0
 
   '@opentrons/shared-data@file:../shared-data/opentrons-shared-data-v0.0.0-dev.tgz':
-    resolution: {integrity: sha512-GQUKDjm7UEhMkrBiHMwwWZwPYK6vECGzauiJzduaJ52PqYkH5gUtaafpsxrMjSar2rWZziwbxC1g1eoO/SWC7A==, tarball: file:../shared-data/opentrons-shared-data-v0.0.0-dev.tgz}
+    resolution: {integrity: sha512-boyNJUeLyxkzBS9AUr/1RYR4sxfufGR+sRnZ+AK/iqMOFshIKs86Rt5H9vt2M7I7l0zpGx5iZFBR2YlveCUbAQ==, tarball: file:../shared-data/opentrons-shared-data-v0.0.0-dev.tgz}
     version: 0.0.0-dev
 
   '@popperjs/core@2.1.1':
