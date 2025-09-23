@@ -12,3 +12,5 @@ You can customize settings for your mix step in a two-part form. Just like in a 
 </figure>
 
 In the aspirate and dispense tabs, you can adjust the flow rate, well order, and tip position within the well. Available advanced settings in a mix step include a delay after aspirating or dispensing, and blowout and touch tip after dispensing. See the advanced settings table in [Transfer steps](transfer.md) for descriptions of each.
+
+Like a transfer step, mix steps are blocked by lids on labware. Use a move step to remove lids, then add a mix step to your protocol. 
