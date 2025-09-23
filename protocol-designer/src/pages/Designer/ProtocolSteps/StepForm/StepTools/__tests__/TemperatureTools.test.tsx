@@ -3,6 +3,8 @@ import { beforeEach, describe, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
+import { getEnableConcurrentModuleActions } from '/protocol-designer/feature-flags/selectors'
+import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import {
   getTemperatureLabwareOptions,
   getTemperatureModuleIds,
@@ -11,8 +13,27 @@ import {
 import { TemperatureTools } from '../TemperatureTools'
 
 import type { ComponentProps } from 'react'
+import type * as FeatureFlagSelectors from '/protocol-designer/feature-flags/selectors'
+import type * as LabwareLocationsSelectors from '/protocol-designer/top-selectors/labware-locations'
 import type * as ModulesSelectors from '/protocol-designer/ui/modules/selectors'
 
+vi.mock('/protocol-designer/feature-flags/selectors', async importOriginal => {
+  const original = await importOriginal<typeof FeatureFlagSelectors>()
+  return {
+    ...original,
+    getEnableConcurrentModuleActions: vi.fn(),
+  }
+})
+vi.mock(
+  '/protocol-designer/top-selectors/labware-locations',
+  async importOriginal => {
+    const original = await importOriginal<typeof LabwareLocationsSelectors>()
+    return {
+      ...original,
+      getRobotStateAtActiveItem: vi.fn(),
+    }
+  }
+)
 vi.mock('/protocol-designer/ui/modules/selectors', async importOriginal => {
   const actualFields = await importOriginal<typeof ModulesSelectors>()
   return {
@@ -86,6 +107,8 @@ describe('TemperatureTools', () => {
         value: 'mockId',
       },
     ])
+    vi.mocked(getEnableConcurrentModuleActions).mockReturnValue(false)
+    vi.mocked(getRobotStateAtActiveItem).mockReturnValue(null)
   })
 
   it('renders a temperature module form with 1 module', () => {
