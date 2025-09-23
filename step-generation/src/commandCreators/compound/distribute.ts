@@ -14,7 +14,7 @@ import {
   NONE_LIQUID_CLASS_NAME,
   POSITION_REFERENCE_MAPPED_TO_WELL_ORIGIN,
   SAFE_MOVE_TO_WELL_LOCATION,
-  WATER_LIQUID_CLASS_NAME_V2,
+  WATER_LIQUID_CLASS_NAME,
   WELL_ORIGIN_TOP,
 } from '@opentrons/shared-data'
 
@@ -265,7 +265,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
     getAllLiquidClassDefs()
       [
         liquidClass === NONE_LIQUID_CLASS_NAME || liquidClass == null
-          ? WATER_LIQUID_CLASS_NAME_V2
+          ? WATER_LIQUID_CLASS_NAME
           : liquidClass
       ].byPipette?.find(
         ({ pipetteModel }) =>
