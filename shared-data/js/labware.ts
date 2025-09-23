@@ -1,4 +1,5 @@
-import { basename, extname } from "path-browserify"
+import { basename, extname } from 'path-browserify'
+
 import fixture12Trough from '../labware/fixtures/2/fixture_12_trough.json'
 import fixture24Tuberack from '../labware/fixtures/2/fixture_24_tuberack.json'
 import fixture96Plate from '../labware/fixtures/2/fixture_96_plate.json'
@@ -114,7 +115,7 @@ function getAllImages(): Record<string, string> {
   const imageKeyToUrl: Record<string, string> = {}
   for (const imgPath in imageModules) {
     const filename = basename(imgPath)
-    const ext = extname(filename) 
+    const ext = extname(filename)
     const base = basename(filename, ext)
     const varName = base.replace(/\./g, '_').replace(/-/g, '_')
     imageKeyToUrl[varName] = imageModules[imgPath] as string
