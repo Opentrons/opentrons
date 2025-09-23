@@ -1,10 +1,11 @@
 import { linearInterpolate } from '@opentrons/shared-data'
 
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { PathOption, QuickTransferSummaryState } from '../types'
 
 interface CalculateWellLimitsParams {
   state: QuickTransferSummaryState
-  tipRack: any
+  tipRack: LabwareDefinition2
   volume: number
   path: PathOption
   conditioningByVolume: Array<[number, number]>
