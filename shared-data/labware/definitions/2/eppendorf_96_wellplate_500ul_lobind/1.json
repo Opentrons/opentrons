@@ -8,7 +8,7 @@
     "displayVolumeUnits": "µL",
     "tags": []
   },
-  "brand": { "brand": "eppendorf", "brandId": [] },
+  "brand": { "brand": "eppendorf", "brandId": ["951032107"] },
   "parameters": {
     "format": "96Standard",
     "quirks": [],

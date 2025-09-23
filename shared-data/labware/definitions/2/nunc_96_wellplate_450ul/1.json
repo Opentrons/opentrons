@@ -8,7 +8,7 @@
     "displayVolumeUnits": "µL",
     "tags": []
   },
-  "brand": { "brand": "nunc", "brandId": [] },
+  "brand": { "brand": "nunc", "brandId": ["249944"] },
   "parameters": {
     "format": "96Standard",
     "quirks": [],

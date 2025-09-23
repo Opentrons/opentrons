@@ -8,7 +8,7 @@
     "displayVolumeUnits": "µL",
     "tags": []
   },
-  "brand": { "brand": "Corning", "brandId": [] },
+  "brand": { "brand": "Corning", "brandId": ["3879"] },
   "parameters": {
     "format": "96Standard",
     "quirks": [],

@@ -8,10 +8,10 @@
     "displayVolumeUnits": "µL",
     "tags": []
   },
-  "brand": { "brand": "eppendorf", "brandId": [] },
+  "brand": { "brand": "eppendorf", "brandId": ["951020427"] },
   "parameters": {
     "format": "96Standard",
-    "quirks": [],
+    "quirks": [],951020427
     "isTiprack": false,
     "loadName": "eppendorf_96_wellplate_150ul",
     "isMagneticModuleCompatible": false

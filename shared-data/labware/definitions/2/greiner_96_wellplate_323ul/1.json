@@ -3,14 +3,14 @@
   "version": 1,
   "namespace": "opentrons",
   "metadata": {
-    "displayName": "Greiner 96 Well Plate 323 \u00b5L",
+    "displayName": "Greiner 96 Well Plate 323 µL",
     "displayCategory": "wellPlate",
-    "displayVolumeUnits": "\u00b5L",
+    "displayVolumeUnits": "µL",
     "tags": []
   },
   "brand": {
     "brand": "greiner",
-    "brandId": []
+    "brandId": ["650101", "650160", "650161", "650162", "650173", "650180", "650185"]
   },
   "parameters": {
     "format": "96Standard",

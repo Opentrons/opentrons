@@ -8,7 +8,7 @@
     "displayVolumeUnits": "µL",
     "tags": []
   },
-  "brand": { "brand": "greiner", "brandId": [] },
+  "brand": { "brand": "greiner", "brandId": ["655101", "655161", "655191"] },
   "parameters": {
     "format": "96Standard",
     "quirks": [],

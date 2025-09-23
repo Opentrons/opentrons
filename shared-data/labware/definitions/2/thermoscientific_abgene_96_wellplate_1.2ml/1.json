@@ -8,7 +8,7 @@
     "displayVolumeUnits": "mL",
     "tags": []
   },
-  "brand": { "brand": "thermoscientific", "brandId": [] },
+  "brand": { "brand": "thermoscientific", "brandId": ["AB0564"] },
   "parameters": {
     "format": "96Standard",
     "quirks": [],
