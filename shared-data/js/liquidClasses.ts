@@ -4,7 +4,7 @@ import type { LiquidClass } from '.'
 // I can't figure out a way to do it autonomously while still having
 // type protection. IMO its easier to just extend this type than not
 // have type protection.
-export type LiquidName = 'water' | 'ethanol_80' | 'glycerol_50' | 'none'
+export type LiquidClassType = 'water' | 'ethanol_80' | 'glycerol_50' | 'none'
 
 interface WithVersion<LiquidClass> {
   def: LiquidClass
@@ -22,13 +22,13 @@ const liquidClassModules: Record<string, LiquidClass> = import.meta.glob(
 // example path: "../liquid-class/definitions/1/water/2.json"
 const parsePath = (
   path: string
-): { name: LiquidName; version: number; path: string } | null => {
+): { name: LiquidClassType; version: number; path: string } | null => {
   const match = path.match(/definitions\/\d+\/([^/]+)\/(\d+)\.json$/)
   if (!match) {
     return null
   }
   const [, name, versionStr] = match
-  return { name: name as LiquidName, version: Number(versionStr), path }
+  return { name: name as LiquidClassType, version: Number(versionStr), path }
 }
 
 // TODO: make none liquid class definition file

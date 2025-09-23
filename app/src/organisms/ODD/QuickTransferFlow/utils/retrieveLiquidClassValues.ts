@@ -272,7 +272,7 @@ const getLiquidClassValues = (
 
   const allLiquidClassDefs = getAllLiquidClassDefs()
 
-  const selectedLiquidClass = state.liquidClassName ?? 'none'
+  const selectedLiquidClass = state.liquidClassName ?? NONE_LIQUID_CLASS_NAME
 
   const liquidClassDef = allLiquidClassDefs[selectedLiquidClass]
 
