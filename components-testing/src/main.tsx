@@ -1,9 +1,12 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
-import { Box, ProtocolDeck } from '@opentrons/components'
+import { ProtocolDeck } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import './styles.css'
+
+// Import the analysis data
 import StackerAnalysis from './StackerAnalysis.json'
 
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
@@ -14,33 +17,40 @@ function App() {
   return (
     <div style={{ padding: '1rem' }}>
       <h1>ProtocolDeck Testing</h1>
-      <p>Testing ProtocolDeck component with StackerAnalysis data</p>
-      <Box
-        padding="1rem"
-        backgroundColor="#f0f0f0"
-        marginTop="1rem"
-        marginBottom="1rem"
+      <p>
+        Testing ProtocolDeck component with StackerAnalysis data (minimal setup)
+      </p>
+
+      <div
+        style={{
+          padding: '1rem',
+          backgroundColor: '#f0f0f0',
+          marginTop: '1rem',
+          marginBottom: '1rem',
+        }}
       >
-        <h2>Package Info:</h2>
+        <h2>Analysis Info:</h2>
         <p>
-          <strong>@opentrons/shared-data:</strong> FLEX_ROBOT_TYPE ={' '}
-          {FLEX_ROBOT_TYPE}
+          <strong>Protocol:</strong> {analysis.metadata.protocolName}
         </p>
         <p>
-          <strong>@opentrons/components:</strong> ProtocolDeck component
-          imported successfully!
+          <strong>Robot Type:</strong> {analysis.robotType}
         </p>
         <p>
-          <strong>Analysis data:</strong> Protocol "
-          {analysis.metadata.protocolName}" for {analysis.robotType}
+          <strong>FLEX_ROBOT_TYPE:</strong> {FLEX_ROBOT_TYPE}
         </p>
-      </Box>
-      <Box
-        padding="1rem"
-        backgroundColor="#fff"
-        border="1px solid #ccc"
-        borderRadius="8px"
+      </div>
+
+      <div
+        style={{
+          padding: '1rem',
+          backgroundColor: '#fff',
+          border: '1px solid #ccc',
+          borderRadius: '8px',
+          marginTop: '1rem',
+        }}
       >
+        <h2>ProtocolDeck Component:</h2>
         <ProtocolDeck
           protocolAnalysis={analysis as any}
           baseDeckProps={{
@@ -50,7 +60,7 @@ function App() {
             },
           }}
         />
-      </Box>
+      </div>
     </div>
   )
 }

@@ -11,18 +11,33 @@ import { cssModuleSideEffect } from './cssModuleSideEffect'
 
 export default defineConfig({
   build: {
-    // Relative to the root
-    ssr: 'src/index.ts',
+    lib: {
+      entry: 'src/index.ts',
+      formats: ['es', 'cjs'],
+      fileName: (format) => `index.${format === 'es' ? 'mjs' : 'js'}`,
+    },
     outDir: 'lib',
     // Do not delete the outdir, typescript types might live there and we don't want to delete them
     emptyOutDir: false,
+    // Ensure CSS is extracted properly
+    cssCodeSplit: false,
     commonjsOptions: {
       transformMixedEsModules: true,
       esmExternals: true,
     },
     rollupOptions: {
-      // Only @opentrons/shared-data is external; step-generation will be bundled!
-      external: ['@opentrons/shared-data'],
+      // Externalize React runtime so consuming app supplies single instance
+      external: [
+        '@opentrons/shared-data',
+        'react',
+        'react-dom',
+        'react/jsx-runtime',
+        'react-dom/client'
+      ],
+      output: {
+        // Ensure CSS is bundled
+        assetFileNames: '[name].[ext]'
+      }
     },
   },
   plugins: [
@@ -44,7 +59,9 @@ export default defineConfig({
     postcss: {
       plugins: [
         postCssImport({ root: 'src/' }),
+        // Apply plugin should come early to transform custom property blocks
         postCssApply(),
+        // Process colors and other functions after apply
         postColorModFunction(),
         postCssPresetEnv({ stage: 0 }),
         lostCss(),

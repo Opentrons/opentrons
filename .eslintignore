@@ -48,3 +48,5 @@ opentrons-ai-server/api/storage/
 /docs/**/*.md
 # And ignore non-semantic formatting issues in mkdocs YAML configuration files.
 /docs/**/*.yml
+
+components-testing/** # ignore everything in components-testing

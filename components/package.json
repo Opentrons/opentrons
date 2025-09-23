@@ -13,8 +13,9 @@
       "require": "./lib/index.js",
       "types": "./lib/index.d.ts"
     },
-    "./styles": "./src/index.module.css",
+    "./styles": "./lib/style.css",
     "./styles/global": "./src/styles/global.css",
+    "./styles/legacy": "./src/index.module.css",
     "./package.json": "./package.json"
   },
   "repository": {

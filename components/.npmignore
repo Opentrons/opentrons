@@ -2,6 +2,7 @@
 src/
 !src/index.module.css
 !src/styles/
+!src/styles/**/*.css
 *.stories.*
 *.test.*
 *.spec.*

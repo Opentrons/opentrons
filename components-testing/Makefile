@@ -1,7 +1,7 @@
 .PHONY: dev build preview setup teardown install-local-packages clean-local-packages
 
 dev:
-	pnpm dev
+	pnpm run dev
 
 build:
 	pnpm build
