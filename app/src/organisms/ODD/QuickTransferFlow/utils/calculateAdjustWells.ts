@@ -29,9 +29,15 @@ export function calculateAdjustWells({
 }: CalculateWellLimitsParams): AdjustWellsResult {
   const tipCapacity = tipRack?.wells?.A1?.totalLiquidVolume
 
+  const minVolumeForMultiAspirateDispense = volume * 2
+
   const actualConditioningVolume =
-    linearInterpolate(volume, conditioningByVolume) ?? 0
-  const actualDisposalVolume = linearInterpolate(volume, disposalByVolume) ?? 0
+    linearInterpolate(
+      minVolumeForMultiAspirateDispense,
+      conditioningByVolume
+    ) ?? 0
+  const actualDisposalVolume =
+    linearInterpolate(minVolumeForMultiAspirateDispense, disposalByVolume) ?? 0
 
   // Calculate extra volumes based on path
   let extraVolumes = 0
