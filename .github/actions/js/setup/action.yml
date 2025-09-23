@@ -128,7 +128,7 @@ runs:
         scan_time=$((scan_end - scan_start))
         echo "⏱️  Package scanning took: ${scan_time}s"
         
-        echo "🚀 Running make setup-js..."
+        echo "🚀 Running yarn setup..."
         setup_start=$(date +%s)
         
         # Configure yarn for faster installs
@@ -136,7 +136,36 @@ runs:
         yarn config set prefer-offline true
         yarn config set network-concurrency 1
         
-        make setup-js
+        # Run yarn install (the main part we need)
+        yarn
+        
+        # Only run app-shell setup if virtualenv exists
+        if [[ -d "app-shell" ]]; then
+          echo "🔍 Checking if app-shell setup is needed..."
+          if [[ -d "api" && -f "api/Pipfile" ]]; then
+            # Check if virtualenv exists
+            if cd api && pipenv --venv >/dev/null 2>&1; then
+              cd ..
+              echo "✅ API virtualenv found, running app-shell setup..."
+              make -C app-shell setup
+            else
+              cd ..
+              echo "⚠️  No API virtualenv found, skipping app-shell setup"
+            fi
+          else
+            echo "⚠️  No API directory found, skipping app-shell setup"
+          fi
+        else
+          echo "⚠️  No app-shell directory found, skipping app-shell setup"
+        fi
+        
+        # Only run app-shell-odd setup if directory exists
+        if [[ -d "app-shell-odd" ]]; then
+          echo "✅ Found app-shell-odd directory, running setup..."
+          make -C app-shell-odd setup
+        else
+          echo "⚠️  No app-shell-odd directory found, skipping app-shell-odd setup"
+        fi
         
         setup_end=$(date +%s)
         setup_time=$((setup_end - setup_start))
