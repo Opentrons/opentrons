@@ -106,7 +106,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
     blowoutFlowRateUlSec,
     blowoutLocation,
     changeTip,
-    conditioningVolume,
     destLabware,
     destWells,
     dispenseDelay,
@@ -166,6 +165,10 @@ export const distribute: CommandCreator<DistributeArgs> = (
   const disposalVolume =
     args.disposalVolume != null && args.disposalVolume > 0
       ? args.disposalVolume
+      : 0
+  const conditioningVolume =
+    args.conditioningVolume != null && args.conditioningVolume > 0
+      ? args.conditioningVolume
       : 0
   // TODO: Ian 2019-04-19 revisit these pipetteDoesNotExist errors, how to do it DRY?
   if (
@@ -534,6 +537,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
     (destWellChunk: string[], chunkIndex: number): CurriedCommandCreator[] => {
       const numDestsPerAsp = destWellChunk.length // can differ on final chunk
       const totalSampleAspirateVolume = volume * numDestsPerAsp
+      const totalGrossAspirateVolume =
+        totalSampleAspirateVolume + disposalVolume + conditioningVolume
       const isFirstChunk = chunkIndex === 0
       const isLastChunk = chunkIndex === destWellChunks.length - 1
       const changeTipNow =
@@ -546,7 +551,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
         ? [
             curryWithoutPython(configureForVolume, {
               pipetteId: pipette,
-              volume: totalSampleAspirateVolume,
+              volume: totalGrossAspirateVolume,
             }),
           ]
         : []
@@ -764,10 +769,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
           liquidClass,
           pipetteSpecs,
           tiprackDefUri: tipRack,
-          targetVolume:
-            totalSampleAspirateVolume +
-            (disposalVolume ?? 0) +
-            (conditioningVolume ?? 0),
+          targetVolume: totalGrossAspirateVolume,
           liquidHandlingAction: 'aspirate',
           byVolumeProperty: 'correctionByVolume',
           defaultValue: 0,
@@ -777,7 +779,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
           liquidClass,
           pipetteSpecs,
           tiprackDefUri: tipRack,
-          targetVolume: conditioningVolume ?? 0,
+          targetVolume: conditioningVolume,
           liquidHandlingAction: 'multiDispense',
           byVolumeProperty: 'correctionByVolume',
           defaultValue: 0,
@@ -798,10 +800,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
       const aspirateCommands = [
         curryWithoutPython(aspirateInPlace, {
           pipetteId: pipette,
-          volume:
-            totalSampleAspirateVolume +
-            (disposalVolume ?? 0) +
-            (conditioningVolume ?? 0),
+          volume: totalGrossAspirateVolume,
           flowRate: aspirateFlowRateUlSec,
           correctionVolume: aspirateCorrectionVolumeForTotalAspiration,
         }),
@@ -844,7 +843,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
           } else if (
             !isFirstWellInChunk &&
             dispenseAirGapVolume > 0 &&
-            (conditioningVolume == null || conditioningVolume === 0)
+            conditioningVolume === 0
           ) {
             airGapInTip = dispenseAirGapVolume
             airGapDispenseFlowRate = dispenseAirGapDispenseFlowRate
@@ -1001,11 +1000,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
           ): CurriedCommandCreator[] =>
             dispenseAirGapVolume > 0 &&
             // don't air gap if not last well in chunk and conditioning volume is present
-            !(
-              wellIndex < destWellChunk.length - 1 &&
-              conditioningVolume != null &&
-              conditioningVolume > 0
-            ) &&
+            !(wellIndex < destWellChunk.length - 1 && conditioningVolume > 0) &&
             // don't air gap if end of full transfer and not changing tip
             !(
               changeTip === 'never' &&
