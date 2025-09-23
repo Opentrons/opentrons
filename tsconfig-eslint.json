@@ -47,6 +47,7 @@
   ],
   "exclude": [
     "analyses-snapshot-testing/**",
+    "components-testing/**",
     "**/node_modules/**",
     "**/coverage/**",
     "**/dist/**/*",
