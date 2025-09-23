@@ -16,7 +16,7 @@ import { useToaster } from '/app/organisms/ToasterOven'
 import { checkLiquidClassCompatibility } from './utils'
 
 import type { ComponentProps, Dispatch } from 'react'
-import type { LiquidClass, LiquidName } from '@opentrons/shared-data'
+import type { LiquidClass, LiquidClassType } from '@opentrons/shared-data'
 import type { SmallButton } from '/app/atoms/buttons'
 import type {
   QuickTransferWizardAction,
@@ -57,7 +57,7 @@ export function SelectLiquidClass({
     if (selectedLiquidClass != null) {
       dispatch({
         type: 'SET_LIQUID_CLASS',
-        liquidClassName: selectedLiquidClass.liquidClassName as LiquidName,
+        liquidClassName: selectedLiquidClass.liquidClassName as LiquidClassType,
       })
     }
     onNext()
