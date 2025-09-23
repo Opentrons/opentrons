@@ -53,6 +53,10 @@ runs:
     - name: 'Setup JS'
       shell: bash
       run: |
+        # Start timing
+        echo "⏱️  Starting JS setup timing..."
+        start_time=$(date +%s)
+        
         # Generic package caching setup
         export CYPRESS_CACHE_FOLDER=~/.cache/Cypress
         export ELECTRON_CACHE=~/.cache/electron
@@ -71,6 +75,7 @@ runs:
         
         # Automatically detect and cache packages that need binary caching
         echo "🔍 Scanning for packages that need binary caching..."
+        scan_start=$(date +%s)
         
         # Find all package.json files in the project
         PACKAGE_FILES=$(find . -name "package.json" -not -path "./node_modules/*" -not -path "./.git/*")
@@ -119,7 +124,12 @@ runs:
           fi
         done
         
+        scan_end=$(date +%s)
+        scan_time=$((scan_end - scan_start))
+        echo "⏱️  Package scanning took: ${scan_time}s"
+        
         echo "🚀 Running make setup-js..."
+        setup_start=$(date +%s)
         
         # Configure yarn for faster installs
         yarn config set network-timeout 60000
@@ -127,3 +137,13 @@ runs:
         yarn config set network-concurrency 1
         
         make setup-js
+        
+        setup_end=$(date +%s)
+        setup_time=$((setup_end - setup_start))
+        echo "⏱️  Make setup-js took: ${setup_time}s"
+        
+        # Final timing summary
+        end_time=$(date +%s)
+        total_time=$((end_time - start_time))
+        echo "⏱️  Total JS setup time: ${total_time}s"
+        echo "⏱️  Breakdown: scanning=${scan_time}s, setup=${setup_time}s"
