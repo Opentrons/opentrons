@@ -14,6 +14,8 @@ import { cssModuleSideEffect } from './cssModuleSideEffect'
 
 import type { UserConfig } from 'vite'
 
+const REQUIRED_APP_VERSION = '8.7.0' // PD requires this robot stack version or higher
+
 // eslint-disable-next-line import/no-default-export
 export default defineConfig(
   async (): Promise<UserConfig> => {
@@ -85,9 +87,14 @@ export default defineConfig(
         _FF_ENV_VARS_: getFeatureFlagEnvVars(),
         _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
         _OT_PD_BUILD_DATE_: JSON.stringify(OT_PD_BUILD_DATE),
-        _OT_PD_MIXPANEL_DEV_ID_: JSON.stringify(process.env.OT_PD_MIXPANEL_DEV_ID),
+        _OT_PD_MIXPANEL_DEV_ID_: JSON.stringify(
+          process.env.OT_PD_MIXPANEL_DEV_ID
+        ),
         _OT_PD_MIXPANEL_ID_: JSON.stringify(process.env.OT_PD_MIXPANEL_ID),
-        _OT_PD_SENTRY_DEV_DSN_: JSON.stringify(process.env.OT_PD_SENTRY_DEV_DSN),
+        _OT_PD_REQUIRED_APP_VERSION_: JSON.stringify(REQUIRED_APP_VERSION),
+        _OT_PD_SENTRY_DEV_DSN_: JSON.stringify(
+          process.env.OT_PD_SENTRY_DEV_DSN
+        ),
         _OT_PD_SENTRY_DSN_: JSON.stringify(process.env.OT_PD_SENTRY_DSN),
         _OT_PD_VERSION_: JSON.stringify(OT_PD_VERSION),
         global: 'globalThis',
