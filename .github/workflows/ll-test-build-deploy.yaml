@@ -103,12 +103,26 @@ jobs:
         with:
           fetch-depth: 0
       - uses: ./.github/actions/js/setup
+      - name: 'Cache build artifacts'
+        id: cache-build
+        uses: actions/cache@v4
+        with:
+          path: labware-library/dist
+          key: ll-build-${{ runner.os }}-${{ hashFiles('labware-library/**') }}-${{ hashFiles('components/**') }}-${{ hashFiles('shared-data/**') }}
+          restore-keys: |
+            ll-build-${{ runner.os }}-${{ hashFiles('labware-library/**') }}-
+            ll-build-${{ runner.os }}-
       - name: 'build LL'
+        if: steps.cache-build.outputs.cache-hit != 'true'
         env:
           OT_LL_MIXPANEL_ID: ${{ secrets.OT_LL_MIXPANEL_ID }}
           OT_LL_MIXPANEL_DEV_ID: ${{ secrets.OT_LL_MIXPANEL_DEV_ID }}
         run: |
           make -C labware-library
+      - name: 'build LL (cached)'
+        if: steps.cache-build.outputs.cache-hit == 'true'
+        run: |
+          echo "✅ Using cached build artifacts - skipping build"
       - name: 'upload github artifact'
         uses: actions/upload-artifact@v4
         with:

@@ -105,8 +105,22 @@ jobs:
           npm config set cache ./.npm-cache
           yarn config set cache-folder ./.yarn-cache
           make setup-js
+      - name: 'Cache components build'
+        id: cache-components
+        uses: actions/cache@v4
+        with:
+          path: storybook-static
+          key: components-storybook-${{ runner.os }}-${{ hashFiles('components/**') }}-${{ hashFiles('app/src/atoms/**') }}-${{ hashFiles('app/src/molecules/**') }}-${{ hashFiles('protocol-designer/src/components/**') }}
+          restore-keys: |
+            components-storybook-${{ runner.os }}-${{ hashFiles('components/**') }}-
+            components-storybook-${{ runner.os }}-
       - name: 'build components'
+        if: steps.cache-components.outputs.cache-hit != 'true'
         run: make -C components
+      - name: 'build components (cached)'
+        if: steps.cache-components.outputs.cache-hit == 'true'
+        run: |
+          echo "✅ Using cached components build - skipping build"
       - name: 'upload github artifact'
         uses: actions/upload-artifact@v4
         with:
@@ -204,8 +218,21 @@ jobs:
           npm config set cache ./.npm-cache
           yarn config set cache-folder ./.yarn-cache
           make setup-js
+      - name: 'Cache TypeScript build'
+        id: cache-ts-build
+        uses: actions/cache@v4
+        with:
+          path: components/dist
+          key: components-ts-${{ runner.os }}-${{ hashFiles('components/**') }}
+          restore-keys: |
+            components-ts-${{ runner.os }}-
       - name: 'build typescript types'
+        if: steps.cache-ts-build.outputs.cache-hit != 'true'
         run: make -C components build-ts
+      - name: 'build typescript types (cached)'
+        if: steps.cache-ts-build.outputs.cache-hit == 'true'
+        run: |
+          echo "✅ Using cached TypeScript build - skipping build"
       # replace package.json stub version number with version from tag
       - name: 'set version number'
         run: |

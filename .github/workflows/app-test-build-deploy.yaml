@@ -247,17 +247,44 @@ jobs:
           smctl.exe healthcheck --all
 
       # Do the frontend dist bundle
+      - name: 'Cache app dist'
+        id: cache-app-dist
+        uses: actions/cache@v4
+        with:
+          path: app/dist
+          key: app-dist-${{ runner.os }}-${{ matrix.variant }}-${{ hashFiles('app/**') }}-${{ hashFiles('components/**') }}-${{ hashFiles('shared-data/**') }}-${{ hashFiles('discovery-client/**') }}
+          restore-keys: |
+            app-dist-${{ runner.os }}-${{ matrix.variant }}-${{ hashFiles('app/**') }}-
+            app-dist-${{ runner.os }}-${{ matrix.variant }}-
+            app-dist-${{ runner.os }}-
       - name: 'bundle ${{matrix.variant}} frontend'
+        if: steps.cache-app-dist.outputs.cache-hit != 'true'
         env:
           OT_APP_MIXPANEL_ID: ${{ secrets.OT_APP_MIXPANEL_ID }}
           OT_APP_INTERCOM_ID: ${{ secrets.OT_APP_INTERCOM_ID }}
           OPENTRONS_PROJECT: ${{ steps.project.outputs.project }}
         run: |
           make -C app dist
+      - name: 'bundle ${{matrix.variant}} frontend (cached)'
+        if: steps.cache-app-dist.outputs.cache-hit == 'true'
+        run: |
+          echo "✅ Using cached app dist - skipping build"
 
       # build the desktop app and deploy it
-      - name: 'build ${{matrix.variant}} app for ${{ matrix.os }}'
+      - name: 'Cache desktop app build'
+        id: cache-desktop-app
         if: matrix.target == 'desktop'
+        uses: actions/cache@v4
+        with:
+          path: app-shell/dist
+          key: desktop-app-${{ runner.os }}-${{ matrix.variant }}-${{ matrix.os }}-${{ hashFiles('app-shell/**') }}-${{ hashFiles('app/dist/**') }}-${{ needs.determine-build-type.outputs.type }}
+          restore-keys: |
+            desktop-app-${{ runner.os }}-${{ matrix.variant }}-${{ matrix.os }}-${{ hashFiles('app-shell/**') }}-
+            desktop-app-${{ runner.os }}-${{ matrix.variant }}-${{ matrix.os }}-
+            desktop-app-${{ runner.os }}-${{ matrix.variant }}-
+            desktop-app-${{ runner.os }}-
+      - name: 'build ${{matrix.variant}} app for ${{ matrix.os }}'
+        if: matrix.target == 'desktop' && steps.cache-desktop-app.outputs.cache-hit != 'true'
         timeout-minutes: 60
         env:
           OT_APP_MIXPANEL_ID: ${{ secrets.OT_APP_MIXPANEL_ID }}
@@ -282,6 +309,10 @@ jobs:
 
         run: |
           make -C app-shell dist-${{ matrix.os }} USE_HARD_LINKS=false
+      - name: 'build ${{matrix.variant}} app for ${{ matrix.os }} (cached)'
+        if: matrix.target == 'desktop' && steps.cache-desktop-app.outputs.cache-hit == 'true'
+        run: |
+          echo "✅ Using cached desktop app build - skipping build"
 
       - name: 'upload github artifact'
         if: matrix.target == 'desktop'
@@ -291,13 +322,30 @@ jobs:
           path: app-shell/dist/publish
 
       # build the ODD app
+      - name: 'Cache ODD app build'
+        id: cache-odd-app
+        if: matrix.target == 'odd'
+        uses: actions/cache@v4
+        with:
+          path: app-shell-odd/dist
+          key: odd-app-${{ runner.os }}-${{ matrix.variant }}-${{ hashFiles('app-shell-odd/**') }}-${{ hashFiles('app/dist/**') }}
+          restore-keys: |
+            odd-app-${{ runner.os }}-${{ matrix.variant }}-${{ hashFiles('app-shell-odd/**') }}-
+            odd-app-${{ runner.os }}-${{ matrix.variant }}-
+            odd-app-${{ runner.os }}-
       - if: matrix.target == 'odd'
         name: 'build ${{matrix.variant}} ODD app'
+        if: matrix.target == 'odd' && steps.cache-odd-app.outputs.cache-hit != 'true'
         timeout-minutes: 60
         env:
           OPENTRONS_PROJECT: ${{ steps.project.outputs.project }}
         run: |
           make -C app-shell-odd dist-ot3
+      - if: matrix.target == 'odd'
+        name: 'build ${{matrix.variant}} ODD app (cached)'
+        if: matrix.target == 'odd' && steps.cache-odd-app.outputs.cache-hit == 'true'
+        run: |
+          echo "✅ Using cached ODD app build - skipping build"
 
   deploy-release-app:
     name: 'Deploy built app artifacts to S3'
