@@ -44,6 +44,13 @@ export function getOnlyLatestDefs(): LabwareDefByDefURI {
     _latestDefs = Object.keys(labwareDefGroups).reduce(
       (acc, groupKey: string) => {
         const version = latestLoadnamesByVersion[groupKey]
+
+        //  if the labware is new to a higher up robot-stack version
+        //  do not list it with the labware definition at all
+        if (version == null) {
+          return acc
+        }
+
         const group = labwareDefGroups[groupKey]
         const resultIdx = group.findIndex(d => d.version === version)
         const latestDefInGroup = group[resultIdx]
