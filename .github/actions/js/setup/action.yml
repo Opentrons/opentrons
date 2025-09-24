@@ -137,7 +137,12 @@ runs:
         yarn config set network-concurrency 1
         
         # Run yarn install (the main part we need)
+        echo "⏱️  Starting yarn install..."
+        yarn_start=$(date +%s)
         yarn
+        yarn_end=$(date +%s)
+        yarn_time=$((yarn_end - yarn_start))
+        echo "⏱️  Yarn install took: ${yarn_time}s"
         
         # Only run app-shell setup if virtualenv exists
         if [[ -d "app-shell" ]]; then
@@ -147,7 +152,11 @@ runs:
             if cd api && pipenv --venv >/dev/null 2>&1; then
               cd ..
               echo "✅ API virtualenv found, running app-shell setup..."
+              app_shell_start=$(date +%s)
               make -C app-shell setup
+              app_shell_end=$(date +%s)
+              app_shell_time=$((app_shell_end - app_shell_start))
+              echo "⏱️  App-shell setup took: ${app_shell_time}s"
             else
               cd ..
               echo "⚠️  No API virtualenv found, skipping app-shell setup"
@@ -162,7 +171,11 @@ runs:
         # Only run app-shell-odd setup if directory exists
         if [[ -d "app-shell-odd" ]]; then
           echo "✅ Found app-shell-odd directory, running setup..."
+          app_shell_odd_start=$(date +%s)
           make -C app-shell-odd setup
+          app_shell_odd_end=$(date +%s)
+          app_shell_odd_time=$((app_shell_odd_end - app_shell_odd_start))
+          echo "⏱️  App-shell-odd setup took: ${app_shell_odd_time}s"
         else
           echo "⚠️  No app-shell-odd directory found, skipping app-shell-odd setup"
         fi
@@ -175,4 +188,4 @@ runs:
         end_time=$(date +%s)
         total_time=$((end_time - start_time))
         echo "⏱️  Total JS setup time: ${total_time}s"
-        echo "⏱️  Breakdown: scanning=${scan_time}s, setup=${setup_time}s"
+        echo "⏱️  Breakdown: scanning=${scan_time}s, yarn=${yarn_time}s, app-shell=${app_shell_time:-0}s, app-shell-odd=${app_shell_odd_time:-0}s"
