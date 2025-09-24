@@ -15,20 +15,13 @@ const analysis = (StackerAnalysis as unknown) as ProtocolAnalysisOutput
 
 function App(): JSX.Element {
   return (
-    <div style={{ padding: '1rem' }}>
+    <div className="appContainer">
       <h1>ProtocolDeck Testing</h1>
       <p>
         Testing ProtocolDeck component with StackerAnalysis data (minimal setup)
       </p>
 
-      <div
-        style={{
-          padding: '1rem',
-          backgroundColor: '#f0f0f0',
-          marginTop: '1rem',
-          marginBottom: '1rem',
-        }}
-      >
+      <div className="analysisInfo">
         <h2>Analysis Info:</h2>
         <p>
           <strong>Protocol:</strong> {analysis.metadata.protocolName}
@@ -42,22 +35,14 @@ function App(): JSX.Element {
       </div>
 
       <div
-        style={{
-          padding: '1rem',
-          backgroundColor: '#fff',
-          border: '1px solid #ccc',
-          borderRadius: '8px',
-          marginTop: '1rem',
-        }}
+        data-testid="protocol-deck-container"
+        className="protocolDeckContainer"
       >
         <h2>ProtocolDeck Component:</h2>
         <ProtocolDeck
           protocolAnalysis={analysis as any}
           baseDeckProps={{
             showSlotLabels: true,
-            svgProps: {
-              style: { width: '100%', height: 'auto', maxWidth: '1000px' },
-            },
           }}
         />
       </div>
@@ -66,7 +51,7 @@ function App(): JSX.Element {
 }
 
 const rootElement = document.getElementById('root')
-if (!rootElement) {
+if (rootElement == null) {
   throw new Error('Root element not found')
 }
 const root = createRoot(rootElement)

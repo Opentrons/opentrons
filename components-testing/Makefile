@@ -1,4 +1,4 @@
-.PHONY: dev build preview setup teardown install-local-packages clean-local-packages
+.PHONY: dev build preview setup teardown install-local-packages clean-local-packages test test-setup test-update-snapshots
 
 dev:
 	pnpm run dev
@@ -33,3 +33,11 @@ clean-local-packages:
 	rm -f ../components/opentrons-components-v0.0.0-dev.tgz
 	@echo "Local packages cleaned!"
 
+test:
+	pnpm playwright test --config=playwright.config.ts
+
+test-setup:
+	npx playwright install --with-deps chromium
+
+test-update-snapshots:
+	pnpm playwright test --config=playwright.config.ts --update-snapshots
