@@ -135,11 +135,13 @@ runs:
         yarn config set network-timeout 60000
         yarn config set prefer-offline true
         yarn config set network-concurrency 1
+        yarn config set enable-progress-bar false
+        yarn config set enable-emoji false
         
         # Run yarn install (the main part we need)
         echo "⏱️  Starting yarn install..."
         yarn_start=$(date +%s)
-        yarn install --frozen-lockfile
+        yarn install --frozen-lockfile --prefer-offline --silent
         yarn_end=$(date +%s)
         yarn_time=$((yarn_end - yarn_start))
         echo "⏱️  Yarn install took: ${yarn_time}s"
