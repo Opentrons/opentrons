@@ -146,23 +146,26 @@ runs:
         yarn_time=$((yarn_end - yarn_start))
         echo "⏱️  Yarn install took: ${yarn_time}s"
         
-        # Only run app-shell setup if virtualenv exists
+        # Only run app-shell setup if directory exists
         if [[ -d "app-shell" ]]; then
           echo "🔍 Checking if app-shell setup is needed..."
           if [[ -d "api" && -f "api/Pipfile" ]]; then
-            # Check if virtualenv exists
+            # Check if virtualenv exists, create minimal one if needed
             if cd api && pipenv --venv >/dev/null 2>&1; then
               cd ..
               echo "✅ API virtualenv found, running app-shell setup..."
-              app_shell_start=$(date +%s)
-              make -C app-shell setup
-              app_shell_end=$(date +%s)
-              app_shell_time=$((app_shell_end - app_shell_start))
-              echo "⏱️  App-shell setup took: ${app_shell_time}s"
             else
               cd ..
-              echo "⚠️  No API virtualenv found, skipping app-shell setup"
+              echo "⚠️  No API virtualenv found, creating minimal one for app-shell..."
+              # Create minimal virtualenv without installing all dependencies
+              cd api && pipenv --python python3 && cd ..
             fi
+            
+            app_shell_start=$(date +%s)
+            make -C app-shell setup
+            app_shell_end=$(date +%s)
+            app_shell_time=$((app_shell_end - app_shell_start))
+            echo "⏱️  App-shell setup took: ${app_shell_time}s"
           else
             echo "⚠️  No API directory found, skipping app-shell setup"
           fi
@@ -172,6 +175,8 @@ runs:
         
         # Only run app-shell-odd setup if directory exists
         if [[ -d "app-shell-odd" ]]; then
+          echo "🔍 Checking if app-shell-odd setup is needed..."
+          # App-shell-odd doesn't need virtualenv, so we can run it directly
           echo "✅ Found app-shell-odd directory, running setup..."
           app_shell_odd_start=$(date +%s)
           make -C app-shell-odd setup
