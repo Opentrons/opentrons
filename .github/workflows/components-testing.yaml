@@ -51,6 +51,7 @@ jobs:
       - name: 'upload playwright report'
         uses: actions/upload-artifact@v4
         if: always()
+        id: upload-report
         with:
           name: playwright-report
           path: components-testing/playwright-report/
@@ -61,9 +62,10 @@ jobs:
           echo "## 🎭 Playwright Test Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           if [ -d "components-testing/playwright-report" ]; then
-            echo "📊 **Test Report**: [View HTML Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts)" >> $GITHUB_STEP_SUMMARY
+            echo "📊 **Test Report**: [Download HTML Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.upload-report.outputs.artifact-id }})" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "The detailed HTML report with screenshots and traces has been uploaded as an artifact." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ No test report generated" >> $GITHUB_STEP_SUMMARY
           fi

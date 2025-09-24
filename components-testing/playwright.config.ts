@@ -8,6 +8,9 @@ const isCI = process.env.CI != null && process.env.CI !== ''
 // eslint-disable-next-line import/no-default-export
 export default defineConfig({
     testDir: './tests',
+    // Remove the platform from the snapshot filename so the local snapshot
+    // from a dev's Mac matches Ubuntu in CI
+    snapshotPathTemplate: '{testDir}/__screenshots__/{testFilePath}/{arg}{ext}',
     /* Reporter to use. See https://playwright.dev/docs/test-reporters */
     reporter: 'html',
     /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */

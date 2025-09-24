@@ -19,12 +19,12 @@
   border-radius: 8px;
   margin-top: 1rem;
   /* Fixed size for consistent screenshots */
-  width: 1152px;
-  height: 648px;
-  min-width: 1152px;
-  max-width: 1152px;
-  min-height: 648px;
-  max-height: 648px;
+  width: 1200px;
+  height: 800px;
+  min-width: 1200px;
+  max-width: 1200px;
+  min-height: 800px;
+  max-height: 800px;
   box-sizing: border-box;
   overflow: hidden;
 }
