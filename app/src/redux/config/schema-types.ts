@@ -16,8 +16,9 @@ export type DevInternalFlag =
   | 'enableLabwareCreator'
   | 'reactQueryDevtools'
   | 'reactScan'
-  | 'quickTransferExportPython'
+  | 'quickTransferExportJSON'
   | 'camera'
+  | 'quickTransferProtocolContentsLog'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
 

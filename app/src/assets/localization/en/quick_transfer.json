@@ -92,6 +92,7 @@
   "failed_analysis": "failed analysis",
   "flow_rate_value": "{{flow_rate}} µL/s",
   "from_bottom": "Between 0 and {{max}} mm",
+  "from_top": "Between {{min}} and 2 mm",
   "got_it": "Got it",
   "grid": "grid",
   "grids": "grids",

@@ -13,6 +13,7 @@ from opentrons.hardware_control.modules.types import (
 )
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
+from opentrons.protocol_api.core.engine.tasks import EngineTaskCore
 from opentrons.protocol_api.core.engine.module_core import HeaterShakerModuleCore
 from opentrons.protocol_api.core.engine.protocol import ProtocolCore
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
@@ -76,15 +77,17 @@ def test_create(
 def test_set_target_temperature(
     decoy: Decoy, mock_engine_client: EngineClient, subject: HeaterShakerModuleCore
 ) -> None:
-    """It should set the target temperature with the engine client."""
-    subject.set_target_temperature(celsius=42.0)
-
-    decoy.verify(
-        mock_engine_client.execute_command(
+    """It should set the target temperature with the engine client and return a EngineTaskCore."""
+    task_mock = decoy.mock(cls=EngineTaskCore)
+    decoy.when(
+        mock_engine_client.execute_command_without_recovery(
             cmd.heater_shaker.SetTargetTemperatureParams(moduleId="1234", celsius=42.0)
-        ),
-        times=1,
-    )
+        )
+    ).then_return(cmd.heater_shaker.SetTargetTemperatureResult(taskId="taskId"))
+    task_mock._id = "taskId"
+    result = subject.set_target_temperature(42.0)
+    assert isinstance(result, EngineTaskCore)
+    assert result._id == "taskId"
 
 
 def test_wait_for_target_temperature(

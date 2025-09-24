@@ -6,7 +6,10 @@ import pytest
 from decoy import Decoy
 from unittest.mock import sentinel
 
-from opentrons_shared_data.pipette.types import PipetteNameType
+from opentrons_shared_data.pipette.types import (
+    PipetteNameType,
+    LiquidClasses as VolumeModes,
+)
 from opentrons_shared_data.pipette.pipette_definition import (
     AvailableSensorDefinition,
 )
@@ -100,6 +103,7 @@ def _fake_static_pipette_config(channels: int) -> StaticPipetteConfig:
         },
         shaft_ul_per_mm=5.0,
         available_sensors=AvailableSensorDefinition(sensors=[]),
+        volume_mode=VolumeModes.default,
     )
 
 

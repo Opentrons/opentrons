@@ -8,8 +8,10 @@
 
 .content {
   display: flex;
+  max-height: 100%;
   flex-direction: column;
   padding: 1.75rem var(--spacing-40) var(--spacing-40);
+  overflow-y: auto;
 }
 
 .navigation_dots {
@@ -46,4 +48,5 @@
   align-self: flex-end;
   margin-top: 9.25rem;
   background: linear-gradient(rgba(255, 0, 0, 0) 85%, #fff);
+  pointer-events: none;
 }
