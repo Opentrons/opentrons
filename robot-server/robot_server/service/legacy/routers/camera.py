@@ -2,6 +2,7 @@ import logging
 import os
 import io
 import tempfile
+from functools import lru_cache
 from typing import Annotated
 from pathlib import Path
 from fastapi import APIRouter, HTTPException, Depends
@@ -15,11 +16,18 @@ from robot_server.service.legacy.models.settings import (
     CameraEnable,
     LiveStreamData,
     LiveStreamSettings,
+    Resolution,
+    StreamStatusType,
 )
 from robot_server.service.json_api import RequestModel
-from opentrons.config import advanced_settings
+from opentrons.config import IS_ROBOT
+from robot_server.runs.dependencies import get_run_data_manager
+from robot_server.runs.run_data_manager import RunDataManager
 from robot_server.hardware import get_robot_type_enum
 from opentrons_shared_data.robot.types import RobotTypeEnum
+from opentrons.protocol_engine import EngineStatus
+from robot_server.camera.settings.store import CameraSettingStore, get_camera_setting_store
+
 
 log = logging.getLogger(__name__)
 
@@ -27,35 +35,77 @@ router = APIRouter()
 
 JPG = "image/jpg"
 
-# todo(chb, 2025-09-10): These Camera defined values should live in a consolidated place
-FRAMERATE_MINIMUM = 1
-FRAMERATE_MAXIMUM = 60
+# todo(chb, 2025-09-19): This temporary for an initial implementation while we determine if some units will ship without cameras
+DEFAULT_CAMERA = "/dev/ot_system_camera"
 
 
 @router.post(
     "/camera",
-    description="Set the camera enablement status. Disabling this disables both the Camera and the Opentrons Live Stream.",
+    description="Set the camera enablement statuses for general camera, live stream and error recovery camera use.",
     responses={
         status.HTTP_400_BAD_REQUEST: {"model": LegacyErrorResponse},
     },
 )
 async def post_camera(
     request_body: RequestModel[CameraEnable],
+    robot_type: Annotated[RobotTypeEnum, Depends(get_robot_type_enum)],
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
+    camera_settings_store: Annotated[
+        CameraSettingStore, Depends(get_camera_setting_store)
+    ],
 ) -> CameraEnable:
     """
-    Sets the Opentrons Camera enablement status. Disabling this disables both the Camera and the Opentrons Live Stream.
+    Sets the Opentrons Camera enablement statuses.
 
-    Returns the enable/disable status of the camera..
+    - Disabling the general camera enablement will disable all camera functionality, including the live stream.
+    - Disabling the live stream will exclusively disable streaming.
+    - Disabling the error recovery camera interaction will exclusively disable error based camera activity.
+
+    Returns the enable/disable statuses of the camera.
     """
-    await advanced_settings.set_adv_setting("enableCamera", request_body.data.enabled)
-    if request_body.data.enabled is False:
-        # Shut off the live stream service
-        stream_settings = _get_stream_settings()
-        stream_settings.source = "NONE"
-        _write_stream_settings(stream_settings)
-        await camera.restart_live_stream()
+    _validate_camera_present()
 
-    return CameraEnable(enabled=request_body.data.enabled)
+    if request_body.data.cameraEnabled is not None:
+        camera_settings_store.set_camera_enable(request_body.data.cameraEnabled)
+    if request_body.data.liveStreamEnabled is not None:
+        camera_settings_store.set_live_stream_enable(request_body.data.liveStreamEnabled)
+    if request_body.data.errorRecoveryCameraEnabled:
+        camera_settings_store.set_error_recovery_camera_enable(request_body.data.errorRecoveryCameraEnabled)
+
+    camera_enabled = camera_settings_store.get_camera_enabled()
+    live_stream_enabled = camera_settings_store.get_live_stream_enabled()
+    error_recovery_camera_enabled = camera_settings_store.get_error_recovery_camera_enabled()
+
+    stream_settings = _get_stream_settings()
+    if (
+        camera_enabled
+        and live_stream_enabled
+        and (
+            run_data_manager.current_run_id is not None
+            and (
+                True
+                if run_data_manager.get(run_data_manager.current_run_id).status
+                not in [
+                    EngineStatus.IDLE,
+                    EngineStatus.STOPPED,
+                    EngineStatus.FAILED,
+                    EngineStatus.SUCCEEDED,
+                ]
+                else False
+            )
+        )
+    ):
+        stream_status = StreamStatusType.ON
+    else:
+        stream_status = StreamStatusType.OFF
+    _write_stream_settings(stream_settings, stream_status)
+    await camera.restart_live_stream()
+
+    return CameraEnable(
+        cameraEnabled=camera_enabled,
+        liveStreamEnabled=live_stream_enabled,
+        errorRecoveryCameraEnabled=error_recovery_camera_enabled,
+    )
 
 
 @router.get(
@@ -67,15 +117,22 @@ async def post_camera(
 )
 async def get_camera(
     robot_type: Annotated[RobotTypeEnum, Depends(get_robot_type_enum)],
+    camera_settings_store: Annotated[
+        CameraSettingStore, Depends(get_camera_setting_store)
+    ],
 ) -> CameraEnable:
     """
     Request the Opentrons Camera enablement status.
     """
-    enable_status = advanced_settings.get_setting_with_env_overload(
-        "enableCamera", robot_type
-    )
+    _validate_camera_present()
+
+    camera_status = camera_settings_store.get_camera_enabled()
+    live_status = camera_settings_store.get_live_stream_enabled()
+    error_recovery_camera_status = camera_settings_store.get_error_recovery_camera_enabled()
     return CameraEnable(
-        enabled=enable_status,
+        cameraEnabled=camera_status,
+        liveStreamEnabled=live_status,
+        errorRecoveryCameraEnabled=error_recovery_camera_status,
     )
 
 
@@ -88,14 +145,15 @@ async def get_camera(
     responses={status.HTTP_200_OK: {"content": {JPG: {}}, "description": "The image"}},
 )
 async def post_picture_capture(
-    robot_type: Annotated[RobotTypeEnum, Depends(get_robot_type_enum)]
+    robot_type: Annotated[RobotTypeEnum, Depends(get_robot_type_enum)],
+    camera_settings_store: Annotated[
+        CameraSettingStore, Depends(get_camera_setting_store)
+    ],
 ) -> StreamingResponse:
     """Take a picture"""
     filename = Path(tempfile.mktemp(suffix=".jpg"))
 
-    camera_enabled = advanced_settings.get_setting_with_env_overload(
-        "enableCamera", robot_type
-    )
+    camera_enabled = camera_settings_store.get_camera_enabled()
     if camera_enabled:
         try:
             await camera.take_picture(filename)
@@ -129,56 +187,6 @@ def _cleanup(filename: Path, fd: io.IOBase) -> None:
         pass
 
 
-@router.post(
-    "/camera/stream",
-    description="Set the stream enablement status.",
-    responses={
-        status.HTTP_400_BAD_REQUEST: {"model": LegacyErrorResponse},
-    },
-)
-async def post_live_stream(
-    request_body: RequestModel[CameraEnable],
-    robot_type: Annotated[RobotTypeEnum, Depends(get_robot_type_enum)],
-) -> LiveStreamData:
-    """
-    Sets the Opentrons Live Stream enablement status.
-
-
-    Returns both the HLS and RTMP relative URLs for this device's live streams.
-
-    HLS:
-        The full HLS stream URL is formatted as: http://{ROBOT_IP}:31950/hls/stream.m3u
-    RTMP:
-        The full RTMP stream URL is formatted as: rtmp://{ROBOT_IP}/live/stream
-    """
-    camera_enabled = advanced_settings.get_setting_with_env_overload(
-        "enableCamera", robot_type
-    )
-
-    # Set the camera enablement status based on request
-    await advanced_settings.set_adv_setting(
-        "enableLiveStream", request_body.data.enabled
-    )
-
-    if camera_enabled:
-        if request_body.data.enabled:
-            # todo(chb, 2025-09-08): In order to restart the stream service, validate that a protocol run is active first.
-            await camera.restart_live_stream()
-        else:
-            # Shut off the live stream service
-            stream_settings = _get_stream_settings()
-            stream_settings.source = "NONE"
-            _write_stream_settings(stream_settings)
-
-            await camera.restart_live_stream()
-
-    return LiveStreamData(
-        enabled=request_body.data.enabled,
-        hls="/hls/stream.m3u",
-        rtmp="/live/stream",
-    )
-
-
 @router.get(
     "/camera/stream",
     description="Request the Opentrons Live Stream enablement status and stream URLs.",
@@ -188,6 +196,9 @@ async def post_live_stream(
 )
 async def get_live_stream(
     robot_type: Annotated[RobotTypeEnum, Depends(get_robot_type_enum)],
+    camera_settings_store: Annotated[
+        CameraSettingStore, Depends(get_camera_setting_store)
+    ],
 ) -> LiveStreamData:
     """
     Request the Opentrons Live Stream enablement status and stream URLs.
@@ -195,13 +206,11 @@ async def get_live_stream(
     Returns both the HLS and RTMP relative URLs for this device's live streams.
 
     HLS:
-        The full HLS stream URL is formatted as: http://{ROBOT_IP}:31950/hls/stream.m3u
+        The full HLS stream URL is formatted as: http://{ROBOT_IP}:{PORT}/hls/stream.m3u
     RTMP:
         The full RTMP stream URL is formatted as: rtmp://{ROBOT_IP}/live/stream
     """
-    enable_status = advanced_settings.get_setting_with_env_overload(
-        "enableLiveStream", robot_type
-    )
+    enable_status = camera_settings_store.get_live_stream_enabled()
     return LiveStreamData(
         enabled=enable_status,
         hls="/hls/stream.m3u",
@@ -219,6 +228,10 @@ async def get_live_stream(
 async def post_live_stream_settings(
     request_body: RequestModel[LiveStreamSettings],
     robot_type: Annotated[RobotTypeEnum, Depends(get_robot_type_enum)],
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
+    camera_settings_store: Annotated[
+        CameraSettingStore, Depends(get_camera_setting_store)
+    ],
 ) -> LiveStreamSettings:
     """
     Configure the Live Stream and restart it.
@@ -228,14 +241,11 @@ async def post_live_stream_settings(
     Arguments:
         request_body: Input payload from the request body.
     """
-    stream_settings = _get_stream_settings()
-
-    # === Validate incoming stream settings
-    # Source device names must be enclosed in quotations for FFMPEG to identify the device
     formatted_source = request_body.data.source
-    if formatted_source is not None and formatted_source[0] != '"':
+    # Source device names must be enclosed in quotations for FFMPEG to identify the device
+    if formatted_source[0] != '"':
         formatted_source = '"' + formatted_source
-    if formatted_source is not None and formatted_source[-1] != '"':
+    if formatted_source[-1] != '"':
         formatted_source = formatted_source + '"'
 
     raw_device = str(formatted_source)[1:-1]
@@ -245,56 +255,55 @@ async def post_live_stream_settings(
         and "NONE" not in formatted_source
         and not os.path.exists(raw_device)
     ):
-        # todo(chb, 2025-09-03): Need to introduce a CAMERA_ERROR code for missing video device
         raise LegacyErrorResponse(
-            message=f"No device found with device path: {raw_device}",
+            message=f"No video device found with device path: {raw_device}",
             errorCode=ErrorCodes.GENERAL_ERROR.value.code,
         ).as_error(status.HTTP_400_BAD_REQUEST)
 
-    # todo(chb, 2025-09-05): Add validation for: Resolution, Bitrate
-
-    if request_body.data.framerate is not None and (
-        request_body.data.framerate < FRAMERATE_MINIMUM
-        or request_body.data.framerate > FRAMERATE_MAXIMUM
+    camera_enabled = camera_settings_store.get_camera_enabled()
+    live_stream_enabled = camera_settings_store.get_live_stream_enabled()
+    
+    if (
+        camera_enabled
+        and live_stream_enabled
+        and (
+            run_data_manager.current_run_id is not None
+            and (
+                True
+                if run_data_manager.get(run_data_manager.current_run_id).status
+                not in [
+                    EngineStatus.IDLE,
+                    EngineStatus.STOPPED,
+                    EngineStatus.FAILED,
+                    EngineStatus.SUCCEEDED,
+                ]
+                else False
+            )
+        )
     ):
-        # todo(chb, 2025-09-03): Need to introduce a CAMERA_ERROR code for invalid settings
-        raise LegacyErrorResponse(
-            message=f"Framerate of {request_body.data.framerate} is invalid.",
-            errorCode=ErrorCodes.GENERAL_ERROR.value.code,
-        ).as_error(status.HTTP_400_BAD_REQUEST)
+        stream_status = StreamStatusType.ON
+    else:
+        stream_status = StreamStatusType.OFF
 
+    # todo(chb, 2025-09-22): To validate framerates, resolutions and bitrates create a common resource resolutions table for front/back end to reference
     updated_settings = LiveStreamSettings(
-        source=formatted_source
-        if formatted_source is not None
-        else stream_settings.source,
-        resolution=request_body.data.resolution
-        if request_body.data.resolution is not None
-        else stream_settings.resolution,
-        framerate=request_body.data.framerate
-        if request_body.data.framerate is not None
-        else stream_settings.framerate,
-        bitrate=request_body.data.bitrate
-        if request_body.data.bitrate is not None
-        else stream_settings.bitrate,
+        source=formatted_source,
+        resolution=Resolution(
+            width=request_body.data.resolution.width,
+            height=request_body.data.resolution.height,
+        ),
+        framerate=request_body.data.framerate,
+        bitrate_k=request_body.data.bitrate_k,
     )
 
     log.info(
-        f"Updated Opentrons-Live-Stream settings: {updated_settings.source} {updated_settings.resolution} {updated_settings.framerate} {updated_settings.bitrate}"
+        f"Updated Opentrons-Live-Stream settings: Status={stream_status}, Source={updated_settings.source}, Resolution={updated_settings.resolution}, Framerate={updated_settings.framerate}, Bitrate={updated_settings.bitrate_k}"
     )
 
-    # write changes to the opentrons-live-stream.conf file
-    _write_stream_settings(updated_settings)
+    # write changes to the configuration file
+    _write_stream_settings(updated_settings, stream_status)
 
-    camera_enabled = advanced_settings.get_setting_with_env_overload(
-        "enableCamera", robot_type
-    )
-    live_stream_enabled = advanced_settings.get_setting_with_env_overload(
-        "enableLiveStream", robot_type
-    )
-    if camera_enabled and live_stream_enabled:
-        # todo(chb, 2025-09-08): In order to restart the stream service, validate that a protocol run is active first.
-
-        await camera.restart_live_stream()
+    await camera.restart_live_stream()
 
     return updated_settings
 
@@ -318,7 +327,7 @@ def _get_stream_settings() -> LiveStreamSettings:
     if not src.exists():
         # todo(chb, 2025-09-03): Need to introduce a CAMERA_ERROR code for missing stream configuration file, maybe just general?
         raise LegacyErrorResponse(
-            message=f"ERROR: Stream Configuration file not found: {src}",
+            message=f"Stream Configuration file not found: {src}",
             errorCode=ErrorCodes.GENERAL_ERROR.value.code,
         ).as_error(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -333,30 +342,91 @@ def _parse_stream_settings(filename: Path) -> LiveStreamSettings:
                 line.split(b"=") for line in fd.read().split(b"\n") if b"=" in line
             ]
         }
+    if sorted(list(contents.keys())) != sorted(camera.STREAM_CONF_FILE_KEYS):
+        raise LegacyErrorResponse(
+            message="Stream Configuration file data is incorrect or missing.",
+            errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+        ).as_error(status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    # Validate file contents to ensure proper formatting
+    # For now we do not validate the camera source, as the camera may no longer exist
+    try:
+        # Validate the status typing
+        StreamStatusType(contents["STATUS"])
+    except KeyError:
+        raise LegacyErrorResponse(
+            message="Stream Configuration file Status setting is not an acceptable status type.",
+            errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+        ).as_error(status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    res_raw = contents["RESOLUTION"].split("x")
+    if not res_raw[0].isdigit() or not res_raw[1].isdigit():
+        raise LegacyErrorResponse(
+            message="Stream Configuration file Resolution setting is not in an acceptable format.",
+            errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+        ).as_error(status.HTTP_500_INTERNAL_SERVER_ERROR)
+    resolution_data = Resolution(width=int(res_raw[0]), height=int(res_raw[1]))
+
+    if not contents["FRAMERATE"].isdigit():
+        raise LegacyErrorResponse(
+            message="Stream Configuration file Framerate setting is not a number.",
+            errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+        ).as_error(status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    if (
+        "K" not in contents["BITRATE"]
+        or not contents["BITRATE"].split("K")[0].isdigit()
+    ):
+        raise LegacyErrorResponse(
+            message="Stream Configuration file Bitrate setting is not in an acceptable format.",
+            errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+        ).as_error(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     return LiveStreamSettings(
         source=contents["SOURCE"],
-        resolution=contents["RESOLUTION"],
+        resolution=resolution_data,
         framerate=int(contents["FRAMERATE"]),
-        bitrate=contents["BITRATE"],
+        bitrate_k=int(contents["BITRATE"].split("K")[0]),
     )
 
 
-def _write_stream_settings(settings: LiveStreamSettings) -> None:
+def _write_stream_settings(
+    settings: LiveStreamSettings, stream_status: StreamStatusType
+) -> None:
     src = camera.get_stream_configuration_filepath()
 
     if not src.exists():
         # todo(chb, 2025-09-03): Need to introduce a CAMERA_ERROR code for missing stream configuration file, maybe just general?
         raise LegacyErrorResponse(
-            message=f"ERROR: Stream Configuration file not found: {src}",
+            message=f"Stream Configuration file not found: {src}",
             errorCode=ErrorCodes.GENERAL_ERROR.value.code,
         ).as_error(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     with src.open("w") as fd:
         file_lines = [
+            f"BOOT_ID={_get_boot_id()}\n",
+            f"STATUS={stream_status}\n",
             f"SOURCE={settings.source}\n",
-            f"RESOLUTION={settings.resolution}\n",
+            f"RESOLUTION={settings.resolution.width}x{settings.resolution.height}\n",
             f"FRAMERATE={settings.framerate}\n",
-            f"BITRATE={settings.bitrate}\n",
+            f"BITRATE={settings.bitrate_k}K\n",
         ]
         fd.writelines(file_lines)
+
+
+def _validate_camera_present() -> None:
+    if not os.path.exists(DEFAULT_CAMERA):
+        # todo(chb, 2025-09-19): for the time being we will just be checking that the embedded flex camera exists to satisfy requirements, but eventually this will be dynamic
+        # As of 2025-09-19 we do not know if this device will be removed from some units, so we need to do error validation eagerly for now.
+        raise LegacyErrorResponse(
+            message=f"No video device found with device path: {DEFAULT_CAMERA}",
+            errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+        ).as_error(status.HTTP_503_SERVICE_UNAVAILABLE)
+
+
+@lru_cache(maxsize=1)
+def _get_boot_id() -> str:
+    if IS_ROBOT:
+        return Path("/proc/sys/kernel/random/boot_id").read_text().strip()
+    else:
+        return "SIMULATED_BOOT_ID"

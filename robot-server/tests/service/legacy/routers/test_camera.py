@@ -20,7 +20,7 @@ def mock_take_picture():
 def mock_camera_configuration_filepath(
     decoy: Decoy, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """Mock out the opentrons.camera stream configuration data query."""
+    """Mock out the camera stream configuration data query."""
     monkeypatch.setattr(
         camera,
         "get_stream_configuration_filepath",
@@ -55,7 +55,12 @@ def test_take_a_picture_camera_disabled_exception(api_client, decoy: Decoy):
     """
     with tempfile.NamedTemporaryFile() as conf:
         conf.write(
-            b"SOURCE=ABC\n" b"RESOLUTION=DEF\n" b"FRAMERATE=1\n" b"BITRATE=GHI\n"
+            b"BOOT_ID=BANANAS\n"
+            b"STATUS=OFF\n"
+            b"SOURCE=ABC\n"
+            b"RESOLUTION=10x20\n"
+            b"FRAMERATE=1\n"
+            b"BITRATE=2000K\n"
         )
         conf.flush()
         conf.seek(0)
@@ -113,7 +118,12 @@ async def test_camera_enable(api_client, decoy: Decoy):
     """
     with tempfile.NamedTemporaryFile() as conf:
         conf.write(
-            b"SOURCE=ABC\n" b"RESOLUTION=DEF\n" b"FRAMERATE=1\n" b"BITRATE=GHI\n"
+            b"BOOT_ID=BANANAS\n"
+            b"STATUS=OFF\n"
+            b"SOURCE=ABC\n"
+            b"RESOLUTION=10x20\n"
+            b"FRAMERATE=1\n"
+            b"BITRATE=2000K\n"
         )
         conf.flush()
         conf.seek(0)
@@ -130,34 +140,23 @@ async def test_camera_enable(api_client, decoy: Decoy):
 
 async def test_camera_stream_enable(api_client, decoy: Decoy):
     """
-    Test that we can GET and POST the Opentrons Live Stream enablement status.
+    Test that we can GET the Opentrons Live Stream enablement status.
     """
     with tempfile.NamedTemporaryFile() as conf:
         conf.write(
-            b"SOURCE=ABC\n" b"RESOLUTION=DEF\n" b"FRAMERATE=1\n" b"BITRATE=GHI\n"
+            b"BOOT_ID=BANANAS\n"
+            b"STATUS=ON\n"
+            b"SOURCE=ABC\n"
+            b"RESOLUTION=10x20\n"
+            b"FRAMERATE=1\n"
+            b"BITRATE=2000K\n"
         )
         conf.flush()
         conf.seek(0)
 
-        post_stream = api_client.post(
-            "/camera/stream", json={"data": {"enabled": True}}
-        )
-        assert post_stream.json() == {
-            "enabled": True,
-            "hls": "/hls/stream.m3u",
-            "rtmp": "/live/stream",
-        }
         decoy.when(camera.get_stream_configuration_filepath()).then_return(
             Path(conf.name)
         )
-        post_stream = api_client.post(
-            "/camera/stream", json={"data": {"enabled": False}}
-        )
-        assert post_stream.json() == {
-            "enabled": False,
-            "hls": "/hls/stream.m3u",
-            "rtmp": "/live/stream",
-        }
         get_stream = api_client.get("/camera/stream")
         assert get_stream.json() == {
             "enabled": False,
@@ -172,7 +171,12 @@ async def test_camera_stream_settings(api_client, decoy: Decoy):
     """
     with tempfile.NamedTemporaryFile() as conf:
         conf.write(
-            b"SOURCE=ABC\n" b"RESOLUTION=DEF\n" b"FRAMERATE=1\n" b"BITRATE=GHI\n"
+            b"BOOT_ID=BANANAS\n"
+            b"STATUS=OFF\n"
+            b"SOURCE=ABC\n"
+            b"RESOLUTION=10x20\n"
+            b"FRAMERATE=1\n"
+            b"BITRATE=2000K\n"
         )
         conf.flush()
         conf.seek(0)
@@ -184,15 +188,15 @@ async def test_camera_stream_settings(api_client, decoy: Decoy):
             json={
                 "data": {
                     "source": "cookie-monster",
-                    "resolution": "DEF",
+                    "resolution": {"height": 10, "width": 20},
                     "framerate": 10,
-                    "bitrate": "GHI",
+                    "bitrate_k": 2000,
                 }
             },
         )
         assert post_settings.json() == {
             "errorCode": "4000",
-            "message": "No device found with device path: cookie-monster",
+            "message": "No video device found with device path: cookie-monster",
         }
 
         # Of note, the handler automatically cleans up input sources to include quotations
@@ -201,16 +205,16 @@ async def test_camera_stream_settings(api_client, decoy: Decoy):
             json={
                 "data": {
                     "source": "NONE",
-                    "resolution": "DEF",
+                    "resolution": {"height": 10, "width": 20},
                     "framerate": 10,
-                    "bitrate": "GHI",
+                    "bitrate_k": 2000,
                 }
             },
         )
         get_settings = api_client.get("/camera/stream/settings")
         assert get_settings.json() == {
             "source": '"NONE"',
-            "resolution": "DEF",
+            "resolution": {"height": 10, "width": 20},
             "framerate": 10,
-            "bitrate": "GHI",
+            "bitrate_k": 2000,
         }

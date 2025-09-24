@@ -228,6 +228,8 @@ class RunDataManager:
                 self._current_run_error_recovery_rules, error_recovery_is_enabled
             )
         )
+        # CASEY NOTE LOOK HERE FOR THE RULES CREATION STUFF^
+        # do not pass this stuff into PE yet, just make the rules here
 
         state_summary = await self._run_orchestrator_store.create(
             run_id=run_id,

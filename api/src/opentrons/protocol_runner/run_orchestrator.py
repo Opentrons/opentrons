@@ -12,6 +12,7 @@ from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.errors import GeneralError
 from opentrons_shared_data.robot.types import RobotType
+from opentrons.system import camera
 
 from . import protocol_runner, RunResult, JsonRunner, PythonAndLegacyRunner
 from ..hardware_control import HardwareControlAPI
@@ -182,6 +183,7 @@ class RunOrchestrator:
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
     ) -> RunResult:
         """Start the run."""
+        await camera.update_live_stream_status(True)
         if self._protocol_runner:
             return await self._protocol_runner.run(
                 deck_configuration=deck_configuration,
@@ -209,6 +211,9 @@ class RunOrchestrator:
                 set_run_status=False,
                 post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
             )
+        # Shut down the live stream, if there is one
+        await camera.update_live_stream_status(False, self.)
+        
 
     def resume_from_recovery(self, reconcile_false_positive: bool) -> None:
         """Resume the run from recovery."""
