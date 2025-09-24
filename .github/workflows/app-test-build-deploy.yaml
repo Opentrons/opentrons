@@ -333,16 +333,14 @@ jobs:
             odd-app-${{ runner.os }}-${{ matrix.variant }}-${{ hashFiles('app-shell-odd/**') }}-
             odd-app-${{ runner.os }}-${{ matrix.variant }}-
             odd-app-${{ runner.os }}-
-      - if: matrix.target == 'odd'
-        name: 'build ${{matrix.variant}} ODD app'
+      - name: 'build ${{matrix.variant}} ODD app'
         if: matrix.target == 'odd' && steps.cache-odd-app.outputs.cache-hit != 'true'
         timeout-minutes: 60
         env:
           OPENTRONS_PROJECT: ${{ steps.project.outputs.project }}
         run: |
           make -C app-shell-odd dist-ot3
-      - if: matrix.target == 'odd'
-        name: 'build ${{matrix.variant}} ODD app (cached)'
+      - name: 'build ${{matrix.variant}} ODD app (cached)'
         if: matrix.target == 'odd' && steps.cache-odd-app.outputs.cache-hit == 'true'
         run: |
           echo "✅ Using cached ODD app build - skipping build"
