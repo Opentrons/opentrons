@@ -13,7 +13,7 @@ import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 const analysis = (StackerAnalysis as unknown) as ProtocolAnalysisOutput
 
-function App() {
+function App(): JSX.Element {
   return (
     <div style={{ padding: '1rem' }}>
       <h1>ProtocolDeck Testing</h1>
@@ -65,7 +65,10 @@ function App() {
   )
 }
 
-const rootElement = document.getElementById('root')!
+const rootElement = document.getElementById('root')
+if (!rootElement) {
+  throw new Error('Root element not found')
+}
 const root = createRoot(rootElement)
 
 root.render(
