@@ -50,14 +50,14 @@ jobs:
           make test
       - name: 'upload playwright report'
         uses: actions/upload-artifact@v4
-        if: always()
+        if: ${{ !cancelled() }}
         id: upload-report
         with:
           name: playwright-report
           path: components-testing/playwright-report/
           retention-days: 30
       - name: 'add test results to summary'
-        if: always()
+        if: ${{ !cancelled() }}
         run: |
           echo "## 🎭 Playwright Test Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
