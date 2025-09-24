@@ -181,7 +181,7 @@ export function createQuickTransferFile(
     // see QuickTransferFlow/README.md for versioning details
     designerApplication: {
       name: 'opentrons/quick-transfer',
-      version: '1.2.0',
+      version: '2.0.0',
       data: quickTransferState,
     },
   }
@@ -301,17 +301,17 @@ export function createQuickTransferPythonFile(
       pythonMetadata(fileMetadata),
       pythonRequirements(FLEX_ROBOT_TYPE),
       pythonDef(quickTransferState, deckConfig),
+      designerApplicationBlob,
     ]
       .filter(section => section)
       .join('\n\n') + '\n'
-  const protocol = protocolContents + designerApplicationBlob
 
   // temporary logging for debugging
   if (enableQuickTransferProtocolContentsLog) {
     console.group('🧪 Quick Transfer Protocol Contents')
-    console.log(protocol)
+    console.log(protocolContents)
     const downloadProtocolPython = (): void => {
-      const blob = new Blob([protocol], { type: 'text/x-python' })
+      const blob = new Blob([protocolContents], { type: 'text/x-python' })
       const url = URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = url
@@ -330,7 +330,7 @@ export function createQuickTransferPythonFile(
     console.groupEnd()
   }
 
-  return new File([protocol], `${fileMetadata.protocolName}.py`, {
+  return new File([protocolContents], `${fileMetadata.protocolName}.py`, {
     type: 'text/x-python',
   })
 }
