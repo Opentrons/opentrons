@@ -44,6 +44,7 @@ This hotfix release addresses several bugs.
 - Set a custom aspirate tip position for any dispense location.
 - Protocol Designer correctly reassigns default tip settings when changing pipettes in your protocol.
 - Protocol Designer no longer crashes when encountering missing tip rack errors in imported protocols.
+- Aspirate and dispense tip positions default to 1 mm above the well bottom if unspecified in your protocols.
 
 ## Opentrons Protocol Designer Changes in 8.5.3
 

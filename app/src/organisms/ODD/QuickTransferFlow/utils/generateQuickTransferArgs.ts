@@ -4,7 +4,6 @@ import uuidv1 from 'uuid/v4'
 import {
   getAllDefinitions,
   getLabwareDefURI,
-  getTipTypeFromTipRackDefinition,
   orderWells,
   POSITION_REFERENCE_BOTTOM,
   TRASH_BIN_ADAPTER_FIXTURE,
@@ -352,9 +351,6 @@ export function generateQuickTransferArgs(
     dropTipWasteChuteLocationEntity?.id ??
     ''
 
-  const tipType = getTipTypeFromTipRackDefinition(quickTransferState.tipRack)
-  const flowRatesForSupportedTip =
-    quickTransferState.pipette.liquids.default.supportedTips[tipType]
   const pipetteEntity = Object.values(invariantContext.pipetteEntities)[0]
 
   const sourceLabwareId = Object.keys(robotState.labware).find(
@@ -399,8 +395,7 @@ export function generateQuickTransferArgs(
     aspirateOffsetFromBottomMm: quickTransferState.tipPositionAspirate,
     dispenseOffsetFromBottomMm: quickTransferState.tipPositionDispense,
     blowoutLocation,
-    blowoutFlowRateUlSec:
-      flowRatesForSupportedTip.defaultBlowOutFlowRate.default,
+    blowoutFlowRateUlSec: quickTransferState.blowOutDispense?.flowRate ?? 0,
     blowoutOffsetFromTopMm: DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
     changeTip: quickTransferState.changeTip,
     preWetTip: quickTransferState.preWetTip,
