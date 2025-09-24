@@ -11,7 +11,7 @@
   "brand": { "brand": "eppendorf", "brandId": ["951020427"] },
   "parameters": {
     "format": "96Standard",
-    "quirks": [],951020427
+    "quirks": [],
     "isTiprack": false,
     "loadName": "eppendorf_96_wellplate_150ul",
     "isMagneticModuleCompatible": false
