@@ -139,7 +139,7 @@ runs:
         # Run yarn install (the main part we need)
         echo "⏱️  Starting yarn install..."
         yarn_start=$(date +%s)
-        yarn
+        yarn install --frozen-lockfile
         yarn_end=$(date +%s)
         yarn_time=$((yarn_end - yarn_start))
         echo "⏱️  Yarn install took: ${yarn_time}s"
