@@ -1,11 +1,9 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import {
-  ETHANOL_LIQUID_CLASS_NAME,
   FLEX_ROBOT_TYPE,
   getAllLiquidClassDefs,
   getFlexNameConversion,
   getLabwareDefURI,
-  GLYCEROL_LIQUID_CLASS_NAME,
   linearInterpolate,
   NONE_LIQUID_CLASS_NAME,
   POSITION_REFERENCE_TOP,
@@ -14,7 +12,6 @@ import {
 } from '@opentrons/shared-data'
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
-  getLiquidClassName,
   getTransferPlanAndReferenceVolumes,
   SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
@@ -274,16 +271,10 @@ const getLiquidClassValues = (
   } = state
 
   const allLiquidClassDefs = getAllLiquidClassDefs()
-  const liquidClassMap = new Map<string, string>([
-    ['water', WATER_LIQUID_CLASS_NAME],
-    ['glycerol_50', GLYCEROL_LIQUID_CLASS_NAME],
-    ['ethanol_80', ETHANOL_LIQUID_CLASS_NAME],
-  ])
-  const selectedLiquidClass = liquidClassMap.get(
-    getLiquidClassName(state.liquidClassName) ?? 'none'
-  )
-  const liquidClassDef =
-    allLiquidClassDefs[selectedLiquidClass ?? NONE_LIQUID_CLASS_NAME]
+
+  const selectedLiquidClass = state.liquidClassName ?? NONE_LIQUID_CLASS_NAME
+
+  const liquidClassDef = allLiquidClassDefs[selectedLiquidClass]
 
   const tiprackUri = getLabwareDefURI(tipRack)
   const tipTypeSettings = liquidClassDef?.byPipette

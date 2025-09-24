@@ -75,6 +75,7 @@ export function ErrorDetailsModal(props: ErrorDetailsModalProps): JSX.Element {
       case ERROR_KINDS.STACKER_HOPPER_EMPTY:
       case ERROR_KINDS.STACKER_SHUTTLE_EMPTY:
       case ERROR_KINDS.STACKER_SHUTTLE_MISSING:
+      case ERROR_KINDS.STACKER_SHUTTLE_STORE_EMPTY:
         return true
       default:
         return false
@@ -233,6 +234,8 @@ export function NotificationBanner({
         return <LabwareMissingOnShuttleErrorBanner />
       case ERROR_KINDS.STACKER_SHUTTLE_MISSING:
         return <StackerShuttleMissingErrorBanner />
+      case ERROR_KINDS.STACKER_SHUTTLE_STORE_EMPTY:
+        return <StackerShuttleStoreEmptyErrorBanner />
       default:
         console.error('Handle error kind notification banners explicitly.')
         return <div />
@@ -322,6 +325,18 @@ export function StackerShuttleMissingErrorBanner(): JSX.Element {
       type="alert"
       heading={t('stacker_shuttle_missing_error_occurs_when')}
       message={t('load_stacker_shuttle_to_proceed')}
+    />
+  )
+}
+
+export function StackerShuttleStoreEmptyErrorBanner(): JSX.Element {
+  const { t } = useTranslation('error_recovery')
+
+  return (
+    <InlineNotification
+      type="alert"
+      heading={t('stacker_shuttle_store_empty_error_occurs_when')}
+      message={t('load_labware_shuttle_to_proceed')}
     />
   )
 }

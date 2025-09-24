@@ -76,11 +76,14 @@ describe('getInitialSummaryState', () => {
       ...props,
       state: {
         ...props.state,
+        volume: 1,
+        path: 'multiAspirate',
         transferType: 'consolidate',
       },
     })
     expect(initialSummaryState).toEqual({
       ...props.state,
+      volume: 1,
       transferType: 'consolidate',
       aspirateFlowRate: 50,
       dispenseFlowRate: 75,
@@ -126,13 +129,14 @@ describe('getInitialSummaryState', () => {
       ...props,
       state: {
         ...props.state,
-        volume: 10,
+        volume: 1,
+        path: 'multiDispense',
         transferType: 'distribute',
       },
     })
     expect(initialSummaryState).toEqual({
       ...props.state,
-      volume: 10,
+      volume: 1,
       transferType: 'distribute',
       aspirateFlowRate: 50,
       dispenseFlowRate: 75,
@@ -145,7 +149,7 @@ describe('getInitialSummaryState', () => {
         cutoutId: 'cutoutA3',
         cutoutFixtureId: 'trashBinAdapter',
       },
-      disposalVolume: 10,
+      disposalVolume: 1,
       blowOutDispense: {
         location: { cutoutId: 'cutoutA3', cutoutFixtureId: 'trashBinAdapter' },
         flowRate: 75,

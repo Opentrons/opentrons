@@ -56,6 +56,8 @@
   "files_available_robot_details": "All files associated with the protocol run are available on the robot detail screen.",
   "final_step": "Final Step",
   "ignore_stored_data": "Ignore stored data",
+  "image_at_step_at_timestamp": "Image at {{step}} at {{timestamp}}",
+  "image_capture": "Image capture",
   "image_capture_window_title": "Image capture of {{step}} at {{timestamp}}",
   "image_gallery": "Image Gallery",
   "labware": "labware",

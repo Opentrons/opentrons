@@ -163,7 +163,7 @@ const MOCK_GLYCEROL = {
   ],
 } as LiquidClass
 const MOCK_WATER = {
-  liquidClassName: 'waterV1',
+  liquidClassName: 'waterV2',
   byPipette: [
     {
       pipetteModel: 'flex_1channel_1000',
