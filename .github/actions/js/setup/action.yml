@@ -104,7 +104,7 @@ runs:
             echo "📦 Found $package $version in $source_file"
             
             # Set up environment variable based on package name
-            env_var=$(echo "${package^^}_CACHE" | sed 's/-/_/g')
+            env_var=$(echo "${package}" | tr '[:lower:]' '[:upper:]' | sed 's/-/_/g')_CACHE
             
             # Try package-mirror first
             # Handle different naming conventions (electron uses 'v' prefix)
