@@ -15,13 +15,13 @@ const analysis = (StackerAnalysis as unknown) as ProtocolAnalysisOutput
 
 function App(): JSX.Element {
   return (
-    <div className="appContainer">
+    <div className="app_container">
       <h1>ProtocolDeck Testing</h1>
       <p>
         Testing ProtocolDeck component with StackerAnalysis data (minimal setup)
       </p>
 
-      <div className="analysisInfo">
+      <div className="analysis_info">
         <h2>Analysis Info:</h2>
         <p>
           <strong>Protocol:</strong> {analysis.metadata.protocolName}
@@ -36,7 +36,7 @@ function App(): JSX.Element {
 
       <div
         data-testid="protocol-deck-container"
-        className="protocolDeckContainer"
+        className="protocol_deck_container"
       >
         <h2>ProtocolDeck Component:</h2>
         <ProtocolDeck
