@@ -30,21 +30,22 @@ import type { RunHeaderContentProps } from '.'
 export function RunHeaderSectionUpper(
   props: RunHeaderContentProps
 ): JSX.Element {
-  const { runId, runStatus } = props
+  const { runId, runStatus, robotName } = props
 
   const { t } = useTranslation('run_details')
   const enableProtocolTimeline = useFeatureFlag('protocolTimeline')
   const navigate = useNavigate()
-  const { protocolKey } = useProtocolDetailsForRun(runId)
 
   const createdAtTimestamp = useRunCreatedAtTimestamp(runId)
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
+  const { protocolKey } = useProtocolDetailsForRun(runId)
 
   const handleVisualizeClick = (): void => {
-    navigate(`/protocols/${protocolKey}/visualization`)
+    // need to encode URL to avoid spaces and slashes
+    const encodedTimestamp = encodeURIComponent(createdAtTimestamp)
+    const targetPath = `/devices/${robotName}/${runId}/${encodedTimestamp}/${protocolKey}/visualization`
+    navigate(targetPath)
   }
-
-  console.log('runStatus', runStatus)
 
   return (
     <Box css={SECTION_STYLE}>

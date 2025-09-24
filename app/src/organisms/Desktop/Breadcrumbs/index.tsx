@@ -68,10 +68,10 @@ const CrumbLinkInactive = styled(Flex)`
 function BreadcrumbsComponent(): JSX.Element | null {
   const { t } = useTranslation('top_navigation')
   const isOnDevice = useSelector(getIsOnDevice)
-  const { protocolKey, robotName, runId } = useParams<
+  const { protocolKey, robotName, runId, runCreatedAtTimestamp } = useParams<
     keyof DesktopRouteParams
   >() as DesktopRouteParams
-  const runCreatedAtTimestamp = useRunCreatedAtTimestamp(runId)
+  const runCreatedAtTimestampFromHook = useRunCreatedAtTimestamp(runId)
 
   const storedProtocol = useSelector((state: State) =>
     getStoredProtocol(state, protocolKey)
@@ -86,11 +86,29 @@ function BreadcrumbsComponent(): JSX.Element | null {
       : protocolKey
 
   // determines whether a crumb is displayed for a path, and the displayed name
-  const crumbNameByPath: { [index: string]: string | null } = {
+  const crumbNameByPath: {
+    [index: string]:
+      | string
+      | null
+      | { linkPath: string; crumbName: string | null }
+  } = {
     '/devices': !(isOnDevice ?? false) ? t('devices') : null,
     [`/devices/${robotName}`]: robotName,
     [`/devices/${robotName}/robot-settings`]: t('robot_settings'),
-    [`/devices/${robotName}/protocol-runs/${runId}`]: runCreatedAtTimestamp,
+    [`/devices/${robotName}/protocol-runs/${runId}`]: runCreatedAtTimestampFromHook,
+
+    // for protocol visualization path from protocol setup page and back to protocol setup page
+    [`/devices/${robotName}/${runId}/${encodeURIComponent(
+      runCreatedAtTimestamp || ''
+    )}`]: {
+      linkPath: `/devices/${robotName}/protocol-runs/${runId}/setup`,
+      crumbName: runCreatedAtTimestamp
+        ? decodeURIComponent(runCreatedAtTimestamp)
+        : null,
+    },
+    [`/devices/${robotName}/${runId}/${encodeURIComponent(
+      runCreatedAtTimestamp || ''
+    )}/${protocolKey}/visualization`]: t('visualization'),
 
     '/protocols': t('protocols'),
     [`/protocols/${protocolKey}`]: protocolDisplayName,
@@ -103,13 +121,28 @@ function BreadcrumbsComponent(): JSX.Element | null {
 
   const pathCrumbs = pathArray.flatMap((_, i) => {
     const linkPath = pathArray.slice(0, i + 1).join('/')
-    const crumbName = crumbNameByPath[linkPath]
+    const crumbConfig = crumbNameByPath[linkPath]
+
+    let crumbName: string | null = null
+    let actualLinkPath: string = linkPath
+
+    if (
+      typeof crumbConfig === 'object' &&
+      crumbConfig !== null &&
+      'linkPath' in crumbConfig
+    ) {
+      crumbName = crumbConfig.crumbName
+      actualLinkPath = crumbConfig.linkPath
+    } else if (typeof crumbConfig === 'string' || crumbConfig === null) {
+      crumbName = crumbConfig
+      actualLinkPath = linkPath
+    }
 
     // filter out null or undefined crumb names
     return crumbName != null
       ? [
           {
-            linkPath,
+            linkPath: actualLinkPath,
             crumbName,
           },
         ]

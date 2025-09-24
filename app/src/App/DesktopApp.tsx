@@ -81,8 +81,16 @@ export const DesktopApp = (): JSX.Element => {
     },
     {
       Component: ProtocolPreview,
-      name: 'Preview',
+      name: 'Visualization',
       path: '/protocols/:protocolKey/visualization',
+    },
+    // for protocol visualization path from protocol setup page and back to protocol setup page
+    // protocolKey is for visualization page and runId is for back to protocol setup page
+    {
+      Component: ProtocolPreview,
+      name: 'Visualization',
+      path:
+        '/devices/:robotName/:runId/:runCreatedAtTimestamp/:protocolKey/visualization',
     },
     {
       Component: Labware,

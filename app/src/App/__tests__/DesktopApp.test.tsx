@@ -135,6 +135,13 @@ describe('DesktopApp', () => {
     screen.getByText('Mock Preview')
   })
 
+  it('renders a ProtocolsTimeline component from /visualization', () => {
+    render(
+      `/devices/otie/95e67900-bc9f-4fbf-92c6-cc4d7226a51b/mockDecodedTimestamp/6b94f0a9-e91e-4202-b25f-ab13beab4bca/visualization`
+    )
+    screen.getByText('Mock Preview')
+  })
+
   it('renders a ProtocolRunDetails component from /devices/:robotName/protocol-runs/:runId/:protocolRunDetailsTab', () => {
     render(
       '/devices/otie/protocol-runs/95e67900-bc9f-4fbf-92c6-cc4d7226a51b/setup'
