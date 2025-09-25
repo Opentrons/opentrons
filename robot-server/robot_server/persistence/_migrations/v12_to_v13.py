@@ -1,14 +1,8 @@
-"""Migrate the persistence directory from schema 11 to 12.
+"""Migrate the persistence directory from schema 12 to 13.
 
-Summary of changes from schema 11:
+Summary of changes from schema 13:
 
-This is a compatibility migration that makes no changes to the database schema or data.
-It exists solely to create a version boundary between software that expects
-`result.definition` in loadModule commands and software that doesn't include it.
-
-This allows new software (schema 12+) to remove `result.definition` from loadModule
-command results without breaking compatibility if users downgrade to older software
-that expects this field to be present.
+This compatability change adds additional camera related fields to the BooleanSettingKey table. 
 """
 
 from pathlib import Path
@@ -19,7 +13,6 @@ from .._folder_migrator import Migration
 
 class Migration12to13(Migration):  # noqa: D101
     def migrate(self, source_dir: Path, dest_dir: Path) -> None:
-        """Migrate the persistence directory from schema 11 to 12."""
-        # This is a no-op migration that simply copies all contents unchanged.
-        # It exists as a compatibility checkpoint between software versions.
+        """Migrate the persistence directory from schema 12 to 13."""
+        # todo add migration that inserts new elements to the boolean table
         copy_contents(source_dir=source_dir, dest_dir=dest_dir)

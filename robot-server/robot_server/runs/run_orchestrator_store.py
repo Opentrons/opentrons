@@ -55,6 +55,7 @@ from opentrons.protocol_engine.types import (
 )
 from opentrons_shared_data.labware.types import LabwareUri
 from opentrons.protocol_engine.resources.file_provider import FileProvider
+from opentrons.protocol_engine.resources.camera_provider import CameraProvider
 from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
 
 _log = logging.getLogger(__name__)
@@ -198,6 +199,7 @@ class RunOrchestratorStore:
         initial_error_recovery_policy: error_recovery_policy.ErrorRecoveryPolicy,
         deck_configuration: DeckConfigurationType,
         file_provider: FileProvider,
+        camera_provider: CameraProvider,
         notify_publishers: Callable[[], None],
         protocol: Optional[ProtocolResource],
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
@@ -250,6 +252,7 @@ class RunOrchestratorStore:
             run_id=run_id,
             protocol_engine=engine,
             hardware_api=self._hardware_api,
+            camera_provider=camera_provider,
             protocol_config=protocol.source.config if protocol else None,
         )
 

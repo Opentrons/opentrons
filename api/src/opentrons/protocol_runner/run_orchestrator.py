@@ -42,6 +42,7 @@ from ..protocol_engine.types import (
     CommandAnnotation,
     ModuleModel,
 )
+from ..protocol_engine.resources.camera_provider import CameraProvider
 from ..protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 
 from ..protocol_reader import JsonProtocolConfig, PythonProtocolConfig, ProtocolSource
@@ -82,6 +83,7 @@ class RunOrchestrator:
     _protocol_live_runner: protocol_runner.LiveRunner
     _hardware_api: HardwareControlAPI
     _protocol_engine: ProtocolEngine
+    _camera_provider: CameraProvider
 
     def __init__(
         self,
@@ -94,6 +96,7 @@ class RunOrchestrator:
         json_or_python_protocol_runner: Optional[
             Union[protocol_runner.PythonAndLegacyRunner, protocol_runner.JsonRunner]
         ] = None,
+        camera_provider: CameraProvider,
         run_id: Optional[str] = None,
     ) -> None:
         """Initialize a run orchestrator interface.
@@ -105,6 +108,7 @@ class RunOrchestrator:
             setup_runner: LiveRunner for setup commands.
             protocol_live_runner: LiveRunner for protocol commands.
             json_or_python_protocol_runner: JsonRunner/PythonAndLegacyRunner for protocol commands.
+            camera_provider: Provides callbacks to Camera interface.
             run_id: run id if any, associated to the runner/engine.
         """
         self._run_id = run_id
@@ -113,6 +117,7 @@ class RunOrchestrator:
         self._setup_runner = setup_runner
         self._fixit_runner = fixit_runner
         self._protocol_live_runner = protocol_live_runner
+        self._camera_provider = camera_provider
         self._fixit_runner.prepare()
         self._setup_runner.prepare()
         self._protocol_engine.set_and_start_queue_worker(self.command_generator)
@@ -128,6 +133,7 @@ class RunOrchestrator:
     def build_orchestrator(
         cls,
         hardware_api: HardwareControlAPI,
+        camera_provider: CameraProvider,
         protocol_engine: ProtocolEngine,
         protocol_config: Optional[
             Union[JsonProtocolConfig, PythonProtocolConfig]
@@ -166,6 +172,7 @@ class RunOrchestrator:
             hardware_api=hardware_api,
             protocol_engine=protocol_engine,
             protocol_live_runner=protocol_live_runner,
+            camera_provider=camera_provider,
         )
 
     def play(self, deck_configuration: Optional[DeckConfigurationType] = None) -> None:
@@ -183,7 +190,7 @@ class RunOrchestrator:
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
     ) -> RunResult:
         """Start the run."""
-        await camera.update_live_stream_status(True)
+        await camera.update_live_stream_status(True, self._camera_provider)
         if self._protocol_runner:
             return await self._protocol_runner.run(
                 deck_configuration=deck_configuration,
@@ -212,7 +219,7 @@ class RunOrchestrator:
                 post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
             )
         # Shut down the live stream, if there is one
-        await camera.update_live_stream_status(False, self.)
+        await camera.update_live_stream_status(False, self._camera_provider)
         
 
     def resume_from_recovery(self, reconcile_false_positive: bool) -> None:

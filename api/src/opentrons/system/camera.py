@@ -5,6 +5,7 @@ import logging
 from opentrons.config import ARCHITECTURE, SystemArchitecture, get_opentrons_path
 from opentrons_shared_data.errors.exceptions import CommunicationError
 from opentrons_shared_data.errors.codes import ErrorCodes
+from opentrons.protocol_engine.resources.camera_provider import CameraProvider
 
 
 log = logging.getLogger(__name__)
@@ -19,18 +20,6 @@ class CameraException(CommunicationError):
             message,
             {"internal-error-message": system_error},
         )
-
-class CameraSettings(BaseModel):
-    """Camera API settings for general enablement and use."""
-
-    camera_enabled: bool = Field(
-        ..., description="Enablement status for general camera use."
-    )
-    live_stream_enabled: bool = Field(
-        ..., description="Enablement status for the Opentrons Live Stream service."
-    )
-    error_recovery_enabled: bool = Field(..., description="Enablement status for camera usage with Error Recovery.")
-
 
 async def take_picture(filename: Path) -> None:
     """Take a picture and save it to filename
@@ -70,9 +59,7 @@ def get_stream_configuration_filepath() -> Path:
     """Return the file path to the Opentrons Live Stream Configuration file."""
     return get_opentrons_path("live_stream_configuration_file")
 
-
-# todo: (chb, 2025-09-24): For engine needs refactor to implement the camera settings callback rather than passing object in
-async def update_live_stream_status(stream_status: bool, camera_enable_settings: CameraSettings) -> None:
+async def update_live_stream_status(stream_status: bool, camera_provider: CameraProvider) -> None:
     """Update and handle a change in the Opentrons Live Stream status."""
     src = get_stream_configuration_filepath()
     if not src.exists():
@@ -91,6 +78,7 @@ async def update_live_stream_status(stream_status: bool, camera_enable_settings:
         return None
     
     # Validate the stream status
+    camera_enable_settings = await camera_provider.get_camera_settings()
     status = "OFF"
     if stream_status and camera_enable_settings.camera_enabled and camera_enable_settings.live_stream_enabled:
         # Check to see if the camera device is available
