@@ -2,10 +2,7 @@ import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 
 import { TEMPERATURE_MODULE_TYPE } from '@opentrons/shared-data'
-import {
-  TEMPERATURE_APPROACHING_TARGET,
-  TimelineFrame,
-} from '@opentrons/step-generation'
+import { TEMPERATURE_APPROACHING_TARGET } from '@opentrons/step-generation'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
@@ -19,6 +16,7 @@ import {
 import { TemperatureTools } from '../TemperatureTools'
 
 import type { ComponentProps } from 'react'
+import type { TimelineFrame } from '@opentrons/step-generation'
 import type * as FeatureFlagSelectors from '/protocol-designer/feature-flags/selectors'
 import type * as LabwareLocationsSelectors from '/protocol-designer/top-selectors/labware-locations'
 import type * as ModulesSelectors from '/protocol-designer/ui/modules/selectors'
