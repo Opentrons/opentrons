@@ -6,12 +6,12 @@ title: "Opentrons OT-2: Safety and Regulatory Information"
 
 The Opentrons OT-2 liquid handling robot has been designed for safe operation. Refer to the specifications and compliance guidelines in this section to ensure safe usage of your robot. These guidelines cover safe use of input and output connections for the product, including the power and data connections, as well as warning labels found on the OT-2 and related hardware. Using the device in a manner other than those specified in this manual may put the user and equipment at risk.
 
-## Safety symbols
+### Safety symbols
 
 Various labels on the OT-2 and in this manual warn you about sources of potential injury or harm.
 
 
-## Warnings and caution section
+### Regulatory warnings
 
 Include regulatory symbols with text.
 
@@ -21,6 +21,21 @@ Include regulatory symbols with text.
 - Toxic
 - Flammable
 - Pinch point
+
+### Notes, tips, and cautions
+
+Throughout this manual, you'll find specially formatted text blocks. These callouts provide helpful information that may not be obvious in the ordinary course of using your OT-2. Pay special attention to warnings: they are only used in situations where you run the risk of personal injury, damage to equipment, loss or spoilage of samples or reagents, data loss, or other harm.
+
+Callouts used in the OT-2 manual look like this:
+
+!!!note
+    **Sample note:** This is something you ought to know, but it doesn't pose any danger.
+
+!!!tip
+    **Sample tip:** This is something you might want to know, but is wholly optional.
+
+!!!warning
+    **Sample warning:** This is something you need to know because there is risk associated with it.
 
 ## Compliance standards
 
@@ -60,3 +75,16 @@ This device complies with Part 15 of the FCC rules. Operation is subject to the 
 - This device must accept any interference received, including interference that may cause undesired operation.
 
 **Note:** This equipment has been tested and found to comply with the limits for a Class A digital device, pursuant to Part 15 of the FCC rules. These limits are designed to provide reasonable protection against harmful interference when the equipment is operated in a commercial environment. This equipment generates, uses, and can radiate radio frequency energy and, if not installed and used in accordance with the instruction manual, may cause harmful interference to radio communications. Operation of this equipment in a residential area is likely to cause harmful interference in which case the user will be required to correct the interference at their own expense.
+
+### CISPR 11 Class A
+
+**Warning:** This is a Class A device, designed for use in industrial settings. Using it in a residential environment may cause radio interference.
+
+### WEEE policy
+
+<img src="../images/WEEE.svg" style="float: right;" width="10%">
+Opentrons is dedicated to adhering to the EU Directive on Waste Electrical and Electronic Equipment (WEEE – 2012/19/EU). Our goal is to ensure that our products are properly disposed of or recycled once they reach the end of their useful life.
+
+Opentrons products that fall under the WEEE directive are labeled with the <img src="../images/WEEE.svg" style="height: 1.25em;"> symbol, signifying that they should not be thrown away with regular household waste but must be collected and handled separately.
+
+If you or your business have Opentrons products that are at end of life or need to be discarded for a separate purpose, contact Opentrons for proper disposal and recycling.

@@ -17,7 +17,3 @@ Summary of top-level topics, similar to Flex. Bullet list with summary of broad 
 - Run protocol: Opentrons app, modules, labware
 - Maintenance
 - Support: How to get it, warranty, contact us
-
-## Notes and warnings
-
-- Callouts used throughout
