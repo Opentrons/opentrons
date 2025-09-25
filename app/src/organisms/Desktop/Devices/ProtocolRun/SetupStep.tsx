@@ -80,7 +80,8 @@ export function SetupStep({
                 color={COLORS.black90}
                 size="1.5rem"
                 css={ACCORDION_STYLE}
-                name={expanded ? 'minus' : 'plus'}
+                name="chevron-up"
+                style={!expanded ? { transform: 'rotate(180deg)' } : {}}
                 margin={SPACING.spacing4}
               />
             </Flex>
