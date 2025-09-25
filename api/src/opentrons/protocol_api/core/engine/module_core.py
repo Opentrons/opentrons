@@ -550,6 +550,16 @@ class HeaterShakerModuleCore(ModuleCore, AbstractHeaterShakerCore[LabwareCore]):
             )
         )
 
+    def set_shake_speed(self, rpm: int) -> EngineTaskCore:
+        """Set the shaker's target shake speed and wait for it to spin up."""
+        result = self._engine_client.execute_command_without_recovery(
+            cmd.heater_shaker.SetShakeSpeedParams(moduleId=self.module_id, rpm=rpm)
+        )
+        shake_task = EngineTaskCore(
+            engine_client=self._engine_client, task_id=result.taskId
+        )
+        return shake_task
+
     def open_labware_latch(self) -> None:
         """Open the labware latch."""
         self._engine_client.execute_command(

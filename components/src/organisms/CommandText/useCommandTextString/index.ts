@@ -177,6 +177,14 @@ export function useCommandTextString(
           command,
         }),
       }
+    case 'heaterShaker/setShakeSpeed':
+      return {
+        kind: 'generic',
+        commandText: utils.getHSConcurrentShakeSpeedCommandText({
+          ...fullParams,
+          command,
+        }),
+      }
 
     case 'moveToSlot':
       return {
