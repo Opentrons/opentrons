@@ -220,6 +220,33 @@ class AbstractThermocyclerCore(
         """
 
     @abstractmethod
+    def start_execute_profile(
+        self,
+        steps: List[ThermocyclerStep],
+        repetitions: int,
+        block_max_volume: Optional[float] = None,
+    ) -> AbstractTaskCore:
+        """Start a Thermocycler Profile.
+
+        Profile defined as a cycle of ``steps`` to repeat for a given number of ``repetitions``
+
+        Note:
+            Unlike the :py:meth:`execute_profile`, once the profile has started
+            the protocol will immediately move on to the next command, rather than waiting
+            for it to finish.
+        Args:
+            steps: List of unique steps that make up a single cycle.
+                Each list item should be a dictionary that maps to
+                the parameters of the :py:meth:`set_block_temperature`
+                method with keys 'temperature', 'hold_time_seconds',
+                and 'hold_time_minutes'.
+            repetitions: The number of times to repeat the cycled steps.
+            block_max_volume: The maximum volume of any individual well
+                of the loaded labware. If not supplied, the thermocycler
+                will default to 25µL/well.
+        """
+
+    @abstractmethod
     def deactivate_lid(self) -> None:
         """Turn off the heated lid."""
 
