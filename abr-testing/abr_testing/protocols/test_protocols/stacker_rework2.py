@@ -320,13 +320,13 @@ def run(protocol: ProtocolContext) -> None:
         )
 
         # ========================== REAGENT PLATE_1 ============================
-        TAGMIX = reagent_plate_1["B1"]  # 96 Wells
-        EPM_1 = reagent_plate_1["B2"]  # 96 Wells
+        TAGMIX = reagent_plate_1["A1"]  # 96 Wells
+        EPM_1 = reagent_plate_1["A1"]  # 96 Wells
         EPH3 = reagent_plate_1["A1"]  # 8 Wells
         FSMM = reagent_plate_1["A1"]  # 8 Wells
         # SSMM_1             = reagent_plate_1['A3'] # 8 Wells
         # SSMM_2             = reagent_plate_1['A4'] # 8 Wells
-        TAGSTOP = reagent_plate_1["A5"]  # 8 Wells
+        TAGSTOP = reagent_plate_1["A1"]  # 8 Wells
         RSB_1 = reagent_plate_1["A1"]  # 8 Wells
         # RSB_2              = reagent_plate_1['A7'] # 8 Wells
         # RSB_3              = reagent_plate_1['A8'] # 8 Wells
@@ -335,102 +335,23 @@ def run(protocol: ProtocolContext) -> None:
         #                   = reagent_plate_1['A11'] # 8 Wells
         #                   = reagent_plate_1['A12'] # 8 Wells
         #                   = reagent_plate_1['A13'] # 8 Wells
-        SMB_1 = reagent_plate_1["A14"]  # 8 Wells
+        SMB_1 = reagent_plate_1["A1"]  # 8 Wells
         # SMB_2 = reagent_plate_1["A15"]  # 8 Wells
         # EEW_1 = reagent_plate_1["A16"]  # 8 Wells
         # EEW_2 = reagent_plate_1["A17"]  # 8 Wells
-        NHB2 = reagent_plate_1["A18"]  # 8 Wells
-        Panel = reagent_plate_1["A19"]  # 8 Wells
-        ET2 = reagent_plate_1["A20"]  # 8 Wells
-        EHB2 = reagent_plate_1["A21"]  # 8 Wells
-        Elute = reagent_plate_1["A22"]  # 8 Wells
-        PPC = reagent_plate_1["A23"]  # 8 Wells
-        EPM_2 = reagent_plate_1["A24"]  # 8 Wells
+        NHB2 = reagent_plate_1["A1"]  # 8 Wells
+        Panel = reagent_plate_1["A1"]  # 8 Wells
+        ET2 = reagent_plate_1["A1"]  # 8 Wells
+        EHB2 = reagent_plate_1["A1"]  # 8 Wells
+        Elute = reagent_plate_1["A1"]  # 8 Wells
+        PPC = reagent_plate_1["A1"]  # 8 Wells
+        EPM_2 = reagent_plate_1["A1"]  # 8 Wells
 
         # ========================== REAGENT PLATE_2 ============================
         AMPure = reagent_plate_2["A1"]  # 96 Wells
         # TWB_1              = reagent_plate_2['A2'] # 96 Wells
-        Barcodes = reagent_plate_2["B1"]  # 96 Wells
+        Barcodes = reagent_plate_2["A1"]  # 96 Wells
         # TWB_2              = reagent_plate_2['B2'] # 96 Wells
-
-        # ======================= TIP AND SAMPLE TRACKING =======================
-        column_list_1 = [
-            "A1",
-            "A2",
-            "A3",
-            "A4",
-            "A5",
-            "A6",
-            "A7",
-            "A8",
-            "A9",
-            "A10",
-            "A11",
-            "A12",
-        ]
-        # pooled_1_list = "A1"
-        # pooled_2_list = "A1"
-        pooled_3_list = "A3"
-        # pooled_4_list = "A4"
-        # pooled_5_list = "A5"
-        # pooled_6_list = "A6"
-
-        SSMM_list = [
-            "A3",
-            "A4",
-            "A3",
-            "A4",
-            "A3",
-            "A4",
-            "A3",
-            "A4",
-            "A3",
-            "A4",
-            "A3",
-            "A4",
-        ]
-        RSB_list = [
-            "A6",
-            "A7",
-            "A8",
-            "A6",
-            "A7",
-            "A8",
-            "A6",
-            "A7",
-            "A8",
-            "A6",
-            "A7",
-            "A8",
-        ]
-        TWB_list = [
-            "A2",
-            "B2",
-            "A2",
-            "B2",
-            "A2",
-            "B2",
-            "A2",
-            "B2",
-            "A2",
-            "B2",
-            "A2",
-            "B2",
-        ]
-        EEW_list = [
-            "A2",
-            "B2",
-            "A2",
-            "B2",
-            "A2",
-            "B2",
-            "A2",
-            "B2",
-            "A2",
-            "B2",
-            "A2",
-            "B2",
-        ]
 
         # ============================ CUSTOM OFFSETS ===========================
         p200_in_Deep384_Z_offset = 9
@@ -2289,7 +2210,7 @@ def run(protocol: ProtocolContext) -> None:
             # ===============================================
             p1000.reset_tipracks()
             p1000.pick_up_tip()
-            p1000.aspirate(EEWVol, reagent_plate_1[EEW_list[0]].bottom())
+            p1000.aspirate(EEWVol, reagent_plate_1["A1"].bottom())
             p1000.dispense(EEWVol, CleanupPlate_2["A1"].bottom())
             p1000.return_tip()
             # ===============================================
@@ -2363,7 +2284,7 @@ def run(protocol: ProtocolContext) -> None:
             # ===============================================
             p1000.reset_tipracks()
             p1000.pick_up_tip()
-            p1000.aspirate(EEWVol, reagent_plate_1[EEW_list[1]].bottom())
+            p1000.aspirate(EEWVol, reagent_plate_1["A1"].bottom())
             p1000.dispense(EEWVol, CleanupPlate_2["A1"].bottom())
             p1000.return_tip()
             # ===============================================
@@ -2405,7 +2326,7 @@ def run(protocol: ProtocolContext) -> None:
             # ===============================================
             p1000.reset_tipracks()
             p1000.pick_up_tip()
-            p1000.aspirate(EEWVol, reagent_plate_1[EEW_list[2]].bottom())
+            p1000.aspirate(EEWVol, reagent_plate_1["A1"].bottom())
             p1000.dispense(EEWVol, CleanupPlate_2["A1"].bottom())
             p1000.return_tip()
             # ===============================================
@@ -2447,7 +2368,7 @@ def run(protocol: ProtocolContext) -> None:
             # ===============================================
             p1000.reset_tipracks()
             p1000.pick_up_tip()
-            p1000.aspirate(EEWVol, reagent_plate_1[EEW_list[3]].bottom())
+            p1000.aspirate(EEWVol, reagent_plate_1["A1"].bottom())
             p1000.dispense(EEWVol, CleanupPlate_2["A1"].bottom())
             p1000.return_tip()
             # ===============================================
@@ -2562,7 +2483,7 @@ def run(protocol: ProtocolContext) -> None:
             # ===============================================
             p1000.move_to(CleanupPlate_2["A1"].bottom(z=0.3))
             p1000.aspirate(TransferSup + 1, rate=0.25)
-            p1000.dispense(TransferSup + 1, sample_plate_3[pooled_3_list].bottom(z=1))
+            p1000.dispense(TransferSup + 1, sample_plate_3["A1"].bottom(z=1))
             # ===============================================
 
             protocol.comment("--> Adding ET2")
@@ -2574,8 +2495,8 @@ def run(protocol: ProtocolContext) -> None:
             p1000.flow_rate.blow_out = p50_flow_rate_blow_out_default * 0.5
             # ===============================================
             p1000.aspirate(ET2Vol, ET2.bottom())
-            p1000.dispense(ET2Vol, sample_plate_3[pooled_3_list].bottom())
-            p1000.move_to(sample_plate_3[pooled_3_list].bottom())
+            p1000.dispense(ET2Vol, sample_plate_3["A1"].bottom())
+            p1000.move_to(sample_plate_3["A1"].bottom())
             p1000.mix(ET2MixRep, ET2MixVol)
             p1000.return_tip()
             # ===============================================
@@ -2595,7 +2516,7 @@ def run(protocol: ProtocolContext) -> None:
             p1000.reset_tipracks()
             p1000.pick_up_tip()
             p1000.aspirate(PPCVol, PPC.bottom(z=0.5))
-            p1000.dispense(PPCVol, sample_plate_3[pooled_3_list].bottom(z=0.5))
+            p1000.dispense(PPCVol, sample_plate_3["A1"].bottom(z=0.5))
             # ===============================================
 
             protocol.comment("--> Adding EPM")
@@ -2607,8 +2528,8 @@ def run(protocol: ProtocolContext) -> None:
             p1000.flow_rate.blow_out = p50_flow_rate_blow_out_default * 0.5
             # ===============================================
             p1000.aspirate(EPMVol, EPM_2.bottom(z=0.5))
-            p1000.dispense(EPMVol, sample_plate_3[pooled_3_list].bottom(z=0.5))
-            p1000.move_to(sample_plate_3[pooled_3_list].bottom(z=0.5))
+            p1000.dispense(EPMVol, sample_plate_3["A1"].bottom(z=0.5))
+            p1000.move_to(sample_plate_3["A1"].bottom(z=0.5))
             p1000.mix(EPMMixRep, EPMMixVol)
             p1000.return_tip()
             # ===============================================
