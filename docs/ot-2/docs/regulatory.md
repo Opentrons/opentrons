@@ -45,21 +45,21 @@ The OT-2 complies with all applicable requirements of the following safety and e
 
 | Rule ID | Title |
 |----|----|
-| IEC/UL/CSA/EN 61010-1:2001 | Safety requirements for electrical equipment for measurement, control, and laboratory use–Part 1: General requirements |
-| IEC/UL/CSA/EN 61010-2-010:2015 Ed. 3 | Safety Requirements For Electrical Equipment For Measurement, Control And Laboratory Use–Part 2-010: Particular Requirements For Laboratory Equipment For The Heating Of Materials |
-| IEC/UL/CSA/EN 61010-2-051:2015 Ed.3 | Safety Requirements For Electrical Equipment For Measurement, Control And Laboratory Use–Part 2-051: Particular Requirements For Laboratory Equipment For Mixing And Stirring |
+| IEC/UL/CSA/EN 61010-1:2001 | Safety requirements for electrical equipment for measurement, control, and laboratory use—Part 1: General requirements |
+| IEC/UL/CSA/EN 61010-2-010:2015 Ed. 3 | Safety Requirements For Electrical Equipment For Measurement, Control And Laboratory Use—Part 2-010: Particular Requirements For Laboratory Equipment For The Heating Of Materials |
+| IEC/UL/CSA/EN 61010-2-051:2015 Ed.3 | Safety Requirements For Electrical Equipment For Measurement, Control And Laboratory Use—Part 2-051: Particular Requirements For Laboratory Equipment For Mixing And Stirring |
 
 ### Electromagnetic compatibility
 
 | Rule ID | Title |
 |----|----|
 | IEC 61326-1:2013 | Electrical Equipment for measurement, control, and laboratory use—EMC Requirements, Class A |
-| EN 61000-3-2:2014 | Electromagnetic compatibility (EMC)–Part 3–2: Limits–Limits for harmonic current emissions |
-| EN 61000-3-3:2013 | Electromagnetic compatibility (EMC)–Part 3-3: Limits–Limitation of voltage changes, voltage fluctuations and flicker in public low-voltage supply systems, for equipment with rated current ≤ 16 A per phase and not subject to conditional connection |
-| KN 61000-6-3:2012 | — |
+| EN 61000-3-2:2014 | Electromagnetic compatibility (EMC)—Part 3–2: Limits—Limits for harmonic current emissions |
+| EN 61000-3-3:2013 | Electromagnetic compatibility (EMC)—Part 3-3: Limits—Limitation of voltage changes, voltage fluctuations and flicker in public low-voltage supply systems, for equipment with rated current ≤ 16 A per phase and not subject to conditional connection |
+| KN 61000-6-3:2012 | Electromagnetic compatibility (EMC) - Part 6-3: Generic standards - Emission standard for residential, commercial and light-industrial environments |
 | EN 61000-3-2:2014 | Electromagnetic compatibility (EMC) – Part 3-2: Limits – Limits for harmonic current emissions (equipment input current ≤ 16 A per phase) |
 | IEC 61000-3-3:2013 Ed.3+A1 | See EN 61000-3-3:2013 above |
-| IEC 61000-6-1 *AEI | <font color="red">CANNOT VERIFY w/ *AEI</font> |
+| IEC 61000-6-1:2016 | Electromagnetic compatibility (EMC) - Part 6-1: Generic standards - Immunity for residential, commercial and light-industrial environments |
 | EN 61000-3-3:2008 | See EN 61000-3-3:2013 above |
 | FCC Part 15 | Subpart B, Sections 15.107 and 15.109 as a Class A digital device |
 | IC ICES-003:2016Ed.6 | Information Technology Equipment (Including Digital Apparatus) Limits and Methods of Measurement |
@@ -68,7 +68,7 @@ The OT-2 complies with all applicable requirements of the following safety and e
 
 **Warning:** Changes or modifications to this unit not expressly approved by Opentrons could void the user's authority to operate the equipment.
 
-This device complies with Part 15 of the FCC rules. Operation is subject to the following:
+This device complies with Part 15 of the FCC Rules. Operation is subject to the following:
 
 - This device may not cause harmful interference.
 
