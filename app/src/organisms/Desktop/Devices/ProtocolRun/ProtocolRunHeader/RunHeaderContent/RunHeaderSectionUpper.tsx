@@ -70,11 +70,7 @@ export function RunHeaderSectionUpper(
         gridGap={enableProtocolTimeline ? SPACING.spacing4 : 0}
       >
         {enableProtocolTimeline && runStatus === RUN_STATUS_IDLE ? (
-          <SecondaryButton
-            onClick={() => {
-              handleVisualizeClick()
-            }}
-          >
+          <SecondaryButton onClick={handleVisualizeClick}>
             {t('visualize')}
           </SecondaryButton>
         ) : null}
