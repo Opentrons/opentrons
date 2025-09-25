@@ -8,6 +8,8 @@ Called "Consumables" in OT-2 manual.
 
 text
 
+Use labware that is ANSI/SLAS-compliant or approved by Opentrons.
+
 ## Concepts
 
 text

@@ -58,7 +58,7 @@ Callouts used in the OT-2 manual look like this:
 
 ## OT-2 warnings, cautions, and notes
 
-### Electrical
+### Electrical safety
 
 Always observe the following electrical safety warnings and cautions:
 
@@ -81,6 +81,18 @@ Always observe the following electrical safety warnings and cautions:
     </tr>
 </table>
 
+### Biological safety
+
+Specimens and reagents containing materials taken from humans should be treated as potentially infectious agents. Opentrons recommends using safe laboratory procedures as explained in [*Biosafety in Microbiological and Biomedical Laboratories (BMBL) 6th Edition*](https://www.cdc.gov/labs/bmbl/).
+
+Under normal circumstances, the Opentrons OT-2 Liquid Handler does not create detectable aerosols from source liquids. However, under certain conditions, it is possible to generate aerosols from source liquids. When operating with BSL2 or above source liquids, precautions against aerosol exposure should be considered in accordance with your local regulatory bodies.
+
+To minimize the potential risk of aerosol exposure from the Opentrons OT-2 Liquid Handler, it is a good practice to:
+
+- Perform maintenance as described in the [Maintenance chapter](maintenance.md).
+- Properly install and secure all instrument covers, pipettes, modules, and labware.
+- Use proper pipetting technique to aid in the mitigation of aerosols.
+
 ### Additional safety practices
 
 <table>
@@ -98,6 +110,10 @@ Always observe the following electrical safety warnings and cautions:
         <tr>
             <td><img src="../images/caution-warning.svg" alt="Yellow warning or caution triangle"></td>
             <td><strong>Caution:</strong> Use good laboratory practices and follow the manufacturer’s precautions when working with chemicals. Opentrons is not responsible or liable for any damages because of, or as a result of, the use of hazardous chemicals.</td>
+        </tr>
+        <tr>
+            <td><img src="../images/caution-warning.svg" alt="Yellow warning or caution triangle"></td>
+            <td><strong>Caution:</strong> Keep corrosive materials, agents, or otherwise damaging materials away from the OT-2.</td>
         </tr>
         <tr>
             <td><img src="../images/heavy-warning.svg" alt="Yellow heavy object warning triangle"></td>
