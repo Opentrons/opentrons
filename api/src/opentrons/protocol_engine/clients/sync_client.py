@@ -85,6 +85,12 @@ class SyncClient:
 
     @overload
     def execute_command_without_recovery(
+        self, params: commands.heater_shaker.SetShakeSpeedParams
+    ) -> commands.heater_shaker.SetShakeSpeedResult:
+        pass
+
+    @overload
+    def execute_command_without_recovery(
         self, params: commands.thermocycler.SetTargetBlockTemperatureParams
     ) -> commands.thermocycler.SetTargetBlockTemperatureResult:
         pass

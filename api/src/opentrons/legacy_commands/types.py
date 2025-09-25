@@ -64,6 +64,7 @@ HEATER_SHAKER_WAIT_FOR_TEMPERATURE: Final = "command.HEATER_SHAKER_WAIT_FOR_TEMP
 HEATER_SHAKER_SET_AND_WAIT_FOR_SHAKE_SPEED: Final = (
     "command.HEATER_SHAKER_SET_AND_WAIT_FOR_SHAKE_SPEED"
 )
+HEATER_SHAKER_SET_SHAKE_SPEED: Final = "command.HEATER_SHAKER_SET_SHAKE_SPEED"
 HEATER_SHAKER_OPEN_LABWARE_LATCH: Final = "command.HEATER_SHAKER_OPEN_LABWARE_LATCH"
 HEATER_SHAKER_CLOSE_LABWARE_LATCH: Final = "command.HEATER_SHAKER_CLOSE_LABWARE_LATCH"
 HEATER_SHAKER_DEACTIVATE_SHAKER: Final = "command.HEATER_SHAKER_DEACTIVATE_SHAKER"
@@ -192,6 +193,15 @@ class HeaterShakerSetAndWaitForShakeSpeedPayload(TextOnlyPayload):
 class HeaterShakerSetAndWaitForShakeSpeedCommand(TypedDict):
     name: Literal["command.HEATER_SHAKER_SET_AND_WAIT_FOR_SHAKE_SPEED"]
     payload: HeaterShakerSetAndWaitForShakeSpeedPayload
+
+
+class HeaterShakerSetShakeSpeedPayload(TextOnlyPayload):
+    pass
+
+
+class HeaterShakerSetShakeSpeedCommand(TypedDict):
+    name: Literal["command.HEATER_SHAKER_SET_SHAKE_SPEED"]
+    payload: HeaterShakerSetShakeSpeedPayload
 
 
 class HeaterShakerOpenLabwareLatchPayload(TextOnlyPayload):
@@ -759,6 +769,7 @@ Command = Union[
     HeaterShakerSetTargetTemperatureCommand,
     HeaterShakerWaitForTemperatureCommand,
     HeaterShakerSetAndWaitForShakeSpeedCommand,
+    HeaterShakerSetShakeSpeedCommand,
     HeaterShakerOpenLabwareLatchCommand,
     HeaterShakerCloseLabwareLatchCommand,
     HeaterShakerDeactivateShakerCommand,
@@ -819,6 +830,7 @@ CommandPayload = Union[
     HeaterShakerSetTargetTemperaturePayload,
     HeaterShakerWaitForTemperaturePayload,
     HeaterShakerSetAndWaitForShakeSpeedPayload,
+    HeaterShakerSetShakeSpeedPayload,
     HeaterShakerOpenLabwareLatchPayload,
     HeaterShakerCloseLabwareLatchPayload,
     HeaterShakerDeactivateShakerPayload,
@@ -979,6 +991,12 @@ class HeaterShakerWaitForTemperatureMessage(
 
 class HeaterShakerSetAndWaitForShakeSpeedMessage(
     CommandMessageFields, HeaterShakerSetAndWaitForShakeSpeedCommand
+):
+    pass
+
+
+class HeaterShakerSetShakeSpeedMessage(
+    CommandMessageFields, HeaterShakerSetShakeSpeedCommand
 ):
     pass
 
@@ -1183,6 +1201,7 @@ CommandMessage = Union[
     HeaterShakerSetTargetTemperatureMessage,
     HeaterShakerWaitForTemperatureMessage,
     HeaterShakerSetAndWaitForShakeSpeedMessage,
+    HeaterShakerSetShakeSpeedMessage,
     HeaterShakerOpenLabwareLatchMessage,
     HeaterShakerCloseLabwareLatchMessage,
     HeaterShakerDeactivateShakerMessage,

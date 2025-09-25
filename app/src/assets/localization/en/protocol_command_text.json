@@ -98,6 +98,7 @@
   "save_position": "Saving position",
   "sealing_to_location": "Sealing to {{labware}} in {{location}}",
   "set_and_await_hs_shake": "Setting Heater-Shaker to shake at {{rpm}} rpm and waiting until reached",
+  "set_hs_shake": "Setting Heater-Shaker to shake at {{rpm}}",
   "set_tip_state": "Setting tips in {{labware}} to {{tip_well_state}}",
   "setting_hs_temp": "Setting Target Temperature of Heater-Shaker to {{temp}}",
   "setting_temperature_module_temp": "Setting Temperature Module to {{temp}} (rounded to nearest integer)",

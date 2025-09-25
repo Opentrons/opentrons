@@ -183,6 +183,16 @@ def heater_shaker_set_and_wait_for_shake_speed(
     }
 
 
+def heater_shaker_set_shake_speed(
+    rpm: int,
+) -> command_types.HeaterShakerSetShakeSpeedCommand:
+    text = f"Setting Heater-Shaker to Shake at {rpm} RPM"
+    return {
+        "name": command_types.HEATER_SHAKER_SET_SHAKE_SPEED,
+        "payload": {"text": text},
+    }
+
+
 def heater_shaker_open_labware_latch() -> command_types.HeaterShakerOpenLabwareLatchCommand:
     text = "Unlatching labware on Heater-Shaker"
     return {

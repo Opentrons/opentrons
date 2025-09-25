@@ -308,6 +308,10 @@ class AbstractHeaterShakerCore(
         """Set the shaker's target shake speed and wait for it to spin up."""
 
     @abstractmethod
+    def set_shake_speed(self, rpm: int) -> AbstractTaskCore:
+        """Set the shaker's target shake speed."""
+
+    @abstractmethod
     def open_labware_latch(self) -> None:
         """Open the labware latch."""
 
