@@ -1,6 +1,12 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 
+import { TEMPERATURE_MODULE_TYPE } from '@opentrons/shared-data'
+import {
+  TEMPERATURE_APPROACHING_TARGET,
+  TimelineFrame,
+} from '@opentrons/step-generation'
+
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
 import { getEnableConcurrentModuleActions } from '/protocol-designer/feature-flags/selectors'
@@ -107,13 +113,26 @@ describe('TemperatureTools', () => {
         value: 'mockId',
       },
     ])
-    vi.mocked(getEnableConcurrentModuleActions).mockReturnValue(false)
-    vi.mocked(getRobotStateAtActiveItem).mockReturnValue(null)
+    vi.mocked(getEnableConcurrentModuleActions).mockReturnValue(true)
+    const mockRobotState: Partial<TimelineFrame> = {
+      modules: {
+        mockId: {
+          slot: 'mockModuleSlot',
+          moduleState: {
+            type: TEMPERATURE_MODULE_TYPE,
+            status: TEMPERATURE_APPROACHING_TARGET,
+            targetTemperature: 123,
+          },
+        },
+      },
+    }
+    vi.mocked(getRobotStateAtActiveItem).mockReturnValue(mockRobotState as any)
   })
 
   it('renders a temperature module form with 1 module', () => {
     render(props)
     screen.getByText('Heat or cool')
     screen.getByText('mock module')
+    screen.getByText('123 °C')
   })
 })
