@@ -5,6 +5,7 @@ import {
   Box,
   COLORS,
   DIRECTION_COLUMN,
+  Divider,
   Flex,
   SPACING,
   StyledText,
@@ -58,7 +59,7 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
         tooltipContent={null}
       />
 
-      <Box borderBottom={`1px solid ${COLORS.grey30}`} />
+      <Divider marginY={0} />
 
       {enableConcurrentModuleActions && priorState !== null && (
         <>
@@ -76,7 +77,7 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
             <PriorHeaterShakerState priorState={priorState} />
           </Flex>
 
-          <Box borderBottom={`1px solid ${COLORS.grey30}`} />
+          <Divider marginY={0} />
         </>
       )}
 

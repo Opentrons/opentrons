@@ -2,9 +2,9 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
 import {
-  Box,
   COLORS,
   DIRECTION_COLUMN,
+  Divider,
   Flex,
   SPACING,
   StyledText,
@@ -56,7 +56,7 @@ export function TemperatureTools(props: StepFormProps): JSX.Element {
           dispatch(hoverSelection({ id: null, text: null }))
         }}
       />
-      <Box borderBottom={`1px solid ${COLORS.grey30}`} />
+      <Divider marginY={0} />
       {enableConcurrentModuleActions && priorState != null && (
         <>
           <Flex
@@ -72,7 +72,7 @@ export function TemperatureTools(props: StepFormProps): JSX.Element {
             </StyledText>
             <PriorTemperatureState priorState={priorState} />
           </Flex>
-          <Box borderBottom={`1px solid ${COLORS.grey30}`} />
+          <Divider marginY={0} />
         </>
       )}
       <Flex
