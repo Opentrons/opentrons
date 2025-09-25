@@ -17,7 +17,7 @@ interface AutoAddPauseUntilTempStepModalProps {
   displayTemperature: string
   handleCancelClick: () => void
   handleContinueClick: () => void
-  displayModule?: string
+  displayModule: string
 }
 
 export const AutoAddPauseUntilTempStepModal = (
