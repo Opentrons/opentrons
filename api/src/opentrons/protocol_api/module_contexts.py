@@ -771,6 +771,39 @@ class ThermocyclerContext(ModuleContext):
             block_max_volume=block_max_volume,
         )
 
+    @publish(command=cmds.thermocycler_start_execute_profile)
+    @requires_version(2, 27)
+    def start_execute_profile(
+        self,
+        steps: List[ThermocyclerStep],
+        repetitions: int,
+        block_max_volume: Optional[float] = None,
+    ) -> Task:
+        """Start a Thermocycler profile and return a :py:class:`Task` representing its execution.
+        Profile is defined as a cycle of ``steps``, for a given number of ``repetitions``.
+
+        Returns a task object that represents concurrent execution of the profile.
+        Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for the preheat to complete.
+
+        :param steps: List of steps that make up a single cycle.
+                      Each list item should be a dictionary that maps to the parameters
+                      of the :py:meth:`set_block_temperature` method. The dictionary's
+                      keys must be ``temperature`` and one or both of
+                      ``hold_time_seconds`` and ``hold_time_minutes``.
+        :param repetitions: The number of times to repeat the cycled steps.
+        :param block_max_volume: The greatest volume of liquid contained in any
+                                 individual well of the loaded labware, in µL.
+                                 If not specified, the default is 25 µL.
+        """
+        repetitions = validation.ensure_thermocycler_repetition_count(repetitions)
+        validated_steps = validation.ensure_thermocycler_profile_steps(steps)
+        task = self._core.start_execute_profile(
+            steps=validated_steps,
+            repetitions=repetitions,
+            block_max_volume=block_max_volume,
+        )
+        return Task(api_version=self._api_version, core=task)
+
     @publish(command=cmds.thermocycler_deactivate_lid)
     @requires_version(2, 0)
     def deactivate_lid(self) -> None:

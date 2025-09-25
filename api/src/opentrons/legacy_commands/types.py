@@ -82,6 +82,7 @@ THERMOCYCLER_OPEN: Final = "command.THERMOCYCLER_OPEN"
 THERMOCYCLER_CLOSE: Final = "command.THERMOCYCLER_CLOSE"
 THERMOCYCLER_SET_BLOCK_TEMP: Final = "command.THERMOCYCLER_SET_BLOCK_TEMP"
 THERMOCYCLER_EXECUTE_PROFILE: Final = "command.THERMOCYCLER_EXECUTE_PROFILE"
+THERMOCYCLER_START_EXECUTE_PROFILE: Final = "command.THERMOCYCLER_START_EXECUTE_PROFILE"
 THERMOCYCLER_DEACTIVATE: Final = "command.THERMOCYCLER_DEACTIVATE"
 THERMOCYCLER_WAIT_FOR_HOLD: Final = "command.THERMOCYCLER_WAIT_FOR_HOLD"
 THERMOCYCLER_WAIT_FOR_TEMP: Final = "command.THERMOCYCLER_WAIT_FOR_TEMP"
@@ -320,6 +321,15 @@ class ThermocyclerExecuteProfileCommandPayload(TextOnlyPayload):
 class ThermocyclerExecuteProfileCommand(TypedDict):
     name: Literal["command.THERMOCYCLER_EXECUTE_PROFILE"]
     payload: ThermocyclerExecuteProfileCommandPayload
+
+
+class ThermocyclerStartExecuteProfileCommandPayload(TextOnlyPayload):
+    steps: List[ThermocyclerStep]
+
+
+class ThermocyclerStartExecuteProfileCommand(TypedDict):
+    name: Literal["command.THERMOCYCLER_START_EXECUTE_PROFILE"]
+    payload: ThermocyclerStartExecuteProfileCommandPayload
 
 
 class ThermocyclerWaitForHoldCommandPayload(TextOnlyPayload):
@@ -783,6 +793,7 @@ Command = Union[
     ThermocyclerWaitForTempCommand,
     ThermocyclerWaitForHoldCommand,
     ThermocyclerExecuteProfileCommand,
+    ThermocyclerStartExecuteProfileCommand,
     ThermocyclerSetBlockTempCommand,
     ThermocyclerOpenCommand,
     TempdeckDeactivateCommand,
@@ -863,6 +874,7 @@ CommandPayload = Union[
     DispenseInDisposalLocationCommandPayload,
     HomeCommandPayload,
     ThermocyclerExecuteProfileCommandPayload,
+    ThermocyclerStartExecuteProfileCommandPayload,
     ThermocyclerSetBlockTempCommandPayload,
     TempdeckAwaitTempCommandPayload,
     TempdeckSetTempCommandPayload,
@@ -1077,6 +1089,12 @@ class ThermocyclerExecuteProfileMessage(
     pass
 
 
+class ThermocyclerStartExecuteProfileMessage(
+    CommandMessageFields, ThermocyclerStartExecuteProfileCommand
+):
+    pass
+
+
 class ThermocyclerSetBlockTempMessage(
     CommandMessageFields, ThermocyclerSetBlockTempCommand
 ):
@@ -1215,6 +1233,7 @@ CommandMessage = Union[
     ThermocyclerWaitForTempMessage,
     ThermocyclerWaitForHoldMessage,
     ThermocyclerExecuteProfileMessage,
+    ThermocyclerStartExecuteProfileMessage,
     ThermocyclerSetBlockTempMessage,
     ThermocyclerOpenMessage,
     TempdeckSetTempMessage,
