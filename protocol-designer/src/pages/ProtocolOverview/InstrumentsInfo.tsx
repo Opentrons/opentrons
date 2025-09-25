@@ -41,7 +41,10 @@ export function InstrumentsInfo({
     equipment => equipment?.name === 'gripper'
   )
 
-  const has96Channel = leftPipette?.name === 'p1000_96' && rightPipette == null
+  const has96Channel =
+    leftPipette != null &&
+    leftPipette.spec.channels === 96 &&
+    rightPipette == null
 
   const pipetteInfo = (pipette?: PipetteOnDeck): JSX.Element => {
     const pipetteName =

@@ -133,4 +133,13 @@ describe('InstrumentsInfo', () => {
     render(props)
     screen.getByText('Left + Right Mount')
   })
+
+  it('should render left + right mount when p200 96 channel is selected', () => {
+    props = {
+      ...props,
+      pipettesOnDeck: [{ ...mock96Pipette[0], name: 'p200_96' }],
+    }
+    render(props)
+    screen.getByText('Left + Right Mount')
+  })
 })

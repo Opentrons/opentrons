@@ -298,7 +298,8 @@ export function Onboarding(): JSX.Element | null {
               ? FLEX_MIDDLE_SLOTS[index]
               : modifiedOt2Slots[index],
           labwareDefURIStack: [
-            ...(values.pipettesByMount.left.pipetteName === 'p1000_96'
+            ...(values.pipettesByMount.left.pipetteName === 'p1000_96' ||
+            values.pipettesByMount.left.pipetteName === 'p200_96'
               ? [adapter96ChannelDefUri]
               : []),
             tiprackDefURI,

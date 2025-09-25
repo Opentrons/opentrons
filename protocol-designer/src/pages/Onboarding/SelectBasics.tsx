@@ -56,7 +56,9 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
   const hasWasteChute = watch('hasWasteChute')
 
   const robotType = fields?.robotType
-  const has96Channel = pipettesByMount.left.pipetteName === 'p1000_96'
+  const has96Channel =
+    pipettesByMount.left.pipetteName === 'p1000_96' ||
+    pipettesByMount.left.pipetteName === 'p200_96'
 
   const targetPipetteMount =
     pipettesByMount.left.pipetteName == null ||

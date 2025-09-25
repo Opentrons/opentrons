@@ -84,7 +84,7 @@ export const editPipettes = (
   // Create new tipracks that are not in previous tiprackURIs
   newTiprackUris.forEach(tiprackDefUri => {
     const adapterUnderLabwareDefURI = newPipetteArray.some(
-      pipette => pipette.name === 'p1000_96'
+      pipette => pipette.name === 'p1000_96' || pipette.name === 'p200_96'
     )
       ? adapter96ChannelDefUri
       : null

@@ -64,7 +64,10 @@ export const PIPETTE_VOLUMES: PipetteVolumes = {
         { label: '50', value: 'p50' },
         { label: '1000', value: 'p1000' },
       ],
-      '96': [{ label: '1000', value: 'p1000' }, {label: '200', value: 'p200' }],
+      '96': [
+        { label: '1000', value: 'p1000' },
+        { label: '200', value: 'p200' },
+      ],
     },
   ],
   [OT2_ROBOT_TYPE]: [

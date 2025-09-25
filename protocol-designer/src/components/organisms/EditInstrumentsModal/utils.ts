@@ -107,7 +107,9 @@ export function getTiprackOptions(props: TiprackOptionsProps): TiprackOption[] {
 
   const isFlexPipette =
     selectedPipetteDisplayCategory === 'FLEX' ||
-    selectedPipetteName === 'p1000_96'
+    selectedPipetteName === 'p1000_96' ||
+    selectedPipetteName === 'p200_96'
+
   const tiprackOptions = allLabware
     ? Object.values(allLabware)
         .filter(def => def.metadata.displayCategory === 'tipRack')

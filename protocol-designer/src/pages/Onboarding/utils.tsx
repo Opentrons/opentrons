@@ -30,7 +30,9 @@ export function getTiprackOptions(
   const defaultTipracks = pipetteSpecs?.liquids.default.defaultTipracks ?? []
   const displayCategory = pipetteSpecs?.displayCategory ?? ''
   const isFlexPipette =
-    displayCategory === 'FLEX' || selectedPipetteName === 'p1000_96'
+    displayCategory === 'FLEX' ||
+    selectedPipetteName === 'p1000_96' ||
+    selectedPipetteName === 'p200_96'
 
   const tiprackOptionsMap = Object.values(allLabware)
     .filter(def => def.metadata.displayCategory === 'tipRack')
