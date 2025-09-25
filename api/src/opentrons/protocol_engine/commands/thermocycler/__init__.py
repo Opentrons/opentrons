@@ -73,7 +73,7 @@ from .run_profile import (
     RunProfileCreate,
 )
 
-from .start_run_profile import (
+from .start_run_extended_profile import (
     StartRunExtendedProfileCommandType,
     StartRunExtendedProfileParams,
     StartRunExtendedProfileStepParams,

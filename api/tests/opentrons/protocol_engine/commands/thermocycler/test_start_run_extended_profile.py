@@ -13,7 +13,7 @@ from opentrons.protocol_engine.state.module_substates import (
 )
 from opentrons.protocol_engine.commands import thermocycler as tc_commands
 from opentrons.protocol_engine.commands.command import SuccessData
-from opentrons.protocol_engine.commands.thermocycler.start_run_profile import (
+from opentrons.protocol_engine.commands.thermocycler.start_run_extended_profile import (
     StartRunExtendedProfileImpl,
 )
 
