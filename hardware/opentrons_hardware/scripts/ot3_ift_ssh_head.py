@@ -371,7 +371,7 @@ async def  run(args: argparse.Namespace) -> None:
         print(f'READEPPROM={serial_number}')
     
     if args.downward:
-        res = await move_for_input(messenger, node,position,"downward",args)
+        res = await move_for_input_2(messenger, node,position,"downward",args)
         #print("move=Pass")
         #return res
     if args.up:
