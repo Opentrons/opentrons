@@ -38,7 +38,6 @@ function CrumbName({ crumbName, isLastCrumb }: CrumbNameProps): JSX.Element {
   return (
     <Flex
       alignItems={ALIGN_CENTER}
-      color={isLastCrumb ? COLORS.grey50 : COLORS.blue50}
       className={isLastCrumb ? styles.crumb_inactive : styles.crumb_active}
     >
       <Box
