@@ -2779,7 +2779,7 @@ def run(protocol: ProtocolContext) -> None:
             protocol.comment("MOVING: tiprack_200_XX = SCP_Position --> B4")
             protocol.move_labware(
                 labware=tiprack_200_XX,
-                new_location=stacker_200_2,
+                new_location=tiprack_A3_adapter,
                 use_gripper=True,
                 pick_up_offset=deck_pick_up_offset,
                 drop_offset=deck_drop_offset,
