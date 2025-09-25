@@ -3,6 +3,8 @@ import isEmpty from 'lodash/isEmpty'
 import last from 'lodash/last'
 import mapValues from 'lodash/mapValues'
 
+import { FLEX_96_CHANNEL_PIPETTES } from '@opentrons/shared-data'
+
 import { INITIAL_DECK_SETUP_STEP_ID } from '/protocol-designer/constants'
 import { createContainer } from '/protocol-designer/labware-ingred/actions'
 import { actions as stepFormActions } from '/protocol-designer/step-forms'
@@ -83,8 +85,8 @@ export const editPipettes = (
 
   // Create new tipracks that are not in previous tiprackURIs
   newTiprackUris.forEach(tiprackDefUri => {
-    const adapterUnderLabwareDefURI = newPipetteArray.some(
-      pipette => pipette.name === 'p1000_96'
+    const adapterUnderLabwareDefURI = newPipetteArray.some(pipette =>
+      FLEX_96_CHANNEL_PIPETTES.includes(pipette.name)
     )
       ? adapter96ChannelDefUri
       : null
