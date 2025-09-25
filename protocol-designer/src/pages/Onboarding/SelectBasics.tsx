@@ -17,6 +17,7 @@ import {
   WRAP,
 } from '@opentrons/components'
 import {
+  FLEX_96_CHANNEL_PIPETTES,
   FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
   THERMOCYCLER_MODULE_TYPE,
@@ -57,8 +58,8 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
 
   const robotType = fields?.robotType
   const has96Channel =
-    pipettesByMount.left.pipetteName === 'p1000_96' ||
-    pipettesByMount.left.pipetteName === 'p200_96'
+    pipettesByMount.left.pipetteName != null &&
+    FLEX_96_CHANNEL_PIPETTES.includes(pipettesByMount.left.pipetteName)
 
   const targetPipetteMount =
     pipettesByMount.left.pipetteName == null ||

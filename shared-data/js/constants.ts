@@ -151,6 +151,8 @@ export const ROBOT_MODELS = ['OT-2 Standard', 'OT-3 Standard']
 export const OT2_ROBOT_TYPE = 'OT-2 Standard' as const
 export const FLEX_ROBOT_TYPE = 'OT-3 Standard' as const
 
+export const FLEX_96_CHANNEL_PIPETTES = ['p1000_96', 'p200_96']
+
 //  TODO(jr, 7/13/23): rename this constant to FLEX_PIPETTES
 export const OT3_PIPETTES = [
   'p300_single_flex',
