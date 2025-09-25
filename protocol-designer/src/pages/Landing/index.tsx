@@ -46,9 +46,7 @@ export function Landing(): JSX.Element {
   const { bakeToast, eatToast } = useKitchen()
   const announcements = useAnnouncements()
   const lastAnnouncement = announcements[announcements.length - 1]
-  const announcementKey = lastAnnouncement
-    ? lastAnnouncement.announcementKey
-    : null
+  const announcementKey = lastAnnouncement.announcementKey
 
   const userHasNotSeenAnnouncement =
     getLocalStorageItem(localStorageAnnouncementKey) !== announcementKey &&
