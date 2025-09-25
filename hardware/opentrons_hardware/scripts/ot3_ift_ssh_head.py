@@ -110,7 +110,53 @@ async def move_for_input(messenger: CanMessenger, node, position,xy,args) -> Non
             print("MOVEUP=Failed")
 
 
-
+async def move_for_input_2(messenger: CanMessenger, node, position,xy,args) -> None:
+    step_size = [0.1, 0.5, 1,5,10, 20, 50]
+    step_length_index = 3
+    step = step_size[step_length_index]
+    pos = 0
+    speed = 10
+    res = {node: (0,0,0)}
+    current = args.current
+    await set_pipette_current(messenger,current,node)
+    try:
+        if xy == "downward":
+            pos = pos + step
+            position['pipette'] = pos
+            res = await move_to(messenger, node, step, speed)
+            
+        elif xy == "up":
+            pos = pos - step
+            position['pipette'] = pos
+            res = await move_to(messenger, node, step, -speed)
+            
+        mores1 = res[node][0]
+        encoder1 =res[node][1]
+        
+        diff = float(encoder1) - float(0)
+        print("diff",diff)
+        try:
+            if abs(diff) > 0:
+                if xy == "downward":
+                    print("MOVEDOWN=Pass")
+                elif xy == "up":
+                    print("MOVEUP=Pass")
+            else:
+                if xy == "downward":
+                    print("MOVEDOWN=Failed")
+                elif xy == "up":
+                    print("MOVEUP=Failed")
+                
+        except:
+            if xy == "downward":
+                print("MOVEDOWN=Failed")
+            elif xy == "up":
+                print("MOVEUP=Failed")
+    except Exception as err:
+        if xy == "downward":
+            print("MOVEDOWN=Failed")
+        elif xy == "up":
+            print("MOVEUP=Failed")
 
 async def _jog_axis(messenger: CanMessenger, node, position,current = 0.1) -> None:
     step_size = [0.1, 0.5, 1, 10, 20, 50]
