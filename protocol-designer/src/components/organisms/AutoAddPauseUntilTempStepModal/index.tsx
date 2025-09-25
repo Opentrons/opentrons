@@ -34,7 +34,7 @@ export const AutoAddPauseUntilTempStepModal = (
   return (
     <Modal
       marginLeft="0"
-      title={t('auto_add_pause_until_temp_step.redesign.title', {
+      title={t('auto_add_pause_until_temp_step.legacy.title', {
         module: displayModule,
         temp: displayTemperature,
       })}
@@ -50,12 +50,12 @@ export const AutoAddPauseUntilTempStepModal = (
         >
           <SecondaryButton onClick={handleCancelClick}>
             <StyledText desktopStyle="bodyDefaultSemiBold">
-              {t('auto_add_pause_until_temp_step.redesign.skip_pause_step')}
+              {t('auto_add_pause_until_temp_step.legacy.skip_pause_step')}
             </StyledText>
           </SecondaryButton>
           <PrimaryButton onClick={handleContinueClick}>
             <StyledText desktopStyle="bodyDefaultSemiBold">
-              {t('auto_add_pause_until_temp_step.redesign.add_pause_step')}
+              {t('auto_add_pause_until_temp_step.legacy.add_pause_step')}
             </StyledText>
           </PrimaryButton>
         </Flex>
@@ -63,7 +63,7 @@ export const AutoAddPauseUntilTempStepModal = (
     >
       <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
         <StyledText desktopStyle="bodyDefaultRegular">
-          {t('auto_add_pause_until_temp_step.redesign.body', {
+          {t('auto_add_pause_until_temp_step.legacy.body', {
             module: displayModule,
             temp: displayTemperature,
           })}
