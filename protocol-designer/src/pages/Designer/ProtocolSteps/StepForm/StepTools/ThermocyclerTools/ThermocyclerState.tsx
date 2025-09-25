@@ -54,7 +54,7 @@ export function ThermocyclerState(props: ThermocyclerStateProps): JSX.Element {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing4}
-      paddingX={`${SPACING.spacing16}`}
+      paddingX={SPACING.spacing16}
     >
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         <StyledText desktopStyle="bodyDefaultSemiBold">
