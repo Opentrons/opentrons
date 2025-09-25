@@ -28,7 +28,7 @@ from dataclasses import dataclass, field
 #  GLOBAL VARIABLES - START
 ###########################################
 
-LABWARE = "example_labware"  # change to desired labware
+LABWARE = "eppendorf_96_wellplate_500ul" # change to desired labware
 
 RESERVOIR = "nest_1_reservoir_290ml"
 
@@ -410,10 +410,18 @@ def _get_height_of_liquid_in_well(
         return 0.01
 
 
+import numpy as np
+from collections import OrderedDict
+from typing import List, Union
+from opentrons.protocol_api import ProtocolContext, Labware
+from opentrons_shared_data.labware.types import LabwareDefinition2, LabwareDefinition3
+
+
 def generate_frusta(
     ctx: ProtocolContext, data: List, labware: Labware
-) -> LabwareDefinition2 | LabwareDefinition3:
-    """Read the geometry creator results and generate frustum dimensions for the IWG."""
+) -> Union[LabwareDefinition2, LabwareDefinition3]:
+    """Read geometry creator results and generate frustum dimensions for the IWG."""
+
     inner_well_json = labware._core.get_definition()
     depth = inner_well_json["wells"]["A1"]["depth"]
     well_shape = inner_well_json["wells"]["A1"].get("shape")
@@ -425,21 +433,20 @@ def generate_frusta(
     else:
         geoID = "defaultWell"
 
+    # annotate wells with geometryDefinitionId
     for well_name in inner_well_json["wells"]:
         inner_well_json["wells"][well_name]["geometryDefinitionId"] = geoID
 
     frusta_data = []
-    radius = 0.0
     side_length = 0.0
+    diameter = 0.0
 
     for i in range(1, len(data)):
-
         vol1, h1 = data[i - 1]
         vol2, h2 = data[i]
 
         delta_volume = vol2 - vol1
         delta_height = h2 - h1
-
         if delta_height == 0:
             continue
 
@@ -447,7 +454,7 @@ def generate_frusta(
             if not ctx.is_simulating():
                 side_length = round(np.sqrt(delta_volume / delta_height), 2)
             section = {
-                "shape": geoID[:-4],
+                "shape": "cuboidal",
                 "bottomXDimension": side_length,
                 "bottomYDimension": side_length,
                 "topXDimension": side_length,
@@ -458,45 +465,60 @@ def generate_frusta(
         elif geoID == "conicalWell":
             if not ctx.is_simulating():
                 radius = round(np.sqrt(delta_volume / (np.pi * delta_height)), 2)
-            diameter = 2 * radius
+                diameter = 2 * radius
             section = {
-                "shape": geoID[:-4],
+                "shape": "conical",
                 "bottomDiameter": diameter,
                 "topDiameter": diameter,
                 "topHeight": round(h2, 2),
                 "bottomHeight": round(h1, 2),
             }
+        else:
+            continue  # skip unsupported
 
         frusta_data.append(section)
 
-    # add one more frusta to ensure heights add up to total depth
-    last = frusta_data[-1]
-    bottom_height = last["topHeight"]
+    # Add one more frustum to reach full depth
+    if frusta_data:
+        last = frusta_data[-1]
+        bottom_height = last["topHeight"]
 
-    if geoID == "cuboidalWell":
-        final_section = {
-            "shape": geoID[:-4],
-            "topXDimension": side_length,
-            "topYDimension": side_length,
-            "bottomXDimension": side_length,
-            "bottomYDimension": side_length,
-            "topHeight": depth,
-            "bottomHeight": bottom_height,
-        }
-    elif geoID == "conicalWell":
-        final_section = {
-            "shape": geoID[:-4],
-            "topDiameter": diameter,
-            "bottomDiameter": diameter,
-            "topHeight": depth,
-            "bottomHeight": bottom_height,
-        }
+        if geoID == "cuboidalWell":
+            final_section = {
+                "shape": "cuboidal",
+                "topXDimension": side_length,
+                "topYDimension": side_length,
+                "bottomXDimension": side_length,
+                "bottomYDimension": side_length,
+                "topHeight": depth,
+                "bottomHeight": bottom_height,
+            }
+        elif geoID == "conicalWell":
+            final_section = {
+                "shape": "conical",
+                "topDiameter": diameter,
+                "bottomDiameter": diameter,
+                "topHeight": depth,
+                "bottomHeight": bottom_height,
+            }
+        else:
+            final_section = {}
 
-    frusta_data.append(final_section)
+        if final_section:
+            frusta_data.append(final_section)
 
     inner_well_json["innerLabwareGeometry"] = {geoID: {"sections": frusta_data}}
 
-    return inner_well_json
+    # Rebuild JSON in schema order
+    key_order = [
+        "ordering", "brand", "metadata", "dimensions",
+        "wells", "groups", "parameters",
+        "namespace", "version", "schemaVersion", "innerLabwareGeometry",
+    ]
+    new_iwg = OrderedDict((k, inner_well_json[k]) for k in key_order if k in inner_well_json)
+
+    return new_iwg
+
 
 
 def get_dispense_props(state: SetupState, ts: TrialState) -> None:
