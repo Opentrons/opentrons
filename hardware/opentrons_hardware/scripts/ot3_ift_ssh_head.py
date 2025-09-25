@@ -375,7 +375,7 @@ async def  run(args: argparse.Namespace) -> None:
         #print("move=Pass")
         #return res
     if args.up:
-        res = await move_for_input(messenger, node,position,"up",args)
+        res = await move_for_input_2(messenger, node,position,"up",args)
         #print("moveup=Pass")
         #return res
 
