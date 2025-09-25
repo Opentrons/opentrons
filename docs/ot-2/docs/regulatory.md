@@ -10,17 +10,36 @@ The Opentrons OT-2 liquid handling robot has been designed for safe operation. R
 
 Various labels on the OT-2 and in this manual warn you about sources of potential injury or harm.
 
-
-### Regulatory warnings
-
-Include regulatory symbols with text.
-
-- Safety
-- Electrical
-- Biological
-- Toxic
-- Flammable
-- Pinch point
+<table>
+    <tr>
+        <th>Symbol</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td><img src="../images/caution-warning.svg" alt="Yellow warning or caution triangle"></td>
+        <td><strong>Warning</strong> or <strong>Caution</strong> alerts users about:
+            <ul>
+                <li>Potentially hazardous conditions.</li>
+                <li>Equipment damage.</li>
+                <li>Actions that may result in personal injury or death.</li>
+                <li>Potentially lost or corrupted data.</li>
+                <li>An unrecoverable interruption of the operation being performed.</li>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <td><img src="../images/shock-warning.svg" alt="Yellow electrical warning triangle"></td>
+        <td><strong>Electrical shock</strong>: alerts users about instrument components that might pose a risk of electrical shock if the instrument is handled improperly.</td>
+    </tr>
+    <tr>
+        <td><img src="../images/pinchpoint-warning.svg" alt="Yellow pinch point warning triangle"></td>
+        <td><strong>Pinch point</strong>: alerts users about instrument components that might pose a risk of injury due to moving parts.</td>
+    </tr>
+    <tr>
+        <td><img src="../images/heavy-warning.svg" alt="Yellow heavy object warning triangle"></td>
+        <td><strong>Heavy object</strong>: alerts users about potentially heavy objects that may require 2 people to lift properly.</td>
+    </tr>
+</table>
 
 ### Notes, tips, and cautions
 
@@ -36,6 +55,56 @@ Callouts used in the OT-2 manual look like this:
 
 !!!warning
     **Sample warning:** This is something you need to know because there is risk associated with it.
+
+## OT-2 warnings, cautions, and notes
+
+### Electrical
+
+Always observe the following electrical safety warnings and cautions:
+
+<table>
+    <tr>
+        <th>Type</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td><img src="../images/caution-warning.svg" alt="Yellow warning or caution triangle"></td>
+        <td><strong>Warning:</strong> Connect the Opentrons OT-2 Liquid Handler to a grounded/earthed (⏚) electrical outlet only.</td>
+    </tr>
+    <tr>
+        <td><img src="../images/shock-warning.svg" alt="Yellow electrical warning triangle"></td>
+        <td><strong>Warning: </strong> The Opentrons OT-2 Liquid Handler contains AC power fuses. If a fuse requires replacement, contact <a href="https://opentrons.com/opentrons-support">Opentrons support</a>.</td>
+    </tr>
+    <tr>
+        <td><img src="../images/shock-warning.svg" alt="Yellow electrical warning triangle"></td>
+        <td><strong>Warning: </strong> Do not use the AC power cable if it is frayed or damaged. The use of damaged power cords can cause an electric shock hazard resulting in injury or damage to the OT-2.</td>
+    </tr>
+</table>
+
+### Additional safety practices
+
+<table>
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><img src="../images/caution-warning.svg" alt="Yellow warning or caution triangle"></td>
+            <td><strong>Warning:</strong> The OT-2 has not been certified for use with explosive or flammable liquids. Do not load plates, tubes, or vials containing explosive or flammable liquids into the OT-2 or otherwise operate the instrument with explosive or flammable liquids in the interior.</td>
+        </tr>
+        <tr>
+            <td><img src="../images/caution-warning.svg" alt="Yellow warning or caution triangle"></td>
+            <td><strong>Caution:</strong> Use good laboratory practices and follow the manufacturer’s precautions when working with chemicals. Opentrons is not responsible or liable for any damages because of, or as a result of, the use of hazardous chemicals.</td>
+        </tr>
+        <tr>
+            <td><img src="../images/heavy-warning.svg" alt="Yellow heavy object warning triangle"></td>
+            <td><strong>Heavy object</strong>: The OT-2 weighs approximately 40 kg (90 lb). Moving or lifting the OT-2 incorrectly can result in injury. Never attempt to move or lift the robot without using proper equipment and proper safety techniques.</td>
+        </tr>
+    </tbody>
+</table>
 
 ## Compliance standards
 
