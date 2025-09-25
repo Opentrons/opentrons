@@ -93,10 +93,10 @@
   },
   "auto_add_pause_until_temp_step": {
     "redesign": {
-      "body": "Add a pause step to wait until the {{module}} reaches {{temperature}}°C. Click Skip to continue to the next protocol step without pausing.",
+      "body": "Add a pause step to wait until the {{module}} reaches {{temperature}} °C. Click Skip to continue to the next protocol step without pausing.",
       "skip_pause_step": "Skip pause step",
       "add_pause_step": "Add pause step",
-      "title": "Pause protocol until {{module}} reaches {{temp}}°C?"
+      "title": "Pause protocol until {{module}} reaches {{temp}} °C?"
     }
   },
   "browse_labware": {
