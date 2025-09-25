@@ -2,7 +2,6 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
 import {
-  Box,
   COLORS,
   DIRECTION_COLUMN,
   Divider,
