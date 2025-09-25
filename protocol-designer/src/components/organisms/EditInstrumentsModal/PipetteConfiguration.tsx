@@ -54,7 +54,6 @@ import type { ThunkDispatch } from '/protocol-designer/types'
 import type { PipetteConfig } from './usePipetteConfig'
 
 interface PipetteConfigurationProps {
-  has96Channel: boolean
   robotType: RobotType
   selectedPipette: string
   pipetteConfig: PipetteConfig
@@ -63,7 +62,6 @@ interface PipetteConfigurationProps {
 }
 
 export function PipetteConfiguration({
-  has96Channel,
   robotType,
   selectedPipette,
   pipetteConfig,
@@ -102,7 +100,6 @@ export function PipetteConfiguration({
           {PIPETTE_TYPES[robotType].map(type => {
             return getShouldShowPipetteType(
               type.value as PipetteType,
-              has96Channel,
               leftPipette,
               rightPipette,
               mount,
