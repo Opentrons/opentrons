@@ -774,6 +774,14 @@ export const savedStepForms = (
             ...savedForm,
             labwareLocationUpdate: updatedLabwareLocation,
           }
+        } else if (
+          savedForm.stepType === 'moveLabware' &&
+          savedForm.labware === labwareIdToDelete
+        ) {
+          return {
+            ...savedForm,
+            labware: null,
+          }
         }
 
         const deleteLabwareUpdate = reduce<FormData, FormData>(
