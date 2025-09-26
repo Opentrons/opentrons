@@ -219,9 +219,6 @@ export function UpdateProtocol(): JSX.Element {
 
           // Clean up extra blank lines
           cleanedText = cleanedText.replace(/\n\n\n+/g, '\n\n').trim()
-          console.log(
-            'Cleaned Protocol Designer metadata from uploaded protocol'
-          )
         }
 
         setErrorText(null)
