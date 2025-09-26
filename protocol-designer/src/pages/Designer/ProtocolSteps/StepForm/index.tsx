@@ -11,6 +11,7 @@ import {
   ConfirmDeleteModal,
   DELETE_STEP_FORM,
 } from '/protocol-designer/components/organisms'
+import { getEnableConcurrentModuleActions } from '/protocol-designer/feature-flags/selectors'
 import {
   getHydratedForm,
   selectors as stepFormSelectors,
@@ -39,6 +40,7 @@ interface StateProps {
   isPristineSetHeaterShakerTempForm: boolean
   invariantContext: InvariantContext
   formData?: FormData | null
+  enableConcurrentModuleActions: boolean
 }
 interface DispatchProps {
   deleteStep: (stepId: string) => void
@@ -63,6 +65,7 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
     saveHeaterShakerFormWithAddedPauseUntilTemp,
     saveStepForm,
     invariantContext,
+    enableConcurrentModuleActions,
   } = props
   const [focusedField, setFocusedField] = useState<string | null>(null)
   const [dirtyFields, setDirtyFields] = useState<StepFieldName[]>(
@@ -152,25 +155,52 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
           onContinueClick={confirmClose}
         />
       )}
-      {showAddPauseUntilTempStepModal ||
-      showAddPauseUntilHeaterShakerTempStepModal ? (
-        <AutoAddPauseUntilTempStepModal
-          displayTemperature={
-            showAddPauseUntilTempStepModal
-              ? formData?.targetTemperature
-              : formData?.targetHeaterShakerTemperature ?? '?'
-          }
-          displayModule={
-            formData.moduleId != null
-              ? getModuleDisplayName(
-                  invariantContext.moduleEntities[formData.moduleId].model
-                )
-              : ''
-          }
-          handleSkipPauseClick={saveStepForm}
-          handleAddPauseClick={handleSave}
-        />
-      ) : null}
+      {showAddPauseUntilTempStepModal &&
+        (enableConcurrentModuleActions ? (
+          <AutoAddPauseUntilTempStepModal
+            type="temperatureModule"
+            displayTemperature={formData.targetTemperature}
+            handleAddPauseClick={handleSave}
+            handleSkipPauseClick={saveStepForm}
+          />
+        ) : (
+          <AutoAddPauseUntilTempStepModal
+            type="legacy"
+            displayTemperature={formData?.targetTemperature ?? '?"'}
+            displayModule={
+              formData.moduleId != null
+                ? getModuleDisplayName(
+                    invariantContext.moduleEntities[formData.moduleId].model
+                  )
+                : ''
+            }
+            handleSkipPauseClick={saveStepForm}
+            handleAddPauseClick={handleSave}
+          />
+        ))}
+      {showAddPauseUntilHeaterShakerTempStepModal &&
+        (enableConcurrentModuleActions ? (
+          <AutoAddPauseUntilTempStepModal
+            type="heaterShaker"
+            displayTemperature={formData?.targetHeaterShakerTemperature ?? '?'}
+            handleSkipPauseClick={saveStepForm}
+            handleAddPauseClick={handleSave}
+          />
+        ) : (
+          <AutoAddPauseUntilTempStepModal
+            type="legacy"
+            displayTemperature={formData?.targetHeaterShakerTemperature ?? '?'}
+            displayModule={
+              formData.moduleId != null
+                ? getModuleDisplayName(
+                    invariantContext.moduleEntities[formData.moduleId].model
+                  )
+                : ''
+            }
+            handleSkipPauseClick={saveStepForm}
+            handleAddPauseClick={handleSave}
+          />
+        ))}
       <StepFormToolbox
         {...{
           canSave,
@@ -200,6 +230,7 @@ const mapStateToProps = (state: BaseState): StateProps => {
       state
     ),
     invariantContext: getInvariantContext(state),
+    enableConcurrentModuleActions: getEnableConcurrentModuleActions(state),
   }
 }
 
