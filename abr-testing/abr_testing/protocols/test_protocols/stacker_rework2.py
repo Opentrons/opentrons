@@ -2865,6 +2865,16 @@ def run(protocol: ProtocolContext) -> None:
             p1000.dispense(TransferSup + 1, sample_plate_3["A1"].bottom(z=1))
             p1000.return_tip()
             # ===============================================
+
+            while len(stacker_50_1.get_stored_labware()) != 0:
+                reset_tiprack = stacker_50_1.retrieve()
+                protocol.move_labware(
+                    labware=reset_tiprack,
+                    new_location=stacker_50_2,
+                    use_gripper=True,
+                )
+                stacker_50_2.store()
+
         if not protocol.is_simulating():
             slack_bot.send_run_completed_message(metadata["protocolName"])
     except Exception as e:
