@@ -171,10 +171,10 @@ const adapters = ['aluminumblock', 'tuberack']
 // Match images to load names
 function buildSortedLabwareImages(
   loadNames: string[]
-): Record<string, string[]> {
+): Record<string, [string, ...string[]]> {
   const matchedImageVars = new Set<string>()
   const imageKeyToUrl = getAllImages()
-  const labwareImages: Record<string, string[]> = {}
+  const labwareImages: Record<string, [string, ...string[]]> = {}
 
   for (const loadName of loadNames) {
     const matchingUrls = Object.entries(imageKeyToUrl)
@@ -186,7 +186,7 @@ function buildSortedLabwareImages(
         return url
       })
     if (matchingUrls.length > 0) {
-      labwareImages[loadName] = matchingUrls
+      labwareImages[loadName] = [matchingUrls[0], ...matchingUrls.slice(1)]
     }
   }
   // Add unmatched images to the object
@@ -209,9 +209,9 @@ function buildSortedLabwareImages(
         return a.localeCompare(b)
       })
 
-      return [key, sortedUrls]
+      return [key, [sortedUrls[0], ...sortedUrls.slice(1)]]
     })
-  )
+  ) as Record<string, [string, ...string[]]>
 
   return sortedLabwareImages
 }
