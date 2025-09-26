@@ -149,7 +149,7 @@ Changes in API Versions
 Version 2.26
 -------------
 
-- 
+- Adds the ability to use the ``flex_96channel_200`` pipette to perform liquid handling actions using :ref:`liquid classes <liquid-classes>`. 
 
 Version 2.25
 -------------

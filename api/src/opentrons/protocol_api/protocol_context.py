@@ -1505,8 +1505,8 @@ class ProtocolContext(CommandPublisher):
             - ``"water"``: an Opentrons-verified liquid class based on deionized water.
             - ``"glycerol_50"``: an Opentrons-verified liquid class for viscous liquid. Based on 50% glycerol.
             - ``"ethanol_80"``: an Opentrons-verified liquid class for volatile liquid. Based on 80% ethanol.
-        :param version: The version of the liquid class to retrieve. If left unspecified, the latest definition for the
-            protocol's API version will be loaded.
+        :param version: Version of the liquid class to retrieve. If left unspecified, defaults to the latest version for the
+            protocol's API level.
 
         :raises: ``LiquidClassDefinitionDoesNotExist``: if the specified liquid class does not exist.
 
