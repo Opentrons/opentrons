@@ -13,7 +13,7 @@ import {
 } from '@opentrons/components'
 
 import { HandleEnter } from '/protocol-designer/components/atoms'
-import { getRobotType } from '/protocol-designer/file-data/selectors'
+import {  getRobotType } from '/protocol-designer/file-data/selectors'
 import { deleteContainer } from '/protocol-designer/labware-ingred/actions'
 import { TIPRACK_LID_LOADNAME } from '/protocol-designer/pages/Designer/utils'
 import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
@@ -134,6 +134,7 @@ export function EditInstrumentsModal(
         mount,
         selectedPipette as PipetteName,
         selectedTips,
+        labware,
         leftPipette,
         rightPipette
       )
