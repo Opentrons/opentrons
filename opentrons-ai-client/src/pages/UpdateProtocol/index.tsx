@@ -201,8 +201,31 @@ export function UpdateProtocol(): JSX.Element {
       })
 
       if (typeof text === 'string' && text !== '') {
+        // Check if this is a Protocol Designer generated protocol
+        let cleanedText = text
+        if (
+          text.includes('"source": "Protocol Designer"') ||
+          text.includes('DESIGNER_APPLICATION = """')
+        ) {
+          // Remove DESIGNER_APPLICATION variable from PD protocols
+          const designerAppRegex = /^DESIGNER_APPLICATION\s*=\s*"""[\s\S]*?"""\s*$/gm
+          cleanedText = text.replace(designerAppRegex, '')
+
+          // Also change the source in metadata to avoid protocol format detection issues
+          cleanedText = cleanedText.replace(
+            '"source": "Protocol Designer"',
+            '"source": "OpentronsAI"'
+          )
+
+          // Clean up extra blank lines
+          cleanedText = cleanedText.replace(/\n\n\n+/g, '\n\n').trim()
+          console.log(
+            'Cleaned Protocol Designer metadata from uploaded protocol'
+          )
+        }
+
         setErrorText(null)
-        setPythonTextValue(text)
+        setPythonTextValue(cleanedText)
       } else {
         setErrorText(String(t('file_length_error')))
       }
