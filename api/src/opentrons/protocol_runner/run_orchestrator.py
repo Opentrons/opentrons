@@ -396,6 +396,18 @@ class RunOrchestrator:
             module_model=ModuleModel.from_hardware(module_model), serial=module_serial
         )
 
+    async def module_disconnected(
+        self, module_model: HardwareModuleModel, module_serial: str | None
+    ) -> bool:
+        """Handle an unexpected module disconnection.
+
+        If this function returns true, the caller should call finish() immediately; if it returns
+        False, the caller should not call finish() until it otherwise would.
+        """
+        return await self._protocol_engine.module_disconnected(
+            module_model=ModuleModel.from_hardware(module_model), serial=module_serial
+        )
+
     async def use_attached_modules(
         self, modules_by_id: Dict[str, HardwareModuleAPI]
     ) -> None:

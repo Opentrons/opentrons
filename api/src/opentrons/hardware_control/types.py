@@ -399,6 +399,7 @@ class HardwareEventType(enum.Enum):
     ERROR_MESSAGE = enum.auto()
     ESTOP_CHANGE = enum.auto()
     ASYNCHRONOUS_MODULE_ERROR = enum.auto()
+    MODULE_DISCONNECTED = enum.auto()
 
 
 @dataclass
@@ -454,6 +455,16 @@ class AsynchronousModuleErrorNotification:
     ] = HardwareEventType.ASYNCHRONOUS_MODULE_ERROR
 
 
+@dataclass(frozen=True)
+class ModuleDisconnectedNotification:
+    module_serial: str | None
+    module_model: "ModuleModel"
+    port: str
+    event: Literal[
+        HardwareEventType.MODULE_DISCONNECTED
+    ] = HardwareEventType.MODULE_DISCONNECTED
+
+
 # new event types get new dataclasses
 # when we add more event types we add them here
 HardwareEvent = Union[
@@ -461,6 +472,7 @@ HardwareEvent = Union[
     ErrorMessageNotification,
     EstopStateNotification,
     AsynchronousModuleErrorNotification,
+    ModuleDisconnectedNotification,
 ]
 
 HardwareEventHandler = Callable[[HardwareEvent], None]

@@ -15,6 +15,7 @@ from opentrons.protocol_engine.types import (
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.robot.types import RobotType
 from opentrons_shared_data.robot.types import RobotTypeEnum
+from opentrons_shared_data.errors.exceptions import ModuleNotPresent
 
 from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
@@ -24,6 +25,7 @@ from opentrons.hardware_control.types import (
     EstopStateNotification,
     HardwareEventHandler,
     AsynchronousModuleErrorNotification,
+    ModuleDisconnectedNotification,
 )
 from opentrons.protocols.api_support.deck_type import should_load_fixed_trash
 from opentrons.protocol_runner import (
@@ -72,7 +74,7 @@ class NoRunOrchestrator(RuntimeError):
     """Raised if you try to get the current run orchestrator while there is none."""
 
 
-async def _do_handle_hardware_event(
+async def _do_handle_hardware_event(  # noqa: C901
     run_orchestrator_store: "RunOrchestratorStore", event: HardwareEvent
 ) -> None:
     if isinstance(event, EstopStateNotification):
@@ -96,6 +98,20 @@ async def _do_handle_hardware_event(
         )
         if should_finish:
             await run_orchestrator_store.run_orchestrator.finish(error=event.exception)
+    elif isinstance(event, ModuleDisconnectedNotification):
+        if run_orchestrator_store.current_run_id is None:
+            return
+        should_finish = (
+            await run_orchestrator_store.run_orchestrator.module_disconnected(
+                module_model=event.module_model, module_serial=event.module_serial
+            )
+        )
+        if should_finish:
+            await run_orchestrator_store.run_orchestrator.finish(
+                error=ModuleNotPresent(
+                    identifier=event.module_serial or event.module_model
+                )
+            )
 
 
 async def handle_hardware_event(
