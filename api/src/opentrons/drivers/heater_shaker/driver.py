@@ -27,6 +27,7 @@ class GCODE(str, Enum):
     GET_LABWARE_LATCH_STATE = "M241"
     DEACTIVATE_HEATER = "M106"
     GET_RESET_REASON = "M114"
+    GET_ERROR_STATE = "M411"
 
 
 HS_BAUDRATE = 115200
@@ -202,3 +203,11 @@ class HeaterShakerDriver(AbstractHeaterShakerDriver):
             gcode=GCODE.DEACTIVATE_HEATER
         )
         await self._connection.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES)
+
+    async def get_error_state(self) -> None:
+        """Raise if the module is in an error state."""
+        await self._connection.send_command(
+            command=CommandBuilder(terminator=HS_COMMAND_TERMINATOR).add_gcode(
+                gcode=GCODE.GET_ERROR_STATE
+            )
+        )

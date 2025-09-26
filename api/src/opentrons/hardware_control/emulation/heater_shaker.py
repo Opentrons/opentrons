@@ -2,6 +2,7 @@
 
 The purpose is to provide a fake backend that responds to GCODE commands.
 """
+
 import logging
 from time import sleep
 from typing import (
@@ -50,6 +51,7 @@ class HeaterShakerEmulator(AbstractEmulator):
             GCODE.CLOSE_LABWARE_LATCH.value: self._close_labware_latch,
             GCODE.GET_LABWARE_LATCH_STATE.value: self._get_labware_latch_state,
             GCODE.DEACTIVATE_HEATER.value: self._deactivate_heater,
+            GCODE.GET_ERROR_STATE.value: self._get_error_state,
         }
         self.reset()
 
@@ -60,7 +62,6 @@ class HeaterShakerEmulator(AbstractEmulator):
         return None if not joined else joined
 
     def reset(self) -> None:
-
         self._temperature = Temperature(
             per_tick=self._settings.temperature.degrees_per_tick,
             current=self._settings.temperature.starting,
@@ -144,6 +145,9 @@ class HeaterShakerEmulator(AbstractEmulator):
     def _deactivate_heater(self, command: Command) -> str:
         self._temperature.deactivate(TEMPERATURE_ROOM)
         return "M106"
+
+    def _get_error_state(self, command: Command) -> str:
+        return "M411"
 
     @staticmethod
     def get_terminator() -> bytes:
