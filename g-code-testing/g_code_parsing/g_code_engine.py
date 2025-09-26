@@ -210,8 +210,8 @@ class GCodeEngine:
             else:
                 raise ValueError(f"APIVersion is {version}")
 
-    @contextmanager
-    def run_http(self, executable: Callable):
+    @asynccontextmanager
+    async def run_http(self, executable: Callable) -> AsyncGenerator:
         """
         Runs http request and returns all G-Code I/O from it
         :param executable: Function connected to HTTP Request to execute
@@ -219,5 +219,5 @@ class GCodeEngine:
         """
         with self._emulate() as h:
             with GCodeWatcher(emulator_settings=self._config) as watcher:
-                asyncio.run(executable(hardware=h))
+                await executable(hardware=h)
             yield GCodeProgram.from_g_code_watcher(watcher)
