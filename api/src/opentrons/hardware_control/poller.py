@@ -88,6 +88,12 @@ class Poller:
         except asyncio.InvalidStateError:
             log.warning("Poller waiter was already cancelled")
 
+    def _error_callback(self, exc: Exception) -> None:
+        try:
+            self._reader.on_error(exc)
+        except Exception:
+            log.exception("Exception in reader callback")
+
     async def _poll_once(self) -> None:
         """Trigger a single read, notifying listeners of success or error."""
         previous_waiters = self._poll_waiters
@@ -101,10 +107,10 @@ class Poller:
         except AbsorbanceReaderDisconnectedError as e:
             for waiter in previous_waiters:
                 Poller._set_waiter_complete(waiter, None)
-            self._reader.on_error(e)
+            self._error_callback(e)
         except Exception as e:
             log.exception("Polling exception")
-            self._reader.on_error(e)
+            self._error_callback(e)
             for waiter in previous_waiters:
                 Poller._set_waiter_complete(waiter, e)
         else:
