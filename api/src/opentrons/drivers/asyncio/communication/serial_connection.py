@@ -462,7 +462,10 @@ class AsyncResponseSerialConnection(SerialConnection):
         self._async_error_ack = async_error_ack.lower()
 
     async def send_command(
-        self, command: CommandBuilder, retries: int = 0, timeout: Optional[float] = None
+        self,
+        command: CommandBuilder,
+        retries: Optional[int] = None,
+        timeout: Optional[float] = None,
     ) -> str:
         """
         Send a command and return the response.
@@ -478,7 +481,7 @@ class AsyncResponseSerialConnection(SerialConnection):
         """
         return await self.send_data(
             data=command.build(),
-            retries=retries or self._number_of_retries,
+            retries=retries if retries is not None else self._number_of_retries,
             timeout=timeout,
         )
 
@@ -500,9 +503,7 @@ class AsyncResponseSerialConnection(SerialConnection):
         async with super().send_data_lock, self._serial.timeout_override(
             "timeout", timeout
         ):
-            return await self._send_data(
-                data=data, retries=retries or self._number_of_retries
-            )
+            return await self._send_data(data=data, retries=retries)
 
     async def _send_data(self, data: str, retries: int = 0) -> str:
         """
@@ -517,7 +518,6 @@ class AsyncResponseSerialConnection(SerialConnection):
         Raises: SerialException
         """
         data_encode = data.encode()
-        retries = retries or self._number_of_retries
 
         for retry in range(retries + 1):
             log.debug(f"{self._name}: Write -> {data_encode!r}")
