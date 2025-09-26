@@ -6,7 +6,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { CameraControls } from '/app/organisms/Desktop/Camera/CameraControls'
 
-import { RobotSettingsCameraControls } from '../CameraControlSettings'
+import { RobotSettingsCameraControls } from '../RobotSettingsCameraControls'
 
 vi.mock('/app/organisms/Desktop/Camera/CameraControls')
 
