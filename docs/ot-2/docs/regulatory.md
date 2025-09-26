@@ -37,7 +37,7 @@ Various labels on the OT-2 and in this manual warn you about sources of potentia
     </tr>
     <tr>
         <td><img src="../images/heavy-warning.svg" alt="Yellow heavy object warning triangle"></td>
-        <td><strong>Heavy object</strong>: alerts users about potentially heavy objects that may require 2 people to lift properly.</td>
+        <td><strong>Heavy object</strong>: alerts users about potentially heavy objects that may require 2 or more people to lift properly.</td>
     </tr>
 </table>
 
@@ -85,9 +85,9 @@ Always observe the following electrical safety warnings and cautions:
 
 Specimens and reagents containing materials taken from humans should be treated as potentially infectious agents. Opentrons recommends using safe laboratory procedures as explained in [*Biosafety in Microbiological and Biomedical Laboratories (BMBL) 6th Edition*](https://www.cdc.gov/labs/bmbl/).
 
-Under normal circumstances, the Opentrons OT-2 Liquid Handler does not create detectable aerosols from source liquids. However, under certain conditions, it is possible to generate aerosols from source liquids. When operating with BSL2 or above source liquids, precautions against aerosol exposure should be considered in accordance with your local regulatory bodies.
+Under normal circumstances, the OT-2 does not create detectable aerosols from source liquids. However, under certain conditions, it is possible to generate aerosols from source liquids. When operating with BSL2 or above source liquids, precautions against aerosol exposure should be considered in accordance with your local regulatory bodies.
 
-To minimize the potential risk of aerosol exposure from the Opentrons OT-2 Liquid Handler, it is a good practice to:
+To minimize the potential risk of aerosol exposure from the OT-2, it is a good practice to:
 
 - Perform maintenance as described in the [Maintenance chapter](maintenance.md).
 - Properly install and secure all instrument covers, pipettes, modules, and labware.
@@ -116,11 +116,24 @@ To minimize the potential risk of aerosol exposure from the Opentrons OT-2 Liqui
             <td><strong>Caution:</strong> Keep corrosive materials, agents, or otherwise damaging materials away from the OT-2.</td>
         </tr>
         <tr>
-            <td><img src="../images/heavy-warning.svg" alt="Yellow heavy object warning triangle"></td>
-            <td><strong>Heavy object</strong>: The OT-2 weighs approximately 40 kg (90 lb). Moving or lifting the OT-2 incorrectly can result in injury. Never attempt to move or lift the robot without using proper equipment and proper safety techniques.</td>
+            <td><img src="../images/caution-warning.svg" alt="Yellow warning or caution triangle"></td>
+            <td><strong>Toxic fumes</strong>: If the user is working with volatile solvents or toxic substances an efficient laboratory ventilation system should be used to remove any vapors that may be produced.</td>
         </tr>
     </tbody>
 </table>
+
+### Product labels
+The OT-2 may display one or more of the following labels for:
+
+- Electrical hazards
+- Electrical Testing Laboratories (ETL)
+- General warnings
+- High-voltage
+- Intellectual property
+- Pinch points
+- Power and fuse ratings
+- Products
+- [WEEE](#weee-policy)
 
 ## Compliance standards
 
@@ -137,15 +150,15 @@ The OT-2 complies with all applicable requirements of the following safety and e
 ### Electromagnetic compatibility
 
 | Rule ID | Title |
-|----|----|
-| IEC 61326-1:2013 | Electrical Equipment for measurement, control, and laboratory use—EMC Requirements, Class A |
-| EN 61000-3-2:2014 | Electromagnetic compatibility (EMC)—Part 3–2: Limits—Limits for harmonic current emissions |
-| EN 61000-3-3:2013 | Electromagnetic compatibility (EMC)—Part 3-3: Limits—Limitation of voltage changes, voltage fluctuations and flicker in public low-voltage supply systems, for equipment with rated current ≤ 16 A per phase and not subject to conditional connection |
-| KN 61000-6-3:2012 | Electromagnetic compatibility (EMC) - Part 6-3: Generic standards - Emission standard for residential, commercial and light-industrial environments |
-| EN 61000-3-2:2014 | Electromagnetic compatibility (EMC) – Part 3-2: Limits – Limits for harmonic current emissions (equipment input current ≤ 16 A per phase) |
-| IEC 61000-3-3:2013 Ed.3+A1 | See EN 61000-3-3:2013 above |
-| IEC 61000-6-1:2016 | Electromagnetic compatibility (EMC) - Part 6-1: Generic standards - Immunity for residential, commercial and light-industrial environments |
-| EN 61000-3-3:2008 | See EN 61000-3-3:2013 above |
+|---|---|
+| IEC 61326-1:2013 | Electrical Equipment for measurement, control, and laboratory use–EMC Requirements, Class A |
+| EN 61000-3-2:2014 | Electromagnetic compatibility (EMC)–Part 3–2: Limits–Limits for harmonic current emissions |
+| EN 61000-3-3:2013 | Electromagnetic compatibility (EMC)–Part 3–3: Limits–Limitation of voltage changes, voltage fluctuations and flicker in public low–voltage supply systems, for equipment with rated current ≤ 16 A per phase and not subject to conditional connection |
+| KN 61000-6-3:2012 | Electromagnetic compatibility (EMC)–Part 6–3: Generic standards–Emission standard for residential, commercial and light–industrial environments |
+| EN 61000-3-2:2014 | Electromagnetic compatibility (EMC)–Part 3–2: Limits–Limits for harmonic current emissions (equipment input current ≤ 16 A per phase) |
+| IEC 61000-3-3:2013 Ed.3+A1 | See EN 61000–3–3:2013 above |
+| IEC 61000-6-1:2016 | Electromagnetic compatibility (EMC)–Part 6–1: Generic standards–Immunity for residential, commercial and light–industrial environments |
+| EN 61000-3-3:2008 | See EN 61000–3–3:2013 above |
 | FCC Part 15 | Subpart B, Sections 15.107 and 15.109 as a Class A digital device |
 | IC ICES-003:2016Ed.6 | Information Technology Equipment (Including Digital Apparatus) Limits and Methods of Measurement |
 
