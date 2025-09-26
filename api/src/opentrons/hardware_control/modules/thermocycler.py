@@ -712,7 +712,6 @@ class Thermocycler(mod_abc.AbstractModule):
             f"https://support.opentrons.com/en/articles/3469797-thermocycler-module"
             f" for troubleshooting."
         )
-        asyncio.run_coroutine_threadsafe(self.cleanup(), self._loop)
         self.error_callback(error)
 
 
