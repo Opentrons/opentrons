@@ -41,6 +41,7 @@ from opentrons_shared_data.liquid_classes.types import (
     DelayPropertiesDict,
 )
 from opentrons.protocol_engine.types import PostRunHardwareState
+from opentrons.protocol_engine.resources.camera_provider import CameraProvider
 
 try:
     import aionotify  # type: ignore[import-untyped]
@@ -360,6 +361,7 @@ def _make_ot3_pe_ctx(
         # TODO(jbl 10-30-2023) load_fixed_trash being hardcoded to True will be refactored once we need tests to have
         #   this be False
         load_fixed_trash=True,
+        camera_provider=None,
     ) as (
         engine,
         loop,

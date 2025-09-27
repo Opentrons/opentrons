@@ -48,6 +48,7 @@ from opentrons.protocol_engine.create_protocol_engine import (
 from opentrons.protocol_engine import error_recovery_policy
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.types import DeckType, EngineStatus, PostRunHardwareState
+from opentrons.protocol_engine.resources.camera_provider import CameraProvider
 from opentrons.protocol_reader.protocol_source import ProtocolSource
 from opentrons.protocol_runner.protocol_runner import create_protocol_runner, LiveRunner
 from opentrons.protocol_runner import RunOrchestrator
@@ -824,6 +825,7 @@ def _create_live_context_pe(
             load_fixed_trash=should_load_fixed_trash_labware_for_python_protocol(
                 api_version
             ),
+            camera_provider=CameraProvider(),
         )
     )
 
@@ -949,6 +951,7 @@ def _run_file_pe(
             protocol_live_runner=LiveRunner(
                 protocol_engine=protocol_engine, hardware_api=hardware_api_wrapped
             ),
+            camera_provider=CameraProvider(),
         )
 
         # TODO(mm, 2024-08-06): This home is theoretically redundant with Protocol

@@ -555,6 +555,7 @@ def _create_live_context_pe(
             load_fixed_trash=should_load_fixed_trash_labware_for_python_protocol(
                 api_version
             ),
+            camera_provider=None,
         )
     )
 

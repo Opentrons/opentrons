@@ -10,7 +10,14 @@ from opentrons.protocol_engine.resources.camera_provider import CameraProvider
 
 log = logging.getLogger(__name__)
 STREAM_CONF_FILE = "opentrons-live-stream.conf"
-STREAM_CONF_FILE_KEYS = ["BOOT_ID", "STATUS", "SOURCE", "RESOLUTION", "FRAMERATE", "BITRATE"]
+STREAM_CONF_FILE_KEYS = [
+    "BOOT_ID",
+    "STATUS",
+    "SOURCE",
+    "RESOLUTION",
+    "FRAMERATE",
+    "BITRATE",
+]
 
 
 class CameraException(CommunicationError):
@@ -20,6 +27,7 @@ class CameraException(CommunicationError):
             message,
             {"internal-error-message": system_error},
         )
+
 
 async def take_picture(filename: Path) -> None:
     """Take a picture and save it to filename
@@ -55,36 +63,54 @@ async def take_picture(filename: Path) -> None:
     if not filename.exists():
         raise CameraException("Failed to save image", "")
 
+
 def get_stream_configuration_filepath() -> Path:
     """Return the file path to the Opentrons Live Stream Configuration file."""
     return get_opentrons_path("live_stream_configuration_file")
 
-async def update_live_stream_status(stream_status: bool, camera_provider: CameraProvider) -> None:
+
+async def update_live_stream_status(
+    stream_status: bool, camera_provider: CameraProvider
+) -> None:
     """Update and handle a change in the Opentrons Live Stream status."""
     src = get_stream_configuration_filepath()
     if not src.exists():
         log.error(f"Opentrons Live Stream configuration file not found: {src}")
         return None
     with src.open("rb") as fd:
-        contents = {
-            key.decode("utf-8"): val.decode("utf-8")
-            for key, val in [
-                line.split(b"=") for line in fd.read().split(b"\n") if b"=" in line
-            ]
-        }
+        try:
+            contents = {
+                key.decode("utf-8"): val.decode("utf-8")
+                for key, val in [
+                    line.split(b"=") for line in fd.read().split(b"\n") if b"=" in line
+                ]
+            }
+        except Exception as e:
+            log.error(
+                f"Opentrons Live Stream status update file parsing failed with: {e}"
+            )
+            return None
     if sorted(list(contents.keys())) != sorted(STREAM_CONF_FILE_KEYS):
-        log.error("Opentrons Live Stream Configuraiton file data is incorrect or missing.")
+        log.error(
+            "Opentrons Live Stream Configuraiton file data is incorrect or missing."
+        )
         # We don't want to write bad or incomplete data to the file
         return None
-    
+
     # Validate the stream status
     camera_enable_settings = await camera_provider.get_camera_settings()
     status = "OFF"
-    if stream_status and camera_enable_settings.camera_enabled and camera_enable_settings.live_stream_enabled:
+    if (
+        stream_status
+        and camera_enable_settings.camera_enabled
+        and camera_enable_settings.live_stream_enabled
+    ):
         # Check to see if the camera device is available
-        raw_device = str(contents['SOURCE'])[1:-1]
+        raw_device = str(contents["SOURCE"])[1:-1]
         if not os.path.exists(raw_device):
-            log.error("Opentrons Live Stream cannot sample the camera. No video device found with device path: {raw_device}")
+            log.error(
+                "Opentrons Live Stream cannot sample the camera. No video device found with device path: {raw_device}"
+            )
         # Enable the stream
         status = "ON"
     with src.open("w") as fd:
@@ -98,6 +124,7 @@ async def update_live_stream_status(stream_status: bool, camera_provider: Camera
         ]
         fd.writelines(file_lines)
     await restart_live_stream()
+
 
 async def restart_live_stream() -> None:
     """Attempt to restart the Opentrons Live Stream service."""

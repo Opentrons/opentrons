@@ -93,10 +93,10 @@ class RunOrchestrator:
         fixit_runner: protocol_runner.LiveRunner,
         setup_runner: protocol_runner.LiveRunner,
         protocol_live_runner: protocol_runner.LiveRunner,
+        camera_provider: CameraProvider,
         json_or_python_protocol_runner: Optional[
             Union[protocol_runner.PythonAndLegacyRunner, protocol_runner.JsonRunner]
         ] = None,
-        camera_provider: CameraProvider,
         run_id: Optional[str] = None,
     ) -> None:
         """Initialize a run orchestrator interface.
@@ -220,7 +220,6 @@ class RunOrchestrator:
             )
         # Shut down the live stream, if there is one
         await camera.update_live_stream_status(False, self._camera_provider)
-        
 
     def resume_from_recovery(self, reconcile_false_positive: bool) -> None:
         """Resume the run from recovery."""
