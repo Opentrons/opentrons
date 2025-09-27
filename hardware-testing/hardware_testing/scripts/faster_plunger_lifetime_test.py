@@ -353,6 +353,7 @@ async def main(args: argparse.Namespace, cfg: TestConfig) -> None:
             T11 = time.time()
             T22 = time.time()
             while T22-T11<=600:
+                print(f"RUN BLOWOUT time {T22-T11}")
                 for current in sorted(currents, reverse=True):
                     speed = CURRENTS_SPEEDS[current]
                     # HOME
