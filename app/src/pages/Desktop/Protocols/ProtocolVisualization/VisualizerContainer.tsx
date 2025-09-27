@@ -1,6 +1,14 @@
 import { useEffect, useState } from 'react'
 
-import { getLabwareDefinitionsFromCommands } from '@opentrons/components'
+import {
+  DIRECTION_COLUMN,
+  Flex,
+  getLabwareDefinitionsFromCommands,
+  OVERFLOW_AUTO,
+  OVERFLOW_HIDDEN,
+  SPACING,
+  StyledText,
+} from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   THERMOCYCLER_MODULE_TYPE,
@@ -15,7 +23,6 @@ import { getProtocolDisplayName } from '/app/transformations/protocols'
 import { CommandSteps } from './CommandSteps'
 import { Controls } from './Controls'
 import { DeckView } from './DeckView'
-import styles from './preview.module.css'
 import { SlotDetails } from './SlotDetails'
 
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
@@ -23,13 +30,15 @@ import type { GroupedCommands } from '/app/redux/protocol-storage'
 
 const SEC_PER_FRAME = 1000
 
-interface ContainerProps {
+interface VisualizerContainerProps {
   analysis: ProtocolAnalysisOutput
   groupedCommands: GroupedCommands | null
   protocolKey: string
   srcFileNames: string[]
 }
-export function PreviewContainer(props: ContainerProps): JSX.Element {
+export function VisualizerContainer(
+  props: VisualizerContainerProps
+): JSX.Element {
   const { analysis, groupedCommands, protocolKey, srcFileNames } = props
   const { commands, robotType, liquids } = analysis
   const [showDeckRenders, setShowDeckRenders] = useState<boolean>(false)
@@ -112,21 +121,63 @@ export function PreviewContainer(props: ContainerProps): JSX.Element {
     }
   }, [isThermocyclerAttached, selectedSlot])
   return (
-    <div className={styles.app}>
-      <Controls
-        protocolName={protocolDisplayName}
-        numErrors={analysis.errors.length}
-        numCommandLength={commands.length}
-        currentCommandIndex={selectedCommandIndex}
-        setSelectedCommand={setSelectedCommand}
-        handlePlayPause={handlePlayPause}
-        isPlaying={isPlaying}
-        commands={commands}
-        groupedCommands={groupedCommands}
-        setShowDeckRenders={setShowDeckRenders}
-        showDeckRenders={showDeckRenders}
-      />
-      <div className={styles.preview_container}>
+    <Flex
+      gridGap={SPACING.spacing16}
+      padding={SPACING.spacing16}
+      style={{ outline: '1px solid red' }}
+      width="100%"
+      height="100vh"
+      overflowY={OVERFLOW_HIDDEN}
+    >
+      {selectedSlot != null && selectedRunTimeCommand != null ? (
+        <SlotDetails
+          slotId={selectedSlot}
+          command={selectedRunTimeCommand}
+          robotState={robotState}
+          onClose={() => {
+            setSelectedSlot(null)
+          }}
+          percentComplete={percentComplete}
+          analysis={analysis}
+          robotType={robotType ?? FLEX_ROBOT_TYPE}
+          allRunDefs={allRunDefs}
+          invariantContext={invariantContext}
+          liquids={liquids}
+        />
+      ) : (
+        <Flex flexDirection={DIRECTION_COLUMN} overflowY={OVERFLOW_AUTO}>
+          <CommandSteps
+            analysis={analysis}
+            currentCommandIndex={selectedCommandIndex}
+            groupedCommands={groupedCommands}
+            setSelectedCommand={setSelectedCommand}
+            percentComplete={percentComplete}
+            handlePause={() => {
+              setIsPlaying(false)
+            }}
+          />
+        </Flex>
+      )}
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing16}
+        overflowY={OVERFLOW_AUTO}
+        width="100%"
+      >
+        <Controls
+          protocolName={protocolDisplayName}
+          numErrors={analysis.errors.length}
+          numCommandLength={commands.length}
+          currentCommandIndex={selectedCommandIndex}
+          setSelectedCommand={setSelectedCommand}
+          handlePlayPause={handlePlayPause}
+          isPlaying={isPlaying}
+          commands={commands}
+          groupedCommands={groupedCommands}
+          setShowDeckRenders={setShowDeckRenders}
+          showDeckRenders={showDeckRenders}
+        />
+
         <DeckView
           commands={analysis.commands}
           liquids={liquids}
@@ -138,34 +189,10 @@ export function PreviewContainer(props: ContainerProps): JSX.Element {
           selectedRunTimeCommand={selectedRunTimeCommand}
           showDeckRenders={showDeckRenders}
         />
-        {selectedSlot != null && selectedRunTimeCommand != null ? (
-          <SlotDetails
-            slotId={selectedSlot}
-            command={selectedRunTimeCommand}
-            robotState={robotState}
-            onClose={() => {
-              setSelectedSlot(null)
-            }}
-            percentComplete={percentComplete}
-            analysis={analysis}
-            robotType={robotType ?? FLEX_ROBOT_TYPE}
-            allRunDefs={allRunDefs}
-            invariantContext={invariantContext}
-            liquids={liquids}
-          />
-        ) : (
-          <CommandSteps
-            analysis={analysis}
-            currentCommandIndex={selectedCommandIndex}
-            groupedCommands={groupedCommands}
-            setSelectedCommand={setSelectedCommand}
-            percentComplete={percentComplete}
-            handlePause={() => {
-              setIsPlaying(false)
-            }}
-          />
-        )}
-      </div>
-    </div>
+      </Flex>
+      <Flex>
+        <StyledText>Labware Info</StyledText>
+      </Flex>
+    </Flex>
   )
 }

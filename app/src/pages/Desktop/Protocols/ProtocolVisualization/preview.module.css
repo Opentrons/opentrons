@@ -83,14 +83,13 @@
   position: relative;
   height: var(--spacing-4);
   border-radius: var(--border-radius-2);
-  background:
-    linear-gradient(
-      to right,
-      var(--blue-50) 0%,
-      var(--blue-50) var(--progress, 0%),
-      #ccc var(--progress, 0%),
-      #ccc 100%
-    );
+  background: linear-gradient(
+    to right,
+    var(--blue-50) 0%,
+    var(--blue-50) var(--progress, 0%),
+    #ccc var(--progress, 0%),
+    #ccc 100%
+  );
 }
 
 /* Hide thumb initially */
@@ -127,8 +126,11 @@
 }
 
 .detail_container {
-  padding-right: var(--spacing-16);
-  padding-bottom: var(--spacing-16);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  /* padding-right: var(--spacing-16); */
+  /* padding-bottom: var(--spacing-16); */
 }
 
 .slot_container {
@@ -151,12 +153,9 @@
 }
 
 .command_step_groups {
-  height:
-    calc(
-      100vh - 248px
-    ); /* 248px is height of the controls container + timeline header */
-
-  overflow-y: scroll;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .slot_details {
