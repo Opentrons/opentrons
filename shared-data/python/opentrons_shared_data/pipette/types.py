@@ -122,6 +122,7 @@ class Quirks(enum.Enum):
     doubleDropTip = "doubleDropTip"
     needsUnstick = "needsUnstick"
     highSpeed = "highSpeed"
+    noLabwarePositionCheck = "noLabwarePositionCheck"
 
 
 class PipetteOEMType(enum.Enum):
