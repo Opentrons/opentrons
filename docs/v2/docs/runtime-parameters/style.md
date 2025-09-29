@@ -6,13 +6,28 @@ Adopting the advice of this guide will help make your protocols clear, consisten
 
 ## General Guidance
 
-**Parameter names are nouns.** Parameters should be discrete enough that you can describe them in a single word or short noun phrase. `display_name` is limited to 30 characters, and you can add more context in the description. Don't ask questions or put other sentence punctuation in parameter names.
+**Parameter names are nouns.** Parameters should be discrete enough that you can describe them in a single word or short noun phrase. `display_name` is limited to 30 characters, and you can add more context in the description. 
 
-| ✅ Dry run | ❌ Dry run? |
-| ✅ Sample count | ❌ How many samples? |
-| ✅ Number of samples | ❌ Number of samples to process. |
+Don't ask questions or put other sentence punctuation in parameter names.  For example:
 
-**Parameter descriptions explain actions.** In one or two clauses or sentences, state when and how the parameter value is used in the protocol. Don't merely restate the parameter name. Punctuate descriptions as sentences, even if they aren't complete sentences.
+<table>
+  <tr>
+    <td>✅ Dry run</td>
+    <td>❌ Dry run?</td>
+  </tr>
+  <tr>
+    <td>✅ Sample count</td>
+    <td>❌ How many samples?</td>
+  </tr>
+  <tr>
+    <td>✅ Number of samples</td>
+    <td>❌ Number of samples to process.</td>
+  </tr>
+</table>
+
+**Parameter descriptions explain actions.** In one or two clauses or sentences, state when and how the parameter value is used in the protocol. Don't merely restate the parameter name. 
+
+Punctuate descriptions as sentences, even if they aren't complete sentences.  For example:
 
 | Parameter name | Parameter description |
 |---------------|----------------------|
@@ -24,16 +39,37 @@ Not every parameter requires a description! For example, in a protocol that uses
 
 **Use sentence case for readability.** Sentence case means adding a capital letter to *only* the first word of the name and description. This gives your parameters a professional appearance. Keep proper names capitalized as they would be elsewhere in a sentence.
 
-| ✅ Number of samples | ❌ number of samples |
-| ✅ Temperature Module slot | ❌ Temperature module slot |
-| ✅ Dilution factor | ❌ Dilution Factor |
+<table>
+  <tr>
+    <td>✅ Number of samples</td>
+    <td>❌ number of samples</td>
+  </tr>
+  <tr>
+    <td>✅ Temperature Module slot</td>
+    <td>❌ Temperature module slot</td>
+  </tr>
+  <tr>
+    <td>✅ Dilution factor</td>
+    <td>❌ Dilution Factor</td>
+  </tr>
+</table>
 
 **Use numerals for all numbers.** In a scientific context, this includes single-digit numbers. Additionally, punctuate numbers according to the needs of your protocol's users. If you plan to share your protocol widely, consider using American English number punctuation (comma for thousands separator; period for decimal separator).
 
-**Order choices logically.** Place items within the `choices` attribute in the order that makes sense for your application. Numeric choices should either ascend or descend. Sorting according to value is easy to use in either direction, but sorting by absolute value is difficult.
+**Order choices logically.** Place items within the `choices` attribute in the order that makes sense for your application. 
 
-| ✅ -3, -2, -1, 0, 1, 2, 3 | ❌ 0, 1, -1, 2, -2, 3, -3 |
-| ✅ 3, 2, 1, 0, -1, -2, -3 | |
+Numeric choices should either ascend or descend. Sorting according to value is easy to use in either direction, but sorting by absolute value is difficult.
+
+<table>
+  <tr>
+    <td>✅ -3, -2, -1, 0, 1, 2, 3</td>
+    <td>❌ 0, 1, -1, 2, -2, 3, -3</td>
+  </tr>
+  <tr>
+    <td>✅ 3, 2, 1, 0, -1, -2, -3</td>
+    <td></td>
+  </tr>
+</table>
 
 String choices may have an intrinsic ordering. If they don't, fall back to alphabetical order.
 

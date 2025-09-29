@@ -4,9 +4,10 @@ Once you've [defined parameters](defining.md), their values are accessible anywh
 
 ## The `params` Object
 
-Protocols with parameters have a `ProtocolContext.params` object, which contains the values of all parameters as set during run setup. Each attribute of `params` corresponds to the `variable_name` of a parameter.
+Protocols with parameters have a [`ProtocolContext.params`][opentrons.protocol_api.ProtocolContext.params] object, which contains the values of all parameters as set during run setup. Each attribute of `params` corresponds to the `variable_name` of a parameter.
 
 For example, consider a protocol that defines the following three parameters:
+
 - `add_bool` with `variable_name="dry_run"`
 - `add_int` with `variable_name="sample_count"`
 - `add_float` with `variable_name="volume"`
@@ -22,7 +23,7 @@ You can also save parameter values to variables with names of your choosing.
 
 ## Parameter Types
 
-Each attribute of `params` has the type corresponding to its parameter definition (except CSV parameters; see below). Keep in mind the parameter's type when using its value in different contexts.
+Each attribute of `params` has the type corresponding to its parameter definition (except CSV parameters; see [Manipulating CSV Data][manipulating-csv-data] below). Keep in mind the parameter's type when using its value in different contexts.
 
 Say you wanted to add a comment to the run log, stating how many samples the protocol will process. Since `sample_count` is an `int`, you'll need to cast it to a `str` or the API will raise an error.
 
@@ -32,17 +33,16 @@ protocol.comment(
 )
 ```
 
-Also be careful with `int` types when performing calculations: dividing an `int` by an `int` with the `/` operator always produces a `float`, even if there is no remainder. The [sample count use case](use_case_sample_count.md) converts a sample count to a column count by dividing by 8—but it uses the `//` integer division operator, so the result can be used for creating ranges, slicing lists, and as `int` argument values without having to cast it in those contexts.
+Also be careful with `int` types when performing calculations: dividing an `int` by an `int` with the `/` operator always produces a `float`, even if there is no remainder. The [sample count use case](use-case-sample-count.md) converts a sample count to a column count by dividing by 8—but it uses the `//` integer division operator, so the result can be used for creating ranges, slicing lists, and as `int` argument values without having to cast it in those contexts.
 
 ## Manipulating CSV Data
 
-CSV parameters have their own `CSVParameter` type, since they don't correspond to a built-in Python type. This class has properties and methods that let you access the CSV data in one of three ways: as a file handler, as a string, or as nested lists.
+CSV parameters have their own [`CSVParameter`][opentrons.protocol_api.CSVParameter] type, since they don't correspond to a built-in Python type. This class has properties and methods that let you access the CSV data in one of three ways: as a file handler, as a string, or as nested lists.
 
-- `CSVParameter.file`: Provides a read-only [file handler object](https://docs.python.org/3/glossary.html#term-file-object) that points to your CSV data. You can pass this object to functions of the built-in `csv` module, or to other modules you import, such as `pandas`.
-- `CSVParameter.contents`: Returns the entire contents of the CSV file as a single string. You then need to parse the data yourself to extract the information you need.
-- `CSVParameter.parse_as_csv()`: Returns CSV data in a structured format—a list of lists of strings. This lets you access any "cell" of your tabular data by row and column index.
+- [`CSVParameter.file`][opentrons.protocol_api.CSVParameter.file]: Provides a read-only [file handler object](https://docs.python.org/3/glossary.html#term-file-object) that points to your CSV data. You can pass this object to functions of the built-in [`csv`](https://docs.python.org/3/library/csv.html#module-csv) module, or to other modules you import, such as `pandas`.
+- [`CSVParameter.contents`][opentrons.protocol_api.CSVParameter.contents]: Returns the entire contents of the CSV file as a single string. You then need to parse the data yourself to extract the information you need.
+- [`CSVParameter.parse_as_csv()`][opentrons.protocol_api.CSVParameter.parse_as_csv]: Returns CSV data in a structured format—a list of lists of strings. This lets you access any "cell" of your tabular data by row and column index. This example parses a runtime parameter named `csv_data`, stores the parsed data as `parsed_csv`, and then accesses different portions of the data:
 
-Example:
 ```python
 parsed_csv = protocol.params.csv_data.parse_as_csv()
 parsed_csv[0]                   # first row (header, if present)
@@ -50,25 +50,24 @@ parsed_csv[1][2]                # second row, third column
 [row[1] for row in parsed_csv]  # second column
 ```
 
-> [!tip]
-> CSV parameters don't have default values. Accessing CSV data in any of the above ways will prevent protocol analysis from completing until you select a CSV file and confirm all runtime parameter values during run setup.
-> 
-> You can use a try–except block to work around this and provide the data needed for protocol analysis. First, add `from opentrons.protocol_api import RuntimeParameterRequiredError` at the top of your protocol. Then catch the error like this:
-> ```python
-> try:
->     parsed_csv = protocol.params.csv_data.parse_as_csv()
-> except RuntimeParameterRequiredError:
->     parsed_csv = [
->         ["source slot", "source well", "volume"],
->         # ...example data rows...
->     ]
-> ```
+*New in version 2.20.*
 
-!!! note
-    Like all Python lists, the lists representing your CSVs are zero-indexed.
+Like all Python lists, the lists representing your CSVs are zero-indexed.
 
-> **New in API 2.20:**
-> The `CSVParameter.parse_as_csv()` method was added in API version 2.20.
+!!! tip
+    CSV parameters don't have default values. Accessing CSV data in any of the above ways will prevent protocol analysis from completing until you select a CSV file and confirm all runtime parameter values during run setup.
+    
+    You can use a try–except block to work around this and provide the data needed for protocol analysis. First, add `from opentrons.protocol_api import RuntimeParameterRequiredError` at the top of your protocol. Then catch the error like this:
+    ```python
+    try:
+        parsed_csv = protocol.params.csv_data.parse_as_csv()
+    except RuntimeParameterRequiredError:
+        parsed_csv = [
+            ["source slot", "source well", "volume"],
+            ["D1", "A1", "50"],
+            ["D2", "B1", "50"],
+        ]
+    ```
 
 ## Limitations
 
@@ -106,4 +105,4 @@ plate = protocol.load_labware(
     load_name=protocol.params.plate_type, location="D2"
 )
 ```
-When performing run setup, you're prompted to apply offsets before selecting parameter values. This is your only opportunity to apply offsets, so they're applied for the default parameter values — in this case, the Corning plate. If you then change the "Well plate type" parameter to the NEST plate, the NEST plate will have default offset values (0.0 on all axes). You can fix this by running Labware Position Check, since it takes place after reanalysis, or by using `.Labware.set_offset` in your protocol.
+When performing run setup, you're prompted to apply offsets before selecting parameter values. This is your only opportunity to apply offsets, so they're applied for the default parameter values — in this case, the Corning plate. If you then change the "Well plate type" parameter to the NEST plate, the NEST plate will have default offset values (0.0 on all axes). You can fix this by running Labware Position Check, since it takes place after reanalysis, or by using [`Labware.set_offset()`][opentrons.protocol_api.Labware.set_offset] in your protocol.
