@@ -191,7 +191,6 @@ export function EditInstrumentsModal(
           />
         ) : (
           <PipetteConfiguration
-            has96Channel={has96Channel}
             robotType={robotType}
             selectedPipette={selectedPipette}
             leftPipette={leftPipette}

@@ -1,4 +1,5 @@
 import {
+  FLEX_96_CHANNEL_PIPETTES,
   getLabwareDefURI,
   getLabwareDisplayName,
   getPipetteSpecsV2,
@@ -43,18 +44,12 @@ export const getSectionsFromPipetteName = (
 
 export const getShouldShowPipetteType = (
   type: PipetteType,
-  has96Channel: boolean,
   leftPipette?: PipetteOnDeck | null,
   rightPipette?: PipetteOnDeck | null,
   currentEditingMount?: PipetteMount | null,
   temporarilyDeletedPipettes?: string[] | null
 ): boolean => {
   if (type === '96') {
-    // if a protocol has 96-Channel, no 96-Channel button
-    if (has96Channel) {
-      return false
-    }
-
     const effectiveLeftPipette =
       leftPipette != null &&
       !temporarilyDeletedPipettes?.includes(leftPipette.id)
@@ -107,7 +102,9 @@ export function getTiprackOptions(props: TiprackOptionsProps): TiprackOption[] {
 
   const isFlexPipette =
     selectedPipetteDisplayCategory === 'FLEX' ||
-    selectedPipetteName === 'p1000_96'
+    (selectedPipetteName != null &&
+      FLEX_96_CHANNEL_PIPETTES.includes(selectedPipetteName))
+
   const tiprackOptions = allLabware
     ? Object.values(allLabware)
         .filter(def => def.metadata.displayCategory === 'tipRack')

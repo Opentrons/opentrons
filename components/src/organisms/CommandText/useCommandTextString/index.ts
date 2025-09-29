@@ -41,10 +41,16 @@ export interface GetTCRunExtendedProfileCommandTextResult {
   commandText: string
   profileElementTexts: Array<TCProfileStepText | TCProfileCycleText>
 }
+export interface GetTCStartRunExtendedProfileCommandTextResult {
+  kind: 'thermocycler/startRunExtendedProfile'
+  commandText: string
+  profileElementTexts: Array<TCProfileStepText | TCProfileCycleText>
+}
 export type GetCommandTextResult =
   | GetGenericCommandTextResult
   | GetTCRunProfileCommandTextResult
   | GetTCRunExtendedProfileCommandTextResult
+  | GetTCStartRunExtendedProfileCommandTextResult
 
 // TODO(jh, 07-18-24): Move the testing that covers this from CommandText to a new file, and verify that all commands are
 // properly tested.
@@ -169,10 +175,24 @@ export function useCommandTextString(
         command,
       })
 
+    case 'thermocycler/startRunExtendedProfile':
+      return utils.getTCStartRunExtendedProfileCommandText({
+        ...fullParams,
+        command,
+      })
+
     case 'heaterShaker/setAndWaitForShakeSpeed':
       return {
         kind: 'generic',
         commandText: utils.getHSShakeSpeedCommandText({
+          ...fullParams,
+          command,
+        }),
+      }
+    case 'heaterShaker/setShakeSpeed':
+      return {
+        kind: 'generic',
+        commandText: utils.getHSConcurrentShakeSpeedCommandText({
           ...fullParams,
           command,
         }),

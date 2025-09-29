@@ -118,6 +118,24 @@ def test_set_and_wait_for_shake_speed(
     )
 
 
+def test_shake_speed(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: HeaterShakerModuleCore
+) -> None:
+    """It should set and wait for shake speed with the engine client."""
+    task_mock = decoy.mock(cls=EngineTaskCore)
+    decoy.when(
+        mock_engine_client.execute_command_without_recovery(
+            cmd.heater_shaker.SetShakeSpeedParams(moduleId="1234", rpm=1337)
+        )
+    ).then_return(
+        cmd.heater_shaker.SetShakeSpeedResult(taskId="taskId", pipetteRetracted=True)
+    )
+    task_mock._id = "taskId"
+    result = subject.set_shake_speed(1337)
+    assert isinstance(result, EngineTaskCore)
+    assert result._id == "taskId"
+
+
 def test_open_labware_latch(
     decoy: Decoy, mock_engine_client: EngineClient, subject: HeaterShakerModuleCore
 ) -> None:

@@ -130,6 +130,11 @@ export function PipetteOverview({
     setSaveAttemptFailed(false)
   }
 
+  const isLeftPipette96Channel =
+    visibleLeftPipette != null && visibleLeftPipette.spec.channels === 96
+  const isRightPipette96Channel =
+    visibleRightPipette != null && visibleRightPipette.spec.channels === 96
+
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
@@ -167,23 +172,24 @@ export function PipetteOverview({
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           {/* Show 96-channel pipette as Left + Right Mount regardless of actual mount */}
-          {visibleLeftPipette?.name === 'p1000_96' ||
-          visibleRightPipette?.name === 'p1000_96' ? (
+          {isLeftPipette96Channel || isRightPipette96Channel ? (
             <PipetteInfoItem
               mount="left" // Always use "left" for display, but PipetteInfoItem will show "Left + Right Mount"
-              pipetteName="p1000_96"
+              pipetteName={
+                isLeftPipette96Channel
+                  ? visibleLeftPipette.name
+                  : visibleRightPipette?.name ?? 'p1000_96'
+              }
               tiprackDefURIs={
-                (visibleLeftPipette?.name === 'p1000_96'
+                (isLeftPipette96Channel
                   ? visibleLeftPipette.tiprackDefURI
                   : visibleRightPipette?.tiprackDefURI) as string[]
               }
               editClick={() => {
-                const pipette96 =
-                  visibleLeftPipette?.name === 'p1000_96'
-                    ? visibleLeftPipette
-                    : visibleRightPipette
-                const info96 =
-                  visibleLeftPipette?.name === 'p1000_96' ? leftInfo : rightInfo
+                const pipette96 = isLeftPipette96Channel
+                  ? visibleLeftPipette
+                  : visibleRightPipette
+                const info96 = isLeftPipette96Channel ? leftInfo : rightInfo
                 if (pipette96 && info96) {
                   setPage('add')
                   setMount(pipette96.mount)
@@ -194,10 +200,9 @@ export function PipetteOverview({
                 }
               }}
               cleanForm={() => {
-                const pipette96 =
-                  visibleLeftPipette?.name === 'p1000_96'
-                    ? visibleLeftPipette
-                    : visibleRightPipette
+                const pipette96 = isLeftPipette96Channel
+                  ? visibleLeftPipette
+                  : visibleRightPipette
                 if (pipette96) {
                   setTemporarilyDeletedPipettes(prev => [...prev, pipette96.id])
                 }
@@ -208,8 +213,7 @@ export function PipetteOverview({
               {/* Show regular pipettes only if no 96-channel */}
               {visibleLeftPipette?.tiprackDefURI != null &&
               leftInfo != null &&
-              leftPipette != null &&
-              visibleLeftPipette.spec.channels !== 96 ? (
+              leftPipette != null ? (
                 <PipetteInfoItem
                   mount="left"
                   pipetteName={leftPipette.name}
@@ -232,8 +236,7 @@ export function PipetteOverview({
               ) : null}
               {visibleRightPipette?.tiprackDefURI != null &&
               rightInfo != null &&
-              rightPipette != null &&
-              visibleRightPipette.spec.channels !== 96 ? (
+              rightPipette != null ? (
                 <PipetteInfoItem
                   mount="right"
                   pipetteName={rightPipette.name}

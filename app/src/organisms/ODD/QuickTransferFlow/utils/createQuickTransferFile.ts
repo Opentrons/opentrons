@@ -181,7 +181,7 @@ export function createQuickTransferFile(
     // see QuickTransferFlow/README.md for versioning details
     designerApplication: {
       name: 'opentrons/quick-transfer',
-      version: '1.2.0',
+      version: '2.0.0',
       data: quickTransferState,
     },
   }
@@ -287,12 +287,21 @@ export function createQuickTransferPythonFile(
     tags: [],
   }
 
+  const designerApplication = {
+    name: 'opentrons/quick-transfer',
+    version: '2.0.0',
+    data: quickTransferState,
+  }
+  const stringifiedDesignerApplication = JSON.stringify(designerApplication)
+  const designerApplicationBlob = `\nDESIGNER_APPLICATION = """${stringifiedDesignerApplication}"""\n`
+
   const protocolContents =
     [
       pythonImports(),
       pythonMetadata(fileMetadata),
       pythonRequirements(FLEX_ROBOT_TYPE),
       pythonDef(quickTransferState, deckConfig),
+      designerApplicationBlob,
     ]
       .filter(section => section)
       .join('\n\n') + '\n'

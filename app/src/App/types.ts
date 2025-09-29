@@ -47,6 +47,7 @@ export interface DesktopRouteParams {
   robotSettingsTab: RobotSettingsTab
   runId: string
   protocolRunDetailsTab: ProtocolRunDetailsTab
+  runCreatedAtTimestamp: string
 }
 
 /**
