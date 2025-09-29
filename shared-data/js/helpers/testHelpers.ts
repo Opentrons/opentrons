@@ -19,7 +19,9 @@ export async function getHighestCommandSchema(): Promise<any> {
       }
     }
   }
-  if (!highestSchema) throw new Error('No schema files found!')
+  if (!highestSchema) {
+    throw new Error('No schema files found')
+  }
 
   return highestSchema
 }
