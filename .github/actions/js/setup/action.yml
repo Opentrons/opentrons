@@ -38,12 +38,10 @@ runs:
       shell: bash
       run: |
         # Set up Cypress to download from package-mirror instead of official source
-        export CYPRESS_DOWNLOAD_PATH_TEMPLATE="https://github.com/Opentrons/package-mirror/releases/download/cypress-${version}/cypress-${version}-${platform}-${arch}.zip"
+        export CYPRESS_DOWNLOAD_PATH_TEMPLATE="https://github.com/Opentrons/package-mirror/releases/download/cypress-{{version}}/cypress-{{version}}-{{platform}}-{{arch}}.zip"
         
         # Show the download URL template for debugging
         echo "🔍 Cypress download template: $CYPRESS_DOWNLOAD_PATH_TEMPLATE"
-        
-        # Enable Cypress debug logging to see download URLs
-        export DEBUG=cypress:cli,cypress:binary
+        echo "🔍 Current platform: $RUNNER_OS"
         
         make setup-js
