@@ -9,9 +9,13 @@ import {
   COLORS,
   DeckInfoLabel,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
   DISPLAY_GRID,
   Flex,
   JUSTIFY_CENTER,
+  ListItem,
+  ListTable,
+  RadioButton,
   OVERFLOW_AUTO,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
@@ -130,55 +134,84 @@ export function AssignLiquidsModal(
                 })}
               </StyledText>
             </Flex>
-            <Box
-              width="100%"
-              padding={`${SPACING.spacing32} ${SPACING.spacing48}`}
-              backgroundColor={COLORS.white}
-              borderRadius={BORDERS.borderRadius12}
-              display={DISPLAY_GRID}
-              gap={SPACING.spacing12}
-            >
-              <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing16}>
-                <Flex
-                  justifyContent={JUSTIFY_CENTER}
-                  width="100%"
-                  color={COLORS.grey60}
-                >
-                  <StyledText
-                    desktopStyle="headingSmallRegular"
-                    css={{ userSelect: 'none' }}
-                  >
-                    {t('click_and_drag')}
-                  </StyledText>
-                </Flex>
-                <SelectableLabware
-                  showBorder={false}
-                  labwareProps={{
-                    wellLabelOption: WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE,
-                    definition: labwareDef,
-                    positioningMode: 'offsetInSlot',
-                    highlightedWells,
-                    wellFill: wellFillFromWellContents(
-                      wellContents,
-                      liquidDisplayColors
-                    ),
-                  }}
-                  selectedPrimaryWells={selectedWells}
-                  selectWells={(wells: WellGroup) =>
-                    dispatch(selectWells(wells))
-                  }
-                  deselectWells={(wells: WellGroup) =>
-                    dispatch(deselectWells(wells))
-                  }
-                  updateHighlightedWells={(wells: WellGroup) => {
-                    setHighlightedWells(wells)
-                  }}
-                  ingredNames={liquidNamesById}
-                  wellContents={wellContents}
-                  nozzleType={null}
-                />
+            <Flex flexDirection={DIRECTION_ROW} gap={SPACING.spacing24}>
+              <Flex flexDirection={DIRECTION_COLUMN} width="224px">
+                <StyledText desktopStyle="captionRegular">
+                  {t('top_of_stack')}
+                </StyledText>
+                <ListTable>
+                  {labwareStack.map((x, index) =>
+                    labware[x] ? (
+                      <ListItem type="default">
+                        <Flex flexDirection={DIRECTION_ROW}>
+                          <StyledText desktopStyle="captionRegular">
+                            {labwareStack.length - 1 - index}
+                          </StyledText>
+                          <RadioButton
+                            buttonLabel={labware[x]?.def.metadata.displayName}
+                            buttonValue={labware[x]?.id}
+                            onChange={function (
+                              event: ChangeEvent<HTMLInputElement>
+                            ): void {
+                              throw new Error('Function not implemented.')
+                            }}
+                          ></RadioButton>
+                        </Flex>
+                      </ListItem>
+                    ) : null
+                  )}
+                </ListTable>
               </Flex>
-            </Box>
+              <Box
+                width="100%"
+                padding={`${SPACING.spacing32} ${SPACING.spacing48}`}
+                backgroundColor={COLORS.white}
+                borderRadius={BORDERS.borderRadius12}
+                display={DISPLAY_GRID}
+                gap={SPACING.spacing12}
+              >
+                <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing16}>
+                  <Flex
+                    justifyContent={JUSTIFY_CENTER}
+                    width="100%"
+                    color={COLORS.grey60}
+                  >
+                    <StyledText
+                      desktopStyle="headingSmallRegular"
+                      css={{ userSelect: 'none' }}
+                    >
+                      {t('click_and_drag')}
+                    </StyledText>
+                  </Flex>
+                  <SelectableLabware
+                    showBorder={false}
+                    labwareProps={{
+                      wellLabelOption: WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE,
+                      definition: labwareDef,
+                      positioningMode: 'offsetInSlot',
+                      highlightedWells,
+                      wellFill: wellFillFromWellContents(
+                        wellContents,
+                        liquidDisplayColors
+                      ),
+                    }}
+                    selectedPrimaryWells={selectedWells}
+                    selectWells={(wells: WellGroup) =>
+                      dispatch(selectWells(wells))
+                    }
+                    deselectWells={(wells: WellGroup) =>
+                      dispatch(deselectWells(wells))
+                    }
+                    updateHighlightedWells={(wells: WellGroup) => {
+                      setHighlightedWells(wells)
+                    }}
+                    ingredNames={liquidNamesById}
+                    wellContents={wellContents}
+                    nozzleType={null}
+                  />
+                </Flex>
+              </Box>
+            </Flex>
           </Flex>
         </Flex>
       </Flex>
