@@ -41,6 +41,8 @@ runs:
         CYPRESS_VERSION=$(grep '"cypress"' package.json | sed 's/.*"cypress": *"\([^"]*\)".*/\1/')
         PLATFORM=$([[ "$RUNNER_OS" == "Linux" ]] && echo "linux" || [[ "$RUNNER_OS" == "macOS" ]] && echo "darwin" || echo "win32")
         export CYPRESS_INSTALL_BINARY="https://github.com/Opentrons/package-mirror/releases/download/cypress-${CYPRESS_VERSION}/cypress-${CYPRESS_VERSION}-${PLATFORM}-x64.zip"
+        export DEBUG=cypress:cli,cypress:binary,cypress:download
         echo "🔍 Cypress ${CYPRESS_VERSION} from package-mirror"
+        echo "🔍 Download URL: $CYPRESS_INSTALL_BINARY"
         
         make setup-js
