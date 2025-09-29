@@ -17,6 +17,11 @@ runs:
         node-version: '22.12.0'
         cache: 'yarn'
 
+    - name: 'Setup Python'
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
     - name: 'Cache Cypress binary'
       id: cache-cypress
       uses: actions/cache@v4
@@ -32,4 +37,7 @@ runs:
     - name: 'Setup JS'
       shell: bash
       run: |
+        # Set up Cypress to download from package-mirror instead of official source
+        export CYPRESS_DOWNLOAD_PATH_TEMPLATE="https://github.com/Opentrons/package-mirror/releases/download/cypress-${version}/cypress-${version}-${platform}-${arch}.zip"
+        
         make setup-js
