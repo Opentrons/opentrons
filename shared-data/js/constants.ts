@@ -445,6 +445,18 @@ export const FLEX_STACKER_C4_ADDRESSABLE_AREA: 'flexStackerModuleV1C4' =
 export const FLEX_STACKER_D4_ADDRESSABLE_AREA: 'flexStackerModuleV1D4' =
   'flexStackerModuleV1D4'
 
+export const exactMatchOnlyLoadNames = new Set([
+  'milliplex_microtiter_plate',
+  'milliplex_microtiter_plate_lid',
+  'ibidi_96_square_well_plate_300ul',
+  'ibidi_96_square_well_plate_300ul_lid',
+  'opentrons_96_deep_well_adapter',
+  'opentrons_96_filtertiprack_1000ul',
+  'opentrons_96_tiprack_1000ul',
+  'opentrons_universal_flat_adapter',
+  'opentrons_universal_flat_adapter_type_b',
+])
+
 export const MAGNETIC_BLOCK_ADDRESSABLE_AREAS: AddressableAreaName[] = [
   MAGNETIC_BLOCK_A1_ADDRESSABLE_AREA,
   MAGNETIC_BLOCK_B1_ADDRESSABLE_AREA,
