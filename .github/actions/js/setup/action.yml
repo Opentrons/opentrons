@@ -22,6 +22,10 @@ runs:
       with:
         python-version: '3.10'
 
+    - name: 'Enable Corepack'
+      shell: bash
+      run: corepack enable
+
     - name: 'Cache Cypress binary'
       id: cache-cypress
       uses: actions/cache@v4
@@ -38,7 +42,7 @@ runs:
       shell: bash
       run: |
         # Set up Cypress to download from package-mirror instead of official source
-        export CYPRESS_DOWNLOAD_PATH_TEMPLATE="https://github.com/Opentrons/package-mirror/releases/download/cypress-{{version}}/cypress-{{version}}-{{platform}}-{{arch}}.zip"
+        export CYPRESS_INSTALL_BINARY="https://github.com/Opentrons/package-mirror/releases/download/cypress-13.7.1/cypress-13.7.1-linux-x86-64.zip"
         
         # Show the download URL template for debugging
         echo "🔍 Cypress download template: $CYPRESS_DOWNLOAD_PATH_TEMPLATE"
