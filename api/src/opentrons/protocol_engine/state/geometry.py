@@ -491,7 +491,6 @@ class GeometryView:
     ) -> LabwareStackupAncestorDefinition:
         """Traverse the stackup to find the first non-labware definition."""
         current_location = top_most_lw_location
-
         while True:
             if isinstance(current_location, OnLabwareLocation):
                 current_labware_id = current_location.labwareId
@@ -500,6 +499,13 @@ class GeometryView:
             else:
                 if isinstance(current_location, ModuleLocation):
                     return self._modules.get_definition(current_location.moduleId)
+                elif (
+                    isinstance(current_location, AddressableAreaLocation)
+                    and current_location.addressableAreaName == "gripperWasteChute"
+                ):
+                    raise errors.InvalidLabwarePositionError(
+                        "Cannot access labware because it is in the waste chute."
+                    )
                 elif isinstance(current_location, AddressableAreaLocation):
                     return self._addressable_areas.get_addressable_area(
                         current_location.addressableAreaName
