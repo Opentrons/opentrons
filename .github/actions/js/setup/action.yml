@@ -43,5 +43,5 @@ runs:
         # Show the download URL template for debugging
         echo "🔍 Cypress download template: $CYPRESS_DOWNLOAD_PATH_TEMPLATE"
         echo "🔍 Current platform: $RUNNER_OS"
-        
+
         make setup-js
