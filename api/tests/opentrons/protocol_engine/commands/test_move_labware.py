@@ -565,10 +565,8 @@ async def test_gripper_move_to_waste_chute_implementation(
             addressableAreaName="gripperWasteChute"
         )
     ]
-    eventual_dest_loc_sequence: LabwareLocationSequence = [
-        NotOnDeckLocationSequenceComponent(logicalLocationName=OFF_DECK_LOCATION)
-    ]
-
+    eventual_dest_loc_sequence = immediate_dest_loc_sequence
+    
     data = MoveLabwareParams(
         labwareId="my-cool-labware-id",
         newLocation=new_location,
