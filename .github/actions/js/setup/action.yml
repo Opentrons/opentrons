@@ -46,9 +46,10 @@ runs:
         
         # Show the download URL template for debugging
         echo "🔍 Cypress download template: $CYPRESS_DOWNLOAD_PATH_TEMPLATE"
+        echo "🔍 Cypress download template: $CYPRESS_INSTALL_BINARY"
+
         echo "🔍 Current platform: $RUNNER_OS"
         
         # Enable Cypress debug logging to see the actual download URL
-        export DEBUG=cypress:cli,cypress:binary,cypress:download
         
         make setup-js
