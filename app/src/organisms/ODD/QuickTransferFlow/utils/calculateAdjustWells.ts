@@ -29,43 +29,75 @@ export function calculateAdjustWells({
 }: CalculateWellLimitsParams): AdjustWellsResult {
   const tipCapacity = tipRack?.wells?.A1?.totalLiquidVolume
 
-  const minVolumeForMultiAspirateDispense = volume * 2
-
-  const actualConditioningVolume =
-    linearInterpolate(
-      minVolumeForMultiAspirateDispense,
-      conditioningByVolume
-    ) ?? 0
-  const actualDisposalVolume =
-    linearInterpolate(minVolumeForMultiAspirateDispense, disposalByVolume) ?? 0
-
-  // Calculate extra volumes based on path
+  // calculate extra volumes based on path
   let extraVolumes = 0
   let minRequiredVolume = volume
+  let finalMaxWells = 1
 
   if (path === 'multiDispense') {
-    minRequiredVolume = volume * 2 // Protocol-designer requirement
-    const isDisposalVolumeEnabled = actualDisposalVolume > 0
-    const isConditioningVolumeEnabled = actualConditioningVolume > 0
-    const airGapVolume =
-      isDisposalVolumeEnabled || isConditioningVolumeEnabled
+    minRequiredVolume = volume * 2
+
+    // calculate the maximum number of wells
+    // by iterating and checking the total volume including disposal/conditioning
+    let maxWellsForTip = 0
+    let totalVolumeInTip = 0
+
+    for (let i = 0; i < state.destinationWells.length; i++) {
+      const wellsToTest = i + 1
+      const volumeForWells = wellsToTest * volume
+
+      const actualConditioningVolume =
+        linearInterpolate(volumeForWells, conditioningByVolume) ?? 0
+      const actualDisposalVolume =
+        linearInterpolate(volumeForWells, disposalByVolume) ?? 0
+
+      const isDisposalVolumeEnabled = actualDisposalVolume > 0
+      const isConditioningVolumeEnabled = actualConditioningVolume > 0
+      const airGapVolume =
+        isDisposalVolumeEnabled || isConditioningVolumeEnabled
+          ? 0
+          : aspirateAirGapVolume
+
+      totalVolumeInTip =
+        volumeForWells +
+        actualConditioningVolume +
+        actualDisposalVolume +
+        airGapVolume
+
+      if (totalVolumeInTip <= tipCapacity) {
+        maxWellsForTip = wellsToTest
+      } else {
+        break
+      }
+    }
+
+    finalMaxWells = Math.max(1, maxWellsForTip)
+
+    // calculate extraVolumes for the final number of wells
+    const finalVolumeForWells = finalMaxWells * volume
+    const finalConditioningVolume =
+      linearInterpolate(finalVolumeForWells, conditioningByVolume) ?? 0
+    const finalDisposalVolume =
+      linearInterpolate(finalVolumeForWells, disposalByVolume) ?? 0
+    const finalIsDisposalVolumeEnabled = finalDisposalVolume > 0
+    const finalIsConditioningVolumeEnabled = finalConditioningVolume > 0
+    const finalAirGapVolume =
+      finalIsDisposalVolumeEnabled || finalIsConditioningVolumeEnabled
         ? 0
         : aspirateAirGapVolume
-    extraVolumes = actualDisposalVolume + airGapVolume
+    extraVolumes = finalDisposalVolume + finalAirGapVolume
   } else if (path === 'multiAspirate') {
     minRequiredVolume = volume * 2
     extraVolumes = aspirateAirGapVolume
+
+    const maxWellsPerTip = Math.floor((tipCapacity - extraVolumes) / volume)
+    const maxWellsWithMinVolume =
+      Math.floor((tipCapacity - extraVolumes) / minRequiredVolume) * 2
+    finalMaxWells = Math.min(maxWellsPerTip, maxWellsWithMinVolume)
+  } else {
+    // Single path
+    finalMaxWells = 1
   }
-
-  const maxWellsPerTip =
-    path === 'single' ? 1 : Math.floor((tipCapacity - extraVolumes) / volume)
-
-  const maxWellsWithMinVolume =
-    path === 'single'
-      ? 1
-      : Math.floor((tipCapacity - extraVolumes) / minRequiredVolume) * 2
-
-  const finalMaxWells = Math.min(maxWellsPerTip, maxWellsWithMinVolume)
 
   // Limit wells based on path
   const adjustedDestinationWells =
