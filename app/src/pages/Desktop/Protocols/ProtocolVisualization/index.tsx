@@ -11,12 +11,12 @@ import {
 } from '/app/redux/protocol-storage'
 
 import styles from './preview.module.css'
-import { PreviewContainer } from './PreviewContainer'
+import { VisualizerContainer } from './VisualizerContainer'
 
 import type { DesktopRouteParams } from '/app/App/types'
 import type { Dispatch, State } from '/app/redux/types'
 
-export function ProtocolPreview(): JSX.Element {
+export function ProtocolVisualization(): JSX.Element {
   const { protocolKey } = useParams<
     keyof DesktopRouteParams
   >() as DesktopRouteParams
@@ -32,7 +32,7 @@ export function ProtocolPreview(): JSX.Element {
   }, [])
 
   return storedProtocol != null && storedProtocol.mostRecentAnalysis != null ? (
-    <PreviewContainer
+    <VisualizerContainer
       analysis={storedProtocol.mostRecentAnalysis}
       groupedCommands={groupedCommands}
       protocolKey={protocolKey}
