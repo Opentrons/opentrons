@@ -340,6 +340,14 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                     current_labware.location
                 )
             )
+            # Check if current location is the waste chute
+            if (
+                isinstance(validated_current_loc, AddressableAreaLocation)
+                and validated_current_loc.addressableAreaName == "gripperWasteChute"
+            ):
+                raise LabwareMovementNotAllowedError(
+                    f"Cannot move {current_labware_definition.parameters.loadName} from the waste chute using the gripper"
+                )
 
             if module_location_error:
                 return DefinedErrorData(
