@@ -343,10 +343,8 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
         self, labware_id: str, new_location: LabwareLocation, new_offset_id: str | None
     ) -> None:
         self._state.labware_by_id[labware_id].offsetId = new_offset_id
-
         if isinstance(new_location, AddressableAreaLocation) and (
-            fixture_validation.is_gripper_waste_chute(new_location.addressableAreaName)
-            or fixture_validation.is_trash(new_location.addressableAreaName)
+            fixture_validation.is_trash(new_location.addressableAreaName)
         ):
             # If a labware has been moved into a waste chute it's been chuted away and is now technically off deck
             new_location = OFF_DECK_LOCATION
@@ -483,7 +481,6 @@ class LabwareView:
     ) -> Optional[LoadedLabware]:
         """Get the labware located in a given slot, if any."""
         loaded_labware = list(self._state.labware_by_id.values())
-
         for labware in loaded_labware:
             if (
                 isinstance(labware.location, DeckSlotLocation)

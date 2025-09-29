@@ -499,13 +499,7 @@ class GeometryView:
             else:
                 if isinstance(current_location, ModuleLocation):
                     return self._modules.get_definition(current_location.moduleId)
-                elif (
-                    isinstance(current_location, AddressableAreaLocation)
-                    and current_location.addressableAreaName == "gripperWasteChute"
-                ):
-                    raise errors.InvalidLabwarePositionError(
-                        "Cannot access labware because it is in the waste chute."
-                    )
+
                 elif isinstance(current_location, AddressableAreaLocation):
                     return self._addressable_areas.get_addressable_area(
                         current_location.addressableAreaName
@@ -2252,6 +2246,12 @@ class GeometryView:
             ):
                 raise errors.LocationNotAccessibleByPipetteError(
                     f"Cannot move pipette to {labware.loadName} because it is on a stacker shuttle"
+                )
+            elif fixture_validation.is_gripper_waste_chute(
+                labware_location.addressableAreaName
+            ):
+                raise errors.LocationNotAccessibleByPipetteError(
+                    f"Cannot move pipette to {labware.loadName} because it is in the waste chute"
                 )
         elif (
             labware_location == OFF_DECK_LOCATION or labware_location == SYSTEM_LOCATION
