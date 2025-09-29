@@ -12,21 +12,17 @@ Contact us if you have any questions about the OT-2. Opentrons teams are here to
 
 ## Support
 
-Answers to many common questions are available on the Opentrons Help Center at <https://support.opentrons.com/>. Contact Opentrons Support directly if you can't find an answer to your question. We can also help you with warranty issues, parts, repairs, supplies, and other support-related problems or concerns.
+Answers to many common questions are available on the Opentrons Help Center at <https://support.opentrons.com/>. Contact Opentrons Support at <support@opentrons.com> if you can't find an answer to your question. We can also help you with warranty issues, parts, repairs, supplies, and other support-related problems or concerns.
 
-Email: <support@opentrons.com>
+Online chat is available from the [Opentrons website](https://opentrons.com/). Click on the live chat popup on the lower right corner of the page.
 
-For online chat, go to the [Opentrons websit](https://opentrons.com/) and click on the live chat popup on the lower right corner of the page.
-
-Support business hours are Monday through Friday, 4:00 AM–8:00 PM Eastern Time (UTC–5 in autumn/winter, UTC–4 in spring/summer).
-
-For after-hours contact and communication, we will do our best to address your issues, but may not be able to provide a proper response until the next business day.
+Support business hours are Monday through Friday, 4:00 AM to 8:00 PM Eastern Time (UTC–5 in winter, UTC–4 in summer). For after-hours contact and communication, we will do our best to address your issues, but may not be able to provide a proper response until the next business day.
 
 ## Sales
 
-Visit the [contact page](https://opentrons.com/contact) of the Opentrons website to get in touch with us or schedule a demo.
+Visit the [contact page](https://opentrons.com/contact) of the Opentrons website to get in touch with Sales or to schedule a demo.
 
-Sales business hours are Monday through Friday, 4:00 AM–8:00 PM Eastern Time (UTC–5 in autumn/winter, UTC–4 in spring/summer).
+Sales business hours are Monday through Friday, 4:00 AM to 8:00 PM Eastern Time (UTC–5 in winter, UTC–4 in summer). Sales observes the same holidays as the general office.
 
 ## Warranty
 
@@ -34,10 +30,10 @@ All hardware purchased from Opentrons is covered under a 1-year [standard warran
 
 ## Business information
 
-Opentrons Labworks Inc
-45-18 Ct Square W
-Long Island City, NY 11101, USA
-https://opentrons.com/
+Opentrons Labworks Inc  
+45-18 Ct Square W  
+Long Island City, NY 11101, USA  
+<https://opentrons.com/>
 
 Our general office hours are Monday through Friday, 9:00 AM–6:00 PM Eastern Time (UTC–5 in autumn/winter, UTC–4 in spring/summer).
 
