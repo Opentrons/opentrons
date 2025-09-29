@@ -1,17 +1,19 @@
 # Parameter Use Case – Cherrypicking
 
-A common liquid handling task is **cherrypicking**: pipetting liquid from only certain wells on a source plate and placing them in order on a destination plate. This use case demonstrates how to use a CSV runtime parameter to automate this process and to customize it on every run—without having to modify the Python protocol itself.
+A common liquid handling task is *cherrypicking*: pipetting liquid from only certain wells on a source plate and placing them in order on a destination plate. This use case demonstrates how to use a CSV runtime parameter to automate this process and to customize it on every run—without having to modify the Python protocol itself.
 
 In this simple example, the CSV will only control:
+
 - Source slot
 - Source well
 - Volume to transfer
 
-The destination labware and well order will remain fixed, to focus on using these three pieces of data with the `transfer` function. In actual use, you can further customize pipetting behavior by adding more runtime parameters or by adding columns to your CSV file.
+The destination labware and well order will remain fixed, to focus on using these three pieces of data with the [`transfer()`][opentrons.protocol_api.InstrumentContext.transfer] function. In actual use, you can further customize pipetting behavior by adding more runtime parameters or by adding columns to your CSV file.
 
 ## Preparing the CSV
 
 To get started, set up the CSV parameter. The data format we expect for this protocol is simple enough to fully explain in the parameter's description:
+
 ```python
 def add_parameters(parameters):
     parameters.add_csv_file(
@@ -24,20 +26,24 @@ def add_parameters(parameters):
         )
     )
 ```
-Example CSV file:
+
+Here is an example of a CSV file that fits this format, specifying three wells across two plates:
+
 ```
 source slot,source well,volume
 D1,A1,50
 D1,C4,30
 D2,H1,50
 ```
+
 The protocol will rely on the data being structured exactly this way, with a header row and the three columns in this order. The technician would select this, or another file with the same structure, during run setup.
 
 Our protocol will use the information contained in the selected CSV for loading labware in the protocol and performing the cherrypicking transfers.
 
 ## Parsing the CSV
 
-Use the API's `parse_as_csv` method to access the CSV data:
+We’ll use the Python API’s [`parse_as_csv`][opentrons.protocol_api.CSVParameter.parse_as_csv] method to allow easy access to different portions of the CSV data at different points in the protocol:
+
 ```python
 def run(protocol):
     well_data = protocol.params.cherrypicking_wells.parse_as_csv()
@@ -47,21 +53,27 @@ Now `well_data` is a list with four elements, one for each row in the file. We'l
 ## Loading Source Labware
 
 We'll use the data from the `source slot` column as part of loading the source labware. Let's assume that we always use Opentrons Tough PCR plates for both source and destination plates. Then we need to determine the locations for loading source plates from the first column of the CSV. This will have three steps:
+
 - Using a list comprehension to get data from the `source slot` column.
 - Deduplicating the items in the column.
 - Looping over the unique items to load the plates.
 
-Get all of the data from the first column of the CSV, using a list comprehension. Then take a slice of the resulting list to remove the header:
+First, we’ll get all of the data from the first column of the CSV, using a list comprehension. Then we’ll take a slice of the resulting list to remove the header:
+
 ```python
 source_slots = [row[0] for row in well_data][1:]
 # ['D1', 'D1', 'D2']
 ```
-Get the unique items in the list by converting it to a set and back to a list:
+
+Next, we’ll get the unique items in the list by converting it to a [`set`](https://docs.python.org/3/library/stdtypes.html#set) and back to a list:
+
 ```python
 unique_source_slots = list(set(source_slots))
 # ['D1', 'D2']
 ```
-Loop over those slot names to load labware:
+
+Finally, we’ll loop over those slot names to load labware:
+
 ```python
 for slot in unique_source_slots:
     protocol.load_labware(
@@ -69,7 +81,8 @@ for slot in unique_source_slots:
         location=slot
     )
 ```
-Note that loading labware in a loop like this doesn't assign each labware instance to a variable. That's fine, because we'll use `ProtocolContext.deck` to refer to them by slot name later on.
+
+Note that loading labware in a loop like this doesn't assign each labware instance to a variable. That's fine, because we'll use [`ProtocolContext.deck`][opentrons.protocol_api.ProtocolContext.deck] to refer to them by slot name later on.
 
 The entire start of the `run()` function, including a pipette and fixed labware (i.e., labware not affected by the CSV runtime parameter) will look like this:
 ```python
@@ -122,19 +135,23 @@ def run(protocol: protocol_api.ProtocolContext):
 
 Now it's time to transfer liquid based on the data in each row of the CSV. 
 
-Slice off the header row of `well_data`. Each remaining row has the source slot, source well, and volume data that we can directly pass to `transfer`. 
+Slice off the header row of `well_data`. Each remaining row has the source slot, source well, and volume data that we can directly pass to `transfer()`. 
 
-We also need to specify the destination well. We want the destinations to proceed in order according to `Labware.wells`. To track this all in a single loop, wrap the CSV data in an `enumerate` object to provide an index that increments each time through the loop. All together, the transfer loop looks like this:
+We also need to specify the destination well. We want the destinations to proceed in order according to [`Labware.wells()`][opentrons.protocol_api.Labware.wells]. To track this all in a single loop, wrap the CSV data in an [`enumerate`](https://docs.python.org/3/library/functions.html#enumerate) object to provide an index that increments each time through the loop. All together, the transfer loop looks like this:
+
 ```python
 for index, row in enumerate(well_data[1:]):
     # get source location from CSV
     source_slot = row[0]
     source_well = row[1]
     source_location = protocol.deck[source_slot][source_well]
+
     # get volume as a number
     transfer_volume = float(row[2])
+
     # get destination location from loop index
     dest_location = dest_plate.wells()[index]
+
     # perform parameterized transfer
     pipette.transfer(
         volume=transfer_volume,
@@ -142,6 +159,14 @@ for index, row in enumerate(well_data[1:]):
         dest=dest_location
     )
 ```
-For each time through the loop, build the source location from the first and second item in the row list, cast the volume to a float, and use the index for the destination well. This code could complete up to 96 transfers, depending on the CSV.
+
+Let’s unpack this. For each time through the loop, we build the source location from the first (`row[0]`) and second (`row[1]`) item in the row list. We then construct a complete location with respect to `protocol.deck`.
+
+Next, we get the volume for the transfer. All CSV data is treated as strings, so we have to cast it to a floating point number.
+
+The last piece of information needed is the destination well. We take the index of the current iteration through the loop, and use that same index with respect to the ordered list of all wells on the destination plate.
+
+With all the information gathered and stored in variables, all that’s left is to pass that information as the arguments of `transfer()`. With our example file, this will execute three transfers. By using a different CSV at run time, this code could complete up to 96 transfers (at which point it would run out of both tips and destination wells).
+
 
 For more complex transfer behavior—such as adjusting location within the well—you could extend the CSV format and the associated code to work with additional data. And check out the [verified cherrypicking protocol](https://library.opentrons.com/p/flex-custom-parameters-cherrypicking) in the Opentrons Protocol Library for further automation based on CSV data, including loading different types of plates, automatically loading tip racks, and more.

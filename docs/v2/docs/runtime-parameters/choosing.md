@@ -6,7 +6,7 @@ The first decision you need to make when adding parameters to your protocol is "
 2. **Work efficiently.** Don't burden run setup with too many choices or confusing options.
 3. **Avoid errors.** Ensure that every combination of parameters produces an analyzable, runnable protocol.
 
-The trick to choosing good parameters is reasoning through the choices the protocol's users may make. If any of them lead to nonsensical outcomes or errors, adjust the parameters—or how your protocol [uses parameter values](using_values.md)—to avoid those situations.
+The trick to choosing good parameters is reasoning through the choices the protocol's users may make. If any of them lead to nonsensical outcomes or errors, adjust the parameters—or how your protocol [uses parameter values](using-values.md)—to avoid those situations.
 
 ## Build on a Task
 

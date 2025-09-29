@@ -3,6 +3,7 @@
 When testing out a new protocol, it's common to perform a dry run to watch your robot go through all the steps without actually handling samples or reagents. This use case explores how to add a single Boolean parameter for whether you're performing a dry run.
 
 The code examples will show how this single value can control:
+
 - Skipping module actions and long delays.
 - Reducing mix repetitions to save time.
 - Returning tips (that never touched any liquid) to their racks.
@@ -33,7 +34,7 @@ Additionally, since "dry run" can have different meanings in different contexts,
 
 Many protocols have built-in delays, either for a module to work or to let a reaction happen passively. Lengthy delays just get in the way when verifying a protocol with a dry run. So wherever the protocol calls for a delay, check the value of `protocol.params.dry_run` and make the protocol behave accordingly.
 
-For example, consider a simple `.delay` command. Wrap it in an `if` statement so the delay only executes when the run is *not* a dry run:
+For example, consider a simple [`delay()`][opentrons.protocol_api.ProtocolContext.delay] command. Wrap it in an `if` statement so the delay only executes when the run is *not* a dry run:
 ```python
 if protocol.params.dry_run is False:
     protocol.delay(minutes=5)
@@ -58,7 +59,8 @@ tc_mod.open_lid()
 
 ## Shortening Mix Steps
 
-Similar to delays, mix steps can take a long time because they are inherently repetitive actions. Mixing ten times takes ten times as long as mixing once! To save time, set a mix repetitions variable based on the value of `protocol.params.dry_run` and pass that to `.mix`:
+Similar to delays, mix steps can take a long time because they are inherently repetitive actions. Mixing ten times takes ten times as long as mixing once! To save time, set a mix repetitions variable based on the value of `protocol.params.dry_run` and pass that to [`mix()`][opentrons.protocol_api.InstrumentContext.mix]:
+
 ```python
 if protocol.params.dry_run is True:
     mix_reps = 1
@@ -66,7 +68,9 @@ else:
     mix_reps = 10
 pipette.mix(repetitions=mix_reps, volume=50, location=plate["A1"].bottom())
 ```
+
 Note that this checks whether the dry run parameter is `True`. If you prefer to set up all your `if` statements to check whether it's `False`, you can reverse the logic:
+
 ```python
 if protocol.params.dry_run is False:
     mix_reps = 10
@@ -76,14 +80,17 @@ else:
 
 ## Returning Tips
 
-Tips used in a dry run should be reusable — for another dry run, if nothing else. It doesn't make sense to dispose of them in a trash container, unless you specifically need to test movement to the trash. You can choose whether to use `.drop_tip` or `.return_tip` based on the value of `protocol.params.dry_run`. If the protocol doesn't have too many tip drop actions, you can use an `if` statement each time:
+Tips used in a dry run should be reusable — for another dry run, if nothing else. It doesn't make sense to dispose of them in a trash container, unless you specifically need to test movement to the trash. You can choose whether to use [`drop_tip()`][opentrons.protocol_api.InstrumentContext.drop_tip] or [`return_tip()`][opentrons.protocol_api.InstrumentContext.return_tip] based on the value of `protocol.params.dry_run`. If the protocol doesn't have too many tip drop actions, you can use an `if` statement each time:
+
 ```python
 if protocol.params.dry_run is True:
     pipette.return_tip()
 else:
     pipette.drop_tip()
 ```
+
 However, repeating this block every time you handle tips could significantly clutter your code. Instead, you could define it as a function:
+
 ```python
 def return_or_drop(pipette):
     if protocol.params.dry_run is True:
@@ -91,17 +98,21 @@ def return_or_drop(pipette):
     else:
         pipette.drop_tip()
 ```
+
 Then call that function throughout your protocol:
+
 ```python
 pipette.pick_up_tip()
 return_or_drop(pipette)
 ```
+
 !!! note
-    It's generally better to define a standalone function, rather than adding a method to the `InstrumentContext` class. This makes your custom, parameterized commands stand out from API methods in your code.
+    It's generally better to define a standalone function, rather than adding a method to the [`InstrumentContext`][opentrons.protocol_api.InstrumentContext] class. This makes your custom, parameterized commands stand out from API methods in your code.
 
 Additionally, if your protocol uses enough tips that you have to replenish tip racks, you'll need separate behavior for dry runs and live runs. In a live run, once you've used all the tips, the rack is empty, because the tips are in the trash. In a dry run, once you've used all the tips in a rack, the rack is *full*, because you returned the tips.
 
-The API has methods to handle both of these situations. To continue using the same tip rack without physically replacing it, call `.reset_tipracks`. In the live run, move the empty tip rack off the deck and move a full one into place:
+The API has methods to handle both of these situations. To continue using the same tip rack without physically replacing it, call [`reset_tipracks()`][opentrons.protocol_api.InstrumentContext.reset_tipracks]. In the live run, move the empty tip rack off the deck and move a full one into place:
+
 ```python
 if protocol.params.dry_run is True:
     pipette.reset_tipracks()
