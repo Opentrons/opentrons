@@ -10,7 +10,10 @@ nav:
   - Labware: labware.md
   - Software: software.md
   - Maintenance: maintenance.md
-  - Appendicies: appendicies.md
+  - Appendices:
+      - Additional Documentation: additional-docs.md
+      - Open Source Software: open-source.md
+      - Warranty, Support, and Contact Information: support.md
 
 theme:
   name: material
