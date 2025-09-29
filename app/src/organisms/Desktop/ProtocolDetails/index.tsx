@@ -528,6 +528,7 @@ export function ProtocolDetails(
                     }}
                     data-testid="ProtocolDetails_runProtocol"
                     disabled={analysisStatus === 'loading'}
+                    whiteSpace="nowrap"
                   >
                     {t('start_setup')}
                   </PrimaryButton>

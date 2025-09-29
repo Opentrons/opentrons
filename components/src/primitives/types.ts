@@ -52,6 +52,7 @@ export interface FlexboxProps {
   alignItems?: string
   alignSelf?: string
   justifyContent?: string
+  justifySelf?: string
   flexDirection?: string
   flexWrap?: string
   whiteSpace?: string
