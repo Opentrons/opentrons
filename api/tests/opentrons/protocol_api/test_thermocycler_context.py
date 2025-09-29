@@ -387,7 +387,6 @@ def test_set_block_temperature_with_liquid_tracking(
             block_max_volume=42,
             ramp_rate=5.6,
         ),
-        mock_core.wait_for_block_temperature(),
         mock_broker.publish(
             "command",
             matchers.DictMatching(
