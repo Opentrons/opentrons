@@ -14,7 +14,7 @@ export interface CameraUsageSettingsProps {
   isRecoveryCaptureEnabled: boolean
 }
 
-export function CameraUsageSettings({
+export function RobotSettingsCameraUsage({
   toggleLiveVideoEnabled,
   toggleRecoveryCaptureEnabled,
   isRecoveryCaptureEnabled,

@@ -7,11 +7,9 @@ import { StyledText } from '@opentrons/components'
 import { getTopPortalEl } from '/app/App/portal'
 import { TertiaryButton } from '/app/atoms/buttons'
 import { CameraControls } from '/app/organisms/Desktop/Camera/CameraControls'
-import styles from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/camerasettings.module.css'
+import styles from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/setupcamera.module.css'
 
-import type { JSX } from 'react'
-
-export function RobotSettingsCameraControls(): JSX.Element {
+export function SetupRunCameraControls(): JSX.Element {
   const { t } = useTranslation('device_settings')
   const [showControls, setShowControls] = useState(false)
 
@@ -20,12 +18,12 @@ export function RobotSettingsCameraControls(): JSX.Element {
   }
 
   return (
-    <div className={styles.settings_container}>
-      <StyledText desktopStyle="bodyLargeSemiBold">
+    <div className={styles.control_settings_container}>
+      <StyledText desktopStyle="bodyDefaultSemiBold">
         {t('camera_controls')}
       </StyledText>
-      <div className={styles.camera_controls_container}>
-        <div className={styles.camera_controls_text_container}>
+      <div className={styles.camera_setting_container}>
+        <div className={styles.camera_setting_text_container}>
           <StyledText desktopStyle="bodyDefaultSemiBold">
             {t('image_video_settings')}
           </StyledText>

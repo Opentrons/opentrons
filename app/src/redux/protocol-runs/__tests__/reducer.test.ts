@@ -19,6 +19,10 @@ describe('protocol runs reducer', () => {
       required: true,
       complete: false,
     },
+    [Constants.CAMERA_SETUP_STEP_KEY]: {
+      required: true,
+      complete: false,
+    },
   }
   it('establishes an empty state if you tell it one', () => {
     const nextState = protocolRunReducer(
