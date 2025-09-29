@@ -167,8 +167,8 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
                 )
               : ''
           }
-          handleCancelClick={saveStepForm}
-          handleContinueClick={handleSave}
+          handleSkipPauseClick={saveStepForm}
+          handleAddPauseClick={handleSave}
         />
       ) : null}
       <StepFormToolbox

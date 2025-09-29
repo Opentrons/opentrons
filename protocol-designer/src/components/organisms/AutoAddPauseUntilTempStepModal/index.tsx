@@ -15,8 +15,8 @@ import {
 
 interface AutoAddPauseUntilTempStepModalProps {
   displayTemperature: string
-  handleCancelClick: () => void
-  handleContinueClick: () => void
+  handleSkipPauseClick: () => void
+  handleAddPauseClick: () => void
   displayModule: string
 }
 
@@ -25,8 +25,8 @@ export const AutoAddPauseUntilTempStepModal = (
 ): JSX.Element => {
   const {
     displayTemperature,
-    handleCancelClick,
-    handleContinueClick,
+    handleSkipPauseClick,
+    handleAddPauseClick,
     displayModule,
   } = props
   const { t } = useTranslation('modal')
@@ -48,12 +48,12 @@ export const AutoAddPauseUntilTempStepModal = (
           gridGap={SPACING.spacing8}
           justifyContent={ALIGN_FLEX_END}
         >
-          <SecondaryButton onClick={handleCancelClick}>
+          <SecondaryButton onClick={handleSkipPauseClick}>
             <StyledText desktopStyle="bodyDefaultSemiBold">
               {t('auto_add_pause_until_temp_step.legacy.skip_pause_step')}
             </StyledText>
           </SecondaryButton>
-          <PrimaryButton onClick={handleContinueClick}>
+          <PrimaryButton onClick={handleAddPauseClick}>
             <StyledText desktopStyle="bodyDefaultSemiBold">
               {t('auto_add_pause_until_temp_step.legacy.add_pause_step')}
             </StyledText>
