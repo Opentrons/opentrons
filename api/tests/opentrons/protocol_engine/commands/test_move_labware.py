@@ -37,8 +37,6 @@ from opentrons.protocol_engine.types import (
     AddressableAreaLocation,
     OnAddressableAreaLocationSequenceComponent,
     OnLabwareLocationSequenceComponent,
-    NotOnDeckLocationSequenceComponent,
-    OFF_DECK_LOCATION,
     LabwareLocationSequence,
 )
 from opentrons.protocol_engine.state.state import StateView
@@ -566,7 +564,7 @@ async def test_gripper_move_to_waste_chute_implementation(
         )
     ]
     eventual_dest_loc_sequence = immediate_dest_loc_sequence
-    
+
     data = MoveLabwareParams(
         labwareId="my-cool-labware-id",
         newLocation=new_location,
