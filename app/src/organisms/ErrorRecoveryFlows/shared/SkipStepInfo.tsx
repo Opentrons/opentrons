@@ -48,6 +48,7 @@ export function SkipStepInfo(props: RecoveryContentProps): JSX.Element {
         case STACKER_HOPPER_EMPTY_SKIP.ROUTE:
         case STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
         case STACKER_STALLED_SKIP.ROUTE:
+        case SHUTTLE_FULL_SKIP.ROUTE:
           if (
             failedCommand?.byRunRecord.commandType === 'flexStacker/retrieve'
           ) {
