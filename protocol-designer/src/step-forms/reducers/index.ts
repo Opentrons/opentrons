@@ -198,7 +198,12 @@ export const unsavedForm = (
 
     case 'SUBSTITUTE_STEP_FORM_PIPETTES': {
       // only substitute unsaved step form if its ID is in the start-end range
-      const { substitutionMap, startStepId, endStepId } = action.payload
+      const {
+        substitutionMap,
+        startStepId,
+        endStepId,
+        newTiprackURI,
+      } = action.payload
       const stepIdsToUpdate = getIdsInRange(
         rootState.orderedStepIds,
         startStepId,
@@ -218,6 +223,7 @@ export const unsavedForm = (
           ...handleFormChange(
             {
               pipette: substitutionMap[unsavedFormState.pipette],
+              tipRack: newTiprackURI,
             },
             unsavedFormState,
             _getPipetteEntitiesRootState(rootState),
@@ -783,7 +789,12 @@ export const savedStepForms = (
     }
 
     case 'SUBSTITUTE_STEP_FORM_PIPETTES': {
-      const { startStepId, endStepId, substitutionMap } = action.payload
+      const {
+        startStepId,
+        endStepId,
+        substitutionMap,
+        newTiprackURI,
+      } = action.payload
       const stepIdsToUpdate = getIdsInRange(
         rootState.orderedStepIds,
         startStepId,
@@ -800,6 +811,7 @@ export const savedStepForms = (
         const updatedFields = handleFormChange(
           {
             pipette: substitutionMap[prevStepForm.pipette],
+            tipRack: newTiprackURI,
           },
           prevStepForm,
           _getPipetteEntitiesRootState(rootState),
@@ -1232,7 +1244,10 @@ export const pipetteInvariantProperties: Reducer<
           acc: NormalizedPipetteById,
           [id, pipetteLoadInfo]: [string, PipetteLoadInfo]
         ) => {
-          const tiprackDefURI = metadata.pipetteTiprackAssignments[id]
+          const tiprackDefURI = metadata.pipetteTiprackAssignments[id] ?? []
+          // If the pipette doesn't exist in the metadata.pipetteTiprackAssignments,
+          // then the protocol file is malformed, but there's nothing we can do about
+          // that, so just assign an empty tiprackDefURI to the pipette in that case.
 
           return {
             ...acc,
