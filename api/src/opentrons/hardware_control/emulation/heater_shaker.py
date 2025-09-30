@@ -147,8 +147,13 @@ class HeaterShakerEmulator(AbstractEmulator):
         return "M106"
 
     def _get_error_state(self, command: Command) -> str:
-        return "M411"
+        return f"M411 {HS_ACK}M411"
 
-    @staticmethod
-    def get_terminator() -> bytes:
+    def get_terminator(self) -> bytes:
         return b"\n"
+
+    def get_ack(self) -> bytes:
+        return HS_ACK.encode()
+
+    def get_autoack(self) -> bool:
+        return False
