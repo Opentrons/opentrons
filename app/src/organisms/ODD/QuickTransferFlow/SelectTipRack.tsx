@@ -34,9 +34,17 @@ export function SelectTipRack(props: SelectTipRackProps): JSX.Element {
   const { onNext, onBack, exitButtonProps, state, dispatch } = props
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
 
+  // (kk:2025-09-30) this should be temporary until fix getAllDefinitions cache issue
+  const is96ChannelTwohundred =
+    state.pipette?.displayName === 'Flex 96-Channel 200 µL'
   const allLabwareDefinition2sByUri = getAllDefinitions(LABWAREV2_DO_NOT_LIST)
   const selectedPipetteDefaultTipracks =
-    state.pipette?.liquids.default.defaultTipracks ?? []
+    state.pipette?.liquids.default.defaultTipracks.filter(tiprackUri => {
+      // "opentrons/opentrons_flex_96_tiprack_20ul/1" -> "opentrons_flex_96_tiprack_20ul"
+      const loadName = tiprackUri.split('/')[1]
+      const isBlockedTiprack = LABWAREV2_DO_NOT_LIST.includes(loadName)
+      return !is96ChannelTwohundred || !isBlockedTiprack
+    }) ?? []
 
   const [selectedTipRack, setSelectedTipRack] = useState<
     LabwareDefinition2 | undefined
