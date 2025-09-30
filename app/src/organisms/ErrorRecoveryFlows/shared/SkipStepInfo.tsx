@@ -64,6 +64,7 @@ export function SkipStepInfo(props: RecoveryContentProps): JSX.Element {
           }
           break
         case STACKER_STALLED_STORE_SKIP.ROUTE:
+        case STACKER_SHUTTLE_EMPTY_STORE_SKIP.ROUTE:
           void manualStore().then(() => {
             skipFailedCommand()
           })
