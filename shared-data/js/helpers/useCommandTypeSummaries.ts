@@ -8,7 +8,6 @@ export function useCommandTypeSummaries(
 ): string {
   const { t } = useTranslation('command_type_summary')
   const fallback = 'Unknown'
-  console.log('commandType', commandType)
   if (commandType == null) {
     return fallback
   }
