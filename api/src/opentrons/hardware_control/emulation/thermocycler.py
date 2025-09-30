@@ -60,7 +60,7 @@ class ThermocyclerEmulator(AbstractEmulator):
         """Handle a line"""
         results = (self._handle(c) for c in self._parser.parse(line))
         joined = " ".join(f"{r} {self._ack}" for r in results if r)
-        return None if not joined else joined
+        return self._ack if not joined else joined
 
     def reset(self) -> None:
         self._lid_temperature = Temperature(
