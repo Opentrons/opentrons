@@ -14,10 +14,10 @@
 //
 // What that all boils down to is that we need, and this module provides, an interface to get the version of a
 // given project that currently exists in the monorepo.
-
-import git from 'simple-git'
 import { dirname } from 'path'
 import { fileURLToPath } from 'url'
+import git from 'simple-git'
+
 const REPO_BASE = dirname(dirname(fileURLToPath(import.meta.url)))
 
 export function monorepoGit() {
@@ -60,4 +60,39 @@ export async function versionForProject(project) {
       )
       return '0.0.0-dev'
     })
+}
+
+export async function latestLabwareVersions(appVersion) {
+  // Returns a map of {labware load name -> highest available version number}
+  // as of app release `appVersion`.
+
+  // Max says PD only needs to worry about labware schema 2:
+  const labwareDir = 'shared-data/labware/definitions/2/'
+  // Fetch all labware definition files that existed in the app at `version`:
+  const lstreeCmd = ['ls-tree', '-r', '--name-only', '-z']
+  // We will first look for a release tag named `v${version}`.
+  // If that doesn't exist, look for a branch named `chore_release-${version}`.
+  const releaseTag = `v${appVersion}`
+  const choreBranch = `origin/chore_release-${appVersion}`
+  const labwareFiles = (
+    await monorepoGit()
+      .raw([...lstreeCmd, releaseTag, labwareDir])
+      .catch(error =>
+        monorepoGit().raw([...lstreeCmd, choreBranch, labwareDir])
+      )
+  )
+    .split('\0')
+    .slice(0, -1) // git puts an extra '\0' at the end, remove it
+    .map(filename => filename.replace(labwareDir, ''))
+  // labwareFiles is a list like: ['agilent_1_reservoir_290ml/1.json', ...]
+
+  // For each loadname in labwareFiles, return the highest labware version:
+  return labwareFiles.reduce((acc, filename) => {
+    const [loadName, jsonFilename] = filename.split('/')
+    const labwareVersion = Number(jsonFilename.replace('.json', ''))
+    if (!acc[loadName] || labwareVersion > acc[loadName]) {
+      acc[loadName] = labwareVersion
+    }
+    return acc
+  }, {})
 }

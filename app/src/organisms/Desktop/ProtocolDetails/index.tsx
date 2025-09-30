@@ -383,7 +383,7 @@ export function ProtocolDetails(
   }
 
   const handleClickTimeline = (): void => {
-    navigate(`/protocols/${protocolKey}/preview`)
+    navigate(`/protocols/${protocolKey}/visualization`)
   }
 
   const UNKNOWN_ATTACHMENT_ERROR = `${protocolDisplayName} protocol uses
@@ -514,13 +514,12 @@ export function ProtocolDetails(
                   </LegacyStyledText>
                 </Flex>
                 <Flex gridGap={SPACING.spacing4} justifySelf={JUSTIFY_END}>
-                  {/* TODO: add OT-2 support */}
-                  {enableProtocolTimeline && robotType === FLEX_ROBOT_TYPE ? (
+                  {enableProtocolTimeline ? (
                     <SecondaryButton
                       onClick={handleClickTimeline}
                       cursor={CURSOR_POINTER}
                     >
-                      Preview
+                      {t('visualize')}
                     </SecondaryButton>
                   ) : null}
                   <PrimaryButton
@@ -529,6 +528,7 @@ export function ProtocolDetails(
                     }}
                     data-testid="ProtocolDetails_runProtocol"
                     disabled={analysisStatus === 'loading'}
+                    whiteSpace="nowrap"
                   >
                     {t('start_setup')}
                   </PrimaryButton>

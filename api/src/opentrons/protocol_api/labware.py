@@ -347,6 +347,11 @@ class Well:
         """Get the current liquid volume in a well."""
         return self._core.get_liquid_volume()
 
+    @requires_version(2, 27)
+    def has_tracked_liquid(self) -> bool:
+        """Get the current liquid volume in a well."""
+        return self._core.has_tracked_liquid()
+
     @requires_version(2, 24)
     def volume_from_height(self, height: LiquidTrackingType) -> LiquidTrackingType:
         """Return the volume contained in a well at any height."""

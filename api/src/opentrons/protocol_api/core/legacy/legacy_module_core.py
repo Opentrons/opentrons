@@ -302,6 +302,15 @@ class LegacyThermocyclerCore(
             steps=steps, repetitions=repetitions, volume=block_max_volume
         )
 
+    def start_execute_profile(
+        self,
+        steps: List[ThermocyclerStep],
+        repetitions: int,
+        block_max_volume: Optional[float] = None,
+    ) -> LegacyTaskCore:
+        """Start a Thermocycler Profile."""
+        assert False, "start_execute_profile only supported on engine core"
+
     def deactivate_lid(self) -> None:
         """Turn off the heated lid."""
         self._sync_module_hardware.deactivate_lid()
@@ -448,6 +457,10 @@ class LegacyHeaterShakerCore(
             raise CannotPerformModuleAction(
                 "Cannot start shaking unless labware latch is closed."
             )
+
+    def set_shake_speed(self, rpm: int) -> LegacyTaskCore:
+        """Set heatershaker speed."""
+        assert False, "set_shake_speed only supported on engine core."
 
     def open_labware_latch(self) -> None:
         """Open the labware latch."""
