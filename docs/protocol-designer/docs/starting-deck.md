@@ -21,20 +21,20 @@ Next, click **Liquids** in the upper left. First, define a liquid to use in your
 
 ## Labware
 
-Click to return to the protocol starting deck, the first step in your protocol timeline. Here, you can edit labware on or off the robot deck. Hover over each deck slot to view slot details. Then, click individual slots to add, remove, or change labware. 
+Click to return to the protocol starting deck, the first step in your protocol timeline. Here, you can edit labware on or off the robot deck. 
 
-To start, Protocol Designer places your chosen tip racks on the deck. Click and choose **Edit labware** to replace or delete the tip rack. Click any open deck slot to add additional tip racks. You can include lids on additional Flex tip racks. 
+To start, Protocol Designer places your chosen tip racks on the deck. You can drag and drop tip racks to new deck slots, or click and choose **Edit labware** to replace or delete the tip rack. Click any open deck slot to add additional tip racks. You can include lids on additional Flex tip racks. 
 
-Use the toggle switch at the upper right of the protocol starting deck to add, view, and edit off-deck labware.
+Hover over any deck slot to view slot details. Then, click individual slots to add, remove, or change labware. 
+
+For the example below, add labware by clicking deck slot D2 and choosing **Add labware**. 
 
 <figure class="screenshot" markdown>
   ![Add labware](images/add_labware3.png)
   <figcaption>Add a well plate to the deck.</figcaption>
 </figure>
 
-For the example slot D2, you can add labware by clicking an open deck slot and choosing **Add labware**. 
-
-In the menu, search for or select a labware type, like well plates, and view available options from the [Labware Library](https://labware.opentrons.com "Labware Library"). At the bottom of the labware list, you can upload a JSON file to use custom labware in your protocol. 
+In the menu, search for or select a labware type, like well plates, and view available options from the [Labware Library](https://labware.opentrons.com "Labware Library"). Protocol Designer also includes compatible lid options for well plates and reservoirs. At the bottom of the labware list, you can upload a JSON file to use custom labware in your protocol. 
 
 Click **Edit liquid** in the labware menu on the right to add liquids you've already defined in your protocol. In the labware graphic, click and drag to select wells across rows and columns. From the dropdown menu, select your liquid and enter the starting volume for each well in microliters (µL). Click **Save** for each liquid added to your labware before clicking **Done**.  
 
