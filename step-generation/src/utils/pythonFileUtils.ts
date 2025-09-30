@@ -39,7 +39,7 @@ import type {
 } from '../types'
 
 const PAPI_VERSION = '2.24' // latest version from api/src/opentrons/protocols/api_support/definitions.py
-export const PD_APPLICATION_VERSION = '8.5.0' // latest PD version to insert into DESIGNER_APPLICATION blob
+export const PD_APPLICATION_VERSION = '8.5.5' // latest PD version to insert into DESIGNER_APPLICATION blob
 
 export function pythonImports(): string {
   return ['import json', 'from opentrons import protocol_api, types'].join('\n')
