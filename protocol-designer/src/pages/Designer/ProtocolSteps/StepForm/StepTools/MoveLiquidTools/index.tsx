@@ -3,6 +3,7 @@ import { useAssignLiquidClass } from './hooks/useAssignLiquidClass'
 import { useSupportedLiquidClassOptions } from './hooks/useSupportedLiquidClassOptions'
 import { LiquidClassesStepTools } from './LiquidClassesStepTools'
 import { SecondStepsMoveLiquidTools } from './SecondStepsMoveLiquidTools'
+import { TipSettings } from './TipSettings'
 
 import type { StepFormProps } from '../../types'
 
@@ -55,6 +56,10 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
             setTab={setTab}
             setShowFormErrors={setShowFormErrors}
           />
+        )
+      case 3:
+        return (
+          <TipSettings propsForFields={propsForFields} formData={formData} />
         )
       default:
         console.warn(

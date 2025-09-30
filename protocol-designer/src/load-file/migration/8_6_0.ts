@@ -1,3 +1,5 @@
+import { AUTOMATIC } from '@opentrons/step-generation'
+
 import { DEFAULT_MM_OFFSET_FROM_BOTTOM } from '/protocol-designer/constants'
 
 import type { ProtocolFile } from '@opentrons/shared-data'
@@ -56,6 +58,7 @@ export const migrateFile = (
               dispense_mmFromBottom != null
                 ? dispense_mmFromBottom
                 : DEFAULT_MM_OFFSET_FROM_BOTTOM,
+            tip_tracking: AUTOMATIC,
           },
         }
       }

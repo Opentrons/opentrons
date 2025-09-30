@@ -105,6 +105,7 @@ describe('getDefaultsForStepType', () => {
         dispense_y_position: 0,
         liquidClassesSupported: true,
         liquidClass: 'none',
+        tip_tracking: 'automatic',
       })
     })
   })

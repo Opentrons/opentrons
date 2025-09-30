@@ -766,6 +766,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
           value: undefined,
         },
+        tip_tracking: {
+          isIndeterminate: false,
+          value: undefined,
+        },
       })
     })
   })
@@ -1140,6 +1144,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
           value: undefined,
         },
         dispense_retract_position_reference: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        tip_tracking: {
           isIndeterminate: false,
           value: undefined,
         },

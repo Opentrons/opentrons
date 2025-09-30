@@ -98,13 +98,5 @@ describe('FirstStepMoveLiquidTools', () => {
     screen.getAllByText('mock WellSelectionField')
     screen.getByText('mock VolumeField')
     screen.getByText('mock PathField')
-    screen.getByText('mock ChangeTipField')
-    screen.getByText('mock DropTipField')
-  })
-
-  it('renders fields when feature flag is enabled', () => {
-    vi.mocked(getEnableTipPickupLocation).mockReturnValue(true)
-    render(props)
-    screen.getByText('mock PickUpTipField')
   })
 })

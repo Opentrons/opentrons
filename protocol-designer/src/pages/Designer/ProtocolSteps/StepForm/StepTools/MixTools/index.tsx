@@ -12,6 +12,7 @@ import {
 import { useAssignLiquidClass } from '../MoveLiquidTools/hooks/useAssignLiquidClass'
 import { useSupportedLiquidClassOptions } from '../MoveLiquidTools/hooks/useSupportedLiquidClassOptions'
 import { LiquidClassesStepTools } from '../MoveLiquidTools/LiquidClassesStepTools'
+import { TipSettings } from '../MoveLiquidTools/TipSettings'
 import { FirstStepMixTools } from './FirstStepMixTools'
 import { SecondStepMixTools } from './SecondStepMixTools'
 
@@ -89,6 +90,10 @@ export function MixTools(
         tab={tab}
         setTab={setTab}
       />
+    ),
+
+    3: () => (
+      <TipSettings propsForFields={propsForFields} formData={formData} />
     ),
   }
 

@@ -234,6 +234,7 @@ describe('createPresavedStepForm', () => {
       liquidClassesSupported: true,
       liquidClass: 'none',
       stepNumber: 0,
+      tip_tracking: 'automatic',
     })
   })
   describe('mix step', () => {

@@ -145,6 +145,7 @@ export function getDefaultsForStepType(
         pushOut_checkbox: null,
         pushOut_volume: null,
         tipRack: null,
+        tip_tracking: 'automatic',
         volume: null,
       }
 
