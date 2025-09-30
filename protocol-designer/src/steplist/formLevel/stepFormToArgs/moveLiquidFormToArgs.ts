@@ -183,7 +183,6 @@ export const moveLiquidFormToArgs = (
     hydratedFormData.aspirate_wellOrder_first,
     hydratedFormData.aspirate_wellOrder_second
   )
-  console.log('form to args tiprack', tipRack)
 
   const isDispensingIntoDisposalLocation =
     'name' in destLabware &&
