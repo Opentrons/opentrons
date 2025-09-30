@@ -241,9 +241,9 @@ class LabwareMovementHandler:
                         legacy_grip_check = False
                         if labware_definition.parameters.quirks is not None:
                             legacy_grip_check = (
-                                Quirks.legacyGripCheck in labware_definition.parameters.quirks
+                                Quirks.legacyGripCheck  # type: ignore[comparison-overlap]
+                                in labware_definition.parameters.quirks
                             )
-
 
                         # todo(mm, 2024-09-26): This currently raises a lower-level 2015 FailedGripperPickupError.
                         # Convert this to a higher-level 3001 LabwareDroppedError or 3002 LabwareNotPickedUpError,
