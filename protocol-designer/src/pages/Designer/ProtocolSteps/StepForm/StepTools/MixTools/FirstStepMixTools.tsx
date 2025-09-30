@@ -1,24 +1,14 @@
 import { useTranslation } from 'react-i18next'
 
-import {
-  DIRECTION_COLUMN,
-  Divider,
-  Flex,
-  SPACING,
-  StyledText,
-} from '@opentrons/components'
+import { DIRECTION_COLUMN, Divider, Flex, SPACING } from '@opentrons/components'
 
 import { InputStepFormField } from '/protocol-designer/components/molecules'
 
 import {
-  ChangeTipField,
-  DropTipField,
   LabwareField,
   PartialTipField,
-  PickUpTipField,
   PipetteField,
   TiprackField,
-  TipWellSelectionField,
   VolumeField,
   WellSelectionField,
 } from '../../PipetteFields'
@@ -32,9 +22,6 @@ interface FirstStepMixToolsProps {
   formData: FormData
   enablePartialTip: boolean
   pipettes: PipetteEntities
-  enableTipPickupLocation: boolean
-  userSelectedPickUpTipLocation: boolean
-  userSelectedDropTipLocation: boolean
 }
 
 export function FirstStepMixTools({
@@ -42,9 +29,6 @@ export function FirstStepMixTools({
   formData,
   enablePartialTip,
   pipettes,
-  enableTipPickupLocation,
-  userSelectedPickUpTipLocation,
-  userSelectedDropTipLocation,
 }: FirstStepMixToolsProps): JSX.Element {
   const { t } = useTranslation(['application', 'form', 'protocol_steps'])
   const is96Channel =

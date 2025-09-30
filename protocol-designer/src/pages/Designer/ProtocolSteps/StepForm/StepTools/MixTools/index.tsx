@@ -1,13 +1,7 @@
 import { useSelector } from 'react-redux'
 
-import {
-  getEnablePartialTipSupport,
-  getEnableTipPickupLocation,
-} from '/protocol-designer/feature-flags/selectors'
-import {
-  getLabwareEntities,
-  getPipetteEntities,
-} from '/protocol-designer/step-forms/selectors'
+import { getEnablePartialTipSupport } from '/protocol-designer/feature-flags/selectors'
+import { getPipetteEntities } from '/protocol-designer/step-forms/selectors'
 
 import { useAssignLiquidClass } from '../MoveLiquidTools/hooks/useAssignLiquidClass'
 import { useSupportedLiquidClassOptions } from '../MoveLiquidTools/hooks/useSupportedLiquidClassOptions'
@@ -33,19 +27,7 @@ export function MixTools(
     setShowFormErrors,
   } = props
   const pipettes = useSelector(getPipetteEntities)
-  const enableTipPickupLocation = useSelector(getEnableTipPickupLocation)
   const enablePartialTip = useSelector(getEnablePartialTipSupport)
-  const labwares = useSelector(getLabwareEntities)
-
-  const pickUpTipLocationValue = propsForFields.pickUpTip_location?.value
-  const userSelectedPickUpTipLocation =
-    pickUpTipLocationValue != null &&
-    labwares[String(pickUpTipLocationValue)] != null
-
-  const dropTipLocationValue = propsForFields.dropTip_location?.value
-  const userSelectedDropTipLocation =
-    dropTipLocationValue != null &&
-    labwares[String(dropTipLocationValue)] != null
 
   const orderedLiquidClassOptions = useAssignLiquidClass(
     formData,
@@ -66,9 +48,6 @@ export function MixTools(
         formData={formData}
         enablePartialTip={enablePartialTip}
         pipettes={pipettes}
-        enableTipPickupLocation={enableTipPickupLocation}
-        userSelectedPickUpTipLocation={userSelectedPickUpTipLocation}
-        userSelectedDropTipLocation={userSelectedDropTipLocation}
       />
     ),
     1: () => (
