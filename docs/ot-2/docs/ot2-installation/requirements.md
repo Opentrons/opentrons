@@ -21,10 +21,22 @@ PLACEHOLDER FOR DIMENSIONAL OT-2 IMAGE HERE (manual p. 21)
 
 The OT-2 has the following power requirements:
 
-- Mains power: 100–240 VAC, 50/60 Hz
-- Input power supply: 36 VDC, 10 A
+- **Mains power:** 100–240 VAC, 50/60 Hz
+- **Input power supply:** 36 VDC, 10 A
 
 The total power consumption of the OT-2 varies depending on the requirements of your protocol.
 
 - **Operating:** ~ 100–180 W
 - **Idle:** ~ 90–120 W
+
+## Environmental conditions
+
+Opentrons has validated the performance of the OT-2 in the conditions recommended for system operation, and operation in those conditions should provide optimal results.
+
+- The robot is designed for indoor use only.
+- Temperature range: 20 °C ± 4° C (68 °F ± 7.2 °F).
+- Relative humidity: 40-60% (up to 80% is acceptable, but outside the recommended range).
+- Altitude: Up to 2,000 meters above sea level.
+
+The OT-2 is safe to use in conditions outside of the recommended specifications, but your results may vary.
+
