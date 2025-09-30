@@ -83,14 +83,15 @@ export const updateInitialDeckState = (
     labware: labwareOnDeck,
   } = initialDeckSetup
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
-
   values.forEach(value => {
     if (value.cutoutFixtureId === THERMOCYCLER_V2_REAR_FIXTURE) {
       return
     }
     const hasLabwareOnSlot = getSlotHasLabware(labwareOnDeck, value.cutoutId)
     const matchingFixture = Object.values(additionalEquipmentOnDeck).find(
-      ae => ae.name === (value.type as DeckFixture)
+      ae =>
+        ae.name === (value.type as DeckFixture) &&
+        ae.location === value.cutoutId
     )
     const fourthColumnSlot =
       matchingFixture != null

@@ -166,7 +166,7 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
     castValue: Number,
   },
   aspirate_mmFromBottom: {
-    castValue: Number,
+    castValue: numberOrNull,
   },
   aspirate_wells: {
     maskValue: defaultTo([]),
@@ -195,7 +195,7 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
     castValue: Number,
   },
   dispense_mmFromBottom: {
-    castValue: Number,
+    castValue: numberOrNull,
   },
   dispense_wells: {
     maskValue: defaultTo([]),
@@ -332,7 +332,7 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
     castValue: Number,
   },
   mix_mmFromBottom: {
-    castValue: Number,
+    castValue: numberOrNull,
   },
   newLocation: {
     hydrate: getLabwareLocation,

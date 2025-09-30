@@ -78,14 +78,9 @@ export const SlotDetailModal = (
   const individualIds = getLiquidIdsOnLabware(wellContents)
 
   const volumesPerLiquid = getVolumesPerLiquid(wellContents, individualIds)
-  const ingedInputs = Object.values(allIngredientGroupFields)
-  const wellFill = Object.values(allWellFill)
 
   const [selectedLiquidId, setSelectedLiquidId] = useState<string | undefined>(
-    wellFill.length > 0
-      ? ingedInputs.find(ingred => wellFill.includes(ingred.displayColor))
-          ?.liquidGroupId ?? ingedInputs[0].liquidGroupId
-      : undefined
+    individualIds[0] // default to the first liquidId in this labware
   )
   const wellContentsWithLiquidId: WellGroup =
     wellContents != null && selectedLiquidId != null
@@ -171,7 +166,7 @@ export const SlotDetailModal = (
           {selectedLiquidId != null ? (
             <LiquidCardList
               selectedLabware={labwareOnDeck}
-              selectedLiquidId={selectedLiquidId ?? ''}
+              selectedLiquidId={selectedLiquidId}
               setSelectedLiquidId={setSelectedLiquidId}
               allIngredGroupFields={allIngredientGroupFields}
               individualIds={individualIds}
