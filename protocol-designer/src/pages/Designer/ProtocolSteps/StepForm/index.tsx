@@ -159,14 +159,14 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
         (enableConcurrentModuleActions ? (
           <AutoAddPauseUntilTempStepModal
             type="temperatureModule"
-            displayTemperature={formData.targetTemperature}
+            displayTemperature={formData?.targetTemperature ?? '?'}
             handleAddPauseClick={handleSave}
             handleSkipPauseClick={saveStepForm}
           />
         ) : (
           <AutoAddPauseUntilTempStepModal
             type="legacy"
-            displayTemperature={formData?.targetTemperature ?? '?"'}
+            displayTemperature={formData?.targetTemperature ?? '?'}
             displayModule={
               formData.moduleId != null
                 ? getModuleDisplayName(
