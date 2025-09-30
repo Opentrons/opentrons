@@ -31,7 +31,7 @@ The total power consumption of the OT-2 varies depending on the requirements of 
 
 ## Environmental conditions
 
-Opentrons has validated the performance of the OT-2 in the conditions recommended for system operation, and operation in those conditions should provide optimal results.
+Opentrons has validated the performance of the OT-2 in conditions recommended for system operation as follows:
 
 - The robot is designed for indoor use only.
 - Temperature range: 20 °C ± 4° C (68 °F ± 7.2 °F).
