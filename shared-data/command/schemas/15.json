@@ -2563,6 +2563,10 @@
             },
             {
               "$ref": "#/$defs/AddressableAreaLocation"
+            },
+            {
+              "const": "wasteChuteLocation",
+              "type": "string"
             }
           ],
           "description": "Location the labware should be loaded into.",
@@ -2639,6 +2643,10 @@
             },
             {
               "$ref": "#/$defs/AddressableAreaLocation"
+            },
+            {
+              "const": "wasteChuteLocation",
+              "type": "string"
             }
           ],
           "description": "Labware the lid should be loaded onto.",
@@ -2723,6 +2731,10 @@
             },
             {
               "$ref": "#/$defs/AddressableAreaLocation"
+            },
+            {
+              "const": "wasteChuteLocation",
+              "type": "string"
             }
           ],
           "description": "Location the lid stack should be loaded into.",
@@ -3243,6 +3255,10 @@
             },
             {
               "$ref": "#/$defs/AddressableAreaLocation"
+            },
+            {
+              "const": "wasteChuteLocation",
+              "type": "string"
             }
           ],
           "description": "Where to move the labware.",
