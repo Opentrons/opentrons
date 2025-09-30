@@ -24,7 +24,7 @@ export const migrateFile = (
 
       // if the tiprack assigned in the form step isn't in the pipette's assigned tipracks
       // then update it
-      if (!assignedTipracks.includes(tipRack)) {
+      if (!assignedTipracks.includes(tipRack as string)) {
         //  check that the new assigned tiprack is even a labware entity,
         //  otherwise default to null
         const newLoadLabwareInfo = Object.values(labware).find(lw =>
@@ -37,7 +37,6 @@ export const migrateFile = (
         return acc
       }
     }
-    // default: keep form as is
     acc[stepId] = form
     return acc
   }, {})
