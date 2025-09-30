@@ -13,9 +13,6 @@ import {
   DISPLAY_GRID,
   Flex,
   JUSTIFY_CENTER,
-  ListItem,
-  ListTable,
-  RadioButton,
   OVERFLOW_AUTO,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
@@ -32,7 +29,7 @@ import {
   LINE_CLAMP_TEXT_STYLE,
   NAV_BAR_HEIGHT_REM,
 } from '/protocol-designer/components/atoms'
-import { LiquidButton } from '/protocol-designer/components/molecules'
+import { LabwareButtonBasket, LiquidButton } from '/protocol-designer/components/molecules'
 import { selectors } from '/protocol-designer/labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
@@ -68,6 +65,7 @@ export function AssignLiquidsModal(
   const selectedWells = useSelector(getSelectedWells)
   const dispatch = useDispatch()
   const { labware } = useSelector(getInitialDeckSetup)
+  console.log('labware', labware)
   const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
   const allWellContents = useSelector(
     wellContentsSelectors.getWellContentsAllLabware
@@ -140,11 +138,11 @@ export function AssignLiquidsModal(
                 <StyledText desktopStyle="captionRegular">
                   {t('top_of_stack')}
                 </StyledText>
-                <ListTable>
-                  {labwareStack.map((x, index) =>
+                <LabwareButtonBasket stackOfLabware={labwareStack} labware={labware} setSelectedLabware={() => {}} selectedLabware={''} />
+                  {/* {labwareStack.map((x, index) =>
                     labware[x] ? (
                       <ListItem type="default">
-                        <Flex flexDirection={DIRECTION_ROW}>
+                        <LabwareButton flexDirection={DIRECTION_ROW}>
                           <StyledText desktopStyle="captionRegular">
                             {labwareStack.length - 1 - index}
                           </StyledText>
@@ -157,11 +155,10 @@ export function AssignLiquidsModal(
                               throw new Error('Function not implemented.')
                             }}
                           ></RadioButton>
-                        </Flex>
+                        </LabwareButton>
                       </ListItem>
                     ) : null
-                  )}
-                </ListTable>
+                  )} */}
               </Flex>
               <Box
                 width="100%"
