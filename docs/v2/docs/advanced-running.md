@@ -9,6 +9,7 @@ The Python API offers two ways of issuing commands to the robot outside of the a
 The Flex and OT-2 run [Jupyter Notebook](https://jupyter.org) servers on port 48888, which you can connect to with your web browser. This is a convenient environment for writing and debugging protocols, since you can define different parts of your protocol in different notebook cells and run a single cell at a time.
 
 Access your robot’s Jupyter Notebook by either:
+
 - Going to the **Advanced** tab of Robot Settings and clicking **Launch Jupyter Notebook**.
 - Going directly to `http://<robot-ip>:48888` in your web browser (if you know your robot's IP address).
 
@@ -16,9 +17,9 @@ Once you've launched Jupyter Notebook, you can create a notebook file or edit an
 
 ### Protocol Structure
 
-Jupyter Notebook is structured around cells: discrete chunks of code that can be run individually. This is nearly the opposite of Opentrons protocols, which bundle all commands into a single `run` function. Therefore, to take full advantage of Jupyter Notebook, you have to restructure your protocol.
+Jupyter Notebook is structured around *cells*: discrete chunks of code that can be run individually. This is nearly the opposite of Opentrons protocols, which bundle all commands into a single `run` function. Therefore, to take full advantage of Jupyter Notebook, you have to restructure your protocol.
 
-Rather than writing a `run` function and embedding commands within it, start your notebook by importing `opentrons.execute` and calling [`get_protocol_api()`][opentrons.execute.get_protocol_api]. This function also replaces the `metadata` block of a standalone protocol by taking the minimum [API version](versioning.md#v2-versioning) as its argument. Then you can call [ProtocolContext][opentrons.protocol_api.ProtocolContext] methods in subsequent lines or cells:
+Rather than writing a `run` function and embedding commands within it, start your notebook by importing `opentrons.execute` and calling [`opentrons.execute.get_protocol_api()`][opentrons.execute.get_protocol_api]. This function also replaces the `metadata` block of a standalone protocol by taking the minimum [API version](versioning.md#v2-versioning) as its argument. Then you can call [`ProtocolContext`][opentrons.protocol_api.ProtocolContext] methods in subsequent lines or cells:
 
 ```python
 import opentrons.execute
@@ -28,7 +29,7 @@ protocol.home()
 
 The first command you execute should always be [`home()`][opentrons.protocol_api.ProtocolContext.home]. If you try to execute other commands first, you will get a `MustHomeError`. (When running protocols through the Opentrons App, the robot homes automatically.)
 
-You should use the same [ProtocolContext][opentrons.protocol_api.ProtocolContext] throughout your notebook, unless you need to start over from the beginning of your protocol logic. In that case, call [`get_protocol_api()`][opentrons.execute.get_protocol_api] again to get a new [ProtocolContext][opentrons.protocol_api.ProtocolContext].
+You should use the same `ProtocolContext` throughout your notebook, unless you need to start over from the beginning of your protocol logic. In that case, call [`get_protocol_api()`][opentrons.execute.get_protocol_api] again to get a new `ProtocolContext`.
 
 ### Running a Previously Written Protocol
 
@@ -41,7 +42,7 @@ def run(protocol: protocol_api.ProtocolContext):
     # the contents of your previously written protocol go here
 ```
 
-Since a typical protocol only defines the `run` function but doesn't call it, this won't immediately cause the robot to move. To begin the run, instantiate a [ProtocolContext][opentrons.protocol_api.ProtocolContext] and pass it to the `run` function you just defined:
+Since a typical protocol only *defines* the `run()` function but doesn't call it, this won't immediately cause the robot to move. To begin the run, instantiate a `ProtocolContext` and pass it to the `run()` function you just defined:
 
 ```python
 protocol = opentrons.execute.get_protocol_api("|apiLevel|")
@@ -62,7 +63,8 @@ For advanced control applications, do the following to calculate and apply labwa
 4. Add the offsets to your code with [`set_offset()`][opentrons.protocol_api.labware.Labware.set_offset].
 
 Creating the dummy protocol requires you to:
-- Use the `metadata` or `requirements` dictionary to specify the API version. (See [API versioning](versioning.md#v2-versioning) for details.) Use the same API version as you did in [`get_protocol_api()`][opentrons.execute.get_protocol_api].
+
+- Use the `metadata` or `requirements` dictionary to specify the API version. (See [Versioning](versioning.md) for details.) Use the same API version as you did in [`get_protocol_api()`][opentrons.execute.get_protocol_api].
 - Define a `run()` function.
 - Load all of your labware in their initial locations.
 - Load your smallest capacity pipette and specify its `tip_racks`.
@@ -86,8 +88,10 @@ Import your protocol in the Opentrons App. In run setup, click **Labware offsets
 ```python
 labware_1 = protocol.load_labware("opentrons_96_tiprack_300ul", location="1")
 labware_1.set_offset(x=0.00, y=0.00, z=0.00)
+
 labware_2 = protocol.load_labware("nest_12_reservoir_15ml", location="2")
 labware_2.set_offset(x=0.10, y=0.20, z=0.30)
+
 labware_3 = protocol.load_labware("nest_96_wellplate_200ul_flat", location="3")
 labware_3.set_offset(x=0.10, y=0.20, z=0.30)
 ```
@@ -104,8 +108,8 @@ Once you've executed this code in Jupyter Notebook, all subsequent positional ca
 
 Keep in mind that `set_offset()` commands will override any labware offsets set by running Labware Position Check in the Opentrons App. In Flex protocols, you should only reuse labware offset measurements when they apply to the *same labware type* used across the Flex deck. On the OT-2, use Labware Position Check to create and reuse labware offsets only for the *same labware type* in the *same deck slot* on the *same robot*.
 
-> [!warning]
-> Improperly reusing offset data may cause your robot to move to an unexpected position or crash against labware, which can lead to incorrect protocol execution or damage your equipment. When in doubt: run Labware Position Check again and update your code!
+!!! warning
+    Improperly reusing offset data may cause your robot to move to an unexpected position or crash against labware, which can lead to incorrect protocol execution or damage your equipment. When in doubt: run Labware Position Check again and update your code!
 
 ## Labware Offset Behavior
 
@@ -153,16 +157,16 @@ If you have custom labware definitions you want to use with Jupyter, make a new 
 
 ## Using Modules
 
-If your protocol uses [modules](new_modules.md), you need to take additional steps to make sure that Jupyter Notebook doesn't send commands that conflict with the robot server. Sending commands to modules while the robot server is running will likely cause errors, and the module commands may not execute as expected.
+If your protocol uses [modules](modules/index.md), you need to take additional steps to make sure that Jupyter Notebook doesn't send commands that conflict with the robot server. Sending commands to modules while the robot server is running will likely cause errors, and the module commands may not execute as expected.
 
 To disable the robot server, open a Jupyter terminal session by going to **New > Terminal** and run `systemctl stop opentrons-robot-server`. Then you can run code from cells in your notebook as usual. When you are done using Jupyter Notebook, you should restart the robot server with `systemctl start opentrons-robot-server`.
 
-> [!note]
-> While the robot server is stopped, the robot will display as unavailable in the Opentrons App. If you need to control the robot or its attached modules through the app, you need to restart the robot server and wait for the robot to appear as available in the app.
+!!! note
+    While the robot server is stopped, the robot will display as unavailable in the Opentrons App. If you need to control the robot or its attached modules through the app, you need to restart the robot server and wait for the robot to appear as available in the app.
 
 ## Command Line
 
-The robot's command line is accessible either by going to **New > Terminal** in Jupyter or [via SSH](https://support.opentrons.com/s/article/Connecting-to-your-OT-2-with-SSH).
+The robot's command line is accessible either by going to **New > Terminal** in Jupyter or [via SSH][command-line-operation-over-ssh].
 
 To execute a protocol from the robot's command line, copy the protocol file to the robot with `scp` and then run the protocol with `opentrons_execute`:
 
