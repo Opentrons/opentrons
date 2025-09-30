@@ -4,10 +4,7 @@ import { beforeAll, describe, expect, it } from 'vitest'
 
 import { i18n } from '../../localization'
 import { getLatestCommandTypeList } from '../testHelpers'
-import {
-  COMMANDS_WITHOUT_SUMMARIES,
-  useCommandTypeSummaries,
-} from '../useCommandTypeSummaries'
+import { useCommandTypeSummaries } from '../useCommandTypeSummaries'
 
 describe('useCommandTypeSummaries', () => {
   beforeAll(async () => {
@@ -44,11 +41,7 @@ describe('useCommandTypeSummaries', () => {
 
   it('returns translations for all command types in the latest schema', async () => {
     const commandTypes = await getLatestCommandTypeList()
-    const filteredCommands = commandTypes.filter(type => {
-      const [command] = type.split('/')
-      return !COMMANDS_WITHOUT_SUMMARIES.includes(command)
-    })
-    for (const cmd of filteredCommands) {
+    for (const cmd of commandTypes) {
       const { result } = renderHook(() => useCommandTypeSummaries(cmd), {
         wrapper: ({ children }) => (
           <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
