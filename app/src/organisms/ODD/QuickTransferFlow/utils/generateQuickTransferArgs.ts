@@ -561,7 +561,8 @@ export function generateQuickTransferArgs(
       const distributeStepArguments: DistributeArgs = {
         ...commonFields,
         commandCreatorFnName: 'distribute',
-        disposalVolume: quickTransferState.disposalVolume,
+        disposalVolume:
+          quickTransferState.disposalVolumeDispenseSettings?.volume ?? null,
         mixBeforeAspirate:
           quickTransferState.mixOnAspirate != null
             ? {
@@ -571,7 +572,7 @@ export function generateQuickTransferArgs(
             : null,
         sourceWell: sourceWells[0],
         destWells,
-        conditioningVolume: null,
+        conditioningVolume: quickTransferState.conditionAspirate ?? null,
       }
       return {
         stepArgs: distributeStepArguments,
