@@ -848,6 +848,7 @@ class OT3Simulator(FlexBackend):
         max_allowed_grip_error: float,
         hard_limit_lower: float,
         hard_limit_upper: float,
+        legacy_grip_check: bool = False,
     ) -> None:
         # This is a (pretty bad) simulation of the gripper actually gripping something,
         # but it should work.

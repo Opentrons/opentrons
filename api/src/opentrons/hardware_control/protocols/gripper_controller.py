@@ -41,6 +41,7 @@ class GripperController(Protocol):
         expected_grip_width: float,
         grip_width_uncertainty_wider: float,
         grip_width_uncertainty_narrower: float,
+        legacy_grip_check: bool = False,
     ) -> None:
         """Ensure that a gripper pickup succeeded."""
 
