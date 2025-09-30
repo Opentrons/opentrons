@@ -97,7 +97,7 @@
       "title": "Pause until Heater-Shaker reaches {{temperature}}\u00a0˚C"
     },
     "legacy": {
-      "body": "Add a pause step to wait until the {{module}} reaches {{temperature}} °C. Click Skip to continue to the next protocol step without pausing.",
+      "body": "Add a pause step to wait until the {{module}} reaches {{temp}} °C. Click Skip to continue to the next protocol step without pausing.",
       "skip_pause_step": "Skip pause step",
       "add_pause_step": "Add pause step",
       "title": "Pause protocol until {{module}} reaches {{temp}} °C?"
