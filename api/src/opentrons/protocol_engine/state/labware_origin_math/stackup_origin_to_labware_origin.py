@@ -49,6 +49,7 @@ from opentrons.protocol_engine.types import (
     OnLabwareLocation,
     LabwareMovementOffsetData,
     LabwareOffsetVector,
+    WASTE_CHUTE_LOCATION,
 )
 
 _OFFSET_ON_TC_OT2 = Point(x=0, y=0, z=10.7)
@@ -174,9 +175,13 @@ def _get_stackup_origin_to_lw_origin(
             slot_name=slot_name,
             is_topmost_labware=False,
         )
+    elif location == WASTE_CHUTE_LOCATION:
+        raise LabwareNotOnDeckError(
+            f"Cannot access {definition.metadata.displayName} because it is the waste chute."
+        )
     else:
         raise LabwareNotOnDeckError(
-            "Cannot access labware since it is not on the deck. "
+            f"Cannot access {definition.metadata.displayName} since it is not on the deck. "
             "Either it has been loaded off-deck or its been moved off-deck."
         )
 

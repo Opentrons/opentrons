@@ -52,6 +52,7 @@ from ..types import (
     LabwareOffsetLocationSequence,
     LegacyLabwareOffsetLocation,
     InStackerHopperLocation,
+    WASTE_CHUTE_LOCATION,
     LabwareLocation,
     LoadedLabware,
     ModuleLocation,
@@ -346,9 +347,14 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
         if isinstance(new_location, AddressableAreaLocation) and (
             fixture_validation.is_trash(new_location.addressableAreaName)
         ):
-            # If a labware has been moved into a waste chute it's been chuted away and is now technically off deck
+            # If a labware has been moved into trash and is now technically off deck
             new_location = OFF_DECK_LOCATION
-
+        elif isinstance(
+            new_location, AddressableAreaLocation
+        ) and fixture_validation.is_gripper_waste_chute(
+            new_location.addressableAreaName
+        ):
+            new_location = WASTE_CHUTE_LOCATION
         self._state.labware_by_id[labware_id].location = new_location
 
     def _set_labware_location(self, state_update: update_types.StateUpdate) -> None:
