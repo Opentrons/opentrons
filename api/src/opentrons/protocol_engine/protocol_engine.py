@@ -391,6 +391,13 @@ class ProtocolEngine:
             module_model, serial
         ):
             return False
+
+        if self._state_store.commands.get_is_terminal():
+            # Do not stop multiple times; it will be common for this action to fire
+            # many times when a module enters an error state, and we don't want to do
+            # the stop behavior over and over
+            return False
+
         self._stop_from_asynchronous_error()
         # like self.request_stop, and unlike self.estop(), we must explicitly request that the
         # hardware stops execution, since not all asynchronous errors will cause the hardware
