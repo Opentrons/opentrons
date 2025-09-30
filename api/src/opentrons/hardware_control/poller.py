@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 from typing import AsyncGenerator, List, Optional
 from opentrons.hardware_control.modules.errors import AbsorbanceReaderDisconnectedError
 from opentrons_shared_data.errors.exceptions import ModuleCommunicationError
+from opentrons.drivers.asyncio.communication.errors import SerialException
 
 
 log = logging.getLogger(__name__)
@@ -94,6 +95,12 @@ class Poller:
         except Exception:
             log.exception("Exception in reader callback")
 
+    def _complete_all(
+        self, exc: Exception | None, previous: List["asyncio.Future[None]"]
+    ) -> None:
+        for waiter in previous:
+            Poller._set_waiter_complete(waiter, exc)
+
     async def _poll_once(self) -> None:
         """Trigger a single read, notifying listeners of success or error."""
         previous_waiters = self._poll_waiters
@@ -105,14 +112,15 @@ class Poller:
         except asyncio.CancelledError:
             raise
         except AbsorbanceReaderDisconnectedError as e:
-            for waiter in previous_waiters:
-                Poller._set_waiter_complete(waiter, None)
             self._error_callback(e)
+            self._complete_all(e, previous_waiters)
+        except SerialException as se:
+            log.error(f"Polling gcode error: {se}")
+            self._error_callback(se)
+            self._complete_all(se, previous_waiters)
         except Exception as e:
             log.exception("Polling exception")
             self._error_callback(e)
-            for waiter in previous_waiters:
-                Poller._set_waiter_complete(waiter, e)
+            self._complete_all(e, previous_waiters)
         else:
-            for waiter in previous_waiters:
-                Poller._set_waiter_complete(waiter)
+            self._complete_all(None, previous_waiters)
