@@ -10,14 +10,15 @@ Examples on this page are in tabs so you can quickly move back and forth to see 
 
 Flex requires you to specify an `apiLevel` of 2.15 or higher. If your OT-2 protocol specified `apiLevel` in the `metadata` dictionary, it's best to move it to the `requirements` dictionary. You can't specify it in both places, or the API will raise an error.
 
-> [!note]
-> Consult the [list of changes in API versions](versioning.md#version-notes) to see what effect raising the `apiLevel` will have. If you increased it by multiple minor versions to get your protocol running on Flex, make sure that your protocol isn't using removed commands or commands whose behavior has changed in a way that may affect your scientific results.
+!!! note
+    Consult the [list of changes in API versions][changes-in-api-versions] to see what effect raising the `apiLevel` will have. If you increased it by multiple minor versions to get your protocol running on Flex, make sure that your protocol isn't using removed commands or commands whose behavior has changed in a way that may affect your scientific results.
 
 You also need to specify `"robotType": "Flex"`. If you omit `robotType` in the `requirements` dictionary, the API will assume the protocol is designed for the OT-2.
 
 === "Original OT-2 code"
     ```python
     from opentrons import protocol_api
+
     metadata = {
         "protocolName": "My Protocol",
         "description": "This protocol uses the OT-2",
@@ -28,19 +29,21 @@ You also need to specify `"robotType": "Flex"`. If you omit `robotType` in the `
 === "Updated Flex code"
     ```python
     from opentrons import protocol_api
+
     metadata = {
         "protocolName": "My Protocol",
         "description": "This protocol uses the Flex",
     }
+
     requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
     ```
 
 ## Pipettes and Tip-rack Load Names
 
-Flex uses different types of pipettes and tip racks than OT-2, which have their own load names in the API. If possible, load Flex pipettes of the same capacity or larger than the OT-2 pipettes. See the [list of pipette API load names](new_pipette.md#new-pipette-models) for the valid values of `instrument_name` in Flex protocols. And check [Labware Library](https://labware.opentrons.com) or the Opentrons App for the load names of Flex tip racks.
+Flex uses different types of pipettes and tip racks than OT-2, which have their own load names in the API. If possible, load Flex pipettes of the same capacity or larger than the OT-2 pipettes. See the [list of pipette API load names](pipettes/loading.md#api-load-names) for the valid values of `instrument_name` in Flex protocols. And check [Labware Library](https://labware.opentrons.com) or the Opentrons App for the load names of Flex tip racks.
 
-> [!note]
-> If you use smaller capacity tips than in the OT-2 protocol, you may need to make further adjustments to avoid running out of tips. Also, the protocol may have more steps and take longer to execute.
+!!! note
+    If you use smaller capacity tips than in the OT-2 protocol, you may need to make further adjustments to avoid running out of tips. Also, the protocol may have more steps and take longer to execute.
 
 This example converts OT-2 code that uses a P300 Single-Channel GEN2 pipette and 300 µL tips to Flex code that uses a Flex 1-Channel 1000 µL pipette and 1000 µL tips.
 
@@ -64,7 +67,7 @@ This example converts OT-2 code that uses a P300 Single-Channel GEN2 pipette and
 
 ## Trash Container
 
-OT-2 protocols always have a [`fixed_trash()`][opentrons.protocol_api.ProtocolContext.fixed_trash] in slot 12. In Flex protocols specifying API version 2.16 or later, you need to [load a trash bin](moving_labware.md#configure-trash-bin). Put it in slot A3 to match the physical position of the OT-2 fixed trash:
+OT-2 protocols always have a [`fixed_trash`][opentrons.protocol_api.ProtocolContext.fixed_trash] in slot 12. In Flex protocols specifying API version 2.16 or later, you need to [load a trash bin](deck-slots.md#trash-bin). Put it in slot A3 to match the physical position of the OT-2 fixed trash:
 
 ```python
 trash = protocol.load_trash_bin("A3")
@@ -72,7 +75,7 @@ trash = protocol.load_trash_bin("A3")
 
 ## Deck Slot Labels
 
-It's good practice to update numeric labels for [deck slots](deck_slots.md) (which match the labels on an OT-2) to coordinate ones (which match the labels on Flex). This is an optional step, since the two formats are interchangeable.
+It's good practice to update numeric labels for [deck slots](deck-slots.md) (which match the labels on an OT-2) to coordinate ones (which match the labels on Flex). This is an optional step, since the two formats are interchangeable.
 
 For example, the code in the previous section changed the location of the tip rack from `1` to `"D1"`.
 
@@ -85,7 +88,7 @@ If your OT-2 protocol uses older generations of the Temperature Module or Thermo
 
 The Heater-Shaker Module only has one generation, `heaterShakerModuleV1`, which is compatible with Flex and OT-2.
 
-The Magnetic Module is not compatible with Flex. For protocols that load `magnetic module`, `magdeck`, or `magnetic module gen2`, you will need to make further modifications to use the [Magnetic Block](modules/magnetic_block.md) and Flex Gripper instead. This will require reworking some of your protocol steps, and you should verify that your new protocol design achieves similar results.
+The Magnetic Module is not compatible with Flex. For protocols that load `magnetic module`, `magdeck`, or `magnetic module gen2`, you will need to make further modifications to use the [Magnetic Block](modules/magnetic-block.md) and Flex Gripper instead. This will require reworking some of your protocol steps, and you should verify that your new protocol design achieves similar results.
 
 This simplified example, taken from a DNA extraction protocol, shows how using the Flex Gripper and the Magnetic Block can save time. Instead of pipetting an entire plate's worth of liquid from the Heater-Shaker to the Magnetic Module and then engaging the module, the gripper moves the plate to the Magnetic Block in one step.
 
@@ -94,6 +97,7 @@ This simplified example, taken from a DNA extraction protocol, shows how using t
     hs_mod.set_and_wait_for_shake_speed(2000)
     protocol.delay(minutes=5)
     hs_mod.deactivate_shaker()
+
     for i in sample_plate.wells():
         # mix, transfer, and blow-out all samples
         pipette.pick_up_tip()
@@ -107,7 +111,9 @@ This simplified example, taken from a DNA extraction protocol, shows how using t
         pipette.dispense(pipette.current_volume,mag_plate[i])
         pipette.blow_out(mag_plate[i].bottom(0.5))
         pipette.drop_tip()
+
     mag_mod.engage()
+
     # perform elution steps
     ```
 
@@ -116,9 +122,11 @@ This simplified example, taken from a DNA extraction protocol, shows how using t
     hs_mod.set_and_wait_for_shake_speed(2000)
     protocol.delay(minutes=5)
     hs_mod.deactivate_shaker()
+
     # move entire plate
     # no pipetting from Heater-Shaker needed
     hs_mod.open_labware_latch()
     protocol.move_labware(sample_plate, mag_block, use_gripper=True)
+
     # perform elution steps
     ```
