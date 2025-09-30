@@ -291,6 +291,47 @@ def test_execute_profile_above_221(
     )
 
 
+def test_start_execute_profile(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: ThermocyclerModuleCore,
+) -> None:
+    """It should run a thermocycler profile with the engine client and return an EngineTaskCore."""
+    task_mock = decoy.mock(cls=EngineTaskCore)
+    decoy.when(
+        mock_engine_client.execute_command_without_recovery(
+            cmd.thermocycler.StartRunExtendedProfileParams(
+                moduleId="1234",
+                profileElements=[
+                    cmd.thermocycler.ProfileCycle(
+                        repetitions=2,
+                        steps=[
+                            cmd.thermocycler.ProfileStep(
+                                celsius=45.6, holdSeconds=12.3, rampRate=0.0
+                            ),
+                            cmd.thermocycler.ProfileStep(
+                                celsius=78.9, holdSeconds=45.6, rampRate=1.0
+                            ),
+                        ],
+                    )
+                ],
+                blockMaxVolumeUl=25,
+            )
+        )
+    ).then_return(cmd.thermocycler.StartRunExtendedProfileResult(taskId="taskId"))
+    task_mock._id = "taskId"
+    result = subject.start_execute_profile(
+        steps=[
+            {"temperature": 45.6, "hold_time_seconds": 12.3, "ramp_rate": 0.0},
+            {"temperature": 78.9, "hold_time_seconds": 45.6, "ramp_rate": 1.0},
+        ],
+        repetitions=2,
+        block_max_volume=25,
+    )
+    assert isinstance(result, EngineTaskCore)
+    assert result._id == "taskId"
+
+
 def test_deactivate_lid(
     decoy: Decoy, mock_engine_client: EngineClient, subject: ThermocyclerModuleCore
 ) -> None:

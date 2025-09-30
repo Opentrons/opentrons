@@ -8,6 +8,7 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+import { FLEX_96_CHANNEL_PIPETTES } from '@opentrons/shared-data'
 
 import {
   getEnablePartialTipSupport,
@@ -56,7 +57,8 @@ export function FirstStepMoveLiquidTools({
 
   const { pipette, tipRack } = propsForFields
   const is96Channel =
-    pipette.value != null && pipettes[String(pipette.value)].name === 'p1000_96'
+    pipette.value != null &&
+    FLEX_96_CHANNEL_PIPETTES.includes(pipettes[String(pipette.value)].name)
   const is8Channel =
     propsForFields.pipette.value != null &&
     pipettes[String(propsForFields.pipette.value)].spec.channels === 8

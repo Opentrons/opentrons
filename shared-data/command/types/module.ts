@@ -21,6 +21,7 @@ export type ModuleRunTimeCommand =
   | TCDeactivateBlockRunTimeCommand
   | TCDeactivateLidRunTimeCommand
   | TCRunProfileRunTimeCommand
+  | TCStartRunExtendedProfileRunTimeCommand
   | TCRunExtendedProfileRunTimeCommand
   | TCAwaitProfileCompleteRunTimeCommand
   | HeaterShakerSetTargetTemperatureRunTimeCommand
@@ -58,6 +59,7 @@ export type ModuleCreateCommand =
   | TCDeactivateLidCreateCommand
   | TCRunProfileCreateCommand
   | TCRunExtendedProfileCreateCommand
+  | TCStartRunExtendedProfileCreateCommand
   | TCAwaitProfileCompleteCreateCommand
   | HeaterShakerWaitForTemperatureCreateCommand
   | HeaterShakerSetAndWaitForShakeSpeedCreateCommand
@@ -220,6 +222,16 @@ export interface TCRunProfileCreateCommand extends CommonCommandCreateInfo {
 export interface TCRunProfileRunTimeCommand
   extends CommonCommandRunTimeInfo,
     TCRunProfileCreateCommand {
+  result?: any
+}
+export interface TCStartRunExtendedProfileCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'thermocycler/startRunExtendedProfile'
+  params: TCExtendedProfileParams
+}
+export interface TCStartRunExtendedProfileRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    TCStartRunExtendedProfileCreateCommand {
   result?: any
 }
 export interface TCRunExtendedProfileCreateCommand
@@ -409,6 +421,12 @@ export interface TCProfileCycle {
 }
 
 export interface TCExtendedProfileParams {
+  moduleId: string
+  profileElements: Array<TCProfileCycle | AtomicProfileStep>
+  blockMaxVolumeUl?: number
+}
+
+export interface TCStartExtendedProfileParams {
   moduleId: string
   profileElements: Array<TCProfileCycle | AtomicProfileStep>
   blockMaxVolumeUl?: number

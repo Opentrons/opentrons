@@ -690,6 +690,10 @@ class ThermocyclerContext(ModuleContext):
         :param block_max_volume: The greatest volume of liquid contained in any
                                  individual well of the loaded labware, in µL.
                                  If not specified, the default is 25 µL.
+                                 After API version 2.27 it will attempt to use
+                                 the liquid tracking of the labware first and
+                                 then fall back to the 25 if there is no probed
+                                 or loaded liquid.
 
         .. note::
 
@@ -700,6 +704,8 @@ class ThermocyclerContext(ModuleContext):
         seconds = validation.ensure_hold_time_seconds(
             seconds=hold_time_seconds, minutes=hold_time_minutes
         )
+        if self._api_version >= APIVersion(2, 27) and block_max_volume is None:
+            block_max_volume = self._get_current_labware_max_vol()
         task = self._core.set_target_block_temperature(
             celsius=temperature,
             hold_time_seconds=seconds,
@@ -770,6 +776,39 @@ class ThermocyclerContext(ModuleContext):
             repetitions=repetitions,
             block_max_volume=block_max_volume,
         )
+
+    @publish(command=cmds.thermocycler_start_execute_profile)
+    @requires_version(2, 27)
+    def start_execute_profile(
+        self,
+        steps: List[ThermocyclerStep],
+        repetitions: int,
+        block_max_volume: Optional[float] = None,
+    ) -> Task:
+        """Start a Thermocycler profile and return a :py:class:`Task` representing its execution.
+        Profile is defined as a cycle of ``steps``, for a given number of ``repetitions``.
+
+        Returns a task object that represents concurrent execution of the profile.
+        Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for the preheat to complete.
+
+        :param steps: List of steps that make up a single cycle.
+                      Each list item should be a dictionary that maps to the parameters
+                      of the :py:meth:`set_block_temperature` method. The dictionary's
+                      keys must be ``temperature`` and one or both of
+                      ``hold_time_seconds`` and ``hold_time_minutes``.
+        :param repetitions: The number of times to repeat the cycled steps.
+        :param block_max_volume: The greatest volume of liquid contained in any
+                                 individual well of the loaded labware, in µL.
+                                 If not specified, the default is 25 µL.
+        """
+        repetitions = validation.ensure_thermocycler_repetition_count(repetitions)
+        validated_steps = validation.ensure_thermocycler_profile_steps(steps)
+        task = self._core.start_execute_profile(
+            steps=validated_steps,
+            repetitions=repetitions,
+            block_max_volume=block_max_volume,
+        )
+        return Task(api_version=self._api_version, core=task)
 
     @publish(command=cmds.thermocycler_deactivate_lid)
     @requires_version(2, 0)
@@ -891,6 +930,19 @@ class ThermocyclerContext(ModuleContext):
     def current_step_index(self) -> Optional[int]:
         """Index of the current step within the current cycle"""
         return self._core.get_current_step_index()
+
+    def _get_current_labware_max_vol(self) -> Optional[float]:
+        max_vol: Optional[float] = None
+        if self.labware is not None:
+            for well in self.labware.wells():
+                if well.has_tracked_liquid():
+                    # make sure that max vol is a float first if we have liquid
+                    max_vol = 0.0 if max_vol is None else max_vol
+                    well_vol = well.current_liquid_volume()
+                    # ignore simulated probe results
+                    if isinstance(well_vol, float):
+                        max_vol = max(max_vol, well_vol)
+        return max_vol
 
 
 class HeaterShakerContext(ModuleContext):

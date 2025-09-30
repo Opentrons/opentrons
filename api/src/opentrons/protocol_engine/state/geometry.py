@@ -1909,6 +1909,15 @@ class GeometryView:
         else:
             return initial_handling_height
 
+    def well_has_tracked_liquid(
+        self,
+        labware_id: str,
+        well_name: str,
+    ) -> bool:
+        """Returns true if this well has had a liquid loaded or a probe result."""
+        last_updated = self._wells.get_last_liquid_update(labware_id, well_name)
+        return last_updated is not None
+
     def get_current_well_volume(
         self,
         labware_id: str,
@@ -2288,6 +2297,12 @@ class GeometryView:
             ):
                 raise errors.LocationNotAccessibleByPipetteError(
                     f"Cannot move pipette to {labware.loadName} because it is on a stacker shuttle"
+                )
+            elif fixture_validation.is_gripper_waste_chute(
+                labware_location.addressableAreaName
+            ):
+                raise errors.LocationNotAccessibleByPipetteError(
+                    f"Cannot move pipette to {labware.loadName} because it is in the waste chute"
                 )
         elif (
             labware_location == OFF_DECK_LOCATION or labware_location == SYSTEM_LOCATION

@@ -151,6 +151,10 @@ class LegacyWellCore(AbstractWellCore):
         """Return the volume contained in a well at any height."""
         return 0.0
 
+    def has_tracked_liquid(self) -> bool:
+        """Return true if liquid has been loaded or probed."""
+        return False
+
     # TODO(mc, 2022-10-28): is this used and/or necessary?
     def __repr__(self) -> str:
         """Use the well's display name as its repr."""
