@@ -32,6 +32,7 @@ from ..types import (
     LabwareLocation,
     OnDeckLabwareLocation,
     GripperMoveType,
+    AccessibleByGripperLocation,
 )
 
 if TYPE_CHECKING:
@@ -95,7 +96,7 @@ class LabwareMovementHandler:
         *,
         labware_id: str,
         current_location: OnDeckLabwareLocation,
-        new_location: OnDeckLabwareLocation,
+        new_location: AccessibleByGripperLocation,
         user_pick_up_offset: Point,
         user_drop_offset: Point,
         post_drop_slide_offset: Optional[Point],
@@ -108,7 +109,7 @@ class LabwareMovementHandler:
         *,
         labware_definition: LabwareDefinition,
         current_location: OnDeckLabwareLocation,
-        new_location: OnDeckLabwareLocation,
+        new_location: AccessibleByGripperLocation,
         user_pick_up_offset: Point,
         user_drop_offset: Point,
         post_drop_slide_offset: Optional[Point],
@@ -122,7 +123,7 @@ class LabwareMovementHandler:
         labware_id: str | None = None,
         labware_definition: LabwareDefinition | None = None,
         current_location: OnDeckLabwareLocation,
-        new_location: OnDeckLabwareLocation,
+        new_location: AccessibleByGripperLocation,
         user_pick_up_offset: Point,
         user_drop_offset: Point,
         post_drop_slide_offset: Optional[Point],

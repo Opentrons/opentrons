@@ -68,6 +68,8 @@ from ..types import (
     CurrentPipetteLocation,
     TipGeometry,
     InStackerHopperLocation,
+    WASTE_CHUTE_LOCATION,
+    AccessibleByGripperLocation,
     OnDeckLabwareLocation,
     AddressableAreaLocation,
     AddressableOffsetVector,
@@ -396,6 +398,11 @@ class GeometryView:
                 "Labware does not have a slot or module associated with it"
                 " since it is no longer on the deck."
             )
+        elif location == WASTE_CHUTE_LOCATION:
+            raise errors.LabwareNotOnDeckError(
+                "Labware does not have a slot or module associated with it"
+                " since it is in the waste chute."
+            )
 
     def get_labware_origin_position(self, labware_id: str) -> Point:
         """Get the deck coordinates of a labware's origin.
@@ -459,7 +466,6 @@ class GeometryView:
                 current_definition = self._labware.get_definition(current_labware_id)
             else:
                 break
-
         return definitions_locations_top_to_bottom
 
     def _get_stackup_module_parent_to_child_offset(
@@ -508,6 +514,10 @@ class GeometryView:
                     return self._addressable_areas.get_slot_definition(
                         current_location.slotName.id
                     )
+                elif current_location == WASTE_CHUTE_LOCATION:
+                    return self._addressable_areas.get_addressable_area(
+                        "gripperWasteChute"
+                    )
                 else:
                     raise errors.InvalidLabwarePositionError(
                         f"Cannot get ancestor slot of location {current_location}"
@@ -522,6 +532,8 @@ class GeometryView:
             return self._modules.get_provided_addressable_area(location.moduleId)
         elif isinstance(location, OnLabwareLocation):
             return self.get_ancestor_addressable_area_name(location.labwareId)
+        elif location == WASTE_CHUTE_LOCATION:
+            return "gripperWasteChute"
         else:
             raise errors.InvalidLabwarePositionError(
                 f"Cannot get ancestor slot of location {location}"
@@ -833,6 +845,11 @@ class GeometryView:
                 f"Labware {self._labware.get_display_name(labware_id)} does not have a slot associated with it"
                 f" since it is no longer on the deck."
             )
+        elif labware.location == WASTE_CHUTE_LOCATION:
+            raise errors.LabwareNotOnDeckError(
+                f"Labware {self._labware.get_display_name(labware_id)} does not have a slot associated with it"
+                f" since it is in the waste chute."
+            )
         else:
             _LOG.error(
                 f"Unhandled location type in get_ancestor_slot_name: {labware.location}"
@@ -1018,9 +1035,7 @@ class GeometryView:
     def get_labware_grip_point(
         self,
         labware_definition: LabwareDefinition,
-        location: Union[
-            DeckSlotLocation, ModuleLocation, OnLabwareLocation, AddressableAreaLocation
-        ],
+        location: AccessibleByGripperLocation,
         move_type: GripperMoveType,
         user_additional_offset: Point | None,
     ) -> Point:
@@ -1047,9 +1062,7 @@ class GeometryView:
     def _get_aa_origin_to_nominal_grip_point(
         self,
         labware_definition: LabwareDefinition,
-        location: Union[
-            DeckSlotLocation, ModuleLocation, OnLabwareLocation, AddressableAreaLocation
-        ],
+        location: AccessibleByGripperLocation,
         move_type: GripperMoveType,
     ) -> Point:
         """Get the nominal grip point of a labware.
@@ -1440,9 +1453,16 @@ class GeometryView:
     def ensure_valid_gripper_location(
         location: LabwareLocation,
     ) -> Union[
-        DeckSlotLocation, ModuleLocation, OnLabwareLocation, AddressableAreaLocation
+        DeckSlotLocation,
+        ModuleLocation,
+        OnLabwareLocation,
+        AddressableAreaLocation,
     ]:
         """Ensure valid on-deck location for gripper, otherwise raise error."""
+        if location == WASTE_CHUTE_LOCATION:
+            raise errors.LabwareMovementNotAllowedError(
+                "Labware movements out of the waste chute are not supported using the gripper."
+            )
         if not isinstance(
             location,
             (
@@ -1451,6 +1471,28 @@ class GeometryView:
                 OnLabwareLocation,
                 AddressableAreaLocation,
             ),
+        ):
+            raise errors.LabwareMovementNotAllowedError(
+                "Off-deck labware movements are not supported using the gripper."
+            )
+        return location
+
+    @staticmethod
+    def ensure_valid_new_gripper_location(
+        location: LabwareLocation,
+    ) -> AccessibleByGripperLocation:
+        """Ensure valid on-deck location for gripper, otherwise raise error."""
+        if (
+            not isinstance(
+                location,
+                (
+                    DeckSlotLocation,
+                    ModuleLocation,
+                    OnLabwareLocation,
+                    AddressableAreaLocation,
+                ),
+            )
+            and location != WASTE_CHUTE_LOCATION
         ):
             raise errors.LabwareMovementNotAllowedError(
                 "Off-deck labware movements are not supported using the gripper."
@@ -2247,17 +2289,15 @@ class GeometryView:
                 raise errors.LocationNotAccessibleByPipetteError(
                     f"Cannot move pipette to {labware.loadName} because it is on a stacker shuttle"
                 )
-            elif fixture_validation.is_gripper_waste_chute(
-                labware_location.addressableAreaName
-            ):
-                raise errors.LocationNotAccessibleByPipetteError(
-                    f"Cannot move pipette to {labware.loadName} because it is in the waste chute"
-                )
         elif (
             labware_location == OFF_DECK_LOCATION or labware_location == SYSTEM_LOCATION
         ):
             raise errors.LocationNotAccessibleByPipetteError(
                 f"Cannot move pipette to {labware.loadName}, labware is off-deck."
+            )
+        elif labware_location == WASTE_CHUTE_LOCATION:
+            raise errors.LocationNotAccessibleByPipetteError(
+                f"Cannot move pipette to {labware.loadName}, labware is in waste chute."
             )
         elif isinstance(labware_location, ModuleLocation):
             module = self._modules.get(labware_location.moduleId)
