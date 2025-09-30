@@ -13,7 +13,7 @@ nav:
   - Appendices:
       - Additional Documentation: additional-docs.md
       - Open Source Software: open-source.md
-      - Warranty, Support, and Contact Information: support.md
+      - Product Support and Company Information: support.md
 
 theme:
   name: material

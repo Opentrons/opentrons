@@ -56,6 +56,6 @@ repositories include:
 
 | Repository | Description |
 | ---- | ---- |
-| [`oe-core`](https://github.com/Opentrons/oe-core) | The heart of Opentrons' [openembedded](https://www.openembedded.org/wiki/Main_Page) system definitions. |
+| [`oe-core`](https://github.com/Opentrons/oe-core) | The heart of Opentrons' [OpenEmbedded](https://www.openembedded.org/wiki/Main_Page) system definitions. |
 | [`opentrons-emulation`](https://github.com/Opentrons/opentrons-emulation) | Emulation of Opentrons robots and modules at either the hardware or firmware level. Uses [Docker](https://www.docker.com/), configuration files, and a simple command-line interface. |
 | [`opentrons-modules`](https://github.com/Opentrons/opentrons-modules) | Firmware for all Opentrons modules. |
