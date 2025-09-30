@@ -482,7 +482,7 @@ class ProtocolEngine:
             # we were paused between two commands, or imagine we were executing a waitForDuration.
             drop_tips_after_run = False
             post_run_hardware_state = PostRunHardwareState.DISENGAGE_IN_PLACE
-            if error is None:
+            if error is None and self._state_store.commands.get_error() is None:
                 error = EStopActivatedError()
 
         if error:
