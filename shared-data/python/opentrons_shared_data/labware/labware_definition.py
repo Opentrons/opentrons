@@ -115,6 +115,10 @@ class LabwareRole(str, Enum):
     system = "system"
 
 
+class Quirks(Enum):
+    legacyGripCheck = "legacyGripCheck"
+
+
 class Metadata(BaseModel):
     displayName: str
     displayCategory: DisplayCategory
