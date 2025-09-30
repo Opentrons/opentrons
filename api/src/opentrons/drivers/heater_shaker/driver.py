@@ -206,8 +206,9 @@ class HeaterShakerDriver(AbstractHeaterShakerDriver):
 
     async def get_error_state(self) -> None:
         """Raise if the module is in an error state."""
-        await self._connection.send_command(
+        await self._connection.send_multiack_command(
             command=CommandBuilder(terminator=HS_COMMAND_TERMINATOR).add_gcode(
                 gcode=GCODE.GET_ERROR_STATE
-            )
+            ),
+            acks=2,
         )
