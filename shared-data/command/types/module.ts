@@ -21,11 +21,13 @@ export type ModuleRunTimeCommand =
   | TCDeactivateBlockRunTimeCommand
   | TCDeactivateLidRunTimeCommand
   | TCRunProfileRunTimeCommand
+  | TCStartRunExtendedProfileRunTimeCommand
   | TCRunExtendedProfileRunTimeCommand
   | TCAwaitProfileCompleteRunTimeCommand
   | HeaterShakerSetTargetTemperatureRunTimeCommand
   | HeaterShakerWaitForTemperatureRunTimeCommand
   | HeaterShakerSetAndWaitForShakeSpeedRunTimeCommand
+  | HeaterShakerSetShakeSpeedRunTimeCommand
   | HeaterShakerOpenLatchRunTimeCommand
   | HeaterShakerCloseLatchRunTimeCommand
   | HeaterShakerDeactivateHeaterRunTimeCommand
@@ -57,9 +59,11 @@ export type ModuleCreateCommand =
   | TCDeactivateLidCreateCommand
   | TCRunProfileCreateCommand
   | TCRunExtendedProfileCreateCommand
+  | TCStartRunExtendedProfileCreateCommand
   | TCAwaitProfileCompleteCreateCommand
   | HeaterShakerWaitForTemperatureCreateCommand
   | HeaterShakerSetAndWaitForShakeSpeedCreateCommand
+  | HeaterShakerSetShakeSpeedCreateCommand
   | HeaterShakerOpenLatchCreateCommand
   | HeaterShakerCloseLatchCreateCommand
   | HeaterShakerDeactivateHeaterCreateCommand
@@ -220,6 +224,16 @@ export interface TCRunProfileRunTimeCommand
     TCRunProfileCreateCommand {
   result?: any
 }
+export interface TCStartRunExtendedProfileCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'thermocycler/startRunExtendedProfile'
+  params: TCExtendedProfileParams
+}
+export interface TCStartRunExtendedProfileRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    TCStartRunExtendedProfileCreateCommand {
+  result?: any
+}
 export interface TCRunExtendedProfileCreateCommand
   extends CommonCommandCreateInfo {
   commandType: 'thermocycler/runExtendedProfile'
@@ -268,6 +282,16 @@ export interface HeaterShakerSetAndWaitForShakeSpeedCreateCommand
 export interface HeaterShakerSetAndWaitForShakeSpeedRunTimeCommand
   extends CommonCommandRunTimeInfo,
     HeaterShakerSetAndWaitForShakeSpeedCreateCommand {
+  result?: any
+}
+export interface HeaterShakerSetShakeSpeedCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'heaterShaker/setShakeSpeed'
+  params: ShakeSpeedParams
+}
+export interface HeaterShakerSetShakeSpeedRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    HeaterShakerSetShakeSpeedCreateCommand {
   result?: any
 }
 export interface HeaterShakerDeactivateHeaterCreateCommand
@@ -397,6 +421,12 @@ export interface TCProfileCycle {
 }
 
 export interface TCExtendedProfileParams {
+  moduleId: string
+  profileElements: Array<TCProfileCycle | AtomicProfileStep>
+  blockMaxVolumeUl?: number
+}
+
+export interface TCStartExtendedProfileParams {
   moduleId: string
   profileElements: Array<TCProfileCycle | AtomicProfileStep>
   blockMaxVolumeUl?: number

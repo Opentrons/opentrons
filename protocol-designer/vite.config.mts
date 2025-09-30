@@ -9,16 +9,24 @@ import postCssPresetEnv from 'postcss-preset-env'
 import { defineConfig } from 'vite'
 import { analyzer } from 'vite-bundle-analyzer'
 
-import { versionForProject } from '../scripts/git-version.mjs'
+import {
+  latestLabwareVersions,
+  versionForProject,
+} from '../scripts/git-version.mjs'
 import { cssModuleSideEffect } from './cssModuleSideEffect'
 
 import type { UserConfig } from 'vite'
+
+const REQUIRED_APP_VERSION = '8.7.0' // PD requires this robot stack version or higher
 
 // eslint-disable-next-line import/no-default-export
 export default defineConfig(
   async (): Promise<UserConfig> => {
     const OT_PD_VERSION = await versionForProject('protocol-designer')
     const OT_PD_BUILD_DATE = new Date().toUTCString()
+    const OT_PD_LATEST_LABWARE_VERSIONS = await latestLabwareVersions(
+      REQUIRED_APP_VERSION
+    )
     const mode = process.env.NODE_ENV ?? 'development'
     return {
       // this makes imports relative rather than absolute
@@ -85,9 +93,15 @@ export default defineConfig(
         _FF_ENV_VARS_: getFeatureFlagEnvVars(),
         _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
         _OT_PD_BUILD_DATE_: JSON.stringify(OT_PD_BUILD_DATE),
-        _OT_PD_MIXPANEL_DEV_ID_: JSON.stringify(process.env.OT_PD_MIXPANEL_DEV_ID),
+        _OT_PD_LATEST_LABWARE_VERSIONS_: OT_PD_LATEST_LABWARE_VERSIONS,
+        _OT_PD_MIXPANEL_DEV_ID_: JSON.stringify(
+          process.env.OT_PD_MIXPANEL_DEV_ID
+        ),
         _OT_PD_MIXPANEL_ID_: JSON.stringify(process.env.OT_PD_MIXPANEL_ID),
-        _OT_PD_SENTRY_DEV_DSN_: JSON.stringify(process.env.OT_PD_SENTRY_DEV_DSN),
+        _OT_PD_REQUIRED_APP_VERSION_: JSON.stringify(REQUIRED_APP_VERSION),
+        _OT_PD_SENTRY_DEV_DSN_: JSON.stringify(
+          process.env.OT_PD_SENTRY_DEV_DSN
+        ),
         _OT_PD_SENTRY_DSN_: JSON.stringify(process.env.OT_PD_SENTRY_DSN),
         _OT_PD_VERSION_: JSON.stringify(OT_PD_VERSION),
         global: 'globalThis',

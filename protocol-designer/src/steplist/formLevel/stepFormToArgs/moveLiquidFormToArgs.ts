@@ -2,7 +2,7 @@ import {
   getAllLiquidClassDefs,
   getFlexNameConversion,
   NONE_LIQUID_CLASS_NAME,
-  WATER_LIQUID_CLASS_NAME_V2,
+  WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
@@ -89,7 +89,7 @@ const getCheckedPath = (
   const liquidClassValuesForTip = allLiquidClassDefs[
     hydratedFormData.liquidClass === NONE_LIQUID_CLASS_NAME ||
     hydratedFormData.liquidClass == null
-      ? WATER_LIQUID_CLASS_NAME_V2
+      ? WATER_LIQUID_CLASS_NAME
       : hydratedFormData.liquidClass ?? null
   ]?.byPipette
     .find(
@@ -353,11 +353,13 @@ export const moveLiquidFormToArgs = (
     nozzles,
     aspirateXOffset: aspirate_x_position ?? 0,
     aspirateYOffset: aspirate_y_position ?? 0,
-    aspirateZOffset: hydratedFormData.aspirate_mmFromBottom ?? 0,
+    aspirateZOffset:
+      hydratedFormData.aspirate_mmFromBottom ?? DEFAULT_MM_OFFSET_FROM_BOTTOM,
     aspiratePositionReference: hydratedFormData.aspirate_position_reference,
     dispenseXOffset: dispense_x_position ?? 0,
     dispenseYOffset: dispense_y_position ?? 0,
-    dispenseZOffset: hydratedFormData.dispense_mmFromBottom ?? 0,
+    dispenseZOffset:
+      hydratedFormData.dispense_mmFromBottom ?? DEFAULT_MM_OFFSET_FROM_BOTTOM,
     dispensePositionReference: hydratedFormData.dispense_position_reference,
     aspirateSubmergeSpeed: hydratedFormData.aspirate_submerge_speed ?? null,
     aspirateSubmergeXOffset: hydratedFormData.aspirate_submerge_x_position ?? 0,

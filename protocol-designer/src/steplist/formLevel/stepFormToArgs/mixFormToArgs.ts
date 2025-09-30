@@ -117,7 +117,7 @@ export const mixFormToArgs = (
     nozzles,
     xOffset: mix_x_position ?? 0,
     yOffset: mix_y_position ?? 0,
-    zOffset: mix_mmFromBottom ?? 0,
+    zOffset: mix_mmFromBottom ?? DEFAULT_MM_OFFSET_FROM_BOTTOM,
     positionReference: mix_position_reference ?? POSITION_REFERENCE_BOTTOM,
     finalPushOut:
       pushOut_checkbox && pushOut_volume != null ? pushOut_volume : 0,

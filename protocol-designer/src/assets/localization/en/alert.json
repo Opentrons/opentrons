@@ -173,11 +173,11 @@
       },
       "TIPRACK_LID_NOT_ALLOWED_ON_DECK": {
         "title": "Invalid tip rack lid position",
-        "body": "The tip rack lid is not allowed directly on a deck slot"
+        "body": "The tip rack lid is not allowed directly on a deck slot."
       },
       "NEXT_TIPRACK_HAS_LID": {
-        "title": "Lid on tip rack",
-        "body": "The next available tip rack has a lid"
+        "title": "Unable to pick up tips",
+        "body": "The next available tip rack has a lid. Remove the lid from the tip rack to pick up tips."
       }
     },
     "warning": {
