@@ -1,22 +1,4 @@
 {
-  "schemaVersion": 2,
-  "version": 1,
-  "namespace": "opentrons",
-  "metadata": {
-    "displayName": "Opentrons 15 Tube Rack with Eppendorf 15 mL",
-    "displayCategory": "tubeRack",
-    "displayVolumeUnits": "mL",
-    "tags": []
-  },
-  "brand": { "brand": "Opentrons", "brandId": ["EP0030122194"] },
-  "parameters": {
-    "format": "irregular",
-    "quirks": [],
-    "isTiprack": false,
-    "loadName": "eppendorf_15_tuberack_15ml",
-    "isMagneticModuleCompatible": false
-  },
-  "cornerOffsetFromSlot": { "x": 0, "y": 0, "z": 0 },
   "ordering": [
     ["A1", "B1", "C1"],
     ["A2", "B2", "C2"],
@@ -24,6 +6,13 @@
     ["A4", "B4", "C4"],
     ["A5", "B5", "C5"]
   ],
+  "brand": { "brand": "Opentrons", "brandId": ["EP0030122194"] },
+  "metadata": {
+    "displayName": "Opentrons 15 Tube Rack with Eppendorf 15 mL",
+    "displayCategory": "tubeRack",
+    "displayVolumeUnits": "mL",
+    "tags": []
+  },
   "dimensions": {
     "yDimension": 85.48,
     "zDimension": 125,
@@ -203,10 +192,16 @@
       "metadata": { "displayCategory": "tubeRack", "wellBottomShape": "flat" }
     }
   ],
-  "stackingOffsetWithLabware": {},
-  "stackingOffsetWithModule": {},
-  "allowedRoles": [],
-  "gripperOffsets": {},
+  "parameters": {
+    "format": "irregular",
+    "quirks": [],
+    "isTiprack": false,
+    "loadName": "eppendorf_15_tuberack_15ml",
+    "isMagneticModuleCompatible": false
+  },
+  "namespace": "opentrons",
+  "version": 1,
+  "schemaVersion": 2,
   "innerLabwareGeometry": {
     "conicalWell": {
       "sections": [

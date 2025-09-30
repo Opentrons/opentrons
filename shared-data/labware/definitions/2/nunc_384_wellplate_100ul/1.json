@@ -1,22 +1,4 @@
 {
-  "schemaVersion": 2,
-  "version": 1,
-  "namespace": "opentrons",
-  "metadata": {
-    "displayName": "Nunc 384 Well Plate 100 µL",
-    "displayCategory": "wellPlate",
-    "displayVolumeUnits": "µL",
-    "tags": []
-  },
-  "brand": { "brand": "nunc", "brandId": ["142761"] },
-  "parameters": {
-    "format": "384Standard",
-    "quirks": [],
-    "isTiprack": false,
-    "loadName": "nunc_384_wellplate_100ul",
-    "isMagneticModuleCompatible": false
-  },
-  "cornerOffsetFromSlot": { "x": 0, "y": 0, "z": 0 },
   "ordering": [
     [
       "A1",
@@ -451,6 +433,13 @@
       "P24"
     ]
   ],
+  "brand": { "brand": "nunc", "brandId": ["142761"] },
+  "metadata": {
+    "displayName": "Nunc 384 Well Plate 100 µL",
+    "displayCategory": "wellPlate",
+    "displayVolumeUnits": "µL",
+    "tags": []
+  },
   "dimensions": { "yDimension": 85.2, "zDimension": 14.4, "xDimension": 127.7 },
   "wells": {
     "A1": {
@@ -5069,10 +5058,16 @@
       "metadata": { "wellBottomShape": "flat" }
     }
   ],
-  "stackingOffsetWithLabware": {},
-  "stackingOffsetWithModule": {},
-  "allowedRoles": [],
-  "gripperOffsets": {},
+  "parameters": {
+    "format": "384Standard",
+    "quirks": [],
+    "isTiprack": false,
+    "loadName": "nunc_384_wellplate_100ul",
+    "isMagneticModuleCompatible": false
+  },
+  "namespace": "opentrons",
+  "version": 1,
+  "schemaVersion": 2,
   "innerLabwareGeometry": {
     "cuboidalWell": {
       "sections": [

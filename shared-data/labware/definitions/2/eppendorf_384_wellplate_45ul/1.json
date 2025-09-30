@@ -1,22 +1,4 @@
 {
-  "schemaVersion": 2,
-  "version": 1,
-  "namespace": "opentrons",
-  "metadata": {
-    "displayName": "Eppendorf 384 Well Plate 45 µL",
-    "displayCategory": "wellPlate",
-    "displayVolumeUnits": "µL",
-    "tags": []
-  },
-  "brand": { "brand": "eppendorf", "brandId": ["951020711"] },
-  "parameters": {
-    "format": "384Standard",
-    "quirks": [],
-    "isTiprack": false,
-    "loadName": "eppendorf_384_wellplate_45ul",
-    "isMagneticModuleCompatible": false
-  },
-  "cornerOffsetFromSlot": { "x": 0, "y": 0, "z": 0 },
   "ordering": [
     [
       "A1",
@@ -451,6 +433,13 @@
       "P24"
     ]
   ],
+  "brand": { "brand": "eppendorf", "brandId": ["951020711"] },
+  "metadata": {
+    "displayName": "Eppendorf 384 Well Plate 45 µL",
+    "displayCategory": "wellPlate",
+    "displayVolumeUnits": "µL",
+    "tags": []
+  },
   "dimensions": {
     "yDimension": 85.48,
     "zDimension": 10.65,
@@ -4689,10 +4678,16 @@
       "metadata": { "wellBottomShape": "u" }
     }
   ],
-  "stackingOffsetWithLabware": {},
-  "stackingOffsetWithModule": {},
-  "allowedRoles": [],
-  "gripperOffsets": {},
+  "parameters": {
+    "format": "384Standard",
+    "quirks": [],
+    "isTiprack": false,
+    "loadName": "eppendorf_384_wellplate_45ul",
+    "isMagneticModuleCompatible": false
+  },
+  "namespace": "opentrons",
+  "version": 1,
+  "schemaVersion": 2,
   "innerLabwareGeometry": {
     "conicalWell": {
       "sections": [

@@ -1,22 +1,4 @@
 {
-  "schemaVersion": 2,
-  "version": 1,
-  "namespace": "opentrons",
-  "metadata": {
-    "displayName": "Costar 96 Well Plate 2.2 mL",
-    "displayCategory": "wellPlate",
-    "displayVolumeUnits": "mL",
-    "tags": []
-  },
-  "brand": { "brand": "Costar", "brandId": ["3960"] },
-  "parameters": {
-    "format": "96Standard",
-    "quirks": [],
-    "isTiprack": false,
-    "loadName": "costar_96_wellplate_2.2ml",
-    "isMagneticModuleCompatible": false
-  },
-  "cornerOffsetFromSlot": { "x": 0, "y": 0, "z": 0 },
   "ordering": [
     ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
     ["A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2"],
@@ -31,6 +13,13 @@
     ["A11", "B11", "C11", "D11", "E11", "F11", "G11", "H11"],
     ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"]
   ],
+  "brand": { "brand": "Costar", "brandId": ["3960"] },
+  "metadata": {
+    "displayName": "Costar 96 Well Plate 2.2 mL",
+    "displayCategory": "wellPlate",
+    "displayVolumeUnits": "mL",
+    "tags": []
+  },
   "dimensions": {
     "yDimension": 85.47,
     "zDimension": 43.82,
@@ -1197,10 +1186,16 @@
       "metadata": { "wellBottomShape": "v" }
     }
   ],
-  "stackingOffsetWithLabware": {},
-  "stackingOffsetWithModule": {},
-  "allowedRoles": [],
-  "gripperOffsets": {},
+  "parameters": {
+    "format": "96Standard",
+    "quirks": [],
+    "isTiprack": false,
+    "loadName": "costar_96_wellplate_2.2ml",
+    "isMagneticModuleCompatible": false
+  },
+  "namespace": "opentrons",
+  "version": 1,
+  "schemaVersion": 2,
   "innerLabwareGeometry": {
     "cuboidalWell": {
       "sections": [
