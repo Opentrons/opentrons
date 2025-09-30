@@ -6,6 +6,7 @@ nav:
   - Safety and Regulatory Information: regulatory.md
   - Installation and Relocation:
       - Installation Requirements: ot2-installation/requirements.md
+      - Unboxing and Assembly: ot2-installation/unboxing.md
   - System Description: system-description.md
   - Instruments and Modules: modules.md
   - Labware: labware.md
