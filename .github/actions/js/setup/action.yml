@@ -47,12 +47,5 @@ runs:
           PLATFORM="win32-x64"
         fi
         export CYPRESS_INSTALL_BINARY="https://github.com/Opentrons/package-mirror/releases/download/cypress-${CYPRESS_VERSION}/cypress-${CYPRESS_VERSION}-${PLATFORM}.zip"
-        export DEBUG=cypress:cli,cypress:binary,cypress:download
-        echo "🔍 Cypress ${CYPRESS_VERSION} from package-mirror"
-        echo "🔍 Platform: $PLATFORM"
-        echo "🔍 Download URL: $CYPRESS_INSTALL_BINARY"
-        echo "🔍 URL length: ${#CYPRESS_INSTALL_BINARY}"
-        echo "🔍 Testing URL availability..."
-        curl -f -s -o /dev/null "$CYPRESS_INSTALL_BINARY" && echo "✅ URL is accessible" || echo "❌ URL not accessible"
         
         make setup-js
