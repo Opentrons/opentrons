@@ -26,6 +26,7 @@ from opentrons.protocol_engine import (
     OnLabwareLocation,
     AddressableAreaLocation,
     InStackerHopperLocation,
+    WASTE_CHUTE_LOCATION,
     OFF_DECK_LOCATION,
     SYSTEM_LOCATION,
 )
@@ -241,11 +242,7 @@ def _map_labware(
     Tuple[Union[DeckSlotName, StagingSlotName], wrapped_deck_conflict.DeckItem]
 ]:
     location_from_engine = engine_state.labware.get_location(labware_id=labware_id)
-
-    if (
-        isinstance(location_from_engine, AddressableAreaLocation)
-        and location_from_engine.addressableAreaName != "gripperWasteChute"
-    ):
+    if isinstance(location_from_engine, AddressableAreaLocation):
         # This will be guaranteed to be either deck slot name or staging slot name
         slot: Union[DeckSlotName, StagingSlotName]
         try:
@@ -302,10 +299,7 @@ def _map_labware(
         location_from_engine == OFF_DECK_LOCATION
         or location_from_engine == SYSTEM_LOCATION
         or isinstance(location_from_engine, InStackerHopperLocation)
-        or (
-            isinstance(location_from_engine, AddressableAreaLocation)
-            and location_from_engine.addressableAreaName == "gripperWasteChute"
-        )
+        or location_from_engine == WASTE_CHUTE_LOCATION
     ):
         # This labware is off-deck. Exclude it from conflict checking.
         # todo(mm, 2023-02-23): Move this logic into wrapped_deck_conflict.
