@@ -1,3 +1,5 @@
+import { sharedDataEn } from '@opentrons/shared-data'
+
 import anonymous from './anonymous.json'
 import app_settings from './app_settings.json'
 import branded from './branded.json'
@@ -62,4 +64,6 @@ export const en = {
   shared,
   top_navigation,
   deck_configuration,
+  //  spread in the json files from shared-data so they're included in the i18n.init resource
+  ...sharedDataEn,
 }

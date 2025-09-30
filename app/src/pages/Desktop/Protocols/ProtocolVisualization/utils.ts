@@ -237,12 +237,10 @@ export const getBackgroundColor = (
 }
 
 interface ActiveLayer {
-  copy: string
   isActiveLayerVisible: boolean
 }
 
 export const getActiveLayer = (
-  isTiprack: boolean,
   pipettes: PipetteTemporalProperties[],
   id: string,
   selectedRunTimeCommand?: RunTimeCommand
@@ -259,46 +257,13 @@ export const getActiveLayer = (
     selectedRunTimeCommand.commandType === 'moveLabware' &&
     'labwareId' in selectedRunTimeCommand.params &&
     selectedRunTimeCommand.params.labwareId === id
-  const isLoadStepAssosciatedWithLabwareId =
-    selectedRunTimeCommand != null &&
-    'labwareId' in selectedRunTimeCommand.params &&
-    selectedRunTimeCommand.params.labwareId === id &&
-    selectedRunTimeCommand.commandType === 'loadLabware'
 
   const isStepAssosciatedWithLabware =
     isStepAssosciatedWithLabwareState ||
     isStepAssosciatedWithLabwareId ||
     isMoveStepAssosciatedWithLabwareId
 
-  let activeCopy = isTiprack
-    ? 'Tiprack used in pipetting step'
-    : 'Labware used in pipetting step'
-  if (isLoadStepAssosciatedWithLabwareId) {
-    activeCopy = 'Loading labware'
-  } else if (isMoveStepAssosciatedWithLabwareId) {
-    activeCopy = 'Moving plate'
-  } else if (
-    isTiprack &&
-    isStepAssosciatedWithLabwareId &&
-    selectedRunTimeCommand?.commandType === 'pickUpTip'
-  ) {
-    activeCopy = 'Picking up tips'
-  } else if (
-    !isTiprack &&
-    isStepAssosciatedWithLabwareState &&
-    selectedRunTimeCommand?.commandType === 'aspirateInPlace'
-  ) {
-    activeCopy = 'Aspirating'
-  } else if (
-    !isTiprack &&
-    isStepAssosciatedWithLabwareState &&
-    selectedRunTimeCommand?.commandType === 'dispenseInPlace'
-  ) {
-    activeCopy = 'Dispensing'
-  }
-
   return {
-    copy: activeCopy,
     isActiveLayerVisible: isStepAssosciatedWithLabware,
   }
 }
@@ -416,25 +381,5 @@ export function getPreviousGroupFirstCommandId(
     return previousGroup.subCommands[0]?.command.id ?? null
   } else {
     return previousGroup.command.id
-  }
-}
-
-export const getThermocyclerOverlayText = (
-  commandType: RunTimeCommand['commandType']
-): string => {
-  switch (commandType) {
-    case 'loadModule':
-      return 'Load Thermocycler'
-    case 'thermocycler/openLid':
-      return 'Opening lid'
-    case 'thermocycler/closeLid':
-      return 'Closing lid'
-    case 'thermocycler/setTargetBlockTemperature':
-      return 'Setting block temperature'
-    case 'thermocycler/waitForLidTemperature':
-      return 'Setting lid temperature'
-    default:
-      //  TODO: the rest of the copy isn't needed for protocol viz user testing purposes
-      return 'Changing thermocycler state'
   }
 }

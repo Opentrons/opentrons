@@ -4,13 +4,15 @@ import capitalize from 'lodash/capitalize'
 import startCase from 'lodash/startCase'
 
 import { titleCase } from '../titleCase'
-import { en } from './en'
+import { sharedDataEn } from './en'
+
+export { sharedDataEn } from './en'
 
 i18n.use(initReactI18next).init(
   {
     lng: 'en',
     fallbackLng: 'en',
-    resources: { en },
+    resources: { sharedDataEn },
     ns: ['command_type_summary'],
     defaultNS: 'command_type_summary',
     interpolation: {

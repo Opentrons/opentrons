@@ -4,10 +4,15 @@ import type { RunTimeCommand } from '../../command/types'
 
 //  returns a command type summary given a specifi commandType
 export function useCommandTypeSummaries(
-  commandType: RunTimeCommand['commandType']
+  commandType?: RunTimeCommand['commandType']
 ): string {
   const { t } = useTranslation('command_type_summary')
   const fallback = 'Unknown'
+  console.log('commandType', commandType)
+  if (commandType == null) {
+    return fallback
+  }
+
   const translated = t(commandType, { defaultValue: fallback })
   if (translated === fallback) {
     console.error(
