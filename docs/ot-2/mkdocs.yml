@@ -10,7 +10,6 @@ nav:
   - Labware: labware.md
   - Software: software.md
   - Maintenance: maintenance.md
-  - Appendicies: appendicies.md
 
 theme:
   name: material
