@@ -127,7 +127,7 @@ const updatePatchOnPipetteChange = (
         Object.values(labwareEntities).map(({ labwareDefURI }) => labwareDefURI)
       )
       firstDefaultTiprackURIOnDeck =
-        pipetteTipracks.find(uri => labwareURIsOnDeck.has(uri)) ?? null
+        pipetteTipracks?.find(uri => labwareURIsOnDeck.has(uri)) ?? null
     }
 
     return {

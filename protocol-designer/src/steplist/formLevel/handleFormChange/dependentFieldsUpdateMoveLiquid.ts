@@ -207,7 +207,7 @@ const updatePatchOnPipetteChange = (
         Object.values(labwareEntities).map(({ labwareDefURI }) => labwareDefURI)
       )
       firstDefaultTiprackURIOnDeck =
-        pipetteTipracks.find(uri => labwareURIsOnDeck.has(uri)) ?? null
+        pipetteTipracks?.find(uri => labwareURIsOnDeck.has(uri)) ?? null
       airGapVolume = minVolume.toString()
       const hasPartialTipSupportedChannel =
         pipetteEntities[newPipette].spec.channels !== 1
