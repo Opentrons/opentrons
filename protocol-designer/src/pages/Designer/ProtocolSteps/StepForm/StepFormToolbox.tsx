@@ -552,7 +552,6 @@ const getStepFormNumPages = (
 ): number => {
   switch (stepType) {
     case 'mix':
-      return 3
     case 'moveLiquid':
       return 4
     case 'thermocycler':

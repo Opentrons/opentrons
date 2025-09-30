@@ -3,23 +3,14 @@ import { useSelector } from 'react-redux'
 
 import {
   DIRECTION_COLUMN,
-  Divider,
   Flex,
   SPACING,
   StyledText,
 } from '@opentrons/components'
 
-import { getEnableTipPickupLocation } from '/protocol-designer/feature-flags/selectors'
-import {
-  getAdditionalEquipmentEntities,
-  getLabwareEntities,
-} from '/protocol-designer/step-forms/selectors'
+import { getAdditionalEquipmentEntities } from '/protocol-designer/step-forms/selectors'
 
-import {
-  DropTipField,
-  PickUpTipField,
-  TipWellSelectionField,
-} from '../../PipetteFields'
+import { DropTipField } from '../../PipetteFields'
 import { ChangeTipField } from '../../PipetteFields/ChangeTipField'
 import { TipTrackingField } from '../../PipetteFields/TipTrackingField'
 
@@ -29,27 +20,24 @@ import type { FieldPropsByName } from '../../types'
 interface TipSettingsProps {
   propsForFields: FieldPropsByName
   formData: FormData
+  stepType: 'moveLiquid' | 'mix'
 }
 
 export function TipSettings(props: TipSettingsProps): JSX.Element {
   const { t } = useTranslation('protocol_steps')
-  const { propsForFields, formData } = props
+  const { propsForFields, formData, stepType } = props
 
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
-  const enableTipPickupLocation = useSelector(getEnableTipPickupLocation)
-  const labwares = useSelector(getLabwareEntities)
-  const userSelectedDropTipLocation =
-    labwares[String(propsForFields.dropTip_location.value)] != null
-  const userSelectedPickUpTipLocation =
-    labwares[String(propsForFields.pickUpTip_location.value)] != null
 
   const isDisposalLocation =
-    additionalEquipmentEntities[String(propsForFields.dispense_labware.value)]
+    stepType === 'moveLiquid' &&
+    (additionalEquipmentEntities[String(propsForFields.dispense_labware?.value)]
       ?.name === 'wasteChute' ||
-    additionalEquipmentEntities[String(propsForFields.dispense_labware.value)]
-      ?.name === 'trashBin'
+      additionalEquipmentEntities[
+        String(propsForFields.dispense_labware?.value)
+      ]?.name === 'trashBin')
 
   return (
     <Flex
@@ -68,9 +56,13 @@ export function TipSettings(props: TipSettingsProps): JSX.Element {
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
           <ChangeTipField
             {...propsForFields.changeTip}
-            aspirateWells={formData.aspirate_wells}
-            dispenseWells={formData.dispense_wells}
-            path={formData.path}
+            {...(stepType === 'moveLiquid'
+              ? {
+                  aspirateWells: formData.aspirate_wells,
+                  dispenseWells: formData.dispense_wells,
+                  path: formData.path,
+                }
+              : {})}
             stepType={formData.stepType}
             isDisposalLocation={isDisposalLocation}
             tooltipContent={null}
@@ -85,41 +77,6 @@ export function TipSettings(props: TipSettingsProps): JSX.Element {
           />
         </Flex>
       </Flex>
-      {enableTipPickupLocation ? (
-        <>
-          <Divider marginY="0" />
-          <PickUpTipField {...propsForFields.pickUpTip_location} />
-          {userSelectedPickUpTipLocation ? (
-            <>
-              <TipWellSelectionField
-                {...propsForFields.pickUpTip_wellNames}
-                nozzles={
-                  typeof propsForFields.nozzles.value === 'string'
-                    ? propsForFields.nozzles.value
-                    : null
-                }
-                labwareId={propsForFields.pickUpTip_location.value}
-                pipetteId={propsForFields.pipette.value}
-              />
-            </>
-          ) : null}
-        </>
-      ) : null}
-      {userSelectedDropTipLocation && enableTipPickupLocation ? (
-        <>
-          <Divider marginY="0" />
-          <TipWellSelectionField
-            {...propsForFields.dropTip_wellNames}
-            nozzles={
-              typeof propsForFields.nozzles.value === 'string'
-                ? propsForFields.nozzles.value
-                : null
-            }
-            labwareId={propsForFields.dropTip_location.value}
-            pipetteId={propsForFields.pipette.value}
-          />
-        </>
-      ) : null}
       <TipTrackingField
         propsForFields={propsForFields}
         padding={`0 ${SPACING.spacing16}`}

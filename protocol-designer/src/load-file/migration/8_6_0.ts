@@ -27,8 +27,9 @@ export const migrateFile = (
   const savedStepsWithUpdatedFields = Object.values(savedStepForms).reduce(
     (acc, form) => {
       //  introduction of allowing hours to heater-shaker timer field
+      const { id } = form
       if (form.stepType === 'heaterShaker') {
-        const { id, heaterShakerTimer } = form
+        const { heaterShakerTimer } = form
 
         return {
           ...acc,
@@ -44,7 +45,7 @@ export const migrateFile = (
       //  fixes a bug where the aspirate/dispense z-offset in the commands was
       //  defaulting to 1mm but the form fields were null
       if (form.stepType === 'moveLiquid') {
-        const { id, aspirate_mmFromBottom, dispense_mmFromBottom } = form
+        const { aspirate_mmFromBottom, dispense_mmFromBottom } = form
 
         return {
           ...acc,
@@ -60,6 +61,12 @@ export const migrateFile = (
                 : DEFAULT_MM_OFFSET_FROM_BOTTOM,
             tip_tracking: AUTOMATIC,
           },
+        }
+      }
+      if (form.stepType === 'mix') {
+        return {
+          ...acc,
+          [id]: { ...form, tip_tracking: AUTOMATIC },
         }
       }
       return acc

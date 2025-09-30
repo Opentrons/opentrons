@@ -59,7 +59,11 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
         )
       case 3:
         return (
-          <TipSettings propsForFields={propsForFields} formData={formData} />
+          <TipSettings
+            propsForFields={propsForFields}
+            formData={formData}
+            stepType="moveLiquid"
+          />
         )
       default:
         console.warn(

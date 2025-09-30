@@ -146,6 +146,7 @@ describe('getDefaultsForStepType', () => {
         pushOut_checkbox: null,
         pushOut_volume: null,
         mix_position_reference: 'well-bottom',
+        tip_tracking: 'automatic',
       })
     })
   })

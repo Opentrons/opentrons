@@ -93,7 +93,11 @@ export function MixTools(
     ),
 
     3: () => (
-      <TipSettings propsForFields={propsForFields} formData={formData} />
+      <TipSettings
+        propsForFields={propsForFields}
+        formData={formData}
+        stepType="mix"
+      />
     ),
   }
 
