@@ -182,5 +182,9 @@
   "view_recovery_options": "View recovery options",
   "you_can_still_drop_tips": "You can still drop the attached tips before proceeding to tip selection.",
   "stacker_shuttle_store_empty_error_occurs_when": "Shuttle empty errors occur when the robot tries to store labware into a stacker from an empty shuttle",
-  "load_labware_shuttle_to_proceed": "Load the shuttle with the correct labware to complete the stacker store step"
+  "load_labware_shuttle_to_proceed": "Load the shuttle with the correct labware to complete the stacker store step",
+  "stacker_shuttle_occupied_error_occurs_when": "Stacker shuttle full errors occur when the shuttle has labware when it should be empty",
+  "remove_labware_from_shuttle_to_proceed": "Remove the labware from the shuttle to complete the stacker retrieve step",
+  "stacker_hopper_or_shuttle_empty_error_occurs_when": "Stacker errors occur when the stacker is empty when the robot expects the stacker to be filled, or when labware is stuck on the labware latch",
+  "troubleshoot_issue_complete_retrieve_step": "Troubleshoot the issue to complete the stacker retrieve step"
 }

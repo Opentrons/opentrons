@@ -15,7 +15,9 @@ import {
   LabwareMissingOnShuttleErrorBanner,
   NoLiquidDetectedBanner,
   OverpressureBanner,
+  StackerHopperOrShuttleEmptyErrorBanner,
   StackerShuttleMissingErrorBanner,
+  StackerShuttleOccupiedErrorBanner,
   StackerShuttleStoreEmptyErrorBanner,
   StackerStallErrorBanner,
   StallErrorBanner,
@@ -239,6 +241,35 @@ describe('renders the InlineNotification', () => {
         type: 'alert',
         heading: `A stall or collision is detected when the robot's motors are blocked`,
         message: 'Clear obstructions before proceeding',
+      }),
+      {}
+    )
+  })
+  it('renders the InlineNotification for StackerShuttleOccupiedErrorBanner', () => {
+    renderWithProviders(<StackerShuttleOccupiedErrorBanner />, {
+      i18nInstance: i18n,
+    })
+    expect(vi.mocked(InlineNotification)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'alert',
+        heading:
+          'Stacker shuttle full errors occur when the shuttle has labware when it should be empty',
+        message:
+          'Remove the labware from the shuttle to complete the stacker retrieve step',
+      }),
+      {}
+    )
+  })
+  it('renders the InlineNotification for StackerHopperOrShuttleEmptyErrorBanner', () => {
+    renderWithProviders(<StackerHopperOrShuttleEmptyErrorBanner />, {
+      i18nInstance: i18n,
+    })
+    expect(vi.mocked(InlineNotification)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'alert',
+        heading:
+          'Stacker errors occur when the stacker is empty when the robot expects the stacker to be filled, or when labware is stuck on the labware latch',
+        message: 'Troubleshoot the issue to complete the stacker retrieve step',
       }),
       {}
     )
