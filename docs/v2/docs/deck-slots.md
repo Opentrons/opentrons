@@ -124,7 +124,7 @@ staging_plate = protocol.load_labware(
 
 It is possible to use slot D4 along with the waste chute. See the [Waste Chute](#waste-chute) section below for details.
 
-### Trash Bin
+### Trash Bin { #trash-bin-api }
 
 In version 2.15 of the API, Flex can only have a single trash bin in slot A3. You do not have to (and cannot) load the trash in version 2.15 protocols.
 
@@ -139,7 +139,7 @@ default_trash = protocol.load_trash_bin(location = "A3")
 
 Call `load_trash_bin()` multiple times to add more than one bin. See [Adding Trash Containers][adding-trash-containers] for more information on using pipettes with multiple trash bins.
 
-### Waste Chute
+### Waste Chute { #waste-chute-api }
 
 The waste chute accepts various materials from Flex pipettes or the Flex Gripper and uses gravity to transport them outside of the robot for disposal. Pipettes can dispose of liquid or drop tips into the chute. The gripper can drop tip racks and other labware into the chute.
 
