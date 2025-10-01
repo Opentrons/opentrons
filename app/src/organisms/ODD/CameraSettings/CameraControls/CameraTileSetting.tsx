@@ -56,7 +56,10 @@ export function CameraTileSetting({
           />
           <div className={styles.tile_container}>
             {SETTING_TILE.map(level => (
-              <SettingTile isActive={adjustedValue >= level * TILE_VALUE} />
+              <SettingTile
+                key={level}
+                isActive={adjustedValue >= level * TILE_VALUE}
+              />
             ))}
           </div>
           <IconButton
@@ -86,5 +89,5 @@ function SettingTile({ isActive }: { isActive: boolean }): JSX.Element {
 
 // Round a setting value to a valid percentage, 0%, 25%, 50%, 75%, or 100%.
 const roundValueToValidPercentage = (value: number): number => {
-  return Math.round(value * 4) / 4
+  return Math.round(value / TILE_VALUE) * TILE_VALUE
 }

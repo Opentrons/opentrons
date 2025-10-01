@@ -42,6 +42,7 @@ import {
   ViewOnlyParameters,
 } from '/app/organisms/ODD/ProtocolSetup'
 import { mockRunTimeParameterData } from '/app/organisms/ODD/ProtocolSetup/__fixtures__'
+import { ProtocolSetupCamera } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupCamera'
 import { mockProtocolModuleInfo } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupInstruments/__fixtures__'
 import { ConfirmCancelRunModal } from '/app/organisms/ODD/RunningProtocol'
 import {
@@ -52,6 +53,7 @@ import { useToaster } from '/app/organisms/ToasterOven'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import { useRobotType } from '/app/redux-resources/robots'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
+import { useFeatureFlag } from '/app/redux/config'
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
@@ -137,6 +139,8 @@ vi.mock('/app/resources/maintenance_runs')
 vi.mock('/app/local-resources/instruments')
 vi.mock('/app/organisms/DoorOpenControl/useIsDoorOpen')
 vi.mock('/app/organisms/LabwarePositionCheck')
+vi.mock('/app/organisms/ODD/ProtocolSetup/ProtocolSetupCamera')
+vi.mock('/app/redux/config')
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -153,6 +157,7 @@ const render = (path = '/') => {
 
 const MockProtocolSetupLabware = vi.mocked(ProtocolSetupLabware)
 const MockProtocolSetupOffsets = vi.mocked(ProtocolSetupOffsets)
+const MockProtocolSetupCamera = vi.mocked(ProtocolSetupCamera)
 const MockProtocolSetupTitleSkeleton = vi.mocked(ProtocolSetupTitleSkeleton)
 const MockProtocolSetupStepSkeleton = vi.mocked(ProtocolSetupStepSkeleton)
 const MockConfirmSetupStepsCompleteModal = vi.mocked(
@@ -351,6 +356,7 @@ describe('ProtocolSetup', () => {
       isApplyingOffsets: false,
       applyOffsets: vi.fn(),
     })
+    when(vi.mocked(useFeatureFlag)).calledWith('camera').thenReturn(true)
   })
 
   it('should render text, image, and buttons', () => {
@@ -464,6 +470,16 @@ describe('ProtocolSetup', () => {
     fireEvent.click(screen.getByText('Labware Offsets'))
     expect(MockProtocolSetupOffsets).toHaveBeenCalled()
     screen.getByText(/Mock ProtocolSetupOffsets/)
+  })
+
+  it('should launch camera screen when click camera', () => {
+    MockProtocolSetupCamera.mockImplementation(
+      vi.fn(() => <div>Mock ProtocolSetupCamera</div>)
+    )
+    render(`/runs/${RUN_ID}/setup/`)
+    fireEvent.click(screen.getByText('Camera'))
+    expect(MockProtocolSetupOffsets).toHaveBeenCalled()
+    screen.getByText(/Mock ProtocolSetupCamera/)
   })
 
   it.skip('should render a confirmation modal when heater-shaker is in a protocol and it is not shaking', () => {
