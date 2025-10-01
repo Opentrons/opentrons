@@ -27,12 +27,15 @@ class ConnectionHandler:
             try:
                 response = self._emulator.handle(line.decode().strip())
                 if response:
-                    response = f"{response}\r\n"
-                    logger.debug("%s Sending: %s", emulator_name, response)
-                    writer.write(response.encode())
+                    response_bytes = response.encode() + self._emulator.get_terminator()
+                    logger.debug(f"{emulator_name} Sending: {response_bytes!r}")
+                    writer.write(response_bytes)
             except Exception as e:
                 logger.exception("%s exception", emulator_name)
-                writer.write(f"Error: {str(e)}\r\n".encode())
+                writer.write(
+                    f"Error: {str(e)} ".encode() + self._emulator.get_terminator()
+                )
 
-            writer.write(self._emulator.get_ack())
+            if self._emulator.get_autoack():
+                writer.write(self._emulator.get_ack())
             await writer.drain()
