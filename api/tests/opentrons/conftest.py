@@ -41,7 +41,6 @@ from opentrons_shared_data.liquid_classes.types import (
     DelayPropertiesDict,
 )
 from opentrons.protocol_engine.types import PostRunHardwareState
-from opentrons.protocol_engine.resources.camera_provider import CameraProvider
 
 try:
     import aionotify  # type: ignore[import-untyped]

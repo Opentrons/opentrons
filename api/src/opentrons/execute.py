@@ -645,6 +645,7 @@ def _run_file_pe(
             hardware_api=hardware_api_wrapped,
         )
 
+        # todo (chb, 2025-09-30): The Camera Provider is provided in to a run by the robot server, no analog exists for execute
         orchestrator = RunOrchestrator(
             hardware_api=hardware_api_wrapped,
             protocol_engine=protocol_engine,
@@ -658,6 +659,7 @@ def _run_file_pe(
             protocol_live_runner=LiveRunner(
                 protocol_engine=protocol_engine, hardware_api=hardware_api_wrapped
             ),
+            camera_provider=None,
         )
 
         unsubscribe = protocol_runner.broker.subscribe(

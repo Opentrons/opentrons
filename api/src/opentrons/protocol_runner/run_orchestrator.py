@@ -83,7 +83,7 @@ class RunOrchestrator:
     _protocol_live_runner: protocol_runner.LiveRunner
     _hardware_api: HardwareControlAPI
     _protocol_engine: ProtocolEngine
-    _camera_provider: CameraProvider
+    _camera_provider: Optional[CameraProvider] = None
 
     def __init__(
         self,
@@ -93,7 +93,7 @@ class RunOrchestrator:
         fixit_runner: protocol_runner.LiveRunner,
         setup_runner: protocol_runner.LiveRunner,
         protocol_live_runner: protocol_runner.LiveRunner,
-        camera_provider: CameraProvider,
+        camera_provider: Optional[CameraProvider] = None,
         json_or_python_protocol_runner: Optional[
             Union[protocol_runner.PythonAndLegacyRunner, protocol_runner.JsonRunner]
         ] = None,
@@ -133,8 +133,8 @@ class RunOrchestrator:
     def build_orchestrator(
         cls,
         hardware_api: HardwareControlAPI,
-        camera_provider: CameraProvider,
         protocol_engine: ProtocolEngine,
+        camera_provider: Optional[CameraProvider] = None,
         protocol_config: Optional[
             Union[JsonProtocolConfig, PythonProtocolConfig]
         ] = None,
@@ -190,7 +190,8 @@ class RunOrchestrator:
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
     ) -> RunResult:
         """Start the run."""
-        await camera.update_live_stream_status(True, self._camera_provider)
+        if self._camera_provider:
+            await camera.update_live_stream_status(True, self._camera_provider)
         if self._protocol_runner:
             return await self._protocol_runner.run(
                 deck_configuration=deck_configuration,
@@ -219,7 +220,8 @@ class RunOrchestrator:
                 post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
             )
         # Shut down the live stream, if there is one
-        await camera.update_live_stream_status(False, self._camera_provider)
+        if self._camera_provider:
+            await camera.update_live_stream_status(False, self._camera_provider)
 
     def resume_from_recovery(self, reconcile_false_positive: bool) -> None:
         """Resume the run from recovery."""

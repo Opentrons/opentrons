@@ -359,7 +359,7 @@ boolean_setting_table = sqlalchemy.Table(
             BooleanSettingKey,
             values_callable=lambda obj: [e.value for e in obj],
             validate_strings=True,
-            create_constraint=False,
+            create_constraint=True,
         ),
         primary_key=True,
     ),

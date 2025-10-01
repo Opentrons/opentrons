@@ -1,8 +1,11 @@
 """Wrapper to provide the callbacks utilized by the Protocol Engine Camera Utility."""
 from typing import Annotated
 from fastapi import Depends
-from robot_server.camera.settings.store import CameraSettingStore, get_camera_setting_store
-from opentrons.system.camera import CameraSettings
+from robot_server.camera.settings.store import (
+    CameraSettingStore,
+    get_camera_setting_store,
+)
+from opentrons.protocol_engine.resources.camera_provider import CameraSettings
 
 
 class CameraProviderWrapper:

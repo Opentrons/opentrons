@@ -26,7 +26,10 @@ from robot_server.runs.run_data_manager import RunDataManager
 from robot_server.hardware import get_robot_type_enum
 from opentrons_shared_data.robot.types import RobotTypeEnum
 from opentrons.protocol_engine import EngineStatus
-from robot_server.camera.settings.store import CameraSettingStore, get_camera_setting_store
+from robot_server.camera.settings.store import (
+    CameraSettingStore,
+    get_camera_setting_store,
+)
 
 
 log = logging.getLogger(__name__)
@@ -68,13 +71,19 @@ async def post_camera(
     if request_body.data.cameraEnabled is not None:
         camera_settings_store.set_camera_enable(request_body.data.cameraEnabled)
     if request_body.data.liveStreamEnabled is not None:
-        camera_settings_store.set_live_stream_enable(request_body.data.liveStreamEnabled)
+        camera_settings_store.set_live_stream_enable(
+            request_body.data.liveStreamEnabled
+        )
     if request_body.data.errorRecoveryCameraEnabled:
-        camera_settings_store.set_error_recovery_camera_enable(request_body.data.errorRecoveryCameraEnabled)
+        camera_settings_store.set_error_recovery_camera_enable(
+            request_body.data.errorRecoveryCameraEnabled
+        )
 
     camera_enabled = camera_settings_store.get_camera_enabled()
     live_stream_enabled = camera_settings_store.get_live_stream_enabled()
-    error_recovery_camera_enabled = camera_settings_store.get_error_recovery_camera_enabled()
+    error_recovery_camera_enabled = (
+        camera_settings_store.get_error_recovery_camera_enabled()
+    )
 
     stream_settings = _get_stream_settings()
     if (
@@ -128,7 +137,9 @@ async def get_camera(
 
     camera_status = camera_settings_store.get_camera_enabled()
     live_status = camera_settings_store.get_live_stream_enabled()
-    error_recovery_camera_status = camera_settings_store.get_error_recovery_camera_enabled()
+    error_recovery_camera_status = (
+        camera_settings_store.get_error_recovery_camera_enabled()
+    )
     return CameraEnable(
         cameraEnabled=camera_status,
         liveStreamEnabled=live_status,
@@ -262,7 +273,7 @@ async def post_live_stream_settings(
 
     camera_enabled = camera_settings_store.get_camera_enabled()
     live_stream_enabled = camera_settings_store.get_live_stream_enabled()
-    
+
     if (
         camera_enabled
         and live_stream_enabled
