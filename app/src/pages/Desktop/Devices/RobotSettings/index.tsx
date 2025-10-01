@@ -20,11 +20,12 @@ import { ApiHostProvider } from '@opentrons/react-api-client'
 import { NavTab } from '/app/molecules/NavTab'
 import { ReachableBanner } from '/app/organisms/Desktop/Devices/ReachableBanner'
 import { RobotSettingsAdvanced } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsAdvanced'
+import { RobotSettingsCamera } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera'
 import { RobotSettingsFeatureFlags } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsFeatureFlags'
 import { RobotSettingsNetworking } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsNetworking'
 import { RobotSettingsCalibration } from '/app/organisms/Desktop/RobotSettingsCalibration'
 import { useRobot } from '/app/redux-resources/robots'
-import { getDevtoolsEnabled } from '/app/redux/config'
+import { getDevtoolsEnabled, useFeatureFlag } from '/app/redux/config'
 import {
   CONNECTABLE,
   OPENTRONS_USB,
@@ -46,6 +47,7 @@ export function RobotSettings(): JSX.Element | null {
   const isNetworkingDisabled = robot?.status === UNREACHABLE
   const [showRobotBusyBanner, setShowRobotBusyBanner] = useState<boolean>(false)
   const robotUpdateSession = useSelector(getRobotUpdateSession)
+  const isCameraEnabled = useFeatureFlag('camera')
 
   const updateRobotStatus = (isRobotBusy: boolean): void => {
     if (isRobotBusy) setShowRobotBusyBanner(true)
@@ -66,6 +68,7 @@ export function RobotSettings(): JSX.Element | null {
         updateRobotStatus={updateRobotStatus}
       />
     ),
+    camera: <RobotSettingsCamera />,
     advanced: (
       <RobotSettingsAdvanced
         robotName={robotName}
@@ -139,6 +142,12 @@ export function RobotSettings(): JSX.Element | null {
               tabName={t('networking')}
               disabled={isNetworkingDisabled}
             />
+            {isCameraEnabled ? (
+              <NavTab
+                to={`/devices/${robotName}/robot-settings/camera`}
+                tabName={t('camera')}
+              />
+            ) : null}
             <NavTab
               to={`/devices/${robotName}/robot-settings/advanced`}
               tabName={t('advanced')}

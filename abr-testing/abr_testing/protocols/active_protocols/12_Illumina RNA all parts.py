@@ -21,7 +21,7 @@ metadata = {
 }
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.25",
+    "apiLevel": "2.26",
 }
 
 
@@ -70,6 +70,8 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
+    helpers.comment_protocol_version(protocol, "02")
+
     # ======================== DOWNLOADED PARAMETERS ========================
     global REUSE_ANY_50_TIPS  # T/F Whether or not Reusing any p50
     global REUSE_ANY_200_TIPS  # T/F Whether or not Reusing any p200

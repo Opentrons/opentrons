@@ -1,0 +1,128 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-24);
+}
+
+.content_container {
+  display: flex;
+  gap: var(--spacing-24);
+}
+
+.footer_container {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.settings_container {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: var(--spacing-16);
+  border: 1px solid var(--grey-30);
+  border-radius: var(--border-radius-4);
+  gap: var(--spacing-16);
+}
+
+.zoom_container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-16);
+}
+
+.zoom_text_container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.zoom_btn_container {
+  display: flex;
+  gap: var(--spacing-8);
+}
+
+.zoom_btn {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-8);
+  border-radius: var(--border-radius-8);
+  background: white;
+  cursor: pointer;
+  gap: var(--spacing-2);
+}
+
+.zoom_btn_txt {
+  color: var(--grey-60);
+}
+
+.zoom_btn_txt_active {
+  color: var(--blue-50);
+}
+
+.zoom_btn_txt_inactive {
+  color: var(--black-90);
+}
+
+.zoom_btn_inactive {
+  border: 1px solid var(--grey-30);
+}
+
+.zoom_btn_active {
+  border: 1px solid var(--blue-50);
+}
+
+.slider_setting_container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-16);
+}
+
+.slider_setting_text_container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.slider_value_container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-8);
+}
+
+.slider_basic {
+  width: 100%;
+  height: 4px;
+  border-radius: var(--border-radius-2);
+  appearance: none;
+  background:
+    linear-gradient(
+      to right,
+      var(--blue-50) 0%,
+      var(--blue-50) var(--slider-progress, 50%),
+      var(--grey-30) var(--slider-progress, 50%),
+      var(--grey-30) 100%
+    );
+  cursor: pointer;
+  outline: none;
+}
+
+.slider_basic::-webkit-slider-thumb {
+  width: 16px;
+  height: 16px;
+  border: none;
+  border-radius: 50%;
+  appearance: none;
+  background: var(--blue-50);
+  cursor: pointer;
+}
+
+/* Necessary to ensure dynamic percentages don't resize the slider. */
+.slider_percentage {
+  min-width: 2rem;
+  text-align: right;
+}
