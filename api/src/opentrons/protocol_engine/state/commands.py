@@ -516,10 +516,13 @@ class CommandStore(HasState[CommandState], HandlesActions):
         )
 
         if action.finish_error_details:
-            self._state.finish_error = self._map_finish_exception_to_error_occurrence(
-                action.finish_error_details.error_id,
-                action.finish_error_details.created_at,
-                action.finish_error_details.error,
+            self._state.finish_error = (
+                self._state.finish_error
+                or self._map_finish_exception_to_error_occurrence(
+                    action.finish_error_details.error_id,
+                    action.finish_error_details.created_at,
+                    action.finish_error_details.error,
+                )
             )
 
     def _handle_door_change_action(self, action: DoorChangeAction) -> None:
