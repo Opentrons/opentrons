@@ -1292,6 +1292,7 @@ async def test_engage_motors(
         (80, 79, 0, 0, 1, 92, 60, False),
         (80, 45, 40, 0, 1, 92, 60, True),
         (80, 100, 0, 40, 0, 92, 60, True),
+        (95.5, 84, 0, 5, 5, 94, 60, True),
     ],
 )
 def test_grip_error_detection(
@@ -1318,6 +1319,42 @@ def test_grip_error_detection(
             allowed_error,
             hard_min,
             hard_max,
+        )
+
+
+@pytest.mark.parametrize(
+    "expected_grip_width,actual_grip_width,wider,narrower,allowed_error,hard_max,hard_min,raise_error",
+    [
+        (95.5, 84, 0, 5, 5, 94, 60, False),
+        (95.5, 60, 0, 5, 5, 94, 60, True),
+        (95.5, 94, 0, 5, 5, 94, 60, True),
+    ],
+)
+def test_grip_error_detection_disable_geometry(
+    controller: OT3Controller,
+    expected_grip_width: float,
+    actual_grip_width: float,
+    wider: float,
+    narrower: float,
+    allowed_error: float,
+    hard_max: float,
+    hard_min: float,
+    raise_error: bool,
+) -> None:
+    context = cast(
+        AbstractContextManager[None],
+        pytest.raises(FailedGripperPickupError) if raise_error else does_not_raise(),
+    )
+    with context:
+        controller.check_gripper_position_within_bounds(
+            expected_grip_width,
+            wider,
+            narrower,
+            actual_grip_width,
+            allowed_error,
+            hard_min,
+            hard_max,
+            True,
         )
 
 

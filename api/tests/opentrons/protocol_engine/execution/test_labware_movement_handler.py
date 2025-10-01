@@ -4,10 +4,11 @@ from __future__ import annotations
 
 from datetime import datetime
 from typing import TYPE_CHECKING, Union, Optional
-from unittest.mock import sentinel
 
 from decoy import Decoy, matchers
 import pytest
+
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition2
 
 from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
 from opentrons.hardware_control import HardwareControlAPI
@@ -89,8 +90,17 @@ def heater_shaker_movement_flagger(decoy: Decoy) -> HeaterShakerMovementFlagger:
     return decoy.mock(cls=HeaterShakerMovementFlagger)
 
 
+@pytest.fixture
+def labware_def(decoy: Decoy) -> LabwareDefinition2:
+    """Get a mocked out LabwareDefinition2 instance."""
+    return decoy.mock(cls=LabwareDefinition2)
+
+
 async def set_up_decoy_hardware_gripper(
-    decoy: Decoy, ot3_hardware_api: OT3API, state_store: StateStore
+    decoy: Decoy,
+    ot3_hardware_api: OT3API,
+    state_store: StateStore,
+    labware_def: LabwareDefinition2,
 ) -> None:
     """Shared hardware gripper decoy setup."""
     decoy.when(state_store.config.use_virtual_gripper).then_return(False)
@@ -111,9 +121,7 @@ async def set_up_decoy_hardware_gripper(
 
     decoy.when(ot3_hardware_api.hardware_gripper.jaw_width).then_return(89)
 
-    decoy.when(
-        state_store.labware.get_grip_force(sentinel.my_teleporting_labware_def)
-    ).then_return(100)
+    decoy.when(state_store.labware.get_grip_force(labware_def)).then_return(100)
 
     decoy.when(state_store.labware.get_labware_offset("new-offset-id")).then_return(
         LabwareOffset(
@@ -156,13 +164,16 @@ async def test_raise_error_if_gripper_pickup_failed(
     state_store: StateStore,
     thermocycler_plate_lifter: ThermocyclerPlateLifter,
     ot3_hardware_api: OT3API,
+    labware_def: LabwareDefinition2,
     subject: LabwareMovementHandler,
 ) -> None:
     """Test that the gripper position check is called at the right time."""
     #  This function should only be called when after the gripper opens,
     #  and then closes again. This is when we expect the labware to be
     #  in the gripper jaws.
-    await set_up_decoy_hardware_gripper(decoy, ot3_hardware_api, state_store)
+    await set_up_decoy_hardware_gripper(
+        decoy, ot3_hardware_api, state_store, labware_def
+    )
     assert ot3_hardware_api.hardware_gripper
 
     user_pick_up_offset = Point(x=123, y=234, z=345)
@@ -175,9 +186,11 @@ async def test_raise_error_if_gripper_pickup_failed(
     starting_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
     to_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_2)
 
+    labware_def.parameters.quirks = []
+
     decoy.when(
         state_store.labware.get_definition("my-teleporting-labware")
-    ).then_return(sentinel.my_teleporting_labware_def)
+    ).then_return(labware_def)
 
     mock_tc_context_manager = decoy.mock(name="mock_tc_context_manager")
     decoy.when(
@@ -202,21 +215,19 @@ async def test_raise_error_if_gripper_pickup_failed(
 
     decoy.when(
         state_store.geometry.get_labware_grip_point(
-            labware_definition=sentinel.my_teleporting_labware_def,
+            labware_definition=labware_def,
             location=starting_location,
         )
     ).then_return(Point(101, 102, 119.5))
 
     decoy.when(
         state_store.geometry.get_labware_grip_point(
-            labware_definition=sentinel.my_teleporting_labware_def, location=to_location
+            labware_definition=labware_def, location=to_location
         )
     ).then_return(Point(201, 202, 219.5))
 
     decoy.when(
-        state_store.labware.get_gripper_width_specs(
-            labware_definition=sentinel.my_teleporting_labware_def
-        )
+        state_store.labware.get_gripper_width_specs(labware_definition=labware_def)
     ).then_return(GripSpecs(targetY=100, uncertaintyNarrower=5, uncertaintyWider=10))
 
     await subject.move_labware_with_gripper(
@@ -238,18 +249,21 @@ async def test_raise_error_if_gripper_pickup_failed(
             expected_grip_width=100,
             grip_width_uncertainty_wider=10,
             grip_width_uncertainty_narrower=5,
+            disable_geometry_grip_check=False,
         ),
         await ot3_hardware_api.grip(force_newtons=100),
         ot3_hardware_api.raise_error_if_gripper_pickup_failed(
             expected_grip_width=100,
             grip_width_uncertainty_wider=10,
             grip_width_uncertainty_narrower=5,
+            disable_geometry_grip_check=False,
         ),
         await ot3_hardware_api.grip(force_newtons=100),
         ot3_hardware_api.raise_error_if_gripper_pickup_failed(
             expected_grip_width=100,
             grip_width_uncertainty_wider=10,
             grip_width_uncertainty_narrower=5,
+            disable_geometry_grip_check=False,
         ),
         await ot3_hardware_api.disengage_axes([Axis.Z_G]),
         await ot3_hardware_api.ungrip(),
@@ -292,6 +306,7 @@ async def test_move_labware_with_gripper(
     thermocycler_plate_lifter: ThermocyclerPlateLifter,
     ot3_hardware_api: OT3API,
     subject: LabwareMovementHandler,
+    labware_def: LabwareDefinition2,
     from_location: Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation],
     to_location: Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation],
     slide_offset: Optional[Point],
@@ -300,11 +315,14 @@ async def test_move_labware_with_gripper(
     # TODO (spp, 2023-07-26): this test does NOT stub out movement waypoints in order to
     #  keep this as the semi-smoke test that it previously was. We should add a proper
     #  smoke test for gripper labware movement with actual labware and make this a unit test.
-    await set_up_decoy_hardware_gripper(decoy, ot3_hardware_api, state_store)
+    labware_def.parameters.quirks = []
+    await set_up_decoy_hardware_gripper(
+        decoy, ot3_hardware_api, state_store, labware_def
+    )
 
     decoy.when(
         state_store.labware.get_definition("my-teleporting-labware")
-    ).then_return(sentinel.my_teleporting_labware_def)
+    ).then_return(labware_def)
 
     user_pick_up_offset = Point(x=123, y=234, z=345)
     user_drop_offset = Point(x=111, y=222, z=333)
@@ -329,26 +347,22 @@ async def test_move_labware_with_gripper(
     )  # TODO: Is this used for anything? Could this have been a sentinel? Are sentinels appropriate here?
 
     decoy.when(
-        state_store.labware.get_dimensions(
-            labware_definition=sentinel.my_teleporting_labware_def
-        )
+        state_store.labware.get_dimensions(labware_definition=labware_def)
     ).then_return(Dimensions(x=100, y=85, z=0))
 
     decoy.when(
-        state_store.labware.get_well_bbox(
-            labware_definition=sentinel.my_teleporting_labware_def
-        )
+        state_store.labware.get_well_bbox(labware_definition=labware_def)
     ).then_return(Dimensions(x=99, y=80, z=1))
 
     decoy.when(
         state_store.geometry.get_labware_grip_point(
-            labware_definition=sentinel.my_teleporting_labware_def,
+            labware_definition=labware_def,
             location=from_location,
         )
     ).then_return(Point(101, 102, 119.5))
     decoy.when(
         state_store.geometry.get_labware_grip_point(
-            labware_definition=sentinel.my_teleporting_labware_def, location=to_location
+            labware_definition=labware_def, location=to_location
         )
     ).then_return(Point(201, 202, 219.5))
     mock_tc_context_manager = decoy.mock(name="mock_tc_context_manager")
@@ -359,9 +373,7 @@ async def test_move_labware_with_gripper(
     ).then_return(mock_tc_context_manager)
 
     decoy.when(
-        state_store.labware.get_gripper_width_specs(
-            labware_definition=sentinel.my_teleporting_labware_def
-        )
+        state_store.labware.get_gripper_width_specs(labware_definition=labware_def)
     ).then_return(GripSpecs(targetY=100, uncertaintyNarrower=5, uncertaintyWider=10))
 
     expected_waypoints = [

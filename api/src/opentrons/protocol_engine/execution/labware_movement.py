@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Optional, TYPE_CHECKING, overload
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition, Quirks
 
 from opentrons.types import Point
 
@@ -238,6 +238,13 @@ class LabwareMovementHandler:
                             labware_definition=labware_definition
                         )
 
+                        disable_geometry_grip_check = False
+                        if labware_definition.parameters.quirks is not None:
+                            disable_geometry_grip_check = (
+                                Quirks.disableGeometryBasedGripCheck  # type: ignore[comparison-overlap]
+                                in labware_definition.parameters.quirks
+                            )
+
                         # todo(mm, 2024-09-26): This currently raises a lower-level 2015 FailedGripperPickupError.
                         # Convert this to a higher-level 3001 LabwareDroppedError or 3002 LabwareNotPickedUpError,
                         # depending on what waypoint we're at, to propagate a more specific error code to users.
@@ -245,6 +252,7 @@ class LabwareMovementHandler:
                             expected_grip_width=grip_specs.targetY,
                             grip_width_uncertainty_wider=grip_specs.uncertaintyWider,
                             grip_width_uncertainty_narrower=grip_specs.uncertaintyNarrower,
+                            disable_geometry_grip_check=disable_geometry_grip_check,
                         )
                 await ot3api.move_to(
                     mount=gripper_mount, abs_position=waypoint_data.position
