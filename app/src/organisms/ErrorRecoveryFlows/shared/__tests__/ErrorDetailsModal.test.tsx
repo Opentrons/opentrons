@@ -253,7 +253,7 @@ describe('renders the InlineNotification', () => {
       expect.objectContaining({
         type: 'alert',
         heading:
-          'Stacker shuttle full errors occur when the shuttle has labware when it should be empty',
+          'Stacker shuttle in use errors occur when the shuttle has labware when it should be empty',
         message:
           'Remove the labware from the shuttle to complete the stacker retrieve step',
       }),
