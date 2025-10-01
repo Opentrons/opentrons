@@ -24,7 +24,7 @@
   ],
   "parameters": {
     "format": "irregular",
-    "quirks": ["legacyGripCheck"],
+    "quirks": ["disableGeometryBasedGripCheck"],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
     "loadName": "opentrons_flex_lid_absorbance_plate_reader_module"

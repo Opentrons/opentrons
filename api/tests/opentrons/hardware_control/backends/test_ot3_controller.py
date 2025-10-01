@@ -1330,7 +1330,7 @@ def test_grip_error_detection(
         (95.5, 94, 0, 5, 5, 94, 60, True),
     ],
 )
-def test_grip_error_detection_legacy(
+def test_grip_error_detection_disable_geometry(
     controller: OT3Controller,
     expected_grip_width: float,
     actual_grip_width: float,

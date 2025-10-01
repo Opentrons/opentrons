@@ -238,10 +238,10 @@ class LabwareMovementHandler:
                             labware_definition=labware_definition
                         )
 
-                        legacy_grip_check = False
+                        disable_geometry_grip_check = False
                         if labware_definition.parameters.quirks is not None:
-                            legacy_grip_check = (
-                                Quirks.legacyGripCheck  # type: ignore[comparison-overlap]
+                            disable_geometry_grip_check = (
+                                Quirks.disableGeometryBasedGripCheck  # type: ignore[comparison-overlap]
                                 in labware_definition.parameters.quirks
                             )
 
@@ -252,7 +252,7 @@ class LabwareMovementHandler:
                             expected_grip_width=grip_specs.targetY,
                             grip_width_uncertainty_wider=grip_specs.uncertaintyWider,
                             grip_width_uncertainty_narrower=grip_specs.uncertaintyNarrower,
-                            legacy_grip_check=legacy_grip_check,
+                            disable_geometry_grip_check=disable_geometry_grip_check,
                         )
                 await ot3api.move_to(
                     mount=gripper_mount, abs_position=waypoint_data.position

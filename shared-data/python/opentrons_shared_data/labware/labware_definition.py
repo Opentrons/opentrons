@@ -116,7 +116,7 @@ class LabwareRole(str, Enum):
 
 
 class Quirks(Enum):
-    legacyGripCheck = "legacyGripCheck"
+    disableGeometryBasedGripCheck = "disableGeometryBasedGripCheck"
 
 
 class Metadata(BaseModel):
